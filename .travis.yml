@@ -6,4 +6,4 @@ cache:
 
 script:
   - npm test
-  - npm run prettier-ci
+  - ./bin/check-code-style.sh
