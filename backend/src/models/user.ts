@@ -1,13 +1,14 @@
 import Sequelize from "sequelize"
 
-interface IUserAttributes {
+interface IUser {
   id: number
 }
 
-type UserInstance = Sequelize.Instance<IUserAttributes> & IUserAttributes
+export type User = Sequelize.Instance<IUser> & IUser
+export type UserModel = Sequelize.Model<User, IUser>
 
-export default (sequalize: Sequelize.Sequelize) => {
-  return sequalize.define<UserInstance, IUserAttributes>("user", {
+export default (sequelize: Sequelize.Sequelize): UserModel => {
+  return sequelize.define<User, IUser>("user", {
     id: {
       primaryKey: true,
       type: Sequelize.INTEGER,

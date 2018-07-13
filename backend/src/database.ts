@@ -1,6 +1,8 @@
 import Sequelize from "sequelize"
 
+import languageFactory from "./models/language"
 import organizationFactory from "./models/organization"
+import textResourceFactory from "./models/textresource"
 import userFactory from "./models/user"
 
 const sequelize = new Sequelize("tulir", "", "", {
@@ -26,12 +28,12 @@ const db = {
 
   Organization: organizationFactory(sequelize),
   User: userFactory(sequelize),
+  Language: languageFactory(sequelize),
+  TextResource: textResourceFactory(sequelize),
 }
 
-Object.values(db).forEach((model: any) => {
-  if (model.associate) {
-    model.associate(db)
-  }
-})
+Object.values(db).forEach(
+  (model: any) => model.associate && model.associate(db),
+)
 
 export default db

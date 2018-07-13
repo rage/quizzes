@@ -6,7 +6,7 @@ import db from "../database"
  * GET /
  * Home page.
  */
-export let index = asyncHandler(async (req: Request, res: Response) => {
+export const index = asyncHandler(async (req: Request, res: Response) => {
   const orgs = await db.Organization.all()
   res.json(orgs.map(org => org.toJSON()))
 })

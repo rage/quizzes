@@ -1,20 +1,17 @@
 import Sequelize from "sequelize"
 
-interface IOrganizationAttributes {
+interface IOrganization {
   id: number
 }
 
-type OrganizationInstance = Sequelize.Instance<IOrganizationAttributes> &
-  IOrganizationAttributes
+export type Organization = Sequelize.Instance<IOrganization> & IOrganization
+export type OrganizationModel = Sequelize.Model<Organization, IOrganization>
 
-export default (sequalize: Sequelize.Sequelize) => {
-  return sequalize.define<OrganizationInstance, IOrganizationAttributes>(
-    "organization",
-    {
-      id: {
-        primaryKey: true,
-        type: Sequelize.INTEGER,
-      },
+export default (sequelize: Sequelize.Sequelize): OrganizationModel => {
+  return sequelize.define<Organization, IOrganization>("organization", {
+    id: {
+      primaryKey: true,
+      type: Sequelize.INTEGER,
     },
-  )
+  })
 }
