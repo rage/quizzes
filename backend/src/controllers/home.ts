@@ -1,9 +1,11 @@
 import { Request, Response } from "express"
+import db from "../database"
 
 /**
  * GET /
  * Home page.
  */
-export let index = (req: Request, res: Response) => {
-  res.json({ message: "Hello world" })
+export let index = async (req: Request, res: Response) => {
+  const orgs = await db.Organization.all()
+  res.json(orgs.map(org => org.toJSON()))
 }
