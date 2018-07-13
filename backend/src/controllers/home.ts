@@ -1,11 +1,12 @@
 import { Request, Response } from "express"
+import asyncHandler from "express-async-handler"
 import db from "../database"
 
 /**
  * GET /
  * Home page.
  */
-export let index = async (req: Request, res: Response) => {
+export let index = asyncHandler(async (req: Request, res: Response) => {
   const orgs = await db.Organization.all()
   res.json(orgs.map(org => org.toJSON()))
-}
+})
