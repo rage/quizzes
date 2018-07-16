@@ -3,12 +3,12 @@ import errorHandler from "errorhandler"
 import app from "./app"
 import db from "./database"
 
+import { Language, Organization } from "./models"
+
 /**
  * Error Handler. Provides full stack - remove for production
  */
 app.use(errorHandler())
-
-const Op = db.Sequelize.Op
 
 /**
  * Start Express server.
@@ -22,37 +22,21 @@ const server = app.listen(app.get("port"), () => {
   console.log("  Press CTRL-C to stop\n")
 })
 
-db.sequelize.sync().then(async () => {
-  let org = await db.Organization.findById(1)
+db.promise.then(async () => {
+  let org = await Organization.findOne(1)
   if (!org) {
-    org = await db.Organization.create({
-      id: 1,
-    })
+    org = new Organization()
+    org.id = 1
+    await org.save()
   }
 
-  let lang = await db.Language.findById("en_US")
+  let lang = await Language.findOne("en_US")
   if (!lang) {
-    lang = await db.Language.create({
-      id: "en_US",
-      name: "English",
-      country: "USA",
-    })
-  }
-
-  let tr = await db.TextResource.find({
-    where: {
-      [Op.and]: [
-        { id: "d1c1743b-7234-4d50-a04c-8c5c8c2780f8" },
-        { language_id: "en_US" },
-      ],
-    },
-  })
-  if (!tr) {
-    tr = await db.TextResource.create({
-      id: "d1c1743b-7234-4d50-a04c-8c5c8c2780f8",
-      language_id: "en_US",
-      value: "foobar",
-    })
+    lang = new Language()
+    lang.id = "en_US"
+    lang.name = "English"
+    lang.country = "USA"
+    await lang.save()
   }
 })
 

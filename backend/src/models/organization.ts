@@ -1,17 +1,6 @@
-import Sequelize from "sequelize"
+import { BaseEntity, Entity, PrimaryColumn } from "typeorm"
 
-interface IOrganization {
-  id: number
-}
-
-export type Organization = Sequelize.Instance<IOrganization> & IOrganization
-export type OrganizationModel = Sequelize.Model<Organization, IOrganization>
-
-export default (sequelize: Sequelize.Sequelize): OrganizationModel => {
-  return sequelize.define<Organization, IOrganization>("organization", {
-    id: {
-      primaryKey: true,
-      type: Sequelize.INTEGER,
-    },
-  })
+@Entity()
+export class Organization extends BaseEntity {
+  @PrimaryColumn() public id: number
 }

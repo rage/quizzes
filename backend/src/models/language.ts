@@ -1,21 +1,10 @@
-import Sequelize from "sequelize"
+import { BaseEntity, Column, Entity, PrimaryColumn } from "typeorm"
 
-interface ILanguage {
-  id: string
-  name: string
-  country: string
-}
+@Entity()
+export class Language extends BaseEntity {
+  @PrimaryColumn() public id: string
 
-export type Language = Sequelize.Instance<ILanguage> & ILanguage
-export type LanguageModel = Sequelize.Model<Language, ILanguage>
+  @Column() public country: string
 
-export default (sequelize: Sequelize.Sequelize): LanguageModel => {
-  return sequelize.define<Language, ILanguage>("language", {
-    id: {
-      primaryKey: true,
-      type: Sequelize.STRING,
-    },
-    name: Sequelize.STRING,
-    country: Sequelize.STRING,
-  })
+  @Column() public name: string
 }

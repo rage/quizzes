@@ -28,9 +28,10 @@
     "express-validator": "^5.2.0",
     "lusca": "^1.6.0",
     "pg": "^7.4.3",
+    "reflect-metadata": "^0.1.12",
     "request": "^2.87.0",
     "request-promise": "^4.2.2",
-    "sequelize": "^4.38.0",
+    "typeorm": "^0.2.7",
     "winston": "^3.0.0"
   },
   "devDependencies": {

@@ -1,39 +1,25 @@
-import Sequelize from "sequelize"
+import "reflect-metadata"
+import { Connection, createConnection } from "typeorm"
 
-import languageFactory from "./models/language"
-import organizationFactory from "./models/organization"
-import textResourceFactory from "./models/textresource"
-import userFactory from "./models/user"
+import * as Models from "./models"
+import { SnakeNamingStrategy } from "./snake_naming"
 
-const sequelize = new Sequelize("tulir", "", "", {
-  host: "/var/run/postgresql",
-
-  dialect: "postgres",
-
-  pool: {
-    max: 5,
-    min: 0,
-
-    acquire: 30000,
-    idle: 10000,
-  },
-
-  // http://docs.sequelizejs.com/manual/tutorial/querying.html#operators
-  operatorsAliases: false,
-})
-
-const db = {
-  Sequelize,
-  sequelize,
-
-  Organization: organizationFactory(sequelize),
-  User: userFactory(sequelize),
-  Language: languageFactory(sequelize),
-  TextResource: textResourceFactory(sequelize),
+interface IDB {
+  conn: Connection
+  promise: Promise<Connection>
 }
-
-Object.values(db).forEach(
-  (model: any) => model.associate && model.associate(db),
-)
-
+const db: IDB = {
+  conn: undefined,
+  promise: undefined,
+}
 export default db
+
+db.promise = createConnection({
+  type: "postgres",
+  host: "/var/run/postgresql",
+  database: "tulir",
+  entities: Object.values(Models),
+  synchronize: true,
+  logging: true,
+  namingStrategy: new SnakeNamingStrategy(),
+}).then(conn => (db.conn = conn))
