@@ -12,14 +12,17 @@ const db: IDB = {
   conn: undefined,
   promise: undefined,
 }
-export default db
 
 db.promise = createConnection({
   type: "postgres",
-  host: "/var/run/postgresql",
-  database: "tulir",
+  host: process.env.DB_HOST || "/var/run/postgresql",
+  database: process.env.DB_NAME || "quizzes",
+  username: process.env.DB_USER || undefined,
+  password: process.env.DB_PASSWORD || undefined,
   entities: Object.values(Models),
   synchronize: true,
   logging: true,
   namingStrategy: new SnakeNamingStrategy(),
 }).then(conn => (db.conn = conn))
+
+export default db
