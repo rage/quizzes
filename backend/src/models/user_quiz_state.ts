@@ -1,4 +1,11 @@
-import { BaseEntity, Column, Entity, ManyToOne } from "typeorm"
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  UpdateDateColumn,
+} from "typeorm"
 import { Quiz } from "./quiz"
 import { User } from "./user"
 
@@ -16,4 +23,9 @@ export class UserQuizState extends BaseEntity {
   @Column("int") public tries: number
   @Column({ type: "enum", enum: ["open", "locked"] })
   public status: string
+
+  @CreateDateColumn({ type: "timestamp" })
+  public createdAt: Date
+  @UpdateDateColumn({ type: "timestamp" })
+  public updatedAt: Date
 }

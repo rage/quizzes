@@ -1,4 +1,11 @@
-import { BaseEntity, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+import {
+  BaseEntity,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+} from "typeorm"
 import { QuizItemAnswer } from "./quiz_item_answer"
 import { QuizOption } from "./quiz_option"
 
@@ -10,4 +17,9 @@ export class QuizOptionAnswer extends BaseEntity {
   public quizItemAnswer: QuizItemAnswer
   @ManyToOne(type => QuizOption, qo => qo.id)
   public quizOption: QuizOption
+
+  @CreateDateColumn({ type: "timestamp" })
+  public createdAt: Date
+  @UpdateDateColumn({ type: "timestamp" })
+  public updatedAt: Date
 }

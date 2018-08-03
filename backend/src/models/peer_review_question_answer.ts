@@ -1,4 +1,11 @@
-import { BaseEntity, Column, Entity, ManyToOne } from "typeorm"
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  UpdateDateColumn,
+} from "typeorm"
 import { PeerReview } from "./peer_review"
 import { PeerReviewQuestion } from "./peer_review_question"
 
@@ -11,4 +18,9 @@ export class PeerReviewQuestionAnswer extends BaseEntity {
 
   @Column("int") public value: number
   @Column("text") public text: string
+
+  @CreateDateColumn({ type: "timestamp" })
+  public createdAt: Date
+  @UpdateDateColumn({ type: "timestamp" })
+  public updatedAt: Date
 }

@@ -1,10 +1,12 @@
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm"
 import { Language } from "./language"
 import { Quiz } from "./quiz"
@@ -25,6 +27,11 @@ export class QuizItem extends BaseEntity {
 
   @Column() public validityRegex: string
   @Column() public formatRegex: string
+
+  @CreateDateColumn({ type: "timestamp" })
+  public createdAt: Date
+  @UpdateDateColumn({ type: "timestamp" })
+  public updatedAt: Date
 }
 
 @Entity()
@@ -39,4 +46,9 @@ export class QuizItemTranslation extends BaseEntity {
 
   @Column("text") public successMessage: string
   @Column("text") public failureMessage: string
+
+  @CreateDateColumn({ type: "timestamp" })
+  public createdAt: Date
+  @UpdateDateColumn({ type: "timestamp" })
+  public updatedAt: Date
 }

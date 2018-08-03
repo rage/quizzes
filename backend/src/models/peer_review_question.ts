@@ -1,10 +1,12 @@
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm"
 import { Language } from "./language"
 import { Quiz } from "./quiz"
@@ -25,6 +27,11 @@ export class PeerReviewQuestion extends BaseEntity {
   @Column() public default: boolean
   @Column({ type: "enum", enum: ["essay", "multiple-choice"] })
   public type: string
+
+  @CreateDateColumn({ type: "timestamp" })
+  public createdAt: Date
+  @UpdateDateColumn({ type: "timestamp" })
+  public updatedAt: Date
 }
 
 @Entity()
@@ -35,4 +42,9 @@ export class PeerReviewQuestionTranslation extends BaseEntity {
   public language: Language
 
   @Column("text") public question: string
+
+  @CreateDateColumn({ type: "timestamp" })
+  public createdAt: Date
+  @UpdateDateColumn({ type: "timestamp" })
+  public updatedAt: Date
 }

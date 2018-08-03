@@ -1,4 +1,11 @@
-import { BaseEntity, Column, Entity, ManyToOne } from "typeorm"
+import {
+  BaseEntity,
+  Column,
+  CreateDateColumn,
+  Entity,
+  ManyToOne,
+  UpdateDateColumn,
+} from "typeorm"
 import { Course } from "./course"
 import { User } from "./user"
 
@@ -14,4 +21,9 @@ export class UserCoursePartState extends BaseEntity {
   @Column("float") public progress: number
   @Column("float") public score: number
   @Column() public completed: boolean
+
+  @CreateDateColumn({ type: "timestamp" })
+  public createdAt: Date
+  @UpdateDateColumn({ type: "timestamp" })
+  public updatedAt: Date
 }

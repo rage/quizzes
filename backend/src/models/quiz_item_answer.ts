@@ -1,9 +1,11 @@
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm"
 import { QuizAnswer } from "./quiz_answer"
 import { QuizItem } from "./quiz_item"
@@ -18,4 +20,9 @@ export class QuizItemAnswer extends BaseEntity {
   public quizItem: QuizItem
 
   @Column("text") public textData: string
+
+  @CreateDateColumn({ type: "timestamp" })
+  public createdAt: Date
+  @UpdateDateColumn({ type: "timestamp" })
+  public updatedAt: Date
 }

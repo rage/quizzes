@@ -1,10 +1,12 @@
 import {
   BaseEntity,
+  CreateDateColumn,
   Entity,
   JoinTable,
   ManyToMany,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm"
 import { Language } from "./language"
 import { Organization } from "./organization"
@@ -19,4 +21,9 @@ export class Course extends BaseEntity {
   @ManyToMany(type => Language, lang => lang.id)
   @JoinTable({ name: "course_language" })
   public languages: Language[]
+
+  @CreateDateColumn({ type: "timestamp" })
+  public createdAt: Date
+  @UpdateDateColumn({ type: "timestamp" })
+  public updatedAt: Date
 }
