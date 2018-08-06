@@ -18,7 +18,7 @@ export class QuizItem extends BaseEntity {
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Quiz
 
-  @Column({ type: "enum", enum: ["essay", "multiple-choice"] })
+  @Column({ type: "enum", enum: ["open", "essay", "multiple-choice"] })
   public type: string
   @Column("int") public order: number
 

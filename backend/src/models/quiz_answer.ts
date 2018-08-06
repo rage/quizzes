@@ -1,9 +1,11 @@
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm"
 import { Language } from "./language"
 import { Quiz } from "./quiz"
@@ -26,4 +28,9 @@ export class QuizAnswer extends BaseEntity {
     enum: ["draft", "submitted", "spam", "confirmed", "rejected", "deprecated"],
   })
   public status: string
+
+  @CreateDateColumn({ type: "timestamp" })
+  public createdAt: Date
+  @UpdateDateColumn({ type: "timestamp" })
+  public updatedAt: Date
 }

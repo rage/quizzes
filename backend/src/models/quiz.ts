@@ -1,10 +1,12 @@
 import {
   BaseEntity,
   Column,
+  CreateDateColumn,
   Entity,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  UpdateDateColumn,
 } from "typeorm"
 import { Course } from "./course"
 import { Language } from "./language"
@@ -27,6 +29,11 @@ export class Quiz extends BaseEntity {
   public deadline?: Date
   @Column({ type: "timestamp", nullable: true })
   public open?: Date
+
+  @CreateDateColumn({ type: "timestamp" })
+  public createdAt: Date
+  @UpdateDateColumn({ type: "timestamp" })
+  public updatedAt: Date
 }
 
 @Entity()
@@ -38,4 +45,10 @@ export class QuizTranslation extends BaseEntity {
 
   @Column("text") public title: string
   @Column("text") public body: string
+  @Column("text") public submitMessage: string
+
+  @CreateDateColumn({ type: "timestamp" })
+  public createdAt: Date
+  @UpdateDateColumn({ type: "timestamp" })
+  public updatedAt: Date
 }
