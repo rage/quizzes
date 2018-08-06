@@ -5,6 +5,7 @@ import database from "../../database"
 import {
   Course,
   Language,
+  Organization,
   Quiz,
   QuizItem,
   QuizItemTranslation,
@@ -24,11 +25,66 @@ async function main() {
     process.env.MONGO_URI || "mongodb://localhost:27017/quiznator",
   )
   const quizzes = await QNQuiz.find({})
+
+  const courseIDs = {
+    "cybersecurity-intro": "en_US",
+    "cybersecurity-securing-software": "en_US",
+    "cybersecurity-advanced": "en_US",
+    "cybersecurity-intro-17": "en_US",
+    "cybersecurity-securing-17": "en_US",
+    "cybersecurity-advanced-17": "en_US",
+    "securing-17": "en_US",
+    "cyber-advanced-17": "en_US",
+    "cyber-advanced-18": "en_US",
+
+    "k2017-ohpe": "fi_FI",
+    "s2017-ohpe": "fi_FI",
+    "k2018-ohpe": "fi_FI",
+
+    "s2017-ohja": "fi_FI",
+    "k2018-ohja": "fi_FI",
+
+    "wepa-s17": "fi_FI",
+
+    "tikape-s17": "fi_FI",
+    "tikape-k18": "fi_FI",
+
+    "tsoha-18": "fi_FI",
+  }
+  await Organization.merge(Organization.create({ id: 0 })).save()
+  await Language.merge(
+    Language.create({ id: "fi_FI", country: "Finland", name: "Finnish" }),
+  ).save()
+  await Language.merge(
+    Language.create({ id: "en_US", country: "United States", name: "English" }),
+  ).save()
+  const org = await Organization.findOne(0)
+  const courses: { [key: string]: Course } = {}
+  for (const [courseID, languageID] of Object.entries(courseIDs)) {
+    courses[courseID] = Course.merge(
+      Course.create({
+        id: getUUIDByString(courseID),
+        organization: org,
+        languages: [await Language.findOne(languageID)],
+      }),
+    )
+    courses[courseID].save()
+  }
+
   const tags = new Set()
   for (const quiz of quizzes) {
+    let course: Course
     for (const tag of quiz.tags) {
-      tags.add(tag)
+      if (tag in courses) {
+        course = courses[tag]
+        break
+      }
     }
+    if (!course) {
+      continue
+    }
+
+    await migrate_quiz(db, course, quiz, 1, 1)
   }
   console.log(tags)
 }
