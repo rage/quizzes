@@ -19,10 +19,11 @@ export async function migrateQuizzes(
 ) {
   const eaiRegex = /ai_([0-9])_([0-9])/
 
+  // TODO add type filter to only allow types handled by migrateQuiz()
   const quizzes = await QNQuiz.find({})
   for (const quiz of quizzes) {
-    let part = 1
-    let section = 1
+    let part = 0
+    let section = 0
     let course: Course
     for (const tag of quiz.tags) {
       if (tag in courses) {
