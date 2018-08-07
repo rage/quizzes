@@ -19,8 +19,17 @@ export async function migrateQuizzes(
 ) {
   const eaiRegex = /ai_([0-9])_([0-9])/
 
-  // TODO add type filter to only allow types handled by migrateQuiz()
-  const quizzes = await QNQuiz.find({})
+  const quizzes = await QNQuiz.find({
+    type: {
+      $in: [
+        oldQuizTypes.ESSAY,
+        oldQuizTypes.OPEN,
+        oldQuizTypes.MULTIPLE_OPEN,
+        oldQuizTypes.MULTIPLE_CHOICE,
+        oldQuizTypes.RADIO_MATRIX,
+      ],
+    },
+  })
   for (const quiz of quizzes) {
     let part = 0
     let section = 0
