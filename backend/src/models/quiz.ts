@@ -30,6 +30,9 @@ export class Quiz extends BaseEntity {
   @Column({ type: "timestamp", nullable: true })
   public open?: Date
 
+  @Column({ default: false })
+  public excludedFromScore: boolean
+
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
   @UpdateDateColumn({ type: "timestamp" })

@@ -33,8 +33,14 @@ export async function migrateQuizzes(
   for (const quiz of quizzes) {
     let part = 0
     let section = 0
+    let excludedFromScore = false
     let course: Course
     for (const tag of quiz.tags) {
+      if (tag === "ignore") {
+        excludedFromScore = true
+        continue
+      }
+
       if (tag in courses) {
         course = courses[tag]
         continue
@@ -51,7 +57,7 @@ export async function migrateQuizzes(
     }
 
     try {
-      await migrateQuiz(db, course, quiz, part, section)
+      await migrateQuiz(db, course, quiz, part, section, excludedFromScore)
     } catch (e) {
       console.error(
         "Failed to migrate quiz",
@@ -68,6 +74,7 @@ export async function migrateQuiz(
   oldQuiz: any,
   part: number,
   section: number = null,
+  excludedFromScore: boolean = false,
 ) {
   const language = course.languages[0]
   const quiz = Quiz.create({
@@ -75,6 +82,7 @@ export async function migrateQuiz(
     course,
     part,
     section,
+    excludedFromScore,
     createdAt: oldQuiz.createdAt,
     updatedAt: oldQuiz.updatedAt,
   })
