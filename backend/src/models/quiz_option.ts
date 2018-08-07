@@ -18,6 +18,8 @@ export class QuizOption extends BaseEntity {
   @ManyToOne(type => QuizItem, qi => qi.id)
   public quizItem: QuizItem
 
+  @Column("int") public order: number
+
   @OneToMany(type => QuizOptionTranslation, qot => qot.quizOption)
   public texts: QuizOptionTranslation[]
 

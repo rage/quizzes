@@ -25,8 +25,10 @@ export class QuizItem extends BaseEntity {
   @OneToMany(type => QuizItemTranslation, qit => qit.quizItem)
   public texts: QuizItemTranslation[]
 
-  @Column() public validityRegex: string
-  @Column() public formatRegex: string
+  @Column({ nullable: true })
+  public validityRegex: string
+  @Column({ nullable: true })
+  public formatRegex: string
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
