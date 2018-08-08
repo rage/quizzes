@@ -21,7 +21,7 @@ db.promise = createConnection({
   password: process.env.DB_PASSWORD || undefined,
   entities: Object.values(Models),
   synchronize: true,
-  logging: true,
+  logging: !!process.env.DB_LOGGING,
   namingStrategy: new SnakeNamingStrategy(),
 }).then(conn => (db.conn = conn))
 
