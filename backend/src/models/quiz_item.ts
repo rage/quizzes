@@ -10,6 +10,7 @@ import {
 } from "typeorm"
 import { Language } from "./language"
 import { Quiz } from "./quiz"
+import { QuizOption } from "./quiz_option"
 
 @Entity()
 export class QuizItem extends BaseEntity {
@@ -24,6 +25,9 @@ export class QuizItem extends BaseEntity {
 
   @OneToMany(type => QuizItemTranslation, qit => qit.quizItem)
   public texts: QuizItemTranslation[]
+
+  @OneToMany(type => QuizOption, qo => qo.quizItem)
+  public options: Promise<QuizOption[]>
 
   @Column({ nullable: true })
   public validityRegex?: string

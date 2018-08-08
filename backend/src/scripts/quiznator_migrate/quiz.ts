@@ -1,4 +1,3 @@
-import { Connection } from "typeorm"
 import {
   Course,
   Quiz,
@@ -112,14 +111,16 @@ export async function migrateQuiz(
   await quiz.texts[0].save()
 
   let item: QuizItem
+  let items: QuizItem[]
+  let options: QuizOption[]
   let order: number
   let choiceOrder: number
   const meta = safeGet(() => oldQuiz.data.meta, {})
   const rightAnswer = safeGet(() => meta.rightAnswer)
   const successes = safeGet(() => meta.successes)
   const errors = safeGet(() => meta.errors)
-  const items = safeGet(() => oldQuiz.data.items, [])
-  const choices = safeGet(() => oldQuiz.data.choices, [])
+  const oldItems = safeGet(() => oldQuiz.data.items, [])
+  const oldChoices = safeGet(() => oldQuiz.data.choices, [])
   switch (oldQuiz.type) {
     case oldQuizTypes.ESSAY:
     case oldQuizTypes.OPEN:
@@ -144,13 +145,15 @@ export async function migrateQuiz(
         }),
       ]
       await item.texts[0].save()
+      quiz.items = Promise.resolve([item])
       break
 
     case oldQuizTypes.MULTIPLE_OPEN:
       order = 0
-      for (const oldItem of items) {
+      items = []
+      for (const oldItem of oldItems) {
         item = QuizItem.create({
-          id: getUUIDByString(oldQuiz.id + oldItem.id),
+          id: getUUIDByString(quiz.id + oldItem.id),
           quiz,
           type: "open",
           validityRegex: rightAnswer[oldItem.id],
@@ -170,7 +173,9 @@ export async function migrateQuiz(
           }),
         ]
         await item.texts[0].save()
+        items.push(item)
       }
+      quiz.items = Promise.resolve(items)
       break
 
     case oldQuizTypes.MULTIPLE_CHOICE:
@@ -195,9 +200,10 @@ export async function migrateQuiz(
       ]
       await item.texts[0].save()
       choiceOrder = 0
-      for (const oldChoice of items) {
+      options = []
+      for (const oldChoice of oldItems) {
         const option = QuizOption.create({
-          id: getUUIDByString(oldQuiz.id + oldChoice.id),
+          id: getUUIDByString(quiz.id + item.id + oldChoice.id),
           quizItem: item,
           order: choiceOrder++,
           correct:
@@ -217,15 +223,19 @@ export async function migrateQuiz(
           }),
         ]
         await option.texts[0].save()
+        options.push(option)
       }
+      item.options = Promise.resolve(options)
+      quiz.items = Promise.resolve([item])
       break
 
     case oldQuizTypes.RADIO_MATRIX:
       order = 0
 
-      for (const oldItem of items) {
+      items = []
+      for (const oldItem of oldItems) {
         item = QuizItem.create({
-          id: getUUIDByString(oldQuiz.id + oldItem.id),
+          id: getUUIDByString(quiz.id + oldItem.id),
           quiz,
           type: "multiple-choice",
           order: order++,
@@ -246,9 +256,10 @@ export async function migrateQuiz(
         await item.texts[0].save()
 
         choiceOrder = 0
-        for (const oldChoice of choices) {
+        options = []
+        for (const oldChoice of oldChoices) {
           const option = QuizOption.create({
-            id: getUUIDByString(oldQuiz.id + oldItem.id + oldChoice.id),
+            id: getUUIDByString(quiz.id + item.id + oldChoice.id),
             quizItem: item,
             order: choiceOrder++,
             correct:
@@ -269,8 +280,12 @@ export async function migrateQuiz(
             }),
           ]
           await option.texts[0].save()
+          options.push(option)
         }
+        item.options = Promise.resolve(options)
+        items.push(item)
       }
+      quiz.items = Promise.resolve(items)
       break
 
     default:

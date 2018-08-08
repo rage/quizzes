@@ -10,6 +10,7 @@ import {
 } from "typeorm"
 import { Course } from "./course"
 import { Language } from "./language"
+import { QuizItem } from "./quiz_item"
 
 @Entity()
 export class Quiz extends BaseEntity {
@@ -29,6 +30,9 @@ export class Quiz extends BaseEntity {
   public deadline?: Date
   @Column({ type: "timestamp", nullable: true })
   public open?: Date
+
+  @OneToMany(type => QuizItem, qi => qi.quiz)
+  public items: Promise<QuizItem[]>
 
   @Column({ default: false })
   public excludedFromScore: boolean

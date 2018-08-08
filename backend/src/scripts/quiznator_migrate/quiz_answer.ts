@@ -1,4 +1,11 @@
-import { Quiz, QuizAnswer, User } from "../../models"
+import {
+  Quiz,
+  QuizAnswer,
+  QuizItemAnswer,
+  QuizOption,
+  QuizOptionAnswer,
+  User,
+} from "../../models"
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
 import { getUUIDByString, progressBar } from "./util"
 
@@ -12,6 +19,7 @@ export async function migrateQuizAnswers(
   const bar = progressBar("Migrating quiz answers", answers.length)
   let quizNotFound = 0
   let userNotFound = 0
+  let itemsNotFound = 0
   for (const answer of answers) {
     const quiz = quizzes[getUUIDByString(answer.quizId)]
     if (!quiz) {
@@ -28,13 +36,18 @@ export async function migrateQuizAnswers(
     }
 
     const newAnswer = await migrateQuizAnswer(quiz, user, answer)
+    if (!newAnswer) {
+      itemsNotFound++
+      bar.tick()
+      return
+    }
     newAnswers[newAnswer.id] = newAnswer
     bar.tick()
   }
 
   console.log(`Quiz answers migrated. ${quizNotFound + userNotFound} answers
- were skipped, ${quizNotFound} did not match any quiz and ${userNotFound} did
- not match any user.`)
+ were skipped, ${quizNotFound} did not match any quiz, ${userNotFound} did not
+ match any user and the quizzes of ${itemsNotFound} did not have any answers.`)
 
   return newAnswers
 }
@@ -44,13 +57,82 @@ export async function migrateQuizAnswer(
   user: User,
   answer: { [key: string]: any },
 ): Promise<QuizAnswer> {
-  const newAnswer = QuizAnswer.create({
+  const quizItems = await quiz.items
+
+  if (quizItems.length === 0) {
+    return null
+  }
+
+  const quizAnswer = QuizAnswer.create({
     id: getUUIDByString(answer._id),
     quiz,
     user,
     status: "draft", // TODO
     language: quiz.course.languages[0],
   })
-  await newAnswer.save()
-  return newAnswer
+  await quizAnswer.save()
+
+  if (Array.isArray(answer.data)) {
+    answer.data = answer.data.map(entry => getUUIDByString(quiz.id + entry))
+  } else if (typeof answer.data === "object") {
+    const newData: { [key: string]: any } = {}
+    for (const [itemID, answerContent] of Object.entries(answer.data)) {
+      newData[getUUIDByString(quiz.id + itemID)] = answerContent
+    }
+    answer.data = newData
+  }
+
+  for (const quizItem of quizItems) {
+    switch (quizItem.type) {
+      case "essay":
+        await QuizItemAnswer.create({
+          id: getUUIDByString(answer._id),
+          quizAnswer,
+          quizItem,
+          textData: answer.data,
+        }).save()
+        break
+
+      case "open":
+        await QuizItemAnswer.create({
+          id: getUUIDByString(answer._id),
+          quizAnswer,
+          quizItem,
+          textData:
+            typeof answer.data === "string"
+              ? answer.data
+              : answer.data[quizItem.id],
+        }).save()
+        break
+
+      case "multiple-choice":
+        const options: { [key: string]: QuizOption } = {}
+        for (const option of await quizItem.options) {
+          options[option.id] = option
+        }
+        const qia = QuizItemAnswer.create({
+          id: getUUIDByString(answer._id),
+          quizAnswer,
+          quizItem,
+          textData: "",
+        })
+        await qia.save()
+        const chosenOptions =
+          Array.isArray(answer.data) || typeof answer.data !== "object"
+            ? answer.data
+            : answer.data[quizItem.id]
+        if (!Array.isArray(answer.data)) {
+          answer.data = [answer.data]
+        }
+        for (const chosenOption of chosenOptions) {
+          await QuizOptionAnswer.create({
+            quizItemAnswer: qia,
+            quizOption: options[quiz.id + quizItem.id + chosenOption],
+          }).save()
+        }
+        break
+    }
+  }
+
+  return quizAnswer
 }
