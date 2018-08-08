@@ -10,17 +10,19 @@ export async function migrateQuizAnswers(
   const answers = await QNQuizAnswer.find({})
   const newAnswers: { [answerID: string]: QuizAnswer } = {}
   const bar = progressBar("Migrating quiz answers", answers.length)
+  let quizNotFound = 0
+  let userNotFound = 0
   for (const answer of answers) {
-    const quiz = quizzes[answer.quizId]
+    const quiz = quizzes[getUUIDByString(answer.quizId)]
     if (!quiz) {
-      console.warn("Quiz not found for answer", answer)
+      quizNotFound++
       bar.tick()
       continue
     }
 
     const user = users[answer.answererId]
     if (!user) {
-      console.warn("User not found for answer", answer)
+      userNotFound++
       bar.tick()
       continue
     }
@@ -29,6 +31,10 @@ export async function migrateQuizAnswers(
     newAnswers[newAnswer.id] = newAnswer
     bar.tick()
   }
+
+  console.log(`Quiz answers migrated. ${quizNotFound + userNotFound} answers
+ were skipped, ${quizNotFound} did not match any quiz and ${userNotFound} did
+ not match any user.`)
 
   return newAnswers
 }

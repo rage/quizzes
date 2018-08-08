@@ -1,5 +1,4 @@
 import axios from "axios"
-import { Connection } from "typeorm"
 
 import { User } from "../../models"
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
