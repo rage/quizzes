@@ -16,10 +16,10 @@ import { getUUIDByString, safeGet } from "./util"
 export async function migrateQuizzes(
   db: Connection,
   courses: { [key: string]: Course },
-) {
+): Promise<{ [quizID: string]: Quiz }> {
   const eaiRegex = /ai_([0-9])_([0-9])/
 
-  const quizzes = await QNQuiz.find({
+  const oldQuizzes = await QNQuiz.find({
     type: {
       $in: [
         oldQuizTypes.ESSAY,
@@ -30,12 +30,13 @@ export async function migrateQuizzes(
       ],
     },
   })
-  for (const quiz of quizzes) {
+  const newQuizzes: { [quizID: string]: Quiz } = {}
+  for (const oldQuiz of oldQuizzes) {
     let part = 0
     let section = 0
     let excludedFromScore = false
     let course: Course
-    for (const tag of quiz.tags) {
+    for (const tag of oldQuiz.tags) {
       if (tag === "ignore") {
         excludedFromScore = true
         continue
@@ -57,25 +58,34 @@ export async function migrateQuizzes(
     }
 
     try {
-      await migrateQuiz(db, course, quiz, part, section, excludedFromScore)
+      const quiz = await migrateQuiz(
+        db,
+        course,
+        oldQuiz,
+        part,
+        section,
+        excludedFromScore,
+      )
+      newQuizzes[quiz.id] = quiz
     } catch (e) {
       console.error(
         "Failed to migrate quiz",
-        require("util").inspect(quiz, false, null),
+        require("util").inspect(oldQuiz, false, null),
       )
       throw e
     }
   }
+  return newQuizzes
 }
 
 export async function migrateQuiz(
   db: Connection,
   course: Course,
-  oldQuiz: any,
+  oldQuiz: { [key: string]: any },
   part: number,
   section: number = null,
   excludedFromScore: boolean = false,
-) {
+): Promise<Quiz> {
   const language = course.languages[0]
   const quiz = Quiz.create({
     id: getUUIDByString(oldQuiz._id),
@@ -285,4 +295,5 @@ export async function migrateQuiz(
     default:
       console.warn("Unhandled quiz:", oldQuiz)
   }
+  return quiz
 }

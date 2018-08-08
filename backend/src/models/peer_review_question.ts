@@ -28,6 +28,9 @@ export class PeerReviewQuestion extends BaseEntity {
   @Column({ type: "enum", enum: ["essay", "multiple-choice"] })
   public type: string
 
+  @Column({ default: true })
+  public answerRequired: boolean
+
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
   @UpdateDateColumn({ type: "timestamp" })
@@ -41,7 +44,8 @@ export class PeerReviewQuestionTranslation extends BaseEntity {
   @ManyToOne(type => Language, lang => lang.id, { primary: true })
   public language: Language
 
-  @Column("text") public question: string
+  @Column("text") public title: string
+  @Column("text") public body: string
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

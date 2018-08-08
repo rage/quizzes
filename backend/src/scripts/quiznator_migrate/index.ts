@@ -19,8 +19,8 @@ async function main() {
 
   const languages = await createLanguages(db)
   const courses = await migrateCourses(org, languages)
-  await migrateQuizzes(db, courses)
-  await migratePeerReviewQuestions(db, courses)
+  const quizzes = await migrateQuizzes(db, courses)
+  await migratePeerReviewQuestions(db, quizzes)
 }
 
 main().catch(console.error)
