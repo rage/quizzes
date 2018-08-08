@@ -11,14 +11,14 @@ import {
 import { Quiz as QNQuiz } from "./app-modules/models"
 
 import oldQuizTypes from "./app-modules/constants/quiz-types"
-import { getUUIDByString, safeGet } from "./util"
+import { getUUIDByString, progressBar, safeGet } from "./util"
 
-export async function migrateQuizzes(
-  db: Connection,
-  courses: { [key: string]: Course },
-): Promise<{ [quizID: string]: Quiz }> {
+export async function migrateQuizzes(courses: {
+  [key: string]: Course
+}): Promise<{ [quizID: string]: Quiz }> {
   const eaiRegex = /ai_([0-9])_([0-9])/
 
+  console.log("Querying quizzes...")
   const oldQuizzes = await QNQuiz.find({
     type: {
       $in: [
@@ -30,6 +30,7 @@ export async function migrateQuizzes(
       ],
     },
   })
+  const bar = progressBar("Migrating quizzes", oldQuizzes.length)
   const newQuizzes: { [quizID: string]: Quiz } = {}
   for (const oldQuiz of oldQuizzes) {
     let part = 0
@@ -54,12 +55,12 @@ export async function migrateQuizzes(
       }
     }
     if (!course) {
+      bar.tick()
       continue
     }
 
     try {
       const quiz = await migrateQuiz(
-        db,
         course,
         oldQuiz,
         part,
@@ -67,6 +68,7 @@ export async function migrateQuizzes(
         excludedFromScore,
       )
       newQuizzes[quiz.id] = quiz
+      bar.tick()
     } catch (e) {
       console.error(
         "Failed to migrate quiz",
@@ -79,7 +81,6 @@ export async function migrateQuizzes(
 }
 
 export async function migrateQuiz(
-  db: Connection,
   course: Course,
   oldQuiz: { [key: string]: any },
   part: number,
@@ -122,7 +123,6 @@ export async function migrateQuiz(
   switch (oldQuiz.type) {
     case oldQuizTypes.ESSAY:
     case oldQuizTypes.OPEN:
-      console.log("Migrating open/essay", oldQuiz)
       item = QuizItem.create({
         id: getUUIDByString(oldQuiz._id),
         quiz,
@@ -147,14 +147,8 @@ export async function migrateQuiz(
       break
 
     case oldQuizTypes.MULTIPLE_OPEN:
-      console.log("Migrating multiple open", oldQuiz)
       order = 0
       for (const oldItem of items) {
-        console.log(
-          "Migrating multiple open item",
-          oldItem,
-          getUUIDByString(oldItem.id),
-        )
         item = QuizItem.create({
           id: getUUIDByString(oldQuiz.id + oldItem.id),
           quiz,
@@ -180,7 +174,6 @@ export async function migrateQuiz(
       break
 
     case oldQuizTypes.MULTIPLE_CHOICE:
-      console.log("Migrating multiple choice", oldQuiz)
       item = QuizItem.create({
         id: getUUIDByString(oldQuiz._id),
         quiz,
@@ -203,11 +196,6 @@ export async function migrateQuiz(
       await item.texts[0].save()
       choiceOrder = 0
       for (const oldChoice of items) {
-        console.log(
-          "Migrating multiple choice option",
-          oldChoice,
-          getUUIDByString(oldChoice.id),
-        )
         const option = QuizOption.create({
           id: getUUIDByString(oldQuiz.id + oldChoice.id),
           quizItem: item,
@@ -233,11 +221,9 @@ export async function migrateQuiz(
       break
 
     case oldQuizTypes.RADIO_MATRIX:
-      console.log("Migrating radio matrix", oldQuiz)
       order = 0
 
       for (const oldItem of items) {
-        console.log("Migrating radio matrix item", oldItem)
         item = QuizItem.create({
           id: getUUIDByString(oldQuiz.id + oldItem.id),
           quiz,
@@ -261,11 +247,6 @@ export async function migrateQuiz(
 
         choiceOrder = 0
         for (const oldChoice of choices) {
-          console.log(
-            "Migrating radio matrix choices",
-            oldChoice,
-            getUUIDByString(oldChoice.id),
-          )
           const option = QuizOption.create({
             id: getUUIDByString(oldQuiz.id + oldItem.id + oldChoice.id),
             quizItem: item,

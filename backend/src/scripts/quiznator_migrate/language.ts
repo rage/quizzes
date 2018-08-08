@@ -1,9 +1,9 @@
 import { Connection } from "typeorm"
 import { Language } from "../../models"
 
-export async function createLanguages(
-  db: Connection,
-): Promise<{ [languageID: string]: Language }> {
+export async function createLanguages(): Promise<{
+  [languageID: string]: Language
+}> {
   const finnish = await Language.merge(
     Language.create({
       id: "fi_FI",

@@ -5,3 +5,4 @@ Additional dependencies:
 * uuid-by-string
 * highland
 * keymirror
+* axios

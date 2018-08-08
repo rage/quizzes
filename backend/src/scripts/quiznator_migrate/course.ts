@@ -1,5 +1,5 @@
 import { Course, Language, Organization } from "../../models"
-import { getUUIDByString } from "./util"
+import { getUUIDByString, progressBar } from "./util"
 
 const courseIDs = {
   "cybersecurity-intro": "en_US",
@@ -34,9 +34,9 @@ export async function migrateCourses(
   languages: { [languageID: string]: Language },
 ): Promise<{ [courseID: string]: Course }> {
   const courses: { [key: string]: Course } = {}
+  const bar = progressBar("Creating courses", Object.entries(courseIDs).length)
   for (const [courseID, language] of Object.entries(courseIDs)) {
     const uuid = getUUIDByString(courseID)
-    console.log("Creating course", uuid, courseID, language)
     courses[courseID] = Course.merge(
       Course.create({
         id: uuid,
@@ -44,7 +44,8 @@ export async function migrateCourses(
         languages: [languages[language]],
       }),
     )
-    courses[courseID].save()
+    await courses[courseID].save()
+    bar.tick()
   }
   return courses
 }

@@ -8,26 +8,31 @@ import {
   PeerReviewQuestionTranslation,
   Quiz,
 } from "../../models"
-import { getUUIDByString, safeGet } from "./util"
+import { getUUIDByString, progressBar, safeGet } from "./util"
 
-export async function migratePeerReviewQuestions(
-  db: Connection,
-  quizzes: { [quizID: string]: Quiz },
-): Promise<{ [prqID: string]: PeerReviewQuestion }> {
+export async function migratePeerReviewQuestions(quizzes: {
+  [quizID: string]: Quiz
+}): Promise<{ [prqID: string]: PeerReviewQuestion }> {
+  console.log("Querying peer review questions...")
   const peerReviewQuestions = await QNQuiz.find({
     type: { $in: [oldQuizTypes.PEER_REVIEW] },
   })
 
   const newQuestions: { [prqID: string]: PeerReviewQuestion } = {}
+  const bar = progressBar(
+    "Migrating peer review questions",
+    peerReviewQuestions.length,
+  )
   for (const oldPRQ of peerReviewQuestions) {
     const quiz = quizzes[getUUIDByString(safeGet(() => oldPRQ.data.quizId))]
     if (!quiz) {
-      console.warn("Quiz not found for peer review", oldPRQ)
+      bar.tick()
       continue
     }
     try {
-      const prq = await migratePeerReviewQuestion(db, quiz, oldPRQ)
+      const prq = await migratePeerReviewQuestion(quiz, oldPRQ)
       newQuestions[prq.id] = prq
+      bar.tick()
     } catch (e) {
       console.error("Failed to migrate peer review question", oldPRQ)
       throw e
@@ -37,7 +42,6 @@ export async function migratePeerReviewQuestions(
 }
 
 export async function migratePeerReviewQuestion(
-  db: Connection,
   quiz: Quiz,
   oldPRQ: { [key: string]: any },
 ): Promise<PeerReviewQuestion> {
