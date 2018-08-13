@@ -4,10 +4,12 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm"
 import { Language } from "./language"
+import { PeerReview } from "./peer_review"
 import { Quiz } from "./quiz"
 import { User } from "./user"
 
@@ -28,6 +30,9 @@ export class QuizAnswer extends BaseEntity {
     enum: ["draft", "submitted", "spam", "confirmed", "rejected", "deprecated"],
   })
   public status: string
+
+  @OneToMany(type => PeerReview, pr => pr.quizAnswer)
+  public peerReviews: Promise<PeerReview[]>
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

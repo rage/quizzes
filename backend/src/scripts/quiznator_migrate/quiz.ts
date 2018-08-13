@@ -54,7 +54,6 @@ export async function migrateQuizzes(courses: {
       }
     }
     if (!course) {
-      bar.tick()
       continue
     }
 
@@ -79,7 +78,7 @@ export async function migrateQuizzes(courses: {
   return newQuizzes
 }
 
-export async function migrateQuiz(
+async function migrateQuiz(
   course: Course,
   oldQuiz: { [key: string]: any },
   part: number,

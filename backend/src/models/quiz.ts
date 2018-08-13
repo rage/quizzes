@@ -10,6 +10,7 @@ import {
 } from "typeorm"
 import { Course } from "./course"
 import { Language } from "./language"
+import { PeerReviewQuestion } from "./peer_review_question"
 import { QuizItem } from "./quiz_item"
 
 @Entity()
@@ -33,6 +34,9 @@ export class Quiz extends BaseEntity {
 
   @OneToMany(type => QuizItem, qi => qi.quiz)
   public items: Promise<QuizItem[]>
+
+  @OneToMany(type => PeerReviewQuestion, prq => prq.quiz)
+  public peerReviewQuestions: Promise<PeerReviewQuestion[]>
 
   @Column({ default: false })
   public excludedFromScore: boolean

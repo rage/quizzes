@@ -4,9 +4,11 @@ import {
   Entity,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm"
+import { PeerReviewQuestionAnswer } from "./peer_review_question_answer"
 import { QuizAnswer } from "./quiz_answer"
 import { User } from "./user"
 
@@ -22,6 +24,9 @@ export class PeerReview extends BaseEntity {
 
   @ManyToMany(type => QuizAnswer, qa => qa.id)
   public rejectedQuizAnswers: QuizAnswer[]
+
+  @OneToMany(type => PeerReviewQuestionAnswer, prqa => prqa.peerReview)
+  public answers: Promise<PeerReviewQuestionAnswer[]>
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

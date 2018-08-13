@@ -24,21 +24,18 @@ export async function migrateQuizAnswers(
     const quiz = quizzes[getUUIDByString(answer.quizId)]
     if (!quiz) {
       quizNotFound++
-      bar.tick()
       continue
     }
 
     const user = users[answer.answererId]
     if (!user) {
       userNotFound++
-      bar.tick()
       continue
     }
 
     const newAnswer = await migrateQuizAnswer(quiz, user, answer)
     if (!newAnswer) {
       itemsNotFound++
-      bar.tick()
       return
     }
     newAnswers[newAnswer.id] = newAnswer
@@ -51,8 +48,7 @@ export async function migrateQuizAnswers(
 
   return newAnswers
 }
-
-export async function migrateQuizAnswer(
+async function migrateQuizAnswer(
   quiz: Quiz,
   user: User,
   answer: { [key: string]: any },
