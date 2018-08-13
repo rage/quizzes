@@ -67,7 +67,7 @@ export async function migrateQuizAnswer(
     id: getUUIDByString(answer._id),
     quiz,
     user,
-    status: "draft", // TODO
+    status: "submitted", // TODO
     language: quiz.course.languages[0],
   })
   await quizAnswer.save()

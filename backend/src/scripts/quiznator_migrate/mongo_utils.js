@@ -15,10 +15,10 @@ function disconnect() {
   return Promise.promisify(mongoose.disconnect, { context: mongoose })()
 }
 
-function clean() {
-  return mongoClient.connectAsync(process.env.MONGO_URI).then(db => {
-    return db.dropDatabaseAsync().then(() => db.closeAsync())
-  })
+async function clean() {
+  const db = await mongoClient.connectAsync(process.env.MONGO_URI)
+  await db.dropDatabaseAsync()
+  await db.closeAsync()
 }
 
 module.exports = {

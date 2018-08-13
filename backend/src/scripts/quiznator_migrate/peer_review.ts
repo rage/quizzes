@@ -1,5 +1,3 @@
-import { Connection } from "typeorm"
-
 import oldQuizTypes from "./app-modules/constants/quiz-types"
 import { Quiz as QNQuiz } from "./app-modules/models"
 
