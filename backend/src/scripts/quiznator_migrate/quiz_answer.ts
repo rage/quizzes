@@ -117,17 +117,19 @@ export async function migrateQuizAnswer(
           textData: "",
         })
         await qia.save()
-        const chosenOptions =
+        let chosenOptions =
           Array.isArray(answer.data) || typeof answer.data !== "object"
             ? answer.data
             : answer.data[quizItem.id]
-        if (!Array.isArray(answer.data)) {
-          answer.data = [answer.data]
+        if (!Array.isArray(chosenOptions)) {
+          chosenOptions = [chosenOptions]
         }
         for (const chosenOption of chosenOptions) {
           await QuizOptionAnswer.create({
+            id: getUUIDByString(answer._id + chosenOption),
             quizItemAnswer: qia,
-            quizOption: options[quiz.id + quizItem.id + chosenOption],
+            quizOption:
+              options[getUUIDByString(quiz.id + quizItem.id + chosenOption)],
           }).save()
         }
         break

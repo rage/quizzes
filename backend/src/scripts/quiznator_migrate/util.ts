@@ -2,6 +2,7 @@ import ProgressBar from "progress"
 import getUUIDByStringBroken from "uuid-by-string"
 
 export function getUUIDByString(str: string): string {
+  // getUUIDByStringBroken seems to ignore the first character of the string
   return getUUIDByStringBroken("_" + str).toLowerCase()
 }
 
