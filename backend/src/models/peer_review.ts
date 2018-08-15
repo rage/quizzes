@@ -2,6 +2,7 @@ import {
   BaseEntity,
   CreateDateColumn,
   Entity,
+  JoinTable,
   ManyToMany,
   ManyToOne,
   OneToMany,
@@ -23,7 +24,8 @@ export class PeerReview extends BaseEntity {
   public user: User
 
   @ManyToMany(type => QuizAnswer, qa => qa.id)
-  public rejectedQuizAnswers: QuizAnswer[]
+  @JoinTable({ name: "peer_review_rejected_quiz_answers" })
+  public rejectedQuizAnswers: Promise<QuizAnswer[]>
 
   @OneToMany(type => PeerReviewQuestionAnswer, prqa => prqa.peerReview)
   public answers: Promise<PeerReviewQuestionAnswer[]>

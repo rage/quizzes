@@ -14,7 +14,7 @@ export async function migrateQuizAnswers(
   users: { [userID: string]: User },
 ): Promise<{ [answerID: string]: QuizAnswer }> {
   console.log("Querying quiz answers...")
-  const answers = await QNQuizAnswer.find({})
+  const answers = await QNQuizAnswer.find({}).limit(5000)
   const newAnswers: { [answerID: string]: QuizAnswer } = {}
   const bar = progressBar("Migrating quiz answers", answers.length)
   let quizNotFound = 0
@@ -106,13 +106,12 @@ async function migrateQuizAnswer(
         for (const option of await quizItem.options) {
           options[option.id] = option
         }
-        const qia = QuizItemAnswer.create({
+        const qia = await QuizItemAnswer.create({
           id: getUUIDByString(answer._id),
           quizAnswer,
           quizItem,
           textData: "",
-        })
-        await qia.save()
+        }).save()
         let chosenOptions =
           Array.isArray(answer.data) || typeof answer.data !== "object"
             ? answer.data

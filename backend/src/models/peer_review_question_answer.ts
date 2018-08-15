@@ -16,8 +16,10 @@ export class PeerReviewQuestionAnswer extends BaseEntity {
   @ManyToOne(type => PeerReviewQuestion, prq => prq.id, { primary: true })
   public peerReviewQuestion: PeerReviewQuestion
 
-  @Column("int") public value: number
-  @Column("text") public text: string
+  @Column({ type: "int", nullable: true })
+  public value: number
+  @Column({ type: "text", nullable: true })
+  public text: string
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

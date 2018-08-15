@@ -25,7 +25,7 @@ export class PeerReviewQuestion extends BaseEntity {
   public texts: PeerReviewQuestionTranslation[]
 
   @Column() public default: boolean
-  @Column({ type: "enum", enum: ["essay", "multiple-choice"] })
+  @Column({ type: "enum", enum: ["essay", "grade"] })
   public type: string
 
   @Column({ default: true })

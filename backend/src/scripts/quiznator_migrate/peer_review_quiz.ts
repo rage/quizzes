@@ -1,5 +1,8 @@
 import oldQuizTypes from "./app-modules/constants/quiz-types"
-import { Quiz as QNQuiz } from "./app-modules/models"
+import {
+  PeerReview as QNPeerReview,
+  Quiz as QNQuiz,
+} from "./app-modules/models"
 
 import {
   PeerReviewQuestion,
@@ -10,13 +13,13 @@ import { getUUIDByString, progressBar, safeGet } from "./util"
 
 export async function migratePeerReviewQuestions(quizzes: {
   [quizID: string]: Quiz
-}): Promise<{ [prqID: string]: PeerReviewQuestion }> {
+}): Promise<{ [prqID: string]: PeerReviewQuestion[] }> {
   console.log("Querying peer review questions...")
   const peerReviewQuestions = await QNQuiz.find({
     type: { $in: [oldQuizTypes.PEER_REVIEW] },
   })
 
-  const newQuestions: { [prqID: string]: PeerReviewQuestion } = {}
+  const newQuestions: { [prqID: string]: PeerReviewQuestion[] } = {}
   const bar = progressBar(
     "Migrating peer review questions",
     peerReviewQuestions.length,
@@ -27,9 +30,12 @@ export async function migratePeerReviewQuestions(quizzes: {
       continue
     }
     try {
-      const prq = await migratePeerReviewQuestion(quiz, oldPRQ)
-      newQuestions[prq.id] = prq
-      quiz.peerReviewQuestions = Promise.resolve([prq])
+      const prqs = await migratePeerReviewQuestion(quiz, oldPRQ)
+      if (!prqs || prqs.length === 0) {
+        continue
+      }
+      newQuestions[oldPRQ._id] = prqs
+      quiz.peerReviewQuestions = Promise.resolve(prqs)
       bar.tick()
     } catch (e) {
       console.error("Failed to migrate peer review question", oldPRQ)
@@ -42,26 +48,58 @@ export async function migratePeerReviewQuestions(quizzes: {
 async function migratePeerReviewQuestion(
   quiz: Quiz,
   oldPRQ: { [key: string]: any },
-): Promise<PeerReviewQuestion> {
+): Promise<PeerReviewQuestion[]> {
   const language = quiz.course.languages[0]
-  const prq = PeerReviewQuestion.create({
-    id: getUUIDByString(oldPRQ._id),
-    quiz,
-    default: false,
-    type: "essay",
-    answerRequired: oldPRQ.data.answeringRequired,
+
+  const peerReviewSample = await QNPeerReview.findOne({
+    $or: [{ quizId: oldPRQ._id }, { sourceQuizId: oldPRQ._id }],
   })
-  await prq.save()
-  prq.texts = [
-    PeerReviewQuestionTranslation.create({
-      peerReviewQuestion: prq.id,
-      language,
-      title: oldPRQ.title || "",
-      body: oldPRQ.body || "",
+  if (!peerReviewSample) {
+    return []
+  }
+
+  const newPRQ = async (
+    id: string,
+    type: string,
+    title: string = "",
+    body: string = "",
+  ) => {
+    const prq = await PeerReviewQuestion.create({
+      id: getUUIDByString(id),
+      quiz,
+      default: false,
+      type,
+      answerRequired: oldPRQ.data.answeringRequired,
       createdAt: oldPRQ.createdAt,
       updatedAt: oldPRQ.updatedAt,
-    }),
-  ]
-  await prq.texts[0].save()
-  return prq
+    }).save()
+    prq.texts = [
+      await PeerReviewQuestionTranslation.create({
+        peerReviewQuestion: prq.id,
+        language,
+        title,
+        body,
+        createdAt: oldPRQ.createdAt,
+        updatedAt: oldPRQ.updatedAt,
+      }).save(),
+    ]
+    return prq
+  }
+
+  const reviewQuestions = []
+
+  if (peerReviewSample.review && peerReviewSample.review !== "n/a") {
+    reviewQuestions.push(
+      await newPRQ(oldPRQ._id, "essay", oldPRQ.title, oldPRQ.body),
+    )
+  }
+  if (peerReviewSample.grading) {
+    for (const question of Object.keys(peerReviewSample.grading)) {
+      reviewQuestions.push(
+        await newPRQ(oldPRQ._id + question, "grade", oldPRQ.title, question),
+      )
+    }
+  }
+
+  return reviewQuestions
 }

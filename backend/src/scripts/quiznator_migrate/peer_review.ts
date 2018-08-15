@@ -1,6 +1,12 @@
 import { PeerReview as QNPeerReview } from "./app-modules/models"
 
-import { PeerReview, Quiz, QuizAnswer, User } from "../../models"
+import {
+  PeerReview,
+  PeerReviewQuestionAnswer,
+  Quiz,
+  QuizAnswer,
+  User,
+} from "../../models"
 import { getUUIDByString, progressBar } from "./util"
 
 export async function migratePeerReviews(
@@ -58,13 +64,36 @@ async function migratePeerReview(
   quiz: Quiz,
   oldPR: { [key: string]: any },
 ): Promise<PeerReview> {
-  const pr = PeerReview.create({
+  const pr = await PeerReview.create({
     id: getUUIDByString(oldPR._id),
     user,
     quizAnswer,
-    rejectedQuizAnswers: rejectedQuizAnswer ? [rejectedQuizAnswer] : [],
-  })
-  await pr.save()
-  // TODO PeerReviewQuestionAnswers
+    rejectedQuizAnswers: Promise.resolve(
+      rejectedQuizAnswer ? [rejectedQuizAnswer] : [],
+    ),
+    createdAt: quizAnswer.createdAt,
+    updatedAt: quizAnswer.updatedAt,
+  }).save()
+
+  const questions = await quiz.peerReviewQuestions
+  const answers = []
+
+  for (const question of questions) {
+    const answer = PeerReviewQuestionAnswer.create({
+      peerReview: pr,
+      peerReviewQuestion: question,
+      createdAt: quizAnswer.createdAt,
+      updatedAt: quizAnswer.updatedAt,
+    })
+    if (question.type === "essay") {
+      answer.text = oldPR.review
+    } else if (question.type === "grade") {
+      answer.value = oldPR.grading[question.texts[0].title]
+    }
+    await answer.save()
+    answers.push(answer)
+  }
+  pr.answers = Promise.resolve(answers)
+
   return pr
 }
