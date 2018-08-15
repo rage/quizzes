@@ -9,35 +9,24 @@ import {
   UpdateDateColumn,
 } from "typeorm"
 import { Language } from "./language"
-import { PeerReviewQuestionCollection } from "./peer_review_question_collection"
+import { PeerReviewQuestion } from "./peer_review_question"
 import { Quiz } from "./quiz"
 
 @Entity()
-export class PeerReviewQuestion extends BaseEntity {
+export class PeerReviewQuestionCollection extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") public id: string
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Quiz
 
-  @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id, {
-    nullable: true,
-  })
-  public collection?: PeerReviewQuestionCollection
-
   @OneToMany(
-    type => PeerReviewQuestionTranslation,
-    prqt => prqt.peerReviewQuestion,
+    type => PeerReviewQuestionCollectionTranslation,
+    prqct => prqct.peerReviewQuestionCollection,
   )
-  public texts: PeerReviewQuestionTranslation[]
+  public texts: PeerReviewQuestionCollectionTranslation[]
 
-  @Column() public default: boolean
-  @Column({ type: "enum", enum: ["essay", "grade"] })
-  public type: string
-
-  @Column({ default: true })
-  public answerRequired: boolean
-
-  @Column("int") public order: number
+  @OneToMany(type => PeerReviewQuestion, prq => prq.collection)
+  public questions: Promise<PeerReviewQuestion[]>
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
@@ -46,9 +35,11 @@ export class PeerReviewQuestion extends BaseEntity {
 }
 
 @Entity()
-export class PeerReviewQuestionTranslation extends BaseEntity {
-  @ManyToOne(type => PeerReviewQuestion, prq => prq.id, { primary: true })
-  public peerReviewQuestion: string
+export class PeerReviewQuestionCollectionTranslation extends BaseEntity {
+  @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id, {
+    primary: true,
+  })
+  public peerReviewQuestionCollection: string
   @ManyToOne(type => Language, lang => lang.id, { primary: true })
   public language: Language
 

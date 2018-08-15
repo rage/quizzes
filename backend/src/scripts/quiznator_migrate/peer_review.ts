@@ -3,6 +3,7 @@ import { PeerReview as QNPeerReview } from "./app-modules/models"
 import {
   PeerReview,
   PeerReviewQuestionAnswer,
+  PeerReviewQuestionCollection,
   Quiz,
   QuizAnswer,
   User,
@@ -12,6 +13,7 @@ import { getUUIDByString, progressBar } from "./util"
 export async function migratePeerReviews(
   users: { [username: string]: User },
   quizzes: { [quizID: string]: Quiz },
+  peerReviewQuestions: { [prqID: string]: PeerReviewQuestionCollection },
   answers: { [answerID: string]: QuizAnswer },
 ): Promise<{ [prID: string]: PeerReview }> {
   console.log("Querying peer reviews...")
@@ -27,9 +29,12 @@ export async function migratePeerReviews(
 
     const rejectedAnswer = answers[getUUIDByString(oldPR.rejectedQuizAnswerId)]
 
-    const quiz =
-      quizzes[getUUIDByString(oldPR.quizId)] ||
-      quizzes[getUUIDByString(oldPR.sourceQuizId)]
+    let quiz = quizzes[getUUIDByString(oldPR.quizId)]
+    let prqc = peerReviewQuestions[getUUIDByString(oldPR.sourceQuizId)]
+    if (!quiz) {
+      quiz = quizzes[getUUIDByString(oldPR.sourceQuizId)]
+      prqc = peerReviewQuestions[getUUIDByString(oldPR.quizId)]
+    }
     if (!quiz) {
       continue
     }
@@ -44,7 +49,7 @@ export async function migratePeerReviews(
         user,
         answer,
         rejectedAnswer,
-        quiz,
+        prqc,
         oldPR,
       )
       newReviews[pr.id] = pr
@@ -61,7 +66,7 @@ async function migratePeerReview(
   user: User,
   quizAnswer: QuizAnswer,
   rejectedQuizAnswer: QuizAnswer,
-  quiz: Quiz,
+  prqc: PeerReviewQuestionCollection,
   oldPR: { [key: string]: any },
 ): Promise<PeerReview> {
   const pr = await PeerReview.create({
@@ -75,10 +80,8 @@ async function migratePeerReview(
     updatedAt: quizAnswer.updatedAt,
   }).save()
 
-  const questions = await quiz.peerReviewQuestions
   const answers = []
-
-  for (const question of questions) {
+  for (const question of await prqc.questions) {
     const answer = PeerReviewQuestionAnswer.create({
       peerReview: pr,
       peerReviewQuestion: question,

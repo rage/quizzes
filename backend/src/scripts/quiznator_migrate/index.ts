@@ -23,12 +23,12 @@ async function main() {
   const languages = await createLanguages()
   const courses = await migrateCourses(org, languages)
   const quizzes = await migrateQuizzes(courses)
-  await migratePeerReviewQuestions(quizzes)
+  const peerReviewQuestions = await migratePeerReviewQuestions(quizzes)
   // console.log("Skipping user migration")
   // const users = {}
   const users = await migrateUsers()
   const answers = await migrateQuizAnswers(quizzes, users)
-  await migratePeerReviews(users, quizzes, answers)
+  await migratePeerReviews(users, quizzes, peerReviewQuestions, answers)
   console.log("Migration complete")
   process.exit()
 }

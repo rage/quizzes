@@ -14,7 +14,7 @@ export async function migrateQuizAnswers(
   users: { [userID: string]: User },
 ): Promise<{ [answerID: string]: QuizAnswer }> {
   console.log("Querying quiz answers...")
-  const answers = await QNQuizAnswer.find({}).limit(5000)
+  const answers = await QNQuizAnswer.find({}).limit(20000)
   const newAnswers: { [answerID: string]: QuizAnswer } = {}
   const bar = progressBar("Migrating quiz answers", answers.length)
   let quizNotFound = 0
