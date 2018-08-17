@@ -19,6 +19,8 @@ export class UserCourseState extends BaseEntity {
   @Column("float") public progress: number
   @Column("float") public score: number
   @Column() public completed: boolean
+  @Column({ type: "timestamp" })
+  public completionDate: Date
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

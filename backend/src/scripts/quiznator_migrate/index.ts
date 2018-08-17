@@ -4,6 +4,7 @@ import { Organization } from "../../models"
 import mongoUtils from "./mongo_utils"
 
 import { migrateCourses } from "./course"
+import { migrateCourseStates } from "./course_state"
 import { createLanguages } from "./language"
 import { migratePeerReviews } from "./peer_review"
 import { migratePeerReviewQuestions } from "./peer_review_quiz"
@@ -25,11 +26,10 @@ async function main() {
   const courses = await migrateCourses(org, languages)
   const quizzes = await migrateQuizzes(courses)
   const peerReviewQuestions = await migratePeerReviewQuestions(quizzes)
-  // console.log("Skipping user migration")
-  // const users = {}
   const users = await migrateUsers()
+  await migrateCourseStates(courses, users)
   const answers = await migrateQuizAnswers(quizzes, users)
-  migrateSpamFlags(users, answers)
+  await migrateSpamFlags(users, answers)
   await migratePeerReviews(users, quizzes, peerReviewQuestions, answers)
   console.log("Migration complete")
   process.exit()
