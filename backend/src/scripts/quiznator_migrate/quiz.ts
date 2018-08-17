@@ -54,6 +54,7 @@ export async function migrateQuizzes(courses: {
       }
     }
     if (!course) {
+      bar.tick() // TODO handle skips?
       continue
     }
 

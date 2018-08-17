@@ -9,7 +9,7 @@ const TMC_TOKEN =
 
 export async function migrateUsers(): Promise<{ [username: string]: User }> {
   console.log("Querying list of usernames...")
-  const usernames = await QNQuizAnswer.distinct("answererId")
+  const usernames = (await QNQuizAnswer.distinct("answererId")).slice(0, 10000)
 
   console.log(`Fetching user list with ${usernames.length} usernames...`)
   const resp = await axios.post(
@@ -27,11 +27,9 @@ export async function migrateUsers(): Promise<{ [username: string]: User }> {
   const bar = progressBar("Creating users", resp.data.length)
   const users: { [username: string]: User } = {}
   for (const info of resp.data) {
-    const user = User.create({
+    users[info.username] = await User.create({
       id: info.id,
-    })
-    await user.save()
-    users[info.username] = user
+    }).save()
     bar.tick()
   }
   return users

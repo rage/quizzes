@@ -24,6 +24,7 @@ export async function migratePeerReviews(
   for (const oldPR of peerReviews) {
     const answer = answers[getUUIDByString(oldPR.chosenQuizAnswerId)]
     if (!answer) {
+      bar.tick() // TODO handle skips?
       continue
     }
 
@@ -36,11 +37,13 @@ export async function migratePeerReviews(
       prqc = peerReviewQuestions[getUUIDByString(oldPR.quizId)]
     }
     if (!quiz) {
+      bar.tick() // TODO handle skips?
       continue
     }
 
     const user = users[oldPR.giverAnswererId]
     if (!user) {
+      bar.tick() // TODO handle skips?
       continue
     }
 

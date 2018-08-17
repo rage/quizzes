@@ -9,6 +9,7 @@ import { migratePeerReviews } from "./peer_review"
 import { migratePeerReviewQuestions } from "./peer_review_quiz"
 import { migrateQuizzes } from "./quiz"
 import { migrateQuizAnswers } from "./quiz_answer"
+import { migrateSpamFlags } from "./spam_flag"
 import { migrateUsers } from "./user"
 
 async function main() {
@@ -28,6 +29,7 @@ async function main() {
   // const users = {}
   const users = await migrateUsers()
   const answers = await migrateQuizAnswers(quizzes, users)
+  migrateSpamFlags(users, answers)
   await migratePeerReviews(users, quizzes, peerReviewQuestions, answers)
   console.log("Migration complete")
   process.exit()

@@ -24,18 +24,21 @@ export async function migrateQuizAnswers(
     const quiz = quizzes[getUUIDByString(answer.quizId)]
     if (!quiz) {
       quizNotFound++
+      bar.tick() // TODO handle skips?
       continue
     }
 
     const user = users[answer.answererId]
     if (!user) {
       userNotFound++
+      bar.tick() // TODO handle skips?
       continue
     }
 
     const newAnswer = await migrateQuizAnswer(quiz, user, answer)
     if (!newAnswer) {
       itemsNotFound++
+      bar.tick() // TODO handle skips?
       return
     }
     newAnswers[newAnswer.id] = newAnswer
