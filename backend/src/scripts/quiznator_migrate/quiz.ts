@@ -17,6 +17,17 @@ export async function migrateQuizzes(courses: {
 }): Promise<{ [quizID: string]: Quiz }> {
   const eaiRegex = /ai_([0-9])_([0-9])/
 
+  const newQuizzes: { [quizID: string]: Quiz } = {}
+
+  const existingQuizzes = await Quiz.find({})
+  if (existingQuizzes.length > 0) {
+    console.log("Existing quizzes found in database, skipping migration")
+    for (const quiz of existingQuizzes) {
+      newQuizzes[quiz.id] = quiz
+    }
+    return newQuizzes
+  }
+
   console.log("Querying quizzes...")
   const oldQuizzes = await QNQuiz.find({
     type: {
@@ -30,7 +41,6 @@ export async function migrateQuizzes(courses: {
     },
   })
   const bar = progressBar("Migrating quizzes", oldQuizzes.length)
-  const newQuizzes: { [quizID: string]: Quiz } = {}
   for (const oldQuiz of oldQuizzes) {
     let part = 0
     let section = 0
@@ -43,7 +53,7 @@ export async function migrateQuizzes(courses: {
       }
 
       if (tag in courses) {
-        course = courses[tag]
+        course = courses[getUUIDByString(tag)]
         continue
       }
 

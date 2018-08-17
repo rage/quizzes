@@ -32,6 +32,9 @@ export async function migrateCourseStates(
         user,
         course,
 
+        progress: completion.data.progress,
+        score: completion.data.score,
+
         completed: completion.completed,
         completionDate: completion.completionDate,
       }).save(),

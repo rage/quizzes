@@ -24,6 +24,18 @@ export async function migratePeerReviewQuestions(quizzes: {
   const newQuestionCollections: {
     [prqID: string]: PeerReviewQuestionCollection
   } = {}
+
+  const existingPRQCs = await PeerReviewQuestionCollection.find({})
+  if (existingPRQCs.length > 0) {
+    console.log(
+      "Existing peer review questions found in database, skipping migration",
+    )
+    for (const prqc of existingPRQCs) {
+      newQuestionCollections[prqc.id] = prqc
+    }
+    return newQuestionCollections
+  }
+
   const bar = progressBar(
     "Migrating peer review questions",
     peerReviewQuestions.length,

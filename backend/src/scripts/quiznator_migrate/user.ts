@@ -17,9 +17,9 @@ export async function migrateUsers(): Promise<{ [username: string]: User }> {
 
   let bar
   const users: { [username: string]: User } = {}
-  console.log("Checking for existing users in database...")
   const existingUsers = await User.find({})
   if (existingUsers.length > 0) {
+    console.log("Existing users found in database, skipping migration")
     const existingUsersByID: { [id: number]: User } = {}
     for (const user of existingUsers) {
       existingUsersByID[user.id] = user
@@ -49,6 +49,7 @@ async function getUserInfo(
     console.log("Reading user info list cache")
     const data = JSON.parse(fs.readFileSync(userInfoCachePath).toString())
     if (data.inputUsernameCount === usernames.length) {
+      console.log("Cache hit, skipping user info list fetch")
       return data.info
     }
   }

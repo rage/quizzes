@@ -34,17 +34,24 @@ export async function migrateCourses(
   languages: { [languageID: string]: Language },
 ): Promise<{ [courseID: string]: Course }> {
   const courses: { [key: string]: Course } = {}
+
+  const existingCourses = await Course.find({})
+  if (existingCourses.length > 0) {
+    console.log("Existing courses found in database, skipping migration")
+    for (const course of existingCourses) {
+      courses[course.id] = course
+    }
+    return courses
+  }
+
   const bar = progressBar("Creating courses", Object.entries(courseIDs).length)
   for (const [courseID, language] of Object.entries(courseIDs)) {
     const uuid = getUUIDByString(courseID)
-    courses[courseID] = Course.merge(
-      Course.create({
-        id: uuid,
-        organization: org,
-        languages: [languages[language]],
-      }),
-    )
-    await courses[courseID].save()
+    courses[uuid] = await Course.create({
+      id: uuid,
+      organization: org,
+      languages: [languages[language]],
+    }).save()
     bar.tick()
   }
   return courses
