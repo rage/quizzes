@@ -1,3 +1,5 @@
+import fs from "fs"
+
 import axios from "axios"
 
 import { User } from "../../models"
@@ -9,7 +11,47 @@ const TMC_TOKEN =
 
 export async function migrateUsers(): Promise<{ [username: string]: User }> {
   console.log("Querying list of usernames...")
-  const usernames = (await QNQuizAnswer.distinct("answererId")).slice(0, 10000)
+  const usernames = await QNQuizAnswer.distinct("answererId")
+
+  const userInfo = await getUserInfo(usernames)
+
+  let bar
+  const users: { [username: string]: User } = {}
+  console.log("Checking for existing users in database...")
+  const existingUsers = await User.find({})
+  if (existingUsers.length > 0) {
+    const existingUsersByID: { [id: number]: User } = {}
+    for (const user of existingUsers) {
+      existingUsersByID[user.id] = user
+    }
+    for (const info of userInfo) {
+      users[info.username] = existingUsersByID[info.id]
+    }
+    return users
+  }
+
+  bar = progressBar("Creating users", userInfo.length)
+  for (const info of userInfo) {
+    users[info.username] = await User.create({
+      id: info.id,
+    }).save()
+    bar.tick()
+  }
+  return users
+}
+
+const userInfoCachePath = "userinfo.json"
+
+async function getUserInfo(
+  usernames: string[],
+): Promise<Array<{ [key: string]: any }>> {
+  if (fs.existsSync(userInfoCachePath)) {
+    console.log("Reading user info list cache")
+    const data = JSON.parse(fs.readFileSync(userInfoCachePath).toString())
+    if (data.inputUsernameCount === usernames.length) {
+      return data.info
+    }
+  }
 
   console.log(`Fetching user list with ${usernames.length} usernames...`)
   const resp = await axios.post(
@@ -24,13 +66,14 @@ export async function migrateUsers(): Promise<{ [username: string]: User }> {
       },
     },
   )
-  const bar = progressBar("Creating users", resp.data.length)
-  const users: { [username: string]: User } = {}
-  for (const info of resp.data) {
-    users[info.username] = await User.create({
-      id: info.id,
-    }).save()
-    bar.tick()
-  }
-  return users
+
+  fs.writeFileSync(
+    userInfoCachePath,
+    JSON.stringify({
+      inputUsernameCount: usernames.length,
+      info: resp.data,
+    }),
+  )
+
+  return resp.data
 }

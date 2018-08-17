@@ -17,7 +17,7 @@ export function safeGet<T>(func: () => T, def?: any): T {
 export function progressBar(message: string, total: number) {
   return new ProgressBar(
     message +
-      "... :percent [:bar] (:current/:total, :rate/s, :elapseds elapsed / :etas remaining)",
+      " :percent [:bar] (:current/:total, :rate/s, :elapseds elapsed / :etas remaining)",
     {
       total,
 
