@@ -96,7 +96,7 @@ async function migrateQuiz(
   section: number = null,
   excludedFromScore: boolean = false,
 ): Promise<Quiz> {
-  const language = course.languages[0]
+  const language = (await course.languages)[0]
   const quiz = Quiz.create({
     id: getUUIDByString(oldQuiz._id),
     course,

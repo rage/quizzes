@@ -67,7 +67,7 @@ async function migrateQuizAnswer(
     quiz,
     user,
     status: "submitted", // TODO
-    language: quiz.course.languages[0],
+    language: (await quiz.course.languages)[0],
   })
   await quizAnswer.save()
 

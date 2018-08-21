@@ -11,7 +11,8 @@
     "no-console": false,
     "arrow-parens": false,
     "object-literal-sort-keys": false,
-    "max-classes-per-file": [true, 2]
+    "max-classes-per-file": [true, 2],
+    "trailing-comma": [false]
   },
   "jsRules": {
     "max-line-length": {

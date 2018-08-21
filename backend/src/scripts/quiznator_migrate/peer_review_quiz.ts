@@ -69,7 +69,7 @@ async function migratePeerReviewQuestion(
   quiz: Quiz,
   oldPRQ: { [key: string]: any },
 ): Promise<PeerReviewQuestionCollection> {
-  const language = quiz.course.languages[0]
+  const language = (await quiz.course.languages)[0]
 
   const peerReviewSample = await QNPeerReview.findOne({
     $or: [{ quizId: oldPRQ._id }, { sourceQuizId: oldPRQ._id }],

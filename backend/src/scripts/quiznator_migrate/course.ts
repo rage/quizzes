@@ -49,8 +49,8 @@ export async function migrateCourses(
     const uuid = getUUIDByString(courseID)
     courses[uuid] = await Course.create({
       id: uuid,
-      organization: org,
-      languages: [languages[language]],
+      organization: Promise.resolve(org),
+      languages: Promise.resolve([languages[language]]),
     }).save()
     bar.tick()
   }

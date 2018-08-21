@@ -16,11 +16,11 @@ export class Course extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") public id: string
 
   @ManyToOne(type => Organization, org => org.id)
-  public organization: Organization
+  public organization: Promise<Organization>
 
   @ManyToMany(type => Language, lang => lang.id)
   @JoinTable({ name: "course_language" })
-  public languages: Language[]
+  public languages: Promise<Language[]>
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
