@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm"
 import { QuizAnswer } from "./quiz_answer"
@@ -11,9 +12,12 @@ import { User } from "./user"
 @Entity()
 export class SpamFlag extends BaseEntity {
   @ManyToOne(type => User, user => user.id, { primary: true })
-  public user: User
+  public user: Promise<User>
+  @PrimaryColumn("int") public userId: number
+
   @ManyToOne(type => QuizAnswer, qa => qa.id, { primary: true })
-  public quizAnswer: QuizAnswer
+  public quizAnswer: Promise<QuizAnswer>
+  @PrimaryColumn() public quizAnswerId: string
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

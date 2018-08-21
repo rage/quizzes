@@ -1,5 +1,6 @@
 import { PeerReview as QNPeerReview } from "./app-modules/models"
 
+import { Any } from "typeorm"
 import {
   PeerReview,
   PeerReviewQuestionAnswer,
@@ -10,66 +11,55 @@ import {
 } from "../../models"
 import { getUUIDByString, progressBar } from "./util"
 
-export async function migratePeerReviews(
-  users: { [username: string]: User },
-  quizzes: { [quizID: string]: Quiz },
-  peerReviewQuestions: { [prqID: string]: PeerReviewQuestionCollection },
-  answers: { [answerID: string]: QuizAnswer },
-): Promise<{ [prID: string]: PeerReview }> {
+export async function migratePeerReviews(users: { [username: string]: User }) {
   console.log("Querying peer reviews...")
   const peerReviews = await QNPeerReview.find({})
 
-  const newReviews: { [prID: string]: PeerReview } = {}
   const bar = progressBar("Migrating peer reviews", peerReviews.length)
   await Promise.all(
     peerReviews.map(async (oldPR: any) => {
-      const answer = answers[getUUIDByString(oldPR.chosenQuizAnswerId)]
+      const answer = await QuizAnswer.findOne(
+        getUUIDByString(oldPR.chosenQuizAnswerId),
+      )
       if (!answer) {
-        bar.tick() // TODO handle skips?
         return
       }
 
-      const rejectedAnswer =
-        answers[getUUIDByString(oldPR.rejectedQuizAnswerId)]
+      const rejectedAnswer = await QuizAnswer.findOne(
+        getUUIDByString(oldPR.rejectedQuizAnswerId),
+      )
 
-      let quiz = quizzes[getUUIDByString(oldPR.quizId)]
-      let prqc = peerReviewQuestions[getUUIDByString(oldPR.sourceQuizId)]
-      if (!quiz) {
-        quiz = quizzes[getUUIDByString(oldPR.sourceQuizId)]
-        prqc = peerReviewQuestions[getUUIDByString(oldPR.quizId)]
-      }
-      if (!quiz) {
-        bar.tick() // TODO handle skips?
+      const quizID = getUUIDByString(oldPR.quizId)
+      const sourceQuizId = getUUIDByString(oldPR.sourceQuizId)
+      const prqcFind = await PeerReviewQuestionCollection.find({
+        take: 1,
+        where: {
+          id: Any([quizID, sourceQuizId]),
+        },
+      })
+      if (!prqcFind) {
         return
       }
 
       const user = users[oldPR.giverAnswererId]
       if (!user) {
-        bar.tick() // TODO handle skips?
         return
       }
 
-      try {
-        const pr = await migratePeerReview(
-          user,
-          answer,
-          rejectedAnswer,
-          prqc,
-          oldPR,
-        )
-        newReviews[pr.id] = pr
-        bar.tick()
-      } catch (e) {
-        console.error("Failed to migrate peer review", oldPR)
-        throw e
-      }
+      await migratePeerReview(
+        user.id,
+        answer,
+        rejectedAnswer,
+        prqcFind[0],
+        oldPR,
+      )
+      bar.tick()
     }),
   )
-  return newReviews
 }
 
 async function migratePeerReview(
-  user: User,
+  userId: number,
   quizAnswer: QuizAnswer,
   rejectedQuizAnswer: QuizAnswer,
   prqc: PeerReviewQuestionCollection,
@@ -77,8 +67,8 @@ async function migratePeerReview(
 ): Promise<PeerReview> {
   const pr = await PeerReview.create({
     id: getUUIDByString(oldPR._id),
-    user,
-    quizAnswer,
+    userId,
+    quizAnswerId: quizAnswer.id,
     rejectedQuizAnswers: Promise.resolve(
       rejectedQuizAnswer ? [rejectedQuizAnswer] : [],
     ),
@@ -89,8 +79,8 @@ async function migratePeerReview(
   const answers = []
   for (const question of await prqc.questions) {
     const answer = PeerReviewQuestionAnswer.create({
-      peerReview: pr,
-      peerReviewQuestion: question,
+      peerReviewId: pr.id,
+      peerReviewQuestionId: question.id,
       createdAt: quizAnswer.createdAt,
       updatedAt: quizAnswer.updatedAt,
     })

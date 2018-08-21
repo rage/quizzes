@@ -5,8 +5,10 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  RelationId,
   UpdateDateColumn,
 } from "typeorm"
+import { Language } from "./language"
 import { QuizAnswer } from "./quiz_answer"
 import { QuizItem } from "./quiz_item"
 
@@ -15,9 +17,12 @@ export class QuizItemAnswer extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") public id: string
 
   @ManyToOne(type => QuizAnswer, qa => qa.id)
-  public quizAnswer: QuizAnswer
+  public quizAnswer: Promise<QuizAnswer>
+  @Column() public quizAnswerId: string
+
   @ManyToOne(type => QuizItem, qi => qi.id)
-  public quizItem: QuizItem
+  public quizItem: Promise<QuizItem>
+  @Column() public quizItemId: string
 
   @Column("text") public textData: string
 

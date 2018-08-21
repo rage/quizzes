@@ -3,10 +3,9 @@ import { QuizAnswerSpamFlag as QNSpamFlag } from "./app-modules/models"
 import { QuizAnswer, SpamFlag, User } from "../../models"
 import { getUUIDByString, progressBar } from "./util"
 
-export async function migrateSpamFlags(
-  users: { [username: string]: User },
-  answers: { [answerID: string]: QuizAnswer },
-): Promise<SpamFlag[]> {
+export async function migrateSpamFlags(users: {
+  [username: string]: User
+}): Promise<SpamFlag[]> {
   console.log("Querying spam flags...")
   const oldFlags = (await QNSpamFlag.find({})).map(
     (spamFlag: { [key: string]: any }) => spamFlag._id.split("-"),
@@ -19,19 +18,12 @@ export async function migrateSpamFlags(
       async ([username, answerID]: [string, string]): Promise<SpamFlag> => {
         const user = users[username]
         if (!user) {
-          bar.tick()
-          return
-        }
-
-        const quizAnswer = answers[getUUIDByString(answerID)]
-        if (!quizAnswer) {
-          bar.tick()
           return
         }
 
         const flag = await SpamFlag.create({
-          user,
-          quizAnswer,
+          userId: user.id,
+          quizAnswerId: getUUIDByString(answerID),
         }).save()
         bar.tick()
         return flag

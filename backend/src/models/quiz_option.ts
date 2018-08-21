@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  RelationId,
   UpdateDateColumn,
 } from "typeorm"
 import { Language } from "./language"
@@ -16,11 +17,14 @@ export class QuizOption extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") public id: string
 
   @ManyToOne(type => QuizItem, qi => qi.id)
-  public quizItem: QuizItem
+  public quizItem: Promise<QuizItem>
+  @Column() public quizItemId: string
 
   @Column("int") public order: number
 
-  @OneToMany(type => QuizOptionTranslation, qot => qot.quizOption)
+  @OneToMany(type => QuizOptionTranslation, qot => qot.quizOption, {
+    eager: true,
+  })
   public texts: QuizOptionTranslation[]
 
   @Column() public correct: boolean
@@ -37,6 +41,7 @@ export class QuizOptionTranslation extends BaseEntity {
   public quizOption: string
   @ManyToOne(type => Language, lang => lang.id, { primary: true })
   public language: Language
+  @Column() public languageId: string
 
   @Column("text") public title: string
   @Column({ type: "text", nullable: true })

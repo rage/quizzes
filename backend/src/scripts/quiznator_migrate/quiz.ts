@@ -53,8 +53,9 @@ export async function migrateQuizzes(courses: {
           continue
         }
 
-        if (tag in courses) {
-          course = courses[getUUIDByString(tag)]
+        const tagUUID = getUUIDByString(tag)
+        if (tagUUID in courses) {
+          course = courses[tagUUID]
           continue
         }
 
@@ -69,23 +70,15 @@ export async function migrateQuizzes(courses: {
         return
       }
 
-      try {
-        const quiz = await migrateQuiz(
-          course,
-          oldQuiz,
-          part,
-          section,
-          excludedFromScore,
-        )
-        newQuizzes[quiz.id] = quiz
-        bar.tick()
-      } catch (e) {
-        console.error(
-          "Failed to migrate quiz",
-          require("util").inspect(oldQuiz, false, null),
-        )
-        throw e
-      }
+      const quiz = await migrateQuiz(
+        course,
+        oldQuiz,
+        part,
+        section,
+        excludedFromScore,
+      )
+      newQuizzes[quiz.id] = quiz
+      bar.tick()
     }),
   )
   return newQuizzes
@@ -98,7 +91,10 @@ async function migrateQuiz(
   section: number = null,
   excludedFromScore: boolean = false,
 ): Promise<Quiz> {
-  const language = (await course.languages)[0]
+  const languageId = course.languages[0].id
+  if (!course || !course.languages || !languageId) {
+    throw Error(JSON.stringify(course))
+  }
   const quiz = Quiz.create({
     id: getUUIDByString(oldQuiz._id),
     course,
@@ -112,7 +108,7 @@ async function migrateQuiz(
   quiz.texts = [
     QuizTranslation.create({
       quiz: quiz.id,
-      language,
+      languageId,
       title: oldQuiz.title || "",
       body: oldQuiz.body || "",
       submitMessage: safeGet(() => oldQuiz.data.meta.submitMessage),
@@ -138,7 +134,7 @@ async function migrateQuiz(
     case oldQuizTypes.OPEN:
       item = QuizItem.create({
         id: getUUIDByString(oldQuiz._id),
-        quiz,
+        quizId: quiz.id,
         type: oldQuiz.type === oldQuizTypes.ESSAY ? "essay" : "open",
         validityRegex: rightAnswer,
         order: 0,
@@ -149,7 +145,7 @@ async function migrateQuiz(
       item.texts = [
         QuizItemTranslation.create({
           quizItem: item.id,
-          language,
+          languageId,
           successMessage: meta.success || "",
           failureMessage: meta.error || "",
           title: "",
@@ -166,7 +162,7 @@ async function migrateQuiz(
       for (const oldItem of oldItems) {
         item = QuizItem.create({
           id: getUUIDByString(quiz.id + oldItem.id),
-          quiz,
+          quizId: quiz.id,
           type: "open",
           validityRegex: rightAnswer[oldItem.id],
           order: order++,
@@ -177,7 +173,7 @@ async function migrateQuiz(
         item.texts = [
           QuizItemTranslation.create({
             quizItem: item.id,
-            language,
+            languageId,
             successMessage: meta.success || "",
             failureMessage: meta.error || "",
             title: oldItem.title || "",
@@ -193,7 +189,7 @@ async function migrateQuiz(
     case oldQuizTypes.MULTIPLE_CHOICE:
       item = QuizItem.create({
         id: getUUIDByString(oldQuiz._id),
-        quiz,
+        quizId: quiz.id,
         type: "multiple-choice",
         order: 0,
         createdAt: oldQuiz.createdAt,
@@ -203,7 +199,7 @@ async function migrateQuiz(
       item.texts = [
         QuizItemTranslation.create({
           quizItem: item.id,
-          language,
+          languageId,
           title: "",
           body: "",
           successMessage: meta.success || "",
@@ -216,7 +212,7 @@ async function migrateQuiz(
       for (const oldChoice of oldItems) {
         const option = QuizOption.create({
           id: getUUIDByString(quiz.id + item.id + oldChoice.id),
-          quizItem: item,
+          quizItemId: item.id,
           order: choiceOrder++,
           correct:
             rightAnswer === oldChoice.id || rightAnswer.includes(oldChoice.id),
@@ -227,7 +223,7 @@ async function migrateQuiz(
         option.texts = [
           QuizOptionTranslation.create({
             quizOption: option.id,
-            language,
+            languageId,
             successMessage: meta.success || "",
             failureMessage: meta.error || "",
             title: oldChoice.title || "",
@@ -248,7 +244,7 @@ async function migrateQuiz(
       for (const oldItem of oldItems) {
         item = QuizItem.create({
           id: getUUIDByString(quiz.id + oldItem.id),
-          quiz,
+          quizId: quiz.id,
           type: "multiple-choice",
           order: order++,
           createdAt: oldQuiz.createdAt,
@@ -258,7 +254,7 @@ async function migrateQuiz(
         item.texts = [
           QuizItemTranslation.create({
             quizItem: item.id,
-            language,
+            languageId,
             successMessage: successes[oldItem.id] || "",
             failureMessage: errors[oldItem.id] || "",
             title: oldItem.title || "",
@@ -272,7 +268,7 @@ async function migrateQuiz(
         for (const oldChoice of oldChoices) {
           const option = QuizOption.create({
             id: getUUIDByString(quiz.id + item.id + oldChoice.id),
-            quizItem: item,
+            quizItemId: item.id,
             order: choiceOrder++,
             correct:
               rightAnswer[oldItem.id] === oldChoice.id ||
@@ -284,7 +280,7 @@ async function migrateQuiz(
           option.texts = [
             QuizOptionTranslation.create({
               quizOption: option.id,
-              language,
+              languageId,
               successMessage: "",
               failureMessage: "",
               title: oldChoice.title || "",

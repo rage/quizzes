@@ -1,9 +1,11 @@
 import {
   BaseEntity,
+  Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  RelationId,
   UpdateDateColumn,
 } from "typeorm"
 import { QuizItemAnswer } from "./quiz_item_answer"
@@ -14,9 +16,12 @@ export class QuizOptionAnswer extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") public id: string
 
   @ManyToOne(type => QuizItemAnswer, qia => qia.id)
-  public quizItemAnswer: QuizItemAnswer
+  public quizItemAnswer: Promise<QuizItemAnswer>
+  @Column() public quizItemAnswerId: string
+
   @ManyToOne(type => QuizOption, qo => qo.id)
-  public quizOption: QuizOption
+  public quizOption: Promise<QuizOption>
+  @Column() public quizOptionId: string
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

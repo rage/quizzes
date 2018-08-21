@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  PrimaryColumn,
   UpdateDateColumn,
 } from "typeorm"
 import { PeerReview } from "./peer_review"
@@ -13,8 +14,11 @@ import { PeerReviewQuestion } from "./peer_review_question"
 export class PeerReviewQuestionAnswer extends BaseEntity {
   @ManyToOne(type => PeerReview, pr => pr.id, { primary: true })
   public peerReview: PeerReview
+  @PrimaryColumn() public peerReviewId: string
+
   @ManyToOne(type => PeerReviewQuestion, prq => prq.id, { primary: true })
   public peerReviewQuestion: PeerReviewQuestion
+  @PrimaryColumn() public peerReviewQuestionId: string
 
   @Column({ type: "int", nullable: true })
   public value: number

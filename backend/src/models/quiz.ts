@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  RelationId,
   UpdateDateColumn,
 } from "typeorm"
 import { Course } from "./course"
@@ -17,10 +18,11 @@ import { QuizItem } from "./quiz_item"
 export class Quiz extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") public id: string
 
-  @ManyToOne(type => Course, course => course.id)
+  @ManyToOne(type => Course, course => course.id, { eager: true })
   public course: Course
+  @Column() public courseId: string
 
-  @OneToMany(type => QuizTranslation, qt => qt.quiz)
+  @OneToMany(type => QuizTranslation, qt => qt.quiz, { eager: true })
   public texts: QuizTranslation[]
 
   @Column("int") public part: number
@@ -32,10 +34,10 @@ export class Quiz extends BaseEntity {
   @Column({ type: "timestamp", nullable: true })
   public open?: Date
 
-  @OneToMany(type => QuizItem, qi => qi.quiz, { lazy: true })
+  @OneToMany(type => QuizItem, qi => qi.quiz)
   public items: Promise<QuizItem[]>
 
-  @OneToMany(type => PeerReviewQuestion, prq => prq.quiz, { lazy: true })
+  @OneToMany(type => PeerReviewQuestion, prq => prq.quiz)
   public peerReviewQuestions: Promise<PeerReviewQuestion[]>
 
   @Column({ default: false })
@@ -53,6 +55,7 @@ export class QuizTranslation extends BaseEntity {
   public quiz: string
   @ManyToOne(type => Language, lang => lang.id, { primary: true })
   public language: Language
+  @Column() public languageId: string
 
   @Column("text") public title: string
   @Column("text") public body: string

@@ -4,6 +4,8 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  PrimaryColumn,
+  RelationId,
   UpdateDateColumn,
 } from "typeorm"
 import { Quiz } from "./quiz"
@@ -12,9 +14,12 @@ import { User } from "./user"
 @Entity()
 export class UserQuizState extends BaseEntity {
   @ManyToOne(type => User, user => user.id, { primary: true })
-  public user: User
+  public user: Promise<User>
+  @PrimaryColumn("int") public userId: number
+
   @ManyToOne(type => Quiz, quiz => quiz.id, { primary: true })
   public quiz: Quiz
+  @PrimaryColumn() public quizId: string
 
   @Column("int") public peerReviewsGiven: number
   @Column("int") public peerReviewsReceived: number

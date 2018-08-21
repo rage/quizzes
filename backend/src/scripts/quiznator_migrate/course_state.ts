@@ -16,30 +16,36 @@ export async function migrateCourseStates(
       async (courseState: any): Promise<UserCourseState> => {
         const user = users[courseState.answererId]
         if (!user) {
-          bar.tick()
           return
         }
 
         const course = courses[getUUIDByString(courseState.courseId)]
         if (!course) {
+          return
+        }
+
+        const existingCourseState = await UserCourseState.findOne({
+          userId: user.id,
+          courseId: course.id,
+        })
+        if (existingCourseState) {
           bar.tick()
           return
         }
 
         const completion = courseState.completion || {}
 
-        const state = await UserCourseState.create({
-          user,
-          course,
+        await UserCourseState.create({
+          userId: user.id,
+          courseId: course.id,
 
-          progress: completion.data.progress,
-          score: completion.data.score,
+          progress: completion.data.progress || 0,
+          score: completion.data.score || 0,
 
           completed: completion.completed,
           completionDate: completion.completionDate,
         }).save()
         bar.tick()
-        return state
       },
     ),
   )

@@ -6,6 +6,7 @@ import {
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
+  RelationId,
   UpdateDateColumn,
 } from "typeorm"
 import { Language } from "./language"
@@ -17,11 +18,13 @@ export class PeerReviewQuestionCollection extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") public id: string
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
-  public quiz: Quiz
+  public quiz: Promise<Quiz>
+  @Column() public quizId: string
 
   @OneToMany(
     type => PeerReviewQuestionCollectionTranslation,
     prqct => prqct.peerReviewQuestionCollection,
+    { eager: true },
   )
   public texts: PeerReviewQuestionCollectionTranslation[]
 
@@ -42,6 +45,7 @@ export class PeerReviewQuestionCollectionTranslation extends BaseEntity {
   public peerReviewQuestionCollection: string
   @ManyToOne(type => Language, lang => lang.id, { primary: true })
   public language: Language
+  @Column() public languageId: string
 
   @Column("text") public title: string
   @Column("text") public body: string

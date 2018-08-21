@@ -2,7 +2,6 @@ import {
   Quiz,
   QuizAnswer,
   QuizItemAnswer,
-  QuizOption,
   QuizOptionAnswer,
   User,
 } from "../../models"
@@ -12,47 +11,47 @@ import { getUUIDByString, progressBar } from "./util"
 export async function migrateQuizAnswers(
   quizzes: { [quizID: string]: Quiz },
   users: { [userID: string]: User },
-): Promise<{ [answerID: string]: QuizAnswer }> {
+) {
   console.log("Querying quiz answers...")
   const answers = await QNQuizAnswer.find({})
-  const newAnswers: { [answerID: string]: QuizAnswer } = {}
   const bar = progressBar("Migrating quiz answers", answers.length)
   let quizNotFound = 0
   let userNotFound = 0
   let itemsNotFound = 0
-  await Promise.all(
-    answers.map(async (answer: any) => {
-      const quiz = quizzes[getUUIDByString(answer.quizId)]
-      if (!quiz) {
-        quizNotFound++
-        bar.tick() // TODO handle skips?
-        return
-      }
-
-      const user = users[answer.answererId]
-      if (!user) {
-        userNotFound++
-        bar.tick() // TODO handle skips?
-        return
-      }
-
-      const newAnswer = await migrateQuizAnswer(quiz, user, answer)
-      if (!newAnswer) {
-        itemsNotFound++
-        bar.tick() // TODO handle skips?
-        return
-      }
-      newAnswers[newAnswer.id] = newAnswer
+  let alreadyMigrated = 0
+  for (const answer of answers) {
+    const existingAnswer = await QuizAnswer.findOne(getUUIDByString(answer._id))
+    if (existingAnswer) {
       bar.tick()
-    }),
+      alreadyMigrated++
+      continue
+    }
+    const quiz = quizzes[getUUIDByString(answer.quizId)]
+    if (!quiz) {
+      quizNotFound++
+      continue
+    }
+
+    const user = users[answer.answererId]
+    if (!user) {
+      userNotFound++
+      continue
+    }
+
+    const newAnswer = await migrateQuizAnswer(quiz, user, answer)
+    if (!newAnswer) {
+      itemsNotFound++
+      continue
+    }
+    bar.tick()
+  }
+
+  console.log(
+    `Quiz answers migrated. ${quizNotFound +
+      userNotFound} answers were skipped, ${quizNotFound} did not match any quiz, ${userNotFound} did not match any user, the quizzes of ${itemsNotFound} did not have any answers and ${alreadyMigrated} were already migrated.`,
   )
-
-  console.log(`Quiz answers migrated. ${quizNotFound + userNotFound} answers
- were skipped, ${quizNotFound} did not match any quiz, ${userNotFound} did not
- match any user and the quizzes of ${itemsNotFound} did not have any answers.`)
-
-  return newAnswers
 }
+
 async function migrateQuizAnswer(
   quiz: Quiz,
   user: User,
@@ -69,7 +68,7 @@ async function migrateQuizAnswer(
     quiz,
     user,
     status: "submitted", // TODO
-    language: (await quiz.course.languages)[0],
+    languageId: quiz.course.languages[0].id,
   })
   await quizAnswer.save()
 
@@ -88,8 +87,8 @@ async function migrateQuizAnswer(
       case "essay":
         await QuizItemAnswer.create({
           id: getUUIDByString(answer._id),
-          quizAnswer,
-          quizItem,
+          quizAnswerId: quizAnswer.id,
+          quizItemId: quizItem.id,
           textData: answer.data,
         }).save()
         break
@@ -97,8 +96,8 @@ async function migrateQuizAnswer(
       case "open":
         await QuizItemAnswer.create({
           id: getUUIDByString(answer._id),
-          quizAnswer,
-          quizItem,
+          quizAnswerId: quizAnswer.id,
+          quizItemId: quizItem.id,
           textData:
             typeof answer.data === "string"
               ? answer.data
@@ -107,14 +106,10 @@ async function migrateQuizAnswer(
         break
 
       case "multiple-choice":
-        const options: { [key: string]: QuizOption } = {}
-        for (const option of await quizItem.options) {
-          options[option.id] = option
-        }
         const qia = await QuizItemAnswer.create({
           id: getUUIDByString(answer._id),
-          quizAnswer,
-          quizItem,
+          quizAnswerId: quizAnswer.id,
+          quizItemId: quizItem.id,
           textData: "",
         }).save()
         let chosenOptions =
@@ -127,9 +122,8 @@ async function migrateQuizAnswer(
         for (const chosenOption of chosenOptions) {
           await QuizOptionAnswer.create({
             id: getUUIDByString(answer._id + chosenOption),
-            quizItemAnswer: qia,
-            quizOption:
-              options[getUUIDByString(quiz.id + quizItem.id + chosenOption)],
+            quizItemAnswerId: qia.id,
+            quizOptionId: getUUIDByString(quiz.id + quizItem.id + chosenOption),
           }).save()
         }
         break
