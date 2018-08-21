@@ -21,47 +21,50 @@ export async function migratePeerReviews(
 
   const newReviews: { [prID: string]: PeerReview } = {}
   const bar = progressBar("Migrating peer reviews", peerReviews.length)
-  for (const oldPR of peerReviews) {
-    const answer = answers[getUUIDByString(oldPR.chosenQuizAnswerId)]
-    if (!answer) {
-      bar.tick() // TODO handle skips?
-      continue
-    }
+  await Promise.all(
+    peerReviews.map(async (oldPR: any) => {
+      const answer = answers[getUUIDByString(oldPR.chosenQuizAnswerId)]
+      if (!answer) {
+        bar.tick() // TODO handle skips?
+        return
+      }
 
-    const rejectedAnswer = answers[getUUIDByString(oldPR.rejectedQuizAnswerId)]
+      const rejectedAnswer =
+        answers[getUUIDByString(oldPR.rejectedQuizAnswerId)]
 
-    let quiz = quizzes[getUUIDByString(oldPR.quizId)]
-    let prqc = peerReviewQuestions[getUUIDByString(oldPR.sourceQuizId)]
-    if (!quiz) {
-      quiz = quizzes[getUUIDByString(oldPR.sourceQuizId)]
-      prqc = peerReviewQuestions[getUUIDByString(oldPR.quizId)]
-    }
-    if (!quiz) {
-      bar.tick() // TODO handle skips?
-      continue
-    }
+      let quiz = quizzes[getUUIDByString(oldPR.quizId)]
+      let prqc = peerReviewQuestions[getUUIDByString(oldPR.sourceQuizId)]
+      if (!quiz) {
+        quiz = quizzes[getUUIDByString(oldPR.sourceQuizId)]
+        prqc = peerReviewQuestions[getUUIDByString(oldPR.quizId)]
+      }
+      if (!quiz) {
+        bar.tick() // TODO handle skips?
+        return
+      }
 
-    const user = users[oldPR.giverAnswererId]
-    if (!user) {
-      bar.tick() // TODO handle skips?
-      continue
-    }
+      const user = users[oldPR.giverAnswererId]
+      if (!user) {
+        bar.tick() // TODO handle skips?
+        return
+      }
 
-    try {
-      const pr = await migratePeerReview(
-        user,
-        answer,
-        rejectedAnswer,
-        prqc,
-        oldPR,
-      )
-      newReviews[pr.id] = pr
-      bar.tick()
-    } catch (e) {
-      console.error("Failed to migrate peer review", oldPR)
-      throw e
-    }
-  }
+      try {
+        const pr = await migratePeerReview(
+          user,
+          answer,
+          rejectedAnswer,
+          prqc,
+          oldPR,
+        )
+        newReviews[pr.id] = pr
+        bar.tick()
+      } catch (e) {
+        console.error("Failed to migrate peer review", oldPR)
+        throw e
+      }
+    }),
+  )
   return newReviews
 }
 

@@ -20,30 +20,32 @@ export async function migrateQuizAnswers(
   let quizNotFound = 0
   let userNotFound = 0
   let itemsNotFound = 0
-  for (const answer of answers) {
-    const quiz = quizzes[getUUIDByString(answer.quizId)]
-    if (!quiz) {
-      quizNotFound++
-      bar.tick() // TODO handle skips?
-      continue
-    }
+  await Promise.all(
+    answers.map(async (answer: any) => {
+      const quiz = quizzes[getUUIDByString(answer.quizId)]
+      if (!quiz) {
+        quizNotFound++
+        bar.tick() // TODO handle skips?
+        return
+      }
 
-    const user = users[answer.answererId]
-    if (!user) {
-      userNotFound++
-      bar.tick() // TODO handle skips?
-      continue
-    }
+      const user = users[answer.answererId]
+      if (!user) {
+        userNotFound++
+        bar.tick() // TODO handle skips?
+        return
+      }
 
-    const newAnswer = await migrateQuizAnswer(quiz, user, answer)
-    if (!newAnswer) {
-      itemsNotFound++
-      bar.tick() // TODO handle skips?
-      return
-    }
-    newAnswers[newAnswer.id] = newAnswer
-    bar.tick()
-  }
+      const newAnswer = await migrateQuizAnswer(quiz, user, answer)
+      if (!newAnswer) {
+        itemsNotFound++
+        bar.tick() // TODO handle skips?
+        return
+      }
+      newAnswers[newAnswer.id] = newAnswer
+      bar.tick()
+    }),
+  )
 
   console.log(`Quiz answers migrated. ${quizNotFound + userNotFound} answers
  were skipped, ${quizNotFound} did not match any quiz, ${userNotFound} did not

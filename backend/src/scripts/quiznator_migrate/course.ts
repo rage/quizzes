@@ -45,14 +45,18 @@ export async function migrateCourses(
   }
 
   const bar = progressBar("Creating courses", Object.entries(courseIDs).length)
-  for (const [courseID, language] of Object.entries(courseIDs)) {
-    const uuid = getUUIDByString(courseID)
-    courses[uuid] = await Course.create({
-      id: uuid,
-      organization: Promise.resolve(org),
-      languages: Promise.resolve([languages[language]]),
-    }).save()
-    bar.tick()
-  }
+  await Promise.all(
+    Object.entries(courseIDs).map(
+      async ([courseID, language]: [string, string]) => {
+        const uuid = getUUIDByString(courseID)
+        courses[uuid] = await Course.create({
+          id: uuid,
+          organization: Promise.resolve(org),
+          languages: Promise.resolve([languages[language]]),
+        }).save()
+        bar.tick()
+      },
+    ),
+  )
   return courses
 }

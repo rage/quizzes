@@ -40,28 +40,30 @@ export async function migratePeerReviewQuestions(quizzes: {
     "Migrating peer review questions",
     peerReviewQuestions.length,
   )
-  for (const oldPRQ of peerReviewQuestions) {
-    const quiz = quizzes[getUUIDByString(safeGet(() => oldPRQ.data.quizId))]
-    if (!quiz) {
-      bar.tick() // TODO handle skips?
-      continue
-    }
-    try {
-      const prqc = await migratePeerReviewQuestion(quiz, oldPRQ)
-      if (!prqc) {
+  await Promise.all(
+    peerReviewQuestions.map(async (oldPRQ: any) => {
+      const quiz = quizzes[getUUIDByString(safeGet(() => oldPRQ.data.quizId))]
+      if (!quiz) {
         bar.tick() // TODO handle skips?
-        continue
+        return
       }
-      newQuestionCollections[prqc.id] = prqc
-      quiz.peerReviewQuestions = Promise.resolve(
-        (await quiz.peerReviewQuestions).concat(await prqc.questions),
-      )
-      bar.tick()
-    } catch (e) {
-      console.error("Failed to migrate peer review question", oldPRQ)
-      throw e
-    }
-  }
+      try {
+        const prqc = await migratePeerReviewQuestion(quiz, oldPRQ)
+        if (!prqc) {
+          bar.tick() // TODO handle skips?
+          return
+        }
+        newQuestionCollections[prqc.id] = prqc
+        quiz.peerReviewQuestions = Promise.resolve(
+          (await quiz.peerReviewQuestions).concat(await prqc.questions),
+        )
+        bar.tick()
+      } catch (e) {
+        console.error("Failed to migrate peer review question", oldPRQ)
+        throw e
+      }
+    }),
+  )
   return newQuestionCollections
 }
 

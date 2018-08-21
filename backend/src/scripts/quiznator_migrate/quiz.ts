@@ -41,51 +41,53 @@ export async function migrateQuizzes(courses: {
     },
   })
   const bar = progressBar("Migrating quizzes", oldQuizzes.length)
-  for (const oldQuiz of oldQuizzes) {
-    let part = 0
-    let section = 0
-    let excludedFromScore = false
-    let course: Course
-    for (const tag of oldQuiz.tags) {
-      if (tag === "ignore") {
-        excludedFromScore = true
-        continue
+  await Promise.all(
+    oldQuizzes.map(async (oldQuiz: any) => {
+      let part = 0
+      let section = 0
+      let excludedFromScore = false
+      let course: Course
+      for (const tag of oldQuiz.tags) {
+        if (tag === "ignore") {
+          excludedFromScore = true
+          continue
+        }
+
+        if (tag in courses) {
+          course = courses[getUUIDByString(tag)]
+          continue
+        }
+
+        const match = tag.match(eaiRegex)
+        if (match) {
+          part = parseInt(match[1], 10)
+          section = parseInt(match[2], 10)
+        }
+      }
+      if (!course) {
+        bar.tick() // TODO handle skips?
+        return
       }
 
-      if (tag in courses) {
-        course = courses[getUUIDByString(tag)]
-        continue
+      try {
+        const quiz = await migrateQuiz(
+          course,
+          oldQuiz,
+          part,
+          section,
+          excludedFromScore,
+        )
+        newQuizzes[quiz.id] = quiz
+        bar.tick()
+      } catch (e) {
+        console.error(
+          "Failed to migrate quiz",
+          require("util").inspect(oldQuiz, false, null),
+        )
+        throw e
       }
-
-      const match = tag.match(eaiRegex)
-      if (match) {
-        part = parseInt(match[1], 10)
-        section = parseInt(match[2], 10)
-      }
-    }
-    if (!course) {
-      bar.tick() // TODO handle skips?
-      continue
-    }
-
-    try {
-      const quiz = await migrateQuiz(
-        course,
-        oldQuiz,
-        part,
-        section,
-        excludedFromScore,
-      )
-      newQuizzes[quiz.id] = quiz
-      bar.tick()
-    } catch (e) {
-      console.error(
-        "Failed to migrate quiz",
-        require("util").inspect(oldQuiz, false, null),
-      )
-      throw e
-    }
-  }
+    }),
+  )
   return newQuizzes
 }
 

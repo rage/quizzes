@@ -15,7 +15,6 @@ export async function migrateUsers(): Promise<{ [username: string]: User }> {
 
   const userInfo = await getUserInfo(usernames)
 
-  let bar
   const users: { [username: string]: User } = {}
   const existingUsers = await User.find({})
   if (existingUsers.length > 0) {
@@ -30,13 +29,15 @@ export async function migrateUsers(): Promise<{ [username: string]: User }> {
     return users
   }
 
-  bar = progressBar("Creating users", userInfo.length)
-  for (const info of userInfo) {
-    users[info.username] = await User.create({
-      id: info.id,
-    }).save()
-    bar.tick()
-  }
+  const bar = progressBar("Creating users", userInfo.length)
+  await Promise.all(
+    userInfo.map(async (info: any) => {
+      users[info.username] = await User.create({
+        id: info.id,
+      }).save()
+      bar.tick()
+    }),
+  )
   return users
 }
 

@@ -13,27 +13,29 @@ export async function migrateSpamFlags(
   )
 
   const bar = progressBar("Migrating spam flags", oldFlags.length)
-  const flags = []
-  for (const [username, answerID] of oldFlags) {
-    const user = users[username]
-    if (!user) {
-      bar.tick()
-      return
-    }
+  // @ts-ignore
+  return await Promise.all(
+    oldFlags.map(
+      async ([username, answerID]: [string, string]): Promise<SpamFlag> => {
+        const user = users[username]
+        if (!user) {
+          bar.tick()
+          return
+        }
 
-    const quizAnswer = answers[getUUIDByString(answerID)]
-    if (!quizAnswer) {
-      bar.tick()
-      return
-    }
+        const quizAnswer = answers[getUUIDByString(answerID)]
+        if (!quizAnswer) {
+          bar.tick()
+          return
+        }
 
-    flags.push(
-      await SpamFlag.create({
-        user: Promise.resolve(user),
-        quizAnswer: Promise.resolve(quizAnswer),
-      }).save(),
-    )
-    bar.tick()
-  }
-  return flags
+        const flag = await SpamFlag.create({
+          user: Promise.resolve(user),
+          quizAnswer: Promise.resolve(quizAnswer),
+        }).save()
+        bar.tick()
+        return flag
+      },
+    ),
+  )
 }
