@@ -18,12 +18,12 @@ export class QuizAnswer extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") public id: string
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
-  public quiz: Promise<Quiz>
+  public quiz: Quiz
   @ManyToOne(type => User, user => user.id)
-  public user: Promise<User>
+  public user: User
 
   @ManyToOne(type => Language, lang => lang.id)
-  public language: Promise<Language>
+  public language: Language
 
   @Column({
     type: "enum",

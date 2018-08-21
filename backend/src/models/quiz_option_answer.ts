@@ -14,9 +14,9 @@ export class QuizOptionAnswer extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") public id: string
 
   @ManyToOne(type => QuizItemAnswer, qia => qia.id)
-  public quizItemAnswer: Promise<QuizItemAnswer>
+  public quizItemAnswer: QuizItemAnswer
   @ManyToOne(type => QuizOption, qo => qo.id)
-  public quizOption: Promise<QuizOption>
+  public quizOption: QuizOption
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

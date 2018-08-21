@@ -12,9 +12,9 @@ import { PeerReviewQuestion } from "./peer_review_question"
 @Entity()
 export class PeerReviewQuestionAnswer extends BaseEntity {
   @ManyToOne(type => PeerReview, pr => pr.id, { primary: true })
-  public peerReview: Promise<PeerReview>
+  public peerReview: PeerReview
   @ManyToOne(type => PeerReviewQuestion, prq => prq.id, { primary: true })
-  public peerReviewQuestion: Promise<PeerReviewQuestion>
+  public peerReviewQuestion: PeerReviewQuestion
 
   @Column({ type: "int", nullable: true })
   public value: number

@@ -98,10 +98,10 @@ async function migrateQuiz(
   section: number = null,
   excludedFromScore: boolean = false,
 ): Promise<Quiz> {
-  const language = Promise.resolve((await course.languages)[0])
+  const language = (await course.languages)[0]
   const quiz = Quiz.create({
     id: getUUIDByString(oldQuiz._id),
-    course: Promise.resolve(course),
+    course,
     part,
     section,
     excludedFromScore,
@@ -109,8 +109,8 @@ async function migrateQuiz(
     updatedAt: oldQuiz.updatedAt,
   })
   await quiz.save()
-  quiz.texts = Promise.resolve([
-    await QuizTranslation.create({
+  quiz.texts = [
+    QuizTranslation.create({
       quiz: quiz.id,
       language,
       title: oldQuiz.title || "",
@@ -118,8 +118,9 @@ async function migrateQuiz(
       submitMessage: safeGet(() => oldQuiz.data.meta.submitMessage),
       createdAt: oldQuiz.createdAt,
       updatedAt: oldQuiz.updatedAt,
-    }).save(),
-  ])
+    }),
+  ]
+  await quiz.texts[0].save()
 
   let item: QuizItem
   let items: QuizItem[]
@@ -137,7 +138,7 @@ async function migrateQuiz(
     case oldQuizTypes.OPEN:
       item = QuizItem.create({
         id: getUUIDByString(oldQuiz._id),
-        quiz: Promise.resolve(quiz),
+        quiz,
         type: oldQuiz.type === oldQuizTypes.ESSAY ? "essay" : "open",
         validityRegex: rightAnswer,
         order: 0,
@@ -145,16 +146,17 @@ async function migrateQuiz(
         updatedAt: oldQuiz.updatedAt,
       })
       await item.save()
-      item.texts = Promise.resolve([
-        await QuizItemTranslation.create({
+      item.texts = [
+        QuizItemTranslation.create({
           quizItem: item.id,
           language,
           successMessage: meta.success || "",
           failureMessage: meta.error || "",
           title: "",
           body: "",
-        }).save(),
-      ])
+        }),
+      ]
+      await item.texts[0].save()
       quiz.items = Promise.resolve([item])
       break
 
@@ -164,7 +166,7 @@ async function migrateQuiz(
       for (const oldItem of oldItems) {
         item = QuizItem.create({
           id: getUUIDByString(quiz.id + oldItem.id),
-          quiz: Promise.resolve(quiz),
+          quiz,
           type: "open",
           validityRegex: rightAnswer[oldItem.id],
           order: order++,
@@ -172,16 +174,17 @@ async function migrateQuiz(
           updatedAt: oldQuiz.updatedAt,
         })
         await item.save()
-        item.texts = Promise.resolve([
-          await QuizItemTranslation.create({
+        item.texts = [
+          QuizItemTranslation.create({
             quizItem: item.id,
             language,
             successMessage: meta.success || "",
             failureMessage: meta.error || "",
             title: oldItem.title || "",
             body: oldItem.body || "",
-          }).save(),
-        ])
+          }),
+        ]
+        await item.texts[0].save()
         items.push(item)
       }
       quiz.items = Promise.resolve(items)
@@ -190,29 +193,30 @@ async function migrateQuiz(
     case oldQuizTypes.MULTIPLE_CHOICE:
       item = QuizItem.create({
         id: getUUIDByString(oldQuiz._id),
-        quiz: Promise.resolve(quiz),
+        quiz,
         type: "multiple-choice",
         order: 0,
         createdAt: oldQuiz.createdAt,
         updatedAt: oldQuiz.updatedAt,
       })
       await item.save()
-      item.texts = Promise.resolve([
-        await QuizItemTranslation.create({
+      item.texts = [
+        QuizItemTranslation.create({
           quizItem: item.id,
           language,
           title: "",
           body: "",
           successMessage: meta.success || "",
           failureMessage: meta.error || "",
-        }).save(),
-      ])
+        }),
+      ]
+      await item.texts[0].save()
       choiceOrder = 0
       options = []
       for (const oldChoice of oldItems) {
         const option = QuizOption.create({
           id: getUUIDByString(quiz.id + item.id + oldChoice.id),
-          quizItem: Promise.resolve(item),
+          quizItem: item,
           order: choiceOrder++,
           correct:
             rightAnswer === oldChoice.id || rightAnswer.includes(oldChoice.id),
@@ -220,16 +224,17 @@ async function migrateQuiz(
           updatedAt: oldQuiz.updatedAt,
         })
         await option.save()
-        option.texts = Promise.resolve([
-          await QuizOptionTranslation.create({
+        option.texts = [
+          QuizOptionTranslation.create({
             quizOption: option.id,
             language,
             successMessage: meta.success || "",
             failureMessage: meta.error || "",
             title: oldChoice.title || "",
             body: oldChoice.body || "",
-          }).save(),
-        ])
+          }),
+        ]
+        await option.texts[0].save()
         options.push(option)
       }
       item.options = Promise.resolve(options)
@@ -243,30 +248,31 @@ async function migrateQuiz(
       for (const oldItem of oldItems) {
         item = QuizItem.create({
           id: getUUIDByString(quiz.id + oldItem.id),
-          quiz: Promise.resolve(quiz),
+          quiz,
           type: "multiple-choice",
           order: order++,
           createdAt: oldQuiz.createdAt,
           updatedAt: oldQuiz.updatedAt,
         })
         await item.save()
-        item.texts = Promise.resolve([
-          await QuizItemTranslation.create({
+        item.texts = [
+          QuizItemTranslation.create({
             quizItem: item.id,
             language,
             successMessage: successes[oldItem.id] || "",
             failureMessage: errors[oldItem.id] || "",
             title: oldItem.title || "",
             body: oldItem.body || "",
-          }).save(),
-        ])
+          }),
+        ]
+        await item.texts[0].save()
 
         choiceOrder = 0
         options = []
         for (const oldChoice of oldChoices) {
           const option = QuizOption.create({
             id: getUUIDByString(quiz.id + item.id + oldChoice.id),
-            quizItem: Promise.resolve(item),
+            quizItem: item,
             order: choiceOrder++,
             correct:
               rightAnswer[oldItem.id] === oldChoice.id ||
@@ -275,16 +281,17 @@ async function migrateQuiz(
             updatedAt: oldQuiz.updatedAt,
           })
           await option.save()
-          option.texts = Promise.resolve([
-            await QuizOptionTranslation.create({
+          option.texts = [
+            QuizOptionTranslation.create({
               quizOption: option.id,
               language,
               successMessage: "",
               failureMessage: "",
               title: oldChoice.title || "",
               body: oldChoice.body || "",
-            }).save(),
-          ])
+            }),
+          ]
+          await option.texts[0].save()
           options.push(option)
         }
         item.options = Promise.resolve(options)

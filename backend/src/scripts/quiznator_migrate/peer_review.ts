@@ -77,8 +77,8 @@ async function migratePeerReview(
 ): Promise<PeerReview> {
   const pr = await PeerReview.create({
     id: getUUIDByString(oldPR._id),
-    user: Promise.resolve(quizAnswer),
-    quizAnswer: Promise.resolve(quizAnswer),
+    user,
+    quizAnswer,
     rejectedQuizAnswers: Promise.resolve(
       rejectedQuizAnswer ? [rejectedQuizAnswer] : [],
     ),
@@ -89,15 +89,15 @@ async function migratePeerReview(
   const answers = []
   for (const question of await prqc.questions) {
     const answer = PeerReviewQuestionAnswer.create({
-      peerReview: Promise.resolve(pr),
-      peerReviewQuestion: Promise.resolve(question),
+      peerReview: pr,
+      peerReviewQuestion: question,
       createdAt: quizAnswer.createdAt,
       updatedAt: quizAnswer.updatedAt,
     })
     if (question.type === "essay") {
       answer.text = oldPR.review
     } else if (question.type === "grade") {
-      answer.value = oldPR.grading[(await question.texts)[0].title]
+      answer.value = oldPR.grading[question.texts[0].title]
     }
     await answer.save()
     answers.push(answer)

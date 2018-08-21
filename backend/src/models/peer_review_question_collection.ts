@@ -17,13 +17,13 @@ export class PeerReviewQuestionCollection extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") public id: string
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
-  public quiz: Promise<Quiz>
+  public quiz: Quiz
 
   @OneToMany(
     type => PeerReviewQuestionCollectionTranslation,
     prqct => prqct.peerReviewQuestionCollection,
   )
-  public texts: Promise<PeerReviewQuestionCollectionTranslation[]>
+  public texts: PeerReviewQuestionCollectionTranslation[]
 
   @OneToMany(type => PeerReviewQuestion, prq => prq.collection)
   public questions: Promise<PeerReviewQuestion[]>
@@ -41,7 +41,7 @@ export class PeerReviewQuestionCollectionTranslation extends BaseEntity {
   })
   public peerReviewQuestionCollection: string
   @ManyToOne(type => Language, lang => lang.id, { primary: true })
-  public language: Promise<Language>
+  public language: Language
 
   @Column("text") public title: string
   @Column("text") public body: string

@@ -30,8 +30,8 @@ export async function migrateSpamFlags(
         }
 
         const flag = await SpamFlag.create({
-          user: Promise.resolve(user),
-          quizAnswer: Promise.resolve(quizAnswer),
+          user,
+          quizAnswer,
         }).save()
         bar.tick()
         return flag

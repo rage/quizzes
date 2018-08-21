@@ -18,10 +18,10 @@ export class Quiz extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") public id: string
 
   @ManyToOne(type => Course, course => course.id)
-  public course: Promise<Course>
+  public course: Course
 
   @OneToMany(type => QuizTranslation, qt => qt.quiz)
-  public texts: Promise<QuizTranslation[]>
+  public texts: QuizTranslation[]
 
   @Column("int") public part: number
   @Column({ type: "int", nullable: true })
@@ -52,7 +52,7 @@ export class QuizTranslation extends BaseEntity {
   @ManyToOne(type => Quiz, quiz => quiz.id, { primary: true })
   public quiz: string
   @ManyToOne(type => Language, lang => lang.id, { primary: true })
-  public language: Promise<Language>
+  public language: Language
 
   @Column("text") public title: string
   @Column("text") public body: string

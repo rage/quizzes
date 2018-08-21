@@ -19,15 +19,15 @@ export class PeerReview extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") public id: string
 
   @ManyToOne(type => QuizAnswer, qa => qa.id)
-  public quizAnswer: Promise<QuizAnswer>
+  public quizAnswer: QuizAnswer
 
   @ManyToOne(type => User, user => user.id)
-  public user: Promise<User>
+  public user: User
 
   @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id, {
     nullable: true,
   })
-  public peerReviewQuestionCollection?: Promise<PeerReviewQuestionCollection>
+  public peerReviewQuestionCollection?: PeerReviewQuestionCollection
 
   @ManyToMany(type => QuizAnswer, qa => qa.id)
   @JoinTable({ name: "peer_review_rejected_quiz_answers" })

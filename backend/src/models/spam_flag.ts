@@ -11,9 +11,9 @@ import { User } from "./user"
 @Entity()
 export class SpamFlag extends BaseEntity {
   @ManyToOne(type => User, user => user.id, { primary: true })
-  public user: Promise<User>
+  public user: User
   @ManyToOne(type => QuizAnswer, qa => qa.id, { primary: true })
-  public quizAnswer: Promise<QuizAnswer>
+  public quizAnswer: QuizAnswer
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

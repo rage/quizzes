@@ -9,16 +9,15 @@ import {
 } from "typeorm"
 import { QuizAnswer } from "./quiz_answer"
 import { QuizItem } from "./quiz_item"
-import { Language } from "./language"
 
 @Entity()
 export class QuizItemAnswer extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") public id: string
 
   @ManyToOne(type => QuizAnswer, qa => qa.id)
-  public quizAnswer: Promise<QuizAnswer>
+  public quizAnswer: QuizAnswer
   @ManyToOne(type => QuizItem, qi => qi.id)
-  public quizItem: Promise<QuizItem>
+  public quizItem: QuizItem
 
   @Column("text") public textData: string
 

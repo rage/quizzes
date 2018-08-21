@@ -29,8 +29,8 @@ export async function migrateCourseStates(
         const completion = courseState.completion || {}
 
         const state = await UserCourseState.create({
-          user: Promise.resolve(user),
-          course: Promise.resolve(course),
+          user,
+          course,
 
           progress: completion.data.progress,
           score: completion.data.score,
