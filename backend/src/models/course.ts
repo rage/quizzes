@@ -15,10 +15,10 @@ import { Organization } from "./organization"
 export class Course extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") public id: string
 
-  @ManyToOne(type => Organization, org => org.id)
+  @ManyToOne(type => Organization, org => org.id, { lazy: true })
   public organization: Promise<Organization>
 
-  @ManyToMany(type => Language, lang => lang.id)
+  @ManyToMany(type => Language, lang => lang.id, { lazy: true })
   @JoinTable({ name: "course_language" })
   public languages: Promise<Language[]>
 

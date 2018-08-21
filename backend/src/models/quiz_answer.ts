@@ -31,7 +31,7 @@ export class QuizAnswer extends BaseEntity {
   })
   public status: string
 
-  @OneToMany(type => PeerReview, pr => pr.quizAnswer)
+  @OneToMany(type => PeerReview, pr => pr.quizAnswer, { lazy: true })
   public peerReviews: Promise<PeerReview[]>
 
   @CreateDateColumn({ type: "timestamp" })

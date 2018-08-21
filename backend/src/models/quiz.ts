@@ -32,10 +32,10 @@ export class Quiz extends BaseEntity {
   @Column({ type: "timestamp", nullable: true })
   public open?: Date
 
-  @OneToMany(type => QuizItem, qi => qi.quiz)
+  @OneToMany(type => QuizItem, qi => qi.quiz, { lazy: true })
   public items: Promise<QuizItem[]>
 
-  @OneToMany(type => PeerReviewQuestion, prq => prq.quiz)
+  @OneToMany(type => PeerReviewQuestion, prq => prq.quiz, { lazy: true })
   public peerReviewQuestions: Promise<PeerReviewQuestion[]>
 
   @Column({ default: false })

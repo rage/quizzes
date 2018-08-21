@@ -33,7 +33,9 @@ export class PeerReview extends BaseEntity {
   @JoinTable({ name: "peer_review_rejected_quiz_answers" })
   public rejectedQuizAnswers: Promise<QuizAnswer[]>
 
-  @OneToMany(type => PeerReviewQuestionAnswer, prqa => prqa.peerReview)
+  @OneToMany(type => PeerReviewQuestionAnswer, prqa => prqa.peerReview, {
+    lazy: true,
+  })
   public answers: Promise<PeerReviewQuestionAnswer[]>
 
   @CreateDateColumn({ type: "timestamp" })
