@@ -69,7 +69,7 @@ async function migratePeerReviewQuestion(
   quiz: Quiz,
   oldPRQ: { [key: string]: any },
 ): Promise<PeerReviewQuestionCollection> {
-  const language = (await quiz.course.languages)[0]
+  const language = (await (await quiz.course).languages)[0]
 
   const peerReviewSample = await QNPeerReview.findOne({
     $or: [{ quizId: oldPRQ._id }, { sourceQuizId: oldPRQ._id }],
@@ -80,20 +80,20 @@ async function migratePeerReviewQuestion(
 
   const prqc = await PeerReviewQuestionCollection.create({
     id: getUUIDByString(oldPRQ._id),
-    quiz,
+    quiz: Promise.resolve(quiz),
     createdAt: oldPRQ.createdAt,
     updatedAt: oldPRQ.updatedAt,
   }).save()
-  prqc.texts = [
+  prqc.texts = Promise.resolve([
     await PeerReviewQuestionCollectionTranslation.create({
       peerReviewQuestionCollection: prqc.id,
-      language,
+      language: Promise.resolve(language),
       title: oldPRQ.title || "",
       body: oldPRQ.body || "",
       createdAt: oldPRQ.createdAt,
       updatedAt: oldPRQ.updatedAt,
     }).save(),
-  ]
+  ])
 
   let order = 1
   const newPRQ = async (
@@ -104,8 +104,8 @@ async function migratePeerReviewQuestion(
   ) => {
     const prq = await PeerReviewQuestion.create({
       id: getUUIDByString(id),
-      quiz,
-      collection: prqc,
+      quiz: Promise.resolve(quiz),
+      collection: Promise.resolve(prqc),
       default: false,
       type,
       order: order++,
@@ -113,16 +113,16 @@ async function migratePeerReviewQuestion(
       createdAt: oldPRQ.createdAt,
       updatedAt: oldPRQ.updatedAt,
     }).save()
-    prq.texts = [
+    prq.texts = Promise.resolve([
       await PeerReviewQuestionTranslation.create({
         peerReviewQuestion: prq.id,
-        language,
+        language: Promise.resolve(language),
         title,
         body,
         createdAt: oldPRQ.createdAt,
         updatedAt: oldPRQ.updatedAt,
       }).save(),
-    ]
+    ])
     return prq
   }
 

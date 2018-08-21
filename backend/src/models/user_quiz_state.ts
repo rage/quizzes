@@ -12,9 +12,9 @@ import { User } from "./user"
 @Entity()
 export class UserQuizState extends BaseEntity {
   @ManyToOne(type => User, user => user.id, { primary: true })
-  public user: User
+  public user: Promise<User>
   @ManyToOne(type => Quiz, quiz => quiz.id, { primary: true })
-  public quiz: Quiz
+  public quiz: Promise<Quiz>
 
   @Column("int") public peerReviewsGiven: number
   @Column("int") public peerReviewsReceived: number

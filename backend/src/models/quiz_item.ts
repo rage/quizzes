@@ -17,14 +17,14 @@ export class QuizItem extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") public id: string
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
-  public quiz: Quiz
+  public quiz: Promise<Quiz>
 
   @Column({ type: "enum", enum: ["open", "essay", "multiple-choice"] })
   public type: string
   @Column("int") public order: number
 
   @OneToMany(type => QuizItemTranslation, qit => qit.quizItem)
-  public texts: QuizItemTranslation[]
+  public texts: Promise<QuizItemTranslation[]>
 
   @OneToMany(type => QuizOption, qo => qo.quizItem)
   public options: Promise<QuizOption[]>
@@ -45,7 +45,7 @@ export class QuizItemTranslation extends BaseEntity {
   @ManyToOne(type => QuizItem, qi => qi.id, { primary: true })
   public quizItem: string
   @ManyToOne(type => Language, lang => lang.id, { primary: true })
-  public language: Language
+  public language: Promise<Language>
 
   @Column("text") public title: string
   @Column("text") public body: string

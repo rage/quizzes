@@ -27,7 +27,12 @@ export async function migrateSpamFlags(
       return
     }
 
-    flags.push(await SpamFlag.create({ user, quizAnswer }).save())
+    flags.push(
+      await SpamFlag.create({
+        user: Promise.resolve(user),
+        quizAnswer: Promise.resolve(quizAnswer),
+      }).save(),
+    )
     bar.tick()
   }
   return flags

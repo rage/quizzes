@@ -64,10 +64,10 @@ async function migrateQuizAnswer(
 
   const quizAnswer = QuizAnswer.create({
     id: getUUIDByString(answer._id),
-    quiz,
-    user,
+    quiz: Promise.resolve(quiz),
+    user: Promise.resolve(user),
     status: "submitted", // TODO
-    language: (await quiz.course.languages)[0],
+    language: Promise.resolve((await (await quiz.course).languages)[0]),
   })
   await quizAnswer.save()
 
@@ -86,8 +86,8 @@ async function migrateQuizAnswer(
       case "essay":
         await QuizItemAnswer.create({
           id: getUUIDByString(answer._id),
-          quizAnswer,
-          quizItem,
+          quizAnswer: Promise.resolve(quizAnswer),
+          quizItem: Promise.resolve(quizItem),
           textData: answer.data,
         }).save()
         break
@@ -95,8 +95,8 @@ async function migrateQuizAnswer(
       case "open":
         await QuizItemAnswer.create({
           id: getUUIDByString(answer._id),
-          quizAnswer,
-          quizItem,
+          quizAnswer: Promise.resolve(quizAnswer),
+          quizItem: Promise.resolve(quizItem),
           textData:
             typeof answer.data === "string"
               ? answer.data
@@ -105,14 +105,14 @@ async function migrateQuizAnswer(
         break
 
       case "multiple-choice":
-        const options: { [key: string]: QuizOption } = {}
+        const options: { [key: string]: Promise<QuizOption> } = {}
         for (const option of await quizItem.options) {
-          options[option.id] = option
+          options[option.id] = Promise.resolve(option)
         }
         const qia = await QuizItemAnswer.create({
           id: getUUIDByString(answer._id),
-          quizAnswer,
-          quizItem,
+          quizAnswer: Promise.resolve(quizAnswer),
+          quizItem: Promise.resolve(quizItem),
           textData: "",
         }).save()
         let chosenOptions =
@@ -125,7 +125,7 @@ async function migrateQuizAnswer(
         for (const chosenOption of chosenOptions) {
           await QuizOptionAnswer.create({
             id: getUUIDByString(answer._id + chosenOption),
-            quizItemAnswer: qia,
+            quizItemAnswer: Promise.resolve(qia),
             quizOption:
               options[getUUIDByString(quiz.id + quizItem.id + chosenOption)],
           }).save()
