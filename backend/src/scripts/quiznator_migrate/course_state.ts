@@ -1,5 +1,6 @@
 import { CourseState as QNCourseState } from "./app-modules/models"
 
+import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { Course, User, UserCourseState } from "../../models"
 import { getUUIDByString, progressBar } from "./util"
 
@@ -10,43 +11,41 @@ export async function migrateCourseStates(
   console.log("Querying course states...")
   const oldStates = await QNCourseState.find({})
 
-  const bar = progressBar("Migrating course states", oldStates.length)
-  await Promise.all(
-    oldStates.map(
-      async (courseState: any): Promise<UserCourseState> => {
-        const user = users[courseState.answererId]
-        if (!user) {
-          return
-        }
+  console.log("Converting course states...")
+  const courseStates: Array<QueryPartialEntity<UserCourseState>> = []
+  for (const courseState of oldStates) {
+    const user = users[courseState.answererId]
+    if (!user) {
+      continue
+    }
 
-        const course = courses[getUUIDByString(courseState.courseId)]
-        if (!course) {
-          return
-        }
+    const course = courses[getUUIDByString(courseState.courseId)]
+    if (!course) {
+      continue
+    }
 
-        const existingCourseState = await UserCourseState.findOne({
-          userId: user.id,
-          courseId: course.id,
-        })
-        if (existingCourseState) {
-          bar.tick()
-          return
-        }
+    const completion = courseState.completion || {}
 
-        const completion = courseState.completion || {}
+    courseStates.push({
+      userId: user.id,
+      courseId: course.id,
 
-        await UserCourseState.create({
-          userId: user.id,
-          courseId: course.id,
+      progress: completion.data.progress || 0,
+      score: completion.data.score || 0,
 
-          progress: completion.data.progress || 0,
-          score: completion.data.score || 0,
+      completed: completion.completed,
+      completionDate: completion.completionDate,
+    })
+  }
 
-          completed: completion.completed,
-          completionDate: completion.completionDate,
-        }).save()
-        bar.tick()
-      },
-    ),
-  )
+  const bar = progressBar("Inserting course states", courseStates.length)
+  const chunkSize = 10900
+  for (let i = 0; i < courseStates.length; i += chunkSize) {
+    await UserCourseState.createQueryBuilder()
+      .insert()
+      .values(courseStates.slice(i, i + chunkSize))
+      .onConflict(`("user_id", "course_id") DO NOTHING`)
+      .execute()
+    bar.tick(chunkSize)
+  }
 }

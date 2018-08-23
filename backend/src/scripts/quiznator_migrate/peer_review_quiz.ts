@@ -4,12 +4,14 @@ import {
   Quiz as QNQuiz,
 } from "./app-modules/models"
 
+import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import {
   PeerReviewQuestion,
   PeerReviewQuestionCollection,
   PeerReviewQuestionCollectionTranslation,
   PeerReviewQuestionTranslation,
   Quiz,
+  UserCourseState,
 } from "../../models"
 import { getUUIDByString, progressBar, safeGet } from "./util"
 
@@ -19,14 +21,20 @@ export async function migratePeerReviewQuestions() {
     type: { $in: [oldQuizTypes.PEER_REVIEW] },
   })
 
-  const newQuestionCollections: {
-    [prqID: string]: PeerReviewQuestionCollection
-  } = {}
-
   const bar = progressBar(
     "Migrating peer review questions",
     peerReviewQuestions.length,
   )
+  const collections: Array<
+    QueryPartialEntity<PeerReviewQuestionCollection>
+  > = []
+  const collectionTranslations: Array<
+    QueryPartialEntity<PeerReviewQuestionCollectionTranslation>
+  > = []
+  const questions: Array<QueryPartialEntity<PeerReviewQuestion>> = []
+  const questionTranslations: Array<
+    QueryPartialEntity<PeerReviewQuestionTranslation>
+  > = []
   await Promise.all(
     peerReviewQuestions.map(async (oldPRQ: any) => {
       const quiz = await Quiz.findOne(
@@ -35,21 +43,58 @@ export async function migratePeerReviewQuestions() {
       if (!quiz) {
         return
       }
-      const prqc = await migratePeerReviewQuestion(quiz, oldPRQ)
-      if (!prqc) {
+
+      const val = await migratePeerReviewQuestion(quiz, oldPRQ)
+      if (!val) {
         return
       }
-      newQuestionCollections[prqc.id] = prqc
+
+      const [prqc, prqct, prqs, prqts] = val
+      collections.push(prqc)
+      collectionTranslations.push(prqct)
+      prqs.forEach(prq => questions.push(prq))
+      prqts.forEach(prqt => questionTranslations.push(prqt))
+
       bar.tick()
     }),
   )
-  return newQuestionCollections
+
+  console.log("Inserting peer review questions")
+  await PeerReviewQuestionCollection.createQueryBuilder()
+    .insert()
+    .values(collections)
+    .onConflict(`("id") DO NOTHING`)
+    .execute()
+  await PeerReviewQuestionCollectionTranslation.createQueryBuilder()
+    .insert()
+    .values(collectionTranslations)
+    .onConflict(
+      `("peer_review_question_collection_id", "language_id") DO NOTHING`,
+    )
+    .execute()
+  await PeerReviewQuestion.createQueryBuilder()
+    .insert()
+    .values(questions)
+    .onConflict(`("id") DO NOTHING`)
+    .execute()
+  await PeerReviewQuestionTranslation.createQueryBuilder()
+    .insert()
+    .values(questionTranslations)
+    .onConflict(`("peer_review_question_id", "language_id") DO NOTHING`)
+    .execute()
 }
 
 async function migratePeerReviewQuestion(
   quiz: Quiz,
   oldPRQ: { [key: string]: any },
-): Promise<PeerReviewQuestionCollection> {
+): Promise<
+  [
+    QueryPartialEntity<PeerReviewQuestionCollection>,
+    QueryPartialEntity<PeerReviewQuestionCollectionTranslation>,
+    Array<QueryPartialEntity<PeerReviewQuestion>>,
+    Array<QueryPartialEntity<PeerReviewQuestionTranslation>>
+  ]
+> {
   const languageId = quiz.course.languages[0].id
 
   const peerReviewSample = await QNPeerReview.findOne({
@@ -59,23 +104,25 @@ async function migratePeerReviewQuestion(
     return null
   }
 
-  const prqc = await PeerReviewQuestionCollection.create({
+  const collection = {
     id: getUUIDByString(oldPRQ._id),
     quizId: quiz.id,
     createdAt: oldPRQ.createdAt,
     updatedAt: oldPRQ.updatedAt,
-  }).save()
-  prqc.texts = [
-    await PeerReviewQuestionCollectionTranslation.create({
-      peerReviewQuestionCollectionId: prqc.id,
-      languageId,
-      title: oldPRQ.title || "",
-      body: oldPRQ.body || "",
-      createdAt: oldPRQ.createdAt,
-      updatedAt: oldPRQ.updatedAt,
-    }).save(),
-  ]
+  }
+  const collectionTranslation = {
+    peerReviewQuestionCollectionId: collection.id,
+    languageId,
+    title: oldPRQ.title || "",
+    body: oldPRQ.body || "",
+    createdAt: oldPRQ.createdAt,
+    updatedAt: oldPRQ.updatedAt,
+  }
 
+  const questions: Array<QueryPartialEntity<PeerReviewQuestion>> = []
+  const questionTranslations: Array<
+    QueryPartialEntity<PeerReviewQuestionTranslation>
+  > = []
   let order = 1
   const newPRQ = async (
     id: string,
@@ -83,42 +130,35 @@ async function migratePeerReviewQuestion(
     title: string = "",
     body: string = "",
   ) => {
-    const prq = await PeerReviewQuestion.create({
+    questions.push({
       id: getUUIDByString(id),
       quizId: quiz.id,
-      collection: prqc,
+      collectionId: collection.id,
       default: false,
       type,
       order: order++,
       answerRequired: oldPRQ.data.answeringRequired,
       createdAt: oldPRQ.createdAt,
       updatedAt: oldPRQ.updatedAt,
-    }).save()
-    prq.texts = [
-      await PeerReviewQuestionTranslation.create({
-        peerReviewQuestionId: prq.id,
-        languageId,
-        title,
-        body,
-        createdAt: oldPRQ.createdAt,
-        updatedAt: oldPRQ.updatedAt,
-      }).save(),
-    ]
-    return prq
+    })
+    questionTranslations.push({
+      peerReviewQuestionId: getUUIDByString(id),
+      languageId,
+      title,
+      body,
+      createdAt: oldPRQ.createdAt,
+      updatedAt: oldPRQ.updatedAt,
+    })
   }
 
-  const reviewQuestions = []
-
   if (peerReviewSample.review && peerReviewSample.review !== "n/a") {
-    reviewQuestions.push(await newPRQ(oldPRQ._id + "essay", "essay"))
+    newPRQ(oldPRQ._id + "essay", "essay")
   }
   if (peerReviewSample.grading) {
     for (const question of Object.keys(peerReviewSample.grading)) {
-      reviewQuestions.push(
-        await newPRQ(oldPRQ._id + question, "grade", question),
-      )
+      newPRQ(oldPRQ._id + question, "grade", question)
     }
   }
-  prqc.questions = Promise.resolve(reviewQuestions)
-  return prqc
+
+  return [collection, collectionTranslation, questions, questionTranslations]
 }

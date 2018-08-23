@@ -1,8 +1,10 @@
-import { QueryFailedError } from "typeorm"
+import { DeepPartial, ObjectType, QueryFailedError } from "typeorm"
+import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import {
   Quiz,
   QuizAnswer,
   QuizItemAnswer,
+  QuizOption,
   QuizOptionAnswer,
   User,
 } from "../../models"
@@ -18,7 +20,7 @@ export async function migrateQuizAnswers(
   const bar = progressBar("Migrating quiz answers", answers.length)
   let quizNotFound = 0
   let userNotFound = 0
-  let itemsNotFound = 0
+  const itemsNotFound = 0
   const alreadyMigrated = 0
 
   await new Promise(
@@ -27,17 +29,12 @@ export async function migrateQuizAnswers(
       reject: (err: Error) => any,
     ): Promise<any> => {
       try {
-        const poolSize = 50000
+        const poolSize = 13100
         let pool: any = []
 
         for (let idx = 0; idx < answers.length; idx++) {
           const extAnswer = answers[idx]
-          /*     const existingAnswer = await QuizAnswer.findOne(getUUIDByString(answer._id))
-          if (existingAnswer) {
-            bar.tick()
-            alreadyMigrated++
-            continue
-          } */
+
           const extQuiz = quizzes[getUUIDByString(extAnswer.quizId)]
           if (!extQuiz) {
             quizNotFound++
@@ -53,7 +50,14 @@ export async function migrateQuizAnswers(
           pool.push({ quiz: extQuiz, user: extUser, answer: extAnswer })
 
           if (pool.length > poolSize || idx === answers.length - 1) {
-            const newAnswers = await Promise.all(
+            const quizAnswers: Array<QueryPartialEntity<QuizAnswer>> = []
+            const quizItemAnswers: Array<
+              QueryPartialEntity<QuizItemAnswer>
+            > = []
+            const quizOptionAnswers: Array<
+              QueryPartialEntity<QuizOptionAnswer>
+            > = []
+            await Promise.all(
               pool.map(
                 async (quizData: any): Promise<any> => {
                   const { quiz, user, answer } = quizData
@@ -61,16 +65,19 @@ export async function migrateQuizAnswers(
                   const quizItems = await quiz.items
 
                   if (quizItems.length === 0) {
-                    return null
+                    quizNotFound++
+                    return
                   }
 
-                  const quizAnswer = await QuizAnswer.create({
+                  quizAnswers.push({
                     id: getUUIDByString(answer._id),
-                    quiz,
-                    user,
+                    quizId: quiz.id,
+                    userId: user.id,
                     status: "submitted", // TODO
                     languageId: quiz.course.languages[0].id,
-                  }).save()
+                  })
+
+                  QuizAnswer.create()
 
                   if (Array.isArray(answer.data)) {
                     answer.data = answer.data.map((entry: any) =>
@@ -90,33 +97,34 @@ export async function migrateQuizAnswers(
                     try {
                       switch (quizItem.type) {
                         case "essay":
-                          await QuizItemAnswer.create({
+                          quizItemAnswers.push({
                             id: getUUIDByString(answer._id),
-                            quizAnswerId: quizAnswer.id,
+                            quizAnswerId: getUUIDByString(answer._id),
                             quizItemId: quizItem.id,
-                            textData: answer.data,
-                          }).save()
+                            textData: (answer.data || "").replace(/\0/g, ""),
+                          })
                           break
 
                         case "open":
-                          await QuizItemAnswer.create({
+                          quizItemAnswers.push({
                             id: getUUIDByString(answer._id),
-                            quizAnswerId: quizAnswer.id,
+                            quizAnswerId: getUUIDByString(answer._id),
                             quizItemId: quizItem.id,
-                            textData:
-                              typeof answer.data === "string"
+                            textData: (
+                              (typeof answer.data === "string"
                                 ? answer.data
-                                : answer.data[quizItem.id],
-                          }).save()
+                                : answer.data[quizItem.id]) || ""
+                            ).replace(/\0/g, ""),
+                          })
                           break
 
                         case "multiple-choice":
-                          const qia = await QuizItemAnswer.create({
+                          quizItemAnswers.push({
                             id: getUUIDByString(answer._id),
-                            quizAnswerId: quizAnswer.id,
+                            quizAnswerId: getUUIDByString(answer._id),
                             quizItemId: quizItem.id,
                             textData: "",
-                          }).save()
+                          })
                           let chosenOptions =
                             Array.isArray(answer.data) ||
                             typeof answer.data !== "object"
@@ -125,17 +133,26 @@ export async function migrateQuizAnswers(
                           if (!Array.isArray(chosenOptions)) {
                             chosenOptions = [chosenOptions]
                           }
-                          await Promise.all(
-                            chosenOptions.map((chosenOption: any) =>
-                              QuizOptionAnswer.create({
-                                id: getUUIDByString(answer._id + chosenOption),
-                                quizItemAnswerId: qia.id,
-                                quizOptionId: getUUIDByString(
-                                  quiz.id + quizItem.id + chosenOption,
-                                ),
-                              }).save(),
-                            ),
-                          )
+                          const quizOptions: {
+                            [optionID: string]: QuizOption
+                          } = {}
+                          for (const option of await quizItem.options) {
+                            quizOptions[option.id] = option
+                          }
+
+                          for (const chosenOption of chosenOptions) {
+                            const optionID = getUUIDByString(
+                              quiz.id + quizItem.id + chosenOption,
+                            )
+                            if (!(optionID in quizOptions)) {
+                              continue
+                            }
+                            quizOptionAnswers.push({
+                              id: getUUIDByString(answer._id + chosenOption),
+                              quizItemAnswerId: getUUIDByString(answer._id),
+                              quizOptionId: optionID,
+                            })
+                          }
                           break
                       }
                     } catch (err) {
@@ -144,15 +161,37 @@ export async function migrateQuizAnswers(
                       }
                     }
                   }
-
-                  bar.tick()
-                  return quizAnswer
                 },
               ),
             )
 
-            itemsNotFound += newAnswers.filter(v => !v).length
+            await QuizAnswer.createQueryBuilder()
+              .insert()
+              .values(quizAnswers)
+              .onConflict(`("id") DO NOTHING`)
+              .execute()
+            const itemAnswerChunk = 16300
+            for (let i = 0; i < quizItemAnswers.length; i += itemAnswerChunk) {
+              await QuizItemAnswer.createQueryBuilder()
+                .insert()
+                .values(quizItemAnswers.slice(i, i + itemAnswerChunk))
+                .onConflict(`("id") DO NOTHING`)
+                .execute()
+            }
+            const optionAnswerChunk = 21800
+            for (
+              let i = 0;
+              i < quizOptionAnswers.length;
+              i += optionAnswerChunk
+            ) {
+              await QuizOptionAnswer.createQueryBuilder()
+                .insert()
+                .values(quizOptionAnswers.slice(i, i + optionAnswerChunk))
+                .onConflict(`("id") DO NOTHING`)
+                .execute()
+            }
 
+            bar.tick(quizAnswers.length)
             pool = []
           }
         }
