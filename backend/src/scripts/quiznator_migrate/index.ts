@@ -17,7 +17,7 @@ async function main() {
   await database.promise
 
   await mongoUtils.connect(
-    process.env.MONGO_URI || "mongodb://localhost:27017/quiznator",
+    process.env.MONGO_URI || "mongodb://localhost:27017/test",
   )
 
   const org = await Organization.merge(Organization.create({ id: 0 })).save()

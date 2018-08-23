@@ -5,6 +5,7 @@ import {
   Entity,
   ManyToOne,
   OneToMany,
+  PrimaryColumn,
   PrimaryGeneratedColumn,
   RelationId,
   UpdateDateColumn,
@@ -39,13 +40,13 @@ export class PeerReviewQuestionCollection extends BaseEntity {
 
 @Entity()
 export class PeerReviewQuestionCollectionTranslation extends BaseEntity {
-  @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id, {
-    primary: true,
-  })
-  public peerReviewQuestionCollection: string
-  @ManyToOne(type => Language, lang => lang.id, { primary: true })
+  @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id)
+  public peerReviewQuestionCollection: Promise<PeerReviewQuestionCollection>
+  @PrimaryColumn() public peerReviewQuestionCollectionId: string
+
+  @ManyToOne(type => Language, lang => lang.id)
   public language: Language
-  @Column() public languageId: string
+  @PrimaryColumn() public languageId: string
 
   @Column("text") public title: string
   @Column("text") public body: string

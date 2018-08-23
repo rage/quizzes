@@ -8,9 +8,6 @@ import {
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
 import { getUUIDByString, progressBar } from "./util"
 
-import { all } from "bluebird"
-import { map } from "bluebird"
-
 export async function migrateQuizAnswers(
   quizzes: { [quizID: string]: Quiz },
   users: { [userID: string]: User },
@@ -21,14 +18,14 @@ export async function migrateQuizAnswers(
   let quizNotFound = 0
   let userNotFound = 0
   let itemsNotFound = 0
-  let alreadyMigrated = 0
+  const alreadyMigrated = 0
 
   await new Promise(
     async (resolve: any): Promise<any> => {
-      let poolSize = 10000
+      const poolSize = 50000
       let pool: any = []
 
-      for (var idx = 0; idx < answers.length; idx++) {
+      for (let idx = 0; idx < answers.length; idx++) {
         const answer = answers[idx]
         /*     const existingAnswer = await QuizAnswer.findOne(getUUIDByString(answer._id))
       if (existingAnswer) {
@@ -36,7 +33,6 @@ export async function migrateQuizAnswers(
         alreadyMigrated++
         continue
       } */
-
         const quiz = quizzes[getUUIDByString(answer.quizId)]
         if (!quiz) {
           quizNotFound++
@@ -52,6 +48,8 @@ export async function migrateQuizAnswers(
         pool.push({ quiz, user, answer })
 
         if (pool.length >= poolSize || idx === answers.length - 1) {
+          let innerIdx = 0
+
           const newAnswers = await Promise.all(
             pool.map(
               async (quizData: any): Promise<any> => {
@@ -137,12 +135,18 @@ export async function migrateQuizAnswers(
                   }
                 }
 
-                bar.tick()
+                innerIdx++
+
+                if (innerIdx === 1000) {
+                  bar.tick(innerIdx)
+                  innerIdx = 0
+                }
                 return quizAnswer
               },
             ),
           )
 
+          bar.tick(innerIdx)
           itemsNotFound += newAnswers.filter(v => !v).length
 
           pool = []
@@ -155,6 +159,9 @@ export async function migrateQuizAnswers(
 
   console.log(
     `Quiz answers migrated. ${quizNotFound +
-      userNotFound} answers were skipped, ${quizNotFound} did not match any quiz, ${userNotFound} did not match any user, the quizzes of ${itemsNotFound} did not have any answers and ${alreadyMigrated} were already migrated.`,
+      userNotFound} answers were skipped,` +
+      `${quizNotFound} did not match any quiz, ${userNotFound} did not match any` +
+      `user, the quizzes of ${itemsNotFound} did not have any answers and ` +
+      `${alreadyMigrated} were already migrated.`,
   )
 }

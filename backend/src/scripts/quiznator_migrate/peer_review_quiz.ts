@@ -33,12 +33,10 @@ export async function migratePeerReviewQuestions() {
         getUUIDByString(safeGet(() => oldPRQ.data.quizId)),
       )
       if (!quiz) {
-        bar.tick() // TODO handle skips?
         return
       }
       const prqc = await migratePeerReviewQuestion(quiz, oldPRQ)
       if (!prqc) {
-        bar.tick() // TODO handle skips?
         return
       }
       newQuestionCollections[prqc.id] = prqc
@@ -69,7 +67,7 @@ async function migratePeerReviewQuestion(
   }).save()
   prqc.texts = [
     await PeerReviewQuestionCollectionTranslation.create({
-      peerReviewQuestionCollection: prqc.id,
+      peerReviewQuestionCollectionId: prqc.id,
       languageId,
       title: oldPRQ.title || "",
       body: oldPRQ.body || "",
@@ -98,7 +96,7 @@ async function migratePeerReviewQuestion(
     }).save()
     prq.texts = [
       await PeerReviewQuestionTranslation.create({
-        peerReviewQuestion: prq.id,
+        peerReviewQuestionId: prq.id,
         languageId,
         title,
         body,

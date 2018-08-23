@@ -66,7 +66,6 @@ export async function migrateQuizzes(courses: {
         }
       }
       if (!course) {
-        bar.tick() // TODO handle skips?
         return
       }
 
@@ -107,7 +106,7 @@ async function migrateQuiz(
   await quiz.save()
   quiz.texts = [
     QuizTranslation.create({
-      quiz: quiz.id,
+      quizId: quiz.id,
       languageId,
       title: oldQuiz.title || "",
       body: oldQuiz.body || "",
@@ -144,7 +143,7 @@ async function migrateQuiz(
       await item.save()
       item.texts = [
         QuizItemTranslation.create({
-          quizItem: item.id,
+          quizItemId: item.id,
           languageId,
           successMessage: meta.success || "",
           failureMessage: meta.error || "",
@@ -172,7 +171,7 @@ async function migrateQuiz(
         await item.save()
         item.texts = [
           QuizItemTranslation.create({
-            quizItem: item.id,
+            quizItemId: item.id,
             languageId,
             successMessage: meta.success || "",
             failureMessage: meta.error || "",
@@ -198,7 +197,7 @@ async function migrateQuiz(
       await item.save()
       item.texts = [
         QuizItemTranslation.create({
-          quizItem: item.id,
+          quizItemId: item.id,
           languageId,
           title: "",
           body: "",
@@ -222,7 +221,7 @@ async function migrateQuiz(
         await option.save()
         option.texts = [
           QuizOptionTranslation.create({
-            quizOption: option.id,
+            quizOptionId: option.id,
             languageId,
             successMessage: meta.success || "",
             failureMessage: meta.error || "",
@@ -253,7 +252,7 @@ async function migrateQuiz(
         await item.save()
         item.texts = [
           QuizItemTranslation.create({
-            quizItem: item.id,
+            quizItemId: item.id,
             languageId,
             successMessage: successes[oldItem.id] || "",
             failureMessage: errors[oldItem.id] || "",
@@ -279,7 +278,7 @@ async function migrateQuiz(
           await option.save()
           option.texts = [
             QuizOptionTranslation.create({
-              quizOption: option.id,
+              quizOptionId: option.id,
               languageId,
               successMessage: "",
               failureMessage: "",

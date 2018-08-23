@@ -17,13 +17,15 @@
     "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve-debug\"",
     "prettier": "prettier --write \"backend/**/*.js\" \"backend/**/*.ts\"",
     "prettier-check": "prettier  --list-different \"backend/**/*.js\" \"backend/**/*.ts\"",
-    "db-migrate": "node --max-old-space-size=8192 dist/backend/src/scripts/quiznator_migrate/index.js"
+    "db-migrate": "node --max-old-space-size=8192 dist/backend/src/scripts/quiznator_migrate/index.js",
+    "db-migrate-inspect": "node --inspect --max-old-space-size=8192 dist/backend/src/scripts/quiznator_migrate/index.js"
   },
   "dependencies": {
     "axios": "^0.18.0",
     "bcrypt": "^3.0.0",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.3",
+    "buffer": "^5.1.0",
     "compression": "^1.7.2",
     "dotenv": "^6.0.0",
     "errorhandler": "^1.5.0",
@@ -39,7 +41,7 @@
     "reflect-metadata": "^0.1.12",
     "request": "^2.87.0",
     "request-promise": "^4.2.2",
-    "typeorm": "^0.2.7",
+    "typeorm": "^0.3.0-alpha.10",
     "uuid-by-string": "^0.6.0",
     "validate.js": "^0.12.0",
     "winston": "^3.0.0"
