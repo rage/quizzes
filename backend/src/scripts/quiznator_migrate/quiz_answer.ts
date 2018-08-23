@@ -64,14 +64,13 @@ export async function migrateQuizAnswers(
                     return null
                   }
 
-                  const quizAnswer = QuizAnswer.create({
+                  const quizAnswer = await QuizAnswer.create({
                     id: getUUIDByString(answer._id),
                     quiz,
                     user,
                     status: "submitted", // TODO
                     languageId: quiz.course.languages[0].id,
-                  })
-                  await quizAnswer.save()
+                  }).save()
 
                   if (Array.isArray(answer.data)) {
                     answer.data = answer.data.map((entry: any) =>
@@ -126,15 +125,17 @@ export async function migrateQuizAnswers(
                           if (!Array.isArray(chosenOptions)) {
                             chosenOptions = [chosenOptions]
                           }
-                          for (const chosenOption of chosenOptions) {
-                            await QuizOptionAnswer.create({
-                              id: getUUIDByString(answer._id + chosenOption),
-                              quizItemAnswerId: qia.id,
-                              quizOptionId: getUUIDByString(
-                                quiz.id + quizItem.id + chosenOption,
-                              ),
-                            }).save()
-                          }
+                          await Promise.all(
+                            chosenOptions.map((chosenOption: any) =>
+                              QuizOptionAnswer.create({
+                                id: getUUIDByString(answer._id + chosenOption),
+                                quizItemAnswerId: qia.id,
+                                quizOptionId: getUUIDByString(
+                                  quiz.id + quizItem.id + chosenOption,
+                                ),
+                              }).save(),
+                            ),
+                          )
                           break
                       }
                     } catch (err) {
