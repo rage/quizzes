@@ -5,6 +5,7 @@ import {
   Entity,
   ManyToOne,
   OneToMany,
+  PrimaryColumn,
   PrimaryGeneratedColumn,
   RelationId,
   UpdateDateColumn,
@@ -37,11 +38,13 @@ export class QuizOption extends BaseEntity {
 
 @Entity()
 export class QuizOptionTranslation extends BaseEntity {
-  @ManyToOne(type => QuizOption, qo => qo.id, { primary: true })
-  public quizOption: string
-  @ManyToOne(type => Language, lang => lang.id, { primary: true })
+  @ManyToOne(type => QuizOption, qo => qo.id)
+  public quizOption: Promise<QuizOption>
+  @PrimaryColumn() public quizOptionId: string
+
+  @ManyToOne(type => Language, lang => lang.id)
   public language: Language
-  @Column() public languageId: string
+  @PrimaryColumn() public languageId: string
 
   @Column("text") public title: string
   @Column({ type: "text", nullable: true })

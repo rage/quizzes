@@ -67,7 +67,7 @@ async function migratePeerReviewQuestion(
   }).save()
   prqc.texts = [
     await PeerReviewQuestionCollectionTranslation.create({
-      peerReviewQuestionCollection: prqc.id,
+      peerReviewQuestionCollectionId: prqc.id,
       languageId,
       title: oldPRQ.title || "",
       body: oldPRQ.body || "",
@@ -96,7 +96,7 @@ async function migratePeerReviewQuestion(
     }).save()
     prq.texts = [
       await PeerReviewQuestionTranslation.create({
-        peerReviewQuestion: prq.id,
+        peerReviewQuestionId: prq.id,
         languageId,
         title,
         body,
