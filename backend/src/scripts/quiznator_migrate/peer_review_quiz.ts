@@ -33,12 +33,10 @@ export async function migratePeerReviewQuestions() {
         getUUIDByString(safeGet(() => oldPRQ.data.quizId)),
       )
       if (!quiz) {
-        bar.tick() // TODO handle skips?
         return
       }
       const prqc = await migratePeerReviewQuestion(quiz, oldPRQ)
       if (!prqc) {
-        bar.tick() // TODO handle skips?
         return
       }
       newQuestionCollections[prqc.id] = prqc

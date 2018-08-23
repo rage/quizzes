@@ -142,7 +142,10 @@ export async function migrateQuizAnswers(
 
   console.log(
     `Quiz answers migrated. ${quizNotFound +
-      userNotFound} answers were skipped, ${quizNotFound} did not match any quiz, ${userNotFound} did not match any user, the quizzes of ${itemsNotFound} did not have any answers and ${alreadyMigrated} were already migrated.`,
+      userNotFound} answers were skipped,` +
+      `${quizNotFound} did not match any quiz, ${userNotFound} did not match any` +
+      `user, the quizzes of ${itemsNotFound} did not have any answers and ` +
+      `${alreadyMigrated} were already migrated.`,
   )
 }
 
