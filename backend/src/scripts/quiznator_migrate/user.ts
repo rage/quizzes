@@ -2,7 +2,8 @@ import fs from "fs"
 
 import axios from "axios"
 
-import { User } from "../../models"
+import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
+import { QuizItemAnswer, User } from "../../models"
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
 import { progressBar } from "./util"
 
@@ -15,10 +16,26 @@ export async function migrateUsers(): Promise<{ [username: string]: User }> {
 
   const userInfo = await getUserInfo(usernames)
 
+  console.log("Converting users...")
+  const dbInput = userInfo.map(
+    (info: any): QueryPartialEntity<User> => ({
+      id: info.id,
+    }),
+  )
+  console.log("Inserting users...")
+  const chunkSize = 65500
+  for (let i = 0; i < dbInput.length; i += chunkSize) {
+    await User.createQueryBuilder()
+      .insert()
+      .values(dbInput.slice(i, i + chunkSize))
+      .onConflict(`("id") DO NOTHING`)
+      .execute()
+  }
+
   const users: { [username: string]: User } = {}
+  console.log("Querying full user list from database...")
   const existingUsers = await User.find({})
   if (existingUsers.length > 0) {
-    console.log("Existing users found in database, skipping migration")
     const existingUsersByID: { [id: number]: User } = {}
     for (const user of existingUsers) {
       existingUsersByID[user.id] = user
@@ -28,16 +45,6 @@ export async function migrateUsers(): Promise<{ [username: string]: User }> {
     }
     return users
   }
-
-  const bar = progressBar("Creating users", userInfo.length)
-  await Promise.all(
-    userInfo.map(async (info: any) => {
-      users[info.username] = await User.create({
-        id: info.id,
-      }).save()
-      bar.tick()
-    }),
-  )
   return users
 }
 
