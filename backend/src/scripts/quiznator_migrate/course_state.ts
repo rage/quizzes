@@ -35,6 +35,7 @@ export async function migrateCourseStates(
 
       completed: completion.completed,
       completionDate: completion.completionDate,
+      completionAnswersDate: completion.completionAnswersDate
     })
   }
 

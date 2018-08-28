@@ -26,6 +26,8 @@ export class UserCourseState extends BaseEntity {
   @Column() public completed: boolean
   @Column({ type: "timestamp", nullable: true })
   public completionDate: Date
+  @Column({ type: "timestamp", nullable: true })
+  public completionAnswersDate: Date
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

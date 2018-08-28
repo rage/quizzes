@@ -7,7 +7,8 @@ const schema = new mongoose.Schema(
     completion: {
       data: { type: mongoose.Schema.Types.Mixed, required: false },
       completed: { type: Boolean, required: false },
-      completionDate: { type: Date, default: Date.now() },
+      completionDate: { type: Date },
+      completionAnswersDate: { type: Date },
       confirmationSent: { type: Boolean, required: false },
       confirmationSentDate: { type: Date },
     },

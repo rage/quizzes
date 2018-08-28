@@ -17,12 +17,7 @@
     "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run serve-debug\"",
     "prettier": "prettier --write \"backend/**/*.js\" \"backend/**/*.ts\"",
     "prettier-check": "prettier  --list-different \"backend/**/*.js\" \"backend/**/*.ts\"",
-<<<<<<< HEAD
-    "db-migrate": "node --max-old-space-size=8192 dist/backend/src/scripts/quiznator_migrate/index.js",
-    "db-migrate-inspect": "node --inspect --max-old-space-size=8192 dist/backend/src/scripts/quiznator_migrate/index.js"
-=======
     "db-migrate": "node --max-old-space-size=16384 dist/backend/src/scripts/quiznator_migrate/index.js"
->>>>>>> 9dfeacef0134f6f41144ccfbb55aefd110c0c463
   },
   "dependencies": {
     "axios": "^0.18.0",
