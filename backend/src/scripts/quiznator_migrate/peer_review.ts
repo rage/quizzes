@@ -21,19 +21,26 @@ export async function migratePeerReviews(users: { [username: string]: User }) {
     QueryPartialEntity<PeerReviewQuestionAnswer>
   > = []
   console.log("Preparing to convert peer reviews...")
+
+  const newAnswers: QuizAnswer[] = await QuizAnswer.find()
+  const emptyMap: { [key: string]: QuizAnswer } = {}
+
+  const answerMap = newAnswers.reduce((obj: { [key: string]: QuizAnswer }, answer: QuizAnswer) => {
+    obj[answer.id] = answer
+
+    return obj
+  }, emptyMap)
+
   const bar = progressBar("Converting peer reviews", peerReviews.length)
   await Promise.all(
     peerReviews.map(async (oldPR: any) => {
-      const answer = await QuizAnswer.findOne(
-        getUUIDByString(oldPR.chosenQuizAnswerId),
-      )
+      const answer = answerMap[getUUIDByString(oldPR.chosenQuizAnswerId)]
+
       if (!answer) {
         return
       }
 
-      const rejectedAnswer = await QuizAnswer.findOne(
-        getUUIDByString(oldPR.rejectedQuizAnswerId),
-      )
+      const rejectedAnswer = answerMap[getUUIDByString(oldPR.rejectedQuizAnswerId)]
 
       const quizID = getUUIDByString(oldPR.quizId)
       const sourceQuizId = getUUIDByString(oldPR.sourceQuizId)

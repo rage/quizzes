@@ -40,7 +40,7 @@ export async function migrateCourseStates(
   }
 
   const bar = progressBar("Inserting course states", courseStates.length)
-  const chunkSize = 10900
+  const chunkSize = 9300
   for (let i = 0; i < courseStates.length; i += chunkSize) {
     await UserCourseState.createQueryBuilder()
       .insert()
