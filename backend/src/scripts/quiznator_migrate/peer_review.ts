@@ -64,7 +64,7 @@ export async function migratePeerReviews(users: { [username: string]: User }) {
     }),
   )
 
-  const prChunk = 16300
+  const prChunk = 13100
   for (let i = 0; i < newPeerReviews.length; i += prChunk) {
     await PeerReview.createQueryBuilder()
       .insert()
@@ -73,8 +73,8 @@ export async function migratePeerReviews(users: { [username: string]: User }) {
       .execute()
   }
 
-  const praChunk = 32700
-  for (let i = 0; i < newPeerReviewAnswers.length; i += prChunk) {
+  const praChunk = 13100
+  for (let i = 0; i < newPeerReviewAnswers.length; i += praChunk) {
     await PeerReviewQuestionAnswer.createQueryBuilder()
       .insert()
       .values(newPeerReviewAnswers.slice(i, i + praChunk))
