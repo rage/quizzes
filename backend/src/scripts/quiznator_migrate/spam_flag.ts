@@ -9,9 +9,9 @@ export async function migrateSpamFlags(users: { [username: string]: User }) {
     (spamFlag: { [key: string]: any }) => spamFlag._id.split("-"),
   )
 
-  const existingIDs = await QuizAnswer.createQueryBuilder()
+  const existingIDs = (await QuizAnswer.createQueryBuilder()
     .select(["id"])
-    .getRawMany()
+    .getRawMany()).map((idObject: { id: string }) => idObject.id)
 
   console.log("Converting spam flags...")
   const spamFlags = []
@@ -38,7 +38,7 @@ export async function migrateSpamFlags(users: { [username: string]: User }) {
     await SpamFlag.createQueryBuilder()
       .insert()
       .values(spamFlags.slice(i, i + chunkSize))
-      .onConflict(`("id") DO NOTHING`)
+      .onConflict(`("user_id", "quiz_answer_id") DO NOTHING`)
       .execute()
   }
 }
