@@ -1,8 +1,7 @@
 import { QuizAnswerSpamFlag as QNSpamFlag } from "./app-modules/models"
 
-import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { QuizAnswer, SpamFlag, User } from "../../models"
-import { getUUIDByString, progressBar } from "./util"
+import { getUUIDByString } from "./util"
 
 export async function migrateSpamFlags(users: { [username: string]: User }) {
   console.log("Querying spam flags...")

@@ -1,4 +1,4 @@
-import { DeepPartial, ObjectType, QueryFailedError } from "typeorm"
+import { QueryFailedError } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import {
   Quiz,

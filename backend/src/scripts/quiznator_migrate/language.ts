@@ -1,4 +1,3 @@
-import { Connection } from "typeorm"
 import { Language } from "../../models"
 
 export async function createLanguages(): Promise<{

@@ -7,9 +7,7 @@ import {
   PeerReviewQuestion,
   PeerReviewQuestionAnswer,
   PeerReviewQuestionCollection,
-  Quiz,
   QuizAnswer,
-  QuizOptionAnswer,
   User,
 } from "../../models"
 import { getUUIDByString, progressBar } from "./util"
