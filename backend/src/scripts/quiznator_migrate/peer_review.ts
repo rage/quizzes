@@ -20,7 +20,8 @@ export async function migratePeerReviews(users: { [username: string]: User }) {
   const newPeerReviewAnswers: Array<
     QueryPartialEntity<PeerReviewQuestionAnswer>
   > = []
-  const bar = progressBar("Migrating peer reviews", peerReviews.length)
+  console.log("Preparing to convert peer reviews...")
+  const bar = progressBar("Converting peer reviews", peerReviews.length)
   await Promise.all(
     peerReviews.map(async (oldPR: any) => {
       const answer = await QuizAnswer.findOne(
@@ -64,6 +65,7 @@ export async function migratePeerReviews(users: { [username: string]: User }) {
     }),
   )
 
+  console.log("Inserting peer reviews...")
   const prChunk = 13100
   for (let i = 0; i < newPeerReviews.length; i += prChunk) {
     await PeerReview.createQueryBuilder()
