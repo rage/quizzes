@@ -32,7 +32,7 @@ export async function migrateUsers(): Promise<{ [username: string]: User }> {
   }
 
   const users: { [username: string]: User } = {}
-  console.log("Querying full user list from database...")
+  console.log("Querying inserted users...")
   const existingUsers = await User.find({})
   if (existingUsers.length > 0) {
     const existingUsersByID: { [id: number]: User } = {}

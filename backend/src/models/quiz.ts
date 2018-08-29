@@ -60,8 +60,10 @@ export class QuizTranslation extends BaseEntity {
   public language: Language
   @PrimaryColumn() public languageId: string
 
-  @Column("text") public title: string
-  @Column("text") public body: string
+  @Column({ type: "text", default: "" })
+  public title: string
+  @Column({ type: "text", default: "" })
+  public body: string
   @Column({ type: "text", nullable: true })
   public submitMessage: string
 

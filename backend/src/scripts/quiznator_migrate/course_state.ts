@@ -42,11 +42,12 @@ export async function migrateCourseStates(
   const bar = progressBar("Inserting course states", courseStates.length)
   const chunkSize = 9300
   for (let i = 0; i < courseStates.length; i += chunkSize) {
+    const vals = courseStates.slice(i, i + chunkSize)
     await UserCourseState.createQueryBuilder()
       .insert()
-      .values(courseStates.slice(i, i + chunkSize))
+      .values(vals)
       .onConflict(`("user_id", "course_id") DO NOTHING`)
       .execute()
-    bar.tick(chunkSize)
+    bar.tick(vals.length)
   }
 }

@@ -53,11 +53,15 @@ export class QuizItemTranslation extends BaseEntity {
   public language: Language
   @PrimaryColumn() public languageId: string
 
-  @Column("text") public title: string
-  @Column("text") public body: string
+  @Column({ type: "text", default: "" })
+  public title: string
+  @Column({ type: "text", default: "" })
+  public body: string
 
-  @Column("text") public successMessage: string
-  @Column("text") public failureMessage: string
+  @Column({ type: "text", default: "" })
+  public successMessage: string
+  @Column({ type: "text", default: "" })
+  public failureMessage: string
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
