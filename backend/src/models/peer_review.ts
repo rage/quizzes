@@ -35,9 +35,8 @@ export class PeerReview extends BaseEntity {
   @Column({ nullable: true })
   public peerReviewQuestionCollectionId?: string
 
-  @ManyToMany(type => QuizAnswer, qa => qa.id)
-  @JoinTable({ name: "peer_review_rejected_quiz_answers" })
-  public rejectedQuizAnswers: Promise<QuizAnswer[]>
+  @Column({ type: String, array: true })
+  public rejectedQuizAnswerIds: string[]
 
   @OneToMany(type => PeerReviewQuestionAnswer, prqa => prqa.peerReview)
   public answers: Promise<PeerReviewQuestionAnswer[]>

@@ -7,12 +7,14 @@ import {
   PeerReviewQuestion,
   PeerReviewQuestionAnswer,
   PeerReviewQuestionCollection,
-  QuizAnswer,
   User,
 } from "../../models"
 import { getUUIDByString, progressBar } from "./util"
 
-export async function migratePeerReviews(users: { [username: string]: User }) {
+export async function migratePeerReviews(
+  users: { [username: string]: User },
+  existingAnswers: { [answerID: string]: boolean },
+) {
   console.log("Querying peer reviews...")
   const peerReviews = await QNPeerReview.find({})
 
@@ -22,35 +24,28 @@ export async function migratePeerReviews(users: { [username: string]: User }) {
   > = []
   console.log("Preparing to convert peer reviews...")
 
-  const newAnswers: QuizAnswer[] = await QuizAnswer.find()
-  const emptyMap: { [key: string]: QuizAnswer } = {}
-
-  const answerMap = newAnswers.reduce((obj: { [key: string]: QuizAnswer }, answer: QuizAnswer) => {
-    obj[answer.id] = answer
-
-    return obj
-  }, emptyMap)
-
   const bar = progressBar("Converting peer reviews", peerReviews.length)
   await Promise.all(
     peerReviews.map(async (oldPR: any) => {
-      const answer = answerMap[getUUIDByString(oldPR.chosenQuizAnswerId)]
-
-      if (!answer) {
+      const answerID = getUUIDByString(oldPR.chosenQuizAnswerId)
+      if (!existingAnswers[answerID]) {
         return
       }
 
-      const rejectedAnswer = answerMap[getUUIDByString(oldPR.rejectedQuizAnswerId)]
+      let rejectedAnswerID = getUUIDByString(oldPR.rejectedQuizAnswerId)
+      if (!existingAnswers[rejectedAnswerID]) {
+        rejectedAnswerID = undefined
+      }
 
       const quizID = getUUIDByString(oldPR.quizId)
-      const sourceQuizId = getUUIDByString(oldPR.sourceQuizId)
+      const sourceQuizID = getUUIDByString(oldPR.sourceQuizId)
       const prqcFind = await PeerReviewQuestionCollection.find({
         take: 1,
         where: {
-          id: Any([quizID, sourceQuizId]),
+          id: Any([quizID, sourceQuizID]),
         },
       })
-      if (!prqcFind) {
+      if (!prqcFind || prqcFind.length === 0) {
         return
       }
 
@@ -61,8 +56,8 @@ export async function migratePeerReviews(users: { [username: string]: User }) {
 
       const [pr, answers] = await migratePeerReview(
         user.id,
-        answer,
-        rejectedAnswer,
+        answerID,
+        rejectedAnswerID,
         await prqcFind[0].questions,
         oldPR,
       )
@@ -73,7 +68,7 @@ export async function migratePeerReviews(users: { [username: string]: User }) {
   )
 
   console.log("Inserting peer reviews...")
-  const prChunk = 13100
+  const prChunk = 10900
   for (let i = 0; i < newPeerReviews.length; i += prChunk) {
     await PeerReview.createQueryBuilder()
       .insert()
@@ -82,7 +77,7 @@ export async function migratePeerReviews(users: { [username: string]: User }) {
       .execute()
   }
 
-  const praChunk = 13100
+  const praChunk = 10900
   for (let i = 0; i < newPeerReviewAnswers.length; i += praChunk) {
     await PeerReviewQuestionAnswer.createQueryBuilder()
       .insert()
@@ -94,8 +89,8 @@ export async function migratePeerReviews(users: { [username: string]: User }) {
 
 function migratePeerReview(
   userId: number,
-  quizAnswer: QuizAnswer,
-  rejectedQuizAnswer: QuizAnswer,
+  quizAnswerID: string,
+  rejectedQuizAnswerID: string,
   questions: PeerReviewQuestion[],
   oldPR: { [key: string]: any },
 ): [
@@ -105,12 +100,10 @@ function migratePeerReview(
   const pr = {
     id: getUUIDByString(oldPR._id),
     userId,
-    quizAnswerId: quizAnswer.id,
-    rejectedQuizAnswers: Promise.resolve(
-      rejectedQuizAnswer ? [rejectedQuizAnswer] : [],
-    ),
-    createdAt: quizAnswer.createdAt,
-    updatedAt: quizAnswer.updatedAt,
+    quizAnswerId: quizAnswerID,
+    rejectedQuizAnswerIds: rejectedQuizAnswerID ? [rejectedQuizAnswerID] : [],
+    createdAt: oldPR.createdAt,
+    updatedAt: oldPR.updatedAt,
   }
 
   const answers = []
@@ -118,8 +111,8 @@ function migratePeerReview(
     const answer: QueryPartialEntity<PeerReviewQuestionAnswer> = {
       peerReviewId: pr.id,
       peerReviewQuestionId: question.id,
-      createdAt: quizAnswer.createdAt,
-      updatedAt: quizAnswer.updatedAt,
+      createdAt: oldPR.createdAt,
+      updatedAt: oldPR.updatedAt,
     }
     if (question.type === "essay") {
       answer.text = oldPR.review

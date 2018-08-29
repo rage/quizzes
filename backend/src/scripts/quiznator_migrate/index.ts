@@ -28,9 +28,9 @@ async function main() {
   await migratePeerReviewQuestions()
   const users = await migrateUsers()
   await migrateCourseStates(courses, users)
-  await migrateQuizAnswers(quizzes, users)
+  const existingAnswers = await migrateQuizAnswers(quizzes, users)
   await migrateSpamFlags(users)
-  await migratePeerReviews(users)
+  await migratePeerReviews(users, existingAnswers)
   console.log("Migration complete")
   process.exit()
 }

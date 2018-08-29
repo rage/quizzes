@@ -1,5 +1,6 @@
 import { QueryFailedError } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
+import db from "../../database"
 import {
   Quiz,
   QuizAnswer,
@@ -14,7 +15,7 @@ import { getUUIDByString, progressBar } from "./util"
 export async function migrateQuizAnswers(
   quizzes: { [quizID: string]: Quiz },
   users: { [userID: string]: User },
-) {
+): Promise<{ [answerID: string]: boolean }> {
   console.log("Querying quiz answers...")
   const answers = await QNQuizAnswer.find({})
   const bar = progressBar("Migrating quiz answers", answers.length)
@@ -22,14 +23,14 @@ export async function migrateQuizAnswers(
   let userNotFound = 0
   const itemsNotFound = 0
   const alreadyMigrated = 0
-
+  const existingAnswers: { [answerID: string]: boolean } = {}
   await new Promise(
     async (
       resolve: (val: any) => any,
       reject: (err: Error) => any,
     ): Promise<any> => {
       try {
-        const poolSize = 13100
+        const poolSize = 9300
         let pool: any = []
 
         for (let idx = 0; idx < answers.length; idx++) {
@@ -46,7 +47,6 @@ export async function migrateQuizAnswers(
             userNotFound++
             continue
           }
-
           pool.push({ quiz: extQuiz, user: extUser, answer: extAnswer })
 
           if (pool.length > poolSize || idx === answers.length - 1) {
@@ -69,13 +69,24 @@ export async function migrateQuizAnswers(
                     return
                   }
 
+                  let status = "submitted"
+                  if (answer.rejected) {
+                    status = "rejected"
+                  } else if (answer.confirmed) {
+                    status = "confirmed"
+                  }
+
+                  const id = getUUIDByString(answer._id)
                   quizAnswers.push({
-                    id: getUUIDByString(answer._id),
+                    id,
                     quizId: quiz.id,
                     userId: user.id,
-                    status: "submitted", // TODO
+                    status,
                     languageId: quiz.course.languages[0].id,
+                    createdAt: answer.createdAt,
+                    updatedAt: answer.updatedAt,
                   })
+                  existingAnswers[id] = true
 
                   QuizAnswer.create()
 
@@ -102,6 +113,8 @@ export async function migrateQuizAnswers(
                             quizAnswerId: getUUIDByString(answer._id),
                             quizItemId: quizItem.id,
                             textData: (answer.data || "").replace(/\0/g, ""),
+                            createdAt: answer.createdAt,
+                            updatedAt: answer.updatedAt,
                           })
                           break
 
@@ -115,6 +128,8 @@ export async function migrateQuizAnswers(
                                 ? answer.data
                                 : answer.data[quizItem.id]) || ""
                             ).replace(/\0/g, ""),
+                            createdAt: answer.createdAt,
+                            updatedAt: answer.updatedAt,
                           })
                           break
 
@@ -124,6 +139,8 @@ export async function migrateQuizAnswers(
                             quizAnswerId: getUUIDByString(answer._id),
                             quizItemId: quizItem.id,
                             textData: "",
+                            createdAt: answer.createdAt,
+                            updatedAt: answer.updatedAt,
                           })
                           let chosenOptions =
                             Array.isArray(answer.data) ||
@@ -151,6 +168,8 @@ export async function migrateQuizAnswers(
                               id: getUUIDByString(answer._id + chosenOption),
                               quizItemAnswerId: getUUIDByString(answer._id),
                               quizOptionId: optionID,
+                              createdAt: answer.createdAt,
+                              updatedAt: answer.updatedAt,
                             })
                           }
                           break
@@ -170,7 +189,7 @@ export async function migrateQuizAnswers(
               .values(quizAnswers)
               .onConflict(`("id") DO NOTHING`)
               .execute()
-            const itemAnswerChunk = 16300
+            const itemAnswerChunk = 10900
             for (let i = 0; i < quizItemAnswers.length; i += itemAnswerChunk) {
               await QuizItemAnswer.createQueryBuilder()
                 .insert()
@@ -178,7 +197,7 @@ export async function migrateQuizAnswers(
                 .onConflict(`("id") DO NOTHING`)
                 .execute()
             }
-            const optionAnswerChunk = 21800
+            const optionAnswerChunk = 13100
             for (
               let i = 0;
               i < quizOptionAnswers.length;
@@ -202,11 +221,31 @@ export async function migrateQuizAnswers(
     },
   )
 
+  console.log("Deprecating duplicate answers...")
+  await db.conn.query(`
+    UPDATE quiz_answer
+    SET status='deprecated'
+    WHERE id IN (
+      SELECT qa1.id
+      FROM quiz_answer qa1
+      INNER JOIN (
+        SELECT quiz_id,
+               user_id,
+               MAX(created_at) AS last_created_at
+        FROM quiz_answer
+        GROUP BY quiz_id, user_id
+        HAVING COUNT(*) > 1
+      ) qa2 ON qa1.quiz_id = qa2.quiz_id
+           AND qa1.user_id = qa2.user_id
+      WHERE qa1.created_at < qa2.last_created_at
+    );`)
+
   console.log(
     `Quiz answers migrated. ${quizNotFound +
-      userNotFound} answers were skipped,` +
+      userNotFound} answers were skipped:` +
       `${quizNotFound} did not match any quiz, ${userNotFound} did not match any` +
       `user, the quizzes of ${itemsNotFound} did not have any answers and ` +
       `${alreadyMigrated} were already migrated.`,
   )
+  return existingAnswers
 }
