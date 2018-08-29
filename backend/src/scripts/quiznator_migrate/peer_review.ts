@@ -9,7 +9,7 @@ import {
   PeerReviewQuestionCollection,
   User,
 } from "../../models"
-import { getUUIDByString, progressBar } from "./util"
+import { getUUIDByString, insert, progressBar } from "./util"
 
 export async function migratePeerReviews(
   users: { [username: string]: User },
@@ -79,11 +79,11 @@ export async function migratePeerReviews(
 
   const praChunk = 10900
   for (let i = 0; i < newPeerReviewAnswers.length; i += praChunk) {
-    await PeerReviewQuestionAnswer.createQueryBuilder()
-      .insert()
-      .values(newPeerReviewAnswers.slice(i, i + praChunk))
-      .onConflict(`("peer_review_id", "peer_review_question_id") DO NOTHING`)
-      .execute()
+    await insert(
+      PeerReviewQuestionAnswer,
+      newPeerReviewAnswers.slice(i, i + praChunk),
+      `"peer_review_id", "peer_review_question_id"`,
+    )
   }
 }
 

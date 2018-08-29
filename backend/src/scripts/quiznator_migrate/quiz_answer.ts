@@ -10,7 +10,7 @@ import {
   User,
 } from "../../models"
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
-import { getUUIDByString, progressBar } from "./util"
+import { getUUIDByString, insert, progressBar } from "./util"
 
 export async function migrateQuizAnswers(
   quizzes: { [quizID: string]: Quiz },
@@ -184,18 +184,13 @@ export async function migrateQuizAnswers(
               ),
             )
 
-            await QuizAnswer.createQueryBuilder()
-              .insert()
-              .values(quizAnswers)
-              .onConflict(`("id") DO NOTHING`)
-              .execute()
+            await insert(QuizAnswer, quizAnswers)
             const itemAnswerChunk = 10900
             for (let i = 0; i < quizItemAnswers.length; i += itemAnswerChunk) {
-              await QuizItemAnswer.createQueryBuilder()
-                .insert()
-                .values(quizItemAnswers.slice(i, i + itemAnswerChunk))
-                .onConflict(`("id") DO NOTHING`)
-                .execute()
+              await insert(
+                QuizItemAnswer,
+                quizItemAnswers.slice(i, i + itemAnswerChunk),
+              )
             }
             const optionAnswerChunk = 13100
             for (
@@ -203,11 +198,10 @@ export async function migrateQuizAnswers(
               i < quizOptionAnswers.length;
               i += optionAnswerChunk
             ) {
-              await QuizOptionAnswer.createQueryBuilder()
-                .insert()
-                .values(quizOptionAnswers.slice(i, i + optionAnswerChunk))
-                .onConflict(`("id") DO NOTHING`)
-                .execute()
+              await insert(
+                QuizOptionAnswer,
+                quizOptionAnswers.slice(i, i + optionAnswerChunk),
+              )
             }
 
             bar.tick(quizAnswers.length)

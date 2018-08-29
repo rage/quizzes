@@ -13,7 +13,7 @@ import {
   Quiz,
   UserCourseState,
 } from "../../models"
-import { getUUIDByString, progressBar, safeGet } from "./util"
+import { getUUIDByString, insert, progressBar, safeGet } from "./util"
 
 export async function migratePeerReviewQuestions() {
   console.log("Querying peer review questions...")
@@ -60,28 +60,18 @@ export async function migratePeerReviewQuestions() {
   )
 
   console.log("Inserting peer review questions")
-  await PeerReviewQuestionCollection.createQueryBuilder()
-    .insert()
-    .values(collections)
-    .onConflict(`("id") DO NOTHING`)
-    .execute()
-  await PeerReviewQuestionCollectionTranslation.createQueryBuilder()
-    .insert()
-    .values(collectionTranslations)
-    .onConflict(
-      `("peer_review_question_collection_id", "language_id") DO NOTHING`,
-    )
-    .execute()
-  await PeerReviewQuestion.createQueryBuilder()
-    .insert()
-    .values(questions)
-    .onConflict(`("id") DO NOTHING`)
-    .execute()
-  await PeerReviewQuestionTranslation.createQueryBuilder()
-    .insert()
-    .values(questionTranslations)
-    .onConflict(`("peer_review_question_id", "language_id") DO NOTHING`)
-    .execute()
+  await insert(PeerReviewQuestionCollection, collections)
+  await insert(
+    PeerReviewQuestionCollectionTranslation,
+    collectionTranslations,
+    `"peer_review_question_collection_id", "language_id"`,
+  )
+  await insert(PeerReviewQuestion, questions)
+  await insert(
+    PeerReviewQuestionTranslation,
+    questionTranslations,
+    `"peer_review_question_id", "language_id"`,
+  )
 }
 
 async function migratePeerReviewQuestion(

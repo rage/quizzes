@@ -5,6 +5,7 @@ import axios from "axios"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { User } from "../../models"
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
+import { insert } from "./util"
 
 const TMC_TOKEN =
   "7ae010e2e5641e6bdf9f05cd60b037ad6027be9189ad9b9420edee3468e7f27e"
@@ -24,11 +25,7 @@ export async function migrateUsers(): Promise<{ [username: string]: User }> {
   console.log("Inserting users...")
   const chunkSize = 65500
   for (let i = 0; i < dbInput.length; i += chunkSize) {
-    await User.createQueryBuilder()
-      .insert()
-      .values(dbInput.slice(i, i + chunkSize))
-      .onConflict(`("id") DO NOTHING`)
-      .execute()
+    await insert(User, dbInput.slice(i, i + chunkSize))
   }
 
   const users: { [username: string]: User } = {}

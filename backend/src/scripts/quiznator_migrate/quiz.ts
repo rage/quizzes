@@ -9,10 +9,9 @@ import {
 } from "../../models"
 import { Quiz as QNQuiz } from "./app-modules/models"
 
-import { BaseEntity } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import oldQuizTypes from "./app-modules/constants/quiz-types"
-import { getUUIDByString, progressBar, safeGet } from "./util"
+import { getUUIDByString, insert, safeGet } from "./util"
 
 export async function migrateQuizzes(courses: {
   [key: string]: Course
@@ -237,19 +236,6 @@ export async function migrateQuizzes(courses: {
   }
 
   console.log("Inserting quizzes...")
-
-  function insert<T extends BaseEntity>(
-    type: typeof BaseEntity,
-    data: Array<QueryPartialEntity<T>>,
-    primaryKeys: string = `"id"`,
-  ) {
-    return type
-      .createQueryBuilder()
-      .insert()
-      .values(data)
-      .onConflict(`(${primaryKeys}) DO NOTHING`)
-      .execute()
-  }
 
   await insert(Quiz, quizzes)
   await insert(QuizTranslation, quizTranslations, `"quiz_id", "language_id"`)
