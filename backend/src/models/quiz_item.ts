@@ -22,7 +22,10 @@ export class QuizItem extends BaseEntity {
   public quiz: Promise<Quiz>
   @Column() public quizId: string
 
-  @Column({ type: "enum", enum: ["open", "essay", "multiple-choice"] })
+  @Column({
+    type: "enum",
+    enum: ["open", "essay", "multiple-choice", "research-agreement"],
+  })
   public type: string
   @Column("int") public order: number
 

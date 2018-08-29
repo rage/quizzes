@@ -27,6 +27,7 @@ export async function migrateQuizzes(courses: {
         oldQuizTypes.MULTIPLE_OPEN,
         oldQuizTypes.MULTIPLE_CHOICE,
         oldQuizTypes.RADIO_MATRIX,
+        oldQuizTypes.PRIVACY_AGREEMENT,
       ],
     },
   })
@@ -95,7 +96,7 @@ export async function migrateQuizzes(courses: {
 
     let order: number
     let choiceOrder: number
-    const meta = safeGet(() => oldQuiz.data.meta, {})
+    const meta = safeGet(() => oldQuiz.data.meta, {}) || {}
     const rightAnswer = safeGet(() => meta.rightAnswer)
     const successes = safeGet(() => meta.successes)
     const errors = safeGet(() => meta.errors)
@@ -146,11 +147,15 @@ export async function migrateQuizzes(courses: {
         break
 
       case oldQuizTypes.MULTIPLE_CHOICE:
+      case oldQuizTypes.PRIVACY_AGREEMENT:
         const itemID = getUUIDByString(oldQuiz._id)
         quizItems.push({
           id: itemID,
           quizId: quiz.id,
-          type: "multiple-choice",
+          type:
+            oldQuiz.type === oldQuizTypes.MULTIPLE_CHOICE
+              ? "multiple-choice"
+              : "research-agreement",
           order: 0,
           createdAt: oldQuiz.createdAt,
           updatedAt: oldQuiz.updatedAt,
@@ -160,6 +165,8 @@ export async function migrateQuizzes(courses: {
           languageId,
           successMessage: meta.success,
           failureMessage: meta.error,
+          title: oldQuiz.title,
+          body: oldQuiz.body,
         })
         choiceOrder = 0
         for (const oldChoice of oldItems) {
@@ -169,8 +176,10 @@ export async function migrateQuizzes(courses: {
             quizItemId: itemID,
             order: choiceOrder++,
             correct:
-              rightAnswer === oldChoice.id ||
-              rightAnswer.includes(oldChoice.id),
+              oldQuiz.type === oldQuizTypes.PRIVACY_AGREEMENT
+                ? true
+                : rightAnswer === oldChoice.id ||
+                  rightAnswer.includes(oldChoice.id),
             createdAt: oldQuiz.createdAt,
             updatedAt: oldQuiz.updatedAt,
           })
