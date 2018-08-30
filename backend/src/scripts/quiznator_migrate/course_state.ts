@@ -19,10 +19,9 @@ export async function migrateCourseStates(
       continue
     }
 
-    const course = courses[getUUIDByString(courseState.courseId)]
-    if (!course) {
-      continue
-    }
+    const course =
+      courses[getUUIDByString(courseState.courseId)] ||
+      courses[getUUIDByString("default")]
 
     const completion = courseState.completion || {}
 

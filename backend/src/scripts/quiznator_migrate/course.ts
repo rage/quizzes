@@ -27,6 +27,8 @@ const courseIDs = {
   "tikape-k18": "fi_FI",
 
   "tsoha-18": "fi_FI",
+
+  default: "unknown",
 }
 
 export async function migrateCourses(

@@ -17,9 +17,17 @@ export async function createLanguages(): Promise<{
       name: "English",
     }),
   ).save()
+  const unknown = await Language.merge(
+    Language.create({
+      id: "unknown",
+      country: "Unknown",
+      name: "Unknown",
+    }),
+  ).save()
 
   return {
     [finnish.id]: finnish,
     [english.id]: english,
+    [unknown.id]: unknown,
   }
 }

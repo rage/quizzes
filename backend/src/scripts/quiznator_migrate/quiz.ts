@@ -47,7 +47,7 @@ export async function migrateQuizzes(courses: {
     let part = 0
     let section = 0
     let excludedFromScore = false
-    let course: Course
+    let course: Course = courses[getUUIDByString("default")]
     for (const tag of oldQuiz.tags) {
       if (tag === "ignore") {
         excludedFromScore = true
@@ -65,9 +65,6 @@ export async function migrateQuizzes(courses: {
         part = parseInt(match[1], 10)
         section = parseInt(match[2], 10)
       }
-    }
-    if (!course) {
-      continue
     }
 
     const languageId = course.languages[0].id
@@ -96,12 +93,12 @@ export async function migrateQuizzes(courses: {
 
     let order: number
     let choiceOrder: number
-    const meta = safeGet(() => oldQuiz.data.meta, {}) || {}
+    const meta = safeGet(() => oldQuiz.data.meta) || {}
     const rightAnswer = safeGet(() => meta.rightAnswer)
-    const successes = safeGet(() => meta.successes)
-    const errors = safeGet(() => meta.errors)
-    const oldItems = safeGet(() => oldQuiz.data.items, [])
-    const oldChoices = safeGet(() => oldQuiz.data.choices, [])
+    const successes = safeGet(() => meta.successes) || {}
+    const errors = safeGet(() => meta.errors) || {}
+    const oldItems = safeGet(() => oldQuiz.data.items) || []
+    const oldChoices = safeGet(() => oldQuiz.data.choices) || []
     switch (oldQuiz.type) {
       case oldQuizTypes.ESSAY:
       case oldQuizTypes.OPEN:
@@ -171,14 +168,15 @@ export async function migrateQuizzes(courses: {
         choiceOrder = 0
         for (const oldChoice of oldItems) {
           const qoid = getUUIDByString(quiz.id + itemID + oldChoice.id)
+          const correct =
+            oldQuiz.type === oldQuizTypes.PRIVACY_AGREEMENT ||
+            rightAnswer === oldChoice.id ||
+            (Array.isArray(rightAnswer) && rightAnswer.includes(oldChoice.id))
           quizOptions.push({
             id: qoid,
             quizItemId: itemID,
             order: choiceOrder++,
-            correct:
-              oldQuiz.type === oldQuizTypes.PRIVACY_AGREEMENT ||
-              rightAnswer === oldChoice.id ||
-              rightAnswer.includes(oldChoice.id),
+            correct: typeof correct === "boolean" ? correct : true,
             createdAt: oldQuiz.createdAt,
             updatedAt: oldQuiz.updatedAt,
           })

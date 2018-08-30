@@ -21,8 +21,6 @@ export async function migrateQuizAnswers(
   const bar = progressBar("Migrating quiz answers", answers.length)
   let quizNotFound = 0
   let userNotFound = 0
-  const itemsNotFound = 0
-  const alreadyMigrated = 0
   const existingAnswers: { [answerID: string]: boolean } = {}
   await new Promise(
     async (
@@ -234,11 +232,8 @@ export async function migrateQuizAnswers(
     );`)
 
   console.log(
-    `Quiz answers migrated. ${quizNotFound +
-      userNotFound} answers were skipped:` +
-      `${quizNotFound} did not match any quiz, ${userNotFound} did not match any` +
-      `user, the quizzes of ${itemsNotFound} did not have any answers and ` +
-      `${alreadyMigrated} were already migrated.`,
+    `Quiz answers migrated. ${quizNotFound} did not match any quiz and ` +
+      `${userNotFound} did not match any user`,
   )
   return existingAnswers
 }

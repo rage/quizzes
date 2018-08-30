@@ -35,17 +35,21 @@ export async function migratePeerReviewQuestions() {
   const questionTranslations: Array<
     QueryPartialEntity<PeerReviewQuestionTranslation>
   > = []
+  let quizNotFound = 0
+  let answerNotFound = 0
   await Promise.all(
     peerReviewQuestions.map(async (oldPRQ: any) => {
       const quiz = await Quiz.findOne(
         getUUIDByString(safeGet(() => oldPRQ.data.quizId)),
       )
       if (!quiz) {
+        quizNotFound++
         return
       }
 
       const val = await migratePeerReviewQuestion(quiz, oldPRQ)
       if (!val) {
+        answerNotFound++
         return
       }
 
@@ -57,6 +61,11 @@ export async function migratePeerReviewQuestions() {
 
       bar.tick()
     }),
+  )
+
+  console.log(
+    `${quizNotFound} peer review questions did not match any quiz and ` +
+      `${answerNotFound} peer review questions did not have any answers.`,
   )
 
   console.log("Inserting peer review questions")
@@ -114,7 +123,7 @@ async function migratePeerReviewQuestion(
     QueryPartialEntity<PeerReviewQuestionTranslation>
   > = []
   let order = 1
-  const newPRQ = async (
+  const newPRQ = (
     id: string,
     type: string,
     title: string = "",
