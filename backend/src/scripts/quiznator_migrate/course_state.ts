@@ -11,7 +11,7 @@ export async function migrateCourseStates(
   console.log("Querying course states...")
   const oldStates = await QNCourseState.find({})
 
-  console.log("Converting course states...")
+  let bar = progressBar("Converting course states", oldStates.length)
   const courseStates: Array<QueryPartialEntity<UserCourseState>> = []
   for (const courseState of oldStates) {
     const user = users[courseState.answererId]
@@ -37,13 +37,14 @@ export async function migrateCourseStates(
       completionDate: completion.completionDate,
       completionAnswersDate: completion.completionAnswersDate,
     })
+    bar.tick()
   }
 
-  const bar = progressBar("Inserting course states", courseStates.length)
+  bar = progressBar("Inserting course states", courseStates.length)
   const chunkSize = 9300
   for (let i = 0; i < courseStates.length; i += chunkSize) {
     const vals = courseStates.slice(i, i + chunkSize)
-    insert(UserCourseState, vals, `"user_id", "course_id"`)
+    await insert(UserCourseState, vals, `"user_id", "course_id"`)
     bar.tick(vals.length)
   }
 }

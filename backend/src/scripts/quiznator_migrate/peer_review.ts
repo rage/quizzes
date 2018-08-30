@@ -24,7 +24,7 @@ export async function migratePeerReviews(
   > = []
   console.log("Preparing to convert peer reviews...")
 
-  const bar = progressBar("Converting peer reviews", peerReviews.length)
+  let bar = progressBar("Converting peer reviews", peerReviews.length)
   await Promise.all(
     peerReviews.map(async (oldPR: any) => {
       const answerID = getUUIDByString(oldPR.chosenQuizAnswerId)
@@ -67,23 +67,27 @@ export async function migratePeerReviews(
     }),
   )
 
-  console.log("Inserting peer reviews...")
+  bar = progressBar("Inserting peer reviews", newPeerReviews.length)
   const prChunk = 10900
   for (let i = 0; i < newPeerReviews.length; i += prChunk) {
-    await PeerReview.createQueryBuilder()
-      .insert()
-      .values(newPeerReviews.slice(i, i + prChunk))
-      .onConflict(`("id") DO NOTHING`)
-      .execute()
+    const vals = newPeerReviews.slice(i, i + prChunk)
+    await insert(PeerReview, vals)
+    bar.tick(vals.length)
   }
 
+  bar = progressBar(
+    "Inserting peer review answers",
+    newPeerReviewAnswers.length,
+  )
   const praChunk = 10900
   for (let i = 0; i < newPeerReviewAnswers.length; i += praChunk) {
+    const vals = newPeerReviewAnswers.slice(i, i + praChunk)
     await insert(
       PeerReviewQuestionAnswer,
-      newPeerReviewAnswers.slice(i, i + praChunk),
+      vals,
       `"peer_review_id", "peer_review_question_id"`,
     )
+    bar.tick(vals.length)
   }
 }
 
