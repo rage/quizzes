@@ -14,12 +14,16 @@ import { migrateSpamFlags } from "./spam_flag"
 import { migrateUsers } from "./user"
 
 async function main() {
+  console.log("Connecting to Postgres")
   await database.promise
 
+  console.log("Connecting to MongoDB")
   await mongoUtils.connect(
     process.env.MONGO_URI || "mongodb://localhost:27017/quiznator",
   )
 
+  console.log("Migration started")
+  console.time("Database migration complete. Time used")
   const org = await Organization.merge(Organization.create({ id: 0 })).save()
 
   const languages = await createLanguages()
@@ -31,7 +35,7 @@ async function main() {
   const existingAnswers = await migrateQuizAnswers(quizzes, users)
   await migrateSpamFlags(users)
   await migratePeerReviews(users, existingAnswers)
-  console.log("Migration complete")
+  console.timeEnd("Database migration complete. Time used")
   process.exit()
 }
 

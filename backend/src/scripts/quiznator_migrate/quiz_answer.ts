@@ -88,8 +88,6 @@ export async function migrateQuizAnswers(
                   })
                   existingAnswers[id] = true
 
-                  QuizAnswer.create()
-
                   if (Array.isArray(answer.data)) {
                     answer.data = answer.data.map((entry: any) =>
                       getUUIDByString(quiz.id + entry),
