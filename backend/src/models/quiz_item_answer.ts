@@ -24,7 +24,10 @@ export class QuizItemAnswer extends BaseEntity {
   public quizItem: Promise<QuizItem>
   @Column() public quizItemId: string
 
-  @Column("text") public textData: string
+  @Column({ type: "text", nullable: true })
+  public textData: string
+  @Column({ type: "int", nullable: true })
+  public intData: number
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

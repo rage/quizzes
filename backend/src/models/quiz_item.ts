@@ -24,7 +24,7 @@ export class QuizItem extends BaseEntity {
 
   @Column({
     type: "enum",
-    enum: ["open", "essay", "multiple-choice", "research-agreement"],
+    enum: ["open", "scale", "essay", "radio", "checkbox", "research-agreement"],
   })
   public type: string
   @Column("int") public order: number

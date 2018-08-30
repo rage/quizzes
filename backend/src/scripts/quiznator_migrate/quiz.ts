@@ -24,6 +24,8 @@ export async function migrateQuizzes(courses: {
       $in: [
         oldQuizTypes.ESSAY,
         oldQuizTypes.OPEN,
+        oldQuizTypes.SCALE,
+        oldQuizTypes.CHECKBOX,
         oldQuizTypes.MULTIPLE_OPEN,
         oldQuizTypes.MULTIPLE_CHOICE,
         oldQuizTypes.RADIO_MATRIX,
@@ -120,14 +122,15 @@ export async function migrateQuizzes(courses: {
         break
 
       case oldQuizTypes.MULTIPLE_OPEN:
+      case oldQuizTypes.SCALE:
         order = 0
         for (const oldItem of oldItems) {
           const qiid = getUUIDByString(quiz.id + oldItem.id)
           quizItems.push({
             id: qiid,
             quizId: quiz.id,
-            type: "open",
-            validityRegex: rightAnswer[oldItem.id],
+            type: oldQuiz.type === oldQuizTypes.SCALE ? "scale" : "open",
+            validityRegex: rightAnswer ? rightAnswer[oldItem.id] : undefined,
             order: order++,
             createdAt: oldQuiz.createdAt,
             updatedAt: oldQuiz.updatedAt,
@@ -145,14 +148,17 @@ export async function migrateQuizzes(courses: {
 
       case oldQuizTypes.MULTIPLE_CHOICE:
       case oldQuizTypes.PRIVACY_AGREEMENT:
+      case oldQuizTypes.CHECKBOX:
         const itemID = getUUIDByString(oldQuiz._id)
         quizItems.push({
           id: itemID,
           quizId: quiz.id,
           type:
-            oldQuiz.type === oldQuizTypes.MULTIPLE_CHOICE
-              ? "multiple-choice"
-              : "research-agreement",
+            oldQuiz.type !== oldQuizTypes.MULTIPLE_CHOICE
+              ? oldQuiz.type !== oldQuizTypes.CHECKBOX
+                ? "research-agreement"
+                : "checkbox"
+              : "radio",
           order: 0,
           createdAt: oldQuiz.createdAt,
           updatedAt: oldQuiz.updatedAt,
@@ -199,7 +205,7 @@ export async function migrateQuizzes(courses: {
           quizItems.push({
             id: qiid,
             quizId: quiz.id,
-            type: "multiple-choice",
+            type: "radio",
             order: order++,
             createdAt: oldQuiz.createdAt,
             updatedAt: oldQuiz.updatedAt,

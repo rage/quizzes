@@ -105,8 +105,8 @@ export async function migrateQuizAnswers(
                       switch (quizItem.type) {
                         case "essay":
                           quizItemAnswers.push({
-                            id: getUUIDByString(answer._id),
-                            quizAnswerId: getUUIDByString(answer._id),
+                            id,
+                            quizAnswerId: id,
                             quizItemId: quizItem.id,
                             textData: (answer.data || "").replace(/\0/g, ""),
                             createdAt: answer.createdAt,
@@ -116,8 +116,8 @@ export async function migrateQuizAnswers(
 
                         case "open":
                           quizItemAnswers.push({
-                            id: getUUIDByString(answer._id),
-                            quizAnswerId: getUUIDByString(answer._id),
+                            id,
+                            quizAnswerId: id,
                             quizItemId: quizItem.id,
                             textData: (
                               (typeof answer.data === "string"
@@ -128,14 +128,27 @@ export async function migrateQuizAnswers(
                             updatedAt: answer.updatedAt,
                           })
                           break
-
-                        case "multiple-choice":
-                        case "research-agreement":
+                        case "scale":
                           quizItemAnswers.push({
-                            id: getUUIDByString(answer._id),
-                            quizAnswerId: getUUIDByString(answer._id),
+                            id,
+                            quizAnswerId: id,
                             quizItemId: quizItem.id,
-                            textData: "",
+                            intData:
+                              typeof answer.data === "number"
+                                ? answer.data
+                                : answer.data[quizItem.id],
+                            createdAt: answer.createdAt,
+                            updatedAt: answer.updatedAt,
+                          })
+                          break
+
+                        case "radio":
+                        case "research-agreement":
+                        case "checkbox":
+                          quizItemAnswers.push({
+                            id,
+                            quizAnswerId: id,
+                            quizItemId: quizItem.id,
                             createdAt: answer.createdAt,
                             updatedAt: answer.updatedAt,
                           })
@@ -163,7 +176,7 @@ export async function migrateQuizAnswers(
                             }
                             quizOptionAnswers.push({
                               id: getUUIDByString(answer._id + chosenOption),
-                              quizItemAnswerId: getUUIDByString(answer._id),
+                              quizItemAnswerId: id,
                               quizOptionId: optionID,
                               createdAt: answer.createdAt,
                               updatedAt: answer.updatedAt,

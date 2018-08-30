@@ -1,13 +1,16 @@
 import { QuizAnswerSpamFlag as QNSpamFlag } from "./app-modules/models"
 
+import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { QuizAnswer, SpamFlag, User } from "../../models"
 import { getUUIDByString, insert, progressBar } from "./util"
-import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 
 export async function migrateSpamFlags(users: { [username: string]: User }) {
   console.log("Querying spam flags...")
   const oldFlags = (await QNSpamFlag.find({})).map(
-    (spamFlag: { [key: string]: any }) => spamFlag._id.split("-"),
+    (spamFlag: { [key: string]: any }) => {
+      const split = spamFlag._id.split("-")
+      return [split.slice(0, -1).join("-"), split.slice(-1)[0]]
+    },
   )
 
   const existingIDs = (await QuizAnswer.createQueryBuilder()
