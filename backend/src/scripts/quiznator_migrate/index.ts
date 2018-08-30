@@ -12,7 +12,6 @@ import { migrateQuizzes } from "./quiz"
 import { migrateQuizAnswers } from "./quiz_answer"
 import { migrateSpamFlags } from "./spam_flag"
 import { migrateUsers } from "./user"
-import { migrateResearchAgreements } from "./research_agreement"
 
 async function main() {
   await database.promise
@@ -29,7 +28,6 @@ async function main() {
   await migratePeerReviewQuestions()
   const users = await migrateUsers()
   await migrateCourseStates(courses, users)
-  await migrateResearchAgreements(quizzes, users)
   const existingAnswers = await migrateQuizAnswers(quizzes, users)
   await migrateSpamFlags(users)
   await migratePeerReviews(users, existingAnswers)

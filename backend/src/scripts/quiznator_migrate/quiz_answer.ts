@@ -134,6 +134,7 @@ export async function migrateQuizAnswers(
                           break
 
                         case "multiple-choice":
+                        case "research-agreement":
                           quizItemAnswers.push({
                             id: getUUIDByString(answer._id),
                             quizAnswerId: getUUIDByString(answer._id),

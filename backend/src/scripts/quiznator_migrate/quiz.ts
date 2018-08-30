@@ -176,10 +176,9 @@ export async function migrateQuizzes(courses: {
             quizItemId: itemID,
             order: choiceOrder++,
             correct:
-              oldQuiz.type === oldQuizTypes.PRIVACY_AGREEMENT
-                ? true
-                : rightAnswer === oldChoice.id ||
-                  rightAnswer.includes(oldChoice.id),
+              oldQuiz.type === oldQuizTypes.PRIVACY_AGREEMENT ||
+              rightAnswer === oldChoice.id ||
+              rightAnswer.includes(oldChoice.id),
             createdAt: oldQuiz.createdAt,
             updatedAt: oldQuiz.updatedAt,
           })
