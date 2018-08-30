@@ -11,7 +11,7 @@ import { Quiz as QNQuiz } from "./app-modules/models"
 
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import oldQuizTypes from "./app-modules/constants/quiz-types"
-import { getUUIDByString, insert, safeGet } from "./util"
+import { getUUIDByString, insert, progressBar, safeGet } from "./util"
 
 export async function migrateQuizzes(courses: {
   [key: string]: Course
@@ -42,7 +42,7 @@ export async function migrateQuizzes(courses: {
     QueryPartialEntity<QuizOptionTranslation>
   > = []
 
-  console.log("Converting quizzes...")
+  const bar = progressBar("Converting quizzes", oldQuizzes.length)
   for (const oldQuiz of oldQuizzes) {
     let part = 0
     let section = 0
@@ -241,10 +241,10 @@ export async function migrateQuizzes(courses: {
       default:
         console.warn("Unhandled quiz:", oldQuiz)
     }
+    bar.tick()
   }
 
   console.log("Inserting quizzes...")
-
   await insert(Quiz, quizzes)
   await insert(QuizTranslation, quizTranslations, `"quiz_id", "language_id"`)
   await insert(QuizItem, quizItems)
