@@ -9,7 +9,12 @@ import {
   PeerReviewQuestionCollection,
   User,
 } from "../../models"
-import { getUUIDByString, insert, progressBar } from "./util"
+import {
+  calculateChunkSize,
+  getUUIDByString,
+  insert,
+  progressBar,
+} from "./util"
 
 export async function migratePeerReviews(
   users: { [username: string]: User },
@@ -66,24 +71,23 @@ export async function migratePeerReviews(
     })
 
     for (const question of questions) {
-      const answer: QueryPartialEntity<PeerReviewQuestionAnswer> = {
+      newPeerReviewAnswers.push({
         peerReviewId: id,
         peerReviewQuestionId: question.id,
         createdAt: oldPR.createdAt,
         updatedAt: oldPR.updatedAt,
-      }
-      if (question.type === "essay") {
-        answer.text = oldPR.review
-      } else if (question.type === "grade") {
-        answer.value = oldPR.grading[question.texts[0].title]
-      }
-      newPeerReviewAnswers.push(answer)
+        text: question.type === "essay" ? oldPR.review : null,
+        value:
+          question.type === "grade"
+            ? oldPR.grading[question.texts[0].title]
+            : null,
+      })
     }
     bar.tick()
   }
 
   bar = progressBar("Inserting peer reviews", newPeerReviews.length)
-  const prChunk = 10900
+  const prChunk = calculateChunkSize(newPeerReviews[0])
   for (let i = 0; i < newPeerReviews.length; i += prChunk) {
     const vals = newPeerReviews.slice(i, i + prChunk)
     await insert(PeerReview, vals)
@@ -94,7 +98,7 @@ export async function migratePeerReviews(
     "Inserting peer review answers",
     newPeerReviewAnswers.length,
   )
-  const praChunk = 10900
+  const praChunk = calculateChunkSize(newPeerReviewAnswers[0])
   for (let i = 0; i < newPeerReviewAnswers.length; i += praChunk) {
     const vals = newPeerReviewAnswers.slice(i, i + praChunk)
     await insert(

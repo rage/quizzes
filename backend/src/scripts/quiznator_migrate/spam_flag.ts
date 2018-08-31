@@ -2,7 +2,12 @@ import { QuizAnswerSpamFlag as QNSpamFlag } from "./app-modules/models"
 
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { QuizAnswer, SpamFlag, User } from "../../models"
-import { getUUIDByString, insert, progressBar } from "./util"
+import {
+  calculateChunkSize,
+  getUUIDByString,
+  insert,
+  progressBar,
+} from "./util"
 
 export async function migrateSpamFlags(users: { [username: string]: User }) {
   console.log("Querying spam flags...")
@@ -38,7 +43,7 @@ export async function migrateSpamFlags(users: { [username: string]: User }) {
   }
 
   bar = progressBar("Inserting spam flags", spamFlags.length)
-  const chunkSize = 32700
+  const chunkSize = calculateChunkSize(spamFlags[0])
   for (let i = 0; i < spamFlags.length; i += chunkSize) {
     const vals = spamFlags.slice(i, i + chunkSize)
     await insert(SpamFlag, vals, `"user_id", "quiz_answer_id"`)

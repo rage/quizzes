@@ -10,7 +10,12 @@ import {
   User,
 } from "../../models"
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
-import { getUUIDByString, insert, progressBar } from "./util"
+import {
+  calculateChunkSize,
+  getUUIDByString,
+  insert,
+  progressBar,
+} from "./util"
 
 export async function migrateQuizAnswers(
   quizzes: { [quizID: string]: Quiz },
@@ -28,7 +33,8 @@ export async function migrateQuizAnswers(
       reject: (err: Error) => any,
     ): Promise<any> => {
       try {
-        const poolSize = 9300
+        const QUIZ_INSERT_FIELD_COUNT = 7
+        const poolSize = Math.floor(65535 / QUIZ_INSERT_FIELD_COUNT) - 1
         let pool: any = []
 
         for (let idx = 0; idx < answers.length; idx++) {
@@ -108,6 +114,7 @@ export async function migrateQuizAnswers(
                             id,
                             quizAnswerId: id,
                             quizItemId: quizItem.id,
+                            intData: null,
                             textData: (answer.data || "").replace(/\0/g, ""),
                             createdAt: answer.createdAt,
                             updatedAt: answer.updatedAt,
@@ -119,6 +126,7 @@ export async function migrateQuizAnswers(
                             id,
                             quizAnswerId: id,
                             quizItemId: quizItem.id,
+                            intData: null,
                             textData: (
                               (typeof answer.data === "string"
                                 ? answer.data
@@ -137,6 +145,7 @@ export async function migrateQuizAnswers(
                               typeof answer.data === "number"
                                 ? answer.data
                                 : answer.data[quizItem.id],
+                            textData: null,
                             createdAt: answer.createdAt,
                             updatedAt: answer.updatedAt,
                           })
@@ -149,6 +158,8 @@ export async function migrateQuizAnswers(
                             id,
                             quizAnswerId: id,
                             quizItemId: quizItem.id,
+                            intData: null,
+                            textData: null,
                             createdAt: answer.createdAt,
                             updatedAt: answer.updatedAt,
                           })
@@ -195,14 +206,14 @@ export async function migrateQuizAnswers(
             )
 
             await insert(QuizAnswer, quizAnswers)
-            const itemAnswerChunk = 10900
+            const itemAnswerChunk = calculateChunkSize(quizItemAnswers[0])
             for (let i = 0; i < quizItemAnswers.length; i += itemAnswerChunk) {
               await insert(
                 QuizItemAnswer,
                 quizItemAnswers.slice(i, i + itemAnswerChunk),
               )
             }
-            const optionAnswerChunk = 13100
+            const optionAnswerChunk = calculateChunkSize(quizOptionAnswers[0])
             for (
               let i = 0;
               i < quizOptionAnswers.length;

@@ -41,3 +41,10 @@ export function insert<T extends BaseEntity>(
     .onConflict(`(${primaryKeys}) DO NOTHING`)
     .execute()
 }
+
+export function calculateChunkSize(dataExample: object): number {
+  if (!dataExample) {
+    return 65535
+  }
+  return Math.floor(65535 / Object.entries(dataExample).length) - 1
+}

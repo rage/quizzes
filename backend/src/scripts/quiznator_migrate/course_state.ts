@@ -2,7 +2,12 @@ import { CourseState as QNCourseState } from "./app-modules/models"
 
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { Course, User, UserCourseState } from "../../models"
-import { getUUIDByString, insert, progressBar } from "./util"
+import {
+  calculateChunkSize,
+  getUUIDByString,
+  insert,
+  progressBar,
+} from "./util"
 
 export async function migrateCourseStates(
   courses: { [courseID: string]: Course },
@@ -40,7 +45,7 @@ export async function migrateCourseStates(
   }
 
   bar = progressBar("Inserting course states", courseStates.length)
-  const chunkSize = 9300
+  const chunkSize = calculateChunkSize(courseStates[0])
   for (let i = 0; i < courseStates.length; i += chunkSize) {
     const vals = courseStates.slice(i, i + chunkSize)
     await insert(UserCourseState, vals, `"user_id", "course_id"`)
