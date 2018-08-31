@@ -80,9 +80,9 @@ export async function migrateQuizAnswers(
                     status = "confirmed"
                   }
 
-                  const id = getUUIDByString(answer._id)
+                  const answerID = getUUIDByString(answer._id)
                   quizAnswers.push({
-                    id,
+                    id: answerID,
                     quizId: quiz.id,
                     userId: user.id,
                     status,
@@ -90,7 +90,7 @@ export async function migrateQuizAnswers(
                     createdAt: answer.createdAt,
                     updatedAt: answer.updatedAt,
                   })
-                  existingAnswers[id] = true
+                  existingAnswers[answerID] = true
 
                   if (Array.isArray(answer.data)) {
                     answer.data = answer.data.map((entry: any) =>
@@ -107,98 +107,93 @@ export async function migrateQuizAnswers(
                   }
 
                   for (const quizItem of quizItems) {
-                    try {
-                      switch (quizItem.type) {
-                        case "essay":
-                          quizItemAnswers.push({
-                            id,
-                            quizAnswerId: id,
-                            quizItemId: quizItem.id,
-                            intData: null,
-                            textData: (answer.data || "").replace(/\0/g, ""),
-                            createdAt: answer.createdAt,
-                            updatedAt: answer.updatedAt,
-                          })
-                          break
+                    const itemID = getUUIDByString(answerID + quizItem.id)
+                    switch (quizItem.type) {
+                      case "essay":
+                        quizItemAnswers.push({
+                          id: itemID,
+                          quizAnswerId: answerID,
+                          quizItemId: quizItem.id,
+                          intData: null,
+                          textData: (answer.data || "").replace(/\0/g, ""),
+                          createdAt: answer.createdAt,
+                          updatedAt: answer.updatedAt,
+                        })
+                        break
 
-                        case "open":
-                          quizItemAnswers.push({
-                            id,
-                            quizAnswerId: id,
-                            quizItemId: quizItem.id,
-                            intData: null,
-                            textData: (
-                              (typeof answer.data === "string"
-                                ? answer.data
-                                : answer.data[quizItem.id]) || ""
-                            ).replace(/\0/g, ""),
-                            createdAt: answer.createdAt,
-                            updatedAt: answer.updatedAt,
-                          })
-                          break
-                        case "scale":
-                          quizItemAnswers.push({
-                            id,
-                            quizAnswerId: id,
-                            quizItemId: quizItem.id,
-                            intData:
-                              typeof answer.data === "number"
-                                ? answer.data
-                                : answer.data[quizItem.id],
-                            textData: null,
-                            createdAt: answer.createdAt,
-                            updatedAt: answer.updatedAt,
-                          })
-                          break
-
-                        case "radio":
-                        case "research-agreement":
-                        case "checkbox":
-                          quizItemAnswers.push({
-                            id,
-                            quizAnswerId: id,
-                            quizItemId: quizItem.id,
-                            intData: null,
-                            textData: null,
-                            createdAt: answer.createdAt,
-                            updatedAt: answer.updatedAt,
-                          })
-                          let chosenOptions =
-                            Array.isArray(answer.data) ||
-                            typeof answer.data !== "object"
+                      case "open":
+                        quizItemAnswers.push({
+                          id: itemID,
+                          quizAnswerId: answerID,
+                          quizItemId: quizItem.id,
+                          intData: null,
+                          textData: (
+                            (typeof answer.data === "string"
                               ? answer.data
-                              : answer.data[quizItem.id]
-                          if (!Array.isArray(chosenOptions)) {
-                            chosenOptions = [chosenOptions]
-                          }
-                          const quizOptions: {
-                            [optionID: string]: QuizOption
-                          } = {}
-                          for (const option of await quizItem.options) {
-                            quizOptions[option.id] = option
-                          }
+                              : answer.data[quizItem.id]) || ""
+                          ).replace(/\0/g, ""),
+                          createdAt: answer.createdAt,
+                          updatedAt: answer.updatedAt,
+                        })
+                        break
+                      case "scale":
+                        quizItemAnswers.push({
+                          id: itemID,
+                          quizAnswerId: answerID,
+                          quizItemId: quizItem.id,
+                          intData:
+                            typeof answer.data === "number"
+                              ? answer.data
+                              : answer.data[quizItem.id],
+                          textData: null,
+                          createdAt: answer.createdAt,
+                          updatedAt: answer.updatedAt,
+                        })
+                        break
 
-                          for (const chosenOption of chosenOptions) {
-                            const optionID = getUUIDByString(
-                              quiz.id + quizItem.id + chosenOption,
-                            )
-                            if (!(optionID in quizOptions)) {
-                              continue
-                            }
-                            quizOptionAnswers.push({
-                              id: getUUIDByString(answer._id + chosenOption),
-                              quizItemAnswerId: id,
-                              quizOptionId: optionID,
-                              createdAt: answer.createdAt,
-                              updatedAt: answer.updatedAt,
-                            })
+                      case "radio":
+                      case "research-agreement":
+                      case "checkbox":
+                        quizItemAnswers.push({
+                          id: itemID,
+                          quizAnswerId: answerID,
+                          quizItemId: quizItem.id,
+                          intData: null,
+                          textData: null,
+                          createdAt: answer.createdAt,
+                          updatedAt: answer.updatedAt,
+                        })
+                        let chosenOptions =
+                          Array.isArray(answer.data) ||
+                          typeof answer.data !== "object"
+                            ? answer.data
+                            : answer.data[quizItem.id]
+                        if (!Array.isArray(chosenOptions)) {
+                          chosenOptions = [chosenOptions]
+                        }
+                        const quizOptions: {
+                          [optionID: string]: QuizOption
+                        } = {}
+                        for (const option of await quizItem.options) {
+                          quizOptions[option.id] = option
+                        }
+
+                        for (const chosenOption of chosenOptions) {
+                          const optionID = getUUIDByString(
+                            quiz.id + quizItem.id + chosenOption,
+                          )
+                          if (!(optionID in quizOptions)) {
+                            continue
                           }
-                          break
-                      }
-                    } catch (err) {
-                      if (!(err instanceof QueryFailedError)) {
-                        throw err
-                      }
+                          quizOptionAnswers.push({
+                            id: getUUIDByString(itemID + chosenOption),
+                            quizItemAnswerId: itemID,
+                            quizOptionId: optionID,
+                            createdAt: answer.createdAt,
+                            updatedAt: answer.updatedAt,
+                          })
+                        }
+                        break
                     }
                   }
                 },

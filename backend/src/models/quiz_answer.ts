@@ -12,6 +12,7 @@ import {
 import { Language } from "./language"
 import { PeerReview } from "./peer_review"
 import { Quiz } from "./quiz"
+import { QuizItemAnswer } from "./quiz_item_answer"
 import { User } from "./user"
 
 @Entity()
@@ -38,6 +39,9 @@ export class QuizAnswer extends BaseEntity {
 
   @OneToMany(type => PeerReview, pr => pr.quizAnswer, { lazy: true })
   public peerReviews: Promise<PeerReview[]>
+
+  @OneToMany(type => QuizItemAnswer, qia => qia.quizAnswer, { lazy: true })
+  public items: Promise<QuizItemAnswer[]>
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

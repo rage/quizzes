@@ -7,7 +7,6 @@ import {
   OneToMany,
   PrimaryColumn,
   PrimaryGeneratedColumn,
-  RelationId,
   UpdateDateColumn,
 } from "typeorm"
 import { Language } from "./language"

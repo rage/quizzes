@@ -4,6 +4,7 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   RelationId,
   UpdateDateColumn,
@@ -11,6 +12,7 @@ import {
 import { Language } from "./language"
 import { QuizAnswer } from "./quiz_answer"
 import { QuizItem } from "./quiz_item"
+import { QuizOptionAnswer } from "./quiz_option_answer"
 
 @Entity()
 export class QuizItemAnswer extends BaseEntity {
@@ -28,6 +30,11 @@ export class QuizItemAnswer extends BaseEntity {
   public textData: string
   @Column({ type: "int", nullable: true })
   public intData: number
+
+  @OneToMany(type => QuizOptionAnswer, qoa => qoa.quizItemAnswer, {
+    lazy: true,
+  })
+  public options: Promise<QuizOptionAnswer[]>
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
