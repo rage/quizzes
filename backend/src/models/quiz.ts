@@ -65,7 +65,7 @@ export class QuizTranslation extends BaseEntity {
   @Column({ type: "text", default: "" })
   public body: string
   @Column({ type: "text", nullable: true })
-  public submitMessage: string
+  public submitMessage?: string
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

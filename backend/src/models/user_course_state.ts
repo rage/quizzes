@@ -21,16 +21,16 @@ export class UserCourseState extends BaseEntity {
   public course: Promise<Course>
   @PrimaryColumn() public courseId: string
 
-  @Column({ type: "float", nullable: true })
+  @Column({ type: "float", default: 0 })
   public progress: number
-  @Column({ type: "float", nullable: true })
+  @Column({ type: "float", default: 0 })
   public score: number
   @Column({ type: "boolean", default: false })
   public completed: boolean
   @Column({ type: "timestamp", nullable: true })
-  public completionDate: Date
+  public completionDate?: Date
   @Column({ type: "timestamp", nullable: true })
-  public completionAnswersDate: Date
+  public completionAnswersDate?: Date
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
