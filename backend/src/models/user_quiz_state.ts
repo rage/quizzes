@@ -21,12 +21,17 @@ export class UserQuizState extends BaseEntity {
   public quiz: Quiz
   @PrimaryColumn() public quizId: string
 
-  @Column("int") public peerReviewsGiven: number
-  @Column("int") public peerReviewsReceived: number
-  @Column("int") public points: number
-  @Column("int") public normalizedPoints: number
-  @Column("int") public tries: number
-  @Column({ type: "enum", enum: ["open", "locked"] })
+  @Column({ type: "int", default: 0 })
+  public peerReviewsGiven: number
+  @Column({ type: "int", default: 0 })
+  public peerReviewsReceived: number
+  @Column({ type: "int", default: 0 })
+  public points: number
+  @Column({ type: "int", default: 0 })
+  public normalizedPoints: number
+  @Column({ type: "int", default: 0 })
+  public tries: number
+  @Column({ type: "enum", enum: ["open", "locked"], default: "open" })
   public status: string
 
   @CreateDateColumn({ type: "timestamp" })

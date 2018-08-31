@@ -23,9 +23,12 @@ export class UserCoursePartState extends BaseEntity {
   @Column({ type: "int", primary: true })
   public coursePart: number
 
-  @Column("float") public progress: number
-  @Column("float") public score: number
-  @Column() public completed: boolean
+  @Column({ type: "float", nullable: true })
+  public progress: number
+  @Column({ type: "float", nullable: true })
+  public score: number
+  @Column({ type: "boolean", default: false })
+  public completed: boolean
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

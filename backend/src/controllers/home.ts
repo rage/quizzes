@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import asyncHandler from "express-async-handler"
-import { Organization } from "../models/organization"
+import { Organization } from "../models"
 
 /**
  * GET /
