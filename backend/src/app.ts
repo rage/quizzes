@@ -2,10 +2,11 @@ import bodyParser from "body-parser"
 import compression from "compression" // compresses requests
 import dotenv from "dotenv"
 import express from "express"
+import graphqlHTTP from "express-graphql"
 import expressValidator from "express-validator"
 import * as lusca from "lusca"
-
 import path from "path"
+import { schema } from "./graphql/schema"
 
 // Load environment variables from .env file, where API keys and passwords are configured
 dotenv.config({ path: ".env.example" })
@@ -32,5 +33,13 @@ app.use(express.static(path.join(__dirname, "public"), { maxAge: 31557600000 }))
  * Primary app routes.
  */
 app.get("/", homeController.index)
+
+const apiEntryPoint = "/graphql"
+
+app.use(
+  apiEntryPoint,
+  bodyParser.json(),
+  graphqlHTTP({ schema, graphiql: true }),
+)
 
 export default app

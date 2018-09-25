@@ -17,7 +17,7 @@ import { Organization } from "./organization"
 export class Course extends BaseEntity {
   @PrimaryGeneratedColumn("uuid") public id: string
 
-  @ManyToOne(type => Organization, org => org.id)
+  @ManyToOne(type => Organization, org => org.id, { eager: true })
   public organization: Organization
   @RelationId((course: Course) => course.organization)
   public organizationId: number

@@ -74,7 +74,9 @@ export async function migrateQuizAnswers(
                   }
 
                   let status = "submitted"
-                  if (answer.rejected) {
+                  if (answer.deprecated) {
+                    status = "deprecated"
+                  } else if (answer.rejected) {
                     status = "rejected"
                   } else if (answer.confirmed) {
                     status = "confirmed"
