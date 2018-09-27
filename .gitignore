@@ -25,6 +25,7 @@ bower_components
 
 # Editors
 .idea
+.vscode
 *.iml
 
 # OS metadata
@@ -36,3 +37,5 @@ dist
 
 # Ignore output from coverage report
 coverage
+
+userinfo.json
