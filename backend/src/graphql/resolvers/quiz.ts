@@ -1,6 +1,8 @@
+import DataLoader from "dataloader"
 import { GraphQLResolveInfo } from "graphql/type/definition"
 import { getRepository } from "typeorm"
 import { Quiz, QuizTranslation } from "../../models/quiz"
+import { QuizItem, QuizItemTranslation } from "../../models/quiz_item"
 
 export const quizResolver = {
   async quiz(
@@ -14,11 +16,16 @@ export const quizResolver = {
   },
 
   async quizzes(obj: any, args: any, context: any, info: any) {
-    const { languageId } = args
+    const { languageId }: { languageId: string } = args
+
+    const repository = getRepository(Quiz)
+    const quizzes = await repository.find()
+    /*     const { languageId }
+     = args
 
     const repository = getRepository(Quiz)
     const quizzes: Quiz[] = await repository.find()
-
+ */
     /*     if (languageId) {
       quizzes = quizzes
         .map(q => {

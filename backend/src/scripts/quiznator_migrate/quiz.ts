@@ -189,8 +189,8 @@ export async function migrateQuizzes(courses: {
           quizOptionTranslations.push({
             quizOptionId: qoid,
             languageId,
-            successMessage: meta.success,
-            failureMessage: meta.error,
+            successMessage: successes[oldChoice.id], // safeGet(() => meta.successes[oldChoice.id]),
+            failureMessage: errors[oldChoice.id], // safeGet(() => meta.errors[oldChoice.id]),
             title: oldChoice.title,
             body: oldChoice.body,
           })
@@ -248,7 +248,7 @@ export async function migrateQuizzes(courses: {
     bar.tick()
   }
 
-  console.log("Inserting quizzes...")
+  console.log("Inserting quizzes...", quizzes.length)
   await insert(Quiz, quizzes)
   await insert(QuizTranslation, quizTranslations, `"quiz_id", "language_id"`)
   await insert(QuizItem, quizItems)

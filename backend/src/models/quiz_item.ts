@@ -32,7 +32,7 @@ export class QuizItem extends BaseEntity {
   @OneToMany(type => QuizItemTranslation, qit => qit.quizItem, { eager: true })
   public texts: QuizItemTranslation[]
 
-  @OneToMany(type => QuizOption, qo => qo.quizItem)
+  @OneToMany(type => QuizOption, qo => qo.quizItem, { eager: true }) // was: not eager
   public options: Promise<QuizOption[]>
 
   @Column({ nullable: true })

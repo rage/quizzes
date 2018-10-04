@@ -85,10 +85,10 @@ export async function migrateQuizAnswers(
                   const answerID = getUUIDByString(answer._id)
                   quizAnswers.push({
                     id: answerID,
-                    quizId: quiz.id,
-                    userId: user.id,
+                    quiz: quiz.id, // was: quizId:
+                    user: user.id, // was: userId:
                     status,
-                    languageId: quiz.course.languages[0].id,
+                    language: quiz.course.languages[0].id, // was: languageId
                     createdAt: answer.createdAt,
                     updatedAt: answer.updatedAt,
                   })

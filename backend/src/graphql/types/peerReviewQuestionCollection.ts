@@ -1,7 +1,7 @@
 export const PeerReviewQuestionCollection = `
   type PeerReviewQuestionCollection {
-    id: String,
-    quiz: Quiz,
+    id: String!,
+    quiz: Quiz!,
     quizId: String,
     tests: [PeerReviewQuestionCollectionTranslation],
     questions: [PeerReviewQuestion],

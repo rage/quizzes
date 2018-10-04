@@ -19,7 +19,7 @@ async function main() {
 
   console.log("Connecting to MongoDB")
   await mongoUtils.connect(
-    process.env.MONGO_URI || "mongodb://localhost:27017/quiznator",
+    process.env.MONGO_URI || "mongodb://localhost:27017/test", // quiznator
   )
 
   console.log("Migration started")

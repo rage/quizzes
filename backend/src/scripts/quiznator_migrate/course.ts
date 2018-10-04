@@ -13,6 +13,7 @@ const courseIDs = {
   "cyber-advanced-18": "en_US",
 
   "elements-of-ai": "en_US",
+  "elements-of-ai-fi": "fi_FI",
 
   "k2017-ohpe": "fi_FI",
   "s2017-ohpe": "fi_FI",
