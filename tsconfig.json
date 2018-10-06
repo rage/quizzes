@@ -21,6 +21,6 @@
       "dom"
     ]
   },
-  "include": ["backend/src/**/*"],
+  "include": ["backend/src/**/*", "domain/user_types/index.ts"],
   "exclude": ["node_modules", "dist"]
 }
