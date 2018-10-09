@@ -4,61 +4,23 @@ import FormControl from '@material-ui/core/FormControl'
 import Input from '@material-ui/core/Input'
 import InputLabel from '@material-ui/core/InputLabel'
 import * as React from 'react'
-import TMCApi from './services/TMCApi'
-import { ITMCProfile, ITMCProfileDetails, ITMCLoginCredentials } from "./types"
+import TMCApi from '../../common/services/TMCApi'
+import { ITMCProfile, ITMCProfileDetails } from "../../common/types"
 
+interface IAppState {
+  user?: ITMCProfile
+}
 
-class App extends React.Component<any, any> {
+class App extends React.Component<any, IAppState> {
 
   constructor(props: any) {
     super(props)
     this.state = {
-      user: ""
+      user: undefined
     }
-  }
-
-  async componentDidMount() {
-    const user = TMCApi.checkStore()
-    if (user) {
-      const profile: ITMCProfileDetails | Error= await TMCApi.getProfile(user.accessToken)
-      console.log(profile)
-      if (profile.administrator) {
-        this.setState({
-          user
-        })
-      }
-    }
-  }
-
-  handleSubmit = async (event: any) => {
-    try {
-      event.preventDefault()
-      const username = event.target.username.value
-      const password = event.target.password.value
-      event.target.username.value = ''
-      event.target.password.value = ''
-      const user = await TMCApi.authenticate({ username, password })
-      const accessToken = user.accessToken
-      const profile = await TMCApi.getProfile(accessToken)
-      if (profile.administrator) {
-        this.setState({
-          user
-        })
-      }
-    } catch (exception) {
-      console.log('shiiiit')
-    }
-  }
-
-  logout = () => {
-    TMCApi.unauthenticate()
-    this.setState({
-      user: ""
-    })
   }
 
   public render() {
-
     const form = () => {
       return (
         <form onSubmit={this.handleSubmit}>
@@ -80,6 +42,44 @@ class App extends React.Component<any, any> {
         {this.state.user ? <Button onClick={this.logout}>logout</Button> : form()}
       </div>
     );
+  }
+
+  public async componentDidMount() {
+    const user = TMCApi.checkStore()
+    if (user) {
+      const profile: ITMCProfileDetails = await TMCApi.getProfile(user.accessToken)
+      console.log(profile)
+      if (profile.administrator) {
+        this.setState({
+          user
+        })
+      }
+    }
+  }
+
+  private handleSubmit = async (event: any) => {
+    try {
+      event.preventDefault()
+      const username = event.target.username.value
+      const password = event.target.password.value
+      event.target.username.value = ''
+      event.target.password.value = ''
+      const user = await TMCApi.authenticate({ username, password })
+      const accessToken = user.accessToken
+      const profile = await TMCApi.getProfile(accessToken)
+      if (profile.administrator) {
+        this.setState({ user })
+      }
+    } catch (exception) {
+      console.log('shiiiit')
+    }
+  }
+
+  private logout = () => {
+    TMCApi.unauthenticate()
+    this.setState({
+      user: undefined
+    })
   }
 }
 

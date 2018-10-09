@@ -1,8 +1,6 @@
-import * as appRoot from "app-root-path"
-import morgan from "morgan"
-import split from "split"
-import stream from "stream"
-import winston from "winston"
+// import * as appRoot from "app-root-path"
+const appRoot = require("app-root-path")
+const winston = require("winston")
 
 const LOG_DIRECTORY = process.env.LOG_DIRECTORY || `${appRoot}/logs/`
 

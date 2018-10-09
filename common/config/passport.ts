@@ -1,7 +1,7 @@
 import passport from "passport"
-import passportHttpBearer from "passport-http-bearer"
+import * as passportHttpBearer from "passport-http-bearer"
 import TMCApi from "../services/TMCApi"
-import { ITMCProfile } from "../types"
+import { ITMCProfile, ITMCProfileDetails } from "../types"
 
 const BearerStrategy = passportHttpBearer.Strategy
 
@@ -11,14 +11,15 @@ passport.serializeUser((TMCProfile: ITMCProfile, done: any) => {
 
 passport.deserializeUser((accessToken: string, done: any) => {
   TMCApi.getProfile(accessToken)
-    .then((TMCProfile: ITMCProfile) => done(undefined, TMCProfile))
+    .then((TMCProfile: ITMCProfileDetails) => done(undefined, TMCProfile))
     .catch((err: any) => done(err))
 })
 
 passport.use(
+  'tmc',
   new BearerStrategy((token: string, done: any) => {
     TMCApi.getProfile(token)
-      .then((TMCProfile: ITMCProfile) => {
+      .then((TMCProfile: ITMCProfileDetails) => {
         if (!TMCProfile) {
           return done(undefined, false)
         }

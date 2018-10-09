@@ -9,7 +9,7 @@
     "allowJs": true,
     "jsx": "react",
     "moduleResolution": "node",
-    "rootDir": "src",
+    "rootDir": "..",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -18,9 +18,13 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "../common/types"
+    ],
   },
   "include": [
-    "src/types/index.ts"
+    "../common/**/*",
   ],
   "exclude": [
     "node_modules",
@@ -30,5 +34,5 @@
     "webpack",
     "jest",
     "src/setupTests.ts"
-  ]
+  ],
 }

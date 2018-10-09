@@ -8,6 +8,7 @@ export interface ITMCProfileDetails {
   username: string
   email: string
   administrator: boolean
+  error?: string
   user_field: {
     first_name: string
     last_name: string
