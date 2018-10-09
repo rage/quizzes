@@ -20,7 +20,7 @@
     "noUnusedLocals": true,
   },
   "include": [
-    "src/types/index.ts" 
+    "src/types/index.ts"
   ],
   "exclude": [
     "node_modules",

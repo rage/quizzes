@@ -8,13 +8,13 @@ export interface ITMCProfileDetails {
   username: string
   email: string
   administrator: boolean
-  user_field: {
+  user_field?: {
     first_name: string
     last_name: string
     organizational_id: string
     course_announcements: boolean
   }
-  extra_fields: {
+  extra_fields?: {
     language: string
     open_university: string
     helsinki_university: string

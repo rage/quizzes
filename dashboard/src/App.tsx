@@ -1,34 +1,66 @@
-import Button from '@material-ui/core/Button';
-import FormControl from '@material-ui/core/FormControl';
-// import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Input from '@material-ui/core/Input';
-import InputLabel from '@material-ui/core/InputLabel';
-import * as React from 'react';
+import Button from '@material-ui/core/Button'
+import FormControl from '@material-ui/core/FormControl'
+// import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Input from '@material-ui/core/Input'
+import InputLabel from '@material-ui/core/InputLabel'
+import * as React from 'react'
 import TMCApi from './services/TMCApi'
 import { ITMCProfile, ITMCProfileDetails, ITMCLoginCredentials } from "./types"
 
-class App extends React.Component {
 
-  public handleSubmit = async (event: any) => {
-    try {
-      event.preventDefault()
-      const username = event.target.username.value 
-      const password = event.target.password.value 
-      event.target.username.value = ''
-      event.target.password.value = ''
-      const res = await TMCApi.authenticate({ username, password })
-      const accessToken = res.accessToken
-      console.log(res)
-      const prof = await TMCApi.getProfile(accessToken)
-      console.log(prof) 
-    } catch (exception) {
-      console.log('shiiit')
+class App extends React.Component<any, any> {
+
+  constructor(props: any) {
+    super(props)
+    this.state = {
+      user: ""
     }
   }
 
+  async componentDidMount() {
+    const user = TMCApi.checkStore()
+    if (user) {
+      const profile: ITMCProfileDetails | Error= await TMCApi.getProfile(user.accessToken)
+      console.log(profile)
+      if (profile.administrator) {
+        this.setState({
+          user
+        })
+      }
+    }
+  }
+
+  handleSubmit = async (event: any) => {
+    try {
+      event.preventDefault()
+      const username = event.target.username.value
+      const password = event.target.password.value
+      event.target.username.value = ''
+      event.target.password.value = ''
+      const user = await TMCApi.authenticate({ username, password })
+      const accessToken = user.accessToken
+      const profile = await TMCApi.getProfile(accessToken)
+      if (profile.administrator) {
+        this.setState({
+          user
+        })
+      }
+    } catch (exception) {
+      console.log('shiiiit')
+    }
+  }
+
+  logout = () => {
+    TMCApi.unauthenticate()
+    this.setState({
+      user: ""
+    })
+  }
+
   public render() {
-    return (
-      <div>
+
+    const form = () => {
+      return (
         <form onSubmit={this.handleSubmit}>
           <FormControl>
             <InputLabel>Username</InputLabel>
@@ -40,6 +72,12 @@ class App extends React.Component {
           </FormControl>
           <Button type="submit">Sign in</Button>
         </form>
+      )
+    }
+
+    return (
+      <div>
+        {this.state.user ? <Button onClick={this.logout}>logout</Button> : form()}
       </div>
     );
   }
