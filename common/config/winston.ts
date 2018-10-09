@@ -30,4 +30,4 @@ const logger = winston.createLogger({
   exitOnError: false,
 })
 
-export default logger
+export { logger }

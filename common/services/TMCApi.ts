@@ -1,6 +1,6 @@
 import { AxiosError, AxiosResponse } from "axios"
 const TmcClient = require("tmc-client-js")
-import axios from "../../common/config/axios"
+import { axios } from "../../common/config/axios"
 import { ITMCProfile, ITMCProfileDetails, ITMCLoginCredentials } from "../types"
 
 const BASE_URL = "https://tmc.mooc.fi//api/v8"

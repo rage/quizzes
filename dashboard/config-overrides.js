@@ -5,7 +5,6 @@ const {
 const tsImportPluginFactory = require('ts-import-plugin')
 
 module.exports = function override(config, env) {
-  // do stuff with the webpack config...
   const tsLoader = getLoader(
       config.module.rules,
       rule =>

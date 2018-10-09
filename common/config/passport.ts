@@ -1,4 +1,4 @@
-import passport from "passport"
+import * as passport from "passport"
 import * as passportHttpBearer from "passport-http-bearer"
 import TMCApi from "../services/TMCApi"
 import { ITMCProfile, ITMCProfileDetails } from "../types"
@@ -29,4 +29,4 @@ passport.use(
   }),
 )
 
-export default passport
+export { passport }

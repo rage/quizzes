@@ -8,8 +8,8 @@ import * as lusca from "lusca"
 import morgan from "morgan"
 import path from "path"
 import stream from "stream"
-import passport from "./config/passport"
-import winston from "./config/winston"
+import { passport } from "../../common/config/passport"
+import { logger } from "../../common/config/winston"
 import { schema } from "./graphql/schema"
 
 // Load environment variables from .env file, where API keys and passwords are configured
@@ -31,7 +31,7 @@ app.use(expressValidator())
 app.use(
   morgan("combined", {
     stream: {
-      write: (meta: any) => winston.info(meta),
+      write: (meta: any) => logger.info(meta),
     },
   }),
 )

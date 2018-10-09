@@ -10,4 +10,4 @@ axios.interceptors.response.use(
   error => Promise.reject(error.response.data),
 )
 
-export default axios
+export { axios }

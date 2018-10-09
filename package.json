@@ -72,6 +72,8 @@
     "@types/morgan": "^1.7.35",
     "@types/node": "^10.9.4",
     "@types/nodemailer": "^4.6.2",
+    "@types/passport": "^0.4.6",
+    "@types/passport-http-bearer": "^1.0.33",
     "@types/request": "^2.47.1",
     "@types/sequelize": "^4.27.23",
     "@types/shelljs": "^0.8.0",
