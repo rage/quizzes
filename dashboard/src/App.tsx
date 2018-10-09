@@ -5,17 +5,28 @@ import Input from '@material-ui/core/Input';
 import InputLabel from '@material-ui/core/InputLabel';
 import * as React from 'react';
 import TMCApi from './services/TMCApi'
+import { ITMCProfile, ITMCProfileDetails, ITMCLoginCredentials } from "./types"
 
 class App extends React.Component {
 
   public handleSubmit = async (event: any) => {
-    console.log("hop")
-    const res = await TMCApi.authenticate({ username: event.target.username.value, password: event.target.password.value })
-    console.log(res)
+    try {
+      event.preventDefault()
+      const username = event.target.username.value 
+      const password = event.target.password.value 
+      event.target.username.value = ''
+      event.target.password.value = ''
+      const res = await TMCApi.authenticate({ username, password })
+      const accessToken = res.accessToken
+      console.log(res)
+      const prof = await TMCApi.getProfile(accessToken)
+      console.log(prof) 
+    } catch (exception) {
+      console.log('shiiit')
+    }
   }
 
   public render() {
-    console.log("hip")
     return (
       <div>
         <form onSubmit={this.handleSubmit}>
@@ -25,7 +36,7 @@ class App extends React.Component {
           </FormControl>
           <FormControl >
             <InputLabel>Password</InputLabel>
-            <Input name="password" type="password"/>
+            <Input name="password" type="password" />
           </FormControl>
           <Button type="submit">Sign in</Button>
         </form>
