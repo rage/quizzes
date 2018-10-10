@@ -1,8 +1,8 @@
 import { Request, Response } from "express"
 import asyncHandler from "express-async-handler"
 import { getRepository } from "typeorm"
+import TMCApi from "../../../common/services/TMCApi"
 import { Organization, Quiz, QuizItem } from "../models"
-import TMCApi from "../services/TMCApi"
 import { ITMCProfile, ITMCProfileDetails } from "../types"
 
 /**
@@ -17,7 +17,7 @@ export const index = asyncHandler(async (req: Request, res: Response) => {
 export const userTest = asyncHandler(async (req: Request, res: Response) => {
   TMCApi.getProfile(req.params.userId)
     .then(
-      (user: ITMCProfile) => (
+      (user: ITMCProfileDetails) => (
         console.log("in userTest:", user), res.send(user)
       ),
     )

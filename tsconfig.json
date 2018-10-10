@@ -10,17 +10,12 @@
     "sourceMap": true,
     "allowJs": true,
     "checkJs": false,
-    "outDir": "dist",
     "baseUrl": ".",
+    "outDir": "build/dist",
+    "lib": ["es2017", "dom", "esnext.asynciterable"],
     "paths": {
-      "*": ["node_modules/*", "../../common/*"]
-    },
-    "lib": [
-      "esnext.asynciterable",
-      "es2017",
-      "dom"
-    ]
-  },
-  "include": ["./**/*", "../../common/**/*"],
-  "exclude": ["node_modules", "dist"]
+       "quizzes/common/*": ["./common/*"],
+    }
+  }
 }
+

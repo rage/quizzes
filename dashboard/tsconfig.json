@@ -22,6 +22,9 @@
       "./node_modules/@types",
       "../common/types"
     ],
+    "paths": {
+      "*": ["node_modules/*", "../../common/*"]
+    }
   },
   "include": [
     "../common/**/*",

@@ -8,7 +8,7 @@ import * as lusca from "lusca"
 import morgan from "morgan"
 import path from "path"
 import stream from "stream"
-import { passport } from "../../common/config/passport"
+import { passport } from "../../common/config/passport-tmc"
 import { logger } from "../../common/config/winston"
 import { schema } from "./graphql/schema"
 

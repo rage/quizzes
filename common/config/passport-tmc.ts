@@ -1,4 +1,5 @@
-import * as passport from "passport"
+// import { passport } from "passport"
+const passport = require("passport")
 import * as passportHttpBearer from "passport-http-bearer"
 import TMCApi from "../services/TMCApi"
 import { ITMCProfile, ITMCProfileDetails } from "../types"
@@ -16,7 +17,6 @@ passport.deserializeUser((accessToken: string, done: any) => {
 })
 
 passport.use(
-  'tmc',
   new BearerStrategy((token: string, done: any) => {
     TMCApi.getProfile(token)
       .then((TMCProfile: ITMCProfileDetails) => {
