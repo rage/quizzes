@@ -18,21 +18,14 @@
     "strictNullChecks": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
-    "typeRoots": [
-      "./node_modules/@types",
-      "../common/types"
-    ],
+    "typeRoots": ["./node_modules/@types", "../common/types"],
     "paths": {
       "*": ["node_modules/*"],
       "@quizzes/common/*": ["../common/*"]
     }
   },
-  "references": [
-    "../common"
-  ],
-  "include": [
-    "../common/**/*",
-  ],
+  "references": [{ "@quizzes/common": "../common" }],
+  "include": ["../common/**/*"],
   "exclude": [
     "node_modules",
     "build",
@@ -41,5 +34,5 @@
     "webpack",
     "jest",
     "src/setupTests.ts"
-  ],
+  ]
 }
