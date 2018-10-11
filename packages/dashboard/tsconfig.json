@@ -9,7 +9,7 @@
     "allowJs": true,
     "jsx": "react",
     "moduleResolution": "node",
-    "rootDir": "..",
+    "rootDir": "src",
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,
     "noImplicitThis": true,
@@ -23,9 +23,13 @@
       "../common/types"
     ],
     "paths": {
-      "*": ["node_modules/*", "../../common/*"]
+      "*": ["node_modules/*"],
+      "@quizzes/common/*": ["../common/*"]
     }
   },
+  "references": [
+    "../common"
+  ],
   "include": [
     "../common/**/*",
   ],

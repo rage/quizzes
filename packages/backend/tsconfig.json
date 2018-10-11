@@ -11,16 +11,21 @@
     "allowJs": true,
     "checkJs": false,
     "outDir": "dist",
+    "rootDir": "..",
     "baseUrl": ".",
     "paths": {
-      "*": ["node_modules/*", "../../common/*"]
+      "*": ["node_modules/*"],
+      "@quizzes/common": ["../common/*"]
     },
     "lib": [
       "esnext.asynciterable",
       "es2017",
       "dom"
-    ]
+    ],
   },
-  "include": ["./**/*", "../../common/**/*"],
+  "references": [
+    { "path": "../common" }
+  ],
+  "include": ["./**/*"],
   "exclude": ["node_modules", "dist"]
 }

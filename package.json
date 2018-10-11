@@ -2,6 +2,11 @@
   "name": "quizzes",
   "license": "Apache-2.0 OR MIT",
   "private": true,
+  "workspaces": [
+    "packages/common",
+    "packages/backend",
+    "packages/dashboard"
+  ],
   "scripts": {
     "start": "yarn run serve",
     "build": "yarn run build-ts",
@@ -83,6 +88,7 @@
     "concurrently": "^3.6.0",
     "husky": "^1.0.0-rc.9",
     "jest": "^23.1.2",
+    "lerna": "^3.4.3",
     "nodemon": "^1.17.5",
     "prettier": "^1.13.6",
     "shelljs": "^0.8.2",

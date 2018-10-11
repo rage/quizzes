@@ -8,13 +8,14 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "sourceMap": true,
-    "allowJs": true,
+    "composite": true,
     "checkJs": false,
-    "baseUrl": ".",
+    "baseUrl": "./packages",
     "outDir": "build/dist",
     "lib": ["es2017", "dom", "esnext.asynciterable"],
     "paths": {
-       "quizzes/common/*": ["./common/*"],
+      "@quizzes/common/*": ["./common/*"],
+      "@quizzes/*": ["./*"],
     }
   }
 }
