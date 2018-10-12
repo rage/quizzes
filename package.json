@@ -3,9 +3,7 @@
   "license": "Apache-2.0 OR MIT",
   "private": true,
   "workspaces": {
-    "packages": [
-      "packages/*"
-    ]
+    "packages": ["packages/*"]
   },
   "scripts": {
     "start": "yarn run serve",
