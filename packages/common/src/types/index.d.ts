@@ -29,3 +29,11 @@ export interface ITMCLoginCredentials {
   username: string
   password: string
 }
+
+export interface IQuizOptions {
+  course?: boolean
+  language?: boolean
+  items?: boolean
+  options?: boolean
+  peerreviews?: boolean
+}
