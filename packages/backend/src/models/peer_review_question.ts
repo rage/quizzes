@@ -15,11 +15,13 @@ import { Quiz } from "./quiz"
 
 @Entity()
 export class PeerReviewQuestion extends BaseEntity {
-  @PrimaryGeneratedColumn("uuid") public id: string
+  @PrimaryGeneratedColumn("uuid")
+  public id: string
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Promise<Quiz>
-  @Column() public quizId: string
+  @Column()
+  public quizId: string
 
   @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id, {
     nullable: true,
@@ -35,14 +37,16 @@ export class PeerReviewQuestion extends BaseEntity {
   )
   public texts: PeerReviewQuestionTranslation[]
 
-  @Column() public default: boolean
+  @Column()
+  public default: boolean
   @Column({ type: "enum", enum: ["essay", "grade"] })
   public type: string
 
   @Column({ default: true })
   public answerRequired: boolean
 
-  @Column("int") public order: number
+  @Column("int")
+  public order: number
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
@@ -54,14 +58,18 @@ export class PeerReviewQuestion extends BaseEntity {
 export class PeerReviewQuestionTranslation extends BaseEntity {
   @ManyToOne(type => PeerReviewQuestion, prq => prq.id)
   public peerReviewQuestion: Promise<PeerReviewQuestion>
-  @PrimaryColumn() public peerReviewQuestionId: string
+  @PrimaryColumn()
+  public peerReviewQuestionId: string
 
   @ManyToOne(type => Language, lang => lang.id)
   public language: Language
-  @PrimaryColumn() public languageId: string
+  @PrimaryColumn()
+  public languageId: string
 
-  @Column("text") public title: string
-  @Column("text") public body: string
+  @Column("text")
+  public title: string
+  @Column("text")
+  public body: string
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

@@ -17,16 +17,19 @@ import { QuizItem } from "./quiz_item"
 
 @Entity()
 export class Quiz extends BaseEntity {
-  @PrimaryGeneratedColumn("uuid") public id: string
+  @PrimaryGeneratedColumn("uuid")
+  public id: string
 
   @ManyToOne(type => Course, course => course.id, { eager: true })
   public course: Course
-  @Column() public courseId: string
+  @Column()
+  public courseId: string
 
   @OneToMany(type => QuizTranslation, qt => qt.quiz, { eager: true })
   public texts: QuizTranslation[]
 
-  @Column("int") public part: number
+  @Column("int")
+  public part: number
   @Column({ type: "int", nullable: true })
   public section?: number
 
@@ -54,11 +57,13 @@ export class Quiz extends BaseEntity {
 export class QuizTranslation extends BaseEntity {
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Promise<Quiz>
-  @PrimaryColumn() public quizId: string
+  @PrimaryColumn()
+  public quizId: string
 
   @ManyToOne(type => Language, lang => lang.id)
   public language: Language
-  @PrimaryColumn() public languageId: string
+  @PrimaryColumn()
+  public languageId: string
 
   @Column({ type: "text", default: "" })
   public title: string

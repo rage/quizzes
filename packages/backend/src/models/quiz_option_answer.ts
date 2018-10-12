@@ -13,15 +13,18 @@ import { QuizOption } from "./quiz_option"
 
 @Entity()
 export class QuizOptionAnswer extends BaseEntity {
-  @PrimaryGeneratedColumn("uuid") public id: string
+  @PrimaryGeneratedColumn("uuid")
+  public id: string
 
   @ManyToOne(type => QuizItemAnswer, qia => qia.id)
   public quizItemAnswer: Promise<QuizItemAnswer>
-  @Column() public quizItemAnswerId: string
+  @Column()
+  public quizItemAnswerId: string
 
   @ManyToOne(type => QuizOption, qo => qo.id)
   public quizOption: Promise<QuizOption>
-  @Column() public quizOptionId: string
+  @Column()
+  public quizOptionId: string
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

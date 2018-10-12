@@ -9,11 +9,14 @@ import {
 
 @Entity()
 export class Language extends BaseEntity {
-  @PrimaryColumn() public id: string
+  @PrimaryColumn()
+  public id: string
 
-  @Column() public country: string
+  @Column()
+  public country: string
 
-  @Column() public name: string
+  @Column()
+  public name: string
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

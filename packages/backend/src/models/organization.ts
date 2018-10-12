@@ -8,7 +8,8 @@ import {
 
 @Entity()
 export class Organization extends BaseEntity {
-  @PrimaryColumn() public id: number
+  @PrimaryColumn()
+  public id: number
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

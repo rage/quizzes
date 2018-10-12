@@ -13,7 +13,8 @@ import { User } from "./user"
 
 @Entity()
 export class QuizAnswer extends BaseEntity {
-  @PrimaryGeneratedColumn("uuid") public id: string
+  @PrimaryGeneratedColumn("uuid")
+  public id: string
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Quiz

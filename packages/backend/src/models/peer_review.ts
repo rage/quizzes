@@ -18,15 +18,18 @@ import { User } from "./user"
 
 @Entity()
 export class PeerReview extends BaseEntity {
-  @PrimaryGeneratedColumn("uuid") public id: string
+  @PrimaryGeneratedColumn("uuid")
+  public id: string
 
   @ManyToOne(type => QuizAnswer, qa => qa.id)
   public quizAnswer: QuizAnswer
-  @Column() public quizAnswerId: string
+  @Column()
+  public quizAnswerId: string
 
   @ManyToOne(type => User, user => user.id)
   public user: User
-  @Column("int") public userId: number
+  @Column("int")
+  public userId: number
 
   @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id, {
     nullable: true,

@@ -15,11 +15,13 @@ import { User } from "./user"
 export class UserQuizState extends BaseEntity {
   @ManyToOne(type => User, user => user.id)
   public user: Promise<User>
-  @PrimaryColumn("int") public userId: number
+  @PrimaryColumn("int")
+  public userId: number
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Quiz
-  @PrimaryColumn() public quizId: string
+  @PrimaryColumn()
+  public quizId: string
 
   @Column({ type: "int", default: 0 })
   public peerReviewsGiven: number

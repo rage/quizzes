@@ -16,11 +16,13 @@ import { Quiz } from "./quiz"
 
 @Entity()
 export class PeerReviewQuestionCollection extends BaseEntity {
-  @PrimaryGeneratedColumn("uuid") public id: string
+  @PrimaryGeneratedColumn("uuid")
+  public id: string
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Promise<Quiz>
-  @Column() public quizId: string
+  @Column()
+  public quizId: string
 
   @OneToMany(
     type => PeerReviewQuestionCollectionTranslation,
@@ -42,14 +44,18 @@ export class PeerReviewQuestionCollection extends BaseEntity {
 export class PeerReviewQuestionCollectionTranslation extends BaseEntity {
   @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id)
   public peerReviewQuestionCollection: Promise<PeerReviewQuestionCollection>
-  @PrimaryColumn() public peerReviewQuestionCollectionId: string
+  @PrimaryColumn()
+  public peerReviewQuestionCollectionId: string
 
   @ManyToOne(type => Language, lang => lang.id)
   public language: Language
-  @PrimaryColumn() public languageId: string
+  @PrimaryColumn()
+  public languageId: string
 
-  @Column("text") public title: string
-  @Column("text") public body: string
+  @Column("text")
+  public title: string
+  @Column("text")
+  public body: string
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

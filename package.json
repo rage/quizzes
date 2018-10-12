@@ -20,9 +20,10 @@
     "debug": "yarn run build && yarn run watch-debug",
     "serve-debug": "nodemon --inspect dist/backend/src/server.js",
     "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run serve-debug\"",
-    "prettier": "prettier --write \"backend/**/*.js\" \"backend/**/*.ts\"",
-    "prettier-check": "prettier  --list-different \"backend/**/*.js\" \"backend/**/*.ts\"",
-    "db-migrate": "node --max-old-space-size=16384 dist/backend/src/scripts/quiznator_migrate/index.js"
+    "prettier": "prettier --write \"packages/**/*.js\" \"packages/**/*.ts\"",
+    "prettier-check": "prettier  --list-different \"packages/**/*.js\" \"packages/**/*.ts\"",
+    "db-migrate": "node --max-old-space-size=16384 dist/backend/src/scripts/quiznator_migrate/index.js",
+    "start-dashboard": "cd packages/dashboard && yarn start"
   },
   "dependencies": {
     "@types/express-graphql": "^0.6.1",

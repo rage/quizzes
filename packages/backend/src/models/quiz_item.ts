@@ -16,18 +16,21 @@ import { QuizOption } from "./quiz_option"
 
 @Entity()
 export class QuizItem extends BaseEntity {
-  @PrimaryGeneratedColumn("uuid") public id: string
+  @PrimaryGeneratedColumn("uuid")
+  public id: string
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Promise<Quiz>
-  @Column() public quizId: string
+  @Column()
+  public quizId: string
 
   @Column({
     type: "enum",
     enum: ["open", "scale", "essay", "radio", "checkbox", "research-agreement"],
   })
   public type: string
-  @Column("int") public order: number
+  @Column("int")
+  public order: number
 
   @OneToMany(type => QuizItemTranslation, qit => qit.quizItem, { eager: true })
   public texts: QuizItemTranslation[]
@@ -50,11 +53,13 @@ export class QuizItem extends BaseEntity {
 export class QuizItemTranslation extends BaseEntity {
   @ManyToOne(type => QuizItem, qi => qi.id)
   public quizItem: Promise<QuizItem>
-  @PrimaryColumn() public quizItemId: string
+  @PrimaryColumn()
+  public quizItemId: string
 
   @ManyToOne(type => Language, lang => lang.id)
   public language: Language
-  @PrimaryColumn() public languageId: string
+  @PrimaryColumn()
+  public languageId: string
 
   @Column({ type: "text", nullable: true })
   public title?: string

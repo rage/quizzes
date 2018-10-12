@@ -14,11 +14,13 @@ import { PeerReviewQuestion } from "./peer_review_question"
 export class PeerReviewQuestionAnswer extends BaseEntity {
   @ManyToOne(type => PeerReview, pr => pr.id)
   public peerReview: PeerReview
-  @PrimaryColumn() public peerReviewId: string
+  @PrimaryColumn()
+  public peerReviewId: string
 
   @ManyToOne(type => PeerReviewQuestion, prq => prq.id)
   public peerReviewQuestion: PeerReviewQuestion
-  @PrimaryColumn() public peerReviewQuestionId: string
+  @PrimaryColumn()
+  public peerReviewQuestionId: string
 
   @Column({ type: "int", nullable: true })
   public value: number

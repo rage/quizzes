@@ -15,7 +15,8 @@ import { Organization } from "./organization"
 
 @Entity()
 export class Course extends BaseEntity {
-  @PrimaryGeneratedColumn("uuid") public id: string
+  @PrimaryGeneratedColumn("uuid")
+  public id: string
 
   @ManyToOne(type => Organization, org => org.id, { eager: true })
   public organization: Organization

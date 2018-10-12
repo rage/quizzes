@@ -14,20 +14,24 @@ import { QuizItem } from "./quiz_item"
 
 @Entity()
 export class QuizOption extends BaseEntity {
-  @PrimaryGeneratedColumn("uuid") public id: string
+  @PrimaryGeneratedColumn("uuid")
+  public id: string
 
   @ManyToOne(type => QuizItem, qi => qi.id)
   public quizItem: Promise<QuizItem>
-  @Column() public quizItemId: string
+  @Column()
+  public quizItemId: string
 
-  @Column("int") public order: number
+  @Column("int")
+  public order: number
 
   @OneToMany(type => QuizOptionTranslation, qot => qot.quizOption, {
     eager: true,
   })
   public texts: QuizOptionTranslation[]
 
-  @Column() public correct: boolean
+  @Column()
+  public correct: boolean
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
@@ -39,11 +43,13 @@ export class QuizOption extends BaseEntity {
 export class QuizOptionTranslation extends BaseEntity {
   @ManyToOne(type => QuizOption, qo => qo.id)
   public quizOption: Promise<QuizOption>
-  @PrimaryColumn() public quizOptionId: string
+  @PrimaryColumn()
+  public quizOptionId: string
 
   @ManyToOne(type => Language, lang => lang.id)
   public language: Language
-  @PrimaryColumn() public languageId: string
+  @PrimaryColumn()
+  public languageId: string
 
   @Column({ type: "text", default: "" })
   public title: string

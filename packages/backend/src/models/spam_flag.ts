@@ -13,11 +13,13 @@ import { User } from "./user"
 export class SpamFlag extends BaseEntity {
   @ManyToOne(type => User, user => user.id)
   public user: Promise<User>
-  @PrimaryColumn("int") public userId: number
+  @PrimaryColumn("int")
+  public userId: number
 
   @ManyToOne(type => QuizAnswer, qa => qa.id)
   public quizAnswer: Promise<QuizAnswer>
-  @PrimaryColumn() public quizAnswerId: string
+  @PrimaryColumn()
+  public quizAnswerId: string
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
