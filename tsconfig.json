@@ -1,20 +1,26 @@
 {
   "compilerOptions": {
+    "target": "es2015",
     "module": "commonjs",
-    "esModuleInterop": true,
-    "target": "es2017",
-    "noImplicitAny": true,
     "moduleResolution": "node",
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
+    "lib": ["es2018", "esnext.asynciterable"],
     "sourceMap": true,
-    "allowJs": true,
-    "checkJs": false,
-    "outDir": "dist",
-    "baseUrl": ".",
-    "paths": {
-      "*": ["node_modules/*", "src/types/*"]
-    }
+    "strict": true,
+    "noImplicitAny": false,
+    "declaration": true,
+    "resolveJsonModule": true,
+    "baseUrl": "./packages",
+    "composite": false,
+    "declarationMap": true,
   },
-  "include": ["backend/src/**/*"]
+  // "references": [
+  //   { "@quizzes/backend": ["./packages/backend"] },
+  //   { "@quizzes/common": ["./packages/common"] },
+  //   { "@quizzes/dashboard": ["./packages/dashboard"] },
+  //   { "path": "packages/*" }
+  // ],
+  // "paths": {
+  //   "@quizzes/*": ["./packages/*/src"],
+  //   "*": ["./packages/*/src"]
+  // }
 }

@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "target": "es2017",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "sourceMap": true,
+    "allowJs": true,
+    "checkJs": false,
+    "outDir": "dist",
+    "rootDir": "..",
+    "baseUrl": ".",
+    "paths": {
+      "*": ["node_modules/*"],
+      "@quizzes/common/src": ["../common/*"]
+    },
+    "lib": [
+      "esnext.asynciterable",
+      "es2017",
+      "dom"
+    ],
+  },
+  "references": [
+    { "path": "../common" }
+  ],
+  "include": ["./**/*"],
+  "exclude": ["node_modules", "dist"]
+}
