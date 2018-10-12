@@ -1,9 +1,9 @@
+import { axios } from "@quizzes/common/src/config/axios"
 import { AxiosError, AxiosResponse } from "axios"
-const TmcClient = require("tmc-client-js")
-import { axios } from "../../common/config/axios"
-import { ITMCProfile, ITMCProfileDetails, ITMCLoginCredentials } from "../types"
+import * as TmcClient from "tmc-client-js"
+import { ITMCLoginCredentials, ITMCProfile, ITMCProfileDetails } from "../types"
 
-const BASE_URL = "https://tmc.mooc.fi//api/v8"
+const BASE_URL = "https://tmc.mooc.fi/api/v8"
 const tmcClient: any = new TmcClient(
   "59a09eef080463f90f8c2f29fbf63014167d13580e1de3562e57b9e6e4515182",
   "2ddf92a15a31f87c1aabb712b7cfd1b88f3465465ec475811ccce6febb1bad28",

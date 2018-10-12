@@ -1,37 +1,10 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "baseUrl": ".",
-    "outDir": "build/dist",
-    "module": "esnext",
-    "target": "es2017",
-    "lib": ["es2017", "dom", "esnext.asynciterable"],
-    "sourceMap": true,
-    "allowJs": true,
-    "jsx": "react",
-    "moduleResolution": "node",
-    "rootDir": "src",
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
-    "importHelpers": true,
-    "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "noUnusedLocals": true,
-    "typeRoots": ["./node_modules/@types", "../common/types"],
-    "paths": {
-      "*": ["node_modules/*"],
-      "@quizzes/common/*": ["../common/*"]
-    }
+    "lib": ["es2018", "dom", "esnext.asynciterable"],
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "jsx": "react"
   },
-  "include": ["../common/**/*"],
-  "exclude": [
-    "node_modules",
-    "build",
-    "scripts",
-    "acceptance-tests",
-    "webpack",
-    "jest",
-    "src/setupTests.ts"
-  ]
+  "exclude": ["node_modules", "dist"]
 }

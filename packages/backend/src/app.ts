@@ -8,8 +8,8 @@ import * as lusca from "lusca"
 import morgan from "morgan"
 import path from "path"
 import stream from "stream"
-import { passport } from "../../common/config/passport-tmc"
-import { logger } from "../../common/config/winston"
+import { passport } from "@quizzes/common/src/config/passport-tmc"
+import { logger } from "@quizzes/common/src/config/winston"
 import { schema } from "./graphql/schema"
 
 // Load environment variables from .env file, where API keys and passwords are configured

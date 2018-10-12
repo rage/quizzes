@@ -1,10 +1,9 @@
+
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "declaration": true,
-    "composite": true
+    "outDir": "./dist",
+    "rootDir": "src"
   },
-  "paths": {
-    "@quizzes/*": ["../"]
-  }
+  "exclude": ["node_modules", "dist"]
 }

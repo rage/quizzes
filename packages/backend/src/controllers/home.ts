@@ -1,7 +1,7 @@
 import { Request, Response } from "express"
 import asyncHandler from "express-async-handler"
 import { getRepository } from "typeorm"
-import TMCApi from "../../../common/services/TMCApi"
+import TMCApi from "@quizzes/common/src/services/TMCApi"
 import { Organization, Quiz, QuizItem } from "../models"
 import { ITMCProfile, ITMCProfileDetails } from "../types"
 

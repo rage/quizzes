@@ -3,9 +3,9 @@ import FormControl from '@material-ui/core/FormControl'
 // import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Input from '@material-ui/core/Input'
 import InputLabel from '@material-ui/core/InputLabel'
+import TMCApi from '@quizzes/common/src/services/TMCApi'
+import { ITMCProfile, ITMCProfileDetails } from "@quizzes/common/src/types"
 import * as React from 'react'
-import TMCApi from '../../common/services/TMCApi'
-import { ITMCProfile, ITMCProfileDetails } from "../../common/types"
 
 interface IAppState {
   user?: ITMCProfile
@@ -45,16 +45,16 @@ class App extends React.Component<any, IAppState> {
   }
 
   public async componentDidMount() {
-    const user = TMCApi.checkStore()
-    if (user) {
-      const profile: ITMCProfileDetails = await TMCApi.getProfile(user.accessToken)
-      console.log(profile)
-      if (profile.administrator) {
-        this.setState({
-          user
-        })
-      }
-    }
+    // const user = TMCApi.checkStore()
+    // if (user) {
+    //   const profile: ITMCProfileDetails = await TMCApi.getProfile(user.accessToken)
+    //   console.log(profile)
+    //   if (profile.administrator) {
+    //     this.setState({
+    //       user
+    //     })
+    //   }
+    // }
   }
 
   private handleSubmit = async (event: any) => {
@@ -82,7 +82,5 @@ class App extends React.Component<any, IAppState> {
     })
   }
 }
-
-
 
 export default App;
