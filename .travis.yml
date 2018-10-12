@@ -5,5 +5,5 @@ cache:
     - "node_modules"
 
 script:
-  - npm test
+  # - yarn test
   - ./bin/check-code-style.sh
