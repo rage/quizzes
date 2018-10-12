@@ -24,7 +24,6 @@
       "@quizzes/common/*": ["../common/*"]
     }
   },
-  "references": [{ "@quizzes/common": "../common" }],
   "include": ["../common/**/*"],
   "exclude": [
     "node_modules",
