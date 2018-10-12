@@ -1,8 +1,8 @@
 # Quizzes
 
-Development environment:
+To start the dashboard:
 
 ```bash
-npm install
-npm run watch
+yarn install
+yarn start-dashboard
 ```
