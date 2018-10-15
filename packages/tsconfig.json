@@ -1,5 +1,6 @@
 {
-  "files": [],
+  "extends": "../tsconfig.json",
+  "include": ["**/src/*"],
   "references": [
     {"path": "common" },
     {"path": "backend" },

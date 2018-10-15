@@ -6,7 +6,7 @@
   "scripts": {
     "start": "yarn run serve",
     "build": "yarn run build-ts",
-    "serve": "node dist/backend/src/server.js",
+    "serve": "node dist/server.js",
     "watch-node": "nodemon --verbose dist/backend/src/server.js",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run watch-node\"",
     "test": "jest --forceExit --coverage --verbose",
@@ -21,8 +21,10 @@
     "db-migrate": "node --max-old-space-size=16384 dist/backend/src/scripts/quiznator_migrate/index.js"
   },
   "dependencies": {
+    "@quizzes/common": "0.0.1",
     "@types/express-graphql": "^0.6.1",
     "@types/graphql-iso-date": "^3.3.0",
+    "@types/parcel-bundler": "^1.10.0",
     "@types/progress": "^2.0.1",
     "apollo-server-express": "^2.0.6",
     "axios": "^0.18.0",
@@ -46,6 +48,8 @@
     "lusca": "^1.6.0",
     "mongoose": "^5.2.9",
     "morgan": "^1.9.1",
+    "parcel-bundler": "^1.10.3",
+    "parcel-plugin-typescript": "^1.0.0",
     "passport": "^0.4.0",
     "passport-http-bearer": "^1.0.1",
     "pg": "^7.4.3",
@@ -55,10 +59,13 @@
     "request-promise": "^4.2.2",
     "stream": "0.0.2",
     "tmc-client-js": "0.0.9",
+    "ts-loader": "^5.2.1",
     "tsconfig-paths": "^3.5.0",
     "typeorm": "^0.3.0-alpha.11",
     "uuid-by-string": "^0.6.0",
     "validate.js": "^0.12.0",
+    "webpack": "^4.20.2",
+    "webpack-node-externals": "^1.7.2",
     "winston": "^3.1.0"
   },
   "devDependencies": {
@@ -92,7 +99,8 @@
     "ts-node": "^7.0.0",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
-    "typescript": "^3.1.1"
+    "typescript": "^3.1.1",
+    "webpack-cli": "^3.1.2"
   },
   "nodemonConfig": {
     "watch": [

@@ -2,9 +2,17 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "lib": ["es2018", "dom", "esnext.asynciterable"],
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "jsx": "preserve"
+    "outDir": "dist",
+    "rootDir": "..",
+    "jsx": "preserve",
+    "moduleResolution": "node",
+    "paths": {
+      "@quizzes/common/*": ["../common/dist/*", "../common/src/*"]
+    }
   },
+  "references": [
+    { "path": "common" }
+  ],
+  "include": ["common"],
   "exclude": ["node_modules", "dist"]
 }

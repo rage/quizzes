@@ -2,7 +2,9 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "./dist",
+    "lib": ["es6", "dom", "esnext.asynciterable"],
+    "module": "commonjs",
+    "outDir": "dist",
     "rootDir": "src",
     "composite": true
   },

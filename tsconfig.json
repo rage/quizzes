@@ -4,14 +4,17 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "lib": ["es2018", "esnext.asynciterable"],
-    "sourceMap": true,
     "strict": true,
     "noImplicitAny": false,
-    "declaration": true,
     "resolveJsonModule": true,
-    "baseUrl": "./packages",
-    "composite": false,
+    "baseUrl": "packages",
+    "composite": true,
+    "declaration": true,
     "declarationMap": true,
+    "sourceMap": true,
+    "paths": {
+      "@quizzes/common/*": ["common/src/*", "common/dist/*"]
+    }
   },
   // "references": [
   //   { "@quizzes/backend": ["./packages/backend"] },

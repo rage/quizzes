@@ -1,4 +1,4 @@
-import { IQuizOptions } from "@quizzes/common/src/types"
+import { IQuizOptions } from "@quizzes/common/types"
 import express, { Request, Response } from "express"
 import asyncHandler from "express-async-handler"
 import { getRepository } from "typeorm"

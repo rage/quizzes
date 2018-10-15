@@ -1,3 +1,5 @@
+import { passport } from "@quizzes/common/config/passport-tmc"
+import { logger } from "@quizzes/common/config/winston"
 import bodyParser from "body-parser"
 import compression from "compression" // compresses requests
 import dotenv from "dotenv"
@@ -8,18 +10,18 @@ import * as lusca from "lusca"
 import morgan from "morgan"
 import path from "path"
 import stream from "stream"
-import { passport } from "@quizzes/common/src/config/passport-tmc"
-import { logger } from "@quizzes/common/src/config/winston"
 import { schema } from "./graphql/schema"
 
 // Load environment variables from .env file, where API keys and passwords are configured
 dotenv.config({ path: ".env" })
 
 // Controllers (route handlers)
-import * as homeController from "./controllers/home"
+import rootController from "./controllers"
 
 // Create Express server
 const app = express()
+const router = express.Router()
+
 const API_PATH = process.env.API_PATH || "/api/v1"
 
 // Express configuration
@@ -42,14 +44,16 @@ app.use(express.static(path.join(__dirname, "public"), { maxAge: 31557600000 }))
 /**
  * Primary app routes.
  */
-app.get(
+/* app.get(
   API_PATH,
   passport.authenticate("bearer", { session: false }),
   homeController.index,
-)
-app.get(`${API_PATH}/quizzes/:language`, homeController.getQuizzes)
-app.get("/user/:userId", homeController.userTest)
+) */
 
+app.use(`${API_PATH}/`, rootController)
+/* app.get(`${API_PATH}/quizzes/:language`, homeController.getQuizzes)
+app.get("/user/:userId", homeController.userTest)
+ */
 const apiEntryPoint = "/graphql"
 
 app.use(

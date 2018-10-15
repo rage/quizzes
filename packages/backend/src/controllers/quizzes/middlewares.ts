@@ -1,4 +1,4 @@
-import { IQuizOptions } from "@quizzes/common/src/types"
+import { IQuizOptions } from "@quizzes/common/types"
 import { getRepository, SelectQueryBuilder } from "typeorm"
 import { Organization, Quiz, QuizItem } from "../../models"
 

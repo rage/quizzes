@@ -1,3 +1,5 @@
+/* eslint-disable no-var-requires */
+require("module-alias/register")
 import errorHandler from "errorhandler"
 
 import app from "./app"
