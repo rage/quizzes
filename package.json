@@ -3,7 +3,9 @@
   "license": "Apache-2.0 OR MIT",
   "private": true,
   "workspaces": {
-    "packages": ["packages/*"]
+    "packages": [
+      "packages/*"
+    ]
   },
   "scripts": {
     "start": "yarn run serve",
@@ -13,8 +15,8 @@
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run watch-node\"",
     "test": "jest --forceExit --coverage --verbose",
     "watch-test": "yarn run test -- --watchAll",
-    "build-ts": "tsc",
-    "watch-ts": "tsc -w",
+    "build-ts": "cd packages/common && tsc && cd ../backend && tsc && tscpaths -p tsconfig.json -s ./src -o ../../dist/backend/src && cd ../..",
+    "watch-ts": "",
     "debug": "yarn run build && yarn run watch-debug",
     "serve-debug": "nodemon --inspect dist/backend/src/server.js",
     "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run serve-debug\"",
@@ -53,17 +55,16 @@
     "passport-http-bearer": "^1.0.1",
     "pg": "^7.4.3",
     "progress": "^2.0.0",
+    "react-scripts-ts": "3.1.0",
     "reflect-metadata": "^0.1.12",
     "request": "^2.87.0",
     "request-promise": "^4.2.2",
     "stream": "0.0.2",
     "tmc-client-js": "0.0.9",
-    "tsconfig-paths": "^3.5.0",
     "typeorm": "^0.3.0-alpha.11",
     "uuid-by-string": "^0.6.0",
     "validate.js": "^0.12.0",
-    "winston": "^3.1.0",
-    "react-scripts-ts": "3.1.0"
+    "winston": "^3.1.0"
   },
   "devDependencies": {
     "@types/body-parser": "^1.17.0",
@@ -94,6 +95,8 @@
     "supertest": "^3.1.0",
     "ts-jest": "^22.4.6",
     "ts-node": "^7.0.0",
+    "tsc-watch": "^1.0.30",
+    "tsconfig-paths": "^3.6.0",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
     "typescript": "^3.1.1"

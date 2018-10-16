@@ -1,3 +1,4 @@
+require("module-alias/register") // eslint-disable-line no-var-requires
 import errorHandler from "errorhandler"
 
 import app from "./app"

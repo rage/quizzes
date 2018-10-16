@@ -10,22 +10,20 @@
     "sourceMap": true,
     "allowJs": true,
     "checkJs": false,
-    "outDir": "dist",
-    "rootDir": "..",
-    "baseUrl": ".",
+    "outDir": "../../dist",
+    "rootDir": "../",
+    "baseUrl": "src/",
     "paths": {
-      "*": ["node_modules/*"],
-      "@quizzes/common/src": ["../common/*"]
+      "@quizzes/common/*": ["../../common/src/*", "../../common/*"],
+      "*": ["node_modules/*"]
     },
     "lib": [
       "esnext.asynciterable",
       "es2017",
       "dom"
-    ],
+    ]
   },
-  "references": [
-    { "path": "../common" }
-  ],
-  "include": ["./**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "dist", "test"]
 }
+

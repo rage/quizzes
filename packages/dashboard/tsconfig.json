@@ -2,9 +2,10 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "lib": ["es2018", "dom", "esnext.asynciterable"],
-    "outDir": "./dist",
-    "rootDir": "./src",
-    "jsx": "react"
+    "outDir": "../../dist",
+    "rootDir": "../",
+    "baseUrl": "src/",
+    "jsx": "react",
   },
   "exclude": ["node_modules", "dist"]
 }

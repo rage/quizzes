@@ -11,8 +11,8 @@
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run watch-node\"",
     "test": "jest --forceExit --coverage --verbose",
     "watch-test": "yarn run test -- --watchAll",
-    "build-ts": "tsc",
-    "watch-ts": "tsc -w",
+    "build-ts": "cd ../common && tsc && cd ../backend && tsc && tscpaths -p tsconfig.json -s ./src -o ../../dist/backend/src",
+    "watch-ts": "sh bin/watch-and-build.sh",
     "debug": "yarn run build && yarn run watch-debug",
     "serve-debug": "nodemon --inspect dist/backend/src/server.js",
     "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run serve-debug\"",
@@ -21,6 +21,7 @@
     "db-migrate": "node --max-old-space-size=16384 dist/backend/src/scripts/quiznator_migrate/index.js"
   },
   "dependencies": {
+    "@quizzes/common": "0.0.1",
     "@types/express-graphql": "^0.6.1",
     "@types/graphql-iso-date": "^3.3.0",
     "@types/progress": "^2.0.1",
@@ -44,6 +45,7 @@
     "highland": "^2.13.0",
     "keymirror": "^0.1.1",
     "lusca": "^1.6.0",
+    "module-alias": "^2.1.0",
     "mongoose": "^5.2.9",
     "morgan": "^1.9.1",
     "passport": "^0.4.0",
@@ -55,7 +57,6 @@
     "request-promise": "^4.2.2",
     "stream": "0.0.2",
     "tmc-client-js": "0.0.9",
-    "tsconfig-paths": "^3.5.0",
     "typeorm": "^0.3.0-alpha.11",
     "uuid-by-string": "^0.6.0",
     "validate.js": "^0.12.0",
@@ -90,6 +91,7 @@
     "supertest": "^3.1.0",
     "ts-jest": "^22.4.6",
     "ts-node": "^7.0.0",
+    "tscpaths": "^0.0.6",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
     "typescript": "^3.1.1"
@@ -106,5 +108,8 @@
     "hooks": {
       "pre-commit": "./bin/check-code-style.sh"
     }
+  },
+  "_moduleAliases": {
+    "@quizzes/common": "../common"
   }
 }

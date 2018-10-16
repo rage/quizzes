@@ -12,6 +12,9 @@
     "baseUrl": "./packages",
     "composite": false,
     "declarationMap": true,
+    "paths": {
+      "@quizzes/common/*": ["./common/src/*"]
+    }
   },
   // "references": [
   //   { "@quizzes/backend": ["./packages/backend"] },

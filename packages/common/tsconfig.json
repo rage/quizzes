@@ -2,8 +2,18 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "src"
+    "outDir": "../../dist/common",
+    "rootDir": ".",
+    "baseUrl": ".",
+    "jsx": "react",
+    "target": "es2018",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "lib": [
+      "esnext.asynciterable",
+      "es2017",
+      "dom"
+    ],
   },
   "exclude": ["node_modules", "dist"]
 }
