@@ -1,7 +1,7 @@
+import { Course, User, UserCourseState } from "@quizzes/common/models"
 import { CourseState as QNCourseState } from "./app-modules/models"
 
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
-import { Course, User, UserCourseState } from "../../models"
 import {
   calculateChunkSize,
   getUUIDByString,

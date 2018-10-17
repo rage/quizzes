@@ -1,5 +1,5 @@
+import { Course } from "@quizzes/common/models/course"
 import { getRepository } from "typeorm"
-import { Course } from "../../models/course"
 
 export const courseResolver = {
   async course(obj: any, { id }: { id: string }, context: any, info: any) {

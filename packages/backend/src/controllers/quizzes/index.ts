@@ -1,8 +1,8 @@
+import { Organization, Quiz, QuizItem } from "@quizzes/common/models"
 import { IQuizOptions } from "@quizzes/common/types"
 import express, { Request, Response } from "express"
 import asyncHandler from "express-async-handler"
 import { getRepository } from "typeorm"
-import { Organization, Quiz, QuizItem } from "../../models"
 
 import { getQuizById, getQuizByIdByLanguage } from "./middlewares"
 

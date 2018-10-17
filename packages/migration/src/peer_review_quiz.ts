@@ -1,10 +1,3 @@
-import oldQuizTypes from "./app-modules/constants/quiz-types"
-import {
-  PeerReview as QNPeerReview,
-  Quiz as QNQuiz,
-} from "./app-modules/models"
-
-import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import {
   PeerReviewQuestion,
   PeerReviewQuestionCollection,
@@ -12,7 +5,14 @@ import {
   PeerReviewQuestionTranslation,
   Quiz,
   UserCourseState,
-} from "../../models"
+} from "@quizzes/common/models"
+import oldQuizTypes from "./app-modules/constants/quiz-types"
+import {
+  PeerReview as QNPeerReview,
+  Quiz as QNQuiz,
+} from "./app-modules/models"
+
+import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { getUUIDByString, insert, progressBar, safeGet } from "./util"
 
 export async function migratePeerReviewQuestions() {

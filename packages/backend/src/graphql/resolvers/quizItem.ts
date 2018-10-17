@@ -1,6 +1,6 @@
+import { QuizItem } from "@quizzes/common/models/quiz_item"
+import { QuizItemTranslation } from "@quizzes/common/models/quiz_item"
 import { getRepository } from "typeorm"
-import { QuizItem } from "../../models/quiz_item"
-import { QuizItemTranslation } from "../../models/quiz_item"
 
 export const quizItemResolver = {
   async quizItem(obj: any, { id }: { id: string }, context: any, info: any) {

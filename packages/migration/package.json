@@ -1,24 +1,11 @@
 {
-  "name": "@quizzes/backend",
+  "name": "@quizzes/migration",
   "version": "0.0.1",
   "license": "Apache-2.0 OR MIT",
   "private": true,
   "scripts": {
-    "start": "yarn run serve",
     "build": "yarn run build-ts",
-    "serve": "node ../../dist/backend/src/server.js",
-    "watch-node": "nodemon --verbose dist/backend/src/server.js",
-    "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run watch-node\"",
-    "test": "jest --forceExit --coverage --verbose",
-    "watch-test": "yarn run test -- --watchAll",
-    "build-ts": "cd ../common && tsc && cd ../backend && tsc && tscpaths -p tsconfig.json -s ./src -o ../../dist/backend/src",
-    "watch-ts": "sh bin/watch-and-build.sh",
-    "debug": "yarn run build && yarn run watch-debug",
-    "serve-debug": "nodemon --inspect dist/backend/src/server.js",
-    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run serve-debug\"",
-    "prettier": "prettier --write \"backend/**/*.js\" \"backend/**/*.ts\"",
-    "prettier-check": "prettier  --list-different \"backend/**/*.js\" \"backend/**/*.ts\"",
-    "db-migrate": "node --max-old-space-size=16384 dist/backend/src/scripts/quiznator_migrate/index.js"
+    "db-migrate": "node --max-old-space-size=16384 ../../dist/migration/src/index.js"
   },
   "dependencies": {
     "@quizzes/common": "0.0.1",

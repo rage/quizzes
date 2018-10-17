@@ -1,6 +1,4 @@
-import { QueryFailedError } from "typeorm"
-import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
-import db from "../../database"
+import db from "@quizzes/common/config/database"
 import {
   Quiz,
   QuizAnswer,
@@ -8,7 +6,9 @@ import {
   QuizOption,
   QuizOptionAnswer,
   User,
-} from "../../models"
+} from "@quizzes/common/models"
+import { QueryFailedError } from "typeorm"
+import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
 import {
   calculateChunkSize,

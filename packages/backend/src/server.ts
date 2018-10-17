@@ -1,8 +1,8 @@
-require("module-alias/register") // eslint-disable-line no-var-requires
+require("module-alias/register") // tslint-disable-line no-var-requires
 import errorHandler from "errorhandler"
 
+import "@quizzes/common/config/database"
 import app from "./app"
-import "./database"
 
 /**
  * Error Handler. Provides full stack - remove for production

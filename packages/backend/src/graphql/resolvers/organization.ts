@@ -1,5 +1,5 @@
+import { Organization } from "@quizzes/common/models/organization"
 import { getRepository } from "typeorm"
-import { Organization } from "../../models/organization"
 
 export const organizationResolver = {
   async organization(

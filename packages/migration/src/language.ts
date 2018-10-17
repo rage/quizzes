@@ -1,4 +1,4 @@
-import { Language } from "../../models"
+import { Language } from "@quizzes/common/models"
 
 export async function createLanguages(): Promise<{
   [languageID: string]: Language

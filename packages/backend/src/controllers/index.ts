@@ -1,9 +1,9 @@
+import { Organization, Quiz, QuizItem } from "@quizzes/common/models"
 import TMCApi from "@quizzes/common/services/TMCApi"
 import { ITMCProfile, ITMCProfileDetails } from "@quizzes/common/types"
 import express, { Request, Response } from "express"
 import asyncHandler from "express-async-handler"
 import { getRepository } from "typeorm"
-import { Organization, Quiz, QuizItem } from "../models"
 import quizRoute from "./quizzes"
 
 const router = express.Router()

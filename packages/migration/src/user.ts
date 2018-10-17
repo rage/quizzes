@@ -1,9 +1,10 @@
+import { User } from "@quizzes/common/models"
+
 import fs from "fs"
 
 import axios from "axios"
 
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
-import { User } from "../../models"
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
 import { calculateChunkSize, insert } from "./util"
 
@@ -66,7 +67,7 @@ async function getUserInfo(
     },
     {
       headers: {
-        Authorization: `Bearer ${TMC_TOKEN}`,
+        "Authorization": `Bearer ${TMC_TOKEN}`,
         "Content-Type": "application/json",
       },
     },

@@ -1,6 +1,6 @@
+import { Organization, Quiz, QuizItem } from "@quizzes/common/models"
 import { IQuizOptions } from "@quizzes/common/types"
 import { getRepository, SelectQueryBuilder } from "typeorm"
-import { Organization, Quiz, QuizItem } from "../../models"
 
 export const getQuizById = async (id: string, option: IQuizOptions) => {
   const { course, items, options, peerreviews } = option

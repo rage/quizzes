@@ -1,12 +1,12 @@
 import "reflect-metadata"
-import { Connection, createConnection } from "typeorm"
+import { Connection, createConnection, EntitySchema } from "typeorm"
 
-import * as Models from "./models"
+import * as Models from "../models"
 import { SnakeNamingStrategy } from "./snake_naming"
 
 interface IDB {
-  conn: Connection
-  promise: Promise<Connection>
+  conn: Connection | undefined
+  promise: Promise<Connection> | undefined
 }
 const db: IDB = {
   conn: undefined,
@@ -23,6 +23,6 @@ db.promise = createConnection({
   synchronize: true,
   logging: !!process.env.DB_LOGGING || true,
   namingStrategy: new SnakeNamingStrategy(),
-}).then(conn => (db.conn = conn))
+}).then((conn: Connection) => (db.conn = conn))
 
 export default db

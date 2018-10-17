@@ -1,5 +1,5 @@
-import database from "../../database"
-import { Organization } from "../../models"
+import { Organization } from "@quizzes/common/models"
+import database from "@quizzes/common/config/database"
 
 import mongoUtils from "./mongo_utils"
 

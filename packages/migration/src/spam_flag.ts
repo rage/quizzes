@@ -1,7 +1,7 @@
+import { QuizAnswer, SpamFlag, User } from "@quizzes/common/models"
 import { QuizAnswerSpamFlag as QNSpamFlag } from "./app-modules/models"
 
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
-import { QuizAnswer, SpamFlag, User } from "../../models"
 import {
   calculateChunkSize,
   getUUIDByString,

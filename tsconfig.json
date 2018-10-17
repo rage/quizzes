@@ -12,18 +12,9 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
+    "strictPropertyInitialization": false,
     "paths": {
       "@quizzes/common/*": ["common/src/*", "common/dist/*"]
     }
-  },
-  // "references": [
-  //   { "@quizzes/backend": ["./packages/backend"] },
-  //   { "@quizzes/common": ["./packages/common"] },
-  //   { "@quizzes/dashboard": ["./packages/dashboard"] },
-  //   { "path": "packages/*" }
-  // ],
-  // "paths": {
-  //   "@quizzes/*": ["./packages/*/src"],
-  //   "*": ["./packages/*/src"]
-  // }
+  }
 }

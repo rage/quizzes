@@ -6,7 +6,7 @@ import {
   QuizOption,
   QuizOptionTranslation,
   QuizTranslation,
-} from "../../models"
+} from "@quizzes/common/models"
 import { Quiz as QNQuiz } from "./app-modules/models"
 
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"

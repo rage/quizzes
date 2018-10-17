@@ -1,14 +1,14 @@
-import { PeerReview as QNPeerReview } from "./app-modules/models"
-
-import { Any } from "typeorm"
-import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import {
   PeerReview,
   PeerReviewQuestion,
   PeerReviewQuestionAnswer,
   PeerReviewQuestionCollection,
   User,
-} from "../../models"
+} from "@quizzes/common/models"
+import { PeerReview as QNPeerReview } from "./app-modules/models"
+
+import { Any } from "typeorm"
+import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import {
   calculateChunkSize,
   getUUIDByString,

@@ -1,8 +1,8 @@
+import { Quiz, QuizTranslation } from "@quizzes/common/models/quiz"
+import { QuizItem, QuizItemTranslation } from "@quizzes/common/models/quiz_item"
 import DataLoader from "dataloader"
 import { GraphQLResolveInfo } from "graphql/type/definition"
 import { getRepository } from "typeorm"
-import { Quiz, QuizTranslation } from "../../models/quiz"
-import { QuizItem, QuizItemTranslation } from "../../models/quiz_item"
 
 export const quizResolver = {
   async quiz(

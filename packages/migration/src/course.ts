@@ -1,4 +1,4 @@
-import { Course, Language, Organization } from "../../models"
+import { Course, Language, Organization } from "@quizzes/common/models"
 import { getUUIDByString, progressBar } from "./util"
 
 const courseIDs = {
