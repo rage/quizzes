@@ -2,11 +2,18 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "lib": ["es6", "dom", "esnext.asynciterable"],
-    "module": "commonjs",
-    "outDir": "dist",
-    "rootDir": "src",
-    "composite": true
+    "outDir": "../../dist/common",
+    "rootDir": ".",
+    "baseUrl": ".",
+    "jsx": "react",
+    "target": "es2018",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "lib": [
+      "esnext.asynciterable",
+      "es2017",
+      "dom"
+    ],
   },
   "exclude": ["node_modules", "dist"]
 }

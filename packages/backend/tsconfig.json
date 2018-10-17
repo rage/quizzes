@@ -15,21 +15,20 @@
     "declarationMap": false,
     "allowJs": true,
     "checkJs": false,
-    "outDir": "dist",
-    "rootDir": "src",
+    "outDir": "../../dist",
+    "rootDir": "../",
+    "baseUrl": "src/",
     "paths": {
-      "@quizzes/common/*": ["../common/dist/*", "../common/src/*"],
-      "*": ["node_modules/*", "../../node_modules/*", "../common/*"],
+      "@quizzes/common/*": ["../../common/src/*", "../../common/*"],
+      "*": ["node_modules/*"]
     },
     "lib": [
       "esnext.asynciterable",
       "es2017",
       "dom"
-    ],
+    ]
   },
-  "references": [
-    { "path": "../common" }
-  ],
-  "include": ["./**/*"],
+  "include": ["./src/**/*"],
   "exclude": ["node_modules", "dist", "test"]
 }
+

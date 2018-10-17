@@ -1,15 +1,14 @@
-import { axios } from "../config/axios"
 import { AxiosError, AxiosResponse } from "axios"
-/* eslint-disable no-var-requires */
-const TmcClient = require("tmc-client-js")
-// import * as TmcClient from "tmc-client-js"
+import TmcClient = require("tmc-client-js")
+import { axios } from "../config/axios"
 import { ITMCLoginCredentials, ITMCProfile, ITMCProfileDetails } from "../types"
 
 const BASE_URL = "https://tmc.mooc.fi/api/v8"
-const tmcClient: any = new TmcClient(
+const TmcClientClass: any = TmcClient
+const tmcClient: any = new TmcClientClass(
   "59a09eef080463f90f8c2f29fbf63014167d13580e1de3562e57b9e6e4515182",
   "2ddf92a15a31f87c1aabb712b7cfd1b88f3465465ec475811ccce6febb1bad28",
-) as any
+)
 
 function getProfile(accessToken: string): Promise<ITMCProfileDetails> {
   return axios
