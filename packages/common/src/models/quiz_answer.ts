@@ -20,11 +20,17 @@ export class QuizAnswer extends BaseEntity {
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Quiz
+  @Column()
+  public quizId: string
   @ManyToOne(type => User, user => user.id)
   public user: User
+  @Column("int")
+  public userId: number
 
   @ManyToOne(type => Language, lang => lang.id)
   public language: Language
+  @Column()
+  public languageId: string
 
   @Column({
     type: "enum",
