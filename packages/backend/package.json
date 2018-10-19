@@ -33,7 +33,6 @@
     "body-parser": "^1.18.3",
     "buffer": "^5.1.0",
     "compression": "^1.7.2",
-    "dataloader": "^1.4.0",
     "dotenv": "^6.0.0",
     "errorhandler": "^1.5.0",
     "express": "^4.16.3",
@@ -49,8 +48,6 @@
     "module-alias": "^2.1.0",
     "mongoose": "^5.2.9",
     "morgan": "^1.9.1",
-    "parcel-bundler": "^1.10.3",
-    "parcel-plugin-typescript": "^1.0.0",
     "passport": "^0.4.0",
     "passport-http-bearer": "^1.0.1",
     "pg": "^7.4.3",
@@ -59,13 +56,9 @@
     "request": "^2.87.0",
     "request-promise": "^4.2.2",
     "stream": "0.0.2",
-    "tmc-client-js": "0.0.9",
     "typeorm": "^0.3.0-alpha.11",
     "uuid-by-string": "^0.6.0",
-    "validate.js": "^0.12.0",
-    "webpack": "^4.20.2",
-    "webpack-node-externals": "^1.7.2",
-    "winston": "^3.1.0"
+    "validate.js": "^0.12.0"
   },
   "devDependencies": {
     "@types/body-parser": "^1.17.0",
@@ -79,8 +72,6 @@
     "@types/morgan": "^1.7.35",
     "@types/node": "^10.9.4",
     "@types/nodemailer": "^4.6.2",
-    "@types/passport": "^0.4.6",
-    "@types/passport-http-bearer": "^1.0.33",
     "@types/request": "^2.47.1",
     "@types/sequelize": "^4.27.23",
     "@types/shelljs": "^0.8.0",
@@ -99,8 +90,7 @@
     "tscpaths": "^0.0.6",
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
-    "typescript": "^3.1.1",
-    "webpack-cli": "^3.1.2"
+    "typescript": "^3.1.1"
   },
   "nodemonConfig": {
     "watch": [
@@ -112,7 +102,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "./bin/check-code-style.sh"
+      "pre-commit": "../../bin/check-code-style.sh"
     }
   },
   "_moduleAliases": {

@@ -1,8 +1,8 @@
 import { Organization, Quiz, QuizItem } from "@quizzes/common/models"
-import { IQuizOptions } from "@quizzes/common/types"
+import { IQuizQuery } from "@quizzes/common/types"
 import { getRepository, SelectQueryBuilder } from "typeorm"
 
-export const getQuizById = async (id: string, option: IQuizOptions) => {
+export const getQuizById = async (id: string, option: IQuizQuery) => {
   const { course, items, options, peerreviews } = option
 
   if (!id) {
@@ -34,10 +34,7 @@ export const getQuizById = async (id: string, option: IQuizOptions) => {
   return await quizQuery.getOne()
 }
 
-export const getQuizByIdByLanguage = async (
-  id: string,
-  option: IQuizOptions,
-) => {
+export const getQuizByIdByLanguage = async (id: string, option: IQuizQuery) => {
   const { course, items, options, peerreviews, language } = option
 
   if (!id) {

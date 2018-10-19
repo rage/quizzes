@@ -67,7 +67,7 @@ async function getUserInfo(
     },
     {
       headers: {
-        "Authorization": `Bearer ${TMC_TOKEN}`,
+        Authorization: `Bearer ${TMC_TOKEN}`,
         "Content-Type": "application/json",
       },
     },

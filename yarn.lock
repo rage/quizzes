@@ -10969,9 +10969,9 @@ rc-rate@~2.4.2:
     rc-util "^4.3.0"
 
 rc-select@~8.4.0:
-  version "8.4.0"
-  resolved "https://registry.yarnpkg.com/rc-select/-/rc-select-8.4.0.tgz#809891a4ed57651d8bd8e2d7916080fe66c03b65"
-  integrity sha512-wYD5jwKcvMUGs4UzougOSnwfJI4sX/gqmD5tLOUK1eFLkkXBSvk206oRbOkw83Aw2GjC0kfbx2hkcbtwGdhJjQ==
+  version "8.4.1"
+  resolved "https://registry.yarnpkg.com/rc-select/-/rc-select-8.4.1.tgz#2801a5829896f6ea902f473c6b0d7226bf3b41c5"
+  integrity sha512-TY/0Wo3vm7aVjcc4StSvFl0myohfVVcxE/GkUOiL5wi+b/alJmLaV4ccxv9OHbIrVJijZQN83TRiIIJ1Q2YJ4Q==
   dependencies:
     babel-runtime "^6.23.0"
     classnames "2.x"

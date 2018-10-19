@@ -4,6 +4,8 @@ import { ITMCProfile, ITMCProfileDetails } from "@quizzes/common/types"
 import express, { Request, Response } from "express"
 import asyncHandler from "express-async-handler"
 import { getRepository } from "typeorm"
+
+import quizAnswerRoute from "./quizanswers"
 import quizRoute from "./quizzes"
 
 const router = express.Router()
@@ -28,5 +30,6 @@ export const index = asyncHandler(async (req: Request, res: Response) => {
 }) */
 
 router.use("/quizzes", quizRoute)
+router.use("/quizanswers", quizAnswerRoute)
 
 export default router

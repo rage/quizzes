@@ -3,15 +3,15 @@ import FormControl from '@material-ui/core/FormControl'
 // import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Input from '@material-ui/core/Input'
 import InputLabel from '@material-ui/core/InputLabel'
-import TMCApi from '@quizzes/common/services/TMCApi'
+import TMCApi from '@quizzes/common/src/services/TMCApi'
 import { ITMCProfile, ITMCProfileDetails } from "@quizzes/common/types"
 import * as React from 'react'
 
-interface IAppState {
+/* interface IAppState {
   user?: ITMCProfile
 }
-
-class App extends React.Component<any, IAppState> {
+ */
+class App extends React.Component<any, any> {
 
   constructor(props: any) {
     super(props)

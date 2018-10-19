@@ -1,4 +1,4 @@
-export interface ITMCProfile {
+export class ITMCProfile {
   username: string
   accessToken: string
 }
@@ -30,10 +30,17 @@ export interface ITMCLoginCredentials {
   password: string
 }
 
-export interface IQuizOptions {
+export interface IQuizQuery {
+  id?: string
   course?: boolean
-  language?: boolean
+  language?: string
   items?: boolean
   options?: boolean
   peerreviews?: boolean
+}
+
+export interface IQuizAnswerQuery {
+  id?: string
+  quiz_id?: string
+  user_id?: number
 }

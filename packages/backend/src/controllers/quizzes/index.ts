@@ -1,34 +1,66 @@
 import { Organization, Quiz, QuizItem } from "@quizzes/common/models"
-import { IQuizOptions } from "@quizzes/common/types"
+import { IQuizAnswerQuery, IQuizQuery } from "@quizzes/common/types"
 import express, { Request, Response } from "express"
 import asyncHandler from "express-async-handler"
-import { getRepository } from "typeorm"
-
-import { getQuizById, getQuizByIdByLanguage } from "./middlewares"
+import { QuizService } from "services/quiz.service"
+import { QuizAnswerService } from "services/quizanswer.service"
 
 const router = express.Router()
+const quizService = QuizService.getInstance()
+const quizAnswerService = QuizAnswerService.getInstance()
 
 router.get(
-  "/:id",
+  ["/:id", "/"],
   asyncHandler(async (req: Request, res: Response) => {
     const { id }: { id: string } = req.params
-    const {
+    const query: IQuizQuery = {
+      id,
+      ...req.query,
+    }
+    /*     const {
       course,
       language,
       items,
       options,
       peerreviews,
-    }: IQuizOptions = req.query
+    } = req.query
 
-    const quiz = language
+    const query: IQuizQuery = {
+      id,
+      course,
+      language,
+      items,
+      options,
+      peerreviews
+    } */
+
+    const result = await quizService.getQuizzes(query)
+    /*     const quiz = language
       ? await getQuizByIdByLanguage(id, req.query)
       : await getQuizById(id, req.query)
 
-    res.json(quiz)
+    res.json(quiz) */
+
+    res.json(result)
   }),
 )
 
 router.get(
+  ["/:quiz_id/answers"],
+  asyncHandler(async (req: Request, res: Response) => {
+    const { quiz_id }: { quiz_id: string } = req.params
+    /*     const {
+      user_id
+    } = req.query */
+
+    const query: IQuizAnswerQuery = { quiz_id, ...req.query }
+
+    const result = await quizAnswerService.getAnswers(query)
+
+    res.json(result)
+  }),
+)
+/* router.get(
   "/",
   asyncHandler(async (req: Request, res: Response) => {
     const { language }: { language: string } = req.query
@@ -60,6 +92,6 @@ router.get(
 
     res.json(quizzes)
   }),
-)
+) */
 
 export default router

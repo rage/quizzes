@@ -9,6 +9,7 @@
     "target": "es2018",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "composite": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "lib": [
@@ -17,5 +18,6 @@
       "dom"
     ],
   },
+  "include": ["./src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

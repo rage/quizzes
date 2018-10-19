@@ -7,7 +7,7 @@
     "strict": true,
     "noImplicitAny": false,
     "resolveJsonModule": true,
-    "baseUrl": "packages",
+    "baseUrl": "./packages",
     "composite": true,
     "declaration": true,
     "declarationMap": true,
@@ -15,6 +15,9 @@
     "strictPropertyInitialization": false,
     "paths": {
       "@quizzes/common/*": ["common/src/*", "common/dist/*"]
-    }
+    },
+    "typeRoots": [
+      "node_modules/@types", "./common/src/types"
+    ]
   }
 }

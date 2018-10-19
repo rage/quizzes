@@ -10,16 +10,12 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "sourceMap": true,
-    "composite": false,
-    "declaration": false,
-    "declarationMap": false,
-    "allowJs": true,
-    "checkJs": false,
     "outDir": "../../dist",
     "rootDir": "../",
     "baseUrl": "src/",
     "paths": {
       "@quizzes/common/*": ["../../common/src/*", "../../common/*"],
+      "services/*": ["./services/*"],
       "*": ["node_modules/*"]
     },
     "lib": [
@@ -31,7 +27,7 @@
       "node_modules/@types", "@quizzes/common/types"
     ]
   },
-  "include": ["./src/**/*"],
+  "include": ["./src/**/*", "../common/**/*"],
   "exclude": ["node_modules", "dist", "test", "src/test"]
 }
 

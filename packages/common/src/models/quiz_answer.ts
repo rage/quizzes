@@ -4,11 +4,13 @@ import {
   CreateDateColumn,
   Entity,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm"
 import { Language } from "./language"
 import { Quiz } from "./quiz"
+import { QuizItemAnswer } from "./quiz_item_answer"
 import { User } from "./user"
 
 @Entity()
@@ -29,6 +31,9 @@ export class QuizAnswer extends BaseEntity {
     enum: ["draft", "submitted", "spam", "confirmed", "rejected", "deprecated"],
   })
   public status: string
+
+  @OneToMany(type => QuizItemAnswer, qi => qi.quizAnswer, { lazy: true })
+  public itemanswers: Promise<QuizItemAnswer[]>
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

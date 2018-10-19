@@ -4,12 +4,20 @@
     "lib": ["es2018", "dom", "esnext.asynciterable"],
     "outDir": "../../dist",
     "rootDir": "../",
-    "baseUrl": "src/",
+    // "baseUrl": "./src/",
     "jsx": "react",
+    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "declarationMap": true,
+    "paths": {
+      "@quizzes/common/*": ["../../common/src/*"],
+      "*": ["node_modules"]
+    },
   },
   "references": [
-    { "path": "common" }
+    { "path": "../common" }
   ],
-  "include": ["common"],
+  "include": ["./src/**/*", "../common"],
   "exclude": ["node_modules", "dist"]
 }
