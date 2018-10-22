@@ -1,7 +1,8 @@
 const { getLoader, injectBabelPlugin } = require("react-app-rewired")
 const tsImportPluginFactory = require("ts-import-plugin")
+const path = require("path")
 
-module.exports = function override(config, env) {
+module.exports = function rewire(config, env) {
   const tsLoader = getLoader(
     config.module.rules,
     rule =>
@@ -15,16 +16,19 @@ module.exports = function override(config, env) {
       before: [
         tsImportPluginFactory([
           {
-            libraryDirectory: "es",
-            libraryName: "antd",
-            style: "css",
+            libraryDirectory: "../common",
+            libraryName: "@quizzes/common",
           },
         ]),
       ],
     }),
   }
 
-  delete config.resolve.plugins.ModuleScopePlugin
+  config.resolve.alias = Object.assign({}, config.resolve.alias, {
+    "@quizzes/common": path.resolve("../common/src"),
+  })
+
+  config.resolve.plugins = []
 
   return config
 }
