@@ -16,7 +16,6 @@ export class QuizAnswerService {
   public async getAnswers(query: IQuizAnswerQuery): Promise<QuizAnswer[]> {
     const { id, quiz_id, user_id } = query
 
-    console.log("query: ", query)
     const queryBuilder: SelectQueryBuilder<
       QuizAnswer
     > = QuizAnswer.createQueryBuilder("quiz_answer")

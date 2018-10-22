@@ -1,6 +1,13 @@
-import { Quiz } from "@quizzes/common/models"
-import { IQuizQuery } from "@quizzes/common/types"
-import { SelectQueryBuilder } from "typeorm"
+import {
+  Quiz,
+  QuizTranslation,
+  QuizItem,
+  PeerReviewQuestion,
+} from "@quizzes/common/models"
+import { IQuizQuery, INewQuizQuery } from "@quizzes/common/types"
+import { SelectQueryBuilder, InsertResult } from "typeorm"
+import quizanswerService from "./quizanswer.service"
+import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 
 export class QuizService {
   public static getInstance(): QuizService {
@@ -86,7 +93,47 @@ export class QuizService {
   }
 
   public async createQuiz(quiz: Quiz): Promise<Quiz> {
-    return await Quiz.create(quiz)
+    /*     const insertResult: InsertResult = await Quiz.createQueryBuilder()
+      .insert()
+      .into(Quiz)
+      .values(query)
+      .onConflict(`("id") DO NOTHING`)
+      .execute() */
+
+    return await Quiz.save(quiz).then(async (newQuiz: Quiz) => {
+      if (newQuiz.texts) {
+        await Promise.all(
+          newQuiz.texts.map((text: QuizTranslation) => {
+            text.quizId = newQuiz.id
+
+            return text.save()
+          }),
+        )
+      }
+
+      if (newQuiz.items) {
+        const items = await newQuiz.items
+        await Promise.all(
+          items.map((item: QuizItem) => {
+            item.quizId = newQuiz.id
+
+            return item.save()
+          }),
+        )
+      }
+
+      if (newQuiz.peerReviewQuestions) {
+        const questions = await newQuiz.peerReviewQuestions
+        await Promise.all(
+          questions.map((question: PeerReviewQuestion) => {
+            question.quizId = newQuiz.id
+
+            return question.save()
+          }),
+        )
+      }
+      return newQuiz
+    })
   }
 
   public async updateQuiz(quiz: Quiz): Promise<Quiz> {

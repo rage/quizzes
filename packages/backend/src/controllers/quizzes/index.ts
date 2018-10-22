@@ -1,5 +1,9 @@
 import { Organization, Quiz, QuizItem } from "@quizzes/common/models"
-import { IQuizAnswerQuery, IQuizQuery } from "@quizzes/common/types"
+import {
+  IQuizAnswerQuery,
+  IQuizQuery,
+  INewQuizQuery,
+} from "@quizzes/common/types"
 import express, { Request, Response } from "express"
 import asyncHandler from "express-async-handler"
 import { QuizService } from "services/quiz.service"
@@ -17,29 +21,8 @@ router.get(
       id,
       ...req.query,
     }
-    /*     const {
-      course,
-      language,
-      items,
-      options,
-      peerreviews,
-    } = req.query
-
-    const query: IQuizQuery = {
-      id,
-      course,
-      language,
-      items,
-      options,
-      peerreviews
-    } */
 
     const result = await quizService.getQuizzes(query)
-    /*     const quiz = language
-      ? await getQuizByIdByLanguage(id, req.query)
-      : await getQuizById(id, req.query)
-
-    res.json(quiz) */
 
     res.json(result)
   }),
@@ -49,13 +32,20 @@ router.get(
   ["/:quiz_id/answers"],
   asyncHandler(async (req: Request, res: Response) => {
     const { quiz_id }: { quiz_id: string } = req.params
-    /*     const {
-      user_id
-    } = req.query */
 
     const query: IQuizAnswerQuery = { quiz_id, ...req.query }
 
     const result = await quizAnswerService.getAnswers(query)
+
+    res.json(result)
+  }),
+)
+
+router.post(
+  "/",
+  asyncHandler(async (req: Request, res: Response) => {
+    const quiz = new Quiz()
+    const result = await quizService.createQuiz(quiz)
 
     res.json(result)
   }),
