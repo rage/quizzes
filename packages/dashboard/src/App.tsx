@@ -45,7 +45,6 @@ class App extends React.Component<any, any> {
   }
 
   public async componentDidMount() {
-    console.log(TMCApi)
     const user = TMCApi.checkStore()
     if (user) {
       const profile: any = await TMCApi.getProfile(user.accessToken)

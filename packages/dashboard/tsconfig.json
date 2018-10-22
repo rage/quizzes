@@ -12,7 +12,6 @@
     "declaration": true,
     "declarationMap": true,
     "allowSyntheticDefaultImports": true,
-    "traceResolution": true,
     "paths": {
       "@quizzes/common/*": ["../../common/src/*"],
       "*": ["node_modules"]
