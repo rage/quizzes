@@ -3,85 +3,91 @@ import FormControl from '@material-ui/core/FormControl'
 // import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Input from '@material-ui/core/Input'
 import InputLabel from '@material-ui/core/InputLabel'
-import TMCApi from '@quizzes/common/services/TMCApi'
-import { ITMCProfile, ITMCProfileDetails } from "@quizzes/common/types"
+// import Paper from '@material-ui/core/Paper'
 import * as React from 'react'
+import { connect } from 'react-redux'
+import TMCApi from './services/TMCApi'
+import { addUser, removeUser } from './store/user/actions'
+import { ITMCProfile, ITMCProfileDetails } from "../../../common/src/types"
 
-/* interface IAppState {
-  user?: ITMCProfile
-}
- */
 class App extends React.Component<any, any> {
 
-  constructor(props: any) {
-    super(props)
-    this.state = {
-      user: undefined
-    }
-  }
-
-  public render() {
-    const form = () => {
-      return (
-        <form onSubmit={this.handleSubmit}>
-          <FormControl>
-            <InputLabel>Username</InputLabel>
-            <Input name="username" />
-          </FormControl>
-          <FormControl >
-            <InputLabel>Password</InputLabel>
-            <Input name="password" type="password" />
-          </FormControl>
-          <Button type="submit">Sign in</Button>
-        </form>
-      )
-    }
-
-    return (
-      <div>
-        {this.state.user ? <Button onClick={this.logout}>logout</Button> : form()}
-      </div>
-    );
-  }
-
   public async componentDidMount() {
-    console.log(TMCApi)
     const user = TMCApi.checkStore()
     if (user) {
-      const profile: any = await TMCApi.getProfile(user.accessToken)
-      console.log(profile)
-      if (profile.administrator) {
-        this.setState({
-          user
-        })
+      const profile = await TMCApi.getProfile(user.accessToken)
+      if ((profile as ITMCProfileDetails).administrator) {
+        this.props.addUser(user)
       }
     }
   }
 
-  private handleSubmit = async (event: any) => {
+  public handleSubmit = async (event: any) => {
     try {
       event.preventDefault()
       const username = event.target.username.value
       const password = event.target.password.value
       event.target.username.value = ''
       event.target.password.value = ''
-      const user = await TMCApi.authenticate({ username, password })
+      const user: ITMCProfile = await TMCApi.authenticate({ username, password })
       const accessToken = user.accessToken
       const profile = await TMCApi.getProfile(accessToken)
-      if (profile.administrator) {
-        this.setState({ user })
+      if ((profile as ITMCProfileDetails).administrator) {
+        this.props.addUser(user)
       }
     } catch (exception) {
       console.log('shiiiit')
     }
   }
 
-  private logout = () => {
+  public logout = () => {
     TMCApi.unauthenticate()
-    this.setState({
-      user: undefined
-    })
+    this.props.removeUser()
+  }
+
+  public render() {
+
+    const form = () => {
+      return (
+        <div style={{ width: 200 }}>
+          <form onSubmit={this.handleSubmit}>
+            <FormControl>
+              <InputLabel>Username</InputLabel>
+              <Input name="username" />
+            </FormControl>
+            <FormControl >
+              <InputLabel>Password</InputLabel>
+              <Input name="password" type="password" />
+            </FormControl>
+            <Button type="submit">Sign in</Button>
+          </form>
+        </div>
+      )
+    }
+
+    const dash = () => {
+      return (
+        <Button onClick={this.logout}>logout</Button>
+      )
+    }
+
+    return (
+      <div>
+        {this.props.user ? dash() : form()}
+      </div>
+    );
   }
 }
 
-export default App;
+const mapStateToProps = (state: any) => {
+  return {
+    user: state.user
+  }
+}
+
+const mapDispatchToProps = {
+  addUser,
+  removeUser
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App)
