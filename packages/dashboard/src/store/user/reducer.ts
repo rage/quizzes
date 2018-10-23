@@ -7,7 +7,7 @@ export type UserAction = ActionType<typeof user>
 
 export const userReducer = (state: userState = null, action: UserAction) => {
   switch (action.type) {
-    case getType(user.add):
+    case getType(user.set):
       return action.payload
     case getType(user.remove):
       return null

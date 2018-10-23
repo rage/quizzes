@@ -2,7 +2,7 @@ import { passport } from "@quizzes/common/config/passport-tmc"
 import { logger } from "@quizzes/common/config/winston"
 import bodyParser from "body-parser"
 import compression from "compression" // compresses requests
-import cors from 'cors'
+import cors from "cors"
 import dotenv from "dotenv"
 import express from "express"
 import graphqlHTTP from "express-graphql"
