@@ -6,9 +6,9 @@ import InputLabel from '@material-ui/core/InputLabel'
 // import Paper from '@material-ui/core/Paper'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import TMCApi from './services/TMCApi'
+import TMCApi from '../../common/src/services/TMCApi'
+import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
 import { addUser, removeUser } from './store/user/actions'
-import { ITMCProfile, ITMCProfileDetails } from "../../../common/src/types"
 
 class App extends React.Component<any, any> {
 
