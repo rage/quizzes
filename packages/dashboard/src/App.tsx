@@ -8,6 +8,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import TMCApi from '../../common/src/services/TMCApi'
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
+import { setQuizzes } from './store/quizzes/actions'
 import { addUser, removeUser } from './store/user/actions'
 
 class App extends React.Component<any, any> {
@@ -18,6 +19,7 @@ class App extends React.Component<any, any> {
       const profile = await TMCApi.getProfile(user.accessToken)
       if ((profile as ITMCProfileDetails).administrator) {
         this.props.addUser(user)
+        this.props.setQuizzes()
       }
     }
   }
@@ -34,6 +36,7 @@ class App extends React.Component<any, any> {
       const profile = await TMCApi.getProfile(accessToken)
       if ((profile as ITMCProfileDetails).administrator) {
         this.props.addUser(user)
+        this.props.setQuizzes()
       }
     } catch (exception) {
       console.log('shiiiit')
@@ -87,6 +90,7 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = {
   addUser,
+  setQuizzes,
   removeUser
 }
 

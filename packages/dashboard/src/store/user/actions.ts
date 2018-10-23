@@ -1,6 +1,7 @@
 import { Dispatch } from "redux"
 import { ActionType, createAction } from "typesafe-actions"
 import { ITMCProfile } from "../../../../common/src/types"
+import * as Quizzes from '../quizzes/actions'
 
 export const remove = createAction("user/REMOVE")
 
@@ -15,8 +16,8 @@ export const addUser = (user: ITMCProfile) => {
 }
 
 export const removeUser = () => {
-  console.log("remove")
   return (dispatch: any) => {
     dispatch(remove())
+    dispatch(Quizzes.clear())
   }
 }

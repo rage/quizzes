@@ -2,6 +2,7 @@ import { passport } from "@quizzes/common/config/passport-tmc"
 import { logger } from "@quizzes/common/config/winston"
 import bodyParser from "body-parser"
 import compression from "compression" // compresses requests
+import cors from 'cors'
 import dotenv from "dotenv"
 import express from "express"
 import graphqlHTTP from "express-graphql"
@@ -28,6 +29,7 @@ const API_PATH = process.env.API_PATH || "/api/v1"
 // Express configuration
 app.set("port", process.env.PORT || 3000)
 app.use(compression())
+app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
 app.use(expressValidator())
