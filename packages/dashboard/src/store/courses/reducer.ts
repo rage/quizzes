@@ -6,7 +6,7 @@ export const coursesReducer = (state: any = [], action: any) => {
     case getType(courses.set):
       return action.payload
     case getType(courses.clear):
-        return []
+      return []
     default:
       return state
   }
