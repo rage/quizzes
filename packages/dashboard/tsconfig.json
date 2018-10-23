@@ -10,9 +10,9 @@
     "experimentalDecorators": true,
     "esModuleInterop": true,
     "declaration": true,
-    "declarationMap": true,
+    "composite": true,
+    // "declarationMap": true,
     "allowSyntheticDefaultImports": true,
-    "traceResolution": true,
     "paths": {
       "@quizzes/common/*": ["../../common/src/*"],
       "*": ["node_modules"]

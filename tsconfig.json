@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2015",
+    "target": "es2018",
     "module": "commonjs",
     "moduleResolution": "node",
     "lib": ["es2018", "esnext.asynciterable"],
@@ -10,7 +10,7 @@
     "baseUrl": "./packages",
     "composite": true,
     "declaration": true,
-    "declarationMap": true,
+    // "declarationMap": true,
     "sourceMap": true,
     "strictPropertyInitialization": false,
     "paths": {
