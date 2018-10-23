@@ -11,6 +11,7 @@
     "emitDecoratorMetadata": true,
     "composite": true,
     "esModuleInterop": true,
+    "declaration": true,
     "allowSyntheticDefaultImports": true,
     "lib": [
       "esnext.asynciterable",
