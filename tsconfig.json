@@ -10,7 +10,7 @@
     "baseUrl": "./packages",
     "composite": true,
     "declaration": true,
-    // "declarationMap": true,
+    "declarationMap": false,
     "sourceMap": true,
     "strictPropertyInitialization": false,
     "paths": {

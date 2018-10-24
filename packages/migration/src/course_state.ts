@@ -2,12 +2,8 @@ import { Course, User, UserCourseState } from "@quizzes/common/models"
 import { CourseState as QNCourseState } from "./app-modules/models"
 
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
-import {
-  calculateChunkSize,
-  getUUIDByString,
-  insert,
-  progressBar,
-} from "./util"
+import { calculateChunkSize, progressBar } from "./util"
+import { getUUIDByString, insert } from "@quizzes/common/util"
 
 export async function migrateCourseStates(
   courses: { [courseID: string]: Course },

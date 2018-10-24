@@ -42,10 +42,9 @@ router.get(
 )
 
 router.post(
-  "/",
+  ["/"],
   asyncHandler(async (req: Request, res: Response) => {
-    const quiz = new Quiz()
-    const result = await quizService.createQuiz(quiz)
+    const result = await quizService.createQuiz(req.body)
 
     res.json(result)
   }),

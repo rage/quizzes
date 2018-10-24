@@ -10,12 +10,8 @@ import {
 import { QueryFailedError } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
-import {
-  calculateChunkSize,
-  getUUIDByString,
-  insert,
-  progressBar,
-} from "./util"
+import { calculateChunkSize, progressBar } from "./util"
+import { getUUIDByString, insert } from "@quizzes/common/util"
 
 export async function migrateQuizAnswers(
   quizzes: { [quizID: string]: Quiz },

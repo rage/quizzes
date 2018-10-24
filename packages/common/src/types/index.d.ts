@@ -1,3 +1,14 @@
+import {
+  Quiz,
+  QuizItem,
+  QuizOption,
+  QuizTranslation,
+  QuizItemTranslation,
+  QuizOptionTranslation,
+  PeerReviewQuestion,
+  PeerReviewQuestionTranslation,
+} from "../models"
+
 export class ITMCProfile {
   username: string
   accessToken: string
@@ -58,7 +69,8 @@ export interface INewQuizQuery {
 }
 
 export interface INewQuizTranslation {
-  quizId: string
+  quiz?: Quiz
+  quizId?: string
   languageId: string
   title: string
   body: string
@@ -66,7 +78,8 @@ export interface INewQuizTranslation {
 }
 
 export interface INewQuizItem {
-  quizId: string
+  quiz?: Quiz
+  quizId?: string
   type: string
   order: number
   texts: INewQuizItemTranslation[]
@@ -76,7 +89,8 @@ export interface INewQuizItem {
 }
 
 export interface INewQuizItemTranslation {
-  quizItemId: string
+  quizItem?: QuizItem
+  quizItemId?: string
   languageId: string
   title?: string
   body?: string
@@ -85,14 +99,16 @@ export interface INewQuizItemTranslation {
 }
 
 export interface INewQuizOption {
-  quizItemId: string
+  quizItem?: QuizItem
+  quizItemId?: string
   order: number
   texts: INewQuizOptionTranslation[]
   correct: boolean
 }
 
 export interface INewQuizOptionTranslation {
-  quizOptionId: string
+  quizOption?: QuizOption
+  quizOptionId?: string
   languageId: string
   title: string
   body?: string
@@ -101,7 +117,8 @@ export interface INewQuizOptionTranslation {
 }
 
 export interface INewPeerReviewQuestion {
-  quizId: string
+  quiz?: Quiz
+  quizId?: string
   collectionId: string
   texts: INewPeerReviewQuestionTranslation[]
   default: boolean
@@ -111,7 +128,8 @@ export interface INewPeerReviewQuestion {
 }
 
 export interface INewPeerReviewQuestionTranslation {
-  peerReviewQuestionId: string
+  peerReviewQuestion?: PeerReviewQuestion
+  peerReviewQuestionId?: string
   languageId: string
   title: string
   body: string

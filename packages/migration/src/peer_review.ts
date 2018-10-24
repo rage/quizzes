@@ -9,12 +9,8 @@ import { PeerReview as QNPeerReview } from "./app-modules/models"
 
 import { Any } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
-import {
-  calculateChunkSize,
-  getUUIDByString,
-  insert,
-  progressBar,
-} from "./util"
+import { calculateChunkSize, progressBar } from "./util"
+import { getUUIDByString, insert } from "@quizzes/common/util"
 
 export async function migratePeerReviews(
   users: { [username: string]: User },

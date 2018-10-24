@@ -11,9 +11,28 @@ import {
 } from "typeorm"
 import { Language } from "./language"
 import { QuizItem } from "./quiz_item"
+import { INewQuizOption, INewQuizOptionTranslation } from "../types"
 
 @Entity()
 export class QuizOption extends BaseEntity {
+  constructor(data: INewQuizOption = {} as INewQuizOption) {
+    super()
+
+    if (!data) {
+      return
+    }
+
+    this.order = data.order
+    this.correct = data.correct
+
+    if (data.texts) {
+      this.texts = data.texts.map(
+        (text: INewQuizOptionTranslation) =>
+          new QuizOptionTranslation({ ...text, quizOption: this }),
+      )
+    }
+  }
+
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
@@ -41,6 +60,22 @@ export class QuizOption extends BaseEntity {
 
 @Entity()
 export class QuizOptionTranslation extends BaseEntity {
+  constructor(
+    data: INewQuizOptionTranslation = {} as INewQuizOptionTranslation,
+  ) {
+    super()
+
+    if (!data) {
+      return
+    }
+
+    this.languageId = data.languageId
+    this.title = data.title
+    this.body = data.body
+    this.successMessage = data.successMessage
+    this.failureMessage = data.failureMessage
+  }
+
   @ManyToOne(type => QuizOption, qo => qo.id)
   public quizOption: Promise<QuizOption>
   @PrimaryColumn()

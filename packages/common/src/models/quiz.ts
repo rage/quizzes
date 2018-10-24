@@ -14,9 +14,51 @@ import { Course } from "./course"
 import { Language } from "./language"
 import { PeerReviewQuestion } from "./peer_review_question"
 import { QuizItem } from "./quiz_item"
-
+import {
+  INewQuizQuery,
+  INewQuizTranslation,
+  INewQuizItem,
+  INewPeerReviewQuestion,
+} from "../types"
+import { getUUIDByString } from "../util"
 @Entity()
 export class Quiz extends BaseEntity {
+  constructor(data: INewQuizQuery = {} as INewQuizQuery) {
+    super()
+
+    if (!data) {
+      return
+    }
+
+    this.courseId = data.courseId || getUUIDByString("default")
+    this.part = data.part || 0
+    this.section = data.section || 0
+    this.deadline = data.deadline
+    this.open = data.open
+
+    if (data.texts) {
+      this.save().then(
+        (newQuiz: Quiz) =>
+          (this.texts = data.texts.map(
+            (text: INewQuizTranslation) =>
+              new QuizTranslation({ ...text, quiz: newQuiz }),
+          )),
+      )
+    }
+
+    if (data.items) {
+      this.items = Promise.all(
+        data.items.map(
+          (item: INewQuizItem) => new QuizItem({ ...item, quiz: this }),
+        ),
+      )
+    }
+
+    /*     if (data.peerReviewQuestions) {
+      this.peerReviewQuestions = data.peerReviewQuestions.map((prq: INewPeerReviewQuestion) => new PeerReviewQuestion({ ...prq, quiz: this }))
+    } */
+  }
+
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
@@ -55,6 +97,22 @@ export class Quiz extends BaseEntity {
 
 @Entity()
 export class QuizTranslation extends BaseEntity {
+  constructor(data: INewQuizTranslation = {} as INewQuizTranslation) {
+    super()
+
+    if (!data) {
+      return
+    }
+
+    console.log("translation constructor received", data)
+
+    this.quizId = data.quizId
+    this.languageId = data.languageId || "unknown"
+    this.title = data.title
+    this.body = data.body
+    this.submitMessage = data.submitMessage || undefined
+  }
+
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Promise<Quiz>
   @PrimaryColumn()
