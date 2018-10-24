@@ -2,9 +2,11 @@ import AppBar from '@material-ui/core/AppBar'
 import Button from '@material-ui/core/Button'
 import FormControl from '@material-ui/core/FormControl'
 // import FormControlLabel from '@material-ui/core/FormControlLabel'
+import Grid from '@material-ui/core/Grid'
 import Input from '@material-ui/core/Input'
 import InputLabel from '@material-ui/core/InputLabel'
 import MenuItem from '@material-ui/core/MenuItem'
+import Paper from '@material-ui/core/Paper'
 import Select from '@material-ui/core/Select'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
@@ -39,19 +41,21 @@ class App extends React.Component<any, any> {
 
     const Login = () => {
       return (
-        <div style={{ width: 200 }}>
-          <form onSubmit={this.handleSubmit}>
-            <FormControl>
-              <InputLabel>Username</InputLabel>
-              <Input name="username" />
-            </FormControl>
-            <FormControl >
-              <InputLabel>Password</InputLabel>
-              <Input name="password" type="password" />
-            </FormControl>
-            <Button type="submit">Sign in</Button>
-          </form>
-        </div>
+        <Grid container={true} justify = 'center'>
+          <Paper style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '50px 50px 50px', marginTop: 100 }}>
+            <form onSubmit={this.handleSubmit}>
+              <FormControl margin="normal" fullWidth={true}>
+                <InputLabel>Username</InputLabel>
+                <Input name="username" />
+              </FormControl>
+              <FormControl margin="normal" fullWidth={true}>
+                <InputLabel>Password</InputLabel>
+                <Input name="password" type="password" />
+              </FormControl>
+              <Button type="submit" variant='contained' style={{ marginTop: 30 }} fullWidth={true}>Sign in</Button>
+            </form>
+          </Paper>
+        </Grid>
       )
     }
 
