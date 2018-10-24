@@ -9,7 +9,7 @@ export const userReducer = (state: userState = null, action: UserAction) => {
   switch (action.type) {
     case getType(user.set):
       return action.payload
-    case getType(user.remove):
+    case getType(user.clear):
       return null
     default:
       return state

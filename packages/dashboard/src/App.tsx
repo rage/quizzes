@@ -5,13 +5,14 @@ import Input from '@material-ui/core/Input'
 import InputLabel from '@material-ui/core/InputLabel'
 import MenuItem from '@material-ui/core/MenuItem'
 import Select from '@material-ui/core/Select'
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-// import TableCell from '@material-ui/core/TableCell';
-// import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
+import Table from '@material-ui/core/Table'
+import TableBody from '@material-ui/core/TableBody'
+// import TableCell from '@material-ui/core/TableCell'
+// import TableHead from '@material-ui/core/TableHead'
+import TableRow from '@material-ui/core/TableRow'
 import * as React from 'react'
 import { connect } from 'react-redux'
+import { BrowserRouter as Router, Link, Route } from 'react-router-dom'
 import TMCApi from '../../common/src/services/TMCApi'
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
 import { setFilter } from './store/filter/actions'
@@ -33,7 +34,7 @@ class App extends React.Component<any, any> {
 
   public render() {
 
-    const form = () => {
+    const Login = () => {
       return (
         <div style={{ width: 200 }}>
           <form onSubmit={this.handleSubmit}>
@@ -51,7 +52,7 @@ class App extends React.Component<any, any> {
       )
     }
 
-    const dash = () => {
+    const Dashboard = () => {
       return (
         <div>
           <div>
@@ -64,16 +65,28 @@ class App extends React.Component<any, any> {
           </div>
           <Table>
             <TableBody>
-              {this.props.quizzes.filter(quiz => quiz.courseId === this.props.filter).map(quiz => <TableRow key={quiz.id}>{quiz.texts[0].title}</TableRow>)}
+              {this.props.quizzes.filter(quiz => quiz.courseId === this.props.filter).map(quiz => <TableRow key={quiz.id}><Link to={`/quizzes/${quiz.id}`}>{quiz.texts[0].title}</Link></TableRow>)}
             </TableBody>
           </Table>
         </div>
       )
     }
 
+    const Quiz = ({ match }) => {
+      const quiz = this.props.quizzes.find(q => q.id === match.params.id)
+      return <div>{quiz.texts[0].title}</div>
+    }
+
     return (
       <div>
-        {this.props.user ? dash() : form()}
+        <Router>
+          {this.props.user ?
+            <div>
+              <Route exact={true} path='/' component={Dashboard} />
+              <Route exact={true} path='/quizzes/:id' component={Quiz} />
+            </div> :
+            <Route exact={true} path='/' component={Login} />}
+        </Router>
       </div>
     );
   }
