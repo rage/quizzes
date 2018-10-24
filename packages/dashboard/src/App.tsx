@@ -41,8 +41,8 @@ class App extends React.Component<any, any> {
 
     const Login = () => {
       return (
-        <Grid container={true} justify = 'center'>
-          <Paper style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '50px 50px 50px', marginTop: 100 }}>
+        <Grid container={true} justify='center'>
+          <Paper style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '50px 150px 100px', marginTop: 100 }}>
             <form onSubmit={this.handleSubmit}>
               <FormControl margin="normal" fullWidth={true}>
                 <InputLabel>Username</InputLabel>
@@ -63,14 +63,6 @@ class App extends React.Component<any, any> {
       return (
         <div>
           <div>
-            <AppBar>
-              <Toolbar>
-                <Typography style={{ flex: 1 }} />
-                <Button onClick={this.logout}>logout</Button>
-              </Toolbar>
-            </AppBar>
-          </div>
-          <div style={{ marginTop: 90 }}>
             <div style={{ marginBottom: 20, marginLeft: 20 }}>
               <Select value={this.props.filter || "cat"} onChange={this.handleSelect} style={{ minWidth: 350 }}>
                 {this.props.courses.map(course => <MenuItem key={course} value={course}>{course}</MenuItem>)}
@@ -90,6 +82,9 @@ class App extends React.Component<any, any> {
     const Quiz = ({ match }) => {
       const quiz = this.props.quizzes.find(q => q.id === match.params.id)
       console.log(quiz)
+      if (!quiz) {
+        return <p>loading..</p>
+      }
       return (
         <div>
           <Typography variant='headline' gutterBottom={true}>{quiz.texts[0].title}</Typography>
@@ -102,6 +97,15 @@ class App extends React.Component<any, any> {
         <Router>
           {this.props.user ?
             <div>
+              <div>
+                <AppBar >
+                  <Toolbar>
+                    <Typography style={{ flex: 1 }} />
+                    <Button onClick={this.logout}>logout</Button>
+                  </Toolbar>
+                </AppBar>
+                <div style={{ height: 80 }}/>
+              </div>
               <Route exact={true} path='/' component={Dashboard} />
               <Route exact={true} path='/quizzes/:id' component={Quiz} />
             </div> :
