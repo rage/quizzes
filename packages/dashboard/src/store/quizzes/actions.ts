@@ -16,7 +16,7 @@ export const setQuizzes = () => {
       const cSet = new Set()
       data.map(quiz => cSet.add(quiz.courseId))
       const courses = Array.from(cSet)
-      dispatch(set(data))
+      dispatch(set(data.sort((q1, q2) => q1.texts[0].title.localeCompare(q2.texts[0].title))))
       dispatch(Courses.set(courses))
       dispatch(Filter.set(courses[0]))
     } catch (error) {

@@ -12,6 +12,7 @@ import TableCell from '@material-ui/core/TableCell'
 // import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Toolbar from '@material-ui/core/Toolbar'
+import Typography from '@material-ui/core/Typography'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { BrowserRouter as Router, Link, Route } from 'react-router-dom'
@@ -60,19 +61,21 @@ class App extends React.Component<any, any> {
           <div>
             <AppBar>
               <Toolbar>
+                <Typography style={{ flex: 1 }} />
                 <Button onClick={this.logout}>logout</Button>
               </Toolbar>
             </AppBar>
           </div>
           <div style={{ marginTop: 90 }}>
-            <div style={{ padding: 20 }}>
-              <Select value={this.props.filter || "cat"} onChange={this.handleSelect} style={{ minWidth: 120 }}>
+            <div style={{ marginBottom: 20, marginLeft: 20 }}>
+              <Select value={this.props.filter || "cat"} onChange={this.handleSelect} style={{ minWidth: 350 }}>
                 {this.props.courses.map(course => <MenuItem key={course} value={course}>{course}</MenuItem>)}
               </Select>
             </div>
             <Table>
               <TableBody>
-                {this.props.quizzes.filter(quiz => quiz.courseId === this.props.filter).map(quiz => <TableRow key={quiz.id}><TableCell><Link to={`/quizzes/${quiz.id}`}>{quiz.texts[0].title}</Link></TableCell></TableRow>)}
+                {this.props.quizzes.filter(quiz => quiz.courseId === this.props.filter)
+                  .map(quiz => <TableRow key={quiz.id}><TableCell><Link to={`/quizzes/${quiz.id}`}>{quiz.texts[0].title}</Link></TableCell></TableRow>)}
               </TableBody>
             </Table>
           </div>
@@ -85,8 +88,8 @@ class App extends React.Component<any, any> {
       console.log(quiz)
       return (
         <div>
-          <h2>{quiz.texts[0].title}</h2>
-          <p>{quiz.texts[0].body}</p>
+          <Typography variant='headline' gutterBottom={true}>{quiz.texts[0].title}</Typography>
+          <Typography variant='body1'>{quiz.texts[0].body}</Typography>
         </div>)
     }
 
