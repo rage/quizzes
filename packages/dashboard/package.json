@@ -16,6 +16,7 @@
     "redux": "^4.0.0",
     "redux-thunk": "^2.3.0",
     "tmc-client-js": "0.0.9",
+    "typeface-roboto": "^0.0.54",
     "typesafe-actions": "^2.0.4"
   },
   "scripts": {

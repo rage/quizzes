@@ -1,3 +1,4 @@
+import AppBar from '@material-ui/core/AppBar'
 import Button from '@material-ui/core/Button'
 import FormControl from '@material-ui/core/FormControl'
 // import FormControlLabel from '@material-ui/core/FormControlLabel'
@@ -7,9 +8,10 @@ import MenuItem from '@material-ui/core/MenuItem'
 import Select from '@material-ui/core/Select'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
-// import TableCell from '@material-ui/core/TableCell'
+import TableCell from '@material-ui/core/TableCell'
 // import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
+import Toolbar from '@material-ui/core/Toolbar'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { BrowserRouter as Router, Link, Route } from 'react-router-dom'
@@ -56,25 +58,36 @@ class App extends React.Component<any, any> {
       return (
         <div>
           <div>
-            <Button onClick={this.logout}>logout</Button>
+            <AppBar>
+              <Toolbar>
+                <Button onClick={this.logout}>logout</Button>
+              </Toolbar>
+            </AppBar>
           </div>
-          <div>
-            <Select value={this.props.filter || "cat"} onChange={this.handleSelect} style={{ minWidth: 120 }}>
-              {this.props.courses.map(course => <MenuItem key={course} value={course}>{course}</MenuItem>)}
-            </Select>
+          <div style={{ marginTop: 90 }}>
+            <div style={{ padding: 20 }}>
+              <Select value={this.props.filter || "cat"} onChange={this.handleSelect} style={{ minWidth: 120 }}>
+                {this.props.courses.map(course => <MenuItem key={course} value={course}>{course}</MenuItem>)}
+              </Select>
+            </div>
+            <Table>
+              <TableBody>
+                {this.props.quizzes.filter(quiz => quiz.courseId === this.props.filter).map(quiz => <TableRow key={quiz.id}><TableCell><Link to={`/quizzes/${quiz.id}`}>{quiz.texts[0].title}</Link></TableCell></TableRow>)}
+              </TableBody>
+            </Table>
           </div>
-          <Table>
-            <TableBody>
-              {this.props.quizzes.filter(quiz => quiz.courseId === this.props.filter).map(quiz => <TableRow key={quiz.id}><Link to={`/quizzes/${quiz.id}`}>{quiz.texts[0].title}</Link></TableRow>)}
-            </TableBody>
-          </Table>
         </div>
       )
     }
 
     const Quiz = ({ match }) => {
       const quiz = this.props.quizzes.find(q => q.id === match.params.id)
-      return <div>{quiz.texts[0].title}</div>
+      console.log(quiz)
+      return (
+        <div>
+          <h2>{quiz.texts[0].title}</h2>
+          <p>{quiz.texts[0].body}</p>
+        </div>)
     }
 
     return (
@@ -85,7 +98,10 @@ class App extends React.Component<any, any> {
               <Route exact={true} path='/' component={Dashboard} />
               <Route exact={true} path='/quizzes/:id' component={Quiz} />
             </div> :
-            <Route exact={true} path='/' component={Login} />}
+            <div>
+              <Route exact={true} path='/' component={Login} />
+              <Route exact={true} path='/quizzes/:id' component={Login} />
+            </div>}
         </Router>
       </div>
     );
