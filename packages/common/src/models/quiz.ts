@@ -30,11 +30,13 @@ export class Quiz extends BaseEntity {
     super()
 
     console.log("quiz constructor got", data)
-    if (!data) {
+    if (!data || (data && !data.id)) {
       return
     }
 
-    this.id = data.id || undefined
+    if (data.id) {
+      this.id = data.id
+    }
     this.courseId = data.courseId || getUUIDByString("default")
     this.part = data.part || 0
     this.section = data.section || 0
@@ -110,7 +112,9 @@ export class QuizTranslation extends BaseEntity {
 
     console.log("translation constructor received", data)
 
-    this.quizId = data.quizId || undefined
+    if (data.quizId) {
+      this.quizId = data.quizId
+    }
     this.languageId = data.languageId || "unknown"
     this.title = data.title
     this.body = data.body
