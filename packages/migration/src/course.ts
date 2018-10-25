@@ -1,5 +1,6 @@
 import { Course, Language, Organization } from "@quizzes/common/models"
-import { getUUIDByString, progressBar } from "./util"
+import { progressBar } from "./util"
+import { getUUIDByString } from "@quizzes/common/util"
 
 const courseIDs = {
   "cybersecurity-intro": "en_US",

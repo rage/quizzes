@@ -13373,10 +13373,33 @@ typeorm@^0.3.0-alpha.11:
     yargs "^11.1.0"
     zen-observable "^0.8.9"
 
+<<<<<<< HEAD
 typesafe-actions@^2.0.4:
   version "2.0.4"
   resolved "https://registry.yarnpkg.com/typesafe-actions/-/typesafe-actions-2.0.4.tgz#31c8f8df3566d549eb52edb64a75997e970c17d0"
   integrity sha512-3qnSDBNtH3mfekmM9w/IVlsqiUT4I5m+mpLp5tV2Ua/28BfaehqUg6eQNC8+cTk+oufbXcubLiWvKS/61qgleQ==
+=======
+typeorm@^0.3.0-alpha.22:
+  version "0.3.0-alpha.22"
+  resolved "https://registry.yarnpkg.com/typeorm/-/typeorm-0.3.0-alpha.22.tgz#ceb961634b458d9bd34012d831e2ad4b4b4e1584"
+  integrity sha512-r34MEUkAy4HAE3mbWQodANx5ofPMX/heaV31rGmbCaXZHoAayrFQl76tZ1Jae12THGEbuqBPSIIJlM9Wt5beVQ==
+  dependencies:
+    "@types/zen-observable" "^0.8.0"
+    app-root-path "^2.0.1"
+    buffer "^5.1.0"
+    chalk "^2.3.2"
+    cli-highlight "^1.2.3"
+    debug "^3.1.0"
+    dotenv "^5.0.1"
+    glob "^7.1.2"
+    js-yaml "^3.11.0"
+    mkdirp "^0.5.1"
+    reflect-metadata "^0.1.12"
+    xml2js "^0.4.17"
+    yargonaut "^1.1.2"
+    yargs "^11.1.0"
+    zen-observable "^0.8.9"
+>>>>>>> api
 
 typescript@^3.1.1:
   version "3.1.3"

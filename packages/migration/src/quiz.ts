@@ -11,7 +11,8 @@ import { Quiz as QNQuiz } from "./app-modules/models"
 
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import oldQuizTypes from "./app-modules/constants/quiz-types"
-import { getUUIDByString, insert, progressBar, safeGet } from "./util"
+import { getUUIDByString, insert } from "@quizzes/common/util"
+import { progressBar, safeGet } from "./util"
 
 export async function migrateQuizzes(courses: {
   [key: string]: Course

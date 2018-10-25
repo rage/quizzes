@@ -6,7 +6,8 @@ import axios from "axios"
 
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
-import { calculateChunkSize, insert } from "./util"
+import { calculateChunkSize } from "./util"
+import { insert } from "@quizzes/common/util"
 
 const TMC_TOKEN =
   "7ae010e2e5641e6bdf9f05cd60b037ad6027be9189ad9b9420edee3468e7f27e"

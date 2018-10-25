@@ -13,7 +13,8 @@ import {
 } from "./app-modules/models"
 
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
-import { getUUIDByString, insert, progressBar, safeGet } from "./util"
+import { progressBar, safeGet } from "./util"
+import { getUUIDByString, insert } from "@quizzes/common/util"
 
 export async function migratePeerReviewQuestions() {
   console.log("Querying peer review questions...")
