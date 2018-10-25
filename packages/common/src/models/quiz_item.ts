@@ -19,6 +19,7 @@ import {
   INewQuizOption,
   INewQuizOptionTranslation,
 } from "../types"
+import { randomUUID } from "../util"
 
 @Entity()
 export class QuizItem extends BaseEntity {
@@ -29,6 +30,12 @@ export class QuizItem extends BaseEntity {
       return
     }
 
+    if (data.quizId) {
+      this.quizId = data.quizId
+    }
+    if (data.id) {
+      this.id = data.id
+    }
     this.type = data.type
     this.order = data.order
     this.validityRegex = data.validityRegex
@@ -37,14 +44,18 @@ export class QuizItem extends BaseEntity {
     if (data.texts) {
       this.texts = data.texts.map(
         (text: INewQuizItemTranslation) =>
-          new QuizItemTranslation({ ...text, quizItem: this }),
+          new QuizItemTranslation({ ...text, quizItemId: this.id }),
       )
     }
     if (data.options) {
       this.options = Promise.all(
         data.options.map(
           (option: INewQuizOption) =>
-            new QuizOption({ ...option, quizItem: this }),
+            new QuizOption({
+              ...option,
+              quizItemId: this.id,
+              id: randomUUID(),
+            }),
         ),
       )
     }
@@ -66,10 +77,16 @@ export class QuizItem extends BaseEntity {
   @Column("int")
   public order: number
 
-  @OneToMany(type => QuizItemTranslation, qit => qit.quizItem, { eager: true })
+  @OneToMany(type => QuizItemTranslation, qit => qit.quizItem, {
+    eager: true,
+    cascade: true,
+  })
   public texts: QuizItemTranslation[]
 
-  @OneToMany(type => QuizOption, qo => qo.quizItem, { eager: true }) // was: not eager
+  @OneToMany(type => QuizOption, qo => qo.quizItem, {
+    eager: true,
+    cascade: true,
+  }) // was: not eager
   public options: Promise<QuizOption[]>
 
   @Column({ nullable: true })
@@ -90,6 +107,10 @@ export class QuizItemTranslation extends BaseEntity {
 
     if (!data) {
       return
+    }
+
+    if (data.quizItemId) {
+      this.quizItemId = data.quizItemId
     }
 
     this.languageId = data.languageId

@@ -19,9 +19,9 @@ import {
   INewQuizOptionTranslation,
   INewPeerReviewQuestion,
 } from "@quizzes/common/types"
-import { getUUIDByString, insert } from "@quizzes/common/util"
+import { getUUIDByString, insert, randomUUID } from "@quizzes/common/util"
 import _ from "lodash"
-import { InsertResult, SelectQueryBuilder } from "typeorm"
+import { InsertResult, SelectQueryBuilder, PromiseUtils } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import quizanswerService from "./quizanswer.service"
 
@@ -69,6 +69,7 @@ export class QuizService {
       queryBuilder
         .leftJoinAndSelect("quiz.items", "quiz_item")
         .leftJoinAndSelect("quiz_item.texts", "quiz_item_translation")
+
       if (language) {
         queryBuilder.where("quiz_item_translation.language_id = :language", {
           language,
@@ -104,7 +105,18 @@ export class QuizService {
       }
     }
 
-    return await queryBuilder.getMany()
+    const res = await queryBuilder.getMany()
+
+    return Promise.all(
+      res.map(async (quiz: Quiz) => {
+        if (quiz.items) {
+          quiz.items = PromiseUtils.extractValue(quiz.items)
+          console.log(quiz.items)
+        }
+        return quiz
+      }),
+    )
+    // return await queryBuilder.getMany()
   }
 
   public async createQuiz(query: INewQuizQuery): Promise<Quiz> {
@@ -112,118 +124,24 @@ export class QuizService {
       query.courseId || getUUIDByString("default"),
     )
 
-    const newId: string = getUUIDByString(
-      `#{Date.now()}-{Math.round(Math.random() * 1000000)}`,
-    )
+    const newQuiz: Quiz = new Quiz({ ...query, id: randomUUID() })
+    const savedQuiz = await newQuiz.save()
 
-    /*     const newQuiz: Quiz = await insert(Quiz, [query])
-      .then((res: InsertResult) => (console.log(res), _.get(res, "generatedMaps[0]"))) */
-    const newQuiz: Quiz = new Quiz(query)
-    /*     const quizQuery: QueryPartialEntity<Quiz> = {
-      course,
-      part: query.part,
-      section: query.section,
-      excludedFromScore: query.excludedFromScore,
+    if (savedQuiz.items) {
+      const items: QuizItem[] = await savedQuiz.items
+
+      items.map(async item => {
+        const savedItem = await item.save()
+
+        if (savedItem.options) {
+          const options: QuizOption[] = await item.options
+
+          options.map(option => option.save())
+        }
+      })
     }
 
-    const newQuiz: Quiz = await insert(Quiz, [quizQuery])
-      .then((res: InsertResult) => _.get(res, "generatedMaps[0]"))
-
-
-    const quizTranslations: Array<QueryPartialEntity<QuizTranslation>> =
-      _.get(query, "texts", [] as INewQuizTranslation[]).map((text: INewQuizTranslation) => ({
-        quizId: newQuiz.id,
-        languageId: text.languageId,
-        title: text.title,
-        body: text.body,
-        submitMessage: text.submitMessage
-      }))
-
-    const items: Array<QueryPartialEntity<QuizItem>> = []
-    const itemTranslations: Array<QueryPartialEntity<QuizItemTranslation>> = []
-    const options: Array<QueryPartialEntity<QuizOption>> = []
-    const optionTranslations: Array<QueryPartialEntity<QuizOptionTranslation>> = []
-    const peerreviews: Array<QueryPartialEntity<PeerReviewQuestion>> = []
-    const peerreviewTranslations: Array<QueryPartialEntity<PeerReviewQuestionTranslation>> = []
-
-    // todo (?) peer review collection
-
-    // if...
-    const newItems: QuizItem[] = await Promise.all(
-      _.get(query, "items", [] as INewQuizItem[]).map(async (item: INewQuizItem) => {
-      const itemQuery: QueryPartialEntity<QuizItem> = {
-        quizId: newQuiz.id,
-        type: item.type,
-        order: item.order,
-        validityRegex: item.validityRegex,
-        formatRegex: item.formatRegex
-      }
-
-      const newItem: QuizItem = await insert(QuizItem, [itemQuery])
-        .then((res: InsertResult) => _.get(res, "generatedMaps[0]"))
-
-      _.get(item, "texts", [] as INewQuizItemTranslation[]).forEach((text: INewQuizItemTranslation) => {
-        const newItemTranslation: QueryPartialEntity<QuizItemTranslation> = {
-          quizItemId: newItem.id,
-          languageId: text.languageId,
-          title: text.title,
-          body: text.body,
-          successMessage: text.successMessage,
-          failureMessage: text.failureMessage
-        }
-
-        itemTranslations.push(newItemTranslation)
-      })
-
-      const newOptions: QuizOption[] = await Promise.all(
-        _.get(item, "options", [] as INewQuizOption[]).map(async (option: INewQuizOption) => {
-        const optionQuery: QueryPartialEntity<QuizOption> = {
-          quizItemId: newItem.id,
-          order: option.order,
-          correct: option.correct
-        }
-
-        const newOption: QuizOption = await insert(QuizOption, [optionQuery])
-          .then((res: InsertResult) => _.get(res, "generatedMaps[0]"))
-
-        _.get(option, "texts", [] as INewQuizOptionTranslation[]).forEach((text: INewQuizOptionTranslation) => {
-          const newOptionTranslation: QueryPartialEntity<QuizOptionTranslation> = {
-            quizOptionId: newOption.id,
-            languageId: text.languageId,
-            successMessage: text.successMessage,
-            failureMessage: text.failureMessage,
-            title: text.title,
-            body: text.body
-          }
-
-          optionTranslations.push(newOptionTranslation)
-        })
-
-        return newOption // push partial
-      }))
-
-      return newItem // push partial
-    }))
-
-    // todo: next...?
-
-    console.log("quiz", newQuiz)
-    console.log("translations", quizTranslations)
-    console.log("items", items)
-    console.log("itemtranslations", itemTranslations),
-    console.log("options", options)
-    console.log("optiontranslations", optionTranslations)
-
-    await insert(QuizTranslation, quizTranslations, `"quiz_id", "language_id"`)
-    // await insert(QuizItem, items)
-    await insert(QuizItemTranslation, itemTranslations, `"quiz_item_id", "language_id"`)
-    // await insert(QuizOption, options)
-    await insert(QuizOptionTranslation, optionTranslations, `"quiz_option_id", "language_id"`)
-
-    return await Quiz.findOne(newQuiz.id) */
-
-    // not saved yet
-    return newQuiz //.save()
+    return savedQuiz
   }
 
   public async updateQuiz(quiz: Quiz): Promise<Quiz> {

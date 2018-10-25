@@ -22,15 +22,14 @@ import {
   INewQuizItem,
   INewPeerReviewQuestion,
 } from "../types"
-import { getUUIDByString } from "../util"
+import { getUUIDByString, randomUUID } from "../util"
 
 @Entity()
 export class Quiz extends BaseEntity {
   constructor(data?: INewQuizQuery) {
     super()
 
-    console.log("quiz constructor got", data)
-    if (!data || (data && !data.id)) {
+    if (!data) {
       return
     }
 
@@ -44,16 +43,20 @@ export class Quiz extends BaseEntity {
     this.open = data.open
 
     if (data.texts) {
-      // this.texts = data.texts.map()
+      this.texts = data.texts.map(
+        (text: INewQuizTranslation) =>
+          new QuizTranslation({ ...text, quizId: data.id }),
+      )
     }
 
-    /*     if (data.items) {
-      this.items = 
-        Promise.all(data.items.map(
-          async (item: QuizItem) => new QuizItem(await item),
-        ))
-      
-    } */
+    if (data.items) {
+      this.items = Promise.all(
+        data.items.map(
+          (item: INewQuizItem) =>
+            new QuizItem({ ...item, quizId: data.id, id: randomUUID() }),
+        ),
+      )
+    }
 
     /*     if (data.peerReviewQuestions) {
       this.peerReviewQuestions = data.peerReviewQuestions.map((prq: INewPeerReviewQuestion) => new PeerReviewQuestion({ ...prq, quiz: this }))
@@ -84,7 +87,7 @@ export class Quiz extends BaseEntity {
   @Column({ type: "timestamp", nullable: true })
   public open?: Date
 
-  @OneToMany(type => QuizItem, qi => qi.quiz, { lazy: true }) // was: not eager
+  @OneToMany(type => QuizItem, qi => qi.quiz, { lazy: true, cascade: true }) // was: not eager
   public items: Promise<QuizItem[]>
 
   @OneToMany(type => PeerReviewQuestion, prq => prq.quiz, { lazy: true }) // was: not eager
@@ -110,8 +113,9 @@ export class QuizTranslation extends BaseEntity {
       return
     }
 
-    console.log("translation constructor received", data)
-
+    if (data.quiz) {
+      this.quiz = PromiseUtils.create(data.quiz)
+    }
     if (data.quizId) {
       this.quizId = data.quizId
     }

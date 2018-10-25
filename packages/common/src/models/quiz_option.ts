@@ -22,13 +22,19 @@ export class QuizOption extends BaseEntity {
       return
     }
 
+    if (data.id) {
+      this.id = data.id
+    }
+    if (data.quizItemId) {
+      this.quizItemId = data.quizItemId
+    }
     this.order = data.order
     this.correct = data.correct
 
     if (data.texts) {
       this.texts = data.texts.map(
         (text: INewQuizOptionTranslation) =>
-          new QuizOptionTranslation({ ...text, quizOption: this }),
+          new QuizOptionTranslation({ ...text, quizOptionId: data.id }),
       )
     }
   }
@@ -67,6 +73,10 @@ export class QuizOptionTranslation extends BaseEntity {
 
     if (!data) {
       return
+    }
+
+    if (data.quizOptionId) {
+      this.quizOptionId = data.quizOptionId
     }
 
     this.languageId = data.languageId
