@@ -57,6 +57,7 @@ export interface IQuizAnswerQuery {
 }
 
 export interface INewQuizQuery {
+  id?: string
   courseId?: string
   texts: INewQuizTranslation[]
   part?: number

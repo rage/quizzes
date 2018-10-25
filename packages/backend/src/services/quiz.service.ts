@@ -57,49 +57,48 @@ export class QuizService {
       }
     }
 
+    queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
+
     if (language) {
-      queryBuilder
-        .leftJoinAndSelect("quiz.texts", "quiz_translation")
-        .where("quiz_translation.language_id = :language", { language })
+      queryBuilder.where("quiz_translation.language_id = :language", {
+        language,
+      })
     }
 
     if (items) {
-      queryBuilder.leftJoinAndSelect("quiz.items", "quiz_item")
-
+      queryBuilder
+        .leftJoinAndSelect("quiz.items", "quiz_item")
+        .leftJoinAndSelect("quiz_item.texts", "quiz_item_translation")
       if (language) {
-        queryBuilder.leftJoinAndSelect(
-          "quiz_item.texts",
-          "quiz_item_translation",
-          "quiz_item_translation.language_id = :language",
-          { language },
-        )
+        queryBuilder.where("quiz_item_translation.language_id = :language", {
+          language,
+        })
       }
     }
 
     if (items && options) {
-      queryBuilder.leftJoinAndSelect("quiz_item.options", "quiz_option")
+      queryBuilder
+        .leftJoinAndSelect("quiz_item.options", "quiz_option")
+        .leftJoinAndSelect("quiz_option.texts", "quiz_option_translation")
 
       if (language) {
-        queryBuilder.leftJoinAndSelect(
-          "quiz_option.texts",
-          "quiz_option_translation",
-          "quiz_option_translation.language_id = :language",
-          { language },
-        )
+        queryBuilder.where("quiz_option_translation.language_id = :language", {
+          language,
+        })
       }
     }
 
     if (peerreviews) {
-      queryBuilder.leftJoinAndSelect(
-        "quiz.peerReviewQuestions",
-        "peer_review_question",
-      )
+      queryBuilder
+        .leftJoinAndSelect("quiz.peerReviewQuestions", "peer_review_question")
+        .leftJoinAndSelect(
+          "peer_review_question.texts",
+          "peer_review_question_translation",
+        )
 
       if (language) {
-        queryBuilder.leftJoinAndSelect(
-          "peer_review_question.texts",
-          "peer_review-question_translation",
-          "peer_review_question_Translation.language_id = :language",
+        queryBuilder.where(
+          "peer_review_question_translation.language_id = :language",
           { language },
         )
       }
@@ -113,6 +112,12 @@ export class QuizService {
       query.courseId || getUUIDByString("default"),
     )
 
+    const newId: string = getUUIDByString(
+      `#{Date.now()}-{Math.round(Math.random() * 1000000)}`,
+    )
+
+    /*     const newQuiz: Quiz = await insert(Quiz, [query])
+      .then((res: InsertResult) => (console.log(res), _.get(res, "generatedMaps[0]"))) */
     const newQuiz: Quiz = new Quiz(query)
     /*     const quizQuery: QueryPartialEntity<Quiz> = {
       course,
@@ -218,7 +223,7 @@ export class QuizService {
     return await Quiz.findOne(newQuiz.id) */
 
     // not saved yet
-    return await newQuiz.save()
+    return newQuiz //.save()
   }
 
   public async updateQuiz(quiz: Quiz): Promise<Quiz> {

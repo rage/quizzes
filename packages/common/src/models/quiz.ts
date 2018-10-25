@@ -7,9 +7,11 @@ import {
   OneToMany,
   PrimaryColumn,
   PrimaryGeneratedColumn,
+  PromiseUtils,
   RelationId,
   UpdateDateColumn,
 } from "typeorm"
+import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { Course } from "./course"
 import { Language } from "./language"
 import { PeerReviewQuestion } from "./peer_review_question"
@@ -21,15 +23,18 @@ import {
   INewPeerReviewQuestion,
 } from "../types"
 import { getUUIDByString } from "../util"
+
 @Entity()
 export class Quiz extends BaseEntity {
-  constructor(data: INewQuizQuery = {} as INewQuizQuery) {
+  constructor(data?: INewQuizQuery) {
     super()
 
+    console.log("quiz constructor got", data)
     if (!data) {
       return
     }
 
+    this.id = data.id || undefined
     this.courseId = data.courseId || getUUIDByString("default")
     this.part = data.part || 0
     this.section = data.section || 0
@@ -37,22 +42,16 @@ export class Quiz extends BaseEntity {
     this.open = data.open
 
     if (data.texts) {
-      this.save().then(
-        (newQuiz: Quiz) =>
-          (this.texts = data.texts.map(
-            (text: INewQuizTranslation) =>
-              new QuizTranslation({ ...text, quiz: newQuiz }),
-          )),
-      )
+      // this.texts = data.texts.map()
     }
 
-    if (data.items) {
-      this.items = Promise.all(
-        data.items.map(
-          (item: INewQuizItem) => new QuizItem({ ...item, quiz: this }),
-        ),
-      )
-    }
+    /*     if (data.items) {
+      this.items = 
+        Promise.all(data.items.map(
+          async (item: QuizItem) => new QuizItem(await item),
+        ))
+      
+    } */
 
     /*     if (data.peerReviewQuestions) {
       this.peerReviewQuestions = data.peerReviewQuestions.map((prq: INewPeerReviewQuestion) => new PeerReviewQuestion({ ...prq, quiz: this }))
@@ -67,7 +66,10 @@ export class Quiz extends BaseEntity {
   @Column()
   public courseId: string
 
-  @OneToMany(type => QuizTranslation, qt => qt.quiz, { eager: true })
+  @OneToMany(type => QuizTranslation, qt => qt.quiz, {
+    eager: true,
+    cascade: true,
+  })
   public texts: QuizTranslation[]
 
   @Column("int")
@@ -97,8 +99,10 @@ export class Quiz extends BaseEntity {
 
 @Entity()
 export class QuizTranslation extends BaseEntity {
-  constructor(data: INewQuizTranslation = {} as INewQuizTranslation) {
+  constructor(data?: INewQuizTranslation) {
     super()
+
+    console.log(data)
 
     if (!data) {
       return
@@ -106,7 +110,7 @@ export class QuizTranslation extends BaseEntity {
 
     console.log("translation constructor received", data)
 
-    this.quizId = data.quizId
+    this.quizId = data.quizId || undefined
     this.languageId = data.languageId || "unknown"
     this.title = data.title
     this.body = data.body
