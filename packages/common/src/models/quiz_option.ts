@@ -9,29 +9,12 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm"
+import { INewQuizOption, INewQuizOptionTranslation } from "../types"
 import { Language } from "./language"
 import { QuizItem } from "./quiz_item"
-import { INewQuizOption, INewQuizOptionTranslation } from "../types"
 
 @Entity()
 export class QuizOption extends BaseEntity {
-  constructor(data: INewQuizOption = {} as INewQuizOption) {
-    super()
-
-    if (!data) {
-      return
-    }
-
-    this.order = data.order
-    this.correct = data.correct
-
-    if (data.texts) {
-      this.texts = data.texts.map(
-        (text: INewQuizOptionTranslation) =>
-          new QuizOptionTranslation({ ...text, quizOption: this }),
-      )
-    }
-  }
 
   @PrimaryGeneratedColumn("uuid")
   public id: string
@@ -56,25 +39,28 @@ export class QuizOption extends BaseEntity {
   public createdAt: Date
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
-}
 
-@Entity()
-export class QuizOptionTranslation extends BaseEntity {
-  constructor(
-    data: INewQuizOptionTranslation = {} as INewQuizOptionTranslation,
-  ) {
+  constructor(data: INewQuizOption = {} as INewQuizOption) {
     super()
 
     if (!data) {
       return
     }
 
-    this.languageId = data.languageId
-    this.title = data.title
-    this.body = data.body
-    this.successMessage = data.successMessage
-    this.failureMessage = data.failureMessage
+    this.order = data.order
+    this.correct = data.correct
+
+    if (data.texts) {
+      this.texts = data.texts.map(
+        (text: INewQuizOptionTranslation) =>
+          new QuizOptionTranslation({ ...text, quizOption: this }),
+      )
+    }
   }
+}
+
+@Entity()
+export class QuizOptionTranslation extends BaseEntity {
 
   @ManyToOne(type => QuizOption, qo => qo.id)
   public quizOption: Promise<QuizOption>
@@ -100,4 +86,20 @@ export class QuizOptionTranslation extends BaseEntity {
   public createdAt: Date
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
+
+  constructor(
+    data: INewQuizOptionTranslation = {} as INewQuizOptionTranslation,
+  ) {
+    super()
+
+    if (!data) {
+      return
+    }
+
+    this.languageId = data.languageId
+    this.title = data.title
+    this.body = data.body
+    this.successMessage = data.successMessage
+    this.failureMessage = data.failureMessage
+  }
 }

@@ -10,45 +10,18 @@ import {
   RelationId,
   UpdateDateColumn,
 } from "typeorm"
-import { Language } from "./language"
-import { Quiz } from "./quiz"
-import { QuizOption } from "./quiz_option"
 import {
   INewQuizItem,
   INewQuizItemTranslation,
   INewQuizOption,
   INewQuizOptionTranslation,
 } from "../types"
+import { Language } from "./language"
+import { Quiz } from "./quiz"
+import { QuizOption } from "./quiz_option"
 
 @Entity()
 export class QuizItem extends BaseEntity {
-  constructor(data: INewQuizItem = {} as INewQuizItem) {
-    super()
-
-    if (!data) {
-      return
-    }
-
-    this.type = data.type
-    this.order = data.order
-    this.validityRegex = data.validityRegex
-    this.formatRegex = data.formatRegex
-
-    if (data.texts) {
-      this.texts = data.texts.map(
-        (text: INewQuizItemTranslation) =>
-          new QuizItemTranslation({ ...text, quizItem: this }),
-      )
-    }
-    if (data.options) {
-      this.options = Promise.all(
-        data.options.map(
-          (option: INewQuizOption) =>
-            new QuizOption({ ...option, quizItem: this }),
-        ),
-      )
-    }
-  }
 
   @PrimaryGeneratedColumn("uuid")
   public id: string
@@ -81,23 +54,40 @@ export class QuizItem extends BaseEntity {
   public createdAt: Date
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
-}
 
-@Entity()
-export class QuizItemTranslation extends BaseEntity {
-  constructor(data: INewQuizItemTranslation = {} as INewQuizItemTranslation) {
+  constructor(data: INewQuizItem = {} as INewQuizItem) {
     super()
 
     if (!data) {
       return
     }
 
-    this.languageId = data.languageId
-    this.title = data.title
-    this.body = data.body
-    this.successMessage = data.successMessage
-    this.failureMessage = data.failureMessage
+    this.type = data.type
+    this.order = data.order
+    this.validityRegex = data.validityRegex
+    this.formatRegex = data.formatRegex
+
+    if (data.texts) {
+      this.texts = data.texts.map(
+        (text: INewQuizItemTranslation) =>
+          new QuizItemTranslation({ ...text, quizItem: this }),
+      )
+    }
+    if (data.options) {
+      this.options = Promise.all(
+        data.options.map(
+          (option: INewQuizOption) =>
+            new QuizOption({ ...option, quizItem: this }),
+        ),
+      )
+    }
   }
+
+
+}
+
+@Entity()
+export class QuizItemTranslation extends BaseEntity {
 
   @ManyToOne(type => QuizItem, qi => qi.id)
   public quizItem: Promise<QuizItem>
@@ -123,4 +113,18 @@ export class QuizItemTranslation extends BaseEntity {
   public createdAt: Date
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
+
+  constructor(data: INewQuizItemTranslation = {} as INewQuizItemTranslation) {
+    super()
+
+    if (!data) {
+      return
+    }
+
+    this.languageId = data.languageId
+    this.title = data.title
+    this.body = data.body
+    this.successMessage = data.successMessage
+    this.failureMessage = data.failureMessage
+  }
 }

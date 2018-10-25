@@ -11,13 +11,13 @@ import Select from '@material-ui/core/Select'
 import Table from '@material-ui/core/Table'
 import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
-// import TableHead from '@material-ui/core/TableHead'
+import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { BrowserRouter as Router, Link, Route } from 'react-router-dom'
+import { BrowserRouter as Router, Link, Redirect, Route } from 'react-router-dom'
 import TMCApi from '../../common/src/services/TMCApi'
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
 import { setFilter } from './store/filter/actions'
@@ -59,16 +59,24 @@ class App extends React.Component<any, any> {
       )
     }
 
+
     const Dashboard = () => {
       return (
         <div>
           <div>
-            <div style={{ marginBottom: 20, marginLeft: 20 }}>
-              <Select value={this.props.filter || "cat"} onChange={this.handleSelect} style={{ minWidth: 350 }}>
+            <Toolbar style={{ marginBottom: 20 }}>
+              <Select value={this.props.filter} onChange={this.handleSelect} style={{ minWidth: 350 }}>
                 {this.props.courses.map(course => <MenuItem key={course} value={course}>{course}</MenuItem>)}
               </Select>
-            </div>
+              <Typography style={{ flex: 1 }} />
+              <Button component={this.MyLink}>New quiz</Button>
+            </Toolbar>
             <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell><Typography>Title</Typography></TableCell>
+                </TableRow>
+              </TableHead>
               <TableBody>
                 {this.props.quizzes.filter(quiz => quiz.courseId === this.props.filter)
                   .map(quiz => <TableRow key={quiz.id}><TableCell><Link to={`/quizzes/${quiz.id}`}>{quiz.texts[0].title}</Link></TableCell></TableRow>)}
@@ -92,6 +100,10 @@ class App extends React.Component<any, any> {
         </div>)
     }
 
+    const newq = () => {
+      return () => <p>new</p>
+    }
+
     return (
       <div>
         <Router>
@@ -104,10 +116,11 @@ class App extends React.Component<any, any> {
                     <Button onClick={this.logout}>logout</Button>
                   </Toolbar>
                 </AppBar>
-                <div style={{ height: 80 }}/>
+                <div style={{ height: 80 }} />
               </div>
               <Route exact={true} path='/' component={Dashboard} />
               <Route exact={true} path='/quizzes/:id' component={Quiz} />
+              <Route exact={true} path='/new' component={newq} />
             </div> :
             <div>
               <Route exact={true} path='/' component={Login} />
@@ -117,6 +130,9 @@ class App extends React.Component<any, any> {
       </div>
     );
   }
+
+  private MyLink = () => <Link to='/new'/>
+
 
   private handleSelect = (event) => {
     this.props.setFilter(event.target.value)
