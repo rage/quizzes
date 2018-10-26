@@ -5,6 +5,7 @@ import FormControl from '@material-ui/core/FormControl'
 import Grid from '@material-ui/core/Grid'
 import Input from '@material-ui/core/Input'
 import InputLabel from '@material-ui/core/InputLabel'
+import ListItem from '@material-ui/core/ListItem';
 import MenuItem from '@material-ui/core/MenuItem'
 import Paper from '@material-ui/core/Paper'
 import Select from '@material-ui/core/Select'
@@ -13,6 +14,7 @@ import TableBody from '@material-ui/core/TableBody'
 import TableCell from '@material-ui/core/TableCell'
 import TableHead from '@material-ui/core/TableHead'
 import TableRow from '@material-ui/core/TableRow'
+import TextField from '@material-ui/core/TextField'
 import Toolbar from '@material-ui/core/Toolbar'
 import Typography from '@material-ui/core/Typography'
 import * as React from 'react'
@@ -20,6 +22,7 @@ import { connect } from 'react-redux'
 import { BrowserRouter as Router, Link, Redirect, Route } from 'react-router-dom'
 import TMCApi from '../../common/src/services/TMCApi'
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
+import QuizForm from './components/quizForm'
 import { setFilter } from './store/filter/actions'
 import { setQuizzes } from './store/quizzes/actions'
 import { addUser, removeUser } from './store/user/actions'
@@ -59,17 +62,16 @@ class App extends React.Component<any, any> {
       )
     }
 
-
     const Dashboard = () => {
       return (
         <div>
           <div>
             <Toolbar style={{ marginBottom: 20 }}>
-              <Select value={this.props.filter} onChange={this.handleSelect} style={{ minWidth: 350 }}>
+              <Select value={this.props.filter || ''} onChange={this.handleSelect} style={{ minWidth: 350 }}>
                 {this.props.courses.map(course => <MenuItem key={course} value={course}>{course}</MenuItem>)}
               </Select>
               <Typography style={{ flex: 1 }} />
-              <Button component={this.MyLink}>New quiz</Button>
+              <Link to='/new' style={{ textDecoration: 'none' }}><Button>New quiz</Button></Link>
             </Toolbar>
             <Table>
               <TableHead>
@@ -100,10 +102,6 @@ class App extends React.Component<any, any> {
         </div>)
     }
 
-    const newq = () => {
-      return () => <p>new</p>
-    }
-
     return (
       <div>
         <Router>
@@ -120,19 +118,21 @@ class App extends React.Component<any, any> {
               </div>
               <Route exact={true} path='/' component={Dashboard} />
               <Route exact={true} path='/quizzes/:id' component={Quiz} />
-              <Route exact={true} path='/new' component={newq} />
+              <Route exact={true} path='/new' component={QuizForm} />
             </div> :
             <div>
               <Route exact={true} path='/' component={Login} />
               <Route exact={true} path='/quizzes/:id' component={Login} />
+              <Route exact={true} path='/new' component={Login} />
             </div>}
         </Router>
       </div>
     );
   }
 
-  private MyLink = () => <Link to='/new'/>
+  private MyLink = () => <Link to='/new' />
 
+  
 
   private handleSelect = (event) => {
     this.props.setFilter(event.target.value)

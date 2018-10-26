@@ -16,7 +16,7 @@ import {
   INewPeerReviewQuestion,
   INewQuizItem,
   INewQuizQuery,
-  INewQuizTranslation
+  INewQuizTranslation,
 } from "../types"
 import { getUUIDByString } from "../util"
 import { Course } from "./course"
@@ -26,7 +26,6 @@ import { QuizItem } from "./quiz_item"
 
 @Entity()
 export class Quiz extends BaseEntity {
-
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
@@ -102,7 +101,6 @@ export class Quiz extends BaseEntity {
 
 @Entity()
 export class QuizTranslation extends BaseEntity {
-  
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Promise<Quiz>
   @PrimaryColumn()
@@ -124,7 +122,7 @@ export class QuizTranslation extends BaseEntity {
   public createdAt: Date
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
-  
+
   constructor(data?: INewQuizTranslation) {
     super()
 

@@ -1,8 +1,8 @@
 import { Organization, Quiz, QuizItem } from "@quizzes/common/models"
 import {
+  INewQuizQuery,
   IQuizAnswerQuery,
   IQuizQuery,
-  INewQuizQuery,
 } from "@quizzes/common/types"
 import express, { Request, Response } from "express"
 import asyncHandler from "express-async-handler"

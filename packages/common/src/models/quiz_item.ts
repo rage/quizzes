@@ -22,7 +22,6 @@ import { QuizOption } from "./quiz_option"
 
 @Entity()
 export class QuizItem extends BaseEntity {
-
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
@@ -82,13 +81,10 @@ export class QuizItem extends BaseEntity {
       )
     }
   }
-
-
 }
 
 @Entity()
 export class QuizItemTranslation extends BaseEntity {
-
   @ManyToOne(type => QuizItem, qi => qi.id)
   public quizItem: Promise<QuizItem>
   @PrimaryColumn()
