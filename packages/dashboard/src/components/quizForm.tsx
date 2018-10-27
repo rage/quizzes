@@ -1,7 +1,16 @@
 import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@material-ui/core'
 import React from 'react'
 import { connect } from 'react-redux'
-import { IQuizQuery } from '../../../common/src/types/index'
+import {
+    INewPeerReviewQuestion,
+    INewPeerReviewQuestionTranslation, 
+    INewQuizItem, 
+    INewQuizItemTranslation,
+    INewQuizOption,
+    INewQuizOptionTranslation, 
+    INewQuizQuery, 
+    INewQuizTranslation 
+} from '../../../common/src/types/index'
 
 class QuizForm extends React.Component<any, any> {
 
@@ -46,7 +55,7 @@ class QuizForm extends React.Component<any, any> {
 
     private submitQuiz = (event) => {
         event.preventDefault()
-        const quiz: IQuizQuery = {
+        const quiz = {
             course: event.target.course.value
         
         }
