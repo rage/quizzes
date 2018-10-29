@@ -1,17 +1,58 @@
 import { Organization, Quiz, QuizItem } from "@quizzes/common/models"
 import {
+  INewQuizQuery,
   IQuizAnswerQuery,
   IQuizQuery,
-  INewQuizQuery,
 } from "@quizzes/common/types"
 import express, { Request, Response } from "express"
 import asyncHandler from "express-async-handler"
+import {
+  Body,
+  Get,
+  JsonController,
+  Param,
+  Post,
+  QueryParam,
+} from "routing-controllers"
 import { QuizService } from "services/quiz.service"
 import { QuizAnswerService } from "services/quizanswer.service"
+import { assertWrappingType } from "graphql"
+import { PromiseUtils } from "typeorm"
 
-const router = express.Router()
-const quizService = QuizService.getInstance()
-const quizAnswerService = QuizAnswerService.getInstance()
+@JsonController("/quizzes")
+export class QuizController {
+  private quizService = QuizService.getInstance()
+  private quizAnswerService = QuizAnswerService.getInstance()
+
+  @Get("/")
+  @Get("/:id")
+  public async get(
+    @Param("id") id: string,
+    @QueryParam("course") course: boolean = true,
+    @QueryParam("language") language: string,
+    @QueryParam("items") items: boolean = true,
+    @QueryParam("options") options: boolean = true,
+    @QueryParam("peerreviews") peerreviews: boolean = true,
+  ): Promise<Quiz[]> {
+    const query: IQuizQuery = {
+      id,
+      course,
+      language,
+      items,
+      options,
+      peerreviews,
+    }
+
+    return this.quizService.getQuizzes(query)
+  }
+
+  @Post("/")
+  public async post(@Body() quiz: Quiz): Promise<Quiz> {
+    console.log("got", quiz)
+    return await this.quizService.createQuiz(quiz)
+  }
+}
+/* const router = express.Router()
 
 router.get(
   ["/:id", "/"],
@@ -48,7 +89,8 @@ router.post(
 
     res.json(result)
   }),
-)
+) */
+
 /* router.get(
   "/",
   asyncHandler(async (req: Request, res: Response) => {
@@ -83,4 +125,4 @@ router.post(
   }),
 ) */
 
-export default router
+// export default router

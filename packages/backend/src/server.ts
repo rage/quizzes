@@ -1,8 +1,14 @@
-require("module-alias/register") // tslint-disable-line no-var-requires
+// tslint:disable-next-line:no-var-requires
+require("module-alias/register")
 import errorHandler from "errorhandler"
 
 import "@quizzes/common/config/database"
+import path from "path"
+import { useExpressServer } from "routing-controllers"
 import app from "./app"
+import controllers from "./controllers"
+
+const API_PATH = process.env.API_PATH || "/api/v1"
 
 /**
  * Error Handler. Provides full stack - remove for production
@@ -12,7 +18,13 @@ app.use(errorHandler())
 /**
  * Start Express server.
  */
-const server = app.listen(app.get("port"), () => {
+
+const expressApp = useExpressServer(app, {
+  routePrefix: API_PATH,
+  controllers,
+})
+
+expressApp.listen(app.get("port"), () => {
   console.log(
     "  App is running at http://localhost:%d in %s mode",
     app.get("port"),
@@ -21,4 +33,4 @@ const server = app.listen(app.get("port"), () => {
   console.log("  Press CTRL-C to stop\n")
 })
 
-export default server
+export default expressApp

@@ -105,32 +105,36 @@ export class QuizService {
       }
     }
 
-    const res = await queryBuilder.getMany()
-
-    return Promise.all(
-      res.map(async (quiz: Quiz) => {
-        if (quiz.items) {
-          quiz.items = PromiseUtils.extractValue(quiz.items)
-          console.log(quiz.items)
-        }
-        return quiz
-      }),
-    )
-    // return await queryBuilder.getMany()
+    return await queryBuilder.getMany()
   }
 
-  public async createQuiz(query: INewQuizQuery): Promise<Quiz> {
+  public async createQuiz(quiz: Quiz): Promise<Quiz> {
     const course: Course = await Course.findOne(
-      query.courseId || getUUIDByString("default"),
+      quiz.courseId || getUUIDByString("default"),
     )
 
-    const newQuiz: Quiz = new Quiz({ ...query, id: randomUUID() })
-    const savedQuiz = await newQuiz.save()
+    let newQuiz: Quiz
 
-    if (savedQuiz.items) {
-      const items: QuizItem[] = await savedQuiz.items
+    if (quiz.id) {
+      newQuiz = await Quiz.findOne({ id: quiz.id })
+    }
 
-      items.map(async item => {
+    console.log("quizservice got", quiz)
+
+    if (!newQuiz) {
+      newQuiz = new Quiz(quiz)
+      newQuiz = await newQuiz.save()
+    } else {
+      // todo: assign actual types
+      console.log("before", newQuiz)
+      newQuiz = Object.assign(newQuiz, quiz)
+      console.log("after", newQuiz)
+    }
+
+    if (quiz.items) {
+      const items: QuizItem[] = await quiz.items
+
+      items.map(async (item: QuizItem) => {
         const savedItem = await item.save()
 
         if (savedItem.options) {
@@ -141,7 +145,7 @@ export class QuizService {
       })
     }
 
-    return savedQuiz
+    return await newQuiz
   }
 
   public async updateQuiz(quiz: Quiz): Promise<Quiz> {

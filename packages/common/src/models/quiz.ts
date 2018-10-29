@@ -26,41 +26,53 @@ import { getUUIDByString, randomUUID } from "../util"
 
 @Entity()
 export class Quiz extends BaseEntity {
-  constructor(data?: INewQuizQuery) {
+  constructor(data?: Quiz) {
     super()
 
     if (!data) {
       return
     }
 
-    if (data.id) {
-      this.id = data.id
-    }
+    this.id = data.id || randomUUID()
     this.courseId = data.courseId || getUUIDByString("default")
     this.part = data.part || 0
     this.section = data.section || 0
     this.deadline = data.deadline
     this.open = data.open
 
+    console.log(this)
+    console.log("data", data)
     if (data.texts) {
-      this.texts = data.texts.map(
-        (text: INewQuizTranslation) =>
-          new QuizTranslation({ ...text, quizId: data.id }),
-      )
+      this.texts = data.texts.map((text: QuizTranslation) => {
+        const qt = new QuizTranslation()
+
+        return Object.assign(qt, { ...text, quizId: this.id })
+      })
     }
 
     if (data.items) {
-      this.items = Promise.all(
-        data.items.map(
-          (item: INewQuizItem) =>
-            new QuizItem({ ...item, quizId: data.id, id: randomUUID() }),
-        ),
-      )
+      console.log("data items", data.items)
+      this.items = this.resolveItems(data.items)
+      console.log("we have items", this.items)
     }
 
     /*     if (data.peerReviewQuestions) {
       this.peerReviewQuestions = data.peerReviewQuestions.map((prq: INewPeerReviewQuestion) => new PeerReviewQuestion({ ...prq, quiz: this }))
     } */
+  }
+
+  private async resolveItems(
+    items: QuizItem[] | Promise<QuizItem[]>,
+  ): Promise<QuizItem[]> {
+    const newItems = await items
+
+    return Promise.all(
+      newItems.map(async (item: QuizItem) => {
+        const qi = new QuizItem(item)
+
+        return Object.assign(qi, { ...item, quizId: this.id })
+      }),
+    )
   }
 
   @PrimaryGeneratedColumn("uuid")
@@ -88,7 +100,7 @@ export class Quiz extends BaseEntity {
   public open?: Date
 
   @OneToMany(type => QuizItem, qi => qi.quiz, { lazy: true, cascade: true }) // was: not eager
-  public items: Promise<QuizItem[]>
+  public items: Promise<QuizItem[]> | QuizItem[]
 
   @OneToMany(type => PeerReviewQuestion, prq => prq.quiz, { lazy: true }) // was: not eager
   public peerReviewQuestions: Promise<PeerReviewQuestion[]>
@@ -104,7 +116,7 @@ export class Quiz extends BaseEntity {
 
 @Entity()
 export class QuizTranslation extends BaseEntity {
-  constructor(data?: INewQuizTranslation) {
+  constructor(data?: QuizTranslation) {
     super()
 
     console.log(data)
@@ -114,7 +126,7 @@ export class QuizTranslation extends BaseEntity {
     }
 
     if (data.quiz) {
-      this.quiz = PromiseUtils.create(data.quiz)
+      this.quiz = data.quiz
     }
     if (data.quizId) {
       this.quizId = data.quizId

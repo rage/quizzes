@@ -7,6 +7,7 @@ import {
   OneToMany,
   PrimaryColumn,
   PrimaryGeneratedColumn,
+  PromiseUtils,
   RelationId,
   UpdateDateColumn,
 } from "typeorm"
@@ -23,13 +24,16 @@ import { randomUUID } from "../util"
 
 @Entity()
 export class QuizItem extends BaseEntity {
-  constructor(data: INewQuizItem = {} as INewQuizItem) {
+  constructor(data?: QuizItem) {
     super()
 
     if (!data) {
       return
     }
 
+    if (data.quiz) {
+      this.quiz = data.quiz
+    }
     if (data.quizId) {
       this.quizId = data.quizId
     }
@@ -42,20 +46,23 @@ export class QuizItem extends BaseEntity {
     this.formatRegex = data.formatRegex
 
     if (data.texts) {
-      this.texts = data.texts.map(
-        (text: INewQuizItemTranslation) =>
-          new QuizItemTranslation({ ...text, quizItemId: this.id }),
-      )
+      this.texts = data.texts.map((text: QuizItemTranslation) => {
+        const qit = new QuizItemTranslation(text)
+        qit.quizItemId = this.id
+
+        return qit
+      })
     }
     if (data.options) {
-      this.options = Promise.all(
-        data.options.map(
-          (option: INewQuizOption) =>
-            new QuizOption({
-              ...option,
-              quizItemId: this.id,
-              id: randomUUID(),
-            }),
+      this.options = data.options.then((options: QuizOption[]) =>
+        Promise.all(
+          options.map((option: QuizOption) => {
+            const qo = new QuizOption(option)
+            qo.quizItemId = this.id
+            qo.id = randomUUID()
+
+            return qo
+          }),
         ),
       )
     }
@@ -65,7 +72,7 @@ export class QuizItem extends BaseEntity {
   public id: string
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
-  public quiz: Promise<Quiz>
+  public quiz: Promise<Quiz> | Quiz
   @Column()
   public quizId: string
 
@@ -102,7 +109,7 @@ export class QuizItem extends BaseEntity {
 
 @Entity()
 export class QuizItemTranslation extends BaseEntity {
-  constructor(data: INewQuizItemTranslation = {} as INewQuizItemTranslation) {
+  constructor(data?: QuizItemTranslation) {
     super()
 
     if (!data) {

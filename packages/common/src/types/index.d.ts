@@ -91,7 +91,7 @@ export interface INewQuizItem {
 }
 
 export interface INewQuizItemTranslation {
-  quizItem?: Promise<QuizItem>
+  quizItem?: Promise<QuizItem> | QuizItem
   quizItemId?: string
   languageId: string
   title?: string
@@ -110,7 +110,7 @@ export interface INewQuizOption {
 }
 
 export interface INewQuizOptionTranslation {
-  quizOption?: Promise<QuizOption>
+  quizOption?: Promise<QuizOption> | QuizOption
   quizOptionId?: string
   languageId: string
   title: string

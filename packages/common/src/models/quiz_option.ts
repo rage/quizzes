@@ -15,7 +15,7 @@ import { INewQuizOption, INewQuizOptionTranslation } from "../types"
 
 @Entity()
 export class QuizOption extends BaseEntity {
-  constructor(data: INewQuizOption = {} as INewQuizOption) {
+  constructor(data?: QuizOption) {
     super()
 
     if (!data) {
@@ -32,10 +32,12 @@ export class QuizOption extends BaseEntity {
     this.correct = data.correct
 
     if (data.texts) {
-      this.texts = data.texts.map(
-        (text: INewQuizOptionTranslation) =>
-          new QuizOptionTranslation({ ...text, quizOptionId: data.id }),
-      )
+      this.texts = data.texts.map((text: QuizOptionTranslation) => {
+        const qot = new QuizOptionTranslation(text)
+        qot.quizOptionId = data.id
+
+        return qot
+      })
     }
   }
 
@@ -43,9 +45,9 @@ export class QuizOption extends BaseEntity {
   public id: string
 
   @ManyToOne(type => QuizItem, qi => qi.id)
-  public quizItem: Promise<QuizItem>
-  @Column()
-  public quizItemId: string
+  public quizItem: Promise<QuizItem> | QuizItem
+  @Column({ nullable: true })
+  public quizItemId: string | null
 
   @Column("int")
   public order: number
@@ -66,9 +68,7 @@ export class QuizOption extends BaseEntity {
 
 @Entity()
 export class QuizOptionTranslation extends BaseEntity {
-  constructor(
-    data: INewQuizOptionTranslation = {} as INewQuizOptionTranslation,
-  ) {
+  constructor(data?: QuizOptionTranslation) {
     super()
 
     if (!data) {

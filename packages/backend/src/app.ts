@@ -16,14 +16,8 @@ import { schema } from "./graphql/schema"
 // Load environment variables from .env file, where API keys and passwords are configured
 dotenv.config({ path: ".env" })
 
-// Controllers (route handlers)
-import rootController from "./controllers"
-
 // Create Express server
 const app = express()
-const router = express.Router()
-
-const API_PATH = process.env.API_PATH || "/api/v1"
 
 // Express configuration
 app.set("port", process.env.PORT || 3000)
@@ -42,19 +36,7 @@ app.use(lusca.xframe("SAMEORIGIN"))
 app.use(lusca.xssProtection(true))
 
 app.use(express.static(path.join(__dirname, "public"), { maxAge: 31557600000 }))
-/**
- * Primary app routes.
- */
-/* app.get(
-  API_PATH,
-  passport.authenticate("bearer", { session: false }),
-  homeController.index,
-) */
 
-app.use(`${API_PATH}/`, rootController)
-/* app.get(`${API_PATH}/quizzes/:language`, homeController.getQuizzes)
-app.get("/user/:userId", homeController.userTest)
- */
 const apiEntryPoint = "/graphql"
 
 app.use(
