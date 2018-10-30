@@ -12,6 +12,7 @@ import {
 import { Language } from "./language"
 import { QuizItem } from "./quiz_item"
 import { INewQuizOption, INewQuizOptionTranslation } from "../types"
+import { randomUUID } from "../util"
 
 @Entity()
 export class QuizOption extends BaseEntity {
@@ -22,22 +23,18 @@ export class QuizOption extends BaseEntity {
       return
     }
 
-    if (data.id) {
-      this.id = data.id
-    }
+    this.id = data.id || randomUUID()
     if (data.quizItemId) {
       this.quizItemId = data.quizItemId
     }
     this.order = data.order
     this.correct = data.correct
+    this.texts = data.texts
 
-    if (data.texts) {
-      this.texts = data.texts.map((text: QuizOptionTranslation) => {
-        const qot = new QuizOptionTranslation(text)
-        qot.quizOptionId = data.id
-
-        return qot
-      })
+    if (this.texts) {
+      this.texts.forEach(
+        (text: QuizOptionTranslation) => (text.quizOptionId = this.id),
+      )
     }
   }
 
@@ -45,7 +42,7 @@ export class QuizOption extends BaseEntity {
   public id: string
 
   @ManyToOne(type => QuizItem, qi => qi.id)
-  public quizItem: Promise<QuizItem> | QuizItem
+  public quizItem: Promise<QuizItem>
   @Column({ nullable: true })
   public quizItemId: string | null
 

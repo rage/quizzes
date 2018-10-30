@@ -31,39 +31,24 @@ export class QuizItem extends BaseEntity {
       return
     }
 
-    if (data.quiz) {
-      this.quiz = data.quiz
-    }
     if (data.quizId) {
       this.quizId = data.quizId
     }
-    if (data.id) {
-      this.id = data.id
-    }
+    this.id = data.id || randomUUID()
     this.type = data.type
     this.order = data.order
     this.validityRegex = data.validityRegex
     this.formatRegex = data.formatRegex
+    this.texts = data.texts
 
-    if (data.texts) {
-      this.texts = data.texts.map((text: QuizItemTranslation) => {
-        const qit = new QuizItemTranslation(text)
-        qit.quizItemId = this.id
-
-        return qit
-      })
+    if (this.texts) {
+      this.texts.forEach(
+        (text: QuizItemTranslation) => (text.quizItemId = this.id),
+      )
     }
-    if (data.options) {
-      this.options = data.options.then((options: QuizOption[]) =>
-        Promise.all(
-          options.map((option: QuizOption) => {
-            const qo = new QuizOption(option)
-            qo.quizItemId = this.id
-            qo.id = randomUUID()
-
-            return qo
-          }),
-        ),
+    if (this.options) {
+      this.options.forEach(
+        (option: QuizOption) => (option.quizItemId = this.id),
       )
     }
   }
@@ -72,7 +57,7 @@ export class QuizItem extends BaseEntity {
   public id: string
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
-  public quiz: Promise<Quiz> | Quiz
+  public quiz: Promise<Quiz>
   @Column()
   public quizId: string
 
@@ -86,7 +71,7 @@ export class QuizItem extends BaseEntity {
 
   @OneToMany(type => QuizItemTranslation, qit => qit.quizItem, {
     eager: true,
-    cascade: true,
+    // cascade: true,
   })
   public texts: QuizItemTranslation[]
 
@@ -94,7 +79,7 @@ export class QuizItem extends BaseEntity {
     eager: true,
     cascade: true,
   }) // was: not eager
-  public options: Promise<QuizOption[]>
+  public options: QuizOption[]
 
   @Column({ nullable: true })
   public validityRegex?: string

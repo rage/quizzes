@@ -39,46 +39,30 @@ export class Quiz extends BaseEntity {
     this.section = data.section || 0
     this.deadline = data.deadline
     this.open = data.open
+    this.texts = data.texts
+    this.items = data.items
+    this.peerReviewQuestions = data.peerReviewQuestions
 
-    console.log(this)
-    console.log("data", data)
-    if (data.texts) {
-      this.texts = data.texts.map((text: QuizTranslation) => {
-        const qt = new QuizTranslation()
-
-        return Object.assign(qt, { ...text, quizId: this.id })
-      })
+    if (this.texts) {
+      this.texts.forEach((text: QuizTranslation) => (text.quizId = this.id))
     }
 
-    if (data.items) {
-      console.log("data items", data.items)
-      this.items = this.resolveItems(data.items)
-      console.log("we have items", this.items)
+    if (this.items) {
+      this.items.forEach((item: QuizItem) => (item.quizId = this.id))
     }
 
-    /*     if (data.peerReviewQuestions) {
-      this.peerReviewQuestions = data.peerReviewQuestions.map((prq: INewPeerReviewQuestion) => new PeerReviewQuestion({ ...prq, quiz: this }))
-    } */
-  }
-
-  private async resolveItems(
-    items: QuizItem[] | Promise<QuizItem[]>,
-  ): Promise<QuizItem[]> {
-    const newItems = await items
-
-    return Promise.all(
-      newItems.map(async (item: QuizItem) => {
-        const qi = new QuizItem(item)
-
-        return Object.assign(qi, { ...item, quizId: this.id })
-      }),
-    )
+    if (this.peerReviewQuestions) {
+      // note: constructors not implemented, I guess
+      this.peerReviewQuestions.forEach(
+        (question: PeerReviewQuestion) => (question.quizId = this.id),
+      )
+    }
   }
 
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(type => Course, course => course.id, { eager: true })
+  @ManyToOne(type => Course, course => course.id, { lazy: true })
   public course: Course
   @Column()
   public courseId: string
@@ -99,11 +83,11 @@ export class Quiz extends BaseEntity {
   @Column({ type: "timestamp", nullable: true })
   public open?: Date
 
-  @OneToMany(type => QuizItem, qi => qi.quiz, { lazy: true, cascade: true }) // was: not eager
-  public items: Promise<QuizItem[]> | QuizItem[]
+  @OneToMany(type => QuizItem, qi => qi.quiz, { eager: true, cascade: true }) // was: not eager
+  public items?: QuizItem[]
 
-  @OneToMany(type => PeerReviewQuestion, prq => prq.quiz, { lazy: true }) // was: not eager
-  public peerReviewQuestions: Promise<PeerReviewQuestion[]>
+  @OneToMany(type => PeerReviewQuestion, prq => prq.quiz, { eager: true }) // was: not eager
+  public peerReviewQuestions: PeerReviewQuestion[]
 
   @Column({ default: false })
   public excludedFromScore: boolean
