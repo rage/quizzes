@@ -48,6 +48,7 @@ export class Quiz extends BaseEntity {
     }
 
     if (this.items) {
+      console.log("got to constructor?")
       this.items.forEach((item: QuizItem) => (item.quizId = this.id))
     }
 

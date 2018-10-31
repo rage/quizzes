@@ -51,6 +51,7 @@ export class QuizOption extends BaseEntity {
 
   @OneToMany(type => QuizOptionTranslation, qot => qot.quizOption, {
     eager: true,
+    cascade: true,
   })
   public texts: QuizOptionTranslation[]
 

@@ -40,6 +40,7 @@ export class QuizItem extends BaseEntity {
     this.validityRegex = data.validityRegex
     this.formatRegex = data.formatRegex
     this.texts = data.texts
+    this.options = data.options
 
     if (this.texts) {
       this.texts.forEach(
@@ -71,7 +72,7 @@ export class QuizItem extends BaseEntity {
 
   @OneToMany(type => QuizItemTranslation, qit => qit.quizItem, {
     eager: true,
-    // cascade: true,
+    cascade: true,
   })
   public texts: QuizItemTranslation[]
 

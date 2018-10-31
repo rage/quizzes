@@ -19,6 +19,7 @@ import {
   INewQuizOptionTranslation,
   INewPeerReviewQuestion,
 } from "@quizzes/common/types"
+import db from "@quizzes/common/config/database"
 import { getUUIDByString, insert, randomUUID } from "@quizzes/common/util"
 import _ from "lodash"
 import {
@@ -26,6 +27,9 @@ import {
   SelectQueryBuilder,
   PromiseUtils,
   BaseEntity,
+  getManager,
+  EntityManager,
+  TransactionManager,
 } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import quizanswerService from "./quizanswer.service"
@@ -72,7 +76,6 @@ export class QuizService {
     }
 
     if (items) {
-      console.log("should not get here")
       queryBuilder
         .leftJoinAndSelect("quiz.items", "quiz_item")
         .leftJoinAndSelect("quiz_item.texts", "quiz_item_translation")
@@ -122,75 +125,45 @@ export class QuizService {
 
     await course */
 
-    let newQuiz: Quiz
+    let newQuiz: Quiz = quiz
 
     if (quiz.id) {
       newQuiz = await Quiz.findOne({ id: quiz.id })
+      newQuiz = Object.assign({}, newQuiz, quiz) // TODO: better update
     }
 
-    console.log("quizservice got", quiz)
+    console.log("quizservice got", newQuiz)
 
-    if (!newQuiz) {
-      newQuiz = new Quiz(quiz)
-      newQuiz = await newQuiz.save()
-    } else {
-      // todo: assign actual types
-      console.log("before", newQuiz)
-      newQuiz = Object.assign(newQuiz, quiz)
-      console.log("after", newQuiz)
+    await getManager().transaction(async tem => {
+      newQuiz = new Quiz(newQuiz)
 
-      newQuiz = await newQuiz.save()
-    }
-
-    if (newQuiz.items) {
       newQuiz.items = await Promise.all(
-        newQuiz.items.map(async (item: QuizItem) => {
+        (newQuiz.items || []).map(async item => {
           const newItem: QuizItem = new QuizItem(item)
 
-          if (item.texts) {
-            newItem.texts = await Promise.all(
-              item.texts.map(async (text: QuizItemTranslation) => {
-                const newTranslation: QuizItemTranslation = new QuizItemTranslation(
-                  text,
-                )
-                text = await newTranslation.save()
+          newItem.texts = (newItem.texts || []).map(
+            text => new QuizItemTranslation(text),
+          )
+          newItem.options = await Promise.all(
+            (newItem.options || []).map(async option => {
+              const newOption: QuizOption = new QuizOption(option)
 
-                return text
-              }),
-            )
-          }
+              newOption.texts = (newOption.texts || []).map(
+                text => new QuizOptionTranslation(text),
+              )
 
-          if (item.options) {
-            newItem.options = await Promise.all(
-              item.options.map(async (option: QuizOption) => {
-                const newOption: QuizOption = new QuizOption(option)
+              return newOption
+            }),
+          )
 
-                if (option.texts) {
-                  newOption.texts = await Promise.all(
-                    option.texts.map(async (text: QuizOptionTranslation) => {
-                      const newTranslation: QuizOptionTranslation = new QuizOptionTranslation(
-                        text,
-                      )
-                      text = await newTranslation.save()
-
-                      return text
-                    }),
-                  )
-                }
-
-                option = await newOption.save()
-
-                return option
-              }),
-            )
-          }
-
-          return await newItem.save()
+          return newItem
         }),
       )
-    }
 
-    return await newQuiz
+      newQuiz = await tem.save(newQuiz)
+    })
+
+    return newQuiz
   }
 
   public async updateQuiz(quiz: Quiz): Promise<Quiz> {
