@@ -1,10 +1,11 @@
 import { createAction } from "typesafe-actions"
+import { Quiz } from "../../../../common/src/models/quiz"
 import { getQuizzes } from "../../services/quizzes"
 import * as Courses from "../courses/actions"
 import * as Filter from "../filter/actions"
 
 export const set = createAction("quizzes/SET", resolve => {
-  return (quizzes: any) => resolve(quizzes)
+  return (quizzes: Quiz[]) => resolve(quizzes)
 })
 
 export const clear = createAction("quizzes/CLEAR")
@@ -12,7 +13,7 @@ export const clear = createAction("quizzes/CLEAR")
 export const setQuizzes = () => {
   return async dispatch => {
     try {
-      const data = await getQuizzes()
+      const data: Quiz[] = await getQuizzes()
       const cSet = new Set()
       data.map(quiz => cSet.add(quiz.courseId))
       const courses = Array.from(cSet)

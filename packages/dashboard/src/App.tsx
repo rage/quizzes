@@ -20,14 +20,17 @@ import Typography from '@material-ui/core/Typography'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { BrowserRouter as Router, Link, Redirect, Route } from 'react-router-dom'
+import { Quiz } from '../../../../common/src/models/quiz'
 import TMCApi from '../../common/src/services/TMCApi'
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
 import QuizForm from './components/quizForm'
+import { setEdit } from './store/edit/actions'
 import { setFilter } from './store/filter/actions'
 import { setQuizzes } from './store/quizzes/actions'
 import { addUser, removeUser } from './store/user/actions'
 
-class App extends React.Component<any, any> {
+
+class App extends React.Component<IDispatchProps & IStateProps, any> {
 
   public async componentDidMount() {
     const user = TMCApi.checkStore()
@@ -89,9 +92,18 @@ class App extends React.Component<any, any> {
       )
     }
 
-    const Quiz = ({ match }) => {
+    const Switch = ({ match }) => {
       const quiz = this.props.quizzes.find(q => q.id === match.params.id)
-      console.log(quiz)
+      if (quiz) {
+        this.props.setEdit(quiz)
+        return <QuizForm/>
+      } else {
+        return <div>new</div>
+      }
+    }
+
+    const QuizView = ({ match }) => {
+      const quiz = this.props.quizzes.find(q => q.id === match.params.id)
       if (!quiz) {
         return <p>loading..</p>
       }
@@ -117,7 +129,7 @@ class App extends React.Component<any, any> {
                 <div style={{ height: 80 }} />
               </div>
               <Route exact={true} path='/' component={Dashboard} />
-              <Route exact={true} path='/quizzes/:id' component={Quiz} />
+              <Route exact={true} path='/quizzes/:id' component={QuizView} />
               <Route exact={true} path='/new' component={QuizForm} />
             </div> :
             <div>
@@ -163,6 +175,21 @@ class App extends React.Component<any, any> {
   }
 }
 
+interface IDispatchProps {
+  addUser: typeof addUser,
+  setEdit: typeof setEdit,
+  setFilter: typeof setFilter,
+  setQuizzes: typeof setQuizzes,
+  removeUser: typeof removeUser
+}
+
+interface IStateProps {
+  courses: any,
+  filter: string,
+  quizzes: Array<typeof Quiz>,
+  user: ITMCProfile
+}
+
 const mapStateToProps = (state: any) => {
   return {
     courses: state.courses,
@@ -174,9 +201,10 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = {
   addUser,
+  setEdit,
   setFilter,
   setQuizzes,
   removeUser
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default connect<IStateProps, IDispatchProps>(mapStateToProps, mapDispatchToProps)(App)
