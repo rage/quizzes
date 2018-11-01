@@ -39,3 +39,6 @@ dist
 coverage
 
 userinfo.json
+
+# Ignore vscode rest client
+test.rest
