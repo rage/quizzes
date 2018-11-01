@@ -1,9 +1,16 @@
 import dotenv from "dotenv"
 import "reflect-metadata"
-import { Connection, createConnection, EntitySchema } from "typeorm"
-
+import {
+  Connection,
+  createConnection,
+  useContainer,
+  EntitySchema,
+} from "typeorm"
+import { Container } from "typedi" // TODO: check if these are properly added
 import * as Models from "../models"
 import { SnakeNamingStrategy } from "./snake_naming"
+
+useContainer(Container)
 
 interface IDB {
   conn: Connection | undefined

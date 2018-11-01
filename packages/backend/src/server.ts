@@ -4,9 +4,16 @@ import errorHandler from "errorhandler"
 
 import "@quizzes/common/config/database"
 import path from "path"
-import { useExpressServer } from "routing-controllers"
+import {
+  useContainer as routingUseContainer,
+  useExpressServer,
+} from "routing-controllers"
+import { Container } from "typedi"
+import { useContainer as typeormUseContainer } from "typeorm"
 import app from "./app"
 import controllers from "./controllers"
+
+routingUseContainer(Container)
 
 const API_PATH = process.env.API_PATH || "/api/v1"
 
