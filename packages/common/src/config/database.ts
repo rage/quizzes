@@ -6,13 +6,40 @@ import {
   useContainer,
   EntitySchema,
 } from "typeorm"
-import { Container } from "typedi" // TODO: check if these are properly added
+import { Container, Service } from "typedi" // TODO: check if these are properly added
 import * as Models from "../models"
 import { SnakeNamingStrategy } from "./snake_naming"
 
-useContainer(Container)
+@Service()
+export class Database {
+  private conn: Connection
 
-interface IDB {
+  public async connect(): Promise<Connection> {
+    if (this.conn) {
+      await this.conn.connect()
+      return this.conn
+    }
+
+    useContainer(Container)
+
+    this.conn = await createConnection({
+      database: process.env.DB_NAME || "quizzes",
+      entities: Object.values(Models),
+      host: process.env.DB_HOST || "/var/run/postgresql",
+      logging: !!process.env.DB_LOGGING || true,
+      namingStrategy: new SnakeNamingStrategy(),
+      password: process.env.DB_PASSWORD || undefined,
+      synchronize: true,
+      type: "postgres",
+      username: process.env.DB_USER || undefined,
+    })
+
+    return this.conn
+  }
+}
+
+export default Database
+/* interface IDB {
   conn: Connection | undefined
   promise: Promise<Connection> | undefined
 }
@@ -34,4 +61,4 @@ db.promise = createConnection({
   username: process.env.DB_USER || undefined,
 }).then((conn: Connection) => (db.conn = conn))
 
-export default db
+export default db */

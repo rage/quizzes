@@ -1,43 +1,28 @@
 // tslint:disable-next-line:no-var-requires
 require("module-alias/register")
-import errorHandler from "errorhandler"
 
-import "@quizzes/common/config/database"
-import path from "path"
-import {
-  useContainer as routingUseContainer,
-  useExpressServer,
-} from "routing-controllers"
+import { Database } from "@quizzes/common/config/database"
+import dotenv from "dotenv"
 import { Container } from "typedi"
-import { useContainer as typeormUseContainer } from "typeorm"
-import app from "./app"
-import controllers from "./controllers"
+import { App } from "./app"
 
-routingUseContainer(Container)
+dotenv.config({ path: ".env" })
 
-const API_PATH = process.env.API_PATH || "/api/v1"
+const app = Container.get(App).getApp()
+const database = Container.get(Database)
+const port = process.env.PORT || 3000
 
-/**
- * Error Handler. Provides full stack - remove for production
- */
-app.use(errorHandler())
+database.connect()
 
 /**
  * Start Express server.
  */
 
-const expressApp = useExpressServer(app, {
-  routePrefix: API_PATH,
-  controllers,
-})
-
-expressApp.listen(app.get("port"), () => {
+app.listen(port, () => {
   console.log(
     "  App is running at http://localhost:%d in %s mode",
-    app.get("port"),
+    port,
     app.get("env"),
   )
   console.log("  Press CTRL-C to stop\n")
 })
-
-export default expressApp
