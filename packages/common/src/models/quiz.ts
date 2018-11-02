@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -33,7 +34,6 @@ export class Quiz extends BaseEntity {
       return
     }
 
-    this.id = data.id || randomUUID()
     this.courseId = data.courseId || getUUIDByString("default")
     this.part = data.part || 0
     this.section = data.section || 0
@@ -42,6 +42,11 @@ export class Quiz extends BaseEntity {
     this.texts = data.texts
     this.items = data.items
     this.peerReviewQuestions = data.peerReviewQuestions
+  }
+
+  @BeforeInsert()
+  addRelations() {
+    this.id = this.id || randomUUID()
 
     if (this.texts) {
       this.texts.forEach((text: QuizTranslation) => (text.quizId = this.id))
@@ -101,8 +106,6 @@ export class Quiz extends BaseEntity {
 export class QuizTranslation extends BaseEntity {
   constructor(data?: QuizTranslation) {
     super()
-
-    console.log(data)
 
     if (!data) {
       return

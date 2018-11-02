@@ -1,4 +1,4 @@
-import db from "@quizzes/common/config/database"
+import db, { Database } from "@quizzes/common/config/database"
 import {
   Course,
   PeerReviewQuestion,
@@ -22,7 +22,7 @@ import {
 } from "@quizzes/common/types"
 import { getUUIDByString, insert, randomUUID } from "@quizzes/common/util"
 import _ from "lodash"
-import { Service } from "typedi"
+import { Service, Container } from "typedi"
 import { InjectManager } from "typeorm-typedi-extensions"
 import {
   BaseEntity,
@@ -33,6 +33,7 @@ import {
   PromiseUtils,
   SelectQueryBuilder,
   TransactionManager,
+  AdvancedConsoleLogger,
 } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import quizanswerService from "./quizanswer.service"
@@ -45,11 +46,9 @@ export class QuizService {
   public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
     const { id, course, language, items, options, peerreviews } = query
 
-    console.log("got query", query)
-    const queryBuilder: SelectQueryBuilder<Quiz> = this.entityManager
-      .createQueryBuilder()
-      .select()
-      .from(Quiz, "quiz")
+    const queryBuilder: SelectQueryBuilder<
+      Quiz
+    > = this.entityManager.createQueryBuilder(Quiz, "quiz")
 
     if (id) {
       console.log(id)
