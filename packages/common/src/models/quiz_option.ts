@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -23,13 +24,17 @@ export class QuizOption extends BaseEntity {
       return
     }
 
-    this.id = data.id || randomUUID()
     if (data.quizItemId) {
       this.quizItemId = data.quizItemId
     }
     this.order = data.order
     this.correct = data.correct
     this.texts = data.texts
+  }
+
+  @BeforeInsert()
+  addRelations() {
+    this.id = this.id || randomUUID()
 
     if (this.texts) {
       this.texts.forEach(

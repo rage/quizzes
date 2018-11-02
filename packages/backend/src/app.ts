@@ -9,7 +9,11 @@ import bodyParser from "body-parser"
 import compression from "compression" // compresses requests
 import dotenv from "dotenv"
 import errorHandler from "errorhandler"
-import express, { Application } from "express"
+import express, {
+  Application,
+  RequestHandler,
+  ErrorRequestHandler,
+} from "express"
 import graphqlHTTP from "express-graphql"
 import expressValidator from "express-validator"
 import * as fs from "fs"
@@ -31,6 +35,22 @@ dotenv.config({ path: ".env" })
 export class App {
   private application: Application
 
+  private handlers: Array<RequestHandler | ErrorRequestHandler> = [
+    compression(),
+    bodyParser.json(),
+    bodyParser.urlencoded({ extended: true }),
+    expressValidator(),
+    morgan("combined", {
+      stream: {
+        write: (meta: any) => logger.info(meta),
+      },
+    }),
+    // lusca.xframe("SAMEORIGIN"),
+    // lusca.xssProtection(true),
+    express.static(path.join(__dirname, "public"), { maxAge: 31557600000 }),
+    errorHandler(),
+  ]
+
   public constructor() {
     useContainer(Container)
 
@@ -39,30 +59,13 @@ export class App {
       controllers,
     })
 
-    this.application.use(compression())
-    this.application.use(bodyParser.json())
-    this.application.use(bodyParser.urlencoded({ extended: true }))
-    this.application.use(expressValidator())
-    this.application.use(
-      morgan("combined", {
-        stream: {
-          write: (meta: any) => logger.info(meta),
-        },
-      }),
-    )
-    this.application.use(lusca.xframe("SAMEORIGIN"))
-    this.application.use(lusca.xssProtection(true))
+    this.handlers.forEach(handler => this.application.use(handler))
 
-    this.application.use(
-      express.static(path.join(__dirname, "public"), { maxAge: 31557600000 }),
-    )
-    this.application.use(errorHandler())
-
-    this.application.use(
+    /*     this.application.use(
       graphqlEntry,
       bodyParser.json(),
       graphqlHTTP({ schema, graphiql: true }),
-    )
+    ) */
   }
 
   public getApp(): Application {

@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -34,13 +35,17 @@ export class QuizItem extends BaseEntity {
     if (data.quizId) {
       this.quizId = data.quizId
     }
-    this.id = data.id || randomUUID()
     this.type = data.type
     this.order = data.order
     this.validityRegex = data.validityRegex
     this.formatRegex = data.formatRegex
     this.texts = data.texts
     this.options = data.options
+  }
+
+  @BeforeInsert()
+  addRelations() {
+    this.id = this.id || randomUUID()
 
     if (this.texts) {
       this.texts.forEach(
@@ -59,7 +64,7 @@ export class QuizItem extends BaseEntity {
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Promise<Quiz>
-  @Column()
+  @Column({ nullable: true })
   public quizId: string
 
   @Column({

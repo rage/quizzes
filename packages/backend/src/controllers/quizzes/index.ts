@@ -1,9 +1,18 @@
-import { Organization, Quiz, QuizItem } from "@quizzes/common/models"
+import {
+  Organization,
+  Quiz,
+  QuizItem,
+  QuizItemTranslation,
+  QuizTranslation,
+  QuizOptionTranslation,
+  QuizOption,
+} from "@quizzes/common/models"
 import {
   INewQuizQuery,
   IQuizAnswerQuery,
   IQuizQuery,
 } from "@quizzes/common/types"
+import { randomUUID } from "@quizzes/common/util"
 import express, { Request, Response } from "express"
 import asyncHandler from "express-async-handler"
 import {
@@ -20,10 +29,15 @@ import {
 import QuizService from "services/quiz.service"
 import { QuizAnswerService } from "services/quizanswer.service"
 import { Inject } from "typedi"
-import { PromiseUtils } from "typeorm"
+import { EntityManager } from "typeorm"
+import { EntityFromBody } from "typeorm-routing-controllers-extensions"
+import { InjectManager } from "typeorm-typedi-extensions"
 
 @JsonController("/quizzes")
 export class QuizController {
+  @InjectManager()
+  private entityManager: EntityManager
+
   @Inject()
   private quizService: QuizService
   @Inject()
@@ -57,7 +71,7 @@ export class QuizController {
     @QueryParam("items") items: boolean = true,
     @QueryParam("options") options: boolean = true,
     @QueryParam("peerreviews") peerreviews: boolean = true,
-  ): Promise<Quiz> {
+  ): Promise<Quiz[]> {
     const query: IQuizQuery = {
       id,
       course,
@@ -69,14 +83,19 @@ export class QuizController {
 
     const res: Quiz[] = await this.quizService.getQuizzes(query)
 
-    if (res.length > 0) {
+    return res
+    /*     if (res.length > 0) {
       return res[0]
     }
 
-    throw new NotFoundError(`quiz with id ${id} and given options not found`)
+    throw new NotFoundError(`quiz with id ${id} and given options not found`) */
   }
 
   @Post("/")
+  public async post(@EntityFromBody() quiz: Quiz): Promise<Quiz> {
+    return await this.entityManager.save(quiz)
+  }
+  /*   @Post("/")
   public async post(@Body({ required: true }) quiz: Quiz): Promise<Quiz> {
     console.log("got", quiz)
 
@@ -87,5 +106,5 @@ export class QuizController {
     }
 
     return newQuiz
-  }
+  } */
 }
