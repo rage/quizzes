@@ -1,68 +1,75 @@
+import "reflect-metadata"
+
+// tslint:disable-next-line:no-var-requires
+require("module-alias/register")
+
 import { passport } from "@quizzes/common/config/passport-tmc"
 import { logger } from "@quizzes/common/config/winston"
 import bodyParser from "body-parser"
 import compression from "compression" // compresses requests
 import cors from "cors"
 import dotenv from "dotenv"
-import express from "express"
+import errorHandler from "errorhandler"
+import express, {
+  Application,
+  RequestHandler,
+  ErrorRequestHandler,
+} from "express"
 import graphqlHTTP from "express-graphql"
 import expressValidator from "express-validator"
 import * as fs from "fs"
 import * as lusca from "lusca"
 import morgan from "morgan"
 import path from "path"
+import { createExpressServer, useContainer } from "routing-controllers"
 import stream from "stream"
+import { Container, Service } from "typedi"
+import controllers from "./controllers"
 import { schema } from "./graphql/schema"
 
-// Load environment variables from .env file, where API keys and passwords are configured
+const API_PATH = process.env.API_PATH || "/api/v1"
+const graphqlEntry = "/graphql"
+
 dotenv.config({ path: ".env" })
 
-// Controllers (route handlers)
-import rootController from "./controllers"
+@Service()
+export class App {
+  private application: Application
 
-// Create Express server
-const app = express()
-const router = express.Router()
+  private handlers: Array<RequestHandler | ErrorRequestHandler> = [
+    compression(),
+    bodyParser.json(),
+    bodyParser.urlencoded({ extended: true }),
+    expressValidator(),
+    morgan("combined", {
+      stream: {
+        write: (meta: any) => logger.info(meta),
+      },
+    }),
+    // lusca.xframe("SAMEORIGIN"),
+    // lusca.xssProtection(true),
+    express.static(path.join(__dirname, "public"), { maxAge: 31557600000 }),
+    errorHandler(),
+  ]
 
-const API_PATH = process.env.API_PATH || "/api/v1"
+  public constructor() {
+    useContainer(Container)
 
-// Express configuration
-app.set("port", process.env.PORT || 3000)
-app.use(compression())
-app.use(cors())
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
-app.use(expressValidator())
-app.use(
-  morgan("combined", {
-    stream: {
-      write: (meta: any) => logger.info(meta),
-    },
-  }),
-)
-app.use(lusca.xframe("SAMEORIGIN"))
-app.use(lusca.xssProtection(true))
+    this.application = createExpressServer({
+      routePrefix: API_PATH,
+      controllers,
+    })
 
-app.use(express.static(path.join(__dirname, "public"), { maxAge: 31557600000 }))
-/**
- * Primary app routes.
- */
-/* app.get(
-  API_PATH,
-  passport.authenticate("bearer", { session: false }),
-  homeController.index,
-) */
+    this.handlers.forEach(handler => this.application.use(handler))
 
-app.use(`${API_PATH}/`, rootController)
-/* app.get(`${API_PATH}/quizzes/:language`, homeController.getQuizzes)
-app.get("/user/:userId", homeController.userTest)
- */
-const apiEntryPoint = "/graphql"
+    /*     this.application.use(
+      graphqlEntry,
+      bodyParser.json(),
+      graphqlHTTP({ schema, graphiql: true }),
+    ) */
+  }
 
-app.use(
-  apiEntryPoint,
-  bodyParser.json(),
-  graphqlHTTP({ schema, graphiql: true }),
-)
-
-export default app
+  public getApp(): Application {
+    return this.application
+  }
+}

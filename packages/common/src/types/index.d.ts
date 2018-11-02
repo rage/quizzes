@@ -79,7 +79,8 @@ export interface INewQuizTranslation {
 }
 
 export interface INewQuizItem {
-  quiz?: Quiz
+  id?: string
+  quiz?: Quiz | Promise<Quiz>
   quizId?: string
   type: string
   order: number
@@ -90,7 +91,7 @@ export interface INewQuizItem {
 }
 
 export interface INewQuizItemTranslation {
-  quizItem?: QuizItem
+  quizItem?: Promise<QuizItem> | QuizItem
   quizItemId?: string
   languageId: string
   title?: string
@@ -100,6 +101,7 @@ export interface INewQuizItemTranslation {
 }
 
 export interface INewQuizOption {
+  id?: string
   quizItem?: QuizItem
   quizItemId?: string
   order: number
@@ -108,7 +110,7 @@ export interface INewQuizOption {
 }
 
 export interface INewQuizOptionTranslation {
-  quizOption?: QuizOption
+  quizOption?: Promise<QuizOption> | QuizOption
   quizOptionId?: string
   languageId: string
   title: string

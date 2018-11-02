@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -10,24 +11,27 @@ import {
   UpdateDateColumn,
 } from "typeorm"
 import { INewQuizOption, INewQuizOptionTranslation } from "../types"
+import { randomUUID } from "../util"
 import { Language } from "./language"
 import { QuizItem } from "./quiz_item"
 
 @Entity()
 export class QuizOption extends BaseEntity {
+
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
   @ManyToOne(type => QuizItem, qi => qi.id)
   public quizItem: Promise<QuizItem>
-  @Column()
-  public quizItemId: string
+  @Column({ nullable: true })
+  public quizItemId: string | null
 
   @Column("int")
   public order: number
 
   @OneToMany(type => QuizOptionTranslation, qot => qot.quizOption, {
     eager: true,
+    cascade: true,
   })
   public texts: QuizOptionTranslation[]
 
@@ -39,20 +43,28 @@ export class QuizOption extends BaseEntity {
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
 
-  constructor(data: INewQuizOption = {} as INewQuizOption) {
+  constructor(data?: QuizOption) {
     super()
 
     if (!data) {
       return
     }
 
+    if (data.quizItemId) {
+      this.quizItemId = data.quizItemId
+    }
     this.order = data.order
     this.correct = data.correct
+    this.texts = data.texts
+  }
 
-    if (data.texts) {
-      this.texts = data.texts.map(
-        (text: INewQuizOptionTranslation) =>
-          new QuizOptionTranslation({ ...text, quizOption: this }),
+  @BeforeInsert()
+  public addRelations() {
+    this.id = this.id || randomUUID()
+
+    if (this.texts) {
+      this.texts.forEach(
+        (text: QuizOptionTranslation) => (text.quizOptionId = this.id),
       )
     }
   }
@@ -60,6 +72,7 @@ export class QuizOption extends BaseEntity {
 
 @Entity()
 export class QuizOptionTranslation extends BaseEntity {
+
   @ManyToOne(type => QuizOption, qo => qo.id)
   public quizOption: Promise<QuizOption>
   @PrimaryColumn()
@@ -85,13 +98,15 @@ export class QuizOptionTranslation extends BaseEntity {
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
 
-  constructor(
-    data: INewQuizOptionTranslation = {} as INewQuizOptionTranslation,
-  ) {
+  constructor(data?: QuizOptionTranslation) {
     super()
 
     if (!data) {
       return
+    }
+
+    if (data.quizOptionId) {
+      this.quizOptionId = data.quizOptionId
     }
 
     this.languageId = data.languageId

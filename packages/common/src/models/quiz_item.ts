@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -7,6 +8,7 @@ import {
   OneToMany,
   PrimaryColumn,
   PrimaryGeneratedColumn,
+  PromiseUtils,
   RelationId,
   UpdateDateColumn,
 } from "typeorm"
@@ -16,18 +18,20 @@ import {
   INewQuizOption,
   INewQuizOptionTranslation,
 } from "../types"
+import { randomUUID } from "../util"
 import { Language } from "./language"
 import { Quiz } from "./quiz"
 import { QuizOption } from "./quiz_option"
 
 @Entity()
 export class QuizItem extends BaseEntity {
+
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Promise<Quiz>
-  @Column()
+  @Column({ nullable: true })
   public quizId: string
 
   @Column({
@@ -38,11 +42,17 @@ export class QuizItem extends BaseEntity {
   @Column("int")
   public order: number
 
-  @OneToMany(type => QuizItemTranslation, qit => qit.quizItem, { eager: true })
+  @OneToMany(type => QuizItemTranslation, qit => qit.quizItem, {
+    eager: true,
+    cascade: true,
+  })
   public texts: QuizItemTranslation[]
 
-  @OneToMany(type => QuizOption, qo => qo.quizItem, { eager: true }) // was: not eager
-  public options: Promise<QuizOption[]>
+  @OneToMany(type => QuizOption, qo => qo.quizItem, {
+    eager: true,
+    cascade: true,
+  }) // was: not eager
+  public options: QuizOption[]
 
   @Column({ nullable: true })
   public validityRegex?: string
@@ -54,30 +64,36 @@ export class QuizItem extends BaseEntity {
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
 
-  constructor(data: INewQuizItem = {} as INewQuizItem) {
+  constructor(data?: QuizItem) {
     super()
 
     if (!data) {
       return
     }
 
+    if (data.quizId) {
+      this.quizId = data.quizId
+    }
     this.type = data.type
     this.order = data.order
     this.validityRegex = data.validityRegex
     this.formatRegex = data.formatRegex
+    this.texts = data.texts
+    this.options = data.options
+  }
 
-    if (data.texts) {
-      this.texts = data.texts.map(
-        (text: INewQuizItemTranslation) =>
-          new QuizItemTranslation({ ...text, quizItem: this }),
+  @BeforeInsert()
+  public addRelations() {
+    this.id = this.id || randomUUID()
+
+    if (this.texts) {
+      this.texts.forEach(
+        (text: QuizItemTranslation) => (text.quizItemId = this.id),
       )
     }
-    if (data.options) {
-      this.options = Promise.all(
-        data.options.map(
-          (option: INewQuizOption) =>
-            new QuizOption({ ...option, quizItem: this }),
-        ),
+    if (this.options) {
+      this.options.forEach(
+        (option: QuizOption) => (option.quizItemId = this.id),
       )
     }
   }
@@ -85,6 +101,7 @@ export class QuizItem extends BaseEntity {
 
 @Entity()
 export class QuizItemTranslation extends BaseEntity {
+
   @ManyToOne(type => QuizItem, qi => qi.id)
   public quizItem: Promise<QuizItem>
   @PrimaryColumn()
@@ -110,11 +127,15 @@ export class QuizItemTranslation extends BaseEntity {
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
 
-  constructor(data: INewQuizItemTranslation = {} as INewQuizItemTranslation) {
+  constructor(data?: QuizItemTranslation) {
     super()
 
     if (!data) {
       return
+    }
+
+    if (data.quizItemId) {
+      this.quizItemId = data.quizItemId
     }
 
     this.languageId = data.languageId

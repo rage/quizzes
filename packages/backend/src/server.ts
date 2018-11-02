@@ -1,24 +1,28 @@
-require("module-alias/register") // tslint-disable-line no-var-requires
-import errorHandler from "errorhandler"
+// tslint:disable-next-line:no-var-requires
+require("module-alias/register")
 
-import "@quizzes/common/config/database"
-import app from "./app"
+import { Database } from "@quizzes/common/config/database"
+import dotenv from "dotenv"
+import { Container } from "typedi"
+import { App } from "./app"
 
-/**
- * Error Handler. Provides full stack - remove for production
- */
-app.use(errorHandler())
+dotenv.config({ path: ".env" })
+
+const app = Container.get(App).getApp()
+const database = Container.get(Database)
+const port = process.env.PORT || 3000
+
+database.connect()
 
 /**
  * Start Express server.
  */
-const server = app.listen(app.get("port"), () => {
+
+app.listen(port, () => {
   console.log(
     "  App is running at http://localhost:%d in %s mode",
-    app.get("port"),
+    port,
     app.get("env"),
   )
   console.log("  Press CTRL-C to stop\n")
 })
-
-export default server

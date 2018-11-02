@@ -1,86 +1,110 @@
-import { Organization, Quiz, QuizItem } from "@quizzes/common/models"
+import {
+  Organization,
+  Quiz,
+  QuizItem,
+  QuizItemTranslation,
+  QuizTranslation,
+  QuizOptionTranslation,
+  QuizOption,
+} from "@quizzes/common/models"
 import {
   INewQuizQuery,
   IQuizAnswerQuery,
   IQuizQuery,
 } from "@quizzes/common/types"
+import { randomUUID } from "@quizzes/common/util"
 import express, { Request, Response } from "express"
 import asyncHandler from "express-async-handler"
-import { QuizService } from "services/quiz.service"
+import {
+  BadRequestError,
+  Body,
+  Get,
+  JsonController,
+  NotFoundError,
+  Param,
+  Post,
+  QueryParam,
+  QueryParams,
+} from "routing-controllers"
+import QuizService from "services/quiz.service"
 import { QuizAnswerService } from "services/quizanswer.service"
+import { Inject } from "typedi"
+import { EntityManager } from "typeorm"
+import { EntityFromBody } from "typeorm-routing-controllers-extensions"
+import { InjectManager } from "typeorm-typedi-extensions"
 
-const router = express.Router()
-const quizService = QuizService.getInstance()
-const quizAnswerService = QuizAnswerService.getInstance()
+@JsonController("/quizzes")
+export class QuizController {
+  @InjectManager()
+  private entityManager: EntityManager
 
-router.get(
-  ["/:id", "/"],
-  asyncHandler(async (req: Request, res: Response) => {
-    const { id }: { id: string } = req.params
+  @Inject()
+  private quizService: QuizService
+  @Inject()
+  private quizAnswerService: QuizAnswerService
+
+  @Get("/")
+  public async getAll(
+    @QueryParam("course") course: boolean = true,
+    @QueryParam("language") language: string,
+    @QueryParam("items") items: boolean = true,
+    @QueryParam("options") options: boolean = true,
+    @QueryParam("peerreviews") peerreviews: boolean = true,
+  ): Promise<Quiz[]> {
     const query: IQuizQuery = {
-      id,
-      ...req.query,
+      id: null,
+      course,
+      language,
+      items,
+      options,
+      peerreviews,
     }
 
-    const result = await quizService.getQuizzes(query)
+    return await this.quizService.getQuizzes(query)
+  }
 
-    res.json(result)
-  }),
-)
+  @Get("/:id")
+  public async get(
+    @Param("id") id: string,
+    @QueryParam("course") course: boolean = true,
+    @QueryParam("language") language: string,
+    @QueryParam("items") items: boolean = true,
+    @QueryParam("options") options: boolean = true,
+    @QueryParam("peerreviews") peerreviews: boolean = true,
+  ): Promise<Quiz[]> {
+    const query: IQuizQuery = {
+      id,
+      course,
+      language,
+      items,
+      options,
+      peerreviews,
+    }
 
-router.get(
-  ["/:quiz_id/answers"],
-  asyncHandler(async (req: Request, res: Response) => {
-    const { quiz_id }: { quiz_id: string } = req.params
+    const res: Quiz[] = await this.quizService.getQuizzes(query)
 
-    const query: IQuizAnswerQuery = { quiz_id, ...req.query }
+    return res
+    /*     if (res.length > 0) {
+      return res[0]
+    }
 
-    const result = await quizAnswerService.getAnswers(query)
+    throw new NotFoundError(`quiz with id ${id} and given options not found`) */
+  }
 
-    res.json(result)
-  }),
-)
+  @Post("/")
+  public async post(@EntityFromBody() quiz: Quiz): Promise<Quiz> {
+    return await this.entityManager.save(quiz)
+  }
+  /*   @Post("/")
+  public async post(@Body({ required: true }) quiz: Quiz): Promise<Quiz> {
+    console.log("got", quiz)
 
-router.post(
-  ["/"],
-  asyncHandler(async (req: Request, res: Response) => {
-    const result = await quizService.createQuiz(req.body)
+    const newQuiz: Quiz = await this.quizService.createQuiz(quiz)
 
-    res.json(result)
-  }),
-)
-/* router.get(
-  "/",
-  asyncHandler(async (req: Request, res: Response) => {
-    const { language }: { language: string } = req.query
+    if (!newQuiz) {
+      throw new BadRequestError("couldn't create quiz")
+    }
 
-    const repository = getRepository(Quiz)
-    const quizzes: Quiz[] = await repository
-      .createQueryBuilder("quiz")
-      .leftJoinAndSelect("quiz.course", "course")
-      .leftJoinAndSelect("course.languages", "language")
-      .where("language.id = :language", { language })
-      .leftJoinAndSelect("quiz.texts", "quiz_translation")
-      // .where("quiz_translation.language_id = :language", { language })
-      .leftJoinAndSelect("quiz.items", "quiz_item")
-      //     .leftJoinAndSelect(
-      //      "quiz_item.texts",
-      //      "quiz_item_translation",
-      //      "quiz_item_translation.language_id = :language", { language })
-      .leftJoinAndSelect("quiz_item.options", "quiz_option")
-      //     .leftJoinAndSelect(
-      //      "quiz_option.texts",
-      //      "quiz_option_translation",
-      //      "quiz_option_translation.language_id = :language", { language })
-      .leftJoinAndSelect("quiz.peerReviewQuestions", "peer_review_question")
-      //     .leftJoinAndSelect(
-      //      "peer_review_question.texts",
-      //      "peer_review_question_translation",
-      //      "peer_review_question_translation.language_id = :language", { language })
-      .getMany()
-
-    res.json(quizzes)
-  }),
-) */
-
-export default router
+    return newQuiz
+  } */
+}

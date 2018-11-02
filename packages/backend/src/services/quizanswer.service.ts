@@ -1,18 +1,10 @@
 import { QuizAnswer, QuizItemAnswer } from "@quizzes/common/models"
 import { IQuizAnswerQuery } from "@quizzes/common/types"
+import { Service } from "typedi"
 import { SelectQueryBuilder } from "typeorm"
 
+@Service()
 export class QuizAnswerService {
-  public static getInstance(): QuizAnswerService {
-    if (!this.instance) {
-      this.instance = new this()
-    }
-
-    return this.instance
-  }
-
-  private static instance: QuizAnswerService
-
   public async getAnswers(query: IQuizAnswerQuery): Promise<QuizAnswer[]> {
     const { id, quiz_id, user_id } = query
 

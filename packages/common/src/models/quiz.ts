@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -18,7 +19,7 @@ import {
   INewQuizQuery,
   INewQuizTranslation,
 } from "../types"
-import { getUUIDByString } from "../util"
+import { getUUIDByString, randomUUID } from "../util"
 import { Course } from "./course"
 import { Language } from "./language"
 import { PeerReviewQuestion } from "./peer_review_question"
@@ -26,10 +27,11 @@ import { QuizItem } from "./quiz_item"
 
 @Entity()
 export class Quiz extends BaseEntity {
+
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(type => Course, course => course.id, { eager: true })
+  @ManyToOne(type => Course, course => course.id, { lazy: true })
   public course: Course
   @Column()
   public courseId: string
@@ -50,11 +52,11 @@ export class Quiz extends BaseEntity {
   @Column({ type: "timestamp", nullable: true })
   public open?: Date
 
-  @OneToMany(type => QuizItem, qi => qi.quiz, { lazy: true }) // was: not eager
-  public items: Promise<QuizItem[]>
+  @OneToMany(type => QuizItem, qi => qi.quiz, { eager: true, cascade: true }) // was: not eager
+  public items?: QuizItem[]
 
-  @OneToMany(type => PeerReviewQuestion, prq => prq.quiz, { lazy: true }) // was: not eager
-  public peerReviewQuestions: Promise<PeerReviewQuestion[]>
+  @OneToMany(type => PeerReviewQuestion, prq => prq.quiz, { eager: true }) // was: not eager
+  public peerReviewQuestions: PeerReviewQuestion[]
 
   @Column({ default: false })
   public excludedFromScore: boolean
@@ -64,43 +66,46 @@ export class Quiz extends BaseEntity {
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
 
-  constructor(data?: INewQuizQuery) {
+  constructor(data?: Quiz) {
     super()
 
-    console.log("quiz constructor got", data)
-    if (!data || (data && !data.id)) {
+    if (!data) {
       return
     }
 
-    if (data.id) {
-      this.id = data.id
-    }
     this.courseId = data.courseId || getUUIDByString("default")
     this.part = data.part || 0
     this.section = data.section || 0
     this.deadline = data.deadline
     this.open = data.open
+    this.texts = data.texts
+    this.items = data.items
+    this.peerReviewQuestions = data.peerReviewQuestions
+  }
 
-    if (data.texts) {
-      // this.texts = data.texts.map()
+  @BeforeInsert()
+  public addRelations() {
+    this.id = this.id || randomUUID()
+
+    if (this.texts) {
+      this.texts.forEach((text: QuizTranslation) => (text.quizId = this.id))
     }
 
-    /*     if (data.items) {
-      this.items = 
-        Promise.all(data.items.map(
-          async (item: QuizItem) => new QuizItem(await item),
-        ))
-      
-    } */
+    if (this.items) {
+      this.items.forEach((item: QuizItem) => (item.quizId = this.id))
+    }
 
-    /*     if (data.peerReviewQuestions) {
-      this.peerReviewQuestions = data.peerReviewQuestions.map((prq: INewPeerReviewQuestion) => new PeerReviewQuestion({ ...prq, quiz: this }))
-    } */
+    if (this.peerReviewQuestions) {
+      this.peerReviewQuestions.forEach(
+        (question: PeerReviewQuestion) => (question.quizId = this.id),
+      )
+    }
   }
 }
 
 @Entity()
 export class QuizTranslation extends BaseEntity {
+
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Promise<Quiz>
   @PrimaryColumn()
@@ -123,17 +128,16 @@ export class QuizTranslation extends BaseEntity {
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
 
-  constructor(data?: INewQuizTranslation) {
+  constructor(data?: QuizTranslation) {
     super()
-
-    console.log(data)
 
     if (!data) {
       return
     }
 
-    console.log("translation constructor received", data)
-
+    if (data.quiz) {
+      this.quiz = data.quiz
+    }
     if (data.quizId) {
       this.quizId = data.quizId
     }
