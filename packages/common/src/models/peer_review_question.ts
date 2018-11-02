@@ -9,9 +9,9 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm"
+import { getUUIDByString, randomUUID } from "../util"
 import { Language } from "./language"
 import { PeerReviewQuestionCollection } from "./peer_review_question_collection"
-import { getUUIDByString, randomUUID } from "../util"
 import { Quiz } from "./quiz"
 
 @Entity()

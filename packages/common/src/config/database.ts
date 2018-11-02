@@ -1,12 +1,12 @@
 import dotenv from "dotenv"
 import "reflect-metadata"
+import { Container, Service } from "typedi"
 import {
   Connection,
   createConnection,
-  useContainer,
   EntitySchema,
+  useContainer,
 } from "typeorm"
-import { Container, Service } from "typedi" // TODO: check if these are properly added
 import * as Models from "../models"
 import { SnakeNamingStrategy } from "./snake_naming"
 

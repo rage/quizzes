@@ -47,6 +47,7 @@
     "request-promise": "^4.2.2",
     "stream": "0.0.2",
     "tmc-client-js": "0.0.9",
+    "typedi": "^0.8.0",
     "typeorm": "^0.3.0-alpha.11",
     "uuid-by-string": "^0.6.0",
     "validate.js": "^0.12.0",
