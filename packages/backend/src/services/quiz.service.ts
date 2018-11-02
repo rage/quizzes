@@ -1,60 +1,68 @@
+import db from "@quizzes/common/config/database"
 import {
   Course,
   PeerReviewQuestion,
+  PeerReviewQuestionTranslation,
   Quiz,
   QuizItem,
-  QuizTranslation,
   QuizItemTranslation,
   QuizOption,
   QuizOptionTranslation,
-  PeerReviewQuestionTranslation,
+  QuizTranslation,
 } from "@quizzes/common/models"
 import {
-  INewQuizQuery,
-  IQuizQuery,
-  INewQuizTranslation,
+  INewPeerReviewQuestion,
   INewQuizItem,
   INewQuizItemTranslation,
   INewQuizOption,
   INewQuizOptionTranslation,
-  INewPeerReviewQuestion,
+  INewQuizQuery,
+  INewQuizTranslation,
+  IQuizQuery,
 } from "@quizzes/common/types"
-import db from "@quizzes/common/config/database"
 import { getUUIDByString, insert, randomUUID } from "@quizzes/common/util"
 import _ from "lodash"
+import { Service } from "typedi"
+import { InjectManager } from "typeorm-typedi-extensions"
 import {
-  InsertResult,
-  SelectQueryBuilder,
-  PromiseUtils,
   BaseEntity,
-  getManager,
+  Brackets,
   EntityManager,
+  getManager,
+  InsertResult,
+  PromiseUtils,
+  SelectQueryBuilder,
   TransactionManager,
 } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import quizanswerService from "./quizanswer.service"
 
+@Service()
 export class QuizService {
-  public static getInstance(): QuizService {
-    if (!this.instance) {
-      this.instance = new this()
-    }
-
-    return this.instance
-  }
-
-  private static instance: QuizService
+  @InjectManager()
+  private entityManager: EntityManager
 
   public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
     const { id, course, language, items, options, peerreviews } = query
 
     console.log("got query", query)
-    const queryBuilder: SelectQueryBuilder<Quiz> = Quiz.createQueryBuilder(
-      "quiz",
-    )
+    const queryBuilder: SelectQueryBuilder<Quiz> = this.entityManager
+      .createQueryBuilder()
+      .select()
+      .from(Quiz, "quiz")
 
     if (id) {
+      console.log(id)
       queryBuilder.where("quiz.id = :id", { id })
+      console.log("after id", queryBuilder.getQuery())
+    }
+
+    if (language) {
+      console.log("language")
+      queryBuilder.andWhere("quiz_translation.language_id = :language", {
+        language,
+      })
+      console.log("after language", queryBuilder.getQuery())
     }
 
     if (course) {
@@ -63,17 +71,11 @@ export class QuizService {
       if (language) {
         queryBuilder
           .leftJoinAndSelect("course.languages", "language")
-          .where("language.id = :language", { language })
+          .andWhere("language.id = :language", { language })
       }
     }
 
     queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
-
-    if (language) {
-      queryBuilder.where("quiz_translation.language_id = :language", {
-        language,
-      })
-    }
 
     if (items) {
       queryBuilder
@@ -81,9 +83,13 @@ export class QuizService {
         .leftJoinAndSelect("quiz_item.texts", "quiz_item_translation")
 
       if (language) {
-        queryBuilder.where("quiz_item_translation.language_id = :language", {
-          language,
-        })
+        queryBuilder.andWhere(
+          new Brackets(qb => {
+            qb.where("quiz_item_translation.language_id = :language", {
+              language,
+            }).orWhere("quiz_item_translation.language_id is null")
+          }),
+        )
       }
     }
 
@@ -93,9 +99,13 @@ export class QuizService {
         .leftJoinAndSelect("quiz_option.texts", "quiz_option_translation")
 
       if (language) {
-        queryBuilder.where("quiz_option_translation.language_id = :language", {
-          language,
-        })
+        queryBuilder.andWhere(
+          new Brackets(qb => {
+            qb.where("quiz_option_translation.language_id = :language", {
+              language,
+            }).orWhere("quiz_option_translation.language_id is null")
+          }),
+        )
       }
     }
 
@@ -108,14 +118,27 @@ export class QuizService {
         )
 
       if (language) {
-        queryBuilder.where(
-          "peer_review_question_translation.language_id = :language",
-          { language },
+        queryBuilder.andWhere(
+          new Brackets(qb => {
+            qb.where(
+              "peer_review_question_translation.language_id = :language",
+              { language },
+            ).orWhere("peer_review_question_translation is null")
+          }),
         )
       }
     }
 
-    return await queryBuilder.getMany()
+    console.log(queryBuilder.getQuery())
+
+    return await queryBuilder
+      .getMany()
+      .then(
+        async (quizzes: Quiz[]) =>
+          await Promise.all(
+            quizzes.map(async (q: Quiz) => this.stripQuiz(q, query)),
+          ),
+      )
   }
 
   public async createQuiz(quiz: Quiz): Promise<Quiz> {
@@ -127,58 +150,97 @@ export class QuizService {
 
     let newQuiz: Quiz = quiz
 
-    if (quiz.id) {
+    /*     if (quiz.id) {
       newQuiz = await Quiz.findOne({ id: quiz.id })
       newQuiz = Object.assign({}, newQuiz, quiz) // TODO: better update
-    }
+    } */
 
     console.log("quizservice got", newQuiz)
 
-    await getManager().transaction(async tem => {
-      newQuiz = new Quiz(newQuiz)
+    try {
+      await this.entityManager.transaction(async tem => {
+        newQuiz = new Quiz(newQuiz)
 
-      newQuiz.items = await Promise.all(
-        (newQuiz.items || []).map(async item => {
-          const newItem: QuizItem = new QuizItem(item)
+        newQuiz.items = await Promise.all(
+          // these don't necessarily need promises
+          (newQuiz.items || []).map(async item => {
+            const newItem: QuizItem = new QuizItem(item)
 
-          newItem.texts = (newItem.texts || []).map(
-            text => new QuizItemTranslation(text),
-          )
-          newItem.options = await Promise.all(
-            (newItem.options || []).map(async option => {
-              const newOption: QuizOption = new QuizOption(option)
+            newItem.texts = (newItem.texts || []).map(
+              text => new QuizItemTranslation(text),
+            )
+            newItem.options = await Promise.all(
+              (newItem.options || []).map(async option => {
+                const newOption: QuizOption = new QuizOption(option)
 
-              newOption.texts = (newOption.texts || []).map(
-                text => new QuizOptionTranslation(text),
-              )
+                newOption.texts = (newOption.texts || []).map(
+                  text => new QuizOptionTranslation(text),
+                )
 
-              return newOption
-            }),
-          )
+                return newOption
+              }),
+            )
 
-          return newItem
-        }),
-      )
+            return newItem
+          }),
+        )
 
-      newQuiz = await tem.save(newQuiz)
-    })
+        newQuiz = await tem.save(newQuiz)
+      })
+    } catch (err) {
+      return null
+    }
 
-    return newQuiz
+    await newQuiz.course
+
+    return await newQuiz
   }
 
   public async updateQuiz(quiz: Quiz): Promise<Quiz> {
-    return await Quiz.save(quiz)
+    return await this.entityManager.save(quiz)
   }
 
   public async deleteQuiz(id: string): Promise<boolean> {
     try {
-      await Quiz.delete({ id })
+      await this.entityManager.delete(Quiz, { id })
 
       return true
     } catch {
       return false
     }
   }
+
+  private async stripQuiz(quiz: Quiz, options: IQuizQuery): Promise<Quiz> {
+    await quiz.course
+
+    if (options.language) {
+      quiz.texts = quiz.texts.filter(t => t.languageId === options.language)
+    }
+
+    if (options.items) {
+      if (!options.options) {
+        quiz.items.forEach(item => {
+          item.options = []
+        })
+      }
+
+      if (options.language) {
+        quiz.items.forEach(item => {
+          item.texts = item.texts.filter(t => t.languageId === options.language)
+          item.options.forEach(
+            option =>
+              (option.texts = option.texts.filter(
+                t => t.languageId === options.language,
+              )),
+          )
+        })
+      }
+    } else {
+      quiz.items = []
+    }
+
+    return await quiz
+  }
 }
 
-export default { QuizService }
+export default QuizService
