@@ -17,7 +17,6 @@ import { QuizItem } from "./quiz_item"
 
 @Entity()
 export class QuizOption extends BaseEntity {
-
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
@@ -72,7 +71,6 @@ export class QuizOption extends BaseEntity {
 
 @Entity()
 export class QuizOptionTranslation extends BaseEntity {
-
   @ManyToOne(type => QuizOption, qo => qo.id)
   public quizOption: Promise<QuizOption>
   @PrimaryColumn()

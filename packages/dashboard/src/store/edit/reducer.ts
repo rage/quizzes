@@ -5,7 +5,9 @@ import {
 } from "../../../../common/src/types/index"
 import * as edit from "./actions"
 
-const initialState = {}
+const initialState = {
+  __course__: "",
+}
 
 export const editReducer = (state = initialState, action) => {
   switch (action.type) {

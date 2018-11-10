@@ -24,7 +24,7 @@ import { Quiz } from '../../../../common/src/models/quiz'
 import TMCApi from '../../common/src/services/TMCApi'
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
 import QuizForm from './components/quizForm'
-import { setEdit } from './store/edit/actions'
+import { newQuiz, setEdit } from './store/edit/actions'
 import { setFilter } from './store/filter/actions'
 import { setQuizzes } from './store/quizzes/actions'
 import { addUser, removeUser } from './store/user/actions'
@@ -71,7 +71,7 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
           <div>
             <Toolbar style={{ marginBottom: 20 }}>
               <Select value={this.props.filter || ''} onChange={this.handleSelect} style={{ minWidth: 350 }}>
-                {this.props.courses.map(course => <MenuItem key={course} value={course}>{course}</MenuItem>)}
+                {this.props.courses.map(course => <MenuItem key={course.id} value={course.id}>{course.id}</MenuItem>)}
               </Select>
               <Typography style={{ flex: 1 }} />
               <Link to='/new' style={{ textDecoration: 'none' }}><Button>New quiz</Button></Link>
@@ -96,9 +96,10 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
       const quiz = this.props.quizzes.find(q => q.id === match.params.id)
       if (quiz) {
         this.props.setEdit(quiz)
-        return <QuizForm/>
+        return <QuizForm />
       } else {
-        return <div>new</div>
+        this.props.newQuiz()
+        return <QuizForm />
       }
     }
 
@@ -129,8 +130,8 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
                 <div style={{ height: 80 }} />
               </div>
               <Route exact={true} path='/' component={Dashboard} />
-              <Route exact={true} path='/quizzes/:id' component={QuizView} />
-              <Route exact={true} path='/new' component={QuizForm} />
+              <Route exact={true} path='/quizzes/:id' component={Switch} />
+              <Route exact={true} path='/new' component={Switch} />
             </div> :
             <div>
               <Route exact={true} path='/' component={Login} />
@@ -177,6 +178,7 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
 
 interface IDispatchProps {
   addUser: typeof addUser,
+  newQuiz: typeof newQuiz,
   setEdit: typeof setEdit,
   setFilter: typeof setFilter,
   setQuizzes: typeof setQuizzes,
@@ -201,6 +203,7 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = {
   addUser,
+  newQuiz,
   setEdit,
   setFilter,
   setQuizzes,

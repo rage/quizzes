@@ -5,7 +5,7 @@ import {
   Connection,
   createConnection,
   EntitySchema,
-  useContainer
+  useContainer,
 } from "typeorm"
 import * as Models from "../models"
 import { SnakeNamingStrategy } from "./snake_naming"

@@ -16,7 +16,6 @@ import { Quiz } from "./quiz"
 
 @Entity()
 export class PeerReviewQuestion extends BaseEntity {
-
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
@@ -81,7 +80,6 @@ export class PeerReviewQuestion extends BaseEntity {
 
 @Entity()
 export class PeerReviewQuestionTranslation extends BaseEntity {
-  
   @ManyToOne(type => PeerReviewQuestion, prq => prq.id)
   public peerReviewQuestion: Promise<PeerReviewQuestion>
   @PrimaryColumn()

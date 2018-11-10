@@ -15,3 +15,9 @@ export const setEdit = (quiz: INewQuizQuery) => {
     dispatch(set(quiz))
   }
 }
+
+export const newQuiz = () => {
+  return dispatch => {
+    dispatch(newq)
+  }
+}
