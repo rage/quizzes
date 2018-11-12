@@ -56,13 +56,12 @@ export class App {
     useContainer(Container)
 
     this.application = createExpressServer({
+      cors: true,
       routePrefix: API_PATH,
       controllers,
-      cors: true,
-      middlewares: this.handlers,
     })
 
-    // this.handlers.forEach(handler => this.application.use(handler))
+    this.handlers.forEach(handler => this.application.use(handler))
 
     /*     this.application.use(
       graphqlEntry,

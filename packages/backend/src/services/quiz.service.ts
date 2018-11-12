@@ -50,6 +50,8 @@ export class QuizService {
       Quiz
     > = this.entityManager.createQueryBuilder(Quiz, "quiz")
 
+    queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
+
     if (id) {
       console.log(id)
       queryBuilder.where("quiz.id = :id", { id })
@@ -73,8 +75,6 @@ export class QuizService {
           .andWhere("language.id = :language", { language })
       }
     }
-
-    queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
 
     if (items) {
       queryBuilder

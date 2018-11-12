@@ -13,12 +13,6 @@ import {
   UpdateDateColumn,
 } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
-import {
-  INewPeerReviewQuestion,
-  INewQuizItem,
-  INewQuizQuery,
-  INewQuizTranslation,
-} from "../types"
 import { getUUIDByString, randomUUID } from "../util"
 import { Course } from "./course"
 import { Language } from "./language"
@@ -30,7 +24,7 @@ export class Quiz extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(type => Course, course => course.id, { lazy: true })
+  @ManyToOne(type => Course, course => course.id, { eager: true }) // was: lazy
   public course: Course
   @Column()
   public courseId: string
@@ -83,7 +77,7 @@ export class Quiz extends BaseEntity {
   }
 
   @BeforeInsert()
-  public addRelations() {
+  private addRelations() {
     this.id = this.id || randomUUID()
 
     if (this.texts) {

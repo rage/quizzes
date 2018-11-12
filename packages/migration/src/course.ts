@@ -1,6 +1,13 @@
-import { Course, Language, Organization } from "@quizzes/common/models"
+import {
+  Course,
+  CourseTranslation,
+  Language,
+  Organization,
+} from "@quizzes/common/models"
 import { progressBar } from "./util"
-import { getUUIDByString } from "@quizzes/common/util"
+import { getUUIDByString, insert } from "@quizzes/common/util"
+import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
+import { InsertResult } from "typeorm"
 
 const courseIDs = {
   "cybersecurity-intro": "en_US",
@@ -38,6 +45,7 @@ export async function migrateCourses(
   languages: { [languageID: string]: Language },
 ): Promise<{ [courseID: string]: Course }> {
   const courses: { [key: string]: Course } = {}
+  const courseTranslations: Array<QueryPartialEntity<CourseTranslation>> = []
 
   const existingCourses = await Course.find({})
   if (existingCourses.length > 0) {
@@ -45,7 +53,7 @@ export async function migrateCourses(
     for (const course of existingCourses) {
       courses[course.id] = course
     }
-    return courses
+    return Promise.resolve(courses)
   }
 
   const bar = progressBar("Creating courses", Object.entries(courseIDs).length)
@@ -58,9 +66,29 @@ export async function migrateCourses(
           organizationId: org.id,
           languages: [languages[languageID]],
         }).save()
+        courseTranslations.push({
+          courseId: uuid,
+          languageId: languageID,
+          abbreviation: courseID,
+          title: courseID,
+        })
         bar.tick()
       },
     ),
   )
-  return courses
+
+  // await insert(Course, courses)
+  await insert(
+    CourseTranslation,
+    courseTranslations,
+    `"course_id", "language_id"`,
+  )
+
+  /*   const newCourses: { [courseID: string] : Course } = {}
+  
+  for (const course of await Course.find({})) {
+    newCourses[course.id] = await course
+  } */
+
+  return courses // I guess it won't need the translations in migration
 }

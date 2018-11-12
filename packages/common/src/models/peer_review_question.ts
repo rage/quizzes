@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -61,13 +62,17 @@ export class PeerReviewQuestion extends BaseEntity {
       return
     }
 
-    this.id = data.id || randomUUID()
     this.quizId = data.quizId
     this.collectionId = data.collectionId // TODO: what to do with these
     this.texts = data.texts
     this.type = data.type
     this.answerRequired = data.answerRequired
     this.order = data.order
+  }
+
+  @BeforeInsert()
+  private addRelations() {
+    this.id = this.id || randomUUID()
 
     if (this.texts) {
       this.texts.forEach(
@@ -108,7 +113,7 @@ export class PeerReviewQuestionTranslation extends BaseEntity {
     }
 
     this.peerReviewQuestionId = data.peerReviewQuestionId
-    this.languageId = data.languageId || getUUIDByString("default")
+    this.languageId = data.languageId || "unknown"
     this.title = data.title
     this.body = data.body
   }

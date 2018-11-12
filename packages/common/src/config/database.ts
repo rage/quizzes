@@ -1,6 +1,6 @@
 import dotenv from "dotenv"
 import "reflect-metadata"
-import { Container, Service } from "typedi" // TODO: check if these are properly added
+import { Container, Service } from "typedi"
 import {
   Connection,
   createConnection,
@@ -26,13 +26,21 @@ export class Database {
       database: process.env.DB_NAME || "quizzes",
       entities: Object.values(Models),
       host: process.env.DB_HOST || "/var/run/postgresql",
-      logging: !!process.env.DB_LOGGING || true,
+      logging: !!process.env.DB_LOGGING || false, // true,
       namingStrategy: new SnakeNamingStrategy(),
       password: process.env.DB_PASSWORD || undefined,
       synchronize: true,
       type: "postgres",
       username: process.env.DB_USER || undefined,
     })
+
+    return this.conn
+  }
+
+  public async getConnection(): Promise<Connection> {
+    if (!this.conn) {
+      await this.connect()
+    }
 
     return this.conn
   }

@@ -1,4 +1,4 @@
-import db from "@quizzes/common/config/database"
+import { Database } from "@quizzes/common/config/database"
 import {
   Quiz,
   QuizAnswer,
@@ -7,6 +7,7 @@ import {
   QuizOptionAnswer,
   User,
 } from "@quizzes/common/models"
+import { Container } from "typedi"
 import { QueryFailedError } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
@@ -18,6 +19,10 @@ export async function migrateQuizAnswers(
   users: { [userID: string]: User },
 ): Promise<{ [answerID: string]: boolean }> {
   console.log("Querying quiz answers...")
+
+  const database = Container.get(Database)
+  const conn = await database.getConnection()
+
   const answers = await QNQuizAnswer.find({})
   const bar = progressBar("Migrating quiz answers", answers.length)
   let quizNotFound = 0
@@ -81,10 +86,10 @@ export async function migrateQuizAnswers(
                   const answerID = getUUIDByString(answer._id)
                   quizAnswers.push({
                     id: answerID,
-                    quiz: quiz.id, // was: quizId:
-                    user: user.id, // was: userId:
+                    quizId: quiz.id,
+                    userId: user.id,
                     status,
-                    language: quiz.course.languages[0].id, // was: languageId
+                    languageId: (await quiz.course).languages[0].id,
                     createdAt: answer.createdAt,
                     updatedAt: answer.updatedAt,
                   })
@@ -230,7 +235,7 @@ export async function migrateQuizAnswers(
   )
 
   console.log("Deprecating duplicate answers...")
-  await db.conn.query(`
+  await conn.query(`
     UPDATE quiz_answer
     SET status='deprecated'
     WHERE id IN (

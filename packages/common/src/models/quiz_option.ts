@@ -10,7 +10,6 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm"
-import { INewQuizOption, INewQuizOptionTranslation } from "../types"
 import { randomUUID } from "../util"
 import { Language } from "./language"
 import { QuizItem } from "./quiz_item"
@@ -58,7 +57,7 @@ export class QuizOption extends BaseEntity {
   }
 
   @BeforeInsert()
-  public addRelations() {
+  private addRelations() {
     this.id = this.id || randomUUID()
 
     if (this.texts) {

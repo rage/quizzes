@@ -13,6 +13,7 @@ import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import oldQuizTypes from "./app-modules/constants/quiz-types"
 import { getUUIDByString, insert } from "@quizzes/common/util"
 import { progressBar, safeGet } from "./util"
+import { AdvancedConsoleLogger } from "typeorm"
 
 export async function migrateQuizzes(courses: {
   [key: string]: Course
@@ -77,6 +78,7 @@ export async function migrateQuizzes(courses: {
     const quiz: QueryPartialEntity<Quiz> = {
       id: getUUIDByString(oldQuiz._id),
       course,
+      courseId: course.id,
       part,
       section,
       excludedFromScore,
@@ -84,6 +86,9 @@ export async function migrateQuizzes(courses: {
       updatedAt: oldQuiz.updatedAt,
     }
     quizzes.push(quiz)
+    if (!quiz.course) {
+      console.log("course: ", quiz.course)
+    }
     quizTranslations.push({
       quizId: quiz.id,
       languageId,
