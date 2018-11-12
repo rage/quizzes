@@ -1,3 +1,4 @@
+import _ from "lodash"
 import { ActionType, createAction } from "typesafe-actions"
 import {
   INewQuizQuery,
@@ -19,5 +20,14 @@ export const setEdit = (quiz: INewQuizQuery) => {
 export const newQuiz = () => {
   return dispatch => {
     dispatch(newq)
+  }
+}
+
+export const changeAttr = (path, value) => {
+  return (dispatch, getState) => {
+    const quiz = Object.assign({}, getState().edit)
+    _.set(quiz, path, value)
+    console.log(quiz === getState().edit)
+    dispatch(set(quiz))
   }
 }

@@ -13,6 +13,7 @@ import {
     INewQuizQuery,
     INewQuizTranslation
 } from '../../../common/src/types/index'
+import { changeAttr } from '../store/edit/actions'
 
 class QuizForm extends React.Component<any, any> {
 
@@ -27,16 +28,26 @@ class QuizForm extends React.Component<any, any> {
 
     public render() {
 
-        /* if (!this.props.edit.__course__) {
-            return <p>loading</p>
-        } */
-
-        const TabContainer = () => {
-            const quizText = this.props.edit.texts.find(t => t.languageId === this.state.language) || this.props.edit.texts[0]
+        const TabContainer = (props: any) => {
+            console.log(props.kakka)
             return (
                 <div>
-                    <TextField label='Title' name='title' value={quizText.title} margin="normal" fullWidth={true} />
-                    <TextField label='Body' name="body" value={quizText.body} margin="normal" fullWidth={true} multiline={true} rowsMax="10" />
+                    <TextField
+                        onChange={this.handleChange(`texts[${props.index}].title`)}
+                        label='Title'
+                        value={this.props.edit.texts[props.index].title} 
+                        margin="normal"
+                        fullWidth={true}
+                    />
+                    <TextField
+                        onChange={this.handleChange(`texts[${props.index}].body`)}
+                        label='Body'
+                        value={this.props.edit.texts[props.index].body}
+                        margin="normal"
+                        fullWidth={true}
+                        multiline={true}
+                        rowsMax="10"
+                    />
                 </div>
             )
         }
@@ -55,7 +66,7 @@ class QuizForm extends React.Component<any, any> {
                             {this.props.edit.__course__.languages.map(l => <Tab value={l.id} key={l.id} label={l.id} />) || ""}
                             <Tab label="add" onClick={this.addLanguage} />
                         </Tabs>
-                        <TabContainer />
+                        {this.props.edit.__course__.languages.map((l, i) => (this.state.language === l.id && <TabContainer key={l.name} index={i} kakka={l} />))}
                     </div> :
                     <p />
                 }
@@ -67,6 +78,10 @@ class QuizForm extends React.Component<any, any> {
                 </div>
             </form>
         )
+    }
+
+    private handleChange = path => event => {
+        this.props.changeAttr(path, event.target.value)
     }
 
     private addLanguage = () => {
@@ -99,11 +114,8 @@ class QuizForm extends React.Component<any, any> {
 
     private submitQuiz = (event) => {
         event.preventDefault()
-        const quiz = {
-            course: event.target.course.value
-
-        }
-        console.log(event.target.course.value)
+        console.log(event.target.title_fi_FI.value)
+        console.log(event.target.title_en_US.value)
     }
 }
 
@@ -117,4 +129,8 @@ const mapStateToProps = (state: any) => {
     }
 }
 
-export default connect(mapStateToProps)(QuizForm)
+const mapDispatchToProps = {
+    changeAttr
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(QuizForm)
