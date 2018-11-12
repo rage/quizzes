@@ -19,7 +19,7 @@ async function main() {
   console.log("Connecting to Postgres")
 
   const database = Container.get(Database)
-  database.connect()
+  await database.connect()
 
   console.log("Connecting to MongoDB")
   await mongoUtils.connect(

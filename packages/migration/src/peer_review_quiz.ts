@@ -95,7 +95,7 @@ async function migratePeerReviewQuestion(
     Array<QueryPartialEntity<PeerReviewQuestionTranslation>>
   ]
 > {
-  const languageId = quiz.course.languages[0].id
+  const languageId = (await quiz.course).languages[0].id
 
   const peerReviewSample = await QNPeerReview.findOne({
     $or: [{ quizId: oldPRQ._id }, { sourceQuizId: oldPRQ._id }],

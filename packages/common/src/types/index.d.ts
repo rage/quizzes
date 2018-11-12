@@ -56,6 +56,11 @@ export interface IQuizAnswerQuery {
   user_id?: number
 }
 
+interface ICourseQuery {
+  language?: string
+  id?: string
+}
+
 export interface INewQuizQuery {
   id?: string
   courseId?: string

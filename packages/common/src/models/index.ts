@@ -2,7 +2,7 @@ export { Language } from "./language"
 export { Organization } from "./organization"
 export { User } from "./user"
 
-export { Course } from "./course"
+export { Course, CourseTranslation } from "./course"
 
 export { Quiz, QuizTranslation } from "./quiz"
 export { QuizItem, QuizItemTranslation } from "./quiz_item"

@@ -17,12 +17,6 @@ import { Course } from "./course"
 import { Language } from "./language"
 import { PeerReviewQuestion } from "./peer_review_question"
 import { QuizItem } from "./quiz_item"
-import {
-  INewQuizQuery,
-  INewQuizTranslation,
-  INewQuizItem,
-  INewPeerReviewQuestion,
-} from "../types"
 import { getUUIDByString, randomUUID } from "../util"
 
 @Entity()
@@ -66,7 +60,7 @@ export class Quiz extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(type => Course, course => course.id, { lazy: true })
+  @ManyToOne(type => Course, course => course.id, { eager: true }) // was: lazy
   public course: Course
   @Column()
   public courseId: string
