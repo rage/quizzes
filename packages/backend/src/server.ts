@@ -12,7 +12,7 @@ const app = Container.get(App).getApp()
 const database = Container.get(Database)
 const port = process.env.PORT || 3000
 
-database.connect()
+database.connect() // hmm, this is async btw
 
 /**
  * Start Express server.

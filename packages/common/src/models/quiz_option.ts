@@ -12,7 +12,6 @@ import {
 } from "typeorm"
 import { Language } from "./language"
 import { QuizItem } from "./quiz_item"
-import { INewQuizOption, INewQuizOptionTranslation } from "../types"
 import { randomUUID } from "../util"
 
 @Entity()
@@ -82,7 +81,7 @@ export class QuizOptionTranslation extends BaseEntity {
       this.quizOptionId = data.quizOptionId
     }
 
-    this.languageId = data.languageId
+    this.languageId = data.languageId || "unknown"
     this.title = data.title
     this.body = data.body
     this.successMessage = data.successMessage

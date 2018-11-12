@@ -15,12 +15,6 @@ import {
 import { Language } from "./language"
 import { Quiz } from "./quiz"
 import { QuizOption } from "./quiz_option"
-import {
-  INewQuizItem,
-  INewQuizItemTranslation,
-  INewQuizOption,
-  INewQuizOptionTranslation,
-} from "../types"
 import { randomUUID } from "../util"
 
 @Entity()
@@ -111,7 +105,7 @@ export class QuizItemTranslation extends BaseEntity {
       this.quizItemId = data.quizItemId
     }
 
-    this.languageId = data.languageId
+    this.languageId = data.languageId || "unknown"
     this.title = data.title
     this.body = data.body
     this.successMessage = data.successMessage

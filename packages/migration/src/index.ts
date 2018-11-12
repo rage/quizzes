@@ -1,5 +1,7 @@
 import { Organization } from "@quizzes/common/models"
-import database from "@quizzes/common/config/database"
+import { Database } from "@quizzes/common/config/database"
+
+import { Container } from "typedi"
 
 import mongoUtils from "./mongo_utils"
 
@@ -15,7 +17,9 @@ import { migrateUsers } from "./user"
 
 async function main() {
   console.log("Connecting to Postgres")
-  await database.promise
+
+  const database = Container.get(Database)
+  await database.connect()
 
   console.log("Connecting to MongoDB")
   await mongoUtils.connect(

@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -9,36 +10,13 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm"
+import { getUUIDByString, randomUUID } from "../util"
 import { Language } from "./language"
 import { PeerReviewQuestionCollection } from "./peer_review_question_collection"
-import { getUUIDByString, randomUUID } from "../util"
 import { Quiz } from "./quiz"
 
 @Entity()
 export class PeerReviewQuestion extends BaseEntity {
-  constructor(data?: PeerReviewQuestion) {
-    super()
-
-    if (!data) {
-      return
-    }
-
-    this.id = data.id || randomUUID()
-    this.quizId = data.quizId
-    this.collectionId = data.collectionId // TODO: what to do with these
-    this.texts = data.texts
-    this.type = data.type
-    this.answerRequired = data.answerRequired
-    this.order = data.order
-
-    if (this.texts) {
-      this.texts.forEach(
-        (text: PeerReviewQuestionTranslation) =>
-          (text.peerReviewQuestionId = this.id),
-      )
-    }
-  }
-
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
@@ -76,23 +54,37 @@ export class PeerReviewQuestion extends BaseEntity {
   public createdAt: Date
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
-}
 
-@Entity()
-export class PeerReviewQuestionTranslation extends BaseEntity {
-  constructor(data?: PeerReviewQuestionTranslation) {
+  constructor(data?: PeerReviewQuestion) {
     super()
 
     if (!data) {
       return
     }
 
-    this.peerReviewQuestionId = data.peerReviewQuestionId
-    this.languageId = data.languageId || getUUIDByString("default")
-    this.title = data.title
-    this.body = data.body
+    this.quizId = data.quizId
+    this.collectionId = data.collectionId // TODO: what to do with these
+    this.texts = data.texts
+    this.type = data.type
+    this.answerRequired = data.answerRequired
+    this.order = data.order
   }
 
+  @BeforeInsert()
+  addRelations() {
+    this.id = this.id || randomUUID()
+
+    if (this.texts) {
+      this.texts.forEach(
+        (text: PeerReviewQuestionTranslation) =>
+          (text.peerReviewQuestionId = this.id),
+      )
+    }
+  }
+}
+
+@Entity()
+export class PeerReviewQuestionTranslation extends BaseEntity {
   @ManyToOne(type => PeerReviewQuestion, prq => prq.id)
   public peerReviewQuestion: Promise<PeerReviewQuestion>
   @PrimaryColumn()
@@ -112,4 +104,17 @@ export class PeerReviewQuestionTranslation extends BaseEntity {
   public createdAt: Date
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
+
+  constructor(data?: PeerReviewQuestionTranslation) {
+    super()
+
+    if (!data) {
+      return
+    }
+
+    this.peerReviewQuestionId = data.peerReviewQuestionId
+    this.languageId = data.languageId || "unknown"
+    this.title = data.title
+    this.body = data.body
+  }
 }

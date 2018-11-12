@@ -55,6 +55,7 @@ export class App {
     useContainer(Container)
 
     this.application = createExpressServer({
+      cors: true,
       routePrefix: API_PATH,
       controllers,
     })
