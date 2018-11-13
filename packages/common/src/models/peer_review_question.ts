@@ -43,6 +43,7 @@ export class PeerReviewQuestion extends BaseEntity {
   public default: boolean
   @Column({ type: "enum", enum: ["essay", "grade"] })
   public type: string
+  // TODO(?): add scale for grade?
 
   @Column({ default: true })
   public answerRequired: boolean

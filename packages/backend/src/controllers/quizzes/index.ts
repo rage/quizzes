@@ -33,6 +33,8 @@ import { EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
 
+import _ from "lodash"
+
 @JsonController("/quizzes")
 export class QuizController {
   @InjectManager()
@@ -44,20 +46,18 @@ export class QuizController {
   private quizAnswerService: QuizAnswerService
 
   @Get("/")
-  public async getAll(
-    @QueryParam("course") course: boolean = true,
-    @QueryParam("language") language: string,
-    @QueryParam("items") items: boolean = true,
-    @QueryParam("options") options: boolean = true,
-    @QueryParam("peerreviews") peerreviews: boolean = true,
-  ): Promise<Quiz[]> {
+  public async getAll(@QueryParams() params: string[]): Promise<Quiz[]> {
     const query: IQuizQuery = {
       id: null,
-      course,
-      language,
-      items,
-      options,
-      peerreviews,
+      ..._.pick(params, [
+        "course",
+        "courseId",
+        "courseAbbreviation",
+        "language",
+        "items",
+        "options",
+        "peerreviews",
+      ]),
     }
 
     return await this.quizService.getQuizzes(query)
@@ -66,19 +66,17 @@ export class QuizController {
   @Get("/:id")
   public async get(
     @Param("id") id: string,
-    @QueryParam("course") course: boolean = true,
-    @QueryParam("language") language: string,
-    @QueryParam("items") items: boolean = true,
-    @QueryParam("options") options: boolean = true,
-    @QueryParam("peerreviews") peerreviews: boolean = true,
+    @QueryParams() params: string[],
   ): Promise<Quiz[]> {
     const query: IQuizQuery = {
       id,
-      course,
-      language,
-      items,
-      options,
-      peerreviews,
+      ..._.pick(params, [
+        "course",
+        "language",
+        "items",
+        "options",
+        "peerreviews",
+      ]),
     }
 
     const res: Quiz[] = await this.quizService.getQuizzes(query)

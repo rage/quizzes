@@ -34,6 +34,7 @@ import {
   SelectQueryBuilder,
   TransactionManager,
   AdvancedConsoleLogger,
+  QueryBuilder,
 } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import quizanswerService from "./quizanswer.service"
@@ -44,8 +45,18 @@ export class QuizService {
   private entityManager: EntityManager
 
   public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
-    const { id, course, language, items, options, peerreviews } = query
+    const {
+      id,
+      courseId,
+      courseAbbreviation,
+      course = true,
+      language,
+      items = true,
+      options = true,
+      peerreviews = true,
+    } = query
 
+    console.log("query", query)
     const queryBuilder: SelectQueryBuilder<
       Quiz
     > = this.entityManager.createQueryBuilder(Quiz, "quiz")
@@ -53,26 +64,35 @@ export class QuizService {
     queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
 
     if (id) {
-      console.log(id)
       queryBuilder.where("quiz.id = :id", { id })
-      console.log("after id", queryBuilder.getQuery())
     }
 
     if (language) {
-      console.log("language")
       queryBuilder.andWhere("quiz_translation.language_id = :language", {
         language,
       })
-      console.log("after language", queryBuilder.getQuery())
     }
 
     if (course) {
-      queryBuilder.leftJoinAndSelect("quiz.course", "course")
+      queryBuilder
+        .leftJoinAndSelect("quiz.course", "course")
+        .leftJoinAndSelect("course.texts", "course_translation")
+
+      if (courseId) {
+        queryBuilder.where("course.id = :courseId", { courseId })
+      }
+      if (courseAbbreviation) {
+        queryBuilder.where(
+          "course_translation.abbreviation = :courseAbbreviation",
+          { courseAbbreviation },
+        )
+      }
 
       if (language) {
         queryBuilder
           .leftJoinAndSelect("course.languages", "language")
           .andWhere("language.id = :language", { language })
+          .andWhere("course_translation.language_id = :language", { language })
       }
     }
 
