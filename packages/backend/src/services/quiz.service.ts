@@ -141,20 +141,21 @@ export class QuizService {
   }
 
   public async createQuiz(quiz: Quiz): Promise<Quiz> {
-    /*     const course: Course = await Course.findOne(
-      quiz.courseId || getUUIDByString("default"),
-    )
+    const newQuiz: Quiz = await this.entityManager.save(quiz)
 
-    await course */
+    if (newQuiz) {
+      // test: ^ does not always return all?
+      const updatedQuiz: Quiz[] = await Quiz.find({ id: newQuiz.id })
 
-    let newQuiz: Quiz = quiz
+      return updatedQuiz[0]
+    }
 
     /*     if (quiz.id) {
       newQuiz = await Quiz.findOne({ id: quiz.id })
       newQuiz = Object.assign({}, newQuiz, quiz) // TODO: better update
     } */
 
-    console.log("quizservice got", newQuiz)
+    /*     console.log("quizservice got", newQuiz)
 
     try {
       await this.entityManager.transaction(async tem => {
@@ -192,7 +193,8 @@ export class QuizService {
 
     await newQuiz.course
 
-    return await newQuiz
+    return await newQuiz */
+    return newQuiz
   }
 
   public async updateQuiz(quiz: Quiz): Promise<Quiz> {

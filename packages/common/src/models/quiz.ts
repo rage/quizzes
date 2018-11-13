@@ -33,6 +33,7 @@ export class Quiz extends BaseEntity {
     this.section = data.section || 0
     this.deadline = data.deadline
     this.open = data.open
+    this.excludedFromScore = data.excludedFromScore
     this.texts = data.texts
     this.items = data.items
     this.peerReviewQuestions = data.peerReviewQuestions

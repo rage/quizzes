@@ -93,7 +93,8 @@ export class QuizController {
 
   @Post("/")
   public async post(@EntityFromBody() quiz: Quiz): Promise<Quiz> {
-    return await this.entityManager.save(quiz)
+    //return await this.entityManager.save(quiz)
+    return await this.quizService.createQuiz(quiz)
   }
   /*   @Post("/")
   public async post(@Body({ required: true }) quiz: Quiz): Promise<Quiz> {
