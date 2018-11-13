@@ -43,6 +43,8 @@ export interface ITMCLoginCredentials {
 
 export interface IQuizQuery {
   id?: string
+  courseId?: string
+  courseAbbreviation?: string
   course?: boolean
   language?: string
   items?: boolean

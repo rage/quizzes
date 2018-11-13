@@ -25,7 +25,7 @@ export class QuizItem extends BaseEntity {
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Promise<Quiz>
   @Column({ nullable: true })
-  public quizId: string
+  public quizId: string | null
 
   @Column({
     type: "enum",
