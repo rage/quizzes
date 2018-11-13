@@ -24,6 +24,7 @@ import { Quiz } from '../../common/src/models/quiz'
 import TMCApi from '../../common/src/services/TMCApi'
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
 import QuizForm from './components/quizForm'
+import { setCourses } from './store/courses/actions'
 import { newQuiz, setEdit } from './store/edit/actions'
 import { setFilter } from './store/filter/actions'
 import { setQuizzes } from './store/quizzes/actions'
@@ -38,6 +39,7 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
       const profile = await TMCApi.getProfile(user.accessToken)
       if ((profile as ITMCProfileDetails).administrator) {
         this.props.addUser(user)
+        this.props.setCourses()
         this.props.setQuizzes()
       }
     }
@@ -70,8 +72,8 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
         <div>
           <div>
             <Toolbar style={{ marginBottom: 20 }}>
-              <Select value={this.props.filter || ''} onChange={this.handleSelect} style={{ minWidth: 350 }}>
-                {this.props.courses.map(course => <MenuItem key={course.id} value={course.id}>{course.id}</MenuItem>)}
+              <Select value={this.props.filter.course || ''} onChange={this.handleSelect} style={{ minWidth: 350 }}>
+                {this.props.courses.map(course => <MenuItem key={course.id} value={course.id}>{course.texts[0].title}</MenuItem>)}
               </Select>
               <Typography style={{ flex: 1 }} />
               <Link to='/new' style={{ textDecoration: 'none' }}><Button>New quiz</Button></Link>
@@ -83,7 +85,7 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {this.props.quizzes.filter(quiz => quiz.courseId === this.props.filter)
+                {this.props.quizzes.filter(quiz => quiz.course.id === this.props.filter.course)
                   .map(quiz => <TableRow key={quiz.id}><TableCell><Link to={`/quizzes/${quiz.id}`}>{quiz.texts[0].title}</Link></TableCell></TableRow>)}
               </TableBody>
             </Table>
@@ -92,7 +94,7 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
       )
     }
 
-    const Switch = ({ match }) => {
+    /* const Switch = ({ match }) => {
       const quiz = this.props.quizzes.find(q => q.id === match.params.id)
       if (quiz) {
         this.props.setEdit(quiz)
@@ -101,7 +103,9 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
         this.props.newQuiz()
         return <QuizForm />
       }
-    }
+    } */
+
+    // <Switch quizzes={this.props.quizzes} setEdit={this.props.setEdit} newQuiz={this.props.newQuiz} />
 
     const QuizView = ({ match }) => {
       const quiz = this.props.quizzes.find(q => q.id === match.params.id)
@@ -130,8 +134,8 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
                 <div style={{ height: 80 }} />
               </div>
               <Route exact={true} path='/' component={Dashboard} />
-              <Route exact={true} path='/quizzes/:id' component={Switch} />
-              <Route exact={true} path='/new' component={Switch} />
+              <Route exact={true} path='/quizzes/:id' component={this.Switch} />
+              <Route exact={true} path='/new' component={this.Switch} />
             </div> :
             <div>
               <Route exact={true} path='/' component={Login} />
@@ -143,12 +147,24 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
     );
   }
 
-  private MyLink = () => <Link to='/new' />
-
-  
+  private Switch = ({ match }) => {
+    if (this.props.quizzes.length === 0) {
+      return <p/>
+    }
+    const quiz = this.props.quizzes.find(q => q.id === match.params.id)
+    if (match.params.id) {
+      console.log(match.params.id)
+      // this.props.setEdit(quiz)
+      return <QuizForm id={match.params.id} quiz={quiz} />
+    } else {
+      console.log("eka")
+      // this.props.newQuiz()
+      return <QuizForm />
+    }
+  }
 
   private handleSelect = (event) => {
-    this.props.setFilter(event.target.value)
+    this.props.setFilter('course', event.target.value)
   }
 
   private handleSubmit = async (event: any) => {
@@ -176,9 +192,21 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
   }
 }
 
+const Switch2 = ({ match }: any, props) => {
+  const quiz = props.quizzes.find(q => q.id === match.params.id)
+  if (quiz) {
+    props.setEdit(quiz)
+    return <QuizForm id={match.params.id}/>
+  } else {
+    props.newQuiz()
+    return <QuizForm />
+  }
+}
+
 interface IDispatchProps {
   addUser: typeof addUser,
   newQuiz: typeof newQuiz,
+  setCourses: typeof setCourses,
   setEdit: typeof setEdit,
   setFilter: typeof setFilter,
   setQuizzes: typeof setQuizzes,
@@ -187,7 +215,7 @@ interface IDispatchProps {
 
 interface IStateProps {
   courses: any,
-  filter: string,
+  filter: any,
   quizzes: any[],
   user: ITMCProfile
 }
@@ -204,6 +232,7 @@ const mapStateToProps = (state: any) => {
 const mapDispatchToProps = {
   addUser,
   newQuiz,
+  setCourses,
   setEdit,
   setFilter,
   setQuizzes,

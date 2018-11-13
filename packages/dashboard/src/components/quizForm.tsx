@@ -13,7 +13,8 @@ import {
     INewQuizQuery,
     INewQuizTranslation
 } from '../../../common/src/types/index'
-import { changeAttr } from '../store/edit/actions'
+import { changeAttr, newQuiz, setEdit } from '../store/edit/actions'
+import { setFilter } from '../store/filter/actions'
 
 class QuizForm extends React.Component<any, any> {
 
@@ -26,47 +27,33 @@ class QuizForm extends React.Component<any, any> {
         }
     }
 
-    public render() {
-
-        const TabContainer = (props: any) => {
-            console.log(props.kakka)
-            return (
-                <div>
-                    <TextField
-                        onChange={this.handleChange(`texts[${props.index}].title`)}
-                        label='Title'
-                        value={this.props.edit.texts[props.index].title} 
-                        margin="normal"
-                        fullWidth={true}
-                    />
-                    <TextField
-                        onChange={this.handleChange(`texts[${props.index}].body`)}
-                        label='Body'
-                        value={this.props.edit.texts[props.index].body}
-                        margin="normal"
-                        fullWidth={true}
-                        multiline={true}
-                        rowsMax="10"
-                    />
-                </div>
-            )
+    public componentDidMount() {
+        if (this.props.quiz) {
+            console.log('yes')
+            this.props.setEdit(this.props.quiz)
+        } else {
+            console.log('no')
+            this.props.newQuiz()
         }
+    }
+
+    public render() {
 
         return (
             <form onSubmit={this.submitQuiz}>
                 <FormControl>
                     <InputLabel>Course</InputLabel>
-                    <Select onChange={this.selectCourse} value={this.props.edit.__course__.id || ""} inputProps={{ name: 'course' }} style={{ minWidth: 350 }}>
+                    <Select onChange={this.selectCourse} value={this.props.edit.course.id || this.props.filter.course} inputProps={{ name: 'course' }} style={{ minWidth: 350 }}>
                         {this.props.courses.map(course => <MenuItem key={course.id} value={course.id}>{course.id}</MenuItem>) || ""}
                     </Select>
                 </FormControl>
-                {this.props.edit.__course__.languages ?
+                {this.props.edit.course.languages ?
                     <div>
-                        <Tabs value={this.state.language || this.props.edit.__course__.languages[0].id} onChange={this.handleTabs}>
-                            {this.props.edit.__course__.languages.map(l => <Tab value={l.id} key={l.id} label={l.id} />) || ""}
+                        <Tabs value={this.props.filter.language} onChange={this.handleTabs}>
+                            {this.props.edit.course.languages.map(l => <Tab value={l.id} key={l.id} label={l.id} />) || ""}
                             <Tab label="add" onClick={this.addLanguage} />
                         </Tabs>
-                        {this.props.edit.__course__.languages.map((l, i) => (this.state.language === l.id && <TabContainer key={l.name} index={i} kakka={l} />))}
+                        {this.props.edit.course.languages.map((l, i) => (this.props.filter.language === l.id && <TabContainer quiz={this.props.edit} handleChange={this.handleChange} key={l.name} index={i} language={l.id} />))}
                     </div> :
                     <p />
                 }
@@ -89,9 +76,10 @@ class QuizForm extends React.Component<any, any> {
     }
 
     private handleTabs = (event, value) => {
-        this.setState({
+        this.props.setFilter('language', value)
+        /* this.setState({
             language: value
-        })
+        }) */
     }
 
     private addItem = () => {
@@ -119,6 +107,32 @@ class QuizForm extends React.Component<any, any> {
     }
 }
 
+const TabContainer = (props: any) => {
+    let index = 0
+    props.quiz.texts.map((t, i) => {if (t.languageId === props.language) { index = i }})
+    return (
+        <div>
+            <TextField
+                onChange={props.handleChange(`texts[${index}].title`)}
+                label='Title'
+                value={props.quiz.texts[index].title} 
+                margin="normal"
+                fullWidth={true}
+            />
+            <TextField
+                onChange={props.handleChange(`texts[${index}].body`)}
+                label='Body'
+                value={props.quiz.texts[index].body}
+                margin="normal"
+                fullWidth={true}
+                multiline={true}
+                rowsMax="10"
+            />
+        </div>
+    )
+}
+
+
 const mapStateToProps = (state: any) => {
     return {
         courses: state.courses,
@@ -130,7 +144,10 @@ const mapStateToProps = (state: any) => {
 }
 
 const mapDispatchToProps = {
-    changeAttr
+    changeAttr,
+    newQuiz,
+    setEdit,
+    setFilter
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(QuizForm)

@@ -2,8 +2,9 @@ import axios from "axios"
 import { Quiz } from "../../../common/src/models/quiz"
 
 export const getQuizzes = async () => {
-  // const response = await axios.get("http://localhost:3000/api/v1/quizzes/")
-  return [mock]
+  const response = await axios.get("http://localhost:3000/api/v1/quizzes/")
+  return response.data
+  // return [mock]
 }
 
 const mock = {
@@ -16,7 +17,7 @@ const mock = {
   excludedFromScore: false,
   createdAt: "2018-05-04T13:44:15.228Z",
   updatedAt: "2018-05-17T10:13:31.250Z",
-  __course__: {
+  course: {
     id: "21356a26-7508-4705-9bab-39b239862632",
     createdAt: "2018-10-03T12:56:51.776Z",
     updatedAt: "2018-10-03T12:56:51.776Z",

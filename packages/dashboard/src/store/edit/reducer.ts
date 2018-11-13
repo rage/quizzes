@@ -6,7 +6,7 @@ import {
 import * as edit from "./actions"
 
 const initialState = {
-  __course__: "",
+  course: "",
 }
 
 export const editReducer = (state = initialState, action) => {

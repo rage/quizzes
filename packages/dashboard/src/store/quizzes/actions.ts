@@ -15,8 +15,8 @@ export const setQuizzes = () => {
     try {
       const data = await getQuizzes()
       const cSet = new Set()
-      data.map(quiz => cSet.add(quiz.__course__))
-      const courses = Array.from(cSet)
+      data.map(quiz => cSet.add(quiz.course.id))
+      const courses = data.filter(quiz => cSet.has(quiz.course.id))
       dispatch(
         set(
           data.sort((q1, q2) =>
@@ -24,8 +24,8 @@ export const setQuizzes = () => {
           ),
         ),
       )
-      dispatch(Courses.set(courses))
-      dispatch(Filter.set(courses[0].id))
+      // dispatch(Courses.set(courses))
+      dispatch(Filter.setFilter("course", courses[0].id))
     } catch (error) {
       console.log(error)
     }
