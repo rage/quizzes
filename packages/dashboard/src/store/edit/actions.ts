@@ -20,8 +20,14 @@ export const setEdit = (quiz: any) => {
 }
 
 export const newQuiz = () => {
-  return dispatch => {
-    dispatch(newq)
+  return (dispatch, getState) => {
+    dispatch(
+      set({
+        course: getState().courses.find(
+          course => course.id === getState().filter.course,
+        ),
+      }),
+    )
   }
 }
 

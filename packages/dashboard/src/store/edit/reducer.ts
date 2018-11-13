@@ -14,6 +14,7 @@ export const editReducer = (state = initialState, action) => {
     case getType(edit.set):
       return action.payload
     case getType(edit.newq):
+      console.log("reducer")
       return initialState
     default:
       return state

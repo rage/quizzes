@@ -134,8 +134,8 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
                 <div style={{ height: 80 }} />
               </div>
               <Route exact={true} path='/' component={Dashboard} />
-              <Route exact={true} path='/quizzes/:id' component={this.Switch} />
-              <Route exact={true} path='/new' component={this.Switch} />
+              <Route exact={true} path='/quizzes/:id' component={this.edit} />
+              <Route exact={true} path='/new' component={this.create} />
             </div> :
             <div>
               <Route exact={true} path='/' component={Login} />
@@ -147,9 +147,21 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
     );
   }
 
+  private edit = ({ match }) => {
+    if (this.props.quizzes.length === 0) {
+      return <p />
+    }
+    const quiz = this.props.quizzes.find(q => q.id === match.params.id)
+    return <QuizForm id={match.params.id} quiz={quiz} />
+  }
+
+  private create = () => {
+    return <QuizForm />
+  }
+
   private Switch = ({ match }) => {
     if (this.props.quizzes.length === 0) {
-      return <p/>
+      return <p />
     }
     const quiz = this.props.quizzes.find(q => q.id === match.params.id)
     if (match.params.id) {
@@ -179,6 +191,7 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
       const profile = await TMCApi.getProfile(accessToken)
       if ((profile as ITMCProfileDetails).administrator) {
         this.props.addUser(user)
+        this.props.setCourses()
         this.props.setQuizzes()
       }
     } catch (exception) {
@@ -196,7 +209,7 @@ const Switch2 = ({ match }: any, props) => {
   const quiz = props.quizzes.find(q => q.id === match.params.id)
   if (quiz) {
     props.setEdit(quiz)
-    return <QuizForm id={match.params.id}/>
+    return <QuizForm id={match.params.id} />
   } else {
     props.newQuiz()
     return <QuizForm />

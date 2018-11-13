@@ -11,7 +11,7 @@ export const set = createAction("quizzes/SET", resolve => {
 export const clear = createAction("quizzes/CLEAR")
 
 export const setQuizzes = () => {
-  return async dispatch => {
+  return async (dispatch, getState) => {
     try {
       const data = await getQuizzes()
       const cSet = new Set()
@@ -24,8 +24,7 @@ export const setQuizzes = () => {
           ),
         ),
       )
-      // dispatch(Courses.set(courses))
-      dispatch(Filter.setFilter("course", courses[0].id))
+      dispatch(Filter.setFilter("course", courses[0].course.id))
     } catch (error) {
       console.log(error)
     }

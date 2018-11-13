@@ -29,10 +29,8 @@ class QuizForm extends React.Component<any, any> {
 
     public componentDidMount() {
         if (this.props.quiz) {
-            console.log('yes')
             this.props.setEdit(this.props.quiz)
         } else {
-            console.log('no')
             this.props.newQuiz()
         }
     }
@@ -108,8 +106,11 @@ class QuizForm extends React.Component<any, any> {
 }
 
 const TabContainer = (props: any) => {
-    let index = 0
-    props.quiz.texts.map((t, i) => {if (t.languageId === props.language) { index = i }})
+    let index = -1
+    props.quiz.texts.map((t, i) => t.languageId === props.language ? index = i : '')
+    if (index !== -1) {
+        console.log('')
+    }
     return (
         <div>
             <TextField
