@@ -25,7 +25,9 @@ export function getUUIDByString(str: string): string {
 }
 
 export function randomUUID(size: number = 1000000, start: number = 0): string {
-  return getUUIDByString(
-    `${Date.now()}-{Math.round(start + Math.random() * size)}`,
-  )
+  const randomUUIDseed: string = `${Date.now()}-${Math.round(
+    start + Math.random() * size,
+  )}`
+
+  return getUUIDByString(randomUUIDseed)
 }
