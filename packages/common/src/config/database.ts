@@ -26,7 +26,7 @@ export class Database {
       database: process.env.DB_NAME || "quizzes",
       entities: Object.values(Models),
       host: process.env.DB_HOST || "/var/run/postgresql",
-      logging: !!process.env.DB_LOGGING || false, //true,
+      logging: !!process.env.DB_LOGGING || true,
       namingStrategy: new SnakeNamingStrategy(),
       password: process.env.DB_PASSWORD || undefined,
       synchronize: true,

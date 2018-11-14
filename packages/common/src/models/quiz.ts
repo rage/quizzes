@@ -85,7 +85,10 @@ export class Quiz extends BaseEntity {
   @OneToMany(type => QuizItem, qi => qi.quiz, { eager: true, cascade: true }) // was: not eager
   public items?: QuizItem[]
 
-  @OneToMany(type => PeerReviewQuestion, prq => prq.quiz, { eager: true }) // was: not eager
+  @OneToMany(type => PeerReviewQuestion, prq => prq.quiz, {
+    eager: true,
+    cascade: true,
+  }) // was: not eager
   public peerReviewQuestions: PeerReviewQuestion[]
 
   @Column({ default: false })

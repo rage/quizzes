@@ -72,6 +72,8 @@ export class QuizController {
       id,
       ..._.pick(params, [
         "course",
+        "courseId",
+        "courseAbbreviation",
         "language",
         "items",
         "options",

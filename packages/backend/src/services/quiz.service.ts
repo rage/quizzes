@@ -47,8 +47,8 @@ export class QuizService {
   public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
     const {
       id,
-      courseId,
-      courseAbbreviation,
+      courseId = null,
+      courseAbbreviation = null,
       course = true,
       language,
       items = true,
@@ -56,75 +56,78 @@ export class QuizService {
       peerreviews = true,
     } = query
 
-    console.log("query", query)
     const queryBuilder: SelectQueryBuilder<
       Quiz
     > = this.entityManager.createQueryBuilder(Quiz, "quiz")
 
-    queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
-
-    if (id) {
-      queryBuilder.where("quiz.id = :id", { id })
-    }
-
-    if (language) {
-      queryBuilder.andWhere("quiz_translation.language_id = :language", {
-        language,
-      })
-    }
+    queryBuilder.leftJoinAndSelect(
+      "quiz.texts",
+      "quiz_translation",
+      language ? "quiz_translation.language_id = :language" : "",
+      { language },
+    )
 
     if (course) {
       queryBuilder
-        .leftJoinAndSelect("quiz.course", "course")
-        .leftJoinAndSelect("course.texts", "course_translation")
-
-      if (courseId) {
-        queryBuilder.where("course.id = :courseId", { courseId })
-      }
-      if (courseAbbreviation) {
-        queryBuilder.where(
-          "course_translation.abbreviation = :courseAbbreviation",
+        .innerJoinAndSelect(
+          "quiz.course",
+          "course",
+          courseId ? "course.id = :courseId" : "",
+          { courseId },
+        )
+        .innerJoinAndSelect(
+          "course.texts",
+          "course_translation",
+          courseAbbreviation
+            ? "course_translation.abbreviation = :courseAbbreviation"
+            : "",
           { courseAbbreviation },
         )
-      }
-
-      if (language) {
-        queryBuilder
-          .leftJoinAndSelect("course.languages", "language")
-          .andWhere("language.id = :language", { language })
-          .andWhere("course_translation.language_id = :language", { language })
-      }
+        .innerJoinAndSelect(
+          "course.languages",
+          "language",
+          language ? "language.id = :language" : "",
+          { language },
+        )
+        .andWhere(
+          language
+            ? new Brackets(qb => {
+                qb.where("course_translation.language_id = :language", {
+                  language,
+                }).orWhere("course_translation.language_id is null")
+              })
+            : "",
+        )
+      // is this wanted behavior - when lang provided but not found, nothing returned
     }
 
-    if (items) {
+    if (items && language) {
       queryBuilder
         .leftJoinAndSelect("quiz.items", "quiz_item")
         .leftJoinAndSelect("quiz_item.texts", "quiz_item_translation")
-
-      if (language) {
-        queryBuilder.andWhere(
-          new Brackets(qb => {
-            qb.where("quiz_item_translation.language_id = :language", {
-              language,
-            }).orWhere("quiz_item_translation.language_id is null")
-          }),
+        .andWhere(
+          language
+            ? new Brackets(qb => {
+                qb.where("quiz_item_translation.language_id = :language", {
+                  language,
+                }).orWhere("quiz_item_translation.language_id is null")
+              })
+            : "",
         )
-      }
-    }
 
-    if (items && options) {
-      queryBuilder
-        .leftJoinAndSelect("quiz_item.options", "quiz_option")
-        .leftJoinAndSelect("quiz_option.texts", "quiz_option_translation")
-
-      if (language) {
-        queryBuilder.andWhere(
-          new Brackets(qb => {
-            qb.where("quiz_option_translation.language_id = :language", {
-              language,
-            }).orWhere("quiz_option_translation.language_id is null")
-          }),
-        )
+      if (options) {
+        queryBuilder
+          .leftJoinAndSelect("quiz_item.options", "quiz_option")
+          .leftJoinAndSelect("quiz_option.texts", "quiz_option_translation")
+          .andWhere(
+            language
+              ? new Brackets(qb => {
+                  qb.where("quiz_option_translation.language_id = :language", {
+                    language,
+                  }).orWhere("quiz_option_translation.language_id is null")
+                })
+              : "",
+          )
       }
     }
 
@@ -147,17 +150,17 @@ export class QuizService {
         )
       }
     }
+    if (id) {
+      queryBuilder.where("quiz.id = :id", { id })
+    }
 
-    console.log(queryBuilder.getQuery())
-
-    return await queryBuilder
-      .getMany()
-      .then(
+    return await queryBuilder.getMany()
+    /*       .then(
         async (quizzes: Quiz[]) =>
           await Promise.all(
             quizzes.map(async (q: Quiz) => this.stripQuiz(q, query)),
           ),
-      )
+      ) */
   }
 
   public async createQuiz(quiz: Quiz): Promise<Quiz> {
@@ -232,6 +235,7 @@ export class QuizService {
   }
 
   private async stripQuiz(quiz: Quiz, options: IQuizQuery): Promise<Quiz> {
+    console.log("rcvd", quiz)
     await quiz.course
 
     if (options.language) {

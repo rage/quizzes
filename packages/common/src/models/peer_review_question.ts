@@ -35,7 +35,7 @@ export class PeerReviewQuestion extends BaseEntity {
   @OneToMany(
     type => PeerReviewQuestionTranslation,
     prqt => prqt.peerReviewQuestion,
-    { eager: true },
+    { eager: true, cascade: true },
   )
   public texts: PeerReviewQuestionTranslation[]
 
