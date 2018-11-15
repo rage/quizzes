@@ -51,7 +51,7 @@ class QuizForm extends React.Component<any, any> {
                             {this.props.edit.course.languages.map(l => <Tab value={l.id} key={l.id} label={l.id} />) || ""}
                             <Tab label="add" onClick={this.addLanguage} />
                         </Tabs>
-                        {this.props.edit.course.languages.map((l, i) => (this.props.filter.language === l.id && <TabContainer quiz={this.props.edit} handleChange={this.handleChange} key={l.name} index={i} language={l.id} />))}
+                        {this.props.edit.course.languages.map((l, i) => (this.props.filter.language === l.id && <TabContainer quiz={this.props.edit} changeAttr={this.props.changeAttr} handleChange={this.handleChange} key={l.name} index={i} language={l.id} />))}
                     </div> :
                     <p />
                 }
@@ -106,17 +106,19 @@ class QuizForm extends React.Component<any, any> {
 }
 
 const TabContainer = (props: any) => {
+    console.log(props.quiz.texts)
     let index = -1
     props.quiz.texts.map((t, i) => t.languageId === props.language ? index = i : '')
-    if (index !== -1) {
-        console.log('')
+    if (index === -1) {
+        props.changeAttr(`texts[${props.quiz.texts.length}]`, { quizId: props.quiz.id, languageId: props.language, title: "", body: "" })
+        props.quiz.texts.map((t, i) => t.languageId === props.language ? index = i : '')
     }
     return (
         <div>
             <TextField
                 onChange={props.handleChange(`texts[${index}].title`)}
                 label='Title'
-                value={props.quiz.texts[index].title} 
+                value={props.quiz.texts[index].title}
                 margin="normal"
                 fullWidth={true}
             />

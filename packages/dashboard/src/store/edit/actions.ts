@@ -10,7 +10,9 @@ export const set = createAction("edit/SET", resolve => {
   return quiz => resolve(quiz)
 })
 
-export const newq = createAction("edit/NEW")
+export const create = createAction("edit/NEW", resolve => {
+  return (course: any) => resolve(course)
+})
 
 export const setEdit = (quiz: any) => {
   return dispatch => {
@@ -21,11 +23,13 @@ export const setEdit = (quiz: any) => {
 
 export const newQuiz = () => {
   return (dispatch, getState) => {
+    const course = getState().courses.find(
+      c => c.id === getState().filter.course,
+    )
     dispatch(
-      set({
-        course: getState().courses.find(
-          course => course.id === getState().filter.course,
-        ),
+      create({
+        courseId: course.id,
+        course,
       }),
     )
   }

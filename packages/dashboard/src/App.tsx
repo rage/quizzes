@@ -156,6 +156,9 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
   }
 
   private create = () => {
+    if (this.props.courses.length === 0) {
+      return <p />
+    }
     return <QuizForm />
   }
 
