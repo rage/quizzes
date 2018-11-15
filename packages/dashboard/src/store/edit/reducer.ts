@@ -7,6 +7,8 @@ import * as edit from "./actions"
 
 const initialState = {
   course: "",
+  texts: [],
+  items: [],
 }
 
 export const editReducer = (state = initialState, action) => {

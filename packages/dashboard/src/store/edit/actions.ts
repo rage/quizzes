@@ -16,7 +16,7 @@ export const create = createAction("edit/NEW", resolve => {
 
 export const setEdit = (quiz: any) => {
   return dispatch => {
-    dispatch(set(quiz))
+    dispatch(set(checkForMissingTranslation(quiz)))
     dispatch(setFilter("language", quiz.course.languages[0].id))
   }
 }
@@ -32,6 +32,7 @@ export const newQuiz = () => {
         course,
       }),
     )
+    dispatch(setFilter("language", course.languages[0].id))
   }
 }
 
@@ -41,4 +42,44 @@ export const changeAttr = (path, value) => {
     _.set(quiz, path, value)
     dispatch(set(quiz))
   }
+}
+
+const checkForMissingTranslation = paramQuiz => {
+  const quiz = Object.assign({}, paramQuiz)
+  const languages = quiz.course.languages.map(l => l.id)
+  languages.map(language => {
+    if (!quiz.texts.find(text => text.languageId === language)) {
+      quiz.texts.push({
+        quizId: quiz.id || "",
+        languageId: language,
+        title: "",
+        body: "",
+      })
+    }
+    quiz.items.map((item, i) => {
+      if (!item.texts.find(text => text.languageId === language)) {
+        quiz.items[i].texts.push({
+          quizItemId: item.id,
+          languageId: language,
+          title: "",
+          body: null,
+          successMessage: null,
+          failureMessage: null,
+        })
+      }
+      item.options.map((option, j) => {
+        if (!option.texts.find(text => text.languageId === language)) {
+          quiz.items[i].options[j].texts.push({
+            quizOptionId: option.id,
+            languageId: language,
+            title: "",
+            body: null,
+            successMessage: null,
+            failureMessage: null,
+          })
+        }
+      })
+    })
+  })
+  return quiz
 }

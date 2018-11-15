@@ -1,4 +1,15 @@
-import { Button, FormControl, InputLabel, MenuItem, Select, TextField } from '@material-ui/core'
+import {
+    Button,
+    ExpansionPanel,
+    ExpansionPanelDetails,
+    ExpansionPanelSummary,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    TextField,
+    Typography
+} from '@material-ui/core'
 import Tab from '@material-ui/core/Tab'
 import Tabs from '@material-ui/core/Tabs'
 import React from 'react'
@@ -47,7 +58,7 @@ class QuizForm extends React.Component<any, any> {
                 </FormControl>
                 {this.props.edit.course.languages ?
                     <div>
-                        <Tabs value={this.props.filter.language} onChange={this.handleTabs}>
+                        <Tabs value={this.props.filter.language} onChange={this.handleTabs} style={{ marginTop: 50 }}>
                             {this.props.edit.course.languages.map(l => <Tab value={l.id} key={l.id} label={l.id} />) || ""}
                             <Tab label="add" onClick={this.addLanguage} />
                         </Tabs>
@@ -55,9 +66,6 @@ class QuizForm extends React.Component<any, any> {
                     </div> :
                     <p />
                 }
-                <div>
-                    <Button onClick={this.addItem}>Add item</Button>
-                </div>
                 <div>
                     <Button type='submit'>save</Button>
                 </div>
@@ -106,35 +114,66 @@ class QuizForm extends React.Component<any, any> {
 }
 
 const TabContainer = (props: any) => {
-    console.log(props.quiz.texts)
     let index = -1
     props.quiz.texts.map((t, i) => t.languageId === props.language ? index = i : '')
     if (index === -1) {
-        props.changeAttr(`texts[${props.quiz.texts.length}]`, { quizId: props.quiz.id, languageId: props.language, title: "", body: "" })
-        props.quiz.texts.map((t, i) => t.languageId === props.language ? index = i : '')
+        // props.changeAttr(`texts[${props.quiz.texts.length}]`, { quizId: props.quiz.id, languageId: props.language, title: "", body: "" })
+        // props.quiz.texts.map((t, i) => t.languageId === props.language ? index = i : '')
     }
     return (
         <div>
-            <TextField
-                onChange={props.handleChange(`texts[${index}].title`)}
-                label='Title'
-                value={props.quiz.texts[index].title}
-                margin="normal"
-                fullWidth={true}
-            />
-            <TextField
-                onChange={props.handleChange(`texts[${index}].body`)}
-                label='Body'
-                value={props.quiz.texts[index].body}
-                margin="normal"
-                fullWidth={true}
-                multiline={true}
-                rowsMax="10"
-            />
+            <div style={{ marginTop: 50 }}>
+                <TextField
+                    onChange={props.handleChange(`texts[${index}].title`)}
+                    label='Title'
+                    value={props.quiz.texts[index].title}
+                    margin="normal"
+                    fullWidth={true}
+                />
+                <TextField
+                    onChange={props.handleChange(`texts[${index}].body`)}
+                    label='Body'
+                    value={props.quiz.texts[index].body}
+                    margin="normal"
+                    fullWidth={true}
+                    multiline={true}
+                    rowsMax="10"
+                />
+            </div>
+            <div style={{ marginTop: 50 }}>
+                <Typography variant='subtitle1'>Items</Typography>
+                {props.quiz.items.sort((i1, i2) => i1.order < i2.order).map(item => itemSwitch(item, props.language))}
+                <Button>Add item</Button>
+            </div>
         </div>
     )
 }
 
+const itemSwitch = (item, language) => {
+    switch (item.type) {
+        case "open":
+            return (
+                <ExpansionPanel key={item.id}>
+                    <ExpansionPanelSummary>
+                        <TextField value={item.texts.find(t => t.languageId === language).title} fullWidth={true} />
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                        kissakoira
+                    </ExpansionPanelDetails>
+                </ExpansionPanel>
+            )
+        case "essay":
+            break
+        case "radio":
+            break
+        case "checkbox":
+            break
+        case "scale":
+            break
+        case "research-agreement":
+            break
+    }
+}
 
 const mapStateToProps = (state: any) => {
     return {
