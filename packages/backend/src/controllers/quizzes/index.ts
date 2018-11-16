@@ -47,6 +47,21 @@ export class QuizController {
 
   @Get("/")
   public async getAll(@QueryParams() params: string[]): Promise<Quiz[]> {
+    return await this.getQuizzes(null, params)
+  }
+
+  @Get("/:id")
+  public async get(
+    @Param("id") id: string,
+    @QueryParams() params: string[],
+  ): Promise<Quiz[]> {
+    return await this.getQuizzes(id, params)
+  }
+
+  private async getQuizzes(
+    id: string | null,
+    params: string[],
+  ): Promise<Quiz[]> {
     const query: IQuizQuery = {
       id: null,
       ..._.pick(params, [
@@ -61,34 +76,6 @@ export class QuizController {
     }
 
     return await this.quizService.getQuizzes(query)
-  }
-
-  @Get("/:id")
-  public async get(
-    @Param("id") id: string,
-    @QueryParams() params: string[],
-  ): Promise<Quiz[]> {
-    const query: IQuizQuery = {
-      id,
-      ..._.pick(params, [
-        "course",
-        "courseId",
-        "courseAbbreviation",
-        "language",
-        "items",
-        "options",
-        "peerreviews",
-      ]),
-    }
-
-    const res: Quiz[] = await this.quizService.getQuizzes(query)
-
-    return res
-    /*     if (res.length > 0) {
-      return res[0]
-    }
-
-    throw new NotFoundError(`quiz with id ${id} and given options not found`) */
   }
 
   @Post("/")
