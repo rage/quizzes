@@ -38,6 +38,8 @@ import {
 } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import quizanswerService from "./quizanswer.service"
+import { string } from "prop-types"
+import { ClickAwayListener } from "@material-ui/core"
 
 @Service()
 export class QuizService {
@@ -75,15 +77,25 @@ export class QuizService {
       ) */
   }
 
-  public async createQuiz(quiz: Quiz): Promise<Quiz> {
-    const newQuiz: Quiz = await this.entityManager.save(quiz)
+  public async createQuiz(quiz: Quiz): Promise<Quiz | undefined> {
+    let oldQuiz: Quiz | undefined
+    let newQuiz: Quiz | undefined
 
-    if (newQuiz) {
+    await this.entityManager.transaction(async entityManager => {
+      if (quiz!.id) {
+        oldQuiz = await entityManager.findOne(Quiz, { id: quiz.id })
+        await this.removeOrphans(entityManager, oldQuiz, quiz)
+      }
+
+      newQuiz = await entityManager.save(quiz)
+    })
+
+    /*     if (newQuiz) {
       // test: ^ does not always return all?
       const updatedQuiz: Quiz[] = await Quiz.find({ id: newQuiz.id })
 
       return updatedQuiz[0]
-    }
+    } */
 
     return newQuiz
   }
@@ -99,6 +111,107 @@ export class QuizService {
       return true
     } catch {
       return false
+    }
+  }
+
+  private async removeOrphans(
+    entityManager: EntityManager,
+    oldQuiz: Quiz | undefined,
+    newQuiz: Quiz | undefined,
+  ): Promise<void> {
+    const toBeRemoved: { [key: string]: any[] } = {
+      textIds: [],
+      itemIds: [],
+      optionIds: [],
+      peerReviewQuestionIds: [],
+    }
+
+    if (!oldQuiz) {
+      return
+    }
+
+    if (oldQuiz.texts) {
+      const oldTextIds: Array<{
+        quizId: string | undefined
+        languageId: string
+      }> = oldQuiz.texts.map(text => ({
+        quizId: text.quizId,
+        languageId: text.languageId,
+      }))
+      const newTextIds: Array<{
+        quizId: string | undefined
+        languageId: string
+      }> = (newQuiz!.texts || []).map(text => ({
+        quizId: text.quizId,
+        languageId: text.languageId,
+      }))
+
+      const includesId = (
+        array: Array<{ quizId: string | undefined; languageId: string }>,
+        id: { quizId: string | undefined; languageId: string },
+      ) =>
+        array.some(
+          (arrayId: { quizId: string | undefined; languageId: string }) =>
+            arrayId.quizId === id.quizId &&
+            arrayId.languageId === id.languageId,
+        )
+
+      toBeRemoved.textIds = oldTextIds.filter(id => !includesId(newTextIds, id))
+    }
+
+    if (oldQuiz.items) {
+      const oldItemIds: string[] = []
+      const oldOptionIds: string[] = []
+      const newItemIds: string[] = []
+      const newOptionIds: string[] = []
+
+      oldQuiz.items.forEach(item => {
+        item.options.forEach(o => oldOptionIds.push(o.id))
+        oldItemIds.push(item.id)
+      })
+
+      if (newQuiz) {
+        ;(newQuiz!.items || []).forEach(item => {
+          item.options.forEach(o => newOptionIds.push(o.id))
+          newItemIds.push(item.id)
+        })
+      }
+
+      toBeRemoved.itemIds = oldItemIds.filter(id => !_.includes(newItemIds, id))
+      toBeRemoved.optionIds = oldOptionIds.filter(
+        id => !_.includes(newOptionIds, id),
+      )
+    }
+
+    if (oldQuiz.peerReviewQuestions) {
+      const oldPrqIds: string[] = (oldQuiz!.peerReviewQuestions || []).map(
+        prq => prq.id,
+      )
+      const newPrqIds: string[] = (newQuiz!.peerReviewQuestions || []).map(
+        prq => prq.id,
+      )
+
+      toBeRemoved.peerReviewQuestionIds = oldPrqIds.filter(
+        id => !_.includes(newPrqIds, id),
+      )
+    }
+
+    console.log("toBeRemoved", toBeRemoved)
+
+    if (toBeRemoved.textIds.length > 0) {
+      await entityManager.delete(QuizTranslation, toBeRemoved.textIds)
+    }
+    if (toBeRemoved.itemIds.length > 0) {
+      await entityManager.delete(QuizItem, toBeRemoved.itemIds)
+    }
+    if (toBeRemoved.optionIds.length > 0) {
+      await entityManager.delete(QuizOption, toBeRemoved.optionIds || [])
+    }
+    if (toBeRemoved.peerReviewQuestionIds.length > 0) {
+      await entityManager.delete(
+        PeerReviewQuestion,
+        toBeRemoved.peerReviewQuestionIds || [],
+      )
     }
   }
 

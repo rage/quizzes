@@ -58,12 +58,18 @@ export class QuizController {
     return await this.getQuizzes(id, params)
   }
 
+  @Post("/")
+  public async post(@EntityFromBody() quiz: Quiz): Promise<Quiz> {
+    //return await this.entityManager.save(quiz)
+    return await this.quizService.createQuiz(quiz)
+  }
+
   private async getQuizzes(
     id: string | null,
     params: string[],
   ): Promise<Quiz[]> {
     const query: IQuizQuery = {
-      id: null,
+      id,
       ..._.pick(params, [
         "course",
         "courseId",
@@ -78,11 +84,6 @@ export class QuizController {
     return await this.quizService.getQuizzes(query)
   }
 
-  @Post("/")
-  public async post(@EntityFromBody() quiz: Quiz): Promise<Quiz> {
-    //return await this.entityManager.save(quiz)
-    return await this.quizService.createQuiz(quiz)
-  }
   /*   @Post("/")
   public async post(@Body({ required: true }) quiz: Quiz): Promise<Quiz> {
     console.log("got", quiz)
