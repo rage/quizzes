@@ -1,5 +1,6 @@
 import {
     Button,
+    Collapse,
     Divider,
     ExpansionPanel,
     ExpansionPanelDetails,
@@ -7,7 +8,9 @@ import {
     FormControl,
     InputLabel,
     MenuItem,
+    Paper,
     Select,
+    SvgIcon,
     TextField,
     Typography
 } from '@material-ui/core'
@@ -15,7 +18,7 @@ import Tab from '@material-ui/core/Tab'
 import Tabs from '@material-ui/core/Tabs'
 import React from 'react'
 import { connect } from 'react-redux'
-import { arrayMove, SortableContainer, SortableElement} from 'react-sortable-hoc'
+import { arrayMove, SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
 import {
     INewPeerReviewQuestion,
     INewPeerReviewQuestionTranslation,
@@ -36,7 +39,8 @@ class QuizForm extends React.Component<any, any> {
         this.state = {
             course: '',
             language: null,
-            items: []
+            items: [],
+            hide: false
         }
     }
 
@@ -71,15 +75,28 @@ class QuizForm extends React.Component<any, any> {
                                 handleOrder={this.handleOrder}
                                 key={l.name}
                                 language={l.id}
+                                hidden={this.state.hide}
+                                onSortEnd={this.onSortEnd}
                             />))}
                     </div> :
                     <p />
                 }
                 <div>
-                    <Button type='submit'>save</Button>
+                    <Button onClick={this.hide}>save</Button>
                 </div>
             </form>
         )
+    }
+
+    private onSortEnd = ({ oldIndex, newIndex }) => {
+        console.log(oldIndex, newIndex)
+        this.props.changeOrder('items', oldIndex, newIndex)
+    }
+
+    private hide = () => {
+        this.setState({
+            hide: !this.state.hide
+        })
     }
 
     private handleChange = path => event => {
@@ -152,41 +169,110 @@ const TabContainer = (props: any) => {
             </div>
             <div style={{ marginTop: 50 }}>
                 <Typography variant='subtitle1'>Items</Typography>
-                {props.quiz.items.sort((i1, i2) => i1.order - i2.order).map((item, i) => itemSwitch(item, props.language, props.handleChange, props.handleOrder, i))}
+                <QuizItems onSortEnd={props.onSortEnd} useDragHandle={true} hidden={props.hidden} quiz={props.quiz} language={props.language} handleChange={props.handleChange} handleOrder={props.handleOrder} />
                 <Button>Add item</Button>
             </div>
         </div>
     )
 }
 
-const itemSwitch = (item, language, handleChange, handleOrder, index) => {
+const QuizItems = SortableContainer((props: any) => {
+    return (
+        <ul>
+            {props.quiz.items.sort((i1, i2) => i1.order - i2.order).map((item, i) => itemSwitch(item, props.language, props.handleChange, props.handleOrder, i, props.hidden))}
+        </ul>
+    )
+})
+
+const DragHandle = SortableHandle(() => <SvgIcon><path d="M20 9H4v2h16V9zM4 15h16v-2H4v2z"/></SvgIcon>)
+
+const OpenItem = SortableElement(({ item, language, index, handleChange, handleOrder }: any) => {
+    return (
+        <ExpansionPanel key={item.id} style={{ marginBottom: 20 }}>
+            <ExpansionPanelSummary>
+                <div style={{ flexBasis: "5%" }} >
+                    <DragHandle />
+                </div>
+                <div style={{ flexBasis: "70%" }}>
+                    <TextField
+                        label="title"
+                        value={item.texts.find(t => t.languageId === language).title}
+                        fullWidth={true}
+                        onChange={handleChange(`items[${index}].texts[${item.texts.findIndex(t => t.languageId === language)}].title`)}
+                    />
+                </div>
+                <div style={{ flexBasis: "20%" }} />
+                <div style={{ flexBasis: "5%" }}>
+                    <p>{item.order}</p>
+                </div>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+                <TextField
+                    label="validity regex"
+                    fullWidth={true}
+                    value={item.validityRegex}
+                />
+            </ExpansionPanelDetails>
+        </ExpansionPanel>
+    )
+})
+
+/*const OpenItem = SortableElement(({ item, language, index, handleChange, handleOrder, hidden }: any) => {
+    
+    return (
+        <Paper style={{ padding: 15, marginBottom: 5 }}>
+            <TextField
+                label="title"
+                value={item.texts.find(t => t.languageId === language).title}
+                fullWidth={true}
+                onChange={handleChange(`items[${index}].texts[${item.texts.findIndex(t => t.languageId === language)}].title`)}
+            />
+            <Collapse in={hidden}>
+                kissasmossus
+            </Collapse>
+        </Paper>
+    )
+})*/
+
+const itemSwitch = (item, language, handleChange, handleOrder, index, hidden) => {
 
     switch (item.type) {
         case "open":
-            return SortableElement(() => {
-                return (
-                    <ExpansionPanel key={item.id}>
-                        <ExpansionPanelSummary>
-                            <TextField
-                                value={item.texts.find(t => t.languageId === language).title} fullWidth={true}
-                                onChange={handleChange(`items[${index}].texts[${item.texts.findIndex(t => t.languageId === language)}].title`)}
-                            />
-                        </ExpansionPanelSummary>
-                        <ExpansionPanelDetails>
-                            <TextField
-                                value={item.order}
-                                label="order"
-                                type="number"
-                                inputProps={{
-                                    step: 1,
-                                    min: 0,
-                                }}
-                                onChange={handleOrder("items", item.order)}
-                            />
-                        </ExpansionPanelDetails>
-                    </ExpansionPanel>
-                )
-            })
+            return <OpenItem key={item.id} hidden={hidden} item={item} language={language} handleChange={handleChange} index={index} handleOrder={handleOrder} />
+        /* return (
+            <ExpansionPanel key={item.id} style={{ marginBottom: 20 }}>
+                <ExpansionPanelSummary>
+                    <div style={{ flexBasis: "75%" }}>
+                        <TextField
+                            label="title"
+                            value={item.texts.find(t => t.languageId === language).title}
+                            fullWidth={true}
+                            onChange={handleChange(`items[${index}].texts[${item.texts.findIndex(t => t.languageId === language)}].title`)}
+                        />
+                    </div>
+                    <div style={{ flexBasis: "10%" }} />
+                    <div style={{ flexBasis: "15%" }}>
+                        <TextField
+                            fullWidth={true}
+                            value={item.order}
+                            label="order"
+                            type="number"
+                            inputProps={{
+                                step: 1,
+                            }}
+                            onChange={handleOrder("items", item.order)}
+                        />
+                    </div>
+                </ExpansionPanelSummary>
+                <ExpansionPanelDetails>
+                    <TextField
+                        label="validity regex"
+                        fullWidth={true}
+                        value={item.validityRegex}
+                    />
+                </ExpansionPanelDetails>
+            </ExpansionPanel>
+        )*/
         case "essay":
             break
         case "radio":

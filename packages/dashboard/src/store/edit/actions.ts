@@ -1,4 +1,5 @@
 import _ from "lodash"
+import { arrayMove } from "react-sortable-hoc"
 import { ActionType, createAction } from "typesafe-actions"
 import {
   INewQuizQuery,
@@ -48,13 +49,8 @@ export const changeOrder = (path, current, next) => {
   return (dispatch, getState) => {
     const quiz = Object.assign({}, getState().edit)
     const array = _.get(quiz, path).sort((o1, o2) => o1.order - o2.order)
-    console.log(current, next)
     array[current].order = next
-    if (current - next > 0) {
-      array[current - 1].order = current
-    } else {
-      array[current + 1].order = current
-    }
+    array[next].order = current
     dispatch(set(quiz))
   }
 }
