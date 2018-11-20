@@ -20,7 +20,12 @@ import {
   INewQuizTranslation,
   IQuizQuery,
 } from "@quizzes/common/types"
-import { getUUIDByString, insert, randomUUID } from "@quizzes/common/util"
+import {
+  getUUIDByString,
+  insert,
+  randomUUID,
+  WhereBuilder,
+} from "@quizzes/common/util"
 import _ from "lodash"
 import { Service, Container } from "typedi"
 import { InjectManager } from "typeorm-typedi-extensions"
@@ -35,11 +40,11 @@ import {
   TransactionManager,
   AdvancedConsoleLogger,
   QueryBuilder,
+  ObjectLiteral,
+  FindOptionsWhereCondition,
 } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import quizanswerService from "./quizanswer.service"
-import { string } from "prop-types"
-import { ClickAwayListener } from "@material-ui/core"
 
 @Service()
 export class QuizService {
@@ -49,32 +54,34 @@ export class QuizService {
   public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
     const { id, language } = query
 
+    console.log("query", query)
     const queryBuilder: SelectQueryBuilder<
       Quiz
     > = this.entityManager.createQueryBuilder(Quiz, "quiz")
 
-    queryBuilder.leftJoinAndSelect(
-      "quiz.texts",
-      "quiz_translation",
-      language ? "quiz_translation.language_id = :language" : "",
-      { language },
-    )
+    const whereBuilder: WhereBuilder<Quiz> = new WhereBuilder(queryBuilder)
 
-    this.queryCourse(queryBuilder, query)
-    this.queryItems(queryBuilder, query)
-    this.queryPeerReviews(queryBuilder, query)
-
-    if (id) {
-      queryBuilder.where("quiz.id = :id", { id })
+    queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
+    if (language) {
+      whereBuilder.add("quiz_translation.language_id = :language", { language })
     }
 
-    return await queryBuilder.getMany()
-    /*       .then(
+    this.queryCourse(queryBuilder, whereBuilder, query)
+    this.queryItems(queryBuilder, whereBuilder, query)
+    this.queryPeerReviews(queryBuilder, whereBuilder, query)
+
+    if (id) {
+      whereBuilder.add("quiz.id = :id", { id })
+    }
+
+    return await queryBuilder
+      .getMany()
+      .then(
         async (quizzes: Quiz[]) =>
           await Promise.all(
             quizzes.map(async (q: Quiz) => this.stripQuiz(q, query)),
           ),
-      ) */
+      )
   }
 
   public async createQuiz(quiz: Quiz): Promise<Quiz | undefined> {
@@ -89,13 +96,6 @@ export class QuizService {
 
       newQuiz = await entityManager.save(quiz)
     })
-
-    /*     if (newQuiz) {
-      // test: ^ does not always return all?
-      const updatedQuiz: Quiz[] = await Quiz.find({ id: newQuiz.id })
-
-      return updatedQuiz[0]
-    } */
 
     return newQuiz
   }
@@ -196,8 +196,6 @@ export class QuizService {
       )
     }
 
-    console.log("toBeRemoved", toBeRemoved)
-
     if (toBeRemoved.textIds.length > 0) {
       await entityManager.delete(QuizTranslation, toBeRemoved.textIds)
     }
@@ -217,6 +215,7 @@ export class QuizService {
 
   private queryPeerReviews(
     queryBuilder: SelectQueryBuilder<Quiz>,
+    whereBuilder: WhereBuilder<Quiz>,
     query: IQuizQuery,
   ) {
     const { peerreviews, language } = query
@@ -232,7 +231,8 @@ export class QuizService {
       )
 
     if (language) {
-      queryBuilder.andWhere(
+      whereBuilder.add(
+        // queryBuilder.andWhere(
         new Brackets(qb => {
           qb.where("peer_review_question_translation.language_id = :language", {
             language,
@@ -244,6 +244,7 @@ export class QuizService {
 
   private queryOptions(
     queryBuilder: SelectQueryBuilder<Quiz>,
+    whereBuilder: WhereBuilder<Quiz>,
     query: IQuizQuery,
   ) {
     const { options, language } = query
@@ -255,19 +256,21 @@ export class QuizService {
     queryBuilder
       .leftJoinAndSelect("quiz_item.options", "quiz_option")
       .leftJoinAndSelect("quiz_option.texts", "quiz_option_translation")
-      .andWhere(
-        language
-          ? new Brackets(qb => {
-              qb.where("quiz_option_translation.language_id = :language", {
-                language,
-              }).orWhere("quiz_option_translation.language_id is null")
-            })
-          : "",
+
+    if (language) {
+      whereBuilder.add(
+        new Brackets(qb => {
+          qb.where("quiz_option_translation.language_id = :language", {
+            language,
+          }).orWhere("quiz_option_translation.language_id is null")
+        }),
       )
+    }
   }
 
   private queryItems(
     queryBuilder: SelectQueryBuilder<Quiz>,
+    whereBuilder: WhereBuilder<Quiz>,
     query: IQuizQuery,
   ) {
     const { items, options, language } = query
@@ -279,23 +282,25 @@ export class QuizService {
     queryBuilder
       .leftJoinAndSelect("quiz.items", "quiz_item")
       .leftJoinAndSelect("quiz_item.texts", "quiz_item_translation")
-      .andWhere(
-        language
-          ? new Brackets(qb => {
-              qb.where("quiz_item_translation.language_id = :language", {
-                language,
-              }).orWhere("quiz_item_translation.language_id is null")
-            })
-          : "",
+
+    if (language) {
+      whereBuilder.add(
+        new Brackets(qb => {
+          qb.where("quiz_item_translation.language_id = :language", {
+            language,
+          }).orWhere("quiz_item_translation.language_id is null")
+        }),
       )
+    }
 
     if (options) {
-      this.queryOptions(queryBuilder, query)
+      this.queryOptions(queryBuilder, whereBuilder, query)
     }
   }
 
   private queryCourse(
     queryBuilder: SelectQueryBuilder<Quiz>,
+    whereBuilder: WhereBuilder<Quiz>,
     query: IQuizQuery,
   ) {
     const { course, courseId, courseAbbreviation, language } = query
@@ -305,35 +310,29 @@ export class QuizService {
     }
 
     queryBuilder
-      .innerJoinAndSelect(
-        "quiz.course",
-        "course",
-        courseId ? "course.id = :courseId" : "",
-        { courseId },
-      )
-      .innerJoinAndSelect(
-        "course.texts",
-        "course_translation",
-        courseAbbreviation
-          ? "course_translation.abbreviation = :courseAbbreviation"
-          : "",
+      .innerJoinAndSelect("quiz.course", "course")
+      .innerJoinAndSelect("course.texts", "course_translation")
+      .innerJoinAndSelect("course.languages", "language")
+
+    if (courseId) {
+      whereBuilder.add("course_translation.id = :courseId", { courseId })
+    }
+    if (courseAbbreviation) {
+      whereBuilder.add(
+        "course_translation.abbreviation = :courseAbbreviation",
         { courseAbbreviation },
       )
-      .innerJoinAndSelect(
-        "course.languages",
-        "language",
-        language ? "language.id = :language" : "",
-        { language },
+    }
+
+    if (language) {
+      whereBuilder.add("language.id = :language", { language }).add(
+        new Brackets(qb => {
+          qb.where("course_translation.language_id = :language", {
+            language,
+          }).orWhere("course_translation.language_id is null")
+        }),
       )
-      .andWhere(
-        language
-          ? new Brackets(qb => {
-              qb.where("course_translation.language_id = :language", {
-                language,
-              }).orWhere("course_translation.language_id is null")
-            })
-          : "",
-      )
+    }
   }
 
   private async stripQuiz(quiz: Quiz, options: IQuizQuery): Promise<Quiz> {
