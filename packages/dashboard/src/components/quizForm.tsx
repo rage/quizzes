@@ -1,5 +1,6 @@
 import {
     Button,
+    Divider,
     ExpansionPanel,
     ExpansionPanelDetails,
     ExpansionPanelSummary,
@@ -14,6 +15,7 @@ import Tab from '@material-ui/core/Tab'
 import Tabs from '@material-ui/core/Tabs'
 import React from 'react'
 import { connect } from 'react-redux'
+import { arrayMove, SortableContainer, SortableElement} from 'react-sortable-hoc'
 import {
     INewPeerReviewQuestion,
     INewPeerReviewQuestionTranslation,
@@ -24,7 +26,7 @@ import {
     INewQuizQuery,
     INewQuizTranslation
 } from '../../../common/src/types/index'
-import { changeAttr, newQuiz, setEdit } from '../store/edit/actions'
+import { changeAttr, changeOrder, newQuiz, setEdit } from '../store/edit/actions'
 import { setFilter } from '../store/filter/actions'
 
 class QuizForm extends React.Component<any, any> {
@@ -62,7 +64,14 @@ class QuizForm extends React.Component<any, any> {
                             {this.props.edit.course.languages.map(l => <Tab value={l.id} key={l.id} label={l.id} />) || ""}
                             <Tab label="add" onClick={this.addLanguage} />
                         </Tabs>
-                        {this.props.edit.course.languages.map((l, i) => (this.props.filter.language === l.id && <TabContainer quiz={this.props.edit} changeAttr={this.props.changeAttr} handleChange={this.handleChange} key={l.name} index={i} language={l.id} />))}
+                        {this.props.edit.course.languages.map((l, i) => (
+                            this.props.filter.language === l.id && <TabContainer
+                                quiz={this.props.edit}
+                                handleChange={this.handleChange}
+                                handleOrder={this.handleOrder}
+                                key={l.name}
+                                language={l.id}
+                            />))}
                     </div> :
                     <p />
                 }
@@ -75,6 +84,12 @@ class QuizForm extends React.Component<any, any> {
 
     private handleChange = path => event => {
         this.props.changeAttr(path, event.target.value)
+    }
+
+    private handleOrder = (path, current) => event => {
+        if (event.target.value) {
+            this.props.changeOrder(path, current, parseInt(event.target.value, 10))
+        }
     }
 
     private addLanguage = () => {
@@ -114,12 +129,7 @@ class QuizForm extends React.Component<any, any> {
 }
 
 const TabContainer = (props: any) => {
-    let index = -1
-    props.quiz.texts.map((t, i) => t.languageId === props.language ? index = i : '')
-    if (index === -1) {
-        // props.changeAttr(`texts[${props.quiz.texts.length}]`, { quizId: props.quiz.id, languageId: props.language, title: "", body: "" })
-        // props.quiz.texts.map((t, i) => t.languageId === props.language ? index = i : '')
-    }
+    const index = props.quiz.texts.findIndex(t => t.languageId === props.language)
     return (
         <div>
             <div style={{ marginTop: 50 }}>
@@ -142,26 +152,41 @@ const TabContainer = (props: any) => {
             </div>
             <div style={{ marginTop: 50 }}>
                 <Typography variant='subtitle1'>Items</Typography>
-                {props.quiz.items.sort((i1, i2) => i1.order < i2.order).map(item => itemSwitch(item, props.language))}
+                {props.quiz.items.sort((i1, i2) => i1.order - i2.order).map((item, i) => itemSwitch(item, props.language, props.handleChange, props.handleOrder, i))}
                 <Button>Add item</Button>
             </div>
         </div>
     )
 }
 
-const itemSwitch = (item, language) => {
+const itemSwitch = (item, language, handleChange, handleOrder, index) => {
+
     switch (item.type) {
         case "open":
-            return (
-                <ExpansionPanel key={item.id}>
-                    <ExpansionPanelSummary>
-                        <TextField value={item.texts.find(t => t.languageId === language).title} fullWidth={true} />
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                        kissakoira
-                    </ExpansionPanelDetails>
-                </ExpansionPanel>
-            )
+            return SortableElement(() => {
+                return (
+                    <ExpansionPanel key={item.id}>
+                        <ExpansionPanelSummary>
+                            <TextField
+                                value={item.texts.find(t => t.languageId === language).title} fullWidth={true}
+                                onChange={handleChange(`items[${index}].texts[${item.texts.findIndex(t => t.languageId === language)}].title`)}
+                            />
+                        </ExpansionPanelSummary>
+                        <ExpansionPanelDetails>
+                            <TextField
+                                value={item.order}
+                                label="order"
+                                type="number"
+                                inputProps={{
+                                    step: 1,
+                                    min: 0,
+                                }}
+                                onChange={handleOrder("items", item.order)}
+                            />
+                        </ExpansionPanelDetails>
+                    </ExpansionPanel>
+                )
+            })
         case "essay":
             break
         case "radio":
@@ -187,6 +212,7 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = {
     changeAttr,
+    changeOrder,
     newQuiz,
     setEdit,
     setFilter
