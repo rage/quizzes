@@ -88,8 +88,8 @@ class QuizForm extends React.Component<any, any> {
         )
     }
 
-    private onSortEnd = ({ oldIndex, newIndex }) => {
-        this.props.changeOrder('items', oldIndex, newIndex)
+    private onSortEnd = ({ oldIndex, newIndex, collection }) => {
+        this.props.changeOrder(collection, oldIndex, newIndex)
     }
 
     private hide = () => {
@@ -176,7 +176,7 @@ const TabContainer = (props: any) => {
                     quiz={props.quiz}
                     language={props.language}
                     handleChange={props.handleChange}
-                    handleOrder={props.handleOrder} />
+                    handleSort={props.onSortEnd} />
                 <Button>Add item</Button>
             </div>
         </div>
@@ -186,20 +186,54 @@ const TabContainer = (props: any) => {
 const ItemContainer = SortableContainer((props: any) => {
     return (
         <div>
-            {props.quiz.items.sort((i1, i2) => i1.order - i2.order).map((item, i) => <ItemSwitch key={item.id} item={item} language={props.language} handleChange={props.handleChange} index={i} />)}
+            {props.quiz.items.sort((i1, i2) => i1.order - i2.order).map((item, i) =>
+                <ItemSwitch
+                    key={item.id}
+                    item={item}
+                    language={props.language}
+                    handleChange={props.handleChange}
+                    index={i}
+                    handleSort={props.handleSort}
+                />)}
         </div>
     )
 })
 
-const OptionContainer = SortableContainer((props: any) => {
-    return (
-        <div>
-            {props.options.sort((o1, o2) => o1.order - o2.order).map((option, index) => <RadioOption collection={`item_${props.itemId}_options`} option={option} index={index} key={option.id} />)}
-        </div>
-    )
-})
-
-const DragHandle = SortableHandle(() => <SvgIcon><path d="M20 9H4v2h16V9zM4 15h16v-2H4v2z" /></SvgIcon>)
+const ItemSwitch = ({ item, language, handleChange, index, handleSort }: any) => {
+    console.log(item.type)
+    switch (item.type) {
+        case "open":
+            return (
+                <OpenItem
+                    collection="items"
+                    item={item}
+                    language={language}
+                    handleChange={handleChange}
+                    index={index}
+                />
+            )
+        case "essay":
+            break
+        case "radio":
+            return (
+                <RadioItem
+                    handleSort={handleSort}
+                    collection="items"
+                    item={item}
+                    language={language}
+                    handleChange={handleChange}
+                    index={index}
+                />
+            )
+        case "checkbox":
+            break
+        case "scale":
+            break
+        case "research-agreement":
+            break
+    }
+    return <p />
+}
 
 const OpenItem = SortableElement((props: any) => {
     return (
@@ -255,9 +289,17 @@ const RadioItem = SortableElement((props: any) => {
                 </div>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
-                <OptionContainer options={props.item.options} itemId={props.item.id} />
+                <OptionContainer onSortEnd={props.handleSort} options={props.item.options} itemOrder={props.item.order} useDragHandle={true} />
             </ExpansionPanelDetails>
         </ExpansionPanel>
+    )
+})
+
+const OptionContainer = SortableContainer((props: any) => {
+    return (
+        <div>
+            {props.options.sort((o1, o2) => o1.order - o2.order).map((option, index) => <RadioOption collection={`items[${props.itemOrder}].options`} option={option} index={index} key={option.id} />)}
+        </div>
     )
 })
 
@@ -271,43 +313,7 @@ const RadioOption = SortableElement((props: any) => {
     )
 })
 
-
-
-/*const OpenItem = SortableElement(({ item, language, index, handleChange, handleOrder, hidden }: any) => {
-    
-    return (
-        <Paper style={{ padding: 15, marginBottom: 5 }}>
-            <TextField
-                label="title"
-                value={item.texts.find(t => t.languageId === language).title}
-                fullWidth={true}
-                onChange={handleChange(`items[${index}].texts[${item.texts.findIndex(t => t.languageId === language)}].title`)}
-            />
-            <Collapse in={hidden}>
-                kissasmossus
-            </Collapse>
-        </Paper>
-    )
-})*/
-
-const ItemSwitch = ({ item, language, handleChange, index }: any) => {
-    console.log(item.type)
-    switch (item.type) {
-        case "open":
-            return <OpenItem collection="item" item={item} language={language} handleChange={handleChange} index={index} />
-        case "essay":
-            break
-        case "radio":
-            return <RadioItem collection="item" item={item} language={language} handleChange={handleChange} index={index} />
-        case "checkbox":
-            break
-        case "scale":
-            break
-        case "research-agreement":
-            break
-    }
-    return <p />
-}
+const DragHandle = SortableHandle(() => <SvgIcon><path d="M20 9H4v2h16V9zM4 15h16v-2H4v2z" /></SvgIcon>)
 
 const mapStateToProps = (state: any) => {
     return {
