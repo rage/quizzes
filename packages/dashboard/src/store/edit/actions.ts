@@ -63,8 +63,8 @@ const checkForMissingTranslation = paramQuiz => {
       quiz.texts.push({
         quizId: quiz.id || "",
         languageId: language,
-        title: "",
-        body: "",
+        title: `quiz title ${language}`,
+        body: `quiz body ${language}`,
       })
     }
     quiz.items.map((item, i) => {
@@ -72,7 +72,7 @@ const checkForMissingTranslation = paramQuiz => {
         quiz.items[i].texts.push({
           quizItemId: item.id,
           languageId: language,
-          title: "",
+          title: `item ${item.order} title ${language}`,
           body: null,
           successMessage: null,
           failureMessage: null,
@@ -83,7 +83,7 @@ const checkForMissingTranslation = paramQuiz => {
           quiz.items[i].options[j].texts.push({
             quizOptionId: option.id,
             languageId: language,
-            title: "",
+            title: `item ${option.order} title ${language}`,
             body: null,
             successMessage: null,
             failureMessage: null,

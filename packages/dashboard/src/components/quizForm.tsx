@@ -11,6 +11,7 @@ import {
     Paper,
     Select,
     SvgIcon,
+    Switch,
     TextField,
     Typography
 } from '@material-ui/core'
@@ -53,7 +54,6 @@ class QuizForm extends React.Component<any, any> {
     }
 
     public render() {
-
         return (
             <form onSubmit={this.submitQuiz}>
                 <FormControl>
@@ -89,7 +89,6 @@ class QuizForm extends React.Component<any, any> {
     }
 
     private onSortEnd = ({ oldIndex, newIndex }) => {
-        console.log(oldIndex, newIndex)
         this.props.changeOrder('items', oldIndex, newIndex)
     }
 
@@ -156,6 +155,7 @@ const TabContainer = (props: any) => {
                     value={props.quiz.texts[index].title}
                     margin="normal"
                     fullWidth={true}
+                    multiline={true}
                 />
                 <TextField
                     onChange={props.handleChange(`texts[${index}].body`)}
@@ -168,27 +168,42 @@ const TabContainer = (props: any) => {
                 />
             </div>
             <div style={{ marginTop: 50 }}>
-                <Typography variant='subtitle1'>Items</Typography>
-                <QuizItems onSortEnd={props.onSortEnd} useDragHandle={true} hidden={props.hidden} quiz={props.quiz} language={props.language} handleChange={props.handleChange} handleOrder={props.handleOrder} />
+                <Typography variant='subtitle1'>Items:</Typography>
+                <ItemContainer
+                    onSortEnd={props.onSortEnd}
+                    useDragHandle={true}
+                    hidden={props.hidden}
+                    quiz={props.quiz}
+                    language={props.language}
+                    handleChange={props.handleChange}
+                    handleOrder={props.handleOrder} />
                 <Button>Add item</Button>
             </div>
         </div>
     )
 }
 
-const QuizItems = SortableContainer((props: any) => {
+const ItemContainer = SortableContainer((props: any) => {
     return (
-        <ul>
-            {props.quiz.items.sort((i1, i2) => i1.order - i2.order).map((item, i) => itemSwitch(item, props.language, props.handleChange, props.handleOrder, i, props.hidden))}
-        </ul>
+        <div>
+            {props.quiz.items.sort((i1, i2) => i1.order - i2.order).map((item, i) => <ItemSwitch key={item.id} item={item} language={props.language} handleChange={props.handleChange} index={i} />)}
+        </div>
     )
 })
 
-const DragHandle = SortableHandle(() => <SvgIcon><path d="M20 9H4v2h16V9zM4 15h16v-2H4v2z"/></SvgIcon>)
-
-const OpenItem = SortableElement(({ item, language, index, handleChange, handleOrder }: any) => {
+const OptionContainer = SortableContainer((props: any) => {
     return (
-        <ExpansionPanel key={item.id} style={{ marginBottom: 20 }}>
+        <div>
+            {props.options.sort((o1, o2) => o1.order - o2.order).map((option, index) => <RadioOption collection={`item_${props.itemId}_options`} option={option} index={index} key={option.id} />)}
+        </div>
+    )
+})
+
+const DragHandle = SortableHandle(() => <SvgIcon><path d="M20 9H4v2h16V9zM4 15h16v-2H4v2z" /></SvgIcon>)
+
+const OpenItem = SortableElement((props: any) => {
+    return (
+        <ExpansionPanel style={{ marginBottom: 20 }}>
             <ExpansionPanelSummary>
                 <div style={{ flexBasis: "5%" }} >
                     <DragHandle />
@@ -196,26 +211,67 @@ const OpenItem = SortableElement(({ item, language, index, handleChange, handleO
                 <div style={{ flexBasis: "70%" }}>
                     <TextField
                         label="title"
-                        value={item.texts.find(t => t.languageId === language).title}
+                        value={props.item.texts.find(t => t.languageId === props.language).title}
                         fullWidth={true}
-                        onChange={handleChange(`items[${index}].texts[${item.texts.findIndex(t => t.languageId === language)}].title`)}
+                        onChange={props.handleChange(`items[${props.item.order}].texts[${props.item.texts.findIndex(t => t.languageId === props.language)}].title`)}
+                        multiline={true}
                     />
                 </div>
                 <div style={{ flexBasis: "20%" }} />
                 <div style={{ flexBasis: "5%" }}>
-                    <p>{item.order}</p>
+                    <p>{props.item.order}</p>
                 </div>
             </ExpansionPanelSummary>
             <ExpansionPanelDetails>
                 <TextField
                     label="validity regex"
                     fullWidth={true}
-                    value={item.validityRegex}
+                    value={props.item.validityRegex}
                 />
             </ExpansionPanelDetails>
         </ExpansionPanel>
     )
 })
+
+const RadioItem = SortableElement((props: any) => {
+    return (
+        <ExpansionPanel style={{ marginBottom: 20 }}>
+            <ExpansionPanelSummary>
+                <div style={{ flexBasis: "5%" }} >
+                    <DragHandle />
+                </div>
+                <div style={{ flexBasis: "70%" }}>
+                    <TextField
+                        label="title"
+                        value={props.item.texts.find(t => t.languageId === props.language).title}
+                        fullWidth={true}
+                        onChange={props.handleChange(`items[${props.item.order}].texts[${props.item.texts.findIndex(t => t.languageId === props.language)}].title`)}
+                        multiline={true}
+                    />
+                </div>
+                <div style={{ flexBasis: "20%" }} />
+                <div style={{ flexBasis: "5%" }}>
+                    <p>{props.item.order}</p>
+                </div>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+                <OptionContainer options={props.item.options} itemId={props.item.id} />
+            </ExpansionPanelDetails>
+        </ExpansionPanel>
+    )
+})
+
+const RadioOption = SortableElement((props: any) => {
+    return (
+        <div>
+            <DragHandle />
+            <TextField value={props.option.texts[0].title} />
+            <Switch checked={props.option.correct} color="primary" />
+        </div>
+    )
+})
+
+
 
 /*const OpenItem = SortableElement(({ item, language, index, handleChange, handleOrder, hidden }: any) => {
     
@@ -234,49 +290,15 @@ const OpenItem = SortableElement(({ item, language, index, handleChange, handleO
     )
 })*/
 
-const itemSwitch = (item, language, handleChange, handleOrder, index, hidden) => {
-
+const ItemSwitch = ({ item, language, handleChange, index }: any) => {
+    console.log(item.type)
     switch (item.type) {
         case "open":
-            return <OpenItem key={item.id} hidden={hidden} item={item} language={language} handleChange={handleChange} index={index} handleOrder={handleOrder} />
-        /* return (
-            <ExpansionPanel key={item.id} style={{ marginBottom: 20 }}>
-                <ExpansionPanelSummary>
-                    <div style={{ flexBasis: "75%" }}>
-                        <TextField
-                            label="title"
-                            value={item.texts.find(t => t.languageId === language).title}
-                            fullWidth={true}
-                            onChange={handleChange(`items[${index}].texts[${item.texts.findIndex(t => t.languageId === language)}].title`)}
-                        />
-                    </div>
-                    <div style={{ flexBasis: "10%" }} />
-                    <div style={{ flexBasis: "15%" }}>
-                        <TextField
-                            fullWidth={true}
-                            value={item.order}
-                            label="order"
-                            type="number"
-                            inputProps={{
-                                step: 1,
-                            }}
-                            onChange={handleOrder("items", item.order)}
-                        />
-                    </div>
-                </ExpansionPanelSummary>
-                <ExpansionPanelDetails>
-                    <TextField
-                        label="validity regex"
-                        fullWidth={true}
-                        value={item.validityRegex}
-                    />
-                </ExpansionPanelDetails>
-            </ExpansionPanel>
-        )*/
+            return <OpenItem collection="item" item={item} language={language} handleChange={handleChange} index={index} />
         case "essay":
             break
         case "radio":
-            break
+            return <RadioItem collection="item" item={item} language={language} handleChange={handleChange} index={index} />
         case "checkbox":
             break
         case "scale":
@@ -284,6 +306,7 @@ const itemSwitch = (item, language, handleChange, handleOrder, index, hidden) =>
         case "research-agreement":
             break
     }
+    return <p />
 }
 
 const mapStateToProps = (state: any) => {
