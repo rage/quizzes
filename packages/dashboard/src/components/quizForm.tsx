@@ -6,6 +6,7 @@ import {
     ExpansionPanelDetails,
     ExpansionPanelSummary,
     FormControl,
+    Grid,
     InputLabel,
     Menu,
     MenuItem,
@@ -32,7 +33,7 @@ import {
     INewQuizQuery,
     INewQuizTranslation
 } from '../../../common/src/types/index'
-import { addItem, changeAttr, changeOrder, newQuiz, setEdit } from '../store/edit/actions'
+import { addItem, addOption, changeAttr, changeOrder, newQuiz, save, setEdit } from '../store/edit/actions'
 import { setFilter } from '../store/filter/actions'
 
 class QuizForm extends React.Component<any, any> {
@@ -84,27 +85,32 @@ class QuizForm extends React.Component<any, any> {
                                 language={l.id}
                                 onSortEnd={this.onSortEnd}
                                 addItem={this.props.addItem}
+                                addOption={this.addOption}
                             />))}
                     </div> :
                     <p />
                 }
                 <Button id="menu" onClick={this.handleMenu}>Add item</Button>
                 <Menu anchorEl={this.state.menuOpen} open={Boolean(this.state.menuOpen)} onClose={this.handleMenu}>
-                    {this.itemTypes.map(type => <MenuItem key={type} onClick={this.addItem(type)}>{type}</MenuItem>)}
+                    {this.itemTypes.map(type => <MenuItem key={type} value={type} onClick={this.addItem}>{type}</MenuItem>)}
                 </Menu>
                 <Toolbar>
                     <Typography style={{ flex: 1 }} />
-                    <Button >save</Button>
+                    <Button onClick={this.props.save}>save</Button>
                 </Toolbar>
             </form>
         )
     }
 
-    private addItem = type => event => {
+    private addOption = item => event => {
+        this.props.addOption(item)
+    }
+
+    private addItem = event => {
         this.setState({
             menuOpen: null
         })
-        this.props.addItem(type)
+        this.props.addItem(event.target.value)
     }
 
     private handleMenu = (event) => {
@@ -137,75 +143,6 @@ class QuizForm extends React.Component<any, any> {
         event.preventDefault()
         console.log(event.target.title_fi_FI.value)
         console.log(event.target.title_en_US.value)
-    }
-}
-
-class TabContainer2 extends React.Component<any, any> {
-
-    constructor(props) {
-        super(props)
-        this.state = {
-            menuOpen: null
-        }
-    }
-
-    public render() {
-
-        const index = this.props.quiz.texts.findIndex(t => t.languageId === this.props.language)
-
-        return (
-            <div>
-                <div style={{ marginTop: 50 }}>
-                    <TextField
-                        onChange={this.props.handleChange(`texts[${index}].title`)}
-                        label='Title'
-                        value={this.props.quiz.texts[index].title}
-                        margin="normal"
-                        fullWidth={true}
-                        multiline={true}
-                    />
-                    <TextField
-                        onChange={this.props.handleChange(`texts[${index}].body`)}
-                        label='Body'
-                        value={this.props.quiz.texts[index].body}
-                        margin="normal"
-                        fullWidth={true}
-                        multiline={true}
-                        rowsMax="10"
-                    />
-                </div>
-                <div style={{ marginTop: 50 }}>
-                    <Typography variant='subtitle1'>Items:</Typography>
-                    <ItemContainer
-                        onSortEnd={this.props.onSortEnd}
-                        useDragHandle={true}
-                        hidden={this.props.hidden}
-                        quiz={this.props.quiz}
-                        language={this.props.language}
-                        handleChange={this.props.handleChange}
-                        handleSort={this.props.onSortEnd}
-                        addItem={this.props.addItem}
-                    />
-                    <Button id="menu" onClick={this.handleMenu}>Add item</Button>
-                    <Menu anchorEl={this.state.menuOpen} open={Boolean(this.state.menuOpen)} onClose={this.handleMenu}>
-                        <MenuItem onClick={this.addItem("open")}>open</MenuItem>
-                    </Menu>
-                </div>
-            </div>
-        )
-    }
-
-    private addItem = type => event => {
-        this.setState({
-            menuOpen: null
-        })
-        this.props.addItem(type)
-    }
-
-    private handleMenu = (event) => {
-        this.setState({
-            menuOpen: this.state.menuOpen ? null : event.currentTarget
-        })
     }
 }
 
@@ -243,6 +180,7 @@ const TabContainer = (props: any) => {
                     handleChange={props.handleChange}
                     handleSort={props.onSortEnd}
                     addItem={props.addItem}
+                    addOption={props.addOption}
                 />
             </div>
         </div>
@@ -253,19 +191,96 @@ const ItemContainer = SortableContainer((props: any) => {
     return (
         <div>
             {props.quiz.items.sort((i1, i2) => i1.order - i2.order).map((item, i) =>
-                <ItemSwitch
+                <Item
                     key={item.id || item.type + i}
                     item={item}
                     language={props.language}
                     handleChange={props.handleChange}
                     index={i}
                     handleSort={props.handleSort}
+                    addOption={props.addOption}
                 />)}
         </div>
     )
 })
 
-const ItemSwitch = ({ item, language, handleChange, index, handleSort }: any) => {
+const Item = SortableElement((props: any) => {
+    return (
+        <ExpansionPanel style={{ marginBottom: 20 }}>
+            <ExpansionPanelSummary>
+                <div style={{ flexBasis: "5%" }} >
+                    <DragHandle />
+                </div>
+                <div style={{ flexBasis: "70%" }}>
+                    <TextField
+                        label="title"
+                        value={props.item.texts.find(t => t.languageId === props.language).title}
+                        fullWidth={true}
+                        onChange={props.handleChange(`items[${props.item.order}].texts[${props.item.texts.findIndex(t => t.languageId === props.language)}].title`)}
+                        multiline={true}
+                    />
+                </div>
+                <div style={{ flexBasis: "20%" }} />
+                <div style={{ flexBasis: "5%" }}>
+                    <p>{props.item.order}</p>
+                </div>
+            </ExpansionPanelSummary>
+            <ExpansionPanelDetails>
+                <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
+                    <Grid item={true} xs={12}>
+                        <TextField
+                            label="validity regex"
+                            fullWidth={true}
+                            value={props.item.validityRegex || ""}
+                        />
+                    </Grid>
+                    <Grid item={true} xs={12}>
+
+                        <OptionContainer
+                            axis="xy"
+                            onSortEnd={props.handleSort}
+                            options={props.item.options}
+                            itemOrder={props.item.order}
+                            useDragHandle={true}
+                            addOption={props.addOption}
+                        />
+
+                    </Grid>
+                </Grid>
+            </ExpansionPanelDetails>
+        </ExpansionPanel>
+    )
+})
+
+const OptionContainer = SortableContainer((props: any) => {
+    return (
+        <Grid container={true} spacing={16}>
+            {props.options.sort((o1, o2) => o1.order - o2.order).map((option, index) => <Option collection={`items[${props.itemOrder}].options`} option={option} index={index} key={option.id || props.itemOrder + index} />)}
+            <Grid item={true} xs={3} >
+                <Paper style={{ padding: 5, marginBottom: 5 }}>
+                    <Button onClick={props.addOption(props.itemOrder)} fullWidth={true}>add</Button>
+                </Paper>
+            </Grid>
+        </Grid>
+    )
+})
+
+const Option = SortableElement((props: any) => {
+    return (
+        <Grid item={true} xs={3} >
+            <Paper style={{ padding: 5, marginBottom: 5 }}>
+                <DragHandle />
+                <TextField value={props.option.texts[0].title} multiline={true} />
+                <Switch checked={props.option.correct} color="primary" />
+            </Paper>
+        </Grid>
+    )
+})
+
+const DragHandle = SortableHandle(() => <SvgIcon><path d="M20 9H4v2h16V9zM4 15h16v-2H4v2z" /></SvgIcon>)
+
+
+/* const ItemSwitch = ({ item, language, handleChange, index, handleSort }: any) => {
     // console.log(item.type)
     switch (item.type) {
         case "open":
@@ -368,27 +383,8 @@ const RadioItem = SortableElement((props: any) => {
             </ExpansionPanelDetails>
         </ExpansionPanel>
     )
-})
+}) */
 
-const OptionContainer = SortableContainer((props: any) => {
-    return (
-        <div>
-            {props.options.sort((o1, o2) => o1.order - o2.order).map((option, index) => <Option collection={`items[${props.itemOrder}].options`} option={option} index={index} key={option.id} />)}
-        </div>
-    )
-})
-
-const Option = SortableElement((props: any) => {
-    return (
-        <Paper style={{ padding: 5, marginBottom: 5 }}>
-            <DragHandle />
-            <TextField value={props.option.texts[0].title} multiline={true} fullWidth={true} />
-            <Switch checked={props.option.correct} color="primary" />
-        </Paper>
-    )
-})
-
-const DragHandle = SortableHandle(() => <SvgIcon><path d="M20 9H4v2h16V9zM4 15h16v-2H4v2z" /></SvgIcon>)
 
 const mapStateToProps = (state: any) => {
     return {
@@ -402,9 +398,11 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = {
     addItem,
+    addOption,
     changeAttr,
     changeOrder,
     newQuiz,
+    save,
     setEdit,
     setFilter
 }

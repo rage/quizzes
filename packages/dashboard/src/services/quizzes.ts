@@ -7,3 +7,7 @@ export const getQuizzes = async () => {
   // return response.data
   return quizzes
 }
+
+export const post = async quiz => {
+  console.log("POST", quiz)
+}

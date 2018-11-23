@@ -5,6 +5,7 @@ import {
   INewQuizQuery,
   INewQuizTranslation,
 } from "../../../../common/src/types/index"
+import { post } from "../../services/quizzes"
 import { setFilter } from "../filter/actions"
 
 export const set = createAction("edit/SET", resolve => {
@@ -22,18 +23,30 @@ export const setEdit = (quiz: any) => {
   }
 }
 
+export const save = () => {
+  return async (dispatch, getState) => {
+    await post(getState().edit)
+  }
+}
+
 export const newQuiz = () => {
   return (dispatch, getState) => {
     const course = getState().courses.find(
       c => c.id === getState().filter.course,
     )
-    dispatch(
+    const quiz = {
+      course,
+      texts: [],
+      items: [],
+    }
+    dispatch(setEdit(quiz))
+    /*dispatch(
       create({
         courseId: course.id,
         course,
       }),
-    )
-    dispatch(setFilter("language", course.languages[0].id))
+    )*/
+    // dispatch(setFilter("language", course.languages[0].id))
   }
 }
 
@@ -70,6 +83,22 @@ export const addItem = type => {
     }
     console.log(item)
     quiz.items.push(item)
+    dispatch(setEdit(quiz))
+  }
+}
+
+export const addOption = item => {
+  console.log(item)
+  return (dispatch, getState) => {
+    const quiz = Object.assign({}, getState().edit)
+    const option = {
+      quizItemId: quiz.items[item].id,
+      order: quiz.items[item].options.length,
+      correct: false,
+      texts: [],
+    }
+    console.log(option)
+    quiz.items[item].options.push(option)
     dispatch(setEdit(quiz))
   }
 }
