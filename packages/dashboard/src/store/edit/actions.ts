@@ -55,6 +55,25 @@ export const changeOrder = (path, current, next) => {
   }
 }
 
+export const addItem = type => {
+  console.log(type)
+  return (dispatch, getState) => {
+    const quiz = Object.assign({}, getState().edit)
+    const item = {
+      quizId: quiz.id,
+      type,
+      order: quiz.items.length,
+      validityRegex: undefined,
+      formatRegex: undefined,
+      texts: [],
+      options: [],
+    }
+    console.log(item)
+    quiz.items.push(item)
+    dispatch(setEdit(quiz))
+  }
+}
+
 const checkForMissingTranslation = paramQuiz => {
   const quiz = Object.assign({}, paramQuiz)
   const languages = quiz.course.languages.map(l => l.id)

@@ -94,31 +94,6 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
       )
     }
 
-    /* const Switch = ({ match }) => {
-      const quiz = this.props.quizzes.find(q => q.id === match.params.id)
-      if (quiz) {
-        this.props.setEdit(quiz)
-        return <QuizForm />
-      } else {
-        this.props.newQuiz()
-        return <QuizForm />
-      }
-    } */
-
-    // <Switch quizzes={this.props.quizzes} setEdit={this.props.setEdit} newQuiz={this.props.newQuiz} />
-
-    const QuizView = ({ match }) => {
-      const quiz = this.props.quizzes.find(q => q.id === match.params.id)
-      if (!quiz) {
-        return <p>loading..</p>
-      }
-      return (
-        <div>
-          <Typography variant='headline' gutterBottom={true}>{quiz.texts[0].title}</Typography>
-          <Typography variant='body1'>{quiz.texts[0].body}</Typography>
-        </div>)
-    }
-
     return (
       <div>
         <Router>

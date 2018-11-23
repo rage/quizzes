@@ -7,12 +7,14 @@ import {
     ExpansionPanelSummary,
     FormControl,
     InputLabel,
+    Menu,
     MenuItem,
     Paper,
     Select,
     SvgIcon,
     Switch,
     TextField,
+    Toolbar,
     Typography
 } from '@material-ui/core'
 import Tab from '@material-ui/core/Tab'
@@ -30,18 +32,24 @@ import {
     INewQuizQuery,
     INewQuizTranslation
 } from '../../../common/src/types/index'
-import { changeAttr, changeOrder, newQuiz, setEdit } from '../store/edit/actions'
+import { addItem, changeAttr, changeOrder, newQuiz, setEdit } from '../store/edit/actions'
 import { setFilter } from '../store/filter/actions'
 
 class QuizForm extends React.Component<any, any> {
 
+    private itemTypes = [
+        "checkbox",
+        "essay",
+        "open",
+        "radio",
+        "research-agreement",
+        "scale"
+    ]
+
     constructor(props) {
         super(props)
         this.state = {
-            course: '',
-            language: null,
-            items: [],
-            hide: false
+            menuOpen: null
         }
     }
 
@@ -59,7 +67,7 @@ class QuizForm extends React.Component<any, any> {
                 <FormControl>
                     <InputLabel>Course</InputLabel>
                     <Select onChange={this.selectCourse} value={this.props.edit.course.id || this.props.filter.course} inputProps={{ name: 'course' }} style={{ minWidth: 350 }}>
-                        {this.props.courses.map(course => <MenuItem key={course.id} value={course.id}>{course.id}</MenuItem>) || ""}
+                        {this.props.courses.map(course => <MenuItem key={course.id} value={course.id}>{course.texts[0].title}</MenuItem>) || ""}
                     </Select>
                 </FormControl>
                 {this.props.edit.course.languages ?
@@ -72,40 +80,45 @@ class QuizForm extends React.Component<any, any> {
                             this.props.filter.language === l.id && <TabContainer
                                 quiz={this.props.edit}
                                 handleChange={this.handleChange}
-                                handleOrder={this.handleOrder}
                                 key={l.name}
                                 language={l.id}
-                                hidden={this.state.hide}
                                 onSortEnd={this.onSortEnd}
+                                addItem={this.props.addItem}
                             />))}
                     </div> :
                     <p />
                 }
-                <div>
-                    <Button onClick={this.hide}>save</Button>
-                </div>
+                <Button id="menu" onClick={this.handleMenu}>Add item</Button>
+                <Menu anchorEl={this.state.menuOpen} open={Boolean(this.state.menuOpen)} onClose={this.handleMenu}>
+                    {this.itemTypes.map(type => <MenuItem key={type} onClick={this.addItem(type)}>{type}</MenuItem>)}
+                </Menu>
+                <Toolbar>
+                    <Typography style={{ flex: 1 }} />
+                    <Button >save</Button>
+                </Toolbar>
             </form>
         )
+    }
+
+    private addItem = type => event => {
+        this.setState({
+            menuOpen: null
+        })
+        this.props.addItem(type)
+    }
+
+    private handleMenu = (event) => {
+        this.setState({
+            menuOpen: this.state.menuOpen ? null : event.currentTarget
+        })
     }
 
     private onSortEnd = ({ oldIndex, newIndex, collection }) => {
         this.props.changeOrder(collection, oldIndex, newIndex)
     }
 
-    private hide = () => {
-        this.setState({
-            hide: !this.state.hide
-        })
-    }
-
     private handleChange = path => event => {
         this.props.changeAttr(path, event.target.value)
-    }
-
-    private handleOrder = (path, current) => event => {
-        if (event.target.value) {
-            this.props.changeOrder(path, current, parseInt(event.target.value, 10))
-        }
     }
 
     private addLanguage = () => {
@@ -114,33 +127,85 @@ class QuizForm extends React.Component<any, any> {
 
     private handleTabs = (event, value) => {
         this.props.setFilter('language', value)
-        /* this.setState({
-            language: value
-        }) */
-    }
-
-    private addItem = () => {
-        this.setState({
-            items: []
-        })
     }
 
     private selectCourse = (event) => {
-        this.setState({
-            course: event.target.value
-        })
-    }
-
-    private selectLanguage = (event) => {
-        this.setState({
-            language: event.target.value
-        })
+        console.log(event.target.value)
     }
 
     private submitQuiz = (event) => {
         event.preventDefault()
         console.log(event.target.title_fi_FI.value)
         console.log(event.target.title_en_US.value)
+    }
+}
+
+class TabContainer2 extends React.Component<any, any> {
+
+    constructor(props) {
+        super(props)
+        this.state = {
+            menuOpen: null
+        }
+    }
+
+    public render() {
+
+        const index = this.props.quiz.texts.findIndex(t => t.languageId === this.props.language)
+
+        return (
+            <div>
+                <div style={{ marginTop: 50 }}>
+                    <TextField
+                        onChange={this.props.handleChange(`texts[${index}].title`)}
+                        label='Title'
+                        value={this.props.quiz.texts[index].title}
+                        margin="normal"
+                        fullWidth={true}
+                        multiline={true}
+                    />
+                    <TextField
+                        onChange={this.props.handleChange(`texts[${index}].body`)}
+                        label='Body'
+                        value={this.props.quiz.texts[index].body}
+                        margin="normal"
+                        fullWidth={true}
+                        multiline={true}
+                        rowsMax="10"
+                    />
+                </div>
+                <div style={{ marginTop: 50 }}>
+                    <Typography variant='subtitle1'>Items:</Typography>
+                    <ItemContainer
+                        onSortEnd={this.props.onSortEnd}
+                        useDragHandle={true}
+                        hidden={this.props.hidden}
+                        quiz={this.props.quiz}
+                        language={this.props.language}
+                        handleChange={this.props.handleChange}
+                        handleSort={this.props.onSortEnd}
+                        addItem={this.props.addItem}
+                    />
+                    <Button id="menu" onClick={this.handleMenu}>Add item</Button>
+                    <Menu anchorEl={this.state.menuOpen} open={Boolean(this.state.menuOpen)} onClose={this.handleMenu}>
+                        <MenuItem onClick={this.addItem("open")}>open</MenuItem>
+                    </Menu>
+                </div>
+            </div>
+        )
+    }
+
+    private addItem = type => event => {
+        this.setState({
+            menuOpen: null
+        })
+        this.props.addItem(type)
+    }
+
+    private handleMenu = (event) => {
+        this.setState({
+            menuOpen: this.state.menuOpen ? null : event.currentTarget
+        })
     }
 }
 
@@ -176,8 +241,9 @@ const TabContainer = (props: any) => {
                     quiz={props.quiz}
                     language={props.language}
                     handleChange={props.handleChange}
-                    handleSort={props.onSortEnd} />
-                <Button>Add item</Button>
+                    handleSort={props.onSortEnd}
+                    addItem={props.addItem}
+                />
             </div>
         </div>
     )
@@ -188,7 +254,7 @@ const ItemContainer = SortableContainer((props: any) => {
         <div>
             {props.quiz.items.sort((i1, i2) => i1.order - i2.order).map((item, i) =>
                 <ItemSwitch
-                    key={item.id}
+                    key={item.id || item.type + i}
                     item={item}
                     language={props.language}
                     handleChange={props.handleChange}
@@ -200,7 +266,7 @@ const ItemContainer = SortableContainer((props: any) => {
 })
 
 const ItemSwitch = ({ item, language, handleChange, index, handleSort }: any) => {
-    console.log(item.type)
+    // console.log(item.type)
     switch (item.type) {
         case "open":
             return (
@@ -226,7 +292,16 @@ const ItemSwitch = ({ item, language, handleChange, index, handleSort }: any) =>
                 />
             )
         case "checkbox":
-            break
+            return (
+                <RadioItem
+                    handleSort={handleSort}
+                    collection="items"
+                    item={item}
+                    language={language}
+                    handleChange={handleChange}
+                    index={index}
+                />
+            )
         case "scale":
             break
         case "research-agreement":
@@ -298,18 +373,18 @@ const RadioItem = SortableElement((props: any) => {
 const OptionContainer = SortableContainer((props: any) => {
     return (
         <div>
-            {props.options.sort((o1, o2) => o1.order - o2.order).map((option, index) => <RadioOption collection={`items[${props.itemOrder}].options`} option={option} index={index} key={option.id} />)}
+            {props.options.sort((o1, o2) => o1.order - o2.order).map((option, index) => <Option collection={`items[${props.itemOrder}].options`} option={option} index={index} key={option.id} />)}
         </div>
     )
 })
 
-const RadioOption = SortableElement((props: any) => {
+const Option = SortableElement((props: any) => {
     return (
-        <div>
+        <Paper style={{ padding: 5, marginBottom: 5 }}>
             <DragHandle />
-            <TextField value={props.option.texts[0].title} />
+            <TextField value={props.option.texts[0].title} multiline={true} fullWidth={true} />
             <Switch checked={props.option.correct} color="primary" />
-        </div>
+        </Paper>
     )
 })
 
@@ -326,6 +401,7 @@ const mapStateToProps = (state: any) => {
 }
 
 const mapDispatchToProps = {
+    addItem,
     changeAttr,
     changeOrder,
     newQuiz,
