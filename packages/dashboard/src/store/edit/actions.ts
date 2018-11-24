@@ -61,6 +61,7 @@ export const changeAttr = (path, value) => {
 export const changeOrder = (path, current, next) => {
   return (dispatch, getState) => {
     const quiz = Object.assign({}, getState().edit)
+    console.log(path)
     const array = _.get(quiz, path).sort((o1, o2) => o1.order - o2.order)
     array[current].order = next
     array[next].order = current
@@ -131,7 +132,7 @@ const checkForMissingTranslation = paramQuiz => {
           quiz.items[i].options[j].texts.push({
             quizOptionId: option.id,
             languageId: language,
-            title: `item ${option.order} title ${language}`,
+            title: `option ${option.order} title ${language}`,
             body: null,
             successMessage: null,
             failureMessage: null,

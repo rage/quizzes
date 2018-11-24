@@ -1,5 +1,9 @@
 import {
     Button,
+    Card,
+    CardActions,
+    CardContent,
+    CardHeader,
     Collapse,
     Divider,
     ExpansionPanel,
@@ -7,6 +11,7 @@ import {
     ExpansionPanelSummary,
     FormControl,
     Grid,
+    IconButton,
     InputLabel,
     Menu,
     MenuItem,
@@ -120,6 +125,7 @@ class QuizForm extends React.Component<any, any> {
     }
 
     private onSortEnd = ({ oldIndex, newIndex, collection }) => {
+        console.log(collection)
         this.props.changeOrder(collection, oldIndex, newIndex)
     }
 
@@ -173,7 +179,6 @@ const TabContainer = (props: any) => {
                 <Typography variant='subtitle1'>Items:</Typography>
                 <ItemContainer
                     onSortEnd={props.onSortEnd}
-                    useDragHandle={true}
                     hidden={props.hidden}
                     quiz={props.quiz}
                     language={props.language}
@@ -181,6 +186,7 @@ const TabContainer = (props: any) => {
                     handleSort={props.onSortEnd}
                     addItem={props.addItem}
                     addOption={props.addOption}
+                    useDragHandle={true}
                 />
             </div>
         </div>
@@ -191,66 +197,95 @@ const ItemContainer = SortableContainer((props: any) => {
     return (
         <div>
             {props.quiz.items.sort((i1, i2) => i1.order - i2.order).map((item, i) =>
-                <Item
-                    key={item.id || item.type + i}
-                    item={item}
-                    language={props.language}
-                    handleChange={props.handleChange}
-                    index={i}
-                    handleSort={props.handleSort}
-                    addOption={props.addOption}
-                />)}
+                <SortableWrapper key={item.id || item.type + i} index={i} collection="items">
+                    <Item
+                        item={item}
+                        language={props.language}
+                        handleChange={props.handleChange}
+                        index={i}
+                        handleSort={props.handleSort}
+                        addOption={props.addOption}
+                        collection="items"
+                    />
+                </SortableWrapper>)}
         </div>
     )
 })
 
-const Item = SortableElement((props: any) => {
-    return (
-        <ExpansionPanel style={{ marginBottom: 20 }}>
-            <ExpansionPanelSummary>
-                <div style={{ flexBasis: "5%" }} >
-                    <DragHandle />
-                </div>
-                <div style={{ flexBasis: "70%" }}>
-                    <TextField
-                        label="title"
-                        value={props.item.texts.find(t => t.languageId === props.language).title}
-                        fullWidth={true}
-                        onChange={props.handleChange(`items[${props.item.order}].texts[${props.item.texts.findIndex(t => t.languageId === props.language)}].title`)}
-                        multiline={true}
+class Item extends React.Component<any, any> {
+
+    constructor(props) {
+        super(props)
+        this.state = {
+            expanded: false
+        }
+    }
+
+    public render() {
+        return (
+            <Card style={{ marginBottom: 20 }}>
+                <DragHandleWrapper>
+                    <CardHeader
+                        title={this.props.item.texts.find(t => t.languageId === this.props.language).title}
+                        titleTypographyProps={{ variant: "subtitle1", gutterBottom: false }}
                     />
-                </div>
-                <div style={{ flexBasis: "20%" }} />
-                <div style={{ flexBasis: "5%" }}>
-                    <p>{props.item.order}</p>
-                </div>
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
-                <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
-                    <Grid item={true} xs={12}>
-                        <TextField
-                            label="validity regex"
-                            fullWidth={true}
-                            value={props.item.validityRegex || ""}
-                        />
-                    </Grid>
-                    <Grid item={true} xs={12}>
+                </DragHandleWrapper>
+                <CardActions>
+                    <IconButton onClick={this.handleExpand}>
+                        <SvgIcon><path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" /></SvgIcon>
+                    </IconButton>
+                </CardActions>
+                <Collapse in={this.state.expanded}>
+                    <CardContent>
+                        <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
+                            <Grid item={true} xs={12}>
+                                <Card>
+                                    <CardHeader subheader="general" />
+                                    <CardContent>
+                                        <TextField
+                                            label="title"
+                                            value={this.props.item.texts.find(t => t.languageId === this.props.language).title}
+                                            fullWidth={true}
+                                            onChange={this.props.handleChange(`items[${this.props.item.order}].texts[${this.props.item.texts.findIndex(t => t.languageId === this.props.language)}].title`)}
+                                            multiline={true}
+                                            margin="normal"
+                                        />
+                                        <TextField
+                                            label="validity regex"
+                                            fullWidth={true}
+                                            value={this.props.item.validityRegex || ""}
+                                            margin="normal"
+                                        />
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                            <Grid item={true} xs={12}>
+                                <Card>
+                                    <CardHeader subheader="options" />
+                                    <CardContent>
+                                        <OptionContainer
+                                            axis="xy"
+                                            onSortEnd={this.props.handleSort}
+                                            options={this.props.item.options}
+                                            itemOrder={this.props.item.order}
+                                            // useDragHandle={true}
+                                            addOption={this.props.addOption}
+                                        />
+                                    </CardContent>
+                                </Card>
+                            </Grid>
+                        </Grid>
+                    </CardContent>
+                </Collapse>
+            </Card>
+        )
+    }
 
-                        <OptionContainer
-                            axis="xy"
-                            onSortEnd={props.handleSort}
-                            options={props.item.options}
-                            itemOrder={props.item.order}
-                            useDragHandle={true}
-                            addOption={props.addOption}
-                        />
+    private handleExpand = (event) => {
+        this.setState({ expanded: !this.state.expanded })
+    }
+}
 
-                    </Grid>
-                </Grid>
-            </ExpansionPanelDetails>
-        </ExpansionPanel>
-    )
-})
 
 const OptionContainer = SortableContainer((props: any) => {
     return (
@@ -269,7 +304,6 @@ const Option = SortableElement((props: any) => {
     return (
         <Grid item={true} xs={3} >
             <Paper style={{ padding: 5, marginBottom: 5 }}>
-                <DragHandle />
                 <TextField value={props.option.texts[0].title} multiline={true} />
                 <Switch checked={props.option.correct} color="primary" />
             </Paper>
@@ -279,12 +313,16 @@ const Option = SortableElement((props: any) => {
 
 const DragHandle = SortableHandle(() => <SvgIcon><path d="M20 9H4v2h16V9zM4 15h16v-2H4v2z" /></SvgIcon>)
 
+const DragHandleWrapper = SortableHandle((props: any) => <div>{props.children}</div>)
 
-/* const ItemSwitch = ({ item, language, handleChange, index, handleSort }: any) => {
+const SortableWrapper = SortableElement((props: any) => <div>{props.children}</div>)
+
+
+/* const ItemSwitch = ({item, language, handleChange, index, handleSort }: any) => {
     // console.log(item.type)
     switch (item.type) {
         case "open":
-            return (
+                            return (
                 <OpenItem
                     collection="items"
                     item={item}
@@ -292,11 +330,11 @@ const DragHandle = SortableHandle(() => <SvgIcon><path d="M20 9H4v2h16V9zM4 15h1
                     handleChange={handleChange}
                     index={index}
                 />
-            )
-        case "essay":
-            break
-        case "radio":
-            return (
+                )
+            case "essay":
+                break
+            case "radio":
+                return (
                 <RadioItem
                     handleSort={handleSort}
                     collection="items"
@@ -305,9 +343,9 @@ const DragHandle = SortableHandle(() => <SvgIcon><path d="M20 9H4v2h16V9zM4 15h1
                     handleChange={handleChange}
                     index={index}
                 />
-            )
-        case "checkbox":
-            return (
+                )
+            case "checkbox":
+                return (
                 <RadioItem
                     handleSort={handleSort}
                     collection="items"
@@ -316,74 +354,74 @@ const DragHandle = SortableHandle(() => <SvgIcon><path d="M20 9H4v2h16V9zM4 15h1
                     handleChange={handleChange}
                     index={index}
                 />
-            )
-        case "scale":
-            break
-        case "research-agreement":
-            break
-    }
+                )
+            case "scale":
+                break
+            case "research-agreement":
+                break
+        }
     return <p />
-}
+                }
 
 const OpenItem = SortableElement((props: any) => {
     return (
         <ExpansionPanel style={{ marginBottom: 20 }}>
-            <ExpansionPanelSummary>
-                <div style={{ flexBasis: "5%" }} >
-                    <DragHandle />
-                </div>
-                <div style={{ flexBasis: "70%" }}>
-                    <TextField
-                        label="title"
-                        value={props.item.texts.find(t => t.languageId === props.language).title}
-                        fullWidth={true}
-                        onChange={props.handleChange(`items[${props.item.order}].texts[${props.item.texts.findIndex(t => t.languageId === props.language)}].title`)}
-                        multiline={true}
-                    />
-                </div>
-                <div style={{ flexBasis: "20%" }} />
-                <div style={{ flexBasis: "5%" }}>
-                    <p>{props.item.order}</p>
-                </div>
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
-                <TextField
-                    label="validity regex"
-                    fullWidth={true}
-                    value={props.item.validityRegex}
-                />
-            </ExpansionPanelDetails>
-        </ExpansionPanel>
-    )
-})
+                    <ExpansionPanelSummary>
+                        <div style={{ flexBasis: "5%" }} >
+                            <DragHandle />
+                        </div>
+                        <div style={{ flexBasis: "70%" }}>
+                            <TextField
+                                label="title"
+                                value={props.item.texts.find(t => t.languageId === props.language).title}
+                                fullWidth={true}
+                                onChange={props.handleChange(`items[${props.item.order}].texts[${props.item.texts.findIndex(t => t.languageId === props.language)}].title`)}
+                                multiline={true}
+                            />
+                        </div>
+                        <div style={{ flexBasis: "20%" }} />
+                        <div style={{ flexBasis: "5%" }}>
+                            <p>{props.item.order}</p>
+                        </div>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                        <TextField
+                            label="validity regex"
+                            fullWidth={true}
+                            value={props.item.validityRegex}
+                        />
+                    </ExpansionPanelDetails>
+                </ExpansionPanel>
+                )
+            })
 
 const RadioItem = SortableElement((props: any) => {
     return (
         <ExpansionPanel style={{ marginBottom: 20 }}>
-            <ExpansionPanelSummary>
-                <div style={{ flexBasis: "5%" }} >
-                    <DragHandle />
-                </div>
-                <div style={{ flexBasis: "70%" }}>
-                    <TextField
-                        label="title"
-                        value={props.item.texts.find(t => t.languageId === props.language).title}
-                        fullWidth={true}
-                        onChange={props.handleChange(`items[${props.item.order}].texts[${props.item.texts.findIndex(t => t.languageId === props.language)}].title`)}
-                        multiline={true}
-                    />
-                </div>
-                <div style={{ flexBasis: "20%" }} />
-                <div style={{ flexBasis: "5%" }}>
-                    <p>{props.item.order}</p>
-                </div>
-            </ExpansionPanelSummary>
-            <ExpansionPanelDetails>
-                <OptionContainer onSortEnd={props.handleSort} options={props.item.options} itemOrder={props.item.order} useDragHandle={true} />
-            </ExpansionPanelDetails>
-        </ExpansionPanel>
-    )
-}) */
+                    <ExpansionPanelSummary>
+                        <div style={{ flexBasis: "5%" }} >
+                            <DragHandle />
+                        </div>
+                        <div style={{ flexBasis: "70%" }}>
+                            <TextField
+                                label="title"
+                                value={props.item.texts.find(t => t.languageId === props.language).title}
+                                fullWidth={true}
+                                onChange={props.handleChange(`items[${props.item.order}].texts[${props.item.texts.findIndex(t => t.languageId === props.language)}].title`)}
+                                multiline={true}
+                            />
+                        </div>
+                        <div style={{ flexBasis: "20%" }} />
+                        <div style={{ flexBasis: "5%" }}>
+                            <p>{props.item.order}</p>
+                        </div>
+                    </ExpansionPanelSummary>
+                    <ExpansionPanelDetails>
+                        <OptionContainer onSortEnd={props.handleSort} options={props.item.options} itemOrder={props.item.order} useDragHandle={true} />
+                    </ExpansionPanelDetails>
+                </ExpansionPanel>
+                )
+            }) */
 
 
 const mapStateToProps = (state: any) => {
