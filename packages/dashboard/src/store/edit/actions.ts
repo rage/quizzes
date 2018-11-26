@@ -17,6 +17,11 @@ export const create = createAction("edit/NEW", resolve => {
 })
 
 export const setEdit = (quiz: any) => {
+  const orderedQuiz = Object.assign({}, quiz)
+  orderedQuiz.items = orderedQuiz.items.sort((i1, i2) => i1.order - i2.order)
+  orderedQuiz.items.map(
+    item => (item.options = item.options.sort((o1, o2) => o1.order - o2.order)),
+  )
   return dispatch => {
     dispatch(set(checkForMissingTranslation(quiz)))
     dispatch(setFilter("language", quiz.course.languages[0].id))

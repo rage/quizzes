@@ -125,12 +125,12 @@ class QuizForm extends React.Component<any, any> {
     }
 
     private onSortEnd = ({ oldIndex, newIndex, collection }) => {
-        console.log(collection)
         this.props.changeOrder(collection, oldIndex, newIndex)
     }
 
     private handleChange = path => event => {
-        this.props.changeAttr(path, event.target.value)
+        console.log(typeof event.target.value)
+        this.props.changeAttr(path, path.endsWith('correct') ? event.target.checked : event.target.value)
     }
 
     private addLanguage = () => {
@@ -213,11 +213,10 @@ const ItemContainer = SortableContainer((props: any) => {
 })
 
 const OptionContainer = SortableContainer((props: any) => {
-    console.log(props.options)
     return (
         <Grid container={true} spacing={16}>
             {props.options.sort((o1, o2) => o1.order - o2.order).map((option, index) =>
-                <Option option={option} language={props.language} key={option.id || props.itemOrder + index} index={index} collection={`items[${props.itemOrder}].options`} />
+                <Option handleChange={props.handleChange} option={option} language={props.language} key={option.id || props.itemOrder + index} index={index} collection={`items[${props.itemOrder}].options`} itemOrder={props.itemOrder}/>
             )}
             <Grid item={true} xs={3} >
                 <Paper style={{ padding: 5, marginBottom: 5 }}>
@@ -241,7 +240,6 @@ class Option extends React.Component<any, any> {
     }
 
     public render() {
-        console.log()
         return (
             <SortableGridItem index={this.props.index} collection={this.props.collection} size={!this.state.expanded ? 3 : 12}>
                 <Card style={{ marginBottom: 20 }}>
@@ -250,7 +248,7 @@ class Option extends React.Component<any, any> {
                             title={this.props.option.texts.find(t => t.languageId === this.props.language).title}
                             titleTypographyProps={{ variant: "subtitle1", gutterBottom: false }}
                         />
-                        <Switch checked={this.props.option.correct} color="primary" />
+                        <Switch checked={this.props.option.correct} value={!this.props.option.correct} color="primary" onChange={this.props.handleChange(`items[${this.props.itemOrder}].options[${this.props.index}].correct`)} />
                     </DragHandleWrapper>
                     <CardActions>
                         <IconButton onClick={this.handleExpand}>
@@ -266,7 +264,7 @@ class Option extends React.Component<any, any> {
                                         label="title"
                                         value={this.props.option.texts.find(t => t.languageId === this.props.language).title || undefined}
                                         fullWidth={true}
-                                        // onChange={this.props.handleChange(`items[${this.props.option.order}].texts[${this.props.options.texts.findIndex(t => t.languageId === this.props.language)}].title`)}
+                                        onChange={this.props.handleChange(`items[${this.props.itemOrder}].options[${this.props.index}].texts[${this.props.option.texts.findIndex(t => t.languageId === this.props.language)}].title`)}
                                         multiline={true}
                                         margin="normal"
                                     />
@@ -274,7 +272,7 @@ class Option extends React.Component<any, any> {
                                         label="body"
                                         value={this.props.option.texts.find(t => t.languageId === this.props.language).body || undefined}
                                         fullWidth={true}
-                                        // onChange={this.props.handleChange(`items[${this.props.option.order}].texts[${this.props.options.texts.findIndex(t => t.languageId === this.props.language)}].body`)}
+                                        onChange={this.props.handleChange(`items[${this.props.itemOrder}].options[${this.props.index}].texts[${this.props.option.texts.findIndex(t => t.languageId === this.props.language)}].body`)}
                                         multiline={true}
                                         margin="normal"
                                     />
@@ -282,7 +280,7 @@ class Option extends React.Component<any, any> {
                                         label="success message"
                                         value={this.props.option.texts.find(t => t.languageId === this.props.language).successMessage || undefined}
                                         fullWidth={true}
-                                        // onChange={this.props.handleChange(`items[${this.props.option.order}].texts[${this.props.options.texts.findIndex(t => t.languageId === this.props.language)}].successMessage`)}
+                                        onChange={this.props.handleChange(`items[${this.props.itemOrder}].options[${this.props.index}].texts[${this.props.option.texts.findIndex(t => t.languageId === this.props.language)}].successMessage`)}
                                         multiline={true}
                                         margin="normal"
                                     />
@@ -290,7 +288,7 @@ class Option extends React.Component<any, any> {
                                         label="failure message"
                                         value={this.props.option.texts.find(o => o.languageId === this.props.language).failureMessage || undefined}
                                         fullWidth={true}
-                                        // onChange={this.props.handleChange(`items[${this.props.option.order}].texts[${this.props.options.texts.findIndex(t => t.languageId === this.props.language)}].failureMessage`)}
+                                        onChange={this.props.handleChange(`items[${this.props.itemOrder}].options[${this.props.index}].texts[${this.props.option.texts.findIndex(t => t.languageId === this.props.language)}].failureMessage`)}
                                         multiline={true}
                                         margin="normal"
                                     />
@@ -302,10 +300,6 @@ class Option extends React.Component<any, any> {
             </SortableGridItem>
         )
     }
-
-    private wrapper = (itemProps) => <SortableGridItem index={this.props.index} collection={this.props.collection} {...itemProps} />
-
-    // private wrapper = (itemProps) => <SortableWrapper2 index={this.props.index} collection={this.props.collection} {...itemProps} />
 
     private handleExpand = (event) => {
         this.setState({ expanded: !this.state.expanded })
@@ -401,6 +395,7 @@ class Item extends React.Component<any, any> {
                                             useDragHandle={true}
                                             addOption={this.props.addOption}
                                             language={this.props.language}
+                                            handleChange={this.props.handleChange}
                                         />
                                     </CardContent>
                                 </Card>
