@@ -212,6 +212,106 @@ const ItemContainer = SortableContainer((props: any) => {
     )
 })
 
+const OptionContainer = SortableContainer((props: any) => {
+    console.log(props.options)
+    return (
+        <Grid container={true} spacing={16}>
+            {props.options.sort((o1, o2) => o1.order - o2.order).map((option, index) =>
+                <Option option={option} language={props.language} key={option.id || props.itemOrder + index} index={index} collection={`items[${props.itemOrder}].options`} />
+            )}
+            <Grid item={true} xs={3} >
+                <Paper style={{ padding: 5, marginBottom: 5 }}>
+                    <Button onClick={props.addOption(props.itemOrder)} fullWidth={true}>add</Button>
+                </Paper>
+            </Grid>
+        </Grid>
+    )
+})
+
+const SortableGridItem = SortableElement((props: any) => <Grid item={true} xs={props.size}>{props.children}</Grid>)
+
+
+class Option extends React.Component<any, any> {
+
+    constructor(props) {
+        super(props)
+        this.state = {
+            expanded: false
+        }
+    }
+
+    public render() {
+        console.log()
+        return (
+            <SortableGridItem index={this.props.index} collection={this.props.collection} size={!this.state.expanded ? 3 : 12}>
+                <Card style={{ marginBottom: 20 }}>
+                    <DragHandleWrapper>
+                        <CardHeader
+                            title={this.props.option.texts.find(t => t.languageId === this.props.language).title}
+                            titleTypographyProps={{ variant: "subtitle1", gutterBottom: false }}
+                        />
+                        <Switch checked={this.props.option.correct} color="primary" />
+                    </DragHandleWrapper>
+                    <CardActions>
+                        <IconButton onClick={this.handleExpand}>
+                            <SvgIcon><path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" /></SvgIcon>
+                        </IconButton>
+                    </CardActions>
+                    <Collapse in={this.state.expanded}>
+                        <CardContent>
+                            <Card>
+                                <CardHeader subheader="general" />
+                                <CardContent>
+                                    <TextField
+                                        label="title"
+                                        value={this.props.option.texts.find(t => t.languageId === this.props.language).title || undefined}
+                                        fullWidth={true}
+                                        // onChange={this.props.handleChange(`items[${this.props.option.order}].texts[${this.props.options.texts.findIndex(t => t.languageId === this.props.language)}].title`)}
+                                        multiline={true}
+                                        margin="normal"
+                                    />
+                                    <TextField
+                                        label="body"
+                                        value={this.props.option.texts.find(t => t.languageId === this.props.language).body || undefined}
+                                        fullWidth={true}
+                                        // onChange={this.props.handleChange(`items[${this.props.option.order}].texts[${this.props.options.texts.findIndex(t => t.languageId === this.props.language)}].body`)}
+                                        multiline={true}
+                                        margin="normal"
+                                    />
+                                    <TextField
+                                        label="success message"
+                                        value={this.props.option.texts.find(t => t.languageId === this.props.language).successMessage || undefined}
+                                        fullWidth={true}
+                                        // onChange={this.props.handleChange(`items[${this.props.option.order}].texts[${this.props.options.texts.findIndex(t => t.languageId === this.props.language)}].successMessage`)}
+                                        multiline={true}
+                                        margin="normal"
+                                    />
+                                    <TextField
+                                        label="failure message"
+                                        value={this.props.option.texts.find(o => o.languageId === this.props.language).failureMessage || undefined}
+                                        fullWidth={true}
+                                        // onChange={this.props.handleChange(`items[${this.props.option.order}].texts[${this.props.options.texts.findIndex(t => t.languageId === this.props.language)}].failureMessage`)}
+                                        multiline={true}
+                                        margin="normal"
+                                    />
+                                </CardContent>
+                            </Card>
+                        </CardContent>
+                    </Collapse>
+                </Card>
+            </SortableGridItem>
+        )
+    }
+
+    private wrapper = (itemProps) => <SortableGridItem index={this.props.index} collection={this.props.collection} {...itemProps} />
+
+    // private wrapper = (itemProps) => <SortableWrapper2 index={this.props.index} collection={this.props.collection} {...itemProps} />
+
+    private handleExpand = (event) => {
+        this.setState({ expanded: !this.state.expanded })
+    }
+}
+
 class Item extends React.Component<any, any> {
 
     constructor(props) {
@@ -244,16 +344,46 @@ class Item extends React.Component<any, any> {
                                     <CardContent>
                                         <TextField
                                             label="title"
-                                            value={this.props.item.texts.find(t => t.languageId === this.props.language).title}
+                                            value={this.props.item.texts.find(t => t.languageId === this.props.language).title || undefined}
                                             fullWidth={true}
                                             onChange={this.props.handleChange(`items[${this.props.item.order}].texts[${this.props.item.texts.findIndex(t => t.languageId === this.props.language)}].title`)}
                                             multiline={true}
                                             margin="normal"
                                         />
                                         <TextField
+                                            label="body"
+                                            value={this.props.item.texts.find(t => t.languageId === this.props.language).body || undefined}
+                                            fullWidth={true}
+                                            onChange={this.props.handleChange(`items[${this.props.item.order}].texts[${this.props.item.texts.findIndex(t => t.languageId === this.props.language)}].body`)}
+                                            multiline={true}
+                                            margin="normal"
+                                        />
+                                        <TextField
+                                            label="success message"
+                                            value={this.props.item.texts.find(t => t.languageId === this.props.language).successMessage || undefined}
+                                            fullWidth={true}
+                                            onChange={this.props.handleChange(`items[${this.props.item.order}].texts[${this.props.item.texts.findIndex(t => t.languageId === this.props.language)}].successMessage`)}
+                                            multiline={true}
+                                            margin="normal"
+                                        />
+                                        <TextField
+                                            label="failure message"
+                                            value={this.props.item.texts.find(t => t.languageId === this.props.language).failureMessage || undefined}
+                                            fullWidth={true}
+                                            onChange={this.props.handleChange(`items[${this.props.item.order}].texts[${this.props.item.texts.findIndex(t => t.languageId === this.props.language)}].failureMessage`)}
+                                            multiline={true}
+                                            margin="normal"
+                                        />
+                                        <TextField
                                             label="validity regex"
                                             fullWidth={true}
-                                            value={this.props.item.validityRegex || ""}
+                                            value={this.props.item.validityRegex || undefined}
+                                            margin="normal"
+                                        />
+                                        <TextField
+                                            label="format regex"
+                                            fullWidth={true}
+                                            value={this.props.item.formatRegex || undefined}
                                             margin="normal"
                                         />
                                     </CardContent>
@@ -268,8 +398,9 @@ class Item extends React.Component<any, any> {
                                             onSortEnd={this.props.handleSort}
                                             options={this.props.item.options}
                                             itemOrder={this.props.item.order}
-                                            // useDragHandle={true}
+                                            useDragHandle={true}
                                             addOption={this.props.addOption}
+                                            language={this.props.language}
                                         />
                                     </CardContent>
                                 </Card>
@@ -286,8 +417,13 @@ class Item extends React.Component<any, any> {
     }
 }
 
+/*<SortableWrapper key={option.id || props.itemOrder + index} index={index} collection={`items[${props.itemOrder}].options`}>
+    <Option option={option} language={props.language} key={option.id || props.itemOrder + index} index={index} collection={`items[${props.itemOrder}].options`} />
+</SortableWrapper>*/
 
-const OptionContainer = SortableContainer((props: any) => {
+
+
+const OptionContainerOld = SortableContainer((props: any) => {
     return (
         <Grid container={true} spacing={16}>
             {props.options.sort((o1, o2) => o1.order - o2.order).map((option, index) => <Option collection={`items[${props.itemOrder}].options`} option={option} index={index} key={option.id || props.itemOrder + index} />)}
@@ -300,7 +436,7 @@ const OptionContainer = SortableContainer((props: any) => {
     )
 })
 
-const Option = SortableElement((props: any) => {
+const OptionOld = SortableElement((props: any) => {
     return (
         <Grid item={true} xs={3} >
             <Paper style={{ padding: 5, marginBottom: 5 }}>
