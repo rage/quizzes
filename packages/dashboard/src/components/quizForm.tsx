@@ -129,7 +129,6 @@ class QuizForm extends React.Component<any, any> {
     }
 
     private handleChange = path => event => {
-        console.log(typeof event.target.value)
         this.props.changeAttr(path, path.endsWith('correct') ? event.target.checked : event.target.value)
     }
 
@@ -196,115 +195,33 @@ const TabContainer = (props: any) => {
 const ItemContainer = SortableContainer((props: any) => {
     return (
         <div>
-            {props.quiz.items.sort((i1, i2) => i1.order - i2.order).map((item, i) =>
-                <SortableWrapper key={item.id || item.type + i} index={i} collection="items">
-                    <Item
-                        item={item}
-                        language={props.language}
-                        handleChange={props.handleChange}
-                        index={i}
-                        handleSort={props.handleSort}
-                        addOption={props.addOption}
-                        collection="items"
-                    />
-                </SortableWrapper>)}
+            {props.quiz.items.sort((i1, i2) => i1.order - i2.order).map((item, i) => {
+                const text = item.texts.find(t => t.languageId === props.language)
+                return (
+                    <SortableWrapper key={item.id || item.type + i} index={i} collection="items">
+                        <Item
+                            language={props.language}
+                            handleChange={props.handleChange}
+                            index={i}
+                            handleSort={props.handleSort}
+                            addOption={props.addOption}
+                            collection="items"
+                            textIndex={item.texts.findIndex(t => t.languageId === props.language)}
+                            order={item.order}
+                            validityRegex={item.validityRegex}
+                            formatRegex={item.formatRegex}
+                            options={item.options}
+                            title={text.title}
+                            body={text.body}
+                            successMessage={text.successMessage}
+                            failureMessage={text.failureMessage}
+                        />
+                    </SortableWrapper>
+                )
+            })}
         </div>
     )
 })
-
-const OptionContainer = SortableContainer((props: any) => {
-    return (
-        <Grid container={true} spacing={16}>
-            {props.options.sort((o1, o2) => o1.order - o2.order).map((option, index) =>
-                <Option handleChange={props.handleChange} option={option} language={props.language} key={option.id || props.itemOrder + index} index={index} collection={`items[${props.itemOrder}].options`} itemOrder={props.itemOrder}/>
-            )}
-            <Grid item={true} xs={3} >
-                <Paper style={{ padding: 5, marginBottom: 5 }}>
-                    <Button onClick={props.addOption(props.itemOrder)} fullWidth={true}>add</Button>
-                </Paper>
-            </Grid>
-        </Grid>
-    )
-})
-
-const SortableGridItem = SortableElement((props: any) => <Grid item={true} xs={props.size}>{props.children}</Grid>)
-
-
-class Option extends React.Component<any, any> {
-
-    constructor(props) {
-        super(props)
-        this.state = {
-            expanded: false
-        }
-    }
-
-    public render() {
-        return (
-            <SortableGridItem index={this.props.index} collection={this.props.collection} size={!this.state.expanded ? 3 : 12}>
-                <Card style={{ marginBottom: 20 }}>
-                    <DragHandleWrapper>
-                        <CardHeader
-                            title={this.props.option.texts.find(t => t.languageId === this.props.language).title}
-                            titleTypographyProps={{ variant: "subtitle1", gutterBottom: false }}
-                        />
-                        <Switch checked={this.props.option.correct} value={!this.props.option.correct} color="primary" onChange={this.props.handleChange(`items[${this.props.itemOrder}].options[${this.props.index}].correct`)} />
-                    </DragHandleWrapper>
-                    <CardActions>
-                        <IconButton onClick={this.handleExpand}>
-                            <SvgIcon><path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" /></SvgIcon>
-                        </IconButton>
-                    </CardActions>
-                    <Collapse in={this.state.expanded}>
-                        <CardContent>
-                            <Card>
-                                <CardHeader subheader="general" />
-                                <CardContent>
-                                    <TextField
-                                        label="title"
-                                        value={this.props.option.texts.find(t => t.languageId === this.props.language).title || undefined}
-                                        fullWidth={true}
-                                        onChange={this.props.handleChange(`items[${this.props.itemOrder}].options[${this.props.index}].texts[${this.props.option.texts.findIndex(t => t.languageId === this.props.language)}].title`)}
-                                        multiline={true}
-                                        margin="normal"
-                                    />
-                                    <TextField
-                                        label="body"
-                                        value={this.props.option.texts.find(t => t.languageId === this.props.language).body || undefined}
-                                        fullWidth={true}
-                                        onChange={this.props.handleChange(`items[${this.props.itemOrder}].options[${this.props.index}].texts[${this.props.option.texts.findIndex(t => t.languageId === this.props.language)}].body`)}
-                                        multiline={true}
-                                        margin="normal"
-                                    />
-                                    <TextField
-                                        label="success message"
-                                        value={this.props.option.texts.find(t => t.languageId === this.props.language).successMessage || undefined}
-                                        fullWidth={true}
-                                        onChange={this.props.handleChange(`items[${this.props.itemOrder}].options[${this.props.index}].texts[${this.props.option.texts.findIndex(t => t.languageId === this.props.language)}].successMessage`)}
-                                        multiline={true}
-                                        margin="normal"
-                                    />
-                                    <TextField
-                                        label="failure message"
-                                        value={this.props.option.texts.find(o => o.languageId === this.props.language).failureMessage || undefined}
-                                        fullWidth={true}
-                                        onChange={this.props.handleChange(`items[${this.props.itemOrder}].options[${this.props.index}].texts[${this.props.option.texts.findIndex(t => t.languageId === this.props.language)}].failureMessage`)}
-                                        multiline={true}
-                                        margin="normal"
-                                    />
-                                </CardContent>
-                            </Card>
-                        </CardContent>
-                    </Collapse>
-                </Card>
-            </SortableGridItem>
-        )
-    }
-
-    private handleExpand = (event) => {
-        this.setState({ expanded: !this.state.expanded })
-    }
-}
 
 class Item extends React.Component<any, any> {
 
@@ -315,14 +232,41 @@ class Item extends React.Component<any, any> {
         }
     }
 
+    public shouldComponentUpdate(nextProps, nextState) {
+        if (nextState.expanded !== this.state.expanded) {
+            return true
+        }
+        if (nextProps.title !== this.props.title) {
+            return true
+        }
+        if (nextProps.body !== this.props.body) {
+            return true
+        }
+        if (nextProps.successMessage !== this.props.successMessage) {
+            return true
+        }
+        if (nextProps.failureMessage !== this.props.failureMessage) {
+            return true
+        }
+        /*if (nextProps.options !== this.props.options) {
+            return true
+        }*/
+        return false
+    }
+
+
     public render() {
+
+        console.log("item")
+
         return (
             <Card style={{ marginBottom: 20 }}>
                 <DragHandleWrapper>
-                    <CardHeader
-                        title={this.props.item.texts.find(t => t.languageId === this.props.language).title}
-                        titleTypographyProps={{ variant: "subtitle1", gutterBottom: false }}
-                    />
+                    {!this.state.expanded ?
+                        <CardHeader
+                            title={this.props.title}
+                            titleTypographyProps={{ variant: "subtitle1", gutterBottom: false }}
+                        /> : ""}
                 </DragHandleWrapper>
                 <CardActions>
                     <IconButton onClick={this.handleExpand}>
@@ -338,46 +282,46 @@ class Item extends React.Component<any, any> {
                                     <CardContent>
                                         <TextField
                                             label="title"
-                                            value={this.props.item.texts.find(t => t.languageId === this.props.language).title || undefined}
+                                            value={this.props.title || undefined}
                                             fullWidth={true}
-                                            onChange={this.props.handleChange(`items[${this.props.item.order}].texts[${this.props.item.texts.findIndex(t => t.languageId === this.props.language)}].title`)}
+                                            onChange={this.props.handleChange(`items[${this.props.order}].texts[${this.props.textIndex}].title`)}
                                             multiline={true}
                                             margin="normal"
                                         />
                                         <TextField
                                             label="body"
-                                            value={this.props.item.texts.find(t => t.languageId === this.props.language).body || undefined}
+                                            value={this.props.body || undefined}
                                             fullWidth={true}
-                                            onChange={this.props.handleChange(`items[${this.props.item.order}].texts[${this.props.item.texts.findIndex(t => t.languageId === this.props.language)}].body`)}
+                                            onChange={this.props.handleChange(`items[${this.props.order}].texts[${this.props.textIndex}].body`)}
                                             multiline={true}
                                             margin="normal"
                                         />
                                         <TextField
                                             label="success message"
-                                            value={this.props.item.texts.find(t => t.languageId === this.props.language).successMessage || undefined}
+                                            value={this.props.successMessage || undefined}
                                             fullWidth={true}
-                                            onChange={this.props.handleChange(`items[${this.props.item.order}].texts[${this.props.item.texts.findIndex(t => t.languageId === this.props.language)}].successMessage`)}
+                                            onChange={this.props.handleChange(`items[${this.props.order}].texts[${this.props.textIndex}].successMessage`)}
                                             multiline={true}
                                             margin="normal"
                                         />
                                         <TextField
                                             label="failure message"
-                                            value={this.props.item.texts.find(t => t.languageId === this.props.language).failureMessage || undefined}
+                                            value={this.props.failureMessage || undefined}
                                             fullWidth={true}
-                                            onChange={this.props.handleChange(`items[${this.props.item.order}].texts[${this.props.item.texts.findIndex(t => t.languageId === this.props.language)}].failureMessage`)}
+                                            onChange={this.props.handleChange(`items[${this.props.order}].texts[${this.props.textIndex}].failureMessage`)}
                                             multiline={true}
                                             margin="normal"
                                         />
                                         <TextField
                                             label="validity regex"
                                             fullWidth={true}
-                                            value={this.props.item.validityRegex || undefined}
+                                            value={this.props.validityRegex || undefined}
                                             margin="normal"
                                         />
                                         <TextField
                                             label="format regex"
                                             fullWidth={true}
-                                            value={this.props.item.formatRegex || undefined}
+                                            value={this.props.formatRegex || undefined}
                                             margin="normal"
                                         />
                                     </CardContent>
@@ -390,8 +334,8 @@ class Item extends React.Component<any, any> {
                                         <OptionContainer
                                             axis="xy"
                                             onSortEnd={this.props.handleSort}
-                                            options={this.props.item.options}
-                                            itemOrder={this.props.item.order}
+                                            options={this.props.options}
+                                            itemOrder={this.props.order}
                                             useDragHandle={true}
                                             addOption={this.props.addOption}
                                             language={this.props.language}
@@ -412,16 +356,28 @@ class Item extends React.Component<any, any> {
     }
 }
 
-/*<SortableWrapper key={option.id || props.itemOrder + index} index={index} collection={`items[${props.itemOrder}].options`}>
-    <Option option={option} language={props.language} key={option.id || props.itemOrder + index} index={index} collection={`items[${props.itemOrder}].options`} />
-</SortableWrapper>*/
-
-
-
-const OptionContainerOld = SortableContainer((props: any) => {
+const OptionContainer = SortableContainer((props: any) => {
     return (
         <Grid container={true} spacing={16}>
-            {props.options.sort((o1, o2) => o1.order - o2.order).map((option, index) => <Option collection={`items[${props.itemOrder}].options`} option={option} index={index} key={option.id || props.itemOrder + index} />)}
+            {props.options.sort((o1, o2) => o1.order - o2.order).map((option, index) => {
+                const text = option.texts.find(t => t.languageId === props.language)
+                return (
+                    <Option
+                        handleChange={props.handleChange}
+                        language={props.language}
+                        key={option.id || props.itemOrder + index}
+                        index={index}
+                        collection={`items[${props.itemOrder}].options`}
+                        itemOrder={props.itemOrder}
+                        textIndex={option.texts.findIndex(t => t.languageId === props.language)}
+                        correct={option.correct}
+                        title={text.title}
+                        body={text.body}
+                        successMessage={text.successMessage}
+                        failureMessage={text.failureMessage}
+                    />
+                )
+            })}
             <Grid item={true} xs={3} >
                 <Paper style={{ padding: 5, marginBottom: 5 }}>
                     <Button onClick={props.addOption(props.itemOrder)} fullWidth={true}>add</Button>
@@ -431,129 +387,108 @@ const OptionContainerOld = SortableContainer((props: any) => {
     )
 })
 
-const OptionOld = SortableElement((props: any) => {
-    return (
-        <Grid item={true} xs={3} >
-            <Paper style={{ padding: 5, marginBottom: 5 }}>
-                <TextField value={props.option.texts[0].title} multiline={true} />
-                <Switch checked={props.option.correct} color="primary" />
-            </Paper>
-        </Grid>
-    )
-})
+class Option extends React.Component<any, any> {
 
-const DragHandle = SortableHandle(() => <SvgIcon><path d="M20 9H4v2h16V9zM4 15h16v-2H4v2z" /></SvgIcon>)
+    constructor(props) {
+        super(props)
+        this.state = {
+            expanded: false
+        }
+    }
+
+    public shouldComponentUpdate(nextProps, nextState) {
+        if (nextState.expanded !== this.state.expanded) {
+            return true
+        }
+        if (nextProps.title !== this.props.title) {
+            return true
+        }
+        if (nextProps.body !== this.props.body) {
+            return true
+        }
+        if (nextProps.successMessage !== this.props.successMessage) {
+            return true
+        }
+        if (nextProps.failureMessage !== this.props.failureMessage) {
+            return true
+        }
+        return false
+    }
+
+    public render() {
+
+        console.log("option")
+
+        return (
+            <SortableGridItem index={this.props.index} collection={this.props.collection} size={!this.state.expanded ? 3 : 12}>
+                <Card style={{ marginBottom: 20 }}>
+                    <DragHandleWrapper>
+                        {!this.state.expanded ? <CardHeader
+                            title={this.props.title}
+                            titleTypographyProps={{ variant: "subtitle1", gutterBottom: false }}
+                        /> : ""}
+                        <Switch checked={this.props.correct} value={!this.props.correct} color="primary" onChange={this.props.handleChange(`items[${this.props.itemOrder}].options[${this.props.index}].correct`)} />
+                    </DragHandleWrapper>
+                    <CardActions>
+                        <IconButton onClick={this.handleExpand}>
+                            <SvgIcon><path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" /></SvgIcon>
+                        </IconButton>
+                    </CardActions>
+                    {this.state.expanded ?
+                        <CardContent>
+                            <Card>
+                                <CardHeader subheader="general" />
+                                <CardContent>
+                                    <TextField
+                                        label="title"
+                                        value={this.props.title || undefined}
+                                        fullWidth={true}
+                                        onChange={this.props.handleChange(`items[${this.props.itemOrder}].options[${this.props.index}].texts[${this.props.textIndex}].title`)}
+                                        multiline={true}
+                                        margin="normal"
+                                    />
+                                    <TextField
+                                        label="body"
+                                        value={this.props.body || undefined}
+                                        fullWidth={true}
+                                        onChange={this.props.handleChange(`items[${this.props.itemOrder}].options[${this.props.index}].texts[${this.props.textIndex}].body`)}
+                                        multiline={true}
+                                        margin="normal"
+                                    />
+                                    <TextField
+                                        label="success message"
+                                        value={this.props.successMessage || undefined}
+                                        fullWidth={true}
+                                        onChange={this.props.handleChange(`items[${this.props.itemOrder}].options[${this.props.index}].texts[${this.props.textIndex}].successMessage`)}
+                                        multiline={true}
+                                        margin="normal"
+                                    />
+                                    <TextField
+                                        label="failure message"
+                                        value={this.props.failureMessage || undefined}
+                                        fullWidth={true}
+                                        onChange={this.props.handleChange(`items[${this.props.itemOrder}].options[${this.props.index}].texts[${this.props.textIndex}].failureMessage`)}
+                                        multiline={true}
+                                        margin="normal"
+                                    />
+                                </CardContent>
+                            </Card>
+                        </CardContent> : ""}
+                </Card>
+            </SortableGridItem>
+        )
+    }
+
+    private handleExpand = (event) => {
+        this.setState({ expanded: !this.state.expanded })
+    }
+}
+
+const SortableGridItem = SortableElement((props: any) => <Grid item={true} xs={props.size}>{props.children}</Grid>)
 
 const DragHandleWrapper = SortableHandle((props: any) => <div>{props.children}</div>)
 
 const SortableWrapper = SortableElement((props: any) => <div>{props.children}</div>)
-
-
-/* const ItemSwitch = ({item, language, handleChange, index, handleSort }: any) => {
-    // console.log(item.type)
-    switch (item.type) {
-        case "open":
-                            return (
-                <OpenItem
-                    collection="items"
-                    item={item}
-                    language={language}
-                    handleChange={handleChange}
-                    index={index}
-                />
-                )
-            case "essay":
-                break
-            case "radio":
-                return (
-                <RadioItem
-                    handleSort={handleSort}
-                    collection="items"
-                    item={item}
-                    language={language}
-                    handleChange={handleChange}
-                    index={index}
-                />
-                )
-            case "checkbox":
-                return (
-                <RadioItem
-                    handleSort={handleSort}
-                    collection="items"
-                    item={item}
-                    language={language}
-                    handleChange={handleChange}
-                    index={index}
-                />
-                )
-            case "scale":
-                break
-            case "research-agreement":
-                break
-        }
-    return <p />
-                }
-
-const OpenItem = SortableElement((props: any) => {
-    return (
-        <ExpansionPanel style={{ marginBottom: 20 }}>
-                    <ExpansionPanelSummary>
-                        <div style={{ flexBasis: "5%" }} >
-                            <DragHandle />
-                        </div>
-                        <div style={{ flexBasis: "70%" }}>
-                            <TextField
-                                label="title"
-                                value={props.item.texts.find(t => t.languageId === props.language).title}
-                                fullWidth={true}
-                                onChange={props.handleChange(`items[${props.item.order}].texts[${props.item.texts.findIndex(t => t.languageId === props.language)}].title`)}
-                                multiline={true}
-                            />
-                        </div>
-                        <div style={{ flexBasis: "20%" }} />
-                        <div style={{ flexBasis: "5%" }}>
-                            <p>{props.item.order}</p>
-                        </div>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                        <TextField
-                            label="validity regex"
-                            fullWidth={true}
-                            value={props.item.validityRegex}
-                        />
-                    </ExpansionPanelDetails>
-                </ExpansionPanel>
-                )
-            })
-
-const RadioItem = SortableElement((props: any) => {
-    return (
-        <ExpansionPanel style={{ marginBottom: 20 }}>
-                    <ExpansionPanelSummary>
-                        <div style={{ flexBasis: "5%" }} >
-                            <DragHandle />
-                        </div>
-                        <div style={{ flexBasis: "70%" }}>
-                            <TextField
-                                label="title"
-                                value={props.item.texts.find(t => t.languageId === props.language).title}
-                                fullWidth={true}
-                                onChange={props.handleChange(`items[${props.item.order}].texts[${props.item.texts.findIndex(t => t.languageId === props.language)}].title`)}
-                                multiline={true}
-                            />
-                        </div>
-                        <div style={{ flexBasis: "20%" }} />
-                        <div style={{ flexBasis: "5%" }}>
-                            <p>{props.item.order}</p>
-                        </div>
-                    </ExpansionPanelSummary>
-                    <ExpansionPanelDetails>
-                        <OptionContainer onSortEnd={props.handleSort} options={props.item.options} itemOrder={props.item.order} useDragHandle={true} />
-                    </ExpansionPanelDetails>
-                </ExpansionPanel>
-                )
-            }) */
-
 
 const mapStateToProps = (state: any) => {
     return {
@@ -577,3 +512,4 @@ const mapDispatchToProps = {
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(QuizForm)
+

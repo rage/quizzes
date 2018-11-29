@@ -17,14 +17,14 @@ export const create = createAction("edit/NEW", resolve => {
 })
 
 export const setEdit = (quiz: any) => {
-  const orderedQuiz = Object.assign({}, quiz)
+  const orderedQuiz = JSON.parse(JSON.stringify(quiz))
   orderedQuiz.items = orderedQuiz.items.sort((i1, i2) => i1.order - i2.order)
   orderedQuiz.items.map(
     item => (item.options = item.options.sort((o1, o2) => o1.order - o2.order)),
   )
   return dispatch => {
-    dispatch(set(checkForMissingTranslation(quiz)))
-    dispatch(setFilter("language", quiz.course.languages[0].id))
+    dispatch(set(checkForMissingTranslation(orderedQuiz)))
+    dispatch(setFilter("language", orderedQuiz.course.languages[0].id))
   }
 }
 
@@ -44,7 +44,7 @@ export const newQuiz = () => {
       texts: [],
       items: [],
     }
-    dispatch(setEdit(quiz))
+    dispatch(set(quiz))
     /*dispatch(
       create({
         courseId: course.id,
@@ -57,7 +57,8 @@ export const newQuiz = () => {
 
 export const changeAttr = (path, value) => {
   return (dispatch, getState) => {
-    const quiz = Object.assign({}, getState().edit)
+    const quiz = JSON.parse(JSON.stringify(getState().edit))
+    // const quiz = Object.assign({}, getState().edit)
     _.set(quiz, path, value)
     dispatch(set(quiz))
   }
@@ -65,7 +66,8 @@ export const changeAttr = (path, value) => {
 
 export const changeOrder = (path, current, next) => {
   return (dispatch, getState) => {
-    const quiz = Object.assign({}, getState().edit)
+    const quiz = JSON.parse(JSON.stringify(getState().edit))
+    // const quiz = Object.assign({}, getState().edit)
     console.log(path)
     const array = _.get(quiz, path).sort((o1, o2) => o1.order - o2.order)
     array[current].order = next
@@ -77,7 +79,8 @@ export const changeOrder = (path, current, next) => {
 export const addItem = type => {
   console.log(type)
   return (dispatch, getState) => {
-    const quiz = Object.assign({}, getState().edit)
+    const quiz = JSON.parse(JSON.stringify(getState().edit))
+    // const quiz = Object.assign({}, getState().edit)
     const item = {
       quizId: quiz.id,
       type,
@@ -96,7 +99,8 @@ export const addItem = type => {
 export const addOption = item => {
   console.log(item)
   return (dispatch, getState) => {
-    const quiz = Object.assign({}, getState().edit)
+    const quiz = JSON.parse(JSON.stringify(getState().edit))
+    // const quiz = Object.assign({}, getState().edit)
     const option = {
       quizItemId: quiz.items[item].id,
       order: quiz.items[item].options.length,
@@ -110,7 +114,8 @@ export const addOption = item => {
 }
 
 const checkForMissingTranslation = paramQuiz => {
-  const quiz = Object.assign({}, paramQuiz)
+  const quiz = JSON.parse(JSON.stringify(paramQuiz))
+  // const quiz = Object.assign({}, paramQuiz)
   const languages = quiz.course.languages.map(l => l.id)
   languages.map(language => {
     if (!quiz.texts.find(text => text.languageId === language)) {
