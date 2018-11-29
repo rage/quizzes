@@ -23,7 +23,7 @@ import { BrowserRouter as Router, Link, Redirect, Route } from 'react-router-dom
 import { Quiz } from '../../common/src/models/quiz'
 import TMCApi from '../../common/src/services/TMCApi'
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
-import QuizForm from './components/quizForm'
+import QuizForm from './components/QuizForm'
 import { setCourses } from './store/courses/actions'
 import { newQuiz, setEdit } from './store/edit/actions'
 import { setFilter } from './store/filter/actions'

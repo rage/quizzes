@@ -68,7 +68,6 @@ export const changeOrder = (path, current, next) => {
   return (dispatch, getState) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
     // const quiz = Object.assign({}, getState().edit)
-    console.log(path)
     const array = _.get(quiz, path).sort((o1, o2) => o1.order - o2.order)
     array[current].order = next
     array[next].order = current

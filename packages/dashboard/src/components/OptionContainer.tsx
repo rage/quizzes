@@ -1,0 +1,73 @@
+import {
+    Button,
+    Card,
+    CardActions,
+    CardContent,
+    CardHeader,
+    Collapse,
+    Divider,
+    ExpansionPanel,
+    ExpansionPanelDetails,
+    ExpansionPanelSummary,
+    FormControl,
+    Grid,
+    IconButton,
+    InputLabel,
+    Menu,
+    MenuItem,
+    Paper,
+    Select,
+    SvgIcon,
+    Switch,
+    TextField,
+    Toolbar,
+    Typography
+} from '@material-ui/core'
+import Tab from '@material-ui/core/Tab'
+import Tabs from '@material-ui/core/Tabs'
+import React from 'react'
+import { connect } from 'react-redux'
+import { arrayMove, SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
+import { addItem, addOption, changeAttr, changeOrder, newQuiz, save, setEdit } from '../store/edit/actions'
+import { setFilter } from '../store/filter/actions'
+import Option from './Option'
+
+const OptionContainer = SortableContainer((props: any) => {
+    const options = props.edit.items[props.index].options
+    return (
+        <Grid container={true} spacing={16}>
+            {options.sort((o1, o2) => o1.order - o2.order).map((option, index) => {
+                const text = option.texts.find(t => t.languageId === props.language)
+                return (
+                    <Option
+                        handleChange={props.handleChange}
+                        language={props.language}
+                        key={option.id || props.itemOrder + index}
+                        index={index}
+                        collection={`items[${props.itemOrder}].options`}
+                        itemIndex={props.index}
+                        textIndex={option.texts.findIndex(t => t.languageId === props.language)}
+                        correct={option.correct}
+                        title={text.title}
+                        body={text.body}
+                        successMessage={text.successMessage}
+                        failureMessage={text.failureMessage}
+                    />
+                )
+            })}
+            <Grid item={true} xs={3} >
+                <Paper style={{ padding: 5, marginBottom: 5 }}>
+                    <Button onClick={props.addOption(props.itemOrder)} fullWidth={true}>add</Button>
+                </Paper>
+            </Grid>
+        </Grid>
+    )
+})
+
+const mapStateToProps = (state) => {
+    return {
+        edit: state.edit
+    }
+}
+
+export default connect(mapStateToProps)(OptionContainer)

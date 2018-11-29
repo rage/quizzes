@@ -28,18 +28,9 @@ import Tabs from '@material-ui/core/Tabs'
 import React from 'react'
 import { connect } from 'react-redux'
 import { arrayMove, SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
-import {
-    INewPeerReviewQuestion,
-    INewPeerReviewQuestionTranslation,
-    INewQuizItem,
-    INewQuizItemTranslation,
-    INewQuizOption,
-    INewQuizOptionTranslation,
-    INewQuizQuery,
-    INewQuizTranslation
-} from '../../../common/src/types/index'
 import { addItem, addOption, changeAttr, changeOrder, newQuiz, save, setEdit } from '../store/edit/actions'
 import { setFilter } from '../store/filter/actions'
+import OptionContainer from './OptionContainer'
 
 class QuizForm extends React.Component<any, any> {
 
@@ -248,12 +239,12 @@ class Item extends React.Component<any, any> {
         if (nextProps.failureMessage !== this.props.failureMessage) {
             return true
         }
-        /*if (nextProps.options !== this.props.options) {
+        /*if (nextProps.options[0] !== this.props.options[0]) {
+            console.log(nextProps.options[0] !== this.props.options[0])
             return true
         }*/
         return false
     }
-
 
     public render() {
 
@@ -284,7 +275,7 @@ class Item extends React.Component<any, any> {
                                             label="title"
                                             value={this.props.title || undefined}
                                             fullWidth={true}
-                                            onChange={this.props.handleChange(`items[${this.props.order}].texts[${this.props.textIndex}].title`)}
+                                            onChange={this.props.handleChange(`items[${this.props.index}].texts[${this.props.textIndex}].title`)}
                                             multiline={true}
                                             margin="normal"
                                         />
@@ -292,7 +283,7 @@ class Item extends React.Component<any, any> {
                                             label="body"
                                             value={this.props.body || undefined}
                                             fullWidth={true}
-                                            onChange={this.props.handleChange(`items[${this.props.order}].texts[${this.props.textIndex}].body`)}
+                                            onChange={this.props.handleChange(`items[${this.props.index}].texts[${this.props.textIndex}].body`)}
                                             multiline={true}
                                             margin="normal"
                                         />
@@ -300,7 +291,7 @@ class Item extends React.Component<any, any> {
                                             label="success message"
                                             value={this.props.successMessage || undefined}
                                             fullWidth={true}
-                                            onChange={this.props.handleChange(`items[${this.props.order}].texts[${this.props.textIndex}].successMessage`)}
+                                            onChange={this.props.handleChange(`items[${this.props.index}].texts[${this.props.textIndex}].successMessage`)}
                                             multiline={true}
                                             margin="normal"
                                         />
@@ -308,7 +299,7 @@ class Item extends React.Component<any, any> {
                                             label="failure message"
                                             value={this.props.failureMessage || undefined}
                                             fullWidth={true}
-                                            onChange={this.props.handleChange(`items[${this.props.order}].texts[${this.props.textIndex}].failureMessage`)}
+                                            onChange={this.props.handleChange(`items[${this.props.index}].texts[${this.props.textIndex}].failureMessage`)}
                                             multiline={true}
                                             margin="normal"
                                         />
@@ -334,8 +325,8 @@ class Item extends React.Component<any, any> {
                                         <OptionContainer
                                             axis="xy"
                                             onSortEnd={this.props.handleSort}
-                                            options={this.props.options}
-                                            itemOrder={this.props.order}
+                                            // options={this.props.options}
+                                            index={this.props.index}
                                             useDragHandle={true}
                                             addOption={this.props.addOption}
                                             language={this.props.language}
@@ -356,7 +347,7 @@ class Item extends React.Component<any, any> {
     }
 }
 
-const OptionContainer = SortableContainer((props: any) => {
+/*const OptionContainer = SortableContainer((props: any) => {
     return (
         <Grid container={true} spacing={16}>
             {props.options.sort((o1, o2) => o1.order - o2.order).map((option, index) => {
@@ -385,9 +376,9 @@ const OptionContainer = SortableContainer((props: any) => {
             </Grid>
         </Grid>
     )
-})
+})*/
 
-class Option extends React.Component<any, any> {
+/* class Option extends React.Component<any, any> {
 
     constructor(props) {
         super(props)
@@ -482,7 +473,7 @@ class Option extends React.Component<any, any> {
     private handleExpand = (event) => {
         this.setState({ expanded: !this.state.expanded })
     }
-}
+} */
 
 const SortableGridItem = SortableElement((props: any) => <Grid item={true} xs={props.size}>{props.children}</Grid>)
 
