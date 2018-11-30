@@ -40,6 +40,8 @@ export const newQuiz = () => {
       c => c.id === getState().filter.course,
     )
     const quiz = {
+      part: 0,
+      section: 0,
       courseId: course.courseId,
       course,
       texts: [],
@@ -64,6 +66,7 @@ export const changeOrder = (path, current, next) => {
     const array = _.get(quiz, path).sort((o1, o2) => o1.order - o2.order)
     const moved = array.splice(current, 1)[0]
     array.splice(next, 0, moved)
+    array.map((object, index) => (object.order = index))
     dispatch(set(quiz))
   }
 }

@@ -77,10 +77,10 @@ class QuizForm extends React.Component<any, any> {
                         </FormControl>
                     </Grid>
                     <Grid item={true} xs={12}>
-                        <TextField label="part" value={this.props.edit.part || undefined} type="number" onChange={this.handleChange("part")} />
+                        <TextField label="part" value={this.props.edit.part} type="number" onChange={this.handleChange("part")} />
                     </Grid>
                     <Grid item={true} xs={12}>
-                        <TextField label="section" value={this.props.edit.section || undefined} type="number" onChange={this.handleChange("section")} />
+                        <TextField label="section" value={this.props.edit.section} type="number" onChange={this.handleChange("section")} />
                     </Grid>
                 </Grid>
                 {this.props.edit.course.languages.map((l, i) => (

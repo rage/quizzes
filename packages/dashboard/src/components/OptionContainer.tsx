@@ -41,7 +41,6 @@ const OptionContainer = SortableContainer((props: any) => {
                 return (
                     <Option
                         handleChange={props.handleChange}
-                        language={props.language}
                         key={option.id || props.index + index}
                         index={index}
                         collection={`items[${props.index}].options`}

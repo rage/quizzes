@@ -79,9 +79,14 @@ class Option extends React.Component<any, any> {
                         /> : ""}
                     </DragHandleWrapper>
                     <CardActions>
-                        <IconButton onClick={this.handleExpand}>
-                            <SvgIcon><path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" /></SvgIcon>
-                        </IconButton>
+                        <Grid container={true} justify="flex-end">
+                            <Grid item={true}>
+                                <IconButton onClick={this.handleExpand}>
+                                    <SvgIcon><path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" /></SvgIcon>
+                                </IconButton>
+                            </Grid>
+                        </Grid>
+                        
                     </CardActions>
                     {this.state.expanded ?
                         <CardContent>

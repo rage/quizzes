@@ -6,6 +6,8 @@ import {
 import * as edit from "./actions"
 
 const initialState = {
+  part: 0,
+  section: 0,
   course: {
     languages: [],
   },
