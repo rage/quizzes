@@ -6,7 +6,9 @@ import {
 import * as edit from "./actions"
 
 const initialState = {
-  course: "",
+  course: {
+    languages: [],
+  },
   texts: [],
   items: [],
 }

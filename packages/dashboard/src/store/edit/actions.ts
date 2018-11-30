@@ -40,25 +40,19 @@ export const newQuiz = () => {
       c => c.id === getState().filter.course,
     )
     const quiz = {
+      courseId: course.courseId,
       course,
       texts: [],
       items: [],
     }
-    dispatch(set(quiz))
-    /*dispatch(
-      create({
-        courseId: course.id,
-        course,
-      }),
-    )*/
-    // dispatch(setFilter("language", course.languages[0].id))
+    dispatch(set(checkForMissingTranslation(quiz)))
+    dispatch(setFilter("language", course.languages[0].id))
   }
 }
 
 export const changeAttr = (path, value) => {
   return (dispatch, getState) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
-    // const quiz = Object.assign({}, getState().edit)
     _.set(quiz, path, value)
     dispatch(set(quiz))
   }
@@ -67,19 +61,16 @@ export const changeAttr = (path, value) => {
 export const changeOrder = (path, current, next) => {
   return (dispatch, getState) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
-    // const quiz = Object.assign({}, getState().edit)
     const array = _.get(quiz, path).sort((o1, o2) => o1.order - o2.order)
-    array[current].order = next
-    array[next].order = current
+    const moved = array.splice(current, 1)[0]
+    array.splice(next, 0, moved)
     dispatch(set(quiz))
   }
 }
 
 export const addItem = type => {
-  console.log(type)
   return (dispatch, getState) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
-    // const quiz = Object.assign({}, getState().edit)
     const item = {
       quizId: quiz.id,
       type,
@@ -89,24 +80,22 @@ export const addItem = type => {
       texts: [],
       options: [],
     }
-    console.log(item)
     quiz.items.push(item)
     dispatch(setEdit(quiz))
   }
 }
 
 export const addOption = item => {
-  console.log(item)
   return (dispatch, getState) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
-    // const quiz = Object.assign({}, getState().edit)
     const option = {
-      quizItemId: quiz.items[item].id,
       order: quiz.items[item].options.length,
       correct: false,
       texts: [],
     }
-    console.log(option)
+    if (quiz.items[item].id) {
+      _.set(option, "quizItemId", quiz.items[item].id)
+    }
     quiz.items[item].options.push(option)
     dispatch(setEdit(quiz))
   }
@@ -114,7 +103,6 @@ export const addOption = item => {
 
 const checkForMissingTranslation = paramQuiz => {
   const quiz = JSON.parse(JSON.stringify(paramQuiz))
-  // const quiz = Object.assign({}, paramQuiz)
   const languages = quiz.course.languages.map(l => l.id)
   languages.map(language => {
     if (!quiz.texts.find(text => text.languageId === language)) {

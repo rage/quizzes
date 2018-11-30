@@ -42,9 +42,9 @@ const OptionContainer = SortableContainer((props: any) => {
                     <Option
                         handleChange={props.handleChange}
                         language={props.language}
-                        key={option.id || props.itemOrder + index}
+                        key={option.id || props.index + index}
                         index={index}
-                        collection={`items[${props.itemOrder}].options`}
+                        collection={`items[${props.index}].options`}
                         itemIndex={props.index}
                         textIndex={option.texts.findIndex(t => t.languageId === props.language)}
                         correct={option.correct}
@@ -57,7 +57,7 @@ const OptionContainer = SortableContainer((props: any) => {
             })}
             <Grid item={true} xs={3} >
                 <Paper style={{ padding: 5, marginBottom: 5 }}>
-                    <Button onClick={props.addOption(props.itemOrder)} fullWidth={true}>add</Button>
+                    <Button onClick={props.addOption(props.index)} fullWidth={true}>add</Button>
                 </Paper>
             </Grid>
         </Grid>

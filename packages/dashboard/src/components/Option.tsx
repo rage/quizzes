@@ -67,7 +67,7 @@ class Option extends React.Component<any, any> {
 
     public render() {
 
-        console.log("option")
+        // console.log("option")
 
         return (
             <SortableGridItem index={this.props.index} collection={this.props.collection} size={!this.state.expanded ? 3 : 12}>
