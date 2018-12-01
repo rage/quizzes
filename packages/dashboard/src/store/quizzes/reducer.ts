@@ -8,7 +8,7 @@ export const quizzesReducer = (
 ) => {
   switch (action.type) {
     case getType(quizzes.set):
-      return action.payload
+      return [...state, ...action.payload]
     case getType(quizzes.clear):
       return []
     default:

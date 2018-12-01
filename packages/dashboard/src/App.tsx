@@ -40,7 +40,7 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
       if ((profile as ITMCProfileDetails).administrator) {
         this.props.addUser(user)
         this.props.setCourses()
-        this.props.setQuizzes()
+        // this.props.setQuizzes()
       }
     }
   }
@@ -170,7 +170,7 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
       if ((profile as ITMCProfileDetails).administrator) {
         this.props.addUser(user)
         this.props.setCourses()
-        this.props.setQuizzes()
+        // this.props.setQuizzes()
       }
     } catch (exception) {
       console.log('shiiiit')
