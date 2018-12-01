@@ -13,6 +13,8 @@
     "declarationMap": false,
     "sourceMap": true,
     "strictPropertyInitialization": false,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "paths": {
       "@quizzes/common/*": ["common/src/*", "common/dist/*"]
     },

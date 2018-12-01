@@ -1,4 +1,10 @@
-import { BaseEntity } from "typeorm"
+import {
+  BaseEntity,
+  Brackets,
+  FindOptionsWhereCondition,
+  ObjectLiteral,
+  SelectQueryBuilder,
+} from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import getUUIDByStringBroken from "uuid-by-string"
 
@@ -30,4 +36,33 @@ export function randomUUID(size: number = 1000000, start: number = 0): string {
   )}`
 
   return getUUIDByString(randomUUIDseed)
+}
+
+export class WhereBuilder<T extends BaseEntity> {
+  private qb: SelectQueryBuilder<T>
+  private idx = 0
+
+  constructor(qb: SelectQueryBuilder<T>) {
+    this.qb = qb
+  }
+
+  public add(
+    condition:
+      | string
+      | Brackets
+      | ((qb: SelectQueryBuilder<T>) => string)
+      | FindOptionsWhereCondition<T>
+      | Array<FindOptionsWhereCondition<T>>,
+    parameters?: ObjectLiteral | undefined,
+  ): WhereBuilder<T> {
+    if (this.idx === 0) {
+      this.qb.where(condition, parameters)
+    } else {
+      this.qb.andWhere(condition, parameters)
+    }
+
+    this.idx++
+
+    return this
+  }
 }

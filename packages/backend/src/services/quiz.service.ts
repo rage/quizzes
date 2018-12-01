@@ -20,7 +20,12 @@ import {
   INewQuizTranslation,
   IQuizQuery,
 } from "@quizzes/common/types"
-import { getUUIDByString, insert, randomUUID } from "@quizzes/common/util"
+import {
+  getUUIDByString,
+  insert,
+  randomUUID,
+  WhereBuilder,
+} from "@quizzes/common/util"
 import _ from "lodash"
 import { Service, Container } from "typedi"
 import { InjectManager } from "typeorm-typedi-extensions"
@@ -35,6 +40,8 @@ import {
   TransactionManager,
   AdvancedConsoleLogger,
   QueryBuilder,
+  ObjectLiteral,
+  FindOptionsWhereCondition,
 } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import quizanswerService from "./quizanswer.service"
@@ -45,110 +52,27 @@ export class QuizService {
   private entityManager: EntityManager
 
   public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
-    const {
-      id,
-      courseId,
-      courseAbbreviation,
-      course = true,
-      language,
-      items = true,
-      options = true,
-      peerreviews = true,
-    } = query
+    const { id, language } = query
 
     console.log("query", query)
     const queryBuilder: SelectQueryBuilder<
       Quiz
     > = this.entityManager.createQueryBuilder(Quiz, "quiz")
 
+    const whereBuilder: WhereBuilder<Quiz> = new WhereBuilder(queryBuilder)
+
     queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
+    if (language) {
+      whereBuilder.add("quiz_translation.language_id = :language", { language })
+    }
+
+    this.queryCourse(queryBuilder, whereBuilder, query)
+    this.queryItems(queryBuilder, whereBuilder, query)
+    this.queryPeerReviews(queryBuilder, whereBuilder, query)
 
     if (id) {
-      queryBuilder.where("quiz.id = :id", { id })
+      whereBuilder.add("quiz.id = :id", { id })
     }
-
-    if (language) {
-      queryBuilder.andWhere("quiz_translation.language_id = :language", {
-        language,
-      })
-    }
-
-    if (course) {
-      queryBuilder
-        .leftJoinAndSelect("quiz.course", "course")
-        .leftJoinAndSelect("course.texts", "course_translation")
-
-      if (courseId) {
-        queryBuilder.where("course.id = :courseId", { courseId })
-      }
-      if (courseAbbreviation) {
-        queryBuilder.where(
-          "course_translation.abbreviation = :courseAbbreviation",
-          { courseAbbreviation },
-        )
-      }
-
-      if (language) {
-        queryBuilder
-          .leftJoinAndSelect("course.languages", "language")
-          .andWhere("language.id = :language", { language })
-          .andWhere("course_translation.language_id = :language", { language })
-      }
-    }
-
-    if (items) {
-      queryBuilder
-        .leftJoinAndSelect("quiz.items", "quiz_item")
-        .leftJoinAndSelect("quiz_item.texts", "quiz_item_translation")
-
-      if (language) {
-        queryBuilder.andWhere(
-          new Brackets(qb => {
-            qb.where("quiz_item_translation.language_id = :language", {
-              language,
-            }).orWhere("quiz_item_translation.language_id is null")
-          }),
-        )
-      }
-    }
-
-    if (items && options) {
-      queryBuilder
-        .leftJoinAndSelect("quiz_item.options", "quiz_option")
-        .leftJoinAndSelect("quiz_option.texts", "quiz_option_translation")
-
-      if (language) {
-        queryBuilder.andWhere(
-          new Brackets(qb => {
-            qb.where("quiz_option_translation.language_id = :language", {
-              language,
-            }).orWhere("quiz_option_translation.language_id is null")
-          }),
-        )
-      }
-    }
-
-    if (peerreviews) {
-      queryBuilder
-        .leftJoinAndSelect("quiz.peerReviewQuestions", "peer_review_question")
-        .leftJoinAndSelect(
-          "peer_review_question.texts",
-          "peer_review_question_translation",
-        )
-
-      if (language) {
-        queryBuilder.andWhere(
-          new Brackets(qb => {
-            qb.where(
-              "peer_review_question_translation.language_id = :language",
-              { language },
-            ).orWhere("peer_review_question_translation is null")
-          }),
-        )
-      }
-    }
-
-    console.log(queryBuilder.getQuery())
 
     return await queryBuilder
       .getMany()
@@ -160,60 +84,19 @@ export class QuizService {
       )
   }
 
-  public async createQuiz(quiz: Quiz): Promise<Quiz> {
-    const newQuiz: Quiz = await this.entityManager.save(quiz)
+  public async createQuiz(quiz: Quiz): Promise<Quiz | undefined> {
+    let oldQuiz: Quiz | undefined
+    let newQuiz: Quiz | undefined
 
-    if (newQuiz) {
-      // test: ^ does not always return all?
-      const updatedQuiz: Quiz[] = await Quiz.find({ id: newQuiz.id })
+    await this.entityManager.transaction(async entityManager => {
+      if (quiz!.id) {
+        oldQuiz = await entityManager.findOne(Quiz, { id: quiz.id })
+        await this.removeOrphans(entityManager, oldQuiz, quiz)
+      }
 
-      return updatedQuiz[0]
-    }
+      newQuiz = await entityManager.save(quiz)
+    })
 
-    /*     if (quiz.id) {
-      newQuiz = await Quiz.findOne({ id: quiz.id })
-      newQuiz = Object.assign({}, newQuiz, quiz) // TODO: better update
-    } */
-
-    /*     console.log("quizservice got", newQuiz)
-
-    try {
-      await this.entityManager.transaction(async tem => {
-        newQuiz = new Quiz(newQuiz)
-
-        newQuiz.items = await Promise.all(
-          // these don't necessarily need promises
-          (newQuiz.items || []).map(async item => {
-            const newItem: QuizItem = new QuizItem(item)
-
-            newItem.texts = (newItem.texts || []).map(
-              text => new QuizItemTranslation(text),
-            )
-            newItem.options = await Promise.all(
-              (newItem.options || []).map(async option => {
-                const newOption: QuizOption = new QuizOption(option)
-
-                newOption.texts = (newOption.texts || []).map(
-                  text => new QuizOptionTranslation(text),
-                )
-
-                return newOption
-              }),
-            )
-
-            return newItem
-          }),
-        )
-
-        newQuiz = await tem.save(newQuiz)
-      })
-    } catch (err) {
-      return null
-    }
-
-    await newQuiz.course
-
-    return await newQuiz */
     return newQuiz
   }
 
@@ -231,6 +114,227 @@ export class QuizService {
     }
   }
 
+  private async removeOrphans(
+    entityManager: EntityManager,
+    oldQuiz: Quiz | undefined,
+    newQuiz: Quiz | undefined,
+  ): Promise<void> {
+    const toBeRemoved: { [key: string]: any[] } = {
+      textIds: [],
+      itemIds: [],
+      optionIds: [],
+      peerReviewQuestionIds: [],
+    }
+
+    if (!oldQuiz) {
+      return
+    }
+
+    if (oldQuiz.texts) {
+      const oldTextIds: Array<{
+        quizId: string | undefined
+        languageId: string
+      }> = oldQuiz.texts.map(text => ({
+        quizId: text.quizId,
+        languageId: text.languageId,
+      }))
+      const newTextIds: Array<{
+        quizId: string | undefined
+        languageId: string
+      }> = (newQuiz!.texts || []).map(text => ({
+        quizId: text.quizId,
+        languageId: text.languageId,
+      }))
+
+      const includesId = (
+        array: Array<{ quizId: string | undefined; languageId: string }>,
+        id: { quizId: string | undefined; languageId: string },
+      ) =>
+        array.some(
+          (arrayId: { quizId: string | undefined; languageId: string }) =>
+            arrayId.quizId === id.quizId &&
+            arrayId.languageId === id.languageId,
+        )
+
+      toBeRemoved.textIds = oldTextIds.filter(id => !includesId(newTextIds, id))
+    }
+
+    if (oldQuiz.items) {
+      const oldItemIds: string[] = []
+      const oldOptionIds: string[] = []
+      const newItemIds: string[] = []
+      const newOptionIds: string[] = []
+
+      oldQuiz.items.forEach(item => {
+        item.options.forEach(o => oldOptionIds.push(o.id))
+        oldItemIds.push(item.id)
+      })
+
+      if (newQuiz) {
+        ;(newQuiz!.items || []).forEach(item => {
+          item.options.forEach(o => newOptionIds.push(o.id))
+          newItemIds.push(item.id)
+        })
+      }
+
+      toBeRemoved.itemIds = oldItemIds.filter(id => !_.includes(newItemIds, id))
+      toBeRemoved.optionIds = oldOptionIds.filter(
+        id => !_.includes(newOptionIds, id),
+      )
+    }
+
+    if (oldQuiz.peerReviewQuestions) {
+      const oldPrqIds: string[] = (oldQuiz!.peerReviewQuestions || []).map(
+        prq => prq.id,
+      )
+      const newPrqIds: string[] = (newQuiz!.peerReviewQuestions || []).map(
+        prq => prq.id,
+      )
+
+      toBeRemoved.peerReviewQuestionIds = oldPrqIds.filter(
+        id => !_.includes(newPrqIds, id),
+      )
+    }
+
+    if (toBeRemoved.textIds.length > 0) {
+      await entityManager.delete(QuizTranslation, toBeRemoved.textIds)
+    }
+    if (toBeRemoved.itemIds.length > 0) {
+      await entityManager.delete(QuizItem, toBeRemoved.itemIds)
+    }
+    if (toBeRemoved.optionIds.length > 0) {
+      await entityManager.delete(QuizOption, toBeRemoved.optionIds || [])
+    }
+    if (toBeRemoved.peerReviewQuestionIds.length > 0) {
+      await entityManager.delete(
+        PeerReviewQuestion,
+        toBeRemoved.peerReviewQuestionIds || [],
+      )
+    }
+  }
+
+  private queryPeerReviews(
+    queryBuilder: SelectQueryBuilder<Quiz>,
+    whereBuilder: WhereBuilder<Quiz>,
+    query: IQuizQuery,
+  ) {
+    const { peerreviews, language } = query
+
+    if (!peerreviews) {
+      return
+    }
+    queryBuilder
+      .leftJoinAndSelect("quiz.peerReviewQuestions", "peer_review_question")
+      .leftJoinAndSelect(
+        "peer_review_question.texts",
+        "peer_review_question_translation",
+      )
+
+    if (language) {
+      whereBuilder.add(
+        // queryBuilder.andWhere(
+        new Brackets(qb => {
+          qb.where("peer_review_question_translation.language_id = :language", {
+            language,
+          }).orWhere("peer_review_question_translation is null")
+        }),
+      )
+    }
+  }
+
+  private queryOptions(
+    queryBuilder: SelectQueryBuilder<Quiz>,
+    whereBuilder: WhereBuilder<Quiz>,
+    query: IQuizQuery,
+  ) {
+    const { options, language } = query
+
+    if (!options) {
+      return
+    }
+
+    queryBuilder
+      .leftJoinAndSelect("quiz_item.options", "quiz_option")
+      .leftJoinAndSelect("quiz_option.texts", "quiz_option_translation")
+
+    if (language) {
+      whereBuilder.add(
+        new Brackets(qb => {
+          qb.where("quiz_option_translation.language_id = :language", {
+            language,
+          }).orWhere("quiz_option_translation.language_id is null")
+        }),
+      )
+    }
+  }
+
+  private queryItems(
+    queryBuilder: SelectQueryBuilder<Quiz>,
+    whereBuilder: WhereBuilder<Quiz>,
+    query: IQuizQuery,
+  ) {
+    const { items, options, language } = query
+
+    if (!items || !language) {
+      return
+    }
+
+    queryBuilder
+      .leftJoinAndSelect("quiz.items", "quiz_item")
+      .leftJoinAndSelect("quiz_item.texts", "quiz_item_translation")
+
+    if (language) {
+      whereBuilder.add(
+        new Brackets(qb => {
+          qb.where("quiz_item_translation.language_id = :language", {
+            language,
+          }).orWhere("quiz_item_translation.language_id is null")
+        }),
+      )
+    }
+
+    if (options) {
+      this.queryOptions(queryBuilder, whereBuilder, query)
+    }
+  }
+
+  private queryCourse(
+    queryBuilder: SelectQueryBuilder<Quiz>,
+    whereBuilder: WhereBuilder<Quiz>,
+    query: IQuizQuery,
+  ) {
+    const { course, courseId, courseAbbreviation, language } = query
+
+    if (!course) {
+      return
+    }
+
+    queryBuilder
+      .innerJoinAndSelect("quiz.course", "course")
+      .innerJoinAndSelect("course.texts", "course_translation")
+      .innerJoinAndSelect("course.languages", "language")
+
+    if (courseId) {
+      whereBuilder.add("course_translation.id = :courseId", { courseId })
+    }
+    if (courseAbbreviation) {
+      whereBuilder.add(
+        "course_translation.abbreviation = :courseAbbreviation",
+        { courseAbbreviation },
+      )
+    }
+
+    if (language) {
+      whereBuilder.add("language.id = :language", { language }).add(
+        new Brackets(qb => {
+          qb.where("course_translation.language_id = :language", {
+            language,
+          }).orWhere("course_translation.language_id is null")
+        }),
+      )
+    }
+  }
+
   private async stripQuiz(quiz: Quiz, options: IQuizQuery): Promise<Quiz> {
     await quiz.course
 
@@ -240,13 +344,13 @@ export class QuizService {
 
     if (options.items) {
       if (!options.options) {
-        quiz.items.forEach(item => {
+        ;(quiz.items || []).forEach(item => {
           item.options = []
         })
       }
 
       if (options.language) {
-        quiz.items.forEach(item => {
+        ;(quiz.items || []).forEach(item => {
           item.texts = item.texts.filter(t => t.languageId === options.language)
           item.options.forEach(
             option =>

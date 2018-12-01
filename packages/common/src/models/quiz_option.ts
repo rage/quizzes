@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryColumn,
@@ -45,7 +46,10 @@ export class QuizOption extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(type => QuizItem, qi => qi.id)
+  @ManyToOne(type => QuizItem, qi => qi.id, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn()
   public quizItem: Promise<QuizItem>
   @Column({ nullable: true })
   public quizItemId: string | null
@@ -88,10 +92,13 @@ export class QuizOptionTranslation extends BaseEntity {
     this.failureMessage = data.failureMessage
   }
 
-  @ManyToOne(type => QuizOption, qo => qo.id)
+  @ManyToOne(type => QuizOption, qo => qo.id, {
+    onDelete: "CASCADE",
+  })
+  @JoinColumn()
   public quizOption: Promise<QuizOption>
   @PrimaryColumn()
-  public quizOptionId: string
+  public quizOptionId: string | undefined
 
   @ManyToOne(type => Language, lang => lang.id)
   public language: Language
