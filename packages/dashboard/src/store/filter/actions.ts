@@ -18,11 +18,23 @@ export const setFilter = (path, value) => {
     }
     const filters = Object.assign({}, getState().filter)
     _.set(filters, path, value)
-    console.log(filters)
     dispatch(set(filters))
   }
 }
 
-// export const setLanguage = () => {}
+export const setLanguage = language => {
+  return dispatch => {
+    dispatch(set({ language }))
+  }
+}
 
-// export const setCourse  = () => {}
+export const setCourse = course => {
+  return async (dispatch, getState) => {
+    if (!getState().quizzes.find(quiz => quiz.courseId === course)) {
+      await dispatch(setQuizzes(course))
+    }
+    const language = getState().courses.find(c => c.id === course).languages[0]
+      .id
+    dispatch(set({ course, language }))
+  }
+}

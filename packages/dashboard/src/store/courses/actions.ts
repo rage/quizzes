@@ -1,6 +1,6 @@
 import { createAction } from "typesafe-actions"
 import { getCourses } from "../../services/courses"
-import { setFilter } from "../filter/actions"
+import { setCourse } from "../filter/actions"
 
 export const set = createAction("courses/SET", resolve => {
   return courses => resolve(courses)
@@ -16,11 +16,11 @@ export const setCourses = () => {
         course => course.id === "1c1d9c7d-5278-45d9-98a2-2dc72834df64",
       )
       if (def) {
-        dispatch(setFilter("course", def.id))
+        dispatch(setCourse(def.id))
       } else if (courses[0]) {
-        dispatch(setFilter("course", courses[0].id))
+        dispatch(setCourse(courses[0].id))
       } else {
-        dispatch(setFilter("course", ""))
+        dispatch(setCourse(""))
       }
       dispatch(set(courses))
     } catch (error) {

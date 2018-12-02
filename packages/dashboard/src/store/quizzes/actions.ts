@@ -10,6 +10,10 @@ export const set = createAction("quizzes/SET", resolve => {
 
 export const clear = createAction("quizzes/CLEAR")
 
+export const remove = createAction("quizzes/REMOVE", resolve => {
+  return (quizId: number) => resolve(quizId)
+})
+
 export const setQuizzes = course => {
   return async (dispatch, getState) => {
     try {

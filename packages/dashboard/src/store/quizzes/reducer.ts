@@ -9,6 +9,11 @@ export const quizzesReducer = (
   switch (action.type) {
     case getType(quizzes.set):
       return [...state, ...action.payload]
+    case getType(quizzes.remove):
+      return [
+        ...state.slice(0, action.payload),
+        ...state.slice(action.payload + 1),
+      ]
     case getType(quizzes.clear):
       return []
     default:

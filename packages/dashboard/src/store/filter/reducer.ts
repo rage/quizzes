@@ -9,7 +9,7 @@ const initialState = {
 export const filterReducer = (state: any = initialState, action: any) => {
   switch (action.type) {
     case getType(filter.set):
-      return action.payload
+      return Object.assign({}, state, action.payload)
     case getType(filter.clear):
       return initialState
     default:

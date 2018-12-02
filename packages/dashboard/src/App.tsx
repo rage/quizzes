@@ -26,7 +26,7 @@ import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
 import QuizForm from './components/QuizForm'
 import { setCourses } from './store/courses/actions'
 import { newQuiz, setEdit } from './store/edit/actions'
-import { setFilter } from './store/filter/actions'
+import { setCourse, setFilter } from './store/filter/actions'
 import { setQuizzes } from './store/quizzes/actions'
 import { addUser, removeUser } from './store/user/actions'
 
@@ -76,7 +76,7 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
                 {this.props.courses.map(course => <MenuItem key={course.id} value={course.id}>{course.texts[0].title}</MenuItem>)}
               </Select>
               <Typography style={{ flex: 1 }} />
-              <Link to='/new' style={{ textDecoration: 'none' }}><Button>New quiz</Button></Link>
+              {this.props.filter.course === "" ? <p/> : <Link to='/new' style={{ textDecoration: 'none' }}><Button>New quiz</Button></Link> }
             </Toolbar>
             <Table>
               <TableHead>
@@ -86,7 +86,7 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
               </TableHead>
               <TableBody>
                 {this.props.quizzes.filter(quiz => quiz.course.id === this.props.filter.course)
-                  .map(quiz => <TableRow key={quiz.id}><TableCell><Link to={`/quizzes/${quiz.id}`}>{quiz.texts[0].title}</Link></TableCell></TableRow>)}
+                  .map(quiz => <TableRow key={quiz.id}><TableCell><Link to={`/quizzes/${quiz.id}`}>{quiz.texts[0] ? quiz.texts[0].title : "no title"}</Link></TableCell></TableRow>)}
               </TableBody>
             </Table>
           </div>
@@ -126,14 +126,16 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
     if (this.props.quizzes.length === 0) {
       return <p />
     }
+    console.log("edit")
     const quiz = this.props.quizzes.find(q => q.id === match.params.id)
-    return <QuizForm id={match.params.id} quiz={quiz} />
+    return <QuizForm quiz={quiz} new={false}/>
   }
 
   private create = () => {
     if (this.props.courses.length === 0) {
       return <p />
     }
+    console.log("create")
     return <QuizForm />
   }
 
@@ -154,7 +156,7 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
   }
 
   private handleSelect = (event) => {
-    this.props.setFilter('course', event.target.value)
+    this.props.setCourse(event.target.value)
   }
 
   private handleSubmit = async (event: any) => {
@@ -197,6 +199,7 @@ const Switch2 = ({ match }: any, props) => {
 interface IDispatchProps {
   addUser: typeof addUser,
   newQuiz: typeof newQuiz,
+  setCourse: typeof setCourse,
   setCourses: typeof setCourses,
   setEdit: typeof setEdit,
   setFilter: typeof setFilter,
@@ -223,6 +226,7 @@ const mapStateToProps = (state: any) => {
 const mapDispatchToProps = {
   addUser,
   newQuiz,
+  setCourse,
   setCourses,
   setEdit,
   setFilter,

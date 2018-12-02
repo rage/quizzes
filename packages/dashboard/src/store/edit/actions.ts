@@ -6,7 +6,8 @@ import {
   INewQuizTranslation,
 } from "../../../../common/src/types/index"
 import { post } from "../../services/quizzes"
-import { setFilter } from "../filter/actions"
+import { setLanguage } from "../filter/actions"
+import * as quizzes from "../quizzes/actions"
 
 export const set = createAction("edit/SET", resolve => {
   return quiz => resolve(quiz)
@@ -24,13 +25,22 @@ export const setEdit = (quiz: any) => {
   )
   return dispatch => {
     dispatch(set(checkForMissingTranslation(orderedQuiz)))
-    dispatch(setFilter("language", orderedQuiz.course.languages[0].id))
   }
 }
 
 export const save = () => {
   return async (dispatch, getState) => {
-    await post(getState().edit)
+    try {
+      const quiz = await post(getState().edit)
+      const index = getState().quizzes.findIndex(q => q.id === quiz.id)
+      if (index > -1) {
+        dispatch(quizzes.remove(index))
+      }
+      dispatch(quizzes.set([quiz]))
+      dispatch(setEdit(quiz))
+    } catch (error) {
+      console.log(error)
+    }
   }
 }
 
@@ -42,13 +52,12 @@ export const newQuiz = () => {
     const quiz = {
       part: 0,
       section: 0,
-      courseId: course.courseId,
+      courseId: course.id,
       course,
       texts: [],
       items: [],
     }
     dispatch(set(checkForMissingTranslation(quiz)))
-    dispatch(setFilter("language", course.languages[0].id))
   }
 }
 
@@ -109,34 +118,43 @@ const checkForMissingTranslation = paramQuiz => {
   const languages = quiz.course.languages.map(l => l.id)
   languages.map(language => {
     if (!quiz.texts.find(text => text.languageId === language)) {
-      quiz.texts.push({
-        quizId: quiz.id || "",
+      const newText = {
         languageId: language,
         title: `quiz title ${language}`,
         body: `quiz body ${language}`,
-      })
+      }
+      if (quiz.id) {
+        Object.assign(newText, { quizId: quiz.id })
+      }
+      quiz.texts.push(newText)
     }
     quiz.items.map((item, i) => {
       if (!item.texts.find(text => text.languageId === language)) {
-        quiz.items[i].texts.push({
-          quizItemId: item.id,
+        const newText = {
           languageId: language,
           title: `item ${item.order} title ${language}`,
           body: null,
           successMessage: null,
           failureMessage: null,
-        })
+        }
+        if (item.id) {
+          Object.assign(newText, { quizItemId: item.id })
+        }
+        quiz.items[i].texts.push(newText)
       }
       item.options.map((option, j) => {
         if (!option.texts.find(text => text.languageId === language)) {
-          quiz.items[i].options[j].texts.push({
-            quizOptionId: option.id,
+          const newText = {
             languageId: language,
             title: `option ${option.order} title ${language}`,
             body: null,
             successMessage: null,
             failureMessage: null,
-          })
+          }
+          if (option.id) {
+            Object.assign(newText, { quizOptionId: option.id })
+          }
+          quiz.items[i].options[j].texts.push(newText)
         }
       })
     })

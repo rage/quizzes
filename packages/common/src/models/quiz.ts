@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryColumn,
@@ -45,10 +46,16 @@ export class Quiz extends BaseEntity {
   @Column({ type: "timestamp", nullable: true })
   public open?: Date
 
-  @OneToMany(type => QuizItem, qi => qi.quiz, { eager: true, cascade: true }) // was: not eager
+  @OneToMany(type => QuizItem, qi => qi.quiz, {
+    eager: true,
+    cascade: true,
+  }) // was: not eager
   public items?: QuizItem[]
 
-  @OneToMany(type => PeerReviewQuestion, prq => prq.quiz, { eager: true }) // was: not eager
+  @OneToMany(type => PeerReviewQuestion, prq => prq.quiz, {
+    eager: true,
+    cascade: true,
+  }) // was: not eager
   public peerReviewQuestions: PeerReviewQuestion[]
 
   @Column({ default: false })
@@ -98,12 +105,17 @@ export class Quiz extends BaseEntity {
 
 @Entity()
 export class QuizTranslation extends BaseEntity {
-  @ManyToOne(type => Quiz, quiz => quiz.id)
+  @ManyToOne(type => Quiz, quiz => quiz.id, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
+  @JoinColumn()
   public quiz: Promise<Quiz>
   @PrimaryColumn()
   public quizId: string
 
   @ManyToOne(type => Language, lang => lang.id)
+  @JoinColumn()
   public language: Language
   @PrimaryColumn()
   public languageId: string

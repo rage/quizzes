@@ -27,9 +27,10 @@ import {
 } from '@material-ui/core'
 import React from 'react'
 import { connect } from 'react-redux'
+import { Redirect } from 'react-router-dom'
 import { arrayMove, SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
 import { addItem, addOption, changeAttr, changeOrder, newQuiz, save, setEdit } from '../store/edit/actions'
-import { setFilter } from '../store/filter/actions'
+import { setFilter, setLanguage } from '../store/filter/actions'
 import ItemContainer from './ItemContainer'
 import OptionContainer from './OptionContainer'
 import TabContainer from './TabContainer'
@@ -48,7 +49,8 @@ class QuizForm extends React.Component<any, any> {
     constructor(props) {
         super(props)
         this.state = {
-            menuOpen: null
+            menuOpen: null,
+            new: true
         }
     }
 
@@ -58,9 +60,14 @@ class QuizForm extends React.Component<any, any> {
         } else {
             this.props.newQuiz()
         }
-    }
+    } 
 
     public render() {
+
+        /* if (this.props.new && this.props.edit.id) {
+            return <Redirect to={`/quizzes/${this.props.edit.id}`} />
+        } */
+
         return (
             <div>
                 <Tabs value={this.props.filter.language || "add"} onChange={this.handleTabs} style={{ marginBottom: 30 }}>
@@ -137,7 +144,7 @@ class QuizForm extends React.Component<any, any> {
     }
 
     private handleTabs = (event, value) => {
-        this.props.setFilter('language', value)
+        this.props.setLanguage(value)
     }
 
     private selectCourse = (event) => {
@@ -163,7 +170,8 @@ const mapDispatchToProps = {
     newQuiz,
     save,
     setEdit,
-    setFilter
+    setFilter,
+    setLanguage
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(QuizForm)
