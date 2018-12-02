@@ -1,5 +1,7 @@
 import { applyMiddleware, combineReducers, createStore } from "redux"
 import { composeWithDevTools } from "redux-devtools-extension"
+import { persistReducer, persistStore } from "redux-persist"
+import storage from "redux-persist/lib/storage"
 import thunk from "redux-thunk"
 import { coursesReducer } from "./courses/reducer"
 import { editReducer } from "./edit/reducer"
@@ -15,7 +17,17 @@ const reducer = combineReducers({
   quizzes: quizzesReducer,
 })
 
+const persistConfig = {
+  key: "root",
+  storage,
+  whitelist: ["filter"],
+}
+
+const persistedReducer = persistReducer(persistConfig, reducer)
+
 export const store = createStore(
-  reducer,
+  persistedReducer,
   composeWithDevTools(applyMiddleware(thunk)),
 )
+
+export const persistor = persistStore(store)

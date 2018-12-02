@@ -1,16 +1,19 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/integration/react'
 import { whyDidYouUpdate } from 'why-did-you-update'
 import App from './App';
-import { store } from './store/store'
+import { persistor, store } from './store/store'
 
 // whyDidYouUpdate(React)
 
 const render = () => {
     ReactDOM.render(
         <Provider store={store}>
-            <App />
+            <PersistGate loading={null} persistor={persistor}>
+                <App />
+            </PersistGate>
         </Provider>,
         document.getElementById('root')
     )

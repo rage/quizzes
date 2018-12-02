@@ -40,7 +40,6 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
       if ((profile as ITMCProfileDetails).administrator) {
         this.props.addUser(user)
         this.props.setCourses()
-        // this.props.setQuizzes()
       }
     }
   }
@@ -139,22 +138,6 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
     return <QuizForm />
   }
 
-  private Switch = ({ match }) => {
-    if (this.props.quizzes.length === 0) {
-      return <p />
-    }
-    const quiz = this.props.quizzes.find(q => q.id === match.params.id)
-    if (match.params.id) {
-      console.log(match.params.id)
-      // this.props.setEdit(quiz)
-      return <QuizForm id={match.params.id} quiz={quiz} />
-    } else {
-      console.log("eka")
-      // this.props.newQuiz()
-      return <QuizForm />
-    }
-  }
-
   private handleSelect = (event) => {
     this.props.setCourse(event.target.value)
   }
@@ -172,27 +155,15 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
       if ((profile as ITMCProfileDetails).administrator) {
         this.props.addUser(user)
         this.props.setCourses()
-        // this.props.setQuizzes()
       }
     } catch (exception) {
-      console.log('shiiiit')
+      console.log(exception)
     }
   }
 
   private logout = () => {
     TMCApi.unauthenticate()
     this.props.removeUser()
-  }
-}
-
-const Switch2 = ({ match }: any, props) => {
-  const quiz = props.quizzes.find(q => q.id === match.params.id)
-  if (quiz) {
-    props.setEdit(quiz)
-    return <QuizForm id={match.params.id} />
-  } else {
-    props.newQuiz()
-    return <QuizForm />
   }
 }
 
