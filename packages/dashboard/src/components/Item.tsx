@@ -59,11 +59,15 @@ class Item extends React.Component<any, any> {
             return true
         }
         return false
-    } 
+    }
 
     public render() {
 
         // console.log("item")
+
+        const renderOptions = type => {
+            return ["radio", "checkbox", "research-agreement"].includes(type)
+        }
 
         return (
             <Card style={{ marginBottom: 20 }}>
@@ -128,36 +132,42 @@ class Item extends React.Component<any, any> {
                                             multiline={true}
                                             margin="normal"
                                         />
-                                        <TextField
-                                            label="validity regex"
-                                            fullWidth={true}
-                                            value={this.props.validityRegex || undefined}
-                                            margin="normal"
-                                        />
-                                        <TextField
-                                            label="format regex"
-                                            fullWidth={true}
-                                            value={this.props.formatRegex || undefined}
-                                            margin="normal"
-                                        />
+                                        {this.props.type === "open" ?
+                                            <div>
+                                                <TextField
+                                                    label="validity regex"
+                                                    fullWidth={true}
+                                                    value={this.props.validityRegex || undefined}
+                                                    margin="normal"
+                                                />
+                                                <TextField
+                                                    label="format regex"
+                                                    fullWidth={true}
+                                                    value={this.props.formatRegex || undefined}
+                                                    margin="normal"
+                                                />
+                                            </div> :
+                                            <p />}
                                     </CardContent>
                                 </Card>
                             </Grid>
-                            <Grid item={true} xs={12}>
-                                <Card>
-                                    <CardHeader subheader="options" />
-                                    <CardContent>
-                                        <OptionContainer
-                                            axis="xy"
-                                            onSortEnd={this.props.handleSort}
-                                            index={this.props.index}
-                                            useDragHandle={true}
-                                            language={this.props.language}
-                                            handleChange={this.props.handleChange}
-                                        />
-                                    </CardContent>
-                                </Card>
-                            </Grid>
+                            {renderOptions(this.props.type) ?
+                                <Grid item={true} xs={12}>
+                                    <Card>
+                                        <CardHeader subheader="options" />
+                                        <CardContent>
+                                            <OptionContainer
+                                                axis="xy"
+                                                onSortEnd={this.props.handleSort}
+                                                index={this.props.index}
+                                                useDragHandle={true}
+                                                language={this.props.language}
+                                                handleChange={this.props.handleChange}
+                                            />
+                                        </CardContent>
+                                    </Card>
+                                </Grid> :
+                                <p />}
                         </Grid>
                     </CardContent>
                 </Collapse>

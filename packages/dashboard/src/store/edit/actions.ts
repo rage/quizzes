@@ -59,6 +59,7 @@ export const newQuiz = () => {
       course,
       texts: [],
       items: [],
+      peerReviewQuestions: [],
     }
     dispatch(set(checkForMissingTranslation(quiz)))
   }
@@ -121,7 +122,7 @@ export const addReview = type => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
     const peerReviewQuestion = {
       quizId: quiz.id,
-      collectionId: "",
+      // collectionId: "",
       default: false,
       type,
       answerRequired: true,
@@ -183,7 +184,7 @@ const checkForMissingTranslation = paramQuiz => {
         const newText = {
           languageId: language,
           title: `peer review ${prq.order} title ${language}`,
-          body: null,
+          body: "",
         }
         if (prq.id) {
           Object.assign(newText, { peerReviewQuestionId: prq.id })

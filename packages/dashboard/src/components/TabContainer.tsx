@@ -93,7 +93,7 @@ class TabContainer extends React.Component<any, any> {
                     <Menu anchorEl={this.state.menuAnchor} open={this.state.menuOpen === "item"} onClose={this.handleMenu}>
                         {this.itemTypes.map(type => <MenuItem key={type} value={type} onClick={this.addItem(type)}>{type}</MenuItem>)}
                     </Menu>
-                    {this.props.items[0] && this.props.items[0].type === "essay" ?
+                    {this.props.items.find(item => item.type === "essay") ?
                         <div>
                             <Typography variant='subtitle1'>Peer review questions:</Typography>
                             <PeerReviewQuestionContainer

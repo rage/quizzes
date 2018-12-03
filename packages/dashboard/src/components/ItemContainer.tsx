@@ -55,6 +55,7 @@ const ItemContainer: ComponentClass<any, any> = SortableContainer((props: any) =
                             body={text.body}
                             successMessage={text.successMessage}
                             failureMessage={text.failureMessage}
+                            type={item.type}
                         />
                     </SortableWrapper>
                 )
