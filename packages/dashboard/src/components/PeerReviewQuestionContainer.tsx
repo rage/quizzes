@@ -32,29 +32,26 @@ import { addItem, addOption, changeAttr, changeOrder, newQuiz, save, setEdit } f
 import { setFilter } from '../store/filter/actions'
 import Item from './Item'
 import OptionContainer from './OptionContainer'
+import PeerReviewQuestion from './PeerReviewQuestion'
 import SortableWrapper from './SortableWrapper'
 
-const ItemContainer: ComponentClass<any, any> = SortableContainer((props: any) => {
+const PeerReviewQuestionContainer = SortableContainer((props: any) => {
     return (
         <div>
-            {props.items.map((item, index) => {
-                const text = item.texts.find(t => t.languageId === props.language)
+            {props.peerReviewQuestions.map((prq, index) => {
+                const text = prq.texts.find(t => t.languageId === props.language)
                 return (
-                    <SortableWrapper key={item.id || item.type + index} index={index} collection="items">
-                        <Item
-                            language={props.language}
-                            handleChange={props.handleChange}
-                            index={index}
-                            handleSort={props.handleSort}
-                            textIndex={item.texts.findIndex(t => t.languageId === props.language)}
-                            order={item.order}
-                            validityRegex={item.validityRegex}
-                            formatRegex={item.formatRegex}
-                            options={item.options}
+                    <SortableWrapper key={prq.id || prq.type + index} index={index} collection="peerReviewQuestions">
+                        <PeerReviewQuestion
+                            answerRequired={prq.answerRequired}
+                            default={prq.default}
+                            order={prq.order}
+                            type={prq.type}
                             title={text.title}
-                            body={text.body}
-                            successMessage={text.successMessage}
-                            failureMessage={text.failureMessage}
+                            body={text.title}
+                            index={index}
+                            textIndex={prq.texts.findIndex(t => t.languageId === props.language)}
+                            handleChange={props.handleChange}
                         />
                     </SortableWrapper>
                 )
@@ -69,4 +66,4 @@ const mapStateToProps = (state: any) => {
     }
 }
 
-export default connect(mapStateToProps)(ItemContainer)
+export default connect(mapStateToProps)(PeerReviewQuestionContainer)

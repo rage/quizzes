@@ -23,6 +23,9 @@ export const setEdit = (quiz: any) => {
   orderedQuiz.items.map(
     item => (item.options = item.options.sort((o1, o2) => o1.order - o2.order)),
   )
+  orderedQuiz.peerReviewQuestions = orderedQuiz.peerReviewQuestions.sort(
+    (p1, p2) => p1.order - p2.order,
+  )
   return dispatch => {
     dispatch(set(checkForMissingTranslation(orderedQuiz)))
   }
@@ -113,6 +116,23 @@ export const addOption = item => {
   }
 }
 
+export const addReview = type => {
+  return (dispatch, getState) => {
+    const quiz = JSON.parse(JSON.stringify(getState().edit))
+    const peerReviewQuestion = {
+      quizId: quiz.id,
+      collectionId: "",
+      default: false,
+      type,
+      answerRequired: true,
+      order: quiz.peerReviewQuestions.length,
+      texts: [],
+    }
+    quiz.peerReviewQuestions.push(peerReviewQuestion)
+    dispatch(setEdit(quiz))
+  }
+}
+
 const checkForMissingTranslation = paramQuiz => {
   const quiz = JSON.parse(JSON.stringify(paramQuiz))
   const languages = quiz.course.languages.map(l => l.id)
@@ -157,6 +177,19 @@ const checkForMissingTranslation = paramQuiz => {
           quiz.items[i].options[j].texts.push(newText)
         }
       })
+    })
+    quiz.peerReviewQuestions.map((prq, i) => {
+      if (!prq.texts.find(text => text.languageId === language)) {
+        const newText = {
+          languageId: language,
+          title: `peer review ${prq.order} title ${language}`,
+          body: null,
+        }
+        if (prq.id) {
+          Object.assign(newText, { peerReviewQuestionId: prq.id })
+        }
+        quiz.peerReviewQuestions[i].texts.push(newText)
+      }
     })
   })
   return quiz

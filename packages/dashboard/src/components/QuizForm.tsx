@@ -37,30 +37,13 @@ import TabContainer from './TabContainer'
 
 class QuizForm extends React.Component<any, any> {
 
-    private itemTypes = [
-        "checkbox",
-        "essay",
-        "open",
-        "radio",
-        "research-agreement",
-        "scale"
-    ]
-
-    constructor(props) {
-        super(props)
-        this.state = {
-            menuOpen: null,
-            new: true
-        }
-    }
-
     public componentDidMount() {
         if (this.props.quiz) {
             this.props.setEdit(this.props.quiz)
         } else {
             this.props.newQuiz()
         }
-    } 
+    }
 
     public render() {
 
@@ -93,19 +76,14 @@ class QuizForm extends React.Component<any, any> {
                 {this.props.edit.course.languages.map((l, i) => (
                     this.props.filter.language === l.id &&
                     <TabContainer
-                        quiz={this.props.edit}
+                        items={this.props.edit.items}
+                        peerReviewQuestions={this.props.edit.peerReviewQuestions}
+                        text={this.props.edit.texts.find(text => text.languageId === l.id)}
+                        textIndex={this.props.edit.texts.find(text => text.languageId === l.id)}
                         handleChange={this.handleChange}
                         key={l.name}
-                        language={l.id}
-                        onSortEnd={this.onSortEnd}
-                        addItem={this.props.addItem}
-                        addOption={this.addOption}
                     />
                 ))}
-                <Button id="menu" onClick={this.handleMenu}>Add item</Button>
-                <Menu anchorEl={this.state.menuOpen} open={Boolean(this.state.menuOpen)} onClose={this.handleMenu}>
-                    {this.itemTypes.map(type => <MenuItem key={type} value={type} onClick={this.addItem(type)}>{type}</MenuItem>)}
-                </Menu>
                 <Toolbar>
                     <Typography style={{ flex: 1 }} />
                     <Button onClick={this.props.save}>save</Button>
@@ -114,33 +92,8 @@ class QuizForm extends React.Component<any, any> {
         )
     }
 
-    private addOption = item => event => {
-        this.props.addOption(item)
-    }
-
-    private addItem = type => event => {
-        this.setState({
-            menuOpen: null
-        })
-        this.props.addItem(type)
-    }
-
-    private handleMenu = (event) => {
-        this.setState({
-            menuOpen: this.state.menuOpen ? null : event.currentTarget
-        })
-    }
-
-    private onSortEnd = ({ oldIndex, newIndex, collection }) => {
-        this.props.changeOrder(collection, oldIndex, newIndex)
-    }
-
     private handleChange = path => event => {
-        this.props.changeAttr(path, path.endsWith('correct') ? event.target.checked : event.target.value)
-    }
-
-    private addLanguage = () => {
-        console.log("do you want to add language to course blaablaa")
+        this.props.changeAttr(path, path.endsWith('correct') || path.endsWith('default') || path.endsWith('Required') ? event.target.checked : event.target.value)
     }
 
     private handleTabs = (event, value) => {
@@ -149,6 +102,10 @@ class QuizForm extends React.Component<any, any> {
 
     private selectCourse = (event) => {
         console.log(event.target.value)
+    }
+
+    private addLanguage = () => {
+        console.log("do you want to add language to course blaablaa")
     }
 }
 

@@ -33,7 +33,13 @@ import { setFilter } from '../store/filter/actions'
 import Option from './Option'
 
 const OptionContainer = SortableContainer((props: any) => {
+
+    const newOption = item => event => {
+        props.addOption(item)
+    }
+
     const options = props.edit.items[props.index].options
+    
     return (
         <Grid container={true} spacing={16}>
             {options.sort((o1, o2) => o1.order - o2.order).map((option, index) => {
@@ -56,7 +62,7 @@ const OptionContainer = SortableContainer((props: any) => {
             })}
             <Grid item={true} xs={3} >
                 <Paper style={{ padding: 5, marginBottom: 5 }}>
-                    <Button onClick={props.addOption(props.index)} fullWidth={true}>add</Button>
+                    <Button onClick={newOption(props.index)} fullWidth={true}>add</Button>
                 </Paper>
             </Grid>
         </Grid>
@@ -69,4 +75,8 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps)(OptionContainer)
+const mapDispatchToProps = {
+    addOption
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(OptionContainer)

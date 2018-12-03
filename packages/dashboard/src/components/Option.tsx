@@ -30,6 +30,7 @@ import { connect } from 'react-redux'
 import { arrayMove, SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
 import { addItem, addOption, changeAttr, changeOrder, newQuiz, save, setEdit } from '../store/edit/actions'
 import { setFilter } from '../store/filter/actions'
+import DragHandleWrapper from './DragHandleWrapper'
 
 class Option extends React.Component<any, any> {
 
@@ -63,7 +64,7 @@ class Option extends React.Component<any, any> {
             return true
         }
         return false
-    }
+    } 
 
     public render() {
 
@@ -143,8 +144,6 @@ class Option extends React.Component<any, any> {
         this.setState({ expanded: !this.state.expanded })
     }
 }
-
-const DragHandleWrapper = SortableHandle((props: any) => <div>{props.children}</div>)
 
 const SortableGridItem = SortableElement((props: any) => <Grid item={true} xs={props.size}>{props.children}</Grid>)
 

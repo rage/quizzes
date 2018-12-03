@@ -125,7 +125,6 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
     if (this.props.quizzes.length === 0) {
       return <p />
     }
-    console.log("edit")
     const quiz = this.props.quizzes.find(q => q.id === match.params.id)
     return <QuizForm quiz={quiz} new={false}/>
   }
@@ -134,7 +133,6 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
     if (this.props.courses.length === 0) {
       return <p />
     }
-    console.log("create")
     return <QuizForm />
   }
 

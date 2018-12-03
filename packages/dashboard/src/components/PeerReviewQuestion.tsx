@@ -4,12 +4,14 @@ import {
     CardActions,
     CardContent,
     CardHeader,
+    Checkbox,
     Collapse,
     Divider,
     ExpansionPanel,
     ExpansionPanelDetails,
     ExpansionPanelSummary,
     FormControl,
+    FormControlLabel,
     Grid,
     IconButton,
     InputLabel,
@@ -33,7 +35,7 @@ import { setFilter } from '../store/filter/actions'
 import DragHandleWrapper from './DragHandleWrapper'
 import OptionContainer from './OptionContainer'
 
-class Item extends React.Component<any, any> {
+class PeerReviewQuestion extends React.Component<any, any> {
 
     constructor(props) {
         super(props)
@@ -42,7 +44,7 @@ class Item extends React.Component<any, any> {
         }
     }
 
-    public shouldComponentUpdate(nextProps, nextState) {
+    /*public shouldComponentUpdate(nextProps, nextState) {
         if (nextState.expanded !== this.state.expanded) {
             return true
         }
@@ -59,11 +61,11 @@ class Item extends React.Component<any, any> {
             return true
         }
         return false
-    } 
+    }*/
 
     public render() {
 
-        // console.log("item")
+        // console.log("peer")
 
         return (
             <Card style={{ marginBottom: 20 }}>
@@ -100,7 +102,7 @@ class Item extends React.Component<any, any> {
                                             label="title"
                                             value={this.props.title || undefined}
                                             fullWidth={true}
-                                            onChange={this.props.handleChange(`items[${this.props.index}].texts[${this.props.textIndex}].title`)}
+                                            onChange={this.props.handleChange(`peerReviewQuestions[${this.props.index}].texts[${this.props.textIndex}].title`)}
                                             multiline={true}
                                             margin="normal"
                                         />
@@ -108,52 +110,31 @@ class Item extends React.Component<any, any> {
                                             label="body"
                                             value={this.props.body || undefined}
                                             fullWidth={true}
-                                            onChange={this.props.handleChange(`items[${this.props.index}].texts[${this.props.textIndex}].body`)}
+                                            onChange={this.props.handleChange(`peerReviewQuestions[${this.props.index}].texts[${this.props.textIndex}].body`)}
                                             multiline={true}
                                             margin="normal"
                                         />
-                                        <TextField
-                                            label="success message"
-                                            value={this.props.successMessage || undefined}
-                                            fullWidth={true}
-                                            onChange={this.props.handleChange(`items[${this.props.index}].texts[${this.props.textIndex}].successMessage`)}
-                                            multiline={true}
-                                            margin="normal"
+                                        <FormControlLabel
+                                            value={this.props.default}
+                                            control={<Checkbox
+                                                checked={this.props.default}
+                                                onChange={this.props.handleChange(`peerReviewQuestions[${this.props.index}].default`)}
+                                                value={this.props.default}
+                                                color="primary"
+                                            />}
+                                            label="default"
+                                            labelPlacement="start"
                                         />
-                                        <TextField
-                                            label="failure message"
-                                            value={this.props.failureMessage || undefined}
-                                            fullWidth={true}
-                                            onChange={this.props.handleChange(`items[${this.props.index}].texts[${this.props.textIndex}].failureMessage`)}
-                                            multiline={true}
-                                            margin="normal"
-                                        />
-                                        <TextField
-                                            label="validity regex"
-                                            fullWidth={true}
-                                            value={this.props.validityRegex || undefined}
-                                            margin="normal"
-                                        />
-                                        <TextField
-                                            label="format regex"
-                                            fullWidth={true}
-                                            value={this.props.formatRegex || undefined}
-                                            margin="normal"
-                                        />
-                                    </CardContent>
-                                </Card>
-                            </Grid>
-                            <Grid item={true} xs={12}>
-                                <Card>
-                                    <CardHeader subheader="options" />
-                                    <CardContent>
-                                        <OptionContainer
-                                            axis="xy"
-                                            onSortEnd={this.props.handleSort}
-                                            index={this.props.index}
-                                            useDragHandle={true}
-                                            language={this.props.language}
-                                            handleChange={this.props.handleChange}
+                                        <FormControlLabel
+                                            value={this.props.answerRequired}
+                                            control={<Checkbox
+                                                checked={this.props.answerRequired}
+                                                onChange={this.props.handleChange(`peerReviewQuestions[${this.props.index}].answerRequired`)}
+                                                value={this.props.answerRequired}
+                                                color="primary"
+                                            />}
+                                            label="answer required"
+                                            labelPlacement="start"
                                         />
                                     </CardContent>
                                 </Card>
@@ -170,4 +151,4 @@ class Item extends React.Component<any, any> {
     }
 }
 
-export default connect()(Item)
+export default connect()(PeerReviewQuestion)
