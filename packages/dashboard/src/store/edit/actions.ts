@@ -134,6 +134,15 @@ export const addReview = type => {
   }
 }
 
+export const remove = (path, index) => {
+  return (dispatch, getState) => {
+    const quiz = JSON.parse(JSON.stringify(getState().edit))
+    const array = _.get(quiz, path)
+    array.splice(index, 1)
+    dispatch(set(quiz))
+  }
+}
+
 const checkForMissingTranslation = paramQuiz => {
   const quiz = JSON.parse(JSON.stringify(paramQuiz))
   const languages = quiz.course.languages.map(l => l.id)
@@ -153,7 +162,7 @@ const checkForMissingTranslation = paramQuiz => {
       if (!item.texts.find(text => text.languageId === language)) {
         const newText = {
           languageId: language,
-          title: `item ${item.order} title ${language}`,
+          title: `${item.type} item ${item.order} title ${language}`,
           body: null,
           successMessage: null,
           failureMessage: null,
@@ -183,7 +192,7 @@ const checkForMissingTranslation = paramQuiz => {
       if (!prq.texts.find(text => text.languageId === language)) {
         const newText = {
           languageId: language,
-          title: `peer review ${prq.order} title ${language}`,
+          title: `peer review ${prq.type} ${prq.order} title ${language}`,
           body: "",
         }
         if (prq.id) {

@@ -59,18 +59,22 @@ class QuizForm extends React.Component<any, any> {
                 </Tabs>
                 <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
                     <Grid item={true} xs={12}>
-                        <FormControl>
-                            <InputLabel>course</InputLabel>
-                            <Select onChange={this.selectCourse} value={this.props.edit.course.id || this.props.filter.course} inputProps={{ name: 'course' }} style={{ minWidth: 350 }}>
-                                {this.props.courses.map(course => <MenuItem key={course.id} value={course.id}>{course.texts[0].title}</MenuItem>) || ""}
-                            </Select>
-                        </FormControl>
-                    </Grid>
-                    <Grid item={true} xs={12}>
-                        <TextField label="part" value={this.props.edit.part} type="number" onChange={this.handleChange("part")} />
-                    </Grid>
-                    <Grid item={true} xs={12}>
-                        <TextField label="section" value={this.props.edit.section} type="number" onChange={this.handleChange("section")} />
+                        <Grid container={true}>
+                            <Grid item={true} xs={4}>
+                                <FormControl>
+                                    <InputLabel>course</InputLabel>
+                                    <Select onChange={this.selectCourse} value={this.props.edit.course.id || this.props.filter.course}>
+                                        {this.props.courses.map(course => <MenuItem key={course.id} value={course.id}>{course.texts[0].title}</MenuItem>) || ""}
+                                    </Select>
+                                </FormControl>
+                            </Grid>
+                            <Grid item={true} xs={4}>
+                                <TextField label="part" value={this.props.edit.part} type="number" onChange={this.handleChange("part")} />
+                            </Grid>
+                            <Grid item={true} xs={4}>
+                                <TextField label="section" value={this.props.edit.section} type="number" onChange={this.handleChange("section")} />
+                            </Grid>
+                        </Grid>
                     </Grid>
                 </Grid>
                 {this.props.edit.course.languages.map((l, i) => (
@@ -79,7 +83,7 @@ class QuizForm extends React.Component<any, any> {
                         items={this.props.edit.items}
                         peerReviewQuestions={this.props.edit.peerReviewQuestions}
                         text={this.props.edit.texts.find(text => text.languageId === l.id)}
-                        textIndex={this.props.edit.texts.find(text => text.languageId === l.id)}
+                        textIndex={this.props.edit.texts.findIndex(text => text.languageId === l.id)}
                         handleChange={this.handleChange}
                         key={l.name}
                     />
@@ -93,6 +97,7 @@ class QuizForm extends React.Component<any, any> {
     }
 
     private handleChange = path => event => {
+        console.log(path, event.target.value)
         this.props.changeAttr(path, path.endsWith('correct') || path.endsWith('default') || path.endsWith('Required') ? event.target.checked : event.target.value)
     }
 

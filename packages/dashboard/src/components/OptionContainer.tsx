@@ -57,6 +57,7 @@ const OptionContainer = SortableContainer((props: any) => {
                         body={text.body}
                         successMessage={text.successMessage}
                         failureMessage={text.failureMessage}
+                        remove={props.remove}
                     />
                 )
             })}

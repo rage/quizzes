@@ -12,6 +12,7 @@ import {
     ExpansionPanelSummary,
     FormControl,
     FormControlLabel,
+    FormGroup,
     Grid,
     IconButton,
     InputLabel,
@@ -114,28 +115,35 @@ class PeerReviewQuestion extends React.Component<any, any> {
                                             multiline={true}
                                             margin="normal"
                                         />
-                                        <FormControlLabel
-                                            value={this.props.default}
-                                            control={<Checkbox
-                                                checked={this.props.default}
-                                                onChange={this.props.handleChange(`peerReviewQuestions[${this.props.index}].default`)}
-                                                value={this.props.default}
-                                                color="primary"
-                                            />}
-                                            label="default"
-                                            labelPlacement="start"
-                                        />
-                                        <FormControlLabel
-                                            value={this.props.answerRequired}
-                                            control={<Checkbox
-                                                checked={this.props.answerRequired}
-                                                onChange={this.props.handleChange(`peerReviewQuestions[${this.props.index}].answerRequired`)}
-                                                value={this.props.answerRequired}
-                                                color="primary"
-                                            />}
-                                            label="answer required"
-                                            labelPlacement="start"
-                                        />
+                                        <Grid container={true} style={{ marginTop: 20 }}>
+                                            <Grid item={true} xs={12}>
+                                                <FormControlLabel
+                                                    control={<Checkbox
+                                                        checked={this.props.default}
+                                                        onChange={this.props.handleChange(`peerReviewQuestions[${this.props.index}].default`)}
+                                                        color="primary"
+                                                    />}
+                                                    label="default"
+                                                />
+                                            </Grid>
+                                            <Grid item={true} xs={12}>
+                                                <FormControlLabel
+                                                    control={<Checkbox
+                                                        checked={this.props.answerRequired}
+                                                        onChange={this.props.handleChange(`peerReviewQuestions[${this.props.index}].answerRequired`)}
+                                                        color="primary"
+                                                    />}
+                                                    label="answer required"
+                                                />
+                                            </Grid>
+                                            <Grid item={true} xs={12}>
+                                                <Grid container={true} justify="flex-end">
+                                                    <IconButton onClick={this.props.remove('peerReviewQuestions', this.props.index)} aria-label="Delete" color="secondary">
+                                                        <SvgIcon><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></SvgIcon>
+                                                    </IconButton>
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
                                     </CardContent>
                                 </Card>
                             </Grid>

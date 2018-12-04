@@ -48,10 +48,11 @@ const PeerReviewQuestionContainer = SortableContainer((props: any) => {
                             order={prq.order}
                             type={prq.type}
                             title={text.title}
-                            body={text.title}
+                            body={text.body}
                             index={index}
                             textIndex={prq.texts.findIndex(t => t.languageId === props.language)}
                             handleChange={props.handleChange}
+                            remove={props.remove}
                         />
                     </SortableWrapper>
                 )

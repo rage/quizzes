@@ -94,7 +94,7 @@ class App extends React.Component<IDispatchProps & IStateProps, any> {
     }
 
     return (
-      <div>
+      <div style={{ paddingLeft: 50, paddingRight: 50 }}>
         <Router>
           {this.props.user ?
             <div>

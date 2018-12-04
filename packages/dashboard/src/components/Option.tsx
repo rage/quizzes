@@ -4,12 +4,14 @@ import {
     CardActions,
     CardContent,
     CardHeader,
+    Checkbox,
     Collapse,
     Divider,
     ExpansionPanel,
     ExpansionPanelDetails,
     ExpansionPanelSummary,
     FormControl,
+    FormControlLabel,
     Grid,
     IconButton,
     InputLabel,
@@ -23,8 +25,6 @@ import {
     Toolbar,
     Typography
 } from '@material-ui/core'
-import Tab from '@material-ui/core/Tab'
-import Tabs from '@material-ui/core/Tabs'
 import React from 'react'
 import { connect } from 'react-redux'
 import { arrayMove, SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
@@ -64,31 +64,37 @@ class Option extends React.Component<any, any> {
             return true
         }
         return false
-    } 
+    }
 
     public render() {
 
         // console.log("option")
 
         return (
-            <SortableGridItem index={this.props.index} collection={this.props.collection} size={!this.state.expanded ? 3 : 12}>
-                <Card style={{ marginBottom: 20 }}>
-                    <DragHandleWrapper>
-                        {!this.state.expanded ? <CardHeader
-                            title={this.props.title}
-                            titleTypographyProps={{ variant: "subtitle1", gutterBottom: false }}
-                        /> : ""}
-                    </DragHandleWrapper>
-                    <CardActions>
-                        <Grid container={true} justify="flex-end">
-                            <Grid item={true}>
-                                <IconButton onClick={this.handleExpand}>
-                                    <SvgIcon><path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" /></SvgIcon>
-                                </IconButton>
+            <SortableGridItem index={this.props.index} collection={this.props.collection} size={!this.state.expanded ? 12 : 12}>
+                <Card>
+                    <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
+                        <Grid item={true} xs={11}>
+                            <DragHandleWrapper>
+                                {!this.state.expanded ?
+                                    <CardHeader
+                                        title={this.props.title}
+                                        titleTypographyProps={{ variant: "subtitle1", gutterBottom: false }}
+                                    /> : ""}
+                            </DragHandleWrapper>
+                        </Grid>
+                        <Grid item={true} xs={1} >
+                            <Grid container={true} justify="flex-end">
+                                <Grid item={true}>
+                                    <CardActions>
+                                        <IconButton onClick={this.handleExpand}>
+                                            <SvgIcon><path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" /></SvgIcon>
+                                        </IconButton>
+                                    </CardActions>
+                                </Grid>
                             </Grid>
                         </Grid>
-                        
-                    </CardActions>
+                    </Grid>
                     {this.state.expanded ?
                         <CardContent>
                             <Card>
@@ -126,12 +132,29 @@ class Option extends React.Component<any, any> {
                                         multiline={true}
                                         margin="normal"
                                     />
-                                    <Switch
-                                        checked={this.props.correct}
-                                        value={!this.props.correct}
-                                        color="primary"
-                                        onChange={this.props.handleChange(`items[${this.props.itemIndex}].options[${this.props.index}].correct`)}
-                                    />
+                                    <Grid container={true} style={{ marginTop: 20 }}>
+                                        <Grid item={true} xs={12}>
+                                            <Grid container={true} justify="space-between">
+                                                <Grid item={true} xs={1}>
+                                                    <FormControlLabel
+                                                        control={<Checkbox
+                                                            checked={this.props.correct}
+                                                            onChange={this.props.handleChange(`items[${this.props.itemIndex}].options[${this.props.index}].correct`)}
+                                                            color="primary"
+                                                        />}
+                                                        label="correct"
+                                                    />
+                                                </Grid>
+                                                <Grid item={true} xs={1}>
+                                                    <Grid onClick={this.props.remove(`items[${this.props.itemIndex}].options`, this.props.index)} container={true} justify="flex-end">
+                                                        <IconButton aria-label="Delete" color="secondary">
+                                                            <SvgIcon><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></SvgIcon>
+                                                        </IconButton>
+                                                    </Grid>
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
                                 </CardContent>
                             </Card>
                         </CardContent> : ""}
