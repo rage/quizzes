@@ -31,7 +31,7 @@ import { setQuizzes } from './store/quizzes/actions'
 import { addUser, removeUser } from './store/user/actions'
 
 
-class App extends React.Component<IDispatchProps & IStateProps, any> {
+class App extends React.Component<any, any> {
 
   public async componentDidMount() {
     const user = TMCApi.checkStore()
