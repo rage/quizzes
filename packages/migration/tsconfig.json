@@ -1,0 +1,37 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "strict": false,
+    "module": "commonjs",
+    "esModuleInterop": true,
+    "target": "es2017",
+    "noImplicitAny": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "sourceMap": true,
+    "composite": false,
+    "declaration": false,
+    "declarationMap": false,
+    "allowJs": true,
+    "checkJs": false,
+    "outDir": "../../dist",
+    "rootDir": "../",
+    "baseUrl": "src/",
+    "paths": {
+      "@quizzes/common/*": ["../../common/src/*", "../../common/*"],
+      "*": ["node_modules/*"]
+    },
+    "lib": [
+      "esnext.asynciterable",
+      "es2017",
+      "dom"
+    ],
+    "typeRoots": [
+      "node_modules/@types", "@quizzes/common/types"
+    ]
+  },
+  "include": ["./src/**/*"],
+  "exclude": ["node_modules", "dist", "test"]
+}
+

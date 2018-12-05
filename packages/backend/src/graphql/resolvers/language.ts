@@ -1,5 +1,5 @@
+import { Language } from "@quizzes/common/models/language"
 import { getRepository } from "typeorm"
-import { Language } from "../../models/language"
 
 export const languageResolver = {
   async language(obj: any, { id }: { id: string }, context: any, info: any) {

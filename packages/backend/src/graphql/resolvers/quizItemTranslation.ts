@@ -1,5 +1,5 @@
+import { QuizItemTranslation } from "@quizzes/common/models/quiz_item"
 import { getRepository } from "typeorm"
-import { QuizItemTranslation } from "../../models/quiz_item"
 
 export const quizItemTranslationResolver = {
   async quizItemTranslation(

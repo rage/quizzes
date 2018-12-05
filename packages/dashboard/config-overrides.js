@@ -1,30 +1,44 @@
 const { getLoader, injectBabelPlugin } = require("react-app-rewired")
 const tsImportPluginFactory = require("ts-import-plugin")
+const path = require("path")
 
-module.exports = function override(config, env) {
-  const tsLoader = getLoader(
+module.exports = function rewire(config, env) {
+  /*   const tsLoader = getLoader(
     config.module.rules,
     rule =>
       rule.loader &&
       typeof rule.loader === "string" &&
       rule.loader.includes("ts-loader"),
+  ) */
+
+  const tsLoader = getLoader(
+    config.module.rules,
+    rule => rule.test && String(rule.test) === String(/\.(ts|tsx)$/),
   )
 
-  tsLoader.options = {
+  delete tsLoader.include
+
+  tsLoader.use.options = {
     getCustomTransformers: () => ({
       before: [
         tsImportPluginFactory([
           {
-            libraryDirectory: "es",
-            libraryName: "antd",
-            style: "css",
+            libraryDirectory: "../common",
+            libraryName: "@quizzes/common",
           },
         ]),
       ],
     }),
   }
 
-  delete config.resolve.plugins.ModuleScopePlugin
+  const oneOf = config.module.rules.find(rule => rule.oneOf).oneOf
+  oneOf.unshift(tsLoader)
+
+  config.resolve.alias = Object.assign({}, config.resolve.alias, {
+    "@quizzes/common": path.resolve("../common/src"),
+  })
+
+  config.resolve.plugins = []
 
   return config
 }

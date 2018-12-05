@@ -3,20 +3,29 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@material-ui/core": "^3.2.0",
+    "@material-ui/core": "^3.4.0",
+    "@quizzes/common": "0.0.1",
     "@types/app-root-path": "^1.2.4",
     "antd": "^3.10.0",
     "axios": "^0.18.0",
+    "lodash": "^4.17.11",
+    "material-ui-icons": "^1.0.0-beta.36",
     "react": "^16.5.2",
     "react-dom": "^16.5.2",
     "react-redux": "^5.0.7",
+    "react-router-dom": "^4.3.1",
     "react-scripts-ts": "3.1.0",
+    "react-sortable-hoc": "^0.8.3",
     "redux": "^4.0.0",
+    "redux-persist": "^5.10.0",
     "redux-thunk": "^2.3.0",
-    "tmc-client-js": "0.0.9"
+    "tmc-client-js": "0.0.9",
+    "typeface-roboto": "^0.0.54",
+    "typesafe-actions": "^2.0.4",
+    "why-did-you-update": "^1.0.6"
   },
   "scripts": {
-    "start": "react-app-rewired start --scripts-version react-scripts-ts",
+    "start": "PORT=5000 react-app-rewired start --scripts-version react-scripts-ts",
     "build": "react-app-rewired build --scripts-version react-scripts-ts",
     "test": "react-app-rewired test --env=jsdom --scripts-version react-scripts-ts",
     "eject": "react-scripts-ts eject"
@@ -29,12 +38,14 @@
     "@types/react": "^16.4.14",
     "@types/react-dom": "^16.0.8",
     "@types/react-redux": "^6.0.9",
+    "path": "^0.12.7",
     "react-app-rewire-typescript": "^2.0.2",
     "react-app-rewired": "^1.6.2",
     "react-scripts-ts": "3.1.0",
+    "redux-devtools-extension": "^2.13.5",
     "ts-import-plugin": "^1.5.5",
-    "typescript": "^3.1.1",
     "tslint": "^5.11.0",
-    "tslint-config-prettier": "^1.15.0"
+    "tslint-config-prettier": "^1.15.0",
+    "typescript": "^3.1.1"
   }
 }

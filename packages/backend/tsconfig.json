@@ -1,5 +1,7 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "strict": false,
     "module": "commonjs",
     "esModuleInterop": true,
     "target": "es2017",
@@ -7,25 +9,26 @@
     "moduleResolution": "node",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
+    "declaration": true,
     "sourceMap": true,
-    "allowJs": true,
-    "checkJs": false,
-    "outDir": "dist",
-    "rootDir": "..",
-    "baseUrl": ".",
+    "outDir": "../../dist",
+    "rootDir": "../",
+    "baseUrl": "src/",
     "paths": {
-      "*": ["node_modules/*"],
-      "@quizzes/common/src": ["../common/*"]
+      "@quizzes/common/*": ["../../common/src/*", "../../common/*"],
+      "services/*": ["./services/*"],
+      "*": ["node_modules/*"]
     },
     "lib": [
       "esnext.asynciterable",
       "es2017",
       "dom"
     ],
+    "typeRoots": [
+      "node_modules/@types", "@quizzes/common/types"
+    ]
   },
-  "references": [
-    { "path": "../common" }
-  ],
-  "include": ["./**/*"],
-  "exclude": ["node_modules", "dist"]
+  "include": ["./src/**/*", "../common/**/*"],
+  "exclude": ["node_modules", "dist", "test", "src/test"]
 }
+

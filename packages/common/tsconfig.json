@@ -2,8 +2,23 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "./dist",
-    "rootDir": "src"
+    "outDir": "../../dist/common",
+    "rootDir": ".",
+    "baseUrl": ".",
+    "jsx": "react",
+    "target": "es2018",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "composite": true,
+    "esModuleInterop": true,
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "lib": [
+      "esnext.asynciterable",
+      "es2017",
+      "dom"
+    ],
   },
+  "include": ["./src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

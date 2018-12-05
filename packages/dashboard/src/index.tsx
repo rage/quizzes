@@ -1,12 +1,23 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
+import { Provider } from 'react-redux'
+import { PersistGate } from 'redux-persist/integration/react'
+import { whyDidYouUpdate } from 'why-did-you-update'
 import App from './App';
-import './index.css';
-import registerServiceWorker from './registerServiceWorker';
+import { persistor, store } from './store/store'
 
-ReactDOM.render(
-  <App />,
-  document.getElementById('root') as HTMLElement
-);
-registerServiceWorker();
+// whyDidYouUpdate(React)
 
+const render = () => {
+    ReactDOM.render(
+        <Provider store={store}>
+            <PersistGate loading={null} persistor={persistor}>
+                <App />
+            </PersistGate>
+        </Provider>,
+        document.getElementById('root')
+    )
+}
+
+render()
+store.subscribe(render)

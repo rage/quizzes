@@ -1,6 +1,8 @@
 // import * as appRoot from "app-root-path"
+/* eslint-disable no-var-requires */
 const appRoot = require("app-root-path")
 const winston = require("winston")
+/* eslint-enable no-var-requires */
 
 const LOG_DIRECTORY = process.env.LOG_DIRECTORY || `${appRoot}/logs/`
 
