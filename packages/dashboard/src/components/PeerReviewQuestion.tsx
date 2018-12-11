@@ -32,7 +32,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { arrayMove, SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
 import { addItem, addOption, changeAttr, changeOrder, newQuiz, save, setEdit } from '../store/edit/actions'
-import { setFilter } from '../store/filter/actions'
 import DragHandleWrapper from './DragHandleWrapper'
 import OptionContainer from './OptionContainer'
 

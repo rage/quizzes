@@ -29,7 +29,6 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { arrayMove, SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
 import { addItem, addOption, changeAttr, changeOrder, newQuiz, save, setEdit } from '../store/edit/actions'
-import { setFilter } from '../store/filter/actions'
 import DragHandleWrapper from './DragHandleWrapper'
 import OptionContainer from './OptionContainer'
 
@@ -56,6 +55,12 @@ class Item extends React.Component<any, any> {
             return true
         }
         if (nextProps.failureMessage !== this.props.failureMessage) {
+            return true
+        }
+        if (nextProps.validityRegex !== this.props.validityRegex) {
+            return true
+        }
+        if (nextProps.formatRegex !== this.props.formatRegex) {
             return true
         }
         return false
@@ -142,12 +147,14 @@ class Item extends React.Component<any, any> {
                                                     label="validity regex"
                                                     fullWidth={true}
                                                     value={this.props.validityRegex || undefined}
+                                                    onChange={this.props.handleChange(`items[${this.props.index}].validityRegex`)}
                                                     margin="normal"
                                                 />
                                                 <TextField
                                                     label="format regex"
                                                     fullWidth={true}
                                                     value={this.props.formatRegex || undefined}
+                                                    onChange={this.props.handleChange(`items[${this.props.index}].formatRegex`)}
                                                     margin="normal"
                                                 />
                                             </div> :
