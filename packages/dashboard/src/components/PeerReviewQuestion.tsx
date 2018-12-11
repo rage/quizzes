@@ -102,7 +102,7 @@ class PeerReviewQuestion extends React.Component<any, any> {
                                             label="title"
                                             value={this.props.title || undefined}
                                             fullWidth={true}
-                                            onChange={this.props.handleChange(`peerReviewQuestions[${this.props.index}].texts[${this.props.textIndex}].title`)}
+                                            onChange={this.props.handleChange(`peerReviewQuestionCollections[${this.props.collectionIndex}].questions[${this.props.index}].texts[${this.props.textIndex}].title`)}
                                             multiline={true}
                                             margin="normal"
                                         />
@@ -110,7 +110,7 @@ class PeerReviewQuestion extends React.Component<any, any> {
                                             label="body"
                                             value={this.props.body || undefined}
                                             fullWidth={true}
-                                            onChange={this.props.handleChange(`peerReviewQuestions[${this.props.index}].texts[${this.props.textIndex}].body`)}
+                                            onChange={this.props.handleChange(`peerReviewQuestionCollections[${this.props.collectionIndex}].questions[${this.props.index}].texts[${this.props.textIndex}].body`)}
                                             multiline={true}
                                             margin="normal"
                                         />
@@ -119,7 +119,7 @@ class PeerReviewQuestion extends React.Component<any, any> {
                                                 <FormControlLabel
                                                     control={<Checkbox
                                                         checked={this.props.default}
-                                                        onChange={this.props.handleChange(`peerReviewQuestions[${this.props.index}].default`)}
+                                                        onChange={this.props.handleChange(`peerReviewQuestionCollections[${this.props.collectionIndex}].questions[${this.props.index}].default`)}
                                                         color="primary"
                                                     />}
                                                     label="default"
@@ -129,7 +129,7 @@ class PeerReviewQuestion extends React.Component<any, any> {
                                                 <FormControlLabel
                                                     control={<Checkbox
                                                         checked={this.props.answerRequired}
-                                                        onChange={this.props.handleChange(`peerReviewQuestions[${this.props.index}].answerRequired`)}
+                                                        onChange={this.props.handleChange(`peerReviewQuestionCollections[${this.props.collectionIndex}].questions[${this.props.index}].answerRequired`)}
                                                         color="primary"
                                                     />}
                                                     label="answer required"
@@ -137,7 +137,7 @@ class PeerReviewQuestion extends React.Component<any, any> {
                                             </Grid>
                                             <Grid item={true} xs={12}>
                                                 <Grid container={true} justify="flex-end">
-                                                    <IconButton onClick={this.props.remove('peerReviewQuestions', this.props.index)} aria-label="Delete" color="secondary">
+                                                    <IconButton onClick={this.props.remove(`peerReviewQuestionCollections[${this.props.collectionIndex}].questions`, this.props.index)} aria-label="Delete" color="secondary">
                                                         <SvgIcon><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></SvgIcon>
                                                     </IconButton>
                                                 </Grid>
