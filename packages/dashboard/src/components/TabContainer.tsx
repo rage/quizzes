@@ -31,7 +31,7 @@ import { arrayMove, SortableContainer, SortableElement, SortableHandle } from 'r
 import { addItem, addOption, addReview, changeAttr, changeOrder, newQuiz, remove, save, setEdit } from '../store/edit/actions'
 import ItemContainer from './ItemContainer'
 import OptionContainer from './OptionContainer'
-import PeerReviewQuestionContainer from './PeerReviewQuestionContainer'
+import PeerReviewQuestionContainer from './PeerReviewQuestionCollection'
 
 class TabContainer extends React.Component<any, any> {
 

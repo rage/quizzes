@@ -2,6 +2,7 @@ import db, { Database } from "@quizzes/common/config/database"
 import {
   Course,
   PeerReviewQuestion,
+  PeerReviewQuestionCollection,
   PeerReviewQuestionTranslation,
   Quiz,
   QuizItem,
@@ -183,7 +184,7 @@ export class QuizService {
       )
     }
 
-    if (oldQuiz.peerReviewQuestions) {
+    /*if (oldQuiz.peerReviewQuestions) {
       const oldPrqIds: string[] = (oldQuiz!.peerReviewQuestions || []).map(
         prq => prq.id,
       )
@@ -194,7 +195,7 @@ export class QuizService {
       toBeRemoved.peerReviewQuestionIds = oldPrqIds.filter(
         id => !_.includes(newPrqIds, id),
       )
-    }
+    }*/
 
     if (toBeRemoved.textIds.length > 0) {
       await entityManager.delete(QuizTranslation, toBeRemoved.textIds)
@@ -224,6 +225,41 @@ export class QuizService {
       return
     }
     queryBuilder
+      .leftJoinAndSelect(
+        "quiz.peerReviewQuestionCollections",
+        "peer_review_question_collection",
+      )
+      .leftJoinAndSelect(
+        "peer_review_question_collection.texts",
+        "peer_review_question_collection_translation",
+      )
+
+    if (language) {
+      whereBuilder.add(
+        // queryBuilder.andWhere(
+        new Brackets(qb => {
+          qb.where(
+            "peer_review_question_collection_translation.language_id = :language",
+            {
+              language,
+            },
+          ).orWhere("peer_review_question_collection_translation is null")
+        }),
+      )
+    }
+  }
+
+  /*private queryPeerReviews(
+    queryBuilder: SelectQueryBuilder<Quiz>,
+    whereBuilder: WhereBuilder<Quiz>,
+    query: IQuizQuery,
+  ) {
+    const { peerreviews, language } = query
+
+    if (!peerreviews) {
+      return
+    }
+    queryBuilder
       .leftJoinAndSelect("quiz.peerReviewQuestions", "peer_review_question")
       .leftJoinAndSelect(
         "peer_review_question.texts",
@@ -240,7 +276,7 @@ export class QuizService {
         }),
       )
     }
-  }
+  }*/
 
   private queryOptions(
     queryBuilder: SelectQueryBuilder<Quiz>,
