@@ -35,12 +35,15 @@ import PeerReviewQuestion from './PeerReviewQuestion'
 import SortableWrapper from './SortableWrapper'
 
 const PeerReviewQuestionContainer = SortableContainer((props: any) => {
+
+    const questions = props.edit.peerReviewQuestionCollections[props.collectionIndex].questions
+
     return (
         <div>
-            {props.questions.map((prq, index) => {
+            {questions.map((prq, index) => {
                 const text = prq.texts.find(t => t.languageId === props.language)
                 return (
-                    <SortableWrapper key={prq.id || prq.type + index} index={index} collection="peerReviewQuestions">
+                    <SortableWrapper key={prq.id || prq.type + index} index={index} collection={`peerReviewQuestionCollections[${props.collectionIndex}.questions]`}>
                         <PeerReviewQuestion
                             answerRequired={prq.answerRequired}
                             default={prq.default}
@@ -63,6 +66,7 @@ const PeerReviewQuestionContainer = SortableContainer((props: any) => {
 
 const mapStateToProps = (state: any) => {
     return {
+        edit: state.edit,
         language: state.filter.language,
     }
 }

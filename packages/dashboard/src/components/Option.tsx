@@ -72,29 +72,28 @@ class Option extends React.Component<any, any> {
         return (
             <SortableGridItem index={this.props.index} collection={this.props.collection} size={!this.state.expanded ? 12 : 12}>
                 <Card>
-                    <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
-                        <Grid item={true} xs={11}>
-                            <DragHandleWrapper>
-                                {!this.state.expanded ?
+                    {!this.state.expanded ?
+                        <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
+                            <Grid item={true} xs={11}>
+                                <DragHandleWrapper>
                                     <CardHeader
                                         title={this.props.title}
                                         titleTypographyProps={{ variant: "subtitle1", gutterBottom: false }}
-                                    /> : ""}
-                            </DragHandleWrapper>
-                        </Grid>
-                        <Grid item={true} xs={1} >
-                            <Grid container={true} justify="flex-end">
-                                <Grid item={true}>
-                                    <CardActions>
-                                        <IconButton onClick={this.handleExpand}>
-                                            <SvgIcon><path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" /></SvgIcon>
-                                        </IconButton>
-                                    </CardActions>
+                                    />
+                                </DragHandleWrapper>
+                            </Grid>
+                            <Grid item={true} xs={1} >
+                                <Grid container={true} justify="flex-end">
+                                    <Grid item={true}>
+                                        <CardActions>
+                                            <IconButton onClick={this.handleExpand}>
+                                                <SvgIcon><path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" /></SvgIcon>
+                                            </IconButton>
+                                        </CardActions>
+                                    </Grid>
                                 </Grid>
                             </Grid>
-                        </Grid>
-                    </Grid>
-                    {this.state.expanded ?
+                        </Grid> :
                         <CardContent>
                             <Card>
                                 <CardHeader subheader="general" />
@@ -153,10 +152,21 @@ class Option extends React.Component<any, any> {
                                                 </Grid>
                                             </Grid>
                                         </Grid>
+                                        <Grid item={true} xs={12} >
+                                            <Grid container={true} justify="flex-end">
+                                                <Grid item={true}>
+                                                    <CardActions>
+                                                        <IconButton onClick={this.handleExpand} style={{ transform: 'rotate(180deg)' }}>
+                                                            <SvgIcon><path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" /></SvgIcon>
+                                                        </IconButton>
+                                                    </CardActions>
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
                                     </Grid>
                                 </CardContent>
                             </Card>
-                        </CardContent> : ""}
+                        </CardContent>}
                 </Card>
             </SortableGridItem>
         )

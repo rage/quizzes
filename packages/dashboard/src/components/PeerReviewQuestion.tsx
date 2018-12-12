@@ -44,7 +44,7 @@ class PeerReviewQuestion extends React.Component<any, any> {
         }
     }
 
-    /*public shouldComponentUpdate(nextProps, nextState) {
+    public shouldComponentUpdate(nextProps, nextState) {
         if (nextState.expanded !== this.state.expanded) {
             return true
         }
@@ -54,43 +54,44 @@ class PeerReviewQuestion extends React.Component<any, any> {
         if (nextProps.body !== this.props.body) {
             return true
         }
-        if (nextProps.successMessage !== this.props.successMessage) {
+        if (nextProps.default !== this.props.default) {
             return true
         }
-        if (nextProps.failureMessage !== this.props.failureMessage) {
+        if (nextProps.answerRequired !== this.props.answerRequired) {
             return true
         }
         return false
-    }*/
+    }
 
     public render() {
 
-        // console.log("peer")
-
+        // console.log("question")
+        
         return (
             <Card style={{ marginBottom: 20 }}>
-                <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
-                    <Grid item={true} xs={11}>
-                        <DragHandleWrapper>
-                            {!this.state.expanded ?
+                {!this.state.expanded ?
+                    <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
+                        <Grid item={true} xs={11}>
+                            <DragHandleWrapper>
                                 <CardHeader
                                     title={this.props.title}
                                     titleTypographyProps={{ variant: "subtitle1", gutterBottom: false }}
-                                /> : ""}
-                        </DragHandleWrapper>
-                    </Grid>
-                    <Grid item={true} xs={1} >
-                        <Grid container={true} justify="flex-end">
-                            <Grid item={true}>
-                                <CardActions>
-                                    <IconButton onClick={this.handleExpand}>
-                                        <SvgIcon><path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" /></SvgIcon>
-                                    </IconButton>
-                                </CardActions>
+                                />
+                            </DragHandleWrapper>
+                        </Grid>
+                        <Grid item={true} xs={1} >
+                            <Grid container={true} justify="flex-end">
+                                <Grid item={true}>
+                                    <CardActions>
+                                        <IconButton onClick={this.handleExpand}>
+                                            <SvgIcon><path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" /></SvgIcon>
+                                        </IconButton>
+                                    </CardActions>
+                                </Grid>
                             </Grid>
                         </Grid>
-                    </Grid>
-                </Grid>
+                    </Grid> :
+                    <p />}
                 <Collapse in={this.state.expanded}>
                     <CardContent>
                         <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
@@ -140,6 +141,17 @@ class PeerReviewQuestion extends React.Component<any, any> {
                                                     <IconButton onClick={this.props.remove(`peerReviewQuestionCollections[${this.props.collectionIndex}].questions`, this.props.index)} aria-label="Delete" color="secondary">
                                                         <SvgIcon><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></SvgIcon>
                                                     </IconButton>
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+                                        <Grid item={true} xs={12} >
+                                            <Grid container={true} justify="flex-end">
+                                                <Grid item={true}>
+                                                    <CardActions>
+                                                        <IconButton onClick={this.handleExpand} style={{ transform: 'rotate(180deg)' }}>
+                                                            <SvgIcon><path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" /></SvgIcon>
+                                                        </IconButton>
+                                                    </CardActions>
                                                 </Grid>
                                             </Grid>
                                         </Grid>

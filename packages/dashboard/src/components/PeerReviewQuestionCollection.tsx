@@ -49,8 +49,11 @@ class PeerReviewQuestionCollection extends React.Component<any, any> {
         }
     }
 
-    /*public shouldComponentUpdate(nextProps, nextState) {
+    public shouldComponentUpdate(nextProps, nextState) {
         if (nextState.expanded !== this.state.expanded) {
+            return true
+        }
+        if (nextState.menuOpen !== this.state.menuOpen) {
             return true
         }
         if (nextProps.title !== this.props.title) {
@@ -59,24 +62,12 @@ class PeerReviewQuestionCollection extends React.Component<any, any> {
         if (nextProps.body !== this.props.body) {
             return true
         }
-        if (nextProps.successMessage !== this.props.successMessage) {
-            return true
-        }
-        if (nextProps.failureMessage !== this.props.failureMessage) {
-            return true
-        }
-        if (nextProps.validityRegex !== this.props.validityRegex) {
-            return true
-        }
-        if (nextProps.formatRegex !== this.props.formatRegex) {
-            return true
-        }
         return false
-    }*/
+    }
 
     public render() {
 
-        // console.log("item")
+        // console.log("collection")
 
         const renderOptions = type => {
             return ["radio", "checkbox", "research-agreement"].includes(type)
@@ -84,12 +75,10 @@ class PeerReviewQuestionCollection extends React.Component<any, any> {
 
         return (
             <Card style={{ marginBottom: 20 }}>
-                {
-                    !this.state.expanded ?
+                {!this.state.expanded ?
                         <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
                             <Grid item={true} xs={11}>
                                 <DragHandleWrapper>
-
                                     <CardHeader
                                         title={this.props.title}
                                         titleTypographyProps={{ variant: "subtitle1", gutterBottom: false }}
@@ -108,8 +97,7 @@ class PeerReviewQuestionCollection extends React.Component<any, any> {
                                 </Grid>
                             </Grid>
                         </Grid> :
-                        <p />
-                }
+                        <p />}
                 <Collapse in={this.state.expanded}>
                     <CardContent>
                         <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
@@ -145,6 +133,23 @@ class PeerReviewQuestionCollection extends React.Component<any, any> {
                                     </CardContent>
                                 </Card>
                             </Grid>
+                            <Grid item={true} xs={12}>
+                                <Paper style={{ padding: 30 }}>
+                                    <Typography variant='subtitle1' style={{ marginBottom: 10 }}>Questions:</Typography>
+                                    <PeerReviewQuestionContainer
+                                        collectionIndex={this.props.index}
+                                        handleChange={this.props.handleChange}
+                                        onSortEnd={this.props.handleSort}
+                                        useDragHandle={true}
+                                        remove={this.props.remove}
+                                        questions={this.props.questions}
+                                    />
+                                    <Button id="review" onClick={this.handleMenu}>Add review question</Button>
+                                    <Menu anchorEl={this.state.menuAnchor} open={this.state.menuOpen === "review"} onClose={this.handleMenu}>
+                                        {this.reviewTypes.map((type, index) => <MenuItem key={type + index} value={type} onClick={this.addReviewQuestion(type)}>{type}</MenuItem>)}
+                                    </Menu>
+                                </Paper>
+                            </Grid>
                             <Grid item={true} xs={12} >
                                 <Grid container={true} justify="flex-end">
                                     <Grid item={true}>
@@ -156,21 +161,6 @@ class PeerReviewQuestionCollection extends React.Component<any, any> {
                                     </Grid>
                                 </Grid>
                             </Grid>
-                            <Paper style={{ padding: 30 }}>
-                                <Typography variant='subtitle1' style={{ marginBottom: 10 }}>Questions:</Typography>
-                                <PeerReviewQuestionContainer
-                                    collectionIndex={this.props.index}
-                                    handleChange={this.props.handleChange}
-                                    onSortEnd={this.props.handleSort}
-                                    useDragHandle={true}
-                                    remove={this.props.remove}
-                                    questions={this.props.questions}
-                                />
-                                <Button id="review" onClick={this.handleMenu}>Add review question</Button>
-                                <Menu anchorEl={this.state.menuAnchor} open={this.state.menuOpen === "review"} onClose={this.handleMenu}>
-                                    {this.reviewTypes.map((type, index) => <MenuItem key={type + index} value={type} onClick={this.addReviewQuestion(type)}>{type}</MenuItem>)}
-                                </Menu>
-                            </Paper>
                         </Grid>
                     </CardContent>
                 </Collapse>
@@ -189,6 +179,7 @@ class PeerReviewQuestionCollection extends React.Component<any, any> {
         })
     }
     private addReviewQuestion = type => event => {
+        console.log("add")
         this.setState({
             menuOpen: null
         })
