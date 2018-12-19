@@ -33,7 +33,10 @@ export class PeerReviewQuestionCollection extends BaseEntity {
   )
   public texts: PeerReviewQuestionCollectionTranslation[]
 
-  @OneToMany(type => PeerReviewQuestion, prq => prq.collection, { eager: true })
+  @OneToMany(type => PeerReviewQuestion, prq => prq.collection, {
+    eager: true,
+    cascade: true,
+  })
   public questions: PeerReviewQuestion[]
 
   @CreateDateColumn({ type: "timestamp" })
@@ -65,9 +68,10 @@ export class PeerReviewQuestionCollection extends BaseEntity {
     }
 
     if (this.questions) {
-      this.questions.forEach(
-        (question: PeerReviewQuestion) => (question.collectionId = this.id),
-      )
+      this.questions.forEach((question: PeerReviewQuestion) => {
+        question.collectionId = this.id
+        question.quizId = this.quizId
+      })
     }
   }
 }
@@ -77,7 +81,7 @@ export class PeerReviewQuestionCollectionTranslation extends BaseEntity {
   @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id)
   public peerReviewQuestionCollection: Promise<PeerReviewQuestionCollection>
   @PrimaryColumn()
-  public peerReviewQuestionCollectionId: string
+  public peerReviewQuestionCollectionId: string | undefined
 
   @ManyToOne(type => Language, lang => lang.id)
   public language: Language

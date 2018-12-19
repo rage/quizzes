@@ -29,7 +29,6 @@ export class PeerReviewQuestion extends BaseEntity {
 
   @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id, {
     nullable: true,
-    onDelete: "CASCADE",
   })
   public collection?: PeerReviewQuestionCollection
   @Column({ nullable: true })
@@ -93,7 +92,7 @@ export class PeerReviewQuestionTranslation extends BaseEntity {
   @JoinColumn()
   public peerReviewQuestion: Promise<PeerReviewQuestion>
   @PrimaryColumn()
-  public peerReviewQuestionId: string
+  public peerReviewQuestionId: string | undefined
 
   @ManyToOne(type => Language, lang => lang.id)
   @JoinColumn()

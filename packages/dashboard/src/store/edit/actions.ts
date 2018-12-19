@@ -59,7 +59,7 @@ export const newQuiz = () => {
       course,
       texts: [],
       items: [],
-      peerReviewQuestions: [],
+      peerReviewQuestionCollections: [],
     }
     dispatch(set(checkForMissingTranslation(quiz)))
   }
