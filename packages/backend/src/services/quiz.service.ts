@@ -247,6 +247,33 @@ export class QuizService {
         }),
       )
     }
+
+    this.queryPeerReviewQuestion(queryBuilder, whereBuilder, query)
+  }
+
+  private queryPeerReviewQuestion(
+    queryBuilder: SelectQueryBuilder<Quiz>,
+    whereBuilder: WhereBuilder<Quiz>,
+    query: IQuizQuery,
+  ) {
+    const { language } = query
+
+    queryBuilder
+      .leftJoinAndSelect(
+        "peer_review_question_collection.questions",
+        "review_question",
+      )
+      .leftJoinAndSelect("review_question.texts", "review_question_translation")
+
+    if (language) {
+      whereBuilder.add(
+        new Brackets(qb => {
+          qb.where("review_question_translation.language_id = :language", {
+            language,
+          }).orWhere("review_question_translation.language_id is null")
+        }),
+      )
+    }
   }
 
   /*private queryPeerReviews(

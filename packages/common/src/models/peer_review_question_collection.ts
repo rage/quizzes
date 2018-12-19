@@ -29,7 +29,7 @@ export class PeerReviewQuestionCollection extends BaseEntity {
   @OneToMany(
     type => PeerReviewQuestionCollectionTranslation,
     prqct => prqct.peerReviewQuestionCollection,
-    { eager: true },
+    { eager: true, cascade: true },
   )
   public texts: PeerReviewQuestionCollectionTranslation[]
 
