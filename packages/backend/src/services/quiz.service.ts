@@ -124,7 +124,8 @@ export class QuizService {
       textIds: [],
       itemIds: [],
       optionIds: [],
-      peerReviewQuestionIds: [],
+      prCollectionIds: [],
+      prQuestionIds: [],
     }
 
     if (!oldQuiz) {
@@ -184,18 +185,31 @@ export class QuizService {
       )
     }
 
-    /*if (oldQuiz.peerReviewQuestions) {
-      const oldPrqIds: string[] = (oldQuiz!.peerReviewQuestions || []).map(
-        prq => prq.id,
-      )
-      const newPrqIds: string[] = (newQuiz!.peerReviewQuestions || []).map(
-        prq => prq.id,
-      )
+    if (oldQuiz.peerReviewQuestionCollections) {
+      const oldCollectionIds: string[] = []
+      const oldQuestionIds: string[] = []
+      const newCollectionIds: string[] = []
+      const newQuestionIds: string[] = []
 
-      toBeRemoved.peerReviewQuestionIds = oldPrqIds.filter(
-        id => !_.includes(newPrqIds, id),
+      oldQuiz.peerReviewQuestionCollections.forEach(collection => {
+        collection.questions.forEach(o => oldQuestionIds.push(o.id))
+        oldCollectionIds.push(collection.id)
+      })
+
+      if (newQuiz) {
+        ;(newQuiz!.peerReviewQuestionCollections || []).forEach(collection => {
+          collection.questions.forEach(o => newQuestionIds.push(o.id))
+          newCollectionIds.push(collection.id)
+        })
+      }
+
+      toBeRemoved.prCollectionIds = oldCollectionIds.filter(
+        id => !_.includes(newCollectionIds, id),
       )
-    }*/
+      toBeRemoved.prQuestionIds = oldQuestionIds.filter(
+        id => !_.includes(newQuestionIds, id),
+      )
+    }
 
     if (toBeRemoved.textIds.length > 0) {
       await entityManager.delete(QuizTranslation, toBeRemoved.textIds)
@@ -206,10 +220,16 @@ export class QuizService {
     if (toBeRemoved.optionIds.length > 0) {
       await entityManager.delete(QuizOption, toBeRemoved.optionIds || [])
     }
-    if (toBeRemoved.peerReviewQuestionIds.length > 0) {
+    if (toBeRemoved.prCollectionIds.length > 0) {
+      await entityManager.delete(
+        PeerReviewQuestionCollection,
+        toBeRemoved.prCollectionIds,
+      )
+    }
+    if (toBeRemoved.prQuestionIds.length > 0) {
       await entityManager.delete(
         PeerReviewQuestion,
-        toBeRemoved.peerReviewQuestionIds || [],
+        toBeRemoved.prQuestionIds || [],
       )
     }
   }
