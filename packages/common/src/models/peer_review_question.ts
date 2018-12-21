@@ -24,15 +24,15 @@ export class PeerReviewQuestion extends BaseEntity {
   @ManyToOne(type => Quiz, quiz => quiz.id, { onDelete: "CASCADE" })
   @JoinColumn()
   public quiz: Promise<Quiz>
-  @Column()
-  public quizId: string
+  @Column({ nullable: true })
+  public quizId: string | null
 
   @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id, {
     nullable: true,
   })
   public collection?: PeerReviewQuestionCollection
   @Column({ nullable: true })
-  public collectionId: string
+  public collectionId: string | null
 
   @OneToMany(
     type => PeerReviewQuestionTranslation,
@@ -65,7 +65,9 @@ export class PeerReviewQuestion extends BaseEntity {
       return
     }
 
-    this.quizId = data.quizId
+    if (data.quizId) {
+      this.quizId = data.quizId
+    }
     this.collectionId = data.collectionId // TODO: what to do with these
     this.texts = data.texts
     this.type = data.type

@@ -24,8 +24,8 @@ export class PeerReviewQuestionCollection extends BaseEntity {
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Promise<Quiz>
-  @Column()
-  public quizId: string
+  @Column({ nullable: true })
+  public quizId: string | null
 
   @OneToMany(
     type => PeerReviewQuestionCollectionTranslation,
@@ -52,7 +52,9 @@ export class PeerReviewQuestionCollection extends BaseEntity {
       return
     }
 
-    this.quizId = data.quizId
+    if (data.quizId) {
+      this.quizId = data.quizId
+    }
     this.texts = data.texts
     this.questions = data.questions
   }

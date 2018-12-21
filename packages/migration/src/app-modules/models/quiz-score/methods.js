@@ -7,8 +7,8 @@ const quizTypes = require("../../constants/quiz-types")
 
 module.exports = schema => {
   schema.statics.getStatsByQuizIds = function(answererId, quizIds) {
-    const quizIdObjects = quizIds.map(id =>
-      id.length === 24 ? mongoose.Types.ObjectId(id) : null,
+    const quizIdObjects = quizIds.map(
+      id => (id.length === 24 ? mongoose.Types.ObjectId(id) : null),
     )
 
     let pipeline = [
