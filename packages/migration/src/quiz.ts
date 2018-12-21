@@ -96,7 +96,7 @@ export async function migrateQuizzes(courses: {
       body: oldQuiz.body,
       submitMessage: safeGet(() => oldQuiz.data.meta.submitMessage),
       createdAt: oldQuiz.createdAt,
-      updatedAt: oldQuiz.updatedAt
+      updatedAt: oldQuiz.updatedAt,
     })
 
     let order: number

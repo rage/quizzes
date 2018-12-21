@@ -98,7 +98,7 @@ export class Quiz extends BaseEntity {
 
     if (this.peerReviewQuestionCollections) {
       this.peerReviewQuestionCollections.forEach(
-        (question: PeerReviewQuestionCollection) => (question.quizId = this.id)
+        (question: PeerReviewQuestionCollection) => (question.quizId = this.id),
       )
     }
   }
