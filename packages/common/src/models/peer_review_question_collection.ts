@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryColumn,
@@ -79,6 +80,7 @@ export class PeerReviewQuestionCollection extends BaseEntity {
 @Entity()
 export class PeerReviewQuestionCollectionTranslation extends BaseEntity {
   @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id)
+  @JoinColumn()
   public peerReviewQuestionCollection: Promise<PeerReviewQuestionCollection>
   @PrimaryColumn()
   public peerReviewQuestionCollectionId: string | undefined
@@ -105,7 +107,10 @@ export class PeerReviewQuestionCollectionTranslation extends BaseEntity {
       return
     }
 
-    this.peerReviewQuestionCollectionId = data.peerReviewQuestionCollectionId
+    if (data.peerReviewQuestionCollectionId) {
+      this.peerReviewQuestionCollectionId = data.peerReviewQuestionCollectionId
+    }
+
     this.languageId = data.languageId || "unknown"
     this.title = data.title
     this.body = data.body
