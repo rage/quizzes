@@ -168,13 +168,13 @@ export class QuizService {
       const newOptionIds: string[] = []
 
       oldQuiz.items.forEach(item => {
-        item.options.forEach(o => oldOptionIds.push(o.id))
+        ;(item.options || []).forEach(o => oldOptionIds.push(o.id))
         oldItemIds.push(item.id)
       })
 
       if (newQuiz) {
         ;(newQuiz!.items || []).forEach(item => {
-          item.options.forEach(o => newOptionIds.push(o.id))
+          ;(item.options || []).forEach(o => newOptionIds.push(o.id))
           newItemIds.push(item.id)
         })
       }
@@ -192,13 +192,13 @@ export class QuizService {
       const newQuestionIds: string[] = []
 
       oldQuiz.peerReviewQuestionCollections.forEach(collection => {
-        collection.questions.forEach(o => oldQuestionIds.push(o.id))
+        ;(collection.questions || []).forEach(o => oldQuestionIds.push(o.id))
         oldCollectionIds.push(collection.id)
       })
 
       if (newQuiz) {
         ;(newQuiz!.peerReviewQuestionCollections || []).forEach(collection => {
-          collection.questions.forEach(o => newQuestionIds.push(o.id))
+          ;(collection.questions || []).forEach(o => newQuestionIds.push(o.id))
           newCollectionIds.push(collection.id)
         })
       }
