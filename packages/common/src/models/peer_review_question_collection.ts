@@ -81,21 +81,24 @@ export class PeerReviewQuestionCollection extends BaseEntity {
 
 @Entity()
 export class PeerReviewQuestionCollectionTranslation extends BaseEntity {
-  @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id)
+  @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn()
   public peerReviewQuestionCollection: Promise<PeerReviewQuestionCollection>
   @PrimaryColumn()
   public peerReviewQuestionCollectionId: string | undefined
 
   @ManyToOne(type => Language, lang => lang.id)
+  @JoinColumn()
   public language: Language
   @PrimaryColumn()
   public languageId: string
 
-  @Column("text")
-  public title: string
-  @Column("text")
-  public body: string
+  @Column({ type: "text", nullable: true })
+  public title?: string
+  @Column({ type: "text", nullable: true })
+  public body?: string
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
@@ -112,7 +115,6 @@ export class PeerReviewQuestionCollectionTranslation extends BaseEntity {
     if (data.peerReviewQuestionCollectionId) {
       this.peerReviewQuestionCollectionId = data.peerReviewQuestionCollectionId
     }
-
     this.languageId = data.languageId || "unknown"
     this.title = data.title
     this.body = data.body

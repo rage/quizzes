@@ -69,7 +69,7 @@ export class QuizService {
 
     this.queryCourse(queryBuilder, whereBuilder, query)
     this.queryItems(queryBuilder, whereBuilder, query)
-    this.queryPeerReviews(queryBuilder, whereBuilder, query)
+    this.queryPeerReviewCollections(queryBuilder, whereBuilder, query)
 
     if (id) {
       whereBuilder.add("quiz.id = :id", { id })
@@ -168,13 +168,13 @@ export class QuizService {
       const newOptionIds: string[] = []
 
       oldQuiz.items.forEach(item => {
-        item.options.forEach(o => oldOptionIds.push(o.id))
+        ;(item.options || []).forEach(o => oldOptionIds.push(o.id))
         oldItemIds.push(item.id)
       })
 
       if (newQuiz) {
         ;(newQuiz!.items || []).forEach(item => {
-          item.options.forEach(o => newOptionIds.push(o.id))
+          ;(item.options || []).forEach(o => newOptionIds.push(o.id))
           newItemIds.push(item.id)
         })
       }
@@ -192,13 +192,13 @@ export class QuizService {
       const newQuestionIds: string[] = []
 
       oldQuiz.peerReviewQuestionCollections.forEach(collection => {
-        collection.questions.forEach(o => oldQuestionIds.push(o.id))
+        ;(collection.questions || []).forEach(o => oldQuestionIds.push(o.id))
         oldCollectionIds.push(collection.id)
       })
 
       if (newQuiz) {
         ;(newQuiz!.peerReviewQuestionCollections || []).forEach(collection => {
-          collection.questions.forEach(o => newQuestionIds.push(o.id))
+          ;(collection.questions || []).forEach(o => newQuestionIds.push(o.id))
           newCollectionIds.push(collection.id)
         })
       }
@@ -234,7 +234,7 @@ export class QuizService {
     }
   }
 
-  private queryPeerReviews(
+  /*   private queryPeerReviews(
     queryBuilder: SelectQueryBuilder<Quiz>,
     whereBuilder: WhereBuilder<Quiz>,
     query: IQuizQuery,
@@ -267,7 +267,7 @@ export class QuizService {
         }),
       )
     }
-  }
+  } */
 
   /*private queryPeerReviews(
     queryBuilder: SelectQueryBuilder<Quiz>,
@@ -352,6 +352,62 @@ export class QuizService {
     if (options) {
       this.queryOptions(queryBuilder, whereBuilder, query)
     }
+  }
+
+  private queryPeerReviewQuestions(
+    queryBuilder: SelectQueryBuilder<Quiz>,
+    whereBuilder: WhereBuilder<Quiz>,
+    query: IQuizQuery,
+  ) {
+    const { peerreviews, language } = query
+
+    if (!peerreviews) {
+      return
+    }
+
+    queryBuilder
+      .leftJoinAndSelect("quiz_prqc.questions", "quiz_prq")
+      .leftJoinAndSelect("quiz_prq.texts", "quiz_prq_translation")
+
+    if (language) {
+      whereBuilder.add(
+        new Brackets(qb => {
+          qb.where("quiz_prq_translation.language_id = :language", {
+            language,
+          }).orWhere("quiz_prq_translation.language_id is null")
+        }),
+      )
+    }
+  }
+
+  private queryPeerReviewCollections(
+    queryBuilder: SelectQueryBuilder<Quiz>,
+    whereBuilder: WhereBuilder<Quiz>,
+    query: IQuizQuery,
+  ) {
+    const { peerreviews, language } = query
+
+    if (!peerreviews || !language) {
+      return
+    }
+
+    queryBuilder
+      .leftJoinAndSelect("quiz.peer_review_question_collections", "quiz_prqc")
+      .leftJoinAndSelect("quiz_prqc.texts", "quiz_prqc_translation")
+
+    if (language) {
+      whereBuilder.add(
+        new Brackets(qb => {
+          qb.where("quiz_prqc_translation.language_id = :language", {
+            language,
+          }).orWhere("quiz_prqc_translation.language_id is null")
+        }),
+      )
+    }
+
+    //if (options) {
+    this.queryPeerReviewQuestions(queryBuilder, whereBuilder, query)
+    //}
   }
 
   private queryCourse(

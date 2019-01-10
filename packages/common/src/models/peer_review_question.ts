@@ -122,7 +122,6 @@ export class PeerReviewQuestionTranslation extends BaseEntity {
     if (data.peerReviewQuestionId) {
       this.peerReviewQuestionId = data.peerReviewQuestionId
     }
-
     this.languageId = data.languageId || "unknown"
     this.title = data.title
     this.body = data.body
