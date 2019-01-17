@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -9,7 +10,7 @@ import {
   RelationId,
   UpdateDateColumn,
 } from "typeorm"
-import { Language } from "./language"
+import { randomUUID } from "../util"
 import { QuizAnswer } from "./quiz_answer"
 import { QuizItem } from "./quiz_item"
 import { QuizOptionAnswer } from "./quiz_option_answer"
@@ -21,8 +22,8 @@ export class QuizItemAnswer extends BaseEntity {
 
   @ManyToOne(type => QuizAnswer, qa => qa.id)
   public quizAnswer: Promise<QuizAnswer>
-  @Column()
-  public quizAnswerId: string
+  @Column({ nullable: true })
+  public quizAnswerId: string | null
 
   @ManyToOne(type => QuizItem, qi => qi.id)
   public quizItem: Promise<QuizItem>
@@ -38,10 +39,37 @@ export class QuizItemAnswer extends BaseEntity {
     eager: true,
     cascade: true,
   })
-  public options: Promise<QuizOptionAnswer[]>
+  public optionAnswers: QuizOptionAnswer[]
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
+
+  constructor(data?: QuizItemAnswer) {
+    super()
+
+    if (!data) {
+      return
+    }
+
+    if (data.quizAnswerId) {
+      this.quizAnswerId = data.quizAnswerId
+    }
+    this.quizItemId = data.quizItemId
+    this.textData = data.textData
+    this.intData = data.intData
+    this.optionAnswers = data.optionAnswers
+  }
+
+  @BeforeInsert()
+  private addRelations() {
+    this.id = this.id || randomUUID()
+
+    if (this.optionAnswers) {
+      this.optionAnswers.forEach(
+        (option: QuizOptionAnswer) => (option.quizItemAnswerId = this.id),
+      )
+    }
+  }
 }

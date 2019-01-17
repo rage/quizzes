@@ -1,5 +1,6 @@
 import {
   BaseEntity,
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -8,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm"
+import { getUUIDByString, randomUUID } from "../util"
 import { Language } from "./language"
 import { Quiz } from "./quiz"
 import { QuizItemAnswer } from "./quiz_item_answer"
@@ -42,10 +44,35 @@ export class QuizAnswer extends BaseEntity {
     eager: true,
     cascade: true,
   })
-  public itemanswers: Promise<QuizItemAnswer[]>
+  public itemAnswers: QuizItemAnswer[]
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
+
+  constructor(data?: QuizAnswer) {
+    super()
+
+    if (!data) {
+      return
+    }
+
+    this.quizId = data.quizId
+    this.userId = data.userId
+    this.languageId = data.languageId
+    this.status = data.status
+    this.itemAnswers = data.itemAnswers
+  }
+
+  @BeforeInsert()
+  private addRelations() {
+    this.id = this.id || randomUUID()
+
+    if (this.itemAnswers) {
+      this.itemAnswers.forEach(
+        (itemAnswer: QuizItemAnswer) => (itemAnswer.quizAnswerId = this.id),
+      )
+    }
+  }
 }
