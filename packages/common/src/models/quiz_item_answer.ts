@@ -35,7 +35,8 @@ export class QuizItemAnswer extends BaseEntity {
   public intData: number
 
   @OneToMany(type => QuizOptionAnswer, qoa => qoa.quizItemAnswer, {
-    lazy: true,
+    eager: true,
+    cascade: true,
   })
   public options: Promise<QuizOptionAnswer[]>
 

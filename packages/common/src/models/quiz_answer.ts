@@ -22,7 +22,7 @@ export class QuizAnswer extends BaseEntity {
   public quiz: Quiz
   @Column()
   public quizId: string
-  @ManyToOne(type => User, user => user.id)
+  @ManyToOne(type => User, user => user.id, { cascade: true })
   public user: User
   @Column("int")
   public userId: number
@@ -38,7 +38,10 @@ export class QuizAnswer extends BaseEntity {
   })
   public status: string
 
-  @OneToMany(type => QuizItemAnswer, qi => qi.quizAnswer, { lazy: true })
+  @OneToMany(type => QuizItemAnswer, qi => qi.quizAnswer, {
+    eager: true,
+    cascade: true,
+  })
   public itemanswers: Promise<QuizItemAnswer[]>
 
   @CreateDateColumn({ type: "timestamp" })

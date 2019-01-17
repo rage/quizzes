@@ -1,11 +1,27 @@
 import { QuizAnswer, QuizItemAnswer } from "@quizzes/common/models"
 import { IQuizAnswerQuery } from "@quizzes/common/types"
 import { Service } from "typedi"
-import { SelectQueryBuilder } from "typeorm"
+import { EntityManager, SelectQueryBuilder } from "typeorm"
+import { InjectManager } from "typeorm-typedi-extensions"
 
 @Service()
 export class QuizAnswerService {
-  public async getAnswers(query: IQuizAnswerQuery): Promise<QuizAnswer[]> {
+  @InjectManager()
+  private entityManager: EntityManager
+
+  public async createQuizAnswer(
+    quiz: QuizAnswer,
+  ): Promise<QuizAnswer | undefined> {
+    let answer: QuizAnswer | undefined
+
+    await this.entityManager.transaction(async entityManager => {
+      answer = await entityManager.save(quiz)
+    })
+
+    return answer
+  }
+
+  /*public async getAnswers(query: IQuizAnswerQuery): Promise<QuizAnswer[]> {
     const { id, quiz_id, user_id } = query
 
     const queryBuilder: SelectQueryBuilder<
@@ -41,7 +57,7 @@ export class QuizAnswerService {
     )
 
     return await queryBuilder.getMany()
-  }
+  }*/
 }
 
 export default { QuizAnswerService }
