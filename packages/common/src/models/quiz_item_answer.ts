@@ -9,6 +9,7 @@ import {
   PrimaryGeneratedColumn,
   RelationId,
   UpdateDateColumn,
+  JoinColumn,
 } from "typeorm"
 import { randomUUID } from "../util"
 import { QuizAnswer } from "./quiz_answer"
@@ -21,11 +22,13 @@ export class QuizItemAnswer extends BaseEntity {
   public id: string
 
   @ManyToOne(type => QuizAnswer, qa => qa.id)
+  @JoinColumn()
   public quizAnswer: Promise<QuizAnswer>
   @Column({ nullable: true })
   public quizAnswerId: string | null
 
   @ManyToOne(type => QuizItem, qi => qi.id)
+  @JoinColumn()
   public quizItem: Promise<QuizItem>
   @Column()
   public quizItemId: string
