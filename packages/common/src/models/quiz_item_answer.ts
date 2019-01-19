@@ -23,7 +23,7 @@ export class QuizItemAnswer extends BaseEntity {
 
   @ManyToOne(type => QuizAnswer, qa => qa.id)
   @JoinColumn()
-  public quizAnswer: Promise<QuizAnswer>
+  // public quizAnswer: Promise<QuizAnswer>
   @Column({ nullable: true })
   public quizAnswerId: string | null
 
