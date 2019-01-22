@@ -53,11 +53,11 @@ export class QuizAnswer extends BaseEntity {
 
   constructor(data?: QuizAnswer) {
     super()
-    console.log("hip", data)
+
     if (!data) {
       return
     }
-    console.log("hop")
+
     this.quizId = data.quizId
     this.userId = data.userId
     this.languageId = data.languageId
@@ -68,7 +68,7 @@ export class QuizAnswer extends BaseEntity {
   @BeforeInsert()
   private addRelations() {
     this.id = this.id || randomUUID()
-    console.log(this.itemAnswers)
+
     if (this.itemAnswers) {
       this.itemAnswers.forEach(
         (itemAnswer: QuizItemAnswer) => (itemAnswer.quizAnswerId = this.id),

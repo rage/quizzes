@@ -9,7 +9,13 @@ import { getRepository } from "typeorm"
 import quizRoute from "./quizzes"
  */
 import { CourseController } from "./courses"
+import { PeerReviewController } from "./peerreviews"
 import { QuizAnswerController } from "./quizanswers"
 import { QuizController } from "./quizzes"
 
-export default [CourseController, QuizAnswerController, QuizController]
+export default [
+  CourseController,
+  PeerReviewController,
+  QuizAnswerController,
+  QuizController,
+]

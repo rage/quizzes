@@ -4,12 +4,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  JoinColumn,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
-  RelationId,
   UpdateDateColumn,
-  JoinColumn,
 } from "typeorm"
 import { randomUUID } from "../util"
 import { QuizAnswer } from "./quiz_answer"
