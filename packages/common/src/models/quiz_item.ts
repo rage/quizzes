@@ -53,6 +53,8 @@ export class QuizItem extends BaseEntity {
   public validityRegex?: string
   @Column({ nullable: true })
   public formatRegex?: string
+  @Column({ nullable: true, default: false })
+  public multi?: boolean
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

@@ -144,8 +144,8 @@ export async function migrateQuizzes(courses: {
           quizItemTranslations.push({
             quizItemId: qiid,
             languageId,
-            successMessage: meta.success,
-            failureMessage: meta.error,
+            successMessage: successes[oldItem.id],
+            failureMessage: errors[oldItem.id],
             title: oldItem.title,
             body: oldItem.body,
           })
@@ -213,6 +213,7 @@ export async function migrateQuizzes(courses: {
             quizId: quiz.id,
             type: "radio",
             order: order++,
+            multi: meta.multi,
             createdAt: oldQuiz.createdAt,
             updatedAt: oldQuiz.updatedAt,
           })

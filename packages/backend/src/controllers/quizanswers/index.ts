@@ -16,7 +16,7 @@ import { EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
 
-@JsonController("/quizzes/:id/answer")
+@JsonController("/quizzes/answer")
 export class QuizAnswerController {
   @InjectManager()
   private entityManager: EntityManager
@@ -25,10 +25,7 @@ export class QuizAnswerController {
   private quizAnswerService: QuizAnswerService
 
   @Post("/")
-  public async post(
-    @Param("id") id: string,
-    @EntityFromBody() quizAnswer: QuizAnswer,
-  ): Promise<QuizAnswer> {
-    return await this.quizAnswerService.createQuizAnswer(quizAnswer)
+  public async post(@Body() answer: any): Promise<any> {
+    return await this.quizAnswerService.createQuizAnswer(answer)
   }
 }
