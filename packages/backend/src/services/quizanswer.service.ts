@@ -20,7 +20,6 @@ export class QuizAnswerService {
       options: true,
     })
     const items = quiz[0].items
-    console.log(items[0].texts)
     let points = 0
     const itemAnswerStatus = items.map(item => {
       const itemAnswer = quizAnswer.itemAnswers.find(
@@ -29,33 +28,69 @@ export class QuizAnswerService {
       const itemTranslation = item.texts.find(
         text => (text.languageId = quizAnswer.languageId),
       )
-      let statusObject
+      let itemStatusObject
       let correct = false
+
       if (item.type === "open") {
         const validator = new RegExp(item.validityRegex)
         if (validator.test(itemAnswer.textData)) {
           points++
           correct = true
         }
-        statusObject = {
+        itemStatusObject = {
+          itemId: item.id,
           correct,
+          submittedValue: itemAnswer.textData,
           message: correct
             ? itemTranslation.successMessage
             : itemTranslation.failureMessage,
         }
       }
+
       if (item.type === "radio") {
-        const options = item.options.map(option => {
+        const optionAnswerStatus = item.options.map(option => {
+          const optionAnswer = itemAnswer.optionAnswers.find(
+            (oa: any) => oa.quizOptionId === option.id,
+          )
           const optionTranslation = option.texts.find(
             text => text.languageId === quizAnswer.languageId,
           )
+          return {
+            optionId: option.id,
+            selected: optionAnswer ? true : false,
+            correctAnswer: option.correct,
+            message:
+              optionAnswer && option.correct
+                ? optionTranslation.successMessage
+                : optionTranslation.failureMessage,
+          }
         })
+        if (item.multi) {
+          correct =
+            optionAnswerStatus.filter(oas => oas.selected !== oas.correctAnswer)
+              .length === 0
+        } else {
+          correct =
+            optionAnswerStatus.filter(oas => oas.selected && oas.correctAnswer)
+              .length > 0
+        }
+        itemStatusObject = {
+          itemId: item.id,
+          correct,
+          message: correct
+            ? itemTranslation.successMessage
+            : itemTranslation.failureMessage,
+          options: optionAnswerStatus,
+        }
       }
-      return statusObject
+
+      return itemStatusObject
     })
+
     const normalizedPoints = points / items.length
-    console.log(points, normalizedPoints)
-    console.log(itemAnswerStatus)
+    itemAnswerStatus.map(ias => {
+      console.log(ias)
+    })
     /*let answer: QuizAnswer | undefined
 
     await this.entityManager.transaction(async entityManager => {
