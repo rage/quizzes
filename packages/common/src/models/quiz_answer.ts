@@ -25,7 +25,7 @@ export class QuizAnswer extends BaseEntity {
   @Column()
   public quizId: string
   @ManyToOne(type => User, user => user.id, { cascade: true })
-  public user: User
+  public user?: User
   @Column("int")
   public userId: number
 
@@ -38,9 +38,9 @@ export class QuizAnswer extends BaseEntity {
     type: "enum",
     enum: ["draft", "submitted", "spam", "confirmed", "rejected", "deprecated"],
   })
-  public status: string
+  public status?: string
 
-  @OneToMany(type => QuizItemAnswer, qi => qi.quizAnswerId, {
+  @OneToMany(type => QuizItemAnswer, qi => qi.quizAnswer, {
     eager: true,
     cascade: true,
   })

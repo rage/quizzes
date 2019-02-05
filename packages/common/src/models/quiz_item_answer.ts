@@ -36,6 +36,8 @@ export class QuizItemAnswer extends BaseEntity {
   public textData: string
   @Column({ type: "int", nullable: true })
   public intData: number
+  @Column({ type: "boolean", nullable: true })
+  public correct: boolean
 
   @OneToMany(type => QuizOptionAnswer, qoa => qoa.quizItemAnswer, {
     eager: true,

@@ -48,7 +48,7 @@ import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import quizanswerService from "./quizanswer.service"
 
 @Service()
-export class QuizService {
+export default class QuizService {
   @InjectManager()
   private entityManager: EntityManager
 
@@ -479,5 +479,3 @@ export class QuizService {
     return await quiz
   }
 }
-
-export default QuizService

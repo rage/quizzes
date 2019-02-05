@@ -1,4 +1,4 @@
-import { QuizAnswer } from "@quizzes/common/models"
+import { Quiz, QuizAnswer } from "@quizzes/common/models"
 import {
   BadRequestError,
   Body,
@@ -10,7 +10,9 @@ import {
   QueryParam,
   QueryParams,
 } from "routing-controllers"
-import { QuizAnswerService } from "services/quizanswer.service"
+import QuizService from "services/quiz.service"
+import QuizAnswerService from "services/quizanswer.service"
+import UserQuizStateService from "services/userquizstate.service"
 import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
@@ -24,8 +26,35 @@ export class QuizAnswerController {
   @Inject()
   private quizAnswerService: QuizAnswerService
 
+  @Inject()
+  private userQuizStateService: UserQuizStateService
+
+  @Inject()
+  private quizService: QuizService
+
   @Post("/")
-  public async post(@Body() answer: any): Promise<any> {
-    return await this.quizAnswerService.createQuizAnswer(answer)
+  public async post(@EntityFromBody() answer: QuizAnswer): Promise<any> {
+    const quiz: Quiz[] = await this.quizService.getQuizzes({
+      id: answer.quizId,
+      items: true,
+      options: true,
+    })
+    const userQState = await this.userQuizStateService.get(
+      answer.userId,
+      answer.quizId,
+    )
+    const {
+      response,
+      quizAnswer,
+      userQuizState,
+    } = await this.quizAnswerService.validateQuizAnswer(
+      answer,
+      quiz[0],
+      userQState,
+    )
+    await this.userQuizStateService.createUserQuizState(userQuizState)
+    await this.quizAnswerService.checkForDeprecated(quizAnswer)
+    await this.quizAnswerService.createQuizAnswer(quizAnswer)
+    return response
   }
 }

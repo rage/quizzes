@@ -7,6 +7,7 @@ import {
   PrimaryColumn,
   RelationId,
   UpdateDateColumn,
+  Double,
 } from "typeorm"
 import { Quiz } from "./quiz"
 import { User } from "./user"
@@ -23,13 +24,13 @@ export class UserQuizState extends BaseEntity {
   @PrimaryColumn()
   public quizId: string
 
-  @Column({ type: "int", default: 0 })
+  @Column({ type: "int", nullable: true })
   public peerReviewsGiven: number
-  @Column({ type: "int", default: 0 })
+  @Column({ type: "int", nullable: true })
   public peerReviewsReceived: number
-  @Column({ type: "int", default: 0 })
+  @Column({ type: "int", nullable: true })
   public points: number
-  @Column({ type: "int", default: 0 })
+  @Column({ type: "numeric", nullable: true })
   public normalizedPoints: number
   @Column({ type: "int", default: 0 })
   public tries: number

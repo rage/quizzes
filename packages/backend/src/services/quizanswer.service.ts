@@ -1,12 +1,18 @@
-import { QuizAnswer, QuizItemAnswer } from "@quizzes/common/models"
+import {
+  Quiz,
+  QuizAnswer,
+  QuizItem,
+  QuizItemAnswer,
+  UserQuizState,
+} from "@quizzes/common/models"
 import { IQuizAnswerQuery } from "@quizzes/common/types"
 import { Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
-import { QuizService } from "./quiz.service"
+import QuizService from "./quiz.service"
 
 @Service()
-export class QuizAnswerService {
+export default class QuizAnswerService {
   @InjectManager()
   private entityManager: EntityManager
 
@@ -14,93 +20,147 @@ export class QuizAnswerService {
   private quizService: QuizService
 
   public async createQuizAnswer(quizAnswer: any) {
-    const quiz = await this.quizService.getQuizzes({
-      id: quizAnswer.quizId,
-      items: true,
-      options: true,
+    let answer: QuizAnswer | undefined
+
+    await this.entityManager.transaction(async entityManager => {
+      answer = await entityManager.save(quizAnswer)
     })
-    const items = quiz[0].items
-    let points = 0
+
+    return answer
+  }
+
+  public async checkForDeprecated(quizAnswer: QuizAnswer) {
+    const answers: QuizAnswer[] = await this.entityManager
+      .createQueryBuilder(QuizAnswer, "quizAnswer")
+      .where("user_id = :userId and quiz_id = :quizId", {
+        userId: quizAnswer.userId,
+        quizId: quizAnswer.quizId,
+      })
+      .getMany()
+    await Promise.all(
+      answers.map(async (answer: QuizAnswer) => {
+        if (answer.status !== "deprecated") {
+          answer.status = "deprecated"
+          this.entityManager.save(answer)
+        }
+      }),
+    )
+  }
+
+  public async validateQuizAnswer(
+    quizAnswer: QuizAnswer,
+    quiz: Quiz,
+    userState: UserQuizState,
+  ) {
+    const userQuizState = userState || new UserQuizState()
+    const items: QuizItem[] = quiz.items
+    let points: number | null = null
+    let normalizedPoints
     const itemAnswerStatus = items.map(item => {
       const itemAnswer = quizAnswer.itemAnswers.find(
-        (ia: any) => ia.quizItemId === item.id,
+        (ia: QuizItemAnswer) => ia.quizItemId === item.id,
       )
       const itemTranslation = item.texts.find(
-        text => (text.languageId = quizAnswer.languageId),
+        text => text.languageId === quizAnswer.languageId,
       )
-      let itemStatusObject
+      let itemStatusObject: any
       let correct = false
 
-      if (item.type === "open") {
-        const validator = new RegExp(item.validityRegex)
-        if (validator.test(itemAnswer.textData)) {
-          points++
-          correct = true
-        }
-        itemStatusObject = {
-          itemId: item.id,
-          correct,
-          submittedValue: itemAnswer.textData,
-          message: correct
-            ? itemTranslation.successMessage
-            : itemTranslation.failureMessage,
-        }
-      }
-
-      if (item.type === "radio") {
-        const optionAnswerStatus = item.options.map(option => {
-          const optionAnswer = itemAnswer.optionAnswers.find(
-            (oa: any) => oa.quizOptionId === option.id,
-          )
-          const optionTranslation = option.texts.find(
-            text => text.languageId === quizAnswer.languageId,
-          )
-          return {
-            optionId: option.id,
-            selected: optionAnswer ? true : false,
-            correctAnswer: option.correct,
-            message:
-              optionAnswer && option.correct
-                ? optionTranslation.successMessage
-                : optionTranslation.failureMessage,
+      switch (item.type) {
+        case "essay":
+          quizAnswer.status = "submitted"
+          userQuizState.peerReviewsReceived = 0
+          itemStatusObject = {}
+          break
+        case "open":
+          const validator = new RegExp(item.validityRegex)
+          if (validator.test(itemAnswer.textData)) {
+            points += 1
+            correct = true
           }
-        })
-        if (item.multi) {
-          correct =
+          itemStatusObject = {
+            correct,
+            submittedAnswer: itemAnswer.textData,
+            message: correct
+              ? itemTranslation.successMessage
+              : itemTranslation.failureMessage,
+          }
+          break
+        case "radio":
+          const optionAnswerStatus = item.options.map(option => {
+            const optionAnswer = itemAnswer.optionAnswers.find(
+              (oa: any) => oa.quizOptionId === option.id,
+            )
+            const optionTranslation = option.texts.find(
+              text => text.languageId === quizAnswer.languageId,
+            )
+            return {
+              optionId: option.id,
+              selected: optionAnswer ? true : false,
+              correctAnswer: option.correct,
+              message:
+                optionAnswer && option.correct
+                  ? optionTranslation.successMessage
+                  : optionTranslation.failureMessage,
+            }
+          })
+          if (
+            item.multi &&
             optionAnswerStatus.filter(oas => oas.selected !== oas.correctAnswer)
               .length === 0
-        } else {
-          correct =
-            optionAnswerStatus.filter(oas => oas.selected && oas.correctAnswer)
-              .length > 0
-        }
-        itemStatusObject = {
-          itemId: item.id,
-          correct,
-          message: correct
-            ? itemTranslation.successMessage
-            : itemTranslation.failureMessage,
-          options: optionAnswerStatus,
-        }
+          ) {
+            correct = true
+            points += 1
+          } else if (
+            !item.multi &&
+            optionAnswerStatus.some(oas => oas.selected && oas.correctAnswer)
+          ) {
+            correct = true
+            points += 1
+          }
+          itemStatusObject = {
+            correct,
+            message: correct
+              ? itemTranslation.successMessage
+              : itemTranslation.failureMessage,
+            options: optionAnswerStatus,
+          }
+          break
       }
+
+      itemStatusObject.itemId = item.id
+      itemAnswer.correct = correct
 
       return itemStatusObject
     })
 
-    const normalizedPoints = points / items.length
-    itemAnswerStatus.map(ias => {
-      console.log(ias)
-    })
-    /*let answer: QuizAnswer | undefined
+    normalizedPoints = points != null ? points / items.length : null
+    console.log("tries", userQuizState.tries)
+    quizAnswer.status = points === null ? quizAnswer.status : "confirmed"
 
-    await this.entityManager.transaction(async entityManager => {
-      answer = await entityManager.save(quizAnswer)
+    userQuizState.userId = quizAnswer.userId
+    userQuizState.quizId = quizAnswer.quizId
+    userQuizState.points =
+      userQuizState.points > points ? userQuizState.points : points
+    userQuizState.normalizedPoints =
+      userQuizState.normalizedPoints > normalizedPoints
+        ? userQuizState.normalizedPoints
+        : normalizedPoints
+    userQuizState.tries = userQuizState.tries ? userQuizState.tries + 1 : 1
+    userQuizState.status = "locked"
+
+    /*itemAnswerStatus.map(ias => {
+      console.log(ias)
     })*/
 
-    return ""
+    const response = {
+      itemAnswerStatus,
+    }
+
+    return { response, quizAnswer, userQuizState }
   }
 
-  /*public async getAnswers(query: IQuizAnswerQuery): Promise<QuizAnswer[]> {
+  public async getAnswers(query: IQuizAnswerQuery): Promise<QuizAnswer[]> {
     const { id, quiz_id, user_id } = query
 
     const queryBuilder: SelectQueryBuilder<
@@ -124,7 +184,7 @@ export class QuizAnswerService {
     }
 
     queryBuilder.leftJoinAndSelect(
-      "quiz_answer.itemanswers",
+      "quiz_answer.item_answers",
       "quiz_item_answer",
       "quiz_item_answer.quiz_answer_id = quiz_answer.id",
     )
@@ -136,7 +196,5 @@ export class QuizAnswerService {
     )
 
     return await queryBuilder.getMany()
-  }*/
+  }
 }
-
-export default { QuizAnswerService }
