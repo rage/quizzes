@@ -39,7 +39,7 @@ export class QuizAnswerController {
       items: true,
       options: true,
     })
-    const userQState = await this.userQuizStateService.get(
+    const userQState = await this.userQuizStateService.getUserQuizState(
       answer.userId,
       answer.quizId,
     )
