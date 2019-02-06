@@ -4,6 +4,7 @@ import {
   QuizItem,
   QuizItemAnswer,
   UserQuizState,
+  User,
 } from "@quizzes/common/models"
 import { IQuizAnswerQuery } from "@quizzes/common/types"
 import { WhereBuilder } from "@quizzes/common/util"
@@ -16,14 +17,20 @@ export default class UserQuizStateService {
   @InjectManager()
   private entityManager: EntityManager
 
-  public async getUserQuizState(userId: number, quizId: string) {
+  public async getUserQuizState(
+    userId: number,
+    quizId: string,
+  ): Promise<UserQuizState | undefined> {
     return await this.entityManager
       .createQueryBuilder(UserQuizState, "userQuizState")
       .where("user_id = :userId and quiz_id = :quizId", { userId, quizId })
       .getOne()
   }
 
-  public async createUserQuizState(userQuizState: UserQuizState) {
-    await this.entityManager.save(userQuizState)
+  public async createUserQuizState(
+    manager: EntityManager,
+    userQuizState: UserQuizState,
+  ) {
+    await manager.save(userQuizState)
   }
 }

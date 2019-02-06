@@ -19,18 +19,15 @@ export default class QuizAnswerService {
   @Inject()
   private quizService: QuizService
 
-  public async createQuizAnswer(quizAnswer: any) {
-    let answer: QuizAnswer | undefined
-
-    await this.entityManager.transaction(async entityManager => {
-      answer = await entityManager.save(quizAnswer)
-    })
-
-    return answer
+  public async createQuizAnswer(manager: EntityManager, quizAnswer: any) {
+    return manager.save(quizAnswer)
   }
 
-  public async checkForDeprecated(quizAnswer: QuizAnswer) {
-    const answers: QuizAnswer[] = await this.entityManager
+  public async checkForDeprecated(
+    manager: EntityManager,
+    quizAnswer: QuizAnswer,
+  ) {
+    const answers: QuizAnswer[] = await manager
       .createQueryBuilder(QuizAnswer, "quizAnswer")
       .where("user_id = :userId and quiz_id = :quizId", {
         userId: quizAnswer.userId,
@@ -41,13 +38,13 @@ export default class QuizAnswerService {
       answers.map(async (answer: QuizAnswer) => {
         if (answer.status !== "deprecated") {
           answer.status = "deprecated"
-          this.entityManager.save(answer)
+          manager.save(answer)
         }
       }),
     )
   }
 
-  public async validateQuizAnswer(
+  public validateQuizAnswer(
     quizAnswer: QuizAnswer,
     quiz: Quiz,
     userState: UserQuizState,

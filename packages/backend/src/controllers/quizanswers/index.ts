@@ -1,4 +1,4 @@
-import { Quiz, QuizAnswer } from "@quizzes/common/models"
+import { Quiz, QuizAnswer, UserQuizState } from "@quizzes/common/models"
 import {
   BadRequestError,
   Body,
@@ -39,7 +39,7 @@ export class QuizAnswerController {
       items: true,
       options: true,
     })
-    const userQState = await this.userQuizStateService.getUserQuizState(
+    const userQState: UserQuizState = await this.userQuizStateService.getUserQuizState(
       answer.userId,
       answer.quizId,
     )
@@ -47,14 +47,15 @@ export class QuizAnswerController {
       response,
       quizAnswer,
       userQuizState,
-    } = await this.quizAnswerService.validateQuizAnswer(
-      answer,
-      quiz[0],
-      userQState,
-    )
-    await this.userQuizStateService.createUserQuizState(userQuizState)
-    await this.quizAnswerService.checkForDeprecated(quizAnswer)
-    await this.quizAnswerService.createQuizAnswer(quizAnswer)
+    } = this.quizAnswerService.validateQuizAnswer(answer, quiz[0], userQState)
+    await this.entityManager.transaction(async manager => {
+      await this.userQuizStateService.createUserQuizState(
+        manager,
+        userQuizState,
+      )
+      await this.quizAnswerService.checkForDeprecated(manager, quizAnswer)
+      await this.quizAnswerService.createQuizAnswer(manager, quizAnswer)
+    })
     return response
   }
 }
