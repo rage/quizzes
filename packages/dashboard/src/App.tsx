@@ -26,7 +26,7 @@ import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
 import QuizForm from './components/QuizForm'
 import { setCourses } from './store/courses/actions'
 import { newQuiz, setEdit } from './store/edit/actions'
-import { setCourse, setFilter } from './store/filter/actions'
+import { setCourse } from './store/filter/actions'
 import { setQuizzes } from './store/quizzes/actions'
 import { addUser, removeUser } from './store/user/actions'
 
@@ -171,14 +171,12 @@ interface IDispatchProps {
   setCourse: typeof setCourse,
   setCourses: typeof setCourses,
   setEdit: typeof setEdit,
-  setFilter: typeof setFilter,
   setQuizzes: typeof setQuizzes,
   removeUser: typeof removeUser
 }
 
 interface IStateProps {
   courses: any,
-  filter: any,
   quizzes: any[],
   user: ITMCProfile
 }
@@ -198,7 +196,6 @@ const mapDispatchToProps = {
   setCourse,
   setCourses,
   setEdit,
-  setFilter,
   setQuizzes,
   removeUser
 }

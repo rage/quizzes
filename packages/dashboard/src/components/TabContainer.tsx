@@ -29,9 +29,9 @@ import React from 'react'
 import { connect } from 'react-redux'
 import { arrayMove, SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
 import { addItem, addOption, addReview, changeAttr, changeOrder, newQuiz, remove, save, setEdit } from '../store/edit/actions'
-import { setFilter } from '../store/filter/actions'
 import ItemContainer from './ItemContainer'
 import OptionContainer from './OptionContainer'
+import PeerReviewQuestionCollectionContainer from './PeerReviewQuestionCollectionContainer'
 import PeerReviewQuestionContainer from './PeerReviewQuestionContainer'
 
 class TabContainer extends React.Component<any, any> {
@@ -109,18 +109,15 @@ class TabContainer extends React.Component<any, any> {
                     </Paper>
                     {this.props.items.find(item => item.type === "essay") ?
                         <Paper style={{ padding: 30 }}>
-                            <Typography variant='subtitle1' style={{ marginBottom: 10 }}>Peer review questions:</Typography>
-                            <PeerReviewQuestionContainer
-                                peerReviewQuestions={this.props.peerReviewQuestions}
+                            <Typography variant='subtitle1' style={{ marginBottom: 10 }}>Peer reviews:</Typography>
+                            <PeerReviewQuestionCollectionContainer
+                                peerReviewQuestionCollections={this.props.peerReviewQuestionCollections}
                                 handleChange={this.props.handleChange}
-                                onSortEnd={this.onSortEnd}
+                                handleSort={this.onSortEnd}
                                 useDragHandle={true}
                                 remove={this.remove}
                             />
-                            <Button id="review" onClick={this.handleMenu}>Add review question</Button>
-                            <Menu anchorEl={this.state.menuAnchor} open={this.state.menuOpen === "review"} onClose={this.handleMenu}>
-                                {this.reviewTypes.map((type, index) => <MenuItem key={type + index} value={type} onClick={this.addReview(type)}>{type}</MenuItem>)}
-                            </Menu>
+                            <Button id="review" onClick={this.addReview}>Add review</Button>
                         </Paper> :
                         <p />}
                 </div>
@@ -135,11 +132,11 @@ class TabContainer extends React.Component<any, any> {
         this.props.addItem(type)
     }
 
-    private addReview = type => event => {
+    private addReview = event => {
         this.setState({
             menuOpen: null
         })
-        this.props.addReview(type)
+        this.props.addReview()
     }
 
     private remove = (path, index) => event => {

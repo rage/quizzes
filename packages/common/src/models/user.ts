@@ -15,4 +15,14 @@ export class User extends BaseEntity {
   public createdAt: Date
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
+
+  /* constructor(data?: User) {
+    super()
+
+    if (!data) {
+      return
+    }
+
+    this.id = data.id
+  } */
 }

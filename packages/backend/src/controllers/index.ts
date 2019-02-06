@@ -8,8 +8,14 @@ import { getRepository } from "typeorm"
 /* import quizAnswerRoute from "./quizanswers"
 import quizRoute from "./quizzes"
  */
-// import { QuizAnswerController } from "./quizanswers"
 import { CourseController } from "./courses"
+import { PeerReviewController } from "./peerreviews"
+import { QuizAnswerController } from "./quizanswers"
 import { QuizController } from "./quizzes"
 
-export default [CourseController, QuizController]
+export default [
+  CourseController,
+  PeerReviewController,
+  QuizAnswerController,
+  QuizController,
+]

@@ -28,21 +28,32 @@ import {
 import React from 'react'
 import { connect } from 'react-redux'
 import { arrayMove, SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
-import { addItem, addOption, changeAttr, changeOrder, newQuiz, save, setEdit } from '../store/edit/actions'
+import { addItem, addOption, addReviewQuestion, changeAttr, changeOrder, newQuiz, save, setEdit } from '../store/edit/actions'
 import DragHandleWrapper from './DragHandleWrapper'
 import OptionContainer from './OptionContainer'
+import PeerReviewQuestionContainer from './PeerReviewQuestionContainer'
 
-class Item extends React.Component<any, any> {
+class PeerReviewQuestionCollection extends React.Component<any, any> {
+
+    private reviewTypes = [
+        "essay",
+        "grade"
+    ]
 
     constructor(props) {
         super(props)
         this.state = {
-            expanded: false
+            expanded: false,
+            menuOpen: false,
+            menuAnchor: null
         }
     }
 
     public shouldComponentUpdate(nextProps, nextState) {
         if (nextState.expanded !== this.state.expanded) {
+            return true
+        }
+        if (nextState.menuOpen !== this.state.menuOpen) {
             return true
         }
         if (nextProps.title !== this.props.title) {
@@ -51,24 +62,12 @@ class Item extends React.Component<any, any> {
         if (nextProps.body !== this.props.body) {
             return true
         }
-        if (nextProps.successMessage !== this.props.successMessage) {
-            return true
-        }
-        if (nextProps.failureMessage !== this.props.failureMessage) {
-            return true
-        }
-        if (nextProps.validityRegex !== this.props.validityRegex) {
-            return true
-        }
-        if (nextProps.formatRegex !== this.props.formatRegex) {
-            return true
-        }
         return false
     }
 
     public render() {
 
-        // console.log("item")
+        // console.log("collection")
 
         const renderOptions = type => {
             return ["radio", "checkbox", "research-agreement"].includes(type)
@@ -76,12 +75,10 @@ class Item extends React.Component<any, any> {
 
         return (
             <Card style={{ marginBottom: 20 }}>
-                {
-                    !this.state.expanded ?
+                {!this.state.expanded ?
                         <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
                             <Grid item={true} xs={11}>
                                 <DragHandleWrapper>
-
                                     <CardHeader
                                         title={this.props.title}
                                         titleTypographyProps={{ variant: "subtitle1", gutterBottom: false }}
@@ -100,8 +97,7 @@ class Item extends React.Component<any, any> {
                                 </Grid>
                             </Grid>
                         </Grid> :
-                        <p />
-                }
+                        <p />}
                 <Collapse in={this.state.expanded}>
                     <CardContent>
                         <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
@@ -113,7 +109,7 @@ class Item extends React.Component<any, any> {
                                             label="title"
                                             value={this.props.title || undefined}
                                             fullWidth={true}
-                                            onChange={this.props.handleChange(`items[${this.props.index}].texts[${this.props.textIndex}].title`)}
+                                            onChange={this.props.handleChange(`peerReviewQuestionCollections[${this.props.index}].texts[${this.props.textIndex}].title`)}
                                             multiline={true}
                                             margin="normal"
                                         />
@@ -121,48 +117,14 @@ class Item extends React.Component<any, any> {
                                             label="body"
                                             value={this.props.body || undefined}
                                             fullWidth={true}
-                                            onChange={this.props.handleChange(`items[${this.props.index}].texts[${this.props.textIndex}].body`)}
+                                            onChange={this.props.handleChange(`peerReviewQuestionCollections[${this.props.index}].texts[${this.props.textIndex}].body`)}
                                             multiline={true}
                                             margin="normal"
                                         />
-                                        <TextField
-                                            label="success message"
-                                            value={this.props.successMessage || undefined}
-                                            fullWidth={true}
-                                            onChange={this.props.handleChange(`items[${this.props.index}].texts[${this.props.textIndex}].successMessage`)}
-                                            multiline={true}
-                                            margin="normal"
-                                        />
-                                        <TextField
-                                            label="failure message"
-                                            value={this.props.failureMessage || undefined}
-                                            fullWidth={true}
-                                            onChange={this.props.handleChange(`items[${this.props.index}].texts[${this.props.textIndex}].failureMessage`)}
-                                            multiline={true}
-                                            margin="normal"
-                                        />
-                                        {this.props.type === "open" ?
-                                            <div>
-                                                <TextField
-                                                    label="validity regex"
-                                                    fullWidth={true}
-                                                    value={this.props.validityRegex || undefined}
-                                                    onChange={this.props.handleChange(`items[${this.props.index}].validityRegex`)}
-                                                    margin="normal"
-                                                />
-                                                <TextField
-                                                    label="format regex"
-                                                    fullWidth={true}
-                                                    value={this.props.formatRegex || undefined}
-                                                    onChange={this.props.handleChange(`items[${this.props.index}].formatRegex`)}
-                                                    margin="normal"
-                                                />
-                                            </div> :
-                                            <p />}
                                         <Grid container={true} style={{ marginTop: 20 }}>
                                             <Grid item={true} xs={12}>
                                                 <Grid container={true} justify="flex-end">
-                                                    <IconButton onClick={this.props.remove('items', this.props.index)} aria-label="Delete" color="secondary">
+                                                    <IconButton onClick={this.props.remove('peerReviewQuestionCollections', this.props.index)} aria-label="Delete" color="secondary">
                                                         <SvgIcon><path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" /></SvgIcon>
                                                     </IconButton>
                                                 </Grid>
@@ -171,24 +133,23 @@ class Item extends React.Component<any, any> {
                                     </CardContent>
                                 </Card>
                             </Grid>
-                            {renderOptions(this.props.type) ?
-                                <Grid item={true} xs={12}>
-                                    <Card>
-                                        <CardHeader subheader="options" />
-                                        <CardContent>
-                                            <OptionContainer
-                                                axis="xy"
-                                                onSortEnd={this.props.handleSort}
-                                                index={this.props.index}
-                                                useDragHandle={true}
-                                                language={this.props.language}
-                                                handleChange={this.props.handleChange}
-                                                remove={this.props.remove}
-                                            />
-                                        </CardContent>
-                                    </Card>
-                                </Grid> :
-                                <p />}
+                            <Grid item={true} xs={12}>
+                                <Paper style={{ padding: 30 }}>
+                                    <Typography variant='subtitle1' style={{ marginBottom: 10 }}>Questions:</Typography>
+                                    <PeerReviewQuestionContainer
+                                        collectionIndex={this.props.index}
+                                        handleChange={this.props.handleChange}
+                                        onSortEnd={this.props.handleSort}
+                                        useDragHandle={true}
+                                        remove={this.props.remove}
+                                        questions={this.props.questions}
+                                    />
+                                    <Button id="review" onClick={this.handleMenu}>Add review question</Button>
+                                    <Menu anchorEl={this.state.menuAnchor} open={this.state.menuOpen === "review"} onClose={this.handleMenu}>
+                                        {this.reviewTypes.map((type, index) => <MenuItem key={type + index} value={type} onClick={this.addReviewQuestion(type)}>{type}</MenuItem>)}
+                                    </Menu>
+                                </Paper>
+                            </Grid>
                             <Grid item={true} xs={12} >
                                 <Grid container={true} justify="flex-end">
                                     <Grid item={true}>
@@ -210,6 +171,24 @@ class Item extends React.Component<any, any> {
     private handleExpand = (event) => {
         this.setState({ expanded: !this.state.expanded })
     }
+
+    private handleMenu = (event) => {
+        this.setState({
+            menuOpen: event.currentTarget.id,
+            menuAnchor: event.currentTarget
+        })
+    }
+    private addReviewQuestion = type => event => {
+        console.log("add")
+        this.setState({
+            menuOpen: null
+        })
+        this.props.addReviewQuestion(this.props.index, type)
+    }
 }
 
-export default connect()(Item)
+const mapDispatchToProps = {
+    addReviewQuestion,
+}
+
+export default connect(null, mapDispatchToProps)(PeerReviewQuestionCollection)

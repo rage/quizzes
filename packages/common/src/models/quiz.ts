@@ -18,6 +18,7 @@ import { getUUIDByString, randomUUID } from "../util"
 import { Course } from "./course"
 import { Language } from "./language"
 import { PeerReviewQuestion } from "./peer_review_question"
+import { PeerReviewQuestionCollection } from "./peer_review_question_collection"
 import { QuizItem } from "./quiz_item"
 
 @Entity()
@@ -52,11 +53,11 @@ export class Quiz extends BaseEntity {
   }) // was: not eager
   public items?: QuizItem[]
 
-  @OneToMany(type => PeerReviewQuestion, prq => prq.quiz, {
+  @OneToMany(type => PeerReviewQuestionCollection, prqc => prqc.quiz, {
     eager: true,
     cascade: true,
   }) // was: not eager
-  public peerReviewQuestions: PeerReviewQuestion[]
+  public peerReviewQuestionCollections: PeerReviewQuestionCollection[]
 
   @Column({ default: false })
   public excludedFromScore: boolean
@@ -80,7 +81,7 @@ export class Quiz extends BaseEntity {
     this.open = data.open
     this.texts = data.texts
     this.items = data.items
-    this.peerReviewQuestions = data.peerReviewQuestions
+    this.peerReviewQuestionCollections = data.peerReviewQuestionCollections
   }
 
   @BeforeInsert()
@@ -95,9 +96,9 @@ export class Quiz extends BaseEntity {
       this.items.forEach((item: QuizItem) => (item.quizId = this.id))
     }
 
-    if (this.peerReviewQuestions) {
-      this.peerReviewQuestions.forEach(
-        (question: PeerReviewQuestion) => (question.quizId = this.id),
+    if (this.peerReviewQuestionCollections) {
+      this.peerReviewQuestionCollections.forEach(
+        (question: PeerReviewQuestionCollection) => (question.quizId = this.id),
       )
     }
   }

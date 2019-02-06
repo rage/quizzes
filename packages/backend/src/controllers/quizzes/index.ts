@@ -27,7 +27,7 @@ import {
   QueryParams,
 } from "routing-controllers"
 import QuizService from "services/quiz.service"
-import { QuizAnswerService } from "services/quizanswer.service"
+import QuizAnswerService from "services/quizanswer.service"
 import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"

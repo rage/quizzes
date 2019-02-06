@@ -30,7 +30,7 @@ import { connect } from 'react-redux'
 import { Redirect } from 'react-router-dom'
 import { arrayMove, SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
 import { addItem, addOption, changeAttr, changeOrder, newQuiz, save, setEdit } from '../store/edit/actions'
-import { setFilter, setLanguage } from '../store/filter/actions'
+import { setLanguage } from '../store/filter/actions'
 import ItemContainer from './ItemContainer'
 import OptionContainer from './OptionContainer'
 import TabContainer from './TabContainer'
@@ -81,7 +81,7 @@ class QuizForm extends React.Component<any, any> {
                     this.props.filter.language === l.id &&
                     <TabContainer
                         items={this.props.edit.items}
-                        peerReviewQuestions={this.props.edit.peerReviewQuestions}
+                        peerReviewQuestionCollections={this.props.edit.peerReviewQuestionCollections}
                         text={this.props.edit.texts.find(text => text.languageId === l.id)}
                         textIndex={this.props.edit.texts.findIndex(text => text.languageId === l.id)}
                         handleChange={this.handleChange}
@@ -97,7 +97,6 @@ class QuizForm extends React.Component<any, any> {
     }
 
     private handleChange = path => event => {
-        console.log(path, event.target.value)
         this.props.changeAttr(path, path.endsWith('correct') || path.endsWith('default') || path.endsWith('Required') ? event.target.checked : event.target.value)
     }
 
@@ -132,7 +131,6 @@ const mapDispatchToProps = {
     newQuiz,
     save,
     setEdit,
-    setFilter,
     setLanguage
 }
 

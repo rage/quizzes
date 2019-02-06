@@ -29,19 +29,21 @@ import React, { ComponentClass } from 'react'
 import { connect } from 'react-redux'
 import { arrayMove, SortableContainer, SortableElement, SortableHandle } from 'react-sortable-hoc'
 import { addItem, addOption, changeAttr, changeOrder, newQuiz, save, setEdit } from '../store/edit/actions'
-import { setFilter } from '../store/filter/actions'
 import Item from './Item'
 import OptionContainer from './OptionContainer'
 import PeerReviewQuestion from './PeerReviewQuestion'
 import SortableWrapper from './SortableWrapper'
 
 const PeerReviewQuestionContainer = SortableContainer((props: any) => {
+
+    const questions = props.edit.peerReviewQuestionCollections[props.collectionIndex].questions
+
     return (
         <div>
-            {props.peerReviewQuestions.map((prq, index) => {
+            {questions.map((prq, index) => {
                 const text = prq.texts.find(t => t.languageId === props.language)
                 return (
-                    <SortableWrapper key={prq.id || prq.type + index} index={index} collection="peerReviewQuestions">
+                    <SortableWrapper key={prq.id || prq.type + index} index={index} collection={`peerReviewQuestionCollections[${props.collectionIndex}.questions]`}>
                         <PeerReviewQuestion
                             answerRequired={prq.answerRequired}
                             default={prq.default}
@@ -51,6 +53,7 @@ const PeerReviewQuestionContainer = SortableContainer((props: any) => {
                             body={text.body}
                             index={index}
                             textIndex={prq.texts.findIndex(t => t.languageId === props.language)}
+                            collectionIndex={props.collectionIndex}
                             handleChange={props.handleChange}
                             remove={props.remove}
                         />
@@ -63,6 +66,7 @@ const PeerReviewQuestionContainer = SortableContainer((props: any) => {
 
 const mapStateToProps = (state: any) => {
     return {
+        edit: state.edit,
         language: state.filter.language,
     }
 }

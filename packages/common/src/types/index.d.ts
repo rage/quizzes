@@ -7,6 +7,8 @@ import {
   QuizOptionTranslation,
   PeerReviewQuestion,
   PeerReviewQuestionTranslation,
+  PeerReviewQuestionCollection,
+  PeerReviewQuestionCollectionTranslation,
 } from "../models"
 
 export class ITMCProfile {
@@ -72,7 +74,7 @@ export interface INewQuizQuery {
   deadline?: Date
   open?: Date
   items: INewQuizItem[]
-  peerReviewQuestions: INewPeerReviewQuestion[]
+  peerReviewQuestionCollections: INewPeerReviewQuestionCollection[]
   excludedFromScore?: boolean
 }
 
@@ -140,6 +142,21 @@ export interface INewPeerReviewQuestion {
 export interface INewPeerReviewQuestionTranslation {
   peerReviewQuestion?: PeerReviewQuestion
   peerReviewQuestionId?: string
+  languageId: string
+  title: string
+  body: string
+}
+
+export interface INewPeerReviewQuestionCollection {
+  quiz?: Quiz
+  quizId?: string
+  texts: INewPeerReviewQuestionCollectionTranslation[]
+  questions: INewPeerReviewQuestion[]
+}
+
+export interface INewPeerReviewQuestionCollectionTranslation {
+  peerReviewQuestionCollection?: PeerReviewQuestionCollection
+  peerReviewQuestionCollectionId: string
   languageId: string
   title: string
   body: string
