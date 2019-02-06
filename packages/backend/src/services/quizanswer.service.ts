@@ -64,6 +64,7 @@ export default class QuizAnswerService {
         text => text.languageId === quizAnswer.languageId,
       )
       let itemStatusObject: any
+      let optionAnswerStatus
       let correct = false
 
       switch (item.type) {
@@ -87,7 +88,7 @@ export default class QuizAnswerService {
           }
           break
         case "radio":
-          const optionAnswerStatus = item.options.map(option => {
+          optionAnswerStatus = item.options.map(option => {
             const optionAnswer = itemAnswer.optionAnswers.find(
               (oa: any) => oa.quizOptionId === option.id,
             )
@@ -126,6 +127,25 @@ export default class QuizAnswerService {
             options: optionAnswerStatus,
           }
           break
+        case "scale":
+          itemStatusObject = {
+            value: itemAnswer.intData,
+          }
+          break
+        case "checkbox":
+        case "research-agreement":
+          optionAnswerStatus = item.options.map(option => {
+            const optionAnswer = itemAnswer.optionAnswers.find(
+              (oa: any) => oa.quizOptionId === option.id,
+            )
+            return {
+              optionId: option.id,
+              selected: optionAnswer ? true : false,
+            }
+          })
+          itemStatusObject = {
+            options: optionAnswerStatus,
+          }
       }
 
       itemStatusObject.itemId = item.id
@@ -135,8 +155,7 @@ export default class QuizAnswerService {
     })
 
     normalizedPoints = points != null ? points / items.length : null
-    console.log("tries", userQuizState.tries)
-    quizAnswer.status = points === null ? quizAnswer.status : "confirmed"
+    quizAnswer.status = quizAnswer.status || "confirmed"
 
     userQuizState.userId = quizAnswer.userId
     userQuizState.quizId = quizAnswer.quizId
