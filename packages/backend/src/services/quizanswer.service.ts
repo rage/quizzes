@@ -6,6 +6,7 @@ import {
   UserQuizState,
 } from "@quizzes/common/models"
 import { IQuizAnswerQuery } from "@quizzes/common/types"
+import { WhereBuilder } from "@quizzes/common/util/index"
 import { Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
@@ -21,6 +22,29 @@ export default class QuizAnswerService {
 
   public async createQuizAnswer(manager: EntityManager, quizAnswer: any) {
     return manager.save(quizAnswer)
+  }
+
+  public async getAnswer(query: any): Promise<QuizAnswer> {
+    const { id, userId, quizId, status } = query
+    const queryBuilder = this.entityManager.createQueryBuilder(
+      QuizAnswer,
+      "quiz_answer",
+    )
+    const whereBuilder: WhereBuilder<QuizAnswer> = new WhereBuilder(
+      queryBuilder,
+    )
+
+    if (id) {
+      whereBuilder.add("quiz_answer.id = :id", { id })
+    }
+    if (userId && quizId && status) {
+      whereBuilder.add(
+        "quiz_answer.user_id = :userId and quiz_answer.quiz_id = :quizId and quiz_answer.status = :status",
+        { userId, quizId, status },
+      )
+    }
+
+    return await queryBuilder.getOne()
   }
 
   public async checkForDeprecated(
@@ -68,6 +92,8 @@ export default class QuizAnswerService {
         case "essay":
           quizAnswer.status = "submitted"
           userQuizState.peerReviewsReceived = 0
+          userQuizState.peerReviewsGiven = userQuizState.peerReviewsGiven || 0
+          userQuizState.spamFlags = 0
           itemStatusObject = {}
           break
         case "open":

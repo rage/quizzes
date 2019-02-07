@@ -32,6 +32,8 @@ export class UserQuizState extends BaseEntity {
   public points: number
   @Column({ type: "numeric", nullable: true })
   public normalizedPoints: number
+  @Column({ type: "int", nullable: true })
+  public spamFlags: number
   @Column({ type: "int", default: 0 })
   public tries: number
   @Column({ type: "enum", enum: ["open", "locked"], default: "open" })

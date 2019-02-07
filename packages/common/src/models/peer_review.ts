@@ -41,8 +41,10 @@ export class PeerReview extends BaseEntity {
   @Column({ type: String, array: true })
   public rejectedQuizAnswerIds: string[]
 
-  @OneToMany(type => PeerReviewQuestionAnswer, prqa => prqa.peerReview)
-  public answers: Promise<PeerReviewQuestionAnswer[]>
+  @OneToMany(type => PeerReviewQuestionAnswer, prqa => prqa.peerReview, {
+    cascade: true,
+  })
+  public answers: PeerReviewQuestionAnswer[]
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date

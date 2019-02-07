@@ -31,6 +31,13 @@ export class Course extends BaseEntity {
   @JoinTable({ name: "course_language" })
   public languages: Language[]
 
+  @Column({ type: "int", nullable: true })
+  public minPeerReviewsReceived: number
+  @Column({ type: "int", nullable: true })
+  public minPeerReviewsGiven: number
+  @Column({ type: "numeric", nullable: true })
+  public maxNegativeReviewPercentage: number
+
   @OneToMany(type => CourseTranslation, ct => ct.course, {
     eager: true,
     cascade: true,
