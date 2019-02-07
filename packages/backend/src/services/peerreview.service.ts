@@ -21,7 +21,7 @@ export default class PeerReviewService {
     manager: EntityManager,
     peerReview: PeerReview,
   ) {
-    await manager.save(peerReview)
+    return await manager.save(peerReview)
   }
 
   public async validateEssayAnswer(

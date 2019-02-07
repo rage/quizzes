@@ -78,8 +78,13 @@ export class PeerReviewController {
     receivingUserQuizState.peerReviewsReceived += 1
     givingUserQuizState.peerReviewsGiven += 1
 
+    let response: PeerReview
+
     await this.entityManager.transaction(async manager => {
-      await this.peerReviewService.createPeerReview(manager, peerReview)
+      response = await this.peerReviewService.createPeerReview(
+        manager,
+        peerReview,
+      )
       const reveivingValidated = await this.peerReviewService.validateEssayAnswer(
         manager,
         quiz[0],
@@ -109,7 +114,7 @@ export class PeerReviewController {
         givingValidated.userQuizState,
       )
     })
-    return ""
+    return response
   }
 
   /*@Post("/")
