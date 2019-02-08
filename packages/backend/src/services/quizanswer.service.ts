@@ -21,6 +21,9 @@ export default class QuizAnswerService {
   private quizService: QuizService
 
   public async createQuizAnswer(manager: EntityManager, quizAnswer: any) {
+    if (!quizAnswer) {
+      return
+    }
     return manager.save(quizAnswer)
   }
 
@@ -90,6 +93,7 @@ export default class QuizAnswerService {
 
       switch (item.type) {
         case "essay":
+          console.log("essay")
           quizAnswer.status = "submitted"
           userQuizState.peerReviewsReceived = 0
           userQuizState.peerReviewsGiven = userQuizState.peerReviewsGiven || 0
@@ -97,6 +101,7 @@ export default class QuizAnswerService {
           itemStatusObject = {}
           break
         case "open":
+          console.log("open")
           const validator = new RegExp(item.validityRegex)
           if (validator.test(itemAnswer.textData)) {
             points += 1
@@ -111,6 +116,7 @@ export default class QuizAnswerService {
           }
           break
         case "radio":
+          console.log("radio")
           optionAnswerStatus = item.options.map(option => {
             const optionAnswer = itemAnswer.optionAnswers.find(
               (oa: any) => oa.quizOptionId === option.id,
@@ -151,12 +157,14 @@ export default class QuizAnswerService {
           }
           break
         case "scale":
+          console.log("scale")
           itemStatusObject = {
             value: itemAnswer.intData,
           }
           break
         case "checkbox":
         case "research-agreement":
+          console.log("other")
           optionAnswerStatus = item.options.map(option => {
             const optionAnswer = itemAnswer.optionAnswers.find(
               (oa: any) => oa.quizOptionId === option.id,
@@ -169,6 +177,7 @@ export default class QuizAnswerService {
           itemStatusObject = {
             options: optionAnswerStatus,
           }
+          break
       }
 
       itemStatusObject.itemId = item.id

@@ -55,6 +55,7 @@ export class QuizController {
     @Param("id") id: string,
     @QueryParams() params: any,
   ): Promise<Quiz[]> {
+    console.log("params", params)
     return await this.getQuizzes(id, params)
   }
 
@@ -68,16 +69,31 @@ export class QuizController {
   private async getQuizzes(id: string | null, params: any): Promise<Quiz[]> {
     const query: IQuizQuery = {
       id,
-      ..._.pick(params, [
-        "course",
-        "courseId",
-        "courseAbbreviation",
-        "language",
-      ]),
-      items: params.items !== "false",
-      course: params.course !== "false",
-      options: params.options !== "false",
-      peerreviews: params.peerreviews !== "false",
+      ..._.pick(params, ["courseId", "courseAbbreviation", "language"]),
+      items:
+        params.items === "true"
+          ? true
+          : params.items === "false"
+          ? false
+          : false,
+      course:
+        params.course === "true"
+          ? true
+          : params.items === "false"
+          ? false
+          : false,
+      options:
+        params.options === "true"
+          ? true
+          : params.items === "false"
+          ? false
+          : false,
+      peerreviews:
+        params.peerreviews === "true"
+          ? true
+          : params.items === "false"
+          ? false
+          : false,
     }
 
     return await this.quizService.getQuizzes(query)

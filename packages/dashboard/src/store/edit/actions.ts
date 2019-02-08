@@ -161,6 +161,7 @@ export const remove = (path, index) => {
 
 const checkForMissingTranslation = paramQuiz => {
   const quiz = JSON.parse(JSON.stringify(paramQuiz))
+  console.log(quiz)
   const languages = quiz.course.languages.map(l => l.id)
   languages.map(language => {
     if (!quiz.texts.find(text => text.languageId === language)) {

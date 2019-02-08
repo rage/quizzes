@@ -13,7 +13,7 @@ const initialState = {
   },
   texts: [],
   items: [],
-  peerReviewQuestions: [],
+  peerReviewQuestionCollections: [],
 }
 
 export const editReducer = (state = initialState, action) => {

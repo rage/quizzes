@@ -7,7 +7,6 @@ import {
   PrimaryColumn,
   RelationId,
   UpdateDateColumn,
-  Double,
 } from "typeorm"
 import { Quiz } from "./quiz"
 import { User } from "./user"

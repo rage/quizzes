@@ -34,6 +34,7 @@ export default class PeerReviewService {
     const given: number = userQuizState.peerReviewsGiven
     const received: number = userQuizState.peerReviewsReceived
     if (
+      quizAnswer &&
       given >= course.minPeerReviewsGiven &&
       received >= course.minPeerReviewsReceived
     ) {

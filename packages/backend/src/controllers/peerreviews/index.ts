@@ -73,6 +73,7 @@ export class PeerReviewController {
 
     const quiz = await this.QuizService.getQuizzes({
       id: receivingQuizAnswer.quizId,
+      course: true,
     })
 
     receivingUserQuizState.peerReviewsReceived += 1
