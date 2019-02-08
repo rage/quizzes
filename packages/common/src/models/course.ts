@@ -37,6 +37,8 @@ export class Course extends BaseEntity {
   public minPeerReviewsGiven: number
   @Column({ type: "numeric", nullable: true })
   public maxNegativeReviewPercentage: number
+  @Column({ type: "int", nullable: true })
+  public maxSpamFlags: number
 
   @OneToMany(type => CourseTranslation, ct => ct.course, {
     eager: true,
