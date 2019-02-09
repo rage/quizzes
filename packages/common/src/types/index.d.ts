@@ -52,6 +52,7 @@ export interface IQuizQuery {
   items?: boolean
   options?: boolean
   peerreviews?: boolean
+  stripped?: boolean
 }
 
 export interface IQuizAnswerQuery {

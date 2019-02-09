@@ -37,7 +37,7 @@ export class QuizOption extends BaseEntity {
   })
   public texts: QuizOptionTranslation[]
 
-  @Column()
+  @Column({ select: false })
   public correct: boolean
 
   @CreateDateColumn({ type: "timestamp" })
@@ -92,9 +92,9 @@ export class QuizOptionTranslation extends BaseEntity {
   @Column({ type: "text", nullable: true })
   public body?: string
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: "text", nullable: true, select: false })
   public successMessage?: string
-  @Column({ type: "text", nullable: true })
+  @Column({ type: "text", nullable: true, select: false })
   public failureMessage?: string
 
   @CreateDateColumn({ type: "timestamp" })

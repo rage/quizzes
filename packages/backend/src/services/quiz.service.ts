@@ -42,6 +42,7 @@ export default class QuizService {
   public async getQuizzes(query: any): Promise<Quiz[]> {
     const queryBuilder = this.entityManager.createQueryBuilder(Quiz, "quiz")
     const language = query.language
+    const stripped = query.stripped
 
     if (language) {
       queryBuilder.leftJoinAndSelect(
@@ -79,6 +80,12 @@ export default class QuizService {
       } else {
         queryBuilder.leftJoinAndSelect("item.texts", "item_translation")
       }
+      if (!stripped) {
+        queryBuilder
+          .addSelect("item.validityRegex")
+          .addSelect("item_translation.successMessage")
+          .addSelect("item_translation.failureMessage")
+      }
     }
 
     if (query.options) {
@@ -91,6 +98,12 @@ export default class QuizService {
         )
       } else {
         queryBuilder.leftJoinAndSelect("option.texts", "option_translation")
+      }
+      if (!stripped) {
+        queryBuilder
+          .addSelect("option.correct")
+          .addSelect("option_translation.successMessage")
+          .addSelect("option_translation.failureMessage")
       }
     }
 

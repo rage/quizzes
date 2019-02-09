@@ -49,7 +49,7 @@ export class QuizItem extends BaseEntity {
   })
   public options: QuizOption[]
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, select: false })
   public validityRegex?: string
   @Column({ nullable: true })
   public formatRegex?: string
@@ -117,9 +117,9 @@ export class QuizItemTranslation extends BaseEntity {
   @Column({ type: "text", nullable: true })
   public body?: string
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: "text", nullable: true, select: false })
   public successMessage?: string
-  @Column({ type: "text", nullable: true })
+  @Column({ type: "text", nullable: true, select: false })
   public failureMessage?: string
 
   @CreateDateColumn({ type: "timestamp" })
