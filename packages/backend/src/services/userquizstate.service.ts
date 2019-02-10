@@ -3,8 +3,8 @@ import {
   QuizAnswer,
   QuizItem,
   QuizItemAnswer,
-  UserQuizState,
   User,
+  UserQuizState,
 } from "@quizzes/common/models"
 import { IQuizAnswerQuery } from "@quizzes/common/types"
 import { WhereBuilder } from "@quizzes/common/util"
@@ -32,5 +32,23 @@ export default class UserQuizStateService {
     userQuizState: UserQuizState,
   ) {
     await manager.save(userQuizState)
+  }
+
+  public async getQuizStatesForUserCourse(
+    manager: EntityManager,
+    userId: number,
+    quizIds: string[],
+  ): Promise<UserQuizState[]> {
+    return await manager
+      .createQueryBuilder(UserQuizState, "user_quiz_state")
+      .innerJoin(
+        QuizAnswer,
+        "quiz_answer",
+        "user_quiz_state.user_id = quiz_answer.user_id and user_quiz_state.quiz_id = quiz_answer.quiz_id",
+      )
+      .where("user_quiz_state.user_id = :userId", { userId })
+      .andWhere("user_quiz_state.quiz_id in (:...quizIds)", { quizIds })
+      .andWhere("quiz_answer.status = 'confirmed'")
+      .getMany()
   }
 }

@@ -18,6 +18,7 @@ import {
 import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
+import UserCourseStateService from "services/usercoursestate.service"
 import UserQuizStateService from "services/userquizstate.service"
 import ValidationService from "services/validation.service"
 import { Inject } from "typedi"
@@ -44,6 +45,9 @@ export class PeerReviewController {
 
   @Inject()
   private validationService: ValidationService
+
+  @Inject()
+  private userCourseStateService: UserCourseStateService
 
   @Get("/")
   public async get(
@@ -90,7 +94,7 @@ export class PeerReviewController {
         manager,
         peerReview,
       )
-      const reveivingValidated = await this.validationService.validateEssayAnswer(
+      const receivingValidated = await this.validationService.validateEssayAnswer(
         manager,
         quiz[0],
         receivingQuizAnswer,
@@ -104,7 +108,7 @@ export class PeerReviewController {
       )
       await this.quizAnswerService.createQuizAnswer(
         manager,
-        reveivingValidated.quizAnswer,
+        receivingValidated.quizAnswer,
       )
       await this.quizAnswerService.createQuizAnswer(
         manager,
@@ -112,12 +116,32 @@ export class PeerReviewController {
       )
       await this.userQuizStateService.createUserQuizState(
         manager,
-        reveivingValidated.userQuizState,
+        receivingValidated.userQuizState,
       )
       await this.userQuizStateService.createUserQuizState(
         manager,
         givingValidated.userQuizState,
       )
+      if (
+        !quiz[0].excludedFromScore &&
+        receivingValidated.quizAnswer.status === "confirmed"
+      ) {
+        await this.userCourseStateService.updateUserCourseState(
+          manager,
+          quiz[0],
+          receivingValidated.userQuizState,
+        )
+      }
+      if (
+        !quiz[0].excludedFromScore &&
+        givingValidated.quizAnswer.status === "confirmed"
+      ) {
+        await this.userCourseStateService.updateUserCourseState(
+          manager,
+          quiz[0],
+          givingValidated.userQuizState,
+        )
+      }
     })
     return response
   }

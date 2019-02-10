@@ -27,7 +27,7 @@ export default class ValidationService {
     const userQuizState = userState || new UserQuizState()
     const items: QuizItem[] = quiz.items
     let points: number | null = null
-    let normalizedPoints
+    let pointsAwarded
     const itemAnswerStatus = items.map(item => {
       const itemAnswer = quizAnswer.itemAnswers.find(
         (ia: QuizItemAnswer) => ia.quizItemId === item.id,
@@ -41,7 +41,6 @@ export default class ValidationService {
 
       switch (item.type) {
         case "essay":
-          console.log("essay")
           quizAnswer.status = "submitted"
           userQuizState.peerReviewsReceived = 0
           userQuizState.peerReviewsGiven = userQuizState.peerReviewsGiven || 0
@@ -49,7 +48,6 @@ export default class ValidationService {
           itemStatusObject = {}
           break
         case "open":
-          console.log("open")
           const validator = new RegExp(item.validityRegex)
           if (validator.test(itemAnswer.textData)) {
             points += 1
@@ -64,7 +62,6 @@ export default class ValidationService {
           }
           break
         case "radio":
-          console.log("radio")
           optionAnswerStatus = item.options.map(option => {
             const optionAnswer = itemAnswer.optionAnswers.find(
               (oa: any) => oa.quizOptionId === option.id,
@@ -105,14 +102,12 @@ export default class ValidationService {
           }
           break
         case "scale":
-          console.log("scale")
           itemStatusObject = {
             value: itemAnswer.intData,
           }
           break
         case "checkbox":
         case "research-agreement":
-          console.log("other")
           optionAnswerStatus = item.options.map(option => {
             const optionAnswer = itemAnswer.optionAnswers.find(
               (oa: any) => oa.quizOptionId === option.id,
@@ -134,17 +129,16 @@ export default class ValidationService {
       return itemStatusObject
     })
 
-    normalizedPoints = points != null ? points / items.length : null
+    pointsAwarded =
+      points != null ? (points / items.length) * quiz.points : null
     quizAnswer.status = quizAnswer.status || "confirmed"
 
     userQuizState.userId = quizAnswer.userId
     userQuizState.quizId = quizAnswer.quizId
-    userQuizState.points =
-      userQuizState.points > points ? userQuizState.points : points
-    userQuizState.normalizedPoints =
-      userQuizState.normalizedPoints > normalizedPoints
-        ? userQuizState.normalizedPoints
-        : normalizedPoints
+    userQuizState.pointsAwarded =
+      userQuizState.pointsAwarded > pointsAwarded
+        ? userQuizState.pointsAwarded
+        : pointsAwarded
     userQuizState.tries = userQuizState.tries ? userQuizState.tries + 1 : 1
     userQuizState.status = "locked"
 
@@ -192,12 +186,10 @@ export default class ValidationService {
       })
       if (sadFaces / total <= course.maxNegativeReviewPercentage) {
         quizAnswer.status = "confirmed"
-        userQuizState.points = 1
-        userQuizState.normalizedPoints = 1
+        userQuizState.pointsAwarded = 1 * quiz.points
       } else {
         quizAnswer.status = "rejected"
-        userQuizState.points = 0
-        userQuizState.normalizedPoints = 0
+        userQuizState.pointsAwarded = 0
         userQuizState.status = "open"
       }
     }

@@ -13,7 +13,7 @@ import { PeerReviewController } from "./peerreviews"
 import { QuizAnswerController } from "./quizanswers"
 import { QuizController } from "./quizzes"
 import { SpamFlagController } from "./spamflags"
-import { UserCourseStateController } from "./userquizstate"
+import { UserCourseStateController } from "./usercoursestate"
 
 export default [
   CourseController,

@@ -42,6 +42,9 @@ export class Quiz extends BaseEntity {
   @Column({ type: "int", nullable: true })
   public section?: number
 
+  @Column({ type: "int", default: 1 })
+  public points: number
+
   @Column({ type: "timestamp", nullable: true })
   public deadline?: Date
   @Column({ type: "timestamp", nullable: true })
