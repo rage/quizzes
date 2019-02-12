@@ -52,12 +52,15 @@ export interface IQuizQuery {
   items?: boolean
   options?: boolean
   peerreviews?: boolean
+  stripped?: boolean
+  exclude?: boolean
 }
 
 export interface IQuizAnswerQuery {
   id?: string
-  quiz_id?: string
-  user_id?: number
+  quizId?: string
+  userId?: number
+  status?: string
 }
 
 interface ICourseQuery {

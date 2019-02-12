@@ -39,15 +39,16 @@ export default class QuizService {
   @InjectManager()
   private entityManager: EntityManager
 
-  public async getQuizzes(query: any): Promise<Quiz[]> {
+  public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
     const queryBuilder = this.entityManager.createQueryBuilder(Quiz, "quiz")
-    const language = query.language
+    const { courseId, exclude, id, language, stripped } = query
 
     if (language) {
       queryBuilder.leftJoinAndSelect(
         "quiz.texts",
         "quiz_translation",
-        `quiz_translation.language_id = '${language}'`,
+        "quiz_translation.language_id = :language",
+        { language },
       )
     } else {
       queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
@@ -61,7 +62,8 @@ export default class QuizService {
         queryBuilder.leftJoinAndSelect(
           "course.texts",
           "course_translation",
-          `course_translation.language_id = '${language}'`,
+          "course_translation.language_id = :language",
+          { language },
         )
       } else {
         queryBuilder.leftJoinAndSelect("course.texts", "course_translation")
@@ -74,10 +76,17 @@ export default class QuizService {
         queryBuilder.leftJoinAndSelect(
           "item.texts",
           "item_translation",
-          `item_translation.language_id = '${language}'`,
+          "item_translation.language_id = :language",
+          { language },
         )
       } else {
         queryBuilder.leftJoinAndSelect("item.texts", "item_translation")
+      }
+      if (!stripped) {
+        queryBuilder
+          .addSelect("item.validityRegex")
+          .addSelect("item_translation.successMessage")
+          .addSelect("item_translation.failureMessage")
       }
     }
 
@@ -87,10 +96,17 @@ export default class QuizService {
         queryBuilder.leftJoinAndSelect(
           "option.texts",
           "option_translation",
-          `option_translation.language_id = '${language}'`,
+          "option_translation.language_id = :language",
+          { language },
         )
       } else {
         queryBuilder.leftJoinAndSelect("option.texts", "option_translation")
+      }
+      if (!stripped) {
+        queryBuilder
+          .addSelect("option.correct")
+          .addSelect("option_translation.successMessage")
+          .addSelect("option_translation.failureMessage")
       }
     }
 
@@ -109,12 +125,14 @@ export default class QuizService {
           .leftJoinAndSelect(
             "peer_review_question_collection.texts",
             "peer_review_question_collection_translation",
-            `peer_review_question_collection_translation.language_id = '${language}'`,
+            "peer_review_question_collection_translation.language_id = :language",
+            { language },
           )
           .leftJoinAndSelect(
             "peer_review_question.texts",
             "peer_review_question_translation",
-            `peer_review_question_translation.language_id = '${language}'`,
+            "peer_review_question_translation.language_id = :language",
+            { language },
           )
       } else {
         queryBuilder
@@ -129,12 +147,16 @@ export default class QuizService {
       }
     }
 
-    if (query.id) {
-      queryBuilder.andWhere(`quiz.id = '${query.id}'`)
+    if (id) {
+      queryBuilder.andWhere("quiz.id = :id", { id })
     }
 
-    if (query.courseId) {
-      queryBuilder.andWhere(`quiz.courseId = '${query.courseId}'`)
+    if (courseId) {
+      queryBuilder.andWhere("quiz.courseId = :courseId", { courseId })
+    }
+
+    if (exclude) {
+      queryBuilder.andWhere("quiz.excluded_from_score = false")
     }
 
     return await queryBuilder.getMany()

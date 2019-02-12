@@ -18,6 +18,7 @@ import {
 import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
+import UserCourseStateService from "services/usercoursestate.service"
 import UserQuizStateService from "services/userquizstate.service"
 import ValidationService from "services/validation.service"
 import { Inject } from "typedi"
@@ -45,6 +46,9 @@ export class PeerReviewController {
   @Inject()
   private validationService: ValidationService
 
+  @Inject()
+  private userCourseStateService: UserCourseStateService
+
   @Get("/")
   public async get(
     @Param("id") id: string,
@@ -57,6 +61,7 @@ export class PeerReviewController {
   public async post(@EntityFromBody() peerReview: PeerReview): Promise<any> {
     const receivingQuizAnswer: QuizAnswer = await this.quizAnswerService.getAnswer(
       { id: peerReview.quizAnswerId },
+      this.entityManager,
     )
     const givingQuizAnswer: QuizAnswer = await this.quizAnswerService.getAnswer(
       {
@@ -64,6 +69,7 @@ export class PeerReviewController {
         quizId: receivingQuizAnswer.quizId,
         status: "submitted",
       },
+      this.entityManager,
     )
 
     const receivingUserQuizState: UserQuizState = await this.userQuizStateService.getUserQuizState(
@@ -90,7 +96,7 @@ export class PeerReviewController {
         manager,
         peerReview,
       )
-      const reveivingValidated = await this.validationService.validateEssayAnswer(
+      const receivingValidated = await this.validationService.validateEssayAnswer(
         manager,
         quiz[0],
         receivingQuizAnswer,
@@ -102,22 +108,44 @@ export class PeerReviewController {
         givingQuizAnswer,
         givingUserQuizState,
       )
-      await this.quizAnswerService.createQuizAnswer(
+      const receivingAnswerUpdated: QuizAnswer = await this.quizAnswerService.createQuizAnswer(
         manager,
-        reveivingValidated.quizAnswer,
+        receivingValidated.quizAnswer,
       )
-      await this.quizAnswerService.createQuizAnswer(
+      const givingAnswerUpdated = await this.quizAnswerService.createQuizAnswer(
         manager,
         givingValidated.quizAnswer,
       )
       await this.userQuizStateService.createUserQuizState(
         manager,
-        reveivingValidated.userQuizState,
+        receivingValidated.userQuizState,
       )
       await this.userQuizStateService.createUserQuizState(
         manager,
         givingValidated.userQuizState,
       )
+      if (
+        !quiz[0].excludedFromScore &&
+        receivingValidated.quizAnswer.status === "confirmed"
+      ) {
+        await this.userCourseStateService.updateUserCourseState(
+          manager,
+          quiz[0],
+          receivingValidated.userQuizState,
+          receivingAnswerUpdated,
+        )
+      }
+      if (
+        !quiz[0].excludedFromScore &&
+        givingValidated.quizAnswer.status === "confirmed"
+      ) {
+        await this.userCourseStateService.updateUserCourseState(
+          manager,
+          quiz[0],
+          givingValidated.userQuizState,
+          givingAnswerUpdated,
+        )
+      }
     })
     return response
   }

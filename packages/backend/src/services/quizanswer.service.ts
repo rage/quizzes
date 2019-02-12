@@ -30,12 +30,12 @@ export default class QuizAnswerService {
     return manager.save(quizAnswer)
   }
 
-  public async getAnswer(query: any): Promise<QuizAnswer> {
+  public async getAnswer(
+    query: IQuizAnswerQuery,
+    manager: EntityManager,
+  ): Promise<QuizAnswer> {
     const { id, userId, quizId, status } = query
-    const queryBuilder = this.entityManager.createQueryBuilder(
-      QuizAnswer,
-      "quiz_answer",
-    )
+    const queryBuilder = manager.createQueryBuilder(QuizAnswer, "quiz_answer")
     const whereBuilder: WhereBuilder<QuizAnswer> = new WhereBuilder(
       queryBuilder,
     )
@@ -50,17 +50,17 @@ export default class QuizAnswerService {
       )
     }
 
-    return await queryBuilder.getOne()
+    return await queryBuilder.orderBy("quiz_answer.updated_at", "DESC").getOne()
   }
 
   public async getAnswers(query: IQuizAnswerQuery): Promise<QuizAnswer[]> {
-    const { id, quiz_id, user_id } = query
+    const { id, quizId, userId } = query
 
     const queryBuilder: SelectQueryBuilder<
       QuizAnswer
     > = QuizAnswer.createQueryBuilder("quiz_answer")
 
-    if (!id && !quiz_id && !user_id) {
+    if (!id && !quizId && !userId) {
       return []
     }
 
@@ -68,12 +68,12 @@ export default class QuizAnswerService {
       queryBuilder.where("quiz_answer.id = :id", { id })
     }
 
-    if (quiz_id) {
-      queryBuilder.where("quiz_answer.quiz_id = :quiz_id", { quiz_id })
+    if (quizId) {
+      queryBuilder.where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
     }
 
-    if (user_id) {
-      queryBuilder.where("quiz_answer.user_id = :user_id", { user_id })
+    if (userId) {
+      queryBuilder.where("quiz_answer.user_id = :user_id", { user_id: userId })
     }
 
     queryBuilder.leftJoinAndSelect(

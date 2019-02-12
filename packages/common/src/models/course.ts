@@ -32,6 +32,10 @@ export class Course extends BaseEntity {
   public languages: Language[]
 
   @Column({ type: "int", nullable: true })
+  public minScoreToPass: number
+  @Column({ type: "int", nullable: true })
+  public minProgressToPass: number
+  @Column({ type: "int", nullable: true })
   public minPeerReviewsReceived: number
   @Column({ type: "int", nullable: true })
   public minPeerReviewsGiven: number

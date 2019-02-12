@@ -12,6 +12,7 @@ import {
 } from "routing-controllers"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
+import UserCourseStateService from "services/usercoursestate.service"
 import UserQuizStateService from "services/userquizstate.service"
 import ValidationService from "services/validation.service"
 import { Inject } from "typedi"
@@ -29,6 +30,9 @@ export class QuizAnswerController {
 
   @Inject()
   private userQuizStateService: UserQuizStateService
+
+  @Inject()
+  private userCourseStateService: UserCourseStateService
 
   @Inject()
   private quizService: QuizService
@@ -53,12 +57,23 @@ export class QuizAnswerController {
       userQuizState,
     } = this.validationService.validateQuizAnswer(answer, quiz[0], userQState)
     await this.entityManager.transaction(async manager => {
-      await this.userQuizStateService.createUserQuizState(
+      const savedUserQuizState: UserQuizState = await this.userQuizStateService.createUserQuizState(
         manager,
         userQuizState,
       )
       await this.validationService.checkForDeprecated(manager, quizAnswer)
-      await this.quizAnswerService.createQuizAnswer(manager, quizAnswer)
+      const savedAnswer: QuizAnswer = await this.quizAnswerService.createQuizAnswer(
+        manager,
+        quizAnswer,
+      )
+      if (!quiz[0].excludedFromScore && savedAnswer.status === "confirmed") {
+        await this.userCourseStateService.updateUserCourseState(
+          manager,
+          quiz[0],
+          savedUserQuizState,
+          savedAnswer,
+        )
+      }
     })
     return response
   }

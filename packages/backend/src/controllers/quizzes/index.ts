@@ -79,19 +79,25 @@ export class QuizController {
       course:
         params.course === "true"
           ? true
-          : params.items === "false"
+          : params.course === "false"
           ? false
           : false,
       options:
         params.options === "true"
           ? true
-          : params.items === "false"
+          : params.options === "false"
           ? false
           : false,
       peerreviews:
         params.peerreviews === "true"
           ? true
-          : params.items === "false"
+          : params.peerreviews === "false"
+          ? false
+          : false,
+      stripped:
+        params.stripped === "true"
+          ? true
+          : params.stripped === "false"
           ? false
           : false,
     }
