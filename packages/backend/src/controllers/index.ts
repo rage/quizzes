@@ -12,10 +12,12 @@ import { CourseController } from "./courses"
 import { PeerReviewController } from "./peerreviews"
 import { QuizAnswerController } from "./quizanswers"
 import { QuizController } from "./quizzes"
+import { SpamFlagController } from "./spamflags"
 
 export default [
   CourseController,
   PeerReviewController,
   QuizAnswerController,
   QuizController,
+  SpamFlagController,
 ]

@@ -24,44 +24,6 @@ export default class PeerReviewService {
     return await manager.save(peerReview)
   }
 
-  public async validateEssayAnswer(
-    manager: EntityManager,
-    quiz: Quiz,
-    quizAnswer: QuizAnswer,
-    userQuizState: UserQuizState,
-  ) {
-    const course: Course = quiz.course
-    const given: number = userQuizState.peerReviewsGiven
-    const received: number = userQuizState.peerReviewsReceived
-    if (
-      given >= course.minPeerReviewsGiven &&
-      received >= course.minPeerReviewsReceived
-    ) {
-      const peerReviews = await this.getPeerReviews(manager, quizAnswer.id)
-      let sadFaces: number = 0
-      let total: number = 0
-      peerReviews.map(pr => {
-        pr.answers.map(answer => {
-          if (answer.value === 1) {
-            sadFaces += 1
-          }
-          total += 1
-        })
-      })
-      if (sadFaces / total <= course.maxNegativeReviewPercentage) {
-        quizAnswer.status = "confirmed"
-        userQuizState.points = 1
-        userQuizState.normalizedPoints = 1
-      } else {
-        quizAnswer.status = "rejected"
-        userQuizState.points = 0
-        userQuizState.normalizedPoints = 0
-        userQuizState.status = "open"
-      }
-    }
-    return { quizAnswer, userQuizState }
-  }
-
   public async getPeerReviews(manager: EntityManager, quizAnswerId: string) {
     return await manager
       .createQueryBuilder(PeerReview, "peer_review")

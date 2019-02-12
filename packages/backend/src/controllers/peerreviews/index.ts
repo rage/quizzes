@@ -19,6 +19,7 @@ import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
 import UserQuizStateService from "services/userquizstate.service"
+import ValidationService from "services/validation.service"
 import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
@@ -40,6 +41,9 @@ export class PeerReviewController {
 
   @Inject()
   private QuizService: QuizService
+
+  @Inject()
+  private validationService: ValidationService
 
   @Get("/")
   public async get(
@@ -73,6 +77,7 @@ export class PeerReviewController {
 
     const quiz = await this.QuizService.getQuizzes({
       id: receivingQuizAnswer.quizId,
+      course: true,
     })
 
     receivingUserQuizState.peerReviewsReceived += 1
@@ -85,13 +90,13 @@ export class PeerReviewController {
         manager,
         peerReview,
       )
-      const reveivingValidated = await this.peerReviewService.validateEssayAnswer(
+      const reveivingValidated = await this.validationService.validateEssayAnswer(
         manager,
         quiz[0],
         receivingQuizAnswer,
         receivingUserQuizState,
       )
-      const givingValidated = await this.peerReviewService.validateEssayAnswer(
+      const givingValidated = await this.validationService.validateEssayAnswer(
         manager,
         quiz[0],
         givingQuizAnswer,

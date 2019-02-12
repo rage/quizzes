@@ -28,22 +28,9 @@ import {
   WhereBuilder,
 } from "@quizzes/common/util"
 import _ from "lodash"
-import { Service, Container } from "typedi"
+import { Service } from "typedi"
+import { EntityManager } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
-import {
-  BaseEntity,
-  Brackets,
-  EntityManager,
-  getManager,
-  InsertResult,
-  PromiseUtils,
-  SelectQueryBuilder,
-  TransactionManager,
-  AdvancedConsoleLogger,
-  QueryBuilder,
-  ObjectLiteral,
-  FindOptionsWhereCondition,
-} from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import quizanswerService from "./quizanswer.service"
 
@@ -52,37 +39,105 @@ export default class QuizService {
   @InjectManager()
   private entityManager: EntityManager
 
-  public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
-    const { id, language } = query
+  public async getQuizzes(query: any): Promise<Quiz[]> {
+    const queryBuilder = this.entityManager.createQueryBuilder(Quiz, "quiz")
+    const language = query.language
 
-    console.log("query", query)
-    const queryBuilder: SelectQueryBuilder<
-      Quiz
-    > = this.entityManager.createQueryBuilder(Quiz, "quiz")
-
-    const whereBuilder: WhereBuilder<Quiz> = new WhereBuilder(queryBuilder)
-
-    queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
     if (language) {
-      whereBuilder.add("quiz_translation.language_id = :language", { language })
-    }
-
-    this.queryCourse(queryBuilder, whereBuilder, query)
-    this.queryItems(queryBuilder, whereBuilder, query)
-    this.queryPeerReviewCollections(queryBuilder, whereBuilder, query)
-
-    if (id) {
-      whereBuilder.add("quiz.id = :id", { id })
-    }
-
-    return await queryBuilder
-      .getMany()
-      .then(
-        async (quizzes: Quiz[]) =>
-          await Promise.all(
-            quizzes.map(async (q: Quiz) => this.stripQuiz(q, query)),
-          ),
+      queryBuilder.leftJoinAndSelect(
+        "quiz.texts",
+        "quiz_translation",
+        `quiz_translation.language_id = '${language}'`,
       )
+    } else {
+      queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
+    }
+
+    if (query.course) {
+      queryBuilder
+        .leftJoinAndSelect("quiz.course", "course")
+        .leftJoinAndSelect("course.languages", "language")
+      if (language) {
+        queryBuilder.leftJoinAndSelect(
+          "course.texts",
+          "course_translation",
+          `course_translation.language_id = '${language}'`,
+        )
+      } else {
+        queryBuilder.leftJoinAndSelect("course.texts", "course_translation")
+      }
+    }
+
+    if (query.items) {
+      queryBuilder.leftJoinAndSelect("quiz.items", "item")
+      if (language) {
+        queryBuilder.leftJoinAndSelect(
+          "item.texts",
+          "item_translation",
+          `item_translation.language_id = '${language}'`,
+        )
+      } else {
+        queryBuilder.leftJoinAndSelect("item.texts", "item_translation")
+      }
+    }
+
+    if (query.options) {
+      queryBuilder.leftJoinAndSelect("item.options", "option")
+      if (language) {
+        queryBuilder.leftJoinAndSelect(
+          "option.texts",
+          "option_translation",
+          `option_translation.language_id = '${language}'`,
+        )
+      } else {
+        queryBuilder.leftJoinAndSelect("option.texts", "option_translation")
+      }
+    }
+
+    if (query.peerreviews) {
+      queryBuilder
+        .leftJoinAndSelect(
+          "quiz.peerReviewQuestionCollections",
+          "peer_review_question_collection",
+        )
+        .leftJoinAndSelect(
+          "peer_review_question_collection.questions",
+          "peer_review_question",
+        )
+      if (language) {
+        queryBuilder
+          .leftJoinAndSelect(
+            "peer_review_question_collection.texts",
+            "peer_review_question_collection_translation",
+            `peer_review_question_collection_translation.language_id = '${language}'`,
+          )
+          .leftJoinAndSelect(
+            "peer_review_question.texts",
+            "peer_review_question_translation",
+            `peer_review_question_translation.language_id = '${language}'`,
+          )
+      } else {
+        queryBuilder
+          .leftJoinAndSelect(
+            "peer_review_question_collection.texts",
+            "peer_review_question_collection_translation",
+          )
+          .leftJoinAndSelect(
+            "peer_review_question.texts",
+            "peer_review_question_translation",
+          )
+      }
+    }
+
+    if (query.id) {
+      queryBuilder.andWhere(`quiz.id = '${query.id}'`)
+    }
+
+    if (query.courseId) {
+      queryBuilder.andWhere(`quiz.courseId = '${query.courseId}'`)
+    }
+
+    return await queryBuilder.getMany()
   }
 
   public async createQuiz(quiz: Quiz): Promise<Quiz | undefined> {
@@ -232,250 +287,5 @@ export default class QuizService {
         toBeRemoved.prQuestionIds || [],
       )
     }
-  }
-
-  /*   private queryPeerReviews(
-    queryBuilder: SelectQueryBuilder<Quiz>,
-    whereBuilder: WhereBuilder<Quiz>,
-    query: IQuizQuery,
-  ) {
-    const { peerreviews, language } = query
-
-    if (!peerreviews) {
-      return
-    }
-    queryBuilder
-      .leftJoinAndSelect(
-        "quiz.peerReviewQuestionCollections",
-        "peer_review_question_collection",
-      )
-      .leftJoinAndSelect(
-        "peer_review_question_collection.texts",
-        "peer_review_question_collection_translation",
-      )
-
-    if (language) {
-      whereBuilder.add(
-        // queryBuilder.andWhere(
-        new Brackets(qb => {
-          qb.where(
-            "peer_review_question_collection_translation.language_id = :language",
-            {
-              language,
-            },
-          ).orWhere("peer_review_question_collection_translation is null")
-        }),
-      )
-    }
-  } */
-
-  /*private queryPeerReviews(
-    queryBuilder: SelectQueryBuilder<Quiz>,
-    whereBuilder: WhereBuilder<Quiz>,
-    query: IQuizQuery,
-  ) {
-    const { peerreviews, language } = query
-
-    if (!peerreviews) {
-      return
-    }
-    queryBuilder
-      .leftJoinAndSelect("quiz.peerReviewQuestions", "peer_review_question")
-      .leftJoinAndSelect(
-        "peer_review_question.texts",
-        "peer_review_question_translation",
-      )
-
-    if (language) {
-      whereBuilder.add(
-        // queryBuilder.andWhere(
-        new Brackets(qb => {
-          qb.where("peer_review_question_translation.language_id = :language", {
-            language,
-          }).orWhere("peer_review_question_translation is null")
-        }),
-      )
-    }
-  }*/
-
-  private queryOptions(
-    queryBuilder: SelectQueryBuilder<Quiz>,
-    whereBuilder: WhereBuilder<Quiz>,
-    query: IQuizQuery,
-  ) {
-    const { options, language } = query
-
-    if (!options) {
-      return
-    }
-
-    queryBuilder
-      .leftJoinAndSelect("quiz_item.options", "quiz_option")
-      .leftJoinAndSelect("quiz_option.texts", "quiz_option_translation")
-
-    if (language) {
-      whereBuilder.add(
-        new Brackets(qb => {
-          qb.where("quiz_option_translation.language_id = :language", {
-            language,
-          }).orWhere("quiz_option_translation.language_id is null")
-        }),
-      )
-    }
-  }
-
-  private queryItems(
-    queryBuilder: SelectQueryBuilder<Quiz>,
-    whereBuilder: WhereBuilder<Quiz>,
-    query: IQuizQuery,
-  ) {
-    const { items, options, language } = query
-
-    if (!items || !language) {
-      return
-    }
-
-    queryBuilder
-      .leftJoinAndSelect("quiz.items", "quiz_item")
-      .leftJoinAndSelect("quiz_item.texts", "quiz_item_translation")
-
-    if (language) {
-      whereBuilder.add(
-        new Brackets(qb => {
-          qb.where("quiz_item_translation.language_id = :language", {
-            language,
-          }).orWhere("quiz_item_translation.language_id is null")
-        }),
-      )
-    }
-
-    if (options) {
-      this.queryOptions(queryBuilder, whereBuilder, query)
-    }
-  }
-
-  private queryPeerReviewQuestions(
-    queryBuilder: SelectQueryBuilder<Quiz>,
-    whereBuilder: WhereBuilder<Quiz>,
-    query: IQuizQuery,
-  ) {
-    const { peerreviews, language } = query
-
-    if (!peerreviews) {
-      return
-    }
-
-    queryBuilder
-      .leftJoinAndSelect("quiz_prqc.questions", "quiz_prq")
-      .leftJoinAndSelect("quiz_prq.texts", "quiz_prq_translation")
-
-    if (language) {
-      whereBuilder.add(
-        new Brackets(qb => {
-          qb.where("quiz_prq_translation.language_id = :language", {
-            language,
-          }).orWhere("quiz_prq_translation.language_id is null")
-        }),
-      )
-    }
-  }
-
-  private queryPeerReviewCollections(
-    queryBuilder: SelectQueryBuilder<Quiz>,
-    whereBuilder: WhereBuilder<Quiz>,
-    query: IQuizQuery,
-  ) {
-    const { peerreviews, language } = query
-
-    if (!peerreviews || !language) {
-      return
-    }
-
-    queryBuilder
-      .leftJoinAndSelect("quiz.peer_review_question_collections", "quiz_prqc")
-      .leftJoinAndSelect("quiz_prqc.texts", "quiz_prqc_translation")
-
-    if (language) {
-      whereBuilder.add(
-        new Brackets(qb => {
-          qb.where("quiz_prqc_translation.language_id = :language", {
-            language,
-          }).orWhere("quiz_prqc_translation.language_id is null")
-        }),
-      )
-    }
-
-    //if (options) {
-    this.queryPeerReviewQuestions(queryBuilder, whereBuilder, query)
-    //}
-  }
-
-  private queryCourse(
-    queryBuilder: SelectQueryBuilder<Quiz>,
-    whereBuilder: WhereBuilder<Quiz>,
-    query: IQuizQuery,
-  ) {
-    const { course, courseId, courseAbbreviation, language } = query
-
-    if (!course) {
-      return
-    }
-
-    queryBuilder
-      .innerJoinAndSelect("quiz.course", "course")
-      .innerJoinAndSelect("course.texts", "course_translation")
-      .innerJoinAndSelect("course.languages", "language")
-
-    if (courseId) {
-      whereBuilder.add("course_translation.course_id = :courseId", { courseId })
-    }
-    if (courseAbbreviation) {
-      whereBuilder.add(
-        "course_translation.abbreviation = :courseAbbreviation",
-        { courseAbbreviation },
-      )
-    }
-
-    if (language) {
-      whereBuilder.add("language.id = :language", { language }).add(
-        new Brackets(qb => {
-          qb.where("course_translation.language_id = :language", {
-            language,
-          }).orWhere("course_translation.language_id is null")
-        }),
-      )
-    }
-  }
-
-  private async stripQuiz(quiz: Quiz, options: IQuizQuery): Promise<Quiz> {
-    await quiz.course
-
-    if (options.language) {
-      quiz.texts = quiz.texts.filter(t => t.languageId === options.language)
-    }
-
-    if (options.items) {
-      if (!options.options) {
-        ;(quiz.items || []).forEach(item => {
-          item.options = []
-        })
-      }
-
-      if (options.language) {
-        ;(quiz.items || []).forEach(item => {
-          item.texts = item.texts.filter(t => t.languageId === options.language)
-          item.options.forEach(
-            option =>
-              (option.texts = option.texts.filter(
-                t => t.languageId === options.language,
-              )),
-          )
-        })
-      }
-    } else {
-      quiz.items = []
-    }
-
-    return await quiz
   }
 }

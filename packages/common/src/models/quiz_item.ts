@@ -44,9 +44,9 @@ export class QuizItem extends BaseEntity {
   public texts: QuizItemTranslation[]
 
   @OneToMany(type => QuizOption, qo => qo.quizItem, {
-    eager: true,
+    eager: false,
     cascade: true,
-  }) // was: not eager
+  })
   public options: QuizOption[]
 
   @Column({ nullable: true })

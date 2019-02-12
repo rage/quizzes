@@ -26,13 +26,13 @@ export class Quiz extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(type => Course, course => course.id, { eager: true }) // was: lazy
+  @ManyToOne(type => Course, course => course.id, { eager: false }) // was: lazy
   public course: Course
   @Column()
   public courseId: string
 
   @OneToMany(type => QuizTranslation, qt => qt.quiz, {
-    eager: true,
+    eager: false,
     cascade: true,
   })
   public texts: QuizTranslation[]
@@ -48,13 +48,13 @@ export class Quiz extends BaseEntity {
   public open?: Date
 
   @OneToMany(type => QuizItem, qi => qi.quiz, {
-    eager: true,
+    eager: false,
     cascade: true,
   }) // was: not eager
   public items?: QuizItem[]
 
   @OneToMany(type => PeerReviewQuestionCollection, prqc => prqc.quiz, {
-    eager: true,
+    eager: false,
     cascade: true,
   }) // was: not eager
   public peerReviewQuestionCollections: PeerReviewQuestionCollection[]
