@@ -3,8 +3,8 @@ import {
   Quiz,
   QuizAnswer,
   SpamFlag,
-  UserQuizState,
   UserCourseState,
+  UserQuizState,
 } from "@quizzes/common/models"
 import {
   BadRequestError,
@@ -36,6 +36,9 @@ export class UserCourseStateController {
 
   @Inject()
   private userCourseStateService: UserCourseStateService
+
+  @Inject()
+  private quizAnswerService: QuizAnswerService
 
   @Get("/:userId/:courseId")
   public async get(

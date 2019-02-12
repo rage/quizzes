@@ -58,8 +58,9 @@ export interface IQuizQuery {
 
 export interface IQuizAnswerQuery {
   id?: string
-  quiz_id?: string
-  user_id?: number
+  quizId?: string
+  userId?: number
+  status?: string
 }
 
 interface ICourseQuery {

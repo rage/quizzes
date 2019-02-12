@@ -14,6 +14,7 @@ import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import CourseService from "./course.service"
 import QuizService from "./quiz.service"
+import QuizAnswerService from "./quizanswer.service"
 import UserQuizStateService from "./userquizstate.service"
 
 @Service()
@@ -26,6 +27,9 @@ export default class UserCourseStateService {
 
   @Inject()
   private quizService: QuizService
+
+  @Inject()
+  private quizAnswerService: QuizAnswerService
 
   @Inject()
   private userQuizStateService: UserQuizStateService
@@ -42,6 +46,7 @@ export default class UserCourseStateService {
     manager: EntityManager,
     userId: number,
     courseId: string,
+    quizAnswer?: QuizAnswer,
   ): Promise<UserCourseState> {
     const course: Course[] = await this.courseService.getCourses({
       id: courseId,
@@ -60,14 +65,11 @@ export default class UserCourseStateService {
       userId,
       quizIds,
     )
-    console.log(userQuizStates)
     const userCourseState: UserCourseState = new UserCourseState()
     let pointsAwarded: number = 0
     userQuizStates.map(uqs => {
       pointsAwarded += uqs.pointsAwarded
     })
-    console.log(pointsTotal)
-    console.log(pointsAwarded)
     userCourseState.pointsAwarded = pointsAwarded
     userCourseState.userId = userId
     userCourseState.courseId = courseId
@@ -79,7 +81,19 @@ export default class UserCourseStateService {
       userCourseState.score >= course[0].minScoreToPass &&
       userCourseState.progress >= course[0].minProgressToPass
     ) {
+      const latestConfirmed: QuizAnswer =
+        quizAnswer ||
+        (await this.quizAnswerService.getAnswer(
+          {
+            userId,
+            quizId: userQuizStates[0].quizId,
+            status: "confirmed",
+          },
+          manager,
+        ))
       userCourseState.completed = true
+      userCourseState.completionDate = latestConfirmed.updatedAt
+      userCourseState.completionAnswersDate = latestConfirmed.createdAt
     }
     return await manager.save(userCourseState)
   }
@@ -88,6 +102,7 @@ export default class UserCourseStateService {
     manager: EntityManager,
     quiz: Quiz,
     userQuizState: UserQuizState,
+    quizAnswer: QuizAnswer,
   ) {
     const courseId = quiz.courseId
     let userCourseState: UserCourseState = await this.getUserCourseState(
@@ -121,6 +136,8 @@ export default class UserCourseStateService {
         userCourseState.progress >= course[0].minProgressToPass
       ) {
         userCourseState.completed = true
+        userCourseState.completionDate = quizAnswer.updatedAt
+        userCourseState.completionAnswersDate = quizAnswer.createdAt
       }
     }
     return await manager.save(userCourseState)

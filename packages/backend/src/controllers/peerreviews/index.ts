@@ -61,6 +61,7 @@ export class PeerReviewController {
   public async post(@EntityFromBody() peerReview: PeerReview): Promise<any> {
     const receivingQuizAnswer: QuizAnswer = await this.quizAnswerService.getAnswer(
       { id: peerReview.quizAnswerId },
+      this.entityManager,
     )
     const givingQuizAnswer: QuizAnswer = await this.quizAnswerService.getAnswer(
       {
@@ -68,6 +69,7 @@ export class PeerReviewController {
         quizId: receivingQuizAnswer.quizId,
         status: "submitted",
       },
+      this.entityManager,
     )
 
     const receivingUserQuizState: UserQuizState = await this.userQuizStateService.getUserQuizState(
@@ -106,11 +108,11 @@ export class PeerReviewController {
         givingQuizAnswer,
         givingUserQuizState,
       )
-      await this.quizAnswerService.createQuizAnswer(
+      const receivingAnswerUpdated: QuizAnswer = await this.quizAnswerService.createQuizAnswer(
         manager,
         receivingValidated.quizAnswer,
       )
-      await this.quizAnswerService.createQuizAnswer(
+      const givingAnswerUpdated = await this.quizAnswerService.createQuizAnswer(
         manager,
         givingValidated.quizAnswer,
       )
@@ -130,6 +132,7 @@ export class PeerReviewController {
           manager,
           quiz[0],
           receivingValidated.userQuizState,
+          receivingAnswerUpdated,
         )
       }
       if (
@@ -140,6 +143,7 @@ export class PeerReviewController {
           manager,
           quiz[0],
           givingValidated.userQuizState,
+          givingAnswerUpdated,
         )
       }
     })

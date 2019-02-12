@@ -49,9 +49,12 @@ export class SpamFlagController {
 
   @Post("/")
   public async post(@EntityFromBody() spamFlag: SpamFlag) {
-    const quizAnswer = await this.quizAnswerService.getAnswer({
-      id: spamFlag.quizAnswerId,
-    })
+    const quizAnswer = await this.quizAnswerService.getAnswer(
+      {
+        id: spamFlag.quizAnswerId,
+      },
+      this.entityManager,
+    )
     const quiz: Quiz[] = await this.quizService.getQuizzes({
       id: quizAnswer.quizId,
       course: true,

@@ -57,7 +57,7 @@ export class QuizAnswerController {
       userQuizState,
     } = this.validationService.validateQuizAnswer(answer, quiz[0], userQState)
     await this.entityManager.transaction(async manager => {
-      await this.userQuizStateService.createUserQuizState(
+      const savedUserQuizState: UserQuizState = await this.userQuizStateService.createUserQuizState(
         manager,
         userQuizState,
       )
@@ -70,7 +70,8 @@ export class QuizAnswerController {
         await this.userCourseStateService.updateUserCourseState(
           manager,
           quiz[0],
-          userQuizState,
+          savedUserQuizState,
+          savedAnswer,
         )
       }
     })
