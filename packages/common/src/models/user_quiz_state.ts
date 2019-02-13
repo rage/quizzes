@@ -27,7 +27,7 @@ export class UserQuizState extends BaseEntity {
   public peerReviewsGiven: number
   @Column({ type: "int", nullable: true })
   public peerReviewsReceived: number
-  @Column({ type: "float", nullable: true })
+  @Column({ type: "double precision", nullable: true })
   public pointsAwarded: number
   @Column({ type: "int", nullable: true })
   public spamFlags: number

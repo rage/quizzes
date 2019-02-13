@@ -55,11 +55,14 @@ export default class UserCourseStateService {
       courseId,
       exclude: true,
     })
+    console.log(quizzes.length)
     let pointsTotal: number = 0
     const quizIds: string[] = quizzes.map(quiz => {
       pointsTotal += quiz.points
       return quiz.id
     })
+    console.log(quizIds.length)
+    console.log(quizIds)
     const userQuizStates: UserQuizState[] = await this.userQuizStateService.getQuizStatesForUserCourse(
       manager,
       userId,
@@ -70,13 +73,13 @@ export default class UserCourseStateService {
     userQuizStates.map(uqs => {
       pointsAwarded += uqs.pointsAwarded
     })
+    console.log(userQuizStates.map(uqs => uqs.quizId))
     userCourseState.pointsAwarded = pointsAwarded
     userCourseState.userId = userId
     userCourseState.courseId = courseId
     userCourseState.quizzesConfirmed = userQuizStates.length
     userCourseState.score = (userCourseState.pointsAwarded / pointsTotal) * 100
-    userCourseState.progress =
-      (userCourseState.quizzesConfirmed / quizzes.length) * 100
+    userCourseState.progress = (userQuizStates.length / quizzes.length) * 100
     if (
       userCourseState.score >= course[0].minScoreToPass &&
       userCourseState.progress >= course[0].minProgressToPass
