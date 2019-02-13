@@ -22,7 +22,8 @@
     "lib": [
       "esnext.asynciterable",
       "es2017",
-      "dom"
+      "dom",
+      "esnext.array"
     ],
     "typeRoots": [
       "node_modules/@types", "@quizzes/common/types"

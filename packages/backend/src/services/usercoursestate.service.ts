@@ -135,6 +135,7 @@ export default class UserCourseStateService {
       userCourseState.progress =
         (userCourseState.quizzesConfirmed / quizzes.length) * 100
       if (
+        !userCourseState.completed &&
         userCourseState.score >= course[0].minScoreToPass &&
         userCourseState.progress >= course[0].minProgressToPass
       ) {

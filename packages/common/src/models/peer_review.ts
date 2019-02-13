@@ -42,7 +42,7 @@ export class PeerReview extends BaseEntity {
   public rejectedQuizAnswerIds: string[]
 
   @OneToMany(type => PeerReviewQuestionAnswer, prqa => prqa.peerReview, {
-    eager: true,
+    eager: false,
     cascade: true,
   })
   public answers: PeerReviewQuestionAnswer[]
