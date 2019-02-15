@@ -40,6 +40,7 @@ export default class PeerReviewService {
 
   public async getAnswersToReview(
     quizId: string,
+    languageId: string,
     reviewerId: number,
   ): Promise<QuizAnswer[]> {
     const givenPeerReviews: PeerReview[] = await this.entityManager
@@ -74,6 +75,7 @@ export default class PeerReviewService {
       )
       .andWhere("quiz_answer.user_id != :reviewerId", { reviewerId })
       .andWhere("quiz_answer.id not in (:...rejected)", { rejected })
+      .andWhere("quiz_answer.language_id = :languageId", { languageId })
       .orderBy("quiz_answer.status")
       .addOrderBy("user_quiz_state.peer_reviews_given", "DESC")
       .addOrderBy("quiz_answer.created_at")
