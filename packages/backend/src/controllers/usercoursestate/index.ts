@@ -5,6 +5,7 @@ import {
   SpamFlag,
   UserCourseState,
   UserQuizState,
+  QuizItem,
 } from "@quizzes/common/models"
 import {
   BadRequestError,
@@ -57,5 +58,16 @@ export class UserCourseStateController {
       )
     }
     return userCourseState
+  }
+
+  @Get("/:userId/:courseId/required-actions")
+  public async getRequiredActions(
+    @Param("userId") userId: number,
+    @Param("courseId") courseId: string,
+  ) {
+    return await this.userCourseStateService.getRequiredActions(
+      userId,
+      courseId,
+    )
   }
 }

@@ -20,7 +20,7 @@ export async function migrateSpamFlags(users: { [username: string]: User }) {
 
   let bar = progressBar("Converting spam flags", oldFlags.length)
   const spamFlags: Array<QueryPartialEntity<SpamFlag>> = []
-  for (let [username, answerID] of oldFlags) {
+  for (let [username, answerID, createdAt, updatedAt] of oldFlags) {
     const user = users[username]
     if (!user) {
       continue
@@ -34,6 +34,8 @@ export async function migrateSpamFlags(users: { [username: string]: User }) {
     spamFlags.push({
       userId: user.id,
       quizAnswerId: answerID,
+      createdAt,
+      updatedAt,
     })
     bar.tick()
   }

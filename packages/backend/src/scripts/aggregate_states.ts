@@ -76,7 +76,9 @@ const createEssayQuizStates = async (): Promise<UserQuizState[]> => {
       userQuizState.spamFlags = row.flagged
       userQuizState.tries = row.tries
       userQuizState.status =
-        row.status === "confirmed" || "submitted" ? "locked" : "open"
+        row.status === "confirmed" || row.status === "submitted"
+          ? "locked"
+          : "open"
       return userQuizState
     },
   )

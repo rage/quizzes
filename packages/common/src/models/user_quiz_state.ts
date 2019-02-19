@@ -7,6 +7,7 @@ import {
   PrimaryColumn,
   RelationId,
   UpdateDateColumn,
+  Index,
 } from "typeorm"
 import { Quiz } from "./quiz"
 import { User } from "./user"
@@ -20,6 +21,7 @@ export class UserQuizState extends BaseEntity {
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Quiz
+  @Index()
   @PrimaryColumn()
   public quizId: string
 

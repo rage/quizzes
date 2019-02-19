@@ -96,6 +96,6 @@ export default class PeerReviewService {
       },
     )
 
-    return [candidates[0], candidates[1]]
+    return candidates.slice(0, 2)
   }
 }
