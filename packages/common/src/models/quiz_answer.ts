@@ -8,6 +8,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
+  Index,
 } from "typeorm"
 import { getUUIDByString, randomUUID } from "../util"
 import { Language } from "./language"
@@ -22,18 +23,22 @@ export class QuizAnswer extends BaseEntity {
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Quiz
+  @Index()
   @Column()
   public quizId: string
   @ManyToOne(type => User, user => user.id, { cascade: true })
   public user?: User
+  @Index()
   @Column("int")
   public userId: number
 
   @ManyToOne(type => Language, lang => lang.id)
   public language: Language
+  @Index()
   @Column()
   public languageId: string
 
+  @Index()
   @Column({
     type: "enum",
     enum: ["draft", "submitted", "spam", "confirmed", "rejected", "deprecated"],

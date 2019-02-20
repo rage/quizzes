@@ -23,13 +23,13 @@ export class UserCourseState extends BaseEntity {
   @PrimaryColumn()
   public courseId: string
 
-  @Column({ type: "float", default: 0 })
+  @Column({ type: "double precision", default: 0 })
   public pointsAwarded: number
   @Column({ type: "int", default: 0 })
   public quizzesConfirmed: number
-  @Column({ type: "float", default: 0 })
+  @Column({ type: "double precision", default: 0 })
   public progress: number
-  @Column({ type: "float", default: 0 })
+  @Column({ type: "double precision", default: 0 })
   public score: number
   @Column({ type: "boolean", default: false })
   public completed: boolean

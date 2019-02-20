@@ -273,7 +273,13 @@ export async function migrateQuizzes(courses: {
 
   console.log("Querying inserted quizzes...")
   const newQuizzes: { [quizID: string]: Quiz } = {}
-  for (const quiz of await Quiz.find({})) {
+  const quizArr = await Quiz.createQueryBuilder("quiz")
+    .leftJoinAndSelect("quiz.course", "course")
+    .leftJoinAndSelect("course.languages", "language")
+    .leftJoinAndSelect("quiz.items", "quiz_item")
+    .leftJoinAndSelect("quiz_item.options", "option")
+    .getMany()
+  for (const quiz of quizArr) {
     newQuizzes[quiz.id] = quiz
   }
   return newQuizzes

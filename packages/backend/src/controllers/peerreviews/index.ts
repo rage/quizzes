@@ -49,12 +49,17 @@ export class PeerReviewController {
   @Inject()
   private userCourseStateService: UserCourseStateService
 
-  @Get("/")
+  @Get("/:quizId/:languageId/:reviewerId")
   public async get(
-    @Param("id") id: string,
-    @Param("answerer") answerer: string,
+    @Param("quizId") quizId: string,
+    @Param("languageId") languageId: string,
+    @Param("reviewerId") reviewerId: number,
   ) {
-    return await this.peerReviewService.getAnswersToReview(id, answerer)
+    return await this.peerReviewService.getAnswersToReview(
+      quizId,
+      languageId,
+      reviewerId,
+    )
   }
 
   @Post("/")

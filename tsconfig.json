@@ -3,7 +3,7 @@
     "target": "es2018",
     "module": "commonjs",
     "moduleResolution": "node",
-    "lib": ["es2018", "esnext.asynciterable"],
+    "lib": ["es2018", "esnext.asynciterable", "esnext.array"],
     "strict": true,
     "noImplicitAny": false,
     "resolveJsonModule": true,

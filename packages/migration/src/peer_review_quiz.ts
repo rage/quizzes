@@ -21,7 +21,7 @@ export async function migratePeerReviewQuestions() {
   const peerReviewQuestions = await QNQuiz.find({
     type: { $in: [oldQuizTypes.PEER_REVIEW] },
   })
-
+  console.log("peer reviews: ", peerReviewQuestions.length)
   const bar = progressBar(
     "Migrating peer review questions",
     peerReviewQuestions.length,
@@ -39,10 +39,15 @@ export async function migratePeerReviewQuestions() {
   let quizNotFound = 0
   let answerNotFound = 0
   await Promise.all(
-    peerReviewQuestions.map(async (oldPRQ: any) => {
-      const quiz = await Quiz.findOne(
-        getUUIDByString(safeGet(() => oldPRQ.data.quizId)),
-      )
+    peerReviewQuestions.map(async (oldPRQ: any, index: number) => {
+      const quiz = await Quiz.createQueryBuilder("quiz")
+        .leftJoinAndSelect("quiz.course", "course")
+        .leftJoinAndSelect("course.languages", "language")
+        .where("quiz.id = :id", {
+          id: getUUIDByString(safeGet(() => oldPRQ.data.quizId)),
+        })
+        .getOne()
+
       if (!quiz) {
         quizNotFound++
         return

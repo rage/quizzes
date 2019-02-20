@@ -25,9 +25,9 @@ export class UserCoursePartState extends BaseEntity {
   @Column({ type: "int", primary: true })
   public coursePart: number
 
-  @Column({ type: "float", default: 0 })
+  @Column({ type: "double precision", default: 0 })
   public progress: number
-  @Column({ type: "float", default: 0 })
+  @Column({ type: "double precision", default: 0 })
   public score: number
   @Column({ type: "boolean", default: false })
   public completed: boolean
