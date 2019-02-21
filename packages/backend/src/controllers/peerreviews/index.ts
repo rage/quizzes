@@ -1,19 +1,11 @@
+import { PeerReview, QuizAnswer, UserQuizState } from "@quizzes/common/models"
+import { ITMCProfileDetails } from "@quizzes/common/types"
 import {
-  PeerReview,
-  Quiz,
-  QuizAnswer,
-  UserQuizState,
-} from "@quizzes/common/models"
-import {
-  BadRequestError,
-  Body,
   Get,
+  HeaderParam,
   JsonController,
-  NotFoundError,
   Param,
   Post,
-  QueryParam,
-  QueryParams,
 } from "routing-controllers"
 import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
@@ -49,21 +41,26 @@ export class PeerReviewController {
   @Inject()
   private userCourseStateService: UserCourseStateService
 
-  @Get("/:quizId/:languageId/:reviewerId")
+  @Get("/:quizId/:languageId")
   public async get(
     @Param("quizId") quizId: string,
     @Param("languageId") languageId: string,
-    @Param("reviewerId") reviewerId: number,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
     return await this.peerReviewService.getAnswersToReview(
       quizId,
       languageId,
-      reviewerId,
+      user.id,
     )
   }
 
   @Post("/")
-  public async post(@EntityFromBody() peerReview: PeerReview): Promise<any> {
+  public async post(
+    @EntityFromBody() peerReview: PeerReview,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ): Promise<any> {
+    peerReview.userId = user.id
+
     const receivingQuizAnswer: QuizAnswer = await this.quizAnswerService.getAnswer(
       { id: peerReview.quizAnswerId },
       this.entityManager,
@@ -154,12 +151,4 @@ export class PeerReviewController {
     })
     return response
   }
-
-  /*@Post("/")
-  public async post(
-    @Param("id") id: string,
-    @EntityFromBody() quizAnswer: QuizAnswer,
-  ): Promise<QuizAnswer> {
-    return await this.quizAnswerService.createQuizAnswer(quizAnswer)
-  }*/
 }

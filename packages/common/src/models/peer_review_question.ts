@@ -94,7 +94,7 @@ export class PeerReviewQuestionTranslation extends BaseEntity {
   @JoinColumn()
   public peerReviewQuestion: Promise<PeerReviewQuestion>
   @PrimaryColumn()
-  public peerReviewQuestionId: string | undefined
+  public peerReviewQuestionId: string
 
   @ManyToOne(type => Language, lang => lang.id)
   @JoinColumn()

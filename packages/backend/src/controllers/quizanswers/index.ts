@@ -1,15 +1,6 @@
-import { Quiz, QuizAnswer, UserQuizState } from "@quizzes/common/models"
-import {
-  BadRequestError,
-  Body,
-  Get,
-  JsonController,
-  NotFoundError,
-  Param,
-  Post,
-  QueryParam,
-  QueryParams,
-} from "routing-controllers"
+import { Quiz, QuizAnswer, User, UserQuizState } from "@quizzes/common/models"
+import { ITMCProfileDetails } from "@quizzes/common/types"
+import { HeaderParam, JsonController, Post } from "routing-controllers"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
 import UserCourseStateService from "services/usercoursestate.service"
@@ -41,7 +32,15 @@ export class QuizAnswerController {
   private validationService: ValidationService
 
   @Post("/")
-  public async post(@EntityFromBody() answer: QuizAnswer): Promise<any> {
+  public async post(
+    @EntityFromBody() answer: QuizAnswer,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ): Promise<any> {
+    answer.userId = user.id
+    // creates new user if necessary
+    answer.user = new User()
+    answer.user.id = answer.userId
+
     const quiz: Quiz[] = await this.quizService.getQuizzes({
       id: answer.quizId,
       items: true,
