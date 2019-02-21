@@ -1,6 +1,13 @@
-import { Course, CourseTranslation } from "@quizzes/common/models"
-import { ICourseQuery } from "@quizzes/common/types"
-import { Get, JsonController, Param, QueryParam } from "routing-controllers"
+import { Course } from "@quizzes/common/models"
+import { ICourseQuery, ITMCProfileDetails } from "@quizzes/common/types"
+import {
+  Get,
+  HeaderParam,
+  JsonController,
+  Param,
+  QueryParam,
+  UnauthorizedError,
+} from "routing-controllers"
 import CourseService from "services/course.service"
 import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
@@ -17,11 +24,17 @@ export class CourseController {
   @Get("/")
   public async getall(
     @QueryParam("language") language: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<Course[]> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
     const query: ICourseQuery = {
       id: null,
       language,
     }
+
     return await this.courseService.getCourses(query)
   }
 
@@ -29,7 +42,12 @@ export class CourseController {
   public async getOne(
     @Param("id") id: string,
     @QueryParam("language") language: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<Course[]> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
     const query: ICourseQuery = {
       id,
       language,

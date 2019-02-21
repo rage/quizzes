@@ -7,7 +7,7 @@ import {
   QuizItemAnswer,
   UserQuizState,
 } from "@quizzes/common/models"
-import { IQuizAnswerQuery } from "@quizzes/common/types"
+import { randomUUID } from "@quizzes/common/util"
 import _ from "lodash"
 import { Service } from "typedi"
 import { Brackets, EntityManager, SelectQueryBuilder } from "typeorm"
@@ -57,6 +57,8 @@ export default class PeerReviewService {
     const rejected = [].concat(
       ...givenPeerReviews.map(pr => pr.rejectedQuizAnswerIds),
     )
+    // query will fail if this array is empty
+    rejected.push(randomUUID())
 
     let candidates: QuizAnswer[] = await this.entityManager
       .createQueryBuilder(QuizAnswer, "quiz_answer")

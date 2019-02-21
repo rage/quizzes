@@ -1,33 +1,10 @@
-import {
-  PeerReview,
-  Quiz,
-  QuizAnswer,
-  SpamFlag,
-  UserCourseState,
-  UserQuizState,
-  QuizItem,
-} from "@quizzes/common/models"
-import {
-  BadRequestError,
-  Body,
-  Get,
-  JsonController,
-  NotFoundError,
-  Param,
-  Post,
-  QueryParam,
-  QueryParams,
-} from "routing-controllers"
-import PeerReviewService from "services/peerreview.service"
-import QuizService from "services/quiz.service"
+import { UserCourseState } from "@quizzes/common/models"
+import { ITMCProfileDetails } from "@quizzes/common/types"
+import { Get, HeaderParam, JsonController, Param } from "routing-controllers"
 import QuizAnswerService from "services/quizanswer.service"
-import SpamFlagService from "services/spamflag.service"
 import UserCourseStateService from "services/usercoursestate.service"
-import UserQuizStateService from "services/userquizstate.service"
-import ValidationService from "services/validation.service"
 import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
-import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
 
 @JsonController("/quizzes/usercoursestate")
@@ -41,32 +18,32 @@ export class UserCourseStateController {
   @Inject()
   private quizAnswerService: QuizAnswerService
 
-  @Get("/:userId/:courseId")
+  @Get("/:courseId")
   public async get(
-    @Param("userId") userId: number,
     @Param("courseId") courseId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
     let userCourseState: UserCourseState = await this.userCourseStateService.getUserCourseState(
-      userId,
+      user.id,
       courseId,
     )
     if (!userCourseState) {
       userCourseState = await this.userCourseStateService.createUserCourseState(
         this.entityManager,
-        userId,
+        user.id,
         courseId,
       )
     }
     return userCourseState
   }
 
-  @Get("/:userId/:courseId/required-actions")
+  @Get("/:courseId/required-actions")
   public async getRequiredActions(
-    @Param("userId") userId: number,
     @Param("courseId") courseId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
     return await this.userCourseStateService.getRequiredActions(
-      userId,
+      user.id,
       courseId,
     )
   }

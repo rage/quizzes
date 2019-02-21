@@ -4,11 +4,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
-  Index,
 } from "typeorm"
 import { getUUIDByString, randomUUID } from "../util"
 import { Language } from "./language"

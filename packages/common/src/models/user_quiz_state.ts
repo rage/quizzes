@@ -3,11 +3,11 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   ManyToOne,
   PrimaryColumn,
   RelationId,
   UpdateDateColumn,
-  Index,
 } from "typeorm"
 import { Quiz } from "./quiz"
 import { User } from "./user"

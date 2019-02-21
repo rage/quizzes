@@ -1,7 +1,7 @@
+import { GraphQLSchema } from "graphql"
 import { makeExecutableSchema } from "graphql-tools"
 import { resolvers } from "./resolvers"
 import { types } from "./types"
-import { GraphQLSchema } from "graphql"
 import { Query } from "./types/query"
 
 const scalarTypes = `

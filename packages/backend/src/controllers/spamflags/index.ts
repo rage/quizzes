@@ -1,22 +1,6 @@
-import {
-  PeerReview,
-  Quiz,
-  QuizAnswer,
-  SpamFlag,
-  UserQuizState,
-} from "@quizzes/common/models"
-import {
-  BadRequestError,
-  Body,
-  Get,
-  JsonController,
-  NotFoundError,
-  Param,
-  Post,
-  QueryParam,
-  QueryParams,
-} from "routing-controllers"
-import PeerReviewService from "services/peerreview.service"
+import { Quiz, SpamFlag } from "@quizzes/common/models"
+import { ITMCProfileDetails } from "@quizzes/common/types"
+import { HeaderParam, JsonController, Post } from "routing-controllers"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
 import SpamFlagService from "services/spamflag.service"
@@ -48,7 +32,12 @@ export class SpamFlagController {
   private validationService: ValidationService
 
   @Post("/")
-  public async post(@EntityFromBody() spamFlag: SpamFlag) {
+  public async post(
+    @EntityFromBody() spamFlag: SpamFlag,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    spamFlag.userId = user.id
+
     const quizAnswer = await this.quizAnswerService.getAnswer(
       {
         id: spamFlag.quizAnswerId,
