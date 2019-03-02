@@ -44,3 +44,7 @@ userinfo.json
 test.rest
 
 packages/widgets/build
+
+# redis
+
+dump.rdb

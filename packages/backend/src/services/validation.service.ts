@@ -61,7 +61,7 @@ export default class ValidationService {
               : itemTranslation.failureMessage,
           }
           break
-        case "radio":
+        case "multiple-choice":
           optionAnswerStatus = item.options.map(option => {
             const optionAnswer = itemAnswer.optionAnswers.find(
               (oa: any) => oa.quizOptionId === option.id,

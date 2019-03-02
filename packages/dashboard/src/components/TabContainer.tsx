@@ -40,7 +40,7 @@ class TabContainer extends React.Component<any, any> {
         "checkbox",
         "essay",
         "open",
-        "radio",
+        "multiple-choice",
         "research-agreement",
         "scale"
     ]

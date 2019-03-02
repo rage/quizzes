@@ -71,7 +71,7 @@ class Item extends React.Component<any, any> {
         // console.log("item")
 
         const renderOptions = type => {
-            return ["radio", "checkbox", "research-agreement"].includes(type)
+            return ["multiple-choice", "checkbox", "research-agreement"].includes(type)
         }
 
         return (
