@@ -5,6 +5,7 @@ import {
   Quiz,
   QuizAnswer,
   QuizItemAnswer,
+  SpamFlag,
   UserQuizState,
 } from "@quizzes/common/models"
 import { randomUUID } from "@quizzes/common/util"
@@ -54,9 +55,15 @@ export default class PeerReviewService {
       .andWhere("quiz_answer.quiz_id = :quizId", { quizId })
       .getMany()
 
+    const givenSpamFlags: SpamFlag[] = await this.entityManager
+      .createQueryBuilder(SpamFlag, "spam_flag")
+      .where("spam_flag.user_id = :reviewerId", { reviewerId })
+      .getMany()
+
     const rejected = [].concat(
       ...givenPeerReviews.map(pr => pr.rejectedQuizAnswerIds),
     )
+    rejected.concat(givenSpamFlags.map(spamFlag => spamFlag.quizAnswerId))
     // query will fail if this array is empty
     rejected.push(randomUUID())
 

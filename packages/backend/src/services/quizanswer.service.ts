@@ -43,11 +43,17 @@ export default class QuizAnswerService {
     if (id) {
       whereBuilder.add("quiz_answer.id = :id", { id })
     }
-    if (userId && quizId && status) {
-      whereBuilder.add(
-        "quiz_answer.user_id = :userId and quiz_answer.quiz_id = :quizId and quiz_answer.status = :status",
-        { userId, quizId, status },
-      )
+
+    if (userId) {
+      whereBuilder.add("quiz_answer.user_id = :userId", { userId })
+    }
+
+    if (quizId) {
+      whereBuilder.add("quiz_answer.quiz_id = :quizId", { quizId })
+    }
+
+    if (status) {
+      whereBuilder.add("quiz_answer.status = :status", { status })
     }
 
     return await queryBuilder.orderBy("quiz_answer.updated_at", "DESC").getOne()
