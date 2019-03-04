@@ -10,7 +10,7 @@ const mapTypeToComponent = {
 }
 
 const id = "3c954097-268f-44bf-9d2e-1efaf9e8f122"
-const accessToken = ""
+const accessToken = "1436f0ed8869efc9d89ce0b6706d9ba07747490e2ed5b2ef3dd18caf0f0ac04a"
 const languageId = "en_US"
 
 class Quiz extends Component {
