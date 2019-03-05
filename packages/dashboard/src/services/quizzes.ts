@@ -1,10 +1,6 @@
 import axios from "axios"
-import { Quiz } from "../../../common/src/models/quiz"
-import TMCApi from "../../../common/src/services/TMCApi"
-import { quizzes } from "./mock"
 
-export const getQuizzes = async course => {
-  const user = TMCApi.checkStore()
+export const getQuizzes = async (course, user) => {
   const response = await axios.get(
     `http://localhost:3000/api/v1/quizzes/?courseId=${course}&course=true&items=true&options=true&peerreviews=true&stripped=false`,
     { headers: { authorization: `Bearer ${user.accessToken}` } },
@@ -12,8 +8,7 @@ export const getQuizzes = async course => {
   return response.data
 }
 
-export const post = async quiz => {
-  const user = TMCApi.checkStore()
+export const post = async (quiz, user) => {
   const response = await axios.post(
     "http://localhost:3000/api/v1/quizzes",
     quiz,

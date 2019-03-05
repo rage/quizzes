@@ -162,7 +162,21 @@ export default class QuizService {
       queryBuilder.andWhere("quiz.excluded_from_score = false")
     }
 
-    return await queryBuilder.getMany()
+    let quizzes: Quiz[] = await queryBuilder.getMany()
+
+    // query doesn't return prqc ids in to prqc_translation for some reason
+    if (query.peerreviews) {
+      quizzes = quizzes.map(quiz => {
+        quiz.peerReviewQuestionCollections.map(prqc => {
+          prqc.texts.map(text => {
+            text.peerReviewQuestionCollectionId = prqc.id
+          })
+        })
+        return quiz
+      })
+    }
+
+    return quizzes
   }
 
   public async createQuiz(quiz: Quiz): Promise<Quiz | undefined> {

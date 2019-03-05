@@ -11,7 +11,7 @@ export const clear = createAction("courses/CLEAR")
 export const setCourses = () => {
   return async (dispatch, getState) => {
     try {
-      const courses = await getCourses()
+      const courses = await getCourses(getState().user)
       if (getState().filter.course) {
         dispatch(setCourse(getState().filter.course))
       } else {

@@ -34,7 +34,7 @@ export const setEdit = (quiz: any) => {
 export const save = () => {
   return async (dispatch, getState) => {
     try {
-      const quiz = await post(getState().edit)
+      const quiz = await post(getState().edit, getState().user)
       const index = getState().quizzes.findIndex(q => q.id === quiz.id)
       if (index > -1) {
         dispatch(quizzes.remove(index))

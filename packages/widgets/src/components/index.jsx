@@ -9,8 +9,8 @@ const mapTypeToComponent = {
   "multiple-choice": MultipleChoice,
 }
 
-const id = "3c954097-268f-44bf-9d2e-1efaf9e8f122"
-const accessToken = ""
+const id = "4bf4cf2f-3058-4311-8d16-26d781261af7"
+const accessToken = "1436f0ed8869efc9d89ce0b6706d9ba07747490e2ed5b2ef3dd18caf0f0ac04a"
 const languageId = "en_US"
 
 class Quiz extends Component {
@@ -18,9 +18,6 @@ class Quiz extends Component {
     quiz: undefined,
     quizAnswer: undefined,
     userCourseState: undefined,
-    answersToReview: undefined,
-    peerReview: undefined,
-    selectedAnswer: undefined
   }
 
   async componentDidMount() {
@@ -102,7 +99,7 @@ class Quiz extends Component {
               languageId={languageId}
               answered={this.state.quizAnswer.id ? true : false}
               textData={this.state.quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id).textData}
-              peerReviewsGiven={this.state.userQuizState.peerReviewsGiven}
+              peerReviewsGiven={this.state.userQuizState ? this.state.userQuizState.peerReviewsGiven : 0}
               peerReviewQuestions={this.state.quiz.peerReviewQuestionCollections}
               submitMessage={this.state.quiz.texts[0].submitMessage}
               handleTextFieldChange={this.handleTextFieldChange(item.id)}

@@ -45,7 +45,8 @@ class PeerReviews extends Component {
     state = {
         peerReview: undefined,
         answersToReview: undefined,
-        submitDisabled: true
+        submitDisabled: true,
+        submitLocked: true
     }
 
     componentDidMount() {
@@ -77,7 +78,10 @@ class PeerReviews extends Component {
             rejectedQuizAnswerIds: [this.state.answersToReview.find(answer => answer.id != quizAnswerId).id],
             answers: this.props.peerReviewQuestions[0].questions.map(question => { return { peerReviewQuestionId: question.id } })
         }
-        this.setState({ peerReview })
+        this.setState({
+            peerReview,
+            submitLocked: false
+        })
     }
 
     handlePeerReviewGradeChange = (peerReviewQuestionId) => (question, value) => {
@@ -91,14 +95,14 @@ class PeerReviews extends Component {
         })
         const peerReview = this.state.peerReview
         const submitDisabled = answers.find(answer => !answer.hasOwnProperty("value")) ? true : false
-        this.setState({ 
+        this.setState({
             peerReview: { ...peerReview, ...{ answers } },
-            submitDisabled 
+            submitDisabled
         })
     }
 
     submitPeerReview = async () => {
-        this.setState({ submitDisabled: true })
+        this.setState({ submitDisabled: true, submitLocked: true })
         const response = await axios.post(
             "http://localhost:3000/api/v1/quizzes/peerreview",
             this.state.peerReview,
@@ -140,9 +144,11 @@ class PeerReviews extends Component {
                                             />
                                         })}
                                         <Button
-                                            disabled={this.state.submitDisabled}
+                                            disabled={this.state.submitLocked ? true : this.state.submitDisabled}
                                             onClick={this.submitPeerReview}
-                                        >Lähetä vertaisarvio</Button>
+                                        >
+                                            Lähetä vertaisarvio
+                                        </Button>
                                     </div>
                                     : <Grid container >
                                         <Grid item xs={3}>
