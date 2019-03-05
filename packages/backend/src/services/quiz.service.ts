@@ -53,6 +53,9 @@ export default class QuizService {
     } else {
       queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
     }
+    if (!stripped) {
+      queryBuilder.addSelect("quiz_translation.submitMessage")
+    }
 
     if (query.course) {
       queryBuilder

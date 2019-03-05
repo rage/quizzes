@@ -12,9 +12,11 @@ import { EntityManager, getManager } from "typeorm"
 
 const database = Container.get(Database)
 
-database.connect().then(() => createUserQuizStates())
-
-const manager = getManager()
+let manager: EntityManager
+database.connect().then(() => {
+  manager = getManager()
+  createUserQuizStates()
+})
 
 const createUserQuizStates = async () => {
   const essayQuizStates: UserQuizState[] = await createEssayQuizStates()

@@ -46,6 +46,7 @@ export class QuizAnswerController {
       items: true,
       options: true,
       peerreviews: true,
+      course: true,
     })
 
     const userQState: UserQuizState = await this.userQuizStateService.getUserQuizState(
@@ -60,6 +61,7 @@ export class QuizAnswerController {
     } = this.validationService.validateQuizAnswer(answer, quiz[0], userQState)
 
     let savedAnswer: QuizAnswer
+    let savedUserQuizState: UserQuizState
 
     await this.entityManager.transaction(async manager => {
       await this.validationService.checkForDeprecated(manager, quizAnswer)
@@ -69,7 +71,7 @@ export class QuizAnswerController {
         quizAnswer,
       )
 
-      const savedUserQuizState: UserQuizState = await this.userQuizStateService.createUserQuizState(
+      savedUserQuizState = await this.userQuizStateService.createUserQuizState(
         manager,
         userQuizState,
       )
@@ -87,6 +89,7 @@ export class QuizAnswerController {
     return {
       quiz: quiz[0],
       quizAnswer: savedAnswer,
+      userQuizState: savedUserQuizState,
     }
   }
 }

@@ -54,22 +54,27 @@ export class QuizController {
       console.log("not found")
     }
     let quizAnswer: QuizAnswer
-    if (userQuizState && userQuizState.status === "locked") {
-      quizAnswer = await this.quizAnswerService.getAnswer(
+    if (userQuizState) {
+      const answer = await this.quizAnswerService.getAnswer(
         { quizId: id, userId: user.id },
         this.entityManager,
       )
+      if (answer.status === "submitted" || answer.status === "confirmed") {
+        quizAnswer = answer
+      }
     }
     const quizzes: Quiz[] = await this.quizService.getQuizzes({
       id,
       items: true,
       options: true,
       peerreviews: true,
-      stripped: quizAnswer === null,
+      course: true,
+      stripped: quizAnswer ? false : true,
     })
     return {
       quiz: quizzes[0],
       quizAnswer,
+      userQuizState,
     }
   }
 

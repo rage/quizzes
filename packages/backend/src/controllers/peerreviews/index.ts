@@ -91,10 +91,11 @@ export class PeerReviewController {
     receivingUserQuizState.peerReviewsReceived += 1
     givingUserQuizState.peerReviewsGiven += 1
 
-    let response: PeerReview
+    let responsePeerReview: PeerReview
+    let responseUserQuizState: UserQuizState
 
     await this.entityManager.transaction(async manager => {
-      response = await this.peerReviewService.createPeerReview(
+      responsePeerReview = await this.peerReviewService.createPeerReview(
         manager,
         peerReview,
       )
@@ -122,7 +123,7 @@ export class PeerReviewController {
         manager,
         receivingValidated.userQuizState,
       )
-      await this.userQuizStateService.createUserQuizState(
+      responseUserQuizState = await this.userQuizStateService.createUserQuizState(
         manager,
         givingValidated.userQuizState,
       )
@@ -149,6 +150,9 @@ export class PeerReviewController {
         )
       }
     })
-    return response
+    return {
+      peerReview: responsePeerReview,
+      userQuizState: responseUserQuizState,
+    }
   }
 }
