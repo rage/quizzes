@@ -70,7 +70,7 @@ class PeerReviewQuestionCollection extends React.Component<any, any> {
         // console.log("collection")
 
         const renderOptions = type => {
-            return ["radio", "checkbox", "research-agreement"].includes(type)
+            return ["multiple-choice", "checkbox", "research-agreement"].includes(type)
         }
 
         return (

@@ -164,7 +164,7 @@ export async function migrateQuizzes(courses: {
               ? oldQuiz.type !== oldQuizTypes.CHECKBOX
                 ? "research-agreement"
                 : "checkbox"
-              : "radio",
+              : "multiple-choice",
           order: 0,
           createdAt: oldQuiz.createdAt,
           updatedAt: oldQuiz.updatedAt,
@@ -211,7 +211,7 @@ export async function migrateQuizzes(courses: {
           quizItems.push({
             id: qiid,
             quizId: quiz.id,
-            type: "radio",
+            type: "multiple-choice",
             order: order++,
             multi: meta.multi,
             createdAt: oldQuiz.createdAt,

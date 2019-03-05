@@ -45,26 +45,37 @@ export class QuizAnswerController {
       id: answer.quizId,
       items: true,
       options: true,
+      peerreviews: true,
+      course: true,
     })
+
     const userQState: UserQuizState = await this.userQuizStateService.getUserQuizState(
       answer.userId,
       answer.quizId,
     )
+
     const {
       response,
       quizAnswer,
       userQuizState,
     } = this.validationService.validateQuizAnswer(answer, quiz[0], userQState)
+
+    let savedAnswer: QuizAnswer
+    let savedUserQuizState: UserQuizState
+
     await this.entityManager.transaction(async manager => {
-      const savedUserQuizState: UserQuizState = await this.userQuizStateService.createUserQuizState(
-        manager,
-        userQuizState,
-      )
       await this.validationService.checkForDeprecated(manager, quizAnswer)
-      const savedAnswer: QuizAnswer = await this.quizAnswerService.createQuizAnswer(
+
+      savedAnswer = await this.quizAnswerService.createQuizAnswer(
         manager,
         quizAnswer,
       )
+
+      savedUserQuizState = await this.userQuizStateService.createUserQuizState(
+        manager,
+        userQuizState,
+      )
+
       if (!quiz[0].excludedFromScore && savedAnswer.status === "confirmed") {
         await this.userCourseStateService.updateUserCourseState(
           manager,
@@ -74,6 +85,11 @@ export class QuizAnswerController {
         )
       }
     })
-    return response
+
+    return {
+      quiz: quiz[0],
+      quizAnswer: savedAnswer,
+      userQuizState: savedUserQuizState,
+    }
   }
 }

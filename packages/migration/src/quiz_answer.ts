@@ -154,7 +154,7 @@ export async function migrateQuizAnswers(
                         })
                         break
 
-                      case "radio":
+                      case "multiple-choice":
                       case "research-agreement":
                       case "checkbox":
                         quizItemAnswers.push({

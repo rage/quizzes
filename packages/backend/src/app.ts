@@ -25,7 +25,7 @@ if (process.env.NODE_ENV !== "production") {
   dotenv.config({ path: ".env" })
 }
 
-const API_PATH = process.env.API_PATH
+const API_PATH = "/api/v1"
 
 @Service()
 export class App {

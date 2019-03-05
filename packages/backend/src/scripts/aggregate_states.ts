@@ -12,16 +12,22 @@ import { EntityManager, getManager } from "typeorm"
 
 const database = Container.get(Database)
 
-database.connect().then(() => createUserQuizStates())
-
-const manager = getManager()
+let manager: EntityManager
+database.connect().then(() => {
+  manager = getManager()
+  createUserQuizStates()
+})
 
 const createUserQuizStates = async () => {
   const essayQuizStates: UserQuizState[] = await createEssayQuizStates()
   const openQuizStates: UserQuizState[] = await createOpenQuizStates()
-  const radioQuizStates: UserQuizState[] = await createRadioQuizStates()
+  const MultipleChoiceQuizStates: UserQuizState[] = await createMultipleChoiceQuizStates()
 
-  const all = [...essayQuizStates, ...openQuizStates, ...radioQuizStates]
+  const all = [
+    ...essayQuizStates,
+    ...openQuizStates,
+    ...MultipleChoiceQuizStates,
+  ]
 
   let start = -1000
   let end = -1
@@ -135,7 +141,7 @@ const createOpenQuizStates = async () => {
   return userQuizStates
 }
 
-const createRadioQuizStates = async (): Promise<UserQuizState[]> => {
+const createMultipleChoiceQuizStates = async (): Promise<UserQuizState[]> => {
   const data = await manager.query(`
   select
     qa.id,
@@ -145,11 +151,11 @@ const createRadioQuizStates = async (): Promise<UserQuizState[]> => {
     t.total,
     tr.tries
   from quiz_answer qa
-  join ${correctRadio} c on qa.id = c.id
+  join ${correctMultipleChoice} c on qa.id = c.id
   join ${total} t on qa.quiz_id = t.id
   join ${tries} tr on qa.user_id = tr.user_id and qa.quiz_id = tr.quiz_id
   where qa.status != 'deprecated'
-  and qa.quiz_id in ${elementsRadio};
+  and qa.quiz_id in ${elementsMultipleChoice};
   `)
   const userQuizStates: UserQuizState[] = data.map(
     (row: any, index: number) => {
@@ -166,7 +172,7 @@ const createRadioQuizStates = async (): Promise<UserQuizState[]> => {
   return userQuizStates
 }
 
-const correctRadio = `
+const correctMultipleChoice = `
 (select qa.id, count(qia.id) correct
 from quiz_answer qa
 join quiz_item_answer qia on qa.id = qia.quiz_answer_id
@@ -232,152 +238,11 @@ const elementsOpen = `
   and course_id = '21356a26-7508-4705-9bab-39b239862632')
   `
 
-const elementsRadio = `
+const elementsMultipleChoice = `
 (select distinct(q.id)
   from quiz as q
   join quiz_item as qi on q.id = qi.quiz_id
-  where type = 'radio'
+  where type = 'multiple-choice'
   and multi != true
   and course_id = '21356a26-7508-4705-9bab-39b239862632')
 `
-
-/*const createUserQuizStates = async () => {
-  console.time()
-  const manager: EntityManager = getManager()
-  const quizAnswers: QuizAnswer[] = await manager
-    .createQueryBuilder(QuizAnswer, "quiz_answer")
-    .getMany()
-  const quizzes: Quiz[] = await manager
-    .createQueryBuilder(Quiz, "quiz")
-    .leftJoinAndSelect("quiz.items", "item")
-    .addSelect("item.validityRegex")
-    .leftJoinAndSelect("item.options", "option")
-    .addSelect("option.correct")
-    .leftJoinAndSelect(
-      "quiz.peerReviewQuestionCollections",
-      "peer_review_question_collection",
-    )
-    .leftJoinAndSelect(
-      "peer_review_question_collection.questions",
-      "peer_review_question",
-    )
-    .getMany()
-  const peerReviews: PeerReview[] = await manager
-    .createQueryBuilder(PeerReview, "peer_review")
-    .getMany()
-  const spamFlags: SpamFlag[] = await manager
-    .createQueryBuilder(SpamFlag, "spam_flag")
-    .getMany()
-  const userQuizStates: UserQuizState[] = []
-  const updatedQuizAnswers: QuizAnswer[] = []
-  quizAnswers.map((quizAnswer, index) => {
-    console.log(index + 1, "/", quizAnswers.length)
-    const quiz: Quiz = quizzes.find(q => q.id === quizAnswer.quizId)
-    let userQuizState: UserQuizState = userQuizStates.find(
-      uqs => uqs.userId === quizAnswer.userId && uqs.quizId === quiz.id,
-    )
-    if (!userQuizState) {
-      userQuizState = new UserQuizState()
-      userQuizState.quizId = quiz.id
-      userQuizState.userId = quizAnswer.userId
-      userQuizState.status = "locked"
-      userQuizStates.push(userQuizState)
-    }
-    userQuizState.tries += 1
-    const status = quizAnswer.status
-    if (status === "deprecated") {
-      return
-    }
-    let correct = 0
-    quizAnswer.itemAnswers.map(itemAnswer => {
-      const quizItem: QuizItem = quiz.items.find(
-        item => item.id === itemAnswer.quizItemId,
-      )
-      switch (quizItem.type) {
-        case "essay":
-          const flagged = spamFlags.filter(
-            sf => sf.quizAnswerId === quizAnswer.id,
-          )
-          const reviewsReceived = peerReviews.filter(
-            pr => pr.quizAnswerId === quizAnswer.id,
-          )
-          const reviewsGiven = peerReviews.filter(
-            pr =>
-              pr.userId === quizAnswer.userId &&
-              quizAnswers.find(qa => qa.id === pr.quizAnswerId).quizId ===
-                quiz.id,
-          )
-          userQuizState.spamFlags = flagged.length
-          userQuizState.peerReviewsReceived = reviewsReceived.length
-          userQuizState.peerReviewsGiven = reviewsGiven.length
-          if (status === "confirmed") {
-            userQuizState.pointsAwarded = 1
-          } else if (status === "spam" || "rejected") {
-            userQuizState.status = "open"
-          } else if (status === "submitted") {
-            if (userQuizState.spamFlags > 3) {
-              quizAnswer.status = "spam"
-              userQuizState.status = "open"
-              updatedQuizAnswers.push(quizAnswer)
-            } else if (
-              userQuizState.peerReviewsReceived >= 2 &&
-              userQuizState.peerReviewsGiven >= 3
-            ) {
-              const total =
-                quiz.peerReviewQuestionCollections[0].questions.filter(
-                  prq => prq.type === "grade",
-                ).length * reviewsReceived.length
-              let negative = 0
-              reviewsReceived.map(review => {
-                negative += review.answers.filter(answer => answer.value === 1)
-                  .length
-              })
-              if (negative / total <= 0.35) {
-                quizAnswer.status = "confirmed"
-                userQuizState.pointsAwarded = 1
-                updatedQuizAnswers.push(quizAnswer)
-              } else {
-                quizAnswer.status = "rejected"
-                userQuizState.status = "open"
-                updatedQuizAnswers.push(quizAnswer)
-              }
-            }
-          }
-          break
-        case "open":
-          const validator = new RegExp(quizItem.validityRegex)
-          if (validator.test(itemAnswer.textData)) {
-            correct += 1
-          }
-          break
-        case "radio":
-          itemAnswer.optionAnswers.map(oa => {
-            if (
-              quiz.items
-                .find(item => item.id === itemAnswer.quizItemId)
-                .options.find(option => option.id === oa.quizOptionId).correct
-            ) {
-              correct += 1
-              return
-            }
-          })
-          break
-        case "checkbox":
-          break
-        default:
-      }
-    })
-    userQuizState.pointsAwarded = correct / quizAnswer.itemAnswers.length
-  })
-  console.log(userQuizStates.length)
-  console.log(updatedQuizAnswers.length)
-  await manager.insert(UserQuizState, userQuizStates)
-  console.log("answers iserted")
-  await Promise.all(
-    updatedQuizAnswers.map(async updated => {
-      await manager.save(QuizAnswer, updated)
-    }),
-  )
-  console.log("updated answers: ", updatedQuizAnswers.length)
-  console.timeEnd()
-  }*/
