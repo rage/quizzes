@@ -2,15 +2,23 @@ import React, { Component } from "react"
 import { Button, Typography } from "@material-ui/core"
 import Essay from "./Essay"
 import MultipleChoice from "./MultipleChoice"
+import Scale from './Scale'
 import axios from "axios"
 
 const mapTypeToComponent = {
   essay: Essay,
   "multiple-choice": MultipleChoice,
+  scale: Scale
 }
 
-const id = "4bf4cf2f-3058-4311-8d16-26d781261af7"
-const accessToken = "1436f0ed8869efc9d89ce0b6706d9ba07747490e2ed5b2ef3dd18caf0f0ac04a"
+const ids = {
+  scale_id: "2684de7b-f52a-4411-a96f-c4f996bc6f4f",
+  essay_id: "4901fd41-2e77-4c3f-a2d9-255582fca7b6",
+  multiple_choice_id: "4bf4cf2f-3058-4311-8d16-26d781261af7"
+}
+
+const id = ids.scale_id
+const accessToken = ""
 const languageId = "en_US"
 
 class Quiz extends Component {
@@ -93,6 +101,7 @@ class Quiz extends Component {
           {this.state.quiz.items.map(item => {
             const ItemComponent = mapTypeToComponent[item.type]
             return <ItemComponent
+              title={item.texts[0].title}
               quizId={id}
               key={item.id}
               accessToken={accessToken}
