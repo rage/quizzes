@@ -9,7 +9,7 @@ const scale_options = 7
 
 
 
-const Scale = ({ handleIntOptionChange, intData, item }) => (
+const Scale = ({ handleIntDataChange, intData, item }) => (
 
     <div>
     <FormControl fullWidth component="fieldset">
@@ -26,7 +26,7 @@ const Scale = ({ handleIntOptionChange, intData, item }) => (
         aria-label="agreement"
         name="agreement"
         value={`${intData}`}
-        onChange={handleIntOptionChange}
+        onChange={handleIntDataChange}
       >
 
       {

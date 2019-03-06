@@ -44,6 +44,7 @@ export class QuizController {
     @QueryParams() params: any,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
+    console.log(params)
     let userQuizState: UserQuizState
     try {
       userQuizState = await this.userQuizStateService.getUserQuizState(
@@ -70,6 +71,7 @@ export class QuizController {
       peerreviews: true,
       course: true,
       stripped: quizAnswer ? false : true,
+      ...params,
     })
     return {
       quiz: quizzes[0],

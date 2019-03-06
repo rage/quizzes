@@ -8,7 +8,7 @@ export default (props) => {
 
     const {
         answered,
-        handleTextFieldChange,
+        handleTextDataChange,
         submitMessage,
         textData,
         ...other
@@ -32,7 +32,7 @@ export default (props) => {
             <div>
                 <TextField
                     value={textData}
-                    onChange={handleTextFieldChange}
+                    onChange={handleTextDataChange}
                     fullWidth={true}
                     multiline={true}
                     margin="normal"
