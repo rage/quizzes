@@ -20,7 +20,6 @@ import Typography from '@material-ui/core/Typography'
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { BrowserRouter as Router, Link, Redirect, Route } from 'react-router-dom'
-import { Quiz } from '../../common/src/models/quiz'
 import TMCApi from '../../common/src/services/TMCApi'
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
 import QuizForm from './components/QuizForm'
