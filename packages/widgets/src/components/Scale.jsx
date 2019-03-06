@@ -5,7 +5,7 @@ import { RadioGroup, FormControl, FormLabel,
 
 
 // for now set here - might this differ for different scales, or always 7...?
-const scale_options = 7
+const number_of_options = 7
 
 
 
@@ -31,7 +31,7 @@ const Scale = ({ handleIntDataChange, intData, item }) => (
 
       {
           Array.from(
-              {length: scale_options},
+              {length: number_of_options},
               (v, i) => i+1
           ).map(
               number => (
