@@ -1,75 +1,56 @@
-import React, {Component} from 'react'
-import { RadioGroup, FormControl, FormLabel, FormControlLabel, Radio } from "@material-ui/core"
+import React from 'react'
+import { RadioGroup, FormControl, FormLabel, FormControlLabel, Radio, Grid } from "@material-ui/core"
 
 
-// for now set here - might this differ for different scales, or alway
+// for now set here - might this differ for different scales, or always 7...?
 const scale_options = 7
 
-class Scale extends Component {
-
-    constructor(props){
-        super(props)
-        this.state = {
-            value: "1"
-        }
-    }
 
 
-    handleChange = (event) => {
-        this.setState({value: event.target.value})
-    }
+const Scale = ({ handleIntOptionChange, intData, title }) => (
 
-    render()
-    {
-        return (
+    <div>
+    <FormControl fullWidth component="fieldset">
 
-        <div>
-        <FormControl component="fieldset">
-          <FormLabel component="legend">{this.props.title}</FormLabel>
-          <RadioGroup
-          row={true}
-            aria-label="agreement"
-            name="agreement"
-            value={this.state.value}
-            onChange={this.handleChange}
-          >
+    <Grid container >
 
-          {
-              Array.from(
-                  {length: scale_options},
-                  (v, i) => i+1
-              ).map(
-                  number => (
-                      <FormControlLabel
-                      key={number}
-                      value={"" + number}
-                      control={<Radio color="primary" />} 
-                      label={"" + number}
-                      labelPlacement="top"
-                      />
-                  
-              ))
-          }
+    <Grid item xs={4}>
+      <FormLabel component="legend">{title}</FormLabel>
+    </Grid>
 
+    <Grid item xs>
+      <RadioGroup 
+        row
+        aria-label="agreement"
+        name="agreement"
+        value={`${intData}`}
+        onChange={handleIntOptionChange}
+      >
 
-
-          </RadioGroup>
-        </FormControl>
-        </div>
-       )
-    }}
+      {
+          Array.from(
+              {length: scale_options},
+              (v, i) => i+1
+          ).map(
+              number => (
+                  <FormControlLabel
+                  key={number}
+                  value={`${number}`}
+                  control={<Radio color="primary" />} 
+                  label={`${number}`}
+                  labelPlacement="start"
+                  />
+              
+          ))
+      }
 
 
-    const ScaleOption = ({ arvo }) => (
-        <FormControlLabel
-            value={arvo}
-            control={<Radio color="primary" />} 
-            label={arvo}
-            labelPlacement="top"
-            />
-            
-    )
+        </RadioGroup>
+      </Grid>      
+    </Grid>
 
-
+    </FormControl>
+    </div>
+   )
 
 export default Scale

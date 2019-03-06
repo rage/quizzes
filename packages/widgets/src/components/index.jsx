@@ -71,6 +71,19 @@ class Quiz extends Component {
     this.setState({ quizAnswer: { ...quizAnswer, ...{ itemAnswers } } })
   }
 
+  handleIntOptionChange = (itemId) => (event) => {
+    //conversion to be sure
+    const value = Number(event.target.value)
+    const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
+      if(itemAnswer.quizItemId === itemId){
+        return { ...itemAnswer, intData: value}
+      }
+      return itemAnswer
+    })
+
+    this.setState({ quizAnswer: { ...this.state.quizAnswer, ...{ itemAnswers } } })
+  }
+
   handleSubmit = async (event) => {
     const response = await axios.post(
       `http://localhost:3000/api/v1/quizzes/answer`,
@@ -108,10 +121,12 @@ class Quiz extends Component {
               languageId={languageId}
               answered={this.state.quizAnswer.id ? true : false}
               textData={this.state.quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id).textData}
+              intData={this.state.quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id).intData}
               peerReviewsGiven={this.state.userQuizState ? this.state.userQuizState.peerReviewsGiven : 0}
               peerReviewQuestions={this.state.quiz.peerReviewQuestionCollections}
               submitMessage={this.state.quiz.texts[0].submitMessage}
               handleTextFieldChange={this.handleTextFieldChange(item.id)}
+              handleIntOptionChange={this.handleIntOptionChange(item.id)}
               setUserQuizState={this.setUserQuizState}
             />
           })}
