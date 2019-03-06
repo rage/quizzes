@@ -1,5 +1,7 @@
 import React from 'react'
-import { RadioGroup, FormControl, FormLabel, FormControlLabel, Radio, Grid } from "@material-ui/core"
+import { RadioGroup, FormControl, FormLabel,
+   FormControlLabel, Radio, Grid,
+  Typography } from "@material-ui/core"
 
 
 // for now set here - might this differ for different scales, or always 7...?
@@ -7,7 +9,7 @@ const scale_options = 7
 
 
 
-const Scale = ({ handleIntOptionChange, intData, title }) => (
+const Scale = ({ handleIntOptionChange, intData, item }) => (
 
     <div>
     <FormControl fullWidth component="fieldset">
@@ -15,7 +17,7 @@ const Scale = ({ handleIntOptionChange, intData, title }) => (
     <Grid container >
 
     <Grid item xs={4}>
-      <FormLabel component="legend">{title}</FormLabel>
+      <FormLabel component="legend"><Typography variant="subtitle1">{item.texts[0].title}</Typography></FormLabel>
     </Grid>
 
     <Grid item xs>
@@ -36,7 +38,11 @@ const Scale = ({ handleIntOptionChange, intData, title }) => (
                   <FormControlLabel
                   key={number}
                   value={`${number}`}
-                  control={<Radio color="primary" />} 
+                  control={
+                    <Radio color="primary" style={{
+                      paddingLeft: 0
+                    }} />
+                  } 
                   label={`${number}`}
                   labelPlacement="start"
                   />

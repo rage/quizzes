@@ -3,7 +3,9 @@ import { Button, Typography } from "@material-ui/core"
 import Essay from "./Essay"
 import MultipleChoice from "./MultipleChoice"
 import Scale from './Scale'
+import Unsupported from './Unsupported'
 import axios from "axios"
+
 
 const mapTypeToComponent = {
   essay: Essay,
@@ -11,8 +13,13 @@ const mapTypeToComponent = {
   scale: Scale
 }
 
+const componentType = (typeName) => {
+  let component = mapTypeToComponent[typeName]
+  return component === undefined ? Unsupported : component
+}
+
 const ids = {
-  scale_id: "2684de7b-f52a-4411-a96f-c4f996bc6f4f",
+  scale_id: "23558109-e0e4-4a2c-b85a-b4b00d2d3cdf",
   essay_id: "4901fd41-2e77-4c3f-a2d9-255582fca7b6",
   multiple_choice_id: "4bf4cf2f-3058-4311-8d16-26d781261af7"
 }
@@ -112,9 +119,9 @@ class Quiz extends Component {
         <div>
           <Typography variant="body1" dangerouslySetInnerHTML={{ __html: this.state.quiz.texts[0].body }} />
           {this.state.quiz.items.map(item => {
-            const ItemComponent = mapTypeToComponent[item.type]
+            const ItemComponent = componentType(item.type) 
             return <ItemComponent
-              title={item.texts[0].title}
+              item={item}
               quizId={id}
               key={item.id}
               accessToken={accessToken}
