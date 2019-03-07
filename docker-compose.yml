@@ -13,8 +13,14 @@ services:
     environment:
       REDIS_HOST: redis
       REDIS_PORT: 6379
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASSWORD: postgres
   redis:
     image: redis:5-alpine
     container_name: redis
   postgres:
     image: postgres:11-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
