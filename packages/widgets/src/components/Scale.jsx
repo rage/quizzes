@@ -9,15 +9,20 @@ const number_of_options = 7
 
 
 
-const Scale = ({ handleIntDataChange, intData, item }) => (
+const Scale = ({ handleIntDataChange,
+   intData,
+    item,
+  answered }) => {
 
+    
+    return (
     <div>
     <FormControl fullWidth component="fieldset">
 
     <Grid container >
 
     <Grid item xs={4}>
-      <FormLabel component="legend"><Typography variant="subtitle1">{item.texts[0].title}</Typography></FormLabel>
+      <FormLabel component="legend" ><Typography variant="subtitle1">{item.texts[0].title}</Typography></FormLabel>
     </Grid>
 
     <Grid item xs>
@@ -39,9 +44,7 @@ const Scale = ({ handleIntDataChange, intData, item }) => (
                   key={number}
                   value={`${number}`}
                   control={
-                    <Radio color="primary" style={{
-                      paddingLeft: 0
-                    }} />
+                    <Radio {...radioButtonOptions(answered)} />
                   } 
                   label={`${number}`}
                   labelPlacement="start"
@@ -58,5 +61,20 @@ const Scale = ({ handleIntDataChange, intData, item }) => (
     </FormControl>
     </div>
    )
+  }
+
+  const radioButtonOptions = (answered) => {
+    let options = {
+      style: {
+        paddingLeft: 0,
+      }, 
+      color: answered ? "default" : "primary"
+    }
+
+    if(answered){
+      options.onChange=null
+    }
+    return options
+  }
 
 export default Scale
