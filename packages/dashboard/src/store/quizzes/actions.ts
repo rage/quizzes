@@ -17,7 +17,7 @@ export const remove = createAction("quizzes/REMOVE", resolve => {
 export const setQuizzes = course => {
   return async (dispatch, getState) => {
     try {
-      const data = await getQuizzes(course)
+      const data = await getQuizzes(course, getState().user)
       const cSet = new Set()
       data.map(quiz => cSet.add(quiz.course.id))
       const courses = data.filter(quiz => cSet.has(quiz.course.id))

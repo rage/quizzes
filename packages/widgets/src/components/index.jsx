@@ -9,24 +9,19 @@ const mapTypeToComponent = {
   "multiple-choice": MultipleChoice,
 }
 
-const id = "3c954097-268f-44bf-9d2e-1efaf9e8f122"
-const accessToken = ""
-const languageId = "en_US"
-
 class Quiz extends Component {
   state = {
     quiz: undefined,
     quizAnswer: undefined,
     userCourseState: undefined,
-    answersToReview: undefined,
-    peerReview: undefined,
-    selectedAnswer: undefined
+    submitLocked: false,
+    correctCount: null
   }
 
   async componentDidMount() {
-    // const { id, languageId, accessToken } = this.props
+    const { id, languageId, accessToken } = this.props
     const response = await axios.get(
-      `http://localhost:3000/api/v1/quizzes/${id}`,
+      `http://localhost:3000/api/v1/quizzes/${id}?language=${languageId}`,
       { headers: { authorization: `Bearer ${accessToken}` } }
     )
     const quiz = response.data.quiz
@@ -39,12 +34,12 @@ class Quiz extends Component {
           return {
             quizItemId: item.id,
             textData: "",
-            intData: null
+            intData: null,
+            optionAnswers: []
           }
         })
       }
     }
-    console.log(response.data)
     this.setState({
       quiz: response.data.quiz,
       quizAnswer,
@@ -66,13 +61,35 @@ class Quiz extends Component {
     this.setState({ quizAnswer: { ...quizAnswer, ...{ itemAnswers } } })
   }
 
+  handleOptionChange = (itemId) => (optionId) => () => {
+    const multi = this.state.quiz.items.find(item => item.id === itemId).multi
+    const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
+      if (itemAnswer.quizItemId === itemId) {
+        const updated = { ...itemAnswer }
+        if (multi) {
+          if (updated.optionAnswers.find(oa => oa.quizOptionId === optionId)) {
+            updated.optionAnswers = updated.optionAnswers.filter(oa => oa.quizOptionId !== optionId)
+          } else {
+            updated.optionAnswers = [...updated.optionAnswers, { quizOptionId: optionId }]
+          }
+        } else {
+          updated.optionAnswers = [{ quizOptionId: optionId }]
+        }
+        return updated
+      }
+      return itemAnswer
+    })
+    const quizAnswer = this.state.quizAnswer
+    this.setState({ quizAnswer: { ...quizAnswer, ...{ itemAnswers } } })
+  }
+
   handleSubmit = async (event) => {
+    this.setState({ submitLocked: true })
     const response = await axios.post(
       `http://localhost:3000/api/v1/quizzes/answer`,
       this.state.quizAnswer,
-      { headers: { authorization: `Bearer ${accessToken}` } }
+      { headers: { authorization: `Bearer ${this.props.accessToken}` } }
     )
-    console.log(response.data)
     this.setState({
       quiz: response.data.quiz,
       quizAnswer: response.data.quizAnswer,
@@ -84,35 +101,84 @@ class Quiz extends Component {
     this.setState({ userQuizState })
   }
 
+  submitDisabled() {
+    const submittable = this.state.quiz.items.map(item => {
+      const itemAnswer = this.state.quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id)
+      if (item.type === "essay") {
+        return itemAnswer.textData ? true : false
+      }
+      if (item.type === "multiple-choice") {
+        return itemAnswer.optionAnswers.length > 0
+      }
+      if (item.type === "scale") {
+        return itemAnswer.intData ? true : false
+      }
+    })
+    return submittable.includes(false)
+  }
+
   render() {
-    if (!this.state.quiz) {
+
+    const {
+      quiz,
+      quizAnswer,
+      userQuizState
+    } = this.state
+
+    const {
+      id,
+      languageId,
+      accessToken
+    } = this.props
+
+
+    if (!accessToken) {
+      return <div>Kirjaudu sisään vastataksesi tehtävään</div>
+    }
+
+    if (!quiz) {
       return <div>Loading</div>
     }
+
     return (
       <div>
-        <Typography variant="h4">{this.state.quiz.texts[0].title}</Typography>
+        <Typography variant="h4">{quiz.texts[0].title}</Typography>
         <div>
-          <Typography variant="body1" dangerouslySetInnerHTML={{ __html: this.state.quiz.texts[0].body }} />
-          {this.state.quiz.items.map(item => {
+          <Typography variant="body1" dangerouslySetInnerHTML={{ __html: quiz.texts[0].body }} />
+          {quiz.items.map(item => {
+            const itemAnswer = quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id)
             const ItemComponent = mapTypeToComponent[item.type]
             return <ItemComponent
               quizId={id}
               key={item.id}
               accessToken={accessToken}
               languageId={languageId}
-              answered={this.state.quizAnswer.id ? true : false}
-              textData={this.state.quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id).textData}
-              peerReviewsGiven={this.state.userQuizState.peerReviewsGiven}
-              peerReviewQuestions={this.state.quiz.peerReviewQuestionCollections}
-              submitMessage={this.state.quiz.texts[0].submitMessage}
+              answered={quizAnswer.id ? true : false}
+              textData={itemAnswer.textData}
+              optionAnswers={itemAnswer.optionAnswers}
+              multi={item.multi}
+              correct={itemAnswer.correct}
+              successMessage={item.texts[0].successMessage}
+              failureMessage={item.texts[0].failureMessage}
+              peerReviewsGiven={userQuizState ? userQuizState.peerReviewsGiven : 0}
+              itemTitle={item.texts[0].title}
+              options={item.options}
+              peerReviewQuestions={quiz.peerReviewQuestionCollections}
+              submitMessage={quiz.texts[0].submitMessage}
               handleTextFieldChange={this.handleTextFieldChange(item.id)}
+              handleOptionChange={this.handleOptionChange(item.id)}
               setUserQuizState={this.setUserQuizState}
             />
           })}
           {
-            this.state.quizAnswer.id
+            quizAnswer.id
               ? ""
-              : <Button onClick={this.handleSubmit}>Vastaa</Button>
+              :
+              <div>
+                <Button
+                  disabled={this.state.submitLocked ? true : this.submitDisabled()}
+                  onClick={this.handleSubmit}>Vastaa</Button>
+              </div>
           }
         </div>
       </div>
