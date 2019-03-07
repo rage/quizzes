@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quizzes-backend-deployment
+spec:
+  selector:
+    matchLabels:
+      app: quizzes-backend
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: quizzes-backend
+    spec:
+      containers:
+      - name: quizzes-backend
+        image: gcr.io/moocfi/quizzes-backend
+        imagePullPolicy: Always
+        ports:
+        - name: backend-http
+          containerPort: 3000

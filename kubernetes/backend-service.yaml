@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: quizzes-backend-service
+  labels:
+    app: quizzes-backend
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: http-server
+  selector:
+    app: quizzes-backend
