@@ -21,11 +21,11 @@ spec:
           containerPort: 3000
         env:
           - name: REDIS_HOST
-            value: quizzes-backend-redis-slave.default.svc.cluster.local
+            value: "quizzes-backend-redis-slave.default.svc.cluster.local"
           - name: REDIS_PORT
-            value: 6379
+            value: "6379"
           - name: REDIS_PASSWORD
             valueFrom:
               secretKeyRef:
                 name: quizzes-backend-redis
-                Key: redis-password
+                key: redis-password
