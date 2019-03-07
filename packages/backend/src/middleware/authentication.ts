@@ -12,10 +12,11 @@ import { promisify } from "util"
 
 @Middleware({ type: "before" })
 export class AuthenticationMiddleware implements ExpressMiddlewareInterface {
-  private client = redis.createClient(
-    Number.parseInt(process.env.REDIS_PORT),
-    process.env.REDIS_HOST,
-  )
+  private client = redis.createClient({
+    host: process.env.REDIS_HOST,
+    port: Number.parseInt(process.env.REDIS_PORT),
+    password: process.env.REDIS_PASSWORD,
+  })
   private get = promisify(this.client.get).bind(this.client)
 
   public async use(req: any, res: any, next: any) {
