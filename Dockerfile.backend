@@ -1,0 +1,21 @@
+FROM node:11-alpine
+
+RUN apk --no-cache update \
+&& apk --no-cache add g++ make bash zlib-dev libpng-dev redis \
+&&  rm -fr /var/cache/apk/*
+
+COPY . /app
+
+WORKDIR /app
+
+RUN yarn install
+
+WORKDIR /app/packages/backend
+
+RUN yarn build
+
+USER node
+
+EXPOSE 3000
+ENV NODE_ENV=production
+CMD [ "yarn", "serve" ]

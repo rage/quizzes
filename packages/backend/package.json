@@ -6,7 +6,7 @@
   "scripts": {
     "start": "yarn run serve",
     "build": "yarn run build-ts",
-    "serve": "node ../../dist/backend/src/server.js",
+    "serve": "pm2 start --no-daemon pm2.json",
     "watch-node": "nodemon --verbose dist/backend/src/server.js",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run watch-node\"",
     "test": "jest --forceExit --coverage --verbose",
@@ -56,6 +56,7 @@
     "passport": "^0.4.0",
     "passport-http-bearer": "^1.0.1",
     "pg": "^7.4.3",
+    "pm2": "^3.3.1",
     "progress": "^2.0.0",
     "redis": "^2.8.0",
     "reflect-metadata": "^0.1.12",

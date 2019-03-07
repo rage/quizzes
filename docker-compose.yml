@@ -1,0 +1,20 @@
+version: '2'
+services:
+  web:
+    build:
+      dockerfile: Dockerfile.backend
+      context: .
+    command: yarn serve
+    ports:
+      - "3000:3000"
+    depends_on:
+      - redis
+      - postgres
+    environment:
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+  redis:
+    image: redis:5-alpine
+    container_name: redis
+  postgres:
+    image: postgres:11-alpine
