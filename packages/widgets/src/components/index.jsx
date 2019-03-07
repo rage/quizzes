@@ -179,6 +179,7 @@ class Quiz extends Component {
               accessToken={accessToken}
               languageId={languageId}
               answered={quizAnswer.id ? true : false}
+              intData={itemAnswer.intData}
               textData={itemAnswer.textData}
               optionAnswers={itemAnswer.optionAnswers}
               multi={item.multi}
