@@ -1,11 +1,11 @@
 import React from 'react'
-import { RadioGroup, FormControl, FormLabel,
-   FormControlLabel, Radio, Grid,
+import { FormControl, FormLabel, FormControlLabel,
+  Radio, RadioGroup,
+  Table, TableBody, TableCell, TableRow,
   Typography } from "@material-ui/core"
 
 
-// for now set here - might this differ for different scales, or always 7...?
-const number_of_options = 7
+const NUMBER_OF_OPTIONS = 7
 
 
 
@@ -19,13 +19,15 @@ const Scale = ({ handleIntDataChange,
     <div>
     <FormControl fullWidth component="fieldset">
 
-    <Grid container >
+    <Table>
+      <TableBody>
+      <TableRow>
 
-    <Grid item xs={4} style={{alignSelf: "center"}}>
+    <TableCell style={{width: "40%"}}>
       <FormLabel component="legend" ><Typography variant="subtitle1">{item.texts[0].title}</Typography></FormLabel>
-    </Grid>
+    </TableCell>
 
-    <Grid item xs>
+    <TableCell style={{width: "40%"}}>
       <RadioGroup 
         row
         aria-label="agreement"
@@ -36,7 +38,7 @@ const Scale = ({ handleIntDataChange,
 
       {
           Array.from(
-              {length: number_of_options},
+              {length: NUMBER_OF_OPTIONS},
               (v, i) => i+1
           ).map(
               number => (
@@ -52,11 +54,11 @@ const Scale = ({ handleIntDataChange,
               
           ))
       }
-
-
         </RadioGroup>
-      </Grid>      
-    </Grid>
+      </TableCell>   
+      </TableRow>   
+      </TableBody>
+    </Table>
 
     </FormControl>
     </div>
