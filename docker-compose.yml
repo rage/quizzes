@@ -16,6 +16,14 @@ services:
       DB_HOST: postgres
       DB_USER: postgres
       DB_PASSWORD: postgres
+  dashboard:
+    build: 
+      dockerfile: Dockerfile.dashboard
+      context: .
+      args:
+      - REACT_APP_BACKEND_URL=http://localhost:3000/
+    ports:
+      - "5001:80"
   redis:
     image: redis:5-alpine
     container_name: redis
@@ -24,3 +32,4 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    
