@@ -21,7 +21,7 @@ const Scale = ({ handleIntDataChange,
 
     <Grid container >
 
-    <Grid item xs={4}>
+    <Grid item xs={4} style={{alignSelf: "center"}}>
       <FormLabel component="legend" ><Typography variant="subtitle1">{item.texts[0].title}</Typography></FormLabel>
     </Grid>
 
