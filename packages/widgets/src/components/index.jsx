@@ -34,7 +34,6 @@ class Quiz extends Component {
       `http://localhost:3000/api/v1/quizzes/${id}?language=${languageId}`,
       { headers: { authorization: `Bearer ${accessToken}` } }
     )
-    console.log(response.data)
     const quiz = response.data.quiz
     let quizAnswer = response.data.quizAnswer
     if (!quizAnswer) {
