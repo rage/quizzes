@@ -2,15 +2,18 @@ apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: quizzes-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: quizzes-ip
+
 spec:
   rules:
     - http:
         paths:
         - path: /
           backend:
-            serviceName: quizzes-backend-service
-            servicePort: 80
-        - path: /dashboard
+            serviceName: quizzes-dashboard-service
+            servicePort: 81
+        - path: /api/*
           backend:
-            serviceName: dashboard-service
+            serviceName: quizzes-backend-service
             servicePort: 80

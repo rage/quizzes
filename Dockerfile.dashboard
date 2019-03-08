@@ -1,6 +1,4 @@
-FROM node:11-alpine as builder 
-
-ENV REACT_APP_BACKEND_URL=http://localhost:3000
+FROM node:11-alpine as builder
 
 RUN apk --no-cache update \
 && apk --no-cache add g++ make bash zlib-dev libpng-dev \
