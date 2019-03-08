@@ -2,6 +2,7 @@
   "name": "@quizzes/dashboard",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:3000",
   "dependencies": {
     "@material-ui/core": "^3.4.0",
     "@quizzes/common": "0.0.1",
