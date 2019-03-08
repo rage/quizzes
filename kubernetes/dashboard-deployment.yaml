@@ -18,4 +18,4 @@ spec:
         imagePullPolicy: Always
         ports:
         - name: dashboard-http
-          containerPort: 3000
+          containerPort: 80
