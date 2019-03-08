@@ -2,11 +2,21 @@ import React, { Component } from "react"
 import { Button, Typography } from "@material-ui/core"
 import Essay from "./Essay"
 import MultipleChoice from "./MultipleChoice"
+import Scale from './Scale'
+import Unsupported from './Unsupported'
 import axios from "axios"
 
 const mapTypeToComponent = {
   essay: Essay,
   "multiple-choice": MultipleChoice,
+  scale: Scale
+}
+
+
+
+const componentType = (typeName) => {
+  let component = mapTypeToComponent[typeName]
+  return component === undefined ? Unsupported : component
 }
 
 class Quiz extends Component {
@@ -47,7 +57,7 @@ class Quiz extends Component {
     })
   }
 
-  handleTextFieldChange = (itemId) => (event) => {
+  handleTextDataChange = (itemId) => (event) => {
     const value = event.target.value
     const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
       if (itemAnswer.quizItemId === itemId) {
@@ -61,6 +71,19 @@ class Quiz extends Component {
     this.setState({ quizAnswer: { ...quizAnswer, ...{ itemAnswers } } })
   }
 
+  handleIntDataChange = (itemId) => (event) => {
+    //conversion to be sure
+    const value = Number(event.target.value)
+    const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
+      if(itemAnswer.quizItemId === itemId){
+        return { ...itemAnswer, intData: value}
+      }
+      return itemAnswer
+    })
+
+    this.setState({ quizAnswer: { ...this.state.quizAnswer, ...{ itemAnswers } } })
+  }
+  
   handleOptionChange = (itemId) => (optionId) => () => {
     const multi = this.state.quiz.items.find(item => item.id === itemId).multi
     const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
@@ -147,13 +170,15 @@ class Quiz extends Component {
           <Typography variant="body1" dangerouslySetInnerHTML={{ __html: quiz.texts[0].body }} />
           {quiz.items.map(item => {
             const itemAnswer = quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id)
-            const ItemComponent = mapTypeToComponent[item.type]
+            const ItemComponent = componentType(item.type)
             return <ItemComponent
+              item={item}
               quizId={id}
               key={item.id}
               accessToken={accessToken}
               languageId={languageId}
               answered={quizAnswer.id ? true : false}
+              intData={itemAnswer.intData}
               textData={itemAnswer.textData}
               optionAnswers={itemAnswer.optionAnswers}
               multi={item.multi}
@@ -165,7 +190,8 @@ class Quiz extends Component {
               options={item.options}
               peerReviewQuestions={quiz.peerReviewQuestionCollections}
               submitMessage={quiz.texts[0].submitMessage}
-              handleTextFieldChange={this.handleTextFieldChange(item.id)}
+              handleTextDataChange={this.handleTextDataChange(item.id)}
+              handleIntDataChange={this.handleIntDataChange(item.id)}
               handleOptionChange={this.handleOptionChange(item.id)}
               setUserQuizState={this.setUserQuizState}
             />
