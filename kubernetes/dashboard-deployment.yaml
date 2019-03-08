@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quizzes-dashboard-deployment
+spec:
+  selector:
+    matchLabels:
+      app: quizzes-dashboard
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: quizzes-dashboard
+    spec:
+      containers:
+      - name: quizzes-dashboard
+        image: gcr.io/moocfi/quizzes-dashboard
+        imagePullPolicy: Always
+        ports:
+        - name: dashboard-http
+          containerPort: 3000
