@@ -3,16 +3,6 @@ import { TextField, Typography, Paper } from '@material-ui/core'
 
 
 
-const fieldInstruction = (languageId) => {
-    const instructionOptions = {
-        en_US: "Answer...",
-        fi_FI: "Vastaus..."
-    }
-    return instructionOptions[languageId] !== undefined ? 
-            instructionOptions[languageId]
-            : "..."
-}
-
 
 const Open = ({
     answered,
@@ -25,11 +15,30 @@ const Open = ({
 }) => {
 
 
+    // defaults to English
+    let languageInfo = ((languageId) => {
+        const languageOptions = {
+            en_US: {
+                placeholder: "Answer", 
+                userAnswerLabel: "Your answer"
+            }, 
+
+            fi_FI: {
+                placeholder: "Vastaus",
+                userAnswerLabel: "Vastauksesi"
+            }
+        }
+        
+        const result = languageOptions[languageId]
+        return result !== undefined
+                ? result
+                : languageOptions.en_US            
+        })(languageId)
 
     if(answered){
         return (
             <div>
-                <Typography variant="subtitle1">Vastasit</Typography>
+                <Typography variant="subtitle1">{languageInfo.userAnswerLabel}:</Typography>
                 <Paper style={paper}>
                     <Typography variant="body1">{ textData }</Typography>
                 </Paper>
@@ -53,7 +62,7 @@ const Open = ({
             onChange={handleTextDataChange}
             fullWidth
             margin="normal"
-            placeholder={fieldInstruction(languageId)}
+            placeholder={languageInfo.placeholder}
             />
         </div>
     )
