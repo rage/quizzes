@@ -129,7 +129,7 @@ class Quiz extends Component {
   submitDisabled() {
     const submittable = this.state.quiz.items.map(item => {
       const itemAnswer = this.state.quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id)
-      if (item.type === "essay") {
+      if (item.type === "essay" || item.type === "open") {
         return itemAnswer.textData ? true : false
       }
       if (item.type === "multiple-choice") {
