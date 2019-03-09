@@ -12,8 +12,6 @@ const mapTypeToComponent = {
   scale: Scale
 }
 
-
-
 const componentType = (typeName) => {
   let component = mapTypeToComponent[typeName]
   return component === undefined ? Unsupported : component
@@ -149,7 +147,6 @@ class Quiz extends Component {
     } = this.state
 
     const {
-      id,
       languageId,
       accessToken
     } = this.props
@@ -173,7 +170,7 @@ class Quiz extends Component {
             const ItemComponent = componentType(item.type)
             return <ItemComponent
               item={item}
-              quizId={id}
+              quizId={quiz.id}
               key={item.id}
               accessToken={accessToken}
               languageId={languageId}

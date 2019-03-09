@@ -1,5 +1,6 @@
 import { Quiz, QuizAnswer, UserQuizState } from "@quizzes/common/models"
 import { IQuizQuery, ITMCProfileDetails } from "@quizzes/common/types"
+import { getUUIDByString } from "@quizzes/common/util"
 import {
   Get,
   HeaderParam,
@@ -16,6 +17,7 @@ import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
+import validator from "validator"
 
 import _ from "lodash"
 
@@ -44,12 +46,13 @@ export class QuizController {
     @QueryParams() params: any,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
-    console.log(params)
+    const quizId = validator.isUUID(id) ? id : getUUIDByString(id)
+
     let userQuizState: UserQuizState
     try {
       userQuizState = await this.userQuizStateService.getUserQuizState(
         user.id,
-        id,
+        quizId,
       )
     } catch (error) {
       console.log("not found")
@@ -57,7 +60,7 @@ export class QuizController {
     let quizAnswer: QuizAnswer
     if (userQuizState) {
       const answer = await this.quizAnswerService.getAnswer(
-        { quizId: id, userId: user.id },
+        { quizId, userId: user.id },
         this.entityManager,
       )
       if (answer.status === "submitted" || answer.status === "confirmed") {
@@ -65,7 +68,7 @@ export class QuizController {
       }
     }
     const quizzes: Quiz[] = await this.quizService.getQuizzes({
-      id,
+      id: quizId,
       items: true,
       options: true,
       peerreviews: true,

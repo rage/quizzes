@@ -16,9 +16,9 @@
   "peerDependencies": {
     "@material-ui/core": ">=3.9.2",
     "axios": "^0.18.0",
+    "likert-react": "^0.0.0-beta6",
     "react": ">=16.0.0",
-    "react-dom": ">=16.0.0",
-    "likert-react": "^0.0.0-beta6"
+    "react-dom": ">=16.0.0"
   },
   "devDependencies": {
     "@material-ui/core": "^3.9.2",
@@ -26,10 +26,10 @@
     "@neutrinojs/react-components": "^8.3.0",
     "@neutrinojs/standardjs": "^8.3.0",
     "axios": "^0.18.0",
+    "likert-react": "^0.0.0-beta6",
     "neutrino": "^8.3.0",
     "prop-types": "^15.7.2",
     "react": "^16.0.0",
-    "react-dom": "^16.0.0",
-    "likert-react": "^0.0.0-beta6"
+    "react-dom": "^16.0.0"
   }
 }
