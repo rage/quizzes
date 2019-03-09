@@ -3,13 +3,15 @@ import { Button, Typography } from "@material-ui/core"
 import Essay from "./Essay"
 import MultipleChoice from "./MultipleChoice"
 import Scale from './Scale'
+import Open from './Open'
 import Unsupported from './Unsupported'
 import axios from "axios"
 
 const mapTypeToComponent = {
   essay: Essay,
   "multiple-choice": MultipleChoice,
-  scale: Scale
+  scale: Scale,
+  open: Open
 }
 
 
