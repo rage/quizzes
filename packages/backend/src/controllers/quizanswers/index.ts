@@ -10,8 +10,9 @@ import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
+import { API_PATH } from "../../config"
 
-@JsonController("/quizzes/answer")
+@JsonController(`${API_PATH}/quizzes/answer`)
 export class QuizAnswerController {
   @InjectManager()
   private entityManager: EntityManager
