@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { Button, Typography } from "@material-ui/core"
+import { Button, Typography, Grid } from "@material-ui/core"
 import Essay from "./Essay"
 import MultipleChoice from "./MultipleChoice"
 import Scale from './Scale'
@@ -73,15 +73,15 @@ class Quiz extends Component {
     //conversion to be sure
     const value = Number(event.target.value)
     const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
-      if(itemAnswer.quizItemId === itemId){
-        return { ...itemAnswer, intData: value}
+      if (itemAnswer.quizItemId === itemId) {
+        return { ...itemAnswer, intData: value }
       }
       return itemAnswer
     })
 
     this.setState({ quizAnswer: { ...this.state.quizAnswer, ...{ itemAnswers } } })
   }
-  
+
   handleOptionChange = (itemId) => (optionId) => () => {
     const multi = this.state.quiz.items.find(item => item.id === itemId).multi
     const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
@@ -163,8 +163,8 @@ class Quiz extends Component {
     return (
       <div>
         <Typography variant="h4">{quiz.texts[0].title}</Typography>
+        <Typography variant="body1" dangerouslySetInnerHTML={{ __html: quiz.texts[0].body }} />
         <div>
-          <Typography variant="body1" dangerouslySetInnerHTML={{ __html: quiz.texts[0].body }} />
           {quiz.items.map(item => {
             const itemAnswer = quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id)
             const ItemComponent = componentType(item.type)
@@ -179,6 +179,7 @@ class Quiz extends Component {
               textData={itemAnswer.textData}
               optionAnswers={itemAnswer.optionAnswers}
               multi={item.multi}
+              singleItem={quiz.items.length === 1}
               correct={itemAnswer.correct}
               successMessage={item.texts[0].successMessage}
               failureMessage={item.texts[0].failureMessage}
