@@ -31,7 +31,7 @@ export default (props) => {
         <Grid container direction={direction} style={{ marginBottom: 10 }} >
             <Grid item sm={questionWidth} >
                 <Typography variant="subtitle1" >{itemTitle}</Typography>
-                {answered
+                {answered && !singleItem
                     ? <Typography variant="body1" style={{ borderLeft: `4px solid ${correct ? "green" : "red"}`, padding: 3 }} >
                         {correct ? successMessage : failureMessage}
                     </Typography>
@@ -42,26 +42,54 @@ export default (props) => {
                 <Grid container direction={direction} justify="space-evenly" style={{ paddingTop: 7 }} >
                     {options.map(option => {
                         const selected = optionAnswers.find(oa => oa.quizOptionId === option.id)
-                        const title = option.texts[0].title
+                        const text = option.texts[0]
+                        const submittedColor = option.correct
+                            ? selected
+                                ? "green"
+                                : "white"
+                            : selected
+                                ? "red"
+                                : "white"
                         return (
                             <Grid item key={option.id} >
                                 {answered
-                                    ? <Button
-                                        fullWidth
-                                        color="inherit"
-                                        {...selectButtonStyle(selected, option.correct)}
-                                    >
-                                        {title}
-                                    </Button>
-                                    : <Button
-                                        variant="outlined"
-                                        fullWidth
-                                        color={selected ? "primary" : "default"}
-                                        style={{ textTransform: "none" }}
-                                        onClick={handleOptionChange(option.id)}
-                                    >
-                                        {title}
-                                    </Button>}
+                                    ? <Grid item key={option.id} >
+                                        <Button
+                                            fullWidth
+                                            color="inherit"
+                                            {...selectButtonStyle(selected, option.correct)}
+                                        >
+                                            {text.title}
+                                        </Button>
+                                        {singleItem
+                                            ? <Typography
+                                                variant="body1"
+                                                style={{
+                                                    borderLeft: `4px solid ${submittedColor}`,
+                                                    padding: 3,
+                                                    marginBottom: 5
+                                                }} >
+                                                {option.correct
+                                                    ? selected
+                                                        ? text.successMessage
+                                                        : text.failureMessage
+                                                    : selected
+                                                        ? text.failureMessage
+                                                        : text.successMessage}
+                                            </Typography>
+                                            : ""}
+                                    </Grid>
+                                    : <Grid item key={option.id} >
+                                        <Button
+                                            variant="outlined"
+                                            fullWidth
+                                            color={selected ? "primary" : "default"}
+                                            style={{ textTransform: "none" }}
+                                            onClick={handleOptionChange(option.id)}
+                                        >
+                                            {text.title}
+                                        </Button>
+                                    </Grid>}
                             </Grid>
                         )
                     })}

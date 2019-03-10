@@ -198,7 +198,13 @@ class Quiz extends Component {
           })}
           {
             quizAnswer.id
-              ? ""
+              ? <Typography variant="h5">
+                {quizAnswer.itemAnswers.some(ia => ia.correct === true)
+                  ? quiz.items.length === 1
+                    ? "Tehtävä oikein"
+                    : `Sait ${quizAnswer.itemAnswers.filter(ia => ia.correct === true).length}/${quiz.items.length} oikein`
+                  : "Tehtävä väärin"}
+              </Typography>
               :
               <div>
                 <Button
