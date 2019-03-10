@@ -1,5 +1,5 @@
 import React from "react"
-import { Button, Table, TableBody, TableCell, TableRow, Typography } from "@material-ui/core"
+import { Button, Grid, Table, TableBody, TableCell, TableRow, Typography } from "@material-ui/core"
 
 export default (props) => {
 
@@ -11,49 +11,63 @@ export default (props) => {
         itemTitle,
         options,
         optionAnswers,
+        singleItem,
         successMessage
     } = props
 
+    let direction = "row"
+    let questionWidth = 5
+    let optionContainerWidth = 7
+
+    if (singleItem) {
+        const maxOptionLength = Math.max(...options.map(option => option.texts[0].title.length))
+        const width = maxOptionLength > 100 ? 12 : Math.ceil(maxOptionLength / (8 + 1 / 3))
+        optionContainerWidth = Math.min(width, 12)
+        questionWidth = 12
+        direction = "column"
+    }
+
     return (
-        <Table>
-            <TableBody>
-                <TableRow>
-                    <TableCell style={{ width: "40%" }} >
-                        <Typography variant="subtitle1" >{itemTitle}</Typography>
-                        {answered
-                            ? <Typography variant="body1" style={{ borderLeft: `4px solid ${correct ? "green" : "red"}`, padding: 3 }} >
-                                {correct ? successMessage : failureMessage}
-                            </Typography>
-                            : ""
-                        }
-                    </TableCell>
+        <Grid container direction={direction} style={{ marginBottom: 10 }} >
+            <Grid item sm={questionWidth} >
+                <Typography variant="subtitle1" >{itemTitle}</Typography>
+                {answered
+                    ? <Typography variant="body1" style={{ borderLeft: `4px solid ${correct ? "green" : "red"}`, padding: 3 }} >
+                        {correct ? successMessage : failureMessage}
+                    </Typography>
+                    : ""
+                }
+            </Grid>
+            <Grid item sm={optionContainerWidth} >
+                <Grid container direction={direction} justify="space-evenly" style={{ paddingTop: 7 }} >
                     {options.map(option => {
                         const selected = optionAnswers.find(oa => oa.quizOptionId === option.id)
+                        const title = option.texts[0].title
                         return (
-                            <TableCell key={option.id} >
+                            <Grid item key={option.id} >
                                 {answered
                                     ? <Button
                                         fullWidth
                                         color="inherit"
                                         {...selectButtonStyle(selected, option.correct)}
                                     >
-                                        {option.texts[0].title}
+                                        {title}
                                     </Button>
                                     : <Button
+                                        variant="outlined"
                                         fullWidth
-                                        variant="contained"
                                         color={selected ? "primary" : "default"}
                                         style={{ textTransform: "none" }}
                                         onClick={handleOptionChange(option.id)}
                                     >
-                                        {option.texts[0].title}
+                                        {title}
                                     </Button>}
-                            </TableCell>
+                            </Grid>
                         )
                     })}
-                </TableRow>
-            </TableBody>
-        </Table>
+                </Grid>
+            </Grid>
+        </Grid>
     )
 }
 
