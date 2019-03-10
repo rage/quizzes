@@ -6,7 +6,7 @@
   "scripts": {
     "start": "yarn run serve",
     "build": "yarn run build-ts",
-    "serve": "pm2 start --no-daemon pm2.json",
+    "serve": "node dist/backend/src/server.js",
     "watch-node": "nodemon --verbose dist/backend/src/server.js",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run watch-node\"",
     "test": "jest --forceExit --coverage --verbose",

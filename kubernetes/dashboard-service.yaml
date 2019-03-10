@@ -7,7 +7,7 @@ metadata:
 spec:
   type: NodePort
   ports:
-  - port: 81
+  - port: 80
     targetPort: dashboard-http
   selector:
     app: quizzes-dashboard

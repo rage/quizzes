@@ -3,17 +3,22 @@ kind: Ingress
 metadata:
   name: quizzes-ingress
   annotations:
-    kubernetes.io/ingress.global-static-ip-name: quizzes-ip
-
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
+  tls:
+  - hosts:
+    - quizzes.mooc.fi
+    secretName: quizzes-moocfi-cert-secret
   rules:
-    - http:
+    - host: quizzes.mooc.fi
+      http:
         paths:
-        - path: /
-          backend:
-            serviceName: quizzes-dashboard-service
-            servicePort: 81
         - path: /api/*
           backend:
             serviceName: quizzes-backend-service
+            servicePort: 80
+        - path: /
+          backend:
+            serviceName: quizzes-dashboard-service
             servicePort: 80
