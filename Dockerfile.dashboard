@@ -1,7 +1,7 @@
 FROM node:11-alpine as builder
 
 RUN apk --no-cache update \
-&& apk --no-cache add g++ make bash zlib-dev libpng-dev \
+&& apk --no-cache add g++ make bash zlib-dev libpng-dev python2 \
 &&  rm -fr /var/cache/apk/*
 
 COPY --chown=node . /app
