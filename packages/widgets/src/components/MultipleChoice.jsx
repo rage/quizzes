@@ -30,17 +30,20 @@ export default (props) => {
                     {options.map(option => {
                         const selected = optionAnswers.find(oa => oa.quizOptionId === option.id)
                         return (
-                            <TableCell key={option.id} style={{ width: `${40 / options.length}%` }}>
+                            <TableCell key={option.id} >
                                 {answered
                                     ? <Button
+                                        fullWidth
                                         color="inherit"
                                         {...selectButtonStyle(selected, option.correct)}
                                     >
                                         {option.texts[0].title}
                                     </Button>
                                     : <Button
+                                        fullWidth
                                         variant="contained"
                                         color={selected ? "primary" : "default"}
+                                        style={{ textTransform: "none" }}
                                         onClick={handleOptionChange(option.id)}
                                     >
                                         {option.texts[0].title}
@@ -55,14 +58,15 @@ export default (props) => {
 }
 
 const selectButtonStyle = (selected, correct) => {
+    const style = { textTransform: "none" }
     return {
         variant: selected ? "contained" : "outlined",
         style: selected
             ? correct
-                ? { color: "white", backgroundColor: "green" }
-                : { color: "white", backgroundColor: "red" }
+                ? { ...style, ...{ color: "white", backgroundColor: "green" } }
+                : { ...style, ...{ color: "white", backgroundColor: "red" } }
             : correct
-                ? { color: "green", outlineColor: "green" }
-                : {}
+                ? { ...style, ...{ color: "green", outlineColor: "green" } }
+                : style
     }
 }
