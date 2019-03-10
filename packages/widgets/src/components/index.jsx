@@ -79,16 +79,44 @@ class Quiz extends Component {
     //conversion to be sure
     const value = Number(event.target.value)
     const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
-      if(itemAnswer.quizItemId === itemId){
-        return { ...itemAnswer, intData: value}
+      if (itemAnswer.quizItemId === itemId) {
+        return { ...itemAnswer, intData: value }
       }
       return itemAnswer
     })
 
     this.setState({ quizAnswer: { ...this.state.quizAnswer, ...{ itemAnswers } } })
   }
-  
+
   handleOptionChange = (itemId) => (optionId) => () => {
+
+
+    //return the optionAnswers to the same as it was before any answer
+    if (typeof optionId === "number" && optionId < 0) {
+      console.log("here i am")
+
+      const quizAnswer = this.state.quizAnswer
+      const itemAnswers = this.state.quizAnswer.itemAnswers
+      const newItemAnswers = itemAnswers.map(ia => {
+        if (ia.quizItemId === itemId) {
+          console.log("HEEEE")
+          return { ...ia, optionAnswers: [] }
+        } else {
+          return ia
+        }
+      })
+
+      this.setState({
+        quizAnswer: {
+          ...quizAnswer,
+          itemAnswers: newItemAnswers
+        }
+      })
+
+      return
+    }
+
+
     const multi = this.state.quiz.items.find(item => item.id === itemId).multi
     const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
       if (itemAnswer.quizItemId === itemId) {
@@ -143,6 +171,8 @@ class Quiz extends Component {
     })
     return submittable.includes(false)
   }
+
+
 
   render() {
 
