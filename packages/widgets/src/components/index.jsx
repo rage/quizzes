@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import { Button, Typography } from "@material-ui/core"
+import Checkbox from './Checkbox'
 import Essay from "./Essay"
 import MultipleChoice from "./MultipleChoice"
 import Scale from './Scale'
@@ -9,7 +10,8 @@ import axios from "axios"
 const mapTypeToComponent = {
   essay: Essay,
   "multiple-choice": MultipleChoice,
-  scale: Scale
+  scale: Scale,
+  checkbox: Checkbox
 }
 
 
@@ -34,6 +36,8 @@ class Quiz extends Component {
       `http://localhost:3000/api/v1/quizzes/${id}?language=${languageId}`,
       { headers: { authorization: `Bearer ${accessToken}` } }
     )
+
+    console.log(response.data)
     const quiz = response.data.quiz
     let quizAnswer = response.data.quizAnswer
     if (!quizAnswer) {
