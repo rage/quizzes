@@ -25,8 +25,6 @@ if (process.env.NODE_ENV !== "production") {
   dotenv.config({ path: ".env" })
 }
 
-const API_PATH = "/api/v1"
-
 @Service()
 export class App {
   private application: Application
@@ -50,7 +48,7 @@ export class App {
 
     this.application = createExpressServer({
       cors: true,
-      routePrefix: API_PATH,
+      // routePrefix: "/",
       controllers,
       middlewares: [AuthenticationMiddleware],
     })

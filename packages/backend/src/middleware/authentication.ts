@@ -16,6 +16,9 @@ export class AuthenticationMiddleware implements ExpressMiddlewareInterface {
   private get = promisify(this.client.get).bind(this.client)
 
   public async use(req: any, res: any, next: any) {
+    if (req.url === "/") {
+      return next()
+    }
     const authorization: string = req.headers.authorization || ""
     const token: string =
       authorization.toLocaleLowerCase().replace("bearer ", "") || ""
