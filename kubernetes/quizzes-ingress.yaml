@@ -4,7 +4,6 @@ metadata:
   name: quizzes-ingress
   annotations:
     certmanager.k8s.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/rewrite-target: /
 spec:
   tls:
   - hosts:
