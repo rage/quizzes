@@ -13,7 +13,7 @@ spec:
     - host: quizzes.mooc.fi
       http:
         paths:
-        - path: /api/*
+        - path: /api/
           backend:
             serviceName: quizzes-backend-service
             servicePort: 80
