@@ -71,6 +71,8 @@ export async function migrateQuizzes(courses: {
       }
     }
 
+    console.log(oldQuiz._id)
+
     const languageId = course.languages[0].id
     if (!course || !course.languages || !languageId) {
       throw Error(JSON.stringify(course))

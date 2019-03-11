@@ -62,6 +62,8 @@ export class Quiz extends BaseEntity {
   }) // was: not eager
   public peerReviewQuestionCollections: PeerReviewQuestionCollection[]
 
+  @Column({ default: true })
+  public autoConfirm: boolean
   @Column({ default: false })
   public excludedFromScore: boolean
 

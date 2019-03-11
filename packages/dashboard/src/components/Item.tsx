@@ -83,22 +83,24 @@ class Item extends React.Component<any, any> {
                                 <DragHandleWrapper>
 
                                     <CardHeader
-                                        title={this.props.title}
+                                        title={this.props.type === "essay" ? "Essay" : this.props.title}
                                         titleTypographyProps={{ variant: "subtitle1", gutterBottom: false }}
                                     />
                                 </DragHandleWrapper>
                             </Grid>
-                            <Grid item={true} xs={1} >
-                                <Grid container={true} justify="flex-end">
-                                    <Grid item={true}>
-                                        <CardActions>
-                                            <IconButton onClick={this.handleExpand}>
-                                                <SvgIcon><path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" /></SvgIcon>
-                                            </IconButton>
-                                        </CardActions>
+                            {this.props.type === "essay"
+                                ? ""
+                                : <Grid item={true} xs={1} >
+                                    <Grid container={true} justify="flex-end">
+                                        <Grid item={true}>
+                                            <CardActions>
+                                                <IconButton onClick={this.handleExpand}>
+                                                    <SvgIcon><path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" /></SvgIcon>
+                                                </IconButton>
+                                            </CardActions>
+                                        </Grid>
                                     </Grid>
-                                </Grid>
-                            </Grid>
+                                </Grid>}
                         </Grid> :
                         <p />
                 }

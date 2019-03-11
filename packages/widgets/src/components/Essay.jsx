@@ -124,11 +124,11 @@ class PeerReviews extends Component {
         return (
             <div>
                 <Typography variant="subtitle1" >{this.props.peerReviewQuestions[0].texts[0].body}</Typography>
-                <Typography variant="subtitle1" >Vertaisarvioita annettu: {this.props.peerReviewsGiven}</Typography>
+                <Typography variant="subtitle1" >Vertaisarvioita annettu: {this.props.peerReviewsGiven}/{this.props.peerReviewsRequired}</Typography>
                 {!answersToReview
                     ? <Typography>Loading</Typography>
                     : answersToReview.length === 0
-                        ? <Typography>No answers available for peerReview</Typography>
+                        ? <Typography>Vertaisarvioitavia ei saatavilla</Typography>
                         : answersToReview.map(answer =>
                             <div key={answer.id} >
                                 <Paper style={paper} >
