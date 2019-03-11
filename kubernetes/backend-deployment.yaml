@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: quizzes-backend
-        image: gcr.io/moocfi/quizzes-backend:build-1552240130-5803e0be3ccbbd6c96c6350ab40171969d2873d0
+        image: gcr.io/moocfi/quizzes-backend:build-1552303737-35a059be0f31423ba8fab293fa962eac86e869fd
         imagePullPolicy: Always
         ports:
         - name: backend-http

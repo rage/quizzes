@@ -25,36 +25,41 @@ class Quiz extends Component {
     quizAnswer: undefined,
     userCourseState: undefined,
     submitLocked: false,
-    correctCount: null
+    correctCount: null,
+    error: undefined,
   }
 
   async componentDidMount() {
     const { id, languageId, accessToken } = this.props
-    const response = await axios.get(
-      `http://localhost:3000/api/v1/quizzes/${id}?language=${languageId}`,
-      { headers: { authorization: `Bearer ${accessToken}` } }
-    )
-    const quiz = response.data.quiz
-    let quizAnswer = response.data.quizAnswer
-    if (!quizAnswer) {
-      quizAnswer = {
-        quizId: quiz.id,
-        languageId,
-        itemAnswers: response.data.quiz.items.map(item => {
-          return {
-            quizItemId: item.id,
-            textData: "",
-            intData: null,
-            optionAnswers: []
-          }
-        })
+    try {
+      const response = await axios.get(
+        `https://quizzes.mooc.fi/api/v1/quizzes/${id}?language=${languageId}`,
+        { headers: { authorization: `Bearer ${accessToken}` } }
+      )
+      const quiz = response.data.quiz
+      let quizAnswer = response.data.quizAnswer
+      if (!quizAnswer) {
+        quizAnswer = {
+          quizId: quiz.id,
+          languageId,
+          itemAnswers: response.data.quiz.items.map(item => {
+            return {
+              quizItemId: item.id,
+              textData: "",
+              intData: null,
+              optionAnswers: []
+            }
+          })
+        }
       }
+      this.setState({
+        quiz: response.data.quiz,
+        quizAnswer,
+        userQuizState: response.data.userQuizState
+      })
+    } catch (e) {
+      this.setState({ error: e.toString() })
     }
-    this.setState({
-      quiz: response.data.quiz,
-      quizAnswer,
-      userQuizState: response.data.userQuizState
-    })
   }
 
   handleTextDataChange = (itemId) => (event) => {
@@ -145,7 +150,8 @@ class Quiz extends Component {
     const {
       quiz,
       quizAnswer,
-      userQuizState
+      userQuizState,
+      error
     } = this.state
 
     const {
@@ -156,6 +162,12 @@ class Quiz extends Component {
 
     if (!accessToken) {
       return <div>Kirjaudu sisään vastataksesi tehtävään</div>
+    }
+
+    if (error) {
+      return <div>Error
+        <pre>{error}</pre>
+      </div>
     }
 
     if (!quiz) {
