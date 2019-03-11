@@ -5,13 +5,11 @@ import express, { Request, Response } from "express"
 import asyncHandler from "express-async-handler"
 import { getRepository } from "typeorm"
 
-/* import quizAnswerRoute from "./quizanswers"
-import quizRoute from "./quizzes"
- */
 import { CourseController } from "./courses"
 import { PeerReviewController } from "./peerreviews"
 import { QuizAnswerController } from "./quizanswers"
 import { QuizController } from "./quizzes"
+import { RootController } from "./root"
 import { SpamFlagController } from "./spamflags"
 import { UserCourseStateController } from "./usercoursestate"
 
@@ -20,6 +18,7 @@ export default [
   PeerReviewController,
   QuizAnswerController,
   QuizController,
+  RootController,
   SpamFlagController,
   UserCourseStateController,
 ]

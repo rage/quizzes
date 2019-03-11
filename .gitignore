@@ -48,3 +48,5 @@ packages/widgets/build
 # redis
 
 dump.rdb
+
+*secret.yaml

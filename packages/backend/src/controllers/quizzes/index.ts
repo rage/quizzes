@@ -18,10 +18,11 @@ import { EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
 import validator from "validator"
+import { API_PATH } from "../../config"
 
 import _ from "lodash"
 
-@JsonController("/quizzes")
+@JsonController(`${API_PATH}/quizzes`)
 export class QuizController {
   @InjectManager()
   private entityManager: EntityManager

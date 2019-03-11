@@ -6,8 +6,9 @@ import UserCourseStateService from "services/usercoursestate.service"
 import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
+import { API_PATH } from "../../config"
 
-@JsonController("/quizzes/usercoursestate")
+@JsonController(`${API_PATH}/quizzes/usercoursestate`)
 export class UserCourseStateController {
   @InjectManager()
   private entityManager: EntityManager
