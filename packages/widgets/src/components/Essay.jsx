@@ -55,7 +55,7 @@ class PeerReviews extends Component {
 
     fetchAnswersToReview = async () => {
         const response = await axios.get(
-            `http://localhost:3000/api/v1/quizzes/peerreview/${this.props.quizId}/${this.props.languageId}`,
+            `https://quizzes.mooc.fi/api/v1/quizzes/peerreview/${this.props.quizId}/${this.props.languageId}`,
             { headers: { authorization: `Bearer ${this.props.accessToken}` } }
         )
         this.setState({ answersToReview: response.data })
@@ -64,7 +64,7 @@ class PeerReviews extends Component {
     flagAsSpam = (quizAnswerId) => async (event) => {
         this.setState({ answersToReview: undefined })
         await axios.post(
-            "http://localhost:3000/api/v1/quizzes/spamflag",
+            "https://quizzes.mooc.fi/api/v1/quizzes/spamflag",
             { quizAnswerId },
             { headers: { authorization: `Bearer ${this.props.accessToken}` } }
         )
@@ -104,7 +104,7 @@ class PeerReviews extends Component {
     submitPeerReview = async () => {
         this.setState({ submitDisabled: true, submitLocked: true })
         const response = await axios.post(
-            "http://localhost:3000/api/v1/quizzes/peerreview",
+            "https://quizzes.mooc.fi/api/v1/quizzes/peerreview",
             this.state.peerReview,
             { headers: { authorization: `Bearer ${this.props.accessToken}` } }
         )
