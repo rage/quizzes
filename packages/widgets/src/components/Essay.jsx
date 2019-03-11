@@ -76,10 +76,11 @@ class PeerReviews extends Component {
     }
 
     selectAnswer = (quizAnswerId) => (event) => {
+        const rejected = this.state.answersToReview.find(answer => answer.id != quizAnswerId)
         const peerReview = {
             quizAnswerId,
             peerReviewQuestionCollectionId: this.props.peerReviewQuestions[0].id,
-            rejectedQuizAnswerIds: [this.state.answersToReview.find(answer => answer.id != quizAnswerId).id],
+            rejectedQuizAnswerIds: rejected ? [rejected.id] : [],
             answers: this.props.peerReviewQuestions[0].questions.map(question => { return { peerReviewQuestionId: question.id } })
         }
         this.setState({
