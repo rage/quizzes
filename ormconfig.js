@@ -9,5 +9,6 @@ module.exports = {
     migrations: ["dist/common/src/migration/*.js"],
     cli: {
         migrationsDir: "packages/common/src/migration"
-    }
+    },
+    entities: ["./dist/common/src/models/**/*.js"]
 }
