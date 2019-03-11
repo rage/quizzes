@@ -174,6 +174,8 @@ class Quiz extends Component {
       return <div>Loading</div>
     }
 
+    const types = quiz.items.map(item => item.type)
+
     return (
       <div>
         <Typography variant="h4">{quiz.texts[0].title}</Typography>
@@ -198,6 +200,7 @@ class Quiz extends Component {
               successMessage={item.texts[0].successMessage}
               failureMessage={item.texts[0].failureMessage}
               peerReviewsGiven={userQuizState ? userQuizState.peerReviewsGiven : 0}
+              peerReviewsRequired={quiz.course.minPeerReviewsGiven}
               itemTitle={item.texts[0].title}
               options={item.options}
               peerReviewQuestions={quiz.peerReviewQuestionCollections}
@@ -212,10 +215,12 @@ class Quiz extends Component {
             quizAnswer.id
               ? <Typography variant="h5">
                 {quizAnswer.itemAnswers.some(ia => ia.correct === true)
-                  ? quiz.items.length === 1
+                  ? types.includes("essay")
                     ? "Tehtävä oikein"
                     : `Sait ${quizAnswer.itemAnswers.filter(ia => ia.correct === true).length}/${quiz.items.length} oikein`
-                  : "Tehtävä väärin"}
+                  : types.includes("essay") || types.includes("scale")
+                    ? ""
+                    : "Tehtävä väärin"}
               </Typography>
               :
               <div>

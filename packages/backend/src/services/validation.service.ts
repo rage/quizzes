@@ -166,6 +166,7 @@ export default class ValidationService {
       userQuizState.spamFlags = null
       userQuizState.status = "open"
     } else if (
+      quiz.autoConfirm &&
       quizAnswer &&
       given >= course.minPeerReviewsGiven &&
       received >= course.minPeerReviewsReceived
