@@ -88,7 +88,7 @@ export default (props) => {
                                             variant="outlined"
                                             fullWidth
                                             color={selected ? "primary" : "default"}
-                                            style={{ textTransform: "none" }}
+                                            style={{ textTransform: "none", margin: "0.5em 0" }}
                                             onClick={handleOptionChange(option.id)}
                                         >
                                             {text.title}
@@ -104,7 +104,7 @@ export default (props) => {
 }
 
 const selectButtonStyle = (selected, correct) => {
-    const style = { textTransform: "none" }
+    const style = { textTransform: "none", margin: "0.5em 0" }
     return {
         variant: selected ? "contained" : "outlined",
         style: selected

@@ -257,6 +257,8 @@ class Quiz extends Component {
           ) : (
             <div>
               <Button
+                variant="contained"
+                color="primary"
                 disabled={
                   this.state.submitLocked ? true : this.submitDisabled()
                 }
