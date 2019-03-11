@@ -12,8 +12,9 @@ import CourseService from "services/course.service"
 import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
+import { API_PATH } from "../../config"
 
-@JsonController("/courses")
+@JsonController(`${API_PATH}/courses`)
 export class CourseController {
   @InjectManager()
   private entityManager: EntityManager

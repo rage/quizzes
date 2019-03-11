@@ -1,9 +1,10 @@
 import React, { Component } from "react"
-import { Button, Typography } from "@material-ui/core"
+import { Button, Typography, Grid } from "@material-ui/core"
 import Checkbox from './Checkbox'
 import Essay from "./Essay"
 import MultipleChoice from "./MultipleChoice"
 import Scale from './Scale'
+import Open from './Open'
 import Unsupported from './Unsupported'
 import axios from "axios"
 
@@ -11,10 +12,9 @@ const mapTypeToComponent = {
   essay: Essay,
   "multiple-choice": MultipleChoice,
   scale: Scale,
-  checkbox: Checkbox
+  checkbox: Checkbox,
+  open: Open
 }
-
-
 
 const componentType = (typeName) => {
   let component = mapTypeToComponent[typeName]
@@ -27,38 +27,41 @@ class Quiz extends Component {
     quizAnswer: undefined,
     userCourseState: undefined,
     submitLocked: false,
-    correctCount: null
+    correctCount: null,
+    error: undefined,
   }
 
   async componentDidMount() {
     const { id, languageId, accessToken } = this.props
-    const response = await axios.get(
-      `http://localhost:3000/api/v1/quizzes/${id}?language=${languageId}`,
-      { headers: { authorization: `Bearer ${accessToken}` } }
-    )
-
-    console.log(response.data)
-    const quiz = response.data.quiz
-    let quizAnswer = response.data.quizAnswer
-    if (!quizAnswer) {
-      quizAnswer = {
-        quizId: quiz.id,
-        languageId,
-        itemAnswers: response.data.quiz.items.map(item => {
-          return {
-            quizItemId: item.id,
-            textData: "",
-            intData: null,
-            optionAnswers: []
-          }
-        })
+    try {
+      const response = await axios.get(
+        `https://quizzes.mooc.fi/api/v1/quizzes/${id}?language=${languageId}`,
+        { headers: { authorization: `Bearer ${accessToken}` } }
+      )
+      const quiz = response.data.quiz
+      let quizAnswer = response.data.quizAnswer
+      if (!quizAnswer) {
+        quizAnswer = {
+          quizId: quiz.id,
+          languageId,
+          itemAnswers: response.data.quiz.items.map(item => {
+            return {
+              quizItemId: item.id,
+              textData: "",
+              intData: null,
+              optionAnswers: []
+            }
+          })
+        }
       }
+      this.setState({
+        quiz: response.data.quiz,
+        quizAnswer,
+        userQuizState: response.data.userQuizState
+      })
+    } catch (e) {
+      this.setState({ error: e.toString() })
     }
-    this.setState({
-      quiz: response.data.quiz,
-      quizAnswer,
-      userQuizState: response.data.userQuizState
-    })
   }
 
   handleTextDataChange = (itemId) => (event) => {
@@ -90,16 +93,12 @@ class Quiz extends Component {
 
   handleOptionChange = (itemId) => (optionId) => () => {
 
-
     //return the optionAnswers to the same as it was before any answer
-    if (typeof optionId === "number" && optionId < 0) {
-      console.log("here i am")
-
+    if (typeof optionId === "number" && optionId === -1) {
       const quizAnswer = this.state.quizAnswer
       const itemAnswers = this.state.quizAnswer.itemAnswers
       const newItemAnswers = itemAnswers.map(ia => {
         if (ia.quizItemId === itemId) {
-          console.log("HEEEE")
           return { ...ia, optionAnswers: [] }
         } else {
           return ia
@@ -159,7 +158,7 @@ class Quiz extends Component {
   submitDisabled() {
     const submittable = this.state.quiz.items.map(item => {
       const itemAnswer = this.state.quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id)
-      if (item.type === "essay") {
+      if (item.type === "essay" || item.type === "open") {
         return itemAnswer.textData ? true : false
       }
       if (item.type === "multiple-choice") {
@@ -168,7 +167,12 @@ class Quiz extends Component {
       if (item.type === "scale") {
         return itemAnswer.intData ? true : false
       }
+      if(item.type === "checkbox"){
+        console.log(itemAnswer)
+        return itemAnswer.optionAnswers.length > 0
+      }
     })
+
     return submittable.includes(false)
   }
 
@@ -179,11 +183,11 @@ class Quiz extends Component {
     const {
       quiz,
       quizAnswer,
-      userQuizState
+      userQuizState,
+      error
     } = this.state
 
     const {
-      id,
       languageId,
       accessToken
     } = this.props
@@ -193,6 +197,12 @@ class Quiz extends Component {
       return <div>Kirjaudu sisään vastataksesi tehtävään</div>
     }
 
+    if (error) {
+      return <div>Error
+        <pre>{error}</pre>
+      </div>
+    }
+
     if (!quiz) {
       return <div>Loading</div>
     }
@@ -200,14 +210,14 @@ class Quiz extends Component {
     return (
       <div>
         <Typography variant="h4">{quiz.texts[0].title}</Typography>
+        <Typography variant="body1" dangerouslySetInnerHTML={{ __html: quiz.texts[0].body }} />
         <div>
-          <Typography variant="body1" dangerouslySetInnerHTML={{ __html: quiz.texts[0].body }} />
           {quiz.items.map(item => {
             const itemAnswer = quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id)
             const ItemComponent = componentType(item.type)
             return <ItemComponent
               item={item}
-              quizId={id}
+              quizId={quiz.id}
               key={item.id}
               accessToken={accessToken}
               languageId={languageId}
@@ -216,6 +226,7 @@ class Quiz extends Component {
               textData={itemAnswer.textData}
               optionAnswers={itemAnswer.optionAnswers}
               multi={item.multi}
+              singleItem={quiz.items.length === 1}
               correct={itemAnswer.correct}
               successMessage={item.texts[0].successMessage}
               failureMessage={item.texts[0].failureMessage}
@@ -232,7 +243,13 @@ class Quiz extends Component {
           })}
           {
             quizAnswer.id
-              ? ""
+              ? <Typography variant="h5">
+                {quizAnswer.itemAnswers.some(ia => ia.correct === true)
+                  ? quiz.items.length === 1
+                    ? "Tehtävä oikein"
+                    : `Sait ${quizAnswer.itemAnswers.filter(ia => ia.correct === true).length}/${quiz.items.length} oikein`
+                  : "Tehtävä väärin"}
+              </Typography>
               :
               <div>
                 <Button
