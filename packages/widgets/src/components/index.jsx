@@ -114,7 +114,7 @@ class Quiz extends Component {
   handleSubmit = async (event) => {
     this.setState({ submitLocked: true })
     const response = await axios.post(
-      `http://localhost:3000/api/v1/quizzes/answer`,
+      `https://quizzes.mooc.fi/api/v1/quizzes/answer`,
       this.state.quizAnswer,
       { headers: { authorization: `Bearer ${this.props.accessToken}` } }
     )
