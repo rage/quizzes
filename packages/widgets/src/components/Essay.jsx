@@ -26,10 +26,14 @@ export default (props) => {
                 <Paper style={paper} >
                     <Typography variant="body1" >{textData}</Typography>
                 </Paper>
-                <Typography variant="subtitle1" >{languageInfo.exampleAnswerLabel}</Typography>
-                <Paper style={paper} >
-                    <Typography variant="body1" dangerouslySetInnerHTML={{ __html: submitMessage }} />
-                </Paper>
+                {submitMessage
+                    ? <div>
+                        <Typography variant="subtitle1" >{languageInfo.exampleAnswerLabel}</Typography>
+                        <Paper style={paper} >
+                            <Typography variant="body1" dangerouslySetInnerHTML={{ __html: submitMessage }} />
+                        </Paper>
+                    </div>
+                    : ""}
                 <PeerReviews {...other} answered={answered} languageInfo={languageInfo} />
             </div>
             :
@@ -39,6 +43,7 @@ export default (props) => {
                     onChange={handleTextDataChange}
                     fullWidth={true}
                     multiline={true}
+                    rows={10}
                     margin="normal"
                 />
             </div>
@@ -76,10 +81,11 @@ class PeerReviews extends Component {
     }
 
     selectAnswer = (quizAnswerId) => (event) => {
+        const rejected = this.state.answersToReview.find(answer => answer.id != quizAnswerId)
         const peerReview = {
             quizAnswerId,
             peerReviewQuestionCollectionId: this.props.peerReviewQuestions[0].id,
-            rejectedQuizAnswerIds: [this.state.answersToReview.find(answer => answer.id != quizAnswerId).id],
+            rejectedQuizAnswerIds: rejected ? [rejected.id] : [],
             answers: this.props.peerReviewQuestions[0].questions.map(question => { return { peerReviewQuestionId: question.id } })
         }
         this.setState({
@@ -127,8 +133,9 @@ class PeerReviews extends Component {
 
         return (
             <div>
-                <Typography variant="subtitle1" >{this.props.peerReviewQuestions[0].texts[0].body}</Typography>
-                <Typography variant="subtitle1" >{this.props.languageInfo.givenPeerReviewsLabel}: {this.props.peerReviewsGiven}/{this.props.peerReviewsRequired}</Typography>
+                <Typography variant="subtitle1" style={{ paddingTop: 10 }} >{this.props.peerReviewQuestions[0].texts[0].body}</Typography>
+                <Typography variant="subtitle1" style={{ paddingTop: 10 }} >{this.props.languageInfo.givenPeerReviewsLabel}: {this.props.peerReviewsGiven}/{this.props.peerReviewsRequired}</Typography>
+                <Typography variant="subtitle1" >Valitse yksi vaihtoehdoista vertaisarvoitavaksi</Typography>
                 {!answersToReview
                     ? <Typography>{this.props.languageInfo.loadingLabel}{this.props.languageInfo.loadingLabel}</Typography>
                     : answersToReview.length === 0
