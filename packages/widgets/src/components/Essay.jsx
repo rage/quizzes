@@ -133,8 +133,8 @@ class PeerReviews extends Component {
 
         return (
             <div>
-                <Typography variant="subtitle1" >{this.props.peerReviewQuestions[0].texts[0].body}</Typography>
-                <Typography variant="subtitle1" >{this.props.languageInfo.givenPeerReviewsLabel}: {this.props.peerReviewsGiven}/{this.props.peerReviewsRequired}</Typography>
+                <Typography variant="subtitle1" style={{ paddingTop: 10 }} >{this.props.peerReviewQuestions[0].texts[0].body}</Typography>
+                <Typography variant="subtitle1" style={{ paddingTop: 10 }} >{this.props.languageInfo.givenPeerReviewsLabel}: {this.props.peerReviewsGiven}/{this.props.peerReviewsRequired}</Typography>
                 <Typography variant="subtitle1" >Valitse yksi vaihtoehdoista vertaisarvoitavaksi</Typography>
                 {!answersToReview
                     ? <Typography>{this.props.languageInfo.loadingLabel}{this.props.languageInfo.loadingLabel}</Typography>
