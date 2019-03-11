@@ -26,10 +26,14 @@ export default (props) => {
                 <Paper style={paper} >
                     <Typography variant="body1" >{textData}</Typography>
                 </Paper>
-                <Typography variant="subtitle1" >{languageInfo.exampleAnswerLabel}</Typography>
-                <Paper style={paper} >
-                    <Typography variant="body1" dangerouslySetInnerHTML={{ __html: submitMessage }} />
-                </Paper>
+                {submitMessage
+                    ? <div>
+                        <Typography variant="subtitle1" >{languageInfo.exampleAnswerLabel}</Typography>
+                        <Paper style={paper} >
+                            <Typography variant="body1" dangerouslySetInnerHTML={{ __html: submitMessage }} />
+                        </Paper>
+                    </div>
+                    : ""}
                 <PeerReviews {...other} answered={answered} languageInfo={languageInfo} />
             </div>
             :
@@ -39,6 +43,7 @@ export default (props) => {
                     onChange={handleTextDataChange}
                     fullWidth={true}
                     multiline={true}
+                    rows={10}
                     margin="normal"
                 />
             </div>
@@ -130,6 +135,7 @@ class PeerReviews extends Component {
             <div>
                 <Typography variant="subtitle1" >{this.props.peerReviewQuestions[0].texts[0].body}</Typography>
                 <Typography variant="subtitle1" >{this.props.languageInfo.givenPeerReviewsLabel}: {this.props.peerReviewsGiven}/{this.props.peerReviewsRequired}</Typography>
+                <Typography variant="subtitle1" >Valitse yksi vaihtoehdoista vertaisarvoitavaksi</Typography>
                 {!answersToReview
                     ? <Typography>{this.props.languageInfo.loadingLabel}{this.props.languageInfo.loadingLabel}</Typography>
                     : answersToReview.length === 0
