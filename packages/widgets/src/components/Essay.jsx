@@ -11,22 +11,26 @@ export default (props) => {
         handleTextDataChange,
         submitMessage,
         textData,
+        languageInfo,
         ...other
     } = props
+
+
+    console.log(props)
 
     return (
         answered
             ?
             <div>
-                <Typography variant="subtitle1" >Vastasit</Typography>
+                <Typography variant="subtitle1" >{languageInfo.userAnswerLabel}</Typography>
                 <Paper style={paper} >
                     <Typography variant="body1" >{textData}</Typography>
                 </Paper>
-                <Typography variant="subtitle1" >Esimerkkivastaus</Typography>
+                <Typography variant="subtitle1" >{languageInfo.exampleAnswerLabel}</Typography>
                 <Paper style={paper} >
                     <Typography variant="body1" dangerouslySetInnerHTML={{ __html: submitMessage }} />
                 </Paper>
-                <PeerReviews {...other} answered={answered} />
+                <PeerReviews {...other} answered={answered} languageInfo={languageInfo} />
             </div>
             :
             <div>
@@ -124,11 +128,11 @@ class PeerReviews extends Component {
         return (
             <div>
                 <Typography variant="subtitle1" >{this.props.peerReviewQuestions[0].texts[0].body}</Typography>
-                <Typography variant="subtitle1" >Vertaisarvioita annettu: {this.props.peerReviewsGiven}/{this.props.peerReviewsRequired}</Typography>
+                <Typography variant="subtitle1" >{this.props.languageInfo.givenPeerReviewsLabel}: {this.props.peerReviewsGiven}/{this.props.peerReviewsRequired}</Typography>
                 {!answersToReview
-                    ? <Typography>Loading</Typography>
-                    : answersToReview.length === 0
-                        ? <Typography>Vertaisarvioitavia ei saatavilla</Typography>
+                    ? <Typography>{this.props.languageInfo.loadingLabel}{this.props.languageInfo.loadingLabel}</Typography>
+                    : answersToReview.length === 
+                        ? <Typography>{this.props.languageInfo.noPeerAnswersAvailableLabel}</Typography>
                         : answersToReview.map(answer =>
                             <div key={answer.id} >
                                 <Paper style={paper} >
@@ -147,16 +151,16 @@ class PeerReviews extends Component {
                                             disabled={this.state.submitLocked ? true : this.state.submitDisabled}
                                             onClick={this.submitPeerReview}
                                         >
-                                            Lähetä vertaisarvio
+                                            {this.props.languageInfo.submitPeerReviewLabel}
                                         </Button>
                                     </div>
                                     : <Grid container >
                                         <Grid item xs={3}>
-                                            <Button onClick={this.flagAsSpam(answer.id)}>Ilmoita asiaton vastaus</Button>
+                                            <Button onClick={this.flagAsSpam(answer.id)}>{this.props.languageInfo.reportAsInappropriateLabel}</Button>
                                         </Grid>
                                         <Grid item xs={8}></Grid>
                                         <Grid item xs={1}>
-                                            <Button onClick={this.selectAnswer(answer.id)}>Valitse</Button>
+                                            <Button onClick={this.selectAnswer(answer.id)}>{this.props.languageInfo.chooseEssayLabel}</Button>
                                         </Grid>
                                     </Grid>
                                 }
