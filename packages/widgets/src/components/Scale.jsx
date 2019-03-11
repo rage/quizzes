@@ -1,19 +1,20 @@
-import React from 'react'
+import React from "react"
 import {
-  FormControl, FormLabel, FormControlLabel,
-  Radio, RadioGroup,
-  Table, TableBody, TableCell, TableRow,
-  Typography
+  FormControl,
+  FormLabel,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  Table,
+  TableBody,
+  TableCell,
+  TableRow,
+  Typography,
 } from "@material-ui/core"
 
 const NUMBER_OF_OPTIONS = 7
 
-const Scale = ({ handleIntDataChange,
-  intData,
-  item,
-  answered }) => {
-
-
+const Scale = ({ handleIntDataChange, intData, item, answered }) => {
   return (
     <div>
       <FormControl fullWidth component="fieldset">
@@ -21,7 +22,11 @@ const Scale = ({ handleIntDataChange,
           <TableBody>
             <TableRow>
               <TableCell style={{ width: "40%" }}>
-                <FormLabel component="legend" ><Typography variant="subtitle1">{item.texts[0].title}</Typography></FormLabel>
+                <FormLabel component="legend">
+                  <Typography variant="subtitle1">
+                    {item.texts[0].title}
+                  </Typography>
+                </FormLabel>
               </TableCell>
               <TableCell style={{ width: "40%" }}>
                 <RadioGroup
@@ -31,13 +36,14 @@ const Scale = ({ handleIntDataChange,
                   value={`${intData}`}
                   onChange={handleIntDataChange}
                 >
-                  {Array.from({ length: NUMBER_OF_OPTIONS }, (v, i) => i + 1).map(number => (
+                  {Array.from(
+                    { length: NUMBER_OF_OPTIONS },
+                    (v, i) => i + 1,
+                  ).map(number => (
                     <FormControlLabel
                       key={number}
                       value={`${number}`}
-                      control={
-                        <Radio {...radioButtonOptions(answered)} />
-                      }
+                      control={<Radio {...radioButtonOptions(answered)} />}
                       label={`${number}`}
                       labelPlacement="start"
                     />
@@ -52,12 +58,12 @@ const Scale = ({ handleIntDataChange,
   )
 }
 
-const radioButtonOptions = (answered) => {
+const radioButtonOptions = answered => {
   let options = {
     style: {
       paddingLeft: 0,
     },
-    color: answered ? "default" : "primary"
+    color: answered ? "default" : "primary",
   }
 
   if (answered) {

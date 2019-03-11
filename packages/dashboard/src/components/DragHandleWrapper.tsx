@@ -1,6 +1,8 @@
-import React, { ComponentClass } from 'react'
-import { SortableHandle } from 'react-sortable-hoc'
+import React, { ComponentClass } from "react"
+import { SortableHandle } from "react-sortable-hoc"
 
-const DragHandleWrapper = SortableHandle((props: any) => <div>{props.children}</div>)
+const DragHandleWrapper = SortableHandle((props: any) => (
+  <div>{props.children}</div>
+))
 
 export default DragHandleWrapper

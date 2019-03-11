@@ -194,7 +194,9 @@ class Quiz extends Component {
 
     return (
       <div>
-        <Typography variant="h5" style={{ paddingBottom: 10 }}>{quiz.texts[0].title}</Typography>
+        <Typography variant="h5" style={{ paddingBottom: 10 }}>
+          {quiz.texts[0].title}
+        </Typography>
         <Typography
           variant="body1"
           style={{ paddingBottom: 10 }}
