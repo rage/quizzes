@@ -1,3 +1,7 @@
+import _ from "lodash"
+import { Service } from "typedi"
+import { Brackets, EntityManager, SelectQueryBuilder } from "typeorm"
+import { InjectManager } from "typeorm-typedi-extensions"
 import {
   Course,
   PeerReview,
@@ -7,12 +11,8 @@ import {
   QuizItemAnswer,
   SpamFlag,
   UserQuizState,
-} from "@quizzes/common/models"
-import { randomUUID } from "@quizzes/common/util"
-import _ from "lodash"
-import { Service } from "typedi"
-import { Brackets, EntityManager, SelectQueryBuilder } from "typeorm"
-import { InjectManager } from "typeorm-typedi-extensions"
+} from "../models"
+import { randomUUID } from "../util"
 
 @Service()
 export default class PeerReviewService {

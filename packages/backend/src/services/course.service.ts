@@ -1,9 +1,9 @@
 import { Database } from "@quizzes/common/config/database"
-import { Course } from "@quizzes/common/models"
-import { ICourseQuery } from "@quizzes/common/types"
 import { Container, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
+import { Course } from "../models"
+import { ICourseQuery } from "../types"
 
 @Service()
 export class CourseService {

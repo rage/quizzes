@@ -1,5 +1,3 @@
-import { Course } from "@quizzes/common/models"
-import { ICourseQuery, ITMCProfileDetails } from "@quizzes/common/types"
 import {
   Get,
   HeaderParam,
@@ -13,6 +11,8 @@ import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { API_PATH } from "../../config"
+import { Course } from "../../models"
+import { ICourseQuery, ITMCProfileDetails } from "../../types"
 
 @JsonController(`${API_PATH}/courses`)
 export class CourseController {

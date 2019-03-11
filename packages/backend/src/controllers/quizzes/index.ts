@@ -1,5 +1,3 @@
-import { Quiz, QuizAnswer, UserQuizState } from "@quizzes/common/models"
-import { IQuizQuery, ITMCProfileDetails } from "@quizzes/common/types"
 import { getUUIDByString } from "@quizzes/common/util"
 import {
   Get,
@@ -19,6 +17,8 @@ import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
 import validator from "validator"
 import { API_PATH } from "../../config"
+import { Quiz, QuizAnswer, UserQuizState } from "../../models"
+import { IQuizQuery, ITMCProfileDetails } from "../../types"
 
 import _ from "lodash"
 

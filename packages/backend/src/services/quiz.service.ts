@@ -1,37 +1,17 @@
-import db, { Database } from "@quizzes/common/config/database"
-import {
-  Course,
-  PeerReviewQuestion,
-  PeerReviewQuestionCollection,
-  PeerReviewQuestionTranslation,
-  Quiz,
-  QuizItem,
-  QuizItemTranslation,
-  QuizOption,
-  QuizOptionTranslation,
-  QuizTranslation,
-} from "@quizzes/common/models"
-import {
-  INewPeerReviewQuestion,
-  INewQuizItem,
-  INewQuizItemTranslation,
-  INewQuizOption,
-  INewQuizOptionTranslation,
-  INewQuizQuery,
-  INewQuizTranslation,
-  IQuizQuery,
-} from "@quizzes/common/types"
-import {
-  getUUIDByString,
-  insert,
-  randomUUID,
-  WhereBuilder,
-} from "@quizzes/common/util"
 import _ from "lodash"
 import { Service } from "typedi"
 import { EntityManager } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
+import {
+  PeerReviewQuestion,
+  PeerReviewQuestionCollection,
+  Quiz,
+  QuizItem,
+  QuizOption,
+  QuizTranslation,
+} from "../models"
+import { IQuizQuery } from "../types"
 import quizanswerService from "./quizanswer.service"
 
 @Service()
