@@ -205,7 +205,7 @@ class Quiz extends Component {
               ia => ia.quizItemId === item.id,
             )
             const ItemComponent = componentType(item.type)
-            
+
             return (
               <ItemComponent
                 item={item}
@@ -241,7 +241,7 @@ class Quiz extends Component {
           {quizAnswer.id ? (
             <Typography variant="h5">
               {this.hasCorrectAnswer(quiz)
-                ? atLeastOneCorrect(quizAnswer.itemAnswers)
+                ? this.atLeastOneCorrect(quizAnswer.itemAnswers)
                   ? quiz.items.length === 1
                     ? "Tehtävä oikein"
                     : `Sait ${
