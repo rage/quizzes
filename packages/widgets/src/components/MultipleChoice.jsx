@@ -61,7 +61,7 @@ export default (props) => {
                                         >
                                             {text.title}
                                         </Button>
-                                        {singleItem
+                                        {singleItem && (successMessage || failureMessage)
                                             ? <Typography
                                                 variant="body1"
                                                 style={{
