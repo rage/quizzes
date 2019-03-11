@@ -6,44 +6,17 @@ import 'likert-react/dist/main.css'
 
 export default (props) => {
 
-    let languageInfo = ((languageId) => {
-        const languageOptions = {
-            en_US: {
-                choosePeerEssayLabel: "Choose",
-                exampleAnswerLabel: "Answer example",
-                givenPeerReviewsLabel: "Peer reviews given",
-                loadingLabel: "Loading",
-                noPeerAnswersAvailableLabel: "No answers available for peer review",
-                reportAsInappropriateLabel: "Report as inappropriate",
-                submitPeerReviewLabel: "Submit review",
-                userAnswerLabel: "Your answer"
-            },
-
-            fi_FI: {
-                chooseEssayLabel: "Valitse",
-                exampleAnswerLabel: "Esimerkkivastaus",
-                givenPeerReviewsLabel: "Vertaisarvioita annettu",
-                loadingLabel: "Ladataan",
-                noPeerAnswersAvailableLabel: "Vertaisarvioitavia vastauksia ei saatavilla",
-                reportAsInappropriateLabel: "Ilmoita asiaton vastaus",
-                submitPeerReviewLabel: "Lähetä vertaisarvio",
-                userAnswerLabel: "Vastauksesi"
-            }
-        }
-
-        const result = languageOptions[languageId]
-        return result !== undefined
-            ? result
-            : languageOptions.en_US
-    })(props.languageId)
-
     const {
         answered,
         handleTextDataChange,
         submitMessage,
         textData,
+        languageInfo,
         ...other
     } = props
+
+
+    console.log(props)
 
     return (
         answered

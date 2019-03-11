@@ -8,32 +8,12 @@ const Open = ({
     answered,
     correct,
     handleTextDataChange,
-    languageId,
+    languageInfo,
     textData,
     successMessage,
     failureMessage
 }) => {
 
-
-    // defaults to English
-    let languageInfo = ((languageId) => {
-        const languageOptions = {
-            en_US: {
-                placeholder: "Answer", 
-                userAnswerLabel: "Your answer"
-            }, 
-
-            fi_FI: {
-                placeholder: "Vastaus",
-                userAnswerLabel: "Vastauksesi"
-            }
-        }
-        
-        const result = languageOptions[languageId]
-        return result !== undefined
-                ? result
-                : languageOptions.en_US            
-        })(languageId)
 
     if(answered){
         return (

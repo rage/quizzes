@@ -7,6 +7,12 @@ import Open from './Open'
 import Unsupported from './Unsupported'
 import axios from "axios"
 
+import languageLabels from '../utils/language_labels'
+
+
+
+  
+
 const mapTypeToComponent = {
   essay: Essay,
   "multiple-choice": MultipleChoice,
@@ -190,6 +196,7 @@ class Quiz extends Component {
               key={item.id}
               accessToken={accessToken}
               languageId={languageId}
+              languageInfo={languageLabels(languageId, item.type)}
               answered={quizAnswer.id ? true : false}
               intData={itemAnswer.intData}
               textData={itemAnswer.textData}
