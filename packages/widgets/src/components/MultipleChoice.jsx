@@ -19,6 +19,10 @@ export default (props) => {
     let questionWidth = 5
     let optionContainerWidth = 7
 
+    const feedbackMessageExists = () => {
+        return failureMessage || successMessage
+    }
+
     if (singleItem) {
         const maxOptionLength = Math.max(...options.map(option => option.texts[0].title.length))
         const width = maxOptionLength > 100 ? 12 : Math.ceil(maxOptionLength / (8 + 1 / 3))
@@ -61,7 +65,7 @@ export default (props) => {
                                         >
                                             {text.title}
                                         </Button>
-                                        {singleItem && (successMessage || failureMessage)
+                                        {singleItem && feedbackMessageExists()
                                             ? <Typography
                                                 variant="body1"
                                                 style={{

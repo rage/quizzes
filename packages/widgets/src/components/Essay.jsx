@@ -6,6 +6,37 @@ import 'likert-react/dist/main.css'
 
 export default (props) => {
 
+    let languageInfo = ((languageId) => {
+        const languageOptions = {
+            en_US: {
+                choosePeerEssayLabel: "Choose",
+                exampleAnswerLabel: "Answer example",
+                givenPeerReviewsLabel: "Peer reviews given",
+                loadingLabel: "Loading",
+                noPeerAnswersAvailableLabel: "No answers available for peer review",
+                reportAsInappropriateLabel: "Report as inappropriate",
+                submitPeerReviewLabel: "Submit review",
+                userAnswerLabel: "Your answer"
+            },
+
+            fi_FI: {
+                chooseEssayLabel: "Valitse",
+                exampleAnswerLabel: "Esimerkkivastaus",
+                givenPeerReviewsLabel: "Vertaisarvioita annettu",
+                loadingLabel: "Ladataan",
+                noPeerAnswersAvailableLabel: "Vertaisarvioitavia vastauksia ei saatavilla",
+                reportAsInappropriateLabel: "Ilmoita asiaton vastaus",
+                submitPeerReviewLabel: "Lähetä vertaisarvio",
+                userAnswerLabel: "Vastauksesi"
+            }
+        }
+
+        const result = languageOptions[languageId]
+        return result !== undefined
+            ? result
+            : languageOptions.en_US
+    })(props.languageId)
+
     const {
         answered,
         handleTextDataChange,
@@ -18,15 +49,15 @@ export default (props) => {
         answered
             ?
             <div>
-                <Typography variant="subtitle1" >Vastasit</Typography>
+                <Typography variant="subtitle1" >{languageInfo.userAnswerLabel}</Typography>
                 <Paper style={paper} >
                     <Typography variant="body1" >{textData}</Typography>
                 </Paper>
-                <Typography variant="subtitle1" >Esimerkkivastaus</Typography>
+                <Typography variant="subtitle1" >{languageInfo.exampleAnswerLabel}</Typography>
                 <Paper style={paper} >
                     <Typography variant="body1" dangerouslySetInnerHTML={{ __html: submitMessage }} />
                 </Paper>
-                <PeerReviews {...other} answered={answered} />
+                <PeerReviews {...other} answered={answered} languageInfo={languageInfo} />
             </div>
             :
             <div>
@@ -125,10 +156,11 @@ class PeerReviews extends Component {
             <div>
                 <Typography variant="subtitle1" >{this.props.peerReviewQuestions[0].texts[0].body}</Typography>
                 <Typography variant="subtitle1" >Vertaisarvioita annettu: {this.props.peerReviewsGiven}/{this.props.peerReviewsRequired}</Typography>
+                <Typography variant="subtitle1" >{this.props.languageInfo.givenPeerReviewsLabel}: {this.props.peerReviewsGiven}/{this.props.peerReviewsRequired}</Typography>
                 {!answersToReview
-                    ? <Typography>Loading</Typography>
+                    ? <Typography>{this.props.languageInfo.loadingLabel}{this.props.languageInfo.loadingLabel}</Typography>
                     : answersToReview.length === 0
-                        ? <Typography>Vertaisarvioitavia ei saatavilla</Typography>
+                        ? <Typography>{this.props.languageInfo.noPeerAnswersAvailableLabel}</Typography>
                         : answersToReview.map(answer =>
                             <div key={answer.id} >
                                 <Paper style={paper} >
@@ -147,16 +179,16 @@ class PeerReviews extends Component {
                                             disabled={this.state.submitLocked ? true : this.state.submitDisabled}
                                             onClick={this.submitPeerReview}
                                         >
-                                            Lähetä vertaisarvio
+                                            {this.props.languageInfo.submitPeerReviewLabel}
                                         </Button>
                                     </div>
                                     : <Grid container >
                                         <Grid item xs={3}>
-                                            <Button onClick={this.flagAsSpam(answer.id)}>Ilmoita asiaton vastaus</Button>
+                                            <Button onClick={this.flagAsSpam(answer.id)}>{this.props.languageInfo.reportAsInappropriateLabel}</Button>
                                         </Grid>
                                         <Grid item xs={8}></Grid>
                                         <Grid item xs={1}>
-                                            <Button onClick={this.selectAnswer(answer.id)}>Valitse</Button>
+                                            <Button onClick={this.selectAnswer(answer.id)}>{this.props.languageInfo.chooseEssayLabel}</Button>
                                         </Grid>
                                     </Grid>
                                 }
