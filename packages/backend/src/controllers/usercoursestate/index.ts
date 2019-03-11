@@ -1,5 +1,3 @@
-import { UserCourseState } from "@quizzes/common/models"
-import { ITMCProfileDetails } from "@quizzes/common/types"
 import { Get, HeaderParam, JsonController, Param } from "routing-controllers"
 import QuizAnswerService from "services/quizanswer.service"
 import UserCourseStateService from "services/usercoursestate.service"
@@ -7,6 +5,8 @@ import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { API_PATH } from "../../config"
+import { UserCourseState } from "../../models"
+import { ITMCProfileDetails } from "../../types"
 
 @JsonController(`${API_PATH}/quizzes/usercoursestate`)
 export class UserCourseStateController {

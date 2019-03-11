@@ -1,15 +1,15 @@
+import { Inject, Service } from "typedi"
+import { EntityManager, SelectQueryBuilder } from "typeorm"
+import { InjectManager } from "typeorm-typedi-extensions"
 import {
   Quiz,
   QuizAnswer,
   QuizItem,
   QuizItemAnswer,
   UserQuizState,
-} from "@quizzes/common/models"
-import { IQuizAnswerQuery } from "@quizzes/common/types"
-import { WhereBuilder } from "@quizzes/common/util/index"
-import { Inject, Service } from "typedi"
-import { EntityManager, SelectQueryBuilder } from "typeorm"
-import { InjectManager } from "typeorm-typedi-extensions"
+} from "../models"
+import { IQuizAnswerQuery } from "../types"
+import { WhereBuilder } from "../util/index"
 import QuizService from "./quiz.service"
 
 @Service()

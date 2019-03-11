@@ -205,6 +205,7 @@ class Quiz extends Component {
               ia => ia.quizItemId === item.id,
             )
             const ItemComponent = componentType(item.type)
+            
             return (
               <ItemComponent
                 item={item}

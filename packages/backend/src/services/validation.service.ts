@@ -1,3 +1,6 @@
+import { Inject, Service } from "typedi"
+import { EntityManager, SelectQueryBuilder } from "typeorm"
+import { InjectManager } from "typeorm-typedi-extensions"
 import {
   Course,
   PeerReview,
@@ -7,11 +10,7 @@ import {
   QuizItem,
   QuizItemAnswer,
   UserQuizState,
-} from "@quizzes/common/models"
-import { IQuizAnswerQuery } from "@quizzes/common/types"
-import { Inject, Service } from "typedi"
-import { EntityManager, SelectQueryBuilder } from "typeorm"
-import { InjectManager } from "typeorm-typedi-extensions"
+} from "../models"
 import PeerReviewService from "./peerreview.service"
 
 @Service()
@@ -166,8 +165,7 @@ export default class ValidationService {
       userQuizState.spamFlags = null
       userQuizState.status = "open"
     } else if (
-      quiz.autoConfirm &&
-      quizAnswer &&
+      quizAnswer.status === "submitted" &&
       given >= course.minPeerReviewsGiven &&
       received >= course.minPeerReviewsReceived
     ) {
@@ -175,17 +173,11 @@ export default class ValidationService {
         manager,
         quizAnswer.id,
       )
-      let sadFaces: number = 0
-      let total: number = 0
-      peerReviews.map(pr => {
-        pr.answers.map(answer => {
-          if (answer.value === 1) {
-            sadFaces += 1
-          }
-          total += 1
-        })
-      })
-      if (sadFaces / total <= course.maxNegativeReviewPercentage) {
+      const answers: number[] = [].concat(
+        ...peerReviews.map(pr => pr.answers.map(a => a.value)),
+      )
+      const sum: number = answers.reduce((prev, curr) => prev + curr)
+      if (sum / answers.length >= course.minReviewAverage) {
         quizAnswer.status = "confirmed"
         userQuizState.pointsAwarded = 1 * quiz.points
       } else {

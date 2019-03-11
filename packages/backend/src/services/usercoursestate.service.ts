@@ -1,3 +1,6 @@
+import { Inject, Service } from "typedi"
+import { EntityManager, SelectQueryBuilder } from "typeorm"
+import { InjectManager } from "typeorm-typedi-extensions"
 import {
   Course,
   PeerReview,
@@ -7,12 +10,8 @@ import {
   QuizItemAnswer,
   UserCourseState,
   UserQuizState,
-} from "@quizzes/common/models"
-import { IQuizAnswerQuery } from "@quizzes/common/types"
-import { Inject, Service } from "typedi"
-import { EntityManager, SelectQueryBuilder } from "typeorm"
-import { InjectManager } from "typeorm-typedi-extensions"
-import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
+} from "../models"
+import { IQuizAnswerQuery } from "../types"
 import CourseService from "./course.service"
 import QuizService from "./quiz.service"
 import QuizAnswerService from "./quizanswer.service"

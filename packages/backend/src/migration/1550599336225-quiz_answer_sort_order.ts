@@ -1,5 +1,6 @@
 import { MigrationInterface, QueryRunner } from "typeorm"
 
+// tslint:disable-next-line:class-name
 export class quizAnswerSortOrder1550599336225 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     await queryRunner.query(

@@ -1,10 +1,10 @@
 // tslint:disable-next-line:no-var-requires
 require("module-alias/register")
 
-import { Database } from "@quizzes/common/config/database"
 import dotenv from "dotenv"
 import { Container } from "typedi"
 import { App } from "./app"
+import { Database } from "./config/database"
 
 dotenv.config({ path: ".env" })
 
