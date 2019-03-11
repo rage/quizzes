@@ -131,7 +131,7 @@ class PeerReviews extends Component {
                 <Typography variant="subtitle1" >{this.props.languageInfo.givenPeerReviewsLabel}: {this.props.peerReviewsGiven}/{this.props.peerReviewsRequired}</Typography>
                 {!answersToReview
                     ? <Typography>{this.props.languageInfo.loadingLabel}{this.props.languageInfo.loadingLabel}</Typography>
-                    : answersToReview.length === 0
+                    : answersToReview.length === 
                         ? <Typography>{this.props.languageInfo.noPeerAnswersAvailableLabel}</Typography>
                         : answersToReview.map(answer =>
                             <div key={answer.id} >
