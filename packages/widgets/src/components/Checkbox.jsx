@@ -20,17 +20,18 @@ const CheckboxWidget = ({
   }
 
   return (
-    <Grid container style={{ marginBottom: 10 }}  >
+    <Grid container style={{ marginBottom: 10 }}>
       <Grid item xs={1}>
-        {answered ?
-          <Checkbox checked disabled />
-          :
+        {answered ? (
+          //value given so component remains controlled -> no error message in console
+          <Checkbox value={`${answered}`} disabled />
+        ) : (
           <Checkbox
             value={optionAnswers[0] && `${optionAnswers[0].quizOptionId}`}
             onChange={toggle}
             color="primary"
           />
-        }
+        )}
       </Grid>
       <Grid item style={{ alignSelf: "center" }} xs>
         {options[0].texts[0].title}
