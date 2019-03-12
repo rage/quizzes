@@ -44,6 +44,8 @@ export default props => {
   ) : (
     <div>
       <TextField
+        variant="outlined"
+        label="Vastauksesi"
         value={textData}
         onChange={handleTextDataChange}
         fullWidth={true}
@@ -51,8 +53,13 @@ export default props => {
         rows={10}
         margin="normal"
       />
+      <div>Sanoja: {wordCount(textData)}</div>
     </div>
   )
+}
+
+function wordCount(string) {
+  return string.match(/[^\s]+/g).length
 }
 
 class PeerReviews extends Component {
