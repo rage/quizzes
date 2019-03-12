@@ -25,10 +25,7 @@ export default props => {
   let direction = "row"
   let questionWidth = 5
   let optionContainerWidth = 7
-
-  const feedbackMessageExists = () => {
-    return failureMessage || successMessage
-  }
+  let optionWidth
 
   if (singleItem) {
     const maxOptionLength = Math.max(
@@ -71,6 +68,9 @@ export default props => {
               oa => oa.quizOptionId === option.id,
             )
             const text = option.texts[0]
+            const feedbackMessageExists = () => {
+              return text.failureMessage || text.successMessage
+            }
             const submittedColor = option.correct
               ? selected
                 ? "green"
