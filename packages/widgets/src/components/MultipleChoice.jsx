@@ -74,17 +74,21 @@ export default props => {
           container
           direction={direction}
           justify="space-evenly"
-          style={{ paddingTop: 7 }}
+          style={{ paddingTop: 7, flexWrap: "nowrap" }}
         >
           {options.map(option => {
             const selected = optionAnswers.find(
               oa => oa.quizOptionId === option.id,
             )
             const text = option.texts[0]
-            const feedbackMessageExists = () => {
-              return text.failureMessage || text.successMessage
-            }
-            const submittedColor = option.correct
+            const feedbackMessage = option.correct
+              ? selected
+                ? text.successMessage
+                : text.failureMessage
+              : selected
+              ? text.failureMessage
+              : text.successMessage
+            const feedbackColor = option.correct
               ? selected
                 ? "green"
                 : "white"
@@ -93,7 +97,7 @@ export default props => {
               : "white"
             return (
               <Grid item key={option.id}>
-                <Grid container>
+                <Grid container direction={direction}>
                   {answered ? (
                     <Grid container direction={direction}>
                       <Grid item sm={optionWidth}>
@@ -105,24 +109,17 @@ export default props => {
                           {text.title}
                         </Button>
                       </Grid>
-
-                      {singleItem && feedbackMessageExists() ? (
+                      {singleItem && feedbackMessage ? (
                         <Grid item>
                           <Typography
                             variant="body1"
                             style={{
-                              borderLeft: `4px solid ${submittedColor}`,
+                              borderLeft: `4px solid ${feedbackColor}`,
                               padding: 3,
                               marginBottom: 5,
                             }}
                           >
-                            {option.correct
-                              ? selected
-                                ? text.successMessage
-                                : text.failureMessage
-                              : selected
-                              ? text.failureMessage
-                              : text.successMessage}
+                            {feedbackMessage}
                           </Typography>
                         </Grid>
                       ) : (

@@ -113,7 +113,7 @@ class TabContainer extends React.Component<any, any> {
         <div style={{ marginTop: 50 }}>
           <Paper style={{ padding: 30, marginBottom: 20 }}>
             <Typography variant="subtitle1" style={{ marginBottom: 10 }}>
-              Items:
+              Items / Question types:
             </Typography>
             <ItemContainer
               onSortEnd={this.onSortEnd}
