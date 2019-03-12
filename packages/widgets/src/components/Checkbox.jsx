@@ -7,7 +7,6 @@ const CheckboxWidget = ({
   optionAnswers,
   handleOptionChange,
 }) => {
-
   const handleChecking = handleOptionChange(options[0])
   const handleUnchecking = handleOptionChange(-1)
 
