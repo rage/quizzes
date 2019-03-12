@@ -72,7 +72,6 @@ export class PeerReviewController {
       .getCount()
 
     if (shouldBeZero !== 0) {
-      console.log("fucker")
       return {}
     }
 
