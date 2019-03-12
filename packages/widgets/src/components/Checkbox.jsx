@@ -1,33 +1,42 @@
-import React from 'react'
-import { Checkbox } from '@material-ui/core'
+import React from "react"
+import { Checkbox, Grid } from "@material-ui/core"
 
-const CheckboxWidget = ({ answered, options, optionAnswers, handleOptionChange }) => {
+const CheckboxWidget = ({
+  answered,
+  options,
+  optionAnswers,
+  handleOptionChange,
+}) => {
 
-    const toggle = () => {
-        if (!optionAnswers[0]) {
-            handleOptionChange(options[0].id)()
-        } else {
-            handleOptionChange(-1)()
+  const handleChecking = handleOptionChange(options[0])
+  const handleUnchecking = handleOptionChange(-1)
+
+  const toggle = () => {
+    if (!optionAnswers[0]) {
+      handleChecking()
+    } else {
+      handleUnchecking()
+    }
+  }
+
+  return (
+    <Grid container style={{ marginBottom: 10 }}  >
+      <Grid item xs={1}>
+        {answered ?
+          <Checkbox checked disabled />
+          :
+          <Checkbox
+            value={optionAnswers[0] && `${optionAnswers[0].quizOptionId}`}
+            onChange={toggle}
+            color="primary"
+          />
         }
-    }
-
-    return (<div>
-        <Checkbox value={optionAnswers[0] && optionAnswers[0].quizOptionId}
-            {...checkboxOptions(answered)}
-            onChange={toggle} />
+      </Grid>
+      <Grid item style={{ alignSelf: "center" }} xs>
         {options[0].texts[0].title}
-
-    </div>)
+      </Grid>
+    </Grid>
+  )
 }
-
-
-const checkboxOptions = (answered) => {
-    return {
-        color: "primary", //(answered ? "default" : "primary"),
-        disabled: answered,
-        //checked: answered
-    }
-}
-
 
 export default CheckboxWidget
