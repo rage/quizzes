@@ -37,6 +37,16 @@ const courseIDs = {
 
   "tsoha-18": "fi_FI",
 
+  "ohjelmoinnin-mooc-2019": "fi_FI",
+
+  "tietokantojen-perusteet-k2019": "fi_FI",
+
+  "web-palvelinohjelmointi-java-19": "fi_FI",
+
+  "tietoliikenteen-perusteet": "fi_FI",
+
+  "tietokoneen-toiminnan-perusteet": "fi_FI",
+
   default: "unknown",
 }
 

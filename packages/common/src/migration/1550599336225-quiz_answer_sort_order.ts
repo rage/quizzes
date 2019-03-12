@@ -3,7 +3,7 @@ import { MigrationInterface, QueryRunner } from "typeorm"
 export class quizAnswerSortOrder1550599336225 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     await queryRunner.query(
-      "create index quiz_answer_sort_order on quiz_answer (status asc, created_at asc)",
+      "create if not exists index quiz_answer_sort_order on quiz_answer (status asc, created_at asc)",
     )
   }
 

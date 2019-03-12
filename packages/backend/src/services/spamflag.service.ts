@@ -1,3 +1,6 @@
+import { Service } from "typedi"
+import { EntityManager, SelectQueryBuilder } from "typeorm"
+import { InjectManager } from "typeorm-typedi-extensions"
 import {
   Course,
   PeerReview,
@@ -7,11 +10,8 @@ import {
   QuizItemAnswer,
   SpamFlag,
   UserQuizState,
-} from "@quizzes/common/models"
-import { IQuizAnswerQuery } from "@quizzes/common/types"
-import { Service } from "typedi"
-import { EntityManager, SelectQueryBuilder } from "typeorm"
-import { InjectManager } from "typeorm-typedi-extensions"
+} from "../models"
+import { IQuizAnswerQuery } from "../types"
 
 @Service()
 export default class SpamFlagService {

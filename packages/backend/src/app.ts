@@ -3,7 +3,6 @@ import "reflect-metadata"
 // tslint:disable-next-line:no-var-requires
 require("module-alias/register")
 
-import { logger } from "@quizzes/common/config/winston"
 import bodyParser from "body-parser"
 import compression from "compression" // compresses requests
 import dotenv from "dotenv"
@@ -18,6 +17,7 @@ import morgan from "morgan"
 import path from "path"
 import { createExpressServer, useContainer } from "routing-controllers"
 import { Container, Service } from "typedi"
+import { logger } from "./config/winston"
 import controllers from "./controllers"
 import { AuthenticationMiddleware } from "./middleware/authentication"
 

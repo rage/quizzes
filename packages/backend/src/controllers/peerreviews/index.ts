@@ -1,5 +1,3 @@
-import { PeerReview, QuizAnswer, UserQuizState } from "@quizzes/common/models"
-import { ITMCProfileDetails } from "@quizzes/common/types"
 import {
   Get,
   HeaderParam,
@@ -18,6 +16,8 @@ import { EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { API_PATH } from "../../config"
+import { PeerReview, QuizAnswer, UserQuizState } from "../../models"
+import { ITMCProfileDetails } from "../../types"
 
 @JsonController(`${API_PATH}/quizzes/peerreview`)
 export class PeerReviewController {
