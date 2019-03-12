@@ -4,65 +4,9 @@ import LikertScale from "likert-react"
 import { Button, Grid, Paper, TextField, Typography } from "@material-ui/core"
 import "likert-react/dist/main.css"
 
-export default props => {
-  const {
-    answered,
-    handleTextDataChange,
-    submitMessage,
-    textData,
-    languageInfo,
-    ...other
-  } = props
-
-  console.log(props)
-
-  return answered ? (
-    <div>
-      <Typography variant="subtitle1">
-        {languageInfo.userAnswerLabel}
-      </Typography>
-      <Paper style={paper}>
-        <Typography variant="body1">{textData}</Typography>
-      </Paper>
-      {submitMessage ? (
-        <div>
-          <Typography variant="subtitle1">
-            {languageInfo.exampleAnswerLabel}
-          </Typography>
-          <Paper style={paper}>
-            <Typography
-              variant="body1"
-              dangerouslySetInnerHTML={{ __html: submitMessage }}
-            />
-          </Paper>
-        </div>
-      ) : (
-        ""
-      )}
-      <PeerReviews {...other} answered={answered} languageInfo={languageInfo} />
-    </div>
-  ) : (
-    <div>
-      <TextField
-        variant="outlined"
-        label="Vastauksesi"
-        value={textData}
-        onChange={handleTextDataChange}
-        fullWidth={true}
-        multiline={true}
-        rows={10}
-        margin="normal"
-      />
-      <div>Sanoja: {wordCount(textData)}</div>
-    </div>
-  )
-}
-
-function wordCount(string) {
-  if (!string) {
-    return 0
-  }
-  return string.match(/[^\s]+/g).length
+const paper = {
+  padding: 10,
+  margin: 10,
 }
 
 class PeerReviews extends Component {
@@ -229,7 +173,4 @@ class PeerReviews extends Component {
   }
 }
 
-const paper = {
-  padding: 10,
-  margin: 10,
-}
+export default PeerReviews
