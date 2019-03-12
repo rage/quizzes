@@ -16,6 +16,7 @@ export default props => {
     failureMessage,
     handleOptionChange,
     itemTitle,
+    multi,
     options,
     optionAnswers,
     singleItem,
@@ -33,15 +34,27 @@ export default props => {
     )
     const width =
       maxOptionLength > 100 ? 12 : Math.ceil(maxOptionLength / (8 + 1 / 3))
-    optionContainerWidth = Math.min(width, 12)
-    questionWidth = 12
+    optionContainerWidth = undefined
+    optionWidth = Math.min(width, 12)
+    questionWidth = undefined
     direction = "column"
   }
 
   return (
     <Grid container direction={direction} style={{ marginBottom: 10 }}>
       <Grid item sm={questionWidth}>
-        <Typography variant="subtitle1">{itemTitle}</Typography>
+        {singleItem ? (
+          ""
+        ) : (
+          <Typography variant="subtitle1">{itemTitle}</Typography>
+        )}
+        {multi ? (
+          <Typography variant="subtitle1">
+            Valitse kaikki sopivat vaihtoehdot
+          </Typography>
+        ) : (
+          ""
+        )}
         {answered && !singleItem ? (
           <Typography
             variant="body1"
@@ -80,49 +93,56 @@ export default props => {
               : "white"
             return (
               <Grid item key={option.id}>
-                {answered ? (
-                  <Grid item key={option.id}>
-                    <Button
-                      fullWidth
-                      color="inherit"
-                      {...selectButtonStyle(selected, option.correct)}
-                    >
-                      {text.title}
-                    </Button>
-                    {singleItem && feedbackMessageExists() ? (
-                      <Typography
-                        variant="body1"
-                        style={{
-                          borderLeft: `4px solid ${submittedColor}`,
-                          padding: 3,
-                          marginBottom: 5,
-                        }}
+                <Grid container>
+                  {answered ? (
+                    <Grid container direction={direction}>
+                      <Grid item sm={optionWidth}>
+                        <Button
+                          fullWidth
+                          color="inherit"
+                          {...selectButtonStyle(selected, option.correct)}
+                        >
+                          {text.title}
+                        </Button>
+                      </Grid>
+
+                      {singleItem && feedbackMessageExists() ? (
+                        <Grid item>
+                          <Typography
+                            variant="body1"
+                            style={{
+                              borderLeft: `4px solid ${submittedColor}`,
+                              padding: 3,
+                              marginBottom: 5,
+                            }}
+                          >
+                            {option.correct
+                              ? selected
+                                ? text.successMessage
+                                : text.failureMessage
+                              : selected
+                              ? text.failureMessage
+                              : text.successMessage}
+                          </Typography>
+                        </Grid>
+                      ) : (
+                        ""
+                      )}
+                    </Grid>
+                  ) : (
+                    <Grid item key={option.id}>
+                      <Button
+                        variant="outlined"
+                        fullWidth
+                        color={selected ? "primary" : "default"}
+                        style={{ textTransform: "none", margin: "0.5em 0" }}
+                        onClick={handleOptionChange(option.id)}
                       >
-                        {option.correct
-                          ? selected
-                            ? text.successMessage
-                            : text.failureMessage
-                          : selected
-                          ? text.failureMessage
-                          : text.successMessage}
-                      </Typography>
-                    ) : (
-                      ""
-                    )}
-                  </Grid>
-                ) : (
-                  <Grid item key={option.id}>
-                    <Button
-                      variant="outlined"
-                      fullWidth
-                      color={selected ? "primary" : "default"}
-                      style={{ textTransform: "none", margin: "0.5em 0" }}
-                      onClick={handleOptionChange(option.id)}
-                    >
-                      {text.title}
-                    </Button>
-                  </Grid>
-                )}
+                        {text.title}
+                      </Button>
+                    </Grid>
+                  )}
+                </Grid>
               </Grid>
             )
           })}
