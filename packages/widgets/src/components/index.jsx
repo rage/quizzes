@@ -271,7 +271,6 @@ class Quiz extends Component {
             </div>
           )}
         </div>
-        <pre>{JSON.stringify(this.state, undefined, 2)}</pre>
       </div>
     )
   }
