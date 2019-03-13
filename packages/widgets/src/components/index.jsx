@@ -3,6 +3,7 @@ import { Button, Typography, Grid } from "@material-ui/core"
 import Checkbox from "./Checkbox"
 import Essay from "./Essay"
 import MultipleChoice from "./MultipleChoice"
+import ResearchAgreement from "./ResearchAgreement"
 import Scale from "./Scale"
 import Open from "./Open"
 import Unsupported from "./Unsupported"
@@ -16,6 +17,7 @@ const mapTypeToComponent = {
   scale: Scale,
   checkbox: Checkbox,
   open: Open,
+  "research-agreement": ResearchAgreement
 }
 
 const componentType = typeName => {
