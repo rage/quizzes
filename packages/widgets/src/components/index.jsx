@@ -8,7 +8,6 @@ import Scale from "./Scale"
 import Open from "./Open"
 import Unsupported from "./Unsupported"
 import axios from "axios"
-
 import languageLabels from "../utils/language_labels"
 
 const mapTypeToComponent = {

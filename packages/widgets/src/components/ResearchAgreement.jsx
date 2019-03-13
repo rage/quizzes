@@ -1,30 +1,6 @@
 import React from "react"
 import { Checkbox, Grid } from "@material-ui/core"
-
-const Option = ({ label, value, toggle, answered }) => {
-  let checkboxOptions = {
-    disabled: answered,
-  }
-  if (answered) {
-    checkboxOptions.checked = true
-  }
-
-  return (
-    <Grid container style={{ marginBottom: "center" }}>
-      <Grid item xs={1}>
-        <Checkbox
-          value={value}
-          color="primary"
-          onChange={toggle}
-          {...checkboxOptions}
-        />
-      </Grid>
-      <Grid item xs style={{ alignSelf: "center" }}>
-        {label}
-      </Grid>
-    </Grid>
-  )
-}
+import CheckboxOption from "./Checkbox/CheckboxOption"
 
 const ResearchAgreement = ({
   options,
@@ -54,7 +30,7 @@ const ResearchAgreement = ({
         )
 
         return (
-          <Option
+          <CheckboxOption
             key={option.id}
             label={option.texts[0].title}
             value={currentAnswer ? currentAnswer.quizOptionId : ""}
