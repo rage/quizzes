@@ -17,7 +17,12 @@ import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
 import validator from "validator"
 import { API_PATH } from "../../config"
-import { Quiz, QuizAnswer, UserQuizState } from "../../models"
+import {
+  PeerReviewQuestionCollection,
+  Quiz,
+  QuizAnswer,
+  UserQuizState,
+} from "../../models"
 import { IQuizQuery, ITMCProfileDetails } from "../../types"
 
 import _ from "lodash"

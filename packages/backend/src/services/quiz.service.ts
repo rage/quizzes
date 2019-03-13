@@ -95,38 +95,26 @@ export default class QuizService {
 
     if (query.peerreviews) {
       queryBuilder
-        .leftJoinAndSelect(
-          "quiz.peerReviewQuestionCollections",
-          "peer_review_question_collection",
-        )
-        .leftJoinAndSelect(
-          "peer_review_question_collection.questions",
-          "peer_review_question",
-        )
+        .leftJoinAndSelect("quiz.peerReviewQuestionCollections", "prqc")
+        .leftJoinAndSelect("prqc.questions", "prq")
       if (language) {
         queryBuilder
           .leftJoinAndSelect(
-            "peer_review_question_collection.texts",
-            "peer_review_question_collection_translation",
-            "peer_review_question_collection_translation.language_id = :language",
+            "prqc.texts",
+            "prqc_translation",
+            "prqc_translation.language_id = :language",
             { language },
           )
           .leftJoinAndSelect(
-            "peer_review_question.texts",
-            "peer_review_question_translation",
-            "peer_review_question_translation.language_id = :language",
+            "prq.texts",
+            "prq_translation",
+            "prq_translation.language_id = :language",
             { language },
           )
       } else {
         queryBuilder
-          .leftJoinAndSelect(
-            "peer_review_question_collection.texts",
-            "peer_review_question_collection_translation",
-          )
-          .leftJoinAndSelect(
-            "peer_review_question.texts",
-            "peer_review_question_translation",
-          )
+          .leftJoinAndSelect("prqc.texts", "prqc_translation")
+          .leftJoinAndSelect("prq.texts", "prq_translation")
       }
     }
 
@@ -142,21 +130,7 @@ export default class QuizService {
       queryBuilder.andWhere("quiz.excluded_from_score = false")
     }
 
-    let quizzes: Quiz[] = await queryBuilder.getMany()
-
-    // query doesn't return prqc ids in to prqc_translation for some reason
-    if (query.peerreviews) {
-      quizzes = quizzes.map(quiz => {
-        quiz.peerReviewQuestionCollections.map(prqc => {
-          prqc.texts.map(text => {
-            text.peerReviewQuestionCollectionId = prqc.id
-          })
-        })
-        return quiz
-      })
-    }
-
-    return quizzes
+    return await queryBuilder.getMany()
   }
 
   public async createQuiz(quiz: Quiz): Promise<Quiz | undefined> {
