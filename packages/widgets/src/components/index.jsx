@@ -96,18 +96,29 @@ class Quiz extends Component {
     })
   }
 
-  handleOptionChange = itemId => (
-    optionId,
-    select = true,
-    additive = false,
-  ) => () => {
-    // if the option should be unchecked independently of other options of the same item
-    // (multiple checkboxes in a research agreement)
-    if (!select) {
-      const quizAnswer = this.state.quizAnswer
-      const itemAnswers = this.state.quizAnswer.itemAnswers
+  handleCheckboxToggling = itemId => optionId => () => {
+    const quizAnswer = this.state.quizAnswer
+    const itemAnswers = quizAnswer.itemAnswers
+    const itemAnswer = itemAnswers.find(ia => ia.quizItemId === itemId)
 
-      const newItemAnswers = itemAnswers.map(ia => {
+    const currentOptionValue = itemAnswer.optionAnswers.find(
+      oa => oa.quizOptionId === optionId,
+    )
+
+    let newItemAnswers = {}
+
+    if (!currentOptionValue) {
+      newItemAnswers = itemAnswers.map(ia => {
+        if (ia.quizItemId === itemId) {
+          return {
+            ...ia,
+            optionAnswers: ia.optionAnswers.concat({ quizOptionId: optionId }),
+          }
+        }
+        return ia
+      })
+    } else {
+      newItemAnswers = itemAnswers.map(ia => {
         if (ia.quizItemId === itemId) {
           return {
             ...ia,
@@ -115,27 +126,18 @@ class Quiz extends Component {
               oa => oa.quizOptionId !== optionId,
             ),
           }
-        } else {
-          return ia
         }
+        return ia
       })
-      console.log("Old item answers: ", itemAnswers)
-      console.log("New item answers: ", newItemAnswers)
-
-      this.setState({
-        quizAnswer: {
-          ...quizAnswer,
-          itemAnswers: newItemAnswers,
-        },
-      })
-
-      return
     }
 
-    let multi = this.state.quiz.items.find(item => item.id === itemId).multi
-    if (additive) {
-      multi = true
-    }
+    this.setState({
+      quizAnswer: { ...quizAnswer, itemAnswers: newItemAnswers },
+    })
+  }
+
+  handleOptionChange = itemId => optionId => () => {
+    const multi = this.state.quiz.items.find(item => item.id === itemId).multi
     const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
       if (itemAnswer.quizItemId === itemId) {
         const updated = { ...itemAnswer }
@@ -282,6 +284,7 @@ class Quiz extends Component {
                 handleTextDataChange={this.handleTextDataChange(item.id)}
                 handleIntDataChange={this.handleIntDataChange(item.id)}
                 handleOptionChange={this.handleOptionChange(item.id)}
+                handleCheckboxToggling={this.handleCheckboxToggling(item.id)}
                 setUserQuizState={this.setUserQuizState}
               />
             )
