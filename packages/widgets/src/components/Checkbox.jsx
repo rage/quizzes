@@ -23,7 +23,7 @@ const CheckboxWidget = ({
       <Grid item xs={1}>
         {answered ? (
           //value given so component remains controlled -> no error message in console
-          <Checkbox value={`${answered}`} disabled />
+          <Checkbox value={`${answered}`} disabled checked />
         ) : (
           <Checkbox
             value={optionAnswers[0] && `${optionAnswers[0].quizOptionId}`}
