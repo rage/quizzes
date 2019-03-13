@@ -35,24 +35,14 @@ const ResearchAgreement = ({
 }) => {
   console.log("Option answers: ", optionAnswers)
 
-  const handleUnchecking = handleOptionChange(-1)
-
   const toggle = optionId => {
     const oa = optionAnswers.find(oa => oa.quizOptionId === optionId)
-    const handleChecking = handleOptionChange(optionId)
     return () => {
       if (!oa) {
-        handleChecking()
+        handleOptionChange(optionId, true, true)()
       } else {
-        handleUnchecking()
+        handleOptionChange(optionId, false, true)()
       }
-    }
-  }
-  ;() => {
-    if (!optionAnswers[0]) {
-      handleChecking()
-    } else {
-      handleUnchecking()
     }
   }
 

@@ -97,18 +97,31 @@ class Quiz extends Component {
     })
   }
 
-  handleOptionChange = itemId => optionId => () => {
-    //return the optionAnswers to the same as it was before any answer
-    if (typeof optionId === "number" && optionId === -1) {
+  handleOptionChange = itemId => (
+    optionId,
+    select = true,
+    additive = false,
+  ) => () => {
+    // if the option should be unchecked independently of other options of the same item
+    // (multiple checkboxes in a research agreement)
+    if (!select) {
       const quizAnswer = this.state.quizAnswer
       const itemAnswers = this.state.quizAnswer.itemAnswers
+
       const newItemAnswers = itemAnswers.map(ia => {
         if (ia.quizItemId === itemId) {
-          return { ...ia, optionAnswers: [] }
+          return {
+            ...ia,
+            optionAnswers: ia.optionAnswers.filter(
+              oa => oa.quizOptionId !== optionId,
+            ),
+          }
         } else {
           return ia
         }
       })
+      console.log("Old item answers: ", itemAnswers)
+      console.log("New item answers: ", newItemAnswers)
 
       this.setState({
         quizAnswer: {
@@ -120,7 +133,10 @@ class Quiz extends Component {
       return
     }
 
-    const multi = this.state.quiz.items.find(item => item.id === itemId).multi
+    let multi = this.state.quiz.items.find(item => item.id === itemId).multi
+    if (additive) {
+      multi = true
+    }
     const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
       if (itemAnswer.quizItemId === itemId) {
         const updated = { ...itemAnswer }
@@ -190,8 +206,7 @@ class Quiz extends Component {
       if (item.type === "scale") {
         return itemAnswer.intData ? true : false
       }
-      if (item.type === "checkbox") {
-        console.log(itemAnswer)
+      if (item.type === "checkbox" || item.type === "research-agreement") {
         return itemAnswer.optionAnswers.length > 0
       }
     })

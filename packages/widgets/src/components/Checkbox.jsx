@@ -8,7 +8,7 @@ const CheckboxWidget = ({
   handleOptionChange,
 }) => {
   const handleChecking = handleOptionChange(options[0])
-  const handleUnchecking = handleOptionChange(-1)
+  const handleUnchecking = handleOptionChange(options[0], false)
 
   const toggle = () => {
     if (!optionAnswers[0]) {
@@ -23,7 +23,7 @@ const CheckboxWidget = ({
       <Grid item xs={1}>
         {answered ? (
           //value given so component remains controlled -> no error message in console
-          <Checkbox value={`${answered}`} disabled />
+          <Checkbox value={`${answered}`} disabled checked />
         ) : (
           <Checkbox
             value={optionAnswers[0] && `${optionAnswers[0].quizOptionId}`}
