@@ -1,5 +1,6 @@
 import React, { Component } from "react"
 import { Button, Typography, Grid } from "@material-ui/core"
+import Checkbox from "./Checkbox"
 import Essay from "./Essay"
 import MultipleChoice from "./MultipleChoice"
 import Scale from "./Scale"
@@ -13,6 +14,7 @@ const mapTypeToComponent = {
   essay: Essay,
   "multiple-choice": MultipleChoice,
   scale: Scale,
+  checkbox: Checkbox,
   open: Open,
 }
 
@@ -94,6 +96,28 @@ class Quiz extends Component {
   }
 
   handleOptionChange = itemId => optionId => () => {
+    //return the optionAnswers to the same as it was before any answer
+    if (typeof optionId === "number" && optionId === -1) {
+      const quizAnswer = this.state.quizAnswer
+      const itemAnswers = this.state.quizAnswer.itemAnswers
+      const newItemAnswers = itemAnswers.map(ia => {
+        if (ia.quizItemId === itemId) {
+          return { ...ia, optionAnswers: [] }
+        } else {
+          return ia
+        }
+      })
+
+      this.setState({
+        quizAnswer: {
+          ...quizAnswer,
+          itemAnswers: newItemAnswers,
+        },
+      })
+
+      return
+    }
+
     const multi = this.state.quiz.items.find(item => item.id === itemId).multi
     const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
       if (itemAnswer.quizItemId === itemId) {
@@ -164,7 +188,12 @@ class Quiz extends Component {
       if (item.type === "scale") {
         return itemAnswer.intData ? true : false
       }
+      if (item.type === "checkbox") {
+        console.log(itemAnswer)
+        return itemAnswer.optionAnswers.length > 0
+      }
     })
+
     return submittable.includes(false)
   }
 
