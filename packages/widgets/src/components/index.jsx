@@ -17,7 +17,7 @@ const mapTypeToComponent = {
   scale: Scale,
   checkbox: Checkbox,
   open: Open,
-  "research-agreement": ResearchAgreement
+  "research-agreement": ResearchAgreement,
 }
 
 const componentType = typeName => {
