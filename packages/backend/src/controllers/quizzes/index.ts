@@ -18,7 +18,7 @@ import { InjectManager } from "typeorm-typedi-extensions"
 import validator from "validator"
 import { API_PATH } from "../../config"
 import {
-  PeerReviewQuestionCollection,
+  PeerReviewCollection,
   Quiz,
   QuizAnswer,
   UserQuizState,

@@ -4,8 +4,8 @@ import { EntityManager } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import {
+  PeerReviewCollection,
   PeerReviewQuestion,
-  PeerReviewQuestionCollection,
   Quiz,
   QuizItem,
   QuizOption,
@@ -95,7 +95,7 @@ export default class QuizService {
 
     if (query.peerreviews) {
       queryBuilder
-        .leftJoinAndSelect("quiz.peerReviewQuestionCollections", "prqc")
+        .leftJoinAndSelect("quiz.peerReviewCollections", "prqc")
         .leftJoinAndSelect("prqc.questions", "prq")
       if (language) {
         queryBuilder
@@ -233,19 +233,19 @@ export default class QuizService {
       )
     }
 
-    if (oldQuiz.peerReviewQuestionCollections) {
+    if (oldQuiz.peerReviewCollections) {
       const oldCollectionIds: string[] = []
       const oldQuestionIds: string[] = []
       const newCollectionIds: string[] = []
       const newQuestionIds: string[] = []
 
-      oldQuiz.peerReviewQuestionCollections.forEach(collection => {
+      oldQuiz.peerReviewCollections.forEach(collection => {
         ;(collection.questions || []).forEach(o => oldQuestionIds.push(o.id))
         oldCollectionIds.push(collection.id)
       })
 
       if (newQuiz) {
-        ;(newQuiz!.peerReviewQuestionCollections || []).forEach(collection => {
+        ;(newQuiz!.peerReviewCollections || []).forEach(collection => {
           ;(collection.questions || []).forEach(o => newQuestionIds.push(o.id))
           newCollectionIds.push(collection.id)
         })
@@ -270,7 +270,7 @@ export default class QuizService {
     }
     if (toBeRemoved.prCollectionIds.length > 0) {
       await entityManager.delete(
-        PeerReviewQuestionCollection,
+        PeerReviewCollection,
         toBeRemoved.prCollectionIds,
       )
     }

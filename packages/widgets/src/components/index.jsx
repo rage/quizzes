@@ -261,7 +261,7 @@ class Quiz extends Component {
                 peerReviewsRequired={quiz.course.minPeerReviewsGiven}
                 itemTitle={item.texts[0].title}
                 options={item.options}
-                peerReviewQuestions={quiz.peerReviewQuestionCollections}
+                peerReviewQuestions={quiz.peerReviewCollections}
                 submitMessage={quiz.texts[0].submitMessage}
                 handleTextDataChange={this.handleTextDataChange(item.id)}
                 handleIntDataChange={this.handleIntDataChange(item.id)}
