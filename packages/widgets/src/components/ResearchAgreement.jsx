@@ -7,8 +7,6 @@ const ResearchAgreement = ({
   answered,
   handleCheckboxToggling,
 }) => {
-  console.log("Option answers: ", optionAnswers)
-
   return (
     <React.Fragment>
       {options.map(option => {

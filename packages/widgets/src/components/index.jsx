@@ -42,6 +42,7 @@ class Quiz extends Component {
         { headers: { authorization: `Bearer ${accessToken}` } },
       )
       const quiz = response.data.quiz
+      console.log("Received quiz: ", quiz)
       let quizAnswer = response.data.quizAnswer
       if (!quizAnswer) {
         quizAnswer = {
@@ -67,12 +68,12 @@ class Quiz extends Component {
     }
   }
 
-  handleTextDataChange = itemId => event => {
+  handleDataChange = (itemId, attributeName) => event => {
     const value = event.target.value
     const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
       if (itemAnswer.quizItemId === itemId) {
         const updated = { ...itemAnswer }
-        updated.textData = value
+        updated[attributeName] = value
         return updated
       }
       return itemAnswer
@@ -81,20 +82,9 @@ class Quiz extends Component {
     this.setState({ quizAnswer: { ...quizAnswer, ...{ itemAnswers } } })
   }
 
-  handleIntDataChange = itemId => event => {
-    //conversion to be sure
-    const value = Number(event.target.value)
-    const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
-      if (itemAnswer.quizItemId === itemId) {
-        return { ...itemAnswer, intData: value }
-      }
-      return itemAnswer
-    })
+  handleTextDataChange = itemId => this.handleDataChange(itemId, "textData")
 
-    this.setState({
-      quizAnswer: { ...this.state.quizAnswer, ...{ itemAnswers } },
-    })
-  }
+  handleIntDataChange = itemId => this.handleDataChange(itemId, "intData")
 
   handleCheckboxToggling = itemId => optionId => () => {
     const quizAnswer = this.state.quizAnswer
@@ -105,34 +95,20 @@ class Quiz extends Component {
       oa => oa.quizOptionId === optionId,
     )
 
-    let newItemAnswers = {}
-
-    if (!currentOptionValue) {
-      newItemAnswers = itemAnswers.map(ia => {
-        if (ia.quizItemId === itemId) {
-          return {
-            ...ia,
-            optionAnswers: ia.optionAnswers.concat({ quizOptionId: optionId }),
-          }
-        }
-        return ia
-      })
-    } else {
-      newItemAnswers = itemAnswers.map(ia => {
-        if (ia.quizItemId === itemId) {
-          return {
-            ...ia,
-            optionAnswers: ia.optionAnswers.filter(
-              oa => oa.quizOptionId !== optionId,
-            ),
-          }
-        }
-        return ia
-      })
+    const newItemAnswer = {
+      ...itemAnswer,
+      optionAnswers: currentOptionValue
+        ? itemAnswer.optionAnswers.filter(oa => oa.quizOptionId !== optionId)
+        : itemAnswer.optionAnswers.concat({ quizOptionId: optionId }),
     }
 
     this.setState({
-      quizAnswer: { ...quizAnswer, itemAnswers: newItemAnswers },
+      quizAnswer: {
+        ...quizAnswer,
+        itemAnswers: itemAnswers.map(ia =>
+          ia.quizItemId === itemId ? newItemAnswer : ia,
+        ),
+      },
     })
   }
 
