@@ -2,18 +2,16 @@ import React from "react"
 import { Grid, Checkbox } from "@material-ui/core"
 
 export default ({ label, value, toggle, answered }) => {
-  let checkboxOptions = {
+  const checkboxOptions = {
     disabled: answered,
-  }
-  if (answered) {
-    checkboxOptions.checked = true
+    checked: value !== undefined,
   }
 
   return (
     <Grid container style={{ marginBottom: 10 }}>
       <Grid item xs={1}>
         <Checkbox
-          value={value}
+          value={value ? value.quizOptionId : ""}
           color="primary"
           onChange={toggle}
           {...checkboxOptions}
