@@ -1,9 +1,9 @@
 import { Course } from "./types/course"
 import { Language } from "./types/language"
 import { Organization } from "./types/organization"
+import { PeerReviewCollection } from "./types/PeerReviewCollection"
+import { PeerReviewCollectionTranslation } from "./types/PeerReviewCollectionTranslation"
 import { PeerReviewQuestion } from "./types/peerReviewQuestion"
-import { PeerReviewQuestionCollection } from "./types/peerReviewQuestionCollection"
-import { PeerReviewQuestionCollectionTranslation } from "./types/peerReviewQuestionCollectionTranslation"
 import { PeerReviewQuestionTranslation } from "./types/peerReviewQuestionTranslation"
 import { Quiz } from "./types/quiz"
 import { QuizItem } from "./types/quizItem"
@@ -18,8 +18,8 @@ export const types = [
   Organization,
   PeerReviewQuestion,
   PeerReviewQuestionTranslation,
-  PeerReviewQuestionCollection,
-  PeerReviewQuestionCollectionTranslation,
+  PeerReviewCollection,
+  PeerReviewCollectionTranslation,
   Quiz,
   QuizItem,
   QuizItemTranslation,

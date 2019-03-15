@@ -47,7 +47,7 @@ class PeerReviews extends Component {
     )
     const peerReview = {
       quizAnswerId,
-      peerReviewQuestionCollectionId: this.props.peerReviewQuestions[0].id,
+      peerReviewCollectionId: this.props.peerReviewQuestions[0].id,
       rejectedQuizAnswerIds: rejected ? [rejected.id] : [],
       answers: this.props.peerReviewQuestions[0].questions.map(question => {
         return { peerReviewQuestionId: question.id }

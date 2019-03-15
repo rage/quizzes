@@ -18,7 +18,7 @@ import { PeerReviewQuestion } from "./peer_review_question"
 import { Quiz } from "./quiz"
 
 @Entity()
-export class PeerReviewQuestionCollection extends BaseEntity {
+export class PeerReviewCollection extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
@@ -28,13 +28,13 @@ export class PeerReviewQuestionCollection extends BaseEntity {
   public quizId: string | null
 
   @OneToMany(
-    type => PeerReviewQuestionCollectionTranslation,
-    prqct => prqct.peerReviewQuestionCollection,
+    type => PeerReviewCollectionTranslation,
+    prct => prct.peerReviewCollection,
     { eager: true, cascade: true },
   )
-  public texts: PeerReviewQuestionCollectionTranslation[]
+  public texts: PeerReviewCollectionTranslation[]
 
-  @OneToMany(type => PeerReviewQuestion, prq => prq.collection, {
+  @OneToMany(type => PeerReviewQuestion, prq => prq.peerReviewCollection, {
     eager: true,
     cascade: true,
   })
@@ -45,7 +45,7 @@ export class PeerReviewQuestionCollection extends BaseEntity {
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
 
-  constructor(data?: PeerReviewQuestionCollection) {
+  constructor(data?: PeerReviewCollection) {
     super()
 
     if (!data) {
@@ -65,14 +65,14 @@ export class PeerReviewQuestionCollection extends BaseEntity {
 
     if (this.texts) {
       this.texts.forEach(
-        (text: PeerReviewQuestionCollectionTranslation) =>
-          (text.peerReviewQuestionCollectionId = this.id),
+        (text: PeerReviewCollectionTranslation) =>
+          (text.peerReviewCollectionId = this.id),
       )
     }
 
     if (this.questions) {
       this.questions.forEach((question: PeerReviewQuestion) => {
-        question.collectionId = this.id
+        question.peerReviewCollectionId = this.id
         question.quizId = this.quizId
       })
     }
@@ -80,14 +80,14 @@ export class PeerReviewQuestionCollection extends BaseEntity {
 }
 
 @Entity()
-export class PeerReviewQuestionCollectionTranslation extends BaseEntity {
-  @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id, {
+export class PeerReviewCollectionTranslation extends BaseEntity {
+  @ManyToOne(type => PeerReviewCollection, prqc => prqc.id, {
     onDelete: "CASCADE",
   })
   @JoinColumn()
-  public peerReviewQuestionCollection: Promise<PeerReviewQuestionCollection>
+  public peerReviewCollection: Promise<PeerReviewCollection>
   @PrimaryColumn()
-  public peerReviewQuestionCollectionId: string
+  public peerReviewCollectionId: string
 
   @ManyToOne(type => Language, lang => lang.id)
   @JoinColumn()
@@ -105,15 +105,15 @@ export class PeerReviewQuestionCollectionTranslation extends BaseEntity {
   @UpdateDateColumn({ type: "timestamp" })
   public updatedAt: Date
 
-  constructor(data?: PeerReviewQuestionCollectionTranslation) {
+  constructor(data?: PeerReviewCollectionTranslation) {
     super()
 
     if (!data) {
       return
     }
 
-    if (data.peerReviewQuestionCollectionId) {
-      this.peerReviewQuestionCollectionId = data.peerReviewQuestionCollectionId
+    if (data.peerReviewCollectionId) {
+      this.peerReviewCollectionId = data.peerReviewCollectionId
     }
     this.languageId = data.languageId || "unknown"
     this.title = data.title

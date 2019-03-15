@@ -17,8 +17,8 @@ import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { getUUIDByString, randomUUID } from "../util"
 import { Course } from "./course"
 import { Language } from "./language"
+import { PeerReviewCollection } from "./peer_review_collection"
 import { PeerReviewQuestion } from "./peer_review_question"
-import { PeerReviewQuestionCollection } from "./peer_review_question_collection"
 import { QuizItem } from "./quiz_item"
 
 @Entity()
@@ -56,11 +56,11 @@ export class Quiz extends BaseEntity {
   }) // was: not eager
   public items?: QuizItem[]
 
-  @OneToMany(type => PeerReviewQuestionCollection, prqc => prqc.quiz, {
+  @OneToMany(type => PeerReviewCollection, prc => prc.quiz, {
     eager: false,
     cascade: true,
   }) // was: not eager
-  public peerReviewQuestionCollections: PeerReviewQuestionCollection[]
+  public peerReviewCollections: PeerReviewCollection[]
 
   @Column({ default: true })
   public autoConfirm: boolean
@@ -86,7 +86,7 @@ export class Quiz extends BaseEntity {
     this.open = data.open
     this.texts = data.texts
     this.items = data.items
-    this.peerReviewQuestionCollections = data.peerReviewQuestionCollections
+    this.peerReviewCollections = data.peerReviewCollections
   }
 
   @BeforeInsert()
@@ -101,9 +101,9 @@ export class Quiz extends BaseEntity {
       this.items.forEach((item: QuizItem) => (item.quizId = this.id))
     }
 
-    if (this.peerReviewQuestionCollections) {
-      this.peerReviewQuestionCollections.forEach(
-        (question: PeerReviewQuestionCollection) => (question.quizId = this.id),
+    if (this.peerReviewCollections) {
+      this.peerReviewCollections.forEach(
+        (question: PeerReviewCollection) => (question.quizId = this.id),
       )
     }
   }

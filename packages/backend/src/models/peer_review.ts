@@ -11,8 +11,8 @@ import {
   RelationId,
   UpdateDateColumn,
 } from "typeorm"
+import { PeerReviewCollection } from "./peer_review_collection"
 import { PeerReviewQuestionAnswer } from "./peer_review_question_answer"
-import { PeerReviewQuestionCollection } from "./peer_review_question_collection"
 import { QuizAnswer } from "./quiz_answer"
 import { User } from "./user"
 
@@ -31,12 +31,12 @@ export class PeerReview extends BaseEntity {
   @Column("int")
   public userId: number
 
-  @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id, {
+  @ManyToOne(type => PeerReviewCollection, prqc => prqc.id, {
     nullable: true,
   })
-  public peerReviewQuestionCollection?: PeerReviewQuestionCollection
+  public peerReviewCollection?: PeerReviewCollection
   @Column({ nullable: true })
-  public peerReviewQuestionCollectionId?: string
+  public peerReviewCollectionId?: string
 
   @Column({ type: String, array: true })
   public rejectedQuizAnswerIds: string[]
