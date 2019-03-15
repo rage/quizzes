@@ -24,8 +24,8 @@ export default props => {
   } = props
 
   let direction = "row"
-  let questionWidth = 5
-  let optionContainerWidth = 7
+  let questionWidth = 6
+  let optionContainerWidth = 6
   let optionWidth
 
   if (singleItem) {
@@ -34,9 +34,9 @@ export default props => {
     )
     const width =
       maxOptionLength > 100 ? 12 : Math.ceil(maxOptionLength / (8 + 1 / 3))
-    optionContainerWidth = undefined
+    optionContainerWidth = 12
     optionWidth = Math.min(width, 12)
-    questionWidth = undefined
+    questionWidth = 12
     direction = "column"
   }
 
@@ -69,81 +69,83 @@ export default props => {
           ""
         )}
       </Grid>
-      <Grid item sm={optionContainerWidth}>
-        <Grid
-          container
-          direction={direction}
-          justify="space-evenly"
-          style={{ paddingTop: 7, flexWrap: "nowrap" }}
-        >
-          {options.map(option => {
-            const selected = optionAnswers.find(
-              oa => oa.quizOptionId === option.id,
-            )
-            const text = option.texts[0]
-            const feedbackMessage = option.correct
-              ? selected
-                ? text.successMessage
-                : text.failureMessage
-              : selected
-              ? text.failureMessage
-              : text.successMessage
-            const feedbackColor = option.correct
-              ? selected
-                ? "green"
-                : "white"
-              : selected
-              ? "red"
+      <Grid
+        item
+        sm={optionContainerWidth}
+        container
+        direction={direction}
+        justify="space-between"
+        style={{ paddingTop: 7 }}
+      >
+        {options.map(option => {
+          const selected = optionAnswers.find(
+            oa => oa.quizOptionId === option.id,
+          )
+          const text = option.texts[0]
+          const feedbackMessage = option.correct
+            ? selected
+              ? text.successMessage
+              : text.failureMessage
+            : selected
+            ? text.failureMessage
+            : text.successMessage
+          const feedbackColor = option.correct
+            ? selected
+              ? "green"
               : "white"
-            return (
-              <Grid item key={option.id}>
-                <Grid container direction={direction}>
-                  {answered ? (
-                    <Grid container direction={direction}>
-                      <Grid item sm={optionWidth}>
-                        <Button
-                          fullWidth
-                          color="inherit"
-                          {...selectButtonStyle(selected, option.correct)}
-                        >
-                          {text.title}
-                        </Button>
-                      </Grid>
-                      {singleItem && feedbackMessage ? (
-                        <Grid item>
-                          <Typography
-                            variant="body1"
-                            style={{
-                              borderLeft: `4px solid ${feedbackColor}`,
-                              padding: 3,
-                              marginBottom: 5,
-                            }}
-                          >
-                            {feedbackMessage}
-                          </Typography>
-                        </Grid>
-                      ) : (
-                        ""
-                      )}
-                    </Grid>
-                  ) : (
-                    <Grid item key={option.id}>
-                      <Button
-                        variant="outlined"
-                        fullWidth
-                        color={selected ? "primary" : "default"}
-                        style={{ textTransform: "none", margin: "0.5em 0" }}
-                        onClick={handleOptionChange(option.id)}
-                      >
-                        {text.title}
-                      </Button>
-                    </Grid>
-                  )}
+            : selected
+            ? "red"
+            : "white"
+          return answered ? (
+            singleItem ? (
+              <Grid item container direction={direction} key={option.id}>
+                <Grid item sm={optionWidth}>
+                  <Button
+                    fullWidth
+                    color="inherit"
+                    {...selectButtonStyle(selected, option.correct)}
+                  >
+                    {text.title}
+                  </Button>
+                </Grid>
+                <Grid item>
+                  <Typography
+                    variant="body1"
+                    style={{
+                      borderLeft: `4px solid ${feedbackColor}`,
+                      padding: 3,
+                      marginBottom: 5,
+                    }}
+                  >
+                    {feedbackMessage}
+                  </Typography>
                 </Grid>
               </Grid>
+            ) : (
+              <Grid item>
+                <Button
+                  fullWidth
+                  color="inherit"
+                  {...selectButtonStyle(selected, option.correct)}
+                >
+                  {text.title}
+                </Button>
+              </Grid>
             )
-          })}
-        </Grid>
+          ) : (
+            <Grid item sm={optionWidth} key={option.id}>
+              <Button
+                variant="outlined"
+                fullWidth
+                color={selected ? "primary" : "default"}
+                style={{ textTransform: "none", margin: "0.5em 0" }}
+                onClick={handleOptionChange(option.id)}
+              >
+                {text.title}
+              </Button>
+            </Grid>
+          )
+        })}
       </Grid>
     </Grid>
   )
