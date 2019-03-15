@@ -49,7 +49,7 @@ import SortableWrapper from "./SortableWrapper"
 
 const PeerReviewQuestionContainer = SortableContainer((props: any) => {
   const questions =
-    props.edit.peerReviewQuestionCollections[props.collectionIndex].questions
+    props.edit.peerReviewCollections[props.collectionIndex].questions
 
   return (
     <div>
@@ -59,7 +59,7 @@ const PeerReviewQuestionContainer = SortableContainer((props: any) => {
           <SortableWrapper
             key={prq.id || prq.type + index}
             index={index}
-            collection={`peerReviewQuestionCollections[${
+            collection={`peerReviewCollections[${
               props.collectionIndex
             }.questions]`}
           >

@@ -118,9 +118,7 @@ class QuizForm extends React.Component<any, any> {
             this.props.filter.language === l.id && (
               <TabContainer
                 items={this.props.edit.items}
-                peerReviewQuestionCollections={
-                  this.props.edit.peerReviewQuestionCollections
-                }
+                peerReviewCollections={this.props.edit.peerReviewCollections}
                 text={this.props.edit.texts.find(
                   text => text.languageId === l.id,
                 )}

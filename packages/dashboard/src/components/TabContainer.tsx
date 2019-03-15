@@ -1,53 +1,16 @@
 import {
   Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Collapse,
-  Divider,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  FormControl,
-  Grid,
-  IconButton,
-  InputLabel,
   Menu,
   MenuItem,
   Paper,
-  Select,
-  SvgIcon,
-  Switch,
-  Tab,
-  Tabs,
   TextField,
-  Toolbar,
   Typography,
 } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
-import {
-  arrayMove,
-  SortableContainer,
-  SortableElement,
-  SortableHandle,
-} from "react-sortable-hoc"
-import {
-  addItem,
-  addOption,
-  addReview,
-  changeAttr,
-  changeOrder,
-  newQuiz,
-  remove,
-  save,
-  setEdit,
-} from "../store/edit/actions"
+import { addItem, addReview, changeOrder, remove } from "../store/edit/actions"
 import ItemContainer from "./ItemContainer"
-import OptionContainer from "./OptionContainer"
-import PeerReviewQuestionCollectionContainer from "./PeerReviewQuestionCollectionContainer"
-import PeerReviewQuestionContainer from "./PeerReviewQuestionContainer"
+import PeerReviewCollectionContainer from "./PeerReviewCollectionContainer"
 
 class TabContainer extends React.Component<any, any> {
   private itemTypes = [
@@ -113,7 +76,7 @@ class TabContainer extends React.Component<any, any> {
         <div style={{ marginTop: 50 }}>
           <Paper style={{ padding: 30, marginBottom: 20 }}>
             <Typography variant="subtitle1" style={{ marginBottom: 10 }}>
-              Items:
+              Items / Question types:
             </Typography>
             <ItemContainer
               onSortEnd={this.onSortEnd}
@@ -143,10 +106,8 @@ class TabContainer extends React.Component<any, any> {
               <Typography variant="subtitle1" style={{ marginBottom: 10 }}>
                 Peer reviews:
               </Typography>
-              <PeerReviewQuestionCollectionContainer
-                peerReviewQuestionCollections={
-                  this.props.peerReviewQuestionCollections
-                }
+              <PeerReviewCollectionContainer
+                peerReviewCollections={this.props.peerReviewCollections}
                 handleChange={this.props.handleChange}
                 handleSort={this.onSortEnd}
                 useDragHandle={true}

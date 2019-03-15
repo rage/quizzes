@@ -59,7 +59,7 @@ export const newQuiz = () => {
       course,
       texts: [],
       items: [],
-      peerReviewQuestionCollections: [],
+      peerReviewCollections: [],
     }
     dispatch(set(checkForMissingTranslation(quiz)))
   }
@@ -120,12 +120,12 @@ export const addOption = item => {
 export const addReview = () => {
   return (dispatch, getState) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
-    const peerReviewQuestionCollection = {
+    const peerReviewCollection = {
       quizId: quiz.id,
       texts: [],
       questions: [],
     }
-    quiz.peerReviewQuestionCollections.push(peerReviewQuestionCollection)
+    quiz.peerReviewCollections.push(peerReviewCollection)
     dispatch(setEdit(quiz))
   }
 }
@@ -133,7 +133,7 @@ export const addReview = () => {
 export const addReviewQuestion = (index, type) => {
   return (dispatch, getState) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
-    const collection = quiz.peerReviewQuestionCollections[index]
+    const collection = quiz.peerReviewCollections[index]
     const peerReviewQuestion = {
       quizId: quiz.id,
       default: false,
@@ -143,7 +143,9 @@ export const addReviewQuestion = (index, type) => {
       texts: [],
     }
     if (collection.id) {
-      Object.assign(peerReviewQuestion, { collectionId: collection.id })
+      Object.assign(peerReviewQuestion, {
+        peerReviewCollectionId: collection.id,
+      })
     }
     collection.questions.push(peerReviewQuestion)
     dispatch(setEdit(quiz))
@@ -161,7 +163,6 @@ export const remove = (path, index) => {
 
 const checkForMissingTranslation = paramQuiz => {
   const quiz = JSON.parse(JSON.stringify(paramQuiz))
-  console.log(quiz)
   const languages = quiz.course.languages.map(l => l.id)
   languages.map(language => {
     if (!quiz.texts.find(text => text.languageId === language)) {
@@ -205,19 +206,19 @@ const checkForMissingTranslation = paramQuiz => {
         }
       })
     })
-    quiz.peerReviewQuestionCollections.map((prqc, i) => {
-      if (!prqc.texts.find(text => text.languageId === language)) {
+    quiz.peerReviewCollections.map((prc, i) => {
+      if (!prc.texts.find(text => text.languageId === language)) {
         const newText = {
           languageId: language,
           title: `peer review collection title ${language}`,
           body: "",
         }
-        if (prqc.id) {
-          Object.assign(newText, { peerReviewQuestionCollectionId: prqc.id })
+        if (prc.id) {
+          Object.assign(newText, { peerReviewQuestionCollectionId: prc.id })
         }
-        quiz.peerReviewQuestionCollections[i].texts.push(newText)
+        quiz.peerReviewCollections[i].texts.push(newText)
       }
-      prqc.questions.map((prq, j) => {
+      prc.questions.map((prq, j) => {
         if (!prq.texts.find(text => text.languageId === language)) {
           const newText = {
             languageId: language,
@@ -225,9 +226,9 @@ const checkForMissingTranslation = paramQuiz => {
             body: "",
           }
           if (prq.id) {
-            Object.assign(newText, { peerReviewQuestionId: prqc.id })
+            Object.assign(newText, { peerReviewQuestionId: prc.id })
           }
-          quiz.peerReviewQuestionCollections[i].questions[j].texts.push(newText)
+          quiz.peerReviewCollections[i].questions[j].texts.push(newText)
         }
       })
     })

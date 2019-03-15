@@ -3,6 +3,7 @@ import axios from "axios"
 import LikertScale from "likert-react"
 import { Button, Grid, Paper, TextField, Typography } from "@material-ui/core"
 import "likert-react/dist/main.css"
+import { BASE_URL } from "../../config"
 
 const paper = {
   padding: 10,
@@ -23,7 +24,7 @@ class PeerReviews extends Component {
 
   fetchAnswersToReview = async () => {
     const response = await axios.get(
-      `https://quizzes.mooc.fi/api/v1/quizzes/peerreview/${this.props.quizId}/${
+      `${BASE_URL}/api/v1/quizzes/peerreview/${this.props.quizId}/${
         this.props.languageId
       }`,
       { headers: { authorization: `Bearer ${this.props.accessToken}` } },
@@ -34,7 +35,7 @@ class PeerReviews extends Component {
   flagAsSpam = quizAnswerId => async event => {
     this.setState({ answersToReview: undefined })
     await axios.post(
-      "https://quizzes.mooc.fi/api/v1/quizzes/spamflag",
+      `${BASE_URL}/api/v1/quizzes/spamflag`,
       { quizAnswerId },
       { headers: { authorization: `Bearer ${this.props.accessToken}` } },
     )
@@ -47,7 +48,7 @@ class PeerReviews extends Component {
     )
     const peerReview = {
       quizAnswerId,
-      peerReviewQuestionCollectionId: this.props.peerReviewQuestions[0].id,
+      peerReviewCollectionId: this.props.peerReviewQuestions[0].id,
       rejectedQuizAnswerIds: rejected ? [rejected.id] : [],
       answers: this.props.peerReviewQuestions[0].questions.map(question => {
         return { peerReviewQuestionId: question.id }
@@ -83,7 +84,7 @@ class PeerReviews extends Component {
   submitPeerReview = async () => {
     this.setState({ submitDisabled: true, submitLocked: true })
     const response = await axios.post(
-      "https://quizzes.mooc.fi/api/v1/quizzes/peerreview",
+      `${BASE_URL}/api/v1/quizzes/peerreview`,
       this.state.peerReview,
       { headers: { authorization: `Bearer ${this.props.accessToken}` } },
     )
@@ -93,7 +94,22 @@ class PeerReviews extends Component {
   }
 
   render() {
-    const peerReview = this.state.peerReview
+    const { peerReview, submitDisabled, submitLocked } = this.state
+
+    const {
+      peerReviewQuestions,
+      peerReviewsGiven,
+      peerReviewsRequired,
+      languageInfo,
+    } = this.props
+
+    if (peerReviewQuestions.length === 0) {
+      return (
+        <Typography variant="subtitle1">
+          Tähän tehtävään ei liity vertaisarvioita
+        </Typography>
+      )
+    }
 
     const answersToReview = peerReview
       ? this.state.answersToReview.filter(
@@ -104,24 +120,22 @@ class PeerReviews extends Component {
     return (
       <div>
         <Typography variant="subtitle1" style={{ paddingTop: 10 }}>
-          {this.props.peerReviewQuestions[0].texts[0].body}
+          {peerReviewQuestions[0].texts[0].body}
         </Typography>
         <Typography variant="subtitle1" style={{ paddingTop: 10 }}>
-          {this.props.languageInfo.givenPeerReviewsLabel}:{" "}
-          {this.props.peerReviewsGiven}/{this.props.peerReviewsRequired}
+          {languageInfo.givenPeerReviewsLabel}: {peerReviewsGiven}/
+          {peerReviewsRequired}
         </Typography>
         <Typography variant="subtitle1">
           Valitse yksi vaihtoehdoista vertaisarvoitavaksi
         </Typography>
         {!answersToReview ? (
           <Typography>
-            {this.props.languageInfo.loadingLabel}
-            {this.props.languageInfo.loadingLabel}
+            {languageInfo.loadingLabel}
+            {languageInfo.loadingLabel}
           </Typography>
         ) : answersToReview.length === 0 ? (
-          <Typography>
-            {this.props.languageInfo.noPeerAnswersAvailableLabel}
-          </Typography>
+          <Typography>{languageInfo.noPeerAnswersAvailableLabel}</Typography>
         ) : (
           answersToReview.map(answer => (
             <div key={answer.id}>
@@ -132,7 +146,7 @@ class PeerReviews extends Component {
               </Paper>
               {peerReview ? (
                 <div>
-                  {this.props.peerReviewQuestions[0].questions.map(question => {
+                  {peerReviewQuestions[0].questions.map(question => {
                     return (
                       <LikertScale
                         key={question.id}
@@ -142,25 +156,23 @@ class PeerReviews extends Component {
                     )
                   })}
                   <Button
-                    disabled={
-                      this.state.submitLocked ? true : this.state.submitDisabled
-                    }
+                    disabled={submitLocked ? true : submitDisabled}
                     onClick={this.submitPeerReview}
                   >
-                    {this.props.languageInfo.submitPeerReviewLabel}
+                    {languageInfo.submitPeerReviewLabel}
                   </Button>
                 </div>
               ) : (
                 <Grid container>
                   <Grid item xs={3}>
                     <Button onClick={this.flagAsSpam(answer.id)}>
-                      {this.props.languageInfo.reportAsInappropriateLabel}
+                      {languageInfo.reportAsInappropriateLabel}
                     </Button>
                   </Grid>
                   <Grid item xs={8} />
                   <Grid item xs={1}>
                     <Button onClick={this.selectAnswer(answer.id)}>
-                      {this.props.languageInfo.chooseEssayLabel}
+                      {languageInfo.chooseEssayLabel}
                     </Button>
                   </Grid>
                 </Grid>

@@ -228,7 +228,7 @@ class Item extends React.Component<any, any> {
               {renderOptions(this.props.type) ? (
                 <Grid item={true} xs={12}>
                   <Card>
-                    <CardHeader subheader="options" />
+                    <CardHeader subheader="Options / Answer alternatives" />
                     <CardContent>
                       <OptionContainer
                         axis="xy"

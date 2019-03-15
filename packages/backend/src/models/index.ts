@@ -17,9 +17,9 @@ export {
   PeerReviewQuestionTranslation,
 } from "./peer_review_question"
 export {
-  PeerReviewQuestionCollection,
-  PeerReviewQuestionCollectionTranslation,
-} from "./peer_review_question_collection"
+  PeerReviewCollection,
+  PeerReviewCollectionTranslation,
+} from "./peer_review_collection"
 export { PeerReview } from "./peer_review"
 export { PeerReviewQuestionAnswer } from "./peer_review_question_answer"
 export { SpamFlag } from "./spam_flag"
