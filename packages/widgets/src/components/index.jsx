@@ -7,7 +7,7 @@ import Scale from "./Scale"
 import Open from "./Open"
 import Unsupported from "./Unsupported"
 import axios from "axios"
-
+import { BASE_URL } from "../config"
 import languageLabels from "../utils/language_labels"
 
 const mapTypeToComponent = {
@@ -37,7 +37,7 @@ class Quiz extends Component {
     const { id, languageId, accessToken } = this.props
     try {
       const response = await axios.get(
-        `https://quizzes.mooc.fi/api/v1/quizzes/${id}?language=${languageId}`,
+        `${BASE_URL}/api/v1/quizzes/${id}?language=${languageId}`,
         { headers: { authorization: `Bearer ${accessToken}` } },
       )
       const quiz = response.data.quiz
@@ -147,7 +147,7 @@ class Quiz extends Component {
   handleSubmit = async event => {
     this.setState({ submitLocked: true })
     const response = await axios.post(
-      `https://quizzes.mooc.fi/api/v1/quizzes/answer`,
+      `${BASE_URL}/api/v1/quizzes/answer`,
       this.state.quizAnswer,
       { headers: { authorization: `Bearer ${this.props.accessToken}` } },
     )
