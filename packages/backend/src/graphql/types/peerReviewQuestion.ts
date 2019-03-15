@@ -3,7 +3,7 @@ export const PeerReviewQuestion = `
     id: String!,
     quiz: Quiz!,
     quizId: String!,
-    collection: PeerReviewQuestionCollection,
+    collection: PeerReviewCollection,
     collectionId: String,
     texts: [PeerReviewQuestionTranslation],
     public: Boolean,

@@ -1,7 +1,7 @@
-export const PeerReviewQuestionCollectionTranslation = `
-  type PeerReviewQuestionCollectionTranslation {
-    peerReviewQuestionCollection: PeerReviewQuestionCollection!,
-    peerReviewQuestionCollectionId: String,
+export const PeerReviewCollectionTranslation = `
+  type PeerReviewCollectionTranslation {
+    PeerReviewCollection: PeerReviewCollection!,
+    PeerReviewCollectionId: String,
     language: Language!,
     languageId: String!,
     title: String,

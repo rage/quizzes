@@ -13,7 +13,7 @@ import {
 } from "typeorm"
 import { getUUIDByString, randomUUID } from "../util"
 import { Language } from "./language"
-import { PeerReviewQuestionCollection } from "./peer_review_question_collection"
+import { PeerReviewCollection } from "./peer_review_collection"
 import { Quiz } from "./quiz"
 
 @Entity()
@@ -27,12 +27,12 @@ export class PeerReviewQuestion extends BaseEntity {
   @Column({ nullable: true })
   public quizId: string | null
 
-  @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id, {
+  @ManyToOne(type => PeerReviewCollection, prqc => prqc.id, {
     nullable: true,
   })
-  public collection?: PeerReviewQuestionCollection
+  public peerReviewCollection?: PeerReviewCollection
   @Column({ nullable: true })
-  public collectionId: string | null
+  public peerReviewCollectionId: string | null
 
   @OneToMany(
     type => PeerReviewQuestionTranslation,
@@ -68,7 +68,7 @@ export class PeerReviewQuestion extends BaseEntity {
     if (data.quizId) {
       this.quizId = data.quizId
     }
-    this.collectionId = data.collectionId // TODO: what to do with these
+    this.peerReviewCollectionId = data.peerReviewCollectionId // TODO: what to do with these
     this.texts = data.texts
     this.type = data.type
     this.answerRequired = data.answerRequired

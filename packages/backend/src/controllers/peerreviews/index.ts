@@ -62,6 +62,19 @@ export class PeerReviewController {
   ): Promise<any> {
     peerReview.userId = user.id
 
+    // Enforce unique (quiz_answer_id, user_id). Do this in db later.
+    const shouldBeZero = await this.entityManager
+      .createQueryBuilder(PeerReview, "peer_review")
+      .where("peer_review.quiz_answer_id = :quizAnswerId", {
+        quizAnswerId: peerReview.quizAnswerId,
+      })
+      .andWhere("peer_review.user_id = :userId", { userId: user.id })
+      .getCount()
+
+    if (shouldBeZero !== 0) {
+      return {}
+    }
+
     const receivingQuizAnswer: QuizAnswer = await this.quizAnswerService.getAnswer(
       { id: peerReview.quizAnswerId },
       this.entityManager,

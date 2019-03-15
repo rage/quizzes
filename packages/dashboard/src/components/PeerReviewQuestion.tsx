@@ -122,7 +122,7 @@ class PeerReviewQuestion extends React.Component<any, any> {
                       value={this.props.title || undefined}
                       fullWidth={true}
                       onChange={this.props.handleChange(
-                        `peerReviewQuestionCollections[${
+                        `peerReviewCollections[${
                           this.props.collectionIndex
                         }].questions[${this.props.index}].texts[${
                           this.props.textIndex
@@ -136,7 +136,7 @@ class PeerReviewQuestion extends React.Component<any, any> {
                       value={this.props.body || undefined}
                       fullWidth={true}
                       onChange={this.props.handleChange(
-                        `peerReviewQuestionCollections[${
+                        `peerReviewCollections[${
                           this.props.collectionIndex
                         }].questions[${this.props.index}].texts[${
                           this.props.textIndex
@@ -152,7 +152,7 @@ class PeerReviewQuestion extends React.Component<any, any> {
                             <Checkbox
                               checked={this.props.default}
                               onChange={this.props.handleChange(
-                                `peerReviewQuestionCollections[${
+                                `peerReviewCollections[${
                                   this.props.collectionIndex
                                 }].questions[${this.props.index}].default`,
                               )}
@@ -168,7 +168,7 @@ class PeerReviewQuestion extends React.Component<any, any> {
                             <Checkbox
                               checked={this.props.answerRequired}
                               onChange={this.props.handleChange(
-                                `peerReviewQuestionCollections[${
+                                `peerReviewCollections[${
                                   this.props.collectionIndex
                                 }].questions[${
                                   this.props.index
@@ -184,7 +184,7 @@ class PeerReviewQuestion extends React.Component<any, any> {
                         <Grid container={true} justify="flex-end">
                           <IconButton
                             onClick={this.props.remove(
-                              `peerReviewQuestionCollections[${
+                              `peerReviewCollections[${
                                 this.props.collectionIndex
                               }].questions`,
                               this.props.index,
