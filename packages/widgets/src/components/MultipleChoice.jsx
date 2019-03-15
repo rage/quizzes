@@ -48,7 +48,7 @@ export default props => {
         ) : (
           <Typography variant="subtitle1">{itemTitle}</Typography>
         )}
-        {multi ? (
+        {multi && !answered ? (
           <Typography variant="subtitle1">
             Valitse kaikki sopivat vaihtoehdot
           </Typography>
