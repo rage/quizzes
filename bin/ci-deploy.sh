@@ -4,10 +4,10 @@ set -euo pipefail
 BIN_DIR=$(dirname "$0")
 
 echo "Building dashboard..."
-echo source "$BIN_DIR/build-docker-dashboard.sh"
+source "$BIN_DIR/build-docker-dashboard.sh"
 
 echo "Building backend..."
-echo source "$BIN_DIR/build-docker-backend.sh"
+source "$BIN_DIR/build-docker-backend.sh"
 
 BRANCH=$(git rev-parse --abbrev-ref HEAD)
 if [[ "$BRANCH" != "master" ]]; then
