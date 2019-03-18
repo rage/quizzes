@@ -286,7 +286,16 @@ class Quiz extends Component {
         />
 
         {containsEssayItems(quiz) ? (
-          <EssayContainer />
+          <EssayContainer
+            accessToken={accessToken}
+            languageInfo={languageLabels(languageId, "essay")}
+            quiz={quiz}
+            handleTextDataChange={this.handleTextDataChange}
+            quizAnswer={this.state.quizAnswer}
+            peerReviewsGiven={
+              userQuizState ? userQuizState.peerReviewsGiven : 0
+            }
+          />
         ) : (
           this.quizItemComponents(quiz, languageId, accessToken)
         )}
