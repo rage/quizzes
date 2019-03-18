@@ -6,3 +6,6 @@ DATE=$(date +%s)
 TAG="gcr.io/moocfi/quizzes-backend:build-$DATE-$REV"
 echo Building "$TAG"
 docker build . -f Dockerfile.backend -t "$TAG"
+
+echo "export QUIZZES_BACKEND_IMAGE=$TAG"
+export QUIZZES_BACKEND_IMAGE=$TAG

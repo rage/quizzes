@@ -3,6 +3,7 @@ import { Button, Typography, Grid } from "@material-ui/core"
 import Checkbox from "./Checkbox"
 import EssayContainer from "./EssayContainer"
 import MultipleChoice from "./MultipleChoice"
+import ResearchAgreement from "./ResearchAgreement"
 import Scale from "./Scale"
 import Open from "./Open"
 import Unsupported from "./Unsupported"
@@ -20,6 +21,7 @@ const mapTypeToComponent = {
   scale: Scale,
   checkbox: Checkbox,
   open: Open,
+  "research-agreement": ResearchAgreement,
 }
 
 const componentType = typeName => {
@@ -45,6 +47,7 @@ class Quiz extends Component {
         { headers: { authorization: `Bearer ${accessToken}` } },
       )
       const quiz = response.data.quiz
+      console.log("Received quiz: ", quiz)
       let quizAnswer = response.data.quizAnswer
       if (!quizAnswer) {
         quizAnswer = {
@@ -70,12 +73,12 @@ class Quiz extends Component {
     }
   }
 
-  handleTextDataChange = itemId => event => {
+  handleDataChange = (itemId, attributeName) => event => {
     const value = event.target.value
     const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
       if (itemAnswer.quizItemId === itemId) {
         const updated = { ...itemAnswer }
-        updated.textData = value
+        updated[attributeName] = value
         return updated
       }
       return itemAnswer
@@ -84,44 +87,37 @@ class Quiz extends Component {
     this.setState({ quizAnswer: { ...quizAnswer, ...{ itemAnswers } } })
   }
 
-  handleIntDataChange = itemId => event => {
-    //conversion to be sure
-    const value = Number(event.target.value)
-    const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
-      if (itemAnswer.quizItemId === itemId) {
-        return { ...itemAnswer, intData: value }
-      }
-      return itemAnswer
-    })
+  handleTextDataChange = itemId => this.handleDataChange(itemId, "textData")
+
+  handleIntDataChange = itemId => this.handleDataChange(itemId, "intData")
+
+  handleCheckboxToggling = itemId => optionId => () => {
+    const quizAnswer = this.state.quizAnswer
+    const itemAnswers = quizAnswer.itemAnswers
+    const itemAnswer = itemAnswers.find(ia => ia.quizItemId === itemId)
+
+    const currentOptionValue = itemAnswer.optionAnswers.find(
+      oa => oa.quizOptionId === optionId,
+    )
+
+    const newItemAnswer = {
+      ...itemAnswer,
+      optionAnswers: currentOptionValue
+        ? itemAnswer.optionAnswers.filter(oa => oa.quizOptionId !== optionId)
+        : itemAnswer.optionAnswers.concat({ quizOptionId: optionId }),
+    }
 
     this.setState({
-      quizAnswer: { ...this.state.quizAnswer, ...{ itemAnswers } },
+      quizAnswer: {
+        ...quizAnswer,
+        itemAnswers: itemAnswers.map(ia =>
+          ia.quizItemId === itemId ? newItemAnswer : ia,
+        ),
+      },
     })
   }
 
   handleOptionChange = itemId => optionId => () => {
-    //return the optionAnswers to the same as it was before any answer
-    if (typeof optionId === "number" && optionId === -1) {
-      const quizAnswer = this.state.quizAnswer
-      const itemAnswers = this.state.quizAnswer.itemAnswers
-      const newItemAnswers = itemAnswers.map(ia => {
-        if (ia.quizItemId === itemId) {
-          return { ...ia, optionAnswers: [] }
-        } else {
-          return ia
-        }
-      })
-
-      this.setState({
-        quizAnswer: {
-          ...quizAnswer,
-          itemAnswers: newItemAnswers,
-        },
-      })
-
-      return
-    }
-
     const multi = this.state.quiz.items.find(item => item.id === itemId).multi
     const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
       if (itemAnswer.quizItemId === itemId) {
@@ -195,8 +191,7 @@ class Quiz extends Component {
       if (item.type === "scale") {
         return itemAnswer.intData ? true : false
       }
-      if (item.type === "checkbox") {
-        console.log(itemAnswer)
+      if (item.type === "checkbox" || item.type === "research-agreement") {
         return itemAnswer.optionAnswers.length > 0
       }
     })
