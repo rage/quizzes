@@ -40,8 +40,6 @@ export default props => {
     direction = "column"
   }
 
-  console.log(optionWidth)
-
   return (
     <Grid container direction={direction} style={{ marginBottom: 10 }}>
       <Grid item sm={questionWidth}>
