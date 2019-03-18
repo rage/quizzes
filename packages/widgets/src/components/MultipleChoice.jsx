@@ -75,7 +75,7 @@ export default props => {
         container
         direction={direction}
         justify="space-between"
-        style={{ paddingTop: 7 }}
+        style={{ paddingTop: 7, flexWrap: singleItem ? "nowrap" : "wrap" }}
       >
         {options.map(option => {
           const selected = optionAnswers.find(
