@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: quizzes-backend
-        image: gcr.io/moocfi/quizzes-backend:build-1552333789-2811aab628b20aa864e22a674f50e304311102d7
+        image: gcr.io/moocfi/quizzes-backend:build-1552878415-eff968b273dca3073a22b2498ceac96e2805ef10
         imagePullPolicy: Always
         ports:
         - name: backend-http
@@ -29,6 +29,31 @@ spec:
               secretKeyRef:
                 name: quizzes-backend-redis
                 key: redis-password
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: POSTGRES_DATABASE
+          - name: DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: POSTGRES_HOST
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: POSTGRES_PASSWORD
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: POSTGRES_USERNAME
+      initContainers:
+      - name: quizzes-backend-run-migrations
+        image: gcr.io/moocfi/quizzes-backend:build-1552878415-eff968b273dca3073a22b2498ceac96e2805ef10
+        command: ['sh', '-c', 'cd /app && yarn typeorm migration:run']
+        env:
           - name: DB_NAME
             valueFrom:
               secretKeyRef:
