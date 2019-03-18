@@ -11,9 +11,12 @@ jobs:
           command: "bin/ci-deploy.sh"
   code_style:
     docker:
-      - image: node:11-alpine
+      - image: circleci/node:11
     steps:
       - checkout
+      - run:
+          name: "Install dependencies"
+          command: "yarn install"
       - run:
           name: "Check code style"
           command: "bin/check-code-style.sh"
