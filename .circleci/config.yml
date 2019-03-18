@@ -15,8 +15,8 @@ jobs:
     steps:
       - checkout
       - run:
-        name: "Check code style"
-        command: "bin/check-code-style.sh"
+          name: "Check code style"
+          command: "bin/check-code-style.sh"
 workflows:
   version: 2
   btd:
