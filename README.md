@@ -1,5 +1,7 @@
 # Quizzes
 
+[![CircleCI](https://circleci.com/gh/rage/quizzes/tree/master.svg?style=svg)](https://circleci.com/gh/rage/quizzes/tree/master)
+
 To start the dashboard:
 
 ```bash
