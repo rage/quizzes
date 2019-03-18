@@ -1,0 +1,10 @@
+version: 2
+jobs:
+  deploy:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - checkout
+      - run:
+        name: "Build and deploy"
+        command: "bin/ci-deploy.sh"
