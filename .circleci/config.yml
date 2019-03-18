@@ -5,6 +5,7 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: "Build and deploy"
           command: "bin/ci-deploy.sh"
