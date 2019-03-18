@@ -40,6 +40,8 @@ export default props => {
     direction = "column"
   }
 
+  console.log(optionWidth)
+
   return (
     <Grid container direction={direction} style={{ marginBottom: 10 }}>
       <Grid item sm={questionWidth}>
@@ -75,7 +77,7 @@ export default props => {
         container
         direction={direction}
         justify="space-between"
-        style={{ paddingTop: 7 }}
+        style={{ paddingTop: 7, flexWrap: singleItem ? "nowrap" : "wrap" }}
       >
         {options.map(option => {
           const selected = optionAnswers.find(
