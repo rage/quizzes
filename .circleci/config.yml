@@ -11,7 +11,7 @@ jobs:
           command: "bin/ci-deploy.sh"
   code_style:
     docker:
-      - image: google/cloud-sdk
+      - image: node:11-alpine
     steps:
       - checkout
       - run:
