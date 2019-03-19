@@ -11,10 +11,6 @@ import axios from "axios"
 import { BASE_URL } from "../config"
 import languageLabels from "../utils/language_labels"
 
-const containsEssayItems = quiz => {
-  return quiz.items.find(qi => qi.type === "essay")
-}
-
 const mapTypeToComponent = {
   essay: EssayContainer,
   "multiple-choice": MultipleChoice,
@@ -214,6 +210,7 @@ class Quiz extends Component {
             essayEncountered = true
             return (
               <EssayContainer
+                answered={quizAnswer.id ? true : false}
                 key={item.id}
                 accessToken={accessToken}
                 languageInfo={languageLabels(languageId, "essay")}
@@ -223,6 +220,7 @@ class Quiz extends Component {
                 peerReviewsGiven={
                   userQuizState ? userQuizState.peerReviewsGiven : 0
                 }
+                peerReviewsRequired={quiz.course.minPeerReviewsGiven}
               />
             )
           }

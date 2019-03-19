@@ -7,36 +7,54 @@ import Paper from "@material-ui/core/Paper"
 import Essay from "./Essay"
 
 const EssayContainer = props => {
-  const essays = props.quiz.items.filter(item => item.type === "essay")
-
   const paper = {
     padding: 10,
     margin: 10,
   }
 
+  const essays = props.quiz.items.filter(item => item.type === "essay")
+
+  const ownAnswers = props.quizAnswer.itemAnswers.map(ia => {
+    const quizItem = props.quiz.items.find(qi => qi.id === ia.quizItemId)
+
+    return (
+      <React.Fragment key={ia.id}>
+        <Typography variant="subtitle1">
+          {quizItem.texts[0] && quizItem.texts[0].title + ": "}
+          {props.languageInfo.userAnswerLabel}
+        </Typography>
+        <Paper style={paper}>
+          <Typography variant="body1">{ia.textData}</Typography>
+        </Paper>
+      </React.Fragment>
+    )
+  })
+
   return (
     <div>
       <h2>Essays</h2>
       <StageVisualizer {...props} />
-      {props.quizAnswer.id ? (
-        <React.Fragment>
-          {props.quizAnswer.itemAnswers.map(ia => {
-            const quizItem = props.quiz.items.find(
-              qi => qi.id === ia.quizItemId,
-            )
 
-            return (
-              <React.Fragment key={ia.id}>
-                <Typography variant="subtitle1">
-                  {quizItem.texts[0].title + ": "}
-                  {props.languageInfo.userAnswerLabel}
-                </Typography>
-                <Paper style={paper}>
-                  <Typography variant="body1">{ia.textData}</Typography>
-                </Paper>
-              </React.Fragment>
-            )
-          })}
+      {props.answered ? (
+        <React.Fragment>
+          {ownAnswers}
+
+          {props.quiz.texts[0].submitMessage && (
+            <div>
+              <Typography variant="subtitle1">
+                {props.languageInfo.exampleAnswerLabel}
+              </Typography>
+              <Paper style={paper}>
+                <Typography
+                  variant="body1"
+                  dangerouslySetInnerHTML={{
+                    __html: props.quiz.texts[0].submitMessage,
+                  }}
+                />
+              </Paper>
+            </div>
+          )}
+
           <PeerReviews
             quizId={props.quiz.id}
             accessToken={props.accessToken}
@@ -50,6 +68,8 @@ const EssayContainer = props => {
           />
         </React.Fragment>
       ) : (
+        // not answered? follows below
+
         <React.Fragment>
           {essays.map(qi => {
             const itemAnswer = props.quizAnswer.itemAnswers.find(
