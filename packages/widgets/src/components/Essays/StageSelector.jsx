@@ -1,12 +1,12 @@
 import React from "react"
 import PeerReviewStageContainer from "./PeerReviewStageContainer"
-import EssayStageContainer from "./EssayStageContainer"
+import EssaysStageContainer from "./EssayStageContainer"
 
 const StageSelector = props => {
   if (props.answered) {
     return <PeerReviewStageContainer {...props} />
   }
-  return <EssayStageContainer {...props} />
+  return <EssaysStageContainer {...props} />
 }
 
 export default StageSelector

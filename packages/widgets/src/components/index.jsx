@@ -1,18 +1,18 @@
 import React, { Component } from "react"
 import { Button, Typography, Grid } from "@material-ui/core"
 import Checkbox from "./Checkbox"
-import EssayContainer from "./EssayContainer"
 import MultipleChoice from "./MultipleChoice"
 import ResearchAgreement from "./ResearchAgreement"
 import Scale from "./Scale"
 import Open from "./Open"
+import Essays from "./Essays"
 import Unsupported from "./Unsupported"
 import axios from "axios"
 import { BASE_URL } from "../config"
 import languageLabels from "../utils/language_labels"
 
 const mapTypeToComponent = {
-  essay: EssayContainer,
+  essay: Essays,
   "multiple-choice": MultipleChoice,
   scale: Scale,
   checkbox: Checkbox,
@@ -209,7 +209,7 @@ class Quiz extends Component {
             }
             essayEncountered = true
             return (
-              <EssayContainer
+              <Essays
                 answered={quizAnswer.id ? true : false}
                 key={item.id}
                 accessToken={accessToken}
@@ -221,6 +221,7 @@ class Quiz extends Component {
                   userQuizState ? userQuizState.peerReviewsGiven : 0
                 }
                 peerReviewsRequired={quiz.course.minPeerReviewsGiven}
+                peerReviewQuestions={quiz.peerReviewCollections}
               />
             )
           }
