@@ -16,6 +16,7 @@ class TabContainer extends React.Component<any, any> {
   private itemTypes = [
     "checkbox",
     "essay",
+    "feedback",
     "open",
     "multiple-choice",
     "research-agreement",

@@ -1,6 +1,7 @@
 import React, { Component } from "react"
 import { Button, Typography, Grid } from "@material-ui/core"
 import Checkbox from "./Checkbox"
+import Feedback from "./Feedback"
 import MultipleChoice from "./MultipleChoice"
 import ResearchAgreement from "./ResearchAgreement"
 import Scale from "./Scale"
@@ -18,6 +19,7 @@ const mapTypeToComponent = {
   checkbox: Checkbox,
   open: Open,
   "research-agreement": ResearchAgreement,
+  feedback: Feedback,
 }
 
 const componentType = typeName => {
@@ -176,7 +178,11 @@ class Quiz extends Component {
       const itemAnswer = this.state.quizAnswer.itemAnswers.find(
         ia => ia.quizItemId === item.id,
       )
-      if (item.type === "essay" || item.type === "open") {
+      if (
+        item.type === "essay" ||
+        item.type === "open" ||
+        item.type === "feedback"
+      ) {
         return itemAnswer.textData ? true : false
       }
       if (item.type === "multiple-choice") {
@@ -200,70 +206,72 @@ class Quiz extends Component {
 
     return (
       <React.Fragment>
-        {quiz.items.map(item => {
-          if (item.type === "essay") {
-            if (essayEncountered) {
-              return ""
+        {quiz.items
+          .sort((i1, i2) => i1.order - i2.order)
+          .map(item => {
+            if (item.type === "essay") {
+              if (essayEncountered) {
+                return ""
+              }
+              essayEncountered = true
+              return (
+                <Essays
+                  answered={quizAnswer.id ? true : false}
+                  key={item.id}
+                  accessToken={accessToken}
+                  languageInfo={languageLabels(languageId, "essay")}
+                  quiz={quiz}
+                  handleTextDataChange={this.handleTextDataChange}
+                  quizAnswer={this.state.quizAnswer}
+                  peerReviewsGiven={
+                    userQuizState ? userQuizState.peerReviewsGiven : 0
+                  }
+                  peerReviewsRequired={quiz.course.minPeerReviewsGiven}
+                  peerReviewQuestions={quiz.peerReviewCollections}
+                  languageId={languageId}
+                />
+              )
             }
-            essayEncountered = true
+
+            const itemAnswer = quizAnswer.itemAnswers.find(
+              ia => ia.quizItemId === item.id,
+            )
+
+            const ItemComponent = componentType(item.type)
             return (
-              <Essays
-                answered={quizAnswer.id ? true : false}
+              <ItemComponent
+                quiz={quiz}
+                quizAnswer={quizAnswer}
+                item={item}
+                quizId={quiz.id}
                 key={item.id}
                 accessToken={accessToken}
-                languageInfo={languageLabels(languageId, "essay")}
-                quiz={quiz}
-                handleTextDataChange={this.handleTextDataChange}
-                quizAnswer={this.state.quizAnswer}
+                languageId={languageId}
+                languageInfo={languageLabels(languageId, item.type)}
+                answered={quizAnswer.id ? true : false}
+                intData={itemAnswer.intData}
+                textData={itemAnswer.textData}
+                optionAnswers={itemAnswer.optionAnswers}
+                multi={item.multi}
+                singleItem={quiz.items.length === 1}
+                correct={itemAnswer.correct}
+                successMessage={item.texts[0].successMessage}
+                failureMessage={item.texts[0].failureMessage}
                 peerReviewsGiven={
                   userQuizState ? userQuizState.peerReviewsGiven : 0
                 }
                 peerReviewsRequired={quiz.course.minPeerReviewsGiven}
+                itemTitle={item.texts[0].title}
+                options={item.options}
                 peerReviewQuestions={quiz.peerReviewCollections}
-                languageId={languageId}
+                submitMessage={quiz.texts[0].submitMessage}
+                handleTextDataChange={this.handleTextDataChange(item.id)}
+                handleIntDataChange={this.handleIntDataChange(item.id)}
+                handleOptionChange={this.handleOptionChange(item.id)}
+                setUserQuizState={this.setUserQuizState}
               />
             )
-          }
-
-          const itemAnswer = quizAnswer.itemAnswers.find(
-            ia => ia.quizItemId === item.id,
-          )
-
-          const ItemComponent = componentType(item.type)
-          return (
-            <ItemComponent
-              quiz={quiz}
-              quizAnswer={quizAnswer}
-              item={item}
-              quizId={quiz.id}
-              key={item.id}
-              accessToken={accessToken}
-              languageId={languageId}
-              languageInfo={languageLabels(languageId, item.type)}
-              answered={quizAnswer.id ? true : false}
-              intData={itemAnswer.intData}
-              textData={itemAnswer.textData}
-              optionAnswers={itemAnswer.optionAnswers}
-              multi={item.multi}
-              singleItem={quiz.items.length === 1}
-              correct={itemAnswer.correct}
-              successMessage={item.texts[0].successMessage}
-              failureMessage={item.texts[0].failureMessage}
-              peerReviewsGiven={
-                userQuizState ? userQuizState.peerReviewsGiven : 0
-              }
-              peerReviewsRequired={quiz.course.minPeerReviewsGiven}
-              itemTitle={item.texts[0].title}
-              options={item.options}
-              peerReviewQuestions={quiz.peerReviewCollections}
-              submitMessage={quiz.texts[0].submitMessage}
-              handleTextDataChange={this.handleTextDataChange(item.id)}
-              handleIntDataChange={this.handleIntDataChange(item.id)}
-              handleOptionChange={this.handleOptionChange(item.id)}
-              setUserQuizState={this.setUserQuizState}
-            />
-          )
-        })}
+          })}
       </React.Fragment>
     )
   }
@@ -303,35 +311,39 @@ class Quiz extends Component {
           dangerouslySetInnerHTML={{ __html: quiz.texts[0].body }}
         />
 
-        {this.quizItemComponents(quiz, languageId, accessToken)}
+        <div>
+          {this.quizItemComponents(quiz, languageId, accessToken)}
 
-        {quizAnswer.id ? (
-          <Typography variant="h5">
-            {this.hasCorrectAnswer(quiz)
-              ? this.atLeastOneCorrect(quizAnswer.itemAnswers)
-                ? quiz.items.length === 1
-                  ? "Tehtävä oikein"
-                  : `Sait ${
-                      quizAnswer.itemAnswers.filter(ia => ia.correct === true)
-                        .length
-                    }/${quiz.items.length} oikein`
-                : types.includes("essay") || types.includes("scale")
-                ? ""
-                : "Tehtävä väärin"
-              : "Olet jo vastannut"}
-          </Typography>
-        ) : (
-          <div>
-            <Button
-              variant="contained"
-              color="primary"
-              disabled={this.state.submitLocked ? true : this.submitDisabled()}
-              onClick={this.handleSubmit}
-            >
-              Vastaa
-            </Button>
-          </div>
-        )}
+          {quizAnswer.id ? (
+            <Typography variant="h5">
+              {this.hasCorrectAnswer(quiz)
+                ? this.atLeastOneCorrect(quizAnswer.itemAnswers)
+                  ? quiz.items.length === 1
+                    ? "Tehtävä oikein"
+                    : `Sait ${
+                        quizAnswer.itemAnswers.filter(ia => ia.correct === true)
+                          .length
+                      }/${quiz.items.length} oikein`
+                  : types.includes("essay") || types.includes("scale")
+                  ? ""
+                  : "Tehtävä väärin"
+                : "Olet jo vastannut"}
+            </Typography>
+          ) : (
+            <div>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={
+                  this.state.submitLocked ? true : this.submitDisabled()
+                }
+                onClick={this.handleSubmit}
+              >
+                Vastaa
+              </Button>
+            </div>
+          )}
+        </div>
       </div>
     )
   }
