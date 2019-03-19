@@ -1,8 +1,22 @@
 import React from "react"
 import { TextField } from "@material-ui/core"
+import Typography from "@material-ui/core/Typography"
 
-const EssayStageContainer = ({ textData, handleTextDataChange }) => (
+const EssayStageContainer = ({
+  itemTitle,
+  itemBody,
+  textData,
+  handleTextDataChange,
+}) => (
   <div>
+    <Typography variant="h6" style={{ paddingBottom: 10 }}>
+      {itemTitle}
+    </Typography>
+    <Typography
+      variant="body1"
+      style={{ paddingBottom: 10 }}
+      dangerouslySetInnerHTML={{ __html: itemBody }}
+    />
     <TextField
       variant="outlined"
       label="Vastauksesi"

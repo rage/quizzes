@@ -139,11 +139,21 @@ class PeerReviews extends Component {
         ) : (
           answersToReview.map(answer => (
             <div key={answer.id}>
-              <Paper style={paper}>
-                <Typography variant="body1">
-                  {answer.itemAnswers[0].textData}
-                </Typography>
-              </Paper>
+              {answer.itemAnswers
+                .filter(ia => {
+                  const quizItem = this.props.quiz.items.find(
+                    qi => qi.id === ia.quizItemId,
+                  )
+                  return quizItem.type === "essay"
+                })
+                .map(ia => {
+                  return (
+                    <Paper style={paper} key={ia.id}>
+                      <Typography variant="body1">{ia.textData}</Typography>
+                    </Paper>
+                  )
+                })}
+
               {peerReview ? (
                 <div>
                   {peerReviewQuestions[0].questions.map(question => {
@@ -172,7 +182,7 @@ class PeerReviews extends Component {
                   <Grid item xs={8} />
                   <Grid item xs={1}>
                     <Button onClick={this.selectAnswer(answer.id)}>
-                      {languageInfo.chooseEssayLabel}
+                      {languageInfo.choosePeerEssayLabel}
                     </Button>
                   </Grid>
                 </Grid>

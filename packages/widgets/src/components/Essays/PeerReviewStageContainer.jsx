@@ -16,26 +16,37 @@ const PeerReviewStageContainer = ({
   quiz,
   ...other
 }) => {
-  const ownAnswers = quizAnswer.itemAnswers.map(ia => {
-    const quizItem = quiz.items.find(qi => qi.id === ia.quizItemId)
+  const ownAnswers = quizAnswer.itemAnswers
+    .sort((e1, e2) => {
+      const qi1 = quiz.items.find(qi => qi.id === e1.quizItemId)
+      const qi2 = quiz.items.find(qi => qi.id === e2.quizItemId)
+      console.log("First comparable", qi1)
+      console.log("Second comparable", qi2)
+      return qi1.order - qi2.order
+    })
+    .map(ia => {
+      const quizItem = quiz.items.find(qi => qi.id === ia.quizItemId)
+      if (quizItem.type !== "essay") {
+        return ""
+      }
 
-    return (
-      <React.Fragment key={ia.id}>
-        <Typography variant="subtitle1">
-          {quizItem.texts[0] && quizItem.texts[0].title + ": "}
-          {languageInfo.userAnswerLabel}
-        </Typography>
-        <Paper style={paper}>
-          <Typography variant="body1">{ia.textData}</Typography>
-        </Paper>
-      </React.Fragment>
-    )
-  })
+      return (
+        <React.Fragment key={ia.id}>
+          <Typography variant="subtitle1">
+            {quizItem.texts[0] && quizItem.texts[0].title + ": "}
+            {languageInfo.userAnswerLabel}
+          </Typography>
+          <Paper style={paper}>
+            <Typography variant="body1">{ia.textData}</Typography>
+          </Paper>
+        </React.Fragment>
+      )
+    })
 
   return (
     <div>
       {ownAnswers}
-      {submitMessage ? (
+      {submitMessage && (
         <div>
           <Typography variant="subtitle1">
             {languageInfo.exampleAnswerLabel}
@@ -47,10 +58,14 @@ const PeerReviewStageContainer = ({
             />
           </Paper>
         </div>
-      ) : (
-        ""
       )}
-      <PeerReviews {...other} answered={answered} languageInfo={languageInfo} />
+
+      <PeerReviews
+        {...other}
+        answered={answered}
+        languageInfo={languageInfo}
+        quiz={quiz}
+      />
     </div>
   )
 }

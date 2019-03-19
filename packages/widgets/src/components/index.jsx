@@ -43,7 +43,6 @@ class Quiz extends Component {
         { headers: { authorization: `Bearer ${accessToken}` } },
       )
       const quiz = response.data.quiz
-      console.log("Received quiz: ", quiz)
       let quizAnswer = response.data.quizAnswer
       if (!quizAnswer) {
         quizAnswer = {
@@ -200,6 +199,8 @@ class Quiz extends Component {
 
     let essayEncountered = false
 
+    console.log("Language id!", languageId)
+
     return (
       <React.Fragment>
         {quiz.items.map(item => {
@@ -222,6 +223,7 @@ class Quiz extends Component {
                 }
                 peerReviewsRequired={quiz.course.minPeerReviewsGiven}
                 peerReviewQuestions={quiz.peerReviewCollections}
+                languageId={languageId}
               />
             )
           }
