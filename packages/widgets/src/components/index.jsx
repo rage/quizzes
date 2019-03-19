@@ -202,15 +202,40 @@ class Quiz extends Component {
   quizItemComponents = (quiz, languageId, accessToken) => {
     const { quizAnswer, userQuizState } = this.state
 
+    let essayEncountered = false
+
     return (
       <React.Fragment>
         {quiz.items.map(item => {
+          if (item.type === "essay") {
+            if (essayEncountered) {
+              return ""
+            }
+            essayEncountered = true
+            return (
+              <EssayContainer
+                key={item.id}
+                accessToken={accessToken}
+                languageInfo={languageLabels(languageId, "essay")}
+                quiz={quiz}
+                handleTextDataChange={this.handleTextDataChange}
+                quizAnswer={this.state.quizAnswer}
+                peerReviewsGiven={
+                  userQuizState ? userQuizState.peerReviewsGiven : 0
+                }
+              />
+            )
+          }
+
           const itemAnswer = quizAnswer.itemAnswers.find(
             ia => ia.quizItemId === item.id,
           )
+
           const ItemComponent = componentType(item.type)
           return (
             <ItemComponent
+              quiz={quiz}
+              quizAnswer={quizAnswer}
               item={item}
               quizId={quiz.id}
               key={item.id}
@@ -280,20 +305,7 @@ class Quiz extends Component {
           dangerouslySetInnerHTML={{ __html: quiz.texts[0].body }}
         />
 
-        {containsEssayItems(quiz) ? (
-          <EssayContainer
-            accessToken={accessToken}
-            languageInfo={languageLabels(languageId, "essay")}
-            quiz={quiz}
-            handleTextDataChange={this.handleTextDataChange}
-            quizAnswer={this.state.quizAnswer}
-            peerReviewsGiven={
-              userQuizState ? userQuizState.peerReviewsGiven : 0
-            }
-          />
-        ) : (
-          this.quizItemComponents(quiz, languageId, accessToken)
-        )}
+        {this.quizItemComponents(quiz, languageId, accessToken)}
 
         {quizAnswer.id ? (
           <Typography variant="h5">

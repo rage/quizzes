@@ -7,6 +7,8 @@ import Paper from "@material-ui/core/Paper"
 import Essay from "./Essay"
 
 const EssayContainer = props => {
+  const essays = props.quiz.items.filter(item => item.type === "essay")
+
   const paper = {
     padding: 10,
     margin: 10,
@@ -14,6 +16,7 @@ const EssayContainer = props => {
 
   return (
     <div>
+      <h2>Essays</h2>
       <StageVisualizer {...props} />
       {props.quizAnswer.id ? (
         <React.Fragment>
@@ -48,19 +51,21 @@ const EssayContainer = props => {
         </React.Fragment>
       ) : (
         <React.Fragment>
-          {props.quiz.items.map(qi => {
+          {essays.map(qi => {
             const itemAnswer = props.quizAnswer.itemAnswers.find(
               ia => ia.quizItemId === qi.id,
             )
-            if (qi.type !== "essay") {
-              return <React.Fragment key={itemAnswer.id} />
-            }
-            console.log("Quiz item:", qi)
 
             return (
               <div key={qi.id}>
-                <h2>{qi.texts[0].title}</h2>
-                <div>{qi.texts[0].body}</div>
+                <Typography variant="h6" style={{ paddingBottom: 10 }}>
+                  {qi.texts[0].title}
+                </Typography>
+                <Typography
+                  variant="body1"
+                  style={{ paddingBottom: 10 }}
+                  dangerouslySetInnerHTML={{ __html: qi.texts[0].body }}
+                />
                 <EssayStageContainer
                   textData={itemAnswer.textData}
                   handleTextDataChange={props.handleTextDataChange(qi.id)}
