@@ -10,11 +10,12 @@ const Open = ({
   successMessage,
   failureMessage,
   item,
+  itemTitle,
 }) => {
   const guidance = (
     <React.Fragment>
       <Typography variant="h6" style={{ paddingBottom: 10 }}>
-        {item.texts[0].title}
+        {itemTitle}
       </Typography>
       <Typography
         variant="body1"

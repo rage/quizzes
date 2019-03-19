@@ -20,8 +20,6 @@ const PeerReviewStageContainer = ({
     .sort((e1, e2) => {
       const qi1 = quiz.items.find(qi => qi.id === e1.quizItemId)
       const qi2 = quiz.items.find(qi => qi.id === e2.quizItemId)
-      console.log("First comparable", qi1)
-      console.log("Second comparable", qi2)
       return qi1.order - qi2.order
     })
     .map(ia => {
@@ -33,8 +31,8 @@ const PeerReviewStageContainer = ({
       return (
         <React.Fragment key={ia.id}>
           <Typography variant="subtitle1">
-            {quizItem.texts[0] && quizItem.texts[0].title + ": "}
-            {languageInfo.userAnswerLabel}
+            {languageInfo.userAnswerLabel + ": "}
+            {quizItem.texts[0] && quizItem.texts[0].title}
           </Typography>
           <Paper style={paper}>
             <Typography variant="body1">{ia.textData}</Typography>

@@ -140,15 +140,14 @@ class Quiz extends Component {
   }
 
   handleSubmit = async event => {
-    let qa = this.state.quizAnswer
-    if (!qa.languageId) {
-      qa.languageId = "en_US"
-    }
-
     this.setState({ submitLocked: true })
-    const response = await axios.post(`${BASE_URL}/api/v1/quizzes/answer`, qa, {
-      headers: { authorization: `Bearer ${this.props.accessToken}` },
-    })
+    const response = await axios.post(
+      `${BASE_URL}/api/v1/quizzes/answer`,
+      this.state.quizAnser,
+      {
+        headers: { authorization: `Bearer ${this.props.accessToken}` },
+      },
+    )
     this.setState({
       quiz: response.data.quiz,
       quizAnswer: response.data.quizAnswer,
@@ -198,8 +197,6 @@ class Quiz extends Component {
     const { quizAnswer, userQuizState } = this.state
 
     let essayEncountered = false
-
-    console.log("Language id!", languageId)
 
     return (
       <React.Fragment>
@@ -272,7 +269,7 @@ class Quiz extends Component {
   }
 
   render() {
-    const { quiz, quizAnswer, userQuizState, error } = this.state
+    const { quiz, quizAnswer, error } = this.state
 
     const { languageId, accessToken } = this.props
 
