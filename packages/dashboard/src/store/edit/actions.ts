@@ -214,7 +214,7 @@ const checkForMissingTranslation = paramQuiz => {
           body: "",
         }
         if (prc.id) {
-          Object.assign(newText, { peerReviewQuestionCollectionId: prc.id })
+          Object.assign(newText, { peerReviewCollectionId: prc.id })
         }
         quiz.peerReviewCollections[i].texts.push(newText)
       }
