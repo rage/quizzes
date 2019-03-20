@@ -27,7 +27,7 @@ export class UserCoursePartStateController {
     const quizzes: Quiz[] = await this.quizService.getQuizzes({ courseId })
     const userQuizStates: UserQuizState[] = await this.userQuizStateService.getQuizStatesForUserCourse(
       this.entityManager,
-      31338,
+      user.id,
       quizzes.map(quiz => quiz.id),
     )
     const parts = new Set()
@@ -43,7 +43,7 @@ export class UserCoursePartStateController {
         maxPoints += quiz.points
       })
       partStates.push({
-        group: part.toString(),
+        group: "osa0" + part.toString(),
         progress: Math.floor((nPoints / maxPoints) * 100),
         n_points: nPoints.toFixed(2),
         max_points: maxPoints,
