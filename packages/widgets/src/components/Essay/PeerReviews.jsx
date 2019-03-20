@@ -4,11 +4,8 @@ import LikertScale from "likert-react"
 import { Button, Grid, Paper, TextField, Typography } from "@material-ui/core"
 import "likert-react/dist/main.css"
 import { BASE_URL } from "../../config"
-
-const paper = {
-  padding: 10,
-  margin: 10,
-}
+import PeerReviewsGuidance from "./PeerReviewsGuidance"
+import PeerReviewOption from "./PeerReviewOption"
 
 class PeerReviews extends Component {
   state = {
@@ -119,16 +116,13 @@ class PeerReviews extends Component {
 
     return (
       <div>
-        <Typography variant="subtitle1" style={{ paddingTop: 10 }}>
-          {peerReviewQuestions[0].texts[0].body}
-        </Typography>
-        <Typography variant="subtitle1" style={{ paddingTop: 10 }}>
-          {languageInfo.givenPeerReviewsLabel}: {peerReviewsGiven}/
-          {peerReviewsRequired}
-        </Typography>
-        <Typography variant="subtitle1">
-          Valitse yksi vaihtoehdoista vertaisarvoitavaksi
-        </Typography>
+        <PeerReviewsGuidance
+          guidanceText={peerReviewQuestions[0].texts[0].body}
+          givenLabel={languageInfo.givenPeerReviewsLabel}
+          given={peerReviewsGiven}
+          required={peerReviewsRequired}
+        />
+
         {!answersToReview ? (
           <Typography>
             {languageInfo.loadingLabel}
@@ -139,20 +133,10 @@ class PeerReviews extends Component {
         ) : (
           answersToReview.map(answer => (
             <div key={answer.id}>
-              {answer.itemAnswers
-                .filter(ia => {
-                  const quizItem = this.props.quiz.items.find(
-                    qi => qi.id === ia.quizItemId,
-                  )
-                  return quizItem.type === "essay"
-                })
-                .map(ia => {
-                  return (
-                    <Paper style={paper} key={ia.id}>
-                      <Typography variant="body1">{ia.textData}</Typography>
-                    </Paper>
-                  )
-                })}
+              <PeerReviewOption
+                answer={answer}
+                quizItems={this.props.quiz.items}
+              />
 
               {peerReview ? (
                 <div>

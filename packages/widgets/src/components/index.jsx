@@ -6,14 +6,16 @@ import MultipleChoice from "./MultipleChoice"
 import ResearchAgreement from "./ResearchAgreement"
 import Scale from "./Scale"
 import Open from "./Open"
-import Essays from "./Essays"
+import EssayStageContainer from "./Essay/Essay"
+import StageVisualizer from "./Essay/StageVisualizer"
+import PeerReviews from "./Essay/PeerReviews"
 import Unsupported from "./Unsupported"
 import axios from "axios"
 import { BASE_URL } from "../config"
 import languageLabels from "../utils/language_labels"
 
 const mapTypeToComponent = {
-  essay: Essays,
+  essay: EssayStageContainer,
   "multiple-choice": MultipleChoice,
   scale: Scale,
   checkbox: Checkbox,
@@ -145,7 +147,7 @@ class Quiz extends Component {
     this.setState({ submitLocked: true })
     const response = await axios.post(
       `${BASE_URL}/api/v1/quizzes/answer`,
-      this.state.quizAnser,
+      this.state.quizAnswer,
       {
         headers: { authorization: `Bearer ${this.props.accessToken}` },
       },
@@ -199,45 +201,23 @@ class Quiz extends Component {
     return submittable.includes(false)
   }
 
+  quizContainsEssay = () => {
+    return this.state.quiz.items.some(ia => ia.type === "essay")
+  }
+
   quizItemComponents = (quiz, languageId, accessToken) => {
     const { quizAnswer, userQuizState } = this.state
-
-    let essayEncountered = false
 
     return (
       <React.Fragment>
         {quiz.items
           .sort((i1, i2) => i1.order - i2.order)
           .map(item => {
-            if (item.type === "essay") {
-              if (essayEncountered) {
-                return ""
-              }
-              essayEncountered = true
-              return (
-                <Essays
-                  answered={quizAnswer.id ? true : false}
-                  key={item.id}
-                  accessToken={accessToken}
-                  languageInfo={languageLabels(languageId, "essay")}
-                  quiz={quiz}
-                  handleTextDataChange={this.handleTextDataChange}
-                  quizAnswer={this.state.quizAnswer}
-                  peerReviewsGiven={
-                    userQuizState ? userQuizState.peerReviewsGiven : 0
-                  }
-                  peerReviewsRequired={quiz.course.minPeerReviewsGiven}
-                  peerReviewQuestions={quiz.peerReviewCollections}
-                  languageId={languageId}
-                />
-              )
-            }
-
             const itemAnswer = quizAnswer.itemAnswers.find(
               ia => ia.quizItemId === item.id,
             )
-
             const ItemComponent = componentType(item.type)
+
             return (
               <ItemComponent
                 quiz={quiz}
@@ -262,6 +242,7 @@ class Quiz extends Component {
                 }
                 peerReviewsRequired={quiz.course.minPeerReviewsGiven}
                 itemTitle={item.texts[0].title}
+                itemBody={item.texts[0].body}
                 options={item.options}
                 peerReviewQuestions={quiz.peerReviewCollections}
                 submitMessage={quiz.texts[0].submitMessage}
@@ -277,8 +258,7 @@ class Quiz extends Component {
   }
 
   render() {
-    const { quiz, quizAnswer, error } = this.state
-
+    const { quiz, quizAnswer, userQuizState, error } = this.state
     const { languageId, accessToken } = this.props
 
     if (!accessToken) {
@@ -312,23 +292,54 @@ class Quiz extends Component {
         />
 
         <div>
+          {this.quizContainsEssay() && (
+            <StageVisualizer
+              answered={quizAnswer.id ? true : false}
+              peerReviewsGiven={
+                this.state.userQuizState
+                  ? this.state.userQuizState.peerReviewsGiven
+                  : 0
+              }
+              peerReviewsRequired={quiz.course.minPeerReviewsGiven}
+            />
+          )}
+
           {this.quizItemComponents(quiz, languageId, accessToken)}
 
           {quizAnswer.id ? (
-            <Typography variant="h5">
-              {this.hasCorrectAnswer(quiz)
-                ? this.atLeastOneCorrect(quizAnswer.itemAnswers)
-                  ? quiz.items.length === 1
-                    ? "Tehtävä oikein"
-                    : `Sait ${
-                        quizAnswer.itemAnswers.filter(ia => ia.correct === true)
-                          .length
-                      }/${quiz.items.length} oikein`
-                  : types.includes("essay") || types.includes("scale")
-                  ? ""
-                  : "Tehtävä väärin"
-                : "Olet jo vastannut"}
-            </Typography>
+            <React.Fragment>
+              {this.quizContainsEssay() && (
+                <PeerReviews
+                  quiz={quiz}
+                  quizId={quiz.id}
+                  languageId={languageId}
+                  languageInfo={languageLabels(languageId, "essay")}
+                  accessToken={accessToken}
+                  peerReviewQuestions={quiz.peerReviewCollections}
+                  peerReviewsGiven={
+                    userQuizState ? userQuizState.peerReviewsGiven : 0
+                  }
+                  peerReviewsRequired={quiz.course.minPeerReviewsGiven}
+                  setUserQuizState={this.setUserQuizState}
+                />
+              )}
+
+              <Typography variant="h5">
+                {this.hasCorrectAnswer(quiz)
+                  ? this.atLeastOneCorrect(quizAnswer.itemAnswers)
+                    ? quiz.items.length === 1
+                      ? "Tehtävä oikein"
+                      : `Sait ${
+                          quizAnswer.itemAnswers.filter(
+                            ia => ia.correct === true,
+                          ).length
+                        }/${quiz.items.length} oikein`
+                    : types.includes("essay") || types.includes("scale")
+                    ? ""
+                    : "Tehtävä väärin"
+                  : "Olet jo vastannut"}
+              </Typography>
+            </React.Fragment>
           ) : (
             <div>
               <Button
