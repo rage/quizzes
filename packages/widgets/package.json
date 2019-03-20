@@ -1,6 +1,6 @@
 {
   "name": "moocfi-quizzes",
-  "version": "0.1.11",
+  "version": "0.1.13",
   "main": "build/index.js",
   "files": [
     "build"
