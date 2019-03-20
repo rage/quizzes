@@ -104,7 +104,10 @@ export default class ValidationService {
           itemStatusObject = {
             value: itemAnswer.intData,
           }
+          points += 1
           break
+        case "feedback":
+          points += 1
         case "checkbox":
         case "research-agreement":
           optionAnswerStatus = item.options.map(option => {
