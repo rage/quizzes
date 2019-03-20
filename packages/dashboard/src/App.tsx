@@ -61,7 +61,7 @@ class App extends React.Component<any, any> {
           >
             <form onSubmit={this.handleSubmit}>
               <FormControl margin="normal" fullWidth={true}>
-                <InputLabel>Username</InputLabel>
+                <InputLabel>Email or username</InputLabel>
                 <Input name="username" />
               </FormControl>
               <FormControl margin="normal" fullWidth={true}>
