@@ -46,7 +46,7 @@ export class UserCoursePartStateController {
       })
       partStates.push({
         group: "osa0" + part.toString(),
-        progress: Math.floor((nPoints / maxPoints) * 100),
+        progress: Math.floor(nPoints / maxPoints),
         n_points: Number(nPoints.toFixed(2)),
         max_points: maxPoints,
       })
