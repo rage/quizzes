@@ -32,6 +32,8 @@ export class UserCoursePartStateController {
     )
     const parts = new Set()
     quizzes.map(quiz => parts.add(quiz.part))
+    // part 0 not valid
+    parts.delete(0)
     const partStates: any[] = []
     parts.forEach(part => {
       const partQuizzes = quizzes.filter(quiz => quiz.part === part)
@@ -45,7 +47,7 @@ export class UserCoursePartStateController {
       partStates.push({
         group: "osa0" + part.toString(),
         progress: Math.floor((nPoints / maxPoints) * 100),
-        n_points: nPoints.toFixed(2),
+        n_points: Number(nPoints.toFixed(2)),
         max_points: maxPoints,
       })
     })
