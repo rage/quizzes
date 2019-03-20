@@ -32,6 +32,8 @@ export class UserCoursePartStateController {
     )
     const parts = new Set()
     quizzes.map(quiz => parts.add(quiz.part))
+    // part 0 not valid
+    parts.delete(0)
     const partStates: any[] = []
     parts.forEach(part => {
       const partQuizzes = quizzes.filter(quiz => quiz.part === part)
