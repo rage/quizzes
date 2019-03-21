@@ -77,9 +77,7 @@ export default class PeerReviewService {
       .where("quiz_answer.quiz_id = :quizId", { quizId })
       .andWhere(
         new Brackets(qb => {
-          qb.where("quiz_answer.status = 'submitted'").orWhere(
-            "quiz_answer.status = 'confirmed'",
-          )
+          qb.where("quiz_answer.status = 'submitted'")
         }),
       )
       .andWhere("quiz_answer.user_id != :reviewerId", { reviewerId })
