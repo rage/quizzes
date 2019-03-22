@@ -82,7 +82,7 @@ export default class PeerReviewService {
       )
       .andWhere("quiz_answer.user_id != :reviewerId", { reviewerId })
       .andWhere("quiz_answer.id not in (:...rejected)", { rejected })
-      .andWhere("user_quiz_state.peer_reviews_received < 3")
+      .andWhere("user_quiz_state.peer_reviews_received < 2")
       .andWhere("quiz_answer.language_id = :languageId", { languageId })
       .orderBy("quiz_answer.status")
       .addOrderBy("user_quiz_state.peer_reviews_given", "DESC")
