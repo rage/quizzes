@@ -11,6 +11,7 @@ export default (languageId, quizItemType) => {
         reportAsInappropriateLabel: "Ilmoita asiaton vastaus",
         submitPeerReviewLabel: "Lähetä vertaisarvio",
         userAnswerLabel: "Vastauksesi",
+        peerReviewsCompletedInfo: "Tarvittavat vertaisarviot annettu",
       },
       open: {
         placeholder: "Vastaus",
@@ -27,6 +28,7 @@ export default (languageId, quizItemType) => {
         reportAsInappropriateLabel: "Report as inappropriate",
         submitPeerReviewLabel: "Submit review",
         userAnswerLabel: "Your answer",
+        peerReviewsCompletedInfo: "All peer reviews have been submitted",
       },
       open: {
         placeholder: "Answer",

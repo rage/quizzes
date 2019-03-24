@@ -5,7 +5,6 @@ import "likert-react/dist/main.css"
 import { BASE_URL } from "../../config"
 import PeerReviewForm from "./PeerReviewForm"
 import PeerReviewsGuidance from "./PeerReviewsGuidance"
-import PeerReviewOption from "./PeerReviewOption"
 
 class PeerReviews extends Component {
   state = {
@@ -85,6 +84,7 @@ class PeerReviews extends Component {
       this.state.peerReview,
       { headers: { authorization: `Bearer ${this.props.accessToken}` } },
     )
+
     await this.fetchAnswersToReview()
     this.props.setUserQuizState(response.data.userQuizState)
     this.setState({ peerReview: undefined })
@@ -119,6 +119,7 @@ class PeerReviews extends Component {
         <PeerReviewsGuidance
           guidanceText={peerReviewQuestions[0].texts[0].body}
           givenLabel={languageInfo.givenPeerReviewsLabel}
+          peerReviewsCompletedInfo={languageInfo.peerReviewsCompletedInfo}
           given={peerReviewsGiven}
           required={peerReviewsRequired}
         />
@@ -138,6 +139,7 @@ class PeerReviews extends Component {
               submitLocked={submitLocked}
               submitPeerReview={this.submitPeerReview}
               flagAsSpam={this.flagAsSpam}
+              quizItems={this.props.quiz.items}
               selectAnswer={this.selectAnswer}
             />
           ))}

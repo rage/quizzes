@@ -1,11 +1,7 @@
 import React from "react"
 import LikertScale from "likert-react"
 import { Button, Grid, Paper, TextField, Typography } from "@material-ui/core"
-
-const paper = {
-  padding: 10,
-  margin: 10,
-}
+import PeerReviewOption from "./PeerReviewOption"
 
 const PeerReviewForm = ({
   answersToReview,
@@ -32,11 +28,8 @@ const PeerReviewForm = ({
     ) : (
       answersToReview.map(answer => (
         <div key={answer.id}>
-          <Paper style={paper}>
-            <Typography variant="body1">
-              {answer.itemAnswers[0].textData}
-            </Typography>
-          </Paper>
+          <PeerReviewOption answer={answer} quizItems={quizItems} />
+
           {peerReview ? (
             <div>
               {peerReviewQuestions[0].questions.map(question => {
