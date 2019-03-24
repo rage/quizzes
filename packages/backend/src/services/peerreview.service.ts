@@ -67,6 +67,9 @@ export default class PeerReviewService {
     // query will fail if this array is empty
     rejected.push(randomUUID())
 
+    const alreadyReviewed = givenPeerReviews.map(pr => pr.quizAnswerId)
+    alreadyReviewed.push(randomUUID())
+
     let candidates: QuizAnswer[] = await this.entityManager
       .createQueryBuilder(QuizAnswer, "quiz_answer")
       .innerJoin(
@@ -82,6 +85,9 @@ export default class PeerReviewService {
       )
       .andWhere("quiz_answer.user_id != :reviewerId", { reviewerId })
       .andWhere("quiz_answer.id not in (:...rejected)", { rejected })
+      .andWhere("quiz_answer.id not in (:...alreadyReviewed)", {
+        alreadyReviewed,
+      })
       .andWhere("user_quiz_state.peer_reviews_received < 2")
       .andWhere("quiz_answer.language_id = :languageId", { languageId })
       .orderBy("quiz_answer.status")
