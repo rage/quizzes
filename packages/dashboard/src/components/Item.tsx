@@ -53,6 +53,8 @@ class Item extends React.Component<any, any> {
     }
   }
 
+  // DISSPLAYNG THE ESSAY: SHOULD BE MORE UNIFORM WITH THE OTHERS!
+
   public shouldComponentUpdate(nextProps, nextState) {
     if (nextState.expanded !== this.state.expanded) {
       return true
@@ -87,6 +89,8 @@ class Item extends React.Component<any, any> {
       )
     }
 
+    console.log("Props: ", this.props)
+
     return (
       <Card style={{ marginBottom: 20 }}>
         {!this.state.expanded ? (
@@ -95,7 +99,8 @@ class Item extends React.Component<any, any> {
               <DragHandleWrapper>
                 <CardHeader
                   title={
-                    this.props.type === "essay" ? "Essay" : this.props.title
+                    this.props.title ||
+                    this.props.type[0].toUpperCase() + this.props.type.slice(1)
                   }
                   titleTypographyProps={{
                     variant: "subtitle1",
@@ -104,27 +109,25 @@ class Item extends React.Component<any, any> {
                 />
               </DragHandleWrapper>
             </Grid>
-            {this.props.type === "essay" ? (
-              ""
-            ) : (
-              <Grid item={true} xs={1}>
-                <Grid container={true} justify="flex-end">
-                  <Grid item={true}>
-                    <CardActions>
-                      <IconButton onClick={this.handleExpand}>
-                        <SvgIcon>
-                          <path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" />
-                        </SvgIcon>
-                      </IconButton>
-                    </CardActions>
-                  </Grid>
+
+            <Grid item={true} xs={1}>
+              <Grid container={true} justify="flex-end">
+                <Grid item={true}>
+                  <CardActions>
+                    <IconButton onClick={this.handleExpand}>
+                      <SvgIcon>
+                        <path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" />
+                      </SvgIcon>
+                    </IconButton>
+                  </CardActions>
                 </Grid>
               </Grid>
-            )}
+            </Grid>
           </Grid>
         ) : (
           <p />
         )}
+
         <Collapse in={this.state.expanded}>
           <CardContent>
             <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
@@ -156,30 +159,35 @@ class Item extends React.Component<any, any> {
                       multiline={true}
                       margin="normal"
                     />
-                    <TextField
-                      label="success message"
-                      value={this.props.successMessage || undefined}
-                      fullWidth={true}
-                      onChange={this.props.handleChange(
-                        `items[${this.props.index}].texts[${
-                          this.props.textIndex
-                        }].successMessage`,
-                      )}
-                      multiline={true}
-                      margin="normal"
-                    />
-                    <TextField
-                      label="failure message"
-                      value={this.props.failureMessage || undefined}
-                      fullWidth={true}
-                      onChange={this.props.handleChange(
-                        `items[${this.props.index}].texts[${
-                          this.props.textIndex
-                        }].failureMessage`,
-                      )}
-                      multiline={true}
-                      margin="normal"
-                    />
+
+                    {this.props.type !== "essay" && (
+                      <React.Fragment>
+                        <TextField
+                          label="success message"
+                          value={this.props.successMessage || undefined}
+                          fullWidth={true}
+                          onChange={this.props.handleChange(
+                            `items[${this.props.index}].texts[${
+                              this.props.textIndex
+                            }].successMessage`,
+                          )}
+                          multiline={true}
+                          margin="normal"
+                        />
+                        <TextField
+                          label="failure message"
+                          value={this.props.failureMessage || undefined}
+                          fullWidth={true}
+                          onChange={this.props.handleChange(
+                            `items[${this.props.index}].texts[${
+                              this.props.textIndex
+                            }].failureMessage`,
+                          )}
+                          multiline={true}
+                          margin="normal"
+                        />
+                      </React.Fragment>
+                    )}
                     {this.props.type === "open" ? (
                       <div>
                         <TextField
