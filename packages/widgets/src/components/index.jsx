@@ -63,7 +63,7 @@ class Quiz extends Component {
         }
       }
       this.setState({
-        quiz: response.data.quiz,
+        quiz,
         quizAnswer,
         userQuizState: response.data.userQuizState,
       })

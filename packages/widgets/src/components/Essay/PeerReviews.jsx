@@ -14,8 +14,13 @@ class PeerReviews extends Component {
     submitLocked: true,
   }
 
+  morePeerReviewsRequired = () =>
+    this.props.peerReviewsGiven < this.props.peerReviewsRequired
+
   componentDidMount() {
-    this.fetchAnswersToReview()
+    if (this.morePeerReviewsRequired()) {
+      this.fetchAnswersToReview()
+    }
   }
 
   fetchAnswersToReview = async () => {
@@ -85,9 +90,11 @@ class PeerReviews extends Component {
       { headers: { authorization: `Bearer ${this.props.accessToken}` } },
     )
 
-    await this.fetchAnswersToReview()
     this.props.setUserQuizState(response.data.userQuizState)
     this.setState({ peerReview: undefined })
+    if (this.props.peerReviewsGiven < this.props.peerReviewsRequired) {
+      await this.fetchAnswersToReview()
+    }
   }
 
   render() {

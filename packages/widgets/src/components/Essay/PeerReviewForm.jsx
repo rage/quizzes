@@ -13,6 +13,7 @@ const PeerReviewForm = ({
   submitPeerReview,
   flagAsSpam,
   selectAnswer,
+  quizItems,
 }) => (
   <React.Fragment>
     <Typography variant="subtitle1">
