@@ -1,6 +1,6 @@
 import React from "react"
 import LikertScale from "likert-react"
-import { Button, Grid, Paper, TextField, Typography } from "@material-ui/core"
+import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
 import PeerReviewOption from "./PeerReviewOption"
 
 const PeerReviewForm = ({
@@ -14,16 +14,21 @@ const PeerReviewForm = ({
   flagAsSpam,
   selectAnswer,
   quizItems,
+  submitDisabled,
 }) => (
   <React.Fragment>
     <Typography variant="subtitle1">
       Valitse yksi vaihtoehdoista vertaisarvoitavaksi
     </Typography>
     {!answersToReview ? (
-      <Typography>
-        {languageInfo.loadingLabel}
-        {languageInfo.loadingLabel}
-      </Typography>
+      <Grid container>
+        <Grid item xs={1}>
+          <CircularProgress size={25} />
+        </Grid>
+        <Grid item>
+          <Typography>{languageInfo.loadingLabel}</Typography>
+        </Grid>
+      </Grid>
     ) : answersToReview.length === 0 ? (
       <Typography>{languageInfo.noPeerAnswersAvailableLabel}</Typography>
     ) : (

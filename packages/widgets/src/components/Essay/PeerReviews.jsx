@@ -130,26 +130,21 @@ class PeerReviews extends Component {
           given={peerReviewsGiven}
           required={peerReviewsRequired}
         />
-        {peerReviewsGiven < peerReviewsRequired &&
-          (!answersToReview ? (
-            <Typography>
-              {languageInfo.loadingLabel}
-              {languageInfo.loadingLabel}
-            </Typography>
-          ) : (
-            <PeerReviewForm
-              answersToReview={answersToReview}
-              languageInfo={languageInfo}
-              peerReviewQuestions={peerReviewQuestions}
-              peerReview={peerReview}
-              handlePeerReviewGradeChange={this.handlePeerReviewGradeChange}
-              submitLocked={submitLocked}
-              submitPeerReview={this.submitPeerReview}
-              flagAsSpam={this.flagAsSpam}
-              quizItems={this.props.quiz.items}
-              selectAnswer={this.selectAnswer}
-            />
-          ))}
+        {peerReviewsGiven < peerReviewsRequired && (
+          <PeerReviewForm
+            answersToReview={answersToReview}
+            languageInfo={languageInfo}
+            peerReviewQuestions={peerReviewQuestions}
+            peerReview={peerReview}
+            handlePeerReviewGradeChange={this.handlePeerReviewGradeChange}
+            submitLocked={submitLocked}
+            submitPeerReview={this.submitPeerReview}
+            flagAsSpam={this.flagAsSpam}
+            quizItems={this.props.quiz.items}
+            selectAnswer={this.selectAnswer}
+            submitDisabled={submitDisabled}
+          />
+        )}
       </div>
     )
   }
