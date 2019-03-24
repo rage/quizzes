@@ -9,10 +9,26 @@ const Open = ({
   textData,
   successMessage,
   failureMessage,
+  item,
+  itemTitle,
 }) => {
+  const guidance = (
+    <React.Fragment>
+      <Typography variant="h6" style={{ paddingBottom: 10 }}>
+        {itemTitle}
+      </Typography>
+      <Typography
+        variant="body1"
+        style={{ paddingBottom: 10 }}
+        dangerouslySetInnerHTML={{ __html: item.texts[0].body }}
+      />
+    </React.Fragment>
+  )
+
   if (answered) {
     return (
       <div>
+        {guidance}
         <Typography variant="subtitle1">
           {languageInfo.userAnswerLabel}:
         </Typography>
@@ -30,6 +46,7 @@ const Open = ({
 
   return (
     <div>
+      {guidance}
       <TextField
         value={textData}
         onChange={handleTextDataChange}

@@ -17,12 +17,12 @@ const PeerReviewForm = ({
   submitPeerReview,
   flagAsSpam,
   selectAnswer,
-}) => {
-  ;<Typography variant="subtitle1">
-    Valitse yksi vaihtoehdoista vertaisarvoitavaksi
-  </Typography>
-  {
-    !answersToReview ? (
+}) => (
+  <React.Fragment>
+    <Typography variant="subtitle1">
+      Valitse yksi vaihtoehdoista vertaisarvoitavaksi
+    </Typography>
+    {!answersToReview ? (
       <Typography>
         {languageInfo.loadingLabel}
         {languageInfo.loadingLabel}
@@ -72,8 +72,8 @@ const PeerReviewForm = ({
           )}
         </div>
       ))
-    )
-  }
-}
+    )}
+  </React.Fragment>
+)
 
 export default PeerReviewForm

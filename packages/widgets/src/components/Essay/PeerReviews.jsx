@@ -4,6 +4,8 @@ import Typography from "@material-ui/core/Typography"
 import "likert-react/dist/main.css"
 import { BASE_URL } from "../../config"
 import PeerReviewForm from "./PeerReviewForm"
+import PeerReviewsGuidance from "./PeerReviewsGuidance"
+import PeerReviewOption from "./PeerReviewOption"
 
 class PeerReviews extends Component {
   state = {
@@ -114,30 +116,31 @@ class PeerReviews extends Component {
 
     return (
       <div>
-        <Typography variant="subtitle1" style={{ paddingTop: 10 }}>
-          {peerReviewQuestions[0].texts[0].body}
-        </Typography>
-        <Typography variant="subtitle1" style={{ paddingTop: 10 }}>
-          {languageInfo.givenPeerReviewsLabel}: {peerReviewsGiven}/
-          {peerReviewsRequired}
-        </Typography>
-        {peerReviewsGiven >= peerReviewsRequired ? (
-          <Typography variant="subtitle1">
-            Olet antanut tarvittavat vertaisarviot.
-          </Typography>
-        ) : (
-          <PeerReviewForm
-            answersToReview={answersToReview}
-            languageInfo={languageInfo}
-            peerReviewQuestions={peerReviewQuestions}
-            peerReview={peerReview}
-            handlePeerReviewGradeChange={this.handlePeerReviewGradeChange}
-            submitLocked={submitLocked}
-            submitPeerReview={this.submitPeerReview}
-            flagAsSpam={this.flagAsSpam}
-            selectAnswer={this.selectAnswer}
-          />
-        )}
+        <PeerReviewsGuidance
+          guidanceText={peerReviewQuestions[0].texts[0].body}
+          givenLabel={languageInfo.givenPeerReviewsLabel}
+          given={peerReviewsGiven}
+          required={peerReviewsRequired}
+        />
+        {peerReviewsGiven < peerReviewsRequired &&
+          (!answersToReview ? (
+            <Typography>
+              {languageInfo.loadingLabel}
+              {languageInfo.loadingLabel}
+            </Typography>
+          ) : (
+            <PeerReviewForm
+              answersToReview={answersToReview}
+              languageInfo={languageInfo}
+              peerReviewQuestions={peerReviewQuestions}
+              peerReview={peerReview}
+              handlePeerReviewGradeChange={this.handlePeerReviewGradeChange}
+              submitLocked={submitLocked}
+              submitPeerReview={this.submitPeerReview}
+              flagAsSpam={this.flagAsSpam}
+              selectAnswer={this.selectAnswer}
+            />
+          ))}
       </div>
     )
   }
