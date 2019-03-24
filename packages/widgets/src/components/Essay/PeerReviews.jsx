@@ -92,7 +92,7 @@ class PeerReviews extends Component {
 
     this.props.setUserQuizState(response.data.userQuizState)
     this.setState({ peerReview: undefined })
-    if (this.props.peerReviewsGiven < this.props.peerReviewsRequired) {
+    if (this.morePeerReviewsRequired()) {
       await this.fetchAnswersToReview()
     }
   }
@@ -130,7 +130,7 @@ class PeerReviews extends Component {
           given={peerReviewsGiven}
           required={peerReviewsRequired}
         />
-        {peerReviewsGiven < peerReviewsRequired && (
+        {this.morePeerReviewsRequired() && (
           <PeerReviewForm
             answersToReview={answersToReview}
             languageInfo={languageInfo}
