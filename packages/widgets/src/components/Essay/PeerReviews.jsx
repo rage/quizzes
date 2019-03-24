@@ -1,14 +1,9 @@
 import React, { Component } from "react"
 import axios from "axios"
-import LikertScale from "likert-react"
-import { Button, Grid, Paper, TextField, Typography } from "@material-ui/core"
+import Typography from "@material-ui/core/Typography"
 import "likert-react/dist/main.css"
 import { BASE_URL } from "../../config"
-
-const paper = {
-  padding: 10,
-  margin: 10,
-}
+import PeerReviewForm from "./PeerReviewForm"
 
 class PeerReviews extends Component {
   state = {
@@ -126,59 +121,22 @@ class PeerReviews extends Component {
           {languageInfo.givenPeerReviewsLabel}: {peerReviewsGiven}/
           {peerReviewsRequired}
         </Typography>
-        <Typography variant="subtitle1">
-          Valitse yksi vaihtoehdoista vertaisarvoitavaksi
-        </Typography>
-        {!answersToReview ? (
-          <Typography>
-            {languageInfo.loadingLabel}
-            {languageInfo.loadingLabel}
+        {peerReviewsGiven >= peerReviewsRequired ? (
+          <Typography variant="subtitle1">
+            Olet antanut tarvittavat vertaisarviot.
           </Typography>
-        ) : answersToReview.length === 0 ? (
-          <Typography>{languageInfo.noPeerAnswersAvailableLabel}</Typography>
         ) : (
-          answersToReview.map(answer => (
-            <div key={answer.id}>
-              <Paper style={paper}>
-                <Typography variant="body1">
-                  {answer.itemAnswers[0].textData}
-                </Typography>
-              </Paper>
-              {peerReview ? (
-                <div>
-                  {peerReviewQuestions[0].questions.map(question => {
-                    return (
-                      <LikertScale
-                        key={question.id}
-                        reviews={[{ question: question.texts[0].title }]}
-                        onClick={this.handlePeerReviewGradeChange(question.id)}
-                      />
-                    )
-                  })}
-                  <Button
-                    disabled={submitLocked ? true : submitDisabled}
-                    onClick={this.submitPeerReview}
-                  >
-                    {languageInfo.submitPeerReviewLabel}
-                  </Button>
-                </div>
-              ) : (
-                <Grid container>
-                  <Grid item xs={3}>
-                    <Button onClick={this.flagAsSpam(answer.id)}>
-                      {languageInfo.reportAsInappropriateLabel}
-                    </Button>
-                  </Grid>
-                  <Grid item xs={8} />
-                  <Grid item xs={1}>
-                    <Button onClick={this.selectAnswer(answer.id)}>
-                      {languageInfo.chooseEssayLabel}
-                    </Button>
-                  </Grid>
-                </Grid>
-              )}
-            </div>
-          ))
+          <PeerReviewForm
+            answersToReview={answersToReview}
+            languageInfo={languageInfo}
+            peerReviewQuestions={peerReviewQuestions}
+            peerReview={peerReview}
+            handlePeerReviewGradeChange={this.handlePeerReviewGradeChange}
+            submitLocked={submitLocked}
+            submitPeerReview={this.submitPeerReview}
+            flagAsSpam={this.flagAsSpam}
+            selectAnswer={this.selectAnswer}
+          />
         )}
       </div>
     )

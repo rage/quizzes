@@ -2,7 +2,7 @@ export default (languageId, quizItemType) => {
   const languageOptions = {
     fi_FI: {
       essay: {
-        chooseEssayLabel: "Valitse",
+        choosePeerEssayLabel: "Valitse",
         exampleAnswerLabel: "Esimerkkivastaus",
         givenPeerReviewsLabel: "Vertaisarvioita annettu",
         loadingLabel: "Ladataan",
