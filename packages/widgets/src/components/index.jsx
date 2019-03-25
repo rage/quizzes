@@ -63,7 +63,7 @@ class Quiz extends Component {
         }
       }
       this.setState({
-        quiz: response.data.quiz,
+        quiz,
         quizAnswer,
         userQuizState: response.data.userQuizState,
       })
@@ -301,6 +301,14 @@ class Quiz extends Component {
                   : 0
               }
               peerReviewsRequired={quiz.course.minPeerReviewsGiven}
+              peerReviewsReceived={
+                this.state.userQuizSstate
+                  ? this.state.userQuizState.peerReviewsReceived
+                  : 0
+              }
+              peerReviewsReceivedRequired={
+                this.state.quiz.course.minPeerReviewsReceived
+              }
             />
           )}
 

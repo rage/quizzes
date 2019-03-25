@@ -12,6 +12,8 @@ const StageVisualizer = ({
   answered,
   peerReviewsGiven,
   peerReviewsRequired,
+  peerReviewsReceived,
+  peerReviewsReceivedRequired,
 }) => {
   let activeStep = 0
   if (answered) {
@@ -19,6 +21,10 @@ const StageVisualizer = ({
 
     if (peerReviewsGiven >= peerReviewsRequired) {
       activeStep = 2
+
+      if (peerReviewsReceived >= peerReviewsReceivedRequired) {
+        activeStep = 3
+      }
     }
   }
 

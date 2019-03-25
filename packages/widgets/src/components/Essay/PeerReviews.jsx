@@ -1,11 +1,10 @@
 import React, { Component } from "react"
 import axios from "axios"
-import LikertScale from "likert-react"
-import { Button, Grid, Paper, TextField, Typography } from "@material-ui/core"
+import Typography from "@material-ui/core/Typography"
 import "likert-react/dist/main.css"
 import { BASE_URL } from "../../config"
+import PeerReviewForm from "./PeerReviewForm"
 import PeerReviewsGuidance from "./PeerReviewsGuidance"
-import PeerReviewOption from "./PeerReviewOption"
 
 class PeerReviews extends Component {
   state = {
@@ -15,8 +14,13 @@ class PeerReviews extends Component {
     submitLocked: true,
   }
 
+  morePeerReviewsRequired = () =>
+    this.props.peerReviewsGiven < this.props.peerReviewsRequired
+
   componentDidMount() {
-    this.fetchAnswersToReview()
+    if (this.morePeerReviewsRequired()) {
+      this.fetchAnswersToReview()
+    }
   }
 
   fetchAnswersToReview = async () => {
@@ -85,9 +89,12 @@ class PeerReviews extends Component {
       this.state.peerReview,
       { headers: { authorization: `Bearer ${this.props.accessToken}` } },
     )
-    await this.fetchAnswersToReview()
+
     this.props.setUserQuizState(response.data.userQuizState)
     this.setState({ peerReview: undefined })
+    if (this.morePeerReviewsRequired()) {
+      await this.fetchAnswersToReview()
+    }
   }
 
   render() {
@@ -119,60 +126,24 @@ class PeerReviews extends Component {
         <PeerReviewsGuidance
           guidanceText={peerReviewQuestions[0].texts[0].body}
           givenLabel={languageInfo.givenPeerReviewsLabel}
+          peerReviewsCompletedInfo={languageInfo.peerReviewsCompletedInfo}
           given={peerReviewsGiven}
           required={peerReviewsRequired}
         />
-
-        {!answersToReview ? (
-          <Typography>
-            {languageInfo.loadingLabel}
-            {languageInfo.loadingLabel}
-          </Typography>
-        ) : answersToReview.length === 0 ? (
-          <Typography>{languageInfo.noPeerAnswersAvailableLabel}</Typography>
-        ) : (
-          answersToReview.map(answer => (
-            <div key={answer.id}>
-              <PeerReviewOption
-                answer={answer}
-                quizItems={this.props.quiz.items}
-              />
-
-              {peerReview ? (
-                <div>
-                  {peerReviewQuestions[0].questions.map(question => {
-                    return (
-                      <LikertScale
-                        key={question.id}
-                        reviews={[{ question: question.texts[0].title }]}
-                        onClick={this.handlePeerReviewGradeChange(question.id)}
-                      />
-                    )
-                  })}
-                  <Button
-                    disabled={submitLocked ? true : submitDisabled}
-                    onClick={this.submitPeerReview}
-                  >
-                    {languageInfo.submitPeerReviewLabel}
-                  </Button>
-                </div>
-              ) : (
-                <Grid container>
-                  <Grid item xs={3}>
-                    <Button onClick={this.flagAsSpam(answer.id)}>
-                      {languageInfo.reportAsInappropriateLabel}
-                    </Button>
-                  </Grid>
-                  <Grid item xs={8} />
-                  <Grid item xs={1}>
-                    <Button onClick={this.selectAnswer(answer.id)}>
-                      {languageInfo.choosePeerEssayLabel}
-                    </Button>
-                  </Grid>
-                </Grid>
-              )}
-            </div>
-          ))
+        {this.morePeerReviewsRequired() && (
+          <PeerReviewForm
+            answersToReview={answersToReview}
+            languageInfo={languageInfo}
+            peerReviewQuestions={peerReviewQuestions}
+            peerReview={peerReview}
+            handlePeerReviewGradeChange={this.handlePeerReviewGradeChange}
+            submitLocked={submitLocked}
+            submitPeerReview={this.submitPeerReview}
+            flagAsSpam={this.flagAsSpam}
+            quizItems={this.props.quiz.items}
+            selectAnswer={this.selectAnswer}
+            submitDisabled={submitDisabled}
+          />
         )}
       </div>
     )
