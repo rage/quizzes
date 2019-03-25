@@ -6,7 +6,7 @@ import MultipleChoice from "./MultipleChoice"
 import ResearchAgreement from "./ResearchAgreement"
 import Scale from "./Scale"
 import Open from "./Open"
-import EssayStageContainer from "./Essay/Essay"
+import Essay from "./Essay"
 import StageVisualizer from "./Essay/StageVisualizer"
 import PeerReviews from "./Essay/PeerReviews"
 import Unsupported from "./Unsupported"
@@ -15,7 +15,7 @@ import { BASE_URL } from "../config"
 import languageLabels from "../utils/language_labels"
 
 const mapTypeToComponent = {
-  essay: EssayStageContainer,
+  essay: Essay,
   "multiple-choice": MultipleChoice,
   scale: Scale,
   checkbox: Checkbox,
