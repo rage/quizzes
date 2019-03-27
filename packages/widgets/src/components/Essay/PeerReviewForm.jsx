@@ -84,31 +84,4 @@ const PeerReviewForm = ({
   </React.Fragment>
 )
 
-class TogglableForm extends Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      visible: props.visible,
-    }
-  }
-
-  toggleVisibility = event => {
-    event.preventDefault()
-    this.setState({ visible: !this.state.visible })
-  }
-
-  render = () => {
-    if (this.state.visible) {
-      return (
-        <React.Fragment>
-          <Button onClick={this.toggleVisibility}>Piilota vertaisarviot</Button>
-          <PeerReviewForm {...this.props} />
-        </React.Fragment>
-      )
-    }
-
-    return <Button onClick={this.toggleVisibility}>Tee vertaisarvio</Button>
-  }
-}
-
-export default TogglableForm
+export default PeerReviewForm

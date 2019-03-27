@@ -5,6 +5,7 @@ import "likert-react/dist/main.css"
 import { BASE_URL } from "../../config"
 import PeerReviewForm from "./PeerReviewForm"
 import PeerReviewsGuidance from "./PeerReviewsGuidance"
+import Togglable from "../../utils/Togglable"
 
 class PeerReviews extends Component {
   state = {
@@ -135,20 +136,25 @@ class PeerReviews extends Component {
           </Typography>
         )}
 
-        <PeerReviewForm
-          answersToReview={answersToReview}
-          languageInfo={languageInfo}
-          peerReviewQuestions={peerReviewQuestions}
-          peerReview={peerReview}
-          handlePeerReviewGradeChange={this.handlePeerReviewGradeChange}
-          submitLocked={submitLocked}
-          submitPeerReview={this.submitPeerReview}
-          flagAsSpam={this.flagAsSpam}
-          quizItems={this.props.quiz.items}
-          selectAnswer={this.selectAnswer}
-          submitDisabled={submitDisabled}
-          visible={this.morePeerReviewsRequired()}
-        />
+        <Togglable
+          initiallyVisible={this.morePeerReviewsRequired()}
+          hideButtonText="Piilota vertaisarvio"
+          displayButtonText="Tee vertaisarvio"
+        >
+          <PeerReviewForm
+            answersToReview={answersToReview}
+            languageInfo={languageInfo}
+            peerReviewQuestions={peerReviewQuestions}
+            peerReview={peerReview}
+            handlePeerReviewGradeChange={this.handlePeerReviewGradeChange}
+            submitLocked={submitLocked}
+            submitPeerReview={this.submitPeerReview}
+            flagAsSpam={this.flagAsSpam}
+            quizItems={this.props.quiz.items}
+            selectAnswer={this.selectAnswer}
+            submitDisabled={submitDisabled}
+          />
+        </Togglable>
       </div>
     )
   }
