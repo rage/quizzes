@@ -39,10 +39,19 @@ const PeerReviewForm = ({
           {peerReview ? (
             <div>
               {peerReviewQuestions[0].questions.map(question => {
+                const currentAnswerValue = peerReview.answers.find(
+                  answer => answer.peerReviewQuestionId === question.id,
+                ).value
+
                 return (
                   <LikertScale
                     key={question.id}
-                    reviews={[{ question: question.texts[0].title }]}
+                    reviews={[
+                      {
+                        question: question.texts[0].title,
+                        review: currentAnswerValue,
+                      },
+                    ]}
                     onClick={handlePeerReviewGradeChange(question.id)}
                   />
                 )
@@ -86,8 +95,6 @@ class TogglableForm extends Component {
   toggleVisibility = event => {
     event.preventDefault()
     this.setState({ visible: !this.state.visible })
-    console.log("Clicked!")
-    console.log("Status: ", this.state.visible)
   }
 
   render = () => {
