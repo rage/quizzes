@@ -18,9 +18,7 @@ class PeerReviews extends Component {
     this.props.peerReviewsGiven < this.props.peerReviewsRequired
 
   componentDidMount() {
-    if (this.morePeerReviewsRequired()) {
-      this.fetchAnswersToReview()
-    }
+    this.fetchAnswersToReview()
   }
 
   fetchAnswersToReview = async () => {
@@ -92,9 +90,7 @@ class PeerReviews extends Component {
 
     this.props.setUserQuizState(response.data.userQuizState)
     this.setState({ peerReview: undefined })
-    if (this.morePeerReviewsRequired()) {
-      await this.fetchAnswersToReview()
-    }
+    await this.fetchAnswersToReview()
   }
 
   render() {
@@ -130,21 +126,29 @@ class PeerReviews extends Component {
           given={peerReviewsGiven}
           required={peerReviewsRequired}
         />
-        {this.morePeerReviewsRequired() && (
-          <PeerReviewForm
-            answersToReview={answersToReview}
-            languageInfo={languageInfo}
-            peerReviewQuestions={peerReviewQuestions}
-            peerReview={peerReview}
-            handlePeerReviewGradeChange={this.handlePeerReviewGradeChange}
-            submitLocked={submitLocked}
-            submitPeerReview={this.submitPeerReview}
-            flagAsSpam={this.flagAsSpam}
-            quizItems={this.props.quiz.items}
-            selectAnswer={this.selectAnswer}
-            submitDisabled={submitDisabled}
-          />
+
+        {!this.morePeerReviewsRequired() && (
+          <Typography variant="subtitle1">
+            Olet jo antanut tarvittavan määrän vertaisarvioita. Voit halutessasi
+            arvioida enemmänkin muiden vastauksia - tekemällä näin parannat myös
+            oman vastauksesi todennäköisyyttä tulla vertaisarvioiduksi!
+          </Typography>
         )}
+
+        <PeerReviewForm
+          answersToReview={answersToReview}
+          languageInfo={languageInfo}
+          peerReviewQuestions={peerReviewQuestions}
+          peerReview={peerReview}
+          handlePeerReviewGradeChange={this.handlePeerReviewGradeChange}
+          submitLocked={submitLocked}
+          submitPeerReview={this.submitPeerReview}
+          flagAsSpam={this.flagAsSpam}
+          quizItems={this.props.quiz.items}
+          selectAnswer={this.selectAnswer}
+          submitDisabled={submitDisabled}
+          visible={this.morePeerReviewsRequired()}
+        />
       </div>
     )
   }

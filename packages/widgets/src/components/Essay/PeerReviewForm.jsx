@@ -1,4 +1,4 @@
-import React from "react"
+import React, { Component } from "react"
 import LikertScale from "likert-react"
 import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
 import PeerReviewOption from "./PeerReviewOption"
@@ -75,4 +75,33 @@ const PeerReviewForm = ({
   </React.Fragment>
 )
 
-export default PeerReviewForm
+class TogglableForm extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+      visible: props.visible,
+    }
+  }
+
+  toggleVisibility = event => {
+    event.preventDefault()
+    this.setState({ visible: !this.state.visible })
+    console.log("Clicked!")
+    console.log("Status: ", this.state.visible)
+  }
+
+  render = () => {
+    if (this.state.visible) {
+      return (
+        <React.Fragment>
+          <Button onClick={this.toggleVisibility}>Piilota vertaisarviot</Button>
+          <PeerReviewForm {...this.props} />
+        </React.Fragment>
+      )
+    }
+
+    return <Button onClick={this.toggleVisibility}>Tee vertaisarvio</Button>
+  }
+}
+
+export default TogglableForm
