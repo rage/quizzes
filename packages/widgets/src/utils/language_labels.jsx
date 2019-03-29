@@ -12,6 +12,7 @@ export default (languageId, quizItemType) => {
         submitPeerReviewLabel: "Lähetä vertaisarvio",
         userAnswerLabel: "Vastauksesi",
         peerReviewsCompletedInfo: "Tarvittavat vertaisarviot annettu",
+        minimumWords: "Sanoja vähintään",
       },
       open: {
         placeholder: "Vastaus",
@@ -29,6 +30,7 @@ export default (languageId, quizItemType) => {
         submitPeerReviewLabel: "Submit review",
         userAnswerLabel: "Your answer",
         peerReviewsCompletedInfo: "All peer reviews have been submitted",
+        minimumWords: "Minimum number of words",
       },
       open: {
         placeholder: "Answer",

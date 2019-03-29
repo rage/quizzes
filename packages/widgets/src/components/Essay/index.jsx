@@ -29,6 +29,11 @@ const Essay = ({
     </React.Fragment>
   ) : (
     <React.Fragment>
+      {item.minWords && (
+        <Typography variant="body1">
+          {languageInfo.minimumWords}: {item.minWords}
+        </Typography>
+      )}
       <TextField
         variant="outlined"
         label="Vastauksesi"
