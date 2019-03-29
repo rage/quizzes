@@ -129,17 +129,15 @@ class PeerReviews extends Component {
         />
 
         {!this.morePeerReviewsRequired() && (
-          <Typography variant="subtitle1">
-            Olet jo antanut tarvittavan määrän vertaisarvioita. Voit halutessasi
-            arvioida enemmänkin muiden vastauksia - tekemällä näin parannat myös
-            oman vastauksesi todennäköisyyttä tulla vertaisarvioiduksi!
+          <Typography variant="subtitle1" style={{ fontWeight: "bold" }}>
+            {this.props.languageInfo.extraPeerReviewsEncouragement}
           </Typography>
         )}
 
         <Togglable
           initiallyVisible={this.morePeerReviewsRequired()}
-          hideButtonText="Piilota vertaisarvio"
-          displayButtonText="Tee vertaisarvio"
+          hideButtonText={languageInfo.hidePeerReview}
+          displayButtonText={languageInfo.displayPeerReview}
         >
           <PeerReviewForm
             answersToReview={answersToReview}
