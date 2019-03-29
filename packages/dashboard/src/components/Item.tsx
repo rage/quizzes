@@ -59,25 +59,20 @@ class Item extends React.Component<any, any> {
     if (nextState.expanded !== this.state.expanded) {
       return true
     }
-    if (nextProps.title !== this.props.title) {
-      return true
-    }
-    if (nextProps.body !== this.props.body) {
-      return true
-    }
-    if (nextProps.successMessage !== this.props.successMessage) {
-      return true
-    }
-    if (nextProps.failureMessage !== this.props.failureMessage) {
-      return true
-    }
-    if (nextProps.validityRegex !== this.props.validityRegex) {
-      return true
-    }
-    if (nextProps.formatRegex !== this.props.formatRegex) {
-      return true
-    }
-    return false
+    const modificationFields: string[] = [
+      "title",
+      "body",
+      "minWords",
+      "maxWords",
+      "successMessage",
+      "failureMessage",
+      "validityRegex",
+      "formatRegex",
+    ]
+
+    return modificationFields.some(
+      fieldName => nextProps[fieldName] !== this.props[fieldName],
+    )
   }
 
   public render() {
@@ -159,6 +154,36 @@ class Item extends React.Component<any, any> {
                       multiline={true}
                       margin="normal"
                     />
+
+                    {this.props.type === "essay" && (
+                      <Grid container={true} spacing={16}>
+                        <Grid item={true} xs={3}>
+                          <TextField
+                            label="minimum number of words (optional)"
+                            value={this.props.minWords || undefined}
+                            onChange={this.props.handleChange(
+                              `items[${this.props.index}].minWords`,
+                            )}
+                            margin="normal"
+                            type="number"
+                            fullWidth={true}
+                          />
+                        </Grid>
+
+                        <Grid item={true} xs={3}>
+                          <TextField
+                            label="maximum number of words (optional)"
+                            value={this.props.maxWords || undefined}
+                            onChange={this.props.handleChange(
+                              `items[${this.props.index}].maxWords`,
+                            )}
+                            margin="normal"
+                            type="number"
+                            fullWidth={true}
+                          />
+                        </Grid>
+                      </Grid>
+                    )}
 
                     {this.props.type !== "essay" && (
                       <React.Fragment>
