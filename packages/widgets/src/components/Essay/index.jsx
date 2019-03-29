@@ -1,6 +1,7 @@
 import React from "react"
 import { Paper, TextField } from "@material-ui/core"
 import Typography from "@material-ui/core/Typography"
+import { wordCount } from "../../utils/string_tools"
 
 const Essay = ({
   itemTitle,
@@ -56,13 +57,6 @@ const Essay = ({
       {answerPortion}
     </div>
   )
-}
-
-function wordCount(string) {
-  if (!string) {
-    return 0
-  }
-  return string.match(/[^\s]+/g).length
 }
 
 export default Essay

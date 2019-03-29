@@ -13,6 +13,7 @@ import Unsupported from "./Unsupported"
 import axios from "axios"
 import { BASE_URL } from "../config"
 import languageLabels from "../utils/language_labels"
+import { wordCount } from "../utils/string_tools"
 
 const mapTypeToComponent = {
   essay: Essay,
@@ -62,6 +63,10 @@ class Quiz extends Component {
           }),
         }
       }
+
+      //for testing before backend support
+      quiz.items = quiz.items.map(ia => ({ ...ia, minWords: 5, maxWords: 10 }))
+
       this.setState({
         quiz,
         quizAnswer,
@@ -185,7 +190,13 @@ class Quiz extends Component {
         item.type === "open" ||
         item.type === "feedback"
       ) {
-        return itemAnswer.textData ? true : false
+        if (!itemAnswer.textData) return false
+        const words = wordCount(itemAnswer.textData)
+        if (item.minWords && words < item.minWords) return false
+
+        // not ordinarily possible
+        if (item.maxWords && words > item.maxWords) return false
+        return true
       }
       if (item.type === "multiple-choice") {
         return itemAnswer.optionAnswers.length > 0
