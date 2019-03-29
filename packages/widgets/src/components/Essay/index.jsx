@@ -33,13 +33,32 @@ const Essay = ({
         variant="outlined"
         label="Vastauksesi"
         value={textData}
-        onChange={handleTextDataChange}
+        onChange={event => {
+          if (!item.maxWords) {
+            handleTextDataChange(event)
+            return
+          }
+          const wordsInChange = wordCount(event.target.value)
+          if (wordsInChange < item.maxWords) {
+            handleTextDataChange(event)
+          } else if (wordsInChange === item.maxWords) {
+            if (
+              event.target.value.length <= textData.length ||
+              event.target.value.substr(textData.length).trim().length != 0
+            ) {
+              handleTextDataChange(event)
+            }
+          }
+        }}
         fullWidth={true}
         multiline={true}
         rows={10}
         margin="normal"
       />
-      <div>Sanoja: {wordCount(textData)}</div>
+      <div>
+        Sanoja: {wordCount(textData)}
+        {item.maxWords && <React.Fragment> / {item.maxWords}</React.Fragment>}
+      </div>
     </React.Fragment>
   )
 
