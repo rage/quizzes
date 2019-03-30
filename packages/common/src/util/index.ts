@@ -66,3 +66,13 @@ export class WhereBuilder<T extends BaseEntity> {
     return this
   }
 }
+
+export function wordCount(str: string | null): number {
+  if (!str) {
+    return 0
+  }
+
+  const words: string[] | null = str.match(/[^\s]+/g)
+
+  return words ? words.length : 0
+}

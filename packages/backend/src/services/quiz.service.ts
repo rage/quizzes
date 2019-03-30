@@ -68,6 +68,8 @@ export default class QuizService {
       if (!stripped) {
         queryBuilder
           .addSelect("item.validityRegex")
+          .addSelect("item.minWords")
+          .addSelect("item.maxWords")
           .addSelect("item_translation.successMessage")
           .addSelect("item_translation.failureMessage")
       }

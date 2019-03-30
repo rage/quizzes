@@ -12,6 +12,7 @@ import {
   UserQuizState,
 } from "../models"
 import PeerReviewService from "./peerreview.service"
+import { wordCount } from "./../../../common/src/util"
 
 @Service()
 export default class ValidationService {
@@ -40,6 +41,18 @@ export default class ValidationService {
 
       switch (item.type) {
         case "essay":
+          // if too short / long - something to be done!
+          // don't accept as "submitted"
+          console.log("Item answer: ", itemAnswer)
+          console.log("Item: ", item)
+          if (item.minWords && wordCount(itemAnswer.textData) < item.minWords) {
+            itemStatusObject = { error: "Too short an answer" }
+            break
+          }
+          if (item.maxWords && wordCount(itemAnswer.textData) > item.maxWords) {
+            itemStatusObject = { error: "Too long an answer" }
+            break
+          }
           quizAnswer.status = "submitted"
           userQuizState.peerReviewsReceived = 0
           userQuizState.peerReviewsGiven = userQuizState.peerReviewsGiven || 0

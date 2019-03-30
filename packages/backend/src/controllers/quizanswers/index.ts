@@ -61,6 +61,15 @@ export class QuizAnswerController {
       userQuizState,
     } = this.validationService.validateQuizAnswer(answer, quiz[0], userQState)
 
+    if (
+      response.itemAnswerStatus.some(status => {
+        return status.error ? true : false
+      })
+    ) {
+      throw new Error("Answer to an essay is too long/short!")
+    }
+    console.log("Should not be reached with length error")
+
     let savedAnswer: QuizAnswer
     let savedUserQuizState: UserQuizState
 

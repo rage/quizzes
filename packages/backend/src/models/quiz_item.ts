@@ -57,6 +57,12 @@ export class QuizItem extends BaseEntity {
   })
   public options: QuizOption[]
 
+  @Column({ type: "smallint", nullable: true, select: false })
+  public minWords?: number
+
+  @Column({ type: "smallint", nullable: true, select: false })
+  public maxWords?: number
+
   @Column({ nullable: true, select: false })
   public validityRegex?: string
   @Column({ nullable: true })
