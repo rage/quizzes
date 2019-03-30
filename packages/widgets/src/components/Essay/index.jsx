@@ -2,6 +2,7 @@ import React from "react"
 import { Paper, TextField } from "@material-ui/core"
 import Typography from "@material-ui/core/Typography"
 import { wordCount } from "../../utils/string_tools"
+import { executeIfTextFieldBetweenNumOfWords as executeIfWordNumberCorrect } from "../../utils/event_filters"
 
 const Essay = ({
   itemTitle,
@@ -38,23 +39,11 @@ const Essay = ({
         variant="outlined"
         label="Vastauksesi"
         value={textData}
-        onChange={event => {
-          if (!item.maxWords) {
-            handleTextDataChange(event)
-            return
-          }
-          const wordsInChange = wordCount(event.target.value)
-          if (wordsInChange < item.maxWords) {
-            handleTextDataChange(event)
-          } else if (wordsInChange === item.maxWords) {
-            if (
-              event.target.value.length <= textData.length ||
-              event.target.value.substr(textData.length).trim().length != 0
-            ) {
-              handleTextDataChange(event)
-            }
-          }
-        }}
+        onChange={executeIfWordNumberCorrect(
+          handleTextDataChange,
+          textData,
+          item.maxWords,
+        )}
         fullWidth={true}
         multiline={true}
         rows={10}

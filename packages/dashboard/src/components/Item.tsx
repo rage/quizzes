@@ -25,7 +25,7 @@ import {
   Toolbar,
   Typography,
 } from "@material-ui/core"
-import React from "react"
+import React, { ChangeEvent } from "react"
 import { connect } from "react-redux"
 import {
   arrayMove,
@@ -33,6 +33,7 @@ import {
   SortableElement,
   SortableHandle,
 } from "react-sortable-hoc"
+import { executeIfOnlyDigitsInTextField } from "../../../common/src/util/index"
 import {
   addItem,
   addOption,
@@ -161,11 +162,18 @@ class Item extends React.Component<any, any> {
                           <TextField
                             label="minimum number of words (optional)"
                             value={this.props.minWords || undefined}
-                            onChange={this.props.handleChange(
-                              `items[${this.props.index}].minWords`,
-                            )}
+                            onChange={
+                              executeIfOnlyDigitsInTextField(
+                                this.props.handleChange(
+                                  `items[${this.props.index}].minWords`,
+                                ),
+                              ) as ((
+                                event: ChangeEvent<HTMLInputElement>,
+                              ) => void)
+                            }
                             margin="normal"
                             type="number"
+                            inputProps={{ min: "0" }}
                             fullWidth={true}
                           />
                         </Grid>
@@ -174,11 +182,18 @@ class Item extends React.Component<any, any> {
                           <TextField
                             label="maximum number of words (optional)"
                             value={this.props.maxWords || undefined}
-                            onChange={this.props.handleChange(
-                              `items[${this.props.index}].maxWords`,
-                            )}
+                            onChange={
+                              executeIfOnlyDigitsInTextField(
+                                this.props.handleChange(
+                                  `items[${this.props.index}].maxWords`,
+                                ),
+                              ) as ((
+                                event: ChangeEvent<HTMLInputElement>,
+                              ) => void)
+                            }
                             margin="normal"
                             type="number"
+                            inputProps={{ min: "0" }}
                             fullWidth={true}
                           />
                         </Grid>
