@@ -1,4 +1,9 @@
-import { HeaderParam, JsonController, Post } from "routing-controllers"
+import {
+  HeaderParam,
+  JsonController,
+  Post,
+  BadRequestError,
+} from "routing-controllers"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
 import UserCourseStateService from "services/usercoursestate.service"
@@ -60,16 +65,20 @@ export class QuizAnswerController {
       quizAnswer,
       userQuizState,
     } = this.validationService.validateQuizAnswer(answer, quiz[0], userQState)
-
-    if (
-      response.itemAnswerStatus.some(status => {
-        return status.error ? true : false
-      })
-    ) {
-      throw new Error("Answer to an essay is too long/short!")
+    const erroneousItemAnswers = response.itemAnswerStatus.filter(status => {
+      return status.error ? true : false
+    })
+    if (erroneousItemAnswers.length > 0) {
+      throw new BadRequestError(
+        "Answer to an essay is not within acceptable limits. " +
+          `${erroneousItemAnswers.map(
+            x =>
+              `Min: ${x.min}, max: ${x.max}. Your answer (${
+                x.data.words
+              } words): ${x.data.text}`,
+          )}`,
+      )
     }
-    console.log("Should not be reached with length error")
-
     let savedAnswer: QuizAnswer
     let savedUserQuizState: UserQuizState
 
