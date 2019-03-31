@@ -5,7 +5,6 @@ export class alterQuizItemAddWordLimitsConstraints1553947075047
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     const qiTable: Table = await queryRunner.getTable("quiz_item")
-    console.log(qiTable.findColumnChecks(qiTable.findColumnByName("quiz_item")))
     if (
       !qiTable
         .findColumnChecks(qiTable.findColumnByName("quiz_item"))

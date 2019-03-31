@@ -14,7 +14,6 @@ import {
 import { IQuizQuery } from "../types"
 import quizanswerService from "./quizanswer.service"
 import ValidationService from "./validation.service"
-import { ValidationError } from "class-validator"
 import { BadRequestError } from "routing-controllers"
 
 @Service()

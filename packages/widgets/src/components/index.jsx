@@ -48,7 +48,6 @@ class Quiz extends Component {
         { headers: { authorization: `Bearer ${accessToken}` } },
       )
       const quiz = response.data.quiz
-      console.log("Response quiz: ", response.data.quiz)
       let quizAnswer = response.data.quizAnswer
       if (!quizAnswer) {
         quizAnswer = {
@@ -64,9 +63,6 @@ class Quiz extends Component {
           }),
         }
       }
-
-      //for testing before backend support
-      //quiz.items = quiz.items.map(ia => ({ ...ia, minWords: 5, maxWords: 10 }))
 
       this.setState({
         quiz,
@@ -195,7 +191,6 @@ class Quiz extends Component {
         const words = wordCount(itemAnswer.textData)
         if (item.minWords && words < item.minWords) return false
 
-        // not ordinarily possible
         if (item.maxWords && words > item.maxWords) return false
         return true
       }
