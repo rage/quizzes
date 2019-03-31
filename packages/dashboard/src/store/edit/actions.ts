@@ -7,6 +7,7 @@ import {
 } from "../../../../common/src/types/index"
 import { post } from "../../services/quizzes"
 import { setLanguage } from "../filter/actions"
+import { displayMessage } from "../notification/actions"
 import * as quizzes from "../quizzes/actions"
 
 export const set = createAction("edit/SET", resolve => {
@@ -41,8 +42,15 @@ export const save = () => {
       }
       dispatch(quizzes.set([quiz]))
       dispatch(setEdit(quiz))
+      dispatch(displayMessage(`Successfully saved ${quiz.title}!`, 5))
     } catch (error) {
       console.log(error)
+      dispatch(
+        displayMessage(
+          `Failed to save changes to ${getState().edit}. ${error}`,
+          5,
+        ),
+      )
     }
   }
 }
