@@ -28,6 +28,7 @@ import {
 import TMCApi from "../../common/src/services/TMCApi"
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
 import QuizForm from "./components/QuizForm"
+import SuccessNotification from "./components/SuccessNotification"
 import { setCourses } from "./store/courses/actions"
 import { newQuiz, setEdit } from "./store/edit/actions"
 import { setCourse } from "./store/filter/actions"
@@ -140,6 +141,7 @@ class App extends React.Component<any, any> {
           {this.props.user ? (
             <div>
               <div>
+                <SuccessNotification />
                 <AppBar>
                   <Toolbar>
                     <Typography style={{ flex: 1 }} />

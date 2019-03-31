@@ -42,12 +42,16 @@ export const save = () => {
       }
       dispatch(quizzes.set([quiz]))
       dispatch(setEdit(quiz))
-      dispatch(displayMessage(`Successfully saved ${quiz.title}!`, false))
+      dispatch(
+        displayMessage(`Successfully saved ${quiz.texts[0].title}!`, false),
+      )
     } catch (error) {
       console.log(error)
       dispatch(
         displayMessage(
-          `Failed to save changes to ${getState().edit}. ${error}`,
+          `Failed to save changes to ${
+            getState().edit.texts[0].title
+          }. ${error}`,
           true,
         ),
       )
