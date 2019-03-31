@@ -237,4 +237,22 @@ export default class ValidationService {
       }),
     )
   }
+
+  public async validateModificationOfExistingQuiz(quiz: Quiz, oldQuiz: Quiz) {
+    const stricter = oldQuiz.items.some(qi => {
+      const qi2 = quiz.items.find(x => x.id === qi.id)
+      if (qi2 === null) {
+        return false
+      }
+      if (qi2.minWords && (!qi.minWords || qi.minWords < qi2.minWords)) {
+        return true
+      }
+      if (qi2.maxWords && (!qi.maxWords || qi.maxWords > qi2.maxWords)) {
+        return true
+      }
+      return false
+    })
+
+    return stricter ? { error: "new quiz contains stricter quiz item" } : {}
+  }
 }

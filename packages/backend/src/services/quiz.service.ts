@@ -1,5 +1,5 @@
 import _ from "lodash"
-import { Service } from "typedi"
+import { Service, Inject } from "typedi"
 import { EntityManager } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
@@ -13,11 +13,17 @@ import {
 } from "../models"
 import { IQuizQuery } from "../types"
 import quizanswerService from "./quizanswer.service"
+import ValidationService from "./validation.service"
+import { ValidationError } from "class-validator"
+import { BadRequestError } from "routing-controllers"
 
 @Service()
 export default class QuizService {
   @InjectManager()
   private entityManager: EntityManager
+
+  @Inject()
+  private validationService: ValidationService
 
   public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
     const queryBuilder = this.entityManager.createQueryBuilder(Quiz, "quiz")
@@ -142,6 +148,24 @@ export default class QuizService {
     await this.entityManager.transaction(async entityManager => {
       if (quiz!.id) {
         oldQuiz = await entityManager.findOne(Quiz, { id: quiz.id })
+
+        const oldQuizItems = await this.entityManager
+          .createQueryBuilder(QuizItem, "item")
+          .addSelect("item.minWords")
+          .addSelect("item.maxWords")
+          .where("item.quizId = :quizId", { quizId: quiz.id })
+          .getMany()
+
+        oldQuiz.items = oldQuizItems
+        const validationResult = await this.validationService.validateModificationOfExistingQuiz(
+          quiz,
+          oldQuiz,
+        )
+        if (validationResult.error) {
+          throw new BadRequestError(
+            "New quiz cannot contain stricter limits on essays",
+          )
+        }
         await this.removeOrphans(entityManager, oldQuiz, quiz)
       }
 
@@ -152,7 +176,13 @@ export default class QuizService {
   }
 
   public async updateQuiz(quiz: Quiz): Promise<Quiz> {
-    return await this.entityManager.save(quiz)
+    let result
+    try {
+      result = await this.entityManager.save(quiz)
+    } catch (error) {
+      throw new Error(error.message)
+    }
+    return result
   }
 
   public async deleteQuiz(id: string): Promise<boolean> {
