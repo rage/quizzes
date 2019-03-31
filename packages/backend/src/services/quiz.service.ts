@@ -55,6 +55,8 @@ export default class QuizService {
 
     if (query.items) {
       queryBuilder.leftJoinAndSelect("quiz.items", "item")
+      queryBuilder.addSelect("item.minWords")
+      queryBuilder.addSelect("item.maxWords")
       if (language) {
         queryBuilder.leftJoinAndSelect(
           "item.texts",
@@ -68,8 +70,6 @@ export default class QuizService {
       if (!stripped) {
         queryBuilder
           .addSelect("item.validityRegex")
-          .addSelect("item.minWords")
-          .addSelect("item.maxWords")
           .addSelect("item_translation.successMessage")
           .addSelect("item_translation.failureMessage")
       }
