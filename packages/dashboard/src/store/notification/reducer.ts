@@ -2,7 +2,7 @@ import { getType } from "typesafe-actions"
 import * as notification from "./actions"
 
 export const notificationReducer = (
-  state: string | null = null,
+  state: { string; boolean } | null = null,
   action: any,
 ) => {
   switch (action.type) {
