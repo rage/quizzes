@@ -32,6 +32,7 @@ import SuccessNotification from "./components/SuccessNotification"
 import { setCourses } from "./store/courses/actions"
 import { newQuiz, setEdit } from "./store/edit/actions"
 import { setCourse } from "./store/filter/actions"
+import { displayMessage } from "./store/notification/actions"
 import { setQuizzes } from "./store/quizzes/actions"
 import { addUser, removeUser } from "./store/user/actions"
 
@@ -138,29 +139,31 @@ class App extends React.Component<any, any> {
     return (
       <div style={{ paddingLeft: 50, paddingRight: 50 }}>
         <Router>
-          {this.props.user ? (
-            <div>
+          <React.Fragment>
+            <SuccessNotification />
+            {this.props.user ? (
               <div>
-                <SuccessNotification />
-                <AppBar>
-                  <Toolbar>
-                    <Typography style={{ flex: 1 }} />
-                    <Button onClick={this.logout}>logout</Button>
-                  </Toolbar>
-                </AppBar>
-                <div style={{ height: 80 }} />
+                <div>
+                  <AppBar>
+                    <Toolbar>
+                      <Typography style={{ flex: 1 }} />
+                      <Button onClick={this.logout}>logout</Button>
+                    </Toolbar>
+                  </AppBar>
+                  <div style={{ height: 80 }} />
+                </div>
+                <Route exact={true} path="/" component={Dashboard} />
+                <Route exact={true} path="/quizzes/:id" component={this.edit} />
+                <Route exact={true} path="/new" component={this.create} />
               </div>
-              <Route exact={true} path="/" component={Dashboard} />
-              <Route exact={true} path="/quizzes/:id" component={this.edit} />
-              <Route exact={true} path="/new" component={this.create} />
-            </div>
-          ) : (
-            <div>
-              <Route exact={true} path="/" component={Login} />
-              <Route exact={true} path="/quizzes/:id" component={Login} />
-              <Route exact={true} path="/new" component={Login} />
-            </div>
-          )}
+            ) : (
+              <div>
+                <Route exact={true} path="/" component={Login} />
+                <Route exact={true} path="/quizzes/:id" component={Login} />
+                <Route exact={true} path="/new" component={Login} />
+              </div>
+            )}
+          </React.Fragment>
         </Router>
       </div>
     )
@@ -201,9 +204,14 @@ class App extends React.Component<any, any> {
       if ((profile as ITMCProfileDetails).administrator) {
         this.props.addUser(user)
         this.props.setCourses()
+      } else {
+        throw new Error()
       }
+      this.props.displayMessage(`Welcome ${user.username}!`, false)
     } catch (exception) {
       console.log(exception)
+
+      this.props.displayMessage("Login failed", true)
     }
   }
 
@@ -215,6 +223,7 @@ class App extends React.Component<any, any> {
 
 interface IDispatchProps {
   addUser: typeof addUser
+  displayMessage: typeof displayMessage
   newQuiz: typeof newQuiz
   setCourse: typeof setCourse
   setCourses: typeof setCourses
@@ -240,6 +249,7 @@ const mapStateToProps = (state: any) => {
 
 const mapDispatchToProps = {
   addUser,
+  displayMessage,
   newQuiz,
   setCourse,
   setCourses,
