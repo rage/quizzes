@@ -63,11 +63,11 @@ const radioButtonOptions = answered => {
     style: {
       paddingLeft: 0,
     },
-    color: answered ? "default" : "primary",
+    color: "primary",
   }
 
   if (answered) {
-    options.onChange = null
+    options.disabled = true
   }
   return options
 }
