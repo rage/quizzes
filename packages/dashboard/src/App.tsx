@@ -204,13 +204,10 @@ class App extends React.Component<any, any> {
       if ((profile as ITMCProfileDetails).administrator) {
         this.props.addUser(user)
         this.props.setCourses()
-      } else {
-        throw new Error()
       }
       this.props.displayMessage(`Welcome ${user.username}!`, false)
     } catch (exception) {
       console.log(exception)
-
       this.props.displayMessage("Login failed", true)
     }
   }
