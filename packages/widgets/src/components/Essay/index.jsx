@@ -1,6 +1,8 @@
 import React from "react"
 import { Paper, TextField } from "@material-ui/core"
 import Typography from "@material-ui/core/Typography"
+import { wordCount } from "../../utils/string_tools"
+import { executeIfTextFieldBetweenNumOfWords as executeIfWordNumberCorrect } from "../../utils/event_filters"
 
 const Essay = ({
   itemTitle,
@@ -28,17 +30,29 @@ const Essay = ({
     </React.Fragment>
   ) : (
     <React.Fragment>
+      {item.minWords && (
+        <Typography variant="body1">
+          {languageInfo.minimumWords}: {item.minWords}
+        </Typography>
+      )}
       <TextField
         variant="outlined"
         label="Vastauksesi"
         value={textData}
-        onChange={handleTextDataChange}
+        onChange={executeIfWordNumberCorrect(
+          handleTextDataChange,
+          textData,
+          item.maxWords,
+        )}
         fullWidth={true}
         multiline={true}
         rows={10}
         margin="normal"
       />
-      <div>Sanoja: {wordCount(textData)}</div>
+      <div>
+        Sanoja: {wordCount(textData)}
+        {item.maxWords && <React.Fragment> / {item.maxWords}</React.Fragment>}
+      </div>
     </React.Fragment>
   )
 
@@ -56,13 +70,6 @@ const Essay = ({
       {answerPortion}
     </div>
   )
-}
-
-function wordCount(string) {
-  if (!string) {
-    return 0
-  }
-  return string.match(/[^\s]+/g).length
 }
 
 export default Essay

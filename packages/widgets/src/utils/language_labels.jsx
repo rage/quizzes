@@ -12,6 +12,7 @@ export default (languageId, quizItemType) => {
         submitPeerReviewLabel: "Lähetä vertaisarvio",
         userAnswerLabel: "Vastauksesi",
         peerReviewsCompletedInfo: "Tarvittavat vertaisarviot annettu",
+        minimumWords: "Sanoja vähintään",
         extraPeerReviewsEncouragement:
           "Olet jo antanut tarvittavan määrän vertaisarvioita. \
          Jatka muiden töiden arviointia painamalla alhaalta - \
@@ -35,6 +36,7 @@ export default (languageId, quizItemType) => {
         submitPeerReviewLabel: "Submit review",
         userAnswerLabel: "Your answer",
         peerReviewsCompletedInfo: "All peer reviews have been submitted",
+        minimumWords: "Minimum number of words",
         extraPeerReviewsEncouragement:
           "You have reviewed the minimum number of peer essays. You may continue to \
         review your peers' works, thereby increasing the probability of your own answer being selected by others!",

@@ -25,7 +25,7 @@ import {
   Toolbar,
   Typography,
 } from "@material-ui/core"
-import React from "react"
+import React, { ChangeEvent } from "react"
 import { connect } from "react-redux"
 import {
   arrayMove,
@@ -33,6 +33,7 @@ import {
   SortableElement,
   SortableHandle,
 } from "react-sortable-hoc"
+import { executeIfOnlyDigitsInTextField } from "../../../common/src/util/index"
 import {
   addItem,
   addOption,
@@ -59,25 +60,20 @@ class Item extends React.Component<any, any> {
     if (nextState.expanded !== this.state.expanded) {
       return true
     }
-    if (nextProps.title !== this.props.title) {
-      return true
-    }
-    if (nextProps.body !== this.props.body) {
-      return true
-    }
-    if (nextProps.successMessage !== this.props.successMessage) {
-      return true
-    }
-    if (nextProps.failureMessage !== this.props.failureMessage) {
-      return true
-    }
-    if (nextProps.validityRegex !== this.props.validityRegex) {
-      return true
-    }
-    if (nextProps.formatRegex !== this.props.formatRegex) {
-      return true
-    }
-    return false
+    const modificationFields: string[] = [
+      "title",
+      "body",
+      "minWords",
+      "maxWords",
+      "successMessage",
+      "failureMessage",
+      "validityRegex",
+      "formatRegex",
+    ]
+
+    return modificationFields.some(
+      fieldName => nextProps[fieldName] !== this.props[fieldName],
+    )
   }
 
   public render() {
@@ -159,6 +155,50 @@ class Item extends React.Component<any, any> {
                       multiline={true}
                       margin="normal"
                     />
+
+                    {this.props.type === "essay" && (
+                      <Grid container={true} spacing={16}>
+                        <Grid item={true} xs={3}>
+                          <TextField
+                            label="minimum number of words (optional)"
+                            value={this.props.minWords || undefined}
+                            onChange={
+                              executeIfOnlyDigitsInTextField(
+                                this.props.handleChange(
+                                  `items[${this.props.index}].minWords`,
+                                ),
+                              ) as ((
+                                event: ChangeEvent<HTMLInputElement>,
+                              ) => void)
+                            }
+                            margin="normal"
+                            type="number"
+                            inputProps={{ min: "0" }}
+                            fullWidth={true}
+                          />
+                        </Grid>
+
+                        <Grid item={true} xs={3}>
+                          <TextField
+                            label="maximum number of words (optional)"
+                            value={this.props.maxWords || undefined}
+                            onChange={
+                              executeIfOnlyDigitsInTextField(
+                                this.props.handleChange(
+                                  `items[${this.props.index}].maxWords`,
+                                ),
+                              ) as ((
+                                event: ChangeEvent<HTMLInputElement>,
+                              ) => void)
+                            }
+                            margin="normal"
+                            type="number"
+                            inputProps={{ min: "0" }}
+                            fullWidth={true}
+                          />
+                        </Grid>
+                      </Grid>
+                    )}
 
                     {this.props.type !== "essay" && (
                       <React.Fragment>

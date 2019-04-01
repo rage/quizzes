@@ -12,6 +12,7 @@ import {
   UserQuizState,
 } from "../models"
 import PeerReviewService from "./peerreview.service"
+import { wordCount } from "./../../../common/src/util"
 
 @Service()
 export default class ValidationService {
@@ -40,6 +41,30 @@ export default class ValidationService {
 
       switch (item.type) {
         case "essay":
+          if (item.minWords && wordCount(itemAnswer.textData) < item.minWords) {
+            itemStatusObject = {
+              error: "Too short an answer",
+              data: {
+                text: itemAnswer.textData,
+                words: wordCount(itemAnswer.textData),
+              },
+              min: item.minWords,
+              max: item.maxWords,
+            }
+            break
+          }
+          if (item.maxWords && wordCount(itemAnswer.textData) > item.maxWords) {
+            itemStatusObject = {
+              error: "Too long an answer",
+              data: {
+                text: itemAnswer.textData,
+                words: wordCount(itemAnswer.textData),
+              },
+              min: item.minWords,
+              max: item.maxWords,
+            }
+            break
+          }
           quizAnswer.status = "submitted"
           userQuizState.peerReviewsReceived = 0
           userQuizState.peerReviewsGiven = userQuizState.peerReviewsGiven || 0
@@ -211,5 +236,23 @@ export default class ValidationService {
         }
       }),
     )
+  }
+
+  public async validateModificationOfExistingQuiz(quiz: Quiz, oldQuiz: Quiz) {
+    const stricter = oldQuiz.items.some(qi => {
+      const qi2 = quiz.items.find(x => x.id === qi.id)
+      if (qi2 === null) {
+        return false
+      }
+      if (qi2.minWords && (!qi.minWords || qi.minWords < qi2.minWords)) {
+        return true
+      }
+      if (qi2.maxWords && (!qi.maxWords || qi.maxWords > qi2.maxWords)) {
+        return true
+      }
+      return false
+    })
+
+    return stricter ? { error: "new quiz contains stricter quiz item" } : {}
   }
 }
