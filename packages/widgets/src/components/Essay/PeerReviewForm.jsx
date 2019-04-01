@@ -1,4 +1,4 @@
-import React from "react"
+import React, { Component } from "react"
 import LikertScale from "likert-react"
 import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
 import PeerReviewOption from "./PeerReviewOption"
@@ -39,10 +39,19 @@ const PeerReviewForm = ({
           {peerReview ? (
             <div>
               {peerReviewQuestions[0].questions.map(question => {
+                const currentAnswerValue = peerReview.answers.find(
+                  answer => answer.peerReviewQuestionId === question.id,
+                ).value
+
                 return (
                   <LikertScale
                     key={question.id}
-                    reviews={[{ question: question.texts[0].title }]}
+                    reviews={[
+                      {
+                        question: question.texts[0].title,
+                        review: currentAnswerValue,
+                      },
+                    ]}
                     onClick={handlePeerReviewGradeChange(question.id)}
                   />
                 )

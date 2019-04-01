@@ -12,6 +12,12 @@ export default (languageId, quizItemType) => {
         submitPeerReviewLabel: "Lähetä vertaisarvio",
         userAnswerLabel: "Vastauksesi",
         peerReviewsCompletedInfo: "Tarvittavat vertaisarviot annettu",
+        extraPeerReviewsEncouragement:
+          "Olet jo antanut tarvittavan määrän vertaisarvioita. \
+         Jatka muiden töiden arviointia painamalla alhaalta - \
+          -  näin parannat oman vastauksesi todennäköisyyttä tulla vertaisarvioiduksi!",
+        displayPeerReview: "Tee vertaisarvio",
+        hidePeerReview: "Piilota",
       },
       open: {
         placeholder: "Vastaus",
@@ -29,6 +35,11 @@ export default (languageId, quizItemType) => {
         submitPeerReviewLabel: "Submit review",
         userAnswerLabel: "Your answer",
         peerReviewsCompletedInfo: "All peer reviews have been submitted",
+        extraPeerReviewsEncouragement:
+          "You have reviewed the minimum number of peer essays. You may continue to \
+        review your peers' works, thereby increasing the probability of your own answer being selected by others!",
+        displayPeerReview: "Add peer review",
+        hidePeerReview: "Hide",
       },
       open: {
         placeholder: "Answer",

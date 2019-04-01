@@ -5,6 +5,7 @@ import "likert-react/dist/main.css"
 import { BASE_URL } from "../../config"
 import PeerReviewForm from "./PeerReviewForm"
 import PeerReviewsGuidance from "./PeerReviewsGuidance"
+import Togglable from "../../utils/Togglable"
 
 class PeerReviews extends Component {
   state = {
@@ -18,9 +19,7 @@ class PeerReviews extends Component {
     this.props.peerReviewsGiven < this.props.peerReviewsRequired
 
   componentDidMount() {
-    if (this.morePeerReviewsRequired()) {
-      this.fetchAnswersToReview()
-    }
+    this.fetchAnswersToReview()
   }
 
   fetchAnswersToReview = async () => {
@@ -92,9 +91,7 @@ class PeerReviews extends Component {
 
     this.props.setUserQuizState(response.data.userQuizState)
     this.setState({ peerReview: undefined })
-    if (this.morePeerReviewsRequired()) {
-      await this.fetchAnswersToReview()
-    }
+    await this.fetchAnswersToReview()
   }
 
   render() {
@@ -130,7 +127,18 @@ class PeerReviews extends Component {
           given={peerReviewsGiven}
           required={peerReviewsRequired}
         />
-        {this.morePeerReviewsRequired() && (
+
+        {!this.morePeerReviewsRequired() && (
+          <Typography variant="subtitle1" style={{ fontWeight: "bold" }}>
+            {this.props.languageInfo.extraPeerReviewsEncouragement}
+          </Typography>
+        )}
+
+        <Togglable
+          initiallyVisible={this.morePeerReviewsRequired()}
+          hideButtonText={languageInfo.hidePeerReview}
+          displayButtonText={languageInfo.displayPeerReview}
+        >
           <PeerReviewForm
             answersToReview={answersToReview}
             languageInfo={languageInfo}
@@ -144,7 +152,7 @@ class PeerReviews extends Component {
             selectAnswer={this.selectAnswer}
             submitDisabled={submitDisabled}
           />
-        )}
+        </Togglable>
       </div>
     )
   }
