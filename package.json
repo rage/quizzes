@@ -3,7 +3,10 @@
   "license": "Apache-2.0 OR MIT",
   "private": true,
   "workspaces": [
-    "packages/*"
+    "packages/backend",
+    "packages/common",
+    "packages/dashboard",
+    "packages/migration"
   ],
   "scripts": {
     "start": "yarn run serve",
