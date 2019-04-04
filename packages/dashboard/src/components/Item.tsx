@@ -89,40 +89,41 @@ class Item extends React.Component<any, any> {
 
     return (
       <Card style={{ marginBottom: 20 }}>
-        {!this.state.expanded ? (
-          <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
-            <Grid item={true} xs={11}>
-              <DragHandleWrapper>
-                <CardHeader
-                  title={
-                    this.props.title ||
-                    this.props.type[0].toUpperCase() + this.props.type.slice(1)
-                  }
-                  titleTypographyProps={{
-                    variant: "subtitle1",
-                    gutterBottom: false,
-                  }}
-                />
-              </DragHandleWrapper>
-            </Grid>
+        <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
+          <Grid item={true} xs={11}>
+            <DragHandleWrapper>
+              <CardHeader
+                title={
+                  this.props.title ||
+                  this.props.type[0].toUpperCase() + this.props.type.slice(1)
+                }
+                titleTypographyProps={{
+                  variant: "subtitle1",
+                  gutterBottom: false,
+                }}
+              />
+            </DragHandleWrapper>
+          </Grid>
 
-            <Grid item={true} xs={1}>
-              <Grid container={true} justify="flex-end">
-                <Grid item={true}>
-                  <CardActions>
-                    <IconButton onClick={this.handleExpand}>
-                      <SvgIcon>
-                        <path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" />
-                      </SvgIcon>
-                    </IconButton>
-                  </CardActions>
-                </Grid>
+          <Grid item={true} xs={1}>
+            <Grid container={true} justify="flex-end">
+              <Grid item={true}>
+                <CardActions>
+                  <IconButton
+                    onClick={this.toggleExpand}
+                    style={{
+                      transform: this.state.expanded ? "rotate(180deg)" : "",
+                    }}
+                  >
+                    <SvgIcon>
+                      <path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" />
+                    </SvgIcon>
+                  </IconButton>
+                </CardActions>
               </Grid>
             </Grid>
           </Grid>
-        ) : (
-          <p />
-        )}
+        </Grid>
 
         <Collapse in={this.state.expanded}>
           <CardContent>
@@ -293,22 +294,6 @@ class Item extends React.Component<any, any> {
               ) : (
                 <p />
               )}
-              <Grid item={true} xs={12}>
-                <Grid container={true} justify="flex-end">
-                  <Grid item={true}>
-                    <CardActions>
-                      <IconButton
-                        onClick={this.handleExpand}
-                        style={{ transform: "rotate(180deg)" }}
-                      >
-                        <SvgIcon>
-                          <path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" />
-                        </SvgIcon>
-                      </IconButton>
-                    </CardActions>
-                  </Grid>
-                </Grid>
-              </Grid>
             </Grid>
           </CardContent>
         </Collapse>
@@ -316,7 +301,7 @@ class Item extends React.Component<any, any> {
     )
   }
 
-  private handleExpand = event => {
+  private toggleExpand = event => {
     this.setState({ expanded: !this.state.expanded })
   }
 }

@@ -45,6 +45,15 @@ import {
 import DragHandleWrapper from "./DragHandleWrapper"
 
 class Option extends React.Component<any, any> {
+  private static attributes: string[] = [
+    "index",
+    "correct",
+    "title",
+    "body",
+    "successMessage",
+    "failureMessage",
+  ]
+
   constructor(props) {
     super(props)
     this.state = {
@@ -56,25 +65,10 @@ class Option extends React.Component<any, any> {
     if (nextState.expanded !== this.state.expanded) {
       return true
     }
-    if (nextProps.index !== this.props.index) {
-      return true
-    }
-    if (nextProps.correct !== this.props.correct) {
-      return true
-    }
-    if (nextProps.title !== this.props.title) {
-      return true
-    }
-    if (nextProps.body !== this.props.body) {
-      return true
-    }
-    if (nextProps.successMessage !== this.props.successMessage) {
-      return true
-    }
-    if (nextProps.failureMessage !== this.props.failureMessage) {
-      return true
-    }
-    return false
+
+    return Option.attributes.some(
+      attribute => nextProps[attribute] === this.props[attribute],
+    )
   }
 
   public render() {
