@@ -94,8 +94,10 @@ class Item extends React.Component<any, any> {
             <DragHandleWrapper>
               <CardHeader
                 title={
-                  this.props.title ||
-                  this.props.type[0].toUpperCase() + this.props.type.slice(1)
+                  this.props.title
+                    ? this.props.title + " (" + this.props.type + ")"
+                    : this.props.type[0].toUpperCase() +
+                      this.props.type.slice(1)
                 }
                 titleTypographyProps={{
                   variant: "subtitle1",
@@ -132,6 +134,9 @@ class Item extends React.Component<any, any> {
                 <Card>
                   <CardHeader subheader="general" />
                   <CardContent>
+                    <Typography variant="subtitle1">
+                      Type: {this.props.type}
+                    </Typography>
                     <TextField
                       label="title"
                       value={this.props.title || undefined}
