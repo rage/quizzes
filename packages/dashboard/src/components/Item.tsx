@@ -111,14 +111,13 @@ class Item extends React.Component<any, any> {
             <Grid container={true} justify="flex-end">
               <Grid item={true}>
                 <CardActions>
-                  <IconButton
-                    onClick={this.toggleExpand}
-                    style={{
-                      transform: this.state.expanded ? "rotate(180deg)" : "",
-                    }}
-                  >
+                  <IconButton onClick={this.toggleExpand}>
                     <SvgIcon>
-                      <path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" />
+                      {this.state.expanded ? (
+                        <path d="M9 6l-4.5 4.5 1.06 1.06L9 8.12l3.44 3.44 1.06-1.06z" />
+                      ) : (
+                        <path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" />
+                      )}
                     </SvgIcon>
                   </IconButton>
                 </CardActions>

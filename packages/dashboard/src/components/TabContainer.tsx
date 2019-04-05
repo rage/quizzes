@@ -13,6 +13,8 @@ import ItemContainer from "./ItemContainer"
 import PeerReviewCollectionContainer from "./PeerReviewCollectionContainer"
 
 class TabContainer extends React.Component<any, any> {
+  private itemCount
+
   private itemTypes = [
     "checkbox",
     "essay",
@@ -30,6 +32,7 @@ class TabContainer extends React.Component<any, any> {
     this.state = {
       menuOpen: false,
       menuAnchor: null,
+      preExistingQuizIds: null,
     }
   }
 
@@ -86,6 +89,7 @@ class TabContainer extends React.Component<any, any> {
               useDragHandle={true}
               handleSort={this.onSortEnd}
               remove={this.remove}
+              preExistingItemIds={this.state.preExistingItemIds}
             />
             <Button id="item" onClick={this.handleMenu}>
               Add item
@@ -127,6 +131,11 @@ class TabContainer extends React.Component<any, any> {
   }
 
   private addItem = type => event => {
+    console.log(this.props.storeItems)
+    this.itemCount = this.props.storeItems.count
+    this.setState({
+      preExistingQuizIds: this.props.storeItems.map(qi => qi.id),
+    })
     this.setState({
       menuOpen: null,
     })
@@ -156,6 +165,12 @@ class TabContainer extends React.Component<any, any> {
   }
 }
 
+const mapStateToProps = (state: any) => {
+  return {
+    storeItems: state.edit.items,
+  }
+}
+
 const mapDispatchToProps = {
   addItem,
   addReview,
@@ -164,6 +179,6 @@ const mapDispatchToProps = {
 }
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps,
 )(TabContainer)

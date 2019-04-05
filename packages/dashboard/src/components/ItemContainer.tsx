@@ -59,6 +59,7 @@ const ItemContainer: ComponentClass<any, any> = SortableContainer(
               collection="items"
             >
               <Item
+                // newlyAdded={props.preExistingItemIds.filter(x => x.id === item.id)}
                 language={props.language}
                 handleChange={props.handleChange}
                 index={index}

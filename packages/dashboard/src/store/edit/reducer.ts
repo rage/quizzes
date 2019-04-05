@@ -1,3 +1,4 @@
+import { bool, string } from "prop-types"
 import { getType } from "typesafe-actions"
 import {
   INewQuizQuery,
@@ -14,6 +15,8 @@ const initialState = {
   texts: [],
   items: [],
   peerReviewCollections: [],
+  // mostRecentItemId: string,
+  // mostRecentHasBeenShown: bool
 }
 
 export const editReducer = (state = initialState, action) => {
