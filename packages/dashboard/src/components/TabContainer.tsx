@@ -6,15 +6,14 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core"
-import React from "react"
+import { InputProps } from "@material-ui/core/Input"
+import React, { Component, createRef } from "react"
 import { connect } from "react-redux"
 import { addItem, addReview, changeOrder, remove } from "../store/edit/actions"
 import ItemContainer from "./ItemContainer"
 import PeerReviewCollectionContainer from "./PeerReviewCollectionContainer"
 
-class TabContainer extends React.Component<any, any> {
-  private itemCount
-
+class TabContainer extends Component<any, any> {
   private itemTypes = [
     "checkbox",
     "essay",
@@ -33,7 +32,45 @@ class TabContainer extends React.Component<any, any> {
       menuOpen: false,
       menuAnchor: null,
       preExisting: null,
+      scrollTo: null,
     }
+  }
+
+  public scrollToNewItem = (itemComponent: HTMLInputElement) => {
+    if (itemComponent) {
+      this.setState({
+        scrollTo: itemComponent,
+      })
+    }
+  }
+
+  public componentDidUpdate() {
+    if (this.state.scrollTo) {
+      this.state.scrollTo.focus()
+      this.state.scrollTo.select()
+      this.setState({
+        scrollTo: null,
+      })
+    }
+  }
+
+  public shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.preExisting) {
+      return true
+    }
+
+    if (this.state.scrollTo) {
+      return true
+    }
+
+    if (
+      this.state.menuOpen !== nextState.menuOpen ||
+      (this.state.menuAnchor && nextState.menuAnchor)
+    ) {
+      return true
+    }
+
+    return this.props !== nextProps
   }
 
   public render() {
@@ -89,8 +126,9 @@ class TabContainer extends React.Component<any, any> {
               useDragHandle={true}
               handleSort={this.onSortEnd}
               remove={this.remove}
-              preExisting={this.state.preExisting}
+              scrollToNew={this.scrollToNewItem}
             />
+
             <Button id="item" onClick={this.handleMenu}>
               Add item
             </Button>
@@ -131,11 +169,12 @@ class TabContainer extends React.Component<any, any> {
   }
 
   private addItem = type => event => {
-    console.log(this.props.storeItems)
-    this.itemCount = this.props.storeItems.count
+    const existingAtStart = this.state.existing
+
     this.setState({
       preExisting: this.props.storeItems.map(qi => qi.id),
     })
+
     this.setState({
       menuOpen: null,
     })

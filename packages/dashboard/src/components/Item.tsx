@@ -25,7 +25,7 @@ import {
   Toolbar,
   Typography,
 } from "@material-ui/core"
-import React, { ChangeEvent } from "react"
+import React, { ChangeEvent, createRef } from "react"
 import { connect } from "react-redux"
 import {
   arrayMove,
@@ -47,19 +47,28 @@ import DragHandleWrapper from "./DragHandleWrapper"
 import OptionContainer from "./OptionContainer"
 
 class Item extends React.Component<any, any> {
+  private myRef = createRef<HTMLInputElement>()
+
   constructor(props) {
     super(props)
     this.state = {
-      expanded: false,
+      expanded: props.newlyAdded,
     }
   }
 
   // DISSPLAYNG THE ESSAY: SHOULD BE MORE UNIFORM WITH THE OTHERS!
 
+  public componentDidMount() {
+    if (this.props.newlyAdded) {
+      this.props.scrollToNew(this.myRef.current)
+    }
+  }
+
   public shouldComponentUpdate(nextProps, nextState) {
     if (nextState.expanded !== this.state.expanded) {
       return true
     }
+
     const modificationFields: string[] = [
       "title",
       "body",
@@ -69,6 +78,7 @@ class Item extends React.Component<any, any> {
       "failureMessage",
       "validityRegex",
       "formatRegex",
+      "newlyAdded",
     ]
 
     return modificationFields.some(
@@ -77,16 +87,11 @@ class Item extends React.Component<any, any> {
   }
 
   public render() {
-    // console.log("item")
-
     const renderOptions = type => {
       return ["multiple-choice", "checkbox", "research-agreement"].includes(
         type,
       )
     }
-
-    console.log("Props: ", this.props)
-
     return (
       <Card style={{ marginBottom: 20 }}>
         <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
@@ -136,7 +141,11 @@ class Item extends React.Component<any, any> {
                     <Typography variant="subtitle1">
                       Type: {this.props.type}
                     </Typography>
+
                     <TextField
+                      inputProps={{
+                        ref: this.myRef,
+                      }}
                       label="title"
                       value={this.props.title || undefined}
                       fullWidth={true}
@@ -148,6 +157,7 @@ class Item extends React.Component<any, any> {
                       multiline={true}
                       margin="normal"
                     />
+
                     <TextField
                       label="body"
                       value={this.props.body || undefined}
