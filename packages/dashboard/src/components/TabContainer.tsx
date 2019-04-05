@@ -32,7 +32,7 @@ class TabContainer extends React.Component<any, any> {
     this.state = {
       menuOpen: false,
       menuAnchor: null,
-      preExistingQuizIds: null,
+      preExisting: null,
     }
   }
 
@@ -89,7 +89,7 @@ class TabContainer extends React.Component<any, any> {
               useDragHandle={true}
               handleSort={this.onSortEnd}
               remove={this.remove}
-              preExistingItemIds={this.state.preExistingItemIds}
+              preExisting={this.state.preExisting}
             />
             <Button id="item" onClick={this.handleMenu}>
               Add item
@@ -134,7 +134,7 @@ class TabContainer extends React.Component<any, any> {
     console.log(this.props.storeItems)
     this.itemCount = this.props.storeItems.count
     this.setState({
-      preExistingQuizIds: this.props.storeItems.map(qi => qi.id),
+      preExisting: this.props.storeItems.map(qi => qi.id),
     })
     this.setState({
       menuOpen: null,

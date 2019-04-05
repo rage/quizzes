@@ -48,6 +48,10 @@ import SortableWrapper from "./SortableWrapper"
 
 const ItemContainer: ComponentClass<any, any> = SortableContainer(
   (props: any) => {
+    console.log("Props for all items: ", props)
+    const newest = props.items
+      .sort((i1, i2) => i1.order - i2.order)
+      .find(i => !i.id)
     return (
       <div>
         {props.items.map((item, index) => {
@@ -59,7 +63,7 @@ const ItemContainer: ComponentClass<any, any> = SortableContainer(
               collection="items"
             >
               <Item
-                // newlyAdded={props.preExistingItemIds.filter(x => x.id === item.id)}
+                newlyAdded={item === newest}
                 language={props.language}
                 handleChange={props.handleChange}
                 index={index}
