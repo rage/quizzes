@@ -21,9 +21,13 @@ export const create = createAction("edit/NEW", resolve => {
 export const setEdit = (quiz: any) => {
   const orderedQuiz = JSON.parse(JSON.stringify(quiz))
   orderedQuiz.items = orderedQuiz.items.sort((i1, i2) => i1.order - i2.order)
-  orderedQuiz.items.map(
-    item => (item.options = item.options.sort((o1, o2) => o1.order - o2.order)),
-  )
+  orderedQuiz.items.map(item => {
+    const newItem = {
+      options: item.options.sort((o1, o2) => o1.order - o2.order),
+      ...item,
+    }
+    return newItem
+  })
   /*orderedQuiz.peerReviewQuestions = orderedQuiz.peerReviewQuestions.sort(
     (p1, p2) => p1.order - p2.order,
   )*/

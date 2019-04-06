@@ -68,7 +68,6 @@ class Item extends React.Component<any, any> {
     if (nextState.expanded !== this.state.expanded) {
       return true
     }
-
     const modificationFields: string[] = [
       "title",
       "body",

@@ -37,11 +37,12 @@ class TabContainer extends Component<any, any> {
   }
 
   public scrollToNewItem = (itemComponent: HTMLInputElement) => {
-    if (itemComponent) {
-      this.setState({
-        scrollTo: itemComponent,
-      })
+    if (!itemComponent) {
+      return
     }
+    this.setState({
+      scrollTo: itemComponent,
+    })
   }
 
   public componentDidUpdate() {
@@ -50,6 +51,7 @@ class TabContainer extends Component<any, any> {
       this.state.scrollTo.select()
       this.setState({
         scrollTo: null,
+        preExisting: null,
       })
     }
   }
@@ -71,6 +73,12 @@ class TabContainer extends Component<any, any> {
     }
 
     return this.props !== nextProps
+  }
+
+  public newest() {
+    const copy = JSON.parse(JSON.stringify(this.props.items))
+    copy.sort((i1, i2) => i2.order - i1.order)
+    return copy.find(i => !i.id)
   }
 
   public render() {
@@ -120,6 +128,7 @@ class TabContainer extends Component<any, any> {
               Items / Question types:
             </Typography>
             <ItemContainer
+              newest={this.newest()}
               onSortEnd={this.onSortEnd}
               items={this.props.items}
               handleChange={this.props.handleChange}
@@ -169,8 +178,6 @@ class TabContainer extends Component<any, any> {
   }
 
   private addItem = type => event => {
-    const existingAtStart = this.state.existing
-
     this.setState({
       preExisting: this.props.storeItems.map(qi => qi.id),
     })

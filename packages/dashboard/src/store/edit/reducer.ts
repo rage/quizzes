@@ -15,8 +15,6 @@ const initialState = {
   texts: [],
   items: [],
   peerReviewCollections: [],
-  // mostRecentItemId: string,
-  // mostRecentHasBeenShown: bool
 }
 
 export const editReducer = (state = initialState, action) => {

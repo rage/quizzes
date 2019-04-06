@@ -48,26 +48,19 @@ import SortableWrapper from "./SortableWrapper"
 
 const ItemContainer: ComponentClass<any, any> = SortableContainer(
   (props: any) => {
-    const newest = props.items
-      .sort((i1, i2) => i2.order - i1.order)
-      .find(i => !i.id)
-
     return (
       <div>
         {props.items.map((item, index) => {
           const text = item.texts.find(t => t.languageId === props.language)
           return (
-            // <SortableWrapper
-            //  key={item.id || item.type + index}
-            //   index={index}
-            //     collection="items"
-            //    >
+            /*       <SortableWrapper
+              key={item.id || item.type + index}
+               index={index}
+                 collection="items"
+                > */
             <Item
               key={item.id || item.type + index}
-              inputProps={{
-                ref: props.myRef,
-              }}
-              newlyAdded={item === newest}
+              newlyAdded={props.newest && item.order === props.newest.order}
               language={props.language}
               handleChange={props.handleChange}
               index={index}
@@ -89,7 +82,7 @@ const ItemContainer: ComponentClass<any, any> = SortableContainer(
               maxWords={item.maxWords}
               scrollToNew={props.scrollToNew}
             />
-            //        </SortableWrapper>
+            //         </SortableWrapper>
           )
         })}
       </div>
