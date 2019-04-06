@@ -53,36 +53,35 @@ const ItemContainer: ComponentClass<any, any> = SortableContainer(
         {props.items.map((item, index) => {
           const text = item.texts.find(t => t.languageId === props.language)
           return (
-            /*       <SortableWrapper
+            <SortableWrapper
               key={item.id || item.type + index}
-               index={index}
-                 collection="items"
-                > */
-            <Item
-              key={item.id || item.type + index}
-              newlyAdded={props.newest && item.order === props.newest.order}
-              language={props.language}
-              handleChange={props.handleChange}
               index={index}
-              handleSort={props.handleSort}
-              textIndex={item.texts.findIndex(
-                t => t.languageId === props.language,
-              )}
-              order={item.order}
-              validityRegex={item.validityRegex}
-              formatRegex={item.formatRegex}
-              options={item.options}
-              title={text.title}
-              body={text.body}
-              successMessage={text.successMessage}
-              failureMessage={text.failureMessage}
-              type={item.type}
-              remove={props.remove}
-              minWords={item.minWords}
-              maxWords={item.maxWords}
-              scrollToNew={props.scrollToNew}
-            />
-            //         </SortableWrapper>
+              collection="items"
+            >
+              <Item
+                newlyAdded={props.newest && item.order === props.newest.order}
+                language={props.language}
+                handleChange={props.handleChange}
+                index={index}
+                handleSort={props.handleSort}
+                textIndex={item.texts.findIndex(
+                  t => t.languageId === props.language,
+                )}
+                order={item.order}
+                validityRegex={item.validityRegex}
+                formatRegex={item.formatRegex}
+                options={item.options}
+                title={text.title}
+                body={text.body}
+                successMessage={text.successMessage}
+                failureMessage={text.failureMessage}
+                type={item.type}
+                remove={props.remove}
+                minWords={item.minWords}
+                maxWords={item.maxWords}
+                scrollToNew={props.scrollToNew}
+              />
+            </SortableWrapper>
           )
         })}
       </div>

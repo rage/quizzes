@@ -31,8 +31,8 @@ class TabContainer extends Component<any, any> {
     this.state = {
       menuOpen: false,
       menuAnchor: null,
-      preExisting: null,
       scrollTo: null,
+      justAdded: false,
     }
   }
 
@@ -49,18 +49,11 @@ class TabContainer extends Component<any, any> {
     if (this.state.scrollTo) {
       this.state.scrollTo.focus()
       this.state.scrollTo.select()
-      this.setState({
-        scrollTo: null,
-        preExisting: null,
-      })
+      this.setState({ scrollTo: null })
     }
   }
 
   public shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.preExisting) {
-      return true
-    }
-
     if (this.state.scrollTo) {
       return true
     }
@@ -76,8 +69,12 @@ class TabContainer extends Component<any, any> {
   }
 
   public newest() {
+    if (!this.state.justAdded) {
+      return undefined
+    }
     const copy = JSON.parse(JSON.stringify(this.props.items))
     copy.sort((i1, i2) => i2.order - i1.order)
+    this.setState({ justAdded: false })
     return copy.find(i => !i.id)
   }
 
@@ -179,11 +176,8 @@ class TabContainer extends Component<any, any> {
 
   private addItem = type => event => {
     this.setState({
-      preExisting: this.props.storeItems.map(qi => qi.id),
-    })
-
-    this.setState({
       menuOpen: null,
+      justAdded: true,
     })
     this.props.addItem(type)
   }

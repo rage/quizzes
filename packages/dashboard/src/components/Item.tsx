@@ -52,7 +52,7 @@ class Item extends React.Component<any, any> {
   constructor(props) {
     super(props)
     this.state = {
-      expanded: props.newlyAdded,
+      expanded: false,
     }
   }
 
@@ -61,6 +61,7 @@ class Item extends React.Component<any, any> {
   public componentDidMount() {
     if (this.props.newlyAdded) {
       this.props.scrollToNew(this.myRef.current)
+      this.setState({ expanded: true })
     }
   }
 
