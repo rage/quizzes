@@ -115,9 +115,10 @@ class Item extends React.Component<any, any> {
                       this.props.type.slice(1)
                 }
                 titleTypographyProps={{
-                  variant: "subtitle1",
+                  variant: "title",
                   gutterBottom: false,
                 }}
+                
               />
             </DragHandleWrapper>
           </Grid>

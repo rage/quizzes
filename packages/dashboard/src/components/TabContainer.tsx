@@ -48,7 +48,6 @@ class TabContainer extends Component<any, any> {
 
   public componentDidUpdate() {
     if (this.state.scrollTo) {
-      this.state.scrollTo.focus()
       this.state.scrollTo.select()
       this.setState({ scrollTo: null })
     }
@@ -137,7 +136,7 @@ class TabContainer extends Component<any, any> {
         </div>
         <div style={{ marginTop: 50 }}>
           <Paper style={{ padding: 30, marginBottom: 20 }}>
-            <Typography variant="subtitle1" style={{ marginBottom: 10 }}>
+            <Typography variant="title" style={{ marginBottom: 10 }}>
               Items / Question types:
             </Typography>
             <ItemContainer
@@ -170,7 +169,7 @@ class TabContainer extends Component<any, any> {
           </Paper>
           {this.props.items.find(item => item.type === "essay") ? (
             <Paper style={{ padding: 30 }}>
-              <Typography variant="subtitle1" style={{ marginBottom: 10 }}>
+              <Typography variant="title" style={{ marginBottom: 10 }}>
                 Peer reviews:
               </Typography>
               <PeerReviewCollectionContainer
