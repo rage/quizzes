@@ -87,7 +87,7 @@ class TabContainer extends Component<any, any> {
       newList[index] = isExpanded
       this.setState({ expandList: newList })
     } else {
-      const newList: boolean[] = this.state.expandList
+      const newList: boolean[] = { ...this.state.expandList }
       newList[index] = isExpanded
       this.setState({ expandList: newList })
     }

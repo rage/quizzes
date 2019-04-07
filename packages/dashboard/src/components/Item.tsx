@@ -53,10 +53,23 @@ class Item extends React.Component<any, any> {
     super(props)
     this.state = {
       expanded: false,
+      expandedOptions: {},
+      optionSortInSession: false,
     }
   }
 
   // DISSPLAYNG THE ESSAY: SHOULD BE MORE UNIFORM WITH THE OTHERS!
+
+  public expandOption = (order: number) => {
+    if (this.state.optionSortInSession) {
+      return
+    }
+    const newExpList: boolean[] = { ...this.state.expandedOptions }
+    newExpList[order] = !newExpList[order]
+    this.setState({
+      expandedOptions: newExpList,
+    })
+  }
 
   public componentDidMount() {
     if (this.props.newlyAdded) {
@@ -73,6 +86,10 @@ class Item extends React.Component<any, any> {
     if (nextState.expanded !== this.state.expanded) {
       return true
     }
+    if (nextState.expandedOptions !== this.state.expandedOptions) {
+      return true
+    }
+
     const modificationFields: string[] = [
       "title",
       "body",
@@ -305,7 +322,10 @@ class Item extends React.Component<any, any> {
                     <CardContent>
                       <OptionContainer
                         axis="xy"
-                        onSortEnd={this.props.handleSort}
+                        expandedOptions={this.state.expandedOptions}
+                        expansionChange={this.expandOption}
+                        onSortEnd={this.onSortEnd}
+                        onSortStart={this.onSortStart}
                         index={this.props.index}
                         useDragHandle={true}
                         language={this.props.language}
@@ -329,6 +349,25 @@ class Item extends React.Component<any, any> {
     this.props.expanded(!this.state.expanded, this.props.order)
     this.setState({ expanded: !this.state.expanded })
   }
+
+  private onSortStart = ({ oldIndex, newIndex, collection }) => {
+    this.setState({ optionSortInSession: true })
+  }
+
+  private onSortEnd = ({ oldIndex, newIndex, collection }) => {
+    const newExpList = { ...this.state.expandedOptions }
+    const temp = newExpList[oldIndex]
+    newExpList[oldIndex] = newExpList[newIndex]
+    newExpList[newIndex] = temp
+    this.setState({
+      expandedOptions: newExpList,
+      optionSortInSession: false,
+    })
+    this.props.changeOrder(collection, oldIndex, newIndex)
+  }
 }
 
-export default connect()(Item)
+export default connect(
+  null,
+  { changeOrder },
+)(Item)
