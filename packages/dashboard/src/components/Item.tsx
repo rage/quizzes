@@ -98,7 +98,12 @@ class Item extends React.Component<any, any> {
       )
     }
     return (
-      <Card style={{ marginBottom: 20 }}>
+      <Card
+        style={{
+          marginBottom: 20,
+          backgroundColor: this.state.expanded ? "#CCCCCC" : "inherit",
+        }}
+      >
         <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
           <Grid item={true} xs={11}>
             <DragHandleWrapper>
