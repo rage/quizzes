@@ -177,9 +177,9 @@ class Item extends React.Component<any, any> {
 
                     {this.props.type === "essay" && (
                       <Grid container={true} spacing={16}>
-                        <Grid item={true} xs={3}>
+                        <Grid item={true} xs={12}>
                           <TextField
-                            label="minimum number of words (optional)"
+                            label="min words (optional)"
                             value={this.props.minWords || undefined}
                             onChange={
                               executeIfOnlyDigitsInTextField(
@@ -197,9 +197,9 @@ class Item extends React.Component<any, any> {
                           />
                         </Grid>
 
-                        <Grid item={true} xs={3}>
+                        <Grid item={true} xs={12}>
                           <TextField
-                            label="maximum number of words (optional)"
+                            label="max words (optional)"
                             value={this.props.maxWords || undefined}
                             onChange={
                               executeIfOnlyDigitsInTextField(
