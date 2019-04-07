@@ -81,39 +81,38 @@ class Option extends React.Component<any, any> {
         size={!this.state.expanded ? 12 : 12}
       >
         <Card>
-
-        <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
-              <Grid item={true} xs={11}>
-                <DragHandleWrapper>
-                  <CardHeader
-                    title={this.props.title}
-                    titleTypographyProps={{
-                      variant: "subtitle1",
-                      gutterBottom: false,
-                    }}
-                  />
-                </DragHandleWrapper>
-              </Grid>
-              <Grid item={true} xs={1}>
-                <Grid container={true} justify="flex-end">
-                  <Grid item={true}>
-                    <CardActions>
+          <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
+            <Grid item={true} xs={11}>
+              <DragHandleWrapper>
+                <CardHeader
+                  title={this.props.title}
+                  titleTypographyProps={{
+                    variant: "subtitle1",
+                    gutterBottom: false,
+                  }}
+                />
+              </DragHandleWrapper>
+            </Grid>
+            <Grid item={true} xs={1}>
+              <Grid container={true} justify="flex-end">
+                <Grid item={true}>
+                  <CardActions>
                     <IconButton onClick={this.toggleExpand}>
-                    <SvgIcon>
-                      {this.state.expanded ? (
-                        <path d="M9 6l-4.5 4.5 1.06 1.06L9 8.12l3.44 3.44 1.06-1.06z" />
-                      ) : (
-                        <path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" />
-                      )}
-                    </SvgIcon>
-                  </IconButton>
-                    </CardActions>
-                  </Grid>
+                      <SvgIcon>
+                        {this.state.expanded ? (
+                          <path d="M9 6l-4.5 4.5 1.06 1.06L9 8.12l3.44 3.44 1.06-1.06z" />
+                        ) : (
+                          <path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" />
+                        )}
+                      </SvgIcon>
+                    </IconButton>
+                  </CardActions>
                 </Grid>
               </Grid>
             </Grid>
+          </Grid>
 
-          {this.state.expanded &&  (
+          {this.state.expanded && (
             <CardContent>
               <Card>
                 <CardHeader subheader="general" />

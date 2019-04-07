@@ -118,7 +118,6 @@ class Item extends React.Component<any, any> {
                   variant: "title",
                   gutterBottom: false,
                 }}
-                
               />
             </DragHandleWrapper>
           </Grid>
