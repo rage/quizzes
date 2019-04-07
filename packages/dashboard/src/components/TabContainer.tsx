@@ -219,12 +219,12 @@ class TabContainer extends Component<any, any> {
   }
 
   private onSortEnd = ({ oldIndex, newIndex, collection }) => {
-    this.props.changeOrder(collection, oldIndex, newIndex)
     const newList: boolean[] = { ...this.state.expandList }
     const temp: boolean = newList[newIndex]
     newList[newIndex] = newList[oldIndex]
     newList[oldIndex] = temp
     this.setState({ expandList: newList })
+    this.props.changeOrder(collection, oldIndex, newIndex)
   }
 }
 

@@ -62,7 +62,7 @@ class Item extends React.Component<any, any> {
     if (this.props.newlyAdded) {
       this.props.scrollToNew(this.myRef.current)
       this.setState({ expanded: true })
-      this.props.expanded(true, this.props.index)
+      this.props.expanded(true, this.props.order)
     }
     if (this.props.expandedAtBeginning) {
       this.setState({ expanded: true })
@@ -83,6 +83,7 @@ class Item extends React.Component<any, any> {
       "validityRegex",
       "formatRegex",
       "newlyAdded",
+      "expandedAtBeginning",
     ]
 
     return modificationFields.some(

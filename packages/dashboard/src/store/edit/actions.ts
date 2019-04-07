@@ -91,13 +91,12 @@ export const changeAttr = (path, value) => {
 
 export const changeOrder = (path, current, next) => {
   return (dispatch, getState) => {
-    const quiz = getState().edit // JSON.parse(JSON.stringify(getState().edit))
+    const quiz = JSON.parse(JSON.stringify(getState().edit))
     const array = _.get(quiz, path).sort((o1, o2) => o1.order - o2.order)
-    console.log("Before moving: ", array)
     const moved = array.splice(current, 1)[0]
-    console.log("After moving: ", moved)
     array.splice(next, 0, moved)
     array.map((object, index) => (object.order = index))
+
     dispatch(set(quiz))
   }
 }
