@@ -48,6 +48,32 @@ class App extends React.Component<any, any> {
     }
   }
 
+  public currentCourseTitle: () => string | null = () => {
+    console.log("wtf")
+    if (!this.props.filter.course) {
+      return null
+    }
+    const currentCourse = this.props.courses.find(
+      c => c.id === this.props.filter.course,
+    )
+    console.log("CUrrent course:", currentCourse)
+    if (!currentCourse) {
+      return null
+    }
+
+    if (!currentCourse.texts[0]) {
+      return null
+    }
+    return currentCourse.texts[0].title
+  }
+
+  public currentQuizTitle: () => string | null = () => {
+    if (!this.props.edit || !this.props.edit.texts[0]) {
+      return null
+    }
+    return this.props.edit.texts[0].title
+  }
+
   public render() {
     const Login = () => {
       return (
@@ -146,6 +172,11 @@ class App extends React.Component<any, any> {
                 <div>
                   <AppBar>
                     <Toolbar>
+                      <Typography>
+                        {this.currentCourseTitle()}
+                        ->
+                        {this.currentQuizTitle()}
+                      </Typography>
                       <Typography style={{ flex: 1 }} />
                       <Button onClick={this.logout}>logout</Button>
                     </Toolbar>
@@ -231,6 +262,8 @@ interface IDispatchProps {
 
 interface IStateProps {
   courses: any
+  edit: any
+  filter: any
   quizzes: any[]
   user: ITMCProfile
 }
@@ -238,6 +271,7 @@ interface IStateProps {
 const mapStateToProps = (state: any) => {
   return {
     courses: state.courses,
+    edit: state.edit,
     filter: state.filter,
     quizzes: state.quizzes,
     user: state.user,
