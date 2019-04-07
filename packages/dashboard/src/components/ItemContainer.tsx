@@ -80,6 +80,11 @@ const ItemContainer: ComponentClass<any, any> = SortableContainer(
                 minWords={item.minWords}
                 maxWords={item.maxWords}
                 scrollToNew={props.scrollToNew}
+                expanded={props.expanded}
+                expandedAtBeginning={
+                  props.shouldBeExpandedList &&
+                  props.shouldBeExpandedList[index]
+                }
               />
             </SortableWrapper>
           )

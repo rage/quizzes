@@ -62,6 +62,10 @@ class Item extends React.Component<any, any> {
     if (this.props.newlyAdded) {
       this.props.scrollToNew(this.myRef.current)
       this.setState({ expanded: true })
+      this.props.expanded(true, this.props.index)
+    }
+    if (this.props.expandedAtBeginning) {
+      this.setState({ expanded: true })
     }
   }
 
@@ -316,6 +320,7 @@ class Item extends React.Component<any, any> {
   }
 
   private toggleExpand = event => {
+    this.props.expanded(!this.state.expanded, this.props.order)
     this.setState({ expanded: !this.state.expanded })
   }
 }

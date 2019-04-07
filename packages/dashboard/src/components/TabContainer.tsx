@@ -33,6 +33,7 @@ class TabContainer extends Component<any, any> {
       menuAnchor: null,
       scrollTo: null,
       justAdded: false,
+      expandList: [],
     }
   }
 
@@ -57,6 +58,9 @@ class TabContainer extends Component<any, any> {
     if (this.state.scrollTo) {
       return true
     }
+    if (this.state.expandList.toString() === nextState.expandList.toString()) {
+      return true
+    }
 
     if (
       this.state.menuOpen !== nextState.menuOpen ||
@@ -76,6 +80,18 @@ class TabContainer extends Component<any, any> {
     copy.sort((i1, i2) => i2.order - i1.order)
     this.setState({ justAdded: false })
     return copy.find(i => !i.id)
+  }
+
+  public expanded = (isExpanded: boolean, index: number) => {
+    if (this.state.expandList.length === 0) {
+      const newList: boolean[] = []
+      newList[index] = isExpanded
+      this.setState({ expandList: newList })
+    } else {
+      const newList: boolean[] = this.state.expandList
+      newList[index] = isExpanded
+      this.setState({ expandList: newList })
+    }
   }
 
   public render() {
@@ -125,6 +141,7 @@ class TabContainer extends Component<any, any> {
               Items / Question types:
             </Typography>
             <ItemContainer
+              expanded={this.expanded}
               newest={this.newest()}
               onSortEnd={this.onSortEnd}
               items={this.props.items}
@@ -133,6 +150,7 @@ class TabContainer extends Component<any, any> {
               handleSort={this.onSortEnd}
               remove={this.remove}
               scrollToNew={this.scrollToNewItem}
+              shouldBeExpandedList={this.state.expandList}
             />
 
             <Button id="item" onClick={this.handleMenu}>
@@ -202,6 +220,11 @@ class TabContainer extends Component<any, any> {
 
   private onSortEnd = ({ oldIndex, newIndex, collection }) => {
     this.props.changeOrder(collection, oldIndex, newIndex)
+    const newList: boolean[] = { ...this.state.expandList }
+    const temp: boolean = newList[newIndex]
+    newList[newIndex] = newList[oldIndex]
+    newList[oldIndex] = temp
+    this.setState({ expandList: newList })
   }
 }
 
