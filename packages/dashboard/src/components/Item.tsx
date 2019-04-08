@@ -336,7 +336,6 @@ class Item extends React.Component<any, any> {
   }
 
   private toggleExpand = event => {
-    console.log("exPAND")
     this.props.expandItem(this.props.order)
   }
 
