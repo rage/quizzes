@@ -63,10 +63,10 @@ const ItemContainer: ComponentClass<any, any> = SortableContainer(
                 language={props.language}
                 handleChange={props.handleChange}
                 index={index}
-                handleSort={props.handleSort}
                 textIndex={item.texts.findIndex(
                   t => t.languageId === props.language,
                 )}
+                onSortEnd={props.onSortEnd}
                 order={item.order}
                 validityRegex={item.validityRegex}
                 formatRegex={item.formatRegex}
@@ -80,8 +80,8 @@ const ItemContainer: ComponentClass<any, any> = SortableContainer(
                 minWords={item.minWords}
                 maxWords={item.maxWords}
                 scrollToNew={props.scrollToNew}
-                expanded={props.expanded}
-                expandedAtBeginning={props.shouldBeExpandedList[item.order]}
+                expandItem={props.expandItem}
+                expanded={props.expandedItems[item.order]}
               />
             </SortableWrapper>
           )

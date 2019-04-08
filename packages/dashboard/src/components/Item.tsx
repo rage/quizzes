@@ -47,23 +47,18 @@ import DragHandleWrapper from "./DragHandleWrapper"
 import OptionContainer from "./OptionContainer"
 
 class Item extends React.Component<any, any> {
-  private myRef = createRef<HTMLInputElement>()
+  private titleRef = createRef<HTMLInputElement>()
 
   constructor(props) {
     super(props)
     this.state = {
-      expanded: false,
       expandedOptions: {},
-      optionSortInSession: false,
     }
   }
 
   // DISSPLAYNG THE ESSAY: SHOULD BE MORE UNIFORM WITH THE OTHERS!
 
   public expandOption = (order: number) => {
-    if (this.state.optionSortInSession) {
-      return
-    }
     const newExpList: boolean[] = { ...this.state.expandedOptions }
     newExpList[order] = !newExpList[order]
     this.setState({
@@ -73,20 +68,16 @@ class Item extends React.Component<any, any> {
 
   public componentDidMount() {
     if (this.props.newlyAdded) {
-      this.props.scrollToNew(this.myRef.current)
-      this.setState({ expanded: true })
-      this.props.expanded(true, this.props.order)
-    }
-    if (this.props.expandedAtBeginning) {
-      this.setState({ expanded: true })
+      this.props.scrollToNew(this.titleRef.current)
+      this.props.expandItem(this.props.order)
     }
   }
 
   public shouldComponentUpdate(nextProps, nextState) {
-    if (nextState.expanded !== this.state.expanded) {
+    if (nextState.expandedOptions !== this.state.expandedOptions) {
       return true
     }
-    if (nextState.expandedOptions !== this.state.expandedOptions) {
+    if (nextProps.expanded !== this.props.expanded) {
       return true
     }
 
@@ -100,7 +91,7 @@ class Item extends React.Component<any, any> {
       "validityRegex",
       "formatRegex",
       "newlyAdded",
-      "expandedAtBeginning",
+      "expanded",
     ]
 
     return modificationFields.some(
@@ -118,7 +109,7 @@ class Item extends React.Component<any, any> {
       <Card
         style={{
           marginBottom: 20,
-          backgroundColor: this.state.expanded ? "#CCCCCC" : "inherit",
+          backgroundColor: this.props.expanded ? "#DDDDDD" : "inherit",
         }}
       >
         <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
@@ -145,7 +136,7 @@ class Item extends React.Component<any, any> {
                 <CardActions>
                   <IconButton onClick={this.toggleExpand}>
                     <SvgIcon>
-                      {this.state.expanded ? (
+                      {this.props.expanded ? (
                         <path d="M9 6l-4.5 4.5 1.06 1.06L9 8.12l3.44 3.44 1.06-1.06z" />
                       ) : (
                         <path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" />
@@ -158,7 +149,7 @@ class Item extends React.Component<any, any> {
           </Grid>
         </Grid>
 
-        <Collapse in={this.state.expanded}>
+        <Collapse in={this.props.expanded}>
           <CardContent>
             <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
               <Grid item={true} xs={12}>
@@ -171,7 +162,7 @@ class Item extends React.Component<any, any> {
 
                     <TextField
                       inputProps={{
-                        ref: this.myRef,
+                        ref: this.titleRef,
                       }}
                       label="title"
                       value={this.props.title || undefined}
@@ -324,8 +315,7 @@ class Item extends React.Component<any, any> {
                         axis="xy"
                         expandedOptions={this.state.expandedOptions}
                         expansionChange={this.expandOption}
-                        onSortEnd={this.onSortEnd}
-                        onSortStart={this.onSortStart}
+                        onSortEnd={this.onOptionSortEnd}
                         index={this.props.index}
                         useDragHandle={true}
                         language={this.props.language}
@@ -346,22 +336,17 @@ class Item extends React.Component<any, any> {
   }
 
   private toggleExpand = event => {
-    this.props.expanded(!this.state.expanded, this.props.order)
-    this.setState({ expanded: !this.state.expanded })
+    console.log("exPAND")
+    this.props.expandItem(this.props.order)
   }
 
-  private onSortStart = ({ oldIndex, newIndex, collection }) => {
-    this.setState({ optionSortInSession: true })
-  }
-
-  private onSortEnd = ({ oldIndex, newIndex, collection }) => {
+  private onOptionSortEnd = ({ oldIndex, newIndex, collection }) => {
     const newExpList = { ...this.state.expandedOptions }
     const temp = newExpList[oldIndex]
     newExpList[oldIndex] = newExpList[newIndex]
     newExpList[newIndex] = temp
     this.setState({
       expandedOptions: newExpList,
-      optionSortInSession: false,
     })
     this.props.changeOrder(collection, oldIndex, newIndex)
   }

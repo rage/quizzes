@@ -33,7 +33,7 @@ class TabContainer extends Component<any, any> {
       menuAnchor: null,
       scrollTo: null,
       justAdded: false,
-      expandList: [],
+      expandedItems: {},
     }
   }
 
@@ -57,7 +57,11 @@ class TabContainer extends Component<any, any> {
     if (this.state.scrollTo) {
       return true
     }
-    if (this.state.expandList.toString() === nextState.expandList.toString()) {
+
+    if (
+      JSON.stringify(this.state.expandedItems) !==
+      JSON.stringify(nextState.expandedItems)
+    ) {
       return true
     }
 
@@ -77,20 +81,17 @@ class TabContainer extends Component<any, any> {
     }
     const copy = JSON.parse(JSON.stringify(this.props.items))
     copy.sort((i1, i2) => i2.order - i1.order)
-    this.setState({ justAdded: false })
+    // this.setState({ justAdded: false })
     return copy.find(i => !i.id)
   }
 
-  public expanded = (isExpanded: boolean, index: number) => {
-    if (this.state.expandList.length === 0) {
-      const newList: boolean[] = []
-      newList[index] = isExpanded
-      this.setState({ expandList: newList })
-    } else {
-      const newList: boolean[] = { ...this.state.expandList }
-      newList[index] = isExpanded
-      this.setState({ expandList: newList })
+  public expandItem = (index: number) => {
+    if (typeof index !== "number") {
+      return
     }
+    const newExp = { ...this.state.expandedItems }
+    newExp[index] = newExp[index] ? !newExp[index] : true
+    this.setState({ expandedItems: newExp })
   }
 
   public render() {
@@ -140,7 +141,7 @@ class TabContainer extends Component<any, any> {
               Items / Question types:
             </Typography>
             <ItemContainer
-              expanded={this.expanded}
+              expandItem={this.expandItem}
               newest={this.newest()}
               onSortEnd={this.onSortEnd}
               items={this.props.items}
@@ -149,7 +150,7 @@ class TabContainer extends Component<any, any> {
               handleSort={this.onSortEnd}
               remove={this.remove}
               scrollToNew={this.scrollToNewItem}
-              shouldBeExpandedList={this.state.expandList}
+              expandedItems={this.state.expandedItems}
             />
 
             <Button id="item" onClick={this.handleMenu}>
@@ -218,11 +219,14 @@ class TabContainer extends Component<any, any> {
   }
 
   private onSortEnd = ({ oldIndex, newIndex, collection }) => {
-    const newList: boolean[] = { ...this.state.expandList }
-    const temp: boolean = newList[newIndex]
-    newList[newIndex] = newList[oldIndex]
-    newList[oldIndex] = temp
-    this.setState({ expandList: newList })
+    if (collection === "items") {
+      const newExp = { ...this.state.expandedItems }
+      const temp: boolean = newExp[oldIndex]
+      newExp[oldIndex] = newExp[newIndex]
+      newExp[newIndex] = temp
+      this.setState({ expandedItems: newExp })
+    }
+
     this.props.changeOrder(collection, oldIndex, newIndex)
   }
 }
