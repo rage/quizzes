@@ -50,7 +50,6 @@ const OptionContainer = SortableContainer((props: any) => {
   }
 
   const options = props.edit.items[props.index].options
-
   return (
     <Grid container={true} spacing={16}>
       {options
@@ -73,6 +72,8 @@ const OptionContainer = SortableContainer((props: any) => {
               successMessage={text.successMessage}
               failureMessage={text.failureMessage}
               remove={props.remove}
+              expanded={props.expandedOptions[index]}
+              expansionChange={props.expansionChange}
             />
           )
         })}

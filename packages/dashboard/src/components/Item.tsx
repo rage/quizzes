@@ -25,7 +25,7 @@ import {
   Toolbar,
   Typography,
 } from "@material-ui/core"
-import React, { ChangeEvent } from "react"
+import React, { ChangeEvent, createRef } from "react"
 import { connect } from "react-redux"
 import {
   arrayMove,
@@ -47,19 +47,40 @@ import DragHandleWrapper from "./DragHandleWrapper"
 import OptionContainer from "./OptionContainer"
 
 class Item extends React.Component<any, any> {
+  private titleRef = createRef<HTMLInputElement>()
+
   constructor(props) {
     super(props)
     this.state = {
-      expanded: false,
+      expandedOptions: {},
     }
   }
 
   // DISSPLAYNG THE ESSAY: SHOULD BE MORE UNIFORM WITH THE OTHERS!
 
+  public expandOption = (order: number) => {
+    const newExpList: boolean[] = { ...this.state.expandedOptions }
+    newExpList[order] = !newExpList[order]
+    this.setState({
+      expandedOptions: newExpList,
+    })
+  }
+
+  public componentDidMount() {
+    if (this.props.newlyAdded) {
+      this.props.scrollToNew(this.titleRef.current)
+      this.props.expandItem(this.props.order)
+    }
+  }
+
   public shouldComponentUpdate(nextProps, nextState) {
-    if (nextState.expanded !== this.state.expanded) {
+    if (nextState.expandedOptions !== this.state.expandedOptions) {
       return true
     }
+    if (nextProps.expanded !== this.props.expanded) {
+      return true
+    }
+
     const modificationFields: string[] = [
       "title",
       "body",
@@ -69,6 +90,8 @@ class Item extends React.Component<any, any> {
       "failureMessage",
       "validityRegex",
       "formatRegex",
+      "newlyAdded",
+      "expanded",
     ]
 
     return modificationFields.some(
@@ -77,61 +100,70 @@ class Item extends React.Component<any, any> {
   }
 
   public render() {
-    // console.log("item")
-
     const renderOptions = type => {
       return ["multiple-choice", "checkbox", "research-agreement"].includes(
         type,
       )
     }
-
-    console.log("Props: ", this.props)
-
     return (
-      <Card style={{ marginBottom: 20 }}>
-        {!this.state.expanded ? (
-          <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
-            <Grid item={true} xs={11}>
-              <DragHandleWrapper>
-                <CardHeader
-                  title={
-                    this.props.title ||
-                    this.props.type[0].toUpperCase() + this.props.type.slice(1)
-                  }
-                  titleTypographyProps={{
-                    variant: "subtitle1",
-                    gutterBottom: false,
-                  }}
-                />
-              </DragHandleWrapper>
-            </Grid>
+      <Card
+        style={{
+          marginBottom: 20,
+          backgroundColor: this.props.expanded ? "#DDDDDD" : "inherit",
+        }}
+      >
+        <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
+          <Grid item={true} xs={11}>
+            <DragHandleWrapper>
+              <CardHeader
+                title={
+                  this.props.title
+                    ? this.props.title + " (" + this.props.type + ")"
+                    : this.props.type[0].toUpperCase() +
+                      this.props.type.slice(1)
+                }
+                titleTypographyProps={{
+                  variant: "title",
+                  gutterBottom: false,
+                }}
+              />
+            </DragHandleWrapper>
+          </Grid>
 
-            <Grid item={true} xs={1}>
-              <Grid container={true} justify="flex-end">
-                <Grid item={true}>
-                  <CardActions>
-                    <IconButton onClick={this.handleExpand}>
-                      <SvgIcon>
+          <Grid item={true} xs={1}>
+            <Grid container={true} justify="flex-end">
+              <Grid item={true}>
+                <CardActions>
+                  <IconButton onClick={this.toggleExpand}>
+                    <SvgIcon>
+                      {this.props.expanded ? (
+                        <path d="M9 6l-4.5 4.5 1.06 1.06L9 8.12l3.44 3.44 1.06-1.06z" />
+                      ) : (
                         <path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" />
-                      </SvgIcon>
-                    </IconButton>
-                  </CardActions>
-                </Grid>
+                      )}
+                    </SvgIcon>
+                  </IconButton>
+                </CardActions>
               </Grid>
             </Grid>
           </Grid>
-        ) : (
-          <p />
-        )}
+        </Grid>
 
-        <Collapse in={this.state.expanded}>
+        <Collapse in={this.props.expanded}>
           <CardContent>
             <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
               <Grid item={true} xs={12}>
                 <Card>
                   <CardHeader subheader="general" />
                   <CardContent>
+                    <Typography variant="subtitle1">
+                      Type: {this.props.type}
+                    </Typography>
+
                     <TextField
+                      inputProps={{
+                        ref: this.titleRef,
+                      }}
                       label="title"
                       value={this.props.title || undefined}
                       fullWidth={true}
@@ -143,6 +175,7 @@ class Item extends React.Component<any, any> {
                       multiline={true}
                       margin="normal"
                     />
+
                     <TextField
                       label="body"
                       value={this.props.body || undefined}
@@ -158,9 +191,9 @@ class Item extends React.Component<any, any> {
 
                     {this.props.type === "essay" && (
                       <Grid container={true} spacing={16}>
-                        <Grid item={true} xs={3}>
+                        <Grid item={true} xs={12}>
                           <TextField
-                            label="minimum number of words (optional)"
+                            label="min words (optional)"
                             value={this.props.minWords || undefined}
                             onChange={
                               executeIfOnlyDigitsInTextField(
@@ -178,9 +211,9 @@ class Item extends React.Component<any, any> {
                           />
                         </Grid>
 
-                        <Grid item={true} xs={3}>
+                        <Grid item={true} xs={12}>
                           <TextField
-                            label="maximum number of words (optional)"
+                            label="max words (optional)"
                             value={this.props.maxWords || undefined}
                             onChange={
                               executeIfOnlyDigitsInTextField(
@@ -280,7 +313,9 @@ class Item extends React.Component<any, any> {
                     <CardContent>
                       <OptionContainer
                         axis="xy"
-                        onSortEnd={this.props.handleSort}
+                        expandedOptions={this.state.expandedOptions}
+                        expansionChange={this.expandOption}
+                        onSortEnd={this.onOptionSortEnd}
                         index={this.props.index}
                         useDragHandle={true}
                         language={this.props.language}
@@ -293,22 +328,6 @@ class Item extends React.Component<any, any> {
               ) : (
                 <p />
               )}
-              <Grid item={true} xs={12}>
-                <Grid container={true} justify="flex-end">
-                  <Grid item={true}>
-                    <CardActions>
-                      <IconButton
-                        onClick={this.handleExpand}
-                        style={{ transform: "rotate(180deg)" }}
-                      >
-                        <SvgIcon>
-                          <path d="M12.44 6.44L9 9.88 5.56 6.44 4.5 7.5 9 12l4.5-4.5z" />
-                        </SvgIcon>
-                      </IconButton>
-                    </CardActions>
-                  </Grid>
-                </Grid>
-              </Grid>
             </Grid>
           </CardContent>
         </Collapse>
@@ -316,9 +335,23 @@ class Item extends React.Component<any, any> {
     )
   }
 
-  private handleExpand = event => {
-    this.setState({ expanded: !this.state.expanded })
+  private toggleExpand = event => {
+    this.props.expandItem(this.props.order)
+  }
+
+  private onOptionSortEnd = ({ oldIndex, newIndex, collection }) => {
+    const newExpList = { ...this.state.expandedOptions }
+    const temp = newExpList[oldIndex]
+    newExpList[oldIndex] = newExpList[newIndex]
+    newExpList[newIndex] = temp
+    this.setState({
+      expandedOptions: newExpList,
+    })
+    this.props.changeOrder(collection, oldIndex, newIndex)
   }
 }
 
-export default connect()(Item)
+export default connect(
+  null,
+  { changeOrder },
+)(Item)
