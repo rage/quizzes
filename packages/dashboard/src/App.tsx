@@ -9,6 +9,7 @@ import ListItem from "@material-ui/core/ListItem"
 import MenuItem from "@material-ui/core/MenuItem"
 import Paper from "@material-ui/core/Paper"
 import Select from "@material-ui/core/Select"
+import SvgIcon from "@material-ui/core/SvgIcon"
 import Table from "@material-ui/core/Table"
 import TableBody from "@material-ui/core/TableBody"
 import TableCell from "@material-ui/core/TableCell"
@@ -24,6 +25,7 @@ import {
   Link,
   Redirect,
   Route,
+  Switch,
 } from "react-router-dom"
 import TMCApi from "../../common/src/services/TMCApi"
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
@@ -49,14 +51,12 @@ class App extends React.Component<any, any> {
   }
 
   public currentCourseTitle: () => string | null = () => {
-    console.log("wtf")
     if (!this.props.filter.course) {
       return null
     }
     const currentCourse = this.props.courses.find(
       c => c.id === this.props.filter.course,
     )
-    console.log("CUrrent course:", currentCourse)
     if (!currentCourse) {
       return null
     }
@@ -172,15 +172,41 @@ class App extends React.Component<any, any> {
                 <div>
                   <AppBar>
                     <Toolbar>
-                      <Typography>
-                        {this.currentCourseTitle()}
-                        ->
-                        {this.currentQuizTitle()}
-                      </Typography>
-                      <Typography style={{ flex: 1 }} />
-                      <Button onClick={this.logout}>logout</Button>
+                      <Grid
+                        container={true}
+                        justify="space-between"
+                        alignItems="center"
+                        spacing={8}
+                      >
+                        <Grid item={true} xs={11} justify="flex-start">
+                          <Grid
+                            container={true}
+                            justify="flex-start"
+                            spacing={0}
+                          >
+                            <Switch>
+                              <Route
+                                exact={true}
+                                path="/"
+                                component={this.shortNavigationPath}
+                              />
+                              <Route
+                                exact={false}
+                                path="/"
+                                component={this.longNavigationPath}
+                              />
+                            </Switch>
+                          </Grid>
+                        </Grid>
+                        <Grid item={true} xs={1}>
+                          <Button color="inherit" onClick={this.logout}>
+                            logout
+                          </Button>
+                        </Grid>
+                      </Grid>
                     </Toolbar>
                   </AppBar>
+
                   <div style={{ height: 80 }} />
                 </div>
                 <Route exact={true} path="/" component={Dashboard} />
@@ -199,6 +225,59 @@ class App extends React.Component<any, any> {
       </div>
     )
   }
+
+  private longNavigationPath = () => (
+    <React.Fragment>
+      <Grid item={true} xs="auto" alignContent="center" justify="center">
+        <Link
+          to="/"
+          style={{
+            textDecoration: "none",
+          }}
+        >
+          <Typography
+            align="center"
+            style={{
+              color: "#FFFFFF",
+            }}
+            variant="subtitle1"
+          >
+            {this.currentCourseTitle()}
+          </Typography>
+        </Link>
+      </Grid>
+      <Grid item={true} xs="auto">
+        <SvgIcon>
+          <path d="M4,10V14H13L9.5,17.5L11.92,19.92L19.84,12L11.92,4.08L9.5,6.5L13,10H4Z" />
+        </SvgIcon>
+      </Grid>
+      <Grid item={true} xs="auto">
+        <Typography
+          align="center"
+          style={{
+            color: "#FFFFFF",
+          }}
+          variant="subtitle1"
+        >
+          {this.currentQuizTitle()}
+        </Typography>
+      </Grid>
+    </React.Fragment>
+  )
+
+  private shortNavigationPath = () => (
+    <Grid item={true} xs="auto" alignContent="center" justify="center">
+      <Typography
+        align="center"
+        style={{
+          color: "#FFFFFF",
+        }}
+        variant="subtitle1"
+      >
+        {this.currentCourseTitle()}
+      </Typography>
+    </Grid>
+  )
 
   private edit = ({ match }) => {
     if (this.props.quizzes.length === 0) {
