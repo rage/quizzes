@@ -132,10 +132,15 @@ class QuizForm extends React.Component<any, any> {
         )}
         <Toolbar>
           <Typography style={{ flex: 1 }} />
-          <Button onClick={this.props.save}>save</Button>
+          <Button onClick={this.handleSaving}>save</Button>
         </Toolbar>
       </div>
     )
+  }
+
+  private handleSaving = (event: any) => {
+    scrollTo(0, 0)
+    this.props.save(event)
   }
 
   private handleChange = path => event => {

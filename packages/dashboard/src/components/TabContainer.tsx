@@ -6,13 +6,14 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core"
-import React from "react"
+import { InputProps } from "@material-ui/core/Input"
+import React, { Component, createRef } from "react"
 import { connect } from "react-redux"
 import { addItem, addReview, changeOrder, remove } from "../store/edit/actions"
 import ItemContainer from "./ItemContainer"
 import PeerReviewCollectionContainer from "./PeerReviewCollectionContainer"
 
-class TabContainer extends React.Component<any, any> {
+class TabContainer extends Component<any, any> {
   private itemTypes = [
     "checkbox",
     "essay",
@@ -30,7 +31,67 @@ class TabContainer extends React.Component<any, any> {
     this.state = {
       menuOpen: false,
       menuAnchor: null,
+      scrollTo: null,
+      justAdded: false,
+      expandedItems: {},
     }
+  }
+
+  public scrollToNewItem = (itemComponent: HTMLInputElement) => {
+    if (!itemComponent) {
+      return
+    }
+    this.setState({
+      scrollTo: itemComponent,
+    })
+  }
+
+  public componentDidUpdate() {
+    if (this.state.scrollTo) {
+      this.state.scrollTo.select()
+      this.setState({ scrollTo: null })
+    }
+  }
+
+  public shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.scrollTo) {
+      return true
+    }
+
+    if (
+      JSON.stringify(this.state.expandedItems) !==
+      JSON.stringify(nextState.expandedItems)
+    ) {
+      return true
+    }
+
+    if (
+      this.state.menuOpen !== nextState.menuOpen ||
+      (this.state.menuAnchor && nextState.menuAnchor)
+    ) {
+      return true
+    }
+
+    return this.props !== nextProps
+  }
+
+  public newest() {
+    if (!this.state.justAdded) {
+      return undefined
+    }
+    const copy = JSON.parse(JSON.stringify(this.props.items))
+    copy.sort((i1, i2) => i2.order - i1.order)
+    // this.setState({ justAdded: false })
+    return copy.find(i => !i.id)
+  }
+
+  public expandItem = (index: number) => {
+    if (typeof index !== "number") {
+      return
+    }
+    const newExp = { ...this.state.expandedItems }
+    newExp[index] = newExp[index] ? !newExp[index] : true
+    this.setState({ expandedItems: newExp })
   }
 
   public render() {
@@ -76,17 +137,22 @@ class TabContainer extends React.Component<any, any> {
         </div>
         <div style={{ marginTop: 50 }}>
           <Paper style={{ padding: 30, marginBottom: 20 }}>
-            <Typography variant="subtitle1" style={{ marginBottom: 10 }}>
+            <Typography variant="title" style={{ marginBottom: 10 }}>
               Items / Question types:
             </Typography>
             <ItemContainer
+              expandItem={this.expandItem}
+              newest={this.newest()}
               onSortEnd={this.onSortEnd}
               items={this.props.items}
               handleChange={this.props.handleChange}
               useDragHandle={true}
               handleSort={this.onSortEnd}
               remove={this.remove}
+              scrollToNew={this.scrollToNewItem}
+              expandedItems={this.state.expandedItems}
             />
+
             <Button id="item" onClick={this.handleMenu}>
               Add item
             </Button>
@@ -104,7 +170,7 @@ class TabContainer extends React.Component<any, any> {
           </Paper>
           {this.props.items.find(item => item.type === "essay") ? (
             <Paper style={{ padding: 30 }}>
-              <Typography variant="subtitle1" style={{ marginBottom: 10 }}>
+              <Typography variant="title" style={{ marginBottom: 10 }}>
                 Peer reviews:
               </Typography>
               <PeerReviewCollectionContainer
@@ -129,6 +195,7 @@ class TabContainer extends React.Component<any, any> {
   private addItem = type => event => {
     this.setState({
       menuOpen: null,
+      justAdded: true,
     })
     this.props.addItem(type)
   }
@@ -152,7 +219,21 @@ class TabContainer extends React.Component<any, any> {
   }
 
   private onSortEnd = ({ oldIndex, newIndex, collection }) => {
+    if (collection === "items") {
+      const newExp = { ...this.state.expandedItems }
+      const temp: boolean = newExp[oldIndex]
+      newExp[oldIndex] = newExp[newIndex]
+      newExp[newIndex] = temp
+      this.setState({ expandedItems: newExp })
+    }
+
     this.props.changeOrder(collection, oldIndex, newIndex)
+  }
+}
+
+const mapStateToProps = (state: any) => {
+  return {
+    storeItems: state.edit.items,
   }
 }
 
@@ -164,6 +245,6 @@ const mapDispatchToProps = {
 }
 
 export default connect(
-  null,
+  mapStateToProps,
   mapDispatchToProps,
 )(TabContainer)

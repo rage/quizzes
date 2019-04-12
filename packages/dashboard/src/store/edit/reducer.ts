@@ -1,3 +1,4 @@
+import { bool, string } from "prop-types"
 import { getType } from "typesafe-actions"
 import {
   INewQuizQuery,
