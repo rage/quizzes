@@ -85,14 +85,20 @@ class App extends React.Component<any, any> {
       )
     }
 
-    const Dashboard = ({ match }) => {
+    const Dashboard = ({ match, history }) => {
       if (
         match.params.id &&
         (!this.props.filter.course ||
           this.props.filter.course !== match.params.id)
       ) {
         this.props.setCourse(match.params.id)
-        return <div />
+      }
+
+      const handleSelect = event => {
+        const courseId = event.target.value
+        if (history.location.pathname !== "/courses/" + courseId) {
+          history.push("/courses/" + courseId)
+        }
       }
 
       return (
@@ -101,7 +107,7 @@ class App extends React.Component<any, any> {
             <Toolbar style={{ marginBottom: 20 }}>
               <Select
                 value={this.props.filter.course || ""}
-                onChange={this.handleSelect}
+                onChange={handleSelect}
                 style={{ minWidth: 350 }}
               >
                 {this.props.courses.map(course => (
@@ -196,10 +202,6 @@ class App extends React.Component<any, any> {
       return <p />
     }
     return <QuizForm />
-  }
-
-  private handleSelect = event => {
-    this.props.setCourse(event.target.value)
   }
 
   private handleSubmit = async (event: any) => {

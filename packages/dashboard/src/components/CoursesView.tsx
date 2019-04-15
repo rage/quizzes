@@ -64,7 +64,15 @@ class CoursesView extends React.Component<any, any> {
               justify="flex-start"
             >
               {this.props.courses.map(course => (
-                <Grid item={true} xs={12} sm={6} md={4} lg={4} xl={3}>
+                <Grid
+                  key={course.id}
+                  item={true}
+                  xs={12}
+                  sm={6}
+                  md={4}
+                  lg={4}
+                  xl={3}
+                >
                   <CourseCard key={course.id} course={course} />
                 </Grid>
               ))}
