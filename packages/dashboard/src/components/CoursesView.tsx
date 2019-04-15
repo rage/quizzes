@@ -11,7 +11,7 @@ import { clear, setCourse } from "../store/filter/actions"
 
 const CourseCard = ({ course }) => {
   return (
-    <Card>
+    <Card style={{ maxWidth: "30em" }}>
       <Link to={`/courses/${course.id}`}>
         <CardHeader title={course.texts[0].title} />
       </Link>
@@ -39,21 +39,37 @@ class CoursesView extends React.Component<any, any> {
   public render() {
     return (
       <React.Fragment>
-        <Typography variant="title" style={{ marginBottom: 10 }}>
-          All courses
-        </Typography>
-
-        <Grid
-          container={true}
-          spacing={24}
-          alignItems="center"
-          justify="center"
-        >
-          {this.props.courses.map(course => (
-            <Grid item={true} xs={12} sm={6} md={6} lg={4} xl={3}>
-              <CourseCard key={course.id} course={course} />
+        <Grid container={true} justify="center">
+          <Grid item={true} xs={12} md={10} lg={8}>
+            <Paper elevation={4} style={{ marginBottom: "2em" }}>
+              <Typography
+                color="primary"
+                variant="headline"
+                style={{
+                  padding: "1em 0 1em 0",
+                  textAlign: "center",
+                  flexFlow: "row",
+                  backgroundColor: "#EEEEEE",
+                }}
+              >
+                All courses
+              </Typography>
+            </Paper>
+          </Grid>
+          <Grid item={true} xs={12} lg={10}>
+            <Grid
+              container={true}
+              spacing={32}
+              alignItems="center"
+              justify="flex-start"
+            >
+              {this.props.courses.map(course => (
+                <Grid item={true} xs={12} sm={6} md={4} lg={4} xl={3}>
+                  <CourseCard key={course.id} course={course} />
+                </Grid>
+              ))}
             </Grid>
-          ))}
+          </Grid>
         </Grid>
       </React.Fragment>
     )
