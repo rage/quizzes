@@ -18,6 +18,8 @@ import TableRow from "@material-ui/core/TableRow"
 import TextField from "@material-ui/core/TextField"
 import Toolbar from "@material-ui/core/Toolbar"
 import Typography from "@material-ui/core/Typography"
+import NavigateNextIcon from "@material-ui/icons/NavigateNext"
+import Breadcrumbs from "@material-ui/lab/Breadcrumbs"
 import * as React from "react"
 import { connect } from "react-redux"
 import {
@@ -188,12 +190,12 @@ class App extends React.Component<any, any> {
                               <Route
                                 exact={true}
                                 path="/"
-                                component={this.shortNavigationPath}
+                                component={this.shortBreadcrumbs}
                               />
                               <Route
                                 exact={false}
                                 path="/"
-                                component={this.longNavigationPath}
+                                component={this.longBreadcrumbs}
                               />
                             </Switch>
                           </Grid>
@@ -226,47 +228,35 @@ class App extends React.Component<any, any> {
     )
   }
 
-  private longNavigationPath = () => (
-    <React.Fragment>
-      <Grid item={true} xs="auto" alignContent="center" justify="center">
-        <Link
-          to="/"
-          style={{
-            textDecoration: "none",
-          }}
-        >
-          <Typography
-            align="center"
-            style={{
-              color: "#FFFFFF",
-            }}
-            variant="subtitle1"
-          >
-            {this.currentCourseTitle()}
-          </Typography>
-        </Link>
-      </Grid>
-      <Grid item={true} xs="auto">
-        <SvgIcon>
-          <path d="M4,10V14H13L9.5,17.5L11.92,19.92L19.84,12L11.92,4.08L9.5,6.5L13,10H4Z" />
-        </SvgIcon>
-      </Grid>
-      <Grid item={true} xs="auto">
+  private longBreadcrumbs = () => (
+    <Breadcrumbs separator={<NavigateNextIcon />} arial-label="Breadcrumb">
+      <Link
+        to="/"
+        style={{
+          textDecoration: "none",
+        }}
+      >
         <Typography
           align="center"
-          style={{
-            color: "#FFFFFF",
-          }}
+          style={{ color: "#FFFFFF" }}
           variant="subtitle1"
         >
-          {this.currentQuizTitle()}
+          {this.currentCourseTitle()}
         </Typography>
-      </Grid>
-    </React.Fragment>
+      </Link>
+
+      <Typography
+        align="center"
+        style={{ color: "#FFFFFF" }}
+        variant="subtitle1"
+      >
+        {this.currentQuizTitle()}
+      </Typography>
+    </Breadcrumbs>
   )
 
-  private shortNavigationPath = () => (
-    <Grid item={true} xs="auto" alignContent="center" justify="center">
+  private shortBreadcrumbs = () => (
+    <Breadcrumbs>
       <Typography
         align="center"
         style={{
@@ -276,7 +266,7 @@ class App extends React.Component<any, any> {
       >
         {this.currentCourseTitle()}
       </Typography>
-    </Grid>
+    </Breadcrumbs>
   )
 
   private edit = ({ match }) => {

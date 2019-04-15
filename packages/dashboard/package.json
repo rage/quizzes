@@ -5,6 +5,8 @@
   "proxy": "http://localhost:3000",
   "dependencies": {
     "@material-ui/core": "^3.4.0",
+    "@material-ui/icons": "^3.0.2",
+    "@material-ui/lab": "^3.0.0-alpha.30",
     "@quizzes/common": "0.0.1",
     "@types/app-root-path": "^1.2.4",
     "antd": "^3.10.0",
