@@ -27,6 +27,7 @@ import {
 } from "react-router-dom"
 import TMCApi from "../../common/src/services/TMCApi"
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
+import CoursesView from "./components/CoursesView"
 import QuizForm from "./components/QuizForm"
 import SuccessNotification from "./components/SuccessNotification"
 import { setCourses } from "./store/courses/actions"
@@ -84,7 +85,16 @@ class App extends React.Component<any, any> {
       )
     }
 
-    const Dashboard = () => {
+    const Dashboard = ({ match }) => {
+      if (
+        match.params.id &&
+        (!this.props.filter.course ||
+          this.props.filter.course !== match.params.id)
+      ) {
+        this.props.setCourse(match.params.id)
+        return <div />
+      }
+
       return (
         <div>
           <div>
@@ -152,15 +162,19 @@ class App extends React.Component<any, any> {
                   </AppBar>
                   <div style={{ height: 80 }} />
                 </div>
-                <Route exact={true} path="/" component={Dashboard} />
+                <Route exact={true} path="/" component={CoursesView} />
                 <Route exact={true} path="/quizzes/:id" component={this.edit} />
                 <Route exact={true} path="/new" component={this.create} />
+                <Route exact={true} path="/courses" component={CoursesView} />
+                <Route exact={true} path="/courses/:id" component={Dashboard} />
               </div>
             ) : (
               <div>
                 <Route exact={true} path="/" component={Login} />
                 <Route exact={true} path="/quizzes/:id" component={Login} />
                 <Route exact={true} path="/new" component={Login} />
+                <Route exact={true} path="/courses" component={Login} />
+                <Route exact={true} path="/courses/:id" component={Login} />
               </div>
             )}
           </React.Fragment>
