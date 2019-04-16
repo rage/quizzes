@@ -31,6 +31,7 @@ import {
 } from "react-router-dom"
 import TMCApi from "../../common/src/services/TMCApi"
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
+import CoursesView from "./components/CoursesView"
 import QuizForm from "./components/QuizForm"
 import SuccessNotification from "./components/SuccessNotification"
 import { setCourses } from "./store/courses/actions"
@@ -112,14 +113,29 @@ class App extends React.Component<any, any> {
       )
     }
 
-    const Dashboard = () => {
+    const Dashboard = ({ match, history }) => {
+      if (
+        match.params.id &&
+        (!this.props.filter.course ||
+          this.props.filter.course !== match.params.id)
+      ) {
+        this.props.setCourse(match.params.id)
+      }
+
+      const handleSelect = event => {
+        const courseId = event.target.value
+        if (history.location.pathname !== "/courses/" + courseId) {
+          history.push("/courses/" + courseId)
+        }
+      }
+
       return (
         <div>
           <div>
             <Toolbar style={{ marginBottom: 20 }}>
               <Select
                 value={this.props.filter.course || ""}
-                onChange={this.handleSelect}
+                onChange={handleSelect}
                 style={{ minWidth: 350 }}
               >
                 {this.props.courses.map(course => (
@@ -211,15 +227,19 @@ class App extends React.Component<any, any> {
 
                   <div style={{ height: 80 }} />
                 </div>
-                <Route exact={true} path="/" component={Dashboard} />
+                <Route exact={true} path="/" component={CoursesView} />
                 <Route exact={true} path="/quizzes/:id" component={this.edit} />
                 <Route exact={true} path="/new" component={this.create} />
+                <Route exact={true} path="/courses" component={CoursesView} />
+                <Route exact={true} path="/courses/:id" component={Dashboard} />
               </div>
             ) : (
               <div>
                 <Route exact={true} path="/" component={Login} />
                 <Route exact={true} path="/quizzes/:id" component={Login} />
                 <Route exact={true} path="/new" component={Login} />
+                <Route exact={true} path="/courses" component={Login} />
+                <Route exact={true} path="/courses/:id" component={Login} />
               </div>
             )}
           </React.Fragment>
@@ -282,10 +302,6 @@ class App extends React.Component<any, any> {
       return <p />
     }
     return <QuizForm />
-  }
-
-  private handleSelect = event => {
-    this.props.setCourse(event.target.value)
   }
 
   private handleSubmit = async (event: any) => {
