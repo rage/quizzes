@@ -53,21 +53,11 @@ class App extends React.Component<any, any> {
     }
   }
 
-  public currentCourseTitle: () => string | null = () => {
+  public currentCourse = () => {
     if (!this.props.filter.course) {
       return null
     }
-    const currentCourse = this.props.courses.find(
-      c => c.id === this.props.filter.course,
-    )
-    if (!currentCourse) {
-      return null
-    }
-
-    if (!currentCourse.texts[0]) {
-      return null
-    }
-    return currentCourse.texts[0].title
+    return this.props.courses.find(c => c.id === this.props.filter.course)
   }
 
   public currentQuizTitle: () => string | null = () => {
@@ -196,24 +186,17 @@ class App extends React.Component<any, any> {
                         alignItems="center"
                         spacing={8}
                       >
-                        <Grid item={true} xs={11} justify="flex-start">
+                        <Grid item={true} xs={11}>
                           <Grid
                             container={true}
                             justify="flex-start"
                             spacing={0}
                           >
-                            <Switch>
-                              <Route
-                                exact={true}
-                                path="/"
-                                component={this.shortBreadcrumbs}
-                              />
-                              <Route
-                                exact={false}
-                                path="/"
-                                component={this.longBreadcrumbs}
-                              />
-                            </Switch>
+                            <Route
+                              exact={false}
+                              path="/"
+                              component={this.PathBreadcrumbs}
+                            />
                           </Grid>
                         </Grid>
                         <Grid item={true} xs={1}>
@@ -248,46 +231,55 @@ class App extends React.Component<any, any> {
     )
   }
 
-  private longBreadcrumbs = () => (
-    <Breadcrumbs separator={<NavigateNextIcon />} arial-label="Breadcrumb">
-      <Link
-        to="/"
-        style={{
-          textDecoration: "none",
-        }}
-      >
+  private PathBreadcrumbs = ({ history }) => {
+    const Crumbify = (path: string | null, label: string | null) => () =>
+      path ? (
+        <Link
+          to={path}
+          style={{
+            textDecoration: "none",
+          }}
+        >
+          <Typography
+            align="center"
+            style={{ color: "#FFFFFF" }}
+            variant="subtitle1"
+          >
+            {label}
+          </Typography>
+        </Link>
+      ) : (
         <Typography
           align="center"
           style={{ color: "#FFFFFF" }}
           variant="subtitle1"
         >
-          {this.currentCourseTitle()}
+          {label}
         </Typography>
-      </Link>
+      )
 
-      <Typography
-        align="center"
-        style={{ color: "#FFFFFF" }}
-        variant="subtitle1"
-      >
-        {this.currentQuizTitle()}
-      </Typography>
-    </Breadcrumbs>
-  )
+    const cCourse = this.currentCourse()
+    const onQuizPage = history.location.pathname.includes("/quizzes/")
+    const onRootPage =
+      history.location.pathname === "/" ||
+      history.location.pathname === "/courses"
 
-  private shortBreadcrumbs = () => (
-    <Breadcrumbs>
-      <Typography
-        align="center"
-        style={{
-          color: "#FFFFFF",
-        }}
-        variant="subtitle1"
-      >
-        {this.currentCourseTitle()}
-      </Typography>
-    </Breadcrumbs>
-  )
+    return (
+      <Breadcrumbs separator={<NavigateNextIcon />} arial-label="Breadcrumb">
+        {Crumbify("/", "Home")()}
+
+        {!onRootPage &&
+          cCourse &&
+          cCourse.texts[0] &&
+          Crumbify(
+            onQuizPage ? `/courses/${this.props.filter.course}` : null,
+            `${cCourse.texts[0].title}`,
+          )()}
+
+        {onQuizPage && Crumbify(null, this.currentQuizTitle())()}
+      </Breadcrumbs>
+    )
+  }
 
   private edit = ({ match }) => {
     if (this.props.quizzes.length === 0) {
