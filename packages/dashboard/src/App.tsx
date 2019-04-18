@@ -9,6 +9,7 @@ import ListItem from "@material-ui/core/ListItem"
 import MenuItem from "@material-ui/core/MenuItem"
 import Paper from "@material-ui/core/Paper"
 import Select from "@material-ui/core/Select"
+import SvgIcon from "@material-ui/core/SvgIcon"
 import Table from "@material-ui/core/Table"
 import TableBody from "@material-ui/core/TableBody"
 import TableCell from "@material-ui/core/TableCell"
@@ -17,6 +18,8 @@ import TableRow from "@material-ui/core/TableRow"
 import TextField from "@material-ui/core/TextField"
 import Toolbar from "@material-ui/core/Toolbar"
 import Typography from "@material-ui/core/Typography"
+import NavigateNextIcon from "@material-ui/icons/NavigateNext"
+import Breadcrumbs from "@material-ui/lab/Breadcrumbs"
 import * as React from "react"
 import { connect } from "react-redux"
 import {
@@ -24,9 +27,11 @@ import {
   Link,
   Redirect,
   Route,
+  Switch,
 } from "react-router-dom"
 import TMCApi from "../../common/src/services/TMCApi"
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
+import CoursesView from "./components/CoursesView"
 import QuizForm from "./components/QuizForm"
 import SuccessNotification from "./components/SuccessNotification"
 import { setCourses } from "./store/courses/actions"
@@ -46,6 +51,20 @@ class App extends React.Component<any, any> {
         this.props.setCourses()
       }
     }
+  }
+
+  public currentCourse = () => {
+    if (!this.props.filter.course) {
+      return null
+    }
+    return this.props.courses.find(c => c.id === this.props.filter.course)
+  }
+
+  public currentQuizTitle: () => string | null = () => {
+    if (!this.props.edit || !this.props.edit.texts[0]) {
+      return null
+    }
+    return this.props.edit.texts[0].title
   }
 
   public render() {
@@ -84,14 +103,29 @@ class App extends React.Component<any, any> {
       )
     }
 
-    const Dashboard = () => {
+    const Dashboard = ({ match, history }) => {
+      if (
+        match.params.id &&
+        (!this.props.filter.course ||
+          this.props.filter.course !== match.params.id)
+      ) {
+        this.props.setCourse(match.params.id)
+      }
+
+      const handleSelect = event => {
+        const courseId = event.target.value
+        if (history.location.pathname !== "/courses/" + courseId) {
+          history.push("/courses/" + courseId)
+        }
+      }
+
       return (
         <div>
           <div>
             <Toolbar style={{ marginBottom: 20 }}>
               <Select
                 value={this.props.filter.course || ""}
-                onChange={this.handleSelect}
+                onChange={handleSelect}
                 style={{ minWidth: 350 }}
               >
                 {this.props.courses.map(course => (
@@ -146,26 +180,104 @@ class App extends React.Component<any, any> {
                 <div>
                   <AppBar>
                     <Toolbar>
-                      <Typography style={{ flex: 1 }} />
-                      <Button onClick={this.logout}>logout</Button>
+                      <Grid
+                        container={true}
+                        justify="space-between"
+                        alignItems="center"
+                        spacing={8}
+                      >
+                        <Grid item={true} xs={11}>
+                          <Grid
+                            container={true}
+                            justify="flex-start"
+                            spacing={0}
+                          >
+                            <Route
+                              exact={false}
+                              path="/"
+                              component={this.PathBreadcrumbs}
+                            />
+                          </Grid>
+                        </Grid>
+                        <Grid item={true} xs={1}>
+                          <Button color="inherit" onClick={this.logout}>
+                            logout
+                          </Button>
+                        </Grid>
+                      </Grid>
                     </Toolbar>
                   </AppBar>
+
                   <div style={{ height: 80 }} />
                 </div>
-                <Route exact={true} path="/" component={Dashboard} />
+                <Route exact={true} path="/" component={CoursesView} />
                 <Route exact={true} path="/quizzes/:id" component={this.edit} />
                 <Route exact={true} path="/new" component={this.create} />
+                <Route exact={true} path="/courses" component={CoursesView} />
+                <Route exact={true} path="/courses/:id" component={Dashboard} />
               </div>
             ) : (
               <div>
                 <Route exact={true} path="/" component={Login} />
                 <Route exact={true} path="/quizzes/:id" component={Login} />
                 <Route exact={true} path="/new" component={Login} />
+                <Route exact={true} path="/courses" component={Login} />
+                <Route exact={true} path="/courses/:id" component={Login} />
               </div>
             )}
           </React.Fragment>
         </Router>
       </div>
+    )
+  }
+
+  private PathBreadcrumbs = ({ history }) => {
+    const Crumbify = (path: string | null, label: string | null) => () =>
+      path ? (
+        <Link
+          to={path}
+          style={{
+            textDecoration: "none",
+          }}
+        >
+          <Typography
+            align="center"
+            style={{ color: "#FFFFFF" }}
+            variant="subtitle1"
+          >
+            {label}
+          </Typography>
+        </Link>
+      ) : (
+        <Typography
+          align="center"
+          style={{ color: "#FFFFFF" }}
+          variant="subtitle1"
+        >
+          {label}
+        </Typography>
+      )
+
+    const cCourse = this.currentCourse()
+    const onQuizPage = history.location.pathname.includes("/quizzes/")
+    const onRootPage =
+      history.location.pathname === "/" ||
+      history.location.pathname === "/courses"
+
+    return (
+      <Breadcrumbs separator={<NavigateNextIcon />} arial-label="Breadcrumb">
+        {Crumbify("/", "Home")()}
+
+        {!onRootPage &&
+          cCourse &&
+          cCourse.texts[0] &&
+          Crumbify(
+            onQuizPage ? `/courses/${this.props.filter.course}` : null,
+            `${cCourse.texts[0].title}`,
+          )()}
+
+        {onQuizPage && Crumbify(null, this.currentQuizTitle())()}
+      </Breadcrumbs>
     )
   }
 
@@ -182,10 +294,6 @@ class App extends React.Component<any, any> {
       return <p />
     }
     return <QuizForm />
-  }
-
-  private handleSelect = event => {
-    this.props.setCourse(event.target.value)
   }
 
   private handleSubmit = async (event: any) => {
@@ -231,6 +339,8 @@ interface IDispatchProps {
 
 interface IStateProps {
   courses: any
+  edit: any
+  filter: any
   quizzes: any[]
   user: ITMCProfile
 }
@@ -238,6 +348,7 @@ interface IStateProps {
 const mapStateToProps = (state: any) => {
   return {
     courses: state.courses,
+    edit: state.edit,
     filter: state.filter,
     quizzes: state.quizzes,
     user: state.user,
