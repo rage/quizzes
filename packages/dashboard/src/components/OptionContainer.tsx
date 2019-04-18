@@ -34,6 +34,7 @@ import {
   SortableHandle,
 } from "react-sortable-hoc"
 import {
+  addFinishedOption,
   addItem,
   addOption,
   changeAttr,
@@ -43,10 +44,15 @@ import {
   setEdit,
 } from "../store/edit/actions"
 import Option from "./Option"
+import OptionDialog from "./OptionDialog"
 
 const OptionContainer = SortableContainer((props: any) => {
   const newOption = item => event => {
     props.addOption(item)
+  }
+
+  const handleSubmission = item => optionData => event => {
+    props.addFinishedOption(item, optionData)
   }
 
   const options = props.edit.items[props.index].options
@@ -79,9 +85,14 @@ const OptionContainer = SortableContainer((props: any) => {
         })}
       <Grid item={true} xs={3}>
         <Paper style={{ padding: 5, marginBottom: 5 }}>
-          <Button onClick={newOption(props.index)} fullWidth={true}>
-            add
-          </Button>
+          {
+            <OptionDialog onSubmit={handleSubmission(props.index)} />
+            /*
+                    <Button onClick={newOption(props.index)} fullWidth={true}>
+                    add
+                  </Button>
+          */
+          }
         </Paper>
       </Grid>
     </Grid>
@@ -96,6 +107,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = {
   addOption,
+  addFinishedOption,
 }
 
 export default connect(

@@ -134,6 +134,31 @@ export const addOption = item => {
   }
 }
 
+export const addFinishedOption = (item, optionData) => {
+  return (dispatch, getState) => {
+    const quiz = JSON.parse(JSON.stringify(getState().edit))
+    const option = {
+      order: quiz.items[item].options.length,
+      correct: optionData.correct,
+      texts: [],
+    }
+    if (quiz.items[item].id) {
+      _.set(option, "quizItemId", quiz.items[item].id)
+    }
+    quiz.items[item].options.push(option)
+    dispatch(setEdit(quiz))
+    const updatedQuiz = JSON.parse(JSON.stringify(getState().edit))
+    const idx = quiz.items[item].options.length - 1
+    updatedQuiz.items[item].options[idx].texts[0].title = optionData.title
+    updatedQuiz.items[item].options[idx].texts[0].failureMessage =
+      optionData.failureMessage
+    updatedQuiz.items[item].options[idx].texts[0].successMessage =
+      optionData.successMessage
+    updatedQuiz.items[item].options[idx].correct = optionData.correct
+    dispatch(setEdit(updatedQuiz))
+  }
+}
+
 export const addReview = () => {
   return (dispatch, getState) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))

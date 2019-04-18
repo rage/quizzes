@@ -306,7 +306,8 @@ class Item extends React.Component<any, any> {
                   </CardContent>
                 </Card>
               </Grid>
-              {renderOptions(this.props.type) ? (
+
+              {renderOptions(this.props.type) && (
                 <Grid item={true} xs={12}>
                   <Card>
                     <CardHeader subheader="Options / Answer alternatives" />
@@ -325,8 +326,6 @@ class Item extends React.Component<any, any> {
                     </CardContent>
                   </Card>
                 </Grid>
-              ) : (
-                <p />
               )}
             </Grid>
           </CardContent>
