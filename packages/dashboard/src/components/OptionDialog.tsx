@@ -31,6 +31,7 @@ export default class OptionDialog extends React.Component<any, any> {
         <Button onClick={this.handleClickOpen}>add option</Button>
         <Dialog
           fullWidth={true}
+          maxWidth="md"
           open={this.state.open}
           onClose={this.handleClose}
           aria-labelledby="option-dialog-title"
@@ -42,12 +43,14 @@ export default class OptionDialog extends React.Component<any, any> {
             <FormGroup>
               <Grid
                 container={true}
-                spacing={8}
-                direction="column"
-                justify="space-evenly"
-                alignItems="stretch"
+                spacing={0}
+                justify="flex-start"
+                alignItems="center"
               >
-                <Grid item={true} xs={12} alignContent="stretch">
+                <Grid item={true} xs={1}>
+                  Text
+                </Grid>
+                <Grid item={true} xs={11} alignContent="stretch">
                   <TextField
                     autoFocus={true}
                     fullWidth={true}
@@ -57,33 +60,38 @@ export default class OptionDialog extends React.Component<any, any> {
                     onChange={this.handleTextFieldChange("title")}
                   />
                 </Grid>
-                <Grid item={true} xs={12}>
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        color="primary"
-                        checked={this.state.correctChecked}
-                        onChange={this.handleCheckingChange}
-                        value="true"
-                      />
-                    }
-                    label="Correct?"
-                    labelPlacement="start"
+                <Grid item={true} xs={1} alignContent="flex-end">
+                  Correct?
+                </Grid>
+                <Grid item={true} xs={11}>
+                  <Checkbox
+                    color="primary"
+                    checked={this.state.correctChecked}
+                    onChange={this.handleCheckingChange}
+                    value="true"
                   />
                 </Grid>
 
-                <Grid item={true} xs={12}>
+                <Grid item={true} xs={2} alignContent="flex-end">
+                  failure message
+                </Grid>
+                <Grid item={true} xs={10}>
                   <TextField
                     fullWidth={true}
                     placeholder="failure message"
+                    multiline={true}
                     value={this.state.optionData.failureMessage}
                     onChange={this.handleTextFieldChange("failureMessage")}
                   />
                 </Grid>
-                <Grid item={true} xs={12}>
+                <Grid item={true} xs={2} alignContent="flex-end">
+                  success message
+                </Grid>
+                <Grid item={true} xs={10}>
                   <TextField
                     fullWidth={true}
                     placeholder="success message"
+                    multiline={true}
                     value={this.state.optionData.successMessage}
                     onChange={this.handleTextFieldChange("successMessage")}
                   />
