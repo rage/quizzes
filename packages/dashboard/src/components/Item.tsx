@@ -44,6 +44,7 @@ import {
   setEdit,
 } from "../store/edit/actions"
 import DragHandleWrapper from "./DragHandleWrapper"
+import MultipleChoiceItem from "./MultipleChoiceItem"
 import OptionContainer from "./OptionContainer"
 
 class Item extends React.Component<any, any> {
@@ -105,6 +106,10 @@ class Item extends React.Component<any, any> {
         type,
       )
     }
+    if (this.props.type === "multiple-choice") {
+      return <MultipleChoiceItem {...this.props} />
+    }
+
     return (
       <Card
         style={{
