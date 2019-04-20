@@ -106,6 +106,7 @@ class Item extends React.Component<any, any> {
         type,
       )
     }
+
     if (this.props.type === "multiple-choice") {
       return <MultipleChoiceItem {...this.props} />
     }

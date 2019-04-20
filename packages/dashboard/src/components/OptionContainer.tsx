@@ -46,58 +46,69 @@ import {
 import Option from "./Option"
 import OptionDialog from "./OptionDialog"
 
-const OptionContainer = SortableContainer((props: any) => {
-  const newOption = item => event => {
-    props.addOption(item)
+class Options extends React.Component<any, any> {
+  constructor(props: any) {
+    super(props)
+    this.state = {
+      open: false,
+    }
   }
 
-  const handleSubmission = item => optionData => event => {
-    props.addFinishedOption(item, optionData)
-  }
-
-  const options = props.edit.items[props.index].options
-  return (
-    <Grid container={true} spacing={16}>
-      {options
-        .sort((o1, o2) => o1.order - o2.order)
-        .map((option, index) => {
-          const text = option.texts.find(t => t.languageId === props.language)
-          return (
-            <Option
-              handleChange={props.handleChange}
-              key={option.id || props.index + index}
-              index={index}
-              collection={`items[${props.index}].options`}
-              itemIndex={props.index}
-              textIndex={option.texts.findIndex(
-                t => t.languageId === props.language,
-              )}
-              correct={option.correct}
-              title={text.title}
-              body={text.body}
-              successMessage={text.successMessage}
-              failureMessage={text.failureMessage}
-              remove={props.remove}
-              expanded={props.expandedOptions[index]}
-              expansionChange={props.expansionChange}
+  public render() {
+    const options = this.props.edit.items[this.props.index].options
+    return (
+      <Grid container={true} spacing={16}>
+        {options
+          .sort((o1, o2) => o1.order - o2.order)
+          .map((option, index) => {
+            const text = option.texts.find(
+              t => t.languageId === this.props.language,
+            )
+            return (
+              <Option
+                handleChange={this.props.handleChange}
+                key={option.id || this.props.index + index}
+                index={index}
+                collection={`items[${this.props.index}].options`}
+                itemIndex={this.props.index}
+                textIndex={option.texts.findIndex(
+                  t => t.languageId === this.props.language,
+                )}
+                correct={option.correct}
+                title={text.title}
+                body={text.body}
+                successMessage={text.successMessage}
+                failureMessage={text.failureMessage}
+                remove={this.props.remove}
+                expanded={this.props.expandedOptions[index]}
+                expansionChange={this.props.expansionChange}
+              />
+            )
+          })}
+        <Grid item={true} xs={3}>
+          <Paper style={{ padding: 5, marginBottom: 5 }}>
+            <Button onClick={this.setOpen(true)}>add option</Button>
+            <OptionDialog
+              onSubmit={this.handleSubmission(this.props.index)}
+              isOpen={this.state.open}
+              onClose={this.setOpen(false)}
             />
-          )
-        })}
-      <Grid item={true} xs={3}>
-        <Paper style={{ padding: 5, marginBottom: 5 }}>
-          {
-            <OptionDialog onSubmit={handleSubmission(props.index)} />
-            /*
-                    <Button onClick={newOption(props.index)} fullWidth={true}>
-                    add
-                  </Button>
-          */
-          }
-        </Paper>
+          </Paper>
+        </Grid>
       </Grid>
-    </Grid>
-  )
-})
+    )
+  }
+
+  private handleSubmission = item => optionData => event => {
+    this.props.addFinishedOption(item, optionData)
+  }
+
+  private setOpen = (newValue: boolean) => () => {
+    this.setState({ open: newValue })
+  }
+}
+
+const OptionContainer = SortableContainer(Options)
 
 const mapStateToProps = state => {
   return {
