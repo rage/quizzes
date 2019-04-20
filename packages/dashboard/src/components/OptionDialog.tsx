@@ -24,6 +24,24 @@ export default class OptionDialog extends React.Component<any, any> {
     }
   }
 
+  public componentDidUpdate() {
+    if (
+      this.props.existingOptData &&
+      (!this.state.optionData ||
+        this.state.optionData.title !== this.props.existingOptData.title)
+    ) {
+      const initial = { correctChecked: false, optionData: {} }
+      initial.correctChecked = this.props.existingOptData.correct
+      initial.optionData = {
+        title: this.props.existingOptData.title,
+        successMessage: this.props.existingOptData.successMessage,
+        failureMessage: this.props.existingOptData.failureMessage,
+        correct: this.props.existingOptData.correct,
+      }
+      this.setState(initial)
+    }
+  }
+
   public shouldComponentUpdate(nextProps, nextState) {
     if (this.props.isOpen !== nextProps.isOpen) {
       return true
@@ -63,7 +81,9 @@ export default class OptionDialog extends React.Component<any, any> {
         aria-labelledby="option-dialog-title"
       >
         <DialogTitle id="option-dialog-title">
-          Add new multiple choice option
+          {this.props.existingOptData
+            ? "Modify option"
+            : "Add new multiple choice option"}
         </DialogTitle>
         <DialogContent>
           <FormGroup>

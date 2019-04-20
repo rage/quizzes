@@ -11,14 +11,20 @@ import AddCircle from "@material-ui/icons/AddCircle"
 import Reorder from "@material-ui/icons/Reorder"
 import React from "react"
 import { connect } from "react-redux"
+import { addFinishedOption } from "../store/edit/actions"
+
+import OptionDialog from "./OptionDialog"
 
 class MultipleChoiceItem extends React.Component<any, any> {
   constructor(props) {
     super(props)
+    this.state = {
+      dialogOpen: false,
+      existingOptData: null,
+    }
   }
 
   public render() {
-    console.log("Props are: ", this.props)
     return (
       <Grid container={true} justify="center" alignItems="center">
         <Grid item={true} xs={12} sm={10} lg={8}>
@@ -57,29 +63,38 @@ class MultipleChoiceItem extends React.Component<any, any> {
                         alignItems="center"
                         spacing={8}
                       >
-                        {this.props.options.map(option => {
-                          return (
-                            <Grid
-                              item={true}
-                              xs={6}
-                              sm={4}
-                              lg={3}
-                              xl={2}
-                              key={option.id}
-                            >
-                              <Button
-                                variant="outlined"
-                                style={{
-                                  borderColor: option.correct ? "green" : "red",
-                                  borderWidth: ".25em",
-                                  textTransform: "none",
-                                }}
+                        {this.props.items[this.props.order].options.map(
+                          option => {
+                            return (
+                              <Grid
+                                item={true}
+                                xs={6}
+                                sm={4}
+                                lg={3}
+                                xl={2}
+                                key={option.id}
                               >
-                                {option.texts[0].title}
-                              </Button>
-                            </Grid>
-                          )
-                        })}
+                                <Button
+                                  variant="outlined"
+                                  style={{
+                                    borderColor: option.correct
+                                      ? "green"
+                                      : "red",
+                                    borderStyle: "dotted",
+                                    borderWidth: ".25em",
+                                    textTransform: "none",
+                                  }}
+                                  onClick={this.modifyExistingOption(
+                                    option.id,
+                                    option.quizItemId,
+                                  )}
+                                >
+                                  {option.texts[0].title}
+                                </Button>
+                              </Grid>
+                            )
+                          },
+                        )}
                       </Grid>
                     </Grid>
                     <Grid item={true} xs={1}>
@@ -87,9 +102,20 @@ class MultipleChoiceItem extends React.Component<any, any> {
                         aria-label="Add option"
                         color="primary"
                         disableRipple={true}
+                        onClick={this.createNewOption}
                       >
                         <AddCircle fontSize="large" nativeColor="#E5E5E5" />
                       </IconButton>
+                      <OptionDialog
+                        onSubmit={
+                          this.state.existingOptData
+                            ? this.updateOption(this.props.index)
+                            : this.handleSubmission(this.props.index)
+                        }
+                        isOpen={this.state.dialogOpen}
+                        onClose={this.handleClose}
+                        existingOptData={this.state.existingOptData}
+                      />
                     </Grid>
                   </Grid>
                 </CardContent>
@@ -124,6 +150,46 @@ class MultipleChoiceItem extends React.Component<any, any> {
       </Grid>
     )
   }
+
+  private modifyExistingOption = (optionId, itemId) => () => {
+    const option = this.props.items
+      .find(i => i.id === itemId)
+      .options.find(o => o.id === optionId)
+    this.setState({
+      existingOptData: {
+        title: option.texts[0].title,
+        correct: option.correct,
+        successMessage: option.texts[0].successMessage,
+        failureMessage: option.texts[0].failureMessage,
+      },
+      dialogOpen: true,
+    })
+  }
+
+  private updateOption = item => optionData => event => {
+    console.log("Now should be updated. To do...")
+  }
+
+  private createNewOption = () => {
+    this.setState({
+      existingOptData: {},
+      dialogOpen: true,
+    })
+  }
+
+  private setOpen = newValue => () => {
+    this.setState({
+      dialogOpen: newValue,
+    })
+  }
+
+  private handleClose = () => {
+    this.setState({ dialogOpen: false, existingOptData: null })
+  }
+
+  private handleSubmission = item => optionData => event => {
+    this.props.addFinishedOption(item, optionData)
+  }
 }
 
 const mapStateToProps = (state: any) => {
@@ -132,4 +198,7 @@ const mapStateToProps = (state: any) => {
   }
 }
 
-export default connect(mapStateToProps)(MultipleChoiceItem)
+export default connect(
+  mapStateToProps,
+  { addFinishedOption },
+)(MultipleChoiceItem)
