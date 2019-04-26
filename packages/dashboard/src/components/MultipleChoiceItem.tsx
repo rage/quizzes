@@ -11,9 +11,43 @@ import AddCircle from "@material-ui/icons/AddCircle"
 import Reorder from "@material-ui/icons/Reorder"
 import React from "react"
 import { connect } from "react-redux"
-import { addFinishedOption } from "../store/edit/actions"
-
+import { SortableContainer, SortableElement } from "react-sortable-hoc"
+import {
+  addFinishedOption,
+  changeOrder,
+  modifyOption,
+} from "../store/edit/actions"
 import OptionDialog from "./OptionDialog"
+import SortableWrapper from "./SortableWrapper"
+
+const SortableOptionList = SortableContainer((props: any) => {
+  return (
+    <ul>
+      {props.items.map((option, index) => (
+        <SortableWrapper
+          collection={`items[${props.order}].options`}
+          index={index}
+          key={`${option.quizItemId}-${index}`}
+        >
+          <li>
+            <Button
+              variant="outlined"
+              style={{
+                borderColor: option.correct ? "green" : "red",
+                borderStyle: "dotted",
+                borderWidth: ".25em",
+                textTransform: "none",
+              }}
+              onClick={props.modifyExistingOption(option.id, option.quizItemId)}
+            >
+              {option.texts[0].title}
+            </Button>
+          </li>
+        </SortableWrapper>
+      ))}
+    </ul>
+  )
+})
 
 class MultipleChoiceItem extends React.Component<any, any> {
   constructor(props) {
@@ -26,7 +60,7 @@ class MultipleChoiceItem extends React.Component<any, any> {
 
   public render() {
     return (
-      <Grid container={true} justify="center" alignItems="center">
+      <Grid container={true} spacing={16} justify="center" alignItems="center">
         <Grid item={true} xs={12} sm={10} lg={8}>
           <Card>
             <Grid container={true} justify="flex-end" alignItems="center">
@@ -57,45 +91,12 @@ class MultipleChoiceItem extends React.Component<any, any> {
                       <Typography variant="body2">{this.props.body}</Typography>
                     </Grid>
                     <Grid item={true} xs={5} md={7} lg={8}>
-                      <Grid
-                        container={true}
-                        justify="space-around"
-                        alignItems="center"
-                        spacing={8}
-                      >
-                        {this.props.items[this.props.order].options.map(
-                          option => {
-                            return (
-                              <Grid
-                                item={true}
-                                xs={6}
-                                sm={4}
-                                lg={3}
-                                xl={2}
-                                key={option.id}
-                              >
-                                <Button
-                                  variant="outlined"
-                                  style={{
-                                    borderColor: option.correct
-                                      ? "green"
-                                      : "red",
-                                    borderStyle: "dotted",
-                                    borderWidth: ".25em",
-                                    textTransform: "none",
-                                  }}
-                                  onClick={this.modifyExistingOption(
-                                    option.id,
-                                    option.quizItemId,
-                                  )}
-                                >
-                                  {option.texts[0].title}
-                                </Button>
-                              </Grid>
-                            )
-                          },
-                        )}
-                      </Grid>
+                      <SortableOptionList
+                        onSortEnd={this.onSortEnd}
+                        items={this.props.items[this.props.order].options}
+                        order={this.props.order}
+                        modifyExistingOption={this.modifyExistingOption}
+                      />
                     </Grid>
                     <Grid item={true} xs={1}>
                       <IconButton
@@ -155,24 +156,30 @@ class MultipleChoiceItem extends React.Component<any, any> {
     const option = this.props.items
       .find(i => i.id === itemId)
       .options.find(o => o.id === optionId)
+
     this.setState({
       existingOptData: {
         title: option.texts[0].title,
         correct: option.correct,
         successMessage: option.texts[0].successMessage,
         failureMessage: option.texts[0].failureMessage,
+        id: optionId,
       },
       dialogOpen: true,
     })
   }
 
+  private onSortEnd = ({ oldIndex, newIndex, collection }) => {
+    this.props.changeOrder(collection, oldIndex, newIndex)
+  }
+
   private updateOption = item => optionData => event => {
-    console.log("Now should be updated. To do...")
+    this.props.modifyOption(item, optionData)
   }
 
   private createNewOption = () => {
     this.setState({
-      existingOptData: {},
+      existingOptData: null,
       dialogOpen: true,
     })
   }
@@ -188,6 +195,7 @@ class MultipleChoiceItem extends React.Component<any, any> {
   }
 
   private handleSubmission = item => optionData => event => {
+    this.handleClose()
     this.props.addFinishedOption(item, optionData)
   }
 }
@@ -200,5 +208,5 @@ const mapStateToProps = (state: any) => {
 
 export default connect(
   mapStateToProps,
-  { addFinishedOption },
+  { addFinishedOption, changeOrder, modifyOption },
 )(MultipleChoiceItem)

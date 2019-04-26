@@ -27,16 +27,12 @@ export default class OptionDialog extends React.Component<any, any> {
   public componentDidUpdate() {
     if (
       this.props.existingOptData &&
-      (!this.state.optionData ||
-        this.state.optionData.title !== this.props.existingOptData.title)
+      JSON.stringify(this.state.optionData) === "{}"
     ) {
       const initial = { correctChecked: false, optionData: {} }
       initial.correctChecked = this.props.existingOptData.correct
       initial.optionData = {
-        title: this.props.existingOptData.title,
-        successMessage: this.props.existingOptData.successMessage,
-        failureMessage: this.props.existingOptData.failureMessage,
-        correct: this.props.existingOptData.correct,
+        ...this.props.existingOptData,
       }
       this.setState(initial)
     }
@@ -98,7 +94,7 @@ export default class OptionDialog extends React.Component<any, any> {
               </Grid>
               <Grid item={true} xs={11}>
                 <TextField
-                  autoFocus={true}
+                  // autoFocus={true}
                   fullWidth={true}
                   multiline={true}
                   placeholder="Text"
@@ -181,11 +177,11 @@ export default class OptionDialog extends React.Component<any, any> {
 
   private handleSubmit = event => {
     this.props.onSubmit(this.state.optionData)(event)
-    this.setState({ optionData: {} })
     this.handleClose()
   }
 
   private handleClose = () => {
     this.props.onClose()
+    this.setState({ optionData: {}, correctChecked: false })
   }
 }

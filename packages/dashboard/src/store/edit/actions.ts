@@ -147,6 +147,7 @@ export const addFinishedOption = (item, optionData) => {
     }
     quiz.items[item].options.push(option)
     dispatch(setEdit(quiz))
+
     const updatedQuiz = JSON.parse(JSON.stringify(getState().edit))
     const idx = quiz.items[item].options.length - 1
     updatedQuiz.items[item].options[idx].texts[0].title = optionData.title
@@ -156,6 +157,30 @@ export const addFinishedOption = (item, optionData) => {
       optionData.successMessage
     updatedQuiz.items[item].options[idx].correct = optionData.correct
     dispatch(setEdit(updatedQuiz))
+  }
+}
+
+export const modifyOption = (item, optionData) => {
+  return (dispatch, getState) => {
+    const quiz = JSON.parse(JSON.stringify(getState().edit))
+    const option = quiz.items[item].options.find(o => o.id === optionData.id)
+    quiz.items[item].options = quiz.items[item].options.map(o =>
+      o.id === option.id
+        ? {
+            ...o,
+            correct: optionData.correct,
+            texts: [
+              {
+                ...o.texts[0],
+                title: optionData.title,
+                failureMessage: optionData.failureMessage,
+                successMessage: optionData.successMessage,
+              },
+            ],
+          }
+        : o,
+    )
+    dispatch(setEdit(quiz))
   }
 }
 
