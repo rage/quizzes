@@ -5,6 +5,7 @@ import {
   CardContent,
   Grid,
   IconButton,
+  TextField,
   Typography,
 } from "@material-ui/core"
 import AddCircle from "@material-ui/icons/AddCircle"
@@ -22,14 +23,27 @@ import SortableWrapper from "./SortableWrapper"
 
 const SortableOptionList = SortableContainer((props: any) => {
   return (
-    <ul>
+    <Grid
+      container={true}
+      spacing={24}
+      justify="flex-start"
+      alignItems="center"
+    >
       {props.items.map((option, index) => (
         <SortableWrapper
           collection={`items[${props.order}].options`}
           index={index}
           key={`${option.quizItemId}-${index}`}
         >
-          <li>
+          <Grid
+            item={true}
+            xs={12}
+            sm={6}
+            md={3}
+            lg={3}
+            xl={2}
+            style={{ textAlign: "center" }}
+          >
             <Button
               variant="outlined"
               style={{
@@ -42,10 +56,20 @@ const SortableOptionList = SortableContainer((props: any) => {
             >
               {option.texts[0].title}
             </Button>
-          </li>
+          </Grid>
         </SortableWrapper>
       ))}
-    </ul>
+      <Grid item={true} xs="auto">
+        <IconButton
+          aria-label="Add option"
+          color="primary"
+          disableRipple={true}
+          onClick={props.createNewOption}
+        >
+          <AddCircle fontSize="large" nativeColor="#E5E5E5" />
+        </IconButton>
+      </Grid>
+    </Grid>
   )
 })
 
@@ -55,6 +79,7 @@ class MultipleChoiceItem extends React.Component<any, any> {
     this.state = {
       dialogOpen: false,
       existingOptData: null,
+      optionsExist: props.items[props.order].options.length > 0,
     }
   }
 
@@ -85,39 +110,78 @@ class MultipleChoiceItem extends React.Component<any, any> {
                     </Grid>
 
                     <Grid item={true} xs={6} md={4} lg={3}>
-                      <Typography variant="title">
-                        {this.props.title}
-                      </Typography>
-                      <Typography variant="body2">{this.props.body}</Typography>
-                    </Grid>
-                    <Grid item={true} xs={5} md={7} lg={8}>
-                      <SortableOptionList
-                        onSortEnd={this.onSortEnd}
-                        items={this.props.items[this.props.order].options}
-                        order={this.props.order}
-                        modifyExistingOption={this.modifyExistingOption}
-                      />
-                    </Grid>
-                    <Grid item={true} xs={1}>
-                      <IconButton
-                        aria-label="Add option"
-                        color="primary"
-                        disableRipple={true}
-                        onClick={this.createNewOption}
-                      >
-                        <AddCircle fontSize="large" nativeColor="#E5E5E5" />
-                      </IconButton>
-                      <OptionDialog
-                        onSubmit={
-                          this.state.existingOptData
-                            ? this.updateOption(this.props.index)
-                            : this.handleSubmission(this.props.index)
+                      <TextField
+                        multiline={true}
+                        fullWidth={true}
+                        placeholder={
+                          this.props.title ? this.props.title : "Title"
                         }
-                        isOpen={this.state.dialogOpen}
-                        onClose={this.handleClose}
-                        existingOptData={this.state.existingOptData}
+                        style={{
+                          fontWeight: "bold",
+                        }}
+                      />
+
+                      <Typography style={{ marginTop: "10px" }} variant="body2">
+                        Body:
+                      </Typography>
+                      <TextField
+                        rows={2}
+                        multiline={true}
+                        fullWidth={true}
+                        placeholder={this.props.body ? this.props.body : "Body"}
                       />
                     </Grid>
+
+                    <Grid item={true} xs={6} md={8} lg={9}>
+                      {this.state.optionsExist ? (
+                        <SortableOptionList
+                          onSortEnd={this.onSortEnd}
+                          createNewOption={this.createNewOption}
+                          items={this.props.items[this.props.order].options}
+                          order={this.props.order}
+                          modifyExistingOption={this.modifyExistingOption}
+                          axis="xy"
+                          distance={2}
+                        />
+                      ) : (
+                        <Grid
+                          container={true}
+                          justify="flex-start"
+                          alignItems="center"
+                        >
+                          <Grid item={true} xs={1}>
+                            <IconButton
+                              aria-label="Add option"
+                              color="primary"
+                              disableRipple={true}
+                              onClick={this.createNewOption}
+                            >
+                              <AddCircle
+                                fontSize="large"
+                                nativeColor="#E5E5E5"
+                              />
+                            </IconButton>
+                          </Grid>
+
+                          <Grid item={true} xs="auto">
+                            <Typography color="textSecondary">
+                              Your question does not have any options yet. Add
+                              an option by clicking the plus button.
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      )}
+                    </Grid>
+                    <OptionDialog
+                      onSubmit={
+                        this.state.existingOptData
+                          ? this.updateOption(this.props.index)
+                          : this.handleSubmission(this.props.index)
+                      }
+                      isOpen={this.state.dialogOpen}
+                      onClose={this.handleClose}
+                      existingOptData={this.state.existingOptData}
+                    />
                   </Grid>
                 </CardContent>
               </Grid>
@@ -197,6 +261,7 @@ class MultipleChoiceItem extends React.Component<any, any> {
   private handleSubmission = item => optionData => event => {
     this.handleClose()
     this.props.addFinishedOption(item, optionData)
+    this.setState({ optionsExist: true })
   }
 }
 
