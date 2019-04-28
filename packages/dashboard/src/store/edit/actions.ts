@@ -224,7 +224,8 @@ export const remove = (path, index) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
     const array = _.get(quiz, path)
     array.splice(index, 1)
-    dispatch(set(quiz))
+    quiz[path] = array.map((arrayItem, idx) => ({ ...arrayItem, order: idx }))
+    dispatch(setEdit(quiz))
   }
 }
 

@@ -25,6 +25,7 @@ import {
   Toolbar,
   Typography,
 } from "@material-ui/core"
+import Delete from "@material-ui/icons/Delete"
 import React, { ChangeEvent, createRef } from "react"
 import { connect } from "react-redux"
 import {
@@ -273,7 +274,8 @@ class Item extends React.Component<any, any> {
                         />
                       </React.Fragment>
                     )}
-                    {this.props.type === "open" ? (
+
+                    {this.props.type === "open" && (
                       <div>
                         <TextField
                           label="validity regex"
@@ -294,23 +296,20 @@ class Item extends React.Component<any, any> {
                           margin="normal"
                         />
                       </div>
-                    ) : (
-                      <p />
                     )}
+
                     <Grid container={true} style={{ marginTop: 20 }}>
                       <Grid item={true} xs={12}>
                         <Grid container={true} justify="flex-end">
                           <IconButton
-                            onClick={this.props.remove(
+                            onClick={this.handleItemRemoval(
                               "items",
                               this.props.index,
                             )}
                             aria-label="Delete"
                             color="secondary"
                           >
-                            <SvgIcon>
-                              <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
-                            </SvgIcon>
+                            <Delete />
                           </IconButton>
                         </Grid>
                       </Grid>
@@ -346,8 +345,11 @@ class Item extends React.Component<any, any> {
     )
   }
 
+  private handleItemRemoval = (path, index) => () => {
+    this.props.remove(path, index)
+  }
+
   private handleItemCancel = quizItemOrder => () => {
-    console.log("Removing item with order: ", quizItemOrder)
     this.props.remove("items", quizItemOrder)
   }
 

@@ -55,10 +55,9 @@ class Options extends React.Component<any, any> {
   }
 
   public render() {
-    const options = this.props.edit.items[this.props.index].options
     return (
       <Grid container={true} spacing={16}>
-        {options
+        {this.props.edit.items[this.props.index].options
           .sort((o1, o2) => o1.order - o2.order)
           .map((option, index) => {
             const text = option.texts.find(

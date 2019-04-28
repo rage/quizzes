@@ -37,6 +37,7 @@ class MultipleChoiceItem extends React.Component<any, any> {
   }
 
   public render() {
+    console.log("Props atm: ", this.props)
     const item = this.props.items[this.props.order]
     if (item.id && !this.state.existingItemExpanded) {
       return (
@@ -95,7 +96,6 @@ class MultipleChoiceItem extends React.Component<any, any> {
                         placeholder={item.id ? this.props.body : "Body"}
                         value={item.texts[0].body || ""}
                         onChange={this.changeEditAttribute("body")}
-                        // defaultValue={ item.id ? this.props.body : ""}
                       />
                     </Grid>
 

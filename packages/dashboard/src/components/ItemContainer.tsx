@@ -76,7 +76,6 @@ const ItemContainer: ComponentClass<any, any> = SortableContainer(
                 successMessage={text.successMessage}
                 failureMessage={text.failureMessage}
                 type={item.type}
-                remove={props.remove}
                 minWords={item.minWords}
                 maxWords={item.maxWords}
                 scrollToNew={props.scrollToNew}
