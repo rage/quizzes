@@ -15,63 +15,15 @@ import { connect } from "react-redux"
 import { SortableContainer, SortableElement } from "react-sortable-hoc"
 import {
   addFinishedOption,
+  changeAttr,
   changeOrder,
   modifyOption,
+  save,
 } from "../store/edit/actions"
+import FinishedMultipleChoiceItem from "./FinishedMultipleChoiceItem"
 import OptionDialog from "./OptionDialog"
+import SortableOptionList from "./SortableOptionList"
 import SortableWrapper from "./SortableWrapper"
-
-const SortableOptionList = SortableContainer((props: any) => {
-  return (
-    <Grid
-      container={true}
-      spacing={24}
-      justify="flex-start"
-      alignItems="center"
-    >
-      {props.items.map((option, index) => (
-        <SortableWrapper
-          collection={`items[${props.order}].options`}
-          index={index}
-          key={`${option.quizItemId}-${index}`}
-        >
-          <Grid
-            item={true}
-            xs={12}
-            sm={6}
-            md={3}
-            lg={3}
-            xl={2}
-            style={{ textAlign: "center" }}
-          >
-            <Button
-              variant="outlined"
-              style={{
-                borderColor: option.correct ? "green" : "red",
-                borderStyle: "dotted",
-                borderWidth: ".25em",
-                textTransform: "none",
-              }}
-              onClick={props.modifyExistingOption(option.id, option.quizItemId)}
-            >
-              {option.texts[0].title}
-            </Button>
-          </Grid>
-        </SortableWrapper>
-      ))}
-      <Grid item={true} xs="auto">
-        <IconButton
-          aria-label="Add option"
-          color="primary"
-          disableRipple={true}
-          onClick={props.createNewOption}
-        >
-          <AddCircle fontSize="large" nativeColor="#E5E5E5" />
-        </IconButton>
-      </Grid>
-    </Grid>
-  )
-})
 
 class MultipleChoiceItem extends React.Component<any, any> {
   constructor(props) {
@@ -80,10 +32,21 @@ class MultipleChoiceItem extends React.Component<any, any> {
       dialogOpen: false,
       existingOptData: null,
       optionsExist: props.items[props.order].options.length > 0,
+      existingItemExpanded: false,
     }
   }
 
   public render() {
+    const item = this.props.items[this.props.order]
+    if (item.id && !this.state.existingItemExpanded) {
+      return (
+        <FinishedMultipleChoiceItem
+          {...this.props}
+          onClickExpand={this.expandExistingItem}
+        />
+      )
+    }
+
     return (
       <Grid container={true} spacing={16} justify="center" alignItems="center">
         <Grid item={true} xs={12} sm={10} lg={8}>
@@ -113,9 +76,10 @@ class MultipleChoiceItem extends React.Component<any, any> {
                       <TextField
                         multiline={true}
                         fullWidth={true}
-                        placeholder={
-                          this.props.title ? this.props.title : "Title"
-                        }
+                        placeholder={item.id ? this.props.title : "Title"}
+                        value={(item.id && item.texts[0].title) || ""}
+                        onChange={this.changeEditAttribute("title")}
+                        // defaultValue={item.id ? this.props.title : ""}
                         style={{
                           fontWeight: "bold",
                         }}
@@ -128,7 +92,10 @@ class MultipleChoiceItem extends React.Component<any, any> {
                         rows={2}
                         multiline={true}
                         fullWidth={true}
-                        placeholder={this.props.body ? this.props.body : "Body"}
+                        placeholder={item.id ? this.props.body : "Body"}
+                        value={item.texts[0].body || ""}
+                        onChange={this.changeEditAttribute("body")}
+                        // defaultValue={ item.id ? this.props.body : ""}
                       />
                     </Grid>
 
@@ -195,8 +162,9 @@ class MultipleChoiceItem extends React.Component<any, any> {
                       color: "white",
                       borderRadius: "5px",
                     }}
+                    onClick={this.saveItem}
                   >
-                    Add
+                    {item.id ? "Save" : "Add"}
                   </Button>
                   <Button
                     style={{
@@ -204,6 +172,9 @@ class MultipleChoiceItem extends React.Component<any, any> {
                       color: "white",
                       borderRadius: "5px",
                     }}
+                    onClick={
+                      item.id ? this.switchToFinishedView : this.props.onCancel
+                    }
                   >
                     Cancel
                   </Button>
@@ -214,6 +185,32 @@ class MultipleChoiceItem extends React.Component<any, any> {
         </Grid>
       </Grid>
     )
+  }
+
+  private changeEditAttribute = (attributeName: string) => e => {
+    this.props.changeAttr(
+      `items[${this.props.order}].texts[0].${attributeName}`,
+      e.target.value,
+    )
+  }
+
+  private saveItem = () => {
+    this.setState({
+      existingItemExpanded: false,
+    })
+    this.props.save()
+  }
+
+  private expandExistingItem = () => {
+    this.setState({
+      existingItemExpanded: true,
+    })
+  }
+
+  private switchToFinishedView = () => {
+    this.setState({
+      existingItemExpanded: false,
+    })
   }
 
   private modifyExistingOption = (optionId, itemId) => () => {
@@ -273,5 +270,5 @@ const mapStateToProps = (state: any) => {
 
 export default connect(
   mapStateToProps,
-  { addFinishedOption, changeOrder, modifyOption },
+  { addFinishedOption, changeAttr, changeOrder, modifyOption, save },
 )(MultipleChoiceItem)

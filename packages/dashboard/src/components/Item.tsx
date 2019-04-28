@@ -40,6 +40,7 @@ import {
   changeAttr,
   changeOrder,
   newQuiz,
+  remove,
   save,
   setEdit,
 } from "../store/edit/actions"
@@ -108,7 +109,12 @@ class Item extends React.Component<any, any> {
     }
 
     if (this.props.type === "multiple-choice") {
-      return <MultipleChoiceItem {...this.props} />
+      return (
+        <MultipleChoiceItem
+          {...this.props}
+          onCancel={this.handleItemCancel(this.props.order)}
+        />
+      )
     }
 
     return (
@@ -340,6 +346,11 @@ class Item extends React.Component<any, any> {
     )
   }
 
+  private handleItemCancel = quizItemOrder => () => {
+    console.log("Removing item with order: ", quizItemOrder)
+    this.props.remove("items", quizItemOrder)
+  }
+
   private toggleExpand = event => {
     this.props.expandItem(this.props.order)
   }
@@ -358,5 +369,5 @@ class Item extends React.Component<any, any> {
 
 export default connect(
   null,
-  { changeOrder },
+  { changeOrder, remove },
 )(Item)
