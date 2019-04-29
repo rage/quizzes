@@ -40,10 +40,7 @@ class FinishedMultipleChoiceItem extends React.Component<any, any> {
                   {item.options.map(opt => (
                     <Grid
                       item={true}
-                      xs={12}
-                      sm={6}
-                      md={4}
-                      lg={3}
+                      xs="auto"
                       key={item.id + opt.order}
                       style={{ textAlign: "center" }}
                     >

@@ -8,9 +8,9 @@ const SortableOptionList = SortableContainer((props: any) => {
   return (
     <Grid
       container={true}
-      spacing={24}
-      justify="flex-start"
-      alignItems="center"
+      spacing={16}
+      justify="space-evenly"
+      alignItems="stretch"
     >
       {props.options.map((option, index) => (
         <SortableWrapper
@@ -18,15 +18,7 @@ const SortableOptionList = SortableContainer((props: any) => {
           index={index}
           key={`${option.quizItemId}-${index}-${option.texts[0].title}`}
         >
-          <Grid
-            item={true}
-            xs={12}
-            sm={6}
-            md={3}
-            lg={3}
-            xl={2}
-            style={{ textAlign: "center" }}
-          >
+          <Grid item={true} xs="auto" style={{ textAlign: "center" }}>
             <Button
               variant="outlined"
               style={{
