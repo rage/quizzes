@@ -95,6 +95,7 @@ class Item extends React.Component<any, any> {
       "formatRegex",
       "newlyAdded",
       "expanded",
+      "order  ",
     ]
 
     return modificationFields.some(
@@ -114,6 +115,7 @@ class Item extends React.Component<any, any> {
         <MultipleChoiceItem
           {...this.props}
           onCancel={this.handleItemCancel(this.props.order)}
+          toggleExpand={this.toggleExpand}
         />
       )
     }

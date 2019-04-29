@@ -50,7 +50,6 @@ export const save = () => {
         displayMessage(`Successfully saved ${quiz.texts[0].title}!`, false),
       )
     } catch (error) {
-      console.log(error)
       dispatch(
         displayMessage(
           `Failed to save changes to ${
@@ -96,7 +95,6 @@ export const changeOrder = (path, current, next) => {
     const moved = array.splice(current, 1)[0]
     array.splice(next, 0, moved)
     array.map((object, index) => (object.order = index))
-
     dispatch(set(quiz))
   }
 }

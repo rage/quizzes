@@ -72,6 +72,10 @@ class TabContainer extends Component<any, any> {
       return true
     }
 
+    if (this.props.items !== nextProps.items) {
+      return true
+    }
+
     return this.props !== nextProps
   }
 
@@ -144,7 +148,6 @@ class TabContainer extends Component<any, any> {
               expandItem={this.expandItem}
               newest={this.newest()}
               onSortEnd={this.onSortEnd}
-              items={this.props.items}
               handleChange={this.props.handleChange}
               useDragHandle={true}
               handleSort={this.onSortEnd}
