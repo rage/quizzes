@@ -46,7 +46,7 @@ import {
   setEdit,
 } from "../store/edit/actions"
 import DragHandleWrapper from "./DragHandleWrapper"
-import MultipleChoiceItem from "./MultipleChoiceItem"
+import MultipleChoiceItem from "./MultipleChoice"
 import OptionContainer from "./OptionContainer"
 
 class Item extends React.Component<any, any> {
@@ -95,7 +95,8 @@ class Item extends React.Component<any, any> {
       "formatRegex",
       "newlyAdded",
       "expanded",
-      "order  ",
+      "order",
+      "items",
     ]
 
     return modificationFields.some(

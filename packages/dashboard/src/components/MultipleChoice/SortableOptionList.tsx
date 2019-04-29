@@ -1,18 +1,8 @@
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Grid,
-  IconButton,
-  TextField,
-  Typography,
-} from "@material-ui/core"
+import { Button, Grid, IconButton } from "@material-ui/core"
 import AddCircle from "@material-ui/icons/AddCircle"
-import Reorder from "@material-ui/icons/Reorder"
 import React from "react"
 import { SortableContainer } from "react-sortable-hoc"
-import SortableWrapper from "./SortableWrapper"
+import SortableWrapper from "../SortableWrapper"
 
 const SortableOptionList = SortableContainer((props: any) => {
   return (
@@ -22,11 +12,11 @@ const SortableOptionList = SortableContainer((props: any) => {
       justify="flex-start"
       alignItems="center"
     >
-      {props.items.map((option, index) => (
+      {props.options.map((option, index) => (
         <SortableWrapper
           collection={`items[${props.order}].options`}
           index={index}
-          key={`${option.quizItemId}-${index}`}
+          key={`${option.quizItemId}-${index}-${option.texts[0].title}`}
         >
           <Grid
             item={true}

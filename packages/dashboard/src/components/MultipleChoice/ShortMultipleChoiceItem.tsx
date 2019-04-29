@@ -1,27 +1,7 @@
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  Grid,
-  IconButton,
-  TextField,
-  Typography,
-} from "@material-ui/core"
-import AddCircle from "@material-ui/icons/AddCircle"
+import { Button, Grid, IconButton, Typography } from "@material-ui/core"
 import Create from "@material-ui/icons/Create"
-import Reorder from "@material-ui/icons/Reorder"
 import React from "react"
-import { connect } from "react-redux"
-import { SortableContainer, SortableElement } from "react-sortable-hoc"
-import {
-  addFinishedOption,
-  changeOrder,
-  modifyOption,
-} from "../store/edit/actions"
-import DragHandleWrapper from "./DragHandleWrapper"
-import OptionDialog from "./OptionDialog"
-import SortableWrapper from "./SortableWrapper"
+import DragHandleWrapper from "../DragHandleWrapper"
 
 class FinishedMultipleChoiceItem extends React.Component<any, any> {
   constructor(props) {

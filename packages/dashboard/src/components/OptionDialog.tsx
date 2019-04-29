@@ -94,7 +94,6 @@ export default class OptionDialog extends React.Component<any, any> {
               </Grid>
               <Grid item={true} xs={11}>
                 <TextField
-                  // autoFocus={true}
                   fullWidth={true}
                   multiline={true}
                   placeholder="Text"

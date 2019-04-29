@@ -12,37 +12,29 @@ import AddCircle from "@material-ui/icons/AddCircle"
 import Reorder from "@material-ui/icons/Reorder"
 import React from "react"
 import { connect } from "react-redux"
-import { SortableContainer, SortableElement } from "react-sortable-hoc"
 import {
   addFinishedOption,
   changeAttr,
   changeOrder,
   modifyOption,
   save,
-} from "../store/edit/actions"
-import DragHandleWrapper from "./DragHandleWrapper"
-import FinishedMultipleChoiceItem from "./FinishedMultipleChoiceItem"
-import OptionDialog from "./OptionDialog"
+} from "../../store/edit/actions"
+import DragHandleWrapper from "../DragHandleWrapper"
+import OptionDialog from "../OptionDialog"
 import SortableOptionList from "./SortableOptionList"
-import SortableWrapper from "./SortableWrapper"
 
 class MultipleChoiceItem extends React.Component<any, any> {
   constructor(props) {
     super(props)
-    this.state = {}
-    /* this.state = {
+    this.state = {
       dialogOpen: false,
       existingOptData: null,
       optionsExist: props.items[props.order].options.length > 0,
-    } */
+    }
   }
 
   public render() {
     const item = this.props.items[this.props.order]
-    if (item.id && !this.props.expanded) {
-      return <FinishedMultipleChoiceItem {...this.props} />
-    }
-
     return (
       <Grid container={true} spacing={16} justify="center" alignItems="center">
         <Grid item={true} xs={12} sm={10} lg={8}>
@@ -56,20 +48,7 @@ class MultipleChoiceItem extends React.Component<any, any> {
                     alignItems="center"
                     spacing={8}
                   >
-                    <Grid item={true} xs={11}>
-                      <Typography color="textSecondary" gutterBottom={true}>
-                        Type: multiple choice
-                      </Typography>
-                    </Grid>
-
-                    <Grid item={true} xs={1}>
-                      <DragHandleWrapper>
-                        <Reorder
-                          fontSize="large"
-                          style={{ transform: "scale(3,1.5)" }}
-                        />
-                      </DragHandleWrapper>
-                    </Grid>
+                    <TopInformation />
 
                     <Grid item={true} xs={6} md={4} lg={3}>
                       <TextField
@@ -98,7 +77,7 @@ class MultipleChoiceItem extends React.Component<any, any> {
                         <SortableOptionList
                           onSortEnd={this.onSortEnd}
                           createNewOption={this.createNewOption}
-                          items={this.props.items[this.props.order].options}
+                          options={this.props.items[this.props.order].options}
                           order={this.props.order}
                           modifyExistingOption={this.modifyExistingOption}
                           axis="xy"
@@ -133,16 +112,6 @@ class MultipleChoiceItem extends React.Component<any, any> {
                         </Grid>
                       )}
                     </Grid>
-                    <OptionDialog
-                      onSubmit={
-                        this.state.existingOptData
-                          ? this.updateOption(this.props.index)
-                          : this.handleSubmission(this.props.index)
-                      }
-                      isOpen={this.state.dialogOpen}
-                      onClose={this.handleClose}
-                      existingOptData={this.state.existingOptData}
-                    />
                   </Grid>
                 </CardContent>
               </Grid>
@@ -177,6 +146,17 @@ class MultipleChoiceItem extends React.Component<any, any> {
             </Grid>
           </Card>
         </Grid>
+
+        <OptionDialog
+          onSubmit={
+            this.state.existingOptData
+              ? this.updateOption(this.props.index)
+              : this.handleSubmission(this.props.index)
+          }
+          isOpen={this.state.dialogOpen}
+          onClose={this.handleClose}
+          existingOptData={this.state.existingOptData}
+        />
       </Grid>
     )
   }
@@ -193,12 +173,12 @@ class MultipleChoiceItem extends React.Component<any, any> {
     this.props.save()
   }
 
-  private modifyExistingOption = (optionId, itemId) => () => {
+  private modifyExistingOption = (optionId: string, itemId: string) => () => {
     const option = this.props.items
       .find(i => i.id === itemId)
       .options.find(o => o.id === optionId)
 
-    /* this.setState({
+    this.setState({
       existingOptData: {
         title: option.texts[0].title,
         correct: option.correct,
@@ -207,7 +187,7 @@ class MultipleChoiceItem extends React.Component<any, any> {
         id: optionId,
       },
       dialogOpen: true,
-    }) */
+    })
   }
 
   private onSortEnd = ({ oldIndex, newIndex, collection }) => {
@@ -219,36 +199,44 @@ class MultipleChoiceItem extends React.Component<any, any> {
   }
 
   private createNewOption = () => {
-    /*
     this.setState({
       existingOptData: null,
       dialogOpen: true,
     })
-    */
-  }
-
-  private setOpen = newValue => () => {
-    /*
-    this.setState({
-      dialogOpen: newValue,
-    })
-    */
   }
 
   private handleClose = () => {
-    /*
     this.setState({ dialogOpen: false, existingOptData: null })
-    */
   }
 
-  private handleSubmission = item => optionData => event => {
+  private handleSubmission = (item: string) => optionData => event => {
     this.handleClose()
     this.props.addFinishedOption(item, optionData)
-    /*
     this.setState({ optionsExist: true })
-    */
   }
 }
+
+const TopInformation = () => (
+  <React.Fragment>
+    <Grid item={true} xs={11}>
+      <Typography color="textSecondary" gutterBottom={true}>
+        Type: multiple choice
+      </Typography>
+    </Grid>
+
+    <Grid item={true} xs={1}>
+      <DragHandleWrapper>
+        <Reorder
+          fontSize="large"
+          style={{
+            transform: "scale(3,1.5)",
+            cursor: "pointer",
+          }}
+        />
+      </DragHandleWrapper>
+    </Grid>
+  </React.Fragment>
+)
 
 export default connect(
   null,
