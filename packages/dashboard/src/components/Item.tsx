@@ -123,7 +123,13 @@ class Item extends React.Component<any, any> {
     }
 
     if (this.props.type === "scale") {
-      return <ScaleItem {...this.props} />
+      return (
+        <ScaleItem
+          {...this.props}
+          onCancel={this.handleItemCancel(this.props.order)}
+          toggleExpand={this.toggleExpand}
+        />
+      )
     }
 
     return (
