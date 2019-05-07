@@ -1,6 +1,7 @@
 import { Button, Grid, IconButton, Typography } from "@material-ui/core"
 import Create from "@material-ui/icons/Create"
 import React from "react"
+import { stringContainsLongerWord } from "../../../../common/src/util/index"
 import DragHandleWrapper from "../DragHandleWrapper"
 
 class FinishedMultipleChoiceItem extends React.Component<any, any> {
@@ -40,7 +41,11 @@ class FinishedMultipleChoiceItem extends React.Component<any, any> {
                   {item.options.map(opt => (
                     <Grid
                       item={true}
-                      xs="auto"
+                      xs={12}
+                      sm={6}
+                      md={4}
+                      lg={3}
+                      xl={2}
                       key={item.id + opt.order}
                       style={{ textAlign: "center" }}
                     >
@@ -51,6 +56,12 @@ class FinishedMultipleChoiceItem extends React.Component<any, any> {
                           borderColor: opt.correct ? "green" : "red",
                           textTransform: "none",
                           color: "black",
+                          wordBreak: stringContainsLongerWord(
+                            opt.texts[0].title,
+                            30,
+                          )
+                            ? "break-all"
+                            : "normal",
                         }}
                       >
                         {opt.texts[0].title}
