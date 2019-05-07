@@ -48,6 +48,7 @@ import {
 import DragHandleWrapper from "./DragHandleWrapper"
 import MultipleChoiceItem from "./MultipleChoice"
 import OptionContainer from "./OptionContainer"
+import ScaleItem from "./Scale"
 
 class Item extends React.Component<any, any> {
   private titleRef = createRef<HTMLInputElement>()
@@ -119,6 +120,10 @@ class Item extends React.Component<any, any> {
           toggleExpand={this.toggleExpand}
         />
       )
+    }
+
+    if (this.props.type === "scale") {
+      return <ScaleItem {...this.props} />
     }
 
     return (
