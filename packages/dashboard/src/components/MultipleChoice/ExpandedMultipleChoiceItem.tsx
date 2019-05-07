@@ -30,6 +30,9 @@ class MultipleChoiceItem extends React.Component<any, any> {
       dialogOpen: false,
       existingOptData: null,
       optionsExist: props.items[props.order].options.length > 0,
+      titleHasBeenModified: this.props.items[this.props.order].id
+        ? true
+        : false,
     }
   }
 
@@ -55,7 +58,11 @@ class MultipleChoiceItem extends React.Component<any, any> {
                         multiline={true}
                         fullWidth={true}
                         placeholder="Title"
-                        value={(item.id && item.texts[0].title) || ""}
+                        value={
+                          (this.state.titleHasBeenModified &&
+                            item.texts[0].title) ||
+                          ""
+                        }
                         onChange={this.changeEditAttribute("title")}
                         style={{
                           fontWeight: "bold",
@@ -162,6 +169,11 @@ class MultipleChoiceItem extends React.Component<any, any> {
   }
 
   private changeEditAttribute = (attributeName: string) => e => {
+    if (attributeName === "title") {
+      this.setState({
+        titleHasBeenModified: true,
+      })
+    }
     this.props.changeAttr(
       `items[${this.props.order}].texts[0].${attributeName}`,
       e.target.value,

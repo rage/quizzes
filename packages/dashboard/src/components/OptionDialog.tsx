@@ -20,7 +20,9 @@ export default class OptionDialog extends React.Component<any, any> {
     super(props)
     this.state = {
       correctChecked: false,
-      optionData: {},
+      optionData: {
+        correct: false,
+      },
     }
   }
 
@@ -166,7 +168,7 @@ export default class OptionDialog extends React.Component<any, any> {
 
   private handleCheckingChange = () => {
     const newOptionData = { ...this.state.optionData }
-    newOptionData.correct = !this.state.correctChecked
+    newOptionData.correct = this.state.correctChecked ? false : true
 
     this.setState({
       correctChecked: !this.state.correctChecked,
@@ -175,6 +177,7 @@ export default class OptionDialog extends React.Component<any, any> {
   }
 
   private handleSubmit = event => {
+    console.log("option data: ", this.state.optionData)
     this.props.onSubmit(this.state.optionData)(event)
     this.handleClose()
   }
