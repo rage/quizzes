@@ -81,7 +81,7 @@ const ShortScale = props => {
 
         <Grid item={true} xs={1}>
           <IconButton
-            aria-label="Add option"
+            aria-label="Modify scale item"
             color="primary"
             disableRipple={true}
             onClick={props.toggleExpand}

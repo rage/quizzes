@@ -46,6 +46,7 @@ import {
   setEdit,
 } from "../store/edit/actions"
 import DragHandleWrapper from "./DragHandleWrapper"
+import EssayItem from "./Essay"
 import MultipleChoiceItem from "./MultipleChoice"
 import OptionContainer from "./OptionContainer"
 import ScaleItem from "./Scale"
@@ -125,6 +126,16 @@ class Item extends React.Component<any, any> {
     if (this.props.type === "scale") {
       return (
         <ScaleItem
+          {...this.props}
+          onCancel={this.handleItemCancel(this.props.order)}
+          toggleExpand={this.toggleExpand}
+        />
+      )
+    }
+
+    if (this.props.type === "essay") {
+      return (
+        <EssayItem
           {...this.props}
           onCancel={this.handleItemCancel(this.props.order)}
           toggleExpand={this.toggleExpand}
