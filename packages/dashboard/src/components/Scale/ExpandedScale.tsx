@@ -56,7 +56,8 @@ class ExpandedScaleItem extends React.Component<any, any> {
                       <TextField
                         fullWidth={true}
                         multiline={true}
-                        placeholder="Title"
+                        required={true}
+                        label="Title"
                         value={
                           (this.state.titleHasBeenModified &&
                             item.texts[0].title) ||
@@ -75,14 +76,14 @@ class ExpandedScaleItem extends React.Component<any, any> {
                       <TextField
                         multiline={true}
                         fullWidth={true}
-                        placeholder="Body"
+                        label="Body"
                         value={item.texts[0].body || ""}
                         onChange={this.changeEditAttribute("body")}
                       />
                     </Grid>
                     <Grid item={true} xs="auto" />
 
-                    <Grid item={true} xs={11} md={9} lg={7}>
+                    <Grid item={true} xs={11} md={11} lg={8}>
                       <Grid
                         container={true}
                         justify="flex-start"
@@ -92,14 +93,14 @@ class ExpandedScaleItem extends React.Component<any, any> {
                           <FormControlLabel
                             aria-label="Minimum option for scale"
                             name="min-alternative"
-                            label="Scale min "
+                            label="Min value"
                             labelPlacement="start"
                             control={
                               <TextField
                                 style={{
-                                  maxWidth: "10em",
+                                  maxWidth: "5em",
+                                  padding: "0px",
                                   marginLeft: ".5em",
-                                  marginRight: ".5em",
                                 }}
                                 required={true}
                                 type="number"
@@ -111,20 +112,28 @@ class ExpandedScaleItem extends React.Component<any, any> {
                               />
                             }
                           />
+                          <Typography
+                            style={{
+                              display: "inline",
+                              marginLeft: "1.5em",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            *
+                          </Typography>
                         </Grid>
 
                         <Grid item={true} xs="auto">
                           <FormControlLabel
                             aria-label="Maximum option for scale"
                             name="max-alternative"
-                            label="Scale max "
+                            label="Max value"
                             labelPlacement="start"
                             control={
                               <TextField
                                 style={{
-                                  maxWidth: "10em",
+                                  maxWidth: "5em",
                                   marginLeft: ".5em",
-                                  marginRight: ".5em",
                                 }}
                                 required={true}
                                 type="number"
@@ -136,6 +145,15 @@ class ExpandedScaleItem extends React.Component<any, any> {
                               />
                             }
                           />
+                          <Typography
+                            style={{
+                              display: "inline",
+                              marginLeft: "1.5em",
+                              fontWeight: "bold",
+                            }}
+                          >
+                            *
+                          </Typography>
                         </Grid>
                       </Grid>
                     </Grid>
@@ -144,7 +162,7 @@ class ExpandedScaleItem extends React.Component<any, any> {
                     <Grid item={true} xs={10} md={8} lg={6}>
                       <TextField
                         fullWidth={true}
-                        placeholder="Min label"
+                        label="Min label"
                         value={item.texts[0].successMessage || ""}
                         onChange={this.changeEditAttribute("successMessage")}
                       />
@@ -154,7 +172,7 @@ class ExpandedScaleItem extends React.Component<any, any> {
                     <Grid item={true} xs={10} md={8} lg={6}>
                       <TextField
                         fullWidth={true}
-                        placeholder="Max label"
+                        label="Max label"
                         value={item.texts[0].failureMessage || ""}
                         onChange={this.changeEditAttribute("failureMessage")}
                       />
