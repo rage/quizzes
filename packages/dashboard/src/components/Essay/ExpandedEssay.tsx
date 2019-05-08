@@ -1,15 +1,9 @@
 import {
-  Button,
   Card,
-  CardActions,
   CardContent,
-  FormControl,
   FormControlLabel,
-  FormLabel,
   Grid,
-  IconButton,
   TextField,
-  Typography,
 } from "@material-ui/core"
 import Reorder from "@material-ui/icons/Reorder"
 import React from "react"
@@ -21,12 +15,21 @@ import {
   modifyOption,
   save,
 } from "../../store/edit/actions"
-import DragHandleWrapper from "../DragHandleWrapper"
+import BottomActionsExpItem from "../BottomActionsExpItem"
+import ExpandedItemTopInformation from "../ExpandedItemTopInformation"
 
 class ExpandedEssay extends React.Component<any, any> {
   constructor(props) {
     super(props)
+    const item = this.props.items[this.props.order]
+    const initData = {
+      title: item.texts[0].title,
+      body: item.texts[0].body,
+      minWords: item.minWords,
+      maxWords: item.maxWords,
+    }
     this.state = {
+      tempItemData: initData,
       titleHasBeenModified: this.props.items[this.props.order].id
         ? true
         : false,
@@ -48,7 +51,7 @@ class ExpandedEssay extends React.Component<any, any> {
                     alignItems="center"
                     spacing={8}
                   >
-                    <TopInformation type={this.props.type} />
+                    <ExpandedItemTopInformation type={this.props.type} />
 
                     <Grid item={true} xs={10} md={8} lg={6}>
                       <TextField
@@ -58,10 +61,10 @@ class ExpandedEssay extends React.Component<any, any> {
                         label="Title"
                         value={
                           (this.state.titleHasBeenModified &&
-                            item.texts[0].title) ||
+                            this.state.tempItemData.title) ||
                           ""
                         }
-                        onChange={this.changeEditAttribute("title")}
+                        onChange={this.changeTempAttribute("title")}
                         style={{
                           fontWeight: "bold",
                           margin: "2em 0em 2em 0em",
@@ -77,8 +80,8 @@ class ExpandedEssay extends React.Component<any, any> {
                         rows={3}
                         fullWidth={true}
                         label="Body"
-                        value={item.texts[0].body || ""}
-                        onChange={this.changeEditAttribute("body")}
+                        value={this.state.tempItemData.body || ""}
+                        onChange={this.changeTempAttribute("body")}
                       />
                     </Grid>
 
@@ -99,8 +102,8 @@ class ExpandedEssay extends React.Component<any, any> {
                             variant="outlined"
                             margin="dense"
                             inputProps={{ min: 1 }}
-                            value={item.minWords || ""}
-                            onChange={this.changeEditAttribute("minWords")}
+                            value={this.state.tempItemData.minWords || ""}
+                            onChange={this.changeTempAttribute("minWords")}
                           />
                         }
                       />
@@ -122,8 +125,8 @@ class ExpandedEssay extends React.Component<any, any> {
                             type="number"
                             variant="outlined"
                             margin="dense"
-                            value={item.maxWords || ""}
-                            onChange={this.changeEditAttribute("maxWords")}
+                            value={this.state.tempItemData.maxWords || ""}
+                            onChange={this.changeTempAttribute("maxWords")}
                           />
                         }
                       />
@@ -132,34 +135,14 @@ class ExpandedEssay extends React.Component<any, any> {
                   </Grid>
                 </CardContent>
               </Grid>
-
               <Grid item={true} xs="auto" />
-              <Grid item={true}>
-                <CardActions>
-                  <Button
-                    style={{
-                      backgroundColor: "#00FF19",
-                      color: "white",
-                      borderRadius: "5px",
-                    }}
-                    onClick={this.saveItem}
-                  >
-                    {item.id ? "Save" : "Add"}
-                  </Button>
-                  <Button
-                    style={{
-                      backgroundColor: "#FF1F00",
-                      color: "white",
-                      borderRadius: "5px",
-                    }}
-                    onClick={
-                      item.id ? this.props.toggleExpand : this.props.onCancel
-                    }
-                  >
-                    Cancel
-                  </Button>
-                </CardActions>
-              </Grid>
+
+              <BottomActionsExpItem
+                onSave={this.saveItem}
+                itemHasBeenSaved={item.id ? true : false}
+                handleExpand={this.props.toggleExpand}
+                handleCancel={this.props.onCancel}
+              />
             </Grid>
           </Card>
         </Grid>
@@ -167,62 +150,43 @@ class ExpandedEssay extends React.Component<any, any> {
     )
   }
 
-  private changeEditAttribute = (attributeName: string) => e => {
+  private changeTempAttribute = (attributeName: string) => e => {
     if (attributeName === "title") {
       this.setState({
         titleHasBeenModified: true,
       })
     }
-    if (attributeName === "minWords" || attributeName === "maxWords") {
-      this.props.changeAttr(
-        `items[${this.props.order}].${attributeName}`,
-        e.target.value,
-      )
-    } else {
-      this.props.changeAttr(
-        `items[${this.props.order}].texts[0].${attributeName}`,
-        e.target.value,
-      )
-    }
+
+    const newData = { ...this.state.tempItemData }
+    newData[attributeName] = e.target.value
+
+    this.setState({
+      tempItemData: newData,
+    })
   }
 
   private saveItem = e => {
     this.props.toggleExpand(e)
+    this.props.changeAttr(
+      `items[${this.props.order}].texts[0].title`,
+      this.state.tempItemData.title,
+    )
+    this.props.changeAttr(
+      `items[${this.props.order}].texts[0].body`,
+      this.state.tempItemData.body,
+    )
+    this.props.changeAttr(
+      `items[${this.props.order}].minWords`,
+      this.state.tempItemData.minWords,
+    )
+    this.props.changeAttr(
+      `items[${this.props.order}].maxWords`,
+      this.state.tempItemData.maxWords,
+    )
+
     this.props.save()
   }
-
-  private handleClose = () => {
-    this.setState({ dialogOpen: false, existingOptData: null })
-  }
-
-  private handleSubmission = (item: string) => optionData => event => {
-    this.handleClose()
-    this.props.addFinishedOption(item, optionData)
-    this.setState({ optionsExist: true })
-  }
 }
-
-const TopInformation = ({ type }) => (
-  <React.Fragment>
-    <Grid item={true} xs={11}>
-      <Typography color="textSecondary" gutterBottom={true}>
-        Type: {type.charAt(0).toUpperCase() + type.substring(1, type.length)}
-      </Typography>
-    </Grid>
-
-    <Grid item={true} xs={1}>
-      <DragHandleWrapper>
-        <Reorder
-          fontSize="large"
-          style={{
-            transform: "scale(3,1.5)",
-            cursor: "pointer",
-          }}
-        />
-      </DragHandleWrapper>
-    </Grid>
-  </React.Fragment>
-)
 
 export default connect(
   null,

@@ -1,7 +1,5 @@
 import {
-  Button,
   Card,
-  CardActions,
   CardContent,
   Grid,
   IconButton,
@@ -9,7 +7,6 @@ import {
   Typography,
 } from "@material-ui/core"
 import AddCircle from "@material-ui/icons/AddCircle"
-import Reorder from "@material-ui/icons/Reorder"
 import React from "react"
 import { connect } from "react-redux"
 import {
@@ -19,16 +16,23 @@ import {
   modifyOption,
   save,
 } from "../../store/edit/actions"
-import DragHandleWrapper from "../DragHandleWrapper"
+import BottomActionsExpItem from "../BottomActionsExpItem"
+import ExpandedItemTopInformation from "../ExpandedItemTopInformation"
 import OptionDialog from "../OptionDialog"
 import SortableOptionList from "./SortableOptionList"
 
 class MultipleChoiceItem extends React.Component<any, any> {
   constructor(props) {
     super(props)
+    const item = this.props.items[this.props.order]
+    const initItemData = {
+      title: item.texts[0].title,
+      body: item.texts[0].body,
+    }
     this.state = {
       dialogOpen: false,
       existingOptData: null,
+      tempItemData: initItemData,
       optionsExist: props.items[props.order].options.length > 0,
       titleHasBeenModified: this.props.items[this.props.order].id
         ? true
@@ -51,7 +55,7 @@ class MultipleChoiceItem extends React.Component<any, any> {
                     alignItems="center"
                     spacing={8}
                   >
-                    <TopInformation />
+                    <ExpandedItemTopInformation type={this.props.type} />
 
                     <Grid item={true} xs={6} md={4} lg={3}>
                       <TextField
@@ -60,7 +64,7 @@ class MultipleChoiceItem extends React.Component<any, any> {
                         placeholder="Title"
                         value={
                           (this.state.titleHasBeenModified &&
-                            item.texts[0].title) ||
+                            this.state.tempItemData.title) ||
                           ""
                         }
                         onChange={this.changeEditAttribute("title")}
@@ -74,7 +78,7 @@ class MultipleChoiceItem extends React.Component<any, any> {
                         multiline={true}
                         fullWidth={true}
                         placeholder="Body"
-                        value={item.texts[0].body || ""}
+                        value={this.state.tempItemData.body || ""}
                         onChange={this.changeEditAttribute("body")}
                       />
                     </Grid>
@@ -124,32 +128,12 @@ class MultipleChoiceItem extends React.Component<any, any> {
               </Grid>
 
               <Grid item={true} xs="auto" />
-              <Grid item={true}>
-                <CardActions>
-                  <Button
-                    style={{
-                      backgroundColor: "#00FF19",
-                      color: "white",
-                      borderRadius: "5px",
-                    }}
-                    onClick={this.saveItem}
-                  >
-                    {item.id ? "Save" : "Add"}
-                  </Button>
-                  <Button
-                    style={{
-                      backgroundColor: "#FF1F00",
-                      color: "white",
-                      borderRadius: "5px",
-                    }}
-                    onClick={
-                      item.id ? this.props.toggleExpand : this.props.onCancel
-                    }
-                  >
-                    Cancel
-                  </Button>
-                </CardActions>
-              </Grid>
+              <BottomActionsExpItem
+                onSave={this.saveItem}
+                itemHasBeenSaved={item.id ? true : false}
+                handleExpand={this.props.toggleExpand}
+                handleCancel={this.props.onCancel}
+              />
             </Grid>
           </Card>
         </Grid>
@@ -174,14 +158,21 @@ class MultipleChoiceItem extends React.Component<any, any> {
         titleHasBeenModified: true,
       })
     }
-    this.props.changeAttr(
-      `items[${this.props.order}].texts[0].${attributeName}`,
-      e.target.value,
-    )
+    const newData = { ...this.state.tempItemData }
+    newData[attributeName] = e.target.value
+    this.setState({ tempItemData: newData })
   }
 
   private saveItem = e => {
     this.props.toggleExpand(e)
+    this.props.changeAttr(
+      `items[${this.props.order}].texts[0].title`,
+      this.state.tempItemData.title,
+    )
+    this.props.changeAttr(
+      `items[${this.props.order}].texts[0].body`,
+      this.state.tempItemData.body,
+    )
     this.props.save()
   }
 
@@ -227,28 +218,6 @@ class MultipleChoiceItem extends React.Component<any, any> {
     this.setState({ optionsExist: true })
   }
 }
-
-const TopInformation = () => (
-  <React.Fragment>
-    <Grid item={true} xs={11}>
-      <Typography color="textSecondary" gutterBottom={true}>
-        Type: multiple choice
-      </Typography>
-    </Grid>
-
-    <Grid item={true} xs={1}>
-      <DragHandleWrapper>
-        <Reorder
-          fontSize="large"
-          style={{
-            transform: "scale(3,1.5)",
-            cursor: "pointer",
-          }}
-        />
-      </DragHandleWrapper>
-    </Grid>
-  </React.Fragment>
-)
 
 export default connect(
   null,
