@@ -1,14 +1,11 @@
 import {
   Button,
-  Collapse,
-  FilledInput,
   FormControl,
   Grid,
   IconButton,
   Input,
   InputLabel,
   MenuItem,
-  OutlinedInput,
   Paper,
   Select,
   TextField,
@@ -21,6 +18,8 @@ import React from "react"
 import { connect } from "react-redux"
 import { changeAttr } from "../store/edit/actions"
 
+const PART_AND_SECTION_SHOW = true
+
 class QuizBasicInfo extends React.Component<any, any> {
   public constructor(props) {
     super(props)
@@ -31,7 +30,12 @@ class QuizBasicInfo extends React.Component<any, any> {
 
   public render() {
     return (
-      <Grid container={true} justify="flex-start" alignItems="center">
+      <Grid
+        container={true}
+        justify="flex-start"
+        alignItems="center"
+        spacing={8}
+      >
         <Grid item={true} xs={3} />
         <Grid item={true} xs={6} style={{ textAlign: "center" }}>
           <Typography variant="h4" style={{ textDecoration: "underline" }}>
@@ -46,8 +50,9 @@ class QuizBasicInfo extends React.Component<any, any> {
               courseLanguages={this.props.courseLanguages}
               quizTexts={this.props.quizTexts}
               onExpand={this.toggleExpansion}
-              changeAttribute={this.changeQuizAttribute}
               setAttribute={this.setQuizAttribute}
+              part={this.props.part}
+              section={this.props.section}
             />
           ) : (
             <ShortInfo
@@ -80,12 +85,15 @@ class QuizBasicInfo extends React.Component<any, any> {
     })
   }
 
-  public changeQuizAttribute = (attributeName: string) => e => {
-    this.props.changeAttr(`texts[0].${attributeName}`, e.target.value)
-  }
-
-  public setQuizAttribute = (attributeName: string, attributeValue: string) => {
-    this.props.changeAttr(`texts[0].${attributeName}`, attributeValue)
+  public setQuizAttribute = (
+    attributeName: string,
+    attributeValue: string | number,
+  ) => {
+    if (attributeName === "part" || attributeName === "section") {
+      this.props.changeAttr(attributeName, attributeValue)
+    } else {
+      this.props.changeAttr(`texts[0].${attributeName}`, attributeValue)
+    }
   }
 }
 
@@ -133,6 +141,8 @@ class ExpandedInfo extends React.Component<any, any> {
       title: props.quizTexts.title || "",
       body: props.quizTexts.body || "",
       submitMessage: props.quizTexts.submitMessge || "",
+      part: props.part || 0,
+      section: props.section || 0,
     }
   }
 
@@ -148,6 +158,7 @@ class ExpandedInfo extends React.Component<any, any> {
             onChange={this.changeTempAttribute("title")}
           />
         </Grid>
+        <Grid item={true} xs={6} />
         <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
           <FormControl variant="outlined">
             <InputLabel>Language</InputLabel>
@@ -165,7 +176,35 @@ class ExpandedInfo extends React.Component<any, any> {
             </Select>
           </FormControl>
         </Grid>
-        <Grid item={true} xs={12} style={{ marginBottom: "2em" }}>
+
+        {PART_AND_SECTION_SHOW && (
+          <Grid item={true} xs={12}>
+            <Grid container={true} justify="flex-start" spacing={16}>
+              <Grid item={true} xs={6} sm={4} md={3}>
+                <TextField
+                  label="Part"
+                  value={this.state.part}
+                  onChange={this.changeTempAttribute("part")}
+                  type="number"
+                />
+              </Grid>
+              <Grid item={true} xs={6} sm={4} md={3}>
+                <TextField
+                  label="Section"
+                  value={this.state.section}
+                  onChange={this.changeTempAttribute("section")}
+                  type="number"
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+        )}
+
+        <Grid
+          item={true}
+          xs={12}
+          style={{ marginBottom: "2em", marginTop: "2em" }}
+        >
           <TextField
             placeholder="Body"
             multiline={true}
@@ -216,6 +255,10 @@ class ExpandedInfo extends React.Component<any, any> {
     this.props.setAttribute("title", this.state.title)
     this.props.setAttribute("body", this.state.body)
     this.props.setAttribute("submitMessage", this.state.submitMessage)
+    if (PART_AND_SECTION_SHOW) {
+      this.props.setAttribute("part", this.state.part)
+      this.props.setAttribute("section", this.state.section)
+    }
     this.props.onExpand()
   }
 }
@@ -298,6 +341,8 @@ const mapStateToProps = (state: any) => {
     filter: state.filter,
     courseLanguages: state.edit.course.languages,
     quizTexts: state.edit.texts[0],
+    part: state.edit.part,
+    section: state.edit.section,
   }
 }
 
