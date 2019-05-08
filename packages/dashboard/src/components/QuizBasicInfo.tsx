@@ -47,6 +47,7 @@ class QuizBasicInfo extends React.Component<any, any> {
               quizTexts={this.props.quizTexts}
               onExpand={this.toggleExpansion}
               changeAttribute={this.changeQuizAttribute}
+              setAttribute={this.setQuizAttribute}
             />
           ) : (
             <ShortInfo
@@ -81,6 +82,10 @@ class QuizBasicInfo extends React.Component<any, any> {
 
   public changeQuizAttribute = (attributeName: string) => e => {
     this.props.changeAttr(`texts[0].${attributeName}`, e.target.value)
+  }
+
+  public setQuizAttribute = (attributeName: string, attributeValue: string) => {
+    this.props.changeAttr(`texts[0].${attributeName}`, attributeValue)
   }
 }
 
@@ -121,79 +126,97 @@ const ShortInfo = ({
   </Grid>
 )
 
-const ExpandedInfo = ({
-  filterLanguage,
-  courseLanguages,
-  quizTexts,
-  changeAttribute,
-  onExpand,
-}) => (
-  <Grid container={true} justify="space-between" alignContent="center">
-    <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
-      <TextField
-        placeholder="Title"
-        multiline={true}
-        rowsMax={10}
-        value={(quizTexts && quizTexts.title) || ""}
-        onChange={changeAttribute("title")}
-      />
-    </Grid>
-    <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
-      <FormControl variant="outlined">
-        <InputLabel>Language</InputLabel>
-        <Select
-          value={filterLanguage}
-          // onChange={}
-        >
-          {courseLanguages.map(languageInfo => {
-            return (
-              <MenuItem value={languageInfo.id} key={languageInfo.id}>
-                {languageInfo.name}
-              </MenuItem>
-            )
-          })}
-        </Select>
-      </FormControl>
-    </Grid>
-    <Grid item={true} xs={12} style={{ marginBottom: "2em" }}>
-      <TextField
-        placeholder="Body"
-        multiline={true}
-        rows={4}
-        rowsMax={15}
-        fullWidth={true}
-        variant="outlined"
-        value={(quizTexts && quizTexts.body) || ""}
-        onChange={changeAttribute("body")}
-      />
-    </Grid>
-    <Grid item={true} xs={12} style={{ marginBottom: "2em" }}>
-      <TextField
-        placeholder="Submit message"
-        value={(quizTexts && quizTexts.submitMessage) || ""}
-        onChange={changeAttribute("submitMessage")}
-      />
-    </Grid>
-    <Grid item={true} xs={6} sm={4} md={3}>
-      <Button variant="outlined" style={{ color: "#79c49b" }}>
-        Save
-      </Button>
-      <Button
-        variant="outlined"
-        style={{ color: "#d16d68" }}
-        onClick={onExpand}
-      >
-        Cancel
-      </Button>
-    </Grid>
-  </Grid>
-)
+class ExpandedInfo extends React.Component<any, any> {
+  constructor(props) {
+    super(props)
+    this.state = {
+      title: props.quizTexts.title || "",
+      body: props.quizTexts.body || "",
+      submitMessage: props.quizTexts.submitMessge || "",
+    }
+  }
 
-const mapStateToProps = (state: any) => {
-  return {
-    filter: state.filter,
-    courseLanguages: state.edit.course.languages,
-    quizTexts: state.edit.texts[0],
+  public render() {
+    return (
+      <Grid container={true} justify="space-between" alignContent="center">
+        <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
+          <TextField
+            placeholder="Title"
+            multiline={true}
+            rowsMax={10}
+            value={this.state.title}
+            onChange={this.changeTempAttribute("title")}
+          />
+        </Grid>
+        <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
+          <FormControl variant="outlined">
+            <InputLabel>Language</InputLabel>
+            <Select
+              value={this.props.filterLanguage}
+              // onChange={}
+            >
+              {this.props.courseLanguages.map(languageInfo => {
+                return (
+                  <MenuItem value={languageInfo.id} key={languageInfo.id}>
+                    {languageInfo.name}
+                  </MenuItem>
+                )
+              })}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item={true} xs={12} style={{ marginBottom: "2em" }}>
+          <TextField
+            placeholder="Body"
+            multiline={true}
+            rows={4}
+            rowsMax={15}
+            fullWidth={true}
+            variant="outlined"
+            value={this.state.body}
+            onChange={this.changeTempAttribute("body")}
+          />
+        </Grid>
+        <Grid item={true} xs={12} style={{ marginBottom: "2em" }}>
+          <TextField
+            placeholder="Submit message"
+            value={this.state.submitMessage}
+            onChange={this.changeTempAttribute("submitMessage")}
+          />
+        </Grid>
+        <Grid item={true} xs={6} sm={4} md={3}>
+          <Button
+            variant="outlined"
+            style={{ color: "#79c49b" }}
+            onClick={this.saveChanges}
+          >
+            Save
+          </Button>
+          <Button
+            variant="outlined"
+            style={{ color: "#d16d68" }}
+            onClick={this.props.onExpand}
+          >
+            Cancel
+          </Button>
+        </Grid>
+      </Grid>
+    )
+  }
+
+  private changeTempAttribute = (attributeName: string) => e => {
+    const newState = { ...this.state }
+    newState[attributeName] = e.target.value
+    this.setState({
+      ...newState,
+    })
+  }
+
+  private saveChanges = () => {
+    this.props.setAttribute("title", this.state.title)
+    this.props.setAttribute("body", this.state.body)
+    this.props.setAttribute("submitMessage", this.state.submitMessage)
+    this.props.onExpand()
   }
 }
 
@@ -267,6 +290,14 @@ class TogglableQuizInstruction extends React.Component<any, any> {
     this.setState({
       expanded: !this.state.expanded,
     })
+  }
+}
+
+const mapStateToProps = (state: any) => {
+  return {
+    filter: state.filter,
+    courseLanguages: state.edit.course.languages,
+    quizTexts: state.edit.texts[0],
   }
 }
 
