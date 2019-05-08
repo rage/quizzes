@@ -1,7 +1,7 @@
 import { Grid, Typography } from "@material-ui/core"
 import Reorder from "@material-ui/icons/Reorder"
 import React from "react"
-import DragHandleWrapper from "./DragHandleWrapper"
+import DragHandleWrapper from "../DragHandleWrapper"
 
 const TopInformation = ({ type }) => (
   <React.Fragment>

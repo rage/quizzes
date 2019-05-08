@@ -15,8 +15,8 @@ import {
   modifyOption,
   save,
 } from "../../store/edit/actions"
-import BottomActionsExpItem from "../BottomActionsExpItem"
-import ExpandedItemTopInformation from "../ExpandedItemTopInformation"
+import BottomActionsExpItem from "../ItemTools/ExpandedBottomActions"
+import ExpandedTopInformation from "../ItemTools/ExpandedTopInformation"
 
 class ExpandedEssay extends React.Component<any, any> {
   constructor(props) {
@@ -51,7 +51,7 @@ class ExpandedEssay extends React.Component<any, any> {
                     alignItems="center"
                     spacing={8}
                   >
-                    <ExpandedItemTopInformation type={this.props.type} />
+                    <ExpandedTopInformation type={this.props.type} />
 
                     <Grid item={true} xs={10} md={8} lg={6}>
                       <TextField
