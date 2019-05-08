@@ -1,5 +1,6 @@
 import {
   Button,
+  Collapse,
   FilledInput,
   FormControl,
   Grid,
@@ -8,11 +9,14 @@ import {
   InputLabel,
   MenuItem,
   OutlinedInput,
+  Paper,
   Select,
   TextField,
   Typography,
 } from "@material-ui/core"
+import ArrowDropUp from "@material-ui/icons/ArrowDropUp"
 import Create from "@material-ui/icons/Create"
+import MoreVert from "@material-ui/icons/MoreVert"
 import React from "react"
 import { connect } from "react-redux"
 import { changeAttr } from "../store/edit/actions"
@@ -30,7 +34,7 @@ class QuizBasicInfo extends React.Component<any, any> {
       <Grid container={true} justify="flex-start" alignItems="center">
         <Grid item={true} xs={3} />
         <Grid item={true} xs={6} style={{ textAlign: "center" }}>
-          <Typography variant="title" style={{ textDecoration: "underline" }}>
+          <Typography variant="h4" style={{ textDecoration: "underline" }}>
             Basic information
           </Typography>
         </Grid>
@@ -55,8 +59,12 @@ class QuizBasicInfo extends React.Component<any, any> {
           )}
         </Grid>
         <Grid item={true} xs={3} />
-        <Grid item={true} xs={6} style={{ textAlign: "center" }}>
-          <Typography variant="title" style={{ textDecoration: "underline" }}>
+        <Grid
+          item={true}
+          xs={6}
+          style={{ textAlign: "center", marginTop: "2em" }}
+        >
+          <Typography variant="h4" style={{ textDecoration: "underline" }}>
             Questions
           </Typography>
         </Grid>
@@ -85,7 +93,7 @@ const ShortInfo = ({
 }) => (
   <Grid container={true} justify="space-between">
     <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
-      <Typography variant="title">{title}</Typography>
+      <Typography variant="title" paragraph={true}>{`${title}`}</Typography>
     </Grid>
     <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
       <Select
@@ -102,7 +110,7 @@ const ShortInfo = ({
       </Select>
     </Grid>
     <Grid xs={12} item={true} style={{ marginBottom: "2em" }}>
-      <Typography variant="body1">{body}</Typography>
+      <TogglableQuizInstruction bodyText={body} />
     </Grid>
     <Grid xs={4}>
       <Button variant="raised" style={{ color: "gray" }} onClick={onExpand}>
@@ -124,6 +132,8 @@ const ExpandedInfo = ({
     <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
       <TextField
         placeholder="Title"
+        multiline={true}
+        rowsMax={10}
         value={(quizTexts && quizTexts.title) || ""}
         onChange={changeAttribute("title")}
       />
@@ -150,6 +160,7 @@ const ExpandedInfo = ({
         placeholder="Body"
         multiline={true}
         rows={4}
+        rowsMax={15}
         fullWidth={true}
         variant="outlined"
         value={(quizTexts && quizTexts.body) || ""}
@@ -183,6 +194,79 @@ const mapStateToProps = (state: any) => {
     filter: state.filter,
     courseLanguages: state.edit.course.languages,
     quizTexts: state.edit.texts[0],
+  }
+}
+
+class TogglableQuizInstruction extends React.Component<any, any> {
+  public constructor({ props }) {
+    super(props)
+    this.state = {
+      expanded: false,
+    }
+  }
+
+  public render() {
+    if (!this.props.bodyText) {
+      return <div />
+    }
+    let content = this.props.bodyText
+
+    if (this.state.expanded) {
+      return (
+        <Paper style={{ padding: "2em 1em 2em 1em" }}>
+          <Grid container={true} justify="center">
+            <Grid item={true} xs={12}>
+              <Typography
+                variant="body1"
+                paragraph={true}
+                style={{ whiteSpace: "pre-wrap" }}
+              >
+                {content}
+              </Typography>
+            </Grid>
+            <Grid item={true} xs={6} sm={4} md={2}>
+              <IconButton onClick={this.toggleExpansion}>
+                <ArrowDropUp fontSize="large" />
+              </IconButton>
+            </Grid>
+          </Grid>
+        </Paper>
+      )
+    }
+
+    const lines: string[] = this.props.bodyText.split("\n")
+    if (lines.length > 16) {
+      content = lines.splice(0, 15).join("\n")
+    }
+
+    return (
+      <Paper style={{ padding: "2em 1em 2em 1em" }}>
+        <Grid container={true} justify="center">
+          <Grid item={true} xs={12}>
+            <Typography
+              variant="body1"
+              paragraph={true}
+              style={{ whiteSpace: "pre-wrap" }}
+            >
+              {content}
+            </Typography>
+          </Grid>
+          {lines.length > 16 && (
+            <Grid item={true} xs={6} sm={4} md={2}>
+              <IconButton onClick={this.toggleExpansion}>
+                <MoreVert fontSize="large" />
+              </IconButton>
+            </Grid>
+          )}
+        </Grid>
+      </Paper>
+    )
+  }
+
+  private toggleExpansion = () => {
+    this.setState({
+      expanded: !this.state.expanded,
+    })
   }
 }
 
