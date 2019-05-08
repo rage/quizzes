@@ -18,11 +18,10 @@ import {
 export default class OptionDialog extends React.Component<any, any> {
   constructor(props) {
     super(props)
+
     this.state = {
       correctChecked: false,
-      optionData: {
-        correct: false,
-      },
+      optionData: {},
     }
   }
 
@@ -62,6 +61,13 @@ export default class OptionDialog extends React.Component<any, any> {
     if (
       this.state.optionData.failureMessage !==
       nextState.optionData.failureMessage
+    ) {
+      return true
+    }
+
+    if (
+      JSON.stringify(this.props.existingOptData) !==
+      JSON.stringify(nextProps.existingOptData)
     ) {
       return true
     }

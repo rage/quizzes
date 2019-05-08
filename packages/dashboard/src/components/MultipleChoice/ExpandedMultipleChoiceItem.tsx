@@ -181,16 +181,18 @@ class MultipleChoiceItem extends React.Component<any, any> {
       .find(i => i.id === itemId)
       .options.find(o => o.id === optionId)
 
+    const newData = {
+      title: option.texts[0].title,
+      correct: option.correct,
+      successMessage: option.texts[0].successMessage,
+      failureMessage: option.texts[0].failureMessage,
+      id: optionId,
+    }
     this.setState({
-      existingOptData: {
-        title: option.texts[0].title,
-        correct: option.correct,
-        successMessage: option.texts[0].successMessage,
-        failureMessage: option.texts[0].failureMessage,
-        id: optionId,
-      },
-      dialogOpen: true,
+      existingOptData: newData,
     })
+    console.log("New data", newData)
+    this.setState({ dialogOpen: true })
   }
 
   private onSortEnd = ({ oldIndex, newIndex, collection }) => {
