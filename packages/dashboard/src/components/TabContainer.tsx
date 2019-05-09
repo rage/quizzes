@@ -1,6 +1,7 @@
 import {
   Button,
   Grid,
+  Grow,
   IconButton,
   Menu,
   MenuItem,
@@ -8,7 +9,7 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core"
-import AddBox from "@material-ui/icons/AddBox"
+import Add from "@material-ui/icons/Add"
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import { addItem, addReview, changeOrder, remove } from "../store/edit/actions"
@@ -204,32 +205,37 @@ class QuestionAdder extends React.Component<any, any> {
   }
 
   public render() {
-    if (this.state.expanded) {
-      return (
-        <Grid item={true} xs={12}>
+    return (
+      <Grid item={true} xs={12} style={{ marginBottom: "2em" }}>
+        <Grid container={true} justify="flex-start" alignContent="stretch">
           <Grid
-            container={true}
-            justify="flex-start"
-            alignContent="center"
-            alignItems="center"
+            item={true}
+            xs="auto"
+            onClick={this.toggleExpand}
+            style={{
+              backgroundColor: "darkgray",
+              cursor: "pointer",
+              width: "5em",
+            }}
           >
-            <Grid item={true} xs="auto">
-              <IconButton
-                style={{ color: "darkgray", padding: "0em" }}
-                onClick={this.toggleExpand}
-              >
-                <AddBox fontSize="large" style={{ color: "darkgray" }} />
-              </IconButton>
-            </Grid>
-
             <Grid
-              item={true}
-              xs={10}
-              sm={8}
-              md={8}
-              xl={6}
-              style={{ alignSelf: "center" }}
+              container={true}
+              direction="column"
+              justify="center"
+              alignContent="center"
+              style={{ height: "100%" }}
             >
+              <Grid item={true} xs={6}>
+                <Add
+                  fontSize="large"
+                  style={{ color: "white", width: "100%", height: "100%" }}
+                />
+              </Grid>
+            </Grid>
+          </Grid>
+
+          <Grow in={this.state.expanded} style={{ transformOrigin: "0 0 0" }}>
+            <Grid item={true} xs={10} lg={8} style={{ alignSelf: "center" }}>
               <Grid
                 container={true}
                 justify="flex-start"
@@ -237,49 +243,46 @@ class QuestionAdder extends React.Component<any, any> {
                 alignContent="center"
                 style={{ backgroundColor: "lightgray" }}
               >
-                {this.props.itemTypes.map(type => (
-                  <Grid
-                    item={true}
-                    xs="auto"
-                    key={type}
-                    style={{ borderRight: "solid", borderColor: "gray" }}
-                  >
-                    <Button
-                      style={{
-                        textTransform: "none",
-                        padding: "1em",
-                        whiteSpace: "pre-wrap",
-                      }}
-                      onClick={this.props.addItem(type)}
+                {this.props.itemTypes.map((type, idx) => (
+                  <Grid item={true} xs="auto" key={type} style={{}}>
+                    <Grid
+                      container={true}
+                      alignContent="center"
+                      alignItems="center"
                     >
-                      {type.replace("-", "\n")}
-                    </Button>
+                      <Grid item={true} xs={11}>
+                        <Button
+                          disabled={!this.state.expanded}
+                          style={{
+                            textTransform: "none",
+                            padding: "1em",
+                            whiteSpace: "pre-wrap",
+                            height: "5em",
+                          }}
+                          onClick={this.props.addItem(type)}
+                        >
+                          {type.replace("-", "\n")}
+                        </Button>
+                      </Grid>
+                      {idx < this.props.itemTypes.length - 1 && (
+                        <Grid item={true} xs={1}>
+                          <Typography
+                            align="center"
+                            variant="h3"
+                            style={{ display: "inline", color: "silver" }}
+                          >
+                            |
+                          </Typography>
+                        </Grid>
+                      )}
+                    </Grid>
                   </Grid>
                 ))}
               </Grid>
             </Grid>
-          </Grid>
-        </Grid>
-      )
-    }
+          </Grow>
 
-    return (
-      <Grid item={true} xs={12}>
-        <Grid
-          container={true}
-          spacing={8}
-          justify="flex-start"
-          alignContent="stretch"
-        >
-          <Grid item={true} xs="auto">
-            <IconButton
-              style={{ color: "darkgray", padding: "0em" }}
-              onClick={this.toggleExpand}
-            >
-              <AddBox fontSize="large" style={{ color: "darkgray" }} />
-            </IconButton>
-          </Grid>
-          {!this.props.itemsExist && (
+          {!this.props.itemsExist && !this.state.expanded && (
             <Grid
               item={true}
               xs={10}
