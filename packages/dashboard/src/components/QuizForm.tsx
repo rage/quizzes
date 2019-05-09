@@ -24,7 +24,7 @@ import {
   setEdit,
 } from "../store/edit/actions"
 import { setLanguage } from "../store/filter/actions"
-import QuizBasicInfo from "./QuizBasicInfo"
+import QuizInfo from "./QuizInfo"
 import TabContainer from "./TabContainer"
 
 class QuizForm extends React.Component<any, any> {
@@ -44,56 +44,8 @@ class QuizForm extends React.Component<any, any> {
     return (
       <Grid container={true} spacing={16} justify="center">
         <Grid item={true} xs={12} sm={10} lg={8}>
-          <QuizBasicInfo {...this.props} />
-          <Tabs
-            value={this.props.filter.language || "add"}
-            onChange={this.handleTabs}
-            style={{ marginBottom: 30 }}
-          >
-            {this.props.edit.course.languages.map(l => (
-              <Tab value={l.id} key={l.id} label={l.id} />
-            ))}
-            <Tab label="add" value="add" onClick={this.addLanguage} />
-          </Tabs>
-          <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
-            <Grid item={true} xs={12}>
-              <Grid container={true}>
-                <Grid item={true} xs={4}>
-                  <FormControl>
-                    <InputLabel>course</InputLabel>
-                    <Select
-                      onChange={this.selectCourse}
-                      value={
-                        this.props.edit.course.id || this.props.filter.course
-                      }
-                    >
-                      {this.props.courses.map(course => (
-                        <MenuItem key={course.id} value={course.id}>
-                          {course.texts[0].title}
-                        </MenuItem>
-                      )) || ""}
-                    </Select>
-                  </FormControl>
-                </Grid>
-                <Grid item={true} xs={4}>
-                  <TextField
-                    label="part"
-                    value={this.props.edit.part}
-                    type="number"
-                    onChange={this.handleChange("part")}
-                  />
-                </Grid>
-                <Grid item={true} xs={4}>
-                  <TextField
-                    label="section"
-                    value={this.props.edit.section}
-                    type="number"
-                    onChange={this.handleChange("section")}
-                  />
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
+          <QuizInfo />
+
           {this.props.edit.course.languages.map(
             (l, i) =>
               this.props.filter.language === l.id && (
@@ -134,18 +86,6 @@ class QuizForm extends React.Component<any, any> {
         ? event.target.checked
         : event.target.value,
     )
-  }
-
-  private handleTabs = (event, value) => {
-    this.props.setLanguage(value)
-  }
-
-  private selectCourse = event => {
-    console.log(event.target.value)
-  }
-
-  private addLanguage = () => {
-    console.log("do you want to add language to course blaablaa")
   }
 }
 
