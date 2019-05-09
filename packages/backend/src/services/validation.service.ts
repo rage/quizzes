@@ -241,7 +241,8 @@ export default class ValidationService {
   public async validateModificationOfExistingQuiz(quiz: Quiz, oldQuiz: Quiz) {
     const stricter = oldQuiz.items.some(qi => {
       const qi2 = quiz.items.find(x => x.id === qi.id)
-      if (qi2 === null) {
+
+      if (!qi2) {
         return false
       }
       if (qi2.minWords && (!qi.minWords || qi.minWords < qi2.minWords)) {

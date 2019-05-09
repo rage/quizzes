@@ -1,12 +1,14 @@
 import {
   Button,
   Grid,
+  IconButton,
   Menu,
   MenuItem,
   Paper,
   TextField,
   Typography,
 } from "@material-ui/core"
+import AddBox from "@material-ui/icons/AddBox"
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import { addItem, addReview, changeOrder, remove } from "../store/edit/actions"
@@ -29,8 +31,6 @@ class TabContainer extends Component<any, any> {
   constructor(props) {
     super(props)
     this.state = {
-      menuOpen: false,
-      menuAnchor: null,
       scrollTo: null,
       justAdded: false,
       expandedItems: {},
@@ -124,22 +124,11 @@ class TabContainer extends Component<any, any> {
           />
         </Grid>
 
-        <Grid item={true} xs={12}>
-          <Button id="item" onClick={this.handleMenu}>
-            Add item
-          </Button>
-          <Menu
-            anchorEl={this.state.menuAnchor}
-            open={this.state.menuOpen === "item"}
-            onClose={this.handleMenu}
-          >
-            {this.itemTypes.map(type => (
-              <MenuItem key={type} value={type} onClick={this.addItem(type)}>
-                {type}
-              </MenuItem>
-            ))}
-          </Menu>
-        </Grid>
+        <QuestionAdder
+          itemTypes={this.itemTypes}
+          addItem={this.addItem}
+          itemsExist={this.props.items && this.props.items.length > 0}
+        />
 
         {this.props.items.find(item => item.type === "essay") && (
           <Grid item={true} xs={12}>
@@ -166,28 +155,17 @@ class TabContainer extends Component<any, any> {
 
   private addItem = type => event => {
     this.setState({
-      menuOpen: null,
       justAdded: true,
     })
     this.props.addItem(type)
   }
 
   private addReview = event => {
-    this.setState({
-      menuOpen: null,
-    })
     this.props.addReview()
   }
 
   private remove = (path, index) => event => {
     this.props.remove(path, index)
-  }
-
-  private handleMenu = event => {
-    this.setState({
-      menuOpen: event.currentTarget.id,
-      menuAnchor: event.currentTarget,
-    })
   }
 
   private onSortEnd = ({ oldIndex, newIndex, collection }) => {
@@ -214,6 +192,121 @@ const mapDispatchToProps = {
   addReview,
   changeOrder,
   remove,
+}
+
+class QuestionAdder extends React.Component<any, any> {
+  constructor(props) {
+    super(props)
+
+    this.state = {
+      expanded: false,
+    }
+  }
+
+  public render() {
+    if (this.state.expanded) {
+      return (
+        <Grid item={true} xs={12}>
+          <Grid
+            container={true}
+            justify="flex-start"
+            alignContent="center"
+            alignItems="center"
+          >
+            <Grid item={true} xs="auto">
+              <IconButton
+                style={{ color: "darkgray", padding: "0em" }}
+                onClick={this.toggleExpand}
+              >
+                <AddBox fontSize="large" style={{ color: "darkgray" }} />
+              </IconButton>
+            </Grid>
+
+            <Grid
+              item={true}
+              xs={10}
+              sm={8}
+              md={8}
+              xl={6}
+              style={{ alignSelf: "center" }}
+            >
+              <Grid
+                container={true}
+                justify="flex-start"
+                alignItems="center"
+                alignContent="center"
+                style={{ backgroundColor: "lightgray" }}
+              >
+                {this.props.itemTypes.map(type => (
+                  <Grid
+                    item={true}
+                    xs="auto"
+                    key={type}
+                    style={{ borderRight: "solid", borderColor: "gray" }}
+                  >
+                    <Button
+                      style={{
+                        textTransform: "none",
+                        padding: "1em",
+                        whiteSpace: "pre-wrap",
+                      }}
+                      onClick={this.props.addItem(type)}
+                    >
+                      {type.replace("-", "\n")}
+                    </Button>
+                  </Grid>
+                ))}
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+      )
+    }
+
+    return (
+      <Grid item={true} xs={12}>
+        <Grid
+          container={true}
+          spacing={8}
+          justify="flex-start"
+          alignContent="stretch"
+        >
+          <Grid item={true} xs="auto">
+            <IconButton
+              style={{ color: "darkgray", padding: "0em" }}
+              onClick={this.toggleExpand}
+            >
+              <AddBox fontSize="large" style={{ color: "darkgray" }} />
+            </IconButton>
+          </Grid>
+          {!this.props.itemsExist && (
+            <Grid
+              item={true}
+              xs={10}
+              sm={8}
+              md={6}
+              lg={4}
+              xl={3}
+              style={{
+                alignSelf: "center",
+              }}
+            >
+              <Typography variant="body1" style={{ color: "darkgray" }}>
+                Your Quiz does not have any questions yet. Add a question by
+                clicking the button on the left.
+              </Typography>
+            </Grid>
+          )}
+        </Grid>
+      </Grid>
+    )
+  }
+
+  private toggleExpand = () => {
+    this.setState({
+      expanded: !this.state.expanded,
+    })
+  }
 }
 
 export default connect(
