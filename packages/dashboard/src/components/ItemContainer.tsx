@@ -1,49 +1,7 @@
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Collapse,
-  Divider,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  FormControl,
-  Grid,
-  IconButton,
-  InputLabel,
-  Menu,
-  MenuItem,
-  Paper,
-  Select,
-  SvgIcon,
-  Switch,
-  Tab,
-  Tabs,
-  TextField,
-  Toolbar,
-  Typography,
-} from "@material-ui/core"
 import React, { ComponentClass } from "react"
 import { connect } from "react-redux"
-import {
-  arrayMove,
-  SortableContainer,
-  SortableElement,
-  SortableHandle,
-} from "react-sortable-hoc"
-import {
-  addItem,
-  addOption,
-  changeAttr,
-  changeOrder,
-  newQuiz,
-  save,
-  setEdit,
-} from "../store/edit/actions"
+import { SortableContainer } from "react-sortable-hoc"
 import Item from "./Item"
-import OptionContainer from "./OptionContainer"
 import SortableWrapper from "./SortableWrapper"
 
 const ItemContainer: ComponentClass<any, any> = SortableContainer(

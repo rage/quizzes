@@ -1,20 +1,10 @@
-import {
-  Button,
-  Grid,
-  Grow,
-  IconButton,
-  Menu,
-  MenuItem,
-  Paper,
-  TextField,
-  Typography,
-} from "@material-ui/core"
-import Add from "@material-ui/icons/Add"
+import { Button, Grid, Paper, Typography } from "@material-ui/core"
 import React, { Component } from "react"
 import { connect } from "react-redux"
 import { addItem, addReview, changeOrder, remove } from "../store/edit/actions"
 import ItemContainer from "./ItemContainer"
 import PeerReviewCollectionContainer from "./PeerReviewCollectionContainer"
+import QuestionAdder from "./QuizQuestionAdder"
 
 class TabContainer extends Component<any, any> {
   private itemTypes = [
@@ -26,8 +16,6 @@ class TabContainer extends Component<any, any> {
     "research-agreement",
     "scale",
   ]
-
-  private reviewTypes = ["essay", "grade"]
 
   constructor(props) {
     super(props)
@@ -193,123 +181,6 @@ const mapDispatchToProps = {
   addReview,
   changeOrder,
   remove,
-}
-
-class QuestionAdder extends React.Component<any, any> {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      expanded: false,
-    }
-  }
-
-  public render() {
-    return (
-      <Grid item={true} xs={12} style={{ marginBottom: "2em" }}>
-        <Grid container={true} justify="flex-start" alignContent="stretch">
-          <Grid
-            item={true}
-            xs="auto"
-            onClick={this.toggleExpand}
-            style={{
-              backgroundColor: "darkgray",
-              cursor: "pointer",
-              width: "5em",
-            }}
-          >
-            <Grid
-              container={true}
-              direction="column"
-              justify="center"
-              alignContent="center"
-              style={{ height: "100%" }}
-            >
-              <Grid item={true} xs={6}>
-                <Add
-                  fontSize="large"
-                  style={{ color: "white", width: "100%", height: "100%" }}
-                />
-              </Grid>
-            </Grid>
-          </Grid>
-
-          <Grow in={this.state.expanded} style={{ transformOrigin: "0 0 0" }}>
-            <Grid item={true} xs={10} lg={8} style={{ alignSelf: "center" }}>
-              <Grid
-                container={true}
-                justify="flex-start"
-                alignItems="center"
-                alignContent="center"
-                style={{ backgroundColor: "lightgray" }}
-              >
-                {this.props.itemTypes.map((type, idx) => (
-                  <Grid item={true} xs="auto" key={type} style={{}}>
-                    <Grid
-                      container={true}
-                      alignContent="center"
-                      alignItems="center"
-                    >
-                      <Grid item={true} xs={11}>
-                        <Button
-                          disabled={!this.state.expanded}
-                          style={{
-                            textTransform: "none",
-                            padding: "1em",
-                            whiteSpace: "pre-wrap",
-                            height: "5em",
-                          }}
-                          onClick={this.props.addItem(type)}
-                        >
-                          {type.replace("-", "\n")}
-                        </Button>
-                      </Grid>
-                      {idx < this.props.itemTypes.length - 1 && (
-                        <Grid item={true} xs={1}>
-                          <Typography
-                            align="center"
-                            variant="h3"
-                            style={{ display: "inline", color: "silver" }}
-                          >
-                            |
-                          </Typography>
-                        </Grid>
-                      )}
-                    </Grid>
-                  </Grid>
-                ))}
-              </Grid>
-            </Grid>
-          </Grow>
-
-          {!this.props.itemsExist && !this.state.expanded && (
-            <Grid
-              item={true}
-              xs={10}
-              sm={8}
-              md={6}
-              lg={4}
-              xl={3}
-              style={{
-                alignSelf: "center",
-              }}
-            >
-              <Typography variant="body1" style={{ color: "darkgray" }}>
-                Your Quiz does not have any questions yet. Add a question by
-                clicking the button on the left.
-              </Typography>
-            </Grid>
-          )}
-        </Grid>
-      </Grid>
-    )
-  }
-
-  private toggleExpand = () => {
-    this.setState({
-      expanded: !this.state.expanded,
-    })
-  }
 }
 
 export default connect(

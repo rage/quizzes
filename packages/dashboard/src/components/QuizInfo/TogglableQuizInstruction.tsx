@@ -41,7 +41,8 @@ class TogglableQuizInstruction extends React.Component<any, any> {
     }
 
     const lines: string[] = this.props.bodyText.split("\n")
-    if (lines.length > 16) {
+    const len = lines.length
+    if (len > 15) {
       content = lines.splice(0, 15).join("\n")
     }
 
@@ -57,7 +58,7 @@ class TogglableQuizInstruction extends React.Component<any, any> {
               {content}
             </Typography>
           </Grid>
-          {lines.length > 16 && (
+          {len > 15 && (
             <Grid item={true} xs={6} sm={4} md={2}>
               <IconButton onClick={this.toggleExpansion}>
                 <MoreVert fontSize="large" />
