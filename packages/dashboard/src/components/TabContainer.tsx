@@ -61,6 +61,10 @@ class TabContainer extends Component<any, any> {
       return true
     }
 
+    if (this.props.items !== nextProps.items) {
+      return true
+    }
+
     return this.props !== nextProps
   }
 

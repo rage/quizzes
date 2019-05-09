@@ -25,6 +25,7 @@ import {
   Toolbar,
   Typography,
 } from "@material-ui/core"
+import Delete from "@material-ui/icons/Delete"
 import React, { ChangeEvent, createRef } from "react"
 import { connect } from "react-redux"
 import {
@@ -40,11 +41,15 @@ import {
   changeAttr,
   changeOrder,
   newQuiz,
+  remove,
   save,
   setEdit,
 } from "../store/edit/actions"
 import DragHandleWrapper from "./DragHandleWrapper"
+import EssayItem from "./Essay"
+import MultipleChoiceItem from "./MultipleChoice"
 import OptionContainer from "./OptionContainer"
+import ScaleItem from "./Scale"
 
 class Item extends React.Component<any, any> {
   private titleRef = createRef<HTMLInputElement>()
@@ -92,6 +97,8 @@ class Item extends React.Component<any, any> {
       "formatRegex",
       "newlyAdded",
       "expanded",
+      "order",
+      "items",
     ]
 
     return modificationFields.some(
@@ -105,6 +112,40 @@ class Item extends React.Component<any, any> {
         type,
       )
     }
+
+    if (this.props.type === "multiple-choice") {
+      return (
+        <MultipleChoiceItem
+          {...this.props}
+          onCancel={this.handleItemCancel(this.props.order)}
+          toggleExpand={this.toggleExpand}
+          onRemoval={this.handleItemRemoval}
+        />
+      )
+    }
+
+    if (this.props.type === "scale") {
+      return (
+        <ScaleItem
+          {...this.props}
+          onCancel={this.handleItemCancel(this.props.order)}
+          toggleExpand={this.toggleExpand}
+          onRemoval={this.handleItemRemoval}
+        />
+      )
+    }
+
+    if (this.props.type === "essay") {
+      return (
+        <EssayItem
+          {...this.props}
+          onCancel={this.handleItemCancel(this.props.order)}
+          toggleExpand={this.toggleExpand}
+          onRemoval={this.handleItemRemoval}
+        />
+      )
+    }
+
     return (
       <Card
         style={{
@@ -261,7 +302,8 @@ class Item extends React.Component<any, any> {
                         />
                       </React.Fragment>
                     )}
-                    {this.props.type === "open" ? (
+
+                    {this.props.type === "open" && (
                       <div>
                         <TextField
                           label="validity regex"
@@ -282,23 +324,20 @@ class Item extends React.Component<any, any> {
                           margin="normal"
                         />
                       </div>
-                    ) : (
-                      <p />
                     )}
+
                     <Grid container={true} style={{ marginTop: 20 }}>
                       <Grid item={true} xs={12}>
                         <Grid container={true} justify="flex-end">
                           <IconButton
-                            onClick={this.props.remove(
+                            onClick={this.handleItemRemoval(
                               "items",
                               this.props.index,
                             )}
                             aria-label="Delete"
                             color="secondary"
                           >
-                            <SvgIcon>
-                              <path d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z" />
-                            </SvgIcon>
+                            <Delete />
                           </IconButton>
                         </Grid>
                       </Grid>
@@ -306,7 +345,8 @@ class Item extends React.Component<any, any> {
                   </CardContent>
                 </Card>
               </Grid>
-              {renderOptions(this.props.type) ? (
+
+              {renderOptions(this.props.type) && (
                 <Grid item={true} xs={12}>
                   <Card>
                     <CardHeader subheader="Options / Answer alternatives" />
@@ -325,14 +365,20 @@ class Item extends React.Component<any, any> {
                     </CardContent>
                   </Card>
                 </Grid>
-              ) : (
-                <p />
               )}
             </Grid>
           </CardContent>
         </Collapse>
       </Card>
     )
+  }
+
+  private handleItemRemoval = (path, index) => () => {
+    this.props.remove(path, index)
+  }
+
+  private handleItemCancel = quizItemOrder => () => {
+    this.props.remove("items", quizItemOrder)
   }
 
   private toggleExpand = event => {
@@ -353,5 +399,5 @@ class Item extends React.Component<any, any> {
 
 export default connect(
   null,
-  { changeOrder },
+  { changeOrder, remove },
 )(Item)
