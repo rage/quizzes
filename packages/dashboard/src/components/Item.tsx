@@ -45,6 +45,7 @@ import {
   save,
   setEdit,
 } from "../store/edit/actions"
+import Checkbox from "./Checkbox"
 import DragHandleWrapper from "./DragHandleWrapper"
 import EssayItem from "./Essay"
 import MultipleChoiceItem from "./MultipleChoice"
@@ -138,6 +139,17 @@ class Item extends React.Component<any, any> {
     if (this.props.type === "essay") {
       return (
         <EssayItem
+          {...this.props}
+          onCancel={this.handleItemCancel(this.props.order)}
+          toggleExpand={this.toggleExpand}
+          onRemoval={this.handleItemRemoval}
+        />
+      )
+    }
+
+    if (this.props.type === "checkbox") {
+      return (
+        <Checkbox
           {...this.props}
           onCancel={this.handleItemCancel(this.props.order)}
           toggleExpand={this.toggleExpand}

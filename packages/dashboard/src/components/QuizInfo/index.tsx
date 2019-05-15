@@ -1,6 +1,7 @@
 import { Grid, Typography } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
+import { Redirect } from "react-router-dom"
 import { changeAttr } from "../../store/edit/actions"
 import ExpandedQuizInfo from "./ExpandedQuizInfo"
 import ShortQuizInfo from "./ShortQuizInfo"
@@ -9,11 +10,31 @@ class QuizInfo extends React.Component<any, any> {
   public constructor(props) {
     super(props)
     this.state = {
-      expanded: !props.quizHasBeenSaved,
+      expanded: false,
+      redirect: null,
+      initialCorrected: false,
+    }
+  }
+
+  public componentDidMount() {
+    this.setState({
+      expanded: !this.props.quizHasBeenSaved,
+    })
+  }
+
+  public componentDidUpdate() {
+    if (!this.state.initialCorrected) {
+      this.setState({
+        initialCorrected: true,
+        expanded: !this.props.quizHasBeenSaved,
+      })
     }
   }
 
   public render() {
+    if (this.state.redirect) {
+      return <Redirect to={`courses/${this.props.currentCourseId}`} />
+    }
     return (
       <Grid
         container={true}
@@ -35,6 +56,11 @@ class QuizInfo extends React.Component<any, any> {
               courseLanguages={this.props.courseLanguages}
               quizTexts={this.props.quizTexts}
               onExpand={this.toggleExpansion}
+              onCancel={
+                this.props.quizHasBeenSaved
+                  ? this.toggleExpansion
+                  : this.redirectToCoursePage
+              }
               setAttribute={this.setQuizAttribute}
               part={this.props.part}
               section={this.props.section}
@@ -75,6 +101,12 @@ class QuizInfo extends React.Component<any, any> {
     } else {
       this.props.changeAttr(`texts[0].${attributeName}`, attributeValue)
     }
+  }
+
+  public redirectToCoursePage = () => {
+    this.setState({
+      redirect: this.props.currentCourseId,
+    })
   }
 }
 

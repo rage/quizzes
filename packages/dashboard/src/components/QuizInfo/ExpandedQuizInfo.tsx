@@ -173,7 +173,7 @@ class ExpandedQuizInfo extends React.Component<any, any> {
           <Button
             variant="outlined"
             style={{ color: "#d16d68" }}
-            onClick={this.props.onExpand}
+            onClick={this.props.onCancel}
           >
             Cancel
           </Button>
@@ -204,8 +204,3 @@ class ExpandedQuizInfo extends React.Component<any, any> {
 }
 
 export default ExpandedQuizInfo
-const mapStateToProps = state => {
-  return {
-    courseId: state.edit.courseId,
-  }
-}

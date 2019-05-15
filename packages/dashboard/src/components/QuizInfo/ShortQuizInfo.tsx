@@ -35,11 +35,11 @@ const ShortQuizInfo = ({
         })}
       </Select>
     </Grid>
-    <Grid xs={12} item={true} style={{ marginBottom: "2em" }}>
+    <Grid item={true} xs={12} style={{ marginBottom: "2em" }}>
       <TogglableQuizInstruction bodyText={body} />
     </Grid>
-    <Grid xs={4}>
-      <Button variant="raised" style={{ color: "gray" }} onClick={onExpand}>
+    <Grid item={true} xs={4}>
+      <Button variant="contained" style={{ color: "gray" }} onClick={onExpand}>
         Edit
         <Create fontSize="small" style={{ marginLeft: ".5em" }} />
       </Button>
