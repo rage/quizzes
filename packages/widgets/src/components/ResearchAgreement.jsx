@@ -1,7 +1,10 @@
+import Typography from "@material-ui/core/Typography"
 import React from "react"
 import CheckboxOption from "./Checkbox/CheckboxOption"
 
 const ResearchAgreement = ({
+  itemBody,
+  itemTitle,
   options,
   optionAnswers,
   answered,
@@ -15,13 +18,25 @@ const ResearchAgreement = ({
         )
 
         return (
-          <CheckboxOption
-            key={option.id}
-            label={option.texts[0].title}
-            value={currentAnswer}
-            toggle={handleCheckboxToggling(option.id)}
-            answered={answered}
-          />
+          <React.Fragment key={option.id}>
+            <Typography variant="h6" style={{ paddingBottom: 10 }}>
+              {itemTitle}
+            </Typography>
+            {itemBody && (
+              <Typography
+                variant="body1"
+                style={{ paddingBottom: 10 }}
+                dangerouslySetInnerHTML={{ __html: itemBody }}
+              />
+            )}
+
+            <CheckboxOption
+              label={option.texts[0].title}
+              value={currentAnswer}
+              toggle={handleCheckboxToggling(option.id)}
+              answered={answered}
+            />
+          </React.Fragment>
         )
       })}
     </React.Fragment>
