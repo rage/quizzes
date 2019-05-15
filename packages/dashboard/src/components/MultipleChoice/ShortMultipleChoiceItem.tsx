@@ -1,8 +1,6 @@
-import { Button, Grid, IconButton, Typography } from "@material-ui/core"
-import Create from "@material-ui/icons/Create"
+import { Button, Grid, Typography } from "@material-ui/core"
 import React from "react"
 import { stringContainsLongerWord } from "../../../../common/src/util/index"
-import DragHandleWrapper from "../DragHandleWrapper"
 import ShortWrapper from "../ItemTools/ShortWrapper"
 
 class FinishedMultipleChoiceItem extends React.Component<any, any> {

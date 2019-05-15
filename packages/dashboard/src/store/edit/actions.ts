@@ -102,6 +102,7 @@ export const changeOrder = (path, current, next) => {
 export const addItem = type => {
   return (dispatch, getState) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
+
     const item = {
       quizId: quiz.id,
       type,
@@ -111,8 +112,14 @@ export const addItem = type => {
       texts: [],
       options: [],
     }
+
     quiz.items.push(item)
     dispatch(setEdit(quiz))
+    if (type === "checkbox") {
+      const updatedQuiz = JSON.parse(JSON.stringify(getState().edit))
+      const idx = updatedQuiz.items.length - 1
+      dispatch(addOption(idx))
+    }
   }
 }
 

@@ -1,20 +1,14 @@
 import React from "react"
-import ExpandedCheckBox from "./ExpandedCheckbox"
-import ShortCheckBox from "./ShortCheckbox"
+import ExpandedCheckbox from "./ExpandedCheckbox"
+import ShortCheckbox from "./ShortCheckbox"
 
 class CheckBox extends React.Component<any, any> {
-  constructor(props) {
-    super(props)
-    this.state = {
-      expanded: false,
-    }
-  }
-
   public render() {
-    if (this.state.expanded) {
-      return <ExpandedCheckBox />
+    const item = this.props.items[this.props.order]
+    if (item.id && !this.props.expanded) {
+      return <ShortCheckbox {...this.props} />
     } else {
-      return <ShortCheckBox />
+      return <ExpandedCheckbox {...this.props} />
     }
   }
 }

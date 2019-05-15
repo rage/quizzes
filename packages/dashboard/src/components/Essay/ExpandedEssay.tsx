@@ -5,16 +5,9 @@ import {
   Grid,
   TextField,
 } from "@material-ui/core"
-import Reorder from "@material-ui/icons/Reorder"
 import React from "react"
 import { connect } from "react-redux"
-import {
-  addFinishedOption,
-  changeAttr,
-  changeOrder,
-  modifyOption,
-  save,
-} from "../../store/edit/actions"
+import { changeAttr, save } from "../../store/edit/actions"
 import BottomActionsExpItem from "../ItemTools/ExpandedBottomActions"
 import ExpandedTopInformation from "../ItemTools/ExpandedTopInformation"
 
@@ -191,5 +184,5 @@ class ExpandedEssay extends React.Component<any, any> {
 
 export default connect(
   null,
-  { addFinishedOption, changeAttr, changeOrder, modifyOption, save },
+  { changeAttr, save },
 )(ExpandedEssay)
