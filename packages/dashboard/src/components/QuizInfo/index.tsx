@@ -9,7 +9,7 @@ class QuizInfo extends React.Component<any, any> {
   public constructor(props) {
     super(props)
     this.state = {
-      expanded: false,
+      expanded: !props.quizHasBeenSaved,
     }
   }
 
@@ -82,12 +82,14 @@ const mapStateToProps = (state: any) => {
   return {
     filter: state.filter,
     courseLanguages: state.edit.course.languages,
-    quizTexts: state.edit.texts[0],
+    //   quizTexts: state.edit.texts[0],
     part: state.edit.part,
     section: state.edit.section,
     includesEssay: state.edit.items.some(i => i.type === "essay"),
     courses: state.courses,
-    currentCourseId: state.edit.courseId,
+    currentCourseId: state.filter.course,
+    quizHasBeenSaved: state.edit.id ? true : false,
+    edit: state.edit,
   }
 }
 

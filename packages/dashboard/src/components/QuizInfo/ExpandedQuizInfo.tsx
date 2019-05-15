@@ -12,15 +12,48 @@ import React from "react"
 const SHOW_COURSE_INFO = true
 
 class ExpandedQuizInfo extends React.Component<any, any> {
+  private attributes = [
+    "title",
+    "body",
+    "submitMessage",
+    "part",
+    "section",
+    "courseId",
+  ]
+
   constructor(props) {
     super(props)
+
     this.state = {
-      title: props.quizTexts.title || "",
-      body: props.quizTexts.body || "",
-      submitMessage: props.quizTexts.submitMessage || "",
+      title: (props.quizTexts && props.quizTexts.title) || "",
+      body: (props.quizTexts && props.quizTexts.body) || "",
+      submitMessage: (props.quizTexts && props.quizTexts.submitMessage) || "",
       part: props.part || 0,
       section: props.section || 0,
       courseId: props.courseId,
+      correctedInitial: false,
+    }
+  }
+
+  public shouldComponentUpdate(nextProps, nextState) {
+    if (this.attributes.some(attr => this.state[attr] !== nextState[attr])) {
+      return true
+    }
+
+    if (JSON.stringify(this.props) !== JSON.stringify(nextProps)) {
+      return true
+    }
+
+    return false
+  }
+
+  public componentDidUpdate() {
+    if (!this.state.correctedInitial) {
+      this.setState({
+        title: this.props.quizTexts.title,
+        body: this.props.quizTexts.body,
+        correctedInitial: true,
+      })
     }
   }
 
@@ -171,3 +204,8 @@ class ExpandedQuizInfo extends React.Component<any, any> {
 }
 
 export default ExpandedQuizInfo
+const mapStateToProps = state => {
+  return {
+    courseId: state.edit.courseId,
+  }
+}

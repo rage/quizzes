@@ -44,7 +44,7 @@ class QuizForm extends React.Component<any, any> {
     return (
       <Grid container={true} spacing={16} justify="center">
         <Grid item={true} xs={12} sm={10} lg={8}>
-          <QuizInfo />
+          <QuizInfo quizTexts={this.props.edit.texts[0]} />
 
           {this.props.edit.course.languages.map(
             (l, i) =>
