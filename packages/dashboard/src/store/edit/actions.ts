@@ -115,7 +115,7 @@ export const addItem = type => {
 
     quiz.items.push(item)
     dispatch(setEdit(quiz))
-    if (type === "checkbox") {
+    if (type === "checkbox" || type === "research-agreement") {
       const updatedQuiz = JSON.parse(JSON.stringify(getState().edit))
       const idx = updatedQuiz.items.length - 1
       dispatch(addOption(idx))

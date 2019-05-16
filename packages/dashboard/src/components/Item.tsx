@@ -50,6 +50,7 @@ import DragHandleWrapper from "./DragHandleWrapper"
 import EssayItem from "./Essay"
 import MultipleChoiceItem from "./MultipleChoice"
 import OptionContainer from "./OptionContainer"
+import ResearchAgreement from "./ResearchAgreement"
 import ScaleItem from "./Scale"
 
 class Item extends React.Component<any, any> {
@@ -150,6 +151,17 @@ class Item extends React.Component<any, any> {
     if (this.props.type === "checkbox") {
       return (
         <Checkbox
+          {...this.props}
+          onCancel={this.handleItemCancel(this.props.order)}
+          toggleExpand={this.toggleExpand}
+          onRemoval={this.handleItemRemoval}
+        />
+      )
+    }
+
+    if (this.props.type === "research-agreement") {
+      return (
+        <ResearchAgreement
           {...this.props}
           onCancel={this.handleItemCancel(this.props.order)}
           toggleExpand={this.toggleExpand}
