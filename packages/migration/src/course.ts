@@ -22,6 +22,7 @@ const courseIDs = {
 
   "elements-of-ai": "en_US",
   "elements-of-ai-fi": "fi_FI",
+  "elements-of-ai-se": "sv_SE",
 
   "k2017-ohpe": "fi_FI",
   "s2017-ohpe": "fi_FI",
@@ -86,6 +87,8 @@ export async function migrateCourses(
       },
     ),
   )
+
+  console.log("done")
 
   // await insert(Course, courses)
   await insert(

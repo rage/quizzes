@@ -14,6 +14,7 @@ import oldQuizTypes from "./app-modules/constants/quiz-types"
 import { getUUIDByString, insert } from "@quizzes/common/util"
 import { progressBar, safeGet } from "./util"
 import { AdvancedConsoleLogger } from "typeorm"
+import { LAST_MIGRATION } from "./"
 
 export async function migrateQuizzes(courses: {
   [key: string]: Course
@@ -34,6 +35,10 @@ export async function migrateQuizzes(courses: {
         oldQuizTypes.PRIVACY_AGREEMENT,
       ],
     },
+    $or: [
+      { createdAt: { $gte: LAST_MIGRATION } },
+      { updatedAt: { $gte: LAST_MIGRATION } },
+    ],
   })
   const quizzes: Array<QueryPartialEntity<Quiz>> = []
   const quizTranslations: Array<QueryPartialEntity<QuizTranslation>> = []

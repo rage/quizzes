@@ -1,4 +1,5 @@
 import { Language } from "@quizzes/common/models"
+import { insert } from "@quizzes/common/util"
 
 export async function createLanguages(): Promise<{
   [languageID: string]: Language
@@ -10,6 +11,7 @@ export async function createLanguages(): Promise<{
       name: "Finnish",
     }),
   ).save()
+
   const english = await Language.merge(
     Language.create({
       id: "en_US",
@@ -17,6 +19,15 @@ export async function createLanguages(): Promise<{
       name: "English",
     }),
   ).save()
+
+  const swedish = await Language.merge(
+    Language.create({
+      id: "sv_SE",
+      country: "Sweden",
+      name: "Swedish",
+    }),
+  ).save()
+
   const unknown = await Language.merge(
     Language.create({
       id: "unknown",
@@ -28,6 +39,7 @@ export async function createLanguages(): Promise<{
   return {
     [finnish.id]: finnish,
     [english.id]: english,
+    [swedish.id]: swedish,
     [unknown.id]: unknown,
   }
 }

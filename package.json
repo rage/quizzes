@@ -23,7 +23,7 @@
     "watch-debug": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run serve-debug\"",
     "prettier": "prettier --write \"packages/**/*.js\" \"packages/**/*.ts\" \"packages/**/*.jsx\" \"packages/**/*.tsx\"",
     "prettier-check": "prettier  --list-different \"packages/**/*.js\" \"packages/**/*.ts\" \"packages/**/*.jsx\" \"packages/**/*.tsx\"",
-    "db-migrate": "node --max-old-space-size=16384 dist/backend/src/scripts/quiznator_migrate/index.js",
+    "db-migrate": "node --max-old-space-size=16384 dist/migration/src/index.js",
     "start-dashboard": "cd packages/dashboard && yarn start",
     "aggregate-states": "node --max-old-space-size=1024 dist/backend/src/scripts/aggregate_states.js"
   },

@@ -15,11 +15,16 @@ import {
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { progressBar, safeGet } from "./util"
 import { getUUIDByString, insert } from "@quizzes/common/util"
+import { LAST_MIGRATION } from "./"
 
 export async function migratePeerReviewQuestions() {
   console.log("Querying peer review questions...")
   const peerReviewQuestions = await QNQuiz.find({
     type: { $in: [oldQuizTypes.PEER_REVIEW] },
+    $or: [
+      { createdAt: { $gte: LAST_MIGRATION } },
+      { updatedAt: { $gte: LAST_MIGRATION } },
+    ],
   })
   console.log("peer reviews: ", peerReviewQuestions.length)
   const bar = progressBar(
