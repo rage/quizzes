@@ -12,7 +12,7 @@ const SortableCheckboxList = SortableContainer((props: any) => {
           <SortableWrapper
             collection={"options"}
             index={index}
-            key={`${index}-${optionData.title}`}
+            key={`${index}`}
           >
             <Grid
               item={true}

@@ -139,6 +139,39 @@ export const addOption = item => {
   }
 }
 
+// atm for research-agreement
+export const updateMultipleOptions = (itemOrder, optionData) => {
+  return (dispatch, getState) => {
+    let quiz = JSON.parse(JSON.stringify(getState().edit))
+    const item = quiz.items[itemOrder]
+    const oldOptions = item.options
+    item.options = optionData.map(optData => {
+      if (!optData.id) {
+        return {
+          order: optData.order,
+          quizItemId: item.id,
+          correct: true,
+          texts: [],
+        }
+      } else {
+        const modifiedOption = oldOptions.find(opt => opt.id === optData.id)
+        modifiedOption.order = optData.order
+        return modifiedOption
+      }
+    })
+    dispatch(setEdit(quiz))
+
+    quiz = JSON.parse(JSON.stringify(getState().edit))
+
+    quiz.items[itemOrder].options.forEach(option => {
+      const optData = optionData.find(od => od.order === option.order)
+      option.texts[0].title = optData.title
+      option.texts[0].body = optData.body
+    })
+    dispatch(setEdit(quiz))
+  }
+}
+
 export const addFinishedOption = (item, optionData) => {
   return (dispatch, getState) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
@@ -152,7 +185,6 @@ export const addFinishedOption = (item, optionData) => {
     }
     quiz.items[item].options.push(option)
     dispatch(setEdit(quiz))
-
     const updatedQuiz = JSON.parse(JSON.stringify(getState().edit))
     const idx = quiz.items[item].options.length - 1
     updatedQuiz.items[item].options[idx].texts[0].title = optionData.title

@@ -11,7 +11,12 @@ import AddCircle from "@material-ui/icons/AddCircle"
 import Clear from "@material-ui/icons/Clear"
 import React from "react"
 import { connect } from "react-redux"
-import { addOption, changeAttr, save } from "../../store/edit/actions"
+import {
+  addOption,
+  changeAttr,
+  save,
+  updateMultipleOptions,
+} from "../../store/edit/actions"
 import CheckboxDialog from "../ItemTools/CheckboxDialog"
 import BottomActionsExpItem from "../ItemTools/ExpandedBottomActions"
 import ExpandedTopInformation from "../ItemTools/ExpandedTopInformation"
@@ -27,6 +32,7 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
       body: option.texts[0].body,
       titleHasBeenModified: item.id ? true : false,
       order: option.order,
+      id: option.id,
     }))
 
     const initData = {
@@ -204,25 +210,29 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
           title: "",
           body: "",
           order: oldOptions.length,
-          titleHasBeenModified: false,
+          titleHasBeenModified: true,
+          id: null,
         }),
       },
     })
   }
 
   private removeOption = (order: number) => e => {
-    console.log("Began removing! The given order: ", order)
-    console.log("The state of the options: ", this.state.tempItemData)
     if (this.state.tempItemData.options.length <= 1) {
       return
     }
 
+    const newOptions = this.state.tempItemData.options.filter(
+      opt => opt.order !== order,
+    )
+
+    let prevOrder = -1
+    newOptions.forEach(opt => (opt.order = ++prevOrder))
+
     this.setState({
       tempItemData: {
         ...this.state.tempItemData,
-        options: this.state.tempItemData.options.filter(
-          opt => opt.order !== order,
-        ),
+        options: newOptions,
       },
     })
   }
@@ -238,13 +248,14 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
       newOptionData[order].titleHasBeenModified = true
     }
 
+    console.log("Change done! New data: ", newOptionData[order])
     this.setState({
-      tempItemData: { ...copyTempItemData, options: newOptionData },
+      tempItemData: { ...this.state.tempItemData, options: newOptionData },
     })
   }
 
   private changeTempAttribute = (attributeName: string) => e => {
-    if (attributeName === "title") {
+    if (attributeName === "title" && !this.state.titleHasBeenModified) {
       this.setState({
         titleHasBeenModified: true,
       })
@@ -253,9 +264,16 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
     const newData = { ...this.state.tempItemData }
     newData[attributeName] = e.target.value
 
-    this.setState({
-      tempItemData: newData,
-    })
+    if (attributeName === "title" && !this.state.titleHasBeenModified) {
+      this.setState({
+        titleHasBeenModified: true,
+        tempItemData: newData,
+      })
+    } else {
+      this.setState({
+        tempItemData: newData,
+      })
+    }
   }
 
   private saveItem = e => {
@@ -265,25 +283,15 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
       this.state.tempItemData.title,
     )
 
-    this.state.tempItemData.options.forEach(optData => {
-      // order could change before saving??
-      // not yet but soon
-      this.props.changeAttr(
-        `items[${this.props.order}].options[${optData.order}].texts[0].title`,
-        optData.title,
-      )
-
-      this.props.changeAttr(
-        `items[${this.props.order}].options[${optData.order}].texts[0].body`,
-        optData.body,
-      )
-    })
-
+    this.props.updateMultipleOptions(
+      this.props.order,
+      this.state.tempItemData.options,
+    )
     this.props.save()
   }
 }
 
 export default connect(
   null,
-  { addOption, changeAttr, save },
+  { addOption, changeAttr, save, updateMultipleOptions },
 )(ExpandedResearchAgreement)
