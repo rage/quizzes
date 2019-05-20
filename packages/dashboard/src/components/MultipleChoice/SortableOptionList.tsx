@@ -18,7 +18,7 @@ const SortableOptionList = SortableContainer((props: any) => {
           <SortableWrapper
             collection={`items[${props.order}].options`}
             index={index}
-            key={`${option.quizItemId}-${index}-${option.texts[0].title}`}
+            key={`${option.quizItemId}-${index}-${option.title}`}
           >
             <Grid item={true} xs={12} sm={6} md={4} lg={3}>
               <div
@@ -28,16 +28,13 @@ const SortableOptionList = SortableContainer((props: any) => {
                   cursor: "pointer",
                   padding: ".5em",
                   textAlign: "center",
-                  wordBreak: stringContainsLongerWord(option.texts[0].title, 30)
+                  wordBreak: stringContainsLongerWord(option.title, 30)
                     ? "break-all"
                     : "normal",
                 }}
-                onClick={props.modifyExistingOption(
-                  option.id,
-                  option.quizItemId,
-                )}
+                onClick={props.modifyExistingOption(option.order)}
               >
-                <Typography variant="body1">{option.texts[0].title}</Typography>
+                <Typography variant="body1">{option.title}</Typography>
               </div>
             </Grid>
           </SortableWrapper>

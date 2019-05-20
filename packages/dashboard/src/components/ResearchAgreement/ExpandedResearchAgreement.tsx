@@ -8,7 +8,6 @@ import {
   Typography,
 } from "@material-ui/core"
 import AddCircle from "@material-ui/icons/AddCircle"
-import Clear from "@material-ui/icons/Clear"
 import React from "react"
 import { connect } from "react-redux"
 import {
@@ -17,7 +16,6 @@ import {
   save,
   updateMultipleOptions,
 } from "../../store/edit/actions"
-import CheckboxDialog from "../ItemTools/CheckboxDialog"
 import BottomActionsExpItem from "../ItemTools/ExpandedBottomActions"
 import ExpandedTopInformation from "../ItemTools/ExpandedTopInformation"
 import SortableCheckboxList from "./SortableCheckboxList"
@@ -47,7 +45,6 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
 
   public render() {
     const item = this.props.items[this.props.order]
-    console.log("Info of item:", item)
     return (
       <Grid container={true} spacing={16} justify="center" alignItems="center">
         <Grid item={true} xs={12}>
@@ -93,54 +90,6 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
                       distance={2}
                     />
 
-                    {/*
-                      this.state.tempItemData.options.map(optionData => {
-                        return (
-                        <Grid item={true} xs={12} key={optionData.order} style={{marginBottom: "2em"}}>
-                        <Grid container={true} justify="flex-start" alignItems="center">
-                        <Grid item={true} xs={2} md={1}>
-                          <Checkbox disabled={true} color="primary"/>
-                        </Grid>
-                        <Grid item={true} xs="auto">
-                        <TextField
-                            fullWidth={true}
-                            multiline={true}
-                            label="Option title"
-                            value={
-                              (optionData.titleHasBeenModified &&
-                                optionData.title) ||
-                              ""
-                            }
-                            onChange={this.changeTempOptionAttribute(optionData.order, "title")}
-                          />
-
-                          <TextField
-                            fullWidth={true}
-                            multiline={true}
-                            label="Option body"
-                            value={optionData.body || ""}
-                            onChange={this.changeTempOptionAttribute(optionData.order, "body")}
-                          />
-                        </Grid>
-
-                        { 
-                          this.state.tempItemData.options.length > 1 &&
-                          (<Grid item={true} xs={2} md={1}>
-                            <IconButton
-                              onClick={this.removeOption(optionData.order)}
-                            >
-                              <Clear fontSize="large" />
-                            </IconButton>
-                        </Grid>)
-                        }
-
-
-                        </Grid>
-                        </Grid>
-                        )
-                      })
-                      */}
-
                     <Grid item={true} xs="auto">
                       <IconButton
                         aria-label="Add option"
@@ -168,17 +117,6 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
             </Grid>
           </Card>
         </Grid>
-
-        {/*
-          <CheckboxDialog
-          onSubmit={
-              this.updateOption(this.props.index)
-          }
-          isOpen={this.state.dialogOpen}
-          onClose={this.handleClose}
-          existingOptData={this.state.tempItemData.options}
-        />
-*/}
       </Grid>
     )
   }
@@ -248,7 +186,6 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
       newOptionData[order].titleHasBeenModified = true
     }
 
-    console.log("Change done! New data: ", newOptionData[order])
     this.setState({
       tempItemData: { ...this.state.tempItemData, options: newOptionData },
     })

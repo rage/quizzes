@@ -15,6 +15,7 @@ import {
   changeOrder,
   modifyOption,
   save,
+  updateMultipleOptions,
 } from "../../store/edit/actions"
 import BottomActionsExpItem from "../ItemTools/ExpandedBottomActions"
 import ExpandedTopInformation from "../ItemTools/ExpandedTopInformation"
@@ -25,9 +26,23 @@ class MultipleChoiceItem extends React.Component<any, any> {
   constructor(props) {
     super(props)
     const item = this.props.items[this.props.order]
+
+    const initOptionsData = item.options.map(option => ({
+      title: option.texts[0].title,
+      body: option.texts[0].body,
+      titleHasBeenModified: item.id ? true : false,
+      order: option.order,
+      id: option.id,
+      quizItemId: item.id,
+      successMessage: option.texts[0].successMessage,
+      failureMessage: option.texts[0].failureMessage,
+      correct: option.correct,
+    }))
+
     const initItemData = {
       title: item.texts[0].title,
       body: item.texts[0].body,
+      options: initOptionsData,
     }
     this.state = {
       dialogOpen: false,
@@ -88,7 +103,7 @@ class MultipleChoiceItem extends React.Component<any, any> {
                         <SortableOptionList
                           onSortEnd={this.onSortEnd}
                           createNewOption={this.createNewOption}
-                          options={this.props.items[this.props.order].options}
+                          options={this.state.tempItemData.options}
                           order={this.props.order}
                           modifyExistingOption={this.modifyExistingOption}
                           axis="xy"
@@ -148,9 +163,26 @@ class MultipleChoiceItem extends React.Component<any, any> {
           isOpen={this.state.dialogOpen}
           onClose={this.handleClose}
           existingOptData={this.state.existingOptData}
+          changeOptionAttribute={this.changeTempOptionAttribute}
         />
       </Grid>
     )
+  }
+
+  private changeTempOptionAttribute = (
+    order: number,
+    attributeName: string,
+  ) => e => {
+    const copyTempItemData = { ...this.state.tempItemData }
+    const newOptionData = copyTempItemData.options
+    newOptionData[order][attributeName] = e.target.value
+    if (attributeName === "title") {
+      newOptionData[order].titleHasBeenModified = true
+    }
+
+    this.setState({
+      tempItemData: { ...this.state.tempItemData, options: newOptionData },
+    })
   }
 
   private changeEditAttribute = (attributeName: string) => e => {
@@ -166,6 +198,7 @@ class MultipleChoiceItem extends React.Component<any, any> {
 
   private saveItem = e => {
     this.props.toggleExpand(e)
+
     this.props.changeAttr(
       `items[${this.props.order}].texts[0].title`,
       this.state.tempItemData.title,
@@ -174,34 +207,77 @@ class MultipleChoiceItem extends React.Component<any, any> {
       `items[${this.props.order}].texts[0].body`,
       this.state.tempItemData.body,
     )
+
+    this.props.updateMultipleOptions(
+      this.props.order,
+      this.state.tempItemData.options,
+    )
+
     this.props.save()
   }
 
-  private modifyExistingOption = (optionId: string, itemId: string) => () => {
-    const option = this.props.items
+  private modifyExistingOption = (optionOrder: number) => () => {
+    const option = this.state.tempItemData.options.find(
+      opt => opt.order === optionOrder,
+    )
+
+    /*this.props.items
       .find(i => i.id === itemId)
       .options.find(o => o.id === optionId)
+      */
 
     const newData = {
-      title: option.texts[0].title,
+      title: option.title,
       correct: option.correct,
-      successMessage: option.texts[0].successMessage,
-      failureMessage: option.texts[0].failureMessage,
-      id: optionId,
+      successMessage: option.successMessage,
+      failureMessage: option.failureMessage,
+      order: option.order,
     }
+
     this.setState({
       existingOptData: newData,
+      dialogOpen: true,
     })
-    console.log("New data", newData)
-    this.setState({ dialogOpen: true })
   }
 
   private onSortEnd = ({ oldIndex, newIndex, collection }) => {
-    this.props.changeOrder(collection, oldIndex, newIndex)
+    const newOptions = { ...this.state.tempItemData }.options
+    newOptions[oldIndex].order = newIndex
+    newOptions[newIndex].order = oldIndex
+
+    const temp = newOptions[oldIndex]
+    newOptions[oldIndex] = newOptions[newIndex]
+    newOptions[newIndex] = temp
+
+    this.setState({
+      tempItemData: {
+        ...this.state.tempItemData,
+        options: newOptions,
+      },
+    })
   }
 
   private updateOption = item => optionData => event => {
-    this.props.modifyOption(item, optionData)
+    const newOptions = { ...this.state.tempItemData }.options.map(opt => {
+      if (opt.order !== optionData.order) {
+        return opt
+      }
+      return {
+        ...opt,
+        title: optionData.title,
+        body: optionData.body,
+        failureMessage: optionData.failureMessage,
+        successMessage: optionData.successMessage,
+        correct: optionData.correct,
+      }
+    })
+
+    this.setState({
+      tempItemData: {
+        ...this.state.tempItemData,
+        options: newOptions,
+      },
+    })
   }
 
   private createNewOption = () => {
@@ -224,5 +300,12 @@ class MultipleChoiceItem extends React.Component<any, any> {
 
 export default connect(
   null,
-  { addFinishedOption, changeAttr, changeOrder, modifyOption, save },
+  {
+    addFinishedOption,
+    changeAttr,
+    changeOrder,
+    modifyOption,
+    save,
+    updateMultipleOptions,
+  },
 )(MultipleChoiceItem)
