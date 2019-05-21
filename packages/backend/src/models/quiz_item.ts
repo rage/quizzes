@@ -63,6 +63,12 @@ export class QuizItem extends BaseEntity {
   @Column({ type: "smallint", nullable: true, select: false })
   public maxWords?: number
 
+  @Column({ type: "smallint", nullable: true, select: false })
+  public minValue?: number
+
+  @Column({ type: "smallint", nullable: true, select: false })
+  public maxValue?: number
+
   @Column({ nullable: true, select: false })
   public validityRegex?: string
   @Column({ nullable: true })
@@ -91,6 +97,8 @@ export class QuizItem extends BaseEntity {
     this.formatRegex = data.formatRegex
     this.texts = data.texts
     this.options = data.options
+    this.minWords = data.minWords
+    this.maxWords = data.maxWords
   }
 
   @BeforeInsert()

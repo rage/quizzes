@@ -15,8 +15,8 @@ import ShortWrapper from "../ItemTools/ShortWrapper"
 const ShortScale = props => {
   const item = props.items[props.order]
 
-  const minimum = item.minWords || 1
-  const maximum = item.maxWords || 7
+  const minimum = item.minValue || 1
+  const maximum = item.maxValue || 7
   return (
     <ShortWrapper toggleExpand={props.toggleExpand}>
       <Grid
@@ -35,7 +35,7 @@ const ShortScale = props => {
                 </Grid>
                 <Grid
                   item={true}
-                  xs={item.maxWords - item.minWords > 5 ? 10 : 2}
+                  xs={item.maxValue - item.minValue > 5 ? 10 : 2}
                 />
                 <Grid item={true} xs="auto">
                   <Typography>{item.texts[0].failureMessage}</Typography>

@@ -25,8 +25,8 @@ class ExpandedScaleItem extends React.Component<any, any> {
     const initialItemData = {
       title: item.texts[0].title,
       body: item.texts[0].body,
-      minValue: item.minWords || 1,
-      maxValue: item.maxWords || 7,
+      minValue: item.minValue || 1,
+      maxValue: item.maxValue || 7,
       minLabel: item.texts[0].successMessage,
       maxLabel: item.texts[0].failureMessage,
     }
@@ -222,11 +222,11 @@ class ExpandedScaleItem extends React.Component<any, any> {
       this.state.tempItemData.body,
     )
     this.props.changeAttr(
-      `items[${this.props.order}].minWords`,
+      `items[${this.props.order}].minValue`,
       this.state.tempItemData.minValue,
     )
     this.props.changeAttr(
-      `items[${this.props.order}].maxWords`,
+      `items[${this.props.order}].maxValue`,
       this.state.tempItemData.maxValue,
     )
     this.props.changeAttr(

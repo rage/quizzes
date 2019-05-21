@@ -62,6 +62,8 @@ export default class QuizService {
       queryBuilder.leftJoinAndSelect("quiz.items", "item")
       queryBuilder.addSelect("item.minWords")
       queryBuilder.addSelect("item.maxWords")
+      queryBuilder.addSelect("item.minValue")
+      queryBuilder.addSelect("item.maxValue")
       if (language) {
         queryBuilder.leftJoinAndSelect(
           "item.texts",
@@ -152,6 +154,8 @@ export default class QuizService {
           .createQueryBuilder(QuizItem, "item")
           .addSelect("item.minWords")
           .addSelect("item.maxWords")
+          .addSelect("item.minValue")
+          .addSelect("item.maxValue")
           .where("item.quizId = :quizId", { quizId: quiz.id })
           .getMany()
 
