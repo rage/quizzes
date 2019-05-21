@@ -21,21 +21,30 @@ export default class OptionDialog extends React.Component<any, any> {
 
     this.state = {
       correctChecked: false,
-      optionData: {},
+      optionData: {
+        title: "",
+        failureMessage: "",
+        successMessage: "",
+        correct: false,
+      },
+      inInitialState: true,
     }
   }
 
   public componentDidUpdate() {
-    if (
-      this.props.existingOptData &&
-      JSON.stringify(this.state.optionData) === "{}"
-    ) {
-      const initial = { correctChecked: false, optionData: {} }
-      initial.correctChecked = this.props.existingOptData.correct
-      initial.optionData = {
+    if (this.props.existingOptData && this.state.inInitialState) {
+      const newState = {
+        correctChecked: false,
+        optionData: {},
+        inInitialState: false,
+      }
+      newState.correctChecked = this.props.existingOptData.correct
+      newState.optionData = {
         ...this.props.existingOptData,
       }
-      this.setState(initial)
+      this.setState({
+        ...newState,
+      })
     }
   }
 
@@ -169,7 +178,7 @@ export default class OptionDialog extends React.Component<any, any> {
   private handleTextFieldChange = fieldName => e => {
     const newOptionData = { ...this.state.optionData }
     newOptionData[fieldName] = e.target.value
-    this.setState({ optionData: newOptionData })
+    this.setState({ optionData: newOptionData, inInitialState: false })
   }
 
   private handleCheckingChange = () => {
@@ -179,17 +188,22 @@ export default class OptionDialog extends React.Component<any, any> {
     this.setState({
       correctChecked: !this.state.correctChecked,
       optionData: newOptionData,
+      inInitialState: false,
     })
   }
 
   private handleSubmit = event => {
-    console.log("option data: ", this.state.optionData)
     this.props.onSubmit(this.state.optionData)(event)
+
     this.handleClose()
   }
 
   private handleClose = () => {
     this.props.onClose()
-    this.setState({ optionData: {}, correctChecked: false })
+    this.setState({
+      optionData: {},
+      correctChecked: false,
+      inInitialState: true,
+    })
   }
 }

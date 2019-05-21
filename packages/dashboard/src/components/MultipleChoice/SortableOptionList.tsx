@@ -34,7 +34,7 @@ const SortableOptionList = SortableContainer((props: any) => {
                 }}
                 onClick={props.modifyExistingOption(option.order)}
               >
-                <Typography variant="body1">{option.title}</Typography>
+                <Typography variant="body1">{option.title || ""}</Typography>
               </div>
             </Grid>
           </SortableWrapper>

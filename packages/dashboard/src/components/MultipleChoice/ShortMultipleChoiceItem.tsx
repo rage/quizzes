@@ -18,11 +18,20 @@ class FinishedMultipleChoiceItem extends React.Component<any, any> {
           justify="flex-start"
           alignItems="center"
         >
-          <Grid item={true} xs={6} md={3} lg={2}>
-            <Typography variant="title">{item.texts[0].title}</Typography>
+          <Grid item={true} xs={6} lg={4}>
+            <Typography
+              variant="title"
+              style={{
+                wordBreak: stringContainsLongerWord(item.texts[0].title, 22)
+                  ? "break-all"
+                  : "normal",
+              }}
+            >
+              {item.texts[0].title}
+            </Typography>
           </Grid>
 
-          <Grid item={true} xs={6} md={9} lg={10}>
+          <Grid item={true} xs={6} lg={8}>
             <Grid
               container={true}
               justify="flex-start"

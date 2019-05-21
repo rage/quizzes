@@ -30,7 +30,6 @@ class MultipleChoiceItem extends React.Component<any, any> {
     const initOptionsData = item.options.map(option => ({
       title: option.texts[0].title,
       body: option.texts[0].body,
-      titleHasBeenModified: item.id ? true : false,
       order: option.order,
       id: option.id,
       quizItemId: item.id,
@@ -158,7 +157,7 @@ class MultipleChoiceItem extends React.Component<any, any> {
           onSubmit={
             this.state.existingOptData
               ? this.updateOption(this.props.index)
-              : this.handleSubmission(this.props.index)
+              : this.handleSubmission(item.id)
           }
           isOpen={this.state.dialogOpen}
           onClose={this.handleClose}
@@ -220,11 +219,6 @@ class MultipleChoiceItem extends React.Component<any, any> {
     const option = this.state.tempItemData.options.find(
       opt => opt.order === optionOrder,
     )
-
-    /*this.props.items
-      .find(i => i.id === itemId)
-      .options.find(o => o.id === optionId)
-      */
 
     const newData = {
       title: option.title,
@@ -291,10 +285,28 @@ class MultipleChoiceItem extends React.Component<any, any> {
     this.setState({ dialogOpen: false, existingOptData: null })
   }
 
-  private handleSubmission = (item: string) => optionData => event => {
+  private handleSubmission = (itemId: string) => optionData => event => {
     this.handleClose()
-    this.props.addFinishedOption(item, optionData)
-    this.setState({ optionsExist: true })
+
+    const newOption = {
+      title: optionData.title,
+      body: optionData.body,
+      successMessage: optionData.successMessage,
+      failureMessage: optionData.failureMessage,
+      correct: optionData.correct,
+      order: this.state.tempItemData.options.length,
+      quizItemId: itemId,
+    }
+
+    const newOptions = this.state.tempItemData.options.concat(newOption)
+
+    this.setState({
+      optionsExist: true,
+      tempItemData: {
+        ...this.state.tempItemData,
+        options: newOptions,
+      },
+    })
   }
 }
 
