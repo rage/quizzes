@@ -33,6 +33,7 @@ import TMCApi from "../../common/src/services/TMCApi"
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
 import CoursesView from "./components/CoursesView"
 import QuizForm from "./components/QuizForm"
+import SingleCourseView from "./components/SingleCourseView"
 import SuccessNotification from "./components/SuccessNotification"
 import { setCourses } from "./store/courses/actions"
 import { newQuiz, setEdit } from "./store/edit/actions"
@@ -103,73 +104,6 @@ class App extends React.Component<any, any> {
       )
     }
 
-    const Dashboard = ({ match, history }) => {
-      if (
-        match.params.id &&
-        (!this.props.filter.course ||
-          this.props.filter.course !== match.params.id)
-      ) {
-        this.props.setCourse(match.params.id)
-      }
-
-      const handleSelect = event => {
-        const courseId = event.target.value
-        if (history.location.pathname !== "/courses/" + courseId) {
-          history.push("/courses/" + courseId)
-        }
-      }
-
-      return (
-        <div>
-          <div>
-            <Toolbar style={{ marginBottom: 20 }}>
-              <Select
-                value={this.props.filter.course || ""}
-                onChange={handleSelect}
-                style={{ minWidth: 350 }}
-              >
-                {this.props.courses.map(course => (
-                  <MenuItem key={course.id} value={course.id}>
-                    {course.texts[0].title}
-                  </MenuItem>
-                ))}
-              </Select>
-              <Typography style={{ flex: 1 }} />
-              {this.props.filter.course === "" ? (
-                <p />
-              ) : (
-                <Link to="/new" style={{ textDecoration: "none" }}>
-                  <Button>New quiz</Button>
-                </Link>
-              )}
-            </Toolbar>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>
-                    <Typography>Title</Typography>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {this.props.quizzes
-                  .filter(quiz => quiz.course.id === this.props.filter.course)
-                  .map(quiz => (
-                    <TableRow key={quiz.id}>
-                      <TableCell>
-                        <Link to={`/quizzes/${quiz.id}`}>
-                          {quiz.texts[0] ? quiz.texts[0].title : "no title"}
-                        </Link>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-      )
-    }
-
     return (
       <div style={{ paddingLeft: 50, paddingRight: 50 }}>
         <Router>
@@ -214,7 +148,11 @@ class App extends React.Component<any, any> {
                 <Route exact={true} path="/quizzes/:id" component={this.edit} />
                 <Route exact={true} path="/new" component={this.create} />
                 <Route exact={true} path="/courses" component={CoursesView} />
-                <Route exact={true} path="/courses/:id" component={Dashboard} />
+                <Route
+                  exact={true}
+                  path="/courses/:id"
+                  component={SingleCourseView}
+                />
               </div>
             ) : (
               <div>
