@@ -1,5 +1,6 @@
 import {
   Button,
+  Card,
   Grid,
   IconButton,
   MenuItem,
@@ -181,7 +182,13 @@ class NewCourseView extends React.Component<any, any> {
               </Typography>
             </Grid>
             <Grid item={true} xs={12} style={{ backgroundColor: "#F8F8F8" }}>
-              <Grid container={true} justify="flex-start" alignItems="center">
+              <Grid
+                container={true}
+                spacing={24}
+                justify="center"
+                alignItems="center"
+                style={{ paddingLeft: ".5em", paddingRight: ".5em" }}
+              >
                 {JSON.stringify(this.state.parts) !== "{}" &&
                   Object.keys(this.state.parts).map(part => {
                     return (
@@ -236,16 +243,27 @@ const LanguageBar = props => {
 const PartComponent = ({ sections, partNumber }) => {
   return (
     <React.Fragment>
-      <Typography>Part {partNumber} </Typography>
-      {Object.keys(sections).map(section => {
-        return (
-          <SectionComponent
-            key={section}
-            sectionNumber={section}
-            quizzes={sections[section]}
-          />
-        )
-      })}
+      <Grid item={true} xs="auto">
+        <Typography variant="title">Part {partNumber} </Typography>
+      </Grid>
+      <Grid item={true} xs={12}>
+        <Grid
+          container={true}
+          spacing={16}
+          justify="flex-start"
+          style={{ backgroundColor: "white" }}
+        >
+          {Object.keys(sections).map(section => {
+            return (
+              <SectionComponent
+                key={section}
+                sectionNumber={section}
+                quizzes={sections[section]}
+              />
+            )
+          })}
+        </Grid>
+      </Grid>
     </React.Fragment>
   )
 }
@@ -253,15 +271,75 @@ const PartComponent = ({ sections, partNumber }) => {
 const SectionComponent = ({ quizzes, sectionNumber }) => {
   return (
     <React.Fragment>
-      <Typography>Section {sectionNumber}</Typography>
-      {quizzes.map(q => {
+      <Grid item={true} xs="auto" style={{ marginLeft: "1em" }}>
+        <Typography variant="subtitle1">SECTION {sectionNumber}</Typography>
+      </Grid>
+
+      {quizzes.map((q, idx) => {
         return (
           <Grid item={true} xs={12} key={q.id}>
-            <Button>{q.texts[0].title}</Button>
+            <CourseComponent
+              idx={idx}
+              quiz={q}
+              needsAttention={idx % 3 === 0}
+            />
           </Grid>
         )
       })}
     </React.Fragment>
+  )
+}
+
+const CourseComponent = ({ idx, needsAttention, quiz }) => {
+  return (
+    <Card
+      square={true}
+      raised={true}
+      elevation={2}
+      style={{ backgroundColor: needsAttention ? "#FB6949" : "#49C7FB" }}
+    >
+      <Grid
+        container={true}
+        justify="space-between"
+        style={{ padding: ".5em 1em .5em 1em" }}
+      >
+        <Grid item={true} xs={11} style={{ cursor: "pointer" }}>
+          <Typography variant="subtitle1" style={{ color: "white" }}>
+            Quiz {idx + 1}: {quiz.texts[0].title}{" "}
+          </Typography>
+        </Grid>
+
+        <Grid item={true} xs="auto">
+          <Link to={`/quizzes/${quiz.id}`} style={{ textDecoration: "none" }}>
+            <Button
+              variant="text"
+              size="small"
+              style={{
+                borderRadius: "0px",
+                backgroundColor: "#107EAB",
+                color: "white",
+                padding: "-.5em",
+              }}
+            >
+              Edit
+            </Button>
+          </Link>
+        </Grid>
+        <Grid item={true} xs={6} style={{ cursor: "pointer" }}>
+          <Typography variant="body1" style={{ color: "white" }}>
+            {quiz.texts[0].title}
+          </Typography>
+        </Grid>
+
+        {needsAttention && (
+          <Grid item={true} xs="auto">
+            <Typography variant="body1">
+              XX answers requiring attention
+            </Typography>
+          </Grid>
+        )}
+      </Grid>
+    </Card>
   )
 }
 
