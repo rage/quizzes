@@ -25,15 +25,22 @@ export class CourseController {
   @Get("/")
   public async getall(
     @QueryParam("language") language: string,
+    @QueryParam("attentionAnswers") attentionAnswers: boolean,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<Course[]> {
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
     }
 
+    console.log(
+      "Value of attentionAnswers inside the course controller: ",
+      attentionAnswers,
+    )
+
     const query: ICourseQuery = {
       id: null,
       language,
+      attentionAnswers,
     }
 
     return await this.courseService.getCourses(query)

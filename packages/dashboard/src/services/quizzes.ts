@@ -8,6 +8,14 @@ export const getQuizzes = async (course, user) => {
   return response.data
 }
 
+export const getOddAnswerCountsByQuizzes = async user => {
+  const response = await axios.get(`/api/v1/quizzes/answer/counts`, {
+    headers: { authorization: `Bearer ${user.accessToken}` },
+  })
+
+  return response.data
+}
+
 export const post = async (quiz, user) => {
   const response = await axios.post(`/api/v1/quizzes`, quiz, {
     headers: {

@@ -36,6 +36,7 @@ import QuizForm from "./components/QuizForm"
 import QuizStatistics from "./components/QuizStatistics"
 import SingleCourseView from "./components/SingleCourseView"
 import SuccessNotification from "./components/SuccessNotification"
+import { setAnswers } from "./store/answers/actions"
 import { setCourses } from "./store/courses/actions"
 import { newQuiz, setEdit } from "./store/edit/actions"
 import { setCourse } from "./store/filter/actions"
@@ -51,6 +52,7 @@ class App extends React.Component<any, any> {
       if ((profile as ITMCProfileDetails).administrator) {
         this.props.addUser(user)
         this.props.setCourses()
+        this.props.setAnswers()
       }
     }
   }
@@ -300,6 +302,7 @@ interface IStateProps {
 
 const mapStateToProps = (state: any) => {
   return {
+    answers: state.answers,
     courses: state.courses,
     edit: state.edit,
     filter: state.filter,
@@ -312,6 +315,7 @@ const mapDispatchToProps = {
   addUser,
   displayMessage,
   newQuiz,
+  setAnswers,
   setCourse,
   setCourses,
   setEdit,

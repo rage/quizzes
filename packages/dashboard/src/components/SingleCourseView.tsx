@@ -194,6 +194,7 @@ class NewCourseView extends React.Component<any, any> {
                   Object.keys(this.state.parts).map(part => {
                     return (
                       <PartComponent
+                        answers={this.props.answers}
                         key={part}
                         partNumber={part}
                         sections={this.state.parts[part]}
@@ -209,7 +210,7 @@ class NewCourseView extends React.Component<any, any> {
   }
 }
 
-const PartComponent = ({ sections, partNumber }) => {
+const PartComponent = ({ sections, partNumber, answers }) => {
   return (
     <React.Fragment>
       <Grid item={true} xs="auto">
@@ -228,6 +229,7 @@ const PartComponent = ({ sections, partNumber }) => {
                 key={section}
                 sectionNumber={section}
                 quizzes={sections[section]}
+                answers={answers}
               />
             )
           })}
@@ -237,7 +239,7 @@ const PartComponent = ({ sections, partNumber }) => {
   )
 }
 
-const SectionComponent = ({ quizzes, sectionNumber }) => {
+const SectionComponent = ({ quizzes, sectionNumber, answers }) => {
   return (
     <React.Fragment>
       <Grid item={true} xs="auto" style={{ marginLeft: "1em" }}>
@@ -250,7 +252,7 @@ const SectionComponent = ({ quizzes, sectionNumber }) => {
             <CourseComponent
               idx={idx}
               quiz={q}
-              needsAttention={idx % 3 === 0}
+              countData={answers.find(a => a.quiz_id === q.id)}
             />
           </Grid>
         )
@@ -259,13 +261,16 @@ const SectionComponent = ({ quizzes, sectionNumber }) => {
   )
 }
 
-const CourseComponent = ({ idx, needsAttention, quiz }) => {
+const CourseComponent = ({ idx, countData, quiz }) => {
   return (
     <Card
       square={true}
       raised={true}
       elevation={2}
-      style={{ backgroundColor: needsAttention ? "#FB6949" : "#49C7FB" }}
+      style={{
+        backgroundColor:
+          countData && countData.count > 0 ? "#FB6949" : "#49C7FB",
+      }}
     >
       <Grid
         container={true}
@@ -310,10 +315,11 @@ const CourseComponent = ({ idx, needsAttention, quiz }) => {
           </Link>
         </Grid>
 
-        {needsAttention && (
+        {countData && countData.count > 0 && (
           <Grid item={true} xs="auto">
             <Typography variant="body1">
-              XX answers requiring attention
+              {countData.count} answer{countData.count === 1 ? "" : "s"}{" "}
+              requiring attention
             </Typography>
           </Grid>
         )}
@@ -324,6 +330,7 @@ const CourseComponent = ({ idx, needsAttention, quiz }) => {
 
 const mapStateToProps = (state: any) => {
   return {
+    answers: state.answers,
     courses: state.courses,
     filter: state.filter,
     quizzes: state.quizzes,

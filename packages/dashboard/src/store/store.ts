@@ -3,6 +3,7 @@ import { composeWithDevTools } from "redux-devtools-extension/developmentOnly"
 import { persistReducer, persistStore } from "redux-persist"
 import storage from "redux-persist/lib/storage"
 import thunk from "redux-thunk"
+import { answersReducer } from "./answers/reducer"
 import { coursesReducer } from "./courses/reducer"
 import { editReducer } from "./edit/reducer"
 import { filterReducer } from "./filter/reducer"
@@ -11,6 +12,7 @@ import { quizzesReducer } from "./quizzes/reducer"
 import { userReducer } from "./user/reducer"
 
 const reducer = combineReducers({
+  answers: answersReducer,
   courses: coursesReducer,
   edit: editReducer,
   filter: filterReducer,

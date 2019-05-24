@@ -96,4 +96,13 @@ export default class QuizAnswerService {
 
     return await queryBuilder.getMany()
   }
+
+  public async getAttentionAnswers(): Promise<any[]> {
+    return await QuizAnswer.createQueryBuilder("quiz_answer")
+      .select("quiz_answer.quiz_id")
+      .addSelect("COUNT(quiz_answer.id)")
+      .where("quiz_answer.status IN ('rejected', 'spam', 'deprecated')")
+      .groupBy("quiz_answer.quiz_id")
+      .getRawMany()
+  }
 }

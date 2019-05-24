@@ -1,8 +1,11 @@
 import {
+  Get,
   HeaderParam,
   JsonController,
   Post,
   BadRequestError,
+  QueryParam,
+  UnauthorizedError,
 } from "routing-controllers"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
@@ -36,6 +39,17 @@ export class QuizAnswerController {
 
   @Inject()
   private validationService: ValidationService
+
+  @Get("/counts")
+  public async getAnswerCounts(
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ): Promise<any[]> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    return await this.quizAnswerService.getAttentionAnswers()
+  }
 
   @Post("/")
   public async post(
