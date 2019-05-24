@@ -97,7 +97,20 @@ export default class QuizAnswerService {
     return await queryBuilder.getMany()
   }
 
-  public async getAttentionAnswers(): Promise<any[]> {
+  public async getEveryonesAnswers(quizId: string): Promise<QuizAnswer[]> {
+    return await QuizAnswer.createQueryBuilder("quiz_answer")
+      .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
+      .getMany()
+  }
+
+  public async getAttentionAnswers(quizId: string): Promise<QuizAnswer[]> {
+    return await QuizAnswer.createQueryBuilder("quiz_answer")
+      .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
+      .andWhere("quiz_answer.status IN ('rejected', 'spam', 'deprecated')")
+      .getMany()
+  }
+
+  public async getAttentionAnswersCount(): Promise<any[]> {
     return await QuizAnswer.createQueryBuilder("quiz_answer")
       .select("quiz_answer.quiz_id")
       .addSelect("COUNT(quiz_answer.id)")

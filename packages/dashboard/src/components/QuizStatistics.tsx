@@ -2,6 +2,7 @@ import { Button, Card, Grid, Typography } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
+import { setAttentionRequiringAnswers } from "../store/answers/actions"
 import { setCourse } from "../store/filter/actions"
 import LanguageBar from "./GeneralTools/LanguageBar"
 
@@ -14,6 +15,15 @@ class QuizStatistics extends React.Component<any, any> {
   }
 
   public componentDidMount() {
+    this.props.setAttentionRequiringAnswers(this.props.match.params.id)
+  }
+
+  /*
+  public componentDidUpdate(){
+
+    if(!this.state.initialized){
+
+    
     const quiz = this.props.quizzes.find(
       c => c.id === this.props.match.params.id,
     )
@@ -28,8 +38,13 @@ class QuizStatistics extends React.Component<any, any> {
         this.props.filter.course !== currentCourse.id)
     ) {
       this.props.setCourse(currentCourse.id)
+
+    } 
+
+
     }
   }
+  */
 
   public render() {
     const quiz = this.props.quizzes.find(
@@ -66,11 +81,11 @@ class QuizStatistics extends React.Component<any, any> {
             <LanguageBar />
 
             <Grid item={true} xs={8}>
-              <AttentionAnswers />
+              <AttentionAnswers answers={this.props.answers} quiz={quiz} />
             </Grid>
 
             <Grid item={true} xs={4}>
-              <GeneralStatistics />
+              <GeneralStatistics answers={this.props.answers} />
             </Grid>
           </Grid>
         </Grid>
@@ -79,7 +94,7 @@ class QuizStatistics extends React.Component<any, any> {
   }
 }
 
-const AttentionAnswers = props => {
+const AttentionAnswers = ({ answers, quiz }) => {
   const placeHolder = [
     [
       {
@@ -111,8 +126,15 @@ const AttentionAnswers = props => {
         </Link>
       </Grid>
 
-      {placeHolder.map(answer => {
-        return <AnswerComponent key={answer[0].title} answerData={answer} />
+      {answers.map((answer, idx) => {
+        return (
+          <AnswerComponent
+            key={answer.id}
+            answerData={answer}
+            idx={idx}
+            quiz={quiz}
+          />
+        )
       })}
     </Grid>
   )
@@ -142,15 +164,13 @@ class AnswerComponent extends React.Component<any, any> {
         >
           <Grid container={true}>
             <Grid item={true} xs={12}>
-              {this.props.answerData.map((quizItemAnswer, idx) => {
-                return (
-                  <ItemAnswerComponent
-                    key={idx}
-                    idx={idx}
-                    isFirst={idx === 0}
-                    isLast={idx === this.props.answerData.length - 1}
-                  />
-                )
+              <ItemAnswerComponent
+                idx={this.props.idx}
+                answer={this.props.answerData}
+                quiz={this.props.quiz}
+                isFirst={this.props.idx === 0}
+                isLast={this.props.idx === this.props.answerData.length - 1}
+              />
               })}
             </Grid>
 
@@ -225,7 +245,7 @@ class AnswerComponent extends React.Component<any, any> {
   }
 }
 
-const ItemAnswerComponent = ({ idx, isFirst, isLast }) => {
+const ItemAnswerComponent = ({ answer, idx, isFirst, isLast, quiz }) => {
   return (
     <Grid
       container={true}
@@ -235,37 +255,49 @@ const ItemAnswerComponent = ({ idx, isFirst, isLast }) => {
         marginLeft: ".5em",
       }}
     >
-      <Grid item={true} xs="auto">
-        <Typography variant="subtitle1">
-          Question {idx}: "Question title"
-        </Typography>
-      </Grid>
+      {quiz.items.map((qItem, qIdx) => {
+        return (
+          <React.Fragment key={qItem.id}>
+            <Grid item={true} xs="auto">
+              <Typography variant="subtitle1">
+                Question {qIdx}: {qItem.texts[0].title}
+              </Typography>
+            </Grid>
 
-      <Grid item={true} xs="auto">
-        <Typography variant="body1" style={{ color: "#9D9696" }}>
-          Type: "Question type"
-        </Typography>
-      </Grid>
+            <Grid item={true} xs="auto">
+              <Typography variant="body1" style={{ color: "#9D9696" }}>
+                Type: {qItem.type}
+              </Typography>
+            </Grid>
 
-      {isFirst && (
-        <React.Fragment>
-          <Grid item={true} xs={4} />
-          <Grid item={true} xs="auto">
-            <Typography variant="body1">0 / 2</Typography>
-          </Grid>
-        </React.Fragment>
-      )}
+            {isFirst && (
+              <React.Fragment>
+                <Grid item={true} xs={4} />
+                <Grid item={true} xs="auto">
+                  <Typography variant="body1">
+                    0 / {quiz.items.length}
+                  </Typography>
+                </Grid>
+              </React.Fragment>
+            )}
 
-      <Grid item={true} xs={12} md={10}>
-        <Typography variant="body1">
-          Pitkä pitkä vastaus tämän olen vastannut opiskelijana hyvästi
-        </Typography>
-      </Grid>
+            <Grid item={true} xs={12} md={10}>
+              {qItem.type === "essay" ? (
+                <Typography variant="body1">
+                  {answer.itemAnswers[qIdx].textData}
+                </Typography>
+              ) : (
+                "Only essay type supported atm"
+              )}
+            </Grid>
+          </React.Fragment>
+        )
+      })}
     </Grid>
   )
 }
 
-const GeneralStatistics = props => {
+const GeneralStatistics = ({ answers }) => {
   return (
     <React.Fragment>
       <Grid
@@ -282,6 +314,34 @@ const GeneralStatistics = props => {
         style={{ backgroundColor: "#49C7FB" }}
       >
         <Grid item={true} xs={12}>
+          <Typography variant="body1">
+            Answers requiring attention: {answers.length}
+          </Typography>
+        </Grid>
+
+        <Grid item={true} xs={12}>
+          <Typography variant="body1">Of those:</Typography>
+          <ul>
+            <li>
+              <Typography variant="body1">
+                Deprecated:{" "}
+                {answers.filter(a => a.status === "deprecated").length}
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body1">
+                Spam: {answers.filter(a => a.status === "spam").length}{" "}
+              </Typography>
+            </li>
+            <li>
+              <Typography variant="body1">
+                Rejected: {answers.filter(a => a.status === "rejected").length}
+              </Typography>
+            </li>
+          </ul>
+        </Grid>
+
+        <Grid item={true} xs={12}>
           <Typography variant="body1">Submissions: xx</Typography>
         </Grid>
         <Grid item={true} xs={12}>
@@ -294,6 +354,7 @@ const GeneralStatistics = props => {
 
 const mapStateToProps = (state: any) => {
   return {
+    answers: state.answers,
     quizzes: state.quizzes,
     courses: state.courses,
     filter: state.filter,
@@ -302,5 +363,5 @@ const mapStateToProps = (state: any) => {
 
 export default connect(
   mapStateToProps,
-  { setCourse },
+  { setAttentionRequiringAnswers, setCourse },
 )(QuizStatistics)

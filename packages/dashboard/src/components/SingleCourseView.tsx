@@ -194,7 +194,7 @@ class NewCourseView extends React.Component<any, any> {
                   Object.keys(this.state.parts).map(part => {
                     return (
                       <PartComponent
-                        answers={this.props.answers}
+                        answerCounts={this.props.answerCounts}
                         key={part}
                         partNumber={part}
                         sections={this.state.parts[part]}
@@ -210,7 +210,7 @@ class NewCourseView extends React.Component<any, any> {
   }
 }
 
-const PartComponent = ({ sections, partNumber, answers }) => {
+const PartComponent = ({ sections, partNumber, answerCounts }) => {
   return (
     <React.Fragment>
       <Grid item={true} xs="auto">
@@ -229,7 +229,7 @@ const PartComponent = ({ sections, partNumber, answers }) => {
                 key={section}
                 sectionNumber={section}
                 quizzes={sections[section]}
-                answers={answers}
+                answerCounts={answerCounts}
               />
             )
           })}
@@ -239,7 +239,7 @@ const PartComponent = ({ sections, partNumber, answers }) => {
   )
 }
 
-const SectionComponent = ({ quizzes, sectionNumber, answers }) => {
+const SectionComponent = ({ quizzes, sectionNumber, answerCounts }) => {
   return (
     <React.Fragment>
       <Grid item={true} xs="auto" style={{ marginLeft: "1em" }}>
@@ -252,7 +252,7 @@ const SectionComponent = ({ quizzes, sectionNumber, answers }) => {
             <CourseComponent
               idx={idx}
               quiz={q}
-              countData={answers.find(a => a.quiz_id === q.id)}
+              countData={answerCounts.find(a => a.quiz_id === q.id)}
             />
           </Grid>
         )
@@ -330,7 +330,7 @@ const CourseComponent = ({ idx, countData, quiz }) => {
 
 const mapStateToProps = (state: any) => {
   return {
-    answers: state.answers,
+    answerCounts: state.answerCounts,
     courses: state.courses,
     filter: state.filter,
     quizzes: state.quizzes,

@@ -36,7 +36,7 @@ import QuizForm from "./components/QuizForm"
 import QuizStatistics from "./components/QuizStatistics"
 import SingleCourseView from "./components/SingleCourseView"
 import SuccessNotification from "./components/SuccessNotification"
-import { setAnswers } from "./store/answers/actions"
+import { setAnswerCounts } from "./store/answerCounts/actions"
 import { setCourses } from "./store/courses/actions"
 import { newQuiz, setEdit } from "./store/edit/actions"
 import { setCourse } from "./store/filter/actions"
@@ -52,7 +52,7 @@ class App extends React.Component<any, any> {
       if ((profile as ITMCProfileDetails).administrator) {
         this.props.addUser(user)
         this.props.setCourses()
-        this.props.setAnswers()
+        this.props.setAnswerCounts()
       }
     }
   }
@@ -315,7 +315,7 @@ const mapDispatchToProps = {
   addUser,
   displayMessage,
   newQuiz,
-  setAnswers,
+  setAnswerCounts,
   setCourse,
   setCourses,
   setEdit,

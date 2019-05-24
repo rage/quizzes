@@ -1,5 +1,8 @@
 import { createAction } from "typesafe-actions"
-import { getOddAnswerCountsByQuizzes } from "../../services/quizzes"
+import {
+  getAttentionRequiringQuizAnswers,
+  getQuizAnswers,
+} from "../../services/quizAnswers"
 
 export const set = createAction("answers/SET", resolve => {
   return (quizzes: any[]) => resolve(quizzes)
@@ -7,10 +10,24 @@ export const set = createAction("answers/SET", resolve => {
 
 export const clear = createAction("answers/CLEAR")
 
-export const setAnswers = () => {
+export const setAllAnswers = quizId => {
   return async (dispatch, getState) => {
     try {
-      const data = await getOddAnswerCountsByQuizzes(getState().user)
+      const data = await getQuizAnswers(quizId, getState().user)
+      dispatch(set(data))
+    } catch (error) {
+      console.log(error)
+    }
+  }
+}
+
+export const setAttentionRequiringAnswers = quizId => {
+  return async (dispatch, getState) => {
+    try {
+      const data = await getAttentionRequiringQuizAnswers(
+        quizId,
+        getState().user,
+      )
       dispatch(set(data))
     } catch (error) {
       console.log(error)

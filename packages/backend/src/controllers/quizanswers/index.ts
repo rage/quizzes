@@ -2,6 +2,7 @@ import {
   Get,
   HeaderParam,
   JsonController,
+  Param,
   Post,
   BadRequestError,
   QueryParam,
@@ -48,7 +49,26 @@ export class QuizAnswerController {
       throw new UnauthorizedError("unauthorized")
     }
 
-    return await this.quizAnswerService.getAttentionAnswers()
+    return await this.quizAnswerService.getAttentionAnswersCount()
+  }
+
+  @Get("/attention")
+  public async getEveryonesAnswers(
+    @QueryParam("attention") attention: boolean,
+    @QueryParam("quizId") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ): Promise<QuizAnswer[]> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    let result: QuizAnswer[]
+
+    result = attention
+      ? await this.quizAnswerService.getAttentionAnswers(quizId)
+      : await this.quizAnswerService.getEveryonesAnswers(quizId)
+
+    return result
   }
 
   @Post("/")
