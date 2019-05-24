@@ -12,9 +12,12 @@ import {
   Typography,
 } from "@material-ui/core"
 
-const NUMBER_OF_OPTIONS = 7
-
 const Scale = ({ handleIntDataChange, intData, item, answered }) => {
+  let number_of_options = 7
+
+  if (item.minWords && item.maxWords) {
+    number_of_options = item.maxWords - item.minWords + 1
+  }
   return (
     <div>
       <FormControl fullWidth component="fieldset">
@@ -37,8 +40,8 @@ const Scale = ({ handleIntDataChange, intData, item, answered }) => {
                   onChange={handleIntDataChange}
                 >
                   {Array.from(
-                    { length: NUMBER_OF_OPTIONS },
-                    (v, i) => i + 1,
+                    { length: number_of_options },
+                    (v, i) => (item.minWords ? item.minWords : 1) + i,
                   ).map(number => (
                     <FormControlLabel
                       key={number}

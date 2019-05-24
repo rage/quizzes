@@ -1,17 +1,10 @@
-import {
-  Button,
-  Menu,
-  MenuItem,
-  Paper,
-  TextField,
-  Typography,
-} from "@material-ui/core"
-import { InputProps } from "@material-ui/core/Input"
-import React, { Component, createRef } from "react"
+import { Button, Grid, Paper, Typography } from "@material-ui/core"
+import React, { Component } from "react"
 import { connect } from "react-redux"
 import { addItem, addReview, changeOrder, remove } from "../store/edit/actions"
 import ItemContainer from "./ItemContainer"
 import PeerReviewCollectionContainer from "./PeerReviewCollectionContainer"
+import QuestionAdder from "./QuizQuestionAdder"
 
 class TabContainer extends Component<any, any> {
   private itemTypes = [
@@ -24,13 +17,9 @@ class TabContainer extends Component<any, any> {
     "scale",
   ]
 
-  private reviewTypes = ["essay", "grade"]
-
   constructor(props) {
     super(props)
     this.state = {
-      menuOpen: false,
-      menuAnchor: null,
       scrollTo: null,
       justAdded: false,
       expandedItems: {},
@@ -72,6 +61,10 @@ class TabContainer extends Component<any, any> {
       return true
     }
 
+    if (this.props.items !== nextProps.items) {
+      return true
+    }
+
     return this.props !== nextProps
   }
 
@@ -96,79 +89,42 @@ class TabContainer extends Component<any, any> {
 
   public render() {
     return (
-      <div>
-        <div style={{ marginTop: 0 }}>
-          <TextField
-            onChange={this.props.handleChange(
-              `texts[${this.props.textIndex}].title`,
-            )}
-            label="title"
-            value={this.props.text.title}
-            margin="normal"
-            fullWidth={true}
-            multiline={true}
-          />
-          <TextField
-            onChange={this.props.handleChange(
-              `texts[${this.props.textIndex}].body`,
-            )}
-            label="body"
-            value={this.props.text.body}
-            margin="normal"
-            fullWidth={true}
-            multiline={true}
-            rowsMax="10"
-          />
-          {this.props.items.find(item => item.type === "essay") ? (
-            <TextField
-              onChange={this.props.handleChange(
-                `texts[${this.props.submitMessage}].submitMessage`,
-              )}
-              label="submit message"
-              value={this.props.text.submitMessage}
-              margin="normal"
-              fullWidth={true}
-              multiline={true}
-              rowsMax="10"
-            />
-          ) : (
-            <p />
-          )}
-        </div>
-        <div style={{ marginTop: 50 }}>
-          <Paper style={{ padding: 30, marginBottom: 20 }}>
-            <Typography variant="title" style={{ marginBottom: 10 }}>
-              Items / Question types:
-            </Typography>
-            <ItemContainer
-              expandItem={this.expandItem}
-              newest={this.newest()}
-              onSortEnd={this.onSortEnd}
-              items={this.props.items}
-              handleChange={this.props.handleChange}
-              useDragHandle={true}
-              handleSort={this.onSortEnd}
-              remove={this.remove}
-              scrollToNew={this.scrollToNewItem}
-              expandedItems={this.state.expandedItems}
-            />
+      <Grid container={true} spacing={8} justify="center">
+        <Grid
+          item={true}
+          xs={12}
+          sm={10}
+          md={6}
+          style={{ textAlign: "center" }}
+        >
+          <Typography variant="h4" style={{ textDecoration: "underline" }}>
+            Questions
+          </Typography>
+        </Grid>
 
-            <Button id="item" onClick={this.handleMenu}>
-              Add item
-            </Button>
-            <Menu
-              anchorEl={this.state.menuAnchor}
-              open={this.state.menuOpen === "item"}
-              onClose={this.handleMenu}
-            >
-              {this.itemTypes.map(type => (
-                <MenuItem key={type} value={type} onClick={this.addItem(type)}>
-                  {type}
-                </MenuItem>
-              ))}
-            </Menu>
-          </Paper>
-          {this.props.items.find(item => item.type === "essay") ? (
+        <Grid item={true} xs={12}>
+          <ItemContainer
+            expandItem={this.expandItem}
+            newest={this.newest()}
+            onSortEnd={this.onSortEnd}
+            items={this.props.items}
+            handleChange={this.props.handleChange}
+            useDragHandle={true}
+            handleSort={this.onSortEnd}
+            remove={this.remove}
+            scrollToNew={this.scrollToNewItem}
+            expandedItems={this.state.expandedItems}
+          />
+        </Grid>
+
+        <QuestionAdder
+          itemTypes={this.itemTypes}
+          addItem={this.addItem}
+          itemsExist={this.props.items && this.props.items.length > 0}
+        />
+
+        {this.props.items.find(item => item.type === "essay") && (
+          <Grid item={true} xs={12}>
             <Paper style={{ padding: 30 }}>
               <Typography variant="title" style={{ marginBottom: 10 }}>
                 Peer reviews:
@@ -184,38 +140,25 @@ class TabContainer extends Component<any, any> {
                 Add review
               </Button>
             </Paper>
-          ) : (
-            <p />
-          )}
-        </div>
-      </div>
+          </Grid>
+        )}
+      </Grid>
     )
   }
 
   private addItem = type => event => {
     this.setState({
-      menuOpen: null,
       justAdded: true,
     })
     this.props.addItem(type)
   }
 
   private addReview = event => {
-    this.setState({
-      menuOpen: null,
-    })
     this.props.addReview()
   }
 
   private remove = (path, index) => event => {
     this.props.remove(path, index)
-  }
-
-  private handleMenu = event => {
-    this.setState({
-      menuOpen: event.currentTarget.id,
-      menuAnchor: event.currentTarget,
-    })
   }
 
   private onSortEnd = ({ oldIndex, newIndex, collection }) => {

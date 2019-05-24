@@ -2,7 +2,7 @@ import React, { ComponentClass } from "react"
 import { SortableHandle } from "react-sortable-hoc"
 
 const DragHandleWrapper = SortableHandle((props: any) => (
-  <div>{props.children}</div>
+  <React.Fragment>{props.children}</React.Fragment>
 ))
 
 export default DragHandleWrapper

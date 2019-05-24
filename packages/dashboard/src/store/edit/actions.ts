@@ -50,7 +50,6 @@ export const save = () => {
         displayMessage(`Successfully saved ${quiz.texts[0].title}!`, false),
       )
     } catch (error) {
-      console.log(error)
       dispatch(
         displayMessage(
           `Failed to save changes to ${
@@ -96,7 +95,6 @@ export const changeOrder = (path, current, next) => {
     const moved = array.splice(current, 1)[0]
     array.splice(next, 0, moved)
     array.map((object, index) => (object.order = index))
-
     dispatch(set(quiz))
   }
 }
@@ -104,6 +102,7 @@ export const changeOrder = (path, current, next) => {
 export const addItem = type => {
   return (dispatch, getState) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
+
     const item = {
       quizId: quiz.id,
       type,
@@ -113,8 +112,14 @@ export const addItem = type => {
       texts: [],
       options: [],
     }
+
     quiz.items.push(item)
     dispatch(setEdit(quiz))
+    if (type === "checkbox" || type === "research-agreement") {
+      const updatedQuiz = JSON.parse(JSON.stringify(getState().edit))
+      const idx = updatedQuiz.items.length - 1
+      dispatch(addOption(idx))
+    }
   }
 }
 
@@ -130,6 +135,91 @@ export const addOption = item => {
       _.set(option, "quizItemId", quiz.items[item].id)
     }
     quiz.items[item].options.push(option)
+    dispatch(setEdit(quiz))
+  }
+}
+
+// atm for research-agreement
+export const updateMultipleOptions = (itemOrder, optionData) => {
+  return (dispatch, getState) => {
+    let quiz = JSON.parse(JSON.stringify(getState().edit))
+    const item = quiz.items[itemOrder]
+    const oldOptions = item.options
+    item.options = optionData.map(optData => {
+      if (!optData.id) {
+        return {
+          order: optData.order,
+          quizItemId: item.id,
+          correct: true,
+          texts: [],
+        }
+      } else {
+        const modifiedOption = oldOptions.find(opt => opt.id === optData.id)
+        modifiedOption.order = optData.order
+        return modifiedOption
+      }
+    })
+    dispatch(setEdit(quiz))
+
+    quiz = JSON.parse(JSON.stringify(getState().edit))
+
+    quiz.items[itemOrder].options.forEach(option => {
+      const optData = optionData.find(od => od.order === option.order)
+      option.texts[0].title = optData.title
+      option.texts[0].body = optData.body
+      ;(option.correct = optData.correct),
+        (option.texts[0].failureMessage = optData.failureMessage),
+        (option.texts[0].successMessage = optData.successMessage)
+    })
+    dispatch(setEdit(quiz))
+  }
+}
+
+export const addFinishedOption = (item, optionData) => {
+  return (dispatch, getState) => {
+    const quiz = JSON.parse(JSON.stringify(getState().edit))
+    const option = {
+      order: quiz.items[item].options.length,
+      correct: optionData.correct,
+      texts: [],
+    }
+    if (quiz.items[item].id) {
+      _.set(option, "quizItemId", quiz.items[item].id)
+    }
+    quiz.items[item].options.push(option)
+    dispatch(setEdit(quiz))
+    const updatedQuiz = JSON.parse(JSON.stringify(getState().edit))
+    const idx = quiz.items[item].options.length - 1
+    updatedQuiz.items[item].options[idx].texts[0].title = optionData.title
+    updatedQuiz.items[item].options[idx].texts[0].failureMessage =
+      optionData.failureMessage
+    updatedQuiz.items[item].options[idx].texts[0].successMessage =
+      optionData.successMessage
+    updatedQuiz.items[item].options[idx].correct = optionData.correct
+    dispatch(setEdit(updatedQuiz))
+  }
+}
+
+export const modifyOption = (item, optionData) => {
+  return (dispatch, getState) => {
+    const quiz = JSON.parse(JSON.stringify(getState().edit))
+    const option = quiz.items[item].options.find(o => o.id === optionData.id)
+    quiz.items[item].options = quiz.items[item].options.map(o =>
+      o.id === option.id
+        ? {
+            ...o,
+            correct: optionData.correct,
+            texts: [
+              {
+                ...o.texts[0],
+                title: optionData.title,
+                failureMessage: optionData.failureMessage,
+                successMessage: optionData.successMessage,
+              },
+            ],
+          }
+        : o,
+    )
     dispatch(setEdit(quiz))
   }
 }
@@ -174,7 +264,8 @@ export const remove = (path, index) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
     const array = _.get(quiz, path)
     array.splice(index, 1)
-    dispatch(set(quiz))
+    quiz[path] = array.map((arrayItem, idx) => ({ ...arrayItem, order: idx }))
+    dispatch(setEdit(quiz))
   }
 }
 
