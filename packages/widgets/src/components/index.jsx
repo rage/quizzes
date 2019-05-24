@@ -256,6 +256,7 @@ class Quiz extends Component {
                 handleTextDataChange={this.handleTextDataChange(item.id)}
                 handleIntDataChange={this.handleIntDataChange(item.id)}
                 handleOptionChange={this.handleOptionChange(item.id)}
+                handleCheckboxToggling={this.handleCheckboxToggling(item.id)}
                 setUserQuizState={this.setUserQuizState}
               />
             )
