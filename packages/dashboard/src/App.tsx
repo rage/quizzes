@@ -33,6 +33,7 @@ import TMCApi from "../../common/src/services/TMCApi"
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
 import CoursesView from "./components/CoursesView"
 import QuizForm from "./components/QuizForm"
+import QuizStatistics from "./components/QuizStatistics"
 import SingleCourseView from "./components/SingleCourseView"
 import SuccessNotification from "./components/SuccessNotification"
 import { setCourses } from "./store/courses/actions"
@@ -153,14 +154,28 @@ class App extends React.Component<any, any> {
                   path="/courses/:id"
                   component={SingleCourseView}
                 />
+                <Route
+                  exact={true}
+                  path="/quizzes/:id/data"
+                  component={QuizStatistics}
+                />
               </div>
             ) : (
               <div>
-                <Route exact={true} path="/" component={Login} />
+                <Route
+                  exact={true}
+                  path="/"
+                  CourseStatisticscomponent={Login}
+                />
                 <Route exact={true} path="/quizzes/:id" component={Login} />
                 <Route exact={true} path="/new" component={Login} />
                 <Route exact={true} path="/courses" component={Login} />
                 <Route exact={true} path="/courses/:id" component={Login} />
+                <Route
+                  exact={true}
+                  path="/quizzes/:id/data"
+                  component={Login}
+                />
               </div>
             )}
           </React.Fragment>

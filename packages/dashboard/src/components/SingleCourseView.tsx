@@ -18,6 +18,7 @@ import React from "react"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 import { setCourse } from "../store/filter/actions"
+import LanguageBar from "./GeneralTools/LanguageBar"
 
 class SingleCourseView extends React.Component<any, any> {
   constructor(props: any) {
@@ -208,38 +209,6 @@ class NewCourseView extends React.Component<any, any> {
   }
 }
 
-const LanguageBar = props => {
-  return (
-    <Grid item={true} xs={12} style={{ backgroundColor: "#F8F8F8" }}>
-      <Grid container={true} justify="space-between">
-        <Grid item={true} xs="auto">
-          <IconButton>
-            <Flag />
-          </IconButton>
-          <IconButton>
-            <Flag />
-          </IconButton>
-          <IconButton>
-            <Flag />
-          </IconButton>
-        </Grid>
-        <Grid item={true} xs="auto">
-          <Button
-            variant="text"
-            style={{
-              borderRadius: "0px",
-              backgroundColor: "#107EAB",
-              color: "white",
-            }}
-          >
-            Add language
-          </Button>
-        </Grid>
-      </Grid>
-    </Grid>
-  )
-}
-
 const PartComponent = ({ sections, partNumber }) => {
   return (
     <React.Fragment>
@@ -304,9 +273,14 @@ const CourseComponent = ({ idx, needsAttention, quiz }) => {
         style={{ padding: ".5em 1em .5em 1em" }}
       >
         <Grid item={true} xs={11} style={{ cursor: "pointer" }}>
-          <Typography variant="subtitle1" style={{ color: "white" }}>
-            Quiz {idx + 1}: {quiz.texts[0].title}{" "}
-          </Typography>
+          <Link
+            to={`/quizzes/${quiz.id}/data`}
+            style={{ textDecoration: "none" }}
+          >
+            <Typography variant="subtitle1" style={{ color: "white" }}>
+              Quiz {idx + 1}: {quiz.texts[0].title}{" "}
+            </Typography>
+          </Link>
         </Grid>
 
         <Grid item={true} xs="auto">
@@ -326,9 +300,14 @@ const CourseComponent = ({ idx, needsAttention, quiz }) => {
           </Link>
         </Grid>
         <Grid item={true} xs={6} style={{ cursor: "pointer" }}>
-          <Typography variant="body1" style={{ color: "white" }}>
-            {quiz.texts[0].title}
-          </Typography>
+          <Link
+            to={`/quizzes/${quiz.id}/data`}
+            style={{ textDecoration: "none" }}
+          >
+            <Typography variant="body1" style={{ color: "white" }}>
+              {quiz.texts[0].title}
+            </Typography>
+          </Link>
         </Grid>
 
         {needsAttention && (
