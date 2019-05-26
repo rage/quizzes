@@ -52,6 +52,18 @@ export class QuizAnswerController {
     return await this.quizAnswerService.getAttentionAnswersCount()
   }
 
+  @Get("/statistics")
+  public async getAnswerStatistics(
+    @QueryParam("quizId") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ): Promise<any> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    return await this.quizAnswerService.getAnswersStatistics(quizId)
+  }
+
   @Get("/attention")
   public async getEveryonesAnswers(
     @QueryParam("attention") attention: boolean,

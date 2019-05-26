@@ -5,6 +5,7 @@ import storage from "redux-persist/lib/storage"
 import thunk from "redux-thunk"
 import { answerCountsReducer } from "./answerCounts/reducer"
 import { answersReducer } from "./answers/reducer"
+import { answerStatisticsReducer } from "./answerStatistics/reducer"
 import { coursesReducer } from "./courses/reducer"
 import { editReducer } from "./edit/reducer"
 import { filterReducer } from "./filter/reducer"
@@ -14,6 +15,7 @@ import { userReducer } from "./user/reducer"
 
 const reducer = combineReducers({
   answerCounts: answerCountsReducer,
+  answerStatistics: answerStatisticsReducer,
   answers: answersReducer,
   courses: coursesReducer,
   edit: editReducer,

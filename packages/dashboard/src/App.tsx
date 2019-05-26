@@ -158,7 +158,7 @@ class App extends React.Component<any, any> {
                 />
                 <Route
                   exact={true}
-                  path="/quizzes/:id/data"
+                  path="/quizzes/:id/answers"
                   component={QuizStatistics}
                 />
               </div>
@@ -175,7 +175,7 @@ class App extends React.Component<any, any> {
                 <Route exact={true} path="/courses/:id" component={Login} />
                 <Route
                   exact={true}
-                  path="/quizzes/:id/data"
+                  path="/quizzes/:id/answers"
                   component={Login}
                 />
               </div>

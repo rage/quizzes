@@ -118,4 +118,22 @@ export default class QuizAnswerService {
       .groupBy("quiz_answer.quiz_id")
       .getRawMany()
   }
+
+  public async getAnswersStatistics(quizId: string): Promise<any> {
+    const result = await UserQuizState.createQueryBuilder("user_quiz_state")
+      .select("user_quiz_state.quiz_id")
+      .addSelect("COUNT(user_quiz_state.quiz_id)")
+      .addSelect("AVG(user_quiz_state.points_awarded)")
+      .addSelect("STDDEV_POP(user_quiz_state.points_awarded)")
+      .where("user_quiz_state.quiz_id = :quiz_id", { quiz_id: quizId })
+      .groupBy("user_quiz_state.quiz_id")
+      .getRawMany()
+
+    if (JSON.stringify(result) === "{}") {
+      return {
+        count: 0,
+      }
+    }
+    return result
+  }
 }
