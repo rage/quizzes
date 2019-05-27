@@ -31,6 +31,7 @@ import {
 } from "react-router-dom"
 import TMCApi from "../../common/src/services/TMCApi"
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
+import AnswerView from "./components/AnswerView"
 import CoursesView from "./components/CoursesView"
 import QuizForm from "./components/QuizForm"
 import QuizStatistics from "./components/QuizStatistics"
@@ -161,6 +162,11 @@ class App extends React.Component<any, any> {
                   path="/quizzes/:id/answers"
                   component={QuizStatistics}
                 />
+                <Route
+                  exact={true}
+                  path="/answers/:id"
+                  component={AnswerView}
+                />
               </div>
             ) : (
               <div>
@@ -178,6 +184,7 @@ class App extends React.Component<any, any> {
                   path="/quizzes/:id/answers"
                   component={Login}
                 />
+                <Route exact={true} path="/answers/:id" component={Login} />
               </div>
             )}
           </React.Fragment>

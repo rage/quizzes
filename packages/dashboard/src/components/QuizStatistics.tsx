@@ -1,4 +1,5 @@
 import { Button, Card, Grid, Typography } from "@material-ui/core"
+import queryString from "query-string"
 import React from "react"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
@@ -21,6 +22,9 @@ class QuizStatistics extends React.Component<any, any> {
   }
 
   public render() {
+    const queryParams = queryString.parse(this.props.location.search)
+    const showingAll = queryParams.all && queryParams.all === "true"
+
     const quiz = this.props.quizzes.find(
       c => c.id === this.props.match.params.id,
     )
@@ -99,7 +103,7 @@ const AttentionAnswers = ({ answers, quiz }) => {
         <Typography variant="title">ANSWERS REQUIRING ATTENTION</Typography>
       </Grid>
       <Grid item={true} xs={2}>
-        <Link to="/">
+        <Link to={`/quizzes/${quiz.id}/answers?all=true`}>
           <Typography color="textPrimary">VIEW ALL</Typography>
         </Link>
       </Grid>
@@ -150,11 +154,13 @@ class AnswerComponent extends React.Component<any, any> {
             </Grid>
 
             {this.state.expanded && (
-              <Grid item={true} xs={12}>
-                <Typography variant="title">
-                  We shall show nice statistics in this place
-                </Typography>
-              </Grid>
+              <DetailedAnswerData
+                answer={this.props.answerData}
+                itemStatistics={[
+                  { avg: 0.7, sd: 0.13 },
+                  { avg: 0.91, sd: 0.2 },
+                ]}
+              />
             )}
 
             <Grid item={true} xs={12} style={{ backgroundColor: "#E5E5E5" }}>
@@ -220,6 +226,68 @@ class AnswerComponent extends React.Component<any, any> {
   }
 }
 
+const DetailedAnswerData = ({ answer, itemStatistics }) => {
+  return (
+    <Grid item={true} xs={12} style={{ margin: "0em 0em 1em 1em" }}>
+      <Grid
+        container={true}
+        justify="flex-start"
+        alignItems="stretch"
+        spacing={16}
+      >
+        <Grid
+          item={true}
+          xs={12}
+          md={3}
+          style={{ borderRight: "1px dashed #9D9696" }}
+        >
+          <Typography variant="subtitle1" color="textSecondary">
+            SPAM FLAGS: XX
+          </Typography>
+          <Link to={`/answers/${answer.id}`}>VIEW PEER REVIEWS</Link>
+        </Grid>
+
+        <Grid item={true} xs={12} md={9}>
+          <Grid
+            container={true}
+            alignItems="center"
+            spacing={24}
+            style={{ marginBottom: "2em" }}
+          >
+            <Grid item={true} xs={4} lg={3} xl={2} />
+            <Grid item={true} xs={4}>
+              <Typography variant="subtitle1">AVERAGE POINTS</Typography>
+            </Grid>
+            <Grid item={true} xs={4}>
+              <Typography variant="subtitle1">STANDARD DEVIATION</Typography>
+            </Grid>
+            <Grid item={true} xs="auto" lg={1} xl={2} />
+
+            {answer.itemAnswers.map((ia, idx) => {
+              return (
+                <React.Fragment key={ia.quizItemId}>
+                  <Grid item={true} xs={4} lg={3} xl={2}>
+                    QUESTION {idx + 1}:
+                  </Grid>
+                  <Grid item={true} xs={4}>
+                    {itemStatistics.length >= idx + 1
+                      ? itemStatistics[idx].avg
+                      : -1}
+                  </Grid>
+                  <Grid item={true} xs={4}>
+                    {itemStatistics.length > idx ? itemStatistics.sd : -1}
+                  </Grid>
+                  <Grid item={true} xs="auto" lg={1} xl={2} />
+                </React.Fragment>
+              )
+            })}
+          </Grid>
+        </Grid>
+      </Grid>
+    </Grid>
+  )
+}
+
 const ItemAnswerComponent = ({ answer, idx, quiz }) => {
   return (
     <Grid
@@ -253,7 +321,7 @@ const ItemAnswerComponent = ({ answer, idx, quiz }) => {
               </Grid>
             )}
 
-            <Grid item={true} xs={12} md={10}>
+            <Grid item={true} xs={12} md={10} style={{ marginTop: "1em" }}>
               {qItem.type === "essay" ? (
                 <Typography variant="body1">
                   {answer.itemAnswers[qIdx].textData}
@@ -278,6 +346,7 @@ const ItemAnswerComponent = ({ answer, idx, quiz }) => {
   )
 }
 
+// about the quiz & all the answers to it
 const GeneralStatistics = ({ answers, answerStatistics }) => {
   return (
     <React.Fragment>
