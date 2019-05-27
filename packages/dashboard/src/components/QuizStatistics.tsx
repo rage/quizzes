@@ -1,9 +1,20 @@
-import { Button, Card, Grid, Typography } from "@material-ui/core"
+import {
+  Button,
+  Card,
+  CircularProgress,
+  Grid,
+  LinearProgress,
+  Typography,
+} from "@material-ui/core"
+import { withStyles } from "@material-ui/core/styles"
 import queryString from "query-string"
 import React from "react"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
-import { setAttentionRequiringAnswers } from "../store/answers/actions"
+import {
+  setAllAnswers,
+  setAttentionRequiringAnswers,
+} from "../store/answers/actions"
 import { setAnswerStatistics } from "../store/answerStatistics/actions"
 import { setCourse } from "../store/filter/actions"
 import LanguageBar from "./GeneralTools/LanguageBar"
@@ -13,18 +24,42 @@ class QuizStatistics extends React.Component<any, any> {
     super(props)
     this.state = {
       initialized: false,
+      showingAll: false,
+    }
+  }
+
+  public componentDidUpdate() {
+    const queryParams = queryString.parse(this.props.location.search)
+    const showing = queryParams.all && queryParams.all === "true"
+
+    if (this.state.showingAll !== showing) {
+      if (showing) {
+        this.props.setAllAnswers(this.props.match.params.id)
+      } else {
+        this.props.setAttentionRequiringAnswers(this.props.match.params.id)
+      }
+      this.setState({
+        showingAll: showing,
+      })
     }
   }
 
   public componentDidMount() {
-    this.props.setAttentionRequiringAnswers(this.props.match.params.id)
     this.props.setAnswerStatistics(this.props.match.params.id)
+    const queryParams = queryString.parse(this.props.location.search)
+    const showing = queryParams.all && queryParams.all === "true"
+
+    if (showing) {
+      this.props.setAllAnswers(this.props.match.params.id)
+    } else {
+      this.props.setAttentionRequiringAnswers(this.props.match.params.id)
+    }
+    this.setState({
+      showingAll: showing,
+    })
   }
 
   public render() {
-    const queryParams = queryString.parse(this.props.location.search)
-    const showingAll = queryParams.all && queryParams.all === "true"
-
     const quiz = this.props.quizzes.find(
       c => c.id === this.props.match.params.id,
     )
@@ -59,16 +94,39 @@ class QuizStatistics extends React.Component<any, any> {
 
             <LanguageBar />
 
-            <Grid item={true} xs={12} md={4} style={{ marginBottom: "1em" }}>
-              <GeneralStatistics
-                answers={this.props.answers}
-                answerStatistics={this.props.answerStatistics}
-              />
-            </Grid>
+            {this.props.answers &&
+            this.props.answers.length > 0 &&
+            this.props.answers[0].quizId === this.props.match.params.id ? (
+              <React.Fragment>
+                <Grid
+                  item={true}
+                  xs={12}
+                  md={4}
+                  style={{ marginBottom: "1em" }}
+                >
+                  {this.state.showingAll ? (
+                    <FilterBox numberOfAnswers={this.props.answers.length} />
+                  ) : (
+                    <GeneralStatistics
+                      answers={this.props.answers}
+                      answerStatistics={this.props.answerStatistics}
+                    />
+                  )}
+                </Grid>
 
-            <Grid item={true} xs={12} md={8}>
-              <AttentionAnswers answers={this.props.answers} quiz={quiz} />
-            </Grid>
+                <Grid item={true} xs={12} md={8}>
+                  <AttentionAnswers
+                    answers={this.props.answers}
+                    quiz={quiz}
+                    showingAll={this.state.showingAll}
+                  />
+                </Grid>
+              </React.Fragment>
+            ) : (
+              <Grid item={true} xs={12} style={{ textAlign: "center" }}>
+                <CircularIndeterminate />
+              </Grid>
+            )}
           </Grid>
         </Grid>
       </Grid>
@@ -76,36 +134,53 @@ class QuizStatistics extends React.Component<any, any> {
   }
 }
 
-const AttentionAnswers = ({ answers, quiz }) => {
-  const placeHolder = [
-    [
-      {
-        title: "Name",
-        type: "Test quiz type",
-        answer: "I am very unsure",
-      },
-      {
-        title: "Select the correct",
-        type: "multiple-choice",
-        selected: "wrong",
-        correctOption: "right",
-      },
-    ],
-  ]
-
+const CircularIndeterminateRough = ({ classes }) => {
   return (
-    <Grid container={true} justify="flex-start" spacing={24}>
+    <CircularProgress
+      size={60}
+      className={classes.progress}
+      disableShrink={true}
+    />
+  )
+}
+
+const styles = theme => ({
+  progress: {
+    margin: theme.spacing.unit * 2,
+  },
+})
+
+const CircularIndeterminate = withStyles(styles)(CircularIndeterminateRough)
+
+const AttentionAnswers = ({ answers, quiz, showingAll }) => {
+  return (
+    <Grid
+      container={true}
+      justify="flex-start"
+      alignItems="center"
+      spacing={24}
+    >
       <Grid
         item={true}
-        xs={10}
+        xs={8}
         style={{ marginBottom: "1em", textAlign: "center" }}
       >
-        <Typography variant="title">ANSWERS REQUIRING ATTENTION</Typography>
+        <Typography variant="title">
+          {showingAll ? "ALL ANSWERS" : "ANSWERS REQUIRING ATTENTION"}
+        </Typography>
       </Grid>
-      <Grid item={true} xs={2}>
-        <Link to={`/quizzes/${quiz.id}/answers?all=true`}>
-          <Typography color="textPrimary">VIEW ALL</Typography>
-        </Link>
+      <Grid item={true} xs={4}>
+        {showingAll ? (
+          <Link to={`/quizzes/${quiz.id}/answers`}>
+            <Typography color="textPrimary">
+              VIEW ANSWERS REQUIRING ATTENTION
+            </Typography>
+          </Link>
+        ) : (
+          <Link to={`/quizzes/${quiz.id}/answers?all=true`}>
+            <Typography color="textPrimary">VIEW ALL</Typography>
+          </Link>
+        )}
       </Grid>
 
       {answers.map((answer, idx) => {
@@ -414,6 +489,40 @@ const GeneralStatistics = ({ answers, answerStatistics }) => {
   )
 }
 
+const FilterBox = ({ numberOfAnswers }) => {
+  return (
+    <React.Fragment>
+      <Grid
+        item={true}
+        xs={12}
+        style={{ marginBottom: "1.5em", textAlign: "center" }}
+      >
+        <Typography variant="title">FILTER OPTIONS</Typography>
+      </Grid>
+
+      <Grid container={true} spacing={32} style={{ backgroundColor: "gray" }}>
+        <Grid item={true} xs={12}>
+          <Typography variant="subtitle1">
+            Total number of answers: {numberOfAnswers}
+          </Typography>
+        </Grid>
+
+        <Grid item={true} xs={12}>
+          <Typography variant="subtitle1">
+            Filter by: date, status, number of review, points range...
+          </Typography>
+        </Grid>
+
+        <Grid item={true} xs={12}>
+          <Typography variant="subtitle1">
+            Order by: date, points, spam, num of peer reviews...
+          </Typography>
+        </Grid>
+      </Grid>
+    </React.Fragment>
+  )
+}
+
 const mapStateToProps = (state: any) => {
   return {
     answers: state.answers,
@@ -426,5 +535,10 @@ const mapStateToProps = (state: any) => {
 
 export default connect(
   mapStateToProps,
-  { setAnswerStatistics, setAttentionRequiringAnswers, setCourse },
+  {
+    setAllAnswers,
+    setAnswerStatistics,
+    setAttentionRequiringAnswers,
+    setCourse,
+  },
 )(QuizStatistics)
