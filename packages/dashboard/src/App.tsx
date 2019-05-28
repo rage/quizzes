@@ -209,8 +209,12 @@ class App extends React.Component<any, any> {
       )
 
     const cCourse = this.currentCourse()
-    const onQuizPage = history.location.pathname.includes("/quizzes/")
+    const onQuizPage =
+      history.location.pathname.includes("/quizzes/") ||
+      history.location.pathname.includes("new")
+    const onSavedQuizPage = history.location.pathname.includes("/quizzes/")
     const onAnswerPage = history.location.pathname.includes("/answers/")
+
     const onRootPage =
       history.location.pathname === "/" ||
       history.location.pathname === "/courses"
@@ -227,7 +231,7 @@ class App extends React.Component<any, any> {
             `${cCourse.texts[0].title}`,
           )()}
 
-        {onQuizPage && Crumbify(null, this.currentQuizTitle())()}
+        {onSavedQuizPage && Crumbify(null, this.currentQuizTitle())()}
 
         {// not a fourth, but an alternative to the third
         onAnswerPage &&

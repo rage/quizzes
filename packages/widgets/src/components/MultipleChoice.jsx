@@ -16,6 +16,7 @@ export default props => {
     failureMessage,
     handleOptionChange,
     itemTitle,
+    itemBody,
     multi,
     options,
     optionAnswers,
@@ -46,7 +47,18 @@ export default props => {
         {singleItem ? (
           ""
         ) : (
-          <Typography variant="subtitle1">{itemTitle}</Typography>
+          <React.Fragment>
+            <Typography variant="h6" style={{ paddingBottom: 10 }}>
+              {itemTitle}
+            </Typography>
+            {itemBody && (
+              <Typography
+                variant="body1"
+                style={{ paddingBottom: 10 }}
+                dangerouslySetInnerHTML={{ __html: itemBody }}
+              />
+            )}
+          </React.Fragment>
         )}
         {multi && !answered ? (
           <Typography variant="subtitle1">

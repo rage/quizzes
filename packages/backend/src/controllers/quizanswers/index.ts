@@ -112,18 +112,24 @@ export class QuizAnswerController {
       quizAnswer,
       userQuizState,
     } = this.validationService.validateQuizAnswer(answer, quiz[0], userQState)
+
     const erroneousItemAnswers = response.itemAnswerStatus.filter(status => {
       return status.error ? true : false
     })
+
     if (erroneousItemAnswers.length > 0) {
       throw new BadRequestError(
-        "Answer to an essay is not within acceptable limits. " +
-          `${erroneousItemAnswers.map(
-            x =>
-              `Min: ${x.min}, max: ${x.max}. Your answer (${
-                x.data.words
-              } words): ${x.data.text}`,
-          )}`,
+        `${erroneousItemAnswers.map(x => {
+          if (x.type === "essay") {
+            return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer (${
+              x.data.words
+            } words): ${x.data.text}`
+          } else if (x.type === "scale") {
+            return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer: ${
+              x.data.answerValue
+            }`
+          }
+        })}`,
       )
     }
     let savedAnswer: QuizAnswer

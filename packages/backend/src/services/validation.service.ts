@@ -1,3 +1,4 @@
+import { BadRequestError } from "routing-controllers"
 import { Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
@@ -32,6 +33,11 @@ export default class ValidationService {
       const itemAnswer = quizAnswer.itemAnswers.find(
         (ia: QuizItemAnswer) => ia.quizItemId === item.id,
       )
+
+      if (!itemAnswer) {
+        throw new BadRequestError("All items need an answer")
+      }
+
       const itemTranslation = item.texts.find(
         text => text.languageId === quizAnswer.languageId,
       )
@@ -43,6 +49,7 @@ export default class ValidationService {
         case "essay":
           if (item.minWords && wordCount(itemAnswer.textData) < item.minWords) {
             itemStatusObject = {
+              type: "essay",
               error: "Too short an answer",
               data: {
                 text: itemAnswer.textData,
@@ -55,6 +62,7 @@ export default class ValidationService {
           }
           if (item.maxWords && wordCount(itemAnswer.textData) > item.maxWords) {
             itemStatusObject = {
+              type: "essay",
               error: "Too long an answer",
               data: {
                 text: itemAnswer.textData,
@@ -126,6 +134,21 @@ export default class ValidationService {
           }
           break
         case "scale":
+          const minimum = item.minValue ? item.minValue : 1
+          const maximum = item.maxValue ? item.maxValue : 7
+          if (itemAnswer.intData < minimum || itemAnswer.intData > maximum) {
+            itemStatusObject = {
+              type: "scale",
+              error: "Scale value out of bounds",
+              data: {
+                answerValue: itemAnswer.intData,
+              },
+              min: minimum,
+              max: maximum,
+            }
+            break
+          }
+
           itemStatusObject = {
             value: itemAnswer.intData,
           }
@@ -240,8 +263,12 @@ export default class ValidationService {
 
   public async validateModificationOfExistingQuiz(quiz: Quiz, oldQuiz: Quiz) {
     const stricter = oldQuiz.items.some(qi => {
+      if (qi.type !== "essay") {
+        return false
+      }
       const qi2 = quiz.items.find(x => x.id === qi.id)
-      if (qi2 === null) {
+
+      if (!qi2) {
         return false
       }
       if (qi2.minWords && (!qi.minWords || qi.minWords < qi2.minWords)) {

@@ -1,7 +1,7 @@
 import React from "react"
-import { Grid, Checkbox } from "@material-ui/core"
+import { Grid, Checkbox, Typography } from "@material-ui/core"
 
-export default ({ label, value, toggle, answered }) => {
+export default ({ body, title, value, toggle, answered }) => {
   const checkboxOptions = {
     disabled: answered,
     checked: value !== undefined,
@@ -18,7 +18,10 @@ export default ({ label, value, toggle, answered }) => {
         />
       </Grid>
       <Grid item xs style={{ alignSelf: "center" }}>
-        {label}
+        {title && <Typography variant="subtitle1">{title}</Typography>}
+        {body && body !== title && (
+          <Typography variant="body1">{body}</Typography>
+        )}
       </Grid>
     </Grid>
   )

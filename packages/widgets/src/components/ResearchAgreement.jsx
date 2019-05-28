@@ -17,7 +17,8 @@ const ResearchAgreement = ({
         return (
           <CheckboxOption
             key={option.id}
-            label={option.texts[0].title}
+            title={option.texts[0].title}
+            body={option.texts[0].body}
             value={currentAnswer}
             toggle={handleCheckboxToggling(option.id)}
             answered={answered}
