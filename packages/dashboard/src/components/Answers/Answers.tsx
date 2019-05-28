@@ -1,7 +1,7 @@
 import { Grid, Typography } from "@material-ui/core"
 import React from "react"
 import { Link } from "react-router-dom"
-import AnswerComponent from "./Answer"
+import Answer from "./Answer"
 
 const AttentionAnswers = ({ answers, quiz, showingAll }) => {
   return (
@@ -36,12 +36,7 @@ const AttentionAnswers = ({ answers, quiz, showingAll }) => {
 
       {answers.map((answer, idx) => {
         return (
-          <AnswerComponent
-            key={answer.id}
-            answerData={answer}
-            idx={idx}
-            quiz={quiz}
-          />
+          <Answer key={answer.id} answerData={answer} idx={idx} quiz={quiz} />
         )
       })}
     </Grid>

@@ -91,8 +91,8 @@ class QuizStatistics extends React.Component<any, any> {
             <LanguageBar />
 
             {this.props.answers &&
-            this.props.answers.length > 0 &&
-            this.props.answers[0].quizId === this.props.match.params.id ? (
+            (this.props.answers.length === 0 ||
+              this.props.answers[0].quizId === this.props.match.params.id) ? (
               <React.Fragment>
                 <Grid
                   item={true}

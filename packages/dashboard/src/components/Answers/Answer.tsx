@@ -2,6 +2,7 @@ import { Button, Card, Grid, Typography } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
+import { setCourse } from "../../store/filter/actions"
 import ItemAnswer from "./ItemAnswer"
 
 class Answer extends React.Component<any, any> {
@@ -24,7 +25,14 @@ class Answer extends React.Component<any, any> {
         <Card
           raised={true}
           square={true}
-          style={{ borderLeft: "1em solid #FB6949" }}
+          style={{
+            borderLeft:
+              "1em solid " +
+              (this.props.answerData.status === "submitted" ||
+              this.props.answerData.status === "spam"
+                ? "#FB6949"
+                : "#49C7FB"),
+          }}
         >
           <Grid container={true}>
             <Grid item={true} xs={12}>
@@ -175,4 +183,7 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps)(Answer)
+export default connect(
+  mapStateToProps,
+  { setCourse },
+)(Answer)
