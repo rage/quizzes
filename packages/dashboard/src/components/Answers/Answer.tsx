@@ -92,9 +92,9 @@ class Answer extends React.Component<any, any> {
                 </Grid>
 
                 <Grid item={true} xs={2} style={{ textAlign: "center" }}>
-                  <Typography>Avg: 3,14</Typography>
+                  <Typography>Avg: xx</Typography>
 
-                  <Typography>SD: 1,00</Typography>
+                  <Typography>SD: xx</Typography>
                 </Grid>
               </Grid>
             </Grid>
