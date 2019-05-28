@@ -15,7 +15,7 @@ import { connect } from "react-redux"
 import { BrowserRouter as Router, Link, Route } from "react-router-dom"
 import TMCApi from "../../common/src/services/TMCApi"
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
-import AnswerView from "./components/Answers/AnswerView"
+import PeerReviewsView from "./components/Answers/PeerReviewsView"
 import QuizStatistics from "./components/Answers/QuizStatistics"
 import CoursesView from "./components/CoursesView"
 import QuizForm from "./components/QuizForm"
@@ -151,7 +151,7 @@ class App extends React.Component<any, any> {
                 <Route
                   exact={true}
                   path="/answers/:id"
-                  component={AnswerView}
+                  component={PeerReviewsView}
                 />
               </div>
             ) : (

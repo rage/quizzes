@@ -1,9 +1,10 @@
 import { Button, Card, Grid, Typography } from "@material-ui/core"
 import React from "react"
+import { connect } from "react-redux"
 import { Link } from "react-router-dom"
-import ItemAnswerComponent from "./ItemAnswer"
+import ItemAnswer from "./ItemAnswer"
 
-class AnswerComponent extends React.Component<any, any> {
+class Answer extends React.Component<any, any> {
   constructor(props) {
     super(props)
     this.state = {
@@ -27,7 +28,7 @@ class AnswerComponent extends React.Component<any, any> {
         >
           <Grid container={true}>
             <Grid item={true} xs={12}>
-              <ItemAnswerComponent
+              <ItemAnswer
                 idx={this.props.idx}
                 answer={this.props.answerData}
                 quiz={this.props.quiz}
@@ -35,12 +36,13 @@ class AnswerComponent extends React.Component<any, any> {
             </Grid>
 
             {this.state.expanded && (
-              <DetailedAnswerData
+              <PeerReviewsSummary
                 answer={this.props.answerData}
-                itemStatistics={[
-                  { avg: 0.7, sd: 0.13 },
-                  { avg: 0.91, sd: 0.2 },
-                ]}
+                spamFlags={
+                  this.props.answerStatistics.find(
+                    as => as.quiz_answer_id === this.props.answerData.id,
+                  ).count
+                }
               />
             )}
 
@@ -107,7 +109,7 @@ class AnswerComponent extends React.Component<any, any> {
   }
 }
 
-const DetailedAnswerData = ({ answer, itemStatistics }) => {
+const PeerReviewsSummary = ({ answer, spamFlags }) => {
   return (
     <Grid item={true} xs={12} style={{ margin: "0em 0em 1em 1em" }}>
       <Grid
@@ -123,7 +125,7 @@ const DetailedAnswerData = ({ answer, itemStatistics }) => {
           style={{ borderRight: "1px dashed #9D9696" }}
         >
           <Typography variant="subtitle1" color="textSecondary">
-            SPAM FLAGS: XX
+            SPAM FLAGS: {spamFlags}
           </Typography>
           <Link to={`/answers/${answer.id}`}>VIEW PEER REVIEWS</Link>
         </Grid>
@@ -151,12 +153,10 @@ const DetailedAnswerData = ({ answer, itemStatistics }) => {
                     QUESTION {idx + 1}:
                   </Grid>
                   <Grid item={true} xs={4}>
-                    {itemStatistics.length >= idx + 1
-                      ? itemStatistics[idx].avg
-                      : -1}
+                    xx
                   </Grid>
                   <Grid item={true} xs={4}>
-                    {itemStatistics.length > idx ? itemStatistics.sd : -1}
+                    xx
                   </Grid>
                   <Grid item={true} xs="auto" lg={1} xl={2} />
                 </React.Fragment>
@@ -169,4 +169,10 @@ const DetailedAnswerData = ({ answer, itemStatistics }) => {
   )
 }
 
-export default AnswerComponent
+const mapStateToProps = state => {
+  return {
+    answerStatistics: state.answerStatistics,
+  }
+}
+
+export default connect(mapStateToProps)(Answer)

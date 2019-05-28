@@ -61,7 +61,8 @@ export class QuizAnswerController {
       throw new UnauthorizedError("unauthorized")
     }
 
-    return await this.quizAnswerService.getAnswersStatistics(quizId)
+    const result = await this.quizAnswerService.getAnswersStatistics(quizId)
+    return result
   }
 
   @Get("/attention")

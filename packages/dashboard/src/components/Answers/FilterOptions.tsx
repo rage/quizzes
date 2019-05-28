@@ -20,15 +20,11 @@ const FilterBox = ({ numberOfAnswers }) => {
         </Grid>
 
         <Grid item={true} xs={12}>
-          <Typography variant="subtitle1">
-            Filter by: date, status, number of review, points range...
-          </Typography>
+          <Typography variant="subtitle1">Filter options: to do</Typography>
         </Grid>
 
         <Grid item={true} xs={12}>
-          <Typography variant="subtitle1">
-            Order by: date, points, spam, num of peer reviews...
-          </Typography>
+          <Typography variant="subtitle1">Order options: to do</Typography>
         </Grid>
       </Grid>
     </React.Fragment>

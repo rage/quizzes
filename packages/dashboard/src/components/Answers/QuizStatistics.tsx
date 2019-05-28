@@ -1,16 +1,7 @@
-import {
-  Button,
-  Card,
-  CircularProgress,
-  Grid,
-  LinearProgress,
-  Typography,
-} from "@material-ui/core"
-import { withStyles } from "@material-ui/core/styles"
+import { CircularProgress, Grid, Typography } from "@material-ui/core"
 import queryString from "query-string"
 import React from "react"
 import { connect } from "react-redux"
-import { Link } from "react-router-dom"
 import {
   setAllAnswers,
   setAttentionRequiringAnswers,
@@ -18,9 +9,9 @@ import {
 import { setAnswerStatistics } from "../../store/answerStatistics/actions"
 import { setCourse, setQuiz } from "../../store/filter/actions"
 import LanguageBar from "../GeneralTools/LanguageBar"
-import AttentionAnswers from "./Answers"
-import FilterBox from "./FilterOptions"
-import GeneralStatistics from "./GeneralQuizStatistics"
+import Answers from "./Answers"
+import FilterOptions from "./FilterOptions"
+import GeneralQuizStatistics from "./GeneralQuizStatistics"
 
 class QuizStatistics extends React.Component<any, any> {
   constructor(props) {
@@ -48,8 +39,6 @@ class QuizStatistics extends React.Component<any, any> {
   }
 
   public componentDidMount() {
-    console.log("props: ", this.props)
-
     this.props.setAnswerStatistics(this.props.match.params.id)
     const queryParams = queryString.parse(this.props.location.search)
     const showing = queryParams.all && queryParams.all === "true"
@@ -112,17 +101,16 @@ class QuizStatistics extends React.Component<any, any> {
                   style={{ marginBottom: "1em" }}
                 >
                   {this.state.showingAll ? (
-                    <FilterBox numberOfAnswers={this.props.answers.length} />
-                  ) : (
-                    <GeneralStatistics
-                      answers={this.props.answers}
-                      answerStatistics={this.props.answerStatistics}
+                    <FilterOptions
+                      numberOfAnswers={this.props.answers.length}
                     />
+                  ) : (
+                    <GeneralQuizStatistics answers={this.props.answers} />
                   )}
                 </Grid>
 
                 <Grid item={true} xs={12} md={8}>
-                  <AttentionAnswers
+                  <Answers
                     answers={this.props.answers}
                     quiz={quiz}
                     showingAll={this.state.showingAll}
@@ -144,7 +132,7 @@ class QuizStatistics extends React.Component<any, any> {
 const mapStateToProps = (state: any) => {
   return {
     answers: state.answers,
-    answerStatistics: state.answerStatistics,
+
     quizzes: state.quizzes,
     courses: state.courses,
     filter: state.filter,

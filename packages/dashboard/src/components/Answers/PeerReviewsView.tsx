@@ -3,7 +3,7 @@ import React from "react"
 import { connect } from "react-redux"
 import { setQuiz } from "../../store/filter/actions"
 
-class AnswerView extends React.Component<any, any> {
+class PeerReviewsView extends React.Component<any, any> {
   constructor(props) {
     super(props)
   }
@@ -39,4 +39,4 @@ const mapStateToProps = state => {
 export default connect(
   mapStateToProps,
   { setQuiz },
-)(AnswerView)
+)(PeerReviewsView)

@@ -7,7 +7,7 @@ export const answerStatisticsReducer = (
 ) => {
   switch (action.type) {
     case getType(answerStatistics.set):
-      return [...action.payload]
+      return action.payload
     case getType(answerStatistics.clear):
       return []
     default:

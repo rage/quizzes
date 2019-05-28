@@ -1,7 +1,7 @@
 import { Grid, Typography } from "@material-ui/core"
 import React from "react"
 
-const GeneralStatistics = ({ answers, answerStatistics }) => {
+const GeneralStatistics = ({ answers }) => {
   return (
     <React.Fragment>
       <Grid
@@ -27,41 +27,16 @@ const GeneralStatistics = ({ answers, answerStatistics }) => {
           <Typography variant="body1">Of those:</Typography>
           <ul>
             <li>
-              <Typography variant="body1">
-                Deprecated:{" "}
-                {answers.filter(a => a.status === "deprecated").length}
-              </Typography>
+              <Grid item={true} xs={12}>
+                <Typography variant="body1">
+                  Waiting for peer review(s): {"-"}
+                </Typography>
+              </Grid>
             </li>
             <li>
-              <Typography variant="body1">
-                Spam: {answers.filter(a => a.status === "spam").length}{" "}
-              </Typography>
-            </li>
-            <li>
-              <Typography variant="body1">
-                Rejected: {answers.filter(a => a.status === "rejected").length}
-              </Typography>
+              <Typography variant="body1">Flagged as spam: {"-"}</Typography>
             </li>
           </ul>
-        </Grid>
-
-        <Grid item={true} xs={12}>
-          <Typography variant="body1">
-            Submissions: {answerStatistics.count || "-"}
-          </Typography>
-        </Grid>
-        <Grid item={true} xs={12}>
-          <Typography variant="body1">
-            Mean: {answerStatistics.average || "-"}
-          </Typography>
-        </Grid>
-        <Grid item={true} xs={12}>
-          <Typography variant="body1">
-            Sd: {answerStatistics.stddev_pop || "-"}
-          </Typography>
-        </Grid>
-        <Grid item={true} xs={12}>
-          Waiting for peer review: xx
         </Grid>
       </Grid>
     </React.Fragment>
