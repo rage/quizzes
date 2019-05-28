@@ -12,8 +12,6 @@ export const getOddAnswerCountsByQuizzes = async user => {
   const response = await axios.get(`/api/v1/quizzes/answer/counts`, {
     headers: { authorization: `Bearer ${user.accessToken}` },
   })
-  console.log("Response in quizzes service: ", response)
-
   return response.data
 }
 

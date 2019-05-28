@@ -18,7 +18,9 @@ const ItemAnswer = ({ answer, idx, quiz }) => {
           <React.Fragment key={qItem.id}>
             <Grid item={true} xs={12} md={8}>
               <Typography variant="subtitle1">
-                Question {qIdx}: {qItem.texts[0].title}
+                Question {qIdx}: {qItem.texts[0].title}{" "}
+                {qItem.type === "scale" &&
+                  `[${qItem.minValue || 1}-${qItem.maxValue || 7}]`}
               </Typography>
             </Grid>
 
