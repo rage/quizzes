@@ -1,40 +1,24 @@
 import AppBar from "@material-ui/core/AppBar"
 import Button from "@material-ui/core/Button"
 import FormControl from "@material-ui/core/FormControl"
-// import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Grid from "@material-ui/core/Grid"
 import Input from "@material-ui/core/Input"
 import InputLabel from "@material-ui/core/InputLabel"
-import ListItem from "@material-ui/core/ListItem"
-import MenuItem from "@material-ui/core/MenuItem"
 import Paper from "@material-ui/core/Paper"
-import Select from "@material-ui/core/Select"
-import SvgIcon from "@material-ui/core/SvgIcon"
-import Table from "@material-ui/core/Table"
-import TableBody from "@material-ui/core/TableBody"
-import TableCell from "@material-ui/core/TableCell"
-import TableHead from "@material-ui/core/TableHead"
-import TableRow from "@material-ui/core/TableRow"
-import TextField from "@material-ui/core/TextField"
 import Toolbar from "@material-ui/core/Toolbar"
 import Typography from "@material-ui/core/Typography"
 import NavigateNextIcon from "@material-ui/icons/NavigateNext"
 import Breadcrumbs from "@material-ui/lab/Breadcrumbs"
+import queryString from "query-string"
 import * as React from "react"
 import { connect } from "react-redux"
-import {
-  BrowserRouter as Router,
-  Link,
-  Redirect,
-  Route,
-  Switch,
-} from "react-router-dom"
+import { BrowserRouter as Router, Link, Route } from "react-router-dom"
 import TMCApi from "../../common/src/services/TMCApi"
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
-import AnswerView from "./components/AnswerView"
+import AnswerView from "./components/Answers/AnswerView"
+import QuizStatistics from "./components/Answers/QuizStatistics"
 import CoursesView from "./components/CoursesView"
 import QuizForm from "./components/QuizForm"
-import QuizStatistics from "./components/QuizStatistics"
 import SingleCourseView from "./components/SingleCourseView"
 import SuccessNotification from "./components/SuccessNotification"
 import { setAnswerCounts } from "./store/answerCounts/actions"
@@ -66,10 +50,12 @@ class App extends React.Component<any, any> {
   }
 
   public currentQuizTitle: () => string | null = () => {
-    if (!this.props.edit || !this.props.edit.texts[0]) {
+    if (!this.props.filter.quiz) {
       return null
     }
-    return this.props.edit.texts[0].title
+
+    const quiz = this.props.quizzes.find(q => q.id === this.props.filter.quiz)
+    return quiz ? quiz.texts[0].title : null
   }
 
   public render() {
@@ -193,7 +179,9 @@ class App extends React.Component<any, any> {
     )
   }
 
-  private PathBreadcrumbs = ({ history }) => {
+  private PathBreadcrumbs = props => {
+    const history = props.history
+
     const Crumbify = (path: string | null, label: string | null) => () =>
       path ? (
         <Link
@@ -222,6 +210,7 @@ class App extends React.Component<any, any> {
 
     const cCourse = this.currentCourse()
     const onQuizPage = history.location.pathname.includes("/quizzes/")
+    const onAnswerPage = history.location.pathname.includes("/answers/")
     const onRootPage =
       history.location.pathname === "/" ||
       history.location.pathname === "/courses"
@@ -239,6 +228,13 @@ class App extends React.Component<any, any> {
           )()}
 
         {onQuizPage && Crumbify(null, this.currentQuizTitle())()}
+
+        {// not a fourth, but an alternative to the third
+        onAnswerPage &&
+          Crumbify(
+            `/quizzes/${this.props.filter.quiz}/answers`,
+            this.currentQuizTitle(),
+          )()}
       </Breadcrumbs>
     )
   }

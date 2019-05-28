@@ -19,13 +19,13 @@ export const clear = createAction("filter/CLEAR")
   }
 }*/
 
-export const setLanguage = language => {
+export const setLanguage = (language: string) => {
   return dispatch => {
     dispatch(set({ language }))
   }
 }
 
-export const setCourse = course => {
+export const setCourse = (course: string) => {
   return async (dispatch, getState) => {
     if (!getState().quizzes.find(quiz => quiz.courseId === course)) {
       await dispatch(setQuizzes(course))
@@ -33,5 +33,11 @@ export const setCourse = course => {
     const language = getState().courses.find(c => c.id === course).languages[0]
       .id
     dispatch(set({ course, language }))
+  }
+}
+
+export const setQuiz = (quizId: string) => {
+  return dispatch => {
+    dispatch(set({ quiz: quizId }))
   }
 }

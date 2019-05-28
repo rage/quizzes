@@ -4,6 +4,7 @@ import * as filter from "./actions"
 const initialState = {
   course: "",
   language: "",
+  quiz: "",
 }
 
 export const filterReducer = (state: any = initialState, action: any) => {
