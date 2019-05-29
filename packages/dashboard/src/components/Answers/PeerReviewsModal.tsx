@@ -1,10 +1,16 @@
 import {
   Button,
+  Card,
   Dialog,
   DialogActions,
   DialogContent,
   DialogTitle,
+  FormControl,
+  FormControlLabel,
+  FormLabel,
   Grid,
+  Radio,
+  RadioGroup,
   Typography,
 } from "@material-ui/core"
 import React from "react"
@@ -36,7 +42,7 @@ class PeerReviewsModal extends React.Component<any, any> {
         maxWidth="md"
       >
         <DialogTitle>
-          <Typography variant="body1" id="peer-reviews-modal-title">
+          <Typography variant="headline" id="peer-reviews-modal-title">
             Received peer reviews ({this.props.peerReviews.length})
           </Typography>
         </DialogTitle>
@@ -45,7 +51,12 @@ class PeerReviewsModal extends React.Component<any, any> {
           <Grid container={true} spacing={16}>
             {this.props.peerReviews !== null &&
               this.props.peerReviews.map((pr, idx) => (
-                <Grid item={true} xs={12} key={pr.id}>
+                <Grid
+                  item={true}
+                  xs={12}
+                  key={pr.id}
+                  style={{ marginBottom: "1em" }}
+                >
                   <PeerReview
                     peerReviewAnswer={pr}
                     idx={idx}
@@ -54,6 +65,11 @@ class PeerReviewsModal extends React.Component<any, any> {
                         q => q.id === this.props.answer.quizId,
                       ).peerReviewCollections[0]
                     }
+                    peerReviewTitle={extractCommonEnding(
+                      this.props.quizzes
+                        .find(q => q.id === this.props.answer.quizId)
+                        .peerReviewCollections.map(prc => prc.texts[0].title),
+                    )}
                   />
                 </Grid>
               ))}
@@ -68,14 +84,18 @@ class PeerReviewsModal extends React.Component<any, any> {
   }
 }
 
-const PeerReview = ({ idx, peerReviewAnswer, peerReviewQuestions }) => {
-  console.log("Peer review quetions", peerReviewQuestions)
+const PeerReview = ({
+  idx,
+  peerReviewAnswer,
+  peerReviewQuestions,
+  peerReviewTitle,
+}) => {
   return (
     <Grid container={true} spacing={16}>
       <Grid item={true} xs={12}>
-        <Typography variant="body1">Peer review {idx + 1}</Typography>
+        <Typography variant="subheading">Peer review {idx + 1}</Typography>
       </Grid>
-      <Grid item={true} xs={12} style={{ backgroundColor: "silver" }}>
+      <Grid item={true} xs={12} style={{ backgroundColor: "#DDDDDD" }}>
         <Grid container={true} spacing={16}>
           <Grid
             item={true}
@@ -83,7 +103,10 @@ const PeerReview = ({ idx, peerReviewAnswer, peerReviewQuestions }) => {
             style={{ borderBottom: "1px dashed black" }}
           >
             <Typography variant="subtitle1">
-              {peerReviewQuestions.texts[0].title}
+              {
+                // peerReviewQuestions.texts[0].title
+                peerReviewTitle
+              }
             </Typography>
             <Typography variant="body1">
               {" "}
@@ -95,21 +118,14 @@ const PeerReview = ({ idx, peerReviewAnswer, peerReviewQuestions }) => {
             return (
               <React.Fragment key={answerIdx}>
                 <Grid item={true} xs={12}>
-                  (Title){" "}
-                  {peerReviewQuestions.questions[answerIdx].texts[0].title} :
-                </Grid>
-                <Grid item={true} xs={12}>
-                  {answer.value === null ? (
-                    <Typography variant="body1">
-                      {" "}
-                      Written answer: {answer.text}{" "}
-                    </Typography>
-                  ) : (
-                    <Typography variant="body1">
-                      {" "}
-                      Numerical answer: {answer.value}
-                    </Typography>
-                  )}
+                  <PeerReviewQuestionAnswer
+                    type={peerReviewQuestions.questions[answerIdx].type}
+                    questionAnswer={answer}
+                    title={
+                      peerReviewQuestions.questions[answerIdx].texts[0].title ||
+                      "No title"
+                    }
+                  />
                 </Grid>
               </React.Fragment>
             )
@@ -118,6 +134,69 @@ const PeerReview = ({ idx, peerReviewAnswer, peerReviewQuestions }) => {
       </Grid>
     </Grid>
   )
+}
+
+const extractCommonEnding = (strings: string[]): string => {
+  if (strings.length === 0) {
+    return ""
+  } else if (strings.length === 1) {
+    return strings[0]
+  }
+
+  let shortest = 1000
+  strings.forEach(
+    str => (shortest = str.length < shortest ? str.length : shortest),
+  )
+
+  for (let i = 0; i < shortest; i++) {
+    let first = strings[0].substring(i)
+
+    if (strings.every(str => str.substring(i) === first)) {
+      while (
+        first.length > 0 &&
+        (first.charAt(0) === " " || first.charAt(0) === ":")
+      ) {
+        first = first.substring(1)
+      }
+      return first
+    }
+  }
+
+  return ""
+}
+
+const PeerReviewQuestionAnswer = ({ type, questionAnswer, title }) => {
+  if (type === "essay") {
+    return (
+      <React.Fragment>
+        <Typography variant="subtitle1">{title}</Typography>
+        <Typography variant="body1" style={{ wordBreak: "break-word" }}>
+          {questionAnswer.text}
+        </Typography>
+      </React.Fragment>
+    )
+  } else if (type === "grade") {
+    return (
+      <FormControl>
+        <FormLabel>{title}</FormLabel>
+        <RadioGroup value={`${questionAnswer.value}`} row={true}>
+          {[1, 2, 3, 4, 5].map(n => {
+            return (
+              <FormControlLabel
+                key={"radio" + n}
+                value={`${n}`}
+                label={n}
+                labelPlacement="start"
+                control={<Radio color="primary" disabled={true} />}
+              />
+            )
+          })}
+        </RadioGroup>
+      </FormControl>
+    )
+  } else {
+    return <div>Unknown / unsupported peer review question type</div>
+  }
 }
 
 const mapStateToProps = state => {

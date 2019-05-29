@@ -11,26 +11,27 @@ export const setPeerReviews = (answerId: string) => {
   return async (dispatch, getState) => {
     try {
       const data = await getPeerReviews(answerId, getState().user)
-      /*
-        const answer = getState().answers.find(a => a.id === answerId)
-        const quiz = getState().quizzes.find(q => q.id === answer.quizId)
-        console.log("The quiz that was promised", quiz)
-        const peerReviewQuestions = quiz.peerReviewCollections.find(prc => (
-          prc.questions.some(q => q.id === data[0].answers[0].peerReviewQuestionId)
-        )).questions
 
-        console.log("Peer review questions: ", peerReviewQuestions)
-        console.log("Data: ", data)
+      const answer = getState().answers.find(a => a.id === answerId)
+      const quiz = getState().quizzes.find(q => q.id === answer.quizId)
+      const peerReviewQuestions = quiz.peerReviewCollections
+        .map(prc => prc.questions)
+        .flat()
 
-        const newData = data.map(pr => {
-          return {
-            ...pr, 
-            answers: pr.answers.sort((a1, a2) => 
-            (peerReviewQuestions.find(q => q.id === a1.peerReviewQuestionId).order -
-             peerReviewQuestions.find(q => q.id === a2.peerReviewQuestionId).order))
-          }
-        })*/
-      dispatch(set(data))
+      const newData = data.map(pr => {
+        return {
+          ...pr,
+          answers: pr.answers.sort((a1, a2) => {
+            return (
+              peerReviewQuestions.find(q => q.id === a1.peerReviewQuestionId)
+                .order -
+              peerReviewQuestions.find(q => q.id === a2.peerReviewQuestionId)
+                .order
+            )
+          }),
+        }
+      })
+      dispatch(set(newData))
     } catch (error) {
       console.log(error)
     }
