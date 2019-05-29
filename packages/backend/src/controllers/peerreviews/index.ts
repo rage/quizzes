@@ -4,6 +4,7 @@ import {
   JsonController,
   Param,
   Post,
+  UnauthorizedError,
 } from "routing-controllers"
 import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
@@ -41,6 +42,22 @@ export class PeerReviewController {
 
   @Inject()
   private userCourseStateService: UserCourseStateService
+
+  @Get("/received/:answerId")
+  public async getGivenReviews(
+    @Param("answerId") answerId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    return await this.peerReviewService.getPeerReviews(
+      this.entityManager,
+      answerId,
+      false,
+    )
+  }
 
   @Get("/:quizId/:languageId")
   public async get(

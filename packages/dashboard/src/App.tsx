@@ -15,7 +15,7 @@ import { connect } from "react-redux"
 import { BrowserRouter as Router, Link, Route } from "react-router-dom"
 import TMCApi from "../../common/src/services/TMCApi"
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
-import PeerReviewsView from "./components/Answers/PeerReviewsView"
+import PeerReviewsView from "./components/Answers/PeerReviewsModal"
 import QuizStatistics from "./components/Answers/QuizStatistics"
 import CoursesView from "./components/CoursesView"
 import QuizForm from "./components/QuizForm"
@@ -148,11 +148,6 @@ class App extends React.Component<any, any> {
                   path="/quizzes/:id/answers"
                   component={QuizStatistics}
                 />
-                <Route
-                  exact={true}
-                  path="/answers/:id"
-                  component={PeerReviewsView}
-                />
               </div>
             ) : (
               <div>
@@ -170,7 +165,6 @@ class App extends React.Component<any, any> {
                   path="/quizzes/:id/answers"
                   component={Login}
                 />
-                <Route exact={true} path="/answers/:id" component={Login} />
               </div>
             )}
           </React.Fragment>

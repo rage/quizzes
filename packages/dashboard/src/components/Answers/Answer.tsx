@@ -1,15 +1,16 @@
 import { Button, Card, Grid, Typography } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
-import { Link } from "react-router-dom"
 import { setCourse } from "../../store/filter/actions"
 import ItemAnswer from "./ItemAnswer"
+import PeerReviewsModal from "./PeerReviewsModal"
 
 class Answer extends React.Component<any, any> {
   constructor(props) {
     super(props)
     this.state = {
       expanded: false,
+      modalOpen: false,
     }
   }
 
@@ -117,64 +118,92 @@ class Answer extends React.Component<any, any> {
   }
 }
 
-const PeerReviewsSummary = ({ answer, spamFlags }) => {
-  return (
-    <Grid item={true} xs={12} style={{ margin: "0em 0em 1em 1em" }}>
-      <Grid
-        container={true}
-        justify="flex-start"
-        alignItems="stretch"
-        spacing={16}
-      >
+class PeerReviewsSummary extends React.Component<any, any> {
+  constructor(props) {
+    super(props)
+    this.state = {
+      modalOpen: false,
+    }
+  }
+
+  public render() {
+    return (
+      <Grid item={true} xs={12} style={{ margin: "0em 0em 1em 1em" }}>
         <Grid
-          item={true}
-          xs={12}
-          md={3}
-          style={{ borderRight: "1px dashed #9D9696" }}
+          container={true}
+          justify="flex-start"
+          alignItems="stretch"
+          spacing={16}
         >
-          <Typography variant="subtitle1" color="textSecondary">
-            SPAM FLAGS: {spamFlags}
-          </Typography>
-          <Link to={`/answers/${answer.id}`}>VIEW PEER REVIEWS</Link>
-        </Grid>
-
-        <Grid item={true} xs={12} md={9}>
           <Grid
-            container={true}
-            alignItems="center"
-            spacing={24}
-            style={{ marginBottom: "2em" }}
+            item={true}
+            xs={12}
+            md={3}
+            style={{ borderRight: "1px dashed #9D9696" }}
           >
-            <Grid item={true} xs={4} lg={3} xl={2} />
-            <Grid item={true} xs={4}>
-              <Typography variant="subtitle1">AVERAGE POINTS</Typography>
-            </Grid>
-            <Grid item={true} xs={4}>
-              <Typography variant="subtitle1">STANDARD DEVIATION</Typography>
-            </Grid>
-            <Grid item={true} xs="auto" lg={1} xl={2} />
+            <Typography variant="subtitle1" color="textSecondary">
+              SPAM FLAGS: {this.props.spamFlags}
+            </Typography>
+            <Button variant="outlined" onClick={this.openModal}>
+              VIEW PEER REVIEWS
+            </Button>
+          </Grid>
 
-            {answer.itemAnswers.map((ia, idx) => {
-              return (
-                <React.Fragment key={ia.quizItemId}>
-                  <Grid item={true} xs={4} lg={3} xl={2}>
-                    QUESTION {idx + 1}:
-                  </Grid>
-                  <Grid item={true} xs={4}>
-                    xx
-                  </Grid>
-                  <Grid item={true} xs={4}>
-                    xx
-                  </Grid>
-                  <Grid item={true} xs="auto" lg={1} xl={2} />
-                </React.Fragment>
-              )
-            })}
+          <Grid item={true} xs={12} md={9}>
+            <Grid
+              container={true}
+              alignItems="center"
+              spacing={24}
+              style={{ marginBottom: "2em" }}
+            >
+              <Grid item={true} xs={4} lg={3} xl={2} />
+              <Grid item={true} xs={4}>
+                <Typography variant="subtitle1">AVERAGE POINTS</Typography>
+              </Grid>
+              <Grid item={true} xs={4}>
+                <Typography variant="subtitle1">STANDARD DEVIATION</Typography>
+              </Grid>
+              <Grid item={true} xs="auto" lg={1} xl={2} />
+
+              {this.props.answer.itemAnswers.map((ia, idx) => {
+                return (
+                  <React.Fragment key={ia.quizItemId}>
+                    <Grid item={true} xs={4} lg={3} xl={2}>
+                      QUESTION {idx + 1}:
+                    </Grid>
+                    <Grid item={true} xs={4}>
+                      xx
+                    </Grid>
+                    <Grid item={true} xs={4}>
+                      xx
+                    </Grid>
+                    <Grid item={true} xs="auto" lg={1} xl={2} />
+                  </React.Fragment>
+                )
+              })}
+            </Grid>
           </Grid>
         </Grid>
+        <PeerReviewsModal
+          answer={this.props.answer}
+          open={this.state.modalOpen}
+          onClose={this.closeModal}
+        />
       </Grid>
-    </Grid>
-  )
+    )
+  }
+
+  private openModal = () => {
+    this.setState({
+      modalOpen: true,
+    })
+  }
+
+  private closeModal = () => {
+    this.setState({
+      modalOpen: false,
+    })
+  }
 }
 
 const mapStateToProps = state => {
