@@ -1,7 +1,8 @@
 import { Button, Card, Grid, Typography } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
-import { setCourse } from "../../store/filter/actions"
+import { setCourse, setQuiz } from "../../store/filter/actions"
+import { setPeerReviews } from "../../store/peerReviews/actions"
 import ItemAnswer from "./ItemAnswer"
 import PeerReviewsModal from "./PeerReviewsModal"
 
@@ -12,6 +13,10 @@ class Answer extends React.Component<any, any> {
       expanded: false,
       modalOpen: false,
     }
+  }
+
+  public componentDidMount() {
+    this.props.setQuiz(this.props.answerData.quizId)
   }
 
   public render() {
@@ -46,12 +51,20 @@ class Answer extends React.Component<any, any> {
 
             {this.state.expanded && (
               <PeerReviewsSummary
+                peerReviewsAnswers={this.props.peerReviews}
+                peerReviewsQuestions={
+                  this.props.quizzes.find(
+                    q => q.id === this.props.answerData.quizId,
+                  ).peerReviewCollections[0].questions
+                }
                 answer={this.props.answerData}
                 spamFlags={
                   this.props.answerStatistics.find(
                     as => as.quiz_answer_id === this.props.answerData.id,
                   ).count
                 }
+                setQuiz={this.props.setQuiz}
+                setPeerReviews={this.props.setPeerReviews}
               />
             )}
 
@@ -126,6 +139,10 @@ class PeerReviewsSummary extends React.Component<any, any> {
     }
   }
 
+  public componentDidMount() {
+    this.props.setPeerReviews(this.props.answer.id)
+  }
+
   public render() {
     return (
       <Grid item={true} xs={12} style={{ margin: "0em 0em 1em 1em" }}>
@@ -163,24 +180,38 @@ class PeerReviewsSummary extends React.Component<any, any> {
               <Grid item={true} xs={4}>
                 <Typography variant="subtitle1">STANDARD DEVIATION</Typography>
               </Grid>
+
               <Grid item={true} xs="auto" lg={1} xl={2} />
 
-              {this.props.answer.itemAnswers.map((ia, idx) => {
-                return (
-                  <React.Fragment key={ia.quizItemId}>
+              {this.props.peerReviewsAnswers &&
+                (this.props.peerReviewsAnswers.length === 0 ||
+                  this.props.peerReviewsAnswers[0].quizAnswerId ===
+                    this.props.answer.id) &&
+                this.props.peerReviewsQuestions.map((question, idx) => (
+                  <React.Fragment key={question.id}>
                     <Grid item={true} xs={4} lg={3} xl={2}>
-                      QUESTION {idx + 1}:
+                      {question.texts[0].title || "No title"}{" "}
+                      {question.type === "essay" && " (Essay)"}:
                     </Grid>
                     <Grid item={true} xs={4}>
-                      xx
+                      {question.type === "essay"
+                        ? "NA"
+                        : this.averagePoints(
+                            this.props.peerReviewsAnswers,
+                            idx,
+                          ).toFixed(2)}
                     </Grid>
                     <Grid item={true} xs={4}>
-                      xx
+                      {question.type === "essay"
+                        ? "NA"
+                        : this.standardDeviation(
+                            this.props.peerReviewsAnswers,
+                            idx,
+                          ).toFixed(2)}
                     </Grid>
                     <Grid item={true} xs="auto" lg={1} xl={2} />
                   </React.Fragment>
-                )
-              })}
+                ))}
             </Grid>
           </Grid>
         </Grid>
@@ -190,6 +221,36 @@ class PeerReviewsSummary extends React.Component<any, any> {
           onClose={this.closeModal}
         />
       </Grid>
+    )
+  }
+
+  private averagePoints = (prAnswers: any[], questionIdx: number): number => {
+    console.log("answers ", prAnswers)
+    const scores = prAnswers.map(a => a.answers[questionIdx].value)
+    if (scores.length === 0) {
+      return -1
+    }
+
+    return scores.reduce((acc, score) => acc + score, 0) / scores.length
+  }
+
+  private standardDeviation = (
+    prAnswers: any[],
+    questionIdx: number,
+  ): number => {
+    console.log("answers ", prAnswers)
+    const scores = prAnswers.map(a => a.answers[questionIdx].value)
+    if (scores.length === 0) {
+      return -1
+    }
+    const average = this.averagePoints(prAnswers, questionIdx)
+    if (average < 0) {
+      return -1
+    }
+    // population sd, not sample
+    return Math.sqrt(
+      scores.reduce((acc, elem) => acc + Math.pow(elem - average, 2), 0) /
+        scores.length,
     )
   }
 
@@ -209,10 +270,12 @@ class PeerReviewsSummary extends React.Component<any, any> {
 const mapStateToProps = state => {
   return {
     answerStatistics: state.answerStatistics,
+    peerReviews: state.peerReviews,
+    quizzes: state.quizzes,
   }
 }
 
 export default connect(
   mapStateToProps,
-  { setCourse },
+  { setCourse, setPeerReviews, setQuiz },
 )(Answer)

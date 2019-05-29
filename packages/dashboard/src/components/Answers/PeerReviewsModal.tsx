@@ -1,6 +1,5 @@
 import {
   Button,
-  Card,
   Dialog,
   DialogActions,
   DialogContent,
@@ -21,12 +20,6 @@ import { setPeerReviews } from "../../store/peerReviews/actions"
 class PeerReviewsModal extends React.Component<any, any> {
   constructor(props) {
     super(props)
-  }
-
-  public componentDidMount() {
-    const answer = this.props.answer
-    this.props.setQuiz(answer.quizId)
-    this.props.setPeerReviews(answer.id)
   }
 
   public render() {
