@@ -14,7 +14,7 @@ import {
   UpdateDateColumn,
 } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
-import { getUUIDByString, randomUUID } from "../util"
+import { getUUIDByString, randomUUID } from "../util/"
 import { Course } from "./course"
 import { Language } from "./language"
 import { PeerReviewCollection } from "./peer_review_collection"

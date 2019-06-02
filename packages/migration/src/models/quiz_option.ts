@@ -11,7 +11,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm"
-import { randomUUID } from "../util"
+import { randomUUID } from "../util/"
 import { Language } from "./language"
 import { QuizItem } from "./quiz_item"
 

@@ -6,12 +6,12 @@ import {
   QuizOption,
   QuizOptionTranslation,
   QuizTranslation,
-} from "@quizzes/common/models"
+} from "./models"
 import { Quiz as QNQuiz } from "./app-modules/models"
 
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import oldQuizTypes from "./app-modules/constants/quiz-types"
-import { getUUIDByString, insert } from "@quizzes/common/util"
+import { getUUIDByString, insert } from "./util/"
 import { progressBar, safeGet } from "./util"
 import { AdvancedConsoleLogger } from "typeorm"
 import { LAST_MIGRATION } from "./"
@@ -123,6 +123,8 @@ export async function migrateQuizzes(courses: {
           type: oldQuiz.type === oldQuizTypes.ESSAY ? "essay" : "open",
           validityRegex: rightAnswer,
           order: 0,
+          minWords: meta.minWords,
+          maxWords: meta.maxWords,
           createdAt: oldQuiz.createdAt,
           updatedAt: oldQuiz.updatedAt,
         })

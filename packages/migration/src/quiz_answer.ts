@@ -1,4 +1,4 @@
-import { Database } from "@quizzes/common/config/database"
+import { Database } from "./config/database"
 import {
   Quiz,
   QuizAnswer,
@@ -6,13 +6,14 @@ import {
   QuizOption,
   QuizOptionAnswer,
   User,
-} from "@quizzes/common/models"
+} from "./models"
 import { Container } from "typedi"
 import { QueryFailedError } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
 import { calculateChunkSize, progressBar } from "./util"
-import { getUUIDByString, insert } from "@quizzes/common/util"
+import { getUUIDByString, insert } from "./util/"
+import { LAST_MIGRATION } from "./"
 
 export async function migrateQuizAnswers(
   quizzes: { [quizID: string]: Quiz },
@@ -23,7 +24,12 @@ export async function migrateQuizAnswers(
   const database = Container.get(Database)
   const conn = await database.getConnection()
 
-  const answers = await QNQuizAnswer.find({})
+  const answers = await QNQuizAnswer.find({
+    $or: [
+      { createdAt: { $gte: LAST_MIGRATION } },
+      { updatedAt: { $gte: LAST_MIGRATION } },
+    ],
+  })
   const bar = progressBar("Migrating quiz answers", answers.length)
   let quizNotFound = 0
   let userNotFound = 0
@@ -168,7 +174,7 @@ export async function migrateQuizAnswers(
                         })
                         let chosenOptions =
                           Array.isArray(answer.data) ||
-                          typeof answer.data !== "object"
+                            typeof answer.data !== "object"
                             ? answer.data
                             : answer.data[quizItem.id]
                         if (!Array.isArray(chosenOptions)) {
@@ -255,7 +261,7 @@ export async function migrateQuizAnswers(
 
   console.log(
     `Quiz answers migrated. ${quizNotFound} did not match any quiz and ` +
-      `${userNotFound} did not match any user`,
+    `${userNotFound} did not match any user`,
   )
   return existingAnswers
 }

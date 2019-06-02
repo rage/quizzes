@@ -2,22 +2,28 @@ import {
   PeerReview,
   PeerReviewQuestion,
   PeerReviewQuestionAnswer,
-  PeerReviewQuestionCollection,
+  PeerReviewCollection,
   User,
-} from "@quizzes/common/models"
+} from "./models"
 import { PeerReview as QNPeerReview } from "./app-modules/models"
 
 import { Any } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { calculateChunkSize, progressBar } from "./util"
-import { getUUIDByString, insert } from "@quizzes/common/util"
+import { getUUIDByString, insert } from "./util/"
+import { LAST_MIGRATION } from "./"
 
 export async function migratePeerReviews(
   users: { [username: string]: User },
   existingAnswers: { [answerID: string]: boolean },
 ) {
   console.log("Querying peer reviews...")
-  const peerReviews = await QNPeerReview.find({})
+  const peerReviews = await QNPeerReview.find({
+    $or: [
+      { createdAt: { $gte: LAST_MIGRATION } },
+      { updatedAt: { $gte: LAST_MIGRATION } },
+    ],
+  })
 
   const newPeerReviews: Array<QueryPartialEntity<PeerReview>> = []
   const newPeerReviewAnswers: Array<
@@ -25,7 +31,7 @@ export async function migratePeerReviews(
   > = []
 
   console.log("Querying peer review question collections...")
-  const prqcArray = await PeerReviewQuestionCollection.find()
+  const prqcArray = await PeerReviewCollection.find()
   console.log("Querying peer review question collection questions...")
   const prqcs: { [prqcID: string]: PeerReviewQuestion[] } = {}
   for (const prqc of prqcArray) {

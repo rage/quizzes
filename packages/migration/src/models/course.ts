@@ -13,7 +13,7 @@ import {
   RelationId,
   UpdateDateColumn,
 } from "typeorm"
-import { getUUIDByString, randomUUID } from "../util"
+import { getUUIDByString, randomUUID } from "../util/"
 import { Language } from "./language"
 import { Organization } from "./organization"
 

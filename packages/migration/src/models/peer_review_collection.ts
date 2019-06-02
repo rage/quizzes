@@ -12,7 +12,7 @@ import {
   RelationId,
   UpdateDateColumn,
 } from "typeorm"
-import { getUUIDByString, randomUUID } from "../util"
+import { getUUIDByString, randomUUID } from "../util/"
 import { Language } from "./language"
 import { PeerReviewQuestion } from "./peer_review_question"
 import { Quiz } from "./quiz"

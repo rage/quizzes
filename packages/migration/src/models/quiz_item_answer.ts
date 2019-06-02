@@ -10,7 +10,7 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm"
-import { randomUUID } from "../util"
+import { randomUUID } from "../util/"
 import { QuizAnswer } from "./quiz_answer"
 import { QuizItem } from "./quiz_item"
 import { QuizOptionAnswer } from "./quiz_option_answer"

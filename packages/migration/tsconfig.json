@@ -28,7 +28,7 @@
       "dom"
     ],
     "typeRoots": [
-      "node_modules/@types", "@quizzes/common/types"
+      "node_modules/@types", "./src/types"
     ]
   },
   "include": ["./src/**/*"],

@@ -1,5 +1,5 @@
-import { Organization } from "@quizzes/common/models"
-import { Database } from "@quizzes/common/config/database"
+import { Organization } from "./models"
+import { Database } from "./config/database"
 
 import { Container } from "typedi"
 
@@ -30,18 +30,18 @@ async function main() {
 
   console.log("Migration started")
   console.time("Database migration complete. Time used")
-  const org = await Organization.merge(Organization.create({ id: 0 })).save()
+  // const org = await Organization.merge(Organization.create({ id: 0 })).save()
 
-  const languages = await createLanguages()
-  const courses = await migrateCourses(org, languages)
-  const quizzes = await migrateQuizzes(courses)
-  /*await migratePeerReviewQuestions()
+  // const languages = await createLanguages()
+  // const courses = await migrateCourses(org, languages)
+  // const quizzes = await migrateQuizzes(courses)
+  // await migratePeerReviewQuestions()
   const users = await migrateUsers()
-  await migrateCourseStates(courses, users)
-  const existingAnswers = await migrateQuizAnswers(quizzes, users)
-  await migrateSpamFlags(users)
-  await migratePeerReviews(users, existingAnswers)
-  console.timeEnd("Database migration complete. Time used")*/
+  // await migrateCourseStates(courses, users)
+  // const existingAnswers = await migrateQuizAnswers(quizzes, users)
+  // await migrateSpamFlags(users)
+  // await migratePeerReviews(users, existingAnswers)
+  console.timeEnd("Database migration complete. Time used")
   process.exit()
 }
 

@@ -3,9 +3,9 @@ import {
   CourseTranslation,
   Language,
   Organization,
-} from "@quizzes/common/models"
+} from "./models"
 import { progressBar } from "./util"
-import { getUUIDByString, insert } from "@quizzes/common/util"
+import { getUUIDByString, insert } from "./util/"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { InsertResult } from "typeorm"
 

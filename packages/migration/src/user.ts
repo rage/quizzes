@@ -1,4 +1,4 @@
-import { User } from "@quizzes/common/models"
+import { User } from "./models"
 
 import fs from "fs"
 
@@ -7,14 +7,20 @@ import axios from "axios"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
 import { calculateChunkSize } from "./util"
-import { insert } from "@quizzes/common/util"
+import { insert } from "./util/"
+import { LAST_MIGRATION } from "./"
 
 const TMC_TOKEN =
   "7ae010e2e5641e6bdf9f05cd60b037ad6027be9189ad9b9420edee3468e7f27e"
 
 export async function migrateUsers(): Promise<{ [username: string]: User }> {
   console.log("Querying list of usernames...")
-  const usernames = await QNQuizAnswer.distinct("answererId")
+  const usernames = await QNQuizAnswer.distinct("answererId", {
+    /*$or: [
+      { createdAt: { $gte: LAST_MIGRATION } },
+      { updatedAt: { $gte: LAST_MIGRATION } },
+    ],*/
+  })
 
   const userInfo = await getUserInfo(usernames)
 
@@ -25,10 +31,10 @@ export async function migrateUsers(): Promise<{ [username: string]: User }> {
     }),
   )
   console.log("Inserting users...")
-  const chunkSize = calculateChunkSize(dbInput[0])
+  /*const chunkSize = calculateChunkSize(dbInput[0])
   for (let i = 0; i < dbInput.length; i += chunkSize) {
     await insert(User, dbInput.slice(i, i + chunkSize))
-  }
+  }*/
 
   const users: { [username: string]: User } = {}
   console.log("Querying inserted users...")
@@ -51,14 +57,14 @@ const userInfoCachePath = "userinfo.json"
 async function getUserInfo(
   usernames: string[],
 ): Promise<Array<{ [key: string]: any }>> {
-  if (fs.existsSync(userInfoCachePath)) {
+  /*if (fs.existsSync(userInfoCachePath)) {
     console.log("Reading user info list cache")
     const data = JSON.parse(fs.readFileSync(userInfoCachePath).toString())
     if (data.inputUsernameCount === usernames.length) {
       console.log("Cache hit, skipping user info list fetch")
       return data.info
     }
-  }
+  }*/
 
   console.log(`Fetching user list with ${usernames.length} usernames...`)
   const resp = await axios.post(
@@ -72,6 +78,11 @@ async function getUserInfo(
         "Content-Type": "application/json",
       },
     },
+  )
+
+  fs.writeFileSync(
+    "usernames.json",
+    JSON.stringify(resp.data.map((user: any) => user.username)),
   )
 
   fs.writeFileSync(

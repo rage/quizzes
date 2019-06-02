@@ -1,11 +1,11 @@
 import {
   PeerReviewQuestion,
-  PeerReviewQuestionCollection,
-  PeerReviewQuestionCollectionTranslation,
+  PeerReviewCollection,
+  PeerReviewCollectionTranslation,
   PeerReviewQuestionTranslation,
   Quiz,
   UserCourseState,
-} from "@quizzes/common/models"
+} from "./models"
 import oldQuizTypes from "./app-modules/constants/quiz-types"
 import {
   PeerReview as QNPeerReview,
@@ -14,7 +14,7 @@ import {
 
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { progressBar, safeGet } from "./util"
-import { getUUIDByString, insert } from "@quizzes/common/util"
+import { getUUIDByString, insert } from "./util/"
 import { LAST_MIGRATION } from "./"
 
 export async function migratePeerReviewQuestions() {
@@ -32,10 +32,10 @@ export async function migratePeerReviewQuestions() {
     peerReviewQuestions.length,
   )
   const collections: Array<
-    QueryPartialEntity<PeerReviewQuestionCollection>
+    QueryPartialEntity<PeerReviewCollection>
   > = []
   const collectionTranslations: Array<
-    QueryPartialEntity<PeerReviewQuestionCollectionTranslation>
+    QueryPartialEntity<PeerReviewCollectionTranslation>
   > = []
   const questions: Array<QueryPartialEntity<PeerReviewQuestion>> = []
   const questionTranslations: Array<
@@ -80,9 +80,9 @@ export async function migratePeerReviewQuestions() {
   )
 
   console.log("Inserting peer review questions")
-  await insert(PeerReviewQuestionCollection, collections)
+  await insert(PeerReviewCollection, collections)
   await insert(
-    PeerReviewQuestionCollectionTranslation,
+    PeerReviewCollectionTranslation,
     collectionTranslations,
     `"peer_review_question_collection_id", "language_id"`,
   )
@@ -99,8 +99,8 @@ async function migratePeerReviewQuestion(
   oldPRQ: { [key: string]: any },
 ): Promise<
   [
-    QueryPartialEntity<PeerReviewQuestionCollection>,
-    QueryPartialEntity<PeerReviewQuestionCollectionTranslation>,
+    QueryPartialEntity<PeerReviewCollection>,
+    QueryPartialEntity<PeerReviewCollectionTranslation>,
     Array<QueryPartialEntity<PeerReviewQuestion>>,
     Array<QueryPartialEntity<PeerReviewQuestionTranslation>>
   ]
@@ -110,9 +110,11 @@ async function migratePeerReviewQuestion(
   const peerReviewSample = await QNPeerReview.findOne({
     $or: [{ quizId: oldPRQ._id }, { sourceQuizId: oldPRQ._id }],
   })
-  if (!peerReviewSample) {
+  
+  // this would skip all new peer review quizzes and we don't want that
+  /* if (!peerReviewSample) {
     return null
-  }
+  }*/
 
   const collection = {
     id: getUUIDByString(oldPRQ._id),
@@ -121,7 +123,7 @@ async function migratePeerReviewQuestion(
     updatedAt: oldPRQ.updatedAt,
   }
   const collectionTranslation = {
-    peerReviewQuestionCollectionId: collection.id,
+    peerReviewCollectionId: collection.id,
     languageId,
     title: oldPRQ.title || "",
     body: oldPRQ.body || "",
@@ -143,7 +145,7 @@ async function migratePeerReviewQuestion(
     questions.push({
       id: getUUIDByString(id),
       quizId: quiz.id,
-      collectionId: collection.id,
+      peerReviewCollectionId: collection.id,
       default: false,
       type,
       order: order++,
