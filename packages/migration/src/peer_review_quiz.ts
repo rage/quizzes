@@ -31,9 +31,7 @@ export async function migratePeerReviewQuestions() {
     "Migrating peer review questions",
     peerReviewQuestions.length,
   )
-  const collections: Array<
-    QueryPartialEntity<PeerReviewCollection>
-  > = []
+  const collections: Array<QueryPartialEntity<PeerReviewCollection>> = []
   const collectionTranslations: Array<
     QueryPartialEntity<PeerReviewCollectionTranslation>
   > = []
@@ -110,7 +108,7 @@ async function migratePeerReviewQuestion(
   const peerReviewSample = await QNPeerReview.findOne({
     $or: [{ quizId: oldPRQ._id }, { sourceQuizId: oldPRQ._id }],
   })
-  
+
   // this would skip all new peer review quizzes and we don't want that
   /* if (!peerReviewSample) {
     return null

@@ -174,7 +174,7 @@ export async function migrateQuizAnswers(
                         })
                         let chosenOptions =
                           Array.isArray(answer.data) ||
-                            typeof answer.data !== "object"
+                          typeof answer.data !== "object"
                             ? answer.data
                             : answer.data[quizItem.id]
                         if (!Array.isArray(chosenOptions)) {
@@ -261,7 +261,7 @@ export async function migrateQuizAnswers(
 
   console.log(
     `Quiz answers migrated. ${quizNotFound} did not match any quiz and ` +
-    `${userNotFound} did not match any user`,
+      `${userNotFound} did not match any user`,
   )
   return existingAnswers
 }

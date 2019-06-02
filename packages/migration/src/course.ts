@@ -1,9 +1,4 @@
-import {
-  Course,
-  CourseTranslation,
-  Language,
-  Organization,
-} from "./models"
+import { Course, CourseTranslation, Language, Organization } from "./models"
 import { progressBar } from "./util"
 import { getUUIDByString, insert } from "./util/"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
