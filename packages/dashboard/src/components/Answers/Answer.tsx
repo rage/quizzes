@@ -19,6 +19,9 @@ class Answer extends React.Component<any, any> {
   }
 
   public render() {
+    const peerAverage = this.average(this.props.answerData.peerReviews)
+    const peerSd = this.standardDeviation(this.props.answerData.peerReviews)
+
     return (
       <Grid
         item={true}
@@ -105,11 +108,14 @@ class Answer extends React.Component<any, any> {
 
                 <Grid item={true} xs={2} style={{ textAlign: "center" }}>
                   <Typography>
-                    Avg: {this.average(this.props.answerData)}
+                    Avg:{" "}
+                    {peerAverage || peerAverage === 0
+                      ? peerAverage.toFixed(2)
+                      : "-"}
                   </Typography>
 
                   <Typography>
-                    SD: {this.standardDeviation(this.props.answerData)}
+                    SD: {peerSd || peerSd === 0 ? peerSd.toFixed(2) : "-"}
                   </Typography>
                 </Grid>
               </Grid>
@@ -120,12 +126,38 @@ class Answer extends React.Component<any, any> {
     )
   }
 
-  private average = (allPeerReviews: any) => {
-    return "xx"
+  private average = (allPeerReviews: any): number | undefined => {
+    const allGrades = allPeerReviews
+      .map(pr => pr.answers)
+      .flat()
+      .filter(pAnswer => pAnswer.value !== null)
+      .map(pAnswer => pAnswer.value)
+    if (allGrades.length === 0) {
+      return undefined
+    }
+    const sum = allGrades.reduce((acc, elem) => acc + elem, 0)
+    return sum / allGrades.length
   }
 
-  private standardDeviation = (allPeerReviews: any) => {
-    return "yy"
+  // population sd, not sample
+  private standardDeviation = (allPeerReviews: any): number | undefined => {
+    const allGrades = allPeerReviews
+      .map(pr => pr.answers)
+      .flat()
+      .filter(pAnswer => pAnswer.value !== null)
+      .map(pAnswer => pAnswer.value)
+
+    if (allGrades.length === 0) {
+      return undefined
+    }
+    const avg = this.average(allPeerReviews)
+    if (avg === undefined) {
+      return undefined
+    }
+    const sum =
+      allGrades.reduce((acc, elem) => acc + Math.pow(elem - avg, 2), 0) /
+      allGrades.length
+    return Math.sqrt(sum)
   }
 
   private showMore = () => {
