@@ -82,7 +82,7 @@ export async function migratePeerReviewQuestions() {
   await insert(
     PeerReviewCollectionTranslation,
     collectionTranslations,
-    `"peer_review_question_collection_id", "language_id"`,
+    `"peer_review_collection_id", "language_id"`,
   )
   await insert(PeerReviewQuestion, questions)
   await insert(

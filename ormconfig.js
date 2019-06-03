@@ -3,7 +3,7 @@ module.exports = {
     host: process.env.DB_HOST || "/var/run/postgresql",
     logging: !!process.env.DB_LOGGING || true,
     password: process.env.DB_PASSWORD || undefined,
-    synchronize: false,
+    synchronize: true,
     type: "postgres",
     username: process.env.DB_USER || undefined,
     migrations: ["dist/backend/src/migration/*.js"],

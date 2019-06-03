@@ -9,7 +9,7 @@ import {
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import getUUIDByStringBroken from "uuid-by-string"
 
-export async function insert<T extends BaseEntity>(
+export async function save<T extends BaseEntity>(
   type: typeof BaseEntity,
   data: Array<any>,
   primaryKeys: string = `"id"`,
@@ -24,7 +24,7 @@ export async function insert<T extends BaseEntity>(
   return saved
 }
 
-export function insert2<T extends BaseEntity>(
+export function insert<T extends BaseEntity>(
   type: typeof BaseEntity,
   data: Array<QueryPartialEntity<T>> | QueryPartialEntity<T>,
   primaryKeys: string = `"id"`,

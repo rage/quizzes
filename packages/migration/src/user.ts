@@ -31,10 +31,10 @@ export async function migrateUsers(): Promise<{ [username: string]: User }> {
     }),
   )
   console.log("Inserting users...")
-  /*const chunkSize = calculateChunkSize(dbInput[0])
+  const chunkSize = calculateChunkSize(dbInput[0])
   for (let i = 0; i < dbInput.length; i += chunkSize) {
     await insert(User, dbInput.slice(i, i + chunkSize))
-  }*/
+  }
 
   const users: { [username: string]: User } = {}
   console.log("Querying inserted users...")

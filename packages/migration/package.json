@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "yarn run build-ts",
-    "build-ts": "cd ../common && tsc && cd ../migration && tsc && tscpaths -p tsconfig.json -s ./src -o ../../dist/migration/src",
+    "build-ts": "cd ../migration && tsc && tscpaths -p tsconfig.json -s ./src -o ../../dist/migration/src",
     "db-migrate": "node --max-old-space-size=16384 ../../dist/migration/src/index.js"
   },
   "dependencies": {
