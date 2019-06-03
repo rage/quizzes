@@ -26,8 +26,12 @@ export default class PeerReviewService {
     return await manager.save(peerReview)
   }
 
-  public async getPeerReviews(manager: EntityManager, quizAnswerId: string) {
-    return await manager
+  public async getPeerReviews(
+    manager: EntityManager,
+    quizAnswerId: string,
+    onlyGrades: boolean = true,
+  ) {
+    let builtQuery = manager
       .createQueryBuilder(PeerReview, "peer_review")
       .innerJoinAndSelect("peer_review.answers", "peer_review_question_answer")
       .innerJoin(
@@ -35,8 +39,14 @@ export default class PeerReviewService {
         "peer_review_question",
       )
       .where("peer_review.quiz_answer_id = :quizAnswerId", { quizAnswerId })
-      .andWhere("peer_review_question.type = :type", { type: "grade" })
-      .getMany()
+
+    if (onlyGrades) {
+      builtQuery = builtQuery.andWhere("peer_review_question.type = :type", {
+        type: "grade",
+      })
+    }
+
+    return await builtQuery.getMany()
   }
 
   public async getAnswersToReview(

@@ -1,13 +1,7 @@
 import { Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
-import {
-  Quiz,
-  QuizAnswer,
-  QuizItem,
-  QuizItemAnswer,
-  UserQuizState,
-} from "../models"
+import { QuizAnswer, UserQuizState, SpamFlag } from "../models"
 import { IQuizAnswerQuery } from "../types"
 import { WhereBuilder } from "../util/index"
 import QuizService from "./quiz.service"
@@ -95,5 +89,42 @@ export default class QuizAnswerService {
     )
 
     return await queryBuilder.getMany()
+  }
+
+  public async getEveryonesAnswers(quizId: string): Promise<QuizAnswer[]> {
+    return await QuizAnswer.createQueryBuilder("quiz_answer")
+      .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
+      .getMany()
+  }
+
+  public async getAttentionAnswers(quizId: string): Promise<QuizAnswer[]> {
+    return await QuizAnswer.createQueryBuilder("quiz_answer")
+      .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
+      .andWhere("quiz_answer.status IN ('spam', 'submitted')")
+      .getMany()
+  }
+
+  public async getAttentionAnswersCount(): Promise<any[]> {
+    return await QuizAnswer.createQueryBuilder("quiz_answer")
+      .select("quiz_answer.quiz_id")
+      .addSelect("COUNT(quiz_answer.id)")
+      .where("quiz_answer.status IN ('spam', 'submitted')")
+      .groupBy("quiz_answer.quiz_id")
+      .getRawMany()
+  }
+
+  public async getAnswersStatistics(quizId: string): Promise<any> {
+    const spamFlagCount = await QuizAnswer.createQueryBuilder("quiz_answer")
+      .select("quiz_answer.id")
+      .addSelect("COUNT(spam_flag.user_id)")
+      .leftJoin(
+        SpamFlag,
+        "spam_flag",
+        "quiz_answer.id = spam_flag.quiz_answer_id",
+      )
+      .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
+      .groupBy("quiz_answer.id")
+      .getRawMany()
+    return spamFlagCount
   }
 }

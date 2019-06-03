@@ -1,8 +1,12 @@
 import {
+  Get,
   HeaderParam,
   JsonController,
+  Param,
   Post,
   BadRequestError,
+  QueryParam,
+  UnauthorizedError,
 } from "routing-controllers"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
@@ -36,6 +40,49 @@ export class QuizAnswerController {
 
   @Inject()
   private validationService: ValidationService
+
+  @Get("/counts")
+  public async getAnswerCounts(
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ): Promise<any[]> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    return await this.quizAnswerService.getAttentionAnswersCount()
+  }
+
+  @Get("/statistics")
+  public async getAnswerStatistics(
+    @QueryParam("quizId") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ): Promise<any> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const result = await this.quizAnswerService.getAnswersStatistics(quizId)
+    return result
+  }
+
+  @Get("/attention")
+  public async getEveryonesAnswers(
+    @QueryParam("attention") attention: boolean,
+    @QueryParam("quizId") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ): Promise<QuizAnswer[]> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    let result: QuizAnswer[]
+
+    result = attention
+      ? await this.quizAnswerService.getAttentionAnswers(quizId)
+      : await this.quizAnswerService.getEveryonesAnswers(quizId)
+
+    return result
+  }
 
   @Post("/")
   public async post(

@@ -1,39 +1,27 @@
 import AppBar from "@material-ui/core/AppBar"
 import Button from "@material-ui/core/Button"
 import FormControl from "@material-ui/core/FormControl"
-// import FormControlLabel from '@material-ui/core/FormControlLabel'
 import Grid from "@material-ui/core/Grid"
 import Input from "@material-ui/core/Input"
 import InputLabel from "@material-ui/core/InputLabel"
-import ListItem from "@material-ui/core/ListItem"
-import MenuItem from "@material-ui/core/MenuItem"
 import Paper from "@material-ui/core/Paper"
-import Select from "@material-ui/core/Select"
-import SvgIcon from "@material-ui/core/SvgIcon"
-import Table from "@material-ui/core/Table"
-import TableBody from "@material-ui/core/TableBody"
-import TableCell from "@material-ui/core/TableCell"
-import TableHead from "@material-ui/core/TableHead"
-import TableRow from "@material-ui/core/TableRow"
-import TextField from "@material-ui/core/TextField"
 import Toolbar from "@material-ui/core/Toolbar"
 import Typography from "@material-ui/core/Typography"
 import NavigateNextIcon from "@material-ui/icons/NavigateNext"
 import Breadcrumbs from "@material-ui/lab/Breadcrumbs"
+import queryString from "query-string"
 import * as React from "react"
 import { connect } from "react-redux"
-import {
-  BrowserRouter as Router,
-  Link,
-  Redirect,
-  Route,
-  Switch,
-} from "react-router-dom"
+import { BrowserRouter as Router, Link, Route } from "react-router-dom"
 import TMCApi from "../../common/src/services/TMCApi"
 import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
+import PeerReviewsView from "./components/Answers/PeerReviewsModal"
+import QuizStatistics from "./components/Answers/QuizStatistics"
 import CoursesView from "./components/CoursesView"
 import QuizForm from "./components/QuizForm"
+import SingleCourseView from "./components/SingleCourseView"
 import SuccessNotification from "./components/SuccessNotification"
+import { setAnswerCounts } from "./store/answerCounts/actions"
 import { setCourses } from "./store/courses/actions"
 import { newQuiz, setEdit } from "./store/edit/actions"
 import { setCourse } from "./store/filter/actions"
@@ -49,6 +37,7 @@ class App extends React.Component<any, any> {
       if ((profile as ITMCProfileDetails).administrator) {
         this.props.addUser(user)
         this.props.setCourses()
+        this.props.setAnswerCounts()
       }
     }
   }
@@ -61,10 +50,12 @@ class App extends React.Component<any, any> {
   }
 
   public currentQuizTitle: () => string | null = () => {
-    if (!this.props.edit || !this.props.edit.texts[0]) {
+    if (!this.props.filter.quiz) {
       return null
     }
-    return this.props.edit.texts[0].title
+
+    const quiz = this.props.quizzes.find(q => q.id === this.props.filter.quiz)
+    return quiz ? quiz.texts[0].title : null
   }
 
   public render() {
@@ -100,73 +91,6 @@ class App extends React.Component<any, any> {
             </form>
           </Paper>
         </Grid>
-      )
-    }
-
-    const Dashboard = ({ match, history }) => {
-      if (
-        match.params.id &&
-        (!this.props.filter.course ||
-          this.props.filter.course !== match.params.id)
-      ) {
-        this.props.setCourse(match.params.id)
-      }
-
-      const handleSelect = event => {
-        const courseId = event.target.value
-        if (history.location.pathname !== "/courses/" + courseId) {
-          history.push("/courses/" + courseId)
-        }
-      }
-
-      return (
-        <div>
-          <div>
-            <Toolbar style={{ marginBottom: 20 }}>
-              <Select
-                value={this.props.filter.course || ""}
-                onChange={handleSelect}
-                style={{ minWidth: 350 }}
-              >
-                {this.props.courses.map(course => (
-                  <MenuItem key={course.id} value={course.id}>
-                    {course.texts[0].title}
-                  </MenuItem>
-                ))}
-              </Select>
-              <Typography style={{ flex: 1 }} />
-              {this.props.filter.course === "" ? (
-                <p />
-              ) : (
-                <Link to="/new" style={{ textDecoration: "none" }}>
-                  <Button>New quiz</Button>
-                </Link>
-              )}
-            </Toolbar>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>
-                    <Typography>Title</Typography>
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {this.props.quizzes
-                  .filter(quiz => quiz.course.id === this.props.filter.course)
-                  .map(quiz => (
-                    <TableRow key={quiz.id}>
-                      <TableCell>
-                        <Link to={`/quizzes/${quiz.id}`}>
-                          {quiz.texts[0] ? quiz.texts[0].title : "no title"}
-                        </Link>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </div>
-        </div>
       )
     }
 
@@ -214,15 +138,33 @@ class App extends React.Component<any, any> {
                 <Route exact={true} path="/quizzes/:id" component={this.edit} />
                 <Route exact={true} path="/new" component={this.create} />
                 <Route exact={true} path="/courses" component={CoursesView} />
-                <Route exact={true} path="/courses/:id" component={Dashboard} />
+                <Route
+                  exact={true}
+                  path="/courses/:id"
+                  component={SingleCourseView}
+                />
+                <Route
+                  exact={true}
+                  path="/quizzes/:id/answers"
+                  component={QuizStatistics}
+                />
               </div>
             ) : (
               <div>
-                <Route exact={true} path="/" component={Login} />
+                <Route
+                  exact={true}
+                  path="/"
+                  CourseStatisticscomponent={Login}
+                />
                 <Route exact={true} path="/quizzes/:id" component={Login} />
                 <Route exact={true} path="/new" component={Login} />
                 <Route exact={true} path="/courses" component={Login} />
                 <Route exact={true} path="/courses/:id" component={Login} />
+                <Route
+                  exact={true}
+                  path="/quizzes/:id/answers"
+                  component={Login}
+                />
               </div>
             )}
           </React.Fragment>
@@ -231,7 +173,9 @@ class App extends React.Component<any, any> {
     )
   }
 
-  private PathBreadcrumbs = ({ history }) => {
+  private PathBreadcrumbs = props => {
+    const history = props.history
+
     const Crumbify = (path: string | null, label: string | null) => () =>
       path ? (
         <Link
@@ -263,6 +207,8 @@ class App extends React.Component<any, any> {
       history.location.pathname.includes("/quizzes/") ||
       history.location.pathname.includes("new")
     const onSavedQuizPage = history.location.pathname.includes("/quizzes/")
+    const onAnswerPage = history.location.pathname.includes("/answers/")
+
     const onRootPage =
       history.location.pathname === "/" ||
       history.location.pathname === "/courses"
@@ -280,6 +226,13 @@ class App extends React.Component<any, any> {
           )()}
 
         {onSavedQuizPage && Crumbify(null, this.currentQuizTitle())()}
+
+        {// not a fourth, but an alternative to the third
+        onAnswerPage &&
+          Crumbify(
+            `/quizzes/${this.props.filter.quiz}/answers`,
+            this.currentQuizTitle(),
+          )()}
       </Breadcrumbs>
     )
   }
@@ -350,6 +303,7 @@ interface IStateProps {
 
 const mapStateToProps = (state: any) => {
   return {
+    answers: state.answers,
     courses: state.courses,
     edit: state.edit,
     filter: state.filter,
@@ -362,6 +316,7 @@ const mapDispatchToProps = {
   addUser,
   displayMessage,
   newQuiz,
+  setAnswerCounts,
   setCourse,
   setCourses,
   setEdit,

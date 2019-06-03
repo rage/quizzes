@@ -13,7 +13,6 @@ import {
 } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
-
 import {
   addItem,
   addOption,
@@ -23,7 +22,7 @@ import {
   save,
   setEdit,
 } from "../store/edit/actions"
-import { setLanguage } from "../store/filter/actions"
+import { setLanguage, setQuiz } from "../store/filter/actions"
 import QuizInfo from "./QuizInfo"
 import TabContainer from "./TabContainer"
 
@@ -31,6 +30,7 @@ class QuizForm extends React.Component<any, any> {
   public componentDidMount() {
     if (this.props.quiz) {
       this.props.setEdit(this.props.quiz)
+      this.props.setQuiz(this.props.quiz.id)
     } else {
       this.props.newQuiz()
     }
@@ -108,6 +108,7 @@ const mapDispatchToProps = {
   save,
   setEdit,
   setLanguage,
+  setQuiz,
 }
 
 export default connect(

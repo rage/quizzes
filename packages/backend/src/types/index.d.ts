@@ -66,6 +66,7 @@ export interface IQuizAnswerQuery {
 interface ICourseQuery {
   language?: string
   id?: string
+  attentionAnswers?: boolean
 }
 
 export interface INewQuizQuery {
