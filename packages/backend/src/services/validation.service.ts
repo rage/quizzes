@@ -174,6 +174,7 @@ export default class ValidationService {
           break
         case "custom-frontend-accept-data":
           if (itemAnswer.correct) {
+            correct = true
             userQuizState.pointsAwarded = 1 * quiz.points
           }
           break
