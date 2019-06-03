@@ -40,6 +40,8 @@ coverage
 
 userinfo.json
 
+usernames.json
+
 # Ignore vscode rest client
 test.rest
 
