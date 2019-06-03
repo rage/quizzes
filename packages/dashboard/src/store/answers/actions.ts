@@ -3,6 +3,7 @@ import {
   getAttentionRequiringQuizAnswers,
   getQuizAnswers,
 } from "../../services/quizAnswers"
+import { answerCountsReducer } from "../answerCounts/reducer"
 
 export const set = createAction("answers/SET", resolve => {
   return (quizzes: any[]) => resolve(quizzes)
@@ -28,7 +29,33 @@ export const setAttentionRequiringAnswers = quizId => {
         quizId,
         getState().user,
       )
-      dispatch(set(data))
+
+      const newData = data.map(answer => {
+        const quiz = getState().quizzes.find(q => q.id === answer.quizId)
+        const peerReviewQuestions = quiz.peerReviewCollections
+          .map(prc => prc.questions)
+          .flat()
+        return {
+          ...answer,
+          peerReviews: answer.peerReviews.map(pr => {
+            return {
+              ...pr,
+              answers: pr.answers.sort((a1, a2) => {
+                return (
+                  peerReviewQuestions.find(
+                    q => q.id === a1.peerReviewQuestionId,
+                  ).order -
+                  peerReviewQuestions.find(
+                    q => q.id === a2.peerReviewQuestionId,
+                  ).order
+                )
+              }),
+            }
+          }),
+        }
+      })
+
+      dispatch(set(newData))
     } catch (error) {
       console.log(error)
     }

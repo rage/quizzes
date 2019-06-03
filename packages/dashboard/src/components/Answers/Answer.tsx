@@ -2,7 +2,6 @@ import { Button, Card, Grid, Typography } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
 import { setCourse, setQuiz } from "../../store/filter/actions"
-import { setPeerReviews } from "../../store/peerReviews/actions"
 import ItemAnswer from "./ItemAnswer"
 import PeerReviewsModal from "./PeerReviewsModal"
 
@@ -64,7 +63,6 @@ class Answer extends React.Component<any, any> {
                   ).count
                 }
                 setQuiz={this.props.setQuiz}
-                setPeerReviews={this.props.setPeerReviews}
               />
             )}
 
@@ -106,9 +104,13 @@ class Answer extends React.Component<any, any> {
                 </Grid>
 
                 <Grid item={true} xs={2} style={{ textAlign: "center" }}>
-                  <Typography>Avg: xx</Typography>
+                  <Typography>
+                    Avg: {this.average(this.props.answerData)}
+                  </Typography>
 
-                  <Typography>SD: xx</Typography>
+                  <Typography>
+                    SD: {this.standardDeviation(this.props.answerData)}
+                  </Typography>
                 </Grid>
               </Grid>
             </Grid>
@@ -116,6 +118,14 @@ class Answer extends React.Component<any, any> {
         </Card>
       </Grid>
     )
+  }
+
+  private average = (allPeerReviews: any) => {
+    return "xx"
+  }
+
+  private standardDeviation = (allPeerReviews: any) => {
+    return "yy"
   }
 
   private showMore = () => {
@@ -137,10 +147,6 @@ class PeerReviewsSummary extends React.Component<any, any> {
     this.state = {
       modalOpen: false,
     }
-  }
-
-  public componentDidMount() {
-    this.props.setPeerReviews(this.props.answer.id)
   }
 
   public render() {
@@ -217,6 +223,7 @@ class PeerReviewsSummary extends React.Component<any, any> {
         </Grid>
         <PeerReviewsModal
           answer={this.props.answer}
+          peerReviews={this.props.peerReviewsAnswers}
           open={this.state.modalOpen}
           onClose={this.closeModal}
         />
@@ -225,7 +232,6 @@ class PeerReviewsSummary extends React.Component<any, any> {
   }
 
   private averagePoints = (prAnswers: any[], questionIdx: number): number => {
-    console.log("answers ", prAnswers)
     const scores = prAnswers.map(a => a.answers[questionIdx].value)
     if (scores.length === 0) {
       return -1
@@ -238,7 +244,6 @@ class PeerReviewsSummary extends React.Component<any, any> {
     prAnswers: any[],
     questionIdx: number,
   ): number => {
-    console.log("answers ", prAnswers)
     const scores = prAnswers.map(a => a.answers[questionIdx].value)
     if (scores.length === 0) {
       return -1
@@ -270,12 +275,11 @@ class PeerReviewsSummary extends React.Component<any, any> {
 const mapStateToProps = state => {
   return {
     answerStatistics: state.answerStatistics,
-    peerReviews: state.peerReviews,
     quizzes: state.quizzes,
   }
 }
 
 export default connect(
   mapStateToProps,
-  { setCourse, setPeerReviews, setQuiz },
+  { setCourse, setQuiz },
 )(Answer)

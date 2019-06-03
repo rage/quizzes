@@ -15,7 +15,6 @@ import {
 import React from "react"
 import { connect } from "react-redux"
 import { setQuiz } from "../../store/filter/actions"
-import { setPeerReviews } from "../../store/peerReviews/actions"
 
 class PeerReviewsModal extends React.Component<any, any> {
   constructor(props) {
@@ -23,7 +22,7 @@ class PeerReviewsModal extends React.Component<any, any> {
   }
 
   public render() {
-    if (this.props.peerReviews == null) {
+    if (!this.props.peerReviews) {
       return <div />
     }
     return (
@@ -35,7 +34,7 @@ class PeerReviewsModal extends React.Component<any, any> {
         maxWidth="md"
       >
         <DialogTitle>
-          <Typography variant="headline" id="peer-reviews-modal-title">
+          <Typography variant="subheading" id="peer-reviews-modal-title">
             Received peer reviews ({this.props.peerReviews.length})
           </Typography>
         </DialogTitle>
@@ -195,12 +194,11 @@ const PeerReviewQuestionAnswer = ({ type, questionAnswer, title }) => {
 const mapStateToProps = state => {
   return {
     answers: state.answers,
-    peerReviews: state.peerReviews,
     quizzes: state.quizzes,
   }
 }
 
 export default connect(
   mapStateToProps,
-  { setQuiz, setPeerReviews },
+  { setQuiz },
 )(PeerReviewsModal)

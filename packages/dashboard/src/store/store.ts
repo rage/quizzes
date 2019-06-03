@@ -10,7 +10,6 @@ import { coursesReducer } from "./courses/reducer"
 import { editReducer } from "./edit/reducer"
 import { filterReducer } from "./filter/reducer"
 import { notificationReducer } from "./notification/reducer"
-import { peerReviewsReducer } from "./peerReviews/reducer"
 import { quizzesReducer } from "./quizzes/reducer"
 import { userReducer } from "./user/reducer"
 
@@ -24,7 +23,6 @@ const reducer = combineReducers({
   user: userReducer,
   quizzes: quizzesReducer,
   notification: notificationReducer,
-  peerReviews: peerReviewsReducer,
 })
 
 const persistConfig = {

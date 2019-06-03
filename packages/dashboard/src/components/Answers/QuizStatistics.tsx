@@ -132,7 +132,6 @@ class QuizStatistics extends React.Component<any, any> {
 const mapStateToProps = (state: any) => {
   return {
     answers: state.answers,
-
     quizzes: state.quizzes,
     courses: state.courses,
     filter: state.filter,
