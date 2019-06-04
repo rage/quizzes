@@ -15,7 +15,7 @@ class TabContainer extends Component<any, any> {
     { label: "multiple choice", value: "multiple-choice" },
     { label: "research agreement", value: "research-agreement" },
     { label: "scale", value: "scale" },
-    { label: "custom", value: "custom-frontend-accept-data" },
+    { label: "custom front", value: "custom-frontend-accept-data" },
   ]
 
   constructor(props) {

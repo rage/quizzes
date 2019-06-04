@@ -15,7 +15,7 @@ const ShortCustomType = props => {
       >
         <Grid item={true} xs={12}>
           <Typography variant="title">{`${item.texts[0].title ||
-            "Question " + (props.order + 1)} (Custom)`}</Typography>
+            "Question " + (props.order + 1)} (Custom front)`}</Typography>
         </Grid>
         <Grid item={true} xs={12}>
           <TextField
