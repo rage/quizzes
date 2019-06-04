@@ -3,7 +3,6 @@ import {
   getAttentionRequiringQuizAnswers,
   getQuizAnswers,
 } from "../../services/quizAnswers"
-import { answerCountsReducer } from "../answerCounts/reducer"
 
 export const set = createAction("answers/SET", resolve => {
   return (quizzes: any[]) => resolve(quizzes)
@@ -30,11 +29,17 @@ export const setAttentionRequiringAnswers = quizId => {
         getState().user,
       )
 
+      if (data.length === 0) {
+        dispatch(set([]))
+        return
+      }
+
+      const quiz = getState().quizzes.find(q => q.id === quizId)
+      const peerReviewQuestions = quiz.peerReviewCollections
+        .map(prc => prc.questions)
+        .flat()
+
       const newData = data.map(answer => {
-        const quiz = getState().quizzes.find(q => q.id === answer.quizId)
-        const peerReviewQuestions = quiz.peerReviewCollections
-          .map(prc => prc.questions)
-          .flat()
         return {
           ...answer,
           peerReviews: answer.peerReviews.map(pr => {

@@ -29,14 +29,12 @@ class PeerReviewsModal extends React.Component<any, any> {
       <Dialog
         open={this.props.open}
         onClose={this.props.onClose}
-        aria-labelledby="peer-reviews-modal-titlModal,e"
+        aria-labelledby="peer-reviews-modal-title"
         fullWidth={true}
         maxWidth="md"
       >
         <DialogTitle>
-          <Typography variant="subheading" id="peer-reviews-modal-title">
-            Received peer reviews ({this.props.peerReviews.length})
-          </Typography>
+          Received peer reviews ({this.props.peerReviews.length})
         </DialogTitle>
 
         <DialogContent>

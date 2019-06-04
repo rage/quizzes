@@ -39,11 +39,11 @@ class QuizStatistics extends React.Component<any, any> {
   }
 
   public componentDidMount() {
+    this.props.setQuiz(this.props.match.params.id)
     this.props.setAnswerStatistics(this.props.match.params.id)
+
     const queryParams = queryString.parse(this.props.location.search)
     const showing = queryParams.all && queryParams.all === "true"
-
-    this.props.setQuiz(this.props.match.params.id)
 
     if (showing) {
       this.props.setAllAnswers(this.props.match.params.id)

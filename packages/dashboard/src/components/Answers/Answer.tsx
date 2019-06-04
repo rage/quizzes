@@ -22,6 +22,10 @@ class Answer extends React.Component<any, any> {
     const peerAverage = this.average(this.props.answerData.peerReviews)
     const peerSd = this.standardDeviation(this.props.answerData.peerReviews)
 
+    const peerReviewCollections = this.props.quizzes.find(
+      q => q.id === this.props.answerData.quizId,
+    ).peerReviewCollections
+
     return (
       <Grid
         item={true}
@@ -55,9 +59,9 @@ class Answer extends React.Component<any, any> {
               <PeerReviewsSummary
                 peerReviewsAnswers={this.props.peerReviews}
                 peerReviewsQuestions={
-                  this.props.quizzes.find(
-                    q => q.id === this.props.answerData.quizId,
-                  ).peerReviewCollections[0].questions
+                  peerReviewCollections.length > 0
+                    ? peerReviewCollections[0].questions
+                    : []
                 }
                 answer={this.props.answerData}
                 spamFlags={
@@ -182,6 +186,12 @@ class PeerReviewsSummary extends React.Component<any, any> {
   }
 
   public render() {
+    if (this.props.peerReviewsQuestions.length === 0) {
+      return (
+        <Typography variant="title">Quiz involves no peer reviews</Typography>
+      )
+    }
+
     return (
       <Grid item={true} xs={12} style={{ margin: "0em 0em 1em 1em" }}>
         <Grid
@@ -225,31 +235,41 @@ class PeerReviewsSummary extends React.Component<any, any> {
                 (this.props.peerReviewsAnswers.length === 0 ||
                   this.props.peerReviewsAnswers[0].quizAnswerId ===
                     this.props.answer.id) &&
-                this.props.peerReviewsQuestions.map((question, idx) => (
-                  <React.Fragment key={question.id}>
-                    <Grid item={true} xs={4} lg={3} xl={2}>
-                      {question.texts[0].title || "No title"}{" "}
-                      {question.type === "essay" && " (Essay)"}:
-                    </Grid>
-                    <Grid item={true} xs={4}>
-                      {question.type === "essay"
-                        ? "NA"
-                        : this.averagePoints(
-                            this.props.peerReviewsAnswers,
-                            idx,
-                          ).toFixed(2)}
-                    </Grid>
-                    <Grid item={true} xs={4}>
-                      {question.type === "essay"
-                        ? "NA"
-                        : this.standardDeviation(
-                            this.props.peerReviewsAnswers,
-                            idx,
-                          ).toFixed(2)}
-                    </Grid>
-                    <Grid item={true} xs="auto" lg={1} xl={2} />
-                  </React.Fragment>
-                ))}
+                this.props.peerReviewsQuestions.map((question, idx) => {
+                  const average = this.averagePoints(
+                    this.props.peerReviewsAnswers,
+                    idx,
+                  )
+
+                  const sd = this.standardDeviation(
+                    this.props.peerReviewsAnswers,
+                    idx,
+                  )
+
+                  return (
+                    <React.Fragment key={question.id}>
+                      <Grid item={true} xs={4} lg={3} xl={2}>
+                        {question.texts[0].title || "No title"}{" "}
+                        {question.type === "essay" && " (Essay)"}:
+                      </Grid>
+                      <Grid item={true} xs={4}>
+                        {question.type === "essay"
+                          ? "NA"
+                          : average === undefined
+                          ? "-"
+                          : average.toFixed(2)}
+                      </Grid>
+                      <Grid item={true} xs={4}>
+                        {question.type === "essay"
+                          ? "NA"
+                          : sd === undefined
+                          ? "-"
+                          : sd.toFixed(2)}
+                      </Grid>
+                      <Grid item={true} xs="auto" lg={1} xl={2} />
+                    </React.Fragment>
+                  )
+                })}
             </Grid>
           </Grid>
         </Grid>
@@ -263,10 +283,13 @@ class PeerReviewsSummary extends React.Component<any, any> {
     )
   }
 
-  private averagePoints = (prAnswers: any[], questionIdx: number): number => {
+  private averagePoints = (
+    prAnswers: any[],
+    questionIdx: number,
+  ): number | undefined => {
     const scores = prAnswers.map(a => a.answers[questionIdx].value)
     if (scores.length === 0) {
-      return -1
+      return undefined
     }
 
     return scores.reduce((acc, score) => acc + score, 0) / scores.length
@@ -275,14 +298,14 @@ class PeerReviewsSummary extends React.Component<any, any> {
   private standardDeviation = (
     prAnswers: any[],
     questionIdx: number,
-  ): number => {
+  ): number | undefined => {
     const scores = prAnswers.map(a => a.answers[questionIdx].value)
     if (scores.length === 0) {
-      return -1
+      return undefined
     }
     const average = this.averagePoints(prAnswers, questionIdx)
-    if (average < 0) {
-      return -1
+    if (average === undefined) {
+      return undefined
     }
     // population sd, not sample
     return Math.sqrt(

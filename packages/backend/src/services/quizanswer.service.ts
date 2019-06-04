@@ -99,16 +99,13 @@ export default class QuizAnswerService {
 
     if (addPeerReviews) {
       query = query
-        .innerJoinAndMapMany(
+        .leftJoinAndMapMany(
           "quiz_answer.peerReviews",
           PeerReview,
           "peer_review",
           "peer_review.quiz_answer_id = quiz_answer.id",
         )
-        .innerJoinAndSelect(
-          "peer_review.answers",
-          "peer_review_question_answer",
-        )
+        .leftJoinAndSelect("peer_review.answers", "peer_review_question_answer")
     }
 
     query = query
@@ -126,16 +123,13 @@ export default class QuizAnswerService {
 
     if (addPeerReviews) {
       query = query
-        .innerJoinAndMapMany(
+        .leftJoinAndMapMany(
           "quiz_answer.peerReviews",
           PeerReview,
           "peer_review",
           "peer_review.quiz_answer_id = quiz_answer.id",
         )
-        .innerJoinAndSelect(
-          "peer_review.answers",
-          "peer_review_question_answer",
-        )
+        .leftJoinAndSelect("peer_review.answers", "peer_review_question_answer")
     }
 
     query = query
