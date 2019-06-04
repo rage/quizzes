@@ -70,6 +70,8 @@ export class QuizAnswerController {
     @QueryParam("attention") attention: boolean,
     @QueryParam("quizId") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
+    @QueryParam("skip") skip?: number,
+    @QueryParam("limit") limit?: number,
   ): Promise<QuizAnswer[]> {
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
