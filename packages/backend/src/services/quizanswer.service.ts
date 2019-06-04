@@ -93,10 +93,11 @@ export default class QuizAnswerService {
 
   public async getEveryonesAnswers(
     quizId: string,
+    skip = 0,
+    limit = 50,
     addPeerReviews?: boolean,
   ): Promise<QuizAnswer[]> {
     let query = QuizAnswer.createQueryBuilder("quiz_answer")
-
     if (addPeerReviews) {
       query = query
         .leftJoinAndMapMany(
@@ -111,12 +112,16 @@ export default class QuizAnswerService {
     query = query
       .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
       .andWhere("quiz_answer.status IN ('spam', 'submitted')")
+      .skip(skip)
+      .take(limit)
 
     return await query.getMany()
   }
 
   public async getAttentionAnswers(
     quizId: string,
+    skip = 0,
+    limit = 50,
     addPeerReviews?: boolean,
   ): Promise<QuizAnswer[]> {
     let query = QuizAnswer.createQueryBuilder("quiz_answer")
@@ -135,6 +140,8 @@ export default class QuizAnswerService {
     query = query
       .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
       .andWhere("quiz_answer.status IN ('spam', 'submitted')")
+      .skip(skip)
+      .limit(limit)
 
     return await query.getMany()
   }

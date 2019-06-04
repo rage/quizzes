@@ -21,6 +21,8 @@ import { API_PATH } from "../../config"
 import { Quiz, QuizAnswer, User, UserQuizState } from "../../models"
 import { ITMCProfileDetails } from "../../types"
 
+const MAX_LIMIT = 100
+
 @JsonController(`${API_PATH}/quizzes/answer`)
 export class QuizAnswerController {
   @InjectManager()
@@ -79,9 +81,23 @@ export class QuizAnswerController {
 
     let result: QuizAnswer[]
 
+    if (limit >= MAX_LIMIT) {
+      limit = MAX_LIMIT
+    }
+
     result = attention
-      ? await this.quizAnswerService.getAttentionAnswers(quizId, true)
-      : await this.quizAnswerService.getEveryonesAnswers(quizId, true)
+      ? await this.quizAnswerService.getAttentionAnswers(
+          quizId,
+          skip,
+          limit,
+          true,
+        )
+      : await this.quizAnswerService.getEveryonesAnswers(
+          quizId,
+          skip,
+          limit,
+          true,
+        )
 
     return result
   }
