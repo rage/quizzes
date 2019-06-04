@@ -79,26 +79,32 @@ class SingleCourseView extends React.Component<any, any> {
             alignItems="stretch"
             spacing={16}
           >
-            <Grid item={true} md="auto" style={{ alignSelf: "center" }}>
-              <Typography variant="title">
+            <Grid item={true} sm={3} />
+            <Grid item={true} xs={12} sm={6} style={{ alignSelf: "center" }}>
+              <Typography variant="title" style={{ textAlign: "center" }}>
                 {currentCourse.texts[0] &&
                   currentCourse.texts[0].title.toUpperCase()}
               </Typography>
             </Grid>
+            <Grid item={true} sm={1} />
 
-            <Grid item={true} xs="auto">
-              <Link to="/new" style={{ textDecoration: "none" }}>
-                <Button
-                  variant="text"
-                  style={{
-                    borderRadius: "0px",
-                    backgroundColor: "#107EAB",
-                    color: "white",
-                  }}
-                >
-                  New quiz
-                </Button>
-              </Link>
+            <Grid item={true} xs="auto" sm={2}>
+              <Grid container={true} justify="flex-end" alignItems="stretch">
+                <Grid item={true} xs="auto">
+                  <Link to="/new" style={{ textDecoration: "none" }}>
+                    <Button
+                      variant="text"
+                      style={{
+                        borderRadius: "0px",
+                        backgroundColor: "#107EAB",
+                        color: "white",
+                      }}
+                    >
+                      New quiz
+                    </Button>
+                  </Link>
+                </Grid>
+              </Grid>
             </Grid>
 
             <LanguageBar />
