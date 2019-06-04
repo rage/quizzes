@@ -18,14 +18,14 @@ class QuestionAdder extends React.Component<any, any> {
           <NewQuizButton toggleExpand={this.toggleExpand} />
 
           <Grow in={this.state.expanded} style={{ transformOrigin: "0 0 0" }}>
-            <Grid item={true} xs={10} lg={8}>
+            <Grid item={true} xs={10} lg="auto">
               <Grid
                 container={true}
                 justify="flex-start"
                 style={{ backgroundColor: "lightgray" }}
               >
                 {this.props.itemTypes.map((type, idx) => (
-                  <Grid item={true} xs="auto" key={type} style={{}}>
+                  <Grid item={true} xs="auto" key={type.value} style={{}}>
                     <Grid container={true} alignItems="center">
                       <Grid item={true} xs={11}>
                         <Button
@@ -36,9 +36,9 @@ class QuestionAdder extends React.Component<any, any> {
                             whiteSpace: "pre-wrap",
                             height: "5em",
                           }}
-                          onClick={this.props.addItem(type)}
+                          onClick={this.props.addItem(type.value)}
                         >
-                          {type.replace("-", "\n")}
+                          {type.label}
                         </Button>
                       </Grid>
 

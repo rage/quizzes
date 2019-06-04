@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: quizzes-dashboard
-        image: gcr.io/moocfi/quizzes-dashboard:build-1558686597-8d55da857a8c3e71d914c7d07ef342ad36b47f43
+        image: gcr.io/moocfi/quizzes-dashboard:build-1559634054-68b12b38d584db034dbb904cb9d258663b1ae9e4
         imagePullPolicy: Always
         ports:
         - name: dashboard-http

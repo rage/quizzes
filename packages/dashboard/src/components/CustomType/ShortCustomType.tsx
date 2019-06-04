@@ -2,7 +2,7 @@ import { Grid, IconButton, TextField, Typography } from "@material-ui/core"
 import React from "react"
 import ShortItemWrapper from "../ItemTools/ShortWrapper"
 
-const ShortEssay = props => {
+const ShortCustomType = props => {
   const item = props.items[props.order]
 
   return (
@@ -15,7 +15,7 @@ const ShortEssay = props => {
       >
         <Grid item={true} xs={12}>
           <Typography variant="title">{`${item.texts[0].title ||
-            "Question " + (props.order + 1)} (Essay)`}</Typography>
+            "Question " + (props.order + 1)} (Custom front)`}</Typography>
         </Grid>
         <Grid item={true} xs={12}>
           <TextField
@@ -33,4 +33,4 @@ const ShortEssay = props => {
   )
 }
 
-export default ShortEssay
+export default ShortCustomType

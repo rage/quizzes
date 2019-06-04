@@ -12,8 +12,8 @@ import {
   QuizItemAnswer,
   UserQuizState,
 } from "../models"
-import PeerReviewService from "./peerreview.service"
 import { wordCount } from "./../../../common/src/util"
+import PeerReviewService from "./peerreview.service"
 
 @Service()
 export default class ValidationService {
@@ -35,7 +35,8 @@ export default class ValidationService {
       )
 
       if (!itemAnswer) {
-        throw new BadRequestError("All items need an answer")
+        // throw new BadRequestError("All items need an answer")
+        return
       }
 
       const itemTranslation = item.texts.find(
@@ -170,6 +171,13 @@ export default class ValidationService {
           itemStatusObject = {
             options: optionAnswerStatus,
           }
+          break
+        case "custom-frontend-accept-data":
+          if (itemAnswer.correct) {
+            correct = true
+            userQuizState.pointsAwarded = 1 * quiz.points
+          }
+          itemStatusObject = {}
           break
       }
 
