@@ -9,7 +9,7 @@ import QuestionAdder from "./QuizQuestionAdder"
 class TabContainer extends Component<any, any> {
   private itemTypes = [
     { label: "checkbox", value: "checkbox" },
-    { label: "essaye", value: "essay" },
+    { label: "essay", value: "essay" },
     { label: "feedback", value: "feedback" },
     { label: "open", value: "open" },
     { label: "multiple choice", value: "multiple-choice" },

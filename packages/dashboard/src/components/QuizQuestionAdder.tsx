@@ -18,7 +18,7 @@ class QuestionAdder extends React.Component<any, any> {
           <NewQuizButton toggleExpand={this.toggleExpand} />
 
           <Grow in={this.state.expanded} style={{ transformOrigin: "0 0 0" }}>
-            <Grid item={true} xs={10} lg={8}>
+            <Grid item={true} xs={10} lg="auto">
               <Grid
                 container={true}
                 justify="flex-start"
