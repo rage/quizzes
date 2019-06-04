@@ -8,13 +8,14 @@ import QuestionAdder from "./QuizQuestionAdder"
 
 class TabContainer extends Component<any, any> {
   private itemTypes = [
-    "checkbox",
-    "essay",
-    "feedback",
-    "open",
-    "multiple-choice",
-    "research-agreement",
-    "scale",
+    { label: "checkbox", value: "checkbox" },
+    { label: "essaye", value: "essay" },
+    { label: "feedback", value: "feedback" },
+    { label: "open", value: "open" },
+    { label: "multiple choice", value: "multiple-choice" },
+    { label: "research agreement", value: "research-agreement" },
+    { label: "scale", value: "scale" },
+    { label: "custom", value: "custom-frontend-accept-data" },
   ]
 
   constructor(props) {
