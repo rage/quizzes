@@ -36,7 +36,13 @@ const AttentionAnswers = ({ answers, quiz, showingAll }) => {
 
       {answers.map((answer, idx) => {
         return (
-          <Answer key={answer.id} answerData={answer} idx={idx} quiz={quiz} />
+          <Answer
+            key={answer.id}
+            answerData={answer}
+            peerReviews={answer.peerReviews}
+            idx={idx}
+            quiz={quiz}
+          />
         )
       })}
     </Grid>

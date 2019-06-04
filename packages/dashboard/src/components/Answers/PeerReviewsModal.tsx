@@ -15,7 +15,6 @@ import {
 import React from "react"
 import { connect } from "react-redux"
 import { setQuiz } from "../../store/filter/actions"
-import { setPeerReviews } from "../../store/peerReviews/actions"
 
 class PeerReviewsModal extends React.Component<any, any> {
   constructor(props) {
@@ -23,21 +22,19 @@ class PeerReviewsModal extends React.Component<any, any> {
   }
 
   public render() {
-    if (this.props.peerReviews == null) {
+    if (!this.props.peerReviews) {
       return <div />
     }
     return (
       <Dialog
         open={this.props.open}
         onClose={this.props.onClose}
-        aria-labelledby="peer-reviews-modal-titlModal,e"
+        aria-labelledby="peer-reviews-modal-title"
         fullWidth={true}
         maxWidth="md"
       >
         <DialogTitle>
-          <Typography variant="headline" id="peer-reviews-modal-title">
-            Received peer reviews ({this.props.peerReviews.length})
-          </Typography>
+          Received peer reviews ({this.props.peerReviews.length})
         </DialogTitle>
 
         <DialogContent>
@@ -195,12 +192,11 @@ const PeerReviewQuestionAnswer = ({ type, questionAnswer, title }) => {
 const mapStateToProps = state => {
   return {
     answers: state.answers,
-    peerReviews: state.peerReviews,
     quizzes: state.quizzes,
   }
 }
 
 export default connect(
   mapStateToProps,
-  { setQuiz, setPeerReviews },
+  { setQuiz },
 )(PeerReviewsModal)

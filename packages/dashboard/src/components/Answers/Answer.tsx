@@ -2,7 +2,6 @@ import { Button, Card, Grid, Typography } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
 import { setCourse, setQuiz } from "../../store/filter/actions"
-import { setPeerReviews } from "../../store/peerReviews/actions"
 import ItemAnswer from "./ItemAnswer"
 import PeerReviewsModal from "./PeerReviewsModal"
 
@@ -20,6 +19,13 @@ class Answer extends React.Component<any, any> {
   }
 
   public render() {
+    const peerAverage = this.average(this.props.answerData.peerReviews)
+    const peerSd = this.standardDeviation(this.props.answerData.peerReviews)
+
+    const peerReviewCollections = this.props.quizzes.find(
+      q => q.id === this.props.answerData.quizId,
+    ).peerReviewCollections
+
     return (
       <Grid
         item={true}
@@ -53,9 +59,9 @@ class Answer extends React.Component<any, any> {
               <PeerReviewsSummary
                 peerReviewsAnswers={this.props.peerReviews}
                 peerReviewsQuestions={
-                  this.props.quizzes.find(
-                    q => q.id === this.props.answerData.quizId,
-                  ).peerReviewCollections[0].questions
+                  peerReviewCollections.length > 0
+                    ? peerReviewCollections[0].questions
+                    : []
                 }
                 answer={this.props.answerData}
                 spamFlags={
@@ -64,7 +70,6 @@ class Answer extends React.Component<any, any> {
                   ).count
                 }
                 setQuiz={this.props.setQuiz}
-                setPeerReviews={this.props.setPeerReviews}
               />
             )}
 
@@ -106,9 +111,16 @@ class Answer extends React.Component<any, any> {
                 </Grid>
 
                 <Grid item={true} xs={2} style={{ textAlign: "center" }}>
-                  <Typography>Avg: xx</Typography>
+                  <Typography>
+                    Avg:{" "}
+                    {peerAverage || peerAverage === 0
+                      ? peerAverage.toFixed(2)
+                      : "-"}
+                  </Typography>
 
-                  <Typography>SD: xx</Typography>
+                  <Typography>
+                    SD: {peerSd || peerSd === 0 ? peerSd.toFixed(2) : "-"}
+                  </Typography>
                 </Grid>
               </Grid>
             </Grid>
@@ -116,6 +128,40 @@ class Answer extends React.Component<any, any> {
         </Card>
       </Grid>
     )
+  }
+
+  private average = (allPeerReviews: any): number | undefined => {
+    const allGrades = allPeerReviews
+      .map(pr => pr.answers)
+      .flat()
+      .filter(pAnswer => pAnswer.value !== null)
+      .map(pAnswer => pAnswer.value)
+    if (allGrades.length === 0) {
+      return undefined
+    }
+    const sum = allGrades.reduce((acc, elem) => acc + elem, 0)
+    return sum / allGrades.length
+  }
+
+  // population sd, not sample
+  private standardDeviation = (allPeerReviews: any): number | undefined => {
+    const allGrades = allPeerReviews
+      .map(pr => pr.answers)
+      .flat()
+      .filter(pAnswer => pAnswer.value !== null)
+      .map(pAnswer => pAnswer.value)
+
+    if (allGrades.length === 0) {
+      return undefined
+    }
+    const avg = this.average(allPeerReviews)
+    if (avg === undefined) {
+      return undefined
+    }
+    const sum =
+      allGrades.reduce((acc, elem) => acc + Math.pow(elem - avg, 2), 0) /
+      allGrades.length
+    return Math.sqrt(sum)
   }
 
   private showMore = () => {
@@ -139,11 +185,13 @@ class PeerReviewsSummary extends React.Component<any, any> {
     }
   }
 
-  public componentDidMount() {
-    this.props.setPeerReviews(this.props.answer.id)
-  }
-
   public render() {
+    if (this.props.peerReviewsQuestions.length === 0) {
+      return (
+        <Typography variant="title">Quiz involves no peer reviews</Typography>
+      )
+    }
+
     return (
       <Grid item={true} xs={12} style={{ margin: "0em 0em 1em 1em" }}>
         <Grid
@@ -187,36 +235,47 @@ class PeerReviewsSummary extends React.Component<any, any> {
                 (this.props.peerReviewsAnswers.length === 0 ||
                   this.props.peerReviewsAnswers[0].quizAnswerId ===
                     this.props.answer.id) &&
-                this.props.peerReviewsQuestions.map((question, idx) => (
-                  <React.Fragment key={question.id}>
-                    <Grid item={true} xs={4} lg={3} xl={2}>
-                      {question.texts[0].title || "No title"}{" "}
-                      {question.type === "essay" && " (Essay)"}:
-                    </Grid>
-                    <Grid item={true} xs={4}>
-                      {question.type === "essay"
-                        ? "NA"
-                        : this.averagePoints(
-                            this.props.peerReviewsAnswers,
-                            idx,
-                          ).toFixed(2)}
-                    </Grid>
-                    <Grid item={true} xs={4}>
-                      {question.type === "essay"
-                        ? "NA"
-                        : this.standardDeviation(
-                            this.props.peerReviewsAnswers,
-                            idx,
-                          ).toFixed(2)}
-                    </Grid>
-                    <Grid item={true} xs="auto" lg={1} xl={2} />
-                  </React.Fragment>
-                ))}
+                this.props.peerReviewsQuestions.map((question, idx) => {
+                  const average = this.averagePoints(
+                    this.props.peerReviewsAnswers,
+                    idx,
+                  )
+
+                  const sd = this.standardDeviation(
+                    this.props.peerReviewsAnswers,
+                    idx,
+                  )
+
+                  return (
+                    <React.Fragment key={question.id}>
+                      <Grid item={true} xs={4} lg={3} xl={2}>
+                        {question.texts[0].title || "No title"}{" "}
+                        {question.type === "essay" && " (Essay)"}:
+                      </Grid>
+                      <Grid item={true} xs={4}>
+                        {question.type === "essay"
+                          ? "NA"
+                          : average === undefined
+                          ? "-"
+                          : average.toFixed(2)}
+                      </Grid>
+                      <Grid item={true} xs={4}>
+                        {question.type === "essay"
+                          ? "NA"
+                          : sd === undefined
+                          ? "-"
+                          : sd.toFixed(2)}
+                      </Grid>
+                      <Grid item={true} xs="auto" lg={1} xl={2} />
+                    </React.Fragment>
+                  )
+                })}
             </Grid>
           </Grid>
         </Grid>
         <PeerReviewsModal
           answer={this.props.answer}
+          peerReviews={this.props.peerReviewsAnswers}
           open={this.state.modalOpen}
           onClose={this.closeModal}
         />
@@ -224,11 +283,13 @@ class PeerReviewsSummary extends React.Component<any, any> {
     )
   }
 
-  private averagePoints = (prAnswers: any[], questionIdx: number): number => {
-    console.log("answers ", prAnswers)
+  private averagePoints = (
+    prAnswers: any[],
+    questionIdx: number,
+  ): number | undefined => {
     const scores = prAnswers.map(a => a.answers[questionIdx].value)
     if (scores.length === 0) {
-      return -1
+      return undefined
     }
 
     return scores.reduce((acc, score) => acc + score, 0) / scores.length
@@ -237,15 +298,14 @@ class PeerReviewsSummary extends React.Component<any, any> {
   private standardDeviation = (
     prAnswers: any[],
     questionIdx: number,
-  ): number => {
-    console.log("answers ", prAnswers)
+  ): number | undefined => {
     const scores = prAnswers.map(a => a.answers[questionIdx].value)
     if (scores.length === 0) {
-      return -1
+      return undefined
     }
     const average = this.averagePoints(prAnswers, questionIdx)
-    if (average < 0) {
-      return -1
+    if (average === undefined) {
+      return undefined
     }
     // population sd, not sample
     return Math.sqrt(
@@ -270,12 +330,11 @@ class PeerReviewsSummary extends React.Component<any, any> {
 const mapStateToProps = state => {
   return {
     answerStatistics: state.answerStatistics,
-    peerReviews: state.peerReviews,
     quizzes: state.quizzes,
   }
 }
 
 export default connect(
   mapStateToProps,
-  { setCourse, setPeerReviews, setQuiz },
+  { setCourse, setQuiz },
 )(Answer)

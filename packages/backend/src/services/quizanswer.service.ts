@@ -1,7 +1,7 @@
 import { Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
-import { QuizAnswer, UserQuizState, SpamFlag } from "../models"
+import { PeerReview, QuizAnswer, UserQuizState, SpamFlag } from "../models"
 import { IQuizAnswerQuery } from "../types"
 import { WhereBuilder } from "../util/index"
 import QuizService from "./quiz.service"
@@ -91,17 +91,52 @@ export default class QuizAnswerService {
     return await queryBuilder.getMany()
   }
 
-  public async getEveryonesAnswers(quizId: string): Promise<QuizAnswer[]> {
-    return await QuizAnswer.createQueryBuilder("quiz_answer")
-      .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
-      .getMany()
-  }
+  public async getEveryonesAnswers(
+    quizId: string,
+    addPeerReviews?: boolean,
+  ): Promise<QuizAnswer[]> {
+    let query = QuizAnswer.createQueryBuilder("quiz_answer")
 
-  public async getAttentionAnswers(quizId: string): Promise<QuizAnswer[]> {
-    return await QuizAnswer.createQueryBuilder("quiz_answer")
+    if (addPeerReviews) {
+      query = query
+        .leftJoinAndMapMany(
+          "quiz_answer.peerReviews",
+          PeerReview,
+          "peer_review",
+          "peer_review.quiz_answer_id = quiz_answer.id",
+        )
+        .leftJoinAndSelect("peer_review.answers", "peer_review_question_answer")
+    }
+
+    query = query
       .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
       .andWhere("quiz_answer.status IN ('spam', 'submitted')")
-      .getMany()
+
+    return await query.getMany()
+  }
+
+  public async getAttentionAnswers(
+    quizId: string,
+    addPeerReviews?: boolean,
+  ): Promise<QuizAnswer[]> {
+    let query = QuizAnswer.createQueryBuilder("quiz_answer")
+
+    if (addPeerReviews) {
+      query = query
+        .leftJoinAndMapMany(
+          "quiz_answer.peerReviews",
+          PeerReview,
+          "peer_review",
+          "peer_review.quiz_answer_id = quiz_answer.id",
+        )
+        .leftJoinAndSelect("peer_review.answers", "peer_review_question_answer")
+    }
+
+    query = query
+      .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
+      .andWhere("quiz_answer.status IN ('spam', 'submitted')")
+
+    return await query.getMany()
   }
 
   public async getAttentionAnswersCount(): Promise<any[]> {

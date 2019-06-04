@@ -28,7 +28,39 @@ export const setAttentionRequiringAnswers = quizId => {
         quizId,
         getState().user,
       )
-      dispatch(set(data))
+
+      if (data.length === 0) {
+        dispatch(set([]))
+        return
+      }
+
+      const quiz = getState().quizzes.find(q => q.id === quizId)
+      const peerReviewQuestions = quiz.peerReviewCollections
+        .map(prc => prc.questions)
+        .flat()
+
+      const newData = data.map(answer => {
+        return {
+          ...answer,
+          peerReviews: answer.peerReviews.map(pr => {
+            return {
+              ...pr,
+              answers: pr.answers.sort((a1, a2) => {
+                return (
+                  peerReviewQuestions.find(
+                    q => q.id === a1.peerReviewQuestionId,
+                  ).order -
+                  peerReviewQuestions.find(
+                    q => q.id === a2.peerReviewQuestionId,
+                  ).order
+                )
+              }),
+            }
+          }),
+        }
+      })
+
+      dispatch(set(newData))
     } catch (error) {
       console.log(error)
     }

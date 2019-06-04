@@ -78,8 +78,8 @@ export class QuizAnswerController {
     let result: QuizAnswer[]
 
     result = attention
-      ? await this.quizAnswerService.getAttentionAnswers(quizId)
-      : await this.quizAnswerService.getEveryonesAnswers(quizId)
+      ? await this.quizAnswerService.getAttentionAnswers(quizId, true)
+      : await this.quizAnswerService.getEveryonesAnswers(quizId, true)
 
     return result
   }
