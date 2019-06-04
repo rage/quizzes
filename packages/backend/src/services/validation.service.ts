@@ -177,6 +177,7 @@ export default class ValidationService {
             correct = true
             userQuizState.pointsAwarded = 1 * quiz.points
           }
+          itemStatusObject = {}
           break
       }
 

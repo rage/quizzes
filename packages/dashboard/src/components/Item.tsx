@@ -16,6 +16,7 @@ import { connect } from "react-redux"
 import { executeIfOnlyDigitsInTextField } from "../../../common/src/util/index"
 import { changeOrder, remove } from "../store/edit/actions"
 import Checkbox from "./Checkbox"
+import CustomType from "./CustomType"
 import Essay from "./Essay"
 import MultipleChoice from "./MultipleChoice"
 import Open from "./Open"
@@ -29,12 +30,14 @@ type itemType =
   | "open"
   | "research-agreement"
   | "scale"
+  | "custom-frontend-accept-data"
 
 class Item extends React.Component<any, any> {
   private titleRef = createRef<HTMLInputElement>()
 
   private itemComponents = {
     checkbox: Checkbox,
+    "custom-frontend-accept-data": CustomType,
     essay: Essay,
     "multiple-choice": MultipleChoice,
     open: Open,
