@@ -31,8 +31,8 @@ class QuizStatistics extends React.Component<any, any> {
 
     if (this.state.showingAll !== showing) {
       if (showing) {
-        //  this.props.setAllAnswersCount(this.props.match.params.id)
         this.props.setAllAnswers(this.props.match.params.id, 1, 10)
+        this.props.setAllAnswersCount(this.props.match.params.id)
       } else {
         this.props.setAttentionRequiringAnswers(
           this.props.match.params.id,
@@ -56,12 +56,12 @@ class QuizStatistics extends React.Component<any, any> {
     const showing = queryParams.all && queryParams.all === "true"
 
     if (showing) {
-      // this.props.setAllAnswersCount(this.props.match.params.id)
       this.props.setAllAnswers(
         this.props.match.params.id,
         this.state.displayingPage,
         this.state.answersPerPage,
       )
+      this.props.setAllAnswersCount(this.props.match.params.id)
     } else {
       this.props.setAttentionRequiringAnswers(
         this.props.match.params.id,
@@ -125,7 +125,7 @@ class QuizStatistics extends React.Component<any, any> {
                         this.props.answerCounts.find(
                           countInfo =>
                             countInfo.quizId === this.props.match.params.id,
-                        ).count
+                        ).totalCount
                       }
                     />
                   ) : (

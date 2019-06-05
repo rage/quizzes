@@ -27,6 +27,7 @@ export const setAllAnswersCount = (quizId: string) => {
         getState().user,
       )
       const oldData = getState().answerCounts
+
       const newData = oldData.map(countInfo => {
         if (countInfo.quizId !== quizId) {
           return countInfo

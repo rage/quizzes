@@ -2,6 +2,7 @@ import { Grid, Typography } from "@material-ui/core"
 import React from "react"
 
 const FilterBox = ({ numberOfAnswers }) => {
+  console.log("Number of answers: ", numberOfAnswers)
   return (
     <React.Fragment>
       <Grid

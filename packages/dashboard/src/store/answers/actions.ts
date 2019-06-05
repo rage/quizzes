@@ -50,6 +50,10 @@ export const setAttentionRequiringAnswers = (
       }
 
       const quiz = getState().quizzes.find(q => q.id === quizId)
+      if (!quiz) {
+        console.log("quiz is undenfined...")
+      }
+
       const peerReviewQuestions = quiz.peerReviewCollections
         .map(prc => prc.questions)
         .flat()

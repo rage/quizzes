@@ -14,10 +14,6 @@ class Answer extends React.Component<any, any> {
     }
   }
 
-  public componentDidMount() {
-    this.props.setQuiz(this.props.answerData.quizId)
-  }
-
   public render() {
     const peerAverage = this.average(this.props.answerData.peerReviews)
     const peerSd = this.standardDeviation(this.props.answerData.peerReviews)

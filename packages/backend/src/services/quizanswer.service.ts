@@ -156,12 +156,18 @@ export default class QuizAnswerService {
   }
 
   public async getNumberOfAnswers(quizId: string): Promise<any> {
-    return await QuizAnswer.createQueryBuilder("quiz_answer")
+    const result = await QuizAnswer.createQueryBuilder("quiz_answer")
       .select("quiz_answer.quiz_id", "quizId")
       .addSelect("COUNT(quiz_answer.id)")
       .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
       .groupBy("quiz_answer.quiz_id")
       .getRawMany()
+
+    if (result.length === 0) {
+      return {}
+    }
+
+    return result[0]
   }
 
   public async getAnswersStatistics(quizId: string): Promise<any> {
