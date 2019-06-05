@@ -1,8 +1,14 @@
 import axios from "axios"
+import { User } from "../../../../dist/common/src/models"
 
-export const getQuizAnswers = async (quizId, user) => {
+export const getQuizAnswers = async (
+  quizId: string,
+  user: any,
+  skip: number,
+  limit: number,
+) => {
   const response = await axios.get(
-    `/api/v1/quizzes/answer/attention?quizId=${quizId}&attention=false`,
+    `/api/v1/quizzes/answer/attention?quizId=${quizId}&attention=false&skip=${skip}&limit={limit}`,
     {
       headers: { authorization: `Bearer ${user.accessToken}` },
     },
@@ -11,14 +17,29 @@ export const getQuizAnswers = async (quizId, user) => {
   return response.data
 }
 
-export const getAttentionRequiringQuizAnswers = async (quizId, user) => {
+export const getAttentionRequiringQuizAnswers = async (
+  quizId: string,
+  user: any,
+  skip: number,
+  limit: number,
+) => {
   const response = await axios.get(
-    `/api/v1/quizzes/answer/attention?quizId=${quizId}&attention=true`,
+    `/api/v1/quizzes/answer/attention?quizId=${quizId}&attention=true&skip=${skip}&limit=${limit}`,
     {
       headers: { authorization: `Bearer ${user.accessToken}` },
     },
   )
 
+  return response.data
+}
+
+export const getTotalNumberOfAnswers = async (quizId: string, user: any) => {
+  const response = await axios.get(
+    `/api/v1/quizzes/answer/counts?quizId=${quizId}`,
+    {
+      headers: { authorization: `Bearer ${user.accessToken}` },
+    },
+  )
   return response.data
 }
 

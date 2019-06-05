@@ -1,46 +1,56 @@
 import { Grid, Typography } from "@material-ui/core"
 import React from "react"
+import { connect } from "react-redux"
 
-const GeneralStatistics = ({ answers }) => {
-  return (
-    <React.Fragment>
-      <Grid
-        item={true}
-        xs={12}
-        style={{ marginBottom: "1.5em", textAlign: "center" }}
-      >
-        <Typography variant="title">QUIZ STATISTICS</Typography>
-      </Grid>
-
-      <Grid
-        container={true}
-        spacing={32}
-        style={{ backgroundColor: "#49C7FB" }}
-      >
-        <Grid item={true} xs={12}>
-          <Typography variant="body1">
-            Answers requiring attention: {answers.length}
-          </Typography>
+class GeneralStatistics extends React.Component<any, any> {
+  public render() {
+    return (
+      <React.Fragment>
+        <Grid
+          item={true}
+          xs={12}
+          style={{ marginBottom: "1.5em", textAlign: "center" }}
+        >
+          <Typography variant="title">QUIZ STATISTICS</Typography>
         </Grid>
 
-        <Grid item={true} xs={12}>
-          <Typography variant="body1">Of those:</Typography>
-          <ul>
-            <li>
-              <Grid item={true} xs={12}>
-                <Typography variant="body1">
-                  Waiting for peer review(s): {"-"}
-                </Typography>
-              </Grid>
-            </li>
-            <li>
-              <Typography variant="body1">Flagged as spam: {"-"}</Typography>
-            </li>
-          </ul>
+        <Grid
+          container={true}
+          spacing={32}
+          style={{ backgroundColor: "#49C7FB" }}
+        >
+          <Grid item={true} xs={12}>
+            <Typography variant="body1">
+              Answers requiring attention:{" "}
+              {this.props.counts.find(c => c.quizId === this.props.id).count}
+            </Typography>
+          </Grid>
+
+          <Grid item={true} xs={12}>
+            <Typography variant="body1">Of those:</Typography>
+            <ul>
+              <li>
+                <Grid item={true} xs={12}>
+                  <Typography variant="body1">
+                    Waiting for peer review(s): {"-"}
+                  </Typography>
+                </Grid>
+              </li>
+              <li>
+                <Typography variant="body1">Flagged as spam: {"-"}</Typography>
+              </li>
+            </ul>
+          </Grid>
         </Grid>
-      </Grid>
-    </React.Fragment>
-  )
+      </React.Fragment>
+    )
+  }
 }
 
-export default GeneralStatistics
+const mapStateToProps = (state: any) => {
+  return {
+    counts: state.answerCounts,
+  }
+}
+
+export default connect(mapStateToProps)(GeneralStatistics)

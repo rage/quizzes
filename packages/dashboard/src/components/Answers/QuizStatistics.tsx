@@ -2,6 +2,7 @@ import { CircularProgress, Grid, Typography } from "@material-ui/core"
 import queryString from "query-string"
 import React from "react"
 import { connect } from "react-redux"
+import { setAllAnswersCount } from "../../store/answerCounts/actions"
 import {
   setAllAnswers,
   setAttentionRequiringAnswers,
@@ -19,6 +20,8 @@ class QuizStatistics extends React.Component<any, any> {
     this.state = {
       initialized: false,
       showingAll: false,
+      displayingPage: 1,
+      answersPerPage: 10,
     }
   }
 
@@ -28,12 +31,19 @@ class QuizStatistics extends React.Component<any, any> {
 
     if (this.state.showingAll !== showing) {
       if (showing) {
-        this.props.setAllAnswers(this.props.match.params.id)
+        //  this.props.setAllAnswersCount(this.props.match.params.id)
+        this.props.setAllAnswers(this.props.match.params.id, 1, 10)
       } else {
-        this.props.setAttentionRequiringAnswers(this.props.match.params.id)
+        this.props.setAttentionRequiringAnswers(
+          this.props.match.params.id,
+          1,
+          10,
+        )
       }
       this.setState({
         showingAll: showing,
+        displayingPage: 1,
+        answersPerPage: 10,
       })
     }
   }
@@ -46,9 +56,18 @@ class QuizStatistics extends React.Component<any, any> {
     const showing = queryParams.all && queryParams.all === "true"
 
     if (showing) {
-      this.props.setAllAnswers(this.props.match.params.id)
+      // this.props.setAllAnswersCount(this.props.match.params.id)
+      this.props.setAllAnswers(
+        this.props.match.params.id,
+        this.state.displayingPage,
+        this.state.answersPerPage,
+      )
     } else {
-      this.props.setAttentionRequiringAnswers(this.props.match.params.id)
+      this.props.setAttentionRequiringAnswers(
+        this.props.match.params.id,
+        this.state.displayingPage,
+        this.state.answersPerPage,
+      )
     }
     this.setState({
       showingAll: showing,
@@ -102,10 +121,15 @@ class QuizStatistics extends React.Component<any, any> {
                 >
                   {this.state.showingAll ? (
                     <FilterOptions
-                      numberOfAnswers={this.props.answers.length}
+                      numberOfAnswers={
+                        this.props.answerCounts.find(
+                          countInfo =>
+                            countInfo.quizId === this.props.match.params.id,
+                        ).count
+                      }
                     />
                   ) : (
-                    <GeneralQuizStatistics answers={this.props.answers} />
+                    <GeneralQuizStatistics id={this.props.match.params.id} />
                   )}
                 </Grid>
 
@@ -131,6 +155,7 @@ class QuizStatistics extends React.Component<any, any> {
 
 const mapStateToProps = (state: any) => {
   return {
+    answerCounts: state.answerCounts,
     answers: state.answers,
     quizzes: state.quizzes,
     courses: state.courses,
@@ -142,6 +167,7 @@ export default connect(
   mapStateToProps,
   {
     setAllAnswers,
+    setAllAnswersCount,
     setAnswerStatistics,
     setAttentionRequiringAnswers,
     setCourse,

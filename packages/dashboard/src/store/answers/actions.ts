@@ -10,10 +10,19 @@ export const set = createAction("answers/SET", resolve => {
 
 export const clear = createAction("answers/CLEAR")
 
-export const setAllAnswers = quizId => {
+export const setAllAnswers = (
+  quizId: string,
+  wantedPageNumber: number,
+  answersPerPage: number,
+) => {
   return async (dispatch, getState) => {
     try {
-      const data = await getQuizAnswers(quizId, getState().user)
+      const data = await getQuizAnswers(
+        quizId,
+        getState().user,
+        (wantedPageNumber - 1) * answersPerPage,
+        answersPerPage,
+      )
       dispatch(set(data))
     } catch (error) {
       console.log(error)
@@ -21,12 +30,18 @@ export const setAllAnswers = quizId => {
   }
 }
 
-export const setAttentionRequiringAnswers = quizId => {
+export const setAttentionRequiringAnswers = (
+  quizId: string,
+  pageNumber: number,
+  answersPerPage: number,
+) => {
   return async (dispatch, getState) => {
     try {
       const data = await getAttentionRequiringQuizAnswers(
         quizId,
         getState().user,
+        (pageNumber - 1) * answersPerPage,
+        answersPerPage,
       )
 
       if (data.length === 0) {

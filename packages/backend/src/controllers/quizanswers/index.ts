@@ -46,12 +46,15 @@ export class QuizAnswerController {
   @Get("/counts")
   public async getAnswerCounts(
     @HeaderParam("authorization") user: ITMCProfileDetails,
+    @QueryParam("quizId") quizId?: string,
   ): Promise<any[]> {
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
     }
 
-    return await this.quizAnswerService.getAttentionAnswersCount()
+    return quizId
+      ? await this.quizAnswerService.getNumberOfAnswers(quizId)
+      : await this.quizAnswerService.getAttentionAnswersCount()
   }
 
   @Get("/statistics")

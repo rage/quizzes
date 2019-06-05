@@ -148,9 +148,18 @@ export default class QuizAnswerService {
 
   public async getAttentionAnswersCount(): Promise<any[]> {
     return await QuizAnswer.createQueryBuilder("quiz_answer")
-      .select("quiz_answer.quiz_id")
+      .select("quiz_answer.quiz_id", "quizId")
       .addSelect("COUNT(quiz_answer.id)")
       .where("quiz_answer.status IN ('spam', 'submitted')")
+      .groupBy("quiz_answer.quiz_id")
+      .getRawMany()
+  }
+
+  public async getNumberOfAnswers(quizId: string): Promise<any> {
+    return await QuizAnswer.createQueryBuilder("quiz_answer")
+      .select("quiz_answer.quiz_id", "quizId")
+      .addSelect("COUNT(quiz_answer.id)")
+      .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
       .groupBy("quiz_answer.quiz_id")
       .getRawMany()
   }

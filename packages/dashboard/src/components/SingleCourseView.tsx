@@ -184,7 +184,7 @@ const SectionComponent = ({ quizzes, sectionNumber, answerCounts }) => {
             <CourseComponent
               idx={idx}
               quiz={q}
-              countData={answerCounts.find(a => a.quiz_id === q.id)}
+              countData={answerCounts.find(a => a.quizId === q.id)}
             />
           </Grid>
         )
