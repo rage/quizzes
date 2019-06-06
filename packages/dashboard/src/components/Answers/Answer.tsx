@@ -76,9 +76,9 @@ class Answer extends React.Component<any, any> {
                 justify="space-between"
                 style={{ margin: ".5em .25em .25em .25em" }}
               >
-                <Grid item={true} xs={4} md={3}>
-                  <Grid container={true} spacing={16}>
-                    <Grid item={true} xs={6}>
+                <Grid item={true} xs={6} lg={4}>
+                  <Grid container={true} justify="flex-start" spacing={16}>
+                    <Grid item={true} xs="auto">
                       <Button
                         variant="contained"
                         style={{
@@ -91,7 +91,7 @@ class Answer extends React.Component<any, any> {
                       </Button>
                     </Grid>
 
-                    <Grid item={true} xs={6}>
+                    <Grid item={true} xs="auto">
                       <Button
                         variant="contained"
                         style={{
