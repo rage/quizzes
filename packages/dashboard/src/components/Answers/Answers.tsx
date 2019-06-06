@@ -2,8 +2,16 @@ import { Grid, Typography } from "@material-ui/core"
 import React from "react"
 import { Link } from "react-router-dom"
 import Answer from "./Answer"
+import PageSelector from "./PageSelector"
 
-const AttentionAnswers = ({ answers, quiz, showingAll }) => {
+const AttentionAnswers = ({
+  answers,
+  quiz,
+  showingAll,
+  currentPage,
+  totalPages,
+  onPageChange,
+}) => {
   return (
     <Grid
       container={true}
@@ -34,6 +42,14 @@ const AttentionAnswers = ({ answers, quiz, showingAll }) => {
         )}
       </Grid>
 
+      <Grid item={true} xs="auto">
+        <PageSelector
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+        />
+      </Grid>
+
       {answers.map((answer, idx) => {
         return (
           <Answer
@@ -45,6 +61,14 @@ const AttentionAnswers = ({ answers, quiz, showingAll }) => {
           />
         )
       })}
+
+      <Grid item={true} xs="auto">
+        <PageSelector
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={onPageChange}
+        />
+      </Grid>
     </Grid>
   )
 }

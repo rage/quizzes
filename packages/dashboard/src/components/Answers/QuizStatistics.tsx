@@ -85,6 +85,15 @@ class QuizStatistics extends React.Component<any, any> {
     if (!quiz) {
       return <p />
     }
+
+    const countInfo = this.props.answerCounts.find(
+      ci => ci.quizId === this.props.match.params.id,
+    )
+
+    const totalNumberOfResults = this.state.showingAll
+      ? countInfo.totalCount
+      : countInfo.count
+
     return (
       <Grid container={true} justify="center" alignItems="center" spacing={16}>
         <Grid item={true} xs={10}>
@@ -120,14 +129,7 @@ class QuizStatistics extends React.Component<any, any> {
                   style={{ marginBottom: "1em" }}
                 >
                   {this.state.showingAll ? (
-                    <FilterOptions
-                      numberOfAnswers={
-                        this.props.answerCounts.find(
-                          countInfo =>
-                            countInfo.quizId === this.props.match.params.id,
-                        ).totalCount
-                      }
-                    />
+                    <FilterOptions numberOfAnswers={totalNumberOfResults} />
                   ) : (
                     <GeneralQuizStatistics id={this.props.match.params.id} />
                   )}
@@ -138,6 +140,11 @@ class QuizStatistics extends React.Component<any, any> {
                     answers={this.props.answers}
                     quiz={quiz}
                     showingAll={this.state.showingAll}
+                    currentPage={this.state.displayingPage}
+                    totalPages={Math.ceil(
+                      totalNumberOfResults / this.state.answersPerPage,
+                    )}
+                    onPageChange={this.handlePageChange}
                   />
                 </Grid>
               </React.Fragment>
@@ -150,6 +157,27 @@ class QuizStatistics extends React.Component<any, any> {
         </Grid>
       </Grid>
     )
+  }
+
+  public handlePageChange = (newPage: number) => () => {
+    if (newPage < 1) {
+      newPage = 1
+    }
+    this.state.showingAll
+      ? this.props.setAllAnswers(
+          this.props.filter.quiz,
+          newPage,
+          this.state.answersPerPage,
+        )
+      : this.props.setAttentionRequiringAnswers(
+          this.props.filter.quiz,
+          newPage,
+          this.state.answersPerPage,
+        )
+
+    this.setState({
+      displayingPage: newPage,
+    })
   }
 }
 

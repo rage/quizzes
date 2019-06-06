@@ -4,6 +4,8 @@ import {
   getQuizAnswers,
 } from "../../services/quizAnswers"
 
+import { setQuizzes } from "../quizzes/actions"
+
 export const set = createAction("answers/SET", resolve => {
   return (quizzes: any[]) => resolve(quizzes)
 })
@@ -51,7 +53,8 @@ export const setAttentionRequiringAnswers = (
 
       const quiz = getState().quizzes.find(q => q.id === quizId)
       if (!quiz) {
-        console.log("quiz is undenfined...")
+        console.log("quiz undefined")
+        console.log("State: ", getState())
       }
 
       const peerReviewQuestions = quiz.peerReviewCollections

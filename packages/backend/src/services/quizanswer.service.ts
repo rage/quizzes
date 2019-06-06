@@ -141,7 +141,7 @@ export default class QuizAnswerService {
       .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
       .andWhere("quiz_answer.status IN ('spam', 'submitted')")
       .skip(skip)
-      .limit(limit)
+      .take(limit)
 
     return await query.getMany()
   }
