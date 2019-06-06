@@ -71,6 +71,7 @@ class QuizStatistics extends React.Component<any, any> {
     }
     this.setState({
       showingAll: showing,
+      initialized: true,
     })
   }
 

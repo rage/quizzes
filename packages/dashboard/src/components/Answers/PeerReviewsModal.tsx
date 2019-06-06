@@ -167,7 +167,7 @@ const PeerReviewQuestionAnswer = ({ type, questionAnswer, title }) => {
     )
   } else if (type === "grade") {
     return (
-      <FormControl>
+      <FormControl fullWidth={true}>
         <FormLabel>{title}</FormLabel>
         <RadioGroup value={`${questionAnswer.value}`} row={true}>
           {[1, 2, 3, 4, 5].map(n => {

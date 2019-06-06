@@ -209,7 +209,7 @@ const CourseComponent = ({ idx, countData, quiz }) => {
         justify="space-between"
         style={{ padding: ".5em 1em .5em 1em" }}
       >
-        <Grid item={true} xs={11} style={{ cursor: "pointer" }}>
+        <Grid item={true} xs={8} md={10} lg={11} style={{ cursor: "pointer" }}>
           <Link
             to={`/quizzes/${quiz.id}/answers`}
             style={{ textDecoration: "none" }}

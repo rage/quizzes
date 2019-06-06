@@ -19,6 +19,7 @@ export const setAllAnswers = (
 ) => {
   return async (dispatch, getState) => {
     try {
+      // dispatch(clear())
       const data = await getQuizAnswers(
         quizId,
         getState().user,
@@ -39,6 +40,7 @@ export const setAttentionRequiringAnswers = (
 ) => {
   return async (dispatch, getState) => {
     try {
+      // dispatch(clear())
       const data = await getAttentionRequiringQuizAnswers(
         quizId,
         getState().user,

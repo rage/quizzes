@@ -6,9 +6,8 @@ const ItemAnswer = ({ answer, idx, quiz }) => {
     <Grid
       container={true}
       alignItems="flex-start"
-      style={{
-        marginLeft: ".5em",
-      }}
+      spacing={8}
+      style={{ paddingLeft: "1em" }}
     >
       {quiz.items.map((qItem, qIdx) => {
         const isFirst = qIdx === 0
