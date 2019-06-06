@@ -37,10 +37,6 @@ class QuizForm extends React.Component<any, any> {
   }
 
   public render() {
-    /* if (this.props.new && this.props.edit.id) {
-            return <Redirect to={`/quizzes/${this.props.edit.id}`} />
-        } */
-
     return (
       <Grid container={true} spacing={16} justify="center">
         <Grid item={true} xs={12} sm={10} lg={8}>
@@ -94,7 +90,6 @@ const mapStateToProps = (state: any) => {
     courses: state.courses,
     edit: state.edit,
     filter: state.filter,
-    quizzes: state.quizzes,
     user: state.user,
   }
 }

@@ -192,7 +192,8 @@ const PeerReviewQuestionAnswer = ({ type, questionAnswer, title }) => {
 const mapStateToProps = state => {
   return {
     answers: state.answers,
-    quizzes: state.quizzes,
+    quizzes: state.quizzes.find(qi => qi.courseId === state.filter.course)
+      .quizzes,
   }
 }
 

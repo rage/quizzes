@@ -6,13 +6,10 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogContentText,
   DialogTitle,
-  FormControlLabel,
   FormGroup,
   Grid,
   TextField,
-  Typography,
 } from "@material-ui/core"
 
 export default class OptionDialog extends React.Component<any, any> {

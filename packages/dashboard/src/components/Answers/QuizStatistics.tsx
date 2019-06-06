@@ -76,7 +76,10 @@ class QuizStatistics extends React.Component<any, any> {
   }
 
   public render() {
-    const quiz = this.props.quizzes.find(
+    if (!this.props.quizzesOfCourse) {
+      return <p />
+    }
+    const quiz = this.props.quizzesOfCourse.quizzes.find(
       c => c.id === this.props.match.params.id,
     )
     const currentCourse = this.props.courses.find(
@@ -203,7 +206,9 @@ const mapStateToProps = (state: any) => {
   return {
     answerCounts: state.answerCounts,
     answers: state.answers,
-    quizzes: state.quizzes,
+    quizzesOfCourse: state.quizzes.find(
+      qi => qi.courseId === state.filter.course,
+    ),
     courses: state.courses,
     filter: state.filter,
   }

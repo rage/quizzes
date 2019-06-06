@@ -88,7 +88,6 @@ const mapStateToProps = (state: any) => {
   return {
     courses: state.courses,
     filter: state.filter,
-    quizzes: state.quizzes,
   }
 }
 

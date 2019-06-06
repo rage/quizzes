@@ -53,7 +53,10 @@ export const setAttentionRequiringAnswers = (
         return
       }
 
-      const quiz = getState().quizzes.find(q => q.id === quizId)
+      const quiz = getState()
+        .quizzes.find(qi => qi.courseId === getState().filter.course)
+        .quizzes.find(q => q.id === quizId)
+
       if (!quiz) {
         console.log("quiz undefined")
         console.log("State: ", getState())

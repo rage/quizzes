@@ -326,7 +326,8 @@ class PeerReviewsSummary extends React.Component<any, any> {
 const mapStateToProps = state => {
   return {
     answerStatistics: state.answerStatistics,
-    quizzes: state.quizzes,
+    quizzes: state.quizzes.find(qi => qi.courseId === state.filter.course)
+      .quizzes,
   }
 }
 

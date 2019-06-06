@@ -1,19 +1,5 @@
-import {
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Collapse,
-  Grid,
-  IconButton,
-  SvgIcon,
-  TextField,
-  Typography,
-} from "@material-ui/core"
-import Delete from "@material-ui/icons/Delete"
-import React, { ChangeEvent, createRef } from "react"
+import React, { createRef } from "react"
 import { connect } from "react-redux"
-import { executeIfOnlyDigitsInTextField } from "../../../common/src/util/index"
 import { changeOrder, remove } from "../store/edit/actions"
 import Checkbox from "./Checkbox"
 import CustomType from "./CustomType"
@@ -51,8 +37,6 @@ class Item extends React.Component<any, any> {
       expandedOptions: {},
     }
   }
-
-  // DISSPLAYNG THE ESSAY: SHOULD BE MORE UNIFORM WITH THE OTHERS!
 
   public expandOption = (order: number): void => {
     const newExpList: boolean[] = { ...this.state.expandedOptions }
@@ -119,17 +103,6 @@ class Item extends React.Component<any, any> {
 
   private toggleExpand = event => {
     this.props.expandItem(this.props.order)
-  }
-
-  private onOptionSortEnd = ({ oldIndex, newIndex, collection }) => {
-    const newExpList = { ...this.state.expandedOptions }
-    const temp = newExpList[oldIndex]
-    newExpList[oldIndex] = newExpList[newIndex]
-    newExpList[newIndex] = temp
-    this.setState({
-      expandedOptions: newExpList,
-    })
-    this.props.changeOrder(collection, oldIndex, newIndex)
   }
 }
 
