@@ -111,7 +111,6 @@ export default class QuizAnswerService {
 
     query = query
       .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
-      .andWhere("quiz_answer.status IN ('spam', 'submitted')")
       .skip(skip)
       .take(limit)
 
