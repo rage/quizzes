@@ -21,8 +21,7 @@ class GeneralStatistics extends React.Component<any, any> {
         >
           <Grid item={true} xs={12}>
             <Typography variant="body1">
-              Answers requiring attention:{" "}
-              {this.props.counts.find(c => c.quizId === this.props.id).count}
+              Answers requiring attention: {this.props.numberOfAnswers}
             </Typography>
           </Grid>
 

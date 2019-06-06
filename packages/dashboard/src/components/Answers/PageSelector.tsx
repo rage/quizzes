@@ -20,7 +20,11 @@ const PageSelector = ({ currentPage, totalPages, onPageChange }) => (
 
     {currentPage > 2 && <PageButton onClick={onPageChange(1)}>1</PageButton>}
 
-    {currentPage > 3 && <Typography variant="body1">...</Typography>}
+    {currentPage > 3 && (
+      <Grid item={true} xs="auto">
+        <Typography variant="body1">...</Typography>
+      </Grid>
+    )}
 
     {currentPage > 1 && (
       <PageButton onClick={onPageChange(currentPage - 1)}>
@@ -37,18 +41,18 @@ const PageSelector = ({ currentPage, totalPages, onPageChange }) => (
     )}
 
     {totalPages - currentPage > 2 && (
-      <Typography variant="body1">...</Typography>
+      <Grid xs="auto" item={true}>
+        <Typography variant="body1">...</Typography>
+      </Grid>
     )}
 
     {totalPages - currentPage > 1 && (
       <PageButton onClick={onPageChange(totalPages)}>{totalPages}</PageButton>
     )}
 
-    {totalPages - currentPage > 0 && (
-      <PageButton icon={true} onClick={onPageChange(currentPage + 1)}>
-        <ChevronRight fontSize="small" />
-      </PageButton>
-    )}
+    <PageButton icon={true} onClick={onPageChange(currentPage + 1)}>
+      <ChevronRight fontSize="small" />
+    </PageButton>
   </Grid>
 )
 
@@ -66,17 +70,11 @@ const PageButton = props => {
   }
 
   return (
-    <Grid
-      item={true}
-      xs="auto"
-      alignContent="stretch"
-      alignItems="stretch"
-      justify="center"
-    >
+    <Grid item={true} xs="auto">
       {props.icon ? (
         <IconButton onClick={props.onClick}>{props.children}</IconButton>
       ) : (
-        <Button fullWidth={true} size="small" onClick={props.onClick}>
+        <Button size="small" onClick={props.onClick}>
           {props.children}
         </Button>
       )}

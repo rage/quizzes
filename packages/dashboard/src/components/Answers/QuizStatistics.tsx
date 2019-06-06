@@ -90,9 +90,12 @@ class QuizStatistics extends React.Component<any, any> {
       ci => ci.quizId === this.props.match.params.id,
     )
 
-    const totalNumberOfResults = this.state.showingAll
-      ? countInfo.totalCount
-      : countInfo.count
+    let totalNumberOfResults = 0
+    if (countInfo) {
+      totalNumberOfResults = this.state.showingAll
+        ? countInfo.totalCount
+        : countInfo.count
+    }
 
     return (
       <Grid container={true} justify="center" alignItems="center" spacing={16}>
@@ -131,7 +134,9 @@ class QuizStatistics extends React.Component<any, any> {
                   {this.state.showingAll ? (
                     <FilterOptions numberOfAnswers={totalNumberOfResults} />
                   ) : (
-                    <GeneralQuizStatistics id={this.props.match.params.id} />
+                    <GeneralQuizStatistics
+                      numberOfAnswers={totalNumberOfResults}
+                    />
                   )}
                 </Grid>
 
@@ -162,6 +167,18 @@ class QuizStatistics extends React.Component<any, any> {
   public handlePageChange = (newPage: number) => () => {
     if (newPage < 1) {
       newPage = 1
+    }
+
+    const countInfo = this.props.answerCounts.find(
+      ci => ci.quizId === this.props.match.params.id,
+    )
+    const pages = Math.ceil(
+      (this.state.showingAll ? countInfo.totalCount : countInfo.count) /
+        this.state.answersPerPage,
+    )
+
+    if (newPage > pages) {
+      newPage = pages
     }
     this.state.showingAll
       ? this.props.setAllAnswers(

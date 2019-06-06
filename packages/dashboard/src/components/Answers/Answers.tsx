@@ -42,33 +42,41 @@ const AttentionAnswers = ({
         )}
       </Grid>
 
-      <Grid item={true} xs="auto">
-        <PageSelector
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={onPageChange}
-        />
-      </Grid>
+      {answers.length === 0 ? (
+        <Grid item={true} xs={12}>
+          <Typography variant="subtitle1">No answers</Typography>
+        </Grid>
+      ) : (
+        <React.Fragment>
+          <Grid item={true} xs="auto">
+            <PageSelector
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+            />
+          </Grid>
 
-      {answers.map((answer, idx) => {
-        return (
-          <Answer
-            key={answer.id}
-            answerData={answer}
-            peerReviews={answer.peerReviews}
-            idx={idx}
-            quiz={quiz}
-          />
-        )
-      })}
+          {answers.map((answer, idx) => {
+            return (
+              <Answer
+                key={answer.id}
+                answerData={answer}
+                peerReviews={answer.peerReviews}
+                idx={idx}
+                quiz={quiz}
+              />
+            )
+          })}
 
-      <Grid item={true} xs="auto">
-        <PageSelector
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={onPageChange}
-        />
-      </Grid>
+          <Grid item={true} xs="auto">
+            <PageSelector
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={onPageChange}
+            />
+          </Grid>
+        </React.Fragment>
+      )}
     </Grid>
   )
 }
