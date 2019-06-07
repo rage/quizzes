@@ -11,6 +11,8 @@ const AttentionAnswers = ({
   currentPage,
   totalPages,
   onPageChange,
+  resultsPerPage,
+  changeResultsPerPage,
 }) => {
   return (
     <Grid
@@ -48,11 +50,13 @@ const AttentionAnswers = ({
         </Grid>
       ) : (
         <React.Fragment>
-          <Grid item={true} xs="auto">
+          <Grid item={true} xs={12}>
             <PageSelector
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={onPageChange}
+              resultsPerPage={resultsPerPage}
+              changeResultsPerPage={changeResultsPerPage}
             />
           </Grid>
 
@@ -68,11 +72,13 @@ const AttentionAnswers = ({
             )
           })}
 
-          <Grid item={true} xs="auto">
+          <Grid item={true} xs={12}>
             <PageSelector
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={onPageChange}
+              resultsPerPage={resultsPerPage}
+              changeResultsPerPage={changeResultsPerPage}
             />
           </Grid>
         </React.Fragment>

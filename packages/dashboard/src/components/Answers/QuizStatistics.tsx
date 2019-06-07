@@ -154,6 +154,8 @@ class QuizStatistics extends React.Component<any, any> {
                       totalNumberOfResults / this.state.answersPerPage,
                     )}
                     onPageChange={this.handlePageChange}
+                    resultsPerPage={this.state.answersPerPage}
+                    changeResultsPerPage={this.handleChangeAnswersPerPage}
                   />
                 </Grid>
               </React.Fragment>
@@ -166,6 +168,30 @@ class QuizStatistics extends React.Component<any, any> {
         </Grid>
       </Grid>
     )
+  }
+
+  public handleChangeAnswersPerPage = e => {
+    const newLengthOfPage = e.target.value
+    const indexOfFirstOnPage =
+      this.state.answersPerPage * (this.state.displayingPage - 1) + 1
+    const newDisplayingPage = Math.ceil(indexOfFirstOnPage / newLengthOfPage)
+
+    this.setState({
+      answersPerPage: newLengthOfPage,
+      displayingPage: newDisplayingPage,
+    })
+
+    this.state.showingAll
+      ? this.props.setAllAnswers(
+          this.props.filter.quiz,
+          newDisplayingPage,
+          newLengthOfPage,
+        )
+      : this.props.setAttentionRequiringAnswers(
+          this.props.filter.quiz,
+          newDisplayingPage,
+          newLengthOfPage,
+        )
   }
 
   public handlePageChange = (newPage: number) => () => {
