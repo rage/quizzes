@@ -22,6 +22,7 @@ class QuizStatistics extends React.Component<any, any> {
       showingAll: false,
       displayingPage: 1,
       answersPerPage: 10,
+      scrollDownAfterUpdate: false,
     }
   }
 
@@ -45,6 +46,14 @@ class QuizStatistics extends React.Component<any, any> {
         displayingPage: 1,
         answersPerPage: 10,
       })
+    }
+
+    if (
+      this.state.scrollDownAfterUpdate &&
+      this.state.answersPerPage === this.props.answers.length
+    ) {
+      this.setState({ scrollDownAfterUpdate: false })
+      scrollTo({ left: 0, top: document.body.scrollHeight, behavior: "auto" })
     }
   }
 
@@ -170,8 +179,15 @@ class QuizStatistics extends React.Component<any, any> {
     )
   }
 
-  public handleChangeAnswersPerPage = e => {
-    const newLengthOfPage = e.target.value
+  public handleChangeAnswersPerPage = async (
+    e: React.ChangeEvent<HTMLSelectElement>,
+    finishAtBottom: boolean = false,
+  ) => {
+    const newLengthOfPage = Number(e.target.value)
+    if (newLengthOfPage === this.state.answersPerPage) {
+      return
+    }
+
     const indexOfFirstOnPage =
       this.state.answersPerPage * (this.state.displayingPage - 1) + 1
     const newDisplayingPage = Math.ceil(indexOfFirstOnPage / newLengthOfPage)
@@ -179,9 +195,9 @@ class QuizStatistics extends React.Component<any, any> {
     this.setState({
       answersPerPage: newLengthOfPage,
       displayingPage: newDisplayingPage,
+      scrollDownAfterUpdate: finishAtBottom,
     })
-
-    this.state.showingAll
+    ;(await this.state.showingAll)
       ? this.props.setAllAnswers(
           this.props.filter.quiz,
           newDisplayingPage,

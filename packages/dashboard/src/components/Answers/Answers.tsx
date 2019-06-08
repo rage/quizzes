@@ -74,6 +74,7 @@ const AttentionAnswers = ({
 
           <Grid item={true} xs={12}>
             <PageSelector
+              isAtBottom={true}
               currentPage={currentPage}
               totalPages={totalPages}
               onPageChange={onPageChange}

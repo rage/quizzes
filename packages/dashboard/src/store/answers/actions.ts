@@ -26,7 +26,7 @@ export const setAllAnswers = (
         (wantedPageNumber - 1) * answersPerPage,
         answersPerPage,
       )
-      dispatch(set(data))
+      await dispatch(set(data))
     } catch (error) {
       console.log(error)
     }
@@ -87,7 +87,7 @@ export const setAttentionRequiringAnswers = (
         }
       })
 
-      dispatch(set(newData))
+      await dispatch(set(newData))
     } catch (error) {
       console.log(error)
     }

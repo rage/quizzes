@@ -1,4 +1,13 @@
-import { Button, Card, Grid, Typography } from "@material-ui/core"
+import {
+  Button,
+  Card,
+  Grid,
+  IconButton,
+  RootRef,
+  Typography,
+} from "@material-ui/core"
+import ExpandLess from "@material-ui/icons/ExpandLess"
+import MoreVert from "@material-ui/icons/MoreVert"
 import React from "react"
 import { connect } from "react-redux"
 import { setCourse, setQuiz } from "../../store/filter/actions"
@@ -6,8 +15,11 @@ import ItemAnswer from "./ItemAnswer"
 import PeerReviewsModal from "./PeerReviewsModal"
 
 class Answer extends React.Component<any, any> {
+  private answerRef: React.RefObject<HTMLElement>
+
   constructor(props) {
     super(props)
+    this.answerRef = React.createRef<HTMLElement>()
     this.state = {
       expanded: false,
       modalOpen: false,
@@ -23,106 +35,118 @@ class Answer extends React.Component<any, any> {
     ).peerReviewCollections
 
     return (
-      <Grid
-        item={true}
-        xs={12}
-        style={{ marginRight: "1em" }}
-        onMouseEnter={this.showMore}
-        onMouseLeave={this.showLess}
-      >
-        <Card
-          raised={true}
-          square={true}
-          style={{
-            borderLeft:
-              "1em solid " +
-              (this.props.answerData.status === "submitted" ||
-              this.props.answerData.status === "spam"
-                ? "#FB6949"
-                : "#49C7FB"),
-          }}
-        >
-          <Grid container={true}>
-            <Grid item={true} xs={12}>
-              <ItemAnswer
-                idx={this.props.idx}
-                answer={this.props.answerData}
-                quiz={this.props.quiz}
-              />
-            </Grid>
+      <RootRef rootRef={this.answerRef}>
+        <Grid item={true} xs={12} style={{ marginRight: "1em" }}>
+          <Card
+            raised={true}
+            square={true}
+            style={{
+              borderLeft:
+                "1em solid " +
+                (this.props.answerData.status === "submitted" ||
+                this.props.answerData.status === "spam"
+                  ? "#FB6949"
+                  : "#49C7FB"),
+            }}
+          >
+            <Grid container={true} justify="center">
+              <Grid item={true} xs={12}>
+                <ItemAnswer
+                  idx={this.props.idx}
+                  answer={this.props.answerData}
+                  quiz={this.props.quiz}
+                  fullLength={this.state.expanded}
+                />
+              </Grid>
 
-            {this.state.expanded && (
-              <PeerReviewsSummary
-                peerReviewsAnswers={this.props.peerReviews}
-                peerReviewsQuestions={
-                  peerReviewCollections.length > 0
-                    ? peerReviewCollections[0].questions
-                    : []
-                }
-                answer={this.props.answerData}
-                spamFlags={
-                  this.props.answerStatistics.find(
-                    as => as.quiz_answer_id === this.props.answerData.id,
-                  ).count
-                }
-                setQuiz={this.props.setQuiz}
-              />
-            )}
+              {!this.state.expanded && (
+                <Grid item={true} xs="auto">
+                  <IconButton onClick={this.showMore}>
+                    <MoreVert />
+                  </IconButton>
+                </Grid>
+              )}
 
-            <Grid item={true} xs={12} style={{ backgroundColor: "#E5E5E5" }}>
-              <Grid
-                container={true}
-                spacing={8}
-                justify="space-between"
-                style={{ margin: ".5em .25em .25em .25em" }}
-              >
-                <Grid item={true} xs={6} lg={4}>
-                  <Grid container={true} justify="flex-start" spacing={16}>
-                    <Grid item={true} xs="auto">
-                      <Button
-                        variant="contained"
-                        style={{
-                          backgroundColor: "#029422",
-                          borderRadius: "0",
-                          color: "white",
-                        }}
-                      >
-                        Accept
-                      </Button>
-                    </Grid>
+              {this.state.expanded && (
+                <React.Fragment>
+                  <PeerReviewsSummary
+                    peerReviewsAnswers={this.props.peerReviews}
+                    peerReviewsQuestions={
+                      peerReviewCollections.length > 0
+                        ? peerReviewCollections[0].questions
+                        : []
+                    }
+                    answer={this.props.answerData}
+                    spamFlags={
+                      this.props.answerStatistics.find(
+                        as => as.quiz_answer_id === this.props.answerData.id,
+                      ).count
+                    }
+                    setQuiz={this.props.setQuiz}
+                  />
+                  <Grid item={true} xs="auto">
+                    <IconButton onClick={this.showLess}>
+                      <ExpandLess />
+                    </IconButton>
+                  </Grid>
+                </React.Fragment>
+              )}
 
-                    <Grid item={true} xs="auto">
-                      <Button
-                        variant="contained"
-                        style={{
-                          backgroundColor: "#D80027",
-                          borderRadius: "0",
-                          color: "white",
-                        }}
-                      >
-                        Reject
-                      </Button>
+              <Grid item={true} xs={12} style={{ backgroundColor: "#E5E5E5" }}>
+                <Grid
+                  container={true}
+                  spacing={8}
+                  justify="space-between"
+                  style={{ margin: ".5em .25em .25em .25em" }}
+                >
+                  <Grid item={true} xs={6} lg={4}>
+                    <Grid container={true} justify="flex-start" spacing={16}>
+                      <Grid item={true} xs="auto">
+                        <Button
+                          variant="contained"
+                          style={{
+                            backgroundColor: "#029422",
+                            borderRadius: "0",
+                            color: "white",
+                          }}
+                        >
+                          Accept
+                        </Button>
+                      </Grid>
+
+                      <Grid item={true} xs="auto">
+                        <Button
+                          variant="contained"
+                          style={{
+                            backgroundColor: "#D80027",
+                            borderRadius: "0",
+                            color: "white",
+                          }}
+                        >
+                          Reject
+                        </Button>
+                      </Grid>
                     </Grid>
                   </Grid>
-                </Grid>
 
-                <Grid item={true} xs={2} style={{ textAlign: "center" }}>
-                  <Typography>
-                    Avg:{" "}
-                    {peerAverage || peerAverage === 0
-                      ? peerAverage.toFixed(2)
-                      : "-"}
-                  </Typography>
+                  <Grid item={true} xs={2} style={{ textAlign: "center" }}>
+                    <Typography>
+                      Avg:{" "}
+                      {peerAverage || peerAverage === 0
+                        ? peerAverage.toFixed(2)
+                        : "-"}
+                    </Typography>
 
-                  <Typography>
-                    SD: {peerSd || peerSd === 0 ? peerSd.toFixed(2) : "-"}
-                  </Typography>
+                    <Typography>
+                      SD: {peerSd || peerSd === 0 ? peerSd.toFixed(2) : "-"}
+                    </Typography>
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
-          </Grid>
-        </Card>
-      </Grid>
+          </Card>
+        </Grid>
+      </RootRef>
     )
   }
 
@@ -167,6 +191,14 @@ class Answer extends React.Component<any, any> {
   }
 
   private showLess = () => {
+    if (!this.answerRef.current) {
+      return
+    }
+    scrollTo({
+      left: 0,
+      top: this.answerRef.current.offsetTop - 100,
+      behavior: "smooth",
+    })
     this.setState({
       expanded: false,
     })
@@ -184,7 +216,9 @@ class PeerReviewsSummary extends React.Component<any, any> {
   public render() {
     if (this.props.peerReviewsQuestions.length === 0) {
       return (
-        <Typography variant="title">Quiz involves no peer reviews</Typography>
+        <Grid item={true} xs={12}>
+          <Typography variant="title">Quiz involves no peer reviews</Typography>
+        </Grid>
       )
     }
 
