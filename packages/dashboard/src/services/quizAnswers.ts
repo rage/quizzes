@@ -1,5 +1,4 @@
 import axios from "axios"
-import { User } from "../../../../dist/common/src/models"
 
 export const getQuizAnswers = async (
   quizId: string,
