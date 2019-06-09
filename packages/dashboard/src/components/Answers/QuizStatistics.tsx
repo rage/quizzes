@@ -143,22 +143,31 @@ class QuizStatistics extends React.Component<any, any> {
                   </Typography>
                 </Grid>
 
-                <Grid item={true}>
+                <Grid item={true} xs={12} md={10} lg={8}>
                   <Paper
+                    square={true}
                     style={{
-                      padding: "1em",
+                      padding: "1.5em",
                     }}
                   >
-                    <Typography variant="h5">{quiz.texts[0].title}</Typography>
-                    <Typography
-                      variant="body1"
-                      style={{
-                        whiteSpace: "pre-wrap",
-                        wordBreak: "break-word",
-                      }}
-                    >
-                      {quiz.texts[0].body}
-                    </Typography>
+                    <Grid container={true} justify="center" spacing={24}>
+                      <Grid item={true} xs="auto">
+                        <Typography variant="h5">
+                          {quiz.texts[0].title}
+                        </Typography>
+                      </Grid>
+                      <Grid>
+                        <Typography
+                          variant="body1"
+                          style={{
+                            whiteSpace: "pre-wrap",
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          {quiz.texts[0].body}
+                        </Typography>
+                      </Grid>
+                    </Grid>
                   </Paper>
                 </Grid>
               </Grid>
@@ -250,7 +259,6 @@ class QuizStatistics extends React.Component<any, any> {
   }
 
   public handlePageChange = (newPage: number) => async () => {
-    console.log("Beginning page change")
     if (newPage < 1) {
       newPage = 1
     }

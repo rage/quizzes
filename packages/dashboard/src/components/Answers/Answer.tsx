@@ -157,7 +157,6 @@ class Answer extends React.Component<any, any> {
 
   private itemAnswersDisplayedInFull = (answer): boolean => {
     const limit = 1500
-    console.log("Answer data: ", answer)
     return !answer.itemAnswers.some(
       ia => ia.textData && ia.textData.length > limit,
     )
