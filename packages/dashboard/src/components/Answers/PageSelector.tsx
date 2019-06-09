@@ -146,7 +146,12 @@ const PageButton = props => {
       {props.icon ? (
         <IconButton onClick={props.onClick}>{props.children}</IconButton>
       ) : (
-        <Button size="small" onClick={props.onClick}>
+        <Button
+          size="small"
+          onClick={props.onClick}
+          disableRipple={true}
+          disableTouchRipple={true}
+        >
           {props.children}
         </Button>
       )}

@@ -50,7 +50,7 @@ class Answer extends React.Component<any, any> {
             }}
           >
             <Grid container={true} justify="center">
-              <Grid item={true} xs={12}>
+              <Grid item={true} xs={12} style={{ paddingRight: "1em" }}>
                 <ItemAnswer
                   idx={this.props.idx}
                   answer={this.props.answerData}
@@ -99,7 +99,6 @@ class Answer extends React.Component<any, any> {
                   justify="space-between"
                   style={{
                     padding: ".5em .5em .25em .5em",
-                    // margin: ".5em 0em .25em 0em"
                   }}
                 >
                   <Grid item={true} xs={6} lg={4}>

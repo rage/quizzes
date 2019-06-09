@@ -64,17 +64,38 @@ class AttentionAnswers extends React.Component<any, any> {
               </RootRef>
             </Grid>
 
-            {this.props.answers.map((answer, idx) => {
-              return (
-                <Answer
-                  key={answer.id}
-                  answerData={answer}
-                  peerReviews={answer.peerReviews}
-                  idx={idx}
-                  quiz={this.props.quiz}
-                />
-              )
-            })}
+            <Grid
+              item={true}
+              xs="auto"
+              style={
+                this.props.inWaitingState
+                  ? {
+                      filter: "opacity(25%)",
+                      cursor: "default",
+                      pointerEvents: "none",
+                    }
+                  : {}
+              }
+            >
+              <Grid
+                container={true}
+                justify="flex-start"
+                alignItems="center"
+                spacing={24}
+              >
+                {this.props.answers.map((answer, idx) => {
+                  return (
+                    <Answer
+                      key={answer.id}
+                      answerData={answer}
+                      peerReviews={answer.peerReviews}
+                      idx={idx}
+                      quiz={this.props.quiz}
+                    />
+                  )
+                })}
+              </Grid>
+            </Grid>
 
             <Grid item={true} xs={12}>
               <PageSelector

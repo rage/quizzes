@@ -23,6 +23,7 @@ class QuizStatistics extends React.Component<any, any> {
       displayingPage: 1,
       answersPerPage: 10,
       scrollDownAfterUpdate: false,
+      waitingForNewAnswers: false,
     }
   }
 
@@ -177,6 +178,7 @@ class QuizStatistics extends React.Component<any, any> {
 
                 <Grid item={true} xs={12} md={8}>
                   <Answers
+                    inWaitingState={this.state.waitingForNewAnswers}
                     answers={this.props.answers}
                     quiz={quiz}
                     showingAll={this.state.showingAll}
@@ -238,7 +240,8 @@ class QuizStatistics extends React.Component<any, any> {
         )
   }
 
-  public handlePageChange = (newPage: number) => () => {
+  public handlePageChange = (newPage: number) => async () => {
+    console.log("Beginning page change")
     if (newPage < 1) {
       newPage = 1
     }
@@ -254,20 +257,27 @@ class QuizStatistics extends React.Component<any, any> {
     if (newPage > pages) {
       newPage = pages
     }
-    this.state.showingAll
-      ? this.props.setAllAnswers(
-          this.props.filter.quiz,
-          newPage,
-          this.state.answersPerPage,
-        )
-      : this.props.setAttentionRequiringAnswers(
-          this.props.filter.quiz,
-          newPage,
-          this.state.answersPerPage,
-        )
 
     this.setState({
       displayingPage: newPage,
+      waitingForNewAnswers: true,
+    })
+
+    if (this.state.showingAll) {
+      await this.props.setAllAnswers(
+        this.props.filter.quiz,
+        newPage,
+        this.state.answersPerPage,
+      )
+    } else {
+      await this.props.setAttentionRequiringAnswers(
+        this.props.filter.quiz,
+        newPage,
+        this.state.answersPerPage,
+      )
+    }
+    this.setState({
+      waitingForNewAnswers: false,
     })
   }
 }
