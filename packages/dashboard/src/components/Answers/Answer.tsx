@@ -86,6 +86,9 @@ class Answer extends React.Component<any, any> {
                       ).count
                     }
                     setQuiz={this.props.setQuiz}
+                    course={this.props.courses.find(
+                      c => c.id === this.props.filter.course,
+                    )}
                   />
                   <Grid item={true} xs="auto">
                     <IconButton onClick={this.showLess}>
@@ -242,6 +245,11 @@ class PeerReviewsSummary extends React.Component<any, any> {
           alignItems="stretch"
           spacing={8}
         >
+          <Grid item={true} xs={12} style={{ textAlign: "center" }}>
+            <Typography variant="subtitle1">
+              Status:{` ${this.props.answer.status}`}
+            </Typography>
+          </Grid>
           <Grid
             item={true}
             xs={12}
@@ -258,8 +266,37 @@ class PeerReviewsSummary extends React.Component<any, any> {
               <Grid item={true} xs={12}>
                 <Typography variant="subtitle1" color="textSecondary">
                   SPAM FLAGS: {this.props.spamFlags}
+                  {this.props.course.maxSpamFlags &&
+                    `. (Maximum allowed: ${this.props.course.maxSpamFlags})`}
                 </Typography>
               </Grid>
+              <Grid item={true} xs={12}>
+                <Typography variant="body1">
+                  Peer reviews given:{" "}
+                  {(this.props.answer.userQuizState &&
+                    this.props.answer.userQuizState.peerReviewsGiven) ||
+                    "none"}
+                  {this.props.course.minPeerReviewsGiven &&
+                    `. (Required: ${this.props.course.minPeerReviewsGiven})`}
+                </Typography>
+              </Grid>
+
+              <Grid item={true} xs={12}>
+                <Typography variant="body1">
+                  Peer reviews received: {this.props.peerReviewsAnswers.length}
+                  {this.props.course.minPeerReviewsReceived &&
+                    `. (Required: ${this.props.course.minPeerReviewsReceived})`}
+                </Typography>
+              </Grid>
+
+              {this.props.course.minReviewAverage && (
+                <Grid item={true} xs={12}>
+                  <Typography variant="body1">
+                    Minimum average of peer reviews:{" "}
+                    {this.props.course.minReviewAverage || "not set"}
+                  </Typography>
+                </Grid>
+              )}
 
               <Grid item={true} xs={12}>
                 <Button variant="outlined" onClick={this.openModal}>
@@ -384,6 +421,8 @@ const mapStateToProps = state => {
     answerStatistics: state.answerStatistics,
     quizzes: state.quizzes.find(qi => qi.courseId === state.filter.course)
       .quizzes,
+    courses: state.courses,
+    filter: state.filter,
   }
 }
 

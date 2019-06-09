@@ -107,6 +107,12 @@ export default class QuizAnswerService {
           "peer_review.quiz_answer_id = quiz_answer.id",
         )
         .leftJoinAndSelect("peer_review.answers", "peer_review_question_answer")
+        .leftJoinAndMapOne(
+          "quiz_answer.userQuizState",
+          UserQuizState,
+          "user_quiz_state",
+          "quiz_answer.user_id = user_quiz_state.user_id",
+        )
     }
 
     query = query
@@ -134,6 +140,12 @@ export default class QuizAnswerService {
           "peer_review.quiz_answer_id = quiz_answer.id",
         )
         .leftJoinAndSelect("peer_review.answers", "peer_review_question_answer")
+        .leftJoinAndMapOne(
+          "quiz_answer.userQuizState",
+          UserQuizState,
+          "user_quiz_state",
+          "quiz_answer.user_id = user_quiz_state.user_id",
+        )
     }
 
     query = query
