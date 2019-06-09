@@ -112,7 +112,7 @@ class QuizStatistics extends React.Component<any, any> {
 
     return (
       <Grid container={true} justify="center" alignItems="center" spacing={16}>
-        <Grid item={true} xs={10}>
+        <Grid item={true} xs={12} md={10}>
           <Grid
             container={true}
             direction="row-reverse"
@@ -120,16 +120,38 @@ class QuizStatistics extends React.Component<any, any> {
             alignItems="stretch"
             spacing={16}
           >
-            <Grid item={true} xs="auto">
-              <Typography variant="title">
-                {currentCourse &&
-                  currentCourse.texts[0] &&
-                  currentCourse.texts[0].title.toUpperCase()}
-              </Typography>
-              <Typography variant="subtitle1">
-                Part {quiz.part} section {quiz.section}
-              </Typography>
-              <Typography variant="subtitle1">{quiz.texts[0].title}</Typography>
+            <Grid item={true} xs={12}>
+              <Grid
+                container={true}
+                justify="center"
+                direction="column"
+                alignContent="center"
+                alignItems="center"
+              >
+                <Grid item={true}>
+                  <Typography variant="title">
+                    {currentCourse &&
+                      currentCourse.texts[0] &&
+                      currentCourse.texts[0].title.toUpperCase()}
+                  </Typography>
+                </Grid>
+
+                <Grid item={true}>
+                  <Typography variant="subtitle1">
+                    Part {quiz.part} section {quiz.section}
+                  </Typography>
+                </Grid>
+
+                <Grid item={true}>
+                  <Typography variant="subheading">
+                    {quiz.texts[0].title}
+                  </Typography>
+                </Grid>
+
+                <Grid item={true}>
+                  <Typography variant="body1">{quiz.texts[0].body}</Typography>
+                </Grid>
+              </Grid>
             </Grid>
 
             <LanguageBar />
@@ -183,6 +205,10 @@ class QuizStatistics extends React.Component<any, any> {
     e: React.ChangeEvent<HTMLSelectElement>,
     finishAtBottom: boolean = false,
   ) => {
+    if (typeof finishAtBottom !== "boolean") {
+      finishAtBottom = false
+    }
+
     const newLengthOfPage = Number(e.target.value)
     if (newLengthOfPage === this.state.answersPerPage) {
       return
@@ -195,9 +221,11 @@ class QuizStatistics extends React.Component<any, any> {
     this.setState({
       answersPerPage: newLengthOfPage,
       displayingPage: newDisplayingPage,
-      scrollDownAfterUpdate: finishAtBottom,
+      scrollDownAfterUpdate:
+        finishAtBottom && newLengthOfPage > this.state.answersPerPage,
     })
-    ;(await this.state.showingAll)
+
+    this.state.showingAll
       ? this.props.setAllAnswers(
           this.props.filter.quiz,
           newDisplayingPage,

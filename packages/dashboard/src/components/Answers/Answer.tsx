@@ -97,7 +97,10 @@ class Answer extends React.Component<any, any> {
                   container={true}
                   spacing={8}
                   justify="space-between"
-                  style={{ margin: ".5em .25em .25em .25em" }}
+                  style={{
+                    padding: ".5em .5em .25em .5em",
+                    // margin: ".5em 0em .25em 0em"
+                  }}
                 >
                   <Grid item={true} xs={6} lg={4}>
                     <Grid container={true} justify="flex-start" spacing={16}>

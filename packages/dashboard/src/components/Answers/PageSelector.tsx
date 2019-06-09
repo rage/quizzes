@@ -16,6 +16,7 @@ import React from "react"
 
 const PageSelector = ({
   isAtBottom = false,
+  upRef,
   changeResultsPerPage,
   currentPage,
   onPageChange,
@@ -24,7 +25,17 @@ const PageSelector = ({
 }) => {
   const handlePageChange = isAtBottom
     ? (n: number) => () => {
-        scrollTo({ left: 0, top: 0, behavior: "auto" })
+        if (!upRef || !upRef.current) {
+          onPageChange(n)()
+          return
+        }
+
+        // -100 a quick fix for the navbar taking space
+        scrollTo({
+          left: 0,
+          top: upRef.current.offsetTop - 100,
+          behavior: "auto",
+        })
         onPageChange(n)()
       }
     : onPageChange
