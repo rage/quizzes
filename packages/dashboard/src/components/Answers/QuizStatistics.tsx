@@ -1,4 +1,4 @@
-import { CircularProgress, Grid, Typography } from "@material-ui/core"
+import { CircularProgress, Grid, Paper, Typography } from "@material-ui/core"
 import queryString from "query-string"
 import React from "react"
 import { connect } from "react-redux"
@@ -144,13 +144,22 @@ class QuizStatistics extends React.Component<any, any> {
                 </Grid>
 
                 <Grid item={true}>
-                  <Typography variant="subheading">
-                    {quiz.texts[0].title}
-                  </Typography>
-                </Grid>
-
-                <Grid item={true}>
-                  <Typography variant="body1">{quiz.texts[0].body}</Typography>
+                  <Paper
+                    style={{
+                      padding: "1em",
+                    }}
+                  >
+                    <Typography variant="h5">{quiz.texts[0].title}</Typography>
+                    <Typography
+                      variant="body1"
+                      style={{
+                        whiteSpace: "pre-wrap",
+                        wordBreak: "break-word",
+                      }}
+                    >
+                      {quiz.texts[0].body}
+                    </Typography>
+                  </Paper>
                 </Grid>
               </Grid>
             </Grid>

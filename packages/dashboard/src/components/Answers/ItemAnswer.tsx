@@ -101,13 +101,14 @@ const ItemAnswerContent = ({ answer, fullLength, type, item }) => {
       return (
         <React.Fragment>
           <Typography variant="body1">
-            Correct option{correctOptions.length > 0 ? "s" : ""} :
+            Correct option{correctOptions.length > 1 ? "s" : ""}
+            {": "}
             <span style={{ fontWeight: "bold" }}>
-              {correctOptions.map(opt => opt.title)}
+              {correctOptions.map(opt => opt.title).join(", ")}
             </span>
           </Typography>
           <Typography variant="body1">
-            Chosen answer:
+            Chosen answer{": "}
             <span style={{ color: chosen && chosen.correct ? "green" : "red" }}>
               {chosen ? chosen.title : ""}
             </span>

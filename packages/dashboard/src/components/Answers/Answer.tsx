@@ -59,13 +59,16 @@ class Answer extends React.Component<any, any> {
                 />
               </Grid>
 
-              {!this.state.expanded && (
-                <Grid item={true} xs="auto">
-                  <IconButton onClick={this.showMore}>
-                    <MoreVert />
-                  </IconButton>
-                </Grid>
-              )}
+              {!this.state.expanded &&
+                ((this.props.quiz.peerReviewCollections &&
+                  this.props.quiz.peerReviewCollections.length > 0) ||
+                  !this.itemAnswersDisplayedInFull(this.props.answerData)) && (
+                  <Grid item={true} xs="auto">
+                    <IconButton onClick={this.showMore}>
+                      <MoreVert />
+                    </IconButton>
+                  </Grid>
+                )}
 
               {this.state.expanded && (
                 <React.Fragment>
@@ -152,6 +155,14 @@ class Answer extends React.Component<any, any> {
     )
   }
 
+  private itemAnswersDisplayedInFull = (answer): boolean => {
+    const limit = 1500
+    console.log("Answer data: ", answer)
+    return !answer.itemAnswers.some(
+      ia => ia.textData && ia.textData.length > limit,
+    )
+  }
+
   private average = (allPeerReviews: any): number | undefined => {
     const allGrades = allPeerReviews
       .map(pr => pr.answers)
@@ -218,7 +229,7 @@ class PeerReviewsSummary extends React.Component<any, any> {
   public render() {
     if (this.props.peerReviewsQuestions.length === 0) {
       return (
-        <Grid item={true} xs={12}>
+        <Grid item={true} xs="auto">
           <Typography variant="title">Quiz involves no peer reviews</Typography>
         </Grid>
       )
@@ -230,7 +241,7 @@ class PeerReviewsSummary extends React.Component<any, any> {
           container={true}
           justify="flex-start"
           alignItems="stretch"
-          spacing={16}
+          spacing={8}
         >
           <Grid
             item={true}
@@ -238,30 +249,41 @@ class PeerReviewsSummary extends React.Component<any, any> {
             md={3}
             style={{ borderRight: "1px dashed #9D9696" }}
           >
-            <Typography variant="subtitle1" color="textSecondary">
-              SPAM FLAGS: {this.props.spamFlags}
-            </Typography>
-            <Button variant="outlined" onClick={this.openModal}>
-              VIEW PEER REVIEWS
-            </Button>
+            <Grid
+              container={true}
+              direction="column"
+              spacing={24}
+              justify="space-around"
+              alignItems="center"
+            >
+              <Grid item={true} xs={12}>
+                <Typography variant="subtitle1" color="textSecondary">
+                  SPAM FLAGS: {this.props.spamFlags}
+                </Typography>
+              </Grid>
+
+              <Grid item={true} xs={12}>
+                <Button variant="outlined" onClick={this.openModal}>
+                  VIEW PEER REVIEWS
+                </Button>
+              </Grid>
+            </Grid>
           </Grid>
 
           <Grid item={true} xs={12} md={9}>
             <Grid
               container={true}
               alignItems="center"
-              spacing={24}
-              style={{ marginBottom: "2em" }}
+              spacing={8}
+              style={{ paddingLeft: "1em", paddingBottom: "1em" }}
             >
-              <Grid item={true} xs={4} lg={3} xl={2} />
-              <Grid item={true} xs={4}>
+              <Grid item={true} xs={4} lg={6} />
+              <Grid item={true} xs={4} lg={3}>
                 <Typography variant="subtitle1">AVERAGE POINTS</Typography>
               </Grid>
-              <Grid item={true} xs={4}>
+              <Grid item={true} xs={4} lg={3}>
                 <Typography variant="subtitle1">STANDARD DEVIATION</Typography>
               </Grid>
-
-              <Grid item={true} xs="auto" lg={1} xl={2} />
 
               {this.props.peerReviewsAnswers &&
                 (this.props.peerReviewsAnswers.length === 0 ||
@@ -280,25 +302,24 @@ class PeerReviewsSummary extends React.Component<any, any> {
 
                   return (
                     <React.Fragment key={question.id}>
-                      <Grid item={true} xs={4} lg={3} xl={2}>
+                      <Grid item={true} xs={4} lg={6}>
                         {question.texts[0].title || "No title"}
                         {question.type === "essay" && " (Essay)"}:
                       </Grid>
-                      <Grid item={true} xs={4}>
+                      <Grid item={true} xs={4} lg={3}>
                         {question.type === "essay"
                           ? "NA"
                           : average === undefined
                           ? "-"
                           : average.toFixed(2)}
                       </Grid>
-                      <Grid item={true} xs={4}>
+                      <Grid item={true} xs={4} lg={3}>
                         {question.type === "essay"
                           ? "NA"
                           : sd === undefined
                           ? "-"
                           : sd.toFixed(2)}
                       </Grid>
-                      <Grid item={true} xs="auto" lg={1} xl={2} />
                     </React.Fragment>
                   )
                 })}
