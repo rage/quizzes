@@ -91,6 +91,7 @@ class AttentionAnswers extends React.Component<any, any> {
                       peerReviews={answer.peerReviews}
                       idx={idx}
                       quiz={this.props.quiz}
+                      updateAnswers={this.props.updateAnswers}
                     />
                   )
                 })}

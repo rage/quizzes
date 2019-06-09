@@ -10,6 +10,7 @@ import ExpandLess from "@material-ui/icons/ExpandLess"
 import MoreVert from "@material-ui/icons/MoreVert"
 import React from "react"
 import { connect } from "react-redux"
+import { updateQuizAnswerStatus } from "../../services/quizAnswers"
 import { setCourse, setQuiz } from "../../store/filter/actions"
 import ItemAnswer from "./ItemAnswer"
 import PeerReviewsModal from "./PeerReviewsModal"
@@ -117,6 +118,10 @@ class Answer extends React.Component<any, any> {
                             borderRadius: "0",
                             color: "white",
                           }}
+                          onClick={this.modifyStatus(
+                            this.props.answerData.id,
+                            "accept",
+                          )}
                         >
                           Accept
                         </Button>
@@ -130,6 +135,10 @@ class Answer extends React.Component<any, any> {
                             borderRadius: "0",
                             color: "white",
                           }}
+                          onClick={this.modifyStatus(
+                            this.props.answerData.id,
+                            "reject",
+                          )}
                         >
                           Reject
                         </Button>
@@ -156,6 +165,19 @@ class Answer extends React.Component<any, any> {
         </Grid>
       </RootRef>
     )
+  }
+
+  private modifyStatus = (quizAnswerId: string, choice: string) => () => {
+    const message = `Are you sure you want to ${choice} the answer?`
+
+    if (confirm(message)) {
+      updateQuizAnswerStatus(
+        quizAnswerId,
+        choice === "accept" ? "confirmed" : "rejected",
+        this.props.user,
+      )
+      this.props.updateAnswers()
+    }
   }
 
   private itemAnswersDisplayedInFull = (answer): boolean => {
@@ -423,6 +445,7 @@ const mapStateToProps = state => {
       .quizzes,
     courses: state.courses,
     filter: state.filter,
+    user: state.user,
   }
 }
 

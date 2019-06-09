@@ -207,6 +207,7 @@ class QuizStatistics extends React.Component<any, any> {
                     onPageChange={this.handlePageChange}
                     resultsPerPage={this.state.answersPerPage}
                     changeResultsPerPage={this.handleChangeAnswersPerPage}
+                    updateAnswers={this.updateAnswers}
                   />
                 </Grid>
               </React.Fragment>
@@ -219,6 +220,20 @@ class QuizStatistics extends React.Component<any, any> {
         </Grid>
       </Grid>
     )
+  }
+
+  public updateAnswers = async () => {
+    ;(await this.state.showingAll)
+      ? this.props.setAllAnswers(
+          this.props.filter.quiz,
+          this.state.displayingPage,
+          this.state.answersPerPage,
+        )
+      : this.props.setAttentionRequiringAnswers(
+          this.props.filter.quiz,
+          this.state.displayingPage,
+          this.state.answersPerPage,
+        )
   }
 
   public handleChangeAnswersPerPage = async (

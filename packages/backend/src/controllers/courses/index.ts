@@ -32,11 +32,6 @@ export class CourseController {
       throw new UnauthorizedError("unauthorized")
     }
 
-    console.log(
-      "Value of attentionAnswers inside the course controller: ",
-      attentionAnswers,
-    )
-
     const query: ICourseQuery = {
       id: null,
       language,

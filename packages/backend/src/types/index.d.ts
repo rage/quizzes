@@ -165,3 +165,11 @@ export interface INewPeerReviewCollectionTranslation {
   title: string
   body: string
 }
+
+export type QuizAnswerStatus =
+  | "draft"
+  | "submitted"
+  | "spam"
+  | "confirmed"
+  | "rejected"
+  | "deprecated"

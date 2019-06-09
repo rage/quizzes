@@ -2,7 +2,7 @@ import { Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { PeerReview, QuizAnswer, UserQuizState, SpamFlag } from "../models"
-import { IQuizAnswerQuery } from "../types"
+import { IQuizAnswerQuery, QuizAnswerStatus } from "../types"
 import { WhereBuilder } from "../util/index"
 import QuizService from "./quiz.service"
 

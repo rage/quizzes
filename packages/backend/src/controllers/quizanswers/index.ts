@@ -19,7 +19,7 @@ import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { API_PATH } from "../../config"
 import { Quiz, QuizAnswer, User, UserQuizState } from "../../models"
-import { ITMCProfileDetails } from "../../types"
+import { ITMCProfileDetails, QuizAnswerStatus } from "../../types"
 
 const MAX_LIMIT = 100
 
@@ -103,6 +103,53 @@ export class QuizAnswerController {
         )
 
     return result
+  }
+
+  @Post("/:answerId")
+  public async modifyStatus(
+    @Param("answerId") id: string,
+    @EntityFromBody() newStatus: QuizAnswerStatus,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const existingAnswer = await this.quizAnswerService.getAnswer(
+      { id: id },
+      this.entityManager,
+    )
+
+    if (!existingAnswer) {
+      return
+    }
+
+    const userQuizState = await this.userQuizStateService.getUserQuizState(
+      existingAnswer.userId,
+      existingAnswer.quizId,
+    )
+    const quiz = (await this.quizService.getQuizzes({
+      id: existingAnswer.quizId,
+    }))[0]
+
+    let newAnswer: QuizAnswer = null
+
+    await this.entityManager.transaction(async manager => {
+      existingAnswer.status = newStatus
+
+      newAnswer = await manager.save(existingAnswer)
+
+      if (newStatus === "confirmed") {
+        await this.userCourseStateService.updateUserCourseState(
+          manager,
+          quiz,
+          userQuizState,
+          newAnswer,
+        )
+      }
+    })
+
+    return newAnswer
   }
 
   @Post("/")
