@@ -23,7 +23,9 @@ export const updateQuizAnswerStatus = async (
 ) => {
   const response = await axios.post(
     `/api/v1/quizzes/answer/${quizAnswerId}`,
-    newStatus,
+    {
+      newStatus,
+    },
     {
       headers: { authorization: `Bearer ${user.accessToken}` },
     },

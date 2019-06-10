@@ -7,6 +7,7 @@ import {
   BadRequestError,
   QueryParam,
   UnauthorizedError,
+  Body,
 } from "routing-controllers"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
@@ -108,9 +109,11 @@ export class QuizAnswerController {
   @Post("/:answerId")
   public async modifyStatus(
     @Param("answerId") id: string,
-    @EntityFromBody() newStatus: QuizAnswerStatus,
+    @Body() body: any,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
+    const newStatus: QuizAnswerStatus = body.newStatus
+
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
     }
@@ -124,22 +127,40 @@ export class QuizAnswerController {
       return
     }
 
-    const userQuizState = await this.userQuizStateService.getUserQuizState(
+    let userQuizState = await this.userQuizStateService.getUserQuizState(
       existingAnswer.userId,
       existingAnswer.quizId,
     )
+
     const quiz = (await this.quizService.getQuizzes({
       id: existingAnswer.quizId,
     }))[0]
 
+    if (!userQuizState) {
+      userQuizState = new UserQuizState()
+      userQuizState.userId = existingAnswer.userId
+      userQuizState.quizId = existingAnswer.quizId
+      userQuizState.pointsAwarded = 0
+      userQuizState = await this.userQuizStateService.createAndCompleteUserQuizState(
+        this.entityManager,
+        userQuizState,
+      )
+    }
+
     let newAnswer: QuizAnswer = null
 
     await this.entityManager.transaction(async manager => {
+      const oldStatus = existingAnswer.status
       existingAnswer.status = newStatus
-
       newAnswer = await manager.save(existingAnswer)
 
-      if (newStatus === "confirmed") {
+      if (newStatus === "confirmed" && oldStatus !== "confirmed") {
+        userQuizState.pointsAwarded = quiz.points
+        await this.userQuizStateService.createUserQuizState(
+          manager,
+          userQuizState,
+        )
+
         await this.userCourseStateService.updateUserCourseState(
           manager,
           quiz,
@@ -149,7 +170,10 @@ export class QuizAnswerController {
       }
     })
 
-    return newAnswer
+    return {
+      newAnswer,
+      userQuizState,
+    }
   }
 
   @Post("/")
