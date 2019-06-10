@@ -19,6 +19,14 @@ import { migrateUsers } from "./user"
 
 import { logger } from "./config/winston"
 
+import dotenv from "dotenv"
+
+import * as appRoot from "app-root-path"
+
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config({ path: `${appRoot.path}/.env` })
+}
+
 async function main() {
   logger.info("Connecting to Postgres")
   const database = Container.get(Database)
@@ -28,9 +36,9 @@ async function main() {
   const migrations = await manager.query(
     "select date from migration order by date desc limit 1",
   )
-  await manager.query(
-    `insert into migration (date) values ('${new Date().toISOString()}')`,
-  )
+
+  const now: any = new Date()
+
   const latest = migrations[0].date.toISOString()
 
   logger.info(`Fetching from quiznator: data added since ${latest}`)
@@ -72,6 +80,12 @@ async function main() {
   await migratePeerReviews(users, existingAnswers, data.peerReviews)
   timer.done({ message: "Migration complete" })
   console.timeEnd("Database migration complete. Time used")
+
+  await manager.query(
+    `insert into migration (date) values ('${new Date(
+      now - 10 * 60000,
+    ).toISOString()}')`,
+  )
 
   process.exit()
 }
