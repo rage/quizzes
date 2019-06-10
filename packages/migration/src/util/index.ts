@@ -14,7 +14,7 @@ export function logger(message: string) {}
 
 export async function insert<T extends BaseEntity>(
   type: typeof BaseEntity,
-  data: Array<any>,
+  data: any[],
   primaryKeys: string = `"id"`,
 ) {
   const saved = Promise.all(

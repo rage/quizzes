@@ -12,22 +12,7 @@ import { Database } from "../config/database"
 
 import { Container } from "typedi"
 
-export async function insert<T extends BaseEntity>(
-  type: typeof BaseEntity,
-  data: Array<any>,
-  primaryKeys: string = `"id"`,
-) {
-  const saved = Promise.all(
-    data.map(async item => {
-      console.log(item)
-      return await type.create(item).save()
-    }),
-  )
-
-  return saved
-}
-
-export function insert2<T extends BaseEntity>(
+export function insert<T extends BaseEntity>(
   type: typeof BaseEntity,
   data: Array<QueryPartialEntity<T>> | QueryPartialEntity<T>,
   primaryKeys: string = `"id"`,
