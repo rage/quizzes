@@ -19,11 +19,6 @@ import { migrateUsers } from "./user"
 
 import { logger } from "./config/winston"
 
-export const LAST_MIGRATION = "2019-03-10T20:52:42+02:00"
-
-const accessToken =
-  "5d7f5ecca16e57a1c0a0182aa8e489fd65a0a8e1b6944e6dc2416b09b8117439"
-
 async function main() {
   logger.info("Connecting to Postgres")
   const database = Container.get(Database)
@@ -42,7 +37,7 @@ async function main() {
   const response = await axios.get(
     `http://quiznator.mooc.fi/api/v1/migration/${encodeURIComponent(latest)}`,
     // `http://127.0.0.1:3000/api/v1/migration/${encodeURIComponent(latest)}`,
-    { headers: { authorization: `Bearer ${accessToken}` } },
+    { headers: { authorization: `Bearer ${process.env.TMC_TOKEN}` } },
   )
 
   const data = response.data

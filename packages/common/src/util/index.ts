@@ -8,8 +8,9 @@ import {
 } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import getUUIDByStringBroken from "uuid-by-string"
-import { Container } from "typedi"
 import { Database } from "../config/database"
+
+import { Container } from "typedi"
 
 export async function insert<T extends BaseEntity>(
   type: typeof BaseEntity,

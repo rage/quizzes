@@ -17,7 +17,6 @@ import { logger } from "./config/winston"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { progressBar, safeGet } from "./util"
 import { getUUIDByString, insert } from "./util/"
-import { LAST_MIGRATION } from "./"
 
 export async function migratePeerReviewQuestions(
   peerReviewQuestions: any[],

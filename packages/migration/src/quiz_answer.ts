@@ -13,7 +13,6 @@ import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
 import { calculateChunkSize, progressBar } from "./util"
 import { getUUIDByString, insert } from "./util/"
-import { LAST_MIGRATION } from "./"
 
 import { logger } from "./config/winston"
 

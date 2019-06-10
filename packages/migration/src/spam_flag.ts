@@ -4,7 +4,6 @@ import { QuizAnswerSpamFlag as QNSpamFlag } from "./app-modules/models"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { calculateChunkSize, progressBar } from "./util"
 import { getUUIDByString, insert } from "./util/"
-import { LAST_MIGRATION } from "./"
 
 import { logger } from "./config/winston"
 

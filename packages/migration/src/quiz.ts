@@ -14,7 +14,6 @@ import oldQuizTypes from "./app-modules/constants/quiz-types"
 import { getUUIDByString, insert } from "./util/"
 import { progressBar, safeGet } from "./util"
 import { AdvancedConsoleLogger } from "typeorm"
-import { LAST_MIGRATION } from "./"
 
 import { logger } from "./config/winston"
 
