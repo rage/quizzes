@@ -53,9 +53,9 @@ export async function migratePeerReviews(
     }
 
     const user = users[oldPR.giverAnswererId]
-    if (!user) {
+    /*if (!user) {
       continue
-    }
+    }*/
 
     const quizID = getUUIDByString(oldPR.quizId)
     const sourceQuizID = getUUIDByString(oldPR.sourceQuizId)
@@ -67,7 +67,7 @@ export async function migratePeerReviews(
     const id = getUUIDByString(oldPR._id)
     newPeerReviews.push({
       id,
-      userId: user.id,
+      userId: user ? user.id : null,
       quizAnswerId: answerID,
       rejectedQuizAnswerIds: rejectedAnswerID ? [rejectedAnswerID] : [],
       createdAt: oldPR.createdAt,

@@ -28,7 +28,7 @@ export class PeerReview extends BaseEntity {
 
   @ManyToOne(type => User, user => user.id)
   public user: User
-  @Column("int")
+  @Column({ type: "int", nullable: true })
   public userId: number
 
   @ManyToOne(type => PeerReviewCollection, prqc => prqc.id, {

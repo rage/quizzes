@@ -26,9 +26,9 @@ export async function migrateSpamFlags(
   const spamFlags: Array<QueryPartialEntity<SpamFlag>> = []
   for (let [username, answerID, createdAt, updatedAt] of oldFlags) {
     const user = users[username]
-    if (!user) {
+    /*if (!user) {
       continue
-    }
+    }*/
 
     answerID = getUUIDByString(answerID)
     if (!existingIDs.includes(answerID)) {
@@ -36,7 +36,8 @@ export async function migrateSpamFlags(
     }
 
     spamFlags.push({
-      userId: user.id,
+      id: getUUIDByString(username + answerID),
+      userId: user ? user.id : null,
       quizAnswerId: answerID,
       createdAt,
       updatedAt,

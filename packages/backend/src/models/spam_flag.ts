@@ -1,9 +1,11 @@
 import {
   BaseEntity,
+  Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
   PrimaryColumn,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from "typeorm"
 import { QuizAnswer } from "./quiz_answer"
@@ -11,14 +13,17 @@ import { User } from "./user"
 
 @Entity()
 export class SpamFlag extends BaseEntity {
+  @PrimaryGeneratedColumn("uuid")
+  public id: string
+
   @ManyToOne(type => User, user => user.id)
   public user: Promise<User>
-  @PrimaryColumn("int")
+  @Column({ type: "int", nullable: true })
   public userId: number
 
   @ManyToOne(type => QuizAnswer, qa => qa.id)
   public quizAnswer: Promise<QuizAnswer>
-  @PrimaryColumn()
+  @Column()
   public quizAnswerId: string
 
   @CreateDateColumn({ type: "timestamp" })

@@ -58,7 +58,7 @@ export async function migrateQuizAnswers(
           const extUser = users[extAnswer.answererId]
           if (!extUser) {
             userNotFound++
-            continue
+            // continue
           }
           pool.push({ quiz: extQuiz, user: extUser, answer: extAnswer })
 
@@ -95,7 +95,7 @@ export async function migrateQuizAnswers(
                   quizAnswers.push({
                     id: answerID,
                     quizId: quiz.id,
-                    userId: user.id,
+                    userId: user ? user.id : null,
                     status,
                     languageId: (await quiz.course).languages[0].id,
                     createdAt: answer.createdAt,

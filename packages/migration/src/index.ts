@@ -76,16 +76,17 @@ async function main() {
     users,
     data.quizAnswers,
   )
-  await migrateSpamFlags(users, data.spamFlags)
+  // await migrateSpamFlags(users, data.spamFlags)
   await migratePeerReviews(users, existingAnswers, data.peerReviews)
-  timer.done({ message: "Migration complete" })
-  console.timeEnd("Database migration complete. Time used")
 
   await manager.query(
     `insert into migration (date) values ('${new Date(
       now - 10 * 60000,
     ).toISOString()}')`,
   )
+
+  timer.done({ message: "Migration complete" })
+  console.timeEnd("Database migration complete. Time used")
 
   process.exit()
 }

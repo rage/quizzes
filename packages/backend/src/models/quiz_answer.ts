@@ -29,7 +29,7 @@ export class QuizAnswer extends BaseEntity {
   @ManyToOne(type => User, user => user.id, { cascade: true })
   public user?: User
   @Index()
-  @Column("int")
+  @Column({ type: "int", nullable: true })
   public userId: number
 
   @ManyToOne(type => Language, lang => lang.id)
