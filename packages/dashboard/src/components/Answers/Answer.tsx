@@ -1,6 +1,11 @@
 import {
   Button,
   Card,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Grid,
   IconButton,
   RootRef,
@@ -11,7 +16,9 @@ import MoreVert from "@material-ui/icons/MoreVert"
 import React from "react"
 import { connect } from "react-redux"
 import { updateQuizAnswerStatus } from "../../services/quizAnswers"
+import { decrement } from "../../store/answerCounts/actions"
 import { setCourse, setQuiz } from "../../store/filter/actions"
+import { displayMessage } from "../../store/notification/actions"
 import ItemAnswer from "./ItemAnswer"
 import PeerReviewsModal from "./PeerReviewsModal"
 
@@ -24,6 +31,8 @@ class Answer extends React.Component<any, any> {
     this.state = {
       expanded: false,
       modalOpen: false,
+      confirmDialogOpen: false,
+      confirmAction: null,
     }
   }
 
@@ -118,10 +127,7 @@ class Answer extends React.Component<any, any> {
                             borderRadius: "0",
                             color: "white",
                           }}
-                          onClick={this.modifyStatus(
-                            this.props.answerData.id,
-                            "accept",
-                          )}
+                          onClick={this.confirmStatusChange("accept")}
                         >
                           Accept
                         </Button>
@@ -135,10 +141,7 @@ class Answer extends React.Component<any, any> {
                             borderRadius: "0",
                             color: "white",
                           }}
-                          onClick={this.modifyStatus(
-                            this.props.answerData.id,
-                            "reject",
-                          )}
+                          onClick={this.confirmStatusChange("reject")}
                         >
                           Reject
                         </Button>
@@ -162,22 +165,86 @@ class Answer extends React.Component<any, any> {
               </Grid>
             </Grid>
           </Card>
+
+          <Dialog
+            open={this.state.confirmDialogOpen}
+            onClose={this.closeConfirmDialog}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              Confirm status change
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Are you certain you want to {this.state.confirmAction} the
+                answer?
+              </DialogContentText>
+            </DialogContent>
+
+            <DialogActions>
+              <Button onClick={this.closeConfirmDialog}>Cancel</Button>
+
+              <Button
+                onClick={this.modifyStatus(
+                  this.state.confirmAction,
+                  this.props.answerData.status === "submitted" ||
+                    this.props.answerData.status === "spam",
+                )}
+              >
+                Confirm
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Grid>
       </RootRef>
     )
   }
 
-  private modifyStatus = (quizAnswerId: string, choice: string) => () => {
-    const message = `Are you sure you want to ${choice} the answer?`
+  private closeConfirmDialog = () => {
+    this.setState({
+      confirmDialogOpen: false,
+      confirmAction: null,
+    })
+  }
 
-    if (confirm(message)) {
-      updateQuizAnswerStatus(
-        quizAnswerId,
+  private confirmStatusChange = (choice: string) => () => {
+    this.setState({
+      confirmDialogOpen: true,
+      confirmAction: choice,
+    })
+  }
+
+  private modifyStatus = (
+    choice: string,
+    requiresAttention: boolean,
+  ) => async () => {
+    let message
+    let errorOccurred = false
+
+    this.closeConfirmDialog()
+    try {
+      await updateQuizAnswerStatus(
+        this.props.answerData.id,
         choice === "accept" ? "confirmed" : "rejected",
         this.props.user,
       )
+
+      message = `Successfully ${
+        choice === "accept" ? "confirmed" : "rejected"
+      } the answer`
+
+      if (requiresAttention) {
+        this.props.decrementAttentionCount(this.props.answerData.quizId)
+      }
+
       this.props.updateAnswers()
+    } catch (e) {
+      message = `Failed to change the status (${e.message})`
+      errorOccurred = true
     }
+
+    this.props.displayMessage(message, errorOccurred, 3)
   }
 
   private itemAnswersDisplayedInFull = (answer): boolean => {
@@ -451,5 +518,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { setCourse, setQuiz },
+  { decrementAttentionCount: decrement, displayMessage, setCourse, setQuiz },
 )(Answer)

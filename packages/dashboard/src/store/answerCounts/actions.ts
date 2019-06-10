@@ -8,6 +8,10 @@ export const set = createAction("answerCounts/SET", resolve => {
 
 export const clear = createAction("answerCounts/CLEAR")
 
+export const decrement = createAction("answerCounts/DECREMENT", resolve => {
+  return (quizId: string) => resolve(quizId)
+})
+
 export const setAnswerCounts = () => {
   return async (dispatch, getState) => {
     try {
@@ -32,12 +36,10 @@ export const setAllAnswersCount = (quizId: string) => {
         if (countInfo.quizId !== quizId) {
           return countInfo
         }
-        console.log("This is the total count info: ", totalCountInfo)
         const newNode = {
           ...countInfo,
           totalCount: totalCountInfo.count,
         }
-        console.log("This is the new node", newNode)
         return newNode
       })
       dispatch(set(newData))
