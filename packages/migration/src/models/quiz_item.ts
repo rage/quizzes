@@ -39,6 +39,7 @@ export class QuizItem extends BaseEntity {
       "checkbox",
       "research-agreement",
       "feedback",
+      "custom-frontend-accept-data",
     ],
   })
   public type: string
