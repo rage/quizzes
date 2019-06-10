@@ -26,8 +26,6 @@ export default class UserQuizStateService {
     userId: number,
     quizId: string,
   ): Promise<UserQuizState | undefined> {
-    console.log("userId: ", userId)
-    console.log("quiz Id: ", quizId)
     return await this.entityManager
       .createQueryBuilder(UserQuizState, "userQuizState")
       .where("user_id = :userId and quiz_id = :quizId", { userId, quizId })

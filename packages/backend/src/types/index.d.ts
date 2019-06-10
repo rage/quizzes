@@ -47,6 +47,7 @@ export interface IQuizQuery {
   id?: string
   courseId?: string
   courseAbbreviation?: string
+  coursePart?: number
   course?: boolean
   language?: string
   items?: boolean

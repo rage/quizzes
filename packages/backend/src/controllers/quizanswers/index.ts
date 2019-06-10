@@ -12,6 +12,7 @@ import {
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
 import UserCourseStateService from "services/usercoursestate.service"
+import UserCoursePartStateService from "services/usercoursepartstate.service"
 import UserQuizStateService from "services/userquizstate.service"
 import ValidationService from "services/validation.service"
 import { Inject } from "typedi"
@@ -19,7 +20,14 @@ import { EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { API_PATH } from "../../config"
-import { Quiz, QuizAnswer, User, UserQuizState } from "../../models"
+import {
+  Quiz,
+  QuizAnswer,
+  User,
+  UserQuizState,
+  UserCoursePartState,
+  UserCourseState,
+} from "../../models"
 import { ITMCProfileDetails, QuizAnswerStatus } from "../../types"
 
 const MAX_LIMIT = 100
@@ -34,6 +42,9 @@ export class QuizAnswerController {
 
   @Inject()
   private userQuizStateService: UserQuizStateService
+
+  @Inject()
+  private userCoursePartStateService: UserCoursePartStateService
 
   @Inject()
   private userCourseStateService: UserCourseStateService
@@ -148,6 +159,8 @@ export class QuizAnswerController {
     }
 
     let newAnswer: QuizAnswer = null
+    let userCourseState: UserCourseState = null
+    let userCoursePartState: UserCoursePartState = null
 
     await this.entityManager.transaction(async manager => {
       const oldStatus = existingAnswer.status
@@ -156,12 +169,18 @@ export class QuizAnswerController {
 
       if (newStatus === "confirmed" && oldStatus !== "confirmed") {
         userQuizState.pointsAwarded = quiz.points
-        await this.userQuizStateService.createUserQuizState(
+        userQuizState = await this.userQuizStateService.createUserQuizState(
           manager,
           userQuizState,
         )
 
-        await this.userCourseStateService.updateUserCourseState(
+        userCoursePartState = await this.userCoursePartStateService.updateUserCoursePartState(
+          manager,
+          quiz,
+          userQuizState.userId,
+        )
+
+        userCourseState = await this.userCourseStateService.updateUserCourseState(
           manager,
           quiz,
           userQuizState,
@@ -173,6 +192,8 @@ export class QuizAnswerController {
     return {
       newAnswer,
       userQuizState,
+      userCoursePartState,
+      userCourseState,
     }
   }
 
