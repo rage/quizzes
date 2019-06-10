@@ -1,47 +1,18 @@
 import {
-  Button,
   Card,
   CardActions,
   CardContent,
   CardHeader,
   Checkbox,
-  Collapse,
-  Divider,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  FormControl,
   FormControlLabel,
   Grid,
   IconButton,
-  InputLabel,
-  Menu,
-  MenuItem,
-  Paper,
-  Select,
   SvgIcon,
-  Switch,
   TextField,
-  Toolbar,
-  Typography,
 } from "@material-ui/core"
-import React, { createRef } from "react"
+import React from "react"
 import { connect } from "react-redux"
-import {
-  arrayMove,
-  SortableContainer,
-  SortableElement,
-  SortableHandle,
-} from "react-sortable-hoc"
-import {
-  addItem,
-  addOption,
-  changeAttr,
-  changeOrder,
-  newQuiz,
-  save,
-  setEdit,
-} from "../store/edit/actions"
+import { SortableElement } from "react-sortable-hoc"
 import DragHandleWrapper from "./DragHandleWrapper"
 
 class Option extends React.Component<any, any> {
@@ -219,7 +190,8 @@ const mapStateToProps = (state: any) => {
     courses: state.courses,
     edit: state.edit,
     filter: state.filter,
-    quizzes: state.quizzes,
+    quizzes: state.quizzes.find(qi => qi.courseId === state.filter.course)
+      .quizzes,
     user: state.user,
   }
 }

@@ -1,52 +1,19 @@
 import {
-  Button,
   Card,
   CardActions,
   CardContent,
   CardHeader,
   Checkbox,
   Collapse,
-  Divider,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  FormControl,
   FormControlLabel,
-  FormGroup,
   Grid,
   IconButton,
-  InputLabel,
-  Menu,
-  MenuItem,
-  Paper,
-  Select,
   SvgIcon,
-  Switch,
-  Tab,
-  Tabs,
   TextField,
-  Toolbar,
-  Typography,
 } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
-import {
-  arrayMove,
-  SortableContainer,
-  SortableElement,
-  SortableHandle,
-} from "react-sortable-hoc"
-import {
-  addItem,
-  addOption,
-  changeAttr,
-  changeOrder,
-  newQuiz,
-  save,
-  setEdit,
-} from "../store/edit/actions"
 import DragHandleWrapper from "./DragHandleWrapper"
-import OptionContainer from "./OptionContainer"
 
 class PeerReviewQuestion extends React.Component<any, any> {
   constructor(props) {

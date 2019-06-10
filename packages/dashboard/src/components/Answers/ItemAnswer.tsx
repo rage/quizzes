@@ -1,14 +1,13 @@
 import { Grid, Typography } from "@material-ui/core"
 import React from "react"
 
-const ItemAnswer = ({ answer, idx, quiz }) => {
+const ItemAnswer = ({ answer, idx, quiz, fullLength }) => {
   return (
     <Grid
       container={true}
       alignItems="flex-start"
-      style={{
-        marginLeft: ".5em",
-      }}
+      spacing={8}
+      style={{ paddingLeft: "1em" }}
     >
       {quiz.items.map((qItem, qIdx) => {
         const isFirst = qIdx === 0
@@ -41,6 +40,7 @@ const ItemAnswer = ({ answer, idx, quiz }) => {
                 type={qItem.type}
                 item={qItem}
                 answer={answer.itemAnswers.find(a => a.quizItemId === qItem.id)}
+                fullLength={fullLength}
               />
             </Grid>
 
@@ -59,7 +59,7 @@ const ItemAnswer = ({ answer, idx, quiz }) => {
   )
 }
 
-const ItemAnswerContent = ({ answer, type, item }) => {
+const ItemAnswerContent = ({ answer, fullLength, type, item }) => {
   if (!answer) {
     return (
       <Typography variant="button">
@@ -67,11 +67,21 @@ const ItemAnswerContent = ({ answer, type, item }) => {
       </Typography>
     )
   }
+
+  let textData = answer.textData
+
+  if (!fullLength && answer.textData && answer.textData.length > 1500) {
+    textData = answer.textData.substring(0, 1501) + "..."
+  }
+
   switch (type) {
     case "essay":
       return (
-        <Typography variant="body1" style={{ whiteSpace: "pre-wrap" }}>
-          {answer.textData}
+        <Typography
+          variant="body1"
+          style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+        >
+          {textData}
         </Typography>
       )
     case "multiple-choice":
@@ -91,13 +101,14 @@ const ItemAnswerContent = ({ answer, type, item }) => {
       return (
         <React.Fragment>
           <Typography variant="body1">
-            Correct option{correctOptions.length > 0 ? "s" : ""} :
+            Correct option{correctOptions.length > 1 ? "s" : ""}
+            {": "}
             <span style={{ fontWeight: "bold" }}>
-              {correctOptions.map(opt => opt.title)}
+              {correctOptions.map(opt => opt.title).join(", ")}
             </span>
           </Typography>
           <Typography variant="body1">
-            Chosen answer:
+            Chosen answer{": "}
             <span style={{ color: chosen && chosen.correct ? "green" : "red" }}>
               {chosen ? chosen.title : ""}
             </span>
@@ -115,10 +126,10 @@ const ItemAnswerContent = ({ answer, type, item }) => {
             Answer:{" "}
             {answer.correct !== null ? (
               <span style={{ color: answer.correct ? "green" : "red" }}>
-                {answer.textData}
+                {textData}
               </span>
             ) : (
-              answer.textData
+              textData
             )}
           </Typography>
         </React.Fragment>
@@ -150,7 +161,18 @@ const ItemAnswerContent = ({ answer, type, item }) => {
           })}
         </React.Fragment>
       )
-
+    case "custom-frontend-accept-data":
+      return (
+        <React.Fragment>
+          <Typography variant="subtitle1">Stored data:</Typography>
+          <Typography
+            variant="body1"
+            style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}
+          >
+            {textData}
+          </Typography>
+        </React.Fragment>
+      )
     default:
       return (
         <Typography variant="subtitle1">Unknown / unsupported type</Typography>

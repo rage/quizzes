@@ -21,6 +21,8 @@ import { API_PATH } from "../../config"
 import { Quiz, QuizAnswer, User, UserQuizState } from "../../models"
 import { ITMCProfileDetails } from "../../types"
 
+const MAX_LIMIT = 100
+
 @JsonController(`${API_PATH}/quizzes/answer`)
 export class QuizAnswerController {
   @InjectManager()
@@ -44,12 +46,15 @@ export class QuizAnswerController {
   @Get("/counts")
   public async getAnswerCounts(
     @HeaderParam("authorization") user: ITMCProfileDetails,
+    @QueryParam("quizId") quizId?: string,
   ): Promise<any[]> {
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
     }
 
-    return await this.quizAnswerService.getAttentionAnswersCount()
+    return quizId
+      ? await this.quizAnswerService.getNumberOfAnswers(quizId)
+      : await this.quizAnswerService.getAttentionAnswersCount()
   }
 
   @Get("/statistics")
@@ -70,6 +75,8 @@ export class QuizAnswerController {
     @QueryParam("attention") attention: boolean,
     @QueryParam("quizId") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
+    @QueryParam("skip") skip?: number,
+    @QueryParam("limit") limit?: number,
   ): Promise<QuizAnswer[]> {
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
@@ -77,9 +84,23 @@ export class QuizAnswerController {
 
     let result: QuizAnswer[]
 
+    if (limit >= MAX_LIMIT) {
+      limit = MAX_LIMIT
+    }
+
     result = attention
-      ? await this.quizAnswerService.getAttentionAnswers(quizId, true)
-      : await this.quizAnswerService.getEveryonesAnswers(quizId, true)
+      ? await this.quizAnswerService.getAttentionAnswers(
+          quizId,
+          skip,
+          limit,
+          true,
+        )
+      : await this.quizAnswerService.getEveryonesAnswers(
+          quizId,
+          skip,
+          limit,
+          true,
+        )
 
     return result
   }

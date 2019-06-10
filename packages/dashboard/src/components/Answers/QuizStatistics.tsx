@@ -1,7 +1,8 @@
-import { CircularProgress, Grid, Typography } from "@material-ui/core"
+import { CircularProgress, Grid, Paper, Typography } from "@material-ui/core"
 import queryString from "query-string"
 import React from "react"
 import { connect } from "react-redux"
+import { setAllAnswersCount } from "../../store/answerCounts/actions"
 import {
   setAllAnswers,
   setAttentionRequiringAnswers,
@@ -19,6 +20,10 @@ class QuizStatistics extends React.Component<any, any> {
     this.state = {
       initialized: false,
       showingAll: false,
+      displayingPage: 1,
+      answersPerPage: 10,
+      scrollDownAfterUpdate: false,
+      waitingForNewAnswers: false,
     }
   }
 
@@ -28,13 +33,28 @@ class QuizStatistics extends React.Component<any, any> {
 
     if (this.state.showingAll !== showing) {
       if (showing) {
-        this.props.setAllAnswers(this.props.match.params.id)
+        this.props.setAllAnswers(this.props.match.params.id, 1, 10)
+        this.props.setAllAnswersCount(this.props.match.params.id)
       } else {
-        this.props.setAttentionRequiringAnswers(this.props.match.params.id)
+        this.props.setAttentionRequiringAnswers(
+          this.props.match.params.id,
+          1,
+          10,
+        )
       }
       this.setState({
         showingAll: showing,
+        displayingPage: 1,
+        answersPerPage: 10,
       })
+    }
+
+    if (
+      this.state.scrollDownAfterUpdate &&
+      this.state.answersPerPage === this.props.answers.length
+    ) {
+      this.setState({ scrollDownAfterUpdate: false })
+      scrollTo({ left: 0, top: document.body.scrollHeight, behavior: "auto" })
     }
   }
 
@@ -46,17 +66,30 @@ class QuizStatistics extends React.Component<any, any> {
     const showing = queryParams.all && queryParams.all === "true"
 
     if (showing) {
-      this.props.setAllAnswers(this.props.match.params.id)
+      this.props.setAllAnswers(
+        this.props.match.params.id,
+        this.state.displayingPage,
+        this.state.answersPerPage,
+      )
+      this.props.setAllAnswersCount(this.props.match.params.id)
     } else {
-      this.props.setAttentionRequiringAnswers(this.props.match.params.id)
+      this.props.setAttentionRequiringAnswers(
+        this.props.match.params.id,
+        this.state.displayingPage,
+        this.state.answersPerPage,
+      )
     }
     this.setState({
       showingAll: showing,
+      initialized: true,
     })
   }
 
   public render() {
-    const quiz = this.props.quizzes.find(
+    if (!this.props.quizzesOfCourse) {
+      return <p />
+    }
+    const quiz = this.props.quizzesOfCourse.quizzes.find(
       c => c.id === this.props.match.params.id,
     )
     const currentCourse = this.props.courses.find(
@@ -66,9 +99,21 @@ class QuizStatistics extends React.Component<any, any> {
     if (!quiz) {
       return <p />
     }
+
+    const countInfo = this.props.answerCounts.find(
+      ci => ci.quizId === this.props.match.params.id,
+    )
+
+    let totalNumberOfResults = 0
+    if (countInfo) {
+      totalNumberOfResults = this.state.showingAll
+        ? countInfo.totalCount
+        : countInfo.count
+    }
+
     return (
       <Grid container={true} justify="center" alignItems="center" spacing={16}>
-        <Grid item={true} xs={10}>
+        <Grid item={true} xs={12} md={10}>
           <Grid
             container={true}
             direction="row-reverse"
@@ -76,16 +121,56 @@ class QuizStatistics extends React.Component<any, any> {
             alignItems="stretch"
             spacing={16}
           >
-            <Grid item={true} xs="auto">
-              <Typography variant="title">
-                {currentCourse &&
-                  currentCourse.texts[0] &&
-                  currentCourse.texts[0].title.toUpperCase()}
-              </Typography>
-              <Typography variant="subtitle1">
-                Part {quiz.part} section {quiz.section}
-              </Typography>
-              <Typography variant="subtitle1">{quiz.texts[0].title}</Typography>
+            <Grid item={true} xs={12}>
+              <Grid
+                container={true}
+                justify="center"
+                direction="column"
+                alignContent="center"
+                alignItems="center"
+              >
+                <Grid item={true}>
+                  <Typography variant="title">
+                    {currentCourse &&
+                      currentCourse.texts[0] &&
+                      currentCourse.texts[0].title.toUpperCase()}
+                  </Typography>
+                </Grid>
+
+                <Grid item={true}>
+                  <Typography variant="subtitle1">
+                    Part {quiz.part} section {quiz.section}
+                  </Typography>
+                </Grid>
+
+                <Grid item={true} xs={12} md={10} lg={8}>
+                  <Paper
+                    square={true}
+                    style={{
+                      padding: "1.5em",
+                    }}
+                  >
+                    <Grid container={true} justify="center" spacing={24}>
+                      <Grid item={true} xs="auto">
+                        <Typography variant="h5">
+                          {quiz.texts[0].title}
+                        </Typography>
+                      </Grid>
+                      <Grid>
+                        <Typography
+                          variant="body1"
+                          style={{
+                            whiteSpace: "pre-wrap",
+                            wordBreak: "break-word",
+                          }}
+                        >
+                          {quiz.texts[0].body}
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                  </Paper>
+                </Grid>
+              </Grid>
             </Grid>
 
             <LanguageBar />
@@ -101,19 +186,27 @@ class QuizStatistics extends React.Component<any, any> {
                   style={{ marginBottom: "1em" }}
                 >
                   {this.state.showingAll ? (
-                    <FilterOptions
-                      numberOfAnswers={this.props.answers.length}
-                    />
+                    <FilterOptions numberOfAnswers={totalNumberOfResults} />
                   ) : (
-                    <GeneralQuizStatistics answers={this.props.answers} />
+                    <GeneralQuizStatistics
+                      numberOfAnswers={totalNumberOfResults}
+                    />
                   )}
                 </Grid>
 
                 <Grid item={true} xs={12} md={8}>
                   <Answers
+                    inWaitingState={this.state.waitingForNewAnswers}
                     answers={this.props.answers}
                     quiz={quiz}
                     showingAll={this.state.showingAll}
+                    currentPage={this.state.displayingPage}
+                    totalPages={Math.ceil(
+                      totalNumberOfResults / this.state.answersPerPage,
+                    )}
+                    onPageChange={this.handlePageChange}
+                    resultsPerPage={this.state.answersPerPage}
+                    changeResultsPerPage={this.handleChangeAnswersPerPage}
                   />
                 </Grid>
               </React.Fragment>
@@ -127,12 +220,92 @@ class QuizStatistics extends React.Component<any, any> {
       </Grid>
     )
   }
+
+  public handleChangeAnswersPerPage = async (
+    e: React.ChangeEvent<HTMLSelectElement>,
+    finishAtBottom: boolean = false,
+  ) => {
+    if (typeof finishAtBottom !== "boolean") {
+      finishAtBottom = false
+    }
+
+    const newLengthOfPage = Number(e.target.value)
+    if (newLengthOfPage === this.state.answersPerPage) {
+      return
+    }
+
+    const indexOfFirstOnPage =
+      this.state.answersPerPage * (this.state.displayingPage - 1) + 1
+    const newDisplayingPage = Math.ceil(indexOfFirstOnPage / newLengthOfPage)
+
+    this.setState({
+      answersPerPage: newLengthOfPage,
+      displayingPage: newDisplayingPage,
+      scrollDownAfterUpdate:
+        finishAtBottom && newLengthOfPage > this.state.answersPerPage,
+    })
+
+    this.state.showingAll
+      ? this.props.setAllAnswers(
+          this.props.filter.quiz,
+          newDisplayingPage,
+          newLengthOfPage,
+        )
+      : this.props.setAttentionRequiringAnswers(
+          this.props.filter.quiz,
+          newDisplayingPage,
+          newLengthOfPage,
+        )
+  }
+
+  public handlePageChange = (newPage: number) => async () => {
+    if (newPage < 1) {
+      newPage = 1
+    }
+
+    const countInfo = this.props.answerCounts.find(
+      ci => ci.quizId === this.props.match.params.id,
+    )
+    const pages = Math.ceil(
+      (this.state.showingAll ? countInfo.totalCount : countInfo.count) /
+        this.state.answersPerPage,
+    )
+
+    if (newPage > pages) {
+      newPage = pages
+    }
+
+    this.setState({
+      displayingPage: newPage,
+      waitingForNewAnswers: true,
+    })
+
+    if (this.state.showingAll) {
+      await this.props.setAllAnswers(
+        this.props.filter.quiz,
+        newPage,
+        this.state.answersPerPage,
+      )
+    } else {
+      await this.props.setAttentionRequiringAnswers(
+        this.props.filter.quiz,
+        newPage,
+        this.state.answersPerPage,
+      )
+    }
+    this.setState({
+      waitingForNewAnswers: false,
+    })
+  }
 }
 
 const mapStateToProps = (state: any) => {
   return {
+    answerCounts: state.answerCounts,
     answers: state.answers,
-    quizzes: state.quizzes,
+    quizzesOfCourse: state.quizzes.find(
+      qi => qi.courseId === state.filter.course,
+    ),
     courses: state.courses,
     filter: state.filter,
   }
@@ -142,6 +315,7 @@ export default connect(
   mapStateToProps,
   {
     setAllAnswers,
+    setAllAnswersCount,
     setAnswerStatistics,
     setAttentionRequiringAnswers,
     setCourse,

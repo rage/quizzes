@@ -1,5 +1,6 @@
 import _ from "lodash"
 import { createAction } from "typesafe-actions"
+import { setCourses } from "../courses/actions"
 import { setQuizzes } from "../quizzes/actions"
 
 export const set = createAction("filter/SET", resolve => {
@@ -27,12 +28,20 @@ export const setLanguage = (language: string) => {
 
 export const setCourse = (course: string) => {
   return async (dispatch, getState) => {
-    if (!getState().quizzes.find(quiz => quiz.courseId === course)) {
-      await dispatch(setQuizzes(course))
+    if (!getState().courses.some(c => c.id === course)) {
+      await dispatch(setCourses())
     }
     const language = getState().courses.find(c => c.id === course).languages[0]
       .id
     dispatch(set({ course, language }))
+
+    if (
+      !getState().quizzes.find(
+        courseQuizzesInfo => courseQuizzesInfo.courseId === course,
+      )
+    ) {
+      await dispatch(setQuizzes(course))
+    }
   }
 }
 

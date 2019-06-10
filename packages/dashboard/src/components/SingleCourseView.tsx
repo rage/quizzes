@@ -18,37 +18,46 @@ class SingleCourseView extends React.Component<any, any> {
   public componentDidUpdate() {
     if (
       !this.state.initialized &&
-      this.props.quizzes &&
-      this.props.quizzes.length > 0 &&
-      this.props.filter.course
+      this.props.quizzesOfCourse &&
+      this.props.quizzesOfCourse.quizzes &&
+      this.props.filter.course === this.props.match.params.id
     ) {
-      const newParts = {}
-
-      this.props.quizzes
-        .filter(q => q.courseId === this.props.filter.course)
-        .forEach(q => {
-          let sections = newParts[`${q.part}`]
-          if (!sections) {
-            sections = {}
-            newParts[`${q.part}`] = sections
-          }
-          let section = sections[`${q.section}`]
-          if (!section) {
-            section = []
-          }
-          section = section.concat(q)
-          sections[`${q.section}`] = section
-        })
-
-      this.setState({
-        parts: newParts,
-        initialized: true,
-      })
+      this.initialize()
     }
   }
 
+  public initialize = () => {
+    const newParts = {}
+
+    this.props.quizzesOfCourse.quizzes.forEach(q => {
+      let sections = newParts[`${q.part}`]
+      if (!sections) {
+        sections = {}
+        newParts[`${q.part}`] = sections
+      }
+      let section = sections[`${q.section}`]
+      if (!section) {
+        section = []
+      }
+      section = section.concat(q)
+      sections[`${q.section}`] = section
+    })
+
+    this.setState({
+      parts: newParts,
+      initialized: true,
+    })
+  }
+
   public componentDidMount() {
-    this.setState({ initialized: false })
+    if (
+      !this.state.initialized &&
+      this.props.quizzesOfCourse &&
+      this.props.quizzesOfCourse.quizzes &&
+      this.props.filter.course === this.props.match.params.id
+    ) {
+      this.initialize()
+    }
 
     if (
       this.props.match.params.id &&
@@ -60,11 +69,11 @@ class SingleCourseView extends React.Component<any, any> {
   }
 
   public render() {
-    if (this.props.courses.length === 0) {
+    if (!this.props.quizzesOfCourse) {
       return <div />
     }
     const currentCourse = this.props.courses.find(
-      course => this.props.filter.course === course.id,
+      course => this.props.match.params.id === course.id,
     )
     if (!currentCourse) {
       return <div />
@@ -184,7 +193,7 @@ const SectionComponent = ({ quizzes, sectionNumber, answerCounts }) => {
             <CourseComponent
               idx={idx}
               quiz={q}
-              countData={answerCounts.find(a => a.quiz_id === q.id)}
+              countData={answerCounts.find(a => a.quizId === q.id)}
             />
           </Grid>
         )
@@ -209,7 +218,7 @@ const CourseComponent = ({ idx, countData, quiz }) => {
         justify="space-between"
         style={{ padding: ".5em 1em .5em 1em" }}
       >
-        <Grid item={true} xs={11} style={{ cursor: "pointer" }}>
+        <Grid item={true} xs={8} md={10} lg={11} style={{ cursor: "pointer" }}>
           <Link
             to={`/quizzes/${quiz.id}/answers`}
             style={{ textDecoration: "none" }}
@@ -265,7 +274,9 @@ const mapStateToProps = (state: any) => {
     answerCounts: state.answerCounts,
     courses: state.courses,
     filter: state.filter,
-    quizzes: state.quizzes,
+    quizzesOfCourse: state.quizzes.find(
+      qi => qi.courseId === state.filter.course,
+    ),
   }
 }
 

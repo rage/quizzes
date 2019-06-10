@@ -26,7 +26,6 @@ import { setCourses } from "./store/courses/actions"
 import { newQuiz, setEdit } from "./store/edit/actions"
 import { setCourse } from "./store/filter/actions"
 import { displayMessage } from "./store/notification/actions"
-import { setQuizzes } from "./store/quizzes/actions"
 import { addUser, removeUser } from "./store/user/actions"
 
 class App extends React.Component<any, any> {
@@ -50,11 +49,13 @@ class App extends React.Component<any, any> {
   }
 
   public currentQuizTitle: () => string | null = () => {
-    if (!this.props.filter.quiz) {
+    if (!this.props.filter.quiz || !this.props.quizzesOfCourse) {
       return null
     }
 
-    const quiz = this.props.quizzes.find(q => q.id === this.props.filter.quiz)
+    const quiz = this.props.quizzesOfCourse.quizzes.find(
+      q => q.id === this.props.filter.quiz,
+    )
     return quiz ? quiz.texts[0].title : null
   }
 
@@ -238,10 +239,12 @@ class App extends React.Component<any, any> {
   }
 
   private edit = ({ match }) => {
-    if (this.props.quizzes.length === 0) {
+    if (!this.props.quizzesOfCourse) {
       return <p />
     }
-    const quiz = this.props.quizzes.find(q => q.id === match.params.id)
+    const quiz = this.props.quizzesOfCourse.quizzes.find(
+      q => q.id === match.params.id,
+    )
     return <QuizForm quiz={quiz} new={false} />
   }
 
@@ -289,7 +292,6 @@ interface IDispatchProps {
   setCourse: typeof setCourse
   setCourses: typeof setCourses
   setEdit: typeof setEdit
-  setQuizzes: typeof setQuizzes
   removeUser: typeof removeUser
 }
 
@@ -297,7 +299,7 @@ interface IStateProps {
   courses: any
   edit: any
   filter: any
-  quizzes: any[]
+  quizzesOfCourse: any
   user: ITMCProfile
 }
 
@@ -307,7 +309,9 @@ const mapStateToProps = (state: any) => {
     courses: state.courses,
     edit: state.edit,
     filter: state.filter,
-    quizzes: state.quizzes,
+    quizzesOfCourse: state.quizzes.find(
+      courseQuizInfo => courseQuizInfo.courseId === state.filter.course,
+    ),
     user: state.user,
   }
 }
@@ -320,7 +324,6 @@ const mapDispatchToProps = {
   setCourse,
   setCourses,
   setEdit,
-  setQuizzes,
   removeUser,
 }
 

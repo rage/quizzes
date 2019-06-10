@@ -167,7 +167,7 @@ const PeerReviewQuestionAnswer = ({ type, questionAnswer, title }) => {
     )
   } else if (type === "grade") {
     return (
-      <FormControl>
+      <FormControl fullWidth={true}>
         <FormLabel>{title}</FormLabel>
         <RadioGroup value={`${questionAnswer.value}`} row={true}>
           {[1, 2, 3, 4, 5].map(n => {
@@ -192,7 +192,8 @@ const PeerReviewQuestionAnswer = ({ type, questionAnswer, title }) => {
 const mapStateToProps = state => {
   return {
     answers: state.answers,
-    quizzes: state.quizzes,
+    quizzes: state.quizzes.find(qi => qi.courseId === state.filter.course)
+      .quizzes,
   }
 }
 

@@ -1,48 +1,8 @@
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardHeader,
-  Collapse,
-  Divider,
-  ExpansionPanel,
-  ExpansionPanelDetails,
-  ExpansionPanelSummary,
-  FormControl,
-  Grid,
-  IconButton,
-  InputLabel,
-  Menu,
-  MenuItem,
-  Paper,
-  Select,
-  SvgIcon,
-  Switch,
-  TextField,
-  Toolbar,
-  Typography,
-} from "@material-ui/core"
-import Tab from "@material-ui/core/Tab"
-import Tabs from "@material-ui/core/Tabs"
+import { Button, Grid, Paper } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
-import {
-  arrayMove,
-  SortableContainer,
-  SortableElement,
-  SortableHandle,
-} from "react-sortable-hoc"
-import {
-  addFinishedOption,
-  addItem,
-  addOption,
-  changeAttr,
-  changeOrder,
-  newQuiz,
-  save,
-  setEdit,
-} from "../store/edit/actions"
+import { SortableContainer } from "react-sortable-hoc"
+import { addFinishedOption, addOption } from "../store/edit/actions"
 import Option from "./Option"
 import OptionDialog from "./OptionDialog"
 
