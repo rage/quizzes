@@ -30,7 +30,12 @@ export const setAllAnswersCount = (quizId: string) => {
         quizId,
         getState().user,
       )
-      const oldData = getState().answerCounts
+
+      let oldData = getState().answerCounts
+      if (oldData.length === 0) {
+        await dispatch(setAnswerCounts())
+        oldData = getState().answerCounts
+      }
 
       const newData = oldData.map(countInfo => {
         if (countInfo.quizId !== quizId) {
