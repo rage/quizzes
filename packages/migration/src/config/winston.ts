@@ -1,33 +1,39 @@
 // import * as appRoot from "app-root-path"
 /* eslint-disable no-var-requires */
 const appRoot = require("app-root-path")
-const winston = require("winston")
+const { createLogger, format, transports } = require("winston")
 /* eslint-enable no-var-requires */
 
-const LOG_DIRECTORY = process.env.LOG_DIRECTORY || `${appRoot}/logs/`
+const LOG_DIRECTORY =
+  process.env.LOG_DIRECTORY || `${appRoot}/packages/migration/src/`
+
+const myFormat = format.printf(({ timestamp, message }: any) => {
+  return `${timestamp}: ${message}`
+})
 
 const options = {
   file: {
     level: "info",
-    filename: `${LOG_DIRECTORY}/app.log`,
-    handleExceptions: true,
+    filename: `${LOG_DIRECTORY}migration.log`,
+    /*handleExceptions: true,
     json: true,
     maxsize: 5242880,
     maxFiles: 5,
-    colorize: false,
+    colorize: false,*/
   },
   console: {
-    level: "debug",
-    handleExceptions: true,
+    level: "info",
+    /*handleExceptions: true,
     json: false,
-    colorize: true,
+    colorize: true,*/
   },
 }
 
-const logger = winston.createLogger({
+const logger = createLogger({
+  format: format.combine(format.timestamp(), myFormat),
   transports: [
-    new winston.transports.File(options.file),
-    new winston.transports.Console(options.console),
+    new transports.File(options.file),
+    new transports.Console(options.console),
   ],
   exitOnError: false,
 })

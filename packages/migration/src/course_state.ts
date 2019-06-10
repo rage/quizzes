@@ -5,11 +5,13 @@ import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { calculateChunkSize, progressBar } from "./util"
 import { getUUIDByString, insert } from "./util/"
 
+import { logger } from "./config/winston"
+
 export async function migrateCourseStates(
   courses: { [courseID: string]: Course },
   users: { [username: string]: User },
 ) {
-  console.log("Querying course states...")
+  logger.info("Querying course states...")
   const oldStates = await QNCourseState.find({})
 
   let bar = progressBar("Converting course states", oldStates.length)

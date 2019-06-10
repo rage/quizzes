@@ -13,26 +13,29 @@ import { calculateChunkSize, progressBar } from "./util"
 import { getUUIDByString, insert } from "./util/"
 import { LAST_MIGRATION } from "./"
 
+import { logger } from "./config/winston"
+
 export async function migratePeerReviews(
   users: { [username: string]: User },
   existingAnswers: { [answerID: string]: boolean },
+  peerReviews: any[],
 ) {
-  console.log("Querying peer reviews...")
-  const peerReviews = await QNPeerReview.find({
+  logger.info("Querying peer reviews...")
+  /*const peerReviews = await QNPeerReview.find({
     $or: [
       { createdAt: { $gte: LAST_MIGRATION } },
       { updatedAt: { $gte: LAST_MIGRATION } },
     ],
-  })
+  })*/
 
   const newPeerReviews: Array<QueryPartialEntity<PeerReview>> = []
   const newPeerReviewAnswers: Array<
     QueryPartialEntity<PeerReviewQuestionAnswer>
   > = []
 
-  console.log("Querying peer review question collections...")
+  logger.info("Querying peer review question collections...")
   const prqcArray = await PeerReviewCollection.find()
-  console.log("Querying peer review question collection questions...")
+  logger.info("Querying peer review question collection questions...")
   const prqcs: { [prqcID: string]: PeerReviewQuestion[] } = {}
   for (const prqc of prqcArray) {
     prqcs[prqc.id] = await prqc.questions

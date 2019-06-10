@@ -4,6 +4,8 @@ import { getUUIDByString, insert } from "./util/"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { InsertResult } from "typeorm"
 
+import { logger } from "./config/winston"
+
 const courseIDs = {
   "cybersecurity-intro": "en_US",
   "cybersecurity-securing-software": "en_US",
@@ -53,14 +55,14 @@ export async function migrateCourses(
   const courses: { [key: string]: Course } = {}
   const courseTranslations: Array<QueryPartialEntity<CourseTranslation>> = []
 
-  const existingCourses = await Course.find({})
+  /*const existingCourses = await Course.find({})
   if (existingCourses.length > 0) {
-    console.log("Existing courses found in database, skipping migration")
+    logger.info"Existing courses found in database, skipping migration")
     for (const course of existingCourses) {
       courses[course.id] = course
     }
     return Promise.resolve(courses)
-  }
+  }*/
 
   const bar = progressBar("Creating courses", Object.entries(courseIDs).length)
   await Promise.all(
@@ -83,7 +85,7 @@ export async function migrateCourses(
     ),
   )
 
-  console.log("done")
+  logger.info("done")
 
   // await insert(Course, courses)
   await insert(

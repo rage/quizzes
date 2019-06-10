@@ -12,21 +12,26 @@ import {
   Quiz as QNQuiz,
 } from "./app-modules/models"
 
+import { logger } from "./config/winston"
+
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { progressBar, safeGet } from "./util"
 import { getUUIDByString, insert } from "./util/"
 import { LAST_MIGRATION } from "./"
 
-export async function migratePeerReviewQuestions() {
-  console.log("Querying peer review questions...")
+export async function migratePeerReviewQuestions(
+  peerReviewQuestions: any[],
+  peerReviews: any[],
+) {
+  /*logger.info"Querying peer review questions...")
   const peerReviewQuestions = await QNQuiz.find({
     type: { $in: [oldQuizTypes.PEER_REVIEW] },
     $or: [
       { createdAt: { $gte: LAST_MIGRATION } },
       { updatedAt: { $gte: LAST_MIGRATION } },
     ],
-  })
-  console.log("peer reviews: ", peerReviewQuestions.length)
+  })*/
+  logger.info("peer reviews: ", peerReviewQuestions.length)
   const bar = progressBar(
     "Migrating peer review questions",
     peerReviewQuestions.length,
@@ -56,7 +61,7 @@ export async function migratePeerReviewQuestions() {
         return
       }
 
-      const val = await migratePeerReviewQuestion(quiz, oldPRQ)
+      const val = await migratePeerReviewQuestion(quiz, oldPRQ, peerReviews)
       if (!val) {
         answerNotFound++
         return
@@ -72,12 +77,12 @@ export async function migratePeerReviewQuestions() {
     }),
   )
 
-  console.log(
+  logger.info(
     `${quizNotFound} peer review questions did not match any quiz and ` +
       `${answerNotFound} peer review questions did not have any answers.`,
   )
 
-  console.log("Inserting peer review questions")
+  logger.info("Inserting peer review questions")
   await insert(PeerReviewCollection, collections)
   await insert(
     PeerReviewCollectionTranslation,
@@ -95,6 +100,7 @@ export async function migratePeerReviewQuestions() {
 async function migratePeerReviewQuestion(
   quiz: Quiz,
   oldPRQ: { [key: string]: any },
+  peerReviews: any[],
 ): Promise<
   [
     QueryPartialEntity<PeerReviewCollection>,
@@ -105,14 +111,17 @@ async function migratePeerReviewQuestion(
 > {
   const languageId = (await quiz.course).languages[0].id
 
-  const peerReviewSample = await QNPeerReview.findOne({
+  /*const peerReviewSample = await QNPeerReview.findOne({
     $or: [{ quizId: oldPRQ._id }, { sourceQuizId: oldPRQ._id }],
-  })
+  })*/
 
-  // this would skip all new peer review quizzes and we don't want that
-  /* if (!peerReviewSample) {
+  const peerReviewSample = peerReviews.find(
+    pr => pr.quizId === oldPRQ._id || pr.sourceQuizId === oldPRQ._id,
+  )
+
+  if (!peerReviewSample) {
     return null
-  }*/
+  }
 
   const collection = {
     id: getUUIDByString(oldPRQ._id),

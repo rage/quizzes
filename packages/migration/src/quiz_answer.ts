@@ -15,21 +15,24 @@ import { calculateChunkSize, progressBar } from "./util"
 import { getUUIDByString, insert } from "./util/"
 import { LAST_MIGRATION } from "./"
 
+import { logger } from "./config/winston"
+
 export async function migrateQuizAnswers(
   quizzes: { [quizID: string]: Quiz },
   users: { [userID: string]: User },
+  answers: any[],
 ): Promise<{ [answerID: string]: boolean }> {
-  console.log("Querying quiz answers...")
+  logger.info("Querying quiz answers...")
 
   const database = Container.get(Database)
   const conn = await database.getConnection()
 
-  const answers = await QNQuizAnswer.find({
+  /*const answers = await QNQuizAnswer.find({
     $or: [
       { createdAt: { $gte: LAST_MIGRATION } },
       { updatedAt: { $gte: LAST_MIGRATION } },
     ],
-  })
+  })*/
   const bar = progressBar("Migrating quiz answers", answers.length)
   let quizNotFound = 0
   let userNotFound = 0
@@ -240,7 +243,7 @@ export async function migrateQuizAnswers(
     },
   )
 
-  console.log("Deprecating duplicate answers...")
+  logger.info("Deprecating duplicate answers...")
   await conn.query(`
     UPDATE quiz_answer
     SET status='deprecated'
@@ -259,7 +262,7 @@ export async function migrateQuizAnswers(
       WHERE qa1.created_at < qa2.last_created_at
     );`)
 
-  console.log(
+  logger.info(
     `Quiz answers migrated. ${quizNotFound} did not match any quiz and ` +
       `${userNotFound} did not match any user`,
   )

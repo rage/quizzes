@@ -16,12 +16,15 @@ import { progressBar, safeGet } from "./util"
 import { AdvancedConsoleLogger } from "typeorm"
 import { LAST_MIGRATION } from "./"
 
-export async function migrateQuizzes(courses: {
-  [key: string]: Course
-}): Promise<{ [quizID: string]: Quiz }> {
+import { logger } from "./config/winston"
+
+export async function migrateQuizzes(
+  courses: { [key: string]: Course },
+  oldQuizzes: any[],
+): Promise<{ [quizID: string]: Quiz }> {
   const eaiRegex = /ai_([0-9])_([0-9])/
 
-  console.log("Querying quizzes...")
+  /*logger.info"Querying quizzes...")
   const oldQuizzes = await QNQuiz.find({
     type: {
       $in: [
@@ -39,7 +42,8 @@ export async function migrateQuizzes(courses: {
       { createdAt: { $gte: LAST_MIGRATION } },
       { updatedAt: { $gte: LAST_MIGRATION } },
     ],
-  })
+  })*/
+
   const quizzes: Array<QueryPartialEntity<Quiz>> = []
   const quizTranslations: Array<QueryPartialEntity<QuizTranslation>> = []
   const quizItems: Array<QueryPartialEntity<QuizItem>> = []
@@ -76,7 +80,7 @@ export async function migrateQuizzes(courses: {
       }
     }
 
-    console.log(oldQuiz._id)
+    // logger.infooldQuiz._id)
 
     const languageId = course.languages[0].id
     if (!course || !course.languages || !languageId) {
@@ -94,7 +98,7 @@ export async function migrateQuizzes(courses: {
     }
     quizzes.push(quiz)
     if (!quiz.course) {
-      console.log("course: ", quiz.course)
+      logger.info("course: ", quiz.course)
     }
     quizTranslations.push({
       quizId: quiz.id,
@@ -112,8 +116,12 @@ export async function migrateQuizzes(courses: {
     const rightAnswer = safeGet(() => meta.rightAnswer)
     const successes = safeGet(() => meta.successes) || {}
     const errors = safeGet(() => meta.errors) || {}
-    const oldItems = safeGet(() => oldQuiz.data.items) || []
-    const oldChoices = safeGet(() => oldQuiz.data.choices) || []
+    let oldItems = safeGet(() => oldQuiz.data.items) || []
+    let oldChoices = safeGet(() => oldQuiz.data.choices) || []
+
+    oldItems = oldItems.filter((item: any) => item !== null)
+    oldChoices = oldItems.filter((choice: any) => choice !== null)
+
     switch (oldQuiz.type) {
       case oldQuizTypes.ESSAY:
       case oldQuizTypes.OPEN:
@@ -264,7 +272,7 @@ export async function migrateQuizzes(courses: {
     bar.tick()
   }
 
-  console.log("Inserting quizzes...", quizzes.length)
+  logger.info("Inserting quizzes...", quizzes.length)
   await insert(Quiz, quizzes)
   await insert(QuizTranslation, quizTranslations, `"quiz_id", "language_id"`)
   await insert(QuizItem, quizItems)
@@ -280,7 +288,7 @@ export async function migrateQuizzes(courses: {
     `"quiz_option_id", "language_id"`,
   )
 
-  console.log("Querying inserted quizzes...")
+  logger.info("Querying inserted quizzes...")
   const newQuizzes: { [quizID: string]: Quiz } = {}
   const quizArr = await Quiz.createQueryBuilder("quiz")
     .leftJoinAndSelect("quiz.course", "course")
