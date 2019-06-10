@@ -302,8 +302,10 @@ class PeerReviewsSummary extends React.Component<any, any> {
                   return (
                     <React.Fragment key={question.id}>
                       <Grid item={true} xs={4} lg={6}>
-                        {question.texts[0].title || "No title"}
-                        {question.type === "essay" && " (Essay)"}:
+                        {question.texts[0].title ||
+                          (question.type === "essay"
+                            ? "Written review"
+                            : "No title")}
                       </Grid>
                       <Grid item={true} xs={4} lg={3}>
                         {question.type === "essay"
