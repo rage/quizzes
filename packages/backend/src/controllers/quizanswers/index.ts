@@ -120,14 +120,14 @@ export class QuizAnswerController {
   @Post("/:answerId")
   public async modifyStatus(
     @Param("answerId") id: string,
-    @Body() body: any,
+    @Body() body: { newStatus: QuizAnswerStatus },
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    const newStatus: QuizAnswerStatus = body.newStatus
-
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
     }
+
+    const newStatus: QuizAnswerStatus = body.newStatus
 
     const existingAnswer = await this.quizAnswerService.getAnswer(
       { id: id },
@@ -138,14 +138,14 @@ export class QuizAnswerController {
       return
     }
 
+    const quiz = (await this.quizService.getQuizzes({
+      id: existingAnswer.quizId,
+    }))[0]
+
     let userQuizState = await this.userQuizStateService.getUserQuizState(
       existingAnswer.userId,
       existingAnswer.quizId,
     )
-
-    const quiz = (await this.quizService.getQuizzes({
-      id: existingAnswer.quizId,
-    }))[0]
 
     if (!userQuizState) {
       userQuizState = new UserQuizState()
@@ -169,10 +169,8 @@ export class QuizAnswerController {
 
       if (newStatus === "confirmed" && oldStatus !== "confirmed") {
         userQuizState.pointsAwarded = quiz.points
-        userQuizState = await this.userQuizStateService.createUserQuizState(
-          manager,
-          userQuizState,
-        )
+
+        userQuizState = await manager.save(userQuizState)
 
         userCoursePartState = await this.userCoursePartStateService.updateUserCoursePartState(
           manager,

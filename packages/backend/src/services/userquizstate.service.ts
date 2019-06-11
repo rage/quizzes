@@ -39,7 +39,6 @@ export default class UserQuizStateService {
     return await manager.save(userQuizState)
   }
 
-  // must have user id and quiz id set!
   public async createAndCompleteUserQuizState(
     manager: EntityManager,
     userQuizState: UserQuizState,
@@ -58,7 +57,10 @@ export default class UserQuizStateService {
         user_id: userQuizState.userId,
       })
 
-    if (!userQuizState.spamFlags) {
+    if (
+      typeof userQuizState.spamFlags !== "number" &&
+      !userQuizState.spamFlags
+    ) {
       userQuizState.spamFlags = (await manager
         .createQueryBuilder(SpamFlag, "spam_flag")
         .select("COUNT(*)")
@@ -66,8 +68,11 @@ export default class UserQuizStateService {
         .setParameters(quizAnswerIds.getParameters())
         .getRawOne()).count
     }
-
-    if (!userQuizState.peerReviewsGiven) {
+    if (
+      typeof userQuizState.peerReviewsGiven !== "number" &&
+      !userQuizState.peerReviewsGiven
+    ) {
+      // change no not use peer review collection?
       userQuizState.peerReviewsGiven = (await manager
         .createQueryBuilder(PeerReview, "peer_review")
         .select("COUNT(*)")
@@ -85,7 +90,10 @@ export default class UserQuizStateService {
         .getRawOne()).count
     }
 
-    if (!userQuizState.peerReviewsReceived) {
+    if (
+      typeof userQuizState.peerReviewsReceived !== "number" &&
+      !userQuizState.peerReviewsReceived
+    ) {
       userQuizState.peerReviewsReceived = (await manager
         .createQueryBuilder(PeerReview, "peer_review")
         .select("COUNT(*)")
@@ -100,7 +108,7 @@ export default class UserQuizStateService {
       userQuizState.status = "locked"
     }
 
-    if (!userQuizState.tries) {
+    if (typeof userQuizState.tries !== "number" || userQuizState.tries === 0) {
       // number of stored quiz answers - if multiple can be created?
       userQuizState.tries = (await manager
         .createQueryBuilder(QuizAnswer, "quiz_answer")

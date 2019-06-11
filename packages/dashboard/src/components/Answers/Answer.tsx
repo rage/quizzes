@@ -25,6 +25,14 @@ import PeerReviewsModal from "./PeerReviewsModal"
 class Answer extends React.Component<any, any> {
   private answerRef: React.RefObject<HTMLElement>
 
+  private borderColorsByStatus = {
+    submitted: "#FB6949",
+    spam: "#FB6949",
+    confirmed: "#48fa5d",
+    rejected: "#d80027",
+    deprecated: "#9b9b9b",
+  }
+
   constructor(props) {
     super(props)
     this.answerRef = React.createRef<HTMLElement>()
@@ -53,10 +61,7 @@ class Answer extends React.Component<any, any> {
             style={{
               borderLeft:
                 "1em solid " +
-                (this.props.answerData.status === "submitted" ||
-                this.props.answerData.status === "spam"
-                  ? "#FB6949"
-                  : "#49C7FB"),
+                this.borderColorsByStatus[this.props.answerData.status],
             }}
           >
             <Grid container={true} justify="center">
@@ -118,35 +123,39 @@ class Answer extends React.Component<any, any> {
                   }}
                 >
                   <Grid item={true} xs={6} lg={4}>
-                    <Grid container={true} justify="flex-start" spacing={16}>
-                      <Grid item={true} xs="auto">
-                        <Button
-                          variant="contained"
-                          style={{
-                            backgroundColor: "#029422",
-                            borderRadius: "0",
-                            color: "white",
-                          }}
-                          onClick={this.confirmStatusChange("accept")}
-                        >
-                          Accept
-                        </Button>
-                      </Grid>
+                    {this.props.answerData.status === "confirmed" ? (
+                      ""
+                    ) : (
+                      <Grid container={true} justify="flex-start" spacing={16}>
+                        <Grid item={true} xs="auto">
+                          <Button
+                            variant="contained"
+                            style={{
+                              backgroundColor: "#029422",
+                              borderRadius: "0",
+                              color: "white",
+                            }}
+                            onClick={this.confirmStatusChange("accept")}
+                          >
+                            Accept
+                          </Button>
+                        </Grid>
 
-                      <Grid item={true} xs="auto">
-                        <Button
-                          variant="contained"
-                          style={{
-                            backgroundColor: "#D80027",
-                            borderRadius: "0",
-                            color: "white",
-                          }}
-                          onClick={this.confirmStatusChange("reject")}
-                        >
-                          Reject
-                        </Button>
+                        <Grid item={true} xs="auto">
+                          <Button
+                            variant="contained"
+                            style={{
+                              backgroundColor: "#D80027",
+                              borderRadius: "0",
+                              color: "white",
+                            }}
+                            onClick={this.confirmStatusChange("reject")}
+                          >
+                            Reject
+                          </Button>
+                        </Grid>
                       </Grid>
-                    </Grid>
+                    )}
                   </Grid>
 
                   <Grid item={true} xs={2} style={{ textAlign: "center" }}>
