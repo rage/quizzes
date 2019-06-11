@@ -31,6 +31,7 @@ import { addUser, removeUser } from "./store/user/actions"
 class App extends React.Component<any, any> {
   public async componentDidMount() {
     const user = TMCApi.checkStore()
+    console.log("User: ", user)
     if (user) {
       const profile = await TMCApi.getProfile(user.accessToken)
       if ((profile as ITMCProfileDetails).administrator) {
@@ -135,6 +136,7 @@ class App extends React.Component<any, any> {
 
                   <div style={{ height: 80 }} />
                 </div>
+
                 <Route exact={true} path="/" component={CoursesView} />
                 <Route exact={true} path="/quizzes/:id" component={this.edit} />
                 <Route exact={true} path="/new" component={this.create} />
@@ -151,22 +153,7 @@ class App extends React.Component<any, any> {
                 />
               </div>
             ) : (
-              <div>
-                <Route
-                  exact={true}
-                  path="/"
-                  CourseStatisticscomponent={Login}
-                />
-                <Route exact={true} path="/quizzes/:id" component={Login} />
-                <Route exact={true} path="/new" component={Login} />
-                <Route exact={true} path="/courses" component={Login} />
-                <Route exact={true} path="/courses/:id" component={Login} />
-                <Route
-                  exact={true}
-                  path="/quizzes/:id/answers"
-                  component={Login}
-                />
-              </div>
+              <Route exact={false} path="/" component={Login} />
             )}
           </React.Fragment>
         </Router>
