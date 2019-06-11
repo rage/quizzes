@@ -31,7 +31,6 @@ import { addUser, removeUser } from "./store/user/actions"
 class App extends React.Component<any, any> {
   public async componentDidMount() {
     const user = TMCApi.checkStore()
-    console.log("User: ", user)
     if (user) {
       const profile = await TMCApi.getProfile(user.accessToken)
       if ((profile as ITMCProfileDetails).administrator) {
