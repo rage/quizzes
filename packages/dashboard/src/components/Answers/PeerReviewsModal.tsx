@@ -1,7 +1,5 @@
 import {
   Button,
-  Card,
-  CardContent,
   Dialog,
   DialogActions,
   DialogContent,
@@ -106,10 +104,9 @@ const PeerReview = ({
                     questionAnswer={answer}
                     title={
                       peerReviewQuestions.questions[answerIdx].texts[0].title ||
-                      (peerReviewQuestions.questions[answerIdx].type ===
-                        "essay" &&
-                        "Written review") ||
-                      "No title"
+                      (peerReviewQuestions.questions[answerIdx].type === "essay"
+                        ? "Written review"
+                        : "No title")
                     }
                   />
                 </Grid>
