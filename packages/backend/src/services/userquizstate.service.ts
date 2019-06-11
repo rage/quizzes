@@ -72,7 +72,6 @@ export default class UserQuizStateService {
       typeof userQuizState.peerReviewsGiven !== "number" &&
       !userQuizState.peerReviewsGiven
     ) {
-      // change no not use peer review collection?
       userQuizState.peerReviewsGiven = (await manager
         .createQueryBuilder(PeerReview, "peer_review")
         .select("COUNT(*)")
@@ -109,7 +108,6 @@ export default class UserQuizStateService {
     }
 
     if (typeof userQuizState.tries !== "number" || userQuizState.tries === 0) {
-      // number of stored quiz answers - if multiple can be created?
       userQuizState.tries = (await manager
         .createQueryBuilder(QuizAnswer, "quiz_answer")
         .select("COUNT(*)")

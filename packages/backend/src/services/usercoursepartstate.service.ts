@@ -74,38 +74,10 @@ export default class UserCoursePartStateService {
         quiz.part,
       )
     } else {
-      const quizzesInPart = await this.quizService.getQuizzes({
-        courseId: quiz.courseId,
-        coursePart: quiz.part,
-        exclude: true,
-      })
-
-      let pointsTotal: number = 0
-      const quizIds: string[] = quizzesInPart.map(quiz => {
-        pointsTotal += quiz.points
-        return quiz.id
-      })
-
-      const userQuizStates: UserQuizState[] = await this.userQuizStateService.getQuizStatesForUserCourse(
+      userCoursePartState = await this.calculateProgressData(
         manager,
-        userId,
-        quizIds,
+        userCoursePartState,
       )
-
-      let pointsAwarded: number = 0
-
-      userQuizStates.forEach(uqs => {
-        pointsAwarded += uqs.pointsAwarded
-      })
-
-      userCoursePartState.score = (pointsAwarded / pointsTotal) * 100
-      userCoursePartState.progress =
-        (userQuizStates.length / quizzesInPart.length) * 100
-
-      if (userCoursePartState.score > 99.99) {
-        userCoursePartState.completed = true
-      }
-
       return await manager.save(userCoursePartState)
     }
   }
@@ -116,9 +88,25 @@ export default class UserCoursePartStateService {
     courseId: string,
     coursePart: number,
   ): Promise<UserCoursePartState> {
+    let userCoursePartState: UserCoursePartState = new UserCoursePartState()
+    userCoursePartState.userId = userId
+    userCoursePartState.courseId = courseId
+    userCoursePartState.coursePart = coursePart
+
+    userCoursePartState = await this.calculateProgressData(
+      manager,
+      userCoursePartState,
+    )
+    return await manager.save(userCoursePartState)
+  }
+
+  private async calculateProgressData(
+    manager: EntityManager,
+    userCoursePartState: UserCoursePartState,
+  ): Promise<UserCoursePartState> {
     const quizzesInPart = await this.quizService.getQuizzes({
-      courseId: courseId,
-      coursePart: coursePart,
+      courseId: userCoursePartState.courseId,
+      coursePart: userCoursePartState.coursePart,
       exclude: true,
     })
 
@@ -130,20 +118,16 @@ export default class UserCoursePartStateService {
 
     const userQuizStates: UserQuizState[] = await this.userQuizStateService.getQuizStatesForUserCourse(
       manager,
-      userId,
+      userCoursePartState.userId,
       quizIds,
     )
 
-    const userCoursePartState: UserCoursePartState = new UserCoursePartState()
-
     let pointsAwarded: number = 0
+
     userQuizStates.forEach(uqs => {
       pointsAwarded += uqs.pointsAwarded
     })
 
-    userCoursePartState.userId = userId
-    userCoursePartState.courseId = courseId
-    userCoursePartState.coursePart = coursePart
     userCoursePartState.score = (pointsAwarded / pointsTotal) * 100
     userCoursePartState.progress =
       (userQuizStates.length / quizzesInPart.length) * 100
@@ -152,6 +136,6 @@ export default class UserCoursePartStateService {
       userCoursePartState.completed = true
     }
 
-    return await manager.save(userCoursePartState)
+    return userCoursePartState
   }
 }

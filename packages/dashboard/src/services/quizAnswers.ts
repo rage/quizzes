@@ -30,8 +30,6 @@ export const updateQuizAnswerStatus = async (
       headers: { authorization: `Bearer ${user.accessToken}` },
     },
   )
-
-  console.log("Response to answer status update ", response.data)
   return response.data
 }
 
