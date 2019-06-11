@@ -64,6 +64,7 @@ export async function migrateCourses(
     return Promise.resolve(courses)
   }*/
 
+  logger.info("Creating courses")
   const bar = progressBar("Creating courses", Object.entries(courseIDs).length)
   await Promise.all(
     Object.entries(courseIDs).map(
@@ -84,8 +85,6 @@ export async function migrateCourses(
       },
     ),
   )
-
-  logger.info("done")
 
   // await insert(Course, courses)
   await insert(

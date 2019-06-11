@@ -23,6 +23,8 @@ import dotenv from "dotenv"
 
 import * as appRoot from "app-root-path"
 
+import { getUUIDByString, insert } from "./util/"
+
 if (process.env.NODE_ENV !== "production") {
   dotenv.config({ path: `${appRoot.path}/.env` })
 }
@@ -76,7 +78,7 @@ async function main() {
     users,
     data.quizAnswers,
   )
-  // await migrateSpamFlags(users, data.spamFlags)
+  await migrateSpamFlags(users, data.spamFlags)
   await migratePeerReviews(users, existingAnswers, data.peerReviews)
 
   await manager.query(

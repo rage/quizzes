@@ -27,13 +27,29 @@ export async function migrateUsers(
 
   const userInfo = await getUserInfo(usernames)
 
-  logger.info("Converting users...")
-  const dbInput = userInfo.map(
-    (info: any): QueryPartialEntity<User> => ({
-      id: info.id,
-    }),
+  const currentUserIds: { [id: string]: boolean } = {}
+  ;(await User.createQueryBuilder()
+    .select(["id"])
+    .getRawMany()).map(
+    (idObject: { id: string }) => (currentUserIds[idObject.id] = true),
   )
-  logger.info("Inserting users...")
+
+  logger.info(
+    `${Object.keys(currentUserIds).length} existing users in the database`,
+  )
+
+  logger.info("Converting users...")
+  const dbInput = userInfo
+    .filter(info => !currentUserIds[info.id])
+    .map(
+      (info: any): QueryPartialEntity<User> => {
+        return {
+          id: info.id,
+        }
+      },
+    )
+
+  logger.info(`Inserting ${dbInput.length} users...`)
   const chunkSize = calculateChunkSize(dbInput[0])
   for (let i = 0; i < dbInput.length; i += chunkSize) {
     await insert(User, dbInput.slice(i, i + chunkSize))
