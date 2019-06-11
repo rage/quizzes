@@ -54,39 +54,141 @@ export default class QuizAnswerService {
   }
 
   public async getAnswers(query: IQuizAnswerQuery): Promise<QuizAnswer[]> {
-    const { id, quizId, userId } = query
+    const {
+      id,
+      quizId,
+      userId,
+      statuses,
+      firstAllowedTime,
+      lastAllowedTime,
+      languageIds,
+      peerReviewsGiven,
+      peerReviewsReceived,
+      spamFlags,
+      addPeerReviews,
+    } = query
 
     const queryBuilder: SelectQueryBuilder<
       QuizAnswer
     > = QuizAnswer.createQueryBuilder("quiz_answer")
 
-    if (!id && !quizId && !userId) {
+    if (
+      !id &&
+      !quizId &&
+      (!statuses || statuses.length === 0) &&
+      !firstAllowedTime &&
+      !lastAllowedTime &&
+      (!languageIds || languageIds.length === 0) &&
+      typeof peerReviewsGiven !== "number" &&
+      typeof peerReviewsReceived !== "number" &&
+      typeof spamFlags !== "number"
+    ) {
       return []
     }
 
+    if (addPeerReviews) {
+      queryBuilder
+        .leftJoinAndMapMany(
+          "quiz_answer.peerReviews",
+          PeerReview,
+          "peer_review",
+          "peer_review.quiz_answer_id = quiz_answer.id",
+        )
+        .leftJoinAndSelect("peer_review.answers", "peer_review_question_answer")
+    }
+
+    // so we can addWhere without regard for the first occurrence of 'where'
+    queryBuilder.where("1 = 1")
+
     if (id) {
-      queryBuilder.where("quiz_answer.id = :id", { id })
+      queryBuilder.andWhere("quiz_answer.id = :id", { id })
     }
 
     if (quizId) {
-      queryBuilder.where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
+      queryBuilder.andWhere("quiz_answer.quiz_id = :quiz_id", {
+        quiz_id: quizId,
+      })
     }
 
     if (userId) {
-      queryBuilder.where("quiz_answer.user_id = :user_id", { user_id: userId })
+      queryBuilder.andWhere("quiz_answer.user_id = :user_id", {
+        user_id: userId,
+      })
     }
 
-    queryBuilder.leftJoinAndSelect(
-      "quiz_answer.item_answers",
-      "quiz_item_answer",
-      "quiz_item_answer.quiz_answer_id = quiz_answer.id",
-    )
+    if (statuses && statuses.length > 0) {
+      queryBuilder.andWhere("quiz_answer.status IN (:...statuses)", {
+        statuses: statuses,
+      })
+    }
 
-    queryBuilder.leftJoinAndSelect(
-      "quiz_item_answer.options",
-      "quiz_option_answer",
-      "quiz_option_answer.quiz_item_answer_id = quiz_item_answer.id",
-    )
+    if (firstAllowedTime) {
+      queryBuilder.andWhere("quiz_answer.created_at > :first_date", {
+        first_date: firstAllowedTime,
+      })
+    }
+
+    if (lastAllowedTime) {
+      queryBuilder.andWhere("quiz_answer_created_at < :last_date", {
+        last_date: lastAllowedTime,
+      })
+    }
+
+    if (languageIds && languageIds.length > 0) {
+      queryBuilder.andWhere("quiz_answer.language_id IN (:...language_ids)", {
+        language_ids: languageIds,
+      })
+    }
+
+    if (typeof peerReviewsGiven === "number" && userId) {
+      //certain to work but slower
+      const givenQuery = await PeerReview.createQueryBuilder("peer_review")
+        .select("peer_review.user_id")
+        .addSelect("COUNT(*)")
+        .groupBy("peer_review.user_id")
+        .having("count >= :given_count", { given_count: peerReviewsGiven })
+
+      //words if user_quiz_state up to date
+      //to do
+
+      queryBuilder
+        .andWhere("quiz_answer.user_id IN (" + givenQuery.getQuery() + ")")
+        .setParameters(givenQuery.getParameters())
+    }
+
+    if (typeof peerReviewsReceived === "number") {
+      //certain to work but slower
+      const receivedQuery = PeerReview.createQueryBuilder("peer_review")
+        .select("peer_review.quiz_answer_id")
+        .addSelect("COUNT(*)")
+        .groupBy("peer_review.quiz_answer_id")
+        .having("count >= :received_count", {
+          received_count: peerReviewsReceived,
+        })
+
+      //words if user_quiz_state up to date
+      // to do
+
+      queryBuilder
+        .andWhere("quiz_answer.id IN (" + receivedQuery.getQuery() + ")")
+        .setParameters(receivedQuery.getParameters())
+    }
+
+    if (typeof spamFlags === "number") {
+      // etsitään kaikki sopivat
+      const spamQuery = await SpamFlag.createQueryBuilder("spam_flag")
+        .select("spam_flag.quiz_answer_id")
+        .addSelect("COUNT(*)")
+        .groupBy("spam_flag.quiz_answer_id")
+        .having("count >= :num_of_flags", { num_of_flags: spamFlags })
+
+      queryBuilder
+        .andWhere("quiz_answer.id IN (" + spamQuery.getQuery() + ")")
+        .setParameters(spamQuery.getParameters)
+    }
+
+    console.log("Logging the sql")
+    queryBuilder.printSql()
 
     return await queryBuilder.getMany()
   }
@@ -98,6 +200,7 @@ export default class QuizAnswerService {
     addPeerReviews?: boolean,
   ): Promise<QuizAnswer[]> {
     let query = QuizAnswer.createQueryBuilder("quiz_answer")
+
     if (addPeerReviews) {
       query = query
         .leftJoinAndMapMany(

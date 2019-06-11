@@ -19,7 +19,7 @@ import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { API_PATH } from "../../config"
 import { Quiz, QuizAnswer, User, UserQuizState } from "../../models"
-import { ITMCProfileDetails } from "../../types"
+import { ITMCProfileDetails, IQuizAnswerQuery } from "../../types"
 
 const MAX_LIMIT = 100
 
@@ -67,6 +67,36 @@ export class QuizAnswerController {
     }
 
     const result = await this.quizAnswerService.getAnswersStatistics(quizId)
+    return result
+  }
+
+  @Get("/salainen_testi")
+  public async getAnswersByCriteria(
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const query: IQuizAnswerQuery = {
+      // id: "juu",
+      quizId: "3c954097-268f-44bf-9d2e-1efaf9e8f122",
+      //userId: 94279,
+
+      // should prob only use statuses
+      statuses: ["confirmed", "rejected"],
+      /*
+      firstAllowedTime: new Date(2016, 1, 21, 10, 33, 30, 0),
+      lastAllowedTime: new Date(),
+      languageIds: [],
+      peerReviewsGiven: 0,
+      peerReviewsReceived: 0,
+      spamFlags: 0,
+      */
+      addPeerReviews: false,
+    }
+
+    const result = await this.quizAnswerService.getAnswers(query)
     return result
   }
 

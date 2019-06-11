@@ -60,7 +60,18 @@ export interface IQuizAnswerQuery {
   id?: string
   quizId?: string
   userId?: number
+  // should prob only use statuses
   status?: string
+  statuses?: string[]
+  firstAllowedTime?: Date
+  lastAllowedTime?: Date
+  languageIds?: string[]
+  // or: max and min for peer reviews given/received
+  peerReviewsGiven?: number
+  peerReviewsReceived?: number
+  // similarly: min/max spamflags
+  spamFlags?: number
+  addPeerReviews?: boolean
 }
 
 interface ICourseQuery {
