@@ -3,6 +3,7 @@ import {
   BeforeInsert,
   Column,
   CreateDateColumn,
+  Index,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -23,6 +24,8 @@ export class QuizItemAnswer extends BaseEntity {
   @ManyToOne(type => QuizAnswer, qa => qa.id)
   @JoinColumn()
   public quizAnswer: Promise<QuizAnswer>
+
+  @Index()
   @Column({ nullable: true })
   public quizAnswerId: string | null
 
