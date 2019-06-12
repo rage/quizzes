@@ -81,19 +81,26 @@ export class QuizAnswerController {
     const query: IQuizAnswerQuery = {
       // id: "juu",
       quizId: "3c954097-268f-44bf-9d2e-1efaf9e8f122",
-      //userId: 94279,
+      userId: 87900,
 
       // should prob only use statuses
       statuses: ["confirmed", "rejected"],
+
+      firstAllowedTime: new Date(2018, 7, 1),
+      lastAllowedTime: new Date(2018, 7, 10),
+
+      languageIds: ["en_US"],
+      // peerReviewsGiven: 2,
       /*
-      firstAllowedTime: new Date(2016, 1, 21, 10, 33, 30, 0),
-      lastAllowedTime: new Date(),
-      languageIds: [],
-      peerReviewsGiven: 0,
       peerReviewsReceived: 0,
       spamFlags: 0,
+
+
+
+      792296
+      792296
       */
-      addPeerReviews: false,
+      addPeerReviews: true,
     }
 
     const result = await this.quizAnswerService.getAnswers(query)
@@ -118,12 +125,21 @@ export class QuizAnswerController {
       limit = MAX_LIMIT
     }
 
+    const limitDate = new Date()
+    limitDate.setDate(limitDate.getDate() - 300)
+
+    const attentionCriteriaQuery: IQuizAnswerQuery = {
+      quizId,
+      // firstAllowedTime: limitDate,
+      statuses: ["spam", "submitted"],
+      addPeerReviews: true,
+    }
+
     result = attention
       ? await this.quizAnswerService.getAttentionAnswers(
-          quizId,
+          attentionCriteriaQuery,
           skip,
           limit,
-          true,
         )
       : await this.quizAnswerService.getEveryonesAnswers(
           quizId,

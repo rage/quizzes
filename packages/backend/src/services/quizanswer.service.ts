@@ -1,7 +1,13 @@
 import { Inject, Service } from "typedi"
-import { EntityManager, SelectQueryBuilder } from "typeorm"
+import { EntityManager, SelectQueryBuilder, getConnection } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
-import { PeerReview, QuizAnswer, UserQuizState, SpamFlag } from "../models"
+import {
+  PeerReview,
+  QuizAnswer,
+  UserQuizState,
+  SpamFlag,
+  PeerReviewCollection,
+} from "../models"
 import { IQuizAnswerQuery } from "../types"
 import { WhereBuilder } from "../util/index"
 import QuizService from "./quiz.service"
@@ -53,7 +59,9 @@ export default class QuizAnswerService {
     return await queryBuilder.orderBy("quiz_answer.updated_at", "DESC").getOne()
   }
 
-  public async getAnswers(query: IQuizAnswerQuery): Promise<QuizAnswer[]> {
+  private async constructGetAnswersQuery(
+    query: IQuizAnswerQuery,
+  ): Promise<SelectQueryBuilder<QuizAnswer>> {
     const {
       id,
       quizId,
@@ -83,7 +91,7 @@ export default class QuizAnswerService {
       typeof peerReviewsReceived !== "number" &&
       typeof spamFlags !== "number"
     ) {
-      return []
+      return null
     }
 
     if (addPeerReviews) {
@@ -123,13 +131,13 @@ export default class QuizAnswerService {
     }
 
     if (firstAllowedTime) {
-      queryBuilder.andWhere("quiz_answer.created_at > :first_date", {
+      queryBuilder.andWhere("quiz_answer.created_at >= :first_date", {
         first_date: firstAllowedTime,
       })
     }
 
     if (lastAllowedTime) {
-      queryBuilder.andWhere("quiz_answer_created_at < :last_date", {
+      queryBuilder.andWhere("quiz_answer.created_at <= :last_date", {
         last_date: lastAllowedTime,
       })
     }
@@ -140,57 +148,110 @@ export default class QuizAnswerService {
       })
     }
 
-    if (typeof peerReviewsGiven === "number" && userId) {
-      //certain to work but slower
-      const givenQuery = await PeerReview.createQueryBuilder("peer_review")
-        .select("peer_review.user_id")
-        .addSelect("COUNT(*)")
-        .groupBy("peer_review.user_id")
-        .having("count >= :given_count", { given_count: peerReviewsGiven })
+    // to make sense, the peer reviews for a certain quiz
+    if (
+      typeof peerReviewsGiven === "number" &&
+      (peerReviewsGiven >= 0 && peerReviewsGiven < 1000) &&
+      quizId
+    ) {
+      // is table peer_review_collection up-to-date?
+      const prcIsInGoodShape = true
 
-      //words if user_quiz_state up to date
-      //to do
+      let goodQuery: string
 
-      queryBuilder
-        .andWhere("quiz_answer.user_id IN (" + givenQuery.getQuery() + ")")
-        .setParameters(givenQuery.getParameters())
+      if (prcIsInGoodShape) {
+        const prcIdsQuery = await PeerReviewCollection.createQueryBuilder(
+          "peer_review_collection",
+        )
+          .select("peer_review_collection.id")
+          .where("peer_review_collection.quiz_id = :quiz_id", {
+            quiz_id: quizId,
+          })
+
+        const givenQuery = await PeerReview.createQueryBuilder("peer_review")
+          .select("peer_review.user_id", "user_id")
+          .addSelect("COUNT(*)", "count")
+          .where(
+            "peer_review.peer_review_collection_id IN (" +
+              prcIdsQuery.getQuery() +
+              ")",
+          )
+          .setParameters(prcIdsQuery.getParameters())
+          .groupBy("peer_review.user_id")
+          .having("peer_review.count >= " + peerReviewsGiven)
+        goodQuery =
+          "SELECT user_id AS user_id FROM (" +
+          givenQuery.getQuery() +
+          ") AS foo"
+      } else {
+      }
+
+      queryBuilder.andWhere("quiz_answer.user_id IN (" + goodQuery + ")")
     }
 
-    if (typeof peerReviewsReceived === "number") {
+    // peer reviews for certain quiz: received total of all peer reviews is of no interest!
+    if (
+      typeof peerReviewsReceived === "number" &&
+      peerReviewsReceived >= 0 &&
+      peerReviewsReceived <= 1000 &&
+      !quizId
+    ) {
       //certain to work but slower
+
+      const prcIdsQuery = await PeerReviewCollection.createQueryBuilder(
+        "peer_review_collection",
+      )
+        .select("peer_review_collection.id")
+        .where("peer_review_collection.quiz_id = :quiz_id", { quiz_id: quizId })
+
       const receivedQuery = PeerReview.createQueryBuilder("peer_review")
         .select("peer_review.quiz_answer_id")
-        .addSelect("COUNT(*)")
+        .addSelect("COUNT(*)", "count")
+        .where(
+          "peer_review.peer_review_collection_id IN (" +
+            prcIdsQuery.getQuery() +
+            ")",
+        )
         .groupBy("peer_review.quiz_answer_id")
-        .having("count >= :received_count", {
-          received_count: peerReviewsReceived,
-        })
+        .having("peer_review.count >= " + peerReviewsReceived)
+
+      const goodQuery =
+        "SELECT quiz_answer_id AS quiz_answer_id FROM (" +
+        receivedQuery.getQuery() +
+        ") AS foo2"
 
       //words if user_quiz_state up to date
       // to do
 
       queryBuilder
-        .andWhere("quiz_answer.id IN (" + receivedQuery.getQuery() + ")")
+        .andWhere("quiz_answer.id IN (" + goodQuery + ")")
         .setParameters(receivedQuery.getParameters())
     }
 
-    if (typeof spamFlags === "number") {
+    if (typeof spamFlags === "number" && spamFlags >= 0 && spamFlags <= 10000) {
       // etsitään kaikki sopivat
       const spamQuery = await SpamFlag.createQueryBuilder("spam_flag")
         .select("spam_flag.quiz_answer_id")
-        .addSelect("COUNT(*)")
+        .addSelect("COUNT(*)", "count")
         .groupBy("spam_flag.quiz_answer_id")
-        .having("count >= :num_of_flags", { num_of_flags: spamFlags })
+        .having("count >= " + spamFlags)
 
-      queryBuilder
-        .andWhere("quiz_answer.id IN (" + spamQuery.getQuery() + ")")
-        .setParameters(spamQuery.getParameters)
+      const goodQuery =
+        "SELECT quiz_answer_id AS quiz_answer_id FROM (" +
+        spamQuery.getQuery() +
+        ") AS foo3"
+
+      queryBuilder.andWhere("quiz_answer.id IN (" + goodQuery + ")")
     }
 
     console.log("Logging the sql")
     queryBuilder.printSql()
 
-    return await queryBuilder.getMany()
+    return queryBuilder
+  }
+
+  public async getAnswers(query: IQuizAnswerQuery): Promise<QuizAnswer[]> {
+    return (await this.constructGetAnswersQuery(query)).getMany()
   }
 
   public async getEveryonesAnswers(
@@ -214,6 +275,7 @@ export default class QuizAnswerService {
 
     query = query
       .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
+
       .skip(skip)
       .take(limit)
 
@@ -221,31 +283,17 @@ export default class QuizAnswerService {
   }
 
   public async getAttentionAnswers(
-    quizId: string,
+    attentionQuery: IQuizAnswerQuery,
+    // quizId: string,
     skip = 0,
     limit = 50,
-    addPeerReviews?: boolean,
+    // addPeerReviews?: boolean,
   ): Promise<QuizAnswer[]> {
-    let query = QuizAnswer.createQueryBuilder("quiz_answer")
-
-    if (addPeerReviews) {
-      query = query
-        .leftJoinAndMapMany(
-          "quiz_answer.peerReviews",
-          PeerReview,
-          "peer_review",
-          "peer_review.quiz_answer_id = quiz_answer.id",
-        )
-        .leftJoinAndSelect("peer_review.answers", "peer_review_question_answer")
-    }
-
-    query = query
-      .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
-      .andWhere("quiz_answer.status IN ('spam', 'submitted')")
+    const constructedQuery = await this.constructGetAnswersQuery(attentionQuery)
+    return await constructedQuery
       .skip(skip)
       .take(limit)
-
-    return await query.getMany()
+      .getMany()
   }
 
   public async getAttentionAnswersCount(): Promise<any[]> {
