@@ -4,6 +4,7 @@ import { Container, Service } from "typedi"
 import {
   Connection,
   createConnection,
+  createConnections,
   EntitySchema,
   getConnectionOptions,
   useContainer,

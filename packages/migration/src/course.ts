@@ -45,6 +45,8 @@ const courseIDs = {
 
   "tietokoneen-toiminnan-perusteet": "fi_FI",
 
+  "tietokoneen-toiminnan-jatkokurssi": "fi_FI",
+
   default: "unknown",
 }
 

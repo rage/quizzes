@@ -22,6 +22,14 @@ export async function migrateQuizzes(
   oldQuizzes: any[],
 ): Promise<{ [quizID: string]: Quiz }> {
   const eaiRegex = /ai_([0-9])_([0-9])/
+  const regexs = [
+    /ai_([0-9])_([0-9])/,
+    /tilpe_([0-9])_([0-9])/,
+    /tito-([0-9]).([0-9])/,
+    /ohjelmoinnin-mooc-2019-([0-9])/,
+    /tietokantojen-perusteet-k2019-([0-9])/,
+    /web-palvelinohjelmointi-java-19-([0-9])/,
+  ]
 
   /*logger.info"Querying quizzes...")
   const oldQuizzes = await QNQuiz.find({
@@ -72,10 +80,20 @@ export async function migrateQuizzes(
         continue
       }
 
-      const match = tag.match(eaiRegex)
+      // const match = tag.match(eaiRegex)
+
+      const regex = regexs.find(
+        r => tag.match(r) !== undefined && tag.match(r) !== null,
+      )
+
+      const match = tag.match(regex)
+
       if (match) {
         part = parseInt(match[1], 10)
         section = parseInt(match[2], 10)
+        if (isNaN(section)) {
+          section = null
+        }
       }
     }
 

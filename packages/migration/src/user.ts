@@ -11,9 +11,6 @@ import { insert } from "./util/"
 
 import { logger } from "./config/winston"
 
-const TMC_TOKEN =
-  "7ae010e2e5641e6bdf9f05cd60b037ad6027be9189ad9b9420edee3468e7f27e"
-
 export async function migrateUsers(
   usernames: any[],
 ): Promise<{ [username: string]: User }> {
@@ -93,7 +90,7 @@ async function getUserInfo(
     },
     {
       headers: {
-        Authorization: `Bearer ${TMC_TOKEN}`,
+        Authorization: `Bearer ${process.env.TMC_TOKEN}`,
         "Content-Type": "application/json",
       },
     },
