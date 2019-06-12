@@ -58,9 +58,9 @@ class QuizStatistics extends React.Component<any, any> {
     }
   }
 
-  public componentDidMount() {
-    this.props.setQuiz(this.props.match.params.id)
-    this.props.setAnswerStatistics(this.props.match.params.id)
+  public async componentDidMount() {
+    await this.props.setQuiz(this.props.match.params.id)
+    await this.props.setAnswerStatistics(this.props.match.params.id)
 
     const queryParams = queryString.parse(this.props.location.search)
     const showing = queryParams.all && queryParams.all === "true"
@@ -73,6 +73,7 @@ class QuizStatistics extends React.Component<any, any> {
       )
       this.props.setAllAnswersCount(this.props.match.params.id)
     } else {
+      console.log("4")
       this.props.setAttentionRequiringAnswers(
         this.props.match.params.id,
         this.state.displayingPage,

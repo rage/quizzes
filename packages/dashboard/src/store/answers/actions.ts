@@ -40,7 +40,6 @@ export const setAttentionRequiringAnswers = (
 ) => {
   return async (dispatch, getState) => {
     try {
-      // dispatch(clear())
       const data = await getAttentionRequiringQuizAnswers(
         quizId,
         getState().user,
@@ -53,9 +52,22 @@ export const setAttentionRequiringAnswers = (
         return
       }
 
-      const quiz = getState()
-        .quizzes.find(qi => qi.courseId === getState().filter.course)
-        .quizzes.find(q => q.id === quizId)
+      if (
+        !getState().quizzes.find(qi => qi.courseId === getState().filter.course)
+      ) {
+        await dispatch(setQuizzes(getState().filter.course))
+      }
+
+      const quizNode = getState().quizzes.find(
+        qi => qi.courseId === getState().filter.course,
+      )
+
+      if (!quizNode) {
+        console.log("Quiz node undefined")
+        console.log("State: ", getState())
+      }
+
+      const quiz = quizNode.quizzes.find(q => q.id === quizId)
 
       if (!quiz) {
         console.log("quiz undefined")
