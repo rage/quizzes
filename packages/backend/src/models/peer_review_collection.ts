@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -24,6 +25,8 @@ export class PeerReviewCollection extends BaseEntity {
 
   @ManyToOne(type => Quiz, quiz => quiz.id)
   public quiz: Promise<Quiz>
+
+  @Index()
   @Column({ nullable: true })
   public quizId: string | null
 
@@ -86,6 +89,7 @@ export class PeerReviewCollectionTranslation extends BaseEntity {
   })
   @JoinColumn()
   public peerReviewCollection: Promise<PeerReviewCollection>
+  @Index()
   @PrimaryColumn()
   public peerReviewCollectionId: string
 

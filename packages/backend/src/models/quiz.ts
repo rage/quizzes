@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -23,6 +24,7 @@ import { QuizItem } from "./quiz_item"
 
 @Entity()
 export class Quiz extends BaseEntity {
+  @Index()
   @PrimaryGeneratedColumn("uuid")
   public id: string
 

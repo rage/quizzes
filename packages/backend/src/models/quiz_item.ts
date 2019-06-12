@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -24,6 +25,7 @@ export class QuizItem extends BaseEntity {
   public id: string
 
   @ManyToOne(type => Quiz, quiz => quiz.id, { onDelete: "CASCADE" })
+  @Index()
   @JoinColumn()
   public quiz: Promise<Quiz>
   @Column({ nullable: true })

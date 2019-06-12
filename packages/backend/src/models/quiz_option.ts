@@ -4,6 +4,7 @@ import {
   Column,
   CreateDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -25,6 +26,7 @@ export class QuizOption extends BaseEntity {
   })
   @JoinColumn()
   public quizItem: Promise<QuizItem>
+  @Index()
   @Column({ nullable: true })
   public quizItemId: string | null
 

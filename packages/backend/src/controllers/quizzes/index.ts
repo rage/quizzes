@@ -63,6 +63,7 @@ export class QuizController {
     } catch (error) {
       console.log("not found")
     }
+
     let quizAnswer: QuizAnswer
     if (userQuizState) {
       const answer = await this.quizAnswerService.getAnswer(
@@ -73,6 +74,7 @@ export class QuizController {
         quizAnswer = answer
       }
     }
+
     const quizzes: Quiz[] = await this.quizService.getQuizzes({
       id: quizId,
       items: true,
@@ -82,6 +84,7 @@ export class QuizController {
       stripped: quizAnswer ? false : true,
       ...params,
     })
+
     return {
       quiz: quizzes[0],
       quizAnswer,

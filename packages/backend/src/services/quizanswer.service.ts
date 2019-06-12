@@ -50,7 +50,12 @@ export default class QuizAnswerService {
       whereBuilder.add("quiz_answer.status = :status", { status })
     }
 
-    return await queryBuilder.orderBy("quiz_answer.updated_at", "DESC").getOne()
+    queryBuilder.orderBy("quiz_answer.updated_at", "DESC")
+
+    const result = await queryBuilder
+      .orderBy("quiz_answer.updated_at", "DESC")
+      .getOne()
+    return result
   }
 
   public async getAnswers(query: IQuizAnswerQuery): Promise<QuizAnswer[]> {
