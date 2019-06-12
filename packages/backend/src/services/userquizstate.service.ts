@@ -2,16 +2,23 @@ import { Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import {
+  PeerReview,
+  PeerReviewCollection,
   Quiz,
   QuizAnswer,
   QuizItem,
   QuizItemAnswer,
+  SpamFlag,
   User,
   UserQuizState,
 } from "../models"
+import QuizAnswerService from "./quizanswer.service"
 
 @Service()
 export default class UserQuizStateService {
+  @Inject()
+  private quizAnswerService: QuizAnswerService
+
   @InjectManager()
   private entityManager: EntityManager
 
@@ -29,6 +36,90 @@ export default class UserQuizStateService {
     manager: EntityManager,
     userQuizState: UserQuizState,
   ): Promise<UserQuizState> {
+    return await manager.save(userQuizState)
+  }
+
+  public async createAndCompleteUserQuizState(
+    manager: EntityManager,
+    userQuizState: UserQuizState,
+  ): Promise<UserQuizState> {
+    if (!userQuizState.userId || !userQuizState.quizId) {
+      return null
+    }
+
+    const quizAnswerIds = await manager
+      .createQueryBuilder(QuizAnswer, "quiz_answer")
+      .select("quiz_answer.id")
+      .where("quiz_answer.quiz_id = :quiz_id", {
+        quiz_id: userQuizState.quizId,
+      })
+      .andWhere("quiz_answer.user_id = :user_id", {
+        user_id: userQuizState.userId,
+      })
+
+    if (
+      typeof userQuizState.spamFlags !== "number" &&
+      !userQuizState.spamFlags
+    ) {
+      userQuizState.spamFlags = (await manager
+        .createQueryBuilder(SpamFlag, "spam_flag")
+        .select("COUNT(*)")
+        .where("spam_flag.quiz_answer_id IN (" + quizAnswerIds.getQuery() + ")")
+        .setParameters(quizAnswerIds.getParameters())
+        .getRawOne()).count
+    }
+    if (
+      typeof userQuizState.peerReviewsGiven !== "number" &&
+      !userQuizState.peerReviewsGiven
+    ) {
+      userQuizState.peerReviewsGiven = (await manager
+        .createQueryBuilder(PeerReview, "peer_review")
+        .select("COUNT(*)")
+        .leftJoin(
+          PeerReviewCollection,
+          "peer_review_collection",
+          "peer_review_collection.id = peer_review.peer_review_collection_id",
+        )
+        .where("peer_review.user_id = :user_id", {
+          user_id: userQuizState.userId,
+        })
+        .andWhere("peer_review_collection.quiz_id = :quiz_id", {
+          quiz_id: userQuizState.quizId,
+        })
+        .getRawOne()).count
+    }
+
+    if (
+      typeof userQuizState.peerReviewsReceived !== "number" &&
+      !userQuizState.peerReviewsReceived
+    ) {
+      userQuizState.peerReviewsReceived = (await manager
+        .createQueryBuilder(PeerReview, "peer_review")
+        .select("COUNT(*)")
+        .where(
+          "peer_review.quiz_answer_id IN (" + quizAnswerIds.getQuery() + ")",
+        )
+        .setParameters(quizAnswerIds.getParameters())
+        .getRawOne()).count
+    }
+
+    if (!userQuizState.status) {
+      userQuizState.status = "locked"
+    }
+
+    if (typeof userQuizState.tries !== "number" || userQuizState.tries === 0) {
+      userQuizState.tries = (await manager
+        .createQueryBuilder(QuizAnswer, "quiz_answer")
+        .select("COUNT(*)")
+        .where("quiz_answer.quiz_id = :quiz_id", {
+          quiz_id: userQuizState.quizId,
+        })
+        .andWhere("quiz_answer.user_id = :user_id", {
+          user_id: userQuizState.userId,
+        })
+        .getRawOne()).count
+    }
+
     return await manager.save(userQuizState)
   }
 

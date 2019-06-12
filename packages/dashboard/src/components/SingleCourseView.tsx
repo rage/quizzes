@@ -2,6 +2,7 @@ import { Button, Card, Grid, Typography } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
+import { firstWords, wordCount } from "../../../common/src/util"
 import { newQuiz } from "../store/edit/actions"
 import { setCourse } from "../store/filter/actions"
 import LanguageBar from "./GeneralTools/LanguageBar"
@@ -216,6 +217,7 @@ const CourseComponent = ({ idx, countData, quiz }) => {
       <Grid
         container={true}
         justify="space-between"
+        alignItems="center"
         style={{ padding: ".5em 1em .5em 1em" }}
       >
         <Grid item={true} xs={8} md={10} lg={11} style={{ cursor: "pointer" }}>
@@ -245,20 +247,28 @@ const CourseComponent = ({ idx, countData, quiz }) => {
             </Button>
           </Link>
         </Grid>
-        <Grid item={true} xs={6} style={{ cursor: "pointer" }}>
+
+        <Grid item={true} xs={9} style={{ cursor: "pointer" }}>
           <Link
             to={`/quizzes/${quiz.id}/data`}
             style={{ textDecoration: "none" }}
           >
             <Typography variant="body1" style={{ color: "white" }}>
-              {quiz.texts[0].title}
+              {wordCount(quiz.texts[0].body) < 15
+                ? quiz.texts[0].body
+                : firstWords(quiz.texts[0].body, 15) + " ..."}
             </Typography>
           </Link>
         </Grid>
 
         {countData && countData.count > 0 && (
-          <Grid item={true} xs="auto">
-            <Typography variant="body1">
+          <Grid item={true} xs={3}>
+            <Typography
+              variant="body1"
+              style={{
+                textAlign: "right",
+              }}
+            >
               {countData.count} answer{countData.count === 1 ? "" : "s"}{" "}
               requiring attention
             </Typography>

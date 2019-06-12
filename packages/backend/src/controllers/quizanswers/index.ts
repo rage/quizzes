@@ -7,10 +7,12 @@ import {
   BadRequestError,
   QueryParam,
   UnauthorizedError,
+  Body,
 } from "routing-controllers"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
 import UserCourseStateService from "services/usercoursestate.service"
+import UserCoursePartStateService from "services/usercoursepartstate.service"
 import UserQuizStateService from "services/userquizstate.service"
 import ValidationService from "services/validation.service"
 import { Inject } from "typedi"
@@ -18,8 +20,15 @@ import { EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { API_PATH } from "../../config"
-import { Quiz, QuizAnswer, User, UserQuizState } from "../../models"
-import { ITMCProfileDetails } from "../../types"
+import {
+  Quiz,
+  QuizAnswer,
+  User,
+  UserQuizState,
+  UserCoursePartState,
+  UserCourseState,
+} from "../../models"
+import { ITMCProfileDetails, QuizAnswerStatus } from "../../types"
 
 const MAX_LIMIT = 100
 
@@ -33,6 +42,9 @@ export class QuizAnswerController {
 
   @Inject()
   private userQuizStateService: UserQuizStateService
+
+  @Inject()
+  private userCoursePartStateService: UserCoursePartStateService
 
   @Inject()
   private userCourseStateService: UserCourseStateService
@@ -103,6 +115,84 @@ export class QuizAnswerController {
         )
 
     return result
+  }
+
+  @Post("/:answerId")
+  public async modifyStatus(
+    @Param("answerId") id: string,
+    @Body() body: { newStatus: QuizAnswerStatus },
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const newStatus: QuizAnswerStatus = body.newStatus
+
+    const existingAnswer = await this.quizAnswerService.getAnswer(
+      { id: id },
+      this.entityManager,
+    )
+
+    if (!existingAnswer) {
+      return
+    }
+
+    const quiz = (await this.quizService.getQuizzes({
+      id: existingAnswer.quizId,
+    }))[0]
+
+    let userQuizState = await this.userQuizStateService.getUserQuizState(
+      existingAnswer.userId,
+      existingAnswer.quizId,
+    )
+
+    if (!userQuizState) {
+      userQuizState = new UserQuizState()
+      userQuizState.userId = existingAnswer.userId
+      userQuizState.quizId = existingAnswer.quizId
+      userQuizState.pointsAwarded = 0
+      userQuizState = await this.userQuizStateService.createAndCompleteUserQuizState(
+        this.entityManager,
+        userQuizState,
+      )
+    }
+
+    let newAnswer: QuizAnswer = null
+    let userCourseState: UserCourseState = null
+    let userCoursePartState: UserCoursePartState = null
+
+    await this.entityManager.transaction(async manager => {
+      const oldStatus = existingAnswer.status
+      existingAnswer.status = newStatus
+      newAnswer = await manager.save(existingAnswer)
+
+      if (newStatus === "confirmed" && oldStatus !== "confirmed") {
+        userQuizState.pointsAwarded = quiz.points
+
+        userQuizState = await manager.save(userQuizState)
+
+        userCoursePartState = await this.userCoursePartStateService.updateUserCoursePartState(
+          manager,
+          quiz,
+          userQuizState.userId,
+        )
+
+        userCourseState = await this.userCourseStateService.updateUserCourseState(
+          manager,
+          quiz,
+          userQuizState,
+          newAnswer,
+        )
+      }
+    })
+
+    return {
+      newAnswer,
+      userQuizState,
+      userCoursePartState,
+      userCourseState,
+    }
   }
 
   @Post("/")

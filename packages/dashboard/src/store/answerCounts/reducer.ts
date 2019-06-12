@@ -3,7 +3,7 @@ import * as quizAnswerCounts from "./actions"
 
 interface IQuizAnswerStatistic {
   quizId: string
-  answerCount: number
+  count: number
 }
 
 export const answerCountsReducer = (
@@ -15,6 +15,15 @@ export const answerCountsReducer = (
       return [...action.payload]
     case getType(quizAnswerCounts.clear):
       return []
+    case getType(quizAnswerCounts.decrement):
+      const quizId = action.payload
+      return state.map(ac => {
+        if (ac.quizId !== quizId) {
+          return ac
+        } else {
+          return { ...ac, count: ac.count - 1 }
+        }
+      })
     default:
       return state
   }

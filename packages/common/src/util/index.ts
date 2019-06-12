@@ -83,6 +83,15 @@ export function wordCount(str: string | null): number {
   return words ? words.length : 0
 }
 
+export function firstWords(str: string, n: number): string {
+  const words: string[] | null = str.match(/[^\s]+/g)
+  if (words === null) {
+    return ""
+  }
+
+  return words.splice(0, n).join(" ")
+}
+
 export function executeIfChangeMatches(
   test: (e: ChangeEvent<HTMLInputElement>) => boolean,
   failingDefaultValue: string | null = null,

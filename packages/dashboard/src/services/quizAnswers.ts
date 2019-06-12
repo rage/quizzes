@@ -16,6 +16,23 @@ export const getQuizAnswers = async (
   return response.data
 }
 
+export const updateQuizAnswerStatus = async (
+  quizAnswerId: string,
+  newStatus: string,
+  user: any,
+) => {
+  const response = await axios.post(
+    `/api/v1/quizzes/answer/${quizAnswerId}`,
+    {
+      newStatus,
+    },
+    {
+      headers: { authorization: `Bearer ${user.accessToken}` },
+    },
+  )
+  return response.data
+}
+
 export const getAttentionRequiringQuizAnswers = async (
   quizId: string,
   user: any,

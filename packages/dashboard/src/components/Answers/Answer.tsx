@@ -1,6 +1,11 @@
 import {
   Button,
   Card,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   Grid,
   IconButton,
   RootRef,
@@ -10,12 +15,23 @@ import ExpandLess from "@material-ui/icons/ExpandLess"
 import MoreVert from "@material-ui/icons/MoreVert"
 import React from "react"
 import { connect } from "react-redux"
+import { updateQuizAnswerStatus } from "../../services/quizAnswers"
+import { decrement } from "../../store/answerCounts/actions"
 import { setCourse, setQuiz } from "../../store/filter/actions"
+import { displayMessage } from "../../store/notification/actions"
 import ItemAnswer from "./ItemAnswer"
 import PeerReviewsModal from "./PeerReviewsModal"
 
 class Answer extends React.Component<any, any> {
   private answerRef: React.RefObject<HTMLElement>
+
+  private borderColorsByStatus = {
+    submitted: "#FB6949",
+    spam: "#FB6949",
+    confirmed: "#48fa5d",
+    rejected: "#d80027",
+    deprecated: "#9b9b9b",
+  }
 
   constructor(props) {
     super(props)
@@ -23,6 +39,8 @@ class Answer extends React.Component<any, any> {
     this.state = {
       expanded: false,
       modalOpen: false,
+      confirmDialogOpen: false,
+      confirmAction: null,
     }
   }
 
@@ -43,10 +61,7 @@ class Answer extends React.Component<any, any> {
             style={{
               borderLeft:
                 "1em solid " +
-                (this.props.answerData.status === "submitted" ||
-                this.props.answerData.status === "spam"
-                  ? "#FB6949"
-                  : "#49C7FB"),
+                this.borderColorsByStatus[this.props.answerData.status],
             }}
           >
             <Grid container={true} justify="center">
@@ -86,6 +101,9 @@ class Answer extends React.Component<any, any> {
                       ).count
                     }
                     setQuiz={this.props.setQuiz}
+                    course={this.props.courses.find(
+                      c => c.id === this.props.filter.course,
+                    )}
                   />
                   <Grid item={true} xs="auto">
                     <IconButton onClick={this.showLess}>
@@ -105,33 +123,39 @@ class Answer extends React.Component<any, any> {
                   }}
                 >
                   <Grid item={true} xs={6} lg={4}>
-                    <Grid container={true} justify="flex-start" spacing={16}>
-                      <Grid item={true} xs="auto">
-                        <Button
-                          variant="contained"
-                          style={{
-                            backgroundColor: "#029422",
-                            borderRadius: "0",
-                            color: "white",
-                          }}
-                        >
-                          Accept
-                        </Button>
-                      </Grid>
+                    {this.props.answerData.status === "confirmed" ? (
+                      ""
+                    ) : (
+                      <Grid container={true} justify="flex-start" spacing={16}>
+                        <Grid item={true} xs="auto">
+                          <Button
+                            variant="contained"
+                            style={{
+                              backgroundColor: "#029422",
+                              borderRadius: "0",
+                              color: "white",
+                            }}
+                            onClick={this.confirmStatusChange("accept")}
+                          >
+                            Accept
+                          </Button>
+                        </Grid>
 
-                      <Grid item={true} xs="auto">
-                        <Button
-                          variant="contained"
-                          style={{
-                            backgroundColor: "#D80027",
-                            borderRadius: "0",
-                            color: "white",
-                          }}
-                        >
-                          Reject
-                        </Button>
+                        <Grid item={true} xs="auto">
+                          <Button
+                            variant="contained"
+                            style={{
+                              backgroundColor: "#D80027",
+                              borderRadius: "0",
+                              color: "white",
+                            }}
+                            onClick={this.confirmStatusChange("reject")}
+                          >
+                            Reject
+                          </Button>
+                        </Grid>
                       </Grid>
-                    </Grid>
+                    )}
                   </Grid>
 
                   <Grid item={true} xs={2} style={{ textAlign: "center" }}>
@@ -150,9 +174,86 @@ class Answer extends React.Component<any, any> {
               </Grid>
             </Grid>
           </Card>
+
+          <Dialog
+            open={this.state.confirmDialogOpen}
+            onClose={this.closeConfirmDialog}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+          >
+            <DialogTitle id="alert-dialog-title">
+              Confirm status change
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText id="alert-dialog-description">
+                Are you certain you want to {this.state.confirmAction} the
+                answer?
+              </DialogContentText>
+            </DialogContent>
+
+            <DialogActions>
+              <Button onClick={this.closeConfirmDialog}>Cancel</Button>
+
+              <Button
+                onClick={this.modifyStatus(
+                  this.state.confirmAction,
+                  this.props.answerData.status === "submitted" ||
+                    this.props.answerData.status === "spam",
+                )}
+              >
+                Confirm
+              </Button>
+            </DialogActions>
+          </Dialog>
         </Grid>
       </RootRef>
     )
+  }
+
+  private closeConfirmDialog = () => {
+    this.setState({
+      confirmDialogOpen: false,
+      confirmAction: null,
+    })
+  }
+
+  private confirmStatusChange = (choice: string) => () => {
+    this.setState({
+      confirmDialogOpen: true,
+      confirmAction: choice,
+    })
+  }
+
+  private modifyStatus = (
+    choice: string,
+    requiresAttention: boolean,
+  ) => async () => {
+    let message
+    let errorOccurred = false
+
+    this.closeConfirmDialog()
+    try {
+      await updateQuizAnswerStatus(
+        this.props.answerData.id,
+        choice === "accept" ? "confirmed" : "rejected",
+        this.props.user,
+      )
+
+      message = `Successfully ${
+        choice === "accept" ? "confirmed" : "rejected"
+      } the answer`
+
+      if (requiresAttention) {
+        this.props.decrementAttentionCount(this.props.answerData.quizId)
+      }
+
+      this.props.updateAnswers()
+    } catch (e) {
+      message = `Failed to change the status (${e.message})`
+      errorOccurred = true
+    }
+
+    this.props.displayMessage(message, errorOccurred, 3)
   }
 
   private itemAnswersDisplayedInFull = (answer): boolean => {
@@ -242,6 +343,11 @@ class PeerReviewsSummary extends React.Component<any, any> {
           alignItems="stretch"
           spacing={8}
         >
+          <Grid item={true} xs={12} style={{ textAlign: "center" }}>
+            <Typography variant="subtitle1">
+              Status:{` ${this.props.answer.status}`}
+            </Typography>
+          </Grid>
           <Grid
             item={true}
             xs={12}
@@ -258,8 +364,37 @@ class PeerReviewsSummary extends React.Component<any, any> {
               <Grid item={true} xs={12}>
                 <Typography variant="subtitle1" color="textSecondary">
                   SPAM FLAGS: {this.props.spamFlags}
+                  {this.props.course.maxSpamFlags &&
+                    `. (Maximum allowed: ${this.props.course.maxSpamFlags})`}
                 </Typography>
               </Grid>
+              <Grid item={true} xs={12}>
+                <Typography variant="body1">
+                  Peer reviews given:{" "}
+                  {(this.props.answer.userQuizState &&
+                    this.props.answer.userQuizState.peerReviewsGiven) ||
+                    "none"}
+                  {this.props.course.minPeerReviewsGiven &&
+                    `. (Required: ${this.props.course.minPeerReviewsGiven})`}
+                </Typography>
+              </Grid>
+
+              <Grid item={true} xs={12}>
+                <Typography variant="body1">
+                  Peer reviews received: {this.props.peerReviewsAnswers.length}
+                  {this.props.course.minPeerReviewsReceived &&
+                    `. (Required: ${this.props.course.minPeerReviewsReceived})`}
+                </Typography>
+              </Grid>
+
+              {this.props.course.minReviewAverage && (
+                <Grid item={true} xs={12}>
+                  <Typography variant="body1">
+                    Minimum average of peer reviews:{" "}
+                    {this.props.course.minReviewAverage || "not set"}
+                  </Typography>
+                </Grid>
+              )}
 
               <Grid item={true} xs={12}>
                 <Button variant="outlined" onClick={this.openModal}>
@@ -386,10 +521,13 @@ const mapStateToProps = state => {
     answerStatistics: state.answerStatistics,
     quizzes: state.quizzes.find(qi => qi.courseId === state.filter.course)
       .quizzes,
+    courses: state.courses,
+    filter: state.filter,
+    user: state.user,
   }
 }
 
 export default connect(
   mapStateToProps,
-  { setCourse, setQuiz },
+  { decrementAttentionCount: decrement, displayMessage, setCourse, setQuiz },
 )(Answer)
