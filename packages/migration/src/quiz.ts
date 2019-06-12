@@ -90,6 +90,9 @@ export async function migrateQuizzes(
 
       if (match) {
         part = parseInt(match[1], 10)
+        if (isNaN(part)) {
+          part = 0
+        }
         section = parseInt(match[2], 10)
         if (isNaN(section)) {
           section = null
