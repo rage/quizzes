@@ -83,21 +83,12 @@ const PeerReview = ({
   return (
     <Grid container={true} spacing={16}>
       <Grid item={true} xs={12}>
-        <Typography variant="subheading">Peer review {idx + 1}</Typography>
+        <Typography variant="headline">Peer review {idx + 1}</Typography>
       </Grid>
       <Grid item={true} xs={12} style={{ backgroundColor: "#DDDDDD" }}>
         <Grid container={true} spacing={16}>
-          <Grid
-            item={true}
-            xs={12}
-            style={{ borderBottom: "1px dashed black" }}
-          >
-            <Typography variant="subtitle1">
-              {
-                // peerReviewQuestions.texts[0].title
-                peerReviewTitle
-              }
-            </Typography>
+          <Grid item={true} xs={12} style={{ borderBottom: "1px solid black" }}>
+            <Typography variant="subtitle1">{peerReviewTitle}</Typography>
             <Typography variant="body1">
               {" "}
               {peerReviewQuestions.texts[0].body}
@@ -113,7 +104,9 @@ const PeerReview = ({
                     questionAnswer={answer}
                     title={
                       peerReviewQuestions.questions[answerIdx].texts[0].title ||
-                      "No title"
+                      (peerReviewQuestions.questions[answerIdx].type === "essay"
+                        ? "Written review"
+                        : "No title")
                     }
                   />
                 </Grid>
@@ -159,7 +152,7 @@ const PeerReviewQuestionAnswer = ({ type, questionAnswer, title }) => {
   if (type === "essay") {
     return (
       <React.Fragment>
-        <Typography variant="subtitle1">{title}</Typography>
+        <Typography variant="subheading">{title}</Typography>
         <Typography variant="body1" style={{ wordBreak: "break-word" }}>
           {questionAnswer.text}
         </Typography>
