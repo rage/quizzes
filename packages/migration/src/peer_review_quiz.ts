@@ -1,36 +1,43 @@
 import {
   PeerReviewQuestion,
-  PeerReviewQuestionCollection,
-  PeerReviewQuestionCollectionTranslation,
+  PeerReviewCollection,
+  PeerReviewCollectionTranslation,
   PeerReviewQuestionTranslation,
   Quiz,
   UserCourseState,
-} from "@quizzes/common/models"
+} from "./models"
 import oldQuizTypes from "./app-modules/constants/quiz-types"
 import {
   PeerReview as QNPeerReview,
   Quiz as QNQuiz,
 } from "./app-modules/models"
 
+import { logger } from "./config/winston"
+
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { progressBar, safeGet } from "./util"
-import { getUUIDByString, insert } from "@quizzes/common/util"
+import { getUUIDByString, insert } from "./util/"
 
-export async function migratePeerReviewQuestions() {
-  console.log("Querying peer review questions...")
+export async function migratePeerReviewQuestions(
+  peerReviewQuestions: any[],
+  peerReviews: any[],
+) {
+  /*logger.info"Querying peer review questions...")
   const peerReviewQuestions = await QNQuiz.find({
     type: { $in: [oldQuizTypes.PEER_REVIEW] },
-  })
-  console.log("peer reviews: ", peerReviewQuestions.length)
+    $or: [
+      { createdAt: { $gte: LAST_MIGRATION } },
+      { updatedAt: { $gte: LAST_MIGRATION } },
+    ],
+  })*/
+  logger.info("peer reviews: ", peerReviewQuestions.length)
   const bar = progressBar(
     "Migrating peer review questions",
     peerReviewQuestions.length,
   )
-  const collections: Array<
-    QueryPartialEntity<PeerReviewQuestionCollection>
-  > = []
+  const collections: Array<QueryPartialEntity<PeerReviewCollection>> = []
   const collectionTranslations: Array<
-    QueryPartialEntity<PeerReviewQuestionCollectionTranslation>
+    QueryPartialEntity<PeerReviewCollectionTranslation>
   > = []
   const questions: Array<QueryPartialEntity<PeerReviewQuestion>> = []
   const questionTranslations: Array<
@@ -53,7 +60,7 @@ export async function migratePeerReviewQuestions() {
         return
       }
 
-      const val = await migratePeerReviewQuestion(quiz, oldPRQ)
+      const val = await migratePeerReviewQuestion(quiz, oldPRQ, peerReviews)
       if (!val) {
         answerNotFound++
         return
@@ -69,17 +76,17 @@ export async function migratePeerReviewQuestions() {
     }),
   )
 
-  console.log(
+  logger.info(
     `${quizNotFound} peer review questions did not match any quiz and ` +
       `${answerNotFound} peer review questions did not have any answers.`,
   )
 
-  console.log("Inserting peer review questions")
-  await insert(PeerReviewQuestionCollection, collections)
+  logger.info("Inserting peer review questions")
+  await insert(PeerReviewCollection, collections)
   await insert(
-    PeerReviewQuestionCollectionTranslation,
+    PeerReviewCollectionTranslation,
     collectionTranslations,
-    `"peer_review_question_collection_id", "language_id"`,
+    `"peer_review_collection_id", "language_id"`,
   )
   await insert(PeerReviewQuestion, questions)
   await insert(
@@ -92,19 +99,25 @@ export async function migratePeerReviewQuestions() {
 async function migratePeerReviewQuestion(
   quiz: Quiz,
   oldPRQ: { [key: string]: any },
+  peerReviews: any[],
 ): Promise<
   [
-    QueryPartialEntity<PeerReviewQuestionCollection>,
-    QueryPartialEntity<PeerReviewQuestionCollectionTranslation>,
+    QueryPartialEntity<PeerReviewCollection>,
+    QueryPartialEntity<PeerReviewCollectionTranslation>,
     Array<QueryPartialEntity<PeerReviewQuestion>>,
     Array<QueryPartialEntity<PeerReviewQuestionTranslation>>
   ]
 > {
   const languageId = (await quiz.course).languages[0].id
 
-  const peerReviewSample = await QNPeerReview.findOne({
+  /*const peerReviewSample = await QNPeerReview.findOne({
     $or: [{ quizId: oldPRQ._id }, { sourceQuizId: oldPRQ._id }],
-  })
+  })*/
+
+  const peerReviewSample = peerReviews.find(
+    pr => pr.quizId === oldPRQ._id || pr.sourceQuizId === oldPRQ._id,
+  )
+
   if (!peerReviewSample) {
     return null
   }
@@ -116,7 +129,7 @@ async function migratePeerReviewQuestion(
     updatedAt: oldPRQ.updatedAt,
   }
   const collectionTranslation = {
-    peerReviewQuestionCollectionId: collection.id,
+    peerReviewCollectionId: collection.id,
     languageId,
     title: oldPRQ.title || "",
     body: oldPRQ.body || "",
@@ -138,7 +151,7 @@ async function migratePeerReviewQuestion(
     questions.push({
       id: getUUIDByString(id),
       quizId: quiz.id,
-      collectionId: collection.id,
+      peerReviewCollectionId: collection.id,
       default: false,
       type,
       order: order++,

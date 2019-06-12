@@ -8,11 +8,25 @@ import {
 } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import getUUIDByStringBroken from "uuid-by-string"
-import { Database } from "../config/database"
+import fs from "fs"
 
-import { Container } from "typedi"
+export function logger(message: string) {}
 
-export function insert<T extends BaseEntity>(
+export async function insert<T extends BaseEntity>(
+  type: typeof BaseEntity,
+  data: any[],
+  primaryKeys: string = `"id"`,
+) {
+  const saved = Promise.all(
+    data.map(async item => {
+      return await type.create(item).save()
+    }),
+  )
+
+  return saved
+}
+
+export function insertForReal<T extends BaseEntity>(
   type: typeof BaseEntity,
   data: Array<QueryPartialEntity<T>> | QueryPartialEntity<T>,
   primaryKeys: string = `"id"`,
@@ -71,11 +85,6 @@ export class WhereBuilder<T extends BaseEntity> {
   }
 }
 
-export function stringContainsLongerWord(str: string, n: number): boolean {
-  const words: string[] = str.split(" ")
-  return words.some(w => w.length > n)
-}
-
 export function wordCount(str: string | null): number {
   if (!str) {
     return 0
@@ -84,15 +93,6 @@ export function wordCount(str: string | null): number {
   const words: string[] | null = str.match(/[^\s]+/g)
 
   return words ? words.length : 0
-}
-
-export function firstWords(str: string, n: number): string {
-  const words: string[] | null = str.match(/[^\s]+/g)
-  if (words === null) {
-    return ""
-  }
-
-  return words.splice(0, n).join(" ")
 }
 
 export function executeIfChangeMatches(
