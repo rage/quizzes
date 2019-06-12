@@ -251,46 +251,21 @@ export default class QuizAnswerService {
   }
 
   public async getAnswers(query: IQuizAnswerQuery): Promise<QuizAnswer[]> {
-    return (await this.constructGetAnswersQuery(query)).getMany()
-  }
-
-  public async getEveryonesAnswers(
-    quizId: string,
-    skip = 0,
-    limit = 50,
-    addPeerReviews?: boolean,
-  ): Promise<QuizAnswer[]> {
-    let query = QuizAnswer.createQueryBuilder("quiz_answer")
-
-    if (addPeerReviews) {
-      query = query
-        .leftJoinAndMapMany(
-          "quiz_answer.peerReviews",
-          PeerReview,
-          "peer_review",
-          "peer_review.quiz_answer_id = quiz_answer.id",
-        )
-        .leftJoinAndSelect("peer_review.answers", "peer_review_question_answer")
+    let { skip, limit } = query
+    skip = typeof skip === "number" ? skip : 0
+    limit = typeof limit === "number" ? limit : 0
+    if (skip < 0) {
+      skip = 0
+    }
+    if (limit < 0) {
+      limit = 0
     }
 
-    query = query
-      .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
+    if (limit > 100) {
+      limit = 100
+    }
 
-      .skip(skip)
-      .take(limit)
-
-    return await query.getMany()
-  }
-
-  public async getAttentionAnswers(
-    attentionQuery: IQuizAnswerQuery,
-    // quizId: string,
-    skip = 0,
-    limit = 50,
-    // addPeerReviews?: boolean,
-  ): Promise<QuizAnswer[]> {
-    const constructedQuery = await this.constructGetAnswersQuery(attentionQuery)
-    return await constructedQuery
+    return (await this.constructGetAnswersQuery(query))
       .skip(skip)
       .take(limit)
       .getMany()
@@ -301,6 +276,15 @@ export default class QuizAnswerService {
       .select("quiz_answer.quiz_id", "quizId")
       .addSelect("COUNT(quiz_answer.id)")
       .where("quiz_answer.status IN ('spam', 'submitted')")
+      .groupBy("quiz_answer.quiz_id")
+      .getRawMany()
+  }
+
+  public async getAnswersCount(query: IQuizAnswerQuery): Promise<any> {
+    const someQuery = await this.constructGetAnswersQuery(query)
+    someQuery
+      .select("quiz_answer.quiz_id")
+      .addSelect("COUNT(*)")
       .groupBy("quiz_answer.quiz_id")
       .getRawMany()
   }

@@ -72,6 +72,8 @@ export interface IQuizAnswerQuery {
   // similarly: min/max spamflags
   spamFlags?: number
   addPeerReviews?: boolean
+  skip?: number
+  limit?: number
 }
 
 interface ICourseQuery {

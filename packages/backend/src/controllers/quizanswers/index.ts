@@ -66,6 +66,16 @@ export class QuizAnswerController {
       throw new UnauthorizedError("unauthorized")
     }
 
+    const limitDate = new Date()
+    limitDate.setDate(limitDate.getDate() - 300)
+
+    const attentionCriteriaQuery: IQuizAnswerQuery = {
+      quizId,
+      firstAllowedTime: limitDate,
+      statuses: ["spam", "submitted"],
+      addPeerReviews: true,
+    }
+
     const result = await this.quizAnswerService.getAnswersStatistics(quizId)
     return result
   }
@@ -102,8 +112,8 @@ export class QuizAnswerController {
       */
       addPeerReviews: true,
     }
-
     const result = await this.quizAnswerService.getAnswers(query)
+
     return result
   }
 
@@ -125,28 +135,21 @@ export class QuizAnswerController {
       limit = MAX_LIMIT
     }
 
-    const limitDate = new Date()
-    limitDate.setDate(limitDate.getDate() - 300)
-
     const attentionCriteriaQuery: IQuizAnswerQuery = {
       quizId,
-      // firstAllowedTime: limitDate,
-      statuses: ["spam", "submitted"],
       addPeerReviews: true,
+      skip,
+      limit,
     }
 
-    result = attention
-      ? await this.quizAnswerService.getAttentionAnswers(
-          attentionCriteriaQuery,
-          skip,
-          limit,
-        )
-      : await this.quizAnswerService.getEveryonesAnswers(
-          quizId,
-          skip,
-          limit,
-          true,
-        )
+    if (attention) {
+      const limitDate = new Date()
+      limitDate.setDate(limitDate.getDate() - 300)
+      attentionCriteriaQuery.firstAllowedTime = limitDate
+      attentionCriteriaQuery.statuses = ["spam", "submitted"]
+    }
+
+    result = await this.quizAnswerService.getAnswers(attentionCriteriaQuery)
 
     return result
   }
