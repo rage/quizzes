@@ -145,14 +145,20 @@ export async function migrateQuizzes(
     switch (oldQuiz.type) {
       case oldQuizTypes.ESSAY:
       case oldQuizTypes.OPEN:
+        let minWords = meta.minWords
+        let maxWords = meta.maxWords
+
+        if (maxWords === 0 || minWords > maxWords) {
+          maxWords = null
+        }
         quizItems.push({
           id: getUUIDByString(oldQuiz._id),
           quizId: quiz.id,
           type: oldQuiz.type === oldQuizTypes.ESSAY ? "essay" : "open",
           validityRegex: rightAnswer,
           order: 0,
-          minWords: meta.minWords,
-          maxWords: meta.maxWords,
+          minWords,
+          maxWords,
           createdAt: oldQuiz.createdAt,
           updatedAt: oldQuiz.updatedAt,
         })
