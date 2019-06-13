@@ -84,53 +84,16 @@ export class QuizAnswerController {
     const limitDate = new Date()
     limitDate.setDate(limitDate.getDate() - 300)
 
-    const attentionCriteriaQuery: IQuizAnswerQuery = {
-      // quizId,
-      firstAllowedTime: limitDate,
-      statuses: ["spam", "submitted"],
-      //  addPeerReviews: true,
-    }
+    const criteriaQuery: IQuizAnswerQuery = quizId
+      ? {
+          quizId,
+        }
+      : {
+          lastAllowedTime: limitDate,
+          statuses: ["spam", "submitted"],
+        }
 
-    return quizId
-      ? await this.quizAnswerService.getNumberOfAnswers(quizId)
-      : await this.quizAnswerService.getAnswersCount(attentionCriteriaQuery) // await this.quizAnswerService.getAttentionAnswersCount() //  //
-  }
-
-  @Get("/salainen_testi")
-  public async getAnswersByCriteria(
-    @HeaderParam("authorization") user: ITMCProfileDetails,
-  ) {
-    if (!user.administrator) {
-      throw new UnauthorizedError("unauthorized")
-    }
-
-    const query: IQuizAnswerQuery = {
-      // id: "juu",
-      quizId: "3c954097-268f-44bf-9d2e-1efaf9e8f122",
-      userId: 87900,
-
-      // should prob only use statuses
-      statuses: ["confirmed", "rejected"],
-
-      firstAllowedTime: new Date(2018, 7, 1),
-      lastAllowedTime: new Date(2018, 7, 10),
-
-      languageIds: ["en_US"],
-      // peerReviewsGiven: 2,
-      /*
-      peerReviewsReceived: 0,
-      spamFlags: 0,
-
-
-
-      792296
-      792296
-      */
-      addPeerReviews: true,
-    }
-    const result = await this.quizAnswerService.getAnswers(query)
-
-    return result
+    return await this.quizAnswerService.getAnswersCount(criteriaQuery)
   }
 
   @Get("/attention")
@@ -161,7 +124,7 @@ export class QuizAnswerController {
     if (attention) {
       const limitDate = new Date()
       limitDate.setDate(limitDate.getDate() - 300)
-      attentionCriteriaQuery.firstAllowedTime = limitDate
+      attentionCriteriaQuery.lastAllowedTime = limitDate
       attentionCriteriaQuery.statuses = ["spam", "submitted"]
     }
 

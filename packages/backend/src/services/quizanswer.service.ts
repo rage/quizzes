@@ -151,15 +151,26 @@ export default class QuizAnswerService {
     // to make sense, the peer reviews for a certain quiz
     if (
       typeof peerReviewsGiven === "number" &&
-      (peerReviewsGiven >= 0 && peerReviewsGiven < 1000) &&
+      (peerReviewsGiven > 0 && peerReviewsGiven < 1000) &&
       quizId
     ) {
-      // is table peer_review_collection up-to-date?
-      const prcIsInGoodShape = true
+      // 1. Jos UserQuizState ajan tasalla
+      const usingUQS = true
+      if (usingUQS) {
+        const userIdsQuery = await UserQuizState.createQueryBuilder(
+          "user_quiz_state",
+        )
+          .select("user_quiz_state.user_id")
+          .where("user_quiz_state.quiz_id = :quizId", { quizId })
+          .andWhere("user_quiz_state.peer_reviews_given >= :peerReviewsGiven", {
+            peerReviewsGiven,
+          })
 
-      let goodQuery: string
-
-      if (prcIsInGoodShape) {
+        queryBuilder
+          .andWhere("quiz_answer.user_id IN (" + userIdsQuery.getQuery() + ")")
+          .setParameters(userIdsQuery.getParameters())
+      } else {
+        // 2. Jos UserQuizState ei ajan tasalla
         const prcIdsQuery = await PeerReviewCollection.createQueryBuilder(
           "peer_review_collection",
         )
@@ -168,7 +179,9 @@ export default class QuizAnswerService {
             quiz_id: quizId,
           })
 
-        const givenQuery = await PeerReview.createQueryBuilder("peer_review")
+        const userIdsAndCountsQuery = await PeerReview.createQueryBuilder(
+          "peer_review",
+        )
           .select("peer_review.user_id", "user_id")
           .addSelect("COUNT(*)", "count")
           .where(
@@ -179,73 +192,106 @@ export default class QuizAnswerService {
           .setParameters(prcIdsQuery.getParameters())
           .groupBy("peer_review.user_id")
           .having("peer_review.count >= " + peerReviewsGiven)
-        goodQuery =
-          "SELECT user_id AS user_id FROM (" +
-          givenQuery.getQuery() +
-          ") AS foo"
-      } else {
-      }
 
-      queryBuilder.andWhere("quiz_answer.user_id IN (" + goodQuery + ")")
+        const acceptableUserIdsQuery =
+          "SELECT user_id AS user_id FROM (" +
+          userIdsAndCountsQuery.getQuery() +
+          ") AS foo"
+
+        queryBuilder
+          .andWhere("quiz_answer.user_id IN (" + acceptableUserIdsQuery + ")")
+          .setParameters(userIdsAndCountsQuery.getParameters())
+      }
     }
 
     // peer reviews for certain quiz: received total of all peer reviews is of no interest!
     if (
       typeof peerReviewsReceived === "number" &&
-      peerReviewsReceived >= 0 &&
+      // kriteerinä 0 -> kaikki täyttävät -> ei tarvetta rajata enempää
+      peerReviewsReceived > 0 &&
       peerReviewsReceived <= 1000 &&
-      !quizId
+      quizId
     ) {
-      //certain to work but slower
+      // 1. Jos UserQuizState ajan tasalla
+      const usingUQS = true
 
-      const prcIdsQuery = await PeerReviewCollection.createQueryBuilder(
-        "peer_review_collection",
-      )
-        .select("peer_review_collection.id")
-        .where("peer_review_collection.quiz_id = :quiz_id", { quiz_id: quizId })
-
-      const receivedQuery = PeerReview.createQueryBuilder("peer_review")
-        .select("peer_review.quiz_answer_id")
-        .addSelect("COUNT(*)", "count")
-        .where(
-          "peer_review.peer_review_collection_id IN (" +
-            prcIdsQuery.getQuery() +
-            ")",
+      if (usingUQS) {
+        const userIdsQuery = await UserQuizState.createQueryBuilder(
+          "user_quiz_state",
         )
-        .groupBy("peer_review.quiz_answer_id")
-        .having("peer_review.count >= " + peerReviewsReceived)
+          .select("user_quiz_state.user_id")
+          .where("user_quiz_state.quiz_id = :quizId", { quizId })
+          .andWhere(
+            "user_quiz_state.peer_reviews_received >= :peerReviewsReceived",
+            { peerReviewsReceived },
+          )
 
-      const goodQuery =
-        "SELECT quiz_answer_id AS quiz_answer_id FROM (" +
-        receivedQuery.getQuery() +
-        ") AS foo2"
+        queryBuilder
+          .andWhere("quiz_answer.user_id IN (" + userIdsQuery.getQuery() + ")")
+          .setParameters(userIdsQuery.getParameters())
+      } else {
+        // 2. Jos UQS ei ajan tasalla
 
-      //words if user_quiz_state up to date
-      // to do
+        const prcIdsQuery = await PeerReviewCollection.createQueryBuilder(
+          "peer_review_collection",
+        )
+          .select("peer_review_collection.id")
+          .where("peer_review_collection.quiz_id = :quiz_id", {
+            quiz_id: quizId,
+          })
 
-      queryBuilder
-        .andWhere("quiz_answer.id IN (" + goodQuery + ")")
-        .setParameters(receivedQuery.getParameters())
+        const receivedQuery = PeerReview.createQueryBuilder("peer_review")
+          .select("peer_review.quiz_answer_id")
+          .addSelect("COUNT(*)", "count")
+          .where(
+            "peer_review.peer_review_collection_id IN (" +
+              prcIdsQuery.getQuery() +
+              ")",
+          )
+          .groupBy("peer_review.quiz_answer_id")
+          .having("peer_review.count >= " + peerReviewsReceived)
+
+        const goodQuery =
+          "SELECT quiz_answer_id AS quiz_answer_id FROM (" +
+          receivedQuery.getQuery() +
+          ") AS foo2"
+
+        queryBuilder
+          .andWhere("quiz_answer.id IN (" + goodQuery + ")")
+          .setParameters(receivedQuery.getParameters())
+      }
     }
 
-    if (typeof spamFlags === "number" && spamFlags >= 0 && spamFlags <= 10000) {
-      // etsitään kaikki sopivat
-      const spamQuery = await SpamFlag.createQueryBuilder("spam_flag")
-        .select("spam_flag.quiz_answer_id")
-        .addSelect("COUNT(*)", "count")
-        .groupBy("spam_flag.quiz_answer_id")
-        .having("count >= " + spamFlags)
+    if (typeof spamFlags === "number" && spamFlags > 0 && spamFlags <= 10000) {
+      // 1. Jos UserQuizState ajan tasalla
+      const usingUQS = true
 
-      const goodQuery =
-        "SELECT quiz_answer_id AS quiz_answer_id FROM (" +
-        spamQuery.getQuery() +
-        ") AS foo3"
+      if (usingUQS) {
+        const userIdsQuery = await UserQuizState.createQueryBuilder(
+          "user_quiz_state",
+        )
+          .select("user_quiz_state.user_id")
+          .where("user_quiz_state.quiz_id = :quizId", { quizId })
+          .andWhere("user_quiz_state.spam_flags >= :spamFlags", { spamFlags })
 
-      queryBuilder.andWhere("quiz_answer.id IN (" + goodQuery + ")")
+        queryBuilder
+          .andWhere("quiz_answer.user_id IN (" + userIdsQuery.getQuery() + ")")
+          .setParameters(userIdsQuery.getParameters())
+      } else {
+        const spamQuery = await SpamFlag.createQueryBuilder("spam_flag")
+          .select("spam_flag.quiz_answer_id")
+          .addSelect("COUNT(*)", "count")
+          .groupBy("spam_flag.quiz_answer_id")
+          .having("count >= " + spamFlags)
+
+        const acceptableIdsQuery =
+          "SELECT quiz_answer_id AS quiz_answer_id FROM (" +
+          spamQuery.getQuery() +
+          ") AS foo3"
+
+        queryBuilder.andWhere("quiz_answer.id IN (" + acceptableIdsQuery + ")")
+      }
     }
-
-    console.log("Logging the sql")
-    queryBuilder.printSql()
 
     return queryBuilder
   }
@@ -271,38 +317,20 @@ export default class QuizAnswerService {
       .getMany()
   }
 
-  public async getAttentionAnswersCount(): Promise<any[]> {
-    return await QuizAnswer.createQueryBuilder("quiz_answer")
-      .select("quiz_answer.quiz_id", "quizId")
-      .addSelect("COUNT(quiz_answer.id)")
-      .where("quiz_answer.status IN ('spam', 'submitted')")
-      .groupBy("quiz_answer.quiz_id")
-      .getRawMany()
-  }
-
   public async getAnswersCount(query: IQuizAnswerQuery): Promise<any> {
     const someQuery = await this.constructGetAnswersQuery(query)
 
-    return await someQuery
-      .select("quiz_answer.quiz_id")
-      .addSelect("COUNT(*)")
-      .groupBy("quiz_answer.quiz_id")
-      .getRawMany()
-  }
-
-  public async getNumberOfAnswers(quizId: string): Promise<any> {
-    const result = await QuizAnswer.createQueryBuilder("quiz_answer")
+    const result = await someQuery
       .select("quiz_answer.quiz_id", "quizId")
       .addSelect("COUNT(quiz_answer.id)")
-      .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
       .groupBy("quiz_answer.quiz_id")
       .getRawMany()
 
-    if (result.length === 0) {
-      return {}
+    if (!query.quizId) {
+      return result
     }
 
-    return result[0]
+    return result.length > 0 ? result[0] : {}
   }
 
   public async getAnswersStatistics(quizId: string): Promise<any> {
