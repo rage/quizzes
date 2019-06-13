@@ -53,7 +53,6 @@ export class QuizController {
     @QueryParams() params: any,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
-    console.time("everything")
     const quizId = validator.isUUID(id) ? id : getUUIDByString(id)
 
     let userQuizState: UserQuizState
