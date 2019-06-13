@@ -18,6 +18,7 @@ import { InjectManager } from "typeorm-typedi-extensions"
 import validator from "validator"
 import { API_PATH } from "../../config"
 import {
+  PeerReview,
   PeerReviewCollection,
   Quiz,
   QuizAnswer,
@@ -52,6 +53,7 @@ export class QuizController {
     @QueryParams() params: any,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
+    console.time("everything")
     const quizId = validator.isUUID(id) ? id : getUUIDByString(id)
 
     let userQuizState: UserQuizState
