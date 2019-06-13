@@ -73,7 +73,6 @@ class QuizStatistics extends React.Component<any, any> {
       )
       this.props.setAllAnswersCount(this.props.match.params.id)
     } else {
-      console.log("4")
       this.props.setAttentionRequiringAnswers(
         this.props.match.params.id,
         this.state.displayingPage,
