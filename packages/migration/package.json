@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "build": "yarn run build-ts",
-    "build-ts": "cd ../common && tsc && cd ../migration && tsc && tscpaths -p tsconfig.json -s ./src -o ../../dist/migration/src",
+    "build-ts": "cd ../migration && tsc && tscpaths -p tsconfig.json -s ./src -o ../../dist/migration/src",
     "db-migrate": "node --max-old-space-size=16384 ../../dist/migration/src/index.js"
   },
   "dependencies": {
@@ -47,14 +47,14 @@
     "request": "^2.87.0",
     "request-promise": "^4.2.2",
     "stream": "0.0.2",
-    "tmc-client-js": "0.0.9",
+    "tmc-client-js": "^0.0.9",
     "typedi": "^0.8.0",
     "typeorm": "^0.3.0-alpha.11",
     "uuid-by-string": "^0.6.0",
     "validate.js": "^0.12.0",
     "webpack": "^4.20.2",
     "webpack-node-externals": "^1.7.2",
-    "winston": "^3.1.0"
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "@types/body-parser": "^1.17.0",

@@ -2,6 +2,7 @@ import {
   BaseEntity,
   Column,
   CreateDateColumn,
+  Index,
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -18,6 +19,8 @@ export class QuizOptionAnswer extends BaseEntity {
 
   @ManyToOne(type => QuizItemAnswer, qia => qia.id)
   public quizItemAnswer: Promise<QuizItemAnswer>
+
+  @Index()
   @Column()
   public quizItemAnswerId: string
 

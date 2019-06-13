@@ -135,6 +135,7 @@ class App extends React.Component<any, any> {
 
                   <div style={{ height: 80 }} />
                 </div>
+
                 <Route exact={true} path="/" component={CoursesView} />
                 <Route exact={true} path="/quizzes/:id" component={this.edit} />
                 <Route exact={true} path="/new" component={this.create} />
@@ -151,22 +152,7 @@ class App extends React.Component<any, any> {
                 />
               </div>
             ) : (
-              <div>
-                <Route
-                  exact={true}
-                  path="/"
-                  CourseStatisticscomponent={Login}
-                />
-                <Route exact={true} path="/quizzes/:id" component={Login} />
-                <Route exact={true} path="/new" component={Login} />
-                <Route exact={true} path="/courses" component={Login} />
-                <Route exact={true} path="/courses/:id" component={Login} />
-                <Route
-                  exact={true}
-                  path="/quizzes/:id/answers"
-                  component={Login}
-                />
-              </div>
+              <Route exact={false} path="/" component={Login} />
             )}
           </React.Fragment>
         </Router>

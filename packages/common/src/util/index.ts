@@ -8,6 +8,9 @@ import {
 } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import getUUIDByStringBroken from "uuid-by-string"
+import { Database } from "../config/database"
+
+import { Container } from "typedi"
 
 export function insert<T extends BaseEntity>(
   type: typeof BaseEntity,
@@ -81,6 +84,15 @@ export function wordCount(str: string | null): number {
   const words: string[] | null = str.match(/[^\s]+/g)
 
   return words ? words.length : 0
+}
+
+export function firstWords(str: string, n: number): string {
+  const words: string[] | null = str.match(/[^\s]+/g)
+  if (words === null) {
+    return ""
+  }
+
+  return words.splice(0, n).join(" ")
 }
 
 export function executeIfChangeMatches(

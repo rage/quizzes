@@ -2,31 +2,39 @@ import {
   PeerReview,
   PeerReviewQuestion,
   PeerReviewQuestionAnswer,
-  PeerReviewQuestionCollection,
+  PeerReviewCollection,
   User,
-} from "@quizzes/common/models"
+} from "./models"
 import { PeerReview as QNPeerReview } from "./app-modules/models"
 
 import { Any } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { calculateChunkSize, progressBar } from "./util"
-import { getUUIDByString, insert } from "@quizzes/common/util"
+import { getUUIDByString, insert } from "./util/"
+
+import { logger } from "./config/winston"
 
 export async function migratePeerReviews(
   users: { [username: string]: User },
   existingAnswers: { [answerID: string]: boolean },
+  peerReviews: any[],
 ) {
-  console.log("Querying peer reviews...")
-  const peerReviews = await QNPeerReview.find({})
+  logger.info("Querying peer reviews...")
+  /*const peerReviews = await QNPeerReview.find({
+    $or: [
+      { createdAt: { $gte: LAST_MIGRATION } },
+      { updatedAt: { $gte: LAST_MIGRATION } },
+    ],
+  })*/
 
   const newPeerReviews: Array<QueryPartialEntity<PeerReview>> = []
   const newPeerReviewAnswers: Array<
     QueryPartialEntity<PeerReviewQuestionAnswer>
   > = []
 
-  console.log("Querying peer review question collections...")
-  const prqcArray = await PeerReviewQuestionCollection.find()
-  console.log("Querying peer review question collection questions...")
+  logger.info("Querying peer review question collections...")
+  const prqcArray = await PeerReviewCollection.find()
+  logger.info("Querying peer review question collection questions...")
   const prqcs: { [prqcID: string]: PeerReviewQuestion[] } = {}
   for (const prqc of prqcArray) {
     prqcs[prqc.id] = await prqc.questions
@@ -45,9 +53,9 @@ export async function migratePeerReviews(
     }
 
     const user = users[oldPR.giverAnswererId]
-    if (!user) {
+    /*if (!user) {
       continue
-    }
+    }*/
 
     const quizID = getUUIDByString(oldPR.quizId)
     const sourceQuizID = getUUIDByString(oldPR.sourceQuizId)
@@ -59,7 +67,7 @@ export async function migratePeerReviews(
     const id = getUUIDByString(oldPR._id)
     newPeerReviews.push({
       id,
-      userId: user.id,
+      userId: user ? user.id : null,
       quizAnswerId: answerID,
       rejectedQuizAnswerIds: rejectedAnswerID ? [rejectedAnswerID] : [],
       createdAt: oldPR.createdAt,

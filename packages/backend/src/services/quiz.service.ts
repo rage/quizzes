@@ -26,7 +26,7 @@ export default class QuizService {
 
   public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
     const queryBuilder = this.entityManager.createQueryBuilder(Quiz, "quiz")
-    const { courseId, exclude, id, language, stripped } = query
+    const { courseId, coursePart, exclude, id, language, stripped } = query
 
     if (language) {
       queryBuilder.leftJoinAndSelect(
@@ -133,6 +133,10 @@ export default class QuizService {
 
     if (courseId) {
       queryBuilder.andWhere("quiz.courseId = :courseId", { courseId })
+    }
+
+    if (coursePart) {
+      queryBuilder.andWhere("quiz.part = :part", { part: coursePart })
     }
 
     if (exclude) {

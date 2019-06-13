@@ -1,18 +1,38 @@
-import { QuizAnswer, SpamFlag, User } from "@quizzes/common/models"
+import { QuizAnswer, SpamFlag, User } from "./models"
 import { QuizAnswerSpamFlag as QNSpamFlag } from "./app-modules/models"
 
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { calculateChunkSize, progressBar } from "./util"
-import { getUUIDByString, insert } from "@quizzes/common/util"
+import { getUUIDByString, insert } from "./util/"
 
-export async function migrateSpamFlags(users: { [username: string]: User }) {
-  console.log("Querying spam flags...")
-  const oldFlags = (await QNSpamFlag.find({})).map(
-    (spamFlag: { [key: string]: any }) => {
-      const split = spamFlag._id.split("-")
-      return [split.slice(0, -1).join("-"), split.slice(-1)[0]]
-    },
+import { logger } from "./config/winston"
+
+export async function migrateSpamFlags(
+  users: { [username: string]: User },
+  flags: any[],
+) {
+  logger.info("Querying spam flags...")
+
+  const currentFlagIds: { [id: string]: boolean } = {}
+  ;(await SpamFlag.createQueryBuilder()
+    .select(["id"])
+    .getRawMany()).forEach(
+    (idObject: { id: string }) => (currentFlagIds[idObject.id] = true),
   )
+
+  logger.info(
+    `${Object.keys(currentFlagIds).length} existing spam flags in the database`,
+  )
+
+  /*if (Object.keys(currentFlagIds).length === flags.length) {
+    return
+  }*/
+
+  //const oldFlags = (await QNSpamFlag.find({}))
+  const oldFlags = flags.map((spamFlag: { [key: string]: any }) => {
+    const split = spamFlag._id.split("-")
+    return [split.slice(0, -1).join("-"), split.slice(-1)[0]]
+  })
 
   const existingIDs = (await QuizAnswer.createQueryBuilder()
     .select(["id"])
@@ -21,18 +41,27 @@ export async function migrateSpamFlags(users: { [username: string]: User }) {
   let bar = progressBar("Converting spam flags", oldFlags.length)
   const spamFlags: Array<QueryPartialEntity<SpamFlag>> = []
   for (let [username, answerID, createdAt, updatedAt] of oldFlags) {
-    const user = users[username]
-    if (!user) {
+    const id = getUUIDByString(username + answerID)
+
+    if (currentFlagIds[id]) {
       continue
     }
 
+    const user = users[username]
+
+    /*if (!user) {
+      continue
+    }*/
+
     answerID = getUUIDByString(answerID)
+
     if (!existingIDs.includes(answerID)) {
       continue
     }
 
     spamFlags.push({
-      userId: user.id,
+      id,
+      userId: user ? user.id : null,
       quizAnswerId: answerID,
       createdAt,
       updatedAt,
@@ -40,6 +69,7 @@ export async function migrateSpamFlags(users: { [username: string]: User }) {
     bar.tick()
   }
 
+  logger.info(`Inserting ${spamFlags.length} spam flags...`)
   bar = progressBar("Inserting spam flags", spamFlags.length)
   const chunkSize = calculateChunkSize(spamFlags[0])
   for (let i = 0; i < spamFlags.length; i += chunkSize) {

@@ -1,13 +1,10 @@
-import {
-  Course,
-  CourseTranslation,
-  Language,
-  Organization,
-} from "@quizzes/common/models"
+import { Course, CourseTranslation, Language, Organization } from "./models"
 import { progressBar } from "./util"
-import { getUUIDByString, insert } from "@quizzes/common/util"
+import { getUUIDByString, insert } from "./util/"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { InsertResult } from "typeorm"
+
+import { logger } from "./config/winston"
 
 const courseIDs = {
   "cybersecurity-intro": "en_US",
@@ -22,6 +19,7 @@ const courseIDs = {
 
   "elements-of-ai": "en_US",
   "elements-of-ai-fi": "fi_FI",
+  "elements-of-ai-se": "sv_SE",
 
   "k2017-ohpe": "fi_FI",
   "s2017-ohpe": "fi_FI",
@@ -47,6 +45,8 @@ const courseIDs = {
 
   "tietokoneen-toiminnan-perusteet": "fi_FI",
 
+  "tietokoneen-toiminnan-jatkokurssi": "fi_FI",
+
   default: "unknown",
 }
 
@@ -57,15 +57,16 @@ export async function migrateCourses(
   const courses: { [key: string]: Course } = {}
   const courseTranslations: Array<QueryPartialEntity<CourseTranslation>> = []
 
-  const existingCourses = await Course.find({})
+  /*const existingCourses = await Course.find({})
   if (existingCourses.length > 0) {
-    console.log("Existing courses found in database, skipping migration")
+    logger.info"Existing courses found in database, skipping migration")
     for (const course of existingCourses) {
       courses[course.id] = course
     }
     return Promise.resolve(courses)
-  }
+  }*/
 
+  logger.info("Creating courses")
   const bar = progressBar("Creating courses", Object.entries(courseIDs).length)
   await Promise.all(
     Object.entries(courseIDs).map(

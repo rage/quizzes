@@ -31,7 +31,6 @@ export class Database {
     })
 
     this.conn = await createConnection(connectionOptions)
-
     return this.conn
   }
 

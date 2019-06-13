@@ -47,6 +47,7 @@ export interface IQuizQuery {
   id?: string
   courseId?: string
   courseAbbreviation?: string
+  coursePart?: number
   course?: boolean
   language?: string
   items?: boolean
@@ -178,3 +179,11 @@ export interface INewPeerReviewCollectionTranslation {
   title: string
   body: string
 }
+
+export type QuizAnswerStatus =
+  | "draft"
+  | "submitted"
+  | "spam"
+  | "confirmed"
+  | "rejected"
+  | "deprecated"
