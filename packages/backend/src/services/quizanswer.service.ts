@@ -282,7 +282,8 @@ export default class QuizAnswerService {
 
   public async getAnswersCount(query: IQuizAnswerQuery): Promise<any> {
     const someQuery = await this.constructGetAnswersQuery(query)
-    someQuery
+
+    return await someQuery
       .select("quiz_answer.quiz_id")
       .addSelect("COUNT(*)")
       .groupBy("quiz_answer.quiz_id")

@@ -43,20 +43,6 @@ export class QuizAnswerController {
   @Inject()
   private validationService: ValidationService
 
-  @Get("/counts")
-  public async getAnswerCounts(
-    @HeaderParam("authorization") user: ITMCProfileDetails,
-    @QueryParam("quizId") quizId?: string,
-  ): Promise<any[]> {
-    if (!user.administrator) {
-      throw new UnauthorizedError("unauthorized")
-    }
-
-    return quizId
-      ? await this.quizAnswerService.getNumberOfAnswers(quizId)
-      : await this.quizAnswerService.getAttentionAnswersCount()
-  }
-
   @Get("/statistics")
   public async getAnswerStatistics(
     @QueryParam("quizId") quizId: string,
@@ -66,18 +52,32 @@ export class QuizAnswerController {
       throw new UnauthorizedError("unauthorized")
     }
 
+    const result = await this.quizAnswerService.getAnswersStatistics(quizId)
+    return result
+  }
+
+  @Get("/counts")
+  public async getAnswerCounts(
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+    @QueryParam("quizId") quizId?: string,
+  ): Promise<any[]> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
     const limitDate = new Date()
     limitDate.setDate(limitDate.getDate() - 300)
 
     const attentionCriteriaQuery: IQuizAnswerQuery = {
-      quizId,
+      // quizId,
       firstAllowedTime: limitDate,
       statuses: ["spam", "submitted"],
-      addPeerReviews: true,
+      //  addPeerReviews: true,
     }
 
-    const result = await this.quizAnswerService.getAnswersStatistics(quizId)
-    return result
+    return quizId
+      ? await this.quizAnswerService.getNumberOfAnswers(quizId)
+      : await this.quizAnswerService.getAnswersCount(attentionCriteriaQuery) // await this.quizAnswerService.getAttentionAnswersCount() //  //
   }
 
   @Get("/salainen_testi")
