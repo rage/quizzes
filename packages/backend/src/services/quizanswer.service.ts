@@ -74,11 +74,14 @@ export default class QuizAnswerService {
       peerReviewsReceived,
       spamFlags,
       addPeerReviews,
+      addSpamFlagNumber,
     } = query
 
     const queryBuilder: SelectQueryBuilder<
       QuizAnswer
     > = QuizAnswer.createQueryBuilder("quiz_answer")
+
+    const allowedToUseUQS = true
 
     if (
       !id &&
@@ -103,6 +106,26 @@ export default class QuizAnswerService {
           "peer_review.quiz_answer_id = quiz_answer.id",
         )
         .leftJoinAndSelect("peer_review.answers", "peer_review_question_answer")
+    }
+
+    if (addSpamFlagNumber) {
+      if (false) {
+        // allowedToUseUQS ) { - for test data this suits better in every case
+        queryBuilder.leftJoinAndMapOne(
+          "quiz_answer.userQuizState",
+          UserQuizState,
+          "user_quiz_state",
+          "user_quiz_state.quiz_id = quiz_answer.quiz_id " +
+            "AND user_quiz_state.user_id = quiz_answer.user_id",
+        )
+      } else {
+        queryBuilder.leftJoinAndMapMany(
+          "quiz_answer.spamFlags",
+          SpamFlag,
+          "spam_flag",
+          "spam_flag.quiz_answer_id = quiz_answer.id",
+        )
+      }
     }
 
     // so we can addWhere without regard for the first occurrence of 'where'
@@ -155,8 +178,7 @@ export default class QuizAnswerService {
       quizId
     ) {
       // 1. Jos UserQuizState ajan tasalla
-      const usingUQS = true
-      if (usingUQS) {
+      if (allowedToUseUQS) {
         const userIdsQuery = await UserQuizState.createQueryBuilder(
           "user_quiz_state",
         )
@@ -213,9 +235,8 @@ export default class QuizAnswerService {
       quizId
     ) {
       // 1. Jos UserQuizState ajan tasalla
-      const usingUQS = true
 
-      if (usingUQS) {
+      if (allowedToUseUQS) {
         const userIdsQuery = await UserQuizState.createQueryBuilder(
           "user_quiz_state",
         )
@@ -264,9 +285,7 @@ export default class QuizAnswerService {
 
     if (typeof spamFlags === "number" && spamFlags > 0 && spamFlags <= 10000) {
       // 1. Jos UserQuizState ajan tasalla
-      const usingUQS = true
-
-      if (usingUQS) {
+      if (allowedToUseUQS) {
         const userIdsQuery = await UserQuizState.createQueryBuilder(
           "user_quiz_state",
         )
@@ -333,7 +352,7 @@ export default class QuizAnswerService {
     return result.length > 0 ? result[0] : {}
   }
 
-  public async getAnswersStatistics(quizId: string): Promise<any> {
+  public async getAnswersSpamCounts(quizId: string): Promise<any> {
     const spamFlagCount = await QuizAnswer.createQueryBuilder("quiz_answer")
       .select("quiz_answer.id")
       .addSelect("COUNT(spam_flag.user_id)")

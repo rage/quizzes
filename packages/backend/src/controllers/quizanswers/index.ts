@@ -59,19 +59,6 @@ export class QuizAnswerController {
   @Inject()
   private validationService: ValidationService
 
-  @Get("/statistics")
-  public async getAnswerStatistics(
-    @QueryParam("quizId") quizId: string,
-    @HeaderParam("authorization") user: ITMCProfileDetails,
-  ): Promise<any> {
-    if (!user.administrator) {
-      throw new UnauthorizedError("unauthorized")
-    }
-
-    const result = await this.quizAnswerService.getAnswersStatistics(quizId)
-    return result
-  }
-
   @Get("/counts")
   public async getAnswerCounts(
     @HeaderParam("authorization") user: ITMCProfileDetails,
@@ -126,10 +113,10 @@ export class QuizAnswerController {
       limitDate.setDate(limitDate.getDate() - 300)
       attentionCriteriaQuery.lastAllowedTime = limitDate
       attentionCriteriaQuery.statuses = ["spam", "submitted"]
+      attentionCriteriaQuery.addSpamFlagNumber = true
     }
 
     result = await this.quizAnswerService.getAnswers(attentionCriteriaQuery)
-
     return result
   }
 

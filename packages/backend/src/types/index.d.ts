@@ -73,6 +73,7 @@ export interface IQuizAnswerQuery {
   // similarly: min/max spamflags
   spamFlags?: number
   addPeerReviews?: boolean
+  addSpamFlagNumber?: boolean
   skip?: number
   limit?: number
 }

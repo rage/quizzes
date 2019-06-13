@@ -1,6 +1,6 @@
 import { createAction } from "typesafe-actions"
 import { getTotalNumberOfAnswers } from "../../services/quizAnswers"
-import { getOddAnswerCountsByQuizzes } from "../../services/quizzes"
+import { getAttentionAnswerCountsByQuizzes } from "../../services/quizzes"
 
 export const set = createAction("answerCounts/SET", resolve => {
   return (quizzes: any[]) => resolve(quizzes)
@@ -15,8 +15,7 @@ export const decrement = createAction("answerCounts/DECREMENT", resolve => {
 export const setAnswerCounts = () => {
   return async (dispatch, getState) => {
     try {
-      const data = await getOddAnswerCountsByQuizzes(getState().user)
-      console.log("received data: ", data)
+      const data = await getAttentionAnswerCountsByQuizzes(getState().user)
       dispatch(set(data))
     } catch (error) {
       console.log(error)

@@ -7,7 +7,6 @@ import {
   setAllAnswers,
   setAttentionRequiringAnswers,
 } from "../../store/answers/actions"
-import { setAnswerStatistics } from "../../store/answerStatistics/actions"
 import { setCourse, setQuiz } from "../../store/filter/actions"
 import LanguageBar from "../GeneralTools/LanguageBar"
 import Answers from "./Answers"
@@ -60,7 +59,6 @@ class QuizStatistics extends React.Component<any, any> {
 
   public async componentDidMount() {
     await this.props.setQuiz(this.props.match.params.id)
-    await this.props.setAnswerStatistics(this.props.match.params.id)
 
     const queryParams = queryString.parse(this.props.location.search)
     const showing = queryParams.all && queryParams.all === "true"
@@ -331,7 +329,6 @@ export default connect(
   {
     setAllAnswers,
     setAllAnswersCount,
-    setAnswerStatistics,
     setAttentionRequiringAnswers,
     setCourse,
     setQuiz,

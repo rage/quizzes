@@ -62,18 +62,7 @@ export const setAttentionRequiringAnswers = (
         qi => qi.courseId === getState().filter.course,
       )
 
-      if (!quizNode) {
-        console.log("Quiz node undefined")
-        console.log("State: ", getState())
-      }
-
       const quiz = quizNode.quizzes.find(q => q.id === quizId)
-
-      if (!quiz) {
-        console.log("quiz undefined")
-        console.log("State: ", getState())
-      }
-
       const peerReviewQuestions = quiz.peerReviewCollections
         .map(prc => prc.questions)
         .flat()
