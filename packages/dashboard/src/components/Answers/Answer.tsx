@@ -361,8 +361,7 @@ class PeerReviewsSummary extends React.Component<any, any> {
                   SPAM FLAGS:{" "}
                   {this.props.answer.userQuizState
                     ? this.props.answer.userQuizState.spamCount
-                    : // only needed if backend doesn't use user quiz state to calculate
-                      this.props.answer.spamFlags.length}
+                    : "not calculated"}
                   {this.props.course.maxSpamFlags &&
                     `. (Maximum allowed: ${this.props.course.maxSpamFlags})`}
                 </Typography>
@@ -370,9 +369,9 @@ class PeerReviewsSummary extends React.Component<any, any> {
               <Grid item={true} xs={12}>
                 <Typography variant="body1">
                   Peer reviews given:{" "}
-                  {(this.props.answer.userQuizState &&
-                    this.props.answer.userQuizState.peerReviewsGiven) ||
-                    "none"}
+                  {this.props.answer.userQuizState
+                    ? this.props.answer.userQuizState.peerReviewsGiven
+                    : "not calculated"}
                   {this.props.course.minPeerReviewsGiven &&
                     `. (Required: ${this.props.course.minPeerReviewsGiven})`}
                 </Typography>

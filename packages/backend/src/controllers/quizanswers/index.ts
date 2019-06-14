@@ -83,7 +83,7 @@ export class QuizAnswerController {
     return await this.quizAnswerService.getAnswersCount(criteriaQuery)
   }
 
-  @Get("/attention")
+  @Get("/")
   public async getEveryonesAnswers(
     @QueryParam("attention") attention: boolean,
     @QueryParam("quizId") quizId: string,
