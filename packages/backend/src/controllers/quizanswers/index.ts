@@ -83,6 +83,18 @@ export class QuizAnswerController {
     return await this.quizAnswerService.getAnswersCount(criteriaQuery)
   }
 
+  @Get("/data/:quizId")
+  public async getExtensiveData(
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+    @Param("quizId") quizId: string,
+  ) {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    return "Data has to be created OwO"
+  }
+
   @Get("/")
   public async getEveryonesAnswers(
     @QueryParam("attention") attention: boolean,

@@ -1,4 +1,10 @@
-import { CircularProgress, Grid, Paper, Typography } from "@material-ui/core"
+import {
+  Button,
+  CircularProgress,
+  Grid,
+  Paper,
+  Typography,
+} from "@material-ui/core"
 import queryString from "query-string"
 import React from "react"
 import { connect } from "react-redux"
@@ -183,13 +189,33 @@ class QuizStatistics extends React.Component<any, any> {
                   md={4}
                   style={{ marginBottom: "1em" }}
                 >
-                  {this.state.showingAll ? (
-                    <FilterOptions numberOfAnswers={totalNumberOfResults} />
-                  ) : (
-                    <GeneralQuizStatistics
-                      numberOfAnswers={totalNumberOfResults}
-                    />
-                  )}
+                  <Grid
+                    container={true}
+                    direction="row"
+                    justify="center"
+                    spacing={32}
+                  >
+                    {this.state.showingAll ? (
+                      <FilterOptions numberOfAnswers={totalNumberOfResults} />
+                    ) : (
+                      <GeneralQuizStatistics
+                        numberOfAnswers={totalNumberOfResults}
+                      />
+                    )}
+
+                    <Grid item={true} xs="auto">
+                      <Button
+                        variant="contained"
+                        onClick={this.handleDownloadClick}
+                        style={{
+                          backgroundColor: "#1D6F42",
+                          color: "white",
+                        }}
+                      >
+                        Download answers data (.csv)
+                      </Button>
+                    </Grid>
+                  </Grid>
                 </Grid>
 
                 <Grid item={true} xs={12} md={8}>
@@ -218,6 +244,10 @@ class QuizStatistics extends React.Component<any, any> {
         </Grid>
       </Grid>
     )
+  }
+
+  public handleDownloadClick = () => {
+    alert("To: do :3")
   }
 
   public updateAnswers = async () => {
