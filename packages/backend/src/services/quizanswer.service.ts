@@ -81,6 +81,8 @@ export default class QuizAnswerService {
       QuizAnswer
     > = QuizAnswer.createQueryBuilder("quiz_answer")
 
+    // allows for fast lookup of some statistics, but unsure if quiz state matches the real state in all cases
+    // methods managing without still left behind else branches
     const allowedToUseUQS = true
 
     if (
@@ -106,26 +108,6 @@ export default class QuizAnswerService {
           "peer_review.quiz_answer_id = quiz_answer.id",
         )
         .leftJoinAndSelect("peer_review.answers", "peer_review_question_answer")
-    }
-
-    if (addSpamFlagNumber) {
-      if (false) {
-        // allowedToUseUQS ) { - for test data this suits better in every case
-        queryBuilder.leftJoinAndMapOne(
-          "quiz_answer.userQuizState",
-          UserQuizState,
-          "user_quiz_state",
-          "user_quiz_state.quiz_id = quiz_answer.quiz_id " +
-            "AND user_quiz_state.user_id = quiz_answer.user_id",
-        )
-      } else {
-        queryBuilder.leftJoinAndMapMany(
-          "quiz_answer.spamFlags",
-          SpamFlag,
-          "spam_flag",
-          "spam_flag.quiz_answer_id = quiz_answer.id",
-        )
-      }
     }
 
     // so we can addWhere without regard for the first occurrence of 'where'
@@ -171,15 +153,15 @@ export default class QuizAnswerService {
       })
     }
 
-    // to make sense, the peer reviews for a certain quiz
+    let userIdsInSuitableUQStates = null
+
     if (
       typeof peerReviewsGiven === "number" &&
       (peerReviewsGiven > 0 && peerReviewsGiven < 1000) &&
       quizId
     ) {
-      // 1. Jos UserQuizState ajan tasalla
       if (allowedToUseUQS) {
-        const userIdsQuery = await UserQuizState.createQueryBuilder(
+        userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
           "user_quiz_state",
         )
           .select("user_quiz_state.user_id")
@@ -187,12 +169,7 @@ export default class QuizAnswerService {
           .andWhere("user_quiz_state.peer_reviews_given >= :peerReviewsGiven", {
             peerReviewsGiven,
           })
-
-        queryBuilder
-          .andWhere("quiz_answer.user_id IN (" + userIdsQuery.getQuery() + ")")
-          .setParameters(userIdsQuery.getParameters())
       } else {
-        // 2. Jos UserQuizState ei ajan tasalla
         const prcIdsQuery = await PeerReviewCollection.createQueryBuilder(
           "peer_review_collection",
         )
@@ -226,33 +203,30 @@ export default class QuizAnswerService {
       }
     }
 
-    // peer reviews for certain quiz: received total of all peer reviews is of no interest!
     if (
       typeof peerReviewsReceived === "number" &&
-      // kriteerinä 0 -> kaikki täyttävät -> ei tarvetta rajata enempää
       peerReviewsReceived > 0 &&
       peerReviewsReceived <= 1000 &&
       quizId
     ) {
-      // 1. Jos UserQuizState ajan tasalla
-
       if (allowedToUseUQS) {
-        const userIdsQuery = await UserQuizState.createQueryBuilder(
-          "user_quiz_state",
-        )
-          .select("user_quiz_state.user_id")
-          .where("user_quiz_state.quiz_id = :quizId", { quizId })
-          .andWhere(
+        if (userIdsInSuitableUQStates) {
+          userIdsInSuitableUQStates.andWhere(
             "user_quiz_state.peer_reviews_received >= :peerReviewsReceived",
             { peerReviewsReceived },
           )
-
-        queryBuilder
-          .andWhere("quiz_answer.user_id IN (" + userIdsQuery.getQuery() + ")")
-          .setParameters(userIdsQuery.getParameters())
+        } else {
+          userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
+            "user_quiz_state",
+          )
+            .select("user_quiz_state.user_id")
+            .where("user_quiz_state.quiz_id = :quizId", { quizId })
+            .andWhere(
+              "user_quiz_state.peer_reviews_received >= :peerReviewsReceived",
+              { peerReviewsReceived },
+            )
+        }
       } else {
-        // 2. Jos UQS ei ajan tasalla
-
         const prcIdsQuery = await PeerReviewCollection.createQueryBuilder(
           "peer_review_collection",
         )
@@ -284,18 +258,20 @@ export default class QuizAnswerService {
     }
 
     if (typeof spamFlags === "number" && spamFlags > 0 && spamFlags <= 10000) {
-      // 1. Jos UserQuizState ajan tasalla
       if (allowedToUseUQS) {
-        const userIdsQuery = await UserQuizState.createQueryBuilder(
-          "user_quiz_state",
-        )
-          .select("user_quiz_state.user_id")
-          .where("user_quiz_state.quiz_id = :quizId", { quizId })
-          .andWhere("user_quiz_state.spam_flags >= :spamFlags", { spamFlags })
-
-        queryBuilder
-          .andWhere("quiz_answer.user_id IN (" + userIdsQuery.getQuery() + ")")
-          .setParameters(userIdsQuery.getParameters())
+        if (userIdsInSuitableUQStates) {
+          userIdsInSuitableUQStates.andWhere(
+            "user_quiz_state.spam_flags >= :spamFlags",
+            { spamFlags },
+          )
+        } else {
+          userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
+            "user_quiz_state",
+          )
+            .select("user_quiz_state.user_id")
+            .where("user_quiz_state.quiz_id = :quizId", { quizId })
+            .andWhere("user_quiz_state.spam_flags >= :spamFlags", { spamFlags })
+        }
       } else {
         const spamQuery = await SpamFlag.createQueryBuilder("spam_flag")
           .select("spam_flag.quiz_answer_id")
@@ -309,6 +285,35 @@ export default class QuizAnswerService {
           ") AS foo3"
 
         queryBuilder.andWhere("quiz_answer.id IN (" + acceptableIdsQuery + ")")
+      }
+    }
+
+    if (userIdsInSuitableUQStates) {
+      queryBuilder
+        .andWhere(
+          "quiz_answer.user_id IN (" +
+            userIdsInSuitableUQStates.getQuery() +
+            ")",
+        )
+        .setParameters(userIdsInSuitableUQStates.getParameters())
+    }
+
+    if (addSpamFlagNumber) {
+      if (allowedToUseUQS) {
+        queryBuilder.leftJoinAndMapOne(
+          "quiz_answer.userQuizState",
+          UserQuizState,
+          "user_quiz_state",
+          "user_quiz_state.quiz_id = quiz_answer.quiz_id " +
+            "AND user_quiz_state.user_id = quiz_answer.user_id",
+        )
+      } else {
+        queryBuilder.leftJoinAndMapMany(
+          "quiz_answer.spamFlags",
+          SpamFlag,
+          "spam_flag",
+          "spam_flag.quiz_answer_id = quiz_answer.id",
+        )
       }
     }
 

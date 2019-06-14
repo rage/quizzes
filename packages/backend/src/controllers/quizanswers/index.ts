@@ -69,7 +69,7 @@ export class QuizAnswerController {
     }
 
     const limitDate = new Date()
-    limitDate.setDate(limitDate.getDate() - 300)
+    limitDate.setDate(limitDate.getDate() - 14)
 
     const criteriaQuery: IQuizAnswerQuery = quizId
       ? {
@@ -104,16 +104,16 @@ export class QuizAnswerController {
     const attentionCriteriaQuery: IQuizAnswerQuery = {
       quizId,
       addPeerReviews: true,
+      addSpamFlagNumber: true,
       skip,
       limit,
     }
 
     if (attention) {
       const limitDate = new Date()
-      limitDate.setDate(limitDate.getDate() - 300)
+      limitDate.setDate(limitDate.getDate() - 14)
       attentionCriteriaQuery.lastAllowedTime = limitDate
       attentionCriteriaQuery.statuses = ["spam", "submitted"]
-      attentionCriteriaQuery.addSpamFlagNumber = true
     }
 
     result = await this.quizAnswerService.getAnswers(attentionCriteriaQuery)
