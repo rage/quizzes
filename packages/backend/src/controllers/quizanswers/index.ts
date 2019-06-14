@@ -92,7 +92,7 @@ export class QuizAnswerController {
       throw new UnauthorizedError("unauthorized")
     }
 
-    return "Data has to be created OwO"
+    return await this.quizAnswerService.getCSVData(quizId)
   }
 
   @Get("/")
