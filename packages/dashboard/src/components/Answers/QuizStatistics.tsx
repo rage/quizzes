@@ -8,6 +8,8 @@ import {
 import queryString from "query-string"
 import React from "react"
 import { connect } from "react-redux"
+import * as XLSX from "xlsx"
+import { getCSVData } from "../../services/quizzes"
 import { setAllAnswersCount } from "../../store/answerCounts/actions"
 import {
   setAllAnswers,
@@ -246,8 +248,9 @@ class QuizStatistics extends React.Component<any, any> {
     )
   }
 
-  public handleDownloadClick = () => {
-    alert("To: do :3")
+  public handleDownloadClick = async () => {
+    const wb = await getCSVData(this.props.filter.quiz, this.props.user)
+    XLSX.writeFile(wb, "sheettext.csv")
   }
 
   public updateAnswers = async () => {
@@ -351,6 +354,7 @@ const mapStateToProps = (state: any) => {
     ),
     courses: state.courses,
     filter: state.filter,
+    user: state.user,
   }
 }
 

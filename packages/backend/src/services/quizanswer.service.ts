@@ -359,10 +359,13 @@ export default class QuizAnswerService {
   }
 
   public async getCSVData(quizId: string): Promise<any> {
-    const data = await this.getAnswers({ quizId, skip: 0, limit: 5 })
-    const ws = XLSX.utils.json_to_sheet(data)
+    const data = await this.getAnswers({ quizId, skip: 0, limit: 200 })
 
-    return await XLSX.utils.sheet_to_csv(ws)
+    const ws = XLSX.utils.json_to_sheet(data)
+    const wb = XLSX.utils.book_new()
+    XLSX.utils.book_append_sheet(wb, ws, "naamiexample")
+
+    return await wb
   }
 
   public async getAnswersSpamCounts(quizId: string): Promise<any> {
