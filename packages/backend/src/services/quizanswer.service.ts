@@ -359,13 +359,26 @@ export default class QuizAnswerService {
   }
 
   public async getCSVData(quizId: string): Promise<any> {
-    const data = await this.getAnswers({ quizId, skip: 0, limit: 200 })
+    const query = {
+      quizId,
+    }
 
+    console.time("before")
+    const data = await (await this.constructGetAnswersQuery(query))
+      .take(20000)
+      .getMany()
+    console.timeEnd("before")
+
+    console.time("sheet")
     const ws = XLSX.utils.json_to_sheet(data)
-    const wb = XLSX.utils.book_new()
-    XLSX.utils.book_append_sheet(wb, ws, "naamiexample")
+    console.timeEnd("sheet")
 
-    return await wb
+    console.time("book")
+    const wb = XLSX.utils.book_new()
+    await XLSX.utils.book_append_sheet(wb, ws, "naamiexample")
+    console.timeEnd("book")
+
+    return wb
   }
 
   public async getAnswersSpamCounts(quizId: string): Promise<any> {

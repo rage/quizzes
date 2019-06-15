@@ -1,9 +1,12 @@
+import { Response } from "express"
 import {
   Get,
   HeaderParam,
   JsonController,
   Param,
   Post,
+  Req,
+  Res,
   BadRequestError,
   QueryParam,
   UnauthorizedError,
@@ -87,12 +90,17 @@ export class QuizAnswerController {
   public async getExtensiveData(
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @Param("quizId") quizId: string,
+    @Res() res: Response,
   ) {
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
     }
 
-    return await this.quizAnswerService.getCSVData(quizId)
+    console.time("total")
+    const result = await this.quizAnswerService.getCSVData(quizId)
+
+    res.send(result)
+    console.timeEnd("total")
   }
 
   @Get("/")
