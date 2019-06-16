@@ -52,41 +52,43 @@ export class QuizController {
     @QueryParams() params: any,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
-    const quizId = validator.isUUID(id) ? id : getUUIDByString(id)
-
-    let userQuizState: UserQuizState
     try {
-      userQuizState = await this.userQuizStateService.getUserQuizState(
-        user.id,
-        quizId,
-      )
-    } catch (error) {
-      console.log("not found")
-    }
-    let quizAnswer: QuizAnswer
-    if (userQuizState) {
-      const answer = await this.quizAnswerService.getAnswer(
-        { quizId, userId: user.id },
-        this.entityManager,
-      )
-      if (answer.status === "submitted" || answer.status === "confirmed") {
-        quizAnswer = answer
+      const quizId = validator.isUUID(id) ? id : getUUIDByString(id)
+
+      let userQuizState: UserQuizState
+      try {
+        userQuizState = await this.userQuizStateService.getUserQuizState(
+          user.id,
+          quizId,
+        )
+      } catch (error) {
+        console.log("not found")
       }
-    }
-    const quizzes: Quiz[] = await this.quizService.getQuizzes({
-      id: quizId,
-      items: true,
-      options: true,
-      peerreviews: true,
-      course: true,
-      stripped: quizAnswer ? false : true,
-      ...params,
-    })
-    return {
-      quiz: quizzes[0],
-      quizAnswer,
-      userQuizState,
-    }
+      let quizAnswer: QuizAnswer
+      if (userQuizState) {
+        const answer = await this.quizAnswerService.getAnswer(
+          { quizId, userId: user.id },
+          this.entityManager,
+        )
+        if (answer.status === "submitted" || answer.status === "confirmed") {
+          quizAnswer = answer
+        }
+      }
+      const quizzes: Quiz[] = await this.quizService.getQuizzes({
+        id: quizId,
+        items: true,
+        options: true,
+        peerreviews: true,
+        course: true,
+        stripped: quizAnswer ? false : true,
+        ...params,
+      })
+      return {
+        quiz: quizzes[0],
+        quizAnswer,
+        userQuizState,
+      }
+    } catch (error) {}
   }
 
   @Post("/")

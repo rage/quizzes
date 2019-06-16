@@ -1,7 +1,6 @@
 import { Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder, getConnection } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
-import * as XLSX from "xlsx"
 import {
   PeerReview,
   QuizAnswer,
@@ -336,10 +335,12 @@ export default class QuizAnswerService {
       limit = 100
     }
 
-    return (await this.constructGetAnswersQuery(query))
+    const result = (await this.constructGetAnswersQuery(query))
       .skip(skip)
       .take(limit)
       .getMany()
+
+    return result
   }
 
   public async getAnswersCount(query: IQuizAnswerQuery): Promise<any> {
@@ -361,24 +362,14 @@ export default class QuizAnswerService {
   public async getCSVData(quizId: string): Promise<any> {
     const query = {
       quizId,
+      addPeerReviews: true,
     }
 
-    console.time("before")
     const data = await (await this.constructGetAnswersQuery(query))
-      .take(20000)
-      .getMany()
-    console.timeEnd("before")
+      .limit(15000)
+      .stream()
 
-    console.time("sheet")
-    const ws = XLSX.utils.json_to_sheet(data)
-    console.timeEnd("sheet")
-
-    console.time("book")
-    const wb = XLSX.utils.book_new()
-    await XLSX.utils.book_append_sheet(wb, ws, "naamiexample")
-    console.timeEnd("book")
-
-    return wb
+    return data
   }
 
   public async getAnswersSpamCounts(quizId: string): Promise<any> {

@@ -1,4 +1,5 @@
 import { Response } from "express"
+import JSONStream from "JSONStream"
 import {
   Get,
   HeaderParam,
@@ -90,21 +91,19 @@ export class QuizAnswerController {
   public async getExtensiveData(
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @Param("quizId") quizId: string,
-    @Res() res: Response,
-  ) {
+  ): Promise<any> {
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
     }
 
-    console.time("total")
     const result = await this.quizAnswerService.getCSVData(quizId)
+    const stringStream = result.pipe(JSONStream.stringify())
 
-    res.send(result)
-    console.timeEnd("total")
+    return stringStream
   }
 
-  @Get("/")
-  public async getEveryonesAnswers(
+  @Get("/answers")
+  public async getAnswers(
     @QueryParam("attention") attention: boolean,
     @QueryParam("quizId") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
@@ -113,6 +112,7 @@ export class QuizAnswerController {
   ): Promise<QuizAnswer[]> {
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
+      return
     }
 
     let result: QuizAnswer[]
@@ -138,6 +138,7 @@ export class QuizAnswerController {
 
     result = await this.quizAnswerService.getAnswers(attentionCriteriaQuery)
     return result
+    console.log("nothing after!")
   }
 
   @Post("/:answerId")

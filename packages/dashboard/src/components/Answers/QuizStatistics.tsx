@@ -18,6 +18,7 @@ import {
 import { setCourse, setQuiz } from "../../store/filter/actions"
 import LanguageBar from "../GeneralTools/LanguageBar"
 import Answers from "./Answers"
+import DownloadButton from "./DownloadButton"
 import FilterOptions from "./FilterOptions"
 import GeneralQuizStatistics from "./GeneralQuizStatistics"
 
@@ -206,16 +207,7 @@ class QuizStatistics extends React.Component<any, any> {
                     )}
 
                     <Grid item={true} xs="auto">
-                      <Button
-                        variant="contained"
-                        onClick={this.handleDownloadClick}
-                        style={{
-                          backgroundColor: "#1D6F42",
-                          color: "white",
-                        }}
-                      >
-                        Download answers data (.csv)
-                      </Button>
+                      <DownloadButton quiz={quiz} user={this.props.user} />
                     </Grid>
                   </Grid>
                 </Grid>
@@ -246,11 +238,6 @@ class QuizStatistics extends React.Component<any, any> {
         </Grid>
       </Grid>
     )
-  }
-
-  public handleDownloadClick = async () => {
-    const wb = await getCSVData(this.props.filter.quiz, this.props.user)
-    XLSX.writeFile(wb, "sheettext.csv")
   }
 
   public updateAnswers = async () => {
