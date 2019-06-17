@@ -14,6 +14,10 @@ RUN yarn install
 
 ENV NODE_ENV=production
 
+WORKDIR /app/packages/migration
+
+RUN yarn build
+
 WORKDIR /app/packages/backend
 
 RUN yarn build
