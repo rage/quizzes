@@ -20,12 +20,12 @@ const Scale = ({ handleIntDataChange, intData, item, answered }) => {
   }
   return (
     <div>
-      <FormControl fullWidth component="fieldset">
+      <FormControl fullWidth>
         <Table>
           <TableBody>
             <TableRow>
               <TableCell style={{ width: "40%" }}>
-                <FormLabel component="legend">
+                <FormLabel>
                   <Typography variant="subtitle1">
                     {item.texts[0].title}
                   </Typography>
@@ -62,11 +62,13 @@ const Scale = ({ handleIntDataChange, intData, item, answered }) => {
 }
 
 const radioButtonOptions = answered => {
+  const color: "primary" = "primary"
   let options = {
     style: {
       paddingLeft: 0,
     },
-    color: "primary",
+    color,
+    disabled: false,
   }
 
   if (answered) {

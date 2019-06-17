@@ -6,8 +6,9 @@ import { BASE_URL } from "../../config"
 import PeerReviewForm from "./PeerReviewForm"
 import PeerReviewsGuidance from "./PeerReviewsGuidance"
 import Togglable from "../../utils/Togglable"
+import { string } from "prop-types"
 
-class PeerReviews extends Component {
+class PeerReviews extends Component<any> {
   state = {
     peerReview: undefined,
     answersToReview: undefined,
@@ -24,7 +25,7 @@ class PeerReviews extends Component {
 
   fetchAnswersToReview = async () => {
     const response = await axios.get(
-      `${BASE_URL}/api/v1/quizzes/peerreview/${this.props.quizId}/${
+      `${this.props.baseUrl}/api/v1/quizzes/peerreview/${this.props.quizId}/${
         this.props.languageId
       }`,
       { headers: { authorization: `Bearer ${this.props.accessToken}` } },
@@ -35,7 +36,7 @@ class PeerReviews extends Component {
   flagAsSpam = quizAnswerId => async event => {
     this.setState({ answersToReview: undefined })
     await axios.post(
-      `${BASE_URL}/api/v1/quizzes/spamflag`,
+      `${this.props.baseUrl}/api/v1/quizzes/spamflag`,
       { quizAnswerId },
       { headers: { authorization: `Bearer ${this.props.accessToken}` } },
     )

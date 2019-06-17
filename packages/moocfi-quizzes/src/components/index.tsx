@@ -11,7 +11,6 @@ import StageVisualizer from "./Essay/StageVisualizer"
 import PeerReviews from "./Essay/PeerReviews"
 import Unsupported from "./Unsupported"
 import axios from "axios"
-import { BASE_URL } from "../config"
 import languageLabels from "../utils/language_labels"
 import { wordCount } from "../utils/string_tools"
 
@@ -30,7 +29,14 @@ const componentType = typeName => {
   return component === undefined ? Unsupported : component
 }
 
-class Quiz extends Component {
+export interface Props {
+  id: string
+  languageId: string
+  accessToken: string
+  baseUrl: string
+}
+
+class Quiz extends Component<Props> {
   state = {
     quiz: undefined,
     quizAnswer: undefined,
@@ -38,13 +44,14 @@ class Quiz extends Component {
     submitLocked: false,
     correctCount: null,
     error: undefined,
+    userQuizState: undefined,
   }
 
   async componentDidMount() {
-    const { id, languageId, accessToken } = this.props
+    const { id, languageId, accessToken, baseUrl } = this.props
     try {
       const response = await axios.get(
-        `${BASE_URL}/api/v1/quizzes/${id}?language=${languageId}`,
+        `${baseUrl}/api/v1/quizzes/${id}?language=${languageId}`,
         { headers: { authorization: `Bearer ${accessToken}` } },
       )
       const quiz = response.data.quiz
@@ -148,7 +155,7 @@ class Quiz extends Component {
   handleSubmit = async event => {
     this.setState({ submitLocked: true })
     const response = await axios.post(
-      `${BASE_URL}/api/v1/quizzes/answer`,
+      `${this.props.baseUrl}/api/v1/quizzes/answer`,
       this.state.quizAnswer,
       {
         headers: { authorization: `Bearer ${this.props.accessToken}` },
@@ -203,6 +210,7 @@ class Quiz extends Component {
       if (item.type === "checkbox" || item.type === "research-agreement") {
         return itemAnswer.optionAnswers.length > 0
       }
+      return undefined
     })
 
     return submittable.includes(false)
@@ -288,6 +296,10 @@ class Quiz extends Component {
 
     const types = quiz.items.map(item => item.type)
 
+    if (quiz.texts.length === 0) {
+      return <div>Error: quiz has no texts.</div>
+    }
+
     return (
       <div>
         <Typography variant="h5" style={{ paddingBottom: 10 }}>
@@ -310,7 +322,7 @@ class Quiz extends Component {
               }
               peerReviewsRequired={quiz.course.minPeerReviewsGiven}
               peerReviewsReceived={
-                this.state.userQuizSstate
+                this.state.userQuizState
                   ? this.state.userQuizState.peerReviewsReceived
                   : 0
               }
@@ -337,6 +349,7 @@ class Quiz extends Component {
                   }
                   peerReviewsRequired={quiz.course.minPeerReviewsGiven}
                   setUserQuizState={this.setUserQuizState}
+                  baseUrl={this.props.baseUrl}
                 />
               )}
 

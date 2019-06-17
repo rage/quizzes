@@ -1,7 +1,17 @@
 import React, { Component } from "react"
 import Button from "@material-ui/core/Button"
 
-class Togglable extends Component {
+interface TogglebleState {
+  toggled: boolean
+}
+
+export interface TogglableProps {
+  initiallyVisible: boolean
+  hideButtonText: string
+  displayButtonText: string
+}
+
+class Togglable extends Component<TogglableProps, TogglebleState> {
   constructor(props) {
     super(props)
     this.state = { toggled: props.initiallyVisible }

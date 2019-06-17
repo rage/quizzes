@@ -1,4 +1,4 @@
-import React from "react"
+import React, { CSSProperties } from "react"
 import {
   Button,
   Grid,
@@ -8,6 +8,7 @@ import {
   TableRow,
   Typography,
 } from "@material-ui/core"
+import { GridDirection } from "@material-ui/core/Grid"
 
 export default props => {
   const {
@@ -24,9 +25,9 @@ export default props => {
     successMessage,
   } = props
 
-  let direction = "row"
-  let questionWidth = 6
-  let optionContainerWidth = 6
+  let direction: GridDirection = "row"
+  let questionWidth: 6 | 12 = 6
+  let optionContainerWidth: 6 | 12 = 6
   let optionWidth
 
   if (singleItem) {
@@ -164,9 +165,10 @@ export default props => {
 }
 
 const selectButtonStyle = (selected, correct) => {
-  const style = { textTransform: "none", margin: "0.5em 0" }
+  const style: CSSProperties = { textTransform: "none", margin: "0.5em 0" }
+  const variant: "contained" | "outlined" = selected ? "contained" : "outlined"
   return {
-    variant: selected ? "contained" : "outlined",
+    variant,
     style: selected
       ? correct
         ? { ...style, ...{ color: "white", backgroundColor: "green" } }

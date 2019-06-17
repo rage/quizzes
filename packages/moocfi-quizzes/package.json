@@ -1,0 +1,29 @@
+{
+  "name": "moocfi-quizzes",
+  "version": "0.2.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "rm -rf ./dist && tsc",
+    "prepare": "yarn build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "Apache-2.0 OR MIT",
+  "devDependencies": {
+    "@types/react": "^16.8.20",
+    "@types/react-dom": "^16.8.4",
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6",
+    "styled-components": "^4.3.1",
+    "typescript": "^3.5.2"
+  },
+  "peerDependencies": {
+    "@material-ui/core": ">=3.9.2",
+    "axios": "^0.18.0",
+    "likert-react": "^0.0.0-beta6",
+    "react": ">=16.0.0",
+    "react-dom": ">=16.0.0",
+    "styled-components": ">=4"
+  }
+}
