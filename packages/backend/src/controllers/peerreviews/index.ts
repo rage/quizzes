@@ -1,3 +1,4 @@
+import JSONStream from "JSONStream"
 import {
   Get,
   HeaderParam,
@@ -57,6 +58,22 @@ export class PeerReviewController {
       answerId,
       false,
     )
+  }
+
+  @Get("/data/:quizId")
+  public async getDetailedPeerReviews(
+    @Param("quizId") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const result = await this.peerReviewService.getCSVData(quizId)
+
+    const stringStream = result.pipe(JSONStream.stringify())
+
+    return stringStream
   }
 
   @Get("/:quizId/:languageId")

@@ -18,7 +18,7 @@ class GeneralStatistics extends React.Component<any, any> {
           <Grid
             container={true}
             spacing={32}
-            style={{ backgroundColor: "#49C7FB" }}
+            style={{ backgroundColor: "#49C7FB", marginBottom: "1em" }}
           >
             <Grid item={true} xs={12}>
               <Typography variant="body1">

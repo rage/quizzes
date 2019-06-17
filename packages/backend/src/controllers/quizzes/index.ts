@@ -1,3 +1,4 @@
+import JSONStream from "JSONStream"
 import { getUUIDByString } from "@quizzes/common/util"
 import {
   Get,
@@ -89,6 +90,21 @@ export class QuizController {
         userQuizState,
       }
     } catch (error) {}
+  }
+
+  @Get("/data/:id")
+  public async getDetailedData(
+    @Param("id") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const result = await this.quizService.getCSVData(quizId)
+    const stringStream = result.pipe(JSONStream.stringify())
+
+    return stringStream
   }
 
   @Post("/")

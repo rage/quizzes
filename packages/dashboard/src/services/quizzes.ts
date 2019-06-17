@@ -15,8 +15,31 @@ export const getAttentionAnswerCountsByQuizzes = async user => {
   return response.data
 }
 
-export const getCSVData = async (quizId, user) => {
+export const getAnswersDetailedData = async (quizId, user) => {
   const response = await axios.get(`/api/v1/quizzes/answer/data/${quizId}`, {
+    headers: {
+      "Content-Type": "application/json",
+      authorization: `Bearer ${user.accessToken}`,
+    },
+  })
+  return response.data
+}
+
+export const getPeerReviewsDetailedData = async (quizId, user) => {
+  const response = await axios.get(
+    `/api/v1/quizzes/peerreview/data/${quizId}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${user.accessToken}`,
+      },
+    },
+  )
+  return response.data
+}
+
+export const getQuizInformationDetailedData = async (quizId, user) => {
+  const response = await axios.get(`/api/v1/quizzes/data/${quizId}`, {
     headers: {
       "Content-Type": "application/json",
       authorization: `Bearer ${user.accessToken}`,

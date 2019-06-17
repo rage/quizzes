@@ -1,9 +1,13 @@
+import knex from "knex"
 import { Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder, getConnection } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
+import validator from "validator"
 import {
   PeerReview,
+  Quiz,
   QuizAnswer,
+  QuizItem,
   UserQuizState,
   SpamFlag,
   PeerReviewCollection,
@@ -360,14 +364,103 @@ export default class QuizAnswerService {
   }
 
   public async getCSVData(quizId: string): Promise<any> {
-    const query = {
-      quizId,
-      addPeerReviews: true,
+    if (!validator.isUUID(quizId)) {
+      return {}
     }
 
-    const data = await (await this.constructGetAnswersQuery(query))
-      .limit(15000)
-      .stream()
+    const quizItemTypes = (await QuizItem.createQueryBuilder("quiz_item")
+      .select("quiz_item.type")
+      .where("quiz_id = :id", { id: quizId })
+      .getRawMany()).map(value => value.quiz_item_type)
+
+    const builder = knex({ client: "pg" })
+
+    let query = builder("quiz_answer")
+      .select({ answer_id: "quiz_answer.id" }, "quiz_answer.user_id", "status")
+      .where("quiz_answer.quiz_id", quizId)
+      .leftJoin(
+        "quiz_item_answer",
+        "quiz_item_answer.quiz_answer_id",
+        "quiz_answer.id",
+      )
+      .innerJoin("quiz_item", "quiz_item.id", "quiz_item_answer.quiz_item_id")
+      .select({ quiz_item_id: "quiz_item.id" }, "quiz_item.type")
+
+    let selectedFields: string[] = []
+
+    if (
+      quizItemTypes.some(
+        type =>
+          type === "multiple-choice" ||
+          type === "checkbox" ||
+          type === "research-agreement",
+      )
+    ) {
+      query = query
+        .leftJoin(
+          "quiz_option_answer",
+          "quiz_option_answer.quiz_item_answer_id",
+          "quiz_item_answer.id",
+        )
+
+        .innerJoin(
+          "quiz_option",
+          "quiz_option.id",
+          "quiz_option_answer.quiz_option_id",
+        )
+
+        .innerJoin(
+          "quiz_option_translation",
+          "quiz_option_translation.quiz_option_id",
+          "quiz_option.id",
+        )
+
+        .select(
+          "quiz_option_answer.quiz_option_id",
+          "quiz_option_translation.language_id",
+          "quiz_option_translation.title",
+          "quiz_option_translation.body",
+        )
+
+      selectedFields.push("correct")
+    } else if (
+      quizItemTypes.length === 1 ||
+      quizItemTypes.every(type => type === quizItemTypes[0])
+    ) {
+      console.log("Every type is the same")
+
+      switch (quizItemTypes[0]) {
+        case "open":
+          selectedFields.push("correct")
+        case "essay":
+          selectedFields.push("text_data")
+          break
+        case "scale":
+          selectedFields.push("int_data")
+          break
+        default:
+          selectedFields = ["text_data", "int_data", "correct"]
+      }
+    } else {
+      let selectedFields = ["text_data", "int_data", "correct"]
+    }
+
+    query = query.select(
+      ...selectedFields.map(field => `quiz_item_answer.${field}`),
+    )
+
+    query = query.select("quiz_answer.created_at", "quiz_answer.updated_at")
+
+    query = query.limit(200)
+
+    console.log("Query: ", query.toString())
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    const data = await queryRunner.stream(query.toString())
+
+    await queryRunner.release()
 
     return data
   }

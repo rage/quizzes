@@ -1,3 +1,4 @@
+import knex from "knex"
 import _ from "lodash"
 import { Service } from "typedi"
 import { Brackets, EntityManager, SelectQueryBuilder } from "typeorm"
@@ -47,6 +48,28 @@ export default class PeerReviewService {
     }
 
     return await builtQuery.getMany()
+  }
+
+  public async getCSVData(quizId: string) {
+    const builder = knex({ client: "pg" })
+
+    let query = builder("quiz_answer")
+      .select({ answer_id: "quiz_answer.id" }, "quiz_answer.user_id", "status")
+      .where("quiz_answer.quiz_id", quizId)
+      .leftJoin(
+        "quiz_item_answer",
+        "quiz_item_answer.quiz_answer_id",
+        "quiz_answer.id",
+      )
+      .innerJoin("quiz_item", "quiz_item.id", "quiz_item_answer.quiz_item_id")
+      .select({ quiz_item_id: "quiz_item.id" }, "quiz_item.type")
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    const data = await queryRunner.stream(query.toString())
+    await queryRunner.release()
+    return data
   }
 
   public async getAnswersToReview(

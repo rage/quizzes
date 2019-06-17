@@ -9,7 +9,11 @@ import queryString from "query-string"
 import React from "react"
 import { connect } from "react-redux"
 import * as XLSX from "xlsx"
-import { getCSVData } from "../../services/quizzes"
+import {
+  getAnswersDetailedData,
+  getPeerReviewsDetailedData,
+  getQuizInformationDetailedData,
+} from "../../services/quizzes"
 import { setAllAnswersCount } from "../../store/answerCounts/actions"
 import {
   setAllAnswers,
@@ -196,7 +200,7 @@ class QuizStatistics extends React.Component<any, any> {
                     container={true}
                     direction="row"
                     justify="center"
-                    spacing={32}
+                    spacing={8}
                   >
                     {this.state.showingAll ? (
                       <FilterOptions numberOfAnswers={totalNumberOfResults} />
@@ -206,8 +210,29 @@ class QuizStatistics extends React.Component<any, any> {
                       />
                     )}
 
-                    <Grid item={true} xs="auto">
-                      <DownloadButton quiz={quiz} user={this.props.user} />
+                    <Grid item={true} xs={12}>
+                      <DownloadButton
+                        quiz={quiz}
+                        service={getQuizInformationDetailedData}
+                        label="Download quiz info"
+                        filenameEnd="information"
+                      />
+                    </Grid>
+                    <Grid item={true} xs={12}>
+                      <DownloadButton
+                        quiz={quiz}
+                        service={getAnswersDetailedData}
+                        label="Download quiz answers data"
+                        filenameEnd="answers"
+                      />
+                    </Grid>
+                    <Grid item={true} xs={12}>
+                      <DownloadButton
+                        quiz={quiz}
+                        service={getPeerReviewsDetailedData}
+                        label={"Download peer review data"}
+                        filenameEnd="peer_reviews"
+                      />
                     </Grid>
                   </Grid>
                 </Grid>
