@@ -7,10 +7,8 @@
   ],
   "license": "MIT",
   "scripts": {
-    "build": "neutrino build",
-    "start": "neutrino start",
-    "lint": "neutrino lint",
-    "test": "neutrino test",
+    "start": "webpack-dev-server --mode development --open",
+    "build": "webpack --mode production",
     "prepublish": "yarn build"
   },
   "peerDependencies": {
@@ -22,14 +20,22 @@
   },
   "devDependencies": {
     "@material-ui/core": "^3.9.2",
-    "@neutrinojs/jest": "^8.3.0",
-    "@neutrinojs/react-components": "^8.3.0",
-    "@neutrinojs/standardjs": "^8.3.0",
+    "@neutrinojs/jest": "^9.0.0-rc.3",
+    "@neutrinojs/react-components": "^9.0.0-rc.3",
+    "@neutrinojs/standardjs": "^9.0.0-rc.3",
     "axios": "^0.18.0",
+    "babel-polyfill": "^6.26.0",
+    "eslint": "^5.16.0",
     "likert-react": "^0.0.0-beta6",
-    "neutrino": "^8.3.0",
+    "neutrino": "^9.0.0-rc.3",
     "prop-types": "^15.7.2",
     "react": "^16.0.0",
-    "react-dom": "^16.0.0"
+    "react-dom": "^16.0.0",
+    "webpack": "^4.34.0",
+    "webpack-cli": "^3.3.4",
+    "webpack-dev-server": "^3.7.1"
+  },
+  "dependencies": {
+    "source-map-support": "^0.5.12"
   }
 }

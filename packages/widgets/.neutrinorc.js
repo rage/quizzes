@@ -1,3 +1,6 @@
+const reactComponents = require("@neutrinojs/react-components")
+const jest = require("@neutrinojs/jest")
+
 module.exports = {
-  use: ["@neutrinojs/react-components", "@neutrinojs/jest"],
+  use: [reactComponents(), jest()],
 }
