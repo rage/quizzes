@@ -35,7 +35,13 @@ export const getPeerReviewsDetailedData = async (quizId, user) => {
       },
     },
   )
-  return response.data
+  return response.data.map(peerReviewRow => ({
+    ...peerReviewRow,
+    rejected_quiz_answer_ids:
+      peerReviewRow.rejected_quiz_answer_ids.length === 1
+        ? peerReviewRow.rejected_quiz_answer_ids[0]
+        : JSON.stringify(peerReviewRow.rejected_quiz_answer_ids),
+  }))
 }
 
 export const getQuizInformationDetailedData = async (quizId, user) => {

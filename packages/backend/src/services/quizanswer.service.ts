@@ -442,7 +442,7 @@ export default class QuizAnswerService {
           selectedFields = ["text_data", "int_data", "correct"]
       }
     } else {
-      let selectedFields = ["text_data", "int_data", "correct"]
+      selectedFields = ["text_data", "int_data", "correct"]
     }
 
     query = query.select(

@@ -28,22 +28,98 @@ export default class QuizService {
   public async getCSVData(quizId: string) {
     const builder = knex({ client: "pg" })
 
-    let query = builder("quiz_answer")
-      .select({ answer_id: "quiz_answer.id" }, "quiz_answer.user_id", "status")
-      .where("quiz_answer.quiz_id", quizId)
-      .leftJoin(
-        "quiz_item_answer",
-        "quiz_item_answer.quiz_answer_id",
-        "quiz_answer.id",
+    const quiz = (await this.getQuizzes({
+      id: quizId,
+      peerreviews: true,
+      options: true,
+      items: true,
+    }))[0]
+
+    if (!quiz) {
+      return
+    }
+
+    let query = builder("quiz")
+      .where("quiz.id", quizId)
+      .innerJoin("quiz_translation", "quiz_translation.quiz_id", "quiz.id")
+      .select(
+        "quiz.course_id",
+        "quiz.id",
+        { quiz_title: "quiz_translation.title" },
+        "quiz.part",
+        "quiz.section",
+        "quiz.points",
+        "quiz.deadline",
+        "quiz.open",
+        "quiz.excluded_from_score",
+        "quiz.auto_confirm",
       )
-      .innerJoin("quiz_item", "quiz_item.id", "quiz_item_answer.quiz_item_id")
-      .select({ quiz_item_id: "quiz_item.id" }, "quiz_item.type")
 
     const queryRunner = this.entityManager.connection.createQueryRunner()
     queryRunner.connect()
 
-    const data = await queryRunner.stream(query.toString())
+    let data: any[] = await queryRunner.query(query.toString())
     await queryRunner.release()
+
+    let info = data[0]
+
+    const newInfo = { ...info }
+
+    quiz.items.forEach((item, idx) => {
+      newInfo[`item_${idx}_id`] = item.id
+      newInfo[`item_${idx}_type`] = item.type
+      if (item.type === "open") {
+        newInfo[`item_${idx}_validity_regex`] = item.validityRegex
+        newInfo[`item_${idx}_format_regex`] = item.formatRegex
+      } else if (item.type === "scale") {
+        newInfo[`item_${idx}_min_value`] = item.minValue
+        newInfo[`item_${idx}_max_value`] = item.maxValue
+      } else if (item.type === "essay") {
+        newInfo[`item_${idx}_min_words`] = item.minWords
+        newInfo[`item_${idx}_max_words`] = item.maxWords
+      }
+      newInfo[`item_${idx}_title`] = item.texts[0].title
+      newInfo[`item_${idx}_body`] = item.texts[0].body
+
+      if (
+        item.type === "multiple-choice" ||
+        item.type === "checkbox" ||
+        item.type === "research-agreement"
+      ) {
+        item.options.forEach((opt, i) => {
+          newInfo[`item_${idx}_opt_${i}_id`] = opt.id
+          newInfo[`item_${idx}_opt_${i}_correct`] = opt.correct
+          newInfo[`item_${idx}_opt_${i}_title`] = opt.texts[0].title
+          newInfo[`item_${idx}_opt_${i}_body`] = opt.texts[0].body
+        })
+      }
+    })
+
+    data[0] = { ...data[0], ...newInfo }
+
+    if (quiz.peerReviewCollections.length > 0) {
+      quiz.peerReviewCollections
+      data = data.map(d => {
+        const newD = { ...d }
+        for (let i = 0; i < quiz.peerReviewCollections.length; i++) {
+          newD[`peer_review_collection_${i}_id`] =
+            quiz.peerReviewCollections[i].id
+          const peerReviewQuestions = quiz.peerReviewCollections[i].questions
+
+          peerReviewQuestions.forEach((question, idx) => {
+            newD[`prc_${i}_question_${idx}_id`] = question.id
+            newD[`prc_${i}_question_${idx}_default`] = question.default
+            newD[`prc_${i}_question_${idx}_type`] = question.type
+            newD[`prc_${i}_question_${idx}_answer_required`] =
+              question.answerRequired
+            newD[`prc_${i}_question_${idx}_title`] = question.texts[0].title
+            newD[`prc_${i}_question_${idx}_body`] = question.texts[0].body
+          })
+        }
+        return newD
+      })
+    }
+
     return data
   }
 

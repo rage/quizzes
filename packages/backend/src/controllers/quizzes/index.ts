@@ -1,4 +1,4 @@
-import JSONStream from "JSONStream"
+import { Response } from "express"
 import { getUUIDByString } from "@quizzes/common/util"
 import {
   Get,
@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   QueryParams,
+  Res,
   UnauthorizedError,
 } from "routing-controllers"
 import QuizService from "services/quiz.service"
@@ -25,7 +26,6 @@ import {
   UserQuizState,
 } from "../../models"
 import { IQuizQuery, ITMCProfileDetails } from "../../types"
-
 import _ from "lodash"
 
 @JsonController(`${API_PATH}/quizzes`)
@@ -96,15 +96,14 @@ export class QuizController {
   public async getDetailedData(
     @Param("id") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
+    @Res() response: Response,
   ) {
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
     }
 
     const result = await this.quizService.getCSVData(quizId)
-    const stringStream = result.pipe(JSONStream.stringify())
-
-    return stringStream
+    return response.send(result)
   }
 
   @Post("/")

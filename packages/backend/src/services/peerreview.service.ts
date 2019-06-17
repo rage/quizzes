@@ -53,16 +53,26 @@ export default class PeerReviewService {
   public async getCSVData(quizId: string) {
     const builder = knex({ client: "pg" })
 
-    let query = builder("quiz_answer")
-      .select({ answer_id: "quiz_answer.id" }, "quiz_answer.user_id", "status")
+    let query = builder("peer_review")
+      .innerJoin("quiz_answer", "quiz_answer.id", "peer_review.quiz_answer_id")
       .where("quiz_answer.quiz_id", quizId)
-      .leftJoin(
-        "quiz_item_answer",
-        "quiz_item_answer.quiz_answer_id",
-        "quiz_answer.id",
+      .select(
+        "peer_review.id",
+        "peer_review.quiz_answer_id",
+        "peer_review.user_id",
+        "peer_review.rejected_quiz_answer_ids",
       )
-      .innerJoin("quiz_item", "quiz_item.id", "quiz_item_answer.quiz_item_id")
-      .select({ quiz_item_id: "quiz_item.id" }, "quiz_item.type")
+      .innerJoin(
+        "peer_review_question_answer",
+        "peer_review_question_answer.peer_review_id",
+        "peer_review.id",
+      )
+      .select(
+        "peer_review_question_answer.value",
+        "peer_review_question_answer.text",
+      )
+
+    query = query.limit(100)
 
     const queryRunner = this.entityManager.connection.createQueryRunner()
     queryRunner.connect()
