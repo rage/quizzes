@@ -15,12 +15,31 @@ import {
 import { wordCount } from "./../../../common/src/util"
 import PeerReviewService from "./peerreview.service"
 
+import UserCoursePartStateService from "./usercoursepartstate.service"
+import UserCourseStateService from "./usercoursestate.service"
+
+// tslint:disable-next-line:no-var-requires
+// const Kafka = require("node-rdkafka")
+
 @Service()
 export default class ValidationService {
+  /*private stream = Kafka.Producer.createWriteStream({
+    "metadata.broker.list": "localhost:9092"
+  }, {}, {
+      topic: "test"
+    })*/
+
   @Inject()
   private peerReviewService: PeerReviewService
 
-  public validateQuizAnswer(
+  @Inject()
+  private userCourseStateService: UserCourseStateService
+
+  @Inject()
+  private userCoursePartStateService: UserCoursePartStateService
+
+  public async validateQuizAnswer(
+    manager: EntityManager,
     quizAnswer: QuizAnswer,
     quiz: Quiz,
     userState: UserQuizState,
@@ -193,12 +212,17 @@ export default class ValidationService {
 
     userQuizState.userId = quizAnswer.userId
     userQuizState.quizId = quizAnswer.quizId
-    userQuizState.pointsAwarded =
-      userQuizState.pointsAwarded > pointsAwarded
-        ? userQuizState.pointsAwarded
-        : pointsAwarded
     userQuizState.tries = userQuizState.tries ? userQuizState.tries + 1 : 1
     userQuizState.status = "locked"
+
+    if (userQuizState.pointsAwarded < pointsAwarded) {
+      userQuizState.pointsAwarded = pointsAwarded
+      // await this.userCourseStateService.updateUserCourseState(manager, quiz, userQuizState, quizAnswer)
+      // await this.userCoursePartStateService.updateUserCoursePartState(manager, quiz, userQuizState.userId)
+      // this.stream.write(Buffer.from("Validating shit!"))
+    }
+
+    // this.stream.write(Buffer.from("Validating stuff!"))
 
     const response = {
       itemAnswerStatus,

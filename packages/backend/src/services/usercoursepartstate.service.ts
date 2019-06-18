@@ -5,8 +5,8 @@ import {
   Course,
   Quiz,
   QuizAnswer,
-  UserCourseState,
   UserCoursePartState,
+  UserCourseState,
   UserQuizState,
 } from "../models"
 import { IQuizAnswerQuery } from "../types"
@@ -14,7 +14,6 @@ import CourseService from "./course.service"
 import QuizService from "./quiz.service"
 import QuizAnswerService from "./quizanswer.service"
 import UserQuizStateService from "./userquizstate.service"
-import { isBuffer } from "util"
 
 @Service()
 export default class UserCoursePartStateService {
@@ -37,7 +36,7 @@ export default class UserCoursePartStateService {
     userId: number,
     courseId: string,
     partNumber: number,
-  ) {
+  ): Promise<UserCoursePartState> {
     return await this.entityManager
       .createQueryBuilder(UserCoursePartState, "user_course_part_state")
       .where("user_course_part_state.user_id = :userId", { userId })
@@ -48,12 +47,18 @@ export default class UserCoursePartStateService {
       .getOne()
   }
 
-  public async getUserCoursePartStates(userId: number, courseId: string) {
-    return await this.entityManager
+  public async getUserCoursePartStates(
+    manager: EntityManager,
+    userId: number,
+    courseId: string,
+  ): Promise<UserCoursePartState[]> {
+    const userCoursePartStates: UserCoursePartState[] = await manager
       .createQueryBuilder(UserCoursePartState, "user_course_part_state")
       .where("user_course_part_state.user_id = :userId", { userId })
       .andWhere("user_course_part_state.course_id = :courseId", { courseId })
       .getMany()
+
+    return userCoursePartStates
   }
 
   public async updateUserCoursePartState(
@@ -128,9 +133,8 @@ export default class UserCoursePartStateService {
       pointsAwarded += uqs.pointsAwarded
     })
 
-    userCoursePartState.score = (pointsAwarded / pointsTotal) * 100
-    userCoursePartState.progress =
-      (userQuizStates.length / quizzesInPart.length) * 100
+    userCoursePartState.score = pointsAwarded
+    userCoursePartState.progress = (pointsAwarded / pointsTotal) * 100
 
     if (userCoursePartState.score > 99.99) {
       userCoursePartState.completed = true

@@ -130,7 +130,7 @@ export class QuizAnswerController {
     const newStatus: QuizAnswerStatus = body.newStatus
 
     const existingAnswer = await this.quizAnswerService.getAnswer(
-      { id: id },
+      { id },
       this.entityManager,
     )
 
@@ -218,35 +218,41 @@ export class QuizAnswerController {
       answer.quizId,
     )
 
-    const {
-      response,
-      quizAnswer,
-      userQuizState,
-    } = this.validationService.validateQuizAnswer(answer, quiz[0], userQState)
-
-    const erroneousItemAnswers = response.itemAnswerStatus.filter(status => {
-      return status.error ? true : false
-    })
-
-    if (erroneousItemAnswers.length > 0) {
-      throw new BadRequestError(
-        `${erroneousItemAnswers.map(x => {
-          if (x.type === "essay") {
-            return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer (${
-              x.data.words
-            } words): ${x.data.text}`
-          } else if (x.type === "scale") {
-            return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer: ${
-              x.data.answerValue
-            }`
-          }
-        })}`,
-      )
-    }
     let savedAnswer: QuizAnswer
     let savedUserQuizState: UserQuizState
 
     await this.entityManager.transaction(async manager => {
+      const {
+        response,
+        quizAnswer,
+        userQuizState,
+      } = await this.validationService.validateQuizAnswer(
+        manager,
+        answer,
+        quiz[0],
+        userQState,
+      )
+
+      const erroneousItemAnswers = response.itemAnswerStatus.filter(status => {
+        return status.error ? true : false
+      })
+
+      if (erroneousItemAnswers.length > 0) {
+        throw new BadRequestError(
+          `${erroneousItemAnswers.map(x => {
+            if (x.type === "essay") {
+              return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer (${
+                x.data.words
+              } words): ${x.data.text}`
+            } else if (x.type === "scale") {
+              return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer: ${
+                x.data.answerValue
+              }`
+            }
+          })}`,
+        )
+      }
+
       await this.validationService.checkForDeprecated(manager, quizAnswer)
 
       savedAnswer = await this.quizAnswerService.createQuizAnswer(
@@ -259,14 +265,14 @@ export class QuizAnswerController {
         userQuizState,
       )
 
-      if (!quiz[0].excludedFromScore && savedAnswer.status === "confirmed") {
+      /*if (!quiz[0].excludedFromScore && savedAnswer.status === "confirmed") {
         await this.userCourseStateService.updateUserCourseState(
           manager,
           quiz[0],
           savedUserQuizState,
           savedAnswer,
         )
-      }
+      }*/
     })
 
     return {

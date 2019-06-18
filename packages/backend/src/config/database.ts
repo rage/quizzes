@@ -25,6 +25,8 @@ export class Database {
 
     const connectionOptions = await getConnectionOptions()
 
+    console.log(connectionOptions)
+
     Object.assign(connectionOptions, {
       entities: Object.values(Models),
       namingStrategy: new SnakeNamingStrategy(),
