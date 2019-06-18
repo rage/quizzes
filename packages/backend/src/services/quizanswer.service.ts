@@ -363,6 +363,117 @@ export default class QuizAnswerService {
     return result.length > 0 ? result[0] : {}
   }
 
+  public async getPlainAnswersCSV(quizId: string): Promise<any> {
+    if (!validator.isUUID(quizId)) {
+      return {}
+    }
+
+    const builder = knex({ client: "pg" })
+
+    let query = builder("quiz_answer")
+      .select(
+        { answer_id: "quiz_answer.id" },
+        "quiz_answer.user_id",
+        "quiz_answer.status",
+        "quiz_answer.created_at",
+        "quiz_answer.updated_at",
+      )
+      .where("quiz_answer.quiz_id", quizId)
+      .leftJoin(
+        "user_quiz_state",
+        "user_quiz_state.user_id",
+        "quiz_answer.user_id",
+      )
+      .select(
+        "user_quiz_state.peer_reviews_given",
+        "user_quiz_state.peer_reviews_received",
+        "user_quiz_state.points_awarded",
+        "user_quiz_state.spam_flags",
+        "user_quiz_state.tries",
+        { quiz_state_status: "user_quiz_state.status" },
+        "user_quiz_state.created_at",
+        "user_quiz_state.updated_at",
+      )
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    const data = await queryRunner.stream(query.toString())
+
+    await queryRunner.release()
+    return data
+  }
+
+  public async getPlainItemAnswersCSV(quizId: string): Promise<any> {
+    const builder = knex({ client: "pg" })
+
+    let query = builder("quiz_item")
+      .where("quiz_item.quiz_id", quizId)
+      .innerJoin(
+        "quiz_item_answer",
+        "quiz_item_answer.quiz_item_id",
+        "quiz_item.id",
+      )
+      .select(
+        { quiz_answer_id: "quiz_item_answer.quiz_answer_id" },
+        { quiz_item_id: "quiz_item_answer.quiz_item_id" },
+        { item_answer_id: "quiz_item_answer.id" },
+        "quiz_item_answer.text_data",
+        "quiz_item_answer.int_data",
+        "quiz_item_answer.correct",
+        "quiz_item_answer.created_at",
+        "quiz_item_answer.updated_at",
+      )
+
+    query = query.limit(1000)
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+    const data = await queryRunner.stream(query.toString())
+
+    await queryRunner.release()
+    return data
+  }
+
+  public async getPlainOptionAnswersCSV(quizId: string): Promise<any> {
+    const builder = knex({ client: "pg" })
+
+    let query = builder("quiz_item")
+      .where("quiz_item.quiz_id", quizId)
+      .innerJoin(
+        "quiz_item_answer",
+        "quiz_item_answer.quiz_item_id",
+        "quiz_item.id",
+      )
+      .innerJoin(
+        "quiz_option",
+        "quiz_option.quiz_item_id",
+        "quiz_item_answer.id",
+      )
+      .innerJoin(
+        "quiz_option_answer",
+        "quiz_option_answer.quiz_option_id",
+        "quiz_option.id",
+      )
+      .select(
+        { option_answer_id: "quiz_option_answer.id" },
+        { quiz_item_answer_id: "quiz_option_answer.quiz_item_answer_id" },
+        { option_answer_id: "quiz_option_answer.quiz_option_id" },
+        "quiz_option_answer",
+        "quiz_option_answer.created_at",
+        "quiz_option_answer.updated_at",
+      )
+
+    query = query.limit(1000)
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+    const data = await queryRunner.stream(query.toString())
+
+    await queryRunner.release()
+    return data
+  }
+
   public async getCSVData(quizId: string): Promise<any> {
     if (!validator.isUUID(quizId)) {
       return {}

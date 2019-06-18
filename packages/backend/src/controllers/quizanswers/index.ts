@@ -91,11 +91,60 @@ export class QuizAnswerController {
     return await this.quizAnswerService.getAnswersCount(criteriaQuery)
   }
 
+  @Get("/data/:quizId/plainAnswers")
+  public async getPlainAnswers(
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+    @Param("quizId") quizId: string,
+  ): Promise<any> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const answersResult = await this.quizAnswerService.getPlainAnswersCSV(
+      quizId,
+    )
+    const answersStringStream = answersResult.pipe(JSONStream.stringify())
+
+    return answersStringStream
+  }
+
+  @Get("/data/:quizId/plainItemAnswers")
+  public async getPlainItemAnswers(
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+    @Param("quizId") quizId: string,
+  ): Promise<any> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const answersResult = await this.quizAnswerService.getPlainItemAnswersCSV(
+      quizId,
+    )
+    const answersStringStream = answersResult.pipe(JSONStream.stringify())
+
+    return answersStringStream
+  }
+
+  @Get("/data/:quizId/plainOptionAnswers")
+  public async getPlainOptionAnswers(
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+    @Param("quizId") quizId: string,
+  ): Promise<any> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const answersResult = await this.quizAnswerService.getPlainOptionAnswersCSV(
+      quizId,
+    )
+    const answersStringStream = answersResult.pipe(JSONStream.stringify())
+    return answersStringStream
+  }
+
   @Get("/data/:quizId")
   public async getExtensiveData(
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @Param("quizId") quizId: string,
-    @Res() response: Response,
   ): Promise<any> {
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")

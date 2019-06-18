@@ -60,6 +60,39 @@ export class PeerReviewController {
     )
   }
 
+  @Get("/data/:quizId/plainPeerReviews")
+  public async getDetailedPlainPeerReviews(
+    @Param("quizId") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const result = await this.peerReviewService.getPlainPeerReviewsCSV(quizId)
+    const stringStream = result.pipe(JSONStream.stringify())
+
+    return stringStream
+  }
+
+  @Get("/data/:quizId/plainAnswers")
+  public async getDetailedPlainPeerReviewQuestionAnswers(
+    @Param("quizId") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const result = await this.peerReviewService.getPlainPeerReviewAnswers(
+      quizId,
+    )
+
+    const stringStream = result.pipe(JSONStream.stringify())
+
+    return stringStream
+  }
+
   @Get("/data/:quizId")
   public async getDetailedPeerReviews(
     @Param("quizId") quizId: string,

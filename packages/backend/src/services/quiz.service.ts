@@ -25,6 +25,127 @@ export default class QuizService {
   @Inject()
   private validationService: ValidationService
 
+  public async getPlainQuizData(quizId: string) {
+    const builder = knex({ client: "pg" })
+
+    let query = builder("quiz")
+      .select()
+      .where("quiz.id", quizId)
+      .join("quiz_translation", "quiz_translation.quiz_id", "quiz.id")
+      .select("id", "title", "body", "submit_message")
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    let data = await queryRunner.stream(query.toString())
+    await queryRunner.release()
+
+    return data
+  }
+
+  public async getPlainQuizItems(quizId: string) {
+    const builder = knex({ client: "pg" })
+
+    let query = builder("quiz_item")
+      .where("quiz_item.quiz_id", quizId)
+      .select(
+        "quiz_item.id",
+        "type",
+        "order",
+        "validity_regex",
+        "format_regex",
+        "multi",
+        "min_words",
+        "max_words",
+        "min_value",
+        "max_value",
+      )
+      .innerJoin(
+        "quiz_item_translation",
+        "quiz_item_translation.quiz_item_id",
+        "quiz_item.id",
+      )
+      .select("title", "body", "success_message", "failure_message")
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    let data = await queryRunner.stream(query.toString())
+    await queryRunner.release()
+    return data
+  }
+
+  public async getPlainQuizItemOptions(quizId: string) {
+    const builder = knex({ client: "pg" })
+
+    let query = builder("quiz_item")
+      .where("quiz_item.quiz_id", quizId)
+      .innerJoin("quiz_option", "quiz_option.quiz_item_id", "quiz_item.id")
+      .select(
+        "quiz_option.quiz_item_id",
+        "quiz_option.id",
+        "quiz_option.correct",
+      )
+      .innerJoin(
+        "quiz_option_translation",
+        "quiz_option_translation.quiz_option_id",
+        "quiz_option.id",
+      )
+      .select("title", "body", "success_message", "failure_message")
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    let data = await queryRunner.stream(query.toString())
+    await queryRunner.release()
+
+    return data
+  }
+
+  public async getPlainQuizPeerReviewCollections(quizId: string) {
+    const builder = knex({ client: "pg" })
+    let query = builder("peer_review_collection")
+      .where("peer_review_collection.quiz_id", quizId)
+      .select("id")
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    let data = await queryRunner.stream(query.toString())
+    await queryRunner.release()
+
+    return data
+  }
+
+  public async getPlainQuizPeerReviewQuestions(quizId: string) {
+    const builder = knex({ client: "pg" })
+
+    let query = builder("peer_review_question")
+      .where("peer_review_question.quiz_id", quizId)
+      .select(
+        "peer_review_question.id",
+        "peer_review_question.peer_review_collection_id",
+        "peer_review_question.default",
+        "type",
+        "answer_required",
+      )
+      .innerJoin(
+        "peer_review_question_translation",
+        "peer_review_question_translation.peer_review_question_id",
+        "peer_review_question.id",
+      )
+      .select("language_id", "title", "body")
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    let data = await queryRunner.stream(query.toString())
+    await queryRunner.release()
+
+    return data
+  }
+
+  /*
   public async getCSVData(quizId: string) {
     const builder = knex({ client: "pg" })
 
@@ -123,6 +244,8 @@ export default class QuizService {
     return data
   }
 
+  */
+
   public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
     const queryBuilder = this.entityManager.createQueryBuilder(Quiz, "quiz")
     const { courseId, coursePart, exclude, id, language, stripped } = query
@@ -138,7 +261,7 @@ export default class QuizService {
       queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
     }
     if (!stripped) {
-      queryBuilder.addSelect("quiz_translation.submitMessage")
+      queryBuilder.addSelect("quiz_translation.submit_message")
     }
 
     if (query.course) {

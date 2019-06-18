@@ -139,6 +139,84 @@ export class QuizController {
   }
   */
 
+  @Get("/data/:id/plainQuizInfo")
+  public async getPlainQuizInfo(
+    @Param("id") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const result = await this.quizService.getPlainQuizData(quizId)
+    const answersStringStream = result.pipe(JSONStream.stringify())
+    return answersStringStream
+  }
+
+  @Get("/data/:id/plainQuizItems")
+  public async getPlainQuizItems(
+    @Param("id") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const result = await this.quizService.getPlainQuizItems(quizId)
+    const answersStringStream = result.pipe(JSONStream.stringify())
+
+    return answersStringStream
+  }
+
+  @Get("/data/:id/plainQuizOptions")
+  public async getPlainQuizOptions(
+    @Param("id") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const result = await this.quizService.getPlainQuizItemOptions(quizId)
+    const answersStringStream = result.pipe(JSONStream.stringify())
+    return answersStringStream
+  }
+
+  @Get("/data/:id/plainPeerReviewCollections")
+  public async getPlainQuizPeerReviewCollections(
+    @Param("id") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const result = await this.quizService.getPlainQuizPeerReviewCollections(
+      quizId,
+    )
+    const answersStringStream = result.pipe(JSONStream.stringify())
+
+    return answersStringStream
+  }
+
+  @Get("/data/:id/plainPeerReviewQuestions")
+  public async getPlainQuizPeerReviewQuestions(
+    @Param("id") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const result = await this.quizService.getPlainQuizPeerReviewQuestions(
+      quizId,
+    )
+    const answersStringStream = result.pipe(JSONStream.stringify())
+
+    return answersStringStream
+  }
+
+  /*
   @Get("/data/:id")
   public async getDetailedData(
     @Param("id") quizId: string,
@@ -152,6 +230,7 @@ export class QuizController {
     const result = await this.quizService.getCSVData(quizId)
     return response.send(result)
   }
+  */
 
   @Post("/")
   public async post(

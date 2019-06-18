@@ -13,13 +13,25 @@ class DownloadButton extends React.Component<
     quiz: Quiz
     user: any
   },
-  { downloading: boolean }
+  { downloading: boolean; processing: boolean }
 > {
   constructor(props) {
     super(props)
     this.state = {
       downloading: false,
+      processing: false,
     }
+  }
+
+  public shouldComponentUpdate(nextProps, nextState) {
+    if (this.state.downloading !== nextState.downloading) {
+      return true
+    }
+    if (this.state.processing !== nextState.processing) {
+      return true
+    }
+
+    return this.props !== nextProps
   }
 
   public render() {
@@ -28,6 +40,14 @@ class DownloadButton extends React.Component<
         <CircularProgress
           style={{
             color: "#1d6f42",
+          }}
+        />
+      )
+    } else if (this.state.processing) {
+      return (
+        <CircularProgress
+          style={{
+            color: "brown",
           }}
         />
       )
@@ -62,28 +82,82 @@ class DownloadButton extends React.Component<
         this.props.user,
       )
 
-      const wsQuiz = XLSX.utils.json_to_sheet(quizInfo)
-      const wsAnswers = XLSX.utils.json_to_sheet(answers)
-      const wsPeerReviews = XLSX.utils.json_to_sheet(peerReviews)
+      this.setState({
+        downloading: false,
+        processing: true,
+      })
+      console.log("processing...")
 
-      XLSX.utils.book_append_sheet(wb, wsQuiz, "quiz info")
-      XLSX.utils.book_append_sheet(wb, wsAnswers, "answers")
-      XLSX.utils.book_append_sheet(wb, wsPeerReviews, "peer reviews")
+      const wsQuizGeneral = XLSX.utils.json_to_sheet(quizInfo.plainInfo)
+      const wsQuizItems = XLSX.utils.json_to_sheet(quizInfo.plainItems)
+      const wsQuizOptions = XLSX.utils.json_to_sheet(quizInfo.plainOptions)
+      const wsQuizPeerReviewCollections = XLSX.utils.json_to_sheet(
+        quizInfo.plainPeerReviewCollections,
+      )
+      const wsQuizPeerReviewQuestions = XLSX.utils.json_to_sheet(
+        quizInfo.plainPeerReviewQuestions,
+      )
+
+      const wsAnswersPlain = XLSX.utils.json_to_sheet(answers.plainAnswers)
+      const wsItemAnswersPlain = XLSX.utils.json_to_sheet(
+        answers.plainItemAnswers,
+      )
+      const wsOptionAnswersPlain = XLSX.utils.json_to_sheet(
+        answers.plainOptionAnswers,
+      )
+
+      const wsPeerReviewsPlain = XLSX.utils.json_to_sheet(
+        peerReviews.plainPeerReviews,
+      )
+      const wsPeerReviewQuestionAnswersPlain = XLSX.utils.json_to_sheet(
+        peerReviews.plainPeerReviewQuestionAnswers,
+      )
+
+      XLSX.utils.book_append_sheet(wb, wsQuizGeneral, "quiz info")
+      XLSX.utils.book_append_sheet(wb, wsQuizItems, "items")
+      XLSX.utils.book_append_sheet(wb, wsQuizOptions, "item options")
+      XLSX.utils.book_append_sheet(
+        wb,
+        wsQuizPeerReviewCollections,
+        "peer review collections",
+      )
+      XLSX.utils.book_append_sheet(
+        wb,
+        wsQuizPeerReviewQuestions,
+        "peer review questions",
+      )
+
+      XLSX.utils.book_append_sheet(wb, wsAnswersPlain, "answers")
+
+      XLSX.utils.book_append_sheet(wb, wsItemAnswersPlain, "item answers")
+      XLSX.utils.book_append_sheet(wb, wsOptionAnswersPlain, "option answers")
+
+      XLSX.utils.book_append_sheet(wb, wsPeerReviewsPlain, "peer reviews")
+      XLSX.utils.book_append_sheet(
+        wb,
+        wsPeerReviewQuestionAnswersPlain,
+        "peer review answers",
+      )
     } else {
       const data = await this.props.service(this.props.quiz.id, this.props.user)
+
+      this.setState({
+        downloading: false,
+        processing: true,
+      })
+      console.log("processing...")
       const ws = XLSX.utils.json_to_sheet(data)
       await XLSX.utils.book_append_sheet(wb, ws, "sheet 0")
     }
-
-    this.setState({
-      downloading: false,
-    })
 
     XLSX.writeFile(
       wb,
       `${this.props.quiz.texts[0].title}_${this.props.filenameEnd}.${this.props
         .fileFormat || "xls"}`,
     )
+    this.setState({
+      processing: false,
+    })
   }
 }
 
