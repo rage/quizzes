@@ -1,4 +1,5 @@
 import { Response } from "express"
+import JSONStream from "JSONStream"
 import { getUUIDByString } from "@quizzes/common/util"
 import {
   Get,
@@ -10,6 +11,7 @@ import {
   Res,
   UnauthorizedError,
 } from "routing-controllers"
+import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
 import UserQuizStateService from "services/userquizstate.service"
@@ -32,6 +34,9 @@ import _ from "lodash"
 export class QuizController {
   @InjectManager()
   private entityManager: EntityManager
+
+  @Inject()
+  private peerReviewService: PeerReviewService
 
   @Inject()
   private quizService: QuizService
@@ -91,6 +96,48 @@ export class QuizController {
       }
     } catch (error) {}
   }
+
+  /* Was not able to figure out multiple streams to one request... maybe come back later(?)
+
+
+
+  @Get("/data/:id/all")
+  public async getSheetsOfData(
+    @Param("id") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+    @Res() response  : Response
+  ){
+
+    console.time("whole")
+
+
+    const answersResult = await this.quizAnswerService.getCSVData(quizId)
+    const answersStringStream = answersResult.pipe(JSONStream.stringify())
+
+
+
+    const peerReviewsResult = await this.peerReviewService.getCSVData(quizId)
+    const peerReviewsStringStream = peerReviewsResult.pipe(JSONStream.stringify())
+  
+
+
+
+
+    // const quizData = await this.quizService.getCSVData(quizId)
+
+
+    return answersStringStream
+
+   return  response.end()
+
+    console.timeEnd("whole")
+    return [
+     answersStringStream,
+      peerReviewsStringStream
+    ]
+
+  }
+  */
 
   @Get("/data/:id")
   public async getDetailedData(

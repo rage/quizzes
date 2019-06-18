@@ -451,10 +451,7 @@ export default class QuizAnswerService {
 
     query = query.select("quiz_answer.created_at", "quiz_answer.updated_at")
 
-    query = query.limit(200)
-
-    console.log("Query: ", query.toString())
-
+    query = query.limit(20000)
     const queryRunner = this.entityManager.connection.createQueryRunner()
     queryRunner.connect()
 

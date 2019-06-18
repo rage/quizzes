@@ -68,11 +68,12 @@ export default class PeerReviewService {
         "peer_review.id",
       )
       .select(
+        "peer_review_question_answer.peer_review_question_id",
         "peer_review_question_answer.value",
         "peer_review_question_answer.text",
       )
 
-    query = query.limit(100)
+    query = query.limit(20000)
 
     const queryRunner = this.entityManager.connection.createQueryRunner()
     queryRunner.connect()

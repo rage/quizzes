@@ -44,6 +44,47 @@ export const getPeerReviewsDetailedData = async (quizId, user) => {
   }))
 }
 
+export const getDetailedEverythingData = async (quizId, user) => {
+  const promiseQuizAnswers = axios.get(
+    `/api/v1/quizzes/answer/data/${quizId}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${user.accessToken}`,
+      },
+    },
+  )
+
+  const promisePeerReviews = axios.get(
+    `/api/v1/quizzes/peerreview/data/${quizId}`,
+    {
+      headers: {
+        "Content-Type": "application/json",
+        authorization: `Bearer ${user.accessToken}`,
+      },
+    },
+  )
+
+  const promiseQuizInfo = axios.get(`/api/v1/quizzes/data/${quizId}`, {
+    headers: {
+      "Content-Type": "application/json",
+      authorization: `Bearer ${user.accessToken}`,
+    },
+  })
+
+  const [responseQuizAnswers, responsePeerReviews, responseQuizInfo] = [
+    await promiseQuizAnswers,
+    await promisePeerReviews,
+    await promiseQuizInfo,
+  ]
+
+  return {
+    answers: responseQuizAnswers.data,
+    peerReviews: responsePeerReviews.data,
+    quizInfo: responseQuizInfo.data,
+  }
+}
+
 export const getQuizInformationDetailedData = async (quizId, user) => {
   const response = await axios.get(`/api/v1/quizzes/data/${quizId}`, {
     headers: {

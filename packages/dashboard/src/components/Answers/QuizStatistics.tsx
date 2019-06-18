@@ -8,9 +8,9 @@ import {
 import queryString from "query-string"
 import React from "react"
 import { connect } from "react-redux"
-import * as XLSX from "xlsx"
 import {
   getAnswersDetailedData,
+  getDetailedEverythingData,
   getPeerReviewsDetailedData,
   getQuizInformationDetailedData,
 } from "../../services/quizzes"
@@ -232,6 +232,16 @@ class QuizStatistics extends React.Component<any, any> {
                         service={getPeerReviewsDetailedData}
                         label={"Download peer review data"}
                         filenameEnd="peer_reviews"
+                      />
+                    </Grid>
+
+                    <Grid item={true} xs={12}>
+                      <DownloadButton
+                        quiz={quiz}
+                        service={getDetailedEverythingData}
+                        label={"Download e v e r y t h i n g"}
+                        fileFormat="xls"
+                        filenameEnd="data"
                       />
                     </Grid>
                   </Grid>

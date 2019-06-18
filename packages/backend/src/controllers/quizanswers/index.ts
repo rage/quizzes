@@ -13,6 +13,7 @@ import {
   UnauthorizedError,
   Body,
 } from "routing-controllers"
+import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
 import UserCourseStateService from "services/usercoursestate.service"
@@ -58,6 +59,9 @@ export class QuizAnswerController {
   private userCourseStateService: UserCourseStateService
 
   @Inject()
+  private peerReviewService: PeerReviewService
+
+  @Inject()
   private quizService: QuizService
 
   @Inject()
@@ -91,15 +95,16 @@ export class QuizAnswerController {
   public async getExtensiveData(
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @Param("quizId") quizId: string,
+    @Res() response: Response,
   ): Promise<any> {
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
     }
 
-    const result = await this.quizAnswerService.getCSVData(quizId)
-    const stringStream = result.pipe(JSONStream.stringify())
+    const answersResult = await this.quizAnswerService.getCSVData(quizId)
+    const answersStringStream = answersResult.pipe(JSONStream.stringify())
 
-    return stringStream
+    return answersStringStream
   }
 
   @Get("/answers")
