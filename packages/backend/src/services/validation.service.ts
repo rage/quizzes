@@ -19,15 +19,19 @@ import UserCoursePartStateService from "./usercoursepartstate.service"
 import UserCourseStateService from "./usercoursestate.service"
 
 // tslint:disable-next-line:no-var-requires
-// const Kafka = require("node-rdkafka")
+const Kafka = require("node-rdkafka")
 
 @Service()
 export default class ValidationService {
-  /*private stream = Kafka.Producer.createWriteStream({
-    "metadata.broker.list": "localhost:9092"
-  }, {}, {
-      topic: "test"
-    })*/
+  private stream = Kafka.Producer.createWriteStream(
+    {
+      "metadata.broker.list": "localhost:9092",
+    },
+    {},
+    {
+      topic: "test",
+    },
+  )
 
   @Inject()
   private peerReviewService: PeerReviewService
@@ -217,12 +221,21 @@ export default class ValidationService {
 
     if (userQuizState.pointsAwarded < pointsAwarded) {
       userQuizState.pointsAwarded = pointsAwarded
-      // await this.userCourseStateService.updateUserCourseState(manager, quiz, userQuizState, quizAnswer)
-      // await this.userCoursePartStateService.updateUserCoursePartState(manager, quiz, userQuizState.userId)
-      // this.stream.write(Buffer.from("Validating shit!"))
+      await this.userCourseStateService.updateUserCourseState(
+        manager,
+        quiz,
+        userQuizState,
+        quizAnswer,
+      )
+      await this.userCoursePartStateService.updateUserCoursePartState(
+        manager,
+        quiz,
+        userQuizState.userId,
+      )
+      this.stream.write(Buffer.from("Validating shit!"))
     }
 
-    // this.stream.write(Buffer.from("Validating stuff!"))
+    this.stream.write(Buffer.from("Validating stuff!"))
 
     const response = {
       itemAnswerStatus,
@@ -291,27 +304,5 @@ export default class ValidationService {
         }
       }),
     )
-  }
-
-  public async validateModificationOfExistingQuiz(quiz: Quiz, oldQuiz: Quiz) {
-    const stricter = oldQuiz.items.some(qi => {
-      if (qi.type !== "essay") {
-        return false
-      }
-      const qi2 = quiz.items.find(x => x.id === qi.id)
-
-      if (!qi2) {
-        return false
-      }
-      if (qi2.minWords && (!qi.minWords || qi.minWords < qi2.minWords)) {
-        return true
-      }
-      if (qi2.maxWords && (!qi.maxWords || qi.maxWords > qi2.maxWords)) {
-        return true
-      }
-      return false
-    })
-
-    return stricter ? { error: "new quiz contains stricter quiz item" } : {}
   }
 }

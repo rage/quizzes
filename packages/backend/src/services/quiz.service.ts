@@ -13,16 +13,12 @@ import {
 } from "../models"
 import { IQuizQuery } from "../types"
 import quizanswerService from "./quizanswer.service"
-import ValidationService from "./validation.service"
 import { BadRequestError } from "routing-controllers"
 
 @Service()
 export default class QuizService {
   @InjectManager()
   private entityManager: EntityManager
-
-  @Inject()
-  private validationService: ValidationService
 
   public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
     const queryBuilder = this.entityManager.createQueryBuilder(Quiz, "quiz")
@@ -164,7 +160,7 @@ export default class QuizService {
           .getMany()
 
         oldQuiz.items = oldQuizItems
-        const validationResult = await this.validationService.validateModificationOfExistingQuiz(
+        const validationResult = this.validateModificationOfExistingQuiz(
           quiz,
           oldQuiz,
         )
@@ -319,5 +315,27 @@ export default class QuizService {
         toBeRemoved.prQuestionIds || [],
       )
     }
+  }
+
+  private validateModificationOfExistingQuiz(quiz: Quiz, oldQuiz: Quiz) {
+    const stricter = oldQuiz.items.some(qi => {
+      if (qi.type !== "essay") {
+        return false
+      }
+      const qi2 = quiz.items.find(x => x.id === qi.id)
+
+      if (!qi2) {
+        return false
+      }
+      if (qi2.minWords && (!qi.minWords || qi.minWords < qi2.minWords)) {
+        return true
+      }
+      if (qi2.maxWords && (!qi.maxWords || qi.maxWords > qi2.maxWords)) {
+        return true
+      }
+      return false
+    })
+
+    return stricter ? { error: "new quiz contains stricter quiz item" } : {}
   }
 }
