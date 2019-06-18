@@ -137,6 +137,7 @@ export class QuizAnswerController {
     const answersResult = await this.quizAnswerService.getPlainOptionAnswersCSV(
       quizId,
     )
+
     const answersStringStream = answersResult.pipe(JSONStream.stringify())
     return answersStringStream
   }

@@ -440,26 +440,17 @@ export default class QuizAnswerService {
 
     let query = builder("quiz_item")
       .where("quiz_item.quiz_id", quizId)
-      .innerJoin(
-        "quiz_item_answer",
-        "quiz_item_answer.quiz_item_id",
-        "quiz_item.id",
-      )
-      .innerJoin(
-        "quiz_option",
-        "quiz_option.quiz_item_id",
-        "quiz_item_answer.id",
-      )
+      .innerJoin("quiz_option", "quiz_option.quiz_item_id", "quiz_item.id")
       .innerJoin(
         "quiz_option_answer",
         "quiz_option_answer.quiz_option_id",
         "quiz_option.id",
       )
+
       .select(
-        { option_answer_id: "quiz_option_answer.id" },
         { quiz_item_answer_id: "quiz_option_answer.quiz_item_answer_id" },
-        { option_answer_id: "quiz_option_answer.quiz_option_id" },
-        "quiz_option_answer",
+        { option_answer_id: "quiz_option_answer.id" },
+        { option_id: "quiz_option_answer.quiz_option_id" },
         "quiz_option_answer.created_at",
         "quiz_option_answer.updated_at",
       )
