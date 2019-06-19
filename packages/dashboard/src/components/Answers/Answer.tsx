@@ -95,11 +95,6 @@ class Answer extends React.Component<any, any> {
                         : []
                     }
                     answer={this.props.answerData}
-                    spamFlags={
-                      this.props.answerStatistics.find(
-                        as => as.quiz_answer_id === this.props.answerData.id,
-                      ).count
-                    }
                     setQuiz={this.props.setQuiz}
                     course={this.props.courses.find(
                       c => c.id === this.props.filter.course,
@@ -363,7 +358,10 @@ class PeerReviewsSummary extends React.Component<any, any> {
             >
               <Grid item={true} xs={12}>
                 <Typography variant="subtitle1" color="textSecondary">
-                  SPAM FLAGS: {this.props.spamFlags}
+                  SPAM FLAGS:{" "}
+                  {this.props.answer.userQuizState
+                    ? this.props.answer.userQuizState.spamCount
+                    : "not calculated"}
                   {this.props.course.maxSpamFlags &&
                     `. (Maximum allowed: ${this.props.course.maxSpamFlags})`}
                 </Typography>
@@ -371,9 +369,9 @@ class PeerReviewsSummary extends React.Component<any, any> {
               <Grid item={true} xs={12}>
                 <Typography variant="body1">
                   Peer reviews given:{" "}
-                  {(this.props.answer.userQuizState &&
-                    this.props.answer.userQuizState.peerReviewsGiven) ||
-                    "none"}
+                  {this.props.answer.userQuizState
+                    ? this.props.answer.userQuizState.peerReviewsGiven
+                    : "not calculated"}
                   {this.props.course.minPeerReviewsGiven &&
                     `. (Required: ${this.props.course.minPeerReviewsGiven})`}
                 </Typography>
@@ -518,7 +516,6 @@ class PeerReviewsSummary extends React.Component<any, any> {
 
 const mapStateToProps = state => {
   return {
-    answerStatistics: state.answerStatistics,
     quizzes: state.quizzes.find(qi => qi.courseId === state.filter.course)
       .quizzes,
     courses: state.courses,

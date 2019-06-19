@@ -250,7 +250,7 @@ const CourseComponent = ({ idx, countData, quiz }) => {
 
         <Grid item={true} xs={9} style={{ cursor: "pointer" }}>
           <Link
-            to={`/quizzes/${quiz.id}/data`}
+            to={`/quizzes/${quiz.id}/answers`}
             style={{ textDecoration: "none" }}
           >
             <Typography variant="body1" style={{ color: "white" }}>

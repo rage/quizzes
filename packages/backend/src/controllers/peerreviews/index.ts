@@ -100,7 +100,7 @@ export class PeerReviewController {
       {
         userId: peerReview.userId,
         quizId: receivingQuizAnswer.quizId,
-        status: ["confirmed", "submitted"],
+        statuses: ["confirmed", "submitted"],
       },
       this.entityManager,
     )
