@@ -239,8 +239,17 @@ class QuizStatistics extends React.Component<any, any> {
                       <DownloadButton
                         quiz={quiz}
                         service={getDetailedEverythingData}
-                        label={"Download e v e r y t h i n g"}
-                        fileFormat="xls"
+                        label={"Download all quiz data"}
+                        fileFormat="xlsx"
+                        filenameEnd="data"
+                      />
+                    </Grid>
+                    <Grid item={true} xs={12}>
+                      <DownloadButton
+                        quiz={quiz}
+                        service={getDetailedEverythingData}
+                        label={"Download all quiz data"}
+                        fileFormat="ods"
                         filenameEnd="data"
                       />
                     </Grid>

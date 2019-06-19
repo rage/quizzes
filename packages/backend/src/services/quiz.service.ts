@@ -145,7 +145,6 @@ export default class QuizService {
     return data
   }
 
-  /*
   public async getCSVData(quizId: string) {
     const builder = knex({ client: "pg" })
 
@@ -243,8 +242,6 @@ export default class QuizService {
 
     return data
   }
-
-  */
 
   public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
     const queryBuilder = this.entityManager.createQueryBuilder(Quiz, "quiz")

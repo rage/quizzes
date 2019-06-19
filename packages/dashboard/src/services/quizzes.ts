@@ -175,6 +175,7 @@ export const getDetailedEverythingData = async (quizId, user) => {
       plainItemAnswers: responseQuizPlainItemAnswers.data,
       plainOptionAnswers: responseQuizPlainOptionAnswers.data,
     },
+
     peerReviews: {
       plainPeerReviews: responsePlainPeerReviews.data.map(peerReviewRow => ({
         ...peerReviewRow,
@@ -183,9 +184,11 @@ export const getDetailedEverythingData = async (quizId, user) => {
             ? peerReviewRow.rejected_quiz_answer_ids[0]
             : JSON.stringify(peerReviewRow.rejected_quiz_answer_ids),
       })),
+
       plainPeerReviewQuestionAnswers:
         responsePlainPeerReviewQuestionAnswers.data,
     },
+
     quizInfo: {
       plainInfo: responsePlainQuizInfo.data,
       plainItems: responsePlainQuizItems.data,

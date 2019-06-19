@@ -52,6 +52,7 @@ export default class PeerReviewService {
 
   public async getPlainPeerReviewsCSV(quizId: string) {
     const builder = knex({ client: "pg" })
+
     let query = builder("peer_review")
       .innerJoin("quiz_answer", "quiz_answer.id", "peer_review.quiz_answer_id")
       .where("quiz_answer.quiz_id", quizId)
@@ -62,18 +63,17 @@ export default class PeerReviewService {
         "peer_review.rejected_quiz_answer_ids",
       )
 
-    query = query.limit(1000)
-
     const queryRunner = this.entityManager.connection.createQueryRunner()
     queryRunner.connect()
-
     const data = await queryRunner.stream(query.toString())
     await queryRunner.release()
+
     return data
   }
 
   public async getPlainPeerReviewAnswers(quizId: string) {
     const builder = knex({ client: "pg" })
+
     let query = builder("peer_review")
       .innerJoin("quiz_answer", "quiz_answer.id", "peer_review.quiz_answer_id")
       .where("quiz_answer.quiz_id", quizId)
@@ -89,7 +89,6 @@ export default class PeerReviewService {
         "peer_review_question_answer.text",
       )
 
-    query = query.limit(1000)
     const queryRunner = this.entityManager.connection.createQueryRunner()
     queryRunner.connect()
 
@@ -120,8 +119,6 @@ export default class PeerReviewService {
         "peer_review_question_answer.value",
         "peer_review_question_answer.text",
       )
-
-    query = query.limit(20000)
 
     const queryRunner = this.entityManager.connection.createQueryRunner()
     queryRunner.connect()

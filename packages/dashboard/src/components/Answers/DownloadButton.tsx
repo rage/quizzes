@@ -76,7 +76,7 @@ class DownloadButton extends React.Component<
 
     const wb = XLSX.utils.book_new()
 
-    if (this.props.fileFormat && this.props.fileFormat !== "csv") {
+    if (this.props.fileFormat) {
       const { answers, peerReviews, quizInfo } = await this.props.service(
         this.props.quiz.id,
         this.props.user,
@@ -86,7 +86,6 @@ class DownloadButton extends React.Component<
         downloading: false,
         processing: true,
       })
-      console.log("processing...")
 
       const wsQuizGeneral = XLSX.utils.json_to_sheet(quizInfo.plainInfo)
       const wsQuizItems = XLSX.utils.json_to_sheet(quizInfo.plainItems)
@@ -109,6 +108,14 @@ class DownloadButton extends React.Component<
       const wsPeerReviewsPlain = XLSX.utils.json_to_sheet(
         peerReviews.plainPeerReviews,
       )
+
+      const peerReviewsInJson = XLSX.utils.sheet_to_json(wsPeerReviewsPlain)
+
+      console.log(
+        "peer reviews sheet converted back to json: ",
+        peerReviewsInJson,
+      )
+
       const wsPeerReviewQuestionAnswersPlain = XLSX.utils.json_to_sheet(
         peerReviews.plainPeerReviewQuestionAnswers,
       )
@@ -133,6 +140,7 @@ class DownloadButton extends React.Component<
       XLSX.utils.book_append_sheet(wb, wsOptionAnswersPlain, "option answers")
 
       XLSX.utils.book_append_sheet(wb, wsPeerReviewsPlain, "peer reviews")
+
       XLSX.utils.book_append_sheet(
         wb,
         wsPeerReviewQuestionAnswersPlain,
@@ -145,7 +153,6 @@ class DownloadButton extends React.Component<
         downloading: false,
         processing: true,
       })
-      console.log("processing...")
       const ws = XLSX.utils.json_to_sheet(data)
       await XLSX.utils.book_append_sheet(wb, ws, "sheet 0")
     }
@@ -153,8 +160,14 @@ class DownloadButton extends React.Component<
     XLSX.writeFile(
       wb,
       `${this.props.quiz.texts[0].title}_${this.props.filenameEnd}.${this.props
-        .fileFormat || "xls"}`,
+        .fileFormat ||
+        "ods"}` /*
+        {
+          bookType: "xlml"
+        }
+      */,
     )
+
     this.setState({
       processing: false,
     })

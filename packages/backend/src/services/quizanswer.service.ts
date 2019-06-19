@@ -425,8 +425,6 @@ export default class QuizAnswerService {
         "quiz_item_answer.updated_at",
       )
 
-    query = query.limit(1000)
-
     const queryRunner = this.entityManager.connection.createQueryRunner()
     queryRunner.connect()
     const data = await queryRunner.stream(query.toString())
@@ -454,8 +452,6 @@ export default class QuizAnswerService {
         "quiz_option_answer.created_at",
         "quiz_option_answer.updated_at",
       )
-
-    query = query.limit(1000)
 
     const queryRunner = this.entityManager.connection.createQueryRunner()
     queryRunner.connect()
@@ -553,7 +549,6 @@ export default class QuizAnswerService {
 
     query = query.select("quiz_answer.created_at", "quiz_answer.updated_at")
 
-    query = query.limit(20000)
     const queryRunner = this.entityManager.connection.createQueryRunner()
     queryRunner.connect()
 
