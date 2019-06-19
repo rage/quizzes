@@ -2,7 +2,7 @@ import { Button, CircularProgress } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
 import * as XLSX from "xlsx"
-import { Quiz } from "../../../../../dist/common/src/models"
+import { Quiz } from "../../../../common/src/models"
 
 class DownloadButton extends React.Component<
   {
