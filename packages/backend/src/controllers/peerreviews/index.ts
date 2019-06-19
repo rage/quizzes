@@ -69,7 +69,7 @@ export class PeerReviewController {
       throw new UnauthorizedError("unauthorized")
     }
 
-    const result = await this.peerReviewService.getPlainPeerReviewsCSV(quizId)
+    const result = await this.peerReviewService.getPlainPeerReviews(quizId)
     const stringStream = result.pipe(JSONStream.stringify())
 
     return stringStream

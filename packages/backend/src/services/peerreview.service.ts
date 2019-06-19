@@ -50,7 +50,7 @@ export default class PeerReviewService {
     return await builtQuery.getMany()
   }
 
-  public async getPlainPeerReviewsCSV(quizId: string) {
+  public async getPlainPeerReviews(quizId: string) {
     const builder = knex({ client: "pg" })
 
     let query = builder("peer_review")

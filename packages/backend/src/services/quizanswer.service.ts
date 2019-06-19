@@ -363,7 +363,7 @@ export default class QuizAnswerService {
     return result.length > 0 ? result[0] : {}
   }
 
-  public async getPlainAnswersCSV(quizId: string): Promise<any> {
+  public async getPlainAnswers(quizId: string): Promise<any> {
     if (!validator.isUUID(quizId)) {
       return {}
     }
@@ -404,7 +404,7 @@ export default class QuizAnswerService {
     return data
   }
 
-  public async getPlainItemAnswersCSV(quizId: string): Promise<any> {
+  public async getPlainItemAnswers(quizId: string): Promise<any> {
     const builder = knex({ client: "pg" })
 
     let query = builder("quiz_item")
@@ -433,7 +433,7 @@ export default class QuizAnswerService {
     return data
   }
 
-  public async getPlainOptionAnswersCSV(quizId: string): Promise<any> {
+  public async getPlainOptionAnswers(quizId: string): Promise<any> {
     const builder = knex({ client: "pg" })
 
     let query = builder("quiz_item")
@@ -525,8 +525,6 @@ export default class QuizAnswerService {
       quizItemTypes.length === 1 ||
       quizItemTypes.every(type => type === quizItemTypes[0])
     ) {
-      console.log("Every type is the same")
-
       switch (quizItemTypes[0]) {
         case "open":
           selectedFields.push("correct")

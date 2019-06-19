@@ -97,48 +97,6 @@ export class QuizController {
     } catch (error) {}
   }
 
-  /* Was not able to figure out multiple streams to one request... maybe come back later(?)
-
-
-
-  @Get("/data/:id/all")
-  public async getSheetsOfData(
-    @Param("id") quizId: string,
-    @HeaderParam("authorization") user: ITMCProfileDetails,
-    @Res() response  : Response
-  ){
-
-    console.time("whole")
-
-
-    const answersResult = await this.quizAnswerService.getCSVData(quizId)
-    const answersStringStream = answersResult.pipe(JSONStream.stringify())
-
-
-
-    const peerReviewsResult = await this.peerReviewService.getCSVData(quizId)
-    const peerReviewsStringStream = peerReviewsResult.pipe(JSONStream.stringify())
-  
-
-
-
-
-    // const quizData = await this.quizService.getCSVData(quizId)
-
-
-    return answersStringStream
-
-   return  response.end()
-
-    console.timeEnd("whole")
-    return [
-     answersStringStream,
-      peerReviewsStringStream
-    ]
-
-  }
-  */
-
   @Get("/data/:id/plainQuizInfo")
   public async getPlainQuizInfo(
     @Param("id") quizId: string,
@@ -216,7 +174,6 @@ export class QuizController {
     return answersStringStream
   }
 
-  /*
   @Get("/data/:id")
   public async getDetailedData(
     @Param("id") quizId: string,
@@ -230,7 +187,6 @@ export class QuizController {
     const result = await this.quizService.getCSVData(quizId)
     return response.send(result)
   }
-  */
 
   @Post("/")
   public async post(

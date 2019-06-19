@@ -100,9 +100,7 @@ export class QuizAnswerController {
       throw new UnauthorizedError("unauthorized")
     }
 
-    const answersResult = await this.quizAnswerService.getPlainAnswersCSV(
-      quizId,
-    )
+    const answersResult = await this.quizAnswerService.getPlainAnswers(quizId)
     const answersStringStream = answersResult.pipe(JSONStream.stringify())
 
     return answersStringStream
@@ -117,7 +115,7 @@ export class QuizAnswerController {
       throw new UnauthorizedError("unauthorized")
     }
 
-    const answersResult = await this.quizAnswerService.getPlainItemAnswersCSV(
+    const answersResult = await this.quizAnswerService.getPlainItemAnswers(
       quizId,
     )
     const answersStringStream = answersResult.pipe(JSONStream.stringify())
@@ -134,7 +132,7 @@ export class QuizAnswerController {
       throw new UnauthorizedError("unauthorized")
     }
 
-    const answersResult = await this.quizAnswerService.getPlainOptionAnswersCSV(
+    const answersResult = await this.quizAnswerService.getPlainOptionAnswers(
       quizId,
     )
 

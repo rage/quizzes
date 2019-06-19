@@ -23,17 +23,6 @@ class DownloadButton extends React.Component<
     }
   }
 
-  public shouldComponentUpdate(nextProps, nextState) {
-    if (this.state.downloading !== nextState.downloading) {
-      return true
-    }
-    if (this.state.processing !== nextState.processing) {
-      return true
-    }
-
-    return this.props !== nextProps
-  }
-
   public render() {
     if (this.state.downloading) {
       return (
@@ -109,13 +98,6 @@ class DownloadButton extends React.Component<
         peerReviews.plainPeerReviews,
       )
 
-      const peerReviewsInJson = XLSX.utils.sheet_to_json(wsPeerReviewsPlain)
-
-      console.log(
-        "peer reviews sheet converted back to json: ",
-        peerReviewsInJson,
-      )
-
       const wsPeerReviewQuestionAnswersPlain = XLSX.utils.json_to_sheet(
         peerReviews.plainPeerReviewQuestionAnswers,
       )
@@ -160,12 +142,7 @@ class DownloadButton extends React.Component<
     XLSX.writeFile(
       wb,
       `${this.props.quiz.texts[0].title}_${this.props.filenameEnd}.${this.props
-        .fileFormat ||
-        "ods"}` /*
-        {
-          bookType: "xlml"
-        }
-      */,
+        .fileFormat || "csv"}`,
     )
 
     this.setState({

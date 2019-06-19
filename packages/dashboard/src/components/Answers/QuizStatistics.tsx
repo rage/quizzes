@@ -1,5 +1,6 @@
 import {
-  Button,
+  Card,
+  CardContent,
   CircularProgress,
   Grid,
   Paper,
@@ -233,6 +234,18 @@ class QuizStatistics extends React.Component<any, any> {
                         label={"Download peer review data"}
                         filenameEnd="peer_reviews"
                       />
+                    </Grid>
+
+                    <Grid item={true} xs={12} style={{ marginTop: "1em" }}>
+                      <Card>
+                        <CardContent>
+                          <Typography variant="subtitle1">
+                            Note: The options below use a lot of memory to
+                            process the data into xlsx/ods. Firefox seems less
+                            likely to crash as a result.
+                          </Typography>
+                        </CardContent>
+                      </Card>
                     </Grid>
 
                     <Grid item={true} xs={12}>
