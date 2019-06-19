@@ -1,5 +1,5 @@
 module.exports = {
-    database: process.env.DB_NAME || "quizzes",
+    database: process.env.DB_NAME,
     host: process.env.DB_HOST || "/var/run/postgresql",
     logging: process.env.DB_LOGGING === "true" || false,
     password: process.env.DB_PASSWORD || undefined,

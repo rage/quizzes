@@ -86,7 +86,7 @@ export default class UserCourseStateService {
           {
             userId,
             quizId: userQuizStates[0].quizId,
-            status: "confirmed",
+            status: ["confirmed"],
           },
           manager,
         ))

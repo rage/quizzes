@@ -61,7 +61,7 @@ export interface IQuizAnswerQuery {
   id?: string
   quizId?: string
   userId?: number
-  status?: string
+  status?: string[]
 }
 
 interface ICourseQuery {
@@ -174,3 +174,18 @@ export type QuizAnswerStatus =
   | "confirmed"
   | "rejected"
   | "deprecated"
+
+export interface Message {
+  timestamp: string
+  user_id: number
+  course_id: string
+  service_id: string
+  progress: PointsByGroup[]
+}
+
+export interface PointsByGroup {
+  group: string
+  max_points: number
+  n_points: number
+  progress: number
+}

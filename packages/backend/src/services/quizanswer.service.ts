@@ -1,7 +1,7 @@
 import { Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
-import { PeerReview, QuizAnswer, UserQuizState, SpamFlag } from "../models"
+import { PeerReview, QuizAnswer, SpamFlag, UserQuizState } from "../models"
 import { IQuizAnswerQuery, QuizAnswerStatus } from "../types"
 import { WhereBuilder } from "../util/index"
 import QuizService from "./quiz.service"
@@ -10,9 +10,6 @@ import QuizService from "./quiz.service"
 export default class QuizAnswerService {
   @InjectManager()
   private entityManager: EntityManager
-
-  @Inject()
-  private quizService: QuizService
 
   public async createQuizAnswer(
     manager: EntityManager,
@@ -47,7 +44,7 @@ export default class QuizAnswerService {
     }
 
     if (status) {
-      whereBuilder.add("quiz_answer.status = :status", { status })
+      whereBuilder.add("quiz_answer.status in (:status)", { status })
     }
 
     return await queryBuilder.orderBy("quiz_answer.updated_at", "DESC").getOne()

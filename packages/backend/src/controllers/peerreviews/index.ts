@@ -17,7 +17,7 @@ import { EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { API_PATH } from "../../config"
-import { PeerReview, QuizAnswer, UserQuizState } from "../../models"
+import { PeerReview, Quiz, QuizAnswer, UserQuizState } from "../../models"
 import { ITMCProfileDetails } from "../../types"
 
 @JsonController(`${API_PATH}/quizzes/peerreview`)
@@ -100,7 +100,7 @@ export class PeerReviewController {
       {
         userId: peerReview.userId,
         quizId: receivingQuizAnswer.quizId,
-        status: "submitted",
+        status: ["confirmed", "submitted"],
       },
       this.entityManager,
     )
@@ -114,10 +114,10 @@ export class PeerReviewController {
       receivingQuizAnswer.quizId,
     )
 
-    const quiz = await this.QuizService.getQuizzes({
+    const quiz: Quiz = (await this.QuizService.getQuizzes({
       id: receivingQuizAnswer.quizId,
       course: true,
-    })
+    }))[0]
 
     receivingUserQuizState.peerReviewsReceived += 1
     givingUserQuizState.peerReviewsGiven += 1
@@ -132,13 +132,13 @@ export class PeerReviewController {
       )
       const receivingValidated = await this.validationService.validateEssayAnswer(
         manager,
-        quiz[0],
+        quiz,
         receivingQuizAnswer,
         receivingUserQuizState,
       )
       const givingValidated = await this.validationService.validateEssayAnswer(
         manager,
-        quiz[0],
+        quiz,
         givingQuizAnswer,
         givingUserQuizState,
       )
@@ -159,23 +159,23 @@ export class PeerReviewController {
         givingValidated.userQuizState,
       )
       if (
-        !quiz[0].excludedFromScore &&
+        !quiz.excludedFromScore &&
         receivingValidated.quizAnswer.status === "confirmed"
       ) {
         await this.userCourseStateService.updateUserCourseState(
           manager,
-          quiz[0],
+          quiz,
           receivingValidated.userQuizState,
           receivingAnswerUpdated,
         )
       }
       if (
-        !quiz[0].excludedFromScore &&
+        !quiz.excludedFromScore &&
         givingValidated.quizAnswer.status === "confirmed"
       ) {
         await this.userCourseStateService.updateUserCourseState(
           manager,
-          quiz[0],
+          quiz,
           givingValidated.userQuizState,
           givingAnswerUpdated,
         )

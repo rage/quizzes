@@ -15,40 +15,17 @@ import {
 import { wordCount } from "./../../../common/src/util"
 import PeerReviewService from "./peerreview.service"
 
-import UserCoursePartStateService from "./usercoursepartstate.service"
-import UserCourseStateService from "./usercoursestate.service"
-
-// tslint:disable-next-line:no-var-requires
-const Kafka = require("node-rdkafka")
-
 @Service()
 export default class ValidationService {
-  private stream = Kafka.Producer.createWriteStream(
-    {
-      "metadata.broker.list": "localhost:9092",
-    },
-    {},
-    {
-      topic: "test",
-    },
-  )
-
   @Inject()
   private peerReviewService: PeerReviewService
 
-  @Inject()
-  private userCourseStateService: UserCourseStateService
-
-  @Inject()
-  private userCoursePartStateService: UserCoursePartStateService
-
-  public async validateQuizAnswer(
+  public validateQuizAnswer(
     manager: EntityManager,
     quizAnswer: QuizAnswer,
     quiz: Quiz,
-    userState: UserQuizState,
+    userQuizState: UserQuizState,
   ) {
-    const userQuizState = userState || new UserQuizState()
     const items: QuizItem[] = quiz.items
     let points: number | null = null
     let pointsAwarded
@@ -219,23 +196,10 @@ export default class ValidationService {
     userQuizState.tries = userQuizState.tries ? userQuizState.tries + 1 : 1
     userQuizState.status = "locked"
 
-    if (userQuizState.pointsAwarded < pointsAwarded) {
-      userQuizState.pointsAwarded = pointsAwarded
-      await this.userCourseStateService.updateUserCourseState(
-        manager,
-        quiz,
-        userQuizState,
-        quizAnswer,
-      )
-      await this.userCoursePartStateService.updateUserCoursePartState(
-        manager,
-        quiz,
-        userQuizState.userId,
-      )
-      this.stream.write(Buffer.from("Validating shit!"))
-    }
-
-    this.stream.write(Buffer.from("Validating stuff!"))
+    userQuizState.pointsAwarded =
+      userQuizState.pointsAwarded > pointsAwarded
+        ? userQuizState.pointsAwarded
+        : pointsAwarded
 
     const response = {
       itemAnswerStatus,
@@ -272,7 +236,7 @@ export default class ValidationService {
       const answers: number[] = [].concat(
         ...peerReviews.map(pr => pr.answers.map(a => a.value)),
       )
-      const sum: number = answers.reduce((prev, curr) => prev + curr)
+      const sum: number = answers.reduce((prev, curr) => prev + curr, 0)
       if (sum / answers.length >= course.minReviewAverage) {
         quizAnswer.status = "confirmed"
         userQuizState.pointsAwarded = 1 * quiz.points

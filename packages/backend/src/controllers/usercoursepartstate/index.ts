@@ -9,7 +9,7 @@ import { EntityManager } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { API_PATH } from "../../config"
 import { Quiz, UserCoursePartState, UserQuizState } from "../../models"
-import { ITMCProfileDetails } from "../../types"
+import { ITMCProfileDetails, PointsByGroup } from "../../types"
 
 @JsonController(`${API_PATH}/courses`)
 export class UserCoursePartStateController {
@@ -30,38 +30,13 @@ export class UserCoursePartStateController {
     @Param("courseId") courseId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    const userCoursePartStates: UserCoursePartState[] = await this.userCoursePartStateService.getUserCoursePartStates(
+    const progress: PointsByGroup[] = await this.userCoursePartStateService.getProgress(
       this.entityManager,
       user.id,
       courseId,
     )
 
-    if (userCoursePartStates.length === 0) {
-      const quizzes: Quiz[] = await this.quizService.getQuizzes({ courseId })
-      const userQuizStates: UserQuizState[] = await this.userQuizStateService.getQuizStatesForUserCourse(
-        this.entityManager,
-        user.id,
-        quizzes.map(quiz => quiz.id),
-      )
-      const parts = new Set()
-      quizzes.map(quiz => parts.add(quiz.part))
-      // part 0 not valid
-      parts.delete(0)
-      Promise.all(
-        Array.from(parts).map(async (part: number) => {
-          userCoursePartStates.push(
-            await this.userCoursePartStateService.createUserCoursePartState(
-              this.entityManager,
-              user.id,
-              courseId,
-              part,
-            ),
-          )
-        }),
-      )
-    }
-
-    return userCoursePartStates
+    return { points_by_group: progress }
 
     /*const quizzes: Quiz[] = await this.quizService.getQuizzes({ courseId })
     const userQuizStates: UserQuizState[] = await this.userQuizStateService.getQuizStatesForUserCourse(

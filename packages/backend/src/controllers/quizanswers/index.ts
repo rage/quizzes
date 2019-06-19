@@ -1,18 +1,19 @@
 import {
+  BadRequestError,
+  Body,
   Get,
   HeaderParam,
   JsonController,
   Param,
   Post,
-  BadRequestError,
   QueryParam,
   UnauthorizedError,
-  Body,
 } from "routing-controllers"
+import KafkaService from "services/kafka.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
-import UserCourseStateService from "services/usercoursestate.service"
 import UserCoursePartStateService from "services/usercoursepartstate.service"
+import UserCourseStateService from "services/usercoursestate.service"
 import UserQuizStateService from "services/userquizstate.service"
 import ValidationService from "services/validation.service"
 import { Inject } from "typedi"
@@ -24,11 +25,15 @@ import {
   Quiz,
   QuizAnswer,
   User,
-  UserQuizState,
   UserCoursePartState,
   UserCourseState,
+  UserQuizState,
 } from "../../models"
-import { ITMCProfileDetails, QuizAnswerStatus } from "../../types"
+import {
+  ITMCProfileDetails,
+  PointsByGroup,
+  QuizAnswerStatus,
+} from "../../types"
 
 const MAX_LIMIT = 100
 
@@ -54,6 +59,9 @@ export class QuizAnswerController {
 
   @Inject()
   private validationService: ValidationService
+
+  @Inject()
+  private KafkaService: KafkaService
 
   @Get("/counts")
   public async getAnswerCounts(
@@ -200,23 +208,28 @@ export class QuizAnswerController {
     @EntityFromBody() answer: QuizAnswer,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
-    answer.userId = user.id
+    const userId = user.id
+
+    answer.userId = userId
     // creates new user if necessary
     answer.user = new User()
     answer.user.id = answer.userId
 
-    const quiz: Quiz[] = await this.quizService.getQuizzes({
+    const quiz: Quiz = (await this.quizService.getQuizzes({
       id: answer.quizId,
       items: true,
       options: true,
       peerreviews: true,
       course: true,
-    })
+    }))[0]
 
-    const userQState: UserQuizState = await this.userQuizStateService.getUserQuizState(
-      answer.userId,
-      answer.quizId,
-    )
+    const userQState: UserQuizState =
+      (await this.userQuizStateService.getUserQuizState(
+        answer.userId,
+        answer.quizId,
+      )) || new UserQuizState()
+
+    const originalPoints = userQState.pointsAwarded || 0
 
     let savedAnswer: QuizAnswer
     let savedUserQuizState: UserQuizState
@@ -229,7 +242,7 @@ export class QuizAnswerController {
       } = await this.validationService.validateQuizAnswer(
         manager,
         answer,
-        quiz[0],
+        quiz,
         userQState,
       )
 
@@ -265,6 +278,24 @@ export class QuizAnswerController {
         userQuizState,
       )
 
+      if (originalPoints < savedUserQuizState.pointsAwarded) {
+        await this.userCoursePartStateService.updateUserCoursePartState(
+          manager,
+          quiz,
+          userQuizState.userId,
+        )
+
+        const courseId = quiz.courseId
+
+        const progress: PointsByGroup[] = await this.userCoursePartStateService.getProgress(
+          manager,
+          userId,
+          courseId,
+        )
+
+        this.KafkaService.sendMessage(userId, courseId, progress)
+      }
+
       /*if (!quiz[0].excludedFromScore && savedAnswer.status === "confirmed") {
         await this.userCourseStateService.updateUserCourseState(
           manager,
@@ -276,7 +307,7 @@ export class QuizAnswerController {
     })
 
     return {
-      quiz: quiz[0],
+      quiz,
       quizAnswer: savedAnswer,
       userQuizState: savedUserQuizState,
     }
