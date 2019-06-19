@@ -40,7 +40,6 @@ export const setAttentionRequiringAnswers = (
 ) => {
   return async (dispatch, getState) => {
     try {
-      // dispatch(clear())
       const data = await getAttentionRequiringQuizAnswers(
         quizId,
         getState().user,
@@ -53,15 +52,17 @@ export const setAttentionRequiringAnswers = (
         return
       }
 
-      const quiz = getState()
-        .quizzes.find(qi => qi.courseId === getState().filter.course)
-        .quizzes.find(q => q.id === quizId)
-
-      if (!quiz) {
-        console.log("quiz undefined")
-        console.log("State: ", getState())
+      if (
+        !getState().quizzes.find(qi => qi.courseId === getState().filter.course)
+      ) {
+        await dispatch(setQuizzes(getState().filter.course))
       }
 
+      const quizNode = getState().quizzes.find(
+        qi => qi.courseId === getState().filter.course,
+      )
+
+      const quiz = quizNode.quizzes.find(q => q.id === quizId)
       const peerReviewQuestions = quiz.peerReviewCollections
         .map(prc => prc.questions)
         .flat()
