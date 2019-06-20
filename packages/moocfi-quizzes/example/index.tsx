@@ -53,7 +53,6 @@ const App = () => {
           Quiz
         </Typography>
         <SimpleErrorBoundary>
-          <Typography>muu</Typography>
           <Thing
             baseUrl={baseUrl.value}
             id={id.value}

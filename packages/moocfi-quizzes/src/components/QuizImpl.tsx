@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Button, Typography, Grid } from "@material-ui/core"
+import { Button, Typography } from "@material-ui/core"
 import Checkbox from "./Checkbox"
 import Feedback from "./Feedback"
 import MultipleChoice from "./MultipleChoice"
@@ -10,33 +10,49 @@ import Essay from "./Essay"
 import StageVisualizer from "./Essay/StageVisualizer"
 import PeerReviews from "./Essay/PeerReviews"
 import Unsupported from "./Unsupported"
-import axios from "axios"
 import languageLabels from "../utils/language_labels"
 import { wordCount } from "../utils/string_tools"
+import {
+  QuizItemAnswer,
+  UserCourseState,
+  UserQuizState,
+} from "../../../common/src/models"
+import { postAnswer } from "../services/answerService"
+import { getQuizInfo } from "../services/quizService"
 
 type QuizState = {
   quiz: any
   quizAnswer: any
-  userCourseState: any
+  userCourseState: UserCourseState
   submitLocked: boolean
-  correctCount: any
-  error: any
-  userQuizState: any
+  correctCount: number
+  error: string
+  userQuizState: UserQuizState
 }
 
-const mapTypeToComponent = {
-  essay: Essay,
-  "multiple-choice": MultipleChoice,
-  scale: Scale,
-  checkbox: Checkbox,
-  open: Open,
-  "research-agreement": ResearchAgreement,
-  feedback: Feedback,
-}
+type ComponentName =
+  | "essay"
+  | "multiple-choice"
+  | "scale"
+  | "checkbox"
+  | "open"
+  | "research-agreement"
+  | "feedback"
+  | "custom-frontend-accept-data"
 
-const componentType = typeName => {
-  let component = mapTypeToComponent[typeName]
-  return component === undefined ? Unsupported : component
+const componentType = (typeName: ComponentName) => {
+  const mapTypeToComponent = {
+    essay: Essay,
+    "multiple-choice": MultipleChoice,
+    scale: Scale,
+    checkbox: Checkbox,
+    open: Open,
+    "research-agreement": ResearchAgreement,
+    feedback: Feedback,
+    "custom-frontend-accept-data": Unsupported,
+  }
+
+  return mapTypeToComponent[typeName]
 }
 
 export interface Props {
@@ -60,17 +76,18 @@ class QuizImpl extends React.Component<Props> {
   async componentDidMount() {
     const { id, languageId, accessToken, baseUrl } = this.props
     try {
-      const response = await axios.get(
-        `${baseUrl}/api/v1/quizzes/${id}?language=${languageId}`,
-        { headers: { authorization: `Bearer ${accessToken}` } },
+      let { quiz, quizAnswer, userQuizState } = await getQuizInfo(
+        id,
+        languageId,
+        baseUrl,
+        accessToken,
       )
-      const quiz = response.data.quiz
-      let quizAnswer = response.data.quizAnswer
+
       if (!quizAnswer) {
         quizAnswer = {
           quizId: quiz.id,
           languageId,
-          itemAnswers: response.data.quiz.items.map(item => {
+          itemAnswers: quiz.items.map(item => {
             return {
               quizItemId: item.id,
               textData: "",
@@ -84,7 +101,7 @@ class QuizImpl extends React.Component<Props> {
       this.setState({
         quiz,
         quizAnswer,
-        userQuizState: response.data.userQuizState,
+        userQuizState,
       })
     } catch (e) {
       this.setState({ error: e.toString() })
@@ -162,19 +179,18 @@ class QuizImpl extends React.Component<Props> {
     this.setState({ quizAnswer: { ...quizAnswer, ...{ itemAnswers } } })
   }
 
-  handleSubmit = async event => {
+  handleSubmit = async () => {
     this.setState({ submitLocked: true })
-    const response = await axios.post(
-      `${this.props.baseUrl}/api/v1/quizzes/answer`,
+    const { quiz, quizAnswer, userQuizState } = await postAnswer(
       this.state.quizAnswer,
-      {
-        headers: { authorization: `Bearer ${this.props.accessToken}` },
-      },
+      this.props.baseUrl,
+      this.props.accessToken,
     )
+
     this.setState({
-      quiz: response.data.quiz,
-      quizAnswer: response.data.quizAnswer,
-      userQuizState: response.data.userQuizState,
+      quiz,
+      quizAnswer,
+      userQuizState,
     })
   }
 

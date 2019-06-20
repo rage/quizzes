@@ -1,4 +1,4 @@
-import React, { CSSProperties } from "react"
+import * as React from "react"
 import {
   Button,
   Grid,
@@ -165,8 +165,11 @@ export default props => {
 }
 
 const selectButtonStyle = (selected, correct) => {
-  const style: CSSProperties = { textTransform: "none", margin: "0.5em 0" }
-  const variant: "contained" | "outlined" = selected ? "contained" : "outlined"
+  const style: React.CSSProperties = {
+    textTransform: "none",
+    margin: "0.5em 0",
+  }
+  const variant = selected ? "contained" : "outlined"
   return {
     variant,
     style: selected
