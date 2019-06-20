@@ -1,4 +1,4 @@
-import React, { Component } from "react"
+import * as React from "react"
 import { Button, Typography, Grid } from "@material-ui/core"
 import Checkbox from "./Checkbox"
 import Feedback from "./Feedback"
@@ -13,6 +13,16 @@ import Unsupported from "./Unsupported"
 import axios from "axios"
 import languageLabels from "../utils/language_labels"
 import { wordCount } from "../utils/string_tools"
+
+type QuizState = {
+  quiz: any
+  quizAnswer: any
+  userCourseState: any
+  submitLocked: boolean
+  correctCount: any
+  error: any
+  userQuizState: any
+}
 
 const mapTypeToComponent = {
   essay: Essay,
@@ -36,8 +46,8 @@ export interface Props {
   baseUrl: string
 }
 
-class QuizImpl extends Component<Props> {
-  state = {
+class QuizImpl extends React.Component<Props> {
+  state: QuizState = {
     quiz: undefined,
     quizAnswer: undefined,
     userCourseState: undefined,
@@ -389,4 +399,4 @@ class QuizImpl extends Component<Props> {
   }
 }
 
-export default Quiz
+export default QuizImpl

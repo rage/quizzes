@@ -13,39 +13,26 @@ const FieldWrapper = styled.div`
 `
 
 const App = () => {
-  const [id, setId] = useLocalStorage("savedQuizId", "")
-  const [baseUrl, setBaseUrl] = useLocalStorage(
+  const id = useInputWithLocalStorage("id", "")
+  const languageId = useInputWithLocalStorage("languageId", "fi_FI")
+  const accessToken = useInputWithLocalStorage("savedAccessToken", "")
+  const baseUrl = useInputWithLocalStorage(
     "savedBaseUrl",
     "https://quizzes.mooc.fi",
   )
-  const [languageId, setLanguageId] = useLocalStorage(
-    "savedLanguageId",
-    "fi_FI",
-  )
-  const [accessToken, setAccessToken] = useLocalStorage("savedAccessToken", "")
+
   return (
-    <div>
+    <>
       <Typography variant="h4" component="h1">
         Quizzes testing
       </Typography>
       <FieldWrapper>
-        <TextField
-          variant="outlined"
-          onChange={e => {
-            setId(e.target.value)
-          }}
-          value={id}
-          label="Quiz id"
-          fullWidth
-        />
+        <TextField variant="outlined" {...id} label="Quiz id" fullWidth />
       </FieldWrapper>
       <FieldWrapper>
         <TextField
           variant="outlined"
-          onChange={e => {
-            setLanguageId(e.target.value)
-          }}
-          value={languageId}
+          {...languageId}
           label="Language id"
           fullWidth
         />
@@ -53,43 +40,43 @@ const App = () => {
       <FieldWrapper>
         <TextField
           variant="outlined"
-          onChange={e => {
-            setAccessToken(e.target.value)
-          }}
-          value={accessToken}
+          {...accessToken}
           label="Access token"
           fullWidth
         />
       </FieldWrapper>
       <FieldWrapper>
-        <TextField
-          variant="outlined"
-          onChange={e => {
-            setBaseUrl(e.target.value)
-          }}
-          value={baseUrl}
-          label="Base url"
-          fullWidth
-        />
+        <TextField variant="outlined" {...baseUrl} label="Base url" fullWidth />
       </FieldWrapper>
       <div>
         <Typography variant="h5" component="h1">
           Quiz
         </Typography>
         <SimpleErrorBoundary>
+          <Typography>muu</Typography>
           <Thing
-            baseUrl={baseUrl}
-            id={id}
-            languageId={languageId}
-            accessToken={accessToken}
+            baseUrl={baseUrl.value}
+            id={id.value}
+            languageId={languageId.value}
+            accessToken={accessToken.value}
           />
         </SimpleErrorBoundary>
       </div>
-    </div>
+    </>
   )
 }
 
 ReactDOM.render(<App />, document.getElementById("root"))
+
+function useInputWithLocalStorage(key, initialValue) {
+  const [value, setValue] = useLocalStorage(key, initialValue)
+
+  const onChange = e => {
+    setValue(e.target.value)
+  }
+
+  return { value, onChange }
+}
 
 function useLocalStorage(key, initialValue) {
   const [storedValue, setStoredValue] = useState(() => {
@@ -97,6 +84,7 @@ function useLocalStorage(key, initialValue) {
   })
 
   const setValue = value => {
+    setStoredValue(value)
     window.localStorage.setItem(key, value)
   }
 
