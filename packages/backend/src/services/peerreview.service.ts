@@ -1,3 +1,4 @@
+import knex from "knex"
 import _ from "lodash"
 import { Service } from "typedi"
 import { Brackets, EntityManager, SelectQueryBuilder } from "typeorm"
@@ -47,6 +48,84 @@ export default class PeerReviewService {
     }
 
     return await builtQuery.getMany()
+  }
+
+  public async getPlainPeerReviews(quizId: string) {
+    const builder = knex({ client: "pg" })
+
+    let query = builder("peer_review")
+      .innerJoin("quiz_answer", "quiz_answer.id", "peer_review.quiz_answer_id")
+      .where("quiz_answer.quiz_id", quizId)
+      .select(
+        "peer_review.id",
+        "peer_review.quiz_answer_id",
+        "peer_review.user_id",
+        "peer_review.rejected_quiz_answer_ids",
+      )
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+    const data = await queryRunner.stream(query.toString())
+    await queryRunner.release()
+
+    return data
+  }
+
+  public async getPlainPeerReviewAnswers(quizId: string) {
+    const builder = knex({ client: "pg" })
+
+    let query = builder("peer_review")
+      .innerJoin("quiz_answer", "quiz_answer.id", "peer_review.quiz_answer_id")
+      .where("quiz_answer.quiz_id", quizId)
+      .innerJoin(
+        "peer_review_question_answer",
+        "peer_review_question_answer.peer_review_id",
+        "peer_review.id",
+      )
+      .select(
+        { peer_review_id: "peer_review.id" },
+        "peer_review_question_answer.peer_review_question_id",
+        "peer_review_question_answer.value",
+        "peer_review_question_answer.text",
+      )
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    const data = await queryRunner.stream(query.toString())
+    await queryRunner.release()
+    return data
+  }
+
+  public async getCSVData(quizId: string) {
+    const builder = knex({ client: "pg" })
+
+    let query = builder("peer_review")
+      .innerJoin("quiz_answer", "quiz_answer.id", "peer_review.quiz_answer_id")
+      .where("quiz_answer.quiz_id", quizId)
+      .select(
+        "peer_review.id",
+        "peer_review.quiz_answer_id",
+        "peer_review.user_id",
+        "peer_review.rejected_quiz_answer_ids",
+      )
+      .innerJoin(
+        "peer_review_question_answer",
+        "peer_review_question_answer.peer_review_id",
+        "peer_review.id",
+      )
+      .select(
+        "peer_review_question_answer.peer_review_question_id",
+        "peer_review_question_answer.value",
+        "peer_review_question_answer.text",
+      )
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    const data = await queryRunner.stream(query.toString())
+    await queryRunner.release()
+    return data
   }
 
   public async getAnswersToReview(

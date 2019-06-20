@@ -7,7 +7,7 @@ export const getQuizAnswers = async (
   limit: number,
 ) => {
   const response = await axios.get(
-    `/api/v1/quizzes/answer?quizId=${quizId}&attention=false&skip=${skip}&limit=${limit}`,
+    `/api/v1/quizzes/answer/answers?quizId=${quizId}&attention=false&skip=${skip}&limit=${limit}`,
     {
       headers: { authorization: `Bearer ${user.accessToken}` },
     },
@@ -40,7 +40,7 @@ export const getAttentionRequiringQuizAnswers = async (
   limit: number,
 ) => {
   const response = await axios.get(
-    `/api/v1/quizzes/answer?quizId=${quizId}&attention=true&skip=${skip}&limit=${limit}`,
+    `/api/v1/quizzes/answer/answers?quizId=${quizId}&attention=true&skip=${skip}&limit=${limit}`,
     {
       headers: { authorization: `Bearer ${user.accessToken}` },
     },

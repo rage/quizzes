@@ -1,7 +1,20 @@
-import { CircularProgress, Grid, Paper, Typography } from "@material-ui/core"
+import {
+  Card,
+  CardContent,
+  CircularProgress,
+  Grid,
+  Paper,
+  Typography,
+} from "@material-ui/core"
 import queryString from "query-string"
 import React from "react"
 import { connect } from "react-redux"
+import {
+  getAnswersDetailedData,
+  getDetailedEverythingData,
+  getPeerReviewsDetailedData,
+  getQuizInformationDetailedData,
+} from "../../services/quizzes"
 import { setAllAnswersCount } from "../../store/answerCounts/actions"
 import {
   setAllAnswers,
@@ -10,6 +23,7 @@ import {
 import { setCourse, setQuiz } from "../../store/filter/actions"
 import LanguageBar from "../GeneralTools/LanguageBar"
 import Answers from "./Answers"
+import DownloadButton from "./DownloadButton"
 import FilterOptions from "./FilterOptions"
 import GeneralQuizStatistics from "./GeneralQuizStatistics"
 
@@ -183,13 +197,76 @@ class QuizStatistics extends React.Component<any, any> {
                   md={4}
                   style={{ marginBottom: "1em" }}
                 >
-                  {this.state.showingAll ? (
-                    <FilterOptions numberOfAnswers={totalNumberOfResults} />
-                  ) : (
-                    <GeneralQuizStatistics
-                      numberOfAnswers={totalNumberOfResults}
-                    />
-                  )}
+                  <Grid
+                    container={true}
+                    direction="row"
+                    justify="center"
+                    spacing={8}
+                  >
+                    {this.state.showingAll ? (
+                      <FilterOptions numberOfAnswers={totalNumberOfResults} />
+                    ) : (
+                      <GeneralQuizStatistics
+                        numberOfAnswers={totalNumberOfResults}
+                      />
+                    )}
+
+                    <Grid item={true} xs={12}>
+                      <DownloadButton
+                        quiz={quiz}
+                        service={getQuizInformationDetailedData}
+                        label="Download quiz info"
+                        filenameEnd="information"
+                      />
+                    </Grid>
+                    <Grid item={true} xs={12}>
+                      <DownloadButton
+                        quiz={quiz}
+                        service={getAnswersDetailedData}
+                        label="Download quiz answers data"
+                        filenameEnd="answers"
+                      />
+                    </Grid>
+                    <Grid item={true} xs={12}>
+                      <DownloadButton
+                        quiz={quiz}
+                        service={getPeerReviewsDetailedData}
+                        label={"Download peer review data"}
+                        filenameEnd="peer_reviews"
+                      />
+                    </Grid>
+
+                    <Grid item={true} xs={12} style={{ marginTop: "1em" }}>
+                      <Card>
+                        <CardContent>
+                          <Typography variant="subtitle1">
+                            Note: The options below use a lot of memory to
+                            process the data into xlsx/ods. Firefox seems less
+                            likely to crash as a result.
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+
+                    <Grid item={true} xs={12}>
+                      <DownloadButton
+                        quiz={quiz}
+                        service={getDetailedEverythingData}
+                        label={"Download all quiz data"}
+                        fileFormat="xlsx"
+                        filenameEnd="data"
+                      />
+                    </Grid>
+                    <Grid item={true} xs={12}>
+                      <DownloadButton
+                        quiz={quiz}
+                        service={getDetailedEverythingData}
+                        label={"Download all quiz data"}
+                        fileFormat="ods"
+                        filenameEnd="data"
+                      />
+                    </Grid>
+                  </Grid>
                 </Grid>
 
                 <Grid item={true} xs={12} md={8}>
@@ -321,6 +398,7 @@ const mapStateToProps = (state: any) => {
     ),
     courses: state.courses,
     filter: state.filter,
+    user: state.user,
   }
 }
 
