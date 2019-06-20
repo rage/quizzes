@@ -24,11 +24,15 @@ import {
   Quiz,
   QuizAnswer,
   User,
-  UserQuizState,
   UserCoursePartState,
   UserCourseState,
+  UserQuizState,
 } from "../../models"
-import { ITMCProfileDetails, QuizAnswerStatus } from "../../types"
+import {
+  ITMCProfileDetails,
+  IQuizAnswerQuery,
+  QuizAnswerStatus,
+} from "../../types"
 
 const MAX_LIMIT = 100
 
@@ -64,25 +68,22 @@ export class QuizAnswerController {
       throw new UnauthorizedError("unauthorized")
     }
 
-    return quizId
-      ? await this.quizAnswerService.getNumberOfAnswers(quizId)
-      : await this.quizAnswerService.getAttentionAnswersCount()
+    const limitDate = new Date()
+    limitDate.setDate(limitDate.getDate() - 14)
+
+    const criteriaQuery: IQuizAnswerQuery = quizId
+      ? {
+          quizId,
+        }
+      : {
+          lastAllowedTime: limitDate,
+          statuses: ["spam", "submitted"],
+        }
+
+    return await this.quizAnswerService.getAnswersCount(criteriaQuery)
   }
 
-  @Get("/statistics")
-  public async getAnswerStatistics(
-    @QueryParam("quizId") quizId: string,
-    @HeaderParam("authorization") user: ITMCProfileDetails,
-  ): Promise<any> {
-    if (!user.administrator) {
-      throw new UnauthorizedError("unauthorized")
-    }
-
-    const result = await this.quizAnswerService.getAnswersStatistics(quizId)
-    return result
-  }
-
-  @Get("/attention")
+  @Get("/")
   public async getEveryonesAnswers(
     @QueryParam("attention") attention: boolean,
     @QueryParam("quizId") quizId: string,
@@ -100,20 +101,22 @@ export class QuizAnswerController {
       limit = MAX_LIMIT
     }
 
-    result = attention
-      ? await this.quizAnswerService.getAttentionAnswers(
-          quizId,
-          skip,
-          limit,
-          true,
-        )
-      : await this.quizAnswerService.getEveryonesAnswers(
-          quizId,
-          skip,
-          limit,
-          true,
-        )
+    const attentionCriteriaQuery: IQuizAnswerQuery = {
+      quizId,
+      addPeerReviews: true,
+      addSpamFlagNumber: true,
+      skip,
+      limit,
+    }
 
+    if (attention) {
+      const limitDate = new Date()
+      limitDate.setDate(limitDate.getDate() - 14)
+      attentionCriteriaQuery.lastAllowedTime = limitDate
+      attentionCriteriaQuery.statuses = ["spam", "submitted"]
+    }
+
+    result = await this.quizAnswerService.getAnswers(attentionCriteriaQuery)
     return result
   }
 
