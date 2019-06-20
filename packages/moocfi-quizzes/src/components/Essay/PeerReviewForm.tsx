@@ -1,4 +1,4 @@
-import React, { Component } from "react"
+import * as React from "react"
 import LikertScale from "likert-react"
 import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
 import PeerReviewOption from "./PeerReviewOption"
@@ -16,7 +16,7 @@ const PeerReviewForm = ({
   quizItems,
   submitDisabled,
 }) => (
-  <React.Fragment>
+  <>
     <Typography variant="subtitle1">
       Valitse yksi vaihtoehdoista vertaisarvoitavaksi
     </Typography>
@@ -81,7 +81,7 @@ const PeerReviewForm = ({
         </div>
       ))
     )}
-  </React.Fragment>
+  </>
 )
 
 export default PeerReviewForm

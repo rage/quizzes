@@ -1,4 +1,4 @@
-import React from "react"
+import * as React from "react"
 import { TextField, Typography, Paper } from "@material-ui/core"
 
 const Open = ({
@@ -13,7 +13,7 @@ const Open = ({
   itemTitle,
 }) => {
   const guidance = (
-    <React.Fragment>
+    <>
       <Typography variant="h6" style={{ paddingBottom: 10 }}>
         {itemTitle}
       </Typography>
@@ -22,7 +22,7 @@ const Open = ({
         style={{ paddingBottom: 10 }}
         dangerouslySetInnerHTML={{ __html: item.texts[0].body }}
       />
-    </React.Fragment>
+    </>
   )
 
   if (answered) {

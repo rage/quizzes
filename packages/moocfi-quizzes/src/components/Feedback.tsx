@@ -1,4 +1,4 @@
-import React from "react"
+import * as React from "react"
 import { TextField, Typography } from "@material-ui/core"
 
 export default props => (

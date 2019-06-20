@@ -1,4 +1,4 @@
-import React from "react"
+import * as React from "react"
 import { Grid, Checkbox, Typography } from "@material-ui/core"
 
 export default ({ body, title, value, toggle, answered }) => {

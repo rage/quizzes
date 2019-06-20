@@ -48,7 +48,7 @@ export default props => {
         {singleItem ? (
           ""
         ) : (
-          <React.Fragment>
+          <>
             <Typography variant="h6" style={{ paddingBottom: 10 }}>
               {itemTitle}
             </Typography>
@@ -59,7 +59,7 @@ export default props => {
                 dangerouslySetInnerHTML={{ __html: itemBody }}
               />
             )}
-          </React.Fragment>
+          </>
         )}
         {multi && !answered ? (
           <Typography variant="subtitle1">

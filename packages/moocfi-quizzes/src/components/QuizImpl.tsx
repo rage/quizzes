@@ -12,11 +12,7 @@ import PeerReviews from "./Essay/PeerReviews"
 import Unsupported from "./Unsupported"
 import languageLabels from "../utils/language_labels"
 import { wordCount } from "../utils/string_tools"
-import {
-  QuizItemAnswer,
-  UserCourseState,
-  UserQuizState,
-} from "../../../common/src/models"
+import { UserCourseState, UserQuizState } from "../../../common/src/models"
 import { postAnswer } from "../services/answerService"
 import { getQuizInfo } from "../services/quizService"
 

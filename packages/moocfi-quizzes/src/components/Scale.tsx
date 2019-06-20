@@ -1,4 +1,4 @@
-import React from "react"
+import * as React from "react"
 import {
   FormControl,
   FormLabel,
@@ -15,8 +15,8 @@ import {
 const Scale = ({ handleIntDataChange, intData, item, answered }) => {
   let number_of_options = 7
 
-  if (item.minWords && item.maxWords) {
-    number_of_options = item.maxWords - item.minWords + 1
+  if (item.minValue && item.maxValue) {
+    number_of_options = item.maxValue - item.minValue + 1
   }
   return (
     <div>
@@ -62,7 +62,7 @@ const Scale = ({ handleIntDataChange, intData, item, answered }) => {
 }
 
 const radioButtonOptions = answered => {
-  const color: "primary" = "primary"
+  const color = "primary"
   let options = {
     style: {
       paddingLeft: 0,

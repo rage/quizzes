@@ -1,14 +1,18 @@
-import React, { Component } from "react"
-import axios from "axios"
+import * as React from "react"
 import Typography from "@material-ui/core/Typography"
 import "likert-react/dist/main.css"
 import { BASE_URL } from "../../config"
 import PeerReviewForm from "./PeerReviewForm"
 import PeerReviewsGuidance from "./PeerReviewsGuidance"
+import {
+  getPeerReviewInfo,
+  postSpamFlag,
+  postPeerReview,
+} from "../../services/peerReviewService"
 import Togglable from "../../utils/Togglable"
 import { string } from "prop-types"
 
-class PeerReviews extends Component<any> {
+class PeerReviews extends React.Component<any> {
   state = {
     peerReview: undefined,
     answersToReview: undefined,
@@ -24,22 +28,18 @@ class PeerReviews extends Component<any> {
   }
 
   fetchAnswersToReview = async () => {
-    const response = await axios.get(
-      `${this.props.baseUrl}/api/v1/quizzes/peerreview/${this.props.quizId}/${
-        this.props.languageId
-      }`,
-      { headers: { authorization: `Bearer ${this.props.accessToken}` } },
+    const answerAlternatives = await getPeerReviewInfo(
+      this.props.quizId,
+      this.props.languageId,
+      this.props.baseUrl,
+      this.props.accessToken,
     )
-    this.setState({ answersToReview: response.data })
+    this.setState({ answersToReview: answerAlternatives })
   }
 
-  flagAsSpam = quizAnswerId => async event => {
+  flagAsSpam = quizAnswerId => async () => {
     this.setState({ answersToReview: undefined })
-    await axios.post(
-      `${this.props.baseUrl}/api/v1/quizzes/spamflag`,
-      { quizAnswerId },
-      { headers: { authorization: `Bearer ${this.props.accessToken}` } },
-    )
+    await postSpamFlag(quizAnswerId, this.props.baseUrl, this.props.accessToken)
     await this.fetchAnswersToReview()
   }
 
@@ -84,13 +84,13 @@ class PeerReviews extends Component<any> {
 
   submitPeerReview = async () => {
     this.setState({ submitDisabled: true, submitLocked: true })
-    const response = await axios.post(
-      `${BASE_URL}/api/v1/quizzes/peerreview`,
+    const { userQuizState } = await postPeerReview(
       this.state.peerReview,
-      { headers: { authorization: `Bearer ${this.props.accessToken}` } },
+      BASE_URL,
+      this.props.accessToken,
     )
 
-    this.props.setUserQuizState(response.data.userQuizState)
+    this.props.setUserQuizState(userQuizState)
     this.setState({ peerReview: undefined })
     await this.fetchAnswersToReview()
   }

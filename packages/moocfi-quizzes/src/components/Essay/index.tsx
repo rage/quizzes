@@ -1,4 +1,4 @@
-import React from "react"
+import * as React from "react"
 import { Paper, TextField } from "@material-ui/core"
 import Typography from "@material-ui/core/Typography"
 import { wordCount } from "../../utils/string_tools"
@@ -20,16 +20,16 @@ const Essay = ({
   }
 
   const answerPortion = answered ? (
-    <React.Fragment>
+    <>
       <Typography variant="subtitle1">
         {languageInfo.userAnswerLabel + ": "}
       </Typography>
       <Paper style={paper}>
         <Typography variant="body1">{textData}</Typography>
       </Paper>
-    </React.Fragment>
+    </>
   ) : (
-    <React.Fragment>
+    <>
       {item.minWords && (
         <Typography variant="body1">
           {languageInfo.minimumWords}: {item.minWords}
@@ -51,9 +51,9 @@ const Essay = ({
       />
       <div>
         Sanoja: {wordCount(textData)}
-        {item.maxWords && <React.Fragment> / {item.maxWords}</React.Fragment>}
+        {item.maxWords && <> / {item.maxWords}</>}
       </div>
-    </React.Fragment>
+    </>
   )
 
   return (
