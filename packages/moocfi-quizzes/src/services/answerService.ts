@@ -1,5 +1,6 @@
 import axios from "axios"
 import { Quiz, QuizAnswer, UserQuizState } from "../../../common/src/models"
+import BASE_URL from "../config"
 
 type AnswerResponse = {
   quiz: Quiz
@@ -9,11 +10,10 @@ type AnswerResponse = {
 
 export const postAnswer = async (
   quizAnswer: QuizAnswer,
-  baseUrl: string,
   accessToken: string,
 ): Promise<AnswerResponse> => {
   const response = await axios.post(
-    `${baseUrl}/api/v1/quizzes/answer`,
+    `${BASE_URL}/api/v1/quizzes/answer`,
     quizAnswer,
     {
       headers: { authorization: `Bearer ${accessToken}` },

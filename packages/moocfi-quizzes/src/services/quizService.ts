@@ -1,5 +1,6 @@
 import axios from "axios"
 import { Quiz, UserQuizState } from "../../../common/src/models"
+import BASE_URL from "../config"
 
 type QuizResponse = {
   quiz: Quiz
@@ -10,11 +11,10 @@ type QuizResponse = {
 export const getQuizInfo = async (
   id,
   languageId,
-  baseUrl,
   accessToken,
 ): Promise<QuizResponse> => {
   const response = await axios.get(
-    `${baseUrl}/api/v1/quizzes/${id}?language=${languageId}`,
+    `${BASE_URL}/api/v1/quizzes/${id}?language=${languageId}`,
     { headers: { authorization: `Bearer ${accessToken}` } },
   )
 

@@ -1,7 +1,6 @@
 import * as React from "react"
 import Typography from "@material-ui/core/Typography"
 import "likert-react/dist/main.css"
-import { BASE_URL } from "../../config"
 import PeerReviewForm from "./PeerReviewForm"
 import PeerReviewsGuidance from "./PeerReviewsGuidance"
 import {
@@ -31,7 +30,6 @@ class PeerReviews extends React.Component<any> {
     const answerAlternatives = await getPeerReviewInfo(
       this.props.quizId,
       this.props.languageId,
-      this.props.baseUrl,
       this.props.accessToken,
     )
     this.setState({ answersToReview: answerAlternatives })
@@ -39,7 +37,7 @@ class PeerReviews extends React.Component<any> {
 
   flagAsSpam = quizAnswerId => async () => {
     this.setState({ answersToReview: undefined })
-    await postSpamFlag(quizAnswerId, this.props.baseUrl, this.props.accessToken)
+    await postSpamFlag(quizAnswerId, this.props.accessToken)
     await this.fetchAnswersToReview()
   }
 
@@ -86,7 +84,6 @@ class PeerReviews extends React.Component<any> {
     this.setState({ submitDisabled: true, submitLocked: true })
     const { userQuizState } = await postPeerReview(
       this.state.peerReview,
-      BASE_URL,
       this.props.accessToken,
     )
 

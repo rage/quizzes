@@ -1,4 +1,5 @@
-import * as React from "react"
+import React, { useState } from "react"
+import { connect } from "react-redux"
 import { Button, Typography } from "@material-ui/core"
 import Checkbox from "./Checkbox"
 import Feedback from "./Feedback"
@@ -15,6 +16,8 @@ import { wordCount } from "../utils/string_tools"
 import { UserCourseState, UserQuizState } from "../../../common/src/models"
 import { postAnswer } from "../services/answerService"
 import { getQuizInfo } from "../services/quizService"
+
+import { setLanguage } from "../state/language/actions"
 
 type QuizState = {
   quiz: any
@@ -58,6 +61,127 @@ export interface Props {
   baseUrl: string
 }
 
+const FuncQuizImpl: React.FunctionComponent<Props> = ({
+  id,
+  languageId,
+  accessToken,
+}) => {
+  const [quiz, setQuiz] = useState(null)
+  const [quizAnswer, setQuizAnswer] = useState(null)
+  const [userCourseState, setUserCourseState] = useState(null)
+  const [submitLocked, setSubmitLocked] = useState(false)
+  const [correctCount, setCorrectCount] = useState(null)
+  const [error, setError] = useState(null)
+  const [userQuizState, setUserQuizState] = useState(null)
+
+  if (!accessToken) {
+    return <div>Kirjaudu sisään vastataksesi tehtävään</div>
+  }
+
+  if (error) {
+    return (
+      <div>
+        Error
+        <pre>{error}</pre>
+      </div>
+    )
+  }
+
+  if (!quiz) {
+    return <div>Loading</div>
+  }
+
+  const types = quiz.items.map(item => item.type)
+
+  if (quiz.texts.length === 0) {
+    return <div>Error: quiz has no texts.</div>
+  }
+
+  return (
+    <div>
+      <Typography variant="h5" style={{ paddingBottom: 10 }}>
+        {quiz.texts[0].title}
+      </Typography>
+      <Typography
+        variant="body1"
+        style={{ paddingBottom: 10 }}
+        dangerouslySetInnerHTML={{ __html: quiz.texts[0].body }}
+      />
+
+      <div>
+        {this.quizContainsEssay() && (
+          <StageVisualizer
+            answered={quizAnswer.id ? true : false}
+            peerReviewsGiven={
+              this.state.userQuizState
+                ? this.state.userQuizState.peerReviewsGiven
+                : 0
+            }
+            peerReviewsRequired={quiz.course.minPeerReviewsGiven}
+            peerReviewsReceived={
+              this.state.userQuizState
+                ? this.state.userQuizState.peerReviewsReceived
+                : 0
+            }
+            peerReviewsReceivedRequired={
+              this.state.quiz.course.minPeerReviewsReceived
+            }
+          />
+        )}
+
+        {this.quizItemComponents(quiz, languageId, accessToken)}
+
+        {quizAnswer.id ? (
+          <React.Fragment>
+            {this.quizContainsEssay() && (
+              <PeerReviews
+                quiz={quiz}
+                quizId={quiz.id}
+                languageId={languageId}
+                languageInfo={languageLabels(languageId, "essay")}
+                accessToken={accessToken}
+                peerReviewQuestions={quiz.peerReviewCollections}
+                peerReviewsGiven={
+                  userQuizState ? userQuizState.peerReviewsGiven : 0
+                }
+                peerReviewsRequired={quiz.course.minPeerReviewsGiven}
+                setUserQuizState={this.setUserQuizState}
+                baseUrl={this.props.baseUrl}
+              />
+            )}
+
+            <Typography variant="h5">
+              {this.hasCorrectAnswer(quiz)
+                ? this.atLeastOneCorrect(quizAnswer.itemAnswers)
+                  ? quiz.items.length === 1
+                    ? "Tehtävä oikein"
+                    : `Sait ${
+                        quizAnswer.itemAnswers.filter(ia => ia.correct === true)
+                          .length
+                      }/${quiz.items.length} oikein`
+                  : types.includes("essay") || types.includes("scale")
+                  ? ""
+                  : "Tehtävä väärin"
+                : "Olet jo vastannut"}
+            </Typography>
+          </React.Fragment>
+        ) : (
+          <div>
+            <Button
+              variant="contained"
+              color="primary"
+              disabled={this.state.submitLocked ? true : this.submitDisabled()}
+              onClick={this.handleSubmit}
+            >
+              Vastaa
+            </Button>
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
+
 class QuizImpl extends React.Component<Props> {
   state: QuizState = {
     quiz: undefined,
@@ -70,12 +194,12 @@ class QuizImpl extends React.Component<Props> {
   }
 
   async componentDidMount() {
-    const { id, languageId, accessToken, baseUrl } = this.props
+    const { id, languageId, accessToken } = this.props
+    //  this.props.setLanguage(languageId)
     try {
       let { quiz, quizAnswer, userQuizState } = await getQuizInfo(
         id,
         languageId,
-        baseUrl,
         accessToken,
       )
 
@@ -179,7 +303,6 @@ class QuizImpl extends React.Component<Props> {
     this.setState({ submitLocked: true })
     const { quiz, quizAnswer, userQuizState } = await postAnswer(
       this.state.quizAnswer,
-      this.props.baseUrl,
       this.props.accessToken,
     )
 
@@ -294,121 +417,8 @@ class QuizImpl extends React.Component<Props> {
       </React.Fragment>
     )
   }
-
-  render() {
-    const { quiz, quizAnswer, userQuizState, error } = this.state
-    const { languageId, accessToken } = this.props
-
-    if (!accessToken) {
-      return <div>Kirjaudu sisään vastataksesi tehtävään</div>
-    }
-
-    if (error) {
-      return (
-        <div>
-          Error
-          <pre>{error}</pre>
-        </div>
-      )
-    }
-
-    if (!quiz) {
-      return <div>Loading</div>
-    }
-
-    const types = quiz.items.map(item => item.type)
-
-    if (quiz.texts.length === 0) {
-      return <div>Error: quiz has no texts.</div>
-    }
-
-    return (
-      <div>
-        <Typography variant="h5" style={{ paddingBottom: 10 }}>
-          {quiz.texts[0].title}
-        </Typography>
-        <Typography
-          variant="body1"
-          style={{ paddingBottom: 10 }}
-          dangerouslySetInnerHTML={{ __html: quiz.texts[0].body }}
-        />
-
-        <div>
-          {this.quizContainsEssay() && (
-            <StageVisualizer
-              answered={quizAnswer.id ? true : false}
-              peerReviewsGiven={
-                this.state.userQuizState
-                  ? this.state.userQuizState.peerReviewsGiven
-                  : 0
-              }
-              peerReviewsRequired={quiz.course.minPeerReviewsGiven}
-              peerReviewsReceived={
-                this.state.userQuizState
-                  ? this.state.userQuizState.peerReviewsReceived
-                  : 0
-              }
-              peerReviewsReceivedRequired={
-                this.state.quiz.course.minPeerReviewsReceived
-              }
-            />
-          )}
-
-          {this.quizItemComponents(quiz, languageId, accessToken)}
-
-          {quizAnswer.id ? (
-            <React.Fragment>
-              {this.quizContainsEssay() && (
-                <PeerReviews
-                  quiz={quiz}
-                  quizId={quiz.id}
-                  languageId={languageId}
-                  languageInfo={languageLabels(languageId, "essay")}
-                  accessToken={accessToken}
-                  peerReviewQuestions={quiz.peerReviewCollections}
-                  peerReviewsGiven={
-                    userQuizState ? userQuizState.peerReviewsGiven : 0
-                  }
-                  peerReviewsRequired={quiz.course.minPeerReviewsGiven}
-                  setUserQuizState={this.setUserQuizState}
-                  baseUrl={this.props.baseUrl}
-                />
-              )}
-
-              <Typography variant="h5">
-                {this.hasCorrectAnswer(quiz)
-                  ? this.atLeastOneCorrect(quizAnswer.itemAnswers)
-                    ? quiz.items.length === 1
-                      ? "Tehtävä oikein"
-                      : `Sait ${
-                          quizAnswer.itemAnswers.filter(
-                            ia => ia.correct === true,
-                          ).length
-                        }/${quiz.items.length} oikein`
-                    : types.includes("essay") || types.includes("scale")
-                    ? ""
-                    : "Tehtävä väärin"
-                  : "Olet jo vastannut"}
-              </Typography>
-            </React.Fragment>
-          ) : (
-            <div>
-              <Button
-                variant="contained"
-                color="primary"
-                disabled={
-                  this.state.submitLocked ? true : this.submitDisabled()
-                }
-                onClick={this.handleSubmit}
-              >
-                Vastaa
-              </Button>
-            </div>
-          )}
-        </div>
-      </div>
-    )
-  }
 }
 
-export default QuizImpl
+export default FuncQuizImpl
+// connect(null, { setLanguage })(
+// QuizImpl //)
