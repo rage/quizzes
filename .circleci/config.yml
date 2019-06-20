@@ -20,9 +20,27 @@ jobs:
       - run:
           name: "Check code style"
           command: "bin/check-code-style.sh"
+  deploy_to_production:
+
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - checkout
+      - run:
+          name: "Test"
+          command: "echo 'We should deploy now.'"
 workflows:
   version: 2
-  btd:
+  build-deploy:
     jobs:
       - build
       - code_style
+      - deploy_to_production:
+          requires:
+            - build
+            - code_style
+          filters:
+            branches:
+              only:
+                - master
+                - deployment-test
