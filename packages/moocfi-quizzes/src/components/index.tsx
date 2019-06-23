@@ -6,6 +6,7 @@ import createStoreInstance from "../state/store"
 
 const Quiz: React.FunctionComponent<Props> = props => {
   const store = createStoreInstance()
+
   return (
     <Provider store={store}>
       <QuizImpl {...props} />

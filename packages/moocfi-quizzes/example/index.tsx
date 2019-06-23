@@ -1,12 +1,12 @@
 import "react-app-polyfill/ie11"
-import * as React from "react"
-import * as ReactDOM from "react-dom"
+import * as React from "../node_modules/react"
+import * as ReactDOM from "../node_modules/react-dom"
 import Thing from "../src"
 import { Typography } from "@material-ui/core"
 import { TextField } from "@material-ui/core"
 import styled from "styled-components"
 import SimpleErrorBoundary from "./SimpleErrorBoundary"
-import { useState } from "react"
+import { useState } from "../node_modules/react"
 
 const FieldWrapper = styled.div`
   padding: 1rem;

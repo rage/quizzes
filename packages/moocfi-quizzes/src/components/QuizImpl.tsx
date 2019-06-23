@@ -1,4 +1,5 @@
-import React, { useState } from "react"
+import * as React from "react"
+import { useState, useEffect } from "react"
 import { connect } from "react-redux"
 import { Button, Typography } from "@material-ui/core"
 import Checkbox from "./Checkbox"
@@ -16,6 +17,7 @@ import { wordCount } from "../utils/string_tools"
 import { UserCourseState, UserQuizState } from "../../../common/src/models"
 import { postAnswer } from "../services/answerService"
 import { getQuizInfo } from "../services/quizService"
+import BASE_URL from "../config"
 
 import { setLanguage } from "../state/language/actions"
 
@@ -61,11 +63,7 @@ export interface Props {
   baseUrl: string
 }
 
-const FuncQuizImpl: React.FunctionComponent<Props> = ({
-  id,
-  languageId,
-  accessToken,
-}) => {
+const FuncQuizImpl = ({ id, languageId, accessToken }) => {
   const [quiz, setQuiz] = useState(null)
   const [quizAnswer, setQuizAnswer] = useState(null)
   const [userCourseState, setUserCourseState] = useState(null)
@@ -73,6 +71,231 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
   const [correctCount, setCorrectCount] = useState(null)
   const [error, setError] = useState(null)
   const [userQuizState, setUserQuizState] = useState(null)
+
+  useEffect(() => {
+    const initialize = async () => {
+      try {
+        let { quiz, quizAnswer, userQuizState } = await getQuizInfo(
+          id,
+          languageId,
+          accessToken,
+        )
+
+        if (!quizAnswer) {
+          quizAnswer = {
+            quizId: quiz.id,
+            languageId,
+            itemAnswers: quiz.items.map(item => {
+              return {
+                quizItemId: item.id,
+                textData: "",
+                intData: null,
+                optionAnswers: [],
+              }
+            }),
+          }
+        }
+
+        setQuiz(quiz)
+        setQuizAnswer(quizAnswer)
+        setUserQuizState(userQuizState)
+      } catch (e) {
+        setError(e.toString())
+      }
+    }
+
+    initialize()
+  }, [])
+
+  /* Hooks end */
+
+  /* Functions at this point */
+
+  const handleDataChange = (itemId: string, attributeName: string) => event => {
+    const value = event.target.value
+    const itemAnswers = quizAnswer.itemAnswers.map(itemAnswer => {
+      if (itemAnswer.quizItemId === itemId) {
+        const updated = { ...itemAnswer }
+        updated[attributeName] = value
+        return updated
+      }
+      return itemAnswer
+    })
+
+    const newQuizAnswer = quizAnswer
+    setQuizAnswer({ ...newQuizAnswer, ...{ itemAnswers } })
+  }
+
+  const handleTextDataChange = itemId => handleDataChange(itemId, "textData")
+
+  const handleIntDataChange = itemId => handleDataChange(itemId, "intData")
+
+  const handleCheckboxToggling = itemId => optionId => () => {
+    const itemAnswers = quizAnswer.itemAnswers
+    const itemAnswer = itemAnswers.find(ia => ia.quizItemId === itemId)
+
+    const currentOptionValue = itemAnswer.optionAnswers.find(
+      oa => oa.quizOptionId === optionId,
+    )
+
+    const newItemAnswer = {
+      ...itemAnswer,
+      optionAnswers: currentOptionValue
+        ? itemAnswer.optionAnswers.filter(oa => oa.quizOptionId !== optionId)
+        : itemAnswer.optionAnswers.concat({ quizOptionId: optionId }),
+    }
+
+    setQuizAnswer({
+      ...quizAnswer,
+      itemAnswers: itemAnswers.map(ia =>
+        ia.quizItemId === itemId ? newItemAnswer : ia,
+      ),
+    })
+  }
+
+  const handleOptionChange = itemId => optionId => () => {
+    const multi = quiz.items.find(item => item.id === itemId).multi
+    const itemAnswers = quizAnswer.itemAnswers.map(itemAnswer => {
+      if (itemAnswer.quizItemId === itemId) {
+        const updated = { ...itemAnswer }
+        if (multi) {
+          if (updated.optionAnswers.find(oa => oa.quizOptionId === optionId)) {
+            updated.optionAnswers = updated.optionAnswers.filter(
+              oa => oa.quizOptionId !== optionId,
+            )
+          } else {
+            updated.optionAnswers = [
+              ...updated.optionAnswers,
+              { quizOptionId: optionId },
+            ]
+          }
+        } else {
+          updated.optionAnswers = [{ quizOptionId: optionId }]
+        }
+        return updated
+      }
+      return itemAnswer
+    })
+    setQuizAnswer({
+      ...quizAnswer,
+      ...{ itemAnswers },
+    })
+  }
+
+  const handleSubmit = async () => {
+    setSubmitLocked(true)
+    const responseData = await postAnswer(quizAnswer, accessToken)
+
+    setQuiz(responseData.quiz)
+    setQuizAnswer(responseData.quizAnswer)
+    setUserQuizState(responseData.userQuizState)
+  }
+
+  // not all quizzess have correct solutions - e.g. self-evaluation
+  const hasCorrectAnswer = quiz => {
+    return quiz.items.some(
+      item =>
+        item.type === "essay" ||
+        item.type === "multiple-choice" ||
+        item.type === "open",
+    )
+  }
+
+  const atLeastOneCorrect = itemAnswers =>
+    itemAnswers.some(ia => ia.correct === true)
+
+  const submitDisabled = () => {
+    const submittable = quiz.items.map(item => {
+      const itemAnswer = quizAnswer.itemAnswers.find(
+        ia => ia.quizItemId === item.id,
+      )
+      if (
+        item.type === "essay" ||
+        item.type === "open" ||
+        item.type === "feedback"
+      ) {
+        if (!itemAnswer.textData) return false
+        const words = wordCount(itemAnswer.textData)
+        if (item.minWords && words < item.minWords) return false
+
+        if (item.maxWords && words > item.maxWords) return false
+        return true
+      }
+      if (item.type === "multiple-choice") {
+        return itemAnswer.optionAnswers.length > 0
+      }
+      if (item.type === "scale") {
+        return itemAnswer.intData ? true : false
+      }
+      if (item.type === "checkbox" || item.type === "research-agreement") {
+        return itemAnswer.optionAnswers.length > 0
+      }
+      return undefined
+    })
+
+    return submittable.includes(false)
+  }
+
+  const quizContainsEssay = () => {
+    return quiz.items.some(ia => ia.type === "essay")
+  }
+
+  const quizItemComponents = (quiz, languageId, accessToken) => {
+    return (
+      <>
+        {quiz.items
+          .sort((i1, i2) => i1.order - i2.order)
+          .map(item => {
+            const itemAnswer = quizAnswer.itemAnswers.find(
+              ia => ia.quizItemId === item.id,
+            )
+            const ItemComponent = componentType(item.type)
+
+            return (
+              <ItemComponent
+                quiz={quiz}
+                quizAnswer={quizAnswer}
+                item={item}
+                quizId={quiz.id}
+                key={item.id}
+                accessToken={accessToken}
+                languageId={languageId}
+                languageInfo={languageLabels(languageId, item.type)}
+                answered={quizAnswer.id ? true : false}
+                intData={itemAnswer.intData}
+                textData={itemAnswer.textData}
+                optionAnswers={itemAnswer.optionAnswers}
+                multi={item.multi}
+                singleItem={quiz.items.length === 1}
+                correct={itemAnswer.correct}
+                successMessage={item.texts[0].successMessage}
+                failureMessage={item.texts[0].failureMessage}
+                peerReviewsGiven={
+                  userQuizState ? userQuizState.peerReviewsGiven : 0
+                }
+                peerReviewsRequired={quiz.course.minPeerReviewsGiven}
+                itemTitle={item.texts[0].title}
+                itemBody={item.texts[0].body}
+                options={item.options}
+                peerReviewQuestions={quiz.peerReviewCollections}
+                submitMessage={quiz.texts[0].submitMessage}
+                handleTextDataChange={handleTextDataChange(item.id)}
+                handleIntDataChange={handleIntDataChange(item.id)}
+                handleOptionChange={handleOptionChange(item.id)}
+                handleCheckboxToggling={handleCheckboxToggling(item.id)}
+                setUserQuizState={setUserQuizState}
+              />
+            )
+          })}
+      </>
+    )
+  }
+
+  if (!quizAnswer) {
+    return <div>Loading...</div>
+  }
+
+  /* Conditional return */
 
   if (!accessToken) {
     return <div>Kirjaudu sisään vastataksesi tehtävään</div>
@@ -109,31 +332,33 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
       />
 
       <div>
-        {this.quizContainsEssay() && (
+        {/*
+         quizContainsEssay() && (
           <StageVisualizer
-            answered={quizAnswer.id ? true : false}
+            answered={(quizAnswer && quizAnswer.id) ? true : false}
             peerReviewsGiven={
-              this.state.userQuizState
-                ? this.state.userQuizState.peerReviewsGiven
+              userQuizState
+                ? userQuizState.peerReviewsGiven
                 : 0
             }
             peerReviewsRequired={quiz.course.minPeerReviewsGiven}
             peerReviewsReceived={
-              this.state.userQuizState
-                ? this.state.userQuizState.peerReviewsReceived
+              userQuizState
+                ? userQuizState.peerReviewsReceived
                 : 0
             }
             peerReviewsReceivedRequired={
-              this.state.quiz.course.minPeerReviewsReceived
+              quiz.course.minPeerReviewsReceived
             }
           />
-        )}
+        )
+          */}
 
-        {this.quizItemComponents(quiz, languageId, accessToken)}
+        {quizItemComponents(quiz, languageId, accessToken)}
 
         {quizAnswer.id ? (
-          <React.Fragment>
-            {this.quizContainsEssay() && (
+          <>
+            {quizContainsEssay() && (
               <PeerReviews
                 quiz={quiz}
                 quizId={quiz.id}
@@ -145,14 +370,14 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
                   userQuizState ? userQuizState.peerReviewsGiven : 0
                 }
                 peerReviewsRequired={quiz.course.minPeerReviewsGiven}
-                setUserQuizState={this.setUserQuizState}
-                baseUrl={this.props.baseUrl}
+                setUserQuizState={setUserQuizState}
+                baseUrl={BASE_URL}
               />
             )}
 
             <Typography variant="h5">
-              {this.hasCorrectAnswer(quiz)
-                ? this.atLeastOneCorrect(quizAnswer.itemAnswers)
+              {hasCorrectAnswer(quiz)
+                ? atLeastOneCorrect(quizAnswer.itemAnswers)
                   ? quiz.items.length === 1
                     ? "Tehtävä oikein"
                     : `Sait ${
@@ -164,14 +389,14 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
                   : "Tehtävä väärin"
                 : "Olet jo vastannut"}
             </Typography>
-          </React.Fragment>
+          </>
         ) : (
           <div>
             <Button
               variant="contained"
               color="primary"
-              disabled={this.state.submitLocked ? true : this.submitDisabled()}
-              onClick={this.handleSubmit}
+              disabled={submitLocked ? true : submitDisabled()}
+              onClick={handleSubmit}
             >
               Vastaa
             </Button>
@@ -181,6 +406,8 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
     </div>
   )
 }
+
+/*
 
 class QuizImpl extends React.Component<Props> {
   state: QuizState = {
@@ -418,6 +645,7 @@ class QuizImpl extends React.Component<Props> {
     )
   }
 }
+*/
 
 export default FuncQuizImpl
 // connect(null, { setLanguage })(

@@ -1,10 +1,9 @@
-import * as React from "react"
+import * as React from "../node_modules/react"
 
-class SimpleErrorBoundary extends React.Component {
+class SimpleErrorBoundary extends React.Component<any, any> {
   state = {
     error: null,
   }
-
   static getDerivedStateFromError(error) {
     return { error: error.toString() }
   }
