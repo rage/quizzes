@@ -56,6 +56,9 @@ jobs:
     steps:
       - checkout
       - run:
+          name: install envsubst
+          command: apt-get install -qq -y gettext
+      - run:
           name: "Deploy"
           command: "bin/ci-update-deployments.sh"
 
