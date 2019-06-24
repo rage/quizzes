@@ -15,7 +15,7 @@ else
 fi
 
 export DASHBOARD_IMAGE="eu.gcr.io/moocfi/quizzes-dashboard:build-$REV"
-export BACKEND_IMAGE="eu.gcr.io/moocfi/quizzes-dashboard:build-$REV"
+export BACKEND_IMAGE="eu.gcr.io/moocfi/quizzes-backend:build-$REV"
 
 
 echo "Building new Kubernetes configs"
