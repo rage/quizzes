@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useSelector, shallowEqual } from "react-redux"
 import Typography from "@material-ui/core/Typography"
 import Paper from "@material-ui/core/Paper"
 
@@ -7,7 +8,14 @@ const paper = {
   margin: 10,
 }
 
-export default ({ answer, quizItems }) => {
+type PeerReviewOptionProps = {
+  answer: any
+}
+
+export default ({ answer }) => {
+  const quiz = useSelector((state: any) => state.quiz)
+  const quizItems = quiz.items
+
   const quizItemById = id => quizItems.find(qi => qi.id === id)
 
   return answer.itemAnswers

@@ -1,23 +1,28 @@
 import * as React from "react"
+import { useSelector, shallowEqual } from "react-redux"
 import { Paper, TextField } from "@material-ui/core"
 import Typography from "@material-ui/core/Typography"
 import { wordCount } from "../../utils/string_tools"
 import { executeIfTextFieldBetweenNumOfWords as executeIfWordNumberCorrect } from "../../utils/event_filters"
+import { QuizItemAnswer } from "../../../../common/src/models"
 
-const Essay = ({
-  itemTitle,
-  itemBody,
-  itemAnswer,
-  textData,
-  handleTextDataChange,
-  answered,
-  item,
-  languageInfo,
-}) => {
+type EssayProps = {
+  textData: string
+  item: any
+  handleTextDataChange: (a: any) => any
+  languageInfo: any
+}
+
+const Essay = ({ textData, handleTextDataChange, item, languageInfo }) => {
   const paper = {
     padding: 10,
     margin: 10,
   }
+
+  const itemBody = item.texts[0].body
+  const itemTitle = item.texts[0].title
+  const quizAnswer = useSelector((state: any) => state.quizAnswer, shallowEqual)
+  const answered = quizAnswer.id
 
   const answerPortion = answered ? (
     <>

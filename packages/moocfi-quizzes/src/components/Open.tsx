@@ -1,17 +1,28 @@
 import * as React from "react"
+import { useSelector, shallowEqual } from "react-redux"
 import { TextField, Typography, Paper } from "@material-ui/core"
 
-const Open = ({
-  answered,
+type OpenProps = {
+  correct: boolean
+  handleTextDataChange: (any) => any
+  languageInfo: any
+  textData: string
+  item
+}
+
+const Open: React.FunctionComponent<OpenProps> = ({
   correct,
   handleTextDataChange,
   languageInfo,
   textData,
-  successMessage,
-  failureMessage,
   item,
-  itemTitle,
 }) => {
+  const answered = useSelector((state: any) => state.quizAnswer, shallowEqual)
+
+  const itemTitle = item.texts[0].title
+  const successMessage = item.texts[0].successMessage
+  const failureMessage = item.texts[0].failureMessage
+
   const guidance = (
     <>
       <Typography variant="h6" style={{ paddingBottom: 10 }}>

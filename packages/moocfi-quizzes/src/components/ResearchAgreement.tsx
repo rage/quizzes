@@ -1,14 +1,21 @@
 import * as React from "react"
 import CheckboxOption from "./Checkbox/CheckboxOption"
 
-const ResearchAgreement = ({
+type ResearchAgreementProps = {
+  options: any[]
+  optionAnswers: any[]
+  answered: boolean
+  handleCheckboxToggling: (any) => any
+}
+
+const ResearchAgreement: React.FunctionComponent<ResearchAgreementProps> = ({
   options,
   optionAnswers,
   answered,
   handleCheckboxToggling,
 }) => {
   return (
-    <React.Fragment>
+    <>
       {options.map(option => {
         const currentAnswer = optionAnswers.find(
           oa => oa.quizOptionId === option.id,
@@ -25,7 +32,7 @@ const ResearchAgreement = ({
           />
         )
       })}
-    </React.Fragment>
+    </>
   )
 }
 

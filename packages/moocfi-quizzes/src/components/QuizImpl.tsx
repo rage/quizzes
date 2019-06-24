@@ -1,7 +1,15 @@
 import * as React from "react"
-import { useState, useEffect } from "react"
-import { connect } from "react-redux"
+import { useCallback, useState, useEffect } from "react"
+import { shallowEqual, useDispatch, useSelector } from "react-redux"
 import { Button, Typography } from "@material-ui/core"
+import * as languageActions from "../state/language/actions"
+import * as messageActions from "../state/message/actions"
+import * as quizActions from "../state/quiz/actions"
+import * as quizAnswerActions from "../state/quizAnswer/actions"
+import * as submitLockedActions from "../state/submitLocked/actions"
+import * as userActions from "../state/user/actions"
+import * as userQuizStateActions from "../state/userQuizState/actions"
+
 import Checkbox from "./Checkbox"
 import Feedback from "./Feedback"
 import MultipleChoice from "./MultipleChoice"
@@ -14,22 +22,15 @@ import PeerReviews from "./Essay/PeerReviews"
 import Unsupported from "./Unsupported"
 import languageLabels from "../utils/language_labels"
 import { wordCount } from "../utils/string_tools"
-import { UserCourseState, UserQuizState } from "../../../common/src/models"
+// don't use common!
+import {
+  UserCourseState,
+  UserQuizState,
+  QuizAnswer,
+} from "../../../common/src/models"
 import { postAnswer } from "../services/answerService"
 import { getQuizInfo } from "../services/quizService"
 import BASE_URL from "../config"
-
-import { setLanguage } from "../state/language/actions"
-
-type QuizState = {
-  quiz: any
-  quizAnswer: any
-  userCourseState: UserCourseState
-  submitLocked: boolean
-  correctCount: number
-  error: string
-  userQuizState: UserQuizState
-}
 
 type ComponentName =
   | "essay"
@@ -63,14 +64,34 @@ export interface Props {
   baseUrl: string
 }
 
-const FuncQuizImpl = ({ id, languageId, accessToken }) => {
-  const [quiz, setQuiz] = useState(null)
-  const [quizAnswer, setQuizAnswer] = useState(null)
-  const [userCourseState, setUserCourseState] = useState(null)
-  const [submitLocked, setSubmitLocked] = useState(false)
-  const [correctCount, setCorrectCount] = useState(null)
-  const [error, setError] = useState(null)
-  const [userQuizState, setUserQuizState] = useState(null)
+const FuncQuizImpl: React.FunctionComponent<Props> = ({
+  id,
+  languageId,
+  accessToken,
+}) => {
+  const submitLocked = useSelector(
+    (state: any) => state.submitLocked,
+    shallowEqual,
+  )
+  const setSubmitLocked = (state: boolean) =>
+    dispatch(submitLockedActions.set(state))
+
+  const error = useSelector((state: any) => state.message, shallowEqual)
+  const setError = (newError: string) => dispatch(messageActions.set(newError))
+
+  const quizAnswer = useSelector((state: any) => state.quizAnswer, shallowEqual)
+  const setQuizAnswer = (newQuizAnswer: QuizAnswer) =>
+    dispatch(quizAnswerActions.set(newQuizAnswer))
+
+  const userQuizState = useSelector(
+    (state: any) => state.userQuizState,
+    shallowEqual,
+  )
+  const setUserQuizState = (newUqs: UserQuizState) =>
+    dispatch(userQuizStateActions.set(newUqs))
+
+  const quiz = useSelector((state: any) => state.quiz, shallowEqual)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     const initialize = async () => {
@@ -96,9 +117,11 @@ const FuncQuizImpl = ({ id, languageId, accessToken }) => {
           }
         }
 
-        setQuiz(quiz)
-        setQuizAnswer(quizAnswer)
-        setUserQuizState(userQuizState)
+        dispatch(userActions.set(accessToken))
+        dispatch(languageActions.set(languageId))
+        dispatch(quizActions.set(quiz))
+        dispatch(quizAnswerActions.set(quizAnswer))
+        dispatch(userQuizStateActions.set(userQuizState))
       } catch (e) {
         setError(e.toString())
       }
@@ -106,10 +129,6 @@ const FuncQuizImpl = ({ id, languageId, accessToken }) => {
 
     initialize()
   }, [])
-
-  /* Hooks end */
-
-  /* Functions at this point */
 
   const handleDataChange = (itemId: string, attributeName: string) => event => {
     const value = event.target.value
@@ -122,8 +141,12 @@ const FuncQuizImpl = ({ id, languageId, accessToken }) => {
       return itemAnswer
     })
 
-    const newQuizAnswer = quizAnswer
-    setQuizAnswer({ ...newQuizAnswer, ...{ itemAnswers } })
+    dispatch(
+      quizAnswerActions.set({
+        ...quizAnswer,
+        ...{ itemAnswers },
+      }),
+    )
   }
 
   const handleTextDataChange = itemId => handleDataChange(itemId, "textData")
@@ -145,12 +168,14 @@ const FuncQuizImpl = ({ id, languageId, accessToken }) => {
         : itemAnswer.optionAnswers.concat({ quizOptionId: optionId }),
     }
 
-    setQuizAnswer({
-      ...quizAnswer,
-      itemAnswers: itemAnswers.map(ia =>
-        ia.quizItemId === itemId ? newItemAnswer : ia,
-      ),
-    })
+    dispatch(
+      quizAnswerActions.set({
+        ...quizAnswer,
+        itemAnswers: itemAnswers.map(ia =>
+          ia.quizItemId === itemId ? newItemAnswer : ia,
+        ),
+      }),
+    )
   }
 
   const handleOptionChange = itemId => optionId => () => {
@@ -176,20 +201,22 @@ const FuncQuizImpl = ({ id, languageId, accessToken }) => {
       }
       return itemAnswer
     })
-    setQuizAnswer({
-      ...quizAnswer,
-      ...{ itemAnswers },
-    })
+    dispatch(
+      quizAnswerActions.set({
+        ...quizAnswer,
+        ...{ itemAnswers },
+      }),
+    )
   }
 
-  const handleSubmit = async () => {
+  const handleSubmit = useCallback(async () => {
     setSubmitLocked(true)
     const responseData = await postAnswer(quizAnswer, accessToken)
 
-    setQuiz(responseData.quiz)
-    setQuizAnswer(responseData.quizAnswer)
-    setUserQuizState(responseData.userQuizState)
-  }
+    dispatch(quizActions.set(responseData.quiz))
+    dispatch(quizAnswerActions.set(responseData.quizAnswer))
+    dispatch(userQuizStateActions.set(responseData.userQuizState))
+  }, [])
 
   // not all quizzess have correct solutions - e.g. self-evaluation
   const hasCorrectAnswer = quiz => {
@@ -253,32 +280,26 @@ const FuncQuizImpl = ({ id, languageId, accessToken }) => {
 
             return (
               <ItemComponent
-                quiz={quiz}
-                quizAnswer={quizAnswer}
                 item={item}
-                quizId={quiz.id}
                 key={item.id}
-                accessToken={accessToken}
-                languageId={languageId}
                 languageInfo={languageLabels(languageId, item.type)}
-                answered={quizAnswer.id ? true : false}
                 intData={itemAnswer.intData}
                 textData={itemAnswer.textData}
                 optionAnswers={itemAnswer.optionAnswers}
-                multi={item.multi}
+                // multi={item.multi}
                 singleItem={quiz.items.length === 1}
                 correct={itemAnswer.correct}
-                successMessage={item.texts[0].successMessage}
-                failureMessage={item.texts[0].failureMessage}
+                // successMessage={item.texts[0].successMessage}
+                // failureMessage={item.texts[0].failureMessage}
                 peerReviewsGiven={
                   userQuizState ? userQuizState.peerReviewsGiven : 0
                 }
-                peerReviewsRequired={quiz.course.minPeerReviewsGiven}
-                itemTitle={item.texts[0].title}
-                itemBody={item.texts[0].body}
-                options={item.options}
-                peerReviewQuestions={quiz.peerReviewCollections}
-                submitMessage={quiz.texts[0].submitMessage}
+                // peerReviewsRequired={quiz.course.minPeerReviewsGiven}
+                // itemTitle={item.texts[0].title}
+                // itemBody={item.texts[0].body}
+                //  options={item.options}
+                //  peerReviewQuestions={quiz.peerReviewCollections}
+                //  submitMessage={quiz.texts[0].submitMessage}
                 handleTextDataChange={handleTextDataChange(item.id)}
                 handleIntDataChange={handleIntDataChange(item.id)}
                 handleOptionChange={handleOptionChange(item.id)}
@@ -290,12 +311,6 @@ const FuncQuizImpl = ({ id, languageId, accessToken }) => {
       </>
     )
   }
-
-  if (!quizAnswer) {
-    return <div>Loading...</div>
-  }
-
-  /* Conditional return */
 
   if (!accessToken) {
     return <div>Kirjaudu sisään vastataksesi tehtävään</div>
@@ -310,8 +325,8 @@ const FuncQuizImpl = ({ id, languageId, accessToken }) => {
     )
   }
 
-  if (!quiz) {
-    return <div>Loading</div>
+  if (!quizAnswer || !quiz) {
+    return <div>Loading...</div>
   }
 
   const types = quiz.items.map(item => item.type)
@@ -332,47 +347,14 @@ const FuncQuizImpl = ({ id, languageId, accessToken }) => {
       />
 
       <div>
-        {/*
-         quizContainsEssay() && (
-          <StageVisualizer
-            answered={(quizAnswer && quizAnswer.id) ? true : false}
-            peerReviewsGiven={
-              userQuizState
-                ? userQuizState.peerReviewsGiven
-                : 0
-            }
-            peerReviewsRequired={quiz.course.minPeerReviewsGiven}
-            peerReviewsReceived={
-              userQuizState
-                ? userQuizState.peerReviewsReceived
-                : 0
-            }
-            peerReviewsReceivedRequired={
-              quiz.course.minPeerReviewsReceived
-            }
-          />
-        )
-          */}
+        {quizContainsEssay() && <StageVisualizer />}
 
         {quizItemComponents(quiz, languageId, accessToken)}
 
         {quizAnswer.id ? (
           <>
             {quizContainsEssay() && (
-              <PeerReviews
-                quiz={quiz}
-                quizId={quiz.id}
-                languageId={languageId}
-                languageInfo={languageLabels(languageId, "essay")}
-                accessToken={accessToken}
-                peerReviewQuestions={quiz.peerReviewCollections}
-                peerReviewsGiven={
-                  userQuizState ? userQuizState.peerReviewsGiven : 0
-                }
-                peerReviewsRequired={quiz.course.minPeerReviewsGiven}
-                setUserQuizState={setUserQuizState}
-                baseUrl={BASE_URL}
-              />
+              <PeerReviews languageInfo={languageLabels(languageId, "essay")} />
             )}
 
             <Typography variant="h5">
@@ -407,246 +389,4 @@ const FuncQuizImpl = ({ id, languageId, accessToken }) => {
   )
 }
 
-/*
-
-class QuizImpl extends React.Component<Props> {
-  state: QuizState = {
-    quiz: undefined,
-    quizAnswer: undefined,
-    userCourseState: undefined,
-    submitLocked: false,
-    correctCount: null,
-    error: undefined,
-    userQuizState: undefined,
-  }
-
-  async componentDidMount() {
-    const { id, languageId, accessToken } = this.props
-    //  this.props.setLanguage(languageId)
-    try {
-      let { quiz, quizAnswer, userQuizState } = await getQuizInfo(
-        id,
-        languageId,
-        accessToken,
-      )
-
-      if (!quizAnswer) {
-        quizAnswer = {
-          quizId: quiz.id,
-          languageId,
-          itemAnswers: quiz.items.map(item => {
-            return {
-              quizItemId: item.id,
-              textData: "",
-              intData: null,
-              optionAnswers: [],
-            }
-          }),
-        }
-      }
-
-      this.setState({
-        quiz,
-        quizAnswer,
-        userQuizState,
-      })
-    } catch (e) {
-      this.setState({ error: e.toString() })
-    }
-  }
-
-  handleDataChange = (itemId, attributeName) => event => {
-    const value = event.target.value
-    const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
-      if (itemAnswer.quizItemId === itemId) {
-        const updated = { ...itemAnswer }
-        updated[attributeName] = value
-        return updated
-      }
-      return itemAnswer
-    })
-    const quizAnswer = this.state.quizAnswer
-    this.setState({ quizAnswer: { ...quizAnswer, ...{ itemAnswers } } })
-  }
-
-  handleTextDataChange = itemId => this.handleDataChange(itemId, "textData")
-
-  handleIntDataChange = itemId => this.handleDataChange(itemId, "intData")
-
-  handleCheckboxToggling = itemId => optionId => () => {
-    const quizAnswer = this.state.quizAnswer
-    const itemAnswers = quizAnswer.itemAnswers
-    const itemAnswer = itemAnswers.find(ia => ia.quizItemId === itemId)
-
-    const currentOptionValue = itemAnswer.optionAnswers.find(
-      oa => oa.quizOptionId === optionId,
-    )
-
-    const newItemAnswer = {
-      ...itemAnswer,
-      optionAnswers: currentOptionValue
-        ? itemAnswer.optionAnswers.filter(oa => oa.quizOptionId !== optionId)
-        : itemAnswer.optionAnswers.concat({ quizOptionId: optionId }),
-    }
-
-    this.setState({
-      quizAnswer: {
-        ...quizAnswer,
-        itemAnswers: itemAnswers.map(ia =>
-          ia.quizItemId === itemId ? newItemAnswer : ia,
-        ),
-      },
-    })
-  }
-
-  handleOptionChange = itemId => optionId => () => {
-    const multi = this.state.quiz.items.find(item => item.id === itemId).multi
-    const itemAnswers = this.state.quizAnswer.itemAnswers.map(itemAnswer => {
-      if (itemAnswer.quizItemId === itemId) {
-        const updated = { ...itemAnswer }
-        if (multi) {
-          if (updated.optionAnswers.find(oa => oa.quizOptionId === optionId)) {
-            updated.optionAnswers = updated.optionAnswers.filter(
-              oa => oa.quizOptionId !== optionId,
-            )
-          } else {
-            updated.optionAnswers = [
-              ...updated.optionAnswers,
-              { quizOptionId: optionId },
-            ]
-          }
-        } else {
-          updated.optionAnswers = [{ quizOptionId: optionId }]
-        }
-        return updated
-      }
-      return itemAnswer
-    })
-    const quizAnswer = this.state.quizAnswer
-    this.setState({ quizAnswer: { ...quizAnswer, ...{ itemAnswers } } })
-  }
-
-  handleSubmit = async () => {
-    this.setState({ submitLocked: true })
-    const { quiz, quizAnswer, userQuizState } = await postAnswer(
-      this.state.quizAnswer,
-      this.props.accessToken,
-    )
-
-    this.setState({
-      quiz,
-      quizAnswer,
-      userQuizState,
-    })
-  }
-
-  setUserQuizState = userQuizState => {
-    this.setState({ userQuizState })
-  }
-
-  // not all quizzess have correct solutions - e.g. self-evaluation
-  hasCorrectAnswer = quiz => {
-    return quiz.items.some(
-      item =>
-        item.type === "essay" ||
-        item.type === "multiple-choice" ||
-        item.type === "open",
-    )
-  }
-
-  atLeastOneCorrect = itemAnswers => itemAnswers.some(ia => ia.correct === true)
-
-  submitDisabled() {
-    const submittable = this.state.quiz.items.map(item => {
-      const itemAnswer = this.state.quizAnswer.itemAnswers.find(
-        ia => ia.quizItemId === item.id,
-      )
-      if (
-        item.type === "essay" ||
-        item.type === "open" ||
-        item.type === "feedback"
-      ) {
-        if (!itemAnswer.textData) return false
-        const words = wordCount(itemAnswer.textData)
-        if (item.minWords && words < item.minWords) return false
-
-        if (item.maxWords && words > item.maxWords) return false
-        return true
-      }
-      if (item.type === "multiple-choice") {
-        return itemAnswer.optionAnswers.length > 0
-      }
-      if (item.type === "scale") {
-        return itemAnswer.intData ? true : false
-      }
-      if (item.type === "checkbox" || item.type === "research-agreement") {
-        return itemAnswer.optionAnswers.length > 0
-      }
-      return undefined
-    })
-
-    return submittable.includes(false)
-  }
-
-  quizContainsEssay = () => {
-    return this.state.quiz.items.some(ia => ia.type === "essay")
-  }
-
-  quizItemComponents = (quiz, languageId, accessToken) => {
-    const { quizAnswer, userQuizState } = this.state
-
-    return (
-      <React.Fragment>
-        {quiz.items
-          .sort((i1, i2) => i1.order - i2.order)
-          .map(item => {
-            const itemAnswer = quizAnswer.itemAnswers.find(
-              ia => ia.quizItemId === item.id,
-            )
-            const ItemComponent = componentType(item.type)
-
-            return (
-              <ItemComponent
-                quiz={quiz}
-                quizAnswer={quizAnswer}
-                item={item}
-                quizId={quiz.id}
-                key={item.id}
-                accessToken={accessToken}
-                languageId={languageId}
-                languageInfo={languageLabels(languageId, item.type)}
-                answered={quizAnswer.id ? true : false}
-                intData={itemAnswer.intData}
-                textData={itemAnswer.textData}
-                optionAnswers={itemAnswer.optionAnswers}
-                multi={item.multi}
-                singleItem={quiz.items.length === 1}
-                correct={itemAnswer.correct}
-                successMessage={item.texts[0].successMessage}
-                failureMessage={item.texts[0].failureMessage}
-                peerReviewsGiven={
-                  userQuizState ? userQuizState.peerReviewsGiven : 0
-                }
-                peerReviewsRequired={quiz.course.minPeerReviewsGiven}
-                itemTitle={item.texts[0].title}
-                itemBody={item.texts[0].body}
-                options={item.options}
-                peerReviewQuestions={quiz.peerReviewCollections}
-                submitMessage={quiz.texts[0].submitMessage}
-                handleTextDataChange={this.handleTextDataChange(item.id)}
-                handleIntDataChange={this.handleIntDataChange(item.id)}
-                handleOptionChange={this.handleOptionChange(item.id)}
-                handleCheckboxToggling={this.handleCheckboxToggling(item.id)}
-                setUserQuizState={this.setUserQuizState}
-              />
-            )
-          })}
-      </React.Fragment>
-    )
-  }
-}
-*/
-
 export default FuncQuizImpl
-// connect(null, { setLanguage })(
-// QuizImpl //)

@@ -12,7 +12,19 @@ import {
   Typography,
 } from "@material-ui/core"
 
-const Scale = ({ handleIntDataChange, intData, item, answered }) => {
+type ScaleProps = {
+  handleIntDataChange: Function
+  intData: number
+  item: any
+  answered: boolean
+}
+
+const Scale: React.FunctionComponent<ScaleProps> = ({
+  handleIntDataChange,
+  intData,
+  item,
+  answered,
+}) => {
   let number_of_options = 7
 
   if (item.minValue && item.maxValue) {

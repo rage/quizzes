@@ -1,8 +1,11 @@
 import * as React from "react"
+import { useState, useEffect } from "react"
+import { useDispatch, useSelector, shallowEqual } from "react-redux"
 import Typography from "@material-ui/core/Typography"
 import "likert-react/dist/main.css"
 import PeerReviewForm from "./PeerReviewForm"
 import PeerReviewsGuidance from "./PeerReviewsGuidance"
+import * as userQuizStateActions from "../../state/userQuizState/actions"
 import {
   getPeerReviewInfo,
   postSpamFlag,
@@ -11,56 +14,74 @@ import {
 import Togglable from "../../utils/Togglable"
 import { string } from "prop-types"
 
-class PeerReviews extends React.Component<any> {
-  state = {
-    peerReview: undefined,
-    answersToReview: undefined,
-    submitDisabled: true,
-    submitLocked: true,
-  }
+type PeerReviewsProps = {
+  languageInfo: any
+}
 
-  morePeerReviewsRequired = () =>
-    this.props.peerReviewsGiven < this.props.peerReviewsRequired
+const PeerReviews: React.FunctionComponent<PeerReviewsProps> = ({
+  languageInfo,
+}) => {
+  const dispatch = useDispatch()
 
-  componentDidMount() {
-    this.fetchAnswersToReview()
-  }
+  const [peerReview, setPeerReview] = useState(undefined)
+  const [answersToReview, setAnswersToReview] = useState(undefined)
+  const [submitDisabled, setSubmitDisabled] = useState(true)
+  const [submitLocked, setSubmitLocked] = useState(true)
 
-  fetchAnswersToReview = async () => {
+  const quiz = useSelector((state: any) => state.quiz, shallowEqual)
+  const languageId = useSelector(
+    (state: any) => state.language.languageId,
+    shallowEqual,
+  )
+  const accessToken = useSelector((state: any) => state.user, shallowEqual)
+
+  const userQuizState = useSelector((state: any) => state.userQuizState)
+  const setUserQuizState = newState =>
+    dispatch(userQuizStateActions.set(newState))
+
+  const peerReviewQuestions = quiz.peerReviewCollections
+
+  useEffect(() => {
+    fetchAnswersToReview()
+  }, [])
+
+  const fetchAnswersToReview = async () => {
     const answerAlternatives = await getPeerReviewInfo(
-      this.props.quizId,
-      this.props.languageId,
-      this.props.accessToken,
+      quiz.id,
+      languageId,
+      accessToken,
     )
-    this.setState({ answersToReview: answerAlternatives })
+    setAnswersToReview(answerAlternatives)
   }
 
-  flagAsSpam = quizAnswerId => async () => {
-    this.setState({ answersToReview: undefined })
-    await postSpamFlag(quizAnswerId, this.props.accessToken)
-    await this.fetchAnswersToReview()
+  const morePeerReviewsRequired = () =>
+    (userQuizState.peerReviewsGiven || 0) < quiz.course.minPeerReviewsGiven
+
+  const flagAsSpam = quizAnswerId => async () => {
+    setAnswersToReview(undefined)
+    await postSpamFlag(quizAnswerId, accessToken)
+    await fetchAnswersToReview()
   }
 
-  selectAnswer = quizAnswerId => event => {
-    const rejected = this.state.answersToReview.find(
-      answer => answer.id != quizAnswerId,
-    )
+  const selectAnswer = quizAnswerId => event => {
+    const rejected = answersToReview.find(answer => answer.id !== quizAnswerId)
     const peerReview = {
       quizAnswerId,
-      peerReviewCollectionId: this.props.peerReviewQuestions[0].id,
+      peerReviewCollectionId: quiz.peerReviewCollections[0].id,
       rejectedQuizAnswerIds: rejected ? [rejected.id] : [],
-      answers: this.props.peerReviewQuestions[0].questions.map(question => {
+      answers: quiz.peerReviewCollections[0].questions.map(question => {
         return { peerReviewQuestionId: question.id }
       }),
     }
-    this.setState({
-      peerReview,
-      submitLocked: false,
-    })
+    setPeerReview(peerReview)
+    setSubmitLocked(false)
   }
 
-  handlePeerReviewGradeChange = peerReviewQuestionId => (question, value) => {
-    const answers = this.state.peerReview.answers.map(answer => {
+  const handlePeerReviewGradeChange = peerReviewQuestionId => (
+    question,
+    value,
+  ) => {
+    const answers = peerReview.answers.map(answer => {
       if (answer.peerReviewQuestionId === peerReviewQuestionId) {
         const updated = { ...answer }
         updated.value = value
@@ -68,92 +89,71 @@ class PeerReviews extends React.Component<any> {
       }
       return answer
     })
-    const peerReview = this.state.peerReview
     const submitDisabled = answers.find(
       answer => !answer.hasOwnProperty("value"),
     )
       ? true
       : false
-    this.setState({
-      peerReview: { ...peerReview, ...{ answers } },
-      submitDisabled,
-    })
+
+    setPeerReview({ ...peerReview, ...{ answers } })
+    setSubmitDisabled(submitDisabled)
   }
 
-  submitPeerReview = async () => {
-    this.setState({ submitDisabled: true, submitLocked: true })
-    const { userQuizState } = await postPeerReview(
-      this.state.peerReview,
-      this.props.accessToken,
-    )
+  const submitPeerReview = async () => {
+    setSubmitDisabled(true)
+    setSubmitLocked(true)
+    const { userQuizState } = await postPeerReview(peerReview, accessToken)
 
-    this.props.setUserQuizState(userQuizState)
-    this.setState({ peerReview: undefined })
-    await this.fetchAnswersToReview()
+    setUserQuizState(userQuizState)
+    setPeerReview(undefined)
+    fetchAnswersToReview()
   }
 
-  render() {
-    const { peerReview, submitDisabled, submitLocked } = this.state
-
-    const {
-      peerReviewQuestions,
-      peerReviewsGiven,
-      peerReviewsRequired,
-      languageInfo,
-    } = this.props
-
-    if (peerReviewQuestions.length === 0) {
-      return (
-        <Typography variant="subtitle1">
-          Tähän tehtävään ei liity vertaisarvioita
-        </Typography>
-      )
-    }
-
-    const answersToReview = peerReview
-      ? this.state.answersToReview.filter(
-          answer => answer.id === peerReview.quizAnswerId,
-        )
-      : this.state.answersToReview
-
+  if (peerReviewQuestions.length === 0) {
     return (
-      <div>
-        <PeerReviewsGuidance
-          guidanceText={peerReviewQuestions[0].texts[0].body}
-          givenLabel={languageInfo.givenPeerReviewsLabel}
-          peerReviewsCompletedInfo={languageInfo.peerReviewsCompletedInfo}
-          given={peerReviewsGiven}
-          required={peerReviewsRequired}
-        />
-
-        {!this.morePeerReviewsRequired() && (
-          <Typography variant="subtitle1" style={{ fontWeight: "bold" }}>
-            {this.props.languageInfo.extraPeerReviewsEncouragement}
-          </Typography>
-        )}
-
-        <Togglable
-          initiallyVisible={this.morePeerReviewsRequired()}
-          hideButtonText={languageInfo.hidePeerReview}
-          displayButtonText={languageInfo.displayPeerReview}
-        >
-          <PeerReviewForm
-            answersToReview={answersToReview}
-            languageInfo={languageInfo}
-            peerReviewQuestions={peerReviewQuestions}
-            peerReview={peerReview}
-            handlePeerReviewGradeChange={this.handlePeerReviewGradeChange}
-            submitLocked={submitLocked}
-            submitPeerReview={this.submitPeerReview}
-            flagAsSpam={this.flagAsSpam}
-            quizItems={this.props.quiz.items}
-            selectAnswer={this.selectAnswer}
-            submitDisabled={submitDisabled}
-          />
-        </Togglable>
-      </div>
+      <Typography variant="subtitle1">
+        Tähän tehtävään ei liity vertaisarvioita
+      </Typography>
     )
   }
+
+  const currentAnswersToReview = peerReview
+    ? answersToReview.filter(answer => answer.id === peerReview.quizAnswerId)
+    : answersToReview
+
+  return (
+    <div>
+      <PeerReviewsGuidance
+        guidanceText={peerReviewQuestions[0].texts[0].body}
+        givenLabel={languageInfo.givenPeerReviewsLabel}
+        peerReviewsCompletedInfo={languageInfo.peerReviewsCompletedInfo}
+      />
+
+      {!this.morePeerReviewsRequired() && (
+        <Typography variant="subtitle1" style={{ fontWeight: "bold" }}>
+          {languageInfo.extraPeerReviewsEncouragement}
+        </Typography>
+      )}
+
+      <Togglable
+        initiallyVisible={morePeerReviewsRequired()}
+        hideButtonText={languageInfo.hidePeerReview}
+        displayButtonText={languageInfo.displayPeerReview}
+      >
+        <PeerReviewForm
+          answersToReview={currentAnswersToReview}
+          languageInfo={languageInfo}
+          peerReview={peerReview}
+          handlePeerReviewGradeChange={handlePeerReviewGradeChange}
+          submitLocked={submitLocked}
+          submitPeerReview={submitPeerReview}
+          flagAsSpam={flagAsSpam}
+          selectAnswer={selectAnswer}
+          submitDisabled={submitDisabled}
+        />
+      </Togglable>
+    </div>
+  )
 }
 
 export default PeerReviews

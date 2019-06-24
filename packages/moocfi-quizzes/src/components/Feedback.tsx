@@ -1,21 +1,40 @@
 import * as React from "react"
+import { useSelector, shallowEqual } from "react-redux"
 import { TextField, Typography } from "@material-ui/core"
 
-export default props => (
-  <div style={{ marginBottom: 10 }}>
-    <Typography variant="subtitle1">{props.itemTitle}</Typography>
-    {props.answered ? (
-      <Typography variant="body1">{props.textData}</Typography>
-    ) : (
-      <TextField
-        variant="outlined"
-        value={props.textData}
-        onChange={props.handleTextDataChange}
-        fullWidth={true}
-        multiline={true}
-        rows={10}
-        margin="normal"
-      />
-    )}
-  </div>
-)
+type FeedbackProps = {
+  item
+  textData
+  handleTextDataChange
+}
+
+const Feedback: React.FunctionComponent<FeedbackProps> = ({
+  item,
+  textData,
+  handleTextDataChange,
+}) => {
+  const answer = useSelector((state: any) => state.quizAnswer)
+  const answered = answer.id ? true : false
+  const itemTitle = item.texts[0].title
+
+  return (
+    <div style={{ marginBottom: 10 }}>
+      <Typography variant="subtitle1">{itemTitle}</Typography>
+      {answered ? (
+        <Typography variant="body1">{textData}</Typography>
+      ) : (
+        <TextField
+          variant="outlined"
+          value={textData}
+          onChange={handleTextDataChange}
+          fullWidth={true}
+          multiline={true}
+          rows={10}
+          margin="normal"
+        />
+      )}
+    </div>
+  )
+}
+
+export default Feedback

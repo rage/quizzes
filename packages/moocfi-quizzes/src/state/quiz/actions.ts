@@ -9,9 +9,13 @@ export const set = createAction("quiz/SET", resolve => {
 export const clear = createAction("quiz/CLEAR")
 
 export const setQuiz = (quizId: string) => async (dispatch, getState) => {
-  const { languageId, accessToken } = getState().filter
+  const languageId = getState().language.languageId
+  const accessToken = getState().user
+
+  if (!accessToken) {
+    throw new Error("Access token is not set")
+  }
 
   const { quiz } = await getQuizInfo(quizId, languageId, accessToken)
-
   await dispatch(set(quiz))
 }

@@ -1,29 +1,33 @@
 import * as React from "react"
-import {
-  Button,
-  Grid,
-  Table,
-  TableBody,
-  TableCell,
-  TableRow,
-  Typography,
-} from "@material-ui/core"
+import { useSelector, shallowEqual } from "react-redux"
+import { Button, Grid, Typography } from "@material-ui/core"
 import { GridDirection } from "@material-ui/core/Grid"
 
-export default props => {
-  const {
-    answered,
-    correct,
-    failureMessage,
-    handleOptionChange,
-    itemTitle,
-    itemBody,
-    multi,
-    options,
-    optionAnswers,
-    singleItem,
-    successMessage,
-  } = props
+type MultipleChoice = {
+  correct: boolean
+  handleOptionChange: (arg0: any) => any
+  item: any
+  optionAnswers: any[]
+  singleItem: boolean
+}
+
+const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
+  correct,
+  handleOptionChange,
+  item,
+  optionAnswers,
+  singleItem,
+}) => {
+  const answer = useSelector((state: any) => state.quizAnswer, shallowEqual)
+  const answered = answer.id ? true : false
+
+  const itemTitle = item.texts[0].title
+  const itemBody = item.texts[0].body
+  const successMessage = item.texts[0].successMessage
+  const failureMessage = item.texts[0].failureMessage
+  const multi = item.multi
+
+  const options = item.options
 
   let direction: GridDirection = "row"
   let questionWidth: 6 | 12 = 6
@@ -181,3 +185,5 @@ const selectButtonStyle = (selected, correct) => {
       : style,
   }
 }
+
+export default MultipleChoice
