@@ -1,11 +1,18 @@
 #!/bin/bash
-set -euo pipefail
+set -eo pipefail
 
-REV=$(git rev-parse --verify HEAD)
 DATE=$(date +%s)
-TAG="gcr.io/moocfi/quizzes-dashboard:build-$DATE-$REV"
+
+if [ -n "$CIRCLE_SHA1" ]; then
+  echo "Running in Circle CI"
+  REV="$CIRCLE_BUILD_NUM-$(git rev-parse --verify HEAD)"
+else
+  echo "Running outside CI"
+  REV="$DATE-$(git rev-parse --verify HEAD)"
+fi
+
+TAG="gcr.io/moocfi/quizzes-dashboard:build-$REV"
 echo Building "$TAG"
 docker build . -f Dockerfile.dashboard -t "$TAG"
 
-echo "export QUIZZES_DASHBOARD_IMAGE=$TAG"
-export QUIZZES_DASHBOARD_IMAGE=$TAG
+echo "Succsefully built image: $TAG"

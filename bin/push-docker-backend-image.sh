@@ -12,7 +12,5 @@ else
 fi
 
 TAG="gcr.io/moocfi/quizzes-backend:build-$REV"
-echo Building "$TAG"
-docker build . -f Dockerfile.backend -t "$TAG"
 
-echo "Succsefully built image: $TAG"
+docker push $TAG

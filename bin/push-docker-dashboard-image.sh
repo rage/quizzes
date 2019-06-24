@@ -11,8 +11,6 @@ else
   REV="$DATE-$(git rev-parse --verify HEAD)"
 fi
 
-TAG="gcr.io/moocfi/quizzes-backend:build-$REV"
-echo Building "$TAG"
-docker build . -f Dockerfile.backend -t "$TAG"
+TAG="gcr.io/moocfi/quizzes-dashboard:build-$REV"
 
-echo "Succsefully built image: $TAG"
+docker push $TAG

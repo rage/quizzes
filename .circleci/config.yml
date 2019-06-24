@@ -1,14 +1,5 @@
-version: 2
+version: 2.1
 jobs:
-  build:
-    docker:
-      - image: google/cloud-sdk
-    steps:
-      - checkout
-      - setup_remote_docker
-      - run:
-          name: "Build and deploy"
-          command: "bin/ci-deploy.sh"
   code_style:
     docker:
       - image: circleci/node:11
@@ -20,24 +11,65 @@ jobs:
       - run:
           name: "Check code style"
           command: "bin/check-code-style.sh"
-  deploy_to_production:
 
+  build_dashboard:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: "Build backend image"
+          command: "bin/build-docker-backend.sh"
+      - when:
+          name: "Push dashboard image"
+          condition:
+            branches:
+              only:
+                - master
+                - deployment-test
+          steps:
+            - run: "bin/push-docker-dashboard-image.sh"
+
+  build_backend:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: "Build dashboard image"
+          command: "bin/build-docker-dashboard.sh"
+      - when:
+          name: "Push backend image"
+          condition:
+            branches:
+              only:
+                - master
+                - deployment-test
+          steps:
+            - run: "bin/push-docker-backend-image.sh"
+
+  deploy_to_production:
     docker:
       - image: google/cloud-sdk
     steps:
       - checkout
       - run:
-          name: "Test"
+          name: "Deploy"
           command: "echo 'We should deploy now.'"
+
 workflows:
   version: 2
   build-deploy:
     jobs:
-      - build
+      - build_dashboard
+      - build_backend
       - code_style
       - deploy_to_production:
           requires:
-            - build
+            - build_dashboard
+            - build_backend
             - code_style
           filters:
             branches:
