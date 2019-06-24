@@ -20,7 +20,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: "Build backend image"
-          command: "bin/build-docker-backend.sh"
+          command: "bin/build-docker-dashboard.sh"
       - when:
           name: "Push dashboard image"
           condition:
@@ -39,7 +39,7 @@ jobs:
       - setup_remote_docker
       - run:
           name: "Build dashboard image"
-          command: "bin/build-docker-dashboard.sh"
+          command: "bin/build-docker-backend.sh"
       - when:
           name: "Push backend image"
           condition:
