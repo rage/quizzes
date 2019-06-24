@@ -30,7 +30,6 @@ import {
 } from "../../../common/src/models"
 import { postAnswer } from "../services/answerService"
 import { getQuizInfo } from "../services/quizService"
-import BASE_URL from "../config"
 
 type ComponentName =
   | "essay"
@@ -121,6 +120,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
         dispatch(languageActions.set(languageId))
         dispatch(quizActions.set(quiz))
         dispatch(quizAnswerActions.set(quizAnswer))
+
         dispatch(userQuizStateActions.set(userQuizState))
       } catch (e) {
         setError(e.toString())
@@ -209,14 +209,17 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
     )
   }
 
-  const handleSubmit = useCallback(async () => {
-    setSubmitLocked(true)
-    const responseData = await postAnswer(quizAnswer, accessToken)
+  const handleSubmit = useCallback(
+    async () => {
+      setSubmitLocked(true)
 
-    dispatch(quizActions.set(responseData.quiz))
-    dispatch(quizAnswerActions.set(responseData.quizAnswer))
-    dispatch(userQuizStateActions.set(responseData.userQuizState))
-  }, [])
+      const responseData = await postAnswer(quizAnswer, accessToken)
+      setQuizAnswer(responseData.quizAnswer)
+      dispatch(quizActions.set(responseData.quiz))
+      dispatch(userQuizStateActions.set(responseData.userQuizState))
+    },
+    [quizAnswer, accessToken],
+  )
 
   // not all quizzess have correct solutions - e.g. self-evaluation
   const hasCorrectAnswer = quiz => {
@@ -286,20 +289,11 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
                 intData={itemAnswer.intData}
                 textData={itemAnswer.textData}
                 optionAnswers={itemAnswer.optionAnswers}
-                // multi={item.multi}
                 singleItem={quiz.items.length === 1}
                 correct={itemAnswer.correct}
-                // successMessage={item.texts[0].successMessage}
-                // failureMessage={item.texts[0].failureMessage}
                 peerReviewsGiven={
                   userQuizState ? userQuizState.peerReviewsGiven : 0
                 }
-                // peerReviewsRequired={quiz.course.minPeerReviewsGiven}
-                // itemTitle={item.texts[0].title}
-                // itemBody={item.texts[0].body}
-                //  options={item.options}
-                //  peerReviewQuestions={quiz.peerReviewCollections}
-                //  submitMessage={quiz.texts[0].submitMessage}
                 handleTextDataChange={handleTextDataChange(item.id)}
                 handleIntDataChange={handleIntDataChange(item.id)}
                 handleOptionChange={handleOptionChange(item.id)}

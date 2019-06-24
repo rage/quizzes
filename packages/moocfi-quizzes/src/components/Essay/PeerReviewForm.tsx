@@ -1,42 +1,142 @@
 import * as React from "react"
-import { useSelector, shallowEqual } from "react-redux"
+import { useCallback } from "react"
+import { useDispatch, useSelector, shallowEqual } from "react-redux"
 import LikertScale from "likert-react"
 import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
 import PeerReviewOption from "./PeerReviewOption"
+import * as peerReviewsActions from "../../state/peerReviews/actions"
+import * as userQuizStateActions from "../../state/userQuizState/actions"
+
+import {
+  getPeerReviewInfo,
+  postSpamFlag,
+  postPeerReview,
+} from "../../services/peerReviewService"
 
 type PeerReviewFormProps = {
-  answersToReview: any
   languageInfo: any
-  peerReview: any
-  handlePeerReviewGradeChange: (a: any) => any
-  submitDisabled: boolean
-  submitLocked: boolean
-  submitPeerReview: (a: any) => any
-  flagAsSpam: (a: any) => any
-  selectAnswer: (a: any) => any
 }
 
 const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
-  answersToReview,
   languageInfo,
-  peerReview,
-  handlePeerReviewGradeChange,
-  submitLocked,
-  submitPeerReview,
-  flagAsSpam,
-  selectAnswer,
-  submitDisabled,
 }) => {
+  const answersToReview = useSelector(
+    (state: any) => state.peerReviews.options,
+    shallowEqual,
+  )
+  const peerReview = useSelector(
+    (state: any) => state.peerReviews.answer,
+    shallowEqual,
+  )
+  const submitLocked = useSelector(
+    (state: any) => state.peerReviews.submitLocked,
+    shallowEqual,
+  )
+  const submitDisabled = useSelector(
+    (state: any) => state.peerReviews.submitDisabled,
+    shallowEqual,
+  )
   const quiz = useSelector((state: any) => state.quiz, shallowEqual)
   const peerReviewQuestions = quiz.peerReviewCollections
-  const quizItems = quiz.items
+  const accessToken = useSelector((state: any) => state.user, shallowEqual)
+  const languageId = useSelector((state: any) => state.languageId, shallowEqual)
 
+  const dispatch = useDispatch()
+  const setPeerReview = useCallback(
+    (peerReview: any) =>
+      dispatch(peerReviewsActions.setReviewAnswer(peerReview)),
+    [],
+  )
+
+  const setUserQuizState = newState =>
+    dispatch(userQuizStateActions.set(newState))
+
+  const setSubmitLocked = useCallback(
+    (status: boolean) => dispatch(peerReviewsActions.setSubmitLocked(status)),
+    [],
+  )
+
+  const setSubmitDisabled = useCallback(
+    (status: boolean) => dispatch(peerReviewsActions.setSubmitDisabled(status)),
+    [],
+  )
+
+  const setAnswersToReview = useCallback(
+    (alternatives: any) =>
+      dispatch(peerReviewsActions.setReviewOptions(alternatives)),
+    [],
+  )
+
+  const currentAnswersToReview = peerReview
+    ? answersToReview.filter(answer => answer.id === peerReview.quizAnswerId)
+    : answersToReview
+
+  const fetchAnswersToReview = async () => {
+    const answerAlternatives = await getPeerReviewInfo(
+      quiz.id,
+      languageId,
+      accessToken,
+    )
+    setAnswersToReview(answerAlternatives)
+  }
+
+  const handlePeerReviewGradeChange = peerReviewQuestionId => (
+    question: any,
+    value: string,
+  ) => {
+    const answers = peerReview.answers.map(answer => {
+      if (answer.peerReviewQuestionId === peerReviewQuestionId) {
+        const updated = { ...answer }
+        updated.value = value
+        return updated
+      }
+      return answer
+    })
+    const submitDisabled = answers.find(
+      answer => !answer.hasOwnProperty("value"),
+    )
+      ? true
+      : false
+
+    setPeerReview({ ...peerReview, ...{ answers } })
+    setSubmitDisabled(submitDisabled)
+  }
+
+  const submitPeerReview = async () => {
+    setSubmitDisabled(true)
+    setSubmitLocked(true)
+    const { userQuizState } = await postPeerReview(peerReview, accessToken)
+
+    setUserQuizState(userQuizState)
+    setPeerReview(undefined)
+    fetchAnswersToReview()
+  }
+
+  const flagAsSpam = quizAnswerId => async () => {
+    setAnswersToReview(undefined)
+    await postSpamFlag(quizAnswerId, accessToken)
+    await fetchAnswersToReview()
+  }
+
+  const selectAnswer = (quizAnswerId: string) => event => {
+    const rejected = answersToReview.find(answer => answer.id !== quizAnswerId)
+    const peerReview = {
+      quizAnswerId,
+      peerReviewCollectionId: quiz.peerReviewCollections[0].id,
+      rejectedQuizAnswerIds: rejected ? [rejected.id] : [],
+      answers: quiz.peerReviewCollections[0].questions.map(question => {
+        return { peerReviewQuestionId: question.id }
+      }),
+    }
+    setPeerReview(peerReview)
+    setSubmitLocked(false)
+  }
   return (
     <>
       <Typography variant="subtitle1">
         Valitse yksi vaihtoehdoista vertaisarvoitavaksi
       </Typography>
-      {!answersToReview ? (
+      {!currentAnswersToReview ? (
         <Grid container>
           <Grid item xs={1}>
             <CircularProgress size={25} />
@@ -45,10 +145,10 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
             <Typography>{languageInfo.loadingLabel}</Typography>
           </Grid>
         </Grid>
-      ) : answersToReview.length === 0 ? (
+      ) : currentAnswersToReview.length === 0 ? (
         <Typography>{languageInfo.noPeerAnswersAvailableLabel}</Typography>
       ) : (
-        answersToReview.map(answer => (
+        currentAnswersToReview.map(answer => (
           <div key={answer.id}>
             <PeerReviewOption answer={answer} />
 

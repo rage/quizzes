@@ -17,8 +17,8 @@ const Open: React.FunctionComponent<OpenProps> = ({
   textData,
   item,
 }) => {
-  const answered = useSelector((state: any) => state.quizAnswer, shallowEqual)
-
+  const answer = useSelector((state: any) => state.quizAnswer, shallowEqual)
+  const answered = answer.id ? true : false
   const itemTitle = item.texts[0].title
   const successMessage = item.texts[0].successMessage
   const failureMessage = item.texts[0].failureMessage

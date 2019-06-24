@@ -20,7 +20,6 @@ const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
 }) => {
   const answer = useSelector((state: any) => state.quizAnswer, shallowEqual)
   const answered = answer.id ? true : false
-
   const itemTitle = item.texts[0].title
   const itemBody = item.texts[0].body
   const successMessage = item.texts[0].successMessage

@@ -3,7 +3,7 @@ import { composeWithDevTools } from "redux-devtools-extension/developmentOnly"
 import thunk from "redux-thunk"
 import { languageReducer } from "./language/reducer"
 import { messageReducer } from "./message/reducer"
-import { peerReviewReducer } from "./peerReview/reducer"
+import { peerReviewsReducer } from "./peerReviews/reducer"
 import { quizReducer } from "./quiz/reducer"
 import { quizAnswerReducer } from "./quizAnswer/reducer"
 import { submitLockedReducer } from "./submitLocked/reducer"
@@ -13,7 +13,7 @@ import { userQuizStateReducer } from "./userQuizState/reducer"
 const reducer = combineReducers({
   language: languageReducer,
   message: messageReducer,
-  peerReview: peerReviewReducer,
+  peerReviews: peerReviewsReducer,
   quiz: quizReducer,
   quizAnswer: quizAnswerReducer,
   submitLocked: submitLockedReducer,

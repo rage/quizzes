@@ -10,6 +10,9 @@ export const userQuizStateReducer = (
 ) => {
   switch (action.type) {
     case getType(userQuizState.set):
+      if (action.payload === undefined) {
+        return initialValue
+      }
       return action.payload
     case getType(userQuizState.clear):
       return initialValue

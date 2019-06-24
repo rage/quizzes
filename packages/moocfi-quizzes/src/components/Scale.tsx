@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useSelector, shallowEqual } from "react-redux"
 import {
   FormControl,
   FormLabel,
@@ -16,16 +17,16 @@ type ScaleProps = {
   handleIntDataChange: Function
   intData: number
   item: any
-  answered: boolean
 }
 
 const Scale: React.FunctionComponent<ScaleProps> = ({
   handleIntDataChange,
   intData,
   item,
-  answered,
 }) => {
   let number_of_options = 7
+  const answer = useSelector((state: any) => state.quiz)
+  const answered = answer.id ? true : false
 
   if (item.minValue && item.maxValue) {
     number_of_options = item.maxValue - item.minValue + 1
