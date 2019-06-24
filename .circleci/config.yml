@@ -55,6 +55,7 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
+      - setup_remote_docker
       - run:
           name: install envsubst
           command: apt-get install -qq -y gettext
