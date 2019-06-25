@@ -82,6 +82,7 @@ export class QuizController {
       stripped: quizAnswer ? false : true,
       ...params,
     })
+
     return {
       quiz: quizzes[0],
       quizAnswer,

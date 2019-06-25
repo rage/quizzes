@@ -203,6 +203,9 @@ export class QuizAnswerController {
     @EntityFromBody() answer: QuizAnswer,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
+    if (!answer.quizId || !answer.languageId) {
+      throw new BadRequestError("Answer must contain some data")
+    }
     answer.userId = user.id
     // creates new user if necessary
     answer.user = new User()
