@@ -60,7 +60,7 @@ export default class QuizAnswerService {
       whereBuilder.add("quiz_answer.status = :status", { status })
     }
 
-    return await queryBuilder.orderBy("quiz_answer.updated_at", "DESC").getOne()
+    return await queryBuilder.orderBy("quiz_answer.created_at", "DESC").getOne()
   }
 
   private async constructGetAnswersQuery(
