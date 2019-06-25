@@ -106,7 +106,6 @@ export class QuizController {
       throw new UnauthorizedError("unauthorized")
     }
 
-
     const result = await this.quizService.getPlainQuizData(quizId)
     const answersStringStream = result.pipe(JSONStream.stringify())
     return answersStringStream
