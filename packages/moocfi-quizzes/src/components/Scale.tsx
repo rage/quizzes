@@ -14,9 +14,15 @@ import {
 import { useTypedSelector } from "../state/store"
 
 type ScaleProps = {
-  handleIntDataChange: Function
+  handleIntDataChange: (event: React.FormEvent, value: string) => void
   intData: number
   item: any
+}
+
+type Radio = {
+  style: { paddingLeft: number }
+  color: "primary" | "secondary" | "default"
+  disabled: boolean
 }
 
 const Scale: React.FunctionComponent<ScaleProps> = ({
@@ -74,18 +80,13 @@ const Scale: React.FunctionComponent<ScaleProps> = ({
   )
 }
 
-const radioButtonOptions = answered => {
-  const color = "primary"
-  let options = {
+const radioButtonOptions = (answered: boolean) => {
+  const options: Radio = {
     style: {
       paddingLeft: 0,
     },
-    color,
-    disabled: false,
-  }
-
-  if (answered) {
-    options.disabled = true
+    color: "primary",
+    disabled: answered,
   }
   return options
 }

@@ -1,5 +1,6 @@
 import { ActionType, getType } from "typesafe-actions"
 import * as peerReviews from "./actions"
+import { QuizAnswerState as QuizAnswer } from "../quizAnswer/reducer"
 
 const initialValue = {
   options: [],
@@ -25,12 +26,12 @@ export type PeerReviewAnswer = {
   peerReviewCollectionId: string
   userId: number
   rejectedQuizAnswerIds: string[]
-  answers: PeerReviewGradeAnswer[]
+  answers: PeerReviewQuestionAnswer[]
 }
 
 export type PeerReviewsState = {
   answer: PeerReviewAnswer
-  options: any[]
+  options: QuizAnswer[]
   submitLocked: boolean
   submitDisabled: boolean
 }

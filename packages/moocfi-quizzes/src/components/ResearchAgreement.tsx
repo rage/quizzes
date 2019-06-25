@@ -1,34 +1,28 @@
 import * as React from "react"
-import CheckboxOption from "./Checkbox/CheckboxOption"
+import CheckboxOption from "./CheckboxOption"
 
 type ResearchAgreementProps = {
-  options: any[]
   optionAnswers: any[]
-  answered: boolean
+  item: any
   handleCheckboxToggling: (any) => any
 }
 
 const ResearchAgreement: React.FunctionComponent<ResearchAgreementProps> = ({
-  options,
+  item,
   optionAnswers,
-  answered,
   handleCheckboxToggling,
 }) => {
+  const options = item.options
+
   return (
     <>
       {options.map(option => {
-        const currentAnswer = optionAnswers.find(
-          oa => oa.quizOptionId === option.id,
-        )
-
         return (
           <CheckboxOption
             key={option.id}
-            title={option.texts[0].title}
-            body={option.texts[0].body}
-            value={currentAnswer}
-            toggle={handleCheckboxToggling(option.id)}
-            answered={answered}
+            handleCheckboxToggling={handleCheckboxToggling(option.id)}
+            item={item}
+            optionAnswers={optionAnswers}
           />
         )
       })}

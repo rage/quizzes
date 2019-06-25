@@ -8,7 +8,6 @@ type MultipleChoice = {
   handleOptionChange: (arg0: any) => any
   item: any
   optionAnswers: any[]
-  singleItem: boolean
 }
 
 const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
@@ -16,8 +15,8 @@ const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
   handleOptionChange,
   item,
   optionAnswers,
-  singleItem,
 }) => {
+  const quiz = useTypedSelector(state => state.quiz)
   const answer = useTypedSelector(state => state.quizAnswer)
   const answered = answer.id ? true : false
   const itemTitle = item.texts[0].title
@@ -25,6 +24,8 @@ const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
   const successMessage = item.texts[0].successMessage
   const failureMessage = item.texts[0].failureMessage
   const multi = item.multi
+
+  const singleItem = quiz.items.length === 1
 
   const options = item.options
 

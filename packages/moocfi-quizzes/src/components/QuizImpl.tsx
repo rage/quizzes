@@ -280,16 +280,11 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
                 intData={itemAnswer.intData}
                 textData={itemAnswer.textData}
                 optionAnswers={itemAnswer.optionAnswers}
-                singleItem={quiz.items.length === 1}
                 correct={itemAnswer.correct}
-                peerReviewsGiven={
-                  userQuizState ? userQuizState.peerReviewsGiven : 0
-                }
                 handleTextDataChange={handleTextDataChange(item.id)}
                 handleIntDataChange={handleIntDataChange(item.id)}
                 handleOptionChange={handleOptionChange(item.id)}
                 handleCheckboxToggling={handleCheckboxToggling(item.id)}
-                setUserQuizState={setUserQuizState}
               />
             )
           })}

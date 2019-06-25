@@ -3,17 +3,22 @@ import { Paper, TextField } from "@material-ui/core"
 import Typography from "@material-ui/core/Typography"
 import { wordCount } from "../../utils/string_tools"
 import { executeIfTextFieldBetweenNumOfWords as executeIfWordNumberCorrect } from "../../utils/event_filters"
-import { QuizItemAnswer } from "../../../../common/src/models"
 import { useTypedSelector } from "../../state/store"
+import { QuizItem } from "../../state/quiz/reducer"
 
 type EssayProps = {
   textData: string
-  item: any
+  item: QuizItem
   handleTextDataChange: (a: any) => any
   languageInfo: any
 }
 
-const Essay = ({ textData, handleTextDataChange, item, languageInfo }) => {
+const Essay: React.FunctionComponent<EssayProps> = ({
+  textData,
+  handleTextDataChange,
+  item,
+  languageInfo,
+}) => {
   const paper = {
     padding: 10,
     margin: 10,
