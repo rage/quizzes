@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useCallback } from "react"
-import { useDispatch, useSelector, shallowEqual } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import LikertScale from "likert-react"
 import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
 import PeerReviewOption from "./PeerReviewOption"
@@ -12,6 +12,7 @@ import {
   postSpamFlag,
   postPeerReview,
 } from "../../services/peerReviewService"
+import { RootAction, Dispatch } from "../../state/store"
 
 type PeerReviewFormProps = {
   languageInfo: any
@@ -20,28 +21,21 @@ type PeerReviewFormProps = {
 const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
   languageInfo,
 }) => {
-  const answersToReview = useSelector(
-    (state: any) => state.peerReviews.options,
-    shallowEqual,
-  )
-  const peerReview = useSelector(
-    (state: any) => state.peerReviews.answer,
-    shallowEqual,
-  )
+  const answersToReview = useSelector(state => state.peerReviews.options)
+  const peerReview = useSelector((state: any) => state.peerReviews.answer)
   const submitLocked = useSelector(
     (state: any) => state.peerReviews.submitLocked,
-    shallowEqual,
   )
   const submitDisabled = useSelector(
     (state: any) => state.peerReviews.submitDisabled,
-    shallowEqual,
   )
-  const quiz = useSelector((state: any) => state.quiz, shallowEqual)
-  const peerReviewQuestions = quiz.peerReviewCollections
-  const accessToken = useSelector((state: any) => state.user, shallowEqual)
-  const languageId = useSelector((state: any) => state.languageId, shallowEqual)
+  const quiz = useSelector((state: any) => state.quiz)
 
-  const dispatch = useDispatch()
+  const peerReviewQuestions = quiz.peerReviewCollections
+  const accessToken = useSelector((state: any) => state.user)
+  const languageId = useSelector((state: any) => state.languageId)
+
+  const dispatch = useDispatch<Dispatch>()
   const setPeerReview = useCallback(
     (peerReview: any) =>
       dispatch(peerReviewsActions.setReviewAnswer(peerReview)),
@@ -105,6 +99,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
   const submitPeerReview = async () => {
     setSubmitDisabled(true)
     setSubmitLocked(true)
+    dispatch({ type: "PEER_REVIEW_SUBMIT_STARTED" })
     const { userQuizState } = await postPeerReview(peerReview, accessToken)
 
     setUserQuizState(userQuizState)

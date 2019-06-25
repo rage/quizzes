@@ -1,7 +1,7 @@
 import { ActionType, getType } from "typesafe-actions"
 import * as language from "./actions"
 
-type LanguageState = {
+export type LanguageState = {
   languageId: string
   languageLabels: object
 }

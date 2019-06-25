@@ -38,7 +38,7 @@ export type PeerReviewsState = {
 export const peerReviewsReducer = (
   state: PeerReviewsState = initialValue,
   action: ActionType<typeof peerReviews>,
-) => {
+): PeerReviewsState => {
   switch (action.type) {
     case getType(peerReviews.set):
       return action.payload
