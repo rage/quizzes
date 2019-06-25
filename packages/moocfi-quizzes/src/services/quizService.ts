@@ -1,6 +1,7 @@
 import axios from "axios"
-import { Quiz, UserQuizState } from "../../../common/src/models"
+import { Quiz } from "../../../common/src/models"
 import BASE_URL from "../config"
+import { UserQuizState } from "../state/user/reducer"
 
 type QuizResponse = {
   quiz: Quiz

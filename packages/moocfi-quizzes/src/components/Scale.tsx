@@ -1,5 +1,4 @@
 import * as React from "react"
-import { useSelector, shallowEqual } from "react-redux"
 import {
   FormControl,
   FormLabel,
@@ -12,6 +11,7 @@ import {
   TableRow,
   Typography,
 } from "@material-ui/core"
+import { useTypedSelector } from "../state/store"
 
 type ScaleProps = {
   handleIntDataChange: Function
@@ -25,7 +25,7 @@ const Scale: React.FunctionComponent<ScaleProps> = ({
   item,
 }) => {
   let number_of_options = 7
-  const answer = useSelector((state: any) => state.quiz)
+  const answer = useTypedSelector(state => state.quiz)
   const answered = answer.id ? true : false
 
   if (item.minValue && item.maxValue) {

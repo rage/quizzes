@@ -2,10 +2,14 @@ import { ActionType, getType } from "typesafe-actions"
 import { Quiz } from "../../../../common/src/models"
 import * as quiz from "./actions"
 
+export type QuizState = {
+  quiz: Quiz
+}
+
 const initialValue = null
 
 export const quizReducer = (
-  state: Quiz = initialValue,
+  state: QuizState = initialValue,
   action: ActionType<typeof quiz>,
 ) => {
   switch (action.type) {

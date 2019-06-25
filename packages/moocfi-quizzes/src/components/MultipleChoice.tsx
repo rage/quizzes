@@ -1,7 +1,7 @@
 import * as React from "react"
-import { useSelector, shallowEqual } from "react-redux"
 import { Button, Grid, Typography } from "@material-ui/core"
 import { GridDirection } from "@material-ui/core/Grid"
+import { useTypedSelector } from "../state/store"
 
 type MultipleChoice = {
   correct: boolean
@@ -18,7 +18,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
   optionAnswers,
   singleItem,
 }) => {
-  const answer = useSelector((state: any) => state.quizAnswer, shallowEqual)
+  const answer = useTypedSelector(state => state.quizAnswer)
   const answered = answer.id ? true : false
   const itemTitle = item.texts[0].title
   const itemBody = item.texts[0].body

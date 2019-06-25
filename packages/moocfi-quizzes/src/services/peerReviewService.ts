@@ -1,6 +1,7 @@
 import axios from "axios"
-import { PeerReview, UserQuizState } from "../../../common/src/models"
 import BASE_URL from "../config"
+import { PeerReviewAnswer } from "../state/peerReviews/reducer"
+import { UserQuizState } from "../state/user/reducer"
 
 export const getPeerReviewInfo = async (
   quizId: string,
@@ -28,7 +29,7 @@ export const postSpamFlag = async (
 }
 
 export const postPeerReview = async (
-  peerReview: PeerReview,
+  peerReview: PeerReviewAnswer,
   accessToken: string,
 ): Promise<{ userQuizState: UserQuizState }> => {
   const response = await axios.post(

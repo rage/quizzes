@@ -1,6 +1,6 @@
 import * as React from "react"
-import { useCallback, useState, useEffect } from "react"
-import { shallowEqual, useDispatch, useSelector } from "react-redux"
+import { useCallback, useEffect } from "react"
+import { useDispatch } from "react-redux"
 import { Button, Typography } from "@material-ui/core"
 import * as languageActions from "../state/language/actions"
 import * as messageActions from "../state/message/actions"
@@ -8,7 +8,6 @@ import * as quizActions from "../state/quiz/actions"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import * as submitLockedActions from "../state/submitLocked/actions"
 import * as userActions from "../state/user/actions"
-import * as userQuizStateActions from "../state/userQuizState/actions"
 
 import Checkbox from "./Checkbox"
 import Feedback from "./Feedback"
@@ -23,13 +22,11 @@ import Unsupported from "./Unsupported"
 import languageLabels from "../utils/language_labels"
 import { wordCount } from "../utils/string_tools"
 // don't use common!
-import {
-  UserCourseState,
-  UserQuizState,
-  QuizAnswer,
-} from "../../../common/src/models"
+import { QuizAnswer } from "../../../common/src/models"
 import { postAnswer } from "../services/answerService"
 import { getQuizInfo } from "../services/quizService"
+import { RootState, useTypedSelector } from "../state/store"
+import { UserQuizState } from "../state/user/reducer"
 
 type ComponentName =
   | "essay"
@@ -68,28 +65,22 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
   languageId,
   accessToken,
 }) => {
-  const submitLocked = useSelector(
-    (state: any) => state.submitLocked,
-    shallowEqual,
-  )
+  const submitLocked = useTypedSelector(state => state.submitLocked)
   const setSubmitLocked = (state: boolean) =>
     dispatch(submitLockedActions.set(state))
 
-  const error = useSelector((state: any) => state.message, shallowEqual)
+  const error = useTypedSelector(state => state.message)
   const setError = (newError: string) => dispatch(messageActions.set(newError))
 
-  const quizAnswer = useSelector((state: any) => state.quizAnswer, shallowEqual)
+  const quizAnswer = useTypedSelector(state => state.quizAnswer)
   const setQuizAnswer = (newQuizAnswer: QuizAnswer) =>
     dispatch(quizAnswerActions.set(newQuizAnswer))
 
-  const userQuizState = useSelector(
-    (state: any) => state.userQuizState,
-    shallowEqual,
-  )
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const setUserQuizState = (newUqs: UserQuizState) =>
-    dispatch(userQuizStateActions.set(newUqs))
+    dispatch(userActions.setQuizState(newUqs))
 
-  const quiz = useSelector((state: any) => state.quiz, shallowEqual)
+  const quiz = useTypedSelector(state => state.quiz)
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -116,12 +107,12 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
           }
         }
 
-        dispatch(userActions.set(accessToken))
+        dispatch(userActions.setToken(accessToken))
         dispatch(languageActions.set(languageId))
         dispatch(quizActions.set(quiz))
         dispatch(quizAnswerActions.set(quizAnswer))
 
-        dispatch(userQuizStateActions.set(userQuizState))
+        dispatch(userActions.setQuizState(userQuizState))
       } catch (e) {
         setError(e.toString())
       }
@@ -216,7 +207,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
       const responseData = await postAnswer(quizAnswer, accessToken)
       setQuizAnswer(responseData.quizAnswer)
       dispatch(quizActions.set(responseData.quiz))
-      dispatch(userQuizStateActions.set(responseData.userQuizState))
+      dispatch(userActions.setQuizState(responseData.userQuizState))
     },
     [quizAnswer, accessToken],
   )

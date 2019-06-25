@@ -1,7 +1,7 @@
 import * as React from "react"
-import { useSelector, shallowEqual } from "react-redux"
 import Typography from "@material-ui/core/Typography"
 import Paper from "@material-ui/core/Paper"
+import { useTypedSelector } from "../../state/store"
 
 const paper = {
   padding: 10,
@@ -13,7 +13,7 @@ type PeerReviewOptionProps = {
 }
 
 export default ({ answer }) => {
-  const quiz = useSelector((state: any) => state.quiz)
+  const quiz = useTypedSelector(state => state.quiz)
   const quizItems = quiz.items
 
   const quizItemById = id => quizItems.find(qi => qi.id === id)

@@ -1,6 +1,6 @@
 import * as React from "react"
-import { useSelector, shallowEqual } from "react-redux"
 import { Stepper, StepLabel, Step } from "@material-ui/core"
+import { useTypedSelector } from "../../state/store"
 
 const steps = [
   "Tehtävään vastaaminen",
@@ -10,14 +10,11 @@ const steps = [
 ]
 
 const StageVisualizer = () => {
-  const quizAnswer = useSelector((state: any) => state.quizAnswer, shallowEqual)
+  const quizAnswer = useTypedSelector(state => state.quizAnswer)
 
-  const userQuizState = useSelector(
-    (state: any) => state.userQuizState,
-    shallowEqual,
-  )
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
 
-  const quiz = useSelector((state: any) => state.quiz, shallowEqual)
+  const quiz = useTypedSelector(state => state.quiz)
 
   const answered = quizAnswer.id ? true : false
 

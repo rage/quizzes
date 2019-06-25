@@ -1,6 +1,6 @@
 import * as React from "react"
-import { useSelector, shallowEqual } from "react-redux"
 import { TextField, Typography } from "@material-ui/core"
+import { useTypedSelector } from "../state/store"
 
 type FeedbackProps = {
   item
@@ -13,7 +13,7 @@ const Feedback: React.FunctionComponent<FeedbackProps> = ({
   textData,
   handleTextDataChange,
 }) => {
-  const answer = useSelector((state: any) => state.quizAnswer)
+  const answer = useTypedSelector(state => state.quizAnswer)
   const answered = answer.id ? true : false
   const itemTitle = item.texts[0].title
 

@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useCallback, useEffect } from "react"
-import { useDispatch, useSelector, shallowEqual } from "react-redux"
+import { useDispatch } from "react-redux"
 import Typography from "@material-ui/core/Typography"
 import "likert-react/dist/main.css"
 import PeerReviewForm from "./PeerReviewForm"
@@ -8,6 +8,7 @@ import PeerReviewsGuidance from "./PeerReviewsGuidance"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
 import { getPeerReviewInfo } from "../../services/peerReviewService"
 import Togglable from "../../utils/Togglable"
+import { useTypedSelector } from "../../state/store"
 
 type PeerReviewsProps = {
   languageInfo: any
@@ -24,14 +25,11 @@ const PeerReviews: React.FunctionComponent<PeerReviewsProps> = ({
     [],
   )
 
-  const quiz = useSelector((state: any) => state.quiz, shallowEqual)
-  const languageId = useSelector(
-    (state: any) => state.language.languageId,
-    shallowEqual,
-  )
-  const accessToken = useSelector((state: any) => state.user, shallowEqual)
+  const quiz = useTypedSelector(state => state.quiz)
+  const languageId = useTypedSelector(state => state.language.languageId)
+  const accessToken = useTypedSelector(state => state.user.accessToken)
 
-  const userQuizState = useSelector((state: any) => state.userQuizState)
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
 
   const peerReviewQuestions = quiz.peerReviewCollections
 

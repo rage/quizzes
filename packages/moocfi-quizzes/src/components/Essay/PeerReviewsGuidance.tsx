@@ -1,6 +1,6 @@
 import * as React from "react"
-import { useSelector, shallowEqual } from "react-redux"
 import Typography from "@material-ui/core/Typography"
+import { useTypedSelector } from "../../state/store"
 
 type PeerReviewsGuidanceProps = {
   givenLabel: string
@@ -11,11 +11,8 @@ type PeerReviewsGuidanceProps = {
 const PeerReviewsGuidance: React.FunctionComponent<
   PeerReviewsGuidanceProps
 > = ({ givenLabel, guidanceText, peerReviewsCompletedInfo }) => {
-  const quiz = useSelector((state: any) => state.quiz, shallowEqual)
-  const userQuizState = useSelector(
-    (state: any) => state.userQuizState,
-    shallowEqual,
-  )
+  const quiz = useTypedSelector(state => state.quiz)
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const given = userQuizState ? userQuizState.peerReviewsGiven : 0
   const required = quiz.course.minPeerReviewsGiven
 

@@ -4,8 +4,10 @@ import * as quizAnswer from "./actions"
 
 const initialValue = null
 
+export type QuizAnswerState = QuizAnswer
+
 export const quizAnswerReducer = (
-  state: QuizAnswer = initialValue,
+  state: QuizAnswerState = initialValue,
   action: ActionType<typeof quizAnswer>,
 ) => {
   switch (action.type) {

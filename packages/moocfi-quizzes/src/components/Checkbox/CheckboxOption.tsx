@@ -1,9 +1,9 @@
 import * as React from "react"
-import { useSelector, shallowEqual } from "react-redux"
 import { Grid, Checkbox, Typography } from "@material-ui/core"
+import { useTypedSelector } from "../../state/store"
 
 export default ({ body, title, value, toggle }) => {
-  const userQuizState = useSelector((state: any) => state.userQuizState)
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const answered = userQuizState.id ? true : false
 
   const checkboxOptions = {

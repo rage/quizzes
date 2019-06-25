@@ -1,6 +1,6 @@
 import * as React from "react"
-import { useSelector, shallowEqual } from "react-redux"
 import { TextField, Typography, Paper } from "@material-ui/core"
+import { useTypedSelector } from "../state/store"
 
 type OpenProps = {
   correct: boolean
@@ -17,7 +17,7 @@ const Open: React.FunctionComponent<OpenProps> = ({
   textData,
   item,
 }) => {
-  const answer = useSelector((state: any) => state.quizAnswer, shallowEqual)
+  const answer = useTypedSelector(state => state.quizAnswer)
   const answered = answer.id ? true : false
   const itemTitle = item.texts[0].title
   const successMessage = item.texts[0].successMessage
