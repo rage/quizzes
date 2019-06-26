@@ -2,13 +2,11 @@ import * as React from "react"
 import { useCallback, useEffect } from "react"
 import { useDispatch } from "react-redux"
 import { Button, Typography } from "@material-ui/core"
-import * as languageActions from "../state/language/actions"
-import * as messageActions from "../state/message/actions"
 import * as quizActions from "../state/quiz/actions"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import * as submitLockedActions from "../state/submitLocked/actions"
 import * as userActions from "../state/user/actions"
-
+import { initialize } from "../state/actions"
 import Checkbox from "./CheckboxOption"
 import Feedback from "./Feedback"
 import MultipleChoice from "./MultipleChoice"
@@ -21,11 +19,8 @@ import PeerReviews from "./Essay/PeerReviews"
 import Unsupported from "./Unsupported"
 import languageLabels from "../utils/language_labels"
 import { wordCount } from "../utils/string_tools"
-// don't use common!
 import { postAnswer } from "../services/answerService"
-import { getQuizInfo } from "../services/quizService"
-import { RootState, useTypedSelector } from "../state/store"
-import { UserQuizState } from "../state/user/reducer"
+import { useTypedSelector } from "../state/store"
 import { QuizAnswer } from "../state/quizAnswer/reducer"
 import { Quiz } from "../state/quiz/reducer"
 
@@ -71,8 +66,6 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
     dispatch(submitLockedActions.set(state))
 
   const error = useTypedSelector(state => state.message)
-  const setError = (newError: string) => dispatch(messageActions.set(newError))
-
   const quizAnswer = useTypedSelector(state => state.quizAnswer)
 
   const setQuizAnswer = (newQuizAnswer: QuizAnswer) =>
@@ -82,126 +75,25 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
   const dispatch = useDispatch()
 
   useEffect(() => {
-    const initialize = async () => {
-      try {
-        let { quiz, quizAnswer, userQuizState } = await getQuizInfo(
-          id,
-          languageId,
-          accessToken,
-        )
-
-        if (!quizAnswer) {
-          quizAnswer = {
-            quizId: quiz.id,
-            languageId,
-            itemAnswers: quiz.items.map(item => {
-              return {
-                quizItemId: item.id,
-                textData: "",
-                intData: null,
-                optionAnswers: [],
-              }
-            }),
-          }
-        }
-
-        dispatch(userActions.setToken(accessToken))
-        dispatch(languageActions.set(languageId))
-        dispatch(quizActions.set(quiz))
-        dispatch(quizAnswerActions.set(quizAnswer))
-
-        dispatch(userActions.setQuizState(userQuizState))
-      } catch (e) {
-        setError(e.toString())
-      }
-    }
-
-    initialize()
+    dispatch(initialize(id, languageId, accessToken))
   }, [])
 
-  const handleDataChange = (itemId: string, attributeName: string) => event => {
-    const value = event.target.value
-    const itemAnswers = quizAnswer.itemAnswers.map(itemAnswer => {
-      if (itemAnswer.quizItemId === itemId) {
-        const updated = { ...itemAnswer }
-        updated[attributeName] = value
-        return updated
-      }
-      return itemAnswer
-    })
+  const handleTextDataChange = (itemId: string) => (
+    e: React.FormEvent<HTMLInputElement>,
+  ) => dispatch(quizAnswerActions.changeTextData(itemId, e.currentTarget.value))
 
+  const handleIntDataChange = (itemId: string) => (
+    e: React.FormEvent<HTMLInputElement>,
+  ) =>
     dispatch(
-      quizAnswerActions.set({
-        ...quizAnswer,
-        ...{ itemAnswers },
-      }),
-    )
-  }
-
-  const handleTextDataChange = itemId => handleDataChange(itemId, "textData")
-
-  const handleIntDataChange = itemId => handleDataChange(itemId, "intData")
-
-  const handleCheckboxToggling = itemId => optionId => () => {
-    const itemAnswers = quizAnswer.itemAnswers
-    const itemAnswer = itemAnswers.find(ia => ia.quizItemId === itemId)
-
-    const currentOptionValue = itemAnswer.optionAnswers.find(
-      oa => oa.quizOptionId === optionId,
+      quizAnswerActions.changeIntData(itemId, Number(e.currentTarget.value)),
     )
 
-    const newItemAnswer = {
-      ...itemAnswer,
-      optionAnswers: currentOptionValue
-        ? itemAnswer.optionAnswers.filter(oa => oa.quizOptionId !== optionId)
-        : itemAnswer.optionAnswers.concat({
-            quizItemAnswerId: itemAnswer.id,
-            quizOptionId: optionId,
-          }),
-    }
+  const handleCheckboxToggling = (itemId: string) => (optionId: string) => () =>
+    dispatch(quizAnswerActions.changeCheckboxData(itemId, optionId))
 
-    dispatch(
-      quizAnswerActions.set({
-        ...quizAnswer,
-        itemAnswers: itemAnswers.map(ia =>
-          ia.quizItemId === itemId ? newItemAnswer : ia,
-        ),
-      }),
-    )
-  }
-
-  const handleOptionChange = itemId => optionId => () => {
-    const multi = quiz.items.find(item => item.id === itemId).multi
-    const itemAnswers = quizAnswer.itemAnswers.map(itemAnswer => {
-      if (itemAnswer.quizItemId === itemId) {
-        const updated = { ...itemAnswer }
-        if (multi) {
-          if (updated.optionAnswers.find(oa => oa.quizOptionId === optionId)) {
-            updated.optionAnswers = updated.optionAnswers.filter(
-              oa => oa.quizOptionId !== optionId,
-            )
-          } else {
-            updated.optionAnswers = [
-              ...updated.optionAnswers,
-              { quizItemAnswerId: itemAnswer.id, quizOptionId: optionId },
-            ]
-          }
-        } else {
-          updated.optionAnswers = [
-            { quizItemAnswerId: itemAnswer.id, quizOptionId: optionId },
-          ]
-        }
-        return updated
-      }
-      return itemAnswer
-    })
-    dispatch(
-      quizAnswerActions.set({
-        ...quizAnswer,
-        ...{ itemAnswers },
-      }),
-    )
-  }
+  const handleOptionChange = (itemId: string) => (optionId: string) => () =>
+    dispatch(quizAnswerActions.changeChosenOption(itemId, optionId))
 
   const handleSubmit = useCallback(
     async () => {

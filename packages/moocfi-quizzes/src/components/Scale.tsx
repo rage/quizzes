@@ -32,7 +32,7 @@ const Scale: React.FunctionComponent<ScaleProps> = ({
   item,
 }) => {
   let number_of_options = 7
-  const answer = useTypedSelector(state => state.quiz)
+  const answer = useTypedSelector(state => state.quizAnswer)
   const answered = answer.id ? true : false
 
   if (item.minValue && item.maxValue) {
