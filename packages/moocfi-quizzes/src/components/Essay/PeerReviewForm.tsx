@@ -5,15 +5,7 @@ import LikertScale from "likert-react"
 import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
 import PeerReviewOption from "./PeerReviewOption"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
-import * as userActions from "../../state/user/actions"
-
-import {
-  getPeerReviewInfo,
-  postSpamFlag,
-  postPeerReview,
-} from "../../services/peerReviewService"
 import { Dispatch, useTypedSelector } from "../../state/store"
-import { UserQuizState } from "../../state/user/reducer"
 
 type PeerReviewFormProps = {
   languageInfo: any
@@ -31,18 +23,13 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
   const quiz = useTypedSelector(state => state.quiz)
 
   const peerReviewQuestions = quiz.peerReviewCollections
-  const accessToken = useTypedSelector(state => state.user.accessToken)
-  const languageId = useTypedSelector(state => state.language.languageId)
 
   const dispatch = useDispatch<Dispatch>()
   const setPeerReview = useCallback(
     (peerReview: any) =>
       dispatch(peerReviewsActions.setReviewAnswer(peerReview)),
-    [],
+    [dispatch],
   )
-
-  const setUserQuizState = (newState: UserQuizState) =>
-    dispatch(userActions.setQuizState(newState))
 
   const setSubmitLocked = useCallback(
     (status: boolean) => dispatch(peerReviewsActions.setSubmitLocked(status)),
@@ -54,29 +41,16 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
     [dispatch],
   )
 
-  const setAnswersToReview = useCallback(
-    (alternatives: any) =>
-      dispatch(peerReviewsActions.setReviewOptions(alternatives)),
-    [dispatch],
-  )
-
   const currentAnswersToReview = peerReview
     ? answersToReview.filter(answer => answer.id === peerReview.quizAnswerId)
     : answersToReview
 
-  const fetchAnswersToReview = async () => {
-    const answerAlternatives = await getPeerReviewInfo(
-      quiz.id,
-      languageId,
-      accessToken,
-    )
-    setAnswersToReview(answerAlternatives)
-  }
-
   const handlePeerReviewGradeChange = peerReviewQuestionId => (
-    question: any,
+    // question: any,
     value: string,
   ) => {
+    // dispatch(peerReviewsActions.changeGrade(peerReviewQuestionId, value))
+
     const answers = peerReview.answers.map(answer => {
       if (answer.peerReviewQuestionId === peerReviewQuestionId) {
         const updated = { ...answer }
@@ -96,19 +70,11 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
   }
 
   const submitPeerReview = async () => {
-    setSubmitDisabled(true)
-    setSubmitLocked(true)
-    const { userQuizState } = await postPeerReview(peerReview, accessToken)
-
-    setUserQuizState(userQuizState)
-    setPeerReview(undefined)
-    fetchAnswersToReview()
+    await dispatch(peerReviewsActions.submit())
   }
 
   const flagAsSpam = quizAnswerId => async () => {
-    setAnswersToReview(undefined)
-    await postSpamFlag(quizAnswerId, accessToken)
-    await fetchAnswersToReview()
+    dispatch(peerReviewsActions.postSpam(quizAnswerId))
   }
 
   const selectAnswer = (quizAnswerId: string) => event => {

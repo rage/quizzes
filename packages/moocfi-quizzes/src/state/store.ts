@@ -16,7 +16,6 @@ import * as quizActions from "./quiz/actions"
 import * as quizAnswerActions from "./quizAnswer/actions"
 import * as submitLockedActions from "./submitLocked/actions"
 import * as userActions from "./user/actions"
-import * as userQuizStateActions from "./userQuizState/actions"
 import * as PeerReviewsActions from "./peerReviews/actions"
 
 const rootReducer = combineReducers({

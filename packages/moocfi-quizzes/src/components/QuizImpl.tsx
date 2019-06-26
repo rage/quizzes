@@ -9,7 +9,7 @@ import * as quizAnswerActions from "../state/quizAnswer/actions"
 import * as submitLockedActions from "../state/submitLocked/actions"
 import * as userActions from "../state/user/actions"
 
-import Checkbox from "./Checkbox"
+import Checkbox from "./CheckboxOption"
 import Feedback from "./Feedback"
 import MultipleChoice from "./MultipleChoice"
 import ResearchAgreement from "./ResearchAgreement"
