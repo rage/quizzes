@@ -14,7 +14,7 @@ const initialValue = {
 export const languageReducer = (
   state: LanguageState = initialValue,
   action: ActionType<typeof language>,
-) => {
+): LanguageState => {
   switch (action.type) {
     case getType(language.set):
       return {

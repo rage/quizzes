@@ -1,8 +1,8 @@
 import { createAction } from "typesafe-actions"
-import { QuizAnswer } from "../../../../common/src/models"
+import { QuizAnswerState } from "./reducer"
 
 export const set = createAction("quizAnswer/SET", resolve => {
-  return (quizAnswer: QuizAnswer) => resolve(quizAnswer)
+  return (quizAnswer: QuizAnswerState) => resolve(quizAnswer)
 })
 
 export const clear = createAction("quizAnswer/CLEAR")

@@ -12,7 +12,11 @@ const FilterBox = ({ numberOfAnswers }) => {
         <Typography variant="title">FILTER OPTIONS</Typography>
       </Grid>
 
-      <Grid container={true} spacing={32} style={{ backgroundColor: "gray" }}>
+      <Grid
+        container={true}
+        spacing={32}
+        style={{ backgroundColor: "gray", marginBottom: "1em" }}
+      >
         <Grid item={true} xs={12}>
           <Typography variant="subtitle1">
             Total number of answers: {numberOfAnswers}

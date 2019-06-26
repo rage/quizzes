@@ -6,7 +6,7 @@ const initialValue = null
 export const messageReducer = (
   state: string = initialValue,
   action: ActionType<typeof message>,
-) => {
+): string => {
   switch (action.type) {
     case getType(message.set):
       return action.payload

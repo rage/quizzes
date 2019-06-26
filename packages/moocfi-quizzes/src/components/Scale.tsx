@@ -12,11 +12,12 @@ import {
   Typography,
 } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
+import { QuizItem } from "../state/quiz/reducer"
 
 type ScaleProps = {
   handleIntDataChange: (event: React.FormEvent, value: string) => void
   intData: number
-  item: any
+  item: QuizItem
 }
 
 type Radio = {

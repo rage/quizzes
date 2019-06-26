@@ -12,6 +12,11 @@ export type UserQuizState = {
   status: "open" | "locked"
 }
 
+export type User = {
+  accessToken: string
+  userQuizState: UserQuizState
+}
+
 export type UserState = {
   readonly accessToken: string
   readonly userQuizState: UserQuizState
@@ -25,7 +30,7 @@ const initialValue = {
 export const userReducer = (
   state: UserState = initialValue,
   action: ActionType<typeof user>,
-) => {
+): UserState => {
   switch (action.type) {
     case getType(user.set):
       return action.payload

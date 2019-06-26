@@ -2,12 +2,14 @@ import * as React from "react"
 import { Button, Grid, Typography } from "@material-ui/core"
 import { GridDirection } from "@material-ui/core/Grid"
 import { useTypedSelector } from "../state/store"
+import { QuizItem } from "../state/quiz/reducer"
+import { QuizOptionAnswer } from "../state/quizAnswer/reducer"
 
 type MultipleChoice = {
   correct: boolean
   handleOptionChange: (arg0: any) => any
-  item: any
-  optionAnswers: any[]
+  item: QuizItem
+  optionAnswers: QuizOptionAnswer[]
 }
 
 const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
@@ -173,7 +175,7 @@ const selectButtonStyle = (selected, correct) => {
     textTransform: "none",
     margin: "0.5em 0",
   }
-  const variant = selected ? "contained" : "outlined"
+  const variant: "contained" | "outlined" = selected ? "contained" : "outlined"
   return {
     variant,
     style: selected

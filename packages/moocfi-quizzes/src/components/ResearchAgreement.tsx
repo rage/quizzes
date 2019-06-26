@@ -1,9 +1,11 @@
 import * as React from "react"
 import CheckboxOption from "./CheckboxOption"
+import { QuizItem } from "../state/quiz/reducer"
+import { QuizOptionAnswer } from "../state/quizAnswer/reducer"
 
 type ResearchAgreementProps = {
-  optionAnswers: any[]
-  item: any
+  optionAnswers: QuizOptionAnswer[]
+  item: QuizItem
   handleCheckboxToggling: (any) => any
 }
 

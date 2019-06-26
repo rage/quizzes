@@ -1,11 +1,11 @@
 import { ActionCreator } from "redux"
 import { createAction } from "typesafe-actions"
-import { Quiz } from "../../../../common/src/models"
 import { getQuizInfo } from "../../services/quizService"
 import { ThunkAction } from "../store"
+import { QuizState } from "./reducer"
 
 export const set = createAction("quiz/SET", resolve => {
-  return (quiz: Quiz) => resolve(quiz)
+  return (quiz: QuizState) => resolve(quiz)
 })
 
 export const clear = createAction("quiz/CLEAR")

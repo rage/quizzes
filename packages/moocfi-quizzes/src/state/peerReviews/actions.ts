@@ -7,7 +7,7 @@ import {
   postSpamFlag,
 } from "../../services/peerReviewService"
 import { setQuizState } from "../user/actions"
-import { ThunkAction } from "../store"
+import { ThunkAction, RootAction } from "../store"
 
 export const set = createAction("peerReviews/SET", resolve => {
   return (newState: PeerReviewsState) => resolve(newState)
@@ -17,6 +17,18 @@ export const setReviewAnswer = createAction(
   "peerReviews/SET_ANSWER",
   resolve => {
     return (peerReview: PeerReviewAnswer) => resolve(peerReview)
+  },
+)
+
+export const selectAnswer = createAction(
+  "peerReview/SELECT_ANSWER",
+  resolve => {
+    return (
+      quizAnswerId: string,
+      userId: number,
+      peerReviewCollectionId: string,
+      questionIds: string[],
+    ) => resolve({ quizAnswerId, userId, peerReviewCollectionId, questionIds })
   },
 )
 
@@ -42,6 +54,17 @@ export const submit = () => async (dispatch, getState) => {
   dispatch(setQuizState(userQuizState))
   dispatch(setReviewAnswer(undefined))
   await dispatch(fetchPeerReviewAlternatives())
+}
+
+// solves the problem of passing info from userState, quizState -> peerReviewReducer
+export const selectAnswerToReview: ActionCreator<ThunkAction> = (
+  quizAnswerId: string,
+) => (dispatch, getState) => {
+  const userId = getState().user.userQuizState.userId
+  const prc = getState().quiz.peerReviewCollections[0]
+  dispatch(
+    selectAnswer(quizAnswerId, userId, prc.id, prc.questions.map(q => q.id)),
+  )
 }
 
 export const postSpam: ActionCreator<ThunkAction> = (

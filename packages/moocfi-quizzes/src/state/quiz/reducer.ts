@@ -34,10 +34,21 @@ export type Course = {
   texts: CourseText[]
 }
 
+export type QuizItemOptionText = {
+  quizOptionId: string
+  languageId: string
+  title: string
+  body: string
+  successMessage: string
+  failureMessage: string
+}
+
 export type QuizItemOption = {
   id: string
   quizItemId: string
   order: number
+  correct: boolean
+  texts: QuizItemOptionText[]
 }
 
 export type QuizItemText = {
@@ -45,6 +56,8 @@ export type QuizItemText = {
   languageId: string
   title: string
   body: string
+  successMessage: string
+  failureMessage: string
 }
 
 export type QuizItem = {
@@ -102,7 +115,7 @@ export type PeerReviewCollection = {
   texts: PeerReviewCollectionText[]
 }
 
-export type QuizState = {
+export type Quiz = {
   id: string
   courseId: string
   part: number
@@ -117,15 +130,17 @@ export type QuizState = {
   texts: QuizText[]
   course: Course
   items: QuizItem[]
-  peerReviewCollections: any[]
+  peerReviewCollections: PeerReviewCollection[]
 }
+
+export type QuizState = Readonly<Quiz>
 
 const initialValue = null
 
 export const quizReducer = (
   state: QuizState = initialValue,
   action: ActionType<typeof quiz>,
-) => {
+): QuizState => {
   switch (action.type) {
     case getType(quiz.set):
       return action.payload

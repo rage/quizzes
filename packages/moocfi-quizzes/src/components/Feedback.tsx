@@ -1,11 +1,12 @@
 import * as React from "react"
 import { TextField, Typography } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
+import { QuizItem } from "../state/quiz/reducer"
 
 type FeedbackProps = {
-  item
-  textData
-  handleTextDataChange
+  item: QuizItem
+  textData: string
+  handleTextDataChange: (a0: React.FormEvent) => void
 }
 
 const Feedback: React.FunctionComponent<FeedbackProps> = ({

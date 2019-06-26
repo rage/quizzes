@@ -1,9 +1,10 @@
 import * as React from "react"
 import { Checkbox, Grid, Typography } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
+import { QuizItem } from "../state/quiz/reducer"
 
 export type CheckboxOptionProps = {
-  item: any
+  item: QuizItem
   optionAnswers: any[]
   handleCheckboxToggling: Function
 }
@@ -21,6 +22,7 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
   const toggle = handleCheckboxToggling(options[0].id)
 
   const quizAnswer = useTypedSelector(state => state.quizAnswer)
+
   const answered = quizAnswer.id ? true : false
 
   const checkboxOptions = {

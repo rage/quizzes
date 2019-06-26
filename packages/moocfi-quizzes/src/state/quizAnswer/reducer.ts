@@ -3,14 +3,16 @@ import * as quizAnswer from "./actions"
 
 const initialValue = null
 
-export type QuizOptionAnswerState = {
-  id: string
+export type QuizOptionAnswer = {
+  id?: string
   quizItemAnswerId: string
   quizOptionId: string
 }
 
-export type QuizItemAnswerState = {
-  id: string
+export type QuizOptionAnswerState = Readonly<QuizOptionAnswer>
+
+export type QuizItemAnswer = {
+  id?: string
   quizAnswerId: string
   quizItemId: string
   textData: string
@@ -18,8 +20,9 @@ export type QuizItemAnswerState = {
   correct: boolean
   optionAnswers: QuizOptionAnswerState[]
 }
+export type QuizItemAnswerState = Readonly<QuizItemAnswer>
 
-export type QuizAnswerState = {
+export type QuizAnswer = {
   id?: string
   quizId: string
   userId: 96010
@@ -33,11 +36,12 @@ export type QuizAnswerState = {
     | "deprecated"
   itemAnswers: QuizItemAnswerState[]
 }
+export type QuizAnswerState = Readonly<QuizAnswer>
 
 export const quizAnswerReducer = (
   state: QuizAnswerState = initialValue,
   action: ActionType<typeof quizAnswer>,
-) => {
+): QuizAnswerState => {
   switch (action.type) {
     case getType(quizAnswer.set):
       return action.payload

@@ -9,7 +9,7 @@ import { QuizItem } from "../../state/quiz/reducer"
 type EssayProps = {
   textData: string
   item: QuizItem
-  handleTextDataChange: (a: any) => any
+  handleTextDataChange: (e: React.FormEvent) => void
   languageInfo: any
 }
 

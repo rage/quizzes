@@ -22,11 +22,12 @@ import Unsupported from "./Unsupported"
 import languageLabels from "../utils/language_labels"
 import { wordCount } from "../utils/string_tools"
 // don't use common!
-import { QuizAnswer } from "../../../common/src/models"
 import { postAnswer } from "../services/answerService"
 import { getQuizInfo } from "../services/quizService"
 import { RootState, useTypedSelector } from "../state/store"
 import { UserQuizState } from "../state/user/reducer"
+import { QuizAnswer } from "../state/quizAnswer/reducer"
+import { Quiz } from "../state/quiz/reducer"
 
 type ComponentName =
   | "essay"
@@ -73,12 +74,9 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
   const setError = (newError: string) => dispatch(messageActions.set(newError))
 
   const quizAnswer = useTypedSelector(state => state.quizAnswer)
+
   const setQuizAnswer = (newQuizAnswer: QuizAnswer) =>
     dispatch(quizAnswerActions.set(newQuizAnswer))
-
-  const userQuizState = useTypedSelector(state => state.user.userQuizState)
-  const setUserQuizState = (newUqs: UserQuizState) =>
-    dispatch(userActions.setQuizState(newUqs))
 
   const quiz = useTypedSelector(state => state.quiz)
   const dispatch = useDispatch()
@@ -156,7 +154,10 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
       ...itemAnswer,
       optionAnswers: currentOptionValue
         ? itemAnswer.optionAnswers.filter(oa => oa.quizOptionId !== optionId)
-        : itemAnswer.optionAnswers.concat({ quizOptionId: optionId }),
+        : itemAnswer.optionAnswers.concat({
+            quizItemAnswerId: itemAnswer.id,
+            quizOptionId: optionId,
+          }),
     }
 
     dispatch(
@@ -182,11 +183,13 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
           } else {
             updated.optionAnswers = [
               ...updated.optionAnswers,
-              { quizOptionId: optionId },
+              { quizItemAnswerId: itemAnswer.id, quizOptionId: optionId },
             ]
           }
         } else {
-          updated.optionAnswers = [{ quizOptionId: optionId }]
+          updated.optionAnswers = [
+            { quizItemAnswerId: itemAnswer.id, quizOptionId: optionId },
+          ]
         }
         return updated
       }
@@ -261,7 +264,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
     return quiz.items.some(ia => ia.type === "essay")
   }
 
-  const quizItemComponents = (quiz, languageId, accessToken) => {
+  const quizItemComponents = (quiz: Quiz, languageId: string) => {
     return (
       <>
         {quiz.items
@@ -329,7 +332,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
       <div>
         {quizContainsEssay() && <StageVisualizer />}
 
-        {quizItemComponents(quiz, languageId, accessToken)}
+        {quizItemComponents(quiz, languageId)}
 
         {quizAnswer.id ? (
           <>

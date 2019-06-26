@@ -1,5 +1,4 @@
 import * as React from "react"
-import { useCallback } from "react"
 import { useDispatch } from "react-redux"
 import LikertScale from "likert-react"
 import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
@@ -24,71 +23,31 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 
   const peerReviewQuestions = quiz.peerReviewCollections
 
-  const dispatch = useDispatch<Dispatch>()
-  const setPeerReview = useCallback(
-    (peerReview: any) =>
-      dispatch(peerReviewsActions.setReviewAnswer(peerReview)),
-    [dispatch],
-  )
-
-  const setSubmitLocked = useCallback(
-    (status: boolean) => dispatch(peerReviewsActions.setSubmitLocked(status)),
-    [dispatch],
-  )
-
-  const setSubmitDisabled = useCallback(
-    (status: boolean) => dispatch(peerReviewsActions.setSubmitDisabled(status)),
-    [dispatch],
-  )
-
   const currentAnswersToReview = peerReview
     ? answersToReview.filter(answer => answer.id === peerReview.quizAnswerId)
     : answersToReview
 
+  const dispatch = useDispatch<Dispatch>()
+
   const handlePeerReviewGradeChange = peerReviewQuestionId => (
-    // question: any,
+    question: any,
     value: string,
   ) => {
-    // dispatch(peerReviewsActions.changeGrade(peerReviewQuestionId, value))
-
-    const answers = peerReview.answers.map(answer => {
-      if (answer.peerReviewQuestionId === peerReviewQuestionId) {
-        const updated = { ...answer }
-        updated.value = Number(value)
-        return updated
-      }
-      return answer
-    })
-    const submitDisabled = answers.find(
-      answer => !answer.hasOwnProperty("value"),
+    dispatch(
+      peerReviewsActions.changeGrade(peerReviewQuestionId, Number(value)),
     )
-      ? true
-      : false
-
-    setPeerReview({ ...peerReview, ...{ answers } })
-    setSubmitDisabled(submitDisabled)
   }
 
-  const submitPeerReview = async () => {
-    await dispatch(peerReviewsActions.submit())
+  const submitPeerReview = () => {
+    dispatch(peerReviewsActions.submit())
   }
 
-  const flagAsSpam = quizAnswerId => async () => {
+  const flagAsSpam = (quizAnswerId: string) => () => {
     dispatch(peerReviewsActions.postSpam(quizAnswerId))
   }
 
-  const selectAnswer = (quizAnswerId: string) => event => {
-    const rejected = answersToReview.find(answer => answer.id !== quizAnswerId)
-    const peerReview = {
-      quizAnswerId,
-      peerReviewCollectionId: quiz.peerReviewCollections[0].id,
-      rejectedQuizAnswerIds: rejected ? [rejected.id] : [],
-      answers: quiz.peerReviewCollections[0].questions.map(question => {
-        return { peerReviewQuestionId: question.id }
-      }),
-    }
-    setPeerReview(peerReview)
-    setSubmitLocked(false)
+  const selectAnswer = (quizAnswerId: string) => () => {
+    dispatch(peerReviewsActions.selectAnswerToReview(quizAnswerId))
   }
   return (
     <>

@@ -11,18 +11,14 @@ const steps = [
 
 const StageVisualizer = () => {
   const quizAnswer = useTypedSelector(state => state.quizAnswer)
-
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
-
   const quiz = useTypedSelector(state => state.quiz)
 
   const answered = quizAnswer.id ? true : false
-
   const peerReviewsGiven = userQuizState ? userQuizState.peerReviewsGiven : 0
   const peerReviewsReceived = userQuizState
     ? userQuizState.peerReviewsReceived
     : 0
-
   const peerReviewsRequired = quiz.course.minPeerReviewsGiven
   const peerReviewsReceivedRequired = quiz.course.minPeerReviewsReceived
 
