@@ -1,5 +1,5 @@
 import * as React from "react"
-import { TextField, Typography, Paper } from "@material-ui/core"
+import { Grid, TextField, Typography, Paper } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
 import { QuizItem } from "../state/quiz/reducer"
 
