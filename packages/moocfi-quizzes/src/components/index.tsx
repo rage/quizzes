@@ -1,4 +1,5 @@
 import * as React from "react"
+import { StylesProvider } from "@material-ui/styles"
 import { Props } from "./QuizImpl"
 import QuizImpl from "./QuizImpl"
 import { Provider } from "react-redux"
@@ -9,7 +10,9 @@ const Quiz: React.FunctionComponent<Props> = props => {
 
   return (
     <Provider store={store}>
-      <QuizImpl {...props} />
+      <StylesProvider injectFirst={true}>
+        <QuizImpl {...props} />
+      </StylesProvider>
     </Provider>
   )
 }

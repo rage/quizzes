@@ -1,6 +1,8 @@
 import * as React from "react"
+import styled from "styled-components"
 import { Button, Grid, Typography } from "@material-ui/core"
 import { GridDirection } from "@material-ui/core/Grid"
+import { StyledTypography } from "./QuizImpl"
 import { useTypedSelector } from "../state/store"
 import { QuizItem } from "../state/quiz/reducer"
 import { QuizOptionAnswer } from "../state/quizAnswer/reducer"
@@ -12,9 +14,25 @@ type MultipleChoice = {
   optionAnswers: QuizOptionAnswer[]
 }
 
-type Button = {
-  style: any
-}
+const BottomMarginedGrid = styled(Grid)`
+  marginbottom: 10px;
+`
+
+const LeftBorderedTypography = styled(
+  ({ barColor, ...others }: { barColor: string }) => <Typography {...others} />,
+)`
+  border-left: 4px solid ${({ barColor }) => barColor};
+  padding: 3;
+  margin-bottom: 5;
+`
+
+const SolutionTypography = styled(
+  ({ correct, ...others }: { correct: boolean }) => (
+    <LeftBorderedTypography barColor={correct ? "green" : "red"} {...others} />
+  ),
+)`
+  margin-bottom: 0;
+`
 
 const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
   correct,
@@ -53,19 +71,16 @@ const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
   }
 
   return (
-    <Grid container direction={direction} style={{ marginBottom: 10 }}>
+    <BottomMarginedGrid container direction={direction}>
       <Grid item sm={questionWidth}>
         {singleItem ? (
           ""
         ) : (
           <>
-            <Typography variant="h6" style={{ paddingBottom: 10 }}>
-              {itemTitle}
-            </Typography>
+            <StyledTypography variant="h6">{itemTitle}</StyledTypography>
             {itemBody && (
-              <Typography
+              <StyledTypography
                 variant="body1"
-                style={{ paddingBottom: 10 }}
                 dangerouslySetInnerHTML={{ __html: itemBody }}
               />
             )}
@@ -79,26 +94,19 @@ const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
           ""
         )}
         {answered && !singleItem ? (
-          <Typography
-            variant="body1"
-            style={{
-              borderLeft: `4px solid ${correct ? "green" : "red"}`,
-              padding: 3,
-            }}
-          >
+          <SolutionTypography correct={correct} variant="body1">
             {correct ? successMessage : failureMessage}
-          </Typography>
+          </SolutionTypography>
         ) : (
           ""
         )}
       </Grid>
-      <Grid
-        item
-        sm={optionContainerWidth}
-        container
+
+      <ChoicesContainer
         direction={direction}
         justify="space-between"
-        style={{ paddingTop: 7, flexWrap: singleItem ? "nowrap" : "wrap" }}
+        singleItem={singleItem}
+        optionContainerWidth={optionContainerWidth}
       >
         {options.map(option => {
           const selected = optionAnswers.find(
@@ -121,75 +129,86 @@ const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
             : "white"
           return answered ? (
             singleItem ? (
-              <Grid item container direction={direction} key={option.id}>
-                <Grid item sm={optionWidth}>
-                  <Button
-                    fullWidth
-                    color="inherit"
-                    {...selectButtonProperties(selected, option.correct)}
-                  >
-                    {text.title}
-                  </Button>
-                </Grid>
-                <Grid item>
-                  <Typography
-                    variant="body1"
-                    style={{
-                      borderLeft: `4px solid ${feedbackColor}`,
-                      padding: 3,
-                      marginBottom: 5,
-                    }}
-                  >
-                    {feedbackMessage}
-                  </Typography>
+              <Grid item={true}>
+                <Grid container direction={direction} key={option.id}>
+                  <Grid item sm={optionWidth}>
+                    <RevealedChoiceButton
+                      selected={selected}
+                      correct={option.correct}
+                      fullWidth
+                    >
+                      {text.title}
+                    </RevealedChoiceButton>
+                  </Grid>
+                  <Grid item>
+                    <LeftBorderedTypography
+                      variant="body1"
+                      barColor={feedbackColor}
+                    >
+                      {feedbackMessage}
+                    </LeftBorderedTypography>
+                  </Grid>
                 </Grid>
               </Grid>
             ) : (
-              <Grid item>
-                <Button
+              <Grid item key={option.id}>
+                <RevealedChoiceButton
+                  selected={selected}
+                  correct={option.correct}
                   fullWidth
-                  color="inherit"
-                  {...selectButtonProperties(selected, option.correct)}
                 >
                   {text.title}
-                </Button>
+                </RevealedChoiceButton>
               </Grid>
             )
           ) : (
             <Grid item sm={optionWidth} key={option.id}>
-              <Button
+              <ChoiceButton
                 variant="outlined"
                 fullWidth
                 color={selected ? "primary" : "default"}
-                style={{ textTransform: "none", margin: "0.5em 0" }}
                 onClick={handleOptionChange(option.id)}
               >
                 {text.title}
-              </Button>
+              </ChoiceButton>
             </Grid>
           )
         })}
-      </Grid>
-    </Grid>
+      </ChoicesContainer>
+    </BottomMarginedGrid>
   )
 }
 
-const selectButtonProperties = (selected, correct) => {
-  const style = {
-    textTransform: "none" as "none",
-    margin: "0.5em 0",
-  }
-  const variant: "contained" | "outlined" = selected ? "contained" : "outlined"
-  return {
-    variant,
-    style: selected
-      ? correct
-        ? { ...style, ...{ color: "white", backgroundColor: "green" } }
-        : { ...style, ...{ color: "white", backgroundColor: "red" } }
-      : correct
-      ? { ...style, ...{ color: "green", outlineColor: "green" } }
-      : style,
-  }
-}
+const ChoicesContainer = styled(
+  ({ singleItem, optionContainerWidth, ...others }) => (
+    <Grid item={true} xs={optionContainerWidth}>
+      <Grid container={true} {...others} />
+    </Grid>
+  ),
+)`
+  padding-top: 7;
+  flex-wrap: ${({ singleItem }) => (singleItem ? "nowrap" : "wrap")};
+`
+
+const ChoiceButton = styled(Button)`
+  text-transform: none;
+  margin: 0.5em 0;
+`
+
+const RevealedChoiceButton = styled(({ selected, correct, ...others }) => (
+  <ChoiceButton variant={selected ? "contained" : "outlined"} {...others} />
+))`
+  ${props =>
+    props.selected
+      ? `
+    color: white;
+    background-color: ${props.correct ? "green" : "red"};
+    `
+      : props.correct
+      ? `
+    color: green;
+    outline-color: green;`
+      : ``}
+`
 
 export default MultipleChoice

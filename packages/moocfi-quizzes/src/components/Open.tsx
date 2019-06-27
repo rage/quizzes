@@ -1,7 +1,10 @@
 import * as React from "react"
-import { Grid, TextField, Typography, Paper } from "@material-ui/core"
+import styled from "styled-components"
+import { Card, TextField, Typography, Paper } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
 import { QuizItem } from "../state/quiz/reducer"
+import { SpaciousTypography } from "./styleComponents"
+import { SpaciousPaper } from "./styleComponents"
 
 type OpenProps = {
   correct: boolean
@@ -10,6 +13,12 @@ type OpenProps = {
   textData: string
   item: QuizItem
 }
+
+const SolutionPaper = styled(({ correct, ...other }) => (
+  <SpaciousPaper {...other} />
+))`
+  border-left: 1rem solid ${props => (props.correct ? "green" : "red")};
+`
 
 const Open: React.FunctionComponent<OpenProps> = ({
   correct,
@@ -26,12 +35,9 @@ const Open: React.FunctionComponent<OpenProps> = ({
 
   const guidance = (
     <>
-      <Typography variant="h6" style={{ paddingBottom: 10 }}>
-        {itemTitle}
-      </Typography>
-      <Typography
+      <SpaciousTypography variant="h6">{itemTitle}</SpaciousTypography>
+      <SpaciousTypography
         variant="body1"
-        style={{ paddingBottom: 10 }}
         dangerouslySetInnerHTML={{ __html: item.texts[0].body }}
       />
     </>
@@ -44,14 +50,14 @@ const Open: React.FunctionComponent<OpenProps> = ({
         <Typography variant="subtitle1">
           {languageInfo.userAnswerLabel}:
         </Typography>
-        <Paper style={paper}>
+        <SpaciousPaper>
           <Typography variant="body1">{textData}</Typography>
-        </Paper>
-        <Paper style={answerStyle(correct)}>
+        </SpaciousPaper>
+        <SolutionPaper correct={correct}>
           <Typography variant="body1">
             {correct ? successMessage : failureMessage}
           </Typography>
-        </Paper>
+        </SolutionPaper>
       </div>
     )
   }
@@ -68,16 +74,6 @@ const Open: React.FunctionComponent<OpenProps> = ({
       />
     </div>
   )
-}
-
-const answerStyle = correct => ({
-  ...paper,
-  borderLeft: `1em solid ${correct ? "green" : "red"}`,
-})
-
-const paper = {
-  padding: 10,
-  margin: 10,
 }
 
 export default Open

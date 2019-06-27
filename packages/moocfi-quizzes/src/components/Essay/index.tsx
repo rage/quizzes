@@ -5,6 +5,7 @@ import { wordCount } from "../../utils/string_tools"
 import { executeIfTextFieldBetweenNumOfWords as executeIfWordNumberCorrect } from "../../utils/event_filters"
 import { useTypedSelector } from "../../state/store"
 import { QuizItem } from "../../state/quiz/reducer"
+import { SpaciousPaper, SpaciousTypography } from "../styleComponents"
 
 type EssayProps = {
   textData: string
@@ -34,9 +35,9 @@ const Essay: React.FunctionComponent<EssayProps> = ({
       <Typography variant="subtitle1">
         {languageInfo.userAnswerLabel + ": "}
       </Typography>
-      <Paper style={paper}>
+      <SpaciousPaper>
         <Typography variant="body1">{textData}</Typography>
-      </Paper>
+      </SpaciousPaper>
     </>
   ) : (
     <>
@@ -68,12 +69,9 @@ const Essay: React.FunctionComponent<EssayProps> = ({
 
   return (
     <div>
-      <Typography variant="h6" style={{ paddingBottom: 10 }}>
-        {itemTitle}
-      </Typography>
-      <Typography
+      <SpaciousTypography variant="h6">{itemTitle}</SpaciousTypography>
+      <SpaciousTypography
         variant="body1"
-        style={{ paddingBottom: 10 }}
         dangerouslySetInnerHTML={{ __html: itemBody }}
       />
 

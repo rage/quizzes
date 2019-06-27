@@ -1,6 +1,7 @@
 import * as React from "react"
 import Typography from "@material-ui/core/Typography"
 import { useTypedSelector } from "../../state/store"
+import { SpaciousTypography } from "../styleComponents"
 
 type PeerReviewsGuidanceProps = {
   givenLabel: string
@@ -18,15 +19,15 @@ const PeerReviewsGuidance: React.FunctionComponent<
 
   return (
     <div>
-      <Typography variant="subtitle1" style={{ paddingTop: 10 }}>
+      <SpaciousTypography variant="subtitle1">
         {guidanceText}
-      </Typography>
-      <Typography variant="subtitle1" style={{ paddingTop: 10 }}>
+      </SpaciousTypography>
+      <SpaciousTypography variant="subtitle1">
         {givenLabel}: {given}/{required}
-      </Typography>
-      <Typography variant="subtitle1">
+      </SpaciousTypography>
+      <SpaciousTypography variant="subtitle1">
         {given >= required && peerReviewsCompletedInfo}
-      </Typography>
+      </SpaciousTypography>
     </div>
   )
 }

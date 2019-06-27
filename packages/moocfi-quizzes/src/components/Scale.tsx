@@ -1,4 +1,5 @@
 import * as React from "react"
+import styled from "styled-components"
 import {
   FormControl,
   FormLabel,
@@ -20,11 +21,13 @@ type ScaleProps = {
   item: QuizItem
 }
 
-type Radio = {
-  style: { paddingLeft: number }
-  color: "primary" | "secondary" | "default"
-  disabled: boolean
-}
+const NarrowTableCell = styled(TableCell)`
+  width: 40%;
+`
+
+const StyledRadio = styled(Radio)`
+  padding-left: 0;
+`
 
 const Scale: React.FunctionComponent<ScaleProps> = ({
   handleIntDataChange,
@@ -44,14 +47,14 @@ const Scale: React.FunctionComponent<ScaleProps> = ({
         <Table>
           <TableBody>
             <TableRow>
-              <TableCell style={{ width: "40%" }}>
+              <NarrowTableCell variant="body">
                 <FormLabel>
                   <Typography variant="subtitle1">
                     {item.texts[0].title}
                   </Typography>
                 </FormLabel>
-              </TableCell>
-              <TableCell style={{ width: "40%" }}>
+              </NarrowTableCell>
+              <NarrowTableCell variant="body" align="right">
                 <RadioGroup
                   row
                   aria-label="agreement"
@@ -66,30 +69,21 @@ const Scale: React.FunctionComponent<ScaleProps> = ({
                     <FormControlLabel
                       key={number}
                       value={`${number}`}
-                      control={<Radio {...radioButtonOptions(answered)} />}
+                      control={
+                        <StyledRadio color="primary" disabled={answered} />
+                      }
                       label={`${number}`}
                       labelPlacement="start"
                     />
                   ))}
                 </RadioGroup>
-              </TableCell>
+              </NarrowTableCell>
             </TableRow>
           </TableBody>
         </Table>
       </FormControl>
     </div>
   )
-}
-
-const radioButtonOptions = (answered: boolean) => {
-  const options: Radio = {
-    style: {
-      paddingLeft: 0,
-    },
-    color: "primary",
-    disabled: answered,
-  }
-  return options
 }
 
 export default Scale

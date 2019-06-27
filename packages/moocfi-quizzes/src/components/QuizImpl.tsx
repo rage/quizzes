@@ -1,6 +1,7 @@
 import * as React from "react"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
+import styled from "styled-components"
 import { Button, Typography } from "@material-ui/core"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { initialize } from "../state/actions"
@@ -18,6 +19,7 @@ import languageLabels from "../utils/language_labels"
 import { wordCount } from "../utils/string_tools"
 import { useTypedSelector } from "../state/store"
 import { Quiz } from "../state/quiz/reducer"
+import { SpaciousTypography } from "./styleComponents"
 
 type ComponentName =
   | "essay"
@@ -190,12 +192,11 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
 
   return (
     <div>
-      <Typography variant="h5" style={{ paddingBottom: 10 }}>
+      <SpaciousTypography variant="h5">
         {quiz.texts[0].title}
-      </Typography>
-      <Typography
+      </SpaciousTypography>
+      <SpaciousTypography
         variant="body1"
-        style={{ paddingBottom: 10 }}
         dangerouslySetInnerHTML={{ __html: quiz.texts[0].body }}
       />
 

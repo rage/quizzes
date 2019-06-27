@@ -3,11 +3,7 @@ import Typography from "@material-ui/core/Typography"
 import Paper from "@material-ui/core/Paper"
 import { useTypedSelector } from "../../state/store"
 import { QuizAnswer } from "../../state/quizAnswer/reducer"
-
-const paper = {
-  padding: 10,
-  margin: 10,
-}
+import { SpaciousPaper } from "../styleComponents"
 
 type PeerReviewOptionProps = {
   answer: QuizAnswer
@@ -40,9 +36,9 @@ const PeerReviewOption: React.FunctionComponent<PeerReviewOptionProps> = ({
               <Typography variant="subtitle2">
                 {quizItem.texts[0].title}
               </Typography>
-              <Paper style={paper} key={ia.id}>
+              <SpaciousPaper key={ia.id}>
                 <Typography variant="body1">{ia.textData}</Typography>
-              </Paper>
+              </SpaciousPaper>
             </React.Fragment>
           )
         })}

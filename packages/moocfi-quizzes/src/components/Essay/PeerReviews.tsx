@@ -1,4 +1,5 @@
 import * as React from "react"
+import styled from "styled-components"
 import { useCallback, useEffect } from "react"
 import { useDispatch } from "react-redux"
 import Typography from "@material-ui/core/Typography"
@@ -67,9 +68,9 @@ const PeerReviews: React.FunctionComponent<PeerReviewsProps> = ({
       />
 
       {!morePeerReviewsRequired() && (
-        <Typography variant="subtitle1" style={{ fontWeight: "bold" }}>
+        <BoldTypography variant="subtitle1">
           {languageInfo.extraPeerReviewsEncouragement}
-        </Typography>
+        </BoldTypography>
       )}
 
       <Togglable
@@ -82,5 +83,9 @@ const PeerReviews: React.FunctionComponent<PeerReviewsProps> = ({
     </div>
   )
 }
+
+const BoldTypography = styled(Typography)`
+  font-weight: bold;
+`
 
 export default PeerReviews
