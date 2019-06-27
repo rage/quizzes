@@ -7,9 +7,13 @@ import { QuizOptionAnswer } from "../state/quizAnswer/reducer"
 
 type MultipleChoice = {
   correct: boolean
-  handleOptionChange: (arg0: any) => any
+  handleOptionChange: (optionId: string) => () => void
   item: QuizItem
   optionAnswers: QuizOptionAnswer[]
+}
+
+type Button = {
+  style: any
 }
 
 const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
@@ -122,7 +126,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
                   <Button
                     fullWidth
                     color="inherit"
-                    {...selectButtonStyle(selected, option.correct)}
+                    {...selectButtonProperties(selected, option.correct)}
                   >
                     {text.title}
                   </Button>
@@ -145,7 +149,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
                 <Button
                   fullWidth
                   color="inherit"
-                  {...selectButtonStyle(selected, option.correct)}
+                  {...selectButtonProperties(selected, option.correct)}
                 >
                   {text.title}
                 </Button>
@@ -170,9 +174,9 @@ const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
   )
 }
 
-const selectButtonStyle = (selected, correct) => {
-  const style: React.CSSProperties = {
-    textTransform: "none",
+const selectButtonProperties = (selected, correct) => {
+  const style = {
+    textTransform: "none" as "none",
     margin: "0.5em 0",
   }
   const variant: "contained" | "outlined" = selected ? "contained" : "outlined"

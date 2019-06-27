@@ -1,11 +1,8 @@
 import * as React from "react"
-import { useCallback, useEffect } from "react"
+import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import { Button, Typography } from "@material-ui/core"
-import * as quizActions from "../state/quiz/actions"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
-import * as submitLockedActions from "../state/submitLocked/actions"
-import * as userActions from "../state/user/actions"
 import { initialize } from "../state/actions"
 import Checkbox from "./CheckboxOption"
 import Feedback from "./Feedback"
@@ -19,9 +16,7 @@ import PeerReviews from "./Essay/PeerReviews"
 import Unsupported from "./Unsupported"
 import languageLabels from "../utils/language_labels"
 import { wordCount } from "../utils/string_tools"
-import { postAnswer } from "../services/answerService"
 import { useTypedSelector } from "../state/store"
-import { QuizAnswer } from "../state/quizAnswer/reducer"
 import { Quiz } from "../state/quiz/reducer"
 
 type ComponentName =
@@ -62,15 +57,8 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
   accessToken,
 }) => {
   const submitLocked = useTypedSelector(state => state.submitLocked)
-  const setSubmitLocked = (state: boolean) =>
-    dispatch(submitLockedActions.set(state))
-
   const error = useTypedSelector(state => state.message)
   const quizAnswer = useTypedSelector(state => state.quizAnswer)
-
-  const setQuizAnswer = (newQuizAnswer: QuizAnswer) =>
-    dispatch(quizAnswerActions.set(newQuizAnswer))
-
   const quiz = useTypedSelector(state => state.quiz)
   const dispatch = useDispatch()
 
@@ -95,17 +83,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
   const handleOptionChange = (itemId: string) => (optionId: string) => () =>
     dispatch(quizAnswerActions.changeChosenOption(itemId, optionId))
 
-  const handleSubmit = useCallback(
-    async () => {
-      setSubmitLocked(true)
-
-      const responseData = await postAnswer(quizAnswer, accessToken)
-      setQuizAnswer(responseData.quizAnswer)
-      dispatch(quizActions.set(responseData.quiz))
-      dispatch(userActions.setQuizState(responseData.userQuizState))
-    },
-    [quizAnswer, accessToken],
-  )
+  const handleSubmit = () => dispatch(quizAnswerActions.submit())
 
   // not all quizzess have correct solutions - e.g. self-evaluation
   const hasCorrectAnswer = quiz => {
@@ -121,7 +99,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
     itemAnswers.some(ia => ia.correct === true)
 
   const submitDisabled = () => {
-    const submittable = quiz.items.map(item => {
+    const itemsSubmittable = quiz.items.map(item => {
       const itemAnswer = quizAnswer.itemAnswers.find(
         ia => ia.quizItemId === item.id,
       )
@@ -149,7 +127,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
       return undefined
     })
 
-    return submittable.includes(false)
+    return itemsSubmittable.includes(false)
   }
 
   const quizContainsEssay = () => {
@@ -204,11 +182,11 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
     return <div>Loading...</div>
   }
 
-  const types = quiz.items.map(item => item.type)
-
   if (quiz.texts.length === 0) {
     return <div>Error: quiz has no texts.</div>
   }
+
+  const types = quiz.items.map(item => item.type)
 
   return (
     <div>

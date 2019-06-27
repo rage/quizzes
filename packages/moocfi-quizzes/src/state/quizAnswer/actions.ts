@@ -2,6 +2,10 @@ import { ActionCreator } from "redux"
 import { createAction } from "typesafe-actions"
 import { QuizAnswerState } from "./reducer"
 import { ThunkAction } from "../store"
+import * as submitLockedActions from "../submitLocked/actions"
+import { postAnswer } from "../../services/answerService"
+import * as userActions from "../user/actions"
+import * as quizActions from "../quiz/actions"
 
 export const set = createAction("quizAnswer/SET", resolve => {
   return (quizAnswer: QuizAnswerState) => resolve(quizAnswer)
@@ -39,4 +43,18 @@ export const changeChosenOption: ActionCreator<ThunkAction> = (
 ) => (dispatch, getState) => {
   const multi = getState().quiz.items.find(i => i.id === itemId).multi
   dispatch(chooseOption(itemId, optionId, multi))
+}
+
+export const submit: ActionCreator<ThunkAction> = () => async (
+  dispatch,
+  getState,
+) => {
+  dispatch(submitLockedActions.set(true))
+  const responseData = await postAnswer(
+    getState().quizAnswer,
+    getState().user.accessToken,
+  )
+  dispatch(set(responseData.quizAnswer))
+  dispatch(quizActions.set(responseData.quiz))
+  dispatch(userActions.setQuizState(responseData.userQuizState))
 }
