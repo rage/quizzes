@@ -5,10 +5,10 @@ import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
 import PeerReviewOption from "./PeerReviewOption"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
 import { Dispatch, useTypedSelector } from "../../state/store"
-import { EssayLabels } from "../../utils/language_labels"
+import { PeerReviewLabels } from "../../utils/language_labels"
 
 type PeerReviewFormProps = {
-  languageInfo: EssayLabels
+  languageInfo: PeerReviewLabels
 }
 
 const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({

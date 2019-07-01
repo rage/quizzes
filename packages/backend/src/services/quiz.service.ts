@@ -293,11 +293,24 @@ export default class QuizService {
       } else {
         queryBuilder.leftJoinAndSelect("item.texts", "item_translation")
       }
+
       if (!stripped) {
         queryBuilder
           .addSelect("item.validityRegex")
           .addSelect("item_translation.successMessage")
           .addSelect("item_translation.failureMessage")
+      } else {
+        /*
+        queryBuilder.addSelect(`CASE
+          WHEN item.type = 'scale' THEN 'item_translation.success_message'
+          ELSE 'seccret'
+          END`, "min_label")
+
+          queryBuilder.addSelect(`CASE
+            WHEN item.type = 'scale' THEN 'item_translation.failure_message'
+            ELSE 'seccret'
+            END`, "max_label")
+            */
       }
     }
 
@@ -361,7 +374,6 @@ export default class QuizService {
     if (exclude) {
       queryBuilder.andWhere("quiz.excluded_from_score = false")
     }
-
     return await queryBuilder.getMany()
   }
 

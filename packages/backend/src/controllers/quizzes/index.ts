@@ -1,5 +1,6 @@
 import { Response } from "express"
 import JSONStream from "JSONStream"
+import knex from "knex"
 import { getUUIDByString } from "@quizzes/common/util"
 import {
   Get,
@@ -26,6 +27,8 @@ import {
   Quiz,
   QuizAnswer,
   UserQuizState,
+  QuizItemTranslation,
+  QuizItem,
 } from "../../models"
 import { IQuizQuery, ITMCProfileDetails } from "../../types"
 import _ from "lodash"
@@ -89,6 +92,33 @@ export class QuizController {
         stripped: quizAnswer ? false : true,
         ...params,
       })
+
+      if (quizzes[0].items.some(i => i.type === "scale")) {
+        const builder = knex({ client: "pg" })
+
+        const query = builder("quiz_item_translation")
+          .select("quiz_item_id", "failure_message", "success_message")
+          .whereIn(
+            "quiz_item_translation.quiz_item_id",
+            quizzes[0].items.map(i => i.id),
+          )
+
+        const queryRunner = this.entityManager.connection.createQueryRunner()
+        queryRunner.connect()
+        const translations = await queryRunner.query(query.toString())
+        await queryRunner.release()
+
+        translations.forEach((tr: any) => {
+          if (tr.failure_message || tr.success_message) {
+            const quizItem = quizzes[0].items.find(
+              i => i.id === tr.quiz_item_id,
+            )
+            quizItem.texts[0].failureMessage = tr.failure_message
+            quizItem.texts[0].successMessage = tr.success_message
+          }
+        })
+      }
+
       return {
         quiz: quizzes[0],
         quizAnswer,

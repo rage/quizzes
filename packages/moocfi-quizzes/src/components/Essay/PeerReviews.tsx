@@ -1,6 +1,6 @@
 import * as React from "react"
 import styled from "styled-components"
-import { useCallback, useEffect } from "react"
+import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import Typography from "@material-ui/core/Typography"
 import "likert-react/dist/main.css"
@@ -9,26 +9,21 @@ import PeerReviewsGuidance from "./PeerReviewsGuidance"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
 import Togglable from "../../utils/Togglable"
 import { useTypedSelector } from "../../state/store"
-import { QuizAnswer } from "../../state/quizAnswer/reducer"
-import { EssayLabels } from "../../utils/language_labels"
+import { PeerReviewLabels } from "../../utils/language_labels"
 
 const BoldTypography = styled(Typography)`
   font-weight: bold;
 `
 
-type PeerReviewsProps = {
-  // not any, but awaiting structure decisions
-  languageInfo: EssayLabels
-}
-
-const PeerReviews: React.FunctionComponent<PeerReviewsProps> = ({
-  languageInfo,
-}) => {
+const PeerReviews: React.FunctionComponent = () => {
   const dispatch = useDispatch()
 
   const quiz = useTypedSelector(state => state.quiz)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const peerReviewQuestions = quiz.peerReviewCollections
+  const languageInfo = useTypedSelector(
+    state => state.language.languageLabels.peerReviews,
+  )
 
   useEffect(() => {
     dispatch(peerReviewsActions.fetchPeerReviewAlternatives())

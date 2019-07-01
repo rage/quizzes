@@ -10,7 +10,6 @@ import { OpenLabels } from "../utils/language_labels"
 type OpenProps = {
   correct: boolean
   handleTextDataChange: (e: React.FormEvent) => void
-  languageInfo: OpenLabels
   textData: string
   item: QuizItem
 }
@@ -24,11 +23,13 @@ const SolutionPaper = styled(({ correct, ...other }) => (
 const Open: React.FunctionComponent<OpenProps> = ({
   correct,
   handleTextDataChange,
-  languageInfo,
   textData,
   item,
 }) => {
   const answer = useTypedSelector(state => state.quizAnswer)
+  const languageInfo = useTypedSelector(
+    state => state.language.languageLabels.open,
+  )
   const answered = answer.id ? true : false
   const itemTitle = item.texts[0].title
   const successMessage = item.texts[0].successMessage

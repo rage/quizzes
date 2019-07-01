@@ -38,6 +38,12 @@ const Scale: React.FunctionComponent<ScaleProps> = ({
   const answer = useTypedSelector(state => state.quizAnswer)
   const answered = answer.id ? true : false
 
+  const minLabel = item.texts[0].successMessage
+  const maxLabel = item.texts[0].failureMessage
+
+  console.log("min label", minLabel)
+  console.log("max label", maxLabel)
+
   if (item.minValue && item.maxValue) {
     number_of_options = item.maxValue - item.minValue + 1
   }
@@ -55,6 +61,7 @@ const Scale: React.FunctionComponent<ScaleProps> = ({
                 </FormLabel>
               </NarrowTableCell>
               <NarrowTableCell variant="body" align="right">
+                {minLabel}
                 <RadioGroup
                   row={true}
                   aria-label="agreement"
@@ -76,6 +83,7 @@ const Scale: React.FunctionComponent<ScaleProps> = ({
                       labelPlacement="start"
                     />
                   ))}
+                  {maxLabel}
                 </RadioGroup>
               </NarrowTableCell>
             </TableRow>

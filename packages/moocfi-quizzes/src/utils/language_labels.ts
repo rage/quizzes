@@ -1,19 +1,24 @@
-import { ComponentName } from "../components/QuizImpl"
-
 export type EssayLabels = {
+  exampleAnswerLabel: string
+  userAnswerLabel: string
+  minimumWords: string
+}
+
+export type PeerReviewLabels = {
+  noPeerAnswersAvailableLabel: string
   choosePeerEssayLabel: string
   displayPeerReview: string
-  exampleAnswerLabel: string
   extraPeerReviewsEncouragementLabel: string
   givenPeerReviewsLabel: string
-  hidePeerReviewLabel: string
-  loadingLabel: string
-  noPeerAnswersAvailableLabel: string
   peerReviewsCompletedInfo: string
   reportAsInappropriateLabel: string
   submitPeerReviewLabel: string
-  userAnswerLabel: string
-  minimumWords: string
+  hidePeerReviewLabel: string
+  loadingLabel: string
+}
+
+export type UnsupportedLabels = {
+  notSupportedInsert: (itemType: string) => string
 }
 
 export type OpenLabels = {
@@ -24,59 +29,76 @@ export type OpenLabels = {
 export type SingleLanguageLabels = {
   essay: EssayLabels
   open: OpenLabels
+  peerReviews: PeerReviewLabels
+  unsupported: UnsupportedLabels
 }
 
 export type LanguageLabels = {
   [langugeId: string]: SingleLanguageLabels
 }
 
-export const languageOptions = {
-  fi_FI: {
-    essay: {
-      choosePeerEssayLabel: "Valitse",
-      exampleAnswerLabel: "Esimerkkivastaus",
-      givenPeerReviewsLabel: "Vertaisarvioita annettu",
-      loadingLabel: "Ladataan",
-      noPeerAnswersAvailableLabel:
-        "Vertaisarvioitavia vastauksia ei saatavilla",
-      reportAsInappropriateLabel: "Ilmoita asiaton vastaus",
-      submitPeerReviewLabel: "Lähetä vertaisarvio",
-      userAnswerLabel: "Vastauksesi",
-      peerReviewsCompletedInfo: "Tarvittavat vertaisarviot annettu",
-      minimumWords: "Sanoja vähintään",
-      extraPeerReviewsEncouragementLabel:
-        "Olet jo antanut tarvittavan määrän vertaisarvioita. \
-         Jatka muiden töiden arviointia painamalla alhaalta - \
-          -  näin parannat oman vastauksesi todennäköisyyttä tulla vertaisarvioiduksi!",
-      displayPeerReview: "Tee vertaisarvio",
-      hidePeerReviewLabel: "Piilota",
-    },
-    open: {
-      placeholder: "Vastaus",
-      userAnswerLabel: "Vastauksesi",
-    },
+const finnishLabels: SingleLanguageLabels = {
+  essay: {
+    exampleAnswerLabel: "Esimerkkivastaus",
+    userAnswerLabel: "Vastauksesi",
+    minimumWords: "Sanoja vähintään",
   },
-  en_US: {
-    essay: {
-      choosePeerEssayLabel: "Choose",
-      exampleAnswerLabel: "Answer example",
-      givenPeerReviewsLabel: "Peer reviews given",
-      loadingLabel: "Loading",
-      noPeerAnswersAvailableLabel: "No answers available for peer review",
-      reportAsInappropriateLabel: "Report as inappropriate",
-      submitPeerReviewLabel: "Submit review",
-      userAnswerLabel: "Your answer",
-      peerReviewsCompletedInfo: "All peer reviews have been submitted",
-      minimumWords: "Minimum number of words",
-      extraPeerReviewsEncouragementLabel:
-        "You have reviewed the minimum number of peer essays. You may continue to \
-        review your peers' works, thereby increasing the probability of your own answer being selected by others!",
-      displayPeerReview: "Add peer review",
-      hidePeerReviewLabel: "Hide",
-    },
-    open: {
-      placeholder: "Answer",
-      userAnswerLabel: "Your answer",
-    },
+  open: {
+    placeholder: "Vastaus",
+    userAnswerLabel: "Vastauksesi",
   },
+  peerReviews: {
+    loadingLabel: "Ladataan",
+    noPeerAnswersAvailableLabel: "Vertaisarvioitavia vastauksia ei saatavilla",
+    choosePeerEssayLabel: "Valitse",
+    displayPeerReview: "Tee vertaisarvio",
+    extraPeerReviewsEncouragementLabel:
+      "Olet jo antanut tarvittavan määrän vertaisarvioita. \
+       Jatka muiden töiden arviointia painamalla alhaalta - \
+        -  näin parannat oman vastauksesi todennäköisyyttä tulla vertaisarvioiduksi!",
+    givenPeerReviewsLabel: "Vertaisarvioita annettu",
+    peerReviewsCompletedInfo: "Tarvittavat vertaisarviot annettu",
+    reportAsInappropriateLabel: "Ilmoita asiaton vastaus",
+    submitPeerReviewLabel: "Lähetä vertaisarvio",
+    hidePeerReviewLabel: "Piilota",
+  },
+  unsupported: {
+    notSupportedInsert: (itemType: string) =>
+      `Kysymystyyppiä'${itemType}' ei tueta.`,
+  },
+}
+
+const englishLabels: SingleLanguageLabels = {
+  essay: {
+    exampleAnswerLabel: "Answer example",
+    userAnswerLabel: "Your answer",
+    minimumWords: "Minimum number of words",
+  },
+  open: {
+    placeholder: "Answer",
+    userAnswerLabel: "Your answer",
+  },
+  peerReviews: {
+    loadingLabel: "Loading",
+    choosePeerEssayLabel: "Choose",
+    givenPeerReviewsLabel: "Peer reviews given",
+    noPeerAnswersAvailableLabel: "No answers available for peer review",
+    reportAsInappropriateLabel: "Report as inappropriate",
+    submitPeerReviewLabel: "Submit review",
+    peerReviewsCompletedInfo: "All peer reviews have been submitted",
+    extraPeerReviewsEncouragementLabel:
+      "You have reviewed the minimum number of peer essays. You may continue to \
+      review your peers' works, thereby increasing the probability of your own answer being selected by others!",
+    displayPeerReview: "Add peer review",
+    hidePeerReviewLabel: "Hide",
+  },
+  unsupported: {
+    notSupportedInsert: (itemType: string) =>
+      `Question of type '${itemType}' is not supported.`,
+  },
+}
+
+export const languageOptions: LanguageLabels = {
+  fi_FI: finnishLabels,
+  en_US: englishLabels,
 }

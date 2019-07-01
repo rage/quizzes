@@ -158,7 +158,6 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
               <ItemComponent
                 item={item}
                 key={item.id}
-                languageInfo={languageLabels[item.type]}
                 intData={itemAnswer.intData}
                 textData={itemAnswer.textData}
                 optionAnswers={itemAnswer.optionAnswers}
@@ -214,9 +213,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
 
         {quizAnswer.id ? (
           <>
-            {quizContainsEssay() && (
-              <PeerReviews languageInfo={languageLabels.essay} />
-            )}
+            {quizContainsEssay() && <PeerReviews />}
 
             <Typography variant="h5">
               {hasCorrectAnswer(quiz)

@@ -12,19 +12,20 @@ type EssayProps = {
   textData: string
   item: QuizItem
   handleTextDataChange: (e: React.FormEvent) => void
-  languageInfo: EssayLabels
 }
 
 const Essay: React.FunctionComponent<EssayProps> = ({
   textData,
   handleTextDataChange,
   item,
-  languageInfo,
 }) => {
   const itemBody = item.texts[0].body
   const itemTitle = item.texts[0].title
   const quizAnswer = useTypedSelector(state => state.quizAnswer)
   const answered = quizAnswer.id
+  const languageInfo = useTypedSelector(
+    state => state.language.languageLabels.essay,
+  )
 
   const answerPortion = answered ? (
     <>
