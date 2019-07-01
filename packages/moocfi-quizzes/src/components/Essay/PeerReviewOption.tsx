@@ -1,6 +1,5 @@
 import * as React from "react"
 import Typography from "@material-ui/core/Typography"
-import Paper from "@material-ui/core/Paper"
 import { useTypedSelector } from "../../state/store"
 import { QuizAnswer } from "../../state/quizAnswer/reducer"
 import { SpaciousPaper } from "../styleComponents"

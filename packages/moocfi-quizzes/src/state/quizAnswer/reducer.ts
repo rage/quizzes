@@ -13,35 +13,35 @@ export type QuizOptionAnswerState = Readonly<QuizOptionAnswer>
 
 export type QuizItemAnswer = {
   id?: string
-  quizAnswerId: string
+  quizAnswerId?: string
   quizItemId: string
   textData: string
   intData: number
-  correct: boolean
-  optionAnswers: QuizOptionAnswerState[]
+  correct?: boolean
+  optionAnswers: QuizOptionAnswer[]
 }
 export type QuizItemAnswerState = Readonly<QuizItemAnswer>
 
 export type QuizAnswer = {
   id?: string
   quizId: string
-  userId: 96010
+  userId?: number
   languageId: string
-  status:
+  status?:
     | "draft"
     | "submitted"
     | "spam"
     | "confirmed"
     | "rejected"
     | "deprecated"
-  itemAnswers: QuizItemAnswerState[]
+  itemAnswers: QuizItemAnswer[]
 }
 export type QuizAnswerState = Readonly<QuizAnswer>
 
 export const quizAnswerReducer = (
   state: QuizAnswerState = initialValue,
   action: ActionType<typeof quizAnswer>,
-): QuizAnswerState => {
+): QuizAnswer => {
   switch (action.type) {
     case getType(quizAnswer.set):
       return action.payload

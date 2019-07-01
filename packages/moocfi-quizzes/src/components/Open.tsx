@@ -5,11 +5,12 @@ import { useTypedSelector } from "../state/store"
 import { QuizItem } from "../state/quiz/reducer"
 import { SpaciousTypography } from "./styleComponents"
 import { SpaciousPaper } from "./styleComponents"
+import { OpenLabels } from "../utils/language_labels"
 
 type OpenProps = {
   correct: boolean
-  handleTextDataChange: (any) => any
-  languageInfo: any
+  handleTextDataChange: (e: React.FormEvent) => void
+  languageInfo: OpenLabels
   textData: string
   item: QuizItem
 }

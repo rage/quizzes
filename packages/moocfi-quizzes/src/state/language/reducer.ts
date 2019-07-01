@@ -1,9 +1,13 @@
 import { ActionType, getType } from "typesafe-actions"
 import * as language from "./actions"
+import {
+  languageOptions,
+  SingleLanguageLabels,
+} from "../../utils/language_labels"
 
 export type LanguageState = {
   languageId: string
-  languageLabels: object
+  languageLabels: SingleLanguageLabels
 }
 
 const initialValue = {
@@ -18,8 +22,8 @@ export const languageReducer = (
   switch (action.type) {
     case getType(language.set):
       return {
-        ...state,
         languageId: action.payload,
+        languageLabels: languageOptions[action.payload],
       }
     case getType(language.clear):
       return initialValue

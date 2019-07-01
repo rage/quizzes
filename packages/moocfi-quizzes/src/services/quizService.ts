@@ -2,10 +2,11 @@ import axios from "axios"
 import BASE_URL from "../config"
 import { UserQuizState } from "../state/user/reducer"
 import { Quiz } from "../state/quiz/reducer"
+import { QuizAnswer } from "../state/quizAnswer/reducer"
 
 type QuizResponse = {
   quiz: Quiz
-  quizAnswer: any
+  quizAnswer: QuizAnswer
   userQuizState: UserQuizState
 }
 

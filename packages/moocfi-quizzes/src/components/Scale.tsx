@@ -43,7 +43,7 @@ const Scale: React.FunctionComponent<ScaleProps> = ({
   }
   return (
     <div>
-      <FormControl fullWidth>
+      <FormControl fullWidth={true}>
         <Table>
           <TableBody>
             <TableRow>
@@ -56,7 +56,7 @@ const Scale: React.FunctionComponent<ScaleProps> = ({
               </NarrowTableCell>
               <NarrowTableCell variant="body" align="right">
                 <RadioGroup
-                  row
+                  row={true}
                   aria-label="agreement"
                   name="agreement"
                   value={`${intData}`}

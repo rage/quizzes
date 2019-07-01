@@ -6,7 +6,7 @@ import { QuizOptionAnswer } from "../state/quizAnswer/reducer"
 type ResearchAgreementProps = {
   optionAnswers: QuizOptionAnswer[]
   item: QuizItem
-  handleCheckboxToggling: (any) => any
+  handleCheckboxToggling: (optionId: string) => () => any
 }
 
 const ResearchAgreement: React.FunctionComponent<ResearchAgreementProps> = ({

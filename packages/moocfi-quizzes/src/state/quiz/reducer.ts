@@ -140,7 +140,7 @@ const initialValue = null
 export const quizReducer = (
   state: QuizState = initialValue,
   action: ActionType<typeof quiz>,
-): QuizState => {
+): Quiz => {
   switch (action.type) {
     case getType(quiz.set):
       return action.payload

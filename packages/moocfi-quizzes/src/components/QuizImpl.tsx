@@ -1,7 +1,6 @@
 import * as React from "react"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
-import styled from "styled-components"
 import { Button, Typography } from "@material-ui/core"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { initialize } from "../state/actions"
@@ -15,13 +14,12 @@ import Essay from "./Essay"
 import StageVisualizer from "./Essay/StageVisualizer"
 import PeerReviews from "./Essay/PeerReviews"
 import Unsupported from "./Unsupported"
-import languageLabels from "../utils/language_labels"
 import { wordCount } from "../utils/string_tools"
 import { useTypedSelector } from "../state/store"
 import { Quiz } from "../state/quiz/reducer"
 import { SpaciousTypography } from "./styleComponents"
 
-type ComponentName =
+export type ComponentName =
   | "essay"
   | "multiple-choice"
   | "scale"
@@ -62,6 +60,9 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
   const error = useTypedSelector(state => state.message)
   const quizAnswer = useTypedSelector(state => state.quizAnswer)
   const quiz = useTypedSelector(state => state.quiz)
+  const languageLabels = useTypedSelector(
+    state => state.language.languageLabels,
+  )
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -105,6 +106,9 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
       const itemAnswer = quizAnswer.itemAnswers.find(
         ia => ia.quizItemId === item.id,
       )
+      if (!itemAnswer) {
+        return false
+      }
       if (
         item.type === "essay" ||
         item.type === "open" ||
@@ -145,13 +149,16 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
             const itemAnswer = quizAnswer.itemAnswers.find(
               ia => ia.quizItemId === item.id,
             )
+            if (!itemAnswer) {
+              return []
+            }
             const ItemComponent = componentType(item.type)
 
             return (
               <ItemComponent
                 item={item}
                 key={item.id}
-                languageInfo={languageLabels(languageId, item.type)}
+                languageInfo={languageLabels[item.type]}
                 intData={itemAnswer.intData}
                 textData={itemAnswer.textData}
                 optionAnswers={itemAnswer.optionAnswers}
@@ -208,7 +215,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
         {quizAnswer.id ? (
           <>
             {quizContainsEssay() && (
-              <PeerReviews languageInfo={languageLabels(languageId, "essay")} />
+              <PeerReviews languageInfo={languageLabels.essay} />
             )}
 
             <Typography variant="h5">

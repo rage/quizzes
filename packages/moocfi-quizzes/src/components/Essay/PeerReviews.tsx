@@ -7,12 +7,18 @@ import "likert-react/dist/main.css"
 import PeerReviewForm from "./PeerReviewForm"
 import PeerReviewsGuidance from "./PeerReviewsGuidance"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
-import { getPeerReviewInfo } from "../../services/peerReviewService"
 import Togglable from "../../utils/Togglable"
 import { useTypedSelector } from "../../state/store"
+import { QuizAnswer } from "../../state/quizAnswer/reducer"
+import { EssayLabels } from "../../utils/language_labels"
+
+const BoldTypography = styled(Typography)`
+  font-weight: bold;
+`
 
 type PeerReviewsProps = {
-  languageInfo: any
+  // not any, but awaiting structure decisions
+  languageInfo: EssayLabels
 }
 
 const PeerReviews: React.FunctionComponent<PeerReviewsProps> = ({
@@ -20,32 +26,13 @@ const PeerReviews: React.FunctionComponent<PeerReviewsProps> = ({
 }) => {
   const dispatch = useDispatch()
 
-  const setAnswersToReview = useCallback(
-    (alternatives: any) =>
-      dispatch(peerReviewsActions.setReviewOptions(alternatives)),
-    [],
-  )
-
   const quiz = useTypedSelector(state => state.quiz)
-  const languageId = useTypedSelector(state => state.language.languageId)
-  const accessToken = useTypedSelector(state => state.user.accessToken)
-
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
-
   const peerReviewQuestions = quiz.peerReviewCollections
 
   useEffect(() => {
-    fetchAnswersToReview()
+    dispatch(peerReviewsActions.fetchPeerReviewAlternatives())
   }, [])
-
-  const fetchAnswersToReview = async () => {
-    const answerAlternatives = await getPeerReviewInfo(
-      quiz.id,
-      languageId,
-      accessToken,
-    )
-    setAnswersToReview(answerAlternatives)
-  }
 
   const morePeerReviewsRequired = () =>
     (userQuizState ? userQuizState.peerReviewsGiven : 0) <
@@ -69,13 +56,13 @@ const PeerReviews: React.FunctionComponent<PeerReviewsProps> = ({
 
       {!morePeerReviewsRequired() && (
         <BoldTypography variant="subtitle1">
-          {languageInfo.extraPeerReviewsEncouragement}
+          {languageInfo.extraPeerReviewsEncouragementLabel}
         </BoldTypography>
       )}
 
       <Togglable
         initiallyVisible={morePeerReviewsRequired()}
-        hideButtonText={languageInfo.hidePeerReview}
+        hideButtonText={languageInfo.hidePeerReviewLabel}
         displayButtonText={languageInfo.displayPeerReview}
       >
         <PeerReviewForm languageInfo={languageInfo} />
@@ -83,9 +70,5 @@ const PeerReviews: React.FunctionComponent<PeerReviewsProps> = ({
     </div>
   )
 }
-
-const BoldTypography = styled(Typography)`
-  font-weight: bold;
-`
 
 export default PeerReviews

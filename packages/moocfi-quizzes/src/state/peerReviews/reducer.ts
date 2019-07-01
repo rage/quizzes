@@ -43,7 +43,7 @@ export type PeerReviewsState = Readonly<PeerReviews>
 export const peerReviewsReducer = (
   state: PeerReviewsState = initialValue,
   action: ActionType<typeof peerReviews>,
-): PeerReviewsState => {
+): PeerReviews => {
   switch (action.type) {
     case getType(peerReviews.set):
       return action.payload

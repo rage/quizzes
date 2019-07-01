@@ -76,7 +76,6 @@ export class QuizController {
           { quizId, userId: user.id },
           this.entityManager,
         )
-        console.log("what answer?", answer)
         if (answer.status === "submitted" || answer.status === "confirmed") {
           quizAnswer = answer
         }

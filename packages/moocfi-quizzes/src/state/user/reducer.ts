@@ -30,7 +30,7 @@ const initialValue = {
 export const userReducer = (
   state: UserState = initialValue,
   action: ActionType<typeof user>,
-): UserState => {
+): User => {
   switch (action.type) {
     case getType(user.set):
       return action.payload

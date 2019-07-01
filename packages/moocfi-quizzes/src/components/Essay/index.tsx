@@ -6,12 +6,13 @@ import { executeIfTextFieldBetweenNumOfWords as executeIfWordNumberCorrect } fro
 import { useTypedSelector } from "../../state/store"
 import { QuizItem } from "../../state/quiz/reducer"
 import { SpaciousPaper, SpaciousTypography } from "../styleComponents"
+import { EssayLabels } from "../../utils/language_labels"
 
 type EssayProps = {
   textData: string
   item: QuizItem
   handleTextDataChange: (e: React.FormEvent) => void
-  languageInfo: any
+  languageInfo: EssayLabels
 }
 
 const Essay: React.FunctionComponent<EssayProps> = ({
@@ -20,11 +21,6 @@ const Essay: React.FunctionComponent<EssayProps> = ({
   item,
   languageInfo,
 }) => {
-  const paper = {
-    padding: 10,
-    margin: 10,
-  }
-
   const itemBody = item.texts[0].body
   const itemTitle = item.texts[0].title
   const quizAnswer = useTypedSelector(state => state.quizAnswer)

@@ -3,11 +3,12 @@ import styled from "styled-components"
 import { Checkbox, Grid, Typography } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
 import { QuizItem } from "../state/quiz/reducer"
+import { QuizOptionAnswer } from "../state/quizAnswer/reducer"
 
 export type CheckboxOptionProps = {
   item: QuizItem
-  optionAnswers: any[]
-  handleCheckboxToggling: Function
+  optionAnswers: QuizOptionAnswer[]
+  handleCheckboxToggling: (optionId: string) => () => void
 }
 
 const VertCenteredGrid = styled(Grid)`
