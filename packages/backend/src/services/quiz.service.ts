@@ -1,5 +1,7 @@
+import knex from "knex"
 import _ from "lodash"
-import { Service, Inject } from "typedi"
+import { BadRequestError } from "routing-controllers"
+import { Inject, Service } from "typedi"
 import { EntityManager } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
@@ -13,12 +15,229 @@ import {
 } from "../models"
 import { IQuizQuery } from "../types"
 import quizanswerService from "./quizanswer.service"
-import { BadRequestError } from "routing-controllers"
 
 @Service()
 export default class QuizService {
   @InjectManager()
   private entityManager: EntityManager
+
+  public async getPlainQuizData(quizId: string) {
+    const builder = knex({ client: "pg" })
+
+    let query = builder("quiz")
+      .select()
+      .where("quiz.id", quizId)
+      .join("quiz_translation", "quiz_translation.quiz_id", "quiz.id")
+      .select("id", "title", "body", "submit_message")
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    let data = await queryRunner.stream(query.toString())
+    await queryRunner.release()
+
+    return data
+  }
+
+  public async getPlainQuizItems(quizId: string) {
+    const builder = knex({ client: "pg" })
+
+    let query = builder("quiz_item")
+      .where("quiz_item.quiz_id", quizId)
+      .select(
+        "quiz_item.id",
+        "type",
+        "order",
+        "validity_regex",
+        "format_regex",
+        "multi",
+        "min_words",
+        "max_words",
+        "min_value",
+        "max_value",
+      )
+      .innerJoin(
+        "quiz_item_translation",
+        "quiz_item_translation.quiz_item_id",
+        "quiz_item.id",
+      )
+      .select("title", "body", "success_message", "failure_message")
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    let data = await queryRunner.stream(query.toString())
+    await queryRunner.release()
+    return data
+  }
+
+  public async getPlainQuizItemOptions(quizId: string) {
+    const builder = knex({ client: "pg" })
+
+    let query = builder("quiz_item")
+      .where("quiz_item.quiz_id", quizId)
+      .innerJoin("quiz_option", "quiz_option.quiz_item_id", "quiz_item.id")
+      .select(
+        "quiz_option.quiz_item_id",
+        "quiz_option.id",
+        "quiz_option.correct",
+      )
+      .innerJoin(
+        "quiz_option_translation",
+        "quiz_option_translation.quiz_option_id",
+        "quiz_option.id",
+      )
+      .select("title", "body", "success_message", "failure_message")
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    let data = await queryRunner.stream(query.toString())
+    await queryRunner.release()
+
+    return data
+  }
+
+  public async getPlainQuizPeerReviewCollections(quizId: string) {
+    const builder = knex({ client: "pg" })
+    let query = builder("peer_review_collection")
+      .where("peer_review_collection.quiz_id", quizId)
+      .select("id")
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    let data = await queryRunner.stream(query.toString())
+    await queryRunner.release()
+
+    return data
+  }
+
+  public async getPlainQuizPeerReviewQuestions(quizId: string) {
+    const builder = knex({ client: "pg" })
+
+    let query = builder("peer_review_question")
+      .where("peer_review_question.quiz_id", quizId)
+      .select(
+        "peer_review_question.id",
+        "peer_review_question.peer_review_collection_id",
+        "peer_review_question.default",
+        "type",
+        "answer_required",
+      )
+      .innerJoin(
+        "peer_review_question_translation",
+        "peer_review_question_translation.peer_review_question_id",
+        "peer_review_question.id",
+      )
+      .select("language_id", "title", "body")
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    let data = await queryRunner.stream(query.toString())
+    await queryRunner.release()
+
+    return data
+  }
+
+  public async getCSVData(quizId: string) {
+    const builder = knex({ client: "pg" })
+
+    const quiz = (await this.getQuizzes({
+      id: quizId,
+      peerreviews: true,
+      options: true,
+      items: true,
+    }))[0]
+
+    if (!quiz) {
+      return
+    }
+
+    let query = builder("quiz")
+      .where("quiz.id", quizId)
+      .innerJoin("quiz_translation", "quiz_translation.quiz_id", "quiz.id")
+      .select(
+        "quiz.course_id",
+        "quiz.id",
+        { quiz_title: "quiz_translation.title" },
+        "quiz.part",
+        "quiz.section",
+        "quiz.points",
+        "quiz.deadline",
+        "quiz.open",
+        "quiz.excluded_from_score",
+        "quiz.auto_confirm",
+      )
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    let data: any[] = await queryRunner.query(query.toString())
+    await queryRunner.release()
+
+    let info = data[0]
+
+    const newInfo = { ...info }
+
+    quiz.items.forEach((item, idx) => {
+      newInfo[`item_${idx}_id`] = item.id
+      newInfo[`item_${idx}_type`] = item.type
+      if (item.type === "open") {
+        newInfo[`item_${idx}_validity_regex`] = item.validityRegex
+        newInfo[`item_${idx}_format_regex`] = item.formatRegex
+      } else if (item.type === "scale") {
+        newInfo[`item_${idx}_min_value`] = item.minValue
+        newInfo[`item_${idx}_max_value`] = item.maxValue
+      } else if (item.type === "essay") {
+        newInfo[`item_${idx}_min_words`] = item.minWords
+        newInfo[`item_${idx}_max_words`] = item.maxWords
+      }
+      newInfo[`item_${idx}_title`] = item.texts[0].title
+      newInfo[`item_${idx}_body`] = item.texts[0].body
+
+      if (
+        item.type === "multiple-choice" ||
+        item.type === "checkbox" ||
+        item.type === "research-agreement"
+      ) {
+        item.options.forEach((opt, i) => {
+          newInfo[`item_${idx}_opt_${i}_id`] = opt.id
+          newInfo[`item_${idx}_opt_${i}_correct`] = opt.correct
+          newInfo[`item_${idx}_opt_${i}_title`] = opt.texts[0].title
+          newInfo[`item_${idx}_opt_${i}_body`] = opt.texts[0].body
+        })
+      }
+    })
+
+    data[0] = { ...data[0], ...newInfo }
+
+    if (quiz.peerReviewCollections.length > 0) {
+      quiz.peerReviewCollections
+      data = data.map(d => {
+        const newD = { ...d }
+        for (let i = 0; i < quiz.peerReviewCollections.length; i++) {
+          newD[`peer_review_collection_${i}_id`] =
+            quiz.peerReviewCollections[i].id
+          const peerReviewQuestions = quiz.peerReviewCollections[i].questions
+
+          peerReviewQuestions.forEach((question, idx) => {
+            newD[`prc_${i}_question_${idx}_id`] = question.id
+            newD[`prc_${i}_question_${idx}_default`] = question.default
+            newD[`prc_${i}_question_${idx}_type`] = question.type
+            newD[`prc_${i}_question_${idx}_answer_required`] =
+              question.answerRequired
+            newD[`prc_${i}_question_${idx}_title`] = question.texts[0].title
+            newD[`prc_${i}_question_${idx}_body`] = question.texts[0].body
+          })
+        }
+        return newD
+      })
+    }
+
+    return data
+  }
 
   public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
     const queryBuilder = this.entityManager.createQueryBuilder(Quiz, "quiz")
@@ -35,7 +254,7 @@ export default class QuizService {
       queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
     }
     if (!stripped) {
-      queryBuilder.addSelect("quiz_translation.submitMessage")
+      queryBuilder.addSelect("quiz_translation.submit_message")
     }
 
     if (query.course) {

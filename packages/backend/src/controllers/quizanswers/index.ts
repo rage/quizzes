@@ -1,3 +1,5 @@
+import { Response } from "express"
+import JSONStream from "JSONStream"
 import {
   BadRequestError,
   Body,
@@ -7,9 +9,12 @@ import {
   Param,
   Post,
   QueryParam,
+  Req,
+  Res,
   UnauthorizedError,
 } from "routing-controllers"
 import KafkaService from "services/kafka.service"
+import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
 import UserCoursePartStateService from "services/usercoursepartstate.service"
@@ -88,8 +93,72 @@ export class QuizAnswerController {
     return await this.quizAnswerService.getAnswersCount(criteriaQuery)
   }
 
-  @Get("/")
-  public async getEveryonesAnswers(
+  @Get("/data/:quizId/plainAnswers")
+  public async getPlainAnswers(
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+    @Param("quizId") quizId: string,
+  ): Promise<any> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const answersResult = await this.quizAnswerService.getPlainAnswers(quizId)
+    const answersStringStream = answersResult.pipe(JSONStream.stringify())
+
+    return answersStringStream
+  }
+
+  @Get("/data/:quizId/plainItemAnswers")
+  public async getPlainItemAnswers(
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+    @Param("quizId") quizId: string,
+  ): Promise<any> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const answersResult = await this.quizAnswerService.getPlainItemAnswers(
+      quizId,
+    )
+    const answersStringStream = answersResult.pipe(JSONStream.stringify())
+
+    return answersStringStream
+  }
+
+  @Get("/data/:quizId/plainOptionAnswers")
+  public async getPlainOptionAnswers(
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+    @Param("quizId") quizId: string,
+  ): Promise<any> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const answersResult = await this.quizAnswerService.getPlainOptionAnswers(
+      quizId,
+    )
+
+    const answersStringStream = answersResult.pipe(JSONStream.stringify())
+    return answersStringStream
+  }
+
+  @Get("/data/:quizId")
+  public async getExtensiveData(
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+    @Param("quizId") quizId: string,
+  ): Promise<any> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const answersResult = await this.quizAnswerService.getCSVData(quizId)
+    const answersStringStream = answersResult.pipe(JSONStream.stringify())
+
+    return answersStringStream
+  }
+
+  @Get("/answers")
+  public async getAnswers(
     @QueryParam("attention") attention: boolean,
     @QueryParam("quizId") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
@@ -98,6 +167,7 @@ export class QuizAnswerController {
   ): Promise<QuizAnswer[]> {
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
+      return
     }
 
     let result: QuizAnswer[]
@@ -123,6 +193,7 @@ export class QuizAnswerController {
 
     result = await this.quizAnswerService.getAnswers(attentionCriteriaQuery)
     return result
+    console.log("nothing after!")
   }
 
   @Post("/:answerId")
@@ -211,6 +282,10 @@ export class QuizAnswerController {
     const userId = user.id
 
     answer.userId = userId
+    if (!answer.quizId || !answer.languageId) {
+      throw new BadRequestError("Answer must contain some data")
+    }
+    answer.userId = user.id
     // creates new user if necessary
     answer.user = new User()
     answer.user.id = answer.userId

@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
       - name: quizzes-backend
-        image: gcr.io/moocfi/quizzes-backend:build-1560346595-ae70c9d7e112e5e3b8a9ea65a3f7339ab2f008f7
+        image: ${BACKEND_IMAGE}
         imagePullPolicy: Always
         ports:
         - name: backend-http
@@ -51,7 +51,7 @@ spec:
                 key: POSTGRES_USERNAME
       initContainers:
       - name: quizzes-backend-run-migrations
-        image: gcr.io/moocfi/quizzes-backend:build-1560346595-ae70c9d7e112e5e3b8a9ea65a3f7339ab2f008f7
+        image: ${BACKEND_IMAGE}
         command: ['sh', '-c', 'cd /app && yarn typeorm migration:run']
         env:
           - name: DB_NAME

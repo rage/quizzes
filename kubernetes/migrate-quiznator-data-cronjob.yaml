@@ -12,7 +12,7 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: migrate-quiznator-data
-              image: gcr.io/moocfi/quizzes-backend:build-1560355061-dcf5980e621072eab8aeb7fff4f3e3af42995950
+              image: ${BACKEND_IMAGE}
               command: ["sh", "-c", "cd /app && yarn db-migrate"]
               resources:
                 requests:
@@ -54,7 +54,7 @@ spec:
                       key: TMC_TOKEN
           initContainers:
           - name: quizzes-backend-run-migrations
-            image: gcr.io/moocfi/quizzes-backend:build-1560355061-dcf5980e621072eab8aeb7fff4f3e3af42995950
+            image: ${BACKEND_IMAGE}
             command: ['sh', '-c', 'cd /app && yarn typeorm migration:run']
             env:
               - name: DB_NAME
