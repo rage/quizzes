@@ -108,15 +108,15 @@ export class QuizController {
         const translations = await queryRunner.query(query.toString())
         await queryRunner.release()
 
-        translations.forEach((tr: any) => {
-          if (tr.failure_message || tr.success_message) {
-            const quizItem = quizzes[0].items.find(
-              i => i.id === tr.quiz_item_id,
+        quizzes[0].items
+          .filter(qi => qi.type === "scale")
+          .forEach(qi => {
+            const translation = translations.find(
+              (t: any) => t.quiz_item_id === qi.id,
             )
-            quizItem.texts[0].failureMessage = tr.failure_message
-            quizItem.texts[0].successMessage = tr.success_message
-          }
-        })
+            qi.texts[0].failureMessage = translation.failure_message
+            qi.texts[0].successMessage = translation.success_message
+          })
       }
 
       return {
