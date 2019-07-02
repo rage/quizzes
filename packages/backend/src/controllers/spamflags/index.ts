@@ -45,10 +45,10 @@ export class SpamFlagController {
       },
       this.entityManager,
     )
-    const quiz: Quiz[] = await this.quizService.getQuizzes({
+    const quiz: Quiz = (await this.quizService.getQuizzes({
       id: quizAnswer.quizId,
       course: true,
-    })
+    }))[0]
     const userquizstate = await this.userQuizStateService.getUserQuizState(
       quizAnswer.userId,
       quizAnswer.quizId,
@@ -57,8 +57,7 @@ export class SpamFlagController {
     let response
     await this.entityManager.transaction(async manager => {
       const validated = await this.validationService.validateEssayAnswer(
-        manager,
-        quiz[0],
+        quiz,
         quizAnswer,
         userquizstate,
       )

@@ -7,10 +7,11 @@ import {
   Post,
   UnauthorizedError,
 } from "routing-controllers"
+import KafkaService from "services/kafka.service"
 import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
-import UserCourseStateService from "services/usercoursestate.service"
+import UserCoursePartStateService from "services/usercoursepartstate.service"
 import UserQuizStateService from "services/userquizstate.service"
 import ValidationService from "services/validation.service"
 import { Inject } from "typedi"
@@ -18,7 +19,7 @@ import { EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { API_PATH } from "../../config"
-import { PeerReview, QuizAnswer, UserQuizState } from "../../models"
+import { PeerReview, Quiz, QuizAnswer, UserQuizState } from "../../models"
 import { ITMCProfileDetails } from "../../types"
 
 @JsonController(`${API_PATH}/quizzes/peerreview`)
@@ -42,7 +43,10 @@ export class PeerReviewController {
   private validationService: ValidationService
 
   @Inject()
-  private userCourseStateService: UserCourseStateService
+  private userCoursePartStateService: UserCoursePartStateService
+
+  @Inject()
+  private kafkaService: KafkaService
 
   @Get("/received/:answerId")
   public async getGivenReviews(
@@ -150,27 +154,15 @@ export class PeerReviewController {
       {
         userId: peerReview.userId,
         quizId: receivingQuizAnswer.quizId,
-        status: "submitted",
+        statuses: ["confirmed", "submitted"],
       },
       this.entityManager,
     )
 
-    const receivingUserQuizState: UserQuizState = await this.userQuizStateService.getUserQuizState(
-      receivingQuizAnswer.userId,
-      receivingQuizAnswer.quizId,
-    )
-    const givingUserQuizState: UserQuizState = await this.userQuizStateService.getUserQuizState(
-      peerReview.userId,
-      receivingQuizAnswer.quizId,
-    )
-
-    const quiz = await this.QuizService.getQuizzes({
+    const quiz: Quiz = (await this.QuizService.getQuizzes({
       id: receivingQuizAnswer.quizId,
       course: true,
-    })
-
-    receivingUserQuizState.peerReviewsReceived += 1
-    givingUserQuizState.peerReviewsGiven += 1
+    }))[0]
 
     let responsePeerReview: PeerReview
     let responseUserQuizState: UserQuizState
@@ -180,18 +172,32 @@ export class PeerReviewController {
         manager,
         peerReview,
       )
-      const receivingValidated = await this.validationService.validateEssayAnswer(
+
+      responseUserQuizState = await this.peerReviewService.processPeerReview(
         manager,
-        quiz[0],
+        quiz,
+        givingQuizAnswer,
+        true,
+      )
+      await this.peerReviewService.processPeerReview(
+        manager,
+        quiz,
+        receivingQuizAnswer,
+      )
+
+      /*const receivingValidated = await this.validationService.validateEssayAnswer(
+        manager,
+        quiz,
         receivingQuizAnswer,
         receivingUserQuizState,
       )
       const givingValidated = await this.validationService.validateEssayAnswer(
         manager,
-        quiz[0],
+        quiz,
         givingQuizAnswer,
         givingUserQuizState,
       )
+
       const receivingAnswerUpdated: QuizAnswer = await this.quizAnswerService.createQuizAnswer(
         manager,
         receivingValidated.quizAnswer,
@@ -200,6 +206,7 @@ export class PeerReviewController {
         manager,
         givingValidated.quizAnswer,
       )
+
       await this.userQuizStateService.createUserQuizState(
         manager,
         receivingValidated.userQuizState,
@@ -208,29 +215,49 @@ export class PeerReviewController {
         manager,
         givingValidated.userQuizState,
       )
+
       if (
-        !quiz[0].excludedFromScore &&
+        !quiz.excludedFromScore &&
         receivingValidated.quizAnswer.status === "confirmed"
       ) {
-        await this.userCourseStateService.updateUserCourseState(
+        const userId = receivingValidated.quizAnswer.userId
+        await this.userCoursePartStateService.updateUserCoursePartState(manager, quiz, userId)
+        this.kafkaService.publishUserProgressUpdated(
           manager,
-          quiz[0],
+          userId,
+          quiz.courseId
+        )
+        this.kafkaService.publishQuizAnswerUpdated(
+          receivingValidated.quizAnswer,
           receivingValidated.userQuizState,
-          receivingAnswerUpdated,
+          quiz
         )
       }
+
       if (
-        !quiz[0].excludedFromScore &&
+        !quiz.excludedFromScore &&
         givingValidated.quizAnswer.status === "confirmed"
       ) {
-        await this.userCourseStateService.updateUserCourseState(
+        const userId = givingValidated.quizAnswer.userId
+        await this.userCoursePartStateService.updateUserCoursePartState(manager, quiz, userId)
+        this.kafkaService.publishUserProgressUpdated(
           manager,
-          quiz[0],
-          givingValidated.userQuizState,
-          givingAnswerUpdated,
+          userId,
+          quiz.courseId
         )
-      }
+        this.kafkaService.publishUserProgressUpdated(
+          manager,
+          givingValidated.quizAnswer.userId,
+          quiz.courseId
+        )
+        this.kafkaService.publishQuizAnswerUpdated(
+          givingValidated.quizAnswer,
+          givingValidated.userQuizState,
+          quiz
+        )
+      }*/
     })
+
     return {
       peerReview: responsePeerReview,
       userQuizState: responseUserQuizState,

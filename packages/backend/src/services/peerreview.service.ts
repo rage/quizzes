@@ -1,6 +1,6 @@
 import knex from "knex"
 import _ from "lodash"
-import { Service } from "typedi"
+import { Service, Inject } from "typedi"
 import { Brackets, EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import {
@@ -14,11 +14,97 @@ import {
   UserQuizState,
 } from "../models"
 import { randomUUID } from "../util"
+import KafkaService from "./kafka.service"
+import QuizAnswerService from "./quizanswer.service"
+import UserCoursePartStateService from "./usercoursepartstate.service"
+import UserQuizStateService from "./userquizstate.service"
+import ValidationService from "./validation.service"
 
 @Service()
 export default class PeerReviewService {
   @InjectManager()
   private entityManager: EntityManager
+
+  @Inject()
+  private quizAnswerService: QuizAnswerService
+
+  @Inject()
+  private userQuizStateService: UserQuizStateService
+
+  @Inject()
+  private validationService: ValidationService
+
+  @Inject()
+  private userCoursePartStateService: UserCoursePartStateService
+
+  @Inject()
+  private kafkaService: KafkaService
+
+  public async processPeerReview(
+    manager: EntityManager,
+    quiz: Quiz,
+    quizAnswer: QuizAnswer,
+    giving?: boolean,
+  ) {
+    const userId = quizAnswer.userId
+
+    const userQuizState = await this.userQuizStateService.getUserQuizState(
+      userId,
+      quizAnswer.quizId,
+      manager,
+    )
+
+    if (giving) {
+      userQuizState.peerReviewsGiven += 1
+    } else {
+      userQuizState.peerReviewsReceived += 1
+    }
+
+    const originalPoints = userQuizState.pointsAwarded
+
+    const peerReviews = await this.getPeerReviews(manager, quizAnswer.id)
+
+    const {
+      quizAnswer: validatedAnswer,
+      userQuizState: validatedState,
+    } = await this.validationService.validateEssayAnswer(
+      quiz,
+      quizAnswer,
+      userQuizState,
+      peerReviews,
+    )
+
+    const updatedAnswer: QuizAnswer = await this.quizAnswerService.createQuizAnswer(
+      manager,
+      validatedAnswer,
+    )
+    const updatedState = await this.userQuizStateService.createUserQuizState(
+      manager,
+      validatedState,
+    )
+
+    if (updatedState.pointsAwarded > originalPoints) {
+      if (!quiz.excludedFromScore) {
+        await this.userCoursePartStateService.updateUserCoursePartState(
+          manager,
+          quiz,
+          userId,
+        )
+        this.kafkaService.publishUserProgressUpdated(
+          manager,
+          userId,
+          quiz.courseId,
+        )
+      }
+      this.kafkaService.publishQuizAnswerUpdated(
+        updatedAnswer,
+        updatedState,
+        quiz,
+      )
+    }
+
+    return updatedState
+  }
 
   public async createPeerReview(
     manager: EntityManager,
