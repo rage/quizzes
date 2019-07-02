@@ -9,7 +9,6 @@ import PeerReviewsGuidance from "./PeerReviewsGuidance"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
 import Togglable from "../../utils/Togglable"
 import { useTypedSelector } from "../../state/store"
-import { PeerReviewLabels } from "../../utils/language_labels"
 
 const BoldTypography = styled(Typography)`
   font-weight: bold;
@@ -36,7 +35,7 @@ const PeerReviews: React.FunctionComponent = () => {
   if (peerReviewQuestions.length === 0) {
     return (
       <Typography variant="subtitle1">
-        Tähän tehtävään ei liity vertaisarvioita
+        {languageInfo.quizInvolvesNoPeerReviewsInstruction}
       </Typography>
     )
   }

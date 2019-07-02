@@ -1,11 +1,10 @@
 import * as React from "react"
 import styled from "styled-components"
-import { Card, TextField, Typography, Paper } from "@material-ui/core"
+import { TextField, Typography, Paper } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
 import { QuizItem } from "../state/quiz/reducer"
 import { SpaciousTypography } from "./styleComponents"
 import { SpaciousPaper } from "./styleComponents"
-import { OpenLabels } from "../utils/language_labels"
 
 type OpenProps = {
   correct: boolean

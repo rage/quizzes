@@ -1,12 +1,11 @@
 import * as React from "react"
-import { Paper, TextField } from "@material-ui/core"
+import { TextField } from "@material-ui/core"
 import Typography from "@material-ui/core/Typography"
 import { wordCount } from "../../utils/string_tools"
 import { executeIfTextFieldBetweenNumOfWords as executeIfWordNumberCorrect } from "../../utils/event_filters"
 import { useTypedSelector } from "../../state/store"
 import { QuizItem } from "../../state/quiz/reducer"
 import { SpaciousPaper, SpaciousTypography } from "../styleComponents"
-import { EssayLabels } from "../../utils/language_labels"
 
 type EssayProps = {
   textData: string
@@ -45,7 +44,7 @@ const Essay: React.FunctionComponent<EssayProps> = ({
       )}
       <TextField
         variant="outlined"
-        label="Vastauksesi"
+        label={languageInfo.textFieldLabel}
         value={textData}
         onChange={executeIfWordNumberCorrect(
           handleTextDataChange,
@@ -58,7 +57,7 @@ const Essay: React.FunctionComponent<EssayProps> = ({
         margin="normal"
       />
       <div>
-        Sanoja: {wordCount(textData)}
+        {languageInfo.currentNumberOfWordsLabel}: {wordCount(textData)}
         {item.maxWords && <> / {item.maxWords}</>}
       </div>
     </>

@@ -74,6 +74,10 @@ const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
 }) => {
   const quiz = useTypedSelector(state => state.quiz)
   const answer = useTypedSelector(state => state.quizAnswer)
+  const languageInfo = useTypedSelector(
+    state => state.language.languageLabels.multipleChoice,
+  )
+
   const answered = answer.id ? true : false
   const itemTitle = item.texts[0].title
   const itemBody = item.texts[0].body
@@ -120,7 +124,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
         )}
         {multi && !answered ? (
           <Typography variant="subtitle1">
-            Valitse kaikki sopivat vaihtoehdot
+            {languageInfo.chooseAllSuitableOptionsLabel}
           </Typography>
         ) : (
           ""

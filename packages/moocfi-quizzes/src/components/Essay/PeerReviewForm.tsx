@@ -5,7 +5,7 @@ import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
 import PeerReviewOption from "./PeerReviewOption"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
 import { Dispatch, useTypedSelector } from "../../state/store"
-import { PeerReviewLabels } from "../../utils/language_labels"
+import { PeerReviewLabels } from "../../utils/languages"
 
 type PeerReviewFormProps = {
   languageInfo: PeerReviewLabels
@@ -53,7 +53,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
   return (
     <>
       <Typography variant="subtitle1">
-        Valitse yksi vaihtoehdoista vertaisarvoitavaksi
+        {languageInfo.chooseEssayInstruction}
       </Typography>
       {!currentAnswersToReview ? (
         <Grid container>
@@ -108,7 +108,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
                 <Grid item xs={8} />
                 <Grid item xs={1}>
                   <Button onClick={selectAnswer(answer.id)}>
-                    {languageInfo.choosePeerEssayLabel}
+                    {languageInfo.chooseButtonLabel}
                   </Button>
                 </Grid>
               </Grid>

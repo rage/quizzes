@@ -93,6 +93,7 @@ export class QuizController {
         ...params,
       })
 
+      // in scale items, failure/success messages currently used for min/max labels!
       if (quizzes[0].items.some(i => i.type === "scale")) {
         const builder = knex({ client: "pg" })
 

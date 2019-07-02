@@ -2,17 +2,20 @@ import * as React from "react"
 import { Stepper, StepLabel, Step } from "@material-ui/core"
 import { useTypedSelector } from "../../state/store"
 
-const steps = [
-  "Tehtävään vastaaminen",
-  "Vertaisarvioden antaminen",
-  "Vertaisarvioden vastaanottaminen",
-  "Tehtävän arvostelu",
-]
-
 const StageVisualizer = () => {
   const quizAnswer = useTypedSelector(state => state.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const quiz = useTypedSelector(state => state.quiz)
+  const languageInfo = useTypedSelector(
+    state => state.language.languageLabels.stage,
+  )
+
+  const steps = [
+    languageInfo.answerStageLabel,
+    languageInfo.givingPeerReviewsStageLabel,
+    languageInfo.receivingPeerReviewsStageLabel,
+    languageInfo.evaluationStageLabel,
+  ]
 
   const answered = quizAnswer.id ? true : false
   const peerReviewsGiven = userQuizState ? userQuizState.peerReviewsGiven : 0

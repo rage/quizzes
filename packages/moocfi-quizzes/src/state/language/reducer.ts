@@ -1,9 +1,6 @@
 import { ActionType, getType } from "typesafe-actions"
 import * as language from "./actions"
-import {
-  languageOptions,
-  SingleLanguageLabels,
-} from "../../utils/language_labels"
+import { languageOptions, SingleLanguageLabels } from "../../utils/languages"
 
 export type LanguageState = {
   languageId: string

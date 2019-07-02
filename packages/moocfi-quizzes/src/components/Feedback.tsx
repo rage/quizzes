@@ -6,7 +6,7 @@ import { QuizItem } from "../state/quiz/reducer"
 type FeedbackProps = {
   item: QuizItem
   textData: string
-  handleTextDataChange: (a0: React.FormEvent) => void
+  handleTextDataChange: (e: React.FormEvent) => void
 }
 
 const Feedback: React.FunctionComponent<FeedbackProps> = ({

@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
-import { Button, Typography } from "@material-ui/core"
+import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { initialize } from "../state/actions"
 import Checkbox from "./CheckboxOption"
@@ -29,7 +29,7 @@ export type ComponentName =
   | "feedback"
   | "custom-frontend-accept-data"
 
-const componentType = (typeName: ComponentName) => {
+const componentsByTypeNames = (typeName: ComponentName) => {
   const mapTypeToComponent = {
     essay: Essay,
     "multiple-choice": MultipleChoice,
@@ -60,9 +60,14 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
   const error = useTypedSelector(state => state.message)
   const quizAnswer = useTypedSelector(state => state.quizAnswer)
   const quiz = useTypedSelector(state => state.quiz)
-  const languageLabels = useTypedSelector(
-    state => state.language.languageLabels,
-  )
+  const languageState = useTypedSelector(state => state.language)
+
+  let languageInfo
+
+  if (languageState.languageLabels) {
+    languageInfo = languageState.languageLabels.general
+  }
+
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -152,7 +157,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
             if (!itemAnswer) {
               return []
             }
-            const ItemComponent = componentType(item.type)
+            const ItemComponent = componentsByTypeNames(item.type)
 
             return (
               <ItemComponent
@@ -174,24 +179,40 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
   }
 
   if (!accessToken) {
-    return <div>Kirjaudu sisään vastataksesi tehtävään</div>
+    return <div>{languageInfo.loginPromptLabel}</div>
   }
 
   if (error) {
     return (
       <div>
-        Error
+        {
+          // languageInfo.errorLabel
+        }
         <pre>{error}</pre>
       </div>
     )
   }
 
   if (!quizAnswer || !quiz) {
-    return <div>Loading...</div>
+    return (
+      <Grid container={true} justify="center">
+        <Grid item={true}>
+          <CircularProgress disableShrink={true} />
+        </Grid>
+      </Grid>
+    )
   }
 
+  // should not be a separate case!
+  // and also never occur, unless the requested language does not
+  // match the language of the quiz...
   if (quiz.texts.length === 0) {
-    return <div>Error: quiz has no texts.</div>
+    return (
+      <div>
+        Error: quiz has no texts. (Likely the quiz does not match the requested
+        language id)
+      </div>
+    )
   }
 
   const types = quiz.items.map(item => item.type)
@@ -219,15 +240,16 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
               {hasCorrectAnswer(quiz)
                 ? atLeastOneCorrect(quizAnswer.itemAnswers)
                   ? quiz.items.length === 1
-                    ? "Tehtävä oikein"
-                    : `Sait ${
+                    ? languageInfo.answerCorrectLabel
+                    : languageInfo.kOutOfNCorrect(
                         quizAnswer.itemAnswers.filter(ia => ia.correct === true)
-                          .length
-                      }/${quiz.items.length} oikein`
+                          .length,
+                        quiz.items.length,
+                      )
                   : types.includes("essay") || types.includes("scale")
                   ? ""
-                  : "Tehtävä väärin"
-                : "Olet jo vastannut"}
+                  : languageInfo.answerIncorrectLabel
+                : languageInfo.alreadyAnsweredLabel}
             </Typography>
           </>
         ) : (
@@ -238,7 +260,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
               disabled={submitLocked ? true : submitDisabled()}
               onClick={handleSubmit}
             >
-              Vastaa
+              {languageInfo.submitButtonLabel}
             </Button>
           </div>
         )}

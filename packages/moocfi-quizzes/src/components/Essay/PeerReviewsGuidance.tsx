@@ -1,5 +1,4 @@
 import * as React from "react"
-import Typography from "@material-ui/core/Typography"
 import { useTypedSelector } from "../../state/store"
 import { SpaciousTypography } from "../styleComponents"
 
@@ -15,7 +14,7 @@ const PeerReviewsGuidance: React.FunctionComponent<
   const quiz = useTypedSelector(state => state.quiz)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const given = userQuizState ? userQuizState.peerReviewsGiven : 0
-  const required = quiz.course.minPeerReviewsGiven
+  const required = quiz.course.minPeerReviewsGiven || 0
 
   return (
     <div>
