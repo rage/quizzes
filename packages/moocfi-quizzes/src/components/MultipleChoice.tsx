@@ -144,72 +144,74 @@ const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
         singleItem={singleItem}
         optionContainerWidth={optionContainerWidth}
       >
-        {options.map(option => {
-          const selected = optionAnswers.find(
-            oa => oa.quizOptionId === option.id,
-          )
-          const text = option.texts[0]
-          const feedbackMessage = option.correct
-            ? selected
-              ? text.successMessage
-              : text.failureMessage
-            : selected
-            ? text.failureMessage
-            : text.successMessage
-          const feedbackColor = option.correct
-            ? selected
-              ? "green"
+        {options
+          .sort((o1, o2) => o2.order - o1.order)
+          .map(option => {
+            const selected = optionAnswers.find(
+              oa => oa.quizOptionId === option.id,
+            )
+            const text = option.texts[0]
+            const feedbackMessage = option.correct
+              ? selected
+                ? text.successMessage
+                : text.failureMessage
+              : selected
+              ? text.failureMessage
+              : text.successMessage
+            const feedbackColor = option.correct
+              ? selected
+                ? "green"
+                : "white"
+              : selected
+              ? "red"
               : "white"
-            : selected
-            ? "red"
-            : "white"
-          return answered ? (
-            singleItem ? (
-              <Grid item={true}>
-                <Grid container direction={direction} key={option.id}>
-                  <Grid item sm={optionWidth}>
-                    <RevealedChoiceButton
-                      selected={selected}
-                      correct={option.correct}
-                      fullWidth
-                    >
-                      {text.title}
-                    </RevealedChoiceButton>
-                  </Grid>
-                  <Grid item>
-                    <LeftBorderedTypography
-                      variant="body1"
-                      barColor={feedbackColor}
-                    >
-                      {feedbackMessage}
-                    </LeftBorderedTypography>
+            return answered ? (
+              singleItem ? (
+                <Grid item={true}>
+                  <Grid container direction={direction} key={option.id}>
+                    <Grid item sm={optionWidth}>
+                      <RevealedChoiceButton
+                        selected={selected}
+                        correct={option.correct}
+                        fullWidth
+                      >
+                        {text.title}
+                      </RevealedChoiceButton>
+                    </Grid>
+                    <Grid item>
+                      <LeftBorderedTypography
+                        variant="body1"
+                        barColor={feedbackColor}
+                      >
+                        {feedbackMessage}
+                      </LeftBorderedTypography>
+                    </Grid>
                   </Grid>
                 </Grid>
-              </Grid>
+              ) : (
+                <Grid item key={option.id}>
+                  <RevealedChoiceButton
+                    selected={selected}
+                    correct={option.correct}
+                    fullWidth
+                  >
+                    {text.title}
+                  </RevealedChoiceButton>
+                </Grid>
+              )
             ) : (
-              <Grid item key={option.id}>
-                <RevealedChoiceButton
-                  selected={selected}
-                  correct={option.correct}
+              <Grid item sm={optionWidth} key={option.id}>
+                <ChoiceButton
+                  variant="outlined"
                   fullWidth
+                  color={selected ? "primary" : "default"}
+                  onClick={handleOptionChange(option.id)}
                 >
                   {text.title}
-                </RevealedChoiceButton>
+                </ChoiceButton>
               </Grid>
             )
-          ) : (
-            <Grid item sm={optionWidth} key={option.id}>
-              <ChoiceButton
-                variant="outlined"
-                fullWidth
-                color={selected ? "primary" : "default"}
-                onClick={handleOptionChange(option.id)}
-              >
-                {text.title}
-              </ChoiceButton>
-            </Grid>
-          )
-        })}
+          })}
       </ChoicesContainer>
     </BottomMarginedGrid>
   )
