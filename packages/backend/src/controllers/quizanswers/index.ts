@@ -62,7 +62,7 @@ export class QuizAnswerController {
   private validationService: ValidationService
 
   @Inject()
-  private KafkaService: KafkaService
+  private kafkaService: KafkaService
 
   @Get("/counts")
   public async getAnswerCounts(
@@ -239,12 +239,7 @@ export class QuizAnswerController {
         response,
         quizAnswer,
         userQuizState,
-      } = await this.validationService.validateQuizAnswer(
-        manager,
-        answer,
-        quiz,
-        userQState,
-      )
+      } = this.validationService.validateQuizAnswer(answer, quiz, userQState)
 
       const erroneousItemAnswers = response.itemAnswerStatus.filter(status => {
         return status.error ? true : false
@@ -278,32 +273,27 @@ export class QuizAnswerController {
         userQuizState,
       )
 
-      if (originalPoints < savedUserQuizState.pointsAwarded) {
+      if (
+        !quiz.excludedFromScore &&
+        originalPoints < savedUserQuizState.pointsAwarded
+      ) {
         await this.userCoursePartStateService.updateUserCoursePartState(
           manager,
           quiz,
           userQuizState.userId,
         )
 
-        const courseId = quiz.courseId
-
-        const progress: PointsByGroup[] = await this.userCoursePartStateService.getProgress(
+        this.kafkaService.publishUserProgressUpdated(
           manager,
           userId,
-          courseId,
+          quiz.courseId,
         )
-
-        this.KafkaService.sendMessage(userId, courseId, progress)
-      }
-
-      /*if (!quiz[0].excludedFromScore && savedAnswer.status === "confirmed") {
-        await this.userCourseStateService.updateUserCourseState(
-          manager,
-          quiz[0],
-          savedUserQuizState,
+        this.kafkaService.publishQuizAnswerUpdated(
           savedAnswer,
+          savedUserQuizState,
+          quiz,
         )
-      }*/
+      }
     })
 
     return {

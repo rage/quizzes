@@ -26,6 +26,7 @@ import {
 import { IQuizQuery, ITMCProfileDetails } from "../../types"
 
 import _ from "lodash"
+import KafkaService from "services/kafka.service"
 
 @JsonController(`${API_PATH}/quizzes`)
 export class QuizController {
@@ -40,6 +41,9 @@ export class QuizController {
 
   @Inject()
   private userQuizStateService: UserQuizStateService
+
+  @Inject()
+  private kafkaService: KafkaService
 
   @Get("/")
   public async getAll(@QueryParams() params: string[]): Promise<Quiz[]> {
@@ -97,7 +101,9 @@ export class QuizController {
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
     }
-    return await this.quizService.createQuiz(quiz)
+    const upsertedQuiz = await this.quizService.createQuiz(quiz)
+    this.kafkaService.publishCourseQuizzesUpdated(quiz.courseId)
+    return upsertedQuiz
   }
 
   private async getQuizzes(id: string | null, params: any): Promise<Quiz[]> {

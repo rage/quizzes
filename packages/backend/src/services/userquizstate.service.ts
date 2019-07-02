@@ -25,8 +25,11 @@ export default class UserQuizStateService {
   public async getUserQuizState(
     userId: number,
     quizId: string,
+    manager?: EntityManager,
   ): Promise<UserQuizState | undefined> {
-    return await this.entityManager
+    const entityManager = manager || this.entityManager
+
+    return await entityManager
       .createQueryBuilder(UserQuizState, "userQuizState")
       .where("user_id = :userId and quiz_id = :quizId", { userId, quizId })
       .getOne()

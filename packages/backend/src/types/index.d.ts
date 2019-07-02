@@ -189,12 +189,13 @@ export type QuizAnswerStatus =
   | "rejected"
   | "deprecated"
 
-export interface Message {
+export interface ProgressMessage {
   timestamp: string
   user_id: number
   course_id: string
   service_id: string
   progress: PointsByGroup[]
+  message_format_version: Number
 }
 
 export interface PointsByGroup {
@@ -202,4 +203,33 @@ export interface PointsByGroup {
   max_points: number
   n_points: number
   progress: number
+}
+
+export interface QuizAnswerMessage {
+  timestamp: string
+  exercise_id: string
+  n_points: number
+  completed: boolean
+  user_id: number
+  course_id: string
+  service_id: string
+  required_actions: string | null
+  message_format_version: number
+}
+
+export interface QuizMessage {
+  timestamp: string
+  course_id: string
+  service_id: string
+  data: ExerciseData[]
+  message_format_version: number
+}
+
+export interface ExerciseData {
+  name: string
+  id: string
+  part: number
+  section: number
+  max_points: number
+  deleted: boolean
 }

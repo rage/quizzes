@@ -17,11 +17,7 @@ import PeerReviewService from "./peerreview.service"
 
 @Service()
 export default class ValidationService {
-  @Inject()
-  private peerReviewService: PeerReviewService
-
   public validateQuizAnswer(
-    manager: EntityManager,
     quizAnswer: QuizAnswer,
     quiz: Quiz,
     userQuizState: UserQuizState,
@@ -209,10 +205,10 @@ export default class ValidationService {
   }
 
   public async validateEssayAnswer(
-    manager: EntityManager,
     quiz: Quiz,
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
+    peerReviews: PeerReview[] = [],
   ) {
     const course: Course = quiz.course
     const given: number = userQuizState.peerReviewsGiven
@@ -229,10 +225,6 @@ export default class ValidationService {
       given >= course.minPeerReviewsGiven &&
       received >= course.minPeerReviewsReceived
     ) {
-      const peerReviews = await this.peerReviewService.getPeerReviews(
-        manager,
-        quizAnswer.id,
-      )
       const answers: number[] = [].concat(
         ...peerReviews.map(pr => pr.answers.map(a => a.value)),
       )

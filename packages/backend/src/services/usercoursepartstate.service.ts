@@ -21,13 +21,7 @@ export default class UserCoursePartStateService {
   private entityManager: EntityManager
 
   @Inject()
-  private courseService: CourseService
-
-  @Inject()
   private quizService: QuizService
-
-  @Inject()
-  private quizAnswerService: QuizAnswerService
 
   @Inject()
   private userQuizStateService: UserQuizStateService
@@ -56,6 +50,7 @@ export default class UserCoursePartStateService {
       .createQueryBuilder(UserCoursePartState, "user_course_part_state")
       .where("user_course_part_state.user_id = :userId", { userId })
       .andWhere("user_course_part_state.course_id = :courseId", { courseId })
+      .orderBy("course_part")
       .getMany()
 
     return userCoursePartStates
@@ -112,7 +107,10 @@ export default class UserCoursePartStateService {
     courseId: string,
     userId: number,
   ): Promise<UserCoursePartState[]> {
-    const quizzes: Quiz[] = await this.quizService.getQuizzes({ courseId })
+    const quizzes: Quiz[] = await this.quizService.getQuizzes({
+      courseId,
+      exclude: true,
+    })
     const parts = new Set()
 
     quizzes.map(quiz => parts.add(quiz.part))
@@ -159,7 +157,9 @@ export default class UserCoursePartStateService {
       .filter(ucps => ucps.coursePart !== 0)
       .map(ucps => {
         const maxPoints = quizzes
-          .filter(quiz => quiz.part === ucps.coursePart)
+          .filter(
+            quiz => quiz.part === ucps.coursePart && !quiz.excludedFromScore,
+          )
           .map(quiz => quiz.points)
           .reduce((acc, curr) => acc + curr)
 
@@ -170,7 +170,8 @@ export default class UserCoursePartStateService {
           max_points: maxPoints,
         }
       })
-    return progress
+
+    return progress.sort()
   }
 
   private async calculateProgressData(
