@@ -74,23 +74,6 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
     dispatch(initialize(id, languageId, accessToken))
   }, [])
 
-  const handleTextDataChange = (itemId: string) => (
-    e: React.FormEvent<HTMLInputElement>,
-  ) => dispatch(quizAnswerActions.changeTextData(itemId, e.currentTarget.value))
-
-  const handleIntDataChange = (itemId: string) => (
-    e: React.FormEvent<HTMLInputElement>,
-  ) =>
-    dispatch(
-      quizAnswerActions.changeIntData(itemId, Number(e.currentTarget.value)),
-    )
-
-  const handleCheckboxToggling = (itemId: string) => (optionId: string) => () =>
-    dispatch(quizAnswerActions.changeCheckboxData(itemId, optionId))
-
-  const handleOptionChange = (itemId: string) => (optionId: string) => () =>
-    dispatch(quizAnswerActions.changeChosenOption(itemId, optionId))
-
   const handleSubmit = () => dispatch(quizAnswerActions.submit())
 
   // not all quizzess have correct solutions - e.g. self-evaluation
@@ -151,28 +134,9 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
         {quiz.items
           .sort((i1, i2) => i1.order - i2.order)
           .map(item => {
-            const itemAnswer = quizAnswer.itemAnswers.find(
-              ia => ia.quizItemId === item.id,
-            )
-            if (!itemAnswer) {
-              return []
-            }
             const ItemComponent = componentsByTypeNames(item.type)
 
-            return (
-              <ItemComponent
-                item={item}
-                key={item.id}
-                intData={itemAnswer.intData}
-                textData={itemAnswer.textData}
-                optionAnswers={itemAnswer.optionAnswers}
-                correct={itemAnswer.correct}
-                handleTextDataChange={handleTextDataChange(item.id)}
-                handleIntDataChange={handleIntDataChange(item.id)}
-                handleOptionChange={handleOptionChange(item.id)}
-                handleCheckboxToggling={handleCheckboxToggling(item.id)}
-              />
-            )
+            return <ItemComponent item={item} key={item.id} />
           })}
       </>
     )
@@ -185,9 +149,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
   if (error) {
     return (
       <div>
-        {
-          // languageInfo.errorLabel
-        }
+        {languageInfo.errorLabel}
         <pre>{error}</pre>
       </div>
     )

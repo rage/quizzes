@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import {
   FormControl,
@@ -13,10 +14,9 @@ import {
 import { useTheme } from "@material-ui/core/styles"
 import { useTypedSelector } from "../state/store"
 import { QuizItem } from "../state/quiz/reducer"
+import * as quizAnswerActions from "../state/quizAnswer/actions"
 
 type ScaleProps = {
-  handleIntDataChange: (event: React.FormEvent, value: string) => void
-  intData: number
   item: QuizItem
 }
 
@@ -35,13 +35,20 @@ const StyledRadio = styled(Radio)`
   padding-left: 0;
 `
 
-const Scale: React.FunctionComponent<ScaleProps> = ({
-  handleIntDataChange,
-  intData,
-  item,
-}) => {
+const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
+  const dispatch = useDispatch()
+  const handleIntDataChange = (itemId: string) => (
+    e: React.FormEvent<HTMLInputElement>,
+  ) =>
+    dispatch(
+      quizAnswerActions.changeIntData(itemId, Number(e.currentTarget.value)),
+    )
+
   const theme = useTheme()
   const matchesSmall = useMediaQuery(theme.breakpoints.down("sm"))
+
+  const itemAnswers = useTypedSelector(state => state.quizAnswer.itemAnswers)
+  const intData = itemAnswers.find(ia => ia.quizItemId === item.id).intData
 
   return (
     <FormControl fullWidth={true} style={{ marginBottom: "1rem" }}>
@@ -58,9 +65,9 @@ const Scale: React.FunctionComponent<ScaleProps> = ({
         </SmallCenteredGrid>
         <Grid item={true} xs={12} md={6}>
           <ScaleOptions
-            intData={intData}
-            handleIntDataChange={handleIntDataChange}
+            handleIntDataChange={handleIntDataChange(item.id)}
             item={item}
+            intData={intData}
           />
         </Grid>
       </GridRow>
@@ -68,10 +75,16 @@ const Scale: React.FunctionComponent<ScaleProps> = ({
   )
 }
 
-const ScaleOptions: React.FunctionComponent<ScaleProps> = ({
-  intData,
+type ScaleOptionsProps = {
+  handleIntDataChange: (event: React.FormEvent, value: string) => void
+  item: QuizItem
+  intData: number
+}
+
+const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
   handleIntDataChange,
   item,
+  intData,
 }) => {
   let number_of_options = 7
   const answer = useTypedSelector(state => state.quizAnswer)

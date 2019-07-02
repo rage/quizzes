@@ -1,17 +1,15 @@
 import * as React from "react"
+import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import { Button, Grid, Typography } from "@material-ui/core"
 import { GridDirection, GridSize } from "@material-ui/core/Grid"
 import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
 import { QuizItem } from "../state/quiz/reducer"
-import { QuizOptionAnswer } from "../state/quizAnswer/reducer"
+import * as quizAnswerActions from "../state/quizAnswer/actions"
 
-type MultipleChoice = {
-  correct: boolean
-  handleOptionChange: (optionId: string) => () => void
+type MultipleChoiceProps = {
   item: QuizItem
-  optionAnswers: QuizOptionAnswer[]
 }
 
 const ChoicesContainer = styled(
@@ -66,17 +64,23 @@ const SolutionTypography = styled(
   margin-bottom: 0;
 `
 
-const MultipleChoice: React.FunctionComponent<MultipleChoice> = ({
-  correct,
-  handleOptionChange,
+const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   item,
-  optionAnswers,
 }) => {
+  const dispatch = useDispatch()
+
+  const handleOptionChange = ((itemId: string) => (optionId: string) => () =>
+    dispatch(quizAnswerActions.changeChosenOption(itemId, optionId)))(item.id)
+
   const quiz = useTypedSelector(state => state.quiz)
   const answer = useTypedSelector(state => state.quizAnswer)
   const languageInfo = useTypedSelector(
     state => state.language.languageLabels.multipleChoice,
   )
+
+  const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
+  const correct = itemAnswer.correct
+  const optionAnswers = itemAnswer.optionAnswers
 
   const answered = answer.id ? true : false
   const itemTitle = item.texts[0].title

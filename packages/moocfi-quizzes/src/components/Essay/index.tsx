@@ -1,23 +1,28 @@
 import * as React from "react"
+import { useDispatch } from "react-redux"
 import { TextField } from "@material-ui/core"
 import Typography from "@material-ui/core/Typography"
 import { wordCount } from "../../utils/string_tools"
 import { executeIfTextFieldBetweenNumOfWords as executeIfWordNumberCorrect } from "../../utils/event_filters"
 import { useTypedSelector } from "../../state/store"
 import { QuizItem } from "../../state/quiz/reducer"
+import * as quizAnswerActions from "../../state/quizAnswer/actions"
 import { SpaciousPaper, SpaciousTypography } from "../styleComponents"
 
 type EssayProps = {
-  textData: string
   item: QuizItem
-  handleTextDataChange: (e: React.FormEvent) => void
 }
 
-const Essay: React.FunctionComponent<EssayProps> = ({
-  textData,
-  handleTextDataChange,
-  item,
-}) => {
+const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
+  const dispatch = useDispatch()
+
+  const handleTextDataChange = ((itemId: string) => (
+    e: React.FormEvent<HTMLInputElement>,
+  ) =>
+    dispatch(quizAnswerActions.changeTextData(itemId, e.currentTarget.value)))(
+    item.id,
+  )
+
   const itemBody = item.texts[0].body
   const itemTitle = item.texts[0].title
   const quizAnswer = useTypedSelector(state => state.quizAnswer)
@@ -25,6 +30,9 @@ const Essay: React.FunctionComponent<EssayProps> = ({
   const languageInfo = useTypedSelector(
     state => state.language.languageLabels.essay,
   )
+
+  const textData = quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id)
+    .textData
 
   const answerPortion = answered ? (
     <>

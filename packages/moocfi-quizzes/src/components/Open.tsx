@@ -1,15 +1,14 @@
 import * as React from "react"
+import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import { TextField, Typography, Paper } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
 import { QuizItem } from "../state/quiz/reducer"
+import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { SpaciousTypography } from "./styleComponents"
 import { SpaciousPaper } from "./styleComponents"
 
 type OpenProps = {
-  correct: boolean
-  handleTextDataChange: (e: React.FormEvent) => void
-  textData: string
   item: QuizItem
 }
 
@@ -19,13 +18,22 @@ const SolutionPaper = styled(({ correct, ...other }) => (
   border-left: 1rem solid ${props => (props.correct ? "green" : "red")};
 `
 
-const Open: React.FunctionComponent<OpenProps> = ({
-  correct,
-  handleTextDataChange,
-  textData,
-  item,
-}) => {
+const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
+  const dispatch = useDispatch()
+
+  const handleTextDataChange = ((itemId: string) => (
+    e: React.FormEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
+  ) => {
+    dispatch(quizAnswerActions.changeTextData(itemId, e.currentTarget.value))
+  })(item.id)
+
   const answer = useTypedSelector(state => state.quizAnswer)
+  const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
+  const correct = itemAnswer.correct
+  const textData = itemAnswer.textData
+
   const languageInfo = useTypedSelector(
     state => state.language.languageLabels.open,
   )
