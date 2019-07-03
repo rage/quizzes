@@ -13,8 +13,8 @@ import {
 } from "@material-ui/core"
 import { useTheme } from "@material-ui/core/styles"
 import { useTypedSelector } from "../state/store"
-import { QuizItem } from "../state/quiz/reducer"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
+import { QuizItem } from "../modelTypes"
 
 type ScaleProps = {
   item: QuizItem

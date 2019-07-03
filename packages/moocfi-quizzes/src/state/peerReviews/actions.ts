@@ -1,6 +1,6 @@
 import { ActionCreator } from "redux"
 import { createAction } from "typesafe-actions"
-import { PeerReviewAnswer, PeerReviewsState } from "./reducer"
+import { PeerReviewsState } from "./reducer"
 import {
   getPeerReviewInfo,
   postPeerReview,
@@ -8,6 +8,7 @@ import {
 } from "../../services/peerReviewService"
 import { setQuizState } from "../user/actions"
 import { ThunkAction, RootAction } from "../store"
+import { PeerReviewAnswer } from "../../modelTypes"
 
 export const set = createAction("peerReviews/SET", resolve => {
   return (newState: PeerReviewsState) => resolve(newState)

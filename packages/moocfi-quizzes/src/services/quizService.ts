@@ -1,8 +1,6 @@
 import axios from "axios"
 import BASE_URL from "../config"
-import { UserQuizState } from "../state/user/reducer"
-import { Quiz } from "../state/quiz/reducer"
-import { QuizAnswer } from "../state/quizAnswer/reducer"
+import { Quiz, QuizAnswer, UserQuizState } from "../modelTypes"
 
 type QuizResponse = {
   quiz: Quiz

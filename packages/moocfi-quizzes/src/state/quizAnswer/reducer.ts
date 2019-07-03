@@ -1,45 +1,11 @@
 import { ActionType, getType } from "typesafe-actions"
 import * as quizAnswer from "./actions"
+import { QuizAnswer } from "../../modelTypes"
 
 const initialValue = null
 
-export type QuizOptionAnswer = {
-  id?: string
-  quizItemAnswerId: string
-  quizOptionId: string
-}
-
-export type QuizOptionAnswerState = Readonly<QuizOptionAnswer>
-
-export type QuizItemAnswer = {
-  id?: string
-  quizAnswerId?: string
-  quizItemId: string
-  textData: string
-  intData: number
-  correct?: boolean
-  optionAnswers: QuizOptionAnswer[]
-}
-export type QuizItemAnswerState = Readonly<QuizItemAnswer>
-
-export type QuizAnswer = {
-  id?: string
-  quizId: string
-  userId?: number
-  languageId: string
-  status?:
-    | "draft"
-    | "submitted"
-    | "spam"
-    | "confirmed"
-    | "rejected"
-    | "deprecated"
-  itemAnswers: QuizItemAnswer[]
-}
-export type QuizAnswerState = Readonly<QuizAnswer>
-
 export const quizAnswerReducer = (
-  state: QuizAnswerState = initialValue,
+  state: QuizAnswer = initialValue,
   action: ActionType<typeof quizAnswer>,
 ): QuizAnswer => {
   switch (action.type) {

@@ -1,14 +1,14 @@
 import { ActionCreator } from "redux"
 import { createAction } from "typesafe-actions"
-import { QuizAnswerState } from "./reducer"
 import { ThunkAction } from "../store"
 import * as submitLockedActions from "../submitLocked/actions"
 import { postAnswer } from "../../services/answerService"
 import * as userActions from "../user/actions"
 import * as quizActions from "../quiz/actions"
+import { QuizAnswer } from "../../modelTypes"
 
 export const set = createAction("quizAnswer/SET", resolve => {
-  return (quizAnswer: QuizAnswerState) => resolve(quizAnswer)
+  return (quizAnswer: QuizAnswer) => resolve(quizAnswer)
 })
 
 export const clear = createAction("quizAnswer/CLEAR")

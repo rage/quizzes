@@ -1,25 +1,10 @@
 import { ActionType, getType } from "typesafe-actions"
 import * as user from "./actions"
-
-export type UserQuizState = {
-  userId: number
-  quizId: string
-  peerReviewsGiven: number
-  peerReviewsReceived: number
-  pointsAwarded: number
-  spamFlags: number
-  tries: number
-  status: "open" | "locked"
-}
-
-export type User = {
-  accessToken: string
-  userQuizState: UserQuizState
-}
+import { UserQuizState } from "../../modelTypes"
 
 export type UserState = {
-  readonly accessToken: string
-  readonly userQuizState: UserQuizState
+  accessToken: string
+  userQuizState: UserQuizState
 }
 
 const initialValue = {
@@ -30,7 +15,7 @@ const initialValue = {
 export const userReducer = (
   state: UserState = initialValue,
   action: ActionType<typeof user>,
-): User => {
+): UserState => {
   switch (action.type) {
     case getType(user.set):
       return action.payload

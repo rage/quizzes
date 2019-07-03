@@ -1,5 +1,6 @@
 import { createAction } from "typesafe-actions"
-import { UserQuizState, UserState } from "./reducer"
+import { UserState } from "./reducer"
+import { UserQuizState } from "../../modelTypes"
 
 export const set = createAction("user/SET", resolve => {
   return (newState: UserState) => resolve(newState)

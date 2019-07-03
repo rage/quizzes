@@ -5,9 +5,9 @@ import Typography from "@material-ui/core/Typography"
 import { wordCount } from "../../utils/string_tools"
 import { executeIfTextFieldBetweenNumOfWords as executeIfWordNumberCorrect } from "../../utils/event_filters"
 import { useTypedSelector } from "../../state/store"
-import { QuizItem } from "../../state/quiz/reducer"
 import * as quizAnswerActions from "../../state/quizAnswer/actions"
 import { SpaciousPaper, SpaciousTypography } from "../styleComponents"
+import { QuizItem } from "../../modelTypes"
 
 type EssayProps = {
   item: QuizItem

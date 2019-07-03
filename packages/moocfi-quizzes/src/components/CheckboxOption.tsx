@@ -3,8 +3,8 @@ import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import { Checkbox, Grid, Typography } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
-import { QuizItem } from "../state/quiz/reducer"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
+import { QuizItem } from "../modelTypes"
 
 export type CheckboxOptionProps = {
   item: QuizItem

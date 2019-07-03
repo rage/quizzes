@@ -16,8 +16,8 @@ import PeerReviews from "./Essay/PeerReviews"
 import Unsupported from "./Unsupported"
 import { wordCount } from "../utils/string_tools"
 import { useTypedSelector } from "../state/store"
-import { Quiz } from "../state/quiz/reducer"
 import { SpaciousTypography } from "./styleComponents"
+import { Quiz } from "../modelTypes"
 
 export type ComponentName =
   | "essay"

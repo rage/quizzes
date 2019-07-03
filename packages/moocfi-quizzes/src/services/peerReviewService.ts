@@ -1,8 +1,6 @@
 import axios from "axios"
 import BASE_URL from "../config"
-import { PeerReviewAnswer } from "../state/peerReviews/reducer"
-import { UserQuizState } from "../state/user/reducer"
-import { QuizAnswer } from "../state/quizAnswer/reducer"
+import { QuizAnswer, PeerReviewAnswer, UserQuizState } from "../modelTypes"
 
 export const getPeerReviewInfo = async (
   quizId: string,

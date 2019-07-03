@@ -5,8 +5,8 @@ import { Button, Grid, Typography } from "@material-ui/core"
 import { GridDirection, GridSize } from "@material-ui/core/Grid"
 import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
-import { QuizItem } from "../state/quiz/reducer"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
+import { QuizItem } from "../modelTypes"
 
 type MultipleChoiceProps = {
   item: QuizItem

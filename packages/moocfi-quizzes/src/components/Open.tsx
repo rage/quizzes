@@ -3,10 +3,10 @@ import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import { TextField, Typography, Paper } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
-import { QuizItem } from "../state/quiz/reducer"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { SpaciousTypography } from "./styleComponents"
 import { SpaciousPaper } from "./styleComponents"
+import { QuizItem } from "../modelTypes"
 
 type OpenProps = {
   item: QuizItem

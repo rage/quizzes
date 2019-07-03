@@ -2,8 +2,8 @@ import * as React from "react"
 import { useDispatch } from "react-redux"
 import { TextField, Typography } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
-import { QuizItem } from "../state/quiz/reducer"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
+import { QuizItem } from "../modelTypes"
 
 type FeedbackProps = {
   item: QuizItem

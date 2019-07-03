@@ -1,6 +1,6 @@
 import { ActionType, getType } from "typesafe-actions"
 import * as peerReviews from "./actions"
-import { QuizAnswerState as QuizAnswer } from "../quizAnswer/reducer"
+import { QuizAnswer, PeerReviewAnswer } from "../../modelTypes"
 
 const initialValue = {
   options: [],
@@ -9,41 +9,17 @@ const initialValue = {
   submitDisabled: true,
 }
 
-type PeerReviewGradeAnswer = {
-  peerReviewQuestionId: string
-  value: number
-}
-
-type PeerReviewEssayAnswer = {
-  peerReviewQuestionId: string
-  text: string
-}
-
-type PeerReviewQuestionAnswer = PeerReviewGradeAnswer
-// not supported yet
-// | PeerReviewEssayAnswer
-
-export type PeerReviewAnswer = {
-  quizAnswerId: string
-  peerReviewCollectionId: string
-  userId: number
-  rejectedQuizAnswerIds: string[]
-  answers: PeerReviewQuestionAnswer[]
-}
-
-export type PeerReviews = {
+export type PeerReviewsState = {
   answer: PeerReviewAnswer
   options: QuizAnswer[]
   submitLocked: boolean
   submitDisabled: boolean
 }
 
-export type PeerReviewsState = Readonly<PeerReviews>
-
 export const peerReviewsReducer = (
   state: PeerReviewsState = initialValue,
   action: ActionType<typeof peerReviews>,
-): PeerReviews => {
+): PeerReviewsState => {
   switch (action.type) {
     case getType(peerReviews.set):
       return action.payload

@@ -1,8 +1,8 @@
 import * as React from "react"
 import Typography from "@material-ui/core/Typography"
 import { useTypedSelector } from "../../state/store"
-import { QuizAnswer } from "../../state/quizAnswer/reducer"
 import { SpaciousPaper } from "../styleComponents"
+import { QuizAnswer } from "../../modelTypes"
 
 type PeerReviewOptionProps = {
   answer: QuizAnswer

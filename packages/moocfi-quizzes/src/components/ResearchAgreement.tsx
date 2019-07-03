@@ -1,7 +1,7 @@
 import * as React from "react"
 import CheckboxOption from "./CheckboxOption"
-import { QuizItem } from "../state/quiz/reducer"
 import { useTypedSelector } from "../state/store"
+import { QuizItem } from "../modelTypes"
 
 type ResearchAgreementProps = {
   item: QuizItem
@@ -18,13 +18,7 @@ const ResearchAgreement: React.FunctionComponent<ResearchAgreementProps> = ({
   return (
     <>
       {options.map(option => {
-        return (
-          <CheckboxOption
-            key={option.id}
-            item={item}
-            optionAnswers={optionAnswers}
-          />
-        )
+        return <CheckboxOption key={option.id} item={item} />
       })}
     </>
   )

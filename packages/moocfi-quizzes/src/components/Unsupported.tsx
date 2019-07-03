@@ -1,6 +1,6 @@
 import * as React from "react"
-import { QuizItem } from "../state/quiz/reducer"
 import { useTypedSelector } from "../state/store"
+import { QuizItem } from "../modelTypes"
 
 type UnsupportedProps = {
   item: QuizItem
