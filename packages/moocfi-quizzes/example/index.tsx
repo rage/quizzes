@@ -54,7 +54,6 @@ const App = () => {
         </Typography>
         <SimpleErrorBoundary>
           <Thing
-            baseUrl={baseUrl.value}
             id={id.value}
             languageId={languageId.value}
             accessToken={accessToken.value}

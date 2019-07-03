@@ -2,12 +2,12 @@ import * as React from "react"
 import { useDispatch } from "react-redux"
 import { TextField } from "@material-ui/core"
 import Typography from "@material-ui/core/Typography"
-import { wordCount } from "../../utils/string_tools"
-import { executeIfTextFieldBetweenNumOfWords as executeIfWordNumberCorrect } from "../../utils/event_filters"
-import { useTypedSelector } from "../../state/store"
-import * as quizAnswerActions from "../../state/quizAnswer/actions"
-import { SpaciousPaper, SpaciousTypography } from "../styleComponents"
-import { QuizItem, MiscEvent } from "../../modelTypes"
+import { wordCount } from "../utils/string_tools"
+import { executeIfTextFieldBetweenNumOfWords as executeIfWordNumberCorrect } from "../utils/event_filters"
+import { useTypedSelector } from "../state/store"
+import * as quizAnswerActions from "../state/quizAnswer/actions"
+import { SpaciousPaper, SpaciousTypography } from "./styleComponents"
+import { QuizItem, MiscEvent } from "../modelTypes"
 
 type EssayProps = {
   item: QuizItem

@@ -3,6 +3,8 @@ import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
+import * as messageActions from "../state/message/actions"
+
 import { initialize } from "../state/actions"
 import Checkbox from "./CheckboxOption"
 import Feedback from "./Feedback"
@@ -11,8 +13,8 @@ import ResearchAgreement from "./ResearchAgreement"
 import Scale from "./Scale"
 import Open from "./Open"
 import Essay from "./Essay"
-import StageVisualizer from "./Essay/StageVisualizer"
-import PeerReviews from "./Essay/PeerReviews"
+import StageVisualizer from "./PeerReviews/StageVisualizer"
+import PeerReviews from "./PeerReviews"
 import Unsupported from "./Unsupported"
 import { useTypedSelector } from "../state/store"
 import { SpaciousTypography } from "./styleComponents"
@@ -37,7 +39,6 @@ export interface Props {
   id: string
   languageId: string
   accessToken: string
-  baseUrl: string
 }
 
 const FuncQuizImpl: React.FunctionComponent<Props> = ({
@@ -65,8 +66,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
 
   const handleSubmit = () => dispatch(quizAnswerActions.submit())
 
-  // not all quizzess have correct solutions - e.g. self-evaluation
-  const hasCorrectAnswer = quiz => {
+  const hasCorrectAnswer = (quiz: Quiz) => {
     return quiz.items.some(
       item =>
         item.type === "essay" ||
@@ -123,12 +123,11 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
   // and also never occur, unless the requested language does not
   // match the language of the quiz...
   if (quiz.texts.length === 0) {
-    return (
-      <div>
-        Error: quiz has no texts. (Likely the quiz does not match the requested
-        language id)
-      </div>
-    )
+    const message =
+      "Error: quiz has no texts. (Likely the quiz does not match the requested " +
+      "language id)"
+    dispatch(messageActions.set(message))
+    return <div>yeet</div>
   }
 
   const types = quiz.items.map(item => item.type)

@@ -4,7 +4,7 @@ import LikertScale from "likert-react"
 import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
 import PeerReviewOption from "./PeerReviewOption"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
-import { Dispatch, useTypedSelector } from "../../state/store"
+import { useTypedSelector } from "../../state/store"
 import { PeerReviewLabels } from "../../utils/languages"
 import { QuizAnswer, PeerReviewAnswer } from "../../modelTypes"
 
