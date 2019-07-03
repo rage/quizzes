@@ -214,7 +214,6 @@ export default class QuizService {
     data[0] = { ...data[0], ...newInfo }
 
     if (quiz.peerReviewCollections.length > 0) {
-      quiz.peerReviewCollections
       data = data.map(d => {
         const newD = { ...d }
         for (let i = 0; i < quiz.peerReviewCollections.length; i++) {
@@ -401,6 +400,7 @@ export default class QuizService {
     let result
     try {
       result = await this.entityManager.save(quiz)
+      this.kafka
     } catch (error) {
       throw new Error(error.message)
     }

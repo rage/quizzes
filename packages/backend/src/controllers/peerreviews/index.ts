@@ -162,6 +162,7 @@ export class PeerReviewController {
     const quiz: Quiz = (await this.QuizService.getQuizzes({
       id: receivingQuizAnswer.quizId,
       course: true,
+      items: true,
     }))[0]
 
     let responsePeerReview: PeerReview
@@ -184,78 +185,6 @@ export class PeerReviewController {
         quiz,
         receivingQuizAnswer,
       )
-
-      /*const receivingValidated = await this.validationService.validateEssayAnswer(
-        manager,
-        quiz,
-        receivingQuizAnswer,
-        receivingUserQuizState,
-      )
-      const givingValidated = await this.validationService.validateEssayAnswer(
-        manager,
-        quiz,
-        givingQuizAnswer,
-        givingUserQuizState,
-      )
-
-      const receivingAnswerUpdated: QuizAnswer = await this.quizAnswerService.createQuizAnswer(
-        manager,
-        receivingValidated.quizAnswer,
-      )
-      const givingAnswerUpdated = await this.quizAnswerService.createQuizAnswer(
-        manager,
-        givingValidated.quizAnswer,
-      )
-
-      await this.userQuizStateService.createUserQuizState(
-        manager,
-        receivingValidated.userQuizState,
-      )
-      responseUserQuizState = await this.userQuizStateService.createUserQuizState(
-        manager,
-        givingValidated.userQuizState,
-      )
-
-      if (
-        !quiz.excludedFromScore &&
-        receivingValidated.quizAnswer.status === "confirmed"
-      ) {
-        const userId = receivingValidated.quizAnswer.userId
-        await this.userCoursePartStateService.updateUserCoursePartState(manager, quiz, userId)
-        this.kafkaService.publishUserProgressUpdated(
-          manager,
-          userId,
-          quiz.courseId
-        )
-        this.kafkaService.publishQuizAnswerUpdated(
-          receivingValidated.quizAnswer,
-          receivingValidated.userQuizState,
-          quiz
-        )
-      }
-
-      if (
-        !quiz.excludedFromScore &&
-        givingValidated.quizAnswer.status === "confirmed"
-      ) {
-        const userId = givingValidated.quizAnswer.userId
-        await this.userCoursePartStateService.updateUserCoursePartState(manager, quiz, userId)
-        this.kafkaService.publishUserProgressUpdated(
-          manager,
-          userId,
-          quiz.courseId
-        )
-        this.kafkaService.publishUserProgressUpdated(
-          manager,
-          givingValidated.quizAnswer.userId,
-          quiz.courseId
-        )
-        this.kafkaService.publishQuizAnswerUpdated(
-          givingValidated.quizAnswer,
-          givingValidated.userQuizState,
-          quiz
-        )
-      }*/
     })
 
     return {
