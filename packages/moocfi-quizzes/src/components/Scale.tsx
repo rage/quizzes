@@ -45,7 +45,9 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
   const theme = useTheme()
   const matchesSmall = useMediaQuery(theme.breakpoints.down("sm"))
 
-  const itemAnswers = useTypedSelector(state => state.quizAnswer.itemAnswers)
+  const itemAnswers = useTypedSelector(
+    state => state.quizAnswer.quizAnswer.itemAnswers,
+  )
   const intData = itemAnswers.find(ia => ia.quizItemId === item.id).intData
 
   return (
@@ -85,7 +87,7 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
   intData,
 }) => {
   let number_of_options = 7
-  const answer = useTypedSelector(state => state.quizAnswer)
+  const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const answered = answer.id ? true : false
 
   const minLabel = item.texts[0].minLabel

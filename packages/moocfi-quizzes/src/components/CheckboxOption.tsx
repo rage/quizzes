@@ -17,7 +17,7 @@ const VertCenteredGrid = styled(Grid)`
 const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
   item,
 }) => {
-  const quizAnswer = useTypedSelector(state => state.quizAnswer)
+  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
 
   const dispatch = useDispatch()
   const option = item.options[0]

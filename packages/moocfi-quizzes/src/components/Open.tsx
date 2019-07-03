@@ -25,7 +25,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
     dispatch(quizAnswerActions.changeTextData(item.id, e.currentTarget.value))
   }
 
-  const answer = useTypedSelector(state => state.quizAnswer)
+  const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
   const correct = itemAnswer.correct
   const textData = itemAnswer.textData

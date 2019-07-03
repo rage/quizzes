@@ -6,16 +6,14 @@ import { languageReducer, LanguageState } from "./language/reducer"
 import { messageReducer } from "./message/reducer"
 import { peerReviewsReducer, PeerReviewsState } from "./peerReviews/reducer"
 import { quizReducer } from "./quiz/reducer"
-import { quizAnswerReducer } from "./quizAnswer/reducer"
-import { submitLockedReducer } from "./submitDisabled/reducer"
+import { quizAnswerReducer, QuizAnswerState } from "./quizAnswer/reducer"
 import { userReducer, UserState } from "./user/reducer"
-import { QuizAnswer, Quiz } from "../modelTypes"
+import { Quiz } from "../modelTypes"
 
 import * as languageActions from "./language/actions"
 import * as messageActions from "./message/actions"
 import * as quizActions from "./quiz/actions"
 import * as quizAnswerActions from "./quizAnswer/actions"
-import * as submitLockedActions from "./submitDisabled/actions"
 import * as userActions from "./user/actions"
 import * as PeerReviewsActions from "./peerReviews/actions"
 
@@ -25,7 +23,6 @@ const rootReducer = combineReducers({
   peerReviews: peerReviewsReducer,
   quiz: quizReducer,
   quizAnswer: quizAnswerReducer,
-  submitLocked: submitLockedReducer,
   user: userReducer,
 })
 
@@ -35,7 +32,6 @@ const rootAction = {
   message: messageActions,
   quiz: quizActions,
   quizAnswer: quizAnswerActions,
-  submitLocked: submitLockedActions,
   user: userActions,
 }
 
@@ -44,8 +40,7 @@ export interface State {
   peerReviews: PeerReviewsState
   message: string
   quiz: Quiz
-  quizAnswer: QuizAnswer
-  submitLocked: boolean
+  quizAnswer: QuizAnswerState
   user: UserState
 }
 

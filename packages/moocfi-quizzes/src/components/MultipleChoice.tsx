@@ -68,7 +68,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   item,
 }) => {
   const quiz = useTypedSelector(state => state.quiz)
-  const answer = useTypedSelector(state => state.quizAnswer)
+  const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
 
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
 
@@ -175,7 +175,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
 }) => {
   const items = useTypedSelector(state => state.quiz.items)
   const item = items.find(i => i.id === option.quizItemId)
-  const quizAnswer = useTypedSelector(state => state.quizAnswer)
+  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const itemAnswer = quizAnswer.itemAnswers.find(
     ia => ia.quizItemId === item.id,
   )

@@ -19,7 +19,7 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
   const handleTextDataChange = (e: MiscEvent) =>
     dispatch(quizAnswerActions.changeTextData(item.id, e.currentTarget.value))
 
-  const quizAnswer = useTypedSelector(state => state.quizAnswer)
+  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const languageInfo = useTypedSelector(
     state => state.language.languageLabels.essay,
   )

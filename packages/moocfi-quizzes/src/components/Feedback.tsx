@@ -17,7 +17,7 @@ const Feedback: React.FunctionComponent<FeedbackProps> = ({ item }) => {
   const handleTextDataChange = (e: MiscEvent) =>
     dispatch(quizAnswerActions.changeTextData(item.id, e.currentTarget.value))
 
-  const answer = useTypedSelector(state => state.quizAnswer)
+  const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const answered = answer.id ? true : false
   const itemTitle = item.texts[0].title
 

@@ -14,7 +14,6 @@ import Essay from "./Essay"
 import StageVisualizer from "./Essay/StageVisualizer"
 import PeerReviews from "./Essay/PeerReviews"
 import Unsupported from "./Unsupported"
-import { wordCount } from "../utils/string_tools"
 import { useTypedSelector } from "../state/store"
 import { SpaciousTypography } from "./styleComponents"
 import { Quiz, QuizItemType } from "../modelTypes"
@@ -46,9 +45,9 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
   languageId,
   accessToken,
 }) => {
-  const submitLocked = useTypedSelector(state => state.submitLocked)
+  const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const error = useTypedSelector(state => state.message)
-  const quizAnswer = useTypedSelector(state => state.quizAnswer)
+  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const quiz = useTypedSelector(state => state.quiz)
   const languageState = useTypedSelector(state => state.language)
 
@@ -78,41 +77,6 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
 
   const atLeastOneCorrect = itemAnswers =>
     itemAnswers.some(ia => ia.correct === true)
-
-  const submitDisabled = () => {
-    const itemsSubmittable = quiz.items.map(item => {
-      const itemAnswer = quizAnswer.itemAnswers.find(
-        ia => ia.quizItemId === item.id,
-      )
-      if (!itemAnswer) {
-        return false
-      }
-      if (
-        item.type === "essay" ||
-        item.type === "open" ||
-        item.type === "feedback"
-      ) {
-        if (!itemAnswer.textData) return false
-        const words = wordCount(itemAnswer.textData)
-        if (item.minWords && words < item.minWords) return false
-
-        if (item.maxWords && words > item.maxWords) return false
-        return true
-      }
-      if (item.type === "multiple-choice") {
-        return itemAnswer.optionAnswers.length > 0
-      }
-      if (item.type === "scale") {
-        return itemAnswer.intData ? true : false
-      }
-      if (item.type === "checkbox" || item.type === "research-agreement") {
-        return itemAnswer.optionAnswers.length > 0
-      }
-      return undefined
-    })
-
-    return itemsSubmittable.includes(false)
-  }
 
   const quizContainsEssay = () => {
     return quiz.items.some(ia => ia.type === "essay")
@@ -209,7 +173,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
             <Button
               variant="contained"
               color="primary"
-              disabled={submitLocked ? true : submitDisabled()}
+              disabled={submitLocked}
               onClick={handleSubmit}
             >
               {languageInfo.submitButtonLabel}

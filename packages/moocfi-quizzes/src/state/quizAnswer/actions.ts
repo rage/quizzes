@@ -1,11 +1,11 @@
 import { ActionCreator } from "redux"
 import { createAction } from "typesafe-actions"
-import { ThunkAction } from "../store"
-import * as submitLockedActions from "../submitDisabled/actions"
+import { ThunkAction, State } from "../store"
 import { postAnswer } from "../../services/answerService"
 import * as userActions from "../user/actions"
 import * as quizActions from "../quiz/actions"
-import { QuizAnswer } from "../../modelTypes"
+import { QuizAnswer, QuizItem } from "../../modelTypes"
+import { wordCount } from "../../utils/string_tools"
 
 export const set = createAction("quizAnswer/SET", resolve => {
   return (quizAnswer: QuizAnswer) => resolve(quizAnswer)
@@ -13,10 +13,14 @@ export const set = createAction("quizAnswer/SET", resolve => {
 
 export const clear = createAction("quizAnswer/CLEAR")
 
-export const changeTextData = createAction(
+export const setLocked = createAction("quizAnswer/SET_LOCKED", resolve => {
+  return () => resolve()
+})
+
+export const changeTextDataAction = createAction(
   "quizAnswer/UPDATE_TEXT_VALUE",
-  resolve => (itemId: string, newValue: string) =>
-    resolve({ itemId, newValue }),
+  resolve => (itemId: string, newValue: string, readyToSubmit: boolean) =>
+    resolve({ itemId, newValue, readyToSubmit }),
 )
 
 export const changeIntData = createAction(
@@ -45,16 +49,44 @@ export const changeChosenOption: ActionCreator<ThunkAction> = (
   dispatch(chooseOption(itemId, optionId, multi))
 }
 
+export const changeTextData: ActionCreator<ThunkAction> = (
+  itemId: string,
+  newValue: string,
+) => (dispatch, getState) => {
+  const itemAnswer = getState().quizAnswer.quizAnswer.itemAnswers.find(
+    qa => qa.quizItemId === itemId,
+  )
+  const item = getState().quiz.items.find(i => i.id === itemId)
+
+  const readyToSubmit = itemAnswerReadyForSubmit(newValue, item)
+  dispatch(changeTextDataAction(itemId, newValue, readyToSubmit))
+}
+
 export const submit: ActionCreator<ThunkAction> = () => async (
   dispatch,
   getState,
 ) => {
-  dispatch(submitLockedActions.set(true))
   const responseData = await postAnswer(
-    getState().quizAnswer,
+    getState().quizAnswer.quizAnswer,
     getState().user.accessToken,
   )
+
+  // remember! Disable submit! Although it's not so necessary
+  dispatch(setLocked())
   dispatch(set(responseData.quizAnswer))
   dispatch(quizActions.set(responseData.quiz))
   dispatch(userActions.setQuizState(responseData.userQuizState))
+}
+
+const itemAnswerReadyForSubmit = (textData: string, item: QuizItem) => {
+  if (!item) {
+    return false
+  }
+  if (!textData) return false
+  const words = wordCount(textData)
+  if (item.minWords && words < item.minWords) return false
+
+  if (item.maxWords && words > item.maxWords) return false
+
+  return true
 }

@@ -3,7 +3,7 @@ import { Stepper, StepLabel, Step } from "@material-ui/core"
 import { useTypedSelector } from "../../state/store"
 
 const StageVisualizer = () => {
-  const quizAnswer = useTypedSelector(state => state.quizAnswer)
+  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const quiz = useTypedSelector(state => state.quiz)
   const languageInfo = useTypedSelector(
