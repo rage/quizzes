@@ -93,39 +93,14 @@ export class QuizController {
         ...params,
       })
 
-      // in scale items, failure/success messages currently used for min/max labels!
-      if (quizzes[0].items.some(i => i.type === "scale")) {
-        const builder = knex({ client: "pg" })
-
-        const query = builder("quiz_item_translation")
-          .select("quiz_item_id", "failure_message", "success_message")
-          .whereIn(
-            "quiz_item_translation.quiz_item_id",
-            quizzes[0].items.map(i => i.id),
-          )
-
-        const queryRunner = this.entityManager.connection.createQueryRunner()
-        queryRunner.connect()
-        const translations = await queryRunner.query(query.toString())
-        await queryRunner.release()
-
-        quizzes[0].items
-          .filter(qi => qi.type === "scale")
-          .forEach(qi => {
-            const translation = translations.find(
-              (t: any) => t.quiz_item_id === qi.id,
-            )
-            qi.texts[0].failureMessage = translation.failure_message
-            qi.texts[0].successMessage = translation.success_message
-          })
-      }
-
       return {
         quiz: quizzes[0],
         quizAnswer,
         userQuizState,
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   @Get("/data/:id/plainQuizInfo")

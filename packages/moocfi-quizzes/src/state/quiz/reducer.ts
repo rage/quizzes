@@ -58,6 +58,8 @@ export type QuizItemText = {
   body: string
   successMessage: string
   failureMessage: string
+  minLabel: string
+  maxLabel: string
 }
 
 export type QuizItem = {

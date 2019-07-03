@@ -90,8 +90,8 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
   const answer = useTypedSelector(state => state.quizAnswer)
   const answered = answer.id ? true : false
 
-  const minLabel = item.texts[0].successMessage
-  const maxLabel = item.texts[0].failureMessage
+  const minLabel = item.texts[0].minLabel
+  const maxLabel = item.texts[0].maxLabel
 
   if (item.minValue && item.maxValue) {
     number_of_options = item.maxValue - item.minValue + 1

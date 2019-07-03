@@ -290,6 +290,9 @@ export default class QuizService {
           "item_translation.language_id = :language",
           { language },
         )
+
+        queryBuilder.addSelect("item_translation.minLabel")
+        queryBuilder.addSelect("item_translation.maxLabel")
       } else {
         queryBuilder.leftJoinAndSelect("item.texts", "item_translation")
       }
@@ -299,18 +302,6 @@ export default class QuizService {
           .addSelect("item.validityRegex")
           .addSelect("item_translation.successMessage")
           .addSelect("item_translation.failureMessage")
-      } else {
-        /*
-        queryBuilder.addSelect(`CASE
-          WHEN item.type = 'scale' THEN 'item_translation.success_message'
-          ELSE 'seccret'
-          END`, "min_label")
-
-          queryBuilder.addSelect(`CASE
-            WHEN item.type = 'scale' THEN 'item_translation.failure_message'
-            ELSE 'seccret'
-            END`, "max_label")
-            */
       }
     }
 
