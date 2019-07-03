@@ -83,25 +83,27 @@ export default class PeerReviewService {
       validatedState,
     )
 
-    if (updatedState.pointsAwarded > originalPoints) {
-      if (!quiz.excludedFromScore) {
-        await this.userCoursePartStateService.updateUserCoursePartState(
-          manager,
-          quiz,
-          userId,
-        )
-        this.kafkaService.publishUserProgressUpdated(
-          manager,
-          userId,
-          quiz.courseId,
-        )
-      }
-      this.kafkaService.publishQuizAnswerUpdated(
-        updatedAnswer,
-        updatedState,
+    if (
+      updatedState.pointsAwarded > originalPoints &&
+      !quiz.excludedFromScore
+    ) {
+      await this.userCoursePartStateService.updateUserCoursePartState(
+        manager,
         quiz,
+        userId,
+      )
+      this.kafkaService.publishUserProgressUpdated(
+        manager,
+        userId,
+        quiz.courseId,
       )
     }
+
+    this.kafkaService.publishQuizAnswerUpdated(
+      updatedAnswer,
+      updatedState,
+      quiz,
+    )
 
     return updatedState
   }

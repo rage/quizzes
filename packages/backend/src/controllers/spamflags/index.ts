@@ -1,4 +1,5 @@
 import { HeaderParam, JsonController, Post } from "routing-controllers"
+import KafkaService from "services/kafka.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
 import SpamFlagService from "services/spamflag.service"
@@ -32,6 +33,9 @@ export class SpamFlagController {
   @Inject()
   private validationService: ValidationService
 
+  @Inject()
+  private kafkaService: KafkaService
+
   @Post("/")
   public async post(
     @EntityFromBody() spamFlag: SpamFlag,
@@ -61,15 +65,20 @@ export class SpamFlagController {
         quizAnswer,
         userquizstate,
       )
-      await this.quizAnswerService.createQuizAnswer(
+      const updatedAnswer = await this.quizAnswerService.createQuizAnswer(
         manager,
         validated.quizAnswer,
       )
-      await this.userQuizStateService.createUserQuizState(
+      const updatedState = await this.userQuizStateService.createUserQuizState(
         manager,
         validated.userQuizState,
       )
       response = await this.spamFlagService.createSpamFlag(manager, spamFlag)
+      this.kafkaService.publishQuizAnswerUpdated(
+        updatedAnswer,
+        updatedState,
+        quiz,
+      )
     })
     return response
   }

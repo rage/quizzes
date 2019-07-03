@@ -213,7 +213,7 @@ export interface QuizAnswerMessage {
   user_id: number
   course_id: string
   service_id: string
-  required_actions: string | null
+  required_actions: string[] | null
   message_format_version: number
 }
 

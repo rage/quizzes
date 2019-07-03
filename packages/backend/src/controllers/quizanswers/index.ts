@@ -238,7 +238,6 @@ export class QuizAnswerController {
     }
 
     let newAnswer: QuizAnswer = null
-    let userCourseState: UserCourseState = null
     let userCoursePartState: UserCoursePartState = null
 
     await this.entityManager.transaction(async manager => {
@@ -257,11 +256,15 @@ export class QuizAnswerController {
           userQuizState.userId,
         )
 
-        userCourseState = await this.userCourseStateService.updateUserCourseState(
-          manager,
-          quiz,
-          userQuizState,
+        this.kafkaService.publishQuizAnswerUpdated(
           newAnswer,
+          userQuizState,
+          quiz,
+        )
+        this.kafkaService.publishUserProgressUpdated(
+          manager,
+          newAnswer.userId,
+          quiz.courseId,
         )
       }
     })
@@ -270,7 +273,6 @@ export class QuizAnswerController {
       newAnswer,
       userQuizState,
       userCoursePartState,
-      userCourseState,
     }
   }
 
@@ -349,8 +351,8 @@ export class QuizAnswerController {
       )
 
       if (
-        !quiz.excludedFromScore &&
-        originalPoints < savedUserQuizState.pointsAwarded
+        originalPoints < savedUserQuizState.pointsAwarded &&
+        !quiz.excludedFromScore
       ) {
         await this.userCoursePartStateService.updateUserCoursePartState(
           manager,
@@ -363,12 +365,13 @@ export class QuizAnswerController {
           userId,
           quiz.courseId,
         )
-        this.kafkaService.publishQuizAnswerUpdated(
-          savedAnswer,
-          savedUserQuizState,
-          quiz,
-        )
       }
+
+      this.kafkaService.publishQuizAnswerUpdated(
+        savedAnswer,
+        savedUserQuizState,
+        quiz,
+      )
     })
 
     return {

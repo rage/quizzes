@@ -78,6 +78,20 @@ export default class KafkaService {
     userQuizState: UserQuizState,
     quiz: Quiz,
   ) {
+    const messages: string[] = []
+    const course = quiz.course
+
+    if (quizAnswer.status === "rejected" || quizAnswer.status === "spam") {
+      messages.push("rejected in peer review")
+    } else if (quiz.items[0].type === "essay") {
+      if (userQuizState.peerReviewsGiven < course.minPeerReviewsGiven) {
+        messages.push("give peer reviews")
+      }
+      if (userQuizState.peerReviewsReceived < course.minPeerReviewsReceived) {
+        messages.push("waiting for peer reviews")
+      }
+    }
+
     const message: QuizAnswerMessage = {
       timestamp: new Date().toISOString(),
       exercise_id: quizAnswer.quizId,
@@ -86,7 +100,7 @@ export default class KafkaService {
       user_id: quizAnswer.userId,
       course_id: quiz.courseId,
       service_id: process.env.SERVICE_ID,
-      required_actions: "",
+      required_actions: messages,
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
     }
     this.userPointsStream.write(Buffer.from(JSON.stringify(message)))

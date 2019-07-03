@@ -214,7 +214,6 @@ export default class QuizService {
     data[0] = { ...data[0], ...newInfo }
 
     if (quiz.peerReviewCollections.length > 0) {
-      quiz.peerReviewCollections
       data = data.map(d => {
         const newD = { ...d }
         for (let i = 0; i < quiz.peerReviewCollections.length; i++) {
