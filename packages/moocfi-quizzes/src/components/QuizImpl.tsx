@@ -17,19 +17,9 @@ import Unsupported from "./Unsupported"
 import { wordCount } from "../utils/string_tools"
 import { useTypedSelector } from "../state/store"
 import { SpaciousTypography } from "./styleComponents"
-import { Quiz } from "../modelTypes"
+import { Quiz, QuizItemType } from "../modelTypes"
 
-export type ComponentName =
-  | "essay"
-  | "multiple-choice"
-  | "scale"
-  | "checkbox"
-  | "open"
-  | "research-agreement"
-  | "feedback"
-  | "custom-frontend-accept-data"
-
-const componentsByTypeNames = (typeName: ComponentName) => {
+const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
     essay: Essay,
     "multiple-choice": MultipleChoice,

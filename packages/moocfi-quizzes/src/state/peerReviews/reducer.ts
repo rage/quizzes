@@ -5,14 +5,12 @@ import { QuizAnswer, PeerReviewAnswer } from "../../modelTypes"
 const initialValue = {
   options: [],
   answer: null,
-  submitLocked: true,
   submitDisabled: true,
 }
 
 export type PeerReviewsState = {
   answer: PeerReviewAnswer
   options: QuizAnswer[]
-  submitLocked: boolean
   submitDisabled: boolean
 }
 
@@ -39,11 +37,10 @@ export const peerReviewsReducer = (
             : answer,
         ),
       }
-      const submitDisabled = newAnswer.answers.find(
-        answer => !answer.hasOwnProperty("value"),
+      const submitDisabled = newAnswer.answers.some(
+        answer => answer.value === null,
       )
-        ? true
-        : false
+
       return {
         ...state,
         answer: newAnswer,
@@ -74,7 +71,6 @@ export const peerReviewsReducer = (
       return {
         ...state,
         answer: peerReviewAnswer,
-        submitLocked: false,
       }
     default:
       return state

@@ -3,23 +3,19 @@ import { useDispatch } from "react-redux"
 import { TextField, Typography } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
-import { QuizItem } from "../modelTypes"
+import { QuizItem, MiscEvent } from "../modelTypes"
 
 type FeedbackProps = {
   item: QuizItem
 }
 
+HTMLElement
+
 const Feedback: React.FunctionComponent<FeedbackProps> = ({ item }) => {
   const dispatch = useDispatch()
 
-  const handleTextDataChange = ((itemId: string) => (
-    e: React.FormEvent<
-      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
-    >,
-  ) =>
-    dispatch(quizAnswerActions.changeTextData(itemId, e.currentTarget.value)))(
-    item.id,
-  )
+  const handleTextDataChange = (e: MiscEvent) =>
+    dispatch(quizAnswerActions.changeTextData(item.id, e.currentTarget.value))
 
   const answer = useTypedSelector(state => state.quizAnswer)
   const answered = answer.id ? true : false

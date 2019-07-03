@@ -6,6 +6,7 @@ import PeerReviewOption from "./PeerReviewOption"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
 import { Dispatch, useTypedSelector } from "../../state/store"
 import { PeerReviewLabels } from "../../utils/languages"
+import { QuizAnswer, PeerReviewAnswer } from "../../modelTypes"
 
 type PeerReviewFormProps = {
   languageInfo: PeerReviewLabels
@@ -16,21 +17,72 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 }) => {
   const answersToReview = useTypedSelector(state => state.peerReviews.options)
   const peerReview = useTypedSelector(state => state.peerReviews.answer)
-  const submitLocked = useTypedSelector(state => state.peerReviews.submitLocked)
-  const submitDisabled = useTypedSelector(
-    state => state.peerReviews.submitDisabled,
-  )
-  const quiz = useTypedSelector(state => state.quiz)
-
-  const peerReviewQuestions = quiz.peerReviewCollections
-
   const currentAnswersToReview = peerReview
     ? answersToReview.filter(answer => answer.id === peerReview.quizAnswerId)
     : answersToReview
 
-  const dispatch = useDispatch<Dispatch>()
+  if (!currentAnswersToReview) {
+    return (
+      <Grid container>
+        <Grid item xs={1}>
+          <CircularProgress size={25} />
+        </Grid>
+        <Grid item>
+          <Typography>{languageInfo.loadingLabel}</Typography>
+        </Grid>
+      </Grid>
+    )
+  }
 
-  const handlePeerReviewGradeChange = peerReviewQuestionId => (
+  if (currentAnswersToReview.length === 0) {
+    return <Typography>{languageInfo.noPeerAnswersAvailableLabel}</Typography>
+  }
+
+  return (
+    <>
+      <Typography variant="subtitle1">
+        {languageInfo.chooseEssayInstruction}
+      </Typography>
+
+      {currentAnswersToReview.map(answer => (
+        <div key={answer.id}>
+          <PeerReviewOption answer={answer} />
+
+          {peerReview ? (
+            <PeerReviewQuestions
+              peerReview={peerReview}
+              languageInfo={languageInfo}
+            />
+          ) : (
+            <UnselectedPeerAnswerActions
+              answer={answer}
+              languageInfo={languageInfo}
+            />
+          )}
+        </div>
+      ))}
+    </>
+  )
+}
+
+type PeerReviewQuestionsProps = {
+  peerReview: PeerReviewAnswer
+  languageInfo: PeerReviewLabels
+}
+
+const PeerReviewQuestions: React.FunctionComponent<
+  PeerReviewQuestionsProps
+> = ({ peerReview, languageInfo }) => {
+  const peerReviewQuestions = useTypedSelector(
+    state => state.quiz.peerReviewCollections,
+  )
+
+  const submitDisabled = useTypedSelector(
+    state => state.peerReviews.submitDisabled,
+  )
+
+  const dispatch = useDispatch()
+  const changeInPeerReviewGrade = peerReviewQuestionId => (
     question: any,
     value: string,
   ) => {
@@ -43,80 +95,63 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
     dispatch(peerReviewsActions.submit())
   }
 
-  const flagAsSpam = (quizAnswerId: string) => () => {
-    dispatch(peerReviewsActions.postSpam(quizAnswerId))
-  }
-
-  const selectAnswer = (quizAnswerId: string) => () => {
-    dispatch(peerReviewsActions.selectAnswerToReview(quizAnswerId))
-  }
   return (
-    <>
-      <Typography variant="subtitle1">
-        {languageInfo.chooseEssayInstruction}
-      </Typography>
-      {!currentAnswersToReview ? (
-        <Grid container>
-          <Grid item xs={1}>
-            <CircularProgress size={25} />
-          </Grid>
-          <Grid item>
-            <Typography>{languageInfo.loadingLabel}</Typography>
-          </Grid>
-        </Grid>
-      ) : currentAnswersToReview.length === 0 ? (
-        <Typography>{languageInfo.noPeerAnswersAvailableLabel}</Typography>
-      ) : (
-        currentAnswersToReview.map(answer => (
-          <div key={answer.id}>
-            <PeerReviewOption answer={answer} />
+    <div>
+      {peerReviewQuestions[0].questions.map(question => {
+        const currentAnswerValue = peerReview.answers.find(
+          answer => answer.peerReviewQuestionId === question.id,
+        ).value
 
-            {peerReview ? (
-              <div>
-                {peerReviewQuestions[0].questions.map(question => {
-                  const currentAnswerValue = peerReview.answers.find(
-                    answer => answer.peerReviewQuestionId === question.id,
-                  ).value
+        return (
+          <LikertScale
+            key={question.id}
+            reviews={[
+              {
+                question: question.texts[0].title,
+                review: currentAnswerValue,
+              },
+            ]}
+            onClick={changeInPeerReviewGrade(question.id)}
+          />
+        )
+      })}
+      <Button disabled={submitDisabled} onClick={submitPeerReview}>
+        {languageInfo.submitPeerReviewLabel}
+      </Button>
+    </div>
+  )
+}
 
-                  return (
-                    <LikertScale
-                      key={question.id}
-                      reviews={[
-                        {
-                          question: question.texts[0].title,
-                          review: currentAnswerValue,
-                        },
-                      ]}
-                      onClick={handlePeerReviewGradeChange(question.id)}
-                    />
-                  )
-                })}
-                <Button
-                  disabled={submitLocked ? true : submitDisabled}
-                  onClick={submitPeerReview}
-                >
-                  {languageInfo.submitPeerReviewLabel}
-                </Button>
-              </div>
-            ) : (
-              <Grid container>
-                <Grid item xs={3}>
-                  <Button onClick={flagAsSpam(answer.id)}>
-                    {languageInfo.reportAsInappropriateLabel}
-                  </Button>
-                </Grid>
-                <Grid item xs={8} />
-                <Grid item xs={1}>
-                  <Button onClick={selectAnswer(answer.id)}>
-                    {languageInfo.chooseButtonLabel}
-                  </Button>
-                </Grid>
-              </Grid>
-            )}
-          </div>
-        ))
-      )}
-    </>
+type UnselectedPeerAnswerActionsProps = {
+  languageInfo: PeerReviewLabels
+  answer: QuizAnswer
+}
+
+const UnselectedPeerAnswerActions: React.FunctionComponent<
+  UnselectedPeerAnswerActionsProps
+> = ({ languageInfo, answer }) => {
+  const dispatch = useDispatch()
+
+  const flagAsSpam = () => {
+    dispatch(peerReviewsActions.postSpam(answer.id))
+  }
+
+  const selectAnswer = () => {
+    dispatch(peerReviewsActions.selectAnswerToReview(answer.id))
+  }
+
+  return (
+    <Grid container>
+      <Grid item xs={3}>
+        <Button onClick={flagAsSpam}>
+          {languageInfo.reportAsInappropriateLabel}
+        </Button>
+      </Grid>
+      <Grid item xs={8} />
+      <Grid item xs={1}>
+        <Button onClick={selectAnswer}>{languageInfo.chooseButtonLabel}</Button>
+      </Grid>
+    </Grid>
   )
 }
 

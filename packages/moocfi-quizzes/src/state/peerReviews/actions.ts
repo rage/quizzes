@@ -50,7 +50,6 @@ export const submit = () => async (dispatch, getState) => {
   const peerReview = getState().peerReviews.answer
   const accessToken = getState().user.accessToken
   dispatch(setSubmitDisabled(true))
-  dispatch(setSubmitLocked(true))
   const { userQuizState } = await postPeerReview(peerReview, accessToken)
   dispatch(setQuizState(userQuizState))
   dispatch(setReviewAnswer(undefined))
@@ -82,7 +81,7 @@ export const fetchPeerReviewAlternatives: ActionCreator<
 > = () => async (dispatch, getState) => {
   const accessToken = getState().user.accessToken
   const quiz = getState().quiz
-  const languageId = getState().user.accessToken
+  const languageId = getState().language.languageId
 
   const answerAlternatives = await getPeerReviewInfo(
     quiz.id,
@@ -90,12 +89,6 @@ export const fetchPeerReviewAlternatives: ActionCreator<
     accessToken,
   )
   dispatch(setReviewOptions(answerAlternatives))
-}
-
-export const setSubmitLocked: ActionCreator<ThunkAction> = (
-  newValue: boolean,
-) => (dispatch, getState) => {
-  dispatch(set({ ...getState().peerReviews, submitLocked: newValue }))
 }
 
 export const setSubmitDisabled = (newValue: boolean) => (

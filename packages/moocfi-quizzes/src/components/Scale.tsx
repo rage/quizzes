@@ -14,7 +14,7 @@ import {
 import { useTheme } from "@material-ui/core/styles"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
-import { QuizItem } from "../modelTypes"
+import { QuizItem, MiscEvent } from "../modelTypes"
 
 type ScaleProps = {
   item: QuizItem
@@ -37,11 +37,9 @@ const StyledRadio = styled(Radio)`
 
 const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
   const dispatch = useDispatch()
-  const handleIntDataChange = (itemId: string) => (
-    e: React.FormEvent<HTMLInputElement>,
-  ) =>
+  const handleIntDataChange = (e: MiscEvent) =>
     dispatch(
-      quizAnswerActions.changeIntData(itemId, Number(e.currentTarget.value)),
+      quizAnswerActions.changeIntData(item.id, Number(e.currentTarget.value)),
     )
 
   const theme = useTheme()
@@ -65,7 +63,7 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
         </SmallCenteredGrid>
         <Grid item={true} xs={12} md={6}>
           <ScaleOptions
-            handleIntDataChange={handleIntDataChange(item.id)}
+            handleIntDataChange={handleIntDataChange}
             item={item}
             intData={intData}
           />
@@ -76,7 +74,7 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
 }
 
 type ScaleOptionsProps = {
-  handleIntDataChange: (event: React.FormEvent, value: string) => void
+  handleIntDataChange: (event: MiscEvent, value: string) => void
   item: QuizItem
   intData: number
 }

@@ -6,11 +6,7 @@ import { GridDirection, GridSize } from "@material-ui/core/Grid"
 import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
-import { QuizItem } from "../modelTypes"
-
-type MultipleChoiceProps = {
-  item: QuizItem
-}
+import { QuizItem, QuizItemOption } from "../modelTypes"
 
 const ChoicesContainer = styled(
   ({ singleItem, optionContainerWidth, ...others }) => (
@@ -64,32 +60,19 @@ const SolutionTypography = styled(
   margin-bottom: 0;
 `
 
+type MultipleChoiceProps = {
+  item: QuizItem
+}
+
 const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   item,
 }) => {
-  const dispatch = useDispatch()
-
-  const handleOptionChange = ((itemId: string) => (optionId: string) => () =>
-    dispatch(quizAnswerActions.changeChosenOption(itemId, optionId)))(item.id)
-
   const quiz = useTypedSelector(state => state.quiz)
   const answer = useTypedSelector(state => state.quizAnswer)
-  const languageInfo = useTypedSelector(
-    state => state.language.languageLabels.multipleChoice,
-  )
 
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
-  const correct = itemAnswer.correct
-  const optionAnswers = itemAnswer.optionAnswers
 
-  const answered = answer.id ? true : false
-  const itemTitle = item.texts[0].title
-  const itemBody = item.texts[0].body
-  const successMessage = item.texts[0].successMessage
-  const failureMessage = item.texts[0].failureMessage
-  const multi = item.multi
-
-  const singleItem = quiz.items.length === 1
+  const onlyOneItem = quiz.items.length === 1
 
   const options = item.options
 
@@ -98,7 +81,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   let optionContainerWidth: 6 | 12 = 6
   let optionWidth: GridSize
 
-  if (singleItem) {
+  if (onlyOneItem) {
     const maxOptionLength = Math.max(
       ...options.map(option => option.texts[0].title.length),
     )
@@ -111,113 +94,168 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   }
 
   return (
-    <BottomMarginedGrid container direction={direction}>
-      <Grid item sm={questionWidth}>
-        {singleItem ? (
-          ""
-        ) : (
-          <>
-            <SpaciousTypography variant="h6">{itemTitle}</SpaciousTypography>
-            {itemBody && (
-              <SpaciousTypography
-                variant="body1"
-                dangerouslySetInnerHTML={{ __html: itemBody }}
-              />
-            )}
-          </>
-        )}
-        {multi && !answered ? (
-          <Typography variant="subtitle1">
-            {languageInfo.chooseAllSuitableOptionsLabel}
-          </Typography>
-        ) : (
-          ""
-        )}
-        {answered && !singleItem ? (
-          <SolutionTypography correct={correct} variant="body1">
-            {correct ? successMessage : failureMessage}
-          </SolutionTypography>
-        ) : (
-          ""
-        )}
-      </Grid>
+    <BottomMarginedGrid container={true} direction={direction}>
+      <UnnamedComponent
+        item={item}
+        itemAnswer={itemAnswer}
+        onlyOneItem={onlyOneItem}
+        questionWidth={questionWidth}
+      />
 
       <ChoicesContainer
         direction={direction}
         justify="space-between"
-        singleItem={singleItem}
+        singleItem={onlyOneItem}
         optionContainerWidth={optionContainerWidth}
       >
         {options
           .sort((o1, o2) => o2.order - o1.order)
           .map(option => {
-            const selected = optionAnswers.find(
-              oa => oa.quizOptionId === option.id,
-            )
-            const text = option.texts[0]
-            const feedbackMessage = option.correct
-              ? selected
-                ? text.successMessage
-                : text.failureMessage
-              : selected
-              ? text.failureMessage
-              : text.successMessage
-            const feedbackColor = option.correct
-              ? selected
-                ? "green"
-                : "white"
-              : selected
-              ? "red"
-              : "white"
-            return answered ? (
-              singleItem ? (
-                <Grid item={true}>
-                  <Grid container direction={direction} key={option.id}>
-                    <Grid item sm={optionWidth}>
-                      <RevealedChoiceButton
-                        selected={selected}
-                        correct={option.correct}
-                        fullWidth
-                      >
-                        {text.title}
-                      </RevealedChoiceButton>
-                    </Grid>
-                    <Grid item>
-                      <LeftBorderedTypography
-                        variant="body1"
-                        barColor={feedbackColor}
-                      >
-                        {feedbackMessage}
-                      </LeftBorderedTypography>
-                    </Grid>
-                  </Grid>
-                </Grid>
-              ) : (
-                <Grid item key={option.id}>
-                  <RevealedChoiceButton
-                    selected={selected}
-                    correct={option.correct}
-                    fullWidth
-                  >
-                    {text.title}
-                  </RevealedChoiceButton>
-                </Grid>
-              )
-            ) : (
-              <Grid item sm={optionWidth} key={option.id}>
-                <ChoiceButton
-                  variant="outlined"
-                  fullWidth
-                  color={selected ? "primary" : "default"}
-                  onClick={handleOptionChange(option.id)}
-                >
-                  {text.title}
-                </ChoiceButton>
-              </Grid>
+            return (
+              <Option
+                option={option}
+                direction={direction}
+                optionWidth={optionWidth}
+              />
             )
           })}
       </ChoicesContainer>
     </BottomMarginedGrid>
+  )
+}
+
+const UnnamedComponent = ({ questionWidth, onlyOneItem, item, itemAnswer }) => {
+  const answered = itemAnswer.id ? true : false
+
+  const languageInfo = useTypedSelector(
+    state => state.language.languageLabels.multipleChoice,
+  )
+
+  const { title, body, successMessage, failureMessage } = item.texts[0]
+
+  if (onlyOneItem) {
+    return <></>
+  }
+  return (
+    <Grid item sm={questionWidth}>
+      <SpaciousTypography variant="h6">{title}</SpaciousTypography>
+
+      {body && (
+        <SpaciousTypography
+          variant="body1"
+          dangerouslySetInnerHTML={{ __html: body }}
+        />
+      )}
+
+      {!answered && item.multi && (
+        <Typography variant="subtitle1">
+          {languageInfo.chooseAllSuitableOptionsLabel}
+        </Typography>
+      )}
+
+      {answered && !onlyOneItem && (
+        <SolutionTypography correct={itemAnswer.correct} variant="body1">
+          {itemAnswer.correct ? successMessage : failureMessage}
+        </SolutionTypography>
+      )}
+    </Grid>
+  )
+}
+
+type OptionProps = {
+  option: QuizItemOption
+  direction: GridDirection
+  optionWidth: GridSize
+}
+
+const Option: React.FunctionComponent<OptionProps> = ({
+  option,
+  direction,
+  optionWidth,
+}) => {
+  const items = useTypedSelector(state => state.quiz.items)
+  const item = items.find(i => i.id === option.quizItemId)
+  const quizAnswer = useTypedSelector(state => state.quizAnswer)
+  const itemAnswer = quizAnswer.itemAnswers.find(
+    ia => ia.quizItemId === item.id,
+  )
+
+  const onlyOneItem = items.length === 1
+
+  const dispatch = useDispatch()
+
+  const handleOptionChange = (optionId: string) => () =>
+    dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))
+
+  const optionAnswers = itemAnswer.optionAnswers
+  const answered = itemAnswer.id ? true : false
+
+  const optionIsSelected = optionAnswers.some(
+    oa => oa.quizOptionId === option.id,
+  )
+  const text = option.texts[0]
+
+  // option incorrect, selected -> success; option correct, not selected -> success! Otherwise failure
+  const feedbackMessage =
+    option.correct === optionIsSelected
+      ? text.successMessage
+      : text.failureMessage
+
+  const feedbackColor = optionIsSelected
+    ? option.correct
+      ? "green"
+      : "red"
+    : "white"
+
+  if (!answered) {
+    return (
+      <Grid item={true} sm={optionWidth} key={option.id}>
+        <ChoiceButton
+          variant="outlined"
+          fullWidth
+          color={optionIsSelected ? "primary" : "default"}
+          onClick={handleOptionChange(option.id)}
+        >
+          {text.title}
+        </ChoiceButton>
+      </Grid>
+    )
+  }
+
+  if (onlyOneItem) {
+    return (
+      <Grid item={true} key={option.id}>
+        <Grid container={true} direction={direction}>
+          <Grid item={true} sm={optionWidth}>
+            <RevealedChoiceButton
+              selected={optionIsSelected}
+              correct={option.correct}
+              fullWidth
+            >
+              {text.title}
+            </RevealedChoiceButton>
+          </Grid>
+
+          <Grid item>
+            <LeftBorderedTypography variant="body1" barColor={feedbackColor}>
+              {feedbackMessage}
+            </LeftBorderedTypography>
+          </Grid>
+        </Grid>
+      </Grid>
+    )
+  }
+
+  return (
+    <Grid item={true} key={option.id}>
+      <RevealedChoiceButton
+        selected={optionIsSelected}
+        correct={option.correct}
+        fullWidth
+      >
+        {text.title}
+      </RevealedChoiceButton>
+    </Grid>
   )
 }
 

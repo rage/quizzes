@@ -5,16 +5,17 @@ import thunk from "redux-thunk"
 import { languageReducer, LanguageState } from "./language/reducer"
 import { messageReducer } from "./message/reducer"
 import { peerReviewsReducer, PeerReviewsState } from "./peerReviews/reducer"
-import { quizReducer, QuizState } from "./quiz/reducer"
-import { quizAnswerReducer, QuizAnswerState } from "./quizAnswer/reducer"
-import { submitLockedReducer } from "./submitLocked/reducer"
+import { quizReducer } from "./quiz/reducer"
+import { quizAnswerReducer } from "./quizAnswer/reducer"
+import { submitLockedReducer } from "./submitDisabled/reducer"
 import { userReducer, UserState } from "./user/reducer"
+import { QuizAnswer, Quiz } from "../modelTypes"
 
 import * as languageActions from "./language/actions"
 import * as messageActions from "./message/actions"
 import * as quizActions from "./quiz/actions"
 import * as quizAnswerActions from "./quizAnswer/actions"
-import * as submitLockedActions from "./submitLocked/actions"
+import * as submitLockedActions from "./submitDisabled/actions"
 import * as userActions from "./user/actions"
 import * as PeerReviewsActions from "./peerReviews/actions"
 
@@ -42,8 +43,8 @@ export interface State {
   language: LanguageState
   peerReviews: PeerReviewsState
   message: string
-  quiz: QuizState
-  quizAnswer: QuizAnswerState
+  quiz: Quiz
+  quizAnswer: QuizAnswer
   submitLocked: boolean
   user: UserState
 }

@@ -1,7 +1,7 @@
 import { ActionCreator } from "redux"
 import { createAction } from "typesafe-actions"
 import { ThunkAction } from "../store"
-import * as submitLockedActions from "../submitLocked/actions"
+import * as submitLockedActions from "../submitDisabled/actions"
 import { postAnswer } from "../../services/answerService"
 import * as userActions from "../user/actions"
 import * as quizActions from "../quiz/actions"

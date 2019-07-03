@@ -1,16 +1,16 @@
 import { ActionType, getType } from "typesafe-actions"
-import * as submitLocked from "./actions"
+import * as submitDisabled from "./actions"
 
 const initialValue = false
 
 export const submitLockedReducer = (
   state: boolean = initialValue,
-  action: ActionType<typeof submitLocked>,
+  action: ActionType<typeof submitDisabled>,
 ) => {
   switch (action.type) {
-    case getType(submitLocked.set):
+    case getType(submitDisabled.set):
       return action.payload
-    case getType(submitLocked.clear):
+    case getType(submitDisabled.clear):
       return initialValue
     default:
       return state

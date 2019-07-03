@@ -1,3 +1,17 @@
+export type QuizItemType =
+  | "essay"
+  | "multiple-choice"
+  | "scale"
+  | "checkbox"
+  | "open"
+  | "research-agreement"
+  | "feedback"
+  | "custom-frontend-accept-data"
+
+export type MiscEvent = React.FormEvent<
+  HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+>
+
 export type UserQuizState = {
   userId: number
   quizId: string
@@ -104,15 +118,7 @@ export type QuizItemText = {
 export type QuizItem = {
   id: string
   quizId: string
-  type:
-    | "open"
-    | "scale"
-    | "essay"
-    | "multiple-choice"
-    | "checkbox"
-    | "research-agreement"
-    | "feedback"
-    | "custom-frontend-accept-data"
+  type: QuizItemType
   order: number
   minWords: number
   maxWords: number
