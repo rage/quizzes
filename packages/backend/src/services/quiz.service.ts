@@ -400,7 +400,6 @@ export default class QuizService {
     let result
     try {
       result = await this.entityManager.save(quiz)
-      this.kafka
     } catch (error) {
       throw new Error(error.message)
     }
