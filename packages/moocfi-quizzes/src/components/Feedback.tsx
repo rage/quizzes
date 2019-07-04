@@ -9,8 +9,6 @@ type FeedbackProps = {
   item: QuizItem
 }
 
-HTMLElement
-
 const Feedback: React.FunctionComponent<FeedbackProps> = ({ item }) => {
   const dispatch = useDispatch()
 

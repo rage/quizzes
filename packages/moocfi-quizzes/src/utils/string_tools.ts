@@ -1,4 +1,4 @@
-export function wordCount(str: string) {
+export const wordCount = (str: string) => {
   if (!str) {
     return 0
   }

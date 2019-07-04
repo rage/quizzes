@@ -35,8 +35,8 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
   )
   const answered = answer.id ? true : false
   const itemTitle = item.texts[0].title
-  const successMessage = item.texts[0].successMessage
-  const failureMessage = item.texts[0].failureMessage
+
+  const { successMessage, failureMessage } = item.texts[0]
 
   const guidance = (
     <>

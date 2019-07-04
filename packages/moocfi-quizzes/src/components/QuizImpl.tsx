@@ -119,15 +119,12 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
     )
   }
 
-  // should not be a separate case!
-  // and also never occur, unless the requested language does not
-  // match the language of the quiz...
   if (quiz.texts.length === 0) {
     const message =
       "Error: quiz has no texts. (Likely the quiz does not match the requested " +
       "language id)"
     dispatch(messageActions.set(message))
-    return <div>yeet</div>
+    return
   }
 
   const types = quiz.items.map(item => item.type)
