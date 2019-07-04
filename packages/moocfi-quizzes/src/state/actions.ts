@@ -11,7 +11,7 @@ export const initialize: ActionCreator<ThunkAction> = (
   id: string,
   languageId: string,
   accessToken: string,
-) => async (dispatch, getState) => {
+) => async dispatch => {
   try {
     let { quiz, quizAnswer, userQuizState } = await getQuizInfo(
       id,

@@ -45,7 +45,11 @@ export const changeChosenOption: ActionCreator<ThunkAction> = (
   itemId: string,
   optionId: string,
 ) => (dispatch, getState) => {
-  const multi = getState().quiz.items.find(i => i.id === itemId).multi
+  const item = getState().quiz.items.find(i => i.id === itemId)
+  if (!item) {
+    return
+  }
+  const multi = item.multi
   dispatch(chooseOption(itemId, optionId, multi))
 }
 
@@ -53,11 +57,10 @@ export const changeTextData: ActionCreator<ThunkAction> = (
   itemId: string,
   newValue: string,
 ) => (dispatch, getState) => {
-  const itemAnswer = getState().quizAnswer.quizAnswer.itemAnswers.find(
-    qa => qa.quizItemId === itemId,
-  )
   const item = getState().quiz.items.find(i => i.id === itemId)
-
+  if (item === undefined) {
+    return
+  }
   const readyToSubmit = itemAnswerReadyForSubmit(newValue, item)
   dispatch(changeTextDataAction(itemId, newValue, readyToSubmit))
 }

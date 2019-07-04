@@ -3,10 +3,12 @@ import * as message from "./actions"
 
 const initialValue = null
 
+type MessageState = string | null
+
 export const messageReducer = (
-  state: string = initialValue,
+  state: MessageState = initialValue,
   action: ActionType<typeof message>,
-): string => {
+): MessageState => {
   switch (action.type) {
     case getType(message.set):
       return action.payload

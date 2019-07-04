@@ -25,7 +25,7 @@ export type UserQuizState = {
 
 export type QuizOptionAnswer = {
   id?: string
-  quizItemAnswerId: string
+  quizItemAnswerId?: string
   quizOptionId: string
 }
 
@@ -33,8 +33,8 @@ export type QuizItemAnswer = {
   id?: string
   quizAnswerId?: string
   quizItemId: string
-  textData: string
-  intData: number
+  textData: string | null
+  intData: number | null
   correct?: boolean
   optionAnswers: QuizOptionAnswer[]
 }
@@ -182,7 +182,7 @@ export type Quiz = {
 
 export type PeerReviewGradeAnswer = {
   peerReviewQuestionId: string
-  value: number
+  value: number | null
 }
 
 export type PeerReviewEssayAnswer = {

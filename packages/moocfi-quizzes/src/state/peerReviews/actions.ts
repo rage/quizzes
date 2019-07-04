@@ -7,7 +7,7 @@ import {
   postSpamFlag,
 } from "../../services/peerReviewService"
 import { setQuizState } from "../user/actions"
-import { ThunkAction, RootAction } from "../store"
+import { ThunkAction } from "../store"
 import { PeerReviewAnswer } from "../../modelTypes"
 
 export const set = createAction("peerReviews/SET", resolve => {
@@ -17,7 +17,7 @@ export const set = createAction("peerReviews/SET", resolve => {
 export const setReviewAnswer = createAction(
   "peerReviews/SET_ANSWER",
   resolve => {
-    return (peerReview: PeerReviewAnswer) => resolve(peerReview)
+    return (peerReview: PeerReviewAnswer | null) => resolve(peerReview)
   },
 )
 
@@ -46,13 +46,19 @@ export const changeGrade = createAction(
     resolve({ peerReviewQuestionId, value }),
 )
 
-export const submit = () => async (dispatch, getState) => {
+export const submit: ActionCreator<ThunkAction> = () => async (
+  dispatch,
+  getState,
+) => {
   const peerReview = getState().peerReviews.answer
+  if (!peerReview) {
+    return
+  }
   const accessToken = getState().user.accessToken
   dispatch(setSubmitDisabled(true))
   const { userQuizState } = await postPeerReview(peerReview, accessToken)
   dispatch(setQuizState(userQuizState))
-  dispatch(setReviewAnswer(undefined))
+  dispatch(setReviewAnswer(null))
   await dispatch(fetchPeerReviewAlternatives())
 }
 
@@ -60,7 +66,17 @@ export const submit = () => async (dispatch, getState) => {
 export const selectAnswerToReview: ActionCreator<ThunkAction> = (
   quizAnswerId: string,
 ) => (dispatch, getState) => {
-  const userId = getState().user.userQuizState.userId
+  const user = getState().user
+  if (!user) {
+    console.log("user not set")
+    return
+  }
+  if (!user.userQuizState) {
+    console.log("uqs not set")
+    return
+  }
+
+  const userId = user.userQuizState.userId
   const prc = getState().quiz.peerReviewCollections[0]
   dispatch(
     selectAnswer(quizAnswerId, userId, prc.id, prc.questions.map(q => q.id)),
@@ -71,7 +87,7 @@ export const postSpam: ActionCreator<ThunkAction> = (
   quizAnswerId: string,
 ) => async (dispatch, getState) => {
   const accessToken = getState().user.accessToken
-  setReviewOptions(undefined)
+  setReviewOptions([])
   await postSpamFlag(quizAnswerId, accessToken)
   fetchPeerReviewAlternatives()
 }
@@ -91,10 +107,9 @@ export const fetchPeerReviewAlternatives: ActionCreator<
   dispatch(setReviewOptions(answerAlternatives))
 }
 
-export const setSubmitDisabled = (newValue: boolean) => (
-  dispatch,
-  getState,
-) => {
+export const setSubmitDisabled: ActionCreator<ThunkAction> = (
+  newValue: boolean,
+) => (dispatch, getState) => {
   dispatch(set({ ...getState().peerReviews, submitDisabled: newValue }))
 }
 
