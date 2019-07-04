@@ -1,5 +1,6 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
+// @ts-ignore
 import LikertScale from "likert-react"
 import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
 import PeerReviewOption from "./PeerReviewOption"
@@ -73,16 +74,19 @@ type PeerReviewQuestionsProps = {
 const PeerReviewQuestions: React.FunctionComponent<
   PeerReviewQuestionsProps
 > = ({ peerReview, languageInfo }) => {
-  const peerReviewQuestions = useTypedSelector(
-    state => state.quiz.peerReviewCollections,
-  )
+  const quiz = useTypedSelector(state => state.quiz)
+  if (!quiz) {
+    return <div />
+  }
+
+  const peerReviewQuestions = quiz.peerReviewCollections
 
   const submitDisabled = useTypedSelector(
     state => state.peerReviews.submitDisabled,
   )
 
   const dispatch = useDispatch()
-  const changeInPeerReviewGrade = peerReviewQuestionId => (
+  const changeInPeerReviewGrade = (peerReviewQuestionId: string) => (
     question: any,
     value: string,
   ) => {
@@ -98,9 +102,13 @@ const PeerReviewQuestions: React.FunctionComponent<
   return (
     <div>
       {peerReviewQuestions[0].questions.map(question => {
-        const currentAnswerValue = peerReview.answers.find(
+        const currentPeerReviewAnswer = peerReview.answers.find(
           answer => answer.peerReviewQuestionId === question.id,
-        ).value
+        )
+        if (!currentPeerReviewAnswer) {
+          return <div />
+        }
+        const currentAnswerValue = currentPeerReviewAnswer.value
 
         return (
           <LikertScale

@@ -7,8 +7,12 @@ type UnsupportedProps = {
 }
 
 export default ({ item }: UnsupportedProps) => {
-  const unsupportedLabels = useTypedSelector(
-    state => state.language.languageLabels.unsupported,
+  const languageLabels = useTypedSelector(
+    state => state.language.languageLabels,
   )
+  if (!languageLabels) {
+    return <div />
+  }
+  const unsupportedLabels = languageLabels.unsupported
   return <div>{unsupportedLabels.notSupportedInsert(item.type)}</div>
 }

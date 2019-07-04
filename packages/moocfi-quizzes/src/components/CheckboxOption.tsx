@@ -28,9 +28,14 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
 
   const answered = quizAnswer.id ? true : false
 
-  const optionAnswer = quizAnswer.itemAnswers.find(
+  const itemAnswer = quizAnswer.itemAnswers.find(
     ia => ia.quizItemId === item.id,
-  ).optionAnswers[0]
+  )
+  if (!itemAnswer) {
+    return <div />
+  }
+
+  const optionAnswer = itemAnswer.optionAnswers[0]
 
   const checkboxOptions = {
     disabled: answered,

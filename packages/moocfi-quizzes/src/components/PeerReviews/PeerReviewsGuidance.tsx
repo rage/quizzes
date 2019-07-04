@@ -14,7 +14,7 @@ const PeerReviewsGuidance: React.FunctionComponent<
   const quiz = useTypedSelector(state => state.quiz)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const given = userQuizState ? userQuizState.peerReviewsGiven : 0
-  const required = quiz.course.minPeerReviewsGiven || 0
+  const required = (quiz && quiz.course.minPeerReviewsGiven) || 0
 
   return (
     <div>

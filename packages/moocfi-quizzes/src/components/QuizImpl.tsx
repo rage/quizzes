@@ -18,7 +18,7 @@ import PeerReviews from "./PeerReviews"
 import Unsupported from "./Unsupported"
 import { useTypedSelector } from "../state/store"
 import { SpaciousTypography } from "./styleComponents"
-import { Quiz, QuizItemType } from "../modelTypes"
+import { Quiz, QuizItemType, QuizItemAnswer } from "../modelTypes"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
@@ -35,13 +35,13 @@ const componentsByTypeNames = (typeName: QuizItemType) => {
   return mapTypeToComponent[typeName]
 }
 
-export interface Props {
+export interface QuizProps {
   id: string
   languageId: string
   accessToken: string
 }
 
-const FuncQuizImpl: React.FunctionComponent<Props> = ({
+const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   id,
   languageId,
   accessToken,
@@ -50,19 +50,19 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
   const error = useTypedSelector(state => state.message)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const quiz = useTypedSelector(state => state.quiz)
-  const languageState = useTypedSelector(state => state.language)
-
-  let languageInfo
-
-  if (languageState.languageLabels) {
-    languageInfo = languageState.languageLabels.general
-  }
+  const languageInfo = useTypedSelector(state => state.language.languageLabels)
 
   const dispatch = useDispatch()
 
   useEffect(() => {
     dispatch(initialize(id, languageId, accessToken))
   }, [])
+
+  if (!quiz || !languageInfo) {
+    return <div />
+  }
+
+  const generalLabels = languageInfo.general
 
   const handleSubmit = () => dispatch(quizAnswerActions.submit())
 
@@ -75,7 +75,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
     )
   }
 
-  const atLeastOneCorrect = itemAnswers =>
+  const atLeastOneCorrect = (itemAnswers: QuizItemAnswer[]) =>
     itemAnswers.some(ia => ia.correct === true)
 
   const quizContainsEssay = () => {
@@ -97,13 +97,13 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
   }
 
   if (!accessToken) {
-    return <div>{languageInfo.loginPromptLabel}</div>
+    return <div>{generalLabels.loginPromptLabel}</div>
   }
 
   if (error) {
     return (
       <div>
-        {languageInfo && languageInfo.errorLabel}
+        {generalLabels && generalLabels.errorLabel}
         <pre>{error}</pre>
       </div>
     )
@@ -124,7 +124,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
       "Error: quiz has no texts. (Likely the quiz does not match the requested " +
       "language id)"
     dispatch(messageActions.set(message))
-    return
+    return <div />
   }
 
   const types = quiz.items.map(item => item.type)
@@ -152,16 +152,16 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
               {hasCorrectAnswer(quiz)
                 ? atLeastOneCorrect(quizAnswer.itemAnswers)
                   ? quiz.items.length === 1
-                    ? languageInfo.answerCorrectLabel
-                    : languageInfo.kOutOfNCorrect(
+                    ? generalLabels.answerCorrectLabel
+                    : generalLabels.kOutOfNCorrect(
                         quizAnswer.itemAnswers.filter(ia => ia.correct === true)
                           .length,
                         quiz.items.length,
                       )
                   : types.includes("essay") || types.includes("scale")
                   ? ""
-                  : languageInfo.answerIncorrectLabel
-                : languageInfo.alreadyAnsweredLabel}
+                  : generalLabels.answerIncorrectLabel
+                : generalLabels.alreadyAnsweredLabel}
             </Typography>
           </>
         ) : (
@@ -172,7 +172,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
               disabled={submitLocked}
               onClick={handleSubmit}
             >
-              {languageInfo.submitButtonLabel}
+              {generalLabels.submitButtonLabel}
             </Button>
           </div>
         )}

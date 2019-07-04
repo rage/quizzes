@@ -19,8 +19,12 @@ const Feedback: React.FunctionComponent<FeedbackProps> = ({ item }) => {
   const answered = answer.id ? true : false
   const itemTitle = item.texts[0].title
 
-  const textData = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
-    .textData
+  const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
+  if (!itemAnswer) {
+    return <div />
+  }
+
+  const textData = itemAnswer.textData
 
   return (
     <div style={{ marginBottom: 10 }}>

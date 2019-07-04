@@ -20,22 +20,29 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
     dispatch(quizAnswerActions.changeTextData(item.id, e.currentTarget.value))
 
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
-  const languageInfo = useTypedSelector(
-    state => state.language.languageLabels.essay,
-  )
+  const languageInfo = useTypedSelector(state => state.language.languageLabels)
 
+  if (!languageInfo) {
+    return <div />
+  }
+  const essayLabels = languageInfo.essay
   const itemBody = item.texts[0].body
   const itemTitle = item.texts[0].title
   const answered = quizAnswer.id ? true : false
 
-  const answerText = quizAnswer.itemAnswers.find(
+  const itemAnswer = quizAnswer.itemAnswers.find(
     ia => ia.quizItemId === item.id,
-  ).textData
+  )
+  if (!itemAnswer) {
+    return <div />
+  }
+
+  const answerText = itemAnswer.textData || ""
 
   const answerPortion = answered ? (
     <>
       <Typography variant="subtitle1">
-        {languageInfo.userAnswerLabel + ": "}
+        {essayLabels.userAnswerLabel + ": "}
       </Typography>
       <SpaciousPaper>
         <Typography variant="body1">{answerText}</Typography>
@@ -45,12 +52,12 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
     <>
       {item.minWords && (
         <Typography variant="body1">
-          {languageInfo.minimumWords}: {item.minWords}
+          {essayLabels.minimumWords}: {item.minWords}
         </Typography>
       )}
       <TextField
         variant="outlined"
-        label={languageInfo.textFieldLabel}
+        label={essayLabels.textFieldLabel}
         value={answerText}
         onChange={executeIfWordNumberCorrect(
           handleTextDataChange,
@@ -63,7 +70,7 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
         margin="normal"
       />
       <div>
-        {languageInfo.currentNumberOfWordsLabel}: {wordCount(answerText)}
+        {essayLabels.currentNumberOfWordsLabel}: {wordCount(answerText)}
         {item.maxWords && <> / {item.maxWords}</>}
       </div>
     </>

@@ -27,12 +27,18 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
 
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
+  if (!itemAnswer) {
+    return <div />
+  }
   const correct = itemAnswer.correct
   const textData = itemAnswer.textData
 
-  const languageInfo = useTypedSelector(
-    state => state.language.languageLabels.open,
-  )
+  const languageInfo = useTypedSelector(state => state.language.languageLabels)
+  if (!languageInfo) {
+    return <div />
+  }
+  const openLabels = languageInfo.open
+
   const answered = answer.id ? true : false
   const itemTitle = item.texts[0].title
 
@@ -53,7 +59,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
       <div>
         {guidance}
         <Typography variant="subtitle1">
-          {languageInfo.userAnswerLabel}:
+          {openLabels.userAnswerLabel}:
         </Typography>
         <SpaciousPaper>
           <Typography variant="body1">{textData}</Typography>
@@ -75,7 +81,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
         onChange={handleTextDataChange}
         fullWidth
         margin="normal"
-        placeholder={languageInfo.placeholder}
+        placeholder={openLabels.placeholder}
       />
     </div>
   )

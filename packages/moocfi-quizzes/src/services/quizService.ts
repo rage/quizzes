@@ -9,9 +9,9 @@ type QuizResponse = {
 }
 
 export const getQuizInfo = async (
-  id,
-  languageId,
-  accessToken,
+  id: string,
+  languageId: string,
+  accessToken: string,
 ): Promise<QuizResponse> => {
   const response = await axios.get(
     `${BASE_URL}/api/v1/quizzes/${id}?language=${languageId}`,
