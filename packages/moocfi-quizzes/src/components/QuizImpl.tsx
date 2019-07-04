@@ -103,7 +103,7 @@ const FuncQuizImpl: React.FunctionComponent<Props> = ({
   if (error) {
     return (
       <div>
-        {languageInfo.errorLabel}
+        {languageInfo && languageInfo.errorLabel}
         <pre>{error}</pre>
       </div>
     )

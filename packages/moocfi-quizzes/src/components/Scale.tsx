@@ -48,7 +48,8 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
   const itemAnswers = useTypedSelector(
     state => state.quizAnswer.quizAnswer.itemAnswers,
   )
-  const intData = itemAnswers.find(ia => ia.quizItemId === item.id).intData
+  const itemAnswer = itemAnswers.find(ia => ia.quizItemId === item.id)
+  const intData = itemAnswer && itemAnswer.intData
 
   return (
     <FormControl fullWidth={true} style={{ marginBottom: "1rem" }}>

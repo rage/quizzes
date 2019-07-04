@@ -18,9 +18,14 @@ export const languageReducer = (
 ): LanguageState => {
   switch (action.type) {
     case getType(language.set):
+      let id = action.payload
+      const options = languageOptions[action.payload]
+      if (!options) {
+        id = "en_US"
+      }
       return {
-        languageId: action.payload,
-        languageLabels: languageOptions[action.payload],
+        languageId: id,
+        languageLabels: languageOptions[id],
       }
     case getType(language.clear):
       return initialValue
