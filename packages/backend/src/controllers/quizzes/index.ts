@@ -1,5 +1,6 @@
 import { Response } from "express"
 import JSONStream from "JSONStream"
+import knex from "knex"
 import { getUUIDByString } from "@quizzes/common/util"
 import {
   Get,
@@ -26,6 +27,8 @@ import {
   Quiz,
   QuizAnswer,
   UserQuizState,
+  QuizItemTranslation,
+  QuizItem,
 } from "../../models"
 import { IQuizQuery, ITMCProfileDetails } from "../../types"
 import _ from "lodash"
@@ -93,12 +96,15 @@ export class QuizController {
         stripped: quizAnswer ? false : true,
         ...params,
       })
+
       return {
         quiz: quizzes[0],
         quizAnswer,
         userQuizState,
       }
-    } catch (error) {}
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   @Get("/data/:id/plainQuizInfo")

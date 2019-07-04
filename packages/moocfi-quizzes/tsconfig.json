@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "outDir": "./dist",
+    "target": "es5",
+    "lib": ["dom", "esnext"],
+    "module": "esnext",
+    "moduleResolution": "node",
+    "noImplicitAny": false,
+    "strictNullChecks": false,
+    "removeComments": true,
+    "declaration": false,
+    "sourceMap": true,
+    "jsx": "react",
+    "typeRoots": [
+      "index.d.ts",
+      "node_modules/@types"
+    ]
+  },
+  "include": [
+    "./src/**/*.tsx",
+    "./src/**/*.ts", "src/utils/string_tools.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

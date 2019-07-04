@@ -193,7 +193,6 @@ export class QuizAnswerController {
 
     result = await this.quizAnswerService.getAnswers(attentionCriteriaQuery)
     return result
-    console.log("nothing after!")
   }
 
   @Post("/:answerId")
