@@ -37,7 +37,7 @@ const createUserQuizStates = async () => {
     if (end > all.length - 1) {
       end = all.length - 1
     }
-    console.log("insert " + start + " though " + end)
+    console.log("insert " + start + " through " + end)
     await manager
       .createQueryBuilder()
       .insert()

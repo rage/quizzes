@@ -1,6 +1,7 @@
 import knex from "knex"
 import _ from "lodash"
-import { Service, Inject } from "typedi"
+import { BadRequestError } from "routing-controllers"
+import { Inject, Service } from "typedi"
 import { EntityManager } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
@@ -14,16 +15,11 @@ import {
 } from "../models"
 import { IQuizQuery } from "../types"
 import quizanswerService from "./quizanswer.service"
-import ValidationService from "./validation.service"
-import { BadRequestError } from "routing-controllers"
 
 @Service()
 export default class QuizService {
   @InjectManager()
   private entityManager: EntityManager
-
-  @Inject()
-  private validationService: ValidationService
 
   public async getPlainQuizData(quizId: string) {
     const builder = knex({ client: "pg" })
@@ -218,7 +214,6 @@ export default class QuizService {
     data[0] = { ...data[0], ...newInfo }
 
     if (quiz.peerReviewCollections.length > 0) {
-      quiz.peerReviewCollections
       data = data.map(d => {
         const newD = { ...d }
         for (let i = 0; i < quiz.peerReviewCollections.length; i++) {
@@ -386,7 +381,7 @@ export default class QuizService {
           .getMany()
 
         oldQuiz.items = oldQuizItems
-        const validationResult = await this.validationService.validateModificationOfExistingQuiz(
+        const validationResult = this.validateModificationOfExistingQuiz(
           quiz,
           oldQuiz,
         )
@@ -541,5 +536,27 @@ export default class QuizService {
         toBeRemoved.prQuestionIds || [],
       )
     }
+  }
+
+  private validateModificationOfExistingQuiz(quiz: Quiz, oldQuiz: Quiz) {
+    const stricter = oldQuiz.items.some(qi => {
+      if (qi.type !== "essay") {
+        return false
+      }
+      const qi2 = quiz.items.find(x => x.id === qi.id)
+
+      if (!qi2) {
+        return false
+      }
+      if (qi2.minWords && (!qi.minWords || qi.minWords < qi2.minWords)) {
+        return true
+      }
+      if (qi2.maxWords && (!qi.maxWords || qi.maxWords > qi2.maxWords)) {
+        return true
+      }
+      return false
+    })
+
+    return stricter ? { error: "new quiz contains stricter quiz item" } : {}
   }
 }

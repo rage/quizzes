@@ -1,23 +1,24 @@
 import { Response } from "express"
 import JSONStream from "JSONStream"
 import {
+  BadRequestError,
+  Body,
   Get,
   HeaderParam,
   JsonController,
   Param,
   Post,
+  QueryParam,
   Req,
   Res,
-  BadRequestError,
-  QueryParam,
   UnauthorizedError,
-  Body,
 } from "routing-controllers"
+import KafkaService from "services/kafka.service"
 import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
-import UserCourseStateService from "services/usercoursestate.service"
 import UserCoursePartStateService from "services/usercoursepartstate.service"
+import UserCourseStateService from "services/usercoursestate.service"
 import UserQuizStateService from "services/userquizstate.service"
 import ValidationService from "services/validation.service"
 import { Inject } from "typedi"
@@ -34,8 +35,9 @@ import {
   UserQuizState,
 } from "../../models"
 import {
-  ITMCProfileDetails,
   IQuizAnswerQuery,
+  ITMCProfileDetails,
+  PointsByGroup,
   QuizAnswerStatus,
 } from "../../types"
 
@@ -59,13 +61,13 @@ export class QuizAnswerController {
   private userCourseStateService: UserCourseStateService
 
   @Inject()
-  private peerReviewService: PeerReviewService
-
-  @Inject()
   private quizService: QuizService
 
   @Inject()
   private validationService: ValidationService
+
+  @Inject()
+  private kafkaService: KafkaService
 
   @Get("/counts")
   public async getAnswerCounts(
@@ -206,7 +208,7 @@ export class QuizAnswerController {
     const newStatus: QuizAnswerStatus = body.newStatus
 
     const existingAnswer = await this.quizAnswerService.getAnswer(
-      { id: id },
+      { id },
       this.entityManager,
     )
 
@@ -235,7 +237,6 @@ export class QuizAnswerController {
     }
 
     let newAnswer: QuizAnswer = null
-    let userCourseState: UserCourseState = null
     let userCoursePartState: UserCoursePartState = null
 
     await this.entityManager.transaction(async manager => {
@@ -254,11 +255,15 @@ export class QuizAnswerController {
           userQuizState.userId,
         )
 
-        userCourseState = await this.userCourseStateService.updateUserCourseState(
-          manager,
-          quiz,
-          userQuizState,
+        this.kafkaService.publishQuizAnswerUpdated(
           newAnswer,
+          userQuizState,
+          quiz,
+        )
+        this.kafkaService.publishUserProgressUpdated(
+          manager,
+          newAnswer.userId,
+          quiz.courseId,
         )
       }
     })
@@ -267,7 +272,6 @@ export class QuizAnswerController {
       newAnswer,
       userQuizState,
       userCoursePartState,
-      userCourseState,
     }
   }
 
@@ -276,6 +280,9 @@ export class QuizAnswerController {
     @EntityFromBody() answer: QuizAnswer,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
+    const userId = user.id
+
+    answer.userId = userId
     if (!answer.quizId || !answer.languageId) {
       throw new BadRequestError("Answer must contain some data")
     }
@@ -284,48 +291,52 @@ export class QuizAnswerController {
     answer.user = new User()
     answer.user.id = answer.userId
 
-    const quiz: Quiz[] = await this.quizService.getQuizzes({
+    const quiz: Quiz = (await this.quizService.getQuizzes({
       id: answer.quizId,
       items: true,
       options: true,
       peerreviews: true,
       course: true,
-    })
+    }))[0]
 
-    const userQState: UserQuizState = await this.userQuizStateService.getUserQuizState(
-      answer.userId,
-      answer.quizId,
-    )
+    const userQState: UserQuizState =
+      (await this.userQuizStateService.getUserQuizState(
+        answer.userId,
+        answer.quizId,
+      )) || new UserQuizState()
 
-    const {
-      response,
-      quizAnswer,
-      userQuizState,
-    } = this.validationService.validateQuizAnswer(answer, quiz[0], userQState)
+    const originalPoints = userQState.pointsAwarded || 0
 
-    const erroneousItemAnswers = response.itemAnswerStatus.filter(status => {
-      return status.error ? true : false
-    })
-
-    if (erroneousItemAnswers.length > 0) {
-      throw new BadRequestError(
-        `${erroneousItemAnswers.map(x => {
-          if (x.type === "essay") {
-            return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer (${
-              x.data.words
-            } words): ${x.data.text}`
-          } else if (x.type === "scale") {
-            return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer: ${
-              x.data.answerValue
-            }`
-          }
-        })}`,
-      )
-    }
     let savedAnswer: QuizAnswer
     let savedUserQuizState: UserQuizState
 
     await this.entityManager.transaction(async manager => {
+      const {
+        response,
+        quizAnswer,
+        userQuizState,
+      } = this.validationService.validateQuizAnswer(answer, quiz, userQState)
+
+      const erroneousItemAnswers = response.itemAnswerStatus.filter(status => {
+        return status.error ? true : false
+      })
+
+      if (erroneousItemAnswers.length > 0) {
+        throw new BadRequestError(
+          `${erroneousItemAnswers.map(x => {
+            if (x.type === "essay") {
+              return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer (${
+                x.data.words
+              } words): ${x.data.text}`
+            } else if (x.type === "scale") {
+              return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer: ${
+                x.data.answerValue
+              }`
+            }
+          })}`,
+        )
+      }
+
       await this.validationService.checkForDeprecated(manager, quizAnswer)
 
       savedAnswer = await this.quizAnswerService.createQuizAnswer(
@@ -338,18 +349,32 @@ export class QuizAnswerController {
         userQuizState,
       )
 
-      if (!quiz[0].excludedFromScore && savedAnswer.status === "confirmed") {
-        await this.userCourseStateService.updateUserCourseState(
+      if (
+        originalPoints < savedUserQuizState.pointsAwarded &&
+        !quiz.excludedFromScore
+      ) {
+        await this.userCoursePartStateService.updateUserCoursePartState(
           manager,
-          quiz[0],
-          savedUserQuizState,
-          savedAnswer,
+          quiz,
+          userQuizState.userId,
+        )
+
+        this.kafkaService.publishUserProgressUpdated(
+          manager,
+          userId,
+          quiz.courseId,
         )
       }
+
+      this.kafkaService.publishQuizAnswerUpdated(
+        savedAnswer,
+        savedUserQuizState,
+        quiz,
+      )
     })
 
     return {
-      quiz: quiz[0],
+      quiz,
       quizAnswer: savedAnswer,
       userQuizState: savedUserQuizState,
     }

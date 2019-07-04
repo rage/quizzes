@@ -1,16 +1,16 @@
 import knex from "knex"
 import { Inject, Service } from "typedi"
-import { EntityManager, SelectQueryBuilder, getConnection } from "typeorm"
+import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import validator from "validator"
 import {
   PeerReview,
+  PeerReviewCollection,
   Quiz,
   QuizAnswer,
   QuizItem,
-  UserQuizState,
   SpamFlag,
-  PeerReviewCollection,
+  UserQuizState,
 } from "../models"
 import { IQuizAnswerQuery } from "../types"
 import { WhereBuilder } from "../util/index"
@@ -20,9 +20,6 @@ import QuizService from "./quiz.service"
 export default class QuizAnswerService {
   @InjectManager()
   private entityManager: EntityManager
-
-  @Inject()
-  private quizService: QuizService
 
   public async createQuizAnswer(
     manager: EntityManager,
@@ -38,7 +35,7 @@ export default class QuizAnswerService {
     query: IQuizAnswerQuery,
     manager: EntityManager,
   ): Promise<QuizAnswer> {
-    const { id, userId, quizId, status } = query
+    const { id, userId, quizId, statuses } = query
     const queryBuilder = manager.createQueryBuilder(QuizAnswer, "quiz_answer")
     const whereBuilder: WhereBuilder<QuizAnswer> = new WhereBuilder(
       queryBuilder,
@@ -56,11 +53,259 @@ export default class QuizAnswerService {
       whereBuilder.add("quiz_answer.quiz_id = :quizId", { quizId })
     }
 
-    if (status) {
-      whereBuilder.add("quiz_answer.status = :status", { status })
+    if (statuses && statuses.length > 0) {
+      whereBuilder.add("quiz_answer.status in (:...statuses)", { statuses })
     }
 
     return await queryBuilder.orderBy("quiz_answer.created_at", "DESC").getOne()
+  }
+
+  public async getAnswers(query: IQuizAnswerQuery): Promise<QuizAnswer[]> {
+    let { skip, limit } = query
+    skip = typeof skip === "number" ? skip : 0
+    limit = typeof limit === "number" ? limit : 0
+    if (skip < 0) {
+      skip = 0
+    }
+    if (limit < 0) {
+      limit = 0
+    }
+
+    if (limit > 100) {
+      limit = 100
+    }
+
+    const result = (await this.constructGetAnswersQuery(query))
+      .skip(skip)
+      .take(limit)
+      .getMany()
+
+    return result
+  }
+
+  public async getAnswersCount(query: IQuizAnswerQuery): Promise<any> {
+    const someQuery = await this.constructGetAnswersQuery(query)
+
+    const result = await someQuery
+      .select("quiz_answer.quiz_id", "quizId")
+      .addSelect("COUNT(quiz_answer.id)")
+      .groupBy("quiz_answer.quiz_id")
+      .getRawMany()
+
+    if (!query.quizId) {
+      return result
+    }
+
+    return result.length > 0 ? result[0] : {}
+  }
+
+  public async getPlainAnswers(quizId: string): Promise<any> {
+    if (!validator.isUUID(quizId)) {
+      return {}
+    }
+
+    const builder = knex({ client: "pg" })
+
+    const query = builder("quiz_answer")
+      .select(
+        { answer_id: "quiz_answer.id" },
+        "quiz_answer.user_id",
+        "quiz_answer.status",
+        "quiz_answer.created_at",
+        "quiz_answer.updated_at",
+      )
+      .where("quiz_answer.quiz_id", quizId)
+      .leftJoin(
+        "user_quiz_state",
+        "user_quiz_state.user_id",
+        "quiz_answer.user_id",
+      )
+      .select(
+        "user_quiz_state.peer_reviews_given",
+        "user_quiz_state.peer_reviews_received",
+        "user_quiz_state.points_awarded",
+        "user_quiz_state.spam_flags",
+        "user_quiz_state.tries",
+        { quiz_state_status: "user_quiz_state.status" },
+        "user_quiz_state.created_at",
+        "user_quiz_state.updated_at",
+      )
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    const data = await queryRunner.stream(query.toString())
+
+    await queryRunner.release()
+    return data
+  }
+
+  public async getPlainItemAnswers(quizId: string): Promise<any> {
+    const builder = knex({ client: "pg" })
+
+    const query = builder("quiz_item")
+      .where("quiz_item.quiz_id", quizId)
+      .innerJoin(
+        "quiz_item_answer",
+        "quiz_item_answer.quiz_item_id",
+        "quiz_item.id",
+      )
+      .select(
+        { quiz_answer_id: "quiz_item_answer.quiz_answer_id" },
+        { quiz_item_id: "quiz_item_answer.quiz_item_id" },
+        { item_answer_id: "quiz_item_answer.id" },
+        "quiz_item_answer.text_data",
+        "quiz_item_answer.int_data",
+        "quiz_item_answer.correct",
+        "quiz_item_answer.created_at",
+        "quiz_item_answer.updated_at",
+      )
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+    const data = await queryRunner.stream(query.toString())
+
+    await queryRunner.release()
+    return data
+  }
+
+  public async getPlainOptionAnswers(quizId: string): Promise<any> {
+    const builder = knex({ client: "pg" })
+
+    const query = builder("quiz_item")
+      .where("quiz_item.quiz_id", quizId)
+      .innerJoin("quiz_option", "quiz_option.quiz_item_id", "quiz_item.id")
+      .innerJoin(
+        "quiz_option_answer",
+        "quiz_option_answer.quiz_option_id",
+        "quiz_option.id",
+      )
+
+      .select(
+        { quiz_item_answer_id: "quiz_option_answer.quiz_item_answer_id" },
+        { option_answer_id: "quiz_option_answer.id" },
+        { option_id: "quiz_option_answer.quiz_option_id" },
+        "quiz_option_answer.created_at",
+        "quiz_option_answer.updated_at",
+      )
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+    const data = await queryRunner.stream(query.toString())
+
+    await queryRunner.release()
+    return data
+  }
+
+  public async getCSVData(quizId: string): Promise<any> {
+    if (!validator.isUUID(quizId)) {
+      return {}
+    }
+
+    const quizItemTypes = (await QuizItem.createQueryBuilder("quiz_item")
+      .select("quiz_item.type")
+      .where("quiz_id = :id", { id: quizId })
+      .getRawMany()).map(value => value.quiz_item_type)
+
+    const builder = knex({ client: "pg" })
+
+    let query = builder("quiz_answer")
+      .select({ answer_id: "quiz_answer.id" }, "quiz_answer.user_id", "status")
+      .where("quiz_answer.quiz_id", quizId)
+      .leftJoin(
+        "quiz_item_answer",
+        "quiz_item_answer.quiz_answer_id",
+        "quiz_answer.id",
+      )
+      .innerJoin("quiz_item", "quiz_item.id", "quiz_item_answer.quiz_item_id")
+      .select({ quiz_item_id: "quiz_item.id" }, "quiz_item.type")
+
+    let selectedFields: string[] = []
+
+    if (
+      quizItemTypes.some(
+        type =>
+          type === "multiple-choice" ||
+          type === "checkbox" ||
+          type === "research-agreement",
+      )
+    ) {
+      query = query
+        .leftJoin(
+          "quiz_option_answer",
+          "quiz_option_answer.quiz_item_answer_id",
+          "quiz_item_answer.id",
+        )
+
+        .innerJoin(
+          "quiz_option",
+          "quiz_option.id",
+          "quiz_option_answer.quiz_option_id",
+        )
+
+        .innerJoin(
+          "quiz_option_translation",
+          "quiz_option_translation.quiz_option_id",
+          "quiz_option.id",
+        )
+
+        .select(
+          "quiz_option_answer.quiz_option_id",
+          "quiz_option_translation.language_id",
+          "quiz_option_translation.title",
+          "quiz_option_translation.body",
+        )
+
+      selectedFields.push("correct")
+    } else if (
+      quizItemTypes.length === 1 ||
+      quizItemTypes.every(type => type === quizItemTypes[0])
+    ) {
+      switch (quizItemTypes[0]) {
+        case "open":
+          selectedFields.push("correct")
+        case "essay":
+          selectedFields.push("text_data")
+          break
+        case "scale":
+          selectedFields.push("int_data")
+          break
+        default:
+          selectedFields = ["text_data", "int_data", "correct"]
+      }
+    } else {
+      selectedFields = ["text_data", "int_data", "correct"]
+    }
+
+    query = query.select(
+      ...selectedFields.map(field => `quiz_item_answer.${field}`),
+    )
+
+    query = query.select("quiz_answer.created_at", "quiz_answer.updated_at")
+
+    const queryRunner = this.entityManager.connection.createQueryRunner()
+    queryRunner.connect()
+
+    const data = await queryRunner.stream(query.toString())
+
+    await queryRunner.release()
+
+    return data
+  }
+
+  public async getAnswersSpamCounts(quizId: string): Promise<any> {
+    const spamFlagCount = await QuizAnswer.createQueryBuilder("quiz_answer")
+      .select("quiz_answer.id")
+      .addSelect("COUNT(spam_flag.user_id)")
+      .leftJoin(
+        SpamFlag,
+        "spam_flag",
+        "quiz_answer.id = spam_flag.quiz_answer_id",
+      )
+      .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
+      .groupBy("quiz_answer.id")
+      .getRawMany()
+    return spamFlagCount
   }
 
   private async constructGetAnswersQuery(
@@ -135,7 +380,7 @@ export default class QuizAnswerService {
 
     if (statuses && statuses.length > 0) {
       queryBuilder.andWhere("quiz_answer.status IN (:...statuses)", {
-        statuses: statuses,
+        statuses,
       })
     }
 
@@ -322,253 +567,5 @@ export default class QuizAnswerService {
     }
 
     return queryBuilder
-  }
-
-  public async getAnswers(query: IQuizAnswerQuery): Promise<QuizAnswer[]> {
-    let { skip, limit } = query
-    skip = typeof skip === "number" ? skip : 0
-    limit = typeof limit === "number" ? limit : 0
-    if (skip < 0) {
-      skip = 0
-    }
-    if (limit < 0) {
-      limit = 0
-    }
-
-    if (limit > 100) {
-      limit = 100
-    }
-
-    const result = (await this.constructGetAnswersQuery(query))
-      .skip(skip)
-      .take(limit)
-      .getMany()
-
-    return result
-  }
-
-  public async getAnswersCount(query: IQuizAnswerQuery): Promise<any> {
-    const someQuery = await this.constructGetAnswersQuery(query)
-
-    const result = await someQuery
-      .select("quiz_answer.quiz_id", "quizId")
-      .addSelect("COUNT(quiz_answer.id)")
-      .groupBy("quiz_answer.quiz_id")
-      .getRawMany()
-
-    if (!query.quizId) {
-      return result
-    }
-
-    return result.length > 0 ? result[0] : {}
-  }
-
-  public async getPlainAnswers(quizId: string): Promise<any> {
-    if (!validator.isUUID(quizId)) {
-      return {}
-    }
-
-    const builder = knex({ client: "pg" })
-
-    let query = builder("quiz_answer")
-      .select(
-        { answer_id: "quiz_answer.id" },
-        "quiz_answer.user_id",
-        "quiz_answer.status",
-        "quiz_answer.created_at",
-        "quiz_answer.updated_at",
-      )
-      .where("quiz_answer.quiz_id", quizId)
-      .leftJoin(
-        "user_quiz_state",
-        "user_quiz_state.user_id",
-        "quiz_answer.user_id",
-      )
-      .select(
-        "user_quiz_state.peer_reviews_given",
-        "user_quiz_state.peer_reviews_received",
-        "user_quiz_state.points_awarded",
-        "user_quiz_state.spam_flags",
-        "user_quiz_state.tries",
-        { quiz_state_status: "user_quiz_state.status" },
-        "user_quiz_state.created_at",
-        "user_quiz_state.updated_at",
-      )
-
-    const queryRunner = this.entityManager.connection.createQueryRunner()
-    queryRunner.connect()
-
-    const data = await queryRunner.stream(query.toString())
-
-    await queryRunner.release()
-    return data
-  }
-
-  public async getPlainItemAnswers(quizId: string): Promise<any> {
-    const builder = knex({ client: "pg" })
-
-    let query = builder("quiz_item")
-      .where("quiz_item.quiz_id", quizId)
-      .innerJoin(
-        "quiz_item_answer",
-        "quiz_item_answer.quiz_item_id",
-        "quiz_item.id",
-      )
-      .select(
-        { quiz_answer_id: "quiz_item_answer.quiz_answer_id" },
-        { quiz_item_id: "quiz_item_answer.quiz_item_id" },
-        { item_answer_id: "quiz_item_answer.id" },
-        "quiz_item_answer.text_data",
-        "quiz_item_answer.int_data",
-        "quiz_item_answer.correct",
-        "quiz_item_answer.created_at",
-        "quiz_item_answer.updated_at",
-      )
-
-    const queryRunner = this.entityManager.connection.createQueryRunner()
-    queryRunner.connect()
-    const data = await queryRunner.stream(query.toString())
-
-    await queryRunner.release()
-    return data
-  }
-
-  public async getPlainOptionAnswers(quizId: string): Promise<any> {
-    const builder = knex({ client: "pg" })
-
-    let query = builder("quiz_item")
-      .where("quiz_item.quiz_id", quizId)
-      .innerJoin("quiz_option", "quiz_option.quiz_item_id", "quiz_item.id")
-      .innerJoin(
-        "quiz_option_answer",
-        "quiz_option_answer.quiz_option_id",
-        "quiz_option.id",
-      )
-
-      .select(
-        { quiz_item_answer_id: "quiz_option_answer.quiz_item_answer_id" },
-        { option_answer_id: "quiz_option_answer.id" },
-        { option_id: "quiz_option_answer.quiz_option_id" },
-        "quiz_option_answer.created_at",
-        "quiz_option_answer.updated_at",
-      )
-
-    const queryRunner = this.entityManager.connection.createQueryRunner()
-    queryRunner.connect()
-    const data = await queryRunner.stream(query.toString())
-
-    await queryRunner.release()
-    return data
-  }
-
-  public async getCSVData(quizId: string): Promise<any> {
-    if (!validator.isUUID(quizId)) {
-      return {}
-    }
-
-    const quizItemTypes = (await QuizItem.createQueryBuilder("quiz_item")
-      .select("quiz_item.type")
-      .where("quiz_id = :id", { id: quizId })
-      .getRawMany()).map(value => value.quiz_item_type)
-
-    const builder = knex({ client: "pg" })
-
-    let query = builder("quiz_answer")
-      .select({ answer_id: "quiz_answer.id" }, "quiz_answer.user_id", "status")
-      .where("quiz_answer.quiz_id", quizId)
-      .leftJoin(
-        "quiz_item_answer",
-        "quiz_item_answer.quiz_answer_id",
-        "quiz_answer.id",
-      )
-      .innerJoin("quiz_item", "quiz_item.id", "quiz_item_answer.quiz_item_id")
-      .select({ quiz_item_id: "quiz_item.id" }, "quiz_item.type")
-
-    let selectedFields: string[] = []
-
-    if (
-      quizItemTypes.some(
-        type =>
-          type === "multiple-choice" ||
-          type === "checkbox" ||
-          type === "research-agreement",
-      )
-    ) {
-      query = query
-        .leftJoin(
-          "quiz_option_answer",
-          "quiz_option_answer.quiz_item_answer_id",
-          "quiz_item_answer.id",
-        )
-
-        .innerJoin(
-          "quiz_option",
-          "quiz_option.id",
-          "quiz_option_answer.quiz_option_id",
-        )
-
-        .innerJoin(
-          "quiz_option_translation",
-          "quiz_option_translation.quiz_option_id",
-          "quiz_option.id",
-        )
-
-        .select(
-          "quiz_option_answer.quiz_option_id",
-          "quiz_option_translation.language_id",
-          "quiz_option_translation.title",
-          "quiz_option_translation.body",
-        )
-
-      selectedFields.push("correct")
-    } else if (
-      quizItemTypes.length === 1 ||
-      quizItemTypes.every(type => type === quizItemTypes[0])
-    ) {
-      switch (quizItemTypes[0]) {
-        case "open":
-          selectedFields.push("correct")
-        case "essay":
-          selectedFields.push("text_data")
-          break
-        case "scale":
-          selectedFields.push("int_data")
-          break
-        default:
-          selectedFields = ["text_data", "int_data", "correct"]
-      }
-    } else {
-      selectedFields = ["text_data", "int_data", "correct"]
-    }
-
-    query = query.select(
-      ...selectedFields.map(field => `quiz_item_answer.${field}`),
-    )
-
-    query = query.select("quiz_answer.created_at", "quiz_answer.updated_at")
-
-    const queryRunner = this.entityManager.connection.createQueryRunner()
-    queryRunner.connect()
-
-    const data = await queryRunner.stream(query.toString())
-
-    await queryRunner.release()
-
-    return data
-  }
-
-  public async getAnswersSpamCounts(quizId: string): Promise<any> {
-    const spamFlagCount = await QuizAnswer.createQueryBuilder("quiz_answer")
-      .select("quiz_answer.id")
-      .addSelect("COUNT(spam_flag.user_id)")
-      .leftJoin(
-        SpamFlag,
-        "spam_flag",
-        "quiz_answer.id = spam_flag.quiz_answer_id",
-      )
-      .where("quiz_answer.quiz_id = :quiz_id", { quiz_id: quizId })
-      .groupBy("quiz_answer.id")
-      .getRawMany()
-    return spamFlagCount
   }
 }

@@ -5,16 +5,15 @@ import {
   Course,
   Quiz,
   QuizAnswer,
-  UserCourseState,
   UserCoursePartState,
+  UserCourseState,
   UserQuizState,
 } from "../models"
-import { IQuizAnswerQuery } from "../types"
+import { IQuizAnswerQuery, PointsByGroup } from "../types"
 import CourseService from "./course.service"
 import QuizService from "./quiz.service"
 import QuizAnswerService from "./quizanswer.service"
 import UserQuizStateService from "./userquizstate.service"
-import { isBuffer } from "util"
 
 @Service()
 export default class UserCoursePartStateService {
@@ -22,13 +21,7 @@ export default class UserCoursePartStateService {
   private entityManager: EntityManager
 
   @Inject()
-  private courseService: CourseService
-
-  @Inject()
   private quizService: QuizService
-
-  @Inject()
-  private quizAnswerService: QuizAnswerService
 
   @Inject()
   private userQuizStateService: UserQuizStateService
@@ -37,7 +30,7 @@ export default class UserCoursePartStateService {
     userId: number,
     courseId: string,
     partNumber: number,
-  ) {
+  ): Promise<UserCoursePartState> {
     return await this.entityManager
       .createQueryBuilder(UserCoursePartState, "user_course_part_state")
       .where("user_course_part_state.user_id = :userId", { userId })
@@ -48,12 +41,19 @@ export default class UserCoursePartStateService {
       .getOne()
   }
 
-  public async getUserCoursePartStates(userId: number, courseId: string) {
-    return await this.entityManager
+  public async getUserCoursePartStates(
+    manager: EntityManager,
+    userId: number,
+    courseId: string,
+  ): Promise<UserCoursePartState[]> {
+    const userCoursePartStates: UserCoursePartState[] = await manager
       .createQueryBuilder(UserCoursePartState, "user_course_part_state")
       .where("user_course_part_state.user_id = :userId", { userId })
       .andWhere("user_course_part_state.course_id = :courseId", { courseId })
+      .orderBy("course_part")
       .getMany()
+
+    return userCoursePartStates
   }
 
   public async updateUserCoursePartState(
@@ -61,18 +61,20 @@ export default class UserCoursePartStateService {
     quiz: Quiz,
     userId: number,
   ): Promise<UserCoursePartState> {
+    const courseId = quiz.courseId
+    const coursePart = quiz.part
     let userCoursePartState = await this.getUserCoursePartState(
       userId,
-      quiz.courseId,
-      quiz.part,
+      courseId,
+      coursePart,
     )
     if (!userCoursePartState) {
-      return await this.createUserCoursePartState(
+      const userCoursePartStates = await this.createUserCoursePartStates(
         manager,
+        courseId,
         userId,
-        quiz.courseId,
-        quiz.part,
       )
+      return userCoursePartStates.find(ucps => ucps.coursePart === coursePart)
     } else {
       userCoursePartState = await this.calculateProgressData(
         manager,
@@ -84,8 +86,8 @@ export default class UserCoursePartStateService {
 
   public async createUserCoursePartState(
     manager: EntityManager,
-    userId: number,
     courseId: string,
+    userId: number,
     coursePart: number,
   ): Promise<UserCoursePartState> {
     let userCoursePartState: UserCoursePartState = new UserCoursePartState()
@@ -98,6 +100,78 @@ export default class UserCoursePartStateService {
       userCoursePartState,
     )
     return await manager.save(userCoursePartState)
+  }
+
+  public async createUserCoursePartStates(
+    manager: EntityManager,
+    courseId: string,
+    userId: number,
+  ): Promise<UserCoursePartState[]> {
+    const quizzes: Quiz[] = await this.quizService.getQuizzes({
+      courseId,
+      exclude: true,
+    })
+    const parts = new Set()
+
+    quizzes.map(quiz => parts.add(quiz.part))
+
+    const userCoursePartStates: UserCoursePartState[] = []
+
+    await Promise.all(
+      Array.from(parts).map(async (part: number) => {
+        const userCoursePartState = await this.createUserCoursePartState(
+          manager,
+          courseId,
+          userId,
+          part,
+        )
+        userCoursePartStates.push(userCoursePartState)
+      }),
+    )
+
+    return userCoursePartStates
+  }
+
+  public async getProgress(
+    manager: EntityManager,
+    userId: number,
+    courseId: string,
+  ): Promise<PointsByGroup[]> {
+    let userCoursePartStates: UserCoursePartState[] = await this.getUserCoursePartStates(
+      manager,
+      userId,
+      courseId,
+    )
+
+    if (userCoursePartStates.length === 0) {
+      userCoursePartStates = await this.createUserCoursePartStates(
+        manager,
+        courseId,
+        userId,
+      )
+    }
+
+    const quizzes: Quiz[] = await this.quizService.getQuizzes({ courseId })
+
+    const progress: PointsByGroup[] = userCoursePartStates
+      .filter(ucps => ucps.coursePart !== 0)
+      .map(ucps => {
+        const maxPoints = quizzes
+          .filter(
+            quiz => quiz.part === ucps.coursePart && !quiz.excludedFromScore,
+          )
+          .map(quiz => quiz.points)
+          .reduce((acc, curr) => acc + curr)
+
+        return {
+          group: "osa0" + ucps.coursePart.toString(),
+          progress: Math.floor(ucps.progress * 100) / 100,
+          n_points: Number(ucps.score.toFixed(2)),
+          max_points: maxPoints,
+        }
+      })
+
+    return progress.sort()
   }
 
   private async calculateProgressData(
@@ -128,9 +202,8 @@ export default class UserCoursePartStateService {
       pointsAwarded += uqs.pointsAwarded
     })
 
-    userCoursePartState.score = (pointsAwarded / pointsTotal) * 100
-    userCoursePartState.progress =
-      (userQuizStates.length / quizzesInPart.length) * 100
+    userCoursePartState.score = pointsAwarded
+    userCoursePartState.progress = pointsAwarded / pointsTotal
 
     if (userCoursePartState.score > 99.99) {
       userCoursePartState.completed = true

@@ -17,15 +17,11 @@ import PeerReviewService from "./peerreview.service"
 
 @Service()
 export default class ValidationService {
-  @Inject()
-  private peerReviewService: PeerReviewService
-
   public validateQuizAnswer(
     quizAnswer: QuizAnswer,
     quiz: Quiz,
-    userState: UserQuizState,
+    userQuizState: UserQuizState,
   ) {
-    const userQuizState = userState || new UserQuizState()
     const items: QuizItem[] = quiz.items
     let points: number | null = null
     let pointsAwarded
@@ -193,12 +189,13 @@ export default class ValidationService {
 
     userQuizState.userId = quizAnswer.userId
     userQuizState.quizId = quizAnswer.quizId
+    userQuizState.tries = userQuizState.tries ? userQuizState.tries + 1 : 1
+    userQuizState.status = "locked"
+
     userQuizState.pointsAwarded =
       userQuizState.pointsAwarded > pointsAwarded
         ? userQuizState.pointsAwarded
         : pointsAwarded
-    userQuizState.tries = userQuizState.tries ? userQuizState.tries + 1 : 1
-    userQuizState.status = "locked"
 
     const response = {
       itemAnswerStatus,
@@ -208,10 +205,10 @@ export default class ValidationService {
   }
 
   public async validateEssayAnswer(
-    manager: EntityManager,
     quiz: Quiz,
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
+    peerReviews: PeerReview[] = [],
   ) {
     const course: Course = quiz.course
     const given: number = userQuizState.peerReviewsGiven
@@ -228,14 +225,10 @@ export default class ValidationService {
       given >= course.minPeerReviewsGiven &&
       received >= course.minPeerReviewsReceived
     ) {
-      const peerReviews = await this.peerReviewService.getPeerReviews(
-        manager,
-        quizAnswer.id,
-      )
       const answers: number[] = [].concat(
         ...peerReviews.map(pr => pr.answers.map(a => a.value)),
       )
-      const sum: number = answers.reduce((prev, curr) => prev + curr)
+      const sum: number = answers.reduce((prev, curr) => prev + curr, 0)
       if (sum / answers.length >= course.minReviewAverage) {
         quizAnswer.status = "confirmed"
         userQuizState.pointsAwarded = 1 * quiz.points
@@ -267,27 +260,5 @@ export default class ValidationService {
         }
       }),
     )
-  }
-
-  public async validateModificationOfExistingQuiz(quiz: Quiz, oldQuiz: Quiz) {
-    const stricter = oldQuiz.items.some(qi => {
-      if (qi.type !== "essay") {
-        return false
-      }
-      const qi2 = quiz.items.find(x => x.id === qi.id)
-
-      if (!qi2) {
-        return false
-      }
-      if (qi2.minWords && (!qi.minWords || qi.minWords < qi2.minWords)) {
-        return true
-      }
-      if (qi2.maxWords && (!qi.maxWords || qi.maxWords > qi2.maxWords)) {
-        return true
-      }
-      return false
-    })
-
-    return stricter ? { error: "new quiz contains stricter quiz item" } : {}
   }
 }
