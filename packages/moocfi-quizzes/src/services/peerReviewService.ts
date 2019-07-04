@@ -7,7 +7,6 @@ export const getPeerReviewInfo = async (
   languageId: string,
   accessToken: string,
 ): Promise<QuizAnswer[]> => {
-  console.log("Language id: ", languageId)
   const response = await axios.get(
     `${BASE_URL}/api/v1/quizzes/peerreview/${quizId}/${languageId}`,
     { headers: { authorization: `Bearer ${accessToken}` } },

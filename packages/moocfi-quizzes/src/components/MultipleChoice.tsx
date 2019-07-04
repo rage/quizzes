@@ -113,6 +113,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
           .map(option => {
             return (
               <Option
+                key={option.id}
                 option={option}
                 direction={direction}
                 optionWidth={optionWidth}
