@@ -21,6 +21,11 @@ const SolutionPaper = styled(({ correct, ...other }) => (
 const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
   const dispatch = useDispatch()
 
+  const languageInfo = useTypedSelector(state => state.language.languageLabels)
+  if (!languageInfo) {
+    return <div />
+  }
+
   const handleTextDataChange = (e: MiscEvent) => {
     dispatch(quizAnswerActions.changeTextData(item.id, e.currentTarget.value))
   }
@@ -33,10 +38,6 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
   const correct = itemAnswer.correct
   const textData = itemAnswer.textData
 
-  const languageInfo = useTypedSelector(state => state.language.languageLabels)
-  if (!languageInfo) {
-    return <div />
-  }
   const openLabels = languageInfo.open
 
   const answered = answer.id ? true : false

@@ -91,6 +91,8 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const answered = answer.id ? true : false
 
+  console.log("The item", item)
+  console.log("The texts: ", item.texts[0])
   const minLabel = item.texts[0].minLabel
   const maxLabel = item.texts[0].maxLabel
 
@@ -119,7 +121,7 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
         >
           {Array.from(
             { length: number_of_options },
-            (v, i) => (item.minWords ? item.minWords : 1) + i,
+            (v, i) => (item.minValue ? item.minValue : 1) + i,
           ).map(number => (
             <FormControlLabel
               key={number}
