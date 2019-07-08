@@ -1,13 +1,16 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
-// @ts-ignore
 import LikertScale from "likert-react"
 import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
 import PeerReviewOption from "./PeerReviewOption"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
 import { useTypedSelector } from "../../state/store"
 import { PeerReviewLabels } from "../../utils/languages"
-import { QuizAnswer, PeerReviewAnswer } from "../../modelTypes"
+import {
+  QuizAnswer,
+  PeerReviewAnswer,
+  PeerReviewQuestion,
+} from "../../modelTypes"
 
 type PeerReviewFormProps = {
   languageInfo: PeerReviewLabels
