@@ -18,7 +18,8 @@ import PeerReviews from "./PeerReviews"
 import Unsupported from "./Unsupported"
 import { useTypedSelector } from "../state/store"
 import { SpaciousTypography } from "./styleComponents"
-import { Quiz, QuizItemType, QuizItemAnswer } from "../modelTypes"
+import { Quiz, QuizItemType, QuizItemAnswer, QuizAnswer } from "../modelTypes"
+import { GeneralLabels } from "../utils/languages"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
@@ -58,25 +59,19 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     dispatch(initialize(id, languageId, accessToken))
   }, [])
 
-  if (!quiz || !languageInfo) {
-    return <div />
+  if (!quiz || !languageInfo || !quizAnswer) {
+    return (
+      <Grid container={true} justify="center">
+        <Grid item={true}>
+          <CircularProgress disableShrink={true} />
+        </Grid>
+      </Grid>
+    )
   }
 
   const generalLabels = languageInfo.general
 
   const handleSubmit = () => dispatch(quizAnswerActions.submit())
-
-  const hasCorrectAnswer = (quiz: Quiz) => {
-    return quiz.items.some(
-      item =>
-        item.type === "essay" ||
-        item.type === "multiple-choice" ||
-        item.type === "open",
-    )
-  }
-
-  const atLeastOneCorrect = (itemAnswers: QuizItemAnswer[]) =>
-    itemAnswers.some(ia => ia.correct === true)
 
   const quizContainsEssay = () => {
     return quiz.items.some(ia => ia.type === "essay")
@@ -89,7 +84,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           .sort((i1, i2) => i1.order - i2.order)
           .map(item => {
             const ItemComponent = componentsByTypeNames(item.type)
-
             return <ItemComponent item={item} key={item.id} />
           })}
       </>
@@ -109,16 +103,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     )
   }
 
-  if (!quizAnswer || !quiz) {
-    return (
-      <Grid container={true} justify="center">
-        <Grid item={true}>
-          <CircularProgress disableShrink={true} />
-        </Grid>
-      </Grid>
-    )
-  }
-
   if (quiz.texts.length === 0) {
     const message =
       "Error: quiz has no texts. (Likely the quiz does not match the requested " +
@@ -126,8 +110,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     dispatch(messageActions.set(message))
     return <div />
   }
-
-  const types = quiz.items.map(item => item.type)
 
   return (
     <div>
@@ -148,21 +130,11 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           <>
             {quizContainsEssay() && <PeerReviews />}
 
-            <Typography variant="h5">
-              {hasCorrectAnswer(quiz)
-                ? atLeastOneCorrect(quizAnswer.itemAnswers)
-                  ? quiz.items.length === 1
-                    ? generalLabels.answerCorrectLabel
-                    : generalLabels.kOutOfNCorrect(
-                        quizAnswer.itemAnswers.filter(ia => ia.correct === true)
-                          .length,
-                        quiz.items.length,
-                      )
-                  : types.includes("essay") || types.includes("scale")
-                  ? ""
-                  : generalLabels.answerIncorrectLabel
-                : generalLabels.alreadyAnsweredLabel}
-            </Typography>
+            <ResultInformation
+              quiz={quiz}
+              quizAnswer={quizAnswer}
+              generalLabels={generalLabels}
+            />
           </>
         ) : (
           <div>
@@ -179,6 +151,57 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       </div>
     </div>
   )
+}
+
+type ResultInformationProps = {
+  quiz: Quiz
+  quizAnswer: QuizAnswer
+  generalLabels: GeneralLabels
+}
+
+const ResultInformation: React.FunctionComponent<ResultInformationProps> = ({
+  quiz,
+  quizAnswer,
+  generalLabels,
+}) => {
+  const hasCorrectAnswer = (quiz: Quiz) => {
+    return quiz.items.some(
+      item =>
+        item.type === "essay" ||
+        item.type === "multiple-choice" ||
+        item.type === "open",
+    )
+  }
+
+  const atLeastOneCorrect = (itemAnswers: QuizItemAnswer[]) =>
+    itemAnswers.some(ia => ia.correct === true)
+
+  const types = quiz.items.map(item => item.type)
+
+  let feedback: string | undefined = undefined
+
+  if (!hasCorrectAnswer(quiz)) {
+    feedback = generalLabels.alreadyAnsweredLabel
+  }
+
+  if (feedback === undefined && !atLeastOneCorrect(quizAnswer.itemAnswers)) {
+    feedback =
+      types.includes("essay") || types.includes("scale")
+        ? ""
+        : generalLabels.answerIncorrectLabel
+  }
+
+  if (feedback === undefined) {
+    feedback =
+      quiz.items.length === 1
+        ? generalLabels.answerCorrectLabel
+        : generalLabels.kOutOfNCorrect(
+            quizAnswer.itemAnswers.filter(ia => ia.correct === true).length,
+            quiz.items.length,
+          )
+  }
+
+  return <Typography variant="h5">{feedback}</Typography>
 }
 
 export default FuncQuizImpl

@@ -78,17 +78,19 @@ const PeerReviewQuestions: React.FunctionComponent<
   PeerReviewQuestionsProps
 > = ({ peerReview, languageInfo }) => {
   const quiz = useTypedSelector(state => state.quiz)
-  if (!quiz) {
-    return <div />
-  }
-
-  const peerReviewQuestions = quiz.peerReviewCollections
 
   const submitDisabled = useTypedSelector(
     state => state.peerReviews.submitDisabled,
   )
 
   const dispatch = useDispatch()
+
+  if (!quiz) {
+    return <div />
+  }
+
+  const peerReviewQuestions = quiz.peerReviewCollections
+
   const changeInPeerReviewGrade = (peerReviewQuestionId: string) => (
     question: any,
     value: string,

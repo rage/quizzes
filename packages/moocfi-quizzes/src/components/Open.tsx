@@ -7,6 +7,7 @@ import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { SpaciousTypography } from "./styleComponents"
 import { SpaciousPaper } from "./styleComponents"
 import { QuizItem, MiscEvent } from "../modelTypes"
+import LaterQuizItemAddition from "./LaterQuizItemAddition"
 
 type OpenProps = {
   item: QuizItem
@@ -33,8 +34,9 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
   if (!itemAnswer) {
-    return <div />
+    return <LaterQuizItemAddition item={item} />
   }
+
   const correct = itemAnswer.correct
   const textData = itemAnswer.textData
 

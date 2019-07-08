@@ -7,6 +7,7 @@ import { executeIfTextFieldBetweenNumOfWords as executeIfWordNumberCorrect } fro
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { SpaciousPaper, SpaciousTypography } from "./styleComponents"
+import LaterQuizItemAddition from "./LaterQuizItemAddition"
 import { QuizItem, MiscEvent } from "../modelTypes"
 
 type EssayProps = {
@@ -30,11 +31,10 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
   const itemTitle = item.texts[0].title
   const answered = quizAnswer.id ? true : false
 
-  const itemAnswer = quizAnswer.itemAnswers.find(
-    ia => ia.quizItemId === item.id,
-  )
+  let itemAnswer = quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id)
+
   if (!itemAnswer) {
-    return <div />
+    return <LaterQuizItemAddition item={item} message="You have not answered" />
   }
 
   const answerText = itemAnswer.textData || ""

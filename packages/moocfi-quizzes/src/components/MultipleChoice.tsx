@@ -7,6 +7,7 @@ import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { QuizItem, QuizItemOption, QuizItemAnswer } from "../modelTypes"
+import LaterQuizItemAddition from "./LaterQuizItemAddition"
 
 const ChoicesContainer = styled(
   ({ singleItem, optionContainerWidth, ...others }) => (
@@ -73,7 +74,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
 
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
   if (!itemAnswer) {
-    return <div />
+    return <LaterQuizItemAddition item={item} />
   }
 
   const onlyOneItem = quiz.items.length === 1
@@ -113,7 +114,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
         optionContainerWidth={optionContainerWidth}
       >
         {options
-          .sort((o1, o2) => o2.order - o1.order)
+          .sort((o1, o2) => o1.order - o2.order)
           .map(option => {
             return (
               <Option
@@ -196,22 +197,24 @@ const Option: React.FunctionComponent<OptionProps> = ({
   direction,
   optionWidth,
 }) => {
+  const dispatch = useDispatch()
+
   const items = useTypedSelector(state => state.quiz!.items)
   const item = items.find(i => i.id === option.quizItemId)
   if (!item) {
-    return <div />
+    // should be impossible
+    return <div>Cannot find related item</div>
   }
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const itemAnswer = quizAnswer.itemAnswers.find(
     ia => ia.quizItemId === item.id,
   )
   if (!itemAnswer) {
-    return <div />
+    // should be impossible
+    return <div>Cannot find related item answer</div>
   }
 
   const onlyOneItem = items.length === 1
-
-  const dispatch = useDispatch()
 
   const handleOptionChange = (optionId: string) => () =>
     dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))

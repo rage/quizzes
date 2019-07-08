@@ -4,6 +4,7 @@ import { TextField, Typography } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { QuizItem, MiscEvent } from "../modelTypes"
+import LaterQuizItemAddition from "./LaterQuizItemAddition"
 
 type FeedbackProps = {
   item: QuizItem
@@ -20,8 +21,9 @@ const Feedback: React.FunctionComponent<FeedbackProps> = ({ item }) => {
   const itemTitle = item.texts[0].title
 
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
+
   if (!itemAnswer) {
-    return <div />
+    return <LaterQuizItemAddition item={item} />
   }
 
   const textData = itemAnswer.textData

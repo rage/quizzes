@@ -10,6 +10,7 @@ export type GeneralLabels = {
   kOutOfNCorrect: (k: number, n: number) => string
   answerIncorrectLabel: string
   alreadyAnsweredLabel: string
+  answerMissingBecauseQuizModifiedLabel: string
 }
 
 export type StageLabels = {

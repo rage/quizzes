@@ -42,6 +42,8 @@ const englishLabels: SingleLanguageLabels = {
     evaluationStageLabel: "Evaluating the answer",
   },
   general: {
+    answerMissingBecauseQuizModifiedLabel:
+      "Question not answered. Quiz has probably been modified after your answer.",
     submitButtonLabel: "Submit",
     errorLabel: "Error",
     loginPromptLabel: "Login to view the quiz",

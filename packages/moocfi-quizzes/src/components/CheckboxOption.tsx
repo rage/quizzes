@@ -5,6 +5,7 @@ import { Checkbox, Grid, Typography } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { QuizItem } from "../modelTypes"
+import LaterQuizItemAddition from "./LaterQuizItemAddition"
 
 export type CheckboxOptionProps = {
   item: QuizItem
@@ -32,7 +33,7 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
     ia => ia.quizItemId === item.id,
   )
   if (!itemAnswer) {
-    return <div />
+    return <LaterQuizItemAddition item={item} message="You have not answered" />
   }
 
   const optionAnswer = itemAnswer.optionAnswers[0]

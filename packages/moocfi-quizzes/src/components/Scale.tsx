@@ -15,6 +15,7 @@ import { useTheme } from "@material-ui/core/styles"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { QuizItem } from "../modelTypes"
+import LaterQuizItemAddition from "./LaterQuizItemAddition"
 
 type ScaleProps = {
   item: QuizItem
@@ -50,6 +51,10 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
   )
   const itemAnswer = itemAnswers.find(ia => ia.quizItemId === item.id)
   const intData = itemAnswer && itemAnswer.intData
+
+  if (!itemAnswer) {
+    return <LaterQuizItemAddition item={item} message="You have not answered" />
+  }
 
   return (
     <FormControl fullWidth={true} style={{ marginBottom: "1rem" }}>
