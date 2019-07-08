@@ -10,6 +10,13 @@ import {
 import { Container } from "typedi"
 import { EntityManager, getManager } from "typeorm"
 
+const courses = {
+  "ohjelmoinnin-mooc-2019": "38240a7b-7e64-4202-91e2-91f6d46f6198",
+  "elements-of-ai": "21356a26-7508-4705-9bab-39b239862632",
+  "elements-of-ai-fi": "5d1e8da2-3154-4966-aa94-2ca0406cf38a",
+  "elements-of-ai-se": "5f496ecc-327a-4899-baff-2daa2b40b05f"
+}
+
 const database = Container.get(Database)
 
 let manager: EntityManager
@@ -71,18 +78,18 @@ const createEssayQuizStates = async (): Promise<UserQuizState[]> => {
   `)
 
   const userQuizStates: UserQuizState[] = data.map(
-    (row: any, index: number) => {
+    (answer: any, index: number) => {
       console.log(index + "/" + data.length)
       const userQuizState: UserQuizState = new UserQuizState()
-      userQuizState.userId = row.user_id
-      userQuizState.quizId = row.quiz_id
-      userQuizState.pointsAwarded = row.status === "confirmed" ? 1 : null
-      userQuizState.peerReviewsGiven = row.given
-      userQuizState.peerReviewsReceived = row.received
-      userQuizState.spamFlags = row.flagged
-      userQuizState.tries = row.tries
+      userQuizState.userId = answer.user_id
+      userQuizState.quizId = answer.quiz_id
+      userQuizState.pointsAwarded = answer.status === "confirmed" ? 1 : null
+      userQuizState.peerReviewsGiven = answer.given
+      userQuizState.peerReviewsReceived = answer.received
+      userQuizState.spamFlags = answer.flagged
+      userQuizState.tries = answer.tries
       userQuizState.status =
-        row.status === "confirmed" || row.status === "submitted"
+        answer.status === "confirmed" || answer.status === "submitted"
           ? "locked"
           : "open"
       return userQuizState
@@ -97,7 +104,7 @@ const createOpenQuizStates = async () => {
   from quiz_answer qa
   join quiz_item_answer qia on qa.id = qia.quiz_answer_id
   join quiz_item qi on qia.quiz_item_id = qi.id
-  where qa.quiz_id in ${elementsOpen};
+  where qa.quiz_id in ${open};
   `)
   const validation: any = {}
   answerData.map((row: any) => {
@@ -122,9 +129,8 @@ const createOpenQuizStates = async () => {
   from quiz_answer as qa
   left outer join ${tries} as t on qa.user_id = t.user_id and qa.quiz_id = t.quiz_id
   where status != 'deprecated'
-  and qa.quiz_id in ${elementsOpen};
+  and qa.quiz_id in ${open};
   `)
-  console.log(data[0])
   const userQuizStates: UserQuizState[] = data.map(
     (row: any, index: number) => {
       console.log(index + "/" + data.length)
@@ -155,7 +161,7 @@ const createMultipleChoiceQuizStates = async (): Promise<UserQuizState[]> => {
   join ${total} t on qa.quiz_id = t.id
   join ${tries} tr on qa.user_id = tr.user_id and qa.quiz_id = tr.quiz_id
   where qa.status != 'deprecated'
-  and qa.quiz_id in ${elementsMultipleChoice};
+  and qa.quiz_id in ${multipleChoice};
   `)
   const userQuizStates: UserQuizState[] = data.map(
     (row: any, index: number) => {
@@ -227,22 +233,38 @@ const elementsEssay = `
   from quiz as q
   join quiz_item as qi on q.id = qi.quiz_id
   where type = 'essay'
-  and course_id = '21356a26-7508-4705-9bab-39b239862632')
+  and (course_id = '21356a26-7508-4705-9bab-39b239862632'
+  or course_id = '5d1e8da2-3154-4966-aa94-2ca0406cf38a'
+  or course_id = '5f496ecc-327a-4899-baff-2daa2b40b05f'))
   `
 
-const elementsOpen = `
+const ohpeEssay = `
+  (select distinct(q.id)
+  from quiz as q
+  join quiz_item as qi on q.id = qi.quiz_id
+  where type = 'essay'
+  and course_id = '38240a7b-7e64-4202-91e2-91f6d46f6198')
+  `
+
+const open = `
   (select distinct(q.id)
   from quiz as q
   join quiz_item as qi on q.id = qi.quiz_id
   where type = 'open'
-  and course_id = '21356a26-7508-4705-9bab-39b239862632')
+  and (course_id = '21356a26-7508-4705-9bab-39b239862632'
+  or course_id = '5d1e8da2-3154-4966-aa94-2ca0406cf38a'
+  or course_id = '5f496ecc-327a-4899-baff-2daa2b40b05f'
+  or course_id = '38240a7b-7e64-4202-91e2-91f6d46f6198'))
   `
 
-const elementsMultipleChoice = `
+const multipleChoice = `
 (select distinct(q.id)
   from quiz as q
   join quiz_item as qi on q.id = qi.quiz_id
   where type = 'multiple-choice'
   and multi != true
-  and course_id = '21356a26-7508-4705-9bab-39b239862632')
+  and (course_id = '21356a26-7508-4705-9bab-39b239862632'
+  or course_id = '5d1e8da2-3154-4966-aa94-2ca0406cf38a'
+  or course_id = '5f496ecc-327a-4899-baff-2daa2b40b05f'
+  or course_id = '38240a7b-7e64-4202-91e2-91f6d46f6198'))
 `
