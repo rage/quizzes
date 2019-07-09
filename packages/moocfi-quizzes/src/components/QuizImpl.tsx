@@ -59,6 +59,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const quiz = useTypedSelector(state => state.quiz)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
 
   const dispatch = useDispatch()
 
@@ -152,6 +153,11 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           </>
         ) : (
           <div>
+            <Typography>
+              Attempts left:{" "}
+              {// ei suoraan! voi olla että osa yrityksistä on jo käytetty!
+              quiz.tries - (userQuizState ? userQuizState.tries : 0)}
+            </Typography>
             <Button
               variant="contained"
               color="primary"
@@ -252,13 +258,13 @@ const QuizPointsInformer = () => {
     )
   }
 
-  const userPoints = answer.pointsAwarded
-
+  const userPoints = answer.pointsAwarded !== null ? answer.pointsAwarded : 0
+  const result = Number.isInteger(userPoints)
+    ? userPoints
+    : userPoints.toFixed(2)
   return (
     <StyledPaper pointsRatio={userPoints / quizPoints}>
-      <Typography variant="body1">
-        Points awarded to you: {userPoints.toFixed(2)}
-      </Typography>
+      <Typography variant="body1">Points awarded to you: {result}</Typography>
       <Typography variant="body1">
         Points available in the quiz: {quizPoints}
       </Typography>

@@ -17,7 +17,7 @@ export type UserQuizState = {
   quizId: string
   peerReviewsGiven: number
   peerReviewsReceived: number
-  pointsAwarded: number
+  pointsAwarded: number | null
   spamFlags: number
   tries: number
   status: "open" | "locked"
@@ -178,6 +178,7 @@ export type Quiz = {
   course: Course
   items: QuizItem[]
   peerReviewCollections: PeerReviewCollection[]
+  tries: number
 }
 
 export type PeerReviewGradeAnswer = {
