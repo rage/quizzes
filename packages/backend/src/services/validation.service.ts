@@ -207,12 +207,32 @@ export default class ValidationService {
     pointsAwarded =
       points !== null ? (points / items.length) * quiz.points : null
 
-    quizAnswer.status = quizAnswer.status || "confirmed"
-
     userQuizState.userId = quizAnswer.userId
     userQuizState.quizId = quizAnswer.quizId
     userQuizState.tries = userQuizState.tries ? userQuizState.tries + 1 : 1
-    userQuizState.status = "locked"
+
+    const noNeedForRetry = itemAnswerStatus.every(ias => {
+      if (!ias.type) {
+        return true
+      }
+      if (
+        ias.type === "scale" ||
+        ias.type === "checkbox" ||
+        ias.type === "research-agreement" ||
+        ias.type === "essay"
+      ) {
+        return true
+      }
+      return ias.correct
+    })
+
+    const noTriesLeft = noNeedForRetry || userQuizState.tries >= quiz.tries
+
+    if (!quizAnswer.status) {
+      quizAnswer.status = noTriesLeft ? "confirmed" : "submitted"
+    }
+
+    userQuizState.status = noTriesLeft ? "locked" : "open"
 
     userQuizState.pointsAwarded =
       userQuizState.pointsAwarded > pointsAwarded

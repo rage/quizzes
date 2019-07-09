@@ -1,6 +1,5 @@
 import { Response } from "express"
 import JSONStream from "JSONStream"
-import knex from "knex"
 import { getUUIDByString } from "@quizzes/common/util"
 import {
   Get,
@@ -68,6 +67,19 @@ export class QuizController {
     try {
       const quizId = validator.isUUID(id) ? id : getUUIDByString(id)
 
+      const supportQuiz = (await this.quizService.getQuizzes({
+        id: quizId,
+        items: true,
+        stripped: true,
+      }))[0]
+
+      console.log("support quiz: ", supportQuiz)
+
+      let triesAllowed = 1
+      if (supportQuiz) {
+        triesAllowed = supportQuiz.tries
+      }
+
       let userQuizState: UserQuizState
       try {
         userQuizState = await this.userQuizStateService.getUserQuizState(
@@ -77,12 +89,38 @@ export class QuizController {
       } catch (error) {
         console.log("not found")
       }
+
+      let stripped = true
+
       let quizAnswer: QuizAnswer
       if (userQuizState) {
+        if (userQuizState.tries >= triesAllowed) {
+          stripped = false
+        }
+
         const answer = await this.quizAnswerService.getAnswer(
           { quizId, userId: user.id },
           this.entityManager,
         )
+
+        const noNeedForRetry = answer.itemAnswers.every(ia => {
+          const quizItem = supportQuiz.items.find(qi => qi.id === ia.quizItemId)
+          if (
+            quizItem.type === "scale" ||
+            quizItem.type === "checkbox" ||
+            quizItem.type === "research-agreement" ||
+            quizItem.type === "essay"
+          ) {
+            return true
+          }
+          return ia.correct
+        })
+        console.log("no need to retry: ", noNeedForRetry)
+
+        if (noNeedForRetry) {
+          stripped = false
+        }
+
         if (answer.status === "submitted" || answer.status === "confirmed") {
           quizAnswer = answer
         }
@@ -93,15 +131,22 @@ export class QuizController {
         options: true,
         peerreviews: true,
         course: true,
-        stripped: quizAnswer ? false : true,
+        stripped,
         ...params,
       })
 
-      return {
-        quiz: quizzes[0],
+      const quiz = quizzes[0]
+      console.log("quiz: ", quiz)
+
+      const result = {
+        quiz,
         quizAnswer,
         userQuizState,
       }
+
+      console.log("Returning: ", result)
+
+      return result
     } catch (error) {
       console.log(error)
     }

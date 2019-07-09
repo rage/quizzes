@@ -119,6 +119,15 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     return <div />
   }
 
+  let triesUsed = 0
+  let triesRemaining = quiz.tries
+  let locked = false
+  if (userQuizState) {
+    triesUsed = userQuizState.tries
+    locked = userQuizState.status === "locked"
+  }
+  triesRemaining -= triesUsed
+
   return (
     <div>
       <Grid container={true} justify="space-between">
@@ -141,7 +150,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
         {quizItemComponents(quiz, languageId)}
 
-        {quizAnswer.id ? (
+        {triesRemaining <= 0 || locked ? (
           <>
             {quizContainsEssay() && <PeerReviews />}
 
@@ -153,11 +162,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           </>
         ) : (
           <div>
-            <Typography>
-              Attempts left:{" "}
-              {// ei suoraan! voi olla että osa yrityksistä on jo käytetty!
-              quiz.tries - (userQuizState ? userQuizState.tries : 0)}
-            </Typography>
+            <Typography>Tries remaining: {triesRemaining}</Typography>
             <Button
               variant="contained"
               color="primary"

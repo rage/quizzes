@@ -282,11 +282,11 @@ export class QuizAnswerController {
   ): Promise<any> {
     const userId = user.id
 
-    answer.userId = userId
     if (!answer.quizId || !answer.languageId) {
       throw new BadRequestError("Answer must contain some data")
     }
-    answer.userId = user.id
+    answer.userId = userId
+
     // creates new user if necessary
     answer.user = new User()
     answer.user.id = answer.userId
@@ -299,7 +299,6 @@ export class QuizAnswerController {
       course: true,
     }))[0]
 
-    // is there ever a quiz state before answering the quiz...?
     const userQState: UserQuizState =
       (await this.userQuizStateService.getUserQuizState(
         answer.userId,
@@ -373,6 +372,38 @@ export class QuizAnswerController {
         quiz,
       )
     })
+
+    let stillAttemptsLeft = false
+
+    if (savedUserQuizState.tries < quiz.tries) {
+      if (
+        !savedAnswer.itemAnswers.every(ia => {
+          if (ia.correct) {
+            return true
+          }
+          const quizItem = quiz.items.find(qi => qi.id === ia.quizItemId)
+          if (
+            quizItem &&
+            (quizItem.type === "scale" ||
+              quizItem.type === "essay" ||
+              quizItem.type === "checkbox" ||
+              quizItem.type === "research-agreement")
+          ) {
+            return true
+          }
+
+          return false
+        })
+      ) {
+        stillAttemptsLeft = true
+      }
+    }
+
+    if (stillAttemptsLeft) {
+      return {
+        userQuizState: savedUserQuizState,
+      }
+    }
 
     return {
       quiz,
