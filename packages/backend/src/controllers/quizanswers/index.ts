@@ -299,6 +299,7 @@ export class QuizAnswerController {
       course: true,
     }))[0]
 
+    // is there ever a quiz state before answering the quiz...?
     const userQState: UserQuizState =
       (await this.userQuizStateService.getUserQuizState(
         answer.userId,

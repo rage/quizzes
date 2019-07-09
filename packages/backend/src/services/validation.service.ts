@@ -15,8 +15,28 @@ import {
 import { wordCount } from "./../../../common/src/util"
 import PeerReviewService from "./peerreview.service"
 
+interface ItemStatusObject {
+  type?: string
+  error?: string
+  data?: {
+    text?: string
+    words?: number
+    answerValue?: number
+  }
+  min?: number
+  max?: number
+  message?: string
+  correctAnswer?: boolean
+  submittedAnswer?: string
+  correct?: boolean
+  options?: any[]
+  itemId?: string
+  value?: number
+}
+
 @Service()
 export default class ValidationService {
+  // does this calculate the awarded points correctly? scale, checkbox, research agreement should not affect score...
   public validateQuizAnswer(
     quizAnswer: QuizAnswer,
     quiz: Quiz,
@@ -24,7 +44,7 @@ export default class ValidationService {
   ) {
     const items: QuizItem[] = quiz.items
     let points: number | null = null
-    let pointsAwarded
+    let pointsAwarded: number | null
     const itemAnswerStatus = items.map(item => {
       const itemAnswer = quizAnswer.itemAnswers.find(
         (ia: QuizItemAnswer) => ia.quizItemId === item.id,
@@ -38,7 +58,7 @@ export default class ValidationService {
       const itemTranslation = item.texts.find(
         text => text.languageId === quizAnswer.languageId,
       )
-      let itemStatusObject: any
+      let itemStatusObject: ItemStatusObject
       let optionAnswerStatus
       let correct = false
 
@@ -155,6 +175,7 @@ export default class ValidationService {
           points += 1
         case "checkbox":
         case "research-agreement":
+          points += 1
           optionAnswerStatus = item.options.map(option => {
             const optionAnswer = itemAnswer.optionAnswers.find(
               (oa: any) => oa.quizOptionId === option.id,
@@ -184,7 +205,8 @@ export default class ValidationService {
     })
 
     pointsAwarded =
-      points != null ? (points / items.length) * quiz.points : null
+      points !== null ? (points / items.length) * quiz.points : null
+
     quizAnswer.status = quizAnswer.status || "confirmed"
 
     userQuizState.userId = quizAnswer.userId

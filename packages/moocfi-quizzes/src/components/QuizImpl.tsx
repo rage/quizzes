@@ -1,7 +1,14 @@
 import * as React from "react"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
-import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
+import styled from "styled-components"
+import {
+  Button,
+  CircularProgress,
+  Grid,
+  Paper,
+  Typography,
+} from "@material-ui/core"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import * as messageActions from "../state/message/actions"
 
@@ -17,7 +24,7 @@ import StageVisualizer from "./PeerReviews/StageVisualizer"
 import PeerReviews from "./PeerReviews"
 import Unsupported from "./Unsupported"
 import { useTypedSelector } from "../state/store"
-import { SpaciousTypography } from "./styleComponents"
+import { SpaciousTypography, SpaciousPaper } from "./styleComponents"
 import { Quiz, QuizItemType, QuizItemAnswer, QuizAnswer } from "../modelTypes"
 import { GeneralLabels } from "../utils/languages"
 
@@ -113,14 +120,21 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   return (
     <div>
-      <SpaciousTypography variant="h5">
-        {quiz.texts[0].title}
-      </SpaciousTypography>
-      <SpaciousTypography
-        variant="body1"
-        dangerouslySetInnerHTML={{ __html: quiz.texts[0].body }}
-      />
+      <Grid container={true} justify="space-between">
+        <Grid item={true} xs={12} md={6}>
+          <SpaciousTypography variant="h5">
+            {quiz.texts[0].title}
+          </SpaciousTypography>
+          <SpaciousTypography
+            variant="body1"
+            dangerouslySetInnerHTML={{ __html: quiz.texts[0].body }}
+          />
+        </Grid>
 
+        <Grid item={true} xs="auto">
+          <QuizPointsInformer />
+        </Grid>
+      </Grid>
       <div>
         {quizContainsEssay() && <StageVisualizer />}
 
@@ -191,17 +205,72 @@ const ResultInformation: React.FunctionComponent<ResultInformationProps> = ({
         : generalLabels.answerIncorrectLabel
   }
 
+  const quizItems = quiz.items
+  const numberOfNotIncorrectAnswers = quizAnswer.itemAnswers.filter(ia => {
+    if (ia.correct === true) return true
+    const item = quizItems.find(i => i.id === ia.quizItemId)
+    return (
+      item &&
+      (item.type === "checkbox" ||
+        item.type === "feedback" ||
+        item.type === "scale" ||
+        item.type === "research-agreement")
+    )
+  }).length
+
   if (feedback === undefined) {
     feedback =
       quiz.items.length === 1
         ? generalLabels.answerCorrectLabel
         : generalLabels.kOutOfNCorrect(
-            quizAnswer.itemAnswers.filter(ia => ia.correct === true).length,
+            numberOfNotIncorrectAnswers,
             quiz.items.length,
           )
   }
 
   return <Typography variant="h5">{feedback}</Typography>
 }
+
+const QuizPointsInformer = () => {
+  const answer = useTypedSelector(state => state.user.userQuizState)
+  const quiz = useTypedSelector(state => state.quiz)
+
+  if (!quiz) {
+    // should not be possible
+    return <div>No quiz</div>
+  }
+
+  const quizPoints = quiz.points
+
+  if (!answer) {
+    return (
+      <SpaciousPaper>
+        <Typography variant="body1">
+          Points available in the quiz: {quizPoints}
+        </Typography>
+      </SpaciousPaper>
+    )
+  }
+
+  const userPoints = answer.pointsAwarded
+
+  return (
+    <StyledPaper pointsRatio={userPoints / quizPoints}>
+      <Typography variant="body1">
+        Points awarded to you: {userPoints.toFixed(2)}
+      </Typography>
+      <Typography variant="body1">
+        Points available in the quiz: {quizPoints}
+      </Typography>
+    </StyledPaper>
+  )
+}
+
+const StyledPaper = styled(({ pointsRatio, ...others }) => (
+  <SpaciousPaper {...others} />
+))`
+  color: ${({ pointsRatio }) =>
+    Math.abs(1 - pointsRatio) < 0.001 ? "green" : "inherit"};
+`
 
 export default FuncQuizImpl
