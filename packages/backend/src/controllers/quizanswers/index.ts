@@ -376,6 +376,7 @@ export class QuizAnswerController {
     if (savedUserQuizState.status === "open") {
       return {
         userQuizState: savedUserQuizState,
+        quizAnswer: savedAnswer,
       }
     }
 

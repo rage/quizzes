@@ -1,9 +1,10 @@
 import { ActionCreator } from "redux"
 import { createAction } from "typesafe-actions"
-import { ThunkAction, State } from "../store"
+import { ThunkAction } from "../store"
 import { postAnswer } from "../../services/answerService"
 import * as userActions from "../user/actions"
 import * as quizActions from "../quiz/actions"
+import * as messageActions from "../message/actions"
 import { QuizAnswer, QuizItem } from "../../modelTypes"
 import { wordCount } from "../../utils/string_tools"
 
@@ -74,11 +75,15 @@ export const submit: ActionCreator<ThunkAction> = () => async (
     getState().user.accessToken,
   )
 
-  // remember! Disable submit! Although it's not so necessary
-  dispatch(setLocked())
-  dispatch(set(responseData.quizAnswer))
-  dispatch(quizActions.set(responseData.quiz))
   dispatch(userActions.setQuizState(responseData.userQuizState))
+
+  if (responseData.userQuizState.status === "locked") {
+    dispatch(quizActions.set(responseData.quiz))
+    dispatch(set(responseData.quizAnswer))
+    dispatch(setLocked())
+  } else {
+    // we'll see, ok?
+  }
 }
 
 const itemAnswerReadyForSubmit = (textData: string, item: QuizItem) => {

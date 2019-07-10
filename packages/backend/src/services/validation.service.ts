@@ -207,7 +207,6 @@ export default class ValidationService {
     userQuizState.tries = userQuizState.tries ? userQuizState.tries + 1 : 1
 
     const noNeedForRetry = itemAnswerStatus.every(ias => {
-      console.log("The ias: ", ias)
       if (!ias.type && typeof ias.correct !== "boolean") {
         return true
       }
@@ -223,8 +222,6 @@ export default class ValidationService {
     })
 
     const noTriesLeft = quiz.triesLimited && userQuizState.tries >= quiz.tries
-    console.log("No need for retries: ", noNeedForRetry)
-    console.log("Hit the tiesLimit: ", noTriesLeft)
 
     const readyToClose = noNeedForRetry || noTriesLeft
 

@@ -99,6 +99,15 @@ export class QuizController {
 
       const quiz = quizzes[0]
 
+      /*
+      if(userQuizState && (userQuizState.status !== "locked")){
+        return {
+          quiz,
+          userQuizState
+        }
+      }
+      */
+
       const result = {
         quiz,
         quizAnswer,

@@ -119,7 +119,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   if (quiz.triesLimited) {
     let triesUsed = 0
-    let triesRemaining = quiz.tries
     if (userQuizState) {
       triesUsed = userQuizState.tries
     }

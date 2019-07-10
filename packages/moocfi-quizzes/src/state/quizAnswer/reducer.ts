@@ -1,6 +1,6 @@
 import { ActionType, getType } from "typesafe-actions"
 import * as quizAnswer from "./actions"
-import { QuizAnswer, QuizItemAnswer } from "../../modelTypes"
+import { QuizAnswer } from "../../modelTypes"
 
 const initialValue: QuizAnswerState = {
   quizAnswer: {
