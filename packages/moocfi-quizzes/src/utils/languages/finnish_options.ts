@@ -44,6 +44,8 @@ const finnishLabels: SingleLanguageLabels = {
     evaluationStageLabel: "Tehtävän arvostelu",
   },
   general: {
+    answerMissingBecauseQuizModifiedLabel:
+      "Kysymykseen ei vastattu. Tehtävää todennäköisesti muutettu vastaamisen jälkeen.",
     submitButtonLabel: "Vastaa",
     errorLabel: "Virhe",
     loginPromptLabel: "Kirjaudu sisään vastataksesi tehtävään",
@@ -52,6 +54,10 @@ const finnishLabels: SingleLanguageLabels = {
     alreadyAnsweredLabel: "Olet jo vastannut",
     answerIncorrectLabel: "Tehtävä väärin",
     kOutOfNCorrect: (k, n) => `Sait ${k}/${n} oikein`,
+    pointsAvailableLabel: "Pisteitä saatavissa",
+    pointsReceivedLabel: "Saamasi pisteet",
+    incorrectSubmitWhileTriesLeftLabel:
+      "Vastauksesi oli virheellinen - voit yrittää uudelleen!",
   },
 }
 

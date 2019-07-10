@@ -4,11 +4,11 @@ import { UserQuizState } from "../../modelTypes"
 
 export type UserState = {
   accessToken: string
-  userQuizState: UserQuizState
+  userQuizState: UserQuizState | null
 }
 
 const initialValue = {
-  accessToken: null,
+  accessToken: "",
   userQuizState: null,
 }
 

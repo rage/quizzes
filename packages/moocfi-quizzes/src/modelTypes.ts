@@ -17,7 +17,7 @@ export type UserQuizState = {
   quizId: string
   peerReviewsGiven: number
   peerReviewsReceived: number
-  pointsAwarded: number
+  pointsAwarded: number | null
   spamFlags: number
   tries: number
   status: "open" | "locked"
@@ -25,7 +25,7 @@ export type UserQuizState = {
 
 export type QuizOptionAnswer = {
   id?: string
-  quizItemAnswerId: string
+  quizItemAnswerId?: string
   quizOptionId: string
 }
 
@@ -33,8 +33,8 @@ export type QuizItemAnswer = {
   id?: string
   quizAnswerId?: string
   quizItemId: string
-  textData: string
-  intData: number
+  textData: string | null
+  intData: number | null
   correct?: boolean
   optionAnswers: QuizOptionAnswer[]
 }
@@ -178,11 +178,13 @@ export type Quiz = {
   course: Course
   items: QuizItem[]
   peerReviewCollections: PeerReviewCollection[]
+  tries: number
+  triesLimited: boolean
 }
 
 export type PeerReviewGradeAnswer = {
   peerReviewQuestionId: string
-  value: number
+  value: number | null
 }
 
 export type PeerReviewEssayAnswer = {

@@ -6,7 +6,8 @@ import { GridDirection, GridSize } from "@material-ui/core/Grid"
 import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
-import { QuizItem, QuizItemOption } from "../modelTypes"
+import { QuizItem, QuizItemOption, QuizItemAnswer } from "../modelTypes"
+import LaterQuizItemAddition from "./LaterQuizItemAddition"
 
 const ChoicesContainer = styled(
   ({ singleItem, optionContainerWidth, ...others }) => (
@@ -44,19 +45,17 @@ const BottomMarginedGrid = styled(Grid)`
   marginbottom: 10px;
 `
 
-const LeftBorderedTypography = styled(
-  ({ barColor, ...others }: { barColor: string }) => <Typography {...others} />,
-)`
+const LeftBorderedTypography = styled(({ barColor, ...others }) => (
+  <Typography {...others} />
+))`
   border-left: 4px solid ${({ barColor }) => barColor};
   padding: 3;
   margin-bottom: 5;
 `
 
-const SolutionTypography = styled(
-  ({ correct, ...others }: { correct: boolean }) => (
-    <LeftBorderedTypography barColor={correct ? "green" : "red"} {...others} />
-  ),
-)`
+const SolutionTypography = styled(({ correct, ...others }) => (
+  <LeftBorderedTypography barColor={correct ? "green" : "red"} {...others} />
+))`
   margin-bottom: 0;
 `
 
@@ -68,9 +67,15 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   item,
 }) => {
   const quiz = useTypedSelector(state => state.quiz)
+  if (!quiz) {
+    return <div />
+  }
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
 
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
+  if (!itemAnswer) {
+    return <LaterQuizItemAddition item={item} />
+  }
 
   const onlyOneItem = quiz.items.length === 1
 
@@ -95,7 +100,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
 
   return (
     <BottomMarginedGrid container={true} direction={direction}>
-      <UnnamedComponent
+      <ItemInformation
         item={item}
         itemAnswer={itemAnswer}
         onlyOneItem={onlyOneItem}
@@ -109,7 +114,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
         optionContainerWidth={optionContainerWidth}
       >
         {options
-          .sort((o1, o2) => o2.order - o1.order)
+          .sort((o1, o2) => o1.order - o2.order)
           .map(option => {
             return (
               <Option
@@ -125,12 +130,27 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   )
 }
 
-const UnnamedComponent = ({ questionWidth, onlyOneItem, item, itemAnswer }) => {
+type ItemInformationProps = {
+  questionWidth: 6 | 12
+  itemAnswer: QuizItemAnswer
+  item: QuizItem
+  onlyOneItem: boolean
+}
+
+const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
+  questionWidth,
+  onlyOneItem,
+  item,
+  itemAnswer,
+}) => {
   const answered = itemAnswer.id ? true : false
 
-  const languageInfo = useTypedSelector(
-    state => state.language.languageLabels.multipleChoice,
-  )
+  const languageInfo = useTypedSelector(state => state.language.languageLabels)
+  if (!languageInfo) {
+    return <div />
+  }
+
+  const multipleChoiceLabels = languageInfo.multipleChoice
 
   const { title, body, successMessage, failureMessage } = item.texts[0]
 
@@ -150,15 +170,21 @@ const UnnamedComponent = ({ questionWidth, onlyOneItem, item, itemAnswer }) => {
 
       {!answered && item.multi && (
         <Typography variant="subtitle1">
-          {languageInfo.chooseAllSuitableOptionsLabel}
+          {multipleChoiceLabels.chooseAllSuitableOptionsLabel}
         </Typography>
       )}
 
-      {answered && !onlyOneItem && (
-        <SolutionTypography correct={itemAnswer.correct} variant="body1">
-          {itemAnswer.correct ? successMessage : failureMessage}
-        </SolutionTypography>
-      )}
+      {answered &&
+        !onlyOneItem &&
+        ((itemAnswer.correct && successMessage) ||
+          (!itemAnswer.correct && failureMessage)) && (
+          <SolutionTypography
+            correct={itemAnswer.correct ? true : false}
+            variant="body1"
+          >
+            {itemAnswer.correct ? successMessage : failureMessage}
+          </SolutionTypography>
+        )}
     </Grid>
   )
 }
@@ -174,16 +200,24 @@ const Option: React.FunctionComponent<OptionProps> = ({
   direction,
   optionWidth,
 }) => {
-  const items = useTypedSelector(state => state.quiz.items)
+  const dispatch = useDispatch()
+
+  const items = useTypedSelector(state => state.quiz!.items)
   const item = items.find(i => i.id === option.quizItemId)
+  if (!item) {
+    // should be impossible
+    return <div>Cannot find related item</div>
+  }
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const itemAnswer = quizAnswer.itemAnswers.find(
     ia => ia.quizItemId === item.id,
   )
+  if (!itemAnswer) {
+    // should be impossible
+    return <div>Cannot find related item answer</div>
+  }
 
   const onlyOneItem = items.length === 1
-
-  const dispatch = useDispatch()
 
   const handleOptionChange = (optionId: string) => () =>
     dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))
@@ -237,11 +271,13 @@ const Option: React.FunctionComponent<OptionProps> = ({
             </RevealedChoiceButton>
           </Grid>
 
-          <Grid item>
-            <LeftBorderedTypography variant="body1" barColor={feedbackColor}>
-              {feedbackMessage}
-            </LeftBorderedTypography>
-          </Grid>
+          {feedbackMessage && (
+            <Grid item>
+              <LeftBorderedTypography variant="body1" barColor={feedbackColor}>
+                {feedbackMessage}
+              </LeftBorderedTypography>
+            </Grid>
+          )}
         </Grid>
       </Grid>
     )

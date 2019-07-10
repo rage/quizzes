@@ -1,6 +1,5 @@
 import { Response } from "express"
 import JSONStream from "JSONStream"
-import knex from "knex"
 import { getUUIDByString } from "@quizzes/common/util"
 import {
   Get,
@@ -22,14 +21,7 @@ import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
 import validator from "validator"
 import { API_PATH } from "../../config"
-import {
-  PeerReviewCollection,
-  Quiz,
-  QuizAnswer,
-  UserQuizState,
-  QuizItemTranslation,
-  QuizItem,
-} from "../../models"
+import { Quiz, QuizAnswer, UserQuizState } from "../../models"
 import { IQuizQuery, ITMCProfileDetails } from "../../types"
 import _ from "lodash"
 import KafkaService from "services/kafka.service"
@@ -77,12 +69,20 @@ export class QuizController {
       } catch (error) {
         console.log("not found")
       }
+
+      let stripped = true
+
       let quizAnswer: QuizAnswer
       if (userQuizState) {
         const answer = await this.quizAnswerService.getAnswer(
           { quizId, userId: user.id },
           this.entityManager,
         )
+
+        if (userQuizState.status === "locked") {
+          stripped = false
+        }
+
         if (answer.status === "submitted" || answer.status === "confirmed") {
           quizAnswer = answer
         }
@@ -93,15 +93,28 @@ export class QuizController {
         options: true,
         peerreviews: true,
         course: true,
-        stripped: quizAnswer ? false : true,
+        stripped,
         ...params,
       })
 
-      return {
-        quiz: quizzes[0],
+      const quiz = quizzes[0]
+
+      /*
+      if(userQuizState && (userQuizState.status !== "locked")){
+        return {
+          quiz,
+          userQuizState
+        }
+      }
+      */
+
+      const result = {
+        quiz,
         quizAnswer,
         userQuizState,
       }
+
+      return result
     } catch (error) {
       console.log(error)
     }

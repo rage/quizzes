@@ -14,7 +14,8 @@ import {
 import { useTheme } from "@material-ui/core/styles"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
-import { QuizItem, MiscEvent } from "../modelTypes"
+import { QuizItem } from "../modelTypes"
+import LaterQuizItemAddition from "./LaterQuizItemAddition"
 
 type ScaleProps = {
   item: QuizItem
@@ -37,10 +38,10 @@ const StyledRadio = styled(Radio)`
 
 const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
   const dispatch = useDispatch()
-  const handleIntDataChange = (e: MiscEvent) =>
-    dispatch(
-      quizAnswerActions.changeIntData(item.id, Number(e.currentTarget.value)),
-    )
+
+  const handleIntDataChange = (e: React.ChangeEvent<{}>, value: string) => {
+    dispatch(quizAnswerActions.changeIntData(item.id, Number(value)))
+  }
 
   const theme = useTheme()
   const matchesSmall = useMediaQuery(theme.breakpoints.down("sm"))
@@ -50,6 +51,10 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
   )
   const itemAnswer = itemAnswers.find(ia => ia.quizItemId === item.id)
   const intData = itemAnswer && itemAnswer.intData
+
+  if (!itemAnswer) {
+    return <LaterQuizItemAddition item={item} message="You have not answered" />
+  }
 
   return (
     <FormControl fullWidth={true} style={{ marginBottom: "1rem" }}>
@@ -68,7 +73,7 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
           <ScaleOptions
             handleIntDataChange={handleIntDataChange}
             item={item}
-            intData={intData}
+            intData={typeof intData === "number" ? intData : undefined}
           />
         </Grid>
       </GridRow>
@@ -77,9 +82,9 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
 }
 
 type ScaleOptionsProps = {
-  handleIntDataChange: (event: MiscEvent, value: string) => void
+  handleIntDataChange: (event: React.ChangeEvent<{}>, value: string) => void
   item: QuizItem
-  intData: number
+  intData: number | undefined
 }
 
 const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
@@ -119,7 +124,7 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
         >
           {Array.from(
             { length: number_of_options },
-            (v, i) => (item.minWords ? item.minWords : 1) + i,
+            (v, i) => (item.minValue ? item.minValue : 1) + i,
           ).map(number => (
             <FormControlLabel
               key={number}

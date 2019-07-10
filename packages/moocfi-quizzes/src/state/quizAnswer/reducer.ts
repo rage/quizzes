@@ -2,10 +2,14 @@ import { ActionType, getType } from "typesafe-actions"
 import * as quizAnswer from "./actions"
 import { QuizAnswer } from "../../modelTypes"
 
-const initialValue = {
-  quizAnswer: null,
+const initialValue: QuizAnswerState = {
+  quizAnswer: {
+    languageId: "",
+    quizId: "",
+    itemAnswers: [],
+  },
   submitLocked: true,
-  itemAnswersReady: null,
+  itemAnswersReady: {},
 }
 
 export type QuizAnswerState = {
@@ -104,9 +108,15 @@ export const quizAnswerReducer = (
       newItemAnswersReady[`${action.payload.itemId}`] = true
 
       const { itemId, optionId, multi } = action.payload
-      const newItemAnswer = {
-        ...state.quizAnswer.itemAnswers.find(ia => ia.quizItemId === itemId),
+
+      const current = state.quizAnswer.itemAnswers.find(
+        ia => ia.quizItemId === itemId,
+      )
+      if (current === undefined) {
+        return state
       }
+      const newItemAnswer = { ...current }
+
       const previouslyChosen = newItemAnswer.optionAnswers.some(
         oa => oa.quizOptionId === optionId,
       )

@@ -7,6 +7,7 @@ import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { SpaciousTypography } from "./styleComponents"
 import { SpaciousPaper } from "./styleComponents"
 import { QuizItem, MiscEvent } from "../modelTypes"
+import LaterQuizItemAddition from "./LaterQuizItemAddition"
 
 type OpenProps = {
   item: QuizItem
@@ -21,18 +22,26 @@ const SolutionPaper = styled(({ correct, ...other }) => (
 const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
   const dispatch = useDispatch()
 
+  const languageInfo = useTypedSelector(state => state.language.languageLabels)
+  if (!languageInfo) {
+    return <div />
+  }
+
   const handleTextDataChange = (e: MiscEvent) => {
     dispatch(quizAnswerActions.changeTextData(item.id, e.currentTarget.value))
   }
 
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
+  if (!itemAnswer) {
+    return <LaterQuizItemAddition item={item} />
+  }
+
   const correct = itemAnswer.correct
   const textData = itemAnswer.textData
 
-  const languageInfo = useTypedSelector(
-    state => state.language.languageLabels.open,
-  )
+  const openLabels = languageInfo.open
+
   const answered = answer.id ? true : false
   const itemTitle = item.texts[0].title
 
@@ -53,7 +62,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
       <div>
         {guidance}
         <Typography variant="subtitle1">
-          {languageInfo.userAnswerLabel}:
+          {openLabels.userAnswerLabel}:
         </Typography>
         <SpaciousPaper>
           <Typography variant="body1">{textData}</Typography>
@@ -75,7 +84,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
         onChange={handleTextDataChange}
         fullWidth
         margin="normal"
-        placeholder={languageInfo.placeholder}
+        placeholder={openLabels.placeholder}
       />
     </div>
   )

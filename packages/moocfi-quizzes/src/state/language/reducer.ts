@@ -4,11 +4,11 @@ import { languageOptions, SingleLanguageLabels } from "../../utils/languages"
 
 export type LanguageState = {
   languageId: string
-  languageLabels: SingleLanguageLabels
+  languageLabels: SingleLanguageLabels | null
 }
 
 const initialValue = {
-  languageId: null,
+  languageId: "",
   languageLabels: null,
 }
 

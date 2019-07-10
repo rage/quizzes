@@ -42,6 +42,8 @@ const englishLabels: SingleLanguageLabels = {
     evaluationStageLabel: "Evaluating the answer",
   },
   general: {
+    answerMissingBecauseQuizModifiedLabel:
+      "Question not answered. Quiz has probably been modified after your answer.",
     submitButtonLabel: "Submit",
     errorLabel: "Error",
     loginPromptLabel: "Login to view the quiz",
@@ -50,6 +52,10 @@ const englishLabels: SingleLanguageLabels = {
     alreadyAnsweredLabel: "You have already answered",
     answerIncorrectLabel: "The answer is incorrect",
     kOutOfNCorrect: (k, n) => `${k}/${n} answers correct`,
+    pointsAvailableLabel: "Points available in the quiz",
+    pointsReceivedLabel: "Points awarded to you",
+    incorrectSubmitWhileTriesLeftLabel:
+      "The answer was incorrect - you may try again!",
   },
 }
 

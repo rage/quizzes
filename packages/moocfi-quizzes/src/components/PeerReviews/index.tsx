@@ -18,11 +18,17 @@ const PeerReviews: React.FunctionComponent = () => {
   const dispatch = useDispatch()
 
   const quiz = useTypedSelector(state => state.quiz)
+  if (!quiz) {
+    return <div />
+  }
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const peerReviewQuestions = quiz.peerReviewCollections
-  const languageInfo = useTypedSelector(
-    state => state.language.languageLabels.peerReviews,
-  )
+  const languageInfo = useTypedSelector(state => state.language.languageLabels)
+  if (!languageInfo) {
+    return <div />
+  }
+
+  const peerReviewsLabels = languageInfo.peerReviews
 
   useEffect(() => {
     dispatch(peerReviewsActions.fetchPeerReviewAlternatives())
@@ -35,7 +41,7 @@ const PeerReviews: React.FunctionComponent = () => {
   if (peerReviewQuestions.length === 0) {
     return (
       <Typography variant="subtitle1">
-        {languageInfo.quizInvolvesNoPeerReviewsInstruction}
+        {peerReviewsLabels.quizInvolvesNoPeerReviewsInstruction}
       </Typography>
     )
   }
@@ -44,22 +50,22 @@ const PeerReviews: React.FunctionComponent = () => {
     <div>
       <PeerReviewsGuidance
         guidanceText={peerReviewQuestions[0].texts[0].body}
-        givenLabel={languageInfo.givenPeerReviewsLabel}
-        peerReviewsCompletedInfo={languageInfo.peerReviewsCompletedInfo}
+        givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
+        peerReviewsCompletedInfo={peerReviewsLabels.peerReviewsCompletedInfo}
       />
 
       {!morePeerReviewsRequired() && (
         <BoldTypography variant="subtitle1">
-          {languageInfo.extraPeerReviewsEncouragementLabel}
+          {peerReviewsLabels.extraPeerReviewsEncouragementLabel}
         </BoldTypography>
       )}
 
       <Togglable
         initiallyVisible={morePeerReviewsRequired()}
-        hideButtonText={languageInfo.hidePeerReviewLabel}
-        displayButtonText={languageInfo.displayPeerReview}
+        hideButtonText={peerReviewsLabels.hidePeerReviewLabel}
+        displayButtonText={peerReviewsLabels.displayPeerReview}
       >
-        <PeerReviewForm languageInfo={languageInfo} />
+        <PeerReviewForm languageInfo={peerReviewsLabels} />
       </Togglable>
     </div>
   )

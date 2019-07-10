@@ -6,15 +6,18 @@ const StageVisualizer = () => {
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const quiz = useTypedSelector(state => state.quiz)
-  const languageInfo = useTypedSelector(
-    state => state.language.languageLabels.stage,
-  )
+
+  const languageInfo = useTypedSelector(state => state.language.languageLabels)
+  if (!languageInfo || !quiz) {
+    return <div />
+  }
+  const stageLabels = languageInfo.stage
 
   const steps = [
-    languageInfo.answerStageLabel,
-    languageInfo.givingPeerReviewsStageLabel,
-    languageInfo.receivingPeerReviewsStageLabel,
-    languageInfo.evaluationStageLabel,
+    stageLabels.answerStageLabel,
+    stageLabels.givingPeerReviewsStageLabel,
+    stageLabels.receivingPeerReviewsStageLabel,
+    stageLabels.evaluationStageLabel,
   ]
 
   const answered = quizAnswer.id ? true : false

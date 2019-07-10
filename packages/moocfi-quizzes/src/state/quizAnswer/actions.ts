@@ -1,9 +1,10 @@
 import { ActionCreator } from "redux"
 import { createAction } from "typesafe-actions"
-import { ThunkAction, State } from "../store"
+import { ThunkAction } from "../store"
 import { postAnswer } from "../../services/answerService"
 import * as userActions from "../user/actions"
 import * as quizActions from "../quiz/actions"
+import * as messageActions from "../message/actions"
 import { QuizAnswer, QuizItem } from "../../modelTypes"
 import { wordCount } from "../../utils/string_tools"
 
@@ -45,7 +46,11 @@ export const changeChosenOption: ActionCreator<ThunkAction> = (
   itemId: string,
   optionId: string,
 ) => (dispatch, getState) => {
-  const multi = getState().quiz.items.find(i => i.id === itemId).multi
+  const item = getState().quiz.items.find(i => i.id === itemId)
+  if (!item) {
+    return
+  }
+  const multi = item.multi
   dispatch(chooseOption(itemId, optionId, multi))
 }
 
@@ -53,11 +58,10 @@ export const changeTextData: ActionCreator<ThunkAction> = (
   itemId: string,
   newValue: string,
 ) => (dispatch, getState) => {
-  const itemAnswer = getState().quizAnswer.quizAnswer.itemAnswers.find(
-    qa => qa.quizItemId === itemId,
-  )
   const item = getState().quiz.items.find(i => i.id === itemId)
-
+  if (item === undefined) {
+    return
+  }
   const readyToSubmit = itemAnswerReadyForSubmit(newValue, item)
   dispatch(changeTextDataAction(itemId, newValue, readyToSubmit))
 }
@@ -71,11 +75,24 @@ export const submit: ActionCreator<ThunkAction> = () => async (
     getState().user.accessToken,
   )
 
-  // remember! Disable submit! Although it's not so necessary
-  dispatch(setLocked())
-  dispatch(set(responseData.quizAnswer))
-  dispatch(quizActions.set(responseData.quiz))
   dispatch(userActions.setQuizState(responseData.userQuizState))
+
+  if (responseData.userQuizState.status === "locked") {
+    dispatch(quizActions.set(responseData.quiz))
+    dispatch(set(responseData.quizAnswer))
+    dispatch(setLocked())
+  } else {
+    const languageInfo = getState().language.languageLabels
+    if (languageInfo) {
+      dispatch(
+        messageActions.displayNotification(
+          languageInfo.general.incorrectSubmitWhileTriesLeftLabel,
+          "red",
+          5,
+        ),
+      )
+    }
+  }
 }
 
 const itemAnswerReadyForSubmit = (textData: string, item: QuizItem) => {

@@ -1,6 +1,10 @@
 import { ActionType, getType } from "typesafe-actions"
 import * as peerReviews from "./actions"
-import { QuizAnswer, PeerReviewAnswer } from "../../modelTypes"
+import {
+  QuizAnswer,
+  PeerReviewAnswer,
+  PeerReviewGradeAnswer,
+} from "../../modelTypes"
 
 const initialValue = {
   options: [],
@@ -9,7 +13,7 @@ const initialValue = {
 }
 
 export type PeerReviewsState = {
-  answer: PeerReviewAnswer
+  answer: PeerReviewAnswer | null
   options: QuizAnswer[]
   submitDisabled: boolean
 }
@@ -29,14 +33,21 @@ export const peerReviewsReducer = (
       return initialValue
     case getType(peerReviews.changeGrade):
       const { peerReviewQuestionId, value } = action.payload
-      const newAnswer = {
-        ...state.answer,
-        answers: state.answer.answers.map(answer =>
+      const currentAnswer = state.answer
+      if (!currentAnswer) {
+        console.log("peer review answer is null")
+        return state
+      }
+
+      const newAnswer: PeerReviewAnswer = {
+        ...currentAnswer,
+        answers: currentAnswer.answers.map(answer =>
           answer.peerReviewQuestionId === peerReviewQuestionId
             ? { ...answer, value }
             : answer,
         ),
       }
+
       const submitDisabled = newAnswer.answers.some(
         answer => answer.value === null,
       )
@@ -59,13 +70,25 @@ export const peerReviewsReducer = (
         answer => answer.id !== quizAnswerId,
       )
 
-      const peerReviewAnswer = {
+      const peerReviewAnswer: PeerReviewAnswer = {
         quizAnswerId,
         userId,
         peerReviewCollectionId,
-        rejectedQuizAnswerIds: rejected.map(x => x.id),
+        rejectedQuizAnswerIds: rejected.map(x => {
+          const id = x.id
+          if (!id) {
+            console.log(
+              "Should be impossible for received quiz answer not to have id...",
+            )
+            return ""
+          }
+          return id
+        }),
         answers: questionIds.map(questionId => {
-          return { peerReviewQuestionId: questionId, value: null }
+          return {
+            peerReviewQuestionId: questionId,
+            value: null,
+          } as PeerReviewGradeAnswer
         }),
       }
       return {

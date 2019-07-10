@@ -6,7 +6,11 @@ import PeerReviewOption from "./PeerReviewOption"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
 import { useTypedSelector } from "../../state/store"
 import { PeerReviewLabels } from "../../utils/languages"
-import { QuizAnswer, PeerReviewAnswer } from "../../modelTypes"
+import {
+  QuizAnswer,
+  PeerReviewAnswer,
+  PeerReviewQuestion,
+} from "../../modelTypes"
 
 type PeerReviewFormProps = {
   languageInfo: PeerReviewLabels
@@ -73,16 +77,21 @@ type PeerReviewQuestionsProps = {
 const PeerReviewQuestions: React.FunctionComponent<
   PeerReviewQuestionsProps
 > = ({ peerReview, languageInfo }) => {
-  const peerReviewQuestions = useTypedSelector(
-    state => state.quiz.peerReviewCollections,
-  )
+  const quiz = useTypedSelector(state => state.quiz)
 
   const submitDisabled = useTypedSelector(
     state => state.peerReviews.submitDisabled,
   )
 
   const dispatch = useDispatch()
-  const changeInPeerReviewGrade = peerReviewQuestionId => (
+
+  if (!quiz) {
+    return <div />
+  }
+
+  const peerReviewQuestions = quiz.peerReviewCollections
+
+  const changeInPeerReviewGrade = (peerReviewQuestionId: string) => (
     question: any,
     value: string,
   ) => {
@@ -98,9 +107,13 @@ const PeerReviewQuestions: React.FunctionComponent<
   return (
     <div>
       {peerReviewQuestions[0].questions.map(question => {
-        const currentAnswerValue = peerReview.answers.find(
+        const currentPeerReviewAnswer = peerReview.answers.find(
           answer => answer.peerReviewQuestionId === question.id,
-        ).value
+        )
+        if (!currentPeerReviewAnswer) {
+          return <div />
+        }
+        const currentAnswerValue = currentPeerReviewAnswer.value
 
         return (
           <LikertScale

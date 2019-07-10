@@ -1,11 +1,11 @@
 import * as React from "react"
 import { StylesProvider } from "@material-ui/styles"
-import { Props } from "./QuizImpl"
+import { QuizProps } from "./QuizImpl"
 import QuizImpl from "./QuizImpl"
 import { Provider } from "react-redux"
 import createStoreInstance from "../state/store"
 
-const Quiz: React.FunctionComponent<Props> = props => {
+const Quiz: React.FunctionComponent<QuizProps> = props => {
   const store = createStoreInstance()
 
   return (
