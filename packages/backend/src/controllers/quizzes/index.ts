@@ -21,14 +21,7 @@ import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { InjectManager } from "typeorm-typedi-extensions"
 import validator from "validator"
 import { API_PATH } from "../../config"
-import {
-  PeerReviewCollection,
-  Quiz,
-  QuizAnswer,
-  UserQuizState,
-  QuizItemTranslation,
-  QuizItem,
-} from "../../models"
+import { Quiz, QuizAnswer, UserQuizState } from "../../models"
 import { IQuizQuery, ITMCProfileDetails } from "../../types"
 import _ from "lodash"
 import KafkaService from "services/kafka.service"
@@ -67,17 +60,6 @@ export class QuizController {
     try {
       const quizId = validator.isUUID(id) ? id : getUUIDByString(id)
 
-      const supportQuiz = (await this.quizService.getQuizzes({
-        id: quizId,
-        items: true,
-        stripped: true,
-      }))[0]
-
-      let triesAllowed = 1
-      if (supportQuiz) {
-        triesAllowed = supportQuiz.tries
-      }
-
       let userQuizState: UserQuizState
       try {
         userQuizState = await this.userQuizStateService.getUserQuizState(
@@ -92,29 +74,12 @@ export class QuizController {
 
       let quizAnswer: QuizAnswer
       if (userQuizState) {
-        if (userQuizState.tries >= triesAllowed) {
-          stripped = false
-        }
-
         const answer = await this.quizAnswerService.getAnswer(
           { quizId, userId: user.id },
           this.entityManager,
         )
 
-        const noNeedForRetry = answer.itemAnswers.every(ia => {
-          const quizItem = supportQuiz.items.find(qi => qi.id === ia.quizItemId)
-          if (
-            quizItem.type === "scale" ||
-            quizItem.type === "checkbox" ||
-            quizItem.type === "research-agreement" ||
-            quizItem.type === "essay"
-          ) {
-            return true
-          }
-          return ia.correct
-        })
-
-        if (noNeedForRetry) {
+        if (userQuizState.status === "locked") {
           stripped = false
         }
 

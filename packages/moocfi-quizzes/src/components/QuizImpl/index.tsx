@@ -113,14 +113,30 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     return <div />
   }
 
-  let triesUsed = 0
   let triesRemaining = quiz.tries
+
+  let stillSubmittable = true
+
+  if (quiz.triesLimited) {
+    let triesUsed = 0
+    let triesRemaining = quiz.tries
+    if (userQuizState) {
+      triesUsed = userQuizState.tries
+    }
+    triesRemaining -= triesUsed
+    if (triesRemaining <= 0) {
+      stillSubmittable = false
+    }
+  }
+
   let locked = false
   if (userQuizState) {
-    triesUsed = userQuizState.tries
     locked = userQuizState.status === "locked"
   }
-  triesRemaining -= triesUsed
+
+  if (locked) {
+    stillSubmittable = false
+  }
 
   return (
     <div>
@@ -144,7 +160,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
         {quizItemComponents(quiz, languageId)}
 
-        {triesRemaining <= 0 || locked ? (
+        {!stillSubmittable ? (
           <>
             {quizContainsEssay() && <PeerReviews />}
 
@@ -156,7 +172,12 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           </>
         ) : (
           <div>
-            <Typography>Tries remaining: {triesRemaining}</Typography>
+            <Typography>
+              {quiz.triesLimited
+                ? `Tries remaining: ${triesRemaining}`
+                : // ...or just say nothing, but let's see if anything shows up
+                  "Unlimited tries"}
+            </Typography>
             <Button
               variant="contained"
               color="primary"

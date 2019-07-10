@@ -179,6 +179,7 @@ export type Quiz = {
   items: QuizItem[]
   peerReviewCollections: PeerReviewCollection[]
   tries: number
+  triesLimited: boolean
 }
 
 export type PeerReviewGradeAnswer = {

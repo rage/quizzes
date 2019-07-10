@@ -6,7 +6,7 @@ export class AlterQuizAddColumnTriesLimited1562744413233
     await queryRunner.addColumn(
       "quiz",
       new TableColumn({
-        name: "triesLimited",
+        name: "tries_limited",
         type: "boolean",
         default: true,
       }),
@@ -14,6 +14,6 @@ export class AlterQuizAddColumnTriesLimited1562744413233
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
-    await queryRunner.dropColumn("quiz", "triesLimited")
+    await queryRunner.dropColumn("quiz", "tries_limited")
   }
 }

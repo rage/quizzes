@@ -49,7 +49,7 @@ export class Quiz extends BaseEntity {
   public tries: number
 
   @Column({ type: "boolean", default: true })
-  public limitedTries: boolean
+  public triesLimited: boolean
 
   @Column({ type: "timestamp", nullable: true })
   public deadline?: Date

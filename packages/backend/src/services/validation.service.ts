@@ -1,11 +1,8 @@
-import { BadRequestError } from "routing-controllers"
-import { Inject, Service } from "typedi"
-import { EntityManager, SelectQueryBuilder } from "typeorm"
-import { InjectManager } from "typeorm-typedi-extensions"
+import { Service } from "typedi"
+import { EntityManager } from "typeorm"
 import {
   Course,
   PeerReview,
-  PeerReviewQuestionAnswer,
   Quiz,
   QuizAnswer,
   QuizItem,
@@ -13,7 +10,6 @@ import {
   UserQuizState,
 } from "../models"
 import { wordCount } from "./../../../common/src/util"
-import PeerReviewService from "./peerreview.service"
 
 interface ItemStatusObject {
   type?: string
@@ -211,7 +207,8 @@ export default class ValidationService {
     userQuizState.tries = userQuizState.tries ? userQuizState.tries + 1 : 1
 
     const noNeedForRetry = itemAnswerStatus.every(ias => {
-      if (!ias.type) {
+      console.log("The ias: ", ias)
+      if (!ias.type && typeof ias.correct !== "boolean") {
         return true
       }
       if (
@@ -225,13 +222,17 @@ export default class ValidationService {
       return ias.correct
     })
 
-    const noTriesLeft = noNeedForRetry || userQuizState.tries >= quiz.tries
+    const noTriesLeft = quiz.triesLimited && userQuizState.tries >= quiz.tries
+    console.log("No need for retries: ", noNeedForRetry)
+    console.log("Hit the tiesLimit: ", noTriesLeft)
+
+    const readyToClose = noNeedForRetry || noTriesLeft
 
     if (!quizAnswer.status) {
-      quizAnswer.status = noTriesLeft ? "confirmed" : "submitted"
+      quizAnswer.status = readyToClose ? "confirmed" : "submitted"
     }
 
-    userQuizState.status = noTriesLeft ? "locked" : "open"
+    userQuizState.status = readyToClose ? "locked" : "open"
 
     userQuizState.pointsAwarded =
       userQuizState.pointsAwarded > pointsAwarded

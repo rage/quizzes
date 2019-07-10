@@ -373,33 +373,7 @@ export class QuizAnswerController {
       )
     })
 
-    let stillAttemptsLeft = false
-
-    if (savedUserQuizState.tries < quiz.tries) {
-      if (
-        !savedAnswer.itemAnswers.every(ia => {
-          if (ia.correct) {
-            return true
-          }
-          const quizItem = quiz.items.find(qi => qi.id === ia.quizItemId)
-          if (
-            quizItem &&
-            (quizItem.type === "scale" ||
-              quizItem.type === "essay" ||
-              quizItem.type === "checkbox" ||
-              quizItem.type === "research-agreement")
-          ) {
-            return true
-          }
-
-          return false
-        })
-      ) {
-        stillAttemptsLeft = true
-      }
-    }
-
-    if (stillAttemptsLeft) {
+    if (savedUserQuizState.status === "open") {
       return {
         userQuizState: savedUserQuizState,
       }
