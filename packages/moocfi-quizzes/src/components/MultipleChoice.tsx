@@ -174,14 +174,17 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
         </Typography>
       )}
 
-      {answered && !onlyOneItem && (
-        <SolutionTypography
-          correct={itemAnswer.correct ? true : false}
-          variant="body1"
-        >
-          {itemAnswer.correct ? successMessage : failureMessage}
-        </SolutionTypography>
-      )}
+      {answered &&
+        !onlyOneItem &&
+        ((itemAnswer.correct && successMessage) ||
+          (!itemAnswer.correct && failureMessage)) && (
+          <SolutionTypography
+            correct={itemAnswer.correct ? true : false}
+            variant="body1"
+          >
+            {itemAnswer.correct ? successMessage : failureMessage}
+          </SolutionTypography>
+        )}
     </Grid>
   )
 }
@@ -268,11 +271,13 @@ const Option: React.FunctionComponent<OptionProps> = ({
             </RevealedChoiceButton>
           </Grid>
 
-          <Grid item>
-            <LeftBorderedTypography variant="body1" barColor={feedbackColor}>
-              {feedbackMessage}
-            </LeftBorderedTypography>
-          </Grid>
+          {feedbackMessage && (
+            <Grid item>
+              <LeftBorderedTypography variant="body1" barColor={feedbackColor}>
+                {feedbackMessage}
+              </LeftBorderedTypography>
+            </Grid>
+          )}
         </Grid>
       </Grid>
     )

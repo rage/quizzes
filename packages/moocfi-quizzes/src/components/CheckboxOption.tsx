@@ -33,7 +33,7 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
     ia => ia.quizItemId === item.id,
   )
   if (!itemAnswer) {
-    return <LaterQuizItemAddition item={item} message="You have not answered" />
+    return <LaterQuizItemAddition item={item} />
   }
 
   const optionAnswer = itemAnswer.optionAnswers[0]
