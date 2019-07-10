@@ -5,7 +5,7 @@ import { SpaciousPaper } from "../styleComponents"
 import { useTypedSelector } from "../../state/store"
 
 const QuizPointsStatus = () => {
-  const answer = useTypedSelector(state => state.user.userQuizState)
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const quiz = useTypedSelector(state => state.quiz)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
 
@@ -17,7 +17,7 @@ const QuizPointsStatus = () => {
   const generalLabels = languageInfo.general
   const quizPoints = quiz.points
 
-  if (!answer) {
+  if (!userQuizState || userQuizState.status === "open") {
     return (
       <SpaciousPaper>
         <Typography variant="body1">
@@ -27,7 +27,8 @@ const QuizPointsStatus = () => {
     )
   }
 
-  const userPoints = answer.pointsAwarded !== null ? answer.pointsAwarded : 0
+  const userPoints =
+    userQuizState.pointsAwarded !== null ? userQuizState.pointsAwarded : 0
   const result = Number.isInteger(userPoints)
     ? userPoints
     : userPoints.toFixed(2)

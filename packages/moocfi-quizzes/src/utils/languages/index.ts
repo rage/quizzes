@@ -13,6 +13,7 @@ export type GeneralLabels = {
   answerMissingBecauseQuizModifiedLabel: string
   pointsAvailableLabel: string
   pointsReceivedLabel: string
+  incorrectSubmitWhileTriesLeftLabel: string
 }
 
 export type StageLabels = {

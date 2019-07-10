@@ -49,13 +49,15 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   accessToken,
 }) => {
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
-  const error = useTypedSelector(state => state.message)
+  const messageState = useTypedSelector(state => state.message)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const quiz = useTypedSelector(state => state.quiz)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
 
   const dispatch = useDispatch()
+
+  const error = messageState.errorMessage
 
   useEffect(() => {
     dispatch(initialize(id, languageId, accessToken))
@@ -109,7 +111,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     const message =
       "Error: quiz has no texts. (Likely the quiz does not match the requested " +
       "language id)"
-    dispatch(messageActions.set(message))
+    dispatch(messageActions.setErrorMessage(message))
     return <div />
   }
 
@@ -171,6 +173,12 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           </>
         ) : (
           <div>
+            {messageState.notification && messageState.notification.message && (
+              <Typography style={{ color: messageState.notification.color }}>
+                {messageState.notification.message}
+              </Typography>
+            )}
+
             <Typography>
               {quiz.triesLimited
                 ? `Tries remaining: ${triesRemaining}`

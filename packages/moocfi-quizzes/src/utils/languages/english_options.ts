@@ -54,6 +54,8 @@ const englishLabels: SingleLanguageLabels = {
     kOutOfNCorrect: (k, n) => `${k}/${n} answers correct`,
     pointsAvailableLabel: "Points available in the quiz",
     pointsReceivedLabel: "Points awarded to you",
+    incorrectSubmitWhileTriesLeftLabel:
+      "The answer was incorrect - you may try again!",
   },
 }
 

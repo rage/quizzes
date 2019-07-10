@@ -82,7 +82,16 @@ export const submit: ActionCreator<ThunkAction> = () => async (
     dispatch(set(responseData.quizAnswer))
     dispatch(setLocked())
   } else {
-    // we'll see, ok?
+    const languageInfo = getState().language.languageLabels
+    if (languageInfo) {
+      dispatch(
+        messageActions.displayNotification(
+          languageInfo.general.incorrectSubmitWhileTriesLeftLabel,
+          "red",
+          5,
+        ),
+      )
+    }
   }
 }
 

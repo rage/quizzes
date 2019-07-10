@@ -56,6 +56,8 @@ const finnishLabels: SingleLanguageLabels = {
     kOutOfNCorrect: (k, n) => `Sait ${k}/${n} oikein`,
     pointsAvailableLabel: "Pisteitä saatavissa",
     pointsReceivedLabel: "Saamasi pisteet",
+    incorrectSubmitWhileTriesLeftLabel:
+      "Vastauksesi oli virheellinen - voit yrittää uudelleen!",
   },
 }
 
