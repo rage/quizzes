@@ -7,19 +7,21 @@ import { useTypedSelector } from "../../state/store"
 const QuizPointsStatus = () => {
   const answer = useTypedSelector(state => state.user.userQuizState)
   const quiz = useTypedSelector(state => state.quiz)
+  const languageInfo = useTypedSelector(state => state.language.languageLabels)
 
-  if (!quiz) {
+  if (!quiz || !languageInfo) {
     // should not be possible
     return <div>No quiz</div>
   }
 
+  const generalLabels = languageInfo.general
   const quizPoints = quiz.points
 
   if (!answer) {
     return (
       <SpaciousPaper>
         <Typography variant="body1">
-          Points available in the quiz: {quizPoints}
+          {generalLabels.pointsAvailableLabel}: {quizPoints}
         </Typography>
       </SpaciousPaper>
     )
@@ -31,7 +33,9 @@ const QuizPointsStatus = () => {
     : userPoints.toFixed(2)
   return (
     <StyledPaper pointsRatio={userPoints / quizPoints}>
-      <Typography variant="body1">Points awarded to you: {result}</Typography>
+      <Typography variant="body1">
+        {generalLabels.pointsReceivedLabel}: {result}
+      </Typography>
       <Typography variant="body1">
         Points available in the quiz: {quizPoints}
       </Typography>

@@ -11,6 +11,8 @@ export type GeneralLabels = {
   answerIncorrectLabel: string
   alreadyAnsweredLabel: string
   answerMissingBecauseQuizModifiedLabel: string
+  pointsAvailableLabel: string
+  pointsReceivedLabel: string
 }
 
 export type StageLabels = {

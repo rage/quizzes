@@ -54,6 +54,8 @@ const finnishLabels: SingleLanguageLabels = {
     alreadyAnsweredLabel: "Olet jo vastannut",
     answerIncorrectLabel: "Tehtävä väärin",
     kOutOfNCorrect: (k, n) => `Sait ${k}/${n} oikein`,
+    pointsAvailableLabel: "Pisteitä saatavissa",
+    pointsReceivedLabel: "Saamasi pisteet",
   },
 }
 
