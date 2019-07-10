@@ -53,7 +53,7 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
   const intData = itemAnswer && itemAnswer.intData
 
   if (!itemAnswer) {
-    return <LaterQuizItemAddition item={item} message="You have not answered" />
+    return <LaterQuizItemAddition item={item} />
   }
 
   return (

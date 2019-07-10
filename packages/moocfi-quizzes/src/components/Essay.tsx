@@ -34,7 +34,7 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
   let itemAnswer = quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id)
 
   if (!itemAnswer) {
-    return <LaterQuizItemAddition item={item} message="You have not answered" />
+    return <LaterQuizItemAddition item={item} />
   }
 
   const answerText = itemAnswer.textData || ""
