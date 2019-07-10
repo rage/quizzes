@@ -36,7 +36,6 @@ interface ItemStatusObject {
 
 @Service()
 export default class ValidationService {
-  // does this calculate the awarded points correctly? scale, checkbox, research agreement should not affect score...
   public validateQuizAnswer(
     quizAnswer: QuizAnswer,
     quiz: Quiz,

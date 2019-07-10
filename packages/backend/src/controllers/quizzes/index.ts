@@ -73,8 +73,6 @@ export class QuizController {
         stripped: true,
       }))[0]
 
-      console.log("support quiz: ", supportQuiz)
-
       let triesAllowed = 1
       if (supportQuiz) {
         triesAllowed = supportQuiz.tries
@@ -115,7 +113,6 @@ export class QuizController {
           }
           return ia.correct
         })
-        console.log("no need to retry: ", noNeedForRetry)
 
         if (noNeedForRetry) {
           stripped = false
@@ -136,15 +133,12 @@ export class QuizController {
       })
 
       const quiz = quizzes[0]
-      console.log("quiz: ", quiz)
 
       const result = {
         quiz,
         quizAnswer,
         userQuizState,
       }
-
-      console.log("Returning: ", result)
 
       return result
     } catch (error) {
