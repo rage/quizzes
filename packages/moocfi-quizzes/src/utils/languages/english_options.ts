@@ -56,6 +56,7 @@ const englishLabels: SingleLanguageLabels = {
     pointsReceivedLabel: "Points awarded to you",
     incorrectSubmitWhileTriesLeftLabel:
       "The answer was incorrect - you may try again!",
+    triesRemainingLabel: "Tries remaining",
   },
 }
 

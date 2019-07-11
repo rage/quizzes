@@ -181,9 +181,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
             <Typography>
               {quiz.triesLimited
-                ? `Tries remaining: ${triesRemaining}`
-                : // ...or just say nothing, but let's see if anything shows up
-                  "Unlimited tries"}
+                ? `${generalLabels.triesRemainingLabel}: ${triesRemaining}`
+                : ""}
             </Typography>
             <Button
               variant="contained"

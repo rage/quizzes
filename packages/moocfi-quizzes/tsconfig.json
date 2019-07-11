@@ -18,7 +18,8 @@
     "typeRoots": [
       "index.d.ts",
       "node_modules/@types"
-    ]
+    ],
+    "types": ["node"]
   },
   "include": [
     "./src/**/*.tsx",
