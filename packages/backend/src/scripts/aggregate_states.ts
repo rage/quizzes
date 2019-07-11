@@ -1,14 +1,7 @@
 import { Container } from "typedi"
 import { EntityManager, getManager } from "typeorm"
 import { Database } from "../config/database"
-import {
-  PeerReview,
-  Quiz,
-  QuizAnswer,
-  QuizItem,
-  SpamFlag,
-  UserQuizState,
-} from "../models"
+import { UserQuizState } from "../models"
 
 const courses = {
   "ohjelmoinnin-mooc-2019": "38240a7b-7e64-4202-91e2-91f6d46f6198",
@@ -51,12 +44,43 @@ const insert = process.argv.includes("cron")
 const createUserQuizStates = async () => {
   const now: any = new Date()
 
-  console.log(date)
+  console.log(now)
+  console.log(
+    `creating user quiz states for answers given or updated since ${date}`,
+  )
 
-  console.log("initiate")
+  console.log("creating ohjelmoinnin mooc user quiz states")
+  const ohjelmoinninMooc: UserQuizState[] = await createOhjelmoinninMoocQuizStates()
+  console.log(`${ohjelmoinninMooc.length} created`)
+  console.log("creating elements of ai user quiz states")
+  const elementsOfAI: UserQuizState[] = await createElementsOfAIUserQuizStates()
+  console.log(`${elementsOfAI.length} created`)
+
+  const userQuizStates: UserQuizState[] = [...ohjelmoinninMooc, ...elementsOfAI]
+
+  console.log(`inserting ${userQuizStates.length} user quiz states`)
+
+  let start = -1000
+  let end = -1
+  while (end !== userQuizStates.length - 1) {
+    start += 1000
+    end += 1000
+    if (end > userQuizStates.length - 1) {
+      end = userQuizStates.length - 1
+    }
+    await insert(userQuizStates.slice(start, end))
+  }
+
+  /*await manager.query(
+    `insert into uqs_aggregation (date) values ('${new Date(
+      now - 10 * 60000,
+    ).toISOString()}')`,
+  )*/
+
+  /*console.log("initiate")
   console.log("creating eai essay states")
   const elementsEssayQuizStates: UserQuizState[] = await createElementsEssayQuizStates()
-  /*console.log("creating ohjelmoinnin mooc essay states")
+  console.log("creating ohjelmoinnin mooc essay states")
   const ohjelmoinninMoocEssayQuizStates: UserQuizState[] = await createOhjelmoinninMoocEssayQuizStates()
   console.log("creating open quiz states")
   const openQuizStates: UserQuizState[] = await createOpenQuizStates()
@@ -107,6 +131,185 @@ const createUserQuizStates = async () => {
       now - 10 * 60000,
     ).toISOString()}')`,
   )*/
+}
+
+const createOhjelmoinninMoocQuizStates = async (): Promise<UserQuizState[]> => {
+  const distinct = `
+  (select
+    distinct(user_id, quiz_id),
+    user_id,
+    quiz_id
+  from quiz_answer
+  where (created_at >= '${date}' or updated_at >= '${date}'))
+  `
+
+  const data = await manager.query(`
+  select
+    d.user_id,
+    d.quiz_id,
+    t.tries
+  from ${distinct} d
+  join ${tries} t on d.user_id = t.user_id and d.quiz_id = t.quiz_id
+  join quiz q on d.quiz_id = q.id
+  where course_id = '38240a7b-7e64-4202-91e2-91f6d46f6198'
+  and d.user_id is not null
+  and d.quiz_id is not null;
+  `)
+
+  const userQuizStates: UserQuizState[] = data.map(
+    (userQuiz: any, index: number) => {
+      const userQuizState: UserQuizState = new UserQuizState()
+      userQuizState.userId = userQuiz.user_id
+      userQuizState.quizId = userQuiz.quiz_id
+      userQuizState.pointsAwarded = 1
+      userQuizState.tries = userQuiz.tries
+      userQuizState.status = "open"
+      return userQuizState
+    },
+  )
+
+  return userQuizStates
+}
+
+const createElementsOfAIUserQuizStates = async () => {
+  const peerReview = `
+    (select quiz_answer_id from peer_review where created_at >= '${date}')
+    `
+
+  const spamFlag = `
+    (select quiz_answer_id from spam_flag where created_at >= '${date}')
+    `
+
+  const latest = `
+  (select
+    id
+  from (select
+          id,
+          row_number() over(partition by user_id, quiz_id order by created_at desc) rn
+        from quiz_answer) s
+  where rn = 1)
+  `
+
+  const type = `
+    (select
+      distinct(quiz_id, type, multi),
+      quiz_id,
+      type,
+      multi
+    from quiz_item)
+  `
+
+  const elementsQuizzes = `
+  (select
+    id
+  from quiz
+  where course_id = '${courses["elements-of-ai"]}'
+  or course_id = '${courses["elements-of-ai-fi"]}'
+  or course_id = '${courses["elements-of-ai-se"]}')
+  `
+
+  const data = await manager.query(`
+  select
+    qa.id,
+    status,
+    qa.user_id,
+    qa.quiz_id,
+    t.type,
+    t.multi,
+    coalesce(g.given, 0) as given,
+    coalesce(r.received, 0) as received,
+    coalesce(spam.flagged, 0) as flagged,
+    coalesce(c.correct, 0) as correct,
+    coalesce(cm.correct, 0) as correct_multi,
+    coalesce(total.total, 0) as total,
+    tries.tries as tries
+  from quiz_answer as qa
+  join ${latest} l on qa.id = l.id
+  join ${type} t on qa.quiz_id = t.quiz_id
+  left join ${given} as g on qa.quiz_id = g.quiz_id and qa.user_id = g.user_id
+  left join ${flagged} as spam on qa.id = spam.quiz_answer_id
+  left join ${received} as r on qa.id = r.quiz_answer_id
+  left join ${tries} as tries on qa.user_id = tries.user_id and qa.quiz_id = tries.quiz_id
+  left join ${correctMultipleChoice} c on qa.id = c.id
+  left join ${correctMultipleChoiceMulti} cm on qa.id = cm.id
+  left join ${total} total on qa.quiz_id = total.id
+  where qa.quiz_id in ${elementsQuizzes}
+  and qa.user_id is not null
+  and qa.quiz_id is not null
+  and (qa.created_at >= '${date}' or qa.updated_at >= '${date}' or qa.id in ${peerReview} or qa.id in ${spamFlag})
+  `)
+
+  const answerData = await manager.query(`
+  select
+    qa.id,
+    text_data,
+    validity_regex
+  from quiz_answer qa
+  left join quiz_item_answer qia on qa.id = qia.quiz_answer_id
+  left join quiz_item qi on qia.quiz_item_id = qi.id
+  where qa.quiz_id in ${elementsQuizzes}
+  and qi.type = 'open'
+  and (qa.created_at >= '${date}' or qa.updated_at >= '${date}');
+  `)
+  const validation: any = {}
+  answerData.map((answer: any) => {
+    if (!validation[answer.id]) {
+      validation[answer.id] = { correct: 0, total: 0 }
+    }
+    const correct = validation[answer.id].correct
+    validation[answer.id].correct = new RegExp(answer.validity_regex).test(
+      answer.text_data.trim().toLowerCase(),
+    )
+      ? correct + 1
+      : correct
+    validation[answer.id].total += 1
+  })
+
+  const userQuizStates: UserQuizState[] = data.map((answer: any) => {
+    const userQuizState = new UserQuizState()
+
+    const status = answer.status
+
+    userQuizState.userId = answer.user_id
+    userQuizState.quizId = answer.quiz_id
+    userQuizState.tries = answer.tries
+    userQuizState.status =
+      status === "confirmed" || status === "submitted" ? "locked" : "open"
+
+    switch (answer.type) {
+      case "essay":
+        userQuizState.peerReviewsGiven = answer.given
+        userQuizState.peerReviewsReceived = answer.received
+        userQuizState.spamFlags = answer.flagged
+        userQuizState.pointsAwarded = status === "confirmed" ? 1 : null
+        break
+      case "open":
+        userQuizState.pointsAwarded =
+          validation[answer.id].correct / validation[answer.id].total
+        break
+      case "multiple-choice":
+        if (answer.multi) {
+          userQuizState.pointsAwarded = answer.correct_multi / answer.total
+        } else {
+          userQuizState.pointsAwarded = answer.correct / answer.total
+        }
+        break
+    }
+
+    return userQuizState
+  })
+
+  console.log(userQuizStates.length)
+  console.log(data[0])
+  console.log(userQuizStates[0])
+  console.log(data[1000])
+  console.log(userQuizStates[1000])
+  console.log(data[50000])
+  console.log(userQuizStates[50000])
+  console.log(data[200000])
+  console.log(userQuizStates[200000])
+
+  return userQuizStates
 }
 
 const createElementsEssayQuizStates = async (): Promise<UserQuizState[]> => {
