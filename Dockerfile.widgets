@@ -1,0 +1,19 @@
+FROM node:11-alpine
+
+RUN apk --no-cache update \
+&& apk --no-cache add g++ make bash zlib-dev libpng-dev postgresql-client redis python2 \
+&&  rm -fr /var/cache/apk/*
+
+COPY --chown=node . /app
+
+USER node
+
+WORKDIR /app
+
+RUN yarn install
+
+ENV NODE_ENV=production
+
+WORKDIR /app/packages/moocfi-quizzes
+
+RUN yarn install

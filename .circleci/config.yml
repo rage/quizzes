@@ -30,6 +30,17 @@ jobs:
           steps:
             - run: "bin/push-docker-dashboard-image.sh"
 
+  build_widgets:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: "Build widgets image"
+          command: "bin/build-docker-widgets.sh"
+
+
   build_backend:
     docker:
       - image: google/cloud-sdk
@@ -67,11 +78,13 @@ workflows:
     jobs:
       - build_dashboard
       - build_backend
+      - build_widgets
       - code_style
       - deploy_to_production:
           requires:
             - build_dashboard
             - build_backend
+            - build_widgets
             - code_style
           filters:
             branches:
