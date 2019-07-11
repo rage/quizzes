@@ -1,6 +1,6 @@
 import axios from "axios"
 
-import { Organization } from "./models"
+import { Organization, Quiz, QuizItem, QuizOption, User } from "./models"
 import { Database } from "./config/database"
 
 import { Container } from "typedi"
@@ -25,6 +25,32 @@ import * as appRoot from "app-root-path"
 
 import { getUUIDByString, insert } from "./util/"
 
+const data = {
+  quizAnswers: [
+    {
+      _id: "5c4ac89e017ffc13eddc8835",
+      updatedAt: "2019-01-25T08:28:14.391Z",
+      createdAt: "2019-01-25T08:28:14.391Z",
+      data: ["jllyf5ja1z"],
+      answererId: "sparkling-earwig-67645",
+      quizId: "5c498c7c017ffc13eddc84f1",
+      deprecated: false,
+      rejected: false,
+      confirmed: true,
+      peerReviewCount: 0,
+      spamFlags: 0,
+      __v: 0,
+    },
+  ],
+}
+
+const user = new User()
+user.id = 34176
+
+const users = {
+  "sparkling-earwig-67645": user,
+}
+
 if (process.env.NODE_ENV !== "production") {
   dotenv.config({ path: `${appRoot.path}/.env` })
 }
@@ -35,7 +61,21 @@ async function main() {
   const connection = await database.connect()
   const manager = connection.createEntityManager()
 
-  const migrations = await manager.query(
+  const quiz: Quiz = await manager
+    .createQueryBuilder(Quiz, "quiz")
+    .leftJoinAndSelect("quiz.course", "course")
+    .leftJoinAndSelect("course.texts", "course_translation")
+    .leftJoinAndSelect("course.languages", "language")
+    .leftJoinAndSelect("quiz.items", "item")
+    .leftJoinAndSelect("item.options", "option")
+    .where("quiz.id = :id", { id: "3ec7c1cc-27f5-4518-890a-201a9fe6121d" })
+    .getOne()
+
+  const quizzes = {
+    "3ec7c1cc-27f5-4518-890a-201a9fe6121d": quiz,
+  }
+
+  /*const migrations = await manager.query(
     "select date from migration order by date desc limit 1",
   )
 
@@ -62,7 +102,7 @@ async function main() {
     process.env.MONGO_URI || "mongodb://localhost:27017/test", // quiznator
   )*/
 
-  logger.info("Migration started")
+  /*Migration started")
   console.time("Database migration complete. Time used")
   const timer = logger.startTimer()
   const org = await Organization.merge(Organization.create({ id: 0 })).save()
@@ -71,14 +111,14 @@ async function main() {
   const courses = await migrateCourses(org, languages)
   const quizzes = await migrateQuizzes(courses, data.quizzes)
   await migratePeerReviewQuestions(data.peerReviewQuizzes, data.peerReviews)
-  const users = await migrateUsers(data.usernames)
+  const users = await migrateUsers(data.usernames)*/
   // await migrateCourseStates(courses, users)
   const existingAnswers = await migrateQuizAnswers(
     quizzes,
     users,
     data.quizAnswers,
   )
-  await migrateSpamFlags(users, data.spamFlags)
+  /*await migrateSpamFlags(users, data.spamFlags)
   await migratePeerReviews(users, existingAnswers, data.peerReviews)
 
   await manager.query(
@@ -90,7 +130,7 @@ async function main() {
   timer.done({ message: "Migration complete" })
   console.timeEnd("Database migration complete. Time used")
 
-  process.exit()
+  process.exit()*/
 }
 
 main().catch(console.error)

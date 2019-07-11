@@ -25,7 +25,8 @@
     "prettier-check": "prettier  --list-different \"packages/**/*.js\" \"packages/**/*.ts\" \"packages/**/*.jsx\" \"packages/**/*.tsx\"",
     "db-migrate": "node --max-old-space-size=16384 dist/migration/src/index.js",
     "start-dashboard": "cd packages/dashboard && yarn start",
-    "aggregate-states": "node --max-old-space-size=1024 dist/backend/src/scripts/aggregate_states.js"
+    "aggregate-states": "node --max-old-space-size=1024 dist/backend/src/scripts/aggregate_states.js",
+    "aggregate-states-cron": "node --max-old-space-size=1024 dist/backend/src/scripts/aggregate_states.js cron"
   },
   "dependencies": {
     "@types/express-graphql": "^0.6.1",
