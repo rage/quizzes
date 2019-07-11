@@ -58,6 +58,7 @@ const finnishLabels: SingleLanguageLabels = {
     pointsReceivedLabel: "Saamasi pisteet",
     incorrectSubmitWhileTriesLeftLabel:
       "Vastauksesi oli virheellinen - voit yrittää uudelleen!",
+    triesRemainingLabel: "Yrityksiä jäljellä",
   },
 }
 
