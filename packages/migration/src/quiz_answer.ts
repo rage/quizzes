@@ -75,8 +75,6 @@ export async function migrateQuizAnswers(
                 async (quizData: any): Promise<any> => {
                   const { quiz, user, answer } = quizData
 
-                  console.log(answer.data)
-
                   const quizItems = await quiz.items
 
                   if (quizItems.length === 0) {
@@ -116,8 +114,6 @@ export async function migrateQuizAnswers(
                     }
                     answer.data = newData
                   }
-
-                  console.log(answer.data)
 
                   for (const quizItem of quizItems) {
                     const itemID = getUUIDByString(answerID + quizItem.id)
@@ -191,8 +187,6 @@ export async function migrateQuizAnswers(
                           quizOptions[option.id] = option
                         }
 
-                        console.log(chosenOptions)
-
                         for (const chosenOption of chosenOptions) {
                           const optionID = getUUIDByString(
                             quiz.id + quizItem.id + chosenOption,
@@ -215,10 +209,7 @@ export async function migrateQuizAnswers(
               ),
             )
 
-            console.log(quizAnswers)
-            console.log(quizItemAnswers)
-            console.log(quizOptionAnswers)
-            /*await insert(QuizAnswer, quizAnswers)
+            await insert(QuizAnswer, quizAnswers)
             const itemAnswerChunk = calculateChunkSize(quizItemAnswers[0])
             for (let i = 0; i < quizItemAnswers.length; i += itemAnswerChunk) {
               await insert(
@@ -236,7 +227,7 @@ export async function migrateQuizAnswers(
                 QuizOptionAnswer,
                 quizOptionAnswers.slice(i, i + optionAnswerChunk),
               )
-            }*/
+            }
 
             bar.tick(quizAnswers.length)
             pool = []
@@ -250,7 +241,7 @@ export async function migrateQuizAnswers(
   )
 
   logger.info("Deprecating duplicate answers...")
-  /*await conn.query(`
+  await conn.query(`
     UPDATE quiz_answer
     SET status='deprecated'
     WHERE id IN (
@@ -266,7 +257,7 @@ export async function migrateQuizAnswers(
       ) qa2 ON qa1.quiz_id = qa2.quiz_id
            AND qa1.user_id = qa2.user_id
       WHERE qa1.created_at < qa2.last_created_at
-    );`)*/
+    );`)
 
   logger.info(
     `Quiz answers migrated. ${quizNotFound} did not match any quiz and ` +
