@@ -1,11 +1,8 @@
-import { BadRequestError } from "routing-controllers"
-import { Inject, Service } from "typedi"
-import { EntityManager, SelectQueryBuilder } from "typeorm"
-import { InjectManager } from "typeorm-typedi-extensions"
+import { Service } from "typedi"
+import { EntityManager } from "typeorm"
 import {
   Course,
   PeerReview,
-  PeerReviewQuestionAnswer,
   Quiz,
   QuizAnswer,
   QuizItem,
@@ -13,7 +10,25 @@ import {
   UserQuizState,
 } from "../models"
 import { wordCount } from "./../../../common/src/util"
-import PeerReviewService from "./peerreview.service"
+
+interface ItemStatusObject {
+  type?: string
+  error?: string
+  data?: {
+    text?: string
+    words?: number
+    answerValue?: number
+  }
+  min?: number
+  max?: number
+  message?: string
+  correctAnswer?: boolean
+  submittedAnswer?: string
+  correct?: boolean
+  options?: any[]
+  itemId?: string
+  value?: number
+}
 
 @Service()
 export default class ValidationService {
@@ -24,7 +39,7 @@ export default class ValidationService {
   ) {
     const items: QuizItem[] = quiz.items
     let points: number | null = null
-    let pointsAwarded
+    let pointsAwarded: number | null
     const itemAnswerStatus = items.map(item => {
       const itemAnswer = quizAnswer.itemAnswers.find(
         (ia: QuizItemAnswer) => ia.quizItemId === item.id,
@@ -38,7 +53,7 @@ export default class ValidationService {
       const itemTranslation = item.texts.find(
         text => text.languageId === quizAnswer.languageId,
       )
-      let itemStatusObject: any
+      let itemStatusObject: ItemStatusObject
       let optionAnswerStatus
       let correct = false
 
@@ -155,6 +170,7 @@ export default class ValidationService {
           points += 1
         case "checkbox":
         case "research-agreement":
+          points += 1
           optionAnswerStatus = item.options.map(option => {
             const optionAnswer = itemAnswer.optionAnswers.find(
               (oa: any) => oa.quizOptionId === option.id,
@@ -184,13 +200,36 @@ export default class ValidationService {
     })
 
     pointsAwarded =
-      points != null ? (points / items.length) * quiz.points : null
-    quizAnswer.status = quizAnswer.status || "confirmed"
+      points !== null ? (points / items.length) * quiz.points : null
 
     userQuizState.userId = quizAnswer.userId
     userQuizState.quizId = quizAnswer.quizId
     userQuizState.tries = userQuizState.tries ? userQuizState.tries + 1 : 1
-    userQuizState.status = "locked"
+
+    const noNeedForRetry = itemAnswerStatus.every(ias => {
+      if (!ias.type && typeof ias.correct !== "boolean") {
+        return true
+      }
+      if (
+        ias.type === "scale" ||
+        ias.type === "checkbox" ||
+        ias.type === "research-agreement" ||
+        ias.type === "essay"
+      ) {
+        return true
+      }
+      return ias.correct
+    })
+
+    const noTriesLeft = quiz.triesLimited && userQuizState.tries >= quiz.tries
+
+    const readyToClose = noNeedForRetry || noTriesLeft
+
+    if (!quizAnswer.status) {
+      quizAnswer.status = readyToClose ? "confirmed" : "submitted"
+    }
+
+    userQuizState.status = readyToClose ? "locked" : "open"
 
     userQuizState.pointsAwarded =
       userQuizState.pointsAwarded > pointsAwarded

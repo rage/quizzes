@@ -193,7 +193,6 @@ export class QuizAnswerController {
 
     result = await this.quizAnswerService.getAnswers(attentionCriteriaQuery)
     return result
-    console.log("nothing after!")
   }
 
   @Post("/:answerId")
@@ -283,11 +282,11 @@ export class QuizAnswerController {
   ): Promise<any> {
     const userId = user.id
 
-    answer.userId = userId
     if (!answer.quizId || !answer.languageId) {
       throw new BadRequestError("Answer must contain some data")
     }
-    answer.userId = user.id
+    answer.userId = userId
+
     // creates new user if necessary
     answer.user = new User()
     answer.user.id = answer.userId
@@ -373,6 +372,13 @@ export class QuizAnswerController {
         quiz,
       )
     })
+
+    if (savedUserQuizState.status === "open") {
+      return {
+        userQuizState: savedUserQuizState,
+        quizAnswer: savedAnswer,
+      }
+    }
 
     return {
       quiz,

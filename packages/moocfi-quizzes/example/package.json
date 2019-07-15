@@ -1,0 +1,34 @@
+{
+  "name": "example",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html"
+  },
+  "dependencies": {
+    "axios": "^0.18.0",
+    "likert-react": "^0.0.0-beta6",
+    "react": ">=16.0.0",
+    "react-app-polyfill": "^1.0.1",
+    "react-dom": ">=16.0.0"
+
+  },
+  "devDependencies": {
+    "@types/react": "^16.8.15",
+    "@types/react-dom": "^16.8.4",
+    "parcel": "^1.12.3",
+    "typescript": "^3.4.5"
+  }
+  , "peerDependencies": {
+    "styled-components": "^4.3.1",
+    "@material-ui/core": "^4.0.0"
+  }
+  ,
+  "alias": {
+    "react": "../node_modules/react",
+    "react-dom": "../node_modules/react-dom",
+    "@material-ui/core": "../node_modules/@material-ui/core"
+  }
+}

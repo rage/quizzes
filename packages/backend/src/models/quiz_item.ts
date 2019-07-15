@@ -140,6 +140,12 @@ export class QuizItemTranslation extends BaseEntity {
   @Column({ type: "text", nullable: true })
   public body?: string
 
+  @Column({ type: "text", nullable: true })
+  public minLabel?: string
+
+  @Column({ type: "text", nullable: true })
+  public maxLabel?: string
+
   @Column({ type: "text", nullable: true, select: false })
   public successMessage?: string
   @Column({ type: "text", nullable: true, select: false })
@@ -166,5 +172,7 @@ export class QuizItemTranslation extends BaseEntity {
     this.body = data.body
     this.successMessage = data.successMessage
     this.failureMessage = data.failureMessage
+    this.minLabel = data.minLabel
+    this.maxLabel = data.maxLabel
   }
 }

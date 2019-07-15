@@ -52,3 +52,6 @@ packages/widgets/build
 dump.rdb
 
 *secret.yaml
+
+.cache
+dist

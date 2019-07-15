@@ -285,9 +285,13 @@ export default class QuizService {
           "item_translation.language_id = :language",
           { language },
         )
+
+        queryBuilder.addSelect("item_translation.minLabel")
+        queryBuilder.addSelect("item_translation.maxLabel")
       } else {
         queryBuilder.leftJoinAndSelect("item.texts", "item_translation")
       }
+
       if (!stripped) {
         queryBuilder
           .addSelect("item.validityRegex")
@@ -356,7 +360,6 @@ export default class QuizService {
     if (exclude) {
       queryBuilder.andWhere("quiz.excluded_from_score = false")
     }
-
     return await queryBuilder.getMany()
   }
 
