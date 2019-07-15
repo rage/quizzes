@@ -6,9 +6,10 @@ export const getPeerReviewInfo = async (
   quizId: string,
   languageId: string,
   accessToken: string,
+  address?: string,
 ): Promise<QuizAnswer[]> => {
   const response = await axios.get(
-    `${BASE_URL}/api/v1/quizzes/peerreview/${quizId}/${languageId}`,
+    `${address || BASE_URL}/api/v1/quizzes/peerreview/${quizId}/${languageId}`,
     { headers: { authorization: `Bearer ${accessToken}` } },
   )
 
@@ -24,6 +25,7 @@ type SpamFlag = {
 export const postSpamFlag = async (
   quizAnswerId: string,
   accessToken: string,
+  address?: string,
 ): Promise<SpamFlag> => {
   let response = await axios.post(
     `${BASE_URL}/api/v1/quizzes/spamflag`,
@@ -36,6 +38,7 @@ export const postSpamFlag = async (
 export const postPeerReview = async (
   peerReview: PeerReviewAnswer,
   accessToken: string,
+  address?: string,
 ): Promise<{ userQuizState: UserQuizState }> => {
   const response = await axios.post(
     `${BASE_URL}/api/v1/quizzes/peerreview`,

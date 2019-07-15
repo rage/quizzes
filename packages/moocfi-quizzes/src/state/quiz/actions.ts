@@ -21,6 +21,7 @@ export const setQuiz: ActionCreator<ThunkAction> = (quizId: string) => async (
     throw new Error("Access token is not set")
   }
 
-  const { quiz } = await getQuizInfo(quizId, languageId, accessToken)
+  const address = getState().backendAddress
+  const { quiz } = await getQuizInfo(quizId, languageId, accessToken, address)
   await dispatch(set(quiz))
 }

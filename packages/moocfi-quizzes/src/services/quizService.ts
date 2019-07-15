@@ -12,9 +12,10 @@ export const getQuizInfo = async (
   id: string,
   languageId: string,
   accessToken: string,
+  address?: string,
 ): Promise<QuizResponse> => {
   const response = await axios.get(
-    `${BASE_URL}/api/v1/quizzes/${id}?language=${languageId}`,
+    `${address || BASE_URL}/api/v1/quizzes/${id}?language=${languageId}`,
     { headers: { authorization: `Bearer ${accessToken}` } },
   )
 

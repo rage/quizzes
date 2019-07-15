@@ -73,6 +73,7 @@ export const submit: ActionCreator<ThunkAction> = () => async (
   const responseData = await postAnswer(
     getState().quizAnswer.quizAnswer,
     getState().user.accessToken,
+    getState().backendAddress,
   )
 
   dispatch(userActions.setQuizState(responseData.userQuizState))

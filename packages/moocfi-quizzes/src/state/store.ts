@@ -2,6 +2,8 @@ import { useSelector, TypedUseSelectorHook } from "react-redux"
 import { applyMiddleware, combineReducers, createStore } from "redux"
 import { composeWithDevTools } from "redux-devtools-extension/developmentOnly"
 import thunk from "redux-thunk"
+
+import { backendAddressReducer } from "./backendAddress/reducer"
 import { languageReducer, LanguageState } from "./language/reducer"
 import { messageReducer } from "./message/reducer"
 import { peerReviewsReducer, PeerReviewsState } from "./peerReviews/reducer"
@@ -10,6 +12,7 @@ import { quizAnswerReducer, QuizAnswerState } from "./quizAnswer/reducer"
 import { userReducer, UserState } from "./user/reducer"
 import { Quiz } from "../modelTypes"
 
+import * as backendAddressActions from "./backendAddress/actions"
 import * as languageActions from "./language/actions"
 import * as messageActions from "./message/actions"
 import * as quizActions from "./quiz/actions"
@@ -18,6 +21,7 @@ import * as userActions from "./user/actions"
 import * as PeerReviewsActions from "./peerReviews/actions"
 
 const rootReducer = combineReducers({
+  backendAddress: backendAddressReducer,
   language: languageReducer,
   message: messageReducer,
   peerReviews: peerReviewsReducer,
@@ -27,6 +31,7 @@ const rootReducer = combineReducers({
 })
 
 const rootAction = {
+  backendAction: backendAddressActions,
   language: languageActions,
   peerReviews: PeerReviewsActions,
   message: messageActions,
@@ -36,6 +41,7 @@ const rootAction = {
 }
 
 export interface State {
+  backendAddress: string
   language: LanguageState
   peerReviews: PeerReviewsState
   message: string

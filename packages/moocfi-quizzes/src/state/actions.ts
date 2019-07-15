@@ -1,7 +1,8 @@
 import { ActionCreator } from "redux"
-import { ThunkAction } from "./store"
+import { ThunkAction, Dispatch } from "./store"
 import { getQuizInfo } from "../services/quizService"
 import * as userActions from "./user/actions"
+import * as backendAddressActions from "./backendAddress/actions"
 import * as languageActions from "./language/actions"
 import * as quizActions from "./quiz/actions"
 import * as quizAnswerActions from "./quizAnswer/actions"
@@ -11,12 +12,14 @@ export const initialize: ActionCreator<ThunkAction> = (
   id: string,
   languageId: string,
   accessToken: string,
-) => async dispatch => {
+  backendAddress?: string,
+) => async (dispatch: Dispatch) => {
   try {
     let { quiz, quizAnswer, userQuizState } = await getQuizInfo(
       id,
       languageId,
       accessToken,
+      backendAddress,
     )
 
     if (!quizAnswer || (userQuizState && userQuizState.status === "open")) {
@@ -32,6 +35,10 @@ export const initialize: ActionCreator<ThunkAction> = (
           }
         }),
       }
+    }
+
+    if (backendAddress) {
+      dispatch(backendAddressActions.set(backendAddress))
     }
 
     dispatch(userActions.setToken(accessToken))
