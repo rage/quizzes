@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: create-user-quiz-states
 spec:
-  schedule: "13/10 * * * *"
+  schedule: "3/10 * * * *"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
