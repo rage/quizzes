@@ -8,6 +8,19 @@ import {
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import getUUIDByStringBroken from "uuid-by-string"
 
+export async function save<T extends BaseEntity>(
+  type: typeof BaseEntity,
+  data: any[],
+) {
+  const saved = Promise.all(
+    data.map(async item => {
+      return await type.create(item).save()
+    }),
+  )
+
+  return saved
+}
+
 export function insert<T extends BaseEntity>(
   type: typeof BaseEntity,
   data: Array<QueryPartialEntity<T>> | QueryPartialEntity<T>,

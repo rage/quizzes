@@ -1,6 +1,6 @@
 import axios from "axios"
 
-import { Organization } from "./models"
+import { Organization, Quiz, QuizItem, QuizOption, User } from "./models"
 import { Database } from "./config/database"
 
 import { Container } from "typedi"
@@ -62,7 +62,7 @@ async function main() {
     process.env.MONGO_URI || "mongodb://localhost:27017/test", // quiznator
   )*/
 
-  logger.info("Migration started")
+  console.log("Migration started")
   console.time("Database migration complete. Time used")
   const timer = logger.startTimer()
   const org = await Organization.merge(Organization.create({ id: 0 })).save()

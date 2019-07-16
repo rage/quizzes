@@ -104,9 +104,7 @@ export async function migrateQuizAnswers(
                   existingAnswers[answerID] = true
 
                   if (Array.isArray(answer.data)) {
-                    answer.data = answer.data.map((entry: any) =>
-                      getUUIDByString(quiz.id + entry),
-                    )
+                    answer.data = answer.data.map((entry: any) => entry)
                   } else if (typeof answer.data === "object") {
                     const newData: { [key: string]: any } = {}
                     for (const [itemID, answerContent] of Object.entries(
