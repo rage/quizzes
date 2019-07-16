@@ -22,6 +22,7 @@ echo "Building new Kubernetes configs"
 mkdir -p "$CURRENT_DIR/../updated-kubernetes-configs"
 envsubst < "$CURRENT_DIR/../kubernetes/backend-deployment.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/backend-deployment.yaml"
 envsubst < "$CURRENT_DIR/../kubernetes/migrate-quiznator-data-cronjob.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/migrate-quiznator-data-cronjob.yaml"
+envsubst < "$CURRENT_DIR/../kubernetes/create-user-quiz-states-cronjob.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/create-user-quiz-states-cronjob.yaml"
 envsubst < "$CURRENT_DIR/../kubernetes/dashboard-deployment.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/dashboard-deployment.yaml"
 
 echo "Applying changes"
