@@ -133,7 +133,7 @@ export async function migrateQuizzes(
     let order: number
     let choiceOrder: number
     const meta = safeGet(() => oldQuiz.data.meta) || {}
-    const rightAnswer = safeGet(() => meta.rightAnswer)
+    const rightAnswer = safeGet(() => meta.rightAnswer) || {}
     const successes = safeGet(() => meta.successes) || {}
     const errors = safeGet(() => meta.errors) || {}
     let oldItems = safeGet(() => oldQuiz.data.items) || []
