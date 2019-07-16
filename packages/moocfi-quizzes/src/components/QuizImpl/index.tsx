@@ -41,12 +41,14 @@ export interface QuizProps {
   id: string
   languageId: string
   accessToken: string
+  backendAddress?: string
 }
 
 const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   id,
   languageId,
   accessToken,
+  backendAddress,
 }) => {
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const messageState = useTypedSelector(state => state.message)
@@ -60,7 +62,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const error = messageState.errorMessage
 
   useEffect(() => {
-    dispatch(initialize(id, languageId, accessToken))
+    dispatch(initialize(id, languageId, accessToken, backendAddress))
   }, [])
 
   if (!quiz || !languageInfo || !quizAnswer) {

@@ -56,7 +56,12 @@ export const submit: ActionCreator<ThunkAction> = () => async (
   }
   const accessToken = getState().user.accessToken
   dispatch(setSubmitDisabled(true))
-  const { userQuizState } = await postPeerReview(peerReview, accessToken)
+  const address = getState().backendAddress
+  const { userQuizState } = await postPeerReview(
+    peerReview,
+    accessToken,
+    address,
+  )
   dispatch(setQuizState(userQuizState))
   dispatch(setReviewAnswer(null))
   await dispatch(fetchPeerReviewAlternatives())
@@ -88,7 +93,8 @@ export const postSpam: ActionCreator<ThunkAction> = (
 ) => async (dispatch, getState) => {
   const accessToken = getState().user.accessToken
   setReviewOptions([])
-  await postSpamFlag(quizAnswerId, accessToken)
+  const address = getState().backendAddress
+  await postSpamFlag(quizAnswerId, accessToken, address)
   fetchPeerReviewAlternatives()
 }
 
@@ -99,10 +105,12 @@ export const fetchPeerReviewAlternatives: ActionCreator<
   const quiz = getState().quiz
   const languageId = getState().language.languageId
 
+  const address = getState().backendAddress
   const answerAlternatives = await getPeerReviewInfo(
     quiz.id,
     languageId,
     accessToken,
+    address,
   )
   dispatch(setReviewOptions(answerAlternatives))
 }

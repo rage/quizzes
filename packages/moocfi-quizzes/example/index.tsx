@@ -57,6 +57,7 @@ const App = () => {
             id={id.value}
             languageId={languageId.value}
             accessToken={accessToken.value}
+            backendAddress={baseUrl.value}
           />
         </SimpleErrorBoundary>
       </div>
