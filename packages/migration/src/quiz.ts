@@ -276,9 +276,11 @@ export async function migrateQuizzes(
               id: qoid,
               quizItemId: qiid,
               order: choiceOrder++,
-              correct:
-                rightAnswer[oldItem.id] === oldChoice.id ||
-                rightAnswer[oldItem.id].includes(oldChoice.id),
+              correct: rightAnswer[oldItem.id]
+                ? Array.isArray(rightAnswer[oldItem.id])
+                  ? rightAnswer[oldItem.id].includes(oldChoice.id)
+                  : rightAnswer[oldItem.id] === oldChoice.id
+                : false,
               createdAt: oldQuiz.createdAt,
               updatedAt: oldQuiz.updatedAt,
             })
