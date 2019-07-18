@@ -10,6 +10,11 @@ import {
 } from "routing-controllers"
 import { promisify } from "util"
 
+const whitelist = [
+  /\/$/,
+  /\/api\/v1\/quizzes\/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}\/titles\/[a-z]{2}_[A-Z]{2}$/,
+]
+
 @Middleware({ type: "before" })
 export class AuthenticationMiddleware implements ExpressMiddlewareInterface {
   private client = redis.createClient({
@@ -20,9 +25,13 @@ export class AuthenticationMiddleware implements ExpressMiddlewareInterface {
   private get = promisify(this.client.get).bind(this.client)
 
   public async use(req: any, res: any, next: any) {
-    if (req.url === "/") {
-      return next()
-    }
+    console.log(req.url)
+    whitelist.forEach(regex => {
+      if (req.url.match(regex)) {
+        console.log("MATCH")
+        return next()
+      }
+    })
     const authorization: string = req.headers.authorization || ""
     const token: string =
       authorization.toLocaleLowerCase().replace("bearer ", "") || ""
