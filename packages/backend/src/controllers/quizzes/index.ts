@@ -120,6 +120,19 @@ export class QuizController {
     }
   }
 
+  @Get("/:course/titles/:language")
+  public async getCourseQuizTitles(
+    @HeaderParam(":course") courseId: string,
+    @HeaderParam(":language") language: string,
+  ) {
+    const quizzes: Quiz[] = await this.quizService.getQuizzes({
+      courseId,
+      language,
+      course: true,
+    })
+    console.log(quizzes)
+  }
+
   @Get("/data/:id/plainQuizInfo")
   public async getPlainQuizInfo(
     @Param("id") quizId: string,
