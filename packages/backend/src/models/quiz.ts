@@ -14,7 +14,7 @@ import {
   UpdateDateColumn,
 } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
-import { getUUIDByString, randomUUID } from "../util"
+import { getUUIDByString, randomUUID } from "../util/index"
 import { Course } from "./course"
 import { Language } from "./language"
 import { PeerReviewCollection } from "./peer_review_collection"
@@ -68,7 +68,7 @@ export class Quiz extends BaseEntity {
   }) // was: not eager
   public peerReviewCollections: PeerReviewCollection[]
 
-  @Column({ default: true })
+  @Column({ default: false })
   public autoConfirm: boolean
   @Column({ default: false })
   public excludedFromScore: boolean
