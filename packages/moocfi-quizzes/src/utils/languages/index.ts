@@ -58,6 +58,8 @@ export type UnsupportedLabels = {
 export type OpenLabels = {
   placeholder: string
   userAnswerLabel: string
+  feedbackForSuccess: string
+  feedbackForFailure: string
 }
 
 export type SingleLanguageLabels = {

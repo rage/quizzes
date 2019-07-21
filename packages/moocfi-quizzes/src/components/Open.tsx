@@ -69,7 +69,9 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
         </SpaciousPaper>
         <SolutionPaper correct={correct}>
           <Typography variant="body1">
-            {correct ? successMessage : failureMessage}
+            {correct
+              ? successMessage || openLabels.feedbackForSuccess
+              : failureMessage || openLabels.feedbackForFailure}
           </Typography>
         </SolutionPaper>
       </div>
@@ -84,6 +86,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
         onChange={handleTextDataChange}
         fullWidth
         margin="normal"
+        variant="outlined"
         placeholder={openLabels.placeholder}
       />
     </div>

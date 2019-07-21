@@ -11,6 +11,8 @@ const finnishLabels: SingleLanguageLabels = {
   open: {
     placeholder: "Vastaus",
     userAnswerLabel: "Vastauksesi",
+    feedbackForFailure: "Vastauksesi on virheellinen",
+    feedbackForSuccess: "Vastauksesi on oikein",
   },
   peerReviews: {
     loadingLabel: "Ladataan",
