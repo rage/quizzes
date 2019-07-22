@@ -23,6 +23,9 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
   const dispatch = useDispatch()
 
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
+  const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
+
   if (!languageInfo) {
     return <div />
   }
@@ -31,7 +34,6 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
     dispatch(quizAnswerActions.changeTextData(item.id, e.currentTarget.value))
   }
 
-  const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
   if (!itemAnswer) {
     return <LaterQuizItemAddition item={item} />
@@ -42,7 +44,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
 
   const openLabels = languageInfo.open
 
-  const answered = answer.id ? true : false
+  const answerLocked = userQuizState && userQuizState.status === "locked"
   const itemTitle = item.texts[0].title
 
   const { successMessage, failureMessage } = item.texts[0]
@@ -57,7 +59,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
     </>
   )
 
-  if (answered) {
+  if (answerLocked) {
     return (
       <div>
         {guidance}

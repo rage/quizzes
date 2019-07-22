@@ -17,7 +17,7 @@ const QuizPointsStatus = () => {
   const generalLabels = languageInfo.general
   const quizPoints = quiz.points
 
-  if (!userQuizState || userQuizState.status === "open") {
+  if (!userQuizState) {
     return (
       <SpaciousPaper>
         <Typography variant="body1">

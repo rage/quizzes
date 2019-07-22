@@ -19,6 +19,7 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
   item,
 }) => {
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
 
   const dispatch = useDispatch()
   const option = item.options[0]
@@ -27,7 +28,8 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
   const toggle = () =>
     dispatch(quizAnswerActions.changeCheckboxData(item.id, option.id))
 
-  const answered = quizAnswer.id ? true : false
+  const answerLocked =
+    userQuizState && userQuizState.status === "locked" ? true : false
 
   const itemAnswer = quizAnswer.itemAnswers.find(
     ia => ia.quizItemId === item.id,
@@ -39,7 +41,7 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
   const optionAnswer = itemAnswer.optionAnswers[0]
 
   const checkboxOptions = {
-    disabled: answered,
+    disabled: answerLocked,
     checked: optionAnswer !== undefined,
   }
 

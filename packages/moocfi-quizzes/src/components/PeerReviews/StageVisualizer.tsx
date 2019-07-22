@@ -20,7 +20,7 @@ const StageVisualizer = () => {
     stageLabels.evaluationStageLabel,
   ]
 
-  const answered = quizAnswer.id ? true : false
+  const answerLocked = userQuizState && userQuizState.status === "locked"
   const peerReviewsGiven = userQuizState ? userQuizState.peerReviewsGiven : 0
   const peerReviewsReceived = userQuizState
     ? userQuizState.peerReviewsReceived
@@ -29,7 +29,7 @@ const StageVisualizer = () => {
   const peerReviewsReceivedRequired = quiz.course.minPeerReviewsReceived
 
   let activeStep = 0
-  if (answered) {
+  if (answerLocked) {
     activeStep = 1
 
     if (peerReviewsGiven >= peerReviewsRequired) {

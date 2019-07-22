@@ -13,11 +13,13 @@ type FeedbackProps = {
 const Feedback: React.FunctionComponent<FeedbackProps> = ({ item }) => {
   const dispatch = useDispatch()
 
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
+
   const handleTextDataChange = (e: MiscEvent) =>
     dispatch(quizAnswerActions.changeTextData(item.id, e.currentTarget.value))
 
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
-  const answered = answer.id ? true : false
+  const answerLocked = userQuizState && userQuizState.status === "locked"
   const itemTitle = item.texts[0].title
 
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
@@ -31,7 +33,7 @@ const Feedback: React.FunctionComponent<FeedbackProps> = ({ item }) => {
   return (
     <div style={{ marginBottom: 10 }}>
       <Typography variant="subtitle1">{itemTitle}</Typography>
-      {answered ? (
+      {answerLocked ? (
         <Typography variant="body1">{textData}</Typography>
       ) : (
         <TextField

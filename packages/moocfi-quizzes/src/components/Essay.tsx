@@ -39,15 +39,24 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
     state => state.quizAnswer.attemptedDisabledSubmit,
   )
 
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
+
   if (!languageInfo) {
     return <div />
   }
   const essayLabels = languageInfo.essay
   const itemBody = item.texts[0].body
   const itemTitle = item.texts[0].title
-  const answered = quizAnswer.id ? true : false
 
   let itemAnswer = quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id)
+
+  let possibleToSubmit = true
+
+  if (userQuizState) {
+    if (userQuizState.status === "locked") {
+      possibleToSubmit = false
+    }
+  }
 
   if (!itemAnswer) {
     return <LaterQuizItemAddition item={item} />
@@ -60,7 +69,7 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
     numOfWords >= (item.minWords || 0) &&
     numOfWords <= (item.maxWords || 666666)
 
-  const answerPortion = answered ? (
+  const answerPortion = !possibleToSubmit ? (
     <>
       <Typography variant="subtitle1">
         {essayLabels.userAnswerLabel + ": "}

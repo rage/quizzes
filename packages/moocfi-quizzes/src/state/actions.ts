@@ -22,7 +22,7 @@ export const initialize: ActionCreator<ThunkAction> = (
       backendAddress,
     )
 
-    if (!quizAnswer || (userQuizState && userQuizState.status === "open")) {
+    if (!quizAnswer) {
       quizAnswer = {
         quizId: quiz.id,
         languageId,

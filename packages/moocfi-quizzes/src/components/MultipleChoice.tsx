@@ -168,7 +168,9 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
   item,
   itemAnswer,
 }) => {
-  const answered = itemAnswer.id ? true : false
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
+
+  const answerLocked = userQuizState && userQuizState.status === "locked"
 
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   if (!languageInfo) {
@@ -194,13 +196,13 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
         />
       )}
 
-      {!answered && item.multi && (
+      {!answerLocked && item.multi && (
         <Typography variant="subtitle1">
           {multipleChoiceLabels.chooseAllSuitableOptionsLabel}
         </Typography>
       )}
 
-      {answered &&
+      {answerLocked &&
         !onlyOneItem &&
         ((itemAnswer.correct && successMessage) ||
           (!itemAnswer.correct && failureMessage)) && (
@@ -234,11 +236,12 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
   const items = useTypedSelector(state => state.quiz!.items)
   const item = items.find(i => i.id === option.quizItemId)
+  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
   if (!item) {
     // should be impossible
     return <div>Cannot find related item</div>
   }
-  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const itemAnswer = quizAnswer.itemAnswers.find(
     ia => ia.quizItemId === item.id,
   )
@@ -253,7 +256,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
     dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))
 
   const optionAnswers = itemAnswer.optionAnswers
-  const answered = itemAnswer.id ? true : false
+  const answerLocked = userQuizState && userQuizState.status === "locked"
 
   const optionIsSelected = optionAnswers.some(
     oa => oa.quizOptionId === option.id,
@@ -272,7 +275,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
       : "red"
     : "white"
 
-  if (!answered) {
+  if (!answerLocked) {
     return (
       <Grid item={true} sm={optionWidth} key={option.id}>
         <ChoiceButton
