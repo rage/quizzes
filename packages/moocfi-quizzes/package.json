@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf ./dist && tsc",
-    "prepare": "yarn build"
+    "prepare": "yarn build",
+    "watch": "tsc --watch"
   },
   "keywords": [],
   "author": "",
