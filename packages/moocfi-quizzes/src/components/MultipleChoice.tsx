@@ -176,6 +176,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
   }
 
   const multipleChoiceLabels = languageInfo.multipleChoice
+  const generalLabels = languageInfo.general
 
   const { title, body, successMessage, failureMessage } = item.texts[0]
 
@@ -207,6 +208,10 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
             correct={itemAnswer.correct ? true : false}
             variant="body1"
           >
+            {itemAnswer.correct
+              ? multipleChoiceLabels.answerCorrectLabel
+              : multipleChoiceLabels.answerIncorrectLabel}
+            <br />
             {itemAnswer.correct ? successMessage : failureMessage}
           </SolutionTypography>
         )}

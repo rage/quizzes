@@ -26,6 +26,8 @@ export type StageLabels = {
 
 export type MultipleChoiceLabels = {
   chooseAllSuitableOptionsLabel: string
+  answerCorrectLabel: string
+  answerIncorrectLabel: string
 }
 
 export type EssayLabels = {

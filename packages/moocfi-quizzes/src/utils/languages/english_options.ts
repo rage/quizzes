@@ -50,6 +50,8 @@ const englishLabels: SingleLanguageLabels = {
   },
   multipleChoice: {
     chooseAllSuitableOptionsLabel: "Choose all suitable options",
+    answerCorrectLabel: "Correct",
+    answerIncorrectLabel: "Incorrect",
   },
   stage: {
     answerStageLabel: "Answering the quiz",
