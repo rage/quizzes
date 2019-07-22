@@ -18,6 +18,17 @@ export const setLocked = createAction("quizAnswer/SET_LOCKED", resolve => {
   return () => resolve()
 })
 
+export const setAttemptedSubmit = createAction(
+  "quizAnswer/ATTEMPT_DISABLED_SUBMIT",
+  resolve => {
+    return () => resolve()
+  },
+)
+
+export const clearAttemptedSubmit = createAction(
+  "quizAnswer/CLEAR_DISABLED_SUBMIT",
+)
+
 export const changeTextDataAction = createAction(
   "quizAnswer/UPDATE_TEXT_VALUE",
   resolve => (itemId: string, newValue: string, readyToSubmit: boolean) =>
@@ -52,6 +63,14 @@ export const changeChosenOption: ActionCreator<ThunkAction> = (
   }
   const multi = item.multi
   dispatch(chooseOption(itemId, optionId, multi))
+}
+
+export const noticeDisabledSubmitAttempt: ActionCreator<ThunkAction> = () => (
+  dispatch,
+  getState,
+) => {
+  dispatch(setAttemptedSubmit())
+  setTimeout(() => dispatch(clearAttemptedSubmit()), 5000)
 }
 
 export const changeTextData: ActionCreator<ThunkAction> = (

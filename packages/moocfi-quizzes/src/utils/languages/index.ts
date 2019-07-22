@@ -31,9 +31,10 @@ export type MultipleChoiceLabels = {
 export type EssayLabels = {
   exampleAnswerLabel: string
   userAnswerLabel: string
-  minimumWords: string
   currentNumberOfWordsLabel: string
   textFieldLabel: string
+  wordLimitsGuidance: (min: number | null, max: number | null) => string
+  conformToLimitsToSubmitLabel: string
 }
 
 export type PeerReviewLabels = {
@@ -58,6 +59,8 @@ export type UnsupportedLabels = {
 export type OpenLabels = {
   placeholder: string
   userAnswerLabel: string
+  feedbackForSuccess: string
+  feedbackForFailure: string
 }
 
 export type SingleLanguageLabels = {

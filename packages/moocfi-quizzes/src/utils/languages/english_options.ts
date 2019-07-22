@@ -4,13 +4,29 @@ const englishLabels: SingleLanguageLabels = {
   essay: {
     exampleAnswerLabel: "Answer example",
     userAnswerLabel: "Your answer",
-    minimumWords: "Minimum number of words",
     currentNumberOfWordsLabel: "Words",
     textFieldLabel: "Your answer",
+    conformToLimitsToSubmitLabel:
+      "Modify your answer to conform to the word limits to submit",
+    wordLimitsGuidance: (min, max) => {
+      if (!min && !max) {
+        return ""
+      }
+      if (!min) {
+        return `Your answer should not exceed ${max} words`
+      }
+
+      if (!max) {
+        return `Your answer should be at least ${min} words long`
+      }
+      return `Your answer should be between ${min} and ${max} words`
+    },
   },
   open: {
     placeholder: "Answer",
     userAnswerLabel: "Your answer",
+    feedbackForSuccess: "Your answer is correct",
+    feedbackForFailure: "Your answer is incorrect",
   },
   peerReviews: {
     loadingLabel: "Loading",
