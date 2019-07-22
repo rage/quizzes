@@ -11,6 +11,8 @@ const englishLabels: SingleLanguageLabels = {
   open: {
     placeholder: "Answer",
     userAnswerLabel: "Your answer",
+    feedbackForSuccess: "Your answer is correct",
+    feedbackForFailure: "Your answer is incorrect",
   },
   peerReviews: {
     loadingLabel: "Loading",
