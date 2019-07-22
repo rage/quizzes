@@ -25,11 +25,16 @@ export const quizAnswerReducer = (
   action: ActionType<typeof quizAnswer>,
 ): QuizAnswerState => {
   switch (action.type) {
+    case getType(quizAnswer.setUnlocked):
+      return {
+        ...state,
+        submitLocked: false,
+      }
     case getType(quizAnswer.set):
       let newItemAnswersReady: Record<string, boolean> = {}
       let newQuizAnswer = action.payload
       newQuizAnswer.itemAnswers.forEach(ia => {
-        newItemAnswersReady[ia.quizItemId] = false
+        newItemAnswersReady[ia.quizItemId] = ia.id !== undefined
       })
 
       return {

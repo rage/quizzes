@@ -14,9 +14,9 @@ export const set = createAction("quizAnswer/SET", resolve => {
 
 export const clear = createAction("quizAnswer/CLEAR")
 
-export const setLocked = createAction("quizAnswer/SET_LOCKED", resolve => {
-  return () => resolve()
-})
+export const setLocked = createAction("quizAnswer/SET_LOCKED")
+
+export const setUnlocked = createAction("quizAnswer/SET_UNLOCKED")
 
 export const setAttemptedSubmit = createAction(
   "quizAnswer/ATTEMPT_DISABLED_SUBMIT",
@@ -101,6 +101,15 @@ export const submit: ActionCreator<ThunkAction> = () => async (
     dispatch(quizActions.set(responseData.quiz))
     dispatch(set(responseData.quizAnswer))
     dispatch(setLocked())
+  } else if (
+    responseData.userQuizState.pointsAwarded &&
+    Math.abs(
+      responseData.userQuizState.pointsAwarded - responseData.quiz.points,
+    ) < 0.001
+  ) {
+    dispatch(quizActions.set(responseData.quiz))
+    dispatch(set(responseData.quizAnswer))
+    console.log("in the right branch")
   } else {
     const languageInfo = getState().language.languageLabels
     if (languageInfo) {

@@ -373,7 +373,10 @@ export class QuizAnswerController {
       )
     })
 
-    if (savedUserQuizState.status === "open") {
+    if (
+      savedUserQuizState.status === "open" &&
+      Math.abs(savedUserQuizState.pointsAwarded - quiz.points) > 0.001
+    ) {
       return {
         userQuizState: savedUserQuizState,
         quizAnswer: savedAnswer,
