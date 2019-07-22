@@ -21,8 +21,10 @@ type ScaleProps = {
   item: QuizItem
 }
 
-const GridRow = styled(Grid)`
-  border-bottom: 1px solid gray;
+const GridRow = styled(({ rowNumber, ...others }) => <Grid {...others} />)`
+  background-color: ${({ rowNumber }) =>
+    rowNumber % 2 === 0 ? "inherit" : "#E0E0E0"};
+  padding: 0.25rem 2rem 0.25rem 1rem;
 `
 
 const SmallCenteredGrid = styled(({ matchesSmall, ...others }) => (
@@ -32,8 +34,26 @@ const SmallCenteredGrid = styled(({ matchesSmall, ...others }) => (
   padding-bottom: ${({ matchesSmall }) => (matchesSmall ? ".5rem" : "0")};
 `
 
+const WideGridItem = styled(({ ...params }) => (
+  <Grid item={true} xs={12} {...params} />
+))`
+  width: 100%;
+`
+
 const StyledRadio = styled(Radio)`
   padding-left: 0;
+`
+
+const StyledFormLabel = styled(FormLabel)`
+  &.MuiFormLabel-root {
+    color: black;
+  }
+`
+const StyledOptionItem = styled(({ numberOfOptions, ...other }) => (
+  <Grid item={true} zeroMinWidth={true} {...other} />
+))`
+  maxwidth: ${({ numberOfOptions }) =>
+    numberOfOptions <= 12 ? `${100 / numberOfOptions}%` : "100%"};
 `
 
 const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
@@ -44,7 +64,7 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
   }
 
   const theme = useTheme()
-  const matchesSmall = useMediaQuery(theme.breakpoints.down("sm"))
+  const matchesSmall = useMediaQuery(theme.breakpoints.down("xs"))
 
   const itemAnswers = useTypedSelector(
     state => state.quizAnswer.quizAnswer.itemAnswers,
@@ -57,19 +77,25 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
   }
 
   return (
-    <FormControl fullWidth={true} style={{ marginBottom: "1rem" }}>
-      <GridRow container={true} justify="flex-start" alignItems="center">
+    <FormControl fullWidth={true}>
+      <GridRow
+        container={true}
+        justify="flex-start"
+        alignItems="center"
+        rowNumber={item.order}
+      >
         <SmallCenteredGrid
           matchesSmall={matchesSmall}
           item={true}
           xs={12}
-          md={6}
+          sm={5}
+          md={4}
         >
-          <FormLabel>
-            <Typography variant="subtitle1">{item.texts[0].title}</Typography>
-          </FormLabel>
+          <StyledFormLabel>
+            <Typography variant="body1">{item.texts[0].title}</Typography>
+          </StyledFormLabel>
         </SmallCenteredGrid>
-        <Grid item={true} xs={12} md={6}>
+        <Grid item={true} xs={12} sm={7} md={8}>
           <ScaleOptions
             handleIntDataChange={handleIntDataChange}
             item={item}
@@ -103,6 +129,11 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
     number_of_options = item.maxValue - item.minValue + 1
   }
 
+  const alternatives = Array.from(
+    { length: number_of_options },
+    (v, i) => (item.minValue ? item.minValue : 1) + i,
+  )
+
   return (
     <Grid container={true} direction="column" alignContent="center">
       {(minLabel || maxLabel) && (
@@ -114,7 +145,7 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
         </Grid>
       )}
 
-      <Grid item={true}>
+      <WideGridItem>
         <RadioGroup
           row={true}
           aria-label="agreement"
@@ -122,20 +153,23 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
           value={`${intData}`}
           onChange={handleIntDataChange}
         >
-          {Array.from(
-            { length: number_of_options },
-            (v, i) => (item.minValue ? item.minValue : 1) + i,
-          ).map(number => (
-            <FormControlLabel
-              key={number}
-              value={`${number}`}
-              control={<StyledRadio color="primary" disabled={answered} />}
-              label={`${number}`}
-              labelPlacement="start"
-            />
-          ))}
+          <Grid
+            container={true}
+            justify={number_of_options <= 12 ? "space-between" : "flex-start"}
+          >
+            {alternatives.map(number => (
+              <StyledOptionItem key={number}>
+                <FormControlLabel
+                  value={`${number}`}
+                  control={<StyledRadio color="primary" disabled={answered} />}
+                  label={`${number}`}
+                  labelPlacement="start"
+                />
+              </StyledOptionItem>
+            ))}
+          </Grid>
         </RadioGroup>
-      </Grid>
+      </WideGridItem>
     </Grid>
   )
 }
