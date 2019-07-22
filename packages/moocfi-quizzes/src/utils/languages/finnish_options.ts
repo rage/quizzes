@@ -6,6 +6,8 @@ const finnishLabels: SingleLanguageLabels = {
     userAnswerLabel: "Vastauksesi",
     currentNumberOfWordsLabel: "Sanoja",
     textFieldLabel: "Vastauksesi",
+    conformToLimitsToSubmitLabel:
+      "Muokkaa vastauksesi sanarajojen sisään lähettääksesi sen",
     wordLimitsGuidance: (min, max) => {
       if (!min && !max) {
         return ""

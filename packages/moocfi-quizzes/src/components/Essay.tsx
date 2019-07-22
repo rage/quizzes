@@ -1,9 +1,9 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
+import styled from "styled-components"
 import { TextField } from "@material-ui/core"
 import Typography from "@material-ui/core/Typography"
 import { wordCount } from "../utils/string_tools"
-import { executeIfTextFieldBetweenNumOfWords as executeIfWordNumberCorrect } from "../utils/event_filters"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { SpaciousPaper, SpaciousTypography } from "./styleComponents"
@@ -14,6 +14,18 @@ type EssayProps = {
   item: QuizItem
 }
 
+const SubmitHelperTypography = styled(
+  ({ attemptWasRecentlyMade, ...others }) => (
+    <Typography
+      color={attemptWasRecentlyMade ? "error" : "inherit"}
+      {...others}
+    />
+  ),
+)`
+  font-style: ${({ attemptWasRecentlyMade }) =>
+    attemptWasRecentlyMade ? "italic" : "inherit"};
+`
+
 const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
   const dispatch = useDispatch()
 
@@ -22,6 +34,10 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
 
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
+
+  const recentlyAttemptedDisabledSubmit = useTypedSelector(
+    state => state.quizAnswer.attemptedDisabledSubmit,
+  )
 
   if (!languageInfo) {
     return <div />
@@ -38,6 +54,11 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
   }
 
   const answerText = itemAnswer.textData || ""
+
+  const numOfWords = wordCount(answerText)
+  const answerWithinLimits =
+    numOfWords >= (item.minWords || 0) &&
+    numOfWords <= (item.maxWords || 666666)
 
   const answerPortion = answered ? (
     <>
@@ -57,18 +78,24 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
         variant="outlined"
         label={essayLabels.textFieldLabel}
         value={answerText}
-        onChange={executeIfWordNumberCorrect(
-          handleTextDataChange,
-          answerText,
-          item.maxWords,
-        )}
+        onChange={handleTextDataChange}
         fullWidth={true}
         multiline={true}
         rows={10}
         margin="normal"
       />
       <div>
-        {essayLabels.currentNumberOfWordsLabel}: {wordCount(answerText)}
+        <Typography>
+          {essayLabels.currentNumberOfWordsLabel}: {numOfWords}
+        </Typography>
+
+        {!answerWithinLimits && (
+          <SubmitHelperTypography
+            attemptWasRecentlyMade={recentlyAttemptedDisabledSubmit}
+          >
+            {essayLabels.conformToLimitsToSubmitLabel}
+          </SubmitHelperTypography>
+        )}
       </div>
     </>
   )
@@ -80,7 +107,6 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
         variant="body1"
         dangerouslySetInnerHTML={{ __html: itemBody }}
       />
-
       {answerPortion}
     </div>
   )

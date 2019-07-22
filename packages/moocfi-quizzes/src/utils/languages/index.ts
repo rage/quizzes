@@ -34,6 +34,7 @@ export type EssayLabels = {
   currentNumberOfWordsLabel: string
   textFieldLabel: string
   wordLimitsGuidance: (min: number | null, max: number | null) => string
+  conformToLimitsToSubmitLabel: string
 }
 
 export type PeerReviewLabels = {

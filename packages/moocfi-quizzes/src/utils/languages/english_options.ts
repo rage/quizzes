@@ -6,6 +6,8 @@ const englishLabels: SingleLanguageLabels = {
     userAnswerLabel: "Your answer",
     currentNumberOfWordsLabel: "Words",
     textFieldLabel: "Your answer",
+    conformToLimitsToSubmitLabel:
+      "Modify your answer to conform to the word limits to submit",
     wordLimitsGuidance: (min, max) => {
       if (!min && !max) {
         return ""

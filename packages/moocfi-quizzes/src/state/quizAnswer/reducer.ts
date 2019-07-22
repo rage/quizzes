@@ -10,12 +10,14 @@ const initialValue: QuizAnswerState = {
   },
   submitLocked: true,
   itemAnswersReady: {},
+  attemptedDisabledSubmit: false,
 }
 
 export type QuizAnswerState = {
   quizAnswer: QuizAnswer
   submitLocked: boolean
   itemAnswersReady: Record<string, boolean>
+  attemptedDisabledSubmit: boolean
 }
 
 export const quizAnswerReducer = (
@@ -34,16 +36,21 @@ export const quizAnswerReducer = (
         submitLocked: true,
         itemAnswersReady: newItemAnswersReady,
         quizAnswer: newQuizAnswer,
+        attemptedDisabledSubmit: state.attemptedDisabledSubmit,
       }
     case getType(quizAnswer.clear):
       return initialValue
     case getType(quizAnswer.setLocked):
       return { ...state, submitLocked: true }
-
+    case getType(quizAnswer.setAttemptedSubmit):
+      return { ...state, attemptedDisabledSubmit: true }
+    case getType(quizAnswer.clearAttemptedSubmit):
+      return { ...state, attemptedDisabledSubmit: false }
     case getType(quizAnswer.changeIntData):
       newItemAnswersReady = { ...state.itemAnswersReady }
       newItemAnswersReady[`${action.payload.itemId}`] = true
       return {
+        ...state,
         submitLocked: !readyToSubmit(newItemAnswersReady),
         itemAnswersReady: newItemAnswersReady,
         quizAnswer: {
@@ -61,6 +68,7 @@ export const quizAnswerReducer = (
         action.payload.readyToSubmit
 
       return {
+        ...state,
         submitLocked: !readyToSubmit(newItemAnswersReady),
         itemAnswersReady: newItemAnswersReady,
         quizAnswer: {
@@ -79,6 +87,7 @@ export const quizAnswerReducer = (
       newItemAnswersReady[`${action.payload.itemId}`] = true
 
       return {
+        ...state,
         submitLocked: !readyToSubmit(newItemAnswersReady),
         itemAnswersReady: newItemAnswersReady,
         quizAnswer: {
@@ -122,6 +131,7 @@ export const quizAnswerReducer = (
       )
       if (previouslyChosen) {
         return {
+          ...state,
           submitLocked: !readyToSubmit(newItemAnswersReady),
           itemAnswersReady: newItemAnswersReady,
           quizAnswer: {
@@ -151,6 +161,7 @@ export const quizAnswerReducer = (
             },
           ]
       return {
+        ...state,
         submitLocked: !readyToSubmit(newItemAnswersReady),
         itemAnswersReady: newItemAnswersReady,
         quizAnswer: {
