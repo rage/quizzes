@@ -4,9 +4,25 @@ const finnishLabels: SingleLanguageLabels = {
   essay: {
     exampleAnswerLabel: "Esimerkkivastaus",
     userAnswerLabel: "Vastauksesi",
-    minimumWords: "Sanoja vähintään",
     currentNumberOfWordsLabel: "Sanoja",
     textFieldLabel: "Vastauksesi",
+    conformToLimitsToSubmitLabel:
+      "Muokkaa vastauksesi sanarajojen sisään lähettääksesi sen",
+    wordLimitsGuidance: (min, max) => {
+      if (!min && !max) {
+        return ""
+      }
+
+      if (!min) {
+        return `Vastaa korkeintaan ${max} sanalla`
+      }
+
+      if (!max) {
+        return `Vastaa vähintään ${min} sanalla`
+      }
+
+      return `Vastaa ${min}-${max} sanalla`
+    },
   },
   open: {
     placeholder: "Vastaus",

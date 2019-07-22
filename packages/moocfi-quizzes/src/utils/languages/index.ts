@@ -31,9 +31,10 @@ export type MultipleChoiceLabels = {
 export type EssayLabels = {
   exampleAnswerLabel: string
   userAnswerLabel: string
-  minimumWords: string
   currentNumberOfWordsLabel: string
   textFieldLabel: string
+  wordLimitsGuidance: (min: number | null, max: number | null) => string
+  conformToLimitsToSubmitLabel: string
 }
 
 export type PeerReviewLabels = {

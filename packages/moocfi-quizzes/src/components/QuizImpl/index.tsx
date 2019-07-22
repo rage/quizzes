@@ -79,10 +79,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   const handleSubmit = () => dispatch(quizAnswerActions.submit())
 
-  const quizContainsEssay = () => {
-    return quiz.items.some(ia => ia.type === "essay")
-  }
-
   const quizItemComponents = (quiz: Quiz, languageId: string) => {
     return (
       <>
@@ -141,6 +137,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     stillSubmittable = false
   }
 
+  const containsPeerReviews =
+    quiz.peerReviewCollections !== null && quiz.peerReviewCollections.length > 0
+
   return (
     <div>
       <Grid container={true} justify="space-between">
@@ -159,13 +158,13 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
         </Grid>
       </Grid>
       <div>
-        {quizContainsEssay() && <StageVisualizer />}
+        {containsPeerReviews && <StageVisualizer />}
 
         {quizItemComponents(quiz, languageId)}
 
         {!stillSubmittable ? (
           <>
-            {quizContainsEssay() && <PeerReviews />}
+            {containsPeerReviews && <PeerReviews />}
 
             <ResultInformation
               quiz={quiz}
@@ -186,14 +185,22 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                 ? `${generalLabels.triesRemainingLabel}: ${triesRemaining}`
                 : ""}
             </Typography>
-            <Button
-              variant="contained"
-              color="primary"
-              disabled={submitLocked}
-              onClick={handleSubmit}
+            <div
+              onClick={e => {
+                if (submitLocked) {
+                  dispatch(quizAnswerActions.noticeDisabledSubmitAttempt())
+                }
+              }}
             >
-              {generalLabels.submitButtonLabel}
-            </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={submitLocked}
+                onClick={handleSubmit}
+              >
+                {generalLabels.submitButtonLabel}
+              </Button>
+            </div>
           </div>
         )}
       </div>
