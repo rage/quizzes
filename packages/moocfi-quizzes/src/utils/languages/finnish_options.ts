@@ -54,6 +54,8 @@ const finnishLabels: SingleLanguageLabels = {
   },
   multipleChoice: {
     chooseAllSuitableOptionsLabel: "Valitse kaikki sopivat vaihtoehdot.",
+    answerCorrectLabel: "Oikein",
+    answerIncorrectLabel: "Väärin",
   },
   stage: {
     answerStageLabel: "Tehtävään vastaaminen",
