@@ -290,27 +290,25 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
   if (onlyOneItem) {
     return (
-      <Grid item={true} key={option.id}>
-        <Grid container={true} direction={direction} alignItems="center">
-          <Grid item={true} sm={optionWidth}>
-            <RevealedChoiceButton
-              selected={optionIsSelected}
-              correct={option.correct}
-              fullWidth
-            >
-              {text.title}
-            </RevealedChoiceButton>
-          </Grid>
-
-          {feedbackMessage && (
-            <Grid item>
-              <LeftBorderedTypography variant="body1" barColor={feedbackColor}>
-                {feedbackMessage}
-              </LeftBorderedTypography>
-            </Grid>
-          )}
+      <React.Fragment>
+        <Grid item={true} sm={optionWidth}>
+          <RevealedChoiceButton
+            selected={optionIsSelected}
+            correct={option.correct}
+            fullWidth
+          >
+            {text.title}
+          </RevealedChoiceButton>
         </Grid>
-      </Grid>
+
+        {feedbackMessage && (
+          <Grid item>
+            <LeftBorderedTypography variant="body1" barColor={feedbackColor}>
+              {feedbackMessage}
+            </LeftBorderedTypography>
+          </Grid>
+        )}
+      </React.Fragment>
     )
   }
 
