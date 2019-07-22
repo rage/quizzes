@@ -45,7 +45,6 @@ const FailureIcon = () => (
 )
 
 const RevealedChoiceButton = styled(({ selected, correct, ...others }) => {
-  console.log(correct)
   return (
     <ChoiceButton variant={selected ? "contained" : "outlined"} {...others}>
       {selected ? correct ? <SuccessIcon /> : <FailureIcon /> : ""}
