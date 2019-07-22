@@ -50,11 +50,9 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
     </>
   ) : (
     <>
-      {item.minWords && (
-        <Typography variant="body1">
-          {essayLabels.minimumWords}: {item.minWords}
-        </Typography>
-      )}
+      <Typography>
+        {essayLabels.wordLimitsGuidance(item.minWords, item.maxWords)}
+      </Typography>
       <TextField
         variant="outlined"
         label={essayLabels.textFieldLabel}
@@ -71,7 +69,6 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
       />
       <div>
         {essayLabels.currentNumberOfWordsLabel}: {wordCount(answerText)}
-        {item.maxWords && <> / {item.maxWords}</>}
       </div>
     </>
   )
