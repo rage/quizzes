@@ -135,6 +135,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
       <ChoicesContainer
         direction={direction}
         justify="space-between"
+        alignItems="center"
         singleItem={onlyOneItem}
         optionContainerWidth={optionContainerWidth}
       >
