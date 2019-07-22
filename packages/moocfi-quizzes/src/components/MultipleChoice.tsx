@@ -291,7 +291,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
   if (onlyOneItem) {
     return (
       <Grid item={true} key={option.id}>
-        <Grid container={true} direction={direction}>
+        <Grid container={true} direction={direction} alignItems="center">
           <Grid item={true} sm={optionWidth}>
             <RevealedChoiceButton
               selected={optionIsSelected}
