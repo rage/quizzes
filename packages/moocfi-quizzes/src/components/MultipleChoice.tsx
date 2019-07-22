@@ -1,13 +1,16 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { Button, Grid, Typography } from "@material-ui/core"
+import { Button, Grid, Typography, Icon } from "@material-ui/core"
 import { GridDirection, GridSize } from "@material-ui/core/Grid"
 import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { QuizItem, QuizItemOption, QuizItemAnswer } from "../modelTypes"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faCheck } from "@fortawesome/free-solid-svg-icons"
+import { faTimes } from "@fortawesome/free-solid-svg-icons"
 
 const ChoicesContainer = styled(
   ({ singleItem, optionContainerWidth, ...others }) => (
@@ -25,9 +28,31 @@ const ChoiceButton = styled(Button)`
   margin: 0.5em 0;
 `
 
-const RevealedChoiceButton = styled(({ selected, correct, ...others }) => (
-  <ChoiceButton variant={selected ? "contained" : "outlined"} {...others} />
-))`
+const IconWrapper = styled.div`
+  margin: 0.5rem;
+`
+
+const SuccessIcon = () => (
+  <IconWrapper>
+    <FontAwesomeIcon icon={faCheck} />
+  </IconWrapper>
+)
+
+const FailureIcon = () => (
+  <IconWrapper>
+    <FontAwesomeIcon icon={faTimes} />
+  </IconWrapper>
+)
+
+const RevealedChoiceButton = styled(({ selected, correct, ...others }) => {
+  console.log(correct)
+  return (
+    <ChoiceButton variant={selected ? "contained" : "outlined"} {...others}>
+      {selected ? correct ? <SuccessIcon /> : <FailureIcon /> : ""}
+      {others.children}
+    </ChoiceButton>
+  )
+})`
   ${props =>
     props.selected
       ? `
