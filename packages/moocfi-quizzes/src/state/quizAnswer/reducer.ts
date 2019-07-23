@@ -156,15 +156,17 @@ export const quizAnswerReducer = (
       }
       const newOptionAnswers = multi
         ? [...newItemAnswer.optionAnswers].concat({
-            quizItemAnswerId: state.quizAnswer.itemAnswers[0].quizAnswerId,
+            quizItemAnswerId: current.id,
             quizOptionId: optionId,
           })
         : [
             {
-              quizItemAnswerId: state.quizAnswer.itemAnswers[0].quizAnswerId,
+              quizItemAnswerId: current.id,
               quizOptionId: optionId,
             },
           ]
+
+      console.log("new option answers: ", newOptionAnswers)
       return {
         ...state,
         submitLocked: !readyToSubmit(newItemAnswersReady),

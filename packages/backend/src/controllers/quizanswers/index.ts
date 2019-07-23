@@ -310,12 +310,22 @@ export class QuizAnswerController {
     let savedAnswer: QuizAnswer
     let savedUserQuizState: UserQuizState
 
+    console.log("quiz answer status before validation: ", answer.status)
+    console.log("option answers:")
+    answer.itemAnswers.forEach(ia => {
+      if (ia.optionAnswers && ia.optionAnswers.length > 0) {
+        ia.optionAnswers.forEach(oa => console.log(oa))
+      }
+    })
+
     await this.entityManager.transaction(async manager => {
       const {
         response,
         quizAnswer,
         userQuizState,
       } = this.validationService.validateQuizAnswer(answer, quiz, userQState)
+
+      console.log("quiz answer status after validation: ", quizAnswer.status)
 
       const erroneousItemAnswers = response.itemAnswerStatus.filter(status => {
         return status.error ? true : false
@@ -339,10 +349,20 @@ export class QuizAnswerController {
 
       await this.validationService.checkForDeprecated(manager, quizAnswer)
 
+      console.log("quiz answer after deprecation changes: ", quizAnswer)
+      console.log("option answers:")
+      quizAnswer.itemAnswers.forEach(ia => {
+        if (ia.optionAnswers && ia.optionAnswers.length > 0) {
+          ia.optionAnswers.forEach(oa => console.log(oa))
+        }
+      })
+
       savedAnswer = await this.quizAnswerService.createQuizAnswer(
         manager,
         quizAnswer,
       )
+
+      console.log("quiz answer status after saving it: ", savedAnswer.status)
 
       savedUserQuizState = await this.userQuizStateService.createUserQuizState(
         manager,
@@ -372,6 +392,11 @@ export class QuizAnswerController {
         quiz,
       )
     })
+
+    console.log(
+      "Quiz answer atht the end of post answer controller: ",
+      savedAnswer,
+    )
 
     if (
       savedUserQuizState.status === "open" &&

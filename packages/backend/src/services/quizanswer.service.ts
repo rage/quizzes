@@ -28,6 +28,13 @@ export default class QuizAnswerService {
     if (!quizAnswer) {
       return
     }
+
+    console.log("right before saving")
+    const quizItemAnswer = quizAnswer.itemAnswers.find(
+      ia => ia.id === "a7319714-8524-42af-a0c5-dd0394feee23",
+    )
+    console.log("item answer: ", quizItemAnswer)
+
     return manager.save(quizAnswer)
   }
 
