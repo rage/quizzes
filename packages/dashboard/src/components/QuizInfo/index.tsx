@@ -21,7 +21,7 @@ interface IQuizInfoPropsFromState {
 
 interface IQuizInfoProps extends IQuizInfoPropsFromState {
   quizTexts: IQuizText
-  changeAttr: (attr: string, attrValue: string | number) => void
+  changeAttr: (attr: string, attrValue: string | number | boolean) => void
 }
 
 interface IQuizInfoState {
@@ -91,6 +91,8 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
               includesEssay={this.props.includesEssay}
               courseId={this.props.currentCourseId}
               courses={this.props.courses}
+              tries={this.props.edit.tries}
+              triesLimited={this.props.edit.triesLimited}
             />
           ) : (
             <ShortQuizInfo
@@ -116,12 +118,14 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
 
   public setQuizAttribute = (
     attributeName: string,
-    attributeValue: string | number,
+    attributeValue: string | number | boolean,
   ) => {
     if (
       attributeName === "part" ||
       attributeName === "section" ||
-      attributeName === "courseId"
+      attributeName === "courseId" ||
+      attributeName === "tries" ||
+      attributeName === "triesLimited"
     ) {
       this.props.changeAttr(attributeName, attributeValue)
     } else {

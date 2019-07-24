@@ -17,6 +17,7 @@ export interface IQuizText {
   languageId: string
   title: string
   body: string
+  submitMessage: string
 }
 
 export interface IQuiz {

@@ -1,17 +1,49 @@
 import {
   Button,
+  Checkbox,
   FormControl,
+  FormControlLabel,
   Grid,
+  Grow,
   InputLabel,
   MenuItem,
   Select,
   TextField,
 } from "@material-ui/core"
 import React from "react"
+import { ICourse, ILanguage, IQuizText } from "../../interfaces"
 
 const SHOW_COURSE_INFO = true
 
-class ExpandedQuizInfo extends React.Component<any, any> {
+interface IProps {
+  filterLanguage: string
+  courseLanguages: ILanguage[]
+  quizTexts: IQuizText
+  onExpand: () => void
+  onCancel: any
+  setAttribute: (attribute: string, value: string | number | boolean) => void
+  part: number
+  section: number
+  includesEssay: boolean
+  courseId: string
+  courses: ICourse[]
+  tries: number
+  triesLimited: boolean
+}
+
+interface IState {
+  title: string
+  body: string
+  submitMessage: string
+  part: number
+  section: number
+  courseId: string
+  correctedInitial: boolean
+  tries: number
+  triesLimited: boolean
+}
+
+class ExpandedQuizInfo extends React.Component<IProps, IState> {
   private attributes = [
     "title",
     "body",
@@ -19,9 +51,11 @@ class ExpandedQuizInfo extends React.Component<any, any> {
     "part",
     "section",
     "courseId",
+    "tries",
+    "triesLimited",
   ]
 
-  constructor(props) {
+  constructor(props: IProps) {
     super(props)
 
     this.state = {
@@ -31,6 +65,8 @@ class ExpandedQuizInfo extends React.Component<any, any> {
       part: props.part || 0,
       section: props.section || 0,
       courseId: props.courseId,
+      tries: props.tries,
+      triesLimited: props.triesLimited,
       correctedInitial: false,
     }
   }
@@ -76,10 +112,7 @@ class ExpandedQuizInfo extends React.Component<any, any> {
         <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
           <FormControl variant="outlined">
             <InputLabel>Language</InputLabel>
-            <Select
-              value={this.props.filterLanguage}
-              // onChange={}
-            >
+            <Select value={this.props.filterLanguage}>
               {this.props.courseLanguages.map(languageInfo => {
                 return (
                   <MenuItem value={languageInfo.id} key={languageInfo.id}>
@@ -131,10 +164,19 @@ class ExpandedQuizInfo extends React.Component<any, any> {
           </Grid>
         )}
 
+        <Grid item={true} xs={12} sm={6} lg={4} style={{ marginTop: "1rem" }}>
+          <TriesInformation
+            tries={this.state.tries}
+            triesLimited={this.state.triesLimited}
+            toggleTriesLimited={this.changeTempAttribute("triesLimited")}
+            handleTriesChange={this.changeTempAttribute("tries")}
+          />
+        </Grid>
+
         <Grid
           item={true}
           xs={12}
-          style={{ marginBottom: "2em", marginTop: "2em" }}
+          style={{ marginBottom: "2rem", marginTop: "2rem" }}
         >
           <TextField
             label="Body"
@@ -184,7 +226,11 @@ class ExpandedQuizInfo extends React.Component<any, any> {
 
   private changeTempAttribute = (attributeName: string) => e => {
     const newState = { ...this.state }
-    newState[attributeName] = e.target.value
+    if (attributeName === "triesLimited") {
+      newState.triesLimited = !this.state.triesLimited
+    } else {
+      newState[attributeName] = e.target.value
+    }
     this.setState({
       ...newState,
     })
@@ -194,6 +240,9 @@ class ExpandedQuizInfo extends React.Component<any, any> {
     this.props.setAttribute("title", this.state.title)
     this.props.setAttribute("body", this.state.body)
     this.props.setAttribute("submitMessage", this.state.submitMessage)
+    this.props.setAttribute("tries", this.state.tries)
+    this.props.setAttribute("triesLimited", this.state.triesLimited)
+
     if (SHOW_COURSE_INFO) {
       this.props.setAttribute("part", this.state.part)
       this.props.setAttribute("section", this.state.section)
@@ -201,6 +250,52 @@ class ExpandedQuizInfo extends React.Component<any, any> {
     }
     this.props.onExpand()
   }
+}
+
+interface ITriesInfoProps {
+  triesLimited: boolean
+  tries: number
+  toggleTriesLimited: (e: any) => void
+  handleTriesChange: (e: any) => void
+}
+
+const TriesInformation: React.FunctionComponent<ITriesInfoProps> = ({
+  triesLimited,
+  toggleTriesLimited,
+  tries,
+  handleTriesChange,
+}) => {
+  return (
+    <Grid container={true}>
+      <Grid item={true} xs={6}>
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={triesLimited}
+              color="primary"
+              onChange={toggleTriesLimited}
+            />
+          }
+          label="Number of tries is limited"
+        />
+      </Grid>
+
+      <Grow
+        style={{ transformOrigin: "left center" }}
+        in={triesLimited}
+        timeout={triesLimited ? 500 : 0}
+      >
+        <Grid item={true} xs={6}>
+          <TextField
+            label="Tries"
+            value={tries}
+            onChange={handleTriesChange}
+            type="number"
+          />
+        </Grid>
+      </Grow>
+    </Grid>
+  )
 }
 
 export default ExpandedQuizInfo
