@@ -85,6 +85,15 @@ export default class ValidationService {
             }
             break
           }
+
+          // or should be left without points...?
+          if (
+            !quiz.peerReviewCollections ||
+            quiz.peerReviewCollections.length === 0
+          ) {
+            points++
+          }
+
           quizAnswer.status = "submitted"
           userQuizState.peerReviewsReceived = 0
           userQuizState.peerReviewsGiven = userQuizState.peerReviewsGiven || 0
@@ -123,6 +132,7 @@ export default class ValidationService {
                   : optionTranslation.failureMessage,
             }
           })
+
           if (
             item.multi &&
             optionAnswerStatus.filter(oas => oas.selected !== oas.correctAnswer)

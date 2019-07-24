@@ -90,7 +90,6 @@ export class QuizController {
           stripped = false
         }
 
-        console.log("ANSWER: ", answer)
         if (answer.status === "submitted" || answer.status === "confirmed") {
           quizAnswer = answer
         }
