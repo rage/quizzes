@@ -3,6 +3,7 @@ import { ThunkAction, Dispatch } from "./store"
 import { getQuizInfo } from "../services/quizService"
 import * as userActions from "./user/actions"
 import * as backendAddressActions from "./backendAddress/actions"
+import * as feedbackDisplayedActions from "./feedbackDisplayed/actions"
 import * as languageActions from "./language/actions"
 import * as quizActions from "./quiz/actions"
 import * as quizAnswerActions from "./quizAnswer/actions"
@@ -22,7 +23,7 @@ export const initialize: ActionCreator<ThunkAction> = (
       backendAddress,
     )
 
-    if (!quizAnswer || (userQuizState && userQuizState.status === "open")) {
+    if (!quizAnswer) {
       quizAnswer = {
         quizId: quiz.id,
         languageId,
@@ -45,6 +46,11 @@ export const initialize: ActionCreator<ThunkAction> = (
     dispatch(languageActions.set(languageId))
     dispatch(quizActions.set(quiz))
     dispatch(quizAnswerActions.set(quizAnswer))
+    if (userQuizState.status === "open") {
+      dispatch(quizAnswerActions.setUnlocked())
+    } else {
+      dispatch(feedbackDisplayedActions.display())
+    }
     dispatch(userActions.setQuizState(userQuizState))
   } catch (e) {
     dispatch(messageActions.set(e.toString()))

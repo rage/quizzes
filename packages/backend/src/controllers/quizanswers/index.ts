@@ -285,7 +285,18 @@ export class QuizAnswerController {
     if (!answer.quizId || !answer.languageId) {
       throw new BadRequestError("Answer must contain some data")
     }
+
+    // make sure that new answer (and item/option answers) are created for each submission
     answer.userId = userId
+    answer.id = undefined
+    answer.itemAnswers.forEach(ia => {
+      ia.quizAnswerId = undefined
+      ia.id = undefined
+      ia.optionAnswers.forEach(oa => {
+        oa.quizItemAnswerId = undefined
+        oa.id = undefined
+      })
+    })
 
     // creates new user if necessary
     answer.user = new User()
@@ -373,7 +384,10 @@ export class QuizAnswerController {
       )
     })
 
-    if (savedUserQuizState.status === "open") {
+    if (
+      savedUserQuizState.status === "open" &&
+      Math.abs(savedUserQuizState.pointsAwarded - quiz.points) > 0.001
+    ) {
       return {
         userQuizState: savedUserQuizState,
         quizAnswer: savedAnswer,

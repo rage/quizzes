@@ -79,7 +79,14 @@ export class QuizController {
           this.entityManager,
         )
 
-        if (userQuizState.status === "locked") {
+        const helperQuiz = (await this.quizService.getQuizzes({
+          id: quizId,
+        }))[0]
+
+        if (
+          userQuizState.status === "locked" ||
+          Math.abs(userQuizState.pointsAwarded - helperQuiz.points) < 0.001
+        ) {
           stripped = false
         }
 
@@ -87,6 +94,7 @@ export class QuizController {
           quizAnswer = answer
         }
       }
+
       const quizzes: Quiz[] = await this.quizService.getQuizzes({
         id: quizId,
         items: true,

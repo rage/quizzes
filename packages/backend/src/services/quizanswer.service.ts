@@ -28,6 +28,7 @@ export default class QuizAnswerService {
     if (!quizAnswer) {
       return
     }
+
     return manager.save(quizAnswer)
   }
 
