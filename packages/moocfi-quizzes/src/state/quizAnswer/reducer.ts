@@ -156,12 +156,10 @@ export const quizAnswerReducer = (
       }
       const newOptionAnswers = multi
         ? [...newItemAnswer.optionAnswers].concat({
-            quizItemAnswerId: current.id,
             quizOptionId: optionId,
           })
         : [
             {
-              quizItemAnswerId: current.id,
               quizOptionId: optionId,
             },
           ]
