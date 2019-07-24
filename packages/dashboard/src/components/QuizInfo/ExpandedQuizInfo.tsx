@@ -41,6 +41,7 @@ interface IState {
   correctedInitial: boolean
   tries: number
   triesLimited: boolean
+  tryCheckBoxHasBeenUsed: boolean
 }
 
 class ExpandedQuizInfo extends React.Component<IProps, IState> {
@@ -68,6 +69,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
       tries: props.tries,
       triesLimited: props.triesLimited,
       correctedInitial: false,
+      tryCheckBoxHasBeenUsed: false,
     }
   }
 
@@ -170,6 +172,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
             triesLimited={this.state.triesLimited}
             toggleTriesLimited={this.changeTempAttribute("triesLimited")}
             handleTriesChange={this.changeTempAttribute("tries")}
+            shouldAnimateTextField={this.state.tryCheckBoxHasBeenUsed}
           />
         </Grid>
 
@@ -228,6 +231,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     const newState = { ...this.state }
     if (attributeName === "triesLimited") {
       newState.triesLimited = !this.state.triesLimited
+      newState.tryCheckBoxHasBeenUsed = true
     } else {
       newState[attributeName] = e.target.value
     }
@@ -257,6 +261,7 @@ interface ITriesInfoProps {
   tries: number
   toggleTriesLimited: (e: any) => void
   handleTriesChange: (e: any) => void
+  shouldAnimateTextField: boolean
 }
 
 const TriesInformation: React.FunctionComponent<ITriesInfoProps> = ({
@@ -264,6 +269,7 @@ const TriesInformation: React.FunctionComponent<ITriesInfoProps> = ({
   toggleTriesLimited,
   tries,
   handleTriesChange,
+  shouldAnimateTextField,
 }) => {
   return (
     <Grid container={true}>
@@ -283,7 +289,7 @@ const TriesInformation: React.FunctionComponent<ITriesInfoProps> = ({
       <Grow
         style={{ transformOrigin: "left center" }}
         in={triesLimited}
-        timeout={triesLimited ? 500 : 0}
+        timeout={triesLimited && shouldAnimateTextField ? 500 : 0}
       >
         <Grid item={true} xs={6}>
           <TextField

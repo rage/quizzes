@@ -51,11 +51,18 @@ const ShortQuizInfo: React.FunctionComponent<IProps> = ({
     </Grid>
 
     <Grid item={true} xs={12}>
-      <Typography>Tries are limited: {triesLimited ? "yes" : "no"}</Typography>
-      <Typography>Number of tries: {tries}</Typography>
+      <Typography variant="subtitle1">
+        {triesLimited
+          ? `${tries}  tr${tries > 1 ? "ies" : "y"} allowed`
+          : "No limit on the number of tries"}
+      </Typography>
     </Grid>
 
-    <Grid item={true} xs={12} style={{ marginBottom: "2em" }}>
+    <Grid
+      item={true}
+      xs={12}
+      style={{ marginBottom: "2rem", marginTop: "1rem" }}
+    >
       <TogglableQuizInstruction bodyText={body} />
     </Grid>
     <Grid item={true} xs={4}>
