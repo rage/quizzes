@@ -2,6 +2,7 @@ import { ActionCreator } from "redux"
 import { createAction } from "typesafe-actions"
 import { ThunkAction } from "../store"
 import { postAnswer } from "../../services/answerService"
+import * as feedbackDisplayedActions from "../feedbackDisplayed/actions"
 import * as userActions from "../user/actions"
 import * as quizActions from "../quiz/actions"
 import * as messageActions from "../message/actions"
@@ -62,6 +63,7 @@ export const changeChosenOption: ActionCreator<ThunkAction> = (
     return
   }
   const multi = item.multi
+  dispatch(feedbackDisplayedActions.hide())
   dispatch(chooseOption(itemId, optionId, multi))
 }
 
@@ -81,6 +83,7 @@ export const changeTextData: ActionCreator<ThunkAction> = (
   if (item === undefined) {
     return
   }
+  dispatch(feedbackDisplayedActions.hide())
   const readyToSubmit = itemAnswerReadyForSubmit(newValue, item)
   dispatch(changeTextDataAction(itemId, newValue, readyToSubmit))
 }
@@ -89,27 +92,26 @@ export const submit: ActionCreator<ThunkAction> = () => async (
   dispatch,
   getState,
 ) => {
-  const responseData = await postAnswer(
+  const { quiz, quizAnswer, userQuizState } = await postAnswer(
     getState().quizAnswer.quizAnswer,
     getState().user.accessToken,
     getState().backendAddress,
   )
 
-  dispatch(userActions.setQuizState(responseData.userQuizState))
+  dispatch(userActions.setQuizState(userQuizState))
 
-  if (responseData.userQuizState.status === "locked") {
-    dispatch(quizActions.set(responseData.quiz))
-    dispatch(set(responseData.quizAnswer))
+  if (userQuizState.status === "locked") {
+    dispatch(quizActions.set(quiz))
+    dispatch(set(quizAnswer))
+    dispatch(feedbackDisplayedActions.display())
     dispatch(setLocked())
   } else if (
-    responseData.userQuizState.pointsAwarded &&
-    Math.abs(
-      responseData.userQuizState.pointsAwarded - responseData.quiz.points,
-    ) < 0.001
+    userQuizState.pointsAwarded &&
+    Math.abs(userQuizState.pointsAwarded - quiz.points) < 0.001
   ) {
-    dispatch(quizActions.set(responseData.quiz))
-    dispatch(set(responseData.quizAnswer))
-    console.log("in the right branch")
+    dispatch(quizActions.set(quiz))
+    dispatch(set(quizAnswer))
+    dispatch(feedbackDisplayedActions.display())
   } else {
     const languageInfo = getState().language.languageLabels
     if (languageInfo) {

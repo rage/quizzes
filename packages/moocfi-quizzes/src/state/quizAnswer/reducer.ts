@@ -38,7 +38,7 @@ export const quizAnswerReducer = (
       })
 
       return {
-        submitLocked: true,
+        ...state,
         itemAnswersReady: newItemAnswersReady,
         quizAnswer: newQuizAnswer,
         attemptedDisabledSubmit: state.attemptedDisabledSubmit,
@@ -166,7 +166,6 @@ export const quizAnswerReducer = (
             },
           ]
 
-      console.log("new option answers: ", newOptionAnswers)
       return {
         ...state,
         submitLocked: !readyToSubmit(newItemAnswersReady),

@@ -119,7 +119,6 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
   intData,
 }) => {
   let number_of_options = 7
-  const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const answerLocked = userQuizState && userQuizState.status === "locked"
   const minLabel = item.texts[0].minLabel

@@ -45,7 +45,6 @@ const FailureIcon = () => (
 )
 
 const RevealedChoiceButton = styled(({ selected, correct, ...others }) => {
-  console.log(correct)
   return (
     <ChoiceButton variant={selected ? "contained" : "outlined"} {...others}>
       {selected ? correct ? <SuccessIcon /> : <FailureIcon /> : ""}
@@ -171,6 +170,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
 
   const answerLocked = userQuizState && userQuizState.status === "locked"
+  const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
 
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   if (!languageInfo) {
@@ -178,7 +178,6 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
   }
 
   const multipleChoiceLabels = languageInfo.multipleChoice
-  const generalLabels = languageInfo.general
 
   const { title, body, successMessage, failureMessage } = item.texts[0]
 
@@ -202,7 +201,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
         </Typography>
       )}
 
-      {answerLocked &&
+      {displayFeedback &&
         !onlyOneItem &&
         ((itemAnswer.correct && successMessage) ||
           (!itemAnswer.correct && failureMessage)) && (
@@ -238,6 +237,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
   const item = items.find(i => i.id === option.quizItemId)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
+
+  const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
+
   if (!item) {
     // should be impossible
     return <div>Cannot find related item</div>
@@ -275,7 +277,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
       : "red"
     : "white"
 
-  if (!answerLocked) {
+  if (!displayFeedback) {
     return (
       <Grid item={true} sm={optionWidth} key={option.id}>
         <ChoiceButton
@@ -290,6 +292,10 @@ const Option: React.FunctionComponent<OptionProps> = ({
     )
   }
 
+  const clickOptions = answerLocked
+    ? {}
+    : { onClick: handleOptionChange(option.id) }
+
   if (onlyOneItem) {
     return (
       <Grid item={true} key={option.id}>
@@ -298,6 +304,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             <RevealedChoiceButton
               selected={optionIsSelected}
               correct={option.correct}
+              {...clickOptions}
               fullWidth
             >
               {text.title}
@@ -317,10 +324,11 @@ const Option: React.FunctionComponent<OptionProps> = ({
   }
 
   return (
-    <Grid item={true} key={option.id}>
+    <Grid item={true} sm={optionWidth}>
       <RevealedChoiceButton
         selected={optionIsSelected}
         correct={option.correct}
+        {...clickOptions}
         fullWidth
       >
         {text.title}
