@@ -72,6 +72,8 @@ export const newQuiz = () => {
       texts: [],
       items: [],
       peerReviewCollections: [],
+      tries: 1,
+      triesLimited: true,
     }
     dispatch(set(checkForMissingTranslation(quiz)))
   }
