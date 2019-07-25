@@ -28,6 +28,14 @@ const ChoiceButton = styled(Button)`
   margin: 0.5em 0;
 `
 
+/*
+const ChoiceButton = styled(({ selected, children, ...props}) =>  <Button {...props} >{children}</Button>)`
+  text-transform: none;
+  margin: 0.5em 0;
+  ${({selected}) => selected ? 'border-width: 3px;' : ''}
+`
+*/
+
 const IconWrapper = styled.div`
   margin: 0.5rem;
 `
@@ -61,7 +69,9 @@ const RevealedChoiceButton = styled(({ selected, correct, ...others }) => {
       : props.correct
       ? `
     color: green;
-    outline-color: green;`
+    border-color: green;
+    border-width: 3px
+    `
       : ``}
 `
 
