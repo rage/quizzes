@@ -2,6 +2,7 @@ import finnishLabels from "./finnish_options"
 import englishLabels from "./english_options"
 
 export type GeneralLabels = {
+  quizLabel: string
   submitButtonLabel: string
   loginPromptLabel: string
   errorLabel: string

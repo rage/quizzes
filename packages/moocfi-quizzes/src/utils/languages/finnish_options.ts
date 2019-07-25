@@ -79,6 +79,7 @@ const finnishLabels: SingleLanguageLabels = {
     incorrectSubmitWhileTriesLeftLabel:
       "Vastauksesi oli virheellinen - voit yrittää uudelleen!",
     triesRemainingLabel: "Yrityksiä jäljellä",
+    quizLabel: "Kysely",
   },
 }
 

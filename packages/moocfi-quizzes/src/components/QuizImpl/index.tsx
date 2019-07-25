@@ -22,6 +22,8 @@ import { useTypedSelector } from "../../state/store"
 import { SpaciousTypography } from "../styleComponents"
 import { Quiz, QuizItemType } from "../../modelTypes"
 
+import TopInfoBar from "./TopInfoBar"
+
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
     essay: Essay,
@@ -142,7 +144,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   return (
     <div>
-      <Grid container={true} justify="space-between">
+      <TopInfoBar />
+      {/* (<Grid container={true} justify="space-between" style={{ backgroundColor: "red"}}>
         <Grid item={true} xs={12} md={6}>
           <SpaciousTypography variant="h5">
             {quiz.texts[0].title}
@@ -156,8 +159,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
         <Grid item={true} xs="auto">
           <QuizPointsStatus />
         </Grid>
-      </Grid>
-      <div>
+      </Grid>) */}
+
+      <div style={{ padding: "1rem" }}>
         {containsPeerReviews && <StageVisualizer />}
 
         {quizItemComponents(quiz, languageId)}
