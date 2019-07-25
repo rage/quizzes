@@ -1,3 +1,4 @@
+import commonmark from "commonmark"
 import * as React from "react"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
@@ -21,8 +22,6 @@ import ResultInformation from "./ResultInformation"
 import { useTypedSelector } from "../../state/store"
 import { SpaciousTypography } from "../styleComponents"
 import { Quiz, QuizItemType } from "../../modelTypes"
-
-import showdown from "showdown"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
@@ -63,7 +62,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   const error = messageState.errorMessage
 
-  const converter = new showdown.Converter()
+  const reader = new commonmark.Parser()
+  const writer = new commonmark.HtmlRenderer()
 
   useEffect(() => {
     dispatch(initialize(id, languageId, accessToken, backendAddress))
@@ -144,6 +144,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const containsPeerReviews =
     quiz.peerReviewCollections !== null && quiz.peerReviewCollections.length > 0
 
+  const body = reader.parse(quiz.texts[0].body)
+
   return (
     <div>
       <Grid container={true} justify="space-between">
@@ -154,7 +156,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           <SpaciousTypography
             variant="body1"
             dangerouslySetInnerHTML={{
-              __html: converter.makeHtml(quiz.texts[0].body),
+              __html: writer.render(body),
             }}
           />
         </Grid>
