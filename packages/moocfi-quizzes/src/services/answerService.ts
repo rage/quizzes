@@ -3,7 +3,7 @@ import BASE_URL from "../config"
 import { Quiz, QuizAnswer, UserQuizState } from "../modelTypes"
 
 type AnswerResponse = {
-  quiz: Quiz
+  quiz?: Quiz
   quizAnswer: QuizAnswer
   userQuizState: UserQuizState
 }
