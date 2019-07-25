@@ -61,7 +61,9 @@ const RevealedChoiceButton = styled(({ selected, correct, ...others }) => {
       : props.correct
       ? `
     color: green;
-    outline-color: green;`
+    border-color: green;
+    border-width: 3px
+    `
       : ``}
 `
 
@@ -281,7 +283,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
     return (
       <Grid item={true} sm={optionWidth} key={option.id}>
         <ChoiceButton
-          variant="outlined"
+          variant={optionIsSelected ? "contained" : "outlined"}
           fullWidth
           color={optionIsSelected ? "primary" : "default"}
           onClick={handleOptionChange(option.id)}
