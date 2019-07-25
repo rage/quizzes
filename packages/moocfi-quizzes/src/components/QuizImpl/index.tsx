@@ -22,6 +22,8 @@ import { useTypedSelector } from "../../state/store"
 import { SpaciousTypography } from "../styleComponents"
 import { Quiz, QuizItemType } from "../../modelTypes"
 
+import showdown from "showdown"
+
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
     essay: Essay,
@@ -60,6 +62,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const dispatch = useDispatch()
 
   const error = messageState.errorMessage
+
+  const converter = new showdown.Converter()
 
   useEffect(() => {
     dispatch(initialize(id, languageId, accessToken, backendAddress))
@@ -149,7 +153,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           </SpaciousTypography>
           <SpaciousTypography
             variant="body1"
-            dangerouslySetInnerHTML={{ __html: quiz.texts[0].body }}
+            dangerouslySetInnerHTML={{
+              __html: converter.makeHtml(quiz.texts[0].body),
+            }}
           />
         </Grid>
 
