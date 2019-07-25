@@ -92,11 +92,16 @@ export const submit: ActionCreator<ThunkAction> = () => async (
   dispatch,
   getState,
 ) => {
-  const { quiz, quizAnswer, userQuizState } = await postAnswer(
+  let { quiz, quizAnswer, userQuizState } = await postAnswer(
     getState().quizAnswer.quizAnswer,
     getState().user.accessToken,
     getState().backendAddress,
   )
+
+  // wrong answer -> quiz not returned
+  if (!quiz) {
+    quiz = getState().quiz
+  }
 
   dispatch(userActions.setQuizState(userQuizState))
 
