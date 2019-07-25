@@ -31,6 +31,7 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
       titleHasBeenModified: item.id ? true : false,
       order: option.order,
       id: option.id,
+      correct: true,
     }))
 
     const initData = {
@@ -150,6 +151,7 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
           order: oldOptions.length,
           titleHasBeenModified: true,
           id: null,
+          correct: true,
         }),
       },
     })

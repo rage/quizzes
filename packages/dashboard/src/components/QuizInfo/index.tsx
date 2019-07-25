@@ -2,11 +2,35 @@ import { Grid, Typography } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
 import { Redirect } from "react-router-dom"
+import { ICourse, ILanguage, IQuiz, IQuizText } from "../../interfaces"
 import { changeAttr } from "../../store/edit/actions"
 import ExpandedQuizInfo from "./ExpandedQuizInfo"
 import ShortQuizInfo from "./ShortQuizInfo"
 
-class QuizInfo extends React.Component<any, any> {
+interface IQuizInfoPropsFromState {
+  filter: any
+  courseLanguages: ILanguage[]
+  part: number
+  section: number
+  includesEssay: boolean
+  courses: ICourse[]
+  currentCourseId: string
+  quizHasBeenSaved: boolean
+  edit: IQuiz
+}
+
+interface IQuizInfoProps extends IQuizInfoPropsFromState {
+  quizTexts: IQuizText
+  changeAttr: (attr: string, attrValue: string | number | boolean) => void
+}
+
+interface IQuizInfoState {
+  expanded: boolean
+  redirect: any
+  initialCorrected: boolean
+}
+
+class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
   public constructor(props) {
     super(props)
     this.state = {
@@ -67,6 +91,8 @@ class QuizInfo extends React.Component<any, any> {
               includesEssay={this.props.includesEssay}
               courseId={this.props.currentCourseId}
               courses={this.props.courses}
+              tries={this.props.edit.tries}
+              triesLimited={this.props.edit.triesLimited}
             />
           ) : (
             <ShortQuizInfo
@@ -75,6 +101,8 @@ class QuizInfo extends React.Component<any, any> {
               title={this.props.quizTexts && this.props.quizTexts.title}
               body={this.props.quizTexts && this.props.quizTexts.body}
               onExpand={this.toggleExpansion}
+              tries={this.props.edit.tries}
+              triesLimited={this.props.edit.triesLimited}
             />
           )}
         </Grid>
@@ -90,12 +118,14 @@ class QuizInfo extends React.Component<any, any> {
 
   public setQuizAttribute = (
     attributeName: string,
-    attributeValue: string | number,
+    attributeValue: string | number | boolean,
   ) => {
     if (
       attributeName === "part" ||
       attributeName === "section" ||
-      attributeName === "courseId"
+      attributeName === "courseId" ||
+      attributeName === "tries" ||
+      attributeName === "triesLimited"
     ) {
       this.props.changeAttr(attributeName, attributeValue)
     } else {
@@ -110,7 +140,7 @@ class QuizInfo extends React.Component<any, any> {
   }
 }
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = (state: any): IQuizInfoPropsFromState => {
   return {
     filter: state.filter,
     courseLanguages: state.edit.course.languages,

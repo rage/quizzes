@@ -136,7 +136,6 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
       <ChoicesContainer
         direction={direction}
         justify="space-between"
-        alignItems="center"
         singleItem={onlyOneItem}
         optionContainerWidth={optionContainerWidth}
       >
@@ -170,7 +169,10 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
   item,
   itemAnswer,
 }) => {
-  const answered = itemAnswer.id ? true : false
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
+
+  const answerLocked = userQuizState && userQuizState.status === "locked"
+  const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
 
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   if (!languageInfo) {
@@ -178,7 +180,6 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
   }
 
   const multipleChoiceLabels = languageInfo.multipleChoice
-  const generalLabels = languageInfo.general
 
   const { title, body, successMessage, failureMessage } = item.texts[0]
 
@@ -196,13 +197,13 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
         />
       )}
 
-      {!answered && item.multi && (
+      {!answerLocked && item.multi && (
         <Typography variant="subtitle1">
           {multipleChoiceLabels.chooseAllSuitableOptionsLabel}
         </Typography>
       )}
 
-      {answered &&
+      {displayFeedback &&
         !onlyOneItem &&
         ((itemAnswer.correct && successMessage) ||
           (!itemAnswer.correct && failureMessage)) && (
@@ -236,11 +237,15 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
   const items = useTypedSelector(state => state.quiz!.items)
   const item = items.find(i => i.id === option.quizItemId)
+  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
+
+  const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
+
   if (!item) {
     // should be impossible
     return <div>Cannot find related item</div>
   }
-  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const itemAnswer = quizAnswer.itemAnswers.find(
     ia => ia.quizItemId === item.id,
   )
@@ -255,7 +260,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
     dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))
 
   const optionAnswers = itemAnswer.optionAnswers
-  const answered = itemAnswer.id ? true : false
+  const answerLocked = userQuizState && userQuizState.status === "locked"
 
   const optionIsSelected = optionAnswers.some(
     oa => oa.quizOptionId === option.id,
@@ -274,7 +279,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
       : "red"
     : "white"
 
-  if (!answered) {
+  if (!displayFeedback) {
     return (
       <Grid item={true} sm={optionWidth} key={option.id}>
         <ChoiceButton
@@ -289,35 +294,43 @@ const Option: React.FunctionComponent<OptionProps> = ({
     )
   }
 
+  const clickOptions = answerLocked
+    ? {}
+    : { onClick: handleOptionChange(option.id) }
+
   if (onlyOneItem) {
     return (
-      <React.Fragment>
-        <Grid item={true} sm={optionWidth}>
-          <RevealedChoiceButton
-            selected={optionIsSelected}
-            correct={option.correct}
-            fullWidth
-          >
-            {text.title}
-          </RevealedChoiceButton>
-        </Grid>
-
-        {feedbackMessage && (
-          <Grid item>
-            <LeftBorderedTypography variant="body1" barColor={feedbackColor}>
-              {feedbackMessage}
-            </LeftBorderedTypography>
+      <Grid item={true} key={option.id}>
+        <Grid container={true} direction={direction}>
+          <Grid item={true} sm={optionWidth}>
+            <RevealedChoiceButton
+              selected={optionIsSelected}
+              correct={option.correct}
+              {...clickOptions}
+              fullWidth
+            >
+              {text.title}
+            </RevealedChoiceButton>
           </Grid>
-        )}
-      </React.Fragment>
+
+          {feedbackMessage && (
+            <Grid item>
+              <LeftBorderedTypography variant="body1" barColor={feedbackColor}>
+                {feedbackMessage}
+              </LeftBorderedTypography>
+            </Grid>
+          )}
+        </Grid>
+      </Grid>
     )
   }
 
   return (
-    <Grid item={true} key={option.id}>
+    <Grid item={true} sm={optionWidth}>
       <RevealedChoiceButton
         selected={optionIsSelected}
         correct={option.correct}
+        {...clickOptions}
         fullWidth
       >
         {text.title}

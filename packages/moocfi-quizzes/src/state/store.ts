@@ -4,6 +4,7 @@ import { composeWithDevTools } from "redux-devtools-extension/developmentOnly"
 import thunk from "redux-thunk"
 
 import { backendAddressReducer } from "./backendAddress/reducer"
+import { feedbackDisplayedReducer } from "./feedbackDisplayed/reducer"
 import { languageReducer, LanguageState } from "./language/reducer"
 import { messageReducer } from "./message/reducer"
 import { peerReviewsReducer, PeerReviewsState } from "./peerReviews/reducer"
@@ -13,6 +14,7 @@ import { userReducer, UserState } from "./user/reducer"
 import { Quiz } from "../modelTypes"
 
 import * as backendAddressActions from "./backendAddress/actions"
+import * as feedbackDisplayedActions from "./feedbackDisplayed/actions"
 import * as languageActions from "./language/actions"
 import * as messageActions from "./message/actions"
 import * as quizActions from "./quiz/actions"
@@ -22,6 +24,7 @@ import * as PeerReviewsActions from "./peerReviews/actions"
 
 const rootReducer = combineReducers({
   backendAddress: backendAddressReducer,
+  feedbackDisplayed: feedbackDisplayedReducer,
   language: languageReducer,
   message: messageReducer,
   peerReviews: peerReviewsReducer,
@@ -32,6 +35,7 @@ const rootReducer = combineReducers({
 
 const rootAction = {
   backendAction: backendAddressActions,
+  feedbackDisplayed: feedbackDisplayedActions,
   language: languageActions,
   peerReviews: PeerReviewsActions,
   message: messageActions,
@@ -42,6 +46,7 @@ const rootAction = {
 
 export interface State {
   backendAddress: string
+  feedbackDisplayed: boolean
   language: LanguageState
   peerReviews: PeerReviewsState
   message: string

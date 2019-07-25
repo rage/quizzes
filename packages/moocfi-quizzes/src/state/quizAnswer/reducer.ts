@@ -25,15 +25,20 @@ export const quizAnswerReducer = (
   action: ActionType<typeof quizAnswer>,
 ): QuizAnswerState => {
   switch (action.type) {
+    case getType(quizAnswer.setUnlocked):
+      return {
+        ...state,
+        submitLocked: false,
+      }
     case getType(quizAnswer.set):
       let newItemAnswersReady: Record<string, boolean> = {}
       let newQuizAnswer = action.payload
       newQuizAnswer.itemAnswers.forEach(ia => {
-        newItemAnswersReady[ia.quizItemId] = false
+        newItemAnswersReady[ia.quizItemId] = ia.id !== undefined
       })
 
       return {
-        submitLocked: true,
+        ...state,
         itemAnswersReady: newItemAnswersReady,
         quizAnswer: newQuizAnswer,
         attemptedDisabledSubmit: state.attemptedDisabledSubmit,
@@ -151,15 +156,14 @@ export const quizAnswerReducer = (
       }
       const newOptionAnswers = multi
         ? [...newItemAnswer.optionAnswers].concat({
-            quizItemAnswerId: state.quizAnswer.itemAnswers[0].quizAnswerId,
             quizOptionId: optionId,
           })
         : [
             {
-              quizItemAnswerId: state.quizAnswer.itemAnswers[0].quizAnswerId,
               quizOptionId: optionId,
             },
           ]
+
       return {
         ...state,
         submitLocked: !readyToSubmit(newItemAnswersReady),

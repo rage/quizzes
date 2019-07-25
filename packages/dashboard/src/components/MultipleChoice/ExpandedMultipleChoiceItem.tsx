@@ -287,13 +287,12 @@ class MultipleChoiceItem extends React.Component<any, any> {
 
   private handleSubmission = (itemId: string) => optionData => event => {
     this.handleClose()
-
     const newOption = {
       title: optionData.title,
       body: optionData.body,
       successMessage: optionData.successMessage,
       failureMessage: optionData.failureMessage,
-      correct: optionData.correct,
+      correct: optionData.correct !== null ? optionData.correct : false,
       order: this.state.tempItemData.options.length,
       quizItemId: itemId,
     }

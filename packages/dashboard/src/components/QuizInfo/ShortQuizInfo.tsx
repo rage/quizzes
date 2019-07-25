@@ -8,19 +8,33 @@ import {
 } from "@material-ui/core"
 import Create from "@material-ui/icons/Create"
 import React from "react"
+import { ILanguage } from "../../interfaces"
 import TogglableQuizInstruction from "./TogglableQuizInstruction"
 
-const ShortQuizInfo = ({
+interface IProps {
+  body: string
+  courseLanguages: ILanguage[]
+  filterLanguage: string
+  onExpand: (a: any) => any
+  title: string
+  tries: number
+  triesLimited: boolean
+}
+
+const ShortQuizInfo: React.FunctionComponent<IProps> = ({
   filterLanguage,
   courseLanguages,
   title,
   body,
   onExpand,
+  tries,
+  triesLimited,
 }) => (
   <Grid container={true} justify="space-between">
     <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
       <Typography variant="title" paragraph={true}>{`${title}`}</Typography>
     </Grid>
+
     <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
       <Select
         value={filterLanguage}
@@ -35,7 +49,20 @@ const ShortQuizInfo = ({
         })}
       </Select>
     </Grid>
-    <Grid item={true} xs={12} style={{ marginBottom: "2em" }}>
+
+    <Grid item={true} xs={12}>
+      <Typography variant="subtitle1">
+        {triesLimited
+          ? `${tries}  tr${tries > 1 ? "ies" : "y"} allowed`
+          : "No limit on the number of tries"}
+      </Typography>
+    </Grid>
+
+    <Grid
+      item={true}
+      xs={12}
+      style={{ marginBottom: "2rem", marginTop: "1rem" }}
+    >
       <TogglableQuizInstruction bodyText={body} />
     </Grid>
     <Grid item={true} xs={4}>

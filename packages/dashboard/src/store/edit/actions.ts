@@ -72,6 +72,8 @@ export const newQuiz = () => {
       texts: [],
       items: [],
       peerReviewCollections: [],
+      tries: 1,
+      triesLimited: true,
     }
     dispatch(set(checkForMissingTranslation(quiz)))
   }
@@ -164,9 +166,9 @@ export const updateMultipleOptions = (itemOrder, optionData) => {
       const optData = optionData.find(od => od.order === option.order)
       option.texts[0].title = optData.title
       option.texts[0].body = optData.body
-      ;(option.correct = optData.correct),
-        (option.texts[0].failureMessage = optData.failureMessage),
-        (option.texts[0].successMessage = optData.successMessage)
+      option.correct = optData.correct
+      option.texts[0].failureMessage = optData.failureMessage
+      option.texts[0].successMessage = optData.successMessage
     })
     dispatch(setEdit(quiz))
   }

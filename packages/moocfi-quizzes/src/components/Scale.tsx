@@ -119,9 +119,8 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
   intData,
 }) => {
   let number_of_options = 7
-  const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
-  const answered = answer.id ? true : false
-
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const answerLocked = userQuizState && userQuizState.status === "locked"
   const minLabel = item.texts[0].minLabel
   const maxLabel = item.texts[0].maxLabel
 
@@ -161,7 +160,12 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
               <StyledOptionItem key={number}>
                 <FormControlLabel
                   value={`${number}`}
-                  control={<StyledRadio color="primary" disabled={answered} />}
+                  control={
+                    <StyledRadio
+                      color="primary"
+                      disabled={answerLocked ? true : false}
+                    />
+                  }
                   label={`${number}`}
                   labelPlacement="start"
                 />
