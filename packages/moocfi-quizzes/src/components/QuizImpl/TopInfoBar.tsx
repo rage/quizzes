@@ -5,6 +5,7 @@ import { useTypedSelector } from "../../state/store"
 
 const StyledGrid = styled(({ answered, ...others }) => <Grid {...others} />)`
   padding: 1rem;
+  color: white;
   background-color: ${({ answered }) => (answered ? "#213094" : "#555f9e")};
 `
 
