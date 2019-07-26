@@ -2930,7 +2930,7 @@ https-browserify@^1.0.0:
   resolved "https://registry.yarnpkg.com/https-browserify/-/https-browserify-1.0.0.tgz#ec06c10e0a34c0f2faf199f7fd7fc78fffd03c73"
   integrity sha1-7AbBDgo0wPL68Zn3/X/Hj//QPHM=
 
-humps@^2.0.1:
+humps@^2.0.0, humps@^2.0.1:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/humps/-/humps-2.0.1.tgz#dd02ea6081bd0568dc5d073184463957ba9ef9aa"
   integrity sha1-3QLqYIG9BWjcXQcxhEY5V7qe+ao=
@@ -4874,6 +4874,13 @@ react-redux@^7.1.0:
     loose-envify "^1.4.0"
     prop-types "^15.7.2"
     react-is "^16.8.6"
+
+react-shadow@^17.1.1:
+  version "17.1.1"
+  resolved "https://registry.yarnpkg.com/react-shadow/-/react-shadow-17.1.1.tgz#948ae0e810fd20f5b65ffe2327a78e30f29b0982"
+  integrity sha512-UjzfVxwtVozqXIhMgg6Wi5P3jhyRmF2raebyyVRq1pS1832zTiYi98m31pV0MJGRL0x9kA55Jr/eYU+SAKQXRQ==
+  dependencies:
+    humps "^2.0.0"
 
 react-transition-group@^4.0.0:
   version "4.2.1"
