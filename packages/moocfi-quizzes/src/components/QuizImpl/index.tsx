@@ -2,6 +2,7 @@ import commonmark from "commonmark"
 import * as React from "react"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
+import styled from "styled-components"
 import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
 import * as quizAnswerActions from "../../state/quizAnswer/actions"
 import * as messageActions from "../../state/message/actions"
@@ -46,6 +47,14 @@ export interface QuizProps {
   accessToken: string
   backendAddress?: string
 }
+
+const SubmitButton = styled(Button)`
+  padding: 10px 20px;
+`
+
+const QuizItemContainerDiv = styled.div`
+  padding-bottom: 20px;
+`
 
 const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   id,
@@ -119,8 +128,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     return <div />
   }
 
-  console.log(quiz)
-
   let triesRemaining = quiz.tries
 
   let stillSubmittable = true
@@ -172,9 +179,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       <div>
         {containsPeerReviews && <StageVisualizer />}
 
-        <div style={{ paddingBottom: "20px" }}>
+        <QuizItemContainerDiv>
           {quizItemComponents(quiz, languageId)}
-        </div>
+        </QuizItemContainerDiv>
 
         {!stillSubmittable ? (
           <>
@@ -206,15 +213,14 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                 }
               }}
             >
-              <Button
+              <SubmitButton
                 variant="contained"
                 color="primary"
                 disabled={submitLocked}
                 onClick={handleSubmit}
-                style={{ padding: "10px 20px" }}
               >
                 {generalLabels.submitButtonLabel}
-              </Button>
+              </SubmitButton>
             </div>
           </div>
         )}
