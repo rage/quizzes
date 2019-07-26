@@ -1,3 +1,4 @@
+import commonmark from "commonmark"
 import * as React from "react"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
@@ -60,6 +61,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const dispatch = useDispatch()
 
   const error = messageState.errorMessage
+
+  const reader = new commonmark.Parser()
+  const writer = new commonmark.HtmlRenderer()
 
   useEffect(() => {
     dispatch(initialize(id, languageId, accessToken, backendAddress))
@@ -140,6 +144,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const containsPeerReviews =
     quiz.peerReviewCollections !== null && quiz.peerReviewCollections.length > 0
 
+  const body = reader.parse(quiz.texts[0].body)
+
   return (
     <div>
       <Grid container={true} justify="space-between">
@@ -149,7 +155,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           </SpaciousTypography>
           <SpaciousTypography
             variant="body1"
-            dangerouslySetInnerHTML={{ __html: quiz.texts[0].body }}
+            dangerouslySetInnerHTML={{
+              __html: writer.render(body),
+            }}
           />
         </Grid>
 
