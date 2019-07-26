@@ -24,8 +24,6 @@ import { useTypedSelector } from "../../state/store"
 import { SpaciousTypography } from "../styleComponents"
 import { Quiz, QuizItemType } from "../../modelTypes"
 
-import root from "react-shadow"
-
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
     essay: Essay,
@@ -50,6 +48,9 @@ export interface QuizProps {
 
 const SubmitButton = styled(Button)`
   padding: 10px 20px;
+  border-radius: 15px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
 `
 
 const QuizItemContainerDiv = styled.div`
