@@ -26,6 +26,10 @@ const ChoicesContainer = styled(
 const ChoiceButton = styled(Button)`
   text-transform: none;
   margin: 0.5em 0;
+  border-radius: 15px;
+  padding: 15px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
 `
 
 const IconWrapper = styled.div`
@@ -135,7 +139,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
 
       <ChoicesContainer
         direction={direction}
-        justify="space-between"
+        justify="flex-start"
         alignItems="center"
         singleItem={onlyOneItem}
         optionContainerWidth={optionContainerWidth}
@@ -314,7 +318,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
         </Grid>
 
         {feedbackMessage && (
-          <Grid item>
+          <Grid item sm={optionWidth}>
             <LeftBorderedTypography variant="body1" barColor={feedbackColor}>
               {feedbackMessage}
             </LeftBorderedTypography>

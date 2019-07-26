@@ -23,6 +23,8 @@ import { useTypedSelector } from "../../state/store"
 import { SpaciousTypography } from "../styleComponents"
 import { Quiz, QuizItemType } from "../../modelTypes"
 
+import root from "react-shadow"
+
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
     essay: Essay,
@@ -117,6 +119,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     return <div />
   }
 
+  console.log(quiz)
+
   let triesRemaining = quiz.tries
 
   let stillSubmittable = true
@@ -168,7 +172,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       <div>
         {containsPeerReviews && <StageVisualizer />}
 
-        {quizItemComponents(quiz, languageId)}
+        <div style={{ paddingBottom: "20px" }}>
+          {quizItemComponents(quiz, languageId)}
+        </div>
 
         {!stillSubmittable ? (
           <>
@@ -205,6 +211,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                 color="primary"
                 disabled={submitLocked}
                 onClick={handleSubmit}
+                style={{ padding: "10px 20px" }}
               >
                 {generalLabels.submitButtonLabel}
               </Button>
