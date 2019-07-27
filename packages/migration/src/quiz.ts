@@ -322,16 +322,13 @@ export async function migrateQuizzes(
   )
 
   logger.info("Querying inserted quizzes...")
-  const newQuizzes: { [quizID: string]: Quiz } = {}
-  const quizArr = await Quiz.createQueryBuilder("quiz")
+
+  let quizArr = await Quiz.createQueryBuilder("quiz")
     .leftJoinAndSelect("quiz.course", "course")
     .leftJoinAndSelect("course.languages", "language")
     .leftJoinAndSelect("quiz.items", "quiz_item")
     .leftJoinAndSelect("quiz_item.options", "option")
     .getMany()
-  for (const quiz of quizArr) {
-    newQuizzes[quiz.id] = quiz
-  }
 
   console.log("Removing deleted items/options")
 
@@ -405,6 +402,18 @@ export async function migrateQuizzes(
       }
     }),
   )
+
+  const newQuizzes: { [quizID: string]: Quiz } = {}
+  quizArr = await Quiz.createQueryBuilder("quiz")
+    .leftJoinAndSelect("quiz.course", "course")
+    .leftJoinAndSelect("course.languages", "language")
+    .leftJoinAndSelect("quiz.items", "quiz_item")
+    .leftJoinAndSelect("quiz_item.options", "option")
+    .getMany()
+
+  for (const quiz of quizArr) {
+    newQuizzes[quiz.id] = quiz
+  }
 
   return newQuizzes
 }
