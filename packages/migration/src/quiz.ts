@@ -103,9 +103,11 @@ export async function migrateQuizzes(
     // logger.infooldQuiz._id)
 
     const languageId = course.languages[0].id
+
     if (!course || !course.languages || !languageId) {
       throw Error(JSON.stringify(course))
     }
+
     const quiz: QueryPartialEntity<Quiz> = {
       id: getUUIDByString(oldQuiz._id),
       course,
@@ -116,7 +118,9 @@ export async function migrateQuizzes(
       createdAt: oldQuiz.createdAt,
       updatedAt: oldQuiz.updatedAt,
     }
+
     quizzes.push(quiz)
+
     if (!quiz.course) {
       logger.info("course: ", quiz.course)
     }
@@ -140,7 +144,7 @@ export async function migrateQuizzes(
     let oldChoices = safeGet(() => oldQuiz.data.choices) || []
 
     oldItems = oldItems.filter((item: any) => item !== null)
-    oldChoices = oldItems.filter((choice: any) => choice !== null)
+    oldChoices = oldChoices.filter((choice: any) => choice !== null)
 
     switch (oldQuiz.type) {
       case oldQuizTypes.ESSAY:
@@ -301,6 +305,7 @@ export async function migrateQuizzes(
   }
 
   logger.info("Inserting quizzes...", quizzes.length)
+
   await insert(Quiz, quizzes)
   await insert(QuizTranslation, quizTranslations, `"quiz_id", "language_id"`)
   await insert(QuizItem, quizItems)
@@ -317,15 +322,98 @@ export async function migrateQuizzes(
   )
 
   logger.info("Querying inserted quizzes...")
-  const newQuizzes: { [quizID: string]: Quiz } = {}
-  const quizArr = await Quiz.createQueryBuilder("quiz")
+
+  let quizArr = await Quiz.createQueryBuilder("quiz")
     .leftJoinAndSelect("quiz.course", "course")
     .leftJoinAndSelect("course.languages", "language")
     .leftJoinAndSelect("quiz.items", "quiz_item")
     .leftJoinAndSelect("quiz_item.options", "option")
     .getMany()
+
+  console.log("Removing deleted items/options")
+
+  const incomingQuizzes: { [id: string]: QueryPartialEntity<Quiz> } = {}
+
+  quizzes.forEach(quiz => {
+    const id: string = quiz.id instanceof Function ? quiz.id() : quiz.id
+    incomingQuizzes[id] = quiz
+  })
+
+  const incomingItems: { [id: string]: QueryPartialEntity<QuizItem> } = {}
+
+  quizItems.forEach(item => {
+    const id: string = item.id instanceof Function ? item.id() : item.id
+    incomingItems[id] = item
+  })
+
+  const incomingOptions: { [id: string]: QueryPartialEntity<QuizOption> } = {}
+
+  quizOptions.forEach(option => {
+    const id: string = option.id instanceof Function ? option.id() : option.id
+    incomingOptions[id] = option
+  })
+
+  const existingItems: string[] = []
+  const existingOptions: string[] = []
+
+  quizArr.forEach(quiz => {
+    if (incomingQuizzes[quiz.id]) {
+      quiz.items.forEach(item => {
+        existingItems.push(item.id)
+        item.options.forEach(option => {
+          existingOptions.push(option.id)
+        })
+      })
+    }
+  })
+
+  const itemsToDelete: string[] = []
+
+  existingItems.forEach(item => {
+    if (!incomingItems[item]) {
+      itemsToDelete.push(item)
+    }
+  })
+
+  const optionsToDelete: string[] = []
+
+  existingOptions.forEach(option => {
+    if (!incomingOptions[option]) {
+      optionsToDelete.push(option)
+    }
+  })
+
+  await Promise.all(
+    itemsToDelete.map(async item => {
+      try {
+        await QuizItem.delete(item)
+      } catch (error) {
+        console.log(`couldn't delete item ${item}`)
+      }
+    }),
+  )
+
+  await Promise.all(
+    optionsToDelete.map(async option => {
+      try {
+        await QuizOption.delete(option)
+      } catch (error) {
+        console.log(`couldn't delete option ${option}`)
+      }
+    }),
+  )
+
+  const newQuizzes: { [quizID: string]: Quiz } = {}
+  quizArr = await Quiz.createQueryBuilder("quiz")
+    .leftJoinAndSelect("quiz.course", "course")
+    .leftJoinAndSelect("course.languages", "language")
+    .leftJoinAndSelect("quiz.items", "quiz_item")
+    .leftJoinAndSelect("quiz_item.options", "option")
+    .getMany()
+
   for (const quiz of quizArr) {
     newQuizzes[quiz.id] = quiz
   }
+
   return newQuizzes
 }
