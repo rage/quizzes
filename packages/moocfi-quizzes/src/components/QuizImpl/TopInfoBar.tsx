@@ -2,11 +2,34 @@ import * as React from "react"
 import { Grid, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import { useTypedSelector } from "../../state/store"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons"
 
 const StyledGrid = styled(({ answered, ...others }) => <Grid {...others} />)`
   padding: 1rem;
   color: white;
   background-color: ${({ answered }) => (answered ? "#213094" : "#555f9e")};
+`
+
+const PointsText = styled.div`
+  font-size: 1.5rem;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  text-align: center;
+`
+
+const PointsLabelText = styled.div`
+  font-size: 1rem;
+  font-family: Roboto, Helvetica, Arial, sans-serif;
+  text-align: center;
+`
+
+const IconWrapper = styled.div`
+  font-size: 3.5rem;
+  margin: 0 1.5rem 0 0.5rem;
+`
+
+const RightMarginedGrid = styled(Grid)`
+  margin-right: 1.5rem;
 `
 
 const TopInfoBar: React.FunctionComponent = () => {
@@ -21,6 +44,8 @@ const TopInfoBar: React.FunctionComponent = () => {
 
   const title = quiz.texts[0].title
   const quizLabel = languageInfo.general.quizLabel
+  const pointsLabel = languageInfo.general.pointsLabel
+
   const receivedPoints =
     userQuizState && userQuizState.pointsAwarded
       ? userQuizState.pointsAwarded
@@ -39,14 +64,26 @@ const TopInfoBar: React.FunctionComponent = () => {
       alignItems="center"
     >
       <Grid item={true}>
-        <Typography variant="h5">{quizLabel}</Typography>
-        <Typography variant="h5">{title}</Typography>
+        <Grid container={true}>
+          <Grid item={true}>
+            <IconWrapper>
+              <FontAwesomeIcon icon={faQuestionCircle} />
+            </IconWrapper>
+          </Grid>
+
+          <Grid>
+            <Typography variant="subtitle1">{quizLabel}:</Typography>
+            <Typography variant="h5">{title}</Typography>
+          </Grid>
+        </Grid>
       </Grid>
-      <Grid item={true}>
-        <Typography variant="h4">
+
+      <RightMarginedGrid item={true}>
+        <PointsLabelText>{pointsLabel}:</PointsLabelText>
+        <PointsText>
           {formattedReceivedPoints}/{availablePoints}
-        </Typography>
-      </Grid>
+        </PointsText>
+      </RightMarginedGrid>
     </StyledGrid>
   )
 }

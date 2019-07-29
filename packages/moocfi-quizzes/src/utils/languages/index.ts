@@ -12,6 +12,7 @@ export type GeneralLabels = {
   answerIncorrectLabel: string
   alreadyAnsweredLabel: string
   answerMissingBecauseQuizModifiedLabel: string
+  pointsLabel: string
   pointsAvailableLabel: string
   pointsReceivedLabel: string
   incorrectSubmitWhileTriesLeftLabel: string

@@ -76,6 +76,7 @@ const englishLabels: SingleLanguageLabels = {
       "The answer was incorrect - you may try again!",
     triesRemainingLabel: "Tries remaining",
     quizLabel: "Quiz",
+    pointsLabel: "Points",
   },
 }
 
