@@ -23,8 +23,9 @@ type ScaleProps = {
 
 const GridRow = styled(({ rowNumber, ...others }) => <Grid {...others} />)`
   background-color: ${({ rowNumber }) =>
-    rowNumber % 2 === 0 ? "inherit" : "#E0E0E0"};
-  padding: 0.25rem 2rem 0.25rem 1rem;
+    rowNumber % 2 === 0 ? "inherit" : "#605c980d"};
+  padding: 1rem 2rem 1rem 1rem;
+  border-radius: 5px;
 `
 
 const SmallCenteredGrid = styled(({ matchesSmall, ...others }) => (
@@ -41,7 +42,7 @@ const WideGridItem = styled(({ ...params }) => (
 `
 
 const StyledRadio = styled(Radio)`
-  padding-left: 0;
+  padding-left: 0.25rem;
 `
 
 const StyledFormLabel = styled(FormLabel)`
