@@ -23,6 +23,7 @@ import { useTypedSelector } from "../../state/store"
 import { Quiz, QuizItemType } from "../../modelTypes"
 
 import TopInfoBar from "./TopInfoBar"
+import { SpaciousTypography } from "../styleComponents"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
@@ -164,6 +165,13 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
       <div style={{ padding: "1rem" }}>
         {containsPeerReviews && <StageVisualizer />}
+
+        <SpaciousTypography
+          variant="body1"
+          dangerouslySetInnerHTML={{
+            __html: writer.render(body),
+          }}
+        />
 
         <QuizItemContainerDiv>
           {quizItemComponents(quiz, languageId)}
