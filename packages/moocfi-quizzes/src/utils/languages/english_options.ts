@@ -75,6 +75,9 @@ const englishLabels: SingleLanguageLabels = {
     incorrectSubmitWhileTriesLeftLabel:
       "The answer was incorrect - you may try again!",
     triesRemainingLabel: "Tries remaining",
+    quizLabel: "Quiz",
+    pointsLabel: "Points",
+    triesNotLimitedLabel: "Number of tries is unlimited",
   },
 }
 

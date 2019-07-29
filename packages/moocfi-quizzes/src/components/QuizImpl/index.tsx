@@ -18,11 +18,12 @@ import Essay from "../Essay"
 import StageVisualizer from "../PeerReviews/StageVisualizer"
 import PeerReviews from "../PeerReviews"
 import Unsupported from "../Unsupported"
-import QuizPointsStatus from "./QuizPointsStatus"
 import ResultInformation from "./ResultInformation"
 import { useTypedSelector } from "../../state/store"
-import { SpaciousTypography } from "../styleComponents"
 import { Quiz, QuizItemType } from "../../modelTypes"
+
+import TopInfoBar from "./TopInfoBar"
+import { SpaciousTypography } from "../styleComponents"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
@@ -160,25 +161,17 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   return (
     <div>
-      <Grid container={true} justify="space-between">
-        <Grid item={true} xs={12} md={6}>
-          <SpaciousTypography variant="h5">
-            {quiz.texts[0].title}
-          </SpaciousTypography>
-          <SpaciousTypography
-            variant="body1"
-            dangerouslySetInnerHTML={{
-              __html: writer.render(body),
-            }}
-          />
-        </Grid>
+      <TopInfoBar />
 
-        <Grid item={true} xs="auto">
-          <QuizPointsStatus />
-        </Grid>
-      </Grid>
-      <div>
+      <div style={{ padding: "1rem" }}>
         {containsPeerReviews && <StageVisualizer />}
+
+        <SpaciousTypography
+          variant="body1"
+          dangerouslySetInnerHTML={{
+            __html: writer.render(body),
+          }}
+        />
 
         <QuizItemContainerDiv>
           {quizItemComponents(quiz, languageId)}
@@ -202,27 +195,33 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
               </Typography>
             )}
 
-            <Typography>
-              {quiz.triesLimited
-                ? `${generalLabels.triesRemainingLabel}: ${triesRemaining}`
-                : ""}
-            </Typography>
-            <div
-              onClick={e => {
-                if (submitLocked) {
-                  dispatch(quizAnswerActions.noticeDisabledSubmitAttempt())
-                }
-              }}
-            >
-              <SubmitButton
-                variant="contained"
-                color="primary"
-                disabled={submitLocked}
-                onClick={handleSubmit}
+            <Grid container={true} alignItems="center" spacing={2}>
+              <Grid
+                item={true}
+                onClick={e => {
+                  if (submitLocked) {
+                    dispatch(quizAnswerActions.noticeDisabledSubmitAttempt())
+                  }
+                }}
               >
-                {generalLabels.submitButtonLabel}
-              </SubmitButton>
-            </div>
+                <SubmitButton
+                  variant="contained"
+                  color="primary"
+                  disabled={submitLocked}
+                  onClick={handleSubmit}
+                >
+                  {generalLabels.submitButtonLabel}
+                </SubmitButton>
+              </Grid>
+
+              <Grid item={true}>
+                <Typography>
+                  {quiz.triesLimited
+                    ? `${generalLabels.triesRemainingLabel}: ${triesRemaining}`
+                    : generalLabels.triesNotLimitedLabel}
+                </Typography>
+              </Grid>
+            </Grid>
           </div>
         )}
       </div>
