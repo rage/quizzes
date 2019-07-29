@@ -20,15 +20,15 @@ interface ISubmitHelperTypographyProps {
 
 const SubmitHelperTypography = styled(Typography)<ISubmitHelperTypographyProps>`
   && {
-    
+    padding-top: .5rem;
     color: ${({ attemptWasRecentlyMade }) =>
       attemptWasRecentlyMade ? "red" : "gray"};
-  font-style: ${({ attemptWasRecentlyMade }) =>
-    attemptWasRecentlyMade ? "inherit" : "italic"};
-  font-weight: ${({ attemptWasRecentlyMade }) =>
-    attemptWasRecentlyMade ? "bold" : "inherit"}
-  font-size: ${({ attemptWasRecentlyMade }) =>
-    attemptWasRecentlyMade ? "1rem" : "0.75rem"};
+    font-style: ${({ attemptWasRecentlyMade }) =>
+      attemptWasRecentlyMade ? "inherit" : "italic"};
+    font-weight: ${({ attemptWasRecentlyMade }) =>
+      attemptWasRecentlyMade ? "bold" : "inherit"}
+    font-size: ${({ attemptWasRecentlyMade }) =>
+      attemptWasRecentlyMade ? "1rem" : "0.75rem"};
   }
 `
 
