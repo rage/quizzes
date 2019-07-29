@@ -64,14 +64,14 @@ const TopInfoBar: React.FunctionComponent = () => {
       alignItems="center"
     >
       <Grid item={true}>
-        <Grid container={true}>
+        <Grid container={true} alignItems="center">
           <Grid item={true}>
             <IconWrapper>
               <FontAwesomeIcon icon={faQuestionCircle} />
             </IconWrapper>
           </Grid>
 
-          <Grid>
+          <Grid item={true}>
             <Typography variant="subtitle1">{quizLabel}:</Typography>
             <Typography variant="h5">{title}</Typography>
           </Grid>

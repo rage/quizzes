@@ -20,7 +20,6 @@ import PeerReviews from "../PeerReviews"
 import Unsupported from "../Unsupported"
 import ResultInformation from "./ResultInformation"
 import { useTypedSelector } from "../../state/store"
-import { SpaciousTypography } from "../styleComponents"
 import { Quiz, QuizItemType } from "../../modelTypes"
 
 import TopInfoBar from "./TopInfoBar"
