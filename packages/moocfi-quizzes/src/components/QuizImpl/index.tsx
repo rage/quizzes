@@ -1,6 +1,8 @@
+import commonmark from "commonmark"
 import * as React from "react"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
+import styled from "styled-components"
 import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
 import * as quizAnswerActions from "../../state/quizAnswer/actions"
 import * as messageActions from "../../state/message/actions"
@@ -45,6 +47,17 @@ export interface QuizProps {
   backendAddress?: string
 }
 
+const SubmitButton = styled(Button)`
+  padding: 10px 20px;
+  border-radius: 15px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+`
+
+const QuizItemContainerDiv = styled.div`
+  padding-bottom: 20px;
+`
+
 const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   id,
   languageId,
@@ -61,6 +74,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const dispatch = useDispatch()
 
   const error = messageState.errorMessage
+
+  const reader = new commonmark.Parser()
+  const writer = new commonmark.HtmlRenderer()
 
   useEffect(() => {
     dispatch(initialize(id, languageId, accessToken, backendAddress))
@@ -141,6 +157,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const containsPeerReviews =
     quiz.peerReviewCollections !== null && quiz.peerReviewCollections.length > 0
 
+  const body = reader.parse(quiz.texts[0].body)
+
   return (
     <div>
       <TopInfoBar />
@@ -151,7 +169,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           </SpaciousTypography>
           <SpaciousTypography
             variant="body1"
-            dangerouslySetInnerHTML={{ __html: quiz.texts[0].body }}
+            dangerouslySetInnerHTML={{
+              __html: writer.render(body),
+            }}
           />
         </Grid>
 
@@ -163,7 +183,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       <div style={{ padding: "1rem" }}>
         {containsPeerReviews && <StageVisualizer />}
 
-        {quizItemComponents(quiz, languageId)}
+        <QuizItemContainerDiv>
+          {quizItemComponents(quiz, languageId)}
+        </QuizItemContainerDiv>
 
         {!stillSubmittable ? (
           <>
@@ -195,14 +217,14 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                 }
               }}
             >
-              <Button
+              <SubmitButton
                 variant="contained"
                 color="primary"
                 disabled={submitLocked}
                 onClick={handleSubmit}
               >
                 {generalLabels.submitButtonLabel}
-              </Button>
+              </SubmitButton>
             </div>
           </div>
         )}
