@@ -25,7 +25,7 @@ const GridRow = styled(({ rowNumber, ...others }) => <Grid {...others} />)`
   background-color: ${({ rowNumber }) =>
     rowNumber % 2 === 0 ? "inherit" : "#605c980d"};
   padding: 1rem 2rem 1rem 1rem;
-  border-radius: 5px;
+  border-radius: 10px;
 `
 
 const SmallCenteredGrid = styled(({ matchesSmall, ...others }) => (
@@ -41,12 +41,28 @@ const WideGridItem = styled(({ ...params }) => (
   width: 100%;
 `
 
-const StyledRadio = styled(Radio)`
+interface IStyledRadioProps {
+  palette: any
+}
+
+const StyledRadio = styled(Radio)<IStyledRadioProps>`
   padding-left: 0.25rem;
+
+  &.MuiRadio-root {
+    color: ${({ palette }) => palette.text.secondary};
+  }
+
+  &.MuiRadio-colorPrimary.Mui-checked {
+    color: ${({ palette }) => palette.primary.main};
+  }
+
+  &.MuiRadio-colorPrimary.Mui-disabled {
+    color: ${({ palette }) => palette.action.disabled};
+  }
 `
 
 const StyledFormLabel = styled(FormLabel)`
-  &.MuiFormLabel-root {
+  && {
     color: black;
   }
 `
@@ -124,6 +140,7 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
   const answerLocked = userQuizState && userQuizState.status === "locked"
   const minLabel = item.texts[0].minLabel
   const maxLabel = item.texts[0].maxLabel
+  const theme = useTheme()
 
   if (item.minValue && item.maxValue) {
     number_of_options = item.maxValue - item.minValue + 1
@@ -165,6 +182,7 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
                     <StyledRadio
                       color="primary"
                       disabled={answerLocked ? true : false}
+                      palette={theme.palette}
                     />
                   }
                   label={`${number}`}
