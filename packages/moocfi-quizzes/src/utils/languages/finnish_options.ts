@@ -80,7 +80,8 @@ const finnishLabels: SingleLanguageLabels = {
       "Vastauksesi oli virheellinen - voit yrittää uudelleen!",
     triesRemainingLabel: "Yrityksiä jäljellä",
     quizLabel: "Kysely",
-    pointsLabel: "Label",
+    pointsLabel: "Pisteitä",
+    triesNotLimitedLabel: "Yritysten lukumäärää ei rajattu",
   },
 }
 

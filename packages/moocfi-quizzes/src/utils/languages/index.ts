@@ -17,6 +17,7 @@ export type GeneralLabels = {
   pointsReceivedLabel: string
   incorrectSubmitWhileTriesLeftLabel: string
   triesRemainingLabel: string
+  triesNotLimitedLabel: string
 }
 
 export type StageLabels = {

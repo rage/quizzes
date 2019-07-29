@@ -162,23 +162,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   return (
     <div>
       <TopInfoBar />
-      {/* (<Grid container={true} justify="space-between" style={{ backgroundColor: "red"}}>
-        <Grid item={true} xs={12} md={6}>
-          <SpaciousTypography variant="h5">
-            {quiz.texts[0].title}
-          </SpaciousTypography>
-          <SpaciousTypography
-            variant="body1"
-            dangerouslySetInnerHTML={{
-              __html: writer.render(body),
-            }}
-          />
-        </Grid>
-
-        <Grid item={true} xs="auto">
-          <QuizPointsStatus />
-        </Grid>
-      </Grid>) */}
 
       <div style={{ padding: "1rem" }}>
         {containsPeerReviews && <StageVisualizer />}
@@ -205,27 +188,33 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
               </Typography>
             )}
 
-            <Typography>
-              {quiz.triesLimited
-                ? `${generalLabels.triesRemainingLabel}: ${triesRemaining}`
-                : ""}
-            </Typography>
-            <div
-              onClick={e => {
-                if (submitLocked) {
-                  dispatch(quizAnswerActions.noticeDisabledSubmitAttempt())
-                }
-              }}
-            >
-              <SubmitButton
-                variant="contained"
-                color="primary"
-                disabled={submitLocked}
-                onClick={handleSubmit}
+            <Grid container={true} alignItems="center" spacing={2}>
+              <Grid
+                item={true}
+                onClick={e => {
+                  if (submitLocked) {
+                    dispatch(quizAnswerActions.noticeDisabledSubmitAttempt())
+                  }
+                }}
               >
-                {generalLabels.submitButtonLabel}
-              </SubmitButton>
-            </div>
+                <SubmitButton
+                  variant="contained"
+                  color="primary"
+                  disabled={submitLocked}
+                  onClick={handleSubmit}
+                >
+                  {generalLabels.submitButtonLabel}
+                </SubmitButton>
+              </Grid>
+
+              <Grid item={true}>
+                <Typography>
+                  {quiz.triesLimited
+                    ? `${generalLabels.triesRemainingLabel}: ${triesRemaining}`
+                    : generalLabels.triesNotLimitedLabel}
+                </Typography>
+              </Grid>
+            </Grid>
           </div>
         )}
       </div>

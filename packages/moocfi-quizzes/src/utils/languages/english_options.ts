@@ -77,6 +77,7 @@ const englishLabels: SingleLanguageLabels = {
     triesRemainingLabel: "Tries remaining",
     quizLabel: "Quiz",
     pointsLabel: "Points",
+    triesNotLimitedLabel: "Number of tries is unlimited",
   },
 }
 
