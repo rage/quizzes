@@ -14,16 +14,22 @@ type EssayProps = {
   item: QuizItem
 }
 
-const SubmitHelperTypography = styled(
-  ({ attemptWasRecentlyMade, ...others }) => (
-    <Typography
-      color={attemptWasRecentlyMade ? "error" : "inherit"}
-      {...others}
-    />
-  ),
-)`
+interface ISubmitHelperTypographyProps {
+  attemptWasRecentlyMade: boolean
+}
+
+const SubmitHelperTypography = styled(Typography)<ISubmitHelperTypographyProps>`
+  && {
+    
+    color: ${({ attemptWasRecentlyMade }) =>
+      attemptWasRecentlyMade ? "red" : "gray"};
   font-style: ${({ attemptWasRecentlyMade }) =>
-    attemptWasRecentlyMade ? "italic" : "inherit"};
+    attemptWasRecentlyMade ? "inherit" : "italic"};
+  font-weight: ${({ attemptWasRecentlyMade }) =>
+    attemptWasRecentlyMade ? "bold" : "inherit"}
+  font-size: ${({ attemptWasRecentlyMade }) =>
+    attemptWasRecentlyMade ? "1rem" : "0.75rem"};
+  }
 `
 
 const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
