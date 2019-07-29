@@ -14,13 +14,13 @@ const StyledGrid = styled(({ answered, ...others }) => <Grid {...others} />)`
 const PointsText = styled.div`
   font-size: 1.5rem;
   font-family: Roboto, Helvetica, Arial, sans-serif;
-  text-align: center;
+  text-align: end;
 `
 
 const PointsLabelText = styled.div`
   font-size: 1rem;
   font-family: Roboto, Helvetica, Arial, sans-serif;
-  text-align: center;
+  text-align: end;
 `
 
 const IconWrapper = styled.div`
