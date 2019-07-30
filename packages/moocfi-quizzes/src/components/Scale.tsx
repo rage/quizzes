@@ -53,7 +53,7 @@ const StyledRadio = styled(Radio)<IStyledRadioProps>`
   padding-left: 0.25rem;
 
   &.MuiRadio-root {
-    color: ${({ palette }) => palette.text.secondary};
+    color: #4f4f4f;
   }
 
   &.MuiRadio-colorPrimary.Mui-checked {

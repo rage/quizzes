@@ -22,13 +22,11 @@ const SubmitHelperTypography = styled(Typography)<ISubmitHelperTypographyProps>`
   && {
     padding-top: .5rem;
     color: ${({ attemptWasRecentlyMade }) =>
-      attemptWasRecentlyMade ? "red" : "gray"};
-    font-style: ${({ attemptWasRecentlyMade }) =>
-      attemptWasRecentlyMade ? "inherit" : "italic"};
+      attemptWasRecentlyMade ? "#AD0000" : "#595959"};
     font-weight: ${({ attemptWasRecentlyMade }) =>
       attemptWasRecentlyMade ? "bold" : "inherit"}
     font-size: ${({ attemptWasRecentlyMade }) =>
-      attemptWasRecentlyMade ? "1rem" : "0.75rem"};
+      attemptWasRecentlyMade ? "1.2rem" : "0.85rem"};
   }
 `
 
