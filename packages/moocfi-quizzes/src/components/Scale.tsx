@@ -21,10 +21,15 @@ type ScaleProps = {
   item: QuizItem
 }
 
-const GridRow = styled(({ rowNumber, ...others }) => <Grid {...others} />)`
-  background-color: ${({ rowNumber }) =>
-    rowNumber % 2 === 0 ? "inherit" : "#E0E0E0"};
-  padding: 0.25rem 2rem 0.25rem 1rem;
+interface IGridRowProps {
+  backgroundIsGray: boolean
+}
+
+const GridRow = styled(Grid)<IGridRowProps>`
+  background-color: ${({ backgroundIsGray }) =>
+    backgroundIsGray ? "#605c980d" : "inherit"};
+  padding: 1rem 2rem 1rem 1rem;
+  border-radius: 10px;
 `
 
 const SmallCenteredGrid = styled(({ matchesSmall, ...others }) => (
@@ -40,12 +45,28 @@ const WideGridItem = styled(({ ...params }) => (
   width: 100%;
 `
 
-const StyledRadio = styled(Radio)`
-  padding-left: 0;
+interface IStyledRadioProps {
+  palette: any
+}
+
+const StyledRadio = styled(Radio)<IStyledRadioProps>`
+  padding-left: 0.25rem;
+
+  &.MuiRadio-root {
+    color: ${({ palette }) => palette.text.secondary};
+  }
+
+  &.MuiRadio-colorPrimary.Mui-checked {
+    color: ${({ palette }) => palette.primary.main};
+  }
+
+  &.MuiRadio-colorPrimary.Mui-disabled {
+    color: ${({ palette }) => palette.action.disabled};
+  }
 `
 
 const StyledFormLabel = styled(FormLabel)`
-  &.MuiFormLabel-root {
+  && {
     color: black;
   }
 `
@@ -63,8 +84,39 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
     dispatch(quizAnswerActions.changeIntData(item.id, Number(value)))
   }
 
+  const backgroundShouldBeColored = (
+    items: QuizItem[],
+    itemId: string,
+  ): boolean => {
+    const scaleAndColored = items.map(qi => true)
+
+    for (let i = 0; i < items.length; i++) {
+      let qi = items[i]
+      if (i === 0) {
+        scaleAndColored[i] = false
+      } else if (items[i - 1].type !== "scale") {
+        scaleAndColored[i] = false
+      } else {
+        scaleAndColored[i] = !scaleAndColored[i - 1]
+      }
+
+      if (qi.id === itemId) {
+        return scaleAndColored[i]
+      }
+    }
+
+    return false
+  }
+
   const theme = useTheme()
   const matchesSmall = useMediaQuery(theme.breakpoints.down("xs"))
+
+  const quiz = useTypedSelector(state => state.quiz)
+
+  if (!quiz) {
+    return <div>No quiz</div>
+  }
+  const quizItems = quiz.items
 
   const itemAnswers = useTypedSelector(
     state => state.quizAnswer.quizAnswer.itemAnswers,
@@ -82,7 +134,7 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
         container={true}
         justify="flex-start"
         alignItems="center"
-        rowNumber={item.order}
+        backgroundIsGray={backgroundShouldBeColored(quizItems, item.id)}
       >
         <SmallCenteredGrid
           matchesSmall={matchesSmall}
@@ -123,6 +175,7 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
   const answerLocked = userQuizState && userQuizState.status === "locked"
   const minLabel = item.texts[0].minLabel
   const maxLabel = item.texts[0].maxLabel
+  const theme = useTheme()
 
   if (item.minValue && item.maxValue) {
     number_of_options = item.maxValue - item.minValue + 1
@@ -164,6 +217,7 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
                     <StyledRadio
                       color="primary"
                       disabled={answerLocked ? true : false}
+                      palette={theme.palette}
                     />
                   }
                   label={`${number}`}
