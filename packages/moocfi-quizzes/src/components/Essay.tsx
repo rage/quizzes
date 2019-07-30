@@ -1,13 +1,13 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { TextField } from "@material-ui/core"
 import Typography from "@material-ui/core/Typography"
 import { wordCount } from "../utils/string_tools"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { SpaciousPaper, SpaciousTypography } from "./styleComponents"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
+import { StyledTextField } from "./styleComponents"
 import { QuizItem, MiscEvent } from "../modelTypes"
 
 type EssayProps = {
@@ -87,7 +87,7 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
       <Typography>
         {essayLabels.wordLimitsGuidance(item.minWords, item.maxWords)}
       </Typography>
-      <TextField
+      <StyledTextField
         variant="outlined"
         label={essayLabels.textFieldLabel}
         value={answerText}

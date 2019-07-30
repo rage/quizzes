@@ -4,7 +4,7 @@ import styled from "styled-components"
 import { TextField, Typography } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
-import { SpaciousTypography } from "./styleComponents"
+import { SpaciousTypography, StyledTextField } from "./styleComponents"
 import { SpaciousPaper } from "./styleComponents"
 import { QuizItem, MiscEvent } from "../modelTypes"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
@@ -68,13 +68,13 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
         <Typography variant="body1">{textData}</Typography>
       </SpaciousPaper>
     ) : (
-      <TextField
+      <StyledTextField
         value={textData}
         onChange={handleTextDataChange}
         fullWidth
         margin="normal"
         variant="outlined"
-        placeholder={openLabels.placeholder}
+        label={openLabels.placeholder}
       />
     )
 
@@ -101,13 +101,13 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
   return (
     <div>
       {guidance}
-      <TextField
+      <StyledTextField
         value={textData}
         onChange={handleTextDataChange}
         fullWidth
         margin="normal"
         variant="outlined"
-        placeholder={openLabels.placeholder}
+        label={openLabels.placeholder}
       />
     </div>
   )
