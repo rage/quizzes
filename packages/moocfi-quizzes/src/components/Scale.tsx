@@ -21,9 +21,13 @@ type ScaleProps = {
   item: QuizItem
 }
 
-const GridRow = styled(({ rowNumber, ...others }) => <Grid {...others} />)`
-  background-color: ${({ rowNumber }) =>
-    rowNumber % 2 === 0 ? "inherit" : "#605c980d"};
+interface IGridRowProps {
+  backgroundIsGray: boolean
+}
+
+const GridRow = styled(Grid)<IGridRowProps>`
+  background-color: ${({ backgroundIsGray }) =>
+    backgroundIsGray ? "#605c980d" : "inherit"};
   padding: 1rem 2rem 1rem 1rem;
   border-radius: 10px;
 `
@@ -80,8 +84,39 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
     dispatch(quizAnswerActions.changeIntData(item.id, Number(value)))
   }
 
+  const backgroundShouldBeColored = (
+    items: QuizItem[],
+    itemId: string,
+  ): boolean => {
+    const scaleAndColored = items.map(qi => true)
+
+    for (let i = 0; i < items.length; i++) {
+      let qi = items[i]
+      if (i === 0) {
+        scaleAndColored[i] = false
+      } else if (items[i - 1].type !== "scale") {
+        scaleAndColored[i] = false
+      } else {
+        scaleAndColored[i] = !scaleAndColored[i - 1]
+      }
+
+      if (qi.id === itemId) {
+        return scaleAndColored[i]
+      }
+    }
+
+    return false
+  }
+
   const theme = useTheme()
   const matchesSmall = useMediaQuery(theme.breakpoints.down("xs"))
+
+  const quiz = useTypedSelector(state => state.quiz)
+
+  if (!quiz) {
+    return <div>No quiz</div>
+  }
+  const quizItems = quiz.items
 
   const itemAnswers = useTypedSelector(
     state => state.quizAnswer.quizAnswer.itemAnswers,
@@ -99,7 +134,7 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
         container={true}
         justify="flex-start"
         alignItems="center"
-        rowNumber={item.order}
+        backgroundIsGray={backgroundShouldBeColored(quizItems, item.id)}
       >
         <SmallCenteredGrid
           matchesSmall={matchesSmall}
