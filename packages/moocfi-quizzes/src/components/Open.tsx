@@ -13,10 +13,12 @@ type OpenProps = {
   item: QuizItem
 }
 
-const SolutionPaper = styled(({ correct, ...other }) => (
-  <SpaciousPaper {...other} />
-))`
-  border-left: 1rem solid ${props => (props.correct ? "green" : "red")};
+interface SolutionPaperProps {
+  correct: boolean | undefined
+}
+
+const SolutionPaper = styled(SpaciousPaper)<SolutionPaperProps>`
+  border-left: 1rem solid ${props => (props.correct ? "#047500" : "#DB0000")};
 `
 
 const Open: React.FunctionComponent<OpenProps> = ({ item }) => {

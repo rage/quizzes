@@ -20,7 +20,7 @@ interface ISubmitHelperTypographyProps {
 
 const SubmitHelperTypography = styled(Typography)<ISubmitHelperTypographyProps>`
   && {
-    padding-top: .5rem;
+    padding-top: 1rem;
     color: ${({ attemptWasRecentlyMade }) =>
       attemptWasRecentlyMade ? "#AD0000" : "#595959"};
     font-weight: ${({ attemptWasRecentlyMade }) =>

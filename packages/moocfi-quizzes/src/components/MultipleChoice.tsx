@@ -24,8 +24,8 @@ const ChoicesContainer = styled(
 `
 
 const ChoiceButton = styled(Button)`
-  text-transform: none;
-  margin: 0.5em 0;
+  text-transform: none !important;
+  margin: 0.5em 0 !important;
   border-radius: 15px;
   padding: 15px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
@@ -60,12 +60,12 @@ const RevealedChoiceButton = styled(({ selected, correct, ...others }) => {
     props.selected
       ? `
     color: white;
-    background-color: ${props.correct ? "green" : "red"};
+    background-color: ${props.correct ? "#047500" : "#DB0000"};
     `
       : props.correct
       ? `
-    color: green;
-    border-color: green;
+    color: #047500;
+    border-color: #047500;
     border-width: 3px
     `
       : ``}
@@ -84,7 +84,10 @@ const LeftBorderedTypography = styled(({ barColor, ...others }) => (
 `
 
 const SolutionTypography = styled(({ correct, ...others }) => (
-  <LeftBorderedTypography barColor={correct ? "green" : "red"} {...others} />
+  <LeftBorderedTypography
+    barColor={correct ? "#047500" : "#DB0000"}
+    {...others}
+  />
 ))`
   margin-bottom: 0;
 `
@@ -280,8 +283,8 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
   const feedbackColor = optionIsSelected
     ? option.correct
-      ? "green"
-      : "red"
+      ? "#047500"
+      : "#DB0000"
     : "white"
 
   if (!displayFeedback) {

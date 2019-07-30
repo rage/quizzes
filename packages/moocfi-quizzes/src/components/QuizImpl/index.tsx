@@ -48,14 +48,25 @@ export interface QuizProps {
 }
 
 const SubmitButton = styled(Button)`
-  padding: 10px 20px;
-  border-radius: 15px;
+  padding: 10px 20px !important;
+  border-radius: 15px !important;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-    0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+    0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2) !important;
 `
 
 const QuizItemContainerDiv = styled.div`
   padding-bottom: 20px;
+`
+
+interface IComponentWrapperProps {
+  rowNumber: number
+}
+
+const ComponentWrapper = styled.div<IComponentWrapperProps>`
+  background-color: ${props =>
+    props.rowNumber % 2 === 0 ? "inherit" : "#605c980d"};
+  border-radius: 10px;
+  padding: 1rem 2rem 1rem 1rem;
 `
 
 const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
@@ -101,9 +112,13 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       <>
         {quiz.items
           .sort((i1, i2) => i1.order - i2.order)
-          .map(item => {
+          .map((item, idx) => {
             const ItemComponent = componentsByTypeNames(item.type)
-            return <ItemComponent item={item} key={item.id} />
+            return (
+              <ComponentWrapper rowNumber={idx}>
+                <ItemComponent item={item} key={item.id} />
+              </ComponentWrapper>
+            )
           })}
       </>
     )
