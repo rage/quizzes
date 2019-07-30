@@ -28,6 +28,7 @@ export type StageLabels = {
 }
 
 export type MultipleChoiceLabels = {
+  selectCorrectAnswerLabel: string
   chooseAllSuitableOptionsLabel: string
   answerCorrectLabel: string
   answerIncorrectLabel: string

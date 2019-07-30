@@ -2,7 +2,11 @@ import * as React from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import { Button, Grid, Typography, Icon } from "@material-ui/core"
-import { GridDirection, GridSize } from "@material-ui/core/Grid"
+import {
+  GridDirection,
+  GridSize,
+  GridItemsAlignment,
+} from "@material-ui/core/Grid"
 import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
@@ -11,17 +15,23 @@ import LaterQuizItemAddition from "./LaterQuizItemAddition"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCheck } from "@fortawesome/free-solid-svg-icons"
 import { faTimes } from "@fortawesome/free-solid-svg-icons"
+import commonmark from "commonmark"
 
-const ChoicesContainer = styled(
+/*const ChoicesContainer = styled(
   ({ singleItem, optionContainerWidth, ...others }) => (
-    <Grid item={true} xs={optionContainerWidth}>
-      <Grid container={true} {...others} />
+    <Grid item container direction={singleItem ? "column" : "row"} alignItems={singleItem ? "center" : "baseline"} xs={optionContainerWidth}>
+      <Grid item container xs={singleItem ? 8 : 12} {...others} />
     </Grid>
   ),
 )`
   padding-top: 7;
-  flex-wrap: ${({ singleItem }) => (singleItem ? "nowrap" : "wrap")};
+`*/
+
+const ChoicesContainer = styled(Grid)`
+  padding-top: 7;
 `
+
+//   flex-wrap: ${({ singleItem }) => (singleItem ? "nowrap" : "wrap")};
 
 const ChoiceButton = styled(Button)`
   text-transform: none;
@@ -72,7 +82,7 @@ const RevealedChoiceButton = styled(({ selected, correct, ...others }) => {
 `
 
 const BottomMarginedGrid = styled(Grid)`
-  marginbottom: 10px;
+  margin-bottom: 10px;
 `
 
 const LeftBorderedTypography = styled(({ barColor, ...others }) => (
@@ -112,9 +122,10 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   const options = item.options
 
   let direction: GridDirection = "row"
+  let alignItems: GridItemsAlignment = "baseline"
   let questionWidth: 6 | 12 = 6
-  let optionContainerWidth: 6 | 12 = 6
-  let optionWidth: GridSize
+  let optionContainerWidth: GridSize = 6
+  let optionWidth: GridSize = "auto"
 
   if (onlyOneItem) {
     const maxOptionLength = Math.max(
@@ -122,14 +133,15 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
     )
     const width =
       maxOptionLength > 100 ? 12 : Math.ceil(maxOptionLength / (8 + 1 / 3))
-    optionContainerWidth = 12
-    optionWidth = Math.min(width, 12) as GridSize
+    optionContainerWidth = 8
+    optionWidth = 12
     questionWidth = 12
     direction = "column"
+    alignItems = "center"
   }
 
   return (
-    <BottomMarginedGrid container={true} direction={direction}>
+    <BottomMarginedGrid container direction={direction} alignItems={alignItems}>
       <ItemInformation
         item={item}
         itemAnswer={itemAnswer}
@@ -138,11 +150,10 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
       />
 
       <ChoicesContainer
-        direction={direction}
-        justify="flex-start"
-        alignItems="center"
-        singleItem={onlyOneItem}
-        optionContainerWidth={optionContainerWidth}
+        item
+        container
+        justify="space-evenly"
+        xs={optionContainerWidth}
       >
         {options
           .sort((o1, o2) => o1.order - o2.order)
@@ -151,7 +162,6 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
               <Option
                 key={option.id}
                 option={option}
-                direction={direction}
                 optionWidth={optionWidth}
               />
             )
@@ -188,17 +198,33 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 
   const { title, body, successMessage, failureMessage } = item.texts[0]
 
-  if (onlyOneItem) {
+  const reader = new commonmark.Parser()
+  const writer = new commonmark.HtmlRenderer()
+
+  const parsedBody = reader.parse(body ? body : "")
+
+  if (onlyOneItem && !answerLocked) {
+    return (
+      <Grid item xs={questionWidth}>
+        <SpaciousTypography variant="h6">
+          {item.multi
+            ? multipleChoiceLabels.chooseAllSuitableOptionsLabel
+            : multipleChoiceLabels.selectCorrectAnswerLabel}
+        </SpaciousTypography>
+      </Grid>
+    )
+  } else if (onlyOneItem) {
     return <></>
   }
+
   return (
-    <Grid item sm={questionWidth}>
+    <Grid item xs={questionWidth}>
       <SpaciousTypography variant="h6">{title}</SpaciousTypography>
 
       {body && (
         <SpaciousTypography
           variant="body1"
-          dangerouslySetInnerHTML={{ __html: body }}
+          dangerouslySetInnerHTML={{ __html: writer.render(parsedBody) }}
         />
       )}
 
@@ -229,13 +255,11 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 
 type OptionProps = {
   option: QuizItemOption
-  direction: GridDirection
   optionWidth: GridSize
 }
 
 const Option: React.FunctionComponent<OptionProps> = ({
   option,
-  direction,
   optionWidth,
 }) => {
   const dispatch = useDispatch()
@@ -286,7 +310,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
   if (!displayFeedback) {
     return (
-      <Grid item={true} sm={optionWidth} key={option.id}>
+      <Grid item={true} xs={optionWidth} key={option.id}>
         <ChoiceButton
           variant={optionIsSelected ? "contained" : "outlined"}
           fullWidth
@@ -306,7 +330,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
   if (onlyOneItem) {
     return (
       <React.Fragment>
-        <Grid item={true} sm={optionWidth}>
+        <Grid item={true} xs={optionWidth}>
           <RevealedChoiceButton
             selected={optionIsSelected}
             correct={option.correct}
@@ -318,7 +342,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
         </Grid>
 
         {feedbackMessage && (
-          <Grid item sm={optionWidth}>
+          <Grid item xs={optionWidth}>
             <LeftBorderedTypography variant="body1" barColor={feedbackColor}>
               {feedbackMessage}
             </LeftBorderedTypography>
@@ -329,7 +353,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
   }
 
   return (
-    <Grid item={true} sm={optionWidth}>
+    <Grid item={true} xs={optionWidth}>
       <RevealedChoiceButton
         selected={optionIsSelected}
         correct={option.correct}
