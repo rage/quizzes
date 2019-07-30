@@ -49,6 +49,7 @@ const englishLabels: SingleLanguageLabels = {
       `Question of type '${itemType}' is not supported.`,
   },
   multipleChoice: {
+    selectCorrectAnswerLabel: "Select correct answer",
     chooseAllSuitableOptionsLabel: "Choose all suitable options",
     answerCorrectLabel: "Correct",
     answerIncorrectLabel: "Incorrect",

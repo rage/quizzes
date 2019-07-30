@@ -53,6 +53,7 @@ const finnishLabels: SingleLanguageLabels = {
       `Kysymystyyppiä'${itemType}' ei tueta.`,
   },
   multipleChoice: {
+    selectCorrectAnswerLabel: "Valitse oikea vaihtoehto",
     chooseAllSuitableOptionsLabel: "Valitse kaikki sopivat vaihtoehdot.",
     answerCorrectLabel: "Oikein",
     answerIncorrectLabel: "Väärin",
