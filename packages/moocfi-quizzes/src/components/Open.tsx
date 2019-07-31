@@ -1,13 +1,14 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { TextField, Typography } from "@material-ui/core"
+import { Typography } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
-import { SpaciousTypography, StyledTextField } from "./styleComponents"
+import { StyledTextField } from "./styleComponents"
 import { SpaciousPaper } from "./styleComponents"
 import { QuizItem, MiscEvent } from "../modelTypes"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
+import MarkdownText from "./MarkdownText"
 
 type OpenProps = {
   item: QuizItem
@@ -54,11 +55,8 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
 
   const guidance = (
     <>
-      <SpaciousTypography variant="h6">{itemTitle}</SpaciousTypography>
-      <SpaciousTypography
-        variant="body1"
-        dangerouslySetInnerHTML={{ __html: item.texts[0].body }}
-      />
+      <MarkdownText variant="h6">{itemTitle}</MarkdownText>
+      <MarkdownText variant="body1">{item.texts[0].body}</MarkdownText>
     </>
   )
 
@@ -89,11 +87,11 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
         }
         {answerPortion}
         <SolutionPaper correct={correct}>
-          <Typography variant="body1">
+          <MarkdownText Component={Typography} variant="body1">
             {correct
               ? successMessage || openLabels.feedbackForSuccess
               : failureMessage || openLabels.feedbackForFailure}
-          </Typography>
+          </MarkdownText>
         </SolutionPaper>
       </div>
     )
@@ -103,6 +101,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
     <div>
       {guidance}
       <StyledTextField
+        rowNumber={item.order}
         value={textData}
         onChange={handleTextDataChange}
         fullWidth

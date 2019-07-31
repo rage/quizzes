@@ -12,10 +12,10 @@ import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { QuizItem, QuizItemOption, QuizItemAnswer } from "../modelTypes"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
+import MarkdownText from "./MarkdownText"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCheck } from "@fortawesome/free-solid-svg-icons"
 import { faTimes } from "@fortawesome/free-solid-svg-icons"
-import commonmark from "commonmark"
 
 /*const ChoicesContainer = styled(
   ({ singleItem, optionContainerWidth, ...others }) => (
@@ -201,11 +201,6 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 
   const { title, body, successMessage, failureMessage } = item.texts[0]
 
-  const reader = new commonmark.Parser()
-  const writer = new commonmark.HtmlRenderer()
-
-  const parsedBody = reader.parse(body ? body : "")
-
   if (onlyOneItem && !answerLocked) {
     return (
       <Grid item xs={questionWidth}>
@@ -224,12 +219,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
     <Grid item xs={questionWidth}>
       <SpaciousTypography variant="h6">{title}</SpaciousTypography>
 
-      {body && (
-        <SpaciousTypography
-          variant="body1"
-          dangerouslySetInnerHTML={{ __html: writer.render(parsedBody) }}
-        />
-      )}
+      {body && <MarkdownText>{body}</MarkdownText>}
 
       {!answerLocked && item.multi && (
         <Typography variant="subtitle1">

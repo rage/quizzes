@@ -5,6 +5,7 @@ import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { QuizItem, MiscEvent } from "../modelTypes"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
+import MarkdownText from "./MarkdownText"
 
 type FeedbackProps = {
   item: QuizItem
@@ -21,6 +22,7 @@ const Feedback: React.FunctionComponent<FeedbackProps> = ({ item }) => {
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const answerLocked = userQuizState && userQuizState.status === "locked"
   const itemTitle = item.texts[0].title
+  const itemBody = item.texts[0].body
 
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
 
@@ -32,7 +34,10 @@ const Feedback: React.FunctionComponent<FeedbackProps> = ({ item }) => {
 
   return (
     <div style={{ marginBottom: 10 }}>
-      <Typography variant="subtitle1">{itemTitle}</Typography>
+      <MarkdownText Component={Typography} variant="subtitle1">
+        {itemTitle}
+      </MarkdownText>
+      <MarkdownText Component={Typography}>{itemBody}</MarkdownText>
       {answerLocked ? (
         <Typography variant="body1">{textData}</Typography>
       ) : (

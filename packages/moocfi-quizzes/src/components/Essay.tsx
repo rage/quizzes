@@ -5,9 +5,10 @@ import Typography from "@material-ui/core/Typography"
 import { wordCount } from "../utils/string_tools"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
-import { SpaciousPaper, SpaciousTypography } from "./styleComponents"
+import { SpaciousPaper } from "./styleComponents"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
 import { StyledTextField } from "./styleComponents"
+import MarkdownText from "./MarkdownText"
 import { QuizItem, MiscEvent } from "../modelTypes"
 
 type EssayProps = {
@@ -116,11 +117,10 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
 
   return (
     <div>
-      <SpaciousTypography variant="h6">{itemTitle}</SpaciousTypography>
-      <SpaciousTypography
-        variant="body1"
-        dangerouslySetInnerHTML={{ __html: itemBody }}
-      />
+      {itemTitle && <MarkdownText variant="h6">{itemTitle}</MarkdownText>}
+
+      {itemBody && <MarkdownText variant="body1">{itemBody}</MarkdownText>}
+
       {answerPortion}
     </div>
   )

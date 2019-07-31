@@ -16,6 +16,7 @@ import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { QuizItem } from "../modelTypes"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
+import MarkdownText from "./MarkdownText"
 
 type ScaleProps = {
   item: QuizItem
@@ -76,8 +77,6 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
   const theme = useTheme()
   const matchesSmall = useMediaQuery(theme.breakpoints.down("xs"))
 
-  const quiz = useTypedSelector(state => state.quiz)
-
   const itemAnswers = useTypedSelector(
     state => state.quizAnswer.quizAnswer.itemAnswers,
   )
@@ -99,7 +98,9 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
           md={4}
         >
           <StyledFormLabel>
-            <Typography variant="body1">{item.texts[0].title}</Typography>
+            <MarkdownText Component={Typography} variant="body1">
+              {item.texts[0].title}
+            </MarkdownText>
           </StyledFormLabel>
         </SmallCenteredGrid>
         <Grid item={true} xs={12} sm={7} md={8}>

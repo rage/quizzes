@@ -1,9 +1,8 @@
-import commonmark from "commonmark"
 import * as React from "react"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
+import { CircularProgress, Grid, Typography } from "@material-ui/core"
 import * as quizAnswerActions from "../../state/quizAnswer/actions"
 import * as messageActions from "../../state/message/actions"
 
@@ -24,6 +23,7 @@ import { Quiz, QuizItemType } from "../../modelTypes"
 
 import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
+import MarkdownText from "../MarkdownText"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
@@ -63,8 +63,8 @@ const ComponentWrapper = styled.div<IComponentWrapperProps>`
 `
 
 const QuizBodyTypography = styled(Typography)`
-  p {
-    margin-bottom: 0px;
+  pre {
+    margin: 0;
   }
 `
 
@@ -84,9 +84,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const dispatch = useDispatch()
 
   const error = messageState.errorMessage
-
-  const reader = new commonmark.Parser()
-  const writer = new commonmark.HtmlRenderer()
 
   useEffect(() => {
     dispatch(initialize(id, languageId, accessToken, backendAddress))
@@ -169,8 +166,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const containsPeerReviews =
     quiz.peerReviewCollections !== null && quiz.peerReviewCollections.length > 0
 
-  const body = reader.parse(quiz.texts[0].body)
-
   return (
     <div>
       <TopInfoBar />
@@ -178,12 +173,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       <div style={{ padding: "1rem" }}>
         {containsPeerReviews && <StageVisualizer />}
 
-        <QuizBodyTypography
-          variant="body1"
-          dangerouslySetInnerHTML={{
-            __html: writer.render(body),
-          }}
-        />
+        <MarkdownText>{quiz.texts[0].body}</MarkdownText>
 
         <QuizItemContainerDiv>
           {quizItemComponents(quiz, languageId)}

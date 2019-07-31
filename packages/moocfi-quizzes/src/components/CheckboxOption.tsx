@@ -6,6 +6,7 @@ import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { QuizItem } from "../modelTypes"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
+import MarkdownText from "./MarkdownText"
 
 export type CheckboxOptionProps = {
   item: QuizItem
@@ -56,9 +57,15 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
         />
       </Grid>
       <VertCenteredGrid item xs>
-        {title && <Typography variant="subtitle1">{title}</Typography>}
+        {title && (
+          <MarkdownText Component={Typography} variant="subtitle1">
+            {title}
+          </MarkdownText>
+        )}
         {body && body !== title && (
-          <Typography variant="body1">{body}</Typography>
+          <MarkdownText Component={Typography} variant="body1">
+            {body}
+          </MarkdownText>
         )}
       </VertCenteredGrid>
     </Grid>
