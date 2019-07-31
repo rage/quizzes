@@ -24,7 +24,6 @@ import { Quiz, QuizItemType } from "../../modelTypes"
 
 import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
-import { SpaciousTypography } from "../styleComponents"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
@@ -61,6 +60,12 @@ const ComponentWrapper = styled.div<IComponentWrapperProps>`
     props.rowNumber % 2 === 0 ? "inherit" : "#605c980d"};
   border-radius: 10px;
   padding: 1rem 2rem 1rem 1rem;
+`
+
+const QuizBodyTypography = styled(Typography)`
+  p {
+    margin-bottom: 0px;
+  }
 `
 
 const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
@@ -173,7 +178,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       <div style={{ padding: "1rem" }}>
         {containsPeerReviews && <StageVisualizer />}
 
-        <SpaciousTypography
+        <QuizBodyTypography
           variant="body1"
           dangerouslySetInnerHTML={{
             __html: writer.render(body),
