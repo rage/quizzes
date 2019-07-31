@@ -11,6 +11,7 @@ const initialValue: QuizAnswerState = {
   submitLocked: true,
   itemAnswersReady: {},
   attemptedDisabledSubmit: false,
+  noChangesSinceSuccessfulSubmit: false,
 }
 
 export type QuizAnswerState = {
@@ -18,6 +19,7 @@ export type QuizAnswerState = {
   submitLocked: boolean
   itemAnswersReady: Record<string, boolean>
   attemptedDisabledSubmit: boolean
+  noChangesSinceSuccessfulSubmit: boolean
 }
 
 export const quizAnswerReducer = (
@@ -45,6 +47,8 @@ export const quizAnswerReducer = (
       }
     case getType(quizAnswer.clear):
       return initialValue
+    case getType(quizAnswer.setNoChangesSinceSuccessfulSubmit):
+      return { ...state, noChangesSinceSuccessfulSubmit: true }
     case getType(quizAnswer.setLocked):
       return { ...state, submitLocked: true }
     case getType(quizAnswer.setAttemptedSubmit):
@@ -66,6 +70,7 @@ export const quizAnswerReducer = (
               : ia,
           ),
         },
+        noChangesSinceSuccessfulSubmit: false,
       }
     case getType(quizAnswer.changeTextDataAction):
       newItemAnswersReady = { ...state.itemAnswersReady }
@@ -85,6 +90,7 @@ export const quizAnswerReducer = (
               : ia,
           ),
         },
+        noChangesSinceSuccessfulSubmit: false,
       }
 
     case getType(quizAnswer.changeCheckboxData):
@@ -116,6 +122,7 @@ export const quizAnswerReducer = (
               : ia,
           ),
         },
+        noChangesSinceSuccessfulSubmit: false,
       }
     case getType(quizAnswer.chooseOption):
       newItemAnswersReady = { ...state.itemAnswersReady }
@@ -152,6 +159,7 @@ export const quizAnswerReducer = (
                   },
             ),
           },
+          noChangesSinceSuccessfulSubmit: false,
         }
       }
       const newOptionAnswers = multi
@@ -176,6 +184,7 @@ export const quizAnswerReducer = (
               : { ...ia, optionAnswers: newOptionAnswers },
           ),
         },
+        noChangesSinceSuccessfulSubmit: false,
       }
 
     default:

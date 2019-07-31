@@ -1,8 +1,9 @@
 import * as React from "react"
 import { Grid } from "@material-ui/core"
 import { QuizItem } from "../modelTypes"
-import { SpaciousTypography, SpaciousPaper } from "./styleComponents"
+import { SpaciousPaper } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
+import MarkdownText from "./MarkdownText"
 
 type Props = {
   item: QuizItem
@@ -19,9 +20,7 @@ const LaterQuizItemAddition: React.FunctionComponent<Props> = ({ item }) => {
   return (
     <Grid container={true}>
       <Grid item={true} xs={12} md={6}>
-        <SpaciousTypography>
-          {item.texts[0].title} ({item.type})
-        </SpaciousTypography>
+        <MarkdownText>{`${item.texts[0].title} (${item.type})`}</MarkdownText>
       </Grid>
       <Grid item={true} xs={12} md={6}>
         <SpaciousPaper style={{ backgroundColor: "lightgray" }}>

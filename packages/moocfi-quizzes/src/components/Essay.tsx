@@ -1,13 +1,14 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { TextField } from "@material-ui/core"
 import Typography from "@material-ui/core/Typography"
 import { wordCount } from "../utils/string_tools"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
-import { SpaciousPaper, SpaciousTypography } from "./styleComponents"
+import { SpaciousPaper } from "./styleComponents"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
+import { StyledTextField } from "./styleComponents"
+import MarkdownText from "./MarkdownText"
 import { QuizItem, MiscEvent } from "../modelTypes"
 
 type EssayProps = {
@@ -20,15 +21,13 @@ interface ISubmitHelperTypographyProps {
 
 const SubmitHelperTypography = styled(Typography)<ISubmitHelperTypographyProps>`
   && {
-    padding-top: .5rem;
+    padding-top: 1rem;
     color: ${({ attemptWasRecentlyMade }) =>
-      attemptWasRecentlyMade ? "red" : "gray"};
-    font-style: ${({ attemptWasRecentlyMade }) =>
-      attemptWasRecentlyMade ? "inherit" : "italic"};
+      attemptWasRecentlyMade ? "#AD0000" : "#595959"};
     font-weight: ${({ attemptWasRecentlyMade }) =>
       attemptWasRecentlyMade ? "bold" : "inherit"}
     font-size: ${({ attemptWasRecentlyMade }) =>
-      attemptWasRecentlyMade ? "1rem" : "0.75rem"};
+      attemptWasRecentlyMade ? "1.2rem" : "0.85rem"};
   }
 `
 
@@ -89,7 +88,8 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
       <Typography>
         {essayLabels.wordLimitsGuidance(item.minWords, item.maxWords)}
       </Typography>
-      <TextField
+      <StyledTextField
+        rowNumber={item.order}
         variant="outlined"
         label={essayLabels.textFieldLabel}
         value={answerText}
@@ -117,11 +117,10 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
 
   return (
     <div>
-      <SpaciousTypography variant="h6">{itemTitle}</SpaciousTypography>
-      <SpaciousTypography
-        variant="body1"
-        dangerouslySetInnerHTML={{ __html: itemBody }}
-      />
+      {itemTitle && <MarkdownText variant="h6">{itemTitle}</MarkdownText>}
+
+      {itemBody && <MarkdownText variant="body1">{itemBody}</MarkdownText>}
+
       {answerPortion}
     </div>
   )

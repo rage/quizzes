@@ -83,6 +83,7 @@ const finnishLabels: SingleLanguageLabels = {
     quizLabel: "Kysely",
     pointsLabel: "Pisteitä",
     triesNotLimitedLabel: "Yritysten lukumäärää ei rajattu",
+    submitGeneralFeedbackLabel: "Vastattu onnistuneesti",
   },
 }
 
