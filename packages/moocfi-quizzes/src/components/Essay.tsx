@@ -88,6 +88,7 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
         {essayLabels.wordLimitsGuidance(item.minWords, item.maxWords)}
       </Typography>
       <StyledTextField
+        rowNumber={item.order}
         variant="outlined"
         label={essayLabels.textFieldLabel}
         value={answerText}

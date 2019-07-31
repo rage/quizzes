@@ -10,7 +10,13 @@ export const SpaciousTypography = styled(Typography)`
   padding-bottom: 0.75rem;
 `
 
-export const StyledTextField = styled(TextField)`
+interface IStyledTextFieldProps {
+  rowNumber: number
+}
+
+export const StyledTextField = styled(TextField)<IStyledTextFieldProps>`
+  background-color: ${props => (props.rowNumber === 2 ? "inherit" : "#fdfdff")};
+
   .MuiOutlinedInput-notchedOutline {
     border-color: #595959;
   }

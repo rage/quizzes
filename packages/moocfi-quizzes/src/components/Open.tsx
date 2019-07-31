@@ -69,6 +69,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
       </SpaciousPaper>
     ) : (
       <StyledTextField
+        rowNumber={item.order}
         value={textData}
         onChange={handleTextDataChange}
         fullWidth
