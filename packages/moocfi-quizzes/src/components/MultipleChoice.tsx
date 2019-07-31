@@ -12,10 +12,10 @@ import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { QuizItem, QuizItemOption, QuizItemAnswer } from "../modelTypes"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
+import MarkdownText from "./MarkdownText"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCheck } from "@fortawesome/free-solid-svg-icons"
 import { faTimes } from "@fortawesome/free-solid-svg-icons"
-import commonmark from "commonmark"
 
 /*const ChoicesContainer = styled(
   ({ singleItem, optionContainerWidth, ...others }) => (
@@ -70,12 +70,12 @@ const RevealedChoiceButton = styled(({ selected, correct, ...others }) => {
     props.selected
       ? `
     color: white;
-    background-color: ${props.correct ? "green" : "red"};
+    background-color: ${props.correct ? "#047500" : "#DB0000"};
     `
       : props.correct
       ? `
-    color: green;
-    border-color: green;
+    color: #047500;
+    border-color: #047500;
     border-width: 3px
     `
       : ``}
@@ -94,7 +94,10 @@ const LeftBorderedTypography = styled(({ barColor, ...others }) => (
 `
 
 const SolutionTypography = styled(({ correct, ...others }) => (
-  <LeftBorderedTypography barColor={correct ? "green" : "red"} {...others} />
+  <LeftBorderedTypography
+    barColor={correct ? "#047500" : "#DB0000"}
+    {...others}
+  />
 ))`
   margin-bottom: 0;
 `
@@ -198,11 +201,6 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 
   const { title, body, successMessage, failureMessage } = item.texts[0]
 
-  const reader = new commonmark.Parser()
-  const writer = new commonmark.HtmlRenderer()
-
-  const parsedBody = reader.parse(body ? body : "")
-
   if (onlyOneItem && !answerLocked) {
     return (
       <Grid item xs={questionWidth}>
@@ -221,12 +219,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
     <Grid item xs={questionWidth}>
       <SpaciousTypography variant="h6">{title}</SpaciousTypography>
 
-      {body && (
-        <SpaciousTypography
-          variant="body1"
-          dangerouslySetInnerHTML={{ __html: writer.render(parsedBody) }}
-        />
-      )}
+      {body && <MarkdownText>{body}</MarkdownText>}
 
       {!answerLocked && item.multi && (
         <Typography variant="subtitle1">
@@ -304,8 +297,8 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
   const feedbackColor = optionIsSelected
     ? option.correct
-      ? "green"
-      : "red"
+      ? "#047500"
+      : "#DB0000"
     : "white"
 
   if (!displayFeedback) {

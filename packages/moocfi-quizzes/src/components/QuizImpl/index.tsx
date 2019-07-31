@@ -1,9 +1,8 @@
-import commonmark from "commonmark"
 import * as React from "react"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
+import { CircularProgress, Grid, Typography } from "@material-ui/core"
 import * as quizAnswerActions from "../../state/quizAnswer/actions"
 import * as messageActions from "../../state/message/actions"
 
@@ -23,7 +22,8 @@ import { useTypedSelector } from "../../state/store"
 import { Quiz, QuizItemType } from "../../modelTypes"
 
 import TopInfoBar from "./TopInfoBar"
-import { SpaciousTypography } from "../styleComponents"
+import SubmitButton from "./SubmitButton"
+import MarkdownText from "../MarkdownText"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
@@ -47,15 +47,25 @@ export interface QuizProps {
   backendAddress?: string
 }
 
-const SubmitButton = styled(Button)`
-  padding: 10px 20px;
-  border-radius: 15px;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-    0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
-`
-
 const QuizItemContainerDiv = styled.div`
   padding-bottom: 20px;
+`
+
+interface IComponentWrapperProps {
+  rowNumber: number
+}
+
+const ComponentWrapper = styled.div<IComponentWrapperProps>`
+  background-color: ${props =>
+    props.rowNumber % 2 === 0 ? "inherit" : "#605c980d"};
+  border-radius: 10px;
+  padding: 1rem 2rem 1rem 1rem;
+`
+
+const QuizBodyTypography = styled(Typography)`
+  pre {
+    margin: 0;
+  }
 `
 
 const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
@@ -75,9 +85,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   const error = messageState.errorMessage
 
-  const reader = new commonmark.Parser()
-  const writer = new commonmark.HtmlRenderer()
-
   useEffect(() => {
     dispatch(initialize(id, languageId, accessToken, backendAddress))
   }, [])
@@ -94,16 +101,18 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   const generalLabels = languageInfo.general
 
-  const handleSubmit = () => dispatch(quizAnswerActions.submit())
-
   const quizItemComponents = (quiz: Quiz, languageId: string) => {
     return (
       <>
         {quiz.items
           .sort((i1, i2) => i1.order - i2.order)
-          .map(item => {
+          .map((item, idx) => {
             const ItemComponent = componentsByTypeNames(item.type)
-            return <ItemComponent item={item} key={item.id} />
+            return (
+              <ComponentWrapper rowNumber={idx} key={item.id}>
+                <ItemComponent item={item} />
+              </ComponentWrapper>
+            )
           })}
       </>
     )
@@ -157,8 +166,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const containsPeerReviews =
     quiz.peerReviewCollections !== null && quiz.peerReviewCollections.length > 0
 
-  const body = reader.parse(quiz.texts[0].body)
-
   return (
     <div>
       <TopInfoBar />
@@ -166,12 +173,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       <div style={{ padding: "1rem" }}>
         {containsPeerReviews && <StageVisualizer />}
 
-        <SpaciousTypography
-          variant="body1"
-          dangerouslySetInnerHTML={{
-            __html: writer.render(body),
-          }}
-        />
+        <MarkdownText>{quiz.texts[0].body}</MarkdownText>
 
         <QuizItemContainerDiv>
           {quizItemComponents(quiz, languageId)}
@@ -204,14 +206,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                   }
                 }}
               >
-                <SubmitButton
-                  variant="contained"
-                  color="primary"
-                  disabled={submitLocked}
-                  onClick={handleSubmit}
-                >
-                  {generalLabels.submitButtonLabel}
-                </SubmitButton>
+                <SubmitButton>{generalLabels.submitButtonLabel}</SubmitButton>
               </Grid>
 
               <Grid item={true}>

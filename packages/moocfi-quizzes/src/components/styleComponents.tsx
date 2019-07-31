@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { Paper, Typography } from "@material-ui/core"
+import { Paper, TextField, Typography } from "@material-ui/core"
 
 export const SpaciousPaper = styled(Paper)`
   padding: 1rem;
@@ -8,4 +8,20 @@ export const SpaciousPaper = styled(Paper)`
 
 export const SpaciousTypography = styled(Typography)`
   padding-bottom: 0.75rem;
+`
+
+interface IStyledTextFieldProps {
+  rowNumber: number
+}
+
+export const StyledTextField = styled(TextField)<IStyledTextFieldProps>`
+  background-color: ${props => (props.rowNumber === 2 ? "inherit" : "#fdfdff")};
+
+  .MuiOutlinedInput-notchedOutline {
+    border-color: #595959;
+  }
+
+  .MuiFormLabel-root {
+    color: #595959;
+  }
 `

@@ -1,6 +1,7 @@
 import * as React from "react"
 import { useTypedSelector } from "../../state/store"
 import { SpaciousTypography } from "../styleComponents"
+import MarkdownText from "../MarkdownText"
 
 type PeerReviewsGuidanceProps = {
   givenLabel: string
@@ -18,9 +19,7 @@ const PeerReviewsGuidance: React.FunctionComponent<
 
   return (
     <div>
-      <SpaciousTypography variant="subtitle1">
-        {guidanceText}
-      </SpaciousTypography>
+      <MarkdownText variant="subtitle1">{guidanceText}</MarkdownText>
       <SpaciousTypography variant="subtitle1">
         {givenLabel}: {given}/{required}
       </SpaciousTypography>

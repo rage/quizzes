@@ -18,6 +18,7 @@ export type GeneralLabels = {
   incorrectSubmitWhileTriesLeftLabel: string
   triesRemainingLabel: string
   triesNotLimitedLabel: string
+  submitGeneralFeedbackLabel: string
 }
 
 export type StageLabels = {

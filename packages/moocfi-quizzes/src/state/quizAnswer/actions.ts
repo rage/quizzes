@@ -15,6 +15,10 @@ export const set = createAction("quizAnswer/SET", resolve => {
 
 export const clear = createAction("quizAnswer/CLEAR")
 
+export const setNoChangesSinceSuccessfulSubmit = createAction(
+  "quizAnswer/SET_NO_CHANGES_SINCE_SUCCESSFUL_SUBMIT",
+)
+
 export const setLocked = createAction("quizAnswer/SET_LOCKED")
 
 export const setUnlocked = createAction("quizAnswer/SET_UNLOCKED")
@@ -104,6 +108,7 @@ export const submit: ActionCreator<ThunkAction> = () => async (
   }
 
   dispatch(userActions.setQuizState(userQuizState))
+  dispatch(setNoChangesSinceSuccessfulSubmit())
 
   if (userQuizState.status === "locked") {
     dispatch(quizActions.set(quiz))
