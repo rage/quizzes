@@ -22,6 +22,7 @@ import ResultInformation from "./ResultInformation"
 import { useTypedSelector } from "../../state/store"
 import { Quiz, QuizItemType } from "../../modelTypes"
 
+import SubmitSnackBar from "../SubmitSnackBar"
 import TopInfoBar from "./TopInfoBar"
 import { SpaciousTypography } from "../styleComponents"
 
@@ -82,6 +83,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
 
+  const [submitClicked, setSubmitClicked] = React.useState(false)
+
   const dispatch = useDispatch()
 
   const error = messageState.errorMessage
@@ -105,7 +108,11 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   const generalLabels = languageInfo.general
 
-  const handleSubmit = () => dispatch(quizAnswerActions.submit())
+  const handleSubmit = () => {
+    dispatch(quizAnswerActions.submit())
+    setSubmitClicked(true)
+    setTimeout(() => setSubmitClicked(false), 500)
+  }
 
   const quizItemComponents = (quiz: Quiz, languageId: string) => {
     return (
@@ -115,8 +122,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           .map((item, idx) => {
             const ItemComponent = componentsByTypeNames(item.type)
             return (
-              <ComponentWrapper rowNumber={idx}>
-                <ItemComponent item={item} key={item.id} />
+              <ComponentWrapper rowNumber={idx} key={item.id}>
+                <ItemComponent item={item} />
               </ComponentWrapper>
             )
           })}
@@ -240,6 +247,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           </div>
         )}
       </div>
+
+      <SubmitSnackBar submitClicked={submitClicked} />
     </div>
   )
 }
