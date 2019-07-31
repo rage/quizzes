@@ -22,8 +22,8 @@ import ResultInformation from "./ResultInformation"
 import { useTypedSelector } from "../../state/store"
 import { Quiz, QuizItemType } from "../../modelTypes"
 
-import SubmitSnackBar from "../SubmitSnackBar"
 import TopInfoBar from "./TopInfoBar"
+import SubmitButton from "./SubmitButton"
 import { SpaciousTypography } from "../styleComponents"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
@@ -47,13 +47,6 @@ export interface QuizProps {
   accessToken: string
   backendAddress?: string
 }
-
-const SubmitButton = styled(Button)`
-  padding: 10px 20px !important;
-  border-radius: 15px !important;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-    0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2) !important;
-`
 
 const QuizItemContainerDiv = styled.div`
   padding-bottom: 20px;
@@ -83,8 +76,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
 
-  const [submitClicked, setSubmitClicked] = React.useState(false)
-
   const dispatch = useDispatch()
 
   const error = messageState.errorMessage
@@ -107,12 +98,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   }
 
   const generalLabels = languageInfo.general
-
-  const handleSubmit = () => {
-    dispatch(quizAnswerActions.submit())
-    setSubmitClicked(true)
-    setTimeout(() => setSubmitClicked(false), 500)
-  }
 
   const quizItemComponents = (quiz: Quiz, languageId: string) => {
     return (
@@ -226,14 +211,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                   }
                 }}
               >
-                <SubmitButton
-                  variant="contained"
-                  color="primary"
-                  disabled={submitLocked}
-                  onClick={handleSubmit}
-                >
-                  {generalLabels.submitButtonLabel}
-                </SubmitButton>
+                <SubmitButton>{generalLabels.submitButtonLabel}</SubmitButton>
               </Grid>
 
               <Grid item={true}>
@@ -247,8 +225,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           </div>
         )}
       </div>
-
-      <SubmitSnackBar submitClicked={submitClicked} />
     </div>
   )
 }
