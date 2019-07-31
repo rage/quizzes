@@ -21,15 +21,6 @@ type ScaleProps = {
   item: QuizItem
 }
 
-interface IGridRowProps {
-  backgroundIsGray: boolean
-}
-
-const GridRow = styled(Grid)<IGridRowProps>`
-  padding: 1rem 2rem 1rem 1rem;
-  border-radius: 10px;
-`
-
 const SmallCenteredGrid = styled(({ matchesSmall, ...others }) => (
   <Grid {...others} />
 ))`
