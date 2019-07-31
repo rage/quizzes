@@ -34,16 +34,16 @@ const ChoicesContainer = styled(Grid)`
 //   flex-wrap: ${({ singleItem }) => (singleItem ? "nowrap" : "wrap")};
 
 const ChoiceButton = styled(Button)`
-  text-transform: none !important;
-  margin: 0.5em 0 !important;
-  border-radius: 15px !important;
-  padding: 15px !important;
+  text-transform: none;
+  margin: 0.5em 0;
+  border-radius: 15px;
+  padding: 15px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-    0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2) !important;
+    0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
 `
 
 const IconWrapper = styled.div`
-  margin: 0.5rem !importantt;
+  margin: 0.5rem;
 `
 
 const SuccessIcon = () => (
@@ -88,7 +88,7 @@ const BottomMarginedGrid = styled(Grid)`
 const LeftBorderedTypography = styled(({ barColor, ...others }) => (
   <Typography {...others} />
 ))`
-  border-left: 4px solid ${({ barColor }) => barColor} !important;
+  border-left: 4px solid ${({ barColor }) => barColor};
   padding: 3;
   margin-bottom: 5;
 `

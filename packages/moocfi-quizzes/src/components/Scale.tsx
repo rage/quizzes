@@ -40,18 +40,10 @@ interface IStyledRadioProps {
 }
 
 const StyledRadio = styled(Radio)<IStyledRadioProps>`
-  padding-left: 0.15rem !important;
+  padding-left: 0.15rem;
 
-  &.MuiRadio-root {
+  MuiRadio-root {
     color: #4f4f4f;
-  }
-
-  &.MuiRadio-colorPrimary.Mui-checked {
-    color: ${({ palette }) => palette.primary.main};
-  }
-
-  &.MuiRadio-colorPrimary.Mui-disabled {
-    color: ${({ palette }) => palette.action.disabled};
   }
 `
 
