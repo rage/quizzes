@@ -13,8 +13,11 @@ import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { QuizItem, QuizItemOption, QuizItemAnswer } from "../modelTypes"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faCheck } from "@fortawesome/free-solid-svg-icons"
-import { faTimes } from "@fortawesome/free-solid-svg-icons"
+import {
+  faCheck,
+  faTimes,
+  faExclamationCircle,
+} from "@fortawesome/free-solid-svg-icons"
 import commonmark from "commonmark"
 
 /*const ChoicesContainer = styled(
@@ -33,7 +36,12 @@ const ChoicesContainer = styled(Grid)`
 
 //   flex-wrap: ${({ singleItem }) => (singleItem ? "nowrap" : "wrap")};
 
-const ChoiceButton = styled(Button)`
+const ChoiceButton = styled(Button)<ChoiceButtonProps>`
+  ${({ onlyOneItem, selected }) =>
+    onlyOneItem
+      ? `width: 70%;
+    ${!selected ? `background-color: white;` : ``}`
+      : ``}
   text-transform: none;
   margin: 0.5em 0;
   border-radius: 15px;
@@ -41,6 +49,11 @@ const ChoiceButton = styled(Button)`
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
     0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
 `
+
+interface ChoiceButtonProps {
+  onlyOneItem: boolean
+  selected: boolean
+}
 
 const IconWrapper = styled.div`
   margin: 0.5rem;
@@ -57,6 +70,12 @@ const FailureIcon = () => (
     <FontAwesomeIcon icon={faTimes} />
   </IconWrapper>
 )
+
+const AttentionIcon = styled(FontAwesomeIcon)`
+  padding: 0 10px;
+  float: left;
+  margin-left: -10px;
+`
 
 const RevealedChoiceButton = styled(({ selected, correct, ...others }) => {
   return (
@@ -85,12 +104,14 @@ const BottomMarginedGrid = styled(Grid)`
   margin-bottom: 10px;
 `
 
-const LeftBorderedTypography = styled(({ barColor, ...others }) => (
-  <Typography {...others} />
-))`
-  border-left: 4px solid ${({ barColor }) => barColor};
-  padding: 3;
-  margin-bottom: 5;
+const LeftBorderedTypography = styled(
+  ({ barColor, onlyOneItem, ...others }) => <Typography {...others} />,
+)`
+  border-left: 6px solid ${({ barColor }) => barColor};
+  padding: 3px;
+  padding-left: 10px;
+  margin-bottom: 5px !important;
+  ${onlyOneItem => onlyOneItem && "width: 70%;"}
 `
 
 const SolutionTypography = styled(({ correct, ...others }) => (
@@ -133,7 +154,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
     )
     const width =
       maxOptionLength > 100 ? 12 : Math.ceil(maxOptionLength / (8 + 1 / 3))
-    optionContainerWidth = 8
+    optionContainerWidth = 12
     optionWidth = 12
     questionWidth = 12
     direction = "column"
@@ -157,12 +178,13 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
       >
         {options
           .sort((o1, o2) => o1.order - o2.order)
-          .map(option => {
+          .map((option, index) => {
             return (
               <Option
                 key={option.id}
                 option={option}
                 optionWidth={optionWidth}
+                shouldBeGray={index % 2 === 0}
               />
             )
           })}
@@ -242,6 +264,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
             correct={itemAnswer.correct ? true : false}
             variant="body1"
           >
+            <AttentionIcon icon={faExclamationCircle} size="3x" />
             {itemAnswer.correct
               ? multipleChoiceLabels.answerCorrectLabel
               : multipleChoiceLabels.answerIncorrectLabel}
@@ -256,11 +279,13 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 type OptionProps = {
   option: QuizItemOption
   optionWidth: GridSize
+  shouldBeGray: boolean
 }
 
 const Option: React.FunctionComponent<OptionProps> = ({
   option,
   optionWidth,
+  shouldBeGray,
 }) => {
   const dispatch = useDispatch()
 
@@ -310,8 +335,15 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
   if (!displayFeedback) {
     return (
-      <Grid item={true} xs={optionWidth} key={option.id}>
+      <OptionGridItem
+        item
+        xs={optionWidth}
+        onlyOneItem={onlyOneItem}
+        shouldBeGray={shouldBeGray}
+      >
         <ChoiceButton
+          onlyOneItem={onlyOneItem}
+          selected={optionIsSelected}
           variant={optionIsSelected ? "contained" : "outlined"}
           fullWidth
           color={optionIsSelected ? "primary" : "default"}
@@ -319,7 +351,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
         >
           {text.title}
         </ChoiceButton>
-      </Grid>
+      </OptionGridItem>
     )
   }
 
@@ -330,8 +362,14 @@ const Option: React.FunctionComponent<OptionProps> = ({
   if (onlyOneItem) {
     return (
       <React.Fragment>
-        <Grid item={true} xs={optionWidth}>
+        <OptionGridItem
+          item
+          xs={optionWidth}
+          onlyOneItem={onlyOneItem}
+          shouldBeGray={shouldBeGray}
+        >
           <RevealedChoiceButton
+            onlyOneItem={onlyOneItem}
             selected={optionIsSelected}
             correct={option.correct}
             {...clickOptions}
@@ -339,22 +377,38 @@ const Option: React.FunctionComponent<OptionProps> = ({
           >
             {text.title}
           </RevealedChoiceButton>
-        </Grid>
+        </OptionGridItem>
 
         {feedbackMessage && (
-          <Grid item xs={optionWidth}>
-            <LeftBorderedTypography variant="body1" barColor={feedbackColor}>
+          <OptionGridItem
+            item
+            xs={optionWidth}
+            onlyOneItem={onlyOneItem}
+            shouldBeGray={shouldBeGray}
+          >
+            <LeftBorderedTypography
+              variant="body1"
+              barColor={feedbackColor}
+              onlyOneItem={onlyOneItem}
+            >
+              <AttentionIcon icon={faExclamationCircle} size="3x" />
               {feedbackMessage}
             </LeftBorderedTypography>
-          </Grid>
+          </OptionGridItem>
         )}
       </React.Fragment>
     )
   }
 
   return (
-    <Grid item={true} xs={optionWidth}>
+    <OptionGridItem
+      item
+      xs={optionWidth}
+      onlyOneItem={onlyOneItem}
+      shouldBeGray={shouldBeGray}
+    >
       <RevealedChoiceButton
+        onlyOneItem={onlyOneItem}
         selected={optionIsSelected}
         correct={option.correct}
         {...clickOptions}
@@ -362,8 +416,36 @@ const Option: React.FunctionComponent<OptionProps> = ({
       >
         {text.title}
       </RevealedChoiceButton>
-    </Grid>
+    </OptionGridItem>
   )
+}
+
+const OptionGridItem = styled(Grid)<OptionGridItemProps>`
+  ${({ onlyOneItem, shouldBeGray }) =>
+    onlyOneItem
+      ? `
+      display: flex;
+      justify-content: center;
+      background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
+    `
+      : ``}
+`
+
+/*const OptionGridItem = styled(Grid)<OptionGridItemProps>`
+  ${onlyOneItem => onlyOneItem
+    ? `
+      display: flex;
+      justify-content: center;
+    `
+    : ``}
+    background-color: ${shouldBeGray => shouldBeGray
+      ? `#605c980d`
+      : `inherit`};
+`*/
+
+type OptionGridItemProps = {
+  onlyOneItem: boolean
+  shouldBeGray: boolean
 }
 
 export default MultipleChoice
