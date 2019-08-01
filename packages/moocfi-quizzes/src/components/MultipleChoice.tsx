@@ -330,7 +330,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
           color={optionIsSelected ? "primary" : "default"}
           onClick={handleOptionChange(option.id)}
         >
-          {text.title}
+          <MarkdownText Component={styled.div``} removeParagraphs>
+            {text.title}
+          </MarkdownText>
         </ChoiceButton>
       </OptionGridItem>
     )
