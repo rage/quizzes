@@ -17,9 +17,19 @@ export async function insert<T extends BaseEntity>(
   data: any[],
   primaryKeys: string = `"id"`,
 ) {
-  const saved = Promise.all(
+  const saved = await Promise.all(
     data.map(async item => {
-      return await type.create(item).save()
+      const createdItem = type.create(item)
+      try {
+        return await createdItem.save()
+      } catch (error) {
+        try {
+          await createdItem.remove()
+          return await createdItem.save()
+        } catch (error) {
+          return createdItem
+        }
+      }
     }),
   )
 
