@@ -228,7 +228,7 @@ export default class ValidationService {
       userQuizState.status = "locked"
     }
 
-    if (quiz.autoConfirm) {
+    if (quiz.awardPointsEvenIfWrong) {
       quizAnswer.status = "confirmed"
       userQuizState.pointsAwarded = quiz.points
     } else if (userQuizState.pointsAwarded < pointsAwarded) {

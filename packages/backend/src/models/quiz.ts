@@ -68,10 +68,12 @@ export class Quiz extends BaseEntity {
   }) // was: not eager
   public peerReviewCollections: PeerReviewCollection[]
 
-  @Column({ default: false })
+  @Column({ default: true })
   public autoConfirm: boolean
   @Column({ default: false })
   public excludedFromScore: boolean
+  @Column({ default: false })
+  public awardPointsEvenIfWrong: boolean
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
