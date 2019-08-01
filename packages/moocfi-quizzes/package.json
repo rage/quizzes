@@ -30,6 +30,7 @@
     "likert-react": "^0.0.0-beta6",
     "parcel": "^1.12.3",
     "react": "16.x",
+    "react-content-loader": "^4.2.2",
     "react-dom": ">= 16.3.0",
     "react-redux": "^7.1.0",
     "redux": "^4.0.1",
@@ -52,14 +53,13 @@
     "commonmark": "^0.29.0",
     "likert-react": "^0.0.0-beta6",
     "react": ">=16.0.0",
+    "react-content-loader": "^4.2.2",
     "react-dom": ">=16.0.0",
     "react-redux": ">= 7.1.0",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
     "styled-components": "^4.3.2",
     "typesafe-actions": "^4.4.2"
-  },
-  "dependencies": {
-    "react-content-loader": "^4.2.2"
   }
+
 }
