@@ -1,6 +1,6 @@
 import { useState } from "react"
 
-export function useInputWithLocalStorage(key, initialValue) {
+export function useInput(key, initialValue) {
   const [value, setValue] = useLocalStorage(key, initialValue)
 
   const onChange = e => {
@@ -10,7 +10,7 @@ export function useInputWithLocalStorage(key, initialValue) {
   return { value, onChange }
 }
 
-function useLocalStorage(key, initialValue) {
+export function useLocalStorage(key, initialValue) {
   const [storedValue, setStoredValue] = useState(() => {
     return window.localStorage.getItem(key) || initialValue
   })
