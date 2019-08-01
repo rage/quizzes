@@ -358,7 +358,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
             {...clickOptions}
             fullWidth
           >
-            {text.title}
+            <MarkdownText Component={styled.div``} removeParagraphs>
+              {text.title}
+            </MarkdownText>
           </RevealedChoiceButton>
         </OptionGridItem>
 
@@ -397,7 +399,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
         {...clickOptions}
         fullWidth
       >
-        {text.title}
+        <MarkdownText Component={styled.div``} removeParagraphs>
+          {text.title}
+        </MarkdownText>
       </RevealedChoiceButton>
     </OptionGridItem>
   )
