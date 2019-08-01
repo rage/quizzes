@@ -34,10 +34,12 @@ const RightMarginedGrid = styled(Grid)`
 `
 
 interface ITopInfoBarProps {
-  loading?: true
+  displayBars?: true
 }
 
-const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({ loading }) => {
+const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
+  displayBars,
+}) => {
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const quiz = useTypedSelector(state => state.quiz)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
@@ -54,10 +56,47 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({ loading }) => {
     pointsLabel = languageInfo.general.pointsLabel
   }
 
+  let titleReplacement
+  let pointsReplacement
+
   if (!quiz) {
     title = ""
     formattedReceivedPoints = ""
     availablePoints = ""
+
+    titleReplacement = displayBars ? (
+      <ContentLoader
+        height={40}
+        width={100}
+        speed={2}
+        primaryColor="#ffffff"
+        primaryOpacity={0.6}
+        secondaryColor="#dddddd"
+        secondaryOpacity={0.6}
+        style={{ width: "300px", height: "31.2px" }}
+      >
+        <rect x="0" y="10" rx="4" ry="20" width="100" height="30" />
+      </ContentLoader>
+    ) : (
+      <div style={{ height: "31.2px" }} />
+    )
+
+    pointsReplacement = displayBars ? (
+      <ContentLoader
+        height={40}
+        width={100}
+        speed={2}
+        primaryColor="#ffffff"
+        primaryOpacity={0.6}
+        secondaryColor="#dddddd"
+        secondaryOpacity={0.6}
+        style={{ width: "45px", height: "31.2px" }}
+      >
+        <rect x="0" y="10" rx="25" ry="25" width="100" height="30" />
+      </ContentLoader>
+    ) : (
+      <div style={{ height: "31.2px" }} />
+    )
   } else {
     title = quiz.texts[0].title
 
@@ -92,18 +131,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({ loading }) => {
             {quiz ? (
               <Typography variant="h5">{title}</Typography>
             ) : (
-              <ContentLoader
-                height={40}
-                width={100}
-                speed={2}
-                primaryColor="#ffffff"
-                primaryOpacity={0.6}
-                secondaryColor="#dddddd"
-                secondaryOpacity={0.6}
-                style={{ width: "300px", height: "31.2px" }}
-              >
-                <rect x="0" y="10" rx="4" ry="20" width="100" height="30" />
-              </ContentLoader>
+              titleReplacement
             )}
           </Grid>
         </Grid>
@@ -112,22 +140,9 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({ loading }) => {
       <RightMarginedGrid item={true}>
         <PointsLabelText>{pointsLabel}:</PointsLabelText>
         <PointsText>
-          {quiz ? (
-            `${formattedReceivedPoints}/${availablePoints}`
-          ) : (
-            <ContentLoader
-              height={40}
-              width={100}
-              speed={2}
-              primaryColor="#ffffff"
-              primaryOpacity={0.6}
-              secondaryColor="#dddddd"
-              secondaryOpacity={0.6}
-              style={{ width: "75px", height: "31.2px" }}
-            >
-              <rect x="0" y="10" rx="15" ry="15" width="100" height="30" />
-            </ContentLoader>
-          )}
+          {quiz
+            ? `${formattedReceivedPoints}/${availablePoints}`
+            : pointsReplacement}
         </PointsText>
       </RightMarginedGrid>
     </StyledGrid>
