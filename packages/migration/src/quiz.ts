@@ -26,7 +26,7 @@ export async function migrateQuizzes(
     /ai_([0-9])_([0-9])/,
     /tilpe_([0-9])_([0-9])/,
     /tito-([0-9]).([0-9])/,
-    /ohjelmoinnin-mooc-2019-([0-9])/,
+    /ohjelmoinnin-mooc-2019-([0-9]+)/,
     /tietokantojen-perusteet-k2019-([0-9])/,
     /web-palvelinohjelmointi-java-19-([0-9])/,
   ]
