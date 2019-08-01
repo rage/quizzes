@@ -8,24 +8,31 @@ import { SpaciousTypography } from "./styleComponents"
 interface IMarkdownTextProps extends TypographyProps {
   children: string
   text?: string
-  Component?: typeof Typography
+  Component?: any
+  removeParagraphs?: boolean
 }
 
 const MarkdownText: React.FunctionComponent<IMarkdownTextProps> = ({
   children,
   text,
   Component = SpaciousTypography,
+  removeParagraphs,
   ...others
 }) => {
   const reader = new commonmark.Parser()
   const writer = new commonmark.HtmlRenderer()
 
   const toBeWritten = reader.parse(children || text || "")
+  let html = writer.render(toBeWritten)
+  if (removeParagraphs) {
+    html = html.replace(/<p>/g, "<div>")
+    html = html.replace(/<\/p>/g, "</div>")
+  }
 
   return (
     <Component
       dangerouslySetInnerHTML={{
-        __html: writer.render(toBeWritten),
+        __html: html,
       }}
       {...others}
     />

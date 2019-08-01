@@ -330,7 +330,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
           color={optionIsSelected ? "primary" : "default"}
           onClick={handleOptionChange(option.id)}
         >
-          {text.title}
+          <MarkdownText Component={styled.div``} removeParagraphs>
+            {text.title}
+          </MarkdownText>
         </ChoiceButton>
       </OptionGridItem>
     )
@@ -356,7 +358,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
             {...clickOptions}
             fullWidth
           >
-            {text.title}
+            <MarkdownText Component={styled.div``} removeParagraphs>
+              {text.title}
+            </MarkdownText>
           </RevealedChoiceButton>
         </OptionGridItem>
 
@@ -395,7 +399,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
         {...clickOptions}
         fullWidth
       >
-        {text.title}
+        <MarkdownText Component={styled.div``} removeParagraphs>
+          {text.title}
+        </MarkdownText>
       </RevealedChoiceButton>
     </OptionGridItem>
   )

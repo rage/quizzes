@@ -20,6 +20,8 @@ const SubmitButton: React.FunctionComponent = () => {
   const noChangesAfterSuccessfulAnswer = useTypedSelector(
     state => state.quizAnswer.noChangesSinceSuccessfulSubmit,
   )
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
+
   const noChangesAfterLoading = useTypedSelector(
     state => state.quizAnswer.noChangesAfterLoading,
   )
@@ -30,9 +32,11 @@ const SubmitButton: React.FunctionComponent = () => {
   const generalLabels = languageInfo.general
 
   let buttonText = generalLabels.submitButtonLabel
-  if (noChangesAfterLoading) {
+
+  if (noChangesAfterLoading && userQuizState && userQuizState.tries > 0) {
     buttonText = generalLabels.submitButtonAlreadyAnsweredLabel
   }
+
   if (noChangesAfterSuccessfulAnswer) {
     buttonText = generalLabels.submitGeneralFeedbackLabel
   }

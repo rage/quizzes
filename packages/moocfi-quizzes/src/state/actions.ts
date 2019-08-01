@@ -47,7 +47,11 @@ export const initialize: ActionCreator<ThunkAction> = (
     dispatch(userActions.setToken(accessToken))
     dispatch(quizActions.set(quiz))
     dispatch(quizAnswerActions.set(quizAnswer))
-    if (userQuizState.status !== "open") {
+    if (
+      userQuizState.status !== "open" ||
+      (userQuizState.pointsAwarded &&
+        Math.abs(userQuizState.pointsAwarded - quiz.points) < 0.001)
+    ) {
       dispatch(feedbackDisplayedActions.display())
     }
     dispatch(userActions.setQuizState(userQuizState))
