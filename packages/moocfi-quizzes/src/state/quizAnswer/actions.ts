@@ -96,6 +96,8 @@ export const submit: ActionCreator<ThunkAction> = () => async (
   dispatch,
   getState,
 ) => {
+  dispatch(setLocked())
+
   let { quiz, quizAnswer, userQuizState } = await postAnswer(
     getState().quizAnswer.quizAnswer,
     getState().user.accessToken,
@@ -114,7 +116,6 @@ export const submit: ActionCreator<ThunkAction> = () => async (
     dispatch(quizActions.set(quiz))
     dispatch(set(quizAnswer))
     dispatch(feedbackDisplayedActions.display())
-    dispatch(setLocked())
   } else if (
     userQuizState.pointsAwarded &&
     Math.abs(userQuizState.pointsAwarded - quiz.points) < 0.001

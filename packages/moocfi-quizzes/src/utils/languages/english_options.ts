@@ -80,6 +80,7 @@ const englishLabels: SingleLanguageLabels = {
     pointsLabel: "Points",
     triesNotLimitedLabel: "Number of tries is unlimited",
     submitGeneralFeedbackLabel: "Submit successful",
+    submitButtonAlreadyAnsweredLabel: "Answered",
   },
 }
 

@@ -17,14 +17,25 @@ const SubmitButton: React.FunctionComponent = () => {
   const dispatch = useDispatch()
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
-  const submitTextDisplayed = useTypedSelector(
+  const noChangesAfterSuccessfulAnswer = useTypedSelector(
     state => state.quizAnswer.noChangesSinceSuccessfulSubmit,
+  )
+  const noChangesAfterLoading = useTypedSelector(
+    state => state.quizAnswer.noChangesAfterLoading,
   )
 
   if (!languageInfo) {
     return <div>language not set</div>
   }
   const generalLabels = languageInfo.general
+
+  let buttonText = generalLabels.submitButtonLabel
+  if (noChangesAfterLoading) {
+    buttonText = generalLabels.submitButtonAlreadyAnsweredLabel
+  }
+  if (noChangesAfterSuccessfulAnswer) {
+    buttonText = generalLabels.submitGeneralFeedbackLabel
+  }
 
   const handleSubmit = () => {
     dispatch(quizAnswerActions.submit())
@@ -37,9 +48,7 @@ const SubmitButton: React.FunctionComponent = () => {
       disabled={submitLocked}
       onClick={handleSubmit}
     >
-      {submitTextDisplayed
-        ? generalLabels.submitGeneralFeedbackLabel
-        : generalLabels.submitButtonLabel}
+      {buttonText}
     </StyledSubmitButton>
   )
 }

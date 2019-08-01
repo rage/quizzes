@@ -84,6 +84,7 @@ const finnishLabels: SingleLanguageLabels = {
     pointsLabel: "Pisteitä",
     triesNotLimitedLabel: "Yritysten lukumäärää ei rajattu",
     submitGeneralFeedbackLabel: "Vastattu onnistuneesti",
+    submitButtonAlreadyAnsweredLabel: "Vastattu",
   },
 }
 

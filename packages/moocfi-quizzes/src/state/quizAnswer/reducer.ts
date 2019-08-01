@@ -12,6 +12,7 @@ const initialValue: QuizAnswerState = {
   itemAnswersReady: {},
   attemptedDisabledSubmit: false,
   noChangesSinceSuccessfulSubmit: false,
+  noChangesAfterLoading: true,
 }
 
 export type QuizAnswerState = {
@@ -20,6 +21,7 @@ export type QuizAnswerState = {
   itemAnswersReady: Record<string, boolean>
   attemptedDisabledSubmit: boolean
   noChangesSinceSuccessfulSubmit: boolean
+  noChangesAfterLoading: boolean
 }
 
 export const quizAnswerReducer = (
@@ -71,6 +73,7 @@ export const quizAnswerReducer = (
           ),
         },
         noChangesSinceSuccessfulSubmit: false,
+        noChangesAfterLoading: false,
       }
     case getType(quizAnswer.changeTextDataAction):
       newItemAnswersReady = { ...state.itemAnswersReady }
@@ -91,6 +94,7 @@ export const quizAnswerReducer = (
           ),
         },
         noChangesSinceSuccessfulSubmit: false,
+        noChangesAfterLoading: false,
       }
 
     case getType(quizAnswer.changeCheckboxData):
@@ -123,6 +127,7 @@ export const quizAnswerReducer = (
           ),
         },
         noChangesSinceSuccessfulSubmit: false,
+        noChangesAfterLoading: false,
       }
     case getType(quizAnswer.chooseOption):
       newItemAnswersReady = { ...state.itemAnswersReady }
@@ -160,6 +165,7 @@ export const quizAnswerReducer = (
             ),
           },
           noChangesSinceSuccessfulSubmit: false,
+          noChangesAfterLoading: false,
         }
       }
       const newOptionAnswers = multi
@@ -185,6 +191,7 @@ export const quizAnswerReducer = (
           ),
         },
         noChangesSinceSuccessfulSubmit: false,
+        noChangesAfterLoading: false,
       }
 
     default:
