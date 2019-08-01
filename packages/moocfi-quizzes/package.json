@@ -14,8 +14,8 @@
   "devDependencies": {
     "@fortawesome/fontawesome-free": "^5.9.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.0-7",
-    "@fortawesome/free-solid-svg-icons": "^5.9.0",
     "@fortawesome/free-regular-svg-icons": "^5.9.0",
+    "@fortawesome/free-solid-svg-icons": "^5.9.0",
     "@fortawesome/react-fontawesome": "^0.1.4",
     "@material-ui/core": "^4.0.0",
     "@material-ui/styles": "^4.2.1",
@@ -42,8 +42,8 @@
   "peerDependencies": {
     "@fortawesome/fontawesome-free": "^5.9.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.19",
-    "@fortawesome/free-solid-svg-icons": "^5.9.0",
     "@fortawesome/free-regular-svg-icons": "^5.9.0",
+    "@fortawesome/free-solid-svg-icons": "^5.9.0",
     "@fortawesome/react-fontawesome": "^0.1.4",
     "@material-ui/core": "^4.0.0",
     "@material-ui/styles": "^4.2.1",
@@ -58,5 +58,8 @@
     "redux-thunk": "^2.3.0",
     "styled-components": "^4.3.2",
     "typesafe-actions": "^4.4.2"
+  },
+  "dependencies": {
+    "react-content-loader": "^4.2.2"
   }
 }
