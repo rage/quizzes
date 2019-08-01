@@ -6,6 +6,7 @@ import thunk from "redux-thunk"
 import { backendAddressReducer } from "./backendAddress/reducer"
 import { feedbackDisplayedReducer } from "./feedbackDisplayed/reducer"
 import { languageReducer, LanguageState } from "./language/reducer"
+import { loadingBarsReducer } from "./loadingBars/reducer"
 import { messageReducer } from "./message/reducer"
 import { peerReviewsReducer, PeerReviewsState } from "./peerReviews/reducer"
 import { quizReducer } from "./quiz/reducer"
@@ -16,6 +17,7 @@ import { Quiz } from "../modelTypes"
 import * as backendAddressActions from "./backendAddress/actions"
 import * as feedbackDisplayedActions from "./feedbackDisplayed/actions"
 import * as languageActions from "./language/actions"
+import * as loadingBarsActions from "./loadingBars/actions"
 import * as messageActions from "./message/actions"
 import * as quizActions from "./quiz/actions"
 import * as quizAnswerActions from "./quizAnswer/actions"
@@ -26,6 +28,7 @@ const rootReducer = combineReducers({
   backendAddress: backendAddressReducer,
   feedbackDisplayed: feedbackDisplayedReducer,
   language: languageReducer,
+  loadingBars: loadingBarsReducer,
   message: messageReducer,
   peerReviews: peerReviewsReducer,
   quiz: quizReducer,
@@ -33,10 +36,11 @@ const rootReducer = combineReducers({
   user: userReducer,
 })
 
-const rootAction = {
+export const rootAction = {
   backendAction: backendAddressActions,
   feedbackDisplayed: feedbackDisplayedActions,
   language: languageActions,
+  loadingBars: loadingBarsActions,
   peerReviews: PeerReviewsActions,
   message: messageActions,
   quiz: quizActions,
@@ -48,6 +52,7 @@ export interface State {
   backendAddress: string
   feedbackDisplayed: boolean
   language: LanguageState
+  loadingBars: boolean
   peerReviews: PeerReviewsState
   message: string
   quiz: Quiz

@@ -3,6 +3,7 @@ import { createAction } from "typesafe-actions"
 import { getQuizInfo } from "../../services/quizService"
 import { ThunkAction } from "../store"
 import { Quiz } from "../../modelTypes"
+import * as loadingBarsActions from "../loadingBars/actions"
 
 export const set = createAction("quiz/SET", resolve => {
   return (quiz: Quiz) => resolve(quiz)
@@ -23,5 +24,6 @@ export const setQuiz: ActionCreator<ThunkAction> = (quizId: string) => async (
 
   const address = getState().backendAddress
   const { quiz } = await getQuizInfo(quizId, languageId, accessToken, address)
-  await dispatch(set(quiz))
+  dispatch(set(quiz))
+  dispatch(loadingBarsActions.set(false))
 }

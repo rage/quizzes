@@ -33,16 +33,11 @@ const RightMarginedGrid = styled(Grid)`
   margin-right: 1.5rem;
 `
 
-interface ITopInfoBarProps {
-  displayBars?: true
-}
-
-const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
-  displayBars,
-}) => {
+const TopInfoBar: React.FunctionComponent = () => {
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const quiz = useTypedSelector(state => state.quiz)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
+  const displayBars = useTypedSelector(state => state.loadingBars)
 
   let title
   let quizLabel

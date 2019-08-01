@@ -1,10 +1,12 @@
 import ContentLoader from "react-content-loader"
 import * as React from "react"
-import { useState, useEffect } from "react"
+import { useEffect } from "react"
+import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
 import { useTypedSelector } from "../../state/store"
+import { rootAction } from "../../state/store"
 
 const ContentWrapper = styled.div`
   padding: 1rem;
@@ -15,31 +17,20 @@ const StyledContentLoader = styled(ContentLoader)`
 `
 
 const LoadingQuiz = () => {
+  const dispatch = useDispatch()
   const languageId = useTypedSelector(state => state.language.languageId)
-  const quiz = useTypedSelector(state => state.quiz)
-  const [displayBars, setDisplayBars] = useState(false)
+  const displayBars = useTypedSelector(state => state.loadingBars)
 
   if (languageId) {
   }
 
-  useEffect(
-    () => {
-      if (!quiz) {
-        setTimeout(() => {
-          if (!quiz) {
-            setDisplayBars(true)
-          }
-        }, 1000)
-      } else {
-        setDisplayBars(false)
-      }
-    },
-    [quiz],
-  )
+  useEffect(() => {
+    dispatch(rootAction.loadingBars.InitializeLoadingBarsAfterDelay())
+  }, [])
 
   return (
     <div>
-      <TopInfoBar displayBars={displayBars} />
+      <TopInfoBar />
       <ContentWrapper>
         {displayBars ? (
           <ContentLoader
