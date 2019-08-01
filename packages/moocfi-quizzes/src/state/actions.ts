@@ -47,9 +47,7 @@ export const initialize: ActionCreator<ThunkAction> = (
     dispatch(userActions.setToken(accessToken))
     dispatch(quizActions.set(quiz))
     dispatch(quizAnswerActions.set(quizAnswer))
-    if (userQuizState.status === "open") {
-      dispatch(quizAnswerActions.setUnlocked())
-    } else {
+    if (userQuizState.status !== "open") {
       dispatch(feedbackDisplayedActions.display())
     }
     dispatch(userActions.setQuizState(userQuizState))

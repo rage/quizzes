@@ -19,6 +19,7 @@ export type GeneralLabels = {
   triesRemainingLabel: string
   triesNotLimitedLabel: string
   submitGeneralFeedbackLabel: string
+  submitButtonAlreadyAnsweredLabel: string
 }
 
 export type StageLabels = {
