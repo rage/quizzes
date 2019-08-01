@@ -1,3 +1,4 @@
+import ContentLoader from "react-content-loader"
 import * as React from "react"
 import { Grid, Typography } from "@material-ui/core"
 import styled from "styled-components"
@@ -36,25 +37,74 @@ const TopInfoBar: React.FunctionComponent = () => {
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const quiz = useTypedSelector(state => state.quiz)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
+  const displayBars = useTypedSelector(state => state.loadingBars)
 
-  if (!quiz || !languageInfo) {
-    // should not be possible
-    return <div>No quiz</div>
+  let title
+  let quizLabel
+  let pointsLabel
+  let receivedPoints
+  let formattedReceivedPoints
+  let availablePoints
+
+  if (languageInfo) {
+    quizLabel = languageInfo.general.quizLabel
+    pointsLabel = languageInfo.general.pointsLabel
   }
 
-  const title = quiz.texts[0].title
-  const quizLabel = languageInfo.general.quizLabel
-  const pointsLabel = languageInfo.general.pointsLabel
+  let titleReplacement
+  let pointsReplacement
 
-  const receivedPoints =
-    userQuizState && userQuizState.pointsAwarded
-      ? userQuizState.pointsAwarded
-      : 0
+  if (!quiz) {
+    title = ""
+    formattedReceivedPoints = ""
+    availablePoints = ""
 
-  const formattedReceivedPoints = Number.isInteger(receivedPoints)
-    ? receivedPoints
-    : receivedPoints.toFixed(2)
-  const availablePoints = quiz.points
+    titleReplacement = displayBars ? (
+      <ContentLoader
+        height={40}
+        width={100}
+        speed={2}
+        primaryColor="#ffffff"
+        primaryOpacity={0.6}
+        secondaryColor="#dddddd"
+        secondaryOpacity={0.6}
+        style={{ width: "300px", height: "31.2px" }}
+      >
+        <rect x="0" y="10" rx="4" ry="20" width="100" height="30" />
+      </ContentLoader>
+    ) : (
+      <div style={{ height: "31.2px" }} />
+    )
+
+    pointsReplacement = displayBars ? (
+      <ContentLoader
+        height={40}
+        width={100}
+        speed={2}
+        primaryColor="#ffffff"
+        primaryOpacity={0.6}
+        secondaryColor="#dddddd"
+        secondaryOpacity={0.6}
+        style={{ width: "45px", height: "31.2px" }}
+      >
+        <rect x="0" y="10" rx="25" ry="25" width="100" height="30" />
+      </ContentLoader>
+    ) : (
+      <div style={{ height: "31.2px" }} />
+    )
+  } else {
+    title = quiz.texts[0].title
+
+    receivedPoints =
+      userQuizState && userQuizState.pointsAwarded
+        ? userQuizState.pointsAwarded
+        : 0
+
+    formattedReceivedPoints = Number.isInteger(receivedPoints)
+      ? receivedPoints
+      : receivedPoints.toFixed(2)
+    availablePoints = quiz.points
+  }
 
   return (
     <StyledGrid
@@ -73,7 +123,11 @@ const TopInfoBar: React.FunctionComponent = () => {
 
           <Grid item={true}>
             <Typography variant="subtitle1">{quizLabel}:</Typography>
-            <Typography variant="h5">{title}</Typography>
+            {quiz ? (
+              <Typography variant="h5">{title}</Typography>
+            ) : (
+              titleReplacement
+            )}
           </Grid>
         </Grid>
       </Grid>
@@ -81,7 +135,9 @@ const TopInfoBar: React.FunctionComponent = () => {
       <RightMarginedGrid item={true}>
         <PointsLabelText>{pointsLabel}:</PointsLabelText>
         <PointsText>
-          {formattedReceivedPoints}/{availablePoints}
+          {quiz
+            ? `${formattedReceivedPoints}/${availablePoints}`
+            : pointsReplacement}
         </PointsText>
       </RightMarginedGrid>
     </StyledGrid>

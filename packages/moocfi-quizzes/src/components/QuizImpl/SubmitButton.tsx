@@ -13,7 +13,7 @@ const StyledSubmitButton = styled(Button)`
     0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
 `
 
-const SubmitButton: React.FunctionComponent<any> = ({ children }) => {
+const SubmitButton: React.FunctionComponent = () => {
   const dispatch = useDispatch()
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)

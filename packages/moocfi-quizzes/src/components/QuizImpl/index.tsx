@@ -21,6 +21,7 @@ import ResultInformation from "./ResultInformation"
 import { useTypedSelector } from "../../state/store"
 import { Quiz, QuizItemType } from "../../modelTypes"
 
+import LoadingQuiz from "./LoadingQuiz"
 import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
 import MarkdownText from "../MarkdownText"
@@ -62,10 +63,8 @@ const ComponentWrapper = styled.div<IComponentWrapperProps>`
   padding: 1rem 2rem 1rem 1rem;
 `
 
-const QuizBodyTypography = styled(Typography)`
-  pre {
-    margin: 0;
-  }
+const QuizContentWrapper = styled.div`
+  padding: 1rem;
 `
 
 const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
@@ -90,13 +89,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   }, [])
 
   if (!quiz || !languageInfo || !quizAnswer) {
-    return (
-      <Grid container={true} justify="center">
-        <Grid item={true}>
-          <CircularProgress disableShrink={true} />
-        </Grid>
-      </Grid>
-    )
+    return <LoadingQuiz />
   }
 
   const generalLabels = languageInfo.general
@@ -170,7 +163,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     <div>
       <TopInfoBar />
 
-      <div style={{ padding: "1rem" }}>
+      <QuizContentWrapper>
         {containsPeerReviews && <StageVisualizer />}
 
         <MarkdownText>{quiz.texts[0].body}</MarkdownText>
@@ -206,7 +199,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                   }
                 }}
               >
-                <SubmitButton>{generalLabels.submitButtonLabel}</SubmitButton>
+                <SubmitButton />
               </Grid>
 
               <Grid item={true}>
@@ -219,7 +212,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
             </Grid>
           </div>
         )}
-      </div>
+      </QuizContentWrapper>
     </div>
   )
 }

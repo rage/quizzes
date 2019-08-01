@@ -15,6 +15,8 @@ export const initialize: ActionCreator<ThunkAction> = (
   accessToken: string,
   backendAddress?: string,
 ) => async (dispatch: Dispatch) => {
+  dispatch(languageActions.set(languageId))
+
   try {
     let { quiz, quizAnswer, userQuizState } = await getQuizInfo(
       id,
@@ -43,7 +45,6 @@ export const initialize: ActionCreator<ThunkAction> = (
     }
 
     dispatch(userActions.setToken(accessToken))
-    dispatch(languageActions.set(languageId))
     dispatch(quizActions.set(quiz))
     dispatch(quizAnswerActions.set(quizAnswer))
     if (userQuizState.status === "open") {
