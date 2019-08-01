@@ -1,4 +1,5 @@
 import { ActionCreator } from "redux"
+import { createAction } from "typesafe-actions"
 import { ThunkAction, Dispatch } from "./store"
 import { getQuizInfo } from "../services/quizService"
 import * as userActions from "./user/actions"
@@ -9,12 +10,15 @@ import * as quizActions from "./quiz/actions"
 import * as quizAnswerActions from "./quizAnswer/actions"
 import * as messageActions from "./message/actions"
 
+export const clearActionCreator = createAction("CLEAR")
+
 export const initialize: ActionCreator<ThunkAction> = (
   id: string,
   languageId: string,
   accessToken: string,
   backendAddress?: string,
 ) => async (dispatch: Dispatch) => {
+  dispatch(clearActionCreator())
   dispatch(languageActions.set(languageId))
 
   try {

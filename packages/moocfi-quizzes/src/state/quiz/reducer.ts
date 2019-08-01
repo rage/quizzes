@@ -4,17 +4,17 @@ import { Quiz } from "../../modelTypes"
 
 type QuizState = Quiz | null
 
-const initialValue = null
+export const initialState = null
 
 export const quizReducer = (
-  state: QuizState = initialValue,
+  state: QuizState = initialState,
   action: ActionType<typeof quiz>,
 ): QuizState => {
   switch (action.type) {
     case getType(quiz.set):
       return action.payload
     case getType(quiz.clear):
-      return initialValue
+      return initialState
     default:
       return state
   }

@@ -1,10 +1,10 @@
 import { ActionType, getType } from "typesafe-actions"
 import * as feedbackDisplayed from "./actions"
 
-const initialValue = false
+export const initialState = false
 
 export const feedbackDisplayedReducer = (
-  state: boolean = initialValue,
+  state: boolean = initialState,
   action: ActionType<typeof feedbackDisplayed>,
 ): boolean => {
   switch (action.type) {
