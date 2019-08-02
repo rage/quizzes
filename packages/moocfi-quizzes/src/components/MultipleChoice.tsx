@@ -62,9 +62,7 @@ const FailureIcon = () => (
 )
 
 const AttentionIcon = styled(FontAwesomeIcon)`
-  padding: 0 10px;
-  float: left;
-  margin-left: -10px;
+  padding-right: 10px;
 `
 
 const RevealedChoiceButton = styled(({ selected, correct, ...others }) => {
@@ -94,22 +92,25 @@ const BottomMarginedGrid = styled(Grid)`
   margin-bottom: 10px;
 `
 
-const LeftBorderedTypography = styled(
-  ({ barColor, onlyOneItem, ...others }) => <Typography {...others} />,
-)`
+interface ILeftBorderedDivProps {
+  barColor: string
+  onlyOneItem?: boolean
+}
+
+const LeftBorderedDiv = styled.div<ILeftBorderedDivProps>`
   border-left: 6px solid ${({ barColor }) => barColor};
   padding: 3px;
   padding-left: 10px;
   margin-bottom: 5px !important;
   ${onlyOneItem => onlyOneItem && "width: 70%;"}
 `
+interface ISolutionDivProps {
+  correct: boolean
+}
 
-const SolutionTypography = styled(({ correct, ...others }) => (
-  <LeftBorderedTypography
-    barColor={correct ? "#047500" : "#DB0000"}
-    {...others}
-  />
-))`
+const SolutionDiv = styled((correct, ...others) => (
+  <LeftBorderedDiv barColor={correct ? "#047500" : "#DB0000"} {...others} />
+))<ISolutionDivProps>`
   margin-bottom: 0;
 `
 
@@ -243,17 +244,21 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
         !onlyOneItem &&
         ((itemAnswer.correct && successMessage) ||
           (!itemAnswer.correct && failureMessage)) && (
-          <SolutionTypography
-            correct={itemAnswer.correct ? true : false}
-            variant="body1"
-          >
-            <AttentionIcon icon={faExclamationCircle} size="3x" />
-            {itemAnswer.correct
-              ? multipleChoiceLabels.answerCorrectLabel
-              : multipleChoiceLabels.answerIncorrectLabel}
-            <br />
-            {itemAnswer.correct ? successMessage : failureMessage}
-          </SolutionTypography>
+          <SolutionDiv correct={itemAnswer.correct ? true : false}>
+            <Grid container alignItems="center">
+              <Grid item>
+                <AttentionIcon icon={faExclamationCircle} size="3x" />
+              </Grid>
+              {itemAnswer.correct
+                ? multipleChoiceLabels.answerCorrectLabel
+                : multipleChoiceLabels.answerIncorrectLabel}
+              <br />
+              <Typography variant="body1">
+                {itemAnswer.correct ? successMessage : failureMessage}
+              </Typography>
+              <Grid item />
+            </Grid>
+          </SolutionDiv>
         )}
     </Grid>
   )
@@ -380,14 +385,20 @@ const Option: React.FunctionComponent<OptionProps> = ({
             onlyOneItem={onlyOneItem}
             shouldBeGray={shouldBeGray}
           >
-            <LeftBorderedTypography
-              variant="body1"
+            <LeftBorderedDiv
+              // variant="body1"
               barColor={feedbackColor}
               onlyOneItem={onlyOneItem}
             >
-              <AttentionIcon icon={faExclamationCircle} size="3x" />
-              {feedbackMessage}
-            </LeftBorderedTypography>
+              <Grid container alignItems="center">
+                <Grid item>
+                  <AttentionIcon icon={faExclamationCircle} size="3x" />
+                </Grid>
+                <Grid item>
+                  <Typography variant="body1">{feedbackMessage}</Typography>
+                </Grid>
+              </Grid>
+            </LeftBorderedDiv>
           </OptionGridItem>
         )}
       </React.Fragment>
