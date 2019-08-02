@@ -2,7 +2,7 @@ import * as React from "react"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { CircularProgress, Grid, Typography } from "@material-ui/core"
+import { Grid, Typography } from "@material-ui/core"
 import * as quizAnswerActions from "../../state/quizAnswer/actions"
 import * as messageActions from "../../state/message/actions"
 
@@ -84,9 +84,12 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   const error = messageState.errorMessage
 
-  useEffect(() => {
-    dispatch(initialize(id, languageId, accessToken, backendAddress))
-  }, [])
+  useEffect(
+    () => {
+      dispatch(initialize(id, languageId, accessToken, backendAddress))
+    },
+    [id, languageId, accessToken, backendAddress],
+  )
 
   if (!quiz || !languageInfo || !quizAnswer) {
     return <LoadingQuiz />

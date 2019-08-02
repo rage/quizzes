@@ -2,7 +2,7 @@ import { ActionType, getType } from "typesafe-actions"
 import * as quizAnswer from "./actions"
 import { QuizAnswer } from "../../modelTypes"
 
-const initialValue: QuizAnswerState = {
+export const initialState: QuizAnswerState = {
   quizAnswer: {
     languageId: "",
     quizId: "",
@@ -25,7 +25,7 @@ export type QuizAnswerState = {
 }
 
 export const quizAnswerReducer = (
-  state: QuizAnswerState = initialValue,
+  state: QuizAnswerState = initialState,
   action: ActionType<typeof quizAnswer>,
 ): QuizAnswerState => {
   switch (action.type) {
@@ -48,7 +48,7 @@ export const quizAnswerReducer = (
         attemptedDisabledSubmit: state.attemptedDisabledSubmit,
       }
     case getType(quizAnswer.clear):
-      return initialValue
+      return initialState
     case getType(quizAnswer.setNoChangesSinceSuccessfulSubmit):
       return { ...state, noChangesSinceSuccessfulSubmit: true }
     case getType(quizAnswer.setLocked):

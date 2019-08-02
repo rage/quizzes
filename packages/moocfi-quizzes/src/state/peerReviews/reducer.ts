@@ -6,7 +6,7 @@ import {
   PeerReviewGradeAnswer,
 } from "../../modelTypes"
 
-const initialValue = {
+export const initialState = {
   options: [],
   answer: null,
   submitDisabled: true,
@@ -19,7 +19,7 @@ export type PeerReviewsState = {
 }
 
 export const peerReviewsReducer = (
-  state: PeerReviewsState = initialValue,
+  state: PeerReviewsState = initialState,
   action: ActionType<typeof peerReviews>,
 ): PeerReviewsState => {
   switch (action.type) {
@@ -30,7 +30,7 @@ export const peerReviewsReducer = (
     case getType(peerReviews.setReviewOptions):
       return { ...state, options: action.payload }
     case getType(peerReviews.clear):
-      return initialValue
+      return initialState
     case getType(peerReviews.changeGrade):
       const { peerReviewQuestionId, value } = action.payload
       const currentAnswer = state.answer

@@ -8,7 +8,7 @@ import createStoreInstance from "../state/store"
 import quizzesTheme from "../themes"
 
 const Quiz: React.FunctionComponent<QuizProps> = props => {
-  const store = createStoreInstance()
+  const store = createStoreInstance(props.id)
 
   return (
     <Provider store={store}>

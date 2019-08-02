@@ -7,13 +7,13 @@ export type UserState = {
   userQuizState: UserQuizState | null
 }
 
-const initialValue = {
+export const initialState = {
   accessToken: "",
   userQuizState: null,
 }
 
 export const userReducer = (
-  state: UserState = initialValue,
+  state: UserState = initialState,
   action: ActionType<typeof user>,
 ): UserState => {
   switch (action.type) {
@@ -24,7 +24,7 @@ export const userReducer = (
     case getType(user.setQuizState):
       return { ...state, userQuizState: action.payload }
     case getType(user.clear):
-      return initialValue
+      return initialState
     default:
       return state
   }
