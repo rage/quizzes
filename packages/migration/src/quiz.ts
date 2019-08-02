@@ -68,6 +68,7 @@ export async function migrateQuizzes(
     let section = 0
     let excludedFromScore = false
     let course: Course = courses[getUUIDByString("default")]
+
     for (const tag of oldQuiz.tags) {
       if (tag === "ignore") {
         excludedFromScore = true
@@ -80,23 +81,20 @@ export async function migrateQuizzes(
         continue
       }
 
-      // const match = tag.match(eaiRegex)
-
       const regex = regexs.find(
         r => tag.match(r) !== undefined && tag.match(r) !== null,
       )
 
       const match = tag.match(regex)
 
-      if (match) {
-        part = parseInt(match[1], 10)
-        if (isNaN(part)) {
-          part = 0
-        }
-        section = parseInt(match[2], 10)
-        if (isNaN(section)) {
-          section = null
-        }
+      const parsedPart = parseInt(match[1], 10)
+      if (!isNaN(parsedPart)) {
+        part = parsedPart
+      }
+
+      const parsedSection = parseInt(match[2], 10)
+      if (!isNaN(parsedSection)) {
+        section = parsedSection
       }
     }
 
