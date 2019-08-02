@@ -2,7 +2,7 @@ import * as React from "react"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { CircularProgress, Grid, Typography } from "@material-ui/core"
+import { Grid, Typography } from "@material-ui/core"
 import * as quizAnswerActions from "../../state/quizAnswer/actions"
 import * as messageActions from "../../state/message/actions"
 import * as languageActions from "../../state/language/actions"
@@ -88,13 +88,16 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   const error = messageState.errorMessage
 
-  useEffect(() => {
-    if (accessToken) {
-      dispatch(initialize(id, languageId, accessToken, backendAddress))
-    } else if (languageId) {
-      dispatch(languageActions.set(languageId))
-    }
-  }, [])
+  useEffect(
+    () => {
+      if (accessToken) {
+        dispatch(initialize(id, languageId, accessToken, backendAddress))
+      } else if (languageId) {
+        dispatch(languageActions.set(languageId))
+      }
+    },
+    [id, languageId, accessToken, backendAddress],
+  )
 
   if (customContent || !accessToken) {
     return <CustomContentQuiz content={customContent} />

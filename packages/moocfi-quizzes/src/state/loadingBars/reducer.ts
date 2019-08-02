@@ -1,12 +1,12 @@
 import { ActionType, getType } from "typesafe-actions"
 import * as loadingBars from "./actions"
 
-const initialValue = false
+export const initialState = false
 
 export type LoadingBarsState = boolean
 
 export const loadingBarsReducer = (
-  state: LoadingBarsState = initialValue,
+  state: LoadingBarsState = initialState,
   action: ActionType<typeof loadingBars>,
 ): LoadingBarsState => {
   switch (action.type) {

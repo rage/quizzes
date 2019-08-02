@@ -6,31 +6,49 @@ import { useTypedSelector } from "../../state/store"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons"
 
-const StyledGrid = styled(({ answered, ...others }) => <Grid {...others} />)`
+const StyledGrid = styled(Grid)`
   padding: 1rem;
   color: white;
-  background-color: ${({ answered }) => (answered ? "#213094" : "#555f9e")};
+  background-color: #213094;
 `
 
-const PointsText = styled.div`
-  font-size: 1.5rem;
-  font-family: Roboto, Helvetica, Arial, sans-serif;
+const PointsText = styled(Typography)`
+  font-size: 1.5rem !important;
   text-align: end;
 `
 
-const PointsLabelText = styled.div`
-  font-size: 1rem;
-  font-family: Roboto, Helvetica, Arial, sans-serif;
-  text-align: end;
+const XXS12Grid = styled(Grid)`
+  @media (max-width: 550px) {
+    max-width: 100%;
+    flex-basis: 100%;
+  }
+`
+
+const PointsLabelText = styled(Typography)`
+  font-size: 1rem !important;
 `
 
 const IconWrapper = styled.div`
   font-size: 3.5rem;
   margin: 0 1.5rem 0 0.5rem;
+  @media (max-width: 550px) {
+    text-align: center;
+  }
 `
 
 const RightMarginedGrid = styled(Grid)`
   margin-right: 1.5rem;
+  text-align: end;
+
+  @media (max-width: 550px) {
+    max-width: 100%;
+    flex-basis: 100%;
+    text-align: left;
+  }
+`
+
+const SpaceFillerDiv = styled.div`
+  height: 31.2px;
 `
 
 interface ITopInfoBarProps {
@@ -68,40 +86,16 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
 
     titleReplacement =
       displayBars || staticBars ? (
-        <ContentLoader
-          animate={staticBars ? false : true}
-          height={40}
-          width={100}
-          speed={2}
-          primaryColor="#ffffff"
-          primaryOpacity={0.6}
-          secondaryColor="#dddddd"
-          secondaryOpacity={0.6}
-          style={{ width: "300px", height: "31.2px" }}
-        >
-          <rect x="0" y="10" rx="4" ry="20" width="100" height="30" />
-        </ContentLoader>
+        <QuizTitleLoadingBar animate={!staticBars} />
       ) : (
-        <div style={{ height: "31.2px" }} />
+        <SpaceFillerDiv />
       )
 
     pointsReplacement =
       displayBars || staticBars ? (
-        <ContentLoader
-          animate={staticBars ? false : true}
-          height={40}
-          width={100}
-          speed={2}
-          primaryColor="#ffffff"
-          primaryOpacity={0.6}
-          secondaryColor="#dddddd"
-          secondaryOpacity={0.6}
-          style={{ width: "45px", height: "31.2px" }}
-        >
-          <rect x="0" y="10" rx="25" ry="25" width="100" height="30" />
-        </ContentLoader>
+        <QuizPointsLoadingBar animate={!staticBars} />
       ) : (
-        <div style={{ height: "31.2px" }} />
+        <SpaceFillerDiv />
       )
   } else {
     title = quiz.texts[0].title
@@ -114,45 +108,102 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
     formattedReceivedPoints = Number.isInteger(receivedPoints)
       ? receivedPoints
       : receivedPoints.toFixed(2)
+
     availablePoints = quiz.points
   }
 
   return (
     <StyledGrid
-      answered={userQuizState && userQuizState.tries > 0}
       container={true}
       justify="space-between"
-      alignItems="center"
+      alignItems="flex-start"
     >
-      <Grid item={true}>
-        <Grid container={true} alignItems="center">
-          <Grid item={true}>
+      <XXS12Grid item={true} xs={9}>
+        <Grid container={true} alignItems="stretch">
+          <XXS12Grid item={true} xs={3} md={2}>
             <IconWrapper>
               <FontAwesomeIcon icon={faQuestionCircle} />
             </IconWrapper>
-          </Grid>
+          </XXS12Grid>
 
-          <Grid item={true}>
+          <XXS12Grid item={true} xs={9} md={10}>
             <Typography variant="subtitle1">{quizLabel}:</Typography>
             {quiz ? (
               <Typography variant="h5">{title}</Typography>
             ) : (
               titleReplacement
             )}
-          </Grid>
+          </XXS12Grid>
         </Grid>
-      </Grid>
+      </XXS12Grid>
 
-      <RightMarginedGrid item={true}>
+      <RightMarginedGrid item={true} xs={2}>
         <PointsLabelText>{pointsLabel}:</PointsLabelText>
-        <PointsText>
-          {quiz
-            ? `${formattedReceivedPoints}/${availablePoints}`
-            : pointsReplacement}
-        </PointsText>
+
+        {quiz ? (
+          <PointsText>
+            {`${formattedReceivedPoints}/${availablePoints}`}
+          </PointsText>
+        ) : (
+          pointsReplacement
+        )}
       </RightMarginedGrid>
     </StyledGrid>
   )
 }
+
+interface ILoadingBarProps {
+  animate: boolean
+}
+
+const QuizTitleLoadingBar: React.FunctionComponent<ILoadingBarProps> = ({
+  animate,
+}) => {
+  return (
+    <StyledQuizTitleContentLoader
+      animate={animate}
+      height={40}
+      width={100}
+      speed={2}
+      primaryColor="#ffffff"
+      primaryOpacity={0.6}
+      secondaryColor="#dddddd"
+      secondaryOpacity={0.6}
+    >
+      <rect x="0" y="10" rx="4" ry="20" width="100" height="30" />
+    </StyledQuizTitleContentLoader>
+  )
+}
+
+const StyledQuizTitleContentLoader = styled(ContentLoader)`
+  width: 100%;
+  max-width: 300px;
+  height: 31.2px;
+`
+
+const QuizPointsLoadingBar: React.FunctionComponent<ILoadingBarProps> = ({
+  animate,
+}) => {
+  return (
+    <StyledQuizPointsContentLoader
+      animate={animate}
+      height={40}
+      width={100}
+      speed={2}
+      primaryColor="#ffffff"
+      primaryOpacity={0.6}
+      secondaryColor="#dddddd"
+      secondaryOpacity={0.6}
+    >
+      <rect x="0" y="10" rx="25" ry="25" width="100" height="30" />
+    </StyledQuizPointsContentLoader>
+  )
+}
+
+const StyledQuizPointsContentLoader = styled(ContentLoader)`
+  width: 100%;
+  max-width: 45px;
+  height: 31.2px;
+`
 
 export default TopInfoBar

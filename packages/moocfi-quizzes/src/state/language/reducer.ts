@@ -7,13 +7,13 @@ export type LanguageState = {
   languageLabels: SingleLanguageLabels | null
 }
 
-const initialValue = {
+export const initialState = {
   languageId: "",
   languageLabels: null,
 }
 
 export const languageReducer = (
-  state: LanguageState = initialValue,
+  state: LanguageState = initialState,
   action: ActionType<typeof language>,
 ): LanguageState => {
   switch (action.type) {
@@ -28,7 +28,7 @@ export const languageReducer = (
         languageLabels: languageOptions[id],
       }
     case getType(language.clear):
-      return initialValue
+      return initialState
     default:
       return state
   }

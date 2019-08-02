@@ -24,6 +24,7 @@ export async function insert<T extends BaseEntity>(
         return await createdItem.save()
       } catch (error) {
         try {
+          console.log("error")
           await createdItem.remove()
           return await createdItem.save()
         } catch (error) {
