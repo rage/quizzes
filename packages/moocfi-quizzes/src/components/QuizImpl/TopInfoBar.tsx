@@ -6,31 +6,49 @@ import { useTypedSelector } from "../../state/store"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons"
 
-const StyledGrid = styled(({ answered, ...others }) => <Grid {...others} />)`
+const StyledGrid = styled(Grid)`
   padding: 1rem;
   color: white;
-  background-color: ${({ answered }) => (answered ? "#213094" : "#555f9e")};
+  background-color: #213094;
 `
 
-const PointsText = styled.div`
-  font-size: 1.5rem;
-  font-family: Roboto, Helvetica, Arial, sans-serif;
+const PointsText = styled(Typography)`
+  font-size: 1.5rem !important;
   text-align: end;
 `
 
-const PointsLabelText = styled.div`
-  font-size: 1rem;
-  font-family: Roboto, Helvetica, Arial, sans-serif;
-  text-align: end;
+const IconAndTitleGrid = styled(Grid)`
+  @media (max-width: 550px) {
+    max-width: 100%;
+    flex-basis: 100%;
+  }
+`
+
+const PointsLabelText = styled(Typography)`
+  font-size: 1rem !important;
 `
 
 const IconWrapper = styled.div`
   font-size: 3.5rem;
   margin: 0 1.5rem 0 0.5rem;
+  @media (max-width: 550px) {
+    text-align: center;
+  }
 `
 
 const RightMarginedGrid = styled(Grid)`
   margin-right: 1.5rem;
+  text-align: end;
+
+  @media (max-width: 550px) {
+    max-width: 100%;
+    flex-basis: 100%;
+    text-align: left;
+  }
+`
+
+const SpaceFillerDiv = styled.div`
+  height: 31.2px;
 `
 
 const TopInfoBar: React.FunctionComponent = () => {
@@ -60,37 +78,15 @@ const TopInfoBar: React.FunctionComponent = () => {
     availablePoints = ""
 
     titleReplacement = displayBars ? (
-      <ContentLoader
-        height={40}
-        width={100}
-        speed={2}
-        primaryColor="#ffffff"
-        primaryOpacity={0.6}
-        secondaryColor="#dddddd"
-        secondaryOpacity={0.6}
-        style={{ width: "300px", height: "31.2px" }}
-      >
-        <rect x="0" y="10" rx="4" ry="20" width="100" height="30" />
-      </ContentLoader>
+      <QuizTitleLoadingBar />
     ) : (
-      <div style={{ height: "31.2px" }} />
+      <SpaceFillerDiv />
     )
 
     pointsReplacement = displayBars ? (
-      <ContentLoader
-        height={40}
-        width={100}
-        speed={2}
-        primaryColor="#ffffff"
-        primaryOpacity={0.6}
-        secondaryColor="#dddddd"
-        secondaryOpacity={0.6}
-        style={{ width: "45px", height: "31.2px" }}
-      >
-        <rect x="0" y="10" rx="25" ry="25" width="100" height="30" />
-      </ContentLoader>
+      <QuizPointsLoadingBar />
     ) : (
-      <div style={{ height: "31.2px" }} />
+      <SpaceFillerDiv />
     )
   } else {
     title = quiz.texts[0].title
@@ -103,44 +99,92 @@ const TopInfoBar: React.FunctionComponent = () => {
     formattedReceivedPoints = Number.isInteger(receivedPoints)
       ? receivedPoints
       : receivedPoints.toFixed(2)
+
     availablePoints = quiz.points
   }
 
   return (
     <StyledGrid
-      answered={userQuizState && userQuizState.tries > 0}
       container={true}
       justify="space-between"
-      alignItems="center"
+      alignItems="flex-start"
     >
-      <Grid item={true}>
+      <IconAndTitleGrid item={true} xs={8}>
         <Grid container={true} alignItems="center">
-          <Grid item={true}>
+          <IconAndTitleGrid item={true} xs={3}>
             <IconWrapper>
               <FontAwesomeIcon icon={faQuestionCircle} />
             </IconWrapper>
-          </Grid>
+          </IconAndTitleGrid>
 
-          <Grid item={true}>
+          <IconAndTitleGrid item={true} xs={9}>
             <Typography variant="subtitle1">{quizLabel}:</Typography>
             {quiz ? (
               <Typography variant="h5">{title}</Typography>
             ) : (
               titleReplacement
             )}
-          </Grid>
+          </IconAndTitleGrid>
         </Grid>
-      </Grid>
+      </IconAndTitleGrid>
 
-      <RightMarginedGrid item={true}>
+      <RightMarginedGrid item={true} xs={2}>
         <PointsLabelText>{pointsLabel}:</PointsLabelText>
-        <PointsText>
-          {quiz
-            ? `${formattedReceivedPoints}/${availablePoints}`
-            : pointsReplacement}
-        </PointsText>
+
+        {quiz ? (
+          <PointsText>
+            `${formattedReceivedPoints}/${availablePoints}`
+          </PointsText>
+        ) : (
+          pointsReplacement
+        )}
       </RightMarginedGrid>
     </StyledGrid>
+  )
+}
+
+const QuizTitleLoadingBar = () => {
+  return (
+    <ContentLoader
+      height={40}
+      width={100}
+      speed={2}
+      primaryColor="#ffffff"
+      primaryOpacity={0.6}
+      secondaryColor="#dddddd"
+      secondaryOpacity={0.6}
+      style={{ width: "100%", maxWidth: "300px", height: "31.2px" }}
+    >
+      <rect x="0" y="10" rx="4" ry="20" width="100" height="30" />
+    </ContentLoader>
+  )
+}
+
+const StyledQuizTitleLoadingBar = styled(QuizTitleLoadingBar)`
+  width: 100%;
+  max-width: 300px;
+  height: 31.2px;
+`
+
+const QuizPointsLoadingBar = () => {
+  return (
+    <ContentLoader
+      height={40}
+      width={100}
+      speed={2}
+      primaryColor="#ffffff"
+      primaryOpacity={0.6}
+      secondaryColor="#dddddd"
+      secondaryOpacity={0.6}
+      style={{
+        width: "100%",
+        maxWidth: "50px",
+        height: "31.2px",
+        textAlign: "end",
+      }}
+    >
+      <rect x="0" y="10" rx="25" ry="25" width="100" height="30" />
+    </ContentLoader>
   )
 }
 
