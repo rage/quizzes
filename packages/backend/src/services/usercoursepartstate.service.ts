@@ -169,8 +169,12 @@ export default class UserCoursePartStateService {
           .map(quiz => quiz.points)
           .reduce((acc, curr) => acc + curr)
 
+        const coursePartString: string = ucps.coursePart.toString()
+
         return {
-          group: "osa0" + ucps.coursePart.toString(),
+          group: `${
+            coursePartString.length > 1 ? "osa" : "osa0"
+          }${coursePartString}`,
           progress: Math.floor(ucps.progress * 100) / 100,
           n_points: Number(ucps.score.toFixed(2)),
           max_points: maxPoints,
