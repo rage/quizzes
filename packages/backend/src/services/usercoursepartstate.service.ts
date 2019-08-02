@@ -5,6 +5,7 @@ import {
   Course,
   Quiz,
   QuizAnswer,
+  User,
   UserCoursePartState,
   UserCourseState,
   UserQuizState,
@@ -91,7 +92,12 @@ export default class UserCoursePartStateService {
     coursePart: number,
   ): Promise<UserCoursePartState> {
     let userCoursePartState: UserCoursePartState = new UserCoursePartState()
+
+    const user = new User()
+    user.id = userId
+
     userCoursePartState.userId = userId
+    userCoursePartState.user = user
     userCoursePartState.courseId = courseId
     userCoursePartState.coursePart = coursePart
 
