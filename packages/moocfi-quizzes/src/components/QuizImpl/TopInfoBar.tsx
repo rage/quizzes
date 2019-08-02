@@ -33,7 +33,14 @@ const RightMarginedGrid = styled(Grid)`
   margin-right: 1.5rem;
 `
 
-const TopInfoBar: React.FunctionComponent = () => {
+interface ITopInfoBarProps {
+  // when the user is not logged in
+  staticBars?: boolean
+}
+
+const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
+  staticBars,
+}) => {
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const quiz = useTypedSelector(state => state.quiz)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
@@ -59,39 +66,43 @@ const TopInfoBar: React.FunctionComponent = () => {
     formattedReceivedPoints = ""
     availablePoints = ""
 
-    titleReplacement = displayBars ? (
-      <ContentLoader
-        height={40}
-        width={100}
-        speed={2}
-        primaryColor="#ffffff"
-        primaryOpacity={0.6}
-        secondaryColor="#dddddd"
-        secondaryOpacity={0.6}
-        style={{ width: "300px", height: "31.2px" }}
-      >
-        <rect x="0" y="10" rx="4" ry="20" width="100" height="30" />
-      </ContentLoader>
-    ) : (
-      <div style={{ height: "31.2px" }} />
-    )
+    titleReplacement =
+      displayBars || staticBars ? (
+        <ContentLoader
+          animate={staticBars ? false : true}
+          height={40}
+          width={100}
+          speed={2}
+          primaryColor="#ffffff"
+          primaryOpacity={0.6}
+          secondaryColor="#dddddd"
+          secondaryOpacity={0.6}
+          style={{ width: "300px", height: "31.2px" }}
+        >
+          <rect x="0" y="10" rx="4" ry="20" width="100" height="30" />
+        </ContentLoader>
+      ) : (
+        <div style={{ height: "31.2px" }} />
+      )
 
-    pointsReplacement = displayBars ? (
-      <ContentLoader
-        height={40}
-        width={100}
-        speed={2}
-        primaryColor="#ffffff"
-        primaryOpacity={0.6}
-        secondaryColor="#dddddd"
-        secondaryOpacity={0.6}
-        style={{ width: "45px", height: "31.2px" }}
-      >
-        <rect x="0" y="10" rx="25" ry="25" width="100" height="30" />
-      </ContentLoader>
-    ) : (
-      <div style={{ height: "31.2px" }} />
-    )
+    pointsReplacement =
+      displayBars || staticBars ? (
+        <ContentLoader
+          animate={staticBars ? false : true}
+          height={40}
+          width={100}
+          speed={2}
+          primaryColor="#ffffff"
+          primaryOpacity={0.6}
+          secondaryColor="#dddddd"
+          secondaryOpacity={0.6}
+          style={{ width: "45px", height: "31.2px" }}
+        >
+          <rect x="0" y="10" rx="25" ry="25" width="100" height="30" />
+        </ContentLoader>
+      ) : (
+        <div style={{ height: "31.2px" }} />
+      )
   } else {
     title = quiz.texts[0].title
 
