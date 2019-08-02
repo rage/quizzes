@@ -24,6 +24,11 @@ const ChoicesContainer = styled(Grid)`
   padding-top: 7;
 `
 
+interface ChoiceButtonProps {
+  onlyOneItem: boolean
+  selected: boolean
+}
+
 const ChoiceButton = styled(Button)<ChoiceButtonProps>`
   ${({ onlyOneItem, selected }) =>
     onlyOneItem
@@ -33,15 +38,12 @@ const ChoiceButton = styled(Button)<ChoiceButtonProps>`
   text-transform: none;
   margin: 0.5em 0;
   border-radius: 15px;
+  border: 1px solid
+    ${({ selected }) => (selected ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.23)")};
   padding: 15px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
     0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
 `
-
-interface ChoiceButtonProps {
-  onlyOneItem: boolean
-  selected: boolean
-}
 
 const IconWrapper = styled.div`
   margin: 0.5rem;
@@ -67,7 +69,7 @@ const AttentionIcon = styled(FontAwesomeIcon)`
 
 const RevealedChoiceButton = styled(({ selected, correct, ...others }) => {
   return (
-    <ChoiceButton variant={selected ? "contained" : "outlined"} {...others}>
+    <ChoiceButton variant={"contained"} {...others}>
       {selected ? correct ? <SuccessIcon /> : <FailureIcon /> : ""}
       {others.children}
     </ChoiceButton>
@@ -325,7 +327,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
         <ChoiceButton
           onlyOneItem={onlyOneItem}
           selected={optionIsSelected}
-          variant={optionIsSelected ? "contained" : "outlined"}
+          variant="contained"
           fullWidth
           color={optionIsSelected ? "primary" : "default"}
           onClick={handleOptionChange(option.id)}
