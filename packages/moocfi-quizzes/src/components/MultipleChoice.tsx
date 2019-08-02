@@ -99,6 +99,7 @@ interface ILeftBorderedDivProps {
 
 const LeftBorderedDiv = styled.div<ILeftBorderedDivProps>`
   border-left: 6px solid ${({ barColor }) => barColor};
+  box-sizing: border-box;
   padding: 3px;
   padding-left: 10px;
   margin-bottom: 5px !important;
