@@ -276,12 +276,14 @@ const Option: React.FunctionComponent<OptionProps> = ({
   const item = items.find(i => i.id === option.quizItemId)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
-
+  const languageLabels = useTypedSelector(
+    state => state.language.languageLabels,
+  )
   const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
 
-  if (!item) {
+  if (!item || !languageLabels) {
     // should be impossible
-    return <div>Cannot find related item</div>
+    return <div>Cannot find related item or language</div>
   }
   const itemAnswer = quizAnswer.itemAnswers.find(
     ia => ia.quizItemId === item.id,
@@ -305,10 +307,15 @@ const Option: React.FunctionComponent<OptionProps> = ({
   const text = option.texts[0]
 
   // option incorrect, selected -> success; option correct, not selected -> success! Otherwise failure
+
+  const generalLabels = languageLabels.general
+
+  const successMessage = text.successMessage || generalLabels.answerCorrectLabel
+  const failureMessage =
+    text.failureMessage || generalLabels.answerIncorrectLabel
+
   const feedbackMessage =
-    option.correct === optionIsSelected
-      ? text.successMessage
-      : text.failureMessage
+    option.correct === optionIsSelected ? successMessage : failureMessage
 
   const feedbackColor = optionIsSelected
     ? option.correct
@@ -366,7 +373,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
           </RevealedChoiceButton>
         </OptionGridItem>
 
-        {feedbackMessage && (
+        {optionIsSelected && (
           <OptionGridItem
             item
             xs={optionWidth}
