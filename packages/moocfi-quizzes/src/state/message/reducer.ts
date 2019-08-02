@@ -1,7 +1,7 @@
 import { ActionType, getType } from "typesafe-actions"
 import * as message from "./actions"
 
-const initialValue = {
+export const initialState = {
   errorMessage: null,
   notification: null,
 }
@@ -15,7 +15,7 @@ export type MessageState = {
 }
 
 export const messageReducer = (
-  state: MessageState = initialValue,
+  state: MessageState = initialState,
   action: ActionType<typeof message>,
 ): MessageState => {
   switch (action.type) {
@@ -35,15 +35,15 @@ export const messageReducer = (
     case getType(message.clearErrorMessage):
       return {
         ...state,
-        errorMessage: initialValue.errorMessage,
+        errorMessage: initialState.errorMessage,
       }
     case getType(message.clearNotification):
       return {
         ...state,
-        notification: initialValue.notification,
+        notification: initialState.notification,
       }
     case getType(message.clear):
-      return initialValue
+      return initialState
     default:
       return state
   }

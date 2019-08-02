@@ -7,7 +7,7 @@ import { backendAddressReducer } from "./backendAddress/reducer"
 import { feedbackDisplayedReducer } from "./feedbackDisplayed/reducer"
 import { languageReducer, LanguageState } from "./language/reducer"
 import { loadingBarsReducer } from "./loadingBars/reducer"
-import { messageReducer } from "./message/reducer"
+import { messageReducer, MessageState } from "./message/reducer"
 import { peerReviewsReducer, PeerReviewsState } from "./peerReviews/reducer"
 import { quizReducer } from "./quiz/reducer"
 import { quizAnswerReducer, QuizAnswerState } from "./quizAnswer/reducer"
@@ -24,7 +24,7 @@ import * as quizAnswerActions from "./quizAnswer/actions"
 import * as userActions from "./user/actions"
 import * as PeerReviewsActions from "./peerReviews/actions"
 
-const rootReducer = combineReducers({
+const rootReducerImpl = combineReducers({
   backendAddress: backendAddressReducer,
   feedbackDisplayed: feedbackDisplayedReducer,
   language: languageReducer,
@@ -35,6 +35,16 @@ const rootReducer = combineReducers({
   quizAnswer: quizAnswerReducer,
   user: userReducer,
 })
+
+const rootReducer: typeof rootReducerImpl = (state, action) => {
+  if (action.type === "CLEAR") {
+    // @ts-ignore
+    const bestState: State = undefined
+
+    return bestState
+  }
+  return rootReducerImpl(state, action)
+}
 
 export const rootAction = {
   backendAction: backendAddressActions,
@@ -54,7 +64,7 @@ export interface State {
   language: LanguageState
   loadingBars: boolean
   peerReviews: PeerReviewsState
-  message: string
+  message: MessageState
   quiz: Quiz
   quizAnswer: QuizAnswerState
   user: UserState
@@ -62,18 +72,36 @@ export interface State {
 
 import { StateType, ActionType } from "typesafe-actions"
 
-export type Store = StateType<typeof createStoreInstance>
+export type Store = StateType<typeof createStoreCreator>
 export type RootState = StateType<typeof rootReducer>
 export type Dispatch = (action: RootAction) => void
+
+type ClearActionType = {
+  type: string
+}
 
 export type ThunkAction = (dispatch: Dispatch, getState: GetState) => any
 export type RootAction =
   | ActionType<typeof rootAction>
   | ThunkAction
   | Promise<any>
+  | ClearActionType
+
 export type GetState = () => State
 
-const createStoreInstance = () => {
+const idToStoreCache: Map<string, Store> = new Map()
+
+const createStoreInstance = (id: string): Store => {
+  const cached = idToStoreCache.get(id)
+  if (cached) {
+    return cached
+  }
+  const store = createStoreCreator()
+  idToStoreCache.set(id, store)
+  return store
+}
+
+const createStoreCreator = () => {
   return createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)))
 }
 
