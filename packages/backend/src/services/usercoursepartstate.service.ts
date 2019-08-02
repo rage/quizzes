@@ -93,11 +93,7 @@ export default class UserCoursePartStateService {
   ): Promise<UserCoursePartState> {
     let userCoursePartState: UserCoursePartState = new UserCoursePartState()
 
-    const user = new User()
-    user.id = userId
-
     userCoursePartState.userId = userId
-    userCoursePartState.user = user
     userCoursePartState.courseId = courseId
     userCoursePartState.coursePart = coursePart
 
@@ -150,6 +146,10 @@ export default class UserCoursePartStateService {
     )
 
     if (userCoursePartStates.length === 0) {
+      const user = new User()
+      user.id = userId
+      await user.save()
+
       userCoursePartStates = await this.createUserCoursePartStates(
         manager,
         courseId,
