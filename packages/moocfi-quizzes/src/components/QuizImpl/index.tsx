@@ -5,6 +5,7 @@ import styled from "styled-components"
 import { Grid, Typography } from "@material-ui/core"
 import * as quizAnswerActions from "../../state/quizAnswer/actions"
 import * as messageActions from "../../state/message/actions"
+import * as languageActions from "../../state/language/actions"
 
 import { initialize } from "../../state/actions"
 import Checkbox from "../CheckboxOption"
@@ -24,6 +25,7 @@ import { Quiz, QuizItemType } from "../../modelTypes"
 import LoadingQuiz from "./LoadingQuiz"
 import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
+import CustomContentQuiz from "./CustomContentQuiz"
 import MarkdownText from "../MarkdownText"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
@@ -46,6 +48,7 @@ export interface QuizProps {
   languageId: string
   accessToken: string
   backendAddress?: string
+  customContent?: Element | JSX.Element
 }
 
 const QuizItemContainerDiv = styled.div`
@@ -72,6 +75,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   languageId,
   accessToken,
   backendAddress,
+  customContent,
 }) => {
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const messageState = useTypedSelector(state => state.message)
@@ -86,10 +90,18 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   useEffect(
     () => {
-      dispatch(initialize(id, languageId, accessToken, backendAddress))
+      if (accessToken) {
+        dispatch(initialize(id, languageId, accessToken, backendAddress))
+      } else if (languageId) {
+        dispatch(languageActions.set(languageId))
+      }
     },
     [id, languageId, accessToken, backendAddress],
   )
+
+  if (customContent || !accessToken) {
+    return <CustomContentQuiz content={customContent} />
+  }
 
   if (!quiz || !languageInfo || !quizAnswer) {
     return <LoadingQuiz />
@@ -112,10 +124,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           })}
       </>
     )
-  }
-
-  if (!accessToken) {
-    return <div>{generalLabels.loginPromptLabel}</div>
   }
 
   if (error) {

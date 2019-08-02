@@ -51,7 +51,14 @@ const SpaceFillerDiv = styled.div`
   height: 31.2px;
 `
 
-const TopInfoBar: React.FunctionComponent = () => {
+interface ITopInfoBarProps {
+  // when the user is not logged in
+  staticBars?: boolean
+}
+
+const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
+  staticBars,
+}) => {
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const quiz = useTypedSelector(state => state.quiz)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
@@ -77,17 +84,19 @@ const TopInfoBar: React.FunctionComponent = () => {
     formattedReceivedPoints = ""
     availablePoints = ""
 
-    titleReplacement = displayBars ? (
-      <QuizTitleLoadingBar />
-    ) : (
-      <SpaceFillerDiv />
-    )
+    titleReplacement =
+      displayBars || staticBars ? (
+        <QuizTitleLoadingBar animate={!staticBars} />
+      ) : (
+        <SpaceFillerDiv />
+      )
 
-    pointsReplacement = displayBars ? (
-      <QuizPointsLoadingBar />
-    ) : (
-      <SpaceFillerDiv />
-    )
+    pointsReplacement =
+      displayBars || staticBars ? (
+        <QuizPointsLoadingBar animate={!staticBars} />
+      ) : (
+        <SpaceFillerDiv />
+      )
   } else {
     title = quiz.texts[0].title
 
@@ -143,9 +152,16 @@ const TopInfoBar: React.FunctionComponent = () => {
   )
 }
 
-const QuizTitleLoadingBar = () => {
+interface ILoadingBarProps {
+  animate: boolean
+}
+
+const QuizTitleLoadingBar: React.FunctionComponent<ILoadingBarProps> = ({
+  animate,
+}) => {
   return (
     <StyledQuizTitleContentLoader
+      animate={animate}
       height={40}
       width={100}
       speed={2}
@@ -165,9 +181,12 @@ const StyledQuizTitleContentLoader = styled(ContentLoader)`
   height: 31.2px;
 `
 
-const QuizPointsLoadingBar = () => {
+const QuizPointsLoadingBar: React.FunctionComponent<ILoadingBarProps> = ({
+  animate,
+}) => {
   return (
     <StyledQuizPointsContentLoader
+      animate={animate}
       height={40}
       width={100}
       speed={2}

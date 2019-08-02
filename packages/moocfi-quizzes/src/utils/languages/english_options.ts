@@ -65,7 +65,7 @@ const englishLabels: SingleLanguageLabels = {
       "Question not answered. Quiz has probably been modified after your answer.",
     submitButtonLabel: "Submit",
     errorLabel: "Error",
-    loginPromptLabel: "Login to view the quiz",
+    loginPromptLabel: "Log in to view the quiz",
     loadingLabel: "Loading",
     answerCorrectLabel: "The answer is correct",
     alreadyAnsweredLabel: "You have already answered",
