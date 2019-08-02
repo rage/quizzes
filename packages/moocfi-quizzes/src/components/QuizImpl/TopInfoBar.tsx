@@ -17,7 +17,7 @@ const PointsText = styled(Typography)`
   text-align: end;
 `
 
-const IconAndTitleGrid = styled(Grid)`
+const XXS12Grid = styled(Grid)`
   @media (max-width: 550px) {
     max-width: 100%;
     flex-basis: 100%;
@@ -109,31 +109,31 @@ const TopInfoBar: React.FunctionComponent = () => {
       justify="space-between"
       alignItems="flex-start"
     >
-      <IconAndTitleGrid item={true} xs={8}>
-        <Grid container={true} alignItems="center">
-          <IconAndTitleGrid item={true} xs={3}>
+      <XXS12Grid item={true} xs={9}>
+        <Grid container={true} alignItems="stretch">
+          <XXS12Grid item={true} xs={3} md={2}>
             <IconWrapper>
               <FontAwesomeIcon icon={faQuestionCircle} />
             </IconWrapper>
-          </IconAndTitleGrid>
+          </XXS12Grid>
 
-          <IconAndTitleGrid item={true} xs={9}>
+          <XXS12Grid item={true} xs={9} md={10}>
             <Typography variant="subtitle1">{quizLabel}:</Typography>
             {quiz ? (
               <Typography variant="h5">{title}</Typography>
             ) : (
               titleReplacement
             )}
-          </IconAndTitleGrid>
+          </XXS12Grid>
         </Grid>
-      </IconAndTitleGrid>
+      </XXS12Grid>
 
       <RightMarginedGrid item={true} xs={2}>
         <PointsLabelText>{pointsLabel}:</PointsLabelText>
 
         {quiz ? (
           <PointsText>
-            `${formattedReceivedPoints}/${availablePoints}`
+            {`${formattedReceivedPoints}/${availablePoints}`}
           </PointsText>
         ) : (
           pointsReplacement
@@ -145,7 +145,7 @@ const TopInfoBar: React.FunctionComponent = () => {
 
 const QuizTitleLoadingBar = () => {
   return (
-    <ContentLoader
+    <StyledQuizTitleContentLoader
       height={40}
       width={100}
       speed={2}
@@ -153,14 +153,13 @@ const QuizTitleLoadingBar = () => {
       primaryOpacity={0.6}
       secondaryColor="#dddddd"
       secondaryOpacity={0.6}
-      style={{ width: "100%", maxWidth: "300px", height: "31.2px" }}
     >
       <rect x="0" y="10" rx="4" ry="20" width="100" height="30" />
-    </ContentLoader>
+    </StyledQuizTitleContentLoader>
   )
 }
 
-const StyledQuizTitleLoadingBar = styled(QuizTitleLoadingBar)`
+const StyledQuizTitleContentLoader = styled(ContentLoader)`
   width: 100%;
   max-width: 300px;
   height: 31.2px;
@@ -168,7 +167,7 @@ const StyledQuizTitleLoadingBar = styled(QuizTitleLoadingBar)`
 
 const QuizPointsLoadingBar = () => {
   return (
-    <ContentLoader
+    <StyledQuizPointsContentLoader
       height={40}
       width={100}
       speed={2}
@@ -176,16 +175,16 @@ const QuizPointsLoadingBar = () => {
       primaryOpacity={0.6}
       secondaryColor="#dddddd"
       secondaryOpacity={0.6}
-      style={{
-        width: "100%",
-        maxWidth: "50px",
-        height: "31.2px",
-        textAlign: "end",
-      }}
     >
       <rect x="0" y="10" rx="25" ry="25" width="100" height="30" />
-    </ContentLoader>
+    </StyledQuizPointsContentLoader>
   )
 }
+
+const StyledQuizPointsContentLoader = styled(ContentLoader)`
+  width: 100%;
+  max-width: 45px;
+  height: 31.2px;
+`
 
 export default TopInfoBar
