@@ -9,6 +9,7 @@ import {
 import AddCircle from "@material-ui/icons/AddCircle"
 import React from "react"
 import { connect } from "react-redux"
+import { IQuizItem, QuizItemType } from "../../interfaces"
 import {
   addFinishedOption,
   changeAttr,
@@ -22,7 +23,48 @@ import ExpandedTopInformation from "../ItemTools/ExpandedTopInformation"
 import OptionDialog from "../OptionDialog"
 import SortableOptionList from "./SortableOptionList"
 
-class MultipleChoiceItem extends React.Component<any, any> {
+interface IExpandedMultipleChoiceItemProps {
+  items: IQuizItem[]
+  order: number
+  type: QuizItemType
+  index: number
+  save: any
+  toggleExpand: any
+  onCancel: any
+  changeAttr: any
+  updateMultipleOptions: any
+}
+
+interface IMultipleChoiceItemState {
+  dialogOpen: boolean
+  existingOptData: any
+  tempItemData: IItemData
+  optionsExist: boolean
+  titleHasBeenModified: boolean
+}
+
+interface IItemData {
+  title: string
+  body: string
+  options: IOptionData[]
+}
+
+export interface IOptionData {
+  title: string
+  body: string
+  order: number
+  id?: string
+  quizItemId: string
+  successMessage: string
+  failureMessage: string
+  correct: boolean
+  titleHasBeenModified?: boolean
+}
+
+class MultipleChoiceItem extends React.Component<
+  IExpandedMultipleChoiceItemProps,
+  IMultipleChoiceItemState
+> {
   constructor(props) {
     super(props)
     const item = this.props.items[this.props.order]
@@ -209,7 +251,10 @@ class MultipleChoiceItem extends React.Component<any, any> {
 
     this.props.updateMultipleOptions(
       this.props.order,
-      this.state.tempItemData.options,
+      this.state.tempItemData.options.map(opt => ({
+        ...opt,
+        correct: !!opt.correct,
+      })),
     )
 
     this.props.save()
@@ -220,9 +265,13 @@ class MultipleChoiceItem extends React.Component<any, any> {
       opt => opt.order === optionOrder,
     )
 
+    if (!option) {
+      return
+    }
+
     const newData = {
       title: option.title,
-      correct: option.correct,
+      correct: !!option.correct,
       successMessage: option.successMessage,
       failureMessage: option.failureMessage,
       order: option.order,
@@ -262,7 +311,7 @@ class MultipleChoiceItem extends React.Component<any, any> {
         body: optionData.body,
         failureMessage: optionData.failureMessage,
         successMessage: optionData.successMessage,
-        correct: optionData.correct,
+        correct: !!optionData.correct,
       }
     })
 
@@ -292,7 +341,7 @@ class MultipleChoiceItem extends React.Component<any, any> {
       body: optionData.body,
       successMessage: optionData.successMessage,
       failureMessage: optionData.failureMessage,
-      correct: optionData.correct !== null ? optionData.correct : false,
+      correct: !!optionData.correct,
       order: this.state.tempItemData.options.length,
       quizItemId: itemId,
     }
