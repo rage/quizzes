@@ -246,7 +246,10 @@ class QuizStatistics extends React.Component<any, any> {
                           Reevaluate the quiz answers. Cannot result in lower
                           points for any quiz answer.
                         </Typography>
-                        <Typography variant="body1">
+                        <Typography
+                          variant="body1"
+                          style={{ marginTop: "1rem" }}
+                        >
                           Example use: you decide that the quiz should
                           automatically award full points. After modifying the
                           quiz, use this button to award the points for everyone
