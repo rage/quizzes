@@ -1,10 +1,35 @@
 import { Grid, RootRef, Typography } from "@material-ui/core"
 import React from "react"
 import { Link } from "react-router-dom"
+import { IQuiz } from "../../interfaces"
 import Answer from "./Answer"
 import PageSelector from "./PageSelector"
 
-class AttentionAnswers extends React.Component<any, any> {
+/*
+
+
+    currentPage={this.props.currentPage}
+    totalPages={this.props.totalPages}
+    onPageChange={this.props.onPageChange}
+    resultsPerPage={this.props.resultsPerPage}
+    changeResultsPerPage={this.props.changeResultsPerPage}
+
+*/
+
+interface IAttentionAnswersProps {
+  showingAll: boolean
+  quiz: IQuiz
+  answers: any[]
+  currentPage: number
+  totalPages: number
+  onPageChange: any
+  resultsPerPage: number
+  changeResultsPerPage: any
+  updateAnswers: any
+  inWaitingState: any
+}
+
+class AttentionAnswers extends React.Component<IAttentionAnswersProps, any> {
   private upperNavigationRef: React.RefObject<HTMLElement>
 
   constructor(props) {
