@@ -4,54 +4,64 @@ import React from "react"
 import { SortableContainer } from "react-sortable-hoc"
 import { stringContainsLongerWord } from "../../../../common/src/util/index"
 import SortableWrapper from "../SortableWrapper"
+import { IOptionData } from "./ExpandedMultipleChoiceItem"
 
-const SortableOptionList = SortableContainer((props: any) => {
-  return (
-    <Grid
-      container={true}
-      spacing={16}
-      justify="space-evenly"
-      alignItems="center"
-    >
-      {props.options.map((option, index) => {
-        return (
-          <SortableWrapper
-            collection={`items[${props.order}].options`}
-            index={index}
-            key={`${option.quizItemId}-${index}-${option.title}`}
+interface ISortableOptionListProps {
+  options: IOptionData[]
+  order: number
+  modifyExistingOption: (order: number) => () => void
+  createNewOption: () => void
+}
+
+const SortableOptionList = SortableContainer<ISortableOptionListProps>(
+  props => {
+    return (
+      <Grid
+        container={true}
+        spacing={16}
+        justify="space-evenly"
+        alignItems="center"
+      >
+        {props.options.map((option, index) => {
+          return (
+            <SortableWrapper
+              collection={`items[${props.order}].options`}
+              index={index}
+              key={`${option.quizItemId}-${index}-${option.title}`}
+            >
+              <Grid item={true} xs={12} sm={6} md={4} lg={3}>
+                <div
+                  style={{
+                    border: "dotted",
+                    borderColor: option.correct ? "green" : "red",
+                    cursor: "pointer",
+                    padding: ".5em",
+                    textAlign: "center",
+                    wordBreak: stringContainsLongerWord(option.title, 30)
+                      ? "break-all"
+                      : "normal",
+                  }}
+                  onClick={props.modifyExistingOption(option.order)}
+                >
+                  <Typography variant="body1">{option.title || ""}</Typography>
+                </div>
+              </Grid>
+            </SortableWrapper>
+          )
+        })}
+        <Grid item={true} xs="auto">
+          <IconButton
+            aria-label="Add option"
+            color="primary"
+            disableRipple={true}
+            onClick={props.createNewOption}
           >
-            <Grid item={true} xs={12} sm={6} md={4} lg={3}>
-              <div
-                style={{
-                  border: "dotted",
-                  borderColor: option.correct ? "green" : "red",
-                  cursor: "pointer",
-                  padding: ".5em",
-                  textAlign: "center",
-                  wordBreak: stringContainsLongerWord(option.title, 30)
-                    ? "break-all"
-                    : "normal",
-                }}
-                onClick={props.modifyExistingOption(option.order)}
-              >
-                <Typography variant="body1">{option.title || ""}</Typography>
-              </div>
-            </Grid>
-          </SortableWrapper>
-        )
-      })}
-      <Grid item={true} xs="auto">
-        <IconButton
-          aria-label="Add option"
-          color="primary"
-          disableRipple={true}
-          onClick={props.createNewOption}
-        >
-          <AddCircle fontSize="large" nativeColor="#E5E5E5" />
-        </IconButton>
+            <AddCircle fontSize="large" nativeColor="#E5E5E5" />
+          </IconButton>
+        </Grid>
       </Grid>
-    </Grid>
-  )
-})
+    )
+  },
+)
 
 export default SortableOptionList
