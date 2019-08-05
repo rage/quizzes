@@ -111,3 +111,7 @@ export interface ILanguage {
   country: string
   name: string
 }
+
+export interface IQuizAnswer {
+  a: any
+}

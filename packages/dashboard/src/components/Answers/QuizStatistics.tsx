@@ -1,4 +1,5 @@
 import {
+  Button,
   Card,
   CardContent,
   CircularProgress,
@@ -220,6 +221,39 @@ class QuizStatistics extends React.Component<any, any> {
                         numberOfAnswers={totalNumberOfResults}
                       />
                     )}
+
+                    <Grid item={true} xs={12}>
+                      <Button
+                        variant="outlined"
+                        style={{
+                          width: "100%",
+                          backgroundColor: "rgb(16, 126, 171)",
+                          color: "white",
+                        }}
+                      >
+                        Reevaluate the answers
+                      </Button>
+                      <div
+                        style={{
+                          border: "1px solid rgb(9, 68, 92)",
+                          borderRadius: "4px",
+                          borderTopWidth: "0px",
+                          marginTop: "-4px",
+                          padding: "1rem",
+                        }}
+                      >
+                        <Typography variant="body1">
+                          Reevaluate the quiz answers. Cannot result in lower
+                          points for any quiz answer.
+                        </Typography>
+                        <Typography variant="body1">
+                          Example use: you decide that the quiz should
+                          automatically award full points. After modifying the
+                          quiz, use this button to award the points for everyone
+                          who has already answered.
+                        </Typography>
+                      </div>
+                    </Grid>
 
                     <Grid item={true} xs={12}>
                       <DownloadButton
