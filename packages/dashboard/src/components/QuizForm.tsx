@@ -36,6 +36,13 @@ class QuizForm extends React.Component<any, any> {
     }
   }
 
+  public componentDidUpdate(prevProps, prevState) {
+    console.log("Props: ", this.props)
+    if (!prevProps.edit.id && this.props.edit.id) {
+      this.props.history.push(`/quizzes/${this.props.edit.id}`)
+    }
+  }
+
   public render() {
     return (
       <Grid container={true} spacing={16} justify="center">

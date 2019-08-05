@@ -18,7 +18,23 @@ export const quizzesReducer = (
       }
       // only updating a single quiz after saving
       if (action.payload.quizzes.length === 1) {
-        const newQuizzes = [
+        const updatedQuiz = action.payload.quizzes[0]
+
+        let newQuizzes = [
+          ...state.find(qi => qi.courseId === action.payload.courseId).quizzes,
+        ]
+
+        if (newQuizzes.includes(quiz => quiz.id === updatedQuiz.id)) {
+          newQuizzes = newQuizzes.map(q =>
+            q.id === action.payload.quizzes[0].id
+              ? action.payload.quizzes[0]
+              : q,
+          )
+        } else {
+          newQuizzes = newQuizzes.concat(updatedQuiz)
+        }
+
+        newQuizzes = [
           ...state.find(qi => qi.courseId === action.payload.courseId).quizzes,
         ].map(q =>
           q.id === action.payload.quizzes[0].id ? action.payload.quizzes[0] : q,

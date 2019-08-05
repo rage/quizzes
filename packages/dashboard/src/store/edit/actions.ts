@@ -8,7 +8,7 @@ import {
 import { post } from "../../services/quizzes"
 import { setLanguage } from "../filter/actions"
 import { displayMessage } from "../notification/actions"
-import * as quizzes from "../quizzes/actions"
+import * as quizActions from "../quizzes/actions"
 
 export const set = createAction("edit/SET", resolve => {
   return quiz => resolve(quiz)
@@ -40,8 +40,8 @@ export const save = () => {
   return async (dispatch, getState) => {
     try {
       const quiz = await post(getState().edit, getState().user)
-      dispatch(quizzes.set({ courseId: quiz.courseId, quizzes: [quiz] }))
 
+      dispatch(quizActions.set({ courseId: quiz.courseId, quizzes: [quiz] }))
       dispatch(setEdit(quiz))
       dispatch(
         displayMessage(`Successfully saved ${quiz.texts[0].title}!`, false),
@@ -49,9 +49,9 @@ export const save = () => {
     } catch (error) {
       dispatch(
         displayMessage(
-          `Failed to save changes to ${
-            getState().edit.texts[0].title
-          }. ${error}`,
+          `Failed to save changes to ${getState().edit.texts[0].title}. ${
+            error.message
+          }`,
           true,
         ),
       )
