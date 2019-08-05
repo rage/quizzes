@@ -1,10 +1,8 @@
 import _ from "lodash"
 import { arrayMove } from "react-sortable-hoc"
 import { ActionType, createAction } from "typesafe-actions"
-import {
-  INewQuizQuery,
-  INewQuizTranslation,
-} from "../../../../common/src/types/index"
+import { IQuiz } from "../../interfaces"
+
 import { post } from "../../services/quizzes"
 import { setLanguage } from "../filter/actions"
 import { displayMessage } from "../notification/actions"
@@ -31,8 +29,10 @@ export const setEdit = (quiz: any) => {
   /*orderedQuiz.peerReviewQuestions = orderedQuiz.peerReviewQuestions.sort(
     (p1, p2) => p1.order - p2.order,
   )*/
+  const checkedQuiz = checkForMissingTranslation(orderedQuiz)
+
   return dispatch => {
-    dispatch(set(checkForMissingTranslation(orderedQuiz)))
+    dispatch(set(checkedQuiz))
   }
 }
 
@@ -268,7 +268,7 @@ export const remove = (path, index) => {
   }
 }
 
-const checkForMissingTranslation = paramQuiz => {
+const checkForMissingTranslation = (paramQuiz: IQuiz) => {
   const quiz = JSON.parse(JSON.stringify(paramQuiz))
   const languages = quiz.course.languages.map(l => l.id)
   languages.map(language => {
