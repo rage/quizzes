@@ -30,6 +30,7 @@ export default class OptionDialog extends React.Component<any, any> {
 
   public componentDidUpdate() {
     if (this.props.existingOptData && this.state.inInitialState) {
+      console.log("interesting...")
       const newState = {
         correctChecked: false,
         optionData: {},

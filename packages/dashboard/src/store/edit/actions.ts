@@ -1,14 +1,12 @@
 import _ from "lodash"
 import { arrayMove } from "react-sortable-hoc"
 import { ActionType, createAction } from "typesafe-actions"
-import {
-  INewQuizQuery,
-  INewQuizTranslation,
-} from "../../../../common/src/types/index"
+import { IQuiz } from "../../interfaces"
+
 import { post } from "../../services/quizzes"
 import { setLanguage } from "../filter/actions"
 import { displayMessage } from "../notification/actions"
-import * as quizzes from "../quizzes/actions"
+import * as quizActions from "../quizzes/actions"
 
 export const set = createAction("edit/SET", resolve => {
   return quiz => resolve(quiz)
@@ -31,8 +29,10 @@ export const setEdit = (quiz: any) => {
   /*orderedQuiz.peerReviewQuestions = orderedQuiz.peerReviewQuestions.sort(
     (p1, p2) => p1.order - p2.order,
   )*/
+  const checkedQuiz = checkForMissingTranslation(orderedQuiz)
+
   return dispatch => {
-    dispatch(set(checkForMissingTranslation(orderedQuiz)))
+    dispatch(set(checkedQuiz))
   }
 }
 
@@ -40,8 +40,8 @@ export const save = () => {
   return async (dispatch, getState) => {
     try {
       const quiz = await post(getState().edit, getState().user)
-      dispatch(quizzes.set({ courseId: quiz.courseId, quizzes: [quiz] }))
 
+      dispatch(quizActions.set({ courseId: quiz.courseId, quizzes: [quiz] }))
       dispatch(setEdit(quiz))
       dispatch(
         displayMessage(`Successfully saved ${quiz.texts[0].title}!`, false),
@@ -49,9 +49,9 @@ export const save = () => {
     } catch (error) {
       dispatch(
         displayMessage(
-          `Failed to save changes to ${
-            getState().edit.texts[0].title
-          }. ${error}`,
+          `Failed to save changes to ${getState().edit.texts[0].title}. ${
+            error.message
+          }`,
           true,
         ),
       )
@@ -268,7 +268,7 @@ export const remove = (path, index) => {
   }
 }
 
-const checkForMissingTranslation = paramQuiz => {
+const checkForMissingTranslation = (paramQuiz: IQuiz) => {
   const quiz = JSON.parse(JSON.stringify(paramQuiz))
   const languages = quiz.course.languages.map(l => l.id)
   languages.map(language => {

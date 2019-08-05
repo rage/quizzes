@@ -1,9 +1,17 @@
 import { Grid, Typography } from "@material-ui/core"
 import Reorder from "@material-ui/icons/Reorder"
 import React from "react"
+import { QuizItemType } from "../../interfaces"
+
 import DragHandleWrapper from "../DragHandleWrapper"
 
-const TopInformation = ({ type }) => (
+interface ITopInformationProps {
+  type: QuizItemType
+}
+
+const TopInformation: React.FunctionComponent<ITopInformationProps> = ({
+  type,
+}) => (
   <React.Fragment>
     <Grid item={true} xs={11}>
       <Typography color="textSecondary" gutterBottom={true}>
