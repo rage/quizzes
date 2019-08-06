@@ -3,11 +3,11 @@ import styled from "styled-components"
 import { Typography } from "@material-ui/core"
 import { useTypedSelector } from "../../state/store"
 
-interface ICustomContentQuizProps {
+interface ILoginPromptProps {
   content?: Element | JSX.Element
 }
 
-const LoginPrompt: React.FunctionComponent<ICustomContentQuizProps> = ({
+const LoginPrompt: React.FunctionComponent<ILoginPromptProps> = ({
   content,
 }) => {
   const contents = content || <DefaultLoginMessage />

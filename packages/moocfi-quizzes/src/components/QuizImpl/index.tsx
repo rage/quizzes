@@ -24,7 +24,7 @@ import { Quiz, QuizItemType } from "../../modelTypes"
 import LoadingQuiz from "./LoadingQuiz"
 import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
-import LoginPrompt from "./CustomContentQuiz"
+import LoginPrompt from "./LoginPrompt"
 import MarkdownText from "../MarkdownText"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
@@ -48,6 +48,7 @@ export interface QuizProps {
   accessToken: string
   backendAddress?: string
   customContent?: Element | JSX.Element
+  fullInfoWithoutLogin?: boolean
 }
 
 const QuizItemContainerDiv = styled.div`
@@ -85,6 +86,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   accessToken,
   backendAddress,
   customContent,
+  fullInfoWithoutLogin,
 }) => {
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const messageState = useTypedSelector(state => state.message)
@@ -100,7 +102,15 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   useEffect(
     () => {
-      dispatch(initialize(id, languageId, accessToken, backendAddress))
+      dispatch(
+        initialize(
+          id,
+          languageId,
+          accessToken,
+          backendAddress,
+          fullInfoWithoutLogin,
+        ),
+      )
     },
     [id, languageId, accessToken, backendAddress],
   )
@@ -170,6 +180,15 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   const containsPeerReviews =
     quiz.peerReviewCollections !== null && quiz.peerReviewCollections.length > 0
+
+  if (!fullInfoWithoutLogin) {
+    return (
+      <div>
+        <TopInfoBar />
+        <LoginPrompt content={customContent} />
+      </div>
+    )
+  }
 
   return (
     <div>
