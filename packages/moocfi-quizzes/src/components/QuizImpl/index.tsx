@@ -5,7 +5,6 @@ import styled from "styled-components"
 import { Grid, Typography } from "@material-ui/core"
 import * as quizAnswerActions from "../../state/quizAnswer/actions"
 import * as messageActions from "../../state/message/actions"
-import * as languageActions from "../../state/language/actions"
 
 import { initialize } from "../../state/actions"
 import Checkbox from "../CheckboxOption"
@@ -25,7 +24,7 @@ import { Quiz, QuizItemType } from "../../modelTypes"
 import LoadingQuiz from "./LoadingQuiz"
 import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
-import CustomContentQuiz from "./CustomContentQuiz"
+import LoginPrompt from "./CustomContentQuiz"
 import MarkdownText from "../MarkdownText"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
@@ -66,8 +65,18 @@ const ComponentWrapper = styled.div<IComponentWrapperProps>`
   padding: 1rem 2rem 1rem 1rem;
 `
 
-const QuizContentWrapper = styled.div`
+interface IQuizContentWrapperProps {
+  disabled: boolean
+}
+
+const QuizContentWrapper = styled.div<IQuizContentWrapperProps>`
   padding: 1rem;
+  ${({ disabled }) =>
+    disabled &&
+    `
+        opacity: 0.5;
+        cursor: default;
+      `}
 `
 
 const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
@@ -83,6 +92,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const quiz = useTypedSelector(state => state.quiz)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
 
   const dispatch = useDispatch()
 
@@ -90,20 +100,11 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   useEffect(
     () => {
-      if (accessToken) {
-        dispatch(initialize(id, languageId, accessToken, backendAddress))
-      } else if (languageId) {
-        dispatch(languageActions.set(languageId))
-      }
+      dispatch(initialize(id, languageId, accessToken, backendAddress))
     },
     [id, languageId, accessToken, backendAddress],
   )
-
-  if (customContent || !accessToken) {
-    return <CustomContentQuiz content={customContent} />
-  }
-
-  if (!quiz || !languageInfo || !quizAnswer) {
+  if (!quiz || !languageInfo) {
     return <LoadingQuiz />
   }
 
@@ -163,7 +164,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     locked = userQuizState.status === "locked"
   }
 
-  if (locked) {
+  if (locked || quizDisabled) {
     stillSubmittable = false
   }
 
@@ -174,7 +175,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     <div>
       <TopInfoBar />
 
-      <QuizContentWrapper>
+      {quizDisabled && <LoginPrompt content={customContent} />}
+
+      <QuizContentWrapper disabled={quizDisabled}>
         {containsPeerReviews && <StageVisualizer />}
 
         <MarkdownText>{quiz.texts[0].body}</MarkdownText>
@@ -205,7 +208,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
               <Grid
                 item={true}
                 onClick={e => {
-                  if (submitLocked) {
+                  if (submitLocked && !quizDisabled) {
                     dispatch(quizAnswerActions.noticeDisabledSubmitAttempt())
                   }
                 }}
@@ -213,13 +216,17 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                 <SubmitButton />
               </Grid>
 
-              <Grid item={true}>
-                <Typography>
-                  {quiz.triesLimited
-                    ? `${generalLabels.triesRemainingLabel}: ${triesRemaining}`
-                    : generalLabels.triesNotLimitedLabel}
-                </Typography>
-              </Grid>
+              {!quizDisabled && (
+                <Grid item={true}>
+                  <Typography>
+                    {quiz.triesLimited
+                      ? `${
+                          generalLabels.triesRemainingLabel
+                        }: ${triesRemaining}`
+                      : generalLabels.triesNotLimitedLabel}
+                  </Typography>
+                </Grid>
+              )}
             </Grid>
           </div>
         )}

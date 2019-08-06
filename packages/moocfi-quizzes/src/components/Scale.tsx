@@ -72,10 +72,11 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
   const itemAnswers = useTypedSelector(
     state => state.quizAnswer.quizAnswer.itemAnswers,
   )
+  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
   const itemAnswer = itemAnswers.find(ia => ia.quizItemId === item.id)
   const intData = itemAnswer && itemAnswer.intData
 
-  if (!itemAnswer) {
+  if (!itemAnswer && !quizDisabled) {
     return <LaterQuizItemAddition item={item} />
   }
 

@@ -9,6 +9,11 @@ export const set = createAction("quiz/SET", resolve => {
   return (quiz: Quiz) => resolve(quiz)
 })
 
+export const setTitle = createAction(
+  "quiz/SET_TITLE",
+  resolve => (title: string) => resolve(title),
+)
+
 export const clear = createAction("quiz/CLEAR")
 
 export const setQuiz: ActionCreator<ThunkAction> = (quizId: string) => async (

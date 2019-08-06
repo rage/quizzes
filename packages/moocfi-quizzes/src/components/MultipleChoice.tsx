@@ -29,6 +29,17 @@ interface ChoiceButtonProps {
   selected: boolean
 }
 
+const DisabledButton = styled(Button)<{ onlyOneItem: boolean }>`
+  ${({ onlyOneItem }) => onlyOneItem && `width: 70%;`}
+  text-transform: none;
+  margin: 0.5em 0;
+  border-radius: 15px;
+  border: 1px solid rgba(0, 0, 0, 0.23);
+  padding: 15px;
+  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
+    0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+`
+
 const ChoiceButton = styled(Button)<ChoiceButtonProps>`
   ${({ onlyOneItem, selected }) =>
     onlyOneItem
@@ -129,13 +140,15 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   item,
 }) => {
   const quiz = useTypedSelector(state => state.quiz)
+  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+  const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+
   if (!quiz) {
     return <div />
   }
-  const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
 
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
-  if (!itemAnswer) {
+  if (!itemAnswer && !quizDisabled) {
     return <LaterQuizItemAddition item={item} />
   }
 
@@ -196,7 +209,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
 
 type ItemInformationProps = {
   questionWidth: 6 | 12
-  itemAnswer: QuizItemAnswer
+  itemAnswer: QuizItemAnswer | undefined
   item: QuizItem
   onlyOneItem: boolean
 }
@@ -248,6 +261,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
       )}
 
       {displayFeedback &&
+        itemAnswer &&
         !onlyOneItem &&
         ((itemAnswer.correct && successMessage) ||
           (!itemAnswer.correct && failureMessage)) && (
@@ -298,6 +312,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
     state => state.language.languageLabels,
   )
   const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
+  const quizDisabled = useTypedSelector(state => state.quizAnswer.submitLocked)
 
   if (!item || !languageLabels) {
     // should be impossible
@@ -306,25 +321,22 @@ const Option: React.FunctionComponent<OptionProps> = ({
   const itemAnswer = quizAnswer.itemAnswers.find(
     ia => ia.quizItemId === item.id,
   )
-  if (!itemAnswer) {
-    // should be impossible
-    return <div>Cannot find related item answer</div>
-  }
 
   const onlyOneItem = items.length === 1
+  const text = option.texts[0]
+
+  if (!itemAnswer && !quizDisabled) {
+    return <div>Answer cannot be retrieved</div>
+  }
 
   const handleOptionChange = (optionId: string) => () =>
     dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))
 
-  const optionAnswers = itemAnswer.optionAnswers
+  const optionAnswers = itemAnswer && itemAnswer.optionAnswers
   const answerLocked = userQuizState && userQuizState.status === "locked"
 
-  const optionIsSelected = optionAnswers.some(
-    oa => oa.quizOptionId === option.id,
-  )
-  const text = option.texts[0]
-
-  // option incorrect, selected -> success; option correct, not selected -> success! Otherwise failure
+  const optionIsSelected =
+    optionAnswers && optionAnswers.some(oa => oa.quizOptionId === option.id)
 
   const generalLabels = languageLabels.general
 
@@ -341,6 +353,32 @@ const Option: React.FunctionComponent<OptionProps> = ({
       : "#DB0000"
     : "white"
 
+  const properButton = quizDisabled ? (
+    <DisabledButton
+      onlyOneItem={onlyOneItem}
+      variant="contained"
+      fullWidth
+      disabled
+    >
+      <MarkdownText Component={styled.div``} removeParagraphs>
+        {text.title}
+      </MarkdownText>
+    </DisabledButton>
+  ) : (
+    <ChoiceButton
+      onlyOneItem={onlyOneItem}
+      selected={!!optionIsSelected}
+      variant="contained"
+      fullWidth
+      color={optionIsSelected ? "primary" : "default"}
+      onClick={handleOptionChange(option.id)}
+    >
+      <MarkdownText Component={styled.div``} removeParagraphs>
+        {text.title}
+      </MarkdownText>
+    </ChoiceButton>
+  )
+
   if (!displayFeedback) {
     return (
       <OptionGridItem
@@ -349,18 +387,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
         onlyOneItem={onlyOneItem}
         shouldBeGray={shouldBeGray}
       >
-        <ChoiceButton
-          onlyOneItem={onlyOneItem}
-          selected={optionIsSelected}
-          variant="contained"
-          fullWidth
-          color={optionIsSelected ? "primary" : "default"}
-          onClick={handleOptionChange(option.id)}
-        >
-          <MarkdownText Component={styled.div``} removeParagraphs>
-            {text.title}
-          </MarkdownText>
-        </ChoiceButton>
+        {properButton}
       </OptionGridItem>
     )
   }

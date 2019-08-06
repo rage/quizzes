@@ -16,7 +16,9 @@ const ResearchAgreement: React.FunctionComponent<ResearchAgreementProps> = ({
   const itemAnswer = quizAnswer.quizAnswer.itemAnswers.find(
     ia => ia.quizItemId === item.id,
   )
-  if (!itemAnswer) {
+  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+
+  if (!itemAnswer && !quizDisabled) {
     return <LaterQuizItemAddition item={item} />
   }
 

@@ -13,6 +13,11 @@ export const set = createAction("quizAnswer/SET", resolve => {
   return (quizAnswer: QuizAnswer) => resolve(quizAnswer)
 })
 
+export const setQuizDisabled = createAction(
+  "quizAnswer/SET_QUIZ_DISABLED",
+  resolve => (newValue: boolean) => resolve(newValue),
+)
+
 export const clear = createAction("quizAnswer/CLEAR")
 
 export const setNoChangesSinceSuccessfulSubmit = createAction(

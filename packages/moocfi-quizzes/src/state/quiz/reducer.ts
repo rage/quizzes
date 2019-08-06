@@ -15,6 +15,20 @@ export const quizReducer = (
       return action.payload
     case getType(quiz.clear):
       return initialState
+    case getType(quiz.setTitle):
+      if (!state) {
+        return state
+      }
+      let newTexts = state && { ...state.texts[0] }
+      if (!newTexts) {
+        return state
+      }
+      newTexts.title = action.payload
+
+      return {
+        ...state,
+        texts: [newTexts],
+      }
     default:
       return state
   }

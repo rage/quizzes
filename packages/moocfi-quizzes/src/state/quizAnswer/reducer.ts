@@ -13,6 +13,7 @@ export const initialState: QuizAnswerState = {
   attemptedDisabledSubmit: false,
   noChangesSinceSuccessfulSubmit: false,
   noChangesAfterLoading: true,
+  quizDisabled: false,
 }
 
 export type QuizAnswerState = {
@@ -22,6 +23,7 @@ export type QuizAnswerState = {
   attemptedDisabledSubmit: boolean
   noChangesSinceSuccessfulSubmit: boolean
   noChangesAfterLoading: boolean
+  quizDisabled: boolean
 }
 
 export const quizAnswerReducer = (
@@ -34,6 +36,8 @@ export const quizAnswerReducer = (
         ...state,
         submitLocked: false,
       }
+    case getType(quizAnswer.setQuizDisabled):
+      return { ...state, quizDisabled: action.payload }
     case getType(quizAnswer.set):
       let newItemAnswersReady: Record<string, boolean> = {}
       let newQuizAnswer = action.payload

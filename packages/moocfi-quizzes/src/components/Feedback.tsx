@@ -15,6 +15,7 @@ const Feedback: React.FunctionComponent<FeedbackProps> = ({ item }) => {
   const dispatch = useDispatch()
 
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
 
   const handleTextDataChange = (e: MiscEvent) =>
     dispatch(quizAnswerActions.changeTextData(item.id, e.currentTarget.value))
@@ -26,11 +27,11 @@ const Feedback: React.FunctionComponent<FeedbackProps> = ({ item }) => {
 
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
 
-  if (!itemAnswer) {
+  if (!itemAnswer && quizDisabled) {
     return <LaterQuizItemAddition item={item} />
   }
 
-  const textData = itemAnswer.textData
+  const textData = itemAnswer ? itemAnswer.textData : ""
 
   return (
     <div style={{ marginBottom: 10 }}>

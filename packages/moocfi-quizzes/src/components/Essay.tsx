@@ -39,6 +39,7 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
 
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
+  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
 
   const recentlyAttemptedDisabledSubmit = useTypedSelector(
     state => state.quizAnswer.attemptedDisabledSubmit,
@@ -63,11 +64,11 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
     }
   }
 
-  if (!itemAnswer) {
+  if (!itemAnswer && !quizDisabled) {
     return <LaterQuizItemAddition item={item} />
   }
 
-  const answerText = itemAnswer.textData || ""
+  const answerText = itemAnswer ? itemAnswer.textData || "" : ""
 
   const numOfWords = wordCount(answerText)
   const answerWithinLimits =
