@@ -30,7 +30,11 @@ const PeerReviews: React.FunctionComponent = () => {
   }
 
   if (quizDisabled) {
-    return <div>There are peer reviews</div>
+    return (
+      <Typography variant="subtitle1">
+        {languageInfo.peerReviews.peerReviewsInfoForLoggedOutUser}
+      </Typography>
+    )
   }
 
   const peerReviewsLabels = languageInfo.peerReviews

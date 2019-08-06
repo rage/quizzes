@@ -16,6 +16,12 @@ const VertCenteredGrid = styled(Grid)`
   align-self: center;
 `
 
+const MarkdownTextWithoutMargin = styled(MarkdownText)`
+  p {
+    margin: 0;
+  }
+`
+
 const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
   item,
 }) => {
@@ -59,14 +65,14 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
       </Grid>
       <VertCenteredGrid item xs>
         {title && (
-          <MarkdownText Component={Typography} variant="subtitle1">
+          <MarkdownTextWithoutMargin Component={Typography} variant="subtitle1">
             {title}
-          </MarkdownText>
+          </MarkdownTextWithoutMargin>
         )}
         {body && body !== title && (
-          <MarkdownText Component={Typography} variant="body1">
+          <MarkdownTextWithoutMargin Component={Typography} variant="body1">
             {body}
-          </MarkdownText>
+          </MarkdownTextWithoutMargin>
         )}
       </VertCenteredGrid>
     </Grid>

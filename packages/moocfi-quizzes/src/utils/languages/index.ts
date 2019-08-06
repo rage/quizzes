@@ -60,6 +60,7 @@ export type PeerReviewLabels = {
   hidePeerReviewLabel: string
   loadingLabel: string
   quizInvolvesNoPeerReviewsInstruction: string
+  peerReviewsInfoForLoggedOutUser: string
 }
 
 export type UnsupportedLabels = {

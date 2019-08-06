@@ -47,6 +47,7 @@ const finnishLabels: SingleLanguageLabels = {
     hidePeerReviewLabel: "Piilota",
     quizInvolvesNoPeerReviewsInstruction:
       "Tähän tehtävään ei liity vertaisarvioita",
+    peerReviewsInfoForLoggedOutUser: "Kyselyyn liittyy vertaisarviointiosio",
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>

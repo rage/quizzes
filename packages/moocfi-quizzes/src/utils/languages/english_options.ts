@@ -43,6 +43,7 @@ const englishLabels: SingleLanguageLabels = {
     displayPeerReview: "Add peer review",
     hidePeerReviewLabel: "Hide",
     quizInvolvesNoPeerReviewsInstruction: "This quiz involves no peer reviews",
+    peerReviewsInfoForLoggedOutUser: "The quiz includes peer reviews",
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
