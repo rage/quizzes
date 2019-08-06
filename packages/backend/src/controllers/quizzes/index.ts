@@ -56,24 +56,25 @@ export class QuizController {
   public async get(
     @Param("id") id: string,
     @QueryParams() params: any,
-    @QueryParam("titleOnly") titleOnly: boolean,
+    @QueryParam("fullInfo") fullInfo: boolean,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
     try {
       const quizId = validator.isUUID(id) ? id : getUUIDByString(id)
       if (!user) {
-        const basicInfo = titleOnly
-          ? await this.quizService.getQuizzes({
-              id: quizId,
-              stripped: true,
-            })
-          : await this.quizService.getQuizzes({
-              id: quizId,
-              peerreviews: true,
-              stripped: true,
-              items: true,
-              options: true,
-            })
+        const basicInfo =
+          fullInfo === false
+            ? await this.quizService.getQuizzes({
+                id: quizId,
+                stripped: true,
+              })
+            : await this.quizService.getQuizzes({
+                id: quizId,
+                peerreviews: true,
+                stripped: true,
+                items: true,
+                options: true,
+              })
 
         return basicInfo[0]
       }

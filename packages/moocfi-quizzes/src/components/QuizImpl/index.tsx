@@ -154,6 +154,15 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     return <div />
   }
 
+  if (!accessToken && !fullInfoWithoutLogin) {
+    return (
+      <div>
+        <TopInfoBar />
+        <LoginPrompt content={customContent} />
+      </div>
+    )
+  }
+
   let triesRemaining = quiz.tries
 
   let stillSubmittable = true
@@ -180,15 +189,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   const containsPeerReviews =
     quiz.peerReviewCollections !== null && quiz.peerReviewCollections.length > 0
-
-  if (!fullInfoWithoutLogin) {
-    return (
-      <div>
-        <TopInfoBar />
-        <LoginPrompt content={customContent} />
-      </div>
-    )
-  }
 
   return (
     <div>

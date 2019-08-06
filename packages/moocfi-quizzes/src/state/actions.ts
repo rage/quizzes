@@ -19,6 +19,7 @@ export const initialize: ActionCreator<ThunkAction> = (
   languageId: string,
   accessToken: string,
   backendAddress?: string,
+  fullInfoWithoutLogin?: boolean,
 ) => async (dispatch: Dispatch) => {
   dispatch(clearActionCreator())
 
@@ -28,11 +29,13 @@ export const initialize: ActionCreator<ThunkAction> = (
   }
 
   try {
+    const fullInfo = !!(accessToken || fullInfoWithoutLogin)
+
     const responseData = await getQuizInfo(
       id,
-      languageId,
       accessToken,
       backendAddress,
+      fullInfo,
     )
 
     let quiz, quizAnswer, userQuizState
