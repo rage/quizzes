@@ -194,7 +194,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     <div>
       <TopInfoBar />
 
-      {quizDisabled && <LoginPrompt content={customContent} />}
+      {quizDisabled && (
+        <LoginPrompt content={customContent} fullQuizInfoShown={true} />
+      )}
 
       <QuizContentWrapper disabled={quizDisabled}>
         {containsPeerReviews && <StageVisualizer />}
