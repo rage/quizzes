@@ -117,7 +117,7 @@ const App = () => {
               <StyledQuizContainer>{quizPortion}</StyledQuizContainer>
             </FlexContainer>
           ) : (
-            { quizPortion }
+            quizPortion
           )}
         </SimpleErrorBoundary>
       </div>

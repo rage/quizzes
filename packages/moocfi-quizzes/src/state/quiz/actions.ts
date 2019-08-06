@@ -1,6 +1,6 @@
 import { ActionCreator } from "redux"
 import { createAction } from "typesafe-actions"
-import { getQuizInfo } from "../../services/quizService"
+import { getQuizInfo, QuizResponse } from "../../services/quizService"
 import { ThunkAction } from "../store"
 import { Quiz } from "../../modelTypes"
 import * as loadingBarsActions from "../loadingBars/actions"
@@ -28,7 +28,17 @@ export const setQuiz: ActionCreator<ThunkAction> = (quizId: string) => async (
   }
 
   const address = getState().backendAddress
-  const { quiz } = (await getQuizInfo(quizId, languageId, accessToken)) as Quiz
+
+  const responseData = await getQuizInfo(quizId, languageId, accessToken)
+
+  let quiz
+  if ((responseData as Quiz).id) {
+    quiz = responseData as Quiz
+  } else {
+    const loginResponse = responseData as QuizResponse
+    quiz = loginResponse.quiz
+  }
+
   dispatch(set(quiz))
   dispatch(loadingBarsActions.set(false))
 }
