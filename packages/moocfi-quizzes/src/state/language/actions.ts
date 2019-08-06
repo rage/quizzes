@@ -1,5 +1,4 @@
 import { ActionCreator } from "redux"
-import { getQuizTitles } from "../../services/quizService"
 import { ThunkAction } from "../store"
 import { createAction } from "typesafe-actions"
 import * as quizActions from "../quiz/actions"

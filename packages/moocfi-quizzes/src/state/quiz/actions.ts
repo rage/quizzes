@@ -28,7 +28,7 @@ export const setQuiz: ActionCreator<ThunkAction> = (quizId: string) => async (
   }
 
   const address = getState().backendAddress
-  const { quiz } = await getQuizInfo(quizId, languageId, accessToken, address)
+  const { quiz } = (await getQuizInfo(quizId, languageId, accessToken)) as Quiz
   dispatch(set(quiz))
   dispatch(loadingBarsActions.set(false))
 }
