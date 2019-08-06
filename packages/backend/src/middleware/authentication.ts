@@ -28,21 +28,32 @@ export class AuthenticationMiddleware implements ExpressMiddlewareInterface {
 
   public async use(req: any, res: any, next: any) {
     console.log(req.url)
+    let onWhiteList = false
+
     whitelist.forEach(regex => {
       if (req.url.match(regex)) {
-        console.log("MATCH")
-        return next()
+        onWhiteList = true
       }
     })
+
     const authorization: string = req.headers.authorization || ""
     const token: string =
       authorization.toLocaleLowerCase().replace("bearer ", "") || ""
+
+    if (onWhiteList && !token) {
+      return next()
+    }
+
     let user: ITMCProfileDetails = JSON.parse(await this.get(token))
     if (!user) {
       try {
         user = await TMCApi.getProfile(token)
         this.client.set(token, JSON.stringify(user), "EX", 3600)
       } catch (error) {
+        if (onWhiteList) {
+          req.headers.authorization = ""
+          return next()
+        }
         throw new UnauthorizedError()
       }
     }
