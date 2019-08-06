@@ -24,6 +24,11 @@ const ChoicesContainer = styled(Grid)`
   padding-top: 7;
 `
 
+interface ChoiceButtonProps {
+  onlyOneItem: boolean
+  selected: boolean
+}
+
 const ChoiceButton = styled(Button)<ChoiceButtonProps>`
   ${({ onlyOneItem, selected }) =>
     onlyOneItem
@@ -33,15 +38,18 @@ const ChoiceButton = styled(Button)<ChoiceButtonProps>`
   text-transform: none;
   margin: 0.5em 0;
   border-radius: 15px;
+  border: 1px solid
+    ${({ selected }) => (selected ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.23)")};
   padding: 15px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
     0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
 `
 
-interface ChoiceButtonProps {
-  onlyOneItem: boolean
-  selected: boolean
-}
+const CentralizedOnSmallScreenTypography = styled(Typography)`
+  @media only screen and (max-width: 600px) {
+    text-align: center;
+  }
+`
 
 const IconWrapper = styled.div`
   margin: 0.5rem;
@@ -60,14 +68,12 @@ const FailureIcon = () => (
 )
 
 const AttentionIcon = styled(FontAwesomeIcon)`
-  padding: 0 10px;
-  float: left;
-  margin-left: -10px;
+  font-size: 30px !important;
 `
 
 const RevealedChoiceButton = styled(({ selected, correct, ...others }) => {
   return (
-    <ChoiceButton variant={selected ? "contained" : "outlined"} {...others}>
+    <ChoiceButton variant={"contained"} {...others}>
       {selected ? correct ? <SuccessIcon /> : <FailureIcon /> : ""}
       {others.children}
     </ChoiceButton>
@@ -92,22 +98,26 @@ const BottomMarginedGrid = styled(Grid)`
   margin-bottom: 10px;
 `
 
-const LeftBorderedTypography = styled(
-  ({ barColor, onlyOneItem, ...others }) => <Typography {...others} />,
-)`
+interface ILeftBorderedDivProps {
+  barColor: string
+  onlyOneItem?: boolean
+}
+
+const LeftBorderedDiv = styled.div<ILeftBorderedDivProps>`
   border-left: 6px solid ${({ barColor }) => barColor};
+  box-sizing: border-box;
   padding: 3px;
   padding-left: 10px;
   margin-bottom: 5px !important;
   ${onlyOneItem => onlyOneItem && "width: 70%;"}
 `
+interface ISolutionDivProps {
+  correct: boolean
+}
 
-const SolutionTypography = styled(({ correct, ...others }) => (
-  <LeftBorderedTypography
-    barColor={correct ? "#047500" : "#DB0000"}
-    {...others}
-  />
-))`
+const SolutionDiv = styled((correct, ...others) => (
+  <LeftBorderedDiv barColor={correct ? "#047500" : "#DB0000"} {...others} />
+))<ISolutionDivProps>`
   margin-bottom: 0;
 `
 
@@ -241,17 +251,27 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
         !onlyOneItem &&
         ((itemAnswer.correct && successMessage) ||
           (!itemAnswer.correct && failureMessage)) && (
-          <SolutionTypography
-            correct={itemAnswer.correct ? true : false}
-            variant="body1"
-          >
-            <AttentionIcon icon={faExclamationCircle} size="3x" />
-            {itemAnswer.correct
-              ? multipleChoiceLabels.answerCorrectLabel
-              : multipleChoiceLabels.answerIncorrectLabel}
-            <br />
-            {itemAnswer.correct ? successMessage : failureMessage}
-          </SolutionTypography>
+          <SolutionDiv correct={itemAnswer.correct ? true : false}>
+            <Grid container alignItems="center" spacing={2}>
+              <Grid item xs={12} sm="auto">
+                <CentralizedOnSmallScreenTypography variant="body1">
+                  <AttentionIcon icon={faExclamationCircle} />
+                </CentralizedOnSmallScreenTypography>
+              </Grid>
+              <Grid item xs={12} sm={10}>
+                <CentralizedOnSmallScreenTypography variant="body1">
+                  {itemAnswer.correct
+                    ? multipleChoiceLabels.answerCorrectLabel
+                    : multipleChoiceLabels.answerIncorrectLabel}
+                </CentralizedOnSmallScreenTypography>
+
+                <br />
+                <CentralizedOnSmallScreenTypography variant="body1">
+                  {itemAnswer.correct ? successMessage : failureMessage}
+                </CentralizedOnSmallScreenTypography>
+              </Grid>
+            </Grid>
+          </SolutionDiv>
         )}
     </Grid>
   )
@@ -274,12 +294,14 @@ const Option: React.FunctionComponent<OptionProps> = ({
   const item = items.find(i => i.id === option.quizItemId)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
-
+  const languageLabels = useTypedSelector(
+    state => state.language.languageLabels,
+  )
   const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
 
-  if (!item) {
+  if (!item || !languageLabels) {
     // should be impossible
-    return <div>Cannot find related item</div>
+    return <div>Cannot find related item or language</div>
   }
   const itemAnswer = quizAnswer.itemAnswers.find(
     ia => ia.quizItemId === item.id,
@@ -303,10 +325,15 @@ const Option: React.FunctionComponent<OptionProps> = ({
   const text = option.texts[0]
 
   // option incorrect, selected -> success; option correct, not selected -> success! Otherwise failure
+
+  const generalLabels = languageLabels.general
+
+  const successMessage = text.successMessage || generalLabels.answerCorrectLabel
+  const failureMessage =
+    text.failureMessage || generalLabels.answerIncorrectLabel
+
   const feedbackMessage =
-    option.correct === optionIsSelected
-      ? text.successMessage
-      : text.failureMessage
+    option.correct === optionIsSelected ? successMessage : failureMessage
 
   const feedbackColor = optionIsSelected
     ? option.correct
@@ -325,7 +352,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
         <ChoiceButton
           onlyOneItem={onlyOneItem}
           selected={optionIsSelected}
-          variant={optionIsSelected ? "contained" : "outlined"}
+          variant="contained"
           fullWidth
           color={optionIsSelected ? "primary" : "default"}
           onClick={handleOptionChange(option.id)}
@@ -364,21 +391,27 @@ const Option: React.FunctionComponent<OptionProps> = ({
           </RevealedChoiceButton>
         </OptionGridItem>
 
-        {feedbackMessage && (
+        {optionIsSelected && (
           <OptionGridItem
             item
             xs={optionWidth}
             onlyOneItem={onlyOneItem}
             shouldBeGray={shouldBeGray}
           >
-            <LeftBorderedTypography
-              variant="body1"
-              barColor={feedbackColor}
-              onlyOneItem={onlyOneItem}
-            >
-              <AttentionIcon icon={faExclamationCircle} size="3x" />
-              {feedbackMessage}
-            </LeftBorderedTypography>
+            <LeftBorderedDiv barColor={feedbackColor} onlyOneItem={onlyOneItem}>
+              <Grid container alignItems="center" spacing={2}>
+                <Grid item xs={12} sm="auto">
+                  <CentralizedOnSmallScreenTypography variant="body1">
+                    <AttentionIcon icon={faExclamationCircle} />
+                  </CentralizedOnSmallScreenTypography>
+                </Grid>
+                <Grid item xs={12} sm={10}>
+                  <CentralizedOnSmallScreenTypography variant="body1">
+                    {feedbackMessage}
+                  </CentralizedOnSmallScreenTypography>
+                </Grid>
+              </Grid>
+            </LeftBorderedDiv>
           </OptionGridItem>
         )}
       </React.Fragment>

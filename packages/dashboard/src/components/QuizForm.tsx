@@ -28,11 +28,20 @@ import TabContainer from "./TabContainer"
 
 class QuizForm extends React.Component<any, any> {
   public componentDidMount() {
+    if (this.props.edit.id) {
+      return
+    }
     if (this.props.quiz) {
       this.props.setEdit(this.props.quiz)
       this.props.setQuiz(this.props.quiz.id)
     } else {
       this.props.newQuiz()
+    }
+  }
+
+  public componentDidUpdate(prevProps, prevState) {
+    if (!prevProps.edit.id && this.props.edit.id) {
+      this.props.history.push(`/quizzes/${this.props.edit.id}`)
     }
   }
 
@@ -68,9 +77,10 @@ class QuizForm extends React.Component<any, any> {
     )
   }
 
-  private handleSaving = (event: any) => {
+  private handleSaving = async (event: any) => {
     scrollTo(0, 0)
-    this.props.save(event)
+    // for saving a quiz for the first time, wait before the url is modified in componentDidUpdate
+    await this.props.save(event)
   }
 
   private handleChange = path => event => {

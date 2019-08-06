@@ -46,11 +46,19 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
     })
   }
 
-  public componentDidUpdate() {
+  public componentDidUpdate(prevProps, prevState) {
     if (!this.state.initialCorrected) {
       this.setState({
         initialCorrected: true,
         expanded: !this.props.quizHasBeenSaved,
+      })
+      // the case if the quiz has just been saved, and the user remains on the quiz page
+    } else if (
+      prevState.expanded &&
+      (!prevProps.quizHasBeenSaved && this.props.quizHasBeenSaved)
+    ) {
+      this.setState({
+        expanded: false,
       })
     }
   }

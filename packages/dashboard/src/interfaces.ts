@@ -21,17 +21,17 @@ export interface IQuizText {
 }
 
 export interface IQuiz {
-  id: string
+  id?: string
   courseId: string
   part: number
   section: number
-  points: number
+  points?: number
   tries: number
   triesLimited: boolean
-  deadline: Date
-  open: Date
-  autoConfirm: boolean
-  excludedFromScore: boolean
+  deadline?: Date
+  open?: Date
+  autoConfirm?: boolean
+  excludedFromScore?: boolean
   texts: IQuizText[]
   course: ICourse
   items: IQuizItem[]

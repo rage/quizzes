@@ -15,6 +15,7 @@ const StyledGrid = styled(Grid)`
 const PointsText = styled(Typography)`
   font-size: 1.5rem !important;
   text-align: end;
+  color: white;
 `
 
 const XXS12Grid = styled(Grid)`
@@ -26,6 +27,7 @@ const XXS12Grid = styled(Grid)`
 
 const PointsLabelText = styled(Typography)`
   font-size: 1rem !important;
+  color: white;
 `
 
 const IconWrapper = styled.div`
