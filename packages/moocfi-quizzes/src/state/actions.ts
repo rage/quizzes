@@ -46,17 +46,16 @@ export const initialize: ActionCreator<ThunkAction> = (
       userQuizState = loginResponse.userQuizState
     }
 
-    console.log("response:", responseData)
+    if (!accessToken) {
+      dispatch(quizAnswerActions.setQuizDisabled(true))
+    }
 
-    console.log("dispatcihng quiz")
-    console.log("quiz: ", quiz)
     dispatch(quizActions.set(quiz))
 
     // having accessToken != being a logged in tmc user,
     // but posting answer still met with a server-side authentication so
     // does not matter
     if (!accessToken) {
-      dispatch(quizAnswerActions.setQuizDisabled(true))
       return
     }
 

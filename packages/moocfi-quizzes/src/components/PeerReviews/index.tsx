@@ -24,8 +24,13 @@ const PeerReviews: React.FunctionComponent = () => {
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const peerReviewQuestions = quiz.peerReviewCollections
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
+  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
   if (!languageInfo) {
     return <div />
+  }
+
+  if (quizDisabled) {
+    return <div>There are peer reviews</div>
   }
 
   const peerReviewsLabels = languageInfo.peerReviews

@@ -109,6 +109,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
         margin="normal"
         variant="outlined"
         label={openLabels.placeholder}
+        disabled={quizDisabled}
       />
     </div>
   )

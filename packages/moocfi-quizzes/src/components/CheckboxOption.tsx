@@ -21,6 +21,7 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
 }) => {
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
 
   const dispatch = useDispatch()
   const option = item.options[0]
@@ -35,15 +36,15 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
   const itemAnswer = quizAnswer.itemAnswers.find(
     ia => ia.quizItemId === item.id,
   )
-  if (!itemAnswer) {
+  if (!itemAnswer && !quizDisabled) {
     return <LaterQuizItemAddition item={item} />
   }
 
-  const optionAnswer = itemAnswer.optionAnswers[0]
+  const optionAnswer = itemAnswer && itemAnswer.optionAnswers[0]
 
   const checkboxOptions = {
-    disabled: answerLocked,
-    checked: optionAnswer !== undefined,
+    disabled: answerLocked || quizDisabled,
+    checked: optionAnswer !== undefined && !quizDisabled,
   }
 
   return (

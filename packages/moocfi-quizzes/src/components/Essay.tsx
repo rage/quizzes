@@ -122,7 +122,19 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
 
       {itemBody && <MarkdownText variant="body1">{itemBody}</MarkdownText>}
 
-      {answerPortion}
+      {quizDisabled ? (
+        <StyledTextField
+          rowNumber={item.order}
+          variant="outlined"
+          fullWidth={true}
+          multiline={true}
+          rows={5}
+          margin="normal"
+          disabled
+        />
+      ) : (
+        answerPortion
+      )}
     </div>
   )
 }

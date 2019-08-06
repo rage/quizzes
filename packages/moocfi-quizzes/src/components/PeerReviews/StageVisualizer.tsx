@@ -6,11 +6,17 @@ const StageVisualizer = () => {
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const quiz = useTypedSelector(state => state.quiz)
+  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
 
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   if (!languageInfo || !quiz) {
     return <div />
   }
+
+  if (quizDisabled) {
+    return <div style={{ display: "none" }} />
+  }
+
   const stageLabels = languageInfo.stage
 
   const steps = [
