@@ -6,6 +6,7 @@ import * as userActions from "./user/actions"
 import * as backendAddressActions from "./backendAddress/actions"
 import * as feedbackDisplayedActions from "./feedbackDisplayed/actions"
 import * as languageActions from "./language/actions"
+import * as loadingBars from "./loadingBars/actions"
 import * as quizActions from "./quiz/actions"
 import * as quizAnswerActions from "./quizAnswer/actions"
 import * as messageActions from "./message/actions"
@@ -31,6 +32,7 @@ export const initialize: ActionCreator<ThunkAction> = (
   try {
     const fullInfo = !!(accessToken || fullInfoWithoutLogin)
 
+    dispatch(loadingBars.InitializeLoadingBarsAfterDelay())
     const responseData = await getQuizInfo(
       id,
       accessToken,

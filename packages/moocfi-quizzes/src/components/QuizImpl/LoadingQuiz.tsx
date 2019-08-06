@@ -1,12 +1,10 @@
 import ContentLoader from "react-content-loader"
 import * as React from "react"
-import { useEffect } from "react"
-import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
 import { useTypedSelector } from "../../state/store"
-import { rootAction } from "../../state/store"
+import LoginPrompt from "./LoginPrompt"
 
 const ContentWrapper = styled.div`
   padding: 1rem;
@@ -16,22 +14,28 @@ const StyledContentLoader = styled(ContentLoader)`
   padding-bottom: 1rem;
 `
 
-const LoadingQuiz = () => {
-  const dispatch = useDispatch()
+interface ILoadingQuizProps {
+  content?: JSX.Element | Element
+}
+
+const LoadingQuiz: React.FunctionComponent<ILoadingQuizProps> = ({
+  content,
+}) => {
   const languageId = useTypedSelector(state => state.language.languageId)
   const displayBars = useTypedSelector(state => state.loadingBars)
+  const accessToken = useTypedSelector(state => state.user.accessToken)
 
   if (languageId) {
   }
 
-  useEffect(() => {
-    dispatch(rootAction.loadingBars.InitializeLoadingBarsAfterDelay())
-  }, [])
-
   return (
     <div>
       <TopInfoBar />
-      <ContentWrapper>
+      {!accessToken && (
+        <LoginPrompt content={content} fullQuizInfoShown={true} />
+      )}
+
+      <ContentWrapper style={{ height: "400px" }}>
         {displayBars ? (
           <ContentLoader
             height={200}
@@ -52,14 +56,9 @@ const LoadingQuiz = () => {
             <rect x="0" y="180" rx="3" ry="3" width="340" height="6" />
           </ContentLoader>
         ) : (
-          <div
-            style={{
-              height: "400px",
-            }}
-          />
+          <div />
         )}
-
-        <SubmitButton />
+        {accessToken && <SubmitButton />}
       </ContentWrapper>
     </div>
   )

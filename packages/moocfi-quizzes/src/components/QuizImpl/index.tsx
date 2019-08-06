@@ -114,8 +114,21 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     },
     [id, languageId, accessToken, backendAddress],
   )
-  if (!quiz || !languageInfo) {
-    return <LoadingQuiz />
+
+  if (!accessToken && !fullInfoWithoutLogin) {
+    return (
+      <div>
+        <TopInfoBar />
+        <LoginPrompt content={customContent} />
+      </div>
+    )
+  }
+
+  if (!quiz) {
+    return <LoadingQuiz content={customContent} />
+  }
+  if (!languageInfo) {
+    return <div>language info not set</div>
   }
 
   const generalLabels = languageInfo.general
@@ -152,15 +165,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       "language id)"
     dispatch(messageActions.setErrorMessage(message))
     return <div />
-  }
-
-  if (!accessToken && !fullInfoWithoutLogin) {
-    return (
-      <div>
-        <TopInfoBar />
-        <LoginPrompt content={customContent} />
-      </div>
-    )
   }
 
   let triesRemaining = quiz.tries
