@@ -75,7 +75,7 @@ const QuizContentWrapper = styled.div<IQuizContentWrapperProps>`
   ${({ disabled }) =>
     disabled &&
     `
-        opacity: 0.5;
+        opacity: 0.6;
         cursor: default;
       `}
 `
