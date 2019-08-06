@@ -19,6 +19,9 @@ import {
   faTimes,
   faExclamationCircle,
 } from "@fortawesome/free-solid-svg-icons"
+import { defaultProps } from "react-content-loader/dist/src/Holder"
+import { useContext } from "react"
+import ChoiceButton from "./ChoiceButton"
 
 const ChoicesContainer = styled(Grid)`
   padding-top: 7;
@@ -29,7 +32,7 @@ interface ChoiceButtonProps {
   selected: boolean
 }
 
-const ChoiceButton = styled(Button)<ChoiceButtonProps>`
+/*const ChoiceButton = styled(Button)<ChoiceButtonProps>`
   ${({ onlyOneItem, selected }) =>
     onlyOneItem
       ? `width: 70%;
@@ -43,7 +46,7 @@ const ChoiceButton = styled(Button)<ChoiceButtonProps>`
   padding: 15px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
     0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
-`
+`*/
 
 const CentralizedOnSmallScreenTypography = styled(Typography)`
   @media only screen and (max-width: 600px) {
@@ -71,7 +74,7 @@ const AttentionIcon = styled(FontAwesomeIcon)`
   font-size: 30px !important;
 `
 
-const RevealedChoiceButton = styled(({ selected, correct, ...others }) => {
+/*const RevealedChoiceButton = styled(({ selected, correct, ...others }) => {
   return (
     <ChoiceButton variant={"contained"} {...others}>
       {selected ? correct ? <SuccessIcon /> : <FailureIcon /> : ""}
@@ -92,7 +95,7 @@ const RevealedChoiceButton = styled(({ selected, correct, ...others }) => {
     border-width: 3px
     `
       : ``}
-`
+`*/
 
 const BottomMarginedGrid = styled(Grid)`
   margin-bottom: 10px;
@@ -352,9 +355,8 @@ const Option: React.FunctionComponent<OptionProps> = ({
         <ChoiceButton
           onlyOneItem={onlyOneItem}
           selected={optionIsSelected}
-          variant="contained"
-          fullWidth
-          color={optionIsSelected ? "primary" : "default"}
+          revealed={false}
+          correct={false}
           onClick={handleOptionChange(option.id)}
         >
           <MarkdownText Component={styled.div``} removeParagraphs>
@@ -378,17 +380,17 @@ const Option: React.FunctionComponent<OptionProps> = ({
           onlyOneItem={onlyOneItem}
           shouldBeGray={shouldBeGray}
         >
-          <RevealedChoiceButton
+          <ChoiceButton
+            revealed
             onlyOneItem={onlyOneItem}
             selected={optionIsSelected}
             correct={option.correct}
             {...clickOptions}
-            fullWidth
           >
             <MarkdownText Component={styled.div``} removeParagraphs>
               {text.title}
             </MarkdownText>
-          </RevealedChoiceButton>
+          </ChoiceButton>
         </OptionGridItem>
 
         {optionIsSelected && (
@@ -425,17 +427,17 @@ const Option: React.FunctionComponent<OptionProps> = ({
       onlyOneItem={onlyOneItem}
       shouldBeGray={shouldBeGray}
     >
-      <RevealedChoiceButton
+      <ChoiceButton
+        revealed
         onlyOneItem={onlyOneItem}
         selected={optionIsSelected}
         correct={option.correct}
         {...clickOptions}
-        fullWidth
       >
         <MarkdownText Component={styled.div``} removeParagraphs>
           {text.title}
         </MarkdownText>
-      </RevealedChoiceButton>
+      </ChoiceButton>
     </OptionGridItem>
   )
 }

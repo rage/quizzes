@@ -27,6 +27,7 @@ import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
 import CustomContentQuiz from "./CustomContentQuiz"
 import MarkdownText from "../MarkdownText"
+import ChoiceButton from "../ChoiceButton"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
