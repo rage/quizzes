@@ -1,8 +1,10 @@
 import { createContext } from "react"
-import { ChoiceButtonHOCProps } from "../components/ChoiceButton"
+import { ChoiceButtonProps } from "../components/ChoiceButton"
+import { SubmitButtonProps } from "../components/QuizImpl/SubmitButton"
 
 export interface ThemeProviderInterface {
-  choiceButton?: React.FunctionComponent<ChoiceButtonHOCProps>
+  choiceButton?: React.FunctionComponent<ChoiceButtonProps>
+  submitButton?: React.FunctionComponent<SubmitButtonProps>
 }
 
 const ThemeProviderContext = createContext<ThemeProviderInterface>({})

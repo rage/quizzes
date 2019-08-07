@@ -6,7 +6,7 @@ import { Button } from "@material-ui/core"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
 
-export interface ChoiceButtonHOCProps {
+export interface ChoiceButtonProps {
   revealed: boolean
   children: any
   onlyOneItem: boolean
@@ -15,12 +15,12 @@ export interface ChoiceButtonHOCProps {
   onClick?: any
 }
 
-interface ChoiceButtonProps {
+interface ButtonProps {
   onlyOneItem: boolean
   selected: boolean
 }
 
-interface RevealedChoiceButtonProps {
+interface RevealedButtonProps {
   onlyOneItem: boolean
   selected: boolean
   correct: boolean
@@ -43,7 +43,7 @@ const FailureIcon = () => (
   </IconWrapper>
 )
 
-const ChoiceButton = styled(Button)<ChoiceButtonProps>`
+const ChoiceButton = styled(Button)<ButtonProps>`
   ${({ onlyOneItem, selected }) =>
     onlyOneItem
       ? `width: 70%;
@@ -60,7 +60,7 @@ const ChoiceButton = styled(Button)<ChoiceButtonProps>`
 `
 
 const RevealedChoiceButton = styled(
-  ({ selected, correct, ...others }: RevealedChoiceButtonProps) => {
+  ({ selected, correct, ...others }: RevealedButtonProps) => {
     return (
       <ChoiceButton
         variant={"contained"}
@@ -89,13 +89,15 @@ const RevealedChoiceButton = styled(
       : ``}
 `
 
-export default (props: ChoiceButtonHOCProps) => {
-  const { revealed, ...others } = props
+export default (props: ChoiceButtonProps) => {
   const themeProvider = useContext(ThemeProviderContext)
-  const ThemedVariant = themeProvider.choiceButton
-  if (ThemedVariant) {
-    return <ThemedVariant {...props} />
+  const { revealed, ...others } = props
+  const ThemedButton = themeProvider.choiceButton
+
+  if (ThemedButton) {
+    return <ThemedButton {...props} />
   }
+
   return revealed ? (
     <RevealedChoiceButton {...others} />
   ) : (
