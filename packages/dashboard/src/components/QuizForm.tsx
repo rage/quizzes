@@ -28,13 +28,10 @@ import TabContainer from "./TabContainer"
 
 class QuizForm extends React.Component<any, any> {
   public componentDidMount() {
-    if (this.props.edit.id) {
-      return
-    }
     if (this.props.quiz) {
       this.props.setEdit(this.props.quiz)
       this.props.setQuiz(this.props.quiz.id)
-    } else {
+    } else if (this.props.new) {
       this.props.newQuiz()
     }
   }
