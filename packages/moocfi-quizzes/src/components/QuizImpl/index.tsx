@@ -211,7 +211,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           {quizItemComponents(quiz, languageId)}
         </QuizItemContainerDiv>
 
-        {!stillSubmittable ? (
+        {!stillSubmittable && !quizDisabled ? (
           <>
             {containsPeerReviews && <PeerReviews />}
 

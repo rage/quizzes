@@ -71,7 +71,7 @@ const finnishLabels: SingleLanguageLabels = {
     submitButtonLabel: "Vastaa",
     errorLabel: "Virhe",
     loginToViewPromptLabel: "Kirjaudu sisään nähdäksesi tehtävän",
-    loginToAnswerPromptLabel: "Kirjaudu sisänn vastataksesi tehtävään",
+    loginToAnswerPromptLabel: "Kirjaudu sisään vastataksesi tehtävään",
     loadingLabel: "Ladataan",
     answerCorrectLabel: "Vastaus oikein",
     alreadyAnsweredLabel: "Olet jo vastannut",
