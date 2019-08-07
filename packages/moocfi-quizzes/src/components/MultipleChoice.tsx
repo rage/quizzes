@@ -31,10 +31,9 @@ interface ChoiceButtonProps {
 
 const ChoiceButton = styled(Button)<ChoiceButtonProps>`
   ${({ onlyOneItem, selected }) =>
-    onlyOneItem
-      ? `width: 70%;
-    ${!selected ? `background-color: white;` : ``}`
-      : ``}
+    `${onlyOneItem ? "width: 70%" : ""};
+  ${!selected ? "background-color: white;" : ""}`}
+
   text-transform: none;
   margin: 0.5em 0;
   border-radius: 15px;
@@ -190,6 +189,8 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
             )
           })}
       </ChoicesContainer>
+
+      {!onlyOneItem && <FeedbackPortion item={item} />}
     </BottomMarginedGrid>
   )
 }
@@ -398,45 +399,95 @@ const Option: React.FunctionComponent<OptionProps> = ({
             onlyOneItem={onlyOneItem}
             shouldBeGray={shouldBeGray}
           >
-            <LeftBorderedDiv barColor={feedbackColor} onlyOneItem={onlyOneItem}>
-              <Grid container alignItems="center" spacing={2}>
-                <Grid item xs={12} sm="auto">
-                  <CentralizedOnSmallScreenTypography variant="body1">
-                    <AttentionIcon icon={faExclamationCircle} />
-                  </CentralizedOnSmallScreenTypography>
-                </Grid>
-                <Grid item xs={12} sm={10}>
-                  <CentralizedOnSmallScreenTypography variant="body1">
-                    {feedbackMessage}
-                  </CentralizedOnSmallScreenTypography>
-                </Grid>
-              </Grid>
-            </LeftBorderedDiv>
+            <FeedbackPortion item={item} />
           </OptionGridItem>
         )}
       </React.Fragment>
     )
   }
 
+  // multiple items
   return (
-    <OptionGridItem
-      item
-      xs={optionWidth}
-      onlyOneItem={onlyOneItem}
-      shouldBeGray={shouldBeGray}
-    >
-      <RevealedChoiceButton
+    <>
+      <OptionGridItem
+        item
+        xs={optionWidth}
         onlyOneItem={onlyOneItem}
-        selected={optionIsSelected}
-        correct={option.correct}
-        {...clickOptions}
-        fullWidth
+        shouldBeGray={shouldBeGray}
       >
-        <MarkdownText Component={styled.div``} removeParagraphs>
-          {text.title}
-        </MarkdownText>
-      </RevealedChoiceButton>
-    </OptionGridItem>
+        <RevealedChoiceButton
+          onlyOneItem={onlyOneItem}
+          selected={optionIsSelected}
+          correct={option.correct}
+          {...clickOptions}
+          fullWidth
+        >
+          <MarkdownText Component={styled.div``} removeParagraphs>
+            {text.title}
+          </MarkdownText>
+        </RevealedChoiceButton>
+      </OptionGridItem>
+    </>
+  )
+}
+
+interface IFeedbackPortionProps {
+  item: QuizItem
+}
+
+const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
+  item,
+}) => {
+  const items = useTypedSelector(state => state.quiz!.items)
+  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+  const languageLabels = useTypedSelector(
+    state => state.language.languageLabels,
+  )
+  const feedbackDisplayed = useTypedSelector(state => state.feedbackDisplayed)
+
+  if (!feedbackDisplayed) {
+    return <div style={{ display: "none" }} />
+  }
+
+  if (!item || !languageLabels) {
+    // should be impossible
+    return <div>Cannot find related item or language</div>
+  }
+  const itemAnswer = quizAnswer.itemAnswers.find(
+    ia => ia.quizItemId === item.id,
+  )
+  if (!itemAnswer) {
+    // should be impossible
+    return <div>Cannot find related item answer</div>
+  }
+
+  const onlyOneItem = items.length === 1
+  const generalLabels = languageLabels.general
+
+  const text = item.texts[0]
+  const successMessage = text.successMessage || generalLabels.answerCorrectLabel
+  const failureMessage =
+    text.failureMessage || generalLabels.answerIncorrectLabel
+
+  const feedbackMessage = itemAnswer.correct ? successMessage : failureMessage
+
+  const feedbackColor = itemAnswer.correct ? "#047500" : "#DB0000"
+
+  return (
+    <LeftBorderedDiv barColor={feedbackColor} onlyOneItem={onlyOneItem}>
+      <Grid container alignItems="center" spacing={2}>
+        <Grid item xs={12} sm="auto">
+          <CentralizedOnSmallScreenTypography variant="body1">
+            <AttentionIcon icon={faExclamationCircle} />
+          </CentralizedOnSmallScreenTypography>
+        </Grid>
+        <Grid item xs={12} sm={10}>
+          <CentralizedOnSmallScreenTypography variant="body1">
+            {feedbackMessage}
+          </CentralizedOnSmallScreenTypography>
+        </Grid>
+      </Grid>
+    </LeftBorderedDiv>
   )
 }
 
