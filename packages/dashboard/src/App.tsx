@@ -229,6 +229,7 @@ class App extends React.Component<any, any> {
     const quiz = this.props.quizzesOfCourse.quizzes.find(
       q => q.id === match.params.id,
     )
+
     return <QuizForm quiz={quiz} new={false} history={history} />
   }
 
@@ -236,7 +237,7 @@ class App extends React.Component<any, any> {
     if (this.props.courses.length === 0) {
       return <p />
     }
-    return <QuizForm history={history} />
+    return <QuizForm history={history} new={true} />
   }
 
   private handleSubmit = async (event: any) => {
