@@ -314,7 +314,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
     state => state.language.languageLabels,
   )
   const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
-  const quizDisabled = useTypedSelector(state => state.quizAnswer.submitLocked)
+  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
 
   if (!item || !languageLabels) {
     // should be impossible
