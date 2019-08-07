@@ -147,6 +147,14 @@ export const quizAnswerReducer = (
         oa => oa.quizOptionId === optionId,
       )
       if (previouslyChosen) {
+        const remainingChosenOptions = current.optionAnswers.filter(
+          oa => oa.quizOptionId !== optionId,
+        ).length
+
+        if (remainingChosenOptions <= 0) {
+          newItemAnswersReady[`${action.payload.itemId}`] = false
+        }
+
         return {
           ...state,
           submitLocked: !readyToSubmit(newItemAnswersReady),
