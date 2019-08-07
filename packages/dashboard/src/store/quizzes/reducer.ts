@@ -1,5 +1,4 @@
 import { ActionType, getType } from "typesafe-actions"
-import { Quiz } from "../../../../common/src/models/quiz"
 import * as quizzes from "./actions"
 
 export const quizzesReducer = (
@@ -26,24 +25,17 @@ export const quizzesReducer = (
 
         if (newQuizzes.includes(quiz => quiz.id === updatedQuiz.id)) {
           newQuizzes = newQuizzes.map(q =>
-            q.id === action.payload.quizzes[0].id
-              ? action.payload.quizzes[0]
-              : q,
+            q.id === updatedQuiz.id ? updatedQuiz : q,
           )
         } else {
           newQuizzes = newQuizzes.concat(updatedQuiz)
         }
 
-        newQuizzes = [
-          ...state.find(qi => qi.courseId === action.payload.courseId).quizzes,
-        ].map(q =>
-          q.id === action.payload.quizzes[0].id ? action.payload.quizzes[0] : q,
-        )
-        return state.map(qi => ({
-          ...qi,
-          quizzes:
-            qi.courseId === action.payload.courseId ? newQuizzes : qi.quizzes,
-        }))
+        return state.map(qi => {
+          return qi.courseId !== action.payload.courseId
+            ? qi
+            : { ...qi, quizzes: newQuizzes }
+        })
       }
 
       // otherwise assuming that everything has been fetched from db
