@@ -125,7 +125,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   }
 
   if (!quiz) {
-    return <LoadingQuiz content={customContent} />
+    return <LoadingQuiz content={customContent} accessToken={accessToken} />
   }
   if (!languageInfo) {
     return <div>language info not set</div>

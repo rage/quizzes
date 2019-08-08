@@ -16,17 +16,14 @@ const StyledContentLoader = styled(ContentLoader)`
 
 interface ILoadingQuizProps {
   content?: JSX.Element | Element
+  accessToken?: string
 }
 
 const LoadingQuiz: React.FunctionComponent<ILoadingQuizProps> = ({
   content,
+  accessToken,
 }) => {
-  const languageId = useTypedSelector(state => state.language.languageId)
   const displayBars = useTypedSelector(state => state.loadingBars)
-  const accessToken = useTypedSelector(state => state.user.accessToken)
-
-  if (languageId) {
-  }
 
   return (
     <div>
@@ -35,7 +32,7 @@ const LoadingQuiz: React.FunctionComponent<ILoadingQuizProps> = ({
         <LoginPrompt content={content} fullQuizInfoShown={true} />
       )}
 
-      <ContentWrapper style={{ height: "400px" }}>
+      <ContentWrapper>
         {displayBars ? (
           <ContentLoader
             height={200}
@@ -45,6 +42,7 @@ const LoadingQuiz: React.FunctionComponent<ILoadingQuizProps> = ({
             primaryOpacity={0.12}
             secondaryColor="#000000"
             secondaryOpacity={0.26}
+            style={{ height: "400px" }}
           >
             <rect x="0" y="15" rx="4" ry="4" width="360" height="6" />
             <rect x="0" y="35" rx="3" ry="3" width="365" height="6" />
@@ -56,7 +54,7 @@ const LoadingQuiz: React.FunctionComponent<ILoadingQuizProps> = ({
             <rect x="0" y="180" rx="3" ry="3" width="340" height="6" />
           </ContentLoader>
         ) : (
-          <div />
+          <div style={{ height: "400px" }} />
         )}
         {accessToken && <SubmitButton />}
       </ContentWrapper>
