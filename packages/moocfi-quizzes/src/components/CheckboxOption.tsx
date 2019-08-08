@@ -16,11 +16,18 @@ const VertCenteredGrid = styled(Grid)`
   align-self: center;
 `
 
+const MarkdownTextWithoutMargin = styled(MarkdownText)`
+  p {
+    margin: 0;
+  }
+`
+
 const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
   item,
 }) => {
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
 
   const dispatch = useDispatch()
   const option = item.options[0]
@@ -35,15 +42,15 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
   const itemAnswer = quizAnswer.itemAnswers.find(
     ia => ia.quizItemId === item.id,
   )
-  if (!itemAnswer) {
+  if (!itemAnswer && !quizDisabled) {
     return <LaterQuizItemAddition item={item} />
   }
 
-  const optionAnswer = itemAnswer.optionAnswers[0]
+  const optionAnswer = itemAnswer && itemAnswer.optionAnswers[0]
 
   const checkboxOptions = {
-    disabled: answerLocked,
-    checked: optionAnswer !== undefined,
+    disabled: answerLocked || quizDisabled,
+    checked: optionAnswer !== undefined && !quizDisabled,
   }
 
   return (
@@ -58,14 +65,14 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
       </Grid>
       <VertCenteredGrid item xs>
         {title && (
-          <MarkdownText Component={Typography} variant="subtitle1">
+          <MarkdownTextWithoutMargin Component={Typography} variant="subtitle1">
             {title}
-          </MarkdownText>
+          </MarkdownTextWithoutMargin>
         )}
         {body && body !== title && (
-          <MarkdownText Component={Typography} variant="body1">
+          <MarkdownTextWithoutMargin Component={Typography} variant="body1">
             {body}
-          </MarkdownText>
+          </MarkdownTextWithoutMargin>
         )}
       </VertCenteredGrid>
     </Grid>

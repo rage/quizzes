@@ -72,10 +72,11 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
   const itemAnswers = useTypedSelector(
     state => state.quizAnswer.quizAnswer.itemAnswers,
   )
+  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
   const itemAnswer = itemAnswers.find(ia => ia.quizItemId === item.id)
   const intData = itemAnswer && itemAnswer.intData
 
-  if (!itemAnswer) {
+  if (!itemAnswer && !quizDisabled) {
     return <LaterQuizItemAddition item={item} />
   }
 
@@ -120,6 +121,8 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
 }) => {
   let number_of_options = 7
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+
   const answerLocked = userQuizState && userQuizState.status === "locked"
   const minLabel = item.texts[0].minLabel
   const maxLabel = item.texts[0].maxLabel
@@ -164,7 +167,7 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
                   control={
                     <StyledRadio
                       color="primary"
-                      disabled={answerLocked ? true : false}
+                      disabled={quizDisabled || answerLocked ? true : false}
                       palette={theme.palette}
                     />
                   }

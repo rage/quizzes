@@ -2,9 +2,11 @@ import finnishLabels from "./finnish_options"
 import englishLabels from "./english_options"
 
 export type GeneralLabels = {
+  [index: string]: string | Function
   quizLabel: string
   submitButtonLabel: string
-  loginPromptLabel: string
+  loginToViewPromptLabel: string
+  loginToAnswerPromptLabel: string
   errorLabel: string
   loadingLabel: string
   answerCorrectLabel: string
@@ -58,6 +60,7 @@ export type PeerReviewLabels = {
   hidePeerReviewLabel: string
   loadingLabel: string
   quizInvolvesNoPeerReviewsInstruction: string
+  peerReviewsInfoForLoggedOutUser: string
 }
 
 export type UnsupportedLabels = {

@@ -33,7 +33,8 @@ const StyledTextField = styled(props => (
 `
 
 const StyledFormControlLabel = styled(FormControlLabel)`
-  margin: 1rem;
+  margin: 0.5rem 1rem;
+  width: 100%;
 `
 
 const App = () => {
@@ -47,8 +48,29 @@ const App = () => {
     "true",
   )
 
+  const [
+    showFullInfoWhenLoggedOut,
+    setShowFullInfoWhenLoggedOut,
+  ] = useLocalStorage("showFullInfoWhenLoggedOut", "true")
+
   const toggleContainerUse = () =>
     setContainerUsed(containerUsed === "true" ? "false" : "true")
+
+  const toggleShowFullInfo = () => {
+    setShowFullInfoWhenLoggedOut(
+      showFullInfoWhenLoggedOut === "true" ? "false" : "true",
+    )
+  }
+
+  const quizPortion = (
+    <Quiz
+      id={id.value}
+      languageId={languageId.value}
+      accessToken={accessToken.value}
+      backendAddress={baseUrl.value}
+      fullInfoWithoutLogin={showFullInfoWhenLoggedOut === "true"}
+    />
+  )
 
   return (
     <>
@@ -73,6 +95,18 @@ const App = () => {
         }
       />
 
+      <StyledFormControlLabel
+        label="Show full quiz info when logged out"
+        control={
+          <Checkbox
+            checked={showFullInfoWhenLoggedOut === "true"}
+            onChange={toggleShowFullInfo}
+            value={showFullInfoWhenLoggedOut.value}
+            color="primary"
+          />
+        }
+      />
+
       <div>
         <Typography variant="h5" component="h1">
           Quiz
@@ -80,22 +114,10 @@ const App = () => {
         <SimpleErrorBoundary>
           {containerUsed === "true" ? (
             <FlexContainer>
-              <StyledQuizContainer>
-                <Quiz
-                  id={id.value}
-                  languageId={languageId.value}
-                  accessToken={accessToken.value}
-                  backendAddress={baseUrl.value}
-                />
-              </StyledQuizContainer>
+              <StyledQuizContainer>{quizPortion}</StyledQuizContainer>
             </FlexContainer>
           ) : (
-            <Quiz
-              id={id.value}
-              languageId={languageId.value}
-              accessToken={accessToken.value}
-              backendAddress={baseUrl.value}
-            />
+            quizPortion
           )}
         </SimpleErrorBoundary>
       </div>

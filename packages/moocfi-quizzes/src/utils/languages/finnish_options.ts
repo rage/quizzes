@@ -47,6 +47,7 @@ const finnishLabels: SingleLanguageLabels = {
     hidePeerReviewLabel: "Piilota",
     quizInvolvesNoPeerReviewsInstruction:
       "Tähän tehtävään ei liity vertaisarvioita",
+    peerReviewsInfoForLoggedOutUser: "Kyselyyn liittyy vertaisarviointiosio",
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
@@ -69,7 +70,8 @@ const finnishLabels: SingleLanguageLabels = {
       "Kysymykseen ei vastattu. Tehtävää todennäköisesti muutettu vastaamisen jälkeen.",
     submitButtonLabel: "Vastaa",
     errorLabel: "Virhe",
-    loginPromptLabel: "Kirjaudu sisään vastataksesi tehtävään",
+    loginToViewPromptLabel: "Kirjaudu sisään nähdäksesi tehtävän",
+    loginToAnswerPromptLabel: "Kirjaudu sisään vastataksesi tehtävään",
     loadingLabel: "Ladataan",
     answerCorrectLabel: "Vastaus oikein",
     alreadyAnsweredLabel: "Olet jo vastannut",

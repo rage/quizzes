@@ -8,6 +8,7 @@ import {
   Param,
   Post,
   QueryParams,
+  QueryParam,
   Res,
   UnauthorizedError,
 } from "routing-controllers"
@@ -55,10 +56,28 @@ export class QuizController {
   public async get(
     @Param("id") id: string,
     @QueryParams() params: any,
+    @QueryParam("fullInfo") fullInfo: boolean,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
     try {
       const quizId = validator.isUUID(id) ? id : getUUIDByString(id)
+      if (!user) {
+        const basicInfo =
+          fullInfo === false
+            ? await this.quizService.getQuizzes({
+                id: quizId,
+                stripped: true,
+              })
+            : await this.quizService.getQuizzes({
+                id: quizId,
+                peerreviews: true,
+                stripped: true,
+                items: true,
+                options: true,
+              })
+
+        return basicInfo[0]
+      }
 
       let userQuizState: UserQuizState
       try {
@@ -226,7 +245,7 @@ export class QuizController {
     @Param("id") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @Res() response: Response,
-  ) {
+  ): Promise<any> {
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
     }

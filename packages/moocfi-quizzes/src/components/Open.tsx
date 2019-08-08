@@ -29,6 +29,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
+  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
 
   if (!languageInfo) {
     return <div />
@@ -39,12 +40,12 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
   }
 
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
-  if (!itemAnswer) {
+  if (!itemAnswer && !quizDisabled) {
     return <LaterQuizItemAddition item={item} />
   }
 
-  const correct = itemAnswer.correct
-  const textData = itemAnswer.textData
+  const correct = itemAnswer ? itemAnswer.correct : false
+  const textData = itemAnswer ? itemAnswer.textData : ""
 
   const openLabels = languageInfo.open
 
@@ -108,6 +109,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
         margin="normal"
         variant="outlined"
         label={openLabels.placeholder}
+        disabled={quizDisabled}
       />
     </div>
   )

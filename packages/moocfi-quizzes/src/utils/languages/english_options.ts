@@ -43,6 +43,7 @@ const englishLabels: SingleLanguageLabels = {
     displayPeerReview: "Add peer review",
     hidePeerReviewLabel: "Hide",
     quizInvolvesNoPeerReviewsInstruction: "This quiz involves no peer reviews",
+    peerReviewsInfoForLoggedOutUser: "The quiz includes peer reviews",
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
@@ -65,7 +66,8 @@ const englishLabels: SingleLanguageLabels = {
       "Question not answered. Quiz has probably been modified after your answer.",
     submitButtonLabel: "Submit",
     errorLabel: "Error",
-    loginPromptLabel: "Log in to view the quiz",
+    loginToViewPromptLabel: "Log in to view the quiz",
+    loginToAnswerPromptLabel: "Log in to answer the quiz",
     loadingLabel: "Loading",
     answerCorrectLabel: "The answer is correct",
     alreadyAnsweredLabel: "You have already answered",

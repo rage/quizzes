@@ -1,12 +1,10 @@
 import ContentLoader from "react-content-loader"
 import * as React from "react"
-import { useEffect } from "react"
-import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
 import { useTypedSelector } from "../../state/store"
-import { rootAction } from "../../state/store"
+import LoginPrompt from "./LoginPrompt"
 
 const ContentWrapper = styled.div`
   padding: 1rem;
@@ -16,21 +14,24 @@ const StyledContentLoader = styled(ContentLoader)`
   padding-bottom: 1rem;
 `
 
-const LoadingQuiz = () => {
-  const dispatch = useDispatch()
-  const languageId = useTypedSelector(state => state.language.languageId)
+interface ILoadingQuizProps {
+  content?: JSX.Element | Element
+  accessToken?: string
+}
+
+const LoadingQuiz: React.FunctionComponent<ILoadingQuizProps> = ({
+  content,
+  accessToken,
+}) => {
   const displayBars = useTypedSelector(state => state.loadingBars)
-
-  if (languageId) {
-  }
-
-  useEffect(() => {
-    dispatch(rootAction.loadingBars.InitializeLoadingBarsAfterDelay())
-  }, [])
 
   return (
     <div>
       <TopInfoBar />
+      {!accessToken && (
+        <LoginPrompt content={content} fullQuizInfoShown={true} />
+      )}
+
       <ContentWrapper>
         {displayBars ? (
           <ContentLoader
@@ -41,6 +42,7 @@ const LoadingQuiz = () => {
             primaryOpacity={0.12}
             secondaryColor="#000000"
             secondaryOpacity={0.26}
+            style={{ height: "400px" }}
           >
             <rect x="0" y="15" rx="4" ry="4" width="360" height="6" />
             <rect x="0" y="35" rx="3" ry="3" width="365" height="6" />
@@ -52,14 +54,9 @@ const LoadingQuiz = () => {
             <rect x="0" y="180" rx="3" ry="3" width="340" height="6" />
           </ContentLoader>
         ) : (
-          <div
-            style={{
-              height: "400px",
-            }}
-          />
+          <div style={{ height: "400px" }} />
         )}
-
-        <SubmitButton />
+        {accessToken && <SubmitButton />}
       </ContentWrapper>
     </div>
   )
