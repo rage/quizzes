@@ -67,7 +67,7 @@ const englishLabels: SingleLanguageLabels = {
     submitButtonLabel: "Submit",
     errorLabel: "Error",
     loginToViewPromptLabel: "Log in to view the quiz",
-    loginToAnswerPromptLabel: "Log in to edit the quiz",
+    loginToAnswerPromptLabel: "Log in to answer the quiz",
     loadingLabel: "Loading",
     answerCorrectLabel: "The answer is correct",
     alreadyAnsweredLabel: "You have already answered",
