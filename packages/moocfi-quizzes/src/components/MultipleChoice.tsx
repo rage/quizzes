@@ -22,6 +22,7 @@ import {
 import { defaultProps } from "react-content-loader/dist/src/Holder"
 import { useContext } from "react"
 import ChoiceButton from "./ChoiceButton"
+import ThemeProviderContext from "../contexes/themeProviderContext"
 
 const ChoicesContainer = styled(Grid)`
   padding-top: 7;
@@ -100,25 +101,26 @@ const BottomMarginedGrid = styled(Grid)`
   margin-bottom: 10px;
 `
 
-interface ILeftBorderedDivProps {
-  barColor: string
+export interface LeftBorderedDivProps {
+  correct: boolean
   onlyOneItem?: boolean
 }
 
-const LeftBorderedDiv = styled.div<ILeftBorderedDivProps>`
-  border-left: 6px solid ${({ barColor }) => barColor};
+const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
+  border-left: 6px solid ${({ correct }) => (correct ? "#047500" : "#DB0000")};
   box-sizing: border-box;
   padding: 3px;
   padding-left: 10px;
-  margin-bottom: 5px !important;
-  ${onlyOneItem => onlyOneItem && "width: 70%;"}
+  margin-bottom: ${({ onlyOneItem }) =>
+    onlyOneItem ? "5px" : "0px"} !important;
+  ${({ onlyOneItem }) => onlyOneItem && "width: 70%;"}
 `
 interface ISolutionDivProps {
   correct: boolean
 }
 
 const SolutionDiv = styled((correct, ...others) => (
-  <LeftBorderedDiv barColor={correct ? "#047500" : "#DB0000"} {...others} />
+  <LeftBorderedDiv correct={correct} {...others} />
 ))<ISolutionDivProps>`
   margin-bottom: 0;
 `
@@ -255,7 +257,8 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
         !onlyOneItem &&
         ((itemAnswer.correct && successMessage) ||
           (!itemAnswer.correct && failureMessage)) && (
-          <SolutionDiv correct={itemAnswer.correct ? true : false}>
+          <FeedbackPortion item={item} />
+          /*<SolutionDiv correct={itemAnswer.correct ? true : false}>
             <Grid container alignItems="center" spacing={2}>
               <Grid item xs={12} sm="auto">
                 <CentralizedOnSmallScreenTypography variant="body1">
@@ -268,14 +271,13 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
                     ? multipleChoiceLabels.answerCorrectLabel
                     : multipleChoiceLabels.answerIncorrectLabel}
                 </CentralizedOnSmallScreenTypography>
-
                 <br />
                 <CentralizedOnSmallScreenTypography variant="body1">
                   {itemAnswer.correct ? successMessage : failureMessage}
                 </CentralizedOnSmallScreenTypography>
               </Grid>
             </Grid>
-          </SolutionDiv>
+          </SolutionDiv>*/
         )}
     </Grid>
   )
@@ -438,6 +440,7 @@ interface IFeedbackPortionProps {
 const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   item,
 }) => {
+  const themeProvider = React.useContext(ThemeProviderContext)
   const items = useTypedSelector(state => state.quiz!.items)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const languageLabels = useTypedSelector(
@@ -463,18 +466,23 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 
   const onlyOneItem = items.length === 1
   const generalLabels = languageLabels.general
+  const multipleChoiceLabels = languageLabels.multipleChoice
 
   const text = item.texts[0]
   const successMessage = text.successMessage || generalLabels.answerCorrectLabel
   const failureMessage =
     text.failureMessage || generalLabels.answerIncorrectLabel
 
-  const feedbackMessage = itemAnswer.correct ? successMessage : failureMessage
+  const correct = (itemAnswer.correct && true) || false
 
-  const feedbackColor = itemAnswer.correct ? "#047500" : "#DB0000"
+  const feedbackMessage = correct ? successMessage : failureMessage
+
+  const ThemedDiv = themeProvider.feedbackMessage
+
+  const FeedbackDiv = ThemedDiv || LeftBorderedDiv
 
   return (
-    <LeftBorderedDiv barColor={feedbackColor} onlyOneItem={onlyOneItem}>
+    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem}>
       <Grid container alignItems="center" spacing={2}>
         <Grid item xs={12} sm="auto">
           <CentralizedOnSmallScreenTypography variant="body1">
@@ -482,12 +490,22 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
           </CentralizedOnSmallScreenTypography>
         </Grid>
         <Grid item xs={12} sm={10}>
+          {!onlyOneItem && (
+            <React.Fragment>
+              <CentralizedOnSmallScreenTypography variant="body1">
+                {itemAnswer.correct
+                  ? multipleChoiceLabels.answerCorrectLabel
+                  : multipleChoiceLabels.answerIncorrectLabel}
+              </CentralizedOnSmallScreenTypography>
+              <br />
+            </React.Fragment>
+          )}
           <CentralizedOnSmallScreenTypography variant="body1">
             {feedbackMessage}
           </CentralizedOnSmallScreenTypography>
         </Grid>
       </Grid>
-    </LeftBorderedDiv>
+    </FeedbackDiv>
   )
 }
 
