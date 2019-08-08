@@ -316,6 +316,10 @@ export class QuizAnswerController {
         answer.quizId,
       )) || new UserQuizState()
 
+    if (userQState.status === "locked") {
+      throw new BadRequestError("Already answered")
+    }
+
     const originalPoints = userQState.pointsAwarded || 0
 
     let savedAnswer: QuizAnswer
