@@ -21,10 +21,22 @@ import { PeerReviewCollection } from "./peer_review_collection"
 import { PeerReviewQuestion } from "./peer_review_question"
 import { QuizItem } from "./quiz_item"
 
+enum DisplayPointsPolicy {
+  displayEverything,
+  displayOnlyWhenFullyCorrect,
+}
+
 @Entity()
 export class Quiz extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
+
+  @Column({
+    type: "enum",
+    enum: DisplayPointsPolicy,
+    default: DisplayPointsPolicy.displayEverything,
+  })
+  public pointsDisplayed?: string
 
   @ManyToOne(type => Course, course => course.id, { eager: false }) // was: lazy
   public course: Course
