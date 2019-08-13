@@ -21,9 +21,9 @@ import { PeerReviewCollection } from "./peer_review_collection"
 import { PeerReviewQuestion } from "./peer_review_question"
 import { QuizItem } from "./quiz_item"
 
-enum ShowCorrectAnswersPolicy {
-  showAlways,
-  showOnlyWhenFullyCorrect,
+enum GrantPointsPolicyEnum {
+  grantWheneverPossible,
+  grantOnlyWhenAnswerFullyCorrect,
 }
 
 @Entity()
@@ -33,10 +33,10 @@ export class Quiz extends BaseEntity {
 
   @Column({
     type: "enum",
-    enum: ShowCorrectAnswersPolicy,
-    default: ShowCorrectAnswersPolicy.showAlways,
+    enum: GrantPointsPolicyEnum,
+    default: GrantPointsPolicyEnum.grantWheneverPossible,
   })
-  public pointsDisplayed?: string
+  public grantPointsPolicy?: string
 
   @ManyToOne(type => Course, course => course.id, { eager: false }) // was: lazy
   public course: Course
