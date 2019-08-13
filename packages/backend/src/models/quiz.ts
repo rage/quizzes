@@ -21,9 +21,9 @@ import { PeerReviewCollection } from "./peer_review_collection"
 import { PeerReviewQuestion } from "./peer_review_question"
 import { QuizItem } from "./quiz_item"
 
-enum DisplayPointsPolicy {
-  displayEverything,
-  displayOnlyWhenFullyCorrect,
+enum ShowCorrectAnswersPolicy {
+  showAlways,
+  showOnlyWhenFullyCorrect,
 }
 
 @Entity()
@@ -33,8 +33,8 @@ export class Quiz extends BaseEntity {
 
   @Column({
     type: "enum",
-    enum: DisplayPointsPolicy,
-    default: DisplayPointsPolicy.displayEverything,
+    enum: ShowCorrectAnswersPolicy,
+    default: ShowCorrectAnswersPolicy.showAlways,
   })
   public pointsDisplayed?: string
 
