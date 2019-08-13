@@ -37,6 +37,9 @@ export default class ValidationService {
     quiz: Quiz,
     userQuizState: UserQuizState,
   ) {
+    const pointsAwardedInTheBeginning = userQuizState
+      ? userQuizState.pointsAwarded
+      : 0
     const items: QuizItem[] = quiz.items
     let points: number | null = null
     let pointsAwarded: number | null
@@ -239,6 +242,17 @@ export default class ValidationService {
       userQuizState.pointsAwarded > pointsAwarded
         ? userQuizState.pointsAwarded
         : pointsAwarded
+
+    switch (quiz.grantPointsPolicy) {
+      case "grantOnlyWhenAnswerFullyCorrect":
+        if (
+          !pointsAwardedInTheBeginning &&
+          Math.abs(userQuizState.pointsAwarded - quiz.points) > 0.001
+        ) {
+          userQuizState.pointsAwarded = 0
+        }
+      default:
+    }
 
     const response = {
       itemAnswerStatus,
