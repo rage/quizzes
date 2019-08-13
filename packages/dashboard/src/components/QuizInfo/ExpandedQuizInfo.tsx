@@ -29,6 +29,9 @@ interface IProps {
   courses: ICourse[]
   tries: number
   triesLimited: boolean
+  grantPointsPolicy:
+    | "grant_whenever_possible"
+    | "grant_only_when_answer_fully_correct"
 }
 
 interface IState {
@@ -42,6 +45,9 @@ interface IState {
   tries: number
   triesLimited: boolean
   tryCheckBoxHasBeenUsed: boolean
+  grantPointsPolicy:
+    | "grant_whenever_possible"
+    | "grant_only_when_answer_fully_correct"
 }
 
 class ExpandedQuizInfo extends React.Component<IProps, IState> {
@@ -54,6 +60,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     "courseId",
     "tries",
     "triesLimited",
+    "grantPointsPolicy",
   ]
 
   constructor(props: IProps) {
@@ -70,6 +77,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
       triesLimited: props.triesLimited,
       correctedInitial: false,
       tryCheckBoxHasBeenUsed: false,
+      grantPointsPolicy: "grant_whenever_possible",
     }
   }
 
@@ -173,6 +181,8 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
             toggleTriesLimited={this.changeTempAttribute("triesLimited")}
             handleTriesChange={this.changeTempAttribute("tries")}
             shouldAnimateTextField={this.state.tryCheckBoxHasBeenUsed}
+            grantPointsPolicy={this.state.grantPointsPolicy}
+            handlePolicyChange={this.changeTempAttribute("grantPointsPolicy")}
           />
         </Grid>
 
@@ -246,6 +256,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     this.props.setAttribute("submitMessage", this.state.submitMessage)
     this.props.setAttribute("tries", this.state.tries)
     this.props.setAttribute("triesLimited", this.state.triesLimited)
+    this.props.setAttribute("grantPointsPolicy", this.state.grantPointsPolicy)
 
     if (SHOW_COURSE_INFO) {
       this.props.setAttribute("part", this.state.part)
@@ -262,6 +273,8 @@ interface ITriesInfoProps {
   toggleTriesLimited: (e: any) => void
   handleTriesChange: (e: any) => void
   shouldAnimateTextField: boolean
+  grantPointsPolicy: string
+  handlePolicyChange: (e: any) => void
 }
 
 const TriesInformation: React.FunctionComponent<ITriesInfoProps> = ({
@@ -270,6 +283,8 @@ const TriesInformation: React.FunctionComponent<ITriesInfoProps> = ({
   tries,
   handleTriesChange,
   shouldAnimateTextField,
+  grantPointsPolicy,
+  handlePolicyChange,
 }) => {
   return (
     <Grid container={true}>
@@ -300,6 +315,30 @@ const TriesInformation: React.FunctionComponent<ITriesInfoProps> = ({
           />
         </Grid>
       </Grow>
+
+      <Grow
+        in={!triesLimited || tries > 1}
+        timeout={(!triesLimited || tries) && shouldAnimateTextField ? 200 : 0}
+      >
+        <PointsPolicySelector
+          grantPointsPolicy={grantPointsPolicy}
+          handlePolicyChange={handlePolicyChange}
+        />
+      </Grow>
+    </Grid>
+  )
+}
+
+const PointsPolicySelector = ({ grantPointsPolicy, handlePolicyChange }) => {
+  return (
+    <Grid item={true} xs={12}>
+      <FormControl>
+        <InputLabel>Policy</InputLabel>
+        <Select value={grantPointsPolicy} onChange={handlePolicyChange}>
+          <MenuItem value="grant_whenever_possible">Item</MenuItem>
+          <MenuItem value="grant_only_when_answer_fully_correct">Quiz</MenuItem>
+        </Select>
+      </FormControl>
     </Grid>
   )
 }

@@ -19,6 +19,9 @@ interface IProps {
   title: string
   tries: number
   triesLimited: boolean
+  grantPointsPolicy:
+    | "grant_whenever_possible"
+    | "grant_only_when_answer_fully_correct"
 }
 
 const ShortQuizInfo: React.FunctionComponent<IProps> = ({
@@ -29,6 +32,7 @@ const ShortQuizInfo: React.FunctionComponent<IProps> = ({
   onExpand,
   tries,
   triesLimited,
+  grantPointsPolicy,
 }) => (
   <Grid container={true} justify="space-between">
     <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
@@ -57,6 +61,16 @@ const ShortQuizInfo: React.FunctionComponent<IProps> = ({
           : "No limit on the number of tries"}
       </Typography>
     </Grid>
+
+    {(!triesLimited || tries > 1) && (
+      <Grid item={true} xs={12}>
+        <Typography variant="subtitle1">
+          {grantPointsPolicy === "grant_whenever_possible"
+            ? "Points granted on a per-item basis"
+            : "Points granted only when all item answers correct"}
+        </Typography>
+      </Grid>
+    )}
 
     <Grid
       item={true}
