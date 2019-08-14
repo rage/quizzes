@@ -1,12 +1,16 @@
 import * as React from "react"
 import styled from "styled-components"
-import { Typography } from "@material-ui/core"
+import { Divider, Typography } from "@material-ui/core"
 import { useTypedSelector } from "../../state/store"
 
 interface ILoginPromptProps {
   content?: Element | JSX.Element
   fullQuizInfoShown?: boolean
 }
+
+const StyledDivider = styled(Divider)`
+  height: 2px;
+`
 
 const LoginPrompt: React.FunctionComponent<ILoginPromptProps> = ({
   content,
@@ -34,13 +38,16 @@ const DefaultLoginMessage: React.FunctionComponent<
   }PromptLabel`
 
   return (
-    <MessageContainer fullQuizInfoShown={!!fullQuizInfoShown}>
-      <StyledTypography variant="subtitle1">
-        {languageLabels
-          ? languageLabels.general[labelPropertyName]
-          : `Log in to ${fullQuizInfoShown ? "answer" : "view"} the quiz`}
-      </StyledTypography>
-    </MessageContainer>
+    <>
+      <MessageContainer fullQuizInfoShown={!!fullQuizInfoShown}>
+        <StyledTypography variant="subtitle1">
+          {languageLabels
+            ? languageLabels.general[labelPropertyName]
+            : `Log in to ${fullQuizInfoShown ? "answer" : "view"} the quiz`}
+        </StyledTypography>
+      </MessageContainer>
+      {fullQuizInfoShown && <StyledDivider variant="fullWidth" />}
+    </>
   )
 }
 
@@ -50,8 +57,7 @@ interface IMessageContainerProps {
 
 const MessageContainer = styled.div<IMessageContainerProps>`
   padding: 1rem;
-  ${({ fullQuizInfoShown }) =>
-    fullQuizInfoShown ? "border-bottom: 3px solid black; " : "height: 400px"}
+  ${({ fullQuizInfoShown }) => (fullQuizInfoShown ? "" : "height: 400px")}
 `
 
 const StyledTypography = styled(Typography)`
