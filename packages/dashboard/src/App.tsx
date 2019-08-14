@@ -5,8 +5,10 @@ import Grid from "@material-ui/core/Grid"
 import Input from "@material-ui/core/Input"
 import InputLabel from "@material-ui/core/InputLabel"
 import Paper from "@material-ui/core/Paper"
+import SvgIcon from "@material-ui/core/SvgIcon"
 import Toolbar from "@material-ui/core/Toolbar"
 import Typography from "@material-ui/core/Typography"
+import Build from "@material-ui/icons/Build"
 import NavigateNextIcon from "@material-ui/icons/NavigateNext"
 import Breadcrumbs from "@material-ui/lab/Breadcrumbs"
 import * as React from "react"
@@ -58,6 +60,8 @@ class App extends React.Component<any, any> {
   }
 
   public render() {
+    const developmentEnvironment = process.env.NODE_ENV === "development"
+
     const Login = () => {
       return (
         <Grid container={true} justify="center">
@@ -101,7 +105,13 @@ class App extends React.Component<any, any> {
             {this.props.user ? (
               <div>
                 <div>
-                  <AppBar>
+                  <AppBar
+                    style={{
+                      backgroundColor: developmentEnvironment
+                        ? "#227722"
+                        : "default",
+                    }}
+                  >
                     <Toolbar>
                       <Grid
                         container={true}
@@ -109,7 +119,7 @@ class App extends React.Component<any, any> {
                         alignItems="center"
                         spacing={8}
                       >
-                        <Grid item={true} xs={11}>
+                        <Grid item={true} xs={12} sm={9} md={10}>
                           <Grid
                             container={true}
                             justify="flex-start"
@@ -122,8 +132,26 @@ class App extends React.Component<any, any> {
                             />
                           </Grid>
                         </Grid>
-                        <Grid item={true} xs={1}>
-                          <Button color="inherit" onClick={this.logout}>
+
+                        <Grid item={true} xs={12} sm="auto">
+                          {developmentEnvironment && (
+                            <SvgIcon
+                              style={{
+                                maxWidth: "34%",
+                                verticalAlign: "middle",
+                                marginRight: "10px",
+                              }}
+                            >
+                              <Build />
+                            </SvgIcon>
+                          )}
+                          <Button
+                            color="inherit"
+                            onClick={this.logout}
+                            style={{
+                              maxWidth: developmentEnvironment ? "66%" : "100%",
+                            }}
+                          >
                             logout
                           </Button>
                         </Grid>
