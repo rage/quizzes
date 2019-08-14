@@ -101,6 +101,7 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
               courses={this.props.courses}
               tries={this.props.edit.tries}
               triesLimited={this.props.edit.triesLimited}
+              grantPointsPolicy={this.props.edit.grantPointsPolicy}
             />
           ) : (
             <ShortQuizInfo
@@ -111,6 +112,7 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
               onExpand={this.toggleExpansion}
               tries={this.props.edit.tries}
               triesLimited={this.props.edit.triesLimited}
+              grantPointsPolicy={this.props.edit.grantPointsPolicy}
             />
           )}
         </Grid>
@@ -133,7 +135,8 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
       attributeName === "section" ||
       attributeName === "courseId" ||
       attributeName === "tries" ||
-      attributeName === "triesLimited"
+      attributeName === "triesLimited" ||
+      attributeName === "grantPointsPolicy"
     ) {
       this.props.changeAttr(attributeName, attributeValue)
     } else {

@@ -8,7 +8,7 @@ import {
 } from "@material-ui/core"
 import Create from "@material-ui/icons/Create"
 import React from "react"
-import { ILanguage } from "../../interfaces"
+import { ILanguage, QuizPointsGrantingPolicy } from "../../interfaces"
 import TogglableQuizInstruction from "./TogglableQuizInstruction"
 
 interface IProps {
@@ -19,6 +19,7 @@ interface IProps {
   title: string
   tries: number
   triesLimited: boolean
+  grantPointsPolicy: QuizPointsGrantingPolicy
 }
 
 const ShortQuizInfo: React.FunctionComponent<IProps> = ({
@@ -29,6 +30,7 @@ const ShortQuizInfo: React.FunctionComponent<IProps> = ({
   onExpand,
   tries,
   triesLimited,
+  grantPointsPolicy,
 }) => (
   <Grid container={true} justify="space-between">
     <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
@@ -52,9 +54,17 @@ const ShortQuizInfo: React.FunctionComponent<IProps> = ({
 
     <Grid item={true} xs={12}>
       <Typography variant="subtitle1">
-        {triesLimited
-          ? `${tries}  tr${tries > 1 ? "ies" : "y"} allowed`
-          : "No limit on the number of tries"}
+        Number of tries that are allowed:
+        {triesLimited ? ` ${tries}` : " No limit"}
+      </Typography>
+    </Grid>
+
+    <Grid item={true} xs={12}>
+      <Typography variant="subtitle1">
+        Point granting policy:
+        {grantPointsPolicy === "grant_whenever_possible"
+          ? " each item answer granted separately"
+          : " only when all item answers correct"}
       </Typography>
     </Grid>
 

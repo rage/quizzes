@@ -64,7 +64,7 @@ export const newQuiz = () => {
     const course = getState().courses.find(
       c => c.id === getState().filter.course,
     )
-    const quiz = {
+    const quiz: IQuiz & { peerReviewCollections: any[] } = {
       part: 0,
       section: 0,
       courseId: course.id,
@@ -74,6 +74,7 @@ export const newQuiz = () => {
       peerReviewCollections: [],
       tries: 1,
       triesLimited: true,
+      grantPointsPolicy: "grant_whenever_possible",
     }
     dispatch(set(checkForMissingTranslation(quiz)))
   }

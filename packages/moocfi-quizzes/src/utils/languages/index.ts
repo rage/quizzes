@@ -1,5 +1,6 @@
 import finnishLabels from "./finnish_options"
 import englishLabels from "./english_options"
+import { QuizPointsGrantingPolicy } from "../../modelTypes"
 
 export type GeneralLabels = {
   [index: string]: string | Function
@@ -22,6 +23,7 @@ export type GeneralLabels = {
   triesNotLimitedLabel: string
   submitGeneralFeedbackLabel: string
   submitButtonAlreadyAnsweredLabel: string
+  pointsGrantingPolicyInformer: (policy: QuizPointsGrantingPolicy) => string
 }
 
 export type StageLabels = {

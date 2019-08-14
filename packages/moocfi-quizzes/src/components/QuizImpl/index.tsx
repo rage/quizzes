@@ -224,9 +224,38 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
         ) : (
           <div>
             {messageState.notification && messageState.notification.message && (
-              <Typography style={{ color: messageState.notification.color }}>
+              <Typography
+                style={{
+                  color: messageState.notification.color,
+                  fontSize: "1.25rem",
+                }}
+              >
                 {messageState.notification.message}
               </Typography>
+            )}
+
+            {!quizDisabled && (
+              <>
+                {!quiz.awardPointsEvenIfWrong && quiz.items.length > 1 && (
+                  <Grid item={true} xs={12}>
+                    <Typography>
+                      {generalLabels.pointsGrantingPolicyInformer(
+                        quiz.grantPointsPolicy,
+                      )}
+                    </Typography>
+                  </Grid>
+                )}
+
+                <Grid item={true} xs={12}>
+                  <Typography>
+                    {quiz.triesLimited
+                      ? `${
+                          generalLabels.triesRemainingLabel
+                        }: ${triesRemaining}`
+                      : generalLabels.triesNotLimitedLabel}
+                  </Typography>
+                </Grid>
+              </>
             )}
 
             <Grid container={true} alignItems="center" spacing={2}>
@@ -240,18 +269,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
               >
                 <SubmitButton />
               </Grid>
-
-              {!quizDisabled && (
-                <Grid item={true}>
-                  <Typography>
-                    {quiz.triesLimited
-                      ? `${
-                          generalLabels.triesRemainingLabel
-                        }: ${triesRemaining}`
-                      : generalLabels.triesNotLimitedLabel}
-                  </Typography>
-                </Grid>
-              )}
             </Grid>
           </div>
         )}

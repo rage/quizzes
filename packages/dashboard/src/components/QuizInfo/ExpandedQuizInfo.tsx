@@ -9,9 +9,15 @@ import {
   MenuItem,
   Select,
   TextField,
+  Typography,
 } from "@material-ui/core"
 import React from "react"
-import { ICourse, ILanguage, IQuizText } from "../../interfaces"
+import {
+  ICourse,
+  ILanguage,
+  IQuizText,
+  QuizPointsGrantingPolicy,
+} from "../../interfaces"
 
 const SHOW_COURSE_INFO = true
 
@@ -29,6 +35,7 @@ interface IProps {
   courses: ICourse[]
   tries: number
   triesLimited: boolean
+  grantPointsPolicy: QuizPointsGrantingPolicy
 }
 
 interface IState {
@@ -42,6 +49,7 @@ interface IState {
   tries: number
   triesLimited: boolean
   tryCheckBoxHasBeenUsed: boolean
+  grantPointsPolicy: QuizPointsGrantingPolicy
 }
 
 class ExpandedQuizInfo extends React.Component<IProps, IState> {
@@ -54,6 +62,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     "courseId",
     "tries",
     "triesLimited",
+    "grantPointsPolicy",
   ]
 
   constructor(props: IProps) {
@@ -70,6 +79,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
       triesLimited: props.triesLimited,
       correctedInitial: false,
       tryCheckBoxHasBeenUsed: false,
+      grantPointsPolicy: props.grantPointsPolicy || "grant_whenever_possible",
     }
   }
 
@@ -166,21 +176,41 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
           </Grid>
         )}
 
-        <Grid item={true} xs={12} sm={6} lg={4} style={{ marginTop: "1rem" }}>
-          <TriesInformation
-            tries={this.state.tries}
-            triesLimited={this.state.triesLimited}
-            toggleTriesLimited={this.changeTempAttribute("triesLimited")}
-            handleTriesChange={this.changeTempAttribute("tries")}
-            shouldAnimateTextField={this.state.tryCheckBoxHasBeenUsed}
-          />
-        </Grid>
-
-        <Grid
-          item={true}
-          xs={12}
-          style={{ marginBottom: "2rem", marginTop: "2rem" }}
+        <div
+          style={{
+            border: "1px solid black",
+            borderRadius: "5px",
+            backgroundColor: "#00000010",
+            margin: "1rem 0",
+            padding: "1rem",
+            width: "100%",
+          }}
         >
+          <Typography
+            variant="subtitle1"
+            style={{ fontSize: "1.25rem", marginBottom: "5px" }}
+          >
+            Number of tries and point granting
+          </Typography>
+          <Grid item={true} xs={12}>
+            <PointsPolicySelector
+              grantPointsPolicy={this.state.grantPointsPolicy}
+              handlePolicyChange={this.changeTempAttribute("grantPointsPolicy")}
+            />
+          </Grid>
+
+          <Grid item={true} xs={12} style={{ marginTop: "1rem" }}>
+            <TriesInformation
+              tries={this.state.tries}
+              triesLimited={this.state.triesLimited}
+              toggleTriesLimited={this.changeTempAttribute("triesLimited")}
+              handleTriesChange={this.changeTempAttribute("tries")}
+              shouldAnimateTextField={this.state.tryCheckBoxHasBeenUsed}
+            />
+          </Grid>
+        </div>
+
+        <Grid item={true} xs={12} style={{ marginBottom: "1.5rem" }}>
           <TextField
             label="Body"
             multiline={true}
@@ -207,17 +237,21 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
           </Grid>
         )}
 
-        <Grid item={true} xs={6} sm={4} md={3}>
+        <Grid item={true} xs="auto">
           <Button
             variant="outlined"
-            style={{ color: "#79c49b" }}
+            style={{ backgroundColor: "rgb(19, 166, 0)", color: "white" }}
             onClick={this.saveChanges}
           >
             Save
           </Button>
           <Button
             variant="outlined"
-            style={{ color: "#d16d68" }}
+            style={{
+              backgroundColor: "rgb(220, 25, 0)",
+              color: "white",
+              marginLeft: "5px",
+            }}
             onClick={this.props.onCancel}
           >
             Cancel
@@ -246,6 +280,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     this.props.setAttribute("submitMessage", this.state.submitMessage)
     this.props.setAttribute("tries", this.state.tries)
     this.props.setAttribute("triesLimited", this.state.triesLimited)
+    this.props.setAttribute("grantPointsPolicy", this.state.grantPointsPolicy)
 
     if (SHOW_COURSE_INFO) {
       this.props.setAttribute("part", this.state.part)
@@ -272,8 +307,8 @@ const TriesInformation: React.FunctionComponent<ITriesInfoProps> = ({
   shouldAnimateTextField,
 }) => {
   return (
-    <Grid container={true}>
-      <Grid item={true} xs={6}>
+    <Grid container={true} justify="flex-start">
+      <Grid item={true} xs="auto">
         <FormControlLabel
           control={
             <Checkbox
@@ -301,6 +336,28 @@ const TriesInformation: React.FunctionComponent<ITriesInfoProps> = ({
         </Grid>
       </Grow>
     </Grid>
+  )
+}
+
+const PointsPolicySelector = ({ grantPointsPolicy, handlePolicyChange }) => {
+  return (
+    <FormControl>
+      <InputLabel style={{ minWidth: "250px" }}>
+        Point granting policy
+      </InputLabel>
+      <Select
+        value={grantPointsPolicy}
+        onChange={handlePolicyChange}
+        variant="outlined"
+      >
+        <MenuItem value="grant_whenever_possible">
+          For every item that is correct
+        </MenuItem>
+        <MenuItem value="grant_only_when_answer_fully_correct">
+          Only when the whole answer is correct
+        </MenuItem>
+      </Select>
+    </FormControl>
   )
 }
 

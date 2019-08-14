@@ -12,6 +12,10 @@ export type QuizItemType =
   | "feedback"
   | "custom-frontend-accept-data"
 
+export type QuizPointsGrantingPolicy =
+  | "grant_whenever_possible"
+  | "grant_only_when_answer_fully_correct"
+
 export interface IQuizText {
   quizId: string
   languageId: string
@@ -35,6 +39,7 @@ export interface IQuiz {
   texts: IQuizText[]
   course: ICourse
   items: IQuizItem[]
+  grantPointsPolicy: QuizPointsGrantingPolicy
 }
 
 export interface IQuizItemOptionText {

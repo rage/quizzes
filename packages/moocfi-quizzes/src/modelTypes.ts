@@ -8,6 +8,10 @@ export type QuizItemType =
   | "feedback"
   | "custom-frontend-accept-data"
 
+export type QuizPointsGrantingPolicy =
+  | "grant_whenever_possible"
+  | "grant_only_when_answer_fully_correct"
+
 export type MiscEvent = React.FormEvent<
   HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
 >
@@ -180,6 +184,8 @@ export type Quiz = {
   peerReviewCollections: PeerReviewCollection[]
   tries: number
   triesLimited: boolean
+  grantPointsPolicy: QuizPointsGrantingPolicy
+  awardPointsEvenIfWrong: boolean
 }
 
 export type PeerReviewGradeAnswer = {
