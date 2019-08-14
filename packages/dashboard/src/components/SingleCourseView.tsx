@@ -3,6 +3,7 @@ import React from "react"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 import { firstWords, wordCount } from "../../../common/src/util"
+import { IQuiz } from "../interfaces"
 import { newQuiz } from "../store/edit/actions"
 import { setCourse } from "../store/filter/actions"
 import LanguageBar from "./GeneralTools/LanguageBar"
@@ -274,6 +275,12 @@ const CourseComponent = ({ idx, countData, quiz }) => {
             </Typography>
           </Grid>
         )}
+
+        <Grid item={true} xs={12}>
+          <Typography variant="body1" style={{ color: "white" }}>
+            {quizItemTypes(quiz)}
+          </Typography>
+        </Grid>
       </Grid>
     </Card>
   )
@@ -293,6 +300,10 @@ const mapStateToProps = (state: any) => {
 const mapDispatchToProps = {
   setCourseTo: setCourse,
   newQuiz,
+}
+
+const quizItemTypes = (quiz: IQuiz): string => {
+  return `[${[...new Set(quiz.items.map(qi => qi.type))].sort().join(", ")}]`
 }
 
 export default connect(
