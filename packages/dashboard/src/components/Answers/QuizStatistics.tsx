@@ -155,7 +155,13 @@ class QuizStatistics extends React.Component<any, any> {
                   </Typography>
                 </Grid>
 
-                <Grid item={true} xs={12} md={10} lg={8}>
+                <Grid
+                  item={true}
+                  xs={12}
+                  md={10}
+                  lg={8}
+                  style={{ minWidth: "50%" }}
+                >
                   <Paper
                     square={true}
                     style={{
@@ -163,12 +169,15 @@ class QuizStatistics extends React.Component<any, any> {
                     }}
                   >
                     <Grid container={true} justify="center" spacing={24}>
-                      <Grid item={true} xs="auto">
-                        <Typography variant="h5">
+                      <Grid item={true} xs={12}>
+                        <Typography
+                          variant="h5"
+                          style={{ textAlign: "center" }}
+                        >
                           {quiz.texts[0].title}
                         </Typography>
                       </Grid>
-                      <Grid>
+                      <Grid item={true} xs={12}>
                         <Typography
                           variant="body1"
                           style={{
