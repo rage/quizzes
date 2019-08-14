@@ -9,8 +9,7 @@ interface ILoginPromptProps {
 }
 
 const StyledDivider = styled(Divider)`
-  height: 3px;
-  background-color: #000000;
+  height: 2px;
 `
 
 const LoginPrompt: React.FunctionComponent<ILoginPromptProps> = ({
