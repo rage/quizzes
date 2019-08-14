@@ -21,10 +21,9 @@ import { PeerReviewCollection } from "./peer_review_collection"
 import { PeerReviewQuestion } from "./peer_review_question"
 import { QuizItem } from "./quiz_item"
 
-enum GrantPointsPolicyEnum {
-  grantWheneverPossible,
-  grantOnlyWhenAnswerFullyCorrect,
-}
+type GrantPointsPolicyType =
+  | "grant_whenever_possible"
+  | "grant_only_when_answer_fully_correct"
 
 @Entity()
 export class Quiz extends BaseEntity {
@@ -32,11 +31,10 @@ export class Quiz extends BaseEntity {
   public id: string
 
   @Column({
-    type: "enum",
-    enum: GrantPointsPolicyEnum,
-    default: GrantPointsPolicyEnum.grantWheneverPossible,
+    type: "varchar",
+    default: "grant_whenever_possible",
   })
-  public grantPointsPolicy?: string
+  public grantPointsPolicy?: GrantPointsPolicyType
 
   @ManyToOne(type => Course, course => course.id, { eager: false }) // was: lazy
   public course: Course

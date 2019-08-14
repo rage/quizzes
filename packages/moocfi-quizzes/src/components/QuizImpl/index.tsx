@@ -236,7 +236,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
             {!quizDisabled && (
               <>
-                {!quiz.awardPointsEvenIfWrong && (
+                {!quiz.awardPointsEvenIfWrong && quiz.items.length > 1 && (
                   <Grid item={true} xs={12}>
                     <Typography>
                       {generalLabels.pointsGrantingPolicyInformer(

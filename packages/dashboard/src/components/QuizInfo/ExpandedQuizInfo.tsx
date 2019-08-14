@@ -12,7 +12,12 @@ import {
   Typography,
 } from "@material-ui/core"
 import React from "react"
-import { ICourse, ILanguage, IQuizText } from "../../interfaces"
+import {
+  ICourse,
+  ILanguage,
+  IQuizText,
+  QuizPointsGrantingPolicy,
+} from "../../interfaces"
 
 const SHOW_COURSE_INFO = true
 
@@ -30,9 +35,7 @@ interface IProps {
   courses: ICourse[]
   tries: number
   triesLimited: boolean
-  grantPointsPolicy:
-    | "grant_whenever_possible"
-    | "grant_only_when_answer_fully_correct"
+  grantPointsPolicy: QuizPointsGrantingPolicy
 }
 
 interface IState {
@@ -46,9 +49,7 @@ interface IState {
   tries: number
   triesLimited: boolean
   tryCheckBoxHasBeenUsed: boolean
-  grantPointsPolicy:
-    | "grant_whenever_possible"
-    | "grant_only_when_answer_fully_correct"
+  grantPointsPolicy: QuizPointsGrantingPolicy
 }
 
 class ExpandedQuizInfo extends React.Component<IProps, IState> {

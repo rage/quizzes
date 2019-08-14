@@ -8,7 +8,7 @@ import {
 } from "@material-ui/core"
 import Create from "@material-ui/icons/Create"
 import React from "react"
-import { ILanguage } from "../../interfaces"
+import { ILanguage, QuizPointsGrantingPolicy } from "../../interfaces"
 import TogglableQuizInstruction from "./TogglableQuizInstruction"
 
 interface IProps {
@@ -19,9 +19,7 @@ interface IProps {
   title: string
   tries: number
   triesLimited: boolean
-  grantPointsPolicy:
-    | "grant_whenever_possible"
-    | "grant_only_when_answer_fully_correct"
+  grantPointsPolicy: QuizPointsGrantingPolicy
 }
 
 const ShortQuizInfo: React.FunctionComponent<IProps> = ({
