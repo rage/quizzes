@@ -27,7 +27,7 @@ const finnishLabels: SingleLanguageLabels = {
   open: {
     placeholder: "Vastaus",
     userAnswerLabel: "Vastauksesi",
-    feedbackForFailure: "Vastauksesi on virheellinen",
+    feedbackForFailure: "Vastauksesi ei ole oikein",
     feedbackForSuccess: "Vastauksesi on oikein",
   },
   peerReviews: {
@@ -80,7 +80,7 @@ const finnishLabels: SingleLanguageLabels = {
     pointsAvailableLabel: "Pisteitä saatavissa",
     pointsReceivedLabel: "Saamasi pisteet",
     incorrectSubmitWhileTriesLeftLabel:
-      "Vastauksesi oli virheellinen - voit yrittää uudelleen!",
+      "Vastauksesi ei ollut täysin oikein - voit yrittää uudelleen!",
     triesRemainingLabel: "Yrityksiä jäljellä",
     quizLabel: "Kysely",
     pointsLabel: "Pisteitä",

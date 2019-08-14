@@ -20,6 +20,10 @@ interface SolutionPaperProps {
 
 const SolutionPaper = styled(SpaciousPaper)<SolutionPaperProps>`
   border-left: 1rem solid ${props => (props.correct ? "#047500" : "#DB0000")};
+
+  p {
+    margin: 0;
+  }
 `
 
 const Open: React.FunctionComponent<OpenProps> = ({ item }) => {

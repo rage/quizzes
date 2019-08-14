@@ -26,7 +26,7 @@ const englishLabels: SingleLanguageLabels = {
     placeholder: "Answer",
     userAnswerLabel: "Your answer",
     feedbackForSuccess: "Your answer is correct",
-    feedbackForFailure: "Your answer is incorrect",
+    feedbackForFailure: "Your answer is not correct",
   },
   peerReviews: {
     loadingLabel: "Loading",
@@ -76,7 +76,7 @@ const englishLabels: SingleLanguageLabels = {
     pointsAvailableLabel: "Points available in the quiz",
     pointsReceivedLabel: "Points awarded to you",
     incorrectSubmitWhileTriesLeftLabel:
-      "The answer was incorrect - you may try again!",
+      "The answer was not fully correct - you may try again!",
     triesRemainingLabel: "Tries remaining",
     quizLabel: "Quiz",
     pointsLabel: "Points",
