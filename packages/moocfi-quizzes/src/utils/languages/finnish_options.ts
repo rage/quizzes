@@ -87,6 +87,16 @@ const finnishLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "Yritysten lukumäärää ei rajattu",
     submitGeneralFeedbackLabel: "Vastattu onnistuneesti",
     submitButtonAlreadyAnsweredLabel: "Vastattu",
+    pointsGrantingPolicyInformer: policy => {
+      switch (policy) {
+        case "grant_only_when_answer_fully_correct":
+          return "Vastauksen oltava täysin oikein jotta pisteitä voi saada"
+        case "grant_whenever_possible":
+          return "Vaillinaisellakin vastauksella voi saada pisteitä"
+        default:
+          return ""
+      }
+    },
   },
 }
 
