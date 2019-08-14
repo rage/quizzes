@@ -77,7 +77,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
       triesLimited: props.triesLimited,
       correctedInitial: false,
       tryCheckBoxHasBeenUsed: false,
-      grantPointsPolicy: "grant_whenever_possible",
+      grantPointsPolicy: props.grantPointsPolicy || "grant_whenever_possible",
     }
   }
 
@@ -316,27 +316,28 @@ const TriesInformation: React.FunctionComponent<ITriesInfoProps> = ({
         </Grid>
       </Grow>
 
-      <Grow
-        in={!triesLimited || tries > 1}
-        timeout={(!triesLimited || tries) && shouldAnimateTextField ? 200 : 0}
-      >
+      {(!triesLimited || tries > 1) && (
         <PointsPolicySelector
           grantPointsPolicy={grantPointsPolicy}
           handlePolicyChange={handlePolicyChange}
         />
-      </Grow>
+      )}
     </Grid>
   )
 }
 
 const PointsPolicySelector = ({ grantPointsPolicy, handlePolicyChange }) => {
   return (
-    <Grid item={true} xs={12}>
+    <Grid item={true} xs={12} style={{ marginTop: "5px" }}>
       <FormControl>
-        <InputLabel>Policy</InputLabel>
+        <InputLabel>Policy for granting points</InputLabel>
         <Select value={grantPointsPolicy} onChange={handlePolicyChange}>
-          <MenuItem value="grant_whenever_possible">Item</MenuItem>
-          <MenuItem value="grant_only_when_answer_fully_correct">Quiz</MenuItem>
+          <MenuItem value="grant_whenever_possible">
+            When item is correct
+          </MenuItem>
+          <MenuItem value="grant_only_when_answer_fully_correct">
+            When whole quiz is correct
+          </MenuItem>
         </Select>
       </FormControl>
     </Grid>
