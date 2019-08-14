@@ -56,21 +56,19 @@ const ShortQuizInfo: React.FunctionComponent<IProps> = ({
 
     <Grid item={true} xs={12}>
       <Typography variant="subtitle1">
-        {triesLimited
-          ? `${tries}  tr${tries > 1 ? "ies" : "y"} allowed`
-          : "No limit on the number of tries"}
+        Number of tries that are allowed:
+        {triesLimited ? ` ${tries}` : " No limit"}
       </Typography>
     </Grid>
 
-    {(!triesLimited || tries > 1) && (
-      <Grid item={true} xs={12}>
-        <Typography variant="subtitle1">
-          {grantPointsPolicy === "grant_whenever_possible"
-            ? "Points granted on a per-item basis"
-            : "Points granted only when all item answers correct"}
-        </Typography>
-      </Grid>
-    )}
+    <Grid item={true} xs={12}>
+      <Typography variant="subtitle1">
+        Point granting policy:
+        {grantPointsPolicy === "grant_whenever_possible"
+          ? " each item answer granted separately"
+          : " only when all item answers correct"}
+      </Typography>
+    </Grid>
 
     <Grid
       item={true}

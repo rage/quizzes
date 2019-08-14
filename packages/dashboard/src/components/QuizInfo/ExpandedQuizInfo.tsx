@@ -9,6 +9,7 @@ import {
   MenuItem,
   Select,
   TextField,
+  Typography,
 } from "@material-ui/core"
 import React from "react"
 import { ICourse, ILanguage, IQuizText } from "../../interfaces"
@@ -174,23 +175,41 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
           </Grid>
         )}
 
-        <Grid item={true} xs={12} sm={6} lg={4} style={{ marginTop: "1rem" }}>
-          <TriesInformation
-            tries={this.state.tries}
-            triesLimited={this.state.triesLimited}
-            toggleTriesLimited={this.changeTempAttribute("triesLimited")}
-            handleTriesChange={this.changeTempAttribute("tries")}
-            shouldAnimateTextField={this.state.tryCheckBoxHasBeenUsed}
-            grantPointsPolicy={this.state.grantPointsPolicy}
-            handlePolicyChange={this.changeTempAttribute("grantPointsPolicy")}
-          />
-        </Grid>
-
-        <Grid
-          item={true}
-          xs={12}
-          style={{ marginBottom: "2rem", marginTop: "2rem" }}
+        <div
+          style={{
+            border: "1px solid black",
+            borderRadius: "5px",
+            backgroundColor: "#00000010",
+            margin: "1rem 0",
+            padding: "1rem",
+            width: "100%",
+          }}
         >
+          <Typography
+            variant="subtitle1"
+            style={{ fontSize: "1.25rem", marginBottom: "5px" }}
+          >
+            Number of tries and point granting
+          </Typography>
+          <Grid item={true} xs={12}>
+            <PointsPolicySelector
+              grantPointsPolicy={this.state.grantPointsPolicy}
+              handlePolicyChange={this.changeTempAttribute("grantPointsPolicy")}
+            />
+          </Grid>
+
+          <Grid item={true} xs={12} style={{ marginTop: "1rem" }}>
+            <TriesInformation
+              tries={this.state.tries}
+              triesLimited={this.state.triesLimited}
+              toggleTriesLimited={this.changeTempAttribute("triesLimited")}
+              handleTriesChange={this.changeTempAttribute("tries")}
+              shouldAnimateTextField={this.state.tryCheckBoxHasBeenUsed}
+            />
+          </Grid>
+        </div>
+
+        <Grid item={true} xs={12} style={{ marginBottom: "1.5rem" }}>
           <TextField
             label="Body"
             multiline={true}
@@ -217,17 +236,21 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
           </Grid>
         )}
 
-        <Grid item={true} xs={6} sm={4} md={3}>
+        <Grid item={true} xs="auto">
           <Button
             variant="outlined"
-            style={{ color: "#79c49b" }}
+            style={{ backgroundColor: "rgb(19, 166, 0)", color: "white" }}
             onClick={this.saveChanges}
           >
             Save
           </Button>
           <Button
             variant="outlined"
-            style={{ color: "#d16d68" }}
+            style={{
+              backgroundColor: "rgb(220, 25, 0)",
+              color: "white",
+              marginLeft: "5px",
+            }}
             onClick={this.props.onCancel}
           >
             Cancel
@@ -273,8 +296,6 @@ interface ITriesInfoProps {
   toggleTriesLimited: (e: any) => void
   handleTriesChange: (e: any) => void
   shouldAnimateTextField: boolean
-  grantPointsPolicy: string
-  handlePolicyChange: (e: any) => void
 }
 
 const TriesInformation: React.FunctionComponent<ITriesInfoProps> = ({
@@ -283,12 +304,10 @@ const TriesInformation: React.FunctionComponent<ITriesInfoProps> = ({
   tries,
   handleTriesChange,
   shouldAnimateTextField,
-  grantPointsPolicy,
-  handlePolicyChange,
 }) => {
   return (
-    <Grid container={true}>
-      <Grid item={true} xs={6}>
+    <Grid container={true} justify="flex-start">
+      <Grid item={true} xs="auto">
         <FormControlLabel
           control={
             <Checkbox
@@ -315,32 +334,29 @@ const TriesInformation: React.FunctionComponent<ITriesInfoProps> = ({
           />
         </Grid>
       </Grow>
-
-      {(!triesLimited || tries > 1) && (
-        <PointsPolicySelector
-          grantPointsPolicy={grantPointsPolicy}
-          handlePolicyChange={handlePolicyChange}
-        />
-      )}
     </Grid>
   )
 }
 
 const PointsPolicySelector = ({ grantPointsPolicy, handlePolicyChange }) => {
   return (
-    <Grid item={true} xs={12} style={{ marginTop: "5px" }}>
-      <FormControl>
-        <InputLabel>Policy for granting points</InputLabel>
-        <Select value={grantPointsPolicy} onChange={handlePolicyChange}>
-          <MenuItem value="grant_whenever_possible">
-            When item is correct
-          </MenuItem>
-          <MenuItem value="grant_only_when_answer_fully_correct">
-            When whole quiz is correct
-          </MenuItem>
-        </Select>
-      </FormControl>
-    </Grid>
+    <FormControl>
+      <InputLabel style={{ minWidth: "250px" }}>
+        Point granting policy
+      </InputLabel>
+      <Select
+        value={grantPointsPolicy}
+        onChange={handlePolicyChange}
+        variant="outlined"
+      >
+        <MenuItem value="grant_whenever_possible">
+          For every item that is correct
+        </MenuItem>
+        <MenuItem value="grant_only_when_answer_fully_correct">
+          Only when the whole answer is correct
+        </MenuItem>
+      </Select>
+    </FormControl>
   )
 }
 
