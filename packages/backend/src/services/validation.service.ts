@@ -244,12 +244,15 @@ export default class ValidationService {
         : pointsAwarded
 
     switch (quiz.grantPointsPolicy) {
-      case "grantOnlyWhenAnswerFullyCorrect":
+      case "grant_only_when_answer_fully_correct":
         if (
           !pointsAwardedInTheBeginning &&
           Math.abs(userQuizState.pointsAwarded - quiz.points) > 0.001
         ) {
           userQuizState.pointsAwarded = 0
+          quizAnswer.itemAnswers.forEach(ia => {
+            ia.correct = undefined
+          })
         }
       default:
     }
