@@ -212,7 +212,9 @@ const CourseComponent = ({ idx, countData, quiz }) => {
       elevation={2}
       style={{
         backgroundColor:
-          countData && countData.count > 0 ? "#FB6949" : "#49C7FB",
+          countData && countData.count > 0
+            ? "rgb(199, 66, 37)"
+            : "rgb(14, 105, 143)",
       }}
     >
       <Grid

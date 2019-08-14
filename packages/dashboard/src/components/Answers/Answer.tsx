@@ -126,7 +126,7 @@ class Answer extends React.Component<any, any> {
                           <Button
                             variant="contained"
                             style={{
-                              backgroundColor: "#029422",
+                              backgroundColor: "rgb(15, 135, 15)",
                               borderRadius: "0",
                               color: "white",
                             }}
@@ -140,7 +140,7 @@ class Answer extends React.Component<any, any> {
                           <Button
                             variant="contained"
                             style={{
-                              backgroundColor: "#D80027",
+                              backgroundColor: "rgb(200, 34, 34)",
                               borderRadius: "0",
                               color: "white",
                             }}
