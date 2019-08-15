@@ -24,8 +24,8 @@ import SuccessNotification from "./components/SuccessNotification"
 import { setAnswerCounts } from "./store/answerCounts/actions"
 import { setCourses } from "./store/courses/actions"
 import { newQuiz, setEdit } from "./store/edit/actions"
-import { setCourse } from "./store/filter/actions"
 import { displayMessage } from "./store/notification/actions"
+import { setQuizzesByQuizId } from "./store/quizzes/actions"
 import { addUser, removeUser } from "./store/user/actions"
 
 class App extends React.Component<any, any> {
@@ -251,12 +251,38 @@ class App extends React.Component<any, any> {
   }
 
   private edit = ({ history, match }) => {
+    const quizIdInPath = match.params.id
     if (!this.props.quizzesOfCourse) {
       return <p />
     }
-    const quiz = this.props.quizzesOfCourse.quizzes.find(
-      q => q.id === match.params.id,
-    )
+
+    // Best case: quiz is on the current course
+    let quiz =
+      this.props.quizzesOfCourse.quizzes &&
+      this.props.quizzesOfCourse.quizzes.find(q => q.id === match.params.id)
+
+    const quizzesByCourses = this.props.quizzesByCourses
+    // Second best: quiz loaded in memory, but under another course
+    if (!quiz) {
+      quizzesByCourses.forEach(courseInfo => {
+        if (quiz) {
+          return
+        }
+        const possibleQuizOnCourse = courseInfo.quizzes.find(
+          q => q.id === quizIdInPath,
+        )
+        if (possibleQuizOnCourse) {
+          quiz = possibleQuizOnCourse
+        }
+      })
+    }
+
+    // Worst case: quiz info must be fetched from the backend (and initiate loading the info of that course)
+    // prob best to load something while waiting, but let's try if this even works...
+    if (!quiz) {
+      this.props.setQuizzesByQuizId(quizIdInPath)
+      return <p />
+    }
 
     return <QuizForm quiz={quiz} new={false} history={history} />
   }
@@ -302,7 +328,6 @@ interface IDispatchProps {
   addUser: typeof addUser
   displayMessage: typeof displayMessage
   newQuiz: typeof newQuiz
-  setCourse: typeof setCourse
   setCourses: typeof setCourses
   setEdit: typeof setEdit
   removeUser: typeof removeUser
@@ -313,6 +338,7 @@ interface IStateProps {
   edit: any
   filter: any
   quizzesOfCourse: any
+  quizzesByCourses: any[]
   user: ITMCProfile
 }
 
@@ -325,6 +351,7 @@ const mapStateToProps = (state: any) => {
     quizzesOfCourse: state.quizzes.find(
       courseQuizInfo => courseQuizInfo.courseId === state.filter.course,
     ),
+    quizzesByCourses: state.quizzes,
     user: state.user,
   }
 }
@@ -334,10 +361,10 @@ const mapDispatchToProps = {
   displayMessage,
   newQuiz,
   setAnswerCounts,
-  setCourse,
   setCourses,
   setEdit,
   removeUser,
+  setQuizzesByQuizId,
 }
 
 export default connect<IStateProps, IDispatchProps>(

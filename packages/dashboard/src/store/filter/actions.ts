@@ -30,7 +30,9 @@ export const setCourse = (course: string) => {
   return async (dispatch, getState) => {
     if (!getState().courses.some(c => c.id === course)) {
       await dispatch(setCourses())
+      console.log("Courses have been set!")
     }
+    console.log("Courses after setting: ", getState().courses)
     const language = getState().courses.find(c => c.id === course).languages[0]
       .id
     dispatch(set({ course, language }))

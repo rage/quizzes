@@ -17,7 +17,7 @@ import React from "react"
 import { connect } from "react-redux"
 import { updateQuizAnswerStatus } from "../../services/quizAnswers"
 import { decrement } from "../../store/answerCounts/actions"
-import { setCourse, setQuiz } from "../../store/filter/actions"
+import { setQuiz } from "../../store/filter/actions"
 import { displayMessage } from "../../store/notification/actions"
 import ItemAnswer from "./ItemAnswer"
 import PeerReviewsModal from "./PeerReviewsModal"
@@ -526,5 +526,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { decrementAttentionCount: decrement, displayMessage, setCourse, setQuiz },
+  { decrementAttentionCount: decrement, displayMessage, setQuiz },
 )(Answer)

@@ -7,7 +7,7 @@ import Typography from "@material-ui/core/Typography"
 import React from "react"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
-import { clear, setCourse } from "../store/filter/actions"
+import { clear } from "../store/filter/actions"
 
 const CourseCard = ({ course }) => {
   return (
@@ -93,5 +93,5 @@ const mapStateToProps = (state: any) => {
 
 export default connect(
   mapStateToProps,
-  { clear, setCourse },
+  { clear },
 )(CoursesView)

@@ -4,7 +4,6 @@ import { ActionType, createAction } from "typesafe-actions"
 import { IQuiz } from "../../interfaces"
 
 import { post } from "../../services/quizzes"
-import { setLanguage } from "../filter/actions"
 import { displayMessage } from "../notification/actions"
 import * as quizActions from "../quizzes/actions"
 

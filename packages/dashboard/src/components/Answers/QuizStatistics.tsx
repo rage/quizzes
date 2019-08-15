@@ -20,7 +20,7 @@ import {
   setAllAnswers,
   setAttentionRequiringAnswers,
 } from "../../store/answers/actions"
-import { setCourse, setQuiz } from "../../store/filter/actions"
+import { setQuiz } from "../../store/filter/actions"
 import LanguageBar from "../GeneralTools/LanguageBar"
 import Answers from "./Answers"
 import DownloadButton from "./DownloadButton"
@@ -417,7 +417,6 @@ export default connect(
     setAllAnswers,
     setAllAnswersCount,
     setAttentionRequiringAnswers,
-    setCourse,
     setQuiz,
   },
 )(QuizStatistics)

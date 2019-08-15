@@ -10,11 +10,15 @@ export const clear = createAction("courses/CLEAR")
 
 export const setCourses = () => {
   return async (dispatch, getState) => {
+    console.log("setting courses")
     try {
       const courses = await getCourses(getState().user)
+      console.log("Courses fetched: ", courses)
+
       if (getState().filter.course) {
         dispatch(setCourse(getState().filter.course))
       } else {
+        /*
         const def = courses.find(
           course => course.id === "1c1d9c7d-5278-45d9-98a2-2dc72834df64",
         )
@@ -23,8 +27,12 @@ export const setCourses = () => {
         } else if (courses[0]) {
           dispatch(setCourse(courses[0].id))
         }
+        */
+        //  dispatch(set(courses))
       }
-      dispatch(set(courses))
+      if (getState().courses.length === 0) {
+        dispatch(set(courses))
+      }
     } catch (error) {
       console.log(error)
     }

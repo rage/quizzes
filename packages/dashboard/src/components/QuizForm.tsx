@@ -22,7 +22,7 @@ import {
   save,
   setEdit,
 } from "../store/edit/actions"
-import { setLanguage, setQuiz } from "../store/filter/actions"
+import { setQuiz } from "../store/filter/actions"
 import QuizInfo from "./QuizInfo"
 import TabContainer from "./TabContainer"
 
@@ -30,6 +30,7 @@ class QuizForm extends React.Component<any, any> {
   public componentDidMount() {
     if (this.props.quiz) {
       this.props.setEdit(this.props.quiz)
+      console.log("Filter touched from quiz form")
       this.props.setQuiz(this.props.quiz.id)
     } else if (this.props.new) {
       this.props.newQuiz()
@@ -109,7 +110,6 @@ const mapDispatchToProps = {
   newQuiz,
   save,
   setEdit,
-  setLanguage,
   setQuiz,
 }
 
