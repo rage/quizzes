@@ -30,7 +30,6 @@ class QuizForm extends React.Component<any, any> {
   public componentDidMount() {
     if (this.props.quiz) {
       this.props.setEdit(this.props.quiz)
-      console.log("Filter touched from quiz form")
       this.props.setQuiz(this.props.quiz.id)
     } else if (this.props.new) {
       this.props.newQuiz()

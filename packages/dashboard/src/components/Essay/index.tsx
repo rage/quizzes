@@ -9,6 +9,9 @@ class EssayItem extends React.Component<any, any> {
 
   public render() {
     const item = this.props.items[this.props.order]
+    if (!item) {
+      return <p />
+    }
     if (item.id && !this.props.expanded) {
       return <ShortEssay {...this.props} />
     } else {

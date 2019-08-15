@@ -24,6 +24,7 @@ import SuccessNotification from "./components/SuccessNotification"
 import { setAnswerCounts } from "./store/answerCounts/actions"
 import { setCourses } from "./store/courses/actions"
 import { newQuiz, setEdit } from "./store/edit/actions"
+import { setCourse, setLanguage, setQuiz } from "./store/filter/actions"
 import { displayMessage } from "./store/notification/actions"
 import { setQuizzesByQuizId } from "./store/quizzes/actions"
 import { addUser, removeUser } from "./store/user/actions"
@@ -252,14 +253,15 @@ class App extends React.Component<any, any> {
 
   private edit = ({ history, match }) => {
     const quizIdInPath = match.params.id
-    if (!this.props.quizzesOfCourse) {
-      return <p />
-    }
+
+    let quiz
 
     // Best case: quiz is on the current course
-    let quiz =
-      this.props.quizzesOfCourse.quizzes &&
-      this.props.quizzesOfCourse.quizzes.find(q => q.id === match.params.id)
+    if (this.props.quizzesOfCourse) {
+      quiz =
+        this.props.quizzesOfCourse.quizzes &&
+        this.props.quizzesOfCourse.quizzes.find(q => q.id === match.params.id)
+    }
 
     const quizzesByCourses = this.props.quizzesByCourses
     // Second best: quiz loaded in memory, but under another course
@@ -273,6 +275,7 @@ class App extends React.Component<any, any> {
         )
         if (possibleQuizOnCourse) {
           quiz = possibleQuizOnCourse
+          // ja ehkä myös nykyisten kurssien siirtyminen sopivaan uuteen quizziiin?
         }
       })
     }
@@ -282,6 +285,19 @@ class App extends React.Component<any, any> {
     if (!quiz) {
       this.props.setQuizzesByQuizId(quizIdInPath)
       return <p />
+    }
+
+    if (this.props.filter.quiz !== quizIdInPath) {
+      this.props.setQuiz(quizIdInPath)
+      if (
+        quiz.texts[0].language &&
+        this.props.filter.language !== quiz.texts[0].language
+      ) {
+        this.props.setLanguage(quiz.texts[0].language)
+      }
+      if (this.props.filter.course !== quiz.courseId) {
+        this.props.setCourse(quiz.courseId)
+      }
     }
 
     return <QuizForm quiz={quiz} new={false} history={history} />
@@ -365,6 +381,9 @@ const mapDispatchToProps = {
   setEdit,
   removeUser,
   setQuizzesByQuizId,
+  setQuiz,
+  setLanguage,
+  setCourse,
 }
 
 export default connect<IStateProps, IDispatchProps>(
