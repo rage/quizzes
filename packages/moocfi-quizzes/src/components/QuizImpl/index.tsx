@@ -234,30 +234,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
               </Typography>
             )}
 
-            {!quizDisabled && (
-              <>
-                {!quiz.awardPointsEvenIfWrong && quiz.items.length > 1 && (
-                  <Grid item={true} xs={12}>
-                    <Typography>
-                      {generalLabels.pointsGrantingPolicyInformer(
-                        quiz.grantPointsPolicy,
-                      )}
-                    </Typography>
-                  </Grid>
-                )}
-
-                <Grid item={true} xs={12}>
-                  <Typography>
-                    {quiz.triesLimited
-                      ? `${
-                          generalLabels.triesRemainingLabel
-                        }: ${triesRemaining}`
-                      : generalLabels.triesNotLimitedLabel}
-                  </Typography>
-                </Grid>
-              </>
-            )}
-
             <Grid container={true} alignItems="center" spacing={2}>
               <Grid
                 item={true}
@@ -266,9 +242,30 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                     dispatch(quizAnswerActions.noticeDisabledSubmitAttempt())
                   }
                 }}
+                xs="auto"
               >
                 <SubmitButton />
               </Grid>
+
+              {!quizDisabled && (
+                <Grid item={true} xs="auto">
+                  <Typography>
+                    {quiz.triesLimited
+                      ? `${
+                          generalLabels.triesRemainingLabel
+                        }: ${triesRemaining}`
+                      : generalLabels.triesNotLimitedLabel}
+                  </Typography>
+
+                  {!quiz.awardPointsEvenIfWrong && quiz.items.length > 1 && (
+                    <Typography>
+                      {generalLabels.pointsGrantingPolicyInformer(
+                        quiz.grantPointsPolicy,
+                      )}
+                    </Typography>
+                  )}
+                </Grid>
+              )}
             </Grid>
           </div>
         )}
