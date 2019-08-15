@@ -95,7 +95,8 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     return false
   }
 
-  public componentDidUpdate() {
+  public componentDidUpdate(prevProps, prevState) {
+    /*
     if (!this.state.correctedInitial) {
       this.setState({
         title: this.props.quizTexts.title,
@@ -103,6 +104,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
         correctedInitial: true,
       })
     }
+    */
   }
 
   public render() {
@@ -243,7 +245,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
             style={{
               backgroundColor: "rgb(220, 25, 0)",
               color: "white",
-              marginLeft: "5px",
+              marginRight: "5px",
             }}
             onClick={this.props.onCancel}
           >
