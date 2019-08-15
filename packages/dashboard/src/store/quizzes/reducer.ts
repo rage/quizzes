@@ -23,7 +23,7 @@ export const quizzesReducer = (
           ...state.find(qi => qi.courseId === action.payload.courseId).quizzes,
         ]
 
-        if (newQuizzes.includes(quiz => quiz.id === updatedQuiz.id)) {
+        if (newQuizzes.some(quiz => quiz.id === updatedQuiz.id)) {
           newQuizzes = newQuizzes.map(q =>
             q.id === updatedQuiz.id ? updatedQuiz : q,
           )

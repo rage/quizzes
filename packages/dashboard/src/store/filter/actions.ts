@@ -22,7 +22,6 @@ export const clear = createAction("filter/CLEAR")
 
 export const setLanguage = (language: string) => {
   return dispatch => {
-    console.log("Some is setting the lanuguage in the filter to", language)
     dispatch(set({ language }))
   }
 }

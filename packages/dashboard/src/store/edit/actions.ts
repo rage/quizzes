@@ -1,5 +1,4 @@
 import _ from "lodash"
-import { arrayMove } from "react-sortable-hoc"
 import { ActionType, createAction } from "typesafe-actions"
 import { IQuiz } from "../../interfaces"
 
@@ -39,9 +38,9 @@ export const save = () => {
   return async (dispatch, getState) => {
     try {
       const quiz = await post(getState().edit, getState().user)
-
       dispatch(quizActions.set({ courseId: quiz.courseId, quizzes: [quiz] }))
       dispatch(setEdit(quiz))
+
       dispatch(
         displayMessage(`Successfully saved ${quiz.texts[0].title}!`, false),
       )

@@ -1,9 +1,4 @@
-import { bool, string } from "prop-types"
 import { getType } from "typesafe-actions"
-import {
-  INewQuizQuery,
-  INewQuizTranslation,
-} from "../../../../common/src/types/index"
 import * as edit from "./actions"
 
 const initialState = {

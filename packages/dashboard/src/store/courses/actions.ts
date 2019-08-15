@@ -10,10 +10,8 @@ export const clear = createAction("courses/CLEAR")
 
 export const setCourses = () => {
   return async (dispatch, getState) => {
-    console.log("setting courses")
     try {
       const courses = await getCourses(getState().user)
-      console.log("Courses fetched: ", courses)
 
       if (getState().filter.course) {
         dispatch(setCourse(getState().filter.course))
