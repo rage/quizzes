@@ -252,7 +252,13 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 
   return (
     <Grid item xs={questionWidth}>
-      <SpaciousTypography variant="h6">{title}</SpaciousTypography>
+      <MarkdownText
+        Component={SpaciousTypography}
+        removeParagraphs
+        variant="subtitle1"
+      >
+        {title}
+      </MarkdownText>
 
       {body && <MarkdownText>{body}</MarkdownText>}
 
@@ -261,34 +267,6 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
           {multipleChoiceLabels.chooseAllSuitableOptionsLabel}
         </Typography>
       )}
-
-      {displayFeedback &&
-        itemAnswer &&
-        !onlyOneItem &&
-        ((itemAnswer.correct && successMessage) ||
-          (!itemAnswer.correct && failureMessage)) && (
-          <SolutionDiv correct={itemAnswer.correct ? true : false}>
-            <Grid container alignItems="center" spacing={2}>
-              <Grid item xs={12} sm="auto">
-                <CentralizedOnSmallScreenTypography variant="body1">
-                  <AttentionIcon icon={faExclamationCircle} />
-                </CentralizedOnSmallScreenTypography>
-              </Grid>
-              <Grid item xs={12} sm={10}>
-                <CentralizedOnSmallScreenTypography variant="body1">
-                  {itemAnswer.correct
-                    ? multipleChoiceLabels.answerCorrectLabel
-                    : multipleChoiceLabels.answerIncorrectLabel}
-                </CentralizedOnSmallScreenTypography>
-
-                <br />
-                <CentralizedOnSmallScreenTypography variant="body1">
-                  {itemAnswer.correct ? successMessage : failureMessage}
-                </CentralizedOnSmallScreenTypography>
-              </Grid>
-            </Grid>
-          </SolutionDiv>
-        )}
     </Grid>
   )
 }
