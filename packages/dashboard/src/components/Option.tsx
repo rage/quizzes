@@ -190,8 +190,9 @@ const mapStateToProps = (state: any) => {
     courses: state.courses,
     edit: state.edit,
     filter: state.filter,
-    quizzes: state.quizzes.find(qi => qi.courseId === state.filter.course)
-      .quizzes,
+    quizzes: state.quizzes.courseInfos.find(
+      qi => qi.courseId === state.filter.course,
+    ).quizzes,
     user: state.user,
   }
 }

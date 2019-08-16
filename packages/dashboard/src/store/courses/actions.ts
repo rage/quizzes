@@ -14,7 +14,8 @@ export const setCourses = () => {
       const courses = await getCourses(getState().user)
 
       if (getState().filter.course) {
-        dispatch(setCourse(getState().filter.course))
+        // surely the code below has no smart use...?
+        // dispatch(setCourse(getState().filter.course))
       } else {
         /*
         const def = courses.find(

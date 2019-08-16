@@ -11,7 +11,7 @@ export const clear = createAction("filter/CLEAR")
 
 /*export const setFilter = (path, value) => {
   return async (dispatch, getState) => {
-    if (path === "course" && !getState().quizzes.find(quiz => quiz.courseId === value)) {
+    if (path === "course" && !getState().courseInfos().quizzes.find(quiz => quiz.courseId === value)) {
       dispatch(setQuizzes(value))
     }
     const filters = Object.assign({}, getState().filter)
@@ -36,7 +36,7 @@ export const setCourse = (course: string) => {
     dispatch(set({ course, language }))
 
     if (
-      !getState().quizzes.find(
+      !getState().quizzes.courseInfos.find(
         courseQuizzesInfo => courseQuizzesInfo.courseId === course,
       )
     ) {

@@ -283,7 +283,9 @@ class App extends React.Component<any, any> {
     // Worst case: quiz info must be fetched from the backend (and initiate loading the info of that course)
     // prob best to load something while waiting, but let's try if this even works...
     if (!quiz) {
-      this.props.setQuizzesByQuizId(quizIdInPath)
+      if (this.props.currentlySettingQuizzes.size <= 0) {
+        this.props.setQuizzesByQuizId(quizIdInPath)
+      }
       return <p />
     }
 
@@ -298,6 +300,8 @@ class App extends React.Component<any, any> {
       if (this.props.filter.course !== quiz.courseId) {
         this.props.setCourse(quiz.courseId)
       }
+
+      return <p />
     }
 
     return <QuizForm quiz={quiz} new={false} history={history} />
@@ -351,6 +355,7 @@ interface IDispatchProps {
 
 interface IStateProps {
   courses: any
+  currentlySettingQuizzes: Set<string>
   edit: any
   filter: any
   quizzesOfCourse: any
@@ -364,11 +369,12 @@ const mapStateToProps = (state: any) => {
     courses: state.courses,
     edit: state.edit,
     filter: state.filter,
-    quizzesOfCourse: state.quizzes.find(
+    quizzesOfCourse: state.quizzes.courseInfos.find(
       courseQuizInfo => courseQuizInfo.courseId === state.filter.course,
     ),
-    quizzesByCourses: state.quizzes,
+    quizzesByCourses: state.quizzes.courseInfos,
     user: state.user,
+    currentlySettingQuizzes: state.quizzes.currentlySetting,
   }
 }
 

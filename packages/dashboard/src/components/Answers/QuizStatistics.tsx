@@ -402,7 +402,7 @@ const mapStateToProps = (state: any) => {
   return {
     answerCounts: state.answerCounts,
     answers: state.answers,
-    quizzesOfCourse: state.quizzes.find(
+    quizzesOfCourse: state.quizzes.courseInfos.find(
       qi => qi.courseId === state.filter.course,
     ),
     courses: state.courses,

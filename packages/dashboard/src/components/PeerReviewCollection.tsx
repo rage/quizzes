@@ -209,7 +209,6 @@ class PeerReviewQuestionCollection extends React.Component<any, any> {
     })
   }
   private addReviewQuestion = type => event => {
-    console.log("add")
     this.setState({
       menuOpen: null,
     })
