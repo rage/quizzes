@@ -53,12 +53,14 @@ export const setAttentionRequiringAnswers = (
       }
 
       if (
-        !getState().quizzes.find(qi => qi.courseId === getState().filter.course)
+        !getState().quizzes.courseInfos.find(
+          qi => qi.courseId === getState().filter.course,
+        )
       ) {
         await dispatch(setQuizzes(getState().filter.course))
       }
 
-      const quizNode = getState().quizzes.find(
+      const quizNode = getState().quizzes.courseInfos.find(
         qi => qi.courseId === getState().filter.course,
       )
 

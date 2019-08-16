@@ -22,7 +22,7 @@ import {
   save,
   setEdit,
 } from "../store/edit/actions"
-import { setLanguage, setQuiz } from "../store/filter/actions"
+import { setQuiz } from "../store/filter/actions"
 import QuizInfo from "./QuizInfo"
 import TabContainer from "./TabContainer"
 
@@ -109,7 +109,6 @@ const mapDispatchToProps = {
   newQuiz,
   save,
   setEdit,
-  setLanguage,
   setQuiz,
 }
 

@@ -95,7 +95,8 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     return false
   }
 
-  public componentDidUpdate() {
+  public componentDidUpdate(prevProps, prevState) {
+    /*
     if (!this.state.correctedInitial) {
       this.setState({
         title: this.props.quizTexts.title,
@@ -103,6 +104,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
         correctedInitial: true,
       })
     }
+    */
   }
 
   public render() {
@@ -240,21 +242,21 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
         <Grid item={true} xs="auto">
           <Button
             variant="outlined"
-            style={{ backgroundColor: "rgb(19, 166, 0)", color: "white" }}
-            onClick={this.saveChanges}
-          >
-            Save
-          </Button>
-          <Button
-            variant="outlined"
             style={{
               backgroundColor: "rgb(220, 25, 0)",
               color: "white",
-              marginLeft: "5px",
+              marginRight: "5px",
             }}
             onClick={this.props.onCancel}
           >
             Cancel
+          </Button>
+          <Button
+            variant="outlined"
+            style={{ backgroundColor: "rgb(15, 125, 0)", color: "white" }}
+            onClick={this.saveChanges}
+          >
+            Save
           </Button>
         </Grid>
       </Grid>

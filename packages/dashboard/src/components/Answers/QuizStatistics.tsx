@@ -20,7 +20,7 @@ import {
   setAllAnswers,
   setAttentionRequiringAnswers,
 } from "../../store/answers/actions"
-import { setCourse, setQuiz } from "../../store/filter/actions"
+import { setQuiz } from "../../store/filter/actions"
 import LanguageBar from "../GeneralTools/LanguageBar"
 import Answers from "./Answers"
 import DownloadButton from "./DownloadButton"
@@ -402,7 +402,7 @@ const mapStateToProps = (state: any) => {
   return {
     answerCounts: state.answerCounts,
     answers: state.answers,
-    quizzesOfCourse: state.quizzes.find(
+    quizzesOfCourse: state.quizzes.courseInfos.find(
       qi => qi.courseId === state.filter.course,
     ),
     courses: state.courses,
@@ -417,7 +417,6 @@ export default connect(
     setAllAnswers,
     setAllAnswersCount,
     setAttentionRequiringAnswers,
-    setCourse,
     setQuiz,
   },
 )(QuizStatistics)

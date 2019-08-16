@@ -3,6 +3,7 @@ import React from "react"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 import { firstWords, wordCount } from "../../../common/src/util"
+import { IQuiz } from "../interfaces"
 import { newQuiz } from "../store/edit/actions"
 import { setCourse } from "../store/filter/actions"
 import LanguageBar from "./GeneralTools/LanguageBar"
@@ -211,7 +212,9 @@ const CourseComponent = ({ idx, countData, quiz }) => {
       elevation={2}
       style={{
         backgroundColor:
-          countData && countData.count > 0 ? "#FB6949" : "#49C7FB",
+          countData && countData.count > 0
+            ? "rgb(199, 66, 37)"
+            : "rgb(14, 105, 143)",
       }}
     >
       <Grid
@@ -274,6 +277,12 @@ const CourseComponent = ({ idx, countData, quiz }) => {
             </Typography>
           </Grid>
         )}
+
+        <Grid item={true} xs={12}>
+          <Typography variant="body1" style={{ color: "white" }}>
+            {quizItemTypes(quiz)}
+          </Typography>
+        </Grid>
       </Grid>
     </Card>
   )
@@ -284,7 +293,7 @@ const mapStateToProps = (state: any) => {
     answerCounts: state.answerCounts,
     courses: state.courses,
     filter: state.filter,
-    quizzesOfCourse: state.quizzes.find(
+    quizzesOfCourse: state.quizzes.courseInfos.find(
       qi => qi.courseId === state.filter.course,
     ),
   }
@@ -293,6 +302,10 @@ const mapStateToProps = (state: any) => {
 const mapDispatchToProps = {
   setCourseTo: setCourse,
   newQuiz,
+}
+
+const quizItemTypes = (quiz: IQuiz): string => {
+  return `[${[...new Set(quiz.items.map(qi => qi.type))].sort().join(", ")}]`
 }
 
 export default connect(

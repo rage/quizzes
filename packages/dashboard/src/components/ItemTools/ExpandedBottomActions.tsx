@@ -18,20 +18,9 @@ class BottomActionButtons extends React.Component<any, any> {
               <Delete fontSize="large" />
             </IconButton>
           )}
-
           <Button
             style={{
-              backgroundColor: "#00FF19",
-              color: "white",
-              borderRadius: "5px",
-            }}
-            onClick={this.props.onSave}
-          >
-            {this.props.itemHasBeenSaved ? "Save" : "Add"}
-          </Button>
-          <Button
-            style={{
-              backgroundColor: "#FF1F00",
+              backgroundColor: "rgb(220, 25, 0)",
               color: "white",
               borderRadius: "5px",
             }}
@@ -42,6 +31,16 @@ class BottomActionButtons extends React.Component<any, any> {
             }
           >
             Cancel
+          </Button>
+          <Button
+            style={{
+              backgroundColor: "rgb(15, 125, 0)",
+              color: "white",
+              borderRadius: "5px",
+            }}
+            onClick={this.props.onSave}
+          >
+            {this.props.itemHasBeenSaved ? "Save" : "Add"}
           </Button>
         </CardActions>
       </Grid>

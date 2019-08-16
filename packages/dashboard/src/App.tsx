@@ -5,8 +5,10 @@ import Grid from "@material-ui/core/Grid"
 import Input from "@material-ui/core/Input"
 import InputLabel from "@material-ui/core/InputLabel"
 import Paper from "@material-ui/core/Paper"
+import SvgIcon from "@material-ui/core/SvgIcon"
 import Toolbar from "@material-ui/core/Toolbar"
 import Typography from "@material-ui/core/Typography"
+import Build from "@material-ui/icons/Build"
 import NavigateNextIcon from "@material-ui/icons/NavigateNext"
 import Breadcrumbs from "@material-ui/lab/Breadcrumbs"
 import * as React from "react"
@@ -22,8 +24,9 @@ import SuccessNotification from "./components/SuccessNotification"
 import { setAnswerCounts } from "./store/answerCounts/actions"
 import { setCourses } from "./store/courses/actions"
 import { newQuiz, setEdit } from "./store/edit/actions"
-import { setCourse } from "./store/filter/actions"
+import { setCourse, setLanguage, setQuiz } from "./store/filter/actions"
 import { displayMessage } from "./store/notification/actions"
+import { setQuizzesByQuizId } from "./store/quizzes/actions"
 import { addUser, removeUser } from "./store/user/actions"
 
 class App extends React.Component<any, any> {
@@ -58,6 +61,8 @@ class App extends React.Component<any, any> {
   }
 
   public render() {
+    const developmentEnvironment = process.env.NODE_ENV === "development"
+
     const Login = () => {
       return (
         <Grid container={true} justify="center">
@@ -101,7 +106,13 @@ class App extends React.Component<any, any> {
             {this.props.user ? (
               <div>
                 <div>
-                  <AppBar>
+                  <AppBar
+                    style={{
+                      backgroundColor: developmentEnvironment
+                        ? "#227722"
+                        : "default",
+                    }}
+                  >
                     <Toolbar>
                       <Grid
                         container={true}
@@ -109,7 +120,7 @@ class App extends React.Component<any, any> {
                         alignItems="center"
                         spacing={8}
                       >
-                        <Grid item={true} xs={11}>
+                        <Grid item={true} xs={12} sm={9} md={10}>
                           <Grid
                             container={true}
                             justify="flex-start"
@@ -122,8 +133,26 @@ class App extends React.Component<any, any> {
                             />
                           </Grid>
                         </Grid>
-                        <Grid item={true} xs={1}>
-                          <Button color="inherit" onClick={this.logout}>
+
+                        <Grid item={true} xs={12} sm="auto">
+                          {developmentEnvironment && (
+                            <SvgIcon
+                              style={{
+                                maxWidth: "34%",
+                                verticalAlign: "middle",
+                                marginRight: "10px",
+                              }}
+                            >
+                              <Build />
+                            </SvgIcon>
+                          )}
+                          <Button
+                            color="inherit"
+                            onClick={this.logout}
+                            style={{
+                              maxWidth: developmentEnvironment ? "66%" : "100%",
+                            }}
+                          >
                             logout
                           </Button>
                         </Grid>
@@ -223,12 +252,57 @@ class App extends React.Component<any, any> {
   }
 
   private edit = ({ history, match }) => {
-    if (!this.props.quizzesOfCourse) {
+    const quizIdInPath = match.params.id
+
+    let quiz
+
+    // Best case: quiz is on the current course
+    if (this.props.quizzesOfCourse) {
+      quiz =
+        this.props.quizzesOfCourse.quizzes &&
+        this.props.quizzesOfCourse.quizzes.find(q => q.id === match.params.id)
+    }
+
+    const quizzesByCourses = this.props.quizzesByCourses
+    // Second best: quiz loaded in memory, but under another course
+    if (!quiz) {
+      quizzesByCourses.forEach(courseInfo => {
+        if (quiz) {
+          return
+        }
+        const possibleQuizOnCourse = courseInfo.quizzes.find(
+          q => q.id === quizIdInPath,
+        )
+        if (possibleQuizOnCourse) {
+          quiz = possibleQuizOnCourse
+          // ja ehkä myös nykyisten kurssien siirtyminen sopivaan uuteen quizziiin?
+        }
+      })
+    }
+
+    // Worst case: quiz info must be fetched from the backend (and initiate loading the info of that course)
+    // prob best to load something while waiting, but let's try if this even works...
+    if (!quiz) {
+      if (this.props.currentlySettingQuizzes.size <= 0) {
+        this.props.setQuizzesByQuizId(quizIdInPath)
+      }
       return <p />
     }
-    const quiz = this.props.quizzesOfCourse.quizzes.find(
-      q => q.id === match.params.id,
-    )
+
+    if (this.props.filter.quiz !== quizIdInPath) {
+      this.props.setQuiz(quizIdInPath)
+      if (
+        quiz.texts[0].language &&
+        this.props.filter.language !== quiz.texts[0].language
+      ) {
+        this.props.setLanguage(quiz.texts[0].language)
+      }
+      if (this.props.filter.course !== quiz.courseId) {
+        this.props.setCourse(quiz.courseId)
+      }
+
+      return <p />
+    }
 
     return <QuizForm quiz={quiz} new={false} history={history} />
   }
@@ -274,7 +348,6 @@ interface IDispatchProps {
   addUser: typeof addUser
   displayMessage: typeof displayMessage
   newQuiz: typeof newQuiz
-  setCourse: typeof setCourse
   setCourses: typeof setCourses
   setEdit: typeof setEdit
   removeUser: typeof removeUser
@@ -282,9 +355,11 @@ interface IDispatchProps {
 
 interface IStateProps {
   courses: any
+  currentlySettingQuizzes: Set<string>
   edit: any
   filter: any
   quizzesOfCourse: any
+  quizzesByCourses: any[]
   user: ITMCProfile
 }
 
@@ -294,10 +369,12 @@ const mapStateToProps = (state: any) => {
     courses: state.courses,
     edit: state.edit,
     filter: state.filter,
-    quizzesOfCourse: state.quizzes.find(
+    quizzesOfCourse: state.quizzes.courseInfos.find(
       courseQuizInfo => courseQuizInfo.courseId === state.filter.course,
     ),
+    quizzesByCourses: state.quizzes.courseInfos,
     user: state.user,
+    currentlySettingQuizzes: state.quizzes.currentlySetting,
   }
 }
 
@@ -306,10 +383,13 @@ const mapDispatchToProps = {
   displayMessage,
   newQuiz,
   setAnswerCounts,
-  setCourse,
   setCourses,
   setEdit,
   removeUser,
+  setQuizzesByQuizId,
+  setQuiz,
+  setLanguage,
+  setCourse,
 }
 
 export default connect<IStateProps, IDispatchProps>(

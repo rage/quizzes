@@ -17,7 +17,7 @@ import React from "react"
 import { connect } from "react-redux"
 import { updateQuizAnswerStatus } from "../../services/quizAnswers"
 import { decrement } from "../../store/answerCounts/actions"
-import { setCourse, setQuiz } from "../../store/filter/actions"
+import { setQuiz } from "../../store/filter/actions"
 import { displayMessage } from "../../store/notification/actions"
 import ItemAnswer from "./ItemAnswer"
 import PeerReviewsModal from "./PeerReviewsModal"
@@ -126,7 +126,7 @@ class Answer extends React.Component<any, any> {
                           <Button
                             variant="contained"
                             style={{
-                              backgroundColor: "#029422",
+                              backgroundColor: "rgb(15, 135, 15)",
                               borderRadius: "0",
                               color: "white",
                             }}
@@ -140,7 +140,7 @@ class Answer extends React.Component<any, any> {
                           <Button
                             variant="contained"
                             style={{
-                              backgroundColor: "#D80027",
+                              backgroundColor: "rgb(200, 34, 34)",
                               borderRadius: "0",
                               color: "white",
                             }}
@@ -516,8 +516,9 @@ class PeerReviewsSummary extends React.Component<any, any> {
 
 const mapStateToProps = state => {
   return {
-    quizzes: state.quizzes.find(qi => qi.courseId === state.filter.course)
-      .quizzes,
+    quizzes: state.quizzes.courseInfos.find(
+      qi => qi.courseId === state.filter.course,
+    ).quizzes,
     courses: state.courses,
     filter: state.filter,
     user: state.user,
@@ -526,5 +527,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { decrementAttentionCount: decrement, displayMessage, setCourse, setQuiz },
+  { decrementAttentionCount: decrement, displayMessage, setQuiz },
 )(Answer)
