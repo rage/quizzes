@@ -252,7 +252,13 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 
   return (
     <Grid item xs={questionWidth}>
-      <SpaciousTypography variant="h6">{title}</SpaciousTypography>
+      <MarkdownText
+        Component={SpaciousTypography}
+        removeParagraphs
+        variant="subtitle1"
+      >
+        {title}
+      </MarkdownText>
 
       {body && <MarkdownText>{body}</MarkdownText>}
 
