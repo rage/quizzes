@@ -155,6 +155,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   const onlyOneItem = quiz.items.length === 1
 
   const options = item.options
+  console.log("Options at start: ", options)
 
   let direction: GridDirection = "row"
   let alignItems: GridItemsAlignment = "baseline"
@@ -303,6 +304,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
   )
 
   const onlyOneItem = items.length === 1
+  console.log("Option: ", option)
   const text = option.texts[0]
 
   if (!itemAnswer && !quizDisabled) {
@@ -405,7 +407,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             onlyOneItem={onlyOneItem}
             shouldBeGray={shouldBeGray}
           >
-            <FeedbackPortion item={item} />
+            <FeedbackPortion item={item} selectedOption={option} />
           </OptionGridItem>
         )}
       </React.Fragment>
@@ -439,10 +441,12 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
 interface IFeedbackPortionProps {
   item: QuizItem
+  selectedOption?: QuizItemOption
 }
 
 const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   item,
+  selectedOption,
 }) => {
   const items = useTypedSelector(state => state.quiz!.items)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
@@ -470,10 +474,18 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   const onlyOneItem = items.length === 1
   const generalLabels = languageLabels.general
 
+  const optionSuccess = selectedOption
+    ? selectedOption.texts[0].successMessage
+    : undefined
+  const optionFailure = selectedOption
+    ? selectedOption.texts[0].failureMessage
+    : undefined
+
   const text = item.texts[0]
-  const successMessage = text.successMessage || generalLabels.answerCorrectLabel
+  const successMessage =
+    optionSuccess || text.successMessage || generalLabels.answerCorrectLabel
   const failureMessage =
-    text.failureMessage || generalLabels.answerIncorrectLabel
+    optionFailure || text.failureMessage || generalLabels.answerIncorrectLabel
 
   const feedbackMessage = itemAnswer.correct ? successMessage : failureMessage
 
