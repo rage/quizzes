@@ -89,15 +89,17 @@ export default class ValidationService {
             break
           }
 
+          quizAnswer.status = "submitted"
+
           // or should be left without points...?
           if (
             !quiz.peerReviewCollections ||
             quiz.peerReviewCollections.length === 0
           ) {
+            quizAnswer.status = "confirmed"
             points++
           }
 
-          quizAnswer.status = "submitted"
           userQuizState.peerReviewsReceived = 0
           userQuizState.peerReviewsGiven = userQuizState.peerReviewsGiven || 0
           userQuizState.spamFlags = 0
@@ -219,11 +221,11 @@ export default class ValidationService {
     userQuizState.quizId = quizAnswer.quizId
     userQuizState.tries = userQuizState.tries ? userQuizState.tries + 1 : 1
 
-    const noTriesLeft = quiz.triesLimited && userQuizState.tries >= quiz.tries
-
     if (!quizAnswer.status) {
-      quizAnswer.status = noTriesLeft ? "confirmed" : "submitted"
+      quizAnswer.status = "confirmed"
     }
+
+    const noTriesLeft = quiz.triesLimited && userQuizState.tries >= quiz.tries
 
     userQuizState.status = noTriesLeft ? "locked" : "open"
 
@@ -232,7 +234,6 @@ export default class ValidationService {
     }
 
     if (quiz.awardPointsEvenIfWrong) {
-      quizAnswer.status = "confirmed"
       userQuizState.pointsAwarded = quiz.points
     } else if (userQuizState.pointsAwarded < pointsAwarded) {
       userQuizState.pointsAwarded = pointsAwarded
