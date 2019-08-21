@@ -66,6 +66,7 @@ const finnishLabels: SingleLanguageLabels = {
     evaluationStageLabel: "Tehtävän arvostelu",
   },
   general: {
+    pastDeadline: "Et voi vastata enää tähän kyselyyn",
     answerMissingBecauseQuizModifiedLabel:
       "Kysymykseen ei vastattu. Tehtävää todennäköisesti muutettu vastaamisen jälkeen.",
     submitButtonLabel: "Vastaa",

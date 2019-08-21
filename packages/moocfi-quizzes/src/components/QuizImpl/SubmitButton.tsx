@@ -15,11 +15,22 @@ const StyledSubmitButton = styled(Button)`
 
 const SubmitButton: React.FunctionComponent = () => {
   const dispatch = useDispatch()
-  const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
+  let submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const noChangesAfterSuccessfulAnswer = useTypedSelector(
     state => state.quizAnswer.noChangesSinceSuccessfulSubmit,
   )
+
+  const quiz = useTypedSelector(state => state.quiz)
+
+  if (
+    quiz &&
+    quiz.deadline &&
+    new Date(quiz.deadline).getTime() < new Date().getTime()
+  ) {
+    submitLocked = true
+  }
+
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
 
   const noChangesAfterLoading = useTypedSelector(

@@ -5,6 +5,7 @@ import {
   Body,
   Get,
   HeaderParam,
+  HeaderParams,
   JsonController,
   Param,
   Post,
@@ -309,6 +310,12 @@ export class QuizAnswerController {
       peerreviews: true,
       course: true,
     }))[0]
+
+    const now = new Date()
+
+    if (quiz.deadline && quiz.deadline.getTime() < now.getTime()) {
+      throw new BadRequestError("No submissions past deadline")
+    }
 
     const userQState: UserQuizState =
       (await this.userQuizStateService.getUserQuizState(
