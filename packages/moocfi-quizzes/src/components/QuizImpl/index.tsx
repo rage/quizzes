@@ -206,7 +206,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
         {containsPeerReviews && <StageVisualizer />}
 
         <MarkdownText>{quiz.texts[0].body}</MarkdownText>
-
         <QuizItemContainerDiv>
           {quizItemComponents(quiz, languageId)}
         </QuizItemContainerDiv>
@@ -249,20 +248,28 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
               {!quizDisabled && (
                 <Grid item={true} xs="auto">
-                  <Typography>
-                    {quiz.triesLimited
-                      ? `${
-                          generalLabels.triesRemainingLabel
-                        }: ${triesRemaining}`
-                      : generalLabels.triesNotLimitedLabel}
-                  </Typography>
+                  {quiz.deadline &&
+                  new Date(quiz.deadline).getTime() < new Date().getTime() ? (
+                    <Typography>{generalLabels.pastDeadline}</Typography>
+                  ) : (
+                    <React.Fragment>
+                      <Typography>
+                        {quiz.triesLimited
+                          ? `${
+                              generalLabels.triesRemainingLabel
+                            }: ${triesRemaining}`
+                          : generalLabels.triesNotLimitedLabel}
+                      </Typography>
 
-                  {!quiz.awardPointsEvenIfWrong && quiz.items.length > 1 && (
-                    <Typography>
-                      {generalLabels.pointsGrantingPolicyInformer(
-                        quiz.grantPointsPolicy,
-                      )}
-                    </Typography>
+                      {!quiz.awardPointsEvenIfWrong &&
+                        quiz.items.length > 1 && (
+                          <Typography>
+                            {generalLabels.pointsGrantingPolicyInformer(
+                              quiz.grantPointsPolicy,
+                            )}
+                          </Typography>
+                        )}
+                    </React.Fragment>
                   )}
                 </Grid>
               )}

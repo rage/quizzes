@@ -62,6 +62,7 @@ const englishLabels: SingleLanguageLabels = {
     evaluationStageLabel: "Evaluating the answer",
   },
   general: {
+    pastDeadline: "You can no longer submit an answer",
     answerMissingBecauseQuizModifiedLabel:
       "Question not answered. Quiz has probably been modified after your answer.",
     submitButtonLabel: "Submit",
