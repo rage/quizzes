@@ -118,7 +118,11 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
 
   return (
     <div>
-      {itemTitle && <MarkdownText variant="h6">{itemTitle}</MarkdownText>}
+      {itemTitle && (
+        <MarkdownText Component={Typography} variant="h6">
+          {itemTitle}
+        </MarkdownText>
+      )}
 
       {itemBody && <MarkdownText variant="body1">{itemBody}</MarkdownText>}
 

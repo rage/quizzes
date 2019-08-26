@@ -140,10 +140,12 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
       </XXS12Grid>
 
       <RightMarginedGrid item={true} xs={2}>
-        <PointsLabelText>{pointsLabel}:</PointsLabelText>
+        <PointsLabelText component="div" paragraph={false}>
+          {pointsLabel}:
+        </PointsLabelText>
 
         {quiz ? (
-          <PointsText>
+          <PointsText component="div" paragraph={false}>
             {`${formattedReceivedPoints}/${availablePoints}`}
           </PointsText>
         ) : (
