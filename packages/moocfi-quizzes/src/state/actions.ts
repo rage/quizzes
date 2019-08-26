@@ -4,6 +4,7 @@ import { ThunkAction, Dispatch } from "./store"
 import { getQuizInfo } from "../services/quizService"
 import * as userActions from "./user/actions"
 import * as backendAddressActions from "./backendAddress/actions"
+import * as customizationActions from "./customization/actions"
 import * as feedbackDisplayedActions from "./feedbackDisplayed/actions"
 import * as languageActions from "./language/actions"
 import * as loadingBars from "./loadingBars/actions"
@@ -21,13 +22,19 @@ export const initialize: ActionCreator<ThunkAction> = (
   accessToken: string,
   backendAddress?: string,
   fullInfoWithoutLogin?: boolean,
+  showAlwaysPointsInfo?: boolean,
 ) => async (dispatch: Dispatch) => {
+  if (showAlwaysPointsInfo === undefined) {
+    showAlwaysPointsInfo = true
+  }
+
   dispatch(clearActionCreator())
 
   dispatch(languageActions.set(languageId))
   if (backendAddress) {
     dispatch(backendAddressActions.set(backendAddress))
   }
+  dispatch(customizationActions.modify_always_show_points(showAlwaysPointsInfo))
 
   try {
     const fullInfo = !!(accessToken || fullInfoWithoutLogin)

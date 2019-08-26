@@ -48,6 +48,11 @@ const App = () => {
     "true",
   )
 
+  const [showAlwaysPoints, setShowAlwaysPoints] = useLocalStorage(
+    "showAlwaysPoints",
+    "true",
+  )
+
   const [
     showFullInfoWhenLoggedOut,
     setShowFullInfoWhenLoggedOut,
@@ -62,6 +67,10 @@ const App = () => {
     )
   }
 
+  const toggleShowAlwaysPoints = () => {
+    setShowAlwaysPoints(showAlwaysPoints === "true" ? "false" : "true")
+  }
+
   const quizPortion = (
     <Quiz
       id={id.value}
@@ -69,6 +78,7 @@ const App = () => {
       accessToken={accessToken.value}
       backendAddress={baseUrl.value}
       fullInfoWithoutLogin={showFullInfoWhenLoggedOut === "true"}
+      showAlwaysPointsInfo={showAlwaysPoints === "true"}
     />
   )
 
@@ -102,6 +112,18 @@ const App = () => {
             checked={showFullInfoWhenLoggedOut === "true"}
             onChange={toggleShowFullInfo}
             value={showFullInfoWhenLoggedOut.value}
+            color="primary"
+          />
+        }
+      />
+
+      <StyledFormControlLabel
+        label="Always show points (e.g. scale)"
+        control={
+          <Checkbox
+            checked={showAlwaysPoints === "true"}
+            onChange={toggleShowAlwaysPoints}
+            value={showAlwaysPoints.value}
             color="primary"
           />
         }
