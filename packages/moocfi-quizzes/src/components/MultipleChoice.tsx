@@ -155,7 +155,6 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   const onlyOneItem = quiz.items.length === 1
 
   const options = item.options
-  console.log("Options at start: ", options)
 
   let direction: GridDirection = "row"
   let alignItems: GridItemsAlignment = "baseline"
@@ -304,7 +303,6 @@ const Option: React.FunctionComponent<OptionProps> = ({
   )
 
   const onlyOneItem = items.length === 1
-  console.log("Option: ", option)
   const text = option.texts[0]
 
   if (!itemAnswer && !quizDisabled) {
