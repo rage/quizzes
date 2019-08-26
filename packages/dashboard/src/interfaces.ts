@@ -116,3 +116,9 @@ export interface ILanguage {
   country: string
   name: string
 }
+
+export interface IDashboardFilter {
+  course: string
+  language: string
+  quiz: string
+}

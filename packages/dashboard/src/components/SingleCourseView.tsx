@@ -3,12 +3,43 @@ import React from "react"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
 import { firstWords, wordCount } from "../../../common/src/util"
-import { IQuiz } from "../interfaces"
+import { ICourse, IDashboardFilter, IQuiz } from "../interfaces"
 import { newQuiz } from "../store/edit/actions"
 import { setCourse } from "../store/filter/actions"
 import LanguageBar from "./GeneralTools/LanguageBar"
 
-class SingleCourseView extends React.Component<any, any> {
+interface ISingleCoursePropsFromParent {
+  match: any
+}
+
+interface IStatePropsFromStore {
+  answerCounts: Array<{ quizId: string; count: number }>
+  courses: ICourse[]
+  filter: IDashboardFilter
+  quizzesOfCourse: any
+}
+
+interface IDispatchPropsFromStore {
+  setCourseTo: (course: string) => any
+  newQuiz: () => any
+}
+
+type SingleCourseProps = IStatePropsFromStore &
+  IDispatchPropsFromStore &
+  ISingleCoursePropsFromParent
+
+interface ISingleCourseViewState {
+  parts: {
+    [part: number]: {
+      [section: number]: IQuiz[]
+    }
+  }
+  initialized: boolean
+}
+class SingleCourseView extends React.Component<
+  SingleCourseProps,
+  ISingleCourseViewState
+> {
   constructor(props) {
     super(props)
     this.state = {
@@ -66,6 +97,12 @@ class SingleCourseView extends React.Component<any, any> {
       (!this.props.filter.course ||
         this.props.filter.course !== this.props.match.params.id)
     ) {
+      this.props.setCourseTo(this.props.match.params.id)
+    }
+
+    // If there are no quizzes under the course, the cause could be that they have not been set
+    // -- or then there simply are no courses, but should be checked
+    if (this.props.match.params.id && !this.props.quizzesOfCourse) {
       this.props.setCourseTo(this.props.match.params.id)
     }
   }
