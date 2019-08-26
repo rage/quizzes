@@ -65,6 +65,11 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   const quiz = useTypedSelector(state => state.quiz)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const displayBars = useTypedSelector(state => state.loadingBars)
+  const alwaysShowPoints = useTypedSelector(
+    state => state.customization.alwaysShowPoints,
+  )
+
+  const showPointsInfo = alwaysShowPoints
 
   let title
   let quizLabel
@@ -139,19 +144,25 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
         </Grid>
       </XXS12Grid>
 
-      <RightMarginedGrid item={true} xs={2}>
-        <PointsLabelText component="div" paragraph={false}>
-          {pointsLabel}:
-        </PointsLabelText>
+      {(!quiz ||
+        alwaysShowPoints ||
+        quiz.items.some(
+          qi => qi.type !== "scale" && qi.type !== "checkbox",
+        )) && (
+        <RightMarginedGrid item={true} xs={2}>
+          <PointsLabelText component="div" paragraph={false}>
+            {pointsLabel}:
+          </PointsLabelText>
 
-        {quiz ? (
-          <PointsText component="div" paragraph={false}>
-            {`${formattedReceivedPoints}/${availablePoints}`}
-          </PointsText>
-        ) : (
-          pointsReplacement
-        )}
-      </RightMarginedGrid>
+          {quiz ? (
+            <PointsText component="div" paragraph={false}>
+              {`${formattedReceivedPoints}/${availablePoints}`}
+            </PointsText>
+          ) : (
+            pointsReplacement
+          )}
+        </RightMarginedGrid>
+      )}
     </StyledGrid>
   )
 }

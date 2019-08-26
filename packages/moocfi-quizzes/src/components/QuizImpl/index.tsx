@@ -106,6 +106,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+  const alwaysShowPoints = useTypedSelector(
+    state => state.customization.alwaysShowPoints,
+  )
 
   const dispatch = useDispatch()
 
@@ -274,7 +277,11 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                       </Typography>
 
                       {!quiz.awardPointsEvenIfWrong &&
-                        quiz.items.length > 1 && (
+                        quiz.items.length > 1 &&
+                        (alwaysShowPoints ||
+                          quiz.items.some(
+                            qi => qi.type !== "scale" && qi.type !== "checkbox",
+                          )) && (
                           <Typography>
                             {generalLabels.pointsGrantingPolicyInformer(
                               quiz.grantPointsPolicy,
