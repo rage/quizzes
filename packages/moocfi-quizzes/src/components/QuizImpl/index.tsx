@@ -80,6 +80,15 @@ const QuizContentWrapper = styled.div<IQuizContentWrapperProps>`
       `}
 `
 
+const OuterDiv = styled.div`
+  p {
+    margin-bottom: 0 !important;
+  }
+  ul {
+    padding-inline-start: 30px;
+  }
+`
+
 const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   id,
   languageId,
@@ -195,7 +204,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     quiz.peerReviewCollections !== null && quiz.peerReviewCollections.length > 0
 
   return (
-    <div>
+    <OuterDiv>
       <TopInfoBar />
 
       {quizDisabled && (
@@ -277,7 +286,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           </div>
         )}
       </QuizContentWrapper>
-    </div>
+    </OuterDiv>
   )
 }
 
