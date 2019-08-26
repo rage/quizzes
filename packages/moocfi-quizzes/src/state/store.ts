@@ -4,6 +4,10 @@ import { composeWithDevTools } from "redux-devtools-extension/developmentOnly"
 import thunk from "redux-thunk"
 
 import { backendAddressReducer } from "./backendAddress/reducer"
+import {
+  customizationReducer,
+  ICustomizationState,
+} from "./customization/reducer"
 import { feedbackDisplayedReducer } from "./feedbackDisplayed/reducer"
 import { languageReducer, LanguageState } from "./language/reducer"
 import { loadingBarsReducer } from "./loadingBars/reducer"
@@ -15,6 +19,7 @@ import { userReducer, UserState } from "./user/reducer"
 import { Quiz } from "../modelTypes"
 
 import * as backendAddressActions from "./backendAddress/actions"
+import * as customizationActions from "./customization/actions"
 import * as feedbackDisplayedActions from "./feedbackDisplayed/actions"
 import * as languageActions from "./language/actions"
 import * as loadingBarsActions from "./loadingBars/actions"
@@ -26,6 +31,7 @@ import * as PeerReviewsActions from "./peerReviews/actions"
 
 const rootReducerImpl = combineReducers({
   backendAddress: backendAddressReducer,
+  customization: customizationReducer,
   feedbackDisplayed: feedbackDisplayedReducer,
   language: languageReducer,
   loadingBars: loadingBarsReducer,
@@ -48,6 +54,7 @@ const rootReducer: typeof rootReducerImpl = (state, action) => {
 
 export const rootAction = {
   backendAction: backendAddressActions,
+  customization: customizationActions,
   feedbackDisplayed: feedbackDisplayedActions,
   language: languageActions,
   loadingBars: loadingBarsActions,
@@ -60,6 +67,7 @@ export const rootAction = {
 
 export interface State {
   backendAddress: string
+  customization: ICustomizationState
   feedbackDisplayed: boolean
   language: LanguageState
   loadingBars: boolean

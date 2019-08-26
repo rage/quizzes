@@ -49,6 +49,7 @@ export interface QuizProps {
   backendAddress?: string
   customContent?: Element | JSX.Element
   fullInfoWithoutLogin?: boolean
+  showAlwaysPointsInfo?: boolean
 }
 
 const QuizItemContainerDiv = styled.div`
@@ -96,6 +97,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   backendAddress,
   customContent,
   fullInfoWithoutLogin,
+  showAlwaysPointsInfo = true,
 }) => {
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const messageState = useTypedSelector(state => state.message)
@@ -118,6 +120,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           accessToken,
           backendAddress,
           fullInfoWithoutLogin,
+          showAlwaysPointsInfo,
         ),
       )
     },
