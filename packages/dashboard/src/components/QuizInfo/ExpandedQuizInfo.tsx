@@ -79,12 +79,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     let stringDeadline
 
     if (props.deadline) {
-      const otherDate = new Date(props.deadline)
-      otherDate.setMinutes(
-        otherDate.getMinutes() - otherDate.getTimezoneOffset(),
-      )
-      stringDeadline = otherDate.toISOString()
-      stringDeadline = stringDeadline.substring(0, stringDeadline.length - 5)
+      stringDeadline = formatDateToTextField(props.deadline)
     }
 
     this.state = {
@@ -425,6 +420,14 @@ const DeadlineSelector = ({
   handleDeadlineChange,
   shouldAnimateTextField,
 }) => {
+  if (!deadline) {
+    deadline = new Date()
+    deadline.setMonth(deadline.getMonth() + 3)
+    deadline.setHours(0)
+    deadline.setMinutes(0)
+    deadline = formatDateToTextField(deadline)
+  }
+
   return (
     <Grid container={true} justify="flex-start">
       <Grid item={true} xs="auto">
@@ -447,7 +450,7 @@ const DeadlineSelector = ({
       >
         <Grid item={true} xs={6}>
           <TextField
-            value={deadline || ""}
+            value={deadline}
             onChange={handleDeadlineChange}
             type="datetime-local"
           />
@@ -455,6 +458,14 @@ const DeadlineSelector = ({
       </Grow>
     </Grid>
   )
+}
+
+const formatDateToTextField = (date: Date): string => {
+  const otherDate = new Date(date)
+  otherDate.setMinutes(otherDate.getMinutes() - otherDate.getTimezoneOffset())
+  let stringDate = otherDate.toISOString()
+  stringDate = stringDate.substring(0, stringDate.length - 8)
+  return stringDate
 }
 
 export default ExpandedQuizInfo
