@@ -19,8 +19,6 @@ import {
   QuizPointsGrantingPolicy,
 } from "../../interfaces"
 
-const SHOW_COURSE_INFO = true
-
 interface IProps {
   filterLanguage: string
   courseLanguages: ILanguage[]
@@ -155,57 +153,55 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
           </FormControl>
         </Grid>
 
-        {SHOW_COURSE_INFO && (
-          <Grid item={true} xs={12}>
-            <Grid container={true} justify="flex-start" spacing={16}>
-              <Grid item={true} xs="auto">
-                <FormControl variant="outlined">
-                  <InputLabel>Course</InputLabel>
-                  <Select
-                    value={this.state.courseId}
-                    onChange={this.changeTempAttribute("courseId")}
-                  >
-                    {this.props.courses.map(course => {
-                      return (
-                        <MenuItem value={course.id} key={course.id}>
-                          {course.texts[0].title}
-                        </MenuItem>
-                      )
-                    })}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item={true} xs={4} sm={3}>
-                <TextField
-                  label="Part"
-                  value={this.state.part}
-                  onChange={this.changeTempAttribute("part")}
-                  type="number"
-                />
-              </Grid>
-              <Grid item={true} xs={4} sm={3}>
-                <TextField
-                  label="Section"
-                  value={this.state.section}
-                  onChange={this.changeTempAttribute("section")}
-                  type="number"
-                />
-              </Grid>
+        <Grid item={true} xs={12}>
+          <Grid container={true} justify="space-between" spacing={16}>
+            <Grid item={true} xs="auto">
+              <FormControl variant="outlined" style={{ marginRight: "5px" }}>
+                <InputLabel>Course</InputLabel>
+                <Select
+                  value={this.state.courseId}
+                  onChange={this.changeTempAttribute("courseId")}
+                >
+                  {this.props.courses.map(course => {
+                    return (
+                      <MenuItem value={course.id} key={course.id}>
+                        {course.texts[0].title}
+                      </MenuItem>
+                    )
+                  })}
+                </Select>
+              </FormControl>
 
-              <Grid item={true} xs={12}>
-                <DeadlineSelector
-                  deadline={this.state.deadline}
-                  deadlineChecked={this.state.deadlineChecked}
-                  toggleDeadlineChecked={this.changeTempAttribute(
-                    "deadlineChecked",
-                  )}
-                  handleDeadlineChange={this.changeTempAttribute("deadline")}
-                  shouldAnimateTextField={this.state.checkboxHasBeenToggledOnce}
-                />
-              </Grid>
+              <TextField
+                label="Part"
+                value={this.state.part}
+                onChange={this.changeTempAttribute("part")}
+                type="number"
+                style={{ maxWidth: "75px", margin: "0 5px" }}
+              />
+
+              <TextField
+                label="Section"
+                value={this.state.section}
+                onChange={this.changeTempAttribute("section")}
+                type="number"
+                style={{ maxWidth: "75px", marginLeft: "5px" }}
+              />
+            </Grid>
+
+            <Grid item={true} xs="auto">
+              <DeadlineSelector
+                deadline={this.state.deadline}
+                deadlineChecked={this.state.deadlineChecked}
+                toggleDeadlineChecked={this.changeTempAttribute(
+                  "deadlineChecked",
+                )}
+                handleDeadlineChange={this.changeTempAttribute("deadline")}
+                shouldAnimateTextField={this.state.checkboxHasBeenToggledOnce}
+              />
             </Grid>
           </Grid>
-        )}
+        </Grid>
 
         <div
           style={{
@@ -221,24 +217,23 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
             variant="subtitle1"
             style={{ fontSize: "1.25rem", marginBottom: "5px" }}
           >
-            Tries and points adjustments
+            Points and tries
           </Typography>
 
-          <Grid item={true} xs={12}>
-            <NumberOfPointsSelector
-              points={this.state.points}
-              handlePointsChange={this.changeTempAttribute("points")}
-            />
-          </Grid>
-
-          <Grid item={true} xs={12}>
+          <Grid item={true} xs={12} md="auto">
+            <div style={{ marginRight: "1rem", display: "inline" }}>
+              <NumberOfPointsSelector
+                points={this.state.points}
+                handlePointsChange={this.changeTempAttribute("points")}
+              />
+            </div>
             <PointsPolicySelector
               grantPointsPolicy={this.state.grantPointsPolicy}
               handlePolicyChange={this.changeTempAttribute("grantPointsPolicy")}
             />
           </Grid>
 
-          <Grid item={true} xs={12} style={{ marginTop: "1rem" }}>
+          <Grid item={true} xs={12} md="auto" style={{ marginTop: "1rem" }}>
             <TriesInformation
               tries={this.state.tries}
               triesLimited={this.state.triesLimited}
@@ -337,11 +332,9 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     )
     this.props.setAttribute("points", this.state.points)
 
-    if (SHOW_COURSE_INFO) {
-      this.props.setAttribute("part", this.state.part)
-      this.props.setAttribute("section", this.state.section)
-      this.props.setAttribute("courseId", this.state.courseId)
-    }
+    this.props.setAttribute("part", this.state.part)
+    this.props.setAttribute("section", this.state.section)
+    this.props.setAttribute("courseId", this.state.courseId)
     this.props.onExpand()
   }
 }
@@ -381,14 +374,13 @@ const TriesInformation: React.FunctionComponent<ITriesInfoProps> = ({
         in={triesLimited}
         timeout={triesLimited && shouldAnimateTextField ? 500 : 0}
       >
-        <Grid item={true} xs={6}>
-          <TextField
-            label="Tries"
-            value={tries}
-            onChange={handleTriesChange}
-            type="number"
-          />
-        </Grid>
+        <TextField
+          label="Tries"
+          value={tries}
+          onChange={handleTriesChange}
+          type="number"
+          style={{ maxWidth: "75px" }}
+        />
       </Grow>
     </Grid>
   )
@@ -455,7 +447,7 @@ const DeadlineSelector = ({
       </Grid>
 
       <Grow
-        style={{ transformOrigin: "left center" }}
+        style={{ transformOrigin: "right center" }}
         in={deadlineChecked}
         timeout={deadlineChecked && shouldAnimateTextField ? 500 : 0}
       >
@@ -478,6 +470,7 @@ const NumberOfPointsSelector = ({ points, handlePointsChange }) => {
       value={points}
       onChange={handlePointsChange}
       type="number"
+      style={{ maxWidth: "75px" }}
     />
   )
 }
