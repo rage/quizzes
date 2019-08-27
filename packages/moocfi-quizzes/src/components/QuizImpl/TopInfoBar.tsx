@@ -16,6 +16,10 @@ const PointsText = styled(Typography)`
   font-size: 1.5rem !important;
   text-align: end;
   color: white;
+
+  @media (max-width: 550px) {
+    text-align: start;
+  }
 `
 
 const XXS12Grid = styled(Grid)`
@@ -28,6 +32,11 @@ const XXS12Grid = styled(Grid)`
 const PointsLabelText = styled(Typography)`
   font-size: 1rem !important;
   color: white;
+
+  @media (max-width: 550px) {
+    text-align: start;
+    margin-top: 10px;
+  }
 `
 
 const IconWrapper = styled.div`
