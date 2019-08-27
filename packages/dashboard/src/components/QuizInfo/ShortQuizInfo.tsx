@@ -41,6 +41,8 @@ const ShortQuizInfo: React.FunctionComponent<IProps> = ({
       <Typography variant="title" paragraph={true}>{`${title}`}</Typography>
     </Grid>
 
+    <Grid item={true} xs={6} />
+
     <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
       <Select
         value={filterLanguage}
@@ -56,27 +58,30 @@ const ShortQuizInfo: React.FunctionComponent<IProps> = ({
       </Select>
     </Grid>
 
-    <Grid item={true} xs={12}>
+    <Grid item={true} xs={12} md={4} style={{ padding: "1rem 0" }}>
       <Typography variant="subtitle1">
         Number of tries that are allowed:
         {triesLimited ? ` ${tries}` : " No limit"}
       </Typography>
     </Grid>
+    <Grid item={true} xs={12} md={4} style={{ padding: "1rem 0" }}>
+      <Grid container={true}>
+        <Grid item={true} xs={12}>
+          <Typography variant="subtitle1">Points: {points}</Typography>
+        </Grid>
 
-    <Grid item={true} xs={12}>
-      <Typography variant="subtitle1">Points: {points}</Typography>
+        <Grid item={true} xs={12}>
+          <Typography variant="subtitle1">
+            Point granting policy:
+            {grantPointsPolicy === "grant_whenever_possible"
+              ? " each item answer granted separately"
+              : " only when all item answers correct"}
+          </Typography>
+        </Grid>
+      </Grid>
     </Grid>
 
-    <Grid item={true} xs={12}>
-      <Typography variant="subtitle1">
-        Point granting policy:
-        {grantPointsPolicy === "grant_whenever_possible"
-          ? " each item answer granted separately"
-          : " only when all item answers correct"}
-      </Typography>
-    </Grid>
-
-    <Grid item={true} xs={12}>
+    <Grid item={true} xs={12} md={4} style={{ padding: "1rem 0" }}>
       <Typography variant="subtitle1">
         {deadline
           ? `Deadline: ${deadline

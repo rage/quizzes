@@ -221,7 +221,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
             variant="subtitle1"
             style={{ fontSize: "1.25rem", marginBottom: "5px" }}
           >
-            Number of tries and point granting
+            Tries and points adjustments
           </Typography>
 
           <Grid item={true} xs={12}>
