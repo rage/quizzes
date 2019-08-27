@@ -2,11 +2,11 @@ import { ActionType, getType } from "typesafe-actions"
 import * as customization from "./actions"
 
 export interface ICustomizationState {
-  alwaysShowPoints: boolean
+  showPointsInfo: boolean
 }
 
 export const initialState = {
-  alwaysShowPoints: true,
+  showPointsInfo: true,
 }
 
 export const customizationReducer = (
@@ -14,10 +14,10 @@ export const customizationReducer = (
   action: ActionType<typeof customization>,
 ): ICustomizationState => {
   switch (action.type) {
-    case getType(customization.modify_always_show_points):
+    case getType(customization.modify_show_points_info):
       return {
         ...state,
-        alwaysShowPoints: action.payload,
+        showPointsInfo: action.payload,
       }
     default:
       return state
