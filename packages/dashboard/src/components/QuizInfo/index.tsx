@@ -143,7 +143,8 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
       attributeName === "tries" ||
       attributeName === "triesLimited" ||
       attributeName === "grantPointsPolicy" ||
-      attributeName === "deadline"
+      attributeName === "deadline" ||
+      attributeName === "points"
     ) {
       this.props.changeAttr(attributeName, attributeValue)
     } else {

@@ -223,8 +223,12 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
           >
             Number of tries and point granting
           </Typography>
+
           <Grid item={true} xs={12}>
-            <Typography variant="body1">Points: {this.state.points}</Typography>
+            <NumberOfPointsSelector
+              points={this.state.points}
+              handlePointsChange={this.changeTempAttribute("points")}
+            />
           </Grid>
 
           <Grid item={true} xs={12}>
@@ -304,6 +308,12 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     } else if (attributeName === "deadlineChecked") {
       newState.deadlineChecked = !this.state.deadlineChecked
       newState.checkboxHasBeenToggledOnce = true
+    } else if (attributeName === "points") {
+      const value = e.target.value
+      newState[attributeName] = value >= 0 ? value : 0
+    } else if (attributeName === "tries") {
+      const value = e.target.value
+      newState[attributeName] = value >= 1 ? value : 1
     } else {
       newState[attributeName] = e.target.value
     }
@@ -325,6 +335,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
         ? this.state.deadline && new Date(this.state.deadline)
         : null,
     )
+    this.props.setAttribute("points", this.state.points)
 
     if (SHOW_COURSE_INFO) {
       this.props.setAttribute("part", this.state.part)
@@ -457,6 +468,17 @@ const DeadlineSelector = ({
         </Grid>
       </Grow>
     </Grid>
+  )
+}
+
+const NumberOfPointsSelector = ({ points, handlePointsChange }) => {
+  return (
+    <TextField
+      label="Points"
+      value={points}
+      onChange={handlePointsChange}
+      type="number"
+    />
   )
 }
 
