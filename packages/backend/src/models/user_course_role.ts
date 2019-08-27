@@ -10,7 +10,7 @@ import {
 import { Course } from "./course"
 import { User } from "./user"
 
-type CourseRole = "teacher" | "assistant"
+export type CourseRole = "teacher" | "assistant"
 
 @Entity()
 export class UserCourseRole extends BaseEntity {

@@ -12,9 +12,13 @@ import {
   Res,
   UnauthorizedError,
 } from "routing-controllers"
+import AuthorizationService, {
+  Permission,
+} from "services/authorization.service"
 import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
+import UserCourseRoleService from "services/usercourserole.service"
 import UserQuizStateService from "services/userquizstate.service"
 import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
@@ -33,6 +37,9 @@ export class QuizController {
   private entityManager: EntityManager
 
   @Inject()
+  private authorizationService: AuthorizationService
+
+  @Inject()
   private peerReviewService: PeerReviewService
 
   @Inject()
@@ -43,6 +50,9 @@ export class QuizController {
 
   @Inject()
   private userQuizStateService: UserQuizStateService
+
+  @Inject()
+  private userCourseRoleService: UserCourseRoleService
 
   @Inject()
   private kafkaService: KafkaService
@@ -197,7 +207,13 @@ export class QuizController {
     @Param("id") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 

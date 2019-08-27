@@ -10,6 +10,7 @@ import {
   PeerReviewCollection,
   PeerReviewCollectionTranslation,
 } from "../models"
+import { Permission } from "services/authorization.service"
 
 export class ITMCProfile {
   username: string
@@ -232,4 +233,11 @@ export interface ExerciseData {
   section: number
   max_points: number
   deleted: boolean
+}
+
+export interface IAuthorizationQuery {
+  user: ITMCProfileDetails
+  courseId?: string
+  quizId?: string
+  permission: Permission
 }
