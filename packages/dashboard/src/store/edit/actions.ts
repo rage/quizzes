@@ -15,7 +15,10 @@ export const create = createAction("edit/NEW", resolve => {
 })
 
 export const setEdit = (quiz: any) => {
-  const orderedQuiz = JSON.parse(JSON.stringify(quiz))
+  const orderedQuiz: IQuiz = JSON.parse(JSON.stringify(quiz))
+  if (!orderedQuiz.items) {
+    return
+  }
   orderedQuiz.items = orderedQuiz.items.sort((i1, i2) => i1.order - i2.order)
   orderedQuiz.items.map(item => {
     const newItem = {
@@ -28,6 +31,10 @@ export const setEdit = (quiz: any) => {
     (p1, p2) => p1.order - p2.order,
   )*/
   const checkedQuiz = checkForMissingTranslation(orderedQuiz)
+
+  if (checkedQuiz.deadline) {
+    checkedQuiz.deadline = new Date(checkedQuiz.deadline)
+  }
 
   return dispatch => {
     dispatch(set(checkedQuiz))

@@ -27,7 +27,7 @@ interface IProps {
   quizTexts: IQuizText
   onExpand: () => void
   onCancel: any
-  setAttribute: (attribute: string, value: string | number | boolean) => void
+  setAttribute: (attribute: string, value: any) => void
   part: number
   section: number
   includesEssay: boolean
@@ -36,6 +36,8 @@ interface IProps {
   tries: number
   triesLimited: boolean
   grantPointsPolicy: QuizPointsGrantingPolicy
+  points?: number
+  deadline?: Date
 }
 
 interface IState {
@@ -48,8 +50,11 @@ interface IState {
   correctedInitial: boolean
   tries: number
   triesLimited: boolean
-  tryCheckBoxHasBeenUsed: boolean
+  checkboxHasBeenToggledOnce: boolean
   grantPointsPolicy: QuizPointsGrantingPolicy
+  points?: number
+  deadline?: string
+  deadlineChecked: boolean
 }
 
 class ExpandedQuizInfo extends React.Component<IProps, IState> {
@@ -63,10 +68,24 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     "tries",
     "triesLimited",
     "grantPointsPolicy",
+    "points",
+    "deadline",
+    "deadlineChecked",
   ]
 
   constructor(props: IProps) {
     super(props)
+
+    let stringDeadline
+
+    if (props.deadline) {
+      const otherDate = new Date(props.deadline)
+      otherDate.setMinutes(
+        otherDate.getMinutes() - otherDate.getTimezoneOffset(),
+      )
+      stringDeadline = otherDate.toISOString()
+      stringDeadline = stringDeadline.substring(0, stringDeadline.length - 5)
+    }
 
     this.state = {
       title: (props.quizTexts && props.quizTexts.title) || "",
@@ -78,8 +97,11 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
       tries: props.tries,
       triesLimited: props.triesLimited,
       correctedInitial: false,
-      tryCheckBoxHasBeenUsed: false,
+      checkboxHasBeenToggledOnce: false,
       grantPointsPolicy: props.grantPointsPolicy || "grant_whenever_possible",
+      points: props.points || 1,
+      deadline: stringDeadline,
+      deadlineChecked: !!props.deadline,
     }
   }
 
@@ -174,6 +196,18 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
                   type="number"
                 />
               </Grid>
+
+              <Grid item={true} xs={12}>
+                <DeadlineSelector
+                  deadline={this.state.deadline}
+                  deadlineChecked={this.state.deadlineChecked}
+                  toggleDeadlineChecked={this.changeTempAttribute(
+                    "deadlineChecked",
+                  )}
+                  handleDeadlineChange={this.changeTempAttribute("deadline")}
+                  shouldAnimateTextField={this.state.checkboxHasBeenToggledOnce}
+                />
+              </Grid>
             </Grid>
           </Grid>
         )}
@@ -195,6 +229,10 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
             Number of tries and point granting
           </Typography>
           <Grid item={true} xs={12}>
+            <Typography variant="body1">Points: {this.state.points}</Typography>
+          </Grid>
+
+          <Grid item={true} xs={12}>
             <PointsPolicySelector
               grantPointsPolicy={this.state.grantPointsPolicy}
               handlePolicyChange={this.changeTempAttribute("grantPointsPolicy")}
@@ -207,7 +245,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
               triesLimited={this.state.triesLimited}
               toggleTriesLimited={this.changeTempAttribute("triesLimited")}
               handleTriesChange={this.changeTempAttribute("tries")}
-              shouldAnimateTextField={this.state.tryCheckBoxHasBeenUsed}
+              shouldAnimateTextField={this.state.checkboxHasBeenToggledOnce}
             />
           </Grid>
         </div>
@@ -267,7 +305,10 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     const newState = { ...this.state }
     if (attributeName === "triesLimited") {
       newState.triesLimited = !this.state.triesLimited
-      newState.tryCheckBoxHasBeenUsed = true
+      newState.checkboxHasBeenToggledOnce = true
+    } else if (attributeName === "deadlineChecked") {
+      newState.deadlineChecked = !this.state.deadlineChecked
+      newState.checkboxHasBeenToggledOnce = true
     } else {
       newState[attributeName] = e.target.value
     }
@@ -283,6 +324,12 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     this.props.setAttribute("tries", this.state.tries)
     this.props.setAttribute("triesLimited", this.state.triesLimited)
     this.props.setAttribute("grantPointsPolicy", this.state.grantPointsPolicy)
+    this.props.setAttribute(
+      "deadline",
+      this.state.deadlineChecked
+        ? this.state.deadline && new Date(this.state.deadline)
+        : null,
+    )
 
     if (SHOW_COURSE_INFO) {
       this.props.setAttribute("part", this.state.part)
@@ -360,6 +407,53 @@ const PointsPolicySelector = ({ grantPointsPolicy, handlePolicyChange }) => {
         </MenuItem>
       </Select>
     </FormControl>
+  )
+}
+
+interface IDeadlineSelectorProps {
+  deadline: Date | undefined
+  deadlineChecked: boolean
+  toggleDeadlineField
+  handleDeadlineChange: (e: any) => void
+  shouldAnimateTextField: (e: any) => any
+}
+
+const DeadlineSelector = ({
+  deadline,
+  deadlineChecked,
+  toggleDeadlineChecked,
+  handleDeadlineChange,
+  shouldAnimateTextField,
+}) => {
+  return (
+    <Grid container={true} justify="flex-start">
+      <Grid item={true} xs="auto">
+        <FormControlLabel
+          control={
+            <Checkbox
+              checked={deadlineChecked}
+              color="primary"
+              onChange={toggleDeadlineChecked}
+            />
+          }
+          label="Quiz has a deadline"
+        />
+      </Grid>
+
+      <Grow
+        style={{ transformOrigin: "left center" }}
+        in={deadlineChecked}
+        timeout={deadlineChecked && shouldAnimateTextField ? 500 : 0}
+      >
+        <Grid item={true} xs={6}>
+          <TextField
+            value={deadline || ""}
+            onChange={handleDeadlineChange}
+            type="datetime-local"
+          />
+        </Grid>
+      </Grow>
+    </Grid>
   )
 }
 

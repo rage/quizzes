@@ -20,6 +20,8 @@ interface IProps {
   tries: number
   triesLimited: boolean
   grantPointsPolicy: QuizPointsGrantingPolicy
+  points?: number
+  deadline?: Date
 }
 
 const ShortQuizInfo: React.FunctionComponent<IProps> = ({
@@ -31,6 +33,8 @@ const ShortQuizInfo: React.FunctionComponent<IProps> = ({
   tries,
   triesLimited,
   grantPointsPolicy,
+  points,
+  deadline,
 }) => (
   <Grid container={true} justify="space-between">
     <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
@@ -60,6 +64,10 @@ const ShortQuizInfo: React.FunctionComponent<IProps> = ({
     </Grid>
 
     <Grid item={true} xs={12}>
+      <Typography variant="subtitle1">Points: {points}</Typography>
+    </Grid>
+
+    <Grid item={true} xs={12}>
       <Typography variant="subtitle1">
         Point granting policy:
         {grantPointsPolicy === "grant_whenever_possible"
@@ -68,6 +76,15 @@ const ShortQuizInfo: React.FunctionComponent<IProps> = ({
       </Typography>
     </Grid>
 
+    <Grid item={true} xs={12}>
+      <Typography variant="subtitle1">
+        {deadline
+          ? `Deadline: ${deadline
+              .toLocaleString()
+              .substring(0, deadline.toLocaleString().length - 3)}`
+          : "No deadline"}
+      </Typography>
+    </Grid>
     <Grid
       item={true}
       xs={12}
