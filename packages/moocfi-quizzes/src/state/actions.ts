@@ -22,10 +22,10 @@ export const initialize: ActionCreator<ThunkAction> = (
   accessToken: string,
   backendAddress?: string,
   fullInfoWithoutLogin?: boolean,
-  showAlwaysPointsInfo?: boolean,
+  showZeroPointsInfo?: boolean,
 ) => async (dispatch: Dispatch) => {
-  if (showAlwaysPointsInfo === undefined) {
-    showAlwaysPointsInfo = true
+  if (showZeroPointsInfo === undefined) {
+    showZeroPointsInfo = true
   }
 
   dispatch(clearActionCreator())
@@ -34,7 +34,6 @@ export const initialize: ActionCreator<ThunkAction> = (
   if (backendAddress) {
     dispatch(backendAddressActions.set(backendAddress))
   }
-  dispatch(customizationActions.modify_always_show_points(showAlwaysPointsInfo))
 
   try {
     const fullInfo = !!(accessToken || fullInfoWithoutLogin)
@@ -57,6 +56,12 @@ export const initialize: ActionCreator<ThunkAction> = (
       quizAnswer = loginResponse.quizAnswer
       userQuizState = loginResponse.userQuizState
     }
+
+    dispatch(
+      customizationActions.modify_show_points_info(
+        showZeroPointsInfo || (quiz && quiz.points > 0),
+      ),
+    )
 
     if (!accessToken) {
       dispatch(quizAnswerActions.setQuizDisabled(true))

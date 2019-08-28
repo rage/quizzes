@@ -78,7 +78,7 @@ const App = () => {
       accessToken={accessToken.value}
       backendAddress={baseUrl.value}
       fullInfoWithoutLogin={showFullInfoWhenLoggedOut === "true"}
-      showAlwaysPointsInfo={showAlwaysPoints === "true"}
+      showZeroPointsInfo={showAlwaysPoints === "true"}
     />
   )
 
@@ -118,7 +118,7 @@ const App = () => {
       />
 
       <StyledFormControlLabel
-        label="Always show points (e.g. scale)"
+        label="Show points info even if quiz points == 1"
         control={
           <Checkbox
             checked={showAlwaysPoints === "true"}

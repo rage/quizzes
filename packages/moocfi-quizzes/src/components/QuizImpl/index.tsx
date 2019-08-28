@@ -49,7 +49,7 @@ export interface QuizProps {
   backendAddress?: string
   customContent?: Element | JSX.Element
   fullInfoWithoutLogin?: boolean
-  showAlwaysPointsInfo?: boolean
+  showZeroPointsInfo?: boolean
 }
 
 const QuizItemContainerDiv = styled.div`
@@ -97,7 +97,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   backendAddress,
   customContent,
   fullInfoWithoutLogin,
-  showAlwaysPointsInfo = true,
+  showZeroPointsInfo = true,
 }) => {
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const messageState = useTypedSelector(state => state.message)
@@ -106,8 +106,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
-  const alwaysShowPoints = useTypedSelector(
-    state => state.customization.alwaysShowPoints,
+  const showPoints = useTypedSelector(
+    state => state.customization.showPointsInfo,
   )
 
   const dispatch = useDispatch()
@@ -123,7 +123,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           accessToken,
           backendAddress,
           fullInfoWithoutLogin,
-          showAlwaysPointsInfo,
+          showZeroPointsInfo,
         ),
       )
     },
@@ -209,6 +209,18 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const containsPeerReviews =
     quiz.peerReviewCollections !== null && quiz.peerReviewCollections.length > 0
 
+  const showPointsPolicyLabel =
+    !quiz.awardPointsEvenIfWrong &&
+    quiz.items.length > 1 &&
+    showPoints &&
+    quiz.items.some(
+      qi =>
+        qi.type !== "checkbox" &&
+        qi.type !== "scale" &&
+        qi.type !== "feedback" &&
+        qi.type !== "research-agreement",
+    )
+
   return (
     <OuterDiv>
       <TopInfoBar />
@@ -275,19 +287,13 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                             }: ${triesRemaining}`
                           : generalLabels.triesNotLimitedLabel}
                       </Typography>
-
-                      {!quiz.awardPointsEvenIfWrong &&
-                        quiz.items.length > 1 &&
-                        (alwaysShowPoints ||
-                          quiz.items.some(
-                            qi => qi.type !== "scale" && qi.type !== "checkbox",
-                          )) && (
-                          <Typography>
-                            {generalLabels.pointsGrantingPolicyInformer(
-                              quiz.grantPointsPolicy,
-                            )}
-                          </Typography>
-                        )}
+                      {showPointsPolicyLabel && (
+                        <Typography>
+                          {generalLabels.pointsGrantingPolicyInformer(
+                            quiz.grantPointsPolicy,
+                          )}
+                        </Typography>
+                      )}
                     </React.Fragment>
                   )}
                 </Grid>
