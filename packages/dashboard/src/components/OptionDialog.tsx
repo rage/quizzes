@@ -123,10 +123,16 @@ export default class OptionDialog extends React.Component<
               justify="flex-start"
               alignItems="center"
             >
-              <Grid item={true} xs={12} sm={1}>
+              <Grid
+                item={true}
+                xs={12}
+                sm={2}
+                md={1}
+                style={{ paddingRight: "5px" }}
+              >
                 <Typography variant="subtitle1">Text</Typography>
               </Grid>
-              <Grid item={true} xs={12} sm={11}>
+              <Grid item={true} xs={12} sm={10} md={11}>
                 <TextField
                   variant="outlined"
                   fullWidth={true}
@@ -136,10 +142,16 @@ export default class OptionDialog extends React.Component<
                   onChange={this.handleTextFieldChange("title")}
                 />
               </Grid>
-              <Grid item={true} xs={12} sm={1}>
+              <Grid
+                item={true}
+                xs={12}
+                sm={2}
+                md={1}
+                style={{ paddingRight: "5px" }}
+              >
                 <Typography variant="subtitle1">Correct?</Typography>
               </Grid>
-              <Grid item={true} xs={12} sm={11}>
+              <Grid item={true} xs={12} sm={10} md={11}>
                 <Checkbox
                   color="primary"
                   checked={this.state.correctChecked}
@@ -149,13 +161,13 @@ export default class OptionDialog extends React.Component<
                 />
               </Grid>
 
-              <Grid item={true} xs={12} sm={2} lg={3}>
-                <Typography variant="subtitle1">
+              <Grid item={true} xs={12} sm={3} lg={4}>
+                <Typography variant="subtitle1" style={{ paddingRight: "5px" }}>
                   Explanation why this option is{" "}
                   {!this.state.optionData.correct && "in"}correct
                 </Typography>
               </Grid>
-              <Grid item={true} xs={12} sm={10} lg={9}>
+              <Grid item={true} xs={12} sm={9} lg={8}>
                 <TextField
                   variant="outlined"
                   fullWidth={true}
