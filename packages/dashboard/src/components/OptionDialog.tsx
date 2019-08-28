@@ -10,6 +10,7 @@ import {
   FormGroup,
   Grid,
   TextField,
+  Typography,
 } from "@material-ui/core"
 
 interface IOptionDialogProps {
@@ -122,11 +123,12 @@ export default class OptionDialog extends React.Component<
               justify="flex-start"
               alignItems="center"
             >
-              <Grid item={true} xs={1}>
-                Text
+              <Grid item={true} xs={12} sm={1}>
+                <Typography variant="subtitle1">Text</Typography>
               </Grid>
-              <Grid item={true} xs={11}>
+              <Grid item={true} xs={12} sm={11}>
                 <TextField
+                  variant="outlined"
                   fullWidth={true}
                   multiline={true}
                   placeholder="Text"
@@ -134,26 +136,30 @@ export default class OptionDialog extends React.Component<
                   onChange={this.handleTextFieldChange("title")}
                 />
               </Grid>
-              <Grid item={true} xs={1}>
-                Correct?
+              <Grid item={true} xs={12} sm={1}>
+                <Typography variant="subtitle1">Correct?</Typography>
               </Grid>
-              <Grid item={true} xs={11}>
+              <Grid item={true} xs={12} sm={11}>
                 <Checkbox
                   color="primary"
                   checked={this.state.correctChecked}
                   onChange={this.handleCheckingChange}
                   value="true"
+                  style={{ paddingLeft: "0" }}
                 />
               </Grid>
 
-              <Grid item={true} xs={2}>
-                Explanation why this option is{" "}
-                {!this.state.optionData.correct && "in"}correct
+              <Grid item={true} xs={12} sm={2} lg={3}>
+                <Typography variant="subtitle1">
+                  Explanation why this option is{" "}
+                  {!this.state.optionData.correct && "in"}correct
+                </Typography>
               </Grid>
-              <Grid item={true} xs={10}>
+              <Grid item={true} xs={12} sm={10} lg={9}>
                 <TextField
+                  variant="outlined"
                   fullWidth={true}
-                  placeholder="message"
+                  placeholder="feedback message"
                   multiline={true}
                   value={this.state.optionData.message}
                   onChange={this.handleTextFieldChange("message")}
