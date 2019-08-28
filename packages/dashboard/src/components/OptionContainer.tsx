@@ -6,6 +6,7 @@ import { addFinishedOption, addOption } from "../store/edit/actions"
 import Option from "./Option"
 import OptionDialog from "./OptionDialog"
 
+/*
 class Options extends React.Component<any, any> {
   constructor(props: any) {
     super(props)
@@ -84,3 +85,5 @@ export default connect(
   mapStateToProps,
   mapDispatchToProps,
 )(OptionContainer)
+
+*/
