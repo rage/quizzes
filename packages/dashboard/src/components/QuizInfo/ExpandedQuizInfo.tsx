@@ -1,10 +1,7 @@
 import {
   Button,
-  Checkbox,
   FormControl,
-  FormControlLabel,
   Grid,
-  Grow,
   InputLabel,
   MenuItem,
   Select,
@@ -18,6 +15,9 @@ import {
   IQuizText,
   QuizPointsGrantingPolicy,
 } from "../../interfaces"
+import DeadlineSelector from "./DeadlineSelector"
+import { NumberOfPointsSelector, PointsPolicySelector } from "./PointsSelector"
+import TriesCustomiser from "./TriesCustomiser"
 
 interface IProps {
   filterLanguage: string
@@ -51,7 +51,7 @@ interface IState {
   checkboxHasBeenToggledOnce: boolean
   grantPointsPolicy: QuizPointsGrantingPolicy
   points?: number
-  deadline?: string
+  deadline: string
   deadlineChecked: boolean
 }
 
@@ -78,6 +78,13 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
 
     if (props.deadline) {
       stringDeadline = formatDateToTextField(props.deadline)
+    } else {
+      // Only saved if the user checks the deadline checkbox - and then this is the default date
+      const deadline = new Date()
+      deadline.setMonth(deadline.getMonth() + 3)
+      deadline.setHours(0)
+      deadline.setMinutes(0)
+      stringDeadline = formatDateToTextField(deadline)
     }
 
     this.state = {
@@ -108,18 +115,6 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     }
 
     return false
-  }
-
-  public componentDidUpdate(prevProps, prevState) {
-    /*
-    if (!this.state.correctedInitial) {
-      this.setState({
-        title: this.props.quizTexts.title,
-        body: this.props.quizTexts.body,
-        correctedInitial: true,
-      })
-    }
-    */
   }
 
   public render() {
@@ -234,7 +229,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
           </Grid>
 
           <Grid item={true} xs={12} md="auto" style={{ marginTop: "1rem" }}>
-            <TriesInformation
+            <TriesCustomiser
               tries={this.state.tries}
               triesLimited={this.state.triesLimited}
               toggleTriesLimited={this.changeTempAttribute("triesLimited")}
@@ -337,142 +332,6 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     this.props.setAttribute("courseId", this.state.courseId)
     this.props.onExpand()
   }
-}
-
-interface ITriesInfoProps {
-  triesLimited: boolean
-  tries: number
-  toggleTriesLimited: (e: any) => void
-  handleTriesChange: (e: any) => void
-  shouldAnimateTextField: boolean
-}
-
-const TriesInformation: React.FunctionComponent<ITriesInfoProps> = ({
-  triesLimited,
-  toggleTriesLimited,
-  tries,
-  handleTriesChange,
-  shouldAnimateTextField,
-}) => {
-  return (
-    <Grid container={true} justify="flex-start">
-      <Grid item={true} xs="auto">
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={triesLimited}
-              color="primary"
-              onChange={toggleTriesLimited}
-            />
-          }
-          label="Number of tries is limited"
-        />
-      </Grid>
-
-      <Grow
-        style={{ transformOrigin: "left center" }}
-        in={triesLimited}
-        timeout={triesLimited && shouldAnimateTextField ? 500 : 0}
-      >
-        <TextField
-          label="Tries"
-          value={tries}
-          onChange={handleTriesChange}
-          type="number"
-          style={{ maxWidth: "75px" }}
-        />
-      </Grow>
-    </Grid>
-  )
-}
-
-const PointsPolicySelector = ({ grantPointsPolicy, handlePolicyChange }) => {
-  return (
-    <FormControl>
-      <InputLabel style={{ minWidth: "250px" }}>
-        Point granting policy
-      </InputLabel>
-      <Select
-        value={grantPointsPolicy}
-        onChange={handlePolicyChange}
-        variant="outlined"
-      >
-        <MenuItem value="grant_whenever_possible">
-          For every item that is correct
-        </MenuItem>
-        <MenuItem value="grant_only_when_answer_fully_correct">
-          Only when the whole answer is correct
-        </MenuItem>
-      </Select>
-    </FormControl>
-  )
-}
-
-interface IDeadlineSelectorProps {
-  deadline: Date | undefined
-  deadlineChecked: boolean
-  toggleDeadlineField
-  handleDeadlineChange: (e: any) => void
-  shouldAnimateTextField: (e: any) => any
-}
-
-const DeadlineSelector = ({
-  deadline,
-  deadlineChecked,
-  toggleDeadlineChecked,
-  handleDeadlineChange,
-  shouldAnimateTextField,
-}) => {
-  if (!deadline) {
-    deadline = new Date()
-    deadline.setMonth(deadline.getMonth() + 3)
-    deadline.setHours(0)
-    deadline.setMinutes(0)
-    deadline = formatDateToTextField(deadline)
-  }
-
-  return (
-    <Grid container={true} justify="flex-start">
-      <Grid item={true} xs="auto">
-        <FormControlLabel
-          control={
-            <Checkbox
-              checked={deadlineChecked}
-              color="primary"
-              onChange={toggleDeadlineChecked}
-            />
-          }
-          label="Quiz has a deadline"
-        />
-      </Grid>
-
-      <Grow
-        style={{ transformOrigin: "right center" }}
-        in={deadlineChecked}
-        timeout={deadlineChecked && shouldAnimateTextField ? 500 : 0}
-      >
-        <Grid item={true} xs={6}>
-          <TextField
-            value={deadline}
-            onChange={handleDeadlineChange}
-            type="datetime-local"
-          />
-        </Grid>
-      </Grow>
-    </Grid>
-  )
-}
-
-const NumberOfPointsSelector = ({ points, handlePointsChange }) => {
-  return (
-    <TextField
-      label="Points"
-      value={points}
-      onChange={handlePointsChange}
-      type="number"
-      style={{ maxWidth: "75px" }}
-    />
-  )
 }
 
 const formatDateToTextField = (date: Date): string => {

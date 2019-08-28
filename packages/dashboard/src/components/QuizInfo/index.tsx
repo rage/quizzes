@@ -68,7 +68,6 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
       return <Redirect to={`courses/${this.props.currentCourseId}`} />
     }
 
-    console.log("Deadline type: " + typeof this.props.edit.deadline)
     return (
       <Grid
         container={true}
