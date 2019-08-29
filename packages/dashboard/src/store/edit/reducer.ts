@@ -15,6 +15,10 @@ const initialState = {
 export const editReducer = (state = initialState, action) => {
   switch (action.type) {
     case getType(edit.set):
+      const deadline = action.payload.deadline
+      if (deadline && typeof deadline === "string") {
+        action.payload.deadline = new Date(deadline)
+      }
       return action.payload
     case getType(edit.create):
       return { ...initialState, ...action.payload }

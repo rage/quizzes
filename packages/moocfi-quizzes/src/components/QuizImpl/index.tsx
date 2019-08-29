@@ -21,6 +21,7 @@ import ResultInformation from "./ResultInformation"
 import { useTypedSelector } from "../../state/store"
 import { Quiz, QuizItemType } from "../../modelTypes"
 
+import Deadline from "./Deadline"
 import LoadingQuiz from "./LoadingQuiz"
 import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
@@ -230,6 +231,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       )}
 
       <QuizContentWrapper disabled={quizDisabled}>
+        <Deadline deadline={quiz.deadline} />
+
         {containsPeerReviews && <StageVisualizer />}
 
         <MarkdownText>{quiz.texts[0].body}</MarkdownText>
