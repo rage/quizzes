@@ -14,7 +14,6 @@ import {
 } from "../models"
 import { IQuizAnswerQuery } from "../types"
 import { WhereBuilder } from "../util/index"
-import QuizService from "./quiz.service"
 
 @Service()
 export default class QuizAnswerService {
@@ -352,10 +351,6 @@ export default class QuizAnswerService {
       QuizAnswer
     > = QuizAnswer.createQueryBuilder("quiz_answer")
 
-    // allows for fast lookup of some statistics, but unsure if quiz state matches the real state in all cases
-    // methods managing without still left behind else branches
-    const allowedToUseUQS = true
-
     if (
       !id &&
       !quizId &&
@@ -436,47 +431,14 @@ export default class QuizAnswerService {
       (peerReviewsGiven > 0 && peerReviewsGiven < 1000) &&
       quizId
     ) {
-      if (allowedToUseUQS) {
-        userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
-          "user_quiz_state",
-        )
-          .select("user_quiz_state.user_id")
-          .where("user_quiz_state.quiz_id = :quizId", { quizId })
-          .andWhere("user_quiz_state.peer_reviews_given >= :peerReviewsGiven", {
-            peerReviewsGiven,
-          })
-      } else {
-        const prcIdsQuery = await PeerReviewCollection.createQueryBuilder(
-          "peer_review_collection",
-        )
-          .select("peer_review_collection.id")
-          .where("peer_review_collection.quiz_id = :quiz_id", {
-            quiz_id: quizId,
-          })
-
-        const userIdsAndCountsQuery = await PeerReview.createQueryBuilder(
-          "peer_review",
-        )
-          .select("peer_review.user_id", "user_id")
-          .addSelect("COUNT(*)", "count")
-          .where(
-            "peer_review.peer_review_collection_id IN (" +
-              prcIdsQuery.getQuery() +
-              ")",
-          )
-          .setParameters(prcIdsQuery.getParameters())
-          .groupBy("peer_review.user_id")
-          .having("peer_review.count >= " + peerReviewsGiven)
-
-        const acceptableUserIdsQuery =
-          "SELECT user_id AS user_id FROM (" +
-          userIdsAndCountsQuery.getQuery() +
-          ") AS foo"
-
-        queryBuilder
-          .andWhere("quiz_answer.user_id IN (" + acceptableUserIdsQuery + ")")
-          .setParameters(userIdsAndCountsQuery.getParameters())
-      }
+      userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
+        "user_quiz_state",
+      )
+        .select("user_quiz_state.user_id")
+        .where("user_quiz_state.quiz_id = :quizId", { quizId })
+        .andWhere("user_quiz_state.peer_reviews_given >= :peerReviewsGiven", {
+          peerReviewsGiven,
+        })
     }
 
     if (
@@ -485,82 +447,37 @@ export default class QuizAnswerService {
       peerReviewsReceived <= 1000 &&
       quizId
     ) {
-      if (allowedToUseUQS) {
-        if (userIdsInSuitableUQStates) {
-          userIdsInSuitableUQStates.andWhere(
+      if (userIdsInSuitableUQStates) {
+        userIdsInSuitableUQStates.andWhere(
+          "user_quiz_state.peer_reviews_received >= :peerReviewsReceived",
+          { peerReviewsReceived },
+        )
+      } else {
+        userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
+          "user_quiz_state",
+        )
+          .select("user_quiz_state.user_id")
+          .where("user_quiz_state.quiz_id = :quizId", { quizId })
+          .andWhere(
             "user_quiz_state.peer_reviews_received >= :peerReviewsReceived",
             { peerReviewsReceived },
           )
-        } else {
-          userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
-            "user_quiz_state",
-          )
-            .select("user_quiz_state.user_id")
-            .where("user_quiz_state.quiz_id = :quizId", { quizId })
-            .andWhere(
-              "user_quiz_state.peer_reviews_received >= :peerReviewsReceived",
-              { peerReviewsReceived },
-            )
-        }
-      } else {
-        const prcIdsQuery = await PeerReviewCollection.createQueryBuilder(
-          "peer_review_collection",
-        )
-          .select("peer_review_collection.id")
-          .where("peer_review_collection.quiz_id = :quiz_id", {
-            quiz_id: quizId,
-          })
-
-        const receivedQuery = PeerReview.createQueryBuilder("peer_review")
-          .select("peer_review.quiz_answer_id")
-          .addSelect("COUNT(*)", "count")
-          .where(
-            "peer_review.peer_review_collection_id IN (" +
-              prcIdsQuery.getQuery() +
-              ")",
-          )
-          .groupBy("peer_review.quiz_answer_id")
-          .having("peer_review.count >= " + peerReviewsReceived)
-
-        const goodQuery =
-          "SELECT quiz_answer_id AS quiz_answer_id FROM (" +
-          receivedQuery.getQuery() +
-          ") AS foo2"
-
-        queryBuilder
-          .andWhere("quiz_answer.id IN (" + goodQuery + ")")
-          .setParameters(receivedQuery.getParameters())
       }
     }
 
     if (typeof spamFlags === "number" && spamFlags > 0 && spamFlags <= 10000) {
-      if (allowedToUseUQS) {
-        if (userIdsInSuitableUQStates) {
-          userIdsInSuitableUQStates.andWhere(
-            "user_quiz_state.spam_flags >= :spamFlags",
-            { spamFlags },
-          )
-        } else {
-          userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
-            "user_quiz_state",
-          )
-            .select("user_quiz_state.user_id")
-            .where("user_quiz_state.quiz_id = :quizId", { quizId })
-            .andWhere("user_quiz_state.spam_flags >= :spamFlags", { spamFlags })
-        }
+      if (userIdsInSuitableUQStates) {
+        userIdsInSuitableUQStates.andWhere(
+          "user_quiz_state.spam_flags >= :spamFlags",
+          { spamFlags },
+        )
       } else {
-        const spamQuery = await SpamFlag.createQueryBuilder("spam_flag")
-          .select("spam_flag.quiz_answer_id")
-          .addSelect("COUNT(*)", "count")
-          .groupBy("spam_flag.quiz_answer_id")
-          .having("count >= " + spamFlags)
-
-        const acceptableIdsQuery =
-          "SELECT quiz_answer_id AS quiz_answer_id FROM (" +
-          spamQuery.getQuery() +
-          ") AS foo3"
-
-        queryBuilder.andWhere("quiz_answer.id IN (" + acceptableIdsQuery + ")")
+        userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
+          "user_quiz_state",
+        )
+          .select("user_quiz_state.user_id")
+          .where("user_quiz_state.quiz_id = :quizId", { quizId })
+          .andWhere("user_quiz_state.spam_flags >= :spamFlags", { spamFlags })
       }
     }
 
