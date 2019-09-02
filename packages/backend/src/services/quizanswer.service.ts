@@ -76,6 +76,16 @@ export default class QuizAnswerService {
       limit = 100
     }
 
+    if (query.quizRequiresPeerReviews && query.quizId) {
+      const prc = await PeerReviewCollection.createQueryBuilder("prc")
+        .where("prc.quiz_id = :quizId", { quizId: query.quizId })
+        .getCount()
+
+      if (prc < 1) {
+        return []
+      }
+    }
+
     const result = (await this.constructGetAnswersQuery(query))
       .skip(skip)
       .take(limit)
@@ -86,6 +96,16 @@ export default class QuizAnswerService {
 
   public async getAnswersCount(query: IQuizAnswerQuery): Promise<any> {
     const someQuery = await this.constructGetAnswersQuery(query)
+
+    if (query.quizRequiresPeerReviews && query.quizId) {
+      const prc = await PeerReviewCollection.createQueryBuilder("prc")
+        .where("prc.quiz_id = :quizId", { quizId: query.quizId })
+        .getCount()
+
+      if (prc) {
+        return { quizId: query.quizId, count: 0 }
+      }
+    }
 
     const result = await someQuery
       .select("quiz_answer.quiz_id", "quizId")
@@ -322,6 +342,7 @@ export default class QuizAnswerService {
       languageIds,
       peerReviewsGiven,
       peerReviewsReceived,
+      quizRequiresPeerReviews,
       spamFlags,
       addPeerReviews,
       addSpamFlagNumber,
@@ -371,6 +392,11 @@ export default class QuizAnswerService {
       queryBuilder.andWhere("quiz_answer.quiz_id = :quiz_id", {
         quiz_id: quizId,
       })
+    } else if (quizRequiresPeerReviews) {
+      queryBuilder
+        .innerJoin(Quiz, "quiz", "quiz_answer.quiz_id = quiz.id")
+        .innerJoin(PeerReviewCollection, "prc", "prc.quiz_id = quiz.id")
+        .where("prc.quiz_id IS NOT NULL")
     }
 
     if (userId) {
@@ -549,22 +575,13 @@ export default class QuizAnswerService {
     }
 
     if (addSpamFlagNumber) {
-      if (allowedToUseUQS) {
-        queryBuilder.leftJoinAndMapOne(
-          "quiz_answer.userQuizState",
-          UserQuizState,
-          "user_quiz_state",
-          "user_quiz_state.quiz_id = quiz_answer.quiz_id " +
-            "AND user_quiz_state.user_id = quiz_answer.user_id",
-        )
-      } else {
-        queryBuilder.leftJoinAndMapMany(
-          "quiz_answer.spamFlags",
-          SpamFlag,
-          "spam_flag",
-          "spam_flag.quiz_answer_id = quiz_answer.id",
-        )
-      }
+      queryBuilder.leftJoinAndMapOne(
+        "quiz_answer.userQuizState",
+        UserQuizState,
+        "user_quiz_state",
+        "user_quiz_state.quiz_id = quiz_answer.quiz_id " +
+          "AND user_quiz_state.user_id = quiz_answer.user_id",
+      )
     }
 
     return queryBuilder
