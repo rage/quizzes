@@ -106,6 +106,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const quiz = useTypedSelector(state => state.quiz)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const storeAccessToken = useTypedSelector(state => state.user.accessToken)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
   const showPoints = useTypedSelector(
     state => state.customization.showPointsInfo,
@@ -131,7 +132,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     [id, languageId, accessToken, backendAddress],
   )
 
-  if (!accessToken && !fullInfoWithoutLogin) {
+  if (!storeAccessToken && !fullInfoWithoutLogin) {
     return (
       <div>
         <TopInfoBar />
