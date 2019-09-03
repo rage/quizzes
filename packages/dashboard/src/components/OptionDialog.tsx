@@ -176,6 +176,9 @@ export default class OptionDialog extends React.Component<
                   value={this.state.optionData.message}
                   onChange={this.handleTextFieldChange("message")}
                 />
+                <Typography variant="body1" style={{ padding: "5px 0" }}>
+                  The student won't see this before completing the exercise.
+                </Typography>
               </Grid>
             </Grid>
           </FormGroup>

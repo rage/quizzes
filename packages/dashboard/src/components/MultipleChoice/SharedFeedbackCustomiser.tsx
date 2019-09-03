@@ -16,6 +16,7 @@ const SharedFeedbackCustomiser: React.FunctionComponent<
   handleMessageChange,
   handleToggleChange,
 }) => {
+  console.log("Mesage used: ", sharedMessageIsUsed)
   return (
     <>
       <FormControlLabel
@@ -26,14 +27,16 @@ const SharedFeedbackCustomiser: React.FunctionComponent<
             onChange={handleToggleChange}
           />
         }
-        label="Set a shared feedback message for all options"
+        label="Set a shared feedback message for all options. Overrides feedback message of every option."
       />
 
       <Grow
-        // style={{ transformOrigin: "right center" }}
-        style={{ width: "100%" }}
+        style={{
+          display: sharedMessageIsUsed ? "inline-flex" : "none",
+          width: "100%",
+          marginTop: "1rem",
+        }}
         in={sharedMessageIsUsed}
-        // btimeout={deadlineChecked && shouldAnimateTextField ? 500 : 0}
       >
         <TextField
           variant="outlined"
