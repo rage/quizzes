@@ -142,7 +142,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     )
   }
 
-  if (!quiz) {
+  const loggedInButNotSetInStore = accessToken && !storeAccessToken
+
+  if (loggedInButNotSetInStore || !quiz) {
     return <LoadingQuiz content={customContent} accessToken={accessToken} />
   }
   if (!languageInfo) {
