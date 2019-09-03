@@ -118,7 +118,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   useEffect(
     () => {
-      console.log("Now the magic happens")
       dispatch(
         initialize(
           id,
@@ -133,7 +132,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     [id, languageId, accessToken, backendAddress],
   )
 
-  if (!storeAccessToken && !fullInfoWithoutLogin) {
+  if (!accessToken && !fullInfoWithoutLogin) {
     return (
       <div>
         <TopInfoBar />
