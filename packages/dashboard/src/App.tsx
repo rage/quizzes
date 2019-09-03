@@ -34,7 +34,8 @@ class App extends React.Component<any, any> {
     const user = TMCApi.checkStore()
     if (user) {
       const profile = await TMCApi.getProfile(user.accessToken)
-      if ((profile as ITMCProfileDetails).administrator) {
+      if (profile.id) {
+        // (profile as ITMCProfileDetails).administrator) {
         this.props.addUser(user)
         this.props.setCourses()
         this.props.setAnswerCounts()

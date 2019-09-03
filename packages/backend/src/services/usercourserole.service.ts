@@ -1,35 +1,22 @@
-import { Inject, Service } from "typedi"
-import { EntityManager, SelectQueryBuilder } from "typeorm"
+import { Service } from "typedi"
+import { EntityManager } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
-import {
-  PeerReview,
-  PeerReviewCollection,
-  Quiz,
-  QuizAnswer,
-  QuizItem,
-  QuizItemAnswer,
-  SpamFlag,
-  User,
-  UserCourseRole,
-} from "../models"
-import QuizAnswerService from "./quizanswer.service"
+import { UserCourseRole } from "../models"
 
 @Service()
 export default class UserCourseRoleService {
-  @InjectManager()
-  private entityManager: EntityManager
-
   public async getUserCourseRoles(
     userId: number,
-    courseId: string,
-    manager?: EntityManager,
+    courseId?: string,
   ): Promise<UserCourseRole[] | undefined> {
-    const entityManager = manager || this.entityManager
+    const queryBuilder = UserCourseRole.createQueryBuilder(
+      "userCourseRole",
+    ).where("user_id = :userId", { userId })
 
-    return await entityManager
-      .createQueryBuilder(UserCourseRole, "userCourseRole")
-      .where("user_id = :userId", { userId })
-      .andWhere("course_id = :courseId", { courseId })
-      .getMany()
+    if (courseId) {
+      queryBuilder.andWhere("course_id = :courseId", { courseId })
+    }
+
+    return await queryBuilder.getMany()
   }
 }

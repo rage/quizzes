@@ -22,6 +22,7 @@ import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
 import UserCoursePartStateService from "services/usercoursepartstate.service"
+import UserCourseRoleService from "services/usercourserole.service"
 import UserCourseStateService from "services/usercoursestate.service"
 import UserQuizStateService from "services/userquizstate.service"
 import ValidationService from "services/validation.service"
@@ -65,6 +66,9 @@ export class QuizAnswerController {
   private userCoursePartStateService: UserCoursePartStateService
 
   @Inject()
+  private userCourseRoleService: UserCourseRoleService
+
+  @Inject()
   private userCourseStateService: UserCourseStateService
 
   @Inject()
@@ -84,8 +88,15 @@ export class QuizAnswerController {
     // This requires a general check - or then we return only the counts that are of interest to the user
     // i.e. the quizzes they could see
 
-    if (!user.administrator) {
-      throw new UnauthorizedError("unauthorized")
+    const roles = await this.userCourseRoleService.getUserCourseRoles(
+      user.id,
+      quizId,
+    )
+
+    if (!roles || roles.length < 1) {
+      if (!user.administrator) {
+        throw new UnauthorizedError("unauthorized")
+      }
     }
 
     const limitDate = new Date()
@@ -99,6 +110,21 @@ export class QuizAnswerController {
           lastAllowedTime: limitDate,
           statuses: ["spam", "submitted"],
         }
+
+    const result = await this.quizAnswerService.getAnswersCount(criteriaQuery)
+    if (user.administrator) {
+      return result
+    }
+
+    const quizzes = await Quiz.findByIds(result.map((info: any) => info.quizId))
+    const filteredQuizzes = quizzes.filter(q =>
+      roles.some(r => r.courseId === q.courseId),
+    )
+    const filtered = result.filter((r: any) =>
+      filteredQuizzes.some(q => q.id === r.quizId),
+    )
+
+    return filtered
 
     return await this.quizAnswerService.getAnswersCount(criteriaQuery)
   }
