@@ -77,6 +77,9 @@ export class QuizItem extends BaseEntity {
   @Column({ nullable: true, default: false })
   public multi?: boolean
 
+  @Column({ nullable: false, default: false, select: true })
+  public usesSharedOptionFeedbackMessage: boolean
+
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
   @UpdateDateColumn({ type: "timestamp" })
@@ -150,6 +153,9 @@ export class QuizItemTranslation extends BaseEntity {
   public successMessage?: string
   @Column({ type: "text", nullable: true, select: false })
   public failureMessage?: string
+
+  @Column({ type: "text", nullable: true, select: false })
+  public sharedOptionFeedbackMessage?: string
 
   @CreateDateColumn({ type: "timestamp" })
   public createdAt: Date
