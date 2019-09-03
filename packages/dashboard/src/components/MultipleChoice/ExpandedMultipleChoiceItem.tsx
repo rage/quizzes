@@ -21,6 +21,7 @@ import {
 import BottomActionsExpItem from "../ItemTools/ExpandedBottomActions"
 import ExpandedTopInformation from "../ItemTools/ExpandedTopInformation"
 import OptionDialog from "../OptionDialog"
+import SharedFeedbackCustomiser from "./SharedFeedbackCustomiser"
 import SortableOptionList from "./SortableOptionList"
 
 interface IExpandedMultipleChoiceItemProps {
@@ -47,6 +48,8 @@ interface IItemData {
   title: string
   body: string
   options: IOptionData[]
+  sharedFeedbackMessageIsUsed: boolean
+  sharedFeedbackMessage: string
 }
 
 export interface IOptionData {
@@ -84,6 +87,8 @@ class MultipleChoiceItem extends React.Component<
       title: item.texts[0].title,
       body: item.texts[0].body,
       options: initOptionsData,
+      sharedFeedbackMessageIsUsed: true,
+      sharedFeedbackMessage: "Yeet",
     }
     this.state = {
       dialogOpen: false,
@@ -179,6 +184,22 @@ class MultipleChoiceItem extends React.Component<
                         </Grid>
                       )}
                     </Grid>
+                    <Grid item={true} xs={12}>
+                      <SharedFeedbackCustomiser
+                        sharedMessageIsUsed={
+                          this.state.tempItemData.sharedFeedbackMessageIsUsed
+                        }
+                        sharedFeedbackMessage={
+                          this.state.tempItemData.sharedFeedbackMessage
+                        }
+                        handleToggleChange={this.changeEditAttribute(
+                          "sharedFeedbackMessageIsUsed",
+                        )}
+                        handleMessageChange={this.changeEditAttribute(
+                          "sharedFeedbackMessage",
+                        )}
+                      />
+                    </Grid>
                   </Grid>
                 </CardContent>
               </Grid>
@@ -216,7 +237,11 @@ class MultipleChoiceItem extends React.Component<
       })
     }
     const newData = { ...this.state.tempItemData }
-    newData[attributeName] = e.target.value
+    if (attributeName === "sharedFeedbackMessageIsUsed") {
+      newData[attributeName] = !newData[attributeName]
+    } else {
+      newData[attributeName] = e.target.value
+    }
     this.setState({ tempItemData: newData })
   }
 
