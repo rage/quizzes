@@ -117,6 +117,7 @@ export type QuizItemText = {
   failureMessage: string
   minLabel: string
   maxLabel: string
+  sharedOptionFeedbackMessage?: string
 }
 
 export type QuizItem = {
@@ -129,6 +130,7 @@ export type QuizItem = {
   minValue: number
   maxValue: number
   formatRegex: string
+  usesSharedOptionFeedbackMessage: boolean
   multi: boolean
   texts: QuizItemText[]
   options: QuizItemOption[]

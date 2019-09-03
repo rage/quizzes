@@ -472,20 +472,28 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   const onlyOneItem = items.length === 1
   const generalLabels = languageLabels.general
 
-  const optionSuccess = selectedOption
-    ? selectedOption.texts[0].successMessage
-    : undefined
-  const optionFailure = selectedOption
-    ? selectedOption.texts[0].failureMessage
-    : undefined
+  let feedbackMessage
+  if (
+    item.usesSharedOptionFeedbackMessage &&
+    item.texts[0].sharedOptionFeedbackMessage !== undefined
+  ) {
+    feedbackMessage = item.texts[0].sharedOptionFeedbackMessage
+  } else {
+    const optionSuccess = selectedOption
+      ? selectedOption.texts[0].successMessage
+      : undefined
+    const optionFailure = selectedOption
+      ? selectedOption.texts[0].failureMessage
+      : undefined
 
-  const text = item.texts[0]
-  const successMessage =
-    optionSuccess || text.successMessage || generalLabels.answerCorrectLabel
-  const failureMessage =
-    optionFailure || text.failureMessage || generalLabels.answerIncorrectLabel
+    const text = item.texts[0]
+    const successMessage =
+      optionSuccess || text.successMessage || generalLabels.answerCorrectLabel
+    const failureMessage =
+      optionFailure || text.failureMessage || generalLabels.answerIncorrectLabel
 
-  const feedbackMessage = itemAnswer.correct ? successMessage : failureMessage
+    feedbackMessage = itemAnswer.correct ? successMessage : failureMessage
+  }
 
   const feedbackColor = itemAnswer.correct ? "#047500" : "#DB0000"
 
