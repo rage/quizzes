@@ -14,6 +14,9 @@ import {
   Res,
   UnauthorizedError,
 } from "routing-controllers"
+import AuthorizationService, {
+  Permission,
+} from "services/authorization.service"
 import KafkaService from "services/kafka.service"
 import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
@@ -50,6 +53,9 @@ export class QuizAnswerController {
   private entityManager: EntityManager
 
   @Inject()
+  private authorizationService: AuthorizationService
+
+  @Inject()
   private quizAnswerService: QuizAnswerService
 
   @Inject()
@@ -75,6 +81,9 @@ export class QuizAnswerController {
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @QueryParam("quizId") quizId?: string,
   ): Promise<any[]> {
+    // This requires a general check - or then we return only the counts that are of interest to the user
+    // i.e. the quizzes they could see
+
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
     }
@@ -99,7 +108,13 @@ export class QuizAnswerController {
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @Param("quizId") quizId: string,
   ): Promise<any> {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 
@@ -114,7 +129,13 @@ export class QuizAnswerController {
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @Param("quizId") quizId: string,
   ): Promise<any> {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 
@@ -131,7 +152,13 @@ export class QuizAnswerController {
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @Param("quizId") quizId: string,
   ): Promise<any> {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 
@@ -148,7 +175,13 @@ export class QuizAnswerController {
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @Param("quizId") quizId: string,
   ): Promise<any> {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 
@@ -166,9 +199,14 @@ export class QuizAnswerController {
     @QueryParam("skip") skip?: number,
     @QueryParam("limit") limit?: number,
   ): Promise<QuizAnswer[]> {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.GRADE,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
-      return
     }
 
     let result: QuizAnswer[]
@@ -202,7 +240,13 @@ export class QuizAnswerController {
     @Body() body: { newStatus: QuizAnswerStatus },
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      answerId: id,
+      permission: Permission.GRADE,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 

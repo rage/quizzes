@@ -6,6 +6,9 @@ import {
   QueryParam,
   UnauthorizedError,
 } from "routing-controllers"
+import AuthorizationService, {
+  Permission,
+} from "services/authorization.service"
 import CourseService from "services/course.service"
 import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
@@ -22,12 +25,17 @@ export class CourseController {
   @Inject()
   private courseService: CourseService
 
+  @Inject()
+  private authorizationService: AuthorizationService
+
   @Get("/")
   public async getall(
     @QueryParam("language") language: string,
     @QueryParam("attentionAnswers") attentionAnswers: boolean,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<Course[]> {
+    // We could check what courses the user is authorized to view, and then send only those courses...
+
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
     }
@@ -47,7 +55,13 @@ export class CourseController {
     @QueryParam("language") language: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<Course[]> {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      courseId: id,
+      permission: Permission.VIEW,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 

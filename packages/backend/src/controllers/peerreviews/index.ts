@@ -7,6 +7,9 @@ import {
   Post,
   UnauthorizedError,
 } from "routing-controllers"
+import AuthorizationService, {
+  Permission,
+} from "services/authorization.service"
 import KafkaService from "services/kafka.service"
 import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
@@ -26,6 +29,9 @@ import { ITMCProfileDetails } from "../../types"
 export class PeerReviewController {
   @InjectManager()
   private entityManager: EntityManager
+
+  @Inject()
+  private authorizationService: AuthorizationService
 
   @Inject()
   private peerReviewService: PeerReviewService
@@ -53,7 +59,13 @@ export class PeerReviewController {
     @Param("answerId") answerId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      answerId,
+      permission: Permission.VIEW,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 
@@ -69,7 +81,13 @@ export class PeerReviewController {
     @Param("quizId") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 
@@ -84,7 +102,13 @@ export class PeerReviewController {
     @Param("quizId") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 
@@ -102,7 +126,13 @@ export class PeerReviewController {
     @Param("quizId") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 

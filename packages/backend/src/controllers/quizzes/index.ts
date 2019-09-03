@@ -286,7 +286,13 @@ export class QuizController {
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @Res() response: Response,
   ): Promise<any> {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 
@@ -299,9 +305,16 @@ export class QuizController {
     @EntityFromBody() quiz: Quiz,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<Quiz> {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      courseId: quiz.courseId,
+      permission: Permission.MODIFY,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
+
     const upsertedQuiz = await this.quizService.createQuiz(quiz)
     this.kafkaService.publishCourseQuizzesUpdated(quiz.courseId)
     return upsertedQuiz

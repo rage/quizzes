@@ -237,6 +237,7 @@ export interface ExerciseData {
 
 export interface IAuthorizationQuery {
   user: ITMCProfileDetails
+  answerId?: string
   courseId?: string
   quizId?: string
   permission: Permission

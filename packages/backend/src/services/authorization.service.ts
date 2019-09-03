@@ -2,9 +2,9 @@ import { Inject, Service } from "typedi"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { EntityManager } from "typeorm"
 import { ITMCProfileDetails, IAuthorizationQuery } from "../types"
+import QuizService from "./quiz.service"
 import QuizAnswerService from "./quizanswer.service"
 import UserCourseRoleService from "./usercourserole.service"
-import QuizService from "./quiz.service"
 
 // Order can be used to quickly solve issues of sufficient authorization
 export enum Permission {
@@ -25,8 +25,12 @@ export default class AuthorizationService {
   @Inject()
   private quizService: QuizService
 
+  @Inject()
+  private quizAnswerService: QuizAnswerService
+
   public isPermitted = async ({
     user,
+    answerId,
     courseId,
     quizId,
     permission,
@@ -34,20 +38,28 @@ export default class AuthorizationService {
     if (user.administrator) {
       return true
     }
-    if (!courseId && !quizId) {
+    if (!courseId && !quizId && !answerId) {
       return false
     }
     if (!courseId) {
-      const quizzes = await this.quizService.getQuizzes({
-        stripped: true,
-        id: quizId,
-      })
+      if (quizId) {
+        const quizzes = await this.quizService.getQuizzes({
+          stripped: true,
+          id: quizId,
+        })
 
-      if (quizzes.length === 0) {
-        return false
+        if (quizzes.length === 0) {
+          return false
+        }
+
+        courseId = quizzes[0].courseId
+      } else if (answerId) {
+        const answer = await this.quizAnswerService.getAnswer(
+          { id: answerId },
+          this.entityManager,
+        )
+        courseId = answer.quiz.courseId
       }
-
-      courseId = quizzes[0].courseId
     }
 
     const roles = await this.userCourseRoleService.getUserCourseRoles(
