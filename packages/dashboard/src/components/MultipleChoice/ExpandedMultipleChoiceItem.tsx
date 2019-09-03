@@ -48,8 +48,8 @@ interface IItemData {
   title: string
   body: string
   options: IOptionData[]
-  sharedFeedbackMessageIsUsed: boolean
-  sharedFeedbackMessage: string
+  usesSharedOptionFeedbackMessage: boolean
+  sharedOptionFeedbackMessage: string
 }
 
 export interface IOptionData {
@@ -87,8 +87,9 @@ class MultipleChoiceItem extends React.Component<
       title: item.texts[0].title,
       body: item.texts[0].body,
       options: initOptionsData,
-      sharedFeedbackMessageIsUsed: true,
-      sharedFeedbackMessage: "Yeet",
+      usesSharedOptionFeedbackMessage: item.usesSharedOptionFeedbackMessage,
+      sharedOptionFeedbackMessage:
+        item.texts[0].sharedOptionFeedbackMessage || "",
     }
     this.state = {
       dialogOpen: false,
@@ -187,16 +188,17 @@ class MultipleChoiceItem extends React.Component<
                     <Grid item={true} xs={12}>
                       <SharedFeedbackCustomiser
                         sharedMessageIsUsed={
-                          this.state.tempItemData.sharedFeedbackMessageIsUsed
+                          this.state.tempItemData
+                            .usesSharedOptionFeedbackMessage
                         }
                         sharedFeedbackMessage={
-                          this.state.tempItemData.sharedFeedbackMessage
+                          this.state.tempItemData.sharedOptionFeedbackMessage
                         }
                         handleToggleChange={this.changeEditAttribute(
-                          "sharedFeedbackMessageIsUsed",
+                          "usesSharedOptionFeedbackMessage",
                         )}
                         handleMessageChange={this.changeEditAttribute(
-                          "sharedFeedbackMessage",
+                          "sharedOptionFeedbackMessage",
                         )}
                       />
                     </Grid>
@@ -237,7 +239,7 @@ class MultipleChoiceItem extends React.Component<
       })
     }
     const newData = { ...this.state.tempItemData }
-    if (attributeName === "sharedFeedbackMessageIsUsed") {
+    if (attributeName === "usesSharedOptionFeedbackMessage") {
       newData[attributeName] = !newData[attributeName]
     } else {
       newData[attributeName] = e.target.value
@@ -255,6 +257,16 @@ class MultipleChoiceItem extends React.Component<
     this.props.changeAttr(
       `items[${this.props.order}].texts[0].body`,
       this.state.tempItemData.body,
+    )
+
+    this.props.changeAttr(
+      `items[${this.props.order}].texts[0].sharedOptionFeedbackMessage`,
+      this.state.tempItemData.sharedOptionFeedbackMessage,
+    )
+
+    this.props.changeAttr(
+      `items[${this.props.order}].usesSharedOptionFeedbackMessage`,
+      this.state.tempItemData.usesSharedOptionFeedbackMessage,
     )
 
     this.props.updateMultipleOptions(

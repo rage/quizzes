@@ -154,7 +154,7 @@ export class QuizItemTranslation extends BaseEntity {
   @Column({ type: "text", nullable: true, select: false })
   public failureMessage?: string
 
-  @Column({ type: "text", nullable: true, select: false })
+  @Column({ type: "text", nullable: true })
   public sharedOptionFeedbackMessage?: string
 
   @CreateDateColumn({ type: "timestamp" })
