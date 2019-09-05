@@ -21,6 +21,7 @@ import ResultInformation from "./ResultInformation"
 import { useTypedSelector } from "../../state/store"
 import { Quiz, QuizItemType } from "../../modelTypes"
 
+import Deadline from "./Deadline"
 import LoadingQuiz from "./LoadingQuiz"
 import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
@@ -49,6 +50,7 @@ export interface QuizProps {
   backendAddress?: string
   customContent?: Element | JSX.Element
   fullInfoWithoutLogin?: boolean
+  showZeroPointsInfo?: boolean
 }
 
 const QuizItemContainerDiv = styled.div`
@@ -80,6 +82,15 @@ const QuizContentWrapper = styled.div<IQuizContentWrapperProps>`
       `}
 `
 
+const OuterDiv = styled.div`
+  p {
+    margin-bottom: 0 !important;
+  }
+  ul {
+    padding-inline-start: 30px;
+  }
+`
+
 const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   id,
   languageId,
@@ -87,6 +98,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   backendAddress,
   customContent,
   fullInfoWithoutLogin,
+  showZeroPointsInfo = true,
 }) => {
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const messageState = useTypedSelector(state => state.message)
@@ -94,7 +106,11 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const quiz = useTypedSelector(state => state.quiz)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const storeAccessToken = useTypedSelector(state => state.user.accessToken)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+  const showPoints = useTypedSelector(
+    state => state.customization.showPointsInfo,
+  )
 
   const dispatch = useDispatch()
 
@@ -109,6 +125,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           accessToken,
           backendAddress,
           fullInfoWithoutLogin,
+          showZeroPointsInfo,
         ),
       )
     },
@@ -124,7 +141,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     )
   }
 
-  if (!quiz) {
+  const loggedInButNotSetInStore = accessToken && !storeAccessToken
+
+  if (loggedInButNotSetInStore || !quiz) {
     return <LoadingQuiz content={customContent} accessToken={accessToken} />
   }
   if (!languageInfo) {
@@ -194,8 +213,20 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const containsPeerReviews =
     quiz.peerReviewCollections !== null && quiz.peerReviewCollections.length > 0
 
+  const showPointsPolicyLabel =
+    !quiz.awardPointsEvenIfWrong &&
+    quiz.items.length > 1 &&
+    showPoints &&
+    quiz.items.some(
+      qi =>
+        qi.type !== "checkbox" &&
+        qi.type !== "scale" &&
+        qi.type !== "feedback" &&
+        qi.type !== "research-agreement",
+    )
+
   return (
-    <div>
+    <OuterDiv>
       <TopInfoBar />
 
       {quizDisabled && (
@@ -203,6 +234,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       )}
 
       <QuizContentWrapper disabled={quizDisabled}>
+        <Deadline deadline={quiz.deadline} />
+
         {containsPeerReviews && <StageVisualizer />}
 
         <MarkdownText>{quiz.texts[0].body}</MarkdownText>
@@ -260,15 +293,13 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                             }: ${triesRemaining}`
                           : generalLabels.triesNotLimitedLabel}
                       </Typography>
-
-                      {!quiz.awardPointsEvenIfWrong &&
-                        quiz.items.length > 1 && (
-                          <Typography>
-                            {generalLabels.pointsGrantingPolicyInformer(
-                              quiz.grantPointsPolicy,
-                            )}
-                          </Typography>
-                        )}
+                      {showPointsPolicyLabel && (
+                        <Typography>
+                          {generalLabels.pointsGrantingPolicyInformer(
+                            quiz.grantPointsPolicy,
+                          )}
+                        </Typography>
+                      )}
                     </React.Fragment>
                   )}
                 </Grid>
@@ -277,7 +308,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           </div>
         )}
       </QuizContentWrapper>
-    </div>
+    </OuterDiv>
   )
 }
 

@@ -12,6 +12,10 @@ export const quizReducer = (
 ): QuizState => {
   switch (action.type) {
     case getType(quiz.set):
+      let deadline = action.payload.deadline
+      if (deadline && typeof deadline === "string") {
+        action.payload.deadline = new Date(deadline)
+      }
       return action.payload
     case getType(quiz.clear):
       return initialState

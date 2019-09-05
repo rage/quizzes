@@ -204,26 +204,9 @@ class MultipleChoiceItem extends React.Component<
           isOpen={this.state.dialogOpen}
           onClose={this.handleClose}
           existingOptData={this.state.existingOptData}
-          changeOptionAttribute={this.changeTempOptionAttribute}
         />
       </Grid>
     )
-  }
-
-  private changeTempOptionAttribute = (
-    order: number,
-    attributeName: string,
-  ) => e => {
-    const copyTempItemData = { ...this.state.tempItemData }
-    const newOptionData = copyTempItemData.options
-    newOptionData[order][attributeName] = e.target.value
-    if (attributeName === "title") {
-      newOptionData[order].titleHasBeenModified = true
-    }
-
-    this.setState({
-      tempItemData: { ...this.state.tempItemData, options: newOptionData },
-    })
   }
 
   private changeEditAttribute = (attributeName: string) => e => {

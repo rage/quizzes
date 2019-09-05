@@ -1,15 +1,4 @@
-import {
-  Button,
-  FormControlLabel,
-  Grid,
-  IconButton,
-  Radio,
-  RadioGroup,
-  Typography,
-} from "@material-ui/core"
-import Create from "@material-ui/icons/Create"
 import React from "react"
-import DragHandleWrapper from "../DragHandleWrapper"
 import ExpandedScale from "./ExpandedScale"
 
 import ShortScale from "./ShortScale"

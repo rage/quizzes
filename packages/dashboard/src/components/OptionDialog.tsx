@@ -10,9 +10,36 @@ import {
   FormGroup,
   Grid,
   TextField,
+  Typography,
 } from "@material-ui/core"
 
-export default class OptionDialog extends React.Component<any, any> {
+interface IOptionDialogProps {
+  onSubmit: (optionData: IOptionData) => (e: any) => void
+  isOpen: boolean
+  onClose: () => void
+  existingOptData: null | IOptionData
+}
+
+interface IOptionDialogState {
+  correctChecked: boolean
+  inInitialState: boolean
+  optionData: IOptionData
+}
+
+interface IOptionData {
+  title?: string
+  correct?: boolean
+  message?: string
+  // success/failure used to update the quiz when changes saved
+  successMessage?: string
+  failureMessage?: string
+  order?: number
+}
+
+export default class OptionDialog extends React.Component<
+  IOptionDialogProps,
+  IOptionDialogState
+> {
   constructor(props) {
     super(props)
 
@@ -20,8 +47,7 @@ export default class OptionDialog extends React.Component<any, any> {
       correctChecked: false,
       optionData: {
         title: "",
-        failureMessage: "",
-        successMessage: "",
+        message: "",
         correct: false,
       },
       inInitialState: true,
@@ -35,10 +61,14 @@ export default class OptionDialog extends React.Component<any, any> {
         optionData: {},
         inInitialState: false,
       }
-      newState.correctChecked = this.props.existingOptData.correct
+      newState.correctChecked = !!this.props.existingOptData.correct
       newState.optionData = {
         ...this.props.existingOptData,
+        message: this.props.existingOptData.correct
+          ? this.props.existingOptData.successMessage
+          : this.props.existingOptData.failureMessage,
       }
+
       this.setState({
         ...newState,
       })
@@ -57,17 +87,7 @@ export default class OptionDialog extends React.Component<any, any> {
       return true
     }
 
-    if (
-      this.state.optionData.successMessage !==
-      nextState.optionData.successMessage
-    ) {
-      return true
-    }
-
-    if (
-      this.state.optionData.failureMessage !==
-      nextState.optionData.failureMessage
-    ) {
+    if (this.state.optionData.message !== nextState.optionData.message) {
       return true
     }
 
@@ -103,11 +123,18 @@ export default class OptionDialog extends React.Component<any, any> {
               justify="flex-start"
               alignItems="center"
             >
-              <Grid item={true} xs={1}>
-                Text
+              <Grid
+                item={true}
+                xs={12}
+                sm={2}
+                md={1}
+                style={{ paddingRight: "5px" }}
+              >
+                <Typography variant="subtitle1">Text</Typography>
               </Grid>
-              <Grid item={true} xs={11}>
+              <Grid item={true} xs={12} sm={10} md={11}>
                 <TextField
+                  variant="outlined"
                   fullWidth={true}
                   multiline={true}
                   placeholder="Text"
@@ -115,40 +142,39 @@ export default class OptionDialog extends React.Component<any, any> {
                   onChange={this.handleTextFieldChange("title")}
                 />
               </Grid>
-              <Grid item={true} xs={1}>
-                Correct?
+              <Grid
+                item={true}
+                xs={12}
+                sm={2}
+                md={1}
+                style={{ paddingRight: "5px" }}
+              >
+                <Typography variant="subtitle1">Correct?</Typography>
               </Grid>
-              <Grid item={true} xs={11}>
+              <Grid item={true} xs={12} sm={10} md={11}>
                 <Checkbox
                   color="primary"
                   checked={this.state.correctChecked}
                   onChange={this.handleCheckingChange}
                   value="true"
+                  style={{ paddingLeft: "0" }}
                 />
               </Grid>
 
-              <Grid item={true} xs={2}>
-                failure message
+              <Grid item={true} xs={12} sm={3} lg={4}>
+                <Typography variant="subtitle1" style={{ paddingRight: "5px" }}>
+                  Explanation why this option is{" "}
+                  {!this.state.optionData.correct && "in"}correct
+                </Typography>
               </Grid>
-              <Grid item={true} xs={10}>
+              <Grid item={true} xs={12} sm={9} lg={8}>
                 <TextField
+                  variant="outlined"
                   fullWidth={true}
-                  placeholder="failure message"
+                  placeholder="feedback message"
                   multiline={true}
-                  value={this.state.optionData.failureMessage}
-                  onChange={this.handleTextFieldChange("failureMessage")}
-                />
-              </Grid>
-              <Grid item={true} xs={2}>
-                success message
-              </Grid>
-              <Grid item={true} xs={10}>
-                <TextField
-                  fullWidth={true}
-                  placeholder="success message"
-                  multiline={true}
-                  value={this.state.optionData.successMessage}
-                  onChange={this.handleTextFieldChange("successMessage")}
+                  value={this.state.optionData.message}
+                  onChange={this.handleTextFieldChange("message")}
                 />
               </Grid>
             </Grid>
@@ -157,13 +183,13 @@ export default class OptionDialog extends React.Component<any, any> {
         <DialogActions>
           <Button
             onClick={this.handleClose}
-            style={{ backgroundColor: "#FF1F00" }}
+            style={{ backgroundColor: "rgb(220, 25, 0)", color: "white" }}
           >
             Cancel
           </Button>
           <Button
             onClick={this.handleSubmit}
-            style={{ backgroundColor: "#00FF19" }}
+            style={{ backgroundColor: "rgb(15, 125, 0)", color: "white" }}
           >
             Save
           </Button>
@@ -190,6 +216,12 @@ export default class OptionDialog extends React.Component<any, any> {
   }
 
   private handleSubmit = event => {
+    const data = this.state.optionData
+    if (data.correct) {
+      data.successMessage = data.message
+    } else {
+      data.failureMessage = data.message
+    }
     this.props.onSubmit(this.state.optionData)(event)
 
     this.handleClose()

@@ -89,7 +89,7 @@ const englishLabels: SingleLanguageLabels = {
         case "grant_only_when_answer_fully_correct":
           return "Answer must be fully correct to receive points"
         case "grant_whenever_possible":
-          return "Partially correct answer may receive some points"
+          return ""
         default:
           return ""
       }

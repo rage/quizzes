@@ -4,6 +4,7 @@ import { ThunkAction, Dispatch } from "./store"
 import { getQuizInfo } from "../services/quizService"
 import * as userActions from "./user/actions"
 import * as backendAddressActions from "./backendAddress/actions"
+import * as customizationActions from "./customization/actions"
 import * as feedbackDisplayedActions from "./feedbackDisplayed/actions"
 import * as languageActions from "./language/actions"
 import * as loadingBars from "./loadingBars/actions"
@@ -21,7 +22,12 @@ export const initialize: ActionCreator<ThunkAction> = (
   accessToken: string,
   backendAddress?: string,
   fullInfoWithoutLogin?: boolean,
+  showZeroPointsInfo?: boolean,
 ) => async (dispatch: Dispatch) => {
+  if (showZeroPointsInfo === undefined) {
+    showZeroPointsInfo = true
+  }
+
   dispatch(clearActionCreator())
 
   dispatch(languageActions.set(languageId))
@@ -50,6 +56,12 @@ export const initialize: ActionCreator<ThunkAction> = (
       quizAnswer = loginResponse.quizAnswer
       userQuizState = loginResponse.userQuizState
     }
+
+    dispatch(
+      customizationActions.modify_show_points_info(
+        showZeroPointsInfo || (quiz && quiz.points > 0),
+      ),
+    )
 
     if (!accessToken) {
       dispatch(quizAnswerActions.setQuizDisabled(true))

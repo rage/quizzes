@@ -21,7 +21,7 @@ interface IQuizInfoPropsFromState {
 
 interface IQuizInfoProps extends IQuizInfoPropsFromState {
   quizTexts: IQuizText
-  changeAttr: (attr: string, attrValue: string | number | boolean) => void
+  changeAttr: (attr: string, attrValue: any) => void
 }
 
 interface IQuizInfoState {
@@ -67,6 +67,7 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
     if (this.state.redirect) {
       return <Redirect to={`courses/${this.props.currentCourseId}`} />
     }
+
     return (
       <Grid
         container={true}
@@ -102,6 +103,8 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
               tries={this.props.edit.tries}
               triesLimited={this.props.edit.triesLimited}
               grantPointsPolicy={this.props.edit.grantPointsPolicy}
+              points={this.props.edit.points}
+              deadline={this.props.edit.deadline}
             />
           ) : (
             <ShortQuizInfo
@@ -113,6 +116,8 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
               tries={this.props.edit.tries}
               triesLimited={this.props.edit.triesLimited}
               grantPointsPolicy={this.props.edit.grantPointsPolicy}
+              points={this.props.edit.points}
+              deadline={this.props.edit.deadline}
             />
           )}
         </Grid>
@@ -128,7 +133,7 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
 
   public setQuizAttribute = (
     attributeName: string,
-    attributeValue: string | number | boolean,
+    attributeValue: string | number | boolean | Date | null,
   ) => {
     if (
       attributeName === "part" ||
@@ -136,7 +141,9 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
       attributeName === "courseId" ||
       attributeName === "tries" ||
       attributeName === "triesLimited" ||
-      attributeName === "grantPointsPolicy"
+      attributeName === "grantPointsPolicy" ||
+      attributeName === "deadline" ||
+      attributeName === "points"
     ) {
       this.props.changeAttr(attributeName, attributeValue)
     } else {
