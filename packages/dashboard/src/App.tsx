@@ -328,7 +328,7 @@ class App extends React.Component<any, any> {
       })
       const accessToken = user.accessToken
       const profile = await TMCApi.getProfile(accessToken)
-      if ((profile as ITMCProfileDetails).administrator) {
+      if ((profile as ITMCProfileDetails).id) {
         this.props.addUser(user)
         this.props.setCourses()
       }
