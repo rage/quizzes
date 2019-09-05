@@ -30,6 +30,9 @@ import { Quiz, QuizAnswer, UserQuizState } from "../../models"
 import { IQuizQuery, ITMCProfileDetails } from "../../types"
 import _ from "lodash"
 import KafkaService from "services/kafka.service"
+type empty = ""
+
+type nonemptystring = Exclude<string, empty>
 
 @JsonController(`${API_PATH}/quizzes`)
 export class QuizController {
@@ -62,13 +65,18 @@ export class QuizController {
     return await this.getQuizzes(null, params)
   }
 
-  @Get("/:id")
+  @Get("/:id(.+)")
   public async get(
-    @Param("id") id: string,
+    @Param("id") id: nonemptystring,
     @QueryParams() params: any,
     @QueryParam("fullInfo") fullInfo: boolean,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
+    console.log("HIP HIP yeet")
+    if (id === "") {
+      return
+    }
+
     try {
       const quizId = validator.isUUID(id) ? id : getUUIDByString(id)
       if (!user) {
