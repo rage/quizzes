@@ -42,30 +42,30 @@ export default class AuthorizationService {
       return false
     }
     if (!courseId) {
-      if (quizId) {
-        const quizzes = await this.quizService.getQuizzes({
-          stripped: true,
-          id: quizId,
-        })
-
-        if (quizzes.length === 0) {
-          return false
-        }
-
-        courseId = quizzes[0].courseId
-      } else if (answerId) {
+      if (answerId) {
         const answer = await this.quizAnswerService.getAnswer(
           { id: answerId },
           this.entityManager,
         )
-        courseId = answer.quiz.courseId
+        quizId = answer.quizId
       }
+
+      const quizzes = await this.quizService.getQuizzes({
+        stripped: true,
+        id: quizId,
+      })
+
+      if (quizzes.length === 0) {
+        return false
+      }
+
+      courseId = quizzes[0].courseId
     }
 
-    const roles = await this.userCourseRoleService.getUserCourseRoles(
-      user.id,
+    const roles = await this.userCourseRoleService.getUserCourseRoles({
+      userId: user.id,
       courseId,
-    )
+    })
 
     if (roles.some(r => r.role === "teacher")) {
       return true

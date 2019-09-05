@@ -39,7 +39,9 @@ export class CourseController {
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<Course[]> {
     // We could check what courses the user is authorized to view, and then send only those courses...
-    const roles = await this.userCourseRoleService.getUserCourseRoles(user.id)
+    const roles = await this.userCourseRoleService.getUserCourseRoles({
+      userId: user.id,
+    })
 
     if (!roles || roles.length < 1) {
       if (!user.administrator) {

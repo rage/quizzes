@@ -88,15 +88,10 @@ export class QuizAnswerController {
     // This requires a general check - or then we return only the counts that are of interest to the user
     // i.e. the quizzes they could see
 
-    const roles = await this.userCourseRoleService.getUserCourseRoles(
-      user.id,
-      quizId,
-    )
+    const roleCount = await this.userCourseRoleService.getRolesCount(user.id)
 
-    if (!roles || roles.length < 1) {
-      if (!user.administrator) {
-        throw new UnauthorizedError("unauthorized")
-      }
+    if (roleCount < 1 && !user.administrator) {
+      throw new UnauthorizedError("unauthorized")
     }
 
     const limitDate = new Date()
@@ -112,9 +107,27 @@ export class QuizAnswerController {
         }
 
     const result = await this.quizAnswerService.getAnswersCount(criteriaQuery)
+
     if (user.administrator) {
       return result
     }
+
+    if (quizId) {
+      const authorized = await this.authorizationService.isPermitted({
+        user,
+        quizId,
+        permission: Permission.VIEW,
+      })
+      if (authorized) {
+        return result
+      } else {
+        throw new UnauthorizedError("unauthorized")
+      }
+    }
+
+    const roles = await this.userCourseRoleService.getUserCourseRoles({
+      userId: user.id,
+    })
 
     const quizzes = await Quiz.findByIds(result.map((info: any) => info.quizId))
     const filteredQuizzes = quizzes.filter(q =>
@@ -125,8 +138,6 @@ export class QuizAnswerController {
     )
 
     return filtered
-
-    return await this.quizAnswerService.getAnswersCount(criteriaQuery)
   }
 
   @Get("/data/:quizId/plainAnswers")
