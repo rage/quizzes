@@ -29,7 +29,7 @@ import { setCourse, setLanguage, setQuiz } from "./store/filter/actions"
 import { displayMessage } from "./store/notification/actions"
 import { setQuizzesByQuizId } from "./store/quizzes/actions"
 import { addUser, removeUser } from "./store/user/actions"
-import { IUserState } from "./store/user/reducer"
+import { InitializationStatus, IUserState } from "./store/user/reducer"
 
 class App extends React.Component<any, any> {
   public async componentDidMount() {
@@ -39,8 +39,6 @@ class App extends React.Component<any, any> {
       if (profile.id) {
         // (profile as ITMCProfileDetails).administrator) {
         this.props.addUser(user, profile.administrator)
-        this.props.setCourses()
-        this.props.setAnswerCounts()
       }
     }
   }
@@ -99,6 +97,12 @@ class App extends React.Component<any, any> {
           </Paper>
         </Grid>
       )
+    }
+
+    if (
+      this.props.user.initializationStatus === InitializationStatus.INITIALIZING
+    ) {
+      return <div>Loggin in...</div>
     }
 
     return (

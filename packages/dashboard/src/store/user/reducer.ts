@@ -2,7 +2,13 @@ import { ActionType, getType } from "typesafe-actions"
 import { ITMCProfile } from "../../../../common/src/types"
 import * as user from "./actions"
 
+export enum InitializationStatus {
+  UNINITIALIZED,
+  INITIALIZING,
+  INITIALIZED,
+}
 export interface IUserState {
+  initializationStatus: InitializationStatus
   username: string
   accessToken: string
   roles: null | any[]
@@ -10,6 +16,7 @@ export interface IUserState {
 }
 
 const initialState = {
+  initializationStatus: InitializationStatus.UNINITIALIZED,
   username: "",
   accessToken: "",
   roles: null,
@@ -24,7 +31,10 @@ export const userReducer = (
 ): IUserState => {
   switch (action.type) {
     case getType(user.set):
-      return action.payload
+      return {
+        ...action.payload,
+        initializationStatus: InitializationStatus.INITIALIZED,
+      }
     case getType(user.setRoles):
       return {
         ...state,

@@ -16,7 +16,7 @@ export default class UserCourseRoleService {
     quizId?: string
   }): Promise<UserCourseRole[] | undefined> {
     const queryBuilder = UserCourseRole.createQueryBuilder("ucr").where(
-      "user_id = :userId",
+      "ucr.user_id = :userId",
       { userId },
     )
 
@@ -25,7 +25,7 @@ export default class UserCourseRoleService {
       .innerJoinAndSelect("course.texts", "text")
 
     if (courseId) {
-      queryBuilder.andWhere("course_id = :courseId", { courseId })
+      queryBuilder.andWhere("ucr.course_id = :courseId", { courseId })
     } else if (quizId) {
       queryBuilder
         .innerJoin(Quiz, "quiz", "course.id = quiz.course_id")
