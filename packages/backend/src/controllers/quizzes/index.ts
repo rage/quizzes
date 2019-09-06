@@ -65,17 +65,17 @@ export class QuizController {
     return await this.getQuizzes(null, params)
   }
 
-  @Get("/:id(.+)")
+  @Get(
+    "/:id([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12})",
+  )
   public async get(
-    @Param("id") id: nonemptystring,
+    @Param("id") id: string,
     @QueryParams() params: any,
     @QueryParam("fullInfo") fullInfo: boolean,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
     console.log("HIP HIP yeet")
-    if (id === "") {
-      return
-    }
+    console.log("id: ", id)
 
     try {
       const quizId = validator.isUUID(id) ? id : getUUIDByString(id)
