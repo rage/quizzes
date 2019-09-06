@@ -21,6 +21,7 @@ import {
 import BottomActionsExpItem from "../ItemTools/ExpandedBottomActions"
 import ExpandedTopInformation from "../ItemTools/ExpandedTopInformation"
 import OptionDialog from "../OptionDialog"
+import SharedFeedbackCustomiser from "./SharedFeedbackCustomiser"
 import SortableOptionList from "./SortableOptionList"
 
 interface IExpandedMultipleChoiceItemProps {
@@ -47,6 +48,8 @@ interface IItemData {
   title: string
   body: string
   options: IOptionData[]
+  usesSharedOptionFeedbackMessage: boolean
+  sharedOptionFeedbackMessage: string
 }
 
 export interface IOptionData {
@@ -84,6 +87,9 @@ class MultipleChoiceItem extends React.Component<
       title: item.texts[0].title,
       body: item.texts[0].body,
       options: initOptionsData,
+      usesSharedOptionFeedbackMessage: item.usesSharedOptionFeedbackMessage,
+      sharedOptionFeedbackMessage:
+        item.texts[0].sharedOptionFeedbackMessage || "",
     }
     this.state = {
       dialogOpen: false,
@@ -179,6 +185,23 @@ class MultipleChoiceItem extends React.Component<
                         </Grid>
                       )}
                     </Grid>
+                    <Grid item={true} xs={12}>
+                      <SharedFeedbackCustomiser
+                        sharedMessageIsUsed={
+                          this.state.tempItemData
+                            .usesSharedOptionFeedbackMessage
+                        }
+                        sharedFeedbackMessage={
+                          this.state.tempItemData.sharedOptionFeedbackMessage
+                        }
+                        handleToggleChange={this.changeEditAttribute(
+                          "usesSharedOptionFeedbackMessage",
+                        )}
+                        handleMessageChange={this.changeEditAttribute(
+                          "sharedOptionFeedbackMessage",
+                        )}
+                      />
+                    </Grid>
                   </Grid>
                 </CardContent>
               </Grid>
@@ -216,7 +239,11 @@ class MultipleChoiceItem extends React.Component<
       })
     }
     const newData = { ...this.state.tempItemData }
-    newData[attributeName] = e.target.value
+    if (attributeName === "usesSharedOptionFeedbackMessage") {
+      newData[attributeName] = !newData[attributeName]
+    } else {
+      newData[attributeName] = e.target.value
+    }
     this.setState({ tempItemData: newData })
   }
 
@@ -230,6 +257,16 @@ class MultipleChoiceItem extends React.Component<
     this.props.changeAttr(
       `items[${this.props.order}].texts[0].body`,
       this.state.tempItemData.body,
+    )
+
+    this.props.changeAttr(
+      `items[${this.props.order}].texts[0].sharedOptionFeedbackMessage`,
+      this.state.tempItemData.sharedOptionFeedbackMessage,
+    )
+
+    this.props.changeAttr(
+      `items[${this.props.order}].usesSharedOptionFeedbackMessage`,
+      this.state.tempItemData.usesSharedOptionFeedbackMessage,
     )
 
     this.props.updateMultipleOptions(
