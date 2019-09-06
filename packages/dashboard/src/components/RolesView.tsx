@@ -2,7 +2,7 @@ import * as React from "react"
 import { connect } from "react-redux"
 import { addRoles } from "../store/user/actions"
 
-class RolesView extends React.Component<any, null> {
+class RolesView extends React.Component<any, any> {
   public componentDidMount() {
     if (!this.props.user.accessToken) {
       addRoles()
