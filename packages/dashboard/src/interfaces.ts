@@ -2,6 +2,8 @@ export type MiscEvent = React.FormEvent<
   HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
 >
 
+export type UserCourseRole = "administrator" | "assistant" | "teacher"
+
 export type QuizItemType =
   | "essay"
   | "multiple-choice"

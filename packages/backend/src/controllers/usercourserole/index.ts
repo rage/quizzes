@@ -21,19 +21,18 @@ export class UserCourseRoleController {
     try {
       console.log("User info: ", user)
       if (user.administrator) {
-        return "administrator"
+        return [{ role: "administrator", courseId: "", courseName: "" }]
       }
 
       const roles = await this.userCourseRoleService.getUserCourseRoles({
         userId: user.id,
       })
 
-      console.log("Roles: ", roles)
       const result = roles.map(r => ({
         role: r.role,
         courseId: r.courseId,
+        courseTitle: r.course.texts[0].title,
       }))
-      console.log("Result: ", result)
 
       return result
     } catch (e) {

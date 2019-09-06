@@ -18,12 +18,12 @@ export class UserCourseRole extends BaseEntity {
   public id: string
 
   @ManyToOne(type => User, user => user.id)
-  public user: Promise<User>
+  public user: User
   @Column({ nullable: false })
   public userId: number
 
-  @ManyToOne(type => Course, course => course.id)
-  public course: Promise<Course>
+  @ManyToOne(type => Course, course => course.id, { eager: false }) // was: lazy
+  public course: Course
   @Column({ nullable: false })
   public courseId: string
 

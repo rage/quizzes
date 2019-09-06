@@ -2,6 +2,7 @@ import { Service } from "typedi"
 import { EntityManager } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { Course, Quiz, UserCourseRole } from "../models"
+import { CourseTranslation } from "@quizzes/common/models"
 
 @Service()
 export default class UserCourseRoleService {
@@ -19,15 +20,17 @@ export default class UserCourseRoleService {
       { userId },
     )
 
+    queryBuilder
+      .innerJoinAndSelect("ucr.course", "course")
+      .innerJoinAndSelect("course.texts", "text")
+
     if (courseId) {
       queryBuilder.andWhere("course_id = :courseId", { courseId })
     } else if (quizId) {
-      queryBuilder.innerJoin(Course, "course", "ucr.course_id = course.id")
       queryBuilder
         .innerJoin(Quiz, "quiz", "course.id = quiz.course_id")
         .where("quiz.id = :quizId", { quizId })
     }
-
     return await queryBuilder.getMany()
   }
 
