@@ -16,6 +16,7 @@ const PointsText = styled(Typography)`
   font-size: 1.5rem !important;
   text-align: end;
   color: white;
+  display: inline;
 
   @media (max-width: 550px) {
     text-align: start;
@@ -50,6 +51,7 @@ const IconWrapper = styled.div`
 const RightMarginedGrid = styled(Grid)`
   margin-right: 1.5rem;
   text-align: end;
+  height: 31.2px;
 
   @media (max-width: 550px) {
     max-width: 100%;
@@ -71,6 +73,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   staticBars,
 }) => {
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const loggedIn = !!useTypedSelector(state => state.user.accessToken)
   const quiz = useTypedSelector(state => state.quiz)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const displayBars = useTypedSelector(state => state.loadingBars)
@@ -91,7 +94,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   }
 
   let titleReplacement
-  let pointsReplacement
+  let pointsPortion
 
   if (!quiz) {
     title = ""
@@ -105,7 +108,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
         <SpaceFillerDiv />
       )
 
-    pointsReplacement =
+    pointsPortion =
       displayBars || staticBars ? (
         <QuizPointsLoadingBar animate={!staticBars} />
       ) : (
@@ -113,17 +116,44 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
       )
   } else {
     title = quiz.texts[0].title
-
-    receivedPoints =
-      userQuizState && userQuizState.pointsAwarded
-        ? userQuizState.pointsAwarded
-        : 0
-
-    formattedReceivedPoints = Number.isInteger(receivedPoints)
-      ? receivedPoints
-      : receivedPoints.toFixed(2)
-
     availablePoints = quiz.points
+
+    if (loggedIn) {
+      receivedPoints =
+        userQuizState && userQuizState.pointsAwarded
+          ? userQuizState.pointsAwarded
+          : 0
+
+      formattedReceivedPoints = Number.isInteger(receivedPoints)
+        ? receivedPoints
+        : receivedPoints.toFixed(2)
+
+      pointsPortion = (
+        <PointsText component="div" paragraph={false}>
+          {`${formattedReceivedPoints}/${availablePoints}`}
+        </PointsText>
+      )
+    } else {
+      pointsPortion = (
+        <>
+          <StyledShortPointContentLoader
+            animate={false}
+            height={30}
+            width={30}
+            primaryColor="#ffffff"
+            primaryOpacity={0.6}
+            secondaryColor="#dddddd"
+            secondaryOpacity={0.6}
+          >
+            <rect x="0" y="5" rx="10" ry="10" width="30" height="25" />
+          </StyledShortPointContentLoader>
+
+          <PointsText component="div" paragraph={false}>
+            {`/${availablePoints}`}
+          </PointsText>
+        </>
+      )
+    }
   }
 
   return (
@@ -156,14 +186,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
           <PointsLabelText component="div" paragraph={false}>
             {pointsLabel}:
           </PointsLabelText>
-
-          {quiz ? (
-            <PointsText component="div" paragraph={false}>
-              {`${formattedReceivedPoints}/${availablePoints}`}
-            </PointsText>
-          ) : (
-            pointsReplacement
-          )}
+          {pointsPortion}
         </RightMarginedGrid>
       )}
     </StyledGrid>
@@ -221,6 +244,13 @@ const QuizPointsLoadingBar: React.FunctionComponent<ILoadingBarProps> = ({
 const StyledQuizPointsContentLoader = styled(ContentLoader)`
   width: 100%;
   max-width: 45px;
+  height: 31.2px;
+`
+
+const StyledShortPointContentLoader = styled(ContentLoader)`
+  max-width: 35px;
+  position: relative;
+  top: 5px;
   height: 31.2px;
 `
 
