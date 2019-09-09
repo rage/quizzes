@@ -17,6 +17,7 @@ const PointsText = styled(Typography)`
   text-align: end;
   color: white;
   display: inline;
+  max-height: 100%;
 
   @media (max-width: 550px) {
     text-align: start;
@@ -134,23 +135,23 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
       )
     } else {
       pointsPortion = (
-        <>
+        <div style={{ height: "31.2px" }}>
           <StyledShortPointContentLoader
             animate={false}
-            height={30}
+            height={25}
             width={30}
             primaryColor="#ffffff"
             primaryOpacity={0.6}
             secondaryColor="#dddddd"
             secondaryOpacity={0.6}
           >
-            <rect x="0" y="5" rx="10" ry="10" width="30" height="25" />
+            <rect x="0" y="0" rx="10" ry="10" width="30" height="25" />
           </StyledShortPointContentLoader>
 
           <PointsText component="div" paragraph={false}>
             {`/${availablePoints}`}
           </PointsText>
-        </>
+        </div>
       )
     }
   }
@@ -247,9 +248,10 @@ const StyledQuizPointsContentLoader = styled(ContentLoader)`
 
 const StyledShortPointContentLoader = styled(ContentLoader)`
   max-width: 35px;
+  max-height: 31.2px;
+  vertical-align: top;
   position: relative;
   top: 5px;
-  height: 31.2px;
 `
 
 export default TopInfoBar
