@@ -51,7 +51,6 @@ const IconWrapper = styled.div`
 const RightMarginedGrid = styled(Grid)`
   margin-right: 1.5rem;
   text-align: end;
-  height: 31.2px;
 
   @media (max-width: 550px) {
     max-width: 100%;
@@ -61,7 +60,7 @@ const RightMarginedGrid = styled(Grid)`
 `
 
 const SpaceFillerDiv = styled.div`
-  height: 31.2px;
+  max-height: 31.2px;
 `
 
 interface ITopInfoBarProps {
@@ -219,7 +218,6 @@ const QuizTitleLoadingBar: React.FunctionComponent<ILoadingBarProps> = ({
 const StyledQuizTitleContentLoader = styled(ContentLoader)`
   width: 100%;
   max-width: 300px;
-  height: 31.2px;
 `
 
 const QuizPointsLoadingBar: React.FunctionComponent<ILoadingBarProps> = ({
