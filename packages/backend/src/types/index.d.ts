@@ -75,6 +75,7 @@ export interface IQuizAnswerQuery {
   spamFlags?: number
   addPeerReviews?: boolean
   addSpamFlagNumber?: boolean
+  quizRequiresPeerReviews?: boolean
   skip?: number
   limit?: number
 }

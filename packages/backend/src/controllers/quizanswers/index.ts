@@ -104,6 +104,7 @@ export class QuizAnswerController {
       : {
           lastAllowedTime: limitDate,
           statuses: ["spam", "submitted"],
+          quizRequiresPeerReviews: true,
         }
 
     const result = await this.quizAnswerService.getAnswersCount(criteriaQuery)
@@ -265,6 +266,7 @@ export class QuizAnswerController {
       limitDate.setDate(limitDate.getDate() - 14)
       attentionCriteriaQuery.lastAllowedTime = limitDate
       attentionCriteriaQuery.statuses = ["spam", "submitted"]
+      attentionCriteriaQuery.quizRequiresPeerReviews = true
     }
 
     result = await this.quizAnswerService.getAnswers(attentionCriteriaQuery)

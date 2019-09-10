@@ -70,6 +70,7 @@ export interface IQuizItemText {
   failureMessage: string
   minLabel: string
   maxLabel: string
+  sharedOptionFeedbackMessage?: string
 }
 
 export interface IQuizItem {
@@ -86,6 +87,7 @@ export interface IQuizItem {
   multi: boolean
   texts: IQuizItemText[]
   options: IQuizItemOption[]
+  usesSharedOptionFeedbackMessage: boolean
 }
 
 export interface ICourseText {

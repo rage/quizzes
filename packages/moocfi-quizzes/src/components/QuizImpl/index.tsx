@@ -135,7 +135,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   if (!accessToken && !fullInfoWithoutLogin) {
     return (
       <div>
-        <TopInfoBar />
+        <TopInfoBar staticBars />
         <LoginPrompt content={customContent} />
       </div>
     )
