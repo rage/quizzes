@@ -74,9 +74,6 @@ export class QuizController {
     @QueryParam("fullInfo") fullInfo: boolean,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
-    console.log("HIP HIP yeet")
-    console.log("id: ", id)
-
     try {
       const quizId = validator.isUUID(id) ? id : getUUIDByString(id)
       if (!user) {

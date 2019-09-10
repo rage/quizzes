@@ -38,7 +38,6 @@ export class CourseController {
     @QueryParam("attentionAnswers") attentionAnswers: boolean,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<Course[]> {
-    // We could check what courses the user is authorized to view, and then send only those courses...
     const roles = await this.userCourseRoleService.getUserCourseRoles({
       userId: user.id,
     })
@@ -53,14 +52,11 @@ export class CourseController {
       id: null,
       language,
       attentionAnswers,
+      user,
     }
 
     const courses = await this.courseService.getCourses(query)
-    if (user.administrator) {
-      return courses
-    }
-
-    return courses.filter(c => roles.some(r => r.courseId === c.id))
+    return courses
   }
 
   @Get("/:id")

@@ -9,6 +9,7 @@ import {
   PeerReviewQuestionTranslation,
   PeerReviewCollection,
   PeerReviewCollectionTranslation,
+  UserCourseRole,
 } from "../models"
 import { Permission } from "services/authorization.service"
 
@@ -78,12 +79,14 @@ export interface IQuizAnswerQuery {
   quizRequiresPeerReviews?: boolean
   skip?: number
   limit?: number
+  user?: ITMCProfileDetails
 }
 
 interface ICourseQuery {
   language?: string
   id?: string
   attentionAnswers?: boolean
+  user?: ITMCProfileDetails
 }
 
 export interface INewQuizQuery {

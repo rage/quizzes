@@ -85,13 +85,22 @@ export class QuizAnswerController {
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @QueryParam("quizId") quizId?: string,
   ): Promise<any[]> {
-    // This requires a general check - or then we return only the counts that are of interest to the user
-    // i.e. the quizzes they could see
-
     const roleCount = await this.userCourseRoleService.getRolesCount(user.id)
 
     if (roleCount < 1 && !user.administrator) {
       throw new UnauthorizedError("unauthorized")
+    }
+
+    // looking for only one count -> easy to check if permitted
+    if (quizId) {
+      const authorized = await this.authorizationService.isPermitted({
+        user,
+        quizId,
+        permission: Permission.VIEW,
+      })
+      if (!authorized) {
+        throw new UnauthorizedError("unauthorized")
+      }
     }
 
     const limitDate = new Date()
@@ -105,25 +114,15 @@ export class QuizAnswerController {
           lastAllowedTime: limitDate,
           statuses: ["spam", "submitted"],
           quizRequiresPeerReviews: true,
+          user,
         }
 
     const result = await this.quizAnswerService.getAnswersCount(criteriaQuery)
 
+    return result
+
     if (user.administrator) {
       return result
-    }
-
-    if (quizId) {
-      const authorized = await this.authorizationService.isPermitted({
-        user,
-        quizId,
-        permission: Permission.VIEW,
-      })
-      if (authorized) {
-        return result
-      } else {
-        throw new UnauthorizedError("unauthorized")
-      }
     }
 
     const roles = await this.userCourseRoleService.getUserCourseRoles({
