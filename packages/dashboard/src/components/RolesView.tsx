@@ -1,3 +1,4 @@
+import { List, ListItem, Typography } from "@material-ui/core"
 import * as React from "react"
 import { connect } from "react-redux"
 import { addRoles } from "../store/user/actions"
@@ -22,15 +23,27 @@ class RolesView extends React.Component<any, any> {
     }
 
     return (
-      <ul>
+      <List>
         {this.props.user.roles.map(role => (
-          <li key={role.courseId + role.role}>
-            {`Role: ${role.role} on course ${role.courseTitle}`}
-          </li>
+          <ListItem key={role.courseId + role.role}>
+            <Typography variant="body1">
+              <span style={stylingObjectForTextEmphasis}>
+                {role.role + " "}
+              </span>
+              {` on course `}
+              <span style={stylingObjectForTextEmphasis}>
+                {" " + role.courseTitle}
+              </span>
+            </Typography>
+          </ListItem>
         ))}
-      </ul>
+      </List>
     )
   }
+}
+
+const stylingObjectForTextEmphasis = {
+  fontWeight: "bold" as "bold",
 }
 
 const mapStateToProps = (state: any) => {
