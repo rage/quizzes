@@ -15,7 +15,7 @@
     "@types/parcel-bundler": "^1.10.0",
     "@types/progress": "^2.0.1",
     "apollo-server-express": "^2.0.6",
-    "axios": "^0.18.0",
+    "axios": "^0.18.1",
     "bluebird": "^3.5.1",
     "body-parser": "^1.18.3",
     "buffer": "^5.1.0",
