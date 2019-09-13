@@ -234,42 +234,46 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 
   const multipleChoiceLabels = languageInfo.multipleChoice
 
+  const selectOptionsLabel = answerLocked
+    ? ""
+    : item.multi
+    ? multipleChoiceLabels.chooseAllSuitableOptionsLabel
+    : onlyOneItem
+    ? multipleChoiceLabels.selectCorrectAnswerLabel
+    : ""
+
   const { title, body, successMessage, failureMessage } = item.texts[0]
 
-  if (onlyOneItem && !answerLocked) {
-    return (
-      <Grid item xs={questionWidth}>
-        <SpaciousTypography variant="h6">
-          {item.multi
-            ? multipleChoiceLabels.chooseAllSuitableOptionsLabel
-            : multipleChoiceLabels.selectCorrectAnswerLabel}
-        </SpaciousTypography>
-      </Grid>
-    )
-  } else if (onlyOneItem) {
-    return <></>
-  }
-
   return (
-    <Grid item xs={questionWidth}>
-      <MarkdownText
-        Component={SpaciousTypography}
-        removeParagraphs
-        variant="subtitle1"
-      >
-        {title}
-      </MarkdownText>
+    <ItemInformationGridItem item xs={questionWidth}>
+      {title && (
+        <MarkdownText
+          Component={SpaciousTypography}
+          removeParagraphs
+          variant="subtitle1"
+        >
+          {title}
+        </MarkdownText>
+      )}
 
       {body && <MarkdownText>{body}</MarkdownText>}
 
-      {!answerLocked && item.multi && (
-        <Typography variant="subtitle1">
-          {multipleChoiceLabels.chooseAllSuitableOptionsLabel}
-        </Typography>
+      {selectOptionsLabel && (
+        <SelectOptionsLabelTypography variant="subtitle1">
+          {selectOptionsLabel}
+        </SelectOptionsLabelTypography>
       )}
-    </Grid>
+    </ItemInformationGridItem>
   )
 }
+
+const ItemInformationGridItem = styled(Grid)`
+  text-align: center;
+`
+
+const SelectOptionsLabelTypography = styled(Typography)`
+  color: 6b6b6b;
+`
 
 type OptionProps = {
   option: QuizItemOption
