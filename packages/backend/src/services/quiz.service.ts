@@ -15,6 +15,7 @@ import {
 } from "../models"
 import { IQuizQuery } from "../types"
 import quizanswerService from "./quizanswer.service"
+import UserCoursePartStateService from "./usercoursepartstate.service"
 import UserQuizStateService from "./userquizstate.service"
 
 @Service()
@@ -24,6 +25,9 @@ export default class QuizService {
 
   @Inject()
   private userQuizStateService: UserQuizStateService
+
+  @Inject(type => UserCoursePartStateService)
+  private userCoursePartStateService: UserCoursePartStateService
 
   public async getPlainQuizData(quizId: string) {
     const builder = knex({ client: "pg" })
@@ -242,8 +246,13 @@ export default class QuizService {
     return data
   }
 
-  public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
-    const queryBuilder = this.entityManager.createQueryBuilder(Quiz, "quiz")
+  public async getQuizzes(
+    query: IQuizQuery,
+    manager?: EntityManager,
+  ): Promise<Quiz[]> {
+    const entityManager = manager || this.entityManager
+
+    const queryBuilder = entityManager.createQueryBuilder(Quiz, "quiz")
     const { courseId, coursePart, exclude, id, language, stripped } = query
 
     if (language) {
@@ -367,9 +376,9 @@ export default class QuizService {
     return await queryBuilder.getMany()
   }
 
-  public async createQuiz(quiz: Quiz): Promise<Quiz | undefined> {
+  public async saveQuiz(quiz: Quiz): Promise<Quiz | undefined> {
     let oldQuiz: Quiz | undefined
-    let newQuiz: Quiz | undefined
+    let savedQuiz: Quiz | undefined
 
     await this.entityManager.transaction(async manager => {
       if (quiz!.id) {
@@ -397,21 +406,28 @@ export default class QuizService {
           )
         }
 
+        await this.removeOrphans(manager, oldQuiz, quiz)
+
+        // gotta do this here or user course part states update wrong
+        savedQuiz = await manager.save(quiz)
+
         if (validationResult.maxPointsAltered) {
           await this.userQuizStateService.updatePointsForQuiz(
             quiz,
             oldQuiz,
             manager,
           )
+          await this.userCoursePartStateService.batchUpdateUserCoursePartStates(
+            quiz,
+            manager,
+          )
         }
-
-        await this.removeOrphans(manager, oldQuiz, quiz)
+      } else {
+        savedQuiz = await manager.save(quiz)
       }
-
-      newQuiz = await manager.save(quiz)
     })
 
-    return newQuiz
+    return savedQuiz
   }
 
   public async updateQuiz(quiz: Quiz): Promise<Quiz> {

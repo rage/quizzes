@@ -255,16 +255,16 @@ export class QuizController {
   }
 
   @Post("/")
-  public async post(
+  public async saveQuiz(
     @EntityFromBody() quiz: Quiz,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<Quiz> {
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
     }
-    const upsertedQuiz = await this.quizService.createQuiz(quiz)
+    const savedQuiz = await this.quizService.saveQuiz(quiz)
     this.kafkaService.publishCourseQuizzesUpdated(quiz.courseId)
-    return upsertedQuiz
+    return savedQuiz
   }
 
   private async getQuizzes(id: string | null, params: any): Promise<Quiz[]> {

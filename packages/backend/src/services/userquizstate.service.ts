@@ -32,6 +32,18 @@ export default class UserQuizStateService {
       .getOne()
   }
 
+  public async getUserQuizStatesByQuiz(
+    quiz: Quiz,
+    manager?: EntityManager,
+  ): Promise<UserQuizState[]> {
+    const entityManager = manager || this.entityManager
+
+    return await entityManager
+      .createQueryBuilder(UserQuizState, "userQuizState")
+      .where("quiz_id = :quizId", { quizId: quiz.id })
+      .getMany()
+  }
+
   public async createUserQuizState(
     manager: EntityManager,
     userQuizState: UserQuizState,
@@ -148,11 +160,12 @@ export default class UserQuizStateService {
     oldQuiz: Quiz,
     manager: EntityManager,
   ) {
+    const maxPoints = quiz.points
+    const oldMaxPoints = oldQuiz.points
+
     await manager.query(`
       update user_quiz_state
-      set points_awarded = ((points_awarded * ${quiz.points}) / ${
-      oldQuiz.points
-    })
+      set points_awarded = ((points_awarded * ${maxPoints}) / ${oldMaxPoints})
       where quiz_id = '${quiz.id}'
     `)
   }

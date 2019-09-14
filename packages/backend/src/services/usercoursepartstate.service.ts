@@ -21,7 +21,7 @@ export default class UserCoursePartStateService {
   @InjectManager()
   private entityManager: EntityManager
 
-  @Inject()
+  @Inject(type => QuizService)
   private quizService: QuizService
 
   @Inject()
@@ -83,6 +83,32 @@ export default class UserCoursePartStateService {
       )
       return await manager.save(userCoursePartState)
     }
+  }
+
+  // this is sloooooow
+  public async batchUpdateUserCoursePartStates(
+    quiz: Quiz,
+    manager?: EntityManager,
+  ): Promise<UserCoursePartState[]> {
+    const entityManager = manager || this.entityManager
+
+    const userCoursePartStates = await entityManager
+      .createQueryBuilder(UserCoursePartState, "ucps")
+      .where("course_id = :courseId and course_part = :coursePart", {
+        courseId: quiz.courseId,
+        coursePart: quiz.part,
+      })
+      .getMany()
+
+    return await Promise.all(
+      userCoursePartStates.map(async ucps => {
+        const userCoursePartState = await this.calculateProgressData(
+          entityManager,
+          ucps,
+        )
+        return await entityManager.save(userCoursePartState)
+      }),
+    )
   }
 
   public async createUserCoursePartState(
@@ -188,11 +214,14 @@ export default class UserCoursePartStateService {
     manager: EntityManager,
     userCoursePartState: UserCoursePartState,
   ): Promise<UserCoursePartState> {
-    const quizzesInPart = await this.quizService.getQuizzes({
-      courseId: userCoursePartState.courseId,
-      coursePart: userCoursePartState.coursePart,
-      exclude: true,
-    })
+    const quizzesInPart = await this.quizService.getQuizzes(
+      {
+        courseId: userCoursePartState.courseId,
+        coursePart: userCoursePartState.coursePart,
+        exclude: true,
+      },
+      manager,
+    )
 
     let pointsTotal: number = 0
     const quizIds: string[] = quizzesInPart.map(quiz => {
