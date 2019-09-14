@@ -16,9 +16,6 @@ import QuizAnswerService from "./quizanswer.service"
 
 @Service()
 export default class UserQuizStateService {
-  @Inject()
-  private quizAnswerService: QuizAnswerService
-
   @InjectManager()
   private entityManager: EntityManager
 
@@ -144,5 +141,19 @@ export default class UserQuizStateService {
       .andWhere("quiz_answer.status = 'confirmed'")
       .orderBy("quiz_answer.updated_at", "DESC")
       .getMany()
+  }
+
+  public async updatePointsForQuiz(
+    quiz: Quiz,
+    oldQuiz: Quiz,
+    manager: EntityManager,
+  ) {
+    await manager.query(`
+      update user_quiz_state
+      set points_awarded = ((points_awarded * ${quiz.points}) / ${
+      oldQuiz.points
+    })
+      where quiz_id = '${quiz.id}'
+    `)
   }
 }

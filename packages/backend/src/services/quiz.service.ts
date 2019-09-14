@@ -15,11 +15,15 @@ import {
 } from "../models"
 import { IQuizQuery } from "../types"
 import quizanswerService from "./quizanswer.service"
+import UserQuizStateService from "./userquizstate.service"
 
 @Service()
 export default class QuizService {
   @InjectManager()
   private entityManager: EntityManager
+
+  @Inject()
+  private userQuizStateService: UserQuizStateService
 
   public async getPlainQuizData(quizId: string) {
     const builder = knex({ client: "pg" })
@@ -367,9 +371,9 @@ export default class QuizService {
     let oldQuiz: Quiz | undefined
     let newQuiz: Quiz | undefined
 
-    await this.entityManager.transaction(async entityManager => {
+    await this.entityManager.transaction(async manager => {
       if (quiz!.id) {
-        oldQuiz = await entityManager.findOne(Quiz, { id: quiz.id })
+        oldQuiz = await manager.findOne(Quiz, { id: quiz.id })
 
         const oldQuizItems = await this.entityManager
           .createQueryBuilder(QuizItem, "item")
@@ -381,19 +385,30 @@ export default class QuizService {
           .getMany()
 
         oldQuiz.items = oldQuizItems
+
         const validationResult = this.validateModificationOfExistingQuiz(
           quiz,
           oldQuiz,
         )
-        if (validationResult.error) {
+
+        if (validationResult.badWordLimit) {
           throw new BadRequestError(
             "New quiz cannot contain stricter limits on essays",
           )
         }
-        await this.removeOrphans(entityManager, oldQuiz, quiz)
+
+        if (validationResult.maxPointsAltered) {
+          await this.userQuizStateService.updatePointsForQuiz(
+            quiz,
+            oldQuiz,
+            manager,
+          )
+        }
+
+        await this.removeOrphans(manager, oldQuiz, quiz)
       }
 
-      newQuiz = await entityManager.save(quiz)
+      newQuiz = await manager.save(quiz)
     })
 
     return newQuiz
@@ -539,7 +554,7 @@ export default class QuizService {
   }
 
   private validateModificationOfExistingQuiz(quiz: Quiz, oldQuiz: Quiz) {
-    const stricter = oldQuiz.items.some(qi => {
+    const badWordLimit = oldQuiz.items.some(qi => {
       if (qi.type !== "essay") {
         return false
       }
@@ -557,6 +572,11 @@ export default class QuizService {
       return false
     })
 
-    return stricter ? { error: "new quiz contains stricter quiz item" } : {}
+    const maxPointsAltered = quiz.points !== oldQuiz.points
+
+    return {
+      badWordLimit,
+      maxPointsAltered,
+    }
   }
 }
