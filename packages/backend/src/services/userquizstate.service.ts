@@ -158,12 +158,14 @@ export default class UserQuizStateService {
   public async updatePointsForQuiz(
     quiz: Quiz,
     oldQuiz: Quiz,
-    manager: EntityManager,
+    manager?: EntityManager,
   ) {
+    const entityManager = manager || this.entityManager
+
     const maxPoints = quiz.points
     const oldMaxPoints = oldQuiz.points
 
-    await manager.query(`
+    await entityManager.query(`
       update user_quiz_state
       set points_awarded = ((points_awarded * ${maxPoints}) / ${oldMaxPoints})
       where quiz_id = '${quiz.id}'

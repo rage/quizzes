@@ -419,6 +419,7 @@ export default class QuizService {
           )
           await this.userCoursePartStateService.batchUpdateUserCoursePartStates(
             quiz,
+            oldQuiz,
             manager,
           )
         }

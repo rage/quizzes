@@ -85,30 +85,35 @@ export default class UserCoursePartStateService {
     }
   }
 
-  // this is sloooooow
   public async batchUpdateUserCoursePartStates(
     quiz: Quiz,
+    oldQuiz: Quiz,
     manager?: EntityManager,
-  ): Promise<UserCoursePartState[]> {
+  ) {
     const entityManager = manager || this.entityManager
 
-    const userCoursePartStates = await entityManager
-      .createQueryBuilder(UserCoursePartState, "ucps")
-      .where("course_id = :courseId and course_part = :coursePart", {
-        courseId: quiz.courseId,
-        coursePart: quiz.part,
-      })
-      .getMany()
+    const maxPoints = quiz.points
+    const oldMaxPoints = oldQuiz.points
 
-    return await Promise.all(
-      userCoursePartStates.map(async ucps => {
-        const userCoursePartState = await this.calculateProgressData(
-          entityManager,
-          ucps,
-        )
-        return await entityManager.save(userCoursePartState)
-      }),
-    )
+    await entityManager.query(`
+      update user_course_part_state ucps
+      set progress
+            = (score - old_points_awarded + points_awarded) / (score / progress - ${oldMaxPoints} + ${maxPoints}),
+          score
+            = score - old_points_awarded + points_awarded
+      from (
+            select
+              user_id,
+              coalesce(points_awarded, 0) as points_awarded,
+              ((coalesce(points_awarded, 0) * ${oldMaxPoints}) / ${maxPoints}) as old_points_awarded
+            from user_quiz_state
+            where quiz_id = '${quiz.id}'
+            ) uqs
+      where ucps.user_id = uqs.user_id
+      and course_id = '${quiz.courseId}'
+      and course_part = ${quiz.part}
+      and score > 0
+    `)
   }
 
   public async createUserCoursePartState(
