@@ -1,3 +1,4 @@
+import Knex from "knex"
 import { Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
@@ -26,6 +27,8 @@ export default class UserCoursePartStateService {
 
   @Inject()
   private userQuizStateService: UserQuizStateService
+
+  private knex = Knex({ client: "pg" })
 
   public async getUserCoursePartState(
     userId: number,
@@ -95,25 +98,38 @@ export default class UserCoursePartStateService {
     const maxPoints = quiz.points
     const oldMaxPoints = oldQuiz.points
 
-    await entityManager.query(`
-      update user_course_part_state ucps
-      set progress
-            = (score - old_points_awarded + points_awarded) / (score / progress - ${oldMaxPoints} + ${maxPoints}),
-          score
-            = score - old_points_awarded + points_awarded
-      from (
-            select
-              user_id,
-              coalesce(points_awarded, 0) as points_awarded,
-              ((coalesce(points_awarded, 0) * ${oldMaxPoints}) / ${maxPoints}) as old_points_awarded
-            from user_quiz_state
-            where quiz_id = '${quiz.id}'
-            ) uqs
-      where ucps.user_id = uqs.user_id
-      and course_id = '${quiz.courseId}'
-      and course_part = ${quiz.part}
-      and score > 0
-    `)
+    const query = this.knex.raw(
+      `
+          update user_course_part_state ucps
+          set progress
+                = (score - old_points_awarded + points_awarded) / (score / progress - :oldMaxPoints + :maxPoints),
+              score
+                = score - old_points_awarded + points_awarded
+          from (
+                select
+                  user_id,
+                  coalesce(points_awarded, 0) as points_awarded,
+                  ((coalesce(points_awarded, 0) * :oldMaxPoints) / :maxPoints) as old_points_awarded
+                from user_quiz_state
+                where quiz_id = :quizId
+                ) uqs
+          where ucps.user_id = uqs.user_id
+          and course_id = :courseId
+          and course_part = :part
+          and score > 0
+      `,
+      {
+        maxPoints,
+        oldMaxPoints,
+        quizId: quiz.id,
+        courseId: quiz.courseId,
+        part: quiz.part,
+      },
+    )
+
+    console.log(query.toString())
+
+    await entityManager.query(query.toString())
   }
 
   public async createUserCoursePartState(

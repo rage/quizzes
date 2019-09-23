@@ -1,4 +1,4 @@
-import knex from "knex"
+import Knex from "knex"
 import { Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
@@ -15,10 +15,18 @@ import {
 import { IQuizAnswerQuery } from "../types"
 import { WhereBuilder } from "../util/index"
 
+// tslint:disable-next-line:max-line-length
+// import PlainObjectToDatabaseEntityTransformer from "../../../../node_modules/typeorm/query-builder/transformer/PlainObjectToDatabaseEntityTransformer"
+
+// tslint:disable-next-line:max-line-length
+import { PlainObjectToDatabaseEntityTransformer } from "typeorm/query-builder/transformer/PlainObjectToDatabaseEntityTransformer"
+
 @Service()
 export default class QuizAnswerService {
   @InjectManager()
   private entityManager: EntityManager
+
+  private knex = Knex({ client: "pg" })
 
   public async createQuizAnswer(
     manager: EntityManager,
@@ -93,6 +101,51 @@ export default class QuizAnswerService {
     return result
   }
 
+  public async getLatestAnswersForQuiz(quiz: Quiz, manager?: EntityManager) {
+    const entityManager = manager || this.entityManager
+
+    const latest = this.knex
+      .select("id")
+      .select(
+        this.knex.raw(
+          "row_number() over(partition by user_id, quiz_id order by created_at desc) rn",
+        ),
+      )
+      .from("quiz_answer")
+      .where({ quiz_id: quiz.id })
+      .as("latest")
+
+    const query = this.knex
+      .select("id")
+      .from(latest)
+      .where("rn", 1)
+
+    const result = await entityManager.query(query.toString())
+
+    const ids = result.map((qa: any) => qa.id)
+
+    return await entityManager
+      .createQueryBuilder(QuizAnswer, "quiz_answer")
+      .where("quiz_answer.id in (:...ids)", { ids })
+      .getMany()
+  }
+
+  public async getUsersForCourse(courseId: string) {
+    const courseQuizzes = this.knex
+      .select("id")
+      .from("quiz")
+      .where({ course_id: courseId })
+
+    const query = this.knex
+      .distinct("user_id")
+      .from("quiz_answer")
+      .where("quiz_id", "in", courseQuizzes)
+
+    return (await this.entityManager.query(query.toString())).map(
+      (qa: any) => qa.user_id,
+    )
+  }
+
   public async getAnswersCount(query: IQuizAnswerQuery): Promise<any> {
     const someQuery = await this.constructGetAnswersQuery(query)
 
@@ -124,7 +177,7 @@ export default class QuizAnswerService {
       return {}
     }
 
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     const query = builder("quiz_answer")
       .select(
@@ -161,7 +214,7 @@ export default class QuizAnswerService {
   }
 
   public async getPlainItemAnswers(quizId: string): Promise<any> {
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     const query = builder("quiz_item")
       .where("quiz_item.quiz_id", quizId)
@@ -190,7 +243,7 @@ export default class QuizAnswerService {
   }
 
   public async getPlainOptionAnswers(quizId: string): Promise<any> {
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     const query = builder("quiz_item")
       .where("quiz_item.quiz_id", quizId)
@@ -227,7 +280,7 @@ export default class QuizAnswerService {
       .where("quiz_id = :id", { id: quizId })
       .getRawMany()).map(value => value.quiz_item_type)
 
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     let query = builder("quiz_answer")
       .select({ answer_id: "quiz_answer.id" }, "quiz_answer.user_id", "status")

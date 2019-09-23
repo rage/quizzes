@@ -1,3 +1,4 @@
+import Knex from "knex"
 import { Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
@@ -18,6 +19,8 @@ import QuizAnswerService from "./quizanswer.service"
 export default class UserQuizStateService {
   @InjectManager()
   private entityManager: EntityManager
+
+  private knex = Knex({ client: "pg" })
 
   public async getUserQuizState(
     userId: number,
@@ -165,10 +168,15 @@ export default class UserQuizStateService {
     const maxPoints = quiz.points
     const oldMaxPoints = oldQuiz.points
 
-    await entityManager.query(`
-      update user_quiz_state
-      set points_awarded = ((points_awarded * ${maxPoints}) / ${oldMaxPoints})
-      where quiz_id = '${quiz.id}'
-    `)
+    const query = this.knex("user_quiz_state")
+      .update({
+        points_awarded: this.knex.raw(
+          "(points_awarded * :maxPoints / :oldMaxPoints)",
+          { maxPoints, oldMaxPoints },
+        ),
+      })
+      .where({ quiz_id: quiz.id })
+
+    await entityManager.query(query.toString())
   }
 }

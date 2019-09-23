@@ -13,8 +13,10 @@ import {
   QuizOption,
   QuizTranslation,
 } from "../models"
-import { IQuizQuery } from "../types"
-import quizanswerService from "./quizanswer.service"
+import { IQuizQuery, QuizValidation } from "../types"
+
+import KafkaService from "./kafka.service"
+import QuizAnswerService from "./quizanswer.service"
 import UserCoursePartStateService from "./usercoursepartstate.service"
 import UserQuizStateService from "./userquizstate.service"
 
@@ -28,6 +30,9 @@ export default class QuizService {
 
   @Inject(type => UserCoursePartStateService)
   private userCoursePartStateService: UserCoursePartStateService
+
+  @Inject(type => KafkaService)
+  private kafkaService: KafkaService
 
   public async getPlainQuizData(quizId: string) {
     const builder = knex({ client: "pg" })
@@ -379,12 +384,13 @@ export default class QuizService {
   public async saveQuiz(quiz: Quiz): Promise<Quiz | undefined> {
     let oldQuiz: Quiz | undefined
     let savedQuiz: Quiz | undefined
+    let validationResult: QuizValidation | undefined
 
     await this.entityManager.transaction(async manager => {
       if (quiz!.id) {
         oldQuiz = await manager.findOne(Quiz, { id: quiz.id })
 
-        const oldQuizItems = await this.entityManager
+        const oldQuizItems = await manager
           .createQueryBuilder(QuizItem, "item")
           .addSelect("item.minWords")
           .addSelect("item.maxWords")
@@ -395,7 +401,7 @@ export default class QuizService {
 
         oldQuiz.items = oldQuizItems
 
-        const validationResult = this.validateModificationOfExistingQuiz(
+        validationResult = this.validateModificationOfExistingQuiz(
           quiz,
           oldQuiz,
         )
@@ -407,9 +413,6 @@ export default class QuizService {
         }
 
         await this.removeOrphans(manager, oldQuiz, quiz)
-
-        // gotta do this here or user course part states update wrong
-        savedQuiz = await manager.save(quiz)
 
         if (validationResult.maxPointsAltered) {
           await this.userQuizStateService.updatePointsForQuiz(
@@ -423,10 +426,15 @@ export default class QuizService {
             manager,
           )
         }
-      } else {
-        savedQuiz = await manager.save(quiz)
       }
+
+      savedQuiz = await manager.save(quiz)
     })
+
+    if (validationResult!.maxPointsAltered) {
+      this.kafkaService.batchPublishQuizAnswerUpdated(savedQuiz)
+      this.kafkaService.batchpublishUserProgressUpdated(quiz)
+    }
 
     return savedQuiz
   }
@@ -570,7 +578,10 @@ export default class QuizService {
     }
   }
 
-  private validateModificationOfExistingQuiz(quiz: Quiz, oldQuiz: Quiz) {
+  private validateModificationOfExistingQuiz(
+    quiz: Quiz,
+    oldQuiz: Quiz,
+  ): QuizValidation {
     const badWordLimit = oldQuiz.items.some(qi => {
       if (qi.type !== "essay") {
         return false

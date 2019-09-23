@@ -9,15 +9,23 @@ import {
   QuizMessage,
 } from "../types"
 import QuizService from "./quiz.service"
+import QuizAnswerService from "./quizanswer.service"
 import UserCoursePartStateService from "./usercoursepartstate.service"
+import UserQuizStateService from "./userquizstate.service"
 
 // tslint:disable-next-line:no-var-requires
 const Kafka = require("node-rdkafka")
 
 @Service()
 export default class KafkaService {
-  @Inject()
+  @Inject(type => QuizService)
   private quizService: QuizService
+
+  @Inject()
+  private quizAnswerService: QuizAnswerService
+
+  @Inject()
+  private userQuizStateService: UserQuizStateService
 
   @Inject()
   private userCoursePartStateService: UserCoursePartStateService
@@ -73,6 +81,12 @@ export default class KafkaService {
     this.progressStream.write(Buffer.from(JSON.stringify(message)))
   }
 
+  public async batchpublishUserProgressUpdated(quiz: Quiz) {
+    const userIds = await this.quizAnswerService.getUsersForCourse(
+      quiz.courseId,
+    )
+  }
+
   public async publishQuizAnswerUpdated(
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
@@ -104,6 +118,29 @@ export default class KafkaService {
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
     }
     this.userPointsStream.write(Buffer.from(JSON.stringify(message)))
+  }
+
+  public async batchPublishQuizAnswerUpdated(quiz: Quiz) {
+    const quizAnswers = await this.quizAnswerService.getLatestAnswersForQuiz(
+      quiz,
+    )
+    const userQuizStates = await this.userQuizStateService.getUserQuizStatesByQuiz(
+      quiz,
+    )
+    const userQuizStateByUser: { [userId: number]: UserQuizState } = {}
+    userQuizStates.forEach(uqs => {
+      userQuizStateByUser[uqs.userId] = uqs
+    })
+
+    await Promise.all(
+      quizAnswers.map(async quizAnswer => {
+        await this.publishQuizAnswerUpdated(
+          quizAnswer,
+          userQuizStateByUser[quizAnswer.userId],
+          quiz,
+        )
+      }),
+    )
   }
 
   public async publishCourseQuizzesUpdated(courseId: string) {
