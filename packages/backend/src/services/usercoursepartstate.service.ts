@@ -95,39 +95,53 @@ export default class UserCoursePartStateService {
   ) {
     const entityManager = manager || this.entityManager
 
-    const maxPoints = quiz.points
-    const oldMaxPoints = oldQuiz.points
-
     const query = this.knex.raw(
       `
-          update user_course_part_state ucps
-          set progress
-                = (score - old_points_awarded + points_awarded) / (score / progress - :oldMaxPoints + :maxPoints),
-              score
-                = score - old_points_awarded + points_awarded
-          from (
-                select
-                  user_id,
-                  coalesce(points_awarded, 0) as points_awarded,
-                  ((coalesce(points_awarded, 0) * :oldMaxPoints) / :maxPoints) as old_points_awarded
-                from user_quiz_state
-                where quiz_id = :quizId
-                ) uqs
-          where ucps.user_id = uqs.user_id
-          and course_id = :courseId
-          and course_part = :part
-          and score > 0
+      update user_course_part_state ucps
+      set
+        progress = data.points / data.max_points,
+        score = data.points
+      from (
+        select
+          points.course_id,
+          points.user_id,
+          points.part,
+          points.points,
+          max.max_points
+        from (
+          select
+            q.course_id,
+            uqs.user_id,
+            q.part,
+            sum(uqs.points_awarded) points
+          from user_quiz_state uqs
+          join quiz q on uqs.quiz_id = q.id
+          where q.course_id = :courseId
+          and q.excluded_from_score = false
+          and (q.part = :oldPart or q.part = :newPart)
+          group by q.course_id, uqs.user_id, q.part
+        ) points
+        join (
+          select
+            q.part,
+            sum(q.points) max_points
+          from quiz q
+          where q.course_id = :courseId
+          and (q.part = :oldPart or q.part = :newPart)
+          and q.excluded_from_score = false
+          group by q.part
+        ) max on points.part = max.part
+      ) data
+      where ucps.course_id = data.course_id
+      and ucps.user_id = data.user_id
+      and ucps.course_part = data.part
       `,
       {
-        maxPoints,
-        oldMaxPoints,
-        quizId: quiz.id,
         courseId: quiz.courseId,
-        part: quiz.part,
+        oldPart: oldQuiz.part,
+        newPart: quiz.part,
       },
     )
-
-    console.log(query.toString())
 
     await entityManager.query(query.toString())
   }

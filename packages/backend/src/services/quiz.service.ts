@@ -414,6 +414,9 @@ export default class QuizService {
 
         await this.removeOrphans(manager, oldQuiz, quiz)
 
+        // gotta save the quiz here or user course states update wrong
+        savedQuiz = await manager.save(quiz)
+
         if (validationResult.maxPointsAltered) {
           await this.userQuizStateService.updatePointsForQuiz(
             quiz,
@@ -426,9 +429,9 @@ export default class QuizService {
             manager,
           )
         }
+      } else {
+        savedQuiz = await manager.save(quiz)
       }
-
-      savedQuiz = await manager.save(quiz)
     })
 
     if (validationResult!.maxPointsAltered) {
