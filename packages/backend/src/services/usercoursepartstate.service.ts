@@ -88,7 +88,7 @@ export default class UserCoursePartStateService {
     }
   }
 
-  public async batchUpdateUserCoursePartStates(
+  public async updateUserCoursePartStates(
     quiz: Quiz,
     oldQuiz: Quiz,
     manager?: EntityManager,

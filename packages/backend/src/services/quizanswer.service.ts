@@ -130,22 +130,6 @@ export default class QuizAnswerService {
       .getMany()
   }
 
-  public async getUsersForCourse(courseId: string) {
-    const courseQuizzes = this.knex
-      .select("id")
-      .from("quiz")
-      .where({ course_id: courseId })
-
-    const query = this.knex
-      .distinct("user_id")
-      .from("quiz_answer")
-      .where("quiz_id", "in", courseQuizzes)
-
-    return (await this.entityManager.query(query.toString())).map(
-      (qa: any) => qa.user_id,
-    )
-  }
-
   public async getAnswersCount(query: IQuizAnswerQuery): Promise<any> {
     const someQuery = await this.constructGetAnswersQuery(query)
 

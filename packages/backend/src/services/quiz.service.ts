@@ -31,9 +31,6 @@ export default class QuizService {
   @Inject(type => UserCoursePartStateService)
   private userCoursePartStateService: UserCoursePartStateService
 
-  @Inject(type => KafkaService)
-  private kafkaService: KafkaService
-
   public async getPlainQuizData(quizId: string) {
     const builder = knex({ client: "pg" })
 
@@ -384,7 +381,6 @@ export default class QuizService {
   public async saveQuiz(quiz: Quiz): Promise<Quiz | undefined> {
     let oldQuiz: Quiz | undefined
     let savedQuiz: Quiz | undefined
-    let validationResult: QuizValidation | undefined
 
     await this.entityManager.transaction(async manager => {
       if (quiz!.id) {
@@ -401,7 +397,7 @@ export default class QuizService {
 
         oldQuiz.items = oldQuizItems
 
-        validationResult = this.validateModificationOfExistingQuiz(
+        const validationResult = this.validateModificationOfExistingQuiz(
           quiz,
           oldQuiz,
         )
@@ -423,7 +419,7 @@ export default class QuizService {
             oldQuiz,
             manager,
           )
-          await this.userCoursePartStateService.batchUpdateUserCoursePartStates(
+          await this.userCoursePartStateService.updateUserCoursePartStates(
             quiz,
             oldQuiz,
             manager,
@@ -433,11 +429,6 @@ export default class QuizService {
         savedQuiz = await manager.save(quiz)
       }
     })
-
-    if (validationResult!.maxPointsAltered) {
-      this.kafkaService.batchPublishQuizAnswerUpdated(savedQuiz)
-      this.kafkaService.batchpublishUserProgressUpdated(quiz)
-    }
 
     return savedQuiz
   }
