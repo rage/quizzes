@@ -97,44 +97,39 @@ export default class UserCoursePartStateService {
 
     const query = this.knex.raw(
       `
-      update user_course_part_state ucps
-      set
-        progress = data.points / data.max_points,
-        score = data.points
+      insert into user_course_part_state(user_id, course_id, course_part, progress, score)
+      select
+        points.user_id as user_id,
+        points.course_id as course_id,
+        points.part as course_part,
+        points.points / max.max_points as progress,
+        points.points as score
       from (
         select
-          points.course_id,
-          points.user_id,
-          points.part,
-          points.points,
-          max.max_points
-        from (
-          select
-            q.course_id,
-            uqs.user_id,
-            q.part,
-            sum(uqs.points_awarded) points
-          from user_quiz_state uqs
-          join quiz q on uqs.quiz_id = q.id
-          where q.course_id = :courseId
-          and q.excluded_from_score = false
-          and (q.part = :oldPart or q.part = :newPart)
-          group by q.course_id, uqs.user_id, q.part
-        ) points
-        join (
-          select
-            q.part,
-            sum(q.points) max_points
-          from quiz q
-          where q.course_id = :courseId
-          and (q.part = :oldPart or q.part = :newPart)
-          and q.excluded_from_score = false
-          group by q.part
-        ) max on points.part = max.part
-      ) data
-      where ucps.course_id = data.course_id
-      and ucps.user_id = data.user_id
-      and ucps.course_part = data.part
+          q.course_id,
+          uqs.user_id,
+          q.part,
+          sum(uqs.points_awarded) as points
+        from user_quiz_state uqs
+        join quiz q on uqs.quiz_id = q.id
+        where q.course_id = :courseId
+        and q.excluded_from_score = false
+        and (q.part = :oldPart or q.part = :newPart)
+        group by q.course_id, uqs.user_id, q.part
+      ) as points
+      join (
+        select
+          q.part,
+          sum(q.points) as max_points
+        from quiz q
+        where q.course_id = :courseId
+        and (q.part = :oldPart or q.part = :newPart)
+        and q.excluded_from_score = false
+        group by q.part
+      ) as max on points.part = max.part
+      on conflict (user_id, course_id, course_part)
+      do update
+      set progress = excluded.progress, score = excluded.score
       `,
       {
         courseId: quiz.courseId,

@@ -419,6 +419,12 @@ export default class QuizService {
             oldQuiz,
             manager,
           )
+        }
+
+        if (
+          validationResult.maxPointsAltered ||
+          validationResult.coursePartAltered
+        ) {
           await this.userCoursePartStateService.updateUserCoursePartStates(
             quiz,
             oldQuiz,
@@ -596,9 +602,12 @@ export default class QuizService {
 
     const maxPointsAltered = quiz.points !== oldQuiz.points
 
+    const coursePartAltered = quiz.part !== oldQuiz.part
+
     return {
       badWordLimit,
       maxPointsAltered,
+      coursePartAltered,
     }
   }
 }

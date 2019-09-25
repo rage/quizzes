@@ -238,4 +238,5 @@ export interface ExerciseData {
 export interface QuizValidation {
   badWordLimit: boolean
   maxPointsAltered: boolean
+  coursePartAltered: boolean
 }
