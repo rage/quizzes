@@ -1,4 +1,4 @@
-import knex from "knex"
+import Knex from "knex"
 import _ from "lodash"
 import { BadRequestError } from "routing-controllers"
 import { Inject, Service } from "typedi"
@@ -31,8 +31,10 @@ export default class QuizService {
   @Inject(type => UserCoursePartStateService)
   private userCoursePartStateService: UserCoursePartStateService
 
+  private knex = Knex({ client: "pg" })
+
   public async getPlainQuizData(quizId: string) {
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     let query = builder("quiz")
       .select()
@@ -50,7 +52,7 @@ export default class QuizService {
   }
 
   public async getPlainQuizItems(quizId: string) {
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     let query = builder("quiz_item")
       .where("quiz_item.quiz_id", quizId)
@@ -82,7 +84,7 @@ export default class QuizService {
   }
 
   public async getPlainQuizItemOptions(quizId: string) {
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     let query = builder("quiz_item")
       .where("quiz_item.quiz_id", quizId)
@@ -109,7 +111,7 @@ export default class QuizService {
   }
 
   public async getPlainQuizPeerReviewCollections(quizId: string) {
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
     let query = builder("peer_review_collection")
       .where("peer_review_collection.quiz_id", quizId)
       .select("id")
@@ -124,7 +126,7 @@ export default class QuizService {
   }
 
   public async getPlainQuizPeerReviewQuestions(quizId: string) {
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     let query = builder("peer_review_question")
       .where("peer_review_question.quiz_id", quizId)
@@ -152,7 +154,7 @@ export default class QuizService {
   }
 
   public async getCSVData(quizId: string) {
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     const quiz = (await this.getQuizzes({
       id: quizId,
@@ -376,6 +378,23 @@ export default class QuizService {
       queryBuilder.andWhere("quiz.excluded_from_score = false")
     }
     return await queryBuilder.getMany()
+  }
+
+  public async getCourseParts(
+    courseId: string,
+    manager?: EntityManager,
+  ): Promise<number[]> {
+    const entityManager = manager || this.entityManager
+
+    const query = this.knex
+      .distinct("part")
+      .from("quiz")
+      .where("course_id", courseId)
+      .orderBy("part")
+
+    return (await entityManager.query(query.toString())).map(
+      (q: { [part: string]: number }) => q.part,
+    )
   }
 
   public async saveQuiz(quiz: Quiz): Promise<Quiz | undefined> {
