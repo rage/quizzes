@@ -9,15 +9,23 @@ import {
   QuizMessage,
 } from "../types"
 import QuizService from "./quiz.service"
+import QuizAnswerService from "./quizanswer.service"
 import UserCoursePartStateService from "./usercoursepartstate.service"
+import UserQuizStateService from "./userquizstate.service"
 
 // tslint:disable-next-line:no-var-requires
 const Kafka = require("node-rdkafka")
 
 @Service()
 export default class KafkaService {
-  @Inject()
+  @Inject(type => QuizService)
   private quizService: QuizService
+
+  @Inject()
+  private quizAnswerService: QuizAnswerService
+
+  @Inject()
+  private userQuizStateService: UserQuizStateService
 
   @Inject()
   private userCoursePartStateService: UserCoursePartStateService

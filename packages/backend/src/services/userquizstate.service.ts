@@ -1,3 +1,4 @@
+import Knex from "knex"
 import { Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
@@ -16,11 +17,10 @@ import QuizAnswerService from "./quizanswer.service"
 
 @Service()
 export default class UserQuizStateService {
-  @Inject()
-  private quizAnswerService: QuizAnswerService
-
   @InjectManager()
   private entityManager: EntityManager
+
+  private knex = Knex({ client: "pg" })
 
   public async getUserQuizState(
     userId: number,
@@ -33,6 +33,18 @@ export default class UserQuizStateService {
       .createQueryBuilder(UserQuizState, "userQuizState")
       .where("user_id = :userId and quiz_id = :quizId", { userId, quizId })
       .getOne()
+  }
+
+  public async getUserQuizStatesByQuiz(
+    quiz: Quiz,
+    manager?: EntityManager,
+  ): Promise<UserQuizState[]> {
+    const entityManager = manager || this.entityManager
+
+    return await entityManager
+      .createQueryBuilder(UserQuizState, "userQuizState")
+      .where("quiz_id = :quizId", { quizId: quiz.id })
+      .getMany()
   }
 
   public async createUserQuizState(
@@ -144,5 +156,27 @@ export default class UserQuizStateService {
       .andWhere("quiz_answer.status = 'confirmed'")
       .orderBy("quiz_answer.updated_at", "DESC")
       .getMany()
+  }
+
+  public async updatePointsForQuiz(
+    quiz: Quiz,
+    oldQuiz: Quiz,
+    manager?: EntityManager,
+  ) {
+    const entityManager = manager || this.entityManager
+
+    const maxPoints = quiz.points
+    const oldMaxPoints = oldQuiz.points
+
+    const query = this.knex("user_quiz_state")
+      .update({
+        points_awarded: this.knex.raw(
+          "(points_awarded * :maxPoints / :oldMaxPoints)",
+          { maxPoints, oldMaxPoints },
+        ),
+      })
+      .where({ quiz_id: quiz.id })
+
+    await entityManager.query(query.toString())
   }
 }

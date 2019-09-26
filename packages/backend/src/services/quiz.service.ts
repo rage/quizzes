@@ -13,13 +13,23 @@ import {
   QuizOption,
   QuizTranslation,
 } from "../models"
-import { IQuizQuery } from "../types"
-import quizanswerService from "./quizanswer.service"
+import { IQuizQuery, QuizValidation } from "../types"
+
+import KafkaService from "./kafka.service"
+import QuizAnswerService from "./quizanswer.service"
+import UserCoursePartStateService from "./usercoursepartstate.service"
+import UserQuizStateService from "./userquizstate.service"
 
 @Service()
 export default class QuizService {
   @InjectManager()
   private entityManager: EntityManager
+
+  @Inject()
+  private userQuizStateService: UserQuizStateService
+
+  @Inject(type => UserCoursePartStateService)
+  private userCoursePartStateService: UserCoursePartStateService
 
   public async getPlainQuizData(quizId: string) {
     const builder = knex({ client: "pg" })
@@ -238,8 +248,13 @@ export default class QuizService {
     return data
   }
 
-  public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
-    const queryBuilder = this.entityManager.createQueryBuilder(Quiz, "quiz")
+  public async getQuizzes(
+    query: IQuizQuery,
+    manager?: EntityManager,
+  ): Promise<Quiz[]> {
+    const entityManager = manager || this.entityManager
+
+    const queryBuilder = entityManager.createQueryBuilder(Quiz, "quiz")
     const { courseId, coursePart, exclude, id, language, stripped } = query
 
     if (language) {
@@ -363,15 +378,15 @@ export default class QuizService {
     return await queryBuilder.getMany()
   }
 
-  public async createQuiz(quiz: Quiz): Promise<Quiz | undefined> {
+  public async saveQuiz(quiz: Quiz): Promise<Quiz | undefined> {
     let oldQuiz: Quiz | undefined
-    let newQuiz: Quiz | undefined
+    let savedQuiz: Quiz | undefined
 
-    await this.entityManager.transaction(async entityManager => {
+    await this.entityManager.transaction(async manager => {
       if (quiz!.id) {
-        oldQuiz = await entityManager.findOne(Quiz, { id: quiz.id })
+        oldQuiz = await manager.findOne(Quiz, { id: quiz.id })
 
-        const oldQuizItems = await this.entityManager
+        const oldQuizItems = await manager
           .createQueryBuilder(QuizItem, "item")
           .addSelect("item.minWords")
           .addSelect("item.maxWords")
@@ -381,22 +396,41 @@ export default class QuizService {
           .getMany()
 
         oldQuiz.items = oldQuizItems
+
         const validationResult = this.validateModificationOfExistingQuiz(
           quiz,
           oldQuiz,
         )
-        if (validationResult.error) {
+
+        if (validationResult.badWordLimit) {
           throw new BadRequestError(
             "New quiz cannot contain stricter limits on essays",
           )
         }
-        await this.removeOrphans(entityManager, oldQuiz, quiz)
-      }
 
-      newQuiz = await entityManager.save(quiz)
+        await this.removeOrphans(manager, oldQuiz, quiz)
+
+        // gotta save the quiz here or user course states update wrong
+        savedQuiz = await manager.save(quiz)
+
+        if (validationResult.maxPointsAltered) {
+          await this.userQuizStateService.updatePointsForQuiz(
+            quiz,
+            oldQuiz,
+            manager,
+          )
+          await this.userCoursePartStateService.updateUserCoursePartStates(
+            quiz,
+            oldQuiz,
+            manager,
+          )
+        }
+      } else {
+        savedQuiz = await manager.save(quiz)
+      }
     })
 
-    return newQuiz
+    return savedQuiz
   }
 
   public async updateQuiz(quiz: Quiz): Promise<Quiz> {
@@ -538,8 +572,11 @@ export default class QuizService {
     }
   }
 
-  private validateModificationOfExistingQuiz(quiz: Quiz, oldQuiz: Quiz) {
-    const stricter = oldQuiz.items.some(qi => {
+  private validateModificationOfExistingQuiz(
+    quiz: Quiz,
+    oldQuiz: Quiz,
+  ): QuizValidation {
+    const badWordLimit = oldQuiz.items.some(qi => {
       if (qi.type !== "essay") {
         return false
       }
@@ -557,6 +594,11 @@ export default class QuizService {
       return false
     })
 
-    return stricter ? { error: "new quiz contains stricter quiz item" } : {}
+    const maxPointsAltered = quiz.points !== oldQuiz.points
+
+    return {
+      badWordLimit,
+      maxPointsAltered,
+    }
   }
 }

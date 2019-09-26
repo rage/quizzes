@@ -1,3 +1,4 @@
+import Knex from "knex"
 import { Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
@@ -21,11 +22,13 @@ export default class UserCoursePartStateService {
   @InjectManager()
   private entityManager: EntityManager
 
-  @Inject()
+  @Inject(type => QuizService)
   private quizService: QuizService
 
   @Inject()
   private userQuizStateService: UserQuizStateService
+
+  private knex = Knex({ client: "pg" })
 
   public async getUserCoursePartState(
     userId: number,
@@ -83,6 +86,64 @@ export default class UserCoursePartStateService {
       )
       return await manager.save(userCoursePartState)
     }
+  }
+
+  public async updateUserCoursePartStates(
+    quiz: Quiz,
+    oldQuiz: Quiz,
+    manager?: EntityManager,
+  ) {
+    const entityManager = manager || this.entityManager
+
+    const query = this.knex.raw(
+      `
+      update user_course_part_state ucps
+      set
+        progress = data.points / data.max_points,
+        score = data.points
+      from (
+        select
+          points.course_id,
+          points.user_id,
+          points.part,
+          points.points,
+          max.max_points
+        from (
+          select
+            q.course_id,
+            uqs.user_id,
+            q.part,
+            sum(uqs.points_awarded) points
+          from user_quiz_state uqs
+          join quiz q on uqs.quiz_id = q.id
+          where q.course_id = :courseId
+          and q.excluded_from_score = false
+          and (q.part = :oldPart or q.part = :newPart)
+          group by q.course_id, uqs.user_id, q.part
+        ) points
+        join (
+          select
+            q.part,
+            sum(q.points) max_points
+          from quiz q
+          where q.course_id = :courseId
+          and (q.part = :oldPart or q.part = :newPart)
+          and q.excluded_from_score = false
+          group by q.part
+        ) max on points.part = max.part
+      ) data
+      where ucps.course_id = data.course_id
+      and ucps.user_id = data.user_id
+      and ucps.course_part = data.part
+      `,
+      {
+        courseId: quiz.courseId,
+        oldPart: oldQuiz.part,
+        newPart: quiz.part,
+      },
+    )
+
+    await entityManager.query(query.toString())
   }
 
   public async createUserCoursePartState(
@@ -188,11 +249,14 @@ export default class UserCoursePartStateService {
     manager: EntityManager,
     userCoursePartState: UserCoursePartState,
   ): Promise<UserCoursePartState> {
-    const quizzesInPart = await this.quizService.getQuizzes({
-      courseId: userCoursePartState.courseId,
-      coursePart: userCoursePartState.coursePart,
-      exclude: true,
-    })
+    const quizzesInPart = await this.quizService.getQuizzes(
+      {
+        courseId: userCoursePartState.courseId,
+        coursePart: userCoursePartState.coursePart,
+        exclude: true,
+      },
+      manager,
+    )
 
     let pointsTotal: number = 0
     const quizIds: string[] = quizzesInPart.map(quiz => {

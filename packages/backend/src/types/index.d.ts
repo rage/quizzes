@@ -234,3 +234,8 @@ export interface ExerciseData {
   max_points: number
   deleted: boolean
 }
+
+export interface QuizValidation {
+  badWordLimit: boolean
+  maxPointsAltered: boolean
+}
