@@ -26,7 +26,8 @@
     "db-migrate": "node --max-old-space-size=16384 dist/migration/src/index.js",
     "start-dashboard": "cd packages/dashboard && yarn start",
     "create-user-quiz-states": "node --max-old-space-size=2048 dist/backend/src/scripts/create_user_quiz_states.js",
-    "create-user-quiz-states-cron": "node --max-old-space-size=2048 dist/backend/src/scripts/create_user_quiz_states.js cron"
+    "create-user-quiz-states-cron": "node --max-old-space-size=2048 dist/backend/src/scripts/create_user_quiz_states.js cron",
+    "kafka-batch-publish": "node --max-old-space-size=2048 dist/backend/src/scripts/kafka_batch_publisher.js"
   },
   "dependencies": {
     "@types/express-graphql": "^0.6.1",
