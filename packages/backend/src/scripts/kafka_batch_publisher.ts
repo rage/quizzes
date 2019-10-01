@@ -44,11 +44,11 @@ const publish = async () => {
         await recalculateProgress(course_id)
       }
 
-      const quizzes = await publishQuizzes(course_id)
+      const quizzes = await publishQuizzes(course)
 
-      await publishAnswers(course_id)
+      await publishAnswers(course)
 
-      await publishProgress(course_id, quizzes)
+      await publishProgress(course, quizzes)
     }
   }
 
