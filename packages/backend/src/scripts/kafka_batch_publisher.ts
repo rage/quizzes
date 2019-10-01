@@ -25,7 +25,7 @@ const knex = Knex({
 })
 
 const producer = new Kafka.Producer({
-  "metadata.broker.list": "localhost:9092",
+  "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
   dr_cb: true,
 })
 
