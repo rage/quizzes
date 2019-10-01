@@ -37,7 +37,7 @@ const publish = async () => {
   for (task of tasks) {
     const { course_id, recalculate_progress } = task
 
-    const course = (await knex("course").where("id", course_id))[0]
+    const course = (await knex<ICourse>("course").where("id", course_id))[0]
 
     if (course_id) {
       if (recalculate_progress) {
@@ -121,10 +121,10 @@ const recalculateProgress = async (courseId: string) => {
   )
 }
 
-const publishQuizzes = async (course: any): Promise<any[]> => {
+const publishQuizzes = async (course: ICourse): Promise<IQuiz[]> => {
   const courseId = course.id
 
-  const quizzes = await knex("quiz")
+  const quizzes = await knex<IQuiz>("quiz")
     .join("quiz_translation", { "quiz.id": "quiz_translation.quiz_id" })
     .where({
       course_id: courseId,
@@ -157,7 +157,7 @@ const publishQuizzes = async (course: any): Promise<any[]> => {
   return quizzes
 }
 
-const publishAnswers = async (course: any) => {
+const publishAnswers = async (course: ICourse) => {
   const courseId = course.id
 
   const distinctTypes = knex("quiz")
@@ -237,7 +237,7 @@ const publishAnswers = async (course: any) => {
   }
 }
 
-const publishProgress = async (course: any, quizzes: any[]) => {
+const publishProgress = async (course: ICourse, quizzes: any[]) => {
   const courseId = course.id
 
   const maxPointsByPart: { [part: number]: number } = {}
@@ -312,6 +312,33 @@ interface IUserCoursePartState {
   completed: boolean
   created_at: Date
   updated_at: Date
+}
+
+interface ICourse {
+  id: string
+  moocfi_id: string
+  min_score_to_pass: number
+  min_progress_to_pass: number
+  min_peer_reviews_received: number
+  min_peer_reviews_given: number
+  min_review_average: number
+  max_spam_flags: number
+  organization: any
+}
+
+interface IQuiz {
+  id: string
+  course_id: string
+  part: number
+  section: number
+  points: number
+  tries: number
+  tries_limited: boolean
+  deadline: Date
+  open: Date
+  auto_confirm: boolean
+  excluded_from_score: boolean
+  grantPointsPolicy: any
 }
 
 producer.on("ready", publish)
