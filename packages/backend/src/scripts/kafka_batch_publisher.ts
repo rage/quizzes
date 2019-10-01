@@ -39,16 +39,18 @@ const publish = async () => {
   for (task of tasks) {
     const { course_id, recalculate_progress } = task
 
+    const course = (await knex<ICourse>("course").where("id", course_id))[0]
+
     if (course_id) {
       if (recalculate_progress) {
         await recalculateProgress(course_id)
       }
 
-      const quizzes = await publishQuizzes(course_id)
+      const quizzes = await publishQuizzes(course)
 
-      await publishAnswers(course_id)
+      await publishAnswers(course)
 
-      await publishProgress(course_id, quizzes)
+      await publishProgress(course, quizzes)
     }
   }
 
@@ -121,8 +123,10 @@ const recalculateProgress = async (courseId: string) => {
   )
 }
 
-const publishQuizzes = async (courseId: string): Promise<any[]> => {
-  const quizzes = await knex("quiz")
+const publishQuizzes = async (course: ICourse): Promise<IQuiz[]> => {
+  const courseId = course.id
+
+  const quizzes = await knex<IQuiz>("quiz")
     .join("quiz_translation", { "quiz.id": "quiz_translation.quiz_id" })
     .where({
       course_id: courseId,
@@ -143,7 +147,7 @@ const publishQuizzes = async (courseId: string): Promise<any[]> => {
 
   const message: QuizMessage = {
     timestamp: new Date().toISOString(),
-    course_id: courseId,
+    course_id: course.moocfi_id,
     service_id: process.env.SERVICE_ID,
     data,
     message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
@@ -155,7 +159,9 @@ const publishQuizzes = async (courseId: string): Promise<any[]> => {
   return quizzes
 }
 
-const publishAnswers = async (courseId: string) => {
+const publishAnswers = async (course: ICourse) => {
+  const courseId = course.id
+
   const distinctTypes = knex("quiz")
     .select([
       "quiz.id",
@@ -200,8 +206,6 @@ const publishAnswers = async (courseId: string) => {
         .where("rn", 1),
     )
 
-  const course = (await knex("course").where("id", courseId))[0]
-
   let answer
 
   for (answer of answers) {
@@ -224,7 +228,7 @@ const publishAnswers = async (courseId: string) => {
       n_points: answer.excluded_from_score ? 0 : answer.points_awarded || 0,
       completed: answer.status === "confirmed",
       user_id: answer.user_id,
-      course_id: courseId,
+      course_id: course.moocfi_id,
       service_id: process.env.SERVICE_ID,
       required_actions: messages,
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
@@ -235,7 +239,9 @@ const publishAnswers = async (courseId: string) => {
   }
 }
 
-const publishProgress = async (courseId: string, quizzes: any[]) => {
+const publishProgress = async (course: ICourse, quizzes: any[]) => {
+  const courseId = course.id
+
   const maxPointsByPart: { [part: number]: number } = {}
 
   quizzes.forEach(({ part, points }) =>
@@ -277,7 +283,7 @@ const publishProgress = async (courseId: string, quizzes: any[]) => {
     const message: ProgressMessage = {
       timestamp: new Date().toISOString(),
       user_id: group[0].user_id,
-      course_id: group[0].course_id,
+      course_id: course.moocfi_id,
       service_id: process.env.SERVICE_ID,
       progress,
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
@@ -308,6 +314,33 @@ interface IUserCoursePartState {
   completed: boolean
   created_at: Date
   updated_at: Date
+}
+
+interface ICourse {
+  id: string
+  moocfi_id: string
+  min_score_to_pass: number
+  min_progress_to_pass: number
+  min_peer_reviews_received: number
+  min_peer_reviews_given: number
+  min_review_average: number
+  max_spam_flags: number
+  organization: any
+}
+
+interface IQuiz {
+  id: string
+  course_id: string
+  part: number
+  section: number
+  points: number
+  tries: number
+  tries_limited: boolean
+  deadline: Date
+  open: Date
+  auto_confirm: boolean
+  excluded_from_score: boolean
+  grantPointsPolicy: any
 }
 
 producer.on("ready", publish)

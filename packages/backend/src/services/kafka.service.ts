@@ -1,6 +1,6 @@
 import { Inject, Service } from "typedi"
 import { EntityManager } from "typeorm"
-import { Quiz, QuizAnswer, UserQuizState } from "../models"
+import { Course, Quiz, QuizAnswer, UserQuizState } from "../models"
 import {
   ExerciseData,
   PointsByGroup,
@@ -65,6 +65,11 @@ export default class KafkaService {
     userId: number,
     courseId: string,
   ) {
+    const course = await manager
+      .createQueryBuilder(Course, "course")
+      .where("course.id = :courseId", { courseId })
+      .getOne()
+
     const progress: PointsByGroup[] = await this.userCoursePartStateService.getProgress(
       manager,
       userId,
@@ -73,7 +78,7 @@ export default class KafkaService {
     const message: ProgressMessage = {
       timestamp: new Date().toISOString(),
       user_id: userId,
-      course_id: courseId,
+      course_id: course.moocfiId,
       service_id: process.env.SERVICE_ID,
       progress,
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
@@ -106,7 +111,7 @@ export default class KafkaService {
       n_points: quiz.excludedFromScore ? 0 : userQuizState.pointsAwarded,
       completed: quizAnswer.status === "confirmed",
       user_id: quizAnswer.userId,
-      course_id: quiz.courseId,
+      course_id: course.moocfiId,
       service_id: process.env.SERVICE_ID,
       required_actions: messages,
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
@@ -115,7 +120,12 @@ export default class KafkaService {
   }
 
   public async publishCourseQuizzesUpdated(courseId: string) {
-    const quizzes: Quiz[] = await this.quizService.getQuizzes({ courseId })
+    const quizzes: Quiz[] = await this.quizService.getQuizzes({
+      courseId,
+      course: true,
+    })
+
+    const course = quizzes[0].course
 
     const data: ExerciseData[] = quizzes.map(quiz => {
       return {
@@ -130,7 +140,7 @@ export default class KafkaService {
 
     const message: QuizMessage = {
       timestamp: new Date().toISOString(),
-      course_id: courseId,
+      course_id: course.moocfiId,
       service_id: process.env.SERVICE_ID,
       data,
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
