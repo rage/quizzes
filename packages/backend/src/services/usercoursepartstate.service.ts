@@ -182,10 +182,6 @@ export default class UserCoursePartStateService {
     courseId: string,
     userId: number,
   ): Promise<UserCoursePartState[]> {
-    const quizzes: Quiz[] = await this.quizService.getQuizzes({
-      courseId,
-      exclude: true,
-    })
     const parts = await this.quizService.getCourseParts(courseId, manager)
 
     const userCoursePartStates: UserCoursePartState[] = []
