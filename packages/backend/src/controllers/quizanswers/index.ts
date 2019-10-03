@@ -383,7 +383,7 @@ export class QuizAnswerController {
           userQuizState.userId,
         )
 
-        this.kafkaService.publishUserProgressUpdated(
+        await this.kafkaService.publishUserProgressUpdated(
           manager,
           userId,
           quiz.courseId,
