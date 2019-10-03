@@ -32,7 +32,7 @@ const producer = new Kafka.Producer({
   dr_cb: false,
 })
 
-const flush = promisify(producer.flush)
+const flush = promisify(producer.flush.bind(producer))
 
 const publish = async () => {
   console.time("done in")
