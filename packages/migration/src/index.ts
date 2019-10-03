@@ -50,48 +50,60 @@ async function main() {
 
   const latest = migrations[0].date.toISOString()
 
-  /*logger.info(`Fetching from quiznator: data added since ${latest}`)
-  const response = await axios.get(
-    `http://quiznator.mooc.fi/api/v1/migration/${encodeURIComponent(latest)}`,
-    // `http://127.0.0.1:3000/api/v1/migration/${encodeURIComponent(latest)}`,
-    { headers: { authorization: `Bearer ${process.env.TMC_TOKEN}` } },
-  )*/
+  let data: { [key: string]: any[] }
 
-  logger.info("Connecting to MongoDB")
-  await mongoUtils.connect(
-    process.env.MONGO_URI || "mongodb://localhost:27017/test", // quiznator
-  )
+  if (process.argv.includes("local_db")) {
+    logger.info(`Fetching from local database: data added since ${latest}`)
+    logger.info("Connecting to MongoDB")
+    await mongoUtils.connect(
+      process.env.MONGO_URI || "mongodb://localhost:27017/test", // quiznator
+    )
 
-  const data: { [key: string]: any[] } = {
-    quizzes: await QNQuiz.find({
-      type: {
-        $in: [
-          oldQuizTypes.ESSAY,
-          oldQuizTypes.OPEN,
-          oldQuizTypes.SCALE,
-          oldQuizTypes.CHECKBOX,
-          oldQuizTypes.MULTIPLE_OPEN,
-          oldQuizTypes.MULTIPLE_CHOICE,
-          oldQuizTypes.RADIO_MATRIX,
-          oldQuizTypes.PRIVACY_AGREEMENT,
-        ],
-      },
-      $or: [{ createdAt: { $gte: latest } }, { updatedAt: { $gte: latest } }],
-    }),
-    peerReviewQuizzes: await QNQuiz.find({
-      type: { $in: [oldQuizTypes.PEER_REVIEW] },
-      $or: [{ createdAt: { $gte: latest } }, { updatedAt: { $gte: latest } }],
-    }),
-    peerReviews: await QNPeerReview.find({
-      $or: [{ createdAt: { $gte: latest } }, { updatedAt: { $gte: latest } }],
-    }),
-    usernames: await QNQuizAnswer.distinct("answererId", {
-      $or: [{ createdAt: { $gte: latest } }, { updatedAt: { $gte: latest } }],
-    }),
-    quizAnswers: await QNQuizAnswer.find({
-      $or: [{ createdAt: { $gte: latest } }, { updatedAt: { $gte: latest } }],
-    }),
-    spamFlags: await QNSpamFlag.find({}),
+    data = {
+      quizzes: await QNQuiz.find({
+        type: {
+          $in: [
+            oldQuizTypes.ESSAY,
+            oldQuizTypes.OPEN,
+            oldQuizTypes.SCALE,
+            oldQuizTypes.CHECKBOX,
+            oldQuizTypes.MULTIPLE_OPEN,
+            oldQuizTypes.MULTIPLE_CHOICE,
+            oldQuizTypes.RADIO_MATRIX,
+            oldQuizTypes.PRIVACY_AGREEMENT,
+          ],
+        },
+        $or: [{ createdAt: { $gte: latest } }, { updatedAt: { $gte: latest } }],
+      }),
+      peerReviewQuizzes: await QNQuiz.find({
+        type: { $in: [oldQuizTypes.PEER_REVIEW] },
+        $or: [{ createdAt: { $gte: latest } }, { updatedAt: { $gte: latest } }],
+      }),
+      peerReviews: await QNPeerReview.find({
+        $or: [{ createdAt: { $gte: latest } }, { updatedAt: { $gte: latest } }],
+      }),
+      usernames: await QNQuizAnswer.distinct("answererId", {
+        $or: [{ createdAt: { $gte: latest } }, { updatedAt: { $gte: latest } }],
+      }),
+      quizAnswers: await QNQuizAnswer.find({
+        $or: [{ createdAt: { $gte: latest } }, { updatedAt: { $gte: latest } }],
+      }),
+      spamFlags: await QNSpamFlag.find({}),
+    }
+    console.log(JSON.stringify(data).length)
+  } else {
+    const local = process.argv.includes("local_server")
+    logger.info(
+      `Fetching from ${
+        local ? "local" : ""
+      } quiznator: data added since ${latest}`,
+    )
+    const baseUrl = local ? "http://127.0.0.1:3000" : "http://quiznator.mooc.fi"
+    const response = await axios.get(
+      `${baseUrl}/api/v1/migration/${encodeURIComponent(latest)}`,
+      { headers: { authorization: `Bearer ${process.env.TMC_TOKEN}` } },
+    )
+    data = response.data
   }
 
   logger.info("Data to be upserted:")

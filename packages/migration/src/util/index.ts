@@ -3,12 +3,15 @@ import {
   BaseEntity,
   Brackets,
   FindOptionsWhereCondition,
+  getConnection,
   ObjectLiteral,
   SelectQueryBuilder,
 } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import getUUIDByStringBroken from "uuid-by-string"
 import fs from "fs"
+
+import { snakeCase } from "typeorm/util/StringUtils"
 
 export function logger(message: string) {}
 
@@ -46,11 +49,29 @@ export function insertForReal<T extends BaseEntity>(
     return
   }
 
+  const properties = getConnection()
+    .getMetadata(type)
+    .columns.map(c => snakeCase(c.propertyName))
+
+  let updateString = ""
+
+  properties.forEach(p => {
+    let property = p
+    if (property === "order") {
+      property = `"order"`
+    } else if (property === "updated_at") {
+      return
+    }
+    updateString = updateString.concat(`${property} = excluded.${property}, `)
+  })
+
+  updateString = updateString.concat("updated_at = now()")
+
   return type
     .createQueryBuilder()
     .insert()
     .values(data)
-    .onConflict(`(${primaryKeys}) DO NOTHING`)
+    .onConflict(`(${primaryKeys}) do update set ${updateString}`)
     .execute()
 }
 
