@@ -9,8 +9,9 @@ import {
   QuizMessage,
 } from "../types"
 
-// tslint:disable-next-line:no-var-requires
-const Kafka = require("node-rdkafka")
+import * as Kafka from "node-rdkafka"
+
+import { promisify } from "util"
 
 if (process.env.NODE_ENV !== "production") {
   dotenv.config({ path: `.env` })
@@ -30,6 +31,8 @@ const producer = new Kafka.Producer({
   "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
   dr_cb: false,
 })
+
+const flush = promisify(producer.flush)
 
 const publish = async () => {
   console.time("done in")
@@ -184,7 +187,7 @@ const publishQuizzes = async (course: ICourse): Promise<IQuiz[]> => {
     }
 
     producer.produce("exercise", null, Buffer.from(JSON.stringify(message)))
-    producer.flush()
+    await flush(1000)
 
     console.log(`published ${quizzes.length} quizzes`)
 
@@ -276,7 +279,7 @@ const publishAnswers = async (course: ICourse) => {
         null,
         Buffer.from(JSON.stringify(message)),
       )
-      producer.flush()
+      await flush(1000)
     }
 
     console.log(`published ${answers.length} answers`)
@@ -343,7 +346,7 @@ const publishProgress = async (course: ICourse, quizzes: any[]) => {
         null,
         Buffer.from(JSON.stringify(message)),
       )
-      producer.flush()
+      await flush(1000)
     }
 
     console.log(`published progress for ${groupedByUser.length} users`)
