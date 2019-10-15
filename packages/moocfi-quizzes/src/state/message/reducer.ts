@@ -4,6 +4,7 @@ import * as message from "./actions"
 export const initialState = {
   errorMessage: null,
   notification: null,
+  notificationDisplayedUntilAnswerChanges: false,
 }
 
 export type MessageState = {
@@ -12,6 +13,7 @@ export type MessageState = {
     message: string
     color: string
   } | null
+  notificationDisplayedUntilAnswerChanges: boolean
 }
 
 export const messageReducer = (
@@ -24,6 +26,15 @@ export const messageReducer = (
         ...state,
         errorMessage: action.payload,
       }
+    case getType(message.answerWasChanged):
+      if (state.notificationDisplayedUntilAnswerChanges) {
+        return {
+          ...state,
+          notification: null,
+          notificationDisplayedUntilAnswerChanges: false,
+        }
+      }
+      return state
     case getType(message.setNotification):
       return {
         ...state,
@@ -31,6 +42,8 @@ export const messageReducer = (
           message: action.payload.message,
           color: action.payload.color,
         },
+        notificationDisplayedUntilAnswerChanges:
+          action.payload.untilAnswerChanged,
       }
     case getType(message.clearErrorMessage):
       return {

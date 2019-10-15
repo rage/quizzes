@@ -86,7 +86,7 @@ const finnishLabels: SingleLanguageLabels = {
     quizLabel: "Kysely",
     pointsLabel: "Pisteitä",
     triesNotLimitedLabel: "Yritysten lukumäärää ei rajattu",
-    submitGeneralFeedbackLabel: "Vastattu onnistuneesti",
+    submitGeneralFeedbackLabel: "Vastattu",
     submitButtonAlreadyAnsweredLabel: "Vastattu",
     pointsGrantingPolicyInformer: policy => {
       switch (policy) {

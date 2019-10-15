@@ -45,23 +45,32 @@ export const changeTextDataAction = createAction(
     resolve({ itemId, newValue, readyToSubmit }),
 )
 
-export const changeIntData = createAction(
+export const changeIntDataAction = createAction(
   "quizAnswer/UPDATE_INT_VALUE",
   resolve => (itemId: string, newValue: number) =>
     resolve({ itemId, newValue }),
 )
 
-export const changeCheckboxData = createAction(
+export const changeCheckboxDataAction = createAction(
   "quizAnswer/TOGGLE_CHECKBOX_VALUE",
   resolve => (itemId: string, optionId: string) =>
     resolve({ itemId, optionId }),
 )
 
-export const chooseOption = createAction(
+export const chooseOptionAction = createAction(
   "quizAnswer/CHOOSE_OPTION",
   resolve => (itemId: string, optionId: string, multi: boolean) =>
     resolve({ itemId, optionId, multi }),
 )
+
+export const chooseOption: ActionCreator<ThunkAction> = (
+  itemId: string,
+  optionId: string,
+  multi: boolean,
+) => (dispatch, getState) => {
+  dispatch(messageActions.answerWasChanged())
+  dispatch(chooseOptionAction(itemId, optionId, multi))
+}
 
 export const changeChosenOption: ActionCreator<ThunkAction> = (
   itemId: string,
@@ -72,8 +81,17 @@ export const changeChosenOption: ActionCreator<ThunkAction> = (
     return
   }
   const multi = item.multi
+  dispatch(messageActions.answerWasChanged())
   dispatch(feedbackDisplayedActions.hide())
   dispatch(chooseOption(itemId, optionId, multi))
+}
+
+export const changeCheckboxData: ActionCreator<ThunkAction> = (
+  itemId: string,
+  optionId: string,
+) => (dispatch, getState) => {
+  dispatch(messageActions.answerWasChanged())
+  dispatch(changeCheckboxDataAction(itemId, optionId))
 }
 
 export const noticeDisabledSubmitAttempt: ActionCreator<ThunkAction> = () => (
@@ -84,6 +102,14 @@ export const noticeDisabledSubmitAttempt: ActionCreator<ThunkAction> = () => (
   setTimeout(() => dispatch(clearAttemptedSubmit()), 5000)
 }
 
+export const changeIntData: ActionCreator<ThunkAction> = (
+  itemId: string,
+  newValue: number,
+) => (dispatch, getState) => {
+  dispatch(messageActions.answerWasChanged())
+  dispatch(changeIntDataAction(itemId, newValue))
+}
+
 export const changeTextData: ActionCreator<ThunkAction> = (
   itemId: string,
   newValue: string,
@@ -92,6 +118,7 @@ export const changeTextData: ActionCreator<ThunkAction> = (
   if (item === undefined) {
     return
   }
+  dispatch(messageActions.answerWasChanged())
   dispatch(feedbackDisplayedActions.hide())
   const readyToSubmit = itemAnswerReadyForSubmit(newValue, item)
   dispatch(changeTextDataAction(itemId, newValue, readyToSubmit))
@@ -135,7 +162,8 @@ export const submit: ActionCreator<ThunkAction> = () => async (
         messageActions.displayNotification(
           languageInfo.general.incorrectSubmitWhileTriesLeftLabel,
           "red",
-          5,
+          60 * 60 * 24,
+          true,
         ),
       )
     }

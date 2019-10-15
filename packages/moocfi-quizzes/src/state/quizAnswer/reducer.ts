@@ -61,7 +61,7 @@ export const quizAnswerReducer = (
       return { ...state, attemptedDisabledSubmit: true }
     case getType(quizAnswer.clearAttemptedSubmit):
       return { ...state, attemptedDisabledSubmit: false }
-    case getType(quizAnswer.changeIntData):
+    case getType(quizAnswer.changeIntDataAction):
       newItemAnswersReady = { ...state.itemAnswersReady }
       newItemAnswersReady[`${action.payload.itemId}`] = true
       return {
@@ -101,7 +101,7 @@ export const quizAnswerReducer = (
         noChangesAfterLoading: false,
       }
 
-    case getType(quizAnswer.changeCheckboxData):
+    case getType(quizAnswer.changeCheckboxDataAction):
       newItemAnswersReady = { ...state.itemAnswersReady }
       newItemAnswersReady[`${action.payload.itemId}`] = true
 
@@ -133,7 +133,7 @@ export const quizAnswerReducer = (
         noChangesSinceSuccessfulSubmit: false,
         noChangesAfterLoading: false,
       }
-    case getType(quizAnswer.chooseOption):
+    case getType(quizAnswer.chooseOptionAction):
       newItemAnswersReady = { ...state.itemAnswersReady }
       newItemAnswersReady[`${action.payload.itemId}`] = true
 

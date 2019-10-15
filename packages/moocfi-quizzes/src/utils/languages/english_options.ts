@@ -82,7 +82,7 @@ const englishLabels: SingleLanguageLabels = {
     quizLabel: "Quiz",
     pointsLabel: "Points",
     triesNotLimitedLabel: "Number of tries is unlimited",
-    submitGeneralFeedbackLabel: "Submit successful",
+    submitGeneralFeedbackLabel: "Submitted",
     submitButtonAlreadyAnsweredLabel: "Answered",
     pointsGrantingPolicyInformer: policy => {
       switch (policy) {
