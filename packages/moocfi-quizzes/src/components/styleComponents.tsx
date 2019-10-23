@@ -25,3 +25,7 @@ export const StyledTextField = styled(TextField)<IStyledTextFieldProps>`
     color: #595959;
   }
 `
+
+export const WhiteSpacePreservingTypography = styled(Typography)`
+  white-space: pre-line;
+`

@@ -5,7 +5,7 @@ import Typography from "@material-ui/core/Typography"
 import { wordCount } from "../utils/string_tools"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
-import { SpaciousPaper } from "./styleComponents"
+import { SpaciousPaper, WhiteSpacePreservingTypography } from "./styleComponents"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
 import { StyledTextField } from "./styleComponents"
 import MarkdownText from "./MarkdownText"
@@ -18,6 +18,7 @@ type EssayProps = {
 interface ISubmitHelperTypographyProps {
   attemptWasRecentlyMade: boolean
 }
+
 
 const SubmitHelperTypography = styled(Typography)<ISubmitHelperTypographyProps>`
   && {
@@ -81,7 +82,7 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
         {essayLabels.userAnswerLabel + ": "}
       </Typography>
       <SpaciousPaper>
-        <Typography variant="body1">{answerText}</Typography>
+        <WhiteSpacePreservingTypography variant="body1">{answerText}</WhiteSpacePreservingTypography>
       </SpaciousPaper>
     </>
   ) : (
