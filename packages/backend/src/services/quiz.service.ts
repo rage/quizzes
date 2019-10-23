@@ -31,6 +31,9 @@ export default class QuizService {
   @Inject(type => UserCoursePartStateService)
   private userCoursePartStateService: UserCoursePartStateService
 
+  @Inject(type => KafkaService)
+  private kafkaService: KafkaService
+
   private knex = Knex({ client: "pg" })
 
   public async getPlainQuizData(quizId: string) {
@@ -449,6 +452,7 @@ export default class QuizService {
             oldQuiz,
             manager,
           )
+          await this.kafkaService.addTask(quiz.courseId, manager)
         }
       } else {
         savedQuiz = await manager.save(quiz)
