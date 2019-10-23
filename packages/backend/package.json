@@ -47,7 +47,7 @@
     "graphql-tools": "^3.1.1",
     "highland": "^2.13.0",
     "keymirror": "^0.1.1",
-    "knex": "^0.17.6",
+    "knex": "^0.19.5",
     "lodash": "^4.17.13",
     "lusca": "^1.6.0",
     "module-alias": "^2.1.0",
