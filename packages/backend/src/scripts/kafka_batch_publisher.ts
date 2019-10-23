@@ -73,15 +73,12 @@ const publish = async () => {
         console.log("publishing progress")
         await publishProgress(course, quizzes)
       }
-    }
 
-    // we don't want this yet
-    /*
-    console.log("removing tasks from database")
-    await knex("kafka_task")
-      .where("id", "in", tasks.map(t => t.id))
-      .del()
-    */
+      console.log("removing task from database")
+      await knex("kafka_task")
+        .where("id", task.id)
+        .del()
+    }
 
     console.timeEnd("done in")
   } catch (error) {
