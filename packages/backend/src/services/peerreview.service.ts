@@ -67,7 +67,7 @@ export default class PeerReviewService {
     const {
       quizAnswer: validatedAnswer,
       userQuizState: validatedState,
-    } = await this.validationService.validateEssayAnswer(
+    } = this.validationService.validateEssayAnswer(
       quiz,
       quizAnswer,
       userQuizState,

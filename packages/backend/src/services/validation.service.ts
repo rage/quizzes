@@ -265,7 +265,7 @@ export default class ValidationService {
     return { response, quizAnswer, userQuizState }
   }
 
-  public async validateEssayAnswer(
+  public validateEssayAnswer(
     quiz: Quiz,
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
@@ -279,22 +279,38 @@ export default class ValidationService {
       userQuizState.spamFlags > course.maxSpamFlags
     ) {
       quizAnswer.status = "spam"
+      userQuizState.peerReviewsReceived = 0
       userQuizState.spamFlags = null
       userQuizState.status = "open"
     } else if (
       quizAnswer.status === "submitted" &&
+      given < course.minPeerReviewsGiven &&
+      received >= course.minPeerReviewsReceived
+    ) {
+      userQuizState.status = "enough-received-but-not-given"
+    } else if (
+      quizAnswer.status === ("submitted" || "enough-received-but-not-given") &&
       given >= course.minPeerReviewsGiven &&
       received >= course.minPeerReviewsReceived
     ) {
       const answers: number[] = [].concat(
-        ...peerReviews.map(pr => pr.answers.map(a => a.value)),
+        ...peerReviews.map(pr =>
+          pr.answers.map(a => {
+            if (a.value) {
+              return a.value
+            }
+          }),
+        ),
       )
+
       const sum: number = answers.reduce((prev, curr) => prev + curr, 0)
+
       if (sum / answers.length >= course.minReviewAverage) {
         quizAnswer.status = "confirmed"
         userQuizState.pointsAwarded = 1 * quiz.points
       } else {
         quizAnswer.status = "rejected"
+        userQuizState.peerReviewsReceived = 0
         userQuizState.pointsAwarded = 0
         userQuizState.status = "open"
       }
