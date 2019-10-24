@@ -67,7 +67,7 @@ export default class PeerReviewService {
     const {
       quizAnswer: validatedAnswer,
       userQuizState: validatedState,
-    } = await this.validationService.validateEssayAnswer(
+    } = this.validationService.validateEssayAnswer(
       quiz,
       quizAnswer,
       userQuizState,
@@ -258,6 +258,8 @@ export default class PeerReviewService {
       .andWhere(
         new Brackets(qb => {
           qb.where("quiz_answer.status = 'submitted'")
+            .orWhere("quiz_answer.status = 'enough-received-but-not-given'")
+            .orWhere("quiz_answer.status = 'confirmed'")
         }),
       )
       .andWhere("quiz_answer.user_id != :reviewerId", { reviewerId })

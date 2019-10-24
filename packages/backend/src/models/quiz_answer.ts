@@ -41,7 +41,15 @@ export class QuizAnswer extends BaseEntity {
   @Index()
   @Column({
     type: "enum",
-    enum: ["draft", "submitted", "spam", "confirmed", "rejected", "deprecated"],
+    enum: [
+      "draft",
+      "submitted",
+      "enough-received-but-not-given",
+      "spam",
+      "confirmed",
+      "rejected",
+      "deprecated",
+    ],
   })
   public status?: string
 
