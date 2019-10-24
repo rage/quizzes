@@ -45,7 +45,7 @@ export const changeGradeAction = createAction(
   resolve => (
     peerReviewQuestionId: string,
     value: number,
-    peerReviewCollection?: PeerReviewCollection,
+    peerReviewCollection: PeerReviewCollection,
   ) => resolve({ peerReviewQuestionId, value, peerReviewCollection }),
 )
 
@@ -54,7 +54,7 @@ export const changeTextAction = createAction(
   resolve => (
     peerReviewQuestionId: string,
     text: string,
-    peerReviewCollection?: PeerReviewCollection,
+    peerReviewCollection: PeerReviewCollection,
   ) => resolve({ peerReviewQuestionId, text, peerReviewCollection }),
 )
 
@@ -65,6 +65,10 @@ export const changeGrade: ActionCreator<ThunkAction> = (
   const peerReviewCollection = getState().quiz.peerReviewCollections.find(prc =>
     prc.questions.some(q => q.id === peerReviewQuestionId),
   )
+  if(!peerReviewCollection){
+    console.log("No answer that matches the id of the reviewed answer")
+    return
+  }
   dispatch(changeGradeAction(peerReviewQuestionId, value, peerReviewCollection))
 }
 
@@ -75,6 +79,10 @@ export const changeText: ActionCreator<ThunkAction> = (
   const peerReviewCollection = getState().quiz.peerReviewCollections.find(prc =>
     prc.questions.some(q => q.id === peerReviewQuestionId),
   )
+  if(!peerReviewCollection){
+    console.log("No answer that matches the id of the reviewed answer")
+    return
+  }
   dispatch(changeTextAction(peerReviewQuestionId, text, peerReviewCollection))
 }
 
@@ -96,7 +104,7 @@ export const submit: ActionCreator<ThunkAction> = () => async (
   )
   dispatch(setQuizState(userQuizState))
   dispatch(setReviewAnswer(null))
-  dispatch(fetchPeerReviewAlternatives())
+  await dispatch(fetchPeerReviewAlternatives())
 }
 
 // solves the problem of passing info from userState, quizState -> peerReviewReducer
