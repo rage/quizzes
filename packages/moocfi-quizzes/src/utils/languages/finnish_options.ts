@@ -48,7 +48,7 @@ const finnishLabels: SingleLanguageLabels = {
     quizInvolvesNoPeerReviewsInstruction:
       "Tähän tehtävään ei liity vertaisarvioita",
     peerReviewsInfoForLoggedOutUser: "Kyselyyn liittyy vertaisarviointiosio",
-    essayQuestionAnswerTextBoxLabel: "Kirjoita arvio"
+    essayQuestionAnswerTextBoxLabel: "Kirjoita arvio",
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>

@@ -1,7 +1,13 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
 import LikertScale from "likert-react"
-import { Button, CircularProgress, Grid, TextField, Typography } from "@material-ui/core"
+import {
+  Button,
+  CircularProgress,
+  Grid,
+  TextField,
+  Typography,
+} from "@material-ui/core"
 import PeerReviewOption from "./PeerReviewOption"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
 import { useTypedSelector } from "../../state/store"
@@ -105,9 +111,14 @@ const PeerReviewQuestions: React.FunctionComponent<
   }
 
   const changeInPeerReviewText = (peerReviewQuestionId: string) => (
-    e: MiscEvent
+    e: MiscEvent,
   ) => {
-    dispatch(peerReviewsActions.changeText(peerReviewQuestionId, e.currentTarget.value))
+    dispatch(
+      peerReviewsActions.changeText(
+        peerReviewQuestionId,
+        e.currentTarget.value,
+      ),
+    )
   }
 
   const submitPeerReview = () => {
@@ -116,8 +127,7 @@ const PeerReviewQuestions: React.FunctionComponent<
 
   return (
     <div>
-      { peerReviewQuestions[0].questions.map(question => {
-        
+      {peerReviewQuestions[0].questions.map(question => {
         let currentPeerReviewAnswer = peerReview.answers.find(
           answer => answer.peerReviewQuestionId === question.id,
         )
@@ -125,16 +135,18 @@ const PeerReviewQuestions: React.FunctionComponent<
           return <div />
         }
 
-        switch(question.type){
+        switch (question.type) {
           case "essay":
-              currentPeerReviewAnswer = currentPeerReviewAnswer as PeerReviewEssayAnswer
-              return <TextualPeerReviewFeedback
+            currentPeerReviewAnswer = currentPeerReviewAnswer as PeerReviewEssayAnswer
+            return (
+              <TextualPeerReviewFeedback
                 handleTextChange={changeInPeerReviewText(question.id)}
                 key={question.id}
                 currentText={currentPeerReviewAnswer.text}
                 questionTexts={question.texts[0]}
-              ></TextualPeerReviewFeedback>
-            break;
+              />
+            )
+            break
           case "grade":
             currentPeerReviewAnswer = currentPeerReviewAnswer as PeerReviewGradeAnswer
 
@@ -151,12 +163,13 @@ const PeerReviewQuestions: React.FunctionComponent<
               />
             )
           default:
-            return <SpaciousTypography>{`The ${question.type} type peer review question is not supported`}</SpaciousTypography>
+            return (
+              <SpaciousTypography>{`The ${
+                question.type
+              } type peer review question is not supported`}</SpaciousTypography>
+            )
         }
-
-
       })}
-
 
       <Button disabled={submitDisabled} onClick={submitPeerReview}>
         {languageInfo.submitPeerReviewLabel}
@@ -166,47 +179,39 @@ const PeerReviewQuestions: React.FunctionComponent<
 }
 
 interface ITextualPeerReviewFeedback {
-  handleTextChange: (a: any) => any,
-  key: string,
-  currentText: string,
+  handleTextChange: (a: any) => any
+  key: string
+  currentText: string
   questionTexts: PeerReviewQuestionText
-
 }
 
-const TextualPeerReviewFeedback : React.FunctionComponent<ITextualPeerReviewFeedback> = ({
-  currentText,
-  handleTextChange,
-  questionTexts
-}) => {
-
+const TextualPeerReviewFeedback: React.FunctionComponent<
+  ITextualPeerReviewFeedback
+> = ({ currentText, handleTextChange, questionTexts }) => {
   const languages = useTypedSelector(state => state.language.languageLabels)
 
-  if(!languages){
+  if (!languages) {
     return <div />
   }
 
   return (
     <>
-    
       <Typography variant="subtitle1">{questionTexts.title}</Typography>
       <Typography variant="body1">{questionTexts.body}</Typography>
-    
-        
-    <TextField 
-      variant="outlined"
-      label={languages.peerReviews.essayQuestionAnswerTextBoxLabel}
-      value={currentText}
-      onChange={handleTextChange}
-      fullWidth={true}
-      multiline={true}
-      rows={10}
-      margin="normal"/>
-    </>)
-} 
 
-
-
-
+      <TextField
+        variant="outlined"
+        label={languages.peerReviews.essayQuestionAnswerTextBoxLabel}
+        value={currentText}
+        onChange={handleTextChange}
+        fullWidth={true}
+        multiline={true}
+        rows={10}
+        margin="normal"
+      />
+    </>
+  )
+}
 
 type UnselectedPeerAnswerActionsProps = {
   languageInfo: PeerReviewLabels

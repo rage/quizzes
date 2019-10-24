@@ -8,7 +8,7 @@ import {
 } from "../../services/peerReviewService"
 import { setQuizState } from "../user/actions"
 import { ThunkAction } from "../store"
-import { PeerReviewAnswer } from "../../modelTypes"
+import { PeerReviewAnswer, PeerReviewCollection } from "../../modelTypes"
 
 export const set = createAction("peerReviews/SET", resolve => {
   return (newState: PeerReviewsState) => resolve(newState)
@@ -40,17 +40,43 @@ export const setReviewOptions = createAction(
   },
 )
 
-export const changeGrade = createAction(
+export const changeGradeAction = createAction(
   "peerReviews/CHANGE_GRADE",
-  resolve => (peerReviewQuestionId: string, value: number) =>
-    resolve({ peerReviewQuestionId, value }),
+  resolve => (
+    peerReviewQuestionId: string,
+    value: number,
+    peerReviewCollection?: PeerReviewCollection,
+  ) => resolve({ peerReviewQuestionId, value, peerReviewCollection }),
 )
 
-export const changeText = createAction(
+export const changeTextAction = createAction(
   "peerReviews/CHANGE_TEXT",
-  resolve => (peerReviewQuestionId: string, text: string) =>
-    resolve({ peerReviewQuestionId, text })
+  resolve => (
+    peerReviewQuestionId: string,
+    text: string,
+    peerReviewCollection?: PeerReviewCollection,
+  ) => resolve({ peerReviewQuestionId, text, peerReviewCollection }),
 )
+
+export const changeGrade: ActionCreator<ThunkAction> = (
+  peerReviewQuestionId: string,
+  value: number,
+) => (dispatch, getState) => {
+  const peerReviewCollection = getState().quiz.peerReviewCollections.find(prc =>
+    prc.questions.some(q => q.id === peerReviewQuestionId),
+  )
+  dispatch(changeGradeAction(peerReviewQuestionId, value, peerReviewCollection))
+}
+
+export const changeText: ActionCreator<ThunkAction> = (
+  peerReviewQuestionId: string,
+  text: string,
+) => (dispatch, getState) => {
+  const peerReviewCollection = getState().quiz.peerReviewCollections.find(prc =>
+    prc.questions.some(q => q.id === peerReviewQuestionId),
+  )
+  dispatch(changeTextAction(peerReviewQuestionId, text, peerReviewCollection))
+}
 
 export const submit: ActionCreator<ThunkAction> = () => async (
   dispatch,
