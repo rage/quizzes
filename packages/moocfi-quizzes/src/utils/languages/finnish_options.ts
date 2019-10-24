@@ -35,6 +35,7 @@ const finnishLabels: SingleLanguageLabels = {
     noPeerAnswersAvailableLabel: "Vertaisarvioitavia vastauksia ei saatavilla",
     chooseButtonLabel: "Valitse",
     chooseEssayInstruction: "Valitse yksi vaihtoehdoista vertaisarvoitavaksi",
+    chosenEssayInstruction: "Arvioi valitsemasi vastaus:",
     displayPeerReview: "Tee vertaisarvio",
     extraPeerReviewsEncouragementLabel:
       "Olet jo antanut tarvittavan määrän vertaisarvioita. \

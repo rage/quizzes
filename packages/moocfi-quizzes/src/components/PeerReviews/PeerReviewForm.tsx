@@ -8,6 +8,7 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core"
+import MarkdownText from "../MarkdownText"
 import PeerReviewOption from "./PeerReviewOption"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
 import { useTypedSelector } from "../../state/store"
@@ -21,7 +22,8 @@ import {
   PeerReviewQuestionText,
   MiscEvent,
 } from "../../modelTypes"
-import { SpaciousTypography, SpaciousPaper } from "../styleComponents"
+import { SpaciousTypography, StyledButton } from "../styleComponents"
+import styled from "styled-components"
 
 type PeerReviewFormProps = {
   languageInfo: PeerReviewLabels
@@ -53,10 +55,14 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
     return <Typography>{languageInfo.noPeerAnswersAvailableLabel}</Typography>
   }
 
+  const chosenStyle = { fontSize: "1.5rem", fontStyle: "bold" }
+
   return (
     <>
-      <Typography variant="subtitle1">
-        {languageInfo.chooseEssayInstruction}
+      <Typography variant="subtitle1" style={chosenStyle}>
+        {peerReview
+          ? languageInfo.chosenEssayInstruction
+          : languageInfo.chooseEssayInstruction}
       </Typography>
 
       {currentAnswersToReview.map(answer => (
@@ -171,9 +177,14 @@ const PeerReviewQuestions: React.FunctionComponent<
         }
       })}
 
-      <Button disabled={submitDisabled} onClick={submitPeerReview}>
+      <StyledButton
+        variant="contained"
+        color="primary"
+        disabled={submitDisabled}
+        onClick={submitPeerReview}
+      >
         {languageInfo.submitPeerReviewLabel}
-      </Button>
+      </StyledButton>
     </div>
   )
 }
@@ -185,6 +196,10 @@ interface ITextualPeerReviewFeedback {
   questionTexts: PeerReviewQuestionText
 }
 
+const StyledReviewEssayQuestion = styled.div`
+  margin: 8px 0;
+`
+
 const TextualPeerReviewFeedback: React.FunctionComponent<
   ITextualPeerReviewFeedback
 > = ({ currentText, handleTextChange, questionTexts }) => {
@@ -195,9 +210,13 @@ const TextualPeerReviewFeedback: React.FunctionComponent<
   }
 
   return (
-    <>
-      <Typography variant="subtitle1">{questionTexts.title}</Typography>
-      <Typography variant="body1">{questionTexts.body}</Typography>
+    <StyledReviewEssayQuestion>
+      <MarkdownText Component={Typography} variant="subtitle1">
+        {questionTexts.title}
+      </MarkdownText>
+      <MarkdownText Component={Typography} variant="body1">
+        {questionTexts.body}
+      </MarkdownText>
 
       <TextField
         variant="outlined"
@@ -206,10 +225,10 @@ const TextualPeerReviewFeedback: React.FunctionComponent<
         onChange={handleTextChange}
         fullWidth={true}
         multiline={true}
-        rows={10}
+        rows={5}
         margin="normal"
       />
-    </>
+    </StyledReviewEssayQuestion>
   )
 }
 
@@ -232,15 +251,17 @@ const UnselectedPeerAnswerActions: React.FunctionComponent<
   }
 
   return (
-    <Grid container>
-      <Grid item xs={3}>
-        <Button onClick={flagAsSpam}>
+    <Grid container={true} justify="space-between">
+      <Grid item>
+        <Button variant="contained" onClick={flagAsSpam}>
           {languageInfo.reportAsInappropriateLabel}
         </Button>
       </Grid>
-      <Grid item xs={8} />
-      <Grid item xs={1}>
-        <Button onClick={selectAnswer}>{languageInfo.chooseButtonLabel}</Button>
+
+      <Grid item>
+        <Button variant="contained" onClick={selectAnswer}>
+          {languageInfo.chooseButtonLabel}
+        </Button>
       </Grid>
     </Grid>
   )

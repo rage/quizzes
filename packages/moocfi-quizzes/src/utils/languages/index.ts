@@ -53,6 +53,7 @@ export type PeerReviewLabels = {
   noPeerAnswersAvailableLabel: string
   chooseButtonLabel: string
   chooseEssayInstruction: string
+  chosenEssayInstruction: string
   displayPeerReview: string
   extraPeerReviewsEncouragementLabel: string
   givenPeerReviewsLabel: string
