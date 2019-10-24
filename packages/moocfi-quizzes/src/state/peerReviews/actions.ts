@@ -96,7 +96,7 @@ export const submit: ActionCreator<ThunkAction> = () => async (
   )
   dispatch(setQuizState(userQuizState))
   dispatch(setReviewAnswer(null))
-  await dispatch(fetchPeerReviewAlternatives())
+  dispatch(fetchPeerReviewAlternatives())
 }
 
 // solves the problem of passing info from userState, quizState -> peerReviewReducer

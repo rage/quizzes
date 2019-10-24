@@ -16,14 +16,17 @@ import { PeerReviewLabels } from "../../utils/languages"
 import {
   QuizAnswer,
   PeerReviewAnswer,
-  PeerReviewQuestion,
   PeerReviewEssayAnswer,
   PeerReviewGradeAnswer,
   PeerReviewQuestionText,
   MiscEvent,
 } from "../../modelTypes"
-import { SpaciousTypography, StyledButton } from "../styleComponents"
+import { SpaciousTypography, StyledButton, RedButton } from "../styleComponents"
 import styled from "styled-components"
+
+const BoldTypography = styled(Typography)`
+  font-weight: bold;
+`
 
 type PeerReviewFormProps = {
   languageInfo: PeerReviewLabels
@@ -34,11 +37,8 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 }) => {
   const answersToReview = useTypedSelector(state => state.peerReviews.options)
   const peerReview = useTypedSelector(state => state.peerReviews.answer)
-  const currentAnswersToReview = peerReview
-    ? answersToReview.filter(answer => answer.id === peerReview.quizAnswerId)
-    : answersToReview
 
-  if (!currentAnswersToReview) {
+  if (!answersToReview) {
     return (
       <Grid container>
         <Grid item xs={1}>
@@ -51,35 +51,52 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
     )
   }
 
-  if (currentAnswersToReview.length === 0) {
+  if (answersToReview.length === 0) {
     return <Typography>{languageInfo.noPeerAnswersAvailableLabel}</Typography>
   }
 
   const chosenStyle = { fontSize: "1.5rem", fontStyle: "bold" }
 
+  // choice has been made
+  if (peerReview) {
+    const chosenAnswer = answersToReview.find(
+      a => a.id === peerReview.quizAnswerId,
+    )
+    if (!chosenAnswer) {
+      return <div>Chosen answer id doesn't belong to any of the options</div>
+    }
+
+    return (
+      <>
+        <Typography variant="subtitle1" style={chosenStyle}>
+          {languageInfo.chosenEssayInstruction}
+        </Typography>
+        <PeerReviewOption answer={chosenAnswer} />
+        <PeerReviewQuestions
+          peerReview={peerReview}
+          languageInfo={languageInfo}
+        />
+      </>
+    )
+  }
+
   return (
     <>
       <Typography variant="subtitle1" style={chosenStyle}>
-        {peerReview
-          ? languageInfo.chosenEssayInstruction
-          : languageInfo.chooseEssayInstruction}
+        {languageInfo.chooseEssayInstruction}
       </Typography>
 
-      {currentAnswersToReview.map(answer => (
+      {answersToReview.map((answer, idx) => (
         <div key={answer.id}>
+          <Typography variant="subtitle1">
+            {`${languageInfo.optionLabel} ${idx + 1}:`}
+          </Typography>
           <PeerReviewOption answer={answer} />
 
-          {peerReview ? (
-            <PeerReviewQuestions
-              peerReview={peerReview}
-              languageInfo={languageInfo}
-            />
-          ) : (
-            <UnselectedPeerAnswerActions
-              answer={answer}
-              languageInfo={languageInfo}
-            />
-          )}
+          <UnselectedPeerAnswerActions
+            answer={answer}
+            languageInfo={languageInfo}
+          />
         </div>
       ))}
     </>
@@ -211,7 +228,7 @@ const TextualPeerReviewFeedback: React.FunctionComponent<
 
   return (
     <StyledReviewEssayQuestion>
-      <MarkdownText Component={Typography} variant="subtitle1">
+      <MarkdownText Component={BoldTypography} variant="subtitle1">
         {questionTexts.title}
       </MarkdownText>
       <MarkdownText Component={Typography} variant="body1">
@@ -253,13 +270,13 @@ const UnselectedPeerAnswerActions: React.FunctionComponent<
   return (
     <Grid container={true} justify="space-between">
       <Grid item>
-        <Button variant="contained" onClick={flagAsSpam}>
+        <RedButton variant="contained" onClick={flagAsSpam}>
           {languageInfo.reportAsInappropriateLabel}
-        </Button>
+        </RedButton>
       </Grid>
 
       <Grid item>
-        <Button variant="contained" onClick={selectAnswer}>
+        <Button variant="contained" color="primary" onClick={selectAnswer}>
           {languageInfo.chooseButtonLabel}
         </Button>
       </Grid>

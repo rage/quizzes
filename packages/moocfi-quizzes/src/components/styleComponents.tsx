@@ -1,6 +1,11 @@
 import styled from "styled-components"
 import { Button, Paper, TextField, Typography } from "@material-ui/core"
 
+export const RedButton = styled(Button)`
+  background-color: rgb(200, 34, 34);
+  color: rgb(255, 255, 255);
+`
+
 export const SpaciousPaper = styled(Paper)`
   padding: 1rem;
   margin: 0.5rem;
