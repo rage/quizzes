@@ -200,9 +200,7 @@ export type PeerReviewEssayAnswer = {
   text: string
 }
 
-export type PeerReviewQuestionAnswer = PeerReviewGradeAnswer
-// not supported yet
-// | PeerReviewEssayAnswer
+export type PeerReviewQuestionAnswer = PeerReviewGradeAnswer | PeerReviewEssayAnswer
 
 export type PeerReviewAnswer = {
   quizAnswerId: string

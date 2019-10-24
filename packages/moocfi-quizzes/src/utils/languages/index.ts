@@ -63,6 +63,7 @@ export type PeerReviewLabels = {
   loadingLabel: string
   quizInvolvesNoPeerReviewsInstruction: string
   peerReviewsInfoForLoggedOutUser: string
+  essayQuestionAnswerTextBoxLabel: string
 }
 
 export type UnsupportedLabels = {

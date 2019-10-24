@@ -4,6 +4,7 @@ import {
   QuizAnswer,
   PeerReviewAnswer,
   PeerReviewGradeAnswer,
+  PeerReviewEssayAnswer,
 } from "../../modelTypes"
 
 export const initialState = {
@@ -32,6 +33,7 @@ export const peerReviewsReducer = (
     case getType(peerReviews.clear):
       return initialState
     case getType(peerReviews.changeGrade):
+      {
       const { peerReviewQuestionId, value } = action.payload
       const currentAnswer = state.answer
       if (!currentAnswer) {
@@ -48,14 +50,39 @@ export const peerReviewsReducer = (
         ),
       }
 
-      const submitDisabled = newAnswer.answers.some(
-        answer => answer.value === null,
-      )
+      const submitDisabled = submitShouldBeDisabled(newAnswer)
 
       return {
         ...state,
         answer: newAnswer,
         submitDisabled,
+      }
+    }
+    case getType(peerReviews.changeText):
+      {
+        const { peerReviewQuestionId, text } = action.payload
+        const currentAnswer = state.answer
+        if (!currentAnswer) {
+          console.log("peer review answer is null")
+          return state
+        }
+  
+        const newAnswer: PeerReviewAnswer = {
+          ...currentAnswer,
+          answers: currentAnswer.answers.map(answer =>
+            answer.peerReviewQuestionId === peerReviewQuestionId
+              ? { ...answer, text }
+              : answer,
+          ),
+        }
+  
+        const submitDisabled = submitShouldBeDisabled(newAnswer)
+  
+        return {
+          ...state,
+          answer: newAnswer,
+          submitDisabled,
+        }
       }
     case getType(peerReviews.selectAnswer):
       const {
@@ -98,4 +125,20 @@ export const peerReviewsReducer = (
     default:
       return state
   }
+}
+
+
+const submitShouldBeDisabled = (prAnswer: PeerReviewAnswer) : boolean => {
+  return prAnswer.answers.some(answer => {
+    if(typeof (answer as PeerReviewGradeAnswer).value === "number"){
+      return false
+    }
+    answer = answer as PeerReviewEssayAnswer
+
+    return (typeof answer.text !== "string"
+        // do we want to check if anything is actually written? 
+        // if essay part is optional, probably shouldn't 
+        || answer.text.trim().length === 0)
+    
+  })
 }

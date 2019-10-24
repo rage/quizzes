@@ -44,6 +44,7 @@ const englishLabels: SingleLanguageLabels = {
     hidePeerReviewLabel: "Hide",
     quizInvolvesNoPeerReviewsInstruction: "This quiz involves no peer reviews",
     peerReviewsInfoForLoggedOutUser: "The quiz includes peer reviews",
+    essayQuestionAnswerTextBoxLabel: "Write the requested review"
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>

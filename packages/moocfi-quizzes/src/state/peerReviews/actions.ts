@@ -46,6 +46,12 @@ export const changeGrade = createAction(
     resolve({ peerReviewQuestionId, value }),
 )
 
+export const changeText = createAction(
+  "peerReviews/CHANGE_TEXT",
+  resolve => (peerReviewQuestionId: string, text: string) =>
+    resolve({ peerReviewQuestionId, text })
+)
+
 export const submit: ActionCreator<ThunkAction> = () => async (
   dispatch,
   getState,
