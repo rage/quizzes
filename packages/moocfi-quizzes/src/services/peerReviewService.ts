@@ -28,7 +28,7 @@ export const postSpamFlag = async (
   address?: string,
 ): Promise<SpamFlag> => {
   let response = await axios.post(
-    `${BASE_URL}/api/v1/quizzes/spamflag`,
+    `${address || BASE_URL}/api/v1/quizzes/spamflag`,
     { quizAnswerId },
     { headers: { authorization: `Bearer ${accessToken}` } },
   )
@@ -41,7 +41,7 @@ export const postPeerReview = async (
   address?: string,
 ): Promise<{ userQuizState: UserQuizState }> => {
   const response = await axios.post(
-    `${BASE_URL}/api/v1/quizzes/peerreview`,
+    `${address || BASE_URL}/api/v1/quizzes/peerreview`,
     peerReview,
     { headers: { authorization: `Bearer ${accessToken}` } },
   )
