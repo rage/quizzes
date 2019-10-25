@@ -135,7 +135,7 @@ export const postSpam: ActionCreator<ThunkAction> = (
   setReviewOptions([])
   const address = getState().backendAddress
   await postSpamFlag(quizAnswerId, accessToken, address)
-  fetchPeerReviewAlternatives()
+  await dispatch(fetchPeerReviewAlternatives())
 }
 
 export const fetchPeerReviewAlternatives: ActionCreator<
