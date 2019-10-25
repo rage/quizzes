@@ -117,22 +117,6 @@ class PeerReviewQuestion extends React.Component<any, any> {
                         <FormControlLabel
                           control={
                             <Checkbox
-                              checked={this.props.default}
-                              onChange={this.props.handleChange(
-                                `peerReviewCollections[${
-                                  this.props.collectionIndex
-                                }].questions[${this.props.index}].default`,
-                              )}
-                              color="primary"
-                            />
-                          }
-                          label="default"
-                        />
-                      </Grid>
-                      <Grid item={true} xs={12}>
-                        <FormControlLabel
-                          control={
-                            <Checkbox
                               checked={this.props.answerRequired}
                               onChange={this.props.handleChange(
                                 `peerReviewCollections[${
