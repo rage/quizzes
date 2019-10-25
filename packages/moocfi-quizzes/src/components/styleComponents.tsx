@@ -31,7 +31,6 @@ export const StyledTextField = styled(TextField)<IStyledTextFieldProps>`
   }
 `
 
-
 export const StyledButton = styled(Button)`
   padding: 10px 20px;
   border-radius: 15px;
