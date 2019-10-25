@@ -31,7 +31,7 @@ const englishLabels: SingleLanguageLabels = {
   peerReviews: {
     loadingLabel: "Loading",
     chooseButtonLabel: "Choose",
-    chooseEssayInstruction: "Choose one of the essays for peer revie",
+    chooseEssayInstruction: "Choose one of the essays for peer review",
     chosenEssayInstruction: "Review the chosen answer",
     givenPeerReviewsLabel: "Peer reviews given",
     noPeerAnswersAvailableLabel: "No answers available for peer review",
