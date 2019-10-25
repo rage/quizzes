@@ -23,7 +23,7 @@ const PeerReviewOption: React.FunctionComponent<PeerReviewOptionProps> = ({
   const quizItemById = (id: string) => quizItems.find(qi => qi.id === id)
 
   return (
-    <>
+    <div style={{ padding: ".5rem 1rem" }}>
       {answer.itemAnswers
         .filter(ia => {
           const item = quizItemById(ia.quizItemId)
@@ -52,7 +52,7 @@ const PeerReviewOption: React.FunctionComponent<PeerReviewOptionProps> = ({
             </React.Fragment>
           )
         })}
-    </>
+    </div>
   )
 }
 

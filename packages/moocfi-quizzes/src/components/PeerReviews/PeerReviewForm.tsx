@@ -1,7 +1,14 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
 import LikertScale from "likert-react"
-import { Button, CircularProgress, Grid, Typography } from "@material-ui/core"
+import {
+  Button,
+  CircularProgress,
+  Grid,
+  TextField,
+  Typography,
+} from "@material-ui/core"
+import MarkdownText from "../MarkdownText"
 import PeerReviewOption from "./PeerReviewOption"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
 import { useTypedSelector } from "../../state/store"
@@ -9,8 +16,17 @@ import { PeerReviewLabels } from "../../utils/languages"
 import {
   QuizAnswer,
   PeerReviewAnswer,
-  PeerReviewQuestion,
+  PeerReviewEssayAnswer,
+  PeerReviewGradeAnswer,
+  PeerReviewQuestionText,
+  MiscEvent,
 } from "../../modelTypes"
+import { SpaciousTypography, StyledButton, RedButton } from "../styleComponents"
+import styled from "styled-components"
+
+const BoldTypography = styled(Typography)`
+  font-weight: bold;
+`
 
 type PeerReviewFormProps = {
   languageInfo: PeerReviewLabels
@@ -21,11 +37,8 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 }) => {
   const answersToReview = useTypedSelector(state => state.peerReviews.options)
   const peerReview = useTypedSelector(state => state.peerReviews.answer)
-  const currentAnswersToReview = peerReview
-    ? answersToReview.filter(answer => answer.id === peerReview.quizAnswerId)
-    : answersToReview
 
-  if (!currentAnswersToReview) {
+  if (!answersToReview) {
     return (
       <Grid container>
         <Grid item xs={1}>
@@ -38,31 +51,52 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
     )
   }
 
-  if (currentAnswersToReview.length === 0) {
+  if (answersToReview.length === 0) {
     return <Typography>{languageInfo.noPeerAnswersAvailableLabel}</Typography>
+  }
+
+  const chosenStyle = { fontSize: "1.5rem", fontStyle: "bold" }
+
+  // choice has been made
+  if (peerReview) {
+    const chosenAnswer = answersToReview.find(
+      a => a.id === peerReview.quizAnswerId,
+    )
+    if (!chosenAnswer) {
+      return <div>Chosen answer id doesn't belong to any of the options</div>
+    }
+
+    return (
+      <>
+        <Typography variant="subtitle1" style={chosenStyle}>
+          {languageInfo.chosenEssayInstruction}
+        </Typography>
+        <PeerReviewOption answer={chosenAnswer} />
+        <PeerReviewQuestions
+          peerReview={peerReview}
+          languageInfo={languageInfo}
+        />
+      </>
+    )
   }
 
   return (
     <>
-      <Typography variant="subtitle1">
+      <Typography variant="subtitle1" style={chosenStyle}>
         {languageInfo.chooseEssayInstruction}
       </Typography>
 
-      {currentAnswersToReview.map(answer => (
+      {answersToReview.map((answer, idx) => (
         <div key={answer.id}>
+          <Typography variant="subtitle1">
+            {`${languageInfo.optionLabel} ${idx + 1}:`}
+          </Typography>
           <PeerReviewOption answer={answer} />
 
-          {peerReview ? (
-            <PeerReviewQuestions
-              peerReview={peerReview}
-              languageInfo={languageInfo}
-            />
-          ) : (
-            <UnselectedPeerAnswerActions
-              answer={answer}
-              languageInfo={languageInfo}
-            />
-          )}
+          <UnselectedPeerAnswerActions
+            answer={answer}
+            languageInfo={languageInfo}
+          />
         </div>
       ))}
     </>
@@ -92,11 +126,21 @@ const PeerReviewQuestions: React.FunctionComponent<
   const peerReviewQuestions = quiz.peerReviewCollections
 
   const changeInPeerReviewGrade = (peerReviewQuestionId: string) => (
-    question: any,
     value: string,
   ) => {
     dispatch(
       peerReviewsActions.changeGrade(peerReviewQuestionId, Number(value)),
+    )
+  }
+
+  const changeInPeerReviewText = (peerReviewQuestionId: string) => (
+    e: MiscEvent,
+  ) => {
+    dispatch(
+      peerReviewsActions.changeText(
+        peerReviewQuestionId,
+        e.currentTarget.value,
+      ),
     )
   }
 
@@ -107,31 +151,104 @@ const PeerReviewQuestions: React.FunctionComponent<
   return (
     <div>
       {peerReviewQuestions[0].questions.map(question => {
-        const currentPeerReviewAnswer = peerReview.answers.find(
+        let currentPeerReviewAnswer = peerReview.answers.find(
           answer => answer.peerReviewQuestionId === question.id,
         )
         if (!currentPeerReviewAnswer) {
           return <div />
         }
-        const currentAnswerValue = currentPeerReviewAnswer.value
 
-        return (
-          <LikertScale
-            key={question.id}
-            reviews={[
-              {
-                question: question.texts[0].title,
-                review: currentAnswerValue,
-              },
-            ]}
-            onClick={changeInPeerReviewGrade(question.id)}
-          />
-        )
+        switch (question.type) {
+          case "essay":
+            currentPeerReviewAnswer = currentPeerReviewAnswer as PeerReviewEssayAnswer
+            return (
+              <TextualPeerReviewFeedback
+                handleTextChange={changeInPeerReviewText(question.id)}
+                key={question.id}
+                currentText={currentPeerReviewAnswer.text}
+                questionTexts={question.texts[0]}
+              />
+            )
+            break
+          case "grade":
+            currentPeerReviewAnswer = currentPeerReviewAnswer as PeerReviewGradeAnswer
+
+            return (
+              <LikertScale
+                key={question.id}
+                reviews={[
+                  {
+                    question: question.texts[0].title,
+                    review: currentPeerReviewAnswer.value,
+                  },
+                ]}
+                onClick={changeInPeerReviewGrade(question.id)}
+              />
+            )
+          default:
+            return (
+              <SpaciousTypography>{`The ${
+                question.type
+              } type peer review question is not supported`}</SpaciousTypography>
+            )
+        }
       })}
-      <Button disabled={submitDisabled} onClick={submitPeerReview}>
+
+      <StyledButton
+        variant="contained"
+        color="primary"
+        disabled={submitDisabled}
+        onClick={submitPeerReview}
+      >
         {languageInfo.submitPeerReviewLabel}
-      </Button>
+      </StyledButton>
     </div>
+  )
+}
+
+interface ITextualPeerReviewFeedback {
+  handleTextChange: (a: any) => any
+  key: string
+  currentText: string
+  questionTexts: PeerReviewQuestionText
+}
+
+const StyledReviewEssayQuestion = styled.div`
+  margin: 8px 0;
+`
+
+const TextualPeerReviewFeedback: React.FunctionComponent<
+  ITextualPeerReviewFeedback
+> = ({ currentText, handleTextChange, questionTexts }) => {
+  const languages = useTypedSelector(state => state.language.languageLabels)
+
+  if (!languages) {
+    return <div />
+  }
+
+  return (
+    <StyledReviewEssayQuestion>
+      <MarkdownText Component={BoldTypography} variant="subtitle1">
+        {questionTexts.title}
+      </MarkdownText>
+
+      {questionTexts.body && (
+        <MarkdownText Component={Typography} variant="body1">
+          {questionTexts.body}
+        </MarkdownText>
+      )}
+
+      <TextField
+        variant="outlined"
+        label={languages.peerReviews.essayQuestionAnswerTextBoxLabel}
+        value={currentText}
+        onChange={handleTextChange}
+        fullWidth={true}
+        multiline={true}
+        rows={5}
+        margin="normal"
+      />
+    </StyledReviewEssayQuestion>
   )
 }
 
@@ -154,15 +271,17 @@ const UnselectedPeerAnswerActions: React.FunctionComponent<
   }
 
   return (
-    <Grid container>
-      <Grid item xs={3}>
-        <Button onClick={flagAsSpam}>
+    <Grid container={true} justify="space-between">
+      <Grid item>
+        <RedButton variant="contained" onClick={flagAsSpam}>
           {languageInfo.reportAsInappropriateLabel}
-        </Button>
+        </RedButton>
       </Grid>
-      <Grid item xs={8} />
-      <Grid item xs={1}>
-        <Button onClick={selectAnswer}>{languageInfo.chooseButtonLabel}</Button>
+
+      <Grid item>
+        <Button variant="contained" color="primary" onClick={selectAnswer}>
+          {languageInfo.chooseButtonLabel}
+        </Button>
       </Grid>
     </Grid>
   )

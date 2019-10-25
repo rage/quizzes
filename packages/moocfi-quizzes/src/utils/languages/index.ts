@@ -53,6 +53,7 @@ export type PeerReviewLabels = {
   noPeerAnswersAvailableLabel: string
   chooseButtonLabel: string
   chooseEssayInstruction: string
+  chosenEssayInstruction: string
   displayPeerReview: string
   extraPeerReviewsEncouragementLabel: string
   givenPeerReviewsLabel: string
@@ -63,6 +64,8 @@ export type PeerReviewLabels = {
   loadingLabel: string
   quizInvolvesNoPeerReviewsInstruction: string
   peerReviewsInfoForLoggedOutUser: string
+  essayQuestionAnswerTextBoxLabel: string
+  optionLabel: string
 }
 
 export type UnsupportedLabels = {

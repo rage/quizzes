@@ -4,6 +4,8 @@ import {
   QuizAnswer,
   PeerReviewAnswer,
   PeerReviewGradeAnswer,
+  PeerReviewEssayAnswer,
+  PeerReviewCollection,
 } from "../../modelTypes"
 
 export const initialState = {
@@ -31,8 +33,12 @@ export const peerReviewsReducer = (
       return { ...state, options: action.payload }
     case getType(peerReviews.clear):
       return initialState
-    case getType(peerReviews.changeGrade):
-      const { peerReviewQuestionId, value } = action.payload
+    case getType(peerReviews.changeGradeAction): {
+      const {
+        peerReviewQuestionId,
+        value,
+        peerReviewCollection,
+      } = action.payload
       const currentAnswer = state.answer
       if (!currentAnswer) {
         console.log("peer review answer is null")
@@ -48,8 +54,9 @@ export const peerReviewsReducer = (
         ),
       }
 
-      const submitDisabled = newAnswer.answers.some(
-        answer => answer.value === null,
+      const submitDisabled = submitShouldBeDisabled(
+        newAnswer,
+        peerReviewCollection,
       )
 
       return {
@@ -57,6 +64,39 @@ export const peerReviewsReducer = (
         answer: newAnswer,
         submitDisabled,
       }
+    }
+    case getType(peerReviews.changeTextAction): {
+      const {
+        peerReviewQuestionId,
+        text,
+        peerReviewCollection,
+      } = action.payload
+      const currentAnswer = state.answer
+      if (!currentAnswer) {
+        console.log("peer review answer is null")
+        return state
+      }
+
+      const newAnswer: PeerReviewAnswer = {
+        ...currentAnswer,
+        answers: currentAnswer.answers.map(answer =>
+          answer.peerReviewQuestionId === peerReviewQuestionId
+            ? { ...answer, text }
+            : answer,
+        ),
+      }
+
+      const submitDisabled = submitShouldBeDisabled(
+        newAnswer,
+        peerReviewCollection,
+      )
+
+      return {
+        ...state,
+        answer: newAnswer,
+        submitDisabled,
+      }
+    }
     case getType(peerReviews.selectAnswer):
       const {
         quizAnswerId,
@@ -98,4 +138,39 @@ export const peerReviewsReducer = (
     default:
       return state
   }
+}
+
+const submitShouldBeDisabled = (
+  prAnswer: PeerReviewAnswer,
+  peerReviewCollection: PeerReviewCollection,
+): boolean => {
+  return prAnswer.answers.some(answer => {
+    const questionId = answer.peerReviewQuestionId
+    const peerReviewQuestion = peerReviewCollection.questions.find(
+      q => q.id === questionId,
+    )
+
+    if (!peerReviewQuestion) {
+      console.log(
+        "Peer review answer to question doesn't match any peer review question",
+      )
+      return true
+    }
+
+    const answerIsRequired = peerReviewQuestion.answerRequired
+
+    if (!answerIsRequired) {
+      return false
+    }
+
+    if (typeof (answer as PeerReviewGradeAnswer).value === "number") {
+      return false
+    }
+    answer = answer as PeerReviewEssayAnswer
+    if (typeof answer.text !== "string") {
+      return true
+    }
+
+    return answerIsRequired && answer.text.trim().length === 0
+  })
 }

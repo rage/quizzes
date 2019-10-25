@@ -32,6 +32,7 @@ const englishLabels: SingleLanguageLabels = {
     loadingLabel: "Loading",
     chooseButtonLabel: "Choose",
     chooseEssayInstruction: "Choose one of the essays for peer review",
+    chosenEssayInstruction: "Review the chosen answer",
     givenPeerReviewsLabel: "Peer reviews given",
     noPeerAnswersAvailableLabel: "No answers available for peer review",
     reportAsInappropriateLabel: "Report as inappropriate",
@@ -40,10 +41,12 @@ const englishLabels: SingleLanguageLabels = {
     extraPeerReviewsEncouragementLabel:
       "You have reviewed the minimum number of peer essays. You may continue to \
         review your peers' works, thereby increasing the probability of your own answer being selected by others!",
-    displayPeerReview: "Add peer review",
+    displayPeerReview: "Write peer review",
     hidePeerReviewLabel: "Hide",
     quizInvolvesNoPeerReviewsInstruction: "This quiz involves no peer reviews",
     peerReviewsInfoForLoggedOutUser: "The quiz includes peer reviews",
+    essayQuestionAnswerTextBoxLabel: "Write the requested review",
+    optionLabel: "Option",
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
@@ -59,7 +62,7 @@ const englishLabels: SingleLanguageLabels = {
     answerStageLabel: "Answering the quiz",
     givingPeerReviewsStageLabel: "Giving peer reviews",
     receivingPeerReviewsStageLabel: "Receiving peer reviews",
-    evaluationStageLabel: "Evaluating the answer",
+    evaluationStageLabel: "Grading the answer",
   },
   general: {
     pastDeadline: "You can no longer submit an answer",
