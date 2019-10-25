@@ -43,8 +43,6 @@ class PeerReviewQuestion extends React.Component<any, any> {
   }
 
   public render() {
-    // console.log("question")
-
     return (
       <Card style={{ marginBottom: 20 }}>
         {!this.state.expanded ? (
@@ -52,7 +50,7 @@ class PeerReviewQuestion extends React.Component<any, any> {
             <Grid item={true} xs={11}>
               <DragHandleWrapper>
                 <CardHeader
-                  title={this.props.title}
+                  title={`${this.props.title} (${this.props.type})`}
                   titleTypographyProps={{
                     variant: "subtitle1",
                     gutterBottom: false,
@@ -82,7 +80,7 @@ class PeerReviewQuestion extends React.Component<any, any> {
             <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
               <Grid item={true} xs={12}>
                 <Card>
-                  <CardHeader subheader="general" />
+                  <CardHeader subheader={this.props.type} />
                   <CardContent>
                     <TextField
                       label="title"
@@ -98,20 +96,22 @@ class PeerReviewQuestion extends React.Component<any, any> {
                       multiline={true}
                       margin="normal"
                     />
-                    <TextField
-                      label="body"
-                      value={this.props.body || undefined}
-                      fullWidth={true}
-                      onChange={this.props.handleChange(
-                        `peerReviewCollections[${
-                          this.props.collectionIndex
-                        }].questions[${this.props.index}].texts[${
-                          this.props.textIndex
-                        }].body`,
-                      )}
-                      multiline={true}
-                      margin="normal"
-                    />
+                    {this.props.type === "essay" && (
+                      <TextField
+                        label="body"
+                        value={this.props.body || undefined}
+                        fullWidth={true}
+                        onChange={this.props.handleChange(
+                          `peerReviewCollections[${
+                            this.props.collectionIndex
+                          }].questions[${this.props.index}].texts[${
+                            this.props.textIndex
+                          }].body`,
+                        )}
+                        multiline={true}
+                        margin="normal"
+                      />
+                    )}
                     <Grid container={true} style={{ marginTop: 20 }}>
                       <Grid item={true} xs={12}>
                         <FormControlLabel
