@@ -231,9 +231,12 @@ const TextualPeerReviewFeedback: React.FunctionComponent<
       <MarkdownText Component={BoldTypography} variant="subtitle1">
         {questionTexts.title}
       </MarkdownText>
-      <MarkdownText Component={Typography} variant="body1">
-        {questionTexts.body}
-      </MarkdownText>
+
+      {questionTexts.body && (
+        <MarkdownText Component={Typography} variant="body1">
+          {questionTexts.body}
+        </MarkdownText>
+      )}
 
       <TextField
         variant="outlined"
