@@ -15,7 +15,28 @@ import React from "react"
 import { connect } from "react-redux"
 import DragHandleWrapper from "./DragHandleWrapper"
 
-class PeerReviewQuestion extends React.Component<any, any> {
+interface IPeerReviewQuestionState {
+  expanded: boolean
+}
+
+interface IPeerReviewQuestionProps {
+  answerRequired: boolean
+  default: boolean
+  order: number
+  type: "essay" | "grade"
+  title?: string
+  body?: string
+  index: number
+  textIndex: number
+  collectionIndex: number
+  handleChange: (attribute: string) => any
+  remove: (e: any, idx: number) => any
+}
+
+class PeerReviewQuestion extends React.Component<
+  IPeerReviewQuestionProps,
+  IPeerReviewQuestionState
+> {
   constructor(props) {
     super(props)
     this.state = {
