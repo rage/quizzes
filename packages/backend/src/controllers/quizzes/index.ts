@@ -109,9 +109,7 @@ export class QuizController {
           stripped = false
         }
 
-        if (answer.status === "submitted" || answer.status === "confirmed") {
-          quizAnswer = answer
-        }
+        quizAnswer = answer
       }
 
       const quizzes: Quiz[] = await this.quizService.getQuizzes({
