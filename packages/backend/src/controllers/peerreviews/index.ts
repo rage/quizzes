@@ -133,7 +133,10 @@ export class PeerReviewController {
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
     peerReview.answers.forEach(answer => {
-      if (answer.value === null && answer.text === null) {
+      if (answer.text) {
+        return
+      }
+      if (answer.value === null) {
         throw new BadRequestError("review must contain values")
       }
     })
@@ -161,7 +164,7 @@ export class PeerReviewController {
       {
         userId: peerReview.userId,
         quizId: receivingQuizAnswer.quizId,
-        statuses: ["confirmed", "submitted"],
+        statuses: ["confirmed", "submitted", "enough-received-but-not-given"],
       },
       this.entityManager,
     )
