@@ -292,7 +292,7 @@ export default class ValidationService {
       given < course.minPeerReviewsGiven &&
       received >= course.minPeerReviewsReceived
     ) {
-      userQuizState.status = "enough-received-but-not-given"
+      quizAnswer.status = "enough-received-but-not-given"
     } else if (
       (quizAnswer.status === "submitted" ||
         quizAnswer.status === "enough-received-but-not-given") &&
