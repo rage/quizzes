@@ -92,7 +92,7 @@ export default class PeerReviewService {
         quiz,
         userId,
       )
-      this.kafkaService.publishUserProgressUpdated(
+      await this.kafkaService.publishUserProgressUpdated(
         manager,
         userId,
         quiz.courseId,
