@@ -275,13 +275,18 @@ export default class ValidationService {
     const given: number = userQuizState.peerReviewsGiven
     const received: number = userQuizState.peerReviewsReceived
     if (
-      quizAnswer.status === "submitted" &&
+      (quizAnswer.status === "submitted" ||
+        quizAnswer.status === "enough-received-but-not-given") &&
       userQuizState.spamFlags > course.maxSpamFlags
     ) {
       quizAnswer.status = "spam"
       userQuizState.peerReviewsReceived = 0
       userQuizState.spamFlags = null
-      userQuizState.status = "open"
+      if (quiz.triesLimited && userQuizState.tries >= quiz.tries) {
+        userQuizState.status = "locked"
+      } else {
+        userQuizState.status = "open"
+      }
     } else if (
       quizAnswer.status === "submitted" &&
       given < course.minPeerReviewsGiven &&
@@ -289,7 +294,8 @@ export default class ValidationService {
     ) {
       userQuizState.status = "enough-received-but-not-given"
     } else if (
-      quizAnswer.status === ("submitted" || "enough-received-but-not-given") &&
+      (quizAnswer.status === "submitted" ||
+        quizAnswer.status === "enough-received-but-not-given") &&
       given >= course.minPeerReviewsGiven &&
       received >= course.minPeerReviewsReceived
     ) {
@@ -312,7 +318,11 @@ export default class ValidationService {
         quizAnswer.status = "rejected"
         userQuizState.peerReviewsReceived = 0
         userQuizState.pointsAwarded = 0
-        userQuizState.status = "open"
+        if (quiz.triesLimited && userQuizState.tries >= quiz.tries) {
+          userQuizState.status = "locked"
+        } else {
+          userQuizState.status = "open"
+        }
       }
     }
     return { quizAnswer, userQuizState }
