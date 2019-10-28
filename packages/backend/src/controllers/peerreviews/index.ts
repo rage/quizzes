@@ -1,5 +1,6 @@
 import JSONStream from "JSONStream"
 import {
+  BadRequestError,
   Get,
   HeaderParam,
   JsonController,
@@ -131,6 +132,15 @@ export class PeerReviewController {
     @EntityFromBody() peerReview: PeerReview,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
+    peerReview.answers.forEach(answer => {
+      if (answer.text) {
+        return
+      }
+      if (answer.value === null) {
+        throw new BadRequestError("review must contain values")
+      }
+    })
+
     peerReview.userId = user.id
 
     // Enforce unique (quiz_answer_id, user_id). Do this in db later.
@@ -154,7 +164,7 @@ export class PeerReviewController {
       {
         userId: peerReview.userId,
         quizId: receivingQuizAnswer.quizId,
-        statuses: ["confirmed", "submitted"],
+        statuses: ["confirmed", "submitted", "enough-received-but-not-given"],
       },
       this.entityManager,
     )
