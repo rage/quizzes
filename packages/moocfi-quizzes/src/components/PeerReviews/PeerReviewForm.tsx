@@ -126,6 +126,7 @@ const PeerReviewQuestions: React.FunctionComponent<
   const peerReviewQuestions = quiz.peerReviewCollections
 
   const changeInPeerReviewGrade = (peerReviewQuestionId: string) => (
+    name: string,
     value: string,
   ) => {
     dispatch(
