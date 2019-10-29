@@ -1,0 +1,95 @@
+apiVersion: batch/v1beta1
+kind: CronJob
+metadata:
+  name: kafka-batch-producer
+spec:
+  schedule: "5/10 * * * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 3600
+      template:
+        spec:
+          restartPolicy: OnFailure
+          containers:
+            - name: kafka-batch-producer
+              image: ${BACKEND_IMAGE}
+              command: ["sh", "-c", "cd /app && yarn kafka-batch-publish"]
+              resources:
+                requests:
+                  memory: "1000Mi"
+              env:
+                - name: REDIS_HOST
+                  value: "quizzes-backend-redis-master.default.svc.cluster.local"
+                - name: REDIS_PORT
+                  value: "6379"
+                - name: REDIS_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: quizzes-backend-redis
+                      key: redis-password
+                - name: DB_NAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: backend-database-secret
+                      key: POSTGRES_DATABASE
+                - name: DB_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: backend-database-secret
+                      key: POSTGRES_HOST
+                - name: DB_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: backend-database-secret
+                      key: POSTGRES_PASSWORD
+                - name: DB_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: backend-database-secret
+                      key: POSTGRES_USERNAME
+                - name: TMC_TOKEN
+                  valueFrom:
+                    secretKeyRef:
+                      name: backend-database-secret
+                      key: TMC_TOKEN
+                - name: KAFKA_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: backend-database-secret
+                      key: KAFKA_HOST
+                - name: MESSAGE_FORMAT_VERSION
+                  valueFrom:
+                    secretKeyRef:
+                      name: backend-database-secret
+                      key: MESSAGE_FORMAT_VERSION
+                - name: SERVICE_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: backend-database-secret
+                      key: SERVICE_ID
+          initContainers:
+          - name: quizzes-backend-run-migrations
+            image: ${BACKEND_IMAGE}
+            command: ['sh', '-c', 'cd /app && yarn typeorm migration:run']
+            env:
+              - name: DB_NAME
+                valueFrom:
+                  secretKeyRef:
+                    name: backend-database-secret
+                    key: POSTGRES_DATABASE
+              - name: DB_HOST
+                valueFrom:
+                  secretKeyRef:
+                    name: backend-database-secret
+                    key: POSTGRES_HOST
+              - name: DB_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: backend-database-secret
+                    key: POSTGRES_PASSWORD
+              - name: DB_USER
+                valueFrom:
+                  secretKeyRef:
+                    name: backend-database-secret
+                    key: POSTGRES_USERNAME
