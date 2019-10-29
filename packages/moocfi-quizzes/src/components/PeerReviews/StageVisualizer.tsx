@@ -26,6 +26,7 @@ const StageVisualizer = () => {
     stageLabels.evaluationStageLabel,
   ]
 
+  const answerStatus = quizAnswer.status ? quizAnswer.status : null
   const answerLocked = userQuizState && userQuizState.status === "locked"
   const peerReviewsGiven = userQuizState ? userQuizState.peerReviewsGiven : 0
   const peerReviewsReceived = userQuizState
@@ -44,6 +45,10 @@ const StageVisualizer = () => {
       if (peerReviewsReceived >= peerReviewsReceivedRequired) {
         activeStep = 3
       }
+    }
+
+    if (answerStatus === "rejected" || answerStatus === "spam") {
+      activeStep = 3
     }
   }
 

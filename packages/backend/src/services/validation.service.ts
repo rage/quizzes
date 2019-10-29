@@ -280,11 +280,11 @@ export default class ValidationService {
       userQuizState.spamFlags > course.maxSpamFlags
     ) {
       quizAnswer.status = "spam"
-      userQuizState.peerReviewsReceived = 0
-      userQuizState.spamFlags = null
       if (quiz.triesLimited && userQuizState.tries >= quiz.tries) {
         userQuizState.status = "locked"
       } else {
+        userQuizState.spamFlags = null
+        userQuizState.peerReviewsReceived = 0
         userQuizState.status = "open"
       }
     } else if (

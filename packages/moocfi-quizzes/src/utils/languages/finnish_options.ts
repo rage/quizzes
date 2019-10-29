@@ -51,6 +51,8 @@ const finnishLabels: SingleLanguageLabels = {
     peerReviewsInfoForLoggedOutUser: "Kyselyyn liittyy vertaisarviointiosio",
     essayQuestionAnswerTextBoxLabel: "Kirjoita arvio",
     optionLabel: "Vaihtoehto",
+    answerRejected: "Vastauksesi on hylätty vertaisarviossa",
+    answerFlaggedAsSpam: "Vastauksesi on hylätty epäasiallisena",
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>

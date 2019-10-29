@@ -91,6 +91,10 @@ const OuterDiv = styled.div`
   }
 `
 
+const BoldTypography = styled(Typography)`
+  font-weight: bold;
+`
+
 const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   id,
   languageId,
@@ -213,6 +217,25 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const containsPeerReviews =
     quiz.peerReviewCollections !== null && quiz.peerReviewCollections.length > 0
 
+  const answerStatus = quizAnswer.status ? quizAnswer.status : null
+
+  const shouldShowPeerReviews = userQuizState
+    ? userQuizState.status === "locked"
+      ? answerStatus === "rejected" || answerStatus === "spam"
+        ? false
+        : true
+      : false
+    : false
+
+  const exerciseFailedMessage =
+    userQuizState && userQuizState.status === "locked"
+      ? answerStatus === "rejected"
+        ? languageInfo.peerReviews.answerRejected
+        : answerStatus === "spam"
+        ? languageInfo.peerReviews.answerFlaggedAsSpam
+        : null
+      : null
+
   const showPointsPolicyLabel =
     !quiz.awardPointsEvenIfWrong &&
     quiz.items.length > 1 &&
@@ -245,7 +268,11 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
         {!stillSubmittable && !quizDisabled ? (
           <>
-            {containsPeerReviews && <PeerReviews />}
+            {exerciseFailedMessage && (
+              <BoldTypography>{exerciseFailedMessage}</BoldTypography>
+            )}
+
+            {containsPeerReviews && shouldShowPeerReviews && <PeerReviews />}
 
             <ResultInformation
               quiz={quiz}
