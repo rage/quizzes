@@ -66,6 +66,8 @@ export type PeerReviewLabels = {
   peerReviewsInfoForLoggedOutUser: string
   essayQuestionAnswerTextBoxLabel: string
   optionLabel: string
+  answerRejected: string
+  answerFlaggedAsSpam: string
 }
 
 export type UnsupportedLabels = {

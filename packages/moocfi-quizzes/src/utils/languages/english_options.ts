@@ -47,6 +47,8 @@ const englishLabels: SingleLanguageLabels = {
     peerReviewsInfoForLoggedOutUser: "The quiz includes peer reviews",
     essayQuestionAnswerTextBoxLabel: "Write the requested review",
     optionLabel: "Option",
+    answerRejected: "Your answer was rejected",
+    answerFlaggedAsSpam: "Your answer was rejected as inappropriate",
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
