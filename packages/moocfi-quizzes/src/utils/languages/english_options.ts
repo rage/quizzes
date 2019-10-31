@@ -51,7 +51,7 @@ const englishLabels: SingleLanguageLabels = {
     optionLabel: "Option",
     answerRejected: "Your answer was rejected",
     answerFlaggedAsSpam: "Your answer was rejected as inappropriate",
-    answerConfirmed: "You answer has been confirmed!",
+    answerConfirmed: "Your answer has been confirmed!",
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
