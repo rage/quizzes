@@ -12,6 +12,11 @@ import { useTypedSelector } from "../../state/store"
 
 const BoldTypography = styled(Typography)`
   font-weight: bold;
+  margin-bottom: 15px;
+`
+
+const TopMarginDiv = styled.div`
+  margin-top: 15px;
 `
 
 const PeerReviews: React.FunctionComponent = () => {
@@ -22,6 +27,7 @@ const PeerReviews: React.FunctionComponent = () => {
     return <div />
   }
 
+  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const peerReviewQuestions = quiz.peerReviewCollections
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
@@ -39,6 +45,11 @@ const PeerReviews: React.FunctionComponent = () => {
   }
 
   const peerReviewsLabels = languageInfo.peerReviews
+
+  const giveExtraPeerReviewsLabel =
+    quizAnswer.status === "confirmed"
+      ? peerReviewsLabels.giveExtraPeerReviewsQuizConfirmed
+      : peerReviewsLabels.giveExtraPeerReviews
 
   useEffect(() => {
     dispatch(peerReviewsActions.fetchPeerReviewAlternatives())
@@ -58,25 +69,40 @@ const PeerReviews: React.FunctionComponent = () => {
 
   return (
     <div>
-      <PeerReviewsGuidance
-        guidanceText={peerReviewQuestions[0].texts[0].body}
-        givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
-        peerReviewsCompletedInfo={peerReviewsLabels.peerReviewsCompletedInfo}
-      />
-
-      {!morePeerReviewsRequired() && (
-        <BoldTypography variant="subtitle1">
-          {peerReviewsLabels.extraPeerReviewsEncouragementLabel}
-        </BoldTypography>
+      {morePeerReviewsRequired() ? (
+        <>
+          <PeerReviewsGuidance
+            guidanceText={peerReviewQuestions[0].texts[0].body}
+            givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
+            peerReviewsCompletedInfo={
+              peerReviewsLabels.peerReviewsCompletedInfo
+            }
+          />
+          <PeerReviewForm languageInfo={peerReviewsLabels} />
+        </>
+      ) : (
+        <>
+          <BoldTypography variant="subtitle1">
+            {giveExtraPeerReviewsLabel}
+          </BoldTypography>
+          <Togglable
+            initiallyVisible={morePeerReviewsRequired()}
+            hideButtonText={peerReviewsLabels.hidePeerReviewLabel}
+            displayButtonText={peerReviewsLabels.displayPeerReview}
+          >
+            <TopMarginDiv>
+              <PeerReviewsGuidance
+                guidanceText={peerReviewQuestions[0].texts[0].body}
+                givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
+                peerReviewsCompletedInfo={
+                  peerReviewsLabels.peerReviewsCompletedInfo
+                }
+              />
+              <PeerReviewForm languageInfo={peerReviewsLabels} />
+            </TopMarginDiv>
+          </Togglable>
+        </>
       )}
-
-      <Togglable
-        initiallyVisible={morePeerReviewsRequired()}
-        hideButtonText={peerReviewsLabels.hidePeerReviewLabel}
-        displayButtonText={peerReviewsLabels.displayPeerReview}
-      >
-        <PeerReviewForm languageInfo={peerReviewsLabels} />
-      </Togglable>
     </div>
   )
 }

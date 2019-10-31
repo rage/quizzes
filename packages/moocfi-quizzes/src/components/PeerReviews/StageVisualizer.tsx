@@ -50,6 +50,10 @@ const StageVisualizer = () => {
     if (answerStatus === "rejected" || answerStatus === "spam") {
       activeStep = 3
     }
+
+    if (answerStatus === "confirmed") {
+      activeStep = 4
+    }
   }
 
   return (

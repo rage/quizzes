@@ -36,11 +36,13 @@ const finnishLabels: SingleLanguageLabels = {
     chooseButtonLabel: "Valitse",
     chooseEssayInstruction: "Valitse yksi vaihtoehdoista vertaisarvoitavaksi",
     chosenEssayInstruction: "Arvioi valitsemasi vastaus:",
-    displayPeerReview: "Tee vertaisarvio",
-    extraPeerReviewsEncouragementLabel:
+    displayPeerReview: "Anna   vertaisarvio",
+    giveExtraPeerReviews:
       "Olet jo antanut tarvittavan määrän vertaisarvioita. \
          Jatka muiden töiden arviointia painamalla alhaalta - \
           -  näin parannat oman vastauksesi todennäköisyyttä tulla vertaisarvioiduksi!",
+    giveExtraPeerReviewsQuizConfirmed:
+      "Voit halutessasi antaa lisää vertaisarvioita",
     givenPeerReviewsLabel: "Vertaisarvioita annettu",
     peerReviewsCompletedInfo: "Tarvittavat vertaisarviot annettu",
     reportAsInappropriateLabel: "Ilmoita asiaton vastaus",
@@ -53,6 +55,7 @@ const finnishLabels: SingleLanguageLabels = {
     optionLabel: "Vaihtoehto",
     answerRejected: "Vastauksesi on hylätty vertaisarviossa",
     answerFlaggedAsSpam: "Vastauksesi on hylätty epäasiallisena",
+    answerConfirmed: "Läpäisit tehtävän hyväksytysti!",
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>

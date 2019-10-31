@@ -93,6 +93,7 @@ const OuterDiv = styled.div`
 
 const BoldTypography = styled(Typography)`
   font-weight: bold;
+  padding-bottom: 20px;
 `
 
 const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
@@ -227,12 +228,14 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       : false
     : false
 
-  const exerciseFailedMessage =
+  const exerciseFinishedMessage =
     userQuizState && userQuizState.status === "locked"
       ? answerStatus === "rejected"
         ? languageInfo.peerReviews.answerRejected
         : answerStatus === "spam"
         ? languageInfo.peerReviews.answerFlaggedAsSpam
+        : answerStatus === "confirmed"
+        ? languageInfo.peerReviews.answerConfirmed
         : null
       : null
 
@@ -268,8 +271,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
         {!stillSubmittable && !quizDisabled ? (
           <>
-            {exerciseFailedMessage && (
-              <BoldTypography>{exerciseFailedMessage}</BoldTypography>
+            {exerciseFinishedMessage && (
+              <BoldTypography>{exerciseFinishedMessage}</BoldTypography>
             )}
 
             {containsPeerReviews && shouldShowPeerReviews && <PeerReviews />}

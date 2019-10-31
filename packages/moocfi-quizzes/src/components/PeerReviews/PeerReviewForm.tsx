@@ -28,6 +28,10 @@ const BoldTypography = styled(Typography)`
   font-weight: bold;
 `
 
+const TopMarginDiv = styled.div`
+  margin-top: 15px;
+`
+
 type PeerReviewFormProps = {
   languageInfo: PeerReviewLabels
 }
@@ -87,7 +91,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
       </Typography>
 
       {answersToReview.map((answer, idx) => (
-        <div key={answer.id}>
+        <TopMarginDiv key={answer.id}>
           <Typography variant="subtitle1">
             {`${languageInfo.optionLabel} ${idx + 1}:`}
           </Typography>
@@ -97,7 +101,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
             answer={answer}
             languageInfo={languageInfo}
           />
-        </div>
+        </TopMarginDiv>
       ))}
     </>
   )
