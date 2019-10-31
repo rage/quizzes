@@ -23,9 +23,6 @@ const PeerReviewsGuidance: React.FunctionComponent<
       <SpaciousTypography variant="subtitle1">
         {givenLabel}: {given}/{required}
       </SpaciousTypography>
-      <SpaciousTypography variant="subtitle1">
-        {given >= required && peerReviewsCompletedInfo}
-      </SpaciousTypography>
     </div>
   )
 }

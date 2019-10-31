@@ -55,7 +55,8 @@ export type PeerReviewLabels = {
   chooseEssayInstruction: string
   chosenEssayInstruction: string
   displayPeerReview: string
-  extraPeerReviewsEncouragementLabel: string
+  giveExtraPeerReviews: string
+  giveExtraPeerReviewsQuizConfirmed: string
   givenPeerReviewsLabel: string
   peerReviewsCompletedInfo: string
   reportAsInappropriateLabel: string
@@ -68,6 +69,7 @@ export type PeerReviewLabels = {
   optionLabel: string
   answerRejected: string
   answerFlaggedAsSpam: string
+  answerConfirmed: string
 }
 
 export type UnsupportedLabels = {

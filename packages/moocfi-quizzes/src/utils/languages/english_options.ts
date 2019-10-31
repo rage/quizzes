@@ -38,10 +38,12 @@ const englishLabels: SingleLanguageLabels = {
     reportAsInappropriateLabel: "Report as inappropriate",
     submitPeerReviewLabel: "Submit review",
     peerReviewsCompletedInfo: "All peer reviews have been submitted",
-    extraPeerReviewsEncouragementLabel:
+    giveExtraPeerReviews:
       "You have reviewed the minimum number of peer essays. You may continue to \
         review your peers' works, thereby increasing the probability of your own answer being selected by others!",
-    displayPeerReview: "Write peer review",
+    giveExtraPeerReviewsQuizConfirmed:
+      "You may still give peer reviews to help others",
+    displayPeerReview: "Give peer review",
     hidePeerReviewLabel: "Hide",
     quizInvolvesNoPeerReviewsInstruction: "This quiz involves no peer reviews",
     peerReviewsInfoForLoggedOutUser: "The quiz includes peer reviews",
@@ -49,6 +51,7 @@ const englishLabels: SingleLanguageLabels = {
     optionLabel: "Option",
     answerRejected: "Your answer was rejected",
     answerFlaggedAsSpam: "Your answer was rejected as inappropriate",
+    answerConfirmed: "You answer has been confirmed!",
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
