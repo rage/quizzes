@@ -271,7 +271,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
         {!stillSubmittable && !quizDisabled ? (
           <>
-            {exerciseFinishedMessage && (
+            {containsPeerReviews && exerciseFinishedMessage && (
               <BoldTypography>{exerciseFinishedMessage}</BoldTypography>
             )}
 
