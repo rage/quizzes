@@ -297,7 +297,8 @@ export default class ValidationService {
       (quizAnswer.status === "submitted" ||
         quizAnswer.status === "enough-received-but-not-given") &&
       given >= course.minPeerReviewsGiven &&
-      received >= course.minPeerReviewsReceived
+      received >= course.minPeerReviewsReceived &&
+      quiz.autoConfirm
     ) {
       const answers: number[] = [].concat(
         ...peerReviews.map(pr =>

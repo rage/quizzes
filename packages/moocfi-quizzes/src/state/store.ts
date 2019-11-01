@@ -3,6 +3,7 @@ import { applyMiddleware, combineReducers, createStore } from "redux"
 import { composeWithDevTools } from "redux-devtools-extension/developmentOnly"
 import thunk from "redux-thunk"
 
+import { activeStepManager } from "./middleware"
 import { backendAddressReducer } from "./backendAddress/reducer"
 import {
   customizationReducer,
@@ -110,7 +111,10 @@ const createStoreInstance = (id: string): Store => {
 }
 
 const createStoreCreator = () => {
-  return createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)))
+  return createStore(
+    rootReducer,
+    composeWithDevTools(applyMiddleware(thunk, activeStepManager)),
+  )
 }
 
 export const useTypedSelector: TypedUseSelectorHook<RootState> = useSelector

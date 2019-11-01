@@ -5,6 +5,7 @@ import { useTypedSelector } from "../../state/store"
 const StageVisualizer = () => {
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const activeStep = useTypedSelector(state => state.peerReviews.activeStep)
   const quiz = useTypedSelector(state => state.quiz)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
 
@@ -26,7 +27,7 @@ const StageVisualizer = () => {
     stageLabels.evaluationStageLabel,
   ]
 
-  const answerStatus = quizAnswer.status ? quizAnswer.status : null
+  /*const answerStatus = quizAnswer.status ? quizAnswer.status : null
   const answerLocked = userQuizState && userQuizState.status === "locked"
   const peerReviewsGiven = userQuizState ? userQuizState.peerReviewsGiven : 0
   const peerReviewsReceived = userQuizState
@@ -54,7 +55,7 @@ const StageVisualizer = () => {
     if (answerStatus === "confirmed") {
       activeStep = 4
     }
-  }
+  }*/
 
   return (
     <Stepper activeStep={activeStep} alternativeLabel>

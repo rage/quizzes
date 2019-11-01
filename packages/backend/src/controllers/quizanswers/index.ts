@@ -247,8 +247,18 @@ export class QuizAnswerController {
       existingAnswer.status = newStatus
       newAnswer = await manager.save(existingAnswer)
 
-      if (newStatus === "confirmed" && oldStatus !== "confirmed") {
-        userQuizState.pointsAwarded = quiz.points
+      if (newStatus !== oldStatus) {
+        if (newStatus === "confirmed") {
+          userQuizState.pointsAwarded = quiz.points
+        } else if (
+          newStatus === "rejected" &&
+          (!quiz.triesLimited || userQuizState.tries < quiz.tries)
+        ) {
+          userQuizState.peerReviewsReceived = 0
+          userQuizState.pointsAwarded = 0
+          userQuizState.spamFlags = 0
+          userQuizState.status = "open"
+        }
 
         userQuizState = await manager.save(userQuizState)
 
@@ -258,12 +268,12 @@ export class QuizAnswerController {
           userQuizState.userId,
         )
 
-        this.kafkaService.publishQuizAnswerUpdated(
+        await this.kafkaService.publishQuizAnswerUpdated(
           newAnswer,
           userQuizState,
           quiz,
         )
-        this.kafkaService.publishUserProgressUpdated(
+        await this.kafkaService.publishUserProgressUpdated(
           manager,
           newAnswer.userId,
           quiz.courseId,

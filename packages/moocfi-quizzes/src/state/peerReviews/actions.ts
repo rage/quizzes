@@ -14,6 +14,13 @@ export const set = createAction("peerReviews/SET", resolve => {
   return (newState: PeerReviewsState) => resolve(newState)
 })
 
+export const changeActiveStep = createAction(
+  "peerReviews/CHANGE_ACTIVE_STEP",
+  resolve => {
+    return (activeStep: number) => resolve(activeStep)
+  },
+)
+
 export const setReviewAnswer = createAction(
   "peerReviews/SET_ANSWER",
   resolve => {

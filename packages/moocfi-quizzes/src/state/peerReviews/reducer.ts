@@ -12,12 +12,14 @@ export const initialState = {
   options: [],
   answer: null,
   submitDisabled: true,
+  activeStep: 0,
 }
 
 export type PeerReviewsState = {
   answer: PeerReviewAnswer | null
   options: QuizAnswer[]
   submitDisabled: boolean
+  activeStep: number
 }
 
 export const peerReviewsReducer = (
@@ -31,6 +33,8 @@ export const peerReviewsReducer = (
       return { ...state, answer: action.payload }
     case getType(peerReviews.setReviewOptions):
       return { ...state, options: action.payload }
+    case getType(peerReviews.changeActiveStep):
+      return { ...state, activeStep: action.payload }
     case getType(peerReviews.clear):
       return initialState
     case getType(peerReviews.changeGradeAction): {
