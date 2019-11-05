@@ -239,8 +239,8 @@ export default class PeerReviewService {
 
     const rejected: string[] = [].concat(
       ...givenPeerReviews.map(pr => pr.rejectedQuizAnswerIds),
+      ...givenSpamFlags.map(spamFlag => spamFlag.quizAnswerId),
     )
-    rejected.concat(givenSpamFlags.map(spamFlag => spamFlag.quizAnswerId))
     // query will fail if this array is empty
     rejected.push(randomUUID())
 
