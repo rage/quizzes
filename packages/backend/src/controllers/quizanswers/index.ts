@@ -221,6 +221,8 @@ export class QuizAnswerController {
 
     const quiz = (await this.quizService.getQuizzes({
       id: existingAnswer.quizId,
+      course: true,
+      items: true,
     }))[0]
 
     let userQuizState = await this.userQuizStateService.getUserQuizState(
@@ -263,7 +265,7 @@ export class QuizAnswerController {
           userQuizState,
           quiz,
         )
-        this.kafkaService.publishUserProgressUpdated(
+        await this.kafkaService.publishUserProgressUpdated(
           manager,
           newAnswer.userId,
           quiz.courseId,
