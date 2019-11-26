@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   UnauthorizedError,
+  QueryParam,
 } from "routing-controllers"
 import KafkaService from "services/kafka.service"
 import PeerReviewService from "services/peerreview.service"
@@ -22,6 +23,7 @@ import { InjectManager } from "typeorm-typedi-extensions"
 import { API_PATH } from "../../config"
 import { PeerReview, Quiz, QuizAnswer, UserQuizState } from "../../models"
 import { ITMCProfileDetails } from "../../types"
+import { PeerReviewQuestionAnswer } from "@quizzes/common/models"
 
 @JsonController(`${API_PATH}/quizzes/peerreview`)
 export class PeerReviewController {
@@ -53,16 +55,35 @@ export class PeerReviewController {
   public async getGivenReviews(
     @Param("answerId") answerId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
+    @QueryParam("stripped") stripped: boolean,
   ) {
     if (!user.administrator) {
-      throw new UnauthorizedError("unauthorized")
+      stripped = true
+      const answer = await this.quizAnswerService.getAnswer(
+        { id: answerId },
+        this.entityManager,
+      )
+      if (answer.userId !== user.id) {
+        throw new UnauthorizedError("unauthorized")
+      }
     }
 
-    return await this.peerReviewService.getPeerReviews(
+    const result = await this.peerReviewService.getPeerReviews(
       this.entityManager,
       answerId,
       false,
     )
+    if (stripped) {
+      const strippedResult = result.map(prAnswer => ({
+        id: prAnswer.id,
+        peerReviewCollectionId: prAnswer.peerReviewCollectionId,
+        answers: prAnswer.answers,
+      }))
+
+      return strippedResult
+    } else {
+      return result
+    }
   }
 
   @Get("/data/:quizId/plainPeerReviews")
