@@ -1,6 +1,11 @@
 import axios from "axios"
 import BASE_URL from "../config"
-import { QuizAnswer, PeerReviewAnswer, UserQuizState } from "../modelTypes"
+import {
+  QuizAnswer,
+  PeerReviewAnswer,
+  UserQuizState,
+  IReceivedPeerReview,
+} from "../modelTypes"
 
 export const getPeerReviewInfo = async (
   quizId: string,
@@ -10,6 +15,20 @@ export const getPeerReviewInfo = async (
 ): Promise<QuizAnswer[]> => {
   const response = await axios.get(
     `${address || BASE_URL}/api/v1/quizzes/peerreview/${quizId}/${languageId}`,
+    { headers: { authorization: `Bearer ${accessToken}` } },
+  )
+
+  return response.data
+}
+
+export const getReceivedReviews = async (
+  quizAnswerId: string,
+  accessToken: string,
+  address?: string,
+): Promise<Array<IReceivedPeerReview>> => {
+  const response = await axios.get(
+    `${address ||
+      BASE_URL}/api/v1/quizzes/peerreview/received/${quizAnswerId}?stripped=true`,
     { headers: { authorization: `Bearer ${accessToken}` } },
   )
 

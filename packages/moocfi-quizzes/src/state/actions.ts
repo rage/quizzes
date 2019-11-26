@@ -11,6 +11,7 @@ import * as loadingBars from "./loadingBars/actions"
 import * as quizActions from "./quiz/actions"
 import * as quizAnswerActions from "./quizAnswer/actions"
 import * as messageActions from "./message/actions"
+import * as receivedReviewsActions from "./receivedReviews/actions"
 import { Quiz } from "../modelTypes"
 import { QuizResponse } from "../services/quizService"
 

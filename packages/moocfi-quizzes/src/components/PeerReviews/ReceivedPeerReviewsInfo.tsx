@@ -5,29 +5,58 @@ import {
   PeerReviewQuestionAnswer,
   PeerReviewGradeAnswer,
   PeerReviewEssayAnswer,
+  IReceivedPeerReview,
 } from "../../modelTypes"
+import { useTypedSelector } from "../../state/store"
+import { useDispatch } from "react-redux"
+import { languageOptions } from "../../utils/languages"
+import { requestReviews } from "../../state/receivedReviews/actions"
+import { peerReviewsReducer } from "../../state/peerReviews/reducer"
 
 const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
   const [modalOpened, setModalOpened] = React.useState(false)
+  const dispatch = useDispatch()
 
-  const receivedReviews: PeerReviewAnswer[] = [
-    {
-      quizAnswerId: "weui",
-      peerReviewCollectionId: "safd",
-      userId: 666,
-      rejectedQuizAnswerIds: [],
-      answers: [
-        {
-          peerReviewQuestionId: "111-222",
-          value: 3,
-        },
-        {
-          peerReviewQuestionId: "222-222",
-          text: "Oikein huono",
-        },
-      ],
-    },
-  ]
+  React.useEffect(() => {
+    dispatch(requestReviews())
+  }, [])
+
+  const receivedReviews = useTypedSelector(
+    state => state.receivedReviews.reviews,
+  )
+  const loadingState = useTypedSelector(
+    state => state.receivedReviews.loadingState,
+  )
+
+  // const receivedReviews: PeerReviewAnswer[] = [
+  //   {
+  //     quizAnswerId: "weui",
+  //     peerReviewCollectionId: "safd",
+  //     userId: 666,
+  //     rejectedQuizAnswerIds: [],
+  //     answers: [
+  //       {
+  //         peerReviewQuestionId: "111-222",
+  //         value: 3,
+  //       },
+  //       {
+  //         peerReviewQuestionId: "222-222",
+  //         text: "Oikein huono",
+  //       },
+  //     ],
+  //   },
+  // ]
+
+  if (
+    loadingState === "loading" ||
+    (loadingState === "began" && receivedReviews.length < 1)
+  ) {
+    return <div>Loading...</div>
+  }
+
+  if (loadingState === "error") {
+    return <div>Something odd occurred. Try reloading</div>
+  }
 
   return (
     <>
@@ -44,16 +73,12 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
 }
 
 interface IReceivedReviewsProps {
-  peerReviews?: PeerReviewAnswer[]
+  peerReviews: IReceivedPeerReview[]
 }
 
 const ReceivedReviewsDetailed: React.FunctionComponent<
   IReceivedReviewsProps
 > = ({ peerReviews }) => {
-  if (!peerReviews) {
-    return <div>Info not available (may be loading)</div>
-  }
-
   return (
     <div>
       <h2>Details of all the reviews</h2>
@@ -79,10 +104,6 @@ const ReceivedReviewsDetailed: React.FunctionComponent<
 const ReceivedReviewsSummary: React.FunctionComponent<
   IReceivedReviewsProps
 > = ({ peerReviews }) => {
-  if (!peerReviews) {
-    return <div>Info not available (may be loading)</div>
-  }
-
   return (
     <div>
       <h2>Overview of the reviews</h2>

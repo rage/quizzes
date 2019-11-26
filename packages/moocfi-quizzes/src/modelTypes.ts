@@ -211,3 +211,9 @@ export type PeerReviewAnswer = {
   rejectedQuizAnswerIds: string[]
   answers: PeerReviewQuestionAnswer[]
 }
+
+export interface IReceivedPeerReview {
+  id: string
+  peerReviewCollectionId?: string
+  answers: PeerReviewQuestionAnswer[]
+}
