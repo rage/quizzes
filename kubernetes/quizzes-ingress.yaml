@@ -8,7 +8,7 @@ spec:
   tls:
   - hosts:
     - quizzes.mooc.fi
-    secretName: quizzes-moocfi-cert-secret
+    secretName: quizzes-cert-secret
   rules:
     - host: quizzes.mooc.fi
       http:
