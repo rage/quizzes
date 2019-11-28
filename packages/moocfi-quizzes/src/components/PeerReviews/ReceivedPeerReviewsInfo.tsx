@@ -6,12 +6,14 @@ import {
   PeerReviewGradeAnswer,
   PeerReviewEssayAnswer,
   IReceivedPeerReview,
+  PeerReviewQuestion,
 } from "../../modelTypes"
 import { useTypedSelector } from "../../state/store"
 import { useDispatch } from "react-redux"
 import { languageOptions } from "../../utils/languages"
 import { requestReviews } from "../../state/receivedReviews/actions"
 import { peerReviewsReducer } from "../../state/peerReviews/reducer"
+import ReceivedPeerReview from "./ReceivedPeerReview"
 
 const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
   const [modalOpened, setModalOpened] = React.useState(false)
@@ -28,6 +30,10 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
     state => state.receivedReviews.loadingState,
   )
 
+  const quiz = useTypedSelector(state => state.quiz)
+  if (!quiz) return <div>ye</div>
+
+  const peerReviewQuestions = quiz.peerReviewCollections[0].questions
   // const receivedReviews: PeerReviewAnswer[] = [
   //   {
   //     quizAnswerId: "weui",
@@ -61,9 +67,15 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
   return (
     <>
       {modalOpened ? (
-        <ReceivedReviewsDetailed peerReviews={receivedReviews} />
+        <ReceivedReviewsDetailed
+          peerReviews={receivedReviews}
+          peerReviewQuestions={peerReviewQuestions}
+        />
       ) : (
-        <ReceivedReviewsSummary peerReviews={receivedReviews} />
+        <ReceivedReviewsSummary
+          peerReviews={receivedReviews}
+          peerReviewQuestions={peerReviewQuestions}
+        />
       )}
       <Button variant="outlined" onClick={() => setModalOpened(!modalOpened)}>
         Toggle mode
@@ -74,29 +86,20 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
 
 interface IReceivedReviewsProps {
   peerReviews: IReceivedPeerReview[]
+  peerReviewQuestions: PeerReviewQuestion[]
 }
 
 const ReceivedReviewsDetailed: React.FunctionComponent<
   IReceivedReviewsProps
-> = ({ peerReviews }) => {
+> = ({ peerReviews, peerReviewQuestions }) => {
   return (
     <div>
       <h2>Details of all the reviews</h2>
-      {peerReviews
-        .map(r =>
-          r.answers
-            .map(ans => {
-              let gradingPart
-              if ((ans as PeerReviewGradeAnswer).value) {
-                gradingPart = (ans as PeerReviewGradeAnswer).value
-              } else {
-                gradingPart = (ans as PeerReviewEssayAnswer).text
-              }
-              return ans.peerReviewQuestionId + ": " + gradingPart
-            })
-            .join(" , "),
-        )
-        .join(" ; ")}
+      {peerReviews.map(pr => (
+        <div style={{ border: "2px black solid" }}>
+          <ReceivedPeerReview questions={peerReviewQuestions} answer={pr} />
+        </div>
+      ))}
     </div>
   )
 }

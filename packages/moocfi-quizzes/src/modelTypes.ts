@@ -157,7 +157,7 @@ export type PeerReviewQuestion = {
   default: boolean
   type: "grade" | "essay"
   answerRequired: boolean
-  order: boolean
+  order: number
   texts: PeerReviewQuestionText[]
 }
 
