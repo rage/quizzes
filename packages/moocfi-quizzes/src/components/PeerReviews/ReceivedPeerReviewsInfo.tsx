@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Button, Typography } from "@material-ui/core"
+import { Button, Typography, List, ListItem } from "@material-ui/core"
 import {
   PeerReviewAnswer,
   PeerReviewQuestionAnswer,
@@ -102,10 +102,25 @@ const ReceivedReviewsDetailed: React.FunctionComponent<
 const ReceivedReviewsSummary: React.FunctionComponent<
   IReceivedReviewsProps
 > = ({ peerReviews }) => {
+  const gradeAnswers = peerReviews.flatMap(review =>
+    review.answers
+      .filter(a => typeof (a as PeerReviewGradeAnswer).value === "number")
+      .map(prqa => prqa.value),
+  )
+  let average: number | string = "-"
+  if (gradeAnswers.length > 0) {
+    average = gradeAnswers.reduce((sum, e) => (sum += e)) / gradeAnswers.length
+    average = average.toFixed(2)
+  }
+
   return (
-    <div>
+    <div style={{ margin: "1rem 0" }}>
       <h2>Overview of the reviews</h2>
-      Number of the reviews you've received: {peerReviews.length}
+
+      <Typography>
+        Your answered has received {peerReviews.length} reviews. The average of
+        all grades is {average}.
+      </Typography>
     </div>
   )
 }
