@@ -3,7 +3,10 @@ import { createAction } from "typesafe-actions"
 import { ThunkAction } from "../store"
 import * as messageActions from "../message/actions"
 
-import { getReceivedReviews } from "../../services/peerReviewService"
+import {
+  getReceivedReviews,
+  mockGetReceivedReviews,
+} from "../../services/peerReviewService"
 import { IReceivedPeerReview } from "../../modelTypes"
 
 export type LoadingState = "began" | "loading" | "done" | "error"
@@ -41,11 +44,13 @@ export const requestReviews: ActionCreator<ThunkAction> = () => async (
   }
 
   try {
-    const reviews = await getReceivedReviews(
-      answerId,
-      accessToken,
-      getState().backendAddress,
-    )
+    // const reviews = await getReceivedReviews(
+    //   answerId,
+    //   accessToken,
+    //   getState().backendAddress,
+    // )
+
+    const reviews = await mockGetReceivedReviews(answerId)
     dispatch(setReviews(reviews))
   } catch (e) {
     dispatch(setLoadingState("error"))

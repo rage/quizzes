@@ -14,20 +14,26 @@ import {
   PeerReviewQuestion,
   IReceivedPeerReview,
 } from "../../modelTypes"
+import MarkdownText from "../MarkdownText"
+import { WhiteSpacePreservingTypography } from "../styleComponents"
+import LikertScale from "likert-react"
 
 interface IReceivedPeerReviewProps {
   questions: PeerReviewQuestion[]
   answer: IReceivedPeerReview
 }
 
+let i = 0
+
 const ReceivedPeerReview: React.FunctionComponent<IReceivedPeerReviewProps> = ({
   questions,
   answer,
 }) => {
-  console.log("Questions: ", questions)
-
+  console.log("Some answer: ", answer)
   return (
-    <div>
+    <div style={{ margin: "10px 5px", border: "dashed black 2px" }}>
+      <h2>Peer review {++i}</h2>
+      <Typography variant="body1">{answer.createdAt.toISOString()}</Typography>
       {questions
         .sort((e1, e2) => e1.order - e2.order)
         .map(question => {
@@ -61,37 +67,74 @@ interface IReceivedPeerReviewQuestionAnswer {
 const PeerReviewQuestionAnswer: React.FunctionComponent<
   IReceivedPeerReviewQuestionAnswer
 > = ({ questionAnswer, questionTitle }) => {
-  if (typeof (questionAnswer as PeerReviewEssayAnswer).text === "string") {
-    questionAnswer = questionAnswer as PeerReviewEssayAnswer
-    return (
-      <React.Fragment>
-        <Typography variant="subtitle1">{questionTitle}</Typography>
-        <Typography variant="body1" style={{ wordBreak: "break-word" }}>
-          {questionAnswer.text}
-        </Typography>
-      </React.Fragment>
-    )
-  } else {
-    questionAnswer = questionAnswer as PeerReviewGradeAnswer
-    return (
-      <FormControl fullWidth={true}>
-        <FormLabel>{questionTitle}</FormLabel>
-        <RadioGroup value={`${questionAnswer.value}`} row={true}>
-          {[1, 2, 3, 4, 5].map(n => {
-            return (
-              <FormControlLabel
-                key={"radio" + n}
-                value={`${n}`}
-                label={n}
-                labelPlacement="start"
-                control={<Radio color="primary" disabled={true} />}
-              />
-            )
-          })}
-        </RadioGroup>
-      </FormControl>
-    )
+  const answerType =
+    typeof (questionAnswer as PeerReviewEssayAnswer).text === "string"
+      ? "essay"
+      : "grade"
+
+  let Component: React.ReactElement
+
+  switch (answerType) {
+    case "essay":
+      Component = (
+        <ReceivedEssayAnswer
+          questionAnswer={questionAnswer as PeerReviewEssayAnswer}
+          questionTitle={questionTitle}
+        />
+      )
+      break
+    case "grade":
+      Component = (
+        <ReceivedGradeAnswer
+          questionAnswer={questionAnswer as PeerReviewGradeAnswer}
+          questionTitle={questionTitle}
+        />
+      )
+      break
+    default:
+      Component = (
+        <div>
+          No support for this type of peer review question type: {answerType}
+        </div>
+      )
   }
+  return <div style={{ margin: "1rem" }}>{Component}</div>
 }
+
+interface IReceivedPeerReviewEssayAnswer {
+  questionAnswer: PeerReviewEssayAnswer
+  questionTitle: string
+  questionBody?: string
+}
+
+interface IReceivedPeerReviewGradeAnswer {
+  questionAnswer: PeerReviewGradeAnswer
+  questionTitle: string
+  questionBody?: string
+}
+
+const ReceivedEssayAnswer: React.FunctionComponent<
+  IReceivedPeerReviewEssayAnswer
+> = ({ questionTitle, questionAnswer }) => (
+  <div style={{ paddingRight: "1.5rem" }}>
+    <MarkdownText variant="subtitle1" style={{ fontWeight: "bold" }}>
+      {questionTitle}
+    </MarkdownText>
+    <WhiteSpacePreservingTypography variant="body1">
+      {questionAnswer.text}
+    </WhiteSpacePreservingTypography>
+  </div>
+)
+
+const ReceivedGradeAnswer: React.FunctionComponent<
+  IReceivedPeerReviewGradeAnswer
+> = ({ questionTitle, questionAnswer }) => (
+  <LikertScale
+    key={questionAnswer.peerReviewQuestionId}
+    reviews={[{ question: questionTitle, review: questionAnswer.value }]}
+    highlightColor="#3262c9"
+    frozen
+  />
+)
 
 export default ReceivedPeerReview

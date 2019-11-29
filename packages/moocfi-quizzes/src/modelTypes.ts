@@ -216,4 +216,5 @@ export interface IReceivedPeerReview {
   id: string
   peerReviewCollectionId?: string
   answers: PeerReviewQuestionAnswer[]
+  createdAt: Date
 }

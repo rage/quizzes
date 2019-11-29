@@ -77,13 +77,17 @@ export class PeerReviewController {
       const strippedResult = result.map(prAnswer => ({
         id: prAnswer.id,
         peerReviewCollectionId: prAnswer.peerReviewCollectionId,
-        answers: prAnswer.answers,
+        createdAt: prAnswer.createdAt,
+        answers: prAnswer.answers.map(prqa => {
+          const { createdAt, updatedAt, ...relevant } = prqa
+          return relevant
+        }),
       }))
 
       return strippedResult
-    } else {
-      return result
     }
+
+    return result
   }
 
   @Get("/data/:quizId/plainPeerReviews")

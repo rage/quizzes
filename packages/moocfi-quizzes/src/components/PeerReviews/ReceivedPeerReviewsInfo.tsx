@@ -96,9 +96,7 @@ const ReceivedReviewsDetailed: React.FunctionComponent<
     <div>
       <h2>Details of all the reviews</h2>
       {peerReviews.map(pr => (
-        <div style={{ border: "2px black solid" }}>
-          <ReceivedPeerReview questions={peerReviewQuestions} answer={pr} />
-        </div>
+        <ReceivedPeerReview questions={peerReviewQuestions} answer={pr} />
       ))}
     </div>
   )
