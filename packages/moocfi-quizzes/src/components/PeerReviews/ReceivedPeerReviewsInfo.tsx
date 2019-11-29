@@ -34,24 +34,6 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
   if (!quiz) return <div>ye</div>
 
   const peerReviewQuestions = quiz.peerReviewCollections[0].questions
-  // const receivedReviews: PeerReviewAnswer[] = [
-  //   {
-  //     quizAnswerId: "weui",
-  //     peerReviewCollectionId: "safd",
-  //     userId: 666,
-  //     rejectedQuizAnswerIds: [],
-  //     answers: [
-  //       {
-  //         peerReviewQuestionId: "111-222",
-  //         value: 3,
-  //       },
-  //       {
-  //         peerReviewQuestionId: "222-222",
-  //         text: "Oikein huono",
-  //       },
-  //     ],
-  //   },
-  // ]
 
   if (
     loadingState === "loading" ||
@@ -64,8 +46,17 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
     return <div>Something odd occurred. Try reloading</div>
   }
 
+  const toggleButton = (
+    <Button variant="outlined" onClick={() => setModalOpened(!modalOpened)}>
+      {modalOpened
+        ? "Show less peer review information"
+        : "Show all the received peer reviews"}
+    </Button>
+  )
+
   return (
     <>
+      {modalOpened && toggleButton}
       {modalOpened ? (
         <ReceivedReviewsDetailed
           peerReviews={receivedReviews}
@@ -77,9 +68,7 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
           peerReviewQuestions={peerReviewQuestions}
         />
       )}
-      <Button variant="outlined" onClick={() => setModalOpened(!modalOpened)}>
-        Toggle mode
-      </Button>
+      {toggleButton}
     </>
   )
 }
@@ -95,9 +84,17 @@ const ReceivedReviewsDetailed: React.FunctionComponent<
   return (
     <div>
       <h2>Details of all the reviews</h2>
-      {peerReviews.map(pr => (
-        <ReceivedPeerReview questions={peerReviewQuestions} answer={pr} />
-      ))}
+      {peerReviews
+        .sort(
+          (rev1, rev2) => rev2.createdAt.getTime() - rev1.createdAt.getTime(),
+        )
+        .map((pr, idx) => (
+          <ReceivedPeerReview
+            questions={peerReviewQuestions}
+            answer={pr}
+            idx={idx}
+          />
+        ))}
     </div>
   )
 }

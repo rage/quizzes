@@ -15,25 +15,28 @@ import {
   IReceivedPeerReview,
 } from "../../modelTypes"
 import MarkdownText from "../MarkdownText"
-import { WhiteSpacePreservingTypography } from "../styleComponents"
+import {
+  WhiteSpacePreservingTypography,
+  SpaciousPaper,
+} from "../styleComponents"
 import LikertScale from "likert-react"
 
 interface IReceivedPeerReviewProps {
   questions: PeerReviewQuestion[]
   answer: IReceivedPeerReview
+  idx: number
 }
-
-let i = 0
 
 const ReceivedPeerReview: React.FunctionComponent<IReceivedPeerReviewProps> = ({
   questions,
   answer,
+  idx,
 }) => {
-  console.log("Some answer: ", answer)
   return (
-    <div style={{ margin: "10px 5px", border: "dashed black 2px" }}>
-      <h2>Peer review {++i}</h2>
-      <Typography variant="body1">{answer.createdAt.toISOString()}</Typography>
+    <SpaciousPaper elevation={4}>
+      <Typography variant="h6">
+        Peer review {idx + 1} ({answer.createdAt.toLocaleDateString()})
+      </Typography>
       {questions
         .sort((e1, e2) => e1.order - e2.order)
         .map(question => {
@@ -54,7 +57,7 @@ const ReceivedPeerReview: React.FunctionComponent<IReceivedPeerReviewProps> = ({
             </div>
           )
         })}
-    </div>
+    </SpaciousPaper>
   )
 }
 
@@ -98,7 +101,7 @@ const PeerReviewQuestionAnswer: React.FunctionComponent<
         </div>
       )
   }
-  return <div style={{ margin: "1rem" }}>{Component}</div>
+  return <div>{Component}</div>
 }
 
 interface IReceivedPeerReviewEssayAnswer {
@@ -116,7 +119,7 @@ interface IReceivedPeerReviewGradeAnswer {
 const ReceivedEssayAnswer: React.FunctionComponent<
   IReceivedPeerReviewEssayAnswer
 > = ({ questionTitle, questionAnswer }) => (
-  <div style={{ paddingRight: "1.5rem" }}>
+  <div style={{ paddingRight: "1.5rem", marginTop: "1rem" }}>
     <MarkdownText variant="subtitle1" style={{ fontWeight: "bold" }}>
       {questionTitle}
     </MarkdownText>
