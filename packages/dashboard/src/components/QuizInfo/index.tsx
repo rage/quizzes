@@ -105,6 +105,7 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
               grantPointsPolicy={this.props.edit.grantPointsPolicy}
               points={this.props.edit.points}
               deadline={this.props.edit.deadline}
+              autoConfirm={this.props.edit.autoConfirm}
             />
           ) : (
             <ShortQuizInfo
@@ -118,6 +119,7 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
               grantPointsPolicy={this.props.edit.grantPointsPolicy}
               points={this.props.edit.points}
               deadline={this.props.edit.deadline}
+              autoConfirm={this.props.edit.autoConfirm}
             />
           )}
         </Grid>
@@ -143,7 +145,8 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
       attributeName === "triesLimited" ||
       attributeName === "grantPointsPolicy" ||
       attributeName === "deadline" ||
-      attributeName === "points"
+      attributeName === "points" ||
+      attributeName === "autoConfirm"
     ) {
       this.props.changeAttr(attributeName, attributeValue)
     } else {

@@ -1,6 +1,8 @@
 import {
   Button,
+  Checkbox,
   FormControl,
+  FormControlLabel,
   Grid,
   InputLabel,
   MenuItem,
@@ -36,6 +38,7 @@ interface IProps {
   grantPointsPolicy: QuizPointsGrantingPolicy
   points?: number
   deadline?: Date
+  autoConfirm?: boolean
 }
 
 interface IState {
@@ -53,6 +56,7 @@ interface IState {
   points?: number
   deadline: string
   deadlineChecked: boolean
+  autoConfirm: boolean
 }
 
 class ExpandedQuizInfo extends React.Component<IProps, IState> {
@@ -69,6 +73,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     "points",
     "deadline",
     "deadlineChecked",
+    "autoConfirm",
   ]
 
   constructor(props: IProps) {
@@ -102,6 +107,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
       points: props.points || 1,
       deadline: stringDeadline,
       deadlineChecked: !!props.deadline,
+      autoConfirm: !!props.autoConfirm,
     }
   }
 
@@ -228,7 +234,20 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
             />
           </Grid>
 
-          <Grid item={true} xs={12} md="auto" style={{ marginTop: "1rem" }}>
+          <Grid item={true} xs={12} md="auto">
+            <FormControlLabel
+              control={
+                <Checkbox
+                  checked={!this.state.autoConfirm}
+                  color="primary"
+                  onChange={this.changeTempAttribute("autoConfirm")}
+                />
+              }
+              label="Every answer must be manually confirmed"
+            />
+          </Grid>
+
+          <Grid item={true} xs={12} md="auto">
             <TriesCustomiser
               tries={this.state.tries}
               triesLimited={this.state.triesLimited}
@@ -304,6 +323,8 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     } else if (attributeName === "tries") {
       const value = e.target.value
       newState[attributeName] = value >= 1 ? value : 1
+    } else if (attributeName === "autoConfirm") {
+      newState.autoConfirm = !this.state.autoConfirm
     } else {
       newState[attributeName] = e.target.value
     }
@@ -318,6 +339,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     this.props.setAttribute("submitMessage", this.state.submitMessage)
     this.props.setAttribute("tries", this.state.tries)
     this.props.setAttribute("triesLimited", this.state.triesLimited)
+    this.props.setAttribute("autoConfirm", this.state.autoConfirm)
     this.props.setAttribute("grantPointsPolicy", this.state.grantPointsPolicy)
     this.props.setAttribute(
       "deadline",

@@ -22,6 +22,7 @@ interface IProps {
   grantPointsPolicy: QuizPointsGrantingPolicy
   points?: number
   deadline?: Date
+  autoConfirm?: boolean
 }
 
 const ShortQuizInfo: React.FunctionComponent<IProps> = ({
@@ -35,6 +36,7 @@ const ShortQuizInfo: React.FunctionComponent<IProps> = ({
   grantPointsPolicy,
   points,
   deadline,
+  autoConfirm,
 }) => (
   <Grid container={true} justify="space-between">
     <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
@@ -90,6 +92,15 @@ const ShortQuizInfo: React.FunctionComponent<IProps> = ({
           : "No deadline"}
       </Typography>
     </Grid>
+
+    <Grid item={true} xs={12}>
+      <Typography variant="subtitle1">
+        {autoConfirm
+          ? "Answers are automatically confirmed when they meet the criteria."
+          : "Answers to the quiz have to be manually confirmed."}
+      </Typography>
+    </Grid>
+
     <Grid
       item={true}
       xs={12}
