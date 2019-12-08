@@ -105,7 +105,10 @@ export default class PeerReviewService {
       quiz,
     )
 
-    return updatedState
+    return {
+      updatedAnswer,
+      updatedState,
+    }
   }
 
   public async createPeerReview(

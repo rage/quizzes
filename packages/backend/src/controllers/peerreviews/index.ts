@@ -176,6 +176,7 @@ export class PeerReviewController {
     }))[0]
 
     let responsePeerReview: PeerReview
+    let responseQuizAnswer: QuizAnswer
     let responseUserQuizState: UserQuizState
 
     await this.entityManager.transaction(async manager => {
@@ -184,12 +185,19 @@ export class PeerReviewController {
         peerReview,
       )
 
-      responseUserQuizState = await this.peerReviewService.processPeerReview(
+      const {
+        updatedAnswer,
+        updatedState,
+      } = await this.peerReviewService.processPeerReview(
         manager,
         quiz,
         givingQuizAnswer,
         true,
       )
+
+      responseQuizAnswer = updatedAnswer
+      responseUserQuizState = updatedState
+
       await this.peerReviewService.processPeerReview(
         manager,
         quiz,
@@ -199,6 +207,7 @@ export class PeerReviewController {
 
     return {
       peerReview: responsePeerReview,
+      quizAnswer: responseQuizAnswer,
       userQuizState: responseUserQuizState,
     }
   }

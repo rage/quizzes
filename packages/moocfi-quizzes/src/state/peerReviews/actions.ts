@@ -6,7 +6,8 @@ import {
   postPeerReview,
   postSpamFlag,
 } from "../../services/peerReviewService"
-import { setQuizState } from "../user/actions"
+import { setAnswer } from "../quizAnswer/actions"
+import { setUserQuizState } from "../user/actions"
 import { ThunkAction } from "../store"
 import { PeerReviewAnswer, PeerReviewCollection } from "../../modelTypes"
 
@@ -97,12 +98,13 @@ export const submit: ActionCreator<ThunkAction> = () => async (
   const accessToken = getState().user.accessToken
   dispatch(setSubmitDisabled(true))
   const address = getState().backendAddress
-  const { userQuizState } = await postPeerReview(
+  const { quizAnswer, userQuizState } = await postPeerReview(
     peerReview,
     accessToken,
     address,
   )
-  dispatch(setQuizState(userQuizState))
+  dispatch(setAnswer(quizAnswer))
+  dispatch(setUserQuizState(userQuizState))
   dispatch(setReviewAnswer(null))
   await dispatch(fetchPeerReviewAlternatives())
 }

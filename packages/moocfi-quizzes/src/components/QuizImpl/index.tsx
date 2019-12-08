@@ -116,6 +116,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const showPoints = useTypedSelector(
     state => state.customization.showPointsInfo,
   )
+  const activeStep = useTypedSelector(state => state.peerReviews.activeStep)
 
   const dispatch = useDispatch()
 
@@ -229,13 +230,16 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     : false
 
   const exerciseFinishedMessage =
-    userQuizState && userQuizState.status === "locked"
-      ? answerStatus === "rejected"
+    activeStep === 4
+      ? languageInfo.peerReviews.answerConfirmed
+      : activeStep === 3
+      ? answerStatus === "submitted" ||
+        answerStatus === "enough-received-but-not-given"
+        ? languageInfo.peerReviews.manualReview
+        : answerStatus === "rejected"
         ? languageInfo.peerReviews.answerRejected
         : answerStatus === "spam"
         ? languageInfo.peerReviews.answerFlaggedAsSpam
-        : answerStatus === "confirmed"
-        ? languageInfo.peerReviews.answerConfirmed
         : null
       : null
 
