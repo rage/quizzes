@@ -22,7 +22,7 @@ export const userReducer = (
     case getType(user.setToken):
       return { ...state, accessToken: action.payload }
     case getType(user.setQuizState):
-      return { ...state, userQuizState: action.payload }
+      return { ...state, userQuizState: action.payload.userQuizState }
     case getType(user.clear):
       return initialState
     default:

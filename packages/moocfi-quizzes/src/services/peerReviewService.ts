@@ -39,7 +39,7 @@ export const postPeerReview = async (
   peerReview: PeerReviewAnswer,
   accessToken: string,
   address?: string,
-): Promise<{ userQuizState: UserQuizState }> => {
+): Promise<{ quizAnswer: QuizAnswer; userQuizState: UserQuizState }> => {
   const response = await axios.post(
     `${address || BASE_URL}/api/v1/quizzes/peerreview`,
     peerReview,

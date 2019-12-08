@@ -70,6 +70,7 @@ export type PeerReviewLabels = {
   answerRejected: string
   answerFlaggedAsSpam: string
   answerConfirmed: string
+  manualReview: string
 }
 
 export type UnsupportedLabels = {

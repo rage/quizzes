@@ -92,7 +92,8 @@ export const initialize: ActionCreator<ThunkAction> = (
     }
 
     dispatch(userActions.setToken(accessToken))
-    dispatch(quizAnswerActions.set(quizAnswer))
+    console.log(quizAnswer)
+    dispatch(quizAnswerActions.setAnswer(quizAnswer))
 
     if (
       userQuizState &&
@@ -103,7 +104,7 @@ export const initialize: ActionCreator<ThunkAction> = (
       dispatch(feedbackDisplayedActions.display())
     }
     if (userQuizState) {
-      dispatch(userActions.setQuizState(userQuizState))
+      dispatch(userActions.setUserQuizState(userQuizState))
     }
   } catch (e) {
     dispatch(messageActions.set(e.toString()))

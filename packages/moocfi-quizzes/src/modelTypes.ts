@@ -55,6 +55,7 @@ export type QuizAnswer = {
     | "confirmed"
     | "rejected"
     | "deprecated"
+    | "enough-received-but-not-given"
   itemAnswers: QuizItemAnswer[]
 }
 
@@ -210,4 +211,10 @@ export type PeerReviewAnswer = {
   userId: number
   rejectedQuizAnswerIds: string[]
   answers: PeerReviewQuestionAnswer[]
+}
+
+export interface QuizAnswerStatePayload {
+  quiz: Quiz
+  quizAnswer: QuizAnswer
+  userQuizState: UserQuizState | null
 }

@@ -111,10 +111,7 @@ const createStoreInstance = (id: string): Store => {
 }
 
 const createStoreCreator = () => {
-  return createStore(
-    rootReducer,
-    composeWithDevTools(applyMiddleware(thunk, activeStepManager)),
-  )
+  return createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)))
 }
 
 export const useTypedSelector: TypedUseSelectorHook<RootState> = useSelector

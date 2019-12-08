@@ -6,11 +6,11 @@ import * as feedbackDisplayedActions from "../feedbackDisplayed/actions"
 import * as userActions from "../user/actions"
 import * as quizActions from "../quiz/actions"
 import * as messageActions from "../message/actions"
-import { QuizAnswer, QuizItem } from "../../modelTypes"
+import { QuizAnswer, QuizAnswerStatePayload, QuizItem } from "../../modelTypes"
 import { wordCount } from "../../utils/string_tools"
 
-export const set = createAction("quizAnswer/SET", resolve => {
-  return (quizAnswer: QuizAnswer) => resolve(quizAnswer)
+export const setAnswer = createAction("quizAnswer/SET", resolve => {
+  return (payload: QuizAnswer) => resolve(payload)
 })
 
 export const setQuizDisabled = createAction(
@@ -62,6 +62,17 @@ export const chooseOptionAction = createAction(
   resolve => (itemId: string, optionId: string, multi: boolean) =>
     resolve({ itemId, optionId, multi }),
 )
+
+/*export const setQuizAnswer: ActionCreator<ThunkAction> = (quizAnswer: QuizAnswer) => {
+  return (dispatch, getState) => {
+    console.log(quizAnswer)
+    dispatch(setAnswer({
+      quiz: getState().quiz,
+      quizAnswer,
+      userQuizState: getState().user.userQuizState
+    }))
+  }
+}*/
 
 export const chooseOption: ActionCreator<ThunkAction> = (
   itemId: string,
@@ -141,19 +152,19 @@ export const submit: ActionCreator<ThunkAction> = () => async (
     quiz = getState().quiz
   }
 
-  dispatch(userActions.setQuizState(userQuizState))
+  dispatch(userActions.setUserQuizState(userQuizState))
   dispatch(setNoChangesSinceSuccessfulSubmit())
 
   if (userQuizState.status === "locked") {
     dispatch(quizActions.set(quiz))
-    dispatch(set(quizAnswer))
+    dispatch(setAnswer(quizAnswer))
     dispatch(feedbackDisplayedActions.display())
   } else if (
     userQuizState.pointsAwarded &&
     Math.abs(userQuizState.pointsAwarded - quiz.points) < 0.001
   ) {
     dispatch(quizActions.set(quiz))
-    dispatch(set(quizAnswer))
+    dispatch(setAnswer(quizAnswer))
     dispatch(feedbackDisplayedActions.display())
   } else {
     const languageInfo = getState().language.languageLabels
