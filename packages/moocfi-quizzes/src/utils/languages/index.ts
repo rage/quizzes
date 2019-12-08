@@ -72,6 +72,19 @@ export type PeerReviewLabels = {
   answerConfirmed: string
 }
 
+export type ReceivedPeerReviewLabels = {
+  loadingLabel: string
+  errorLabel: string
+  noPeerReviewsReceivedlabel: string
+  toggleButtonExpandLabel: string
+  toggleButtonShrinkLabel: string
+  numberOfPeerReviewsText: (n: number) => string
+  averageOfGradesLabel: string
+  noSupportForQuestionTypeLabel: string
+  detailedViewLabel: string
+  summaryViewLabel: string
+}
+
 export type UnsupportedLabels = {
   notSupportedInsert: (itemType: string) => string
 }
@@ -91,6 +104,7 @@ export type SingleLanguageLabels = {
   multipleChoice: MultipleChoiceLabels
   stage: StageLabels
   general: GeneralLabels
+  receivedPeerReviews: ReceivedPeerReviewLabels
 }
 
 export type LanguageLabels = {

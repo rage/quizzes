@@ -14,6 +14,11 @@ import * as messageActions from "./message/actions"
 import * as receivedReviewsActions from "./receivedReviews/actions"
 import { Quiz } from "../modelTypes"
 import { QuizResponse } from "../services/quizService"
+import {
+  getPeerReviewInfo,
+  mockGetReceivedReviews,
+  getReceivedReviews,
+} from "../services/peerReviewService"
 
 export const clearActionCreator = createAction("CLEAR")
 

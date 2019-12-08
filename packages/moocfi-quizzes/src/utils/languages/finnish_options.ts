@@ -57,6 +57,23 @@ const finnishLabels: SingleLanguageLabels = {
     answerFlaggedAsSpam: "Vastauksesi on hylätty epäasiallisena",
     answerConfirmed: "Läpäisit tehtävän hyväksytysti!",
   },
+  receivedPeerReviews: {
+    errorLabel:
+      "Virhe saatujen vertaisarviontien näyttämisessä. Kokeile ladata sivu uudelleen.",
+    noSupportForQuestionTypeLabel:
+      "Tämänlaista vertaisarviointikysymyksen tyyppiä ei tueta",
+    loadingLabel: "Ladataan saamiasi vertaisarvioita...",
+    noPeerReviewsReceivedlabel:
+      "Vastauksesi ei ole vielä saanut vertaisarvioita. Parannat todennäköisyyttä tulla arvioiduksi, jos arvioit muiden vastauksia!",
+    numberOfPeerReviewsText: n =>
+      `Vastauksesi on saanut ${n} arvio${n > 0 ? "ta" : "n"}.`,
+    toggleButtonExpandLabel: "Näytä kaikki saamasi vertaisarviot",
+    toggleButtonShrinkLabel: "Piilota saamasi vertaisarviot",
+    averageOfGradesLabel:
+      "Vertaisarvioiden kaikkien numeroarvosanojen keskiarvo on",
+    detailedViewLabel: "Kaikki vastauksesi saamat vertaisarviot",
+    summaryViewLabel: "Saamasi vertaisarviot",
+  },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
       `Kysymystyyppiä'${itemType}' ei tueta.`,

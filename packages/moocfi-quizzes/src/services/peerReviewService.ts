@@ -169,6 +169,13 @@ export const mockGetReceivedReviews = async (
   ]
 
   return new Promise(resolve => {
-    setTimeout(() => resolve(data), 3000)
+    setTimeout(
+      () =>
+        resolve(
+          data,
+          //[]
+        ),
+      3000,
+    )
   })
 }
