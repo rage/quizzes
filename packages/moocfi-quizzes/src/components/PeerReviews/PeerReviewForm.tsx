@@ -265,9 +265,11 @@ type UnselectedPeerAnswerActionsProps = {
 const UnselectedPeerAnswerActions: React.FunctionComponent<
   UnselectedPeerAnswerActionsProps
 > = ({ languageInfo, answer }) => {
+  const [disabled, setDisabled] = React.useState(false)
   const dispatch = useDispatch()
 
   const flagAsSpam = () => {
+    setDisabled(true)
     dispatch(peerReviewsActions.postSpam(answer.id))
   }
 
@@ -278,7 +280,7 @@ const UnselectedPeerAnswerActions: React.FunctionComponent<
   return (
     <Grid container={true} justify="space-between">
       <Grid item>
-        <RedButton variant="contained" onClick={flagAsSpam}>
+        <RedButton variant="contained" disabled={disabled} onClick={flagAsSpam}>
           {languageInfo.reportAsInappropriateLabel}
         </RedButton>
       </Grid>

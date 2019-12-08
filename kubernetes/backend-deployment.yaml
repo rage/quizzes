@@ -49,6 +49,21 @@ spec:
               secretKeyRef:
                 name: backend-database-secret
                 key: POSTGRES_USERNAME
+          - name: KAFKA_HOST
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: KAFKA_HOST
+          - name: MESSAGE_FORMAT_VERSION
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: MESSAGE_FORMAT_VERSION
+          - name: SERVICE_ID
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: SERVICE_ID
       initContainers:
       - name: quizzes-backend-run-migrations
         image: ${BACKEND_IMAGE}

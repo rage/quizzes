@@ -53,7 +53,7 @@
     "keymirror": "^0.1.1",
     "lusca": "^1.6.0",
     "module-alias": "^2.1.0",
-    "mongoose": "^5.2.9",
+    "mongoose": "^5.7.5",
     "morgan": "^1.9.1",
     "passport": "^0.4.0",
     "passport-http-bearer": "^1.0.1",

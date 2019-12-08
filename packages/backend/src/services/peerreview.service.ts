@@ -240,43 +240,38 @@ export default class PeerReviewService {
       .where("spam_flag.user_id = :reviewerId", { reviewerId })
       .getMany()
 
-    const rejected = [].concat(
+    const rejected: string[] = [].concat(
       ...givenPeerReviews.map(pr => pr.rejectedQuizAnswerIds),
+      ...givenSpamFlags.map(spamFlag => spamFlag.quizAnswerId),
     )
-    rejected.concat(givenSpamFlags.map(spamFlag => spamFlag.quizAnswerId))
     // query will fail if this array is empty
     rejected.push(randomUUID())
 
     const alreadyReviewed = givenPeerReviews.map(pr => pr.quizAnswerId)
     alreadyReviewed.push(randomUUID())
 
-    let candidates: QuizAnswer[] = await this.entityManager
-      .createQueryBuilder(QuizAnswer, "quiz_answer")
-      .innerJoin(
-        UserQuizState,
-        "user_quiz_state",
-        "quiz_answer.user_id = user_quiz_state.user_id and quiz_answer.quiz_id = user_quiz_state.quiz_id",
-      )
-      .where("quiz_answer.quiz_id = :quizId", { quizId })
-      .andWhere(
-        new Brackets(qb => {
-          qb.where("quiz_answer.status = 'submitted'")
-            .orWhere("quiz_answer.status = 'enough-received-but-not-given'")
-            .orWhere("quiz_answer.status = 'confirmed'")
-        }),
-      )
-      .andWhere("quiz_answer.user_id != :reviewerId", { reviewerId })
-      .andWhere("quiz_answer.id not in (:...rejected)", { rejected })
-      .andWhere("quiz_answer.id not in (:...alreadyReviewed)", {
+    let candidates: QuizAnswer[] = await this.getCandidates(
+      quizId,
+      languageId,
+      reviewerId,
+      rejected,
+      alreadyReviewed,
+      false,
+    )
+
+    let includeThis: QuizAnswer[] = []
+
+    if (candidates.length < 2) {
+      includeThis = candidates
+      candidates = await this.getCandidates(
+        quizId,
+        languageId,
+        reviewerId,
+        rejected,
         alreadyReviewed,
-      })
-      .andWhere("quiz_answer.language_id = :languageId", { languageId })
-      .orderBy("quiz_answer.status")
-      .addOrderBy("user_quiz_state.peer_reviews_given", "DESC")
-      .addOrderBy("quiz_answer.created_at")
-      .addOrderBy("user_quiz_state.peer_reviews_received")
-      .limit(20)
-      .getMany()
+        true,
+      )
+    }
 
     candidates = _.shuffle(candidates)
     candidates = candidates.sort(
@@ -291,6 +286,47 @@ export default class PeerReviewService {
       },
     )
 
+    if (includeThis.length === 1) {
+      return [...includeThis, ...candidates.slice(0, 1)]
+    }
+
     return candidates.slice(0, 2)
+  }
+
+  private async getCandidates(
+    quizId: string,
+    languageId: string,
+    reviewerId: number,
+    rejected: string[],
+    alreadyReviewed: string[],
+    includeNonPriority: boolean,
+  ) {
+    let statuses = ["submitted"]
+
+    if (includeNonPriority) {
+      statuses = [...statuses, "enough-received-but-not-given", "confirmed"]
+    }
+
+    return await this.entityManager
+      .createQueryBuilder(QuizAnswer, "quiz_answer")
+      .innerJoin(
+        UserQuizState,
+        "user_quiz_state",
+        "quiz_answer.user_id = user_quiz_state.user_id and quiz_answer.quiz_id = user_quiz_state.quiz_id",
+      )
+      .where("quiz_answer.quiz_id = :quizId", { quizId })
+      .andWhere("quiz_answer.status in (:...statuses)", { statuses })
+      .andWhere("quiz_answer.user_id != :reviewerId", { reviewerId })
+      .andWhere("quiz_answer.id not in (:...rejected)", { rejected })
+      .andWhere("quiz_answer.id not in (:...alreadyReviewed)", {
+        alreadyReviewed,
+      })
+      .andWhere("quiz_answer.language_id = :languageId", { languageId })
+      .orderBy("quiz_answer.status")
+      .addOrderBy("user_quiz_state.peer_reviews_given", "DESC")
+      .addOrderBy("quiz_answer.created_at")
+      .addOrderBy("user_quiz_state.peer_reviews_received")
+      .limit(20)
+      .getMany()
   }
 }

@@ -1,4 +1,9 @@
-import { HeaderParam, JsonController, Post } from "routing-controllers"
+import {
+  BadRequestError,
+  HeaderParam,
+  JsonController,
+  Post,
+} from "routing-controllers"
 import KafkaService from "services/kafka.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
@@ -41,6 +46,12 @@ export class SpamFlagController {
     @EntityFromBody() spamFlag: SpamFlag,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
+    if (
+      await this.spamFlagService.getSpamFlag(user.id, spamFlag.quizAnswerId)
+    ) {
+      throw new BadRequestError("only one flag allowed")
+    }
+
     spamFlag.userId = user.id
 
     const quizAnswer = await this.quizAnswerService.getAnswer(
@@ -52,6 +63,7 @@ export class SpamFlagController {
     const quiz: Quiz = (await this.quizService.getQuizzes({
       id: quizAnswer.quizId,
       course: true,
+      items: true,
     }))[0]
     const userquizstate = await this.userQuizStateService.getUserQuizState(
       quizAnswer.userId,
@@ -74,11 +86,14 @@ export class SpamFlagController {
         validated.userQuizState,
       )
       response = await this.spamFlagService.createSpamFlag(manager, spamFlag)
-      this.kafkaService.publishQuizAnswerUpdated(
-        updatedAnswer,
-        updatedState,
-        quiz,
-      )
+
+      if (quizAnswer.status !== updatedAnswer.status) {
+        this.kafkaService.publishQuizAnswerUpdated(
+          updatedAnswer,
+          updatedState,
+          quiz,
+        )
+      }
     })
     return response
   }

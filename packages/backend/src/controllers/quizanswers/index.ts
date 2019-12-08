@@ -221,6 +221,8 @@ export class QuizAnswerController {
 
     const quiz = (await this.quizService.getQuizzes({
       id: existingAnswer.quizId,
+      course: true,
+      items: true,
     }))[0]
 
     let userQuizState = await this.userQuizStateService.getUserQuizState(
