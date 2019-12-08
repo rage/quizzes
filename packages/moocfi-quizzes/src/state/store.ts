@@ -3,7 +3,6 @@ import { applyMiddleware, combineReducers, createStore } from "redux"
 import { composeWithDevTools } from "redux-devtools-extension/developmentOnly"
 import thunk from "redux-thunk"
 
-import { activeStepManager } from "./middleware"
 import { backendAddressReducer } from "./backendAddress/reducer"
 import {
   customizationReducer,

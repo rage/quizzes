@@ -92,7 +92,6 @@ export const initialize: ActionCreator<ThunkAction> = (
     }
 
     dispatch(userActions.setToken(accessToken))
-    console.log(quizAnswer)
     dispatch(quizAnswerActions.setAnswer(quizAnswer))
 
     if (

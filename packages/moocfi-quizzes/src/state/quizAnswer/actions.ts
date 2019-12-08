@@ -63,17 +63,6 @@ export const chooseOptionAction = createAction(
     resolve({ itemId, optionId, multi }),
 )
 
-/*export const setQuizAnswer: ActionCreator<ThunkAction> = (quizAnswer: QuizAnswer) => {
-  return (dispatch, getState) => {
-    console.log(quizAnswer)
-    dispatch(setAnswer({
-      quiz: getState().quiz,
-      quizAnswer,
-      userQuizState: getState().user.userQuizState
-    }))
-  }
-}*/
-
 export const chooseOption: ActionCreator<ThunkAction> = (
   itemId: string,
   optionId: string,

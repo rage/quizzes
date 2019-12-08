@@ -30,56 +30,6 @@ type PeerReviewActions =
   | typeof setAnswer
   | typeof setQuizState
 
-/*const activeStepReducer = (
-  state: PeerReviewsState = initialState,
-  action: ActionType<PeerReviewActions>,
-): PeerReviewsState => {
-  switch (action.type) {
-    case getType(setAnswer) || getType(setQuizState):
-      const quiz = action.payload.quiz
-      const quizAnswer = action.payload.quizAnswer
-      const userQuizState = action.payload.userQuizState
-
-      if (quiz && quizAnswer && userQuizState) {
-        const course = quiz.course
-        const answerStatus = quizAnswer.status ? quizAnswer.status : null
-        const answerLocked = userQuizState && userQuizState.status === "locked"
-        const peerReviewsGiven = userQuizState ? userQuizState.peerReviewsGiven : 0
-        const peerReviewsReceived = userQuizState
-          ? userQuizState.peerReviewsReceived
-          : 0
-        const peerReviewsRequired = course.minPeerReviewsGiven
-        const peerReviewsReceivedRequired = course.minPeerReviewsReceived
-
-        let activeStep = 0
-        if (answerLocked) {
-          activeStep = 1
-
-          if (peerReviewsGiven >= peerReviewsRequired) {
-            activeStep = 2
-
-            if (peerReviewsReceived >= peerReviewsReceivedRequired) {
-              activeStep = 3
-            }
-          }
-
-          if (answerStatus === "rejected" || answerStatus === "spam") {
-            activeStep = 3
-          }
-
-          if (answerStatus === "confirmed") {
-            activeStep = 4
-          }
-        }
-        return { ...state, activeStep }
-      } else {
-        return state
-      }
-    default:
-      return state
-  }
-}*/
-
 export const peerReviewsReducer = (
   state: PeerReviewsState = initialState,
   action: ActionType<PeerReviewActions>,
@@ -91,8 +41,6 @@ export const peerReviewsReducer = (
       return { ...state, answer: action.payload }
     case getType(peerReviews.setReviewOptions):
       return { ...state, options: action.payload }
-    case getType(peerReviews.changeActiveStep):
-      return { ...state, activeStep: action.payload }
     case getType(peerReviews.clear):
       return initialState
     case getType(peerReviews.changeGradeAction): {
