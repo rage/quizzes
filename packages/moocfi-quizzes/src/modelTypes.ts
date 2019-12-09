@@ -213,7 +213,6 @@ export type PeerReviewAnswer = {
   answers: PeerReviewQuestionAnswer[]
 }
 
-
 export interface IReceivedPeerReview {
   id: string
   peerReviewCollectionId?: string
@@ -225,5 +224,4 @@ export interface QuizAnswerStatePayload {
   quiz: Quiz
   quizAnswer: QuizAnswer
   userQuizState: UserQuizState | null
-
 }
