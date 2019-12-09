@@ -16,7 +16,6 @@ import { Quiz } from "../modelTypes"
 import { QuizResponse } from "../services/quizService"
 import {
   getPeerReviewInfo,
-  mockGetReceivedReviews,
   getReceivedReviews,
 } from "../services/peerReviewService"
 
