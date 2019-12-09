@@ -6,6 +6,7 @@ import Typography from "@material-ui/core/Typography"
 import "likert-react/dist/main.css"
 import PeerReviewForm from "./PeerReviewForm"
 import PeerReviewsGuidance from "./PeerReviewsGuidance"
+import ReceivedPeerReviewsInfo from "./ReceivedPeerReviewsInfo"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
 import Togglable from "../../utils/Togglable"
 import { useTypedSelector } from "../../state/store"
@@ -70,6 +71,9 @@ const PeerReviews: React.FunctionComponent = () => {
 
   return (
     <div>
+      {userQuizState && userQuizState.status === "locked" && (
+        <ReceivedPeerReviewsInfo />
+      )}
       {morePeerReviewsRequired() ? (
         <>
           <PeerReviewsGuidance

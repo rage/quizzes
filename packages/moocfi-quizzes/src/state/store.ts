@@ -16,6 +16,10 @@ import { peerReviewsReducer, PeerReviewsState } from "./peerReviews/reducer"
 import { quizReducer } from "./quiz/reducer"
 import { quizAnswerReducer, QuizAnswerState } from "./quizAnswer/reducer"
 import { userReducer, UserState } from "./user/reducer"
+import {
+  receivedReviewsReducer,
+  IReceivedReviewsState,
+} from "./receivedReviews/reducer"
 import { Quiz } from "../modelTypes"
 
 import * as backendAddressActions from "./backendAddress/actions"
@@ -28,6 +32,7 @@ import * as quizActions from "./quiz/actions"
 import * as quizAnswerActions from "./quizAnswer/actions"
 import * as userActions from "./user/actions"
 import * as PeerReviewsActions from "./peerReviews/actions"
+import * as receivedReviewsActions from "./receivedReviews/actions"
 
 const rootReducerImpl = combineReducers({
   backendAddress: backendAddressReducer,
@@ -39,6 +44,7 @@ const rootReducerImpl = combineReducers({
   peerReviews: peerReviewsReducer,
   quiz: quizReducer,
   quizAnswer: quizAnswerReducer,
+  receivedReviews: receivedReviewsReducer,
   user: userReducer,
 })
 
@@ -63,6 +69,7 @@ export const rootAction = {
   quiz: quizActions,
   quizAnswer: quizAnswerActions,
   user: userActions,
+  receivedReviews: receivedReviewsActions,
 }
 
 export interface State {
@@ -76,6 +83,7 @@ export interface State {
   quiz: Quiz
   quizAnswer: QuizAnswerState
   user: UserState
+  receivedReviews: IReceivedReviewsState
 }
 
 import { StateType, ActionType } from "typesafe-actions"

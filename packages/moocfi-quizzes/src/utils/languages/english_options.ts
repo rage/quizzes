@@ -54,6 +54,24 @@ const englishLabels: SingleLanguageLabels = {
     answerConfirmed: "Your answer has been confirmed!",
     manualReview: "Your answer is being reviewed by course staff",
   },
+  receivedPeerReviews: {
+    averageOfGradesLabel:
+      "The average of all the answers to numerical questions",
+    detailedViewLabel: "All the reviews your answer has received",
+    errorLabel:
+      "An error occurred in displaying the peer reviews you've received. Reloading the page could help",
+    loadingLabel: "Loading the received peer reviews...",
+    noPeerReviewsReceivedlabel:
+      "Your answer has not yet received any peer reviews. You can improve your chances to be chosen by reviewing other people's works!",
+    noSupportForQuestionTypeLabel:
+      "This kind of peer review question is not supported",
+    numberOfPeerReviewsText: n =>
+      `Your answer has received ${n} peer review${n > 1 ? "s" : ""}.`,
+    summaryViewLabel: "Information on the received peer reviews",
+    toggleButtonExpandLabel:
+      "Show all the peer reviews your answer has received",
+    toggleButtonShrinkLabel: "Show only summary",
+  },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
       `Question of type '${itemType}' is not supported.`,

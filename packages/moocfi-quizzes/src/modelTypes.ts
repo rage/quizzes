@@ -158,7 +158,7 @@ export type PeerReviewQuestion = {
   default: boolean
   type: "grade" | "essay"
   answerRequired: boolean
-  order: boolean
+  order: number
   texts: PeerReviewQuestionText[]
 }
 
@@ -211,6 +211,13 @@ export type PeerReviewAnswer = {
   userId: number
   rejectedQuizAnswerIds: string[]
   answers: PeerReviewQuestionAnswer[]
+}
+
+export interface IReceivedPeerReview {
+  id: string
+  peerReviewCollectionId?: string
+  answers: PeerReviewQuestionAnswer[]
+  createdAt: Date
 }
 
 export interface QuizAnswerStatePayload {
