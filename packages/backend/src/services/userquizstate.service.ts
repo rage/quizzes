@@ -170,10 +170,13 @@ export default class UserQuizStateService {
 
     const query = this.knex("user_quiz_state")
       .update({
-        points_awarded: this.knex.raw(
-          "(points_awarded * :maxPoints / :oldMaxPoints)",
-          { maxPoints, oldMaxPoints },
-        ),
+        points_awarded:
+          oldMaxPoints === 0
+            ? this.knex.raw(":maxPoints", { maxPoints })
+            : this.knex.raw("(points_awarded * :maxPoints / :oldMaxPoints)", {
+                maxPoints,
+                oldMaxPoints,
+              }),
       })
       .where({ quiz_id: quiz.id })
 

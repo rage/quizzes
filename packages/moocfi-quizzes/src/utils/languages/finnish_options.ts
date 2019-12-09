@@ -56,6 +56,7 @@ const finnishLabels: SingleLanguageLabels = {
     answerRejected: "Vastauksesi on hylätty vertaisarviossa",
     answerFlaggedAsSpam: "Vastauksesi on hylätty epäasiallisena",
     answerConfirmed: "Läpäisit tehtävän hyväksytysti!",
+    manualReview: "Vastauksesi odottaa kurssihenkilökunnan arviota",
   },
   receivedPeerReviews: {
     errorLabel:

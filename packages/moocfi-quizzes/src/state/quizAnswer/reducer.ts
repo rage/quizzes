@@ -38,7 +38,7 @@ export const quizAnswerReducer = (
       }
     case getType(quizAnswer.setQuizDisabled):
       return { ...state, quizDisabled: action.payload }
-    case getType(quizAnswer.set):
+    case getType(quizAnswer.setAnswer):
       let newItemAnswersReady: Record<string, boolean> = {}
       let newQuizAnswer = action.payload
       newQuizAnswer.itemAnswers.forEach(ia => {

@@ -28,6 +28,7 @@ const PeerReviews: React.FunctionComponent = () => {
     return <div />
   }
 
+  const activeStep = useTypedSelector(state => state.peerReviews.activeStep)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const peerReviewQuestions = quiz.peerReviewCollections
@@ -90,7 +91,7 @@ const PeerReviews: React.FunctionComponent = () => {
             {giveExtraPeerReviewsLabel}
           </BoldTypography>
           <Togglable
-            initiallyVisible={morePeerReviewsRequired()}
+            initiallyVisible={activeStep === 1}
             hideButtonText={peerReviewsLabels.hidePeerReviewLabel}
             displayButtonText={peerReviewsLabels.displayPeerReview}
           >

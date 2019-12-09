@@ -52,6 +52,7 @@ const englishLabels: SingleLanguageLabels = {
     answerRejected: "Your answer was rejected",
     answerFlaggedAsSpam: "Your answer was rejected as inappropriate",
     answerConfirmed: "Your answer has been confirmed!",
+    manualReview: "Your answer is being reviewed by course staff",
   },
   receivedPeerReviews: {
     averageOfGradesLabel:

@@ -1,5 +1,8 @@
+import reduceReducers from "reduce-reducers"
 import { ActionType, getType } from "typesafe-actions"
 import * as peerReviews from "./actions"
+import { setAnswer } from "../quizAnswer/actions"
+import { setQuizState } from "../user/actions"
 import {
   QuizAnswer,
   PeerReviewAnswer,
@@ -8,21 +11,28 @@ import {
   PeerReviewCollection,
 } from "../../modelTypes"
 
-export const initialState = {
+export const initialState: PeerReviewsState = {
   options: [],
   answer: null,
   submitDisabled: true,
+  activeStep: 0,
 }
 
 export type PeerReviewsState = {
   answer: PeerReviewAnswer | null
   options: QuizAnswer[]
   submitDisabled: boolean
+  activeStep: number
 }
+
+type PeerReviewActions =
+  | typeof peerReviews
+  | typeof setAnswer
+  | typeof setQuizState
 
 export const peerReviewsReducer = (
   state: PeerReviewsState = initialState,
-  action: ActionType<typeof peerReviews>,
+  action: ActionType<PeerReviewActions>,
 ): PeerReviewsState => {
   switch (action.type) {
     case getType(peerReviews.set):
@@ -124,7 +134,7 @@ export const peerReviewsReducer = (
           }
           return id
         }),
-        answers: questionIds.map(questionId => {
+        answers: questionIds.map((questionId: string) => {
           return {
             peerReviewQuestionId: questionId,
             value: null,
@@ -135,10 +145,54 @@ export const peerReviewsReducer = (
         ...state,
         answer: peerReviewAnswer,
       }
+    case getType(setQuizState):
+      const quiz = action.payload.quiz
+      const quizAnswer = action.payload.quizAnswer
+      const userQuizState = action.payload.userQuizState
+
+      if (quiz && quizAnswer && userQuizState) {
+        const course = quiz.course
+        const answerStatus = quizAnswer.status ? quizAnswer.status : null
+        const answerLocked = userQuizState && userQuizState.status === "locked"
+        const peerReviewsGiven = userQuizState
+          ? userQuizState.peerReviewsGiven
+          : 0
+        const peerReviewsReceived = userQuizState
+          ? userQuizState.peerReviewsReceived
+          : 0
+        const peerReviewsRequired = course.minPeerReviewsGiven
+        const peerReviewsReceivedRequired = course.minPeerReviewsReceived
+
+        let activeStep = 0
+        if (answerLocked) {
+          activeStep = 1
+
+          if (peerReviewsGiven >= peerReviewsRequired) {
+            activeStep = 2
+
+            if (peerReviewsReceived >= peerReviewsReceivedRequired) {
+              activeStep = 3
+            }
+          }
+
+          if (answerStatus === "rejected" || answerStatus === "spam") {
+            activeStep = 3
+          }
+
+          if (answerStatus === "confirmed") {
+            activeStep = 4
+          }
+        }
+        return { ...state, activeStep }
+      } else {
+        return state
+      }
     default:
       return state
   }
 }
+
+// export const peerReviewsReducer = reduceReducers(prReducer, activeStepReducer)
 
 const submitShouldBeDisabled = (
   prAnswer: PeerReviewAnswer,

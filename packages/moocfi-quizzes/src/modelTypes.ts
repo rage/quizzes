@@ -55,6 +55,7 @@ export type QuizAnswer = {
     | "confirmed"
     | "rejected"
     | "deprecated"
+    | "enough-received-but-not-given"
   itemAnswers: QuizItemAnswer[]
 }
 
@@ -212,9 +213,17 @@ export type PeerReviewAnswer = {
   answers: PeerReviewQuestionAnswer[]
 }
 
+
 export interface IReceivedPeerReview {
   id: string
   peerReviewCollectionId?: string
   answers: PeerReviewQuestionAnswer[]
   createdAt: Date
+}
+
+export interface QuizAnswerStatePayload {
+  quiz: Quiz
+  quizAnswer: QuizAnswer
+  userQuizState: UserQuizState | null
+
 }
