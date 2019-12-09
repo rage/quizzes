@@ -32,6 +32,10 @@ const ReceivedPeerReview: React.FunctionComponent<IReceivedPeerReviewProps> = ({
   answer,
   idx,
 }) => {
+  if (typeof answer.createdAt === "string") {
+    answer.createdAt = new Date(answer.createdAt)
+  }
+
   return (
     <SpaciousPaper elevation={4}>
       <Typography variant="h6">
