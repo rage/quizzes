@@ -20,7 +20,13 @@ export const receivedReviewsReducer = (
     case getType(receivedReviews.setLoadingState):
       return { ...state, loadingState: action.payload }
     case getType(receivedReviews.setReviews):
-      return { reviews: action.payload, loadingState: "done" }
+      const newReviews = action.payload.map(review => {
+        if (typeof review.createdAt === "string") {
+          return { ...review, createdAt: new Date(review.createdAt) }
+        }
+        return review
+      })
+      return { reviews: newReviews, loadingState: "done" }
     default:
       return state
   }
