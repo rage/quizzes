@@ -53,10 +53,10 @@ export class PeerReviewController {
 
   @Get("/received/:answerId")
   public async getGivenReviews(
-    @HeaderParam("authorization") user: ITMCProfileDetails,
     @Param("answerId") answerId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
     @QueryParam("stripped") stripped: boolean,
-  ): Promise<any> {
+  ) {
     if (!user.administrator) {
       stripped = true
       const answer = await this.quizAnswerService.getAnswer(
@@ -139,16 +139,12 @@ export class PeerReviewController {
     return stringStream
   }
 
-  @Get("/:quizId/:languageId(w{2,4}_w{2,4})")
+  @Get("/:quizId/:languageId([^-]*)")
   public async get(
     @Param("quizId") quizId: string,
     @Param("languageId") languageId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    if (quizId === "received") {
-      console.log("HHeh")
-      return
-    }
     return await this.peerReviewService.getAnswersToReview(
       quizId,
       languageId,
