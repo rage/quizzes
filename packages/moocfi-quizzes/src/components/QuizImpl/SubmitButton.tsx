@@ -1,5 +1,6 @@
 import * as React from "react"
 import styled from "styled-components"
+import ThemeProviderContext from "../../contexes/themeProviderContext"
 import { Button } from "@material-ui/core"
 import { useDispatch } from "react-redux"
 
@@ -13,13 +14,20 @@ const StyledSubmitButton = styled(Button)`
     0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
 `
 
+export interface SubmitButtonProps {
+  disabled: boolean
+  onClick: any
+}
+
 const SubmitButton: React.FunctionComponent = () => {
+  const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
   let submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const noChangesAfterSuccessfulAnswer = useTypedSelector(
     state => state.quizAnswer.noChangesSinceSuccessfulSubmit,
   )
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
 
   const quiz = useTypedSelector(state => state.quiz)
 
@@ -30,8 +38,6 @@ const SubmitButton: React.FunctionComponent = () => {
   ) {
     submitLocked = true
   }
-
-  const userQuizState = useTypedSelector(state => state.user.userQuizState)
 
   const noChangesAfterLoading = useTypedSelector(
     state => state.quizAnswer.noChangesAfterLoading,
@@ -54,6 +60,16 @@ const SubmitButton: React.FunctionComponent = () => {
 
   const handleSubmit = () => {
     dispatch(quizAnswerActions.submit())
+  }
+
+  const ThemedSubmitButton = themeProvider.submitButton
+
+  if (ThemedSubmitButton) {
+    return (
+      <ThemedSubmitButton disabled={submitLocked} onClick={handleSubmit}>
+        {buttonText}
+      </ThemedSubmitButton>
+    )
   }
 
   return (

@@ -19,41 +19,11 @@ import {
   faTimes,
   faExclamationCircle,
 } from "@fortawesome/free-solid-svg-icons"
+import ThemeProviderContext from "../contexes/themeProviderContext"
+import ChoiceButton from "./ChoiceButton"
 
 const ChoicesContainer = styled(Grid)`
   padding-top: 7;
-`
-
-interface ChoiceButtonProps {
-  onlyOneItem: boolean
-  selected: boolean
-}
-
-const DisabledButton = styled(Button)<{ onlyOneItem: boolean }>`
-  ${({ onlyOneItem }) => onlyOneItem && `width: 70%;`}
-  text-transform: none;
-  margin: 0.5em 0;
-  border-radius: 15px;
-  border: 1px solid rgba(0, 0, 0, 0.23);
-  padding: 15px;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-    0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
-  background-color: rgba(0, 0, 0, 0) !important;
-`
-
-const ChoiceButton = styled(Button)<ChoiceButtonProps>`
-  ${({ onlyOneItem, selected }) =>
-    `${onlyOneItem ? "width: 70%" : ""};
-  ${!selected ? "background-color: white;" : ""}`}
-
-  text-transform: none;
-  margin: 0.5em 0;
-  border-radius: 15px;
-  border: 1px solid
-    ${({ selected }) => (selected ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.23)")};
-  padding: 15px;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-    0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
 `
 
 const CentralizedOnSmallScreenTypography = styled(Typography)`
@@ -82,54 +52,26 @@ const AttentionIcon = styled(FontAwesomeIcon)`
   font-size: 30px !important;
 `
 
-const RevealedChoiceButton = styled(({ selected, correct, ...others }) => {
-  return (
-    <ChoiceButton variant={"contained"} {...others}>
-      {selected ? correct ? <SuccessIcon /> : <FailureIcon /> : ""}
-      {others.children}
-    </ChoiceButton>
-  )
-})`
-  ${props =>
-    props.selected
-      ? `
-    color: white;
-    background-color: ${props.correct ? "#047500" : "#DB0000"};
-    `
-      : props.correct
-      ? `
-    color: #047500;
-    border-color: #047500;
-    border-width: 3px
-    `
-      : ``}
-`
-
 const BottomMarginedGrid = styled(Grid)`
   margin-bottom: 10px;
 `
 
 interface ILeftBorderedDivProps {
-  barColor: string
+  correct: boolean
   onlyOneItem?: boolean
 }
 
 const LeftBorderedDiv = styled.div<ILeftBorderedDivProps>`
-  border-left: 6px solid ${({ barColor }) => barColor};
+  border-left: 6px solid ${({ correct }) => (correct ? "#047500" : "#DB0000")};
   box-sizing: border-box;
   padding: 3px;
   padding-left: 10px;
   margin-bottom: 5px !important;
-  ${onlyOneItem => onlyOneItem && "width: 70%;"}
+  ${({ onlyOneItem }) => onlyOneItem && "width: 70%;"}
 `
-interface ISolutionDivProps {
-  correct: boolean
-}
 
-const SolutionDiv = styled((correct, ...others) => (
-  <LeftBorderedDiv barColor={correct ? "#047500" : "#DB0000"} {...others} />
-))<ISolutionDivProps>`
-  margin-bottom: 0;
+const LeftAlignedMarkdownText = styled(MarkdownText)`
+  text-align: left;
 `
 
 type MultipleChoiceProps = {
@@ -247,13 +189,13 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
   return (
     <ItemInformationGridItem item xs={questionWidth}>
       {title && (
-        <MarkdownText
+        <LeftAlignedMarkdownText
           Component={SpaciousTypography}
           removeParagraphs
           variant="subtitle1"
         >
           {title}
-        </MarkdownText>
+        </LeftAlignedMarkdownText>
       )}
 
       {body && <MarkdownText>{body}</MarkdownText>}
@@ -286,8 +228,8 @@ const Option: React.FunctionComponent<OptionProps> = ({
   optionWidth,
   shouldBeGray,
 }) => {
+  const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
-
   const items = useTypedSelector(state => state.quiz!.items)
   const item = items.find(i => i.id === option.quizItemId)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
@@ -322,47 +264,6 @@ const Option: React.FunctionComponent<OptionProps> = ({
   const optionIsSelected =
     optionAnswers && optionAnswers.some(oa => oa.quizOptionId === option.id)
 
-  const generalLabels = languageLabels.general
-
-  const successMessage = text.successMessage || generalLabels.answerCorrectLabel
-  const failureMessage =
-    text.failureMessage || generalLabels.answerIncorrectLabel
-
-  const feedbackMessage =
-    option.correct === optionIsSelected ? successMessage : failureMessage
-
-  const feedbackColor = optionIsSelected
-    ? option.correct
-      ? "#047500"
-      : "#DB0000"
-    : "white"
-
-  const properButton = quizDisabled ? (
-    <DisabledButton
-      onlyOneItem={onlyOneItem}
-      variant="contained"
-      fullWidth
-      disabled
-    >
-      <MarkdownText Component={styled.div``} removeParagraphs>
-        {text.title}
-      </MarkdownText>
-    </DisabledButton>
-  ) : (
-    <ChoiceButton
-      onlyOneItem={onlyOneItem}
-      selected={!!optionIsSelected}
-      variant="contained"
-      fullWidth
-      color={optionIsSelected ? "primary" : "default"}
-      onClick={handleOptionChange(option.id)}
-    >
-      <MarkdownText Component={styled.div``} removeParagraphs>
-        {text.title}
-      </MarkdownText>
-    </ChoiceButton>
-  )
-
   if (!displayFeedback) {
     return (
       <OptionGridItem
@@ -370,8 +271,20 @@ const Option: React.FunctionComponent<OptionProps> = ({
         xs={optionWidth}
         onlyOneItem={onlyOneItem}
         shouldBeGray={shouldBeGray}
+        providedStyles={themeProvider.optionGridItemStyles}
       >
-        {properButton}
+        <ChoiceButton
+          onlyOneItem={onlyOneItem}
+          selected={!!optionIsSelected}
+          revealed={false}
+          correct={false}
+          onClick={handleOptionChange(option.id)}
+          disabled={quizDisabled}
+        >
+          <MarkdownText Component={styled.div``} removeParagraphs>
+            {text.title}
+          </MarkdownText>
+        </ChoiceButton>
       </OptionGridItem>
     )
   }
@@ -388,18 +301,19 @@ const Option: React.FunctionComponent<OptionProps> = ({
           xs={optionWidth}
           onlyOneItem={onlyOneItem}
           shouldBeGray={shouldBeGray}
+          providedStyles={themeProvider.optionGridItemStyles}
         >
-          <RevealedChoiceButton
+          <ChoiceButton
+            revealed
             onlyOneItem={onlyOneItem}
-            selected={optionIsSelected}
+            selected={!!optionIsSelected}
             correct={option.correct}
             {...clickOptions}
-            fullWidth
           >
             <MarkdownText Component={styled.div``} removeParagraphs>
               {text.title}
             </MarkdownText>
-          </RevealedChoiceButton>
+          </ChoiceButton>
         </OptionGridItem>
 
         {optionIsSelected && (
@@ -408,6 +322,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             xs={optionWidth}
             onlyOneItem={onlyOneItem}
             shouldBeGray={shouldBeGray}
+            providedStyles={themeProvider.optionGridItemStyles}
           >
             <FeedbackPortion item={item} selectedOption={option} />
           </OptionGridItem>
@@ -425,17 +340,17 @@ const Option: React.FunctionComponent<OptionProps> = ({
         onlyOneItem={onlyOneItem}
         shouldBeGray={shouldBeGray}
       >
-        <RevealedChoiceButton
+        <ChoiceButton
+          revealed
           onlyOneItem={onlyOneItem}
-          selected={optionIsSelected}
+          selected={!!optionIsSelected}
           correct={option.correct}
           {...clickOptions}
-          fullWidth
         >
           <MarkdownText Component={styled.div``} removeParagraphs>
             {text.title}
           </MarkdownText>
-        </RevealedChoiceButton>
+        </ChoiceButton>
       </OptionGridItem>
     </>
   )
@@ -450,6 +365,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   item,
   selectedOption,
 }) => {
+  const themeProvider = React.useContext(ThemeProviderContext)
   const items = useTypedSelector(state => state.quiz!.items)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const languageLabels = useTypedSelector(
@@ -499,10 +415,14 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
     feedbackMessage = itemAnswer.correct ? successMessage : failureMessage
   }
 
-  const feedbackColor = itemAnswer.correct ? "#047500" : "#DB0000"
+  const correct = (itemAnswer.correct && true) || false
+
+  const ThemedDiv = themeProvider.feedbackMessage
+
+  const FeedbackDiv = ThemedDiv || LeftBorderedDiv
 
   return (
-    <LeftBorderedDiv barColor={feedbackColor} onlyOneItem={onlyOneItem}>
+    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem}>
       <Grid container alignItems="center" spacing={2}>
         <Grid item xs={12} sm="auto">
           <CentralizedOnSmallScreenTypography variant="body1">
@@ -515,7 +435,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
           </CentralizedOnSmallScreenTypography>
         </Grid>
       </Grid>
-    </LeftBorderedDiv>
+    </FeedbackDiv>
   )
 }
 
@@ -528,11 +448,13 @@ const OptionGridItem = styled(Grid)<OptionGridItemProps>`
       background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
     `
       : ``}
+  ${({ providedStyles }) => providedStyles}
 `
 
 type OptionGridItemProps = {
   onlyOneItem: boolean
   shouldBeGray: boolean
+  providedStyles?: string
 }
 
 export default MultipleChoice

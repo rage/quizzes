@@ -5,17 +5,18 @@ import styled from "styled-components"
 import { useTypedSelector } from "../../state/store"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons"
+import ThemeProviderContext from "../../contexes/themeProviderContext"
 
-const StyledGrid = styled(Grid)`
+const StyledGrid = styled(Grid)<{ providedStyles: string | undefined }>`
   padding: 1rem;
   color: white;
   background-color: #213094;
+  ${({ providedStyles }) => providedStyles}
 `
 
 const PointsText = styled(Typography)`
   font-size: 1.5rem !important;
   text-align: end;
-  color: white;
   display: inline;
   max-height: 100%;
 
@@ -33,7 +34,6 @@ const XXS12Grid = styled(Grid)`
 
 const PointsLabelText = styled(Typography)`
   font-size: 1rem !important;
-  color: white;
 
   @media (max-width: 550px) {
     text-align: start;
@@ -72,6 +72,7 @@ interface ITopInfoBarProps {
 const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   staticBars,
 }) => {
+  const themeProvider = React.useContext(ThemeProviderContext)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const loggedIn = !!useTypedSelector(state => state.user.accessToken)
   const quiz = useTypedSelector(state => state.quiz)
@@ -156,18 +157,27 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
     }
   }
 
+  const providedIcon = themeProvider.topInfoBarIcon
+
+  console.log(providedIcon)
+
   return (
     <StyledGrid
       container={true}
       justify="space-between"
       alignItems="flex-start"
+      providedStyles={themeProvider.topInfoBarStyles}
     >
       <XXS12Grid item={true} xs={9}>
         <Grid container={true} alignItems="stretch">
           <XXS12Grid item={true} xs={3} md={2}>
-            <IconWrapper>
-              <FontAwesomeIcon icon={faQuestionCircle} />
-            </IconWrapper>
+            {providedIcon ? (
+              providedIcon
+            ) : (
+              <IconWrapper>
+                <FontAwesomeIcon icon={faQuestionCircle} />
+              </IconWrapper>
+            )}
           </XXS12Grid>
 
           <XXS12Grid item={true} xs={9} md={10}>

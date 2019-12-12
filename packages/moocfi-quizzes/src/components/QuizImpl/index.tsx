@@ -28,6 +28,8 @@ import SubmitButton from "./SubmitButton"
 import LoginPrompt from "./LoginPrompt"
 import MarkdownText from "../MarkdownText"
 
+import ThemeProviderContext from "../../contexes/themeProviderContext"
+
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
     essay: Essay,
@@ -57,15 +59,17 @@ const QuizItemContainerDiv = styled.div`
   padding-bottom: 20px;
 `
 
-interface IComponentWrapperProps {
+interface IItemWrapperProps {
   rowNumber: number
+  providedStyles?: string | undefined
 }
 
-const ComponentWrapper = styled.div<IComponentWrapperProps>`
+const ItemWrapper = styled.div<IItemWrapperProps>`
   background-color: ${props =>
-    props.rowNumber % 2 === 0 ? "inherit" : "#605c980d"};
+    props.rowNumber % 2 !== 0 ? "inherit" : "#605c980d"};
   border-radius: 10px;
   padding: 1rem 2rem 1rem 1rem;
+  ${({ providedStyles, rowNumber }) => rowNumber % 2 === 0 && providedStyles}
 `
 
 interface IQuizContentWrapperProps {
@@ -82,13 +86,18 @@ const QuizContentWrapper = styled.div<IQuizContentWrapperProps>`
       `}
 `
 
-const OuterDiv = styled.div`
+const OuterDiv = styled.div<{ providedStyles: string | undefined }>`
   p {
     margin-bottom: 0 !important;
   }
   ul {
     padding-inline-start: 30px;
   }
+  ${({ providedStyles }) => providedStyles}
+`
+
+const QuizBody = styled(MarkdownText)`
+  padding-bottom: 1.5rem;
 `
 
 const BoldTypography = styled(Typography)`
@@ -105,6 +114,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   fullInfoWithoutLogin,
   showZeroPointsInfo = true,
 }) => {
+  const themeProvider = React.useContext(ThemeProviderContext)
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const messageState = useTypedSelector(state => state.message)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
@@ -166,9 +176,13 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           .map((item, idx) => {
             const ItemComponent = componentsByTypeNames(item.type)
             return (
-              <ComponentWrapper rowNumber={idx} key={item.id}>
+              <ItemWrapper
+                rowNumber={idx}
+                providedStyles={themeProvider.itemWrapperStyles}
+                key={item.id}
+              >
                 <ItemComponent item={item} />
-              </ComponentWrapper>
+              </ItemWrapper>
             )
           })}
       </>
@@ -256,7 +270,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     )
 
   return (
-    <OuterDiv>
+    <OuterDiv providedStyles={themeProvider.topInfoBarStyles}>
       <TopInfoBar />
 
       {quizDisabled && (
@@ -268,7 +282,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
         {containsPeerReviews && <StageVisualizer />}
 
-        <MarkdownText>{quiz.texts[0].body}</MarkdownText>
+        <QuizBody>{quiz.texts[0].body}</QuizBody>
         <QuizItemContainerDiv>
           {quizItemComponents(quiz, languageId)}
         </QuizItemContainerDiv>
