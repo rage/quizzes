@@ -56,7 +56,7 @@ const BottomMarginedGrid = styled(Grid)`
   margin-bottom: 10px;
 `
 
-interface ILeftBorderedDivProps {
+export interface LeftBorderedDivProps {
   correct: boolean
   onlyOneItem?: boolean
 }

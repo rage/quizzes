@@ -54,7 +54,7 @@ const StageVisualizer = (props: any) => {
               },
             }}
           >
-            label
+            {label}
           </StepLabel>
         </Step>
       ))}

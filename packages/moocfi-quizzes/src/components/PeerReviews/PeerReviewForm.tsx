@@ -21,8 +21,12 @@ import {
   PeerReviewQuestionText,
   MiscEvent,
 } from "../../modelTypes"
-import { SpaciousTypography, StyledButton, RedButton } from "../styleComponents"
+import { SpaciousTypography } from "../styleComponents"
 import styled from "styled-components"
+
+import SelectButton from "./SelectButton"
+import SpamButton from "./SpamButton"
+import PeerReviewSubmitButton from "./PeerReviewSubmitButton"
 
 const BoldTypography = styled(Typography)`
   font-weight: bold;
@@ -199,14 +203,12 @@ const PeerReviewQuestions: React.FunctionComponent<
         }
       })}
 
-      <StyledButton
-        variant="contained"
-        color="primary"
+      <PeerReviewSubmitButton
         disabled={submitDisabled}
         onClick={submitPeerReview}
       >
         {languageInfo.submitPeerReviewLabel}
-      </StyledButton>
+      </PeerReviewSubmitButton>
     </div>
   )
 }
@@ -280,15 +282,15 @@ const UnselectedPeerAnswerActions: React.FunctionComponent<
   return (
     <Grid container={true} justify="space-between">
       <Grid item>
-        <RedButton variant="contained" disabled={disabled} onClick={flagAsSpam}>
+        <SpamButton disabled={disabled} onClick={flagAsSpam}>
           {languageInfo.reportAsInappropriateLabel}
-        </RedButton>
+        </SpamButton>
       </Grid>
 
       <Grid item>
-        <Button variant="contained" color="primary" onClick={selectAnswer}>
+        <SelectButton onClick={selectAnswer}>
           {languageInfo.chooseButtonLabel}
-        </Button>
+        </SelectButton>
       </Grid>
     </Grid>
   )
