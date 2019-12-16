@@ -1,8 +1,19 @@
 import * as React from "react"
-import { Stepper, StepLabel, Step } from "@material-ui/core"
+import {
+  Stepper,
+  StepIcon,
+  StepLabel,
+  Step,
+  withStyles,
+} from "@material-ui/core"
 import { useTypedSelector } from "../../state/store"
 
-const StageVisualizer = () => {
+let styles = {
+  root: { backgroundColor: "#f6f4f4" },
+  stepIcon: { color: "#4844a3 !important" },
+}
+
+const StageVisualizer = (props: any) => {
   const activeStep = useTypedSelector(state => state.peerReviews.activeStep)
   const quiz = useTypedSelector(state => state.quiz)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
@@ -25,15 +36,30 @@ const StageVisualizer = () => {
     stageLabels.evaluationStageLabel,
   ]
 
+  const { classes } = props
+
   return (
-    <Stepper activeStep={activeStep} alternativeLabel>
+    <Stepper
+      activeStep={activeStep}
+      alternativeLabel
+      classes={{ root: classes.root }}
+    >
       {steps.map(label => (
         <Step key={label}>
-          <StepLabel>{label}</StepLabel>
+          <StepLabel
+            StepIconProps={{
+              classes: {
+                active: classes.stepIcon,
+                completed: classes.stepIcon,
+              },
+            }}
+          >
+            label
+          </StepLabel>
         </Step>
       ))}
     </Stepper>
   )
 }
 
-export default StageVisualizer
+export default withStyles(styles)(StageVisualizer)

@@ -285,6 +285,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
         <QuizBody>{quiz.texts[0].body}</QuizBody>
         <QuizItemContainerDiv>
           {quizItemComponents(quiz, languageId)}
+          <MarkdownText>{quiz.texts[0].submitMessage}</MarkdownText>
         </QuizItemContainerDiv>
 
         {!stillSubmittable && !quizDisabled ? (

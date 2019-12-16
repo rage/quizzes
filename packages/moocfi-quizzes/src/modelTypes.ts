@@ -64,6 +64,7 @@ export type QuizText = {
   languageId: string
   title: string
   body: string
+  submitMessage: string
 }
 
 export type CourseText = {
