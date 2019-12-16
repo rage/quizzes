@@ -46,6 +46,7 @@ export const requestReviews: ActionCreator<ThunkAction> = () => async (
       accessToken,
       getState().backendAddress,
     )
+
     dispatch(setReviews(reviews))
   } catch (e) {
     dispatch(setLoadingState("error"))

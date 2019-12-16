@@ -6,8 +6,8 @@ import {
   JsonController,
   Param,
   Post,
-  UnauthorizedError,
   QueryParam,
+  UnauthorizedError,
 } from "routing-controllers"
 import KafkaService from "services/kafka.service"
 import PeerReviewService from "services/peerreview.service"
@@ -139,7 +139,7 @@ export class PeerReviewController {
     return stringStream
   }
 
-  @Get("/:quizId/:languageId")
+  @Get("/:quizId/:languageId([^-]*)")
   public async get(
     @Param("quizId") quizId: string,
     @Param("languageId") languageId: string,
