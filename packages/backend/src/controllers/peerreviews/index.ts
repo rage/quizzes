@@ -139,7 +139,7 @@ export class PeerReviewController {
     return stringStream
   }
 
-  @Get("/:quizId/:languageId(([a-z]|[A-Z]|_){5,8})")
+  @Get("/:quizId/:languageId")
   public async get(
     @Param("quizId") quizId: string,
     @Param("languageId") languageId: string,
