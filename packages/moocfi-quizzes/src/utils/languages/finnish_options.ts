@@ -38,7 +38,7 @@ const finnishLabels: SingleLanguageLabels = {
     chosenEssayInstruction: "Arvioi valitsemasi vastaus:",
     displayPeerReview: "Anna   vertaisarvio",
     giveExtraPeerReviews:
-      "Anna lisää vertaisarvioita niin oma vastauksesi tulee nopeammin arvioiduksi!",
+      "Olet antanut vaaditun määrän vertaisarvioita. Antamalla lisää vertaisarvioita oma vastauksesi tulee nopeammin arvioiduksi!",
     giveExtraPeerReviewsQuizConfirmed:
       "Voit halutessasi antaa lisää vertaisarvioita",
     givenPeerReviewsLabel: "Vertaisarvioita annettu",

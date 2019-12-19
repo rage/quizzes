@@ -39,7 +39,7 @@ const englishLabels: SingleLanguageLabels = {
     submitPeerReviewLabel: "Submit review",
     peerReviewsCompletedInfo: "All peer reviews have been submitted",
     giveExtraPeerReviews:
-      "Give more peer reviews to have your answer revieved faster!",
+      "You have given the required number of peer reviews. By giving more peer reviews your answer will be reviewed faster!",
     giveExtraPeerReviewsQuizConfirmed:
       "You may still give peer reviews to help others",
     displayPeerReview: "Give peer review",
