@@ -84,6 +84,7 @@ export type ReceivedPeerReviewLabels = {
   noSupportForQuestionTypeLabel: string
   detailedViewLabel: string
   summaryViewLabel: string
+  peerReviewLabel: string
 }
 
 export type UnsupportedLabels = {

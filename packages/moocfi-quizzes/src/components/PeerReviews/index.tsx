@@ -10,11 +10,7 @@ import ReceivedPeerReviewsInfo from "./ReceivedPeerReviewsInfo"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
 import Togglable from "../../utils/Togglable"
 import { useTypedSelector } from "../../state/store"
-
-const BoldTypography = styled(Typography)`
-  font-weight: bold;
-  margin-bottom: 15px;
-`
+import { BoldTypography } from "../styleComponents"
 
 const TopMarginDiv = styled.div`
   margin-top: 15px;
@@ -34,6 +30,7 @@ const PeerReviews: React.FunctionComponent = () => {
   const peerReviewQuestions = quiz.peerReviewCollections
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+
   if (!languageInfo) {
     return <div />
   }
@@ -49,7 +46,7 @@ const PeerReviews: React.FunctionComponent = () => {
   const peerReviewsLabels = languageInfo.peerReviews
 
   const giveExtraPeerReviewsLabel =
-    quizAnswer.status === "confirmed"
+    activeStep >= 3
       ? peerReviewsLabels.giveExtraPeerReviewsQuizConfirmed
       : peerReviewsLabels.giveExtraPeerReviews
 
@@ -71,9 +68,7 @@ const PeerReviews: React.FunctionComponent = () => {
 
   return (
     <div>
-      {userQuizState && userQuizState.status === "locked" && (
-        <ReceivedPeerReviewsInfo />
-      )}
+      {activeStep >= 2 && <ReceivedPeerReviewsInfo />}
       {morePeerReviewsRequired() ? (
         <>
           <PeerReviewsGuidance

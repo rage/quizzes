@@ -27,6 +27,7 @@ import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
 import LoginPrompt from "./LoginPrompt"
 import MarkdownText from "../MarkdownText"
+import { BoldTypography } from "../styleComponents"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
@@ -89,11 +90,6 @@ const OuterDiv = styled.div`
   ul {
     padding-inline-start: 30px;
   }
-`
-
-const BoldTypography = styled(Typography)`
-  font-weight: bold;
-  padding-bottom: 20px;
 `
 
 const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({

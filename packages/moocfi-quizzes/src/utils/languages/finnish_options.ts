@@ -38,9 +38,7 @@ const finnishLabels: SingleLanguageLabels = {
     chosenEssayInstruction: "Arvioi valitsemasi vastaus:",
     displayPeerReview: "Anna   vertaisarvio",
     giveExtraPeerReviews:
-      "Olet jo antanut tarvittavan määrän vertaisarvioita. \
-         Jatka muiden töiden arviointia painamalla alhaalta - \
-          -  näin parannat oman vastauksesi todennäköisyyttä tulla vertaisarvioiduksi!",
+      "Olet antanut vaaditun määrän vertaisarvioita. Antamalla lisää vertaisarvioita oma vastauksesi tulee nopeammin arvioiduksi!",
     giveExtraPeerReviewsQuizConfirmed:
       "Voit halutessasi antaa lisää vertaisarvioita",
     givenPeerReviewsLabel: "Vertaisarvioita annettu",
@@ -65,15 +63,15 @@ const finnishLabels: SingleLanguageLabels = {
       "Tämänlaista vertaisarviointikysymyksen tyyppiä ei tueta",
     loadingLabel: "Ladataan saamiasi vertaisarvioita...",
     noPeerReviewsReceivedlabel:
-      "Vastauksesi ei ole vielä saanut vertaisarvioita. Parannat todennäköisyyttä tulla arvioiduksi, jos arvioit muiden vastauksia!",
+      "Vastauksesi ei ole vielä saanut vertaisarvioita",
     numberOfPeerReviewsText: n =>
       `Vastauksesi on saanut ${n} arvio${n > 0 ? "ta" : "n"}.`,
     toggleButtonExpandLabel: "Näytä kaikki saamasi vertaisarviot",
     toggleButtonShrinkLabel: "Piilota saamasi vertaisarviot",
-    averageOfGradesLabel:
-      "Vertaisarvioiden kaikkien numeroarvosanojen keskiarvo on",
+    averageOfGradesLabel: "Kaikkien numeroarvosanojen keskiarvo on",
     detailedViewLabel: "Kaikki vastauksesi saamat vertaisarviot",
-    summaryViewLabel: "Saamasi vertaisarviot",
+    summaryViewLabel: "Saamasi vertaisarviot:",
+    peerReviewLabel: "Vertaisarvio",
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
