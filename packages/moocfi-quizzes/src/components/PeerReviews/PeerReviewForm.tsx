@@ -21,7 +21,12 @@ import {
   PeerReviewQuestionText,
   MiscEvent,
 } from "../../modelTypes"
-import { SpaciousTypography, StyledButton, RedButton } from "../styleComponents"
+import {
+  BaseButton,
+  SpaciousTypography,
+  StyledButton,
+  RedButton,
+} from "../styleComponents"
 import styled from "styled-components"
 
 const BoldTypography = styled(Typography)`
@@ -72,9 +77,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 
     return (
       <>
-        <Typography variant="subtitle1" style={chosenStyle}>
-          {languageInfo.chosenEssayInstruction}
-        </Typography>
+        <BoldTypography>{languageInfo.chosenEssayInstruction}</BoldTypography>
         <PeerReviewOption answer={chosenAnswer} />
         <PeerReviewQuestions
           peerReview={peerReview}
@@ -86,9 +89,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 
   return (
     <>
-      <Typography variant="subtitle1" style={chosenStyle}>
-        {languageInfo.chooseEssayInstruction}
-      </Typography>
+      <BoldTypography>{languageInfo.chooseEssayInstruction}</BoldTypography>
 
       {answersToReview.map((answer, idx) => (
         <TopMarginDiv key={answer.id}>
@@ -286,9 +287,9 @@ const UnselectedPeerAnswerActions: React.FunctionComponent<
       </Grid>
 
       <Grid item>
-        <Button variant="contained" color="primary" onClick={selectAnswer}>
+        <BaseButton variant="contained" color="primary" onClick={selectAnswer}>
           {languageInfo.chooseButtonLabel}
-        </Button>
+        </BaseButton>
       </Grid>
     </Grid>
   )

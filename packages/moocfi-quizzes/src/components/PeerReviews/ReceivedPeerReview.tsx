@@ -1,12 +1,6 @@
 import * as React from "react"
-import {
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  Radio,
-  RadioGroup,
-  Typography,
-} from "@material-ui/core"
+import styled from "styled-components"
+import { Paper } from "@material-ui/core"
 import {
   PeerReviewQuestionAnswer,
   PeerReviewGradeAnswer,
@@ -20,17 +14,25 @@ import {
   SpaciousPaper,
 } from "../styleComponents"
 import LikertScale from "likert-react"
+import { BoldTypography } from "../styleComponents"
+import { ReceivedPeerReviewLabels } from "../../utils/languages/"
 
+const AnswerPaper = styled(Paper)`
+  padding: 0.5rem;
+  margin-bottom: 1rem;
+`
 interface IReceivedPeerReviewProps {
   questions: PeerReviewQuestion[]
   answer: IReceivedPeerReview
   idx: number
+  receivedReviewsLabels: ReceivedPeerReviewLabels
 }
 
 const ReceivedPeerReview: React.FunctionComponent<IReceivedPeerReviewProps> = ({
   questions,
   answer,
   idx,
+  receivedReviewsLabels,
 }) => {
   if (typeof answer.createdAt === "string") {
     answer.createdAt = new Date(answer.createdAt)
@@ -38,9 +40,10 @@ const ReceivedPeerReview: React.FunctionComponent<IReceivedPeerReviewProps> = ({
 
   return (
     <SpaciousPaper elevation={4}>
-      <Typography variant="h6">
-        Peer review {idx + 1} ({answer.createdAt.toLocaleDateString()})
-      </Typography>
+      <BoldTypography>
+        {receivedReviewsLabels.peerReviewLabel} {idx + 1} (
+        {answer.createdAt.toLocaleDateString()})
+      </BoldTypography>
       {questions
         .sort((e1, e2) => e1.order - e2.order)
         .map(question => {
@@ -124,12 +127,12 @@ const ReceivedEssayAnswer: React.FunctionComponent<
   IReceivedPeerReviewEssayAnswer
 > = ({ questionTitle, questionAnswer }) => (
   <div style={{ paddingRight: "1.5rem", marginTop: "1rem" }}>
-    <MarkdownText variant="subtitle1" style={{ fontWeight: "bold" }}>
-      {questionTitle}
-    </MarkdownText>
-    <WhiteSpacePreservingTypography variant="body1">
-      {questionAnswer.text}
-    </WhiteSpacePreservingTypography>
+    <MarkdownText>{questionTitle}</MarkdownText>
+    <AnswerPaper>
+      <WhiteSpacePreservingTypography variant="body1">
+        {questionAnswer.text}
+      </WhiteSpacePreservingTypography>
+    </AnswerPaper>
   </div>
 )
 
