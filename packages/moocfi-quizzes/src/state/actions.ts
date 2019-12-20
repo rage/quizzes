@@ -81,6 +81,13 @@ export const initialize: ActionCreator<ThunkAction> = (
       return
     }
 
+    if (
+      quiz.deadline &&
+      new Date(quiz.deadline).getTime() < new Date().getTime()
+    ) {
+      dispatch(quizAnswerActions.pastDeadline())
+    }
+
     if (!quizAnswer) {
       quizAnswer = {
         quizId: quiz.id,

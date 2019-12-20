@@ -14,6 +14,7 @@ export const initialState: QuizAnswerState = {
   noChangesSinceSuccessfulSubmit: false,
   noChangesAfterLoading: true,
   quizDisabled: false,
+  pastDeadline: false,
 }
 
 export type QuizAnswerState = {
@@ -24,6 +25,7 @@ export type QuizAnswerState = {
   noChangesSinceSuccessfulSubmit: boolean
   noChangesAfterLoading: boolean
   quizDisabled: boolean
+  pastDeadline: boolean
 }
 
 export const quizAnswerReducer = (
@@ -57,6 +59,8 @@ export const quizAnswerReducer = (
       return { ...state, noChangesSinceSuccessfulSubmit: true }
     case getType(quizAnswer.setLocked):
       return { ...state, submitLocked: true }
+    case getType(quizAnswer.pastDeadline):
+      return { ...state, pastDeadline: true }
     case getType(quizAnswer.setAttemptedSubmit):
       return { ...state, attemptedDisabledSubmit: true }
     case getType(quizAnswer.clearAttemptedSubmit):

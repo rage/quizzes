@@ -102,6 +102,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   showZeroPointsInfo = true,
 }) => {
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
+  const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
   const messageState = useTypedSelector(state => state.message)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const quiz = useTypedSelector(state => state.quiz)
@@ -300,7 +301,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
               <Grid
                 item={true}
                 onClick={e => {
-                  if (submitLocked && !quizDisabled) {
+                  if ((submitLocked || pastDeadline) && !quizDisabled) {
                     dispatch(quizAnswerActions.noticeDisabledSubmitAttempt())
                   }
                 }}
@@ -311,8 +312,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
               {!quizDisabled && (
                 <Grid item={true} xs="auto">
-                  {quiz.deadline &&
-                  new Date(quiz.deadline).getTime() < new Date().getTime() ? (
+                  {pastDeadline ? (
                     <Typography>{generalLabels.pastDeadline}</Typography>
                   ) : (
                     <React.Fragment>
