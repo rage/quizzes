@@ -16,7 +16,6 @@ const SharedFeedbackCustomiser: React.FunctionComponent<
   handleMessageChange,
   handleToggleChange,
 }) => {
-  console.log("Mesage used: ", sharedMessageIsUsed)
   return (
     <>
       <FormControlLabel
