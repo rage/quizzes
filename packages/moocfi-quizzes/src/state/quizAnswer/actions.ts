@@ -28,6 +28,8 @@ export const setLocked = createAction("quizAnswer/SET_LOCKED")
 
 export const setUnlocked = createAction("quizAnswer/SET_UNLOCKED")
 
+export const pastDeadline = createAction("quizAnswer/PAST_DEADLINE")
+
 export const setAttemptedSubmit = createAction(
   "quizAnswer/ATTEMPT_DISABLED_SUBMIT",
   resolve => {

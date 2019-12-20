@@ -25,7 +25,7 @@ const PeerReviews: React.FunctionComponent = () => {
   }
 
   const activeStep = useTypedSelector(state => state.peerReviews.activeStep)
-  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+  const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const peerReviewQuestions = quiz.peerReviewCollections
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
@@ -69,28 +69,9 @@ const PeerReviews: React.FunctionComponent = () => {
   return (
     <div>
       {activeStep >= 2 && <ReceivedPeerReviewsInfo />}
-      {morePeerReviewsRequired() ? (
-        <>
-          <PeerReviewsGuidance
-            guidanceText={peerReviewQuestions[0].texts[0].body}
-            givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
-            peerReviewsCompletedInfo={
-              peerReviewsLabels.peerReviewsCompletedInfo
-            }
-          />
-          <PeerReviewForm languageInfo={peerReviewsLabels} />
-        </>
-      ) : (
-        <>
-          <BoldTypography variant="subtitle1">
-            {giveExtraPeerReviewsLabel}
-          </BoldTypography>
-          <Togglable
-            initiallyVisible={activeStep === 1}
-            hideButtonText={peerReviewsLabels.hidePeerReviewLabel}
-            displayButtonText={peerReviewsLabels.displayPeerReview}
-          >
-            <TopMarginDiv>
+      {morePeerReviewsRequired()
+        ? !pastDeadline && (
+            <>
               <PeerReviewsGuidance
                 guidanceText={peerReviewQuestions[0].texts[0].body}
                 givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
@@ -99,10 +80,31 @@ const PeerReviews: React.FunctionComponent = () => {
                 }
               />
               <PeerReviewForm languageInfo={peerReviewsLabels} />
-            </TopMarginDiv>
-          </Togglable>
-        </>
-      )}
+            </>
+          )
+        : !pastDeadline && (
+            <>
+              <BoldTypography variant="subtitle1">
+                {giveExtraPeerReviewsLabel}
+              </BoldTypography>
+              <Togglable
+                initiallyVisible={activeStep === 1}
+                hideButtonText={peerReviewsLabels.hidePeerReviewLabel}
+                displayButtonText={peerReviewsLabels.displayPeerReview}
+              >
+                <TopMarginDiv>
+                  <PeerReviewsGuidance
+                    guidanceText={peerReviewQuestions[0].texts[0].body}
+                    givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
+                    peerReviewsCompletedInfo={
+                      peerReviewsLabels.peerReviewsCompletedInfo
+                    }
+                  />
+                  <PeerReviewForm languageInfo={peerReviewsLabels} />
+                </TopMarginDiv>
+              </Togglable>
+            </>
+          )}
     </div>
   )
 }
