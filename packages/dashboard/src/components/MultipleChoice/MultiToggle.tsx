@@ -17,22 +17,6 @@ const MultiToggle: React.FunctionComponent<IMultiToggleProps> = ({
       }
       label="Answerer should choose all the correct options"
     />
-
-    <Grow
-      style={{
-        display: multi ? "inline-flex" : "none",
-        width: "100%",
-        marginTop: "1rem",
-      }}
-      in={multi}
-    >
-      <TextField
-        variant="outlined"
-        placeholder="Grading policy (this does nothing at the moment you can write anything)"
-        multiline={true}
-        type="text"
-      />
-    </Grow>
   </>
 )
 
