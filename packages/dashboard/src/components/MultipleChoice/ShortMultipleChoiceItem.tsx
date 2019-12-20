@@ -71,6 +71,11 @@ class FinishedMultipleChoiceItem extends React.Component<any, any> {
             </Grid>
           </Grid>
         </Grid>
+        {item.multi && (
+          <Typography variant="subtitle1">
+            Answerers can choose multiple options
+          </Typography>
+        )}
       </ShortWrapper>
     )
   }
