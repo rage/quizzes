@@ -37,7 +37,7 @@ const Home = ({ courses }: HomeProps) => {
         Quizzes
       </Typography>
       {courses.map(course => (
-        <Link href="/courses/[id]" as={`/courses/${course.id}`}>
+        <Link key={course.id} href="/courses/[id]" as={`/courses/${course.id}`}>
           <CourseLink>
             <StyledCard key={course.id}>
               <CardContent>

@@ -1,6 +1,7 @@
 import axios from "axios"
-import { Quiz } from "../types/Quiz"
+import { CourseListQuiz } from "../types/Quiz"
 import { Course } from "../types/Course"
+import { EditableQuiz } from "../types/EditQuiz"
 
 const api = axios.create({
   baseURL: "https://quizzes.mooc.fi/api/v1",
@@ -11,13 +12,17 @@ const api = axios.create({
 })
 
 export const fetchCourses = async (): Promise<Course[]> => {
-  const res = await api.get("/courses")
-  return res.data
+  return (await api.get("/courses")).data
 }
 
-export const fetchCourseQuizzes = async (courseId: string): Promise<Quiz[]> => {
-  const res = await api.get(
+export const fetchCourseQuizzes = async (
+  courseId: string,
+): Promise<CourseListQuiz[]> => {
+  return (await api.get(
     `/quizzes/?courseId=${courseId}&course=true&items=true&options=true&peerreviews=true&stripped=false`,
-  )
-  return res.data
+  )).data
+}
+
+export const fetchQuiz = async (id: string): Promise<EditableQuiz> => {
+  return (await api.get(`/quizzes/${id}`)).data.quiz
 }

@@ -1,4 +1,4 @@
-export interface Quiz {
+export interface CourseListQuiz {
   id: string
   grantPointsPolicy: GrantPointsPolicy
   courseId: string

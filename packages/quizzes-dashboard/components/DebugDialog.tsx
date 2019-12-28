@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import { Button, Dialog, DialogContent, Typography } from "@material-ui/core"
 import styled from "styled-components"
+import EditableDebugField from "./EditableDebugField"
 
 const DialogTitleContainer = styled.div`
   display: flex;
@@ -17,10 +18,21 @@ const StyledDialogTitle = styled(Typography)`
 
 interface DebugDialogProps {
   data: any
+  editable?: boolean
 }
 
-export default ({ data }: DebugDialogProps) => {
+const ContentWrapper = styled.div`
+  overflow-y: hidden;
+`
+
+const StyledPreWrapper = styled.div`
+  overflow-y: auto;
+  height: 100%;
+`
+
+export default ({ data, editable = false }: DebugDialogProps) => {
   const [debugOpen, setDebugOpen] = useState(false)
+  const content = JSON.stringify(data, undefined, 2)
   return (
     <>
       {" "}
@@ -39,10 +51,15 @@ export default ({ data }: DebugDialogProps) => {
             Close
           </CloseButton>
         </DialogTitleContainer>
-
-        <DialogContent>
-          <pre>{JSON.stringify(data, undefined, 2)}</pre>
-        </DialogContent>
+        <ContentWrapper>
+          {editable ? (
+            <EditableDebugField initialValue={content} />
+          ) : (
+            <StyledPreWrapper>
+              <pre>{content}</pre>
+            </StyledPreWrapper>
+          )}
+        </ContentWrapper>
       </Dialog>
     </>
   )
