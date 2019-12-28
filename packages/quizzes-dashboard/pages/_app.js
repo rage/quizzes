@@ -6,6 +6,10 @@ import {
   createMuiTheme,
 } from "@material-ui/core/styles"
 import Layout from "../components/Layout"
+import "@fortawesome/fontawesome-svg-core/styles.css"
+import { config as fontAwesomeConfig } from "@fortawesome/fontawesome-svg-core"
+
+fontAwesomeConfig.autoAddCss = false
 
 const theme = createMuiTheme({
   overrides: {
