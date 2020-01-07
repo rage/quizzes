@@ -41,7 +41,6 @@ import {
   PointsByGroup,
   QuizAnswerStatus,
 } from "../../types"
-import { get } from "http"
 
 const MAX_LIMIT = 100
 
