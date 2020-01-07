@@ -22,22 +22,13 @@ export interface SubmitButtonProps {
 const SubmitButton: React.FunctionComponent = () => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
-  let submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
+  const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
+  const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const noChangesAfterSuccessfulAnswer = useTypedSelector(
     state => state.quizAnswer.noChangesSinceSuccessfulSubmit,
   )
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
-
-  const quiz = useTypedSelector(state => state.quiz)
-
-  if (
-    quiz &&
-    quiz.deadline &&
-    new Date(quiz.deadline).getTime() < new Date().getTime()
-  ) {
-    submitLocked = true
-  }
 
   const noChangesAfterLoading = useTypedSelector(
     state => state.quizAnswer.noChangesAfterLoading,
@@ -76,7 +67,7 @@ const SubmitButton: React.FunctionComponent = () => {
     <StyledSubmitButton
       variant="contained"
       color="primary"
-      disabled={submitLocked}
+      disabled={submitLocked || pastDeadline}
       onClick={handleSubmit}
     >
       {buttonText}

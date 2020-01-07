@@ -1,4 +1,5 @@
 import * as React from "react"
+import styled from "styled-components"
 import { Button, Typography } from "@material-ui/core"
 import {
   PeerReviewGradeAnswer,
@@ -9,6 +10,12 @@ import { useTypedSelector } from "../../state/store"
 import { useDispatch } from "react-redux"
 import { requestReviews } from "../../state/receivedReviews/actions"
 import ReceivedPeerReview from "./ReceivedPeerReview"
+import { BaseButton, BoldTypography } from "../styleComponents"
+import { ReceivedPeerReviewLabels } from "../../utils/languages/"
+
+const ToggleButton = styled(BaseButton)<{ expanded: boolean }>`
+  ${props => props.expanded && "margin-top: 0.5rem;"}
+`
 
 const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
   const [expanded, setExpanded] = React.useState(false)
@@ -51,52 +58,46 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
     return <div>{receivedReviewsLabels.errorLabel}</div>
   }
 
-  if (receivedReviews.length === 0) {
-    return (
-      <Typography variant="subtitle1">
-        {receivedReviewsLabels.noPeerReviewsReceivedlabel}
-      </Typography>
-    )
-  }
-
-  const toggleButton = (
-    <Button variant="outlined" onClick={() => setExpanded(!expanded)}>
-      {expanded
-        ? receivedReviewsLabels.toggleButtonShrinkLabel
-        : receivedReviewsLabels.toggleButtonExpandLabel}
-    </Button>
-  )
-
   return (
-    <>
-      {expanded && toggleButton}
-      {expanded ? (
+    <div style={{ marginBottom: "1rem" }}>
+      <ReceivedReviewsSummary
+        peerReviews={receivedReviews}
+        peerReviewQuestions={peerReviewQuestions}
+        receivedReviewsLabels={receivedReviewsLabels}
+      />
+      {receivedReviews.length > 0 && (
+        <ToggleButton
+          variant="outlined"
+          expanded={expanded}
+          onClick={() => setExpanded(!expanded)}
+        >
+          {expanded
+            ? receivedReviewsLabels.toggleButtonShrinkLabel
+            : receivedReviewsLabels.toggleButtonExpandLabel}
+        </ToggleButton>
+      )}
+      {expanded && (
         <ReceivedReviewsDetailed
           peerReviews={receivedReviews}
           peerReviewQuestions={peerReviewQuestions}
-        />
-      ) : (
-        <ReceivedReviewsSummary
-          peerReviews={receivedReviews}
-          peerReviewQuestions={peerReviewQuestions}
+          receivedReviewsLabels={receivedReviewsLabels}
         />
       )}
-      {toggleButton}
-    </>
+    </div>
   )
 }
 
 interface IReceivedReviewsProps {
   peerReviews: IReceivedPeerReview[]
   peerReviewQuestions: PeerReviewQuestion[]
+  receivedReviewsLabels: ReceivedPeerReviewLabels
 }
 
 const ReceivedReviewsDetailed: React.FunctionComponent<
   IReceivedReviewsProps
-> = ({ peerReviews, peerReviewQuestions }) => {
+> = ({ peerReviews, peerReviewQuestions, receivedReviewsLabels }) => {
   return (
-    <div>
-      <h2>{}Details of all the reviews</h2>
+    <div style={{ marginTop: 20 }}>
       {peerReviews
         .sort(
           (rev1, rev2) => rev2.createdAt.getTime() - rev1.createdAt.getTime(),
@@ -106,6 +107,7 @@ const ReceivedReviewsDetailed: React.FunctionComponent<
             questions={peerReviewQuestions}
             answer={pr}
             idx={idx}
+            receivedReviewsLabels={receivedReviewsLabels}
           />
         ))}
     </div>
@@ -114,7 +116,7 @@ const ReceivedReviewsDetailed: React.FunctionComponent<
 
 const ReceivedReviewsSummary: React.FunctionComponent<
   IReceivedReviewsProps
-> = ({ peerReviews }) => {
+> = ({ peerReviews, receivedReviewsLabels }) => {
   const gradeAnswers = peerReviews.flatMap(review =>
     review.answers
       .filter(a => typeof (a as PeerReviewGradeAnswer).value === "number")
@@ -129,12 +131,17 @@ const ReceivedReviewsSummary: React.FunctionComponent<
 
   return (
     <div style={{ margin: "1rem 0" }}>
-      <h2>Overview of the reviews</h2>
-
-      <Typography>
-        Your answer has received {peerReviews.length} reviews. The average of
-        all grades is {average}.
-      </Typography>
+      <BoldTypography>{receivedReviewsLabels.summaryViewLabel}</BoldTypography>
+      {peerReviews.length === 0 ? (
+        <Typography variant="subtitle1">
+          {receivedReviewsLabels.noPeerReviewsReceivedlabel}
+        </Typography>
+      ) : (
+        <Typography>
+          {receivedReviewsLabels.numberOfPeerReviewsText(peerReviews.length)}{" "}
+          {receivedReviewsLabels.averageOfGradesLabel} {average + "."}
+        </Typography>
+      )}
     </div>
   )
 }

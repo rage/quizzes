@@ -10,11 +10,7 @@ import ReceivedPeerReviewsInfo from "./ReceivedPeerReviewsInfo"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
 import Togglable from "../../utils/Togglable"
 import { useTypedSelector } from "../../state/store"
-
-const BoldTypography = styled(Typography)`
-  font-weight: bold;
-  margin-bottom: 15px;
-`
+import { BoldTypography } from "../styleComponents"
 
 const TopMarginDiv = styled.div`
   margin-top: 15px;
@@ -29,11 +25,12 @@ const PeerReviews: React.FunctionComponent = () => {
   }
 
   const activeStep = useTypedSelector(state => state.peerReviews.activeStep)
-  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+  const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const peerReviewQuestions = quiz.peerReviewCollections
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+
   if (!languageInfo) {
     return <div />
   }
@@ -49,7 +46,7 @@ const PeerReviews: React.FunctionComponent = () => {
   const peerReviewsLabels = languageInfo.peerReviews
 
   const giveExtraPeerReviewsLabel =
-    quizAnswer.status === "confirmed"
+    activeStep >= 3
       ? peerReviewsLabels.giveExtraPeerReviewsQuizConfirmed
       : peerReviewsLabels.giveExtraPeerReviews
 
@@ -71,31 +68,10 @@ const PeerReviews: React.FunctionComponent = () => {
 
   return (
     <div>
-      {userQuizState && userQuizState.status === "locked" && (
-        <ReceivedPeerReviewsInfo />
-      )}
-      {morePeerReviewsRequired() ? (
-        <>
-          <PeerReviewsGuidance
-            guidanceText={peerReviewQuestions[0].texts[0].body}
-            givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
-            peerReviewsCompletedInfo={
-              peerReviewsLabels.peerReviewsCompletedInfo
-            }
-          />
-          <PeerReviewForm languageInfo={peerReviewsLabels} />
-        </>
-      ) : (
-        <>
-          <BoldTypography variant="subtitle1">
-            {giveExtraPeerReviewsLabel}
-          </BoldTypography>
-          <Togglable
-            initiallyVisible={activeStep === 1}
-            hideButtonText={peerReviewsLabels.hidePeerReviewLabel}
-            displayButtonText={peerReviewsLabels.displayPeerReview}
-          >
-            <TopMarginDiv>
+      {activeStep >= 2 && <ReceivedPeerReviewsInfo />}
+      {morePeerReviewsRequired()
+        ? !pastDeadline && (
+            <>
               <PeerReviewsGuidance
                 guidanceText={peerReviewQuestions[0].texts[0].body}
                 givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
@@ -104,10 +80,31 @@ const PeerReviews: React.FunctionComponent = () => {
                 }
               />
               <PeerReviewForm languageInfo={peerReviewsLabels} />
-            </TopMarginDiv>
-          </Togglable>
-        </>
-      )}
+            </>
+          )
+        : !pastDeadline && (
+            <>
+              <BoldTypography variant="subtitle1">
+                {giveExtraPeerReviewsLabel}
+              </BoldTypography>
+              <Togglable
+                initiallyVisible={activeStep === 1}
+                hideButtonText={peerReviewsLabels.hidePeerReviewLabel}
+                displayButtonText={peerReviewsLabels.displayPeerReview}
+              >
+                <TopMarginDiv>
+                  <PeerReviewsGuidance
+                    guidanceText={peerReviewQuestions[0].texts[0].body}
+                    givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
+                    peerReviewsCompletedInfo={
+                      peerReviewsLabels.peerReviewsCompletedInfo
+                    }
+                  />
+                  <PeerReviewForm languageInfo={peerReviewsLabels} />
+                </TopMarginDiv>
+              </Togglable>
+            </>
+          )}
     </div>
   )
 }

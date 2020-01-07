@@ -27,6 +27,7 @@ import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
 import LoginPrompt from "./LoginPrompt"
 import MarkdownText from "../MarkdownText"
+import { BoldTypography } from "../styleComponents"
 
 import ThemeProviderContext from "../../contexes/themeProviderContext"
 
@@ -100,11 +101,6 @@ const QuizBody = styled(MarkdownText)`
   padding-bottom: 1.5rem;
 `
 
-const BoldTypography = styled(Typography)`
-  font-weight: bold;
-  padding-bottom: 20px;
-`
-
 const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   id,
   languageId,
@@ -116,6 +112,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
+  const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
   const messageState = useTypedSelector(state => state.message)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const quiz = useTypedSelector(state => state.quiz)
@@ -319,7 +316,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
               <Grid
                 item={true}
                 onClick={e => {
-                  if (submitLocked && !quizDisabled) {
+                  if ((submitLocked || pastDeadline) && !quizDisabled) {
                     dispatch(quizAnswerActions.noticeDisabledSubmitAttempt())
                   }
                 }}
@@ -330,8 +327,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
               {!quizDisabled && (
                 <Grid item={true} xs="auto">
-                  {quiz.deadline &&
-                  new Date(quiz.deadline).getTime() < new Date().getTime() ? (
+                  {pastDeadline ? (
                     <Typography>{generalLabels.pastDeadline}</Typography>
                   ) : (
                     <React.Fragment>
