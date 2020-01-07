@@ -1,6 +1,6 @@
 import Knex from "knex"
 import { Inject, Service } from "typedi"
-import { EntityManager, SelectQueryBuilder } from "typeorm"
+import { EntityManager, SelectQueryBuilder, EntityRepository } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import validator from "validator"
 import {
@@ -12,7 +12,7 @@ import {
   SpamFlag,
   UserQuizState,
 } from "../models"
-import { IQuizAnswerQuery } from "../types"
+import { AnsweredQuiz, IQuizAnswerQuery } from "../types"
 import { WhereBuilder } from "../util/index"
 
 // tslint:disable-next-line:max-line-length
@@ -128,6 +128,33 @@ export default class QuizAnswerService {
       .createQueryBuilder(QuizAnswer, "quiz_answer")
       .where("quiz_answer.id in (:...ids)", { ids })
       .getMany()
+  }
+
+  public async getAnswered(
+    courseId: string,
+    userId: number,
+  ): Promise<AnsweredQuiz[]> {
+    const query = this.knex.raw(
+      `select
+          q.id as quiz_id,
+          coalesce(uqs.tries > 0, false) as answered,
+          coalesce(uqs.points_awarded > 0, false) as correct
+        from quiz q
+        left join (
+          select
+            quiz_id,
+            tries,
+            points_awarded
+          from user_quiz_state
+          where user_id = :userId
+        ) uqs
+          on q.id = uqs.quiz_id
+        where q.course_id = :courseId
+        `,
+      { courseId, userId },
+    )
+
+    return await this.entityManager.query(query.toString())
   }
 
   public async getAnswersCount(query: IQuizAnswerQuery): Promise<any> {

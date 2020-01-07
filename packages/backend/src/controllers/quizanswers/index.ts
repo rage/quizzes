@@ -41,6 +41,7 @@ import {
   PointsByGroup,
   QuizAnswerStatus,
 } from "../../types"
+import { get } from "http"
 
 const MAX_LIMIT = 100
 
@@ -424,5 +425,21 @@ export class QuizAnswerController {
       quizAnswer: savedAnswer,
       userQuizState: savedUserQuizState,
     }
+  }
+
+  @Get("/answered/:courseId")
+  public async getAnswered(
+    @Param("courseId") courseId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    const answered = await this.quizAnswerService.getAnswered(courseId, user.id)
+    const answeredByQuizId: { [id: string]: any } = {}
+    answered.forEach(a => {
+      answeredByQuizId[a.quiz_id] = {
+        answered: a.answered,
+        correct: a.correct,
+      }
+    })
+    return answeredByQuizId
   }
 }

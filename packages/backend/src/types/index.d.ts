@@ -240,3 +240,9 @@ export interface QuizValidation {
   maxPointsAltered: boolean
   coursePartAltered: boolean
 }
+
+export interface AnsweredQuiz {
+  quiz_id: string
+  answered: boolean
+  correct: boolean
+}
