@@ -448,7 +448,6 @@ const OptionGridItem = styled(Grid)<OptionGridItemProps>`
       background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
     `
       : ``}
-  ${({ providedStyles }) => providedStyles}
 `
 
 type OptionGridItemProps = {

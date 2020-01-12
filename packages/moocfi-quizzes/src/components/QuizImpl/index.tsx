@@ -66,8 +66,7 @@ interface IItemWrapperProps {
 }
 
 const ItemWrapper = styled.div<IItemWrapperProps>`
-  background-color: ${props =>
-    props.rowNumber % 2 !== 0 ? "inherit" : "#605c980d"};
+  background-color: ${props => props.rowNumber % 2 === 0 && "#605c980d"};
   border-radius: 10px;
   padding: 1rem 2rem 1rem 1rem;
   ${({ providedStyles, rowNumber }) => rowNumber % 2 === 0 && providedStyles}
@@ -86,6 +85,15 @@ const QuizContentWrapper = styled.div<IQuizContentWrapperProps>`
         cursor: default;
       `}
 `
+
+const UpperContent = styled.div``
+
+interface LowerContentProps {
+  providedStyles: string | undefined
+  singleItem: boolean
+}
+
+const LowerContent = styled.div``
 
 const OuterDiv = styled.div<{ providedStyles: string | undefined }>`
   p {
@@ -267,7 +275,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     )
 
   return (
-    <OuterDiv providedStyles={themeProvider.topInfoBarStyles}>
+    <OuterDiv providedStyles={themeProvider.mainDivStyles}>
       <TopInfoBar />
 
       {quizDisabled && (
@@ -275,83 +283,87 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       )}
 
       <QuizContentWrapper disabled={quizDisabled}>
-        <Deadline deadline={quiz.deadline} />
+        <UpperContent>
+          <Deadline deadline={quiz.deadline} />
 
-        {containsPeerReviews && <StageVisualizer />}
+          {containsPeerReviews && <StageVisualizer />}
 
-        <QuizBody>{quiz.texts[0].body}</QuizBody>
-        <QuizItemContainerDiv>
-          {quizItemComponents(quiz, languageId)}
-          <MarkdownText>{quiz.texts[0].submitMessage}</MarkdownText>
-        </QuizItemContainerDiv>
+          <QuizBody>{quiz.texts[0].body}</QuizBody>
+        </UpperContent>
+        <LowerContent>
+          <QuizItemContainerDiv>
+            {quizItemComponents(quiz, languageId)}
+            <MarkdownText>{quiz.texts[0].submitMessage}</MarkdownText>
+          </QuizItemContainerDiv>
 
-        {!stillSubmittable && !quizDisabled ? (
-          <>
-            {containsPeerReviews && exerciseFinishedMessage && (
-              <BoldTypography>{exerciseFinishedMessage}</BoldTypography>
-            )}
-
-            {containsPeerReviews && shouldShowPeerReviews && <PeerReviews />}
-
-            <ResultInformation
-              quiz={quiz}
-              quizAnswer={quizAnswer}
-              generalLabels={generalLabels}
-            />
-          </>
-        ) : (
-          <div>
-            {messageState.notification && messageState.notification.message && (
-              <Typography
-                style={{
-                  color: messageState.notification.color,
-                  fontSize: "1.25rem",
-                }}
-              >
-                {messageState.notification.message}
-              </Typography>
-            )}
-
-            <Grid container={true} alignItems="center" spacing={2}>
-              <Grid
-                item={true}
-                onClick={e => {
-                  if ((submitLocked || pastDeadline) && !quizDisabled) {
-                    dispatch(quizAnswerActions.noticeDisabledSubmitAttempt())
-                  }
-                }}
-                xs="auto"
-              >
-                <SubmitButton />
-              </Grid>
-
-              {!quizDisabled && (
-                <Grid item={true} xs="auto">
-                  {pastDeadline ? (
-                    <Typography>{generalLabels.pastDeadline}</Typography>
-                  ) : (
-                    <React.Fragment>
-                      <Typography>
-                        {quiz.triesLimited
-                          ? `${
-                              generalLabels.triesRemainingLabel
-                            }: ${triesRemaining}`
-                          : generalLabels.triesNotLimitedLabel}
-                      </Typography>
-                      {showPointsPolicyLabel && (
-                        <Typography>
-                          {generalLabels.pointsGrantingPolicyInformer(
-                            quiz.grantPointsPolicy,
-                          )}
-                        </Typography>
-                      )}
-                    </React.Fragment>
-                  )}
-                </Grid>
+          {!stillSubmittable && !quizDisabled ? (
+            <>
+              {containsPeerReviews && exerciseFinishedMessage && (
+                <BoldTypography>{exerciseFinishedMessage}</BoldTypography>
               )}
-            </Grid>
-          </div>
-        )}
+
+              {containsPeerReviews && shouldShowPeerReviews && <PeerReviews />}
+
+              <ResultInformation
+                quiz={quiz}
+                quizAnswer={quizAnswer}
+                generalLabels={generalLabels}
+              />
+            </>
+          ) : (
+            <div>
+              {messageState.notification && messageState.notification.message && (
+                <Typography
+                  style={{
+                    color: messageState.notification.color,
+                    fontSize: "1.25rem",
+                  }}
+                >
+                  {messageState.notification.message}
+                </Typography>
+              )}
+
+              <Grid container={true} alignItems="center" spacing={2}>
+                <Grid
+                  item={true}
+                  onClick={e => {
+                    if ((submitLocked || pastDeadline) && !quizDisabled) {
+                      dispatch(quizAnswerActions.noticeDisabledSubmitAttempt())
+                    }
+                  }}
+                  xs="auto"
+                >
+                  <SubmitButton />
+                </Grid>
+
+                {!quizDisabled && (
+                  <Grid item={true} xs="auto">
+                    {pastDeadline ? (
+                      <Typography>{generalLabels.pastDeadline}</Typography>
+                    ) : (
+                      <React.Fragment>
+                        <Typography>
+                          {quiz.triesLimited
+                            ? `${
+                                generalLabels.triesRemainingLabel
+                              }: ${triesRemaining}`
+                            : generalLabels.triesNotLimitedLabel}
+                        </Typography>
+                        {showPointsPolicyLabel && (
+                          <Typography>
+                            {generalLabels.pointsGrantingPolicyInformer(
+                              quiz.grantPointsPolicy,
+                            )}
+                          </Typography>
+                        )}
+                      </React.Fragment>
+                    )}
+                  </Grid>
+                )}
+              </Grid>
+            </div>
+          )}
+        </LowerContent>
       </QuizContentWrapper>
     </OuterDiv>
   )
