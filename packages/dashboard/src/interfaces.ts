@@ -40,6 +40,7 @@ export interface IQuiz {
   course: ICourse
   items: IQuizItem[]
   grantPointsPolicy: QuizPointsGrantingPolicy
+  peerReviewCollections?: IPeerReviewCollection[]
 }
 
 export interface IQuizItemOptionText {

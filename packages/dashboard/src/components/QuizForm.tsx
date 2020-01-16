@@ -1,18 +1,8 @@
-import {
-  Button,
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  Tab,
-  Tabs,
-  TextField,
-  Toolbar,
-  Typography,
-} from "@material-ui/core"
+import { Button, Grid, Toolbar, Typography } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
+import { ICourse, IQuiz } from "../interfaces"
+
 import {
   addItem,
   addOption,
@@ -22,11 +12,32 @@ import {
   save,
   setEdit,
 } from "../store/edit/actions"
+import { IEditState } from "../store/edit/reducer"
 import { setQuiz } from "../store/filter/actions"
+import { IFilterState } from "../store/filter/reducer"
+import { userState } from "../store/user/reducer"
 import QuizInfo from "./QuizInfo"
 import TabContainer from "./TabContainer"
 
-class QuizForm extends React.Component<any, any> {
+interface IQuizFormProps {
+  courses: ICourse[]
+  edit: IEditState
+  filter: IFilterState
+  user: userState
+  quiz?: IQuiz
+  new: boolean
+  history: any
+  addItem: any
+  addOption: any
+  changeAttr: any
+  changeOrder: any
+  newQuiz: any
+  save: any
+  setEdit: (quiz: IQuiz) => any
+  setQuiz: (quizId?: string) => any
+}
+
+class QuizForm extends React.Component<IQuizFormProps, any> {
   public componentDidMount() {
     if (this.props.quiz) {
       this.props.setEdit(this.props.quiz)
@@ -77,7 +88,7 @@ class QuizForm extends React.Component<any, any> {
   private handleSaving = async (event: any) => {
     scrollTo(0, 0)
     // for saving a quiz for the first time, wait before the url is modified in componentDidUpdate
-    await this.props.save(event)
+    await this.props.save()
   }
 
   private handleChange = path => event => {

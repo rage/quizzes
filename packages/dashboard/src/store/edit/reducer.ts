@@ -1,7 +1,33 @@
 import { getType } from "typesafe-actions"
+import {
+  ICourse,
+  IPeerReviewCollection,
+  IQuizItem,
+  IQuizText,
+  QuizPointsGrantingPolicy,
+} from "../../interfaces"
 import * as edit from "./actions"
 
-const initialState = {
+export interface IEditState {
+  id?: string
+  courseId?: string
+  part: number
+  section: number
+  points?: number
+  tries?: number
+  triesLimited?: boolean
+  deadline?: Date
+  open?: Date
+  autoConfirm?: boolean
+  excludedFromScore?: boolean
+  texts: IQuizText[]
+  course: any
+  items: IQuizItem[]
+  grantPointsPolicy?: QuizPointsGrantingPolicy
+  peerReviewCollections?: IPeerReviewCollection[]
+}
+
+const initialState: IEditState = {
   part: 0,
   section: 0,
   course: {
@@ -12,7 +38,10 @@ const initialState = {
   peerReviewCollections: [],
 }
 
-export const editReducer = (state = initialState, action) => {
+export const editReducer = (
+  state: IEditState = initialState,
+  action,
+): IEditState => {
   switch (action.type) {
     case getType(edit.set):
       const deadline = action.payload.deadline
