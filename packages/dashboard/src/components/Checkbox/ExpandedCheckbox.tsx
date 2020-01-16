@@ -138,8 +138,6 @@ class ExpandedCheckbox extends React.Component<any, any> {
       `items[${this.props.order}].options[0].texts[0].body`,
       this.state.tempItemData.optionBody,
     )
-
-    this.props.save()
   }
 }
 

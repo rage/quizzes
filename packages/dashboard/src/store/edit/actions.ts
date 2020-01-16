@@ -47,7 +47,6 @@ export const save = () => {
       const quiz = await post(getState().edit, getState().user)
       dispatch(quizActions.set({ courseId: quiz.courseId, quizzes: [quiz] }))
       dispatch(setEdit(quiz))
-
       dispatch(
         displayMessage(`Successfully saved ${quiz.texts[0].title}!`, false),
       )

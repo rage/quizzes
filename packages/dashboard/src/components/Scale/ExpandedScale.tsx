@@ -237,8 +237,6 @@ class ExpandedScaleItem extends React.Component<any, any> {
       `items[${this.props.order}].texts[0].maxLabel`,
       this.state.tempItemData.maxLabel,
     )
-
-    this.props.save()
   }
 }
 

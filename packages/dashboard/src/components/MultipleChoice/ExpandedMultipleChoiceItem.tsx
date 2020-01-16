@@ -293,8 +293,6 @@ class MultipleChoiceItem extends React.Component<
         correct: !!opt.correct,
       })),
     )
-
-    this.props.save()
   }
 
   private modifyExistingOption = (optionOrder: number) => () => {

@@ -234,8 +234,6 @@ class ExpandedOpen extends React.Component<any, any> {
       `items[${this.props.order}].validityRegex`,
       this.state.tempItemData.validityRegex,
     )
-
-    this.props.save()
   }
 }
 

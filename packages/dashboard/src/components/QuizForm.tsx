@@ -78,7 +78,13 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
           )}
           <Toolbar>
             <Typography style={{ flex: 1 }} />
-            <Button onClick={this.handleSaving}>save</Button>
+            <Button
+              variant="outlined"
+              style={{ backgroundColor: "rgb(15, 125, 0)", color: "white" }}
+              onClick={this.handleSaving}
+            >
+              save
+            </Button>
           </Toolbar>
         </Grid>
       </Grid>
@@ -88,7 +94,8 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
   private handleSaving = async (event: any) => {
     scrollTo(0, 0)
     // for saving a quiz for the first time, wait before the url is modified in componentDidUpdate
-    await this.props.save()
+    // await
+    this.props.save()
   }
 
   private handleChange = path => event => {

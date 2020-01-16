@@ -226,7 +226,6 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
       this.props.order,
       this.state.tempItemData.options,
     )
-    this.props.save()
   }
 }
 

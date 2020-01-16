@@ -177,8 +177,6 @@ class ExpandedEssay extends React.Component<any, any> {
       `items[${this.props.order}].maxWords`,
       this.state.tempItemData.maxWords,
     )
-
-    this.props.save()
   }
 }
 
