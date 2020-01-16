@@ -19,6 +19,7 @@ import KafkaService from "./kafka.service"
 import QuizAnswerService from "./quizanswer.service"
 import UserCoursePartStateService from "./usercoursepartstate.service"
 import UserQuizStateService from "./userquizstate.service"
+import { debug } from "util"
 
 @Service()
 export default class QuizService {
@@ -273,7 +274,7 @@ export default class QuizService {
       queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
     }
     if (!stripped) {
-      queryBuilder.addSelect("quiz_translation.submit_message")
+      queryBuilder.addSelect("quiz_translation.submitMessage")
     }
 
     if (query.course) {
