@@ -19,7 +19,6 @@ import KafkaService from "./kafka.service"
 import QuizAnswerService from "./quizanswer.service"
 import UserCoursePartStateService from "./usercoursepartstate.service"
 import UserQuizStateService from "./userquizstate.service"
-import { debug } from "util"
 
 @Service()
 export default class QuizService {

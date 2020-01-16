@@ -89,7 +89,7 @@ export class QuizController {
         console.log("not found")
       }
 
-      let stripped = !user.administrator
+      let stripped = true
 
       let quizAnswer: QuizAnswer
       if (userQuizState) {
@@ -112,8 +112,6 @@ export class QuizController {
         quizAnswer = answer
       }
 
-      console.log("Stripped: ", stripped)
-
       const quizzes: Quiz[] = await this.quizService.getQuizzes({
         id: quizId,
         items: true,
@@ -125,8 +123,6 @@ export class QuizController {
       })
 
       const quiz = quizzes[0]
-
-      console.log("Quiz: ", quiz.texts[0])
 
       /*
       if(userQuizState && (userQuizState.status !== "locked")){
