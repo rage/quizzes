@@ -8,7 +8,7 @@ import {
 import React from "react"
 
 interface IDeadlineSelectorProps {
-  deadline: string
+  deadline?: Date
   deadlineChecked: boolean
   toggleDeadlineChecked: (e: any) => void
   handleDeadlineChange: (e: any) => void
@@ -44,7 +44,7 @@ const DeadlineSelector: React.FunctionComponent<IDeadlineSelectorProps> = ({
       >
         <Grid item={true} xs={6}>
           <TextField
-            value={deadline}
+            value={formatDateToTextField(deadline)}
             onChange={handleDeadlineChange}
             type="datetime-local"
           />
@@ -52,6 +52,21 @@ const DeadlineSelector: React.FunctionComponent<IDeadlineSelectorProps> = ({
       </Grow>
     </Grid>
   )
+}
+
+const formatDateToTextField = (date?: Date): string => {
+  if (!date) {
+    date = new Date()
+    date.setMonth(date.getMonth() + 3)
+    date.setHours(0)
+    date.setMinutes(0)
+  }
+
+  const otherDate = new Date(date)
+  otherDate.setMinutes(otherDate.getMinutes() - otherDate.getTimezoneOffset())
+  let stringDate = otherDate.toISOString()
+  stringDate = stringDate.substring(0, stringDate.length - 8)
+  return stringDate
 }
 
 export default DeadlineSelector

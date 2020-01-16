@@ -20,7 +20,7 @@ class BottomActionButtons extends React.Component<any, any> {
           )}
           <Button
             style={{
-              backgroundColor: "rgb(220, 25, 0)",
+              backgroundColor: "rgb(87, 61, 77)",
               color: "white",
               borderRadius: "5px",
             }}
@@ -30,17 +30,7 @@ class BottomActionButtons extends React.Component<any, any> {
                 : this.props.handleCancel
             }
           >
-            Cancel
-          </Button>
-          <Button
-            style={{
-              backgroundColor: "rgb(15, 125, 0)",
-              color: "white",
-              borderRadius: "5px",
-            }}
-            onClick={this.props.onSave}
-          >
-            {this.props.itemHasBeenSaved ? "Save" : "Add"}
+            Close
           </Button>
         </CardActions>
       </Grid>
