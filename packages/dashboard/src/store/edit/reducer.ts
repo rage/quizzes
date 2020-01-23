@@ -105,13 +105,12 @@ const createSwappedOptions = (
     return undefined
   }
 
-  return quizItem.options.map(opt => {
-    if (opt.order === idx1) {
-      return { ...opt, order: idx2 }
-    }
-    if (opt.order === idx2) {
-      return { ...opt, order: idx1 }
-    }
-    return opt
-  })
+  const newOptions = quizItem.options.map(e => e)
+  const temp = newOptions[idx1]
+  temp.order = idx2
+  newOptions[idx1] = newOptions[idx2]
+  newOptions[idx1].order = idx1
+  newOptions[idx2] = temp
+  console.log("New options: ", newOptions)
+  return newOptions
 }

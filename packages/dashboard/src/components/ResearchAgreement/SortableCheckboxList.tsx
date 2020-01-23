@@ -17,6 +17,8 @@ interface ISortableCheckboxListProps {
 
 const SortableCheckboxList = SortableContainer(
   (props: ISortableCheckboxListProps) => {
+    console.log("Props: ", props)
+
     return (
       <Grid item={true} xs={12}>
         {props.options.map((option, index) => {
