@@ -19,25 +19,6 @@ import BottomActionsExpItem from "../ItemTools/ExpandedBottomActions"
 import ExpandedTopInformation from "../ItemTools/ExpandedTopInformation"
 
 class ExpandedScaleItem extends React.Component<any, any> {
-  constructor(props) {
-    super(props)
-    const item = this.props.items[this.props.order]
-    const initialItemData = {
-      title: item.texts[0].title,
-      body: item.texts[0].body,
-      minValue: item.minValue || 1,
-      maxValue: item.maxValue || 7,
-      minLabel: item.texts[0].minLabel,
-      maxLabel: item.texts[0].maxLabel,
-    }
-    this.state = {
-      tempItemData: initialItemData,
-      titleHasBeenModified: this.props.items[this.props.order].id
-        ? true
-        : false,
-    }
-  }
-
   public render() {
     const item = this.props.items[this.props.order]
     return (
@@ -61,11 +42,7 @@ class ExpandedScaleItem extends React.Component<any, any> {
                         multiline={true}
                         required={true}
                         label="Title"
-                        value={
-                          (this.state.titleHasBeenModified &&
-                            this.state.tempItemData.title) ||
-                          ""
-                        }
+                        value={item.texts[0].title}
                         onChange={this.changeEditAttribute("title")}
                         style={{
                           fontWeight: "bold",
@@ -80,7 +57,7 @@ class ExpandedScaleItem extends React.Component<any, any> {
                         multiline={true}
                         fullWidth={true}
                         label="Body"
-                        value={this.state.tempItemData.body || ""}
+                        value={item.texts[0].body}
                         onChange={this.changeEditAttribute("body")}
                       />
                     </Grid>
@@ -109,7 +86,7 @@ class ExpandedScaleItem extends React.Component<any, any> {
                                 type="number"
                                 variant="outlined"
                                 margin="dense"
-                                value={this.state.tempItemData.minValue}
+                                value={item.minValue || 1}
                                 inputProps={{ min: 2 }}
                                 onChange={this.changeEditAttribute("minValue")}
                               />
@@ -142,7 +119,7 @@ class ExpandedScaleItem extends React.Component<any, any> {
                                 type="number"
                                 variant="outlined"
                                 margin="dense"
-                                value={this.state.tempItemData.maxValue}
+                                value={item.maxValue || 7}
                                 inputProps={{ min: 2 }}
                                 onChange={this.changeEditAttribute("maxValue")}
                               />
@@ -166,7 +143,7 @@ class ExpandedScaleItem extends React.Component<any, any> {
                       <TextField
                         fullWidth={true}
                         label="Min label"
-                        value={this.state.tempItemData.minLabel || ""}
+                        value={item.texts[0].minLabel || ""}
                         onChange={this.changeEditAttribute("minLabel")}
                       />
                     </Grid>
@@ -176,7 +153,7 @@ class ExpandedScaleItem extends React.Component<any, any> {
                       <TextField
                         fullWidth={true}
                         label="Max label"
-                        value={this.state.tempItemData.maxLabel || ""}
+                        value={item.texts[0].maxLabel || ""}
                         onChange={this.changeEditAttribute("maxLabel")}
                       />
                     </Grid>
@@ -186,7 +163,6 @@ class ExpandedScaleItem extends React.Component<any, any> {
 
               <Grid item={true} xs="auto" />
               <BottomActionsExpItem
-                onSave={this.saveItem}
                 itemHasBeenSaved={item.id ? true : false}
                 handleExpand={this.props.toggleExpand}
                 handleCancel={this.props.onCancel}
@@ -200,43 +176,22 @@ class ExpandedScaleItem extends React.Component<any, any> {
   }
 
   private changeEditAttribute = (attributeName: string) => e => {
-    if (attributeName === "title") {
-      this.setState({
-        titleHasBeenModified: true,
-      })
+    const value = e.target.value
+
+    switch (attributeName) {
+      case "maxValue":
+      case "minValue":
+        this.props.changeAttr(
+          `items[${this.props.order}].${attributeName}`,
+          value,
+        )
+        break
+      default:
+        this.props.changeAttr(
+          `items[${this.props.order}].texts[0].${attributeName}`,
+          value,
+        )
     }
-    const newData = { ...this.state.tempItemData }
-    newData[attributeName] = e.target.value
-    this.setState({ tempItemData: newData })
-  }
-
-  private saveItem = e => {
-    this.props.toggleExpand(e)
-
-    this.props.changeAttr(
-      `items[${this.props.order}].texts[0].title`,
-      this.state.tempItemData.title,
-    )
-    this.props.changeAttr(
-      `items[${this.props.order}].texts[0].body`,
-      this.state.tempItemData.body,
-    )
-    this.props.changeAttr(
-      `items[${this.props.order}].minValue`,
-      this.state.tempItemData.minValue,
-    )
-    this.props.changeAttr(
-      `items[${this.props.order}].maxValue`,
-      this.state.tempItemData.maxValue,
-    )
-    this.props.changeAttr(
-      `items[${this.props.order}].texts[0].minLabel`,
-      this.state.tempItemData.minLabel,
-    )
-    this.props.changeAttr(
-      `items[${this.props.order}].texts[0].maxLabel`,
-      this.state.tempItemData.maxLabel,
-    )
   }
 }
 

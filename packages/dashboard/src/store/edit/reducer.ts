@@ -3,6 +3,7 @@ import {
   ICourse,
   IPeerReviewCollection,
   IQuizItem,
+  IQuizItemOption,
   IQuizText,
   QuizPointsGrantingPolicy,
 } from "../../interfaces"
@@ -42,6 +43,7 @@ export const editReducer = (
   state: IEditState = initialState,
   action,
 ): IEditState => {
+  let newOptions
   switch (action.type) {
     case getType(edit.set):
       const deadline = action.payload.deadline
@@ -51,7 +53,65 @@ export const editReducer = (
       return action.payload
     case getType(edit.create):
       return { ...initialState, ...action.payload }
+    case getType(edit.removeOption):
+      const option: IQuizItemOption = action.payload
+      if (!option) {
+        return state
+      }
+      const item = state.items.find(it => it.id === option.quizItemId)
+      if (!item) {
+        return state
+      }
+      newOptions = item.options.filter(opt => opt.id !== option.id)
+      let prevOrder = -1
+      newOptions.forEach(opt => (opt.order = ++prevOrder))
+      return {
+        ...state,
+        items: state.items.map(it =>
+          it.id !== item.id ? it : { ...it, options: newOptions },
+        ),
+      }
+    case getType(edit.swapOptionOrders):
+      const { quizItem, optionIdx1, optionIdx2 } = action.payload
+
+      const oldQuizItem = state.items.find(qi => qi.id === quizItem.id)
+
+      newOptions = createSwappedOptions(oldQuizItem, optionIdx1, optionIdx2)
+
+      if (newOptions === undefined) {
+        return state
+      }
+
+      return {
+        ...state,
+        items: state.items.map(it =>
+          it.id !== quizItem.id ? it : { ...it, options: newOptions },
+        ),
+      }
     default:
       return state
   }
+}
+
+const createSwappedOptions = (
+  quizItem: IQuizItem | undefined,
+  idx1: number,
+  idx2: number,
+): IQuizItemOption[] | undefined => {
+  const option1 = quizItem && quizItem.options.find(opt => opt.order === idx1)
+  const option2 = quizItem && quizItem.options.find(opt => opt.order === idx2)
+
+  if (!quizItem || !option1 || !option2) {
+    return undefined
+  }
+
+  return quizItem.options.map(opt => {
+    if (opt.order === idx1) {
+      return { ...opt, order: idx2 }
+    }
+    if (opt.order === idx2) {
+      return { ...opt, order: idx1 }
+    }
+    return opt
+  })
 }

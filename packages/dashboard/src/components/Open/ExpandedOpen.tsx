@@ -10,7 +10,7 @@ import {
 } from "@material-ui/core/styles"
 import React from "react"
 import { connect } from "react-redux"
-import { changeAttr, save } from "../../store/edit/actions"
+import { changeAttr } from "../../store/edit/actions"
 import BottomActionsExpItem from "../ItemTools/ExpandedBottomActions"
 import ExpandedTopInformation from "../ItemTools/ExpandedTopInformation"
 
@@ -40,22 +40,6 @@ const redTheme = createMuiTheme({
 })
 
 class ExpandedOpen extends React.Component<any, any> {
-  constructor(props) {
-    super(props)
-    const item = this.props.items[this.props.order]
-    const initData = {
-      title: item.texts[0].title,
-      body: item.texts[0].body,
-      validityRegex: item.validityRegex,
-      successMessage: item.texts[0].successMessage,
-      failureMessage: item.texts[0].failureMessage,
-    }
-    this.state = {
-      tempItemData: initData,
-      titleHasBeenModified: item.id ? true : false,
-    }
-  }
-
   public render() {
     const item = this.props.items[this.props.order]
 
@@ -86,11 +70,7 @@ class ExpandedOpen extends React.Component<any, any> {
                             fullWidth={true}
                             multiline={true}
                             label="Title"
-                            value={
-                              (this.state.titleHasBeenModified &&
-                                this.state.tempItemData.title) ||
-                              ""
-                            }
+                            value={item.texts[0].title || ""}
                             onChange={this.changeTempAttribute("title")}
                             style={{
                               fontWeight: "bold",
@@ -104,13 +84,12 @@ class ExpandedOpen extends React.Component<any, any> {
                             fullWidth={true}
                             multiline={true}
                             rows={
-                              this.state.tempItemData.body &&
-                              this.state.tempItemData.body.length > 0
+                              item.texts[0].body && item.texts[0].body > 0
                                 ? 3
                                 : 1
                             }
                             label="Body"
-                            value={this.state.tempItemData.body || ""}
+                            value={item.texts[0].body || ""}
                             onChange={this.changeTempAttribute("body")}
                             variant="outlined"
                           />
@@ -131,7 +110,7 @@ class ExpandedOpen extends React.Component<any, any> {
                             fullWidth={true}
                             required={true}
                             label="Validity regex"
-                            value={this.state.tempItemData.validityRegex || ""}
+                            value={item.validityRegex || ""}
                             onChange={this.changeTempAttribute("validityRegex")}
                           />
                         </Grid>
@@ -143,9 +122,7 @@ class ExpandedOpen extends React.Component<any, any> {
                               multiline={true}
                               fullWidth={true}
                               label="Success message"
-                              value={
-                                this.state.tempItemData.successMessage || ""
-                              }
+                              value={item.texts[0].successMessage || ""}
                               onChange={this.changeTempAttribute(
                                 "successMessage",
                               )}
@@ -161,9 +138,7 @@ class ExpandedOpen extends React.Component<any, any> {
                               fullWidth={true}
                               multiline={true}
                               label="Failure message"
-                              value={
-                                this.state.tempItemData.failureMessage || ""
-                              }
+                              value={item.texts[0].failureMessage || ""}
                               onChange={this.changeTempAttribute(
                                 "failureMessage",
                               )}
@@ -179,7 +154,6 @@ class ExpandedOpen extends React.Component<any, any> {
               <Grid item={true} xs="auto" />
 
               <BottomActionsExpItem
-                onSave={this.saveItem}
                 itemHasBeenSaved={item.id ? true : false}
                 handleExpand={this.props.toggleExpand}
                 handleCancel={this.props.onCancel}
@@ -193,53 +167,25 @@ class ExpandedOpen extends React.Component<any, any> {
   }
 
   private changeTempAttribute = (attributeName: string) => e => {
-    const newData = { ...this.state.tempItemData }
-    newData[attributeName] = e.target.value
+    const value = e.target.value
 
-    if (attributeName === "title") {
-      this.setState({
-        titleHasBeenModified: true,
-        tempItemData: newData,
-      })
+    if (attributeName === "validityRegex") {
+      this.props.changeAttr(
+        `items[${this.props.order}].${attributeName}`,
+        value,
+      )
     } else {
-      this.setState({
-        tempItemData: newData,
-      })
+      this.props.changeAttr(
+        `items[${this.props.order}].texts[0].${attributeName}`,
+        value,
+      )
     }
-  }
-
-  private saveItem = e => {
-    this.props.toggleExpand(e)
-    this.props.changeAttr(
-      `items[${this.props.order}].texts[0].title`,
-      this.state.tempItemData.title,
-    )
-
-    this.props.changeAttr(
-      `items[${this.props.order}].texts[0].body`,
-      this.state.tempItemData.body,
-    )
-
-    this.props.changeAttr(
-      `items[${this.props.order}].texts[0].successMessage`,
-      this.state.tempItemData.successMessage,
-    )
-
-    this.props.changeAttr(
-      `items[${this.props.order}].texts[0].failureMessage`,
-      this.state.tempItemData.failureMessage,
-    )
-
-    this.props.changeAttr(
-      `items[${this.props.order}].validityRegex`,
-      this.state.tempItemData.validityRegex,
-    )
   }
 }
 
 export default withStyles(styles)(
   connect(
     null,
-    { changeAttr, save },
+    { changeAttr },
   )(ExpandedOpen),
 )
