@@ -1,4 +1,5 @@
 import { createContext } from "react"
+import { IItemWrapperProps, LowerContentProps } from "../components/QuizImpl"
 import { ChoiceButtonProps } from "../components/ChoiceButton"
 import { SubmitButtonProps } from "../components/QuizImpl/SubmitButton"
 import { LeftBorderedDivProps } from "../components/MultipleChoice"
@@ -16,8 +17,19 @@ export interface ThemeProviderInterface {
   topInfoBarStyles?: string
   topInfoBarIcon?: React.FunctionComponent<any>
   mainDivStyles?: string
-  itemWrapperStyles?: string
+  itemWrapper?: React.FunctionComponent<IItemWrapperProps>
   optionGridItemStyles?: string
+  multipleChoiceItemContentStyles?: string
+  narrowOpenItemContentStyles?: string
+  wideOpenItemContentStyles?: string
+  essayItemContentStyles?: string
+  upperContentStyles?: string
+  lowerContent?: React.FunctionComponent<LowerContentProps>
+  submitMessageDivStyles?: string
+  answerPaperStyles?: string
+  answerFieldStyles?: string
+  quizBodyStyles?: string
+  stepperStyles?: string
 }
 
 const ThemeProviderContext = createContext<ThemeProviderInterface>({})

@@ -289,9 +289,9 @@ const UnselectedPeerAnswerActions: React.FunctionComponent<
       </Grid>
 
       <Grid item>
-        <BaseButton variant="contained" color="primary" onClick={selectAnswer}>
+        <SelectButton onClick={selectAnswer}>
           {languageInfo.chooseButtonLabel}
-        </BaseButton>
+        </SelectButton>
       </Grid>
     </Grid>
   )

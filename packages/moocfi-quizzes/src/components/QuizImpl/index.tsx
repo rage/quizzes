@@ -60,16 +60,15 @@ const QuizItemContainerDiv = styled.div`
   padding-bottom: 20px;
 `
 
-interface IItemWrapperProps {
+export interface IItemWrapperProps {
   rowNumber: number
-  providedStyles?: string | undefined
 }
 
 const ItemWrapper = styled.div<IItemWrapperProps>`
-  background-color: ${props => props.rowNumber % 2 === 0 && "#605c980d"};
+  background-color: ${({ rowNumber }) =>
+    rowNumber % 2 === 0 ? "inherit" : "#605c980d"};
   border-radius: 10px;
   padding: 1rem 2rem 1rem 1rem;
-  ${({ providedStyles, rowNumber }) => rowNumber % 2 === 0 && providedStyles}
 `
 
 interface IQuizContentWrapperProps {
@@ -86,14 +85,19 @@ const QuizContentWrapper = styled.div<IQuizContentWrapperProps>`
       `}
 `
 
-const UpperContent = styled.div``
-
-interface LowerContentProps {
+interface UpperContentProps {
   providedStyles: string | undefined
-  singleItem: boolean
 }
 
-const LowerContent = styled.div``
+const UpperContent = styled.div<UpperContentProps>`
+  ${({ providedStyles }) => providedStyles}
+`
+
+export interface LowerContentProps {
+  nItems: number
+}
+
+const LowerContent = styled.div<LowerContentProps>``
 
 const OuterDiv = styled.div<{ providedStyles: string | undefined }>`
   p {
@@ -105,8 +109,26 @@ const OuterDiv = styled.div<{ providedStyles: string | undefined }>`
   ${({ providedStyles }) => providedStyles}
 `
 
-const QuizBody = styled(MarkdownText)`
+interface QuizBodyProps {
+  providedStyles: string | undefined
+}
+
+const QuizBody = styled(MarkdownText)<QuizBodyProps>`
   padding-bottom: 1.5rem;
+  ${({ providedStyles }) => providedStyles}
+`
+interface SubmitMessageDivProps {
+  providedStyles: string | undefined
+}
+
+const SubmitMessageDiv = styled.div<SubmitMessageDivProps>`
+  border-left: 6px solid #047500;
+  padding: 0.25rem 0 0 1rem;
+  margin 0 0 3rem 0;
+  p {
+    margin: 1rem 0px !important;
+  }
+  ${({ providedStyles }) => providedStyles}
 `
 
 const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
@@ -174,6 +196,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const generalLabels = languageInfo.general
 
   const quizItemComponents = (quiz: Quiz, languageId: string) => {
+    const StyledWrapper = themeProvider.itemWrapper || ItemWrapper
+
     return (
       <>
         {quiz.items
@@ -181,13 +205,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           .map((item, idx) => {
             const ItemComponent = componentsByTypeNames(item.type)
             return (
-              <ItemWrapper
-                rowNumber={idx}
-                providedStyles={themeProvider.itemWrapperStyles}
-                key={item.id}
-              >
+              <StyledWrapper rowNumber={idx} key={item.id}>
                 <ItemComponent item={item} />
-              </ItemWrapper>
+              </StyledWrapper>
             )
           })}
       </>
@@ -248,6 +268,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       : false
     : false
 
+  const submitMessage = quiz.texts[0].submitMessage
+
   const exerciseFinishedMessage =
     activeStep === 4
       ? languageInfo.peerReviews.answerConfirmed
@@ -274,6 +296,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
         qi.type !== "research-agreement",
     )
 
+  const ThemedLowerContent = themeProvider.lowerContent || LowerContent
+
   return (
     <OuterDiv providedStyles={themeProvider.mainDivStyles}>
       <TopInfoBar />
@@ -283,87 +307,104 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       )}
 
       <QuizContentWrapper disabled={quizDisabled}>
-        <UpperContent>
+        <UpperContent providedStyles={themeProvider.upperContentStyles}>
           <Deadline deadline={quiz.deadline} />
 
           {containsPeerReviews && <StageVisualizer />}
 
-          <QuizBody>{quiz.texts[0].body}</QuizBody>
+          <QuizBody providedStyles={themeProvider.quizBodyStyles}>
+            {quiz.texts[0].body}
+          </QuizBody>
         </UpperContent>
-        <LowerContent>
-          <QuizItemContainerDiv>
-            {quizItemComponents(quiz, languageId)}
-            <MarkdownText>{quiz.texts[0].submitMessage}</MarkdownText>
-          </QuizItemContainerDiv>
+        <QuizItemContainerDiv>
+          {quizItemComponents(quiz, languageId)}
+        </QuizItemContainerDiv>
+        <ThemedLowerContent nItems={quiz.items.length}>
+          <div>
+            {!stillSubmittable && !quizDisabled ? (
+              <>
+                {submitMessage && (
+                  <SubmitMessageDiv
+                    providedStyles={themeProvider.submitMessageDivStyles}
+                  >
+                    <MarkdownText>{submitMessage}</MarkdownText>
+                  </SubmitMessageDiv>
+                )}
 
-          {!stillSubmittable && !quizDisabled ? (
-            <>
-              {containsPeerReviews && exerciseFinishedMessage && (
-                <BoldTypography>{exerciseFinishedMessage}</BoldTypography>
-              )}
+                {containsPeerReviews && exerciseFinishedMessage && (
+                  <BoldTypography>{exerciseFinishedMessage}</BoldTypography>
+                )}
 
-              {containsPeerReviews && shouldShowPeerReviews && <PeerReviews />}
+                {containsPeerReviews && shouldShowPeerReviews && (
+                  <PeerReviews />
+                )}
 
-              <ResultInformation
-                quiz={quiz}
-                quizAnswer={quizAnswer}
-                generalLabels={generalLabels}
-              />
-            </>
-          ) : (
-            <div>
-              {messageState.notification && messageState.notification.message && (
-                <Typography
-                  style={{
-                    color: messageState.notification.color,
-                    fontSize: "1.25rem",
-                  }}
-                >
-                  {messageState.notification.message}
-                </Typography>
-              )}
+                <ResultInformation
+                  quiz={quiz}
+                  quizAnswer={quizAnswer}
+                  generalLabels={generalLabels}
+                />
+              </>
+            ) : (
+              <div>
+                <div>
+                  {messageState.notification &&
+                    messageState.notification.message && (
+                      <Typography
+                        style={{
+                          color: messageState.notification.color,
+                          fontSize: "1.25rem",
+                        }}
+                      >
+                        {messageState.notification.message}
+                      </Typography>
+                    )}
 
-              <Grid container={true} alignItems="center" spacing={2}>
-                <Grid
-                  item={true}
-                  onClick={e => {
-                    if ((submitLocked || pastDeadline) && !quizDisabled) {
-                      dispatch(quizAnswerActions.noticeDisabledSubmitAttempt())
-                    }
-                  }}
-                  xs="auto"
-                >
-                  <SubmitButton />
-                </Grid>
+                  <Grid container={true} alignItems="center" spacing={2}>
+                    <Grid
+                      item={true}
+                      onClick={e => {
+                        if ((submitLocked || pastDeadline) && !quizDisabled) {
+                          dispatch(
+                            quizAnswerActions.noticeDisabledSubmitAttempt(),
+                          )
+                        }
+                      }}
+                      xs="auto"
+                    >
+                      <SubmitButton />
+                    </Grid>
 
-                {!quizDisabled && (
-                  <Grid item={true} xs="auto">
-                    {pastDeadline ? (
-                      <Typography>{generalLabels.pastDeadline}</Typography>
-                    ) : (
-                      <React.Fragment>
-                        <Typography>
-                          {quiz.triesLimited
-                            ? `${
-                                generalLabels.triesRemainingLabel
-                              }: ${triesRemaining}`
-                            : generalLabels.triesNotLimitedLabel}
-                        </Typography>
-                        {showPointsPolicyLabel && (
-                          <Typography>
-                            {generalLabels.pointsGrantingPolicyInformer(
-                              quiz.grantPointsPolicy,
+                    {!quizDisabled && (
+                      <Grid item={true} xs="auto">
+                        {pastDeadline ? (
+                          <Typography>{generalLabels.pastDeadline}</Typography>
+                        ) : (
+                          <React.Fragment>
+                            <Typography>
+                              {quiz.triesLimited
+                                ? `${
+                                    generalLabels.triesRemainingLabel
+                                  }: ${triesRemaining}`
+                                : generalLabels.triesNotLimitedLabel}
+                            </Typography>
+                            {showPointsPolicyLabel && (
+                              <Typography>
+                                {generalLabels.pointsGrantingPolicyInformer(
+                                  quiz.grantPointsPolicy,
+                                )}
+                              </Typography>
                             )}
-                          </Typography>
+                          </React.Fragment>
                         )}
-                      </React.Fragment>
+                      </Grid>
                     )}
                   </Grid>
-                )}
-              </Grid>
-            </div>
-          )}
-        </LowerContent>
+                </div>
+              </div>
+            )}
+          </div>
+        </ThemedLowerContent>
       </QuizContentWrapper>
     </OuterDiv>
   )

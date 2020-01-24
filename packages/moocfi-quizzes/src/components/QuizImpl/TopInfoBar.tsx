@@ -157,9 +157,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
     }
   }
 
-  const providedIcon = themeProvider.topInfoBarIcon
-
-  console.log(providedIcon)
+  const ProvidedIcon = themeProvider.topInfoBarIcon
 
   return (
     <StyledGrid
@@ -171,8 +169,8 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
       <XXS12Grid item={true} xs={9}>
         <Grid container={true} alignItems="stretch">
           <XXS12Grid item={true} xs={3} md={2}>
-            {providedIcon ? (
-              providedIcon
+            {ProvidedIcon ? (
+              <ProvidedIcon />
             ) : (
               <IconWrapper>
                 <FontAwesomeIcon icon={faQuestionCircle} />

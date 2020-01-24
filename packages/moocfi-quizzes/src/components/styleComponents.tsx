@@ -50,3 +50,11 @@ export const StyledButton = styled(BaseButton)`
 export const WhiteSpacePreservingTypography = styled(Typography)`
   white-space: pre-line;
 `
+
+interface ItemContentProps {
+  providedStyles: string | undefined
+}
+
+export const ItemContent = styled.div<ItemContentProps>`
+  ${({ providedStyles }) => providedStyles}
+`

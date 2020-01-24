@@ -52,8 +52,13 @@ const AttentionIcon = styled(FontAwesomeIcon)`
   font-size: 30px !important;
 `
 
-const BottomMarginedGrid = styled(Grid)`
+interface ItemContentProps {
+  providedStyles: string | undefined
+}
+
+const ItemContent = styled(Grid)<ItemContentProps>`
   margin-bottom: 10px;
+  ${({ providedStyles }) => providedStyles}
 `
 
 export interface LeftBorderedDivProps {
@@ -61,7 +66,7 @@ export interface LeftBorderedDivProps {
   onlyOneItem?: boolean
 }
 
-const LeftBorderedDiv = styled.div<ILeftBorderedDivProps>`
+const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
   border-left: 6px solid ${({ correct }) => (correct ? "#047500" : "#DB0000")};
   box-sizing: border-box;
   padding: 3px;
@@ -81,6 +86,7 @@ type MultipleChoiceProps = {
 const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   item,
 }) => {
+  const themeProvider = React.useContext(ThemeProviderContext)
   const quiz = useTypedSelector(state => state.quiz)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
@@ -100,8 +106,8 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
 
   let direction: GridDirection = "row"
   let alignItems: GridItemsAlignment = "baseline"
-  let questionWidth: 6 | 12 = 6
-  let optionContainerWidth: GridSize = 6
+  let questionWidth: 5 | 12 = 5
+  let optionContainerWidth: GridSize = 7
   let optionWidth: GridSize = "auto"
 
   if (onlyOneItem) {
@@ -118,7 +124,12 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   }
 
   return (
-    <BottomMarginedGrid container direction={direction} alignItems={alignItems}>
+    <ItemContent
+      container
+      direction={direction}
+      alignItems={alignItems}
+      providedStyles={themeProvider.multipleChoiceItemContentStyles}
+    >
       <ItemInformation
         item={item}
         itemAnswer={itemAnswer}
@@ -126,12 +137,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
         questionWidth={questionWidth}
       />
 
-      <ChoicesContainer
-        item
-        container
-        justify="space-evenly"
-        xs={optionContainerWidth}
-      >
+      <ChoicesContainer item container spacing={1} xs={optionContainerWidth}>
         {options
           .sort((o1, o2) => o1.order - o2.order)
           .map((option, index) => {
@@ -147,12 +153,12 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
       </ChoicesContainer>
 
       {!onlyOneItem && <FeedbackPortion item={item} />}
-    </BottomMarginedGrid>
+    </ItemContent>
   )
 }
 
 type ItemInformationProps = {
-  questionWidth: 6 | 12
+  questionWidth: 5 | 12
   itemAnswer: QuizItemAnswer | undefined
   item: QuizItem
   onlyOneItem: boolean
@@ -440,12 +446,13 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 }
 
 const OptionGridItem = styled(Grid)<OptionGridItemProps>`
-  ${({ onlyOneItem, shouldBeGray }) =>
+  ${({ onlyOneItem, shouldBeGray, providedStyles }) =>
     onlyOneItem
       ? `
       display: flex;
       justify-content: center;
       background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
+      ${providedStyles}
     `
       : ``}
 `

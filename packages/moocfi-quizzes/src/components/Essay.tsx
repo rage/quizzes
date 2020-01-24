@@ -10,9 +10,10 @@ import {
   WhiteSpacePreservingTypography,
 } from "./styleComponents"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
-import { StyledTextField } from "./styleComponents"
+import { ItemContent, StyledTextField } from "./styleComponents"
 import MarkdownText from "./MarkdownText"
 import { QuizItem, MiscEvent } from "../modelTypes"
+import ThemeProviderContext from "../contexes/themeProviderContext"
 
 type EssayProps = {
   item: QuizItem
@@ -21,6 +22,22 @@ type EssayProps = {
 interface ISubmitHelperTypographyProps {
   attemptWasRecentlyMade: boolean
 }
+
+interface AnswerPaperProps {
+  providedStyles: string | undefined
+}
+
+const AnswerPaper = styled(SpaciousPaper)<AnswerPaperProps>`
+  ${({ providedStyles }) => providedStyles}
+`
+
+interface AnswerFieldProps {
+  providedStyles: string | undefined
+}
+
+const AnswerField = styled(StyledTextField)<AnswerFieldProps>`
+  ${({ providedStyles }) => providedStyles}
+`
 
 const SubmitHelperTypography = styled(Typography)<ISubmitHelperTypographyProps>`
   && {
@@ -35,6 +52,8 @@ const SubmitHelperTypography = styled(Typography)<ISubmitHelperTypographyProps>`
 `
 
 const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
+  const themeProvider = React.useContext(ThemeProviderContext)
+
   const dispatch = useDispatch()
 
   const handleTextDataChange = (e: MiscEvent) =>
@@ -83,18 +102,18 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
       <Typography variant="subtitle1">
         {essayLabels.userAnswerLabel + ": "}
       </Typography>
-      <SpaciousPaper>
+      <AnswerPaper providedStyles={themeProvider.answerPaperStyles}>
         <WhiteSpacePreservingTypography variant="body1">
           {answerText}
         </WhiteSpacePreservingTypography>
-      </SpaciousPaper>
+      </AnswerPaper>
     </>
   ) : (
     <>
       <Typography>
         {essayLabels.wordLimitsGuidance(item.minWords, item.maxWords)}
       </Typography>
-      <StyledTextField
+      <AnswerField
         rowNumber={item.order}
         variant="outlined"
         label={essayLabels.textFieldLabel}
@@ -104,6 +123,7 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
         multiline={true}
         rows={10}
         margin="normal"
+        providedStyles={themeProvider.answerFieldStyles}
       />
       <div>
         <Typography>
@@ -122,7 +142,7 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
   )
 
   return (
-    <div>
+    <ItemContent providedStyles={themeProvider.essayItemContentStyles}>
       {itemTitle && (
         <MarkdownText Component={Typography} variant="h6">
           {itemTitle}
@@ -132,7 +152,7 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
       {itemBody && <MarkdownText variant="body1">{itemBody}</MarkdownText>}
 
       {quizDisabled ? (
-        <StyledTextField
+        <AnswerField
           rowNumber={item.order}
           variant="outlined"
           fullWidth={true}
@@ -140,11 +160,12 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
           rows={5}
           margin="normal"
           disabled
+          providedStyles={themeProvider.answerFieldStyles}
         />
       ) : (
         answerPortion
       )}
-    </div>
+    </ItemContent>
   )
 }
 
