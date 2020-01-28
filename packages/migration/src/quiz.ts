@@ -11,7 +11,7 @@ import { Quiz as QNQuiz } from "./app-modules/models"
 
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import oldQuizTypes from "./app-modules/constants/quiz-types"
-import { getUUIDByString, insert } from "./util/"
+import { getUUIDByString, insertForReal } from "./util/"
 import { progressBar, safeGet } from "./util"
 import { AdvancedConsoleLogger } from "typeorm"
 
@@ -113,8 +113,8 @@ export async function migrateQuizzes(
       part,
       section,
       excludedFromScore,
-      createdAt: oldQuiz.createdAt,
-      updatedAt: oldQuiz.updatedAt,
+      createdAt: new Date(oldQuiz.createdAt),
+      updatedAt: new Date(oldQuiz.updatedAt),
     }
 
     quizzes.push(quiz)
@@ -128,8 +128,8 @@ export async function migrateQuizzes(
       title: oldQuiz.title,
       body: oldQuiz.body,
       submitMessage: safeGet(() => oldQuiz.data.meta.submitMessage),
-      createdAt: oldQuiz.createdAt,
-      updatedAt: oldQuiz.updatedAt,
+      createdAt: new Date(oldQuiz.createdAt),
+      updatedAt: new Date(oldQuiz.updatedAt),
     })
 
     let order: number
@@ -161,8 +161,8 @@ export async function migrateQuizzes(
           order: 0,
           minWords,
           maxWords,
-          createdAt: oldQuiz.createdAt,
-          updatedAt: oldQuiz.updatedAt,
+          createdAt: new Date(oldQuiz.createdAt),
+          updatedAt: new Date(oldQuiz.updatedAt),
         })
         quizItemTranslations.push({
           quizItemId: getUUIDByString(oldQuiz._id),
@@ -183,8 +183,8 @@ export async function migrateQuizzes(
             type: oldQuiz.type === oldQuizTypes.SCALE ? "scale" : "open",
             validityRegex: rightAnswer ? rightAnswer[oldItem.id] : undefined,
             order: order++,
-            createdAt: oldQuiz.createdAt,
-            updatedAt: oldQuiz.updatedAt,
+            createdAt: new Date(oldQuiz.createdAt),
+            updatedAt: new Date(oldQuiz.updatedAt),
           })
           quizItemTranslations.push({
             quizItemId: qiid,
@@ -211,8 +211,8 @@ export async function migrateQuizzes(
                 : "checkbox"
               : "multiple-choice",
           order: 0,
-          createdAt: oldQuiz.createdAt,
-          updatedAt: oldQuiz.updatedAt,
+          createdAt: new Date(oldQuiz.createdAt),
+          updatedAt: new Date(oldQuiz.updatedAt),
         })
         quizItemTranslations.push({
           quizItemId: itemID,
@@ -234,8 +234,8 @@ export async function migrateQuizzes(
             quizItemId: itemID,
             order: choiceOrder++,
             correct: typeof correct === "boolean" ? correct : true,
-            createdAt: oldQuiz.createdAt,
-            updatedAt: oldQuiz.updatedAt,
+            createdAt: new Date(oldQuiz.createdAt),
+            updatedAt: new Date(oldQuiz.updatedAt),
           })
           quizOptionTranslations.push({
             quizOptionId: qoid,
@@ -259,8 +259,8 @@ export async function migrateQuizzes(
             type: "multiple-choice",
             order: order++,
             multi: meta.multi,
-            createdAt: oldQuiz.createdAt,
-            updatedAt: oldQuiz.updatedAt,
+            createdAt: new Date(oldQuiz.createdAt),
+            updatedAt: new Date(oldQuiz.updatedAt),
           })
           quizItemTranslations.push({
             quizItemId: qiid,
@@ -283,8 +283,8 @@ export async function migrateQuizzes(
                   ? rightAnswer[oldItem.id].includes(oldChoice.id)
                   : rightAnswer[oldItem.id] === oldChoice.id
                 : false,
-              createdAt: oldQuiz.createdAt,
-              updatedAt: oldQuiz.updatedAt,
+              createdAt: new Date(oldQuiz.createdAt),
+              updatedAt: new Date(oldQuiz.updatedAt),
             })
             quizOptionTranslations.push({
               quizOptionId: qoid,
@@ -304,16 +304,20 @@ export async function migrateQuizzes(
 
   logger.info("Inserting quizzes...", quizzes.length)
 
-  await insert(Quiz, quizzes)
-  await insert(QuizTranslation, quizTranslations, `"quiz_id", "language_id"`)
-  await insert(QuizItem, quizItems)
-  await insert(
+  await insertForReal(Quiz, quizzes)
+  await insertForReal(
+    QuizTranslation,
+    quizTranslations,
+    `"quiz_id", "language_id"`,
+  )
+  await insertForReal(QuizItem, quizItems)
+  await insertForReal(
     QuizItemTranslation,
     quizItemTranslations,
     `"quiz_item_id", "language_id"`,
   )
-  await insert(QuizOption, quizOptions)
-  await insert(
+  await insertForReal(QuizOption, quizOptions)
+  await insertForReal(
     QuizOptionTranslation,
     quizOptionTranslations,
     `"quiz_option_id", "language_id"`,

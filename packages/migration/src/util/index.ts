@@ -3,6 +3,7 @@ import {
   BaseEntity,
   Brackets,
   FindOptionsWhereCondition,
+  getConnection,
   ObjectLiteral,
   SelectQueryBuilder,
 } from "typeorm"
@@ -10,9 +11,44 @@ import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import getUUIDByStringBroken from "uuid-by-string"
 import fs from "fs"
 
+import { snakeCase } from "typeorm/util/StringUtils"
+
 export function logger(message: string) {}
 
-export async function insert<T extends BaseEntity>(
+export function insert<T extends BaseEntity>(
+  type: typeof BaseEntity,
+  data: Array<QueryPartialEntity<T>> | QueryPartialEntity<T>,
+  primaryKeys: string = `"id"`,
+) {
+  if (data instanceof Array && data.length === 0) {
+    return
+  }
+
+  const properties = getConnection()
+    .getMetadata(type)
+    .columns.map(c => snakeCase(c.propertyName))
+
+  let updateString = ""
+
+  properties.forEach(p => {
+    let property = p
+    if (property === "order") {
+      property = `"order"`
+    }
+    updateString = updateString.concat(`${property} = excluded.${property}, `)
+  })
+
+  updateString = updateString.substring(0, updateString.length - 2)
+
+  return type
+    .createQueryBuilder()
+    .insert()
+    .values(data)
+    .onConflict(`(${primaryKeys}) do update set ${updateString}`)
+    .execute()
+}
+
+/*export async function insert<T extends BaseEntity>(
   type: typeof BaseEntity,
   data: any[],
   primaryKeys: string = `"id"`,
@@ -35,7 +71,7 @@ export async function insert<T extends BaseEntity>(
   )
 
   return saved
-}
+}*/
 
 export function insertForReal<T extends BaseEntity>(
   type: typeof BaseEntity,
@@ -46,11 +82,29 @@ export function insertForReal<T extends BaseEntity>(
     return
   }
 
+  const properties = getConnection()
+    .getMetadata(type)
+    .columns.map(c => snakeCase(c.propertyName))
+
+  let updateString = ""
+
+  properties.forEach(p => {
+    let property = p
+    if (property === "order") {
+      property = `"order"`
+    } else if (property === "updated_at") {
+      return
+    }
+    updateString = updateString.concat(`${property} = excluded.${property}, `)
+  })
+
+  updateString = updateString.concat("updated_at = now()")
+
   return type
     .createQueryBuilder()
     .insert()
     .values(data)
-    .onConflict(`(${primaryKeys}) DO NOTHING`)
+    .onConflict(`(${primaryKeys}) do update set ${updateString}`)
     .execute()
 }
 

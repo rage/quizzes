@@ -43,9 +43,9 @@ export async function migratePeerReviews(
   let bar = progressBar("Converting peer reviews", peerReviews.length)
   for (const oldPR of peerReviews) {
     const answerID = getUUIDByString(oldPR.chosenQuizAnswerId)
-    if (!existingAnswers[answerID]) {
+    /*if (!existingAnswers[answerID]) {
       continue
-    }
+    }*/
 
     let rejectedAnswerID = getUUIDByString(oldPR.rejectedQuizAnswerId)
     if (!existingAnswers[rejectedAnswerID]) {
@@ -69,17 +69,18 @@ export async function migratePeerReviews(
       id,
       userId: user ? user.id : null,
       quizAnswerId: answerID,
+      peerReviewCollectionId: quizID || sourceQuizID,
       rejectedQuizAnswerIds: rejectedAnswerID ? [rejectedAnswerID] : [],
-      createdAt: oldPR.createdAt,
-      updatedAt: oldPR.updatedAt,
+      createdAt: new Date(oldPR.createdAt),
+      updatedAt: new Date(oldPR.updatedAt),
     })
 
     for (const question of questions) {
       newPeerReviewAnswers.push({
         peerReviewId: id,
         peerReviewQuestionId: question.id,
-        createdAt: oldPR.createdAt,
-        updatedAt: oldPR.updatedAt,
+        createdAt: new Date(oldPR.createdAt),
+        updatedAt: new Date(oldPR.updatedAt),
         text: question.type === "essay" ? oldPR.review : null,
         value:
           question.type === "grade"

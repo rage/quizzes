@@ -12,7 +12,7 @@ import { QueryFailedError } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
 import { calculateChunkSize, progressBar } from "./util"
-import { getUUIDByString, insert } from "./util/"
+import { getUUIDByString, insertForReal } from "./util/"
 
 import { logger } from "./config/winston"
 
@@ -98,8 +98,8 @@ export async function migrateQuizAnswers(
                     userId: user ? user.id : null,
                     status,
                     languageId: (await quiz.course).languages[0].id,
-                    createdAt: answer.createdAt,
-                    updatedAt: answer.updatedAt,
+                    createdAt: new Date(answer.createdAt),
+                    updatedAt: new Date(answer.updatedAt),
                   })
                   existingAnswers[answerID] = true
 
@@ -125,8 +125,8 @@ export async function migrateQuizAnswers(
                           quizItemId: quizItem.id,
                           intData: null,
                           textData: (answer.data || "").replace(/\0/g, ""),
-                          createdAt: answer.createdAt,
-                          updatedAt: answer.updatedAt,
+                          createdAt: new Date(answer.createdAt),
+                          updatedAt: new Date(answer.updatedAt),
                         })
                         break
 
@@ -141,8 +141,8 @@ export async function migrateQuizAnswers(
                               ? answer.data
                               : answer.data[quizItem.id]) || ""
                           ).replace(/\0/g, ""),
-                          createdAt: answer.createdAt,
-                          updatedAt: answer.updatedAt,
+                          createdAt: new Date(answer.createdAt),
+                          updatedAt: new Date(answer.updatedAt),
                         })
                         break
                       case "scale":
@@ -155,8 +155,8 @@ export async function migrateQuizAnswers(
                               ? answer.data
                               : answer.data[quizItem.id],
                           textData: null,
-                          createdAt: answer.createdAt,
-                          updatedAt: answer.updatedAt,
+                          createdAt: new Date(answer.createdAt),
+                          updatedAt: new Date(answer.updatedAt),
                         })
                         break
 
@@ -169,8 +169,8 @@ export async function migrateQuizAnswers(
                           quizItemId: quizItem.id,
                           intData: null,
                           textData: null,
-                          createdAt: answer.createdAt,
-                          updatedAt: answer.updatedAt,
+                          createdAt: new Date(answer.createdAt),
+                          updatedAt: new Date(answer.updatedAt),
                         })
                         let chosenOptions =
                           Array.isArray(answer.data) ||
@@ -198,8 +198,8 @@ export async function migrateQuizAnswers(
                             id: getUUIDByString(itemID + chosenOption),
                             quizItemAnswerId: itemID,
                             quizOptionId: optionID,
-                            createdAt: answer.createdAt,
-                            updatedAt: answer.updatedAt,
+                            createdAt: new Date(answer.createdAt),
+                            updatedAt: new Date(answer.updatedAt),
                           })
                         }
                         break
@@ -209,10 +209,17 @@ export async function migrateQuizAnswers(
               ),
             )
 
-            await insert(QuizAnswer, quizAnswers)
+            const quizAnswerChunk = calculateChunkSize(quizAnswers[0])
+            console.log("SIZE: " + quizAnswerChunk)
+            for (let i = 0; i < quizItemAnswers.length; i += quizAnswerChunk) {
+              await insertForReal(
+                QuizItemAnswer,
+                quizItemAnswers.slice(i, i + quizAnswerChunk),
+              )
+            }
             const itemAnswerChunk = calculateChunkSize(quizItemAnswers[0])
             for (let i = 0; i < quizItemAnswers.length; i += itemAnswerChunk) {
-              await insert(
+              await insertForReal(
                 QuizItemAnswer,
                 quizItemAnswers.slice(i, i + itemAnswerChunk),
               )
@@ -223,7 +230,7 @@ export async function migrateQuizAnswers(
               i < quizOptionAnswers.length;
               i += optionAnswerChunk
             ) {
-              await insert(
+              await insertForReal(
                 QuizOptionAnswer,
                 quizOptionAnswers.slice(i, i + optionAnswerChunk),
               )

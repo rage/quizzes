@@ -125,16 +125,16 @@ async function migratePeerReviewQuestion(
   const collection = {
     id: getUUIDByString(oldPRQ._id),
     quizId: quiz.id,
-    createdAt: oldPRQ.createdAt,
-    updatedAt: oldPRQ.updatedAt,
+    createdAt: new Date(oldPRQ.createdAt),
+    updatedAt: new Date(oldPRQ.updatedAt),
   }
   const collectionTranslation = {
     peerReviewCollectionId: collection.id,
     languageId,
     title: oldPRQ.title || "",
     body: oldPRQ.body || "",
-    createdAt: oldPRQ.createdAt,
-    updatedAt: oldPRQ.updatedAt,
+    createdAt: new Date(oldPRQ.createdAt),
+    updatedAt: new Date(oldPRQ.updatedAt),
   }
 
   const questions: Array<QueryPartialEntity<PeerReviewQuestion>> = []
@@ -156,16 +156,16 @@ async function migratePeerReviewQuestion(
       type,
       order: order++,
       answerRequired: oldPRQ.data.answeringRequired,
-      createdAt: oldPRQ.createdAt,
-      updatedAt: oldPRQ.updatedAt,
+      createdAt: new Date(oldPRQ.createdAt),
+      updatedAt: new Date(oldPRQ.updatedAt),
     })
     questionTranslations.push({
       peerReviewQuestionId: getUUIDByString(id),
       languageId,
       title,
       body,
-      createdAt: oldPRQ.createdAt,
-      updatedAt: oldPRQ.updatedAt,
+      createdAt: new Date(oldPRQ.createdAt),
+      updatedAt: new Date(oldPRQ.updatedAt),
     })
   }
 
