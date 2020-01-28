@@ -7,7 +7,7 @@ import {
 } from "./models"
 import { PeerReview as QNPeerReview } from "./app-modules/models"
 
-import { Any } from "typeorm"
+import { EntityManager } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { calculateChunkSize, progressBar } from "./util"
 import { getUUIDByString, insert } from "./util/"
@@ -16,8 +16,9 @@ import { logger } from "./config/winston"
 
 export async function migratePeerReviews(
   users: { [username: string]: User },
-  existingAnswers: { [answerID: string]: boolean },
+  existingAnswersDeprecated: { [answerID: string]: boolean },
   peerReviews: any[],
+  manager: EntityManager,
 ) {
   logger.info("Querying peer reviews...")
   /*const peerReviews = await QNPeerReview.find({
@@ -26,6 +27,13 @@ export async function migratePeerReviews(
       { updatedAt: { $gte: LAST_MIGRATION } },
     ],
   })*/
+
+  const existingAnswers: { [key: string]: boolean } = {}
+  const answerIds = await manager.query("select id from quiz_answer")
+
+  answerIds.forEach((answer: any) => {
+    existingAnswers[answer.id] = true
+  })
 
   const newPeerReviews: Array<QueryPartialEntity<PeerReview>> = []
   const newPeerReviewAnswers: Array<
@@ -43,9 +51,9 @@ export async function migratePeerReviews(
   let bar = progressBar("Converting peer reviews", peerReviews.length)
   for (const oldPR of peerReviews) {
     const answerID = getUUIDByString(oldPR.chosenQuizAnswerId)
-    /*if (!existingAnswers[answerID]) {
+    if (!existingAnswers[answerID]) {
       continue
-    }*/
+    }
 
     let rejectedAnswerID = getUUIDByString(oldPR.rejectedQuizAnswerId)
     if (!existingAnswers[rejectedAnswerID]) {
@@ -60,6 +68,7 @@ export async function migratePeerReviews(
     const quizID = getUUIDByString(oldPR.quizId)
     const sourceQuizID = getUUIDByString(oldPR.sourceQuizId)
     const questions = prqcs[quizID] || prqcs[sourceQuizID]
+
     if (!questions) {
       continue
     }
@@ -69,7 +78,7 @@ export async function migratePeerReviews(
       id,
       userId: user ? user.id : null,
       quizAnswerId: answerID,
-      peerReviewCollectionId: quizID || sourceQuizID,
+      peerReviewCollectionId: questions[0].peerReviewCollectionId,
       rejectedQuizAnswerIds: rejectedAnswerID ? [rejectedAnswerID] : [],
       createdAt: new Date(oldPR.createdAt),
       updatedAt: new Date(oldPR.updatedAt),

@@ -126,7 +126,7 @@ async function main() {
     data.quizAnswers,
   )
   await migrateSpamFlags(users, data.spamFlags)
-  await migratePeerReviews(users, existingAnswers, data.peerReviews)
+  await migratePeerReviews(users, existingAnswers, data.peerReviews, manager)
 
   await manager.query(
     `insert into migration (date) values ('${new Date(
