@@ -73,54 +73,6 @@ export function insert<T extends BaseEntity>(
   return saved
 }*/
 
-export function insertForReal<T extends BaseEntity>(
-  type: typeof BaseEntity,
-  data: Array<QueryPartialEntity<T>> | QueryPartialEntity<T>,
-  primaryKeys: string = `"id"`,
-) {
-  if (data instanceof Array && data.length === 0) {
-    return
-  }
-
-  const properties = getConnection()
-    .getMetadata(type)
-    .columns.map(c => snakeCase(c.propertyName))
-
-  let updateString = ""
-
-  properties.forEach(p => {
-    let property = p
-    if (property === "order") {
-      property = `"order"`
-    } else if (property === "updated_at") {
-      return
-    }
-    updateString = updateString.concat(`${property} = excluded.${property}, `)
-  })
-
-  updateString = updateString.concat("updated_at = now()")
-
-  return type
-    .createQueryBuilder()
-    .insert()
-    .values(data)
-    .onConflict(`(${primaryKeys}) do update set ${updateString}`)
-    .execute()
-}
-
-export function getUUIDByString(str: string): string {
-  // getUUIDByStringBroken seems to ignore the first character of the string
-  return getUUIDByStringBroken("_" + str).toLowerCase()
-}
-
-export function randomUUID(size: number = 1000000, start: number = 0): string {
-  const randomUUIDseed: string = `${Date.now()}-${Math.round(
-    start + Math.random() * size,
-  )}`
-
-  return getUUIDByString(randomUUIDseed)
-}
-
 export class WhereBuilder<T extends BaseEntity> {
   private qb: SelectQueryBuilder<T>
   private idx = 0
