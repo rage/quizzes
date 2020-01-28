@@ -11,7 +11,7 @@ import { Quiz as QNQuiz } from "./app-modules/models"
 
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import oldQuizTypes from "./app-modules/constants/quiz-types"
-import { getUUIDByString, insertForReal } from "./util/"
+import { getUUIDByString, insert } from "./util/"
 import { progressBar, safeGet } from "./util"
 import { AdvancedConsoleLogger } from "typeorm"
 
@@ -304,20 +304,16 @@ export async function migrateQuizzes(
 
   logger.info("Inserting quizzes...", quizzes.length)
 
-  await insertForReal(Quiz, quizzes)
-  await insertForReal(
-    QuizTranslation,
-    quizTranslations,
-    `"quiz_id", "language_id"`,
-  )
-  await insertForReal(QuizItem, quizItems)
-  await insertForReal(
+  await insert(Quiz, quizzes)
+  await insert(QuizTranslation, quizTranslations, `"quiz_id", "language_id"`)
+  await insert(QuizItem, quizItems)
+  await insert(
     QuizItemTranslation,
     quizItemTranslations,
     `"quiz_item_id", "language_id"`,
   )
-  await insertForReal(QuizOption, quizOptions)
-  await insertForReal(
+  await insert(QuizOption, quizOptions)
+  await insert(
     QuizOptionTranslation,
     quizOptionTranslations,
     `"quiz_option_id", "language_id"`,

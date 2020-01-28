@@ -12,7 +12,7 @@ import { QueryFailedError } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { QuizAnswer as QNQuizAnswer } from "./app-modules/models"
 import { calculateChunkSize, progressBar } from "./util"
-import { getUUIDByString, insertForReal } from "./util/"
+import { getUUIDByString, insert } from "./util/"
 
 import { logger } from "./config/winston"
 
@@ -210,16 +210,16 @@ export async function migrateQuizAnswers(
             )
 
             const quizAnswerChunk = calculateChunkSize(quizAnswers[0])
-            console.log("SIZE: " + quizAnswerChunk)
+
             for (let i = 0; i < quizItemAnswers.length; i += quizAnswerChunk) {
-              await insertForReal(
+              await insert(
                 QuizItemAnswer,
                 quizItemAnswers.slice(i, i + quizAnswerChunk),
               )
             }
             const itemAnswerChunk = calculateChunkSize(quizItemAnswers[0])
             for (let i = 0; i < quizItemAnswers.length; i += itemAnswerChunk) {
-              await insertForReal(
+              await insert(
                 QuizItemAnswer,
                 quizItemAnswers.slice(i, i + itemAnswerChunk),
               )
@@ -230,7 +230,7 @@ export async function migrateQuizAnswers(
               i < quizOptionAnswers.length;
               i += optionAnswerChunk
             ) {
-              await insertForReal(
+              await insert(
                 QuizOptionAnswer,
                 quizOptionAnswers.slice(i, i + optionAnswerChunk),
               )
