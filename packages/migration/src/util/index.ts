@@ -73,6 +73,19 @@ export function insert<T extends BaseEntity>(
   return saved
 }*/
 
+export function getUUIDByString(str: string): string {
+  // getUUIDByStringBroken seems to ignore the first character of the string
+  return getUUIDByStringBroken("_" + str).toLowerCase()
+}
+
+export function randomUUID(size: number = 1000000, start: number = 0): string {
+  const randomUUIDseed: string = `${Date.now()}-${Math.round(
+    start + Math.random() * size,
+  )}`
+
+  return getUUIDByString(randomUUIDseed)
+}
+
 export class WhereBuilder<T extends BaseEntity> {
   private qb: SelectQueryBuilder<T>
   private idx = 0
