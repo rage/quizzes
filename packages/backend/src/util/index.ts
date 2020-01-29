@@ -23,13 +23,13 @@ export async function save<T extends BaseEntity>(
   return saved
 }
 
-export function insert<T extends BaseEntity>(
+export async function insert<T extends BaseEntity>(
   type: typeof BaseEntity,
   data: Array<QueryPartialEntity<T>> | QueryPartialEntity<T>,
   primaryKeys: string = `"id"`,
 ) {
   if (data instanceof Array && data.length === 0) {
-    return
+    return Promise.resolve()
   }
 
   const properties = getConnection()
@@ -42,15 +42,16 @@ export function insert<T extends BaseEntity>(
     let property = p
     if (property === "order") {
       property = `"order"`
-    } else if (property === "updated_at") {
-      return
+    }
+    if (property === "default") {
+      property = `"default"`
     }
     updateString = updateString.concat(`${property} = excluded.${property}, `)
   })
 
-  updateString = updateString.concat("updated_at = now()")
+  updateString = updateString.substring(0, updateString.length - 2)
 
-  return type
+  return await type
     .createQueryBuilder()
     .insert()
     .values(data)

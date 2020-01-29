@@ -15,13 +15,13 @@ import { snakeCase } from "typeorm/util/StringUtils"
 
 export function logger(message: string) {}
 
-export function insert<T extends BaseEntity>(
+export async function insert<T extends BaseEntity>(
   type: typeof BaseEntity,
   data: Array<QueryPartialEntity<T>> | QueryPartialEntity<T>,
   primaryKeys: string = `"id"`,
 ) {
   if (data instanceof Array && data.length === 0) {
-    return
+    return Promise.resolve()
   }
 
   const properties = getConnection()
@@ -35,12 +35,15 @@ export function insert<T extends BaseEntity>(
     if (property === "order") {
       property = `"order"`
     }
+    if (property === "default") {
+      property = `"default"`
+    }
     updateString = updateString.concat(`${property} = excluded.${property}, `)
   })
 
   updateString = updateString.substring(0, updateString.length - 2)
 
-  return type
+  return await type
     .createQueryBuilder()
     .insert()
     .values(data)

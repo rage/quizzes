@@ -382,21 +382,21 @@ export async function migrateQuizzes(
   })
 
   await Promise.all(
-    itemsToDelete.map(async item => {
-      try {
-        await QuizItem.delete(item)
-      } catch (error) {
-        console.log(`couldn't delete item ${item}`)
-      }
-    }),
-  )
-
-  await Promise.all(
     optionsToDelete.map(async option => {
       try {
         await QuizOption.delete(option)
       } catch (error) {
         console.log(`couldn't delete option ${option}`)
+      }
+    }),
+  )
+
+  await Promise.all(
+    itemsToDelete.map(async item => {
+      try {
+        await QuizItem.delete(item)
+      } catch (error) {
+        console.log(`couldn't delete item ${item}`)
       }
     }),
   )

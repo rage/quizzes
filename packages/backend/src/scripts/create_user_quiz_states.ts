@@ -114,6 +114,7 @@ const createOhjelmoinninMoocQuizStates = async (): Promise<UserQuizState[]> => {
       userQuizState.pointsAwarded = 1
       userQuizState.tries = userQuiz.tries
       userQuizState.status = "open"
+      userQuizState.updatedAt = new Date()
       return userQuizState
     },
   )
@@ -223,6 +224,7 @@ const createElementsOfAIUserQuizStates = async () => {
     userQuizState.userId = answer.user_id
     userQuizState.quizId = answer.quiz_id
     userQuizState.tries = answer.tries
+    userQuizState.updatedAt = new Date()
     userQuizState.status =
       status === "confirmed" || status === "submitted" ? "locked" : "open"
 

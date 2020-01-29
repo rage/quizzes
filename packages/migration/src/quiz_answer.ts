@@ -180,6 +180,13 @@ export async function migrateQuizAnswers(
                         if (!Array.isArray(chosenOptions)) {
                           chosenOptions = [chosenOptions]
                         }
+                        chosenOptions = (() => {
+                          const uniques = new Set()
+                          chosenOptions.forEach((option: any) =>
+                            uniques.add(option),
+                          )
+                          return Array.from(uniques)
+                        })()
                         const quizOptions: {
                           [optionID: string]: QuizOption
                         } = {}
@@ -211,10 +218,10 @@ export async function migrateQuizAnswers(
 
             const quizAnswerChunk = calculateChunkSize(quizAnswers[0])
 
-            for (let i = 0; i < quizItemAnswers.length; i += quizAnswerChunk) {
+            for (let i = 0; i < quizAnswers.length; i += quizAnswerChunk) {
               await insert(
-                QuizItemAnswer,
-                quizItemAnswers.slice(i, i + quizAnswerChunk),
+                QuizAnswer,
+                quizAnswers.slice(i, i + quizAnswerChunk),
               )
             }
             const itemAnswerChunk = calculateChunkSize(quizItemAnswers[0])
@@ -225,6 +232,7 @@ export async function migrateQuizAnswers(
               )
             }
             const optionAnswerChunk = calculateChunkSize(quizOptionAnswers[0])
+
             for (
               let i = 0;
               i < quizOptionAnswers.length;
@@ -270,5 +278,11 @@ export async function migrateQuizAnswers(
     `Quiz answers migrated. ${quizNotFound} did not match any quiz and ` +
       `${userNotFound} did not match any user`,
   )
+
+  const answerIds = await conn.query("select id from quiz_answer")
+  answerIds.forEach((answer: any) => {
+    existingAnswers[answer.id] = true
+  })
+
   return existingAnswers
 }

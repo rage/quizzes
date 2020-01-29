@@ -88,7 +88,6 @@ async function main() {
       }),
       spamFlags: await QNSpamFlag.find({}),
     }
-    console.log(JSON.stringify(data).length)
   } else {
     const local = process.argv.includes("local_server")
     logger.info(
@@ -117,7 +116,11 @@ async function main() {
   const languages = await createLanguages()
   const courses = await migrateCourses(org, languages)
   const quizzes = await migrateQuizzes(courses, data.quizzes)
-  await migratePeerReviewQuestions(data.peerReviewQuizzes, data.peerReviews)
+  await migratePeerReviewQuestions(
+    data.peerReviewQuizzes,
+    data.peerReviews,
+    quizzes,
+  )
   const users = await migrateUsers(data.usernames)
   // await migrateCourseStates(courses, users)
   const existingAnswers = await migrateQuizAnswers(
