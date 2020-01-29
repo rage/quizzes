@@ -48,7 +48,7 @@ async function main() {
 
   const now: any = new Date()
 
-  const latest = migrations[0].date.toISOString()
+  const latest = new Date("0").toISOString()
 
   let data: { [key: string]: any[] }
 

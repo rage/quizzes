@@ -92,7 +92,7 @@ export async function migratePeerReviews(
         text: question.type === "essay" ? oldPR.review : null,
         value:
           question.type === "grade"
-            ? oldPR.grading[question.texts[0].title]
+            ? (oldPR.grading && oldPR.grading[question.texts[0].title]) || null
             : null,
       })
     }
