@@ -279,10 +279,5 @@ export async function migrateQuizAnswers(
       `${userNotFound} did not match any user`,
   )
 
-  const answerIds = await conn.query("select id from quiz_answer")
-  answerIds.forEach((answer: any) => {
-    existingAnswers[answer.id] = true
-  })
-
   return existingAnswers
 }

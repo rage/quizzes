@@ -123,13 +123,9 @@ async function main() {
   )
   const users = await migrateUsers(data.usernames)
   // await migrateCourseStates(courses, users)
-  const existingAnswers = await migrateQuizAnswers(
-    quizzes,
-    users,
-    data.quizAnswers,
-  )
+  await migrateQuizAnswers(quizzes, users, data.quizAnswers)
   await migrateSpamFlags(users, data.spamFlags)
-  await migratePeerReviews(users, existingAnswers, data.peerReviews, manager)
+  await migratePeerReviews(users, data.peerReviews, manager)
 
   await manager.query(
     `insert into migration (date) values ('${new Date(

@@ -16,7 +16,6 @@ import { logger } from "./config/winston"
 
 export async function migratePeerReviews(
   users: { [username: string]: User },
-  existingAnswersDeprecated: { [answerID: string]: boolean },
   peerReviews: any[],
   manager: EntityManager,
 ) {
