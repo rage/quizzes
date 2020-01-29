@@ -98,8 +98,8 @@ export async function migrateQuizAnswers(
                     userId: user ? user.id : null,
                     status,
                     languageId: (await quiz.course).languages[0].id,
-                    createdAt: answer.createdAt,
-                    updatedAt: answer.updatedAt,
+                    createdAt: new Date(answer.createdAt),
+                    updatedAt: new Date(answer.updatedAt),
                   })
                   existingAnswers[answerID] = true
 
@@ -125,8 +125,8 @@ export async function migrateQuizAnswers(
                           quizItemId: quizItem.id,
                           intData: null,
                           textData: (answer.data || "").replace(/\0/g, ""),
-                          createdAt: answer.createdAt,
-                          updatedAt: answer.updatedAt,
+                          createdAt: new Date(answer.createdAt),
+                          updatedAt: new Date(answer.updatedAt),
                         })
                         break
 
@@ -141,8 +141,8 @@ export async function migrateQuizAnswers(
                               ? answer.data
                               : answer.data[quizItem.id]) || ""
                           ).replace(/\0/g, ""),
-                          createdAt: answer.createdAt,
-                          updatedAt: answer.updatedAt,
+                          createdAt: new Date(answer.createdAt),
+                          updatedAt: new Date(answer.updatedAt),
                         })
                         break
                       case "scale":
@@ -155,8 +155,8 @@ export async function migrateQuizAnswers(
                               ? answer.data
                               : answer.data[quizItem.id],
                           textData: null,
-                          createdAt: answer.createdAt,
-                          updatedAt: answer.updatedAt,
+                          createdAt: new Date(answer.createdAt),
+                          updatedAt: new Date(answer.updatedAt),
                         })
                         break
 
@@ -169,8 +169,8 @@ export async function migrateQuizAnswers(
                           quizItemId: quizItem.id,
                           intData: null,
                           textData: null,
-                          createdAt: answer.createdAt,
-                          updatedAt: answer.updatedAt,
+                          createdAt: new Date(answer.createdAt),
+                          updatedAt: new Date(answer.updatedAt),
                         })
                         let chosenOptions =
                           Array.isArray(answer.data) ||
@@ -180,6 +180,13 @@ export async function migrateQuizAnswers(
                         if (!Array.isArray(chosenOptions)) {
                           chosenOptions = [chosenOptions]
                         }
+                        chosenOptions = (() => {
+                          const uniques = new Set()
+                          chosenOptions.forEach((option: any) =>
+                            uniques.add(option),
+                          )
+                          return Array.from(uniques)
+                        })()
                         const quizOptions: {
                           [optionID: string]: QuizOption
                         } = {}
@@ -198,8 +205,8 @@ export async function migrateQuizAnswers(
                             id: getUUIDByString(itemID + chosenOption),
                             quizItemAnswerId: itemID,
                             quizOptionId: optionID,
-                            createdAt: answer.createdAt,
-                            updatedAt: answer.updatedAt,
+                            createdAt: new Date(answer.createdAt),
+                            updatedAt: new Date(answer.updatedAt),
                           })
                         }
                         break
@@ -209,7 +216,14 @@ export async function migrateQuizAnswers(
               ),
             )
 
-            await insert(QuizAnswer, quizAnswers)
+            const quizAnswerChunk = calculateChunkSize(quizAnswers[0])
+
+            for (let i = 0; i < quizAnswers.length; i += quizAnswerChunk) {
+              await insert(
+                QuizAnswer,
+                quizAnswers.slice(i, i + quizAnswerChunk),
+              )
+            }
             const itemAnswerChunk = calculateChunkSize(quizItemAnswers[0])
             for (let i = 0; i < quizItemAnswers.length; i += itemAnswerChunk) {
               await insert(
@@ -218,6 +232,7 @@ export async function migrateQuizAnswers(
               )
             }
             const optionAnswerChunk = calculateChunkSize(quizOptionAnswers[0])
+
             for (
               let i = 0;
               i < quizOptionAnswers.length;
@@ -263,5 +278,6 @@ export async function migrateQuizAnswers(
     `Quiz answers migrated. ${quizNotFound} did not match any quiz and ` +
       `${userNotFound} did not match any user`,
   )
+
   return existingAnswers
 }

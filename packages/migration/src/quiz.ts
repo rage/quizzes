@@ -113,8 +113,8 @@ export async function migrateQuizzes(
       part,
       section,
       excludedFromScore,
-      createdAt: oldQuiz.createdAt,
-      updatedAt: oldQuiz.updatedAt,
+      createdAt: new Date(oldQuiz.createdAt),
+      updatedAt: new Date(oldQuiz.updatedAt),
     }
 
     quizzes.push(quiz)
@@ -128,8 +128,8 @@ export async function migrateQuizzes(
       title: oldQuiz.title,
       body: oldQuiz.body,
       submitMessage: safeGet(() => oldQuiz.data.meta.submitMessage),
-      createdAt: oldQuiz.createdAt,
-      updatedAt: oldQuiz.updatedAt,
+      createdAt: new Date(oldQuiz.createdAt),
+      updatedAt: new Date(oldQuiz.updatedAt),
     })
 
     let order: number
@@ -161,8 +161,8 @@ export async function migrateQuizzes(
           order: 0,
           minWords,
           maxWords,
-          createdAt: oldQuiz.createdAt,
-          updatedAt: oldQuiz.updatedAt,
+          createdAt: new Date(oldQuiz.createdAt),
+          updatedAt: new Date(oldQuiz.updatedAt),
         })
         quizItemTranslations.push({
           quizItemId: getUUIDByString(oldQuiz._id),
@@ -183,8 +183,8 @@ export async function migrateQuizzes(
             type: oldQuiz.type === oldQuizTypes.SCALE ? "scale" : "open",
             validityRegex: rightAnswer ? rightAnswer[oldItem.id] : undefined,
             order: order++,
-            createdAt: oldQuiz.createdAt,
-            updatedAt: oldQuiz.updatedAt,
+            createdAt: new Date(oldQuiz.createdAt),
+            updatedAt: new Date(oldQuiz.updatedAt),
           })
           quizItemTranslations.push({
             quizItemId: qiid,
@@ -211,8 +211,8 @@ export async function migrateQuizzes(
                 : "checkbox"
               : "multiple-choice",
           order: 0,
-          createdAt: oldQuiz.createdAt,
-          updatedAt: oldQuiz.updatedAt,
+          createdAt: new Date(oldQuiz.createdAt),
+          updatedAt: new Date(oldQuiz.updatedAt),
         })
         quizItemTranslations.push({
           quizItemId: itemID,
@@ -234,8 +234,8 @@ export async function migrateQuizzes(
             quizItemId: itemID,
             order: choiceOrder++,
             correct: typeof correct === "boolean" ? correct : true,
-            createdAt: oldQuiz.createdAt,
-            updatedAt: oldQuiz.updatedAt,
+            createdAt: new Date(oldQuiz.createdAt),
+            updatedAt: new Date(oldQuiz.updatedAt),
           })
           quizOptionTranslations.push({
             quizOptionId: qoid,
@@ -259,8 +259,8 @@ export async function migrateQuizzes(
             type: "multiple-choice",
             order: order++,
             multi: meta.multi,
-            createdAt: oldQuiz.createdAt,
-            updatedAt: oldQuiz.updatedAt,
+            createdAt: new Date(oldQuiz.createdAt),
+            updatedAt: new Date(oldQuiz.updatedAt),
           })
           quizItemTranslations.push({
             quizItemId: qiid,
@@ -283,8 +283,8 @@ export async function migrateQuizzes(
                   ? rightAnswer[oldItem.id].includes(oldChoice.id)
                   : rightAnswer[oldItem.id] === oldChoice.id
                 : false,
-              createdAt: oldQuiz.createdAt,
-              updatedAt: oldQuiz.updatedAt,
+              createdAt: new Date(oldQuiz.createdAt),
+              updatedAt: new Date(oldQuiz.updatedAt),
             })
             quizOptionTranslations.push({
               quizOptionId: qoid,
@@ -382,21 +382,21 @@ export async function migrateQuizzes(
   })
 
   await Promise.all(
-    itemsToDelete.map(async item => {
-      try {
-        await QuizItem.delete(item)
-      } catch (error) {
-        console.log(`couldn't delete item ${item}`)
-      }
-    }),
-  )
-
-  await Promise.all(
     optionsToDelete.map(async option => {
       try {
         await QuizOption.delete(option)
       } catch (error) {
         console.log(`couldn't delete option ${option}`)
+      }
+    }),
+  )
+
+  await Promise.all(
+    itemsToDelete.map(async item => {
+      try {
+        await QuizItem.delete(item)
+      } catch (error) {
+        console.log(`couldn't delete item ${item}`)
       }
     }),
   )
