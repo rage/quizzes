@@ -14,6 +14,12 @@ export const create = createAction("edit/NEW", resolve => {
   return (course: any) => resolve(course)
 })
 
+export const modifyOptionOrder = createAction(
+  "edit/OPTION_ORDER_MODIFIED",
+  resolve => (quizItem: IQuizItem, optionIdx1: number, optionIdx2: number) =>
+    resolve({ quizItem, optionIdx1, optionIdx2 }),
+)
+
 export const swapOptionOrders = createAction(
   "edit/SWAP_OPTION_ORDER",
   resolve => (quizItem: IQuizItem, optionIdx1: number, optionIdx2: number) =>

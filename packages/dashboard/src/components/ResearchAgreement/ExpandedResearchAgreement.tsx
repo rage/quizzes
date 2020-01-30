@@ -13,8 +13,8 @@ import { connect } from "react-redux"
 import {
   addOption,
   changeAttr,
+  modifyOptionOrder,
   removeOption,
-  swapOptionOrders,
   updateMultipleOptions,
 } from "../../store/edit/actions"
 import BottomActionsExpItem from "../ItemTools/ExpandedBottomActions"
@@ -119,7 +119,7 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
   }
 
   private onSortEnd = ({ oldIndex, newIndex, collection }) => {
-    this.props.swapOptionOrders(
+    this.props.modifyOptionOrder(
       this.props.items[this.props.order],
       oldIndex,
       newIndex,
@@ -172,7 +172,7 @@ export default connect(
     addOption,
     changeAttr,
     removeOption,
-    swapOptionOrders,
+    modifyOptionOrder,
     updateMultipleOptions,
   },
 )(ExpandedResearchAgreement)
