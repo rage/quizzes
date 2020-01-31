@@ -406,6 +406,7 @@ export async function migrateQuizzes(
     .leftJoinAndSelect("quiz.course", "course")
     .leftJoinAndSelect("course.languages", "language")
     .leftJoinAndSelect("quiz.items", "quiz_item")
+    .addSelect("quiz_item.validityRegex")
     .leftJoinAndSelect("quiz_item.options", "option")
     .getMany()
 

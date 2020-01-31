@@ -49,6 +49,7 @@ async function main() {
   const now: any = new Date()
 
   const latest = migrations[0].date.toISOString()
+  // const latest = new Date("2020-02-01").toISOString()
 
   let data: { [key: string]: any[] }
 
