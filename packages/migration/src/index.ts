@@ -48,8 +48,8 @@ async function main() {
 
   const now: any = new Date()
 
-  // const latest = migrations[0].date.toISOString()
-  const latest = new Date("0").toISOString()
+  const latest = migrations[0].date.toISOString()
+  // const latest = new Date("2020-02-01").toISOString()
 
   let data: { [key: string]: any[] }
 
@@ -128,11 +128,11 @@ async function main() {
   await migrateSpamFlags(users, data.spamFlags)
   await migratePeerReviews(users, data.peerReviews, manager)
 
-  /*await manager.query(
+  await manager.query(
     `insert into migration (date) values ('${new Date(
       now - 10 * 60000,
     ).toISOString()}')`,
-  )*/
+  )
 
   timer.done({ message: "Migration complete" })
   console.timeEnd("Database migration complete. Time used")
