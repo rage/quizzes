@@ -1,5 +1,7 @@
-import dotenv from "dotenv"
-import Knex from "knex"
+import * as Kafka from "node-rdkafka"
+import knex from "../config/knex"
+
+import { promisify } from "util"
 
 import {
   ExerciseData,
@@ -8,24 +10,6 @@ import {
   QuizAnswerMessage,
   QuizMessage,
 } from "../types"
-
-import * as Kafka from "node-rdkafka"
-
-import { promisify } from "util"
-
-if (process.env.NODE_ENV !== "production") {
-  dotenv.config({ path: `.env` })
-}
-
-const knex = Knex({
-  client: "pg",
-  connection: {
-    host: process.env.DB_HOST || "/var/run/postgresql",
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-  },
-})
 
 const producer = new Kafka.Producer({
   "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
