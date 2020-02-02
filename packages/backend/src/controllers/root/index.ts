@@ -9,7 +9,7 @@ export class RootController {
     return {}
   }
 
-  @Get("status/healthz")
+  @Get("api/healthz")
   public async getHealth(@Res() res: any) {
     try {
       await knex.raw("select 1")

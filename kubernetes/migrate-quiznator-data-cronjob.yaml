@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: migrate-quiznator-data
 spec:
-  schedule: "8/10 * * * *"
+  schedule: "8 * * * *"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
