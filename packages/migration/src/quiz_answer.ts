@@ -129,6 +129,7 @@ export async function migrateQuizAnswers(
                           quizItemId: quizItem.id,
                           intData: null,
                           textData: (answer.data || "").replace(/\0/g, ""),
+                          correct: null,
                           createdAt: new Date(answer.createdAt),
                           updatedAt: new Date(answer.updatedAt),
                         })
@@ -166,6 +167,7 @@ export async function migrateQuizAnswers(
                               ? answer.data
                               : answer.data[quizItem.id],
                           textData: null,
+                          correct: null,
                           createdAt: new Date(answer.createdAt),
                           updatedAt: new Date(answer.updatedAt),
                         })
@@ -180,6 +182,7 @@ export async function migrateQuizAnswers(
                           quizItemId: quizItem.id,
                           intData: null,
                           textData: null,
+                          correct: null,
                           createdAt: new Date(answer.createdAt),
                           updatedAt: new Date(answer.updatedAt),
                         })
