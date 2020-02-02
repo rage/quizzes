@@ -4,6 +4,7 @@ metadata:
   name: migrate-quiznator-data
 spec:
   schedule: "8/10 * * * *"
+  concurrencyPolicy: Forbid
   jobTemplate:
     spec:
       activeDeadlineSeconds: 36000
