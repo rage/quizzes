@@ -3,7 +3,7 @@ import * as React from "react"
 
 interface ISharedFeedbackCustomiserProps {
   sharedMessageIsUsed: boolean
-  sharedFeedbackMessage: string
+  sharedFeedbackMessage?: string
   handleToggleChange: (e: any) => void
   handleMessageChange: (e: any) => void
 }
@@ -39,7 +39,7 @@ const SharedFeedbackCustomiser: React.FunctionComponent<
       >
         <TextField
           variant="outlined"
-          value={sharedFeedbackMessage}
+          value={sharedFeedbackMessage || ""}
           onChange={handleMessageChange}
           multiline={true}
           type="text"
