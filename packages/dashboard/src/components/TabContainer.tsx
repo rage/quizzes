@@ -84,7 +84,11 @@ class TabContainer extends Component<any, any> {
       return
     }
     const newExp = { ...this.state.expandedItems }
-    newExp[index] = newExp[index] ? !newExp[index] : true
+    if (typeof newExp[index] === "boolean") {
+      newExp[index] = !newExp[index]
+    } else {
+      newExp[index] = true
+    }
     this.setState({ expandedItems: newExp })
   }
 

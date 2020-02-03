@@ -19,10 +19,9 @@ interface IMultipleChoiceItemProps {
 const MultipleChoiceItem: React.FunctionComponent<IMultipleChoiceItemProps> = (
   props: any,
 ) => {
-  const item = props.items[props.order]
   const { expanded, ...expandedProps } = props
 
-  if (item.id && !props.expanded) {
+  if (!expanded) {
     return <ShortMultipleChoiceItem {...props} />
   } else {
     return <ExpandedMultipleChoiceItem {...expandedProps} />
