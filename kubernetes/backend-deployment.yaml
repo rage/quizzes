@@ -16,6 +16,18 @@ spec:
       - name: quizzes-backend
         image: ${BACKEND_IMAGE}
         imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /api/healthz
+            port: 3000
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/healthz
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
         ports:
         - name: backend-http
           containerPort: 3000

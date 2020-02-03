@@ -2,6 +2,7 @@ import { Container } from "typedi"
 import { EntityManager, getManager } from "typeorm"
 import { Database } from "../config/database"
 import { UserQuizState } from "../models"
+import { insert } from "../util/"
 
 const courses = {
   "ohjelmoinnin-mooc-2019": "38240a7b-7e64-4202-91e2-91f6d46f6198",
@@ -23,7 +24,7 @@ database.connect().then(async () => {
   createUserQuizStates()
 })
 
-const insert = process.argv.includes("cron")
+/*const insert = process.argv.includes("cron")
   ? async (batch: UserQuizState[]) => {
       await Promise.all(
         batch.map(async uqs => {
@@ -39,7 +40,7 @@ const insert = process.argv.includes("cron")
         .values(batch)
         .onConflict(`(user_id, quiz_id) DO NOTHING`)
         .execute()
-    }
+    }*/
 
 const createUserQuizStates = async () => {
   const now: any = new Date()
@@ -68,7 +69,11 @@ const createUserQuizStates = async () => {
     if (end > userQuizStates.length - 1) {
       end = userQuizStates.length - 1
     }
-    await insert(userQuizStates.slice(start, end))
+    await insert(
+      UserQuizState,
+      userQuizStates.slice(start, end),
+      `"user_id", "quiz_id"`,
+    )
   }
 
   await manager.query(
@@ -109,6 +114,7 @@ const createOhjelmoinninMoocQuizStates = async (): Promise<UserQuizState[]> => {
       userQuizState.pointsAwarded = 1
       userQuizState.tries = userQuiz.tries
       userQuizState.status = "open"
+      userQuizState.updatedAt = new Date()
       return userQuizState
     },
   )
@@ -218,6 +224,7 @@ const createElementsOfAIUserQuizStates = async () => {
     userQuizState.userId = answer.user_id
     userQuizState.quizId = answer.quiz_id
     userQuizState.tries = answer.tries
+    userQuizState.updatedAt = new Date()
     userQuizState.status =
       status === "confirmed" || status === "submitted" ? "locked" : "open"
 
