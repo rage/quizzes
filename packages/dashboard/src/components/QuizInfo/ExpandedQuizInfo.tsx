@@ -160,7 +160,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
           <Grid item={true} xs={12} md="auto">
             <div style={{ marginRight: "1rem", display: "inline" }}>
               <NumberOfPointsSelector
-                points={this.state.points}
+                points={this.props.points}
                 handlePointsChange={this.changeTempAttribute("points")}
               />
             </div>

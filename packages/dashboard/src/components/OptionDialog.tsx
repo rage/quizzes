@@ -32,7 +32,7 @@ const OptionDialogFunc: React.FunctionComponent<IOptionDialogProps> = props => {
   }
   const option = options[props.optionIdx]
   if (!option) {
-    return <div>"No option in index " + props.optionIdx</div>
+    return <div />
   }
 
   const handleAttributeChange = attributeName => e => {
