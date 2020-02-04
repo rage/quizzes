@@ -12,7 +12,7 @@ spec:
         spec:
           restartPolicy: OnFailure
           containers:
-            - name: refresh-reaktor-view
+            - name: update-quiz-item-answer-correct
               image: ${BACKEND_IMAGE}
               command: ["sh", "-c", "cd /app && yarn update-quiz-item-answer-correct"]
               resources:
