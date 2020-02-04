@@ -28,7 +28,7 @@ const update = async () => {
     console.log(`updating data received since ${date}`)
 
     console.log("updating open answers")
-    await knex.raw(`
+    const open: any = await knex.raw(`
             update quiz_item_answer
             set correct = v.is_correct from (
                 select
@@ -43,9 +43,10 @@ const update = async () => {
             ) as v
             where quiz_item_answer.id = v.id
         `)
+    console.log(`${open.rowCount} updated`)
 
     console.log("updating multiple choice answers")
-    await knex.raw(`
+    const multipleChoice: any = await knex.raw(`
             update quiz_item_answer
             set correct = v.correct
             from (
@@ -64,9 +65,10 @@ const update = async () => {
             ) as v
             where quiz_item_answer.id = v.id
         `)
+    console.log(`${multipleChoice.rowCount} updated`)
 
     console.log("updating multiple choice all that apply answers")
-    await knex.raw(`
+    const multipleChoiceMulti: any = await knex.raw(`
             update quiz_item_answer
             set correct = case when v.correct = v.total and v.false = 0 then true else false end
             from (
@@ -113,9 +115,10 @@ const update = async () => {
                 and qi.multi = true
             ) as v where quiz_item_answer.id = v.id
         `)
+    console.log(`${multipleChoiceMulti.rowCount} updated`)
 
     console.log("updating essay answers")
-    await knex.raw(`
+    const essay: any = await knex.raw(`
             update quiz_item_answer
             set correct =
                 case
@@ -138,6 +141,8 @@ const update = async () => {
             ) as v
             where quiz_item_answer.id = v.id;
         `)
+    console.log(`${essay.rowCount} updated`)
+
     console.timeEnd("done in")
   } catch (error) {
     console.log(error)
