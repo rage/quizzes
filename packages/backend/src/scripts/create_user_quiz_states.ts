@@ -9,6 +9,8 @@ const courses = {
   "elements-of-ai": "21356a26-7508-4705-9bab-39b239862632",
   "elements-of-ai-fi": "5d1e8da2-3154-4966-aa94-2ca0406cf38a",
   "elements-of-ai-se": "5f496ecc-327a-4899-baff-2daa2b40b05f",
+  "elements-of-ai-ee": "5bfa04ac-30b9-49d9-a171-2c140f11f9a7",
+  "elements-of-ai-de": "5bbd7d17-3099-48cb-a8c2-2bf70d0ea375",
 }
 
 const database = Container.get(Database)
@@ -24,24 +26,6 @@ database.connect().then(async () => {
   createUserQuizStates()
 })
 
-/*const insert = process.argv.includes("cron")
-  ? async (batch: UserQuizState[]) => {
-      await Promise.all(
-        batch.map(async uqs => {
-          await uqs.save()
-        }),
-      )
-    }
-  : async (batch: UserQuizState[]) => {
-      await manager
-        .createQueryBuilder()
-        .insert()
-        .into(UserQuizState)
-        .values(batch)
-        .onConflict(`(user_id, quiz_id) DO NOTHING`)
-        .execute()
-    }*/
-
 const createUserQuizStates = async () => {
   const now: any = new Date()
 
@@ -50,14 +34,15 @@ const createUserQuizStates = async () => {
     `creating user quiz states for answers given or updated since ${date}`,
   )
 
-  console.log("creating ohjelmoinnin mooc user quiz states")
+  /*console.log("creating ohjelmoinnin mooc user quiz states")
   const ohjelmoinninMooc: UserQuizState[] = await createOhjelmoinninMoocQuizStates()
-  console.log(`${ohjelmoinninMooc.length} created`)
+  console.log(`${ohjelmoinninMooc.length} created`)*/
   console.log("creating elements of ai user quiz states")
   const elementsOfAI: UserQuizState[] = await createElementsOfAIUserQuizStates()
   console.log(`${elementsOfAI.length} created`)
 
-  const userQuizStates: UserQuizState[] = [...ohjelmoinninMooc, ...elementsOfAI]
+  // const userQuizStates: UserQuizState[] = [...ohjelmoinninMooc, ...elementsOfAI]
+  const userQuizStates: UserQuizState[] = elementsOfAI
 
   console.log(`inserting ${userQuizStates.length} user quiz states`)
 
@@ -156,8 +141,12 @@ const createElementsOfAIUserQuizStates = async () => {
   from quiz
   where course_id = '${courses["elements-of-ai"]}'
   or course_id = '${courses["elements-of-ai-fi"]}'
-  or course_id = '${courses["elements-of-ai-se"]}')
+  or course_id = '${courses["elements-of-ai-se"]}'
+  or course_id = '${courses["elements-of-ai-ee"]}'
+  or course_id = '${courses["elements-of-ai-de"]}')
   `
+
+  console.log("querying answer data")
 
   const data = await manager.query(`
   select
@@ -190,6 +179,8 @@ const createElementsOfAIUserQuizStates = async () => {
   and (qa.created_at >= '${date}' or qa.updated_at >= '${date}' or qa.id in ${peerReview} or qa.id in ${spamFlag})
   `)
 
+  console.log("querying open answer data")
+
   const answerData = await manager.query(`
   select
     qa.id,
@@ -202,6 +193,7 @@ const createElementsOfAIUserQuizStates = async () => {
   and qi.type = 'open'
   and (qa.created_at >= '${date}' or qa.updated_at >= '${date}');
   `)
+
   const validation: any = {}
   answerData.map((answer: any) => {
     if (!validation[answer.id]) {
@@ -215,6 +207,8 @@ const createElementsOfAIUserQuizStates = async () => {
       : correct
     validation[answer.id].total += 1
   })
+
+  console.log("creating user quiz states")
 
   const userQuizStates: UserQuizState[] = data.map((answer: any) => {
     const userQuizState = new UserQuizState()
@@ -375,431 +369,3 @@ const tries = `
   from quiz_answer
   group by user_id, quiz_id)
   `
-
-/*const createElementsEssayQuizStates = async (): Promise<UserQuizState[]> => {
-const peerReview = `
-  (select quiz_answer_id from peer_review where created_at >= '${date}')
-  `
-
-const spamFlag = `
-  (select quiz_answer_id from spam_flag where created_at >= '${date}')
-  `
-
-const latest = `
-(select
-  id
-from (select
-        id,
-        row_number() over(partition by user_id, quiz_id order by created_at desc) rn
-      from quiz_answer
-      where quiz_id in ${elementsEssay}
-      and status != 'deprecated'
-      and (created_at >= '${date}' or updated_at >= '${date}' or id in ${peerReview} or id in ${spamFlag})
-      and user_id is not null
-      and quiz_id is not null) s
-where rn = 1)
-`
-
-const data = await manager.query(`
-select
-  qa.id,
-  status,
-  qa.user_id,
-  qa.quiz_id,
-  coalesce(s.sadface, 0) as sadface,
-  coalesce(s.total, 0) as total,
-  coalesce(g.given, 0) as given,
-  coalesce(r.received, 0) as received,
-  coalesce(spam.flagged, 0) as flagged,
-  t.tries as tries
-from quiz_answer as qa
-join ${latest} l on qa.id = l.id
-left outer join ${peerreview} as s on qa.id = s.quiz_answer_id
-left outer join ${given} as g on qa.quiz_id = g.quiz_id and qa.user_id = g.user_id
-left outer join ${flagged} as spam on qa.id = spam.quiz_answer_id
-left outer join ${received} as r on qa.id = r.quiz_answer_id
-left outer join ${tries} as t on qa.user_id = t.user_id and qa.quiz_id = t.quiz_id
-`)
-
-const userQuizStates: UserQuizState[] = data.map(
-  (answer: any, index: number) => {
-    const userQuizState: UserQuizState = new UserQuizState()
-    userQuizState.userId = answer.user_id
-    userQuizState.quizId = answer.quiz_id
-    userQuizState.pointsAwarded = answer.status === "confirmed" ? 1 : null
-    userQuizState.peerReviewsGiven = answer.given
-    userQuizState.peerReviewsReceived = answer.received
-    userQuizState.spamFlags = answer.flagged
-    userQuizState.tries = answer.tries
-    userQuizState.status =
-      answer.status === "confirmed" || answer.status === "submitted"
-        ? "locked"
-        : "open"
-    return userQuizState
-  },
-)
-
-console.log(`${userQuizStates.length} created`)
-
-const set = new Set()
-
-userQuizStates
-  .filter(uqs => uqs.userId !== null && uqs.quizId !== null)
-  .forEach(o => {
-    set.add(o.userId + o.quizId)
-  })
-
-console.log(set.size)
-
-return userQuizStates
-}
-
-const createOhjelmoinninMoocEssayQuizStates = async (): Promise<
-UserQuizState[]
-> => {
-const data = await manager.query(`
-select
-  qa.id,
-  status,
-  qa.user_id,
-  qa.quiz_id,
-  t.tries as tries
-from quiz_answer as qa
-left join ${tries} as t on qa.user_id = t.user_id and qa.quiz_id = t.quiz_id
-where status != 'deprecated'
-and qa.quiz_id in ${ohjelmoinninMoocEssay}
-and (qa.created_at >= '${date}' or qa.updated_at >= '${date}');
-`)
-
-const userQuizStates: UserQuizState[] = data.map(
-  (answer: any, index: number) => {
-    const userQuizState: UserQuizState = new UserQuizState()
-    userQuizState.userId = answer.user_id
-    userQuizState.quizId = answer.quiz_id
-    userQuizState.pointsAwarded = 1
-    userQuizState.tries = answer.tries
-    userQuizState.status = "locked"
-    return userQuizState
-  },
-)
-
-console.log(`${userQuizStates.length} created`)
-
-const set = new Set()
-
-userQuizStates
-  .filter(uqs => uqs.userId !== null && uqs.quizId !== null)
-  .forEach(o => {
-    set.add(o.userId + o.quizId)
-  })
-
-console.log(set.size)
-
-return userQuizStates
-}
-
-const createOpenQuizStates = async () => {
-const answerData = await manager.query(`
-select
-  qa.id,
-  text_data,
-  validity_regex
-from quiz_answer qa
-left join quiz_item_answer qia on qa.id = qia.quiz_answer_id
-left join quiz_item qi on qia.quiz_item_id = qi.id
-where qa.quiz_id in ${open}
-and (qa.created_at >= '${date}' or qa.updated_at >= '${date}');
-`)
-const validation: any = {}
-answerData.map((answer: any) => {
-  if (!validation[answer.id]) {
-    validation[answer.id] = { correct: 0, total: 0 }
-  }
-  const correct = validation[answer.id].correct
-  validation[answer.id].correct = new RegExp(answer.validity_regex).test(
-    answer.text_data.trim().toLowerCase(),
-  )
-    ? correct + 1
-    : correct
-  validation[answer.id].total += 1
-})
-const data = await manager.query(`
-select
-  qa.id,
-  status,
-  qa.user_id,
-  qa.quiz_id,
-  t.tries as tries
-from quiz_answer as qa
-left outer join ${tries} as t on qa.user_id = t.user_id and qa.quiz_id = t.quiz_id
-where status != 'deprecated'
-and qa.quiz_id in ${open}
-and (qa.created_at >= '${date}' or qa.updated_at >= '${date}');
-`)
-const userQuizStates: UserQuizState[] = data.map(
-  (answer: any, index: number) => {
-    const userQuizState: UserQuizState = new UserQuizState()
-    userQuizState.userId = answer.user_id
-    userQuizState.quizId = answer.quiz_id
-    userQuizState.pointsAwarded =
-      validation[answer.id].correct / validation[answer.id].total
-    userQuizState.tries = answer.tries
-    userQuizState.status = "locked"
-    return userQuizState
-  },
-)
-
-console.log(`${userQuizStates.length} created`)
-
-const set = new Set()
-
-userQuizStates
-  .filter(uqs => uqs.userId !== null && uqs.quizId !== null)
-  .forEach(o => {
-    set.add(o.userId + o.quizId)
-  })
-
-console.log(set.size)
-
-return userQuizStates
-}
-
-const createMultipleChoiceQuizStates = async (): Promise<UserQuizState[]> => {
-const data = await manager.query(`
-select
-  qa.id,
-  qa.quiz_id,
-  qa.user_id,
-  c.correct,
-  t.total,
-  tr.tries
-from quiz_answer qa
-left join ${correctMultipleChoice} c on qa.id = c.id
-left join ${total} t on qa.quiz_id = t.id
-left join ${tries} tr on qa.user_id = tr.user_id and qa.quiz_id = tr.quiz_id
-where qa.status != 'deprecated'
-and qa.quiz_id in ${multipleChoice}
-and (qa.created_at >= '${date}' or qa.updated_at >= '${date}');
-`)
-const userQuizStates: UserQuizState[] = data.map(
-  (answer: any, index: number) => {
-    const userQuizState: UserQuizState = new UserQuizState()
-    userQuizState.userId = answer.user_id
-    userQuizState.quizId = answer.quiz_id
-    userQuizState.pointsAwarded = answer.correct / answer.total
-    userQuizState.tries = answer.tries
-    userQuizState.status = "locked"
-    return userQuizState
-  },
-)
-
-console.log(`${userQuizStates.length} created`)
-
-const set = new Set()
-
-userQuizStates
-  .filter(uqs => uqs.userId !== null && uqs.quizId !== null)
-  .forEach(o => {
-    set.add(o.userId + o.quizId)
-  })
-
-console.log(set.size)
-
-return userQuizStates
-}
-
-const createMultipleChoiceMultiQuizStates = async (): Promise<
-UserQuizState[]
-> => {
-const data = await manager.query(`
-select
-  qa.id,
-  qa.quiz_id,
-  qa.user_id,
-  c.correct,
-  t.total,
-  tr.tries
-from quiz_answer qa
-left join ${correctMultipleChoiceMulti} c on qa.id = c.id
-left join ${total} t on qa.quiz_id = t.id
-left join ${tries} tr on qa.user_id = tr.user_id and qa.quiz_id = tr.quiz_id
-where qa.status != 'deprecated'
-and qa.quiz_id in ${multipleChoiceMulti}
-and (qa.created_at >= '${date}' or qa.updated_at >= '${date}');
-`)
-const userQuizStates: UserQuizState[] = data.map(
-  (answer: any, index: number) => {
-    const userQuizState: UserQuizState = new UserQuizState()
-    userQuizState.userId = answer.user_id
-    userQuizState.quizId = answer.quiz_id
-    userQuizState.pointsAwarded = answer.correct / answer.total
-    userQuizState.tries = answer.tries
-    userQuizState.status = "locked"
-    return userQuizState
-  },
-)
-
-console.log(`${userQuizStates.length} created`)
-
-const set = new Set()
-
-userQuizStates
-  .filter(uqs => uqs.userId !== null && uqs.quizId !== null)
-  .forEach(o => {
-    set.add(o.userId + o.quizId)
-  })
-
-console.log(set.size)
-
-return userQuizStates
-}
-
-const createScaleQuizStates = async (): Promise<UserQuizState[]> => {
-const data = await manager.query(`
-select
-  qa.user_id,
-  qa.quiz_id,
-  tr.tries
-from quiz_answer qa
-left join ${tries} tr on qa.user_id = tr.user_id and qa.quiz_id = tr.quiz_id
-where qa.quiz_id in ${scale}
-`)
-const userQuizStates: UserQuizState[] = data.map(
-  (answer: any, index: number) => {
-    const userQuizState: UserQuizState = new UserQuizState()
-    userQuizState.userId = answer.user_id
-    userQuizState.quizId = answer.quiz_id
-    userQuizState.pointsAwarded = 1
-    userQuizState.tries = answer.tries
-    userQuizState.status = "locked"
-    return userQuizState
-  },
-)
-
-console.log(`${userQuizStates.length} created`)
-
-const set = new Set()
-
-userQuizStates
-  .filter(uqs => uqs.userId !== null && uqs.quizId !== null)
-  .forEach(o => {
-    set.add(o.userId + o.quizId)
-  })
-
-console.log(set.size)
-
-return userQuizStates
-}
-
-const createCheckboxQuizStates = async (): Promise<UserQuizState[]> => {
-const data = await manager.query(`
-select
-  qa.user_id,
-  qa.quiz_id,
-  tr.tries
-from quiz_answer qa
-left join ${tries} tr on qa.user_id = tr.user_id and qa.quiz_id = tr.quiz_id
-where qa.quiz_id in ${checkbox}
-`)
-const userQuizStates: UserQuizState[] = data.map(
-  (answer: any, index: number) => {
-    const userQuizState: UserQuizState = new UserQuizState()
-    userQuizState.userId = answer.user_id
-    userQuizState.quizId = answer.quiz_id
-    userQuizState.pointsAwarded = 1
-    userQuizState.tries = answer.tries
-    userQuizState.status = "locked"
-    return userQuizState
-  },
-)
-
-console.log(`${userQuizStates.length} created`)
-
-const set = new Set()
-
-userQuizStates
-  .filter(uqs => uqs.userId !== null && uqs.quizId !== null)
-  .forEach(o => {
-    set.add(o.userId + o.quizId)
-  })
-
-console.log(set.size)
-
-return userQuizStates
-}*/
-
-/*const elementsEssay = `
-  (select
-    distinct(q.id)
-  from quiz as q
-  join quiz_item as qi on q.id = qi.quiz_id
-  where type = 'essay'
-  and (course_id = '${courses["elements-of-ai"]}'
-  or course_id = '${courses["elements-of-ai-fi"]}'
-  or course_id = '${courses["elements-of-ai-se"]}'))
-  `
-
-const ohjelmoinninMoocEssay = `
-  (select
-    distinct(q.id)
-  from quiz as q
-  join quiz_item as qi on q.id = qi.quiz_id
-  where type = 'essay'
-  and course_id = '${courses["ohjelmoinnin-mooc-2019"]}')
-  `
-
-const open = `
-  (select
-    distinct(q.id)
-  from quiz as q
-  join quiz_item as qi on q.id = qi.quiz_id
-  where type = 'open'
-  and (course_id = '${courses["elements-of-ai"]}'
-  or course_id = '${courses["elements-of-ai-fi"]}'
-  or course_id = '${courses["elements-of-ai-se"]}'
-  or course_id = '${courses["ohjelmoinnin-mooc-2019"]}'))
-  `
-
-const multipleChoice = `
-  (select
-    distinct(q.id)
-  from quiz as q
-  join quiz_item as qi on q.id = qi.quiz_id
-  where type = 'multiple-choice'
-  and multi != true
-  and (course_id = '${courses["elements-of-ai"]}'
-  or course_id = '${courses["elements-of-ai-fi"]}'
-  or course_id = '${courses["elements-of-ai-se"]}'
-  or course_id = '${courses["ohjelmoinnin-mooc-2019"]}'))
-`
-
-const multipleChoiceMulti = `
-  (select
-    distinct(q.id)
-  from quiz as q
-  join quiz_item as qi on q.id = qi.quiz_id
-  where type = 'multiple-choice'
-  and multi = true
-  and (course_id = '${courses["elements-of-ai"]}'
-  or course_id = '${courses["elements-of-ai-fi"]}'
-  or course_id = '${courses["elements-of-ai-se"]}'
-  or course_id = '${courses["ohjelmoinnin-mooc-2019"]}'))
-`
-
-const scale = `
-  (select
-    distinct(q.id)
-  from quiz q
-  join quiz_item qi on q.id = qi.quiz_id
-  where type = 'scale'
-  and course_id = '${courses["ohjelmoinnin-mooc-2019"]}')
-  `
-
-const checkbox = `
-  (select
-    distinct(q.id)
-  from quiz q
-  join quiz_item qi on q.id = qi.quiz_id
-  where type = 'checkbox'
-  and course_id = '${courses["ohjelmoinnin-mooc-2019"]}')
-  `*/
