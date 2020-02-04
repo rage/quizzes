@@ -28,7 +28,8 @@
     "create-user-quiz-states": "node --max-old-space-size=2048 dist/backend/src/scripts/create_user_quiz_states.js",
     "create-user-quiz-states-cron": "node --max-old-space-size=2048 dist/backend/src/scripts/create_user_quiz_states.js cron",
     "kafka-batch-publish": "node --max-old-space-size=2048 dist/backend/src/scripts/kafka_batch_publisher.js",
-    "refresh-reaktor-view": "node dist/backend/src/scripts/reaktor_view_refresh.js"
+    "refresh-reaktor-view": "node dist/backend/src/scripts/reaktor_view_refresh.js",
+    "update-quiz-item-answer-correct": "node dist/backend/src/scripts/update_quiz_item_answer_correct.js"
   },
   "dependencies": {
     "@types/express-graphql": "^0.6.1",

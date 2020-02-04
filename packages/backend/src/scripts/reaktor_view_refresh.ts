@@ -1,7 +1,7 @@
 import knex from "../config/knex"
 ;(async () => {
   try {
-    console.time()
+    console.time("done in")
     console.log(new Date(), "refreshing reaktor_view")
     await knex.raw(`refresh materialized view reaktor_view`)
     console.timeEnd("done in")
