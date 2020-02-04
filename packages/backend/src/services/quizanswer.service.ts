@@ -286,11 +286,6 @@ export default class QuizAnswerService {
       return {}
     }
 
-    const quizItemTypes = (await QuizItem.createQueryBuilder("quiz_item")
-      .select("quiz_item.type")
-      .where("quiz_id = :id", { id: quizId })
-      .getRawMany()).map(value => value.quiz_item_type)
-
     const builder = Knex({ client: "pg" })
 
     let query = builder("quiz_answer")
@@ -311,12 +306,12 @@ export default class QuizAnswerService {
         "quiz_option_answer.quiz_item_answer_id",
         "quiz_item_answer.id",
       )
-      .innerJoin(
+      .leftJoin(
         "quiz_option",
         "quiz_option.id",
         "quiz_option_answer.quiz_option_id",
       )
-      .innerJoin(
+      .leftJoin(
         "quiz_option_translation",
         "quiz_option_translation.quiz_option_id",
         "quiz_option.id",
