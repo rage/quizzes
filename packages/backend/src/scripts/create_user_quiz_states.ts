@@ -213,21 +213,25 @@ const createElementsOfAIUserQuizStates = async () => {
   const userQuizStates: UserQuizState[] = data.map((answer: any) => {
     const userQuizState = new UserQuizState()
 
-    const status = answer.status
+    const answerStatus = answer.status
+    const status =
+      answerStatus === "confirmed" || answerStatus === "submitted"
+        ? "locked"
+        : "open"
 
     userQuizState.userId = answer.user_id
     userQuizState.quizId = answer.quiz_id
     userQuizState.tries = answer.tries
     userQuizState.updatedAt = new Date()
-    userQuizState.status =
-      status === "confirmed" || status === "submitted" ? "locked" : "open"
+    userQuizState.status = status
 
     switch (answer.type) {
       case "essay":
         userQuizState.peerReviewsGiven = answer.given
-        userQuizState.peerReviewsReceived = answer.received
-        userQuizState.spamFlags = answer.flagged
-        userQuizState.pointsAwarded = status === "confirmed" ? 1 : null
+        userQuizState.peerReviewsReceived =
+          status === "locked" ? answer.received : null
+        userQuizState.spamFlags = status === "locked" ? answer.flagged : null
+        userQuizState.pointsAwarded = answerStatus === "confirmed" ? 1 : null
         break
       case "open":
         userQuizState.pointsAwarded =
