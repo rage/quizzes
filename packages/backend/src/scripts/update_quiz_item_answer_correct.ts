@@ -1,4 +1,4 @@
-import knex from "../config/knex"
+import { quizzes as knex } from "../config/knex"
 
 const update = async () => {
   try {

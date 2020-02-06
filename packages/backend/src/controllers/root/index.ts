@@ -1,5 +1,5 @@
 import { Get, HttpCode, JsonController, Res } from "routing-controllers"
-import knex from "../../config/knex"
+import { quizzes as knex } from "../../config/knex"
 
 @JsonController("/")
 export class RootController {
