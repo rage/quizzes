@@ -223,8 +223,8 @@ const createElementsOfAIUserQuizStates = async () => {
     userQuizState.userId = answer.user_id
     userQuizState.quizId = answer.quiz_id
     userQuizState.tries = answer.tries
-    userQuizState.updatedAt = answer.updated
-    userQuizState.createdAt = answer.created
+    userQuizState.updatedAt = new Date(answer.updated)
+    userQuizState.createdAt = new Date(answer.created)
     userQuizState.status = status
     userQuizState.pointsAwarded = answer.points
 
