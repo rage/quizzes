@@ -21,8 +21,8 @@ let date: Date
 database.connect().then(async () => {
   manager = getManager()
   date = (await manager.query(
-    "select date from uqs_aggregation order by date desc limit 1",
-  ))[0].date.toISOString()
+    "select date from migration order by date desc limit 2",
+  ))[1].date.toISOString()
   createUserQuizStates()
 })
 
@@ -61,11 +61,11 @@ const createUserQuizStates = async () => {
     )
   }
 
-  await manager.query(
+  /*await manager.query(
     `insert into uqs_aggregation (date) values ('${new Date(
       now - 10 * 60000,
     ).toISOString()}')`,
-  )
+  )*/
 }
 
 const createOhjelmoinninMoocQuizStates = async (): Promise<UserQuizState[]> => {
@@ -151,35 +151,36 @@ const createElementsOfAIUserQuizStates = async () => {
   const data = await manager.query(`
   select
     qa.id,
-    status,
+    qa.status,
     qa.user_id,
     qa.quiz_id,
     t.type,
     t.multi,
     coalesce(g.given, 0) as given,
     coalesce(r.received, 0) as received,
+    points.points points,
     coalesce(spam.flagged, 0) as flagged,
-    coalesce(c.correct, 0) as correct,
-    coalesce(cm.correct, 0) as correct_multi,
-    coalesce(total.total, 0) as total,
-    tries.tries as tries
+    tries.tries as tries,
+    time.updated updated,
+    time.created created
   from quiz_answer as qa
-  join ${latest} l on qa.id = l.id
   join ${type} t on qa.quiz_id = t.quiz_id
   left join ${given} as g on qa.quiz_id = g.quiz_id and qa.user_id = g.user_id
-  left join ${flagged} as spam on qa.id = spam.quiz_answer_id
   left join ${received} as r on qa.id = r.quiz_answer_id
+  left join ${points} as points on qa.id = points.id
+  left join ${flagged} as spam on qa.id = spam.quiz_answer_id
   left join ${tries} as tries on qa.user_id = tries.user_id and qa.quiz_id = tries.quiz_id
-  left join ${correctMultipleChoice} c on qa.id = c.id
-  left join ${correctMultipleChoiceMulti} cm on qa.id = cm.id
-  left join ${total} total on qa.quiz_id = total.id
+  left join ${timestamps} time on qa.user_id = time.user_id and qa.quiz_id = time.quiz_id
   where qa.quiz_id in ${elementsQuizzes}
   and qa.user_id is not null
   and qa.quiz_id is not null
+  and qa.status != 'deprecated'
   and (qa.created_at >= '${date}' or qa.updated_at >= '${date}' or qa.id in ${peerReview} or qa.id in ${spamFlag})
   `)
 
-  console.log("querying open answer data")
+  console.log(`found ${data.length} answers`)
+
+  /*console.log("querying open answer data")
 
   const answerData = await manager.query(`
   select
@@ -206,7 +207,7 @@ const createElementsOfAIUserQuizStates = async () => {
       ? correct + 1
       : correct
     validation[answer.id].total += 1
-  })
+  })*/
 
   console.log("creating user quiz states")
 
@@ -222,8 +223,10 @@ const createElementsOfAIUserQuizStates = async () => {
     userQuizState.userId = answer.user_id
     userQuizState.quizId = answer.quiz_id
     userQuizState.tries = answer.tries
-    userQuizState.updatedAt = new Date()
+    userQuizState.updatedAt = answer.updated
+    userQuizState.createdAt = answer.created
     userQuizState.status = status
+    userQuizState.pointsAwarded = answer.points
 
     switch (answer.type) {
       case "essay":
@@ -233,7 +236,7 @@ const createElementsOfAIUserQuizStates = async () => {
         userQuizState.spamFlags = status === "locked" ? answer.flagged : null
         userQuizState.pointsAwarded = answerStatus === "confirmed" ? 1 : null
         break
-      case "open":
+      /*case "open":
         userQuizState.pointsAwarded =
           validation[answer.id].correct / validation[answer.id].total
         break
@@ -243,7 +246,7 @@ const createElementsOfAIUserQuizStates = async () => {
         } else {
           userQuizState.pointsAwarded = answer.correct / answer.total
         }
-        break
+        break*/
     }
 
     return userQuizState
@@ -251,6 +254,31 @@ const createElementsOfAIUserQuizStates = async () => {
 
   return userQuizStates
 }
+
+const timestamps = `
+  (select
+    user_id,
+    quiz_id,
+    min(created_at) created,
+    max(updated_at) updated
+  from quiz_answer
+  group by user_id, quiz_id)
+`
+
+const points = `
+  (select
+    qa.id,
+    p.points::double precision / p.total points
+  from quiz_answer qa
+  join (
+    select
+      quiz_answer_id,
+      count(case when correct = true then id end) points,
+      count(id) total
+    from quiz_item_answer
+    group by quiz_answer_id
+  ) p on qa.id = p.quiz_answer_id)
+`
 
 const correctMultipleChoice = `
   (select
