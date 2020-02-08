@@ -62,7 +62,7 @@ const ItemContent = styled(Grid)<ItemContentProps>`
 `
 
 export interface LeftBorderedDivProps {
-  correct: boolean
+  correct: boolean | undefined
   onlyOneItem?: boolean
 }
 

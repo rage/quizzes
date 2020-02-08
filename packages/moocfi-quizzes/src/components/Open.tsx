@@ -16,7 +16,7 @@ type OpenProps = {
 }
 
 interface SolutionPaperProps {
-  correct: boolean
+  correct: boolean | undefined
 }
 
 const SolutionPaper = styled(SpaciousPaper)<SolutionPaperProps>`
