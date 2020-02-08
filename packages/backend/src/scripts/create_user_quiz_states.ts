@@ -48,7 +48,7 @@ const createUserQuizStates = async () => {
 
   let start = -1000
   let end = -1
-  while (end !== userQuizStates.length - 1) {
+  while (end !== userQuizStates.length) {
     start += 1000
     end += 1000
     if (end > userQuizStates.length) {
