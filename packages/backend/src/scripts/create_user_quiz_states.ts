@@ -51,9 +51,6 @@ const createUserQuizStates = async () => {
   while (end !== userQuizStates.length - 1) {
     start += 1000
     end += 1000
-    if (end > userQuizStates.length - 1) {
-      end = userQuizStates.length - 1
-    }
     await insert(
       UserQuizState,
       userQuizStates.slice(start, end),
