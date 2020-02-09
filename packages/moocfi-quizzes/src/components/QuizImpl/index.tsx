@@ -296,6 +296,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
         qi.type !== "research-agreement",
     )
 
+  console.log("####################")
+  console.log(themeProvider)
   const ThemedLowerContent = themeProvider.lowerContent || LowerContent
 
   return (
