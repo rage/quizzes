@@ -32,6 +32,6 @@ export interface ThemeProviderInterface {
   stepperStyles?: string
 }
 
-const ThemeProviderContext = createContext<ThemeProviderInterface>({})
+const ThemeProviderContext: any = createContext<ThemeProviderInterface>({})
 
 export default ThemeProviderContext

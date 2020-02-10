@@ -83,6 +83,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
       <>
         <BoldTypography>{languageInfo.chosenEssayInstruction}</BoldTypography>
         <PeerReviewOption answer={chosenAnswer} />
+        <SelectButton onClick={() => {}}>Peru valinta</SelectButton>
         <PeerReviewQuestions
           peerReview={peerReview}
           languageInfo={languageInfo}
