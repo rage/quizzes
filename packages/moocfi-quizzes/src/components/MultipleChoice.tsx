@@ -22,8 +22,22 @@ import {
 import ThemeProviderContext from "../contexes/themeProviderContext"
 import ChoiceButton from "./ChoiceButton"
 
-const ChoicesContainer = styled(Grid)`
+const QuestionContainer = styled.div`
+  flex: 1
+  font-size: 1.25rem;
+  margin-right: 0.25rem; 
+`
+
+interface ChoicesContainerProps {
+  direction: string
+  onlyOneItem: boolean
+}
+
+const ChoicesContainer = styled.div<ChoicesContainerProps>`
+  display: flex;
+  flex-direction: ${({ direction }) => direction};
   padding-top: 7;
+  ${({ onlyOneItem }) => onlyOneItem && "width: 100%"}
 `
 
 const CentralizedOnSmallScreenTypography = styled(Typography)`
@@ -53,11 +67,17 @@ const AttentionIcon = styled(FontAwesomeIcon)`
 `
 
 interface ItemContentProps {
+  direction: string
   providedStyles: string | undefined
 }
 
-const ItemContent = styled(Grid)<ItemContentProps>`
+const ItemContent = styled.div<ItemContentProps>`
   margin-bottom: 10px;
+  > div:first-of-type {
+    display: flex;
+    justify-content: space-between;
+    flex-direction: ${({ direction }) => direction};
+  }
   ${({ providedStyles }) => providedStyles}
 `
 
@@ -67,6 +87,7 @@ export interface LeftBorderedDivProps {
 }
 
 const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
+  display: flex;
   border-left: 6px solid ${({ correct }) => (correct ? "#047500" : "#DB0000")};
   box-sizing: border-box;
   padding: 3px;
@@ -124,36 +145,37 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   }
 
   return (
-    <ItemContent
-      container
-      direction={direction}
-      alignItems={alignItems}
-      providedStyles={themeProvider.multipleChoiceItemContentStyles}
-    >
-      <ItemInformation
-        item={item}
-        itemAnswer={itemAnswer}
-        onlyOneItem={onlyOneItem}
-        questionWidth={questionWidth}
-      />
+    <>
+      <ItemContent
+        direction={direction}
+        providedStyles={themeProvider.multipleChoiceItemContentStyles}
+      >
+        <div>
+          <ItemInformation
+            item={item}
+            itemAnswer={itemAnswer}
+            onlyOneItem={onlyOneItem}
+            questionWidth={questionWidth}
+          />
 
-      <ChoicesContainer item container spacing={1} xs={optionContainerWidth}>
-        {options
-          .sort((o1, o2) => o1.order - o2.order)
-          .map((option, index) => {
-            return (
-              <Option
-                key={option.id}
-                option={option}
-                optionWidth={optionWidth}
-                shouldBeGray={index % 2 === 0}
-              />
-            )
-          })}
-      </ChoicesContainer>
-
-      {!onlyOneItem && <FeedbackPortion item={item} />}
-    </ItemContent>
+          <ChoicesContainer direction={direction} onlyOneItem={onlyOneItem}>
+            {options
+              .sort((o1, o2) => o1.order - o2.order)
+              .map((option, index) => {
+                return (
+                  <Option
+                    key={option.id}
+                    option={option}
+                    optionWidth={optionWidth}
+                    shouldBeGray={index % 2 === 0}
+                  />
+                )
+              })}
+          </ChoicesContainer>
+        </div>
+        {!onlyOneItem && <FeedbackPortion item={item} />}
+      </ItemContent>
+    </>
   )
 }
 
@@ -193,7 +215,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
   const { title, body, successMessage, failureMessage } = item.texts[0]
 
   return (
-    <ItemInformationGridItem item xs={questionWidth}>
+    <QuestionContainer>
       {title && (
         <LeftAlignedMarkdownText
           Component={SpaciousTypography}
@@ -211,7 +233,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
           {selectOptionsLabel}
         </SelectOptionsLabelTypography>
       )}
-    </ItemInformationGridItem>
+    </QuestionContainer>
   )
 }
 
@@ -272,9 +294,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
   if (!displayFeedback) {
     return (
-      <OptionGridItem
-        item
-        xs={optionWidth}
+      <OptionContainer
         onlyOneItem={onlyOneItem}
         shouldBeGray={shouldBeGray}
         providedStyles={themeProvider.optionGridItemStyles}
@@ -291,7 +311,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             {text.title}
           </MarkdownText>
         </ChoiceButton>
-      </OptionGridItem>
+      </OptionContainer>
     )
   }
 
@@ -302,9 +322,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
   if (onlyOneItem) {
     return (
       <React.Fragment>
-        <OptionGridItem
-          item
-          xs={optionWidth}
+        <OptionContainer
           onlyOneItem={onlyOneItem}
           shouldBeGray={shouldBeGray}
           providedStyles={themeProvider.optionGridItemStyles}
@@ -320,18 +338,16 @@ const Option: React.FunctionComponent<OptionProps> = ({
               {text.title}
             </MarkdownText>
           </ChoiceButton>
-        </OptionGridItem>
+        </OptionContainer>
 
         {optionIsSelected && (
-          <OptionGridItem
-            item
-            xs={optionWidth}
+          <OptionContainer
             onlyOneItem={onlyOneItem}
             shouldBeGray={shouldBeGray}
             providedStyles={themeProvider.optionGridItemStyles}
           >
             <FeedbackPortion item={item} selectedOption={option} />
-          </OptionGridItem>
+          </OptionContainer>
         )}
       </React.Fragment>
     )
@@ -340,12 +356,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
   // multiple items
   return (
     <>
-      <OptionGridItem
-        item
-        xs={optionWidth}
-        onlyOneItem={onlyOneItem}
-        shouldBeGray={shouldBeGray}
-      >
+      <OptionContainer onlyOneItem={onlyOneItem} shouldBeGray={shouldBeGray}>
         <ChoiceButton
           revealed
           onlyOneItem={onlyOneItem}
@@ -357,7 +368,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             {text.title}
           </MarkdownText>
         </ChoiceButton>
-      </OptionGridItem>
+      </OptionContainer>
     </>
   )
 }
@@ -429,23 +440,17 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 
   return (
     <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem}>
-      <Grid container alignItems="center" spacing={2}>
-        <Grid item xs={12} sm="auto">
-          <CentralizedOnSmallScreenTypography variant="body1">
-            <AttentionIcon icon={faExclamationCircle} />
-          </CentralizedOnSmallScreenTypography>
-        </Grid>
-        <Grid item xs={12} sm={10}>
-          <CentralizedOnSmallScreenTypography variant="body1">
-            {feedbackMessage}
-          </CentralizedOnSmallScreenTypography>
-        </Grid>
-      </Grid>
+      <CentralizedOnSmallScreenTypography variant="body1">
+        <AttentionIcon icon={faExclamationCircle} />
+      </CentralizedOnSmallScreenTypography>
+      <CentralizedOnSmallScreenTypography variant="body1">
+        {feedbackMessage}
+      </CentralizedOnSmallScreenTypography>
     </FeedbackDiv>
   )
 }
 
-const OptionGridItem = styled(Grid)<OptionGridItemProps>`
+const OptionContainer = styled.div<OptionContainerProps>`
   ${({ onlyOneItem, shouldBeGray, providedStyles }) =>
     onlyOneItem
       ? `
@@ -454,10 +459,13 @@ const OptionGridItem = styled(Grid)<OptionGridItemProps>`
       background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
       ${providedStyles}
     `
-      : ``}
+      : `
+      "margin-right: 0.5rem;
+      ${providedStyles}
+      `}
 `
 
-type OptionGridItemProps = {
+type OptionContainerProps = {
   onlyOneItem: boolean
   shouldBeGray: boolean
   providedStyles?: string

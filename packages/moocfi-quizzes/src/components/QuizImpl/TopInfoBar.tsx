@@ -7,12 +7,31 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
 
-const StyledGrid = styled(Grid)<{ providedStyles: string | undefined }>`
-  padding: 1rem;
+const Container = styled.div<{ providedStyles: string | undefined }>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 2rem;
   color: white;
   background-color: #213094;
   ${({ providedStyles }) => providedStyles}
 `
+
+const IconContainer = styled.div`
+  margin-right: 1rem;
+  font-size: 3.5rem;
+`
+
+const TitleContainer = styled.div`
+  margin-right: auto;
+`
+
+const PointsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+
+const QuizStatusMessage = styled(Typography)``
 
 const PointsText = styled(Typography)`
   font-size: 1.5rem !important;
@@ -41,14 +60,6 @@ const PointsLabelText = styled(Typography)`
   }
 `
 
-const IconWrapper = styled.div`
-  font-size: 3.5rem;
-  margin: 0 1.5rem 0 0.5rem;
-  @media (max-width: 550px) {
-    text-align: center;
-  }
-`
-
 const RightMarginedGrid = styled(Grid)`
   margin-right: 1.5rem;
   text-align: end;
@@ -73,6 +84,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   staticBars,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
+  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const loggedIn = !!useTypedSelector(state => state.user.accessToken)
   const quiz = useTypedSelector(state => state.quiz)
@@ -81,6 +93,13 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   const showPointsInfo = useTypedSelector(
     state => state.customization.showPointsInfo,
   )
+
+  const answerStatus = quizAnswer.status
+  const status = answerStatus
+    ? answerStatus !== "rejected" && answerStatus !== "spam"
+      ? "answered"
+      : "rejected"
+    : ""
 
   let title
   let quizLabel
@@ -160,44 +179,36 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   const ProvidedIcon = themeProvider.topInfoBarIcon
 
   return (
-    <StyledGrid
-      container={true}
-      justify="space-between"
-      alignItems="flex-start"
-      providedStyles={themeProvider.topInfoBarStyles}
-    >
-      <XXS12Grid item={true} xs={9}>
-        <Grid container={true} alignItems="stretch">
-          <XXS12Grid item={true} xs={3} md={2}>
-            {ProvidedIcon ? (
-              <ProvidedIcon />
-            ) : (
-              <IconWrapper>
-                <FontAwesomeIcon icon={faQuestionCircle} />
-              </IconWrapper>
-            )}
-          </XXS12Grid>
-
-          <XXS12Grid item={true} xs={9} md={10}>
-            <Typography variant="subtitle1">{quizLabel}:</Typography>
-            {quiz ? (
-              <Typography variant="h5">{title}</Typography>
-            ) : (
-              titleReplacement
-            )}
-          </XXS12Grid>
-        </Grid>
-      </XXS12Grid>
-
+    <Container providedStyles={themeProvider.topInfoBarStyles}>
+      <IconContainer>
+        {ProvidedIcon ? (
+          <>
+            <ProvidedIcon status={status} />
+            <QuizStatusMessage className={status} variant="subtitle1">
+              {status ? status : "Unanswered"}:
+            </QuizStatusMessage>
+          </>
+        ) : (
+          <FontAwesomeIcon icon={faQuestionCircle} />
+        )}
+      </IconContainer>
+      <TitleContainer>
+        <Typography variant="subtitle1">{quizLabel}:</Typography>
+        {quiz ? (
+          <Typography variant="h5">{title}</Typography>
+        ) : (
+          titleReplacement
+        )}
+      </TitleContainer>
       {(!quiz || showPointsInfo) && (
-        <RightMarginedGrid item={true} xs={2}>
+        <PointsContainer>
           <PointsLabelText component="div" paragraph={false}>
             {pointsLabel}:
           </PointsLabelText>
           {pointsPortion}
-        </RightMarginedGrid>
+        </PointsContainer>
       )}
-    </StyledGrid>
+    </Container>
   )
 }
 
