@@ -76,6 +76,7 @@ interface IQuizContentWrapperProps {
 }
 
 const QuizContentWrapper = styled.div<IQuizContentWrapperProps>`
+  margin-top: 1rem;
   padding: 1rem;
   ${({ disabled }) =>
     disabled &&
@@ -97,7 +98,10 @@ export interface LowerContentProps {
   nItems: number
 }
 
-const LowerContent = styled.div<LowerContentProps>``
+const LowerContent = styled.div<LowerContentProps>`
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+`
 
 const OuterDiv = styled.div<{ providedStyles: string | undefined }>`
   p {
@@ -114,7 +118,7 @@ interface QuizBodyProps {
 }
 
 const QuizBody = styled(MarkdownText)<QuizBodyProps>`
-  padding-bottom: 1.5rem;
+  padding: 0 1rem 1rem;
   ${({ providedStyles }) => providedStyles}
 `
 interface SubmitMessageDivProps {

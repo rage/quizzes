@@ -91,8 +91,15 @@ const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
   border-left: 6px solid ${({ correct }) => (correct ? "#047500" : "#DB0000")};
   box-sizing: border-box;
   padding: 3px;
-  padding-left: 10px;
+  padding: 0.5rem 0 0.5rem 0.5rem;
   margin-bottom: 5px !important;
+  p:nth-of-type(1) {
+    display: none;
+  }
+  p:nth-of-type(2) {
+    margin-top: -0.25rem;
+    padding: 0 0 0 0.5rem;
+  }
   ${({ onlyOneItem }) => onlyOneItem && "width: 70%;"}
 `
 
@@ -460,8 +467,7 @@ const OptionContainer = styled.div<OptionContainerProps>`
       ${providedStyles}
     `
       : `
-      "margin-right: 0.5rem;
-      ${providedStyles}
+      margin-left: 1rem;
       `}
 `
 
