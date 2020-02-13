@@ -6,7 +6,8 @@
   "scripts": {
     "build": "rm -rf ./dist && tsc",
     "prepare": "yarn build",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "watch-deploy": "watch 'yalc publish --changed && cd ../../../elements-of-ai-material && yalc update' src"
   },
   "keywords": [],
   "author": "",
@@ -39,7 +40,8 @@
     "redux-thunk": "^2.3.0",
     "styled-components": "^4.3.2",
     "typesafe-actions": "^4.4.2",
-    "typescript": "^3.5.2"
+    "typescript": "^3.5.2",
+    "watch": "^1.0.2"
   },
   "peerDependencies": {
     "@fortawesome/fontawesome-free": "^5.9.0",

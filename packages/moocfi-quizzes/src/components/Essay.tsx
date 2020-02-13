@@ -41,6 +41,7 @@ const AnswerField = styled(StyledTextField)<AnswerFieldProps>`
 
 const SubmitHelperTypography = styled(Typography)<ISubmitHelperTypographyProps>`
   && {
+    height: 1rem;
     padding-top: 1rem;
     color: ${({ attemptWasRecentlyMade }) =>
       attemptWasRecentlyMade ? "#AD0000" : "#595959"};
@@ -130,13 +131,11 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
           {essayLabels.currentNumberOfWordsLabel}: {numOfWords}
         </Typography>
 
-        {!answerWithinLimits && (
-          <SubmitHelperTypography
-            attemptWasRecentlyMade={recentlyAttemptedDisabledSubmit}
-          >
-            {essayLabels.conformToLimitsToSubmitLabel}
-          </SubmitHelperTypography>
-        )}
+        <SubmitHelperTypography
+          attemptWasRecentlyMade={recentlyAttemptedDisabledSubmit}
+        >
+          {answerWithinLimits ? "" : essayLabels.conformToLimitsToSubmitLabel}
+        </SubmitHelperTypography>
       </div>
     </>
   )

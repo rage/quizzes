@@ -76,7 +76,7 @@ const englishLabels: SingleLanguageLabels = {
   },
   multipleChoice: {
     selectCorrectAnswerLabel: "Select correct answer",
-    chooseAllSuitableOptionsLabel: "Choose all suitable options",
+    chooseAllSuitableOptionsLabel: "Select all that apply",
     answerCorrectLabel: "Correct",
     answerIncorrectLabel: "Incorrect",
   },

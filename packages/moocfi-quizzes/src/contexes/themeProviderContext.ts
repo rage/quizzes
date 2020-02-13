@@ -18,7 +18,7 @@ export interface ThemeProviderInterface {
   topInfoBarIcon?: React.FunctionComponent<any>
   mainDivStyles?: string
   itemWrapper?: React.FunctionComponent<IItemWrapperProps>
-  optionGridItemStyles?: string
+  optionWrapperStyles?: string
   multipleChoiceItemContentStyles?: string
   narrowOpenItemContentStyles?: string
   wideOpenItemContentStyles?: string
@@ -30,6 +30,7 @@ export interface ThemeProviderInterface {
   answerFieldStyles?: string
   quizBodyStyles?: string
   stepperStyles?: string
+  submitGroupStyles?: string
 }
 
 const ThemeProviderContext = createContext<ThemeProviderInterface>({})

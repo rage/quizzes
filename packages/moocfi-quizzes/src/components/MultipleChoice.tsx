@@ -23,9 +23,9 @@ import ThemeProviderContext from "../contexes/themeProviderContext"
 import ChoiceButton from "./ChoiceButton"
 
 const QuestionContainer = styled.div`
-  flex: 1
+  flex: 1;
   font-size: 1.25rem;
-  margin-right: 0.25rem; 
+  margin-right: 0.25rem;
 `
 
 interface ChoicesContainerProps {
@@ -301,10 +301,10 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
   if (!displayFeedback) {
     return (
-      <OptionContainer
+      <OptionWrapper
         onlyOneItem={onlyOneItem}
         shouldBeGray={shouldBeGray}
-        providedStyles={themeProvider.optionGridItemStyles}
+        providedStyles={themeProvider.optionWrapperStyles}
       >
         <ChoiceButton
           onlyOneItem={onlyOneItem}
@@ -318,7 +318,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             {text.title}
           </MarkdownText>
         </ChoiceButton>
-      </OptionContainer>
+      </OptionWrapper>
     )
   }
 
@@ -329,10 +329,10 @@ const Option: React.FunctionComponent<OptionProps> = ({
   if (onlyOneItem) {
     return (
       <React.Fragment>
-        <OptionContainer
+        <OptionWrapper
           onlyOneItem={onlyOneItem}
           shouldBeGray={shouldBeGray}
-          providedStyles={themeProvider.optionGridItemStyles}
+          providedStyles={themeProvider.optionWrapperStyles}
         >
           <ChoiceButton
             revealed
@@ -345,16 +345,16 @@ const Option: React.FunctionComponent<OptionProps> = ({
               {text.title}
             </MarkdownText>
           </ChoiceButton>
-        </OptionContainer>
+        </OptionWrapper>
 
         {optionIsSelected && (
-          <OptionContainer
+          <OptionWrapper
             onlyOneItem={onlyOneItem}
             shouldBeGray={shouldBeGray}
-            providedStyles={themeProvider.optionGridItemStyles}
+            providedStyles={themeProvider.optionWrapperStyles}
           >
             <FeedbackPortion item={item} selectedOption={option} />
-          </OptionContainer>
+          </OptionWrapper>
         )}
       </React.Fragment>
     )
@@ -363,7 +363,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
   // multiple items
   return (
     <>
-      <OptionContainer onlyOneItem={onlyOneItem} shouldBeGray={shouldBeGray}>
+      <OptionWrapper onlyOneItem={onlyOneItem} shouldBeGray={shouldBeGray}>
         <ChoiceButton
           revealed
           onlyOneItem={onlyOneItem}
@@ -375,7 +375,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             {text.title}
           </MarkdownText>
         </ChoiceButton>
-      </OptionContainer>
+      </OptionWrapper>
     </>
   )
 }
@@ -457,7 +457,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   )
 }
 
-const OptionContainer = styled.div<OptionContainerProps>`
+const OptionWrapper = styled.div<OptionWrapperProps>`
   ${({ onlyOneItem, shouldBeGray, providedStyles }) =>
     onlyOneItem
       ? `
@@ -471,7 +471,7 @@ const OptionContainer = styled.div<OptionContainerProps>`
       `}
 `
 
-type OptionContainerProps = {
+type OptionWrapperProps = {
   onlyOneItem: boolean
   shouldBeGray: boolean
   providedStyles?: string
