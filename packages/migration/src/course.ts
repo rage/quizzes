@@ -20,6 +20,8 @@ const courseIDs = {
   "elements-of-ai": "en_US",
   "elements-of-ai-fi": "fi_FI",
   "elements-of-ai-se": "sv_SE",
+  "elements-of-ai-ee": "et_EE",
+  "elements-of-ai-de": "de_DE",
 
   "k2017-ohpe": "fi_FI",
   "s2017-ohpe": "fi_FI",

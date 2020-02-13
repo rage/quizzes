@@ -16,20 +16,15 @@ interface IMultipleChoiceItemProps {
   updateMultipleOptions: any
 }
 
-class MultipleChoiceItem extends React.Component<IMultipleChoiceItemProps> {
-  constructor(props: any) {
-    super(props)
-  }
+const MultipleChoiceItem: React.FunctionComponent<IMultipleChoiceItemProps> = (
+  props: any,
+) => {
+  const { expanded, ...expandedProps } = props
 
-  public render() {
-    const item = this.props.items[this.props.order]
-    const { expanded, ...expandedProps } = this.props
-
-    if (item.id && !this.props.expanded) {
-      return <ShortMultipleChoiceItem {...this.props} />
-    } else {
-      return <ExpandedMultipleChoiceItem {...expandedProps} />
-    }
+  if (!expanded) {
+    return <ShortMultipleChoiceItem {...props} />
+  } else {
+    return <ExpandedMultipleChoiceItem {...expandedProps} />
   }
 }
 

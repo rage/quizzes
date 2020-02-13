@@ -4,6 +4,12 @@ import React from "react"
 import { connect } from "react-redux"
 import { remove } from "../../store/edit/actions"
 
+interface IExpandedBottomActionProps {
+  handleExpand: () => any
+  index: number
+  remove: (idx: number) => any
+}
+
 class BottomActionButtons extends React.Component<any, any> {
   constructor(props) {
     super(props)
@@ -13,22 +19,17 @@ class BottomActionButtons extends React.Component<any, any> {
     return (
       <Grid item={true}>
         <CardActions>
-          {this.props.itemHasBeenSaved && (
-            <IconButton onClick={this.handleRemoval(this.props.index)}>
-              <Delete fontSize="large" />
-            </IconButton>
-          )}
+          <IconButton onClick={this.handleRemoval(this.props.index)}>
+            <Delete fontSize="large" />
+          </IconButton>
+
           <Button
             style={{
               backgroundColor: "rgb(87, 61, 77)",
               color: "white",
               borderRadius: "5px",
             }}
-            onClick={
-              this.props.itemHasBeenSaved
-                ? this.props.handleExpand
-                : this.props.handleCancel
-            }
+            onClick={this.props.handleExpand}
           >
             Close
           </Button>

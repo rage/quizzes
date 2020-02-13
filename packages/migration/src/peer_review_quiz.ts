@@ -20,8 +20,13 @@ import { getUUIDByString, insert } from "./util/"
 
 export async function migratePeerReviewQuestions(
   peerReviewQuestions: any[],
-  peerReviews: any[],
+  peerReviewData: any[],
+  quizzes: any,
 ) {
+  if (peerReviewQuestions.length === 0) {
+    return
+  }
+
   /*logger.info"Querying peer review questions...")
   const peerReviewQuestions = await QNQuiz.find({
     type: { $in: [oldQuizTypes.PEER_REVIEW] },
@@ -31,6 +36,7 @@ export async function migratePeerReviewQuestions(
     ],
   })*/
   logger.info("peer reviews: ", peerReviewQuestions.length)
+
   const bar = progressBar(
     "Migrating peer review questions",
     peerReviewQuestions.length,
@@ -45,15 +51,24 @@ export async function migratePeerReviewQuestions(
   > = []
   let quizNotFound = 0
   let answerNotFound = 0
+
+  const peerReviews: { [key: string]: any } = {}
+  peerReviewData.forEach(pr => {
+    peerReviews[pr.quizId] = pr
+    peerReviews[pr.sourceQuizId] = pr
+  })
+
   await Promise.all(
     peerReviewQuestions.map(async (oldPRQ: any, index: number) => {
-      const quiz = await Quiz.createQueryBuilder("quiz")
+      /*const quiz = await Quiz.createQueryBuilder("quiz")
         .leftJoinAndSelect("quiz.course", "course")
         .leftJoinAndSelect("course.languages", "language")
         .where("quiz.id = :id", {
           id: getUUIDByString(safeGet(() => oldPRQ.data.quizId)),
         })
-        .getOne()
+        .getOne()*/
+
+      const quiz = quizzes[getUUIDByString(safeGet(() => oldPRQ.data.quizId))]
 
       if (!quiz) {
         quizNotFound++
@@ -82,6 +97,7 @@ export async function migratePeerReviewQuestions(
   )
 
   logger.info("Inserting peer review questions")
+
   await insert(PeerReviewCollection, collections)
   await insert(
     PeerReviewCollectionTranslation,
@@ -99,7 +115,7 @@ export async function migratePeerReviewQuestions(
 async function migratePeerReviewQuestion(
   quiz: Quiz,
   oldPRQ: { [key: string]: any },
-  peerReviews: any[],
+  peerReviews: any,
 ): Promise<
   [
     QueryPartialEntity<PeerReviewCollection>,
@@ -114,9 +130,11 @@ async function migratePeerReviewQuestion(
     $or: [{ quizId: oldPRQ._id }, { sourceQuizId: oldPRQ._id }],
   })*/
 
-  const peerReviewSample = peerReviews.find(
+  /*const peerReviewSample = peerReviews.find(
     pr => pr.quizId === oldPRQ._id || pr.sourceQuizId === oldPRQ._id,
-  )
+  )*/
+
+  const peerReviewSample = peerReviews[oldPRQ._id]
 
   if (!peerReviewSample) {
     return null
@@ -125,16 +143,16 @@ async function migratePeerReviewQuestion(
   const collection = {
     id: getUUIDByString(oldPRQ._id),
     quizId: quiz.id,
-    createdAt: oldPRQ.createdAt,
-    updatedAt: oldPRQ.updatedAt,
+    createdAt: new Date(oldPRQ.createdAt),
+    updatedAt: new Date(oldPRQ.updatedAt),
   }
   const collectionTranslation = {
     peerReviewCollectionId: collection.id,
     languageId,
     title: oldPRQ.title || "",
     body: oldPRQ.body || "",
-    createdAt: oldPRQ.createdAt,
-    updatedAt: oldPRQ.updatedAt,
+    createdAt: new Date(oldPRQ.createdAt),
+    updatedAt: new Date(oldPRQ.updatedAt),
   }
 
   const questions: Array<QueryPartialEntity<PeerReviewQuestion>> = []
@@ -156,16 +174,16 @@ async function migratePeerReviewQuestion(
       type,
       order: order++,
       answerRequired: oldPRQ.data.answeringRequired,
-      createdAt: oldPRQ.createdAt,
-      updatedAt: oldPRQ.updatedAt,
+      createdAt: new Date(oldPRQ.createdAt),
+      updatedAt: new Date(oldPRQ.updatedAt),
     })
     questionTranslations.push({
       peerReviewQuestionId: getUUIDByString(id),
       languageId,
       title,
       body,
-      createdAt: oldPRQ.createdAt,
-      updatedAt: oldPRQ.updatedAt,
+      createdAt: new Date(oldPRQ.createdAt),
+      updatedAt: new Date(oldPRQ.updatedAt),
     })
   }
 

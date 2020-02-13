@@ -156,7 +156,6 @@ class ExpandedOpen extends React.Component<any, any> {
               <BottomActionsExpItem
                 itemHasBeenSaved={item.id ? true : false}
                 handleExpand={this.props.toggleExpand}
-                handleCancel={this.props.onCancel}
                 index={this.props.order}
               />
             </Grid>

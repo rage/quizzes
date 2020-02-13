@@ -1,20 +1,20 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: migrate-quiznator-data
+  name: refresh-reaktor-view
 spec:
-  schedule: "8 * * * *"
+  schedule: "0 0 * * *"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
-      activeDeadlineSeconds: 36000
+      activeDeadlineSeconds: 3600
       template:
         spec:
           restartPolicy: OnFailure
           containers:
-            - name: migrate-quiznator-data
+            - name: refresh-reaktor-view
               image: ${BACKEND_IMAGE}
-              command: ["sh", "-c", "cd /app && yarn db-migrate"]
+              command: ["sh", "-c", "cd /app && yarn refresh-reaktor-view"]
               resources:
                 requests:
                   memory: "1000Mi"
@@ -53,6 +53,21 @@ spec:
                     secretKeyRef:
                       name: backend-database-secret
                       key: TMC_TOKEN
+                - name: KAFKA_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: backend-database-secret
+                      key: KAFKA_HOST
+                - name: MESSAGE_FORMAT_VERSION
+                  valueFrom:
+                    secretKeyRef:
+                      name: backend-database-secret
+                      key: MESSAGE_FORMAT_VERSION
+                - name: SERVICE_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: backend-database-secret
+                      key: SERVICE_ID
           initContainers:
           - name: quizzes-backend-run-migrations
             image: ${BACKEND_IMAGE}

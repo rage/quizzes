@@ -12,17 +12,6 @@ import BottomActionsExpItem from "../ItemTools/ExpandedBottomActions"
 import ExpandedTopInformation from "../ItemTools/ExpandedTopInformation"
 
 class ExpandedEssay extends React.Component<any, any> {
-  constructor(props) {
-    super(props)
-    const item = this.props.items[this.props.order]
-    const initData = {
-      title: item.texts[0].title,
-      body: item.texts[0].body,
-      minWords: item.minWords,
-      maxWords: item.maxWords,
-    }
-  }
-
   public render() {
     const item = this.props.items[this.props.order]
     return (
@@ -46,7 +35,7 @@ class ExpandedEssay extends React.Component<any, any> {
                         multiline={true}
                         required={true}
                         label="Title"
-                        value={item.texts[0].title}
+                        value={item.texts[0].title || ""}
                         onChange={this.changeTempAttribute("title")}
                         style={{
                           fontWeight: "bold",
@@ -63,7 +52,7 @@ class ExpandedEssay extends React.Component<any, any> {
                         rows={3}
                         fullWidth={true}
                         label="Body"
-                        value={item.texts[0].body}
+                        value={item.texts[0].body || ""}
                         onChange={this.changeTempAttribute("body")}
                       />
                     </Grid>
@@ -85,7 +74,11 @@ class ExpandedEssay extends React.Component<any, any> {
                             variant="outlined"
                             margin="dense"
                             inputProps={{ min: 1 }}
-                            value={item.minWords}
+                            value={
+                              typeof item.minWords === "number"
+                                ? item.minWords
+                                : ""
+                            }
                             onChange={this.changeTempAttribute("minWords")}
                           />
                         }
@@ -108,7 +101,11 @@ class ExpandedEssay extends React.Component<any, any> {
                             type="number"
                             variant="outlined"
                             margin="dense"
-                            value={item.maxWords}
+                            value={
+                              typeof item.maxWords === "number"
+                                ? item.maxWords
+                                : ""
+                            }
                             onChange={this.changeTempAttribute("maxWords")}
                           />
                         }
