@@ -1,12 +1,26 @@
 import { Button, Grid, Paper, Typography } from "@material-ui/core"
 import React, { Component } from "react"
 import { connect } from "react-redux"
+import { Prompt } from "react-router-dom"
+import { IPeerReviewCollection, IQuizItem } from "../interfaces"
 import { addItem, addReview, changeOrder, remove } from "../store/edit/actions"
 import ItemContainer from "./ItemContainer"
 import PeerReviewCollectionContainer from "./PeerReviewCollectionContainer"
 import QuestionAdder from "./QuizQuestionAdder"
+import { quizContentsDiffer } from "./tools"
 
-class TabContainer extends Component<any, any> {
+interface ITabContainerProps {
+  items: IQuizItem[]
+  peerReviewCollections: IPeerReviewCollection[]
+}
+
+interface ITabContainerState {
+  scrollTo: HTMLInputElement | null
+  justAdded: boolean
+  expandedItems: { [n: number]: any }
+}
+
+class TabContainer extends Component<any, ITabContainerState> {
   private itemTypes = [
     { label: "checkbox", value: "checkbox" },
     { label: "essay", value: "essay" },
@@ -55,13 +69,6 @@ class TabContainer extends Component<any, any> {
       return true
     }
 
-    if (
-      this.state.menuOpen !== nextState.menuOpen ||
-      (this.state.menuAnchor && nextState.menuAnchor)
-    ) {
-      return true
-    }
-
     if (this.props.items !== nextProps.items) {
       return true
     }
@@ -89,6 +96,8 @@ class TabContainer extends Component<any, any> {
   }
 
   public render() {
+    const unsaved = this.quizHasUnsavedChanges()
+    console.log("Rendering! Unsaved changes: ", unsaved)
     return (
       <Grid container={true} spacing={8} justify="center">
         <Grid
@@ -102,6 +111,11 @@ class TabContainer extends Component<any, any> {
             Questions
           </Typography>
         </Grid>
+
+        <Prompt
+          when={unsaved}
+          message="There are unsaved changes on the page. Are you sure you wish to exit?"
+        />
 
         <Grid item={true} xs={12}>
           <ItemContainer
@@ -173,11 +187,29 @@ class TabContainer extends Component<any, any> {
 
     this.props.changeOrder(collection, oldIndex, newIndex)
   }
+
+  private quizHasUnsavedChanges = (): boolean => {
+    if (this.props.justAdded) {
+      return true
+    }
+
+    const savedQuizInfo = this.props.courseInfos
+      .find(ci => ci.courseId === this.props.filter.course)
+      .quizzes.find(q => q.id === this.props.filter.quiz)
+
+    const editInfo = this.props.edit
+
+    return quizContentsDiffer(editInfo, savedQuizInfo)
+  }
 }
 
 const mapStateToProps = (state: any) => {
   return {
-    storeItems: state.edit.items,
+    items: state.edit.items,
+    peerReviewCollections: state.edit.peerReviewCollections,
+    edit: state.edit,
+    courseInfos: state.quizzes.courseInfos,
+    filter: state.filter,
   }
 }
 
