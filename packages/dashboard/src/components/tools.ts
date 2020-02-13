@@ -25,9 +25,6 @@ const quizFields = [
 ]
 
 export const quizContentsDiffer = (quiz1: IQuiz, quiz2: IQuiz): boolean => {
-  console.log("quiz 1: ", quiz1)
-  console.log("quiz 2:", quiz2)
-
   if (quizFields.some(field => quiz1[field] !== quiz2[field])) {
     return true
   }

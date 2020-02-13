@@ -46,13 +46,19 @@ interface IState {
   checkboxHasBeenToggledOnce: boolean
   points?: number
   deadlineChecked: boolean
+  defaultDeadline: Date
 }
 
 class ExpandedQuizInfo extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props)
+    const deadline = new Date()
+    deadline.setMonth(deadline.getMonth() + 3)
+    deadline.setHours(0)
+    deadline.setMinutes(0)
 
     this.state = {
+      defaultDeadline: deadline,
       correctedInitial: false,
       checkboxHasBeenToggledOnce: false,
       deadlineChecked: !!props.deadline,
@@ -128,10 +134,10 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
 
             <Grid item={true} xs="auto">
               <DeadlineSelector
-                deadline={this.props.deadline}
+                deadline={this.props.deadline || this.state.defaultDeadline}
                 deadlineChecked={this.state.deadlineChecked}
-                toggleDeadlineChecked={this.changeTempAttribute(
-                  "deadlineChecked",
+                toggleDeadlineChecked={this.toggleDeadline(
+                  this.props.deadline || this.state.defaultDeadline,
                 )}
                 handleDeadlineChange={this.changeTempAttribute("deadline")}
                 shouldAnimateTextField={this.state.checkboxHasBeenToggledOnce}
@@ -238,6 +244,21 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     )
   }
 
+  private toggleDeadline = (deadline?: Date) => () => {
+    const changedTo = !this.state.deadlineChecked
+    this.setState({
+      ...this.state,
+      deadlineChecked: changedTo,
+      checkboxHasBeenToggledOnce: true,
+    })
+
+    if (!changedTo) {
+      this.props.setAttribute("deadline", null)
+    } else {
+      this.props.setAttribute("deadline", deadline)
+    }
+  }
+
   private changeTempAttribute = (attributeName: string) => e => {
     const value = e.target.value
 
@@ -248,12 +269,6 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
       case "triesLimited":
         this.props.setAttribute(attributeName, !this.props[attributeName])
         break
-      case "deadlineChecked":
-        this.setState({
-          ...this.state,
-          deadlineChecked: !this.state.deadlineChecked,
-          checkboxHasBeenToggledOnce: true,
-        })
       case "deadline":
       default:
         this.props.setAttribute(attributeName, value)

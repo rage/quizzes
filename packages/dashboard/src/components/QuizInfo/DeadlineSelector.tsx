@@ -56,12 +56,8 @@ const DeadlineSelector: React.FunctionComponent<IDeadlineSelectorProps> = ({
 
 const formatDateToTextField = (date?: Date): string => {
   if (!date) {
-    date = new Date()
-    date.setMonth(date.getMonth() + 3)
-    date.setHours(0)
-    date.setMinutes(0)
+    return ""
   }
-
   const otherDate = new Date(date)
   otherDate.setMinutes(otherDate.getMinutes() - otherDate.getTimezoneOffset())
   let stringDate = otherDate.toISOString()
