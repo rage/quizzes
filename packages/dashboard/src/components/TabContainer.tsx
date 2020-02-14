@@ -18,7 +18,6 @@ interface ITabContainerState {
   scrollTo: HTMLInputElement | null
   justAdded: boolean
   expandedItems: { [n: number]: any }
-  notifyOfUnsavedState: boolean
 }
 
 class TabContainer extends Component<any, ITabContainerState> {
@@ -39,7 +38,6 @@ class TabContainer extends Component<any, ITabContainerState> {
       scrollTo: null,
       justAdded: false,
       expandedItems: {},
-      notifyOfUnsavedState: false,
     }
     console.log("Props: ", props)
   }
@@ -53,15 +51,6 @@ class TabContainer extends Component<any, ITabContainerState> {
   }
 
   public componentDidUpdate(prevProps, prevState) {
-    // To Do: not on every update, some better way to show prompt if unsaved
-    if (!prevProps) {
-      this.setState({
-        notifyOfUnsavedState: false,
-      })
-    } else {
-      this.checkIfUnsaved()
-    }
-
     if (this.state.scrollTo) {
       this.state.scrollTo.select()
       this.setState({ scrollTo: null })
@@ -70,10 +59,6 @@ class TabContainer extends Component<any, ITabContainerState> {
 
   public shouldComponentUpdate(nextProps, nextState) {
     if (this.state.scrollTo) {
-      return true
-    }
-
-    if (this.state.notifyOfUnsavedState !== nextState.notifyOfUnsavedState) {
       return true
     }
 
@@ -112,7 +97,6 @@ class TabContainer extends Component<any, ITabContainerState> {
       newExp[index] = true
     }
     this.setState({ expandedItems: newExp })
-    this.checkIfUnsaved()
   }
 
   public render() {
@@ -129,11 +113,6 @@ class TabContainer extends Component<any, ITabContainerState> {
             Questions
           </Typography>
         </Grid>
-
-        <Prompt
-          when={this.state.notifyOfUnsavedState}
-          message="There are unsaved changes on the page. Are you sure you wish to exit?"
-        />
 
         <Grid item={true} xs={12}>
           <ItemContainer
@@ -204,19 +183,6 @@ class TabContainer extends Component<any, ITabContainerState> {
     }
 
     this.props.changeOrder(collection, oldIndex, newIndex)
-  }
-
-  private checkIfUnsaved = () => {
-    const savedQuizInfo = this.props.courseInfos
-      .find(ci => ci.courseId === this.props.filter.course)
-      .quizzes.find(q => q.id === this.props.filter.quiz)
-
-    const editInfo = this.props.edit
-
-    const unsaved = quizContentsDiffer(editInfo, savedQuizInfo)
-    this.setState({
-      notifyOfUnsavedState: unsaved,
-    })
   }
 }
 

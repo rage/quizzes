@@ -1,6 +1,7 @@
 import { Button, Grid, Toolbar, Typography } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
+import { Prompt } from "react-router-dom"
 import { ICourse, IQuiz } from "../interfaces"
 
 import {
@@ -18,9 +19,11 @@ import { IFilterState } from "../store/filter/reducer"
 import { userState } from "../store/user/reducer"
 import QuizInfo from "./QuizInfo"
 import TabContainer from "./TabContainer"
+import { quizContentsDiffer } from "./tools"
 
 interface IQuizFormProps {
   courses: ICourse[]
+  courseInfos: any[]
   edit: IEditState
   filter: IFilterState
   user: userState
@@ -38,6 +41,13 @@ interface IQuizFormProps {
 }
 
 class QuizForm extends React.Component<IQuizFormProps, any> {
+  constructor(props) {
+    super(props)
+    this.state = {
+      notifyOfUnsavedState: false,
+    }
+  }
+
   public componentDidMount() {
     if (this.props.quiz) {
       this.props.setEdit(this.props.quiz)
@@ -48,6 +58,14 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
   }
 
   public componentDidUpdate(prevProps, prevState) {
+    if (
+      prevProps &&
+      this.props.history.location.pathname ===
+        prevProps.history.location.pathname
+    ) {
+      console.log("checking..")
+      this.checkIfUnsaved()
+    }
     if (!prevProps.edit.id && this.props.edit.id) {
       this.props.history.push(`/quizzes/${this.props.edit.id}`)
     }
@@ -59,6 +77,10 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
         <Grid item={true} xs={12} sm={10} lg={8}>
           <QuizInfo quizTexts={this.props.edit.texts[0]} />
 
+          <Prompt
+            when={this.state.notifyOfUnsavedState}
+            message="There are unsaved changes on the page. Are you sure you wish to exit?"
+          />
           {this.props.edit.course.languages.map(
             (l, i) =>
               this.props.filter.language === l.id && (
@@ -93,8 +115,26 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
     scrollTo(0, 0)
     // for saving a quiz for the first time, wait before the url is modified in componentDidUpdate
     // await
-
     this.props.save()
+    this.setState({
+      notifyOfUnsavedState: false,
+    })
+  }
+
+  private checkIfUnsaved = () => {
+    const savedQuizInfo = this.props.courseInfos
+      .find(ci => ci.courseId === this.props.filter.course)
+      .quizzes.find(q => q.id === this.props.filter.quiz)
+
+    const editInfo = this.props.edit
+
+    const unsaved = quizContentsDiffer(editInfo as IQuiz, savedQuizInfo)
+
+    if (unsaved !== this.state.notifyOfUnsavedState) {
+      this.setState({
+        notifyOfUnsavedState: unsaved,
+      })
+    }
   }
 
   private handleChange = path => event => {
@@ -115,6 +155,7 @@ const mapStateToProps = (state: any) => {
     edit: state.edit,
     filter: state.filter,
     user: state.user,
+    courseInfos: state.quizzes.courseInfos,
   }
 }
 
