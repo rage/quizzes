@@ -1,4 +1,5 @@
 import * as React from "react"
+import { useRef, useState } from "react"
 import { useDispatch } from "react-redux"
 import LikertScale from "likert-react"
 import {
@@ -12,6 +13,7 @@ import MarkdownText from "../MarkdownText"
 import PeerReviewOption from "./PeerReviewOption"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
 import { useTypedSelector } from "../../state/store"
+import { scrollToRef } from "../../utils"
 import { PeerReviewLabels } from "../../utils/languages"
 import {
   QuizAnswer,
@@ -22,10 +24,12 @@ import {
   MiscEvent,
 } from "../../modelTypes"
 import {
-  BaseButton,
+  BoldTypography,
+  BoldTypographyMedium,
   SpaciousTypography,
-  StyledButton,
-  RedButton,
+  TopMarginDivLarge,
+  TopMarginDivSmall,
+  withMargin,
 } from "../styleComponents"
 import styled from "styled-components"
 
@@ -33,12 +37,16 @@ import SelectButton from "./SelectButton"
 import SpamButton from "./SpamButton"
 import PeerReviewSubmitButton from "./PeerReviewSubmitButton"
 
-const BoldTypography = styled(Typography)`
-  font-weight: bold;
+const OptionTypography = styled(BoldTypography)`
+  margin-bottom: 1rem;
 `
 
-const TopMarginDiv = styled.div`
-  margin-top: 15px;
+const ButtonWrapper = styled.div`
+  display: flex;
+  margin: 1rem 0 2rem;
+  button:last-of-type {
+    margin-left: auto;
+  }
 `
 
 type PeerReviewFormProps = {
@@ -48,8 +56,16 @@ type PeerReviewFormProps = {
 const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
   languageInfo,
 }) => {
+  const ref = useState(useRef(null))[0]
+
   const answersToReview = useTypedSelector(state => state.peerReviews.options)
   const peerReview = useTypedSelector(state => state.peerReviews.answer)
+  const dispatch = useDispatch()
+
+  const unselectAnswer = () => {
+    dispatch(peerReviewsActions.unselectAnswer())
+    scrollToRef(ref)
+  }
 
   if (!answersToReview) {
     return (
@@ -68,7 +84,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
     return <Typography>{languageInfo.noPeerAnswersAvailableLabel}</Typography>
   }
 
-  const chosenStyle = { fontSize: "1.5rem", fontStyle: "bold" }
+  const Instructions = withMargin(BoldTypographyMedium, "2rem 0 0")
 
   // choice has been made
   if (peerReview) {
@@ -80,47 +96,58 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
     }
 
     return (
-      <>
-        <BoldTypography>{languageInfo.chosenEssayInstruction}</BoldTypography>
-        <PeerReviewOption answer={chosenAnswer} />
-        <SelectButton onClick={() => {}}>Peru valinta</SelectButton>
-        <PeerReviewQuestions
-          peerReview={peerReview}
-          languageInfo={languageInfo}
-        />
-      </>
+      <div ref={ref}>
+        <Instructions>{languageInfo.chosenEssayInstruction}</Instructions>
+        <TopMarginDivLarge>
+          <PeerReviewOption answer={chosenAnswer} />
+          <ButtonWrapper>
+            <SelectButton onClick={unselectAnswer}>
+              {languageInfo.unselectButtonLabel}
+            </SelectButton>
+          </ButtonWrapper>
+          <PeerReviewQuestions
+            peerReview={peerReview}
+            languageInfo={languageInfo}
+            scrollRef={ref}
+          />
+        </TopMarginDivLarge>
+      </div>
     )
   }
 
   return (
-    <>
-      <BoldTypography>{languageInfo.chooseEssayInstruction}</BoldTypography>
-
+    <div ref={ref}>
+      <TopMarginDivLarge>
+        <BoldTypographyMedium>
+          {languageInfo.chooseEssayInstruction}
+        </BoldTypographyMedium>
+      </TopMarginDivLarge>
       {answersToReview.map((answer, idx) => (
-        <TopMarginDiv key={answer.id}>
-          <Typography variant="subtitle1">
+        <TopMarginDivLarge key={answer.id}>
+          <OptionTypography variant="subtitle1">
             {`${languageInfo.optionLabel} ${idx + 1}:`}
-          </Typography>
+          </OptionTypography>
           <PeerReviewOption answer={answer} />
-
-          <UnselectedPeerAnswerActions
+          <ReportOrSelect
             answer={answer}
             languageInfo={languageInfo}
+            scrollRef={ref}
           />
-        </TopMarginDiv>
+        </TopMarginDivLarge>
       ))}
-    </>
+    </div>
   )
 }
 
 type PeerReviewQuestionsProps = {
   peerReview: PeerReviewAnswer
   languageInfo: PeerReviewLabels
+  scrollRef: any
 }
 
 const PeerReviewQuestions: React.FunctionComponent<
   PeerReviewQuestionsProps
-> = ({ peerReview, languageInfo }) => {
+> = ({ peerReview, languageInfo, scrollRef }) => {
   const quiz = useTypedSelector(state => state.quiz)
 
   const submitDisabled = useTypedSelector(
@@ -157,6 +184,7 @@ const PeerReviewQuestions: React.FunctionComponent<
 
   const submitPeerReview = () => {
     dispatch(peerReviewsActions.submit())
+    scrollToRef(scrollRef)
   }
 
   return (
@@ -237,7 +265,7 @@ const TextualPeerReviewFeedback: React.FunctionComponent<
 
   return (
     <StyledReviewEssayQuestion>
-      <MarkdownText Component={BoldTypography} variant="subtitle1">
+      <MarkdownText Component={BoldTypographyMedium} variant="subtitle1">
         {questionTexts.title}
       </MarkdownText>
 
@@ -261,40 +289,40 @@ const TextualPeerReviewFeedback: React.FunctionComponent<
   )
 }
 
-type UnselectedPeerAnswerActionsProps = {
+type ReportOrSelectProps = {
   languageInfo: PeerReviewLabels
   answer: QuizAnswer
+  scrollRef: any
 }
 
-const UnselectedPeerAnswerActions: React.FunctionComponent<
-  UnselectedPeerAnswerActionsProps
-> = ({ languageInfo, answer }) => {
+const ReportOrSelect: React.FunctionComponent<ReportOrSelectProps> = ({
+  languageInfo,
+  answer,
+  scrollRef,
+}) => {
   const [disabled, setDisabled] = React.useState(false)
   const dispatch = useDispatch()
 
   const flagAsSpam = () => {
     setDisabled(true)
     dispatch(peerReviewsActions.postSpam(answer.id))
+    scrollToRef(scrollRef)
   }
 
   const selectAnswer = () => {
     dispatch(peerReviewsActions.selectAnswerToReview(answer.id))
+    scrollToRef(scrollRef)
   }
 
   return (
-    <Grid container={true} justify="space-between">
-      <Grid item>
-        <SpamButton disabled={disabled} onClick={flagAsSpam}>
-          {languageInfo.reportAsInappropriateLabel}
-        </SpamButton>
-      </Grid>
-
-      <Grid item>
-        <SelectButton onClick={selectAnswer}>
-          {languageInfo.chooseButtonLabel}
-        </SelectButton>
-      </Grid>
-    </Grid>
+    <ButtonWrapper>
+      <SpamButton disabled={disabled} onClick={flagAsSpam}>
+        {languageInfo.reportAsInappropriateLabel}
+      </SpamButton>
+      <SelectButton onClick={selectAnswer}>
+        {languageInfo.chooseButtonLabel}
+      </SelectButton>
+    </ButtonWrapper>
   )
 }
 

@@ -31,6 +31,7 @@ export interface ThemeProviderInterface {
   quizBodyStyles?: string
   stepperStyles?: string
   submitGroupStyles?: string
+  messageGroupStyles?: string
 }
 
 const ThemeProviderContext = createContext<ThemeProviderInterface>({})

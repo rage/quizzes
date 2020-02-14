@@ -6,6 +6,8 @@ import { Button } from "@material-ui/core"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
 
+import { StyledButton } from "./styleComponents"
+
 export interface ChoiceButtonProps {
   revealed: boolean
   children: any
@@ -44,18 +46,12 @@ const FailureIcon = () => (
   </IconWrapper>
 )
 
-const ChoiceButton = styled(Button)<ButtonProps>`
+const ChoiceButton = styled(StyledButton)<ButtonProps>`
   ${({ onlyOneItem }) => onlyOneItem && `width: 70%;`}
-  ${({ selected }) =>
-    !selected && `background-color: white;`}
-  text-transform: none;
+  ${({ selected }) => !selected && `background-color: white;`}
   margin: 0.5em 0;
-  border-radius: 15px;
   border: 1px solid
     ${({ selected }) => (selected ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.23)")};
-  padding: 15px;
-  box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
-    0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
 `
 
 const RevealedChoiceButton = styled(

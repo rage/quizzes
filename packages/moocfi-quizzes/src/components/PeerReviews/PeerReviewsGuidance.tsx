@@ -1,6 +1,10 @@
 import * as React from "react"
+import styled from "styled-components"
+
 import { useTypedSelector } from "../../state/store"
-import { SpaciousTypography } from "../styleComponents"
+
+import { Typography } from "@material-ui/core"
+import { TopMarginDivSmall, BoldTypographyLarge } from "../styleComponents"
 import MarkdownText from "../MarkdownText"
 
 type PeerReviewsGuidanceProps = {
@@ -18,12 +22,14 @@ const PeerReviewsGuidance: React.FunctionComponent<
   const required = (quiz && quiz.course.minPeerReviewsGiven) || 0
 
   return (
-    <div>
-      <SpaciousTypography variant="subtitle1">
+    <TopMarginDivSmall>
+      <BoldTypographyLarge variant="subtitle1">
         {givenLabel}: {given}/{required}
-      </SpaciousTypography>
-      <MarkdownText variant="subtitle1">{guidanceText}</MarkdownText>
-    </div>
+      </BoldTypographyLarge>
+      <TopMarginDivSmall>
+        <MarkdownText Component={Typography}>{guidanceText}</MarkdownText>
+      </TopMarginDivSmall>
+    </TopMarginDivSmall>
   )
 }
 

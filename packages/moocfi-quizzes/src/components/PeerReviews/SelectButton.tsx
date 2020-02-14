@@ -1,6 +1,8 @@
 import React from "react"
-import { Button } from "@material-ui/core"
+
 import ThemeProviderContext from "../../contexes/themeProviderContext"
+
+import { BaseButton } from "../styleComponents"
 
 export interface SelectButtonProps {
   children: any
@@ -17,9 +19,9 @@ const SelectButton: React.FunctionComponent<SelectButtonProps> = props => {
   }
 
   return (
-    <Button variant="contained" color="primary" onClick={props.onClick}>
+    <BaseButton variant="contained" color="primary" onClick={props.onClick}>
       {...props.children}
-    </Button>
+    </BaseButton>
   )
 }
 

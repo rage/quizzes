@@ -12,6 +12,10 @@ import styled from "styled-components"
 import SimpleErrorBoundary from "./SimpleErrorBoundary"
 import { useInput, useLocalStorage } from "./customHooks"
 
+const TallContainer = styled.div`
+  padding-bottom: 1000px;
+`
+
 const FlexContainer = styled.div`
   display: flex;
   flex-direction: row;
@@ -129,7 +133,7 @@ const App = () => {
         }
       />
 
-      <div>
+      <TallContainer>
         <Typography variant="h5" component="h1">
           Quiz
         </Typography>
@@ -142,7 +146,7 @@ const App = () => {
             quizPortion
           )}
         </SimpleErrorBoundary>
-      </div>
+      </TallContainer>
     </>
   )
 }

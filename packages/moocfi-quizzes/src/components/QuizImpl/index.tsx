@@ -27,7 +27,7 @@ import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
 import LoginPrompt from "./LoginPrompt"
 import MarkdownText from "../MarkdownText"
-import { BoldTypography } from "../styleComponents"
+import { BoldTypographyMedium } from "../styleComponents"
 
 import ThemeProviderContext from "../../contexes/themeProviderContext"
 
@@ -101,6 +101,14 @@ export interface LowerContentProps {
 const LowerContent = styled.div<LowerContentProps>`
   margin-bottom: 1rem;
   padding-left: 1rem;
+`
+
+interface MessageGroupProps {
+  providedStyles: string | undefined
+}
+
+const MessageGroup = styled.div<MessageGroupProps>`
+  ${({ providedStyles }) => providedStyles}
 `
 
 interface SubmitGroupProps {
@@ -337,7 +345,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
         </QuizItemContainerDiv>
         <ThemedLowerContent nItems={quiz.items.length}>
           {!stillSubmittable && !quizDisabled ? (
-            <SubmitGroup providedStyles={themeProvider.submitGroupStyles}>
+            <MessageGroup providedStyles={themeProvider.messageGroupStyles}>
               {submitMessage && (
                 <SubmitMessage
                   providedStyles={themeProvider.submitMessageDivStyles}
@@ -347,7 +355,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
               )}
 
               {containsPeerReviews && exerciseFinishedMessage && (
-                <BoldTypography>{exerciseFinishedMessage}</BoldTypography>
+                <BoldTypographyMedium>
+                  {exerciseFinishedMessage}
+                </BoldTypographyMedium>
               )}
 
               {containsPeerReviews && shouldShowPeerReviews && <PeerReviews />}
@@ -357,7 +367,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                 quizAnswer={quizAnswer}
                 generalLabels={generalLabels}
               />
-            </SubmitGroup>
+            </MessageGroup>
           ) : (
             <>
               {messageState.notification && messageState.notification.message && (

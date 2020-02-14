@@ -130,6 +130,8 @@ export const selectAnswerToReview: ActionCreator<ThunkAction> = (
   )
 }
 
+export const unselectAnswer = createAction("peerReviews/UNSELECT")
+
 export const postSpam: ActionCreator<ThunkAction> = (
   quizAnswerId: string,
 ) => async (dispatch, getState) => {
