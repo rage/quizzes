@@ -285,9 +285,14 @@ export const addReviewQuestion = (index, type) => {
 export const remove = (path, index) => {
   return (dispatch, getState) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
+
     const array = _.get(quiz, path)
     array.splice(index, 1)
-    quiz[path] = array.map((arrayItem, idx) => ({ ...arrayItem, order: idx }))
+    _.set(
+      quiz,
+      path,
+      array.map((arrayItem, idx) => ({ ...arrayItem, order: idx })),
+    )
     dispatch(setEdit(quiz))
   }
 }

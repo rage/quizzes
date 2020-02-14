@@ -6,6 +6,7 @@ import {
   IQuiz,
   IQuizItem,
   IQuizItemOption,
+  IQuizItemOptionText,
   IQuizItemText,
   IQuizText,
 } from "../interfaces"
@@ -25,9 +26,6 @@ const quizFields = [
 ]
 
 export const quizContentsDiffer = (quiz1: IQuiz, quiz2: IQuiz): boolean => {
-  console.log("Quiz1: ", quiz1)
-  console.log("Quiz2: ", quiz2)
-
   if (quizFields.some(field => quiz1[field] !== quiz2[field])) {
     return true
   }
@@ -71,7 +69,7 @@ const quizItemFields = [
   "validityRegex",
   "formatRegex",
   "multi",
-  "usesSharedFeedbackMessage",
+  "usesSharedOptionFeedbackMessage",
 ]
 
 const quizItemTextFields = [
@@ -83,7 +81,6 @@ const quizItemTextFields = [
   "maxLabel",
   "successMessage",
   "failureMessage",
-  "sharedOptionFeedbackMessage",
 ]
 
 const quizItemOptionFields = ["id", "quizItemId", "order", "correct"]
@@ -122,6 +119,35 @@ const itemsDiffer = (items1: IQuizItem[], items2: IQuizItem[]): boolean => {
     return true
   }
 
+  if (items1.some(item => item.usesSharedOptionFeedbackMessage)) {
+    const textArrays1 = items1
+      .filter(item => item.usesSharedOptionFeedbackMessage)
+      .map(item => item.texts)
+    const textArrays2 = items2
+      .filter(item => item.usesSharedOptionFeedbackMessage)
+      .map(item => item.texts)
+    if (textArrays1.length !== textArrays2.length) {
+      return true
+    }
+    const allOptionTexts1 = textArrays1.reduce(
+      (accTexts: IQuizItemText[], elem) => accTexts.concat(elem),
+      [],
+    )
+    const allOptionTexts2 = textArrays2.reduce(
+      (accTexts: IQuizItemText[], elem) => accTexts.concat(elem),
+      [],
+    )
+
+    if (
+      !elementsHaveSamePropertyValues(allOptionTexts1, allOptionTexts2, [
+        "quizId",
+        "sharedOptionFeedbackMessage",
+      ])
+    ) {
+      return true
+    }
+  }
+
   const allOptions1 = items1.reduce(
     (accOptions: IQuizItemOption[], qi) => accOptions.concat(qi.options),
     [],
@@ -142,8 +168,14 @@ const itemsDiffer = (items1: IQuizItem[], items2: IQuizItem[]): boolean => {
     return true
   }
 
-  const optionTexts1 = allOptions1.map(o => o.texts)
-  const optionTexts2 = allOptions2.map(o => o.texts)
+  const optionTexts1 = allOptions1.reduce(
+    (accTexts: IQuizItemOptionText[], option) => accTexts.concat(option.texts),
+    [],
+  )
+  const optionTexts2 = allOptions2.reduce(
+    (accTexts: IQuizItemOptionText[], option) => accTexts.concat(option.texts),
+    [],
+  )
 
   return (
     optionTexts1.length !== optionTexts2.length ||
@@ -185,6 +217,13 @@ const peerReviewQuestionFields = [
   "order",
 ]
 
+const peerReviewQuestionTextFields = [
+  "languageId",
+  "title",
+  "body",
+  "peerReviewQuestionId",
+]
+
 const peerReviewCollectionTextFields = [
   "peerReviewCollectionId",
   "languageId",
@@ -203,7 +242,7 @@ const peerReviewCollectionsDiffer = (
     return false
   }
   if (
-    prc1.length !== prc2!.length ||
+    prc1.length !== prc2.length ||
     !elementsHaveSamePropertyValues(prc1, prc2, peerReviewCollectionFields)
   ) {
     return true
@@ -247,7 +286,7 @@ const peerReviewCollectionsDiffer = (
     !elementsHaveSamePropertyValues(
       allQuestionTexts1,
       allQuestionTexts2,
-      peerReviewQuestionFields,
+      peerReviewQuestionTextFields,
     )
   ) {
     return true

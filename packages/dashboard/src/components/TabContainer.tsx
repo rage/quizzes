@@ -177,6 +177,13 @@ class TabContainer extends Component<any, ITabContainerState> {
   }
 
   private remove = (path, index) => event => {
+    /* // This is called to remove review question
+    // w/ `peerReviewCollections[${
+      this.props.collectionIndex
+    }].questions`,
+    this.props.index,
+    */
+
     this.props.remove(path, index)
   }
 
