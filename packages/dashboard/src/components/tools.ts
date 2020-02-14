@@ -17,7 +17,6 @@ const quizFields = [
   "points",
   "tries",
   "triesLimited",
-  "deadline",
   "open",
   "autoConfirm",
   "excludedFromScore",
@@ -25,8 +24,29 @@ const quizFields = [
 ]
 
 export const quizContentsDiffer = (quiz1: IQuiz, quiz2: IQuiz): boolean => {
+  console.log("Quiz1: ", quiz1)
+  console.log("Quiz2: ", quiz2)
+
   if (quizFields.some(field => quiz1[field] !== quiz2[field])) {
     return true
+  }
+
+  if(quiz1.deadline || quiz2.deadline){
+    if(!quiz1.deadline  || !quiz2.deadline){
+      return true
+    }
+
+    let deadline1: string | Date = new Date(quiz1.deadline)
+    let deadline2: string | Date = new Date(quiz2.deadline)
+
+    deadline1 = deadline1.toISOString().substring(0, 16)
+
+
+    deadline2 = deadline2.toISOString().substring(0, 16)
+    
+    if(deadline1 !== deadline2){
+      return true
+    }
   }
 
   return (
