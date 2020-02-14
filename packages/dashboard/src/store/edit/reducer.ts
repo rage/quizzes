@@ -26,6 +26,7 @@ export interface IEditState {
   items: IQuizItem[]
   grantPointsPolicy?: QuizPointsGrantingPolicy
   peerReviewCollections?: IPeerReviewCollection[]
+  unsaved: boolean
 }
 
 const initialState: IEditState = {
@@ -37,6 +38,7 @@ const initialState: IEditState = {
   texts: [],
   items: [],
   peerReviewCollections: [],
+  unsaved: false,
 }
 
 export const editReducer = (

@@ -25,7 +25,14 @@ const quizFields = [
   "awardPointsEvenIfWrong",
 ]
 
-export const quizContentsDiffer = (quiz1: IQuiz, quiz2: IQuiz): boolean => {
+export const quizContentsDiffer = (quiz1?: IQuiz, quiz2?: IQuiz): boolean => {
+  if (quiz1 === undefined || quiz2 === undefined) {
+    if (quiz1 === quiz2) {
+      return false
+    }
+    return true
+  }
+
   if (quizFields.some(field => quiz1[field] !== quiz2[field])) {
     return true
   }

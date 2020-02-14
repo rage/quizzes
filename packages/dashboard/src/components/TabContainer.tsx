@@ -18,6 +18,7 @@ interface ITabContainerState {
   scrollTo: HTMLInputElement | null
   justAdded: boolean
   expandedItems: { [n: number]: any }
+  notifyOfUnsavedState: boolean
 }
 
 class TabContainer extends Component<any, ITabContainerState> {
@@ -38,9 +39,10 @@ class TabContainer extends Component<any, ITabContainerState> {
       scrollTo: null,
       justAdded: false,
       expandedItems: {},
+      notifyOfUnsavedState: false,
     }
+    console.log("Props: ", props)
   }
-
   public scrollToNewItem = (itemComponent: HTMLInputElement) => {
     if (!itemComponent) {
       return
@@ -50,7 +52,16 @@ class TabContainer extends Component<any, ITabContainerState> {
     })
   }
 
-  public componentDidUpdate() {
+  public componentDidUpdate(prevProps, prevState) {
+    // To Do: not on every update, some better way to show prompt if unsaved
+    if (!prevProps) {
+      this.setState({
+        notifyOfUnsavedState: false,
+      })
+    } else {
+      this.checkIfUnsaved()
+    }
+
     if (this.state.scrollTo) {
       this.state.scrollTo.select()
       this.setState({ scrollTo: null })
@@ -59,6 +70,10 @@ class TabContainer extends Component<any, ITabContainerState> {
 
   public shouldComponentUpdate(nextProps, nextState) {
     if (this.state.scrollTo) {
+      return true
+    }
+
+    if (this.state.notifyOfUnsavedState !== nextState.notifyOfUnsavedState) {
       return true
     }
 
@@ -97,11 +112,10 @@ class TabContainer extends Component<any, ITabContainerState> {
       newExp[index] = true
     }
     this.setState({ expandedItems: newExp })
+    this.checkIfUnsaved()
   }
 
   public render() {
-    const unsaved = this.quizHasUnsavedChanges()
-    console.log("Rendering! Unsaved changes: ", unsaved)
     return (
       <Grid container={true} spacing={8} justify="center">
         <Grid
@@ -117,7 +131,7 @@ class TabContainer extends Component<any, ITabContainerState> {
         </Grid>
 
         <Prompt
-          when={unsaved}
+          when={this.state.notifyOfUnsavedState}
           message="There are unsaved changes on the page. Are you sure you wish to exit?"
         />
 
@@ -177,13 +191,6 @@ class TabContainer extends Component<any, ITabContainerState> {
   }
 
   private remove = (path, index) => event => {
-    /* // This is called to remove review question
-    // w/ `peerReviewCollections[${
-      this.props.collectionIndex
-    }].questions`,
-    this.props.index,
-    */
-
     this.props.remove(path, index)
   }
 
@@ -199,18 +206,17 @@ class TabContainer extends Component<any, ITabContainerState> {
     this.props.changeOrder(collection, oldIndex, newIndex)
   }
 
-  private quizHasUnsavedChanges = (): boolean => {
-    if (this.props.justAdded) {
-      return true
-    }
-
+  private checkIfUnsaved = () => {
     const savedQuizInfo = this.props.courseInfos
       .find(ci => ci.courseId === this.props.filter.course)
       .quizzes.find(q => q.id === this.props.filter.quiz)
 
     const editInfo = this.props.edit
 
-    return quizContentsDiffer(editInfo, savedQuizInfo)
+    const unsaved = quizContentsDiffer(editInfo, savedQuizInfo)
+    this.setState({
+      notifyOfUnsavedState: unsaved,
+    })
   }
 }
 

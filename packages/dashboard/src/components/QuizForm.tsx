@@ -93,6 +93,7 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
     scrollTo(0, 0)
     // for saving a quiz for the first time, wait before the url is modified in componentDidUpdate
     // await
+
     this.props.save()
   }
 
