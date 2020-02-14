@@ -6,6 +6,7 @@ import {
   IQuiz,
   IQuizItem,
   IQuizItemOption,
+  IQuizItemText,
   IQuizText,
 } from "../interfaces"
 
@@ -31,8 +32,8 @@ export const quizContentsDiffer = (quiz1: IQuiz, quiz2: IQuiz): boolean => {
     return true
   }
 
-  if(quiz1.deadline || quiz2.deadline){
-    if(!quiz1.deadline  || !quiz2.deadline){
+  if (quiz1.deadline || quiz2.deadline) {
+    if (!quiz1.deadline || !quiz2.deadline) {
       return true
     }
 
@@ -41,10 +42,9 @@ export const quizContentsDiffer = (quiz1: IQuiz, quiz2: IQuiz): boolean => {
 
     deadline1 = deadline1.toISOString().substring(0, 16)
 
-
     deadline2 = deadline2.toISOString().substring(0, 16)
-    
-    if(deadline1 !== deadline2){
+
+    if (deadline1 !== deadline2) {
       return true
     }
   }
@@ -106,12 +106,18 @@ const itemsDiffer = (items1: IQuizItem[], items2: IQuizItem[]): boolean => {
     return true
   }
 
-  const texts1 = items1.map(i => i.texts)
-  const texts2 = items2.map(i => i.texts)
+  const allTexts1 = items1.reduce(
+    (accTexts: IQuizItemText[], item) => accTexts.concat(item.texts),
+    [],
+  )
+  const allTexts2 = items2.reduce(
+    (accTexts: IQuizItemText[], item) => accTexts.concat(item.texts),
+    [],
+  )
 
   if (
-    texts1.length !== texts2.length ||
-    !elementsHaveSamePropertyValues(texts1, texts2, quizItemTextFields)
+    allTexts1.length !== allTexts2.length ||
+    !elementsHaveSamePropertyValues(allTexts1, allTexts2, quizItemTextFields)
   ) {
     return true
   }
@@ -149,13 +155,22 @@ const itemsDiffer = (items1: IQuizItem[], items2: IQuizItem[]): boolean => {
   )
 }
 
-const quizTextFields = ["quizId", "languageId", "title", "body"]
+const quizTextFields = [
+  "quizId",
+  "languageId",
+  "title",
+  "body",
+  "submitMessage",
+]
 
-const quizTextsDiffer = (texts1: IQuizText[], texts2: IQuizText[]): boolean => {
-  if (texts1.length !== texts2.length) {
+const quizTextsDiffer = (
+  texts1: IQuizText[],
+  allTexts2: IQuizText[],
+): boolean => {
+  if (texts1.length !== allTexts2.length) {
     return true
   }
-  return !elementsHaveSamePropertyValues(texts1, texts2, quizTextFields)
+  return !elementsHaveSamePropertyValues(texts1, allTexts2, quizTextFields)
 }
 
 const peerReviewCollectionFields = ["id", "quizId"]
@@ -265,7 +280,9 @@ const elementsHaveSamePropertyValues = (
   return arr1.every(elem1 =>
     arr2.some(elem2 => {
       return propertyNames.every(
-        propName => elem1[propName] === elem2[propName],
+        propName =>
+          (!elem1[propName] && !elem2[propName]) ||
+          elem1[propName] === elem2[propName],
       )
     }),
   )

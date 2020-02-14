@@ -73,12 +73,8 @@ class ExpandedEssay extends React.Component<any, any> {
                             type="number"
                             variant="outlined"
                             margin="dense"
-                            inputProps={{ min: 1 }}
-                            value={
-                              typeof item.minWords === "number"
-                                ? item.minWords
-                                : ""
-                            }
+                            inputProps={{ min: 0 }}
+                            value={item.minWords || ""}
                             onChange={this.changeTempAttribute("minWords")}
                           />
                         }
@@ -101,11 +97,8 @@ class ExpandedEssay extends React.Component<any, any> {
                             type="number"
                             variant="outlined"
                             margin="dense"
-                            value={
-                              typeof item.maxWords === "number"
-                                ? item.maxWords
-                                : ""
-                            }
+                            inputProps={{ min: 0 }}
+                            value={item.maxWords || ""}
                             onChange={this.changeTempAttribute("maxWords")}
                           />
                         }
@@ -145,7 +138,7 @@ class ExpandedEssay extends React.Component<any, any> {
       }
       this.props.changeAttr(
         `items[${this.props.order}].${attributeName}`,
-        value,
+        Number(value),
       )
     }
   }

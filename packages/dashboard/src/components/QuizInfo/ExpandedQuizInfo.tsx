@@ -269,6 +269,12 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
       case "triesLimited":
         this.props.setAttribute(attributeName, !this.props[attributeName])
         break
+      case "tries":
+      case "section":
+      case "part":
+      case "points":
+        this.props.setAttribute(attributeName, Number(value))
+        break
       case "deadline":
       default:
         this.props.setAttribute(attributeName, value)
