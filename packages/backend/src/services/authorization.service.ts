@@ -10,8 +10,8 @@ import UserCourseRoleService from "./usercourserole.service"
 export enum Permission {
   VIEW = 0,
   GRADE = 1,
-  EXPORT = 2,
-  MODIFY = 3,
+  MODIFY = 2,
+  EXPORT = 3,
 }
 
 @Service()
@@ -72,7 +72,7 @@ export default class AuthorizationService {
     }
     if (
       roles.some(r => r.role === "assistant") &&
-      permission <= Permission.GRADE
+      permission <= Permission.EXPORT
     ) {
       return true
     }

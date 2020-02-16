@@ -58,10 +58,27 @@ export class QuizController {
   private kafkaService: KafkaService
 
   @Get("/")
-  public async getAll(@QueryParams() params: string[]): Promise<Quiz[]> {
-    if (!user.administrator) {
+  public async getAll(
+    @QueryParams() params: string[],
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ): Promise<Quiz[]> {
+    const paramsObj: any = params
+    let authorized = user.administrator
+
+    if (!authorized && paramsObj.course === "true") {
+      const courseId = paramsObj.courseId
+
+      authorized = await this.authorizationService.isPermitted({
+        user,
+        courseId,
+        permission: Permission.VIEW,
+      })
+    }
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
+
     return await this.getQuizzes(null, params)
   }
 

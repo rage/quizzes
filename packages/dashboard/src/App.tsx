@@ -34,6 +34,7 @@ import { InitializationStatus, IUserState } from "./store/user/reducer"
 class App extends React.Component<any, any> {
   public async componentDidMount() {
     const user = TMCApi.checkStore()
+
     if (user) {
       const profile = await TMCApi.getProfile(user.accessToken)
       if (profile.id) {
@@ -102,7 +103,7 @@ class App extends React.Component<any, any> {
     if (
       this.props.user.initializationStatus === InitializationStatus.INITIALIZING
     ) {
-      return <div>Loggin in...</div>
+      return <div>Logging in...</div>
     }
 
     return (
@@ -370,10 +371,8 @@ class App extends React.Component<any, any> {
       const accessToken = user.accessToken
       const profile = await TMCApi.getProfile(accessToken)
       if ((profile as ITMCProfileDetails).id) {
-        this.props.addUser(user, profile.administrator)
-        this.props.setCourses()
+        this.props.addUser(user, profile.administrator, true)
       }
-      this.props.displayMessage(`Welcome ${user.username}!`, false)
     } catch (exception) {
       console.log(exception)
       this.props.displayMessage("Login failed", true)
