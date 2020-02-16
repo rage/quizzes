@@ -21,6 +21,7 @@ import {
 import BottomActionsExpItem from "../ItemTools/ExpandedBottomActions"
 import ExpandedTopInformation from "../ItemTools/ExpandedTopInformation"
 import OptionDialog from "../OptionDialog"
+import MultiToggle from "./MultiToggle"
 import SharedFeedbackCustomiser from "./SharedFeedbackCustomiser"
 import SortableOptionList from "./SortableOptionList"
 
@@ -50,6 +51,7 @@ interface IItemData {
   options: IOptionData[]
   usesSharedOptionFeedbackMessage: boolean
   sharedOptionFeedbackMessage: string
+  multi: boolean
 }
 
 export interface IOptionData {
@@ -90,6 +92,7 @@ class MultipleChoiceItem extends React.Component<
       usesSharedOptionFeedbackMessage: item.usesSharedOptionFeedbackMessage,
       sharedOptionFeedbackMessage:
         item.texts[0].sharedOptionFeedbackMessage || "",
+      multi: item.multi,
     }
     this.state = {
       dialogOpen: false,
@@ -202,6 +205,13 @@ class MultipleChoiceItem extends React.Component<
                         )}
                       />
                     </Grid>
+
+                    <Grid item={true} xs={12}>
+                      <MultiToggle
+                        multi={this.state.tempItemData.multi}
+                        toggleMulti={this.changeEditAttribute("multi")}
+                      />
+                    </Grid>
                   </Grid>
                 </CardContent>
               </Grid>
@@ -239,7 +249,10 @@ class MultipleChoiceItem extends React.Component<
       })
     }
     const newData = { ...this.state.tempItemData }
-    if (attributeName === "usesSharedOptionFeedbackMessage") {
+    if (
+      attributeName === "usesSharedOptionFeedbackMessage" ||
+      attributeName === "multi"
+    ) {
       newData[attributeName] = !newData[attributeName]
     } else {
       newData[attributeName] = e.target.value
@@ -250,24 +263,28 @@ class MultipleChoiceItem extends React.Component<
   private saveItem = e => {
     this.props.toggleExpand(e)
 
+    const itemsString = `items[${this.props.order}]`
+
     this.props.changeAttr(
-      `items[${this.props.order}].texts[0].title`,
+      `${itemsString}.texts[0].title`,
       this.state.tempItemData.title,
     )
     this.props.changeAttr(
-      `items[${this.props.order}].texts[0].body`,
+      `${itemsString}.texts[0].body`,
       this.state.tempItemData.body,
     )
 
     this.props.changeAttr(
-      `items[${this.props.order}].texts[0].sharedOptionFeedbackMessage`,
+      `${itemsString}.texts[0].sharedOptionFeedbackMessage`,
       this.state.tempItemData.sharedOptionFeedbackMessage,
     )
 
     this.props.changeAttr(
-      `items[${this.props.order}].usesSharedOptionFeedbackMessage`,
+      `${itemsString}.usesSharedOptionFeedbackMessage`,
       this.state.tempItemData.usesSharedOptionFeedbackMessage,
     )
+
+    this.props.changeAttr(`${itemsString}.multi`, this.state.tempItemData.multi)
 
     this.props.updateMultipleOptions(
       this.props.order,

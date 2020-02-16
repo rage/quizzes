@@ -74,7 +74,7 @@ export async function migrateSpamFlags(
   const chunkSize = calculateChunkSize(spamFlags[0])
   for (let i = 0; i < spamFlags.length; i += chunkSize) {
     const vals = spamFlags.slice(i, i + chunkSize)
-    await insert(SpamFlag, vals, `"user_id", "quiz_answer_id"`)
+    await insert(SpamFlag, vals)
     bar.tick(vals.length)
   }
 }

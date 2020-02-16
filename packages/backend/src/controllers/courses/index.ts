@@ -56,7 +56,13 @@ export class CourseController {
     }
 
     const courses = await this.courseService.getCourses(query)
-    return courses
+
+    if (user.administrator) {
+      return courses
+    }
+
+    const courseIdsForAllRoles = new Set(roles.map(r => r.courseId))
+    return courses.filter(course => courseIdsForAllRoles.has(course.id))
   }
 
   @Get("/:id")

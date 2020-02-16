@@ -80,6 +80,7 @@ export const newQuiz = () => {
       tries: 1,
       triesLimited: true,
       grantPointsPolicy: "grant_whenever_possible",
+      autoConfirm: true,
     }
     dispatch(set(checkForMissingTranslation(quiz)))
   }

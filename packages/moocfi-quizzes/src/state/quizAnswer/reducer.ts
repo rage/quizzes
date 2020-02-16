@@ -14,6 +14,7 @@ export const initialState: QuizAnswerState = {
   noChangesSinceSuccessfulSubmit: false,
   noChangesAfterLoading: true,
   quizDisabled: false,
+  pastDeadline: false,
 }
 
 export type QuizAnswerState = {
@@ -24,6 +25,7 @@ export type QuizAnswerState = {
   noChangesSinceSuccessfulSubmit: boolean
   noChangesAfterLoading: boolean
   quizDisabled: boolean
+  pastDeadline: boolean
 }
 
 export const quizAnswerReducer = (
@@ -38,7 +40,7 @@ export const quizAnswerReducer = (
       }
     case getType(quizAnswer.setQuizDisabled):
       return { ...state, quizDisabled: action.payload }
-    case getType(quizAnswer.set):
+    case getType(quizAnswer.setAnswer):
       let newItemAnswersReady: Record<string, boolean> = {}
       let newQuizAnswer = action.payload
       newQuizAnswer.itemAnswers.forEach(ia => {
@@ -57,11 +59,13 @@ export const quizAnswerReducer = (
       return { ...state, noChangesSinceSuccessfulSubmit: true }
     case getType(quizAnswer.setLocked):
       return { ...state, submitLocked: true }
+    case getType(quizAnswer.pastDeadline):
+      return { ...state, pastDeadline: true }
     case getType(quizAnswer.setAttemptedSubmit):
       return { ...state, attemptedDisabledSubmit: true }
     case getType(quizAnswer.clearAttemptedSubmit):
       return { ...state, attemptedDisabledSubmit: false }
-    case getType(quizAnswer.changeIntData):
+    case getType(quizAnswer.changeIntDataAction):
       newItemAnswersReady = { ...state.itemAnswersReady }
       newItemAnswersReady[`${action.payload.itemId}`] = true
       return {
@@ -101,7 +105,7 @@ export const quizAnswerReducer = (
         noChangesAfterLoading: false,
       }
 
-    case getType(quizAnswer.changeCheckboxData):
+    case getType(quizAnswer.changeCheckboxDataAction):
       newItemAnswersReady = { ...state.itemAnswersReady }
       newItemAnswersReady[`${action.payload.itemId}`] = true
 
@@ -133,7 +137,7 @@ export const quizAnswerReducer = (
         noChangesSinceSuccessfulSubmit: false,
         noChangesAfterLoading: false,
       }
-    case getType(quizAnswer.chooseOption):
+    case getType(quizAnswer.chooseOptionAction):
       newItemAnswersReady = { ...state.itemAnswersReady }
       newItemAnswersReady[`${action.payload.itemId}`] = true
 

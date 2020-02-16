@@ -16,6 +16,18 @@ spec:
       - name: quizzes-backend
         image: ${BACKEND_IMAGE}
         imagePullPolicy: Always
+        livenessProbe:
+          httpGet:
+            path: /api/healthz
+            port: 3000
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /api/healthz
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
         ports:
         - name: backend-http
           containerPort: 3000
@@ -49,6 +61,21 @@ spec:
               secretKeyRef:
                 name: backend-database-secret
                 key: POSTGRES_USERNAME
+          - name: KAFKA_HOST
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: KAFKA_HOST
+          - name: MESSAGE_FORMAT_VERSION
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: MESSAGE_FORMAT_VERSION
+          - name: SERVICE_ID
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: SERVICE_ID
       initContainers:
       - name: quizzes-backend-run-migrations
         image: ${BACKEND_IMAGE}

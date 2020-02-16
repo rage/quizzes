@@ -6,12 +6,14 @@ import Typography from "@material-ui/core/Typography"
 import "likert-react/dist/main.css"
 import PeerReviewForm from "./PeerReviewForm"
 import PeerReviewsGuidance from "./PeerReviewsGuidance"
+import ReceivedPeerReviewsInfo from "./ReceivedPeerReviewsInfo"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
 import Togglable from "../../utils/Togglable"
 import { useTypedSelector } from "../../state/store"
+import { BoldTypography } from "../styleComponents"
 
-const BoldTypography = styled(Typography)`
-  font-weight: bold;
+const TopMarginDiv = styled.div`
+  margin-top: 15px;
 `
 
 const PeerReviews: React.FunctionComponent = () => {
@@ -21,10 +23,14 @@ const PeerReviews: React.FunctionComponent = () => {
   if (!quiz) {
     return <div />
   }
+
+  const activeStep = useTypedSelector(state => state.peerReviews.activeStep)
+  const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const peerReviewQuestions = quiz.peerReviewCollections
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+
   if (!languageInfo) {
     return <div />
   }
@@ -38,6 +44,11 @@ const PeerReviews: React.FunctionComponent = () => {
   }
 
   const peerReviewsLabels = languageInfo.peerReviews
+
+  const giveExtraPeerReviewsLabel =
+    activeStep >= 3
+      ? peerReviewsLabels.giveExtraPeerReviewsQuizConfirmed
+      : peerReviewsLabels.giveExtraPeerReviews
 
   useEffect(() => {
     dispatch(peerReviewsActions.fetchPeerReviewAlternatives())
@@ -57,25 +68,43 @@ const PeerReviews: React.FunctionComponent = () => {
 
   return (
     <div>
-      <PeerReviewsGuidance
-        guidanceText={peerReviewQuestions[0].texts[0].body}
-        givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
-        peerReviewsCompletedInfo={peerReviewsLabels.peerReviewsCompletedInfo}
-      />
-
-      {!morePeerReviewsRequired() && (
-        <BoldTypography variant="subtitle1">
-          {peerReviewsLabels.extraPeerReviewsEncouragementLabel}
-        </BoldTypography>
-      )}
-
-      <Togglable
-        initiallyVisible={morePeerReviewsRequired()}
-        hideButtonText={peerReviewsLabels.hidePeerReviewLabel}
-        displayButtonText={peerReviewsLabels.displayPeerReview}
-      >
-        <PeerReviewForm languageInfo={peerReviewsLabels} />
-      </Togglable>
+      {activeStep >= 2 && <ReceivedPeerReviewsInfo />}
+      {morePeerReviewsRequired()
+        ? !pastDeadline && (
+            <>
+              <PeerReviewsGuidance
+                guidanceText={peerReviewQuestions[0].texts[0].body}
+                givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
+                peerReviewsCompletedInfo={
+                  peerReviewsLabels.peerReviewsCompletedInfo
+                }
+              />
+              <PeerReviewForm languageInfo={peerReviewsLabels} />
+            </>
+          )
+        : !pastDeadline && (
+            <>
+              <BoldTypography variant="subtitle1">
+                {giveExtraPeerReviewsLabel}
+              </BoldTypography>
+              <Togglable
+                initiallyVisible={activeStep === 1}
+                hideButtonText={peerReviewsLabels.hidePeerReviewLabel}
+                displayButtonText={peerReviewsLabels.displayPeerReview}
+              >
+                <TopMarginDiv>
+                  <PeerReviewsGuidance
+                    guidanceText={peerReviewQuestions[0].texts[0].body}
+                    givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
+                    peerReviewsCompletedInfo={
+                      peerReviewsLabels.peerReviewsCompletedInfo
+                    }
+                  />
+                  <PeerReviewForm languageInfo={peerReviewsLabels} />
+                </TopMarginDiv>
+              </Togglable>
+            </>
+          )}
     </div>
   )
 }

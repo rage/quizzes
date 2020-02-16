@@ -1,5 +1,5 @@
 import * as React from "react"
-import Button from "@material-ui/core/Button"
+import { BaseButton } from "../components/styleComponents"
 
 export interface TogglableProps {
   initiallyVisible: boolean
@@ -18,9 +18,9 @@ const Togglable: React.FunctionComponent<TogglableProps> = ({
 
   return (
     <React.Fragment>
-      <Button variant="outlined" color="default" onClick={toggle}>
+      <BaseButton variant="outlined" color="default" onClick={toggle}>
         {toggled ? hideButtonText : displayButtonText}
-      </Button>
+      </BaseButton>
       {toggled && children}
     </React.Fragment>
   )

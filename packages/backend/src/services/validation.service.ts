@@ -265,7 +265,7 @@ export default class ValidationService {
     return { response, quizAnswer, userQuizState }
   }
 
-  public async validateEssayAnswer(
+  public validateEssayAnswer(
     quiz: Quiz,
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
@@ -275,28 +275,55 @@ export default class ValidationService {
     const given: number = userQuizState.peerReviewsGiven
     const received: number = userQuizState.peerReviewsReceived
     if (
-      quizAnswer.status === "submitted" &&
+      (quizAnswer.status === "submitted" ||
+        quizAnswer.status === "enough-received-but-not-given") &&
       userQuizState.spamFlags > course.maxSpamFlags
     ) {
       quizAnswer.status = "spam"
-      userQuizState.spamFlags = null
-      userQuizState.status = "open"
+      if (quiz.triesLimited && userQuizState.tries >= quiz.tries) {
+        userQuizState.status = "locked"
+      } else {
+        userQuizState.spamFlags = null
+        userQuizState.peerReviewsReceived = 0
+        userQuizState.status = "open"
+      }
     } else if (
       quizAnswer.status === "submitted" &&
-      given >= course.minPeerReviewsGiven &&
+      given < course.minPeerReviewsGiven &&
       received >= course.minPeerReviewsReceived
     ) {
+      quizAnswer.status = "enough-received-but-not-given"
+    } else if (
+      (quizAnswer.status === "submitted" ||
+        quizAnswer.status === "enough-received-but-not-given") &&
+      given >= course.minPeerReviewsGiven &&
+      received >= course.minPeerReviewsReceived &&
+      quiz.autoConfirm
+    ) {
       const answers: number[] = [].concat(
-        ...peerReviews.map(pr => pr.answers.map(a => a.value)),
+        ...peerReviews.map(pr =>
+          pr.answers.map(a => {
+            if (a.value) {
+              return a.value
+            }
+          }),
+        ),
       )
+
       const sum: number = answers.reduce((prev, curr) => prev + curr, 0)
+
       if (sum / answers.length >= course.minReviewAverage) {
         quizAnswer.status = "confirmed"
         userQuizState.pointsAwarded = 1 * quiz.points
       } else {
         quizAnswer.status = "rejected"
+        userQuizState.peerReviewsReceived = 0
         userQuizState.pointsAwarded = 0
-        userQuizState.status = "open"
+        if (quiz.triesLimited && userQuizState.tries >= quiz.tries) {
+          userQuizState.status = "locked"
+        } else {
+          userQuizState.status = "open"
+        }
       }
     }
     return { quizAnswer, userQuizState }

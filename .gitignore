@@ -43,7 +43,7 @@ userinfo.json
 usernames.json
 
 # Ignore vscode rest client
-test.rest
+*.rest
 
 packages/widgets/build
 

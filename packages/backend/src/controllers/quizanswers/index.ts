@@ -1,4 +1,3 @@
-import { Response } from "express"
 import JSONStream from "JSONStream"
 import {
   BadRequestError,
@@ -18,7 +17,6 @@ import AuthorizationService, {
   Permission,
 } from "services/authorization.service"
 import KafkaService from "services/kafka.service"
-import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
 import UserCoursePartStateService from "services/usercoursepartstate.service"
@@ -118,8 +116,6 @@ export class QuizAnswerController {
         }
 
     const result = await this.quizAnswerService.getAnswersCount(criteriaQuery)
-
-    return result
 
     if (user.administrator) {
       return result
@@ -301,6 +297,8 @@ export class QuizAnswerController {
 
     const quiz = (await this.quizService.getQuizzes({
       id: existingAnswer.quizId,
+      course: true,
+      items: true,
     }))[0]
 
     let userQuizState = await this.userQuizStateService.getUserQuizState(
@@ -327,8 +325,18 @@ export class QuizAnswerController {
       existingAnswer.status = newStatus
       newAnswer = await manager.save(existingAnswer)
 
-      if (newStatus === "confirmed" && oldStatus !== "confirmed") {
-        userQuizState.pointsAwarded = quiz.points
+      if (newStatus !== oldStatus) {
+        if (newStatus === "confirmed") {
+          userQuizState.pointsAwarded = quiz.points
+        } else if (
+          newStatus === "rejected" &&
+          (!quiz.triesLimited || userQuizState.tries < quiz.tries)
+        ) {
+          userQuizState.peerReviewsReceived = 0
+          userQuizState.pointsAwarded = 0
+          userQuizState.spamFlags = 0
+          userQuizState.status = "open"
+        }
 
         userQuizState = await manager.save(userQuizState)
 
@@ -338,12 +346,12 @@ export class QuizAnswerController {
           userQuizState.userId,
         )
 
-        this.kafkaService.publishQuizAnswerUpdated(
+        await this.kafkaService.publishQuizAnswerUpdated(
           newAnswer,
           userQuizState,
           quiz,
         )
-        this.kafkaService.publishUserProgressUpdated(
+        await this.kafkaService.publishUserProgressUpdated(
           manager,
           newAnswer.userId,
           quiz.courseId,
@@ -463,7 +471,7 @@ export class QuizAnswerController {
           userQuizState.userId,
         )
 
-        this.kafkaService.publishUserProgressUpdated(
+        await this.kafkaService.publishUserProgressUpdated(
           manager,
           userId,
           quiz.courseId,
@@ -492,5 +500,21 @@ export class QuizAnswerController {
       quizAnswer: savedAnswer,
       userQuizState: savedUserQuizState,
     }
+  }
+
+  @Get("/answered/:courseId")
+  public async getAnswered(
+    @Param("courseId") courseId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    const answered = await this.quizAnswerService.getAnswered(courseId, user.id)
+    const answeredByQuizId: { [id: string]: any } = {}
+    answered.forEach(a => {
+      answeredByQuizId[a.quiz_id] = {
+        answered: a.answered,
+        correct: a.correct,
+      }
+    })
+    return answeredByQuizId
   }
 }

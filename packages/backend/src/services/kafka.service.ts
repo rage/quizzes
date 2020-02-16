@@ -1,6 +1,7 @@
+import Knex from "knex"
 import { Inject, Service } from "typedi"
 import { EntityManager } from "typeorm"
-import { Quiz, QuizAnswer, UserQuizState } from "../models"
+import { Course, Quiz, QuizAnswer, UserQuizState } from "../models"
 import {
   ExerciseData,
   PointsByGroup,
@@ -9,54 +10,50 @@ import {
   QuizMessage,
 } from "../types"
 import QuizService from "./quiz.service"
+import QuizAnswerService from "./quizanswer.service"
 import UserCoursePartStateService from "./usercoursepartstate.service"
+import UserQuizStateService from "./userquizstate.service"
 
-// tslint:disable-next-line:no-var-requires
-const Kafka = require("node-rdkafka")
+import * as Kafka from "node-rdkafka"
+
+import { promisify } from "util"
 
 @Service()
 export default class KafkaService {
-  @Inject()
+  @Inject(type => QuizService)
   private quizService: QuizService
 
   @Inject()
   private userCoursePartStateService: UserCoursePartStateService
 
-  private progressStream = Kafka.Producer.createWriteStream(
-    {
-      "metadata.broker.list": process.env.KAFKA_URI,
-    },
-    {},
-    {
-      topic: "user-course-progress",
-    },
-  )
+  private knex = Knex({ client: "pg" })
 
-  private userPointsStream = Kafka.Producer.createWriteStream(
-    {
-      "metadata.broker.list": process.env.KAFKA_URI,
-    },
-    {},
-    {
-      topic: "user-points",
-    },
-  )
+  private producer: any
 
-  private exerciseStream = Kafka.Producer.createWriteStream(
-    {
-      "metadata.broker.list": process.env.KAFKA_URI,
-    },
-    {},
-    {
-      topic: "exercise",
-    },
-  )
+  private flush: any
+
+  constructor() {
+    const producer = new Kafka.Producer({
+      "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
+      dr_cb: false,
+    })
+    producer.on("ready", () => {
+      this.producer = producer
+    })
+    producer.connect()
+    this.flush = promisify(producer.flush.bind(producer))
+  }
 
   public async publishUserProgressUpdated(
     manager: EntityManager,
     userId: number,
     courseId: string,
   ) {
+    const course = await manager
+      .createQueryBuilder(Course, "course")
+      .where("course.id = :courseId", { courseId })
+      .getOne()
+
     const progress: PointsByGroup[] = await this.userCoursePartStateService.getProgress(
       manager,
       userId,
@@ -65,12 +62,13 @@ export default class KafkaService {
     const message: ProgressMessage = {
       timestamp: new Date().toISOString(),
       user_id: userId,
-      course_id: courseId,
+      course_id: course.moocfiId,
       service_id: process.env.SERVICE_ID,
       progress,
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
     }
-    this.progressStream.write(Buffer.from(JSON.stringify(message)))
+
+    await this.produce("user-course-progress", message)
   }
 
   public async publishQuizAnswerUpdated(
@@ -98,16 +96,21 @@ export default class KafkaService {
       n_points: quiz.excludedFromScore ? 0 : userQuizState.pointsAwarded,
       completed: quizAnswer.status === "confirmed",
       user_id: quizAnswer.userId,
-      course_id: quiz.courseId,
+      course_id: course.moocfiId,
       service_id: process.env.SERVICE_ID,
       required_actions: messages,
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
     }
-    this.userPointsStream.write(Buffer.from(JSON.stringify(message)))
+
+    await this.produce("user-points", message)
   }
 
   public async publishCourseQuizzesUpdated(courseId: string) {
-    const quizzes: Quiz[] = await this.quizService.getQuizzes({ courseId })
+    const quizzes: Quiz[] = await this.quizService.getQuizzes({
+      courseId,
+      course: true,
+    })
+    const course = quizzes[0].course
 
     const data: ExerciseData[] = quizzes.map(quiz => {
       return {
@@ -122,12 +125,29 @@ export default class KafkaService {
 
     const message: QuizMessage = {
       timestamp: new Date().toISOString(),
-      course_id: courseId,
+      course_id: course.moocfiId,
       service_id: process.env.SERVICE_ID,
       data,
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
     }
 
-    this.exerciseStream.write(Buffer.from(JSON.stringify(message)))
+    await this.produce("exercise", message)
+  }
+
+  public async addTask(courseId: string, manager: EntityManager) {
+    const query = this.knex("kafka_task").insert({ course_id: courseId })
+    await manager.query(query.toString())
+  }
+
+  private async produce(
+    topic: "user-course-progress" | "user-points" | "exercise",
+    message: ProgressMessage | QuizAnswerMessage | QuizMessage,
+  ) {
+    try {
+      this.producer.produce(topic, null, Buffer.from(JSON.stringify(message)))
+      await this.flush(1000)
+    } catch (error) {
+      console.log("producer not ready")
+    }
   }
 }

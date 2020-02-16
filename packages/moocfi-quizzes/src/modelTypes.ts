@@ -55,6 +55,7 @@ export type QuizAnswer = {
     | "confirmed"
     | "rejected"
     | "deprecated"
+    | "enough-received-but-not-given"
   itemAnswers: QuizItemAnswer[]
 }
 
@@ -157,7 +158,7 @@ export type PeerReviewQuestion = {
   default: boolean
   type: "grade" | "essay"
   answerRequired: boolean
-  order: boolean
+  order: number
   texts: PeerReviewQuestionText[]
 }
 
@@ -200,9 +201,9 @@ export type PeerReviewEssayAnswer = {
   text: string
 }
 
-export type PeerReviewQuestionAnswer = PeerReviewGradeAnswer
-// not supported yet
-// | PeerReviewEssayAnswer
+export type PeerReviewQuestionAnswer =
+  | PeerReviewGradeAnswer
+  | PeerReviewEssayAnswer
 
 export type PeerReviewAnswer = {
   quizAnswerId: string
@@ -210,4 +211,17 @@ export type PeerReviewAnswer = {
   userId: number
   rejectedQuizAnswerIds: string[]
   answers: PeerReviewQuestionAnswer[]
+}
+
+export interface IReceivedPeerReview {
+  id: string
+  peerReviewCollectionId?: string
+  answers: PeerReviewQuestionAnswer[]
+  createdAt: Date
+}
+
+export interface QuizAnswerStatePayload {
+  quiz: Quiz
+  quizAnswer: QuizAnswer
+  userQuizState: UserQuizState | null
 }

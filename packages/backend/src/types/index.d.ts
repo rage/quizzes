@@ -246,3 +246,14 @@ export interface IAuthorizationQuery {
   quizId?: string
   permission: Permission
 }
+export interface QuizValidation {
+  badWordLimit: boolean
+  maxPointsAltered: boolean
+  coursePartAltered: boolean
+}
+
+export interface AnsweredQuiz {
+  quiz_id: string
+  answered: boolean
+  correct: boolean
+}

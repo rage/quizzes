@@ -1,20 +1,18 @@
 import { Service } from "typedi"
-import { EntityManager } from "typeorm"
-import { InjectManager } from "typeorm-typedi-extensions"
-import { Course, Quiz, UserCourseRole } from "../models"
-import { CourseTranslation } from "@quizzes/common/models"
+import { Quiz, UserCourseRole } from "../models"
 
+interface IUserCourseRolesQuery {
+  userId: number
+  courseId?: string
+  quizId?: string
+}
 @Service()
 export default class UserCourseRoleService {
   public async getUserCourseRoles({
     userId,
     courseId,
     quizId,
-  }: {
-    userId: number
-    courseId?: string
-    quizId?: string
-  }): Promise<UserCourseRole[] | undefined> {
+  }: IUserCourseRolesQuery): Promise<UserCourseRole[] | undefined> {
     const queryBuilder = UserCourseRole.createQueryBuilder("ucr").where(
       "ucr.user_id = :userId",
       { userId },

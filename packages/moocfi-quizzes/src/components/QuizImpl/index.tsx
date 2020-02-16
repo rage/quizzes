@@ -27,6 +27,7 @@ import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
 import LoginPrompt from "./LoginPrompt"
 import MarkdownText from "../MarkdownText"
+import { BoldTypography } from "../styleComponents"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
@@ -101,6 +102,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   showZeroPointsInfo = true,
 }) => {
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
+  const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
   const messageState = useTypedSelector(state => state.message)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const quiz = useTypedSelector(state => state.quiz)
@@ -111,6 +113,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const showPoints = useTypedSelector(
     state => state.customization.showPointsInfo,
   )
+  const activeStep = useTypedSelector(state => state.peerReviews.activeStep)
 
   const dispatch = useDispatch()
 
@@ -213,6 +216,30 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const containsPeerReviews =
     quiz.peerReviewCollections !== null && quiz.peerReviewCollections.length > 0
 
+  const answerStatus = quizAnswer.status ? quizAnswer.status : null
+
+  const shouldShowPeerReviews = userQuizState
+    ? userQuizState.status === "locked"
+      ? answerStatus === "rejected" || answerStatus === "spam"
+        ? false
+        : true
+      : false
+    : false
+
+  const exerciseFinishedMessage =
+    activeStep === 4
+      ? languageInfo.peerReviews.answerConfirmed
+      : activeStep === 3
+      ? answerStatus === "submitted" ||
+        answerStatus === "enough-received-but-not-given"
+        ? languageInfo.peerReviews.manualReview
+        : answerStatus === "rejected"
+        ? languageInfo.peerReviews.answerRejected
+        : answerStatus === "spam"
+        ? languageInfo.peerReviews.answerFlaggedAsSpam
+        : null
+      : null
+
   const showPointsPolicyLabel =
     !quiz.awardPointsEvenIfWrong &&
     quiz.items.length > 1 &&
@@ -245,7 +272,11 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
         {!stillSubmittable && !quizDisabled ? (
           <>
-            {containsPeerReviews && <PeerReviews />}
+            {containsPeerReviews && exerciseFinishedMessage && (
+              <BoldTypography>{exerciseFinishedMessage}</BoldTypography>
+            )}
+
+            {containsPeerReviews && shouldShowPeerReviews && <PeerReviews />}
 
             <ResultInformation
               quiz={quiz}
@@ -270,7 +301,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
               <Grid
                 item={true}
                 onClick={e => {
-                  if (submitLocked && !quizDisabled) {
+                  if ((submitLocked || pastDeadline) && !quizDisabled) {
                     dispatch(quizAnswerActions.noticeDisabledSubmitAttempt())
                   }
                 }}
@@ -281,8 +312,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
               {!quizDisabled && (
                 <Grid item={true} xs="auto">
-                  {quiz.deadline &&
-                  new Date(quiz.deadline).getTime() < new Date().getTime() ? (
+                  {pastDeadline ? (
                     <Typography>{generalLabels.pastDeadline}</Typography>
                   ) : (
                     <React.Fragment>

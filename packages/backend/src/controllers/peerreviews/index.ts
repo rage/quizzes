@@ -1,10 +1,12 @@
 import JSONStream from "JSONStream"
 import {
+  BadRequestError,
   Get,
   HeaderParam,
   JsonController,
   Param,
   Post,
+  QueryParam,
   UnauthorizedError,
 } from "routing-controllers"
 import AuthorizationService, {
@@ -58,6 +60,7 @@ export class PeerReviewController {
   public async getGivenReviews(
     @Param("answerId") answerId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
+    @QueryParam("stripped") stripped: boolean,
   ) {
     const authorized = await this.authorizationService.isPermitted({
       user,
@@ -66,14 +69,36 @@ export class PeerReviewController {
     })
 
     if (!authorized) {
-      throw new UnauthorizedError("unauthorized")
+      stripped = true
+      const answer = await this.quizAnswerService.getAnswer(
+        { id: answerId },
+        this.entityManager,
+      )
+      if (answer.userId !== user.id) {
+        throw new UnauthorizedError("unauthorized")
+      }
     }
 
-    return await this.peerReviewService.getPeerReviews(
+    const result = await this.peerReviewService.getPeerReviews(
       this.entityManager,
       answerId,
       false,
     )
+    if (stripped) {
+      const strippedResult = result.map(prAnswer => ({
+        id: prAnswer.id,
+        peerReviewCollectionId: prAnswer.peerReviewCollectionId,
+        createdAt: prAnswer.createdAt,
+        answers: prAnswer.answers.map(prqa => {
+          const { createdAt, updatedAt, ...relevant } = prqa
+          return relevant
+        }),
+      }))
+
+      return strippedResult
+    }
+
+    return result
   }
 
   @Get("/data/:quizId/plainPeerReviews")
@@ -161,6 +186,15 @@ export class PeerReviewController {
     @EntityFromBody() peerReview: PeerReview,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
+    peerReview.answers.forEach(answer => {
+      if (answer.text) {
+        return
+      }
+      if (answer.value === null) {
+        throw new BadRequestError("review must contain values")
+      }
+    })
+
     peerReview.userId = user.id
 
     // Enforce unique (quiz_answer_id, user_id). Do this in db later.
@@ -184,7 +218,7 @@ export class PeerReviewController {
       {
         userId: peerReview.userId,
         quizId: receivingQuizAnswer.quizId,
-        statuses: ["confirmed", "submitted"],
+        statuses: ["confirmed", "submitted", "enough-received-but-not-given"],
       },
       this.entityManager,
     )
@@ -196,6 +230,7 @@ export class PeerReviewController {
     }))[0]
 
     let responsePeerReview: PeerReview
+    let responseQuizAnswer: QuizAnswer
     let responseUserQuizState: UserQuizState
 
     await this.entityManager.transaction(async manager => {
@@ -204,12 +239,19 @@ export class PeerReviewController {
         peerReview,
       )
 
-      responseUserQuizState = await this.peerReviewService.processPeerReview(
+      const {
+        updatedAnswer,
+        updatedState,
+      } = await this.peerReviewService.processPeerReview(
         manager,
         quiz,
         givingQuizAnswer,
         true,
       )
+
+      responseQuizAnswer = updatedAnswer
+      responseUserQuizState = updatedState
+
       await this.peerReviewService.processPeerReview(
         manager,
         quiz,
@@ -219,6 +261,7 @@ export class PeerReviewController {
 
     return {
       peerReview: responsePeerReview,
+      quizAnswer: responseQuizAnswer,
       userQuizState: responseUserQuizState,
     }
   }

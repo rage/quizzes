@@ -1,4 +1,4 @@
-import knex from "knex"
+import Knex from "knex"
 import _ from "lodash"
 import { BadRequestError } from "routing-controllers"
 import { Inject, Service } from "typedi"
@@ -13,16 +13,31 @@ import {
   QuizOption,
   QuizTranslation,
 } from "../models"
-import { IQuizQuery } from "../types"
-import quizanswerService from "./quizanswer.service"
+import { IQuizQuery, QuizValidation } from "../types"
+
+import KafkaService from "./kafka.service"
+import QuizAnswerService from "./quizanswer.service"
+import UserCoursePartStateService from "./usercoursepartstate.service"
+import UserQuizStateService from "./userquizstate.service"
 
 @Service()
 export default class QuizService {
   @InjectManager()
   private entityManager: EntityManager
 
+  @Inject()
+  private userQuizStateService: UserQuizStateService
+
+  @Inject(type => UserCoursePartStateService)
+  private userCoursePartStateService: UserCoursePartStateService
+
+  @Inject(type => KafkaService)
+  private kafkaService: KafkaService
+
+  private knex = Knex({ client: "pg" })
+
   public async getPlainQuizData(quizId: string) {
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     let query = builder("quiz")
       .select()
@@ -40,7 +55,7 @@ export default class QuizService {
   }
 
   public async getPlainQuizItems(quizId: string) {
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     let query = builder("quiz_item")
       .where("quiz_item.quiz_id", quizId)
@@ -72,7 +87,7 @@ export default class QuizService {
   }
 
   public async getPlainQuizItemOptions(quizId: string) {
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     let query = builder("quiz_item")
       .where("quiz_item.quiz_id", quizId)
@@ -99,7 +114,7 @@ export default class QuizService {
   }
 
   public async getPlainQuizPeerReviewCollections(quizId: string) {
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
     let query = builder("peer_review_collection")
       .where("peer_review_collection.quiz_id", quizId)
       .select("id")
@@ -114,7 +129,7 @@ export default class QuizService {
   }
 
   public async getPlainQuizPeerReviewQuestions(quizId: string) {
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     let query = builder("peer_review_question")
       .where("peer_review_question.quiz_id", quizId)
@@ -142,7 +157,7 @@ export default class QuizService {
   }
 
   public async getCSVData(quizId: string) {
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     const quiz = (await this.getQuizzes({
       id: quizId,
@@ -238,8 +253,13 @@ export default class QuizService {
     return data
   }
 
-  public async getQuizzes(query: IQuizQuery): Promise<Quiz[]> {
-    const queryBuilder = this.entityManager.createQueryBuilder(Quiz, "quiz")
+  public async getQuizzes(
+    query: IQuizQuery,
+    manager?: EntityManager,
+  ): Promise<Quiz[]> {
+    const entityManager = manager || this.entityManager
+
+    const queryBuilder = entityManager.createQueryBuilder(Quiz, "quiz")
     const { courseId, coursePart, exclude, id, language, stripped } = query
 
     if (language) {
@@ -253,7 +273,7 @@ export default class QuizService {
       queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
     }
     if (!stripped) {
-      queryBuilder.addSelect("quiz_translation.submit_message")
+      queryBuilder.addSelect("quiz_translation.submitMessage")
     }
 
     if (query.course) {
@@ -363,15 +383,32 @@ export default class QuizService {
     return await queryBuilder.getMany()
   }
 
-  public async createQuiz(quiz: Quiz): Promise<Quiz | undefined> {
+  public async getCourseParts(
+    courseId: string,
+    manager?: EntityManager,
+  ): Promise<number[]> {
+    const entityManager = manager || this.entityManager
+
+    const query = this.knex
+      .distinct("part")
+      .from("quiz")
+      .where("course_id", courseId)
+      .orderBy("part")
+
+    return (await entityManager.query(query.toString())).map(
+      (q: { [part: string]: number }) => q.part,
+    )
+  }
+
+  public async saveQuiz(quiz: Quiz): Promise<Quiz | undefined> {
     let oldQuiz: Quiz | undefined
-    let newQuiz: Quiz | undefined
+    let savedQuiz: Quiz | undefined
 
-    await this.entityManager.transaction(async entityManager => {
+    await this.entityManager.transaction(async manager => {
       if (quiz!.id) {
-        oldQuiz = await entityManager.findOne(Quiz, { id: quiz.id })
+        oldQuiz = await manager.findOne(Quiz, { id: quiz.id })
 
-        const oldQuizItems = await this.entityManager
+        const oldQuizItems = await manager
           .createQueryBuilder(QuizItem, "item")
           .addSelect("item.minWords")
           .addSelect("item.maxWords")
@@ -381,22 +418,48 @@ export default class QuizService {
           .getMany()
 
         oldQuiz.items = oldQuizItems
+
         const validationResult = this.validateModificationOfExistingQuiz(
           quiz,
           oldQuiz,
         )
-        if (validationResult.error) {
+
+        if (validationResult.badWordLimit) {
           throw new BadRequestError(
             "New quiz cannot contain stricter limits on essays",
           )
         }
-        await this.removeOrphans(entityManager, oldQuiz, quiz)
-      }
 
-      newQuiz = await entityManager.save(quiz)
+        await this.removeOrphans(manager, oldQuiz, quiz)
+
+        // gotta save the quiz here or user course states update wrong
+        savedQuiz = await manager.save(quiz)
+
+        if (validationResult.maxPointsAltered) {
+          await this.userQuizStateService.updatePointsForQuiz(
+            quiz,
+            oldQuiz,
+            manager,
+          )
+        }
+
+        if (
+          validationResult.maxPointsAltered ||
+          validationResult.coursePartAltered
+        ) {
+          await this.userCoursePartStateService.updateUserCoursePartStates(
+            quiz,
+            oldQuiz,
+            manager,
+          )
+          await this.kafkaService.addTask(quiz.courseId, manager)
+        }
+      } else {
+        savedQuiz = await manager.save(quiz)
+      }
     })
 
-    return newQuiz
+    return savedQuiz
   }
 
   public async updateQuiz(quiz: Quiz): Promise<Quiz> {
@@ -538,8 +601,11 @@ export default class QuizService {
     }
   }
 
-  private validateModificationOfExistingQuiz(quiz: Quiz, oldQuiz: Quiz) {
-    const stricter = oldQuiz.items.some(qi => {
+  private validateModificationOfExistingQuiz(
+    quiz: Quiz,
+    oldQuiz: Quiz,
+  ): QuizValidation {
+    const badWordLimit = oldQuiz.items.some(qi => {
       if (qi.type !== "essay") {
         return false
       }
@@ -557,6 +623,14 @@ export default class QuizService {
       return false
     })
 
-    return stricter ? { error: "new quiz contains stricter quiz item" } : {}
+    const maxPointsAltered = quiz.points !== oldQuiz.points
+
+    const coursePartAltered = quiz.part !== oldQuiz.part
+
+    return {
+      badWordLimit,
+      maxPointsAltered,
+      coursePartAltered,
+    }
   }
 }

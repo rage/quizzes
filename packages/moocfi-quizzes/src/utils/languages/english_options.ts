@@ -31,19 +31,44 @@ const englishLabels: SingleLanguageLabels = {
   peerReviews: {
     loadingLabel: "Loading",
     chooseButtonLabel: "Choose",
-    chooseEssayInstruction: "Choose one of the essays for peer revie",
+    chooseEssayInstruction: "Choose one of the essays for peer review",
+    chosenEssayInstruction: "Review the chosen answer",
     givenPeerReviewsLabel: "Peer reviews given",
     noPeerAnswersAvailableLabel: "No answers available for peer review",
     reportAsInappropriateLabel: "Report as inappropriate",
     submitPeerReviewLabel: "Submit review",
     peerReviewsCompletedInfo: "All peer reviews have been submitted",
-    extraPeerReviewsEncouragementLabel:
-      "You have reviewed the minimum number of peer essays. You may continue to \
-        review your peers' works, thereby increasing the probability of your own answer being selected by others!",
-    displayPeerReview: "Add peer review",
+    giveExtraPeerReviews:
+      "You have given the required number of peer reviews. By giving more peer reviews your answer will be reviewed faster!",
+    giveExtraPeerReviewsQuizConfirmed:
+      "You may still give peer reviews to help others",
+    displayPeerReview: "Give peer review",
     hidePeerReviewLabel: "Hide",
     quizInvolvesNoPeerReviewsInstruction: "This quiz involves no peer reviews",
     peerReviewsInfoForLoggedOutUser: "The quiz includes peer reviews",
+    essayQuestionAnswerTextBoxLabel: "Write the requested review",
+    optionLabel: "Option",
+    answerRejected: "Your answer was rejected",
+    answerFlaggedAsSpam: "Your answer was rejected as inappropriate",
+    answerConfirmed: "Your answer has been confirmed!",
+    manualReview: "Your answer is being reviewed by course staff",
+  },
+  receivedPeerReviews: {
+    averageOfGradesLabel: "The average grade of received reviews is",
+    detailedViewLabel: "All the reviews your answer has received",
+    errorLabel:
+      "An error occurred in displaying the peer reviews you've received. Reloading the page could help",
+    loadingLabel: "Loading the received peer reviews...",
+    noPeerReviewsReceivedlabel:
+      "Your answer has not yet received any peer reviews",
+    noSupportForQuestionTypeLabel:
+      "This kind of peer review question is not supported",
+    numberOfPeerReviewsText: n =>
+      `Your answer has received ${n} peer review${n > 1 ? "s" : ""}.`,
+    summaryViewLabel: "Received peer reviews:",
+    toggleButtonExpandLabel: "Show all received peer reviews",
+    toggleButtonShrinkLabel: "Hide",
+    peerReviewLabel: "Peer review",
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
@@ -59,7 +84,7 @@ const englishLabels: SingleLanguageLabels = {
     answerStageLabel: "Answering the quiz",
     givingPeerReviewsStageLabel: "Giving peer reviews",
     receivingPeerReviewsStageLabel: "Receiving peer reviews",
-    evaluationStageLabel: "Evaluating the answer",
+    evaluationStageLabel: "Grading the answer",
   },
   general: {
     pastDeadline: "You can no longer submit an answer",
@@ -82,7 +107,7 @@ const englishLabels: SingleLanguageLabels = {
     quizLabel: "Quiz",
     pointsLabel: "Points",
     triesNotLimitedLabel: "Number of tries is unlimited",
-    submitGeneralFeedbackLabel: "Submit successful",
+    submitGeneralFeedbackLabel: "Submitted",
     submitButtonAlreadyAnsweredLabel: "Answered",
     pointsGrantingPolicyInformer: policy => {
       switch (policy) {

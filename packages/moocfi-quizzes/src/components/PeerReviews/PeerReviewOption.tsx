@@ -1,7 +1,10 @@
 import * as React from "react"
 import Typography from "@material-ui/core/Typography"
 import { useTypedSelector } from "../../state/store"
-import { SpaciousPaper } from "../styleComponents"
+import {
+  SpaciousPaper,
+  WhiteSpacePreservingTypography,
+} from "../styleComponents"
 import { QuizAnswer } from "../../modelTypes"
 
 type PeerReviewOptionProps = {
@@ -20,7 +23,7 @@ const PeerReviewOption: React.FunctionComponent<PeerReviewOptionProps> = ({
   const quizItemById = (id: string) => quizItems.find(qi => qi.id === id)
 
   return (
-    <>
+    <div style={{ padding: ".5rem 1rem" }}>
       {answer.itemAnswers
         .filter(ia => {
           const item = quizItemById(ia.quizItemId)
@@ -42,12 +45,14 @@ const PeerReviewOption: React.FunctionComponent<PeerReviewOptionProps> = ({
             <React.Fragment key={ia.id}>
               <Typography variant="subtitle2">{quizTitle}</Typography>
               <SpaciousPaper key={ia.id}>
-                <Typography variant="body1">{ia.textData}</Typography>
+                <WhiteSpacePreservingTypography variant="body1">
+                  {ia.textData}
+                </WhiteSpacePreservingTypography>
               </SpaciousPaper>
             </React.Fragment>
           )
         })}
-    </>
+    </div>
   )
 }
 

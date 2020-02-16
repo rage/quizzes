@@ -6,9 +6,10 @@ import {
   postPeerReview,
   postSpamFlag,
 } from "../../services/peerReviewService"
-import { setQuizState } from "../user/actions"
+import { setAnswer } from "../quizAnswer/actions"
+import { setUserQuizState } from "../user/actions"
 import { ThunkAction } from "../store"
-import { PeerReviewAnswer } from "../../modelTypes"
+import { PeerReviewAnswer, PeerReviewCollection } from "../../modelTypes"
 
 export const set = createAction("peerReviews/SET", resolve => {
   return (newState: PeerReviewsState) => resolve(newState)
@@ -40,11 +41,51 @@ export const setReviewOptions = createAction(
   },
 )
 
-export const changeGrade = createAction(
+export const changeGradeAction = createAction(
   "peerReviews/CHANGE_GRADE",
-  resolve => (peerReviewQuestionId: string, value: number) =>
-    resolve({ peerReviewQuestionId, value }),
+  resolve => (
+    peerReviewQuestionId: string,
+    value: number,
+    peerReviewCollection: PeerReviewCollection,
+  ) => resolve({ peerReviewQuestionId, value, peerReviewCollection }),
 )
+
+export const changeTextAction = createAction(
+  "peerReviews/CHANGE_TEXT",
+  resolve => (
+    peerReviewQuestionId: string,
+    text: string,
+    peerReviewCollection: PeerReviewCollection,
+  ) => resolve({ peerReviewQuestionId, text, peerReviewCollection }),
+)
+
+export const changeGrade: ActionCreator<ThunkAction> = (
+  peerReviewQuestionId: string,
+  value: number,
+) => (dispatch, getState) => {
+  const peerReviewCollection = getState().quiz.peerReviewCollections.find(prc =>
+    prc.questions.some(q => q.id === peerReviewQuestionId),
+  )
+  if (!peerReviewCollection) {
+    console.log("No answer that matches the id of the reviewed answer")
+    return
+  }
+  dispatch(changeGradeAction(peerReviewQuestionId, value, peerReviewCollection))
+}
+
+export const changeText: ActionCreator<ThunkAction> = (
+  peerReviewQuestionId: string,
+  text: string,
+) => (dispatch, getState) => {
+  const peerReviewCollection = getState().quiz.peerReviewCollections.find(prc =>
+    prc.questions.some(q => q.id === peerReviewQuestionId),
+  )
+  if (!peerReviewCollection) {
+    console.log("No answer that matches the id of the reviewed answer")
+    return
+  }
+  dispatch(changeTextAction(peerReviewQuestionId, text, peerReviewCollection))
+}
 
 export const submit: ActionCreator<ThunkAction> = () => async (
   dispatch,
@@ -57,12 +98,13 @@ export const submit: ActionCreator<ThunkAction> = () => async (
   const accessToken = getState().user.accessToken
   dispatch(setSubmitDisabled(true))
   const address = getState().backendAddress
-  const { userQuizState } = await postPeerReview(
+  const { quizAnswer, userQuizState } = await postPeerReview(
     peerReview,
     accessToken,
     address,
   )
-  dispatch(setQuizState(userQuizState))
+  dispatch(setAnswer(quizAnswer))
+  dispatch(setUserQuizState(userQuizState))
   dispatch(setReviewAnswer(null))
   await dispatch(fetchPeerReviewAlternatives())
 }
@@ -95,7 +137,7 @@ export const postSpam: ActionCreator<ThunkAction> = (
   setReviewOptions([])
   const address = getState().backendAddress
   await postSpamFlag(quizAnswerId, accessToken, address)
-  fetchPeerReviewAlternatives()
+  await dispatch(fetchPeerReviewAlternatives())
 }
 
 export const fetchPeerReviewAlternatives: ActionCreator<

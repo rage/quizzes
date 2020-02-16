@@ -11,8 +11,13 @@ import * as loadingBars from "./loadingBars/actions"
 import * as quizActions from "./quiz/actions"
 import * as quizAnswerActions from "./quizAnswer/actions"
 import * as messageActions from "./message/actions"
+import * as receivedReviewsActions from "./receivedReviews/actions"
 import { Quiz } from "../modelTypes"
 import { QuizResponse } from "../services/quizService"
+import {
+  getPeerReviewInfo,
+  getReceivedReviews,
+} from "../services/peerReviewService"
 
 export const clearActionCreator = createAction("CLEAR")
 
@@ -76,6 +81,13 @@ export const initialize: ActionCreator<ThunkAction> = (
       return
     }
 
+    if (
+      quiz.deadline &&
+      new Date(quiz.deadline).getTime() < new Date().getTime()
+    ) {
+      dispatch(quizAnswerActions.pastDeadline())
+    }
+
     if (!quizAnswer) {
       quizAnswer = {
         quizId: quiz.id,
@@ -92,7 +104,7 @@ export const initialize: ActionCreator<ThunkAction> = (
     }
 
     dispatch(userActions.setToken(accessToken))
-    dispatch(quizAnswerActions.set(quizAnswer))
+    dispatch(quizAnswerActions.setAnswer(quizAnswer))
 
     if (
       userQuizState &&
@@ -103,7 +115,7 @@ export const initialize: ActionCreator<ThunkAction> = (
       dispatch(feedbackDisplayedActions.display())
     }
     if (userQuizState) {
-      dispatch(userActions.setQuizState(userQuizState))
+      dispatch(userActions.setUserQuizState(userQuizState))
     }
   } catch (e) {
     dispatch(messageActions.set(e.toString()))

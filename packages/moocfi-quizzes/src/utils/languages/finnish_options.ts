@@ -35,11 +35,12 @@ const finnishLabels: SingleLanguageLabels = {
     noPeerAnswersAvailableLabel: "Vertaisarvioitavia vastauksia ei saatavilla",
     chooseButtonLabel: "Valitse",
     chooseEssayInstruction: "Valitse yksi vaihtoehdoista vertaisarvoitavaksi",
-    displayPeerReview: "Tee vertaisarvio",
-    extraPeerReviewsEncouragementLabel:
-      "Olet jo antanut tarvittavan määrän vertaisarvioita. \
-         Jatka muiden töiden arviointia painamalla alhaalta - \
-          -  näin parannat oman vastauksesi todennäköisyyttä tulla vertaisarvioiduksi!",
+    chosenEssayInstruction: "Arvioi valitsemasi vastaus:",
+    displayPeerReview: "Anna   vertaisarvio",
+    giveExtraPeerReviews:
+      "Olet antanut vaaditun määrän vertaisarvioita. Antamalla lisää vertaisarvioita oma vastauksesi tulee nopeammin arvioiduksi!",
+    giveExtraPeerReviewsQuizConfirmed:
+      "Voit halutessasi antaa lisää vertaisarvioita",
     givenPeerReviewsLabel: "Vertaisarvioita annettu",
     peerReviewsCompletedInfo: "Tarvittavat vertaisarviot annettu",
     reportAsInappropriateLabel: "Ilmoita asiaton vastaus",
@@ -48,6 +49,29 @@ const finnishLabels: SingleLanguageLabels = {
     quizInvolvesNoPeerReviewsInstruction:
       "Tähän tehtävään ei liity vertaisarvioita",
     peerReviewsInfoForLoggedOutUser: "Kyselyyn liittyy vertaisarviointiosio",
+    essayQuestionAnswerTextBoxLabel: "Kirjoita arvio",
+    optionLabel: "Vaihtoehto",
+    answerRejected: "Vastauksesi on hylätty vertaisarviossa",
+    answerFlaggedAsSpam: "Vastauksesi on hylätty epäasiallisena",
+    answerConfirmed: "Läpäisit tehtävän hyväksytysti!",
+    manualReview: "Vastauksesi odottaa kurssihenkilökunnan arviota",
+  },
+  receivedPeerReviews: {
+    errorLabel:
+      "Virhe saatujen vertaisarviontien näyttämisessä. Kokeile ladata sivu uudelleen.",
+    noSupportForQuestionTypeLabel:
+      "Tämänlaista vertaisarviointikysymyksen tyyppiä ei tueta",
+    loadingLabel: "Ladataan saamiasi vertaisarvioita...",
+    noPeerReviewsReceivedlabel:
+      "Vastauksesi ei ole vielä saanut vertaisarvioita",
+    numberOfPeerReviewsText: n =>
+      `Vastauksesi on saanut ${n} arvio${n > 0 ? "ta" : "n"}.`,
+    toggleButtonExpandLabel: "Näytä kaikki saamasi vertaisarviot",
+    toggleButtonShrinkLabel: "Piilota saamasi vertaisarviot",
+    averageOfGradesLabel: "Kaikkien numeroarvosanojen keskiarvo on",
+    detailedViewLabel: "Kaikki vastauksesi saamat vertaisarviot",
+    summaryViewLabel: "Saamasi vertaisarviot:",
+    peerReviewLabel: "Vertaisarvio",
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
@@ -86,7 +110,7 @@ const finnishLabels: SingleLanguageLabels = {
     quizLabel: "Kysely",
     pointsLabel: "Pisteitä",
     triesNotLimitedLabel: "Yritysten lukumäärää ei rajattu",
-    submitGeneralFeedbackLabel: "Vastattu onnistuneesti",
+    submitGeneralFeedbackLabel: "Vastattu",
     submitButtonAlreadyAnsweredLabel: "Vastattu",
     pointsGrantingPolicyInformer: policy => {
       switch (policy) {

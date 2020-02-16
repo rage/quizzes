@@ -1,20 +1,22 @@
+import { getUUIDByString } from "@quizzes/common/util"
 import { Response } from "express"
 import JSONStream from "JSONStream"
-import { getUUIDByString } from "@quizzes/common/util"
+import _ from "lodash"
 import {
   Get,
   HeaderParam,
   JsonController,
   Param,
   Post,
-  QueryParams,
   QueryParam,
+  QueryParams,
   Res,
   UnauthorizedError,
 } from "routing-controllers"
 import AuthorizationService, {
   Permission,
 } from "services/authorization.service"
+import KafkaService from "services/kafka.service"
 import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
@@ -28,11 +30,6 @@ import validator from "validator"
 import { API_PATH } from "../../config"
 import { Quiz, QuizAnswer, UserQuizState } from "../../models"
 import { IQuizQuery, ITMCProfileDetails } from "../../types"
-import _ from "lodash"
-import KafkaService from "services/kafka.service"
-type empty = ""
-
-type nonemptystring = Exclude<string, empty>
 
 @JsonController(`${API_PATH}/quizzes`)
 export class QuizController {
@@ -124,9 +121,7 @@ export class QuizController {
           stripped = false
         }
 
-        if (answer.status === "submitted" || answer.status === "confirmed") {
-          quizAnswer = answer
-        }
+        quizAnswer = answer
       }
 
       const quizzes: Quiz[] = await this.quizService.getQuizzes({
@@ -306,7 +301,7 @@ export class QuizController {
   }
 
   @Post("/")
-  public async post(
+  public async saveQuiz(
     @EntityFromBody() quiz: Quiz,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<Quiz> {
@@ -319,10 +314,9 @@ export class QuizController {
     if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
-
-    const upsertedQuiz = await this.quizService.createQuiz(quiz)
+    const savedQuiz = await this.quizService.saveQuiz(quiz)
     this.kafkaService.publishCourseQuizzesUpdated(quiz.courseId)
-    return upsertedQuiz
+    return savedQuiz
   }
 
   private async getQuizzes(id: string | null, params: any): Promise<Quiz[]> {

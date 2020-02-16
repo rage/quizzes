@@ -53,8 +53,10 @@ export type PeerReviewLabels = {
   noPeerAnswersAvailableLabel: string
   chooseButtonLabel: string
   chooseEssayInstruction: string
+  chosenEssayInstruction: string
   displayPeerReview: string
-  extraPeerReviewsEncouragementLabel: string
+  giveExtraPeerReviews: string
+  giveExtraPeerReviewsQuizConfirmed: string
   givenPeerReviewsLabel: string
   peerReviewsCompletedInfo: string
   reportAsInappropriateLabel: string
@@ -63,6 +65,26 @@ export type PeerReviewLabels = {
   loadingLabel: string
   quizInvolvesNoPeerReviewsInstruction: string
   peerReviewsInfoForLoggedOutUser: string
+  essayQuestionAnswerTextBoxLabel: string
+  optionLabel: string
+  answerRejected: string
+  answerFlaggedAsSpam: string
+  answerConfirmed: string
+  manualReview: string
+}
+
+export type ReceivedPeerReviewLabels = {
+  loadingLabel: string
+  errorLabel: string
+  noPeerReviewsReceivedlabel: string
+  toggleButtonExpandLabel: string
+  toggleButtonShrinkLabel: string
+  numberOfPeerReviewsText: (n: number) => string
+  averageOfGradesLabel: string
+  noSupportForQuestionTypeLabel: string
+  detailedViewLabel: string
+  summaryViewLabel: string
+  peerReviewLabel: string
 }
 
 export type UnsupportedLabels = {
@@ -84,6 +106,7 @@ export type SingleLanguageLabels = {
   multipleChoice: MultipleChoiceLabels
   stage: StageLabels
   general: GeneralLabels
+  receivedPeerReviews: ReceivedPeerReviewLabels
 }
 
 export type LanguageLabels = {

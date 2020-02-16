@@ -95,22 +95,22 @@ const PeerReview = ({
             </Typography>
           </Grid>
 
-          {peerReviewAnswer.answers.map((answer, answerIdx) => {
+          {peerReviewQuestions.questions.map(question => {
+            const answer = peerReviewAnswer.answers.find(
+              pra => pra.peerReviewQuestionId === question.id,
+            )
+
             return (
-              <React.Fragment key={answerIdx}>
-                <Grid item={true} xs={12}>
-                  <PeerReviewQuestionAnswer
-                    type={peerReviewQuestions.questions[answerIdx].type}
-                    questionAnswer={answer}
-                    title={
-                      peerReviewQuestions.questions[answerIdx].texts[0].title ||
-                      (peerReviewQuestions.questions[answerIdx].type === "essay"
-                        ? "Written review"
-                        : "No title")
-                    }
-                  />
-                </Grid>
-              </React.Fragment>
+              <Grid item={true} xs={12} key={question.id}>
+                <PeerReviewQuestionAnswer
+                  type={question.type}
+                  questionAnswer={answer}
+                  title={
+                    question.texts[0].title ||
+                    (question.type === "essay" ? "Written review" : "No title")
+                  }
+                />
+              </Grid>
             )
           })}
         </Grid>

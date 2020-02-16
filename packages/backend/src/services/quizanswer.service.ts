@@ -1,6 +1,6 @@
-import knex from "knex"
+import Knex from "knex"
 import { Inject, Service } from "typedi"
-import { EntityManager, SelectQueryBuilder } from "typeorm"
+import { EntityManager, SelectQueryBuilder, EntityRepository } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import validator from "validator"
 import {
@@ -12,13 +12,21 @@ import {
   SpamFlag,
   UserQuizState,
 } from "../models"
-import { IQuizAnswerQuery } from "../types"
+import { AnsweredQuiz, IQuizAnswerQuery } from "../types"
 import { WhereBuilder } from "../util/index"
+
+// tslint:disable-next-line:max-line-length
+// import PlainObjectToDatabaseEntityTransformer from "../../../../node_modules/typeorm/query-builder/transformer/PlainObjectToDatabaseEntityTransformer"
+
+// tslint:disable-next-line:max-line-length
+import { PlainObjectToDatabaseEntityTransformer } from "typeorm/query-builder/transformer/PlainObjectToDatabaseEntityTransformer"
 
 @Service()
 export default class QuizAnswerService {
   @InjectManager()
   private entityManager: EntityManager
+
+  private knex = Knex({ client: "pg" })
 
   public async createQuizAnswer(
     manager: EntityManager,
@@ -93,6 +101,62 @@ export default class QuizAnswerService {
     return result
   }
 
+  public async getLatestAnswersForQuiz(quiz: Quiz, manager?: EntityManager) {
+    const entityManager = manager || this.entityManager
+
+    const latest = this.knex
+      .select("id")
+      .select(
+        this.knex.raw(
+          "row_number() over(partition by user_id, quiz_id order by created_at desc) rn",
+        ),
+      )
+      .from("quiz_answer")
+      .where({ quiz_id: quiz.id })
+      .as("latest")
+
+    const query = this.knex
+      .select("id")
+      .from(latest)
+      .where("rn", 1)
+
+    const result = await entityManager.query(query.toString())
+
+    const ids = result.map((qa: any) => qa.id)
+
+    return await entityManager
+      .createQueryBuilder(QuizAnswer, "quiz_answer")
+      .where("quiz_answer.id in (:...ids)", { ids })
+      .getMany()
+  }
+
+  public async getAnswered(
+    courseId: string,
+    userId: number,
+  ): Promise<AnsweredQuiz[]> {
+    const query = this.knex.raw(
+      `select
+          q.id as quiz_id,
+          coalesce(uqs.tries > 0, false) as answered,
+          coalesce(uqs.points_awarded > 0, false) as correct
+        from quiz q
+        left join (
+          select
+            quiz_id,
+            tries,
+            points_awarded
+          from user_quiz_state
+          where user_id = :userId
+        ) uqs
+          on q.id = uqs.quiz_id
+        where q.course_id = :courseId
+        `,
+      { courseId, userId },
+    )
+
+    return await this.entityManager.query(query.toString())
+  }
+
   public async getAnswersCount(query: IQuizAnswerQuery): Promise<any> {
     const someQuery = await this.constructGetAnswersQuery(query)
 
@@ -124,7 +188,7 @@ export default class QuizAnswerService {
       return {}
     }
 
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     const query = builder("quiz_answer")
       .select(
@@ -161,7 +225,7 @@ export default class QuizAnswerService {
   }
 
   public async getPlainItemAnswers(quizId: string): Promise<any> {
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     const query = builder("quiz_item")
       .where("quiz_item.quiz_id", quizId)
@@ -190,7 +254,7 @@ export default class QuizAnswerService {
   }
 
   public async getPlainOptionAnswers(quizId: string): Promise<any> {
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     const query = builder("quiz_item")
       .where("quiz_item.quiz_id", quizId)
@@ -222,12 +286,7 @@ export default class QuizAnswerService {
       return {}
     }
 
-    const quizItemTypes = (await QuizItem.createQueryBuilder("quiz_item")
-      .select("quiz_item.type")
-      .where("quiz_id = :id", { id: quizId })
-      .getRawMany()).map(value => value.quiz_item_type)
-
-    const builder = knex({ client: "pg" })
+    const builder = Knex({ client: "pg" })
 
     let query = builder("quiz_answer")
       .select({ answer_id: "quiz_answer.id" }, "quiz_answer.user_id", "status")
@@ -240,62 +299,29 @@ export default class QuizAnswerService {
       .innerJoin("quiz_item", "quiz_item.id", "quiz_item_answer.quiz_item_id")
       .select({ quiz_item_id: "quiz_item.id" }, "quiz_item.type")
 
-    let selectedFields: string[] = []
-
-    if (
-      quizItemTypes.some(
-        type =>
-          type === "multiple-choice" ||
-          type === "checkbox" ||
-          type === "research-agreement",
+    let selectedFields: string[] = ["text_data", "int_data", "correct"]
+    query = query
+      .leftJoin(
+        "quiz_option_answer",
+        "quiz_option_answer.quiz_item_answer_id",
+        "quiz_item_answer.id",
       )
-    ) {
-      query = query
-        .leftJoin(
-          "quiz_option_answer",
-          "quiz_option_answer.quiz_item_answer_id",
-          "quiz_item_answer.id",
-        )
-
-        .innerJoin(
-          "quiz_option",
-          "quiz_option.id",
-          "quiz_option_answer.quiz_option_id",
-        )
-
-        .innerJoin(
-          "quiz_option_translation",
-          "quiz_option_translation.quiz_option_id",
-          "quiz_option.id",
-        )
-
-        .select(
-          "quiz_option_answer.quiz_option_id",
-          "quiz_option_translation.language_id",
-          "quiz_option_translation.title",
-          "quiz_option_translation.body",
-        )
-
-      selectedFields.push("correct")
-    } else if (
-      quizItemTypes.length === 1 ||
-      quizItemTypes.every(type => type === quizItemTypes[0])
-    ) {
-      switch (quizItemTypes[0]) {
-        case "open":
-          selectedFields.push("correct")
-        case "essay":
-          selectedFields.push("text_data")
-          break
-        case "scale":
-          selectedFields.push("int_data")
-          break
-        default:
-          selectedFields = ["text_data", "int_data", "correct"]
-      }
-    } else {
-      selectedFields = ["text_data", "int_data", "correct"]
-    }
+      .leftJoin(
+        "quiz_option",
+        "quiz_option.id",
+        "quiz_option_answer.quiz_option_id",
+      )
+      .leftJoin(
+        "quiz_option_translation",
+        "quiz_option_translation.quiz_option_id",
+        "quiz_option.id",
+      )
+      .select(
+        "quiz_option_answer.quiz_option_id",
+        "quiz_option_translation.language_id",
+        "quiz_option_translation.title",
+        "quiz_option_translation.body",
+      )
 
     query = query.select(
       ...selectedFields.map(field => `quiz_item_answer.${field}`),

@@ -43,6 +43,8 @@ export class Course extends BaseEntity {
   public minReviewAverage: number
   @Column({ type: "int", nullable: true })
   public maxSpamFlags: number
+  @Column({ type: "uuid", nullable: true })
+  public moocfiId: string
 
   @OneToMany(type => CourseTranslation, ct => ct.course, {
     eager: true,

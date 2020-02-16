@@ -37,7 +37,7 @@ export class UserCourseRoleController {
       return result
     } catch (e) {
       console.log(e)
-      throw new Error("Thewe was someting wrong:")
+      throw new Error("There was someting wrong")
     }
   }
 }
