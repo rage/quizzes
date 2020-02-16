@@ -1,9 +1,9 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: refresh-reaktor-view
+  name: update-quiz-item-answer-correct
 spec:
-  schedule: "55 0 * * *"
+  schedule: "28 * * * *"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
@@ -12,9 +12,9 @@ spec:
         spec:
           restartPolicy: OnFailure
           containers:
-            - name: refresh-reaktor-view
+            - name: update-quiz-item-answer-correct
               image: ${BACKEND_IMAGE}
-              command: ["sh", "-c", "cd /app && yarn refresh-reaktor-view"]
+              command: ["sh", "-c", "cd /app && yarn update-quiz-item-answer-correct"]
               resources:
                 requests:
                   memory: "1000Mi"

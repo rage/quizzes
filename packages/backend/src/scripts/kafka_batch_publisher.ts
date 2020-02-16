@@ -1,5 +1,5 @@
 import * as Kafka from "node-rdkafka"
-import knex from "../config/knex"
+import { quizzes as knex } from "../config/knex"
 
 import { promisify } from "util"
 
