@@ -7,7 +7,6 @@ import { addItem, addReview, changeOrder, remove } from "../store/edit/actions"
 import ItemContainer from "./ItemContainer"
 import PeerReviewCollectionContainer from "./PeerReviewCollectionContainer"
 import QuestionAdder from "./QuizQuestionAdder"
-import { quizContentsDiffer } from "./tools"
 
 interface ITabContainerProps {
   items: IQuizItem[]
