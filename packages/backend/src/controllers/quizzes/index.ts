@@ -49,6 +49,9 @@ export class QuizController {
 
   @Get("/")
   public async getAll(@QueryParams() params: string[]): Promise<Quiz[]> {
+    if (!user.administrator) {
+      throw new UnauthorizedError("unauthorized")
+    }
     return await this.getQuizzes(null, params)
   }
 
