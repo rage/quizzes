@@ -39,7 +39,6 @@ class TabContainer extends Component<any, ITabContainerState> {
       justAdded: false,
       expandedItems: {},
     }
-    console.log("Props: ", props)
   }
   public scrollToNewItem = (itemComponent: HTMLInputElement) => {
     if (!itemComponent) {

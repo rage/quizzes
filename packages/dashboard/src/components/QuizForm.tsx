@@ -41,33 +41,18 @@ interface IQuizFormProps {
 }
 
 class QuizForm extends React.Component<IQuizFormProps, any> {
-  constructor(props) {
-    super(props)
-    this.state = {
-      notifyOfUnsavedState: false,
-    }
-  }
-
   public componentDidMount() {
     if (this.props.quiz) {
       this.props.setEdit(this.props.quiz)
       this.props.setQuiz(this.props.quiz.id)
     } else if (this.props.new) {
       this.props.newQuiz()
-      this.setState({
-        notifyOfUnsavedState: true,
-      })
     }
   }
 
   public componentDidUpdate(prevProps, prevState) {
     if (!prevProps.edit.id && this.props.edit.id) {
-      this.setState({
-        notifyOfUnsavedState: false,
-      })
       this.props.history.push(`/quizzes/${this.props.edit.id}`)
-    } else if (this.props.edit.id) {
-      this.checkIfUnsaved()
     }
   }
 
@@ -77,10 +62,7 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
         <Grid item={true} xs={12} sm={10} lg={8}>
           <QuizInfo quizTexts={this.props.edit.texts[0]} />
 
-          <Prompt
-            when={this.state.notifyOfUnsavedState}
-            message="There are unsaved changes on the page. Are you sure you wish to exit?"
-          />
+          <Prompt message={this.checker} />
           {this.props.edit.course.languages.map(
             (l, i) =>
               this.props.filter.language === l.id && (
@@ -115,13 +97,22 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
     scrollTo(0, 0)
     // for saving a quiz for the first time, wait before the url is modified in componentDidUpdate
     // await
-    this.setState({
-      notifyOfUnsavedState: false,
-    })
     this.props.save()
   }
 
-  private checkIfUnsaved = () => {
+  private checker = location => {
+    if (location.pathname !== this.props.history.location.pathname) {
+      if (this.props.new && location.pathname.includes("/quizzes/")) {
+        return true
+      }
+
+      if (this.shouldPromptUser()) {
+        return "There are unsaved changes on the page. Are you sure you want to exit?"
+      }
+    }
+  }
+
+  private shouldPromptUser = () => {
     const savedQuizInfo = this.props.courseInfos
       .find(ci => ci.courseId === this.props.filter.course)
       .quizzes.find(q => q.id === this.props.filter.quiz)
@@ -129,12 +120,7 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
     const editInfo = this.props.edit
 
     const unsaved = quizContentsDiffer(editInfo as IQuiz, savedQuizInfo)
-
-    if (unsaved !== this.state.notifyOfUnsavedState) {
-      this.setState({
-        notifyOfUnsavedState: unsaved,
-      })
-    }
+    return unsaved
   }
 
   private handleChange = path => event => {
