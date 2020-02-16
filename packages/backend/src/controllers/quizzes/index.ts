@@ -48,7 +48,10 @@ export class QuizController {
   private kafkaService: KafkaService
 
   @Get("/")
-  public async getAll(@QueryParams() params: string[]): Promise<Quiz[]> {
+  public async getAll(
+    @QueryParams() params: string[],
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ): Promise<Quiz[]> {
     if (!user.administrator) {
       throw new UnauthorizedError("unauthorized")
     }
