@@ -54,20 +54,20 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
       this.props.setQuiz(this.props.quiz.id)
     } else if (this.props.new) {
       this.props.newQuiz()
+      this.setState({
+        notifyOfUnsavedState: true,
+      })
     }
   }
 
   public componentDidUpdate(prevProps, prevState) {
-    if (
-      prevProps &&
-      this.props.history.location.pathname ===
-        prevProps.history.location.pathname
-    ) {
-      console.log("checking..")
-      this.checkIfUnsaved()
-    }
     if (!prevProps.edit.id && this.props.edit.id) {
+      this.setState({
+        notifyOfUnsavedState: false,
+      })
       this.props.history.push(`/quizzes/${this.props.edit.id}`)
+    } else if (this.props.edit.id) {
+      this.checkIfUnsaved()
     }
   }
 
@@ -115,10 +115,10 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
     scrollTo(0, 0)
     // for saving a quiz for the first time, wait before the url is modified in componentDidUpdate
     // await
-    this.props.save()
     this.setState({
       notifyOfUnsavedState: false,
     })
+    this.props.save()
   }
 
   private checkIfUnsaved = () => {
