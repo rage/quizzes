@@ -168,7 +168,7 @@ const publishQuizzes = async (course: ICourse): Promise<IQuiz[]> => {
     }
 
     producer.produce("exercise", null, Buffer.from(JSON.stringify(message)))
-    await flush(1000)
+    await flush(10000)
 
     console.log(`published ${quizzes.length} quizzes`)
 
@@ -260,7 +260,7 @@ const publishAnswers = async (course: ICourse) => {
         null,
         Buffer.from(JSON.stringify(message)),
       )
-      await flush(1000)
+      await flush(10000)
     }
 
     console.log(`published ${answers.length} answers`)
@@ -327,7 +327,7 @@ const publishProgress = async (course: ICourse, quizzes: any[]) => {
         null,
         Buffer.from(JSON.stringify(message)),
       )
-      await flush(1000)
+      await flush(10000)
     }
 
     console.log(`published progress for ${groupedByUser.length} users`)
