@@ -21,7 +21,7 @@ const flush = promisify(producer.flush.bind(producer))
 const publish = async () => {
   console.time("done in")
   try {
-    const tasks = await knex<IKafkaTask>("kafka_task").orderBy(knex.raw("RANDOM()"))
+    const tasks = await knex<IKafkaTask>("kafka_task").orderBy("created_at")
 
     console.log(new Date())
     console.log(
