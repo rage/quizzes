@@ -21,7 +21,7 @@ const flush = promisify(producer.flush.bind(producer))
 const publish = async () => {
   console.time("done in")
   try {
-    const tasks = await knex<IKafkaTask>("kafka_task").orderBy("created_at")
+    const tasks = await knex<IKafkaTask>("kafka_task").orderBy(knex.raw('RANDOM()'))
 
     console.log(new Date())
     console.log(
@@ -51,11 +51,11 @@ const publish = async () => {
         console.log("publishing quizzes")
         const quizzes = await publishQuizzes(course)
 
-        console.log("publishing answers")
-        await publishAnswers(course)
-
         console.log("publishing progress")
         await publishProgress(course, quizzes)
+
+        console.log("publishing answers")
+        await publishAnswers(course)
       }
 
       console.log("removing task from database")
