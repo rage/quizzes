@@ -50,8 +50,8 @@ const StageVisualizer = (props: any) => {
       alternativeLabel
       providedStyles={themeProvider.stepperStyles}
     >
-      {steps.map(label => (
-        <Step key={label}>
+      {steps.map((label,index) => (
+        <Step key={label} aria-current={activeStep == index}>
           <StepLabel>{label}</StepLabel>
         </Step>
       ))}

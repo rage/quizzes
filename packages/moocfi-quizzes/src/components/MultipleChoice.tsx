@@ -194,10 +194,8 @@ type ItemInformationProps = {
 }
 
 const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
-  questionWidth,
   onlyOneItem,
   item,
-  itemAnswer,
 }) => {
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
 
@@ -314,6 +312,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
           correct={false}
           onClick={handleOptionChange(option.id)}
           disabled={quizDisabled}
+          aria-selected={optionIsSelected}
         >
           <MarkdownText Component={styled.div``} removeParagraphs>
             {text.title}
@@ -341,6 +340,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             selected={!!optionIsSelected}
             correct={option.correct}
             {...clickOptions}
+            aria-selected={optionIsSelected}
           >
             <MarkdownText Component={styled.div``} removeParagraphs>
               {text.title}
@@ -371,6 +371,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
           selected={!!optionIsSelected}
           correct={option.correct}
           {...clickOptions}
+          aria-selected={optionIsSelected}
         >
           <MarkdownText Component={styled.div``} removeParagraphs>
             {text.title}

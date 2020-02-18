@@ -125,6 +125,8 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
         rows={10}
         margin="normal"
         providedStyles={themeProvider.answerFieldStyles}
+        id="essay-text-field"
+        
       />
       <div>
         <Typography>

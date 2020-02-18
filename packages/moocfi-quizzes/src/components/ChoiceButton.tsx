@@ -66,6 +66,7 @@ const RevealedChoiceButton = styled(
         selected={selected}
         fullWidth
         {...others}
+        aria-label={correct ? "correct-answer" : "wrong-answer"}
       >
         {selected ? correct ? <SuccessIcon /> : <FailureIcon /> : ""}
         {others.children}

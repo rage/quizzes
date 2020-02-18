@@ -9,7 +9,7 @@ interface IMarkdownTextProps extends TypographyProps {
   children: string
   text?: string
   Component?: any
-  removeParagraphs?: boolean
+  removeParagraphs?: boolean,
 }
 
 const MarkdownText: React.FunctionComponent<IMarkdownTextProps> = ({
