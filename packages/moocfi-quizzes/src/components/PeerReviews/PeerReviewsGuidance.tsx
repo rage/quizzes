@@ -19,10 +19,10 @@ const PeerReviewsGuidance: React.FunctionComponent<
 
   return (
     <div>
-      <SpaciousTypography variant="subtitle1">
+      <SpaciousTypography component="p" variant="subtitle1">
         {givenLabel}: {given}/{required}
       </SpaciousTypography>
-      <MarkdownText variant="subtitle1">{guidanceText}</MarkdownText>
+      <MarkdownText component="p" variant="subtitle1">{guidanceText}</MarkdownText>
     </div>
   )
 }

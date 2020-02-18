@@ -37,7 +37,7 @@ const PeerReviews: React.FunctionComponent = () => {
 
   if (quizDisabled) {
     return (
-      <Typography variant="subtitle1">
+      <Typography component="p" variant="subtitle1">
         {languageInfo.peerReviews.peerReviewsInfoForLoggedOutUser}
       </Typography>
     )
@@ -60,7 +60,7 @@ const PeerReviews: React.FunctionComponent = () => {
 
   if (peerReviewQuestions.length === 0) {
     return (
-      <Typography variant="subtitle1">
+      <Typography component="p" variant="subtitle1">
         {peerReviewsLabels.quizInvolvesNoPeerReviewsInstruction}
       </Typography>
     )
@@ -84,7 +84,7 @@ const PeerReviews: React.FunctionComponent = () => {
           )
         : !pastDeadline && (
             <>
-              <BoldTypography variant="subtitle1">
+              <BoldTypography component="p" variant="subtitle1">
                 {giveExtraPeerReviewsLabel}
               </BoldTypography>
               <Togglable

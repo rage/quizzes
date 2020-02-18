@@ -100,7 +100,7 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
 
   const answerPortion = !possibleToSubmit ? (
     <>
-      <Typography variant="subtitle1">
+      <Typography component="p" variant="subtitle1">
         {essayLabels.userAnswerLabel + ": "}
       </Typography>
       <AnswerPaper providedStyles={themeProvider.answerPaperStyles}>
@@ -143,7 +143,7 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
   return (
     <ItemContent providedStyles={themeProvider.essayItemContentStyles}>
       {itemTitle && (
-        <MarkdownText Component={Typography} variant="h6">
+        <MarkdownText component="p" Component={Typography} variant="h6">
           {itemTitle}
         </MarkdownText>
       )}

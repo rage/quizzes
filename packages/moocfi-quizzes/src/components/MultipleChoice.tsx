@@ -228,8 +228,9 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
           Component={SpaciousTypography}
           removeParagraphs
           variant="subtitle1"
+          component="p"
         >
-          {title}
+          {title} 
         </LeftAlignedMarkdownText>
       )}
 

@@ -192,10 +192,10 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
           <FontAwesomeIcon icon={faQuestionCircle} />
         )}
       </IconContainer>
-      <TitleContainer>
-        <Typography variant="subtitle1">{quizLabel}:</Typography>
+      <TitleContainer role="heading">
+        <Typography  component="p" variant="subtitle1" id="quiz-type-label">{quizLabel}:</Typography>
         {quiz ? (
-          <Typography variant="h5">{title}</Typography>
+          <Typography variant="h5" component="h2" aria-describedby="quiz-type-label">{title}</Typography>
         ) : (
           titleReplacement
         )}

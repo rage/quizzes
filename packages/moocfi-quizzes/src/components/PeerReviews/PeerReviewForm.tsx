@@ -98,7 +98,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 
       {answersToReview.map((answer, idx) => (
         <TopMarginDiv key={answer.id}>
-          <Typography variant="subtitle1">
+          <Typography component="p" variant="subtitle1">
             {`${languageInfo.optionLabel} ${idx + 1}:`}
           </Typography>
           <PeerReviewOption answer={answer} />
@@ -237,7 +237,7 @@ const TextualPeerReviewFeedback: React.FunctionComponent<
 
   return (
     <StyledReviewEssayQuestion>
-      <MarkdownText Component={BoldTypography} variant="subtitle1">
+      <MarkdownText component="p" Component={BoldTypography} variant="subtitle1">
         {questionTexts.title}
       </MarkdownText>
 

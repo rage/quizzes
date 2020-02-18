@@ -133,7 +133,7 @@ const ReceivedReviewsSummary: React.FunctionComponent<
     <div style={{ margin: "1rem 0" }}>
       <BoldTypography>{receivedReviewsLabels.summaryViewLabel}</BoldTypography>
       {peerReviews.length === 0 ? (
-        <Typography variant="subtitle1">
+        <Typography component="p" variant="subtitle1">
           {receivedReviewsLabels.noPeerReviewsReceivedlabel}
         </Typography>
       ) : (

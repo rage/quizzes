@@ -69,7 +69,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
 
   const guidance = (
     <>
-      <MarkdownText variant="h6">{itemTitle}</MarkdownText>
+      <MarkdownText component="p" variant="h6">{itemTitle}</MarkdownText>
       <MarkdownText variant="body1">{item.texts[0].body}</MarkdownText>
     </>
   )

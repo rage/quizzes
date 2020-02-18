@@ -64,7 +64,7 @@ const ResultInformation: React.FunctionComponent<ResultInformationProps> = ({
           )
   }
 
-  return <Typography variant="h5">{feedback}</Typography>
+  return <Typography component="p" variant="h5">{feedback}</Typography>
 }
 
 export default ResultInformation
