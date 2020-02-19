@@ -2,7 +2,8 @@ import { Button, CircularProgress } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
 import * as XLSX from "xlsx"
-import { Quiz } from "../../../../common/src/models"
+import { IQuiz } from "../../interfaces"
+import { IUserState } from "../../store/user/reducer"
 
 class DownloadButton extends React.Component<
   {
@@ -10,8 +11,8 @@ class DownloadButton extends React.Component<
     service: (qId: any, user: any) => Promise<any>
     filenameEnd: string
     fileFormat?: string
-    quiz: Quiz
-    user: any
+    quiz: IQuiz
+    user: IUserState
   },
   { downloading: boolean; processing: boolean }
 > {

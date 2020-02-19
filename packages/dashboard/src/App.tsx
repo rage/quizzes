@@ -19,6 +19,7 @@ import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
 import QuizStatistics from "./components/Answers/QuizStatistics"
 import CoursesView from "./components/CoursesView"
 import QuizForm from "./components/QuizForm"
+import RolesView from "./components/RolesView"
 import SingleCourseView from "./components/SingleCourseView"
 import SuccessNotification from "./components/SuccessNotification"
 import { setAnswerCounts } from "./store/answerCounts/actions"
@@ -28,16 +29,17 @@ import { setCourse, setLanguage, setQuiz } from "./store/filter/actions"
 import { displayMessage } from "./store/notification/actions"
 import { setQuizzesByQuizId } from "./store/quizzes/actions"
 import { addUser, removeUser } from "./store/user/actions"
+import { InitializationStatus, IUserState } from "./store/user/reducer"
 
 class App extends React.Component<any, any> {
   public async componentDidMount() {
     const user = TMCApi.checkStore()
+
     if (user) {
       const profile = await TMCApi.getProfile(user.accessToken)
-      if ((profile as ITMCProfileDetails).administrator) {
-        this.props.addUser(user)
-        this.props.setCourses()
-        this.props.setAnswerCounts()
+      if (profile.id) {
+        // (profile as ITMCProfileDetails).administrator) {
+        this.props.addUser(user, profile.administrator)
       }
     }
   }
@@ -98,12 +100,18 @@ class App extends React.Component<any, any> {
       )
     }
 
+    if (
+      this.props.user.initializationStatus === InitializationStatus.INITIALIZING
+    ) {
+      return <div>Logging in...</div>
+    }
+
     return (
       <div style={{ paddingLeft: 50, paddingRight: 50 }}>
         <Router>
           <React.Fragment>
             <SuccessNotification />
-            {this.props.user ? (
+            {this.props.user.accessToken ? (
               <div>
                 <div>
                   <AppBar
@@ -120,7 +128,7 @@ class App extends React.Component<any, any> {
                         alignItems="center"
                         spacing={8}
                       >
-                        <Grid item={true} xs={12} sm={9} md={10}>
+                        <Grid item={true} xs={12} sm={6}>
                           <Grid
                             container={true}
                             justify="flex-start"
@@ -134,27 +142,61 @@ class App extends React.Component<any, any> {
                           </Grid>
                         </Grid>
 
-                        <Grid item={true} xs={12} sm="auto">
-                          {developmentEnvironment && (
-                            <SvgIcon
-                              style={{
-                                maxWidth: "34%",
-                                verticalAlign: "middle",
-                                marginRight: "10px",
-                              }}
-                            >
-                              <Build />
-                            </SvgIcon>
-                          )}
-                          <Button
-                            color="inherit"
-                            onClick={this.logout}
-                            style={{
-                              maxWidth: developmentEnvironment ? "66%" : "100%",
-                            }}
+                        <Grid item={true} xs={12} sm={6}>
+                          <Grid
+                            container={true}
+                            justify="flex-end"
+                            alignItems="center"
+                            spacing={16}
                           >
-                            logout
-                          </Button>
+                            {developmentEnvironment && (
+                              <Grid item={true}>
+                                <SvgIcon
+                                  style={{
+                                    verticalAlign: "middle",
+                                  }}
+                                >
+                                  <Build />
+                                </SvgIcon>
+                              </Grid>
+                            )}
+                            <Grid item={true}>
+                              <Link
+                                to="/roles"
+                                style={{
+                                  textDecoration: "none",
+                                  maxWidth: developmentEnvironment
+                                    ? "33%"
+                                    : "50%",
+                                }}
+                              >
+                                <Typography
+                                  align="center"
+                                  style={{
+                                    color: "#FFFFFF",
+                                    display: "inline",
+                                  }}
+                                  variant="subtitle1"
+                                >
+                                  My roles
+                                </Typography>
+                              </Link>
+                            </Grid>
+
+                            <Grid>
+                              <Button
+                                color="inherit"
+                                onClick={this.logout}
+                                style={{
+                                  maxWidth: developmentEnvironment
+                                    ? "33%"
+                                    : "50%",
+                                }}
+                              >
+                                logout
+                              </Button>
+                            </Grid>
+                          </Grid>
                         </Grid>
                       </Grid>
                     </Toolbar>
@@ -167,6 +209,7 @@ class App extends React.Component<any, any> {
                 <Route exact={true} path="/quizzes/:id" component={this.edit} />
                 <Route exact={true} path="/new" component={this.create} />
                 <Route exact={true} path="/courses" component={CoursesView} />
+                <Route exact={true} path="/roles" component={RolesView} />
                 <Route
                   exact={true}
                   path="/courses/:id"
@@ -327,11 +370,9 @@ class App extends React.Component<any, any> {
       })
       const accessToken = user.accessToken
       const profile = await TMCApi.getProfile(accessToken)
-      if ((profile as ITMCProfileDetails).administrator) {
-        this.props.addUser(user)
-        this.props.setCourses()
+      if ((profile as ITMCProfileDetails).id) {
+        this.props.addUser(user, profile.administrator, true)
       }
-      this.props.displayMessage(`Welcome ${user.username}!`, false)
     } catch (exception) {
       console.log(exception)
       this.props.displayMessage("Login failed", true)
@@ -360,7 +401,7 @@ interface IStateProps {
   filter: any
   quizzesOfCourse: any
   quizzesByCourses: any[]
-  user: ITMCProfile
+  user: IUserState
 }
 
 const mapStateToProps = (state: any) => {

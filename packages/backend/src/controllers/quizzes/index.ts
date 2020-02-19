@@ -1,20 +1,26 @@
+import { getUUIDByString } from "@quizzes/common/util"
 import { Response } from "express"
 import JSONStream from "JSONStream"
-import { getUUIDByString } from "@quizzes/common/util"
+import _ from "lodash"
 import {
   Get,
   HeaderParam,
   JsonController,
   Param,
   Post,
-  QueryParams,
   QueryParam,
+  QueryParams,
   Res,
   UnauthorizedError,
 } from "routing-controllers"
+import AuthorizationService, {
+  Permission,
+} from "services/authorization.service"
+import KafkaService from "services/kafka.service"
 import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
+import UserCourseRoleService from "services/usercourserole.service"
 import UserQuizStateService from "services/userquizstate.service"
 import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
@@ -24,13 +30,14 @@ import validator from "validator"
 import { API_PATH } from "../../config"
 import { Quiz, QuizAnswer, UserQuizState } from "../../models"
 import { IQuizQuery, ITMCProfileDetails } from "../../types"
-import _ from "lodash"
-import KafkaService from "services/kafka.service"
 
 @JsonController(`${API_PATH}/quizzes`)
 export class QuizController {
   @InjectManager()
   private entityManager: EntityManager
+
+  @Inject()
+  private authorizationService: AuthorizationService
 
   @Inject()
   private peerReviewService: PeerReviewService
@@ -45,6 +52,9 @@ export class QuizController {
   private userQuizStateService: UserQuizStateService
 
   @Inject()
+  private userCourseRoleService: UserCourseRoleService
+
+  @Inject()
   private kafkaService: KafkaService
 
   @Get("/")
@@ -52,13 +62,29 @@ export class QuizController {
     @QueryParams() params: string[],
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<Quiz[]> {
-    if (!user.administrator) {
+    const paramsObj: any = params
+    let authorized = user.administrator
+
+    if (!authorized && paramsObj.course === "true") {
+      const courseId = paramsObj.courseId
+
+      authorized = await this.authorizationService.isPermitted({
+        user,
+        courseId,
+        permission: Permission.VIEW,
+      })
+    }
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
+
     return await this.getQuizzes(null, params)
   }
 
-  @Get("/:id")
+  @Get(
+    "/:id([0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-4[0-9A-Fa-f]{3}-[89ABab][0-9A-Fa-f]{3}-[0-9A-Fa-f]{12})",
+  )
   public async get(
     @Param("id") id: string,
     @QueryParams() params: any,
@@ -172,7 +198,13 @@ export class QuizController {
     @Param("id") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 
@@ -186,7 +218,13 @@ export class QuizController {
     @Param("id") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 
@@ -201,7 +239,13 @@ export class QuizController {
     @Param("id") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 
@@ -215,7 +259,13 @@ export class QuizController {
     @Param("id") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 
@@ -232,7 +282,13 @@ export class QuizController {
     @Param("id") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 
@@ -250,7 +306,13 @@ export class QuizController {
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @Res() response: Response,
   ): Promise<any> {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 
@@ -263,7 +325,13 @@ export class QuizController {
     @EntityFromBody() quiz: Quiz,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<Quiz> {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      courseId: quiz.courseId,
+      permission: Permission.MODIFY,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
     const savedQuiz = await this.quizService.saveQuiz(quiz)
