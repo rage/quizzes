@@ -9,7 +9,9 @@ import {
   PeerReviewQuestionTranslation,
   PeerReviewCollection,
   PeerReviewCollectionTranslation,
+  UserCourseRole,
 } from "../models"
+import { Permission } from "services/authorization.service"
 
 export class ITMCProfile {
   username: string
@@ -77,12 +79,14 @@ export interface IQuizAnswerQuery {
   quizRequiresPeerReviews?: boolean
   skip?: number
   limit?: number
+  user?: ITMCProfileDetails
 }
 
 interface ICourseQuery {
   language?: string
   id?: string
   attentionAnswers?: boolean
+  user?: ITMCProfileDetails
 }
 
 export interface INewQuizQuery {
@@ -235,6 +239,13 @@ export interface ExerciseData {
   deleted: boolean
 }
 
+export interface IAuthorizationQuery {
+  user: ITMCProfileDetails
+  answerId?: string
+  courseId?: string
+  quizId?: string
+  permission: Permission
+}
 export interface QuizValidation {
   badWordLimit: boolean
   maxPointsAltered: boolean

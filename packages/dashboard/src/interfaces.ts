@@ -2,6 +2,8 @@ export type MiscEvent = React.FormEvent<
   HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
 >
 
+export type UserCourseRoleType = "administrator" | "assistant" | "teacher"
+
 export type QuizItemType =
   | "essay"
   | "multiple-choice"
@@ -22,6 +24,12 @@ export interface IQuizText {
   title: string
   body: string
   submitMessage: string
+}
+
+export interface IUserCourseRole {
+  role: UserCourseRoleType
+  courseId: string
+  courseTitle: string
 }
 
 export interface IQuiz {

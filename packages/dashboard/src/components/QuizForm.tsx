@@ -16,7 +16,7 @@ import {
 import { IEditState } from "../store/edit/reducer"
 import { setQuiz } from "../store/filter/actions"
 import { IFilterState } from "../store/filter/reducer"
-import { userState } from "../store/user/reducer"
+import { IUserState } from "../store/user/reducer"
 import QuizInfo from "./QuizInfo"
 import TabContainer from "./TabContainer"
 import { quizContentsDiffer } from "./tools"
@@ -26,7 +26,7 @@ interface IQuizFormProps {
   courseInfos: any[]
   edit: IEditState
   filter: IFilterState
-  user: userState
+  user: IUserState
   quiz?: IQuiz
   new: boolean
   history: any
