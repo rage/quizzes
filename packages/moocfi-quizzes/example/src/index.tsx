@@ -43,7 +43,7 @@ const StyledFormControlLabel = styled(FormControlLabel)`
 
 const App = () => {
   const id = useInput("id", "")
-  const languageId = useInput("languageId", "fi_FI")
+  const languageId = useInput("languageId", "")
   const accessToken = useInput("savedAccessToken", "")
   const baseUrl = useInput("savedBaseUrl", "https://quizzes.mooc.fi")
 

@@ -7,14 +7,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
 
-const Container = styled.div<{ providedStyles: string | undefined }>`
+export interface TopInfoBarContainerProps {
+  loggedIn?: boolean
+  answered?: boolean
+  confirmed?: boolean
+  rejected?: boolean
+}
+
+const Container = styled.div<TopInfoBarContainerProps>`
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1.5rem 2rem;
   color: white;
   background-color: #213094;
-  ${({ providedStyles }) => providedStyles}
 `
 
 const IconContainer = styled.div`
@@ -177,9 +183,10 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   }
 
   const ProvidedIcon = themeProvider.topInfoBarIcon
+  const TopInfoBarContainer = themeProvider.topInfoBarContainer || Container
 
   return (
-    <Container providedStyles={themeProvider.topInfoBarStyles}>
+    <TopInfoBarContainer loggedIn={loggedIn}>
       <IconContainer>
         {ProvidedIcon ? (
           <>
@@ -200,7 +207,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
           titleReplacement
         )}
       </TitleContainer>
-      {(!quiz || showPointsInfo) && (
+      {(!quiz || !quiz.excludedFromScore) && (
         <PointsContainer>
           <PointsLabelText component="div" paragraph={false}>
             {pointsLabel}:
@@ -208,7 +215,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
           {pointsPortion}
         </PointsContainer>
       )}
-    </Container>
+    </TopInfoBarContainer>
   )
 }
 

@@ -132,43 +132,53 @@ export const submit: ActionCreator<ThunkAction> = () => async (
 ) => {
   dispatch(setLocked())
 
-  let { quiz, quizAnswer, userQuizState } = await postAnswer(
-    getState().quizAnswer.quizAnswer,
-    getState().user.accessToken,
-    getState().backendAddress,
-  )
+  try {
+    let { quiz, quizAnswer, userQuizState } = await postAnswer(
+      getState().quizAnswer.quizAnswer,
+      getState().user.accessToken,
+      getState().backendAddress,
+    )
 
-  // wrong answer -> quiz not returned
-  if (!quiz) {
-    quiz = getState().quiz
-  }
-
-  dispatch(userActions.setUserQuizState(userQuizState))
-  dispatch(setNoChangesSinceSuccessfulSubmit())
-
-  if (userQuizState.status === "locked") {
-    dispatch(quizActions.set(quiz))
-    dispatch(setAnswer(quizAnswer))
-    dispatch(feedbackDisplayedActions.display())
-  } else if (
-    userQuizState.pointsAwarded &&
-    Math.abs(userQuizState.pointsAwarded - quiz.points) < 0.001
-  ) {
-    dispatch(quizActions.set(quiz))
-    dispatch(setAnswer(quizAnswer))
-    dispatch(feedbackDisplayedActions.display())
-  } else {
-    const languageInfo = getState().language.languageLabels
-    if (languageInfo) {
-      dispatch(
-        messageActions.displayNotification(
-          languageInfo.general.incorrectSubmitWhileTriesLeftLabel,
-          "red",
-          60 * 60 * 24,
-          true,
-        ),
-      )
+    // wrong answer -> quiz not returned
+    if (!quiz) {
+      quiz = getState().quiz
     }
+
+    dispatch(userActions.setUserQuizState(userQuizState))
+    dispatch(setNoChangesSinceSuccessfulSubmit())
+
+    if (userQuizState.status === "locked") {
+      dispatch(quizActions.set(quiz))
+      dispatch(setAnswer(quizAnswer))
+      dispatch(feedbackDisplayedActions.display())
+    } else if (
+      userQuizState.pointsAwarded &&
+      Math.abs(userQuizState.pointsAwarded - quiz.points) < 0.001
+    ) {
+      dispatch(quizActions.set(quiz))
+      dispatch(setAnswer(quizAnswer))
+      dispatch(feedbackDisplayedActions.display())
+    } else {
+      const languageInfo = getState().language.languageLabels
+      if (languageInfo) {
+        dispatch(
+          messageActions.displayNotification(
+            languageInfo.general.incorrectSubmitWhileTriesLeftLabel,
+            "red",
+            60 * 60 * 24,
+            true,
+          ),
+        )
+      }
+    }
+  } catch (error) {
+    dispatch(
+      messageActions.displayNotification(
+        getState().language.languageLabels!.error.submitFailedError ||
+          "submit error",
+        "red",
+      ),
+    )
   }
 }
 

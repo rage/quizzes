@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useRef, useState } from "react"
+import { useContext, useRef, useState } from "react"
 import { useDispatch } from "react-redux"
 import LikertScale from "likert-react"
 import {
@@ -20,6 +20,7 @@ import {
   PeerReviewAnswer,
   PeerReviewEssayAnswer,
   PeerReviewGradeAnswer,
+  PeerReviewQuestion,
   PeerReviewQuestionText,
   MiscEvent,
 } from "../../modelTypes"
@@ -36,17 +37,27 @@ import styled from "styled-components"
 import SelectButton from "./SelectButton"
 import SpamButton from "./SpamButton"
 import PeerReviewSubmitButton from "./PeerReviewSubmitButton"
+import ThemeProviderContext from "../../contexes/themeProviderContext"
 
-const OptionTypography = styled(BoldTypography)`
-  margin-bottom: 1rem;
-`
+interface ButtonWrapperProps {
+  providedStyles: string | undefined
+}
 
-const ButtonWrapper = styled.div`
+const ButtonWrapper = styled.div<ButtonWrapperProps>`
   display: flex;
   margin: 1rem 0 2rem;
   button:last-of-type {
     margin-left: auto;
   }
+  ${({ providedStyles }) => providedStyles}
+`
+
+interface QuestionBlockWrapperProps {
+  providedStyles: string | undefined
+}
+
+const QuestionBlockWrapper = styled.div<QuestionBlockWrapperProps>`
+  ${({ providedStyles }) => providedStyles}
 `
 
 type PeerReviewFormProps = {
@@ -56,6 +67,8 @@ type PeerReviewFormProps = {
 const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
   languageInfo,
 }) => {
+  const themeProvider = useContext(ThemeProviderContext)
+
   const ref = useState(useRef(null))[0]
 
   const answersToReview = useTypedSelector(state => state.peerReviews.options)
@@ -85,6 +98,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
   }
 
   const Instructions = withMargin(BoldTypographyMedium, "2rem 0 0")
+  const OptionTypography = withMargin(BoldTypography, "0 0 1rem")
 
   // choice has been made
   if (peerReview) {
@@ -100,7 +114,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
         <Instructions>{languageInfo.chosenEssayInstruction}</Instructions>
         <TopMarginDivLarge>
           <PeerReviewOption answer={chosenAnswer} />
-          <ButtonWrapper>
+          <ButtonWrapper providedStyles={themeProvider.buttonWrapperStyles}>
             <SelectButton onClick={unselectAnswer}>
               {languageInfo.unselectButtonLabel}
             </SelectButton>
@@ -124,7 +138,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
       </TopMarginDivLarge>
       {answersToReview.map((answer, idx) => (
         <TopMarginDivLarge key={answer.id}>
-          <OptionTypography variant="subtitle1">
+          <OptionTypography>
             {`${languageInfo.optionLabel} ${idx + 1}:`}
           </OptionTypography>
           <PeerReviewOption answer={answer} />
@@ -148,6 +162,8 @@ type PeerReviewQuestionsProps = {
 const PeerReviewQuestions: React.FunctionComponent<
   PeerReviewQuestionsProps
 > = ({ peerReview, languageInfo, scrollRef }) => {
+  const themeProvider = useContext(ThemeProviderContext)
+
   const quiz = useTypedSelector(state => state.quiz)
 
   const submitDisabled = useTypedSelector(
@@ -187,52 +203,78 @@ const PeerReviewQuestions: React.FunctionComponent<
     scrollToRef(scrollRef)
   }
 
+  const questions = peerReviewQuestions[0].questions
+
+  const blocks: PeerReviewQuestion[][] = []
+  let block: PeerReviewQuestion[] = []
+
+  for (let i = 0; i < questions.length; i++) {
+    if (questions[i].type === "essay") {
+      block.length > 0 && blocks.push(block)
+      block = []
+    }
+    block.push(questions[i])
+    if (i === questions.length - 1) {
+      blocks.push(block)
+    }
+  }
+
   return (
     <div>
-      {peerReviewQuestions[0].questions.map(question => {
-        let currentPeerReviewAnswer = peerReview.answers.find(
-          answer => answer.peerReviewQuestionId === question.id,
+      {blocks.map(block => {
+        return (
+          <QuestionBlockWrapper
+            providedStyles={themeProvider.questionBlockWrapperStyles}
+          >
+            {block.map(question => {
+              let currentPeerReviewAnswer = peerReview.answers.find(
+                answer => answer.peerReviewQuestionId === question.id,
+              )
+              if (!currentPeerReviewAnswer) {
+                return <div />
+              }
+
+              switch (question.type) {
+                case "essay":
+                  currentPeerReviewAnswer = currentPeerReviewAnswer as PeerReviewEssayAnswer
+                  return (
+                    <TextualPeerReviewFeedback
+                      handleTextChange={changeInPeerReviewText(question.id)}
+                      key={question.id}
+                      currentText={currentPeerReviewAnswer.text}
+                      questionTexts={question.texts[0]}
+                    />
+                  )
+                  break
+                case "grade":
+                  currentPeerReviewAnswer = currentPeerReviewAnswer as PeerReviewGradeAnswer
+
+                  return (
+                    <LikertScale
+                      key={question.id}
+                      separatorType={
+                        themeProvider.likertSeparatorType || "dotted-line"
+                      }
+                      reviews={[
+                        {
+                          question: question.texts[0].title,
+                          review: currentPeerReviewAnswer.value,
+                        },
+                      ]}
+                      onClick={changeInPeerReviewGrade(question.id)}
+                    />
+                  )
+                default:
+                  return (
+                    <SpaciousTypography>{`The ${
+                      question.type
+                    } type peer review question is not supported`}</SpaciousTypography>
+                  )
+              }
+            })}
+          </QuestionBlockWrapper>
         )
-        if (!currentPeerReviewAnswer) {
-          return <div />
-        }
-
-        switch (question.type) {
-          case "essay":
-            currentPeerReviewAnswer = currentPeerReviewAnswer as PeerReviewEssayAnswer
-            return (
-              <TextualPeerReviewFeedback
-                handleTextChange={changeInPeerReviewText(question.id)}
-                key={question.id}
-                currentText={currentPeerReviewAnswer.text}
-                questionTexts={question.texts[0]}
-              />
-            )
-            break
-          case "grade":
-            currentPeerReviewAnswer = currentPeerReviewAnswer as PeerReviewGradeAnswer
-
-            return (
-              <LikertScale
-                key={question.id}
-                reviews={[
-                  {
-                    question: question.texts[0].title,
-                    review: currentPeerReviewAnswer.value,
-                  },
-                ]}
-                onClick={changeInPeerReviewGrade(question.id)}
-              />
-            )
-          default:
-            return (
-              <SpaciousTypography>{`The ${
-                question.type
-              } type peer review question is not supported`}</SpaciousTypography>
-            )
-        }
       })}
-
       <PeerReviewSubmitButton
         disabled={submitDisabled}
         onClick={submitPeerReview}
@@ -300,6 +342,8 @@ const ReportOrSelect: React.FunctionComponent<ReportOrSelectProps> = ({
   answer,
   scrollRef,
 }) => {
+  const themeProvider = useContext(ThemeProviderContext)
+
   const [disabled, setDisabled] = React.useState(false)
   const dispatch = useDispatch()
 
@@ -315,7 +359,7 @@ const ReportOrSelect: React.FunctionComponent<ReportOrSelectProps> = ({
   }
 
   return (
-    <ButtonWrapper>
+    <ButtonWrapper providedStyles={themeProvider.buttonWrapperStyles}>
       <SpamButton disabled={disabled} onClick={flagAsSpam}>
         {languageInfo.reportAsInappropriateLabel}
       </SpamButton>

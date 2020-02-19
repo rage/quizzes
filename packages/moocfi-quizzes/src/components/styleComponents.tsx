@@ -14,6 +14,10 @@ export const RedButton = styled(BaseButton)`
   color: rgb(255, 255, 255);
 `
 
+export const FlexContainer = styled.div`
+  display: flex;
+`
+
 export const TopMarginDivSmall = styled.div`
   margin-top: 1rem;
 `
@@ -43,9 +47,14 @@ export const BoldTypographyLarge = styled(BoldTypography)`
   font-size: 1.5rem;
 `
 
-export const withMargin = (Component: React.ComponentType, margin: string) => {
+export const withMargin = (
+  Component: React.ComponentType<any>,
+  margin: string,
+) => {
   return styled(Component)`
-    margin: ${margin};
+    && {
+      margin: ${margin};
+    }
   `
 }
 

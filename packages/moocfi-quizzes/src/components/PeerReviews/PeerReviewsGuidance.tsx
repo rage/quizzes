@@ -4,7 +4,12 @@ import styled from "styled-components"
 import { useTypedSelector } from "../../state/store"
 
 import { Typography } from "@material-ui/core"
-import { TopMarginDivSmall, BoldTypographyLarge } from "../styleComponents"
+import {
+  TopMarginDivSmall,
+  BoldTypographyLarge,
+  withMargin,
+  BoldTypography,
+} from "../styleComponents"
 import MarkdownText from "../MarkdownText"
 
 type PeerReviewsGuidanceProps = {
@@ -21,15 +26,16 @@ const PeerReviewsGuidance: React.FunctionComponent<
   const given = userQuizState ? userQuizState.peerReviewsGiven : 0
   const required = (quiz && quiz.course.minPeerReviewsGiven) || 0
 
+  const GivenCount = withMargin(BoldTypographyLarge, "2rem 0 0 ")
+  const Instructions = withMargin(MarkdownText, "1.5rem 0 0 ")
+
   return (
-    <TopMarginDivSmall>
-      <BoldTypographyLarge variant="subtitle1">
+    <>
+      <GivenCount>
         {givenLabel}: {given}/{required}
-      </BoldTypographyLarge>
-      <TopMarginDivSmall>
-        <MarkdownText Component={Typography}>{guidanceText}</MarkdownText>
-      </TopMarginDivSmall>
-    </TopMarginDivSmall>
+      </GivenCount>
+      <Instructions Component={Typography}>{guidanceText}</Instructions>
+    </>
   )
 }
 

@@ -2,7 +2,7 @@ import * as React from "react"
 import { useEffect } from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { Grid, Typography } from "@material-ui/core"
+import { Typography } from "@material-ui/core"
 import * as quizAnswerActions from "../../state/quizAnswer/actions"
 import * as messageActions from "../../state/message/actions"
 
@@ -27,6 +27,7 @@ import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
 import LoginPrompt from "./LoginPrompt"
 import MarkdownText from "../MarkdownText"
+import Notification from "../Notification"
 import { BoldTypographyMedium } from "../styleComponents"
 
 import ThemeProviderContext from "../../contexes/themeProviderContext"
@@ -51,9 +52,15 @@ export interface QuizProps {
   languageId: string
   accessToken: string
   backendAddress?: string
-  customContent?: Element | JSX.Element
+  customContent?: CustomContent
   fullInfoWithoutLogin?: boolean
   showZeroPointsInfo?: boolean
+}
+
+export type CustomContent = {
+  Login: Element | JSX.Element
+  Loading: Element | JSX.Element
+  WrongLocale: Element | JSX.Element
 }
 
 const QuizItemContainerDiv = styled.div`
@@ -71,11 +78,11 @@ const ItemWrapper = styled.div<IItemWrapperProps>`
   padding: 1rem 2rem 1rem 1rem;
 `
 
-interface IQuizContentWrapperProps {
+export interface QuizContentProps {
   disabled: boolean
 }
 
-const QuizContentWrapper = styled.div<IQuizContentWrapperProps>`
+const QuizContent = styled.div<QuizContentProps>`
   margin-top: 1rem;
   padding: 1rem;
   ${({ disabled }) =>
@@ -117,7 +124,8 @@ interface SubmitGroupProps {
 
 const SubmitGroup = styled.div<SubmitGroupProps>`
   display: flex;
-  > :nth-child(2) {
+  flex-wrap: wrap;
+  > :last-child {
     margin-left: 1rem;
   }
   ${({ providedStyles }) => providedStyles}
@@ -155,6 +163,16 @@ const SubmitMessage = styled.div<SubmitMessageProps>`
   ${({ providedStyles }) => providedStyles}
 `
 
+const Error = styled.div`
+  display: flex;
+  width: auto;
+  padding: 4rem;
+  p {
+    font-size: 2rem;
+    margin: auto;
+  }
+`
+
 const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   id,
   languageId,
@@ -162,7 +180,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   backendAddress,
   customContent,
   fullInfoWithoutLogin,
-  showZeroPointsInfo = true,
+  showZeroPointsInfo = false,
+  children,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
@@ -199,11 +218,21 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     [id, languageId, accessToken, backendAddress],
   )
 
+  if (error) {
+    return (
+      <Error>
+        <p>{error}</p>
+      </Error>
+    )
+  }
+
+  const CustomLogin = customContent && customContent.Login
+
   if (!accessToken && !fullInfoWithoutLogin) {
     return (
       <div>
         <TopInfoBar staticBars />
-        <LoginPrompt content={customContent} />
+        <LoginPrompt content={CustomLogin} />
       </div>
     )
   }
@@ -235,15 +264,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
             )
           })}
       </>
-    )
-  }
-
-  if (error) {
-    return (
-      <div>
-        {generalLabels && generalLabels.errorLabel}
-        <pre>{error}</pre>
-      </div>
     )
   }
 
@@ -320,17 +340,15 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
         qi.type !== "research-agreement",
     )
 
-  const ThemedLowerContent = themeProvider.lowerContent || LowerContent
+  const QuizContentWrapper = themeProvider.quizContent || QuizContent
+  const LowerContentWrapper = themeProvider.lowerContent || LowerContent
+
+  const wrongLocale = !!(customContent && customContent.WrongLocale)
 
   return (
     <OuterDiv providedStyles={themeProvider.mainDivStyles}>
       <TopInfoBar />
-
-      {quizDisabled && (
-        <LoginPrompt content={customContent} fullQuizInfoShown={true} />
-      )}
-
-      <QuizContentWrapper disabled={quizDisabled}>
+      <QuizContentWrapper disabled={quizDisabled || wrongLocale}>
         <UpperContent providedStyles={themeProvider.upperContentStyles}>
           <Deadline deadline={quiz.deadline} />
 
@@ -339,19 +357,28 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           <QuizBody providedStyles={themeProvider.quizBodyStyles}>
             {quiz.texts[0].body}
           </QuizBody>
+          {children}
         </UpperContent>
         <QuizItemContainerDiv>
           {quizItemComponents(quiz, languageId)}
         </QuizItemContainerDiv>
-        <ThemedLowerContent nItems={quiz.items.length}>
+        <Notification />
+        <LowerContentWrapper nItems={quiz.items.length}>
           {!stillSubmittable && !quizDisabled ? (
             <MessageGroup providedStyles={themeProvider.messageGroupStyles}>
               {submitMessage && (
-                <SubmitMessage
-                  providedStyles={themeProvider.submitMessageDivStyles}
-                >
-                  <MarkdownText>{submitMessage}</MarkdownText>
-                </SubmitMessage>
+                <>
+                  <SubmitMessage
+                    providedStyles={themeProvider.submitMessageDivStyles}
+                  >
+                    <Typography>
+                      {languageInfo.essay.exampleAnswerLabel}
+                    </Typography>
+                    <div>
+                      <MarkdownText>{submitMessage}</MarkdownText>
+                    </div>
+                  </SubmitMessage>
+                </>
               )}
 
               {containsPeerReviews && exerciseFinishedMessage && (
@@ -370,17 +397,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
             </MessageGroup>
           ) : (
             <>
-              {messageState.notification && messageState.notification.message && (
-                <Typography
-                  style={{
-                    color: messageState.notification.color,
-                    fontSize: "1.25rem",
-                  }}
-                >
-                  {messageState.notification.message}
-                </Typography>
-              )}
-
               <SubmitGroup providedStyles={themeProvider.submitGroupStyles}>
                 <div
                   onClick={e => {
@@ -419,8 +435,15 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
               </SubmitGroup>
             </>
           )}
-        </ThemedLowerContent>
+        </LowerContentWrapper>
       </QuizContentWrapper>
+      {customContent && customContent.WrongLocale}
+      {quizDisabled && (
+        <LoginPrompt
+          content={customContent && customContent.Login}
+          fullQuizInfoShown={true}
+        />
+      )}
     </OuterDiv>
   )
 }
