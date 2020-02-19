@@ -72,7 +72,7 @@ export default class AuthorizationService {
     }
     if (
       roles.some(r => r.role === "assistant") &&
-      permission <= Permission.EXPORT
+      permission <= Permission.MODIFY
     ) {
       return true
     }
