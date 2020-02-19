@@ -6,7 +6,7 @@ import { InjectManager } from "typeorm-typedi-extensions"
 import { API_PATH } from "../../config"
 import { ITMCProfileDetails } from "../../types"
 
-@JsonController(`${API_PATH}/quizzes/usercourserole`)
+@JsonController(`${API_PATH}/usercourseroles`)
 export class UserCourseRoleController {
   @InjectManager()
   private entityManager: EntityManager
