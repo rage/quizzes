@@ -1,6 +1,7 @@
 import { Card, CardContent, Grid, Typography } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
+import { IQuiz, IUserCourseRole } from "../../interfaces"
 import {
   getAnswersDetailedData,
   getDetailedEverythingData,
@@ -9,12 +10,14 @@ import {
 } from "../../services/quizzes"
 import DownloadButton from "./DownloadButton"
 
-const DataExporter: React.FunctionComponent<any> = ({
+interface IDataExporterProps {
+  quiz: IQuiz
+  isAdmin: boolean
+  courseRoles: IUserCourseRole[]
+}
+
+const DataExporter: React.FunctionComponent<IDataExporterProps> = ({
   quiz,
-  getAllData,
-  getAnswersData,
-  getPeerReviewData,
-  getQuizData,
   isAdmin,
   courseRoles,
 }) => {
@@ -29,7 +32,7 @@ const DataExporter: React.FunctionComponent<any> = ({
       <Grid item={true} xs={12}>
         <DownloadButton
           quiz={quiz}
-          service={getQuizData}
+          service={getQuizInformationDetailedData}
           label="Download quiz info"
           filenameEnd="information"
         />
@@ -37,7 +40,7 @@ const DataExporter: React.FunctionComponent<any> = ({
       <Grid item={true} xs={12}>
         <DownloadButton
           quiz={quiz}
-          service={getAnswersData}
+          service={getAnswersDetailedData}
           label="Download quiz answers data"
           filenameEnd="answers"
         />
@@ -45,7 +48,7 @@ const DataExporter: React.FunctionComponent<any> = ({
       <Grid item={true} xs={12}>
         <DownloadButton
           quiz={quiz}
-          service={getPeerReviewData}
+          service={getPeerReviewsDetailedData}
           label={"Download peer review data"}
           filenameEnd="peer_reviews"
         />
@@ -65,7 +68,7 @@ const DataExporter: React.FunctionComponent<any> = ({
       <Grid item={true} xs={12}>
         <DownloadButton
           quiz={quiz}
-          service={getAllData}
+          service={getDetailedEverythingData}
           label={"Download all quiz data"}
           fileFormat="xlsx"
           filenameEnd="data"
@@ -74,7 +77,7 @@ const DataExporter: React.FunctionComponent<any> = ({
       <Grid item={true} xs={12}>
         <DownloadButton
           quiz={quiz}
-          service={getAllData}
+          service={getDetailedEverythingData}
           label={"Download all quiz data"}
           fileFormat="ods"
           filenameEnd="data"
@@ -91,12 +94,4 @@ const mapStateToProps = state => ({
   ),
 })
 
-export default connect(
-  mapStateToProps,
-  {
-    getAnswersData: getAnswersDetailedData,
-    getAllData: getDetailedEverythingData,
-    getPeerReviewData: getPeerReviewsDetailedData,
-    getQuizData: getQuizInformationDetailedData,
-  },
-)(DataExporter)
+export default connect(mapStateToProps)(DataExporter)

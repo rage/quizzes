@@ -92,7 +92,6 @@ export const addRoles = () => async (dispatch, getState) => {
   let administrator = false
   let newRoles: null | any[] = null
 
-  console.log("ROles: ", roles)
   if (roles && roles.length === 1 && roles[0].role === "administrator") {
     administrator = true
   } else {

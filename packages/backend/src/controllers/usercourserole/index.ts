@@ -19,7 +19,6 @@ export class UserCourseRoleController {
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any[] | string> {
     try {
-      console.log("User info: ", user)
       if (user.administrator) {
         return [{ role: "administrator", courseId: "", courseName: "" }]
       }
