@@ -271,7 +271,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     const message =
       "Error: quiz has no texts. (Likely the quiz does not match the requested " +
       "language id)"
-    dispatch(messageActions.setErrorMessage(message))
+    dispatch(messageActions.errorOccurred(message))
     return <div />
   }
 
