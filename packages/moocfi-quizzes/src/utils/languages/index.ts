@@ -24,6 +24,9 @@ export type GeneralLabels = {
   submitGeneralFeedbackLabel: string
   submitButtonAlreadyAnsweredLabel: string
   pointsGrantingPolicyInformer: (policy: QuizPointsGrantingPolicy) => string
+  answered: string
+  unanswered: string
+  rejected: string
 }
 
 export type StageLabels = {
@@ -52,6 +55,7 @@ export type EssayLabels = {
 export type PeerReviewLabels = {
   noPeerAnswersAvailableLabel: string
   chooseButtonLabel: string
+  unselectButtonLabel: string
   chooseEssayInstruction: string
   chosenEssayInstruction: string
   displayPeerReview: string
@@ -98,6 +102,11 @@ export type OpenLabels = {
   feedbackForFailure: string
 }
 
+export type ErrorLabels = {
+  submitFailedError: string
+  quizLoadFailedError: string
+}
+
 export type SingleLanguageLabels = {
   essay: EssayLabels
   open: OpenLabels
@@ -107,6 +116,7 @@ export type SingleLanguageLabels = {
   stage: StageLabels
   general: GeneralLabels
   receivedPeerReviews: ReceivedPeerReviewLabels
+  error: ErrorLabels
 }
 
 export type LanguageLabels = {

@@ -145,6 +145,11 @@ export const peerReviewsReducer = (
         ...state,
         answer: peerReviewAnswer,
       }
+    case getType(peerReviews.unselectAnswer):
+      return {
+        ...state,
+        answer: null,
+      }
     case getType(setQuizState):
       const quiz = action.payload.quiz
       const quizAnswer = action.payload.quizAnswer

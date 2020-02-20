@@ -1,11 +1,16 @@
 import { createContext } from "react"
-import { IItemWrapperProps, LowerContentProps } from "../components/QuizImpl"
+import {
+  IItemWrapperProps,
+  LowerContentProps,
+  QuizContentProps,
+} from "../components/QuizImpl"
 import { ChoiceButtonProps } from "../components/ChoiceButton"
 import { SubmitButtonProps } from "../components/QuizImpl/SubmitButton"
 import { LeftBorderedDivProps } from "../components/MultipleChoice"
 import { SpamButtonProps } from "../components/PeerReviews/SpamButton"
 import { SelectButtonProps } from "../components/PeerReviews/SelectButton"
 import { PeerReviewSubmitButtonProps } from "../components/PeerReviews/PeerReviewSubmitButton"
+import { TopInfoBarContainerProps } from "../components/QuizImpl/TopInfoBar"
 
 export interface ThemeProviderInterface {
   choiceButton?: React.FunctionComponent<ChoiceButtonProps>
@@ -14,7 +19,7 @@ export interface ThemeProviderInterface {
   selectButton?: React.FunctionComponent<SelectButtonProps>
   peerReviewSubmitButton?: React.FunctionComponent<PeerReviewSubmitButtonProps>
   feedbackMessage?: React.FunctionComponent<LeftBorderedDivProps>
-  topInfoBarStyles?: string
+  topInfoBarContainer?: React.FunctionComponent<TopInfoBarContainerProps>
   topInfoBarIcon?: React.FunctionComponent<any>
   mainDivStyles?: string
   itemWrapper?: React.FunctionComponent<IItemWrapperProps>
@@ -25,12 +30,17 @@ export interface ThemeProviderInterface {
   essayItemContentStyles?: string
   upperContentStyles?: string
   lowerContent?: React.FunctionComponent<LowerContentProps>
+  quizContent?: React.FunctionComponent<QuizContentProps>
   submitMessageDivStyles?: string
   answerPaperStyles?: string
   answerFieldStyles?: string
   quizBodyStyles?: string
   stepperStyles?: string
   submitGroupStyles?: string
+  messageGroupStyles?: string
+  likertSeparatorType?: "dotted-line" | "striped"
+  questionBlockWrapperStyles?: string
+  buttonWrapperStyles?: string
 }
 
 const ThemeProviderContext = createContext<ThemeProviderInterface>({})

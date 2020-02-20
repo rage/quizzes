@@ -1,6 +1,6 @@
 import * as React from "react"
 import styled from "styled-components"
-import { useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useDispatch } from "react-redux"
 import Typography from "@material-ui/core/Typography"
 import "likert-react/dist/main.css"
@@ -8,15 +8,22 @@ import PeerReviewForm from "./PeerReviewForm"
 import PeerReviewsGuidance from "./PeerReviewsGuidance"
 import ReceivedPeerReviewsInfo from "./ReceivedPeerReviewsInfo"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
+import { scrollToRef } from "../../utils"
 import Togglable from "../../utils/Togglable"
 import { useTypedSelector } from "../../state/store"
-import { BoldTypography } from "../styleComponents"
+import {
+  BoldTypography,
+  TopMarginDivSmall,
+  TopMarginDivLarge,
+} from "../styleComponents"
 
-const TopMarginDiv = styled.div`
+/*const TopMarginDiv = styled.div`
   margin-top: 15px;
-`
+`*/
 
 const PeerReviews: React.FunctionComponent = () => {
+  const ref = useState(useRef(null))[0]
+
   const dispatch = useDispatch()
 
   const quiz = useTypedSelector(state => state.quiz)
@@ -67,8 +74,7 @@ const PeerReviews: React.FunctionComponent = () => {
   }
 
   return (
-    <div>
-      {activeStep >= 2 && <ReceivedPeerReviewsInfo />}
+    <div ref={ref}>
       {morePeerReviewsRequired()
         ? !pastDeadline && (
             <>
@@ -83,7 +89,7 @@ const PeerReviews: React.FunctionComponent = () => {
             </>
           )
         : !pastDeadline && (
-            <>
+            <TopMarginDivLarge>
               <BoldTypography component="p" variant="subtitle1">
                 {giveExtraPeerReviewsLabel}
               </BoldTypography>
@@ -91,8 +97,9 @@ const PeerReviews: React.FunctionComponent = () => {
                 initiallyVisible={activeStep === 1}
                 hideButtonText={peerReviewsLabels.hidePeerReviewLabel}
                 displayButtonText={peerReviewsLabels.displayPeerReview}
+                scrollRef={ref}
               >
-                <TopMarginDiv>
+                <TopMarginDivSmall>
                   <PeerReviewsGuidance
                     guidanceText={peerReviewQuestions[0].texts[0].body}
                     givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
@@ -101,10 +108,11 @@ const PeerReviews: React.FunctionComponent = () => {
                     }
                   />
                   <PeerReviewForm languageInfo={peerReviewsLabels} />
-                </TopMarginDiv>
+                </TopMarginDivSmall>
               </Togglable>
-            </>
+            </TopMarginDivLarge>
           )}
+      {activeStep >= 2 && <ReceivedPeerReviewsInfo />}
     </div>
   )
 }

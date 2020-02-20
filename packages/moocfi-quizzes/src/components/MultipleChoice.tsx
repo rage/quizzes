@@ -23,6 +23,8 @@ import ThemeProviderContext from "../contexes/themeProviderContext"
 import ChoiceButton from "./ChoiceButton"
 
 const QuestionContainer = styled.div`
+  display: flex;
+  flex-direction: column;
   flex: 1;
   font-size: 1.25rem;
   margin-right: 0.25rem;
@@ -236,7 +238,10 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
       {body && <MarkdownText>{body}</MarkdownText>}
 
       {selectOptionsLabel && (
-        <SelectOptionsLabelTypography variant="subtitle1">
+        <SelectOptionsLabelTypography
+          variant="subtitle1"
+          onlyOneItem={onlyOneItem}
+        >
           {selectOptionsLabel}
         </SelectOptionsLabelTypography>
       )}
@@ -244,12 +249,11 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
   )
 }
 
-const ItemInformationGridItem = styled(Grid)`
-  text-align: center;
-`
-
-const SelectOptionsLabelTypography = styled(Typography)`
+const SelectOptionsLabelTypography = styled(Typography)<{
+  onlyOneItem: boolean
+}>`
   color: 6b6b6b;
+  ${({ onlyOneItem }) => onlyOneItem && "margin: 0 auto 1rem;"}
 `
 
 type OptionProps = {
@@ -448,15 +452,25 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 
   const FeedbackDiv = ThemedDiv || LeftBorderedDiv
 
+  if (ThemedDiv) {
+    return (
+      <ThemedDiv correct={correct} onlyOneItem={onlyOneItem}>
+        <CentralizedOnSmallScreenTypography variant="body1">
+          {feedbackMessage}
+        </CentralizedOnSmallScreenTypography>
+      </ThemedDiv>
+    )
+  }
+
   return (
-    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem}>
+    <LeftBorderedDiv correct={correct} onlyOneItem={onlyOneItem}>
       <CentralizedOnSmallScreenTypography variant="body1">
         <AttentionIcon icon={faExclamationCircle} />
       </CentralizedOnSmallScreenTypography>
       <CentralizedOnSmallScreenTypography variant="body1">
         {feedbackMessage}
       </CentralizedOnSmallScreenTypography>
-    </FeedbackDiv>
+    </LeftBorderedDiv>
   )
 }
 

@@ -1,6 +1,13 @@
 import React from "react"
-import { StyledButton } from "../styleComponents"
+import styled from "styled-components"
+
 import ThemeProviderContext from "../../contexes/themeProviderContext"
+
+import { StyledButton } from "../styleComponents"
+
+const SubmitButton = styled(StyledButton)`
+  margin: 2rem 0 0;
+`
 
 export interface PeerReviewSubmitButtonProps {
   children: any
@@ -20,14 +27,14 @@ const PeerReviewSubmitButton: React.FunctionComponent<
   }
 
   return (
-    <StyledButton
+    <SubmitButton
       variant="contained"
       color="primary"
       disabled={props.disabled}
       onClick={props.onClick}
     >
       {...props.children}
-    </StyledButton>
+    </SubmitButton>
   )
 }
 

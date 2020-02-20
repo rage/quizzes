@@ -7,12 +7,23 @@ export const BaseButton = styled(Button)`
 
 export const BoldTypography = styled(Typography)`
   font-weight: bold;
-  padding-bottom: 1rem;
 `
 
 export const RedButton = styled(BaseButton)`
   background-color: rgb(200, 34, 34);
   color: rgb(255, 255, 255);
+`
+
+export const FlexContainer = styled.div`
+  display: flex;
+`
+
+export const TopMarginDivSmall = styled.div`
+  margin-top: 1rem;
+`
+
+export const TopMarginDivLarge = styled.div`
+  margin-top: 2rem;
 `
 
 export const SpaciousPaper = styled(Paper)`
@@ -23,6 +34,29 @@ export const SpaciousPaper = styled(Paper)`
 export const SpaciousTypography = styled(Typography)`
   padding-bottom: 0.75rem;
 `
+
+export const BoldTypographyNormal = styled(BoldTypography)`
+  font-size: 1rem;
+`
+
+export const BoldTypographyMedium = styled(BoldTypography)`
+  font-size: 1.25rem;
+`
+
+export const BoldTypographyLarge = styled(BoldTypography)`
+  font-size: 1.5rem;
+`
+
+export const withMargin = (
+  Component: React.ComponentType<any>,
+  margin: string,
+) => {
+  return styled(Component)`
+    && {
+      margin: ${margin};
+    }
+  `
+}
 
 interface IStyledTextFieldProps {
   rowNumber: number

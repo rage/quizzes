@@ -7,7 +7,7 @@ const finnishLabels: SingleLanguageLabels = {
     currentNumberOfWordsLabel: "Sanoja",
     textFieldLabel: "Vastauksesi",
     conformToLimitsToSubmitLabel:
-      "Muokkaa vastauksesi sanarajojen sisään lähettääksesi sen",
+      "Muokkaa vastauksesi sanarajojen sisään voidaksesi lähettää sen",
     wordLimitsGuidance: (min, max) => {
       if (!min && !max) {
         return ""
@@ -34,15 +34,16 @@ const finnishLabels: SingleLanguageLabels = {
     loadingLabel: "Ladataan",
     noPeerAnswersAvailableLabel: "Vertaisarvioitavia vastauksia ei saatavilla",
     chooseButtonLabel: "Valitse",
-    chooseEssayInstruction: "Valitse yksi vaihtoehdoista vertaisarvoitavaksi",
+    unselectButtonLabel: "Peru valinta",
+    chooseEssayInstruction: "Valitse yksi vaihtoehdoista arvoitavaksi",
     chosenEssayInstruction: "Arvioi valitsemasi vastaus:",
-    displayPeerReview: "Anna   vertaisarvio",
+    displayPeerReview: "Anna vertaisarvio",
     giveExtraPeerReviews:
-      "Olet antanut vaaditun määrän vertaisarvioita. Antamalla lisää vertaisarvioita oma vastauksesi tulee nopeammin arvioiduksi!",
+      "Olet antanut vaaditun määrän vertaisarvioita. Jos annat vielä lisää vertaisarvioita, oma vastauksesi tulee nopeammin arvioiduksi!",
     giveExtraPeerReviewsQuizConfirmed:
-      "Voit halutessasi antaa lisää vertaisarvioita",
+      "Voit halutessasi vielä antaa lisää vertaisarvioita",
     givenPeerReviewsLabel: "Vertaisarvioita annettu",
-    peerReviewsCompletedInfo: "Tarvittavat vertaisarviot annettu",
+    peerReviewsCompletedInfo: "Olet antanut tarpeeksi monta vertaisarviota",
     reportAsInappropriateLabel: "Ilmoita asiaton vastaus",
     submitPeerReviewLabel: "Lähetä vertaisarvio",
     hidePeerReviewLabel: "Piilota",
@@ -51,9 +52,9 @@ const finnishLabels: SingleLanguageLabels = {
     peerReviewsInfoForLoggedOutUser: "Kyselyyn liittyy vertaisarviointiosio",
     essayQuestionAnswerTextBoxLabel: "Kirjoita arvio",
     optionLabel: "Vaihtoehto",
-    answerRejected: "Vastauksesi on hylätty vertaisarviossa",
+    answerRejected: "Vastauksesi on hylätty",
     answerFlaggedAsSpam: "Vastauksesi on hylätty epäasiallisena",
-    answerConfirmed: "Läpäisit tehtävän hyväksytysti!",
+    answerConfirmed: "Vastaus hyväksytty!",
     manualReview: "Vastauksesi odottaa kurssihenkilökunnan arviota",
   },
   receivedPeerReviews: {
@@ -68,7 +69,7 @@ const finnishLabels: SingleLanguageLabels = {
       `Vastauksesi on saanut ${n} arvio${n > 0 ? "ta" : "n"}.`,
     toggleButtonExpandLabel: "Näytä kaikki saamasi vertaisarviot",
     toggleButtonShrinkLabel: "Piilota saamasi vertaisarviot",
-    averageOfGradesLabel: "Kaikkien numeroarvosanojen keskiarvo on",
+    averageOfGradesLabel: "Kaikkien arvosteluiden keskiarvo on",
     detailedViewLabel: "Kaikki vastauksesi saamat vertaisarviot",
     summaryViewLabel: "Saamasi vertaisarviot:",
     peerReviewLabel: "Vertaisarvio",
@@ -87,10 +88,10 @@ const finnishLabels: SingleLanguageLabels = {
     answerStageLabel: "Tehtävään vastaaminen",
     givingPeerReviewsStageLabel: "Vertaisarvioiden antaminen",
     receivingPeerReviewsStageLabel: "Vertaisarvioiden vastaanottaminen",
-    evaluationStageLabel: "Tehtävän arvostelu",
+    evaluationStageLabel: "Odottaa arvostelua",
   },
   general: {
-    pastDeadline: "Et voi vastata enää tähän kyselyyn",
+    pastDeadline: "Et voi vastata enää tähän tehtävään",
     answerMissingBecauseQuizModifiedLabel:
       "Kysymykseen ei vastattu. Tehtävää todennäköisesti muutettu vastaamisen jälkeen.",
     submitButtonLabel: "Vastaa",
@@ -99,13 +100,13 @@ const finnishLabels: SingleLanguageLabels = {
     loginToAnswerPromptLabel: "Kirjaudu sisään vastataksesi tehtävään",
     loadingLabel: "Ladataan",
     answerCorrectLabel: "Vastaus oikein",
-    alreadyAnsweredLabel: "Olet jo vastannut",
+    alreadyAnsweredLabel: "Olet jo vastannut tähän",
     answerIncorrectLabel: "Vastaus väärin",
     kOutOfNCorrect: (k, n) => `Sait ${k}/${n} oikein`,
     pointsAvailableLabel: "Pisteitä saatavissa",
     pointsReceivedLabel: "Saamasi pisteet",
     incorrectSubmitWhileTriesLeftLabel:
-      "Vastauksesi ei ollut täysin oikein - voit yrittää uudelleen!",
+      "Vastauksesi ei ollut täysin oikein. Ole hyvä ja yritä uudestaan!",
     triesRemainingLabel: "Yrityksiä jäljellä",
     quizLabel: "Kysely",
     pointsLabel: "Pisteitä",
@@ -115,13 +116,21 @@ const finnishLabels: SingleLanguageLabels = {
     pointsGrantingPolicyInformer: policy => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
-          return "Vastauksen oltava täysin oikein jotta pisteitä voi saada"
+          return "Vastauksen on oltava täysin oikein saadaksesi pisteitä"
         case "grant_whenever_possible":
           return ""
         default:
           return ""
       }
     },
+    answered: "Vastattu",
+    unanswered: "Vastaamaton",
+    rejected: "Vastaus hylätty, yritä uudelleen",
+  },
+  error: {
+    submitFailedError:
+      "Vastauksen lähettäminen ei onnistunut. Kokeile myöhemmin uudestaan.",
+    quizLoadFailedError: "Tehtävän lataaminen ei onnistunut",
   },
 }
 

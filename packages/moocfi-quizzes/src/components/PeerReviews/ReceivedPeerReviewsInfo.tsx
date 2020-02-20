@@ -10,8 +10,16 @@ import { useTypedSelector } from "../../state/store"
 import { useDispatch } from "react-redux"
 import { requestReviews } from "../../state/receivedReviews/actions"
 import ReceivedPeerReview from "./ReceivedPeerReview"
-import { BaseButton, BoldTypography } from "../styleComponents"
+import {
+  BaseButton,
+  BoldTypography,
+  TopMarginDivSmall,
+  TopMarginDivLarge,
+  withMargin,
+} from "../styleComponents"
 import { ReceivedPeerReviewLabels } from "../../utils/languages/"
+
+import Togglable from "../../utils/Togglable"
 
 const ToggleButton = styled(BaseButton)<{ expanded: boolean }>`
   ${props => props.expanded && "margin-top: 0.5rem;"}
@@ -59,31 +67,27 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
   }
 
   return (
-    <div style={{ marginBottom: "1rem" }}>
+    <TopMarginDivLarge>
       <ReceivedReviewsSummary
         peerReviews={receivedReviews}
         peerReviewQuestions={peerReviewQuestions}
         receivedReviewsLabels={receivedReviewsLabels}
       />
       {receivedReviews.length > 0 && (
-        <ToggleButton
-          variant="outlined"
-          expanded={expanded}
-          onClick={() => setExpanded(!expanded)}
+        <Togglable
+          initiallyVisible={false}
+          hideButtonText={receivedReviewsLabels.toggleButtonShrinkLabel}
+          displayButtonText={receivedReviewsLabels.toggleButtonExpandLabel}
+          scrollRef={null}
         >
-          {expanded
-            ? receivedReviewsLabels.toggleButtonShrinkLabel
-            : receivedReviewsLabels.toggleButtonExpandLabel}
-        </ToggleButton>
+          <ReceivedReviewsDetailed
+            peerReviews={receivedReviews}
+            peerReviewQuestions={peerReviewQuestions}
+            receivedReviewsLabels={receivedReviewsLabels}
+          />
+        </Togglable>
       )}
-      {expanded && (
-        <ReceivedReviewsDetailed
-          peerReviews={receivedReviews}
-          peerReviewQuestions={peerReviewQuestions}
-          receivedReviewsLabels={receivedReviewsLabels}
-        />
-      )}
-    </div>
+    </TopMarginDivLarge>
   )
 }
 
@@ -124,23 +128,27 @@ const ReceivedReviewsSummary: React.FunctionComponent<
   )
 
   let average: number | string = "-"
+
   if (gradeAnswers.length > 0) {
     average = gradeAnswers.reduce((sum, e) => (sum += e)) / gradeAnswers.length
     average = average.toFixed(2)
   }
 
+  const Title = withMargin(BoldTypography, "1rem 0 0")
+  const Body = withMargin(Typography, "0.5rem 0 0")
+
   return (
-    <div style={{ margin: "1rem 0" }}>
-      <BoldTypography>{receivedReviewsLabels.summaryViewLabel}</BoldTypography>
+    <div>
+      <Title>{receivedReviewsLabels.summaryViewLabel}</Title>
       {peerReviews.length === 0 ? (
-        <Typography component="p" variant="subtitle1">
+        <Body component="p" variant="subtitle1">
           {receivedReviewsLabels.noPeerReviewsReceivedlabel}
-        </Typography>
+        </Body>
       ) : (
-        <Typography>
+        <Body>
           {receivedReviewsLabels.numberOfPeerReviewsText(peerReviews.length)}{" "}
           {receivedReviewsLabels.averageOfGradesLabel} {average + "."}
-        </Typography>
+        </Body>
       )}
     </div>
   )

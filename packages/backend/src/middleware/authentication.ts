@@ -15,13 +15,15 @@ const whitelist = [
   /\/api\/v1\/quizzes\/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}\/titles\/[a-z]{2}_[A-Z]{2}$/,
   /\/api\/v1\/quizzes\/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$/,
   /\/api\/v1\/quizzes\/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}\?fullInfo\=(true|false)$/,
+  /\/api\/v1\/quizzes\/[0-9a-fA-F]{24}$/,
+  /\/api\/v1\/quizzes\/[0-9a-fA-F]{24}\?fullInfo\=(true|false)$/,
 ]
 
 @Middleware({ type: "before" })
 export class AuthenticationMiddleware implements ExpressMiddlewareInterface {
   private client = redis.createClient({
     host: process.env.REDIS_HOST,
-    port: Number.parseInt(process.env.REDIS_PORT),
+    port: Number.parseInt(process.env.REDIS_PORT, 10),
     password: process.env.REDIS_PASSWORD,
   })
   private get = promisify(this.client.get).bind(this.client)
