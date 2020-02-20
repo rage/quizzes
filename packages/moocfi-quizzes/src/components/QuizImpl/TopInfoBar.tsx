@@ -100,15 +100,11 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
     state => state.customization.showPointsInfo,
   )
 
-  const answerStatus = quizAnswer.status
-  const status = answerStatus
-    ? answerStatus !== "rejected" && answerStatus !== "spam"
-      ? "answered"
-      : "rejected"
-    : ""
-
   let title
   let quizLabel
+  let answeredLabel
+  let unansweredLabel
+  let rejectedLabel
   let pointsLabel
   let receivedPoints
   let formattedReceivedPoints
@@ -117,7 +113,22 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   if (languageInfo) {
     quizLabel = languageInfo.general.quizLabel
     pointsLabel = languageInfo.general.pointsLabel
+    answeredLabel = languageInfo.general.answered
+    unansweredLabel = languageInfo.general.unanswered
+    rejectedLabel = languageInfo.general.rejected
   }
+
+  const answerStatus = quizAnswer.status
+  const status = answerStatus
+    ? answerStatus !== "rejected" && answerStatus !== "spam"
+      ? "answered"
+      : "rejected"
+    : ""
+  const statusLabel = status
+    ? status === "rejected"
+      ? rejectedLabel
+      : answeredLabel
+    : unansweredLabel
 
   let titleReplacement
   let pointsPortion
@@ -192,7 +203,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
           <>
             <ProvidedIcon status={status} />
             <QuizStatusMessage className={status} variant="subtitle1">
-              {status ? status : "Unanswered"}:
+              {statusLabel}
             </QuizStatusMessage>
           </>
         ) : (

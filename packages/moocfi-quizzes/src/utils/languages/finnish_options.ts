@@ -123,6 +123,9 @@ const finnishLabels: SingleLanguageLabels = {
           return ""
       }
     },
+    answered: "Vastattu",
+    unanswered: "Vastaamaton",
+    rejected: "Vastaus hylätty, yritä uudelleen",
   },
   error: {
     submitFailedError:

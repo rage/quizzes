@@ -70,7 +70,7 @@ export const chooseOption: ActionCreator<ThunkAction> = (
   optionId: string,
   multi: boolean,
 ) => (dispatch, getState) => {
-  dispatch(messageActions.answerWasChanged())
+  // dispatch(messageActions.answerWasChanged())
   dispatch(chooseOptionAction(itemId, optionId, multi))
 }
 
@@ -83,7 +83,7 @@ export const changeChosenOption: ActionCreator<ThunkAction> = (
     return
   }
   const multi = item.multi
-  dispatch(messageActions.answerWasChanged())
+  // dispatch(messageActions.answerWasChanged())
   dispatch(feedbackDisplayedActions.hide())
   dispatch(chooseOption(itemId, optionId, multi))
 }
@@ -92,7 +92,7 @@ export const changeCheckboxData: ActionCreator<ThunkAction> = (
   itemId: string,
   optionId: string,
 ) => (dispatch, getState) => {
-  dispatch(messageActions.answerWasChanged())
+  // dispatch(messageActions.answerWasChanged())
   dispatch(changeCheckboxDataAction(itemId, optionId))
 }
 
@@ -108,7 +108,7 @@ export const changeIntData: ActionCreator<ThunkAction> = (
   itemId: string,
   newValue: number,
 ) => (dispatch, getState) => {
-  dispatch(messageActions.answerWasChanged())
+  // dispatch(messageActions.answerWasChanged())
   dispatch(changeIntDataAction(itemId, newValue))
 }
 
@@ -120,7 +120,7 @@ export const changeTextData: ActionCreator<ThunkAction> = (
   if (item === undefined) {
     return
   }
-  dispatch(messageActions.answerWasChanged())
+  // dispatch(messageActions.answerWasChanged())
   dispatch(feedbackDisplayedActions.hide())
   const readyToSubmit = itemAnswerReadyForSubmit(newValue, item)
   dispatch(changeTextDataAction(itemId, newValue, readyToSubmit))
@@ -162,21 +162,17 @@ export const submit: ActionCreator<ThunkAction> = () => async (
       const languageInfo = getState().language.languageLabels
       if (languageInfo) {
         dispatch(
-          messageActions.displayNotification(
+          messageActions.notifyUser(
             languageInfo.general.incorrectSubmitWhileTriesLeftLabel,
-            "red",
-            60 * 60 * 24,
-            true,
           ),
         )
       }
     }
   } catch (error) {
     dispatch(
-      messageActions.displayNotification(
+      messageActions.errorOccurred(
         getState().language.languageLabels!.error.submitFailedError ||
           "submit error",
-        "red",
       ),
     )
   }

@@ -24,6 +24,9 @@ export type GeneralLabels = {
   submitGeneralFeedbackLabel: string
   submitButtonAlreadyAnsweredLabel: string
   pointsGrantingPolicyInformer: (policy: QuizPointsGrantingPolicy) => string
+  answered: string
+  unanswered: string
+  rejected: string
 }
 
 export type StageLabels = {

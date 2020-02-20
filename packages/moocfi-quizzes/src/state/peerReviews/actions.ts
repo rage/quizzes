@@ -8,7 +8,7 @@ import {
 } from "../../services/peerReviewService"
 import { setAnswer } from "../quizAnswer/actions"
 import { setUserQuizState } from "../user/actions"
-import { displayNotification, setErrorMessage } from "../message/actions"
+import { errorOccurred } from "../message/actions"
 import { ThunkAction } from "../store"
 import { PeerReviewAnswer, PeerReviewCollection } from "../../modelTypes"
 
@@ -111,10 +111,9 @@ export const submit: ActionCreator<ThunkAction> = () => async (
     await dispatch(fetchPeerReviewAlternatives())
   } catch (error) {
     dispatch(
-      displayNotification(
+      errorOccurred(
         getState().language.languageLabels!.error.submitFailedError ||
           "submit error",
-        "red",
       ),
     )
   }
@@ -153,9 +152,7 @@ export const postSpam: ActionCreator<ThunkAction> = (
     await postSpamFlag(quizAnswerId, accessToken, address)
     await dispatch(fetchPeerReviewAlternatives())
   } catch (error) {
-    dispatch(
-      setErrorMessage("Could not submit your report, Please try again later"),
-    )
+    dispatch(errorOccurred("Could not submit. Please try again later"))
   }
 }
 
@@ -176,12 +173,7 @@ export const fetchPeerReviewAlternatives: ActionCreator<
     )
     dispatch(setReviewOptions(answerAlternatives))
   } catch (error) {
-    dispatch(
-      displayNotification(
-        "something went wrong while retrieving answers",
-        "red",
-      ),
-    )
+    dispatch(errorOccurred("something went wrong while retrieving answers"))
   }
 }
 

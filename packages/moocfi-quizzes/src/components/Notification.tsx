@@ -2,8 +2,8 @@ import * as React from "react"
 import styled from "styled-components"
 import { useTypedSelector } from "../state/store"
 
-const Message = styled.p<{ msgColor: string }>`
-  color: ${({ msgColor }) => msgColor};
+const Message = styled.p<{ msgColor: string | null }>`
+  ${({ msgColor }) => `color: ${msgColor};`}
   font-size: 1.25rem;
   padding: 1rem 0;
 `
@@ -15,12 +15,11 @@ const Break = styled.div`
 
 const Notification: React.FunctionComponent = () => {
   const messageState = useTypedSelector(state => state.message)
-  if (messageState.notification && messageState.notification.message) {
+  if (messageState.message) {
+    const color = (messageState.error && "red") || null
     return (
       <>
-        <Message msgColor={messageState.notification.color}>
-          {messageState.notification.message}
-        </Message>
+        <Message msgColor={color}>{messageState.message}</Message>
         <Break />
       </>
     )

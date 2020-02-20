@@ -249,10 +249,6 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
   )
 }
 
-const ItemInformationGridItem = styled(Grid)`
-  text-align: center;
-`
-
 const SelectOptionsLabelTypography = styled(Typography)<{
   onlyOneItem: boolean
 }>`
@@ -453,15 +449,25 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 
   const FeedbackDiv = ThemedDiv || LeftBorderedDiv
 
+  if (ThemedDiv) {
+    return (
+      <ThemedDiv correct={correct} onlyOneItem={onlyOneItem}>
+        <CentralizedOnSmallScreenTypography variant="body1">
+          {feedbackMessage}
+        </CentralizedOnSmallScreenTypography>
+      </ThemedDiv>
+    )
+  }
+
   return (
-    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem}>
+    <LeftBorderedDiv correct={correct} onlyOneItem={onlyOneItem}>
       <CentralizedOnSmallScreenTypography variant="body1">
         <AttentionIcon icon={faExclamationCircle} />
       </CentralizedOnSmallScreenTypography>
       <CentralizedOnSmallScreenTypography variant="body1">
         {feedbackMessage}
       </CentralizedOnSmallScreenTypography>
-    </FeedbackDiv>
+    </LeftBorderedDiv>
   )
 }
 

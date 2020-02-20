@@ -120,6 +120,9 @@ const englishLabels: SingleLanguageLabels = {
           return ""
       }
     },
+    answered: "Answered",
+    unanswered: "Unanswered",
+    rejected: "Rejected answer, try again",
   },
   error: {
     submitFailedError: "Could not send your answer. Please try again later.",

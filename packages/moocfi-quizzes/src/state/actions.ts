@@ -119,7 +119,7 @@ export const initialize: ActionCreator<ThunkAction> = (
     }
   } catch (e) {
     dispatch(
-      messageActions.setErrorMessage(
+      messageActions.fatalErrorOccurred(
         getState().language.languageLabels!.error.quizLoadFailedError ||
           e.toString(),
       ),

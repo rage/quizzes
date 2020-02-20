@@ -200,7 +200,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   const dispatch = useDispatch()
 
-  const error = messageState.errorMessage
+  const fatal = messageState.fatal
 
   useEffect(
     () => {
@@ -218,10 +218,10 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     [id, languageId, accessToken, backendAddress],
   )
 
-  if (error) {
+  if (fatal) {
     return (
       <Error>
-        <p>{error}</p>
+        <p>{messageState.message}</p>
       </Error>
     )
   }
@@ -362,7 +362,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
         <QuizItemContainerDiv>
           {quizItemComponents(quiz, languageId)}
         </QuizItemContainerDiv>
-        <Notification />
         <LowerContentWrapper nItems={quiz.items.length}>
           {!stillSubmittable && !quizDisabled ? (
             <MessageGroup providedStyles={themeProvider.messageGroupStyles}>
@@ -398,6 +397,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           ) : (
             <>
               <SubmitGroup providedStyles={themeProvider.submitGroupStyles}>
+                <Notification />
                 <div
                   onClick={e => {
                     if ((submitLocked || pastDeadline) && !quizDisabled) {

@@ -37,6 +37,7 @@ import styled from "styled-components"
 import SelectButton from "./SelectButton"
 import SpamButton from "./SpamButton"
 import PeerReviewSubmitButton from "./PeerReviewSubmitButton"
+import Notification from "../Notification"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
 
 interface ButtonWrapperProps {
@@ -149,6 +150,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
           />
         </TopMarginDivLarge>
       ))}
+      <Notification />
     </div>
   )
 }
@@ -169,6 +171,7 @@ const PeerReviewQuestions: React.FunctionComponent<
   const submitDisabled = useTypedSelector(
     state => state.peerReviews.submitDisabled,
   )
+  const error = useTypedSelector(state => state.message.error)
 
   const dispatch = useDispatch()
 
@@ -275,8 +278,9 @@ const PeerReviewQuestions: React.FunctionComponent<
           </QuestionBlockWrapper>
         )
       })}
+      <Notification />
       <PeerReviewSubmitButton
-        disabled={submitDisabled}
+        disabled={submitDisabled || error}
         onClick={submitPeerReview}
       >
         {languageInfo.submitPeerReviewLabel}
@@ -344,6 +348,7 @@ const ReportOrSelect: React.FunctionComponent<ReportOrSelectProps> = ({
 }) => {
   const themeProvider = useContext(ThemeProviderContext)
 
+  const error = useTypedSelector(state => state.message.error)
   const [disabled, setDisabled] = React.useState(false)
   const dispatch = useDispatch()
 
@@ -360,7 +365,7 @@ const ReportOrSelect: React.FunctionComponent<ReportOrSelectProps> = ({
 
   return (
     <ButtonWrapper providedStyles={themeProvider.buttonWrapperStyles}>
-      <SpamButton disabled={disabled} onClick={flagAsSpam}>
+      <SpamButton disabled={disabled || error} onClick={flagAsSpam}>
         {languageInfo.reportAsInappropriateLabel}
       </SpamButton>
       <SelectButton onClick={selectAnswer}>
