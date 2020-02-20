@@ -151,8 +151,8 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
       <WideGridItem>
         <RadioGroup
           row={true}
-          aria-label="agreement"
-          name="agreement"
+          aria-label={item.texts[0].title}
+          name={item.texts[0].title}
           value={`${intData}`}
           onChange={handleIntDataChange}
         >
