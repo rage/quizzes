@@ -1,11 +1,22 @@
 import * as React from "react"
 import styled from "styled-components"
 import { useTypedSelector } from "../state/store"
+import { scrollToRef } from "../utils"
 
-const Message = styled.p<{ msgColor: string | null }>`
-  ${({ msgColor }) => `color: ${msgColor};`}
-  font-size: 1.25rem;
+const Message = styled.div<{ msgColor: string | null }>`
+  ${({ msgColor }) => `
+  display: flex
+  border-style: solid;
+  border-width: 0.25rem;
+  border-color: ${msgColor}
   padding: 1rem 0;
+  p {
+    margin: auto;
+    color: ${msgColor};
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
+  `}
 `
 
 const Break = styled.div`
@@ -13,15 +24,21 @@ const Break = styled.div`
   height: 0;
 `
 
-const Notification: React.FunctionComponent = () => {
+interface NotificationProps {
+  scrollRef: any
+}
+
+const Notification: React.FunctionComponent<NotificationProps> = ({
+  scrollRef,
+}) => {
   const messageState = useTypedSelector(state => state.message)
   if (messageState.message) {
     const color = (messageState.error && "red") || null
+    scrollToRef(scrollRef)
     return (
-      <>
-        <Message msgColor={color}>{messageState.message}</Message>
-        <Break />
-      </>
+      <Message msgColor={color}>
+        <p>{messageState.message}</p>
+      </Message>
     )
   }
   return null

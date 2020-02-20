@@ -183,6 +183,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   showZeroPointsInfo = false,
   children,
 }) => {
+  const ref = React.useRef(null)
   const themeProvider = React.useContext(ThemeProviderContext)
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
@@ -348,6 +349,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   return (
     <OuterDiv providedStyles={themeProvider.mainDivStyles}>
       <TopInfoBar />
+      <div ref={ref} />
+      <Notification scrollRef={ref} />
       <QuizContentWrapper disabled={quizDisabled || wrongLocale}>
         <UpperContent providedStyles={themeProvider.upperContentStyles}>
           <Deadline deadline={quiz.deadline} />
@@ -397,7 +400,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           ) : (
             <>
               <SubmitGroup providedStyles={themeProvider.submitGroupStyles}>
-                <Notification />
+                <div />
                 <div
                   onClick={e => {
                     if ((submitLocked || pastDeadline) && !quizDisabled) {

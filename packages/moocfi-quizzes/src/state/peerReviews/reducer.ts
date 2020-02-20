@@ -12,7 +12,7 @@ import {
 } from "../../modelTypes"
 
 export const initialState: PeerReviewsState = {
-  options: [],
+  options: null,
   answer: null,
   submitDisabled: true,
   activeStep: 0,
@@ -20,7 +20,7 @@ export const initialState: PeerReviewsState = {
 
 export type PeerReviewsState = {
   answer: PeerReviewAnswer | null
-  options: QuizAnswer[]
+  options: QuizAnswer[] | null
   submitDisabled: boolean
   activeStep: number
 }
@@ -116,9 +116,10 @@ export const peerReviewsReducer = (
       } = action.payload
 
       const answersToReview = state.options
-      const rejected = answersToReview.filter(
-        answer => answer.id !== quizAnswerId,
-      )
+      const rejected =
+        (answersToReview &&
+          answersToReview.filter(answer => answer.id !== quizAnswerId)) ||
+        []
 
       const peerReviewAnswer: PeerReviewAnswer = {
         quizAnswerId,

@@ -74,6 +74,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 
   const answersToReview = useTypedSelector(state => state.peerReviews.options)
   const peerReview = useTypedSelector(state => state.peerReviews.answer)
+  const error = useTypedSelector(state => state.message.error)
   const dispatch = useDispatch()
 
   const unselectAnswer = () => {
@@ -83,14 +84,16 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 
   if (!answersToReview) {
     return (
-      <Grid container>
-        <Grid item xs={1}>
-          <CircularProgress size={25} />
-        </Grid>
-        <Grid item>
-          <Typography>{languageInfo.loadingLabel}</Typography>
-        </Grid>
-      </Grid>
+      <div>
+        {error ? (
+          <div />
+        ) : (
+          <>
+            <CircularProgress size={25} />
+            <Typography>{languageInfo.loadingLabel}</Typography>
+          </>
+        )}
+      </div>
     )
   }
 
@@ -150,7 +153,6 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
           />
         </TopMarginDivLarge>
       ))}
-      <Notification />
     </div>
   )
 }
@@ -278,7 +280,7 @@ const PeerReviewQuestions: React.FunctionComponent<
           </QuestionBlockWrapper>
         )
       })}
-      <Notification />
+      <div />
       <PeerReviewSubmitButton
         disabled={submitDisabled || error}
         onClick={submitPeerReview}
