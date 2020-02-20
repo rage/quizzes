@@ -43,7 +43,9 @@ const PeerReviewOption: React.FunctionComponent<PeerReviewOptionProps> = ({
 
           return (
             <React.Fragment key={ia.id}>
-              <Typography component="p" variant="subtitle2">{quizTitle}</Typography>
+              <Typography component="p" variant="subtitle2">
+                {quizTitle}
+              </Typography>
               <SpaciousPaper key={ia.id}>
                 <WhiteSpacePreservingTypography variant="body1">
                   {ia.textData}

@@ -237,7 +237,11 @@ const TextualPeerReviewFeedback: React.FunctionComponent<
 
   return (
     <StyledReviewEssayQuestion>
-      <MarkdownText component="p" Component={BoldTypography} variant="subtitle1">
+      <MarkdownText
+        component="p"
+        Component={BoldTypography}
+        variant="subtitle1"
+      >
         {questionTexts.title}
       </MarkdownText>
 

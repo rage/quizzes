@@ -35,6 +35,7 @@ interface ChoicesContainerProps {
 
 const ChoicesContainer = styled.div<ChoicesContainerProps>`
   display: flex;
+  flex-wrap: wrap:
   flex-direction: ${({ direction }) => direction};
   padding-top: 7;
   ${({ onlyOneItem }) => onlyOneItem && "width: 100%"}
@@ -228,7 +229,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
           variant="subtitle1"
           component="p"
         >
-          {title} 
+          {title}
         </LeftAlignedMarkdownText>
       )}
 

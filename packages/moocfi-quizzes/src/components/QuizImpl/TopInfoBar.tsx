@@ -193,9 +193,17 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
         )}
       </IconContainer>
       <TitleContainer role="heading">
-        <Typography  component="p" variant="subtitle1" id="quiz-type-label">{quizLabel}:</Typography>
+        <Typography component="p" variant="subtitle1" id="quiz-type-label">
+          {quizLabel}:
+        </Typography>
         {quiz ? (
-          <Typography variant="h5" component="h2" aria-describedby="quiz-type-label">{title}</Typography>
+          <Typography
+            variant="h5"
+            component="h2"
+            aria-describedby="quiz-type-label"
+          >
+            {title}
+          </Typography>
         ) : (
           titleReplacement
         )}
