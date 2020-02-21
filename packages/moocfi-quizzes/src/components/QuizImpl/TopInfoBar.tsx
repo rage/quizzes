@@ -7,14 +7,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
 
-const Container = styled.div<{ providedStyles: string | undefined }>`
+export interface TopInfoBarContainerProps {
+  loggedIn?: boolean
+  answered?: boolean
+  confirmed?: boolean
+  rejected?: boolean
+}
+
+const Container = styled.div<TopInfoBarContainerProps>`
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 1.5rem 2rem;
   color: white;
   background-color: #213094;
-  ${({ providedStyles }) => providedStyles}
 `
 
 const IconContainer = styled.div`
@@ -94,15 +100,11 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
     state => state.customization.showPointsInfo,
   )
 
-  const answerStatus = quizAnswer.status
-  const status = answerStatus
-    ? answerStatus !== "rejected" && answerStatus !== "spam"
-      ? "answered"
-      : "rejected"
-    : ""
-
   let title
   let quizLabel
+  let answeredLabel
+  let unansweredLabel
+  let rejectedLabel
   let pointsLabel
   let receivedPoints
   let formattedReceivedPoints
@@ -111,7 +113,22 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   if (languageInfo) {
     quizLabel = languageInfo.general.quizLabel
     pointsLabel = languageInfo.general.pointsLabel
+    answeredLabel = languageInfo.general.answered
+    unansweredLabel = languageInfo.general.unanswered
+    rejectedLabel = languageInfo.general.rejected
   }
+
+  const answerStatus = quizAnswer.status
+  const status = answerStatus
+    ? answerStatus !== "rejected" && answerStatus !== "spam"
+      ? "answered"
+      : "rejected"
+    : ""
+  const statusLabel = status
+    ? status === "rejected"
+      ? rejectedLabel
+      : answeredLabel
+    : unansweredLabel
 
   let titleReplacement
   let pointsPortion
@@ -177,15 +194,16 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   }
 
   const ProvidedIcon = themeProvider.topInfoBarIcon
+  const TopInfoBarContainer = themeProvider.topInfoBarContainer || Container
 
   return (
-    <Container providedStyles={themeProvider.topInfoBarStyles}>
+    <TopInfoBarContainer loggedIn={loggedIn}>
       <IconContainer>
         {ProvidedIcon ? (
           <>
             <ProvidedIcon status={status} />
             <QuizStatusMessage className={status} variant="subtitle1">
-              {status ? status : "Unanswered"}:
+              {statusLabel}
             </QuizStatusMessage>
           </>
         ) : (
@@ -193,14 +211,22 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
         )}
       </IconContainer>
       <TitleContainer role="heading">
-        <Typography  component="p" variant="subtitle1" id="quiz-type-label">{quizLabel}:</Typography>
+        <Typography component="p" variant="subtitle1" id="quiz-type-label">
+          {quizLabel}:
+        </Typography>
         {quiz ? (
-          <Typography variant="h5" component="h2" aria-describedby="quiz-type-label">{title}</Typography>
+          <Typography
+            variant="h5"
+            component="h2"
+            aria-describedby="quiz-type-label"
+          >
+            {title}
+          </Typography>
         ) : (
           titleReplacement
         )}
       </TitleContainer>
-      {(!quiz || showPointsInfo) && (
+      {(!quiz || !quiz.excludedFromScore) && (
         <PointsContainer>
           <PointsLabelText component="div" paragraph={false}>
             {pointsLabel}:
@@ -208,7 +234,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
           {pointsPortion}
         </PointsContainer>
       )}
-    </Container>
+    </TopInfoBarContainer>
   )
 }
 

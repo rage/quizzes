@@ -33,7 +33,7 @@ export const requestReviews: ActionCreator<ThunkAction> = () => async (
   const accessToken = getState().user.accessToken
   if (!answerId || !accessToken) {
     dispatch(
-      messageActions.setErrorMessage(
+      messageActions.errorOccurred(
         "Something unexpected occurred -- try reloading",
       ),
     )
@@ -49,6 +49,6 @@ export const requestReviews: ActionCreator<ThunkAction> = () => async (
 
     dispatch(setReviews(reviews))
   } catch (e) {
-    dispatch(setLoadingState("error"))
+    dispatch(messageActions.errorOccurred("error"))
   }
 }

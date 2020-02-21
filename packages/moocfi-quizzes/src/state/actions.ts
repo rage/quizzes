@@ -28,7 +28,7 @@ export const initialize: ActionCreator<ThunkAction> = (
   backendAddress?: string,
   fullInfoWithoutLogin?: boolean,
   showZeroPointsInfo?: boolean,
-) => async (dispatch: Dispatch) => {
+) => async (dispatch: Dispatch, getState) => {
   if (showZeroPointsInfo === undefined) {
     showZeroPointsInfo = true
   }
@@ -118,6 +118,11 @@ export const initialize: ActionCreator<ThunkAction> = (
       dispatch(userActions.setUserQuizState(userQuizState))
     }
   } catch (e) {
-    dispatch(messageActions.set(e.toString()))
+    dispatch(
+      messageActions.fatalErrorOccurred(
+        getState().language.languageLabels!.error.quizLoadFailedError ||
+          e.toString(),
+      ),
+    )
   }
 }

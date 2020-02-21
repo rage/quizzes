@@ -1,5 +1,7 @@
 import * as React from "react"
+import { useContext } from "react"
 import styled from "styled-components"
+import ThemeProviderContext from "../../contexes/themeProviderContext"
 import { Paper } from "@material-ui/core"
 import {
   PeerReviewQuestionAnswer,
@@ -14,12 +16,15 @@ import {
   SpaciousPaper,
 } from "../styleComponents"
 import LikertScale from "likert-react"
-import { BoldTypography } from "../styleComponents"
+import { BoldTypography, withMargin } from "../styleComponents"
 import { ReceivedPeerReviewLabels } from "../../utils/languages/"
 
-const AnswerPaper = styled(Paper)`
-  padding: 0.5rem;
-  margin-bottom: 1rem;
+interface AnswerPaperProps {
+  providedStyles?: string | undefined
+}
+
+const AnswerPaper = styled(SpaciousPaper)<AnswerPaperProps>`
+  ${({ providedStyles }) => providedStyles}
 `
 interface IReceivedPeerReviewProps {
   questions: PeerReviewQuestion[]
@@ -34,16 +39,20 @@ const ReceivedPeerReview: React.FunctionComponent<IReceivedPeerReviewProps> = ({
   idx,
   receivedReviewsLabels,
 }) => {
+  const themeProvider = useContext(ThemeProviderContext)
+
   if (typeof answer.createdAt === "string") {
     answer.createdAt = new Date(answer.createdAt)
   }
 
+  const Title = withMargin(BoldTypography, "0 0 0.5rem !important")
+
   return (
-    <SpaciousPaper elevation={4}>
-      <BoldTypography>
+    <AnswerPaper elevation={4} providedStyles={themeProvider.answerPaperStyles}>
+      <Title>
         {receivedReviewsLabels.peerReviewLabel} {idx + 1} (
         {answer.createdAt.toLocaleDateString()})
-      </BoldTypography>
+      </Title>
       {questions
         .sort((e1, e2) => e1.order - e2.order)
         .map(question => {
@@ -64,7 +73,7 @@ const ReceivedPeerReview: React.FunctionComponent<IReceivedPeerReviewProps> = ({
             </div>
           )
         })}
-    </SpaciousPaper>
+    </AnswerPaper>
   )
 }
 

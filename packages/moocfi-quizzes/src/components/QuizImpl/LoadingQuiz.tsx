@@ -5,6 +5,7 @@ import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
 import { useTypedSelector } from "../../state/store"
 import LoginPrompt from "./LoginPrompt"
+import { CustomContent } from "./"
 
 const ContentWrapper = styled.div`
   padding: 1rem;
@@ -15,7 +16,7 @@ const StyledContentLoader = styled(ContentLoader)`
 `
 
 interface ILoadingQuizProps {
-  content?: JSX.Element | Element
+  content?: CustomContent
   accessToken?: string
 }
 
@@ -25,11 +26,18 @@ const LoadingQuiz: React.FunctionComponent<ILoadingQuizProps> = ({
 }) => {
   const displayBars = useTypedSelector(state => state.loadingBars)
 
+  if (content && content.Loading) {
+    return <>{content.Loading}</>
+  }
+
   return (
     <div>
       <TopInfoBar />
       {!accessToken && (
-        <LoginPrompt content={content} fullQuizInfoShown={true} />
+        <LoginPrompt
+          content={content && content.Login}
+          fullQuizInfoShown={true}
+        />
       )}
 
       <ContentWrapper>

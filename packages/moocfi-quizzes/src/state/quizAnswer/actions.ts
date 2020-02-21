@@ -70,7 +70,7 @@ export const chooseOption: ActionCreator<ThunkAction> = (
   optionId: string,
   multi: boolean,
 ) => (dispatch, getState) => {
-  dispatch(messageActions.answerWasChanged())
+  // dispatch(messageActions.answerWasChanged())
   dispatch(chooseOptionAction(itemId, optionId, multi))
 }
 
@@ -83,7 +83,7 @@ export const changeChosenOption: ActionCreator<ThunkAction> = (
     return
   }
   const multi = item.multi
-  dispatch(messageActions.answerWasChanged())
+  // dispatch(messageActions.answerWasChanged())
   dispatch(feedbackDisplayedActions.hide())
   dispatch(chooseOption(itemId, optionId, multi))
 }
@@ -92,7 +92,7 @@ export const changeCheckboxData: ActionCreator<ThunkAction> = (
   itemId: string,
   optionId: string,
 ) => (dispatch, getState) => {
-  dispatch(messageActions.answerWasChanged())
+  // dispatch(messageActions.answerWasChanged())
   dispatch(changeCheckboxDataAction(itemId, optionId))
 }
 
@@ -108,7 +108,7 @@ export const changeIntData: ActionCreator<ThunkAction> = (
   itemId: string,
   newValue: number,
 ) => (dispatch, getState) => {
-  dispatch(messageActions.answerWasChanged())
+  // dispatch(messageActions.answerWasChanged())
   dispatch(changeIntDataAction(itemId, newValue))
 }
 
@@ -120,7 +120,7 @@ export const changeTextData: ActionCreator<ThunkAction> = (
   if (item === undefined) {
     return
   }
-  dispatch(messageActions.answerWasChanged())
+  // dispatch(messageActions.answerWasChanged())
   dispatch(feedbackDisplayedActions.hide())
   const readyToSubmit = itemAnswerReadyForSubmit(newValue, item)
   dispatch(changeTextDataAction(itemId, newValue, readyToSubmit))
@@ -132,43 +132,49 @@ export const submit: ActionCreator<ThunkAction> = () => async (
 ) => {
   dispatch(setLocked())
 
-  let { quiz, quizAnswer, userQuizState } = await postAnswer(
-    getState().quizAnswer.quizAnswer,
-    getState().user.accessToken,
-    getState().backendAddress,
-  )
+  try {
+    let { quiz, quizAnswer, userQuizState } = await postAnswer(
+      getState().quizAnswer.quizAnswer,
+      getState().user.accessToken,
+      getState().backendAddress,
+    )
 
-  // wrong answer -> quiz not returned
-  if (!quiz) {
-    quiz = getState().quiz
-  }
-
-  dispatch(userActions.setUserQuizState(userQuizState))
-  dispatch(setNoChangesSinceSuccessfulSubmit())
-
-  if (userQuizState.status === "locked") {
-    dispatch(quizActions.set(quiz))
-    dispatch(setAnswer(quizAnswer))
-    dispatch(feedbackDisplayedActions.display())
-  } else if (
-    userQuizState.pointsAwarded &&
-    Math.abs(userQuizState.pointsAwarded - quiz.points) < 0.001
-  ) {
-    dispatch(quizActions.set(quiz))
-    dispatch(setAnswer(quizAnswer))
-    dispatch(feedbackDisplayedActions.display())
-  } else {
-    const languageInfo = getState().language.languageLabels
-    if (languageInfo) {
-      dispatch(
-        messageActions.displayNotification(
-          languageInfo.general.incorrectSubmitWhileTriesLeftLabel,
-          "red",
-          60 * 60 * 24,
-          true,
-        ),
-      )
+    // wrong answer -> quiz not returned
+    if (!quiz) {
+      quiz = getState().quiz
     }
+
+    dispatch(userActions.setUserQuizState(userQuizState))
+    dispatch(setNoChangesSinceSuccessfulSubmit())
+
+    if (userQuizState.status === "locked") {
+      dispatch(quizActions.set(quiz))
+      dispatch(setAnswer(quizAnswer))
+      dispatch(feedbackDisplayedActions.display())
+    } else if (
+      userQuizState.pointsAwarded &&
+      Math.abs(userQuizState.pointsAwarded - quiz.points) < 0.001
+    ) {
+      dispatch(quizActions.set(quiz))
+      dispatch(setAnswer(quizAnswer))
+      dispatch(feedbackDisplayedActions.display())
+    } else {
+      const languageInfo = getState().language.languageLabels
+      if (languageInfo) {
+        dispatch(
+          messageActions.notifyUser(
+            languageInfo.general.incorrectSubmitWhileTriesLeftLabel,
+          ),
+        )
+      }
+    }
+  } catch (error) {
+    dispatch(
+      messageActions.errorOccurred(
+        getState().language.languageLabels!.error.submitFailedError ||
+          "submit error",
+      ),
+    )
   }
 }
 
