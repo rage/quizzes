@@ -91,7 +91,7 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
           md={4}
         >
           <StyledFormLabel>
-            <MarkdownText Component={Typography} variant="body1">
+            <MarkdownText Component={Typography} variant="body1" id="info">
               {item.texts[0].title}
             </MarkdownText>
           </StyledFormLabel>

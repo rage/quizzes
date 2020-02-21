@@ -219,6 +219,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
           removeParagraphs
           variant="subtitle1"
           component="p"
+          id="item-question"
         >
           {title} 
         </LeftAlignedMarkdownText>
@@ -440,7 +441,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   const FeedbackDiv = ThemedDiv || LeftBorderedDiv
 
   return (
-    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem}>
+    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem} role="alertdialog">
       <CentralizedOnSmallScreenTypography variant="body1">
         <AttentionIcon icon={faExclamationCircle} />
       </CentralizedOnSmallScreenTypography>
