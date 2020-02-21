@@ -37,7 +37,7 @@ interface ChoicesContainerProps {
 
 const ChoicesContainer = styled.div<ChoicesContainerProps>`
   display: flex;
-  flex-wrap: wrap:
+  flex-wrap: wrap;
   flex-direction: ${({ direction }) => direction};
   padding-top: 7;
   ${({ onlyOneItem }) => onlyOneItem && "width: 100%"}

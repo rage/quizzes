@@ -226,3 +226,22 @@ export interface QuizAnswerStatePayload {
   quizAnswer: QuizAnswer
   userQuizState: UserQuizState | null
 }
+
+export interface PointsByGroup {
+  group: string
+  max_points: number
+  n_points: number
+  progress: number
+}
+
+export interface QuizAnswerMessage {
+  timestamp: string
+  exercise_id: string
+  n_points: number
+  completed: boolean
+  user_id: number
+  course_id: string
+  service_id: string
+  required_actions: string[] | null
+  message_format_version: number
+}
