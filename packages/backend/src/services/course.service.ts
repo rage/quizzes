@@ -5,6 +5,7 @@ import { InjectManager } from "typeorm-typedi-extensions"
 import { Course } from "../models"
 import { ICourseQuery } from "../types"
 import UserCourseRoleService from "./usercourserole.service"
+import Knex = require("knex")
 
 @Service()
 export class CourseService {
@@ -50,6 +51,40 @@ export class CourseService {
             courses.map(async (c: Course) => this.stripCourse(c, query)),
           ),
       )
+  }
+
+  public async duplicateCourse(
+    courseId: string,
+    name: string,
+    slug: string,
+  ): Promise<Course> {
+    // 1. check if the course exists
+
+    const courseToBeDuplicated = await Course.findOne(courseId)
+    if (!courseToBeDuplicated) {
+      return null
+    }
+
+    // 2. knex together the thingies
+
+    const oldCourseId = courseId
+
+    this.entityManager.transaction(async manager => {
+      const newCourse = await manager.create(Course)
+
+      const builder = Knex({ client: "pg" })
+
+      builder("course_translation").insert({
+        course_id: "",
+        language_id: "",
+        abbreviation: slug,
+        title: title,
+      })
+    })
+
+    // return the course
+
+    return null
   }
 
   private async stripCourse(
