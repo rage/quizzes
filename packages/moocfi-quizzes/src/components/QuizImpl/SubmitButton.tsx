@@ -69,6 +69,7 @@ const SubmitButton: React.FunctionComponent = () => {
       color="primary"
       disabled={submitLocked || pastDeadline}
       onClick={handleSubmit}
+      aria-label={buttonText}
     >
       {buttonText}
     </StyledSubmitButton>

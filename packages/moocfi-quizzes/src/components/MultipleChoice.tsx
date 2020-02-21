@@ -35,6 +35,7 @@ interface ChoicesContainerProps {
 
 const ChoicesContainer = styled.div<ChoicesContainerProps>`
   display: flex;
+  flex-wrap: wrap;
   flex-direction: ${({ direction }) => direction};
   padding-top: 7;
   ${({ onlyOneItem }) => onlyOneItem && "width: 100%"}
@@ -133,26 +134,17 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   const options = item.options
 
   let direction: GridDirection = "row"
-  let alignItems: GridItemsAlignment = "baseline"
   let questionWidth: 5 | 12 = 5
-  let optionContainerWidth: GridSize = 7
   let optionWidth: GridSize = "auto"
 
   if (onlyOneItem) {
     const maxOptionLength = Math.max(
       ...options.map(option => option.texts[0].title.length),
     )
-    const width =
-      maxOptionLength > 100 ? 12 : Math.ceil(maxOptionLength / (8 + 1 / 3))
-    optionContainerWidth = 12
-    optionWidth = 12
-    questionWidth = 12
-    direction = "column"
-    alignItems = "center"
   }
 
   return (
-    <>
+    <div role="group" aria-label={item.texts[0].title}>
       <ItemContent
         direction={direction}
         providedStyles={themeProvider.multipleChoiceItemContentStyles}
@@ -182,7 +174,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
         </div>
         {!onlyOneItem && <FeedbackPortion item={item} />}
       </ItemContent>
-    </>
+    </div>
   )
 }
 
@@ -235,7 +227,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
       {body && <MarkdownText>{body}</MarkdownText>}
 
       {selectOptionsLabel && (
-        <SelectOptionsLabelTypography variant="subtitle1">
+        <SelectOptionsLabelTypography component="p" variant="subtitle1">
           {selectOptionsLabel}
         </SelectOptionsLabelTypography>
       )}

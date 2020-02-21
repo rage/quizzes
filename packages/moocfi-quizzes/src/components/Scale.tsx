@@ -155,13 +155,14 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
           name={item.texts[0].title}
           value={`${intData}`}
           onChange={handleIntDataChange}
+          aria-describedy="info "
         >
           <Grid
             container={true}
             justify={number_of_options <= 12 ? "space-between" : "flex-start"}
           >
             {alternatives.map(number => (
-              <StyledOptionItem key={number}>
+              <StyledOptionItem key={number} role="radio">
                 <FormControlLabel
                   value={`${number}`}
                   control={

@@ -175,6 +175,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   const error = messageState.errorMessage
 
+
   useEffect(
     () => {
       dispatch(
@@ -313,9 +314,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     )
 
   const ThemedLowerContent = themeProvider.lowerContent || LowerContent
-
   return (
-    <OuterDiv providedStyles={themeProvider.mainDivStyles}>
+    <OuterDiv providedStyles={themeProvider.mainDivStyles} aria-label={quiz.texts[0].title} role="form">
       <TopInfoBar />
 
       {quizDisabled && (
