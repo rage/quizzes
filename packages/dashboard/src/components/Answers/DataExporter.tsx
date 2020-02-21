@@ -89,9 +89,9 @@ const DataExporter: React.FunctionComponent<IDataExporterProps> = ({
 
 const mapStateToProps = state => ({
   isAdmin: state.user.administrator,
-  courseRoles: state.user.roles.filter(
-    role => role.courseId === state.filter.course,
-  ),
+  courseRoles: state.user.roles
+    ? state.user.roles.filter(role => role.courseId === state.filter.course)
+    : [],
 })
 
 export default connect(mapStateToProps)(DataExporter)
