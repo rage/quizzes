@@ -1,6 +1,6 @@
 import _ from "lodash"
 import { ActionType, createAction } from "typesafe-actions"
-import { IQuiz } from "../../interfaces"
+import { IQuiz, IQuizItem, IQuizItemOption } from "../../interfaces"
 
 import { post } from "../../services/quizzes"
 import { displayMessage } from "../notification/actions"
@@ -13,6 +13,23 @@ export const set = createAction("edit/SET", resolve => {
 export const create = createAction("edit/NEW", resolve => {
   return (course: any) => resolve(course)
 })
+
+export const modifyOptionOrder = createAction(
+  "edit/OPTION_ORDER_MODIFIED",
+  resolve => (quizItem: IQuizItem, optionIdx1: number, optionIdx2: number) =>
+    resolve({ quizItem, optionIdx1, optionIdx2 }),
+)
+
+export const swapOptionOrders = createAction(
+  "edit/SWAP_OPTION_ORDER",
+  resolve => (quizItem: IQuizItem, optionIdx1: number, optionIdx2: number) =>
+    resolve({ quizItem, optionIdx1, optionIdx2 }),
+)
+
+export const removeOption = createAction(
+  "edit/REMOVE_OPTION",
+  resolve => (option: IQuizItemOption) => resolve({ option }),
+)
 
 export const setEdit = (quiz: any) => {
   const orderedQuiz: IQuiz = JSON.parse(JSON.stringify(quiz))
@@ -47,7 +64,6 @@ export const save = () => {
       const quiz = await post(getState().edit, getState().user)
       dispatch(quizActions.set({ courseId: quiz.courseId, quizzes: [quiz] }))
       dispatch(setEdit(quiz))
-
       dispatch(
         displayMessage(`Successfully saved ${quiz.texts[0].title}!`, false),
       )
@@ -81,6 +97,7 @@ export const newQuiz = () => {
       triesLimited: true,
       grantPointsPolicy: "grant_whenever_possible",
       autoConfirm: true,
+      points: 1,
     }
     dispatch(set(checkForMissingTranslation(quiz)))
   }
@@ -129,18 +146,18 @@ export const addItem = type => {
   }
 }
 
-export const addOption = item => {
+export const addOption = (itemOrder: number) => {
   return (dispatch, getState) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
     const option = {
-      order: quiz.items[item].options.length,
+      order: quiz.items[itemOrder].options.length,
       correct: false,
       texts: [],
     }
-    if (quiz.items[item].id) {
-      _.set(option, "quizItemId", quiz.items[item].id)
+    if (quiz.items[itemOrder].id) {
+      _.set(option, "quizItemId", quiz.items[itemOrder].id)
     }
-    quiz.items[item].options.push(option)
+    quiz.items[itemOrder].options.push(option)
     dispatch(setEdit(quiz))
   }
 }
@@ -268,9 +285,14 @@ export const addReviewQuestion = (index, type) => {
 export const remove = (path, index) => {
   return (dispatch, getState) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
+
     const array = _.get(quiz, path)
     array.splice(index, 1)
-    quiz[path] = array.map((arrayItem, idx) => ({ ...arrayItem, order: idx }))
+    _.set(
+      quiz,
+      path,
+      array.map((arrayItem, idx) => ({ ...arrayItem, order: idx })),
+    )
     dispatch(setEdit(quiz))
   }
 }

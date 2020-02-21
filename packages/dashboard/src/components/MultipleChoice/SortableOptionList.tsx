@@ -3,18 +3,23 @@ import AddCircle from "@material-ui/icons/AddCircle"
 import React from "react"
 import { SortableContainer } from "react-sortable-hoc"
 import { stringContainsLongerWord } from "../../../../common/src/util/index"
+import { IQuizItemOption } from "../../interfaces"
 import SortableWrapper from "../SortableWrapper"
-import { IOptionData } from "./ExpandedMultipleChoiceItem"
 
 interface ISortableOptionListProps {
-  options: IOptionData[]
+  options: IQuizItemOption[]
   order: number
-  modifyExistingOption: (order: number) => () => void
   createNewOption: () => void
+  openOptionDialog: (optionIdx: number) => any
 }
 
 const SortableOptionList = SortableContainer<ISortableOptionListProps>(
   props => {
+    console.log(
+      "Sortable option list is rendered with the following props:",
+      props,
+    )
+
     return (
       <Grid
         container={true}
@@ -27,7 +32,7 @@ const SortableOptionList = SortableContainer<ISortableOptionListProps>(
             <SortableWrapper
               collection={`items[${props.order}].options`}
               index={index}
-              key={`${option.quizItemId}-${index}-${option.title}`}
+              key={`${option.quizItemId}-${index}-${option.texts[0].title}`}
             >
               <Grid item={true} xs={12} sm={6} md={4} lg={3}>
                 <div
@@ -37,13 +42,18 @@ const SortableOptionList = SortableContainer<ISortableOptionListProps>(
                     cursor: "pointer",
                     padding: ".5em",
                     textAlign: "center",
-                    wordBreak: stringContainsLongerWord(option.title, 30)
+                    wordBreak: stringContainsLongerWord(
+                      option.texts[0].title,
+                      30,
+                    )
                       ? "break-all"
                       : "normal",
                   }}
-                  onClick={props.modifyExistingOption(option.order)}
+                  onClick={props.openOptionDialog(index)}
                 >
-                  <Typography variant="body1">{option.title || ""}</Typography>
+                  <Typography variant="body1">
+                    {option.texts[0].title || ""}
+                  </Typography>
                 </div>
               </Grid>
             </SortableWrapper>

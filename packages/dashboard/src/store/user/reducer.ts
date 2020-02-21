@@ -1,5 +1,4 @@
 import { ActionType, getType } from "typesafe-actions"
-import { ITMCProfile } from "../../../../common/src/types"
 import * as user from "./actions"
 
 export enum InitializationStatus {

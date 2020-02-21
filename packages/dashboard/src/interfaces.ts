@@ -48,6 +48,7 @@ export interface IQuiz {
   course: ICourse
   items: IQuizItem[]
   grantPointsPolicy: QuizPointsGrantingPolicy
+  peerReviewCollections?: IPeerReviewCollection[]
 }
 
 export interface IQuizItemOptionText {
@@ -117,8 +118,38 @@ export interface ICourse {
   organization: any
 }
 
+export interface IPeerReviewCollectionText {
+  peerReviewCollectionId: string
+  languageId: string
+  title: string
+  body: string
+}
+
+type PeerReviewQuestionType = "grade" | "essay"
+
+export interface IPeerReviewCollectionQuestionText {
+  peerReviewQuestionId: string
+  languageId: string
+  title: string
+  body: string
+}
+
+export interface IPeerReviewCollectionQuestion {
+  id: string
+  quizId: string
+  peerReviewCollectionId: string
+  default: boolean
+  type: PeerReviewQuestionType
+  answerRequired: boolean
+  order: number
+  texts: IPeerReviewCollectionQuestionText[]
+}
+
 export interface IPeerReviewCollection {
-  a: any
+  id: string
+  quizId: string
+  questions: IPeerReviewCollectionQuestion[]
+  texts: IPeerReviewCollectionText[]
 }
 
 export interface ILanguage {
