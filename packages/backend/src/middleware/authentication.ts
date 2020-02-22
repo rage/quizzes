@@ -1,7 +1,5 @@
-import TMCApi from "@quizzes/common/services/TMCApi"
-import { ITMCProfileDetails } from "@quizzes/common/types"
 import { NextFunction, Request, Response } from "express"
-import redis from "redis"
+// import redis from "redis"
 import {
   ExpressMiddlewareInterface,
   Middleware,
@@ -9,6 +7,10 @@ import {
   UnauthorizedError,
 } from "routing-controllers"
 import { promisify } from "util"
+import TMCApi from "../services/TMCApi"
+import { ITMCProfileDetails } from "../types"
+
+import redis from "../config/redis"
 
 const whitelist = [
   /\/$/,
@@ -19,12 +21,12 @@ const whitelist = [
 
 @Middleware({ type: "before" })
 export class AuthenticationMiddleware implements ExpressMiddlewareInterface {
-  private client = redis.createClient({
+  /*private client = redis.createClient({
     host: process.env.REDIS_HOST,
     port: Number.parseInt(process.env.REDIS_PORT, 10),
     password: process.env.REDIS_PASSWORD,
   })
-  private get = promisify(this.client.get).bind(this.client)
+  private get = promisify(this.client.get).bind(this.client)*/
 
   public async use(req: any, res: any, next: any) {
     console.log(req.url)
@@ -44,12 +46,13 @@ export class AuthenticationMiddleware implements ExpressMiddlewareInterface {
       return next()
     }
 
-    let user: ITMCProfileDetails = JSON.parse(await this.get(token))
+    let user: ITMCProfileDetails = JSON.parse(await redis.get(token))
     if (!user) {
       try {
         user = await TMCApi.getProfile(token)
-        this.client.set(token, JSON.stringify(user), "EX", 3600)
+        redis.set(token, JSON.stringify(user), "EX", 3600)
       } catch (error) {
+        console.log(error)
         if (onWhiteList) {
           req.headers.authorization = ""
           return next()

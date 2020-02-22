@@ -207,8 +207,8 @@ const PeerReviewQuestions: React.FunctionComponent<
 
   const submitPeerReview = () => {
     dispatch(peerReviewsActions.submit())
-    courseProgressProvider.refreshProgress &&
-      courseProgressProvider.refreshProgress()
+    /*courseProgressProvider.refreshProgress &&
+      courseProgressProvider.refreshProgress()*/
     scrollToRef(scrollRef)
   }
 

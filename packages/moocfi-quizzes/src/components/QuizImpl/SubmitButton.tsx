@@ -49,8 +49,8 @@ const SubmitButton: React.FunctionComponent = () => {
 
   const handleSubmit = () => {
     dispatch(quizAnswerActions.submit())
-    courseProgressProvider.refreshProgress &&
-      courseProgressProvider.refreshProgress()
+    /*courseProgressProvider.refreshProgress &&
+      courseProgressProvider.refreshProgress()*/
   }
 
   const ThemedSubmitButton = themeProvider.submitButton

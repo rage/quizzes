@@ -27,6 +27,8 @@
     "redux-thunk": ">= 2.3.0",
     "reduce-reducers": "^1.0.4",
     "styled-components": ">= 4.0.0",
-    "typesafe-actions": ">= 4.4.2"
+    "typesafe-actions": ">= 4.4.2",
+    "websocket": "^1.0.31",
+    "@types/websocket": "^1.0.0"
   }
 }

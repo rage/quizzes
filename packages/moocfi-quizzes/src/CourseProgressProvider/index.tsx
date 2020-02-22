@@ -6,6 +6,10 @@ import CourseProgressProviderContext, {
 import { PointsByGroup } from "../modelTypes"
 import { getUserCourseData } from "../services/courseProgressService"
 
+import { w3cwebsocket as W3CWebSocket } from "websocket"
+
+const client = new W3CWebSocket("ws://127.0.0.1:9000", "echo-protocol")
+
 interface CourseProgressProviderProps {
   accessToken: string
   courseId: string
@@ -19,8 +23,25 @@ export const CourseProgressProvider: React.FunctionComponent<
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    client.onopen = () => {
+      console.log("WebSocket Client Connected")
+      const sendToken = () => {
+        if (client.readyState === client.OPEN) {
+          client.send(JSON.stringify([accessToken, courseId]))
+        }
+      }
+      sendToken()
+    }
     fetchProgressData()
   }, [])
+
+  client.onmessage = message => {
+    if (message.data === "ping") {
+      fetchProgressData()
+    }
+  }
+
+  client.onclose = e => {}
 
   const fetchProgressData = async () => {
     try {

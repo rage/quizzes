@@ -41,7 +41,9 @@
     "styled-components": "^4.3.2",
     "typesafe-actions": "^4.4.2",
     "typescript": "^3.5.2",
-    "watch": "^1.0.2"
+    "watch": "^1.0.2",
+    "websocket": "^1.0.31",
+    "@types/websocket": "^1.0.0"
   },
   "peerDependencies": {
     "@fortawesome/fontawesome-free": "^5.9.0",
@@ -63,6 +65,8 @@
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
     "styled-components": "^4.3.2",
-    "typesafe-actions": "^4.4.2"
+    "typesafe-actions": "^4.4.2",
+    "websocket": "^1.0.31",
+    "@types/websocket": "^1.0.0"
   }
 }
