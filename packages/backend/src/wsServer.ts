@@ -30,7 +30,7 @@ export const pingClient = (userId: number, courseId: string) => {
 
 wsServer.on("request", (request: any) => {
   let connection: any
-  if (request.origin === "http://localhost:1235") {
+  if (request.origin === "http://localhost:1234") {
     connection = request.accept("echo-protocol", request.origin)
   } else {
     request.reject()
