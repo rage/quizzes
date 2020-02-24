@@ -7,6 +7,7 @@ export interface CourseProgressProviderInterface {
   loading?: boolean
   userCourseProgress?: PointsByGroup[]
   requiredActions?: any[]
+  updated?: boolean
 }
 
 const CourseProgressProviderContext = createContext<

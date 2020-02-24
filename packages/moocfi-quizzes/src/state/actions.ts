@@ -91,7 +91,7 @@ export const initialize: ActionCreator<ThunkAction> = (
     if (!quizAnswer) {
       quizAnswer = {
         quizId: quiz.id,
-        languageId,
+        languageId, // This can lead to wrong language id in answer. Needs to be fixed.
         itemAnswers: quiz.items.map(item => {
           return {
             quizItemId: item.id,

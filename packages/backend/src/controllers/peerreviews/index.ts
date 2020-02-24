@@ -9,13 +9,9 @@ import {
   QueryParam,
   UnauthorizedError,
 } from "routing-controllers"
-import KafkaService from "services/kafka.service"
 import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
-import UserCoursePartStateService from "services/usercoursepartstate.service"
-import UserQuizStateService from "services/userquizstate.service"
-import ValidationService from "services/validation.service"
 import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
@@ -23,7 +19,8 @@ import { InjectManager } from "typeorm-typedi-extensions"
 import { API_PATH } from "../../config"
 import { PeerReview, Quiz, QuizAnswer, UserQuizState } from "../../models"
 import { ITMCProfileDetails } from "../../types"
-import { PeerReviewQuestionAnswer } from "@quizzes/common/models"
+
+import { pingClient } from "../../wsServer"
 
 @JsonController(`${API_PATH}/quizzes/peerreview`)
 export class PeerReviewController {
@@ -37,19 +34,7 @@ export class PeerReviewController {
   private quizAnswerService: QuizAnswerService
 
   @Inject()
-  private userQuizStateService: UserQuizStateService
-
-  @Inject()
   private QuizService: QuizService
-
-  @Inject()
-  private validationService: ValidationService
-
-  @Inject()
-  private userCoursePartStateService: UserCoursePartStateService
-
-  @Inject()
-  private kafkaService: KafkaService
 
   @Get("/received/:answerId")
   public async getGivenReviews(
@@ -228,6 +213,7 @@ export class PeerReviewController {
         quiz,
         receivingQuizAnswer,
       )
+      pingClient(receivingQuizAnswer.userId, quiz.courseId)
     })
 
     return {

@@ -12,6 +12,12 @@ const wsServer = new WebSocketServer.server({
   httpServer: server,
 })
 
+const originAccepted: { [origin: string]: boolean } = {
+  "http://localhost:1234": true,
+  "http://localhost:8000": true,
+  "https://40f60d95.ngrok.io": true,
+}
+
 const clients: { [userId: number]: any } = {}
 
 export const pingClient = (userId: number, courseId: string) => {
@@ -29,8 +35,10 @@ export const pingClient = (userId: number, courseId: string) => {
 }
 
 wsServer.on("request", (request: any) => {
+  console.log("request")
   let connection: any
-  if (request.origin === "http://localhost:1234") {
+  if (originAccepted[request.origin]) {
+    console.log("request")
     connection = request.accept("echo-protocol", request.origin)
   } else {
     request.reject()

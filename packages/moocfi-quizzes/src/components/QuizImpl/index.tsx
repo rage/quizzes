@@ -7,6 +7,7 @@ import * as quizAnswerActions from "../../state/quizAnswer/actions"
 import * as messageActions from "../../state/message/actions"
 
 import { initialize } from "../../state/actions"
+import { updateQuizState } from "../../state/user/actions"
 import Checkbox from "../CheckboxOption"
 import Feedback from "../Feedback"
 import MultipleChoice from "../MultipleChoice"
@@ -31,6 +32,9 @@ import Notification from "../Notification"
 import { BoldTypographyMedium } from "../styleComponents"
 
 import ThemeProviderContext from "../../contexes/themeProviderContext"
+import CourseProgressProviderContext from "../../contexes/courseProgressProviderContext"
+
+import { requestReviews } from "../../state/receivedReviews/actions"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
@@ -185,6 +189,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 }) => {
   const ref = React.useRef(null)
   const themeProvider = React.useContext(ThemeProviderContext)
+  const courseProgressProvider = React.useContext(CourseProgressProviderContext)
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
   const messageState = useTypedSelector(state => state.message)
@@ -245,6 +250,12 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   }
   if (!languageInfo) {
     return <div>language info not set</div>
+  }
+
+  if (courseProgressProvider.updated) {
+    console.log("UPDATE")
+    dispatch(updateQuizState())
+    dispatch(requestReviews())
   }
 
   const generalLabels = languageInfo.general
