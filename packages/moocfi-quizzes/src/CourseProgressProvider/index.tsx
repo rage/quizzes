@@ -9,18 +9,7 @@ import { getUserCourseData } from "../services/courseProgressService"
 import { promisify } from "util"
 
 import { w3cwebsocket as W3CWebSocket } from "websocket"
-
-const client = new W3CWebSocket("ws://localhost:9000", "echo-protocol")
-
-client.onopen = () => {
-  console.log("WebSocket Client Connected")
-  const sendToken = () => {
-    if (client.readyState === 1) {
-      client.send(JSON.stringify([accessToken, courseId]))
-    }
-  }
-  sendToken()
-}
+// import { client as WebSocketClient }from "websocket"
 
 interface CourseProgressProviderProps {
   accessToken: string
@@ -34,59 +23,45 @@ export const CourseProgressProvider: React.FunctionComponent<
   const [updated, setUpdated] = useState(false)
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [timer, setTimer] = useState(10)
+  const [verified, setVerified] = useState(false)
+  const [client, setClient] = useState<W3CWebSocket>()
 
   useEffect(() => {
-    console.log("MOUNT ", client)
+    init()
   }, [])
 
-  const init = async () => {
-    client.onopen = () => {
-      console.log("WebSocket Client Connected")
-      const sendToken = () => {
-        if (client.readyState === 1) {
-          client.send(JSON.stringify([accessToken, courseId]))
+  useEffect(() => {
+    if (client && !verified) {
+      client.send(JSON.stringify([accessToken, courseId]))
+      setVerified(true)
+    }
+  })
+
+  const connect = (): Promise<W3CWebSocket> => {
+    return new Promise((resolve: any, reject: any) => {
+      const client = new W3CWebSocket("ws://localhost:9000", "echo-protocol")
+      client.onmessage = (message: any) => {
+        if (message.data === "ping") {
+          fetchProgressData()
+          setUpdated(true)
+          setUpdated(false)
         }
       }
-      sendToken()
-    }
-    const connect = promisify(client.onopen)
-    await connect()
+
+      client.onclose = (e: any) => {}
+      client.onopen = function() {
+        resolve(client)
+      }
+      client.onerror = function(err) {
+        reject(err)
+      }
+    })
+  }
+
+  const init = async () => {
+    setClient(await connect())
     await fetchProgressData()
   }
-
-  /*useEffect(() => {
-    console.log("MOUNT ", client)
-    /*client.onopen = () => {
-      console.log("WebSocket Client Connected")
-      const sendToken = () => {
-        if (client.readyState === 1) {
-          client.send(JSON.stringify([accessToken, courseId]))
-        }
-      }
-      sendToken()
-    }*/
-  /*setTimeout(() => {
-    if (client.readyState === 1) {
-      console.log(client)
-      client.send(JSON.stringify([accessToken, courseId]))
-    } else {
-      console.log("else")
-      setTimer(10)
-    }
-  }, timer)
-  fetchProgressData()
-}, [])*/
-
-  client.onmessage = message => {
-    if (message.data === "ping") {
-      fetchProgressData()
-      setUpdated(true)
-      setUpdated(false)
-    }
-  }
-
-  client.onclose = e => {}
 
   const fetchProgressData = async () => {
     try {
@@ -113,7 +88,7 @@ export const CourseProgressProvider: React.FunctionComponent<
     userCourseProgress: data.userCourseProgress,
     requiredActions: data.requiredActions,
   }
-  console.log(client)
+
   return (
     <CourseProgressProviderContext.Provider value={value}>
       {children}
