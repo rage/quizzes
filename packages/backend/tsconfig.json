@@ -15,9 +15,12 @@
     "rootDir": "../",
     "baseUrl": "src/",
     "paths": {
-      "@quizzes/common/*": ["../../common/src/*", "../../common/*"],
-      "services/*": ["./services/*"],
-      "*": ["node_modules/*"]
+      "services/*": [
+        "./services/*"
+      ],
+      "*": [
+        "node_modules/*"
+      ]
     },
     "lib": [
       "esnext.asynciterable",
@@ -26,10 +29,17 @@
       "esnext.array"
     ],
     "typeRoots": [
-      "node_modules/@types", "@quizzes/common/types"
+      "node_modules/@types",
+      "@quizzes/backend/types"
     ]
   },
-  "include": ["./src/**/*", "../common/**/*"],
-  "exclude": ["node_modules", "dist", "test", "src/test"]
+  "include": [
+    "./src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "test",
+    "src/test"
+  ]
 }
-

@@ -21,6 +21,8 @@ import { logger } from "./config/winston"
 import controllers from "./controllers"
 import { AuthenticationMiddleware } from "./middleware/authentication"
 
+import * as typeorm from "typeorm"
+
 if (process.env.NODE_ENV !== "production") {
   dotenv.config({ path: ".env" })
 }
@@ -45,6 +47,7 @@ export class App {
 
   public constructor() {
     useContainer(Container)
+    typeorm.useContainer(Container)
 
     this.application = createExpressServer({
       cors: true,

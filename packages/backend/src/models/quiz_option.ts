@@ -24,7 +24,7 @@ export class QuizOption extends BaseEntity {
     onDelete: "CASCADE",
   })
   @JoinColumn()
-  public quizItem: Promise<QuizItem>
+  public quizItem: QuizItem
   @Column({ nullable: true })
   public quizItemId: string | null
 
@@ -78,7 +78,7 @@ export class QuizOptionTranslation extends BaseEntity {
     onDelete: "CASCADE",
   })
   @JoinColumn()
-  public quizOption: Promise<QuizOption>
+  public quizOption: QuizOption
   @PrimaryColumn()
   public quizOptionId: string | undefined
 

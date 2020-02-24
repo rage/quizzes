@@ -16,7 +16,7 @@
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run watch-node\"",
     "test": "jest --forceExit --coverage --verbose",
     "watch-test": "yarn run test -- --watchAll",
-    "build-ts": "cd packages/common && tsc && cd ../backend && tsc && tscpaths -p tsconfig.json -s ./src -o ../../dist/backend/src && cd ../..",
+    "build-ts": "cd packages/backend && tsc && tscpaths -p tsconfig.json -s ./src -o ../../dist/backend/src && cd ../..",
     "watch-ts": "",
     "debug": "yarn run build && yarn run watch-debug",
     "serve-debug": "nodemon --inspect dist/backend/src/server.js",
@@ -67,7 +67,7 @@
     "request-promise": "^4.2.2",
     "stream": "0.0.2",
     "tmc-client-js": "0.0.9",
-    "typeorm": "^0.3.0-alpha.22",
+    "typeorm": "^0.3.0-rc.17",
     "uuid-by-string": "^0.6.0",
     "validate.js": "^0.12.0",
     "winston": "^3.1.0"
