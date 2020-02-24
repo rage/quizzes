@@ -1,4 +1,4 @@
-import { getUUIDByString } from "@quizzes/common/util"
+import { getUUIDByString } from "@../../util"
 import { Response } from "express"
 import JSONStream from "JSONStream"
 import _ from "lodash"

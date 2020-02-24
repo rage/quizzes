@@ -1,4 +1,3 @@
-import { Database } from "@quizzes/common/config/database"
 import { Container, Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"

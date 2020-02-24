@@ -9,7 +9,7 @@ import {
   QuizItemAnswer,
   UserQuizState,
 } from "../models"
-import { wordCount } from "./../../../common/src/util"
+import { wordCount } from "../util"
 
 interface ItemStatusObject {
   type?: string
