@@ -6,9 +6,21 @@ import CourseProgressProviderContext, {
 import { PointsByGroup } from "../modelTypes"
 import { getUserCourseData } from "../services/courseProgressService"
 
+import { promisify } from "util"
+
 import { w3cwebsocket as W3CWebSocket } from "websocket"
 
 const client = new W3CWebSocket("ws://localhost:9000", "echo-protocol")
+
+client.onopen = () => {
+  console.log("WebSocket Client Connected")
+  const sendToken = () => {
+    if (client.readyState === 1) {
+      client.send(JSON.stringify([accessToken, courseId]))
+    }
+  }
+  sendToken()
+}
 
 interface CourseProgressProviderProps {
   accessToken: string
@@ -26,6 +38,25 @@ export const CourseProgressProvider: React.FunctionComponent<
 
   useEffect(() => {
     console.log("MOUNT ", client)
+  }, [])
+
+  const init = async () => {
+    client.onopen = () => {
+      console.log("WebSocket Client Connected")
+      const sendToken = () => {
+        if (client.readyState === 1) {
+          client.send(JSON.stringify([accessToken, courseId]))
+        }
+      }
+      sendToken()
+    }
+    const connect = promisify(client.onopen)
+    await connect()
+    await fetchProgressData()
+  }
+
+  /*useEffect(() => {
+    console.log("MOUNT ", client)
     /*client.onopen = () => {
       console.log("WebSocket Client Connected")
       const sendToken = () => {
@@ -35,17 +66,17 @@ export const CourseProgressProvider: React.FunctionComponent<
       }
       sendToken()
     }*/
-    setTimeout(() => {
-      if (client.readyState === 1) {
-        console.log(client)
-        client.send(JSON.stringify([accessToken, courseId]))
-      } else {
-        console.log("else")
-        setTimer(10)
-      }
-    }, timer)
-    fetchProgressData()
-  }, [])
+  /*setTimeout(() => {
+    if (client.readyState === 1) {
+      console.log(client)
+      client.send(JSON.stringify([accessToken, courseId]))
+    } else {
+      console.log("else")
+      setTimer(10)
+    }
+  }, timer)
+  fetchProgressData()
+}, [])*/
 
   client.onmessage = message => {
     if (message.data === "ping") {
