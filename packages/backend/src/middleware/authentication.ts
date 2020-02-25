@@ -1,5 +1,3 @@
-import TMCApi from "@quizzes/common/services/TMCApi"
-import { ITMCProfileDetails } from "@quizzes/common/types"
 import { NextFunction, Request, Response } from "express"
 import redis from "redis"
 import {
@@ -9,6 +7,8 @@ import {
   UnauthorizedError,
 } from "routing-controllers"
 import { promisify } from "util"
+import TMCApi from "../services/TMCApi"
+import { ITMCProfileDetails } from "../types"
 
 const whitelist = [
   /\/$/,

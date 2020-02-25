@@ -13,13 +13,14 @@ import {
   UserQuizState,
 } from "../models"
 import { AnsweredQuiz, IQuizAnswerQuery } from "../types"
-import { WhereBuilder } from "../util/index"
+import { WhereBuilder, stringContainsLongerWord } from "../util/index"
 
 // tslint:disable-next-line:max-line-length
 // import PlainObjectToDatabaseEntityTransformer from "../../../../node_modules/typeorm/query-builder/transformer/PlainObjectToDatabaseEntityTransformer"
 
 // tslint:disable-next-line:max-line-length
 import { PlainObjectToDatabaseEntityTransformer } from "typeorm/query-builder/transformer/PlainObjectToDatabaseEntityTransformer"
+import { setCorrectValuesForAwardPointsEvenIfWrong1564678844323 } from "migration/1564678844323-set_correct_values_for_award_points_even_if_wrong"
 
 @Service()
 export default class QuizAnswerService {
@@ -170,11 +171,19 @@ export default class QuizAnswerService {
       }
     }
 
-    const result = await someQuery
+    someQuery
       .select("quiz_answer.quiz_id", "quizId")
-      .addSelect("COUNT(quiz_answer.id)")
-      .groupBy("quiz_answer.quiz_id")
-      .getRawMany()
+      .addSelect("COUNT(*)")
+      .addGroupBy("quiz_answer.quiz_id")
+
+    const result = (await someQuery.execute()).map(
+      (countInfo: { quizId: string; count: string }) => {
+        return {
+          ...countInfo,
+          count: Number(countInfo.count),
+        }
+      },
+    )
 
     if (!query.quizId) {
       return result
