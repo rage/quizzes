@@ -3,12 +3,14 @@ import { useContext, useEffect, useState } from "react"
 import CourseProgressProviderContext, {
   CourseProgressProviderInterface,
 } from "../contexes/courseProgressProviderContext"
+import { Snackbar } from "@material-ui/core"
 import { PointsByGroup } from "../modelTypes"
 import { getUserCourseData } from "../services/courseProgressService"
 
 import { promisify } from "util"
 
 import { w3cwebsocket as W3CWebSocket } from "websocket"
+import { ThemeProviderInterface } from "../contexes/themeProviderContext"
 // import { client as WebSocketClient }from "websocket"
 
 interface CourseProgressProviderProps {
@@ -20,11 +22,12 @@ export const CourseProgressProvider: React.FunctionComponent<
   CourseProgressProviderProps
 > = ({ accessToken, courseId, children }) => {
   const [data, setData] = useState<any>([])
-  const [updated, setUpdated] = useState(false)
+  const [updateQuiz, setUpdateQuiz] = useState({})
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(true)
   const [verified, setVerified] = useState(false)
   const [client, setClient] = useState<W3CWebSocket>()
+  const [message, setMessage] = useState("")
 
   useEffect(() => {
     init()
@@ -32,22 +35,20 @@ export const CourseProgressProvider: React.FunctionComponent<
 
   useEffect(() => {
     if (client && !verified) {
-      client.send(JSON.stringify([accessToken, courseId]))
+      client.send(JSON.stringify({ accessToken, courseId }))
       setVerified(true)
     }
   })
 
+  const init = async () => {
+    setClient(await connect())
+    await fetchProgressData()
+  }
+
   const connect = (): Promise<W3CWebSocket> => {
     return new Promise((resolve: any, reject: any) => {
       const client = new W3CWebSocket("ws://localhost:9000", "echo-protocol")
-      client.onmessage = (message: any) => {
-        if (message.data === "ping") {
-          fetchProgressData()
-          setUpdated(true)
-          setUpdated(false)
-        }
-      }
-
+      client.onmessage = onMessage
       client.onclose = (e: any) => {}
       client.onopen = function() {
         resolve(client)
@@ -58,9 +59,13 @@ export const CourseProgressProvider: React.FunctionComponent<
     })
   }
 
-  const init = async () => {
-    setClient(await connect())
-    await fetchProgressData()
+  const onMessage = (message: any) => {
+    if (message.data === "ping") {
+      fetchProgressData()
+    } else {
+      setUpdateQuiz({ ...updateQuiz, [message.data]: true })
+      setMessage("You have received a new peer review")
+    }
   }
 
   const fetchProgressData = async () => {
@@ -80,17 +85,29 @@ export const CourseProgressProvider: React.FunctionComponent<
     setTimeout(() => fetchProgressData(), 1000)
   }
 
-  const value = {
-    refreshProgress,
-    updated,
+  const quizUpdated = (id: string) => {
+    setUpdateQuiz({ ...updateQuiz, [id]: false })
+  }
+
+  const value: CourseProgressProviderInterface = {
     error,
     loading,
+    refreshProgress,
+    updateQuiz,
+    quizUpdated,
     userCourseProgress: data.userCourseProgress,
     requiredActions: data.requiredActions,
   }
 
   return (
     <CourseProgressProviderContext.Provider value={value}>
+      <Snackbar
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        open={!!message}
+        onClose={() => setMessage("")}
+        autoHideDuration={6000}
+        message={message}
+      />
       {children}
     </CourseProgressProviderContext.Provider>
   )

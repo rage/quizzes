@@ -7,7 +7,8 @@ export interface CourseProgressProviderInterface {
   loading?: boolean
   userCourseProgress?: PointsByGroup[]
   requiredActions?: any[]
-  updated?: boolean
+  updateQuiz?: { [id: string]: boolean }
+  quizUpdated?: (id: string) => void
 }
 
 const CourseProgressProviderContext = createContext<

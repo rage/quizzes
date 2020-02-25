@@ -20,17 +20,31 @@ const originAccepted: { [origin: string]: boolean } = {
 
 const clients: { [userId: number]: any } = {}
 
-export const pingClient = (userId: number, courseId: string) => {
+export const messageClient = (
+  userId: number,
+  courseId: string,
+  message?: string,
+) => {
   if (clients[userId] && clients[userId][courseId]) {
     const connection = clients[userId][courseId]
     if (connection.connected) {
-      connection.sendUTF("ping")
+      if (message) {
+        connection.sendUTF(message)
+      } else {
+        connection.sendUTF("ping")
+      }
     } else {
       delete clients[userId][courseId]
-      redis.publisher.publish("websocket", `${userId}:${courseId}`)
+      redis.publisher.publish(
+        "websocket",
+        JSON.stringify({ userId, courseId, message }),
+      )
     }
   } else {
-    redis.publisher.publish("websocket", `${userId}:${courseId}`)
+    redis.publisher.publish(
+      "websocket",
+      JSON.stringify({ userId, courseId, message }),
+    )
   }
 }
 
@@ -48,14 +62,14 @@ wsServer.on("request", (request: any) => {
 
   connection.on("message", async (message: any) => {
     const data = JSON.parse(message.utf8Data)
-    if (Array.isArray(data) && data.length === 2) {
-      const token = data[0]
-      const courseId = data[1]
+    if (data instanceof Object && data.accessToken && data.courseId) {
+      const accessToken = data.accessToken
+      const courseId = data.courseId
       try {
-        let user: ITMCProfileDetails = JSON.parse(await redis.get(token))
+        let user: ITMCProfileDetails = JSON.parse(await redis.get(accessToken))
         if (!user) {
-          user = await TMCApi.getProfile(token)
-          redis.set(token, JSON.stringify(user), "EX", 3600)
+          user = await TMCApi.getProfile(accessToken)
+          redis.set(accessToken, JSON.stringify(user), "EX", 3600)
         }
         clients[user.id] = {
           ...clients[user.id],
@@ -73,11 +87,22 @@ wsServer.on("request", (request: any) => {
 })
 
 redis.subscriber.on("message", (channel: any, message: any) => {
-  const split = message.split(":")
-  const userId = split[0]
-  const courseId = split[1]
-  if (clients[userId] && clients[userId][courseId]) {
-    clients[userId][courseId].sendUTF("ping")
+  const data = JSON.parse(message)
+  if (data instanceof Object && data.userId && data.courseId) {
+    const userId = data.userId
+    const courseId = data.courseId
+    if (clients[userId] && clients[userId][courseId]) {
+      const connection = clients[userId][courseId]
+      if (connection.connected) {
+        if (data.message) {
+          connection.sendUTF(message)
+        } else {
+          connection.sendUTF("ping")
+        }
+      } else {
+        delete clients[userId][courseId]
+      }
+    }
   }
 })
 

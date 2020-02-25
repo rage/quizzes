@@ -252,10 +252,14 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     return <div>language info not set</div>
   }
 
-  if (courseProgressProvider.updated) {
-    console.log("UPDATE")
+  if (
+    courseProgressProvider.updateQuiz &&
+    courseProgressProvider.updateQuiz[quiz.id]
+  ) {
     dispatch(updateQuizState())
     dispatch(requestReviews())
+    courseProgressProvider.quizUpdated &&
+      courseProgressProvider.quizUpdated(quiz.id)
   }
 
   const generalLabels = languageInfo.general

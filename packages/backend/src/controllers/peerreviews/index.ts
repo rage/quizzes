@@ -20,7 +20,7 @@ import { API_PATH } from "../../config"
 import { PeerReview, Quiz, QuizAnswer, UserQuizState } from "../../models"
 import { ITMCProfileDetails } from "../../types"
 
-import { pingClient } from "../../wsServer"
+import { messageClient } from "../../wsServer"
 
 @JsonController(`${API_PATH}/quizzes/peerreview`)
 export class PeerReviewController {
@@ -213,7 +213,7 @@ export class PeerReviewController {
         quiz,
         receivingQuizAnswer,
       )
-      pingClient(receivingQuizAnswer.userId, quiz.courseId)
+      messageClient(receivingQuizAnswer.userId, quiz.courseId, quiz.id)
     })
 
     return {

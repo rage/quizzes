@@ -18,7 +18,7 @@ import * as Kafka from "node-rdkafka"
 
 import { promisify } from "util"
 
-import { pingClient } from "../wsServer"
+import { messageClient } from "../wsServer"
 
 @Service()
 export default class KafkaService {
@@ -70,7 +70,7 @@ export default class KafkaService {
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
     }
 
-    pingClient(userId, courseId)
+    messageClient(userId, courseId)
 
     await this.produce("user-course-progress", message)
   }
