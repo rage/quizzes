@@ -68,7 +68,7 @@
     "routing-controllers": "^0.7.7",
     "stream": "0.0.2",
     "typedi": "^0.8.0",
-    "typeorm": "^0.3.0-alpha.22",
+    "typeorm": "^0.3.0-rc.17",
     "typeorm-routing-controllers-extensions": "^0.2.0",
     "typeorm-typedi-extensions": "^0.2.1",
     "uuid-by-string": "^0.6.0",

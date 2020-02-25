@@ -12,6 +12,14 @@ import {
 } from "../styleComponents"
 import MarkdownText from "../MarkdownText"
 
+import ThemeProviderContext from "../../contexes/themeProviderContext"
+
+const PeerReviewsGuidanceContainer = styled.div<{
+  providedStyles: string | undefined
+}>`
+  ${({ providedStyles }) => providedStyles}
+`
+
 type PeerReviewsGuidanceProps = {
   givenLabel: string
   peerReviewsCompletedInfo: string
@@ -21,6 +29,7 @@ type PeerReviewsGuidanceProps = {
 const PeerReviewsGuidance: React.FunctionComponent<
   PeerReviewsGuidanceProps
 > = ({ givenLabel, guidanceText, peerReviewsCompletedInfo }) => {
+  const themeProvider = React.useContext(ThemeProviderContext)
   const quiz = useTypedSelector(state => state.quiz)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const given = userQuizState ? userQuizState.peerReviewsGiven : 0
@@ -30,12 +39,14 @@ const PeerReviewsGuidance: React.FunctionComponent<
   const Instructions = withMargin(MarkdownText, "1.5rem 0 0 ")
 
   return (
-    <>
+    <PeerReviewsGuidanceContainer
+      providedStyles={themeProvider.peerReviewGuidanceStyles}
+    >
       <GivenCount component="p" variant="subtitle1">
         {givenLabel}: {given}/{required}
       </GivenCount>
       <Instructions Component="p">{guidanceText}</Instructions>
-    </>
+    </PeerReviewsGuidanceContainer>
   )
 }
 

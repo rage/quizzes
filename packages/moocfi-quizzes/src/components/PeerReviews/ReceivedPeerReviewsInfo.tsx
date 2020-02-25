@@ -18,6 +18,7 @@ import {
   withMargin,
 } from "../styleComponents"
 import { ReceivedPeerReviewLabels } from "../../utils/languages/"
+import ThemeProviderContext from "../../contexes/themeProviderContext"
 
 import Togglable from "../../utils/Togglable"
 import Notification from "../Notification"
@@ -26,7 +27,14 @@ const ToggleButton = styled(BaseButton)<{ expanded: boolean }>`
   ${props => props.expanded && "margin-top: 0.5rem;"}
 `
 
+const ReceivedPeerReviewsContainer = styled(TopMarginDivLarge)<{
+  providedStyles: string | undefined
+}>`
+  ${({ providedStyles }) => providedStyles}
+`
+
 const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
+  const themeProvider = React.useContext(ThemeProviderContext)
   const [expanded, setExpanded] = React.useState(false)
   const dispatch = useDispatch()
 
@@ -73,7 +81,9 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
   }
 
   return (
-    <TopMarginDivLarge>
+    <ReceivedPeerReviewsContainer
+      providedStyles={themeProvider.receivedPeerReviewsStyles}
+    >
       <ReceivedReviewsSummary
         peerReviews={receivedReviews}
         peerReviewQuestions={peerReviewQuestions}
@@ -93,7 +103,7 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
           />
         </Togglable>
       )}
-    </TopMarginDivLarge>
+    </ReceivedPeerReviewsContainer>
   )
 }
 

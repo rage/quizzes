@@ -1,18 +1,9 @@
-import {
-  Button,
-  FormControl,
-  Grid,
-  InputLabel,
-  MenuItem,
-  Select,
-  Tab,
-  Tabs,
-  TextField,
-  Toolbar,
-  Typography,
-} from "@material-ui/core"
+import { Button, Grid, Toolbar, Typography } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
+import { Prompt } from "react-router-dom"
+import { ICourse, IQuiz } from "../interfaces"
+
 import {
   addItem,
   addOption,
@@ -22,11 +13,34 @@ import {
   save,
   setEdit,
 } from "../store/edit/actions"
+import { IEditState } from "../store/edit/reducer"
 import { setQuiz } from "../store/filter/actions"
+import { IFilterState } from "../store/filter/reducer"
+import { IUserState } from "../store/user/reducer"
 import QuizInfo from "./QuizInfo"
 import TabContainer from "./TabContainer"
+import { quizContentsDiffer } from "./tools"
 
-class QuizForm extends React.Component<any, any> {
+interface IQuizFormProps {
+  courses: ICourse[]
+  courseInfos: any[]
+  edit: IEditState
+  filter: IFilterState
+  user: IUserState
+  quiz?: IQuiz
+  new: boolean
+  history: any
+  addItem: any
+  addOption: any
+  changeAttr: any
+  changeOrder: any
+  newQuiz: any
+  save: any
+  setEdit: (quiz: IQuiz) => any
+  setQuiz: (quizId?: string) => any
+}
+
+class QuizForm extends React.Component<IQuizFormProps, any> {
   public componentDidMount() {
     if (this.props.quiz) {
       this.props.setEdit(this.props.quiz)
@@ -48,12 +62,11 @@ class QuizForm extends React.Component<any, any> {
         <Grid item={true} xs={12} sm={10} lg={8}>
           <QuizInfo quizTexts={this.props.edit.texts[0]} />
 
+          <Prompt message={this.checker} />
           {this.props.edit.course.languages.map(
             (l, i) =>
               this.props.filter.language === l.id && (
                 <TabContainer
-                  items={this.props.edit.items}
-                  peerReviewCollections={this.props.edit.peerReviewCollections}
                   text={this.props.edit.texts.find(
                     text => text.languageId === l.id,
                   )}
@@ -67,7 +80,13 @@ class QuizForm extends React.Component<any, any> {
           )}
           <Toolbar>
             <Typography style={{ flex: 1 }} />
-            <Button onClick={this.handleSaving}>save</Button>
+            <Button
+              variant="outlined"
+              style={{ backgroundColor: "rgb(15, 125, 0)", color: "white" }}
+              onClick={this.handleSaving}
+            >
+              save
+            </Button>
           </Toolbar>
         </Grid>
       </Grid>
@@ -77,7 +96,31 @@ class QuizForm extends React.Component<any, any> {
   private handleSaving = async (event: any) => {
     scrollTo(0, 0)
     // for saving a quiz for the first time, wait before the url is modified in componentDidUpdate
-    await this.props.save(event)
+    // await
+    this.props.save()
+  }
+
+  private checker = location => {
+    if (location.pathname !== this.props.history.location.pathname) {
+      if (this.props.new && location.pathname.includes("/quizzes/")) {
+        return true
+      }
+
+      if (this.shouldPromptUser()) {
+        return "There are unsaved changes on the page. Are you sure you want to exit?"
+      }
+    }
+  }
+
+  private shouldPromptUser = () => {
+    const savedQuizInfo = this.props.courseInfos
+      .find(ci => ci.courseId === this.props.filter.course)
+      .quizzes.find(q => q.id === this.props.filter.quiz)
+
+    const editInfo = this.props.edit
+
+    const unsaved = quizContentsDiffer(editInfo as IQuiz, savedQuizInfo)
+    return unsaved
   }
 
   private handleChange = path => event => {
@@ -98,6 +141,7 @@ const mapStateToProps = (state: any) => {
     edit: state.edit,
     filter: state.filter,
     user: state.user,
+    courseInfos: state.quizzes.courseInfos,
   }
 }
 

@@ -1,5 +1,7 @@
-import dotenv from "dotenv"
-import Knex from "knex"
+import * as Kafka from "node-rdkafka"
+import { quizzes as knex } from "../config/knex"
+
+import { promisify } from "util"
 
 import {
   ExerciseData,
@@ -8,24 +10,6 @@ import {
   QuizAnswerMessage,
   QuizMessage,
 } from "../types"
-
-import * as Kafka from "node-rdkafka"
-
-import { promisify } from "util"
-
-if (process.env.NODE_ENV !== "production") {
-  dotenv.config({ path: `.env` })
-}
-
-const knex = Knex({
-  client: "pg",
-  connection: {
-    host: process.env.DB_HOST || "/var/run/postgresql",
-    database: process.env.DB_NAME,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-  },
-})
 
 const producer = new Kafka.Producer({
   "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
@@ -67,11 +51,11 @@ const publish = async () => {
         console.log("publishing quizzes")
         const quizzes = await publishQuizzes(course)
 
-        console.log("publishing answers")
-        await publishAnswers(course)
-
         console.log("publishing progress")
         await publishProgress(course, quizzes)
+
+        console.log("publishing answers")
+        await publishAnswers(course)
       }
 
       console.log("removing task from database")
@@ -184,7 +168,7 @@ const publishQuizzes = async (course: ICourse): Promise<IQuiz[]> => {
     }
 
     producer.produce("exercise", null, Buffer.from(JSON.stringify(message)))
-    await flush(1000)
+    await flush(10000)
 
     console.log(`published ${quizzes.length} quizzes`)
 
@@ -276,7 +260,7 @@ const publishAnswers = async (course: ICourse) => {
         null,
         Buffer.from(JSON.stringify(message)),
       )
-      await flush(1000)
+      await flush(10000)
     }
 
     console.log(`published ${answers.length} answers`)
@@ -343,7 +327,7 @@ const publishProgress = async (course: ICourse, quizzes: any[]) => {
         null,
         Buffer.from(JSON.stringify(message)),
       )
-      await flush(1000)
+      await flush(10000)
     }
 
     console.log(`published progress for ${groupedByUser.length} users`)

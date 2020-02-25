@@ -15,11 +15,8 @@
     "strictPropertyInitialization": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
-    "paths": {
-      "@quizzes/common/*": ["common/src/*", "common/dist/*"]
-    },
     "typeRoots": [
-      "node_modules/@types", "./common/src/types"
+      "node_modules/@types", "./backend/src/types"
     ]
   }
 }

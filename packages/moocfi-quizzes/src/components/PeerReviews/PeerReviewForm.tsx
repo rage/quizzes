@@ -53,7 +53,11 @@ const ButtonWrapper = styled.div<ButtonWrapperProps>`
   }
   ${({ providedStyles }) => providedStyles}
 `
-
+const PeerReviewFormContainer = styled.div<{
+  providedStyles: string | undefined
+}>`
+  ${({ providedStyles }) => providedStyles}
+`
 interface QuestionBlockWrapperProps {
   providedStyles: string | undefined
 }
@@ -115,7 +119,10 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
     }
 
     return (
-      <div ref={ref}>
+      <PeerReviewFormContainer
+        providedStyles={themeProvider.peerReviewFormStyles}
+      >
+        <div ref={ref} />
         <Instructions>{languageInfo.chosenEssayInstruction}</Instructions>
         <TopMarginDivLarge>
           <PeerReviewOption answer={chosenAnswer} />
@@ -130,12 +137,15 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
             scrollRef={ref}
           />
         </TopMarginDivLarge>
-      </div>
+      </PeerReviewFormContainer>
     )
   }
 
   return (
-    <div ref={ref}>
+    <PeerReviewFormContainer
+      providedStyles={themeProvider.peerReviewFormStyles}
+    >
+      <div ref={ref} />
       <TopMarginDivLarge>
         <BoldTypographyMedium>
           {languageInfo.chooseEssayInstruction}
@@ -154,7 +164,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
           />
         </TopMarginDivLarge>
       ))}
-    </div>
+    </PeerReviewFormContainer>
   )
 }
 

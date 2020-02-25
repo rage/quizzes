@@ -1,5 +1,3 @@
-import TMCApi from "@quizzes/common/services/TMCApi"
-import { ITMCProfileDetails } from "@quizzes/common/types"
 import { NextFunction, Request, Response } from "express"
 import redis from "redis"
 import {
@@ -9,9 +7,12 @@ import {
   UnauthorizedError,
 } from "routing-controllers"
 import { promisify } from "util"
+import TMCApi from "../services/TMCApi"
+import { ITMCProfileDetails } from "../types"
 
 const whitelist = [
   /\/$/,
+  /\/api\/healthz$/,
   /\/api\/v1\/quizzes\/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}\/titles\/[a-z]{2}_[A-Z]{2}$/,
   /\/api\/v1\/quizzes\/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$/,
   /\/api\/v1\/quizzes\/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}\?fullInfo\=(true|false)$/,

@@ -17,11 +17,15 @@ import {
   TopMarginDivLarge,
 } from "../styleComponents"
 
-/*const TopMarginDiv = styled.div`
-  margin-top: 15px;
-`*/
+import ThemeProviderContext from "../../contexes/themeProviderContext"
+
+const PeerReviewContainer = styled.div<{ providedStyles: string | undefined }>`
+  ${({ providedStyles }) => providedStyles}
+`
 
 const PeerReviews: React.FunctionComponent = () => {
+  const themeProvider = React.useContext(ThemeProviderContext)
+
   const ref = useState(useRef(null))[0]
 
   const dispatch = useDispatch()
@@ -61,7 +65,7 @@ const PeerReviews: React.FunctionComponent = () => {
     dispatch(peerReviewsActions.fetchPeerReviewAlternatives())
   }, [])
 
-  const morePeerReviewsRequired = () =>
+  const morePeerReviewsRequired =
     (userQuizState ? userQuizState.peerReviewsGiven : 0) <
     quiz.course.minPeerReviewsGiven
 
@@ -74,8 +78,11 @@ const PeerReviews: React.FunctionComponent = () => {
   }
 
   return (
-    <div ref={ref}>
-      {morePeerReviewsRequired()
+    <PeerReviewContainer
+      providedStyles={themeProvider.peerReviewContainerStyles}
+    >
+      <div ref={ref} />
+      {morePeerReviewsRequired
         ? !pastDeadline && (
             <>
               <PeerReviewsGuidance
@@ -113,7 +120,7 @@ const PeerReviews: React.FunctionComponent = () => {
             </TopMarginDivLarge>
           )}
       {activeStep >= 2 && <ReceivedPeerReviewsInfo />}
-    </div>
+    </PeerReviewContainer>
   )
 }
 

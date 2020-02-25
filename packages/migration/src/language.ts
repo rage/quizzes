@@ -28,6 +28,22 @@ export async function createLanguages(): Promise<{
     }),
   ).save()
 
+  const estonian = await Language.merge(
+    Language.create({
+      id: "et_EE",
+      country: "Estonia",
+      name: "Estonian",
+    }),
+  ).save()
+
+  const german = await Language.merge(
+    Language.create({
+      id: "de_DE",
+      country: "Germany",
+      name: "German",
+    }),
+  ).save()
+
   const unknown = await Language.merge(
     Language.create({
       id: "unknown",
@@ -40,6 +56,8 @@ export async function createLanguages(): Promise<{
     [finnish.id]: finnish,
     [english.id]: english,
     [swedish.id]: swedish,
+    [estonian.id]: estonian,
+    [german.id]: german,
     [unknown.id]: unknown,
   }
 }

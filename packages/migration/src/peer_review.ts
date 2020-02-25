@@ -7,7 +7,7 @@ import {
 } from "./models"
 import { PeerReview as QNPeerReview } from "./app-modules/models"
 
-import { Any } from "typeorm"
+import { EntityManager } from "typeorm"
 import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import { calculateChunkSize, progressBar } from "./util"
 import { getUUIDByString, insert } from "./util/"
@@ -16,8 +16,8 @@ import { logger } from "./config/winston"
 
 export async function migratePeerReviews(
   users: { [username: string]: User },
-  existingAnswers: { [answerID: string]: boolean },
   peerReviews: any[],
+  manager: EntityManager,
 ) {
   logger.info("Querying peer reviews...")
   /*const peerReviews = await QNPeerReview.find({
@@ -26,6 +26,13 @@ export async function migratePeerReviews(
       { updatedAt: { $gte: LAST_MIGRATION } },
     ],
   })*/
+
+  const existingAnswers: { [key: string]: boolean } = {}
+  const answerIds = await manager.query("select id from quiz_answer")
+
+  answerIds.forEach((answer: any) => {
+    existingAnswers[answer.id] = true
+  })
 
   const newPeerReviews: Array<QueryPartialEntity<PeerReview>> = []
   const newPeerReviewAnswers: Array<
@@ -60,6 +67,7 @@ export async function migratePeerReviews(
     const quizID = getUUIDByString(oldPR.quizId)
     const sourceQuizID = getUUIDByString(oldPR.sourceQuizId)
     const questions = prqcs[quizID] || prqcs[sourceQuizID]
+
     if (!questions) {
       continue
     }
@@ -69,21 +77,22 @@ export async function migratePeerReviews(
       id,
       userId: user ? user.id : null,
       quizAnswerId: answerID,
+      peerReviewCollectionId: questions[0].peerReviewCollectionId,
       rejectedQuizAnswerIds: rejectedAnswerID ? [rejectedAnswerID] : [],
-      createdAt: oldPR.createdAt,
-      updatedAt: oldPR.updatedAt,
+      createdAt: new Date(oldPR.createdAt),
+      updatedAt: new Date(oldPR.updatedAt),
     })
 
     for (const question of questions) {
       newPeerReviewAnswers.push({
         peerReviewId: id,
         peerReviewQuestionId: question.id,
-        createdAt: oldPR.createdAt,
-        updatedAt: oldPR.updatedAt,
+        createdAt: new Date(oldPR.createdAt),
+        updatedAt: new Date(oldPR.updatedAt),
         text: question.type === "essay" ? oldPR.review : null,
         value:
           question.type === "grade"
-            ? oldPR.grading[question.texts[0].title]
+            ? (oldPR.grading && oldPR.grading[question.texts[0].title]) || null
             : null,
       })
     }
