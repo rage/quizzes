@@ -20,39 +20,45 @@ const originAccepted: { [origin: string]: boolean } = {
 
 const clients: { [userId: number]: any } = {}
 
+type MessageType =
+  | "PROGRESS_UPDATED"
+  | "PEER_REVIEW_REVEIVED"
+  | "QUIZ_CONFIRMED"
+
 export const messageClient = (
   userId: number,
   courseId: string,
+  type: MessageType,
   message?: string,
 ) => {
   if (clients[userId] && clients[userId][courseId]) {
     const connection = clients[userId][courseId]
     if (connection.connected) {
-      if (message) {
-        connection.sendUTF(message)
-      } else {
-        connection.sendUTF("ping")
-      }
+      connection.sendUTF(
+        JSON.stringify({
+          type,
+          message,
+        }),
+      )
     } else {
       delete clients[userId][courseId]
       redis.publisher.publish(
         "websocket",
-        JSON.stringify({ userId, courseId, message }),
+        JSON.stringify({ userId, courseId, type, message }),
       )
     }
   } else {
     redis.publisher.publish(
       "websocket",
-      JSON.stringify({ userId, courseId, message }),
+      JSON.stringify({ userId, courseId, type, message }),
     )
   }
 }
 
 wsServer.on("request", (request: any) => {
-  console.log("request")
+  console.log("request ", request.origin)
   let connection: any
   if (originAccepted[request.origin]) {
-    console.log("request")
     connection = request.accept("echo-protocol", request.origin)
   } else {
     request.reject()
@@ -75,7 +81,7 @@ wsServer.on("request", (request: any) => {
           ...clients[user.id],
           [courseId]: connection,
         }
-        console.log("connection confirmed")
+        console.log("connection verified")
       } catch (error) {
         connection.drop()
         console.log("unauthorized websocket connection")
@@ -88,17 +94,18 @@ wsServer.on("request", (request: any) => {
 
 redis.subscriber.on("message", (channel: any, message: any) => {
   const data = JSON.parse(message)
-  if (data instanceof Object && data.userId && data.courseId) {
+  if (data instanceof Object && data.userId && data.courseId && data.type) {
     const userId = data.userId
     const courseId = data.courseId
     if (clients[userId] && clients[userId][courseId]) {
       const connection = clients[userId][courseId]
       if (connection.connected) {
-        if (data.message) {
-          connection.sendUTF(message)
-        } else {
-          connection.sendUTF("ping")
-        }
+        connection.sendUTF(
+          JSON.stringify({
+            type: data.type,
+            message: data.message,
+          }),
+        )
       } else {
         delete clients[userId][courseId]
       }

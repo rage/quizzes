@@ -10,7 +10,6 @@ import { getUserCourseData } from "../services/courseProgressService"
 import { promisify } from "util"
 
 import { w3cwebsocket as W3CWebSocket } from "websocket"
-import { ThemeProviderInterface } from "../contexes/themeProviderContext"
 // import { client as WebSocketClient }from "websocket"
 
 interface CourseProgressProviderProps {
@@ -48,6 +47,7 @@ export const CourseProgressProvider: React.FunctionComponent<
   const connect = (): Promise<W3CWebSocket> => {
     return new Promise((resolve: any, reject: any) => {
       const client = new W3CWebSocket("ws://localhost:9000", "echo-protocol")
+      console.log("CONNECT")
       client.onmessage = onMessage
       client.onclose = (e: any) => {}
       client.onopen = function() {
@@ -60,11 +60,19 @@ export const CourseProgressProvider: React.FunctionComponent<
   }
 
   const onMessage = (message: any) => {
-    if (message.data === "ping") {
-      fetchProgressData()
-    } else {
-      setUpdateQuiz({ ...updateQuiz, [message.data]: true })
-      setMessage("You have received a new peer review")
+    const data = JSON.parse(message.data)
+    if (data instanceof Object) {
+      switch (data.type) {
+        case "PROGRESS_UPDATED":
+          fetchProgressData()
+          break
+        case "PEER_REVIEW_REVEIVED":
+          setUpdateQuiz({ ...updateQuiz, [data.message]: true })
+          setMessage("You have received a new peer review")
+          break
+        case "QUIZ_CONFIRMED":
+          break
+      }
     }
   }
 

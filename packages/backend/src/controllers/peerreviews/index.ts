@@ -213,7 +213,12 @@ export class PeerReviewController {
         quiz,
         receivingQuizAnswer,
       )
-      messageClient(receivingQuizAnswer.userId, quiz.courseId, quiz.id)
+      messageClient(
+        receivingQuizAnswer.userId,
+        quiz.courseId,
+        "PEER_REVIEW_REVEIVED",
+        quiz.id,
+      )
     })
 
     return {

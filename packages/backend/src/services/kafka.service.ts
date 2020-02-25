@@ -70,7 +70,7 @@ export default class KafkaService {
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
     }
 
-    messageClient(userId, courseId)
+    messageClient(userId, courseId, "PROGRESS_UPDATED")
 
     await this.produce("user-course-progress", message)
   }
