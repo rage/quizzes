@@ -68,22 +68,238 @@ export class CourseService {
 
     const oldCourseId = courseId
 
-    this.entityManager.transaction(async manager => {
+    let resultingCourse: Course
+
+    await this.entityManager.transaction(async manager => {
+      // 1. create the course
+
       const newCourse = await manager.create(Course)
+      const newCourseId = newCourse.id
+
+      console.log("New course has been created. Id: ", newCourseId)
 
       const builder = Knex({ client: "pg" })
+      // 2. create the translation. Expects that each course only has one translation!
 
-      builder("course_translation").insert({
-        course_id: "",
-        language_id: "",
+      let query = builder("course_translation").insert({
+        course_id: newCourseId,
+        language_id: courseToBeDuplicated.texts[0].languageId,
         abbreviation: slug,
-        title: title,
+        title: name,
       })
+      await manager.connection.query(query.toQuery())
+
+      console.log("New course has been created")
+
+      query = builder("course_language").insert({
+        course_id: newCourseId,
+        language_id: courseToBeDuplicated.texts[0].languageId,
+      })
+      await manager.connection.query(query.toQuery())
+
+      // 3. Insert duplicate quizzes and quiz translations
+
+      let rawQuery = builder.raw(
+        `
+        INSERT INTO quiz
+          (id, course_id, part, section, points, deadline,
+          open, excluded_from_score, auto_confirm, tries, tries_limited,
+          award_points_even_if_wrong)
+
+        SELECT
+          uuid_generate_v5(:newCourseId, id::text), :newCourseId, part, section, points, deadline,
+          open, excluded_from_score, auto_confirm, tries, tries_limited,
+          award_points_even_if_wrong
+         
+        FROM quiz WHERE course_id = :oldCourseId;
+      `,
+        {
+          newCourseId,
+          oldCourseId,
+        },
+      )
+      await manager.connection.query(rawQuery.toQuery())
+
+      rawQuery = builder.raw(
+        `
+        INSERT INTO quiz_translation
+          (quiz_id, language_id, title, body, submit_message)
+        SELECT
+          uuid_generate_v5(:newCourseId, quiz_id::text), language_id, title, body, submit_message
+        FROM quiz_translation WHERE quiz_id in (SELECT id FROM quiz WHERE course_id  = :oldCourseId);`,
+        {
+          newCourseId,
+          oldCourseId,
+        },
+      )
+      await manager.connection.query(rawQuery.toQuery())
+
+      // 4. Insert duplicate items and their translations
+
+      rawQuery = builder.raw(
+        `
+        INSERT INTO quiz_item 
+          (id, quiz_id, type, "order", validity_regex, format_regex, multi, min_words, max_words, max_value, min_value)
+
+        SELECT
+          uuid_generate_v5(:newCourseId, id::text), uuid_generate_v5(:newCourseid, quiz_id::text), type,
+          "order", validity_regex, format_regex, multi, min_words, max_words, max_value, min_value
+
+        FROM quiz_item WHERE quiz_id in (SELECT id FROM quiz WHERE course_id = :oldCourseId);`,
+        {
+          newCourseId,
+          oldCourseId,
+        },
+      )
+
+      await manager.connection.query(rawQuery.toQuery())
+
+      rawQuery = builder.raw(
+        `
+      INSERT INTO quiz_item_translation
+        (quiz_item_id, language_id, title, body, success_message, failure_message, min_label, max_label)
+      SELECT
+        uuid_generate_v5(:newCourseId, quiz_item_id::text), language_id, title,
+        body, success_message, failure_message, min_label, max_label
+      FROM quiz_item_translation
+        WHERE quiz_item_id in (
+          SELECT id FROM quiz_item WHERE quiz_id in (
+            SELECT id FROM quiz WHERE course_id = :oldCourseId
+          )
+        );
+      `,
+        {
+          newCourseId,
+          oldCourseId,
+        },
+      )
+
+      await manager.connection.query(rawQuery.toQuery())
+
+      // 5. Insert duplicate options and their translations
+
+      rawQuery = builder.raw(
+        `
+      INSERT INTO quiz_option (id, quiz_item_id, "order", correct)
+      SELECT
+        uuid_generate_v5(:newCourseId, id::text), uuid_generate_v5(:newCourseId, quiz_item_id::text), "order", correct
+      FROM
+        quiz_option WHERE quiz_item_id in (
+          SELECT id FROM quiz_item WHERE quiz_id in (
+            SELECT id FROM quiz WHERE course_id = :oldCourseId
+          )
+        );
+      `,
+        {
+          newCourseId,
+          oldCourseId,
+        },
+      )
+
+      await manager.connection.query(rawQuery.toQuery())
+
+      rawQuery = builder.raw(
+        `
+      INSERT INTO quiz_option_translation
+        (quiz_option_id, language_id, title, body, success_message, failure_message)
+      SELECT
+        uuid_generate_v5(:newCourseId, quiz_option_id::text), language_id, title, body, success_message, failure_message
+      FROM
+        quiz_option_translation WHERE quiz_option_id in (
+          SELECT id FROM quiz_option WHERE quiz_item_id in (
+            SELECT id FROM quiz_item WHERE quiz_id in (
+              SELECT id FROM quiz WHERE course_id = :oldCourseId
+            )
+          )
+        );
+      `,
+        {
+          newCourseId,
+          oldCourseId,
+        },
+      )
+
+      await manager.connection.query(rawQuery.toQuery())
+
+      // 6. Add peer review collections and their translations
+
+      rawQuery = builder.raw(
+        `
+      INSERT INTO peer_review_collection (id, quiz_id)
+      SELECT uuid_generate_v5(:newCourseId, id::text), uuid_generate_v5(:newCourseId, quiz_id::text)
+      FROM peer_review_collection WHERE quiz_id IN (
+        SELECT id FROM quiz WHERE course_id = :oldCourseId
+      );
+      `,
+        {
+          newCourseId,
+          oldCourseId,
+        },
+      )
+
+      await manager.connection.query(rawQuery.toQuery())
+
+      rawQuery = builder.raw(
+        `
+      INSERT INTO peer_review_collection_translation (peer_review_collection_id, language_id, title, body)
+      SELECT uuid_generate_v5(:newCourseId, peer_review_collection_id::text), language_id, title, body
+      FROM peer_review_collection_translation
+        WHERE peer_review_collection_id IN (
+          SELECT id FROM peer_review_collection WHERE quiz_id IN (
+            SELECT id FROM quiz WHERE course_id = :oldCourseId
+          )
+        );
+      `,
+        {
+          newCourseId,
+          oldCourseId,
+        },
+      )
+
+      await manager.connection.query(rawQuery.toQuery())
+
+      // 7. Add peer review questions and their translations
+
+      rawQuery = builder.raw(
+        `
+      INSERT INTO peer_review_question (id, quiz_id, peer_review_collection_id,
+        "default", type, answer_required, "order")
+      SELECT uuid_generate_v5(:newCourseId, id::text), uuid_generate_v5(:newCourseId, quiz_id::text),
+        uuid_generate_v5(:newCourseId, peer_review_collection_id::text),
+        "default", type, answer_required, "order"
+      FROM peer_review_question WHERE quiz_id IN (
+        SELECT id FROM quiz WHERE course_id = :oldCourseId
+      );
+      `,
+        {
+          newCourseId,
+          oldCourseId,
+        },
+      )
+
+      await manager.connection.query(rawQuery.toQuery())
+
+      rawQuery = builder.raw(
+        `
+      INSERT INTO peer_review_question_translation (peer_review_question_id, language_id, title, body)
+      SELECT uuid_generate_v5(:newCourseId, peer_review_question_id::text), language_id, title, body
+      FROM peer_review_question_translation WHERE peer_review_question_id IN (
+        SELECT id FROM peer_review_question WHERE quiz_id IN (
+          SELECT id FROM quiz WHERE course_id = :oldCourseId
+        )
+      );
+      `,
+        {
+          newCourseId,
+          oldCourseId,
+        },
+      )
+
+      await manager.connection.query(rawQuery.toQuery())
+
+      resultingCourse = newCourse
     })
-
-    // return the course
-
-    return null
+    return resultingCourse
   }
 
   private async stripCourse(

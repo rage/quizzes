@@ -14,7 +14,7 @@ import AuthorizationService, {
 import CourseService from "services/course.service"
 import UserCourseRoleService from "services/usercourserole.service"
 import { Inject } from "typedi"
-import { EntityManager } from "typeorm"
+import { EntityManager, AdvancedConsoleLogger } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { API_PATH } from "../../config"
@@ -98,21 +98,27 @@ export class CourseController {
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @Body() names: { title: string; slug: string },
   ): Promise<any> {
+    console.log("Is controller method called?")
     const authorized = await this.authorizationService.isPermitted({
       user,
       courseId: id,
       permission: Permission.DUPLICATE,
     })
+    console.log("authorization retrieved")
 
     if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
+    console.log("authorization checked")
 
     const { title, slug } = names
-    const result = this.courseService.duplicateCourse(id, title, slug)
+    console.log("creating...")
+    const result = await this.courseService.duplicateCourse(id, title, slug)
+    console.log("created!")
     if (!result) {
       return "Failed for some reason"
     }
-    return `You sent ${title}, ${slug}`
+    console.log("Looking good!")
+    return result
   }
 }
