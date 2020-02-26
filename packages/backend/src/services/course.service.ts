@@ -1,6 +1,7 @@
 import { Container, Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
+import { v4 as uuidv4 } from "uuid"
 import { Course } from "../models"
 import { ICourseQuery } from "../types"
 import UserCourseRoleService from "./usercourserole.service"
@@ -67,18 +68,23 @@ export class CourseService {
     // 2. knex together the thingies
 
     const oldCourseId = courseId
-
-    let resultingCourse: Course
+    const newCourseId = uuidv4()
 
     await this.entityManager.transaction(async manager => {
       // 1. create the course
 
-      const newCourse = await manager.create(Course)
-      const newCourseId = newCourse.id
-
-      console.log("New course has been created. Id: ", newCourseId)
-
       const builder = Knex({ client: "pg" })
+
+      console.log("New created: ", newCourseId)
+
+      // 1. Create the quiz
+
+      const initialQuery = builder("course").insert({
+        id: newCourseId,
+      })
+
+      await manager.query(initialQuery.toQuery())
+
       // 2. create the translation. Expects that each course only has one translation!
 
       let query = builder("course_translation").insert({
@@ -87,7 +93,7 @@ export class CourseService {
         abbreviation: slug,
         title: name,
       })
-      await manager.connection.query(query.toQuery())
+      await manager.query(query.toQuery())
 
       console.log("New course has been created")
 
@@ -95,9 +101,11 @@ export class CourseService {
         course_id: newCourseId,
         language_id: courseToBeDuplicated.texts[0].languageId,
       })
-      await manager.connection.query(query.toQuery())
+      await manager.query(query.toQuery())
 
       // 3. Insert duplicate quizzes and quiz translations
+
+      console.log("Starting to insert the quiz info")
 
       let rawQuery = builder.raw(
         `
@@ -118,7 +126,7 @@ export class CourseService {
           oldCourseId,
         },
       )
-      await manager.connection.query(rawQuery.toQuery())
+      await manager.query(rawQuery.toQuery())
 
       rawQuery = builder.raw(
         `
@@ -132,17 +140,19 @@ export class CourseService {
           oldCourseId,
         },
       )
-      await manager.connection.query(rawQuery.toQuery())
+      await manager.query(rawQuery.toQuery())
+
+      console.log("Inserted the quiz info!")
 
       // 4. Insert duplicate items and their translations
 
       rawQuery = builder.raw(
         `
-        INSERT INTO quiz_item 
+        INSERT INTO quiz_item
           (id, quiz_id, type, "order", validity_regex, format_regex, multi, min_words, max_words, max_value, min_value)
 
         SELECT
-          uuid_generate_v5(:newCourseId, id::text), uuid_generate_v5(:newCourseid, quiz_id::text), type,
+          uuid_generate_v5(:newCourseId, id::text), uuid_generate_v5(:newCourseId, quiz_id::text), type,
           "order", validity_regex, format_regex, multi, min_words, max_words, max_value, min_value
 
         FROM quiz_item WHERE quiz_id in (SELECT id FROM quiz WHERE course_id = :oldCourseId);`,
@@ -152,7 +162,7 @@ export class CourseService {
         },
       )
 
-      await manager.connection.query(rawQuery.toQuery())
+      await manager.query(rawQuery.toQuery())
 
       rawQuery = builder.raw(
         `
@@ -174,7 +184,9 @@ export class CourseService {
         },
       )
 
-      await manager.connection.query(rawQuery.toQuery())
+      await manager.query(rawQuery.toQuery())
+
+      console.log("inserted the quiz item info!")
 
       // 5. Insert duplicate options and their translations
 
@@ -196,7 +208,7 @@ export class CourseService {
         },
       )
 
-      await manager.connection.query(rawQuery.toQuery())
+      await manager.query(rawQuery.toQuery())
 
       rawQuery = builder.raw(
         `
@@ -219,7 +231,9 @@ export class CourseService {
         },
       )
 
-      await manager.connection.query(rawQuery.toQuery())
+      await manager.query(rawQuery.toQuery())
+
+      console.log("inserted the quiz option info!")
 
       // 6. Add peer review collections and their translations
 
@@ -237,7 +251,7 @@ export class CourseService {
         },
       )
 
-      await manager.connection.query(rawQuery.toQuery())
+      await manager.query(rawQuery.toQuery())
 
       rawQuery = builder.raw(
         `
@@ -256,7 +270,7 @@ export class CourseService {
         },
       )
 
-      await manager.connection.query(rawQuery.toQuery())
+      await manager.query(rawQuery.toQuery())
 
       // 7. Add peer review questions and their translations
 
@@ -277,7 +291,7 @@ export class CourseService {
         },
       )
 
-      await manager.connection.query(rawQuery.toQuery())
+      await manager.query(rawQuery.toQuery())
 
       rawQuery = builder.raw(
         `
@@ -295,11 +309,10 @@ export class CourseService {
         },
       )
 
-      await manager.connection.query(rawQuery.toQuery())
-
-      resultingCourse = newCourse
+      await manager.query(rawQuery.toQuery())
     })
-    return resultingCourse
+
+    return await this.entityManager.findOne(Course, newCourseId)
   }
 
   private async stripCourse(

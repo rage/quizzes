@@ -104,21 +104,20 @@ export class CourseController {
       courseId: id,
       permission: Permission.DUPLICATE,
     })
-    console.log("authorization retrieved")
 
     if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
-    console.log("authorization checked")
 
     const { title, slug } = names
     console.log("creating...")
     const result = await this.courseService.duplicateCourse(id, title, slug)
+
+    console.log("Result is: ", result)
     console.log("created!")
     if (!result) {
       return "Failed for some reason"
     }
-    console.log("Looking good!")
     return result
   }
 }

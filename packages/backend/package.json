@@ -71,6 +71,7 @@
     "typeorm": "^0.3.0-rc.17",
     "typeorm-routing-controllers-extensions": "^0.2.0",
     "typeorm-typedi-extensions": "^0.2.1",
+    "uuid": "^7.0.1",
     "uuid-by-string": "^0.6.0",
     "validate.js": "^0.12.0",
     "validator": "^10.11.0",
