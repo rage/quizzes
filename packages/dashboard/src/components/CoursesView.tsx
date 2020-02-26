@@ -13,7 +13,7 @@ const CourseCard = ({ course }) => {
   return (
     <Card style={{ maxWidth: "30em" }}>
       <Link to={`/courses/${course.id}`}>
-        <CardHeader title={course.texts[0].title} />
+        <CardHeader title={course.texts[0] ? course.texts[0].title : ""} />
       </Link>
       <CardContent>
         <Typography variant="body1">

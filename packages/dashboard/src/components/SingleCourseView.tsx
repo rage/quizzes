@@ -6,6 +6,7 @@ import { firstWords, wordCount } from "../../../common/src/util"
 import { ICourse, IDashboardFilter, IQuiz } from "../interfaces"
 import { newQuiz } from "../store/edit/actions"
 import { setCourse } from "../store/filter/actions"
+import CourseDuplicateButton from "./CourseDuplicateButton"
 import LanguageBar from "./GeneralTools/LanguageBar"
 
 interface ISingleCoursePropsFromParent {
@@ -154,6 +155,8 @@ class SingleCourseView extends React.Component<
                 </Grid>
               </Grid>
             </Grid>
+
+            <CourseDuplicateButton />
 
             <LanguageBar />
 
