@@ -106,8 +106,8 @@ export default class PeerReviewService {
     )
 
     return {
-      updatedAnswer,
-      updatedState,
+      answer: updatedAnswer,
+      state: updatedState,
     }
   }
 

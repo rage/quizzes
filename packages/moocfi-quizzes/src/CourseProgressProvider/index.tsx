@@ -17,6 +17,12 @@ interface CourseProgressProviderProps {
   courseId: string
 }
 
+type MessageType =
+  | "PROGRESS_UPDATED"
+  | "PEER_REVIEW_REVEIVED"
+  | "QUIZ_CONFIRMED"
+  | "QUIZ_REJECTED"
+
 export const CourseProgressProvider: React.FunctionComponent<
   CourseProgressProviderProps
 > = ({ accessToken, courseId, children }) => {
@@ -24,36 +30,46 @@ export const CourseProgressProvider: React.FunctionComponent<
   const [updateQuiz, setUpdateQuiz] = useState({})
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [verified, setVerified] = useState(false)
-  const [client, setClient] = useState<W3CWebSocket>()
-  const [message, setMessage] = useState("")
+  const [moocfiVerified, setMoocfiVerified] = useState(false)
+  const [quizzesVerified, setQuizzesVerified] = useState(false)
+  const [moocfiClient, setMoocfiClient] = useState<W3CWebSocket | undefined>()
+  const [quizzesClient, setQuizzesClient] = useState<W3CWebSocket | undefined>()
+  const [messages, setMessage] = useState("")
 
   useEffect(() => {
     init()
   }, [])
 
   useEffect(() => {
-    if (client && !verified) {
-      client.send(JSON.stringify({ accessToken, courseId }))
-      setVerified(true)
+    if (moocfiClient && !moocfiVerified) {
+      moocfiClient.send(JSON.stringify({ accessToken, courseId }))
+      setMoocfiVerified(true)
+      console.log("Connected to moocfi")
+    }
+    if (quizzesClient && !quizzesVerified) {
+      quizzesClient.send(JSON.stringify({ accessToken, courseId }))
+      setQuizzesVerified(true)
+      console.log("Connected to quizzes")
     }
   })
 
   const init = async () => {
     await fetchProgressData()
-    setClient(await connect())
+    setQuizzesClient(
+      await connect("ws://localhost:7000").catch(() => undefined),
+    )
+    setMoocfiClient(await connect("ws://localhost:9000").catch(() => undefined))
   }
 
-  const connect = (): Promise<W3CWebSocket> => {
+  const connect = (host: string): Promise<W3CWebSocket> => {
     return new Promise((resolve: any, reject: any) => {
-      const client = new W3CWebSocket("ws://localhost:9000", "echo-protocol")
-      console.log("CONNECT")
+      const client = new W3CWebSocket(host, "echo-protocol")
       client.onmessage = onMessage
       client.onclose = (e: any) => {}
-      client.onopen = function() {
+      client.onopen = () => {
         resolve(client)
       }
-      client.onerror = function(err) {
+      client.onerror = err => {
         reject(err)
       }
     })
@@ -66,11 +82,13 @@ export const CourseProgressProvider: React.FunctionComponent<
         case "PROGRESS_UPDATED":
           fetchProgressData()
           break
-        case "PEER_REVIEW_REVEIVED":
+        case "PEER_REVIEW_RECEIVED":
           setUpdateQuiz({ ...updateQuiz, [data.message]: true })
           setMessage("You have received a new peer review")
           break
         case "QUIZ_CONFIRMED":
+          setUpdateQuiz({ ...updateQuiz, [data.message]: true })
+          setMessage("Your answer was confirmed!")
           break
       }
     }
@@ -111,10 +129,10 @@ export const CourseProgressProvider: React.FunctionComponent<
     <CourseProgressProviderContext.Provider value={value}>
       <Snackbar
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        open={!!message}
+        open={!!messages}
         onClose={() => setMessage("")}
         autoHideDuration={6000}
-        message={message}
+        message={messages}
       />
       {children}
     </CourseProgressProviderContext.Provider>

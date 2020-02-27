@@ -27,6 +27,7 @@ export const getUserCourseData = async (
                   section
                   ExerciseCompletions(orderBy: updated_at_DESC, first: 1) {
                     user {id}
+                    completed
                     required_actions {
                       value
                     }

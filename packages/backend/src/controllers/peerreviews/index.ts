@@ -24,7 +24,7 @@ import { API_PATH } from "../../config"
 import { PeerReview, Quiz, QuizAnswer, UserQuizState } from "../../models"
 import { ITMCProfileDetails } from "../../types"
 
-import { messageClient } from "../../wsServer"
+import { messageClient, MessageType } from "../../wsServer"
 
 @JsonController(`${API_PATH}/quizzes/peerreview`)
 export class PeerReviewController {
@@ -226,30 +226,42 @@ export class PeerReviewController {
         peerReview,
       )
 
-      const {
-        updatedAnswer,
-        updatedState,
-      } = await this.peerReviewService.processPeerReview(
+      const givingUpdated = await this.peerReviewService.processPeerReview(
         manager,
         quiz,
         givingQuizAnswer,
         true,
       )
 
-      responseQuizAnswer = updatedAnswer
-      responseUserQuizState = updatedState
+      responseQuizAnswer = givingUpdated.answer
+      responseUserQuizState = givingUpdated.state
 
-      await this.peerReviewService.processPeerReview(
+      const receivingUpdated = await this.peerReviewService.processPeerReview(
         manager,
         quiz,
         receivingQuizAnswer,
       )
-      messageClient(
-        receivingQuizAnswer.userId,
-        quiz.courseId,
-        "PEER_REVIEW_REVEIVED",
-        quiz.id,
-      )
+
+      const newStatus = receivingUpdated.answer.status
+      const messages: MessageType[] = ["PEER_REVIEW_RECEIVED"]
+
+      if (receivingQuizAnswer.status !== newStatus) {
+        if (newStatus === "confirmed") {
+          messages.push("QUIZ_CONFIRMED")
+        }
+        if (newStatus === "rejected" || newStatus === "spam") {
+          messages.push("QUIZ_REJECTED")
+        }
+      }
+
+      messages.forEach(message => {
+        messageClient(
+          receivingQuizAnswer.userId,
+          quiz.courseId,
+          message,
+          quiz.id,
+        )
+      })
     })
 
     return {

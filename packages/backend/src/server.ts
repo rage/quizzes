@@ -18,7 +18,7 @@ const port = process.env.PORT || 3000
 
 database.connect() // hmm, this is async btw
 
-// wsListen()
+wsListen()
 
 /**
  * Start Express server.

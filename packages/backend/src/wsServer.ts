@@ -4,7 +4,7 @@ import redis from "./config/redis"
 import TMCApi from "./services/TMCApi"
 import { ITMCProfileDetails } from "./types"
 
-const webSocketsServerPort = 9000
+const webSocketsServerPort = 7000
 const server = http.createServer()
 export const wsListen = () => server.listen(webSocketsServerPort)
 
@@ -20,10 +20,11 @@ const originAccepted: { [origin: string]: boolean } = {
 
 const clients: { [userId: number]: any } = {}
 
-type MessageType =
+export type MessageType =
   | "PROGRESS_UPDATED"
-  | "PEER_REVIEW_REVEIVED"
+  | "PEER_REVIEW_RECEIVED"
   | "QUIZ_CONFIRMED"
+  | "QUIZ_REJECTED"
 
 export const messageClient = (
   userId: number,

@@ -91,21 +91,14 @@ const App = () => {
   )
 
   const Div = styled.div`
-    display: flex;
+    display: block;
     flex-wrap: wrap;
     width: 100%;
     padding: 2rem;
     p {
       margin: auto;
-      text-align: center;
-      font-size: 2rem;
-    }
-    div {
-      height: 0;
-      flex-basis: 100;
-    }
-    button {
-      margin: auto;
+      text-align: left;
+      font-size: 1.5rem;
     }
   `
 
@@ -126,10 +119,26 @@ const App = () => {
     }
     return (
       <Div>
-        <p>{JSON.stringify(props.userCourseProgress)}</p>
-        <p>{JSON.stringify(props.requiredActions)}</p>
-        <div />
-        <button onClick={props.refreshProgress}>Reload</button>
+        {props.userCourseProgress.data.currentUser.user_course_progresses[0].progress.map(
+          p => {
+            return <p>{JSON.stringify(p)}</p>
+          },
+        )}
+        {props.userCourseProgress.data.currentUser.user_course_progresses[0].course.exercises.map(
+          e => {
+            const ex = { ...e }
+            delete ex.ExerciseCompletions
+            return (
+              <div>
+                #########################
+                <p>{JSON.stringify(ex)}</p>
+                {e.ExerciseCompletions.map(a => {
+                  return <p>{JSON.stringify(a)}</p>
+                })}
+              </div>
+            )
+          },
+        )}
       </Div>
     )
   }
