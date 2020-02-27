@@ -341,17 +341,13 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
         qi.type !== "research-agreement",
     )
 
-<<<<<<< HEAD
-  const ThemedLowerContent = themeProvider.lowerContent || LowerContent
-=======
   const QuizContentWrapper = themeProvider.quizContent || QuizContent
   const LowerContentWrapper = themeProvider.lowerContent || LowerContent
 
   const wrongLocale = !!(customContent && customContent.WrongLocale)
 
->>>>>>> 70fb22fdb563841d873ba7b6b36d07f88b845cec
   return (
-    <OuterDiv providedStyles={themeProvider.mainDivStyles} aria-label={quiz.texts[0].title} role="form">
+    <OuterDiv providedStyles={themeProvider.mainDivStyles} aria-label={quiz.texts[0].title} role="form" >
       <TopInfoBar />
       <QuizContentWrapper disabled={quizDisabled || wrongLocale}>
         <UpperContent providedStyles={themeProvider.upperContentStyles}>

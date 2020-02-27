@@ -158,7 +158,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
             onlyOneItem={onlyOneItem}
             questionWidth={questionWidth}
           />
-
+         
           <ChoicesContainer direction={direction} onlyOneItem={onlyOneItem}>
             {options
               .sort((o1, o2) => o1.order - o2.order)
@@ -307,6 +307,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
           onClick={handleOptionChange(option.id)}
           disabled={quizDisabled}
           aria-selected={optionIsSelected}
+          
         >
           <MarkdownText Component={styled.div``} removeParagraphs>
             {text.title}
@@ -335,6 +336,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             correct={option.correct}
             {...clickOptions}
             aria-selected={optionIsSelected}
+            aria-label={`${text.title}-${option.correct ? "correct" : "incorrect"}`}
           >
             <MarkdownText Component={styled.div``} removeParagraphs>
               {text.title}
@@ -366,6 +368,8 @@ const Option: React.FunctionComponent<OptionProps> = ({
           correct={option.correct}
           {...clickOptions}
           aria-selected={optionIsSelected}
+          aria-label={`${text.title}-${option.correct ? "correct" : "incorrect"}`}
+          
         >
           <MarkdownText Component={styled.div``} removeParagraphs>
             {text.title}
@@ -453,7 +457,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 
   return (
     
-    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem} role="alertdialog">
+    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem} >
       <CentralizedOnSmallScreenTypography variant="body1">
         <AttentionIcon icon={faExclamationCircle} />
       </CentralizedOnSmallScreenTypography>

@@ -90,7 +90,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
         fullWidth
         margin="normal"
         variant="outlined"
-        label={itemTitle}
+        label={itemTitle ? itemTitle : openLabels.placeholder}
         id={`${itemTitle}-textfield`}
       />
     )
@@ -128,7 +128,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
           fullWidth
           margin="normal"
           variant="outlined"
-          label={itemTitle}
+          label={itemTitle ? itemTitle : openLabels.placeholder}
           disabled={quizDisabled}
           id={`${itemTitle}-textfield`}
           aria-label={itemTitle}
