@@ -67,17 +67,17 @@ const publish = async () => {
         console.log("publishing quizzes")
         const quizzes = await publishQuizzes(course)
 
-        console.log("publishing answers")
+        /*console.log("publishing answers")
         await publishAnswers(course)
 
         console.log("publishing progress")
-        await publishProgress(course, quizzes)
+        await publishProgress(course, quizzes)*/
       }
 
-      console.log("removing task from database")
+      /*console.log("removing task from database")
       await knex("kafka_task")
         .where("id", task.id)
-        .del()
+        .del()*/
     }
 
     console.timeEnd("done in")
@@ -160,7 +160,6 @@ const publishQuizzes = async (course: ICourse): Promise<IQuiz[]> => {
       .join("quiz_translation", { "quiz.id": "quiz_translation.quiz_id" })
       .where({
         course_id: courseId,
-        excluded_from_score: false,
       })
       .andWhereNot("part", 0)
 
