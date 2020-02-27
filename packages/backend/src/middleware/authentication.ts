@@ -14,6 +14,7 @@ import redis from "../config/redis"
 
 const whitelist = [
   /\/$/,
+  /\/api\/healthz$/,
   /\/api\/v1\/quizzes\/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}\/titles\/[a-z]{2}_[A-Z]{2}$/,
   /\/api\/v1\/quizzes\/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}$/,
   /\/api\/v1\/quizzes\/[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}\?fullInfo\=(true|false)$/,
@@ -21,13 +22,6 @@ const whitelist = [
 
 @Middleware({ type: "before" })
 export class AuthenticationMiddleware implements ExpressMiddlewareInterface {
-  /*private client = redis.createClient({
-    host: process.env.REDIS_HOST,
-    port: Number.parseInt(process.env.REDIS_PORT, 10),
-    password: process.env.REDIS_PASSWORD,
-  })
-  private get = promisify(this.client.get).bind(this.client)*/
-
   public async use(req: any, res: any, next: any) {
     console.log(req.url)
     let onWhiteList = false

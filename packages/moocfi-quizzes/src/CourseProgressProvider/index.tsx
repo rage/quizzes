@@ -40,8 +40,8 @@ export const CourseProgressProvider: React.FunctionComponent<
   })
 
   const init = async () => {
-    setClient(await connect())
     await fetchProgressData()
+    setClient(await connect())
   }
 
   const connect = (): Promise<W3CWebSocket> => {
@@ -103,7 +103,7 @@ export const CourseProgressProvider: React.FunctionComponent<
     refreshProgress,
     updateQuiz,
     quizUpdated,
-    userCourseProgress: data.userCourseProgress,
+    userCourseProgress: data,
     requiredActions: data.requiredActions,
   }
 

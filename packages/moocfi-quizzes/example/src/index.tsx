@@ -137,7 +137,7 @@ const App = () => {
 
   return (
     <CourseProgressProvider
-      courseId="833a49b4-1c5e-4c61-b512-8cd64dd8aa7e"
+      courseId="b5746948-5141-4d45-aceb-79adb037c29b"
       accessToken={accessToken.value}
     >
       <Typography variant="h4" component="h1">

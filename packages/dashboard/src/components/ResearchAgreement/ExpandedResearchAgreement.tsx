@@ -13,7 +13,8 @@ import { connect } from "react-redux"
 import {
   addOption,
   changeAttr,
-  save,
+  modifyOptionOrder,
+  removeOption,
   updateMultipleOptions,
 } from "../../store/edit/actions"
 import BottomActionsExpItem from "../ItemTools/ExpandedBottomActions"
@@ -35,7 +36,6 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
     }))
 
     const initData = {
-      title: item.texts[0].title,
       options: initOptionData,
     }
     this.state = {
@@ -46,6 +46,7 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
 
   public render() {
     const item = this.props.items[this.props.order]
+
     return (
       <Grid container={true} spacing={16} justify="center" alignItems="center">
         <Grid item={true} xs={12}>
@@ -67,11 +68,7 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
                         multiline={true}
                         required={true}
                         label="Title"
-                        value={
-                          (this.state.titleHasBeenModified &&
-                            this.state.tempItemData.title) ||
-                          ""
-                        }
+                        value={item.texts[0].title || ""}
                         onChange={this.changeTempAttribute("title")}
                         style={{
                           fontWeight: "bold",
@@ -82,7 +79,7 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
                     <Grid item={true} xs="auto" />
 
                     <SortableCheckboxList
-                      options={this.state.tempItemData.options}
+                      options={item.options}
                       onRemove={this.removeOption}
                       changeTempOptionAttribute={this.changeTempOptionAttribute}
                       itemOrder={item.order}
@@ -109,7 +106,6 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
               </Grid>
 
               <BottomActionsExpItem
-                onSave={this.saveItem}
                 itemHasBeenSaved={item.id ? true : false}
                 handleExpand={this.props.toggleExpand}
                 handleCancel={this.props.onCancel}
@@ -123,114 +119,60 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
   }
 
   private onSortEnd = ({ oldIndex, newIndex, collection }) => {
-    const newOptions = { ...this.state.tempItemData }.options
-    newOptions[oldIndex].order = newIndex
-    newOptions[newIndex].order = oldIndex
-
-    const temp = newOptions[oldIndex]
-    newOptions[oldIndex] = newOptions[newIndex]
-    newOptions[newIndex] = temp
-
-    this.setState({
-      tempItemData: {
-        ...this.state.tempItemData,
-        options: newOptions,
-      },
-    })
+    this.props.modifyOptionOrder(
+      this.props.items[this.props.order],
+      oldIndex,
+      newIndex,
+    )
   }
 
   private addOption = () => {
-    const oldOptions = this.state.tempItemData.options
-
-    this.setState({
-      tempItemData: {
-        ...this.state.tempItemData,
-        options: oldOptions.concat({
-          title: "",
-          body: "",
-          order: oldOptions.length,
-          titleHasBeenModified: true,
-          id: null,
-          correct: true,
-        }),
-      },
-    })
+    this.props.addOption(this.props.order)
   }
 
   private removeOption = (order: number) => e => {
-    if (this.state.tempItemData.options.length <= 1) {
+    const item = this.props.items[this.props.order]
+    const optionToBeRemoved = item.options.find(opt => opt.order === order)
+    if (item.options.length <= 1 || !optionToBeRemoved) {
       return
     }
-
-    const newOptions = this.state.tempItemData.options.filter(
-      opt => opt.order !== order,
-    )
-
-    let prevOrder = -1
-    newOptions.forEach(opt => (opt.order = ++prevOrder))
-
-    this.setState({
-      tempItemData: {
-        ...this.state.tempItemData,
-        options: newOptions,
-      },
-    })
+    this.props.removeOption(optionToBeRemoved)
   }
 
   private changeTempOptionAttribute = (
     order: number,
     attributeName: string,
   ) => e => {
-    const copyTempItemData = { ...this.state.tempItemData }
-    const newOptionData = copyTempItemData.options
-    newOptionData[order][attributeName] = e.target.value
-    if (attributeName === "title") {
-      newOptionData[order].titleHasBeenModified = true
-    }
+    const value = e.target.value
 
-    this.setState({
-      tempItemData: { ...this.state.tempItemData, options: newOptionData },
-    })
+    /*
+    const item = this.props.items[this.props.order]
+    const newOption = {...item.options.find(opt => opt.order === order)}
+    newOption.texts[0][attributeName] = value
+    const newOptions = item.options.map(opt => opt.order !== order ? opt : newOption)
+    */
+
+    this.props.changeAttr(
+      `items[${this.props.order}].options[${order}].texts[0].${attributeName}`,
+      value,
+    )
   }
 
   private changeTempAttribute = (attributeName: string) => e => {
-    if (attributeName === "title" && !this.state.titleHasBeenModified) {
-      this.setState({
-        titleHasBeenModified: true,
-      })
+    const value = e.target.value
+    if (attributeName === "title") {
+      this.props.changeAttr(`items[${this.props.order}].texts[0].title`, value)
     }
-
-    const newData = { ...this.state.tempItemData }
-    newData[attributeName] = e.target.value
-
-    if (attributeName === "title" && !this.state.titleHasBeenModified) {
-      this.setState({
-        titleHasBeenModified: true,
-        tempItemData: newData,
-      })
-    } else {
-      this.setState({
-        tempItemData: newData,
-      })
-    }
-  }
-
-  private saveItem = e => {
-    this.props.toggleExpand(e)
-    this.props.changeAttr(
-      `items[${this.props.order}].texts[0].title`,
-      this.state.tempItemData.title,
-    )
-
-    this.props.updateMultipleOptions(
-      this.props.order,
-      this.state.tempItemData.options,
-    )
-    this.props.save()
   }
 }
 
 export default connect(
   null,
-  { addOption, changeAttr, save, updateMultipleOptions },
+  {
+    addOption,
+    changeAttr,
+    removeOption,
+    modifyOptionOrder,
+    updateMultipleOptions,
+  },
 )(ExpandedResearchAgreement)

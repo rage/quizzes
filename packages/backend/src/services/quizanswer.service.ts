@@ -13,13 +13,14 @@ import {
   UserQuizState,
 } from "../models"
 import { AnsweredQuiz, IQuizAnswerQuery } from "../types"
-import { WhereBuilder } from "../util/index"
+import { WhereBuilder, stringContainsLongerWord } from "../util/index"
 
 // tslint:disable-next-line:max-line-length
 // import PlainObjectToDatabaseEntityTransformer from "../../../../node_modules/typeorm/query-builder/transformer/PlainObjectToDatabaseEntityTransformer"
 
 // tslint:disable-next-line:max-line-length
 import { PlainObjectToDatabaseEntityTransformer } from "typeorm/query-builder/transformer/PlainObjectToDatabaseEntityTransformer"
+import { setCorrectValuesForAwardPointsEvenIfWrong1564678844323 } from "migration/1564678844323-set_correct_values_for_award_points_even_if_wrong"
 
 @Service()
 export default class QuizAnswerService {
@@ -170,11 +171,19 @@ export default class QuizAnswerService {
       }
     }
 
-    const result = await someQuery
+    someQuery
       .select("quiz_answer.quiz_id", "quizId")
-      .addSelect("COUNT(quiz_answer.id)")
-      .groupBy("quiz_answer.quiz_id")
-      .getRawMany()
+      .addSelect("COUNT(*)")
+      .addGroupBy("quiz_answer.quiz_id")
+
+    const result = (await someQuery.execute()).map(
+      (countInfo: { quizId: string; count: string }) => {
+        return {
+          ...countInfo,
+          count: Number(countInfo.count),
+        }
+      },
+    )
 
     if (!query.quizId) {
       return result
@@ -286,11 +295,6 @@ export default class QuizAnswerService {
       return {}
     }
 
-    const quizItemTypes = (await QuizItem.createQueryBuilder("quiz_item")
-      .select("quiz_item.type")
-      .where("quiz_id = :id", { id: quizId })
-      .getRawMany()).map(value => value.quiz_item_type)
-
     const builder = Knex({ client: "pg" })
 
     let query = builder("quiz_answer")
@@ -304,62 +308,29 @@ export default class QuizAnswerService {
       .innerJoin("quiz_item", "quiz_item.id", "quiz_item_answer.quiz_item_id")
       .select({ quiz_item_id: "quiz_item.id" }, "quiz_item.type")
 
-    let selectedFields: string[] = []
-
-    if (
-      quizItemTypes.some(
-        type =>
-          type === "multiple-choice" ||
-          type === "checkbox" ||
-          type === "research-agreement",
+    let selectedFields: string[] = ["text_data", "int_data", "correct"]
+    query = query
+      .leftJoin(
+        "quiz_option_answer",
+        "quiz_option_answer.quiz_item_answer_id",
+        "quiz_item_answer.id",
       )
-    ) {
-      query = query
-        .leftJoin(
-          "quiz_option_answer",
-          "quiz_option_answer.quiz_item_answer_id",
-          "quiz_item_answer.id",
-        )
-
-        .innerJoin(
-          "quiz_option",
-          "quiz_option.id",
-          "quiz_option_answer.quiz_option_id",
-        )
-
-        .innerJoin(
-          "quiz_option_translation",
-          "quiz_option_translation.quiz_option_id",
-          "quiz_option.id",
-        )
-
-        .select(
-          "quiz_option_answer.quiz_option_id",
-          "quiz_option_translation.language_id",
-          "quiz_option_translation.title",
-          "quiz_option_translation.body",
-        )
-
-      selectedFields.push("correct")
-    } else if (
-      quizItemTypes.length === 1 ||
-      quizItemTypes.every(type => type === quizItemTypes[0])
-    ) {
-      switch (quizItemTypes[0]) {
-        case "open":
-          selectedFields.push("correct")
-        case "essay":
-          selectedFields.push("text_data")
-          break
-        case "scale":
-          selectedFields.push("int_data")
-          break
-        default:
-          selectedFields = ["text_data", "int_data", "correct"]
-      }
-    } else {
-      selectedFields = ["text_data", "int_data", "correct"]
-    }
+      .leftJoin(
+        "quiz_option",
+        "quiz_option.id",
+        "quiz_option_answer.quiz_option_id",
+      )
+      .leftJoin(
+        "quiz_option_translation",
+        "quiz_option_translation.quiz_option_id",
+        "quiz_option.id",
+      )
+      .select(
+        "quiz_option_answer.quiz_option_id",
+        "quiz_option_translation.language_id",
+        "quiz_option_translation.title",
+        "quiz_option_translation.body",
+      )
 
     query = query.select(
       ...selectedFields.map(field => `quiz_item_answer.${field}`),

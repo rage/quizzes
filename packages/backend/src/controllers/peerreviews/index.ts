@@ -9,6 +9,10 @@ import {
   QueryParam,
   UnauthorizedError,
 } from "routing-controllers"
+import AuthorizationService, {
+  Permission,
+} from "services/authorization.service"
+import KafkaService from "services/kafka.service"
 import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
@@ -28,6 +32,9 @@ export class PeerReviewController {
   private entityManager: EntityManager
 
   @Inject()
+  private authorizationService: AuthorizationService
+
+  @Inject()
   private peerReviewService: PeerReviewService
 
   @Inject()
@@ -42,7 +49,13 @@ export class PeerReviewController {
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @QueryParam("stripped") stripped: boolean,
   ) {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      answerId,
+      permission: Permission.VIEW,
+    })
+
+    if (!authorized) {
       stripped = true
       const answer = await this.quizAnswerService.getAnswer(
         { id: answerId },
@@ -80,7 +93,13 @@ export class PeerReviewController {
     @Param("quizId") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 
@@ -95,7 +114,13 @@ export class PeerReviewController {
     @Param("quizId") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 
@@ -113,7 +138,13 @@ export class PeerReviewController {
     @Param("quizId") quizId: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ) {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
       throw new UnauthorizedError("unauthorized")
     }
 

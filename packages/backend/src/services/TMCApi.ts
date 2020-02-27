@@ -12,7 +12,9 @@ const tmcClient = new TmcClientClass(
 
 export function getProfile(accessToken: string): Promise<ITMCProfileDetails> {
   return axios
-    .get(`${BASE_URL}/users/current?access_token=${accessToken}`)
+    .get<ITMCProfileDetails>(
+      `${BASE_URL}/users/current?access_token=${accessToken}`,
+    )
     .then((res: AxiosResponse<ITMCProfileDetails>) => {
       if (res.status !== 200) {
         res.data.error = "user not found"
