@@ -22,13 +22,13 @@ export class QuizItemAnswer extends BaseEntity {
 
   @ManyToOne(type => QuizAnswer, qa => qa.id)
   @JoinColumn()
-  public quizAnswer: Promise<QuizAnswer>
+  public quizAnswer: QuizAnswer
   @Column({ nullable: true })
   public quizAnswerId: string | null
 
   @ManyToOne(type => QuizItem, qi => qi.id)
   // @JoinColumn()
-  public quizItem: Promise<QuizItem>
+  public quizItem: QuizItem
   @Column()
   public quizItemId: string
 

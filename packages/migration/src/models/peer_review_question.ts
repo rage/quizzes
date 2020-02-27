@@ -23,7 +23,7 @@ export class PeerReviewQuestion extends BaseEntity {
 
   @ManyToOne(type => Quiz, quiz => quiz.id, { onDelete: "CASCADE" })
   @JoinColumn()
-  public quiz: Promise<Quiz>
+  public quiz: Quiz
   @Column({ nullable: true })
   public quizId: string | null
 
@@ -92,7 +92,7 @@ export class PeerReviewQuestion extends BaseEntity {
 export class PeerReviewQuestionTranslation extends BaseEntity {
   @ManyToOne(type => PeerReviewQuestion, prq => prq.id, { onDelete: "CASCADE" })
   @JoinColumn()
-  public peerReviewQuestion: Promise<PeerReviewQuestion>
+  public peerReviewQuestion: PeerReviewQuestion
   @PrimaryColumn()
   public peerReviewQuestionId: string
 
