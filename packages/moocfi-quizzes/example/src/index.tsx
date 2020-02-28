@@ -119,26 +119,28 @@ const App = () => {
     }
     return (
       <Div>
-        {props.userCourseProgress.data.currentUser.user_course_progresses[0].progress.map(
-          p => {
-            return <p>{JSON.stringify(p)}</p>
-          },
-        )}
-        {props.userCourseProgress.data.currentUser.user_course_progresses[0].course.exercises.map(
-          e => {
-            const ex = { ...e }
-            delete ex.ExerciseCompletions
-            return (
-              <div>
-                #########################
-                <p>{JSON.stringify(ex)}</p>
-                {e.ExerciseCompletions.map(a => {
-                  return <p>{JSON.stringify(a)}</p>
-                })}
-              </div>
-            )
-          },
-        )}
+        {props.userCourseProgress.data.currentUser.user_course_progresses[0] &&
+          props.userCourseProgress.data.currentUser.user_course_progresses[0].progress.map(
+            p => {
+              return <p>{JSON.stringify(p)}</p>
+            },
+          )}
+        {props.userCourseProgress.data.currentUser.user_course_progresses[0] &&
+          props.userCourseProgress.data.currentUser.user_course_progresses[0].course.exercises.map(
+            e => {
+              const ex = { ...e }
+              delete ex.ExerciseCompletions
+              return (
+                <div>
+                  #########################
+                  <p>{JSON.stringify(ex)}</p>
+                  {e.ExerciseCompletions.map(a => {
+                    return <p>{JSON.stringify(a)}</p>
+                  })}
+                </div>
+              )
+            },
+          )}
       </Div>
     )
   }

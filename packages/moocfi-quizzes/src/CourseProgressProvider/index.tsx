@@ -1,13 +1,17 @@
 import * as React from "react"
 import { useContext, useEffect, useState } from "react"
+import styled from "styled-components"
 import CourseProgressProviderContext, {
   CourseProgressProviderInterface,
 } from "../contexes/courseProgressProviderContext"
-import { Snackbar } from "@material-ui/core"
+import { Slide, Snackbar } from "@material-ui/core"
+import { ToastContainer, toast, TypeOptions } from "react-toastify"
 import { PointsByGroup } from "../modelTypes"
 import { getUserCourseData } from "../services/courseProgressService"
 
 import { promisify } from "util"
+
+import "react-toastify/dist/ReactToastify.css"
 
 import { w3cwebsocket as W3CWebSocket } from "websocket"
 // import { client as WebSocketClient }from "websocket"
@@ -26,6 +30,9 @@ type MessageType =
 export const CourseProgressProvider: React.FunctionComponent<
   CourseProgressProviderProps
 > = ({ accessToken, courseId, children }) => {
+  // const messages = React.useRef<string[]>([])
+  // const [message, setMessage] = useState<string | undefined>()
+  const [open, setOpen] = useState(false)
   const [data, setData] = useState<any>([])
   const [updateQuiz, setUpdateQuiz] = useState({})
   const [error, setError] = useState(false)
@@ -34,10 +41,11 @@ export const CourseProgressProvider: React.FunctionComponent<
   const [quizzesVerified, setQuizzesVerified] = useState(false)
   const [moocfiClient, setMoocfiClient] = useState<W3CWebSocket | undefined>()
   const [quizzesClient, setQuizzesClient] = useState<W3CWebSocket | undefined>()
-  const [messages, setMessage] = useState("")
+  // const [messages, setMessage] = useState<string[]>([])
 
   useEffect(() => {
     init()
+    notifySticky("Shits gone down yo!", toast.TYPE.ERROR)
   }, [])
 
   useEffect(() => {
@@ -75,23 +83,46 @@ export const CourseProgressProvider: React.FunctionComponent<
     })
   }
 
+  const notifyRegular = (message: string, type?: TypeOptions) =>
+    toast(message, { containerId: "regular", type })
+  const notifySticky = (message: string, type?: TypeOptions) =>
+    toast(message, { containerId: "sticky", type })
+
   const onMessage = (message: any) => {
     const data = JSON.parse(message.data)
     if (data instanceof Object) {
       switch (data.type) {
         case "PROGRESS_UPDATED":
           fetchProgressData()
+          // setMessage([...messages, "Course progress updated"])
+          // queueMessage("Course progress updated")
+          notifyRegular("Course progress updated")
           break
         case "PEER_REVIEW_RECEIVED":
           setUpdateQuiz({ ...updateQuiz, [data.message]: true })
-          setMessage("You have received a new peer review")
+          // setMessage([...messages, "You have received a new peer review"])
+          //queueMessage("You have received a new peer review")
+          notifyRegular("You have received a new peer review")
           break
         case "QUIZ_CONFIRMED":
           setUpdateQuiz({ ...updateQuiz, [data.message]: true })
-          setMessage("Your answer was confirmed!")
+          //setMessage([...messages, "Your answer was confirmed!"])
+          notifyRegular("Your answer was confirmed!")
+          // queueMessage("Your answer was confirmed!")
           break
       }
     }
+  }
+
+  const queueMessage = (newMessage: string) => {
+    // messages.current.push(newMessage)
+    /*if (!message) {
+        console.log("SET")
+        setMessage(newMessage)
+      } else {
+        console.log("PUSH")
+        messages.current.push(newMessage)
+      }*/
   }
 
   const fetchProgressData = async () => {
@@ -127,12 +158,18 @@ export const CourseProgressProvider: React.FunctionComponent<
 
   return (
     <CourseProgressProviderContext.Provider value={value}>
-      <Snackbar
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        open={!!messages}
-        onClose={() => setMessage("")}
-        autoHideDuration={6000}
-        message={messages}
+      <ToastContainer
+        enableMultiContainer
+        autoClose={false}
+        hideProgressBar
+        containerId={"sticky"}
+        position={toast.POSITION.TOP_LEFT}
+      />
+      <ToastContainer
+        enableMultiContainer
+        hideProgressBar
+        containerId={"regular"}
+        position={toast.POSITION.TOP_RIGHT}
       />
       {children}
     </CourseProgressProviderContext.Provider>

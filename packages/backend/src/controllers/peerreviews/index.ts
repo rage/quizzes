@@ -257,7 +257,7 @@ export class PeerReviewController {
       messages.forEach(message => {
         messageClient(
           receivingQuizAnswer.userId,
-          quiz.courseId,
+          quiz.course.moocfiId,
           message,
           quiz.id,
         )
