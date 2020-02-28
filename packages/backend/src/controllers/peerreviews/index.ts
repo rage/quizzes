@@ -201,6 +201,9 @@ export class PeerReviewController {
       { id: peerReview.quizAnswerId },
       this.entityManager,
     )
+
+    const oldStatus = receivingQuizAnswer.status
+
     const givingQuizAnswer: QuizAnswer = await this.quizAnswerService.getAnswer(
       {
         userId: peerReview.userId,
@@ -245,7 +248,7 @@ export class PeerReviewController {
       const newStatus = receivingUpdated.answer.status
       const messages: MessageType[] = ["PEER_REVIEW_RECEIVED"]
 
-      if (receivingQuizAnswer.status !== newStatus) {
+      if (oldStatus !== newStatus) {
         if (newStatus === "confirmed") {
           messages.push("QUIZ_CONFIRMED")
         }

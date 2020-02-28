@@ -32,6 +32,7 @@ export const messageClient = (
   type: MessageType,
   message?: string,
 ) => {
+  console.log(message)
   if (clients[userId] && clients[userId][courseId]) {
     const connection = clients[userId][courseId]
     if (connection.connected) {

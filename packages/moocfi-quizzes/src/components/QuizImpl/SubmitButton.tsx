@@ -1,7 +1,7 @@
 import * as React from "react"
 import styled from "styled-components"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
-import CourseProgressProviderContext from "../../contexes/courseProgressProviderContext"
+import CourseProgressProviderContext from "../../contexes/courseStatusProviderContext"
 import { Button } from "@material-ui/core"
 import { useDispatch } from "react-redux"
 

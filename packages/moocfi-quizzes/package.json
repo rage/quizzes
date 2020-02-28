@@ -35,6 +35,7 @@
     "react-content-loader": "^4.2.2",
     "react-dom": ">= 16.3.0",
     "react-redux": "^7.1.0",
+    "react-toastify": "^5.5.0",
     "reduce-reducers": "^1.0.4",
     "redux": "^4.0.1",
     "redux-devtools-extension": "^2.13.8",
@@ -44,7 +45,7 @@
     "typescript": "^3.5.2",
     "watch": "^1.0.2",
     "websocket": "^1.0.31",
-    "react-toastify": "^5.5.0"
+    "graphql-request": "^1.8.2"
   },
   "peerDependencies": {
     "@fortawesome/fontawesome-free": "^5.9.0",
@@ -63,12 +64,13 @@
     "react-content-loader": "^4.2.2",
     "react-dom": ">=16.0.0",
     "react-redux": ">= 7.1.0",
+    "react-toastify": "^5.5.0",
     "reduce-reducers": "^1.0.4",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
     "styled-components": "^4.3.2",
     "typesafe-actions": "^4.4.2",
     "websocket": "^1.0.31",
-    "react-toastify": "^5.5.0"
+    "graphql-request": "^1.8.2"
   }
 }

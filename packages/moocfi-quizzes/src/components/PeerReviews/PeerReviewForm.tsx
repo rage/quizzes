@@ -39,7 +39,7 @@ import SpamButton from "./SpamButton"
 import PeerReviewSubmitButton from "./PeerReviewSubmitButton"
 import Notification from "../Notification"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
-import CourseProgressProviderContext from "../../contexes/courseProgressProviderContext"
+import CourseProgressProviderContext from "../../contexes/courseStatusProviderContext"
 
 interface ButtonWrapperProps {
   providedStyles: string | undefined

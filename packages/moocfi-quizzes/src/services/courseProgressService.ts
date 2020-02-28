@@ -1,66 +1,68 @@
 import axios from "axios"
 import BASE_URL from "../config"
 import { PointsByGroup } from "../modelTypes"
+import { GraphQLClient } from "graphql-request"
+
+let graphQLClient: GraphQLClient
+
+const request = async (accessToken: string, query: string) => {
+  if (!graphQLClient) {
+    graphQLClient = new GraphQLClient(`${process.env.MOOCFI_URL}/api`, {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+    })
+  }
+  return await graphQLClient.request(query)
+}
 
 export const getUserCourseData = async (
   courseId: string,
   accessToken: string,
 ): Promise<any> => {
-  const response = await axios.post(
-    `${process.env.MOOCFI_URL}/api`,
+  const query = `
     {
-      operationName: null,
-      variables: {},
-      query: `
-        {
-          currentUser {
-            user_course_progresses(
-              where: { course: { id: "${courseId}" } }
-            ) {
-              n_points
+      currentUser {
+        user_course_progresses(
+          where: { course: { id: "${courseId}" } }
+        ) {
+          n_points
+          max_points
+          progress
+          course {
+            exercises {
+              id
+              quizzes_id: custom_id
+              name
+              part
+              section
               max_points
-              progress
-              course {
-                exercises(orderBy: part_ASC) {
-                  custom_id
-                  part
-                  section
-                  ExerciseCompletions(orderBy: updated_at_DESC, first: 1) {
-                    user {id}
-                    completed
-                    required_actions {
-                      value
-                    }
-                  }
+            }
+            withAnswer: exercises(orderBy: part_ASC) {
+              id
+              custom_id
+              part
+              section
+              exercise_completions(orderBy: updated_at_DESC, first: 1) {
+                completed
+                n_points
+                required_actions {
+                  value
                 }
               }
             }
-            completions(
-              where: { course: { id: "${courseId}" } }
-            ) {
-              id
-            }
           }
         }
-      `,
-    },
-    {
-      headers: {
-        "content-type": "application/json",
-        authorization: `Bearer ${accessToken}`,
-      },
-    },
-  )
-  console.log(response.data)
-  return response.data
-  /*return {
-    requiredActions: (await axios.get(
-      `${BASE_URL}/api/v1/quizzes/usercoursestate/${courseId}/required-actions`,
-      { headers: { authorization: `Bearer ${accessToken}` } },
-    )).data,
-    userCourseProgress: (await axios.get(
-      `${BASE_URL}/api/v1/courses/${courseId}/users/current/progress`,
-      { headers: { authorization: `Bearer ${accessToken}` } },
-    )).data.points_by_group,
-  }*/
+        completions(
+          where: { course: { id: "${courseId}" } }
+        ) {
+          id
+        }
+      }
+    }
+  `
+  const data = await request(accessToken, query)
+
+  console.log(data)
+  return data
 }

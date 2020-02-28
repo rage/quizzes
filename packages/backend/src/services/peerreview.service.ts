@@ -144,7 +144,7 @@ export default class PeerReviewService {
   public async getPlainPeerReviews(quizId: string) {
     const builder = knex({ client: "pg" })
 
-    let query = builder("peer_review")
+    const query = builder("peer_review")
       .innerJoin("quiz_answer", "quiz_answer.id", "peer_review.quiz_answer_id")
       .where("quiz_answer.quiz_id", quizId)
       .select(
@@ -165,7 +165,7 @@ export default class PeerReviewService {
   public async getPlainPeerReviewAnswers(quizId: string) {
     const builder = knex({ client: "pg" })
 
-    let query = builder("peer_review")
+    const query = builder("peer_review")
       .innerJoin("quiz_answer", "quiz_answer.id", "peer_review.quiz_answer_id")
       .where("quiz_answer.quiz_id", quizId)
       .innerJoin(
@@ -191,7 +191,7 @@ export default class PeerReviewService {
   public async getCSVData(quizId: string) {
     const builder = knex({ client: "pg" })
 
-    let query = builder("peer_review")
+    const query = builder("peer_review")
       .innerJoin("quiz_answer", "quiz_answer.id", "peer_review.quiz_answer_id")
       .where("quiz_answer.quiz_id", quizId)
       .select(

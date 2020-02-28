@@ -32,7 +32,7 @@ import Notification from "../Notification"
 import { BoldTypographyMedium } from "../styleComponents"
 
 import ThemeProviderContext from "../../contexes/themeProviderContext"
-import CourseProgressProviderContext from "../../contexes/courseProgressProviderContext"
+import CourseProgressProviderContext from "../../contexes/courseStatusProviderContext"
 
 import { requestReviews } from "../../state/receivedReviews/actions"
 

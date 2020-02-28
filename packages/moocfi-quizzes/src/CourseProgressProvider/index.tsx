@@ -1,25 +1,26 @@
 import * as React from "react"
 import { useContext, useEffect, useState } from "react"
-import styled from "styled-components"
 import CourseProgressProviderContext, {
   CourseProgressProviderInterface,
-} from "../contexes/courseProgressProviderContext"
-import { Slide, Snackbar } from "@material-ui/core"
+  ProgressData,
+  ProgressByGroup,
+  ExercisesByPart,
+  AnswersByPart,
+} from "../contexes/courseStatusProviderContext"
 import { ToastContainer, toast, TypeOptions } from "react-toastify"
 import { PointsByGroup } from "../modelTypes"
 import { getUserCourseData } from "../services/courseProgressService"
 
-import { promisify } from "util"
-
 import "react-toastify/dist/ReactToastify.css"
 
 import { w3cwebsocket as W3CWebSocket } from "websocket"
-// import { client as WebSocketClient }from "websocket"
 
 interface CourseProgressProviderProps {
   accessToken: string
   courseId: string
 }
+
+const ToastTypes = toast.TYPE
 
 type MessageType =
   | "PROGRESS_UPDATED"
@@ -30,10 +31,7 @@ type MessageType =
 export const CourseProgressProvider: React.FunctionComponent<
   CourseProgressProviderProps
 > = ({ accessToken, courseId, children }) => {
-  // const messages = React.useRef<string[]>([])
-  // const [message, setMessage] = useState<string | undefined>()
-  const [open, setOpen] = useState(false)
-  const [data, setData] = useState<any>([])
+  const [data, setData] = useState<ProgressData>()
   const [updateQuiz, setUpdateQuiz] = useState({})
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -41,11 +39,9 @@ export const CourseProgressProvider: React.FunctionComponent<
   const [quizzesVerified, setQuizzesVerified] = useState(false)
   const [moocfiClient, setMoocfiClient] = useState<W3CWebSocket | undefined>()
   const [quizzesClient, setQuizzesClient] = useState<W3CWebSocket | undefined>()
-  // const [messages, setMessage] = useState<string[]>([])
 
   useEffect(() => {
     init()
-    notifySticky("Shits gone down yo!", toast.TYPE.ERROR)
   }, [])
 
   useEffect(() => {
@@ -69,6 +65,20 @@ export const CourseProgressProvider: React.FunctionComponent<
     setMoocfiClient(await connect("ws://localhost:9000").catch(() => undefined))
   }
 
+  const fetchProgressData = async () => {
+    try {
+      setLoading(true)
+      const data = await getUserCourseData(courseId, accessToken)
+      setData(transformData(data))
+      setLoading(false)
+    } catch (error) {
+      console.log("Could not fetch course progress data")
+      setError(true)
+      setLoading(false)
+      notifySticky("Could not fetch course progress data", ToastTypes.ERROR)
+    }
+  }
+
   const connect = (host: string): Promise<W3CWebSocket> => {
     return new Promise((resolve: any, reject: any) => {
       const client = new W3CWebSocket(host, "echo-protocol")
@@ -83,83 +93,55 @@ export const CourseProgressProvider: React.FunctionComponent<
     })
   }
 
-  const notifyRegular = (message: string, type?: TypeOptions) =>
-    toast(message, { containerId: "regular", type })
-  const notifySticky = (message: string, type?: TypeOptions) =>
-    toast(message, { containerId: "sticky", type })
-
   const onMessage = (message: any) => {
     const data = JSON.parse(message.data)
     if (data instanceof Object) {
       switch (data.type) {
         case "PROGRESS_UPDATED":
           fetchProgressData()
-          // setMessage([...messages, "Course progress updated"])
-          // queueMessage("Course progress updated")
-          notifyRegular("Course progress updated")
+          notifyRegular("Course progress updated", ToastTypes.SUCCESS)
           break
         case "PEER_REVIEW_RECEIVED":
           setUpdateQuiz({ ...updateQuiz, [data.message]: true })
-          // setMessage([...messages, "You have received a new peer review"])
-          //queueMessage("You have received a new peer review")
-          notifyRegular("You have received a new peer review")
+          notifyRegular(
+            "You have received a new peer review",
+            ToastTypes.SUCCESS,
+          )
           break
         case "QUIZ_CONFIRMED":
           setUpdateQuiz({ ...updateQuiz, [data.message]: true })
-          //setMessage([...messages, "Your answer was confirmed!"])
-          notifyRegular("Your answer was confirmed!")
-          // queueMessage("Your answer was confirmed!")
+          notifyRegular("Your answer was confirmed!", ToastTypes.SUCCESS)
           break
       }
     }
   }
 
-  const queueMessage = (newMessage: string) => {
-    // messages.current.push(newMessage)
-    /*if (!message) {
-        console.log("SET")
-        setMessage(newMessage)
-      } else {
-        console.log("PUSH")
-        messages.current.push(newMessage)
-      }*/
-  }
-
-  const fetchProgressData = async () => {
-    try {
-      setLoading(true)
-      const data = await getUserCourseData(courseId, accessToken)
-      setData(data)
-      setLoading(false)
-    } catch (error) {
-      setError(true)
-      setLoading(false)
-    }
-  }
-
-  const refreshProgress = () => {
-    setLoading(true)
-    setTimeout(() => fetchProgressData(), 1000)
-  }
+  const notifyRegular = (message: string, type?: TypeOptions) =>
+    toast(message, { containerId: "regular", type })
+  const notifySticky = (message: string, type?: TypeOptions) =>
+    toast(message, { containerId: "sticky", type })
 
   const quizUpdated = (id: string) => {
     setUpdateQuiz({ ...updateQuiz, [id]: false })
   }
 
+  const notifyError = (message: string) =>
+    notifySticky(message, ToastTypes.ERROR)
+
   const value: CourseProgressProviderInterface = {
     error,
     loading,
-    refreshProgress,
     updateQuiz,
     quizUpdated,
-    userCourseProgress: data,
-    requiredActions: data.requiredActions,
+    notifyError,
+    data,
   }
 
   return (
     <CourseProgressProviderContext.Provider value={value}>
       <ToastContainer
         enableMultiContainer
+        newestOnTop
         autoClose={false}
         hideProgressBar
         containerId={"sticky"}
@@ -167,6 +149,8 @@ export const CourseProgressProvider: React.FunctionComponent<
       />
       <ToastContainer
         enableMultiContainer
+        newestOnTop
+        autoClose={false}
         hideProgressBar
         containerId={"regular"}
         position={toast.POSITION.TOP_RIGHT}
@@ -183,4 +167,55 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
 ) => {
   const injectProps = useContext(CourseProgressProviderContext)
   return <Component {...props} {...injectProps} />
+}
+
+const transformData = (data: any): ProgressData => {
+  const courseProgress = data.currentUser.user_course_progresses[0]
+  const completed = data.currentUser.completions.length > 0
+  let n_points
+  let max_points
+  const progressByGroup: ProgressByGroup = {}
+  const exercisesByPart: ExercisesByPart = {}
+  const answersByPart: AnswersByPart = {}
+  if (courseProgress) {
+    n_points = courseProgress.n_points
+    max_points = courseProgress.max_points
+    for (const groupProgress of courseProgress.progress) {
+      progressByGroup[groupProgress.group] = groupProgress
+    }
+    const exerciseData = courseProgress.course
+    for (const exercise of exerciseData.exercises) {
+      const partExercises = exercisesByPart[exercise.part] || []
+      exercisesByPart[exercise.part] = [...partExercises, exercise]
+    }
+    for (const exercise of exerciseData.withAnswer) {
+      const answer = exercise.exercise_completions[0]
+      if (answer) {
+        const partAnswers = answersByPart[exercise.part] || []
+        answersByPart[exercise.part] = [
+          ...partAnswers,
+          {
+            exercise_id: exercise.id,
+            exercise_quizzes_id: exercise.custom_id,
+            part: exercise.part,
+            section: exercise.section,
+            n_points: answer.n_points,
+            completed: answer.completed,
+            required_actions: answer.required_actions.map(
+              (action: any) => action.value,
+            ),
+          },
+        ]
+      }
+    }
+  }
+
+  return {
+    completed,
+    n_points,
+    max_points,
+    progressByGroup,
+    exercisesByPart,
+    answersByPart,
+  }
 }
