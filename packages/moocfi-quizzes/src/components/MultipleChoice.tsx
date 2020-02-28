@@ -350,7 +350,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             shouldBeGray={shouldBeGray}
             providedStyles={themeProvider.optionWrapperStyles}
           >
-            <FeedbackPortion item={item} selectedOption={option} />
+            <FeedbackPortion item={item} selectedOption={option}/>
           </OptionWrapper>
         )}
       </React.Fragment>
@@ -447,7 +447,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 
   if (ThemedDiv) {
     return (
-      <ThemedDiv correct={correct} onlyOneItem={onlyOneItem}>
+      <ThemedDiv correct={correct} onlyOneItem={onlyOneItem} >
         <CentralizedOnSmallScreenTypography variant="body1">
           {feedbackMessage}
         </CentralizedOnSmallScreenTypography>

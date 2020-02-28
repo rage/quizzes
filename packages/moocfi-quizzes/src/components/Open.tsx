@@ -131,7 +131,6 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
           label={itemTitle ? itemTitle : openLabels.placeholder}
           disabled={quizDisabled}
           id={`${itemTitle}-textfield`}
-          aria-label={itemTitle}
         />
       </div>
     </ItemContent>
