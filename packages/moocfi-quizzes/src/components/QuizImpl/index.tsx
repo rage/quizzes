@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useEffect } from "react"
+import { useContext, useEffect, useRef } from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import { Typography } from "@material-ui/core"
@@ -32,7 +32,7 @@ import Notification from "../Notification"
 import { BoldTypographyMedium } from "../styleComponents"
 
 import ThemeProviderContext from "../../contexes/themeProviderContext"
-import CourseProgressProviderContext from "../../contexes/courseStatusProviderContext"
+import { CourseStatusProviderContext } from "../../contexes/courseStatusProviderContext"
 
 import { requestReviews } from "../../state/receivedReviews/actions"
 
@@ -187,9 +187,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   showZeroPointsInfo = false,
   children,
 }) => {
-  const ref = React.useRef(null)
-  const themeProvider = React.useContext(ThemeProviderContext)
-  const courseProgressProvider = React.useContext(CourseProgressProviderContext)
+  const ref = useRef(null)
+  const themeProvider = useContext(ThemeProviderContext)
+  const courseStatusProvider = useContext(CourseStatusProviderContext)
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
   const messageState = useTypedSelector(state => state.message)
@@ -253,13 +253,13 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   }
 
   if (
-    courseProgressProvider.updateQuiz &&
-    courseProgressProvider.updateQuiz[quiz.id]
+    courseStatusProvider.updateQuiz &&
+    courseStatusProvider.updateQuiz[quiz.id]
   ) {
     dispatch(updateQuizState())
     dispatch(requestReviews())
-    courseProgressProvider.quizUpdated &&
-      courseProgressProvider.quizUpdated(quiz.id)
+    courseStatusProvider.quizUpdated &&
+      courseStatusProvider.quizUpdated(quiz.id)
   }
 
   const generalLabels = languageInfo.general

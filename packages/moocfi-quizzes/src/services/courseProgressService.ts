@@ -63,6 +63,5 @@ export const getUserCourseData = async (
   `
   const data = await request(accessToken, query)
 
-  console.log(data)
   return data
 }

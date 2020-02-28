@@ -39,7 +39,6 @@ import SpamButton from "./SpamButton"
 import PeerReviewSubmitButton from "./PeerReviewSubmitButton"
 import Notification from "../Notification"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
-import CourseProgressProviderContext from "../../contexes/courseStatusProviderContext"
 
 interface ButtonWrapperProps {
   providedStyles: string | undefined
@@ -168,7 +167,6 @@ const PeerReviewQuestions: React.FunctionComponent<
   PeerReviewQuestionsProps
 > = ({ peerReview, languageInfo, scrollRef }) => {
   const themeProvider = useContext(ThemeProviderContext)
-  const courseProgressProvider = React.useContext(CourseProgressProviderContext)
 
   const quiz = useTypedSelector(state => state.quiz)
 
@@ -207,8 +205,6 @@ const PeerReviewQuestions: React.FunctionComponent<
 
   const submitPeerReview = () => {
     dispatch(peerReviewsActions.submit())
-    /*courseProgressProvider.refreshProgress &&
-      courseProgressProvider.refreshProgress()*/
     scrollToRef(scrollRef)
   }
 

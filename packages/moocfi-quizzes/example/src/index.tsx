@@ -12,9 +12,9 @@ import styled from "styled-components"
 import SimpleErrorBoundary from "./SimpleErrorBoundary"
 import { useInput, useLocalStorage } from "./customHooks"
 import {
-  CourseProgressProvider,
+  CourseStatusProvider,
   injectCourseProgress,
-} from "../../src/CourseProgressProvider"
+} from "../../src/CourseStatusProvider"
 
 const TallContainer = styled.div`
   padding-bottom: 1000px;
@@ -122,7 +122,7 @@ const App = () => {
   const Progress = injectCourseProgress(DataTest)
 
   return (
-    <CourseProgressProvider
+    <CourseStatusProvider
       courseId="b5746948-5141-4d45-aceb-79adb037c29b"
       accessToken={accessToken.value}
     >
@@ -185,7 +185,7 @@ const App = () => {
           )}
         </SimpleErrorBoundary>
       </TallContainer>
-    </CourseProgressProvider>
+    </CourseStatusProvider>
   )
 }
 

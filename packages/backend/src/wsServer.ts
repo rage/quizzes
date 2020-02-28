@@ -30,29 +30,28 @@ export const messageClient = (
   userId: number,
   courseId: string,
   type: MessageType,
-  message?: string,
+  payload?: string,
 ) => {
-  console.log(message)
   if (clients[userId] && clients[userId][courseId]) {
     const connection = clients[userId][courseId]
     if (connection.connected) {
       connection.sendUTF(
         JSON.stringify({
           type,
-          message,
+          payload,
         }),
       )
     } else {
       delete clients[userId][courseId]
       redis.publisher.publish(
         "websocket",
-        JSON.stringify({ userId, courseId, type, message }),
+        JSON.stringify({ userId, courseId, type, payload }),
       )
     }
   } else {
     redis.publisher.publish(
       "websocket",
-      JSON.stringify({ userId, courseId, type, message }),
+      JSON.stringify({ userId, courseId, type, payload }),
     )
   }
 }
@@ -105,7 +104,7 @@ redis.subscriber.on("message", (channel: any, message: any) => {
         connection.sendUTF(
           JSON.stringify({
             type: data.type,
-            message: data.message,
+            payload: data.payload,
           }),
         )
       } else {

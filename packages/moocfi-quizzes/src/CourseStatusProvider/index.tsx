@@ -1,14 +1,16 @@
 import * as React from "react"
 import { useContext, useEffect, useState } from "react"
-import CourseProgressProviderContext, {
+import {
+  CourseProgressProviderContext,
   CourseProgressProviderInterface,
+  CourseStatusProviderContext,
+  CourseStatusProviderInterface,
   ProgressData,
   ProgressByGroup,
   ExercisesByPart,
   AnswersByPart,
 } from "../contexes/courseStatusProviderContext"
 import { ToastContainer, toast, TypeOptions } from "react-toastify"
-import { PointsByGroup } from "../modelTypes"
 import { getUserCourseData } from "../services/courseProgressService"
 
 import "react-toastify/dist/ReactToastify.css"
@@ -22,13 +24,23 @@ interface CourseProgressProviderProps {
 
 const ToastTypes = toast.TYPE
 
-type MessageType =
-  | "PROGRESS_UPDATED"
-  | "PEER_REVIEW_REVEIVED"
-  | "QUIZ_CONFIRMED"
-  | "QUIZ_REJECTED"
+enum MessageType {
+  PROGRESS_UPDATED = "PROGRESS_UPDATED",
+  PEER_REVIEW_RECEIVED = "PEER_REVIEW_RECEIVED",
+  QUIZ_CONFIRMED = "QUIZ_CONFIRMED",
+  QUIZ_REJECTED = "QUIZ_REJECTED",
+}
 
-export const CourseProgressProvider: React.FunctionComponent<
+interface Message {
+  type: MessageType
+  payload: string
+}
+
+const isMessage = (message: any): message is Message => {
+  return "type" in message && message.type in MessageType
+}
+
+export const CourseStatusProvider: React.FunctionComponent<
   CourseProgressProviderProps
 > = ({ accessToken, courseId, children }) => {
   const [data, setData] = useState<ProgressData>()
@@ -93,23 +105,23 @@ export const CourseProgressProvider: React.FunctionComponent<
     })
   }
 
-  const onMessage = (message: any) => {
-    const data = JSON.parse(message.data)
-    if (data instanceof Object) {
-      switch (data.type) {
+  const onMessage = (inbound: any) => {
+    const message = JSON.parse(inbound.data)
+    if (isMessage(message)) {
+      switch (message.type) {
         case "PROGRESS_UPDATED":
           fetchProgressData()
           notifyRegular("Course progress updated", ToastTypes.SUCCESS)
           break
         case "PEER_REVIEW_RECEIVED":
-          setUpdateQuiz({ ...updateQuiz, [data.message]: true })
+          setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
           notifyRegular(
             "You have received a new peer review",
             ToastTypes.SUCCESS,
           )
           break
         case "QUIZ_CONFIRMED":
-          setUpdateQuiz({ ...updateQuiz, [data.message]: true })
+          setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
           notifyRegular("Your answer was confirmed!", ToastTypes.SUCCESS)
           break
       }
@@ -128,34 +140,39 @@ export const CourseProgressProvider: React.FunctionComponent<
   const notifyError = (message: string) =>
     notifySticky(message, ToastTypes.ERROR)
 
-  const value: CourseProgressProviderInterface = {
+  const progress: CourseProgressProviderInterface = {
     error,
     loading,
-    updateQuiz,
-    quizUpdated,
     notifyError,
     data,
   }
 
+  const status: CourseStatusProviderInterface = {
+    updateQuiz,
+    quizUpdated,
+    notifyError,
+  }
+
   return (
-    <CourseProgressProviderContext.Provider value={value}>
-      <ToastContainer
-        enableMultiContainer
-        newestOnTop
-        autoClose={false}
-        hideProgressBar
-        containerId={"sticky"}
-        position={toast.POSITION.TOP_LEFT}
-      />
-      <ToastContainer
-        enableMultiContainer
-        newestOnTop
-        autoClose={false}
-        hideProgressBar
-        containerId={"regular"}
-        position={toast.POSITION.TOP_RIGHT}
-      />
-      {children}
+    <CourseProgressProviderContext.Provider value={progress}>
+      <CourseStatusProviderContext.Provider value={status}>
+        <ToastContainer
+          enableMultiContainer
+          newestOnTop
+          autoClose={false}
+          hideProgressBar
+          containerId={"sticky"}
+          position={toast.POSITION.TOP_LEFT}
+        />
+        <ToastContainer
+          enableMultiContainer
+          newestOnTop
+          hideProgressBar
+          containerId={"regular"}
+          position={toast.POSITION.TOP_RIGHT}
+        />
+        {children}
+      </CourseStatusProviderContext.Provider>
     </CourseProgressProviderContext.Provider>
   )
 }

@@ -1,10 +1,10 @@
 import Quiz from "./components"
 import ThemeProviderContext from "./contexes/themeProviderContext"
 import {
-  CourseProgressProvider,
+  CourseStatusProvider,
   injectCourseProgress,
-} from "./CourseProgressProvider"
+} from "./CourseStatusProvider"
 
-export { ThemeProviderContext, CourseProgressProvider, injectCourseProgress }
+export { ThemeProviderContext, CourseStatusProvider, injectCourseProgress }
 
 export default Quiz

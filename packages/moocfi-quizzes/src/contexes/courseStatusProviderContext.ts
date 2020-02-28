@@ -40,17 +40,25 @@ type RequiredAction =
   | "give peer reviews"
   | "waiting for peer reviews"
 
-export interface CourseProgressProviderInterface {
-  error?: boolean
-  loading?: boolean
-  data?: ProgressData
-  updateQuiz?: { [id: string]: boolean }
-  quizUpdated?: (id: string) => void
+interface ProviderBaseInterface {
   notifyError?: (message: string) => void
 }
 
-const CourseProgressProviderContext = createContext<
-  CourseProgressProviderInterface
+export interface CourseProgressProviderInterface extends ProviderBaseInterface {
+  error?: boolean
+  loading?: boolean
+  data?: ProgressData
+}
+
+export interface CourseStatusProviderInterface extends ProviderBaseInterface {
+  updateQuiz?: { [id: string]: boolean }
+  quizUpdated?: (id: string) => void
+}
+
+export const CourseStatusProviderContext = createContext<
+  CourseStatusProviderInterface
 >({})
 
-export default CourseProgressProviderContext
+export const CourseProgressProviderContext = createContext<
+  CourseProgressProviderInterface
+>({})

@@ -1,15 +1,12 @@
 import * as React from "react"
 import styled from "styled-components"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
-import CourseProgressProviderContext from "../../contexes/courseStatusProviderContext"
-import { Button } from "@material-ui/core"
 import { useDispatch } from "react-redux"
 
 import { useTypedSelector } from "../../state/store"
 import * as quizAnswerActions from "../../state/quizAnswer/actions"
 
 import { StyledButton } from "../styleComponents"
-import { CourseProgressProvider } from "../../CourseProgressProvider"
 
 export interface SubmitButtonProps {
   disabled: boolean
@@ -18,7 +15,6 @@ export interface SubmitButtonProps {
 
 const SubmitButton: React.FunctionComponent = () => {
   const themeProvider = React.useContext(ThemeProviderContext)
-  const courseProgressProvider = React.useContext(CourseProgressProviderContext)
   const dispatch = useDispatch()
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
@@ -49,8 +45,6 @@ const SubmitButton: React.FunctionComponent = () => {
 
   const handleSubmit = () => {
     dispatch(quizAnswerActions.submit())
-    /*courseProgressProvider.refreshProgress &&
-      courseProgressProvider.refreshProgress()*/
   }
 
   const ThemedSubmitButton = themeProvider.submitButton
