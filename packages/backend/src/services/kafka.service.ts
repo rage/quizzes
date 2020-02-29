@@ -18,6 +18,12 @@ import * as Kafka from "node-rdkafka"
 
 import { promisify } from "util"
 
+export enum RequiredAction {
+  REJECTED = "REJECTED",
+  GIVE_PEER_REVIEW = "GIVE_PEER_REVIEW",
+  PENDING_PEER_REVIEW = "PENDING_PEER_REVIEW",
+}
+
 @Service()
 export default class KafkaService {
   @Inject(type => QuizService)
@@ -76,17 +82,17 @@ export default class KafkaService {
     userQuizState: UserQuizState,
     quiz: Quiz,
   ) {
-    const messages: string[] = []
+    const messages: RequiredAction[] = []
     const course = quiz.course
 
     if (quizAnswer.status === "rejected" || quizAnswer.status === "spam") {
-      messages.push("rejected in peer review")
+      messages.push(RequiredAction.REJECTED)
     } else if (quiz.items[0].type === "essay") {
       if (userQuizState.peerReviewsGiven < course.minPeerReviewsGiven) {
-        messages.push("give peer reviews")
+        messages.push(RequiredAction.GIVE_PEER_REVIEW)
       }
       if (userQuizState.peerReviewsReceived < course.minPeerReviewsReceived) {
-        messages.push("waiting for peer reviews")
+        messages.push(RequiredAction.PENDING_PEER_REVIEW)
       }
     }
 
