@@ -6,7 +6,9 @@ import { Container } from "typedi"
 import { App } from "./app"
 import { Database } from "./config/database"
 
-dotenv.config({ path: ".env" })
+if (process.env.NODE_ENV !== "production") {
+  dotenv.config({ path: ".env" })
+}
 
 const app = Container.get(App).getApp()
 const database = Container.get(Database)
