@@ -35,10 +35,11 @@ type ExerciseCompletion = {
   required_actions: RequiredAction[]
 }
 
-type RequiredAction =
-  | "rejected in peer review"
-  | "give peer reviews"
-  | "waiting for peer reviews"
+export enum RequiredAction {
+  REJECTED = "REJECTED",
+  GIVE_PEER_REVIEW = "GIVE_PEER_REVIEW",
+  PENDING_PEER_REVIEW = "PENDING_PEER_REVIEW",
+}
 
 interface ProviderBaseInterface {
   notifyError?: (message: string) => void

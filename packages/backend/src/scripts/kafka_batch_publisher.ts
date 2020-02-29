@@ -11,6 +11,8 @@ import {
   QuizMessage,
 } from "../types"
 
+import { RequiredAction } from "../services/kafka.service"
+
 const producer = new Kafka.Producer({
   "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
   dr_cb: false,
@@ -229,16 +231,16 @@ const publishAnswers = async (course: ICourse) => {
     let answer
 
     for (answer of answers) {
-      const messages: string[] = []
+      const messages: RequiredAction[] = []
 
       if (answer.status === "rejected" || answer.status === "spam") {
-        messages.push("rejected in peer review")
+        messages.push(RequiredAction.REJECTED)
       } else if (answer.types.includes("essay")) {
         if (answer.peer_reviews_given < course.min_peer_reviews_given) {
-          messages.push("give peer reviews")
+          messages.push(RequiredAction.GIVE_PEER_REVIEW)
         }
         if (answer.peer_reviews_received < course.min_peer_reviews_received) {
-          messages.push("waiting for peer reviews")
+          messages.push(RequiredAction.PENDING_PEER_REVIEW)
         }
       }
 

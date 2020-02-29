@@ -43,6 +43,21 @@ export class PeerReviewController {
   @Inject()
   private QuizService: QuizService
 
+  @Get(
+    "/:quizId([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/:languageId",
+  )
+  public async get(
+    @Param("quizId") quizId: string,
+    @Param("languageId") languageId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    return await this.peerReviewService.getAnswersToReview(
+      quizId,
+      languageId,
+      user.id,
+    )
+  }
+
   @Get("/received/:answerId")
   public async getGivenReviews(
     @Param("answerId") answerId: string,
@@ -86,86 +101,6 @@ export class PeerReviewController {
     }
 
     return result
-  }
-
-  @Get("/data/:quizId/plainPeerReviews")
-  public async getDetailedPlainPeerReviews(
-    @Param("quizId") quizId: string,
-    @HeaderParam("authorization") user: ITMCProfileDetails,
-  ) {
-    const authorized = await this.authorizationService.isPermitted({
-      user,
-      quizId,
-      permission: Permission.EXPORT,
-    })
-
-    if (!authorized) {
-      throw new UnauthorizedError("unauthorized")
-    }
-
-    const result = await this.peerReviewService.getPlainPeerReviews(quizId)
-    const stringStream = result.pipe(JSONStream.stringify())
-
-    return stringStream
-  }
-
-  @Get("/data/:quizId/plainAnswers")
-  public async getDetailedPlainPeerReviewQuestionAnswers(
-    @Param("quizId") quizId: string,
-    @HeaderParam("authorization") user: ITMCProfileDetails,
-  ) {
-    const authorized = await this.authorizationService.isPermitted({
-      user,
-      quizId,
-      permission: Permission.EXPORT,
-    })
-
-    if (!authorized) {
-      throw new UnauthorizedError("unauthorized")
-    }
-
-    const result = await this.peerReviewService.getPlainPeerReviewAnswers(
-      quizId,
-    )
-
-    const stringStream = result.pipe(JSONStream.stringify())
-
-    return stringStream
-  }
-
-  @Get("/data/:quizId")
-  public async getDetailedPeerReviews(
-    @Param("quizId") quizId: string,
-    @HeaderParam("authorization") user: ITMCProfileDetails,
-  ) {
-    const authorized = await this.authorizationService.isPermitted({
-      user,
-      quizId,
-      permission: Permission.EXPORT,
-    })
-
-    if (!authorized) {
-      throw new UnauthorizedError("unauthorized")
-    }
-
-    const result = await this.peerReviewService.getCSVData(quizId)
-
-    const stringStream = result.pipe(JSONStream.stringify())
-
-    return stringStream
-  }
-
-  @Get("/:quizId/:languageId")
-  public async get(
-    @Param("quizId") quizId: string,
-    @Param("languageId") languageId: string,
-    @HeaderParam("authorization") user: ITMCProfileDetails,
-  ) {
-    return await this.peerReviewService.getAnswersToReview(
-      quizId,
-      languageId,
-      user.id,
-    )
   }
 
   @Post("/")
@@ -272,5 +207,72 @@ export class PeerReviewController {
       quizAnswer: responseQuizAnswer,
       userQuizState: responseUserQuizState,
     }
+  }
+
+  @Get("/data/:quizId/plainPeerReviews")
+  public async getDetailedPlainPeerReviews(
+    @Param("quizId") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const result = await this.peerReviewService.getPlainPeerReviews(quizId)
+    const stringStream = result.pipe(JSONStream.stringify())
+
+    return stringStream
+  }
+
+  @Get("/data/:quizId/plainAnswers")
+  public async getDetailedPlainPeerReviewQuestionAnswers(
+    @Param("quizId") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const result = await this.peerReviewService.getPlainPeerReviewAnswers(
+      quizId,
+    )
+
+    const stringStream = result.pipe(JSONStream.stringify())
+
+    return stringStream
+  }
+
+  @Get("/data/:quizId")
+  public async getDetailedPeerReviews(
+    @Param("quizId") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const result = await this.peerReviewService.getCSVData(quizId)
+
+    const stringStream = result.pipe(JSONStream.stringify())
+
+    return stringStream
   }
 }

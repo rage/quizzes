@@ -114,6 +114,7 @@ const ReceivedReviewsDetailed: React.FunctionComponent<
         )
         .map((pr, idx) => (
           <ReceivedPeerReview
+            key={pr.id}
             questions={peerReviewQuestions}
             answer={pr}
             idx={idx}

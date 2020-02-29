@@ -9,6 +9,7 @@ import {
   ProgressByGroup,
   ExercisesByPart,
   AnswersByPart,
+  RequiredAction,
 } from "../contexes/courseStatusProviderContext"
 import { ToastContainer, toast, TypeOptions } from "react-toastify"
 import { getUserCourseData } from "../services/courseProgressService"
@@ -219,7 +220,7 @@ const transformData = (data: any): ProgressData => {
             n_points: answer.n_points,
             completed: answer.completed,
             required_actions: answer.required_actions.map(
-              (action: any) => action.value,
+              (action: any) => action.value in RequiredAction && action.value,
             ),
           },
         ]
