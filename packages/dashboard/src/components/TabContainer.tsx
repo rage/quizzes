@@ -1,7 +1,6 @@
 import { Button, Grid, Paper, Typography } from "@material-ui/core"
 import React, { Component } from "react"
 import { connect } from "react-redux"
-import { Prompt } from "react-router-dom"
 import { IPeerReviewCollection, IQuizItem } from "../interfaces"
 import { addItem, addReview, changeOrder, remove } from "../store/edit/actions"
 import ItemContainer from "./ItemContainer"
@@ -11,6 +10,13 @@ import QuestionAdder from "./QuizQuestionAdder"
 interface ITabContainerProps {
   items: IQuizItem[]
   peerReviewCollections: IPeerReviewCollection[]
+  handleChange: any
+  addItem: any
+  changeOrder: any
+  addReview: any
+  remove: any
+  text: any
+  textIndex: number
 }
 
 interface ITabContainerState {
@@ -19,7 +25,7 @@ interface ITabContainerState {
   expandedItems: { [n: number]: any }
 }
 
-class TabContainer extends Component<any, ITabContainerState> {
+class TabContainer extends Component<ITabContainerProps, ITabContainerState> {
   private itemTypes = [
     { label: "checkbox", value: "checkbox" },
     { label: "essay", value: "essay" },

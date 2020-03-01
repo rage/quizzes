@@ -1,7 +1,14 @@
-import { CircularProgress, Grid, Paper, Typography } from "@material-ui/core"
+import {
+  Button,
+  CircularProgress,
+  Grid,
+  Paper,
+  Typography,
+} from "@material-ui/core"
 import queryString from "query-string"
 import React from "react"
 import { connect } from "react-redux"
+import { Link } from "react-router-dom"
 import { setAllAnswersCount } from "../../store/answerCounts/actions"
 import {
   setAllAnswers,
@@ -120,6 +127,23 @@ class QuizStatistics extends React.Component<any, any> {
             alignItems="stretch"
             spacing={16}
           >
+            <Grid item={true} xs={12}>
+              <Link
+                to={`/quizzes/${this.props.filter.quiz}`}
+                style={{ textDecoration: "none" }}
+              >
+                <Button
+                  variant="contained"
+                  style={{
+                    backgroundColor: "rgb(16, 126, 171)",
+                    color: "white",
+                    borderRadius: "0px",
+                  }}
+                >
+                  View the editor
+                </Button>
+              </Link>
+            </Grid>
             <Grid item={true} xs={12}>
               <Grid
                 container={true}

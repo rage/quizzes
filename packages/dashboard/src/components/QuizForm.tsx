@@ -1,7 +1,7 @@
 import { Button, Grid, Toolbar, Typography } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
-import { Prompt } from "react-router-dom"
+import { Link, Prompt } from "react-router-dom"
 import { ICourse, IQuiz } from "../interfaces"
 
 import {
@@ -60,9 +60,27 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
     return (
       <Grid container={true} spacing={16} justify="center">
         <Grid item={true} xs={12} sm={10} lg={8}>
+          {this.props.edit.id && (
+            <Link
+              to={`/quizzes/${this.props.edit.id}/answers`}
+              style={{ textDecoration: "none" }}
+            >
+              <Button
+                variant="contained"
+                style={{
+                  backgroundColor: "rgb(16, 126, 171)",
+                  color: "white",
+                  borderRadius: "0px",
+                }}
+              >
+                View the answers
+              </Button>
+            </Link>
+          )}
           <QuizInfo quizTexts={this.props.edit.texts[0]} />
 
           <Prompt message={this.checker} />
+
           {this.props.edit.course.languages.map(
             (l, i) =>
               this.props.filter.language === l.id && (
