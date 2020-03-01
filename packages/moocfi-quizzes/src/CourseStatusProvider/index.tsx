@@ -32,6 +32,12 @@ enum MessageType {
   QUIZ_REJECTED = "QUIZ_REJECTED",
 }
 
+enum ConnectionStatus {
+  CONNECTED = "CONNECTED",
+  CONNECTING = "CONNECTING",
+  DISCONNECTED = "DISCONNECTED",
+}
+
 interface Message {
   type: MessageType
   payload: string
@@ -48,38 +54,42 @@ export const CourseStatusProvider: React.FunctionComponent<
   const [updateQuiz, setUpdateQuiz] = useState({})
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [moocfiVerified, setMoocfiVerified] = useState(false)
-  const [quizzesVerified, setQuizzesVerified] = useState(false)
+  const [moocfiStatus, setMoocfiStatus] = useState<ConnectionStatus>(
+    ConnectionStatus.DISCONNECTED,
+  )
+  const [quizzesStatus, setQuizzesStatus] = useState<ConnectionStatus>(
+    ConnectionStatus.DISCONNECTED,
+  )
   const [moocfiClient, setMoocfiClient] = useState<W3CWebSocket | undefined>()
   const [quizzesClient, setQuizzesClient] = useState<W3CWebSocket | undefined>()
 
   useEffect(() => {
     if (accessToken && !data) {
-      console.log("INIT")
       init()
     }
     if (data && !accessToken) {
-      console.log("LOGOUT")
       logout()
     }
-    if (moocfiClient && !moocfiVerified) {
-      moocfiClient.send(JSON.stringify({ accessToken, courseId }))
-      setMoocfiVerified(true)
-      console.log("Connected to moocfi")
+    if (moocfiStatus === ConnectionStatus.DISCONNECTED) {
+      setMoocfiStatus(ConnectionStatus.CONNECTING)
+      connect(
+        "ws://localhost:9000",
+        setMoocfiClient,
+        setMoocfiStatus,
+      )
     }
-    if (quizzesClient && !quizzesVerified) {
-      quizzesClient.send(JSON.stringify({ accessToken, courseId }))
-      setQuizzesVerified(true)
-      console.log("Connected to quizzes")
+    if (quizzesStatus === ConnectionStatus.DISCONNECTED) {
+      setQuizzesStatus(ConnectionStatus.CONNECTING)
+      connect(
+        "ws://localhost:7000",
+        setMoocfiClient,
+        setQuizzesStatus,
+      )
     }
   })
 
   const init = async () => {
     await fetchProgressData()
-    setQuizzesClient(
-      await connect("ws://localhost:7000").catch(() => undefined),
-    )
-    setMoocfiClient(await connect("ws://localhost:9000").catch(() => undefined))
   }
 
   const fetchProgressData = async () => {
@@ -97,18 +107,36 @@ export const CourseStatusProvider: React.FunctionComponent<
     }
   }
 
-  const connect = (host: string): Promise<W3CWebSocket> => {
-    return new Promise((resolve: any, reject: any) => {
-      const client = new W3CWebSocket(host, "echo-protocol")
-      client.onmessage = onMessage
-      client.onclose = (e: any) => {}
-      client.onopen = () => {
-        resolve(client)
+  const connect = async (
+    host: string,
+    setClient: React.Dispatch<React.SetStateAction<W3CWebSocket | undefined>>,
+    setStatus: React.Dispatch<React.SetStateAction<ConnectionStatus>>,
+  ) => {
+    try {
+      const client: W3CWebSocket = await new Promise(
+        (resolve: any, reject: any) => {
+          const client = new W3CWebSocket(host, "echo-protocol")
+          client.onmessage = onMessage
+          client.onopen = () => {
+            resolve(client)
+          }
+          client.onerror = err => {
+            reject(err)
+          }
+        },
+      )
+      client.onclose = () => {
+        console.log(`connection to ${host} lost, attempting to reconnect...`)
+        setStatus(ConnectionStatus.DISCONNECTED)
       }
-      client.onerror = err => {
-        reject(err)
-      }
-    })
+      client.send(JSON.stringify({ accessToken, courseId }))
+      setClient(client)
+      setStatus(ConnectionStatus.CONNECTED)
+      console.log(`connected to ${host}`)
+    } catch (error) {
+      console.log(`could not connect to ${host}, attempting to reconnect...`)
+      setTimeout(() => setStatus(ConnectionStatus.DISCONNECTED), 10000)
+    }
   }
 
   const logout = () => {
@@ -117,12 +145,12 @@ export const CourseStatusProvider: React.FunctionComponent<
     quizzesClient && quizzesClient.close()
     setMoocfiClient(undefined)
     setQuizzesClient(undefined)
-    setMoocfiVerified(false)
-    setQuizzesVerified(false)
+    setMoocfiStatus(ConnectionStatus.DISCONNECTED)
+    setQuizzesStatus(ConnectionStatus.DISCONNECTED)
   }
 
   const onMessage = (inbound: any) => {
-    console.log(inbound.data)
+    console.log(inbound)
     const message = JSON.parse(inbound.data)
     if (isMessage(message)) {
       switch (message.type) {
