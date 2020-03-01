@@ -111,7 +111,8 @@ export const CourseStatusProvider: React.FunctionComponent<
     return new Promise((resolve: any, reject: any) => {
       const client = new W3CWebSocket(host, "echo-protocol")
       client.onmessage = onMessage
-      client.onclose = (e: any) => {}
+      client.onclose = (e: any) =>
+        client.send(JSON.stringify({ accessToken, courseId, close: true }))
       client.onopen = () => {
         resolve(client)
       }

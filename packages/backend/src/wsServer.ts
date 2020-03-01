@@ -69,6 +69,7 @@ wsServer.on("request", (request: any) => {
 
   connection.on("message", async (message: any) => {
     const data = JSON.parse(message.utf8Data)
+    console.log(data)
     if (data instanceof Object && data.accessToken && data.courseId) {
       const accessToken = data.accessToken
       const courseId = data.courseId
@@ -90,6 +91,10 @@ wsServer.on("request", (request: any) => {
     } else {
       connection.drop()
     }
+  })
+
+  connection.on("close", () => {
+    console.log("closed")
   })
 })
 
