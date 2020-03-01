@@ -1,7 +1,8 @@
 import { createAction } from "typesafe-actions"
 import { ICourse } from "../../interfaces"
-import { getCourses, duplicateCourse } from "../../services/courses"
+import { duplicateCourse, getCourses } from "../../services/courses"
 import { setCourse } from "../filter/actions"
+import { displayMessage } from "../notification/actions"
 
 export const set = createAction("courses/SET", resolve => {
   return courses => resolve(courses)
@@ -27,8 +28,10 @@ export const createDuplicateCourse = (
         getState().user,
       )
       dispatch(add(newCourse))
+      dispatch(displayMessage(`The course ${title} was created!`, false))
     } catch (error) {
       console.log(error)
+      dispatch(displayMessage(`Failed to create the course ${title}.`, true))
     }
   }
 }
@@ -37,6 +40,7 @@ export const setCourses = () => {
   return async (dispatch, getState) => {
     try {
       const courses = await getCourses(getState().user)
+      dispatch(set(courses))
     } catch (error) {
       console.log(error)
     }
