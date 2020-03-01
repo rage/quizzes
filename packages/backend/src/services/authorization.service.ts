@@ -12,6 +12,7 @@ export enum Permission {
   GRADE = 1,
   MODIFY = 2,
   EXPORT = 3,
+  DUPLICATE = 4,
 }
 
 @Service()

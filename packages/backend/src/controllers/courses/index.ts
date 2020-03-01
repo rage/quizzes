@@ -5,6 +5,8 @@ import {
   Param,
   QueryParam,
   UnauthorizedError,
+  Post,
+  Body,
 } from "routing-controllers"
 import AuthorizationService, {
   Permission,
@@ -12,8 +14,9 @@ import AuthorizationService, {
 import CourseService from "services/course.service"
 import UserCourseRoleService from "services/usercourserole.service"
 import { Inject } from "typedi"
-import { EntityManager } from "typeorm"
+import { EntityManager, AdvancedConsoleLogger } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
+import { EntityFromBody } from "typeorm-routing-controllers-extensions"
 import { API_PATH } from "../../config"
 import { Course } from "../../models"
 import { ICourseQuery, ITMCProfileDetails } from "../../types"
@@ -87,5 +90,25 @@ export class CourseController {
     }
 
     return await this.courseService.getCourses(query)
+  }
+
+  @Post("/:id/duplicate")
+  public async duplicateCourse(
+    @Param("id") id: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+    @Body() names: { title: string; abbreviation: string },
+  ): Promise<Course> {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      courseId: id,
+      permission: Permission.DUPLICATE,
+    })
+
+    if (!authorized) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const { title, abbreviation } = names
+    return await this.courseService.duplicateCourse(id, title, abbreviation)
   }
 }
