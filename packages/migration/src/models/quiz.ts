@@ -124,7 +124,7 @@ export class QuizTranslation extends BaseEntity {
     onUpdate: "CASCADE",
   })
   @JoinColumn()
-  public quiz: Promise<Quiz>
+  public quiz: Quiz
   @PrimaryColumn()
   public quizId: string
 

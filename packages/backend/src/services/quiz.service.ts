@@ -36,6 +36,218 @@ export default class QuizService {
 
   private knex = Knex({ client: "pg" })
 
+  public async getQuizzes(
+    query: IQuizQuery,
+    manager?: EntityManager,
+  ): Promise<Quiz[]> {
+    const entityManager = manager || this.entityManager
+
+    const queryBuilder = entityManager.createQueryBuilder(Quiz, "quiz")
+    const { courseId, coursePart, exclude, id, language, stripped } = query
+
+    if (language) {
+      queryBuilder.leftJoinAndSelect(
+        "quiz.texts",
+        "quiz_translation",
+        "quiz_translation.language_id = :language",
+        { language },
+      )
+    } else {
+      queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
+    }
+    if (!stripped) {
+      queryBuilder.addSelect("quiz_translation.submitMessage")
+    }
+
+    if (query.course) {
+      queryBuilder
+        .leftJoinAndSelect("quiz.course", "course")
+        .leftJoinAndSelect("course.languages", "language")
+      if (language) {
+        queryBuilder.leftJoinAndSelect(
+          "course.texts",
+          "course_translation",
+          "course_translation.language_id = :language",
+          { language },
+        )
+      } else {
+        queryBuilder.leftJoinAndSelect("course.texts", "course_translation")
+      }
+    }
+
+    if (query.items) {
+      queryBuilder.leftJoinAndSelect("quiz.items", "item")
+      queryBuilder.addSelect("item.minWords")
+      queryBuilder.addSelect("item.maxWords")
+      queryBuilder.addSelect("item.minValue")
+      queryBuilder.addSelect("item.maxValue")
+      if (language) {
+        queryBuilder.leftJoinAndSelect(
+          "item.texts",
+          "item_translation",
+          "item_translation.language_id = :language",
+          { language },
+        )
+
+        queryBuilder.addSelect("item_translation.minLabel")
+        queryBuilder.addSelect("item_translation.maxLabel")
+      } else {
+        queryBuilder.leftJoinAndSelect("item.texts", "item_translation")
+      }
+
+      if (!stripped) {
+        queryBuilder
+          .addSelect("item.validityRegex")
+          .addSelect("item_translation.successMessage")
+          .addSelect("item_translation.failureMessage")
+      }
+    }
+
+    if (query.options) {
+      queryBuilder.leftJoinAndSelect("item.options", "option")
+      if (language) {
+        queryBuilder.leftJoinAndSelect(
+          "option.texts",
+          "option_translation",
+          "option_translation.language_id = :language",
+          { language },
+        )
+      } else {
+        queryBuilder.leftJoinAndSelect("option.texts", "option_translation")
+      }
+      if (!stripped) {
+        queryBuilder
+          .addSelect("option.correct")
+          .addSelect("option_translation.successMessage")
+          .addSelect("option_translation.failureMessage")
+      }
+    }
+
+    if (query.peerreviews) {
+      queryBuilder
+        .leftJoinAndSelect("quiz.peerReviewCollections", "prqc")
+        .leftJoinAndSelect("prqc.questions", "prq")
+      if (language) {
+        queryBuilder
+          .leftJoinAndSelect(
+            "prqc.texts",
+            "prqc_translation",
+            "prqc_translation.language_id = :language",
+            { language },
+          )
+          .leftJoinAndSelect(
+            "prq.texts",
+            "prq_translation",
+            "prq_translation.language_id = :language",
+            { language },
+          )
+      } else {
+        queryBuilder
+          .leftJoinAndSelect("prqc.texts", "prqc_translation")
+          .leftJoinAndSelect("prq.texts", "prq_translation")
+      }
+    }
+
+    if (id) {
+      queryBuilder.andWhere("quiz.id = :id", { id })
+    }
+
+    if (courseId) {
+      queryBuilder.andWhere("quiz.courseId = :courseId", { courseId })
+    }
+
+    if (coursePart) {
+      queryBuilder.andWhere("quiz.part = :part", { part: coursePart })
+    }
+
+    if (exclude) {
+      queryBuilder.andWhere("quiz.excluded_from_score = false")
+    }
+    return await queryBuilder.getMany()
+  }
+
+  public async saveQuiz(quiz: Quiz): Promise<Quiz | undefined> {
+    let oldQuiz: Quiz | undefined
+    let savedQuiz: Quiz | undefined
+
+    await this.entityManager.transaction(async manager => {
+      if (quiz!.id) {
+        oldQuiz = await manager.findOne(Quiz, { id: quiz.id })
+
+        const oldQuizItems = await manager
+          .createQueryBuilder(QuizItem, "item")
+          .addSelect("item.minWords")
+          .addSelect("item.maxWords")
+          .addSelect("item.minValue")
+          .addSelect("item.maxValue")
+          .where("item.quizId = :quizId", { quizId: quiz.id })
+          .getMany()
+
+        oldQuiz.items = oldQuizItems
+
+        const validationResult = this.validateModificationOfExistingQuiz(
+          quiz,
+          oldQuiz,
+        )
+
+        if (validationResult.badWordLimit) {
+          throw new BadRequestError(
+            "New quiz cannot contain stricter limits on essays",
+          )
+        }
+
+        await this.removeOrphans(manager, oldQuiz, quiz)
+
+        // gotta save the quiz here or user course states update wrong
+        savedQuiz = await manager.save(quiz)
+
+        if (validationResult.maxPointsAltered) {
+          await this.userQuizStateService.updatePointsForQuiz(
+            quiz,
+            oldQuiz,
+            manager,
+          )
+        }
+
+        if (
+          validationResult.maxPointsAltered ||
+          validationResult.coursePartAltered
+        ) {
+          await this.userCoursePartStateService.updateUserCoursePartStates(
+            quiz,
+            oldQuiz,
+            manager,
+          )
+          await this.kafkaService.addTask(quiz.courseId, manager)
+        }
+      } else {
+        savedQuiz = await manager.save(quiz)
+      }
+    })
+
+    return savedQuiz
+  }
+
+  public async updateQuiz(quiz: Quiz): Promise<Quiz> {
+    let result
+    try {
+      result = await this.entityManager.save(quiz)
+    } catch (error) {
+      throw new Error(error.message)
+    }
+    return result
+  }
+
+  public async deleteQuiz(id: string): Promise<boolean> {
+    try {
+      await this.entityManager.delete(Quiz, { id })
+
+      return true
+    } catch {
+      return false
+    }
+  }
+
   public async getPlainQuizData(quizId: string) {
     const builder = Knex({ client: "pg" })
 
@@ -253,136 +465,6 @@ export default class QuizService {
     return data
   }
 
-  public async getQuizzes(
-    query: IQuizQuery,
-    manager?: EntityManager,
-  ): Promise<Quiz[]> {
-    const entityManager = manager || this.entityManager
-
-    const queryBuilder = entityManager.createQueryBuilder(Quiz, "quiz")
-    const { courseId, coursePart, exclude, id, language, stripped } = query
-
-    if (language) {
-      queryBuilder.leftJoinAndSelect(
-        "quiz.texts",
-        "quiz_translation",
-        "quiz_translation.language_id = :language",
-        { language },
-      )
-    } else {
-      queryBuilder.leftJoinAndSelect("quiz.texts", "quiz_translation")
-    }
-    if (!stripped) {
-      queryBuilder.addSelect("quiz_translation.submitMessage")
-    }
-
-    if (query.course) {
-      queryBuilder
-        .leftJoinAndSelect("quiz.course", "course")
-        .leftJoinAndSelect("course.languages", "language")
-      if (language) {
-        queryBuilder.leftJoinAndSelect(
-          "course.texts",
-          "course_translation",
-          "course_translation.language_id = :language",
-          { language },
-        )
-      } else {
-        queryBuilder.leftJoinAndSelect("course.texts", "course_translation")
-      }
-    }
-
-    if (query.items) {
-      queryBuilder.leftJoinAndSelect("quiz.items", "item")
-      queryBuilder.addSelect("item.minWords")
-      queryBuilder.addSelect("item.maxWords")
-      queryBuilder.addSelect("item.minValue")
-      queryBuilder.addSelect("item.maxValue")
-      if (language) {
-        queryBuilder.leftJoinAndSelect(
-          "item.texts",
-          "item_translation",
-          "item_translation.language_id = :language",
-          { language },
-        )
-
-        queryBuilder.addSelect("item_translation.minLabel")
-        queryBuilder.addSelect("item_translation.maxLabel")
-      } else {
-        queryBuilder.leftJoinAndSelect("item.texts", "item_translation")
-      }
-
-      if (!stripped) {
-        queryBuilder
-          .addSelect("item.validityRegex")
-          .addSelect("item_translation.successMessage")
-          .addSelect("item_translation.failureMessage")
-      }
-    }
-
-    if (query.options) {
-      queryBuilder.leftJoinAndSelect("item.options", "option")
-      if (language) {
-        queryBuilder.leftJoinAndSelect(
-          "option.texts",
-          "option_translation",
-          "option_translation.language_id = :language",
-          { language },
-        )
-      } else {
-        queryBuilder.leftJoinAndSelect("option.texts", "option_translation")
-      }
-      if (!stripped) {
-        queryBuilder
-          .addSelect("option.correct")
-          .addSelect("option_translation.successMessage")
-          .addSelect("option_translation.failureMessage")
-      }
-    }
-
-    if (query.peerreviews) {
-      queryBuilder
-        .leftJoinAndSelect("quiz.peerReviewCollections", "prqc")
-        .leftJoinAndSelect("prqc.questions", "prq")
-      if (language) {
-        queryBuilder
-          .leftJoinAndSelect(
-            "prqc.texts",
-            "prqc_translation",
-            "prqc_translation.language_id = :language",
-            { language },
-          )
-          .leftJoinAndSelect(
-            "prq.texts",
-            "prq_translation",
-            "prq_translation.language_id = :language",
-            { language },
-          )
-      } else {
-        queryBuilder
-          .leftJoinAndSelect("prqc.texts", "prqc_translation")
-          .leftJoinAndSelect("prq.texts", "prq_translation")
-      }
-    }
-
-    if (id) {
-      queryBuilder.andWhere("quiz.id = :id", { id })
-    }
-
-    if (courseId) {
-      queryBuilder.andWhere("quiz.courseId = :courseId", { courseId })
-    }
-
-    if (coursePart) {
-      queryBuilder.andWhere("quiz.part = :part", { part: coursePart })
-    }
-
-    if (exclude) {
-      queryBuilder.andWhere("quiz.excluded_from_score = false")
-    }
-    return await queryBuilder.getMany()
-  }
-
   public async getCourseParts(
     courseId: string,
     manager?: EntityManager,
@@ -398,88 +480,6 @@ export default class QuizService {
     return (await entityManager.query(query.toString())).map(
       (q: { [part: string]: number }) => q.part,
     )
-  }
-
-  public async saveQuiz(quiz: Quiz): Promise<Quiz | undefined> {
-    let oldQuiz: Quiz | undefined
-    let savedQuiz: Quiz | undefined
-
-    await this.entityManager.transaction(async manager => {
-      if (quiz!.id) {
-        oldQuiz = await manager.findOne(Quiz, { id: quiz.id })
-
-        const oldQuizItems = await manager
-          .createQueryBuilder(QuizItem, "item")
-          .addSelect("item.minWords")
-          .addSelect("item.maxWords")
-          .addSelect("item.minValue")
-          .addSelect("item.maxValue")
-          .where("item.quizId = :quizId", { quizId: quiz.id })
-          .getMany()
-
-        oldQuiz.items = oldQuizItems
-
-        const validationResult = this.validateModificationOfExistingQuiz(
-          quiz,
-          oldQuiz,
-        )
-
-        if (validationResult.badWordLimit) {
-          throw new BadRequestError(
-            "New quiz cannot contain stricter limits on essays",
-          )
-        }
-
-        await this.removeOrphans(manager, oldQuiz, quiz)
-
-        // gotta save the quiz here or user course states update wrong
-        savedQuiz = await manager.save(quiz)
-
-        if (validationResult.maxPointsAltered) {
-          await this.userQuizStateService.updatePointsForQuiz(
-            quiz,
-            oldQuiz,
-            manager,
-          )
-        }
-
-        if (
-          validationResult.maxPointsAltered ||
-          validationResult.coursePartAltered
-        ) {
-          await this.userCoursePartStateService.updateUserCoursePartStates(
-            quiz,
-            oldQuiz,
-            manager,
-          )
-          await this.kafkaService.addTask(quiz.courseId, manager)
-        }
-      } else {
-        savedQuiz = await manager.save(quiz)
-      }
-    })
-
-    return savedQuiz
-  }
-
-  public async updateQuiz(quiz: Quiz): Promise<Quiz> {
-    let result
-    try {
-      result = await this.entityManager.save(quiz)
-    } catch (error) {
-      throw new Error(error.message)
-    }
-    return result
-  }
-
-  public async deleteQuiz(id: string): Promise<boolean> {
-    try {
-      await this.entityManager.delete(Quiz, { id })
-
-      return true
-    } catch {
-      return false
-    }
   }
 
   private async removeOrphans(

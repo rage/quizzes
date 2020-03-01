@@ -80,7 +80,7 @@ export class Course extends BaseEntity {
 @Entity()
 export class CourseTranslation extends BaseEntity {
   @ManyToOne(type => Course, course => course.id)
-  public course: Promise<Course>
+  public course: Course
   @PrimaryColumn()
   public courseId: string
 

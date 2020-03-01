@@ -115,7 +115,7 @@ export class QuizAnswerController {
           user,
         }
 
-    let result = await this.quizAnswerService.getAnswersCount(criteriaQuery)
+    const result = await this.quizAnswerService.getAnswersCount(criteriaQuery)
 
     // only one quiz and user has permission to view the course -> safe to return
     if (user.administrator || quizId) {

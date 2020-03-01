@@ -12,6 +12,7 @@ import {
   UserCourseRole,
 } from "../models"
 import { Permission } from "services/authorization.service"
+import { RequiredAction } from "../services/kafka.service"
 
 export class ITMCProfile {
   username: string
@@ -218,7 +219,7 @@ export interface QuizAnswerMessage {
   user_id: number
   course_id: string
   service_id: string
-  required_actions: string[] | null
+  required_actions: RequiredAction[] | null
   message_format_version: number
 }
 
