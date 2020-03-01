@@ -12,7 +12,6 @@ import {
 import AuthorizationService, {
   Permission,
 } from "services/authorization.service"
-import KafkaService from "services/kafka.service"
 import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"

@@ -38,18 +38,6 @@ export default class KafkaService {
 
   private flush: any
 
-  constructor() {
-    const producer = new Kafka.Producer({
-      "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
-      dr_cb: false,
-    })
-    producer.on("ready", () => {
-      this.producer = producer
-    })
-    producer.connect()
-    this.flush = promisify(producer.flush.bind(producer))
-  }
-
   public async publishUserProgressUpdated(
     manager: EntityManager,
     userId: number,
@@ -145,15 +133,37 @@ export default class KafkaService {
     await manager.query(query.toString())
   }
 
+  private connect() {
+    return new Promise((resolve, reject) => {
+      this.producer.connect(
+        {},
+        (err: Error, data: any) => {
+          if (err) {
+            reject(err)
+          }
+          resolve(data)
+        },
+      )
+    })
+  }
+
   private async produce(
     topic: "user-course-progress" | "user-points" | "exercise",
     message: ProgressMessage | QuizAnswerMessage | QuizMessage,
   ) {
     try {
+      if (!this.producer) {
+        this.producer = new Kafka.Producer({
+          "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
+          dr_cb: false,
+        })
+        await this.connect()
+        this.flush = promisify(this.producer.flush.bind(this.producer))
+      }
       this.producer.produce(topic, null, Buffer.from(JSON.stringify(message)))
       await this.flush(1000)
     } catch (error) {
-      console.log("producer not ready")
+      console.log("producer failed")
     }
   }
 }

@@ -44,7 +44,7 @@ const isMessage = (message: any): message is Message => {
 export const CourseStatusProvider: React.FunctionComponent<
   CourseProgressProviderProps
 > = ({ accessToken, courseId, children }) => {
-  const [data, setData] = useState<ProgressData>()
+  const [data, setData] = useState<ProgressData | undefined>()
   const [updateQuiz, setUpdateQuiz] = useState({})
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -54,10 +54,14 @@ export const CourseStatusProvider: React.FunctionComponent<
   const [quizzesClient, setQuizzesClient] = useState<W3CWebSocket | undefined>()
 
   useEffect(() => {
-    init()
-  }, [])
-
-  useEffect(() => {
+    if (accessToken && !data) {
+      console.log("INIT")
+      init()
+    }
+    if (data && !accessToken) {
+      console.log("LOGOUT")
+      logout()
+    }
     if (moocfiClient && !moocfiVerified) {
       moocfiClient.send(JSON.stringify({ accessToken, courseId }))
       setMoocfiVerified(true)
@@ -76,6 +80,16 @@ export const CourseStatusProvider: React.FunctionComponent<
       await connect("ws://localhost:7000").catch(() => undefined),
     )
     setMoocfiClient(await connect("ws://localhost:9000").catch(() => undefined))
+  }
+
+  const logout = () => {
+    setData(undefined)
+    moocfiClient && moocfiClient.close()
+    quizzesClient && quizzesClient.close()
+    setMoocfiClient(undefined)
+    setQuizzesClient(undefined)
+    setMoocfiVerified(false)
+    setQuizzesVerified(false)
   }
 
   const fetchProgressData = async () => {
@@ -196,7 +210,7 @@ const transformData = (data: any): ProgressData => {
   let max_points
   let exercise_completions = 0
   let total_exercises = 0
-  let actions = new Set()
+  let distinctActions = new Set()
   const progressByGroup: ProgressByGroup = {}
   const exercisesByPart: ExercisesByPart = {}
   const answersByPart: AnswersByPart = {}
@@ -229,7 +243,7 @@ const transformData = (data: any): ProgressData => {
             completed: answer.completed,
             required_actions: answer.required_actions.map((action: any) => {
               if (action.value in RequiredAction) {
-                actions.add(action.value)
+                distinctActions.add(action.value)
                 return action.value
               }
             }),
@@ -238,7 +252,7 @@ const transformData = (data: any): ProgressData => {
       }
     }
   }
-  const required_actions = Array.from(actions) as RequiredAction[]
+  const required_actions = Array.from(distinctActions) as RequiredAction[]
 
   return {
     completed,
