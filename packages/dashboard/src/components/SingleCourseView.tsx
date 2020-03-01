@@ -128,7 +128,10 @@ class SingleCourseView extends React.Component<
             alignItems="stretch"
             spacing={16}
           >
-            <Grid item={true} sm={3} />
+            <Grid item={true} sm={3}>
+              <CourseDuplicateButton />
+            </Grid>
+
             <Grid item={true} xs={12} sm={6} style={{ alignSelf: "center" }}>
               <Typography variant="title" style={{ textAlign: "center" }}>
                 {currentCourse.texts[0] &&
@@ -155,8 +158,6 @@ class SingleCourseView extends React.Component<
                 </Grid>
               </Grid>
             </Grid>
-
-            <CourseDuplicateButton />
 
             <LanguageBar />
 

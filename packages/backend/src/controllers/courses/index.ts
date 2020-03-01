@@ -96,9 +96,8 @@ export class CourseController {
   public async duplicateCourse(
     @Param("id") id: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
-    @Body() names: { title: string; slug: string },
-  ): Promise<any> {
-    console.log("Is controller method called?")
+    @Body() names: { title: string; abbreviation: string },
+  ): Promise<Course> {
     const authorized = await this.authorizationService.isPermitted({
       user,
       courseId: id,
@@ -109,15 +108,7 @@ export class CourseController {
       throw new UnauthorizedError("unauthorized")
     }
 
-    const { title, slug } = names
-    console.log("creating...")
-    const result = await this.courseService.duplicateCourse(id, title, slug)
-
-    console.log("Result is: ", result)
-    console.log("created!")
-    if (!result) {
-      return "Failed for some reason"
-    }
-    return result
+    const { title, abbreviation } = names
+    return await this.courseService.duplicateCourse(id, title, abbreviation)
   }
 }

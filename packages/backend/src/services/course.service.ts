@@ -56,16 +56,12 @@ export class CourseService {
   public async duplicateCourse(
     courseId: string,
     name: string,
-    slug: string,
+    abbreviation: string,
   ): Promise<Course> {
-    // 1. check if the course exists
-
     const courseToBeDuplicated = await Course.findOne(courseId)
     if (!courseToBeDuplicated) {
       return null
     }
-
-    // 2. knex together the thingies
 
     const oldCourseId = courseId
     const newCourseId = uuidv4()
@@ -74,8 +70,6 @@ export class CourseService {
       // 1. create the course
 
       const builder = Knex({ client: "pg" })
-
-      console.log("New created: ", newCourseId)
 
       // 1. Create the quiz
 
@@ -90,12 +84,10 @@ export class CourseService {
       let query = builder("course_translation").insert({
         course_id: newCourseId,
         language_id: courseToBeDuplicated.texts[0].languageId,
-        abbreviation: slug,
+        abbreviation,
         title: name,
       })
       await manager.query(query.toQuery())
-
-      console.log("New course has been created")
 
       query = builder("course_language").insert({
         course_id: newCourseId,
@@ -104,8 +96,6 @@ export class CourseService {
       await manager.query(query.toQuery())
 
       // 3. Insert duplicate quizzes and quiz translations
-
-      console.log("Starting to insert the quiz info")
 
       let rawQuery = builder.raw(
         `
@@ -141,8 +131,6 @@ export class CourseService {
         },
       )
       await manager.query(rawQuery.toQuery())
-
-      console.log("Inserted the quiz info!")
 
       // 4. Insert duplicate items and their translations
 
@@ -185,8 +173,6 @@ export class CourseService {
       )
 
       await manager.query(rawQuery.toQuery())
-
-      console.log("inserted the quiz item info!")
 
       // 5. Insert duplicate options and their translations
 
@@ -232,8 +218,6 @@ export class CourseService {
       )
 
       await manager.query(rawQuery.toQuery())
-
-      console.log("inserted the quiz option info!")
 
       // 6. Add peer review collections and their translations
 

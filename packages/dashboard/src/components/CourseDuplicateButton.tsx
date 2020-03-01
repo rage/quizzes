@@ -71,7 +71,7 @@ class CourseDuplicateButton extends React.Component<
           }}
           onClick={this.setDialogOpenness(true)}
         >
-          Duplicate
+          Duplicate course
         </Button>
 
         <Dialog
@@ -160,8 +160,10 @@ class CourseDuplicateButton extends React.Component<
   }
 }
 const mapStateToProps = state => ({
-  course: state.courses.find(c => c.id === state.filter.course),
-  courseCount: state.courses.length,
+  course: state.courses
+    ? state.courses.find(c => c.id === state.filter.course)
+    : [],
+  courseCount: state.courses ? state.courses.length : 0,
 })
 
 export default connect(
