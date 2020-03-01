@@ -81,11 +81,12 @@ export const CourseStatusProvider: React.FunctionComponent<
   const fetchProgressData = async () => {
     try {
       setLoading(true)
-      const data = await getUserCourseData(courseId, accessToken)
-      setData(transformData(data))
+      const data = transformData(await getUserCourseData(courseId, accessToken))
+      setData(data)
       setLoading(false)
     } catch (error) {
       console.log("Could not fetch course progress data")
+      console.log(error)
       setError(true)
       setLoading(false)
       notifySticky("Could not fetch course progress data", ToastTypes.ERROR)
@@ -145,7 +146,7 @@ export const CourseStatusProvider: React.FunctionComponent<
     error,
     loading,
     notifyError,
-    data,
+    courseProgressData: data,
   }
 
   const status: CourseStatusProviderInterface = {
@@ -190,8 +191,12 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
 const transformData = (data: any): ProgressData => {
   const courseProgress = data.currentUser.user_course_progresses[0]
   const completed = data.currentUser.completions.length > 0
+  let points_to_pass = 0
   let n_points
   let max_points
+  let exercise_completions = 0
+  let total_exercises = 0
+  let actions = new Set()
   const progressByGroup: ProgressByGroup = {}
   const exercisesByPart: ExercisesByPart = {}
   const answersByPart: AnswersByPart = {}
@@ -202,13 +207,16 @@ const transformData = (data: any): ProgressData => {
       progressByGroup[groupProgress.group] = groupProgress
     }
     const exerciseData = courseProgress.course
+    points_to_pass = exerciseData.points_needed || 0
     for (const exercise of exerciseData.exercises) {
+      total_exercises += 1
       const partExercises = exercisesByPart[exercise.part] || []
       exercisesByPart[exercise.part] = [...partExercises, exercise]
     }
     for (const exercise of exerciseData.withAnswer) {
       const answer = exercise.exercise_completions[0]
       if (answer) {
+        exercise_completions += 1
         const partAnswers = answersByPart[exercise.part] || []
         answersByPart[exercise.part] = [
           ...partAnswers,
@@ -219,19 +227,27 @@ const transformData = (data: any): ProgressData => {
             section: exercise.section,
             n_points: answer.n_points,
             completed: answer.completed,
-            required_actions: answer.required_actions.map(
-              (action: any) => action.value in RequiredAction && action.value,
-            ),
+            required_actions: answer.required_actions.map((action: any) => {
+              if (action.value in RequiredAction) {
+                actions.add(action.value)
+                return action.value
+              }
+            }),
           },
         ]
       }
     }
   }
+  const required_actions = Array.from(actions) as RequiredAction[]
 
   return {
     completed,
+    points_to_pass,
     n_points,
     max_points,
+    exercise_completions,
+    total_exercises,
+    required_actions,
     progressByGroup,
     exercisesByPart,
     answersByPart,

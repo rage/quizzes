@@ -117,7 +117,7 @@ const App = () => {
         </Div>
       )
     }
-    return <Div>{JSON.stringify(props.data)}</Div>
+    return <Div>{JSON.stringify(props.courseProgressData)}</Div>
   }
   const Progress = injectCourseProgress(DataTest)
 
