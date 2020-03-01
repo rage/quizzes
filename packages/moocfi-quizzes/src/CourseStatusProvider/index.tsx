@@ -16,7 +16,7 @@ import { getUserCourseData } from "../services/courseProgressService"
 
 import "react-toastify/dist/ReactToastify.css"
 
-import { w3cwebsocket as W3CWebSocket } from "websocket"
+import { w3cwebsocket as W3CWebSocket, client } from "websocket"
 
 interface CourseProgressProviderProps {
   accessToken: string
@@ -82,16 +82,6 @@ export const CourseStatusProvider: React.FunctionComponent<
     setMoocfiClient(await connect("ws://localhost:9000").catch(() => undefined))
   }
 
-  const logout = () => {
-    setData(undefined)
-    moocfiClient && moocfiClient.close()
-    quizzesClient && quizzesClient.close()
-    setMoocfiClient(undefined)
-    setQuizzesClient(undefined)
-    setMoocfiVerified(false)
-    setQuizzesVerified(false)
-  }
-
   const fetchProgressData = async () => {
     try {
       setLoading(true)
@@ -111,8 +101,7 @@ export const CourseStatusProvider: React.FunctionComponent<
     return new Promise((resolve: any, reject: any) => {
       const client = new W3CWebSocket(host, "echo-protocol")
       client.onmessage = onMessage
-      client.onclose = (e: any) =>
-        client.send(JSON.stringify({ accessToken, courseId, close: true }))
+      client.onclose = (e: any) => {}
       client.onopen = () => {
         resolve(client)
       }
@@ -122,7 +111,18 @@ export const CourseStatusProvider: React.FunctionComponent<
     })
   }
 
+  const logout = () => {
+    setData(undefined)
+    moocfiClient && moocfiClient.close()
+    quizzesClient && quizzesClient.close()
+    setMoocfiClient(undefined)
+    setQuizzesClient(undefined)
+    setMoocfiVerified(false)
+    setQuizzesVerified(false)
+  }
+
   const onMessage = (inbound: any) => {
+    console.log(inbound.data)
     const message = JSON.parse(inbound.data)
     if (isMessage(message)) {
       switch (message.type) {

@@ -18,7 +18,8 @@ const originAccepted: { [origin: string]: boolean } = {
   "https://40f60d95.ngrok.io": true,
 }
 
-const clients: { [userId: number]: any } = {}
+const connectionByUserCourse = new Map()
+const userCourseByConnection = new Map()
 
 export type MessageType =
   | "PROGRESS_UPDATED"
@@ -26,32 +27,33 @@ export type MessageType =
   | "QUIZ_CONFIRMED"
   | "QUIZ_REJECTED"
 
-export const messageClient = (
+export const pushMessageToClient = (
   userId: number,
   courseId: string,
   type: MessageType,
   payload?: string,
 ) => {
-  if (clients[userId] && clients[userId][courseId]) {
-    const connection = clients[userId][courseId]
+  const userCourseObjectString = JSON.stringify({ userId, courseId })
+  const connection = connectionByUserCourse.get(userCourseObjectString)
+  if (connection) {
     if (connection.connected) {
       connection.sendUTF(
         JSON.stringify({
           type,
-          payload,
+          message: payload,
         }),
       )
     } else {
-      delete clients[userId][courseId]
+      connectionByUserCourse.delete(userCourseObjectString)
       redis.publisher.publish(
         "websocket",
-        JSON.stringify({ userId, courseId, type, payload }),
+        JSON.stringify({ userId, courseId, type, message: payload }),
       )
     }
   } else {
     redis.publisher.publish(
       "websocket",
-      JSON.stringify({ userId, courseId, type, payload }),
+      JSON.stringify({ userId, courseId, type, message: payload }),
     )
   }
 }
@@ -79,10 +81,12 @@ wsServer.on("request", (request: any) => {
           user = await TMCApi.getProfile(accessToken)
           redis.set(accessToken, JSON.stringify(user), "EX", 3600)
         }
-        clients[user.id] = {
-          ...clients[user.id],
-          [courseId]: connection,
+        const userCourseObject = {
+          userId: user.id,
+          courseId,
         }
+        connectionByUserCourse.set(JSON.stringify(userCourseObject), connection)
+        userCourseByConnection.set(connection, userCourseObject)
         console.log("connection verified")
       } catch (error) {
         connection.drop()
@@ -94,7 +98,11 @@ wsServer.on("request", (request: any) => {
   })
 
   connection.on("close", () => {
-    console.log("closed")
+    const userCourseObjectString = JSON.stringify(
+      userCourseByConnection.get(connection),
+    )
+    userCourseByConnection.delete(connection)
+    connectionByUserCourse.delete(userCourseObjectString)
   })
 })
 
@@ -103,17 +111,18 @@ redis.subscriber.on("message", (channel: any, message: any) => {
   if (data instanceof Object && data.userId && data.courseId && data.type) {
     const userId = data.userId
     const courseId = data.courseId
-    if (clients[userId] && clients[userId][courseId]) {
-      const connection = clients[userId][courseId]
+    const userCourseObjectString = JSON.stringify({ userId, courseId })
+    const connection = connectionByUserCourse.get(userCourseObjectString)
+    if (connection) {
       if (connection.connected) {
         connection.sendUTF(
           JSON.stringify({
             type: data.type,
-            payload: data.payload,
+            message: data.message,
           }),
         )
       } else {
-        delete clients[userId][courseId]
+        connectionByUserCourse.delete(userCourseObjectString)
       }
     }
   }

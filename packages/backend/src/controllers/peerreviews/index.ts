@@ -23,7 +23,7 @@ import { API_PATH } from "../../config"
 import { PeerReview, Quiz, QuizAnswer, UserQuizState } from "../../models"
 import { ITMCProfileDetails } from "../../types"
 
-import { messageClient, MessageType } from "../../wsServer"
+import { MessageType, pushMessageToClient } from "../../wsServer"
 
 @JsonController(`${API_PATH}/quizzes/peerreview`)
 export class PeerReviewController {
@@ -192,7 +192,7 @@ export class PeerReviewController {
       }
 
       messages.forEach(message => {
-        messageClient(
+        pushMessageToClient(
           receivingQuizAnswer.userId,
           quiz.course.moocfiId,
           message,

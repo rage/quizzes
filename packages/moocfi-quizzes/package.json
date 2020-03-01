@@ -29,6 +29,7 @@
     "@types/websocket": "^1.0.0",
     "axios": "^0.18.0",
     "commonmark": "^0.29.0",
+    "graphql-request": "^1.8.2",
     "likert-react": "^0.0.0-beta6",
     "parcel": "^1.12.3",
     "react": "16.x",
@@ -44,8 +45,7 @@
     "typesafe-actions": "^4.4.2",
     "typescript": "^3.5.2",
     "watch": "^1.0.2",
-    "websocket": "^1.0.31",
-    "graphql-request": "^1.8.2"
+    "websocket": "^1.0.31"
   },
   "peerDependencies": {
     "@fortawesome/fontawesome-free": "^5.9.0",
@@ -59,6 +59,7 @@
     "@types/websocket": "^1.0.0",
     "axios": "^0.18.0",
     "commonmark": "^0.29.0",
+    "graphql-request": "^1.8.2",
     "likert-react": "^0.0.0-beta6",
     "react": ">=16.0.0",
     "react-content-loader": "^4.2.2",
@@ -70,7 +71,7 @@
     "redux-thunk": "^2.3.0",
     "styled-components": "^4.3.2",
     "typesafe-actions": "^4.4.2",
-    "websocket": "^1.0.31",
-    "graphql-request": "^1.8.2"
-  }
+    "websocket": "^1.0.31"
+  },
+  "dependencies": {}
 }
