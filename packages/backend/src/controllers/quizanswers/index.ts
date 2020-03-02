@@ -468,13 +468,12 @@ export class QuizAnswerController {
           quiz,
           userQuizState.userId,
         )
+        await this.kafkaService.publishUserProgressUpdated(
+          manager,
+          userId,
+          quiz.courseId,
+        )
       }
-
-      await this.kafkaService.publishUserProgressUpdated(
-        manager,
-        userId,
-        quiz.courseId,
-      )
 
       this.kafkaService.publishQuizAnswerUpdated(
         savedAnswer,
