@@ -30,6 +30,7 @@ enum MessageType {
   PEER_REVIEW_RECEIVED = "PEER_REVIEW_RECEIVED",
   QUIZ_CONFIRMED = "QUIZ_CONFIRMED",
   QUIZ_REJECTED = "QUIZ_REJECTED",
+  COURSE_CONFIRMED = "COURSE_CONFIRMED",
 }
 
 enum ConnectionStatus {
@@ -169,7 +170,6 @@ export const CourseStatusProvider: React.FunctionComponent<
       switch (message.type) {
         case "PROGRESS_UPDATED":
           fetchProgressData()
-          notifyRegular("Course progress updated", ToastType.SUCCESS)
           break
         case "PEER_REVIEW_RECEIVED":
           setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
@@ -225,7 +225,7 @@ export const CourseStatusProvider: React.FunctionComponent<
       <CourseStatusProviderContext.Provider value={status}>
         <ToastContainer
           enableMultiContainer
-          newestOnTop
+          newestOnTop={false}
           autoClose={false}
           hideProgressBar
           containerId={"sticky"}
@@ -233,7 +233,7 @@ export const CourseStatusProvider: React.FunctionComponent<
         />
         <ToastContainer
           enableMultiContainer
-          newestOnTop
+          newestOnTop={false}
           hideProgressBar
           containerId={"regular"}
           position={toast.POSITION.TOP_RIGHT}
