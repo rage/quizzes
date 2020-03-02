@@ -13,6 +13,7 @@ import { connect } from "react-redux"
 import { Redirect } from "react-router-dom"
 import { ICourse } from "../interfaces"
 import { createDuplicateCourse } from "../store/courses/actions"
+import { createAndSaveSpaceSeparatedValueFile } from "./tools"
 
 interface ICourseDuplicateButtonProps {
   createDuplicateCourse: (
@@ -92,7 +93,9 @@ class CourseDuplicateButton extends React.Component<
             </Typography>
 
             <Typography variant="body1">
-              Please fill in the info for the new course below
+              Please fill in the info for the new course below. After creating
+              the new course you will be able to download a file that contains
+              the ids of both old and new quiz ids.
             </Typography>
             <FormGroup style={{ marginTop: "10px" }}>
               <TextField

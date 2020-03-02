@@ -76,10 +76,12 @@ export class CourseService {
   }
 
   public async duplicateCourse(
-    courseId: string,
+    course: Course,
     name: string,
     abbreviation: string,
   ): Promise<Course> {
+    const courseId = course.id
+
     const courseToBeDuplicated = await Course.findOne(courseId)
     if (!courseToBeDuplicated) {
       return null

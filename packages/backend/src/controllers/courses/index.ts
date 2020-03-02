@@ -98,7 +98,10 @@ export class CourseController {
     @Param("id") id: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @Body() names: { title: string; abbreviation: string },
-  ): Promise<Course> {
+  ): Promise<{
+    newCourse: Course
+    correspondanceData: any[]
+  }> {
     const authorized = await this.authorizationService.isPermitted({
       user,
       courseId: id,
@@ -110,7 +113,22 @@ export class CourseController {
     }
 
     const { title, abbreviation } = names
-    return await this.courseService.duplicateCourse(id, title, abbreviation)
+
+    const oldCourse = await Course.findOne(id)
+    if (!oldCourse) {
+      throw new Error("The id does not match any course")
+    }
+
+    const newCourse = await this.courseService.duplicateCourse(
+      oldCourse,
+      title,
+      abbreviation,
+    )
+    const correspondanceData = await this.courseService.generateQuizTransitionFile(
+      newCourse,
+      oldCourse,
+    )
+    return { newCourse, correspondanceData }
   }
 
   @Get("/:id/quizIdFile")

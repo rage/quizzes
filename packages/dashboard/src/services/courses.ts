@@ -14,7 +14,10 @@ export const duplicateCourse = async (
   title: string,
   abbreviation: string,
   user: any,
-): Promise<ICourse> => {
+): Promise<{
+  newCourse: ICourse
+  correspondanceData: any[]
+}> => {
   const response = await axios.post(
     `/api/v1/courses/${courseId}/duplicate`,
     {

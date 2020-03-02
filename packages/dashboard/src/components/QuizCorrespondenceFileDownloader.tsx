@@ -12,7 +12,6 @@ import {
 } from "@material-ui/core"
 import * as React from "react"
 import { connect } from "react-redux"
-import * as XLSX from "xlsx"
 import { ICourse } from "../interfaces"
 import { getCourseQuizIdCorrespondense } from "../services/courses"
 import { createAndSaveSpaceSeparatedValueFile } from "./tools"
@@ -83,6 +82,7 @@ class CorrespondenceIdFileDownloader extends React.Component<
                 Old course (was used to create this course)
               </InputLabel>
               <Select
+                variant="outlined"
                 value={this.state.oldCourseId}
                 onChange={this.changeQuizId}
                 inputProps={{
