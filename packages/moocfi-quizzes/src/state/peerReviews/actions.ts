@@ -152,7 +152,13 @@ export const postSpam: ActionCreator<ThunkAction> = (
     await postSpamFlag(quizAnswerId, accessToken, address)
     await dispatch(fetchPeerReviewAlternatives())
   } catch (error) {
-    dispatch(errorOccurred("Could not submit. Please try again later"))
+    const languageLabels = getState().language.languageLabels
+    dispatch(
+      errorOccurred(
+        (languageLabels && languageLabels.error.submitSpamFlagError) ||
+          "spam flag submit error",
+      ),
+    )
   }
 }
 
@@ -173,7 +179,13 @@ export const fetchPeerReviewAlternatives: ActionCreator<
     )
     dispatch(setReviewOptions(answerAlternatives))
   } catch (error) {
-    dispatch(errorOccurred("something went wrong while retrieving answers"))
+    const languageLabels = getState().language.languageLabels
+    dispatch(
+      errorOccurred(
+        (languageLabels && languageLabels.error.fetchReviewCandidatesError) ||
+          "couldn't fetch answers to review",
+      ),
+    )
   }
 }
 

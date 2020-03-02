@@ -226,6 +226,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   )
 
   if (fatal) {
+    console.log("quiz")
     courseStatusProvider.notifyError &&
       courseStatusProvider.notifyError(messageState.message)
     return (
@@ -373,7 +374,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     <OuterDiv providedStyles={themeProvider.mainDivStyles}>
       <TopInfoBar />
       <div ref={ref} />
-      <Notification scrollRef={ref} />
+      {/*<Notification scrollRef={ref} />*/}
       <QuizContentWrapper disabled={quizDisabled || wrongLocale}>
         <UpperContent providedStyles={themeProvider.upperContentStyles}>
           <Deadline deadline={quiz.deadline} />

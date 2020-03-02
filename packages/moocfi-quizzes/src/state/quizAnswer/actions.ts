@@ -169,10 +169,11 @@ export const submit: ActionCreator<ThunkAction> = () => async (
       }
     }
   } catch (error) {
+    const languageLabels = getState().language.languageLabels
     dispatch(
       messageActions.errorOccurred(
-        getState().language.languageLabels!.error.submitFailedError ||
-          "submit error",
+        (languageLabels && languageLabels.error.submitFailedError) ||
+          "could not submit answer",
       ),
     )
   }

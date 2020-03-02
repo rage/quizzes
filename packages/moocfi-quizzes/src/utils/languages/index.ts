@@ -1,6 +1,8 @@
 import englishLabels from "./english_options"
+import estonianLabels from "./estonian_options"
 import finnishLabels from "./finnish_options"
 import germanLabels from "./german_options"
+import swedishLabels from "./swedish_options"
 import { QuizPointsGrantingPolicy } from "../../modelTypes"
 
 export type GeneralLabels = {
@@ -135,6 +137,8 @@ export type LanguageLabels = {
 
 export const languageOptions: LanguageLabels = {
   en_US: englishLabels,
+  et_EE: estonianLabels,
   fi_FI: finnishLabels,
   de_DE: germanLabels,
+  sv_SE: swedishLabels,
 }

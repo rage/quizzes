@@ -125,6 +125,7 @@ const App = () => {
     <CourseStatusProvider
       courseId="b5746948-5141-4d45-aceb-79adb037c29b"
       accessToken={accessToken.value}
+      languageId={languageId.value}
     >
       <Typography variant="h4" component="h1">
         Quizzes testing
