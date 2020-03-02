@@ -207,6 +207,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const dispatch = useDispatch()
 
   const fatal = messageState.fatal
+  const error = messageState.error
 
   useEffect(
     () => {
@@ -225,11 +226,18 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   )
 
   if (fatal) {
+    courseStatusProvider.notifyError &&
+      courseStatusProvider.notifyError(messageState.message)
     return (
       <Error>
         <p>{messageState.message}</p>
       </Error>
     )
+  }
+
+  if (error) {
+    courseStatusProvider.notifyError &&
+      courseStatusProvider.notifyError(messageState.message)
   }
 
   const CustomLogin = customContent && customContent.Login
