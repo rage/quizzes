@@ -180,14 +180,14 @@ export class PeerReviewController {
       )
 
       const newStatus = receivingUpdated.answer.status
-      const messages: MessageType[] = ["PEER_REVIEW_RECEIVED"]
+      const messages: MessageType[] = [MessageType.PEER_REVIEW_RECEIVED]
 
       if (oldStatus !== newStatus) {
         if (newStatus === "confirmed") {
-          messages.push("QUIZ_CONFIRMED")
+          messages.push(MessageType.QUIZ_CONFIRMED)
         }
         if (newStatus === "rejected" || newStatus === "spam") {
-          messages.push("QUIZ_REJECTED")
+          messages.push(MessageType.QUIZ_REJECTED)
         }
       }
 

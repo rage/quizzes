@@ -143,6 +143,7 @@ export const CourseStatusProvider: React.FunctionComponent<
         },
       )
       client.onmessage = onMessage
+      client.onerror = error => console.log(error)
       client.onclose = onClose(host, setStatus)
       client.send(JSON.stringify({ accessToken, courseId }))
       setClient(client)
@@ -168,19 +169,23 @@ export const CourseStatusProvider: React.FunctionComponent<
     const message = JSON.parse(inbound.data)
     if (isMessage(message)) {
       switch (message.type) {
-        case "PROGRESS_UPDATED":
+        case MessageType.PROGRESS_UPDATED:
           fetchProgressData()
           break
-        case "PEER_REVIEW_RECEIVED":
+        case MessageType.PEER_REVIEW_RECEIVED:
           setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
           notifyRegular(
             "You have received a new peer review",
             ToastType.SUCCESS,
           )
           break
-        case "QUIZ_CONFIRMED":
+        case MessageType.QUIZ_CONFIRMED:
           setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
           notifyRegular("Your answer was confirmed!", ToastType.SUCCESS)
+          break
+        case MessageType.QUIZ_REJECTED:
+          break
+        case MessageType.COURSE_CONFIRMED:
           break
       }
     }

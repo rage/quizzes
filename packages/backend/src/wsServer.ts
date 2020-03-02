@@ -12,20 +12,15 @@ const wsServer = new WebSocketServer.server({
   httpServer: server,
 })
 
-const originAccepted: { [origin: string]: boolean } = {
-  "http://localhost:1234": true,
-  "http://localhost:8000": true,
-  "https://40f60d95.ngrok.io": true,
-}
-
 const connectionByUserCourse = new Map()
 const userCourseByConnection = new Map()
 
-export type MessageType =
-  | "PROGRESS_UPDATED"
-  | "PEER_REVIEW_RECEIVED"
-  | "QUIZ_CONFIRMED"
-  | "QUIZ_REJECTED"
+export enum MessageType {
+  PROGRESS_UPDATED = "PROGRESS_UPDATED",
+  PEER_REVIEW_RECEIVED = "PEER_REVIEW_RECEIVED",
+  QUIZ_CONFIRMED = "QUIZ_CONFIRMED",
+  QUIZ_REJECTED = "QUIZ_REJECTED",
+}
 
 export const pushMessageToClient = (
   userId: number,
@@ -60,18 +55,10 @@ export const pushMessageToClient = (
 
 wsServer.on("request", (request: any) => {
   console.log("request ", request.origin)
-  let connection: any
-  if (originAccepted[request.origin]) {
-    connection = request.accept("echo-protocol", request.origin)
-  } else {
-    request.reject()
-    console.log("connection rejected")
-    return
-  }
+  const connection = request.accept("echo-protocol", request.origin)
 
   connection.on("message", async (message: any) => {
     const data = JSON.parse(message.utf8Data)
-    console.log(data)
     if (data instanceof Object && data.accessToken && data.courseId) {
       const accessToken = data.accessToken
       const courseId = data.courseId
@@ -90,7 +77,7 @@ wsServer.on("request", (request: any) => {
         console.log("connection verified")
       } catch (error) {
         connection.drop()
-        console.log("unauthorized websocket connection")
+        console.log("connection rejected")
       }
     } else {
       connection.drop()
