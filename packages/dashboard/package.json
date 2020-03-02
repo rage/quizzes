@@ -28,7 +28,7 @@
     "typeface-roboto": "^0.0.54",
     "typesafe-actions": "^2.0.4",
     "why-did-you-update": "^1.0.6",
-    "xlsx": "^0.14.3"
+    "xlsx": "^.0.15.5"
   },
   "scripts": {
     "start": "PORT=5001 react-app-rewired start --scripts-version react-scripts-ts",

@@ -27,3 +27,18 @@ export const duplicateCourse = async (
   )
   return response.data
 }
+
+export const getCourseQuizIdCorrespondense = async (
+  newCourseId,
+  oldCourseId,
+  user: any,
+): Promise<any[]> => {
+  const response = await axios.get(
+    `/api/v1/courses/${newCourseId}/quizIdFile?oldCourse=${oldCourseId}`,
+    {
+      headers: { authorization: `Bearer ${user.accessToken}` },
+    },
+  )
+
+  return response.data
+}

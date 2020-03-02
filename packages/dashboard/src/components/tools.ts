@@ -1,3 +1,4 @@
+import * as XLSX from "xlsx"
 import {
   IPeerReviewCollection,
   IPeerReviewCollectionQuestion,
@@ -10,6 +11,23 @@ import {
   IQuizItemText,
   IQuizText,
 } from "../interfaces"
+
+export const createAndSaveSpaceSeparatedValueFile = (
+  data: any[],
+  filename: string,
+) => {
+  const wb = XLSX.utils.book_new()
+  const ws = XLSX.utils.json_to_sheet(data)
+  XLSX.utils.book_append_sheet(wb, ws, "ws")
+
+  XLSX.writeFile(
+    wb,
+    `${filename}.csv`,
+    // will not allow the file separator property in options otherwise
+    // @ts-ignore
+    { bookType: "csv", FS: " " },
+  )
+}
 
 const quizFields = [
   "grantPointsPolicy",
