@@ -462,12 +462,16 @@ export class QuizAnswerController {
         userQuizState,
       )
 
-      if (originalPoints < savedUserQuizState.pointsAwarded) {
+      if (
+        originalPoints < savedUserQuizState.pointsAwarded &&
+        !quiz.excludedFromScore
+      ) {
         await this.userCoursePartStateService.updateUserCoursePartState(
           manager,
           quiz,
           userQuizState.userId,
         )
+
         await this.kafkaService.publishUserProgressUpdated(
           manager,
           userId,
