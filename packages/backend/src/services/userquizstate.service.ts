@@ -123,7 +123,7 @@ export default class UserQuizStateService {
     }
 
     if (typeof userQuizState.tries !== "number" || userQuizState.tries === 0) {
-      const query = manager
+      userQuizState.tries = (await manager
         .createQueryBuilder(QuizAnswer, "quiz_answer")
         .select("COUNT(*)")
         .where("quiz_answer.quiz_id = :quiz_id", {
@@ -132,12 +132,7 @@ export default class UserQuizStateService {
         .andWhere("quiz_answer.user_id = :user_id", {
           user_id: userQuizState.userId,
         })
-        .getQueryAndParameters()
-
-      const result = await manager.query(query[0], query[1])
-      const tries = Number(result[0].count)
-
-      userQuizState.tries = tries
+        .getRawOne()).count
     }
 
     return await manager.save(userQuizState)
