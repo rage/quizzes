@@ -6,6 +6,8 @@ import { Container } from "typedi"
 import { App } from "./app"
 import { Database } from "./config/database"
 
+import { wsListen } from "./wsServer"
+
 if (process.env.NODE_ENV !== "production") {
   dotenv.config({ path: ".env" })
 }
@@ -15,6 +17,8 @@ const database = Container.get(Database)
 const port = process.env.PORT || 3000
 
 database.connect() // hmm, this is async btw
+
+wsListen()
 
 /**
  * Start Express server.
