@@ -66,8 +66,7 @@ class QuizStatistics extends React.Component<any, any> {
   }
 
   public async componentDidMount() {
-    await this.props.setQuiz(this.props.match.params.id)
-
+    await this.props.setQuiz(this.props.match.params.id, true)
     const queryParams = queryString.parse(this.props.location.search)
     const showing = queryParams.all && queryParams.all === "true"
 

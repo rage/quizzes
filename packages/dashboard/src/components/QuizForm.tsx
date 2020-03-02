@@ -37,7 +37,7 @@ interface IQuizFormProps {
   newQuiz: any
   save: any
   setEdit: (quiz: IQuiz) => any
-  setQuiz: (quizId?: string) => any
+  setQuiz: (quizId?: string, alsoSetCourse?: boolean) => any
 }
 
 class QuizForm extends React.Component<IQuizFormProps, any> {
