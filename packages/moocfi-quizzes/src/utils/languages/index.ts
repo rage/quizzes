@@ -28,6 +28,10 @@ export type GeneralLabels = {
   answered: string
   unanswered: string
   rejected: string
+  progressUpdated: string
+  answerConfirmed: string
+  answerConfirmedFor: (title: string) => string
+  courseCompleted: string
 }
 
 export type StageLabels = {
@@ -90,6 +94,8 @@ export type ReceivedPeerReviewLabels = {
   detailedViewLabel: string
   summaryViewLabel: string
   peerReviewLabel: string
+  peerReviewReceived: string
+  peerReviewReceivedFor: (title: string) => string
 }
 
 export type UnsupportedLabels = {
@@ -104,8 +110,11 @@ export type OpenLabels = {
 }
 
 export type ErrorLabels = {
+  progressFetchError: string
   submitFailedError: string
   quizLoadFailedError: string
+  submitSpamFlagError: string
+  fetchReviewCandidatesError: string
 }
 
 export type SingleLanguageLabels = {

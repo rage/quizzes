@@ -76,6 +76,9 @@ const finnishLabels: SingleLanguageLabels = {
     detailedViewLabel: "Alle Evaluationen, die deine Antwort erhalten hat",
     summaryViewLabel: "Erhaltene Peer-Evaluationen:",
     peerReviewLabel: "Peer-Evaluation",
+    peerReviewReceived: "Olet saanut uuden vertaisarvion",
+    peerReviewReceivedFor: (title: string) =>
+      `Olet saanut uuden vertaisarvion tehtävässä ${title}`,
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
@@ -129,11 +132,22 @@ const finnishLabels: SingleLanguageLabels = {
     answered: "Beantwortet",
     unanswered: "Nicht beantwortet",
     rejected: "Antwort abgelehnt, bitte erneut versuchen",
+    progressUpdated: "Kurssipisteesi ovat päivittyneet",
+    answerConfirmed: "Vastauksesi on hyväksytty",
+    answerConfirmedFor: (title: string) =>
+      `Vastauksesi tehtävään ${title} on hyväksytty`,
+    courseCompleted: "Olet päässyt läpi kurssista!",
   },
   error: {
     submitFailedError:
       "Deine Antwort konnte nicht gesendet werden. Bitte versuch es später noch einmal.",
     quizLoadFailedError: "Die Übung konnte nicht geladen werden.",
+    progressFetchError:
+      "Suoritustietojen lataaminen ei onnistunut. Kokeile myöhemmin uudestaan",
+    submitSpamFlagError:
+      "Asiattomasta vastauksesta ilmoittaminen ei onnistunut",
+    fetchReviewCandidatesError:
+      "Vastausten lataaminen vertaisarviota varten ei onnistunut. Kokeile myöhemmin uudestaan.",
   },
 }
 
