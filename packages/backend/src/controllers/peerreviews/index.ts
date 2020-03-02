@@ -23,6 +23,8 @@ import { API_PATH } from "../../config"
 import { PeerReview, Quiz, QuizAnswer, UserQuizState } from "../../models"
 import { ITMCProfileDetails } from "../../types"
 
+import { MessageType, pushMessageToClient } from "../../wsServer"
+
 @JsonController(`${API_PATH}/quizzes/peerreview`)
 export class PeerReviewController {
   @InjectManager()
@@ -134,6 +136,8 @@ export class PeerReviewController {
       this.entityManager,
     )
 
+    const oldStatus = receivingQuizAnswer.status
+
     const givingQuizAnswer: QuizAnswer = await this.quizAnswerService.getAnswer(
       {
         userId: peerReview.userId,
@@ -174,6 +178,27 @@ export class PeerReviewController {
         quiz,
         receivingQuizAnswer,
       )
+
+      const newStatus = receivingUpdated.answer.status
+      const messages: MessageType[] = [MessageType.PEER_REVIEW_RECEIVED]
+
+      if (oldStatus !== newStatus) {
+        if (newStatus === "confirmed") {
+          messages.push(MessageType.QUIZ_CONFIRMED)
+        }
+        if (newStatus === "rejected" || newStatus === "spam") {
+          messages.push(MessageType.QUIZ_REJECTED)
+        }
+      }
+
+      messages.forEach(message => {
+        pushMessageToClient(
+          receivingQuizAnswer.userId,
+          quiz.course.moocfiId,
+          message,
+          quiz.id,
+        )
+      })
     })
 
     return {
