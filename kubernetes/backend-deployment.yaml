@@ -31,6 +31,8 @@ spec:
         ports:
         - name: backend-http
           containerPort: 3000
+        - name: ws
+          containerPort: 7000
         env:
           - name: REDIS_HOST
             value: "quizzes-backend-redis-master.default.svc.cluster.local"
