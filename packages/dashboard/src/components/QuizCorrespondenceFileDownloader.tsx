@@ -92,8 +92,10 @@ class CorrespondenceIdFileDownloader extends React.Component<
               >
                 {this.props.courses
                   .sort((e1, e2) => {
-                    const title1 = e1.texts[0].title
-                    const title2 = e2.texts[0].title
+                    const title1 =
+                      e1.texts[0].title && e1.texts[0].title.toLowerCase()
+                    const title2 =
+                      e2.texts[0].title && e2.texts[0].title.toLowerCase()
                     if (title1 < title2) {
                       return -1
                     } else if (title1 > title2) {
