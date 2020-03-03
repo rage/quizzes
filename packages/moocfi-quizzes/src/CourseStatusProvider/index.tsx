@@ -98,14 +98,14 @@ export const CourseStatusProvider: React.FunctionComponent<
     }
     if (shouldConnectMoocfi) {
       connect(
-        "ws://localhost:9000",
+        "wss://www.mooc.fi/ws",
         setMoocfiClient,
         setMoocfiStatus,
       )
     }
     if (shouldConnectQuizzes) {
       connect(
-        "ws://localhost:7000",
+        "wss://quizzes.mooc.fi/ws",
         setQuizzesClient,
         setQuizzesStatus,
       )
@@ -156,7 +156,7 @@ export const CourseStatusProvider: React.FunctionComponent<
       console.log(`connected to ${host}`)
     } catch (error) {
       console.log(`could not connect to ${host}, attempting to reconnect...`)
-      //setTimeout(() => setStatus(ConnectionStatus.DISCONNECTED), 10000)
+      setTimeout(() => setStatus(ConnectionStatus.DISCONNECTED), 10000)
     }
   }
 
@@ -261,7 +261,7 @@ export const CourseStatusProvider: React.FunctionComponent<
       </CourseStatusProviderContext.Provider>
     </CourseProgressProviderContext.Provider>
   )
-}, providerPropsAreEqual)
+})
 
 export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
   Component: React.FunctionComponent<P> | React.ComponentType<P>,
