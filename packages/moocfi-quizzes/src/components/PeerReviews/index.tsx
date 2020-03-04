@@ -74,7 +74,7 @@ const PeerReviews: React.FunctionComponent = () => {
   }
 
   return (
-    <div ref={ref}>
+    <div ref={ref} role="group" aria-live="polite" aria-relevant="additions text">
       {morePeerReviewsRequired()
         ? !pastDeadline && (
             <>
@@ -84,13 +84,14 @@ const PeerReviews: React.FunctionComponent = () => {
                 peerReviewsCompletedInfo={
                   peerReviewsLabels.peerReviewsCompletedInfo
                 }
+                
               />
               <PeerReviewForm languageInfo={peerReviewsLabels} />
             </>
           )
         : !pastDeadline && (
             <TopMarginDivLarge>
-              <BoldTypography component="p" variant="subtitle1">
+              <BoldTypography component="p" variant="subtitle1" >
                 {giveExtraPeerReviewsLabel}
               </BoldTypography>
               <Togglable

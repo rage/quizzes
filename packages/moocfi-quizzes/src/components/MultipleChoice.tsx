@@ -136,26 +136,17 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   const options = item.options
 
   let direction: GridDirection = "row"
-  let alignItems: GridItemsAlignment = "baseline"
   let questionWidth: 5 | 12 = 5
-  let optionContainerWidth: GridSize = 7
   let optionWidth: GridSize = "auto"
 
   if (onlyOneItem) {
     const maxOptionLength = Math.max(
       ...options.map(option => option.texts[0].title.length),
     )
-    const width =
-      maxOptionLength > 100 ? 12 : Math.ceil(maxOptionLength / (8 + 1 / 3))
-    optionContainerWidth = 12
-    optionWidth = 12
-    questionWidth = 12
-    direction = "column"
-    alignItems = "center"
   }
 
   return (
-    <>
+    <div role="group" aria-label={item.texts[0].title}>
       <ItemContent
         direction={direction}
         providedStyles={themeProvider.multipleChoiceItemContentStyles}
@@ -167,7 +158,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
             onlyOneItem={onlyOneItem}
             questionWidth={questionWidth}
           />
-
+         
           <ChoicesContainer direction={direction} onlyOneItem={onlyOneItem}>
             {options
               .sort((o1, o2) => o1.order - o2.order)
@@ -185,7 +176,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
         </div>
         {!onlyOneItem && <FeedbackPortion item={item} />}
       </ItemContent>
-    </>
+    </div>
   )
 }
 
@@ -230,6 +221,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
           removeParagraphs
           variant="subtitle1"
           component="p"
+          id="item-question"
         >
           {title}
         </LeftAlignedMarkdownText>
@@ -238,10 +230,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
       {body && <MarkdownText>{body}</MarkdownText>}
 
       {selectOptionsLabel && (
-        <SelectOptionsLabelTypography
-          variant="subtitle1"
-          onlyOneItem={onlyOneItem}
-        >
+        <SelectOptionsLabelTypography component="p" variant="subtitle1" onlyOneItem={onlyOneItem}>
           {selectOptionsLabel}
         </SelectOptionsLabelTypography>
       )}
@@ -318,6 +307,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
           onClick={handleOptionChange(option.id)}
           disabled={quizDisabled}
           aria-selected={optionIsSelected}
+          
         >
           <MarkdownText Component={styled.div``} removeParagraphs>
             {text.title}
@@ -346,6 +336,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             correct={option.correct}
             {...clickOptions}
             aria-selected={optionIsSelected}
+            aria-label={`${text.title}-${option.correct ? "correct" : "incorrect"}`}
           >
             <MarkdownText Component={styled.div``} removeParagraphs>
               {text.title}
@@ -359,7 +350,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             shouldBeGray={shouldBeGray}
             providedStyles={themeProvider.optionWrapperStyles}
           >
-            <FeedbackPortion item={item} selectedOption={option} />
+            <FeedbackPortion item={item} selectedOption={option}/>
           </OptionWrapper>
         )}
       </React.Fragment>
@@ -377,6 +368,8 @@ const Option: React.FunctionComponent<OptionProps> = ({
           correct={option.correct}
           {...clickOptions}
           aria-selected={optionIsSelected}
+          aria-label={`${text.title}-${option.correct ? "correct" : "incorrect"}`}
+          
         >
           <MarkdownText Component={styled.div``} removeParagraphs>
             {text.title}
@@ -454,7 +447,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 
   if (ThemedDiv) {
     return (
-      <ThemedDiv correct={correct} onlyOneItem={onlyOneItem}>
+      <ThemedDiv correct={correct} onlyOneItem={onlyOneItem} >
         <CentralizedOnSmallScreenTypography variant="body1">
           {feedbackMessage}
         </CentralizedOnSmallScreenTypography>
@@ -463,14 +456,15 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   }
 
   return (
-    <LeftBorderedDiv correct={correct} onlyOneItem={onlyOneItem}>
+    
+    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem} >
       <CentralizedOnSmallScreenTypography variant="body1">
         <AttentionIcon icon={faExclamationCircle} />
       </CentralizedOnSmallScreenTypography>
       <CentralizedOnSmallScreenTypography variant="body1">
         {feedbackMessage}
       </CentralizedOnSmallScreenTypography>
-    </LeftBorderedDiv>
+    </FeedbackDiv>
   )
 }
 

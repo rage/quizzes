@@ -27,6 +27,7 @@ const SolutionPaper = styled(SpaciousPaper)<SolutionPaperProps>`
   }
 `
 
+
 const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
@@ -69,9 +70,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
 
   const guidance = (
     <>
-      <MarkdownText component="p" variant="h6">
-        {itemTitle}
-      </MarkdownText>
+      <MarkdownText id={`${itemTitle}-title`} component="p" variant="h6">{itemTitle}</MarkdownText>
       <MarkdownText variant="body1">{item.texts[0].body}</MarkdownText>
     </>
   )
@@ -91,7 +90,8 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
         fullWidth
         margin="normal"
         variant="outlined"
-        label={openLabels.placeholder}
+        label={itemTitle ? itemTitle : openLabels.placeholder}
+        id={`${itemTitle}-textfield`}
       />
     )
 
@@ -100,7 +100,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
         <div className="openAnswered">
           {guidance}
           {
-            <Typography variant="subtitle1">
+            <Typography component="p" variant="subtitle1">
               {openLabels.userAnswerLabel}:
             </Typography>
           }
@@ -128,8 +128,9 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
           fullWidth
           margin="normal"
           variant="outlined"
-          label={openLabels.placeholder}
+          label={itemTitle ? itemTitle : openLabels.placeholder}
           disabled={quizDisabled}
+          id={`${itemTitle}-textfield`}
         />
       </div>
     </ItemContent>

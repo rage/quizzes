@@ -210,7 +210,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
           <FontAwesomeIcon icon={faQuestionCircle} />
         )}
       </IconContainer>
-      <TitleContainer role="heading">
+      <TitleContainer>
         <Typography component="p" variant="subtitle1" id="quiz-type-label">
           {quizLabel}:
         </Typography>
