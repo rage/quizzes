@@ -89,7 +89,6 @@ export const CourseStatusProvider: React.FunctionComponent<
     quizzesStatus === ConnectionStatus.DISCONNECTED
 
   useEffect(() => {
-    console.log("why")
     if (shouldFetch) {
       fetchProgressData()
     }
