@@ -87,17 +87,19 @@ const recalculateProgress = async (courseId: string) => {
         coalesce(points.points / max.max_points, 0) as progress,
         coalesce(points.points, 0) as score
       from (
-        select
-          distinct(user_id),
-          course_id,
-          part
-        from user_course_part_state ucps
-        cross join (
+        select distinct on (uqs.user_id, q.part)
+          uqs.user_id,
+          q.part,
+          q.course_id
+        from user_quiz_state uqs
+        cross join quiz q
+        where q.course_id = :courseId
+        and uqs.quiz_id in (
           select
-            distinct(part)
-          from quiz q
-          where q.course_id = :courseId) as p
-        where ucps.course_id = :courseId
+            id
+          from quiz
+          where course_id = :courseId
+        )
       ) as parts
       left join (
         select

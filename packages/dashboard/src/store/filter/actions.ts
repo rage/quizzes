@@ -1,7 +1,8 @@
 import _ from "lodash"
 import { createAction } from "typesafe-actions"
+import { IQuiz } from "../../interfaces"
 import { setCourses } from "../courses/actions"
-import { setQuizzes } from "../quizzes/actions"
+import { setQuizzes, setQuizzesByQuizId } from "../quizzes/actions"
 
 export const set = createAction("filter/SET", resolve => {
   return filter => resolve(filter)
@@ -45,8 +46,26 @@ export const setCourse = (course: string) => {
   }
 }
 
-export const setQuiz = (quizId: string) => {
-  return dispatch => {
-    dispatch(set({ quiz: quizId }))
+export const setQuiz = (quizId: string, setAlsoCourse: boolean = true) => {
+  return async (dispatch, getState) => {
+    const newState: any = { quiz: quizId }
+
+    if (setAlsoCourse) {
+      if (
+        !getState().quizzes.courseInfos ||
+        getState().quizzes.courseInfos.length === 0
+      ) {
+        await dispatch(setQuizzesByQuizId(quizId))
+      }
+
+      const courseInfo = getState().quizzes.courseInfos.find(courseQuizzes =>
+        courseQuizzes.quizzes.some(quiz => quiz.id === quizId),
+      )
+      if (courseInfo) {
+        newState.course = courseInfo.courseId
+      }
+    }
+
+    dispatch(set(newState))
   }
 }

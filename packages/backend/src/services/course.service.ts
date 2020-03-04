@@ -1,11 +1,12 @@
+import Knex = require("knex")
 import { Container, Inject, Service } from "typedi"
 import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
+import { ReadStream } from "typeorm/platform/PlatformTools"
 import { v4 as uuidv4 } from "uuid"
 import { Course } from "../models"
 import { ICourseQuery } from "../types"
 import UserCourseRoleService from "./usercourserole.service"
-import Knex = require("knex")
 
 @Service()
 export class CourseService {
@@ -53,11 +54,34 @@ export class CourseService {
       )
   }
 
+  public async generateQuizTransitionFile(
+    newCourse: Course,
+    oldCourse: Course,
+  ): Promise<any> {
+    const builder = Knex({ client: "pg" })
+    const rawQuery = builder.raw(
+      `
+        SELECT id AS old_id, uuid_generate_v5(:newCourseId, id::text) AS new_id
+        FROM quiz
+        WHERE course_id = :oldCourseId
+      `,
+      {
+        newCourseId: newCourse.id,
+        oldCourseId: oldCourse.id,
+      },
+    )
+
+    const data = this.entityManager.query(rawQuery.toQuery())
+    return data
+  }
+
   public async duplicateCourse(
-    courseId: string,
+    course: Course,
     name: string,
     abbreviation: string,
   ): Promise<Course> {
+    const courseId = course.id
+
     const courseToBeDuplicated = await Course.findOne(courseId)
     if (!courseToBeDuplicated) {
       return null

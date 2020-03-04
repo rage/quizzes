@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ws
+  labels:
+    app: quizzes-backend
+spec:
+  type: NodePort
+  ports:
+  - port: 7000
+    targetPort: ws
+  selector:
+    app: quizzes-backend

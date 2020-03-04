@@ -1,12 +1,13 @@
+import JSONStream from "JSONStream"
 import {
+  Body,
   Get,
   HeaderParam,
   JsonController,
   Param,
+  Post,
   QueryParam,
   UnauthorizedError,
-  Post,
-  Body,
 } from "routing-controllers"
 import AuthorizationService, {
   Permission,
@@ -14,9 +15,9 @@ import AuthorizationService, {
 import CourseService from "services/course.service"
 import UserCourseRoleService from "services/usercourserole.service"
 import { Inject } from "typedi"
-import { EntityManager, AdvancedConsoleLogger } from "typeorm"
-import { InjectManager } from "typeorm-typedi-extensions"
+import { AdvancedConsoleLogger, EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
+import { InjectManager } from "typeorm-typedi-extensions"
 import { API_PATH } from "../../config"
 import { Course } from "../../models"
 import { ICourseQuery, ITMCProfileDetails } from "../../types"
@@ -97,7 +98,10 @@ export class CourseController {
     @Param("id") id: string,
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @Body() names: { title: string; abbreviation: string },
-  ): Promise<Course> {
+  ): Promise<{
+    newCourse: Course
+    correspondanceData: any[]
+  }> {
     const authorized = await this.authorizationService.isPermitted({
       user,
       courseId: id,
@@ -109,6 +113,58 @@ export class CourseController {
     }
 
     const { title, abbreviation } = names
-    return await this.courseService.duplicateCourse(id, title, abbreviation)
+
+    const oldCourse = await Course.findOne(id)
+    if (!oldCourse) {
+      throw new Error("The id does not match any course")
+    }
+
+    const newCourse = await this.courseService.duplicateCourse(
+      oldCourse,
+      title,
+      abbreviation,
+    )
+    const correspondanceData = await this.courseService.generateQuizTransitionFile(
+      newCourse,
+      oldCourse,
+    )
+    return { newCourse, correspondanceData }
+  }
+
+  @Get("/:id/quizIdFile")
+  public async createCorrespondenceTable(
+    @Param("id") id: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+    @QueryParam("oldCourse") oldCourseId: string,
+  ): Promise<any> {
+    let authorized = await this.authorizationService.isPermitted({
+      user,
+      courseId: id,
+      permission: Permission.DUPLICATE,
+    })
+
+    authorized =
+      authorized &&
+      (await this.authorizationService.isPermitted({
+        user,
+        courseId: oldCourseId,
+        permission: Permission.DUPLICATE,
+      }))
+
+    if (!authorized) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const courses = await Course.findByIds([id, oldCourseId])
+
+    if (courses.length < 2) {
+      throw new Error("Invalid course id(s)")
+    }
+
+    const result = await this.courseService.generateQuizTransitionFile(
+      courses.find(c => c.id === id),
+      courses.find(c => c.id === oldCourseId),
+    )
+    return result
   }
 }
