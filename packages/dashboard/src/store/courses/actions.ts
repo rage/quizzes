@@ -1,4 +1,5 @@
 import { createAction } from "typesafe-actions"
+import { createAndSaveSpaceSeparatedValueFile } from "../../components/tools"
 import { ICourse } from "../../interfaces"
 import { duplicateCourse, getCourses } from "../../services/courses"
 import { setCourse } from "../filter/actions"
@@ -21,13 +22,17 @@ export const createDuplicateCourse = (
 ) => {
   return async (dispatch, getState) => {
     try {
-      const newCourse = await duplicateCourse(
+      const { newCourse, correspondanceData } = await duplicateCourse(
         courseId,
         title,
         abbreviation,
         getState().user,
       )
       dispatch(add(newCourse))
+      createAndSaveSpaceSeparatedValueFile(
+        correspondanceData,
+        `quiz_ids_${courseId}_to_${newCourse.id}`,
+      )
       dispatch(displayMessage(`The course ${title} was created!`, false))
     } catch (error) {
       console.log(error)

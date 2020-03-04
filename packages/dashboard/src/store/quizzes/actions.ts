@@ -1,4 +1,5 @@
 import { createAction } from "typesafe-actions"
+import { IQuiz } from "../../interfaces"
 import { getQuiz, getQuizzes } from "../../services/quizzes"
 
 export const set = createAction("quizzes/SET", resolve => {
@@ -52,19 +53,31 @@ export const setQuizzes = (course: string) => {
 export const setQuizzesByQuizId = (quizId: string) => {
   return async (dispatch, getState) => {
     try {
-      const data = await getQuiz(quizId)
+      // surely this might be stored locally sometimes?
+      const data = await getQuizFromStoreOrBackend(quizId, getState)
       const courseId = data.courseId
       if (courseId) {
-        dispatch(setQuizzes(courseId))
-        /*
-        data = await getQuizzes(courseId, getState().user)
-        dispatch(set({ courseId, quizzes: data }))
-        */
+        await dispatch(setQuizzes(courseId))
       }
     } catch (e) {
       console.log(e)
     }
   }
+}
+
+const getQuizFromStoreOrBackend = async (
+  quizId: string,
+  storeStateGetter: any,
+): Promise<IQuiz> => {
+  const courseQuizCollections = storeStateGetter().quizzes.courseInfos
+  let quiz: IQuiz
+  for (let i = 0; i < courseQuizCollections.legnth; i++) {
+    quiz = courseQuizCollections[i].quizzes.find(q => q.id === quizId)
+    if (quiz) {
+      return quiz
+    }
+  }
+  return await getQuiz(quizId)
 }
 
 export interface ICourseQuizzes {

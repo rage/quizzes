@@ -81,7 +81,7 @@ export const addUser = (
     dispatch(set(userInfo))
   }
   if (loginFormCompleted) {
-    dispatch(Notification.displayMessage(`Welcome, ${user.username}!`, false))
+    dispatch(Notification.displayMessage(`Welcome!`, false))
   }
   dispatch(Courses.setCourses())
   dispatch(AnswerCounts.setAnswerCounts())

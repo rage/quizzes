@@ -9,6 +9,7 @@ import { setCourse } from "../store/filter/actions"
 import { IUserState } from "../store/user/reducer"
 import CourseDuplicateButton from "./CourseDuplicateButton"
 import LanguageBar from "./GeneralTools/LanguageBar"
+import QuizCorrespondenceFileDownloader from "./QuizCorrespondenceFileDownloader"
 
 interface ISingleCoursePropsFromParent {
   match: any
@@ -131,7 +132,14 @@ class SingleCourseView extends React.Component<
             spacing={16}
           >
             <Grid item={true} sm={3}>
-              {this.props.user.administrator && <CourseDuplicateButton />}
+              {this.props.user.administrator && (
+                <React.Fragment>
+                  <CourseDuplicateButton />
+                  <div style={{ marginTop: "10px" }}>
+                    <QuizCorrespondenceFileDownloader />
+                  </div>
+                </React.Fragment>
+              )}
             </Grid>
 
             <Grid item={true} xs={12} sm={6} style={{ alignSelf: "center" }}>
