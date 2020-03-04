@@ -7,119 +7,118 @@ const finnishLabels: SingleLanguageLabels = {
     currentNumberOfWordsLabel: "Antal ord",
     textFieldLabel: "Ditt svar",
     conformToLimitsToSubmitLabel:
-      "Muokkaa vastauksesi sanarajojen sisään voidaksesi lähettää sen",
+      "För att skicka svaret, se till att det är mellan ordgränserna",
     wordLimitsGuidance: (min, max) => {
       if (!min && !max) {
         return ""
       }
 
       if (!min) {
-        return `Vastaa korkeintaan ${max} sanalla`
+        return `Ditt svar borde vara högst ${max} ord lång`
       }
 
       if (!max) {
-        return `Vastaa vähintään ${min} sanalla`
+        return `Ditt svar borde vara minst ${min} ord lång`
       }
 
-      return `Vastaa ${min}-${max} sanalla`
+      return `Ditt svar borde vara mellan ${min} och ${max} ord lång`
     },
   },
   open: {
-    placeholder: "Vastaus",
+    placeholder: "Svar",
     userAnswerLabel: "Ditt svar",
-    feedbackForFailure: "Vastauksesi ei ole oikein",
-    feedbackForSuccess: "Vastauksesi on oikein",
+    feedbackForFailure: "Ditt svar är inte rätt",
+    feedbackForSuccess: "Ditt svar är rätt",
   },
   peerReviews: {
     loadingLabel: "Laddas",
-    noPeerAnswersAvailableLabel: "Vertaisarvioitavia vastauksia ei saatavilla",
+    noPeerAnswersAvailableLabel: "Svar för peer review föreliggar inte",
     chooseButtonLabel: "Välj",
-    unselectButtonLabel: "Peru valinta",
-    chooseEssayInstruction: "Valitse yksi vaihtoehdoista arvoitavaksi",
-    chosenEssayInstruction: "Arvioi valitsemasi vastaus:",
-    displayPeerReview: "Anna vertaisarvio",
+    unselectButtonLabel: "Avbryt valet",
+    chooseEssayInstruction: "Välj en alternativ för uppskattning",
+    chosenEssayInstruction: "Granska det svaret som du valt:",
+    displayPeerReview: "Ge peer review",
     giveExtraPeerReviews:
-      "Olet antanut vaaditun määrän vertaisarvioita. Jos annat vielä lisää vertaisarvioita, oma vastauksesi tulee nopeammin arvioiduksi!",
+      "Du har redan givit tillräckligt många uppskattningar. Om du skriver ännu mera uppskattningar, ditt svar ska granskas snabbare!",
     giveExtraPeerReviewsQuizConfirmed:
-      "Voit halutessasi vielä antaa lisää vertaisarvioita",
-    givenPeerReviewsLabel: "Vertaisarvioita annettu",
-    peerReviewsCompletedInfo: "Olet antanut tarpeeksi monta vertaisarviota",
+      "Om du vill kan du fortfarande ge peer reviews för att hjälpa andra.",
+    givenPeerReviewsLabel: "Antalet givna peer reviews",
+    peerReviewsCompletedInfo: "Du har givit tillräckligt peer reviews",
     reportAsInappropriateLabel: "Meddela om osakligt svar",
-    submitPeerReviewLabel: "Lähetä vertaisarvio",
-    hidePeerReviewLabel: "Piilota",
+    submitPeerReviewLabel: "Skicka peer review",
+    hidePeerReviewLabel: "Gömma",
     quizInvolvesNoPeerReviewsInstruction:
       "Tähän tehtävään ei liity vertaisarvioita",
     peerReviewsInfoForLoggedOutUser: "Kyselyyn liittyy vertaisarviointiosio",
-    essayQuestionAnswerTextBoxLabel: "Kirjoita arvio",
+    essayQuestionAnswerTextBoxLabel: "Skriv en uppskattning",
     optionLabel: "Alternativ",
-    answerRejected: "Vastauksesi on hylätty",
-    answerFlaggedAsSpam: "Vastauksesi on hylätty epäasiallisena",
-    answerConfirmed: "Vastaus hyväksytty!",
-    manualReview: "Vastauksesi odottaa kurssihenkilökunnan arviota",
+    answerRejected: "Ditt svar är underkänt",
+    answerFlaggedAsSpam: "Ditt svar har rapporteras som spam",
+    answerConfirmed: "Ditt svar är godkänt!!",
+    manualReview: "Kursens personal håller på att uppskatta ditt svar",
   },
   receivedPeerReviews: {
     errorLabel:
-      "Virhe saatujen vertaisarviontien näyttämisessä. Kokeile ladata sivu uudelleen.",
-    noSupportForQuestionTypeLabel:
-      "Tämänlaista vertaisarviointikysymyksen tyyppiä ei tueta",
-    loadingLabel: "Ladataan saamiasi vertaisarvioita...",
+      "Någöt misslyckades med att visa peer reviews. Försök uppdatera webbsidan.",
+    noSupportForQuestionTypeLabel: "Den här peer review typen stöds inte",
+    loadingLabel: "Laddas mottagna peer reviews...",
     noPeerReviewsReceivedlabel:
-      "Vastauksesi ei ole vielä saanut vertaisarvioita",
+      "Ditt svar har inte ännu mottagit peer reviews ",
     numberOfPeerReviewsText: n =>
-      `Vastauksesi on saanut ${n} arvio${n > 0 ? "ta" : "n"}.`,
-    toggleButtonExpandLabel: "Näytä kaikki saamasi vertaisarviot",
-    toggleButtonShrinkLabel: "Piilota saamasi vertaisarviot",
-    averageOfGradesLabel: "Kaikkien arvosteluiden keskiarvo on",
-    detailedViewLabel: "Kaikki vastauksesi saamat vertaisarviot",
-    summaryViewLabel: "Saamasi vertaisarviot:",
-    peerReviewLabel: "Vertaisarvio",
-    peerReviewReceived: "Olet saanut uuden vertaisarvion",
+      `Ditt svar har tagit emot ${n} peer review${n > 0 ? "s" : ""}.`,
+    toggleButtonExpandLabel: "Visa alla mottagna peer reviews",
+    toggleButtonShrinkLabel: "Gömma peer reviews",
+    averageOfGradesLabel: "Det medelvärdet av alla mottagna peer reviews är",
+    detailedViewLabel: "Alla uppskattningar som ditt svar har mottagit",
+    summaryViewLabel: "Mottagna peer reviews:",
+    peerReviewLabel: "Peer review",
+    peerReviewReceived: "Du har fått en ny peer review",
     peerReviewReceivedFor: (title: string) =>
-      `Olet saanut uuden vertaisarvion tehtävässä ${title}`,
+      `Du har fått en ny peer review i uppgiften ${title}`,
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
-      `Kysymystyyppiä'${itemType}' ei tueta.`,
+      `Frågtypen ${itemType} stöds inte.`,
   },
   multipleChoice: {
-    selectCorrectAnswerLabel: "Valitse oikea vaihtoehto",
-    chooseAllSuitableOptionsLabel: "Valitse kaikki sopivat vaihtoehdot.",
+    selectCorrectAnswerLabel: "Välj det rätta alternativet",
+    chooseAllSuitableOptionsLabel: "Välj alla lämpliga alternativ.",
     answerCorrectLabel: "Rätt",
     answerIncorrectLabel: "Fel",
   },
   stage: {
-    answerStageLabel: "Tehtävään vastaaminen",
-    givingPeerReviewsStageLabel: "Vertaisarvioiden antaminen",
-    receivingPeerReviewsStageLabel: "Vertaisarvioiden vastaanottaminen",
-    evaluationStageLabel: "Odottaa arvostelua",
+    answerStageLabel: "Svara på uppgiften",
+    givingPeerReviewsStageLabel: "Ge peer reviews",
+    receivingPeerReviewsStageLabel: "Svaret mottar peer reviews",
+    evaluationStageLabel: "Svaret väntar på bedömning",
   },
   general: {
-    pastDeadline: "Et voi vastata enää tähän tehtävään",
+    pastDeadline: "Du kan inte längre svara den här uppgiften",
     answerMissingBecauseQuizModifiedLabel:
-      "Kysymykseen ei vastattu. Tehtävää todennäköisesti muutettu vastaamisen jälkeen.",
+      "Frågan har inte svarats. Sannolikt har uppgiften bearbetats efter ditt svar.",
     submitButtonLabel: "Skicka",
-    errorLabel: "Virhe",
-    loginToViewPromptLabel: "Kirjaudu sisään nähdäksesi tehtävän",
-    loginToAnswerPromptLabel: "Kirjaudu sisään vastataksesi tehtävään",
+    errorLabel: "Fel",
+    loginToViewPromptLabel: "Logga in för att visa uppgiften",
+    loginToAnswerPromptLabel: "Logga in för att svara uppgiften",
     loadingLabel: "Laddas",
-    answerCorrectLabel: "Vastaus oikein",
-    alreadyAnsweredLabel: "Olet jo vastannut tähän",
-    answerIncorrectLabel: "Vastaus väärin",
-    kOutOfNCorrect: (k, n) => `Sait ${k}/${n} oikein`,
-    pointsAvailableLabel: "Pisteitä saatavissa",
-    pointsReceivedLabel: "Saamasi pisteet",
+    answerCorrectLabel: "Svaret är rätt",
+    alreadyAnsweredLabel: "Du har redan svarit den här",
+    answerIncorrectLabel: "Svaret är inte rätt",
+    kOutOfNCorrect: (k, n) => `${k}/${n} rätta svar`,
+    pointsAvailableLabel: "Antalet poäng som man kan få från uppgiften",
+    pointsReceivedLabel: "Dina poängt",
     incorrectSubmitWhileTriesLeftLabel:
-      "Vastauksesi ei ollut täysin oikein. Ole hyvä ja yritä uudestaan!",
-    triesRemainingLabel: "Yrityksiä jäljellä",
-    quizLabel: "Kysely",
-    pointsLabel: "Pisteitä",
-    triesNotLimitedLabel: "Yritysten lukumäärää ei rajattu",
-    submitGeneralFeedbackLabel: "Vastattu",
-    submitButtonAlreadyAnsweredLabel: "Vastattu",
+      "Svaret var inte helt rätt. Var snäll och försök på nytt!",
+    triesRemainingLabel: "Antalet försök kvar",
+    quizLabel: "Quiz",
+    pointsLabel: "Poäng",
+    triesNotLimitedLabel: "Antalet försök har ingen gräns",
+    submitGeneralFeedbackLabel: "Skickat",
+    submitButtonAlreadyAnsweredLabel: "Svarat",
     pointsGrantingPolicyInformer: policy => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
-          return "Vastauksen on oltava täysin oikein saadaksesi pisteitä"
+          return "Svaret ska vara helt rätt för att tjäna poäng"
         case "grant_whenever_possible":
           return ""
         default:
@@ -127,19 +126,20 @@ const finnishLabels: SingleLanguageLabels = {
       }
     },
     // These three are in elements of ai messages
-    answered: "Vastattu",
+    answered: "Skickat",
     unanswered: "Vastaamaton",
     rejected: "Vastaus hylätty, yritä uudelleen",
     progressUpdated: "Kurssipisteesi ovat päivittyneet",
     answerConfirmed: "Vastauksesi on hyväksytty",
     answerConfirmedFor: (title: string) =>
       `Vastauksesi tehtävään ${title} on hyväksytty`,
-    courseCompleted: "Olet päässyt läpi kurssista!",
+    courseCompleted: "Du har avklarat kursen!",
   },
   error: {
     submitFailedError:
-      "Vastauksen lähettäminen ei onnistunut. Kokeile myöhemmin uudestaan.",
-    quizLoadFailedError: "Tehtävän lataaminen ei onnistunut",
+      "Misslyckades att skicka svaret. Försök på nytt senare, tack.",
+    quizLoadFailedError:
+      "Misslyckades att skicka svaret. Försök på nytt senare, tack.",
     progressFetchError:
       "Suoritustietojen lataaminen ei onnistunut. Kokeile myöhemmin uudestaan",
     submitSpamFlagError:
