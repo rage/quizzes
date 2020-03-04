@@ -203,6 +203,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   const fatal = messageState.fatal
 
+
   useEffect(
     () => {
       dispatch(
@@ -347,7 +348,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const wrongLocale = !!(customContent && customContent.WrongLocale)
 
   return (
-    <OuterDiv providedStyles={themeProvider.mainDivStyles}>
+    <OuterDiv providedStyles={themeProvider.mainDivStyles} aria-label={quiz.texts[0].title} role="form">
       <TopInfoBar />
       <div ref={ref} />
       <Notification scrollRef={ref} />

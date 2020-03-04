@@ -61,6 +61,7 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
           color="primary"
           onChange={toggle}
           {...checkboxOptions}
+          inputProps={{'aria-label':`${title}`}}
         />
       </Grid>
       <VertCenteredGrid item xs>
