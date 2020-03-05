@@ -2,124 +2,122 @@ import { SingleLanguageLabels } from "./index"
 
 const finnishLabels: SingleLanguageLabels = {
   essay: {
-    exampleAnswerLabel: "Näidisvastus",
-    userAnswerLabel: "Teie vastus",
+    exampleAnswerLabel: "Näide",
+    userAnswerLabel: "Sinu vastus",
     currentNumberOfWordsLabel: "Sõnade arv",
     textFieldLabel: "Teie vastus",
     conformToLimitsToSubmitLabel:
-      "Muokkaa vastauksesi sanarajojen sisään voidaksesi lähettää sen",
+      "Kontrolli, et sinu vastus mahub sõnade limiiti",
     wordLimitsGuidance: (min, max) => {
       if (!min && !max) {
         return ""
       }
 
       if (!min) {
-        return `Vastaa korkeintaan ${max} sanalla`
+        return `Sinu vastus ei tohiks ületada ${max} sõna`
       }
 
       if (!max) {
-        return `Vastaa vähintään ${min} sanalla`
+        return `Sinu vastus peaks olema vähemalt ${min} sõna `
       }
 
-      return `Vastaa ${min}-${max} sanalla`
+      return `Sinu vastus peaks olema ${min} ja ${max} sõna piires`
     },
   },
   open: {
     placeholder: "Vastus",
-    userAnswerLabel: "Teie vastus",
-    feedbackForFailure: "Vastauksesi ei ole oikein",
-    feedbackForSuccess: "Vastauksesi on oikein",
+    userAnswerLabel: "Sinu vastus",
+    feedbackForFailure: "Sinu vastus ei ole õige",
+    feedbackForSuccess: "Sinu vastus on õige",
   },
   peerReviews: {
-    loadingLabel: "Laen",
-    noPeerAnswersAvailableLabel: "Vertaisarvioitavia vastauksia ei saatavilla",
+    loadingLabel: "Laeb",
+    noPeerAnswersAvailableLabel: "Hinnanguid ei ole",
     chooseButtonLabel: "Vali",
-    unselectButtonLabel: "Peru valinta",
-    chooseEssayInstruction: "Valitse yksi vaihtoehdoista arvoitavaksi",
-    chosenEssayInstruction: "Arvioi valitsemasi vastaus:",
-    displayPeerReview: "Anna vertaisarvio",
+    unselectButtonLabel: "Tühista valik",
+    chooseEssayInstruction: "Vali üks, millele hinnang anda",
+    chosenEssayInstruction: "Anna hinnang valitud vastusele:",
+    displayPeerReview: "Anna vastastikune hinnang",
     giveExtraPeerReviews:
-      "Olet antanut vaaditun määrän vertaisarvioita. Jos annat vielä lisää vertaisarvioita, oma vastauksesi tulee nopeammin arvioiduksi!",
+      "Oled andnud piisava arvu vastastikuseid hinnanguid. Kui annad rohkem hinnanguid, siis ka sinu vastuseid vaadatakse kiiremini läbi!",
     giveExtraPeerReviewsQuizConfirmed:
-      "Voit halutessasi vielä antaa lisää vertaisarvioita",
-    givenPeerReviewsLabel: "Vertaisarvioita annettu",
-    peerReviewsCompletedInfo: "Olet antanut tarpeeksi monta vertaisarviota",
-    reportAsInappropriateLabel: "Teata spämmist",
-    submitPeerReviewLabel: "Lähetä vertaisarvio",
-    hidePeerReviewLabel: "Piilota",
+      "Võid anda veel hinnanguid, et teistele abiks olla",
+    givenPeerReviewsLabel: "Vastastikune hindamine tehtud",
+    peerReviewsCompletedInfo: "Oled andnud piisavalt hinnanguid",
+    reportAsInappropriateLabel: "Anna teada spämmist",
+    submitPeerReviewLabel: "Esita hinnang",
+    hidePeerReviewLabel: "Peida",
     quizInvolvesNoPeerReviewsInstruction:
       "Tähän tehtävään ei liity vertaisarvioita",
     peerReviewsInfoForLoggedOutUser: "Kyselyyn liittyy vertaisarviointiosio",
-    essayQuestionAnswerTextBoxLabel: "Kirjoita arvio",
-    optionLabel: "Optsioon",
-    answerRejected: "Vastauksesi on hylätty",
-    answerFlaggedAsSpam: "Vastauksesi on hylätty epäasiallisena",
-    answerConfirmed: "Vastaus hyväksytty!",
-    manualReview: "Vastauksesi odottaa kurssihenkilökunnan arviota",
+    essayQuestionAnswerTextBoxLabel: "Kirjuta hinnang",
+    optionLabel: "Valik",
+    answerRejected: "Sinu vastus on tagasi lükatud",
+    answerFlaggedAsSpam: "Sinu vastus on märgitud spämmiks",
+    answerConfirmed: "Sinu vastus on vastu võetud!",
+    manualReview: "Sinu vastust vaatab läbi kursuse koordinaator",
   },
   receivedPeerReviews: {
     errorLabel:
-      "Virhe saatujen vertaisarviontien näyttämisessä. Kokeile ladata sivu uudelleen.",
-    noSupportForQuestionTypeLabel:
-      "Tämänlaista vertaisarviointikysymyksen tyyppiä ei tueta",
-    loadingLabel: "Ladataan saamiasi vertaisarvioita...",
-    noPeerReviewsReceivedlabel:
-      "Vastauksesi ei ole vielä saanut vertaisarvioita",
+      "Ilmnes viga hinnangute laadimisel. Palun proovi lehte uuesti laadida.",
+    noSupportForQuestionTypeLabel: "Seda sorti hinnangu küsimus pole toetatud.",
+    loadingLabel: "Laetakse kogutud hinnanguid...",
+    noPeerReviewsReceivedlabel: "Sinu vastusele pole veel hinnangut antud",
     numberOfPeerReviewsText: n =>
-      `Vastauksesi on saanut ${n} arvio${n > 0 ? "ta" : "n"}.`,
-    toggleButtonExpandLabel: "Näytä kaikki saamasi vertaisarviot",
-    toggleButtonShrinkLabel: "Piilota saamasi vertaisarviot",
-    averageOfGradesLabel: "Kaikkien arvosteluiden keskiarvo on",
-    detailedViewLabel: "Kaikki vastauksesi saamat vertaisarviot",
-    summaryViewLabel: "Saamasi vertaisarviot:",
-    peerReviewLabel: "Vertaisarvio",
-    peerReviewReceived: "Olet saanut uuden vertaisarvion",
+      `Sinu vastus on saanud n vastastikust hinnangut`,
+    toggleButtonExpandLabel: "Näita kõiki saadud hinnanguid",
+    toggleButtonShrinkLabel: "Peida hinnangud",
+    averageOfGradesLabel: "Keskmine hinne saadud hinnangutel on",
+    detailedViewLabel: "Kõik hinnangud, mis sinu vastusele on antud",
+    summaryViewLabel: "Saadud hinnangud:",
+    peerReviewLabel: "Vastastikused hinnangud",
+    peerReviewReceived: "Oled saanud uue vastastikuse hinnangu",
     peerReviewReceivedFor: (title: string) =>
-      `Olet saanut uuden vertaisarvion tehtävässä ${title}`,
+      `Oled saanud uue vastastikuse hinnangu ülesandes ${title}`,
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
-      `Kysymystyyppiä'${itemType}' ei tueta.`,
+      `'${itemType}' tüüpi küsimused pole toetatud.`,
   },
   multipleChoice: {
-    selectCorrectAnswerLabel: "Valitse oikea vaihtoehto",
-    chooseAllSuitableOptionsLabel: "Valitse kaikki sopivat vaihtoehdot.",
+    selectCorrectAnswerLabel: "Vali õige vastus",
+    chooseAllSuitableOptionsLabel: "vali kõik, mis sobivad.",
     answerCorrectLabel: "Õige",
     answerIncorrectLabel: "Vale",
   },
   stage: {
-    answerStageLabel: "Tehtävään vastaaminen",
-    givingPeerReviewsStageLabel: "Vertaisarvioiden antaminen",
-    receivingPeerReviewsStageLabel: "Vertaisarvioiden vastaanottaminen",
-    evaluationStageLabel: "Odottaa arvostelua",
+    answerStageLabel: "Harjutusele vastamine",
+    givingPeerReviewsStageLabel: "Vastastikuse hinnangu andmine",
+    receivingPeerReviewsStageLabel: "Vastastikuse hinnangu ootel",
+    evaluationStageLabel: "Hinnangu ootel",
   },
   general: {
-    pastDeadline: "Et voi vastata enää tähän tehtävään",
+    pastDeadline: "Enam ei saa harjutusele vastust anda",
     answerMissingBecauseQuizModifiedLabel:
-      "Kysymykseen ei vastattu. Tehtävää todennäköisesti muutettu vastaamisen jälkeen.",
+      "Küsimusele pole vastatud. Küsimustikku on tõenäoliselt pärast sinu vastust muudetud.",
     submitButtonLabel: "Esita",
-    errorLabel: "Virhe",
-    loginToViewPromptLabel: "Kirjaudu sisään nähdäksesi tehtävän",
-    loginToAnswerPromptLabel: "Kirjaudu sisään vastataksesi tehtävään",
-    loadingLabel: "Laen",
-    answerCorrectLabel: "Vastaus oikein",
-    alreadyAnsweredLabel: "Olet jo vastannut tähän",
-    answerIncorrectLabel: "Vastaus väärin",
-    kOutOfNCorrect: (k, n) => `Sait ${k}/${n} oikein`,
-    pointsAvailableLabel: "Pisteitä saatavissa",
-    pointsReceivedLabel: "Saamasi pisteet",
+    errorLabel: "Viga",
+    loginToViewPromptLabel: "Logi sisse, et ülesannet vaadata",
+    loginToAnswerPromptLabel: "Logi sisse, et ülesannet vaadata",
+    loadingLabel: "Laeb",
+    answerCorrectLabel: "Vastus on õige",
+    alreadyAnsweredLabel: "Sa oled juba sellele vastanud",
+    answerIncorrectLabel: "Vastus pole õige",
+    kOutOfNCorrect: (k, n) => `${k}/${n} õiget vastust`,
+    pointsAvailableLabel: "Ülesande eest saadavad punktid",
+    pointsReceivedLabel: "Saadud punktid",
     incorrectSubmitWhileTriesLeftLabel:
-      "Vastauksesi ei ollut täysin oikein. Ole hyvä ja yritä uudestaan!",
-    triesRemainingLabel: "Yrityksiä jäljellä",
-    quizLabel: "Kysely",
-    pointsLabel: "Pisteitä",
-    triesNotLimitedLabel: "Yritysten lukumäärää ei rajattu",
-    submitGeneralFeedbackLabel: "Vastattu",
-    submitButtonAlreadyAnsweredLabel: "Vastattu",
+      "Vastus pole täielikult õige. Palun proovi uuesti!",
+    triesRemainingLabel: "Kaitseid jäänud",
+    quizLabel: "Küsitlus",
+    pointsLabel: "Punktid",
+    triesNotLimitedLabel: "Katsete arv ei ole piiratud",
+    submitGeneralFeedbackLabel: "Esitatud",
+    submitButtonAlreadyAnsweredLabel: "Vastatud",
     pointsGrantingPolicyInformer: policy => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
-          return "Vastauksen on oltava täysin oikein saadaksesi pisteitä"
+          return "Punktide saamiseks peab vastus täielikult õige olema"
         case "grant_whenever_possible":
           return ""
         default:
@@ -127,25 +125,23 @@ const finnishLabels: SingleLanguageLabels = {
       }
     },
     // These three are in elements of ai messages
-    answered: "Vastattu",
-    unanswered: "Vastaamaton",
-    rejected: "Vastaus hylätty, yritä uudelleen",
-    progressUpdated: "Kurssipisteesi ovat päivittyneet",
-    answerConfirmed: "Vastauksesi on hyväksytty",
+    answered: "Vastatud",
+    unanswered: "Ei vastatud",
+    rejected: "Sinu vastus on tagasi lükatud. Palun proovi uuesti",
+    progressUpdated: "Kursuse progress uuendatud",
+    answerConfirmed: "Sinu vastus on kinnitatud!",
     answerConfirmedFor: (title: string) =>
-      `Vastauksesi tehtävään ${title} on hyväksytty`,
-    courseCompleted: "Olet päässyt läpi kurssista!",
+      `Sinu vastus ülesandes ${title} on kinnitatud!`,
+    courseCompleted: "Oled kursuse lõpetanud!",
   },
   error: {
-    submitFailedError:
-      "Vastauksen lähettäminen ei onnistunut. Kokeile myöhemmin uudestaan.",
-    quizLoadFailedError: "Tehtävän lataaminen ei onnistunut",
+    submitFailedError: "Ei saanud vastust saata. Palun proovi hiljem uuesti.",
+    quizLoadFailedError: "Ei saanud harjutust laadida.",
     progressFetchError:
-      "Suoritustietojen lataaminen ei onnistunut. Kokeile myöhemmin uudestaan",
-    submitSpamFlagError:
-      "Asiattomasta vastauksesta ilmoittaminen ei onnistunut",
+      "Ei saanud kursuse staatuse infot laadida. Palun proovi hiljem uuesti.",
+    submitSpamFlagError: "Ei saanud spämmi raporteerida",
     fetchReviewCandidatesError:
-      "Vastausten lataaminen vertaisarviota varten ei onnistunut. Kokeile myöhemmin uudestaan.",
+      "Midagi läks valesti. Palun proovi hiljem uuesti.",
   },
 }
 
