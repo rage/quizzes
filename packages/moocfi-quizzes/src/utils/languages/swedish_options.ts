@@ -7,118 +7,122 @@ const finnishLabels: SingleLanguageLabels = {
     currentNumberOfWordsLabel: "Antal ord",
     textFieldLabel: "Ditt svar",
     conformToLimitsToSubmitLabel:
-      "För att skicka svaret, se till att det är mellan ordgränserna",
+      "För att kunna skicka ditt svar, bearbeta det inom det begränsade ordantalet.",
     wordLimitsGuidance: (min, max) => {
       if (!min && !max) {
         return ""
       }
 
       if (!min) {
-        return `Ditt svar borde vara högst ${max} ord lång`
+        return `Ditt svar bör inte överskrida ${max} ord.`
       }
 
       if (!max) {
-        return `Ditt svar borde vara minst ${min} ord lång`
+        return `Ditt svar bör vara minst ${min} ord`
       }
 
-      return `Ditt svar borde vara mellan ${min} och ${max} ord lång`
+      return `Ditt svar bör vara mellan ${min} och ${max} ord`
     },
   },
   open: {
     placeholder: "Svar",
     userAnswerLabel: "Ditt svar",
-    feedbackForFailure: "Ditt svar är inte rätt",
+    feedbackForFailure: "Ditt svar är fel",
     feedbackForSuccess: "Ditt svar är rätt",
   },
   peerReviews: {
-    loadingLabel: "Laddas",
-    noPeerAnswersAvailableLabel: "Svar för peer review föreliggar inte",
+    loadingLabel: "Laddar",
+    noPeerAnswersAvailableLabel:
+      "Inga svar tillgängliga för kollegial bedömning",
     chooseButtonLabel: "Välj",
-    unselectButtonLabel: "Avbryt valet",
-    chooseEssayInstruction: "Välj en alternativ för uppskattning",
-    chosenEssayInstruction: "Granska det svaret som du valt:",
-    displayPeerReview: "Ge peer review",
+    unselectButtonLabel: "Upphäv valet",
+    chooseEssayInstruction: "Välj ett alternativ för bedömning",
+    chosenEssayInstruction: "Bedöm det svar som du valde:",
+    displayPeerReview: "Ge kollegial bedömning",
     giveExtraPeerReviews:
-      "Du har redan givit tillräckligt många uppskattningar. Om du skriver ännu mera uppskattningar, ditt svar ska granskas snabbare!",
+      "Du har gett det krävda antalet kollegiala bedömningar. Om du ger flera kollegiala bedömningar, bedöms dina svar snabbare!",
     giveExtraPeerReviewsQuizConfirmed:
-      "Om du vill kan du fortfarande ge peer reviews för att hjälpa andra.",
-    givenPeerReviewsLabel: "Antalet givna peer reviews",
-    peerReviewsCompletedInfo: "Du har givit tillräckligt peer reviews",
-    reportAsInappropriateLabel: "Meddela om osakligt svar",
-    submitPeerReviewLabel: "Skicka peer review",
-    hidePeerReviewLabel: "Gömma",
+      "Om du vill kan du ge ännu fler kollegiala bedömningar för att hjälpa andra.",
+    givenPeerReviewsLabel: "Kollegiala bedömningar givna",
+    peerReviewsCompletedInfo:
+      "Du har gett tillräckligt många kollegiala bedömningar.",
+    reportAsInappropriateLabel: "Anmäl om osakligt svar",
+    submitPeerReviewLabel: "Skicka den kollegiala bedömningen",
+    hidePeerReviewLabel: "Göm",
     quizInvolvesNoPeerReviewsInstruction:
       "Tähän tehtävään ei liity vertaisarvioita",
     peerReviewsInfoForLoggedOutUser: "Kyselyyn liittyy vertaisarviointiosio",
-    essayQuestionAnswerTextBoxLabel: "Skriv en uppskattning",
+    essayQuestionAnswerTextBoxLabel: "Skriv en bedömning",
     optionLabel: "Alternativ",
-    answerRejected: "Ditt svar är underkänt",
-    answerFlaggedAsSpam: "Ditt svar har rapporteras som spam",
-    answerConfirmed: "Ditt svar är godkänt!!",
-    manualReview: "Kursens personal håller på att uppskatta ditt svar",
+    answerRejected: "Ditt svar är inte godkänt",
+    answerFlaggedAsSpam: "Ditt svar har underkänts som osakligt",
+    answerConfirmed: "Ditt svar är godkänt!",
+    manualReview: "Ditt svar väntar på bedömning av kurspersonalen",
   },
   receivedPeerReviews: {
     errorLabel:
-      "Någöt misslyckades med att visa peer reviews. Försök uppdatera webbsidan.",
-    noSupportForQuestionTypeLabel: "Den här peer review typen stöds inte",
-    loadingLabel: "Laddas mottagna peer reviews...",
+      "Det förekom ett fel i visningen av inlämnade bedömningar. Vänligen försök ladda sidan på nytt.",
+    noSupportForQuestionTypeLabel:
+      "Den här typen av kollegial bedömningsfråga stöds inte",
+    loadingLabel: "Laddar inkomna kollegiala bedömningar…",
     noPeerReviewsReceivedlabel:
-      "Ditt svar har inte ännu mottagit peer reviews ",
+      "Ditt svar har inte ännu fått kollegial bedömning",
     numberOfPeerReviewsText: n =>
-      `Ditt svar har tagit emot ${n} peer review${n > 0 ? "s" : ""}.`,
-    toggleButtonExpandLabel: "Visa alla mottagna peer reviews",
-    toggleButtonShrinkLabel: "Gömma peer reviews",
-    averageOfGradesLabel: "Det medelvärdet av alla mottagna peer reviews är",
-    detailedViewLabel: "Alla uppskattningar som ditt svar har mottagit",
-    summaryViewLabel: "Mottagna peer reviews:",
-    peerReviewLabel: "Peer review",
-    peerReviewReceived: "Du har fått en ny peer review",
+      `Ditt svar har fått ${n} kollegial${n > 0 ? "a" : ""} bedömning${
+        n > 0 ? "ar" : ""
+      }`,
+    toggleButtonExpandLabel: "Visa alla inkomna kollegiala bedömningar",
+    toggleButtonShrinkLabel: "Göm kollegiala bedömningar",
+    averageOfGradesLabel: "Medeltalet för alla bedömningar är",
+    detailedViewLabel: "Alla bedömningar till ditt svar",
+    summaryViewLabel: "Mottagna kollegiala bedömningar:",
+    peerReviewLabel: "Kollegial bedömning",
+    peerReviewReceived: "Du har fått en ny kollegial bedömning",
     peerReviewReceivedFor: (title: string) =>
-      `Du har fått en ny peer review i uppgiften ${title}`,
+      `Du har fått en ny kollegial bedömning i uppgift ${title}`,
   },
   unsupported: {
-    notSupportedInsert: (itemType: string) =>
-      `Frågtypen ${itemType} stöds inte.`,
+    notSupportedInsert: (itemType: string) => `Frågtypen ${itemType} stöds ej.`,
   },
   multipleChoice: {
-    selectCorrectAnswerLabel: "Välj det rätta alternativet",
-    chooseAllSuitableOptionsLabel: "Välj alla lämpliga alternativ.",
+    selectCorrectAnswerLabel: "Välj rätt svar",
+    chooseAllSuitableOptionsLabel: "Välj alla passande alternativ",
     answerCorrectLabel: "Rätt",
     answerIncorrectLabel: "Fel",
   },
   stage: {
-    answerStageLabel: "Svara på uppgiften",
-    givingPeerReviewsStageLabel: "Ge peer reviews",
-    receivingPeerReviewsStageLabel: "Svaret mottar peer reviews",
-    evaluationStageLabel: "Svaret väntar på bedömning",
+    answerStageLabel: "Att ge svar på uppgiften",
+    givingPeerReviewsStageLabel: "Att ge kollegial bedömning",
+    receivingPeerReviewsStageLabel: "Att ta emot kollegial bedömning",
+    evaluationStageLabel: "Att vänta på bedömning",
   },
   general: {
-    pastDeadline: "Du kan inte längre svara den här uppgiften",
+    pastDeadline: "Du kan inte längre besvara denna uppgift.",
     answerMissingBecauseQuizModifiedLabel:
-      "Frågan har inte svarats. Sannolikt har uppgiften bearbetats efter ditt svar.",
-    submitButtonLabel: "Skicka",
+      "Frågan är obesvarad. Uppgiften har troligtvis ändrats efter ditt svar.",
+    submitButtonLabel: "Svara",
     errorLabel: "Fel",
-    loginToViewPromptLabel: "Logga in för att visa uppgiften",
-    loginToAnswerPromptLabel: "Logga in för att svara uppgiften",
-    loadingLabel: "Laddas",
+    loginToViewPromptLabel: "Logga in för att se uppgiften",
+    loginToAnswerPromptLabel: "Logga in för att svara på uppgiften",
+    loadingLabel: "Laddar",
     answerCorrectLabel: "Svaret är rätt",
-    alreadyAnsweredLabel: "Du har redan svarit den här",
-    answerIncorrectLabel: "Svaret är inte rätt",
-    kOutOfNCorrect: (k, n) => `${k}/${n} rätta svar`,
-    pointsAvailableLabel: "Antalet poäng som man kan få från uppgiften",
-    pointsReceivedLabel: "Dina poängt",
+    alreadyAnsweredLabel: "Du har redan besvarat denna fråga",
+    answerIncorrectLabel: "Svaret är fel",
+    kOutOfNCorrect: (k, n) => `Du fick ${k}/${n} rätt`,
+    pointsAvailableLabel: "Möjliga poäng för denna uppgift",
+    pointsReceivedLabel: "Dina poäng",
     incorrectSubmitWhileTriesLeftLabel:
-      "Svaret var inte helt rätt. Var snäll och försök på nytt!",
-    triesRemainingLabel: "Antalet försök kvar",
-    quizLabel: "Quiz",
+      "Ditt svar var inte helt rätt. Vänligen, försök igen!",
+    triesRemainingLabel: "Antal försök kvar",
+    quizLabel: "Frågesport",
     pointsLabel: "Poäng",
-    triesNotLimitedLabel: "Antalet försök har ingen gräns",
-    submitGeneralFeedbackLabel: "Skickat",
-    submitButtonAlreadyAnsweredLabel: "Svarat",
+    triesNotLimitedLabel: "Antalen försök är inte begränsade",
+    submitGeneralFeedbackLabel: "Inlämnad",
+    submitButtonAlreadyAnsweredLabel: "Besvarad",
     pointsGrantingPolicyInformer: policy => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
-          return "Svaret ska vara helt rätt för att tjäna poäng"
+          return "För att få poäng måste svaret vara helt rätt"
         case "grant_whenever_possible":
           return ""
         default:
@@ -129,17 +133,15 @@ const finnishLabels: SingleLanguageLabels = {
     answered: "Skickat",
     unanswered: "Vastaamaton",
     rejected: "Vastaus hylätty, yritä uudelleen",
-    progressUpdated: "Kurssipisteesi ovat päivittyneet",
-    answerConfirmed: "Vastauksesi on hyväksytty",
+    progressUpdated: "Dina kurspoäng har uppdaterats",
+    answerConfirmed: "Ditt svar är godkänt",
     answerConfirmedFor: (title: string) =>
-      `Vastauksesi tehtävään ${title} on hyväksytty`,
+      `Ditt svar på uppgift ${title} är godkänt!`,
     courseCompleted: "Du har avklarat kursen!",
   },
   error: {
-    submitFailedError:
-      "Misslyckades att skicka svaret. Försök på nytt senare, tack.",
-    quizLoadFailedError:
-      "Misslyckades att skicka svaret. Försök på nytt senare, tack.",
+    submitFailedError: "Ditt svar kunde inte skickas. Försök igen senare.",
+    quizLoadFailedError: "Uppgiften kunde inte laddas. Försök igen senare.",
     progressFetchError:
       "Suoritustietojen lataaminen ei onnistunut. Kokeile myöhemmin uudestaan",
     submitSpamFlagError:
