@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useContext, useEffect, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import {
   CourseProgressProviderContext,
   CourseProgressProviderInterface,
@@ -20,7 +20,7 @@ import "react-toastify/dist/ReactToastify.css"
 interface CourseStatusProviderProps {
   accessToken: string
   courseId: string
-  languageId?: string
+  languageId: string
 }
 
 const ToastType = toast.TYPE
@@ -48,24 +48,18 @@ const isMessage = (message: any): message is Message => {
   return "type" in message && message.type in MessageType
 }
 
-const providerPropsAreEqual = (
-  prevProps: CourseStatusProviderProps,
-  nextProps: CourseStatusProviderProps,
-) => {
-  return (
-    prevProps.accessToken === nextProps.accessToken &&
-    prevProps.courseId === nextProps.courseId &&
-    prevProps.languageId === nextProps.languageId
-  )
-}
-
 export const CourseStatusProvider: React.FunctionComponent<
   CourseStatusProviderProps
-> = React.memo(({ accessToken, courseId, languageId = "ens_US", children }) => {
+> = React.memo(({ children, ...props }) => {
+  const { accessToken, courseId, languageId } = props
+
+  const prevProps = useRef(props)
+
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [updateQuiz, setUpdateQuiz] = useState({})
   const [data, setData] = useState<ProgressData | undefined>()
+
   const [moocfiStatus, setMoocfiStatus] = useState<ConnectionStatus>(
     ConnectionStatus.DISCONNECTED,
   )
@@ -75,39 +69,37 @@ export const CourseStatusProvider: React.FunctionComponent<
   const [moocfiClient, setMoocfiClient] = useState<WebSocket | undefined>()
   const [quizzesClient, setQuizzesClient] = useState<WebSocket | undefined>()
 
-  const shouldFetch = accessToken && !data && !error
-  const shouldLogout = (data || error) && !accessToken
+  const shouldFetch =
+    accessToken !== prevProps.current.accessToken ||
+    courseId !== prevProps.current.courseId ||
+    languageId !== prevProps.current.languageId
   const shouldConnectMoocfi =
-    accessToken &&
-    !loading &&
-    !error &&
-    moocfiStatus === ConnectionStatus.DISCONNECTED
+    !loading && !error && moocfiStatus === ConnectionStatus.DISCONNECTED
   const shouldConnectQuizzes =
-    accessToken &&
-    !loading &&
-    !error &&
-    quizzesStatus === ConnectionStatus.DISCONNECTED
+    !loading && !error && quizzesStatus === ConnectionStatus.DISCONNECTED
 
   useEffect(() => {
-    if (shouldFetch) {
-      fetchProgressData()
-    }
-    if (shouldLogout) {
+    if (accessToken && courseId) {
+      if (shouldFetch) {
+        prevProps.current = props
+        fetchProgressData()
+      }
+      if (shouldConnectMoocfi) {
+        connect(
+          "wss://www.mooc.fi/ws",
+          setMoocfiClient,
+          setMoocfiStatus,
+        )
+      }
+      if (shouldConnectQuizzes) {
+        connect(
+          "wss://quizzes.mooc.fi/ws",
+          setQuizzesClient,
+          setQuizzesStatus,
+        )
+      }
+    } else {
       logout()
-    }
-    if (shouldConnectMoocfi) {
-      connect(
-        "wss://www.mooc.fi/ws",
-        setMoocfiClient,
-        setMoocfiStatus,
-      )
-    }
-    if (shouldConnectQuizzes) {
-      connect(
-        "wss://quizzes.mooc.fi/ws",
-        setQuizzesClient,
-        setQuizzesStatus,
-      )
     }
   })
 
@@ -119,7 +111,6 @@ export const CourseStatusProvider: React.FunctionComponent<
     } catch (error) {
       setError(true)
       setLoading(false)
-      console.log(error)
       console.log("Could not fetch course progress data")
       notifySticky(
         languageOptions[languageId].error.progressFetchError,
@@ -147,16 +138,23 @@ export const CourseStatusProvider: React.FunctionComponent<
         },
       )
       client.onmessage = onMessage
-      client.onerror = error => console.log(error)
-      client.onclose = onClose(host, setStatus)
+      client.onerror = e => reconnect(host, setStatus)
+      client.onclose = e => reconnect(host, setStatus)
       client.send(JSON.stringify({ accessToken, courseId }))
       setClient(client)
       setStatus(ConnectionStatus.CONNECTED)
       console.log(`connected to ${host}`)
     } catch (error) {
-      console.log(`could not connect to ${host}, attempting to reconnect...`)
-      setTimeout(() => setStatus(ConnectionStatus.DISCONNECTED), 10000)
+      reconnect(host, setStatus)
     }
+  }
+
+  const reconnect = (
+    host: string,
+    setStatus: React.Dispatch<React.SetStateAction<ConnectionStatus>>,
+  ) => {
+    console.log(`could not connect to ${host}, attempting to reconnect...`)
+    setTimeout(() => setStatus(ConnectionStatus.DISCONNECTED), 10000)
   }
 
   const logout = () => {
@@ -167,6 +165,7 @@ export const CourseStatusProvider: React.FunctionComponent<
     quizzesClient && quizzesClient.close()
     setMoocfiClient(undefined)
     setQuizzesClient(undefined)
+    prevProps.current = {}
   }
 
   const onMessage = (inbound: any) => {
@@ -200,16 +199,6 @@ export const CourseStatusProvider: React.FunctionComponent<
           break
       }
     }
-  }
-
-  const onClose = (
-    host: string,
-    setStatus: React.Dispatch<React.SetStateAction<ConnectionStatus>>,
-  ) => (e: any) => {
-    console.log(e)
-    accessToken &&
-      console.log(`connection to ${host} lost, attempting to reconnect...`)
-    setStatus(ConnectionStatus.DISCONNECTED)
   }
 
   const notifyRegular = (message: string, type?: TypeOptions) =>
