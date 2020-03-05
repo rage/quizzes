@@ -2,10 +2,10 @@ import { SingleLanguageLabels } from "./index"
 
 const finnishLabels: SingleLanguageLabels = {
   essay: {
-    exampleAnswerLabel: "Esimerkkivastaus",
-    userAnswerLabel: "Vastauksesi",
-    currentNumberOfWordsLabel: "Sanoja",
-    textFieldLabel: "Vastauksesi",
+    exampleAnswerLabel: "Näidisvastus",
+    userAnswerLabel: "Teie vastus",
+    currentNumberOfWordsLabel: "Sõnade arv",
+    textFieldLabel: "Teie vastus",
     conformToLimitsToSubmitLabel:
       "Muokkaa vastauksesi sanarajojen sisään voidaksesi lähettää sen",
     wordLimitsGuidance: (min, max) => {
@@ -25,15 +25,15 @@ const finnishLabels: SingleLanguageLabels = {
     },
   },
   open: {
-    placeholder: "Vastaus",
-    userAnswerLabel: "Vastauksesi",
+    placeholder: "Vastus",
+    userAnswerLabel: "Teie vastus",
     feedbackForFailure: "Vastauksesi ei ole oikein",
     feedbackForSuccess: "Vastauksesi on oikein",
   },
   peerReviews: {
-    loadingLabel: "Ladataan",
+    loadingLabel: "Laen",
     noPeerAnswersAvailableLabel: "Vertaisarvioitavia vastauksia ei saatavilla",
-    chooseButtonLabel: "Valitse",
+    chooseButtonLabel: "Vali",
     unselectButtonLabel: "Peru valinta",
     chooseEssayInstruction: "Valitse yksi vaihtoehdoista arvoitavaksi",
     chosenEssayInstruction: "Arvioi valitsemasi vastaus:",
@@ -44,14 +44,14 @@ const finnishLabels: SingleLanguageLabels = {
       "Voit halutessasi vielä antaa lisää vertaisarvioita",
     givenPeerReviewsLabel: "Vertaisarvioita annettu",
     peerReviewsCompletedInfo: "Olet antanut tarpeeksi monta vertaisarviota",
-    reportAsInappropriateLabel: "Ilmoita asiaton vastaus",
+    reportAsInappropriateLabel: "Teata spämmist",
     submitPeerReviewLabel: "Lähetä vertaisarvio",
     hidePeerReviewLabel: "Piilota",
     quizInvolvesNoPeerReviewsInstruction:
       "Tähän tehtävään ei liity vertaisarvioita",
     peerReviewsInfoForLoggedOutUser: "Kyselyyn liittyy vertaisarviointiosio",
     essayQuestionAnswerTextBoxLabel: "Kirjoita arvio",
-    optionLabel: "Vaihtoehto",
+    optionLabel: "Optsioon",
     answerRejected: "Vastauksesi on hylätty",
     answerFlaggedAsSpam: "Vastauksesi on hylätty epäasiallisena",
     answerConfirmed: "Vastaus hyväksytty!",
@@ -84,8 +84,8 @@ const finnishLabels: SingleLanguageLabels = {
   multipleChoice: {
     selectCorrectAnswerLabel: "Valitse oikea vaihtoehto",
     chooseAllSuitableOptionsLabel: "Valitse kaikki sopivat vaihtoehdot.",
-    answerCorrectLabel: "Oikein",
-    answerIncorrectLabel: "Väärin",
+    answerCorrectLabel: "Õige",
+    answerIncorrectLabel: "Vale",
   },
   stage: {
     answerStageLabel: "Tehtävään vastaaminen",
@@ -97,11 +97,11 @@ const finnishLabels: SingleLanguageLabels = {
     pastDeadline: "Et voi vastata enää tähän tehtävään",
     answerMissingBecauseQuizModifiedLabel:
       "Kysymykseen ei vastattu. Tehtävää todennäköisesti muutettu vastaamisen jälkeen.",
-    submitButtonLabel: "Vastaa",
+    submitButtonLabel: "Esita",
     errorLabel: "Virhe",
     loginToViewPromptLabel: "Kirjaudu sisään nähdäksesi tehtävän",
     loginToAnswerPromptLabel: "Kirjaudu sisään vastataksesi tehtävään",
-    loadingLabel: "Ladataan",
+    loadingLabel: "Laen",
     answerCorrectLabel: "Vastaus oikein",
     alreadyAnsweredLabel: "Olet jo vastannut tähän",
     answerIncorrectLabel: "Vastaus väärin",
