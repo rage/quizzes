@@ -53,6 +53,20 @@ const ButtonWrapper = styled.div<ButtonWrapperProps>`
   ${({ providedStyles }) => providedStyles}
 `
 
+const Loading = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem 0 0 1rem;
+  p {
+    margin-top: 1rem;
+  }
+`
+
+const Form = styled.div<{ providedStyles?: string }>`
+  ${({ providedStyles }) => providedStyles}
+`
+
 interface QuestionBlockWrapperProps {
   providedStyles: string | undefined
 }
@@ -84,7 +98,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 
   if (!answersToReview) {
     return (
-      <div>
+      <Loading>
         {error ? (
           <div />
         ) : (
@@ -93,7 +107,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
             <Typography>{languageInfo.loadingLabel}</Typography>
           </>
         )}
-      </div>
+      </Loading>
     )
   }
 
@@ -114,7 +128,8 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
     }
 
     return (
-      <div ref={ref}>
+      <Form providedStyles={themeProvider.peerReviewFormStyles}>
+        <div ref={ref} />
         <Instructions>{languageInfo.chosenEssayInstruction}</Instructions>
         <TopMarginDivLarge>
           <PeerReviewOption answer={chosenAnswer} />
@@ -129,12 +144,13 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
             scrollRef={ref}
           />
         </TopMarginDivLarge>
-      </div>
+      </Form>
     )
   }
 
   return (
-    <div ref={ref}>
+    <Form providedStyles={themeProvider.peerReviewFormStyles}>
+      <div ref={ref} />
       <TopMarginDivLarge>
         <BoldTypographyMedium>
           {languageInfo.chooseEssayInstruction}
@@ -153,7 +169,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
           />
         </TopMarginDivLarge>
       ))}
-    </div>
+    </Form>
   )
 }
 

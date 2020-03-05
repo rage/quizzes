@@ -18,6 +18,7 @@ import {
   withMargin,
 } from "../styleComponents"
 import { ReceivedPeerReviewLabels } from "../../utils/languages/"
+import ThemeProviderContext from "../../contexes/themeProviderContext"
 
 import Togglable from "../../utils/Togglable"
 import Notification from "../Notification"
@@ -26,10 +27,24 @@ const ToggleButton = styled(BaseButton)<{ expanded: boolean }>`
   ${props => props.expanded && "margin-top: 0.5rem;"}
 `
 
+const Loading = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1.5rem 0 0 1rem;
+  p {
+    margin-top: 0.5rem;
+  }
+`
+
+const Received = styled(TopMarginDivLarge)<{ providedStyles?: string }>`
+  ${({ providedStyles }) => providedStyles}
+`
+
 const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
   const [expanded, setExpanded] = React.useState(false)
   const dispatch = useDispatch()
-
+  const themeProvider = React.useContext(ThemeProviderContext)
   const receivedReviews = useTypedSelector(
     state => state.receivedReviews.reviews,
   )
@@ -59,7 +74,7 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
 
   if (!receivedReviews) {
     return (
-      <div>
+      <Loading>
         {error ? (
           <div />
         ) : (
@@ -68,12 +83,12 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
             <Typography>{receivedReviewsLabels.loadingLabel}</Typography>
           </>
         )}
-      </div>
+      </Loading>
     )
   }
 
   return (
-    <TopMarginDivLarge>
+    <Received providedStyles={themeProvider.receivedPeerReviewsStyles}>
       <ReceivedReviewsSummary
         peerReviews={receivedReviews}
         peerReviewQuestions={peerReviewQuestions}
@@ -93,7 +108,7 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
           />
         </Togglable>
       )}
-    </TopMarginDivLarge>
+    </Received>
   )
 }
 
