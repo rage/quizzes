@@ -209,7 +209,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const fatal = messageState.fatal
   const error = messageState.error
 
-
   useEffect(
     () => {
       dispatch(
@@ -372,7 +371,11 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const wrongLocale = !!(customContent && customContent.WrongLocale)
 
   return (
-    <OuterDiv providedStyles={themeProvider.mainDivStyles} aria-label={quiz.texts[0].title} role="form">
+    <OuterDiv
+      providedStyles={themeProvider.mainDivStyles}
+      aria-label={quiz.texts[0].title}
+      role="form"
+    >
       <TopInfoBar />
       <div ref={ref} />
       {/*<Notification scrollRef={ref} />*/}

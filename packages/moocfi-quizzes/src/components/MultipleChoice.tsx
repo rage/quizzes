@@ -87,6 +87,7 @@ const ItemContent = styled.div<ItemContentProps>`
 export interface LeftBorderedDivProps {
   correct: boolean | undefined
   onlyOneItem?: boolean
+  message?: string
 }
 
 const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
@@ -158,7 +159,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
             onlyOneItem={onlyOneItem}
             questionWidth={questionWidth}
           />
-         
+
           <ChoicesContainer direction={direction} onlyOneItem={onlyOneItem}>
             {options
               .sort((o1, o2) => o1.order - o2.order)
@@ -230,7 +231,11 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
       {body && <MarkdownText>{body}</MarkdownText>}
 
       {selectOptionsLabel && (
-        <SelectOptionsLabelTypography component="p" variant="subtitle1" onlyOneItem={onlyOneItem}>
+        <SelectOptionsLabelTypography
+          component="p"
+          variant="subtitle1"
+          onlyOneItem={onlyOneItem}
+        >
           {selectOptionsLabel}
         </SelectOptionsLabelTypography>
       )}
@@ -307,7 +312,6 @@ const Option: React.FunctionComponent<OptionProps> = ({
           onClick={handleOptionChange(option.id)}
           disabled={quizDisabled}
           aria-selected={optionIsSelected}
-          
         >
           <MarkdownText Component={styled.div``} removeParagraphs>
             {text.title}
@@ -336,7 +340,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
             correct={option.correct}
             {...clickOptions}
             aria-selected={optionIsSelected}
-            aria-label={`${text.title}-${option.correct ? "correct" : "incorrect"}`}
+            aria-label={`${text.title}-${
+              option.correct ? "correct" : "incorrect"
+            }`}
           >
             <MarkdownText Component={styled.div``} removeParagraphs>
               {text.title}
@@ -350,7 +356,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             shouldBeGray={shouldBeGray}
             providedStyles={themeProvider.optionWrapperStyles}
           >
-            <FeedbackPortion item={item} selectedOption={option}/>
+            <FeedbackPortion item={item} selectedOption={option} />
           </OptionWrapper>
         )}
       </React.Fragment>
@@ -368,8 +374,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
           correct={option.correct}
           {...clickOptions}
           aria-selected={optionIsSelected}
-          aria-label={`${text.title}-${option.correct ? "correct" : "incorrect"}`}
-          
+          aria-label={`${text.title}-${
+            option.correct ? "correct" : "incorrect"
+          }`}
         >
           <MarkdownText Component={styled.div``} removeParagraphs>
             {text.title}
@@ -447,7 +454,15 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 
   if (ThemedDiv) {
     return (
-      <ThemedDiv correct={correct} onlyOneItem={onlyOneItem} >
+      <ThemedDiv
+        correct={correct}
+        onlyOneItem={onlyOneItem}
+        message={
+          correct
+            ? generalLabels.answerCorrectLabel
+            : generalLabels.answerIncorrectLabel
+        }
+      >
         <CentralizedOnSmallScreenTypography variant="body1">
           {feedbackMessage}
         </CentralizedOnSmallScreenTypography>
@@ -456,8 +471,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   }
 
   return (
-    
-    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem} >
+    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem}>
       <CentralizedOnSmallScreenTypography variant="body1">
         <AttentionIcon icon={faExclamationCircle} />
       </CentralizedOnSmallScreenTypography>

@@ -53,6 +53,16 @@ const ButtonWrapper = styled.div<ButtonWrapperProps>`
   ${({ providedStyles }) => providedStyles}
 `
 
+const Loading = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem 0 0 1rem;
+  p {
+    margin-top: 1rem;
+  }
+`
+
 interface QuestionBlockWrapperProps {
   providedStyles: string | undefined
 }
@@ -84,7 +94,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 
   if (!answersToReview) {
     return (
-      <div>
+      <Loading>
         {error ? (
           <div />
         ) : (
@@ -93,7 +103,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
             <Typography>{languageInfo.loadingLabel}</Typography>
           </>
         )}
-      </div>
+      </Loading>
     )
   }
 

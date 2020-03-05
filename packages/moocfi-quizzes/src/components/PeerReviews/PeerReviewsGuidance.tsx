@@ -31,7 +31,7 @@ const PeerReviewsGuidance: React.FunctionComponent<
 
   return (
     <>
-      <GivenCount component="p" variant="subtitle1" >
+      <GivenCount component="p" variant="subtitle1">
         {givenLabel}: {given}/{required}
       </GivenCount>
       <Instructions Component="p">{guidanceText}</Instructions>

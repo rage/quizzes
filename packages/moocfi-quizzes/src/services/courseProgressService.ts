@@ -7,14 +7,11 @@ let graphQLClient: GraphQLClient
 
 const request = async (accessToken: string, query: string) => {
   if (!graphQLClient) {
-    graphQLClient = new GraphQLClient(
-      `${process.env.MOOCFI_URL || "http://localhost:4000"}/api`,
-      {
-        headers: {
-          authorization: `Bearer ${accessToken}`,
-        },
+    graphQLClient = new GraphQLClient(`https://www.mooc.fi/api`, {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
       },
-    )
+    })
   }
   return await graphQLClient.request(query)
 }

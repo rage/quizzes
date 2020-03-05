@@ -90,7 +90,20 @@ export default (props: ChoiceButtonProps) => {
   const ThemedButton = themeProvider.choiceButton
 
   if (ThemedButton) {
-    return <ThemedButton {...props} />
+    return (
+      <ThemedButton {...props}>
+        {others.children}
+        {revealed && others.selected ? (
+          others.correct ? (
+            <SuccessIcon />
+          ) : (
+            <FailureIcon />
+          )
+        ) : (
+          ""
+        )}
+      </ThemedButton>
+    )
   }
 
   return revealed ? (
