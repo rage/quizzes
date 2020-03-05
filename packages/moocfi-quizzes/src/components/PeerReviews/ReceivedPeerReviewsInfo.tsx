@@ -37,6 +37,10 @@ const Loading = styled.div`
   }
 `
 
+const Received = styled(TopMarginDivLarge)<{ providedStyles?: string }>`
+  ${({ providedStyles }) => providedStyles}
+`
+
 const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
   const [expanded, setExpanded] = React.useState(false)
   const dispatch = useDispatch()
@@ -84,7 +88,7 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
   }
 
   return (
-    <TopMarginDivLarge>
+    <Received providedStyles={themeProvider.receivedPeerReviewsStyles}>
       <ReceivedReviewsSummary
         peerReviews={receivedReviews}
         peerReviewQuestions={peerReviewQuestions}
@@ -104,7 +108,7 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
           />
         </Togglable>
       )}
-    </TopMarginDivLarge>
+    </Received>
   )
 }
 

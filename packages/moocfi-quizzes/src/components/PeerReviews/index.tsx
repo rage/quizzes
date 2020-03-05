@@ -1,6 +1,6 @@
 import * as React from "react"
 import styled from "styled-components"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useContext } from "react"
 import { useDispatch } from "react-redux"
 import Typography from "@material-ui/core/Typography"
 import "likert-react/dist/main.css"
@@ -16,14 +16,19 @@ import {
   TopMarginDivSmall,
   TopMarginDivLarge,
 } from "../styleComponents"
+import ThemeProviderContext from "../../contexes/themeProviderContext"
 
 /*const TopMarginDiv = styled.div`
   margin-top: 15px;
 `*/
 
+const HiddenWrapper = styled(TopMarginDivLarge)<{ providedStyles?: string }>`
+  ${({ providedStyles }) => providedStyles}
+`
+
 const PeerReviews: React.FunctionComponent = () => {
   const ref = useState(useRef(null))[0]
-
+  const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
 
   const quiz = useTypedSelector(state => state.quiz)
@@ -94,7 +99,9 @@ const PeerReviews: React.FunctionComponent = () => {
             </>
           )
         : !pastDeadline && (
-            <TopMarginDivLarge>
+            <HiddenWrapper
+              providedStyles={themeProvider.peerReviewContainerStyles}
+            >
               <BoldTypography component="p" variant="subtitle1">
                 {giveExtraPeerReviewsLabel}
               </BoldTypography>
@@ -115,7 +122,7 @@ const PeerReviews: React.FunctionComponent = () => {
                   <PeerReviewForm languageInfo={peerReviewsLabels} />
                 </TopMarginDivSmall>
               </Togglable>
-            </TopMarginDivLarge>
+            </HiddenWrapper>
           )}
       {activeStep >= 2 && <ReceivedPeerReviewsInfo />}
     </div>
