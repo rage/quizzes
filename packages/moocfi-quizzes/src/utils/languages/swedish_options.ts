@@ -131,8 +131,8 @@ const finnishLabels: SingleLanguageLabels = {
     },
     // These three are in elements of ai messages
     answered: "Skickat",
-    unanswered: "Vastaamaton",
-    rejected: "Vastaus hylätty, yritä uudelleen",
+    unanswered: "Obesvarad",
+    rejected: "Ditt svar är inte godkänt, försök igen",
     progressUpdated: "Dina kurspoäng har uppdaterats",
     answerConfirmed: "Ditt svar är godkänt",
     answerConfirmedFor: (title: string) =>
@@ -143,11 +143,10 @@ const finnishLabels: SingleLanguageLabels = {
     submitFailedError: "Ditt svar kunde inte skickas. Försök igen senare.",
     quizLoadFailedError: "Uppgiften kunde inte laddas. Försök igen senare.",
     progressFetchError:
-      "Suoritustietojen lataaminen ei onnistunut. Kokeile myöhemmin uudestaan",
-    submitSpamFlagError:
-      "Asiattomasta vastauksesta ilmoittaminen ei onnistunut",
+      "Framstegsinformationen kunde inte laddas. Försök igen senare.",
+    submitSpamFlagError: "Anmälan av ett osakligt svar kunde inte skickas.",
     fetchReviewCandidatesError:
-      "Vastausten lataaminen vertaisarviota varten ei onnistunut. Kokeile myöhemmin uudestaan.",
+      "Svaralternativ för kollegial bedömning kunde inte laddas. Försök igen senare.",
   },
 }
 
