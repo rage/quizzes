@@ -201,6 +201,7 @@ export interface ProgressMessage {
   course_id: string
   service_id: string
   progress: PointsByGroup[]
+  exercise_completions_by_section?: ExerciseCompletionsBySection[]
   message_format_version: Number
 }
 
@@ -209,6 +210,14 @@ export interface PointsByGroup {
   max_points: number
   n_points: number
   progress: number
+}
+
+export interface ExerciseCompletionsBySection {
+  part: number
+  section: number
+  exercises_total: number
+  exercises_completed: number
+  required_actions: RequiredAction[]
 }
 
 export interface QuizAnswerMessage {

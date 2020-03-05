@@ -4,6 +4,7 @@ import { quizzes as knex } from "../config/knex"
 import { promisify } from "util"
 
 import {
+  ExerciseCompletionsBySection,
   ExerciseData,
   PointsByGroup,
   ProgressMessage,
@@ -42,7 +43,10 @@ const publish = async () => {
         }`,
       )
 
-      const course = (await knex<ICourse>("course").where("id", course_id))[0]
+      const course = (await knex<ICourse>("course").where(
+        "id",
+        task.course_id,
+      ))[0]
 
       if (course_id) {
         if (recalculate_progress) {
@@ -277,6 +281,50 @@ const publishProgress = async (course: ICourse, quizzes: any[]) => {
   try {
     const courseId = course.id
 
+    const raw = await knex.raw(`
+      select
+        qa.user_id,
+        part,
+        coalesce(section, 0) section,
+        count(case when qa.status = 'confirmed' then 1 end) completed,
+        count(q.id) total,
+        count(case when qa.status = 'submitted' and uqs.peer_reviews_given < 3 then 1 end) give,
+        count(case when qa.status = 'submitted' and peer_reviews_received < 2 then 1 end) pending,
+        count(case when qa.status in ('rejected', 'spam') then 1 end) rejected
+      from quiz_answer qa
+      join user_quiz_state uqs
+        on qa.user_id = uqs.user_id
+        and qa.quiz_id = uqs.quiz_id
+      join quiz q on qa.quiz_id = q.id
+      where course_id = '${course.id}'
+      group by qa.user_id, part, section
+      order by qa.user_id
+    `)
+
+    const byUser: { [user: number]: ExerciseCompletionsBySection[] } = {}
+
+    raw.rows.forEach((item: any) => {
+      const arr = byUser[item.user_id] || []
+      const requiredActions: RequiredAction[] = []
+      if (item.give > 0) {
+        requiredActions.push(RequiredAction.GIVE_PEER_REVIEW)
+      }
+      if (item.pending > 0) {
+        requiredActions.push(RequiredAction.PENDING_PEER_REVIEW)
+      }
+      if (item.rejected > 0) {
+        requiredActions.push(RequiredAction.REJECTED)
+      }
+      arr.push({
+        part: item.part,
+        section: item.section,
+        exercises_total: item.total,
+        exercises_completed: item.completed,
+        required_actions: requiredActions,
+      })
+      byUser[item.user_id] = arr
+    })
+
     const maxPointsByPart: { [part: number]: number } = {}
 
     quizzes.forEach(({ part, points }) =>
@@ -323,6 +371,7 @@ const publishProgress = async (course: ICourse, quizzes: any[]) => {
         course_id: course.moocfi_id,
         service_id: process.env.SERVICE_ID,
         progress,
+        exercise_completions_by_section: byUser[group[0].user_id],
         message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
       }
       producer.produce(
