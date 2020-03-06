@@ -44,6 +44,8 @@ import {
   QuizAnswerStatus,
 } from "../../types"
 
+import { MessageType, pushMessageToClient } from "../../wsServer"
+
 const MAX_LIMIT = 100
 
 @JsonController(`${API_PATH}/quizzes/answer`)
@@ -495,6 +497,12 @@ export class QuizAnswerController {
         quizAnswer: savedAnswer,
       }
     }
+
+    pushMessageToClient(
+      userId,
+      quiz.course.moocfiId,
+      MessageType.PROGRESS_UPDATED,
+    )
 
     return {
       quiz,
