@@ -34,7 +34,7 @@ const publish = async () => {
     let task: IKafkaTask
 
     for (task of tasks) {
-      const { course_id, recalculate_progress } = task
+      const { course_id, recalculate_progress, recalculate_only } = task
 
       console.count("task")
       console.log(
@@ -54,14 +54,16 @@ const publish = async () => {
           await recalculateProgress(course_id)
         }
 
-        console.log("publishing quizzes")
-        const quizzes = await publishQuizzes(course)
+        if (!recalculate_only) {
+          console.log("publishing quizzes")
+          const quizzes = await publishQuizzes(course)
 
-        console.log("publishing progress")
-        await publishProgress(course, quizzes)
+          console.log("publishing progress")
+          await publishProgress(course, quizzes)
 
-        console.log("publishing answers")
-        await publishAnswers(course)
+          console.log("publishing answers")
+          await publishAnswers(course)
+        }
       }
 
       console.log("removing task from database")
@@ -394,6 +396,7 @@ interface IKafkaTask {
   course_id: string
   quiz_id: string
   recalculate_progress: boolean
+  recalculate_only: boolean
   created_at: Date
 }
 
