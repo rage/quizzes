@@ -1,4 +1,3 @@
-import Knex from "knex"
 import { Inject, Service } from "typedi"
 import { EntityManager } from "typeorm"
 import { Course, Quiz, QuizAnswer, UserQuizState } from "../models"
@@ -34,7 +33,7 @@ export default class KafkaService {
   @Inject()
   private userCoursePartStateService: UserCoursePartStateService
 
-  private knex = Knex({ client: "pg" })
+  private knex = knex
 
   private producer: any
 
@@ -50,7 +49,7 @@ export default class KafkaService {
       .where("course.id = :courseId", { courseId })
       .getOne()
 
-    const raw = await knex.raw(`
+    const raw = await this.knex.raw(`
       select
         part,
         coalesce(section, 0) section,
