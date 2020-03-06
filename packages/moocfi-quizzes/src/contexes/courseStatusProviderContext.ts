@@ -10,8 +10,9 @@ export interface ProgressData {
   total_exercises: number
   required_actions: RequiredAction[]
   progressByGroup: ProgressByGroup
-  exercisesByPart: ExercisesByPart
-  answersByPart: AnswersByPart
+  // exercisesByPart: ExercisesByPart
+  // answersByPart: AnswersByPart
+  exercise_completions_by_section: any
 }
 
 export type ProgressByGroup = { [group: string]: PointsByGroup }
