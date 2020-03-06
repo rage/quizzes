@@ -11,11 +11,17 @@ import {
   UserCourseState,
   UserQuizState,
 } from "../models"
-import { IQuizAnswerQuery } from "../types"
 import CourseService from "./course.service"
 import QuizService from "./quiz.service"
 import QuizAnswerService from "./quizanswer.service"
+import UserCoursePartStateService from "./usercoursepartstate.service"
 import UserQuizStateService from "./userquizstate.service"
+
+import { quizzes as knex } from "../config/knex"
+
+import { PointsByGroup, ProgressMessage } from "../types"
+
+import { RequiredAction } from "./kafka.service"
 
 @Service()
 export default class UserCourseStateService {
@@ -34,12 +40,95 @@ export default class UserCourseStateService {
   @Inject()
   private userQuizStateService: UserQuizStateService
 
-  public async getUserCourseState(userId: number, courseId: string) {
-    return await this.entityManager
+  @Inject()
+  private userCoursePartStateService: UserCoursePartStateService
+
+  private knex = knex
+
+  public async getUserCourseState(
+    userId: number,
+    courseId: string,
+  ): Promise<any> {
+    const course = await this.entityManager
+      .createQueryBuilder(Course, "course")
+      .where("course.moocfi_id = :courseId", { courseId })
+      .getOne()
+
+    const raw = await this.knex.raw(`
+      select
+        part,
+        coalesce(section, 0) section,
+        count(case when qa.status = 'confirmed' then 1 end) completed,
+        count(q.id) total,
+        count(case when qa.status = 'submitted' and uqs.peer_reviews_given < 3 then 1 end) give,
+        count(case when qa.status = 'submitted' and peer_reviews_received < 2 then 1 end) pending,
+        count(case when qa.status in ('rejected', 'spam') then 1 end) rejected
+      from quiz_answer qa
+      join user_quiz_state uqs
+        on qa.user_id = uqs.user_id
+        and qa.quiz_id = uqs.quiz_id
+      join quiz q on qa.quiz_id = q.id
+      where course_id = '${course.id}'
+      and qa.user_id = ${userId}
+      group by qa.user_id, part, section
+      order by qa.user_id
+    `)
+
+    const arr: any[] = []
+
+    raw.rows.forEach((item: any) => {
+      const requiredActions: RequiredAction[] = []
+      if (item.give > 0) {
+        requiredActions.push(RequiredAction.GIVE_PEER_REVIEW)
+      }
+      if (item.pending > 0) {
+        requiredActions.push(RequiredAction.PENDING_PEER_REVIEW)
+      }
+      if (item.rejected > 0) {
+        requiredActions.push(RequiredAction.REJECTED)
+      }
+      arr.push({
+        part: item.part,
+        section: item.section,
+        exercises_total: item.total,
+        exercises_completed: item.completed,
+        required_actions: requiredActions,
+      })
+    })
+
+    const progress: PointsByGroup[] = await this.userCoursePartStateService.getProgress(
+      this.entityManager,
+      userId,
+      course.id,
+    )
+
+    let nPoints = 0
+    let maxPoints = 0
+
+    progress.forEach(part => {
+      nPoints += part.n_points
+      maxPoints += part.max_points
+    })
+
+    return {
+      currentUser: {
+        user_course_progresses: [
+          {
+            n_points: nPoints,
+            max_points: maxPoints,
+            progress,
+            exercise_completions_by_section: arr,
+          },
+        ],
+        completions: [],
+      },
+    }
+
+    /*return await this.entityManager
       .createQueryBuilder(UserCourseState, "user_course_state")
       .where("user_course_state.user_id = :userId", { userId })
       .andWhere("user_course_state.course_id = :courseId", { courseId })
-      .getOne()
+      .getOne()*/
   }
 
   public async createUserCourseState(
