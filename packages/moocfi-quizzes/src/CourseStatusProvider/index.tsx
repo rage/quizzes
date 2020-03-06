@@ -103,7 +103,7 @@ export const CourseStatusProvider: React.FunctionComponent<
       }
       if (shouldConnectQuizzes) {
         connect(
-          "wss://quizzes.mooc.fi/ws",
+          "ws://localhost:7000",
           setQuizzesClient,
           setQuizzesStatus,
         )
@@ -193,21 +193,21 @@ export const CourseStatusProvider: React.FunctionComponent<
           break
         case MessageType.PEER_REVIEW_RECEIVED:
           setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
-          notifyRegular(
+          /*notifyRegular(
             languageOptions[languageId].receivedPeerReviews.peerReviewReceived,
             ToastType.SUCCESS,
-          )
+          )*/
           break
         case MessageType.QUIZ_CONFIRMED:
           setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
-          notifyRegular(
+          /*notifyRegular(
             languageOptions[languageId].general.answerConfirmed,
             ToastType.SUCCESS,
           )
           notifyRegular(
             languageOptions[languageId].general.progressUpdated,
             ToastType.SUCCESS,
-          )
+          )*/
           break
         case MessageType.QUIZ_REJECTED:
           break

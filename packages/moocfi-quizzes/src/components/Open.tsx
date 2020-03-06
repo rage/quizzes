@@ -107,7 +107,14 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
             </Typography>
           }
           {answerPortion}
-          <FeedbackMessage correct={correct}>
+          <FeedbackMessage
+            correct={correct}
+            message={
+              correct
+                ? openLabels.feedbackForSuccess
+                : openLabels.feedbackForFailure
+            }
+          >
             <MarkdownText Component={Typography} variant="body1">
               {correct
                 ? successMessage || openLabels.feedbackForSuccess

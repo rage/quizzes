@@ -45,6 +45,7 @@ export interface ThemeProviderInterface {
   peerReviewFormStyles?: string
   receivedPeerReviewsStyles?: string
   peerReviewContainerStyles?: string
+  optionContainerStyles?: string
 }
 
 const ThemeProviderContext = createContext<ThemeProviderInterface>({})
