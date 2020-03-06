@@ -123,7 +123,7 @@ const App = () => {
 
   return (
     <CourseStatusProvider
-      courseId="b5746948-5141-4d45-aceb-79adb037c29b"
+      courseId="08c4757a-51ec-4551-bdb6-46fba3da765b"
       accessToken={accessToken.value}
       languageId={languageId.value}
     >

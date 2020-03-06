@@ -83,14 +83,8 @@ export const CourseStatusProvider: React.FunctionComponent<
     !loading && !error && quizzesStatus === ConnectionStatus.DISCONNECTED
 
   useEffect(() => {
-    console.log("fire")
     if (accessToken && courseId) {
-      console.log(accessToken, " ", prevProps.current.accessToken)
-      console.log(courseId, " ", prevProps.current.courseId)
-      console.log(languageId, " ", prevProps.current.languageId)
-      console.log("ok")
       if (shouldFetch) {
-        console.log("should")
         prevProps.current = props
         fetchProgressData()
       }
@@ -103,7 +97,7 @@ export const CourseStatusProvider: React.FunctionComponent<
       }
       if (shouldConnectQuizzes) {
         connect(
-          "ws://localhost:7000",
+          "wss://quizzes.mooc.fi/ws",
           setQuizzesClient,
           setQuizzesStatus,
         )
@@ -114,7 +108,6 @@ export const CourseStatusProvider: React.FunctionComponent<
   })
 
   const fetchProgressData = async () => {
-    console.log("fetch")
     try {
       const data = transformData(await getUserCourseData(courseId, accessToken))
       setData(data)
@@ -233,14 +226,14 @@ export const CourseStatusProvider: React.FunctionComponent<
   const progress: CourseProgressProviderInterface = {
     error,
     loading,
-    notifyError,
+    // notifyError,
     courseProgressData: data,
   }
 
   const status: CourseStatusProviderInterface = {
     updateQuiz,
     quizUpdated,
-    notifyError,
+    // notifyError,
   }
 
   return (
