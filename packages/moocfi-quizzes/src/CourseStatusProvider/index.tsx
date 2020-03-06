@@ -53,7 +53,11 @@ export const CourseStatusProvider: React.FunctionComponent<
 > = React.memo(({ children, ...props }) => {
   const { accessToken, courseId, languageId } = props
 
-  const prevProps = useRef(props)
+  const prevProps = useRef({
+    accessToken: "",
+    courseId: "",
+    languageId: "",
+  })
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -79,8 +83,14 @@ export const CourseStatusProvider: React.FunctionComponent<
     !loading && !error && quizzesStatus === ConnectionStatus.DISCONNECTED
 
   useEffect(() => {
+    console.log("fire")
     if (accessToken && courseId) {
+      console.log(accessToken, " ", prevProps.current.accessToken)
+      console.log(courseId, " ", prevProps.current.courseId)
+      console.log(languageId, " ", prevProps.current.languageId)
+      console.log("ok")
       if (shouldFetch) {
+        console.log("should")
         prevProps.current = props
         fetchProgressData()
       }
@@ -104,6 +114,7 @@ export const CourseStatusProvider: React.FunctionComponent<
   })
 
   const fetchProgressData = async () => {
+    console.log("fetch")
     try {
       const data = transformData(await getUserCourseData(courseId, accessToken))
       setData(data)
@@ -111,6 +122,7 @@ export const CourseStatusProvider: React.FunctionComponent<
     } catch (error) {
       setError(true)
       setLoading(false)
+      console.log(error)
       console.log("Could not fetch course progress data")
       notifySticky(
         languageOptions[languageId].error.progressFetchError,
@@ -265,6 +277,7 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
 }
 
 const transformData = (data: any): ProgressData => {
+  console.log(data)
   const courseProgress = data.currentUser.user_course_progresses[0]
   const completed = data.currentUser.completions.length > 0
   let points_to_pass = 0
@@ -285,8 +298,6 @@ const transformData = (data: any): ProgressData => {
     for (const groupProgress of courseProgress.progress) {
       progressByGroup[groupProgress.group] = groupProgress
     }
-    const exerciseData = courseProgress.course
-    points_to_pass = exerciseData.points_needed || 0
   }
   const required_actions = Array.from(distinctActions) as RequiredAction[]
 

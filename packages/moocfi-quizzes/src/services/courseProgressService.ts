@@ -20,6 +20,22 @@ export const getUserCourseData = async (
   courseId: string,
   accessToken: string,
 ): Promise<any> => {
+  console.log("get")
+  const response = await axios.get(
+    `${BASE_URL}/api/v1/quizzes/usercoursestate/${courseId}`,
+    {
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+      },
+    },
+  )
+  return response.data
+}
+
+/*export const getUserCourseData = async (
+  courseId: string,
+  accessToken: string,
+): Promise<any> => {
   const query = `
     {
       currentUser {
@@ -64,4 +80,4 @@ export const getUserCourseData = async (
   const data = await request(accessToken, query)
 
   return data
-}
+}*/
