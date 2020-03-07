@@ -124,14 +124,15 @@ const recalculateProgress = async (courseId: string) => {
       and parts.part = points.part
       left join (
         select
+          q.course_id,
           q.part,
           sum(q.points) as max_points
         from quiz q
         where q.course_id = :courseId
         and q.excluded_from_score = false
-        group by q.part
+        group by q.course_id, q.part
       ) as max
-      on parts.part = max.part
+      on parts.part = max.part and parts.course_id = max.course_id
       on conflict (user_id, course_id, course_part)
       do update
       set progress = excluded.progress, score = excluded.score
