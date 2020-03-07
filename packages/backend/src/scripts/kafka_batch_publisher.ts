@@ -90,7 +90,9 @@ const recalculateProgress = async (courseId: string) => {
         parts.user_id as user_id,
         parts.course_id as course_id,
         parts.part as course_part,
-        coalesce(points.points / max.max_points, 0) as progress,
+        coalesce(
+          case when max.max_points is not null and max.max_points > 0 then (points.points / max.max_points) end, 0
+        ) as progress,
         coalesce(points.points, 0) as score
       from (
         select distinct on (uqs.user_id, q.part)
