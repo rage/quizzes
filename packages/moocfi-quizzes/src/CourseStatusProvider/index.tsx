@@ -13,7 +13,10 @@ import {
 } from "../contexes/courseStatusProviderContext"
 import { languageOptions } from "../utils/languages"
 import { ToastContainer, toast, TypeOptions } from "react-toastify"
-import { getUserCourseData } from "../services/courseProgressService"
+import {
+  getCompletion,
+  getUserCourseData,
+} from "../services/courseProgressService"
 
 import "react-toastify/dist/ReactToastify.css"
 
@@ -109,7 +112,11 @@ export const CourseStatusProvider: React.FunctionComponent<
 
   const fetchProgressData = async () => {
     try {
-      const data = transformData(await getUserCourseData(courseId, accessToken))
+      const progressData = await getUserCourseData(courseId, accessToken)
+      const completionData = await getCompletion(courseId, accessToken)
+      progressData.currentUser.completions =
+        completionData.currentUser.completions
+      const data = transformData(progressData)
       setData(data)
       setLoading(false)
     } catch (error) {
@@ -203,8 +210,10 @@ export const CourseStatusProvider: React.FunctionComponent<
           )*/
           break
         case MessageType.QUIZ_REJECTED:
+          setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
           break
         case MessageType.COURSE_CONFIRMED:
+          fetchProgressData()
           break
       }
     }
@@ -270,7 +279,6 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
 }
 
 const transformData = (data: any): ProgressData => {
-  console.log(data)
   const courseProgress = data.currentUser.user_course_progresses[0]
   const completed = data.currentUser.completions.length > 0
   let points_to_pass = 0

@@ -21,7 +21,7 @@ export const getUserCourseData = async (
   accessToken: string,
 ): Promise<any> => {
   const response = await axios.get(
-    `${BASE_URL}/api/v1/quizzes/usercoursestate/${courseId}`,
+    `https://quizzes.mooc.fi/api/v1/quizzes/usercoursestate/${courseId}`,
     {
       headers: {
         authorization: `Bearer ${accessToken}`,
@@ -29,6 +29,24 @@ export const getUserCourseData = async (
     },
   )
   return response.data
+}
+
+export const getCompletion = async (
+  courseId: string,
+  accessToken: string,
+): Promise<any> => {
+  const query = `
+    {
+      currentUser {
+        completions(
+          where: { course: { id: "${courseId}" } }
+        ) {
+          id
+        }
+      }
+    }
+  `
+  return await request(accessToken, query)
 }
 
 /*export const getUserCourseData = async (
