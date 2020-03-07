@@ -122,7 +122,7 @@ const recalculateProgress = async (courseId: string) => {
       on parts.course_id = points.course_id
       and parts.user_id = points.user_id
       and parts.part = points.part
-      join (
+      left join (
         select
           q.part,
           sum(q.points) as max_points
