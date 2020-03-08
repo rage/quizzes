@@ -34,7 +34,7 @@ const publish = async () => {
     let task: IKafkaTask
 
     for (task of tasks) {
-      const { course_id, recalculate_progress } = task
+      const { course_id, recalculate_progress, recalculate_only } = task
 
       console.count("task")
       console.log(
@@ -54,14 +54,16 @@ const publish = async () => {
           await recalculateProgress(course_id)
         }
 
-        console.log("publishing quizzes")
-        const quizzes = await publishQuizzes(course)
+        if (!recalculate_only) {
+          console.log("publishing quizzes")
+          const quizzes = await publishQuizzes(course)
 
-        console.log("publishing progress")
-        await publishProgress(course, quizzes)
+          console.log("publishing progress")
+          await publishProgress(course, quizzes)
 
-        console.log("publishing answers")
-        await publishAnswers(course)
+          console.log("publishing answers")
+          await publishAnswers(course)
+        }
       }
 
       console.log("removing task from database")
@@ -88,7 +90,9 @@ const recalculateProgress = async (courseId: string) => {
         parts.user_id as user_id,
         parts.course_id as course_id,
         parts.part as course_part,
-        coalesce(points.points / max.max_points, 0) as progress,
+        coalesce(
+          case when max.max_points is not null and max.max_points > 0 then (points.points / max.max_points) end, 0
+        ) as progress,
         coalesce(points.points, 0) as score
       from (
         select distinct on (uqs.user_id, q.part)
@@ -120,16 +124,17 @@ const recalculateProgress = async (courseId: string) => {
       on parts.course_id = points.course_id
       and parts.user_id = points.user_id
       and parts.part = points.part
-      join (
+      left join (
         select
+          q.course_id,
           q.part,
           sum(q.points) as max_points
         from quiz q
         where q.course_id = :courseId
         and q.excluded_from_score = false
-        group by q.part
+        group by q.course_id, q.part
       ) as max
-      on parts.part = max.part
+      on parts.part = max.part and parts.course_id = max.course_id
       on conflict (user_id, course_id, course_part)
       do update
       set progress = excluded.progress, score = excluded.score
@@ -394,6 +399,7 @@ interface IKafkaTask {
   course_id: string
   quiz_id: string
   recalculate_progress: boolean
+  recalculate_only: boolean
   created_at: Date
 }
 
