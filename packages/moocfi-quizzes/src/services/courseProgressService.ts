@@ -39,7 +39,7 @@ export const getCompletion = async (
     {
       currentUser {
         completions(
-          where: { course: { id: "${courseId}" } }
+          course_id: "${courseId}"
         ) {
           id
         }
