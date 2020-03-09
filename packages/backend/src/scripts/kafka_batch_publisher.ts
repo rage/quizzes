@@ -4,7 +4,6 @@ import { quizzes as knex } from "../config/knex"
 import { promisify } from "util"
 
 import {
-  ExerciseCompletionsBySection,
   ExerciseData,
   PointsByGroup,
   ProgressMessage,
