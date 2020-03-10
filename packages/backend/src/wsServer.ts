@@ -102,6 +102,7 @@ redis.subscriber.on("message", (channel: any, message: any) => {
     const connection = connectionByUserCourse.get(userCourseObjectString)
     if (connection) {
       if (connection.connected) {
+        console.log("connection found")
         connection.sendUTF(
           JSON.stringify({
             type: data.type,
