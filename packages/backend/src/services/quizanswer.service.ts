@@ -374,10 +374,15 @@ export default class QuizAnswerService {
       firstAllowedTime,
       lastAllowedTime,
       languageIds,
-      peerReviewsGiven,
-      peerReviewsReceived,
+      minPeerReviewsGiven,
+      maxPeerReviewsGiven,
+      minPeerReviewsReceived,
+      maxPeerReviewsReceived,
       quizRequiresPeerReviews,
-      spamFlags,
+      minSpamFlags,
+      maxSpamFlags,
+      minPeerReviewAverage,
+      maxPeerReviewAverage,
       addPeerReviews,
       addSpamFlagNumber,
     } = query
@@ -393,9 +398,14 @@ export default class QuizAnswerService {
       !firstAllowedTime &&
       !lastAllowedTime &&
       (!languageIds || languageIds.length === 0) &&
-      typeof peerReviewsGiven !== "number" &&
-      typeof peerReviewsReceived !== "number" &&
-      typeof spamFlags !== "number"
+      typeof minPeerReviewsGiven !== "number" &&
+      typeof maxPeerReviewsGiven !== "number" &&
+      typeof minPeerReviewsReceived !== "number" &&
+      typeof maxPeerReviewsReceived !== "number" &&
+      typeof minSpamFlags !== "number" &&
+      typeof maxSpamFlags !== "number" &&
+      typeof minPeerReviewAverage !== "number" &&
+      typeof maxPeerReviewAverage !== "number"
     ) {
       return null
     }
@@ -462,8 +472,7 @@ export default class QuizAnswerService {
     let userIdsInSuitableUQStates = null
 
     if (
-      typeof peerReviewsGiven === "number" &&
-      (peerReviewsGiven > 0 && peerReviewsGiven < 1000) &&
+      (minPeerReviewsGiven != null || maxPeerReviewsGiven != null) &&
       quizId
     ) {
       userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
@@ -471,49 +480,90 @@ export default class QuizAnswerService {
       )
         .select("user_quiz_state.user_id")
         .where("user_quiz_state.quiz_id = :quizId", { quizId })
-        .andWhere("user_quiz_state.peer_reviews_given >= :peerReviewsGiven", {
-          peerReviewsGiven,
-        })
+
+      if (minPeerReviewsGiven != null) {
+        userIdsInSuitableUQStates.andWhere(
+          "user_quiz_state.peer_reviews_given >= :minPeerReviewsGiven",
+          {
+            minPeerReviewsGiven,
+          },
+        )
+      }
+
+      if (maxPeerReviewsGiven != null) {
+        userIdsInSuitableUQStates.andWhere(
+          "user_quiz_state.peer_reviews_given <= :maxPeerReviewsGiven",
+          {
+            maxPeerReviewsGiven,
+          },
+        )
+      }
     }
 
     if (
-      typeof peerReviewsReceived === "number" &&
-      peerReviewsReceived > 0 &&
-      peerReviewsReceived <= 1000 &&
+      (minPeerReviewsReceived != null || maxPeerReviewsReceived != null) &&
       quizId
     ) {
-      if (userIdsInSuitableUQStates) {
-        userIdsInSuitableUQStates.andWhere(
-          "user_quiz_state.peer_reviews_received >= :peerReviewsReceived",
-          { peerReviewsReceived },
-        )
-      } else {
+      if (!userIdsInSuitableUQStates) {
         userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
           "user_quiz_state",
         )
           .select("user_quiz_state.user_id")
           .where("user_quiz_state.quiz_id = :quizId", { quizId })
-          .andWhere(
-            "user_quiz_state.peer_reviews_received >= :peerReviewsReceived",
-            { peerReviewsReceived },
-          )
+      }
+
+      if (minPeerReviewsReceived != null) {
+        userIdsInSuitableUQStates.andWhere(
+          "user_quiz_state.peer_reviews_received >= :minPeerReviewsReceived",
+          { minPeerReviewsReceived },
+        )
+      }
+
+      if (maxPeerReviewsReceived != null) {
+        userIdsInSuitableUQStates.andWhere(
+          "user_quiz_state.peer_reviews_received <= :maxPeerReviewsReceived",
+          { maxPeerReviewsReceived },
+        )
       }
     }
 
-    if (typeof spamFlags === "number" && spamFlags > 0 && spamFlags <= 10000) {
-      if (userIdsInSuitableUQStates) {
-        userIdsInSuitableUQStates.andWhere(
-          "user_quiz_state.spam_flags >= :spamFlags",
-          { spamFlags },
-        )
-      } else {
+    if (minSpamFlags != null || maxSpamFlags != null) {
+      if (!userIdsInSuitableUQStates) {
         userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
           "user_quiz_state",
         )
           .select("user_quiz_state.user_id")
           .where("user_quiz_state.quiz_id = :quizId", { quizId })
-          .andWhere("user_quiz_state.spam_flags >= :spamFlags", { spamFlags })
       }
+
+      if (minSpamFlags != null) {
+        userIdsInSuitableUQStates.andWhere(
+          "user_quiz_state.spam_flags >= :minSpamFlags",
+          { minSpamFlags },
+        )
+      }
+
+      if (maxSpamFlags != null) {
+        userIdsInSuitableUQStates.andWhere(
+          "user_quiz_state.spam_flags <= :maxSpamFlags",
+          { maxSpamFlags },
+        )
+      }
+    }
+
+    if (
+      (minPeerReviewAverage != null || maxPeerReviewAverage != null) &&
+      quizId
+    ) {
+      if (!userIdsInSuitableUQStates) {
+        userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
+          "user_quiz_state",
+        )
+          .select("user_quiz_state.user_id")
+          .where("user_quiz_state.quiz_id = :quizId", { quizId })
+      }
+
+      throw new Error("Filtering by average not supported yet!")
     }
 
     if (userIdsInSuitableUQStates) {

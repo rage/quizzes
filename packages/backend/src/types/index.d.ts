@@ -70,11 +70,14 @@ export interface IQuizAnswerQuery {
   firstAllowedTime?: Date
   lastAllowedTime?: Date
   languageIds?: string[]
-  // or: max and min for peer reviews given/received
-  peerReviewsGiven?: number
-  peerReviewsReceived?: number
-  // similarly: min/max spamflags
-  spamFlags?: number
+  minPeerReviewsGiven?: number
+  maxPeerReviewsGiven?: number
+  minPeerReviewsReceived?: number
+  maxPeerReviewsReceived?: number
+  minSpamFlags?: number
+  maxSpamFlags?: number
+  minPeerReviewAverage?: number
+  maxPeerReviewAverage?: number
   addPeerReviews?: boolean
   addSpamFlagNumber?: boolean
   quizRequiresPeerReviews?: boolean
