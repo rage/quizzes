@@ -330,8 +330,8 @@ export default class PeerReviewService {
             FROM
                 user_quiz_state
             WHERE
-                peer_reviews_given >= 3
-                AND peer_reviews_received >= 2
+                peer_reviews_given < 3
+                AND peer_reviews_received < 2
                 AND points_awarded IS NULL
         )
       `),
@@ -353,6 +353,10 @@ export default class PeerReviewService {
       .toString()
 
     const ids = (await this.entityManager.query(query)).map((qa: any) => qa.id)
+
+    if (ids.length === 0) {
+      return []
+    }
 
     return await this.entityManager
       .createQueryBuilder(QuizAnswer, "quiz_answer")
