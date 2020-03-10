@@ -17,7 +17,7 @@ export class RootController {
   @Get("api/healthz")
   public async getHealth(@Res() res: any) {
     try {
-      const quiz = this.entityManager
+      const quiz = await this.entityManager
         .createQueryBuilder(Quiz, "quiz")
         .where("quiz.id = :id", { id: "83d2b8b8-53e7-40b0-bb04-4369151ac75b" })
         .getOne()
