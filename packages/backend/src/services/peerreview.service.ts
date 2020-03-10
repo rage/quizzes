@@ -301,32 +301,62 @@ export default class PeerReviewService {
     alreadyReviewed: string[],
     includeNonPriority: boolean,
   ) {
+    const builder = knex({ client: "pg" })
+
     let statuses = ["submitted"]
 
     if (includeNonPriority) {
       statuses = [...statuses, "enough-received-but-not-given", "confirmed"]
     }
 
+    const query = builder("quiz_answer")
+      .select(
+        builder.raw(`
+        "quiz_answer"."id"
+      `),
+      )
+      .joinRaw(
+        `
+        INNER JOIN "user_quiz_state" "user_quiz_state" ON quiz_answer.user_id = user_quiz_state.user_id
+        AND quiz_answer.quiz_id = user_quiz_state.quiz_id
+      `,
+      )
+      .where("quiz_answer.quiz_id", quizId)
+      .andWhere(
+        builder.raw(`
+        quiz_answer.user_id IN (
+            SELECT
+                user_id
+            FROM
+                user_quiz_state
+            WHERE
+                peer_reviews_given >= 3
+                AND peer_reviews_received >= 2
+                AND points_awarded IS NULL
+        )
+      `),
+      )
+      .andWhere("quiz_answer.user_id", "!=", reviewerId)
+      .andWhere("quiz_answer.status", "in", statuses)
+      .andWhere("quiz_answer.id", "not in", rejected)
+      .andWhere("quiz_answer.id", "not in", alreadyReviewed)
+      .andWhere("quiz_answer.language_id", languageId)
+      .orderByRaw(
+        `
+        "quiz_answer"."status" ASC,
+        user_quiz_state.peer_reviews_given DESC,
+        quiz_answer.created_at ASC,
+        user_quiz_state.peer_reviews_received ASC
+      `,
+      )
+      .limit(20)
+      .toString()
+
+    const ids = (await this.entityManager.query(query)).map((qa: any) => qa.id)
+
     return await this.entityManager
       .createQueryBuilder(QuizAnswer, "quiz_answer")
-      .innerJoin(
-        UserQuizState,
-        "user_quiz_state",
-        "quiz_answer.user_id = user_quiz_state.user_id and quiz_answer.quiz_id = user_quiz_state.quiz_id",
-      )
-      .where("quiz_answer.quiz_id = :quizId", { quizId })
-      .andWhere("quiz_answer.status in (:...statuses)", { statuses })
-      .andWhere("quiz_answer.user_id != :reviewerId", { reviewerId })
-      .andWhere("quiz_answer.id not in (:...rejected)", { rejected })
-      .andWhere("quiz_answer.id not in (:...alreadyReviewed)", {
-        alreadyReviewed,
-      })
-      .andWhere("quiz_answer.language_id = :languageId", { languageId })
-      .orderBy("quiz_answer.status")
-      .addOrderBy("user_quiz_state.peer_reviews_given", "DESC")
-      .addOrderBy("quiz_answer.created_at")
-      .addOrderBy("user_quiz_state.peer_reviews_received")
-      .limit(20)
+      .where("quiz_answer.id in (:...ids)", { ids })
       .getMany()
   }
 }
