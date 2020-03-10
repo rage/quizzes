@@ -24,7 +24,7 @@ envsubst < "$CURRENT_DIR/../kubernetes/backend-deployment.yaml" > "$CURRENT_DIR/
 # envsubst < "$CURRENT_DIR/../kubernetes/migrate-quiznator-data-cronjob.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/migrate-quiznator-data-cronjob.yaml"
 # envsubst < "$CURRENT_DIR/../kubernetes/create-user-quiz-states-cronjob.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/create-user-quiz-states-cronjob.yaml"
 envsubst < "$CURRENT_DIR/../kubernetes/dashboard-deployment.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/dashboard-deployment.yaml"
-# envsubst < "$CURRENT_DIR/../kubernetes/kafka-batch-producer-cronjob.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/kafka-batch-producer-cronjob.yaml"
+envsubst < "$CURRENT_DIR/../kubernetes/kafka-batch-producer-cronjob.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/kafka-batch-producer-cronjob.yaml"
 # envsubst < "$CURRENT_DIR/../kubernetes/update-quiz-item-answer-correct-cronjob.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/update-quiz-item-answer-correct-cronjob.yaml"
 envsubst < "$CURRENT_DIR/../kubernetes/refresh-reaktor-view-cronjob.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/refresh-reaktor-view-cronjob.yaml"
 
