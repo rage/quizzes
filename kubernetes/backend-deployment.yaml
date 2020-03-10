@@ -6,7 +6,7 @@ spec:
   selector:
     matchLabels:
       app: quizzes-backend
-  replicas: 3
+  replicas: 5
   template:
     metadata:
       labels:
