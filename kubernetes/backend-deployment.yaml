@@ -16,6 +16,13 @@ spec:
       - name: quizzes-backend
         image: ${BACKEND_IMAGE}
         imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "100m"
+          limits:
+            memory: "1000Mi"
+            cpu: "500m"
         readinessProbe:
           httpGet:
             path: /api/healthz
