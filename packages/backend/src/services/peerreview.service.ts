@@ -303,47 +303,48 @@ export default class PeerReviewService {
   ) {
     const builder = knex({ client: "pg" })
 
-    let statuses = ["submitted"]
-
-    if (includeNonPriority) {
-      statuses = [...statuses, "enough-received-but-not-given", "confirmed"]
-    }
+    const limitingQuery = builder("user_quiz_state")
+      .select("user_id")
+      .join("quiz", "user_quiz_state.quiz_id", "quiz.id")
+      .join("course", "quiz.course_id", "course.id")
+      .where("quiz_id", quizId)
+      .modify(qb => {
+        if (includeNonPriority) {
+          qb.where("points_awarded", ">", 0).andWhere(
+            builder.raw(
+              "peer_reviews_received = course.min_peer_reviews_received",
+            ),
+          )
+        } else {
+          qb.whereNull("points_awarded").andWhere(
+            builder.raw(
+              "peer_reviews_received < course.min_peer_reviews_received",
+            ),
+          )
+        }
+      })
 
     const query = builder("quiz_answer")
       .select(
         builder.raw(`
-        "quiz_answer"."id"
+        quiz_answer.id
       `),
       )
       .joinRaw(
         `
-        INNER JOIN "user_quiz_state" "user_quiz_state" ON quiz_answer.user_id = user_quiz_state.user_id
+        INNER JOIN user_quiz_state
+        ON quiz_answer.user_id = user_quiz_state.user_id
         AND quiz_answer.quiz_id = user_quiz_state.quiz_id
       `,
       )
-      .where("quiz_answer.quiz_id", quizId)
-      .andWhere(
-        builder.raw(`
-        quiz_answer.user_id IN (
-            SELECT
-                user_id
-            FROM
-                user_quiz_state
-            WHERE
-                peer_reviews_given < 3
-                AND peer_reviews_received < 2
-                AND points_awarded IS NULL
-        )
-      `),
-      )
       .andWhere("quiz_answer.user_id", "!=", reviewerId)
-      .andWhere("quiz_answer.status", "in", statuses)
+      .andWhere("quiz_answer.user_id", "in", limitingQuery)
       .andWhere("quiz_answer.id", "not in", rejected)
       .andWhere("quiz_answer.id", "not in", alreadyReviewed)
       .andWhere("quiz_answer.language_id", languageId)
       .orderByRaw(
         `
-        "quiz_answer"."status" ASC,
+        quiz_answer.status ASC,
         user_quiz_state.peer_reviews_given DESC,
         quiz_answer.created_at ASC,
         user_quiz_state.peer_reviews_received ASC
@@ -351,6 +352,8 @@ export default class PeerReviewService {
       )
       .limit(20)
       .toString()
+
+    console.log(query)
 
     const ids = (await this.entityManager.query(query)).map((qa: any) => qa.id)
 
