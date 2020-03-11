@@ -297,6 +297,7 @@ export class QuizAnswerController {
         attentionCriteriaQuery.minPeerReviewsGiven = course.minPeerReviewsGiven
         attentionCriteriaQuery.minPeerReviewsReceived =
           course.minPeerReviewsReceived
+        attentionCriteriaQuery.minSpamFlagsOr = 1
       } else {
         const limitDate = new Date()
         limitDate.setDate(limitDate.getDate() - 14)

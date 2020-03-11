@@ -78,6 +78,7 @@ export interface IQuizAnswerQuery {
   minPeerReviewsReceived?: number
   maxPeerReviewsReceived?: number
   minSpamFlags?: number
+  minSpamFlagsOr?: number
   maxSpamFlags?: number
   minPeerReviewAverage?: number
   maxPeerReviewAverage?: number

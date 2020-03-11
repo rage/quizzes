@@ -1,6 +1,11 @@
 import Knex from "knex"
 import { Inject, Service } from "typedi"
-import { EntityManager, SelectQueryBuilder, EntityRepository } from "typeorm"
+import {
+  EntityManager,
+  SelectQueryBuilder,
+  EntityRepository,
+  Brackets,
+} from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import validator from "validator"
 import {
@@ -183,6 +188,7 @@ export default class QuizAnswerService {
         statuses: ["spam", "submitted", "enough-received-but-not-given"],
         minPeerReviewsGiven: 3,
         minPeerReviewsReceived: 2,
+        minSpamFlagsOr: 1,
       }
       elementsCriteria.courseIdIncludedInCourseIds = true
 
@@ -395,6 +401,7 @@ export default class QuizAnswerService {
       maxPeerReviewsReceived,
       quizRequiresPeerReviews,
       minSpamFlags,
+      minSpamFlagsOr,
       maxSpamFlags,
       minPeerReviewAverage,
       maxPeerReviewAverage,
@@ -421,6 +428,7 @@ export default class QuizAnswerService {
       typeof maxSpamFlags !== "number" &&
       typeof minPeerReviewAverage !== "number" &&
       typeof maxPeerReviewAverage !== "number" &&
+      typeof minSpamFlagsOr !== "number" &&
       !courseIds &&
       courseIdIncludedInCourseIds == null
     ) {
@@ -528,23 +536,10 @@ export default class QuizAnswerService {
       throw new Error("filtering by average not supported yet")
     }
 
-    if (minPeerReviewsGiven) {
-      queryBuilder.andWhere(
-        "user_quiz_state.peer_reviews_given >= :minPeerReviewsGiven",
-        { minPeerReviewsGiven },
-      )
-    }
     if (maxPeerReviewsGiven) {
       queryBuilder.andWhere(
         "user_quiz_state.peer_reviews_given <= :maxPeerReviewsGiven",
         { maxPeerReviewsGiven },
-      )
-    }
-
-    if (minPeerReviewsReceived) {
-      queryBuilder.andWhere(
-        "user_quiz_state.peer_reviews_received >= :minPeerReviewsReceived",
-        { minPeerReviewsReceived },
       )
     }
 
@@ -566,6 +561,35 @@ export default class QuizAnswerService {
         maxSpamFlags,
       })
     }
+
+    if (minSpamFlagsOr && minPeerReviewsGiven && minPeerReviewsReceived) {
+      queryBuilder.andWhere(
+        `(user_quiz_state.spam_flags >= :minSpamFlagsOr
+        OR (user_quiz_state.peer_reviews_given >= :minPeerReviewsGiven
+          AND user_quiz_state.peer_reviews_received >= :minPeerReviewsReceived))`,
+        {
+          minSpamFlagsOr,
+          minPeerReviewsGiven,
+          minPeerReviewsReceived,
+        },
+      )
+    } else {
+      if (minPeerReviewsGiven) {
+        queryBuilder.andWhere(
+          "user_quiz_state.peer_reviews_given >= :minPeerReviewsGiven",
+          { minPeerReviewsGiven },
+        )
+      }
+
+      if (minPeerReviewsReceived) {
+        queryBuilder.andWhere(
+          "user_quiz_state.peer_reviews_received >= :minPeerReviewsReceived",
+          { minPeerReviewsReceived },
+        )
+      }
+    }
+
+    console.log("SQL: ", queryBuilder.getQueryAndParameters())
     return queryBuilder
   }
 
