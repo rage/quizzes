@@ -310,11 +310,13 @@ export default class PeerReviewService {
       .where("quiz_id", quizId)
       .modify(qb => {
         if (includeNonPriority) {
-          qb.where("points_awarded", ">", 0).andWhere(
-            builder.raw(
-              "peer_reviews_received = course.min_peer_reviews_received",
-            ),
-          )
+          qb.where("points_awarded", ">", 0)
+            .andWhere(
+              builder.raw(
+                "peer_reviews_received = course.min_peer_reviews_received",
+              ),
+            )
+            .andWhere("spam_flags", "<=", "max_spam_flags")
         } else {
           qb.whereNull("points_awarded").andWhere(
             builder.raw(
@@ -342,6 +344,11 @@ export default class PeerReviewService {
       .andWhere("quiz_answer.id", "not in", rejected)
       .andWhere("quiz_answer.id", "not in", alreadyReviewed)
       .andWhere("quiz_answer.language_id", languageId)
+      .andWhere("quiz_answer.status", "not in", [
+        "deprecated",
+        "rejected",
+        "spam",
+      ])
       .orderByRaw(
         `
         quiz_answer.status ASC,
@@ -352,8 +359,6 @@ export default class PeerReviewService {
       )
       .limit(20)
       .toString()
-
-    console.log(query)
 
     const ids = (await this.entityManager.query(query)).map((qa: any) => qa.id)
 
