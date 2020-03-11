@@ -122,26 +122,21 @@ export class QuizAnswerController {
           user,
         }
 
-    const result = await this.quizAnswerService.getAnswersCount(criteriaQuery)
-
     // only one quiz and user has permission to view the course -> safe to return
     if (user.administrator || quizId) {
-      return result
+      return await this.quizAnswerService.getAnswersCount(criteriaQuery)
     }
 
     const roles = await this.userCourseRoleService.getUserCourseRoles({
       userId: user.id,
     })
 
-    const quizzes = await Quiz.findByIds(result.map((info: any) => info.quizId))
-    const filteredQuizzes = quizzes.filter(q =>
-      roles.some(r => r.courseId === q.courseId),
-    )
-    const filtered = result.filter((r: any) =>
-      filteredQuizzes.some(q => q.id === r.quizId),
-    )
+    criteriaQuery.courseIds = roles.map(r => r.courseId)
+    criteriaQuery.courseIdIncludedInCourseIds = true
 
-    return filtered
+    const result = await this.quizAnswerService.getAnswersCount(criteriaQuery)
+
+    return result
   }
 
   @Get("/data/:quizId/plainAnswers")
@@ -323,6 +318,7 @@ export class QuizAnswerController {
     }
 
     result = await this.quizAnswerService.getAnswers(attentionCriteriaQuery)
+
     return result
   }
 

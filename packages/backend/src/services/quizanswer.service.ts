@@ -100,10 +100,10 @@ export default class QuizAnswerService {
       }
     }
 
-    const result = (await this.constructGetAnswersQuery(query))
-      .skip(skip)
-      .take(limit)
-      .getMany()
+    const sqlQuery = this.constructGetAnswersQuery(query)
+    sqlQuery.skip(skip).take(limit)
+
+    const result = await sqlQuery.getMany()
 
     return result
   }
@@ -176,9 +176,7 @@ export default class QuizAnswerService {
       // Assuming that all the relevant quizzes on all elements courses use the same values, which are hard-coded below
       // TODO: change query building to support option "course-minimum" for the relevant properties
 
-      const elementsCourseIds: string[] = await this.courseService.getElementsCourseIds(
-        true,
-      )
+      const elementsCourseIds: string[] = await this.courseService.getElementsCourseIds()
       const elementsCriteria: IQuizAnswerQuery = {
         courseIds: elementsCourseIds,
         courseIdIncludedInCourseIds: true,
@@ -188,25 +186,16 @@ export default class QuizAnswerService {
       }
       elementsCriteria.courseIdIncludedInCourseIds = true
 
-      const result1 = await this.getQuizCounts(elementsCriteria)
+      const nonElementsCriteria = { ...query }
 
-      const elementsQuizIds = result1.map((elem: any) => elem.quizId)
-      const resultAll = await this.getQuizCounts(query)
-
-      const result2 = resultAll.filter(
-        (elem: any) => !elementsQuizIds.includes(elem.quizId),
-      )
-      result = result1.concat(result2)
-
-      /* Change to this when we want to rely on user quiz state with every quiz. Otherwise the counts will be lower / 0
-        on some quizzes (hopefully only old and fairly unneeded ones)
       nonElementsCriteria.courseIds = elementsCourseIds
       nonElementsCriteria.courseIdIncludedInCourseIds = false
 
-      const result2 = await this.getQuizCounts(nonElementsCriteria)
-
+      const [result1, result2] = await Promise.all([
+        this.getQuizCounts(elementsCriteria),
+        this.getQuizCounts(nonElementsCriteria),
+      ])
       result = result1.concat(result2)
-      */
     }
 
     if (!query.quizId) {
@@ -387,9 +376,9 @@ export default class QuizAnswerService {
     return spamFlagCount
   }
 
-  private async constructGetAnswersQuery(
+  private constructGetAnswersQuery(
     query: IQuizAnswerQuery,
-  ): Promise<SelectQueryBuilder<QuizAnswer>> {
+  ): SelectQueryBuilder<QuizAnswer> {
     const {
       id,
       quizId,
@@ -461,30 +450,34 @@ export default class QuizAnswerService {
         quiz_id: quizId,
       })
     } else if (quizRequiresPeerReviews) {
-      queryBuilder
-        .innerJoin(Quiz, "quiz", "quiz_answer.quiz_id = quiz.id")
-        .innerJoin(PeerReviewCollection, "prc", "prc.quiz_id = quiz.id")
-        .where("prc.quiz_id IS NOT NULL")
+      queryBuilder.andWhere(
+        "quiz_answer.quiz_id in (SELECT quiz_id FROM peer_review_collection)",
+      )
     }
 
     // Required for the min / max criteria to work when the counts are needed for more than one quiz
     // This could be done always, but depends on the correct state of user quiz state
     // Hopefully that can be counted on with newer courses and answers
 
-    if (courseIds && courseIds.length > 0) {
-      queryBuilder
-        .innerJoin(
-          UserQuizState,
-          "user_quiz_state",
-          "user_quiz_state.quiz_id = quiz_answer.quiz_id",
-        )
-        .andWhere("user_quiz_state.user_id = quiz_answer.user_id")
+    if (addSpamFlagNumber) {
+      queryBuilder.leftJoinAndMapOne(
+        "quiz_answer.userQuizState",
+        UserQuizState,
+        "user_quiz_state",
+        "user_quiz_state.quiz_id = quiz_answer.quiz_id " +
+          "AND user_quiz_state.user_id = quiz_answer.user_id",
+      )
+    } else {
+      queryBuilder.leftJoin(
+        UserQuizState,
+        "user_quiz_state",
+        "user_quiz_state.quiz_id = quiz_answer.quiz_id " +
+          "AND user_quiz_state.user_id = quiz_answer.user_id",
+      )
     }
 
     if (courseIds && courseIds.length > 0) {
-      if (!quizRequiresPeerReviews) {
-        queryBuilder.innerJoin(Quiz, "quiz", "quiz_answer.quiz_id = quiz.id")
-      }
+      queryBuilder.innerJoin(Quiz, "quiz", "quiz_answer.quiz_id = quiz.id")
 
       queryBuilder.andWhere(
         `quiz.course_id ${
@@ -526,192 +519,58 @@ export default class QuizAnswerService {
 
     // We assume that user quiz states are usable in this case
     // true for elements courses, which are currently the only need for courseIds property
-    if (courseIds && courseIds.length > 0) {
-      if (minPeerReviewAverage) {
-        throw new Error("filtering by average not supported yet")
-      }
 
-      if (maxPeerReviewAverage) {
-        throw new Error("filtering by average not supported yet")
-      }
-
-      if (minPeerReviewsGiven) {
-        queryBuilder.andWhere(
-          "user_quiz_state.peer_reviews_given >= :minPeerReviewsGiven",
-          { minPeerReviewsGiven },
-        )
-      }
-      if (maxPeerReviewsGiven) {
-        queryBuilder.andWhere(
-          "user_quiz_state.peer_reviews_given <= :maxPeerReviewsGiven",
-          { maxPeerReviewsGiven },
-        )
-      }
-
-      if (minPeerReviewsReceived) {
-        queryBuilder.andWhere(
-          "user_quiz_state.peer_reviews_received >= :minPeerReviewsReceived",
-          { minPeerReviewsReceived },
-        )
-      }
-
-      if (maxPeerReviewsReceived) {
-        queryBuilder.andWhere(
-          "user_quiz_state.peer_reviews_received <= :maxPeerReviewsReceived",
-          { maxPeerReviewsReceived },
-        )
-      }
-
-      if (minSpamFlags) {
-        queryBuilder.andWhere("user_quiz_state.spam_flags>= :minSpamFlags", {
-          minSpamFlags,
-        })
-      }
-
-      if (maxSpamFlags) {
-        queryBuilder.andWhere("user_quiz_state.spam_flags <= :maxSpamFlags", {
-          maxSpamFlags,
-        })
-      }
-
-      // Must be handled somehow if they are needed. Join has happened
-      /*
-      if (addSpamFlagNumber) {
-        queryBuilder.leftJoinAndMapOne(
-          "quiz_answer.userQuizState",
-          UserQuizState,
-          "user_quiz_state",
-          "user_quiz_state.quiz_id = quiz_answer.quiz_id " +
-            "AND user_quiz_state.user_id = quiz_answer.user_id",
-        )
-      }
-      */
-
-      return queryBuilder
+    if (minPeerReviewAverage) {
+      throw new Error("filtering by average not supported yet")
     }
 
-    let userIdsInSuitableUQStates = null
+    if (maxPeerReviewAverage) {
+      throw new Error("filtering by average not supported yet")
+    }
 
-    if (
-      (minPeerReviewsGiven != null || maxPeerReviewsGiven != null) &&
-      quizId
-    ) {
-      userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
-        "user_quiz_state",
+    if (minPeerReviewsGiven) {
+      queryBuilder.andWhere(
+        "user_quiz_state.peer_reviews_given >= :minPeerReviewsGiven",
+        { minPeerReviewsGiven },
       )
-        .select("user_quiz_state.user_id")
-        .where("user_quiz_state.quiz_id = :quizId", { quizId })
-
-      if (minPeerReviewsGiven != null) {
-        userIdsInSuitableUQStates.andWhere(
-          "user_quiz_state.peer_reviews_given >= :minPeerReviewsGiven",
-          {
-            minPeerReviewsGiven,
-          },
-        )
-      }
-
-      if (maxPeerReviewsGiven != null) {
-        userIdsInSuitableUQStates.andWhere(
-          "user_quiz_state.peer_reviews_given <= :maxPeerReviewsGiven",
-          {
-            maxPeerReviewsGiven,
-          },
-        )
-      }
     }
-
-    if (
-      (minPeerReviewsReceived != null || maxPeerReviewsReceived != null) &&
-      quizId
-    ) {
-      if (!userIdsInSuitableUQStates) {
-        userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
-          "user_quiz_state",
-        )
-          .select("user_quiz_state.user_id")
-          .where("user_quiz_state.quiz_id = :quizId", { quizId })
-      }
-
-      if (minPeerReviewsReceived != null) {
-        userIdsInSuitableUQStates.andWhere(
-          "user_quiz_state.peer_reviews_received >= :minPeerReviewsReceived",
-          { minPeerReviewsReceived },
-        )
-      }
-
-      if (maxPeerReviewsReceived != null) {
-        userIdsInSuitableUQStates.andWhere(
-          "user_quiz_state.peer_reviews_received <= :maxPeerReviewsReceived",
-          { maxPeerReviewsReceived },
-        )
-      }
-    }
-
-    if ((minSpamFlags != null || maxSpamFlags != null) && quizId) {
-      if (!userIdsInSuitableUQStates) {
-        userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
-          "user_quiz_state",
-        )
-          .select("user_quiz_state.user_id")
-          .where("user_quiz_state.quiz_id IN :quizId", { quizId })
-      }
-
-      if (minSpamFlags != null) {
-        userIdsInSuitableUQStates.andWhere(
-          "user_quiz_state.spam_flags >= :minSpamFlags",
-          { minSpamFlags },
-        )
-      }
-
-      if (maxSpamFlags != null) {
-        userIdsInSuitableUQStates.andWhere(
-          "user_quiz_state.spam_flags <= :maxSpamFlags",
-          { maxSpamFlags },
-        )
-      }
-    }
-
-    if (
-      (minPeerReviewAverage != null || maxPeerReviewAverage != null) &&
-      quizId
-    ) {
-      if (!userIdsInSuitableUQStates) {
-        userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
-          "user_quiz_state",
-        )
-          .select("user_quiz_state.user_id")
-          .where("user_quiz_state.quiz_id = :quizId", { quizId })
-      }
-
-      throw new Error("Filtering by average not supported yet!")
-    }
-
-    if (userIdsInSuitableUQStates) {
-      queryBuilder
-        .andWhere(
-          "quiz_answer.user_id IN (" +
-            userIdsInSuitableUQStates.getQuery() +
-            ")",
-        )
-        .setParameters(userIdsInSuitableUQStates.getParameters())
-    }
-
-    if (addSpamFlagNumber) {
-      queryBuilder.leftJoinAndMapOne(
-        "quiz_answer.userQuizState",
-        UserQuizState,
-        "user_quiz_state",
-        "user_quiz_state.quiz_id = quiz_answer.quiz_id " +
-          "AND user_quiz_state.user_id = quiz_answer.user_id",
+    if (maxPeerReviewsGiven) {
+      queryBuilder.andWhere(
+        "user_quiz_state.peer_reviews_given <= :maxPeerReviewsGiven",
+        { maxPeerReviewsGiven },
       )
     }
 
+    if (minPeerReviewsReceived) {
+      queryBuilder.andWhere(
+        "user_quiz_state.peer_reviews_received >= :minPeerReviewsReceived",
+        { minPeerReviewsReceived },
+      )
+    }
+
+    if (maxPeerReviewsReceived) {
+      queryBuilder.andWhere(
+        "user_quiz_state.peer_reviews_received <= :maxPeerReviewsReceived",
+        { maxPeerReviewsReceived },
+      )
+    }
+
+    if (minSpamFlags) {
+      queryBuilder.andWhere("user_quiz_state.spam_flags>= :minSpamFlags", {
+        minSpamFlags,
+      })
+    }
+
+    if (maxSpamFlags) {
+      queryBuilder.andWhere("user_quiz_state.spam_flags <= :maxSpamFlags", {
+        maxSpamFlags,
+      })
+    }
     return queryBuilder
   }
 
   private async getQuizCounts(query: IQuizAnswerQuery): Promise<any> {
-    const someQuery = await this.constructGetAnswersQuery(query)
+    const someQuery = this.constructGetAnswersQuery(query)
 
     if (query.quizRequiresPeerReviews && query.quizId) {
       const prc = await PeerReviewCollection.createQueryBuilder("prc")
@@ -725,7 +584,7 @@ export default class QuizAnswerService {
 
     someQuery
       .select("quiz_answer.quiz_id", "quizId")
-      .addSelect("COUNT(DISTINCT quiz_answer.id)")
+      .addSelect("COUNT(quiz_answer.id)")
       .addGroupBy("quiz_answer.quiz_id")
 
     const result = (await someQuery.execute()).map(
