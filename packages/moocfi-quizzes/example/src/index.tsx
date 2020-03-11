@@ -50,7 +50,7 @@ const App = () => {
   const quizId = useInput("quizId", "")
   const languageId = useInput("languageId", "")
   const accessToken = useInput("accessToken", "")
-  const moocfiBaseUrl = useInput("moocfiBaseUrl", "https://mooc.fi")
+  const moocfiBaseUrl = useInput("moocfiBaseUrl", "https://www.mooc.fi")
   const quizzesBaseUrl = useInput("quizzesBaseUrl", "https://quizzes.mooc.fi")
 
   const [containerUsed, setContainerUsed] = useLocalStorage(
