@@ -24,6 +24,8 @@ interface CourseStatusProviderProps {
   accessToken: string
   courseId: string
   languageId: string
+  moocfiBaseUrl: string
+  quizzesBaseUrl: string
 }
 
 const ToastType = toast.TYPE
@@ -54,18 +56,57 @@ const isMessage = (message: any): message is Message => {
 export const CourseStatusProvider: React.FunctionComponent<
   CourseStatusProviderProps
 > = React.memo(({ children, ...props }) => {
-  const { accessToken, courseId, languageId } = props
+  const {
+    accessToken,
+    courseId,
+    languageId,
+    moocfiBaseUrl,
+    quizzesBaseUrl,
+  } = props
 
   const prevProps = useRef({
     accessToken: "",
     courseId: "",
     languageId: "",
+    moocfiBaseUrl: "",
+    quizzesBaseUrl: "",
   })
 
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-  const [updateQuiz, setUpdateQuiz] = useState({})
-  const [data, setData] = useState<ProgressData | undefined>()
+  const moocfiWsUrl =
+    moocfiBaseUrl && moocfiBaseUrl.includes("localhost")
+      ? moocfiBaseUrl.replace("http", "ws")
+      : moocfiBaseUrl.replace("https", "wss")
+
+  const quizzesWsUrl =
+    quizzesBaseUrl && quizzesBaseUrl.includes("localhost")
+      ? quizzesBaseUrl.replace("http", "ws")
+      : quizzesBaseUrl.replace("https", "wss")
+
+  const [progressProviderState, setProgressProviderState] = useState<
+    CourseProgressProviderInterface
+  >({
+    error: false,
+    loading: true,
+    notifyError: (message: string) => {
+      notifySticky(message, ToastType.ERROR)
+    },
+    courseProgressData: undefined,
+  })
+
+  const [statusProviderState, setStatusProviderState] = useState<
+    CourseStatusProviderInterface
+  >({
+    updateQuiz: {},
+    quizUpdated: (id: string) => {
+      setStatusProviderState({
+        ...statusProviderState,
+        updateQuiz: { ...statusProviderState.updateQuiz, [id]: false },
+      })
+    },
+    notifyError: (message: string) => {
+      notifySticky(message, ToastType.ERROR)
+    },
+  })
 
   const [moocfiStatus, setMoocfiStatus] = useState<ConnectionStatus>(
     ConnectionStatus.DISCONNECTED,
@@ -74,21 +115,21 @@ export const CourseStatusProvider: React.FunctionComponent<
     ConnectionStatus.DISCONNECTED,
   )
 
+  const [moocfiClient, setMoocfiClient] = useState<WebSocket | undefined>()
+  const [quizzesClient, setQuizzesClient] = useState<WebSocket | undefined>()
+
   const maxReconnectDelay = 1800
   const [moocfiReconnectDelay, setMoocfiReconnectDelay] = useState(10)
   const [quizzesReconnectDelay, setQuizzesReconnectDelay] = useState(10)
 
-  const [moocfiClient, setMoocfiClient] = useState<WebSocket | undefined>()
-  const [quizzesClient, setQuizzesClient] = useState<WebSocket | undefined>()
-
   const shouldFetch =
     accessToken !== prevProps.current.accessToken ||
     courseId !== prevProps.current.courseId ||
-    languageId !== prevProps.current.languageId
-  const shouldConnectMoocfi =
-    !loading && !error && moocfiStatus === ConnectionStatus.DISCONNECTED
-  const shouldConnectQuizzes =
-    !loading && !error && quizzesStatus === ConnectionStatus.DISCONNECTED
+    languageId !== prevProps.current.languageId ||
+    moocfiBaseUrl !== prevProps.current.moocfiBaseUrl
+  quizzesBaseUrl !== prevProps.current.quizzesBaseUrl
+  const shouldConnectMoocfi = moocfiStatus === ConnectionStatus.DISCONNECTED
+  const shouldConnectQuizzes = quizzesStatus === ConnectionStatus.DISCONNECTED
 
   useEffect(() => {
     if (accessToken && courseId) {
@@ -98,7 +139,7 @@ export const CourseStatusProvider: React.FunctionComponent<
       }
       if (shouldConnectMoocfi) {
         connect(
-          "wss://www.mooc.fi/ws",
+          `${moocfiWsUrl}/ws`,
           setMoocfiClient,
           setMoocfiStatus,
           moocfiReconnectDelay,
@@ -107,7 +148,7 @@ export const CourseStatusProvider: React.FunctionComponent<
       }
       if (shouldConnectQuizzes) {
         connect(
-          "wss://quizzes.mooc.fi/ws",
+          `${quizzesWsUrl}/ws`,
           setQuizzesClient,
           setQuizzesStatus,
           quizzesReconnectDelay,
@@ -121,16 +162,30 @@ export const CourseStatusProvider: React.FunctionComponent<
 
   const fetchProgressData = async () => {
     try {
-      const progressData = await getUserCourseData(courseId, accessToken)
-      const completionData = await getCompletion(courseId, accessToken)
+      const progressData = await getUserCourseData(
+        courseId,
+        accessToken,
+        quizzesBaseUrl,
+      )
+      const completionData = await getCompletion(
+        courseId,
+        accessToken,
+        moocfiBaseUrl,
+      )
       progressData.currentUser.completions =
         completionData.currentUser.completions
       const data = transformData(progressData)
-      setData(data)
-      setLoading(false)
+      setProgressProviderState({
+        ...progressProviderState,
+        courseProgressData: data,
+        loading: false,
+      })
     } catch (error) {
-      setError(true)
-      setLoading(false)
+      setProgressProviderState({
+        ...progressProviderState,
+        loading: false,
+        error: true,
+      })
       console.log(error)
       console.log("Could not fetch course progress data")
       notifySticky(
@@ -167,6 +222,7 @@ export const CourseStatusProvider: React.FunctionComponent<
         reconnect(host, setStatus, reconnectDelay, setReconnectDelay)
       client.send(JSON.stringify({ accessToken, courseId }))
       setClient(client)
+      setReconnectDelay(10)
       setStatus(ConnectionStatus.CONNECTED)
       console.log(`connected to ${host}`)
     } catch (error) {
@@ -193,17 +249,24 @@ export const CourseStatusProvider: React.FunctionComponent<
   }
 
   const logout = () => {
-    setLoading(true)
-    setError(false)
-    setData(undefined)
+    setProgressProviderState({
+      ...progressProviderState,
+      loading: true,
+      error: false,
+      courseProgressData: undefined,
+    })
     moocfiClient && moocfiClient.close()
     quizzesClient && quizzesClient.close()
     setMoocfiClient(undefined)
     setQuizzesClient(undefined)
+    setMoocfiReconnectDelay(10)
+    setQuizzesReconnectDelay(10)
     prevProps.current = {
       accessToken: "",
       courseId: "",
       languageId: "",
+      moocfiBaseUrl: "",
+      quizzesBaseUrl: "",
     }
   }
 
@@ -215,14 +278,26 @@ export const CourseStatusProvider: React.FunctionComponent<
           fetchProgressData()
           break
         case MessageType.PEER_REVIEW_RECEIVED:
-          setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
+          setStatusProviderState({
+            ...progressProviderState,
+            updateQuiz: {
+              ...statusProviderState.updateQuiz,
+              [message.payload]: true,
+            },
+          })
           /*notifyRegular(
             languageOptions[languageId].receivedPeerReviews.peerReviewReceived,
             ToastType.SUCCESS,
           )*/
           break
         case MessageType.QUIZ_CONFIRMED:
-          setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
+          setStatusProviderState({
+            ...progressProviderState,
+            updateQuiz: {
+              ...statusProviderState.updateQuiz,
+              [message.payload]: true,
+            },
+          })
           /*notifyRegular(
             languageOptions[languageId].general.answerConfirmed,
             ToastType.SUCCESS,
@@ -233,7 +308,13 @@ export const CourseStatusProvider: React.FunctionComponent<
           )*/
           break
         case MessageType.QUIZ_REJECTED:
-          setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
+          setStatusProviderState({
+            ...progressProviderState,
+            updateQuiz: {
+              ...statusProviderState.updateQuiz,
+              [message.payload]: true,
+            },
+          })
           break
         case MessageType.COURSE_CONFIRMED:
           fetchProgressData()
@@ -247,30 +328,9 @@ export const CourseStatusProvider: React.FunctionComponent<
   const notifySticky = (message: string, type?: TypeOptions) =>
     toast(message, { containerId: "sticky", type })
 
-  const quizUpdated = (id: string) => {
-    setUpdateQuiz({ ...updateQuiz, [id]: false })
-  }
-
-  const notifyError = (message: string) => {
-    notifySticky(message, ToastType.ERROR)
-  }
-
-  const progress: CourseProgressProviderInterface = {
-    error,
-    loading,
-    // notifyError,
-    courseProgressData: data,
-  }
-
-  const status: CourseStatusProviderInterface = {
-    // updateQuiz,
-    // quizUpdated,
-    // notifyError,
-  }
-
   return (
-    <CourseProgressProviderContext.Provider value={progress}>
-      <CourseStatusProviderContext.Provider value={status}>
+    <CourseProgressProviderContext.Provider value={progressProviderState}>
+      <CourseStatusProviderContext.Provider value={statusProviderState}>
         <ToastContainer
           enableMultiContainer
           newestOnTop={false}

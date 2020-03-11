@@ -46,10 +46,12 @@ const StyledFormControlLabel = styled(FormControlLabel)`
 `
 
 const App = () => {
-  const id = useInput("id", "")
+  const courseId = useInput("courseId", "")
+  const quizId = useInput("quizId", "")
   const languageId = useInput("languageId", "")
-  const accessToken = useInput("savedAccessToken", "")
-  const baseUrl = useInput("savedBaseUrl", "https://quizzes.mooc.fi")
+  const accessToken = useInput("accessToken", "")
+  const moocfiBaseUrl = useInput("moocfiBaseUrl", "https://mooc.fi")
+  const quizzesBaseUrl = useInput("quizzesBaseUrl", "https://quizzes.mooc.fi")
 
   const [containerUsed, setContainerUsed] = useLocalStorage(
     "containerUsed",
@@ -81,10 +83,10 @@ const App = () => {
 
   const quizPortion = (
     <Quiz
-      id={id.value}
+      id={quizId.value}
       languageId={languageId.value}
       accessToken={accessToken.value}
-      backendAddress={baseUrl.value}
+      backendAddress={quizzesBaseUrl.value}
       fullInfoWithoutLogin={showFullInfoWhenLoggedOut === "true"}
       showZeroPointsInfo={showAlwaysPoints === "true"}
     />
@@ -123,18 +125,22 @@ const App = () => {
 
   return (
     <CourseStatusProvider
-      courseId="08c4757a-51ec-4551-bdb6-46fba3da765b"
+      courseId={courseId.value}
       accessToken={accessToken.value}
       languageId={languageId.value}
+      moocfiBaseUrl={moocfiBaseUrl.value}
+      quizzesBaseUrl={quizzesBaseUrl.value}
     >
       <Typography variant="h4" component="h1">
         Quizzes testing
       </Typography>
       <Progress />
-      <StyledTextField {...id} label="Quiz id" />
+      <StyledTextField {...courseId} label="Course id" />
+      <StyledTextField {...quizId} label="Quiz id" />
       <StyledTextField {...languageId} label="Language id" />
       <StyledTextField {...accessToken} label="Access token" />
-      <StyledTextField {...baseUrl} label="Base url" />
+      <StyledTextField {...moocfiBaseUrl} label="Moocfi base url" />
+      <StyledTextField {...quizzesBaseUrl} label="Quizzes base url" />
 
       <StyledFormControlLabel
         label="Use a paper container"

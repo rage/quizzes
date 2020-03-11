@@ -189,6 +189,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 }) => {
   const ref = useRef(null)
   const themeProvider = useContext(ThemeProviderContext)
+  const themeProviderRef = useRef(themeProvider)
   const courseStatusProvider = useContext(CourseStatusProviderContext)
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
@@ -226,7 +227,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   )
 
   if (fatal) {
-    console.log("quiz")
     courseStatusProvider.notifyError &&
       courseStatusProvider.notifyError(messageState.message)
     return (

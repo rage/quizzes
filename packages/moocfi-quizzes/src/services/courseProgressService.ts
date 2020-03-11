@@ -5,9 +5,9 @@ import { GraphQLClient } from "graphql-request"
 
 let graphQLClient: GraphQLClient
 
-const request = async (accessToken: string, query: string) => {
+const request = async (accessToken: string, query: string, baseUrl: string) => {
   if (!graphQLClient) {
-    graphQLClient = new GraphQLClient(`https://www.mooc.fi/api`, {
+    graphQLClient = new GraphQLClient(`${baseUrl}/api`, {
       headers: {
         authorization: `Bearer ${accessToken}`,
       },
@@ -19,9 +19,10 @@ const request = async (accessToken: string, query: string) => {
 export const getUserCourseData = async (
   courseId: string,
   accessToken: string,
+  baseUrl: string,
 ): Promise<any> => {
   const response = await axios.get(
-    `https://quizzes.mooc.fi/api/v1/quizzes/usercoursestate/${courseId}`,
+    `${baseUrl}/api/v1/quizzes/usercoursestate/${courseId}`,
     {
       headers: {
         authorization: `Bearer ${accessToken}`,
@@ -34,6 +35,7 @@ export const getUserCourseData = async (
 export const getCompletion = async (
   courseId: string,
   accessToken: string,
+  baseUrl: string,
 ): Promise<any> => {
   const query = `
     {
@@ -46,7 +48,7 @@ export const getCompletion = async (
       }
     }
   `
-  return await request(accessToken, query)
+  return await request(accessToken, query, baseUrl)
 }
 
 /*export const getUserCourseData = async (
