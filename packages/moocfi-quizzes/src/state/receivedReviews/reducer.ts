@@ -3,12 +3,12 @@ import * as receivedReviews from "./actions"
 import { IReceivedPeerReview } from "../../modelTypes"
 
 export interface IReceivedReviewsState {
-  reviews: Array<IReceivedPeerReview>
+  reviews: Array<IReceivedPeerReview> | null
   loadingState: receivedReviews.LoadingState
 }
 
 export const initialState: IReceivedReviewsState = {
-  reviews: [],
+  reviews: null,
   loadingState: "loading",
 }
 

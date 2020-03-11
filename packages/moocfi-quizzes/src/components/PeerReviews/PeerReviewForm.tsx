@@ -39,6 +39,7 @@ import SpamButton from "./SpamButton"
 import PeerReviewSubmitButton from "./PeerReviewSubmitButton"
 import Notification from "../Notification"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
+import CourseProgressProviderContext from "../../contexes/courseProgressProviderContext"
 
 interface ButtonWrapperProps {
   providedStyles: string | undefined
@@ -52,7 +53,11 @@ const ButtonWrapper = styled.div<ButtonWrapperProps>`
   }
   ${({ providedStyles }) => providedStyles}
 `
-
+const PeerReviewFormContainer = styled.div<{
+  providedStyles: string | undefined
+}>`
+  ${({ providedStyles }) => providedStyles}
+`
 interface QuestionBlockWrapperProps {
   providedStyles: string | undefined
 }
@@ -74,6 +79,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 
   const answersToReview = useTypedSelector(state => state.peerReviews.options)
   const peerReview = useTypedSelector(state => state.peerReviews.answer)
+  const error = useTypedSelector(state => state.message.error)
   const dispatch = useDispatch()
 
   const unselectAnswer = () => {
@@ -83,14 +89,16 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 
   if (!answersToReview) {
     return (
-      <Grid container>
-        <Grid item xs={1}>
-          <CircularProgress size={25} />
-        </Grid>
-        <Grid item>
-          <Typography>{languageInfo.loadingLabel}</Typography>
-        </Grid>
-      </Grid>
+      <div>
+        {error ? (
+          <div />
+        ) : (
+          <>
+            <CircularProgress size={25} />
+            <Typography>{languageInfo.loadingLabel}</Typography>
+          </>
+        )}
+      </div>
     )
   }
 
@@ -111,7 +119,10 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
     }
 
     return (
-      <div ref={ref}>
+      <PeerReviewFormContainer
+        providedStyles={themeProvider.peerReviewFormStyles}
+      >
+        <div ref={ref} />
         <Instructions>{languageInfo.chosenEssayInstruction}</Instructions>
         <TopMarginDivLarge>
           <PeerReviewOption answer={chosenAnswer} />
@@ -126,12 +137,15 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
             scrollRef={ref}
           />
         </TopMarginDivLarge>
-      </div>
+      </PeerReviewFormContainer>
     )
   }
 
   return (
-    <div ref={ref}>
+    <PeerReviewFormContainer
+      providedStyles={themeProvider.peerReviewFormStyles}
+    >
+      <div ref={ref} />
       <TopMarginDivLarge>
         <BoldTypographyMedium>
           {languageInfo.chooseEssayInstruction}
@@ -150,8 +164,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
           />
         </TopMarginDivLarge>
       ))}
-      <Notification />
-    </div>
+    </PeerReviewFormContainer>
   )
 }
 
@@ -165,6 +178,7 @@ const PeerReviewQuestions: React.FunctionComponent<
   PeerReviewQuestionsProps
 > = ({ peerReview, languageInfo, scrollRef }) => {
   const themeProvider = useContext(ThemeProviderContext)
+  const courseProgressProvider = React.useContext(CourseProgressProviderContext)
 
   const quiz = useTypedSelector(state => state.quiz)
 
@@ -203,6 +217,8 @@ const PeerReviewQuestions: React.FunctionComponent<
 
   const submitPeerReview = () => {
     dispatch(peerReviewsActions.submit())
+    courseProgressProvider.refreshProgress &&
+      courseProgressProvider.refreshProgress()
     scrollToRef(scrollRef)
   }
 
@@ -278,7 +294,7 @@ const PeerReviewQuestions: React.FunctionComponent<
           </QuestionBlockWrapper>
         )
       })}
-      <Notification />
+      <div />
       <PeerReviewSubmitButton
         disabled={submitDisabled || error}
         onClick={submitPeerReview}

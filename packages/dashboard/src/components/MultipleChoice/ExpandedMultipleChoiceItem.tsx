@@ -12,9 +12,11 @@ import { connect } from "react-redux"
 import { IQuizItem, QuizItemType } from "../../interfaces"
 import {
   addFinishedOption,
+  addOption,
   changeAttr,
   changeOrder,
   modifyOption,
+  modifyOptionOrder,
   save,
   updateMultipleOptions,
 } from "../../store/edit/actions"
@@ -26,6 +28,7 @@ import SharedFeedbackCustomiser from "./SharedFeedbackCustomiser"
 import SortableOptionList from "./SortableOptionList"
 
 interface IExpandedMultipleChoiceItemProps {
+  addOption: any
   items: IQuizItem[]
   order: number
   type: QuizItemType
@@ -35,23 +38,12 @@ interface IExpandedMultipleChoiceItemProps {
   onCancel: any
   changeAttr: any
   updateMultipleOptions: any
+  modifyOptionOrder: any
 }
 
 interface IMultipleChoiceItemState {
   dialogOpen: boolean
-  existingOptData: any
-  tempItemData: IItemData
-  optionsExist: boolean
-  titleHasBeenModified: boolean
-}
-
-interface IItemData {
-  title: string
-  body: string
-  options: IOptionData[]
-  usesSharedOptionFeedbackMessage: boolean
-  sharedOptionFeedbackMessage: string
-  multi: boolean
+  openIdx: number
 }
 
 export interface IOptionData {
@@ -72,36 +64,9 @@ class MultipleChoiceItem extends React.Component<
 > {
   constructor(props) {
     super(props)
-    const item = this.props.items[this.props.order]
-
-    const initOptionsData = item.options.map(option => ({
-      title: option.texts[0].title,
-      body: option.texts[0].body,
-      order: option.order,
-      id: option.id,
-      quizItemId: item.id,
-      successMessage: option.texts[0].successMessage,
-      failureMessage: option.texts[0].failureMessage,
-      correct: option.correct,
-    }))
-
-    const initItemData = {
-      title: item.texts[0].title,
-      body: item.texts[0].body,
-      options: initOptionsData,
-      usesSharedOptionFeedbackMessage: item.usesSharedOptionFeedbackMessage,
-      sharedOptionFeedbackMessage:
-        item.texts[0].sharedOptionFeedbackMessage || "",
-      multi: item.multi,
-    }
     this.state = {
       dialogOpen: false,
-      existingOptData: null,
-      tempItemData: initItemData,
-      optionsExist: props.items[props.order].options.length > 0,
-      titleHasBeenModified: this.props.items[this.props.order].id
-        ? true
-        : false,
+      openIdx: 0,
     }
   }
 
@@ -127,11 +92,7 @@ class MultipleChoiceItem extends React.Component<
                         multiline={true}
                         fullWidth={true}
                         placeholder="Title"
-                        value={
-                          (this.state.titleHasBeenModified &&
-                            this.state.tempItemData.title) ||
-                          ""
-                        }
+                        value={item.texts[0].title || ""}
                         onChange={this.changeEditAttribute("title")}
                         style={{
                           fontWeight: "bold",
@@ -143,21 +104,21 @@ class MultipleChoiceItem extends React.Component<
                         multiline={true}
                         fullWidth={true}
                         placeholder="Body"
-                        value={this.state.tempItemData.body || ""}
+                        value={item.texts[0].body || ""}
                         onChange={this.changeEditAttribute("body")}
                       />
                     </Grid>
 
                     <Grid item={true} xs={6} md={8} lg={9}>
-                      {this.state.optionsExist ? (
+                      {item.options.length > 0 ? (
                         <SortableOptionList
                           onSortEnd={this.onSortEnd}
                           createNewOption={this.createNewOption}
-                          options={this.state.tempItemData.options}
+                          options={item.options}
                           order={this.props.order}
-                          modifyExistingOption={this.modifyExistingOption}
                           axis="xy"
                           distance={2}
+                          openOptionDialog={this.openOptionForModification}
                         />
                       ) : (
                         <Grid
@@ -191,11 +152,10 @@ class MultipleChoiceItem extends React.Component<
                     <Grid item={true} xs={12}>
                       <SharedFeedbackCustomiser
                         sharedMessageIsUsed={
-                          this.state.tempItemData
-                            .usesSharedOptionFeedbackMessage
+                          item.usesSharedOptionFeedbackMessage
                         }
                         sharedFeedbackMessage={
-                          this.state.tempItemData.sharedOptionFeedbackMessage
+                          item.texts[0].sharedOptionFeedbackMessage
                         }
                         handleToggleChange={this.changeEditAttribute(
                           "usesSharedOptionFeedbackMessage",
@@ -208,7 +168,7 @@ class MultipleChoiceItem extends React.Component<
 
                     <Grid item={true} xs={12}>
                       <MultiToggle
-                        multi={this.state.tempItemData.multi}
+                        multi={item.multi}
                         toggleMulti={this.changeEditAttribute("multi")}
                       />
                     </Grid>
@@ -218,7 +178,6 @@ class MultipleChoiceItem extends React.Component<
 
               <Grid item={true} xs="auto" />
               <BottomActionsExpItem
-                onSave={this.saveItem}
                 itemHasBeenSaved={item.id ? true : false}
                 handleExpand={this.props.toggleExpand}
                 handleCancel={this.props.onCancel}
@@ -229,169 +188,76 @@ class MultipleChoiceItem extends React.Component<
         </Grid>
 
         <OptionDialog
-          onSubmit={
-            this.state.existingOptData
-              ? this.updateOption(this.props.index)
-              : this.handleSubmission(item.id)
-          }
+          optionIdx={this.state.openIdx}
           isOpen={this.state.dialogOpen}
           onClose={this.handleClose}
-          existingOptData={this.state.existingOptData}
+          item={item}
         />
       </Grid>
     )
   }
 
   private changeEditAttribute = (attributeName: string) => e => {
-    if (attributeName === "title") {
-      this.setState({
-        titleHasBeenModified: true,
-      })
-    }
-    const newData = { ...this.state.tempItemData }
-    if (
-      attributeName === "usesSharedOptionFeedbackMessage" ||
-      attributeName === "multi"
-    ) {
-      newData[attributeName] = !newData[attributeName]
-    } else {
-      newData[attributeName] = e.target.value
-    }
-    this.setState({ tempItemData: newData })
-  }
-
-  private saveItem = e => {
-    this.props.toggleExpand(e)
-
+    const value = e.target.value
     const itemsString = `items[${this.props.order}]`
 
-    this.props.changeAttr(
-      `${itemsString}.texts[0].title`,
-      this.state.tempItemData.title,
-    )
-    this.props.changeAttr(
-      `${itemsString}.texts[0].body`,
-      this.state.tempItemData.body,
-    )
-
-    this.props.changeAttr(
-      `${itemsString}.texts[0].sharedOptionFeedbackMessage`,
-      this.state.tempItemData.sharedOptionFeedbackMessage,
-    )
-
-    this.props.changeAttr(
-      `${itemsString}.usesSharedOptionFeedbackMessage`,
-      this.state.tempItemData.usesSharedOptionFeedbackMessage,
-    )
-
-    this.props.changeAttr(`${itemsString}.multi`, this.state.tempItemData.multi)
-
-    this.props.updateMultipleOptions(
-      this.props.order,
-      this.state.tempItemData.options.map(opt => ({
-        ...opt,
-        correct: !!opt.correct,
-      })),
-    )
-
-    this.props.save()
+    switch (attributeName) {
+      case "title":
+      case "body":
+      case "sharedOptionFeedbackMessage":
+        this.props.changeAttr(`${itemsString}.texts[0].${attributeName}`, value)
+        break
+      case "multi":
+      case "usesSharedOptionFeedbackMessage":
+        this.props.changeAttr(
+          `${itemsString}.${attributeName}`,
+          !this.props.items[this.props.order][attributeName],
+        )
+        break
+      default:
+    }
   }
 
-  private modifyExistingOption = (optionOrder: number) => () => {
-    const option = this.state.tempItemData.options.find(
+  private modifyOption = (optionOrder: number) => () => {
+    const option = this.props.items[this.props.index].options.find(
       opt => opt.order === optionOrder,
     )
 
     if (!option) {
       return
     }
-
-    const newData = {
-      title: option.title,
-      correct: !!option.correct,
-      successMessage: option.successMessage,
-      failureMessage: option.failureMessage,
-      order: option.order,
-    }
-
     this.setState({
-      existingOptData: newData,
       dialogOpen: true,
     })
   }
 
   private onSortEnd = ({ oldIndex, newIndex, collection }) => {
-    const newOptions = { ...this.state.tempItemData }.options
-    newOptions[oldIndex].order = newIndex
-    newOptions[newIndex].order = oldIndex
-
-    const temp = newOptions[oldIndex]
-    newOptions[oldIndex] = newOptions[newIndex]
-    newOptions[newIndex] = temp
-
-    this.setState({
-      tempItemData: {
-        ...this.state.tempItemData,
-        options: newOptions,
-      },
-    })
+    this.props.modifyOptionOrder(
+      this.props.items[this.props.order],
+      oldIndex,
+      newIndex,
+    )
   }
 
-  private updateOption = item => optionData => event => {
-    const newOptions = { ...this.state.tempItemData }.options.map(opt => {
-      if (opt.order !== optionData.order) {
-        return opt
-      }
-      return {
-        ...opt,
-        title: optionData.title,
-        body: optionData.body,
-        failureMessage: optionData.failureMessage,
-        successMessage: optionData.successMessage,
-        correct: !!optionData.correct,
-      }
-    })
-
+  private openOptionForModification = optionIdx => () => {
     this.setState({
-      tempItemData: {
-        ...this.state.tempItemData,
-        options: newOptions,
-      },
+      dialogOpen: true,
+      openIdx: optionIdx,
     })
   }
 
   private createNewOption = () => {
+    const newIdx = this.props.items[this.props.index].options.length
+    this.props.addOption(this.props.index)
+
     this.setState({
-      existingOptData: null,
       dialogOpen: true,
+      openIdx: newIdx,
     })
   }
 
   private handleClose = () => {
-    this.setState({ dialogOpen: false, existingOptData: null })
-  }
-
-  private handleSubmission = (itemId: string) => optionData => event => {
-    this.handleClose()
-    const newOption = {
-      title: optionData.title,
-      body: optionData.body,
-      successMessage: optionData.successMessage,
-      failureMessage: optionData.failureMessage,
-      correct: !!optionData.correct,
-      order: this.state.tempItemData.options.length,
-      quizItemId: itemId,
-    }
-
-    const newOptions = this.state.tempItemData.options.concat(newOption)
-
-    this.setState({
-      optionsExist: true,
-      tempItemData: {
-        ...this.state.tempItemData,
-        options: newOptions,
-      },
-    })
+    this.setState({ dialogOpen: false })
   }
 }
 
@@ -399,9 +265,11 @@ export default connect(
   null,
   {
     addFinishedOption,
+    addOption,
     changeAttr,
     changeOrder,
     modifyOption,
+    modifyOptionOrder,
     save,
     updateMultipleOptions,
   },

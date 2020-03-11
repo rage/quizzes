@@ -11,6 +11,10 @@ import { StylesProvider } from "@material-ui/styles"
 import styled from "styled-components"
 import SimpleErrorBoundary from "./SimpleErrorBoundary"
 import { useInput, useLocalStorage } from "./customHooks"
+import {
+  CourseProgressProvider,
+  injectCourseProgress,
+} from "../../src/CourseProgressProvider"
 
 const TallContainer = styled.div`
   padding-bottom: 1000px;
@@ -86,12 +90,60 @@ const App = () => {
     />
   )
 
+  const Div = styled.div`
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 2rem;
+    p {
+      margin: auto;
+      text-align: center;
+      font-size: 2rem;
+    }
+    div {
+      height: 0;
+      flex-basis: 100;
+    }
+    button {
+      margin: auto;
+    }
+  `
+
+  const DataTest = (props: any) => {
+    if (props.error) {
+      return (
+        <Div>
+          <p>Error</p>
+        </Div>
+      )
+    }
+    if (props.loading) {
+      return (
+        <Div>
+          <p>Loading</p>
+        </Div>
+      )
+    }
+    return (
+      <Div>
+        <p>{JSON.stringify(props.userCourseProgress)}</p>
+        <p>{JSON.stringify(props.requiredActions)}</p>
+        <div />
+        <button onClick={props.refreshProgress}>Reload</button>
+      </Div>
+    )
+  }
+  const Progress = injectCourseProgress(DataTest)
+
   return (
-    <>
+    <CourseProgressProvider
+      courseId="833a49b4-1c5e-4c61-b512-8cd64dd8aa7e"
+      accessToken={accessToken.value}
+    >
       <Typography variant="h4" component="h1">
         Quizzes testing
       </Typography>
-
+      <Progress />
       <StyledTextField {...id} label="Quiz id" />
       <StyledTextField {...languageId} label="Language id" />
       <StyledTextField {...accessToken} label="Access token" />
@@ -147,7 +199,7 @@ const App = () => {
           )}
         </SimpleErrorBoundary>
       </TallContainer>
-    </>
+    </CourseProgressProvider>
   )
 }
 

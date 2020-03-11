@@ -1,4 +1,5 @@
-import { Get, HttpCode, JsonController } from "routing-controllers"
+import { Get, HttpCode, JsonController, Res } from "routing-controllers"
+import { quizzes as knex } from "../../config/knex"
 
 @JsonController("/")
 export class RootController {
@@ -6,5 +7,15 @@ export class RootController {
   @Get("/")
   public async get() {
     return {}
+  }
+
+  @Get("api/healthz")
+  public async getHealth(@Res() res: any) {
+    try {
+      await knex.raw("select 1")
+      return res.status(200).send()
+    } catch (error) {
+      return res.status(500).send()
+    }
   }
 }

@@ -3,7 +3,7 @@ import {
   IItemWrapperProps,
   LowerContentProps,
   QuizContentProps,
-} from "../components/QuizImpl"
+} from "../components/QuizImpl/"
 import { ChoiceButtonProps } from "../components/ChoiceButton"
 import { SubmitButtonProps } from "../components/QuizImpl/SubmitButton"
 import { LeftBorderedDivProps } from "../components/MultipleChoice"
@@ -41,6 +41,10 @@ export interface ThemeProviderInterface {
   likertSeparatorType?: "dotted-line" | "striped"
   questionBlockWrapperStyles?: string
   buttonWrapperStyles?: string
+  peerReviewGuidanceStyles?: string
+  peerReviewFormStyles?: string
+  receivedPeerReviewsStyles?: string
+  peerReviewContainerStyles?: string
 }
 
 const ThemeProviderContext = createContext<ThemeProviderInterface>({})

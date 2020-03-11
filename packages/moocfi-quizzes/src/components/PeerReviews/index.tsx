@@ -8,7 +8,6 @@ import PeerReviewForm from "./PeerReviewForm"
 import PeerReviewsGuidance from "./PeerReviewsGuidance"
 import ReceivedPeerReviewsInfo from "./ReceivedPeerReviewsInfo"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
-import { scrollToRef } from "../../utils"
 import Togglable from "../../utils/Togglable"
 import { useTypedSelector } from "../../state/store"
 import {
@@ -17,11 +16,15 @@ import {
   TopMarginDivLarge,
 } from "../styleComponents"
 
-/*const TopMarginDiv = styled.div`
-  margin-top: 15px;
-`*/
+import ThemeProviderContext from "../../contexes/themeProviderContext"
+
+const PeerReviewContainer = styled.div<{ providedStyles: string | undefined }>`
+  ${({ providedStyles }) => providedStyles}
+`
 
 const PeerReviews: React.FunctionComponent = () => {
+  const themeProvider = React.useContext(ThemeProviderContext)
+
   const ref = useState(useRef(null))[0]
 
   const dispatch = useDispatch()
@@ -61,7 +64,7 @@ const PeerReviews: React.FunctionComponent = () => {
     dispatch(peerReviewsActions.fetchPeerReviewAlternatives())
   }, [])
 
-  const morePeerReviewsRequired = () =>
+  const morePeerReviewsRequired =
     (userQuizState ? userQuizState.peerReviewsGiven : 0) <
     quiz.course.minPeerReviewsGiven
 
@@ -74,47 +77,50 @@ const PeerReviews: React.FunctionComponent = () => {
   }
 
   return (
-    <div ref={ref} role="group" aria-live="polite" aria-relevant="additions text">
-      {morePeerReviewsRequired()
-        ? !pastDeadline && (
-            <>
-              <PeerReviewsGuidance
-                guidanceText={peerReviewQuestions[0].texts[0].body}
-                givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
-                peerReviewsCompletedInfo={
-                  peerReviewsLabels.peerReviewsCompletedInfo
-                }
-                
-              />
-              <PeerReviewForm languageInfo={peerReviewsLabels} />
-            </>
-          )
-        : !pastDeadline && (
-            <TopMarginDivLarge>
-              <BoldTypography component="p" variant="subtitle1" >
-                {giveExtraPeerReviewsLabel}
-              </BoldTypography>
-              <Togglable
-                initiallyVisible={activeStep === 1}
-                hideButtonText={peerReviewsLabels.hidePeerReviewLabel}
-                displayButtonText={peerReviewsLabels.displayPeerReview}
-                scrollRef={ref}
-              >
-                <TopMarginDivSmall>
-                  <PeerReviewsGuidance
-                    guidanceText={peerReviewQuestions[0].texts[0].body}
-                    givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
-                    peerReviewsCompletedInfo={
-                      peerReviewsLabels.peerReviewsCompletedInfo
-                    }
-                  />
-                  <PeerReviewForm languageInfo={peerReviewsLabels} />
-                </TopMarginDivSmall>
-              </Togglable>
-            </TopMarginDivLarge>
-          )}
+    <PeerReviewContainer
+      providedStyles={themeProvider.peerReviewContainerStyles}
+      aria-live="polite"
+      aria-relevant="additions text"
+    >
+      <div ref={ref} />
+      {!pastDeadline &&
+        (morePeerReviewsRequired ? (
+          <>
+            <PeerReviewsGuidance
+              guidanceText={peerReviewQuestions[0].texts[0].body}
+              givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
+              peerReviewsCompletedInfo={
+                peerReviewsLabels.peerReviewsCompletedInfo
+              }
+            />
+            <PeerReviewForm languageInfo={peerReviewsLabels} />
+          </>
+        ) : (
+          <TopMarginDivLarge>
+            <BoldTypography component="p" variant="subtitle1">
+              {giveExtraPeerReviewsLabel}
+            </BoldTypography>
+            <Togglable
+              initiallyVisible={activeStep === 1}
+              hideButtonText={peerReviewsLabels.hidePeerReviewLabel}
+              displayButtonText={peerReviewsLabels.displayPeerReview}
+              scrollRef={ref}
+            >
+              <TopMarginDivSmall>
+                <PeerReviewsGuidance
+                  guidanceText={peerReviewQuestions[0].texts[0].body}
+                  givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
+                  peerReviewsCompletedInfo={
+                    peerReviewsLabels.peerReviewsCompletedInfo
+                  }
+                />
+                <PeerReviewForm languageInfo={peerReviewsLabels} />
+              </TopMarginDivSmall>
+            </Togglable>
+          </TopMarginDivLarge>
+        ))}
       {activeStep >= 2 && <ReceivedPeerReviewsInfo />}
-    </div>
+    </PeerReviewContainer>
   )
 }
 

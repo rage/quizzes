@@ -24,6 +24,8 @@ export { PeerReview } from "./peer_review"
 export { PeerReviewQuestionAnswer } from "./peer_review_question_answer"
 export { SpamFlag } from "./spam_flag"
 
+export { UserCourseRole } from "./user_course_role"
+
 export { UserCourseState } from "./user_course_state"
 export { UserCoursePartState } from "./user_course_part_state"
 export { UserQuizState } from "./user_quiz_state"

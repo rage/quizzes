@@ -1,6 +1,6 @@
 import * as React from "react"
 import styled from "styled-components"
-import { Button, Typography } from "@material-ui/core"
+import { Button, CircularProgress, Typography } from "@material-ui/core"
 import {
   PeerReviewGradeAnswer,
   IReceivedPeerReview,
@@ -18,20 +18,30 @@ import {
   withMargin,
 } from "../styleComponents"
 import { ReceivedPeerReviewLabels } from "../../utils/languages/"
+import ThemeProviderContext from "../../contexes/themeProviderContext"
 
 import Togglable from "../../utils/Togglable"
+import Notification from "../Notification"
 
 const ToggleButton = styled(BaseButton)<{ expanded: boolean }>`
   ${props => props.expanded && "margin-top: 0.5rem;"}
 `
 
+const ReceivedPeerReviewsContainer = styled(TopMarginDivLarge)<{
+  providedStyles: string | undefined
+}>`
+  ${({ providedStyles }) => providedStyles}
+`
+
 const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
+  const themeProvider = React.useContext(ThemeProviderContext)
   const [expanded, setExpanded] = React.useState(false)
   const dispatch = useDispatch()
 
   const receivedReviews = useTypedSelector(
     state => state.receivedReviews.reviews,
   )
+  const error = useTypedSelector(state => state.message.error)
   const loadingState = useTypedSelector(
     state => state.receivedReviews.loadingState,
   )
@@ -55,19 +65,25 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
 
   const peerReviewQuestions = quiz.peerReviewCollections[0].questions
 
-  if (
-    loadingState === "loading" ||
-    (loadingState === "began" && receivedReviews.length < 1)
-  ) {
-    return <div>{receivedReviewsLabels.loadingLabel}</div>
-  }
-
-  if (loadingState === "error") {
-    return <div>{receivedReviewsLabels.errorLabel}</div>
+  if (!receivedReviews) {
+    return (
+      <div>
+        {error ? (
+          <div />
+        ) : (
+          <>
+            <CircularProgress size={25} />
+            <Typography>{receivedReviewsLabels.loadingLabel}</Typography>
+          </>
+        )}
+      </div>
+    )
   }
 
   return (
-    <TopMarginDivLarge>
+    <ReceivedPeerReviewsContainer
+      providedStyles={themeProvider.receivedPeerReviewsStyles}
+    >
       <ReceivedReviewsSummary
         peerReviews={receivedReviews}
         peerReviewQuestions={peerReviewQuestions}
@@ -87,7 +103,7 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
           />
         </Togglable>
       )}
-    </TopMarginDivLarge>
+    </ReceivedPeerReviewsContainer>
   )
 }
 
