@@ -116,6 +116,13 @@ class QuizStatistics extends React.Component<any, any> {
         : countInfo.count
     }
 
+    const isAdmin = this.props.user.administrator
+    const roles = this.props.user.roles
+      ? this.props.user.roles.filter(
+          role => role.courseId === this.props.filter.course,
+        )
+      : []
+
     return (
       <Grid container={true} justify="center" alignItems="center" spacing={16}>
         <Grid item={true} xs={12} md={10}>
@@ -204,8 +211,6 @@ class QuizStatistics extends React.Component<any, any> {
               </Grid>
             </Grid>
 
-            <LanguageBar />
-
             {this.props.answers &&
             (this.props.answers.length === 0 ||
               this.props.answers[0].quizId === this.props.match.params.id) ? (
@@ -213,7 +218,11 @@ class QuizStatistics extends React.Component<any, any> {
                 <Grid
                   item={true}
                   xs={12}
-                  md={4}
+                  md={
+                    isAdmin || roles.some(role => role.role === "teacher")
+                      ? 4
+                      : 12
+                  }
                   style={{ marginBottom: "1em" }}
                 >
                   <Grid

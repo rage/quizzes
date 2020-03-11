@@ -37,7 +37,7 @@ class Answer extends React.Component<any, any> {
     super(props)
     this.answerRef = React.createRef<HTMLElement>()
     this.state = {
-      expanded: false,
+      expanded: true,
       modalOpen: false,
       confirmDialogOpen: false,
       confirmAction: null,
