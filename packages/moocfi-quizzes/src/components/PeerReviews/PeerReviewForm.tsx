@@ -3,9 +3,7 @@ import { useContext, useRef, useState } from "react"
 import { useDispatch } from "react-redux"
 import LikertScale from "likert-react"
 import {
-  Button,
   CircularProgress,
-  Grid,
   TextField,
   Typography,
 } from "@material-ui/core"
@@ -29,7 +27,6 @@ import {
   BoldTypographyMedium,
   SpaciousTypography,
   TopMarginDivLarge,
-  TopMarginDivSmall,
   withMargin,
 } from "../styleComponents"
 import styled from "styled-components"
@@ -37,7 +34,6 @@ import styled from "styled-components"
 import SelectButton from "./SelectButton"
 import SpamButton from "./SpamButton"
 import PeerReviewSubmitButton from "./PeerReviewSubmitButton"
-import Notification from "../Notification"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
 import CourseProgressProviderContext from "../../contexes/courseProgressProviderContext"
 

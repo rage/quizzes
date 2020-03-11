@@ -1,11 +1,10 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { Button, Grid, Typography, Icon } from "@material-ui/core"
+import {  Typography } from "@material-ui/core"
 import {
   GridDirection,
   GridSize,
-  GridItemsAlignment,
 } from "@material-ui/core/Grid"
 import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
@@ -15,8 +14,6 @@ import LaterQuizItemAddition from "./LaterQuizItemAddition"
 import MarkdownText from "./MarkdownText"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
-  faCheck,
-  faTimes,
   faExclamationCircle,
 } from "@fortawesome/free-solid-svg-icons"
 import ThemeProviderContext from "../contexes/themeProviderContext"
@@ -49,21 +46,6 @@ const CentralizedOnSmallScreenTypography = styled(Typography)`
   }
 `
 
-const IconWrapper = styled.div`
-  margin: 0.5rem;
-`
-
-const SuccessIcon = () => (
-  <IconWrapper>
-    <FontAwesomeIcon icon={faCheck} />
-  </IconWrapper>
-)
-
-const FailureIcon = () => (
-  <IconWrapper>
-    <FontAwesomeIcon icon={faTimes} />
-  </IconWrapper>
-)
 
 const AttentionIcon = styled(FontAwesomeIcon)`
   font-size: 30px !important;
@@ -139,11 +121,6 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   let questionWidth: 5 | 12 = 5
   let optionWidth: GridSize = "auto"
 
-  if (onlyOneItem) {
-    const maxOptionLength = Math.max(
-      ...options.map(option => option.texts[0].title.length),
-    )
-  }
 
   return (
     <div role="group" aria-label={item.texts[0].title}>
@@ -192,10 +169,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
   item,
 }) => {
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
-
   const answerLocked = userQuizState && userQuizState.status === "locked"
-  const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
-
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   if (!languageInfo) {
     return <div />
@@ -211,7 +185,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
     ? multipleChoiceLabels.selectCorrectAnswerLabel
     : ""
 
-  const { title, body, successMessage, failureMessage } = item.texts[0]
+  const { title, body } = item.texts[0]
 
   return (
     <QuestionContainer>
@@ -253,7 +227,6 @@ type OptionProps = {
 
 const Option: React.FunctionComponent<OptionProps> = ({
   option,
-  optionWidth,
   shouldBeGray,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)

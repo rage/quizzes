@@ -2,10 +2,8 @@ import * as React from "react"
 import styled from "styled-components"
 import {
   Stepper,
-  StepIcon,
   StepLabel,
   Step,
-  withStyles,
 } from "@material-ui/core"
 import { useTypedSelector } from "../../state/store"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
@@ -18,7 +16,7 @@ const StyledStepper = styled(Stepper)<StyledStepperProps>`
   ${({ providedStyles }) => providedStyles}
 `
 
-const StageVisualizer = (props: any) => {
+const StageVisualizer = () => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const activeStep = useTypedSelector(state => state.peerReviews.activeStep)
   const quiz = useTypedSelector(state => state.quiz)
@@ -42,7 +40,6 @@ const StageVisualizer = (props: any) => {
     stageLabels.evaluationStageLabel,
   ]
 
-  const { classes } = props
 
   return (
     <StyledStepper

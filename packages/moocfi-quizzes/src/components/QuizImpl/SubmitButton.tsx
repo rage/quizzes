@@ -1,15 +1,11 @@
 import * as React from "react"
-import styled from "styled-components"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
 import CourseProgressProviderContext from "../../contexes/courseProgressProviderContext"
-import { Button } from "@material-ui/core"
 import { useDispatch } from "react-redux"
-
 import { useTypedSelector } from "../../state/store"
 import * as quizAnswerActions from "../../state/quizAnswer/actions"
-
 import { StyledButton } from "../styleComponents"
-import { CourseProgressProvider } from "../../CourseProgressProvider"
+
 
 export interface SubmitButtonProps {
   disabled: boolean
