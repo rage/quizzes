@@ -73,6 +73,11 @@ export const CourseStatusProvider: React.FunctionComponent<
   const [quizzesStatus, setQuizzesStatus] = useState<ConnectionStatus>(
     ConnectionStatus.DISCONNECTED,
   )
+
+  const maxReconnectDelay = 1800
+  const [moocfiReconnectDelay, setMoocfiReconnectDelay] = useState(10)
+  const [quizzesReconnectDelay, setQuizzesReconnectDelay] = useState(10)
+
   const [moocfiClient, setMoocfiClient] = useState<WebSocket | undefined>()
   const [quizzesClient, setQuizzesClient] = useState<WebSocket | undefined>()
 
@@ -96,6 +101,8 @@ export const CourseStatusProvider: React.FunctionComponent<
           "wss://www.mooc.fi/ws",
           setMoocfiClient,
           setMoocfiStatus,
+          moocfiReconnectDelay,
+          setMoocfiReconnectDelay,
         )
       }
       if (shouldConnectQuizzes) {
@@ -103,6 +110,8 @@ export const CourseStatusProvider: React.FunctionComponent<
           "wss://quizzes.mooc.fi/ws",
           setQuizzesClient,
           setQuizzesStatus,
+          quizzesReconnectDelay,
+          setQuizzesReconnectDelay,
         )
       }
     } else {
@@ -135,6 +144,8 @@ export const CourseStatusProvider: React.FunctionComponent<
     host: string,
     setClient: React.Dispatch<React.SetStateAction<WebSocket | undefined>>,
     setStatus: React.Dispatch<React.SetStateAction<ConnectionStatus>>,
+    reconnectDelay: number,
+    setReconnectDelay: React.Dispatch<React.SetStateAction<number>>,
   ) => {
     setStatus(ConnectionStatus.CONNECTING)
     try {
@@ -150,23 +161,35 @@ export const CourseStatusProvider: React.FunctionComponent<
         },
       )
       client.onmessage = onMessage
-      client.onerror = e => reconnect(host, setStatus)
-      client.onclose = e => reconnect(host, setStatus)
+      client.onerror = e =>
+        reconnect(host, setStatus, reconnectDelay, setReconnectDelay)
+      client.onclose = e =>
+        reconnect(host, setStatus, reconnectDelay, setReconnectDelay)
       client.send(JSON.stringify({ accessToken, courseId }))
       setClient(client)
       setStatus(ConnectionStatus.CONNECTED)
       console.log(`connected to ${host}`)
     } catch (error) {
-      reconnect(host, setStatus)
+      reconnect(host, setStatus, reconnectDelay, setReconnectDelay)
     }
   }
 
   const reconnect = (
     host: string,
     setStatus: React.Dispatch<React.SetStateAction<ConnectionStatus>>,
+    reconnectDelay: number,
+    setReconnectDelay: React.Dispatch<React.SetStateAction<number>>,
   ) => {
-    console.log(`could not connect to ${host}, attempting to reconnect...`)
-    setTimeout(() => setStatus(ConnectionStatus.DISCONNECTED), 10000)
+    console.log(
+      `could not connect to ${host}, attempting to reconnect in ${reconnectDelay}...`,
+    )
+    setTimeout(
+      () => setStatus(ConnectionStatus.DISCONNECTED),
+      reconnectDelay * 1000,
+    )
+    if (reconnectDelay < maxReconnectDelay) {
+      setReconnectDelay(reconnectDelay * 2)
+    }
   }
 
   const logout = () => {
@@ -240,8 +263,8 @@ export const CourseStatusProvider: React.FunctionComponent<
   }
 
   const status: CourseStatusProviderInterface = {
-    updateQuiz,
-    quizUpdated,
+    // updateQuiz,
+    // quizUpdated,
     // notifyError,
   }
 
