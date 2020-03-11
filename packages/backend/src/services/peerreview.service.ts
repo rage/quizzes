@@ -310,19 +310,19 @@ export default class PeerReviewService {
       .where("quiz_id", quizId)
       .modify(qb => {
         if (includeNonPriority) {
-          qb.where("points_awarded", ">", 0)
-            .andWhere(
-              builder.raw(
-                "peer_reviews_received = course.min_peer_reviews_received",
-              ),
-            )
-            .andWhere("spam_flags", "<=", "max_spam_flags")
-        } else {
-          qb.whereNull("points_awarded").andWhere(
+          qb.where("points_awarded", ">", 0).andWhere(
             builder.raw(
-              "peer_reviews_received < course.min_peer_reviews_received",
+              "peer_reviews_received = course.min_peer_reviews_received",
             ),
           )
+        } else {
+          qb.whereNull("points_awarded")
+            .andWhere(
+              builder.raw(
+                "peer_reviews_received < course.min_peer_reviews_received",
+              ),
+            )
+            .andWhere(builder.raw("spam_flags <= max_spam_flags"))
         }
       })
 
