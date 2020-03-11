@@ -49,48 +49,6 @@ export default class KafkaService {
       .where("course.id = :courseId", { courseId })
       .getOne()
 
-    const raw = await this.knex.raw(`
-      select
-        part,
-        coalesce(section, 0) section,
-        count(case when qa.status = 'confirmed' then 1 end) completed,
-        count(q.id) total,
-        count(case when qa.status = 'submitted' and uqs.peer_reviews_given < 3 then 1 end) give,
-        count(case when qa.status = 'submitted' and peer_reviews_received < 2 then 1 end) pending,
-        count(case when qa.status in ('rejected', 'spam') then 1 end) rejected
-      from quiz_answer qa
-      join user_quiz_state uqs
-        on qa.user_id = uqs.user_id
-        and qa.quiz_id = uqs.quiz_id
-      join quiz q on qa.quiz_id = q.id
-      where course_id = '${courseId}'
-      and qa.user_id = ${userId}
-      group by qa.user_id, part, section
-      order by qa.user_id
-    `)
-
-    const arr: any[] = []
-
-    raw.rows.forEach((item: any) => {
-      const requiredActions: RequiredAction[] = []
-      if (item.give > 0) {
-        requiredActions.push(RequiredAction.GIVE_PEER_REVIEW)
-      }
-      if (item.pending > 0) {
-        requiredActions.push(RequiredAction.PENDING_PEER_REVIEW)
-      }
-      if (item.rejected > 0) {
-        requiredActions.push(RequiredAction.REJECTED)
-      }
-      arr.push({
-        part: item.part,
-        section: item.section,
-        exercises_total: item.total,
-        exercises_completed: item.completed,
-        required_actions: requiredActions,
-      })
-    })
-
     const progress: PointsByGroup[] = await this.userCoursePartStateService.getProgress(
       manager,
       userId,
@@ -102,7 +60,6 @@ export default class KafkaService {
       course_id: course.moocfiId,
       service_id: process.env.SERVICE_ID,
       progress,
-      exercise_completions_by_section: arr,
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
     }
 

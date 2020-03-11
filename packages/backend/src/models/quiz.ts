@@ -80,6 +80,8 @@ export class Quiz extends BaseEntity {
 
   @Column({ default: true })
   public autoConfirm: boolean
+  @Column({ default: true })
+  public autoReject: boolean
   @Column({ default: false })
   public excludedFromScore: boolean
   @Column({ default: false })

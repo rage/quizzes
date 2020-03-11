@@ -12,6 +12,7 @@ import {
   Req,
   Res,
   UnauthorizedError,
+  QueryParams,
 } from "routing-controllers"
 import AuthorizationService, {
   Permission,
@@ -44,6 +45,7 @@ import {
   QuizAnswerStatus,
 } from "../../types"
 
+import CourseService from "services/course.service"
 import { MessageType, pushMessageToClient } from "../../wsServer"
 
 const MAX_LIMIT = 100
@@ -70,6 +72,9 @@ export class QuizAnswerController {
 
   @Inject()
   private userCourseStateService: UserCourseStateService
+
+  @Inject()
+  private courseService: CourseService
 
   @Inject()
   private quizService: QuizService
@@ -234,7 +239,18 @@ export class QuizAnswerController {
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @QueryParam("skip") skip?: number,
     @QueryParam("limit") limit?: number,
-  ): Promise<QuizAnswer[]> {
+    @QueryParam("minDate") minDate?: string,
+    @QueryParam("maxDate") maxDate?: string,
+    @QueryParam("statuses") statuses?: string[],
+    @QueryParam("minSpamFlags") minSpamFlags?: number,
+    @QueryParam("maxSpamFlags") maxSpamFlags?: number,
+    @QueryParam("minGivenPeerReviews") minGivenPeerReviews?: number,
+    @QueryParam("maxGivenPeerReviews") maxGivenPeerReviews?: number,
+    @QueryParam("minReceivedPeerReviews") minReceivedPeerReviews?: number,
+    @QueryParam("maxReceivedPeerReviews") maxReceivedPeerReviews?: number,
+    @QueryParam("minAverageOfGrades") minAverageOfGrades?: number,
+    @QueryParam("maxAverageOfGrades") maxAverageOfGrades?: number,
+  ): Promise<QuizAnswer[] | string> {
     const authorized = await this.authorizationService.isPermitted({
       user,
       quizId,
@@ -260,11 +276,50 @@ export class QuizAnswerController {
     }
 
     if (attention) {
-      const limitDate = new Date()
-      limitDate.setDate(limitDate.getDate() - 14)
-      attentionCriteriaQuery.lastAllowedTime = limitDate
-      attentionCriteriaQuery.statuses = ["spam", "submitted"]
+      const quizzes = await this.quizService.getQuizzes({ id: quizId })
+
+      if (!quizzes || quizzes.length === 0) {
+        throw new Error("Invalid quiz id!")
+      }
+
+      const courses = await this.courseService.getCourses({
+        id: quizzes[0].courseId,
+      })
+      if (!courses || courses.length === 0) {
+        throw new Error("Quiz has no corresponding course")
+      }
+
+      const course = courses[0]
+
       attentionCriteriaQuery.quizRequiresPeerReviews = true
+
+      if (course.texts[0].abbreviation.includes("elements-of-ai")) {
+        attentionCriteriaQuery.statuses = [
+          "spam",
+          "submitted",
+          "enough-received-but-not-given",
+        ]
+        attentionCriteriaQuery.minPeerReviewsGiven = course.minPeerReviewsGiven
+        attentionCriteriaQuery.minPeerReviewsReceived =
+          course.minPeerReviewsReceived
+      } else {
+        const limitDate = new Date()
+        limitDate.setDate(limitDate.getDate() - 14)
+        attentionCriteriaQuery.lastAllowedTime = limitDate
+        attentionCriteriaQuery.statuses = ["spam", "submitted"]
+      }
+    } else {
+      attentionCriteriaQuery.firstAllowedTime = minDate && new Date(minDate)
+      attentionCriteriaQuery.lastAllowedTime = maxDate && new Date(maxDate)
+      attentionCriteriaQuery.statuses = statuses
+      attentionCriteriaQuery.minPeerReviewsGiven = minGivenPeerReviews
+      attentionCriteriaQuery.maxPeerReviewsGiven = maxGivenPeerReviews
+      attentionCriteriaQuery.minPeerReviewsReceived = minReceivedPeerReviews
+      attentionCriteriaQuery.maxPeerReviewsReceived = maxReceivedPeerReviews
+      attentionCriteriaQuery.minPeerReviewAverage = minAverageOfGrades
+      attentionCriteriaQuery.maxPeerReviewAverage = maxAverageOfGrades
+      attentionCriteriaQuery.minSpamFlags = minSpamFlags
+      attentionCriteriaQuery.maxSpamFlags = maxSpamFlags
     }
 
     result = await this.quizAnswerService.getAnswers(attentionCriteriaQuery)

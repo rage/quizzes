@@ -3,7 +3,7 @@ kind: CronJob
 metadata:
   name: update-quiz-item-answer-correct
 spec:
-  schedule: "28 * * * *"
+  schedule: "5 * * * *"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
