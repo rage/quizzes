@@ -236,7 +236,7 @@ export default class QuizAnswerService {
 
     someQuery
       .select("quiz_answer.quiz_id", "quizId")
-      .addSelect("COUNT(*)")
+      .addSelect("COUNT(DISTINCT quiz_answer.id)")
       .addGroupBy("quiz_answer.quiz_id")
 
     const result = (await someQuery.execute()).map(
