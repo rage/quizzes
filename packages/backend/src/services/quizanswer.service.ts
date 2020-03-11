@@ -216,41 +216,6 @@ export default class QuizAnswerService {
     return result.length > 0 ? result[0] : {}
   }
 
-  private async getQuizCounts(query: IQuizAnswerQuery): Promise<any> {
-    console.log("Query for counts: ", query)
-
-    const someQuery = await this.constructGetAnswersQuery(query)
-
-    if (query.quizRequiresPeerReviews && query.quizId) {
-      const prc = await PeerReviewCollection.createQueryBuilder("prc")
-        .where("prc.quiz_id = :quizId", { quizId: query.quizId })
-        .getCount()
-
-      if (prc) {
-        return { quizId: query.quizId, count: 0 }
-      }
-    }
-
-    console.log("The constructed query: ", someQuery.getQueryAndParameters()),
-      someQuery.printSql()
-
-    someQuery
-      .select("quiz_answer.quiz_id", "quizId")
-      .addSelect("COUNT(DISTINCT quiz_answer.id)")
-      .addGroupBy("quiz_answer.quiz_id")
-
-    const result = (await someQuery.execute()).map(
-      (countInfo: { quizId: string; count: string }) => {
-        return {
-          ...countInfo,
-          count: Number(countInfo.count),
-        }
-      },
-    )
-
-    return result
-  }
-
   public async getPlainAnswers(quizId: string): Promise<any> {
     if (!validator.isUUID(quizId)) {
       return {}
@@ -743,5 +708,35 @@ export default class QuizAnswerService {
     }
 
     return queryBuilder
+  }
+
+  private async getQuizCounts(query: IQuizAnswerQuery): Promise<any> {
+    const someQuery = await this.constructGetAnswersQuery(query)
+
+    if (query.quizRequiresPeerReviews && query.quizId) {
+      const prc = await PeerReviewCollection.createQueryBuilder("prc")
+        .where("prc.quiz_id = :quizId", { quizId: query.quizId })
+        .getCount()
+
+      if (prc) {
+        return { quizId: query.quizId, count: 0 }
+      }
+    }
+
+    someQuery
+      .select("quiz_answer.quiz_id", "quizId")
+      .addSelect("COUNT(DISTINCT quiz_answer.id)")
+      .addGroupBy("quiz_answer.quiz_id")
+
+    const result = (await someQuery.execute()).map(
+      (countInfo: { quizId: string; count: string }) => {
+        return {
+          ...countInfo,
+          count: Number(countInfo.count),
+        }
+      },
+    )
+
+    return result
   }
 }
