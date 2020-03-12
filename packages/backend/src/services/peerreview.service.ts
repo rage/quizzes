@@ -339,6 +339,7 @@ export default class PeerReviewService {
         AND quiz_answer.quiz_id = user_quiz_state.quiz_id
       `,
       )
+      .where("quiz_answer.quiz_id", quizId)
       .andWhere("quiz_answer.user_id", "!=", reviewerId)
       .andWhere("quiz_answer.user_id", "in", limitingQuery)
       .andWhere("quiz_answer.id", "not in", rejected)
