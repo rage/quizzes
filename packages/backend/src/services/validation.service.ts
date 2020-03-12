@@ -281,19 +281,22 @@ export default class ValidationService {
     const given: number = userQuizState.peerReviewsGiven
     const received: number = userQuizState.peerReviewsReceived
     if (
-      quiz.autoReject &&
       (quizAnswer.status === "submitted" ||
         quizAnswer.status === "enough-received-but-not-given") &&
       userQuizState.spamFlags > course.maxSpamFlags
     ) {
-      quizAnswer.status = "spam"
-      if (quiz.triesLimited && userQuizState.tries >= quiz.tries) {
-        userQuizState.status = "locked"
+      if (quiz.autoReject) {
+        quizAnswer.status = "spam"
+        if (quiz.triesLimited && userQuizState.tries >= quiz.tries) {
+          userQuizState.status = "locked"
+        } else {
+          userQuizState.spamFlags = null
+          userQuizState.peerReviewsReceived = 0
+          userQuizState.status = "open"
+          userQuizState.pointsAwarded = null
+        }
       } else {
-        userQuizState.spamFlags = null
-        userQuizState.peerReviewsReceived = 0
-        userQuizState.status = "open"
-        userQuizState.pointsAwarded = null
+        quizAnswer.status = "manual-review"
       }
     } else if (
       quizAnswer.status === "submitted" &&
@@ -303,7 +306,15 @@ export default class ValidationService {
       quizAnswer.status = "enough-received-but-not-given"
     } else if (
       (quizAnswer.status === "submitted" ||
-        quizAnswer.status === "enough-received-but-not-given") &&
+        quizAnswer.status === "enough-received-but-not-given" ||
+        // if the cause for manual review was too low an average,
+        // their answer has a chance to be confirmed if their new average
+        // is good enough
+        // Of course it could be that an answer should remain in this state,
+        // which is also probable since they are unlikely to receive further
+        // peer reviews...
+        (quizAnswer.status === "manual-review" &&
+          userQuizState.spamFlags <= course.maxSpamFlags)) &&
       given >= course.minPeerReviewsGiven &&
       received >= course.minPeerReviewsReceived &&
       quiz.autoConfirm
@@ -332,8 +343,11 @@ export default class ValidationService {
         } else {
           userQuizState.status = "open"
         }
+      } else {
+        quizAnswer.status = "manual-review"
       }
     }
+
     return { quizAnswer, userQuizState }
   }
 

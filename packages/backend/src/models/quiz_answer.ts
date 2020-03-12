@@ -45,10 +45,11 @@ export class QuizAnswer extends BaseEntity {
       "draft",
       "submitted",
       "enough-received-but-not-given",
-      "spam",
       "confirmed",
+      "spam",
       "rejected",
       "deprecated",
+      "manual-review",
     ],
   })
   public status?: string

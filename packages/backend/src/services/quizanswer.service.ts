@@ -197,10 +197,7 @@ export default class QuizAnswerService {
         elementsCriteria = {
           courseIds: elementsCourseIds,
           courseIdIncludedInCourseIds: true,
-          statuses: ["spam", "submitted", "enough-received-but-not-given"],
-          minPeerReviewsGiven: 3,
-          minPeerReviewsReceived: 2,
-          minSpamFlagsOr: 1,
+          statuses: ["manual-review"],
         }
         elementsCriteria.courseIdIncludedInCourseIds = true
       }
