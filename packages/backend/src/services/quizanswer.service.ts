@@ -609,7 +609,6 @@ export default class QuizAnswerService {
       }
     }
 
-    console.log("SQL: ", queryBuilder.getQueryAndParameters())
     return queryBuilder
   }
 
