@@ -70,9 +70,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
   languageInfo,
 }) => {
   const themeProvider = useContext(ThemeProviderContext)
-
   const ref = useState(useRef(null))[0]
-
   const answersToReview = useTypedSelector(state => state.peerReviews.options)
   const peerReview = useTypedSelector(state => state.peerReviews.answer)
   const error = useTypedSelector(state => state.message.error)
@@ -175,22 +173,22 @@ const PeerReviewQuestions: React.FunctionComponent<
 > = ({ peerReview, languageInfo, scrollRef }) => {
   const themeProvider = useContext(ThemeProviderContext)
   const courseProgressProvider = React.useContext(CourseProgressProviderContext)
-
   const quiz = useTypedSelector(state => state.quiz)
-
   const submitDisabled = useTypedSelector(
     state => state.peerReviews.submitDisabled,
   )
   const error = useTypedSelector(state => state.message.error)
-
   const dispatch = useDispatch()
+  const languages = useTypedSelector(state => state.language.languageLabels)
+  const HiddenLikertDescription = styled.p`
+    position:absolute;
+    left:-10000px;
+  `
 
   if (!quiz) {
     return <div />
   }
-
   const peerReviewQuestions = quiz.peerReviewCollections
-
   const changeInPeerReviewGrade = (peerReviewQuestionId: string) => (
     name: string,
     value: string,
@@ -240,7 +238,11 @@ const PeerReviewQuestions: React.FunctionComponent<
         return (
           <QuestionBlockWrapper
             providedStyles={themeProvider.questionBlockWrapperStyles}
+            role="group"
+            aria-label={languages.peerReviews.peerReviewGroupTitle}
+            aria-describedby="peer-review-info"
           >
+            <HiddenLikertDescription id="peer-review-info">{languages.peerReviews.peerReviewLikertDetails}</HiddenLikertDescription>
             {block.map(question => {
               let currentPeerReviewAnswer = peerReview.answers.find(
                 answer => answer.peerReviewQuestionId === question.id,
@@ -265,7 +267,7 @@ const PeerReviewQuestions: React.FunctionComponent<
                   currentPeerReviewAnswer = currentPeerReviewAnswer as PeerReviewGradeAnswer
 
                   return (
-                    <LikertScale
+                  <LikertScale
                       key={question.id}
                       separatorType={
                         themeProvider.likertSeparatorType || "dotted-line"
@@ -278,6 +280,7 @@ const PeerReviewQuestions: React.FunctionComponent<
                       ]}
                       onClick={changeInPeerReviewGrade(question.id)}
                     />
+                   
                   )
                 default:
                   return (
