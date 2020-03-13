@@ -319,6 +319,11 @@ export default class PeerReviewService {
           qb.whereNull("points_awarded")
             .andWhere(
               builder.raw(
+                "peer_reviews_given >= course.min_peer_reviews_given",
+              ),
+            )
+            .andWhere(
+              builder.raw(
                 "peer_reviews_received < course.min_peer_reviews_received",
               ),
             )
