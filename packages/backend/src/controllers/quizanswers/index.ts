@@ -289,15 +289,7 @@ export class QuizAnswerController {
       attentionCriteriaQuery.quizRequiresPeerReviews = true
 
       if (course.texts[0].abbreviation.includes("elements-of-ai")) {
-        attentionCriteriaQuery.statuses = [
-          "spam",
-          "submitted",
-          "enough-received-but-not-given",
-        ]
-        attentionCriteriaQuery.minPeerReviewsGiven = course.minPeerReviewsGiven
-        attentionCriteriaQuery.minPeerReviewsReceived =
-          course.minPeerReviewsReceived
-        attentionCriteriaQuery.minSpamFlagsOr = 1
+        attentionCriteriaQuery.statuses = ["manual-review"]
       } else {
         const limitDate = new Date()
         limitDate.setDate(limitDate.getDate() - 14)
