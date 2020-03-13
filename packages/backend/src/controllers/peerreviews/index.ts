@@ -142,13 +142,7 @@ export class PeerReviewController {
       {
         userId: peerReview.userId,
         quizId: receivingQuizAnswer.quizId,
-        statuses: [
-          "confirmed",
-          "submitted",
-          "enough-received-but-not-given",
-          // receiving 1 spam flag could make status 'manual-review'
-          "manual-review",
-        ],
+        statuses: ["confirmed", "submitted", "enough-received-but-not-given"],
       },
       this.entityManager,
     )
