@@ -31,8 +31,6 @@ class Answer extends React.Component<any, any> {
     confirmed: "#48fa5d",
     rejected: "#d80027",
     deprecated: "#9b9b9b",
-    "enough-received-but-not-given": "#FB6949",
-    "manual-review": "#FB6949",
   }
 
   constructor(props) {

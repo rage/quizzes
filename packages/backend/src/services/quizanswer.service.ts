@@ -172,8 +172,6 @@ export default class QuizAnswerService {
   public async getAnswersCount(query: IQuizAnswerQuery): Promise<any> {
     let result
 
-    const permittedCourseIds = query.courseIds
-
     // Temporarily check elements courses counts differently from others
     // Later: save the attention criteria in database for each course
     // (and maybe don't request the numbers for all the courses in one request)
@@ -183,44 +181,26 @@ export default class QuizAnswerService {
       // Assuming that all the relevant quizzes on all elements courses use the same values, which are hard-coded below
       // TODO: change query building to support option "course-minimum" for the relevant properties
 
-      let elementsCourseIds: string[] = await this.courseService.getElementsCourseIds()
-
-      // undefined for admins
-      if (permittedCourseIds) {
-        elementsCourseIds = elementsCourseIds.filter(id =>
-          permittedCourseIds.includes(id),
-        )
+      const elementsCourseIds: string[] = await this.courseService.getElementsCourseIds()
+      const elementsCriteria: IQuizAnswerQuery = {
+        courseIds: elementsCourseIds,
+        courseIdIncludedInCourseIds: true,
+        statuses: ["spam", "submitted", "enough-received-but-not-given"],
+        minPeerReviewsGiven: 3,
+        minPeerReviewsReceived: 2,
+        minSpamFlagsOr: 1,
       }
-
-      let elementsCriteria: IQuizAnswerQuery
-      if (elementsCourseIds.length > 0) {
-        elementsCriteria = {
-          courseIds: elementsCourseIds,
-          courseIdIncludedInCourseIds: true,
-          statuses: ["manual-review"],
-        }
-        elementsCriteria.courseIdIncludedInCourseIds = true
-      }
+      elementsCriteria.courseIdIncludedInCourseIds = true
 
       const nonElementsCriteria = { ...query }
 
-      if (permittedCourseIds) {
-        nonElementsCriteria.courseIds = permittedCourseIds.filter(
-          id => !elementsCourseIds.includes(id),
-        )
-      } else {
-        nonElementsCriteria.courseIds = elementsCourseIds
-        nonElementsCriteria.courseIdIncludedInCourseIds = false
-      }
+      nonElementsCriteria.courseIds = elementsCourseIds
+      nonElementsCriteria.courseIdIncludedInCourseIds = false
 
-      const promise1: Promise<any> | [] =
-        elementsCourseIds.length > 0 ? this.getQuizCounts(elementsCriteria) : []
-      const promise2: Promise<any> | [] =
-        nonElementsCriteria.courseIds.length > 0
-          ? this.getQuizCounts(nonElementsCriteria)
-          : []
-
-      const [result1, result2] = await Promise.all([promise1, promise2])
+      const [result1, result2] = await Promise.all([
+        this.getQuizCounts(elementsCriteria),
+        this.getQuizCounts(nonElementsCriteria),
+      ])
       result = result1.concat(result2)
     }
 
@@ -609,6 +589,7 @@ export default class QuizAnswerService {
       }
     }
 
+    console.log("SQL: ", queryBuilder.getQueryAndParameters())
     return queryBuilder
   }
 
