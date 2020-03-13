@@ -310,11 +310,8 @@ export default class ValidationService {
         // if the cause for manual review was too low an average,
         // their answer has a chance to be confirmed if their new average
         // is good enough
-        // Of course it could be that an answer should remain in this state,
-        // which is also probable since they are unlikely to receive further
-        // peer reviews...
         (quizAnswer.status === "manual-review" &&
-          userQuizState.spamFlags <= course.maxSpamFlags)) &&
+          userQuizState.spamFlags < 1)) &&
       given >= course.minPeerReviewsGiven &&
       received >= course.minPeerReviewsReceived &&
       quiz.autoConfirm
