@@ -4,15 +4,16 @@ import { PointsByGroup } from "../modelTypes"
 export interface ProgressData {
   completed: boolean
   points_to_pass: number
+  exercise_completions_to_pass: number
   n_points: number
   max_points: number
   exercise_completions: number
   total_exercises: number
   required_actions: RequiredAction[]
   progressByGroup: ProgressByGroup
-  // exercisesByPart: ExercisesByPart
-  // answersByPart: AnswersByPart
-  exercise_completions_by_section: any
+  exercisesByPart: ExercisesByPart
+  answersByPart: AnswersByPart
+  // exercise_completions_by_section: any
 }
 
 export type ProgressByGroup = { [group: string]: PointsByGroup }

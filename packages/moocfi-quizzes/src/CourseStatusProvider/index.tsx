@@ -14,7 +14,7 @@ import {
 import { languageOptions } from "../utils/languages"
 import { ToastContainer, toast, TypeOptions } from "react-toastify"
 import {
-  getCompletion,
+  // getCompletion,
   getUserCourseData,
 } from "../services/courseProgressService"
 
@@ -126,18 +126,23 @@ export const CourseStatusProvider: React.FunctionComponent<
     accessToken !== prevProps.current.accessToken ||
     courseId !== prevProps.current.courseId ||
     languageId !== prevProps.current.languageId ||
-    moocfiBaseUrl !== prevProps.current.moocfiBaseUrl
-  quizzesBaseUrl !== prevProps.current.quizzesBaseUrl
+    moocfiBaseUrl !== prevProps.current.moocfiBaseUrl ||
+    quizzesBaseUrl !== prevProps.current.quizzesBaseUrl ||
+    quizzesBaseUrl !== prevProps.current.quizzesBaseUrl
+  const shouldLogout = !accessToken && prevProps.current.accessToken
   const shouldConnectMoocfi = moocfiStatus === ConnectionStatus.DISCONNECTED
   const shouldConnectQuizzes = quizzesStatus === ConnectionStatus.DISCONNECTED
 
   useEffect(() => {
+    console.log("fire")
     if (accessToken && courseId) {
       if (shouldFetch) {
+        console.log("fetch")
         prevProps.current = props
         fetchProgressData()
       }
       if (shouldConnectMoocfi) {
+        console.log("connect 1")
         connect(
           `${moocfiWsUrl}/ws`,
           setMoocfiClient,
@@ -147,6 +152,7 @@ export const CourseStatusProvider: React.FunctionComponent<
         )
       }
       if (shouldConnectQuizzes) {
+        console.log("connect 2")
         connect(
           `${quizzesWsUrl}/ws`,
           setQuizzesClient,
@@ -155,7 +161,9 @@ export const CourseStatusProvider: React.FunctionComponent<
           setQuizzesReconnectDelay,
         )
       }
-    } else {
+    }
+    if (shouldLogout) {
+      console.log("logout")
       logout()
     }
   })
@@ -165,15 +173,8 @@ export const CourseStatusProvider: React.FunctionComponent<
       const progressData = await getUserCourseData(
         courseId,
         accessToken,
-        quizzesBaseUrl,
-      )
-      const completionData = await getCompletion(
-        courseId,
-        accessToken,
         moocfiBaseUrl,
       )
-      progressData.currentUser.completions =
-        completionData.currentUser.completions
       const data = transformData(progressData)
       setProgressProviderState({
         ...progressProviderState,
@@ -361,7 +362,7 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
   return <Component {...props} {...injectProps} />
 }
 
-const transformData = (data: any): ProgressData => {
+/*const transformData = (data: any): ProgressData => {
   const courseProgress = data.currentUser.user_course_progresses[0]
   const completed = data.currentUser.completions.length > 0
   let points_to_pass = 0
@@ -398,12 +399,13 @@ const transformData = (data: any): ProgressData => {
     //answersByPart,
     exercise_completions_by_section,
   }
-}
+}*/
 
-/*const transformData = (data: any): ProgressData => {
+const transformData = (data: any): ProgressData => {
   const courseProgress = data.currentUser.user_course_progresses[0]
   const completed = data.currentUser.completions.length > 0
   let points_to_pass = 0
+  let exercise_completions_to_pass
   let n_points
   let max_points
   let exercise_completions = 0
@@ -420,8 +422,11 @@ const transformData = (data: any): ProgressData => {
     }
     const exerciseData = courseProgress.course
     points_to_pass = exerciseData.points_needed || 0
+    exercise_completions_to_pass = exerciseData.exercise_completions_needed || 0
     for (const exercise of exerciseData.exercises) {
-      total_exercises += 1
+      if (exercise.part != 0) {
+        total_exercises += 1
+      }
       const partExercises = exercisesByPart[exercise.part] || []
       exercisesByPart[exercise.part] = [...partExercises, exercise]
     }
@@ -455,6 +460,7 @@ const transformData = (data: any): ProgressData => {
   return {
     completed,
     points_to_pass,
+    exercise_completions_to_pass,
     n_points,
     max_points,
     exercise_completions,
@@ -464,4 +470,4 @@ const transformData = (data: any): ProgressData => {
     exercisesByPart,
     answersByPart,
   }
-}*/
+}

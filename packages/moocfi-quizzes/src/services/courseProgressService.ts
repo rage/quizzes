@@ -16,7 +16,7 @@ const request = async (accessToken: string, query: string, baseUrl: string) => {
   return await graphQLClient.request(query)
 }
 
-export const getUserCourseData = async (
+/*export const getUserCourseData = async (
   courseId: string,
   accessToken: string,
   baseUrl: string,
@@ -49,11 +49,12 @@ export const getCompletion = async (
     }
   `
   return await request(accessToken, query, baseUrl)
-}
+}*/
 
-/*export const getUserCourseData = async (
+export const getUserCourseData = async (
   courseId: string,
   accessToken: string,
+  baseUrl: string,
 ): Promise<any> => {
   const query = `
     {
@@ -65,6 +66,8 @@ export const getCompletion = async (
           max_points
           progress
           course {
+            points_needed
+            exercise_completions_needed
             exercises {
               id
               quizzes_id: custom_id
@@ -78,6 +81,7 @@ export const getCompletion = async (
               custom_id
               part
               section
+              max_points
               exercise_completions(orderBy: updated_at_DESC, first: 1) {
                 completed
                 n_points
@@ -89,14 +93,14 @@ export const getCompletion = async (
           }
         }
         completions(
-          where: { course: { id: "${courseId}" } }
+          course_id: "${courseId}"
         ) {
           id
         }
       }
     }
   `
-  const data = await request(accessToken, query)
+  const data = await request(accessToken, query, baseUrl)
 
   return data
-}*/
+}
