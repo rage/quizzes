@@ -23,9 +23,11 @@ type PeerReviewsGuidanceProps = {
   guidanceText: string
 }
 
-const PeerReviewsGuidance: React.FunctionComponent<
-  PeerReviewsGuidanceProps
-> = ({ givenLabel, guidanceText, peerReviewsCompletedInfo }) => {
+const PeerReviewsGuidance: React.FunctionComponent<PeerReviewsGuidanceProps> = ({
+  givenLabel,
+  guidanceText,
+  peerReviewsCompletedInfo,
+}) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const quiz = useTypedSelector(state => state.quiz)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)

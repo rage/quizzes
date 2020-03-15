@@ -1,0 +1,18 @@
+export interface UserInfo {
+  id: number
+  username: string
+  email: string
+  user_field: UserField
+  extra_fields: ExtraFields
+  administrator: boolean
+}
+
+export interface ExtraFields {}
+
+export interface UserField {
+  first_name: string
+  last_name: string
+  html1: string
+  organizational_id: string
+  course_announcements: boolean
+}

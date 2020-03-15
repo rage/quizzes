@@ -6,7 +6,8 @@
     "packages/backend",
     "packages/common",
     "packages/dashboard",
-    "packages/migration"
+    "packages/migration",
+    "packages/backendv2"
   ],
   "scripts": {
     "start": "yarn run serve",

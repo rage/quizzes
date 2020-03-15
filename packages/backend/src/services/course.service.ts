@@ -19,9 +19,10 @@ export class CourseService {
   public async getCourses(query: ICourseQuery): Promise<Course[]> {
     const { language, id, user } = query
 
-    const queryBuilder: SelectQueryBuilder<
-      Course
-    > = this.entityManager.createQueryBuilder(Course, "course")
+    const queryBuilder: SelectQueryBuilder<Course> = this.entityManager.createQueryBuilder(
+      Course,
+      "course",
+    )
 
     if (user && !user.administrator) {
       const roles = await this.userCourseRoleService.getUserCourseRoles({

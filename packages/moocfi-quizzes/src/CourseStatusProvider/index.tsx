@@ -51,156 +51,151 @@ const isMessage = (message: any): message is Message => {
   return "type" in message && message.type in MessageType
 }
 
-export const CourseStatusProvider: React.FunctionComponent<
-  CourseStatusProviderProps
-> = React.memo(({ children, ...props }) => {
-  const { accessToken, courseId, languageId } = props
+export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderProps> = React.memo(
+  ({ children, ...props }) => {
+    const { accessToken, courseId, languageId } = props
 
-  const prevProps = useRef({
-    accessToken: "",
-    courseId: "",
-    languageId: "",
-  })
-
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
-  const [updateQuiz, setUpdateQuiz] = useState({})
-  const [data, setData] = useState<ProgressData | undefined>()
-
-  const [moocfiStatus, setMoocfiStatus] = useState<ConnectionStatus>(
-    ConnectionStatus.DISCONNECTED,
-  )
-  const [quizzesStatus, setQuizzesStatus] = useState<ConnectionStatus>(
-    ConnectionStatus.DISCONNECTED,
-  )
-  const [moocfiClient, setMoocfiClient] = useState<WebSocket | undefined>()
-  const [quizzesClient, setQuizzesClient] = useState<WebSocket | undefined>()
-
-  const shouldFetch =
-    accessToken !== prevProps.current.accessToken ||
-    courseId !== prevProps.current.courseId ||
-    languageId !== prevProps.current.languageId
-  const shouldConnectMoocfi =
-    !loading && !error && moocfiStatus === ConnectionStatus.DISCONNECTED
-  const shouldConnectQuizzes =
-    !loading && !error && quizzesStatus === ConnectionStatus.DISCONNECTED
-
-  useEffect(() => {
-    if (accessToken && courseId) {
-      if (shouldFetch) {
-        prevProps.current = props
-        fetchProgressData()
-      }
-      if (shouldConnectMoocfi) {
-        connect(
-          "wss://www.mooc.fi/ws",
-          setMoocfiClient,
-          setMoocfiStatus,
-        )
-      }
-      if (shouldConnectQuizzes) {
-        connect(
-          "wss://quizzes.mooc.fi/ws",
-          setQuizzesClient,
-          setQuizzesStatus,
-        )
-      }
-    } else {
-      logout()
-    }
-  })
-
-  const fetchProgressData = async () => {
-    try {
-      const progressData = await getUserCourseData(courseId, accessToken)
-      const completionData = await getCompletion(courseId, accessToken)
-      progressData.currentUser.completions =
-        completionData.currentUser.completions
-      const data = transformData(progressData)
-      setData(data)
-      setLoading(false)
-    } catch (error) {
-      setError(true)
-      setLoading(false)
-      console.log(error)
-      console.log("Could not fetch course progress data")
-      notifySticky(
-        languageOptions[languageId].error.progressFetchError,
-        ToastType.ERROR,
-      )
-    }
-  }
-
-  const connect = async (
-    host: string,
-    setClient: React.Dispatch<React.SetStateAction<WebSocket | undefined>>,
-    setStatus: React.Dispatch<React.SetStateAction<ConnectionStatus>>,
-  ) => {
-    setStatus(ConnectionStatus.CONNECTING)
-    try {
-      const client: WebSocket = await new Promise(
-        (resolve: any, reject: any) => {
-          const client = new WebSocket(host, "echo-protocol")
-          client.onopen = () => {
-            resolve(client)
-          }
-          client.onerror = err => {
-            reject(err)
-          }
-        },
-      )
-      client.onmessage = onMessage
-      client.onerror = e => reconnect(host, setStatus)
-      client.onclose = e => reconnect(host, setStatus)
-      client.send(JSON.stringify({ accessToken, courseId }))
-      setClient(client)
-      setStatus(ConnectionStatus.CONNECTED)
-      console.log(`connected to ${host}`)
-    } catch (error) {
-      reconnect(host, setStatus)
-    }
-  }
-
-  const reconnect = (
-    host: string,
-    setStatus: React.Dispatch<React.SetStateAction<ConnectionStatus>>,
-  ) => {
-    console.log(`could not connect to ${host}, attempting to reconnect...`)
-    setTimeout(() => setStatus(ConnectionStatus.DISCONNECTED), 10000)
-  }
-
-  const logout = () => {
-    setLoading(true)
-    setError(false)
-    setData(undefined)
-    moocfiClient && moocfiClient.close()
-    quizzesClient && quizzesClient.close()
-    setMoocfiClient(undefined)
-    setQuizzesClient(undefined)
-    prevProps.current = {
+    const prevProps = useRef({
       accessToken: "",
       courseId: "",
       languageId: "",
-    }
-  }
+    })
 
-  const onMessage = (inbound: any) => {
-    const message = JSON.parse(inbound.data)
-    if (isMessage(message)) {
-      switch (message.type) {
-        case MessageType.PROGRESS_UPDATED:
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState(false)
+    const [updateQuiz, setUpdateQuiz] = useState({})
+    const [data, setData] = useState<ProgressData | undefined>()
+
+    const [moocfiStatus, setMoocfiStatus] = useState<ConnectionStatus>(
+      ConnectionStatus.DISCONNECTED,
+    )
+    const [quizzesStatus, setQuizzesStatus] = useState<ConnectionStatus>(
+      ConnectionStatus.DISCONNECTED,
+    )
+    const [moocfiClient, setMoocfiClient] = useState<WebSocket | undefined>()
+    const [quizzesClient, setQuizzesClient] = useState<WebSocket | undefined>()
+
+    const shouldFetch =
+      accessToken !== prevProps.current.accessToken ||
+      courseId !== prevProps.current.courseId ||
+      languageId !== prevProps.current.languageId
+    const shouldConnectMoocfi =
+      !loading && !error && moocfiStatus === ConnectionStatus.DISCONNECTED
+    const shouldConnectQuizzes =
+      !loading && !error && quizzesStatus === ConnectionStatus.DISCONNECTED
+
+    useEffect(() => {
+      if (accessToken && courseId) {
+        if (shouldFetch) {
+          prevProps.current = props
           fetchProgressData()
-          break
-        case MessageType.PEER_REVIEW_RECEIVED:
-          setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
-          /*notifyRegular(
+        }
+        if (shouldConnectMoocfi) {
+          connect("wss://www.mooc.fi/ws", setMoocfiClient, setMoocfiStatus)
+        }
+        if (shouldConnectQuizzes) {
+          connect(
+            "wss://quizzes.mooc.fi/ws",
+            setQuizzesClient,
+            setQuizzesStatus,
+          )
+        }
+      } else {
+        logout()
+      }
+    })
+
+    const fetchProgressData = async () => {
+      try {
+        const progressData = await getUserCourseData(courseId, accessToken)
+        const completionData = await getCompletion(courseId, accessToken)
+        progressData.currentUser.completions =
+          completionData.currentUser.completions
+        const data = transformData(progressData)
+        setData(data)
+        setLoading(false)
+      } catch (error) {
+        setError(true)
+        setLoading(false)
+        console.log(error)
+        console.log("Could not fetch course progress data")
+        notifySticky(
+          languageOptions[languageId].error.progressFetchError,
+          ToastType.ERROR,
+        )
+      }
+    }
+
+    const connect = async (
+      host: string,
+      setClient: React.Dispatch<React.SetStateAction<WebSocket | undefined>>,
+      setStatus: React.Dispatch<React.SetStateAction<ConnectionStatus>>,
+    ) => {
+      setStatus(ConnectionStatus.CONNECTING)
+      try {
+        const client: WebSocket = await new Promise(
+          (resolve: any, reject: any) => {
+            const client = new WebSocket(host, "echo-protocol")
+            client.onopen = () => {
+              resolve(client)
+            }
+            client.onerror = err => {
+              reject(err)
+            }
+          },
+        )
+        client.onmessage = onMessage
+        client.onerror = e => reconnect(host, setStatus)
+        client.onclose = e => reconnect(host, setStatus)
+        client.send(JSON.stringify({ accessToken, courseId }))
+        setClient(client)
+        setStatus(ConnectionStatus.CONNECTED)
+        console.log(`connected to ${host}`)
+      } catch (error) {
+        reconnect(host, setStatus)
+      }
+    }
+
+    const reconnect = (
+      host: string,
+      setStatus: React.Dispatch<React.SetStateAction<ConnectionStatus>>,
+    ) => {
+      console.log(`could not connect to ${host}, attempting to reconnect...`)
+      setTimeout(() => setStatus(ConnectionStatus.DISCONNECTED), 10000)
+    }
+
+    const logout = () => {
+      setLoading(true)
+      setError(false)
+      setData(undefined)
+      moocfiClient && moocfiClient.close()
+      quizzesClient && quizzesClient.close()
+      setMoocfiClient(undefined)
+      setQuizzesClient(undefined)
+      prevProps.current = {
+        accessToken: "",
+        courseId: "",
+        languageId: "",
+      }
+    }
+
+    const onMessage = (inbound: any) => {
+      const message = JSON.parse(inbound.data)
+      if (isMessage(message)) {
+        switch (message.type) {
+          case MessageType.PROGRESS_UPDATED:
+            fetchProgressData()
+            break
+          case MessageType.PEER_REVIEW_RECEIVED:
+            setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
+            /*notifyRegular(
             languageOptions[languageId].receivedPeerReviews.peerReviewReceived,
             ToastType.SUCCESS,
           )*/
-          break
-        case MessageType.QUIZ_CONFIRMED:
-          setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
-          /*notifyRegular(
+            break
+          case MessageType.QUIZ_CONFIRMED:
+            setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
+            /*notifyRegular(
             languageOptions[languageId].general.answerConfirmed,
             ToastType.SUCCESS,
           )
@@ -208,66 +203,67 @@ export const CourseStatusProvider: React.FunctionComponent<
             languageOptions[languageId].general.progressUpdated,
             ToastType.SUCCESS,
           )*/
-          break
-        case MessageType.QUIZ_REJECTED:
-          setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
-          break
-        case MessageType.COURSE_CONFIRMED:
-          fetchProgressData()
-          break
+            break
+          case MessageType.QUIZ_REJECTED:
+            setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
+            break
+          case MessageType.COURSE_CONFIRMED:
+            fetchProgressData()
+            break
+        }
       }
     }
-  }
 
-  const notifyRegular = (message: string, type?: TypeOptions) =>
-    toast(message, { containerId: "regular", type })
-  const notifySticky = (message: string, type?: TypeOptions) =>
-    toast(message, { containerId: "sticky", type })
+    const notifyRegular = (message: string, type?: TypeOptions) =>
+      toast(message, { containerId: "regular", type })
+    const notifySticky = (message: string, type?: TypeOptions) =>
+      toast(message, { containerId: "sticky", type })
 
-  const quizUpdated = (id: string) => {
-    setUpdateQuiz({ ...updateQuiz, [id]: false })
-  }
+    const quizUpdated = (id: string) => {
+      setUpdateQuiz({ ...updateQuiz, [id]: false })
+    }
 
-  const notifyError = (message: string) => {
-    notifySticky(message, ToastType.ERROR)
-  }
+    const notifyError = (message: string) => {
+      notifySticky(message, ToastType.ERROR)
+    }
 
-  const progress: CourseProgressProviderInterface = {
-    error,
-    loading,
-    // notifyError,
-    courseProgressData: data,
-  }
+    const progress: CourseProgressProviderInterface = {
+      error,
+      loading,
+      // notifyError,
+      courseProgressData: data,
+    }
 
-  const status: CourseStatusProviderInterface = {
-    updateQuiz,
-    quizUpdated,
-    // notifyError,
-  }
+    const status: CourseStatusProviderInterface = {
+      updateQuiz,
+      quizUpdated,
+      // notifyError,
+    }
 
-  return (
-    <CourseProgressProviderContext.Provider value={progress}>
-      <CourseStatusProviderContext.Provider value={status}>
-        <ToastContainer
-          enableMultiContainer
-          newestOnTop={false}
-          autoClose={false}
-          hideProgressBar
-          containerId={"sticky"}
-          position={toast.POSITION.TOP_LEFT}
-        />
-        <ToastContainer
-          enableMultiContainer
-          newestOnTop={false}
-          hideProgressBar
-          containerId={"regular"}
-          position={toast.POSITION.TOP_RIGHT}
-        />
-        {children}
-      </CourseStatusProviderContext.Provider>
-    </CourseProgressProviderContext.Provider>
-  )
-})
+    return (
+      <CourseProgressProviderContext.Provider value={progress}>
+        <CourseStatusProviderContext.Provider value={status}>
+          <ToastContainer
+            enableMultiContainer
+            newestOnTop={false}
+            autoClose={false}
+            hideProgressBar
+            containerId={"sticky"}
+            position={toast.POSITION.TOP_LEFT}
+          />
+          <ToastContainer
+            enableMultiContainer
+            newestOnTop={false}
+            hideProgressBar
+            containerId={"regular"}
+            position={toast.POSITION.TOP_RIGHT}
+          />
+          {children}
+        </CourseStatusProviderContext.Provider>
+      </CourseProgressProviderContext.Provider>
+    )
+  },
+)
 
 export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
   Component: React.FunctionComponent<P> | React.ComponentType<P>,

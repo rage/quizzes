@@ -179,15 +179,12 @@ export default class KafkaService {
 
   private connect() {
     return new Promise((resolve, reject) => {
-      this.producer.connect(
-        {},
-        (err: Error, data: any) => {
-          if (err) {
-            reject(err)
-          }
-          resolve(data)
-        },
-      )
+      this.producer.connect({}, (err: Error, data: any) => {
+        if (err) {
+          reject(err)
+        }
+        resolve(data)
+      })
     })
   }
 

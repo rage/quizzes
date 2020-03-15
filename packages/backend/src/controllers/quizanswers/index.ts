@@ -298,11 +298,13 @@ export class QuizAnswerController {
       return
     }
 
-    const quiz = (await this.quizService.getQuizzes({
-      id: existingAnswer.quizId,
-      course: true,
-      items: true,
-    }))[0]
+    const quiz = (
+      await this.quizService.getQuizzes({
+        id: existingAnswer.quizId,
+        course: true,
+        items: true,
+      })
+    )[0]
 
     let userQuizState = await this.userQuizStateService.getUserQuizState(
       existingAnswer.userId,
@@ -396,13 +398,15 @@ export class QuizAnswerController {
     answer.user = new User()
     answer.user.id = answer.userId
 
-    const quiz: Quiz = (await this.quizService.getQuizzes({
-      id: answer.quizId,
-      items: true,
-      options: true,
-      peerreviews: true,
-      course: true,
-    }))[0]
+    const quiz: Quiz = (
+      await this.quizService.getQuizzes({
+        id: answer.quizId,
+        items: true,
+        options: true,
+        peerreviews: true,
+        course: true,
+      })
+    )[0]
 
     const now = new Date()
 
@@ -440,13 +444,9 @@ export class QuizAnswerController {
         throw new BadRequestError(
           `${erroneousItemAnswers.map(x => {
             if (x.type === "essay") {
-              return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer (${
-                x.data.words
-              } words): ${x.data.text}`
+              return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer (${x.data.words} words): ${x.data.text}`
             } else if (x.type === "scale") {
-              return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer: ${
-                x.data.answerValue
-              }`
+              return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer: ${x.data.answerValue}`
             }
           })}`,
         )

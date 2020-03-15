@@ -179,9 +179,11 @@ type PeerReviewQuestionsProps = {
   scrollRef: any
 }
 
-const PeerReviewQuestions: React.FunctionComponent<
-  PeerReviewQuestionsProps
-> = ({ peerReview, languageInfo, scrollRef }) => {
+const PeerReviewQuestions: React.FunctionComponent<PeerReviewQuestionsProps> = ({
+  peerReview,
+  languageInfo,
+  scrollRef,
+}) => {
   const themeProvider = useContext(ThemeProviderContext)
 
   const quiz = useTypedSelector(state => state.quiz)
@@ -287,9 +289,7 @@ const PeerReviewQuestions: React.FunctionComponent<
                   )
                 default:
                   return (
-                    <SpaciousTypography>{`The ${
-                      question.type
-                    } type peer review question is not supported`}</SpaciousTypography>
+                    <SpaciousTypography>{`The ${question.type} type peer review question is not supported`}</SpaciousTypography>
                   )
               }
             })}
@@ -318,9 +318,11 @@ const StyledReviewEssayQuestion = styled.div`
   margin: 8px 0;
 `
 
-const TextualPeerReviewFeedback: React.FunctionComponent<
-  ITextualPeerReviewFeedback
-> = ({ currentText, handleTextChange, questionTexts }) => {
+const TextualPeerReviewFeedback: React.FunctionComponent<ITextualPeerReviewFeedback> = ({
+  currentText,
+  handleTextChange,
+  questionTexts,
+}) => {
   const languages = useTypedSelector(state => state.language.languageLabels)
 
   if (!languages) {

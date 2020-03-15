@@ -371,12 +371,14 @@ export default class QuizService {
   public async getCSVData(quizId: string) {
     const builder = Knex({ client: "pg" })
 
-    const quiz = (await this.getQuizzes({
-      id: quizId,
-      peerreviews: true,
-      options: true,
-      items: true,
-    }))[0]
+    const quiz = (
+      await this.getQuizzes({
+        id: quizId,
+        peerreviews: true,
+        options: true,
+        items: true,
+      })
+    )[0]
 
     if (!quiz) {
       return

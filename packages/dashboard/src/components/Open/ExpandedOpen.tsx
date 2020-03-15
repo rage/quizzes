@@ -182,9 +182,4 @@ class ExpandedOpen extends React.Component<any, any> {
   }
 }
 
-export default withStyles(styles)(
-  connect(
-    null,
-    { changeAttr },
-  )(ExpandedOpen),
-)
+export default withStyles(styles)(connect(null, { changeAttr })(ExpandedOpen))

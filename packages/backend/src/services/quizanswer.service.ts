@@ -382,9 +382,9 @@ export default class QuizAnswerService {
       addSpamFlagNumber,
     } = query
 
-    const queryBuilder: SelectQueryBuilder<
-      QuizAnswer
-    > = QuizAnswer.createQueryBuilder("quiz_answer")
+    const queryBuilder: SelectQueryBuilder<QuizAnswer> = QuizAnswer.createQueryBuilder(
+      "quiz_answer",
+    )
 
     if (
       !id &&
@@ -463,7 +463,8 @@ export default class QuizAnswerService {
 
     if (
       typeof peerReviewsGiven === "number" &&
-      (peerReviewsGiven > 0 && peerReviewsGiven < 1000) &&
+      peerReviewsGiven > 0 &&
+      peerReviewsGiven < 1000 &&
       quizId
     ) {
       userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
