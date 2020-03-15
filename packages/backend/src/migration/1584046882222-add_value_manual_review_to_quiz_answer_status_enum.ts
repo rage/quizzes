@@ -4,6 +4,12 @@ export class addValueManualReviewToQuizAnswerStatusEnum1584046882222
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     await queryRunner.query(
+      "DROP MATERIALIZED VIEW IF EXISTS reaktor.spam_flag, reaktor.peer_review_question_answer; " +
+        "DROP MATERIALIZED VIEW IF EXISTS reaktor.peer_review; " +
+        "DROP MATERIALIZED VIEW IF EXISTS reaktor.quiz_answer; ",
+    )
+
+    await queryRunner.query(
       // tslint:disable-next-line:max-line-length
       "create type quiz_answer_status_enum_new as enum ('draft', 'submitted', 'enough-received-but-not-given', 'confirmed', 'spam', 'rejected', 'deprecated', 'manual-review')",
     )
@@ -15,9 +21,65 @@ export class addValueManualReviewToQuizAnswerStatusEnum1584046882222
     await queryRunner.query(
       "alter type quiz_answer_status_enum_new rename to quiz_answer_status_enum",
     )
+
+    await queryRunner.query(
+      `CREATE MATERIALIZED VIEW reaktor.quiz_answer AS SELECT quiz_answer.id,
+      quiz_answer.quiz_id,
+      quiz_answer.user_id,
+      quiz_answer.language_id,
+      quiz_answer.status,
+      quiz_answer.created_at,
+      quiz_answer.updated_at
+     FROM quiz_answer
+    WHERE (quiz_answer.quiz_id IN ( SELECT quiz.id
+             FROM reaktor.quiz))`,
+    )
+
+    await queryRunner.query(
+      `CREATE MATERIALIZED VIEW reaktor.peer_review AS SELECT peer_review.id,
+              peer_review.quiz_answer_id,
+              peer_review.user_id,
+              peer_review.peer_review_collection_id,
+              peer_review.rejected_quiz_answer_ids,
+              peer_review.created_at,
+              peer_review.updated_at
+             FROM peer_review
+            WHERE (peer_review.quiz_answer_id IN ( SELECT quiz_answer.id
+                     FROM reaktor.quiz_answer))`,
+    )
+
+    await queryRunner.query(
+      // tslint:disable-next-line:max-line-length
+      `CREATE MATERIALIZED VIEW reaktor.peer_review_question_answer AS SELECT peer_review_question_answer.peer_review_id,
+                      peer_review_question_answer.peer_review_question_id,
+                      peer_review_question_answer.value,
+                      peer_review_question_answer.text,
+                      peer_review_question_answer.created_at,
+                      peer_review_question_answer.updated_at
+                     FROM peer_review_question_answer
+                    WHERE (peer_review_question_answer.peer_review_id IN ( SELECT peer_review.id
+                             FROM reaktor.peer_review))`,
+    )
+
+    await queryRunner.query(
+      `CREATE MATERIALIZED VIEW reaktor.spam_flag AS  SELECT spam_flag.user_id,
+                              spam_flag.quiz_answer_id,
+                              spam_flag.created_at,
+                              spam_flag.updated_at,
+                              spam_flag.id
+                             FROM spam_flag
+                            WHERE (spam_flag.quiz_answer_id IN ( SELECT quiz_answer.id
+                                     FROM reaktor.quiz_answer))`,
+    )
   }
 
   public async down(queryRunner: QueryRunner): Promise<any> {
+    await queryRunner.query(
+      "DROP MATERIALIZED VIEW IF EXISTS reaktor.spam_flag, reaktor.peer_review_question_answer; " +
+        "DROP MATERIALIZED VIEW IF EXISTS reaktor.peer_review; " +
+        "DROP MATERIALIZED VIEW IF EXISTS reaktor.quiz_answer; ",
+    )
+
     await queryRunner.query(
       // tslint:disable-next-line:max-line-length
       "create type quiz_answer_status_enum_rollback as enum ('draft', 'submitted', 'enough-received-but-not-given', 'spam', 'confirmed', 'rejected', 'deprecated')",
@@ -29,6 +91,56 @@ export class addValueManualReviewToQuizAnswerStatusEnum1584046882222
     await queryRunner.query("drop type quiz_answer_status_enum")
     await queryRunner.query(
       "alter type quiz_answer_status_enum_rollback rename to quiz_answer_status_enum",
+    )
+
+    await queryRunner.query(
+      `CREATE MATERIALIZED VIEW reaktor.quiz_answer AS SELECT quiz_answer.id,
+      quiz_answer.quiz_id,
+      quiz_answer.user_id,
+      quiz_answer.language_id,
+      quiz_answer.status,
+      quiz_answer.created_at,
+      quiz_answer.updated_at
+     FROM quiz_answer
+    WHERE (quiz_answer.quiz_id IN ( SELECT quiz.id
+             FROM reaktor.quiz))`,
+    )
+
+    await queryRunner.query(
+      `CREATE MATERIALIZED VIEW reaktor.peer_review AS SELECT peer_review.id,
+              peer_review.quiz_answer_id,
+              peer_review.user_id,
+              peer_review.peer_review_collection_id,
+              peer_review.rejected_quiz_answer_ids,
+              peer_review.created_at,
+              peer_review.updated_at
+             FROM peer_review
+            WHERE (peer_review.quiz_answer_id IN ( SELECT quiz_answer.id
+                     FROM reaktor.quiz_answer))`,
+    )
+
+    await queryRunner.query(
+      // tslint:disable-next-line:max-line-length
+      `CREATE MATERIALIZED VIEW reaktor.peer_review_question_answer AS SELECT peer_review_question_answer.peer_review_id,
+                      peer_review_question_answer.peer_review_question_id,
+                      peer_review_question_answer.value,
+                      peer_review_question_answer.text,
+                      peer_review_question_answer.created_at,
+                      peer_review_question_answer.updated_at
+                     FROM peer_review_question_answer
+                    WHERE (peer_review_question_answer.peer_review_id IN ( SELECT peer_review.id
+                             FROM reaktor.peer_review))`,
+    )
+
+    await queryRunner.query(
+      `CREATE MATERIALIZED VIEW reaktor.spam_flag AS  SELECT spam_flag.user_id,
+                              spam_flag.quiz_answer_id,
+                              spam_flag.created_at,
+                              spam_flag.updated_at,
+                              spam_flag.id
+                             FROM spam_flag
+                            WHERE (spam_flag.quiz_answer_id IN ( SELECT quiz_answer.id
+                                     FROM reaktor.quiz_answer))`,
     )
   }
 }
