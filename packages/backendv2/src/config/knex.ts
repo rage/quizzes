@@ -9,5 +9,4 @@ export const knex = Knex({
     user: env.DB_USER,
     password: env.DB_PASSWORD || undefined,
   },
-  searchPath: ["public"],
 })

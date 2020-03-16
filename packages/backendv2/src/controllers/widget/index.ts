@@ -22,8 +22,18 @@ const widget = new Router({
   })
 
   .post("/answer", accessControl(), async ctx => {
-    console.log(ctx.req)
-    ctx.body = "answer"
+    try {
+      const response = await QuizAnswer.query()
+        .withGraphJoined("itemAnswers")
+        .limit(1)
+      const user = ctx.state.user
+      const answer = ctx.request.body
+      answer.user_id = user.id
+      // const response = await QuizAnswer.query().insertGraph(answer)
+      ctx.body = response
+    } catch (error) {
+      console.log(error)
+    }
   })
 
 export default widget

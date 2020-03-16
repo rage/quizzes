@@ -1,4 +1,4 @@
-import { Context } from "koa"
+import { ParameterizedContext } from "koa"
 import winston, { format } from "winston"
 import { v4 as uuidv4 } from "uuid"
 
@@ -22,7 +22,10 @@ export const GlobalLogger = winston.createLogger({
   transports: [new winston.transports.Console()],
 })
 
-const loggerMiddleware = async (ctx: Context, next: () => Promise<any>) => {
+const loggerMiddleware = async (
+  ctx: ParameterizedContext,
+  next: () => Promise<any>,
+) => {
   const start = Date.now()
   const log = GlobalLogger.child({ requestId: uuidv4() })
   // @ts-ignore

@@ -6,7 +6,7 @@ class QuizAnswer extends Model {
     return "quiz_answer"
   }
   static relationMappings = {
-    itemsAnswers: {
+    itemAnswers: {
       relation: Model.HasManyRelation,
       modelClass: QuizItemAnswer,
       join: {

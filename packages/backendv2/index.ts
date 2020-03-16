@@ -17,6 +17,7 @@ interface CustomState {
 }
 
 const app = new Koa<CustomState, CustomContext>()
+
 app.use(logger)
 
 app.use(bodyParser())
