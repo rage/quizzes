@@ -1,6 +1,5 @@
-import { Context } from "koa"
 import { getCurrentUserDetails } from "../services/tmc"
-import { userInfo } from "os"
+import { Context } from "koa"
 
 interface AccessControlOptions {
   administator?: boolean
