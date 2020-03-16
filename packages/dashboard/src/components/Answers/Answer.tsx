@@ -528,7 +528,8 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  { decrementAttentionCount: decrement, displayMessage, setQuiz },
-)(Answer)
+export default connect(mapStateToProps, {
+  decrementAttentionCount: decrement,
+  displayMessage,
+  setQuiz,
+})(Answer)

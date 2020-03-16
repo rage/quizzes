@@ -25,11 +25,11 @@ export async function migrateUsers(
   const userInfo = await getUserInfo(usernames)
 
   const currentUserIds: { [id: string]: boolean } = {}
-  ;(await User.createQueryBuilder()
-    .select(["id"])
-    .getRawMany()).map(
-    (idObject: { id: string }) => (currentUserIds[idObject.id] = true),
-  )
+  ;(
+    await User.createQueryBuilder()
+      .select(["id"])
+      .getRawMany()
+  ).map((idObject: { id: string }) => (currentUserIds[idObject.id] = true))
 
   logger.info(
     `${Object.keys(currentUserIds).length} existing users in the database`,

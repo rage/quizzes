@@ -16,9 +16,7 @@ import ExpandedTopInformation from "../ItemTools/ExpandedTopInformation"
 // Uncomment when typescript updated to >=3.5
 type ExpandedScaleItemProps = any // Omit<IScaleItemProps, "expanded">
 
-const ExpandedScaleItem: React.FunctionComponent<
-  ExpandedScaleItemProps
-> = props => {
+const ExpandedScaleItem: React.FunctionComponent<ExpandedScaleItemProps> = props => {
   const changeEditAttribute = (attributeName: string) => e => {
     const value = e.target.value
 
@@ -189,7 +187,4 @@ const ExpandedScaleItem: React.FunctionComponent<
   )
 }
 
-export default connect(
-  null,
-  { changeAttr },
-)(ExpandedScaleItem)
+export default connect(null, { changeAttr })(ExpandedScaleItem)

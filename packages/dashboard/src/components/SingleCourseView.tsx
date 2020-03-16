@@ -360,7 +360,4 @@ const quizItemTypes = (quiz: IQuiz): string => {
   return `[${[...new Set(quiz.items.map(qi => qi.type))].sort().join(", ")}]`
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SingleCourseView)
+export default connect(mapStateToProps, mapDispatchToProps)(SingleCourseView)

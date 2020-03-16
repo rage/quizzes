@@ -21,18 +21,28 @@ export class QuizAnswer extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(type => Quiz, quiz => quiz.id)
+  @ManyToOne(
+    type => Quiz,
+    quiz => quiz.id,
+  )
   public quiz: Quiz
   @Index()
   @Column()
   public quizId: string
-  @ManyToOne(type => User, user => user.id, { cascade: true })
+  @ManyToOne(
+    type => User,
+    user => user.id,
+    { cascade: true },
+  )
   public user?: User
   @Index()
   @Column({ type: "int", nullable: true })
   public userId: number
 
-  @ManyToOne(type => Language, lang => lang.id)
+  @ManyToOne(
+    type => Language,
+    lang => lang.id,
+  )
   public language: Language
   @Index()
   @Column()
@@ -54,10 +64,14 @@ export class QuizAnswer extends BaseEntity {
   })
   public status?: string
 
-  @OneToMany(type => QuizItemAnswer, qi => qi.quizAnswer, {
-    eager: true,
-    cascade: true,
-  })
+  @OneToMany(
+    type => QuizItemAnswer,
+    qi => qi.quizAnswer,
+    {
+      eager: true,
+      cascade: true,
+    },
+  )
   public itemAnswers: QuizItemAnswer[]
 
   @CreateDateColumn({ type: "timestamp" })

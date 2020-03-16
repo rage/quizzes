@@ -22,12 +22,20 @@ export class Course extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(type => Organization, org => org.id, { eager: true })
+  @ManyToOne(
+    type => Organization,
+    org => org.id,
+    { eager: true },
+  )
   public organization: Organization
   @RelationId((course: Course) => course.organization)
   public organizationId: number
 
-  @ManyToMany(type => Language, lang => lang.id, { eager: true })
+  @ManyToMany(
+    type => Language,
+    lang => lang.id,
+    { eager: true },
+  )
   @JoinTable({ name: "course_language" })
   public languages: Language[]
 
@@ -44,10 +52,14 @@ export class Course extends BaseEntity {
   @Column({ type: "int", nullable: true })
   public maxSpamFlags: number
 
-  @OneToMany(type => CourseTranslation, ct => ct.course, {
-    eager: true,
-    cascade: true,
-  })
+  @OneToMany(
+    type => CourseTranslation,
+    ct => ct.course,
+    {
+      eager: true,
+      cascade: true,
+    },
+  )
   public texts: CourseTranslation[]
 
   @CreateDateColumn({ type: "timestamp" })
@@ -79,12 +91,18 @@ export class Course extends BaseEntity {
 
 @Entity()
 export class CourseTranslation extends BaseEntity {
-  @ManyToOne(type => Course, course => course.id)
+  @ManyToOne(
+    type => Course,
+    course => course.id,
+  )
   public course: Course
   @PrimaryColumn()
   public courseId: string
 
-  @ManyToOne(type => Language, lang => lang.id)
+  @ManyToOne(
+    type => Language,
+    lang => lang.id,
+  )
   public language: Language
   @PrimaryColumn()
   public languageId: string
