@@ -74,9 +74,10 @@ interface IReceivedPeerReviewQuestionAnswer {
   questionBody: string
 }
 
-const PeerReviewQuestionAnswer: React.FunctionComponent<
-  IReceivedPeerReviewQuestionAnswer
-> = ({ questionAnswer, questionTitle }) => {
+const PeerReviewQuestionAnswer: React.FunctionComponent<IReceivedPeerReviewQuestionAnswer> = ({
+  questionAnswer,
+  questionTitle,
+}) => {
   const answerType =
     typeof (questionAnswer as PeerReviewEssayAnswer).text === "string"
       ? "essay"
@@ -123,9 +124,10 @@ interface IReceivedPeerReviewGradeAnswer {
   questionBody?: string
 }
 
-const ReceivedEssayAnswer: React.FunctionComponent<
-  IReceivedPeerReviewEssayAnswer
-> = ({ questionTitle, questionAnswer }) => (
+const ReceivedEssayAnswer: React.FunctionComponent<IReceivedPeerReviewEssayAnswer> = ({
+  questionTitle,
+  questionAnswer,
+}) => (
   <div style={{ paddingRight: "1.5rem", marginTop: "1rem" }}>
     <MarkdownText>{questionTitle}</MarkdownText>
     <AnswerPaper>
@@ -136,9 +138,10 @@ const ReceivedEssayAnswer: React.FunctionComponent<
   </div>
 )
 
-const ReceivedGradeAnswer: React.FunctionComponent<
-  IReceivedPeerReviewGradeAnswer
-> = ({ questionTitle, questionAnswer }) => (
+const ReceivedGradeAnswer: React.FunctionComponent<IReceivedPeerReviewGradeAnswer> = ({
+  questionTitle,
+  questionAnswer,
+}) => (
   <LikertScale
     key={questionAnswer.peerReviewQuestionId}
     reviews={[{ question: questionTitle, review: questionAnswer.value }]}

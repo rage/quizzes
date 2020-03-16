@@ -376,12 +376,9 @@ const mapStateToProps = (state: any) => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    setAllAnswers,
-    setAllAnswersCount,
-    setAttentionRequiringAnswers,
-    setQuiz,
-  },
-)(QuizStatistics)
+export default connect(mapStateToProps, {
+  setAllAnswers,
+  setAllAnswersCount,
+  setAttentionRequiringAnswers,
+  setQuiz,
+})(QuizStatistics)

@@ -274,17 +274,15 @@ export default class PeerReviewService {
     }
 
     candidates = _.shuffle(candidates)
-    candidates = candidates.sort(
-      (a, b): number => {
-        if (a.status < b.status) {
-          return 1
-        } else if (a.status > b.status) {
-          return -1
-        } else {
-          return 0
-        }
-      },
-    )
+    candidates = candidates.sort((a, b): number => {
+      if (a.status < b.status) {
+        return 1
+      } else if (a.status > b.status) {
+        return -1
+      } else {
+        return 0
+      }
+    })
 
     if (includeThis.length === 1) {
       return [...includeThis, ...candidates.slice(0, 1)]

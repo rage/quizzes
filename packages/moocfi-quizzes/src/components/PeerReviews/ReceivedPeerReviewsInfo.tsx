@@ -93,9 +93,11 @@ interface IReceivedReviewsProps {
   receivedReviewsLabels: ReceivedPeerReviewLabels
 }
 
-const ReceivedReviewsDetailed: React.FunctionComponent<
-  IReceivedReviewsProps
-> = ({ peerReviews, peerReviewQuestions, receivedReviewsLabels }) => {
+const ReceivedReviewsDetailed: React.FunctionComponent<IReceivedReviewsProps> = ({
+  peerReviews,
+  peerReviewQuestions,
+  receivedReviewsLabels,
+}) => {
   return (
     <div style={{ marginTop: 20 }}>
       {peerReviews
@@ -114,9 +116,10 @@ const ReceivedReviewsDetailed: React.FunctionComponent<
   )
 }
 
-const ReceivedReviewsSummary: React.FunctionComponent<
-  IReceivedReviewsProps
-> = ({ peerReviews, receivedReviewsLabels }) => {
+const ReceivedReviewsSummary: React.FunctionComponent<IReceivedReviewsProps> = ({
+  peerReviews,
+  receivedReviewsLabels,
+}) => {
   const gradeAnswers = peerReviews.flatMap(review =>
     review.answers
       .filter(a => typeof (a as PeerReviewGradeAnswer).value === "number")

@@ -55,7 +55,8 @@ class QuizInfo extends React.Component<IQuizInfoProps, IQuizInfoState> {
       // the case if the quiz has just been saved, and the user remains on the quiz page
     } else if (
       prevState.expanded &&
-      (!prevProps.quizHasBeenSaved && this.props.quizHasBeenSaved)
+      !prevProps.quizHasBeenSaved &&
+      this.props.quizHasBeenSaved
     ) {
       this.setState({
         expanded: false,
@@ -176,7 +177,4 @@ const mapStateToProps = (state: any): IQuizInfoPropsFromState => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  { changeAttr },
-)(QuizInfo)
+export default connect(mapStateToProps, { changeAttr })(QuizInfo)

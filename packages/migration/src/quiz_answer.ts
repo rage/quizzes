@@ -68,12 +68,12 @@ export async function migrateQuizAnswers(
 
           if (pool.length > poolSize || idx === answers.length - 1) {
             const quizAnswers: Array<QueryPartialEntity<QuizAnswer>> = []
-            const quizItemAnswers: Array<
-              QueryPartialEntity<QuizItemAnswer>
-            > = []
-            const quizOptionAnswers: Array<
-              QueryPartialEntity<QuizOptionAnswer>
-            > = []
+            const quizItemAnswers: Array<QueryPartialEntity<
+              QuizItemAnswer
+            >> = []
+            const quizOptionAnswers: Array<QueryPartialEntity<
+              QuizOptionAnswer
+            >> = []
             await Promise.all(
               pool.map(
                 async (quizData: any): Promise<any> => {

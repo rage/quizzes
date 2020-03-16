@@ -166,13 +166,10 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
   }
 }
 
-export default connect(
-  null,
-  {
-    addOption,
-    changeAttr,
-    removeOption,
-    modifyOptionOrder,
-    updateMultipleOptions,
-  },
-)(ExpandedResearchAgreement)
+export default connect(null, {
+  addOption,
+  changeAttr,
+  removeOption,
+  modifyOptionOrder,
+  updateMultipleOptions,
+})(ExpandedResearchAgreement)

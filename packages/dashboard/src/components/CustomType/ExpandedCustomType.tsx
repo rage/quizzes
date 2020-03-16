@@ -124,7 +124,4 @@ class ExpandedCustomType extends React.Component<any, any> {
   }
 }
 
-export default connect(
-  null,
-  { changeAttr, save },
-)(ExpandedCustomType)
+export default connect(null, { changeAttr, save })(ExpandedCustomType)

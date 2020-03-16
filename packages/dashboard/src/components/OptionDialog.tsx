@@ -153,10 +153,7 @@ const OptionDialogFunc: React.FunctionComponent<IOptionDialogProps> = props => {
   )
 }
 
-export default connect(
-  null,
-  {
-    changeAttr,
-    modifyOption,
-  },
-)(OptionDialogFunc)
+export default connect(null, {
+  changeAttr,
+  modifyOption,
+})(OptionDialogFunc)

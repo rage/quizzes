@@ -76,46 +76,54 @@ export default class UserQuizStateService {
       typeof userQuizState.spamFlags !== "number" &&
       !userQuizState.spamFlags
     ) {
-      userQuizState.spamFlags = (await manager
-        .createQueryBuilder(SpamFlag, "spam_flag")
-        .select("COUNT(*)")
-        .where("spam_flag.quiz_answer_id IN (" + quizAnswerIds.getQuery() + ")")
-        .setParameters(quizAnswerIds.getParameters())
-        .getRawOne()).count
+      userQuizState.spamFlags = (
+        await manager
+          .createQueryBuilder(SpamFlag, "spam_flag")
+          .select("COUNT(*)")
+          .where(
+            "spam_flag.quiz_answer_id IN (" + quizAnswerIds.getQuery() + ")",
+          )
+          .setParameters(quizAnswerIds.getParameters())
+          .getRawOne()
+      ).count
     }
     if (
       typeof userQuizState.peerReviewsGiven !== "number" &&
       !userQuizState.peerReviewsGiven
     ) {
-      userQuizState.peerReviewsGiven = (await manager
-        .createQueryBuilder(PeerReview, "peer_review")
-        .select("COUNT(*)")
-        .leftJoin(
-          PeerReviewCollection,
-          "peer_review_collection",
-          "peer_review_collection.id = peer_review.peer_review_collection_id",
-        )
-        .where("peer_review.user_id = :user_id", {
-          user_id: userQuizState.userId,
-        })
-        .andWhere("peer_review_collection.quiz_id = :quiz_id", {
-          quiz_id: userQuizState.quizId,
-        })
-        .getRawOne()).count
+      userQuizState.peerReviewsGiven = (
+        await manager
+          .createQueryBuilder(PeerReview, "peer_review")
+          .select("COUNT(*)")
+          .leftJoin(
+            PeerReviewCollection,
+            "peer_review_collection",
+            "peer_review_collection.id = peer_review.peer_review_collection_id",
+          )
+          .where("peer_review.user_id = :user_id", {
+            user_id: userQuizState.userId,
+          })
+          .andWhere("peer_review_collection.quiz_id = :quiz_id", {
+            quiz_id: userQuizState.quizId,
+          })
+          .getRawOne()
+      ).count
     }
 
     if (
       typeof userQuizState.peerReviewsReceived !== "number" &&
       !userQuizState.peerReviewsReceived
     ) {
-      userQuizState.peerReviewsReceived = (await manager
-        .createQueryBuilder(PeerReview, "peer_review")
-        .select("COUNT(*)")
-        .where(
-          "peer_review.quiz_answer_id IN (" + quizAnswerIds.getQuery() + ")",
-        )
-        .setParameters(quizAnswerIds.getParameters())
-        .getRawOne()).count
+      userQuizState.peerReviewsReceived = (
+        await manager
+          .createQueryBuilder(PeerReview, "peer_review")
+          .select("COUNT(*)")
+          .where(
+            "peer_review.quiz_answer_id IN (" + quizAnswerIds.getQuery() + ")",
+          )
+          .setParameters(quizAnswerIds.getParameters())
+          .getRawOne()
+      ).count
     }
 
     if (!userQuizState.status) {

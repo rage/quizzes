@@ -128,9 +128,11 @@ export class QuizController {
           this.entityManager,
         )
 
-        const helperQuiz = (await this.quizService.getQuizzes({
-          id: quizId,
-        }))[0]
+        const helperQuiz = (
+          await this.quizService.getQuizzes({
+            id: quizId,
+          })
+        )[0]
 
         if (
           userQuizState.status === "locked" ||
