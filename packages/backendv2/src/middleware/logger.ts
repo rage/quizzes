@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid"
 
 const myFormat = format.printf(
   ({ level, message, timestamp, requestId, ...metadata }) => {
-    return `${timestamp} [${requestId}] ${level}: ${message}, ${JSON.stringify(
+    return `${timestamp} [${requestId || '00000000-0000-0000-0000-000000000000'}] ${level}: ${message}, ${JSON.stringify(
       metadata,
     )}`
   },
