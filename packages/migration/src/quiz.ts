@@ -54,13 +54,13 @@ export async function migrateQuizzes(
   const quizzes: Array<QueryPartialEntity<Quiz>> = []
   const quizTranslations: Array<QueryPartialEntity<QuizTranslation>> = []
   const quizItems: Array<QueryPartialEntity<QuizItem>> = []
-  const quizItemTranslations: Array<QueryPartialEntity<
-    QuizItemTranslation
-  >> = []
+  const quizItemTranslations: Array<
+    QueryPartialEntity<QuizItemTranslation>
+  > = []
   const quizOptions: Array<QueryPartialEntity<QuizOption>> = []
-  const quizOptionTranslations: Array<QueryPartialEntity<
-    QuizOptionTranslation
-  >> = []
+  const quizOptionTranslations: Array<
+    QueryPartialEntity<QuizOptionTranslation>
+  > = []
 
   const bar = progressBar("Converting quizzes", oldQuizzes.length)
   for (const oldQuiz of oldQuizzes) {
