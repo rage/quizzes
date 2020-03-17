@@ -267,7 +267,7 @@ const publishAnswers = async (course: ICourse) => {
       }
 
       producer.produce(
-        "user-points",
+        "user-points-2",
         null,
         Buffer.from(JSON.stringify(message)),
       )

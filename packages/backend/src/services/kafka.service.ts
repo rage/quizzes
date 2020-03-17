@@ -97,7 +97,7 @@ export default class KafkaService {
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
     }
 
-    await this.produce("user-points", message)
+    await this.produce("user-points-2", message)
   }
 
   public async publishCourseQuizzesUpdated(courseId: string) {
@@ -149,7 +149,7 @@ export default class KafkaService {
   }
 
   private async produce(
-    topic: "user-course-progress" | "user-points" | "exercise",
+    topic: "user-course-progress" | "user-points-2" | "exercise",
     message: ProgressMessage | QuizAnswerMessage | QuizMessage,
   ) {
     try {
