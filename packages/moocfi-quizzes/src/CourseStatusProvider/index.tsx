@@ -91,7 +91,7 @@ export const CourseStatusProvider: React.FunctionComponent<
         prevProps.current = props
         fetchProgressData()
       }
-      if (shouldConnectMoocfi) {
+      /*if (shouldConnectMoocfi) {
         connect(
           "wss://www.mooc.fi/ws",
           setMoocfiClient,
@@ -104,7 +104,7 @@ export const CourseStatusProvider: React.FunctionComponent<
           setQuizzesClient,
           setQuizzesStatus,
         )
-      }
+      }*/
     } else {
       logout()
     }
