@@ -147,13 +147,11 @@ export class PeerReviewController {
       this.entityManager,
     )
 
-    const quiz: Quiz = (
-      await this.QuizService.getQuizzes({
-        id: receivingQuizAnswer.quizId,
-        course: true,
-        items: true,
-      })
-    )[0]
+    const quiz: Quiz = (await this.QuizService.getQuizzes({
+      id: receivingQuizAnswer.quizId,
+      course: true,
+      items: true,
+    }))[0]
 
     let responsePeerReview: PeerReview
     let responseQuizAnswer: QuizAnswer

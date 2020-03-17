@@ -60,13 +60,11 @@ export class SpamFlagController {
       },
       this.entityManager,
     )
-    const quiz: Quiz = (
-      await this.quizService.getQuizzes({
-        id: quizAnswer.quizId,
-        course: true,
-        items: true,
-      })
-    )[0]
+    const quiz: Quiz = (await this.quizService.getQuizzes({
+      id: quizAnswer.quizId,
+      course: true,
+      items: true,
+    }))[0]
     const userquizstate = await this.userQuizStateService.getUserQuizState(
       quizAnswer.userId,
       quizAnswer.quizId,

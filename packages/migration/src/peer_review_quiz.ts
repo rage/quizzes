@@ -42,13 +42,13 @@ export async function migratePeerReviewQuestions(
     peerReviewQuestions.length,
   )
   const collections: Array<QueryPartialEntity<PeerReviewCollection>> = []
-  const collectionTranslations: Array<QueryPartialEntity<
-    PeerReviewCollectionTranslation
-  >> = []
+  const collectionTranslations: Array<
+    QueryPartialEntity<PeerReviewCollectionTranslation>
+  > = []
   const questions: Array<QueryPartialEntity<PeerReviewQuestion>> = []
-  const questionTranslations: Array<QueryPartialEntity<
-    PeerReviewQuestionTranslation
-  >> = []
+  const questionTranslations: Array<
+    QueryPartialEntity<PeerReviewQuestionTranslation>
+  > = []
   let quizNotFound = 0
   let answerNotFound = 0
 
@@ -121,7 +121,7 @@ async function migratePeerReviewQuestion(
     QueryPartialEntity<PeerReviewCollection>,
     QueryPartialEntity<PeerReviewCollectionTranslation>,
     Array<QueryPartialEntity<PeerReviewQuestion>>,
-    Array<QueryPartialEntity<PeerReviewQuestionTranslation>>,
+    Array<QueryPartialEntity<PeerReviewQuestionTranslation>>
   ]
 > {
   const languageId = (await quiz.course).languages[0].id
@@ -156,9 +156,9 @@ async function migratePeerReviewQuestion(
   }
 
   const questions: Array<QueryPartialEntity<PeerReviewQuestion>> = []
-  const questionTranslations: Array<QueryPartialEntity<
-    PeerReviewQuestionTranslation
-  >> = []
+  const questionTranslations: Array<
+    QueryPartialEntity<PeerReviewQuestionTranslation>
+  > = []
   let order = 1
   const newPRQ = (
     id: string,

@@ -16,18 +16,12 @@ export class SpamFlag extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(
-    type => User,
-    user => user.id,
-  )
+  @ManyToOne(type => User, user => user.id)
   public user: User
   @Column({ type: "int", nullable: true })
   public userId: number
 
-  @ManyToOne(
-    type => QuizAnswer,
-    qa => qa.id,
-  )
+  @ManyToOne(type => QuizAnswer, qa => qa.id)
   public quizAnswer: QuizAnswer
   @Column()
   public quizAnswerId: string

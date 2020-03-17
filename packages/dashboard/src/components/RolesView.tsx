@@ -52,4 +52,7 @@ const mapStateToProps = (state: any) => {
   }
 }
 
-export default connect(mapStateToProps, { addRoles })(RolesView)
+export default connect(
+  mapStateToProps,
+  { addRoles },
+)(RolesView)

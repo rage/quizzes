@@ -207,4 +207,7 @@ const mapDispatchToProps = {
   remove,
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(TabContainer)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(TabContainer)
