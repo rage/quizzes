@@ -313,7 +313,7 @@ export default class PeerReviewService {
     reviewerId: number,
     rejected: string[],
     alreadyReviewed: string[],
-  ): Promise<Array<{ id: string; status: string }>> {
+  ): Promise<Array<{ id: string; status: string }> | null> {
     const builder = knex({ client: "pg" })
 
     let query = builder("quiz_answer")
@@ -324,6 +324,10 @@ export default class PeerReviewService {
       .andWhere("quiz_answer.id", "NOT IN", alreadyReviewed)
 
     query = this.addCriteriaBasedOnPriority(priority, query, rejected)
+
+    if (query === null) {
+      return null
+    }
 
     query = query.limit(20)
 
