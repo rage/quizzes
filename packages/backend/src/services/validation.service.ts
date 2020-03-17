@@ -271,6 +271,13 @@ export default class ValidationService {
     return { response, quizAnswer, userQuizState }
   }
 
+  private openishStates = [
+    "given-more-than-enough",
+    "given-enough",
+    "submitted",
+    "enough-received-but-not-given",
+  ]
+
   public validateEssayAnswer(
     quiz: Quiz,
     quizAnswer: QuizAnswer,
@@ -280,9 +287,9 @@ export default class ValidationService {
     const course: Course = quiz.course
     const given: number = userQuizState.peerReviewsGiven
     const received: number = userQuizState.peerReviewsReceived
+
     if (
-      (quizAnswer.status === "submitted" ||
-        quizAnswer.status === "enough-received-but-not-given") &&
+      this.openishStates.includes(quizAnswer.status) &&
       userQuizState.spamFlags > course.maxSpamFlags
     ) {
       if (quiz.autoReject) {
@@ -305,13 +312,7 @@ export default class ValidationService {
     ) {
       quizAnswer.status = "enough-received-but-not-given"
     } else if (
-      (quizAnswer.status === "submitted" ||
-        quizAnswer.status === "enough-received-but-not-given" ||
-        // if the cause for manual review was too low an average,
-        // their answer has a chance to be confirmed if their new average
-        // is good enough
-        (quizAnswer.status === "manual-review" &&
-          userQuizState.spamFlags < 1)) &&
+      this.openishStates.includes(quizAnswer.status) &&
       given >= course.minPeerReviewsGiven &&
       received >= course.minPeerReviewsReceived &&
       quiz.autoConfirm
@@ -342,6 +343,24 @@ export default class ValidationService {
         }
       } else {
         quizAnswer.status = "manual-review"
+      }
+    }
+
+    if (
+      !quiz.autoReject &&
+      userQuizState.spamFlags > 0 &&
+      this.openishStates.includes(quizAnswer.status)
+    ) {
+      quizAnswer.status = "manual-review"
+    } else if (
+      quizAnswer.status === "submitted" ||
+      quizAnswer.status === "given-enough" ||
+      quizAnswer.status === "enough-received-but-not-given"
+    ) {
+      if (given === course.minPeerReviewsGiven) {
+        quizAnswer.status = "given-enough"
+      } else if (given > course.minPeerReviewsGiven) {
+        quizAnswer.status = "given-more-than-enough"
       }
     }
 

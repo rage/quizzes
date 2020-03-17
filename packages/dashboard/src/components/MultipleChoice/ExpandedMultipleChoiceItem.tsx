@@ -261,13 +261,16 @@ class MultipleChoiceItem extends React.Component<
   }
 }
 
-export default connect(null, {
-  addFinishedOption,
-  addOption,
-  changeAttr,
-  changeOrder,
-  modifyOption,
-  modifyOptionOrder,
-  save,
-  updateMultipleOptions,
-})(MultipleChoiceItem)
+export default connect(
+  null,
+  {
+    addFinishedOption,
+    addOption,
+    changeAttr,
+    changeOrder,
+    modifyOption,
+    modifyOptionOrder,
+    save,
+    updateMultipleOptions,
+  },
+)(MultipleChoiceItem)

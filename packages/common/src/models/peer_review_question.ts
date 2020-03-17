@@ -21,23 +21,15 @@ export class PeerReviewQuestion extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(
-    type => Quiz,
-    quiz => quiz.id,
-    { onDelete: "CASCADE" },
-  )
+  @ManyToOne(type => Quiz, quiz => quiz.id, { onDelete: "CASCADE" })
   @JoinColumn()
   public quiz: Promise<Quiz>
   @Column({ nullable: true })
   public quizId: string | null
 
-  @ManyToOne(
-    type => PeerReviewQuestionCollection,
-    prqc => prqc.id,
-    {
-      nullable: true,
-    },
-  )
+  @ManyToOne(type => PeerReviewQuestionCollection, prqc => prqc.id, {
+    nullable: true,
+  })
   public collection?: PeerReviewQuestionCollection
   @Column({ nullable: true })
   public collectionId: string | null
@@ -98,20 +90,13 @@ export class PeerReviewQuestion extends BaseEntity {
 
 @Entity()
 export class PeerReviewQuestionTranslation extends BaseEntity {
-  @ManyToOne(
-    type => PeerReviewQuestion,
-    prq => prq.id,
-    { onDelete: "CASCADE" },
-  )
+  @ManyToOne(type => PeerReviewQuestion, prq => prq.id, { onDelete: "CASCADE" })
   @JoinColumn()
   public peerReviewQuestion: Promise<PeerReviewQuestion>
   @PrimaryColumn()
   public peerReviewQuestionId: string
 
-  @ManyToOne(
-    type => Language,
-    lang => lang.id,
-  )
+  @ManyToOne(type => Language, lang => lang.id)
   @JoinColumn()
   public language: Language
   @PrimaryColumn()

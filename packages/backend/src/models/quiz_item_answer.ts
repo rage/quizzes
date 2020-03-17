@@ -21,10 +21,7 @@ export class QuizItemAnswer extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(
-    type => QuizAnswer,
-    qa => qa.id,
-  )
+  @ManyToOne(type => QuizAnswer, qa => qa.id)
   @JoinColumn()
   public quizAnswer: QuizAnswer
 
@@ -32,10 +29,7 @@ export class QuizItemAnswer extends BaseEntity {
   @Column({ nullable: true })
   public quizAnswerId: string | null
 
-  @ManyToOne(
-    type => QuizItem,
-    qi => qi.id,
-  )
+  @ManyToOne(type => QuizItem, qi => qi.id)
   // @JoinColumn()
   public quizItem: QuizItem
   @Column()
@@ -48,14 +42,10 @@ export class QuizItemAnswer extends BaseEntity {
   @Column({ type: "boolean", nullable: true })
   public correct: boolean
 
-  @OneToMany(
-    type => QuizOptionAnswer,
-    qoa => qoa.quizItemAnswer,
-    {
-      eager: true,
-      cascade: true,
-    },
-  )
+  @OneToMany(type => QuizOptionAnswer, qoa => qoa.quizItemAnswer, {
+    eager: true,
+    cascade: true,
+  })
   public optionAnswers: QuizOptionAnswer[]
 
   @CreateDateColumn({ type: "timestamp" })

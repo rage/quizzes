@@ -35,9 +35,9 @@ export async function migratePeerReviews(
   })
 
   const newPeerReviews: Array<QueryPartialEntity<PeerReview>> = []
-  const newPeerReviewAnswers: Array<QueryPartialEntity<
-    PeerReviewQuestionAnswer
-  >> = []
+  const newPeerReviewAnswers: Array<
+    QueryPartialEntity<PeerReviewQuestionAnswer>
+  > = []
 
   logger.info("Querying peer review question collections...")
   const prqcArray = await PeerReviewCollection.find()

@@ -23,8 +23,6 @@ import UserQuizStateService from "./userquizstate.service"
 import ValidationService from "./validation.service"
 import { string } from "prop-types"
 
-const PR_PRIORITY_LEVELS = 5
-
 @Service()
 export default class PeerReviewService {
   @InjectManager()
@@ -258,16 +256,11 @@ export default class PeerReviewService {
     const alreadyReviewed = givenPeerReviews.map(pr => pr.quizAnswerId)
     alreadyReviewed.push(randomUUID())
 
-    const course = (await this.quizService.getQuizzes({
-      id: quizId,
-      course: true,
-    }))[0].course
-
     let allCandidates: any[] = []
     let candidates
     let priority = 0
 
-    while (allCandidates.length < 2 && priority < PR_PRIORITY_LEVELS) {
+    while (allCandidates.length < 2) {
       candidates = await this.getCandidates(
         priority,
         quizId,
@@ -275,12 +268,13 @@ export default class PeerReviewService {
         reviewerId,
         rejected,
         alreadyReviewed,
-        course,
       )
 
-      candidates = _.shuffle(candidates).filter(
-        c => !allCandidates.find(e => e.id === c.id),
-      )
+      if (candidates === null) {
+        break
+      }
+
+      candidates = _.shuffle(candidates)
 
       allCandidates = allCandidates.concat(candidates)
       priority++
@@ -319,7 +313,6 @@ export default class PeerReviewService {
     reviewerId: number,
     rejected: string[],
     alreadyReviewed: string[],
-    course: Course,
   ): Promise<Array<{ id: string; status: string }>> {
     const builder = knex({ client: "pg" })
 
@@ -330,113 +323,41 @@ export default class PeerReviewService {
       .andWhere("quiz_answer.user_id", "!=", reviewerId)
       .andWhere("quiz_answer.id", "NOT IN", alreadyReviewed)
 
-    query = this.addCriteriaBasedOnPriority(priority, query, course, rejected)
+    query = this.addCriteriaBasedOnPriority(priority, query, rejected)
 
     query = query.limit(20)
 
     return await this.entityManager.query(query.toQuery())
   }
 
+  private statusesByPriority = [
+    "given-more-than-enough",
+    "given-enough",
+    "submitted",
+    "manual-review",
+    "confirmed",
+    "enough-received-but-not-given",
+  ]
+
   private addCriteriaBasedOnPriority(
     priority: number,
     queryBuilder: knex.QueryBuilder,
-    course: Course,
     rejected: string[],
   ) {
-    switch (priority) {
-      case 0:
-        // no spam flags, has given enough, has not received enough, status is submitted,
-        // has not been rejected by the user
-
-        queryBuilder = queryBuilder
-          .andWhere("quiz_answer.id", "NOT IN", rejected)
-          .andWhere("quiz_answer.status", "submitted")
-          .joinRaw(
-            "INNER JOIN user_quiz_state ON (quiz_answer.quiz_id =  user_quiz_state.quiz_id" +
-              " AND quiz_answer.user_id = user_quiz_state.user_id)",
-          )
-          .andWhere(
-            "user_quiz_state.peer_reviews_given",
-            ">=",
-            course.minPeerReviewsGiven,
-          )
-          .andWhere(
-            "user_quiz_state.peer_reviews_received",
-            "<",
-            course.minPeerReviewsReceived,
-          )
-          .andWhere("user_quiz_state.spam_flags", "<", 1)
-        break
-
-      case 1:
-        // same as above, but those who have not given enough peer reviews
-        queryBuilder = queryBuilder
-          .andWhere("quiz_answer.id", "NOT IN", rejected)
-          .andWhere("quiz_answer.status", "submitted")
-          .andWhere(
-            "user_quiz_state.peer_reviews_given",
-            "<",
-            course.minPeerReviewsGiven,
-          )
-          .joinRaw(
-            "INNER JOIN user_quiz_state ON (quiz_answer.quiz_id =  user_quiz_state.quiz_id" +
-              " AND quiz_answer.user_id = user_quiz_state.user_id)",
-          )
-          .andWhere(
-            "user_quiz_state.peer_reviews_received",
-            "<",
-            course.minPeerReviewsReceived,
-          )
-          .andWhere("user_quiz_state.spam_flags", "<", 1)
-          // .orderBy("user_quiz_state.peer_reviews_given", "desc")
-          .orderBy("quiz_answer.created_at", "asc")
-        // .orderBy("user_quiz_state.peer_reviews_received", "asc")
-        break
-
-      case 2:
-        // still needs peer reviews, but may have a small number of spam flags
-        queryBuilder = queryBuilder
-          .andWhere("quiz_answer.id", "NOT IN", rejected)
-          .andWhere("quiz_answer.status", "in", [
-            "submitted",
-            "manual-review",
-            "enough-received-but-not-given",
-          ])
-          .joinRaw(
-            "INNER JOIN user_quiz_state ON (quiz_answer.quiz_id =  user_quiz_state.quiz_id" +
-              " AND quiz_answer.user_id = user_quiz_state.user_id)",
-          )
-          .andWhere("user_quiz_state.spam_flags", "<=", course.maxSpamFlags)
-          // .orderBy("user_quiz_state.peer_reviews_given", "desc")
-          .orderBy("quiz_answer.created_at", "asc")
-        // .orderBy("user_quiz_state.peer_reviews_received", "asc")
-        break
-
-      case 3:
-        // doesn't need more reviews, and is a confirmed answer
-        queryBuilder = queryBuilder
-          .andWhere("quiz_answer.id", "NOT IN", rejected)
-          .andWhere("quiz_answer.status", "in", ["confirmed"])
-        break
-
-      default:
-        // been rejected before (not many of these. might be good to separate
-        // answers flagged as spam from the answers that simply weren't chosen the first time)
-        queryBuilder = queryBuilder
-          .andWhere("quiz_answer.id", "in", rejected)
-          .andWhere("quiz_answer.status", "not in", [
-            "deprecated",
-            "spam",
-            "rejected",
-            "draft",
-          ])
-          .joinRaw(
-            "INNER JOIN user_quiz_state ON (quiz_answer.quiz_id =  user_quiz_state.quiz_id" +
-              " AND quiz_answer.user_id = user_quiz_state.user_id)",
-          )
-          .orderBy("quiz_answer.status", "asc")
-          .orderBy("user_quiz_state.peer_reviews_given", "desc")
-          .orderBy("quiz_answer.created_at", "asc")
+    // we won't consider rejected answers
+    if (priority < this.statusesByPriority.length) {
+      queryBuilder = queryBuilder
+        .andWhere("quiz_answer.id", "NOT IN", rejected)
+        .andWhere("quiz_answer.status", this.statusesByPriority[priority])
+        .orderBy("quiz_answer.created_at", "asc")
+    }
+    // let's check the few rejected answers, too
+    else if (priority === this.statusesByPriority.length) {
+      queryBuilder = queryBuilder
+        .andWhere("quiz_answer.id", "IN", rejected)
+        .andWhere("quiz_answer.status", "IN", this.statusesByPriority)
+    } else {
+      return null
     }
 
     return queryBuilder

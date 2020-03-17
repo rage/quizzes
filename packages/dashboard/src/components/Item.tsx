@@ -106,4 +106,7 @@ class Item extends React.Component<any, any> {
   }
 }
 
-export default connect(null, { changeOrder, remove })(Item)
+export default connect(
+  null,
+  { changeOrder, remove },
+)(Item)

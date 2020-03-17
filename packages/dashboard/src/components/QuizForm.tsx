@@ -174,4 +174,7 @@ const mapDispatchToProps = {
   setQuiz,
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(QuizForm)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps,
+)(QuizForm)

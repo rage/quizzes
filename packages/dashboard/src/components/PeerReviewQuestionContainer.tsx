@@ -21,7 +21,9 @@ const PeerReviewQuestionContainer = SortableContainer((props: any) => {
           <SortableWrapper
             key={prq.id || prq.type + index}
             index={index}
-            collection={`peerReviewCollections[${props.collectionIndex}.questions]`}
+            collection={`peerReviewCollections[${
+              props.collectionIndex
+            }.questions]`}
           >
             <PeerReviewQuestion
               answerRequired={prq.answerRequired}

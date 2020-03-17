@@ -13,9 +13,10 @@ export default class UserCourseRoleService {
     courseId,
     quizId,
   }: IUserCourseRolesQuery): Promise<UserCourseRole[] | undefined> {
-    const queryBuilder = UserCourseRole.createQueryBuilder(
-      "ucr",
-    ).where("ucr.user_id = :userId", { userId })
+    const queryBuilder = UserCourseRole.createQueryBuilder("ucr").where(
+      "ucr.user_id = :userId",
+      { userId },
+    )
 
     queryBuilder
       .innerJoinAndSelect("ucr.course", "course")

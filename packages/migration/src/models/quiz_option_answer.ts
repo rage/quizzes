@@ -16,18 +16,12 @@ export class QuizOptionAnswer extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(
-    type => QuizItemAnswer,
-    qia => qia.id,
-  )
+  @ManyToOne(type => QuizItemAnswer, qia => qia.id)
   public quizItemAnswer: QuizItemAnswer
   @Column()
   public quizItemAnswerId: string
 
-  @ManyToOne(
-    type => QuizOption,
-    qo => qo.id,
-  )
+  @ManyToOne(type => QuizOption, qo => qo.id)
   public quizOption: QuizOption
   @Column()
   public quizOptionId: string

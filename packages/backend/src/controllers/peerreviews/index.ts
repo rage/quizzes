@@ -143,23 +143,22 @@ export class PeerReviewController {
         userId: peerReview.userId,
         quizId: receivingQuizAnswer.quizId,
         statuses: [
+          "given-more-than-enough",
+          "given-enough",
           "confirmed",
           "submitted",
           "enough-received-but-not-given",
-          // receiving 1 spam flag could make status 'manual-review'
           "manual-review",
         ],
       },
       this.entityManager,
     )
 
-    const quiz: Quiz = (
-      await this.QuizService.getQuizzes({
-        id: receivingQuizAnswer.quizId,
-        course: true,
-        items: true,
-      })
-    )[0]
+    const quiz: Quiz = (await this.QuizService.getQuizzes({
+      id: receivingQuizAnswer.quizId,
+      course: true,
+      items: true,
+    }))[0]
 
     let responsePeerReview: PeerReview
     let responseQuizAnswer: QuizAnswer

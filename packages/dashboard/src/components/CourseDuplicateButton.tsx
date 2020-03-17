@@ -169,6 +169,7 @@ const mapStateToProps = state => ({
   courseCount: state.courses ? state.courses.length : 0,
 })
 
-export default connect(mapStateToProps, { createDuplicateCourse })(
-  CourseDuplicateButton,
-)
+export default connect(
+  mapStateToProps,
+  { createDuplicateCourse },
+)(CourseDuplicateButton)
