@@ -27,6 +27,7 @@ const loggerMiddleware = async (
   next: () => Promise<any>,
 ) => {
   const start = Date.now()
+  ctx.state.start = start
   const log = GlobalLogger.child({ requestId: uuidv4() })
   // @ts-ignore
   ctx.log = log

@@ -12,19 +12,22 @@ const accessControl = (options?: AccessControlOptions) => {
     next: () => Promise<any>,
   ) => {
     if (options?.unrestricted) {
-      await next()
-    } else {
-      try {
-        ctx.state.user = await getCurrentUserDetails(
-          ctx.headers.authorization.toLocaleLowerCase().replace("bearer ", ""),
-        )
-        if (options?.administator) {
-          ctx.assert(ctx.state.user.administator, 401)
-        }
-        await next()
-      } catch (error) {
-        ctx.throw(401)
+      return next()
+    }
+    try {
+      ctx.state.user = await getCurrentUserDetails(
+        ctx.headers.authorization.toLocaleLowerCase().replace("bearer ", ""),
+      )
+      if (options?.administator) {
+        throw new Error()
       }
+    } catch (error) {
+      error.status = 401
+      error.message = "unauthorized"
+      throw error
+    }
+    if (ctx.state.user) {
+      await next()
     }
   }
   return accessControl

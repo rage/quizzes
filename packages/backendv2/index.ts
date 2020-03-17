@@ -1,12 +1,14 @@
 import http from "http"
 import Koa from "koa"
-import { Model } from "objection"
+import { Model, snakeCaseMappers } from "objection"
 import bodyParser from "koa-bodyparser"
 import { knex } from "./src/config/knex"
 import api from "./src/controllers/api"
 import logger from "./src/middleware/logger"
+import errorHandler from "./src/middleware/error_handler"
 import winston from "winston"
 Model.knex(knex)
+Model.columnNameMappers = snakeCaseMappers()
 
 interface CustomContext {
   log: winston.Logger
@@ -17,6 +19,8 @@ interface CustomState {
 }
 
 const app = new Koa<CustomState, CustomContext>()
+
+app.use(errorHandler)
 
 app.use(logger)
 
