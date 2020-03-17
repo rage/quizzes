@@ -428,137 +428,144 @@ export class QuizAnswerController {
     @EntityFromBody() answer: QuizAnswer,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
-    const userId = user.id
+    try {
+      const userId = user.id
 
-    if (!answer.quizId || !answer.languageId) {
-      throw new BadRequestError("Answer must contain some data")
-    }
-
-    // make sure that new answer (and item/option answers) are created for each submission
-    answer.userId = userId
-    answer.id = undefined
-    answer.itemAnswers.forEach(ia => {
-      ia.quizAnswerId = undefined
-      ia.id = undefined
-      ia.optionAnswers.forEach(oa => {
-        oa.quizItemAnswerId = undefined
-        oa.id = undefined
-      })
-    })
-
-    // creates new user if necessary
-    answer.user = new User()
-    answer.user.id = answer.userId
-
-    const quiz: Quiz = (
-      await this.quizService.getQuizzes({
-        id: answer.quizId,
-        items: true,
-        options: true,
-        peerreviews: true,
-        course: true,
-      })
-    )[0]
-
-    const now = new Date()
-
-    if (quiz.deadline && quiz.deadline.getTime() < now.getTime()) {
-      throw new BadRequestError("No submissions past deadline")
-    }
-
-    const userQState: UserQuizState =
-      (await this.userQuizStateService.getUserQuizState(
-        answer.userId,
-        answer.quizId,
-      )) || new UserQuizState()
-
-    if (userQState.status === "locked") {
-      throw new BadRequestError("Already answered")
-    }
-
-    const originalPoints = userQState.pointsAwarded || 0
-
-    let savedAnswer: QuizAnswer
-    let savedUserQuizState: UserQuizState
-
-    await this.entityManager.transaction(async manager => {
-      const {
-        response,
-        quizAnswer,
-        userQuizState,
-      } = this.validationService.validateQuizAnswer(answer, quiz, userQState)
-
-      const erroneousItemAnswers = response.itemAnswerStatus.filter(status => {
-        return status.error ? true : false
-      })
-
-      if (erroneousItemAnswers.length > 0) {
-        throw new BadRequestError(
-          `${erroneousItemAnswers.map(x => {
-            if (x.type === "essay") {
-              return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer (${x.data.words} words): ${x.data.text}`
-            } else if (x.type === "scale") {
-              return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer: ${x.data.answerValue}`
-            }
-          })}`,
-        )
+      if (!answer.quizId || !answer.languageId) {
+        throw new BadRequestError("Answer must contain some data")
       }
 
-      await this.validationService.checkForDeprecated(manager, quizAnswer)
+      // make sure that new answer (and item/option answers) are created for each submission
+      answer.userId = userId
+      answer.id = undefined
+      answer.itemAnswers.forEach(ia => {
+        ia.quizAnswerId = undefined
+        ia.id = undefined
+        ia.optionAnswers.forEach(oa => {
+          oa.quizItemAnswerId = undefined
+          oa.id = undefined
+        })
+      })
 
-      savedAnswer = await this.quizAnswerService.createQuizAnswer(
-        manager,
-        quizAnswer,
-      )
+      // creates new user if necessary
+      answer.user = new User()
+      answer.user.id = answer.userId
 
-      savedUserQuizState = await this.userQuizStateService.createUserQuizState(
-        manager,
-        userQuizState,
-      )
+      const quiz: Quiz = (
+        await this.quizService.getQuizzes({
+          id: answer.quizId,
+          items: true,
+          options: true,
+          peerreviews: true,
+          course: true,
+        })
+      )[0]
+
+      const now = new Date()
+
+      if (quiz.deadline && quiz.deadline.getTime() < now.getTime()) {
+        throw new BadRequestError("No submissions past deadline")
+      }
+
+      const userQState: UserQuizState =
+        (await this.userQuizStateService.getUserQuizState(
+          answer.userId,
+          answer.quizId,
+        )) || new UserQuizState()
+
+      if (userQState.status === "locked") {
+        throw new BadRequestError("Already answered")
+      }
+
+      const originalPoints = userQState.pointsAwarded || 0
+
+      let savedAnswer: QuizAnswer
+      let savedUserQuizState: UserQuizState
+
+      await this.entityManager.transaction(async manager => {
+        const {
+          response,
+          quizAnswer,
+          userQuizState,
+        } = this.validationService.validateQuizAnswer(answer, quiz, userQState)
+
+        const erroneousItemAnswers = response.itemAnswerStatus.filter(
+          status => {
+            return status.error ? true : false
+          },
+        )
+
+        if (erroneousItemAnswers.length > 0) {
+          throw new BadRequestError(
+            `${erroneousItemAnswers.map(x => {
+              if (x.type === "essay") {
+                return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer (${x.data.words} words): ${x.data.text}`
+              } else if (x.type === "scale") {
+                return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer: ${x.data.answerValue}`
+              }
+            })}`,
+          )
+        }
+
+        await this.validationService.checkForDeprecated(manager, quizAnswer)
+
+        savedAnswer = await this.quizAnswerService.createQuizAnswer(
+          manager,
+          quizAnswer,
+        )
+
+        savedUserQuizState = await this.userQuizStateService.createUserQuizState(
+          manager,
+          userQuizState,
+        )
+
+        if (
+          originalPoints < savedUserQuizState.pointsAwarded &&
+          !quiz.excludedFromScore
+        ) {
+          await this.userCoursePartStateService.updateUserCoursePartState(
+            manager,
+            quiz,
+            userQuizState.userId,
+          )
+          await this.kafkaService.publishUserProgressUpdated(
+            manager,
+            userId,
+            quiz.courseId,
+          )
+        }
+
+        this.kafkaService.publishQuizAnswerUpdated(
+          savedAnswer,
+          savedUserQuizState,
+          quiz,
+        )
+      })
 
       if (
-        originalPoints < savedUserQuizState.pointsAwarded &&
-        !quiz.excludedFromScore
+        savedUserQuizState.status === "open" &&
+        Math.abs(savedUserQuizState.pointsAwarded - quiz.points) > 0.001
       ) {
-        await this.userCoursePartStateService.updateUserCoursePartState(
-          manager,
-          quiz,
-          userQuizState.userId,
-        )
-        await this.kafkaService.publishUserProgressUpdated(
-          manager,
-          userId,
-          quiz.courseId,
-        )
+        return {
+          userQuizState: savedUserQuizState,
+          quizAnswer: savedAnswer,
+        }
       }
 
-      this.kafkaService.publishQuizAnswerUpdated(
-        savedAnswer,
-        savedUserQuizState,
-        quiz,
+      pushMessageToClient(
+        userId,
+        quiz.course.moocfiId,
+        MessageType.PROGRESS_UPDATED,
       )
-    })
 
-    if (
-      savedUserQuizState.status === "open" &&
-      Math.abs(savedUserQuizState.pointsAwarded - quiz.points) > 0.001
-    ) {
       return {
-        userQuizState: savedUserQuizState,
+        quiz,
         quizAnswer: savedAnswer,
+        userQuizState: savedUserQuizState,
       }
-    }
-
-    pushMessageToClient(
-      userId,
-      quiz.course.moocfiId,
-      MessageType.PROGRESS_UPDATED,
-    )
-
-    return {
-      quiz,
-      quizAnswer: savedAnswer,
-      userQuizState: savedUserQuizState,
+    } catch (error) {
+      console.log(error)
+      throw new BadRequestError()
     }
   }
 
