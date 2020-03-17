@@ -286,7 +286,6 @@ export default class PeerReviewService {
       priority++
     }
 
-<<<<<<< HEAD
     if (allCandidates.length < 1) {
       return []
     }
@@ -302,18 +301,6 @@ export default class PeerReviewService {
         }
       },
     )
-=======
-    candidates = _.shuffle(candidates)
-    candidates = candidates.sort((a, b): number => {
-      if (a.status < b.status) {
-        return 1
-      } else if (a.status > b.status) {
-        return -1
-      } else {
-        return 0
-      }
-    })
->>>>>>> master
 
     allCandidates = allCandidates.slice(0, 2)
 
