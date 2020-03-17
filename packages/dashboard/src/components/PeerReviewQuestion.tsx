@@ -108,7 +108,11 @@ class PeerReviewQuestion extends React.Component<
                       value={this.props.title || undefined}
                       fullWidth={true}
                       onChange={this.props.handleChange(
-                        `peerReviewCollections[${this.props.collectionIndex}].questions[${this.props.index}].texts[${this.props.textIndex}].title`,
+                        `peerReviewCollections[${
+                          this.props.collectionIndex
+                        }].questions[${this.props.index}].texts[${
+                          this.props.textIndex
+                        }].title`,
                       )}
                       multiline={true}
                       margin="normal"
@@ -119,7 +123,11 @@ class PeerReviewQuestion extends React.Component<
                         value={this.props.body || undefined}
                         fullWidth={true}
                         onChange={this.props.handleChange(
-                          `peerReviewCollections[${this.props.collectionIndex}].questions[${this.props.index}].texts[${this.props.textIndex}].body`,
+                          `peerReviewCollections[${
+                            this.props.collectionIndex
+                          }].questions[${this.props.index}].texts[${
+                            this.props.textIndex
+                          }].body`,
                         )}
                         multiline={true}
                         margin="normal"
@@ -132,7 +140,11 @@ class PeerReviewQuestion extends React.Component<
                             <Checkbox
                               checked={this.props.answerRequired}
                               onChange={this.props.handleChange(
-                                `peerReviewCollections[${this.props.collectionIndex}].questions[${this.props.index}].answerRequired`,
+                                `peerReviewCollections[${
+                                  this.props.collectionIndex
+                                }].questions[${
+                                  this.props.index
+                                }].answerRequired`,
                               )}
                               color="primary"
                             />
@@ -144,7 +156,9 @@ class PeerReviewQuestion extends React.Component<
                         <Grid container={true} justify="flex-end">
                           <IconButton
                             onClick={this.props.remove(
-                              `peerReviewCollections[${this.props.collectionIndex}].questions`,
+                              `peerReviewCollections[${
+                                this.props.collectionIndex
+                              }].questions`,
                               this.props.index,
                             )}
                             aria-label="Delete"

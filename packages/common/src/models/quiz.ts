@@ -26,23 +26,15 @@ export class Quiz extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(
-    type => Course,
-    course => course.id,
-    { eager: false },
-  ) // was: lazy
+  @ManyToOne(type => Course, course => course.id, { eager: false }) // was: lazy
   public course: Course
   @Column()
   public courseId: string
 
-  @OneToMany(
-    type => QuizTranslation,
-    qt => qt.quiz,
-    {
-      eager: false,
-      cascade: true,
-    },
-  )
+  @OneToMany(type => QuizTranslation, qt => qt.quiz, {
+    eager: false,
+    cascade: true,
+  })
   public texts: QuizTranslation[]
 
   @Column("int")
@@ -58,24 +50,16 @@ export class Quiz extends BaseEntity {
   @Column({ type: "timestamp", nullable: true })
   public open?: Date
 
-  @OneToMany(
-    type => QuizItem,
-    qi => qi.quiz,
-    {
-      eager: false,
-      cascade: true,
-    },
-  ) // was: not eager
+  @OneToMany(type => QuizItem, qi => qi.quiz, {
+    eager: false,
+    cascade: true,
+  }) // was: not eager
   public items?: QuizItem[]
 
-  @OneToMany(
-    type => PeerReviewQuestionCollection,
-    prqc => prqc.quiz,
-    {
-      eager: false,
-      cascade: true,
-    },
-  ) // was: not eager
+  @OneToMany(type => PeerReviewQuestionCollection, prqc => prqc.quiz, {
+    eager: false,
+    cascade: true,
+  }) // was: not eager
   public peerReviewQuestionCollections: PeerReviewQuestionCollection[]
 
   @Column({ default: true })
@@ -127,23 +111,16 @@ export class Quiz extends BaseEntity {
 
 @Entity()
 export class QuizTranslation extends BaseEntity {
-  @ManyToOne(
-    type => Quiz,
-    quiz => quiz.id,
-    {
-      onDelete: "CASCADE",
-      onUpdate: "CASCADE",
-    },
-  )
+  @ManyToOne(type => Quiz, quiz => quiz.id, {
+    onDelete: "CASCADE",
+    onUpdate: "CASCADE",
+  })
   @JoinColumn()
   public quiz: Promise<Quiz>
   @PrimaryColumn()
   public quizId: string
 
-  @ManyToOne(
-    type => Language,
-    lang => lang.id,
-  )
+  @ManyToOne(type => Language, lang => lang.id)
   @JoinColumn()
   public language: Language
   @PrimaryColumn()

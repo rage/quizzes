@@ -20,9 +20,9 @@ let date: Date
 
 database.connect().then(async () => {
   manager = getManager()
-  date = (
-    await manager.query("select date from migration order by date desc limit 2")
-  )[1].date.toISOString()
+  date = (await manager.query(
+    "select date from migration order by date desc limit 2",
+  ))[1].date.toISOString()
   createUserQuizStates()
 })
 
