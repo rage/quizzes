@@ -45,8 +45,9 @@ const widget = new Router<CustomState, CustomContext>({
   })
 
 const validateQuizAnswer = async (quizAnswer: QuizAnswer) => {
-  await knex.raw(
-    `
+  await Promise.all([
+    await knex.raw(
+      `
     UPDATE
       quiz_item_answer
     SET
@@ -70,10 +71,10 @@ const validateQuizAnswer = async (quizAnswer: QuizAnswer) => {
     WHERE
       quiz_item_answer.id = v.id
     `,
-    { quizAnswerId: quizAnswer.id },
-  )
-  await knex.raw(
-    `
+      { quizAnswerId: quizAnswer.id },
+    ),
+    await knex.raw(
+      `
     UPDATE
         quiz_item_answer
     SET
@@ -129,13 +130,13 @@ const validateQuizAnswer = async (quizAnswer: QuizAnswer) => {
         quiz_item_answer.quiz_item_id = v.id
         AND quiz_item_answer.quiz_answer_id = :quizAnswerId
     `,
-    {
-      quizAnswerId: quizAnswer.id,
-      quizId: quizAnswer.quizId,
-    },
-  )
-  await knex.raw(
-    `
+      {
+        quizAnswerId: quizAnswer.id,
+        quizId: quizAnswer.quizId,
+      },
+    ),
+    await knex.raw(
+      `
     UPDATE
         quiz_item_answer
     SET
@@ -156,8 +157,9 @@ const validateQuizAnswer = async (quizAnswer: QuizAnswer) => {
     WHERE
         quiz_item_answer.id = v.id
     `,
-    { quizAnswerId: quizAnswer.id },
-  )
+      { quizAnswerId: quizAnswer.id },
+    ),
+  ])
   const answer = await QuizAnswer.query()
     .withGraphJoined("itemAnswers.[optionAnswers]")
     .where("quiz_answer.id", quizAnswer.id)
