@@ -3,6 +3,8 @@ import QuizItemAnswer from "./quiz_item_answer"
 import User from "./user"
 
 class QuizAnswer extends Model {
+  id!: string
+  quizId!: string
   static get tableName() {
     return "quiz_answer"
   }
