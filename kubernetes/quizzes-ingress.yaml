@@ -4,6 +4,7 @@ metadata:
   name: quizzes-ingress
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.org/websocket-services: "ws"
 spec:
   tls:
   - hosts:
@@ -21,3 +22,7 @@ spec:
           backend:
             serviceName: quizzes-dashboard-service
             servicePort: 80
+        - path: /ws
+          backend:
+            serviceName: ws
+            servicePort: 7000

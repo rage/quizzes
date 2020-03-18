@@ -1,4 +1,3 @@
-import { getUUIDByString } from "@../../util"
 import { Response } from "express"
 import JSONStream from "JSONStream"
 import _ from "lodash"
@@ -30,6 +29,7 @@ import validator from "validator"
 import { API_PATH } from "../../config"
 import { Quiz, QuizAnswer, UserQuizState } from "../../models"
 import { IQuizQuery, ITMCProfileDetails } from "../../types"
+import { getUUIDByString } from "../../util"
 
 @JsonController(`${API_PATH}/quizzes`)
 export class QuizController {

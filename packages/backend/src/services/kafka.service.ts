@@ -1,4 +1,3 @@
-import Knex from "knex"
 import { Inject, Service } from "typedi"
 import { EntityManager } from "typeorm"
 import { Course, Quiz, QuizAnswer, UserQuizState } from "../models"
@@ -18,6 +17,14 @@ import * as Kafka from "node-rdkafka"
 
 import { promisify } from "util"
 
+import { quizzes as knex } from "../config/knex"
+
+export enum RequiredAction {
+  REJECTED = "REJECTED",
+  GIVE_PEER_REVIEW = "GIVE_PEER_REVIEW",
+  PENDING_PEER_REVIEW = "PENDING_PEER_REVIEW",
+}
+
 @Service()
 export default class KafkaService {
   @Inject(type => QuizService)
@@ -26,23 +33,11 @@ export default class KafkaService {
   @Inject()
   private userCoursePartStateService: UserCoursePartStateService
 
-  private knex = Knex({ client: "pg" })
+  private knex = knex
 
   private producer: any
 
   private flush: any
-
-  constructor() {
-    const producer = new Kafka.Producer({
-      "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
-      dr_cb: false,
-    })
-    producer.on("ready", () => {
-      this.producer = producer
-    })
-    producer.connect()
-    this.flush = promisify(producer.flush.bind(producer))
-  }
 
   public async publishUserProgressUpdated(
     manager: EntityManager,
@@ -76,17 +71,17 @@ export default class KafkaService {
     userQuizState: UserQuizState,
     quiz: Quiz,
   ) {
-    const messages: string[] = []
+    const messages: RequiredAction[] = []
     const course = quiz.course
 
     if (quizAnswer.status === "rejected" || quizAnswer.status === "spam") {
-      messages.push("rejected in peer review")
+      messages.push(RequiredAction.REJECTED)
     } else if (quiz.items[0].type === "essay") {
       if (userQuizState.peerReviewsGiven < course.minPeerReviewsGiven) {
-        messages.push("give peer reviews")
+        messages.push(RequiredAction.GIVE_PEER_REVIEW)
       }
       if (userQuizState.peerReviewsReceived < course.minPeerReviewsReceived) {
-        messages.push("waiting for peer reviews")
+        messages.push(RequiredAction.PENDING_PEER_REVIEW)
       }
     }
 
@@ -102,7 +97,7 @@ export default class KafkaService {
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
     }
 
-    await this.produce("user-points", message)
+    await this.produce("user-points-2", message)
   }
 
   public async publishCourseQuizzesUpdated(courseId: string) {
@@ -139,15 +134,37 @@ export default class KafkaService {
     await manager.query(query.toString())
   }
 
+  private connect() {
+    return new Promise((resolve, reject) => {
+      this.producer.connect(
+        {},
+        (err: Error, data: any) => {
+          if (err) {
+            reject(err)
+          }
+          resolve(data)
+        },
+      )
+    })
+  }
+
   private async produce(
-    topic: "user-course-progress" | "user-points" | "exercise",
+    topic: "user-course-progress" | "user-points-2" | "exercise",
     message: ProgressMessage | QuizAnswerMessage | QuizMessage,
   ) {
     try {
+      if (!this.producer) {
+        this.producer = new Kafka.Producer({
+          "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
+          dr_cb: false,
+        })
+        await this.connect()
+        this.flush = promisify(this.producer.flush.bind(this.producer))
+      }
       this.producer.produce(topic, null, Buffer.from(JSON.stringify(message)))
       await this.flush(1000)
     } catch (error) {
-      console.log("producer not ready")
+      console.log("producer failed")
     }
   }
 }

@@ -11,6 +11,8 @@ import {
   QuizMessage,
 } from "../types"
 
+import { RequiredAction } from "../services/kafka.service"
+
 const producer = new Kafka.Producer({
   "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
   dr_cb: false,
@@ -31,7 +33,7 @@ const publish = async () => {
     let task: IKafkaTask
 
     for (task of tasks) {
-      const { course_id, recalculate_progress } = task
+      const { course_id, recalculate_progress, recalculate_only } = task
 
       console.count("task")
       console.log(
@@ -40,7 +42,10 @@ const publish = async () => {
         }`,
       )
 
-      const course = (await knex<ICourse>("course").where("id", course_id))[0]
+      const course = (await knex<ICourse>("course").where(
+        "id",
+        task.course_id,
+      ))[0]
 
       if (course_id) {
         if (recalculate_progress) {
@@ -48,14 +53,16 @@ const publish = async () => {
           await recalculateProgress(course_id)
         }
 
-        console.log("publishing quizzes")
-        const quizzes = await publishQuizzes(course)
+        if (!recalculate_only) {
+          console.log("publishing quizzes")
+          const quizzes = await publishQuizzes(course)
 
-        console.log("publishing progress")
-        await publishProgress(course, quizzes)
+          console.log("publishing progress")
+          await publishProgress(course, quizzes)
 
-        console.log("publishing answers")
-        await publishAnswers(course)
+          console.log("publishing answers")
+          await publishAnswers(course)
+        }
       }
 
       console.log("removing task from database")
@@ -82,20 +89,24 @@ const recalculateProgress = async (courseId: string) => {
         parts.user_id as user_id,
         parts.course_id as course_id,
         parts.part as course_part,
-        coalesce(points.points / max.max_points, 0) as progress,
+        coalesce(
+          case when max.max_points is not null and max.max_points > 0 then (points.points / max.max_points) end, 0
+        ) as progress,
         coalesce(points.points, 0) as score
       from (
-        select
-          distinct(user_id),
-          course_id,
-          part
-        from user_course_part_state ucps
-        cross join (
+        select distinct on (uqs.user_id, q.part)
+          uqs.user_id,
+          q.part,
+          q.course_id
+        from user_quiz_state uqs
+        cross join quiz q
+        where q.course_id = :courseId
+        and uqs.quiz_id in (
           select
-            distinct(part)
-          from quiz q
-          where q.course_id = :courseId) as p
-        where ucps.course_id = :courseId
+            id
+          from quiz
+          where course_id = :courseId
+        )
       ) as parts
       left join (
         select
@@ -112,16 +123,17 @@ const recalculateProgress = async (courseId: string) => {
       on parts.course_id = points.course_id
       and parts.user_id = points.user_id
       and parts.part = points.part
-      join (
+      left join (
         select
+          q.course_id,
           q.part,
           sum(q.points) as max_points
         from quiz q
         where q.course_id = :courseId
         and q.excluded_from_score = false
-        group by q.part
+        group by q.course_id, q.part
       ) as max
-      on parts.part = max.part
+      on parts.part = max.part and parts.course_id = max.course_id
       on conflict (user_id, course_id, course_part)
       do update
       set progress = excluded.progress, score = excluded.score
@@ -144,7 +156,6 @@ const publishQuizzes = async (course: ICourse): Promise<IQuiz[]> => {
       .join("quiz_translation", { "quiz.id": "quiz_translation.quiz_id" })
       .where({
         course_id: courseId,
-        excluded_from_score: false,
       })
       .andWhereNot("part", 0)
 
@@ -230,16 +241,16 @@ const publishAnswers = async (course: ICourse) => {
     let answer
 
     for (answer of answers) {
-      const messages: string[] = []
+      const messages: RequiredAction[] = []
 
       if (answer.status === "rejected" || answer.status === "spam") {
-        messages.push("rejected in peer review")
+        messages.push(RequiredAction.REJECTED)
       } else if (answer.types.includes("essay")) {
         if (answer.peer_reviews_given < course.min_peer_reviews_given) {
-          messages.push("give peer reviews")
+          messages.push(RequiredAction.GIVE_PEER_REVIEW)
         }
         if (answer.peer_reviews_received < course.min_peer_reviews_received) {
-          messages.push("waiting for peer reviews")
+          messages.push(RequiredAction.PENDING_PEER_REVIEW)
         }
       }
 
@@ -256,7 +267,7 @@ const publishAnswers = async (course: ICourse) => {
       }
 
       producer.produce(
-        "user-points",
+        "user-points-2",
         null,
         Buffer.from(JSON.stringify(message)),
       )
@@ -342,6 +353,7 @@ interface IKafkaTask {
   course_id: string
   quiz_id: string
   recalculate_progress: boolean
+  recalculate_only: boolean
   created_at: Date
 }
 

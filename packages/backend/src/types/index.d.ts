@@ -12,6 +12,8 @@ import {
   UserCourseRole,
 } from "../models"
 import { Permission } from "services/authorization.service"
+import { RequiredAction } from "../services/kafka.service"
+import { ModifyTableQuizItemAddColumnUsesSharedOptionFeedbackMessage1567500257341 } from "migration/1567500257341-ModifyTableQuizItemAddColumnUsesSharedOptionFeedbackMessage"
 
 export class ITMCProfile {
   username: string
@@ -66,14 +68,20 @@ export interface IQuizAnswerQuery {
   // should prob only use statuses
   status?: string
   statuses?: string[]
+  courseIds?: string[]
+  courseIdIncludedInCourseIds?: boolean
   firstAllowedTime?: Date
   lastAllowedTime?: Date
   languageIds?: string[]
-  // or: max and min for peer reviews given/received
-  peerReviewsGiven?: number
-  peerReviewsReceived?: number
-  // similarly: min/max spamflags
-  spamFlags?: number
+  minPeerReviewsGiven?: number
+  maxPeerReviewsGiven?: number
+  minPeerReviewsReceived?: number
+  maxPeerReviewsReceived?: number
+  minSpamFlags?: number
+  minSpamFlagsOr?: number
+  maxSpamFlags?: number
+  minPeerReviewAverage?: number
+  maxPeerReviewAverage?: number
   addPeerReviews?: boolean
   addSpamFlagNumber?: boolean
   quizRequiresPeerReviews?: boolean
@@ -218,7 +226,7 @@ export interface QuizAnswerMessage {
   user_id: number
   course_id: string
   service_id: string
-  required_actions: string[] | null
+  required_actions: RequiredAction[] | null
   message_format_version: number
 }
 

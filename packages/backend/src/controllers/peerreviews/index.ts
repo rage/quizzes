@@ -12,13 +12,9 @@ import {
 import AuthorizationService, {
   Permission,
 } from "services/authorization.service"
-import KafkaService from "services/kafka.service"
 import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
-import UserCoursePartStateService from "services/usercoursepartstate.service"
-import UserQuizStateService from "services/userquizstate.service"
-import ValidationService from "services/validation.service"
 import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
@@ -26,6 +22,8 @@ import { InjectManager } from "typeorm-typedi-extensions"
 import { API_PATH } from "../../config"
 import { PeerReview, Quiz, QuizAnswer, UserQuizState } from "../../models"
 import { ITMCProfileDetails } from "../../types"
+
+import { MessageType, pushMessageToClient } from "../../wsServer"
 
 @JsonController(`${API_PATH}/quizzes/peerreview`)
 export class PeerReviewController {
@@ -42,19 +40,22 @@ export class PeerReviewController {
   private quizAnswerService: QuizAnswerService
 
   @Inject()
-  private userQuizStateService: UserQuizStateService
-
-  @Inject()
   private QuizService: QuizService
 
-  @Inject()
-  private validationService: ValidationService
-
-  @Inject()
-  private userCoursePartStateService: UserCoursePartStateService
-
-  @Inject()
-  private kafkaService: KafkaService
+  @Get(
+    "/:quizId([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/:languageId",
+  )
+  public async get(
+    @Param("quizId") quizId: string,
+    @Param("languageId") languageId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    return await this.peerReviewService.getAnswersToReview(
+      quizId,
+      languageId,
+      user.id,
+    )
+  }
 
   @Get("/received/:answerId")
   public async getGivenReviews(
@@ -99,6 +100,112 @@ export class PeerReviewController {
     }
 
     return result
+  }
+
+  @Post("/")
+  public async post(
+    @EntityFromBody() peerReview: PeerReview,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ): Promise<any> {
+    peerReview.answers.forEach(answer => {
+      if (answer.text) {
+        return
+      }
+      if (answer.value === null) {
+        throw new BadRequestError("review must contain values")
+      }
+    })
+
+    peerReview.userId = user.id
+
+    // Enforce unique (quiz_answer_id, user_id). Do this in db later.
+    const shouldBeZero = await this.entityManager
+      .createQueryBuilder(PeerReview, "peer_review")
+      .where("peer_review.quiz_answer_id = :quizAnswerId", {
+        quizAnswerId: peerReview.quizAnswerId,
+      })
+      .andWhere("peer_review.user_id = :userId", { userId: user.id })
+      .getCount()
+
+    if (shouldBeZero !== 0) {
+      return {}
+    }
+
+    const receivingQuizAnswer: QuizAnswer = await this.quizAnswerService.getAnswer(
+      { id: peerReview.quizAnswerId },
+      this.entityManager,
+    )
+
+    const oldStatus = receivingQuizAnswer.status
+
+    const givingQuizAnswer: QuizAnswer = await this.quizAnswerService.getAnswer(
+      {
+        userId: peerReview.userId,
+        quizId: receivingQuizAnswer.quizId,
+        statuses: ["confirmed", "submitted", "enough-received-but-not-given"],
+      },
+      this.entityManager,
+    )
+
+    const quiz: Quiz = (await this.QuizService.getQuizzes({
+      id: receivingQuizAnswer.quizId,
+      course: true,
+      items: true,
+    }))[0]
+
+    let responsePeerReview: PeerReview
+    let responseQuizAnswer: QuizAnswer
+    let responseUserQuizState: UserQuizState
+
+    await this.entityManager.transaction(async manager => {
+      responsePeerReview = await this.peerReviewService.createPeerReview(
+        manager,
+        peerReview,
+      )
+
+      const givingUpdated = await this.peerReviewService.processPeerReview(
+        manager,
+        quiz,
+        givingQuizAnswer,
+        true,
+      )
+
+      responseQuizAnswer = givingUpdated.answer
+      responseUserQuizState = givingUpdated.state
+
+      const receivingUpdated = await this.peerReviewService.processPeerReview(
+        manager,
+        quiz,
+        receivingQuizAnswer,
+      )
+
+      const newStatus = receivingUpdated.answer.status
+      const messages: MessageType[] = [MessageType.PEER_REVIEW_RECEIVED]
+
+      if (oldStatus !== newStatus) {
+        if (newStatus === "confirmed") {
+          messages.push(MessageType.QUIZ_CONFIRMED)
+        }
+        if (newStatus === "rejected" || newStatus === "spam") {
+          messages.push(MessageType.QUIZ_REJECTED)
+        }
+      }
+
+      messages.forEach(message => {
+        pushMessageToClient(
+          receivingQuizAnswer.userId,
+          quiz.course.moocfiId,
+          message,
+          quiz.id,
+        )
+      })
+    })
+
+    return {
+      peerReview: responsePeerReview,
+      quizAnswer: responseQuizAnswer,
+      userQuizState: responseUserQuizState,
+    }
   }
 
   @Get("/data/:quizId/plainPeerReviews")
@@ -166,103 +273,5 @@ export class PeerReviewController {
     const stringStream = result.pipe(JSONStream.stringify())
 
     return stringStream
-  }
-
-  @Get("/:quizId/:languageId")
-  public async get(
-    @Param("quizId") quizId: string,
-    @Param("languageId") languageId: string,
-    @HeaderParam("authorization") user: ITMCProfileDetails,
-  ) {
-    return await this.peerReviewService.getAnswersToReview(
-      quizId,
-      languageId,
-      user.id,
-    )
-  }
-
-  @Post("/")
-  public async post(
-    @EntityFromBody() peerReview: PeerReview,
-    @HeaderParam("authorization") user: ITMCProfileDetails,
-  ): Promise<any> {
-    peerReview.answers.forEach(answer => {
-      if (answer.text) {
-        return
-      }
-      if (answer.value === null) {
-        throw new BadRequestError("review must contain values")
-      }
-    })
-
-    peerReview.userId = user.id
-
-    // Enforce unique (quiz_answer_id, user_id). Do this in db later.
-    const shouldBeZero = await this.entityManager
-      .createQueryBuilder(PeerReview, "peer_review")
-      .where("peer_review.quiz_answer_id = :quizAnswerId", {
-        quizAnswerId: peerReview.quizAnswerId,
-      })
-      .andWhere("peer_review.user_id = :userId", { userId: user.id })
-      .getCount()
-
-    if (shouldBeZero !== 0) {
-      return {}
-    }
-
-    const receivingQuizAnswer: QuizAnswer = await this.quizAnswerService.getAnswer(
-      { id: peerReview.quizAnswerId },
-      this.entityManager,
-    )
-    const givingQuizAnswer: QuizAnswer = await this.quizAnswerService.getAnswer(
-      {
-        userId: peerReview.userId,
-        quizId: receivingQuizAnswer.quizId,
-        statuses: ["confirmed", "submitted", "enough-received-but-not-given"],
-      },
-      this.entityManager,
-    )
-
-    const quiz: Quiz = (await this.QuizService.getQuizzes({
-      id: receivingQuizAnswer.quizId,
-      course: true,
-      items: true,
-    }))[0]
-
-    let responsePeerReview: PeerReview
-    let responseQuizAnswer: QuizAnswer
-    let responseUserQuizState: UserQuizState
-
-    await this.entityManager.transaction(async manager => {
-      responsePeerReview = await this.peerReviewService.createPeerReview(
-        manager,
-        peerReview,
-      )
-
-      const {
-        updatedAnswer,
-        updatedState,
-      } = await this.peerReviewService.processPeerReview(
-        manager,
-        quiz,
-        givingQuizAnswer,
-        true,
-      )
-
-      responseQuizAnswer = updatedAnswer
-      responseUserQuizState = updatedState
-
-      await this.peerReviewService.processPeerReview(
-        manager,
-        quiz,
-        receivingQuizAnswer,
-      )
-    })
-
-    return {
-      peerReview: responsePeerReview,
-      quizAnswer: responseQuizAnswer,
-      userQuizState: responseUserQuizState,
-    }
   }
 }

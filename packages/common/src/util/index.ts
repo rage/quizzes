@@ -115,7 +115,7 @@ export function executeIfChangeMatches(
 
 export function executeIfOnlyDigitsInTextField(
   callback: (event: ChangeEvent<HTMLInputElement>) => void,
-): ((e: ChangeEvent<HTMLInputElement>) => void) {
+): (e: ChangeEvent<HTMLInputElement>) => void {
   return executeIfChangeMatches((e: ChangeEvent<HTMLInputElement>) => {
     const eventValue = e.target.value
     const regex = eventValue.match(/^\d*$/)
