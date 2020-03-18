@@ -4,6 +4,7 @@ import Quiz from "../../models/quiz"
 import QuizAnswer from "../../models/quiz_answer"
 import QuizItemAnswer from "../../models/quiz_item_answer"
 import accessControl from "../../middleware/access_control"
+import User from "../../models/user"
 
 const widget = new Router<CustomState, CustomContext>({
   prefix: "/widget",
@@ -25,10 +26,13 @@ const widget = new Router<CustomState, CustomContext>({
 
   .post("/answer", accessControl(), async ctx => {
     const user = ctx.state.user
-    console.log("herp")
     const answer = ctx.request.body
-    answer.user = { id: user.id }
     try {
+      const userInDb = await User.query().findById(user.id)
+      answer.user_id = user.id
+      if (!userInDb) {
+        answer.user = { id: user.id }
+      }
       const response = await QuizAnswer.query().insertGraph(answer)
       ctx.body = response
     } catch (error) {
