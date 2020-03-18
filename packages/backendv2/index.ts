@@ -6,17 +6,9 @@ import { knex } from "./src/config/knex"
 import api from "./src/controllers/api"
 import logger from "./src/middleware/logger"
 import errorHandler from "./src/middleware/error_handler"
-import winston from "winston"
+import { CustomContext, CustomState } from "./src/types"
 Model.knex(knex)
 Model.columnNameMappers = snakeCaseMappers()
-
-interface CustomContext {
-  log: winston.Logger
-}
-
-interface CustomState {
-  user: any
-}
 
 const app = new Koa<CustomState, CustomContext>()
 

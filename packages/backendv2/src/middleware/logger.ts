@@ -1,4 +1,4 @@
-import { ParameterizedContext } from "koa"
+import { CustomContext } from "../types"
 import winston, { format } from "winston"
 import { v4 as uuidv4 } from "uuid"
 
@@ -23,7 +23,7 @@ export const GlobalLogger = winston.createLogger({
 })
 
 const loggerMiddleware = async (
-  ctx: ParameterizedContext,
+  ctx: CustomContext,
   next: () => Promise<any>,
 ) => {
   const start = Date.now()

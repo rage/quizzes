@@ -1,10 +1,11 @@
 import Router from "koa-router"
+import { CustomContext, CustomState } from "../../types"
 import Quiz from "../../models/quiz"
 import QuizAnswer from "../../models/quiz_answer"
 import QuizItemAnswer from "../../models/quiz_item_answer"
 import accessControl from "../../middleware/access_control"
 
-const widget = new Router({
+const widget = new Router<CustomState, CustomContext>({
   prefix: "/widget",
 })
 

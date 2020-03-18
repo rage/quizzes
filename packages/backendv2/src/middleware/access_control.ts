@@ -1,5 +1,5 @@
+import { CustomContext } from "../types"
 import { getCurrentUserDetails } from "../services/tmc"
-import { ParameterizedContext } from "koa"
 
 interface AccessControlOptions {
   administator?: boolean
@@ -8,7 +8,7 @@ interface AccessControlOptions {
 
 const accessControl = (options?: AccessControlOptions) => {
   const accessControl = async (
-    ctx: ParameterizedContext,
+    ctx: CustomContext,
     next: () => Promise<any>,
   ) => {
     if (options?.unrestricted) {

@@ -1,9 +1,6 @@
-import { ParameterizedContext } from "koa"
+import { CustomContext } from "../types"
 
-const errorHandler = async (
-  ctx: ParameterizedContext,
-  next: () => Promise<any>,
-) => {
+const errorHandler = async (ctx: CustomContext, next: () => Promise<any>) => {
   try {
     await next()
   } catch (error) {
