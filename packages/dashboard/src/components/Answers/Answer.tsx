@@ -194,8 +194,7 @@ class Answer extends React.Component<any, any> {
               <Button
                 onClick={this.modifyStatus(
                   this.state.confirmAction,
-                  this.props.answerData.status === "submitted" ||
-                    this.props.answerData.status === "spam",
+                  this.props.answerData.status === "manual-review",
                 )}
               >
                 Confirm
