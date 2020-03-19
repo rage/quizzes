@@ -56,6 +56,9 @@ export type QuizAnswer = {
     | "rejected"
     | "deprecated"
     | "enough-received-but-not-given"
+    | "manual-review"
+    | "given-more-than-enough"
+    | "given-enough"
   itemAnswers: QuizItemAnswer[]
 }
 

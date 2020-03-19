@@ -142,7 +142,14 @@ export class PeerReviewController {
       {
         userId: peerReview.userId,
         quizId: receivingQuizAnswer.quizId,
-        statuses: ["confirmed", "submitted", "enough-received-but-not-given"],
+        statuses: [
+          "given-more-than-enough",
+          "given-enough",
+          "confirmed",
+          "submitted",
+          "enough-received-but-not-given",
+          "manual-review",
+        ],
       },
       this.entityManager,
     )

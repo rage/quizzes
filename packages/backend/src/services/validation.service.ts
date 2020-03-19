@@ -271,6 +271,13 @@ export default class ValidationService {
     return { response, quizAnswer, userQuizState }
   }
 
+  private openishStates = [
+    "given-more-than-enough",
+    "given-enough",
+    "submitted",
+    "enough-received-but-not-given",
+  ]
+
   public validateEssayAnswer(
     quiz: Quiz,
     quizAnswer: QuizAnswer,
@@ -280,20 +287,23 @@ export default class ValidationService {
     const course: Course = quiz.course
     const given: number = userQuizState.peerReviewsGiven
     const received: number = userQuizState.peerReviewsReceived
+
     if (
-      quiz.autoReject &&
-      (quizAnswer.status === "submitted" ||
-        quizAnswer.status === "enough-received-but-not-given") &&
+      this.openishStates.includes(quizAnswer.status) &&
       userQuizState.spamFlags > course.maxSpamFlags
     ) {
-      quizAnswer.status = "spam"
-      if (quiz.triesLimited && userQuizState.tries >= quiz.tries) {
-        userQuizState.status = "locked"
+      if (quiz.autoReject) {
+        quizAnswer.status = "spam"
+        if (quiz.triesLimited && userQuizState.tries >= quiz.tries) {
+          userQuizState.status = "locked"
+        } else {
+          userQuizState.spamFlags = null
+          userQuizState.peerReviewsReceived = 0
+          userQuizState.status = "open"
+          userQuizState.pointsAwarded = null
+        }
       } else {
-        userQuizState.spamFlags = null
-        userQuizState.peerReviewsReceived = 0
-        userQuizState.status = "open"
-        userQuizState.pointsAwarded = null
+        quizAnswer.status = "manual-review"
       }
     } else if (
       quizAnswer.status === "submitted" &&
@@ -302,8 +312,7 @@ export default class ValidationService {
     ) {
       quizAnswer.status = "enough-received-but-not-given"
     } else if (
-      (quizAnswer.status === "submitted" ||
-        quizAnswer.status === "enough-received-but-not-given") &&
+      this.openishStates.includes(quizAnswer.status) &&
       given >= course.minPeerReviewsGiven &&
       received >= course.minPeerReviewsReceived &&
       quiz.autoConfirm
@@ -332,8 +341,29 @@ export default class ValidationService {
         } else {
           userQuizState.status = "open"
         }
+      } else {
+        quizAnswer.status = "manual-review"
       }
     }
+
+    if (
+      !quiz.autoReject &&
+      userQuizState.spamFlags > 0 &&
+      this.openishStates.includes(quizAnswer.status)
+    ) {
+      quizAnswer.status = "manual-review"
+    } else if (
+      quizAnswer.status === "submitted" ||
+      quizAnswer.status === "given-enough" ||
+      quizAnswer.status === "enough-received-but-not-given"
+    ) {
+      if (given === course.minPeerReviewsGiven) {
+        quizAnswer.status = "given-enough"
+      } else if (given > course.minPeerReviewsGiven) {
+        quizAnswer.status = "given-more-than-enough"
+      }
+    }
+
     return { quizAnswer, userQuizState }
   }
 
