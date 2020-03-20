@@ -27,7 +27,6 @@ const SolutionPaper = styled(SpaciousPaper)<SolutionPaperProps>`
   }
 `
 
-
 const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
@@ -70,7 +69,9 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
 
   const guidance = (
     <>
-      <MarkdownText id={`${itemTitle}-title`} component="p" variant="h6">{itemTitle}</MarkdownText>
+      <MarkdownText id={`${itemTitle}-title`} component="p" variant="h6">
+        {itemTitle}
+      </MarkdownText>
       <MarkdownText variant="body1">{item.texts[0].body}</MarkdownText>
     </>
   )

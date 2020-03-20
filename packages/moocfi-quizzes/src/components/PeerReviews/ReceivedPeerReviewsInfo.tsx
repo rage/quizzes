@@ -19,7 +19,6 @@ import { ReceivedPeerReviewLabels } from "../../utils/languages/"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
 import Togglable from "../../utils/Togglable"
 
-
 const ReceivedPeerReviewsContainer = styled(TopMarginDivLarge)<{
   providedStyles: string | undefined
 }>`

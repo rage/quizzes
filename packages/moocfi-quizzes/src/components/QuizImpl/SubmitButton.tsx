@@ -6,7 +6,6 @@ import { useTypedSelector } from "../../state/store"
 import * as quizAnswerActions from "../../state/quizAnswer/actions"
 import { StyledButton } from "../styleComponents"
 
-
 export interface SubmitButtonProps {
   disabled: boolean
   onClick: any

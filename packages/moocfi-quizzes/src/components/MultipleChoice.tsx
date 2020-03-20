@@ -1,11 +1,8 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import {  Typography } from "@material-ui/core"
-import {
-  GridDirection,
-  GridSize,
-} from "@material-ui/core/Grid"
+import { Typography } from "@material-ui/core"
+import { GridDirection, GridSize } from "@material-ui/core/Grid"
 import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
@@ -13,9 +10,7 @@ import { QuizItem, QuizItemOption, QuizItemAnswer } from "../modelTypes"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
 import MarkdownText from "./MarkdownText"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import {
-  faExclamationCircle,
-} from "@fortawesome/free-solid-svg-icons"
+import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons"
 import ThemeProviderContext from "../contexes/themeProviderContext"
 import ChoiceButton from "./ChoiceButton"
 
@@ -45,7 +40,6 @@ const CentralizedOnSmallScreenTypography = styled(Typography)`
     text-align: center;
   }
 `
-
 
 const AttentionIcon = styled(FontAwesomeIcon)`
   font-size: 30px !important;
@@ -121,7 +115,6 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   let questionWidth: 5 | 12 = 5
   let optionWidth: GridSize = "auto"
 
-
   return (
     <div role="group" aria-label={item.texts[0].title}>
       <ItemContent
@@ -135,7 +128,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
             onlyOneItem={onlyOneItem}
             questionWidth={questionWidth}
           />
-         
+
           <ChoicesContainer direction={direction} onlyOneItem={onlyOneItem}>
             {options
               .sort((o1, o2) => o1.order - o2.order)
@@ -195,7 +188,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
           removeParagraphs
           variant="subtitle1"
           component="p"
-          id="item-question"
+          id={`item-question-${title}`}
         >
           {title}
         </LeftAlignedMarkdownText>
@@ -204,7 +197,11 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
       {body && <MarkdownText>{body}</MarkdownText>}
 
       {selectOptionsLabel && (
-        <SelectOptionsLabelTypography component="p" variant="subtitle1" onlyOneItem={onlyOneItem}>
+        <SelectOptionsLabelTypography
+          component="p"
+          variant="subtitle1"
+          onlyOneItem={onlyOneItem}
+        >
           {selectOptionsLabel}
         </SelectOptionsLabelTypography>
       )}
@@ -279,8 +276,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
           correct={false}
           onClick={handleOptionChange(option.id)}
           disabled={quizDisabled}
-          aria-selected={optionIsSelected}
-          
+          aria-pressed={optionIsSelected}
         >
           <MarkdownText Component={styled.div``} removeParagraphs>
             {text.title}
@@ -309,7 +305,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
             correct={option.correct}
             {...clickOptions}
             aria-selected={optionIsSelected}
-            aria-label={`${text.title}-${option.correct ? "correct" : "incorrect"}`}
+            aria-label={`${text.title}-${
+              option.correct ? "correct" : "incorrect"
+            }`}
           >
             <MarkdownText Component={styled.div``} removeParagraphs>
               {text.title}
@@ -323,7 +321,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             shouldBeGray={shouldBeGray}
             providedStyles={themeProvider.optionWrapperStyles}
           >
-            <FeedbackPortion item={item} selectedOption={option}/>
+            <FeedbackPortion item={item} selectedOption={option} />
           </OptionWrapper>
         )}
       </React.Fragment>
@@ -341,8 +339,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
           correct={option.correct}
           {...clickOptions}
           aria-selected={optionIsSelected}
-          aria-label={`${text.title}-${option.correct ? "correct" : "incorrect"}`}
-          
+          aria-label={`${text.title}-${
+            option.correct ? "correct" : "incorrect"
+          }`}
         >
           <MarkdownText Component={styled.div``} removeParagraphs>
             {text.title}
@@ -420,7 +419,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 
   if (ThemedDiv) {
     return (
-      <ThemedDiv correct={correct} onlyOneItem={onlyOneItem} >
+      <ThemedDiv correct={correct} onlyOneItem={onlyOneItem}>
         <CentralizedOnSmallScreenTypography variant="body1">
           {feedbackMessage}
         </CentralizedOnSmallScreenTypography>
@@ -429,8 +428,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   }
 
   return (
-    
-    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem} >
+    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem}>
       <CentralizedOnSmallScreenTypography variant="body1">
         <AttentionIcon icon={faExclamationCircle} />
       </CentralizedOnSmallScreenTypography>

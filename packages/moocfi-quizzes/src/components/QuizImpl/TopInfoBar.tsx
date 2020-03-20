@@ -50,7 +50,6 @@ const PointsText = styled(Typography)`
   }
 `
 
-
 const PointsLabelText = styled(Typography)`
   font-size: 1rem !important;
 
@@ -59,7 +58,6 @@ const PointsLabelText = styled(Typography)`
     margin-top: 10px;
   }
 `
-
 
 const SpaceFillerDiv = styled.div`
   max-height: 31.2px;

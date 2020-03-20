@@ -1,10 +1,6 @@
 import * as React from "react"
 import styled from "styled-components"
-import {
-  Stepper,
-  StepLabel,
-  Step,
-} from "@material-ui/core"
+import { Stepper, StepLabel, Step } from "@material-ui/core"
 import { useTypedSelector } from "../../state/store"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
 
@@ -39,7 +35,6 @@ const StageVisualizer = () => {
     stageLabels.receivingPeerReviewsStageLabel,
     stageLabels.evaluationStageLabel,
   ]
-
 
   return (
     <StyledStepper

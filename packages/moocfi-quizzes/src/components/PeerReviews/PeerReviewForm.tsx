@@ -1,12 +1,8 @@
 import * as React from "react"
-import { useContext, useRef, useState } from "react"
+import { useContext, useRef, useState, useEffect } from "react"
 import { useDispatch } from "react-redux"
 import LikertScale from "likert-react"
-import {
-  CircularProgress,
-  TextField,
-  Typography,
-} from "@material-ui/core"
+import { CircularProgress, TextField, Typography } from "@material-ui/core"
 import MarkdownText from "../MarkdownText"
 import PeerReviewOption from "./PeerReviewOption"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
@@ -30,7 +26,6 @@ import {
   withMargin,
 } from "../styleComponents"
 import styled from "styled-components"
-
 import SelectButton from "./SelectButton"
 import SpamButton from "./SpamButton"
 import PeerReviewSubmitButton from "./PeerReviewSubmitButton"
@@ -49,7 +44,7 @@ const ButtonWrapper = styled.div<ButtonWrapperProps>`
   }
   ${({ providedStyles }) => providedStyles}
 `
-const PeerReviewFormContainer = styled.div<{
+export const PeerReviewFormContainer = styled.div<{
   providedStyles: string | undefined
 }>`
   ${({ providedStyles }) => providedStyles}
@@ -71,13 +66,23 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 }) => {
   const themeProvider = useContext(ThemeProviderContext)
   const ref = useState(useRef(null))[0]
+  const focusRef = useRef<HTMLParagraphElement>(null)
   const answersToReview = useTypedSelector(state => state.peerReviews.options)
   const peerReview = useTypedSelector(state => state.peerReviews.answer)
   const error = useTypedSelector(state => state.message.error)
   const dispatch = useDispatch()
+  console.log(peerReview)
+
+  useEffect(
+    () => {
+      focusRef.current && focusRef.current.focus()
+    },
+    [Boolean(peerReview)],
+  )
 
   const unselectAnswer = () => {
     dispatch(peerReviewsActions.unselectAnswer())
+
     scrollToRef(ref)
   }
 
@@ -102,7 +107,6 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 
   const Instructions = withMargin(BoldTypographyMedium, "2rem 0 0")
   const OptionTypography = withMargin(BoldTypography, "0 0 1rem")
-
   // choice has been made
   if (peerReview) {
     const chosenAnswer = answersToReview.find(
@@ -117,7 +121,9 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
         providedStyles={themeProvider.peerReviewFormStyles}
       >
         <div ref={ref} />
-        <Instructions>{languageInfo.chosenEssayInstruction}</Instructions>
+        <Instructions ref={focusRef} tabIndex={-1}>
+          {languageInfo.chosenEssayInstruction}
+        </Instructions>
         <TopMarginDivLarge>
           <PeerReviewOption answer={chosenAnswer} />
           <ButtonWrapper providedStyles={themeProvider.buttonWrapperStyles}>
@@ -141,7 +147,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
     >
       <div ref={ref} />
       <TopMarginDivLarge>
-        <BoldTypographyMedium>
+        <BoldTypographyMedium ref={focusRef} tabIndex={-1}>
           {languageInfo.chooseEssayInstruction}
         </BoldTypographyMedium>
       </TopMarginDivLarge>
@@ -181,8 +187,8 @@ const PeerReviewQuestions: React.FunctionComponent<
   const dispatch = useDispatch()
   const languages = useTypedSelector(state => state.language.languageLabels)
   const HiddenLikertDescription = styled.p`
-    position:absolute;
-    left:-10000px;
+    position: absolute;
+    left: -10000px;
   `
 
   if (!quiz) {
@@ -242,7 +248,9 @@ const PeerReviewQuestions: React.FunctionComponent<
             aria-label={languages.peerReviews.peerReviewGroupTitle}
             aria-describedby="peer-review-info"
           >
-            <HiddenLikertDescription id="peer-review-info">{languages.peerReviews.peerReviewLikertDetails}</HiddenLikertDescription>
+            <HiddenLikertDescription id="peer-review-info">
+              {languages.peerReviews.peerReviewLikertDetails}
+            </HiddenLikertDescription>
             {block.map(question => {
               let currentPeerReviewAnswer = peerReview.answers.find(
                 answer => answer.peerReviewQuestionId === question.id,
@@ -267,7 +275,7 @@ const PeerReviewQuestions: React.FunctionComponent<
                   currentPeerReviewAnswer = currentPeerReviewAnswer as PeerReviewGradeAnswer
 
                   return (
-                  <LikertScale
+                    <LikertScale
                       key={question.id}
                       separatorType={
                         themeProvider.likertSeparatorType || "dotted-line"
@@ -280,7 +288,6 @@ const PeerReviewQuestions: React.FunctionComponent<
                       ]}
                       onClick={changeInPeerReviewGrade(question.id)}
                     />
-                   
                   )
                 default:
                   return (

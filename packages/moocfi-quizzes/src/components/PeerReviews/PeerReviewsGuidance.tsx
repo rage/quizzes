@@ -1,10 +1,7 @@
 import * as React from "react"
 import styled from "styled-components"
 import { useTypedSelector } from "../../state/store"
-import {
-  BoldTypographyLarge,
-  withMargin,
-} from "../styleComponents"
+import { BoldTypographyLarge, withMargin } from "../styleComponents"
 import MarkdownText from "../MarkdownText"
 
 import ThemeProviderContext from "../../contexes/themeProviderContext"
@@ -23,7 +20,7 @@ type PeerReviewsGuidanceProps = {
 
 const PeerReviewsGuidance: React.FunctionComponent<
   PeerReviewsGuidanceProps
-> = ({ givenLabel, guidanceText, peerReviewsCompletedInfo }) => {
+> = ({ givenLabel, guidanceText }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const quiz = useTypedSelector(state => state.quiz)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
@@ -32,6 +29,7 @@ const PeerReviewsGuidance: React.FunctionComponent<
 
   const GivenCount = withMargin(BoldTypographyLarge, "2rem 0 0 ")
   const Instructions = withMargin(MarkdownText, "1.5rem 0 0 ")
+  React.useEffect(() => console.log("Title rerenders"))
 
   return (
     <PeerReviewsGuidanceContainer
