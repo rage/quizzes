@@ -126,10 +126,11 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
     }
 
     return (
-      
       <Form providedStyles={themeProvider.peerReviewFormStyles}>
         <div ref={ref} />
-        <Instructions ref={focusRef} tabIndex={-1}>{languageInfo.chosenEssayInstruction}</Instructions>
+        <Instructions ref={focusRef} tabIndex={-1}>
+          {languageInfo.chosenEssayInstruction}
+        </Instructions>
         <TopMarginDivLarge>
           <PeerReviewOption answer={chosenAnswer} />
           <ButtonWrapper providedStyles={themeProvider.buttonWrapperStyles}>

@@ -17,8 +17,6 @@ import {
 } from "../styleComponents"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
 
-
-
 const PeerReviewContainer = styled.div<{ providedStyles: string | undefined }>`
   ${({ providedStyles }) => providedStyles}
 `
@@ -28,7 +26,6 @@ const HiddenWrapper = styled(TopMarginDivLarge)<{ providedStyles?: string }>`
 `
 
 const PeerReviews: React.FunctionComponent = () => {
-
   const ref = useState(useRef(null))[0]
   const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
