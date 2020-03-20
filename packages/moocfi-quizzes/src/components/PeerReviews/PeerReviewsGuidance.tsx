@@ -1,14 +1,12 @@
 import * as React from "react"
 import styled from "styled-components"
+import ThemeProviderContext from "../../contexes/themeProviderContext"
+
 import { useTypedSelector } from "../../state/store"
 import { BoldTypographyLarge, withMargin } from "../styleComponents"
 import MarkdownText from "../MarkdownText"
 
-import ThemeProviderContext from "../../contexes/themeProviderContext"
-
-const PeerReviewsGuidanceContainer = styled.div<{
-  providedStyles: string | undefined
-}>`
+const Guidance = styled.div<{ providedStyles?: string }>`
   ${({ providedStyles }) => providedStyles}
 `
 
@@ -20,7 +18,7 @@ type PeerReviewsGuidanceProps = {
 
 const PeerReviewsGuidance: React.FunctionComponent<
   PeerReviewsGuidanceProps
-> = ({ givenLabel, guidanceText }) => {
+> = ({ givenLabel, guidanceText, peerReviewsCompletedInfo }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const quiz = useTypedSelector(state => state.quiz)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
@@ -32,14 +30,12 @@ const PeerReviewsGuidance: React.FunctionComponent<
   React.useEffect(() => console.log("Title rerenders"))
 
   return (
-    <PeerReviewsGuidanceContainer
-      providedStyles={themeProvider.peerReviewGuidanceStyles}
-    >
+    <Guidance providedStyles={themeProvider.peerReviewGuidanceStyles}>
       <GivenCount component="p" variant="subtitle1">
         {givenLabel}: {given}/{required}
       </GivenCount>
       <Instructions Component="p">{guidanceText}</Instructions>
-    </PeerReviewsGuidanceContainer>
+    </Guidance>
   )
 }
 

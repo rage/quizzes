@@ -30,7 +30,6 @@ import SelectButton from "./SelectButton"
 import SpamButton from "./SpamButton"
 import PeerReviewSubmitButton from "./PeerReviewSubmitButton"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
-import CourseProgressProviderContext from "../../contexes/courseProgressProviderContext"
 
 interface ButtonWrapperProps {
   providedStyles: string | undefined
@@ -44,11 +43,21 @@ const ButtonWrapper = styled.div<ButtonWrapperProps>`
   }
   ${({ providedStyles }) => providedStyles}
 `
-export const PeerReviewFormContainer = styled.div<{
-  providedStyles: string | undefined
-}>`
+
+const Loading = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 2rem 0 0 1rem;
+  p {
+    margin-top: 1rem;
+  }
+`
+
+const Form = styled.div<{ providedStyles?: string }>`
   ${({ providedStyles }) => providedStyles}
 `
+
 interface QuestionBlockWrapperProps {
   providedStyles: string | undefined
 }
@@ -88,7 +97,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 
   if (!answersToReview) {
     return (
-      <div>
+      <Loading>
         {error ? (
           <div />
         ) : (
@@ -97,7 +106,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
             <Typography>{languageInfo.loadingLabel}</Typography>
           </>
         )}
-      </div>
+      </Loading>
     )
   }
 
@@ -117,13 +126,10 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
     }
 
     return (
-      <PeerReviewFormContainer
-        providedStyles={themeProvider.peerReviewFormStyles}
-      >
+      
+      <Form providedStyles={themeProvider.peerReviewFormStyles}>
         <div ref={ref} />
-        <Instructions ref={focusRef} tabIndex={-1}>
-          {languageInfo.chosenEssayInstruction}
-        </Instructions>
+        <Instructions ref={focusRef} tabIndex={-1}>{languageInfo.chosenEssayInstruction}</Instructions>
         <TopMarginDivLarge>
           <PeerReviewOption answer={chosenAnswer} />
           <ButtonWrapper providedStyles={themeProvider.buttonWrapperStyles}>
@@ -137,14 +143,12 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
             scrollRef={ref}
           />
         </TopMarginDivLarge>
-      </PeerReviewFormContainer>
+      </Form>
     )
   }
 
   return (
-    <PeerReviewFormContainer
-      providedStyles={themeProvider.peerReviewFormStyles}
-    >
+    <Form providedStyles={themeProvider.peerReviewFormStyles}>
       <div ref={ref} />
       <TopMarginDivLarge>
         <BoldTypographyMedium ref={focusRef} tabIndex={-1}>
@@ -164,7 +168,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
           />
         </TopMarginDivLarge>
       ))}
-    </PeerReviewFormContainer>
+    </Form>
   )
 }
 
@@ -178,7 +182,6 @@ const PeerReviewQuestions: React.FunctionComponent<
   PeerReviewQuestionsProps
 > = ({ peerReview, languageInfo, scrollRef }) => {
   const themeProvider = useContext(ThemeProviderContext)
-  const courseProgressProvider = React.useContext(CourseProgressProviderContext)
   const quiz = useTypedSelector(state => state.quiz)
   const submitDisabled = useTypedSelector(
     state => state.peerReviews.submitDisabled,
@@ -217,8 +220,6 @@ const PeerReviewQuestions: React.FunctionComponent<
 
   const submitPeerReview = () => {
     dispatch(peerReviewsActions.submit())
-    courseProgressProvider.refreshProgress &&
-      courseProgressProvider.refreshProgress()
     scrollToRef(scrollRef)
   }
 

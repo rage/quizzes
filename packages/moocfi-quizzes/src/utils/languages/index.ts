@@ -1,5 +1,8 @@
-import finnishLabels from "./finnish_options"
 import englishLabels from "./english_options"
+import estonianLabels from "./estonian_options"
+import finnishLabels from "./finnish_options"
+import germanLabels from "./german_options"
+import swedishLabels from "./swedish_options"
 import { QuizPointsGrantingPolicy } from "../../modelTypes"
 
 export type GeneralLabels = {
@@ -27,6 +30,10 @@ export type GeneralLabels = {
   answered: string
   unanswered: string
   rejected: string
+  progressUpdated: string
+  answerConfirmed: string
+  answerConfirmedFor: (title: string) => string
+  courseCompleted: string
 }
 
 export type StageLabels = {
@@ -91,6 +98,8 @@ export type ReceivedPeerReviewLabels = {
   detailedViewLabel: string
   summaryViewLabel: string
   peerReviewLabel: string
+  peerReviewReceived: string
+  peerReviewReceivedFor: (title: string) => string
 }
 
 export type UnsupportedLabels = {
@@ -105,8 +114,11 @@ export type OpenLabels = {
 }
 
 export type ErrorLabels = {
+  progressFetchError: string
   submitFailedError: string
   quizLoadFailedError: string
+  submitSpamFlagError: string
+  fetchReviewCandidatesError: string
 }
 
 export type SingleLanguageLabels = {
@@ -126,6 +138,9 @@ export type LanguageLabels = {
 }
 
 export const languageOptions: LanguageLabels = {
-  fi_FI: finnishLabels,
   en_US: englishLabels,
+  et_EE: estonianLabels,
+  fi_FI: finnishLabels,
+  de_DE: germanLabels,
+  sv_SE: swedishLabels,
 }

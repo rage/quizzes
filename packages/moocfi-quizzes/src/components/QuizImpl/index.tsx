@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useEffect } from "react"
+import { useContext, useEffect, useRef } from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import { Typography } from "@material-ui/core"
@@ -7,6 +7,7 @@ import * as quizAnswerActions from "../../state/quizAnswer/actions"
 import * as messageActions from "../../state/message/actions"
 
 import { initialize } from "../../state/actions"
+import { updateQuizState } from "../../state/user/actions"
 import Checkbox from "../CheckboxOption"
 import Feedback from "../Feedback"
 import MultipleChoice from "../MultipleChoice"
@@ -31,6 +32,9 @@ import Notification from "../Notification"
 import { BoldTypographyMedium } from "../styleComponents"
 
 import ThemeProviderContext from "../../contexes/themeProviderContext"
+import { CourseStatusProviderContext } from "../../contexes/courseStatusProviderContext"
+
+import { requestReviews } from "../../state/receivedReviews/actions"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
@@ -183,8 +187,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   showZeroPointsInfo = false,
   children,
 }) => {
-  const ref = React.useRef(null)
-  const themeProvider = React.useContext(ThemeProviderContext)
+  const ref = useRef(null)
+  const themeProvider = useContext(ThemeProviderContext)
+  const courseStatusProvider = useContext(CourseStatusProviderContext)
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
   const messageState = useTypedSelector(state => state.message)
@@ -202,6 +207,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const dispatch = useDispatch()
 
   const fatal = messageState.fatal
+  const error = messageState.error
 
   useEffect(
     () => {
@@ -220,11 +226,19 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   )
 
   if (fatal) {
+    console.log("quiz")
+    courseStatusProvider.notifyError &&
+      courseStatusProvider.notifyError(messageState.message)
     return (
       <Error>
         <p>{messageState.message}</p>
       </Error>
     )
+  }
+
+  if (error) {
+    courseStatusProvider.notifyError &&
+      courseStatusProvider.notifyError(messageState.message)
   }
 
   const CustomLogin = customContent && customContent.Login
@@ -245,6 +259,16 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   }
   if (!languageInfo) {
     return <div>language info not set</div>
+  }
+
+  if (
+    courseStatusProvider.updateQuiz &&
+    courseStatusProvider.updateQuiz[quiz.id]
+  ) {
+    dispatch(updateQuizState())
+    dispatch(requestReviews())
+    courseStatusProvider.quizUpdated &&
+      courseStatusProvider.quizUpdated(quiz.id)
   }
 
   const generalLabels = languageInfo.general
@@ -354,7 +378,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     >
       <TopInfoBar />
       <div ref={ref} />
-      <Notification scrollRef={ref} />
+      {/*<Notification scrollRef={ref} />*/}
       <QuizContentWrapper disabled={quizDisabled || wrongLocale}>
         <UpperContent providedStyles={themeProvider.upperContentStyles}>
           <Deadline deadline={quiz.deadline} />

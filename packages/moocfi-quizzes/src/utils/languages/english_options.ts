@@ -73,6 +73,9 @@ const englishLabels: SingleLanguageLabels = {
     toggleButtonExpandLabel: "Show all received peer reviews",
     toggleButtonShrinkLabel: "Hide",
     peerReviewLabel: "Peer review",
+    peerReviewReceived: "You have received a new peer review",
+    peerReviewReceivedFor: (title: string) =>
+      `You have received a new peer review in the exercise ${title}`,
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
@@ -126,10 +129,21 @@ const englishLabels: SingleLanguageLabels = {
     answered: "Answered",
     unanswered: "Unanswered",
     rejected: "Rejected answer, try again",
+    progressUpdated: "Course progress updated",
+    answerConfirmed: "Your answer was confirmed!",
+    answerConfirmedFor: (title: string) =>
+      `Your answer to exercise ${title} was confirmed!`,
+    courseCompleted: "You have completed the course!",
   },
   error: {
     submitFailedError: "Could not send your answer. Please try again later.",
     quizLoadFailedError: "Could not load the exercise",
+    progressFetchError:
+      "Suoritustietojen lataaminen ei onnistunut. Kokeile myöhemmin uudestaan",
+    submitSpamFlagError:
+      "Asiattomasta vastauksesta ilmoittaminen ei onnistunut",
+    fetchReviewCandidatesError:
+      "Vastausten lataaminen vertaisarviota varten ei onnistunut. Kokeile myöhemmin uudestaan.",
   },
 }
 

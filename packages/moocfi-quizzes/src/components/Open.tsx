@@ -91,7 +91,8 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
         fullWidth
         margin="normal"
         variant="outlined"
-        label={itemTitle ? itemTitle : openLabels.placeholder}
+        //label={itemTitle ? itemTitle : openLabels.placeholder}
+        label={openLabels.placeholder}
         id={`${itemTitle}-textfield`}
       />
     )
@@ -106,7 +107,14 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
             </Typography>
           }
           {answerPortion}
-          <FeedbackMessage correct={correct}>
+          <FeedbackMessage
+            correct={correct}
+            message={
+              correct
+                ? openLabels.feedbackForSuccess
+                : openLabels.feedbackForFailure
+            }
+          >
             <MarkdownText Component={Typography} variant="body1">
               {correct
                 ? successMessage || openLabels.feedbackForSuccess
@@ -129,7 +137,8 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
           fullWidth
           margin="normal"
           variant="outlined"
-          label={itemTitle ? itemTitle : openLabels.placeholder}
+          //label={itemTitle ? itemTitle : openLabels.placeholder}
+          label={openLabels.placeholder}
           disabled={quizDisabled}
           id={`${itemTitle}-textfield`}
         />

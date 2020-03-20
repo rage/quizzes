@@ -56,9 +56,6 @@ const finnishLabels: SingleLanguageLabels = {
     answerFlaggedAsSpam: "Vastauksesi on hylätty epäasiallisena",
     answerConfirmed: "Vastaus hyväksytty!",
     manualReview: "Vastauksesi odottaa kurssihenkilökunnan arviota",
-    peerReviewGroupTitle: "Vertaisarviointikysymykset",
-    peerReviewLikertDetails:
-      "Arvioi jokainen väite asteikolla 1-5. 1 on vahvasti eri mieltä ja 5 on vahvasti samaa mieltä.",
   },
   receivedPeerReviews: {
     errorLabel:

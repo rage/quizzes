@@ -25,10 +25,24 @@ const ReceivedPeerReviewsContainer = styled(TopMarginDivLarge)<{
   ${({ providedStyles }) => providedStyles}
 `
 
+const Loading = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1.5rem 0 0 1rem;
+  p {
+    margin-top: 0.5rem;
+  }
+`
+
+const Received = styled(TopMarginDivLarge)<{ providedStyles?: string }>`
+  ${({ providedStyles }) => providedStyles}
+`
+
 const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
-
+  const themeProvider = React.useContext(ThemeProviderContext)
   const receivedReviews = useTypedSelector(
     state => state.receivedReviews.reviews,
   )
@@ -55,7 +69,7 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
 
   if (!receivedReviews) {
     return (
-      <div>
+      <Loading>
         {error ? (
           <div />
         ) : (
@@ -64,14 +78,12 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
             <Typography>{receivedReviewsLabels.loadingLabel}</Typography>
           </>
         )}
-      </div>
+      </Loading>
     )
   }
 
   return (
-    <ReceivedPeerReviewsContainer
-      providedStyles={themeProvider.receivedPeerReviewsStyles}
-    >
+    <Received providedStyles={themeProvider.receivedPeerReviewsStyles}>
       <ReceivedReviewsSummary
         peerReviews={receivedReviews}
         peerReviewQuestions={peerReviewQuestions}
@@ -91,7 +103,7 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
           />
         </Togglable>
       )}
-    </ReceivedPeerReviewsContainer>
+    </Received>
   )
 }
 
@@ -112,6 +124,7 @@ const ReceivedReviewsDetailed: React.FunctionComponent<
         )
         .map((pr, idx) => (
           <ReceivedPeerReview
+            key={pr.id}
             questions={peerReviewQuestions}
             answer={pr}
             idx={idx}

@@ -25,6 +25,7 @@ const QuestionContainer = styled.div`
 interface ChoicesContainerProps {
   direction: string
   onlyOneItem: boolean
+  providedStyles: string | undefined
 }
 
 const ChoicesContainer = styled.div<ChoicesContainerProps>`
@@ -33,6 +34,8 @@ const ChoicesContainer = styled.div<ChoicesContainerProps>`
   flex-direction: ${({ direction }) => direction};
   padding-top: 7;
   ${({ onlyOneItem }) => onlyOneItem && "width: 100%"}
+  ${({ onlyOneItem, providedStyles }) =>
+    providedStyles && onlyOneItem && providedStyles}
 `
 
 const CentralizedOnSmallScreenTypography = styled(Typography)`
@@ -63,6 +66,7 @@ const ItemContent = styled.div<ItemContentProps>`
 export interface LeftBorderedDivProps {
   correct: boolean | undefined
   onlyOneItem?: boolean
+  message?: string
 }
 
 const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
@@ -115,6 +119,13 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   let questionWidth: 5 | 12 = 5
   let optionWidth: GridSize = "auto"
 
+  if (onlyOneItem) {
+    const maxOptionLength = Math.max(
+      ...options.map(option => option.texts[0].title.length),
+    )
+    direction = "column"
+  }
+
   return (
     <div role="group" aria-label={item.texts[0].title}>
       <ItemContent
@@ -129,7 +140,11 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
             questionWidth={questionWidth}
           />
 
-          <ChoicesContainer direction={direction} onlyOneItem={onlyOneItem}>
+          <ChoicesContainer
+            direction={direction}
+            onlyOneItem={onlyOneItem}
+            providedStyles={themeProvider.optionContainerStyles}
+          >
             {options
               .sort((o1, o2) => o1.order - o2.order)
               .map((option, index) => {
@@ -144,7 +159,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
               })}
           </ChoicesContainer>
         </div>
-        {!onlyOneItem && <FeedbackPortion item={item} />}
+        {/*!onlyOneItem && */ <FeedbackPortion item={item} />}
       </ItemContent>
     </div>
   )
@@ -182,7 +197,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 
   return (
     <QuestionContainer>
-      {title && (
+      {!onlyOneItem && title && (
         <LeftAlignedMarkdownText
           Component={SpaciousTypography}
           removeParagraphs
@@ -321,7 +336,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             shouldBeGray={shouldBeGray}
             providedStyles={themeProvider.optionWrapperStyles}
           >
-            <FeedbackPortion item={item} selectedOption={option} />
+            {/*<FeedbackPortion item={item} selectedOption={option} />*/}
           </OptionWrapper>
         )}
       </React.Fragment>
@@ -355,11 +370,11 @@ const Option: React.FunctionComponent<OptionProps> = ({
 interface IFeedbackPortionProps {
   item: QuizItem
   selectedOption?: QuizItemOption
+  onlyOneItem?: boolean
 }
 
 const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   item,
-  selectedOption,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const items = useTypedSelector(state => state.quiz!.items)
@@ -387,6 +402,14 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 
   const onlyOneItem = items.length === 1
   const generalLabels = languageLabels.general
+
+  const optionAnswers = itemAnswer && itemAnswer.optionAnswers
+
+  const optionAnswer = optionAnswers[0]
+
+  const selectedOption = item.options.find(
+    o => o.id === optionAnswer.quizOptionId,
+  )
 
   let feedbackMessage
   if (
@@ -419,7 +442,15 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 
   if (ThemedDiv) {
     return (
-      <ThemedDiv correct={correct} onlyOneItem={onlyOneItem}>
+      <ThemedDiv
+        correct={correct}
+        onlyOneItem={onlyOneItem}
+        message={
+          correct
+            ? generalLabels.answerCorrectLabel
+            : generalLabels.answerIncorrectLabel
+        }
+      >
         <CentralizedOnSmallScreenTypography variant="body1">
           {feedbackMessage}
         </CentralizedOnSmallScreenTypography>

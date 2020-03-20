@@ -12,9 +12,9 @@ import styled from "styled-components"
 import SimpleErrorBoundary from "./SimpleErrorBoundary"
 import { useInput, useLocalStorage } from "./customHooks"
 import {
-  CourseProgressProvider,
+  CourseStatusProvider,
   injectCourseProgress,
-} from "../../src/CourseProgressProvider"
+} from "../../src/CourseStatusProvider"
 
 const TallContainer = styled.div`
   padding-bottom: 1000px;
@@ -91,21 +91,14 @@ const App = () => {
   )
 
   const Div = styled.div`
-    display: flex;
+    display: block;
     flex-wrap: wrap;
     width: 100%;
     padding: 2rem;
     p {
       margin: auto;
-      text-align: center;
-      font-size: 2rem;
-    }
-    div {
-      height: 0;
-      flex-basis: 100;
-    }
-    button {
-      margin: auto;
+      text-align: left;
+      font-size: 1.5rem;
     }
   `
 
@@ -124,21 +117,15 @@ const App = () => {
         </Div>
       )
     }
-    return (
-      <Div>
-        <p>{JSON.stringify(props.userCourseProgress)}</p>
-        <p>{JSON.stringify(props.requiredActions)}</p>
-        <div />
-        <button onClick={props.refreshProgress}>Reload</button>
-      </Div>
-    )
+    return <Div>{JSON.stringify(props.courseProgressData)}</Div>
   }
   const Progress = injectCourseProgress(DataTest)
 
   return (
-    <CourseProgressProvider
-      courseId="833a49b4-1c5e-4c61-b512-8cd64dd8aa7e"
+    <CourseStatusProvider
+      courseId="08c4757a-51ec-4551-bdb6-46fba3da765b"
       accessToken={accessToken.value}
+      languageId={languageId.value}
     >
       <Typography variant="h4" component="h1">
         Quizzes testing
@@ -199,7 +186,7 @@ const App = () => {
           )}
         </SimpleErrorBoundary>
       </TallContainer>
-    </CourseProgressProvider>
+    </CourseStatusProvider>
   )
 }
 
