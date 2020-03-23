@@ -4,6 +4,11 @@ metadata:
   name: quizzes-ingress
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/server-snippet: |
+     location /ws {
+        deny all;
+        return 400;
+      }
 spec:
   tls:
   - hosts:
