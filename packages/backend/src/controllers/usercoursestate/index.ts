@@ -28,13 +28,13 @@ export class UserCourseStateController {
       user.id,
       courseId,
     )
-    if (!userCourseState) {
+    /*if (!userCourseState) {
       userCourseState = await this.userCourseStateService.createUserCourseState(
         this.entityManager,
         user.id,
         courseId,
       )
-    }
+    }*/
     return userCourseState
   }
 
