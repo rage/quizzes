@@ -12,12 +12,21 @@ export const set = createAction("answers/SET", resolve => {
 
 export const clear = createAction("answers/CLEAR")
 
+export const loadingStateChanged = createAction(
+  "answers/LOADING_STATE_CHANGED",
+  resolve => {
+    return (newState: boolean) => resolve(newState)
+  },
+)
+
 export const setAllAnswers = (
   quizId: string,
   wantedPageNumber: number,
   answersPerPage: number,
 ) => {
   return async (dispatch, getState) => {
+    dispatch(loadingStateChanged(true))
+
     try {
       // dispatch(clear())
       const data = await getQuizAnswers(
@@ -28,6 +37,7 @@ export const setAllAnswers = (
       )
       await dispatch(set(data))
     } catch (error) {
+      dispatch(loadingStateChanged(false))
       console.log(error)
     }
   }
@@ -39,6 +49,8 @@ export const setAttentionRequiringAnswers = (
   answersPerPage: number,
 ) => {
   return async (dispatch, getState) => {
+    dispatch(loadingStateChanged(true))
+
     try {
       const data = await getAttentionRequiringQuizAnswers(
         quizId,
@@ -92,6 +104,7 @@ export const setAttentionRequiringAnswers = (
 
       await dispatch(set(newData))
     } catch (error) {
+      dispatch(loadingStateChanged(false))
       console.log(error)
     }
   }

@@ -30,7 +30,6 @@ class QuizStatistics extends React.Component<any, any> {
       displayingPage: 1,
       answersPerPage: 10,
       scrollDownAfterUpdate: false,
-      waitingForNewAnswers: false,
     }
   }
 
@@ -91,6 +90,7 @@ class QuizStatistics extends React.Component<any, any> {
   }
 
   public render() {
+    console.log("loading: ", this.props.answersLoading)
     if (!this.props.quizzesOfCourse) {
       return <p />
     }
@@ -245,7 +245,7 @@ class QuizStatistics extends React.Component<any, any> {
 
                 <Grid item={true} xs={12} md={8}>
                   <Answers
-                    inWaitingState={this.state.waitingForNewAnswers}
+                    inWaitingState={this.props.answersLoading}
                     answers={this.props.answers}
                     quiz={quiz}
                     showingAll={this.state.showingAll}
@@ -341,7 +341,6 @@ class QuizStatistics extends React.Component<any, any> {
 
     this.setState({
       displayingPage: newPage,
-      waitingForNewAnswers: true,
     })
 
     if (this.state.showingAll) {
@@ -357,19 +356,17 @@ class QuizStatistics extends React.Component<any, any> {
         this.state.answersPerPage,
       )
     }
-    this.setState({
-      waitingForNewAnswers: false,
-    })
   }
 }
 
 const mapStateToProps = (state: any) => {
   return {
     answerCounts: state.answerCounts,
-    answers: state.answers,
+    answers: state.answers.data,
     quizzesOfCourse: state.quizzes.courseInfos.find(
       qi => qi.courseId === state.filter.course,
     ),
+    answersLoading: state.answers.loading,
     courses: state.courses,
     filter: state.filter,
     user: state.user,
