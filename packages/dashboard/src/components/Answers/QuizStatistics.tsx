@@ -70,12 +70,12 @@ class QuizStatistics extends React.Component<any, any> {
     const showing = queryParams.all && queryParams.all === "true"
 
     if (showing) {
+      await this.props.setAllAnswersCount(this.props.match.params.id)
       this.props.setAllAnswers(
         this.props.match.params.id,
         this.state.displayingPage,
         this.state.answersPerPage,
       )
-      this.props.setAllAnswersCount(this.props.match.params.id)
     } else {
       this.props.setAttentionRequiringAnswers(
         this.props.match.params.id,
@@ -90,7 +90,6 @@ class QuizStatistics extends React.Component<any, any> {
   }
 
   public render() {
-    console.log("loading: ", this.props.answersLoading)
     if (!this.props.quizzesOfCourse) {
       return <p />
     }

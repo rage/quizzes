@@ -88,14 +88,18 @@ export const setAttentionRequiringAnswers = (
             return {
               ...pr,
               answers: pr.answers.sort((a1, a2) => {
-                return (
-                  peerReviewQuestions.find(
-                    q => q.id === a1.peerReviewQuestionId,
-                  ).order -
-                  peerReviewQuestions.find(
-                    q => q.id === a2.peerReviewQuestionId,
-                  ).order
+                const prq1 = peerReviewQuestions.find(
+                  q => q.id === a1.peerReviewQuestionId,
                 )
+                const prq2 = peerReviewQuestions.find(
+                  q => q.id === a2.peerReviewQuestionId,
+                )
+
+                if (!prq1 || !prq2) {
+                  return -1
+                }
+
+                return prq1.order - prq2.order
               }),
             }
           }),
