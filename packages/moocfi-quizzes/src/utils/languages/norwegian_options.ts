@@ -128,18 +128,18 @@ const norwegianLabels: SingleLanguageLabels = {
           return ""
       }
     },
-    answered: "Vastattu",
-    unanswered: "Vastaamaton",
-    rejected: "Vastaus hylätty, yritä uudelleen",
-    progressUpdated: "Kurssipisteesi ovat päivittyneet",
-    answerConfirmed: "Vastauksesi on hyväksytty",
+    answered: "Answered",
+    unanswered: "Unanswered",
+    rejected: "Rejected answer, try again",
+    progressUpdated: "Course progress updated",
+    answerConfirmed: "Your answer was confirmed!",
     answerConfirmedFor: (title: string) =>
-      `Vastauksesi tehtävään ${title} on hyväksytty`,
-    courseCompleted: "Olet päässyt läpi kurssista!",
+      `Your answer to exercise ${title} was confirmed!`,
+    courseCompleted: "You have completed the course!",
   },
   error: {
-    submitFailedError: "Kunne ikke sende svaret. Prøv igjen senere.",
-    quizLoadFailedError: "Kunne ikke laste inn oppgaven.",
+    submitFailedError: "Could not send your answer. Please try again later.",
+    quizLoadFailedError: "Could not load the exercise",
     progressFetchError:
       "Suoritustietojen lataaminen ei onnistunut. Kokeile myöhemmin uudestaan",
     submitSpamFlagError:
