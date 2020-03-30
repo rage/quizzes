@@ -1,6 +1,6 @@
 import { SingleLanguageLabels } from "./index"
 
-const finnishLabels: SingleLanguageLabels = {
+const norwegianLabels: SingleLanguageLabels = {
   essay: {
     exampleAnswerLabel: "Eksempelsvar",
     userAnswerLabel: "Ditt svar",
