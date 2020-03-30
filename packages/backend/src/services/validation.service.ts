@@ -347,12 +347,6 @@ export default class ValidationService {
     }
 
     if (
-      !quiz.autoReject &&
-      userQuizState.spamFlags > 0 &&
-      this.openishStates.includes(quizAnswer.status)
-    ) {
-      quizAnswer.status = "manual-review"
-    } else if (
       quizAnswer.status === "submitted" ||
       quizAnswer.status === "given-enough" ||
       quizAnswer.status === "enough-received-but-not-given"
