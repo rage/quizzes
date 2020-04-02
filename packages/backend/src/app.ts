@@ -55,7 +55,10 @@ export class App {
     typeorm.useContainer(Container)
 
     if (process.env.SENTRY_DSN) {
-      Sentry.init({ dsn: process.env.SENTRY_DSN })
+      Sentry.init({
+        dsn: process.env.SENTRY_DSN,
+        release: `quizzes-backend@${process.env.GIT_COMMIT}`,
+      })
     }
 
     this.application = createExpressServer({
