@@ -4,6 +4,7 @@ import {
   ExpressMiddlewareInterface,
   Middleware,
   UseBefore,
+  UnauthorizedError,
 } from "routing-controllers"
 import { AuthenticationMiddleware } from "./authentication"
 
@@ -34,7 +35,11 @@ export class SentryErrorHandlerMiddleware
     return Sentry.Handlers.errorHandler({
       shouldHandleError(handledError: any) {
         // Discard all not founds and unauthorizeds
-        if (handledError.status === 404 || handledError.status === 401) {
+        if (
+          handledError.status === 404 ||
+          handledError.status === 401 ||
+          handledError instanceof UnauthorizedError
+        ) {
           return false
         }
         return true
