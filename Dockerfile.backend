@@ -1,5 +1,8 @@
 FROM node:11-alpine
 
+ARG GIT_COMMIT=""
+LABEL GIT_COMMIT=${GIT_COMMIT}
+
 RUN apk --no-cache update \
 && apk --no-cache add g++ make bash zlib-dev libpng-dev postgresql-client redis python2 \
 &&  rm -fr /var/cache/apk/*
@@ -25,3 +28,5 @@ RUN yarn build
 EXPOSE 3000
 
 CMD [ "yarn", "serve" ]
+
+ENV GIT_COMMIT=${GIT_COMMIT}
