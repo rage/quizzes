@@ -19,9 +19,14 @@ import { createExpressServer, useContainer } from "routing-controllers"
 import { Container, Service } from "typedi"
 import { logger } from "./config/winston"
 import controllers from "./controllers"
-import { AuthenticationMiddleware } from "./middleware/authentication"
 
 import * as typeorm from "typeorm"
+
+import { AuthenticationMiddleware } from "./middleware/authentication"
+import { SentryRequestHandlerMiddleware } from "./middleware/sentry"
+import { SentryErrorHandlerMiddleware } from "./middleware/sentry"
+
+import * as Sentry from "@sentry/node"
 
 if (process.env.NODE_ENV !== "production") {
   dotenv.config({ path: ".env" })
@@ -49,11 +54,22 @@ export class App {
     useContainer(Container)
     typeorm.useContainer(Container)
 
+    if (process.env.SENTRY_DSN) {
+      Sentry.init({
+        dsn: process.env.SENTRY_DSN,
+        release: `quizzes-backend@${process.env.GIT_COMMIT}`,
+      })
+    }
+
     this.application = createExpressServer({
       cors: true,
       // routePrefix: "/",
       controllers,
-      middlewares: [AuthenticationMiddleware],
+      middlewares: [
+        SentryRequestHandlerMiddleware,
+        AuthenticationMiddleware,
+        SentryErrorHandlerMiddleware,
+      ],
     })
 
     this.handlers.forEach(handler => this.application.use(handler))
