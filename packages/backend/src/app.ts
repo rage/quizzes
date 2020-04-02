@@ -28,6 +28,8 @@ import { SentryErrorHandlerMiddleware } from "./middleware/sentry"
 
 import * as Sentry from "@sentry/node"
 
+import { get } from "lodash"
+
 if (process.env.NODE_ENV !== "production") {
   dotenv.config({ path: ".env" })
 }
@@ -58,6 +60,13 @@ export class App {
       Sentry.init({
         dsn: process.env.SENTRY_DSN,
         release: `quizzes-backend@${process.env.GIT_COMMIT}`,
+        beforeSend(event) {
+          // Modify the event
+          if (get(event, "request.headers.user")) {
+            delete event.request.headers.user
+          }
+          return event
+        },
       })
     }
 
