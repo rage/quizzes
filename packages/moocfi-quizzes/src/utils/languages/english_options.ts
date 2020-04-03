@@ -45,8 +45,6 @@ const englishLabels: SingleLanguageLabels = {
       "You may still give peer reviews to help others",
     displayPeerReview: "Give peer review",
     hidePeerReviewLabel: "Hide",
-    quizInvolvesNoPeerReviewsInstruction: "This quiz involves no peer reviews",
-    peerReviewsInfoForLoggedOutUser: "The quiz includes peer reviews",
     essayQuestionAnswerTextBoxLabel: "Write a review",
     optionLabel: "Option",
     answerRejected: "Your answer has been rejected",

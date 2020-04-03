@@ -76,8 +76,6 @@ export type PeerReviewLabels = {
   submitPeerReviewLabel: string
   hidePeerReviewLabel: string
   loadingLabel: string
-  quizInvolvesNoPeerReviewsInstruction: string
-  peerReviewsInfoForLoggedOutUser: string
   essayQuestionAnswerTextBoxLabel: string
   optionLabel: string
   answerRejected: string

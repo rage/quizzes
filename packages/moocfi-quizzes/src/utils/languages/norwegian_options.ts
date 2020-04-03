@@ -48,9 +48,6 @@ const norwegianLabels: SingleLanguageLabels = {
     reportAsInappropriateLabel: "Rapporter som spam",
     submitPeerReviewLabel: "Send inn vurdering",
     hidePeerReviewLabel: "Skjul",
-    quizInvolvesNoPeerReviewsInstruction:
-      "Tähän tehtävään ei liity vertaisarvioita",
-    peerReviewsInfoForLoggedOutUser: "Kyselyyn liittyy vertaisarviointiosio",
     essayQuestionAnswerTextBoxLabel: "Skriv en vurdering",
     optionLabel: "Alternativ",
     answerRejected: "Svaret ditt er avvist",
@@ -75,9 +72,9 @@ const norwegianLabels: SingleLanguageLabels = {
     detailedViewLabel: "Alle fagfellevurderingene svaret ditt har fått",
     summaryViewLabel: "Mottatte fagfellevurderinger:",
     peerReviewLabel: "Fagfellevurdering",
-    peerReviewReceived: "Olet saanut uuden vertaisarvion",
+    peerReviewReceived: "Du har mottatt en ny fagfellevurdering",
     peerReviewReceivedFor: (title: string) =>
-      `Olet saanut uuden vertaisarvion tehtävässä ${title}`,
+      `Du har mottatt en ny fagfellevurdering for trening: ${title}`,
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
@@ -128,24 +125,23 @@ const norwegianLabels: SingleLanguageLabels = {
           return ""
       }
     },
-    answered: "Answered",
-    unanswered: "Unanswered",
-    rejected: "Rejected answer, try again",
-    progressUpdated: "Course progress updated",
-    answerConfirmed: "Your answer was confirmed!",
+    answered: "Besvart",
+    unanswered: "Ubesvart",
+    rejected: "Avvist svar, prøv igjen",
+    progressUpdated: "Kursens fremgang oppdatert",
+    answerConfirmed: "Svaret ditt ble bekreftet!",
     answerConfirmedFor: (title: string) =>
-      `Your answer to exercise ${title} was confirmed!`,
-    courseCompleted: "You have completed the course!",
+      `Svaret ditt på oppgave ${title} ble bekreftet!`,
+    courseCompleted: "Du har fullført kurset!",
   },
   error: {
-    submitFailedError: "Could not send your answer. Please try again later.",
-    quizLoadFailedError: "Could not load the exercise",
+    submitFailedError: "Kunne ikke sende svaret. Prøv igjen senere.",
+    quizLoadFailedError: "Kunne ikke laste opp øvelsen",
     progressFetchError:
-      "Suoritustietojen lataaminen ei onnistunut. Kokeile myöhemmin uudestaan",
-    submitSpamFlagError:
-      "Asiattomasta vastauksesta ilmoittaminen ei onnistunut",
+      "Kunne ikke hente fremdriftsdata for kurset. Prøv igjen senere.",
+    submitSpamFlagError: "Kunne ikke rapportere spam",
     fetchReviewCandidatesError:
-      "Vastausten lataaminen vertaisarviota varten ei onnistunut. Kokeile myöhemmin uudestaan.",
+      "Noe gikk galt mens du hentet svar for fagfellevurdering. Prøv igjen senere.",
   },
 }
 

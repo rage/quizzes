@@ -48,9 +48,6 @@ const finnishLabels: SingleLanguageLabels = {
     reportAsInappropriateLabel: "Als Spam melden",
     submitPeerReviewLabel: "Evaluation abgeben",
     hidePeerReviewLabel: "Ausblenden",
-    quizInvolvesNoPeerReviewsInstruction:
-      "Tähän tehtävään ei liity vertaisarvioita",
-    peerReviewsInfoForLoggedOutUser: "Kyselyyn liittyy vertaisarviointiosio",
     essayQuestionAnswerTextBoxLabel: "Evaluation erstellen",
     optionLabel: "Alternative",
     answerRejected: "Deine Antwort wurde abgelehnt",

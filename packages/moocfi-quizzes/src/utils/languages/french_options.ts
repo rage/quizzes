@@ -50,10 +50,6 @@ const frenchLabels: SingleLanguageLabels = {
     reportAsInappropriateLabel: "Signaler comme inappropriée",
     submitPeerReviewLabel: "Soumettre une évaluation",
     hidePeerReviewLabel: "Cacher",
-    quizInvolvesNoPeerReviewsInstruction:
-      "Ce quiz n'implique pas d'évaluation par les pairs",
-    peerReviewsInfoForLoggedOutUser:
-      "Ce quiz prévoit des évaluations par les pairs",
     essayQuestionAnswerTextBoxLabel: "Rédiger une évaluation",
     optionLabel: "Option",
     answerRejected: "Votre réponse a été refusée",
