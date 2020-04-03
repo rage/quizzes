@@ -49,7 +49,7 @@ const PeerReviews: React.FunctionComponent = () => {
   if (quizDisabled) {
     return (
       <Typography component="p" variant="subtitle1">
-        {languageInfo.peerReviews.peerReviewsInfoForLoggedOutUser}
+        {/*languageInfo.peerReviews.peerReviewsInfoForLoggedOutUser*/}
       </Typography>
     )
   }
@@ -72,7 +72,7 @@ const PeerReviews: React.FunctionComponent = () => {
   if (peerReviewQuestions.length === 0) {
     return (
       <Typography component="p" variant="subtitle1">
-        {peerReviewsLabels.quizInvolvesNoPeerReviewsInstruction}
+        {/*peerReviewsLabels.quizInvolvesNoPeerReviewsInstruction*/}
       </Typography>
     )
   }

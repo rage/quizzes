@@ -1,6 +1,6 @@
 {
   "name": "moocfi-quizzes",
-  "version": "0.7.14-alpha",
+  "version": "0.7.15-alpha",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
