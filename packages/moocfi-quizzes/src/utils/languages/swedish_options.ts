@@ -49,9 +49,6 @@ const finnishLabels: SingleLanguageLabels = {
     reportAsInappropriateLabel: "Anmäl om osakligt svar",
     submitPeerReviewLabel: "Skicka den kollegiala bedömningen",
     hidePeerReviewLabel: "Göm",
-    quizInvolvesNoPeerReviewsInstruction:
-      "Tähän tehtävään ei liity vertaisarvioita",
-    peerReviewsInfoForLoggedOutUser: "Kyselyyn liittyy vertaisarviointiosio",
     essayQuestionAnswerTextBoxLabel: "Skriv en bedömning",
     optionLabel: "Alternativ",
     answerRejected: "Ditt svar är inte godkänt",

@@ -47,9 +47,6 @@ const finnishLabels: SingleLanguageLabels = {
     reportAsInappropriateLabel: "Anna teada spämmist",
     submitPeerReviewLabel: "Esita hinnang",
     hidePeerReviewLabel: "Peida",
-    quizInvolvesNoPeerReviewsInstruction:
-      "Tähän tehtävään ei liity vertaisarvioita",
-    peerReviewsInfoForLoggedOutUser: "Kyselyyn liittyy vertaisarviointiosio",
     essayQuestionAnswerTextBoxLabel: "Kirjuta hinnang",
     optionLabel: "Valik",
     answerRejected: "Sinu vastus on tagasi lükatud",
