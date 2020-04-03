@@ -2,7 +2,6 @@ import * as React from "react"
 import { useContext } from "react"
 import ThemeProviderContext from "../contexes/themeProviderContext"
 import styled from "styled-components"
-import { Button } from "@material-ui/core"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
 

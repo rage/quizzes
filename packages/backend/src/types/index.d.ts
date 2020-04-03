@@ -13,6 +13,7 @@ import {
 } from "../models"
 import { Permission } from "services/authorization.service"
 import { RequiredAction } from "../services/kafka.service"
+import { ModifyTableQuizItemAddColumnUsesSharedOptionFeedbackMessage1567500257341 } from "migration/1567500257341-ModifyTableQuizItemAddColumnUsesSharedOptionFeedbackMessage"
 
 export class ITMCProfile {
   username: string
@@ -67,14 +68,20 @@ export interface IQuizAnswerQuery {
   // should prob only use statuses
   status?: string
   statuses?: string[]
+  courseIds?: string[]
+  courseIdIncludedInCourseIds?: boolean
   firstAllowedTime?: Date
   lastAllowedTime?: Date
   languageIds?: string[]
-  // or: max and min for peer reviews given/received
-  peerReviewsGiven?: number
-  peerReviewsReceived?: number
-  // similarly: min/max spamflags
-  spamFlags?: number
+  minPeerReviewsGiven?: number
+  maxPeerReviewsGiven?: number
+  minPeerReviewsReceived?: number
+  maxPeerReviewsReceived?: number
+  minSpamFlags?: number
+  minSpamFlagsOr?: number
+  maxSpamFlags?: number
+  minPeerReviewAverage?: number
+  maxPeerReviewAverage?: number
   addPeerReviews?: boolean
   addSpamFlagNumber?: boolean
   quizRequiresPeerReviews?: boolean
@@ -201,7 +208,6 @@ export interface ProgressMessage {
   course_id: string
   service_id: string
   progress: PointsByGroup[]
-  exercise_completions_by_section?: ExerciseCompletionsBySection[]
   message_format_version: Number
 }
 
@@ -210,14 +216,6 @@ export interface PointsByGroup {
   max_points: number
   n_points: number
   progress: number
-}
-
-export interface ExerciseCompletionsBySection {
-  part: number
-  section: number
-  exercises_total: number
-  exercises_completed: number
-  required_actions: RequiredAction[]
 }
 
 export interface QuizAnswerMessage {

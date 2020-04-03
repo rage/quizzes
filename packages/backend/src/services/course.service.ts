@@ -4,7 +4,7 @@ import { EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import { ReadStream } from "typeorm/platform/PlatformTools"
 import { v4 as uuidv4 } from "uuid"
-import { Course } from "../models"
+import { Course, CourseTranslation } from "../models"
 import { ICourseQuery } from "../types"
 import UserCourseRoleService from "./usercourserole.service"
 
@@ -335,6 +335,28 @@ export class CourseService {
     }
 
     return await course
+  }
+
+  public async getElementsCourseIds(
+    reallyCheck: boolean = false,
+  ): Promise<string[]> {
+    if (reallyCheck) {
+      const query = `SELECT id FROM course JOIN course_translation 
+    ON course.id = course_translation.course_id
+    WHERE course_translation.abbreviation LIKE '%elements-of-ai%';`
+
+      const result = await this.entityManager.query(query)
+      console.log("Result: ", result)
+      return result.map((e: any) => e.id)
+    } else {
+      return [
+        "21356a26-7508-4705-9bab-39b239862632",
+        "5d1e8da2-3154-4966-aa94-2ca0406cf38a",
+        "5f496ecc-327a-4899-baff-2daa2b40b05f",
+        "5bbd7d17-3099-48cb-a8c2-2bf70d0ea375",
+        "5bfa04ac-30b9-49d9-a171-2c140f11f9a7",
+      ]
+    }
   }
 }
 

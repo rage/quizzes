@@ -15,7 +15,7 @@ const FilterBox = ({ numberOfAnswers }) => {
       <Grid
         container={true}
         spacing={32}
-        style={{ backgroundColor: "gray", marginBottom: "1em" }}
+        style={{ backgroundColor: "gray", marginBottom: "1em", width: "100%" }}
       >
         <Grid item={true} xs={12}>
           <Typography variant="subtitle1">
@@ -23,6 +23,7 @@ const FilterBox = ({ numberOfAnswers }) => {
           </Typography>
         </Grid>
 
+        {/*
         <Grid item={true} xs={12}>
           <Typography variant="subtitle1">Filter options: to do</Typography>
         </Grid>
@@ -30,6 +31,8 @@ const FilterBox = ({ numberOfAnswers }) => {
         <Grid item={true} xs={12}>
           <Typography variant="subtitle1">Order options: to do</Typography>
         </Grid>
+      
+*/}
       </Grid>
     </React.Fragment>
   )

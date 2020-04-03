@@ -37,7 +37,7 @@ class Answer extends React.Component<any, any> {
     super(props)
     this.answerRef = React.createRef<HTMLElement>()
     this.state = {
-      expanded: false,
+      expanded: true,
       modalOpen: false,
       confirmDialogOpen: false,
       confirmAction: null,
@@ -359,9 +359,10 @@ class PeerReviewsSummary extends React.Component<any, any> {
               <Grid item={true} xs={12}>
                 <Typography variant="subtitle1" color="textSecondary">
                   SPAM FLAGS:{" "}
-                  {this.props.answer.userQuizState
-                    ? this.props.answer.userQuizState.spamCount
-                    : "not calculated"}
+                  {this.props.answer.userQuizState &&
+                  typeof this.props.answer.userQuizState.spamFlags === "number"
+                    ? this.props.answer.userQuizState.spamFlags
+                    : "Not calculated (likely old data)"}
                   {this.props.course.maxSpamFlags &&
                     `. (Maximum allowed: ${this.props.course.maxSpamFlags})`}
                 </Typography>
@@ -527,5 +528,9 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { decrementAttentionCount: decrement, displayMessage, setQuiz },
+  {
+    decrementAttentionCount: decrement,
+    displayMessage,
+    setQuiz,
+  },
 )(Answer)

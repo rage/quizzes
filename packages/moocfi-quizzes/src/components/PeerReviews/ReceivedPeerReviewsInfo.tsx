@@ -1,6 +1,6 @@
 import * as React from "react"
 import styled from "styled-components"
-import { Button, CircularProgress, Typography } from "@material-ui/core"
+import { CircularProgress, Typography } from "@material-ui/core"
 import {
   PeerReviewGradeAnswer,
   IReceivedPeerReview,
@@ -11,20 +11,18 @@ import { useDispatch } from "react-redux"
 import { requestReviews } from "../../state/receivedReviews/actions"
 import ReceivedPeerReview from "./ReceivedPeerReview"
 import {
-  BaseButton,
   BoldTypography,
-  TopMarginDivSmall,
   TopMarginDivLarge,
   withMargin,
 } from "../styleComponents"
 import { ReceivedPeerReviewLabels } from "../../utils/languages/"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
-
 import Togglable from "../../utils/Togglable"
-import Notification from "../Notification"
 
-const ToggleButton = styled(BaseButton)<{ expanded: boolean }>`
-  ${props => props.expanded && "margin-top: 0.5rem;"}
+const ReceivedPeerReviewsContainer = styled(TopMarginDivLarge)<{
+  providedStyles: string | undefined
+}>`
+  ${({ providedStyles }) => providedStyles}
 `
 
 const Loading = styled.div`
@@ -42,16 +40,13 @@ const Received = styled(TopMarginDivLarge)<{ providedStyles?: string }>`
 `
 
 const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
-  const [expanded, setExpanded] = React.useState(false)
+  const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
   const themeProvider = React.useContext(ThemeProviderContext)
   const receivedReviews = useTypedSelector(
     state => state.receivedReviews.reviews,
   )
   const error = useTypedSelector(state => state.message.error)
-  const loadingState = useTypedSelector(
-    state => state.receivedReviews.loadingState,
-  )
   const quiz = useTypedSelector(state => state.quiz)
   const languageLabels = useTypedSelector(
     state => state.language.languageLabels,

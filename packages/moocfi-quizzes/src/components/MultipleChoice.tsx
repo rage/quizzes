@@ -1,12 +1,8 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { Button, Grid, Typography, Icon } from "@material-ui/core"
-import {
-  GridDirection,
-  GridSize,
-  GridItemsAlignment,
-} from "@material-ui/core/Grid"
+import { Typography } from "@material-ui/core"
+import { GridDirection, GridSize } from "@material-ui/core/Grid"
 import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
@@ -14,11 +10,7 @@ import { QuizItem, QuizItemOption, QuizItemAnswer } from "../modelTypes"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
 import MarkdownText from "./MarkdownText"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import {
-  faCheck,
-  faTimes,
-  faExclamationCircle,
-} from "@fortawesome/free-solid-svg-icons"
+import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons"
 import ThemeProviderContext from "../contexes/themeProviderContext"
 import ChoiceButton from "./ChoiceButton"
 
@@ -51,22 +43,6 @@ const CentralizedOnSmallScreenTypography = styled(Typography)`
     text-align: center;
   }
 `
-
-const IconWrapper = styled.div`
-  margin: 0.5rem;
-`
-
-const SuccessIcon = () => (
-  <IconWrapper>
-    <FontAwesomeIcon icon={faCheck} />
-  </IconWrapper>
-)
-
-const FailureIcon = () => (
-  <IconWrapper>
-    <FontAwesomeIcon icon={faTimes} />
-  </IconWrapper>
-)
 
 const AttentionIcon = styled(FontAwesomeIcon)`
   font-size: 30px !important;
@@ -201,10 +177,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
   item,
 }) => {
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
-
   const answerLocked = userQuizState && userQuizState.status === "locked"
-  const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
-
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   if (!languageInfo) {
     return <div />
@@ -220,7 +193,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
     ? multipleChoiceLabels.selectCorrectAnswerLabel
     : ""
 
-  const { title, body, successMessage, failureMessage } = item.texts[0]
+  const { title, body } = item.texts[0]
 
   return (
     <QuestionContainer>
@@ -230,7 +203,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
           removeParagraphs
           variant="subtitle1"
           component="p"
-          id="item-question"
+          id={`item-question-${title}`}
         >
           {title}
         </LeftAlignedMarkdownText>
@@ -266,7 +239,6 @@ type OptionProps = {
 
 const Option: React.FunctionComponent<OptionProps> = ({
   option,
-  optionWidth,
   shouldBeGray,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
@@ -319,7 +291,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
           correct={false}
           onClick={handleOptionChange(option.id)}
           disabled={quizDisabled}
-          aria-selected={optionIsSelected}
+          aria-pressed={optionIsSelected}
         >
           <MarkdownText Component={styled.div``} removeParagraphs>
             {text.title}

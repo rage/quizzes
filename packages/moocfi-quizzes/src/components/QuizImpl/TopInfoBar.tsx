@@ -1,6 +1,6 @@
 import ContentLoader from "react-content-loader"
 import * as React from "react"
-import { Grid, Typography } from "@material-ui/core"
+import { Typography } from "@material-ui/core"
 import styled from "styled-components"
 import { useTypedSelector } from "../../state/store"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -50,30 +50,12 @@ const PointsText = styled(Typography)`
   }
 `
 
-const XXS12Grid = styled(Grid)`
-  @media (max-width: 550px) {
-    max-width: 100%;
-    flex-basis: 100%;
-  }
-`
-
 const PointsLabelText = styled(Typography)`
   font-size: 1rem !important;
 
   @media (max-width: 550px) {
     text-align: start;
     margin-top: 10px;
-  }
-`
-
-const RightMarginedGrid = styled(Grid)`
-  margin-right: 1.5rem;
-  text-align: end;
-
-  @media (max-width: 550px) {
-    max-width: 100%;
-    flex-basis: 100%;
-    text-align: left;
   }
 `
 
@@ -96,9 +78,6 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   const quiz = useTypedSelector(state => state.quiz)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const displayBars = useTypedSelector(state => state.loadingBars)
-  const showPointsInfo = useTypedSelector(
-    state => state.customization.showPointsInfo,
-  )
 
   let title
   let quizLabel

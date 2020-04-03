@@ -53,6 +53,9 @@ const englishLabels: SingleLanguageLabels = {
     answerFlaggedAsSpam: "Your answer has been reported as spam",
     answerConfirmed: "Your answer has been accepted!",
     manualReview: "Your answer is being reviewed by course staff",
+    peerReviewGroupTitle: "Vertaisarviointikysymykset",
+    peerReviewLikertDetails:
+      "Arvioi jokainen väite asteikolla 1-5. 1 on vahvasti eri mieltä ja 5 on vahvasti samaa mieltä.",
   },
   receivedPeerReviews: {
     averageOfGradesLabel: "The average grade of received reviews is",

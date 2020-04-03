@@ -82,6 +82,8 @@ export type PeerReviewLabels = {
   answerFlaggedAsSpam: string
   answerConfirmed: string
   manualReview: string
+  peerReviewGroupTitle: string
+  peerReviewLikertDetails: string
 }
 
 export type ReceivedPeerReviewLabels = {

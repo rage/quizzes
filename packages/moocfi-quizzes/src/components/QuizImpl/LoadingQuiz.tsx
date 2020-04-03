@@ -11,10 +11,6 @@ const ContentWrapper = styled.div`
   padding: 1rem;
 `
 
-const StyledContentLoader = styled(ContentLoader)`
-  padding-bottom: 1rem;
-`
-
 interface ILoadingQuizProps {
   content?: CustomContent
   accessToken?: string
