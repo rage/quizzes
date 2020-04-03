@@ -40,7 +40,6 @@ const Received = styled(TopMarginDivLarge)<{ providedStyles?: string }>`
 `
 
 const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
-  const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
   const themeProvider = React.useContext(ThemeProviderContext)
   const receivedReviews = useTypedSelector(

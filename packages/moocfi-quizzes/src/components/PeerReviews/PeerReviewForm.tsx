@@ -247,11 +247,13 @@ const PeerReviewQuestions: React.FunctionComponent<
           <QuestionBlockWrapper
             providedStyles={themeProvider.questionBlockWrapperStyles}
             role="group"
-            aria-label={languages.peerReviews.peerReviewGroupTitle}
+            aria-label={
+              (languages && languages.peerReviews.peerReviewGroupTitle) || ""
+            }
             aria-describedby="peer-review-info"
           >
             <HiddenLikertDescription id="peer-review-info">
-              {languages.peerReviews.peerReviewLikertDetails}
+              {languages && languages.peerReviews.peerReviewLikertDetails}
             </HiddenLikertDescription>
             {block.map(question => {
               let currentPeerReviewAnswer = peerReview.answers.find(
