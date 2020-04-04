@@ -1,6 +1,6 @@
 import { SingleLanguageLabels } from "./index"
 
-const finnishLabels: SingleLanguageLabels = {
+const swedishLabels: SingleLanguageLabels = {
   essay: {
     exampleAnswerLabel: "Exempelsvar",
     userAnswerLabel: "Ditt svar",
@@ -67,7 +67,7 @@ const finnishLabels: SingleLanguageLabels = {
     loadingLabel: "Laddar inkomna kollegiala bedömningar…",
     noPeerReviewsReceivedlabel:
       "Ditt svar har inte ännu fått kollegial bedömning",
-    numberOfPeerReviewsText: n =>
+    numberOfPeerReviewsText: (n) =>
       `Ditt svar har fått ${n} kollegial${n > 0 ? "a" : ""} bedömning${
         n > 0 ? "ar" : ""
       }`,
@@ -119,7 +119,7 @@ const finnishLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "Antalen försök är inte begränsade",
     submitGeneralFeedbackLabel: "Inlämnad",
     submitButtonAlreadyAnsweredLabel: "Besvarad",
-    pointsGrantingPolicyInformer: policy => {
+    pointsGrantingPolicyInformer: (policy) => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "För att få poäng måste svaret vara helt rätt"
@@ -150,4 +150,4 @@ const finnishLabels: SingleLanguageLabels = {
   },
 }
 
-export default finnishLabels
+export default swedishLabels
