@@ -1,11 +1,8 @@
 import * as React from "react"
-import styled from "styled-components"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
 import { useDispatch } from "react-redux"
-
 import { useTypedSelector } from "../../state/store"
 import * as quizAnswerActions from "../../state/quizAnswer/actions"
-
 import { StyledButton } from "../styleComponents"
 
 export interface SubmitButtonProps {

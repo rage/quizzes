@@ -55,6 +55,9 @@ const finnishLabels: SingleLanguageLabels = {
     answerConfirmed: "Du hast die Übung bestanden!",
     manualReview:
       "Deine Antwort wartet auf die Evaluierung durch das Kurspersonal",
+    peerReviewGroupTitle: "Vertaisarviointikysymykset",
+    peerReviewLikertDetails:
+      "Arvioi jokainen väite asteikolla 1-5. 1 on vahvasti eri mieltä ja 5 on vahvasti samaa mieltä.",
   },
   receivedPeerReviews: {
     errorLabel:

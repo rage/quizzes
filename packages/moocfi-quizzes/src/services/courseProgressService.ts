@@ -39,7 +39,7 @@ export const getCompletion = async (
     {
       currentUser {
         completions(
-          course_id: "${courseId}"
+          course_id: "55dff8af-c06c-4a97-88e6-af7c04d252ca"
         ) {
           id
         }

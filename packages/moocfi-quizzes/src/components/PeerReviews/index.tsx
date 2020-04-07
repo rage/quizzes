@@ -8,7 +8,6 @@ import PeerReviewForm from "./PeerReviewForm"
 import PeerReviewsGuidance from "./PeerReviewsGuidance"
 import ReceivedPeerReviewsInfo from "./ReceivedPeerReviewsInfo"
 import * as peerReviewsActions from "../../state/peerReviews/actions"
-import { scrollToRef } from "../../utils"
 import Togglable from "../../utils/Togglable"
 import { useTypedSelector } from "../../state/store"
 import {
@@ -18,9 +17,9 @@ import {
 } from "../styleComponents"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
 
-/*const TopMarginDiv = styled.div`
-  margin-top: 15px;
-`*/
+const PeerReviewContainer = styled.div<{ providedStyles: string | undefined }>`
+  ${({ providedStyles }) => providedStyles}
+`
 
 const HiddenWrapper = styled(TopMarginDivLarge)<{ providedStyles?: string }>`
   ${({ providedStyles }) => providedStyles}
@@ -50,7 +49,7 @@ const PeerReviews: React.FunctionComponent = () => {
   if (quizDisabled) {
     return (
       <Typography component="p" variant="subtitle1">
-        {languageInfo.peerReviews.peerReviewsInfoForLoggedOutUser}
+        {/*languageInfo.peerReviews.peerReviewsInfoForLoggedOutUser*/}
       </Typography>
     )
   }
@@ -66,14 +65,14 @@ const PeerReviews: React.FunctionComponent = () => {
     dispatch(peerReviewsActions.fetchPeerReviewAlternatives())
   }, [])
 
-  const morePeerReviewsRequired = () =>
+  const morePeerReviewsRequired =
     (userQuizState ? userQuizState.peerReviewsGiven : 0) <
     quiz.course.minPeerReviewsGiven
 
   if (peerReviewQuestions.length === 0) {
     return (
       <Typography component="p" variant="subtitle1">
-        {peerReviewsLabels.quizInvolvesNoPeerReviewsInstruction}
+        {/*peerReviewsLabels.quizInvolvesNoPeerReviewsInstruction*/}
       </Typography>
     )
   }
@@ -85,7 +84,7 @@ const PeerReviews: React.FunctionComponent = () => {
       aria-live="polite"
       aria-relevant="additions text"
     >
-      {morePeerReviewsRequired()
+      {morePeerReviewsRequired
         ? !pastDeadline && (
             <>
               <PeerReviewsGuidance

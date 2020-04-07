@@ -3,14 +3,7 @@ import styled from "styled-components"
 import ThemeProviderContext from "../../contexes/themeProviderContext"
 
 import { useTypedSelector } from "../../state/store"
-
-import { Typography } from "@material-ui/core"
-import {
-  TopMarginDivSmall,
-  BoldTypographyLarge,
-  withMargin,
-  BoldTypography,
-} from "../styleComponents"
+import { BoldTypographyLarge, withMargin } from "../styleComponents"
 import MarkdownText from "../MarkdownText"
 
 const Guidance = styled.div<{ providedStyles?: string }>`
@@ -34,6 +27,7 @@ const PeerReviewsGuidance: React.FunctionComponent<
 
   const GivenCount = withMargin(BoldTypographyLarge, "2rem 0 0 ")
   const Instructions = withMargin(MarkdownText, "1.5rem 0 0 ")
+  React.useEffect(() => console.log("Title rerenders"))
 
   return (
     <Guidance providedStyles={themeProvider.peerReviewGuidanceStyles}>

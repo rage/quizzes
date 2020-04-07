@@ -124,9 +124,17 @@ async function main() {
   )
   const users = await migrateUsers(data.usernames)
   // await migrateCourseStates(courses, users)
-  await migrateQuizAnswers(quizzes, users, data.quizAnswers)
+  if (data.quizAnswers.length > 0) {
+    console.log("no answers to migrate")
+    await migrateQuizAnswers(quizzes, users, data.quizAnswers)
+  }
+
   await migrateSpamFlags(users, data.spamFlags)
-  await migratePeerReviews(users, data.peerReviews, manager)
+
+  if (data.peerReviews.length > 0) {
+    console.log("no peer reviews to migrate")
+    await migratePeerReviews(users, data.peerReviews, manager)
+  }
 
   await manager.query(
     `insert into migration (date) values ('${new Date(

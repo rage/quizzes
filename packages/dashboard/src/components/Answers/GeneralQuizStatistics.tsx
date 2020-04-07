@@ -18,13 +18,19 @@ class GeneralStatistics extends React.Component<any, any> {
           <Grid
             container={true}
             spacing={32}
-            style={{ backgroundColor: "#49C7FB", marginBottom: "1em" }}
+            style={{
+              backgroundColor: "#49C7FB",
+              marginBottom: "1em",
+              width: "100%",
+            }}
           >
             <Grid item={true} xs={12}>
               <Typography variant="body1">
                 Answers requiring attention: {this.props.numberOfAnswers}
               </Typography>
             </Grid>
+
+            {/*
 
             <Grid item={true} xs={12}>
               <Typography variant="body1">Of those:</Typography>
@@ -43,6 +49,7 @@ class GeneralStatistics extends React.Component<any, any> {
                 </li>
               </ul>
             </Grid>
+*/}
           </Grid>
         </Grid>
       </React.Fragment>

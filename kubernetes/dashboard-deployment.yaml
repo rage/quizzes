@@ -16,6 +16,13 @@ spec:
       - name: quizzes-dashboard
         image: ${DASHBOARD_IMAGE}
         imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "100m"
+          limits:
+            memory: "1000Mi"
+            cpu: "500m"
         ports:
         - name: dashboard-http
           containerPort: 80

@@ -281,6 +281,7 @@ export default class ValidationService {
     const given: number = userQuizState.peerReviewsGiven
     const received: number = userQuizState.peerReviewsReceived
     if (
+      quiz.autoReject &&
       (quizAnswer.status === "submitted" ||
         quizAnswer.status === "enough-received-but-not-given") &&
       userQuizState.spamFlags > course.maxSpamFlags
@@ -292,6 +293,7 @@ export default class ValidationService {
         userQuizState.spamFlags = null
         userQuizState.peerReviewsReceived = 0
         userQuizState.status = "open"
+        userQuizState.pointsAwarded = null
       }
     } else if (
       quizAnswer.status === "submitted" &&
@@ -321,7 +323,7 @@ export default class ValidationService {
       if (sum / answers.length >= course.minReviewAverage) {
         quizAnswer.status = "confirmed"
         userQuizState.pointsAwarded = 1 * quiz.points
-      } else {
+      } else if (quiz.autoReject) {
         quizAnswer.status = "rejected"
         userQuizState.peerReviewsReceived = 0
         userQuizState.pointsAwarded = 0

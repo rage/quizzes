@@ -53,6 +53,9 @@ const finnishLabels: SingleLanguageLabels = {
     answerFlaggedAsSpam: "Sinu vastus on märgitud spämmiks",
     answerConfirmed: "Sinu vastus on vastu võetud!",
     manualReview: "Sinu vastust vaatab läbi kursuse koordinaator",
+    peerReviewGroupTitle: "Vertaisarviointikysymykset",
+    peerReviewLikertDetails:
+      "Arvioi jokainen väite asteikolla 1-5. 1 on vahvasti eri mieltä ja 5 on vahvasti samaa mieltä.",
   },
   receivedPeerReviews: {
     errorLabel:

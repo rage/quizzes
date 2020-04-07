@@ -54,6 +54,9 @@ const norwegianLabels: SingleLanguageLabels = {
     answerFlaggedAsSpam: "Svaret ditt er rapportert som spam",
     answerConfirmed: "Svaret ditt er godkjent!",
     manualReview: "Svaret ditt blir vurdert av kursets ansatte",
+    peerReviewGroupTitle: "Vertaisarviointikysymykset",
+    peerReviewLikertDetails:
+      "Arvioi jokainen väite asteikolla 1-5. 1 on vahvasti eri mieltä ja 5 on vahvasti samaa mieltä.",
   },
   receivedPeerReviews: {
     errorLabel:

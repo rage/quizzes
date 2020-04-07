@@ -3,7 +3,7 @@ import {
   IItemWrapperProps,
   LowerContentProps,
   QuizContentProps,
-} from "../components/QuizImpl"
+} from "../components/QuizImpl/"
 import { ChoiceButtonProps } from "../components/ChoiceButton"
 import { SubmitButtonProps } from "../components/QuizImpl/SubmitButton"
 import { LeftBorderedDivProps } from "../components/MultipleChoice"
