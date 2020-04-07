@@ -55,9 +55,9 @@ const finnishLabels: SingleLanguageLabels = {
     answerConfirmed: "Du hast die Übung bestanden!",
     manualReview:
       "Deine Antwort wartet auf die Evaluierung durch das Kurspersonal",
-    peerReviewGroupTitle: "Vertaisarviointikysymykset",
+    peerReviewGroupTitle: "Peer-evaluierte Fragen",
     peerReviewLikertDetails:
-      "Arvioi jokainen väite asteikolla 1-5. 1 on vahvasti eri mieltä ja 5 on vahvasti samaa mieltä.",
+      "Bitte bewerte jede Aussage auf einer Skala von 1-5. 1: stimme überhaupt nicht zu, 5: stimme völlig zu",
   },
   receivedPeerReviews: {
     errorLabel:
@@ -76,9 +76,9 @@ const finnishLabels: SingleLanguageLabels = {
     detailedViewLabel: "Alle Evaluationen, die deine Antwort erhalten hat",
     summaryViewLabel: "Erhaltene Peer-Evaluationen:",
     peerReviewLabel: "Peer-Evaluation",
-    peerReviewReceived: "Olet saanut uuden vertaisarvion",
+    peerReviewReceived: "Du hast eine neue Peer-Evaluation erhalten",
     peerReviewReceivedFor: (title: string) =>
-      `Olet saanut uuden vertaisarvion tehtävässä ${title}`,
+      `Du hast in der Übung ${title} eine neue Peer-Evaluation erhalten`,
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
@@ -132,22 +132,23 @@ const finnishLabels: SingleLanguageLabels = {
     answered: "Beantwortet",
     unanswered: "Nicht beantwortet",
     rejected: "Antwort abgelehnt, bitte erneut versuchen",
-    progressUpdated: "Kurssipisteesi ovat päivittyneet",
-    answerConfirmed: "Vastauksesi on hyväksytty",
+    progressUpdated: "Kursfortschritt aktualisiert",
+    answerConfirmed: "Deine Antwort wurde bestätigt!",
     answerConfirmedFor: (title: string) =>
-      `Vastauksesi tehtävään ${title} on hyväksytty`,
-    courseCompleted: "Olet päässyt läpi kurssista!",
+      `Deine Antwort auf die Übung ${title}
+      wurde bestätigt!`,
+    courseCompleted: "Du hast den Kurs abgeschlossen!",
   },
   error: {
     submitFailedError:
       "Deine Antwort konnte nicht gesendet werden. Bitte versuch es später noch einmal.",
     quizLoadFailedError: "Die Übung konnte nicht geladen werden.",
     progressFetchError:
-      "Suoritustietojen lataaminen ei onnistunut. Kokeile myöhemmin uudestaan",
+      "Kursfortschrittsdaten konnten nicht abgerufen werden. Bitte versuche es später noch einmal.",
     submitSpamFlagError:
-      "Asiattomasta vastauksesta ilmoittaminen ei onnistunut",
+      "Fehler beim Melden einer unangemessenen Antwort",
     fetchReviewCandidatesError:
-      "Vastausten lataaminen vertaisarviota varten ei onnistunut. Kokeile myöhemmin uudestaan.",
+      "Beim Abrufen von Antworten für Peer-Evaluation ist ein Fehler aufgetreten. Bitte versuche es später noch einmal.",
   },
 }
 
