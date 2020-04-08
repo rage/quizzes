@@ -145,8 +145,7 @@ const finnishLabels: SingleLanguageLabels = {
     quizLoadFailedError: "Die Übung konnte nicht geladen werden.",
     progressFetchError:
       "Kursfortschrittsdaten konnten nicht abgerufen werden. Bitte versuche es später noch einmal.",
-    submitSpamFlagError:
-      "Fehler beim Melden einer unangemessenen Antwort",
+    submitSpamFlagError: "Fehler beim Melden einer unangemessenen Antwort",
     fetchReviewCandidatesError:
       "Beim Abrufen von Antworten für Peer-Evaluation ist ein Fehler aufgetreten. Bitte versuche es später noch einmal.",
   },

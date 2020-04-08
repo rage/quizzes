@@ -138,8 +138,7 @@ const englishLabels: SingleLanguageLabels = {
     quizLoadFailedError: "Could not load the exercise",
     progressFetchError:
       "Could not fetch course progress data. Please try again later.",
-    submitSpamFlagError:
-      "Could not report spam.",
+    submitSpamFlagError: "Could not report spam.",
     fetchReviewCandidatesError:
       "Something went wrong while retrieving answers for peer review. Please try again later.",
   },
