@@ -80,9 +80,9 @@ const frenchLabels: SingleLanguageLabels = {
     detailedViewLabel: "Toutes les évaluations que votre réponse a reçues",
     summaryViewLabel: "Les évaluations par les pairs reçues:",
     peerReviewLabel: "Évaluation par les pairs",
-    peerReviewReceived: "Olet saanut uuden vertaisarvion",
+    peerReviewReceived: "Vous avez reçu un nouvel examen par les pairs",
     peerReviewReceivedFor: (title: string) =>
-      `Olet saanut uuden vertaisarvion tehtävässä ${title}`,
+      `Vous avez reçu un nouvel examen par les pairs pour l'exercice ${title}`,
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
@@ -134,24 +134,24 @@ const frenchLabels: SingleLanguageLabels = {
           return ""
       }
     },
-    answered: "Answered",
-    unanswered: "Unanswered",
-    rejected: "Rejected answer, try again",
-    progressUpdated: "Course progress updated",
-    answerConfirmed: "Your answer was confirmed!",
+    answered: "Répondue",
+    unanswered: "Sans réponse",
+    rejected: "Réponse refusée, réessayez",
+    progressUpdated: "Progression du cours mise à jour",
+    answerConfirmed: "Votre réponse a été confirmée!",
     answerConfirmedFor: (title: string) =>
-      `Your answer to exercise ${title} was confirmed!`,
-    courseCompleted: "You have completed the course!",
+      `Votre réponse à l'exercice ${title} a été confirmée!`,
+    courseCompleted: "Vous avez terminé le cours!",
   },
   error: {
-    submitFailedError: "Could not send your answer. Please try again later.",
-    quizLoadFailedError: "Could not load the exercise",
+    submitFailedError:
+      "Impossible d'envoyer votre réponse. Veuillez réessayer plus tard.",
+    quizLoadFailedError: "Impossible de charger l'exercice",
     progressFetchError:
-      "Suoritustietojen lataaminen ei onnistunut. Kokeile myöhemmin uudestaan",
-    submitSpamFlagError:
-      "Asiattomasta vastauksesta ilmoittaminen ei onnistunut",
+      "Impossible de récupérer les données de progression du cours. Veuillez réessayer plus tard.",
+    submitSpamFlagError: "Impossible de signaler le spam",
     fetchReviewCandidatesError:
-      "Vastausten lataaminen vertaisarviota varten ei onnistunut. Kokeile myöhemmin uudestaan.",
+      "Une erreur s'est produite lors de la récupération des réponses pour examen par les pairs. Veuillez réessayer plus tard.",
   },
 }
 
