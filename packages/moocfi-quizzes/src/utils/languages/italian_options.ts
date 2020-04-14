@@ -58,7 +58,7 @@ const italianLabels: SingleLanguageLabels = {
       "La tua risposta è in corso di valutazione da parte del personale del corso",
     peerReviewGroupTitle: "Vertaisarviointikysymykset",
     peerReviewLikertDetails:
-      "Arvioi jokainen väite asteikolla 1-5. 1 on vahvasti eri mieltä ja 5 on vahvasti samaa mieltä.",
+      "Si prega di valutare il grado in cui si è d'accordo con ogni affermazione. 1 significa per niente, 5 significa completamente d'accordo.",
   },
   receivedPeerReviews: {
     errorLabel:
@@ -68,8 +68,8 @@ const italianLabels: SingleLanguageLabels = {
     loadingLabel: "Caricamento delle valutazioni tra pari ricevute...",
     noPeerReviewsReceivedlabel:
       "La tua risposta non ha ancora ricevuto valutazioni tra pari",
-    numberOfPeerReviewsText: (n) =>
-      `&#39La tua risposta ha ricevuto ${n} valutazione / i tra pari.`,
+    numberOfPeerReviewsText: n =>
+      `La tua risposta ha ricevuto ${n} valutazione / i tra pari.`,
     toggleButtonExpandLabel: "Mostrare tutte le valutazioni tra pari ricevute",
     toggleButtonShrinkLabel: "Nascondere le valutazioni tra pari",
     averageOfGradesLabel: "Il voto medio delle valutazioni ricevute è",
@@ -119,7 +119,7 @@ const italianLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "Il numero di tentativi è illimitato",
     submitGeneralFeedbackLabel: "Invio effettuato",
     submitButtonAlreadyAnsweredLabel: "Risposta data",
-    pointsGrantingPolicyInformer: (policy) => {
+    pointsGrantingPolicyInformer: policy => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "Per ottenere punti, la risposta deve essere completamente esatta"
