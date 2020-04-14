@@ -91,10 +91,10 @@ const italianLabels: SingleLanguageLabels = {
     answerIncorrectLabel: "Sbagliato",
   },
   stage: {
-    answerStageLabel: "Tehtävään vastaaminen",
-    givingPeerReviewsStageLabel: "Vertaisarvioiden antaminen",
-    receivingPeerReviewsStageLabel: "Vertaisarvioiden vastaanottaminen",
-    evaluationStageLabel: "Odottaa arvostelua",
+    answerStageLabel: "Fare l'esercizio",
+    givingPeerReviewsStageLabel: "Effettuare valutazioni tra pari",
+    receivingPeerReviewsStageLabel: "Ricevere valutazioni tra pari",
+    evaluationStageLabel: "In attesa di valutazione",
   },
   general: {
     pastDeadline: "Non è più possibile fare questo esercizio",
@@ -140,7 +140,7 @@ const italianLabels: SingleLanguageLabels = {
   },
   error: {
     submitFailedError: "Impossibile inviare la risposta. Riprova in seguito.",
-    quizLoadFailedError: "Tehtävän lataaminen ei onnistunut",
+    quizLoadFailedError: "Impossibile caricare l'esercizio",
     progressFetchError:
       "Impossibile recuperare i dati relativi all'avanzamento del corso. Riprova in seguito.",
     submitSpamFlagError: "Impossibile segnalare lo spam",
