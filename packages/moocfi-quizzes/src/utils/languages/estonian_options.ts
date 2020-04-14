@@ -63,7 +63,7 @@ const estonianLabels: SingleLanguageLabels = {
     noSupportForQuestionTypeLabel: "Seda sorti hinnangu küsimus pole toetatud.",
     loadingLabel: "Laetakse kogutud hinnanguid...",
     noPeerReviewsReceivedlabel: "Sinu vastusele pole veel hinnangut antud",
-    numberOfPeerReviewsText: (n) =>
+    numberOfPeerReviewsText: n =>
       `Sinu vastus on saanud n vastastikust hinnangut`,
     toggleButtonExpandLabel: "Näita kõiki saadud hinnanguid",
     toggleButtonShrinkLabel: "Peida hinnangud",
@@ -114,7 +114,7 @@ const estonianLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "Katsete arv ei ole piiratud",
     submitGeneralFeedbackLabel: "Esitatud",
     submitButtonAlreadyAnsweredLabel: "Vastatud",
-    pointsGrantingPolicyInformer: (policy) => {
+    pointsGrantingPolicyInformer: policy => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "Punktide saamiseks peab vastus täielikult õige olema"

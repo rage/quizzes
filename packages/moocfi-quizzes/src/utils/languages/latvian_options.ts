@@ -47,16 +47,15 @@ const latvianLabels: SingleLanguageLabels = {
     reportAsInappropriateLabel: "Sūdzēties par mēstuli",
     submitPeerReviewLabel: "Iesniegt atzinumu",
     hidePeerReviewLabel: "Paslēpt",
-    quizInvolvesNoPeerReviewsInstruction:
-      "Ar šo uzdevumu nav saistītas salīdzinošās atsauksmes",
-    peerReviewsInfoForLoggedOutUser:
-      "Aptaujā ir salīdzinošās pārskatīšanas sadaļa",
     essayQuestionAnswerTextBoxLabel: "Rakstīt atzinumu",
     optionLabel: "Izvēles iespēja",
     answerRejected: "Jūsu atbilde ir noraidīta.",
     answerFlaggedAsSpam: "Par jūsu atbildi ziņots, ka tā esot mēstule.",
     answerConfirmed: "Jūsu atbilde ir akceptēta!",
     manualReview: "Jūsu atbildi izskata kursa rīkotāji.",
+    peerReviewGroupTitle: "Salīdzinošās vērtēšanas jautājumi",
+    peerReviewLikertDetails:
+      "Lūdzu, novērtējiet katru apgalvojumu no 1 līdz 5, 1 nozīmē, ka nepiekrītu, un 5, kas pilnīgi piekrīt.",
   },
   receivedPeerReviews: {
     errorLabel:
@@ -64,7 +63,7 @@ const latvianLabels: SingleLanguageLabels = {
     noSupportForQuestionTypeLabel: "Tādi jautājumi recenzēšanā nav paredzēti.",
     loadingLabel: "Notiek saņemto atzinumu ielāde...",
     noPeerReviewsReceivedlabel: "Vēl nav neviena atzinuma par jūsu atbildi.",
-    numberOfPeerReviewsText: (n) =>
+    numberOfPeerReviewsText: n =>
       `Par jūsu atbildi saņemto atzinumu skaits: ${n}.`,
     toggleButtonExpandLabel: "Parādīt visus saņemtos atzinumus",
     toggleButtonShrinkLabel: "Paslēpt atzinumus",
@@ -115,7 +114,7 @@ const latvianLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "Mēģinājumu skaits nav ierobežots.",
     submitGeneralFeedbackLabel: "Iesniegts:",
     submitButtonAlreadyAnsweredLabel: "Atbildēts:",
-    pointsGrantingPolicyInformer: (policy) => {
+    pointsGrantingPolicyInformer: policy => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "Lai saņemtu punktus, atbildei jābūt pilnīgi pareizai."
