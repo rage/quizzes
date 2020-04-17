@@ -351,8 +351,8 @@ export default class ValidationService {
       userQuizState.spamFlags > 0 &&
       this.openishStates.includes(quizAnswer.status)
     ) {
-      if(userQuizState.spamFlags >= 3) {
-        if(quizAnswer.status === "enough-received-but-not-given") {
+      if (userQuizState.spamFlags >= 3) {
+        if (quizAnswer.status === "enough-received-but-not-given") {
           quizAnswer.status = "manual-review-once-given-enough"
         } else {
           quizAnswer.status = "manual-review-once-given-and-received-enough"
