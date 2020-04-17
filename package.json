@@ -73,6 +73,7 @@
     "winston": "^3.1.0"
   },
   "devDependencies": {
+    "@types/node": "^10.9.4",
     "@types/body-parser": "^1.17.0",
     "@types/compression": "^0.0.36",
     "@types/dotenv": "^4.0.3",
@@ -105,9 +106,6 @@
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
     "typescript": "^3.1.1"
-  },
-  "peerDependencies": {
-    "@types/node": "^10.9.4"
   },
   "nodemonConfig": {
     "watch": [

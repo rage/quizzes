@@ -37,6 +37,7 @@
     "eject": "react-scripts-ts eject"
   },
   "devDependencies": {
+    "@types/node": "^10.11.5",
     "@types/jest": "^23.3.3",
     "@types/passport": "^0.4.6",
     "@types/passport-http-bearer": "^1.0.33",
@@ -52,8 +53,5 @@
     "tslint": "^5.11.0",
     "tslint-config-prettier": "^1.15.0",
     "typescript": "^3.1.1"
-  },
-  "peerDependencies": {
-    "@types/node": "^10.11.5"
   }
 }
