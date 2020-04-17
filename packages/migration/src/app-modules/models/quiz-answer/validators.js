@@ -40,12 +40,10 @@ module.exports = schema => {
           review: { presence: true },
         }
 
-        return validators
-          .validate(data, schema)
-          .then(
-            success => Promise.resolve(),
-            error => Promise.reject("data is invalid"),
-          )
+        return validators.validate(data, schema).then(
+          success => Promise.resolve(),
+          error => Promise.reject("data is invalid"),
+        )
       },
     }
 

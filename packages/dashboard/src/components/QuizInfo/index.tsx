@@ -177,7 +177,4 @@ const mapStateToProps = (state: any): IQuizInfoPropsFromState => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  { changeAttr },
-)(QuizInfo)
+export default connect(mapStateToProps, { changeAttr })(QuizInfo)

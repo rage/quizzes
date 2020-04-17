@@ -113,9 +113,10 @@ type PeerReviewQuestionsProps = {
   languageInfo: PeerReviewLabels
 }
 
-const PeerReviewQuestions: React.FunctionComponent<
-  PeerReviewQuestionsProps
-> = ({ peerReview, languageInfo }) => {
+const PeerReviewQuestions: React.FunctionComponent<PeerReviewQuestionsProps> = ({
+  peerReview,
+  languageInfo,
+}) => {
   const quiz = useTypedSelector(state => state.quiz)
 
   const submitDisabled = useTypedSelector(
@@ -193,9 +194,7 @@ const PeerReviewQuestions: React.FunctionComponent<
             )
           default:
             return (
-              <SpaciousTypography>{`The ${
-                question.type
-              } type peer review question is not supported`}</SpaciousTypography>
+              <SpaciousTypography>{`The ${question.type} type peer review question is not supported`}</SpaciousTypography>
             )
         }
       })}
@@ -223,9 +222,11 @@ const StyledReviewEssayQuestion = styled.div`
   margin: 8px 0;
 `
 
-const TextualPeerReviewFeedback: React.FunctionComponent<
-  ITextualPeerReviewFeedback
-> = ({ currentText, handleTextChange, questionTexts }) => {
+const TextualPeerReviewFeedback: React.FunctionComponent<ITextualPeerReviewFeedback> = ({
+  currentText,
+  handleTextChange,
+  questionTexts,
+}) => {
   const languages = useTypedSelector(state => state.language.languageLabels)
 
   if (!languages) {
@@ -263,9 +264,10 @@ type UnselectedPeerAnswerActionsProps = {
   answer: QuizAnswer
 }
 
-const UnselectedPeerAnswerActions: React.FunctionComponent<
-  UnselectedPeerAnswerActionsProps
-> = ({ languageInfo, answer }) => {
+const UnselectedPeerAnswerActions: React.FunctionComponent<UnselectedPeerAnswerActionsProps> = ({
+  languageInfo,
+  answer,
+}) => {
   const [disabled, setDisabled] = React.useState(false)
   const dispatch = useDispatch()
 

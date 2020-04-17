@@ -119,21 +119,18 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   const error = messageState.errorMessage
 
-  useEffect(
-    () => {
-      dispatch(
-        initialize(
-          id,
-          languageId,
-          accessToken,
-          backendAddress,
-          fullInfoWithoutLogin,
-          showZeroPointsInfo,
-        ),
-      )
-    },
-    [id, languageId, accessToken, backendAddress],
-  )
+  useEffect(() => {
+    dispatch(
+      initialize(
+        id,
+        languageId,
+        accessToken,
+        backendAddress,
+        fullInfoWithoutLogin,
+        showZeroPointsInfo,
+      ),
+    )
+  }, [id, languageId, accessToken, backendAddress])
 
   if (!accessToken && !fullInfoWithoutLogin) {
     return (
@@ -318,9 +315,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                     <React.Fragment>
                       <Typography>
                         {quiz.triesLimited
-                          ? `${
-                              generalLabels.triesRemainingLabel
-                            }: ${triesRemaining}`
+                          ? `${generalLabels.triesRemainingLabel}: ${triesRemaining}`
                           : generalLabels.triesNotLimitedLabel}
                       </Typography>
                       {showPointsPolicyLabel && (

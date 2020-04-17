@@ -26,9 +26,9 @@ interface IDefaultLoginMessageProps {
   fullQuizInfoShown?: boolean
 }
 
-const DefaultLoginMessage: React.FunctionComponent<
-  IDefaultLoginMessageProps
-> = ({ fullQuizInfoShown }) => {
+const DefaultLoginMessage: React.FunctionComponent<IDefaultLoginMessageProps> = ({
+  fullQuizInfoShown,
+}) => {
   const languageLabels = useTypedSelector(
     state => state.language.languageLabels,
   )

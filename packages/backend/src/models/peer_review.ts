@@ -21,19 +21,29 @@ export class PeerReview extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(type => QuizAnswer, qa => qa.id)
+  @ManyToOne(
+    type => QuizAnswer,
+    qa => qa.id,
+  )
   public quizAnswer: QuizAnswer
   @Column()
   public quizAnswerId: string
 
-  @ManyToOne(type => User, user => user.id)
+  @ManyToOne(
+    type => User,
+    user => user.id,
+  )
   public user: User
   @Column({ type: "int", nullable: true })
   public userId: number
 
-  @ManyToOne(type => PeerReviewCollection, prqc => prqc.id, {
-    nullable: true,
-  })
+  @ManyToOne(
+    type => PeerReviewCollection,
+    prqc => prqc.id,
+    {
+      nullable: true,
+    },
+  )
   public peerReviewCollection?: PeerReviewCollection
   @Column({ nullable: true })
   public peerReviewCollectionId?: string
@@ -41,10 +51,14 @@ export class PeerReview extends BaseEntity {
   @Column({ type: String, array: true })
   public rejectedQuizAnswerIds: string[]
 
-  @OneToMany(type => PeerReviewQuestionAnswer, prqa => prqa.peerReview, {
-    eager: false,
-    cascade: true,
-  })
+  @OneToMany(
+    type => PeerReviewQuestionAnswer,
+    prqa => prqa.peerReview,
+    {
+      eager: false,
+      cascade: true,
+    },
+  )
   public answers: PeerReviewQuestionAnswer[]
 
   @CreateDateColumn({ type: "timestamp" })

@@ -13,12 +13,18 @@ import { User } from "./user"
 
 @Entity()
 export class UserCourseState extends BaseEntity {
-  @ManyToOne(type => User, user => user.id)
+  @ManyToOne(
+    type => User,
+    user => user.id,
+  )
   public user: User
   @PrimaryColumn("int")
   public userId: number
 
-  @ManyToOne(type => Course, course => course.id)
+  @ManyToOne(
+    type => Course,
+    course => course.id,
+  )
   public course: Course
   @PrimaryColumn()
   public courseId: string

@@ -13,7 +13,7 @@ export class addValuesToQuizAnswerStatusEnum1584046882222
       // tslint:disable-next-line:max-line-length
       "create type quiz_answer_status_enum_new as enum ('draft', 'given-more-than-enough', 'given-enough', 'submitted',  'manual-review', 'confirmed', 'enough-received-but-not-given', 'spam','rejected','deprecated')",
     )
-    
+
     await queryRunner.query(
       // tslint:disable-next-line:max-line-length
       "alter table quiz_answer alter column status set data type quiz_answer_status_enum_new using (status::text::quiz_answer_status_enum_new)",
