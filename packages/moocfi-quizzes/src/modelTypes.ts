@@ -91,6 +91,7 @@ export type Course = {
   minPeerReviewsGiven: number
   minReviewAverage: number
   maxSpamFlags: number
+  maxReviewSpamFlags: number
   languages: CourseLanguage[]
   texts: CourseText[]
 }
