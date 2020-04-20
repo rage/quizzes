@@ -352,12 +352,10 @@ export default class ValidationService {
       this.openishStates.includes(quizAnswer.status)
     ) {
       if (userQuizState.spamFlags < course.maxReviewSpamFlags) {
-        if (quizAnswer.status === "enough-received-but-not-given") {
+        if (quizAnswer.status === "enough-received-but-not-given" || quizAnswer.status === 'submitted') {
           quizAnswer.status = "manual-review-once-given-enough"
         } else if (quizAnswer.status === "given-enough") {
           quizAnswer.status = "manual-review-once-given-and-received-enough"
-        } else if (quizAnswer.status === "submitted") {
-          quizAnswer.status = "submitted"
         }
       } else {
         quizAnswer.status = "manual-review"
