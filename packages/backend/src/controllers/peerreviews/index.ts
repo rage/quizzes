@@ -150,7 +150,7 @@ export class PeerReviewController {
           "enough-received-but-not-given",
           "manual-review",
           "manual-review-once-given-enough",
-          "manual-review-once-given-and-received-enough"
+          "manual-review-once-given-and-received-enough",
         ],
       },
       this.entityManager,
