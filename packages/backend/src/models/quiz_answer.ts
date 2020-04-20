@@ -20,6 +20,8 @@ type QuizAnswerStatusType =
   | "draft"
   | "given-more-than-enough"
   | "given-enough"
+  | "manual-review-once-given-and-received-enough"
+  | "manual-review-once-given-enough"
   | "submitted"
   | "manual-review"
   | "confirmed"
@@ -57,6 +59,8 @@ export class QuizAnswer extends BaseEntity {
       "draft",
       "given-more-than-enough",
       "given-enough",
+      "manual-review-once-given-and-received-enough",
+      "manual-review-once-given-enough",
       "submitted",
       "manual-review",
       "confirmed",
