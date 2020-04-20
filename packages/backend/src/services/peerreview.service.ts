@@ -338,6 +338,8 @@ export default class PeerReviewService {
     "given-more-than-enough",
     "given-enough",
     "submitted",
+    "manual-review-once-given-enough",
+    "manual-review-once-given-and-received-enough",
     "manual-review",
     "confirmed",
     "enough-received-but-not-given",
