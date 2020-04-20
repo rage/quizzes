@@ -276,6 +276,7 @@ export default class ValidationService {
     "given-enough",
     "submitted",
     "enough-received-but-not-given",
+    "manual-review"
   ]
 
   public validateEssayAnswer(
