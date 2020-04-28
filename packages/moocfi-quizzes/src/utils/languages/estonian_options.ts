@@ -1,6 +1,6 @@
 import { SingleLanguageLabels } from "./index"
 
-const finnishLabels: SingleLanguageLabels = {
+const estonianLabels: SingleLanguageLabels = {
   essay: {
     exampleAnswerLabel: "Näide",
     userAnswerLabel: "Sinu vastus",
@@ -53,9 +53,9 @@ const finnishLabels: SingleLanguageLabels = {
     answerFlaggedAsSpam: "Sinu vastus on märgitud spämmiks",
     answerConfirmed: "Sinu vastus on vastu võetud!",
     manualReview: "Sinu vastust vaatab läbi kursuse koordinaator",
-    peerReviewGroupTitle: "Vertaisarviointikysymykset",
+    peerReviewGroupTitle: "Vastastikuse hinnangu küsimused",
     peerReviewLikertDetails:
-      "Arvioi jokainen väite asteikolla 1-5. 1 on vahvasti eri mieltä ja 5 on vahvasti samaa mieltä.",
+      "Hinnake iga väidet skaalal 1-5. 1: üldse ei nõustu, 5: nõustun kindlalt",
   },
   receivedPeerReviews: {
     errorLabel:
@@ -145,4 +145,4 @@ const finnishLabels: SingleLanguageLabels = {
   },
 }
 
-export default finnishLabels
+export default estonianLabels

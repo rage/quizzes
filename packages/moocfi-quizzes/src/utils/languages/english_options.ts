@@ -51,9 +51,9 @@ const englishLabels: SingleLanguageLabels = {
     answerFlaggedAsSpam: "Your answer has been reported as spam",
     answerConfirmed: "Your answer has been accepted!",
     manualReview: "Your answer is being reviewed by course staff",
-    peerReviewGroupTitle: "Vertaisarviointikysymykset",
+    peerReviewGroupTitle: "Peer review questions",
     peerReviewLikertDetails:
-      "Arvioi jokainen väite asteikolla 1-5. 1 on vahvasti eri mieltä ja 5 on vahvasti samaa mieltä.",
+      "Evaluate each statement on a scale of 1-5. 1 means strongly disagree, 5 means strongly agree.",
   },
   receivedPeerReviews: {
     averageOfGradesLabel: "The average grade of received reviews is",
@@ -137,11 +137,10 @@ const englishLabels: SingleLanguageLabels = {
     submitFailedError: "Could not send your answer. Please try again later.",
     quizLoadFailedError: "Could not load the exercise",
     progressFetchError:
-      "Suoritustietojen lataaminen ei onnistunut. Kokeile myöhemmin uudestaan",
-    submitSpamFlagError:
-      "Asiattomasta vastauksesta ilmoittaminen ei onnistunut",
+      "Could not fetch course progress data. Please try again later.",
+    submitSpamFlagError: "Could not report spam.",
     fetchReviewCandidatesError:
-      "Vastausten lataaminen vertaisarviota varten ei onnistunut. Kokeile myöhemmin uudestaan.",
+      "Something went wrong while retrieving answers for peer review. Please try again later.",
   },
 }
 
