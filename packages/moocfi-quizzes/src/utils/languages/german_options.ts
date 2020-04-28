@@ -1,6 +1,6 @@
 import { SingleLanguageLabels } from "./index"
 
-const finnishLabels: SingleLanguageLabels = {
+const germanLabels: SingleLanguageLabels = {
   essay: {
     exampleAnswerLabel: "Musterantwort",
     userAnswerLabel: "Deine Antwort",
@@ -151,4 +151,4 @@ const finnishLabels: SingleLanguageLabels = {
   },
 }
 
-export default finnishLabels
+export default germanLabels
