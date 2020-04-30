@@ -113,6 +113,7 @@ export interface ICourse {
   minPeerReviewsGiven: number
   minReviewAverage: number
   maxSpamFlags: number
+  maxReviewSpamFlags: number
   languages: ILanguage[]
   texts: ICourseText[]
   organization: any

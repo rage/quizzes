@@ -377,6 +377,7 @@ interface ICourse {
   min_peer_reviews_given: number
   min_review_average: number
   max_spam_flags: number
+  max_review_spam_flags: number
   organization: any
 }
 
