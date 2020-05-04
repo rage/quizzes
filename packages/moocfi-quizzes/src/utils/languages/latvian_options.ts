@@ -103,7 +103,7 @@ const latvianLabels: SingleLanguageLabels = {
     answerCorrectLabel: "Atbilde pareiza",
     alreadyAnsweredLabel: "Uz šo jau atbildējāt.",
     answerIncorrectLabel: "Atbilde nav pareiza",
-    kOutOfNCorrect: (k, n) => `No ${k}/${n}atbildēm pareizas k.`,
+    kOutOfNCorrect: (k, n) => `Pareizi atbildēts ${k}/${n}.`,
     pointsAvailableLabel: "Par uzdevumu var saņemt šādu skaitu punktu:",
     pointsReceivedLabel: "Saņemtie punkti",
     incorrectSubmitWhileTriesLeftLabel:

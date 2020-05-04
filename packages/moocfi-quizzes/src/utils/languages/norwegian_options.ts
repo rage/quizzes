@@ -27,7 +27,7 @@ const norwegianLabels: SingleLanguageLabels = {
   open: {
     placeholder: "Svar",
     userAnswerLabel: "Ditt svar",
-    feedbackForFailure: "Svaret ditt er ikke korrekt",
+    feedbackForFailure: "Svaret ditt er ikke riktig",
     feedbackForSuccess: "Svaret ditt er korrekt",
   },
   peerReviews: {
@@ -87,7 +87,7 @@ const norwegianLabels: SingleLanguageLabels = {
     selectCorrectAnswerLabel: "Velg riktig svar",
     chooseAllSuitableOptionsLabel: "Velg  riktige påstander",
     answerCorrectLabel: "Korrekt",
-    answerIncorrectLabel: "Ikke korrekt",
+    answerIncorrectLabel: "Ikke riktig",
   },
   stage: {
     answerStageLabel: "Å svare på oppgaven",
@@ -106,7 +106,7 @@ const norwegianLabels: SingleLanguageLabels = {
     loadingLabel: "Laster inn",
     answerCorrectLabel: "Svaret er korrekt",
     alreadyAnsweredLabel: "Du har allerede besvart dette",
-    answerIncorrectLabel: "Svaret er ikke korrekt",
+    answerIncorrectLabel: "Svaret er ikke riktig",
     kOutOfNCorrect: (k, n) => `${k}/${n} svar er korrekt`,
     pointsAvailableLabel: "Poeng tilgjengelig",
     pointsReceivedLabel: "Din poengsum",
