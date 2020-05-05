@@ -124,7 +124,7 @@ const latvianLabels: SingleLanguageLabels = {
           return ""
       }
     },
-    answered: "Atbildēja",
+    answered: "Atbildēts",
     unanswered: "Neatbildēts",
     rejected: "Atbilde noraidīta. Lūdzu, mēģiniet vēlreiz",
     progressUpdated: "Atjaunināti dati par to, cik tālu kurss nokārtots.",
