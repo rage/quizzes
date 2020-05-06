@@ -5,10 +5,11 @@ import { Typography } from "@material-ui/core"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { StyledTextField } from "./styleComponents"
-import { SpaciousPaper } from "./styleComponents"
+import { ItemContent, SpaciousPaper } from "./styleComponents"
 import { QuizItem, MiscEvent } from "../modelTypes"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
 import MarkdownText from "./MarkdownText"
+import ThemeProviderContext from "../contexes/themeProviderContext"
 
 type OpenProps = {
   item: QuizItem
@@ -27,9 +28,11 @@ const SolutionPaper = styled(SpaciousPaper)<SolutionPaperProps>`
 `
 
 const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
+  const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
 
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
+  const quiz = useTypedSelector(state => state.quiz)
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
@@ -58,12 +61,22 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
 
   const { successMessage, failureMessage } = item.texts[0]
 
+  const singleItemQuiz = quiz && quiz.items.length === 1
+
+  const providedStyles = singleItemQuiz
+    ? themeProvider.narrowOpenItemContentStyles
+    : themeProvider.wideOpenItemContentStyles
+
   const guidance = (
     <>
-      <MarkdownText variant="h6">{itemTitle}</MarkdownText>
+      <MarkdownText id={`${itemTitle}-title`} component="p" variant="h6">
+        {itemTitle}
+      </MarkdownText>
       <MarkdownText variant="body1">{item.texts[0].body}</MarkdownText>
     </>
   )
+
+  const FeedbackMessage = themeProvider.feedbackMessage || SolutionPaper
 
   if (displayFeedback) {
     const answerPortion = answerLocked ? (
@@ -78,44 +91,59 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
         fullWidth
         margin="normal"
         variant="outlined"
+        //label={itemTitle ? itemTitle : openLabels.placeholder}
         label={openLabels.placeholder}
+        id={`${itemTitle}-textfield`}
       />
     )
 
     return (
-      <div>
-        {guidance}
-        {
-          <Typography variant="subtitle1">
-            {openLabels.userAnswerLabel}:
-          </Typography>
-        }
-        {answerPortion}
-        <SolutionPaper correct={correct}>
-          <MarkdownText Component={Typography} variant="body1">
-            {correct
-              ? successMessage || openLabels.feedbackForSuccess
-              : failureMessage || openLabels.feedbackForFailure}
-          </MarkdownText>
-        </SolutionPaper>
-      </div>
+      <ItemContent providedStyles={providedStyles}>
+        <div className="openAnswered">
+          {guidance}
+          {
+            <Typography component="p" variant="subtitle1">
+              {openLabels.userAnswerLabel}:
+            </Typography>
+          }
+          {answerPortion}
+          <FeedbackMessage
+            correct={correct}
+            message={
+              correct
+                ? openLabels.feedbackForSuccess
+                : openLabels.feedbackForFailure
+            }
+          >
+            <MarkdownText Component={Typography} variant="body1">
+              {correct
+                ? successMessage || openLabels.feedbackForSuccess
+                : failureMessage || openLabels.feedbackForFailure}
+            </MarkdownText>
+          </FeedbackMessage>
+        </div>
+      </ItemContent>
     )
   }
 
   return (
-    <div>
-      {guidance}
-      <StyledTextField
-        rowNumber={item.order}
-        value={textData}
-        onChange={handleTextDataChange}
-        fullWidth
-        margin="normal"
-        variant="outlined"
-        label={openLabels.placeholder}
-        disabled={quizDisabled}
-      />
-    </div>
+    <ItemContent providedStyles={providedStyles}>
+      <div className="open">
+        {guidance}
+        <StyledTextField
+          rowNumber={item.order}
+          value={textData}
+          onChange={handleTextDataChange}
+          fullWidth
+          margin="normal"
+          variant="outlined"
+          //label={itemTitle ? itemTitle : openLabels.placeholder}
+          label={openLabels.placeholder}
+          disabled={quizDisabled}
+          id={`${itemTitle}-textfield`}
+        />
+      </div>
+    </ItemContent>
   )
 }
 

@@ -1,12 +1,13 @@
 {
   "name": "moocfi-quizzes",
-  "version": "0.6.1",
+  "version": "0.7.17-alpha",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf ./dist && tsc",
     "prepare": "yarn build",
-    "watch": "tsc --watch"
+    "watch": "tsc --watch",
+    "watch-deploy": "watch 'yalc publish --changed && cd ../../../elements-of-ai-material && yalc update' src"
   },
   "keywords": [],
   "author": "",
@@ -27,19 +28,22 @@
     "@types/styled-components": "^4.1.16",
     "axios": "^0.18.0",
     "commonmark": "^0.29.0",
+    "graphql-request": "^1.8.2",
     "likert-react": "^0.0.0-beta6",
     "parcel": "^1.12.3",
     "react": "16.x",
     "react-content-loader": "^4.2.2",
     "react-dom": ">= 16.3.0",
     "react-redux": "^7.1.0",
+    "react-toastify": "^5.5.0",
     "reduce-reducers": "^1.0.4",
     "redux": "^4.0.1",
     "redux-devtools-extension": "^2.13.8",
     "redux-thunk": "^2.3.0",
     "styled-components": "^4.3.2",
     "typesafe-actions": "^4.4.2",
-    "typescript": "^3.5.2"
+    "typescript": "^3.5.2",
+    "watch": "^1.0.2"
   },
   "peerDependencies": {
     "@fortawesome/fontawesome-free": "^5.9.0",
@@ -52,15 +56,20 @@
     "@types/commonmark": "^0.27.4",
     "axios": "^0.18.0",
     "commonmark": "^0.29.0",
+    "graphql-request": "^1.8.2",
     "likert-react": "^0.0.0-beta6",
     "react": ">=16.0.0",
     "react-content-loader": "^4.2.2",
     "react-dom": ">=16.0.0",
     "react-redux": ">= 7.1.0",
+    "react-toastify": "^5.5.0",
     "reduce-reducers": "^1.0.4",
     "redux": "^4.0.1",
     "redux-thunk": "^2.3.0",
     "styled-components": "^4.3.2",
     "typesafe-actions": "^4.4.2"
+  },
+  "dependencies": {
+    "prop-types": "^15.7.2"
   }
 }

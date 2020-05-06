@@ -22,25 +22,9 @@ export const requestReviews: ActionCreator<ThunkAction> = () => async (
   dispatch,
   getState,
 ) => {
-  dispatch(setLoadingState("began"))
-  setTimeout(() => {
-    // if not finished loading
-    if (getState().receivedReviews.loadingState === "began") {
-      dispatch(setLoadingState("loading"))
-    }
-  }, 1500)
-  const answerId = getState().quizAnswer.quizAnswer.id
-  const accessToken = getState().user.accessToken
-  if (!answerId || !accessToken) {
-    dispatch(
-      messageActions.setErrorMessage(
-        "Something unexpected occurred -- try reloading",
-      ),
-    )
-    return
-  }
-
   try {
+    const answerId = getState().quizAnswer.quizAnswer.id || ""
+    const accessToken = getState().user.accessToken
     const reviews = await getReceivedReviews(
       answerId,
       accessToken,
@@ -48,7 +32,12 @@ export const requestReviews: ActionCreator<ThunkAction> = () => async (
     )
 
     dispatch(setReviews(reviews))
-  } catch (e) {
-    dispatch(setLoadingState("error"))
+  } catch (error) {
+    const labels = getState().language.languageLabels
+    dispatch(
+      messageActions.errorOccurred(
+        (labels && labels.receivedPeerReviews.errorLabel) || "error",
+      ),
+    )
   }
 }

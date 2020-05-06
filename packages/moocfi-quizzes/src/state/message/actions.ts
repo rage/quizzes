@@ -3,7 +3,33 @@ import { createAction } from "typesafe-actions"
 import { MessageState } from "./reducer"
 import { ThunkAction } from "../store"
 
-export const set = createAction("message/SET", resolve => {
+export const fatalErrorOccurred = createAction(
+  "message/FATAL_ERROR",
+  resolve => {
+    return (message: string) => resolve(message)
+  },
+)
+
+export const errorOccurred = createAction("message/ERROR", resolve => {
+  return (message: string) => resolve(message)
+})
+
+export const notify = createAction("message/INFO", resolve => {
+  return (message: string) => resolve(message)
+})
+
+export const clear = createAction("message/CLEAR")
+
+export const notifyUser: ActionCreator<ThunkAction> = (
+  message: string,
+  lengthInSeconds?: number,
+) => async dispatch => {
+  dispatch(notify(message))
+
+  setTimeout(() => dispatch(clear()), 1000 * (lengthInSeconds || 10))
+}
+
+/*export const set = createAction("message/SET", resolve => {
   return (message: MessageState) => resolve(message)
 })
 
@@ -45,6 +71,4 @@ export const displayNotification: ActionCreator<ThunkAction> = (
   if (lengthInSeconds) {
     setTimeout(() => dispatch(clearNotification()), 1000 * lengthInSeconds)
   }
-}
-
-export const clear = createAction("message/CLEAR")
+}*/

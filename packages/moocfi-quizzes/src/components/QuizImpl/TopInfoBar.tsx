@@ -1,21 +1,47 @@
 import ContentLoader from "react-content-loader"
 import * as React from "react"
-import { Grid, Typography } from "@material-ui/core"
+import { Typography } from "@material-ui/core"
 import styled from "styled-components"
 import { useTypedSelector } from "../../state/store"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons"
+import ThemeProviderContext from "../../contexes/themeProviderContext"
 
-const StyledGrid = styled(Grid)`
-  padding: 1rem;
+export interface TopInfoBarContainerProps {
+  loggedIn?: boolean
+  answered?: boolean
+  confirmed?: boolean
+  rejected?: boolean
+}
+
+const Container = styled.div<TopInfoBarContainerProps>`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 2rem;
   color: white;
   background-color: #213094;
 `
 
+const IconContainer = styled.div`
+  margin-right: 1rem;
+  font-size: 3.5rem;
+`
+
+const TitleContainer = styled.div`
+  margin-right: auto;
+`
+
+const PointsContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+`
+
+const QuizStatusMessage = styled(Typography)``
+
 const PointsText = styled(Typography)`
   font-size: 1.5rem !important;
   text-align: end;
-  color: white;
   display: inline;
   max-height: 100%;
 
@@ -24,39 +50,12 @@ const PointsText = styled(Typography)`
   }
 `
 
-const XXS12Grid = styled(Grid)`
-  @media (max-width: 550px) {
-    max-width: 100%;
-    flex-basis: 100%;
-  }
-`
-
 const PointsLabelText = styled(Typography)`
   font-size: 1rem !important;
-  color: white;
 
   @media (max-width: 550px) {
     text-align: start;
     margin-top: 10px;
-  }
-`
-
-const IconWrapper = styled.div`
-  font-size: 3.5rem;
-  margin: 0 1.5rem 0 0.5rem;
-  @media (max-width: 550px) {
-    text-align: center;
-  }
-`
-
-const RightMarginedGrid = styled(Grid)`
-  margin-right: 1.5rem;
-  text-align: end;
-
-  @media (max-width: 550px) {
-    max-width: 100%;
-    flex-basis: 100%;
-    text-align: left;
   }
 `
 
@@ -72,17 +71,19 @@ interface ITopInfoBarProps {
 const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   staticBars,
 }) => {
+  const themeProvider = React.useContext(ThemeProviderContext)
+  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const loggedIn = !!useTypedSelector(state => state.user.accessToken)
   const quiz = useTypedSelector(state => state.quiz)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const displayBars = useTypedSelector(state => state.loadingBars)
-  const showPointsInfo = useTypedSelector(
-    state => state.customization.showPointsInfo,
-  )
 
   let title
   let quizLabel
+  let answeredLabel
+  let unansweredLabel
+  let rejectedLabel
   let pointsLabel
   let receivedPoints
   let formattedReceivedPoints
@@ -91,7 +92,22 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   if (languageInfo) {
     quizLabel = languageInfo.general.quizLabel
     pointsLabel = languageInfo.general.pointsLabel
+    answeredLabel = languageInfo.general.answered
+    unansweredLabel = languageInfo.general.unanswered
+    rejectedLabel = languageInfo.general.rejected
   }
+
+  const answerStatus = quizAnswer.status
+  const status = answerStatus
+    ? answerStatus !== "rejected" && answerStatus !== "spam"
+      ? "answered"
+      : "rejected"
+    : ""
+  const statusLabel = status
+    ? status === "rejected"
+      ? rejectedLabel
+      : answeredLabel
+    : unansweredLabel
 
   let titleReplacement
   let pointsPortion
@@ -156,40 +172,48 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
     }
   }
 
+  const ProvidedIcon = themeProvider.topInfoBarIcon
+  const TopInfoBarContainer = themeProvider.topInfoBarContainer || Container
+
   return (
-    <StyledGrid
-      container={true}
-      justify="space-between"
-      alignItems="flex-start"
-    >
-      <XXS12Grid item={true} xs={9}>
-        <Grid container={true} alignItems="stretch">
-          <XXS12Grid item={true} xs={3} md={2}>
-            <IconWrapper>
-              <FontAwesomeIcon icon={faQuestionCircle} />
-            </IconWrapper>
-          </XXS12Grid>
-
-          <XXS12Grid item={true} xs={9} md={10}>
-            <Typography variant="subtitle1">{quizLabel}:</Typography>
-            {quiz ? (
-              <Typography variant="h5">{title}</Typography>
-            ) : (
-              titleReplacement
-            )}
-          </XXS12Grid>
-        </Grid>
-      </XXS12Grid>
-
-      {(!quiz || showPointsInfo) && (
-        <RightMarginedGrid item={true} xs={2}>
+    <TopInfoBarContainer loggedIn={loggedIn}>
+      <IconContainer>
+        {ProvidedIcon ? (
+          <>
+            <ProvidedIcon status={status} />
+            <QuizStatusMessage className={status} variant="subtitle1">
+              {statusLabel}
+            </QuizStatusMessage>
+          </>
+        ) : (
+          <FontAwesomeIcon icon={faQuestionCircle} />
+        )}
+      </IconContainer>
+      <TitleContainer>
+        <Typography component="p" variant="subtitle1" id="quiz-type-label">
+          {quizLabel}:
+        </Typography>
+        {quiz ? (
+          <Typography
+            variant="h5"
+            component="h2"
+            aria-describedby="quiz-type-label"
+          >
+            {title}
+          </Typography>
+        ) : (
+          titleReplacement
+        )}
+      </TitleContainer>
+      {(!quiz || !quiz.excludedFromScore) && (
+        <PointsContainer>
           <PointsLabelText component="div" paragraph={false}>
             {pointsLabel}:
           </PointsLabelText>
           {pointsPortion}
-        </RightMarginedGrid>
+        </PointsContainer>
       )}
-    </StyledGrid>
+    </TopInfoBarContainer>
   )
 }
 

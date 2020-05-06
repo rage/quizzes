@@ -61,11 +61,16 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
           color="primary"
           onChange={toggle}
           {...checkboxOptions}
+          inputProps={{ "aria-label": `${title}` }}
         />
       </Grid>
       <VertCenteredGrid item xs>
         {title && (
-          <MarkdownTextWithoutMargin Component={Typography} variant="subtitle1">
+          <MarkdownTextWithoutMargin
+            component="p"
+            Component={Typography}
+            variant="subtitle1"
+          >
             {title}
           </MarkdownTextWithoutMargin>
         )}

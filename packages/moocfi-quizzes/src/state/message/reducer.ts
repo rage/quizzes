@@ -2,18 +2,26 @@ import { ActionType, getType } from "typesafe-actions"
 import * as message from "./actions"
 
 export const initialState = {
-  errorMessage: null,
+  fatal: false,
+  error: false,
+  info: false,
+  message: "",
+  /*errorMessage: null,
   notification: null,
-  notificationDisplayedUntilAnswerChanges: false,
+  notificationDisplayedUntilAnswerChanges: false,*/
 }
 
 export type MessageState = {
-  errorMessage: string | null
+  fatal: boolean
+  error: boolean
+  info: boolean
+  message: string
+  /*errorMessage: string | null
   notification: {
     message: string
     color: string
   } | null
-  notificationDisplayedUntilAnswerChanges: boolean
+  notificationDisplayedUntilAnswerChanges: boolean*/
 }
 
 export const messageReducer = (
@@ -21,7 +29,27 @@ export const messageReducer = (
   action: ActionType<typeof message>,
 ): MessageState => {
   switch (action.type) {
-    case getType(message.setErrorMessage):
+    case getType(message.fatalErrorOccurred):
+      return {
+        ...state,
+        fatal: true,
+        message: action.payload,
+      }
+    case getType(message.errorOccurred):
+      return {
+        ...state,
+        error: true,
+        message: action.payload,
+      }
+    case getType(message.notify):
+      return {
+        ...state,
+        info: true,
+        message: action.payload,
+      }
+    case getType(message.clear):
+      return initialState
+    /*case getType(message.setErrorMessage):
       return {
         ...state,
         errorMessage: action.payload,
@@ -54,9 +82,7 @@ export const messageReducer = (
       return {
         ...state,
         notification: initialState.notification,
-      }
-    case getType(message.clear):
-      return initialState
+      }*/
     default:
       return state
   }

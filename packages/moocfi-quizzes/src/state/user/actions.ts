@@ -2,7 +2,9 @@ import { ActionCreator } from "redux"
 import { createAction } from "typesafe-actions"
 import { ThunkAction } from "../store"
 import { UserState } from "./reducer"
-import { QuizAnswerStatePayload, UserQuizState } from "../../modelTypes"
+import { Quiz, QuizAnswerStatePayload, UserQuizState } from "../../modelTypes"
+import { getQuizInfo, QuizResponse } from "../../services/quizService"
+import { setAnswer } from "../quizAnswer/actions"
 
 export const set = createAction("user/SET", resolve => {
   return (newState: UserState) => resolve(newState)
@@ -30,6 +32,19 @@ export const setUserQuizState: ActionCreator<ThunkAction> = (
         userQuizState,
       }),
     )
+  }
+}
+
+export const updateQuizState: ActionCreator<ThunkAction> = () => {
+  return async (dispatch, getState) => {
+    const responseData = (await getQuizInfo(
+      getState().quiz.id,
+      getState().user.accessToken,
+      getState().backendAddress,
+      true,
+    )) as QuizAnswerStatePayload
+    dispatch(setQuizState(responseData))
+    dispatch(setAnswer(responseData.quizAnswer))
   }
 }
 

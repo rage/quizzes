@@ -260,7 +260,8 @@ export default class UserCourseStateService {
       )
       const actionObject = {
         quizId: quiz.id,
-        coursePart: quiz.part,
+        part: quiz.part,
+        section: quiz.section,
         status: quizAnswer.status,
         messages: [] as string[],
       }
