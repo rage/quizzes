@@ -5,6 +5,7 @@ import {
   PeerReview,
   Quiz,
   QuizAnswer,
+  QuizAnswerStatusType,
   QuizItem,
   QuizItemAnswer,
   UserQuizState,
@@ -276,7 +277,6 @@ export default class ValidationService {
     "given-enough",
     "submitted",
     "enough-received-but-not-given",
-    "manual-review",
   ]
 
   public validateEssayAnswer(
@@ -291,20 +291,17 @@ export default class ValidationService {
 
     if (
       this.openishStates.includes(quizAnswer.status) &&
-      userQuizState.spamFlags > course.maxSpamFlags
+      userQuizState.spamFlags > course.maxSpamFlags &&
+      quiz.autoReject
     ) {
-      if (quiz.autoReject) {
-        quizAnswer.status = "spam"
-        if (quiz.triesLimited && userQuizState.tries >= quiz.tries) {
-          userQuizState.status = "locked"
-        } else {
-          userQuizState.spamFlags = null
-          userQuizState.peerReviewsReceived = 0
-          userQuizState.status = "open"
-          userQuizState.pointsAwarded = null
-        }
+      quizAnswer.status = "spam"
+      if (quiz.triesLimited && userQuizState.tries >= quiz.tries) {
+        userQuizState.status = "locked"
       } else {
-        quizAnswer.status = "manual-review"
+        userQuizState.spamFlags = null
+        userQuizState.peerReviewsReceived = 0
+        userQuizState.status = "open"
+        userQuizState.pointsAwarded = null
       }
     } else if (
       quizAnswer.status === "submitted" &&
@@ -377,6 +374,98 @@ export default class ValidationService {
     }
 
     return { quizAnswer, userQuizState }
+  }
+
+  public assesAnswerStatus(
+    quiz: Quiz,
+    quizAnswer: QuizAnswer,
+    userQuizState: UserQuizState,
+    peerReviews: PeerReview[],
+  ): QuizAnswerStatusType {
+    const autoConfirm = quiz.autoConfirm
+    const autoReject = quiz.autoReject
+
+    const maxSpamFlags = quiz.course.maxSpamFlags
+    const maxReviewSpamFlags = quiz.course.maxReviewSpamFlags
+
+    const spamFlagsReceived = userQuizState.spamFlags
+
+    const givenEnough =
+      userQuizState.peerReviewsGiven >= quiz.course.minPeerReviewsGiven
+    const givenExtra =
+      userQuizState.peerReviewsGiven > quiz.course.minPeerReviewsGiven
+    const receivedEnough =
+      userQuizState.peerReviewsReceived >= quiz.course.minPeerReviewsReceived
+
+    const flaggedButPassing =
+      0 < spamFlagsReceived && spamFlagsReceived <= maxSpamFlags
+    const flaggedAndFailing =
+      maxSpamFlags < spamFlagsReceived && spamFlagsReceived < maxReviewSpamFlags
+    const flaggedAndFailingHard = spamFlagsReceived >= maxReviewSpamFlags
+
+    if (autoReject && (flaggedAndFailing || flaggedAndFailingHard)) {
+      return "spam"
+    }
+
+    if (!autoReject) {
+      if (flaggedAndFailingHard) {
+        return "manual-review"
+      }
+      if (flaggedAndFailing) {
+        if (givenEnough) {
+          return "manual-review"
+        } else {
+          return "manual-review-once-given-enough"
+        }
+      }
+      if (flaggedButPassing) {
+        if (givenEnough && receivedEnough) {
+          return "manual-review"
+        } else {
+          return "manual-review-once-given-and-received-enough"
+        }
+      }
+    }
+
+    if (!givenEnough && !receivedEnough) {
+      return quizAnswer.status
+    }
+
+    if (!givenEnough && receivedEnough) {
+      return "enough-received-but-not-given"
+    }
+
+    if (givenEnough && !receivedEnough) {
+      if (givenExtra) {
+        return "given-more-than-enough"
+      } else {
+        return "given-enough"
+      }
+    }
+
+    if (autoConfirm) {
+      const answers: number[] = [].concat(
+        ...peerReviews.map(pr =>
+          pr.answers.map(a => {
+            if (a.value) {
+              return a.value
+            }
+          }),
+        ),
+      )
+
+      const sum: number = answers.reduce((prev, curr) => prev + curr, 0)
+
+      if (sum / answers.length >= quiz.course.minReviewAverage) {
+        return "confirmed"
+      } else if (autoReject) {
+        return "rejected"
+      } else {
+        return "manual-review"
+      }
+    }
+
+    return quizAnswer.status
   }
 
   public async checkForDeprecated(

@@ -43,7 +43,4 @@ class BottomActionButtons extends React.Component<any, any> {
   }
 }
 
-export default connect(
-  null,
-  { remove },
-)(BottomActionButtons)
+export default connect(null, { remove })(BottomActionButtons)

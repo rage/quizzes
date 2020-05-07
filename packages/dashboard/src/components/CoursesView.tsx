@@ -91,7 +91,4 @@ const mapStateToProps = (state: any) => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  { clear },
-)(CoursesView)
+export default connect(mapStateToProps, { clear })(CoursesView)

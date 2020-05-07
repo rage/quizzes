@@ -78,7 +78,4 @@ const mapDispatchToProps = {
   displayMessage,
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SuccessNotification)
+export default connect(mapStateToProps, mapDispatchToProps)(SuccessNotification)

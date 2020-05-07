@@ -8,9 +8,7 @@ interface ISharedFeedbackCustomiserProps {
   handleMessageChange: (e: any) => void
 }
 
-const SharedFeedbackCustomiser: React.FunctionComponent<
-  ISharedFeedbackCustomiserProps
-> = ({
+const SharedFeedbackCustomiser: React.FunctionComponent<ISharedFeedbackCustomiserProps> = ({
   sharedMessageIsUsed,
   sharedFeedbackMessage,
   handleMessageChange,

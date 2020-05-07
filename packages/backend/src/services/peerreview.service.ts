@@ -284,17 +284,15 @@ export default class PeerReviewService {
       return []
     }
 
-    allCandidates = allCandidates.sort(
-      (a, b): number => {
-        if (a.status < b.status) {
-          return 1
-        } else if (a.status > b.status) {
-          return -1
-        } else {
-          return 0
-        }
-      },
-    )
+    allCandidates = allCandidates.sort((a, b): number => {
+      if (a.status < b.status) {
+        return 1
+      } else if (a.status > b.status) {
+        return -1
+      } else {
+        return 0
+      }
+    })
 
     allCandidates = allCandidates.slice(0, 2)
 

@@ -144,7 +144,4 @@ class ExpandedEssay extends React.Component<any, any> {
   }
 }
 
-export default connect(
-  null,
-  { changeAttr },
-)(ExpandedEssay)
+export default connect(null, { changeAttr })(ExpandedEssay)
