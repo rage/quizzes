@@ -279,7 +279,7 @@ export default class ValidationService {
     "enough-received-but-not-given",
   ]
 
-  public validateEssayAnswer(
+  public validateEssayAnswerDepr(
     quiz: Quiz,
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
@@ -372,6 +372,43 @@ export default class ValidationService {
         quizAnswer.status = "given-more-than-enough"
       }
     }
+
+    return { quizAnswer, userQuizState }
+  }
+
+  public validateEssayAnswer(
+    quiz: Quiz,
+    quizAnswer: QuizAnswer,
+    userQuizState: UserQuizState,
+    peerReviews: PeerReview[] = [],
+  ) {
+    const oldStatus = quizAnswer.status
+    const newStatus = this.assesAnswerStatus(
+      quiz,
+      quizAnswer,
+      userQuizState,
+      peerReviews,
+    )
+
+    if (newStatus === oldStatus) {
+      return { quizAnswer, userQuizState }
+    }
+
+    if (
+      (newStatus === "spam" || newStatus === "rejected") &&
+      !(quiz.triesLimited && userQuizState.tries >= quiz.tries)
+    ) {
+      userQuizState.spamFlags = null
+      userQuizState.peerReviewsReceived = 0
+      userQuizState.pointsAwarded = null
+      userQuizState.status = "open"
+    }
+
+    if (newStatus === "confirmed") {
+      userQuizState.pointsAwarded = 1 * quiz.points
+    }
+
+    quizAnswer.status = newStatus
 
     return { quizAnswer, userQuizState }
   }
