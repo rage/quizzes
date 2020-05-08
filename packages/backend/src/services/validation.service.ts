@@ -382,8 +382,12 @@ export default class ValidationService {
     userQuizState: UserQuizState,
     peerReviews: PeerReview[] = [],
   ) {
+    if (["confirmed", "rejected", "spam"].includes(quizAnswer.status)) {
+      return { quizAnswer, userQuizState }
+    }
+
     const oldStatus = quizAnswer.status
-    const newStatus = this.assesAnswerStatus(
+    const newStatus = this.assessAnswerStatus(
       quiz,
       quizAnswer,
       userQuizState,
@@ -405,6 +409,7 @@ export default class ValidationService {
     }
 
     if (newStatus === "confirmed") {
+      // TODO: Different multiplier for quizzes that have varying quiz item types
       userQuizState.pointsAwarded = 1 * quiz.points
     }
 
@@ -413,7 +418,7 @@ export default class ValidationService {
     return { quizAnswer, userQuizState }
   }
 
-  public assesAnswerStatus(
+  public assessAnswerStatus(
     quiz: Quiz,
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
@@ -434,28 +439,25 @@ export default class ValidationService {
     const receivedEnough =
       userQuizState.peerReviewsReceived >= quiz.course.minPeerReviewsReceived
 
-    const flaggedButPassing =
-      0 < spamFlagsReceived && spamFlagsReceived <= maxSpamFlags
-    const flaggedAndFailing =
-      maxSpamFlags < spamFlagsReceived && spamFlagsReceived < maxReviewSpamFlags
-    const flaggedAndFailingHard = spamFlagsReceived >= maxReviewSpamFlags
+    const flaggedButKeepInPeerReviewPool =
+      spamFlagsReceived >= maxSpamFlags &&
+      spamFlagsReceived < maxReviewSpamFlags
+    const flaggedAndRemoveFromPeerReviewPool =
+      spamFlagsReceived >= maxReviewSpamFlags
 
-    if (autoReject && (flaggedAndFailing || flaggedAndFailingHard)) {
+    if (autoReject && flaggedAndRemoveFromPeerReviewPool) {
       return "spam"
     }
 
     if (!autoReject) {
-      if (flaggedAndFailingHard) {
-        return "manual-review"
-      }
-      if (flaggedAndFailing) {
+      if (flaggedAndRemoveFromPeerReviewPool) {
         if (givenEnough) {
           return "manual-review"
         } else {
           return "manual-review-once-given-enough"
         }
       }
-      if (flaggedButPassing) {
+      if (flaggedButKeepInPeerReviewPool) {
         if (givenEnough && receivedEnough) {
           return "manual-review"
         } else {
@@ -481,17 +483,17 @@ export default class ValidationService {
     }
 
     if (autoConfirm) {
-      const answers: number[] = [].concat(
-        ...peerReviews.map(pr =>
-          pr.answers.map(a => {
-            if (a.value) {
-              return a.value
-            }
-          }),
-        ),
-      )
+      const answers = peerReviews
+        .map(pr => pr.answers.map(a => a.value))
+        .flat()
+        .filter(o => o !== undefined && o !== null)
 
       const sum: number = answers.reduce((prev, curr) => prev + curr, 0)
+
+      if (answers.length === 0) {
+        console.warn("Assessing an essay with 0 numeric peer review answers")
+        return quizAnswer.status
+      }
 
       if (sum / answers.length >= quiz.course.minReviewAverage) {
         return "confirmed"
@@ -501,6 +503,8 @@ export default class ValidationService {
         return "manual-review"
       }
     }
+
+    // TODO: if not auto confirm move to manual review once widget smart enough
 
     return quizAnswer.status
   }
