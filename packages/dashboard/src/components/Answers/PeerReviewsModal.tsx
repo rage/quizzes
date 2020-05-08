@@ -191,4 +191,7 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { setQuiz })(PeerReviewsModal)
+export default connect(
+  mapStateToProps,
+  { setQuiz },
+)(PeerReviewsModal)

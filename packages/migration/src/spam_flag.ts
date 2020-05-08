@@ -14,11 +14,11 @@ export async function migrateSpamFlags(
   logger.info("Querying spam flags...")
 
   const currentFlagIds: { [id: string]: boolean } = {}
-  ;(
-    await SpamFlag.createQueryBuilder()
-      .select(["id"])
-      .getRawMany()
-  ).forEach((idObject: { id: string }) => (currentFlagIds[idObject.id] = true))
+  ;(await SpamFlag.createQueryBuilder()
+    .select(["id"])
+    .getRawMany()).forEach(
+    (idObject: { id: string }) => (currentFlagIds[idObject.id] = true),
+  )
 
   logger.info(
     `${Object.keys(currentFlagIds).length} existing spam flags in the database`,
@@ -29,9 +29,9 @@ export async function migrateSpamFlags(
     return [split.slice(0, -1).join("-"), split.slice(-1)[0]]
   })
 
-  const existingIDs = (
-    await QuizAnswer.query("select id from quiz_answer")
-  ).map((qa: any) => qa.id)
+  const existingIDs = (await QuizAnswer.query(
+    "select id from quiz_answer",
+  )).map((qa: any) => qa.id)
 
   let bar = progressBar("Converting spam flags", oldFlags.length)
   const spamFlags: Array<QueryPartialEntity<SpamFlag>> = []

@@ -121,4 +121,7 @@ class ExpandedCheckbox extends React.Component<any, IExpandedCheckboxState> {
   }
 }
 
-export default connect(null, { changeAttr, save })(ExpandedCheckbox)
+export default connect(
+  null,
+  { changeAttr, save },
+)(ExpandedCheckbox)
