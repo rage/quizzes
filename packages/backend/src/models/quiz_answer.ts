@@ -16,7 +16,7 @@ import { Quiz } from "./quiz"
 import { QuizItemAnswer } from "./quiz_item_answer"
 import { User } from "./user"
 
-type QuizAnswerStatusType =
+export type QuizAnswerStatusType =
   | "draft"
   | "given-more-than-enough"
   | "given-enough"
