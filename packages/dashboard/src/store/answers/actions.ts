@@ -12,12 +12,21 @@ export const set = createAction("answers/SET", resolve => {
 
 export const clear = createAction("answers/CLEAR")
 
+export const loadingStateChanged = createAction(
+  "answers/LOADING_STATE_CHANGED",
+  resolve => {
+    return (newState: boolean) => resolve(newState)
+  },
+)
+
 export const setAllAnswers = (
   quizId: string,
   wantedPageNumber: number,
   answersPerPage: number,
 ) => {
   return async (dispatch, getState) => {
+    dispatch(loadingStateChanged(true))
+
     try {
       // dispatch(clear())
       const data = await getQuizAnswers(
@@ -28,6 +37,7 @@ export const setAllAnswers = (
       )
       await dispatch(set(data))
     } catch (error) {
+      dispatch(loadingStateChanged(false))
       console.log(error)
     }
   }
@@ -39,6 +49,8 @@ export const setAttentionRequiringAnswers = (
   answersPerPage: number,
 ) => {
   return async (dispatch, getState) => {
+    dispatch(loadingStateChanged(true))
+
     try {
       const data = await getAttentionRequiringQuizAnswers(
         quizId,
@@ -76,14 +88,18 @@ export const setAttentionRequiringAnswers = (
             return {
               ...pr,
               answers: pr.answers.sort((a1, a2) => {
-                return (
-                  peerReviewQuestions.find(
-                    q => q.id === a1.peerReviewQuestionId,
-                  ).order -
-                  peerReviewQuestions.find(
-                    q => q.id === a2.peerReviewQuestionId,
-                  ).order
+                const prq1 = peerReviewQuestions.find(
+                  q => q.id === a1.peerReviewQuestionId,
                 )
+                const prq2 = peerReviewQuestions.find(
+                  q => q.id === a2.peerReviewQuestionId,
+                )
+
+                if (!prq1 || !prq2) {
+                  return -1
+                }
+
+                return prq1.order - prq2.order
               }),
             }
           }),
@@ -92,6 +108,7 @@ export const setAttentionRequiringAnswers = (
 
       await dispatch(set(newData))
     } catch (error) {
+      dispatch(loadingStateChanged(false))
       console.log(error)
     }
   }

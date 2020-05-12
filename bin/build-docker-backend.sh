@@ -13,6 +13,6 @@ fi
 
 TAG="eu.gcr.io/moocfi/quizzes-backend:build-$REV"
 echo Building "$TAG"
-docker build . -f Dockerfile.backend -t "$TAG"
+docker build . -f Dockerfile.backend -t "$TAG" --build-arg=GIT_COMMIT="$(git rev-parse --short HEAD)"
 
 echo "Successfully built image: $TAG"

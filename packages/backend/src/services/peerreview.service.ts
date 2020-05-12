@@ -1,6 +1,6 @@
 import knex from "knex"
 import _ from "lodash"
-import { Service, Inject } from "typedi"
+import { Inject, Service } from "typedi"
 import { Brackets, EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import {
@@ -14,16 +14,22 @@ import {
   UserQuizState,
 } from "../models"
 import { randomUUID } from "../util"
+import CourseService from "./course.service"
 import KafkaService from "./kafka.service"
+import QuizService from "./quiz.service"
 import QuizAnswerService from "./quizanswer.service"
 import UserCoursePartStateService from "./usercoursepartstate.service"
 import UserQuizStateService from "./userquizstate.service"
 import ValidationService from "./validation.service"
+import { string } from "prop-types"
 
 @Service()
 export default class PeerReviewService {
   @InjectManager()
   private entityManager: EntityManager
+
+  @Inject()
+  private quizService: QuizService
 
   @Inject()
   private quizAnswerService: QuizAnswerService
@@ -250,31 +256,35 @@ export default class PeerReviewService {
     const alreadyReviewed = givenPeerReviews.map(pr => pr.quizAnswerId)
     alreadyReviewed.push(randomUUID())
 
-    let candidates: QuizAnswer[] = await this.getCandidates(
-      quizId,
-      languageId,
-      reviewerId,
-      rejected,
-      alreadyReviewed,
-      false,
-    )
+    let allCandidates: any[] = []
+    let candidates
+    let priority = 0
 
-    let includeThis: QuizAnswer[] = []
-
-    if (candidates.length < 2) {
-      includeThis = candidates
+    while (allCandidates.length < 2) {
       candidates = await this.getCandidates(
+        priority,
         quizId,
         languageId,
         reviewerId,
         rejected,
         alreadyReviewed,
-        true,
       )
+
+      if (candidates === null) {
+        break
+      }
+
+      candidates = _.shuffle(candidates)
+
+      allCandidates = allCandidates.concat(candidates)
+      priority++
     }
 
-    candidates = _.shuffle(candidates)
-    candidates = candidates.sort(
+    if (allCandidates.length < 1) {
+      return []
+    }
+
+    allCandidates = allCandidates.sort(
       (a, b): number => {
         if (a.status < b.status) {
           return 1
@@ -286,90 +296,76 @@ export default class PeerReviewService {
       },
     )
 
-    if (includeThis.length === 1) {
-      return [...includeThis, ...candidates.slice(0, 1)]
-    }
+    allCandidates = allCandidates.slice(0, 2)
 
-    return candidates.slice(0, 2)
+    return await this.entityManager
+      .createQueryBuilder(QuizAnswer, "quiz_answer")
+      .where("quiz_answer.id in (:...ids)", {
+        ids: allCandidates.map(c => c.id),
+      })
+      .getMany()
   }
 
   private async getCandidates(
+    priority: number,
     quizId: string,
     languageId: string,
     reviewerId: number,
     rejected: string[],
     alreadyReviewed: string[],
-    includeNonPriority: boolean,
-  ) {
+  ): Promise<Array<{ id: string; status: string }> | null> {
     const builder = knex({ client: "pg" })
 
-    const limitingQuery = builder("user_quiz_state")
-      .select("user_id")
-      .join("quiz", "user_quiz_state.quiz_id", "quiz.id")
-      .join("course", "quiz.course_id", "course.id")
-      .where("quiz_id", quizId)
-      .modify(qb => {
-        if (includeNonPriority) {
-          qb.where("points_awarded", ">", 0).andWhere(
-            builder.raw(
-              "peer_reviews_received = course.min_peer_reviews_received",
-            ),
-          )
-        } else {
-          qb.whereNull("points_awarded")
-            .andWhere(
-              builder.raw(
-                "peer_reviews_received < course.min_peer_reviews_received",
-              ),
-            )
-            .andWhere(builder.raw("spam_flags <= max_spam_flags"))
-        }
-      })
-
-    const query = builder("quiz_answer")
-      .select(
-        builder.raw(`
-        quiz_answer.id
-      `),
-      )
-      .joinRaw(
-        `
-        INNER JOIN user_quiz_state
-        ON quiz_answer.user_id = user_quiz_state.user_id
-        AND quiz_answer.quiz_id = user_quiz_state.quiz_id
-      `,
-      )
+    let query = builder("quiz_answer")
+      .select("quiz_answer.id", "quiz_answer.status")
       .where("quiz_answer.quiz_id", quizId)
-      .andWhere("quiz_answer.user_id", "!=", reviewerId)
-      .andWhere("quiz_answer.user_id", "in", limitingQuery)
-      .andWhere("quiz_answer.id", "not in", rejected)
-      .andWhere("quiz_answer.id", "not in", alreadyReviewed)
       .andWhere("quiz_answer.language_id", languageId)
-      .andWhere("quiz_answer.status", "not in", [
-        "deprecated",
-        "rejected",
-        "spam",
-      ])
-      .orderByRaw(
-        `
-        quiz_answer.status ASC,
-        user_quiz_state.peer_reviews_given DESC,
-        quiz_answer.created_at ASC,
-        user_quiz_state.peer_reviews_received ASC
-      `,
-      )
-      .limit(20)
-      .toString()
+      .andWhere("quiz_answer.user_id", "!=", reviewerId)
+      .andWhere("quiz_answer.id", "NOT IN", alreadyReviewed)
 
-    const ids = (await this.entityManager.query(query)).map((qa: any) => qa.id)
+    query = this.addCriteriaBasedOnPriority(priority, query, rejected)
 
-    if (ids.length === 0) {
-      return []
+    if (query === null) {
+      return null
     }
 
-    return await this.entityManager
-      .createQueryBuilder(QuizAnswer, "quiz_answer")
-      .where("quiz_answer.id in (:...ids)", { ids })
-      .getMany()
+    query = query.limit(20)
+
+    return await this.entityManager.query(query.toQuery())
+  }
+
+  private statusesByPriority = [
+    "given-more-than-enough",
+    "given-enough",
+    "submitted",
+    "manual-review-once-given-enough",
+    "manual-review-once-given-and-received-enough",
+    "manual-review",
+    "confirmed",
+    "enough-received-but-not-given",
+  ]
+
+  private addCriteriaBasedOnPriority(
+    priority: number,
+    queryBuilder: knex.QueryBuilder,
+    rejected: string[],
+  ) {
+    // we won't consider rejected answers
+    if (priority < this.statusesByPriority.length) {
+      queryBuilder = queryBuilder
+        .andWhere("quiz_answer.id", "NOT IN", rejected)
+        .andWhere("quiz_answer.status", this.statusesByPriority[priority])
+        .orderBy("quiz_answer.created_at", "asc")
+    }
+    // let's check the few rejected answers, too
+    else if (priority === this.statusesByPriority.length) {
+      queryBuilder = queryBuilder
+        .andWhere("quiz_answer.id", "IN", rejected)
+        .andWhere("quiz_answer.status", "IN", this.statusesByPriority)
+    } else {
+      return null
+    }
+
+    return queryBuilder
   }
 }
