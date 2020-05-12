@@ -145,4 +145,4 @@ const hungarianLabels: SingleLanguageLabels = {
   },
 }
 
-export default englishLabels
+export default hungarianLabels
