@@ -1,6 +1,6 @@
 import { SingleLanguageLabels } from "./index"
 
-const englishLabels: SingleLanguageLabels = {
+const hungarianLabels: SingleLanguageLabels = {
   essay: {
     exampleAnswerLabel: "Példaválasz",
     userAnswerLabel: "Az Ön válasza",
@@ -145,4 +145,4 @@ const englishLabels: SingleLanguageLabels = {
   },
 }
 
-export default englishLabels
+export default hungarianLabels
