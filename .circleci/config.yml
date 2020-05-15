@@ -21,14 +21,10 @@ jobs:
       - run:
           name: "Build backend image"
           command: "bin/build-docker-dashboard.sh"
-      - when:
-          name: "Push dashboard image"
-          condition:
-            branches:
-              only:
-                - master
-          steps:
-            - run: "bin/push-docker-dashboard-image.sh"
+      - run:
+          name: "Push image if on master"
+          command: "bin/push-docker-dashboard-image.sh"
+
 
   build_widgets:
     docker:
@@ -50,14 +46,9 @@ jobs:
       - run:
           name: "Build dashboard image"
           command: "bin/build-docker-backend.sh"
-      - when:
-          name: "Push backend image"
-          condition:
-            branches:
-              only:
-                - master
-          steps:
-            - run: "bin/push-docker-backend-image.sh"
+      - run:
+          name: "Push image if on master"
+          command: "bin/push-docker-backend-image.sh"
 
   deploy_to_production:
     docker:
