@@ -148,4 +148,4 @@ const danishLabels: SingleLanguageLabels = {
   },
 }
 
-export default finnishLabels
+export default danishLabels
