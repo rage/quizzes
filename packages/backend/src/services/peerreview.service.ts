@@ -21,7 +21,6 @@ import QuizAnswerService from "./quizanswer.service"
 import UserCoursePartStateService from "./usercoursepartstate.service"
 import UserQuizStateService from "./userquizstate.service"
 import ValidationService from "./validation.service"
-import { string } from "prop-types"
 
 @Service()
 export default class PeerReviewService {

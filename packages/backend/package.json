@@ -46,7 +46,8 @@
     "uuid": "^7.0.1",
     "uuid-by-string": "^0.6.0",
     "validator": "^10.11.0",
-    "websocket": "^1.0.31"
+    "websocket": "^1.0.31",
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "@sentry/node": "5.15.4",

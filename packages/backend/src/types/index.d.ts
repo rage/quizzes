@@ -13,7 +13,6 @@ import {
 } from "../models"
 import { Permission } from "services/authorization.service"
 import { RequiredAction } from "../services/kafka.service"
-import { ModifyTableQuizItemAddColumnUsesSharedOptionFeedbackMessage1567500257341 } from "migration/1567500257341-ModifyTableQuizItemAddColumnUsesSharedOptionFeedbackMessage"
 
 export class ITMCProfile {
   username: string
