@@ -80,6 +80,8 @@ export class Quiz extends BaseEntity {
 
   @Column({ default: true })
   public autoConfirm: boolean
+  @Column({ default: true })
+  public autoReject: boolean
   @Column({ default: false })
   public excludedFromScore: boolean
   @Column({ default: false })
@@ -134,7 +136,7 @@ export class QuizTranslation extends BaseEntity {
     onUpdate: "CASCADE",
   })
   @JoinColumn()
-  public quiz: Promise<Quiz>
+  public quiz: Quiz
   @PrimaryColumn()
   public quizId: string
 

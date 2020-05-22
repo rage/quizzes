@@ -1,6 +1,6 @@
 import knex from "knex"
 import _ from "lodash"
-import { Service, Inject } from "typedi"
+import { Inject, Service } from "typedi"
 import { Brackets, EntityManager, SelectQueryBuilder } from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import {
@@ -14,16 +14,22 @@ import {
   UserQuizState,
 } from "../models"
 import { randomUUID } from "../util"
+import CourseService from "./course.service"
 import KafkaService from "./kafka.service"
+import QuizService from "./quiz.service"
 import QuizAnswerService from "./quizanswer.service"
 import UserCoursePartStateService from "./usercoursepartstate.service"
 import UserQuizStateService from "./userquizstate.service"
 import ValidationService from "./validation.service"
+import { string } from "prop-types"
 
 @Service()
 export default class PeerReviewService {
   @InjectManager()
   private entityManager: EntityManager
+
+  @Inject()
+  private quizService: QuizService
 
   @Inject()
   private quizAnswerService: QuizAnswerService
@@ -106,8 +112,8 @@ export default class PeerReviewService {
     )
 
     return {
-      updatedAnswer,
-      updatedState,
+      answer: updatedAnswer,
+      state: updatedState,
     }
   }
 
@@ -144,7 +150,7 @@ export default class PeerReviewService {
   public async getPlainPeerReviews(quizId: string) {
     const builder = knex({ client: "pg" })
 
-    let query = builder("peer_review")
+    const query = builder("peer_review")
       .innerJoin("quiz_answer", "quiz_answer.id", "peer_review.quiz_answer_id")
       .where("quiz_answer.quiz_id", quizId)
       .select(
@@ -165,7 +171,7 @@ export default class PeerReviewService {
   public async getPlainPeerReviewAnswers(quizId: string) {
     const builder = knex({ client: "pg" })
 
-    let query = builder("peer_review")
+    const query = builder("peer_review")
       .innerJoin("quiz_answer", "quiz_answer.id", "peer_review.quiz_answer_id")
       .where("quiz_answer.quiz_id", quizId)
       .innerJoin(
@@ -191,7 +197,7 @@ export default class PeerReviewService {
   public async getCSVData(quizId: string) {
     const builder = knex({ client: "pg" })
 
-    let query = builder("peer_review")
+    const query = builder("peer_review")
       .innerJoin("quiz_answer", "quiz_answer.id", "peer_review.quiz_answer_id")
       .where("quiz_answer.quiz_id", quizId)
       .select(
@@ -250,31 +256,35 @@ export default class PeerReviewService {
     const alreadyReviewed = givenPeerReviews.map(pr => pr.quizAnswerId)
     alreadyReviewed.push(randomUUID())
 
-    let candidates: QuizAnswer[] = await this.getCandidates(
-      quizId,
-      languageId,
-      reviewerId,
-      rejected,
-      alreadyReviewed,
-      false,
-    )
+    let allCandidates: any[] = []
+    let candidates
+    let priority = 0
 
-    let includeThis: QuizAnswer[] = []
-
-    if (candidates.length < 2) {
-      includeThis = candidates
+    while (allCandidates.length < 2) {
       candidates = await this.getCandidates(
+        priority,
         quizId,
         languageId,
         reviewerId,
         rejected,
         alreadyReviewed,
-        true,
       )
+
+      if (candidates === null) {
+        break
+      }
+
+      candidates = _.shuffle(candidates)
+
+      allCandidates = allCandidates.concat(candidates)
+      priority++
     }
 
-    candidates = _.shuffle(candidates)
-    candidates = candidates.sort(
+    if (allCandidates.length < 1) {
+      return []
+    }
+
+    allCandidates = allCandidates.sort(
       (a, b): number => {
         if (a.status < b.status) {
           return 1
@@ -286,47 +296,76 @@ export default class PeerReviewService {
       },
     )
 
-    if (includeThis.length === 1) {
-      return [...includeThis, ...candidates.slice(0, 1)]
-    }
+    allCandidates = allCandidates.slice(0, 2)
 
-    return candidates.slice(0, 2)
+    return await this.entityManager
+      .createQueryBuilder(QuizAnswer, "quiz_answer")
+      .where("quiz_answer.id in (:...ids)", {
+        ids: allCandidates.map(c => c.id),
+      })
+      .getMany()
   }
 
   private async getCandidates(
+    priority: number,
     quizId: string,
     languageId: string,
     reviewerId: number,
     rejected: string[],
     alreadyReviewed: string[],
-    includeNonPriority: boolean,
-  ) {
-    let statuses = ["submitted"]
+  ): Promise<Array<{ id: string; status: string }> | null> {
+    const builder = knex({ client: "pg" })
 
-    if (includeNonPriority) {
-      statuses = [...statuses, "enough-received-but-not-given", "confirmed"]
+    let query = builder("quiz_answer")
+      .select("quiz_answer.id", "quiz_answer.status")
+      .where("quiz_answer.quiz_id", quizId)
+      .andWhere("quiz_answer.language_id", languageId)
+      .andWhere("quiz_answer.user_id", "!=", reviewerId)
+      .andWhere("quiz_answer.id", "NOT IN", alreadyReviewed)
+
+    query = this.addCriteriaBasedOnPriority(priority, query, rejected)
+
+    if (query === null) {
+      return null
     }
 
-    return await this.entityManager
-      .createQueryBuilder(QuizAnswer, "quiz_answer")
-      .innerJoin(
-        UserQuizState,
-        "user_quiz_state",
-        "quiz_answer.user_id = user_quiz_state.user_id and quiz_answer.quiz_id = user_quiz_state.quiz_id",
-      )
-      .where("quiz_answer.quiz_id = :quizId", { quizId })
-      .andWhere("quiz_answer.status in (:...statuses)", { statuses })
-      .andWhere("quiz_answer.user_id != :reviewerId", { reviewerId })
-      .andWhere("quiz_answer.id not in (:...rejected)", { rejected })
-      .andWhere("quiz_answer.id not in (:...alreadyReviewed)", {
-        alreadyReviewed,
-      })
-      .andWhere("quiz_answer.language_id = :languageId", { languageId })
-      .orderBy("quiz_answer.status")
-      .addOrderBy("user_quiz_state.peer_reviews_given", "DESC")
-      .addOrderBy("quiz_answer.created_at")
-      .addOrderBy("user_quiz_state.peer_reviews_received")
-      .limit(20)
-      .getMany()
+    query = query.limit(20)
+
+    return await this.entityManager.query(query.toQuery())
+  }
+
+  private statusesByPriority = [
+    "given-more-than-enough",
+    "given-enough",
+    "submitted",
+    "manual-review-once-given-enough",
+    "manual-review-once-given-and-received-enough",
+    "manual-review",
+    "confirmed",
+    "enough-received-but-not-given",
+  ]
+
+  private addCriteriaBasedOnPriority(
+    priority: number,
+    queryBuilder: knex.QueryBuilder,
+    rejected: string[],
+  ) {
+    // we won't consider rejected answers
+    if (priority < this.statusesByPriority.length) {
+      queryBuilder = queryBuilder
+        .andWhere("quiz_answer.id", "NOT IN", rejected)
+        .andWhere("quiz_answer.status", this.statusesByPriority[priority])
+        .orderBy("quiz_answer.created_at", "asc")
+    }
+    // let's check the few rejected answers, too
+    else if (priority === this.statusesByPriority.length) {
+      queryBuilder = queryBuilder
+        .andWhere("quiz_answer.id", "IN", rejected)
+        .andWhere("quiz_answer.status", "IN", this.statusesByPriority)
+    } else {
+      return null
+    }
+
+    return queryBuilder
   }
 }

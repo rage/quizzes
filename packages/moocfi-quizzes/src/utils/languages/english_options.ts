@@ -2,12 +2,12 @@ import { SingleLanguageLabels } from "./index"
 
 const englishLabels: SingleLanguageLabels = {
   essay: {
-    exampleAnswerLabel: "Answer example",
+    exampleAnswerLabel: "Example answer",
     userAnswerLabel: "Your answer",
     currentNumberOfWordsLabel: "Words",
     textFieldLabel: "Your answer",
     conformToLimitsToSubmitLabel:
-      "Modify your answer to conform to the word limits to submit",
+      "To be able to submit the answer, make sure it conforms to the word limits",
     wordLimitsGuidance: (min, max) => {
       if (!min && !max) {
         return ""
@@ -17,7 +17,7 @@ const englishLabels: SingleLanguageLabels = {
       }
 
       if (!max) {
-        return `Your answer should be at least ${min} words long`
+        return `Your answer should be at least ${min} words`
       }
       return `Your answer should be between ${min} and ${max} words`
     },
@@ -30,28 +30,30 @@ const englishLabels: SingleLanguageLabels = {
   },
   peerReviews: {
     loadingLabel: "Loading",
-    chooseButtonLabel: "Choose",
-    chooseEssayInstruction: "Choose one of the essays for peer review",
-    chosenEssayInstruction: "Review the chosen answer",
+    chooseButtonLabel: "Select",
+    unselectButtonLabel: "Cancel selection",
+    chooseEssayInstruction: "Choose one option to review",
+    chosenEssayInstruction: "Review the answer you selected",
     givenPeerReviewsLabel: "Peer reviews given",
     noPeerAnswersAvailableLabel: "No answers available for peer review",
-    reportAsInappropriateLabel: "Report as inappropriate",
+    reportAsInappropriateLabel: "Report as spam",
     submitPeerReviewLabel: "Submit review",
-    peerReviewsCompletedInfo: "All peer reviews have been submitted",
+    peerReviewsCompletedInfo: "You have given enough peer reviews",
     giveExtraPeerReviews:
-      "You have given the required number of peer reviews. By giving more peer reviews your answer will be reviewed faster!",
+      "You have given the required number of peer reviews. If you give more peer reviews your answer will be reviewed faster!",
     giveExtraPeerReviewsQuizConfirmed:
       "You may still give peer reviews to help others",
     displayPeerReview: "Give peer review",
     hidePeerReviewLabel: "Hide",
-    quizInvolvesNoPeerReviewsInstruction: "This quiz involves no peer reviews",
-    peerReviewsInfoForLoggedOutUser: "The quiz includes peer reviews",
-    essayQuestionAnswerTextBoxLabel: "Write the requested review",
+    essayQuestionAnswerTextBoxLabel: "Write a review",
     optionLabel: "Option",
-    answerRejected: "Your answer was rejected",
-    answerFlaggedAsSpam: "Your answer was rejected as inappropriate",
-    answerConfirmed: "Your answer has been confirmed!",
+    answerRejected: "Your answer has been rejected",
+    answerFlaggedAsSpam: "Your answer has been reported as spam",
+    answerConfirmed: "Your answer has been accepted!",
     manualReview: "Your answer is being reviewed by course staff",
+    peerReviewGroupTitle: "Peer review questions",
+    peerReviewLikertDetails:
+      "Evaluate each statement on a scale of 1-5. 1 means strongly disagree, 5 means strongly agree.",
   },
   receivedPeerReviews: {
     averageOfGradesLabel: "The average grade of received reviews is",
@@ -69,56 +71,76 @@ const englishLabels: SingleLanguageLabels = {
     toggleButtonExpandLabel: "Show all received peer reviews",
     toggleButtonShrinkLabel: "Hide",
     peerReviewLabel: "Peer review",
+    peerReviewReceived: "You have received a new peer review",
+    peerReviewReceivedFor: (title: string) =>
+      `You have received a new peer review in the exercise ${title}`,
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
       `Question of type '${itemType}' is not supported.`,
   },
   multipleChoice: {
-    selectCorrectAnswerLabel: "Select correct answer",
-    chooseAllSuitableOptionsLabel: "Choose all suitable options",
+    selectCorrectAnswerLabel: "Select the correct answer",
+    chooseAllSuitableOptionsLabel: "Select all that apply",
     answerCorrectLabel: "Correct",
     answerIncorrectLabel: "Incorrect",
   },
   stage: {
-    answerStageLabel: "Answering the quiz",
+    answerStageLabel: "Answering the exercise",
     givingPeerReviewsStageLabel: "Giving peer reviews",
     receivingPeerReviewsStageLabel: "Receiving peer reviews",
-    evaluationStageLabel: "Grading the answer",
+    evaluationStageLabel: "Waiting to be graded",
   },
   general: {
-    pastDeadline: "You can no longer submit an answer",
+    pastDeadline: "You can no longer give an answer to this exercise",
     answerMissingBecauseQuizModifiedLabel:
       "Question not answered. Quiz has probably been modified after your answer.",
     submitButtonLabel: "Submit",
     errorLabel: "Error",
-    loginToViewPromptLabel: "Log in to view the quiz",
-    loginToAnswerPromptLabel: "Log in to answer the quiz",
+    loginToViewPromptLabel: "Log in to view the exercise",
+    loginToAnswerPromptLabel: "Log in to answer the exercise",
     loadingLabel: "Loading",
     answerCorrectLabel: "The answer is correct",
-    alreadyAnsweredLabel: "You have already answered",
-    answerIncorrectLabel: "The answer is incorrect",
+    alreadyAnsweredLabel: "You have already answered this",
+    answerIncorrectLabel: "The answer is not correct",
     kOutOfNCorrect: (k, n) => `${k}/${n} answers correct`,
-    pointsAvailableLabel: "Points available in the quiz",
-    pointsReceivedLabel: "Points awarded to you",
+    pointsAvailableLabel: "Points available for the exercise",
+    pointsReceivedLabel: "Received points",
     incorrectSubmitWhileTriesLeftLabel:
-      "The answer was not fully correct - you may try again!",
+      "The answer was not fully correct. Please try again!",
     triesRemainingLabel: "Tries remaining",
     quizLabel: "Quiz",
     pointsLabel: "Points",
-    triesNotLimitedLabel: "Number of tries is unlimited",
+    triesNotLimitedLabel: "The number of tries is not limited",
     submitGeneralFeedbackLabel: "Submitted",
     submitButtonAlreadyAnsweredLabel: "Answered",
     pointsGrantingPolicyInformer: policy => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
-          return "Answer must be fully correct to receive points"
+          return "To receive points the answer must be fully correct"
         case "grant_whenever_possible":
           return ""
         default:
           return ""
       }
     },
+    answered: "Answered",
+    unanswered: "Unanswered",
+    rejected: "Rejected answer, try again",
+    progressUpdated: "Course progress updated",
+    answerConfirmed: "Your answer was confirmed!",
+    answerConfirmedFor: (title: string) =>
+      `Your answer to exercise ${title} was confirmed!`,
+    courseCompleted: "You have completed the course!",
+  },
+  error: {
+    submitFailedError: "Could not send your answer. Please try again later.",
+    quizLoadFailedError: "Could not load the exercise",
+    progressFetchError:
+      "Could not fetch course progress data. Please try again later.",
+    submitSpamFlagError: "Could not report spam.",
+    fetchReviewCandidatesError:
+      "Something went wrong while retrieving answers for peer review. Please try again later.",
   },
 }
 

@@ -1,5 +1,3 @@
-import React from "react"
-
 import {
   Button,
   Checkbox,
@@ -12,230 +10,153 @@ import {
   TextField,
   Typography,
 } from "@material-ui/core"
+import React from "react"
+import { connect } from "react-redux"
+
+import { IQuizItem } from "../interfaces"
+import { changeAttr, modifyOption } from "../store/edit/actions"
 
 interface IOptionDialogProps {
-  onSubmit: (optionData: IOptionData) => (e: any) => void
+  optionIdx: number
   isOpen: boolean
   onClose: () => void
-  existingOptData: null | IOptionData
+  item: IQuizItem
+  modifyOption: any
+  changeAttr: any
 }
 
-interface IOptionDialogState {
-  correctChecked: boolean
-  inInitialState: boolean
-  optionData: IOptionData
-}
+const OptionDialogFunc: React.FunctionComponent<IOptionDialogProps> = props => {
+  const options = props.item.options
+  if (!options) {
+    return <></>
+  }
+  const option = options[props.optionIdx]
+  if (!option) {
+    return <div />
+  }
 
-interface IOptionData {
-  title?: string
-  correct?: boolean
-  message?: string
-  // success/failure used to update the quiz when changes saved
-  successMessage?: string
-  failureMessage?: string
-  order?: number
-}
+  const handleAttributeChange = attributeName => e => {
+    const value = e.target.value
 
-export default class OptionDialog extends React.Component<
-  IOptionDialogProps,
-  IOptionDialogState
-> {
-  constructor(props) {
-    super(props)
-
-    this.state = {
-      correctChecked: false,
-      optionData: {
-        title: "",
-        message: "",
-        correct: false,
-      },
-      inInitialState: true,
+    const baseString = `items[${props.item.order}].options[${props.optionIdx}]`
+    switch (attributeName) {
+      case "title":
+      case "body":
+      case "failureMessage":
+      case "successMessage":
+        props.changeAttr(`${baseString}.texts[0].[${attributeName}]`, value)
+        break
+      case "correct":
+        props.changeAttr(
+          `${baseString}.${attributeName}`,
+          !option[attributeName],
+        )
+        break
+      default:
+        break
     }
   }
 
-  public componentDidUpdate() {
-    if (this.props.existingOptData && this.state.inInitialState) {
-      const newState = {
-        correctChecked: false,
-        optionData: {},
-        inInitialState: false,
-      }
-      newState.correctChecked = !!this.props.existingOptData.correct
-      newState.optionData = {
-        ...this.props.existingOptData,
-        message: this.props.existingOptData.correct
-          ? this.props.existingOptData.successMessage
-          : this.props.existingOptData.failureMessage,
-      }
-
-      this.setState({
-        ...newState,
-      })
-    }
-  }
-
-  public shouldComponentUpdate(nextProps, nextState) {
-    if (this.props.isOpen !== nextProps.isOpen) {
-      return true
-    }
-    if (this.state.correctChecked !== nextState.correctChecked) {
-      return true
-    }
-
-    if (this.state.optionData.title !== nextState.optionData.title) {
-      return true
-    }
-
-    if (this.state.optionData.message !== nextState.optionData.message) {
-      return true
-    }
-
-    if (
-      JSON.stringify(this.props.existingOptData) !==
-      JSON.stringify(nextProps.existingOptData)
-    ) {
-      return true
-    }
-
-    return false
-  }
-
-  public render() {
-    return (
-      <Dialog
-        fullWidth={true}
-        maxWidth="md"
-        open={this.props.isOpen}
-        onClose={this.handleClose}
-        aria-labelledby="option-dialog-title"
-      >
-        <DialogTitle id="option-dialog-title">
-          {this.props.existingOptData
-            ? "Modify option"
-            : "Add new multiple choice option"}
-        </DialogTitle>
-        <DialogContent>
-          <FormGroup>
+  return (
+    <Dialog
+      fullWidth={true}
+      maxWidth="md"
+      open={props.isOpen}
+      onClose={props.onClose}
+      aria-labelledby="option-dialog-title"
+    >
+      <DialogTitle id="option-dialog-title">
+        {option.id ? "Modify option" : "Add new multiple choice option"}
+      </DialogTitle>
+      <DialogContent>
+        <FormGroup>
+          <Grid
+            container={true}
+            spacing={0}
+            justify="flex-start"
+            alignItems="center"
+          >
             <Grid
-              container={true}
-              spacing={0}
-              justify="flex-start"
-              alignItems="center"
+              item={true}
+              xs={12}
+              sm={2}
+              md={1}
+              style={{ paddingRight: "5px" }}
             >
-              <Grid
-                item={true}
-                xs={12}
-                sm={2}
-                md={1}
-                style={{ paddingRight: "5px" }}
-              >
-                <Typography variant="subtitle1">Text</Typography>
-              </Grid>
-              <Grid item={true} xs={12} sm={10} md={11}>
-                <TextField
-                  variant="outlined"
-                  fullWidth={true}
-                  multiline={true}
-                  placeholder="Text"
-                  value={this.state.optionData.title}
-                  onChange={this.handleTextFieldChange("title")}
-                />
-              </Grid>
-              <Grid
-                item={true}
-                xs={12}
-                sm={2}
-                md={1}
-                style={{ paddingRight: "5px" }}
-              >
-                <Typography variant="subtitle1">Correct?</Typography>
-              </Grid>
-              <Grid item={true} xs={12} sm={10} md={11}>
-                <Checkbox
-                  color="primary"
-                  checked={this.state.correctChecked}
-                  onChange={this.handleCheckingChange}
-                  value="true"
-                  style={{ paddingLeft: "0" }}
-                />
-              </Grid>
-
-              <Grid item={true} xs={12} sm={3} lg={4}>
-                <Typography variant="subtitle1" style={{ paddingRight: "5px" }}>
-                  Explanation why this option is{" "}
-                  {!this.state.optionData.correct && "in"}correct
-                </Typography>
-              </Grid>
-              <Grid item={true} xs={12} sm={9} lg={8}>
-                <TextField
-                  variant="outlined"
-                  fullWidth={true}
-                  placeholder="feedback message"
-                  multiline={true}
-                  value={this.state.optionData.message}
-                  onChange={this.handleTextFieldChange("message")}
-                />
-                <Typography variant="body1" style={{ padding: "5px 0" }}>
-                  The student won't see this before completing the exercise.
-                </Typography>
-              </Grid>
+              <Typography variant="subtitle1">Text</Typography>
             </Grid>
-          </FormGroup>
-        </DialogContent>
-        <DialogActions>
-          <Button
-            onClick={this.handleClose}
-            style={{ backgroundColor: "rgb(220, 25, 0)", color: "white" }}
-          >
-            Cancel
-          </Button>
-          <Button
-            onClick={this.handleSubmit}
-            style={{ backgroundColor: "rgb(15, 125, 0)", color: "white" }}
-          >
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-    )
-  }
+            <Grid item={true} xs={12} sm={10} md={11}>
+              <TextField
+                variant="outlined"
+                fullWidth={true}
+                multiline={true}
+                placeholder="Text"
+                value={option.texts[0].title || ""}
+                onChange={handleAttributeChange("title")}
+              />
+            </Grid>
+            <Grid
+              item={true}
+              xs={12}
+              sm={2}
+              md={1}
+              style={{ paddingRight: "5px" }}
+            >
+              <Typography variant="subtitle1">Correct?</Typography>
+            </Grid>
+            <Grid item={true} xs={12} sm={10} md={11}>
+              <Checkbox
+                color="primary"
+                checked={option.correct}
+                onChange={handleAttributeChange("correct")}
+                value="true"
+                style={{ paddingLeft: "0" }}
+              />
+            </Grid>
 
-  private handleTextFieldChange = fieldName => e => {
-    const newOptionData = { ...this.state.optionData }
-    newOptionData[fieldName] = e.target.value
-    this.setState({ optionData: newOptionData, inInitialState: false })
-  }
-
-  private handleCheckingChange = () => {
-    const newOptionData = { ...this.state.optionData }
-    newOptionData.correct = this.state.correctChecked ? false : true
-
-    this.setState({
-      correctChecked: !this.state.correctChecked,
-      optionData: newOptionData,
-      inInitialState: false,
-    })
-  }
-
-  private handleSubmit = event => {
-    const data = this.state.optionData
-    if (data.correct) {
-      data.successMessage = data.message
-    } else {
-      data.failureMessage = data.message
-    }
-    this.props.onSubmit(this.state.optionData)(event)
-
-    this.handleClose()
-  }
-
-  private handleClose = () => {
-    this.props.onClose()
-    this.setState({
-      optionData: {},
-      correctChecked: false,
-      inInitialState: true,
-    })
-  }
+            <Grid item={true} xs={12} sm={3} lg={4}>
+              <Typography variant="subtitle1" style={{ paddingRight: "5px" }}>
+                Explanation why this option is {!option.correct && "in"}correct
+              </Typography>
+            </Grid>
+            <Grid item={true} xs={12} sm={9} lg={8}>
+              <TextField
+                variant="outlined"
+                fullWidth={true}
+                placeholder="feedback message"
+                multiline={true}
+                value={
+                  option.correct
+                    ? option.texts[0].successMessage || ""
+                    : option.texts[0].failureMessage || ""
+                }
+                onChange={handleAttributeChange(
+                  `${option.correct ? "success" : "failure"}Message`,
+                )}
+              />
+              <Typography variant="body1" style={{ padding: "5px 0" }}>
+                The student won't see this before completing the exercise.
+              </Typography>
+            </Grid>
+          </Grid>
+        </FormGroup>
+      </DialogContent>
+      <DialogActions>
+        <Button
+          onClick={props.onClose}
+          style={{ backgroundColor: "rgb(87, 61, 77)", color: "white" }}
+        >
+          Close
+        </Button>
+      </DialogActions>
+    </Dialog>
+  )
 }
+
+export default connect(
+  null,
+  {
+    changeAttr,
+    modifyOption,
+  },
+)(OptionDialogFunc)

@@ -1,12 +1,31 @@
 import { Button, Grid, Paper, Typography } from "@material-ui/core"
 import React, { Component } from "react"
 import { connect } from "react-redux"
+import { IPeerReviewCollection, IQuizItem } from "../interfaces"
 import { addItem, addReview, changeOrder, remove } from "../store/edit/actions"
 import ItemContainer from "./ItemContainer"
 import PeerReviewCollectionContainer from "./PeerReviewCollectionContainer"
 import QuestionAdder from "./QuizQuestionAdder"
 
-class TabContainer extends Component<any, any> {
+interface ITabContainerProps {
+  items: IQuizItem[]
+  peerReviewCollections: IPeerReviewCollection[]
+  handleChange: any
+  addItem: any
+  changeOrder: any
+  addReview: any
+  remove: any
+  text: any
+  textIndex: number
+}
+
+interface ITabContainerState {
+  scrollTo: HTMLInputElement | null
+  justAdded: boolean
+  expandedItems: { [n: number]: any }
+}
+
+class TabContainer extends Component<ITabContainerProps, ITabContainerState> {
   private itemTypes = [
     { label: "checkbox", value: "checkbox" },
     { label: "essay", value: "essay" },
@@ -26,7 +45,6 @@ class TabContainer extends Component<any, any> {
       expandedItems: {},
     }
   }
-
   public scrollToNewItem = (itemComponent: HTMLInputElement) => {
     if (!itemComponent) {
       return
@@ -36,7 +54,7 @@ class TabContainer extends Component<any, any> {
     })
   }
 
-  public componentDidUpdate() {
+  public componentDidUpdate(prevProps, prevState) {
     if (this.state.scrollTo) {
       this.state.scrollTo.select()
       this.setState({ scrollTo: null })
@@ -51,13 +69,6 @@ class TabContainer extends Component<any, any> {
     if (
       JSON.stringify(this.state.expandedItems) !==
       JSON.stringify(nextState.expandedItems)
-    ) {
-      return true
-    }
-
-    if (
-      this.state.menuOpen !== nextState.menuOpen ||
-      (this.state.menuAnchor && nextState.menuAnchor)
     ) {
       return true
     }
@@ -84,7 +95,11 @@ class TabContainer extends Component<any, any> {
       return
     }
     const newExp = { ...this.state.expandedItems }
-    newExp[index] = newExp[index] ? !newExp[index] : true
+    if (typeof newExp[index] === "boolean") {
+      newExp[index] = !newExp[index]
+    } else {
+      newExp[index] = true
+    }
     this.setState({ expandedItems: newExp })
   }
 
@@ -177,7 +192,11 @@ class TabContainer extends Component<any, any> {
 
 const mapStateToProps = (state: any) => {
   return {
-    storeItems: state.edit.items,
+    items: state.edit.items,
+    peerReviewCollections: state.edit.peerReviewCollections,
+    edit: state.edit,
+    courseInfos: state.quizzes.courseInfos,
+    filter: state.filter,
   }
 }
 

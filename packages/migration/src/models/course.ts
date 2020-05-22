@@ -43,6 +43,8 @@ export class Course extends BaseEntity {
   public minReviewAverage: number
   @Column({ type: "int", nullable: true })
   public maxSpamFlags: number
+  @Column({ type: "int", nullable: true })
+  public maxReviewSpamFlags: number
 
   @OneToMany(type => CourseTranslation, ct => ct.course, {
     eager: true,
@@ -80,7 +82,7 @@ export class Course extends BaseEntity {
 @Entity()
 export class CourseTranslation extends BaseEntity {
   @ManyToOne(type => Course, course => course.id)
-  public course: Promise<Course>
+  public course: Course
   @PrimaryColumn()
   public courseId: string
 

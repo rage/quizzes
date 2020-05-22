@@ -1,5 +1,13 @@
-import finnishLabels from "./finnish_options"
 import englishLabels from "./english_options"
+import estonianLabels from "./estonian_options"
+import finnishLabels from "./finnish_options"
+import frenchLabels from "./french_options"
+import germanLabels from "./german_options"
+import norwegianLabels from "./norwegian_options"
+import swedishLabels from "./swedish_options"
+import italianLabels from "./italian_options"
+import latvianLabels from "./latvian_options"
+import hungarianLabels from "./hungarian_options"
 import { QuizPointsGrantingPolicy } from "../../modelTypes"
 
 export type GeneralLabels = {
@@ -24,6 +32,13 @@ export type GeneralLabels = {
   submitGeneralFeedbackLabel: string
   submitButtonAlreadyAnsweredLabel: string
   pointsGrantingPolicyInformer: (policy: QuizPointsGrantingPolicy) => string
+  answered: string
+  unanswered: string
+  rejected: string
+  progressUpdated: string
+  answerConfirmed: string
+  answerConfirmedFor: (title: string) => string
+  courseCompleted: string
 }
 
 export type StageLabels = {
@@ -52,6 +67,7 @@ export type EssayLabels = {
 export type PeerReviewLabels = {
   noPeerAnswersAvailableLabel: string
   chooseButtonLabel: string
+  unselectButtonLabel: string
   chooseEssayInstruction: string
   chosenEssayInstruction: string
   displayPeerReview: string
@@ -63,14 +79,14 @@ export type PeerReviewLabels = {
   submitPeerReviewLabel: string
   hidePeerReviewLabel: string
   loadingLabel: string
-  quizInvolvesNoPeerReviewsInstruction: string
-  peerReviewsInfoForLoggedOutUser: string
   essayQuestionAnswerTextBoxLabel: string
   optionLabel: string
   answerRejected: string
   answerFlaggedAsSpam: string
   answerConfirmed: string
   manualReview: string
+  peerReviewGroupTitle: string
+  peerReviewLikertDetails: string
 }
 
 export type ReceivedPeerReviewLabels = {
@@ -85,6 +101,8 @@ export type ReceivedPeerReviewLabels = {
   detailedViewLabel: string
   summaryViewLabel: string
   peerReviewLabel: string
+  peerReviewReceived: string
+  peerReviewReceivedFor: (title: string) => string
 }
 
 export type UnsupportedLabels = {
@@ -98,6 +116,14 @@ export type OpenLabels = {
   feedbackForFailure: string
 }
 
+export type ErrorLabels = {
+  progressFetchError: string
+  submitFailedError: string
+  quizLoadFailedError: string
+  submitSpamFlagError: string
+  fetchReviewCandidatesError: string
+}
+
 export type SingleLanguageLabels = {
   essay: EssayLabels
   open: OpenLabels
@@ -107,6 +133,7 @@ export type SingleLanguageLabels = {
   stage: StageLabels
   general: GeneralLabels
   receivedPeerReviews: ReceivedPeerReviewLabels
+  error: ErrorLabels
 }
 
 export type LanguageLabels = {
@@ -114,6 +141,14 @@ export type LanguageLabels = {
 }
 
 export const languageOptions: LanguageLabels = {
-  fi_FI: finnishLabels,
   en_US: englishLabels,
+  et_EE: estonianLabels,
+  fi_FI: finnishLabels,
+  de_DE: germanLabels,
+  sv_SE: swedishLabels,
+  nb_NO: norwegianLabels,
+  fr_FR: frenchLabels,
+  it_IT: italianLabels,
+  lv_LV: latvianLabels,
+  hu_HU: hungarianLabels,
 }

@@ -6,7 +6,7 @@ spec:
   selector:
     matchLabels:
       app: quizzes-backend
-  replicas: 3
+  replicas: 5
   template:
     metadata:
       labels:
@@ -16,9 +16,24 @@ spec:
       - name: quizzes-backend
         image: ${BACKEND_IMAGE}
         imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "100m"
+          limits:
+            memory: "1000Mi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /api/healthz
+            port: 3000
+          initialDelaySeconds: 5
+          periodSeconds: 5
         ports:
         - name: backend-http
           containerPort: 3000
+        - name: ws
+          containerPort: 7000
         env:
           - name: REDIS_HOST
             value: "quizzes-backend-redis-master.default.svc.cluster.local"
@@ -59,11 +74,28 @@ spec:
               secretKeyRef:
                 name: backend-database-secret
                 key: MESSAGE_FORMAT_VERSION
+          - name: NEW_RELIC_LICENSE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: NEW_RELIC_LICENSE_KEY
+          - name: NEW_RELIC_APP_NAME
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: NEW_RELIC_APP_NAME
+          - name: NEW_RELIC_NO_CONFIG_FILE
+            value: "true"
           - name: SERVICE_ID
             valueFrom:
               secretKeyRef:
                 name: backend-database-secret
                 key: SERVICE_ID
+          - name: SENTRY_DSN
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: SENTRY_DSN
       initContainers:
       - name: quizzes-backend-run-migrations
         image: ${BACKEND_IMAGE}
@@ -89,3 +121,8 @@ spec:
               secretKeyRef:
                 name: backend-database-secret
                 key: POSTGRES_USERNAME
+          - name: SENTRY_DSN
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: SENTRY_DSN

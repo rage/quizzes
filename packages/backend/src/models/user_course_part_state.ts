@@ -18,7 +18,7 @@ export class UserCoursePartState extends BaseEntity {
   public userId: number
 
   @ManyToOne(type => Course, course => course.id)
-  public course: Promise<Course>
+  public course: Course
   @PrimaryColumn()
   public courseId: string
 

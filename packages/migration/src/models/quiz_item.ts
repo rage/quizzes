@@ -25,7 +25,7 @@ export class QuizItem extends BaseEntity {
 
   @ManyToOne(type => Quiz, quiz => quiz.id, { onDelete: "CASCADE" })
   @JoinColumn()
-  public quiz: Promise<Quiz>
+  public quiz: Quiz
   @Column({ nullable: true })
   public quizId: string | null
 
@@ -117,7 +117,7 @@ export class QuizItemTranslation extends BaseEntity {
     onDelete: "CASCADE",
   })
   @JoinColumn()
-  public quizItem: Promise<QuizItem>
+  public quizItem: QuizItem
   @PrimaryColumn()
   public quizItemId: string | undefined
 

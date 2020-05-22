@@ -16,6 +16,20 @@ import { Quiz } from "./quiz"
 import { QuizItemAnswer } from "./quiz_item_answer"
 import { User } from "./user"
 
+export type QuizAnswerStatusType =
+  | "draft"
+  | "given-more-than-enough"
+  | "given-enough"
+  | "manual-review-once-given-and-received-enough"
+  | "manual-review-once-given-enough"
+  | "submitted"
+  | "manual-review"
+  | "confirmed"
+  | "enough-received-but-not-given"
+  | "spam"
+  | "rejected"
+  | "deprecated"
+
 @Entity()
 export class QuizAnswer extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
@@ -43,15 +57,20 @@ export class QuizAnswer extends BaseEntity {
     type: "enum",
     enum: [
       "draft",
+      "given-more-than-enough",
+      "given-enough",
+      "manual-review-once-given-and-received-enough",
+      "manual-review-once-given-enough",
       "submitted",
+      "manual-review",
+      "confirmed",
       "enough-received-but-not-given",
       "spam",
-      "confirmed",
       "rejected",
       "deprecated",
     ],
   })
-  public status?: string
+  public status?: QuizAnswerStatusType
 
   @OneToMany(type => QuizItemAnswer, qi => qi.quizAnswer, {
     eager: true,

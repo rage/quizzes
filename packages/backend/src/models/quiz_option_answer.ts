@@ -18,14 +18,14 @@ export class QuizOptionAnswer extends BaseEntity {
   public id: string
 
   @ManyToOne(type => QuizItemAnswer, qia => qia.id)
-  public quizItemAnswer: Promise<QuizItemAnswer>
+  public quizItemAnswer: QuizItemAnswer
 
   @Index()
   @Column()
   public quizItemAnswerId: string
 
   @ManyToOne(type => QuizOption, qo => qo.id)
-  public quizOption: Promise<QuizOption>
+  public quizOption: QuizOption
   @Column()
   public quizOptionId: string
 

@@ -1,6 +1,11 @@
 import Knex from "knex"
 import { Inject, Service } from "typedi"
-import { EntityManager, SelectQueryBuilder } from "typeorm"
+import {
+  EntityManager,
+  SelectQueryBuilder,
+  EntityRepository,
+  Brackets,
+} from "typeorm"
 import { InjectManager } from "typeorm-typedi-extensions"
 import validator from "validator"
 import {
@@ -11,20 +16,27 @@ import {
   QuizItem,
   SpamFlag,
   UserQuizState,
+  Course,
 } from "../models"
-import { IQuizAnswerQuery } from "../types"
-import { WhereBuilder } from "../util/index"
+import { AnsweredQuiz, IQuizAnswerQuery } from "../types"
+import { WhereBuilder, stringContainsLongerWord } from "../util/index"
 
 // tslint:disable-next-line:max-line-length
 // import PlainObjectToDatabaseEntityTransformer from "../../../../node_modules/typeorm/query-builder/transformer/PlainObjectToDatabaseEntityTransformer"
 
 // tslint:disable-next-line:max-line-length
 import { PlainObjectToDatabaseEntityTransformer } from "typeorm/query-builder/transformer/PlainObjectToDatabaseEntityTransformer"
+import { setCorrectValuesForAwardPointsEvenIfWrong1564678844323 } from "migration/1564678844323-set_correct_values_for_award_points_even_if_wrong"
+import { element } from "prop-types"
+import CourseService from "./course.service"
 
 @Service()
 export default class QuizAnswerService {
   @InjectManager()
   private entityManager: EntityManager
+
+  @Inject()
+  private courseService: CourseService
 
   private knex = Knex({ client: "pg" })
 
@@ -93,10 +105,10 @@ export default class QuizAnswerService {
       }
     }
 
-    const result = (await this.constructGetAnswersQuery(query))
-      .skip(skip)
-      .take(limit)
-      .getMany()
+    const sqlQuery = this.constructGetAnswersQuery(query)
+    sqlQuery.skip(skip).take(limit)
+
+    const result = await sqlQuery.getMany()
 
     return result
   }
@@ -130,24 +142,87 @@ export default class QuizAnswerService {
       .getMany()
   }
 
+  public async getAnswered(
+    courseId: string,
+    userId: number,
+  ): Promise<AnsweredQuiz[]> {
+    const query = this.knex.raw(
+      `select
+          q.id as quiz_id,
+          coalesce(uqs.tries > 0, false) as answered,
+          coalesce(uqs.points_awarded > 0, false) as correct
+        from quiz q
+        left join (
+          select
+            quiz_id,
+            tries,
+            points_awarded
+          from user_quiz_state
+          where user_id = :userId
+        ) uqs
+          on q.id = uqs.quiz_id
+        where q.course_id = :courseId
+        `,
+      { courseId, userId },
+    )
+
+    return await this.entityManager.query(query.toString())
+  }
+
   public async getAnswersCount(query: IQuizAnswerQuery): Promise<any> {
-    const someQuery = await this.constructGetAnswersQuery(query)
+    let result
 
-    if (query.quizRequiresPeerReviews && query.quizId) {
-      const prc = await PeerReviewCollection.createQueryBuilder("prc")
-        .where("prc.quiz_id = :quizId", { quizId: query.quizId })
-        .getCount()
+    const permittedCourseIds = query.courseIds
 
-      if (prc) {
-        return { quizId: query.quizId, count: 0 }
+    // Temporarily check elements courses counts differently from others
+    // Later: save the attention criteria in database for each course
+    // (and maybe don't request the numbers for all the courses in one request)
+    if (query.quizId) {
+      result = await this.getQuizCounts(query)
+    } else {
+      // Assuming that all the relevant quizzes on all elements courses use the same values, which are hard-coded below
+      // TODO: change query building to support option "course-minimum" for the relevant properties
+
+      let elementsCourseIds: string[] = await this.courseService.getElementsCourseIds()
+
+      // undefined for admins
+      if (permittedCourseIds) {
+        elementsCourseIds = elementsCourseIds.filter(id =>
+          permittedCourseIds.includes(id),
+        )
       }
-    }
 
-    const result = await someQuery
-      .select("quiz_answer.quiz_id", "quizId")
-      .addSelect("COUNT(quiz_answer.id)")
-      .groupBy("quiz_answer.quiz_id")
-      .getRawMany()
+      let elementsCriteria: IQuizAnswerQuery
+      if (elementsCourseIds.length > 0) {
+        elementsCriteria = {
+          courseIds: elementsCourseIds,
+          courseIdIncludedInCourseIds: true,
+          statuses: ["manual-review"],
+        }
+        elementsCriteria.courseIdIncludedInCourseIds = true
+      }
+
+      const nonElementsCriteria = { ...query }
+
+      if (permittedCourseIds) {
+        nonElementsCriteria.courseIds = permittedCourseIds.filter(
+          id => !elementsCourseIds.includes(id),
+        )
+      } else {
+        nonElementsCriteria.courseIds = elementsCourseIds
+        nonElementsCriteria.courseIdIncludedInCourseIds = false
+      }
+
+      const promise1: Promise<any> | [] =
+        elementsCourseIds.length > 0 ? this.getQuizCounts(elementsCriteria) : []
+      const promise2: Promise<any> | [] =
+        nonElementsCriteria.courseIds.length > 0
+          ? this.getQuizCounts(nonElementsCriteria)
+          : []
+
+      const [result1, result2] = await Promise.all([promise1, promise2])
+      result = result1.concat(result2)
+    }
 
     if (!query.quizId) {
       return result
@@ -259,11 +334,6 @@ export default class QuizAnswerService {
       return {}
     }
 
-    const quizItemTypes = (await QuizItem.createQueryBuilder("quiz_item")
-      .select("quiz_item.type")
-      .where("quiz_id = :id", { id: quizId })
-      .getRawMany()).map(value => value.quiz_item_type)
-
     const builder = Knex({ client: "pg" })
 
     let query = builder("quiz_answer")
@@ -277,62 +347,29 @@ export default class QuizAnswerService {
       .innerJoin("quiz_item", "quiz_item.id", "quiz_item_answer.quiz_item_id")
       .select({ quiz_item_id: "quiz_item.id" }, "quiz_item.type")
 
-    let selectedFields: string[] = []
-
-    if (
-      quizItemTypes.some(
-        type =>
-          type === "multiple-choice" ||
-          type === "checkbox" ||
-          type === "research-agreement",
+    let selectedFields: string[] = ["text_data", "int_data", "correct"]
+    query = query
+      .leftJoin(
+        "quiz_option_answer",
+        "quiz_option_answer.quiz_item_answer_id",
+        "quiz_item_answer.id",
       )
-    ) {
-      query = query
-        .leftJoin(
-          "quiz_option_answer",
-          "quiz_option_answer.quiz_item_answer_id",
-          "quiz_item_answer.id",
-        )
-
-        .innerJoin(
-          "quiz_option",
-          "quiz_option.id",
-          "quiz_option_answer.quiz_option_id",
-        )
-
-        .innerJoin(
-          "quiz_option_translation",
-          "quiz_option_translation.quiz_option_id",
-          "quiz_option.id",
-        )
-
-        .select(
-          "quiz_option_answer.quiz_option_id",
-          "quiz_option_translation.language_id",
-          "quiz_option_translation.title",
-          "quiz_option_translation.body",
-        )
-
-      selectedFields.push("correct")
-    } else if (
-      quizItemTypes.length === 1 ||
-      quizItemTypes.every(type => type === quizItemTypes[0])
-    ) {
-      switch (quizItemTypes[0]) {
-        case "open":
-          selectedFields.push("correct")
-        case "essay":
-          selectedFields.push("text_data")
-          break
-        case "scale":
-          selectedFields.push("int_data")
-          break
-        default:
-          selectedFields = ["text_data", "int_data", "correct"]
-      }
-    } else {
-      selectedFields = ["text_data", "int_data", "correct"]
-    }
+      .leftJoin(
+        "quiz_option",
+        "quiz_option.id",
+        "quiz_option_answer.quiz_option_id",
+      )
+      .leftJoin(
+        "quiz_option_translation",
+        "quiz_option_translation.quiz_option_id",
+        "quiz_option.id",
+      )
+      .select(
+        "quiz_option_answer.quiz_option_id",
+        "quiz_option_translation.language_id",
+        "quiz_option_translation.title",
+        "quiz_option_translation.body",
+      )
 
     query = query.select(
       ...selectedFields.map(field => `quiz_item_answer.${field}`),
@@ -365,21 +402,29 @@ export default class QuizAnswerService {
     return spamFlagCount
   }
 
-  private async constructGetAnswersQuery(
+  private constructGetAnswersQuery(
     query: IQuizAnswerQuery,
-  ): Promise<SelectQueryBuilder<QuizAnswer>> {
+  ): SelectQueryBuilder<QuizAnswer> {
     const {
       id,
       quizId,
       userId,
+      courseIds,
+      courseIdIncludedInCourseIds = true,
       statuses,
       firstAllowedTime,
       lastAllowedTime,
       languageIds,
-      peerReviewsGiven,
-      peerReviewsReceived,
+      minPeerReviewsGiven,
+      maxPeerReviewsGiven,
+      minPeerReviewsReceived,
+      maxPeerReviewsReceived,
       quizRequiresPeerReviews,
-      spamFlags,
+      minSpamFlags,
+      minSpamFlagsOr,
+      maxSpamFlags,
+      minPeerReviewAverage,
+      maxPeerReviewAverage,
       addPeerReviews,
       addSpamFlagNumber,
     } = query
@@ -395,9 +440,17 @@ export default class QuizAnswerService {
       !firstAllowedTime &&
       !lastAllowedTime &&
       (!languageIds || languageIds.length === 0) &&
-      typeof peerReviewsGiven !== "number" &&
-      typeof peerReviewsReceived !== "number" &&
-      typeof spamFlags !== "number"
+      typeof minPeerReviewsGiven !== "number" &&
+      typeof maxPeerReviewsGiven !== "number" &&
+      typeof minPeerReviewsReceived !== "number" &&
+      typeof maxPeerReviewsReceived !== "number" &&
+      typeof minSpamFlags !== "number" &&
+      typeof maxSpamFlags !== "number" &&
+      typeof minPeerReviewAverage !== "number" &&
+      typeof maxPeerReviewAverage !== "number" &&
+      typeof minSpamFlagsOr !== "number" &&
+      !courseIds &&
+      courseIdIncludedInCourseIds == null
     ) {
       return null
     }
@@ -425,10 +478,41 @@ export default class QuizAnswerService {
         quiz_id: quizId,
       })
     } else if (quizRequiresPeerReviews) {
-      queryBuilder
-        .innerJoin(Quiz, "quiz", "quiz_answer.quiz_id = quiz.id")
-        .innerJoin(PeerReviewCollection, "prc", "prc.quiz_id = quiz.id")
-        .where("prc.quiz_id IS NOT NULL")
+      queryBuilder.andWhere(
+        "quiz_answer.quiz_id in (SELECT quiz_id FROM peer_review_collection)",
+      )
+    }
+
+    // Required for the min / max criteria to work when the counts are needed for more than one quiz
+    // This could be done always, but depends on the correct state of user quiz state
+    // Hopefully that can be counted on with newer courses and answers
+
+    if (addSpamFlagNumber) {
+      queryBuilder.leftJoinAndMapOne(
+        "quiz_answer.userQuizState",
+        UserQuizState,
+        "user_quiz_state",
+        "user_quiz_state.quiz_id = quiz_answer.quiz_id " +
+          "AND user_quiz_state.user_id = quiz_answer.user_id",
+      )
+    } else {
+      queryBuilder.leftJoin(
+        UserQuizState,
+        "user_quiz_state",
+        "user_quiz_state.quiz_id = quiz_answer.quiz_id " +
+          "AND user_quiz_state.user_id = quiz_answer.user_id",
+      )
+    }
+
+    if (courseIds && courseIds.length > 0) {
+      queryBuilder.innerJoin(Quiz, "quiz", "quiz_answer.quiz_id = quiz.id")
+
+      queryBuilder.andWhere(
+        `quiz.course_id ${
+          courseIdIncludedInCourseIds ? "IN" : "NOT IN"
+        } (:...courseIds)`,
+        { courseIds },
+      )
     }
 
     if (userId) {
@@ -461,83 +545,100 @@ export default class QuizAnswerService {
       })
     }
 
-    let userIdsInSuitableUQStates = null
+    // We assume that user quiz states are usable in this case
+    // true for elements courses, which are currently the only need for courseIds property
 
-    if (
-      typeof peerReviewsGiven === "number" &&
-      (peerReviewsGiven > 0 && peerReviewsGiven < 1000) &&
-      quizId
-    ) {
-      userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
-        "user_quiz_state",
+    if (minPeerReviewAverage) {
+      throw new Error("filtering by average not supported yet")
+    }
+
+    if (maxPeerReviewAverage) {
+      throw new Error("filtering by average not supported yet")
+    }
+
+    if (maxPeerReviewsGiven) {
+      queryBuilder.andWhere(
+        "user_quiz_state.peer_reviews_given <= :maxPeerReviewsGiven",
+        { maxPeerReviewsGiven },
       )
-        .select("user_quiz_state.user_id")
-        .where("user_quiz_state.quiz_id = :quizId", { quizId })
-        .andWhere("user_quiz_state.peer_reviews_given >= :peerReviewsGiven", {
-          peerReviewsGiven,
-        })
     }
 
-    if (
-      typeof peerReviewsReceived === "number" &&
-      peerReviewsReceived > 0 &&
-      peerReviewsReceived <= 1000 &&
-      quizId
-    ) {
-      if (userIdsInSuitableUQStates) {
-        userIdsInSuitableUQStates.andWhere(
-          "user_quiz_state.peer_reviews_received >= :peerReviewsReceived",
-          { peerReviewsReceived },
-        )
-      } else {
-        userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
-          "user_quiz_state",
-        )
-          .select("user_quiz_state.user_id")
-          .where("user_quiz_state.quiz_id = :quizId", { quizId })
-          .andWhere(
-            "user_quiz_state.peer_reviews_received >= :peerReviewsReceived",
-            { peerReviewsReceived },
-          )
-      }
-    }
-
-    if (typeof spamFlags === "number" && spamFlags > 0 && spamFlags <= 10000) {
-      if (userIdsInSuitableUQStates) {
-        userIdsInSuitableUQStates.andWhere(
-          "user_quiz_state.spam_flags >= :spamFlags",
-          { spamFlags },
-        )
-      } else {
-        userIdsInSuitableUQStates = await UserQuizState.createQueryBuilder(
-          "user_quiz_state",
-        )
-          .select("user_quiz_state.user_id")
-          .where("user_quiz_state.quiz_id = :quizId", { quizId })
-          .andWhere("user_quiz_state.spam_flags >= :spamFlags", { spamFlags })
-      }
-    }
-
-    if (userIdsInSuitableUQStates) {
-      queryBuilder
-        .andWhere(
-          "quiz_answer.user_id IN (" +
-            userIdsInSuitableUQStates.getQuery() +
-            ")",
-        )
-        .setParameters(userIdsInSuitableUQStates.getParameters())
-    }
-
-    if (addSpamFlagNumber) {
-      queryBuilder.leftJoinAndMapOne(
-        "quiz_answer.userQuizState",
-        UserQuizState,
-        "user_quiz_state",
-        "user_quiz_state.quiz_id = quiz_answer.quiz_id " +
-          "AND user_quiz_state.user_id = quiz_answer.user_id",
+    if (maxPeerReviewsReceived) {
+      queryBuilder.andWhere(
+        "user_quiz_state.peer_reviews_received <= :maxPeerReviewsReceived",
+        { maxPeerReviewsReceived },
       )
+    }
+
+    if (minSpamFlags) {
+      queryBuilder.andWhere("user_quiz_state.spam_flags>= :minSpamFlags", {
+        minSpamFlags,
+      })
+    }
+
+    if (maxSpamFlags) {
+      queryBuilder.andWhere("user_quiz_state.spam_flags <= :maxSpamFlags", {
+        maxSpamFlags,
+      })
+    }
+
+    if (minSpamFlagsOr && minPeerReviewsGiven && minPeerReviewsReceived) {
+      queryBuilder.andWhere(
+        `(user_quiz_state.spam_flags >= :minSpamFlagsOr
+        OR (user_quiz_state.peer_reviews_given >= :minPeerReviewsGiven
+          AND user_quiz_state.peer_reviews_received >= :minPeerReviewsReceived))`,
+        {
+          minSpamFlagsOr,
+          minPeerReviewsGiven,
+          minPeerReviewsReceived,
+        },
+      )
+    } else {
+      if (minPeerReviewsGiven) {
+        queryBuilder.andWhere(
+          "user_quiz_state.peer_reviews_given >= :minPeerReviewsGiven",
+          { minPeerReviewsGiven },
+        )
+      }
+
+      if (minPeerReviewsReceived) {
+        queryBuilder.andWhere(
+          "user_quiz_state.peer_reviews_received >= :minPeerReviewsReceived",
+          { minPeerReviewsReceived },
+        )
+      }
     }
 
     return queryBuilder
+  }
+
+  private async getQuizCounts(query: IQuizAnswerQuery): Promise<any> {
+    const someQuery = this.constructGetAnswersQuery(query)
+
+    if (query.quizRequiresPeerReviews && query.quizId) {
+      const prc = await PeerReviewCollection.createQueryBuilder("prc")
+        .where("prc.quiz_id = :quizId", { quizId: query.quizId })
+        .getCount()
+
+      if (prc) {
+        return { quizId: query.quizId, count: 0 }
+      }
+    }
+
+    someQuery
+      .select("quiz_answer.quiz_id", "quizId")
+      .addSelect("COUNT(quiz_answer.id)")
+      .addGroupBy("quiz_answer.quiz_id")
+
+    const result = (await someQuery.execute()).map(
+      (countInfo: { quizId: string; count: string }) => {
+        return {
+          ...countInfo,
+          count: Number(countInfo.count),
+        }
+      },
+    )
+
+    return result
   }
 }

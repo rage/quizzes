@@ -16,7 +16,7 @@
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"yarn run watch-ts\" \"yarn run watch-node\"",
     "test": "jest --forceExit --coverage --verbose",
     "watch-test": "yarn run test -- --watchAll",
-    "build-ts": "cd packages/common && tsc && cd ../backend && tsc && tscpaths -p tsconfig.json -s ./src -o ../../dist/backend/src && cd ../..",
+    "build-ts": "cd packages/backend && tsc && tscpaths -p tsconfig.json -s ./src -o ../../dist/backend/src && cd ../..",
     "watch-ts": "",
     "debug": "yarn run build && yarn run watch-debug",
     "serve-debug": "nodemon --inspect dist/backend/src/server.js",
@@ -27,7 +27,9 @@
     "start-dashboard": "cd packages/dashboard && yarn start",
     "create-user-quiz-states": "node --max-old-space-size=2048 dist/backend/src/scripts/create_user_quiz_states.js",
     "create-user-quiz-states-cron": "node --max-old-space-size=2048 dist/backend/src/scripts/create_user_quiz_states.js cron",
-    "kafka-batch-publish": "node --max-old-space-size=2048 dist/backend/src/scripts/kafka_batch_publisher.js"
+    "kafka-batch-publish": "node --max-old-space-size=2048 dist/backend/src/scripts/kafka_batch_publisher.js",
+    "refresh-reaktor-view": "node dist/backend/src/scripts/reaktor_view_refresh.js",
+    "update-quiz-item-answer-correct": "node dist/backend/src/scripts/update_quiz_item_answer_correct.js"
   },
   "dependencies": {
     "@types/express-graphql": "^0.6.1",
@@ -65,7 +67,7 @@
     "request-promise": "^4.2.2",
     "stream": "0.0.2",
     "tmc-client-js": "0.0.9",
-    "typeorm": "^0.3.0-alpha.22",
+    "typeorm": "^0.3.0-rc.17",
     "uuid-by-string": "^0.6.0",
     "validate.js": "^0.12.0",
     "winston": "^3.1.0"
@@ -91,7 +93,7 @@
     "@types/winston": "^2.3.9",
     "chai": "^4.1.2",
     "concurrently": "^3.6.0",
-    "husky": "^1.0.0-rc.9",
+    "husky": "^4.2.5",
     "jest": "^23.1.2",
     "nodemon": "^1.17.5",
     "prettier": "^1.13.6",

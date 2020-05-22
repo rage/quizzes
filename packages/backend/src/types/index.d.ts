@@ -9,7 +9,11 @@ import {
   PeerReviewQuestionTranslation,
   PeerReviewCollection,
   PeerReviewCollectionTranslation,
+  UserCourseRole,
 } from "../models"
+import { Permission } from "services/authorization.service"
+import { RequiredAction } from "../services/kafka.service"
+import { ModifyTableQuizItemAddColumnUsesSharedOptionFeedbackMessage1567500257341 } from "migration/1567500257341-ModifyTableQuizItemAddColumnUsesSharedOptionFeedbackMessage"
 
 export class ITMCProfile {
   username: string
@@ -64,25 +68,33 @@ export interface IQuizAnswerQuery {
   // should prob only use statuses
   status?: string
   statuses?: string[]
+  courseIds?: string[]
+  courseIdIncludedInCourseIds?: boolean
   firstAllowedTime?: Date
   lastAllowedTime?: Date
   languageIds?: string[]
-  // or: max and min for peer reviews given/received
-  peerReviewsGiven?: number
-  peerReviewsReceived?: number
-  // similarly: min/max spamflags
-  spamFlags?: number
+  minPeerReviewsGiven?: number
+  maxPeerReviewsGiven?: number
+  minPeerReviewsReceived?: number
+  maxPeerReviewsReceived?: number
+  minSpamFlags?: number
+  minSpamFlagsOr?: number
+  maxSpamFlags?: number
+  minPeerReviewAverage?: number
+  maxPeerReviewAverage?: number
   addPeerReviews?: boolean
   addSpamFlagNumber?: boolean
   quizRequiresPeerReviews?: boolean
   skip?: number
   limit?: number
+  user?: ITMCProfileDetails
 }
 
 interface ICourseQuery {
   language?: string
   id?: string
   attentionAnswers?: boolean
+  user?: ITMCProfileDetails
 }
 
 export interface INewQuizQuery {
@@ -214,7 +226,7 @@ export interface QuizAnswerMessage {
   user_id: number
   course_id: string
   service_id: string
-  required_actions: string[] | null
+  required_actions: RequiredAction[] | null
   message_format_version: number
 }
 
@@ -235,8 +247,21 @@ export interface ExerciseData {
   deleted: boolean
 }
 
+export interface IAuthorizationQuery {
+  user: ITMCProfileDetails
+  answerId?: string
+  courseId?: string
+  quizId?: string
+  permission: Permission
+}
 export interface QuizValidation {
   badWordLimit: boolean
   maxPointsAltered: boolean
   coursePartAltered: boolean
+}
+
+export interface AnsweredQuiz {
+  quiz_id: string
+  answered: boolean
+  correct: boolean
 }

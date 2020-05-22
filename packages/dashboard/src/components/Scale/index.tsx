@@ -1,20 +1,23 @@
 import React from "react"
+import { IQuizItem, QuizItemType } from "../../interfaces"
 import ExpandedScale from "./ExpandedScale"
-
 import ShortScale from "./ShortScale"
 
-class ScaleItem extends React.Component<any, any> {
-  constructor(props) {
-    super(props)
-  }
+export interface IScaleItemProps {
+  changeAttr: (attribute: string, newValue: any) => void
+  order: number
+  items: IQuizItem[]
+  type: QuizItemType
+  toggleExpand: () => void
+  onCancel: () => void
+  expanded: boolean
+}
 
-  public render() {
-    const item = this.props.items[this.props.order]
-    if (item.id && !this.props.expanded) {
-      return <ShortScale {...this.props} />
-    } else {
-      return <ExpandedScale {...this.props} />
-    }
+const ScaleItem: React.FunctionComponent<IScaleItemProps> = props => {
+  if (!props.expanded) {
+    return <ShortScale {...props} />
+  } else {
+    return <ExpandedScale {...props} />
   }
 }
 

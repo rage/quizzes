@@ -1,12 +1,13 @@
 import * as React from "react"
-import { useEffect } from "react"
+import { useContext, useEffect, useRef } from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { Grid, Typography } from "@material-ui/core"
+import { Typography } from "@material-ui/core"
 import * as quizAnswerActions from "../../state/quizAnswer/actions"
 import * as messageActions from "../../state/message/actions"
 
 import { initialize } from "../../state/actions"
+import { updateQuizState } from "../../state/user/actions"
 import Checkbox from "../CheckboxOption"
 import Feedback from "../Feedback"
 import MultipleChoice from "../MultipleChoice"
@@ -27,7 +28,13 @@ import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
 import LoginPrompt from "./LoginPrompt"
 import MarkdownText from "../MarkdownText"
-import { BoldTypography } from "../styleComponents"
+import Notification from "../Notification"
+import { BoldTypographyMedium } from "../styleComponents"
+
+import ThemeProviderContext from "../../contexes/themeProviderContext"
+import { CourseStatusProviderContext } from "../../contexes/courseStatusProviderContext"
+
+import { requestReviews } from "../../state/receivedReviews/actions"
 
 const componentsByTypeNames = (typeName: QuizItemType) => {
   const mapTypeToComponent = {
@@ -49,31 +56,38 @@ export interface QuizProps {
   languageId: string
   accessToken: string
   backendAddress?: string
-  customContent?: Element | JSX.Element
+  customContent?: CustomContent
   fullInfoWithoutLogin?: boolean
   showZeroPointsInfo?: boolean
+}
+
+export type CustomContent = {
+  Login: Element | JSX.Element
+  Loading: Element | JSX.Element
+  WrongLocale: Element | JSX.Element
 }
 
 const QuizItemContainerDiv = styled.div`
   padding-bottom: 20px;
 `
 
-interface IComponentWrapperProps {
+export interface IItemWrapperProps {
   rowNumber: number
 }
 
-const ComponentWrapper = styled.div<IComponentWrapperProps>`
-  background-color: ${props =>
-    props.rowNumber % 2 === 0 ? "inherit" : "#605c980d"};
+const ItemWrapper = styled.div<IItemWrapperProps>`
+  background-color: ${({ rowNumber }) =>
+    rowNumber % 2 === 0 ? "inherit" : "#605c980d"};
   border-radius: 10px;
   padding: 1rem 2rem 1rem 1rem;
 `
 
-interface IQuizContentWrapperProps {
+export interface QuizContentProps {
   disabled: boolean
 }
 
-const QuizContentWrapper = styled.div<IQuizContentWrapperProps>`
+const QuizContent = styled.div<QuizContentProps>`
+  margin-top: 1rem;
   padding: 1rem;
   ${({ disabled }) =>
     disabled &&
@@ -83,12 +97,83 @@ const QuizContentWrapper = styled.div<IQuizContentWrapperProps>`
       `}
 `
 
-const OuterDiv = styled.div`
+interface UpperContentProps {
+  providedStyles: string | undefined
+}
+
+const UpperContent = styled.div<UpperContentProps>`
+  ${({ providedStyles }) => providedStyles}
+`
+
+export interface LowerContentProps {
+  nItems: number
+}
+
+const LowerContent = styled.div<LowerContentProps>`
+  margin-bottom: 1rem;
+  padding-left: 1rem;
+`
+
+interface MessageGroupProps {
+  providedStyles: string | undefined
+}
+
+const MessageGroup = styled.div<MessageGroupProps>`
+  ${({ providedStyles }) => providedStyles}
+`
+
+interface SubmitGroupProps {
+  providedStyles: string | undefined
+}
+
+const SubmitGroup = styled.div<SubmitGroupProps>`
+  display: flex;
+  flex-wrap: wrap;
+  > :last-child {
+    margin-left: 1rem;
+  }
+  ${({ providedStyles }) => providedStyles}
+`
+
+const OuterDiv = styled.div<{ providedStyles: string | undefined }>`
   p {
     margin-bottom: 0 !important;
   }
   ul {
     padding-inline-start: 30px;
+  }
+  ${({ providedStyles }) => providedStyles}
+`
+
+interface QuizBodyProps {
+  providedStyles: string | undefined
+}
+
+const QuizBody = styled(MarkdownText)<QuizBodyProps>`
+  padding: 0 1rem 1rem;
+  ${({ providedStyles }) => providedStyles}
+`
+interface SubmitMessageProps {
+  providedStyles: string | undefined
+}
+
+const SubmitMessage = styled.div<SubmitMessageProps>`
+  border-left: 6px solid #047500;
+  padding: 0.25rem 0 0 1rem;
+  margin 0 0 3rem 0;
+  p {
+    margin: 1rem 0px !important;
+  }
+  ${({ providedStyles }) => providedStyles}
+`
+
+const Error = styled.div`
+  display: flex;
+  width: auto;
+  padding: 4rem;
+  p {
+    font-size: 2rem;
+    margin: auto;
   }
 `
 
@@ -99,8 +184,12 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   backendAddress,
   customContent,
   fullInfoWithoutLogin,
-  showZeroPointsInfo = true,
+  showZeroPointsInfo = false,
+  children,
 }) => {
+  const ref = useRef(null)
+  const themeProvider = useContext(ThemeProviderContext)
+  const courseStatusProvider = useContext(CourseStatusProviderContext)
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
   const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
   const messageState = useTypedSelector(state => state.message)
@@ -117,7 +206,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
 
   const dispatch = useDispatch()
 
-  const error = messageState.errorMessage
+  const fatal = messageState.fatal
+  const error = messageState.error
 
   useEffect(
     () => {
@@ -135,11 +225,29 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     [id, languageId, accessToken, backendAddress],
   )
 
+  if (fatal) {
+    console.log("quiz")
+    courseStatusProvider.notifyError &&
+      courseStatusProvider.notifyError(messageState.message)
+    return (
+      <Error>
+        <p>{messageState.message}</p>
+      </Error>
+    )
+  }
+
+  if (error) {
+    courseStatusProvider.notifyError &&
+      courseStatusProvider.notifyError(messageState.message)
+  }
+
+  const CustomLogin = customContent && customContent.Login
+
   if (!accessToken && !fullInfoWithoutLogin) {
     return (
       <div>
         <TopInfoBar staticBars />
-        <LoginPrompt content={customContent} />
+        <LoginPrompt content={CustomLogin} />
       </div>
     )
   }
@@ -153,9 +261,21 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     return <div>language info not set</div>
   }
 
+  if (
+    courseStatusProvider.updateQuiz &&
+    courseStatusProvider.updateQuiz[quiz.id]
+  ) {
+    dispatch(updateQuizState())
+    dispatch(requestReviews())
+    courseStatusProvider.quizUpdated &&
+      courseStatusProvider.quizUpdated(quiz.id)
+  }
+
   const generalLabels = languageInfo.general
 
   const quizItemComponents = (quiz: Quiz, languageId: string) => {
+    const StyledWrapper = themeProvider.itemWrapper || ItemWrapper
+
     return (
       <>
         {quiz.items
@@ -163,21 +283,12 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           .map((item, idx) => {
             const ItemComponent = componentsByTypeNames(item.type)
             return (
-              <ComponentWrapper rowNumber={idx} key={item.id}>
+              <StyledWrapper rowNumber={idx} key={item.id}>
                 <ItemComponent item={item} />
-              </ComponentWrapper>
+              </StyledWrapper>
             )
           })}
       </>
-    )
-  }
-
-  if (error) {
-    return (
-      <div>
-        {generalLabels && generalLabels.errorLabel}
-        <pre>{error}</pre>
-      </div>
     )
   }
 
@@ -185,7 +296,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     const message =
       "Error: quiz has no texts. (Likely the quiz does not match the requested " +
       "language id)"
-    dispatch(messageActions.setErrorMessage(message))
+    dispatch(messageActions.errorOccurred(message))
     return <div />
   }
 
@@ -226,6 +337,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       : false
     : false
 
+  const submitMessage = quiz.texts[0].submitMessage
+
   const exerciseFinishedMessage =
     activeStep === 4
       ? languageInfo.peerReviews.answerConfirmed
@@ -252,92 +365,116 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
         qi.type !== "research-agreement",
     )
 
+  const QuizContentWrapper = themeProvider.quizContent || QuizContent
+  const LowerContentWrapper = themeProvider.lowerContent || LowerContent
+
+  const wrongLocale = !!(customContent && customContent.WrongLocale)
+
   return (
-    <OuterDiv>
+    <OuterDiv
+      providedStyles={themeProvider.mainDivStyles}
+      aria-label={quiz.texts[0].title}
+      role="form"
+    >
       <TopInfoBar />
+      <div ref={ref} />
+      {/*<Notification scrollRef={ref} />*/}
+      <QuizContentWrapper disabled={quizDisabled || wrongLocale}>
+        <UpperContent providedStyles={themeProvider.upperContentStyles}>
+          <Deadline deadline={quiz.deadline} />
 
-      {quizDisabled && (
-        <LoginPrompt content={customContent} fullQuizInfoShown={true} />
-      )}
+          {containsPeerReviews && <StageVisualizer />}
 
-      <QuizContentWrapper disabled={quizDisabled}>
-        <Deadline deadline={quiz.deadline} />
-
-        {containsPeerReviews && <StageVisualizer />}
-
-        <MarkdownText>{quiz.texts[0].body}</MarkdownText>
+          <QuizBody providedStyles={themeProvider.quizBodyStyles}>
+            {quiz.texts[0].body}
+          </QuizBody>
+          {children}
+        </UpperContent>
         <QuizItemContainerDiv>
           {quizItemComponents(quiz, languageId)}
         </QuizItemContainerDiv>
-
-        {!stillSubmittable && !quizDisabled ? (
-          <>
-            {containsPeerReviews && exerciseFinishedMessage && (
-              <BoldTypography>{exerciseFinishedMessage}</BoldTypography>
-            )}
-
-            {containsPeerReviews && shouldShowPeerReviews && <PeerReviews />}
-
-            <ResultInformation
-              quiz={quiz}
-              quizAnswer={quizAnswer}
-              generalLabels={generalLabels}
-            />
-          </>
-        ) : (
-          <div>
-            {messageState.notification && messageState.notification.message && (
-              <Typography
-                style={{
-                  color: messageState.notification.color,
-                  fontSize: "1.25rem",
-                }}
-              >
-                {messageState.notification.message}
-              </Typography>
-            )}
-
-            <Grid container={true} alignItems="center" spacing={2}>
-              <Grid
-                item={true}
-                onClick={e => {
-                  if ((submitLocked || pastDeadline) && !quizDisabled) {
-                    dispatch(quizAnswerActions.noticeDisabledSubmitAttempt())
-                  }
-                }}
-                xs="auto"
-              >
-                <SubmitButton />
-              </Grid>
-
-              {!quizDisabled && (
-                <Grid item={true} xs="auto">
-                  {pastDeadline ? (
-                    <Typography>{generalLabels.pastDeadline}</Typography>
-                  ) : (
-                    <React.Fragment>
-                      <Typography>
-                        {quiz.triesLimited
-                          ? `${
-                              generalLabels.triesRemainingLabel
-                            }: ${triesRemaining}`
-                          : generalLabels.triesNotLimitedLabel}
-                      </Typography>
-                      {showPointsPolicyLabel && (
-                        <Typography>
-                          {generalLabels.pointsGrantingPolicyInformer(
-                            quiz.grantPointsPolicy,
-                          )}
-                        </Typography>
-                      )}
-                    </React.Fragment>
-                  )}
-                </Grid>
+        <LowerContentWrapper nItems={quiz.items.length}>
+          {!stillSubmittable && !quizDisabled ? (
+            <MessageGroup providedStyles={themeProvider.messageGroupStyles}>
+              {submitMessage && (
+                <>
+                  <SubmitMessage
+                    providedStyles={themeProvider.submitMessageDivStyles}
+                  >
+                    <Typography>
+                      {languageInfo.essay.exampleAnswerLabel}
+                    </Typography>
+                    <div>
+                      <MarkdownText>{submitMessage}</MarkdownText>
+                    </div>
+                  </SubmitMessage>
+                </>
               )}
-            </Grid>
-          </div>
-        )}
+
+              {containsPeerReviews && exerciseFinishedMessage && (
+                <BoldTypographyMedium>
+                  {exerciseFinishedMessage}
+                </BoldTypographyMedium>
+              )}
+
+              {containsPeerReviews && shouldShowPeerReviews && <PeerReviews />}
+
+              <ResultInformation
+                quiz={quiz}
+                quizAnswer={quizAnswer}
+                generalLabels={generalLabels}
+              />
+            </MessageGroup>
+          ) : (
+            <>
+              <SubmitGroup providedStyles={themeProvider.submitGroupStyles}>
+                <div />
+                <div
+                  onClick={e => {
+                    if ((submitLocked || pastDeadline) && !quizDisabled) {
+                      dispatch(quizAnswerActions.noticeDisabledSubmitAttempt())
+                    }
+                  }}
+                >
+                  <SubmitButton />
+                </div>
+
+                {!quizDisabled && (
+                  <div>
+                    {pastDeadline ? (
+                      <Typography>{generalLabels.pastDeadline}</Typography>
+                    ) : (
+                      <React.Fragment>
+                        <Typography>
+                          {quiz.triesLimited
+                            ? `${
+                                generalLabels.triesRemainingLabel
+                              }: ${triesRemaining}`
+                            : generalLabels.triesNotLimitedLabel}
+                        </Typography>
+                        {showPointsPolicyLabel && (
+                          <Typography>
+                            {generalLabels.pointsGrantingPolicyInformer(
+                              quiz.grantPointsPolicy,
+                            )}
+                          </Typography>
+                        )}
+                      </React.Fragment>
+                    )}
+                  </div>
+                )}
+              </SubmitGroup>
+            </>
+          )}
+        </LowerContentWrapper>
       </QuizContentWrapper>
+      {customContent && customContent.WrongLocale}
+      {quizDisabled && (
+        <LoginPrompt
+          content={customContent && customContent.Login}
+          fullQuizInfoShown={true}
+        />
+      )}
     </OuterDiv>
   )
 }

@@ -9,13 +9,12 @@ import {
   QueryParam,
   UnauthorizedError,
 } from "routing-controllers"
-import KafkaService from "services/kafka.service"
+import AuthorizationService, {
+  Permission,
+} from "services/authorization.service"
 import PeerReviewService from "services/peerreview.service"
 import QuizService from "services/quiz.service"
 import QuizAnswerService from "services/quizanswer.service"
-import UserCoursePartStateService from "services/usercoursepartstate.service"
-import UserQuizStateService from "services/userquizstate.service"
-import ValidationService from "services/validation.service"
 import { Inject } from "typedi"
 import { EntityManager } from "typeorm"
 import { EntityFromBody } from "typeorm-routing-controllers-extensions"
@@ -23,12 +22,16 @@ import { InjectManager } from "typeorm-typedi-extensions"
 import { API_PATH } from "../../config"
 import { PeerReview, Quiz, QuizAnswer, UserQuizState } from "../../models"
 import { ITMCProfileDetails } from "../../types"
-import { PeerReviewQuestionAnswer } from "@quizzes/common/models"
+
+import { MessageType, pushMessageToClient } from "../../wsServer"
 
 @JsonController(`${API_PATH}/quizzes/peerreview`)
 export class PeerReviewController {
   @InjectManager()
   private entityManager: EntityManager
+
+  @Inject()
+  private authorizationService: AuthorizationService
 
   @Inject()
   private peerReviewService: PeerReviewService
@@ -37,19 +40,22 @@ export class PeerReviewController {
   private quizAnswerService: QuizAnswerService
 
   @Inject()
-  private userQuizStateService: UserQuizStateService
-
-  @Inject()
   private QuizService: QuizService
 
-  @Inject()
-  private validationService: ValidationService
-
-  @Inject()
-  private userCoursePartStateService: UserCoursePartStateService
-
-  @Inject()
-  private kafkaService: KafkaService
+  @Get(
+    "/:quizId([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})/:languageId",
+  )
+  public async get(
+    @Param("quizId") quizId: string,
+    @Param("languageId") languageId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    return await this.peerReviewService.getAnswersToReview(
+      quizId,
+      languageId,
+      user.id,
+    )
+  }
 
   @Get("/received/:answerId")
   public async getGivenReviews(
@@ -57,7 +63,13 @@ export class PeerReviewController {
     @HeaderParam("authorization") user: ITMCProfileDetails,
     @QueryParam("stripped") stripped: boolean,
   ) {
-    if (!user.administrator) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      answerId,
+      permission: Permission.VIEW,
+    })
+
+    if (!authorized) {
       stripped = true
       const answer = await this.quizAnswerService.getAnswer(
         { id: answerId },
@@ -88,68 +100,6 @@ export class PeerReviewController {
     }
 
     return result
-  }
-
-  @Get("/data/:quizId/plainPeerReviews")
-  public async getDetailedPlainPeerReviews(
-    @Param("quizId") quizId: string,
-    @HeaderParam("authorization") user: ITMCProfileDetails,
-  ) {
-    if (!user.administrator) {
-      throw new UnauthorizedError("unauthorized")
-    }
-
-    const result = await this.peerReviewService.getPlainPeerReviews(quizId)
-    const stringStream = result.pipe(JSONStream.stringify())
-
-    return stringStream
-  }
-
-  @Get("/data/:quizId/plainAnswers")
-  public async getDetailedPlainPeerReviewQuestionAnswers(
-    @Param("quizId") quizId: string,
-    @HeaderParam("authorization") user: ITMCProfileDetails,
-  ) {
-    if (!user.administrator) {
-      throw new UnauthorizedError("unauthorized")
-    }
-
-    const result = await this.peerReviewService.getPlainPeerReviewAnswers(
-      quizId,
-    )
-
-    const stringStream = result.pipe(JSONStream.stringify())
-
-    return stringStream
-  }
-
-  @Get("/data/:quizId")
-  public async getDetailedPeerReviews(
-    @Param("quizId") quizId: string,
-    @HeaderParam("authorization") user: ITMCProfileDetails,
-  ) {
-    if (!user.administrator) {
-      throw new UnauthorizedError("unauthorized")
-    }
-
-    const result = await this.peerReviewService.getCSVData(quizId)
-
-    const stringStream = result.pipe(JSONStream.stringify())
-
-    return stringStream
-  }
-
-  @Get("/:quizId/:languageId")
-  public async get(
-    @Param("quizId") quizId: string,
-    @Param("languageId") languageId: string,
-    @HeaderParam("authorization") user: ITMCProfileDetails,
-  ) {
-    return await this.peerReviewService.getAnswersToReview(
-      quizId,
-      languageId,
-      user.id,
-    )
   }
 
   @Post("/")
@@ -185,11 +135,23 @@ export class PeerReviewController {
       { id: peerReview.quizAnswerId },
       this.entityManager,
     )
+
+    const oldStatus = receivingQuizAnswer.status
+
     const givingQuizAnswer: QuizAnswer = await this.quizAnswerService.getAnswer(
       {
         userId: peerReview.userId,
         quizId: receivingQuizAnswer.quizId,
-        statuses: ["confirmed", "submitted", "enough-received-but-not-given"],
+        statuses: [
+          "given-more-than-enough",
+          "given-enough",
+          "confirmed",
+          "submitted",
+          "enough-received-but-not-given",
+          "manual-review",
+          "manual-review-once-given-enough",
+          "manual-review-once-given-and-received-enough",
+        ],
       },
       this.entityManager,
     )
@@ -210,24 +172,42 @@ export class PeerReviewController {
         peerReview,
       )
 
-      const {
-        updatedAnswer,
-        updatedState,
-      } = await this.peerReviewService.processPeerReview(
+      const givingUpdated = await this.peerReviewService.processPeerReview(
         manager,
         quiz,
         givingQuizAnswer,
         true,
       )
 
-      responseQuizAnswer = updatedAnswer
-      responseUserQuizState = updatedState
+      responseQuizAnswer = givingUpdated.answer
+      responseUserQuizState = givingUpdated.state
 
-      await this.peerReviewService.processPeerReview(
+      const receivingUpdated = await this.peerReviewService.processPeerReview(
         manager,
         quiz,
         receivingQuizAnswer,
       )
+
+      const newStatus = receivingUpdated.answer.status
+      const messages: MessageType[] = [MessageType.PEER_REVIEW_RECEIVED]
+
+      if (oldStatus !== newStatus) {
+        if (newStatus === "confirmed") {
+          messages.push(MessageType.QUIZ_CONFIRMED)
+        }
+        if (newStatus === "rejected" || newStatus === "spam") {
+          messages.push(MessageType.QUIZ_REJECTED)
+        }
+      }
+
+      messages.forEach(message => {
+        pushMessageToClient(
+          receivingQuizAnswer.userId,
+          quiz.course.moocfiId,
+          message,
+          quiz.id,
+        )
+      })
     })
 
     return {
@@ -235,5 +215,72 @@ export class PeerReviewController {
       quizAnswer: responseQuizAnswer,
       userQuizState: responseUserQuizState,
     }
+  }
+
+  @Get("/data/:quizId/plainPeerReviews")
+  public async getDetailedPlainPeerReviews(
+    @Param("quizId") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const result = await this.peerReviewService.getPlainPeerReviews(quizId)
+    const stringStream = result.pipe(JSONStream.stringify())
+
+    return stringStream
+  }
+
+  @Get("/data/:quizId/plainAnswers")
+  public async getDetailedPlainPeerReviewQuestionAnswers(
+    @Param("quizId") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const result = await this.peerReviewService.getPlainPeerReviewAnswers(
+      quizId,
+    )
+
+    const stringStream = result.pipe(JSONStream.stringify())
+
+    return stringStream
+  }
+
+  @Get("/data/:quizId")
+  public async getDetailedPeerReviews(
+    @Param("quizId") quizId: string,
+    @HeaderParam("authorization") user: ITMCProfileDetails,
+  ) {
+    const authorized = await this.authorizationService.isPermitted({
+      user,
+      quizId,
+      permission: Permission.EXPORT,
+    })
+
+    if (!authorized) {
+      throw new UnauthorizedError("unauthorized")
+    }
+
+    const result = await this.peerReviewService.getCSVData(quizId)
+
+    const stringStream = result.pipe(JSONStream.stringify())
+
+    return stringStream
   }
 }

@@ -8,6 +8,7 @@ import {
 } from "../../services/peerReviewService"
 import { setAnswer } from "../quizAnswer/actions"
 import { setUserQuizState } from "../user/actions"
+import { errorOccurred } from "../message/actions"
 import { ThunkAction } from "../store"
 import { PeerReviewAnswer, PeerReviewCollection } from "../../modelTypes"
 
@@ -91,22 +92,31 @@ export const submit: ActionCreator<ThunkAction> = () => async (
   dispatch,
   getState,
 ) => {
-  const peerReview = getState().peerReviews.answer
-  if (!peerReview) {
-    return
+  try {
+    const peerReview = getState().peerReviews.answer
+    if (!peerReview) {
+      return
+    }
+    const accessToken = getState().user.accessToken
+    dispatch(setSubmitDisabled(true))
+    const address = getState().backendAddress
+    const { quizAnswer, userQuizState } = await postPeerReview(
+      peerReview,
+      accessToken,
+      address,
+    )
+    dispatch(setAnswer(quizAnswer))
+    dispatch(setUserQuizState(userQuizState))
+    dispatch(setReviewAnswer(null))
+    await dispatch(fetchPeerReviewAlternatives())
+  } catch (error) {
+    dispatch(
+      errorOccurred(
+        getState().language.languageLabels!.error.submitFailedError ||
+          "submit error",
+      ),
+    )
   }
-  const accessToken = getState().user.accessToken
-  dispatch(setSubmitDisabled(true))
-  const address = getState().backendAddress
-  const { quizAnswer, userQuizState } = await postPeerReview(
-    peerReview,
-    accessToken,
-    address,
-  )
-  dispatch(setAnswer(quizAnswer))
-  dispatch(setUserQuizState(userQuizState))
-  dispatch(setReviewAnswer(null))
-  await dispatch(fetchPeerReviewAlternatives())
 }
 
 // solves the problem of passing info from userState, quizState -> peerReviewReducer
@@ -130,31 +140,53 @@ export const selectAnswerToReview: ActionCreator<ThunkAction> = (
   )
 }
 
+export const unselectAnswer = createAction("peerReviews/UNSELECT")
+
 export const postSpam: ActionCreator<ThunkAction> = (
   quizAnswerId: string,
 ) => async (dispatch, getState) => {
-  const accessToken = getState().user.accessToken
-  setReviewOptions([])
-  const address = getState().backendAddress
-  await postSpamFlag(quizAnswerId, accessToken, address)
-  await dispatch(fetchPeerReviewAlternatives())
+  try {
+    const accessToken = getState().user.accessToken
+    setReviewOptions([])
+    const address = getState().backendAddress
+    await postSpamFlag(quizAnswerId, accessToken, address)
+    await dispatch(fetchPeerReviewAlternatives())
+  } catch (error) {
+    const languageLabels = getState().language.languageLabels
+    dispatch(
+      errorOccurred(
+        (languageLabels && languageLabels.error.submitSpamFlagError) ||
+          "spam flag submit error",
+      ),
+    )
+  }
 }
 
 export const fetchPeerReviewAlternatives: ActionCreator<
   ThunkAction
 > = () => async (dispatch, getState) => {
-  const accessToken = getState().user.accessToken
-  const quiz = getState().quiz
-  const languageId = getState().language.languageId
+  try {
+    const accessToken = getState().user.accessToken
+    const quiz = getState().quiz
+    const languageId = getState().language.languageId
 
-  const address = getState().backendAddress
-  const answerAlternatives = await getPeerReviewInfo(
-    quiz.id,
-    languageId,
-    accessToken,
-    address,
-  )
-  dispatch(setReviewOptions(answerAlternatives))
+    const address = getState().backendAddress
+    const answerAlternatives = await getPeerReviewInfo(
+      quiz.id,
+      languageId,
+      accessToken,
+      address,
+    )
+    dispatch(setReviewOptions(answerAlternatives))
+  } catch (error) {
+    const languageLabels = getState().language.languageLabels
+    dispatch(
+      errorOccurred(
+        (languageLabels && languageLabels.error.fetchReviewCandidatesError) ||
+          "couldn't fetch answers to review",
+      ),
+    )
+  }
 }
 
 export const setSubmitDisabled: ActionCreator<ThunkAction> = (

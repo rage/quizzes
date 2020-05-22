@@ -3,6 +3,7 @@ import {
   BaseEntity,
   Brackets,
   FindOptionsWhereCondition,
+  getConnection,
   ObjectLiteral,
   SelectQueryBuilder,
 } from "typeorm"
@@ -10,9 +11,47 @@ import { QueryPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 import getUUIDByStringBroken from "uuid-by-string"
 import fs from "fs"
 
+import { snakeCase } from "typeorm/util/StringUtils"
+
 export function logger(message: string) {}
 
 export async function insert<T extends BaseEntity>(
+  type: typeof BaseEntity,
+  data: Array<QueryPartialEntity<T>> | QueryPartialEntity<T>,
+  primaryKeys: string = `"id"`,
+) {
+  if (data instanceof Array && data.length === 0) {
+    return Promise.resolve()
+  }
+
+  const properties = getConnection()
+    .getMetadata(type)
+    .columns.map(c => snakeCase(c.propertyName))
+
+  let updateString = ""
+
+  properties.forEach(p => {
+    let property = p
+    if (property === "order") {
+      property = `"order"`
+    }
+    if (property === "default") {
+      property = `"default"`
+    }
+    updateString = updateString.concat(`${property} = excluded.${property}, `)
+  })
+
+  updateString = updateString.substring(0, updateString.length - 2)
+
+  return await type
+    .createQueryBuilder()
+    .insert()
+    .values(data)
+    .onConflict(`(${primaryKeys}) do update set ${updateString}`)
+    .execute()
+}
+
+/*export async function insert<T extends BaseEntity>(
   type: typeof BaseEntity,
   data: any[],
   primaryKeys: string = `"id"`,
@@ -35,24 +74,7 @@ export async function insert<T extends BaseEntity>(
   )
 
   return saved
-}
-
-export function insertForReal<T extends BaseEntity>(
-  type: typeof BaseEntity,
-  data: Array<QueryPartialEntity<T>> | QueryPartialEntity<T>,
-  primaryKeys: string = `"id"`,
-) {
-  if (data instanceof Array && data.length === 0) {
-    return
-  }
-
-  return type
-    .createQueryBuilder()
-    .insert()
-    .values(data)
-    .onConflict(`(${primaryKeys}) DO NOTHING`)
-    .execute()
-}
+}*/
 
 export function getUUIDByString(str: string): string {
   // getUUIDByStringBroken seems to ignore the first character of the string
@@ -126,7 +148,7 @@ export function executeIfChangeMatches(
 
 export function executeIfOnlyDigitsInTextField(
   callback: (event: ChangeEvent<HTMLInputElement>) => void,
-): ((e: ChangeEvent<HTMLInputElement>) => void) {
+): (e: ChangeEvent<HTMLInputElement>) => void {
   return executeIfChangeMatches((e: ChangeEvent<HTMLInputElement>) => {
     const eventValue = e.target.value
     const regex = eventValue.match(/^\d*$/)

@@ -31,13 +31,15 @@ class Answer extends React.Component<any, any> {
     confirmed: "#48fa5d",
     rejected: "#d80027",
     deprecated: "#9b9b9b",
+    "enough-received-but-not-given": "#FB6949",
+    "manual-review": "#FB6949",
   }
 
   constructor(props) {
     super(props)
     this.answerRef = React.createRef<HTMLElement>()
     this.state = {
-      expanded: false,
+      expanded: true,
       modalOpen: false,
       confirmDialogOpen: false,
       confirmAction: null,
@@ -192,8 +194,7 @@ class Answer extends React.Component<any, any> {
               <Button
                 onClick={this.modifyStatus(
                   this.state.confirmAction,
-                  this.props.answerData.status === "submitted" ||
-                    this.props.answerData.status === "spam",
+                  this.props.answerData.status === "manual-review",
                 )}
               >
                 Confirm
@@ -359,9 +360,10 @@ class PeerReviewsSummary extends React.Component<any, any> {
               <Grid item={true} xs={12}>
                 <Typography variant="subtitle1" color="textSecondary">
                   SPAM FLAGS:{" "}
-                  {this.props.answer.userQuizState
-                    ? this.props.answer.userQuizState.spamCount
-                    : "not calculated"}
+                  {this.props.answer.userQuizState &&
+                  typeof this.props.answer.userQuizState.spamFlags === "number"
+                    ? this.props.answer.userQuizState.spamFlags
+                    : "Not calculated (likely old data)"}
                   {this.props.course.maxSpamFlags &&
                     `. (Maximum allowed: ${this.props.course.maxSpamFlags})`}
                 </Typography>
@@ -527,5 +529,9 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { decrementAttentionCount: decrement, displayMessage, setQuiz },
+  {
+    decrementAttentionCount: decrement,
+    displayMessage,
+    setQuiz,
+  },
 )(Answer)

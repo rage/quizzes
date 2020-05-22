@@ -1,18 +1,21 @@
 import {
-  Button,
   FormControlLabel,
   Grid,
-  IconButton,
   Radio,
   RadioGroup,
   Typography,
 } from "@material-ui/core"
-import Create from "@material-ui/icons/Create"
 import React from "react"
-import DragHandleWrapper from "../DragHandleWrapper"
+import { IQuizItem } from "../../interfaces"
 import ShortWrapper from "../ItemTools/ShortWrapper"
 
-const ShortScale = props => {
+interface IShortScaleProps {
+  items: IQuizItem[]
+  order: number
+  toggleExpand: () => void
+}
+
+const ShortScale: React.FunctionComponent<IShortScaleProps> = props => {
   const item = props.items[props.order]
 
   const minimum = item.minValue || 1

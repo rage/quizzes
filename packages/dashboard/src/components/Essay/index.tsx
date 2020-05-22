@@ -12,7 +12,7 @@ class EssayItem extends React.Component<any, any> {
     if (!item) {
       return <p />
     }
-    if (item.id && !this.props.expanded) {
+    if (!this.props.expanded) {
       return <ShortEssay {...this.props} />
     } else {
       return <ExpandedEssay {...this.props} />

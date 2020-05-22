@@ -1,4 +1,7 @@
 import * as React from "react"
+import { useContext } from "react"
+import styled from "styled-components"
+import ThemeProviderContext from "../../contexes/themeProviderContext"
 import Typography from "@material-ui/core/Typography"
 import { useTypedSelector } from "../../state/store"
 import {
@@ -7,6 +10,14 @@ import {
 } from "../styleComponents"
 import { QuizAnswer } from "../../modelTypes"
 
+interface AnswerPaperProps {
+  providedStyles: string | undefined
+}
+
+const AnswerPaper = styled(SpaciousPaper)<AnswerPaperProps>`
+  ${({ providedStyles }) => providedStyles}
+`
+
 type PeerReviewOptionProps = {
   answer: QuizAnswer
 }
@@ -14,6 +25,8 @@ type PeerReviewOptionProps = {
 const PeerReviewOption: React.FunctionComponent<PeerReviewOptionProps> = ({
   answer,
 }) => {
+  const themeProvider = useContext(ThemeProviderContext)
+
   const quiz = useTypedSelector(state => state.quiz)
   if (!quiz) {
     return <div />
@@ -43,12 +56,17 @@ const PeerReviewOption: React.FunctionComponent<PeerReviewOptionProps> = ({
 
           return (
             <React.Fragment key={ia.id}>
-              <Typography variant="subtitle2">{quizTitle}</Typography>
-              <SpaciousPaper key={ia.id}>
+              <Typography component="p" variant="subtitle2">
+                {quizTitle}
+              </Typography>
+              <AnswerPaper
+                key={ia.id}
+                providedStyles={themeProvider.answerPaperStyles}
+              >
                 <WhiteSpacePreservingTypography variant="body1">
                   {ia.textData}
                 </WhiteSpacePreservingTypography>
-              </SpaciousPaper>
+              </AnswerPaper>
             </React.Fragment>
           )
         })}

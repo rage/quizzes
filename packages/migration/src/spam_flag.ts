@@ -24,19 +24,14 @@ export async function migrateSpamFlags(
     `${Object.keys(currentFlagIds).length} existing spam flags in the database`,
   )
 
-  /*if (Object.keys(currentFlagIds).length === flags.length) {
-    return
-  }*/
-
-  //const oldFlags = (await QNSpamFlag.find({}))
   const oldFlags = flags.map((spamFlag: { [key: string]: any }) => {
     const split = spamFlag._id.split("-")
     return [split.slice(0, -1).join("-"), split.slice(-1)[0]]
   })
 
-  const existingIDs = (await QuizAnswer.createQueryBuilder()
-    .select(["id"])
-    .getRawMany()).map((idObject: { id: string }) => idObject.id)
+  const existingIDs = (await QuizAnswer.query(
+    "select id from quiz_answer",
+  )).map((qa: any) => qa.id)
 
   let bar = progressBar("Converting spam flags", oldFlags.length)
   const spamFlags: Array<QueryPartialEntity<SpamFlag>> = []
@@ -48,10 +43,6 @@ export async function migrateSpamFlags(
     }
 
     const user = users[username]
-
-    /*if (!user) {
-      continue
-    }*/
 
     answerID = getUUIDByString(answerID)
 
@@ -74,7 +65,7 @@ export async function migrateSpamFlags(
   const chunkSize = calculateChunkSize(spamFlags[0])
   for (let i = 0; i < spamFlags.length; i += chunkSize) {
     const vals = spamFlags.slice(i, i + chunkSize)
-    await insert(SpamFlag, vals, `"user_id", "quiz_answer_id"`)
+    await insert(SpamFlag, vals)
     bar.tick(vals.length)
   }
 }

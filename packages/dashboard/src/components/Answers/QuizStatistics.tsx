@@ -1,6 +1,5 @@
 import {
-  Card,
-  CardContent,
+  Button,
   CircularProgress,
   Grid,
   Paper,
@@ -9,12 +8,7 @@ import {
 import queryString from "query-string"
 import React from "react"
 import { connect } from "react-redux"
-import {
-  getAnswersDetailedData,
-  getDetailedEverythingData,
-  getPeerReviewsDetailedData,
-  getQuizInformationDetailedData,
-} from "../../services/quizzes"
+import { Link } from "react-router-dom"
 import { setAllAnswersCount } from "../../store/answerCounts/actions"
 import {
   setAllAnswers,
@@ -23,7 +17,7 @@ import {
 import { setQuiz } from "../../store/filter/actions"
 import LanguageBar from "../GeneralTools/LanguageBar"
 import Answers from "./Answers"
-import DownloadButton from "./DownloadButton"
+import DataExporter from "./DataExporter"
 import FilterOptions from "./FilterOptions"
 import GeneralQuizStatistics from "./GeneralQuizStatistics"
 
@@ -36,7 +30,6 @@ class QuizStatistics extends React.Component<any, any> {
       displayingPage: 1,
       answersPerPage: 10,
       scrollDownAfterUpdate: false,
-      waitingForNewAnswers: false,
     }
   }
 
@@ -72,18 +65,17 @@ class QuizStatistics extends React.Component<any, any> {
   }
 
   public async componentDidMount() {
-    await this.props.setQuiz(this.props.match.params.id)
-
+    await this.props.setQuiz(this.props.match.params.id, true)
     const queryParams = queryString.parse(this.props.location.search)
     const showing = queryParams.all && queryParams.all === "true"
 
     if (showing) {
+      await this.props.setAllAnswersCount(this.props.match.params.id)
       this.props.setAllAnswers(
         this.props.match.params.id,
         this.state.displayingPage,
         this.state.answersPerPage,
       )
-      this.props.setAllAnswersCount(this.props.match.params.id)
     } else {
       this.props.setAttentionRequiringAnswers(
         this.props.match.params.id,
@@ -123,6 +115,13 @@ class QuizStatistics extends React.Component<any, any> {
         : countInfo.count
     }
 
+    const isAdmin = this.props.user.administrator
+    const roles = this.props.user.roles
+      ? this.props.user.roles.filter(
+          role => role.courseId === this.props.filter.course,
+        )
+      : []
+
     return (
       <Grid container={true} justify="center" alignItems="center" spacing={16}>
         <Grid item={true} xs={12} md={10}>
@@ -133,6 +132,23 @@ class QuizStatistics extends React.Component<any, any> {
             alignItems="stretch"
             spacing={16}
           >
+            <Grid item={true} xs={12}>
+              <Link
+                to={`/quizzes/${this.props.filter.quiz}`}
+                style={{ textDecoration: "none" }}
+              >
+                <Button
+                  variant="contained"
+                  style={{
+                    backgroundColor: "rgb(16, 126, 171)",
+                    color: "white",
+                    borderRadius: "0px",
+                  }}
+                >
+                  View the editor
+                </Button>
+              </Link>
+            </Grid>
             <Grid item={true} xs={12}>
               <Grid
                 container={true}
@@ -194,8 +210,6 @@ class QuizStatistics extends React.Component<any, any> {
               </Grid>
             </Grid>
 
-            <LanguageBar />
-
             {this.props.answers &&
             (this.props.answers.length === 0 ||
               this.props.answers[0].quizId === this.props.match.params.id) ? (
@@ -203,7 +217,11 @@ class QuizStatistics extends React.Component<any, any> {
                 <Grid
                   item={true}
                   xs={12}
-                  md={4}
+                  md={
+                    isAdmin || roles.some(role => role.role === "teacher")
+                      ? 4
+                      : 12
+                  }
                   style={{ marginBottom: "1em" }}
                 >
                   <Grid
@@ -220,67 +238,13 @@ class QuizStatistics extends React.Component<any, any> {
                       />
                     )}
 
-                    <Grid item={true} xs={12}>
-                      <DownloadButton
-                        quiz={quiz}
-                        service={getQuizInformationDetailedData}
-                        label="Download quiz info"
-                        filenameEnd="information"
-                      />
-                    </Grid>
-                    <Grid item={true} xs={12}>
-                      <DownloadButton
-                        quiz={quiz}
-                        service={getAnswersDetailedData}
-                        label="Download quiz answers data"
-                        filenameEnd="answers"
-                      />
-                    </Grid>
-                    <Grid item={true} xs={12}>
-                      <DownloadButton
-                        quiz={quiz}
-                        service={getPeerReviewsDetailedData}
-                        label={"Download peer review data"}
-                        filenameEnd="peer_reviews"
-                      />
-                    </Grid>
-
-                    <Grid item={true} xs={12} style={{ marginTop: "1em" }}>
-                      <Card>
-                        <CardContent>
-                          <Typography variant="subtitle1">
-                            Note: The options below use a lot of memory to
-                            process the data into xlsx/ods. Firefox seems less
-                            likely to crash as a result.
-                          </Typography>
-                        </CardContent>
-                      </Card>
-                    </Grid>
-
-                    <Grid item={true} xs={12}>
-                      <DownloadButton
-                        quiz={quiz}
-                        service={getDetailedEverythingData}
-                        label={"Download all quiz data"}
-                        fileFormat="xlsx"
-                        filenameEnd="data"
-                      />
-                    </Grid>
-                    <Grid item={true} xs={12}>
-                      <DownloadButton
-                        quiz={quiz}
-                        service={getDetailedEverythingData}
-                        label={"Download all quiz data"}
-                        fileFormat="ods"
-                        filenameEnd="data"
-                      />
-                    </Grid>
+                    <DataExporter quiz={quiz} />
                   </Grid>
                 </Grid>
 
                 <Grid item={true} xs={12} md={8}>
                   <Answers
-                    inWaitingState={this.state.waitingForNewAnswers}
+                    inWaitingState={this.props.answersLoading}
                     answers={this.props.answers}
                     quiz={quiz}
                     showingAll={this.state.showingAll}
@@ -376,7 +340,6 @@ class QuizStatistics extends React.Component<any, any> {
 
     this.setState({
       displayingPage: newPage,
-      waitingForNewAnswers: true,
     })
 
     if (this.state.showingAll) {
@@ -392,19 +355,17 @@ class QuizStatistics extends React.Component<any, any> {
         this.state.answersPerPage,
       )
     }
-    this.setState({
-      waitingForNewAnswers: false,
-    })
   }
 }
 
 const mapStateToProps = (state: any) => {
   return {
     answerCounts: state.answerCounts,
-    answers: state.answers,
+    answers: state.answers.data,
     quizzesOfCourse: state.quizzes.courseInfos.find(
       qi => qi.courseId === state.filter.course,
     ),
+    answersLoading: state.answers.loading,
     courses: state.courses,
     filter: state.filter,
     user: state.user,

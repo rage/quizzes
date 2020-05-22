@@ -11,6 +11,14 @@ import { StylesProvider } from "@material-ui/styles"
 import styled from "styled-components"
 import SimpleErrorBoundary from "./SimpleErrorBoundary"
 import { useInput, useLocalStorage } from "./customHooks"
+import {
+  CourseStatusProvider,
+  injectCourseProgress,
+} from "../../src/CourseStatusProvider"
+
+const TallContainer = styled.div`
+  padding-bottom: 1000px;
+`
 
 const FlexContainer = styled.div`
   display: flex;
@@ -39,7 +47,7 @@ const StyledFormControlLabel = styled(FormControlLabel)`
 
 const App = () => {
   const id = useInput("id", "")
-  const languageId = useInput("languageId", "fi_FI")
+  const languageId = useInput("languageId", "")
   const accessToken = useInput("savedAccessToken", "")
   const baseUrl = useInput("savedBaseUrl", "https://quizzes.mooc.fi")
 
@@ -82,12 +90,47 @@ const App = () => {
     />
   )
 
+  const Div = styled.div`
+    display: block;
+    flex-wrap: wrap;
+    width: 100%;
+    padding: 2rem;
+    p {
+      margin: auto;
+      text-align: left;
+      font-size: 1.5rem;
+    }
+  `
+
+  const DataTest = (props: any) => {
+    if (props.error) {
+      return (
+        <Div>
+          <p>Error</p>
+        </Div>
+      )
+    }
+    if (props.loading) {
+      return (
+        <Div>
+          <p>Loading</p>
+        </Div>
+      )
+    }
+    return <Div>{JSON.stringify(props.courseProgressData)}</Div>
+  }
+  const Progress = injectCourseProgress(DataTest)
+
   return (
-    <>
+    <CourseStatusProvider
+      courseId="08c4757a-51ec-4551-bdb6-46fba3da765b"
+      accessToken={accessToken.value}
+      languageId={languageId.value}
+    >
       <Typography variant="h4" component="h1">
         Quizzes testing
       </Typography>
-
+      <Progress />
       <StyledTextField {...id} label="Quiz id" />
       <StyledTextField {...languageId} label="Language id" />
       <StyledTextField {...accessToken} label="Access token" />
@@ -129,7 +172,7 @@ const App = () => {
         }
       />
 
-      <div>
+      <TallContainer>
         <Typography variant="h5" component="h1">
           Quiz
         </Typography>
@@ -142,8 +185,8 @@ const App = () => {
             quizPortion
           )}
         </SimpleErrorBoundary>
-      </div>
-    </>
+      </TallContainer>
+    </CourseStatusProvider>
   )
 }
 

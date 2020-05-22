@@ -91,7 +91,7 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
           md={4}
         >
           <StyledFormLabel>
-            <MarkdownText Component={Typography} variant="body1">
+            <MarkdownText Component={Typography} variant="body1" id="info">
               {item.texts[0].title}
             </MarkdownText>
           </StyledFormLabel>
@@ -151,17 +151,18 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
       <WideGridItem>
         <RadioGroup
           row={true}
-          aria-label="agreement"
-          name="agreement"
+          aria-label={item.texts[0].title}
+          name={item.texts[0].title}
           value={`${intData}`}
           onChange={handleIntDataChange}
+          aria-describedy="info "
         >
           <Grid
             container={true}
             justify={number_of_options <= 12 ? "space-between" : "flex-start"}
           >
             {alternatives.map(number => (
-              <StyledOptionItem key={number}>
+              <StyledOptionItem key={number} role="radio">
                 <FormControlLabel
                   value={`${number}`}
                   control={

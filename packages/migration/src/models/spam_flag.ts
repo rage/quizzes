@@ -17,12 +17,12 @@ export class SpamFlag extends BaseEntity {
   public id: string
 
   @ManyToOne(type => User, user => user.id)
-  public user: Promise<User>
+  public user: User
   @Column({ type: "int", nullable: true })
   public userId: number
 
   @ManyToOne(type => QuizAnswer, qa => qa.id)
-  public quizAnswer: Promise<QuizAnswer>
+  public quizAnswer: QuizAnswer
   @Column()
   public quizAnswerId: string
 

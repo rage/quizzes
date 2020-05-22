@@ -5,6 +5,7 @@ import { QuizController } from "./quizzes"
 import { RootController } from "./root"
 import { SpamFlagController } from "./spamflags"
 import { UserCoursePartStateController } from "./usercoursepartstate"
+import { UserCourseRoleController } from "./usercourserole"
 import { UserCourseStateController } from "./usercoursestate"
 
 export default [
@@ -15,5 +16,6 @@ export default [
   RootController,
   SpamFlagController,
   UserCoursePartStateController,
+  UserCourseRoleController,
   UserCourseStateController,
 ]

@@ -6,7 +6,10 @@ import { firstWords, wordCount } from "../../../common/src/util"
 import { ICourse, IDashboardFilter, IQuiz } from "../interfaces"
 import { newQuiz } from "../store/edit/actions"
 import { setCourse } from "../store/filter/actions"
+import { IUserState } from "../store/user/reducer"
+import CourseDuplicateButton from "./CourseDuplicateButton"
 import LanguageBar from "./GeneralTools/LanguageBar"
+import QuizCorrespondenceFileDownloader from "./QuizCorrespondenceFileDownloader"
 
 interface ISingleCoursePropsFromParent {
   match: any
@@ -22,6 +25,7 @@ interface IStatePropsFromStore {
 interface IDispatchPropsFromStore {
   setCourseTo: (course: string) => any
   newQuiz: () => any
+  user: IUserState
 }
 
 type SingleCourseProps = IStatePropsFromStore &
@@ -127,7 +131,17 @@ class SingleCourseView extends React.Component<
             alignItems="stretch"
             spacing={16}
           >
-            <Grid item={true} sm={3} />
+            <Grid item={true} sm={3}>
+              {this.props.user.administrator && (
+                <React.Fragment>
+                  <CourseDuplicateButton />
+                  <div style={{ marginTop: "10px" }}>
+                    <QuizCorrespondenceFileDownloader />
+                  </div>
+                </React.Fragment>
+              )}
+            </Grid>
+
             <Grid item={true} xs={12} sm={6} style={{ alignSelf: "center" }}>
               <Typography variant="title" style={{ textAlign: "center" }}>
                 {currentCourse.texts[0] &&
@@ -333,6 +347,7 @@ const mapStateToProps = (state: any) => {
     quizzesOfCourse: state.quizzes.courseInfos.find(
       qi => qi.courseId === state.filter.course,
     ),
+    user: state.user,
   }
 }
 

@@ -8,7 +8,7 @@ export { Quiz, QuizTranslation } from "./quiz"
 export { QuizItem, QuizItemTranslation } from "./quiz_item"
 export { QuizOption, QuizOptionTranslation } from "./quiz_option"
 
-export { QuizAnswer } from "./quiz_answer"
+export { QuizAnswer, QuizAnswerStatusType } from "./quiz_answer"
 export { QuizItemAnswer } from "./quiz_item_answer"
 export { QuizOptionAnswer } from "./quiz_option_answer"
 
@@ -23,6 +23,8 @@ export {
 export { PeerReview } from "./peer_review"
 export { PeerReviewQuestionAnswer } from "./peer_review_question_answer"
 export { SpamFlag } from "./spam_flag"
+
+export { UserCourseRole } from "./user_course_role"
 
 export { UserCourseState } from "./user_course_state"
 export { UserCoursePartState } from "./user_course_part_state"
