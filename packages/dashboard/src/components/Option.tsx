@@ -84,9 +84,7 @@ class Option extends React.Component<any, any> {
                     value={this.props.title || undefined}
                     fullWidth={true}
                     onChange={this.props.handleChange(
-                      `items[${this.props.itemIndex}].options[${
-                        this.props.index
-                      }].texts[${this.props.textIndex}].title`,
+                      `items[${this.props.itemIndex}].options[${this.props.index}].texts[${this.props.textIndex}].title`,
                     )}
                     multiline={true}
                     margin="normal"
@@ -96,9 +94,7 @@ class Option extends React.Component<any, any> {
                     value={this.props.body || undefined}
                     fullWidth={true}
                     onChange={this.props.handleChange(
-                      `items[${this.props.itemIndex}].options[${
-                        this.props.index
-                      }].texts[${this.props.textIndex}].body`,
+                      `items[${this.props.itemIndex}].options[${this.props.index}].texts[${this.props.textIndex}].body`,
                     )}
                     multiline={true}
                     margin="normal"
@@ -108,9 +104,7 @@ class Option extends React.Component<any, any> {
                     value={this.props.successMessage || undefined}
                     fullWidth={true}
                     onChange={this.props.handleChange(
-                      `items[${this.props.itemIndex}].options[${
-                        this.props.index
-                      }].texts[${this.props.textIndex}].successMessage`,
+                      `items[${this.props.itemIndex}].options[${this.props.index}].texts[${this.props.textIndex}].successMessage`,
                     )}
                     multiline={true}
                     margin="normal"
@@ -120,9 +114,7 @@ class Option extends React.Component<any, any> {
                     value={this.props.failureMessage || undefined}
                     fullWidth={true}
                     onChange={this.props.handleChange(
-                      `items[${this.props.itemIndex}].options[${
-                        this.props.index
-                      }].texts[${this.props.textIndex}].failureMessage`,
+                      `items[${this.props.itemIndex}].options[${this.props.index}].texts[${this.props.textIndex}].failureMessage`,
                     )}
                     multiline={true}
                     margin="normal"
@@ -136,9 +128,7 @@ class Option extends React.Component<any, any> {
                               <Checkbox
                                 checked={this.props.correct}
                                 onChange={this.props.handleChange(
-                                  `items[${this.props.itemIndex}].options[${
-                                    this.props.index
-                                  }].correct`,
+                                  `items[${this.props.itemIndex}].options[${this.props.index}].correct`,
                                 )}
                                 color="primary"
                               />

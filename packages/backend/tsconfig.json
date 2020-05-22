@@ -11,8 +11,8 @@
     "emitDecoratorMetadata": true,
     "declaration": true,
     "sourceMap": true,
-    "outDir": "../../dist",
-    "rootDir": "../",
+    "outDir": "dist",
+    "rootDir": "./",
     "baseUrl": "src/",
     "paths": {
       "services/*": [

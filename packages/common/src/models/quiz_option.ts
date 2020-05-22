@@ -20,9 +20,13 @@ export class QuizOption extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(type => QuizItem, qi => qi.id, {
-    onDelete: "CASCADE",
-  })
+  @ManyToOne(
+    type => QuizItem,
+    qi => qi.id,
+    {
+      onDelete: "CASCADE",
+    },
+  )
   @JoinColumn()
   public quizItem: Promise<QuizItem>
   @Column({ nullable: true })
@@ -31,10 +35,14 @@ export class QuizOption extends BaseEntity {
   @Column("int")
   public order: number
 
-  @OneToMany(type => QuizOptionTranslation, qot => qot.quizOption, {
-    eager: true,
-    cascade: true,
-  })
+  @OneToMany(
+    type => QuizOptionTranslation,
+    qot => qot.quizOption,
+    {
+      eager: true,
+      cascade: true,
+    },
+  )
   public texts: QuizOptionTranslation[]
 
   @Column({ select: false })
@@ -74,15 +82,22 @@ export class QuizOption extends BaseEntity {
 
 @Entity()
 export class QuizOptionTranslation extends BaseEntity {
-  @ManyToOne(type => QuizOption, qo => qo.id, {
-    onDelete: "CASCADE",
-  })
+  @ManyToOne(
+    type => QuizOption,
+    qo => qo.id,
+    {
+      onDelete: "CASCADE",
+    },
+  )
   @JoinColumn()
   public quizOption: Promise<QuizOption>
   @PrimaryColumn()
   public quizOptionId: string | undefined
 
-  @ManyToOne(type => Language, lang => lang.id)
+  @ManyToOne(
+    type => Language,
+    lang => lang.id,
+  )
   public language: Language
   @PrimaryColumn()
   public languageId: string

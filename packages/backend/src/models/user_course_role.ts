@@ -17,12 +17,19 @@ export class UserCourseRole extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(type => User, user => user.id)
+  @ManyToOne(
+    type => User,
+    user => user.id,
+  )
   public user: User
   @Column({ nullable: false })
   public userId: number
 
-  @ManyToOne(type => Course, course => course.id, { eager: false }) // was: lazy
+  @ManyToOne(
+    type => Course,
+    course => course.id,
+    { eager: false },
+  ) // was: lazy
   public course: Course
   @Column({ nullable: false })
   public courseId: string

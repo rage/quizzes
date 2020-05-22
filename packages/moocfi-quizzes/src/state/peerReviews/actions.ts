@@ -136,7 +136,12 @@ export const selectAnswerToReview: ActionCreator<ThunkAction> = (
   const userId = user.userQuizState.userId
   const prc = getState().quiz.peerReviewCollections[0]
   dispatch(
-    selectAnswer(quizAnswerId, userId, prc.id, prc.questions.map(q => q.id)),
+    selectAnswer(
+      quizAnswerId,
+      userId,
+      prc.id,
+      prc.questions.map(q => q.id),
+    ),
   )
 }
 
@@ -162,9 +167,10 @@ export const postSpam: ActionCreator<ThunkAction> = (
   }
 }
 
-export const fetchPeerReviewAlternatives: ActionCreator<
-  ThunkAction
-> = () => async (dispatch, getState) => {
+export const fetchPeerReviewAlternatives: ActionCreator<ThunkAction> = () => async (
+  dispatch,
+  getState,
+) => {
   try {
     const accessToken = getState().user.accessToken
     const quiz = getState().quiz
