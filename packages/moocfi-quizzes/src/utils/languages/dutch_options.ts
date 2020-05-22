@@ -63,13 +63,12 @@ const dutchLabels: SingleLanguageLabels = {
     noSupportForQuestionTypeLabel:
       "Een dergelijke beoordelingsvraag wordt niet ondersteund",
     loadingLabel: "Ontvangen beoordelingen laden...",
-    noPeerReviewsReceivedlabel:
-      "Uw antwoord is nog niet beoordeeld",
-    numberOfPeerReviewsText: n =>
-      `Uw antwoord is ${n} keer beoordeeld.`,
+    noPeerReviewsReceivedlabel: "Uw antwoord is nog niet beoordeeld",
+    numberOfPeerReviewsText: n => `Uw antwoord is ${n} keer beoordeeld.`,
     toggleButtonExpandLabel: "Toon alle ontvangen beoordelingen",
     toggleButtonShrinkLabel: "Verberg beoordelingen",
-    averageOfGradesLabel: "Het gemiddelde cijfer van de ontvangen beoordelingen is",
+    averageOfGradesLabel:
+      "Het gemiddelde cijfer van de ontvangen beoordelingen is",
     detailedViewLabel: "Alle ontvangen beoordelingen van uw antwoord",
     summaryViewLabel: "Ontvangen beoordelingen:",
     peerReviewLabel: "Beoordeling",
@@ -141,8 +140,7 @@ const dutchLabels: SingleLanguageLabels = {
     quizLoadFailedError: "Kan oefening niet laden",
     progressFetchError:
       "Kan voortganggegevens niet ophalen. Probeer het later opnieuw.",
-    submitSpamFlagError:
-      "Kan spam niet melden",
+    submitSpamFlagError: "Kan spam niet melden",
     fetchReviewCandidatesError:
       "Er is iets misgegaan bij het ophalen van de antwoorden voor beoordeling. Probeer het later opnieuw.",
   },
