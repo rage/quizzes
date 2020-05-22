@@ -129,22 +129,22 @@ const danishLabels: SingleLanguageLabels = {
     answered: "Besvaret",
     unanswered: "Ubesvaret",
     rejected: "Dit svar er afvist, prøv igen",
-    progressUpdated: "Kurssipisteesi ovat päivittyneet",
-    answerConfirmed: "Vastauksesi on hyväksytty",
+    progressUpdated: "Kursusforløb opdateret",
+    answerConfirmed: "Dit svar blev bekræftet!",
     answerConfirmedFor: (title: string) =>
-      `Vastauksesi tehtävään ${title} on hyväksytty`,
-    courseCompleted: "Olet päässyt läpi kurssista!",
+      `Dit svar på øvelse ${title} blev bekræftet`,
+    courseCompleted: "Du har gennemført kurset!",
   },
   error: {
     submitFailedError:
-      "Vastauksen lähettäminen ei onnistunut. Kokeile myöhemmin uudestaan.",
-    quizLoadFailedError: "Tehtävän lataaminen ei onnistunut",
+      "Dit svar kunne ikke indsendes. Prøv igen senere.",
+    quizLoadFailedError: "Øvelsen kunne ikke indlæses",
     progressFetchError:
-      "Suoritustietojen lataaminen ei onnistunut. Kokeile myöhemmin uudestaan",
+      "Data om kursusforløb kunne ikke hentes. Prøv igen senere.",
     submitSpamFlagError:
-      "Asiattomasta vastauksesta ilmoittaminen ei onnistunut",
+      "Spam kunne ikke rapporteres",
     fetchReviewCandidatesError:
-      "Vastausten lataaminen vertaisarviota varten ei onnistunut. Kokeile myöhemmin uudestaan.",
+      "Der opstod en fejl under hentning af svar til peer review. Prøv igen senere.",
   },
 }
 
