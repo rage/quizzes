@@ -24,7 +24,7 @@
     "prettier": "prettier --write \"packages/**/*.js\" \"packages/**/*.ts\" \"packages/**/*.jsx\" \"packages/**/*.tsx\"",
     "prettier-check": "prettier  --list-different \"packages/**/*.js\" \"packages/**/*.ts\" \"packages/**/*.jsx\" \"packages/**/*.tsx\"",
     "db-migrate": "node --max-old-space-size=16384 dist/migration/src/index.js",
-    "start-dashboard": "cd packages/dashboard && yarn start",
+    "start-dashboard": "cd packages/quizzes-dashboard && npm run build && npm run start",
     "create-user-quiz-states": "node --max-old-space-size=2048 dist/backend/src/scripts/create_user_quiz_states.js",
     "create-user-quiz-states-cron": "node --max-old-space-size=2048 dist/backend/src/scripts/create_user_quiz_states.js cron",
     "kafka-batch-publish": "node --max-old-space-size=2048 dist/backend/src/scripts/kafka_batch_publisher.js",
