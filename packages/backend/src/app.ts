@@ -12,7 +12,6 @@ import express, {
   ErrorRequestHandler,
   RequestHandler,
 } from "express"
-import expressValidator from "express-validator"
 import morgan from "morgan"
 import path from "path"
 import { createExpressServer, useContainer } from "routing-controllers"
@@ -42,7 +41,6 @@ export class App {
     compression(),
     bodyParser.json(),
     bodyParser.urlencoded({ extended: true }),
-    expressValidator(),
     morgan("combined", {
       stream: {
         write: (meta: any) => logger.info(meta),

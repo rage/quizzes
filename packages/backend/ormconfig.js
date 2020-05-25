@@ -10,7 +10,7 @@ module.exports = {
   cli: {
     migrationsDir: "packages/backend/src/migration",
   },
-  entities: ["./dist/backend/src/models/**/*.js"],
+  entities: ["./dist/src/models/**/*.js"],
   extra: {
     max: 20,
   },

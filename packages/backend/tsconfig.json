@@ -1,6 +1,9 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "resolveJsonModule": true,
+    "composite": true,
+    "declarationMap": false,
+    "strictPropertyInitialization": false,
     "strict": false,
     "module": "commonjs",
     "esModuleInterop": true,
