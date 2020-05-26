@@ -2,8 +2,8 @@ import { Button, Grid, IconButton, Typography } from "@material-ui/core"
 import AddCircle from "@material-ui/icons/AddCircle"
 import React from "react"
 import { SortableContainer } from "react-sortable-hoc"
-import { stringContainsLongerWord } from "../../../../common/src/util/index"
 import { IQuizItemOption } from "../../interfaces"
+import { stringContainsLongerWord } from "../../util/index"
 import SortableWrapper from "../SortableWrapper"
 
 interface ISortableOptionListProps {
