@@ -10,6 +10,7 @@ export interface CourseListQuiz {
   deadline: null
   open: null
   autoConfirm: boolean
+  autoReject: boolean
   excludedFromScore: boolean
   awardPointsEvenIfWrong: boolean
   createdAt: Date

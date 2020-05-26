@@ -3,14 +3,23 @@ import { NextPage } from "next"
 import { fetchCourseQuizzes } from "../../services/quizzes"
 import { CourseListQuiz } from "../../types/Quiz"
 
-import { get, groupBy } from "lodash"
+import { get, groupBy, Dictionary } from "lodash"
 import { Typography, Card, CardContent } from "@material-ui/core"
 import DebugDialog from "../../components/DebugDialog"
-import styled from "styled-components"
 import Link from "next/link"
+import styled from "styled-components"
 
 interface ShowCoursePageProps {
   id: string
+  quizzes: CourseListQuiz[]
+}
+
+interface quiz {
+  quiz: CourseListQuiz
+}
+
+interface section {
+  section: string
   quizzes: CourseListQuiz[]
 }
 
@@ -28,32 +37,74 @@ const ShowCoursePage = ({ quizzes, id }: ShowCoursePageProps) => {
   const name =
     get(quizzes, "[0].course.texts[0].title") || `Unknown course ${id}`
   const byPart = groupBy(quizzes, "part")
+  let byPartAndSection: Record<string, Dictionary<CourseListQuiz[]>> = {}
+  for (let [part, quizzes] of Object.entries(byPart)) {
+    byPartAndSection[part] = groupBy(quizzes, "section")
+  }
   return (
     <>
       <Typography variant="h3">Edit {name}</Typography>
-      {Object.entries(byPart).map(([part, quizzes]) => (
+      {Object.entries(byPartAndSection).map(([part, section]) => (
         <div key={part}>
-          <Typography variant="h5">Part {part}</Typography>
-          {quizzes.map(quiz => {
-            const title = get(quiz, "texts[0].title") || quiz.id
+          <Typography variant="h4">Part {part}</Typography>
+          {Object.entries(section).map(([section, quizzes]) => {
             return (
-              <Link
-                key={quiz.id}
-                href="/quizzes/[id]/edit"
-                as={`/quizzes/${quiz.id}/edit`}
-              >
-                <QuizLink>
-                  <QuizCard>
-                    <CardContent>{title}</CardContent>
-                  </QuizCard>
-                </QuizLink>
-              </Link>
+              <>
+                <SectionOfPart
+                  key={part + section}
+                  section={section}
+                  quizzes={quizzes}
+                />
+              </>
             )
           })}
         </div>
       ))}
       <DebugDialog data={quizzes} />
     </>
+  )
+}
+
+const SectionOfPart = ({ section, quizzes }: section) => {
+  return (
+    <>
+      <Typography variant="h6">Section {section}</Typography>
+      {quizzes.map(quiz => {
+        return (
+          <>
+            <Quiz key={quiz.courseId + quiz.id} quiz={quiz} />
+          </>
+        )
+      })}
+    </>
+  )
+}
+
+const Quiz = ({ quiz }: quiz) => {
+  const title = get(quiz, "texts[0].title") || quiz.id
+  return (
+    <Link
+      key={quiz.id}
+      href="/quizzes/[id]/edit"
+      as={`/quizzes/${quiz.id}/edit`}
+    >
+      <QuizLink>
+        <QuizCard>
+          <CardContent>
+            <div>
+              <Typography display="block" color="inherit" variant="body1">
+                {title}
+              </Typography>
+            </div>
+            <div>
+              <Typography variant="overline" color="secondary">
+                [{quiz.items[0].type}]
+              </Typography>
+            </div>
+          </CardContent>
+        </QuizCard>
+      </QuizLink>
+    </Link>
   )
 }
 
