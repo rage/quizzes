@@ -95,7 +95,11 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
                         disableRipple={true}
                         onClick={this.addOption}
                       >
-                        <AddCircle component="svg" fontSize="large" htmlColor="#E5E5E5" />
+                        <AddCircle
+                          component="svg"
+                          fontSize="large"
+                          htmlColor="#E5E5E5"
+                        />
                       </IconButton>
                     </Grid>
                     <Grid item={true} xs="auto">

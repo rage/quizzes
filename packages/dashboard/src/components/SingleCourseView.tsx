@@ -16,7 +16,7 @@ interface ISingleCoursePropsFromParent {
 }
 
 interface IStatePropsFromStore {
-  answerCounts: Array<{ quizId: string; count: number }>
+  answerCounts: { quizId: string; count: number }[]
   courses: ICourse[]
   filter: IDashboardFilter
   quizzesOfCourse: any

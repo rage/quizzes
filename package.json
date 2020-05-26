@@ -2,8 +2,7 @@
   "name": "quizzes",
   "license": "Apache-2.0 OR MIT",
   "private": true,
-  "workspaces": [
-  ],
+  "workspaces": [],
   "scripts": {
     "start": "yarn run serve",
     "build": "yarn run build-ts",
