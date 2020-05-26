@@ -123,13 +123,13 @@ class SingleCourseView extends React.Component<
     }
 
     return (
-      <Grid container={true} justify="center" alignItems="center" spacing={16}>
+      <Grid container={true} justify="center" alignItems="center" spacing={3}>
         <Grid item={true} xs={10}>
           <Grid
             container={true}
             justify="center"
             alignItems="stretch"
-            spacing={16}
+            spacing={3}
           >
             <Grid item={true} sm={3}>
               {this.props.user.administrator && (
@@ -143,7 +143,7 @@ class SingleCourseView extends React.Component<
             </Grid>
 
             <Grid item={true} xs={12} sm={6} style={{ alignSelf: "center" }}>
-              <Typography variant="title" style={{ textAlign: "center" }}>
+              <Typography variant="h6" style={{ textAlign: "center" }}>
                 {currentCourse.texts[0] &&
                   currentCourse.texts[0].title.toUpperCase()}
               </Typography>
@@ -179,7 +179,7 @@ class SingleCourseView extends React.Component<
             <Grid item={true} xs={12} style={{ backgroundColor: "#F8F8F8" }}>
               <Grid
                 container={true}
-                spacing={24}
+                spacing={5}
                 justify="center"
                 alignItems="center"
                 style={{ paddingLeft: ".5em", paddingRight: ".5em" }}
@@ -208,12 +208,12 @@ const PartComponent = ({ sections, partNumber, answerCounts }) => {
   return (
     <React.Fragment>
       <Grid item={true} xs="auto">
-        <Typography variant="title">Part {partNumber} </Typography>
+        <Typography variant="h6">Part {partNumber} </Typography>
       </Grid>
       <Grid item={true} xs={12}>
         <Grid
           container={true}
-          spacing={16}
+          spacing={3}
           justify="flex-start"
           style={{ backgroundColor: "white" }}
         >

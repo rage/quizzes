@@ -142,7 +142,7 @@ class TabContainer extends Component<ITabContainerProps, ITabContainerState> {
         {this.props.items.find(item => item.type === "essay") && (
           <Grid item={true} xs={12}>
             <Paper style={{ padding: 30 }}>
-              <Typography variant="title" style={{ marginBottom: 10 }}>
+              <Typography variant="h6" style={{ marginBottom: 10 }}>
                 Peer reviews:
               </Typography>
               <PeerReviewCollectionContainer

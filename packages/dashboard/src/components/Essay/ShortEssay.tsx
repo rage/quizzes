@@ -9,12 +9,12 @@ const ShortEssay = props => {
     <ShortItemWrapper toggleExpand={props.toggleExpand}>
       <Grid
         container={true}
-        spacing={16}
+        spacing={3}
         justify="flex-start"
         alignItems="center"
       >
         <Grid item={true} xs={12}>
-          <Typography variant="title">{`${item.texts[0].title ||
+          <Typography variant="h6">{`${item.texts[0].title ||
             "Question " + (props.order + 1)} (Essay)`}</Typography>
         </Grid>
         <Grid item={true} xs={12}>

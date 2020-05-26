@@ -44,7 +44,7 @@ class CoursesView extends React.Component<any, any> {
             <Paper elevation={4} style={{ marginBottom: "2em" }}>
               <Typography
                 color="primary"
-                variant="headline"
+                variant="h5"
                 style={{
                   padding: "1em 0 1em 0",
                   textAlign: "center",
@@ -59,7 +59,7 @@ class CoursesView extends React.Component<any, any> {
           <Grid item={true} xs={12} lg={10}>
             <Grid
               container={true}
-              spacing={32}
+              spacing={8}
               alignItems="center"
               justify="flex-start"
             >

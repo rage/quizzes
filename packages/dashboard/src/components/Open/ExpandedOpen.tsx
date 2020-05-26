@@ -21,7 +21,7 @@ const styles = (theme: Theme) =>
       flexWrap: "wrap",
     },
     margin: {
-      margin: theme.spacing.unit,
+      margin: theme.spacing(),
     },
   })
 
@@ -29,14 +29,12 @@ const greenTheme = createMuiTheme({
   palette: {
     primary: green,
   },
-  typography: { useNextVariants: true },
 })
 
 const redTheme = createMuiTheme({
   palette: {
     primary: red,
   },
-  typography: { useNextVariants: true },
 })
 
 class ExpandedOpen extends React.Component<any, any> {
@@ -44,7 +42,7 @@ class ExpandedOpen extends React.Component<any, any> {
     const item = this.props.items[this.props.order]
 
     return (
-      <Grid container={true} spacing={16} justify="center" alignItems="center">
+      <Grid container={true} spacing={3} justify="center" alignItems="center">
         <Grid item={true} xs={12}>
           <Card>
             <Grid container={true} justify="flex-end" alignItems="center">
@@ -100,7 +98,7 @@ class ExpandedOpen extends React.Component<any, any> {
                     <Grid item={true} xs={12}>
                       <Grid
                         container={true}
-                        spacing={24}
+                        spacing={5}
                         justify="flex-start"
                         alignItems="center"
                       >

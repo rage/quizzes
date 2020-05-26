@@ -18,14 +18,14 @@ class AttentionAnswers extends React.Component<any, any> {
         container={true}
         justify="flex-start"
         alignItems="center"
-        spacing={24}
+        spacing={5}
       >
         <Grid
           item={true}
           xs={8}
           style={{ marginBottom: "1em", textAlign: "center" }}
         >
-          <Typography variant="title">
+          <Typography variant="h6">
             {this.props.showingAll
               ? "ALL ANSWERS"
               : "ANSWERS REQUIRING ATTENTION"}
@@ -81,7 +81,7 @@ class AttentionAnswers extends React.Component<any, any> {
                 container={true}
                 justify="flex-start"
                 alignItems="center"
-                spacing={24}
+                spacing={5}
               >
                 {this.props.answers.map((answer, idx) => {
                   return (

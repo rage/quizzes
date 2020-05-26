@@ -9,12 +9,12 @@ const FilterBox = ({ numberOfAnswers }) => {
         xs={12}
         style={{ marginBottom: "1.5em", textAlign: "center" }}
       >
-        <Typography variant="title">FILTER OPTIONS</Typography>
+        <Typography variant="h6">FILTER OPTIONS</Typography>
       </Grid>
 
       <Grid
         container={true}
-        spacing={32}
+        spacing={8}
         style={{ backgroundColor: "gray", marginBottom: "1em", width: "100%" }}
       >
         <Grid item={true} xs={12}>

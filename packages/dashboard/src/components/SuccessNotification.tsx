@@ -32,7 +32,7 @@ class SuccessNotification extends React.Component<any, any> {
           message={
             <Grid
               container={true}
-              spacing={16}
+              spacing={3}
               alignItems="center"
               justify="space-evenly"
             >

@@ -43,7 +43,7 @@ class Option extends React.Component<any, any> {
         size={12}
       >
         <Card>
-          <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
+          <Grid style={{ flexGrow: 1 }} container={true} spacing={3}>
             <Grid item={true} xs={11}>
               <DragHandleWrapper>
                 <CardHeader

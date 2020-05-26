@@ -123,14 +123,14 @@ class QuizStatistics extends React.Component<any, any> {
       : []
 
     return (
-      <Grid container={true} justify="center" alignItems="center" spacing={16}>
+      <Grid container={true} justify="center" alignItems="center" spacing={3}>
         <Grid item={true} xs={12} md={10}>
           <Grid
             container={true}
             direction="row-reverse"
             justify="center"
             alignItems="stretch"
-            spacing={16}
+            spacing={3}
           >
             <Grid item={true} xs={12}>
               <Link
@@ -158,7 +158,7 @@ class QuizStatistics extends React.Component<any, any> {
                 alignItems="center"
               >
                 <Grid item={true}>
-                  <Typography variant="title">
+                  <Typography variant="h6">
                     {currentCourse &&
                       currentCourse.texts[0] &&
                       currentCourse.texts[0].title.toUpperCase()}
@@ -184,7 +184,7 @@ class QuizStatistics extends React.Component<any, any> {
                       padding: "1.5em",
                     }}
                   >
-                    <Grid container={true} justify="center" spacing={24}>
+                    <Grid container={true} justify="center" spacing={5}>
                       <Grid item={true} xs={12}>
                         <Typography
                           variant="h5"
