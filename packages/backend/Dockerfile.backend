@@ -1,4 +1,4 @@
-FROM node:11-alpine
+FROM node:12-alpine
 
 ARG GIT_COMMIT=""
 LABEL GIT_COMMIT=${GIT_COMMIT}
@@ -11,22 +11,16 @@ COPY --chown=node . /app
 
 USER node
 
-WORKDIR /app
-
-RUN yarn install
-
 ENV NODE_ENV=production
-
-WORKDIR /app/packages/migration
-
-RUN yarn build
 
 WORKDIR /app/packages/backend
 
-RUN yarn build
+RUN npm ci
+
+RUN npm run build
 
 EXPOSE 3000
 
-CMD [ "yarn", "serve" ]
+CMD [ "npm", "start" ]
 
 ENV GIT_COMMIT=${GIT_COMMIT}
