@@ -55,7 +55,7 @@ const dutchLabels: SingleLanguageLabels = {
     manualReview: "Uw antwoord wordt beoordeeld door een cursusmedewerker",
     peerReviewGroupTitle: "Beoordeelde vragen",
     peerReviewLikertDetails:
-      "Arvioi jokainen väite asteikolla 1-5. 1 on vahvasti eri mieltä ja 5 on vahvasti samaa mieltä.",
+      "Evalueer elke stelling op een schaal van 1-5. Ik ben het er zeer mee oneens en 5 is het er volledig mee eens.",
   },
   receivedPeerReviews: {
     errorLabel:
