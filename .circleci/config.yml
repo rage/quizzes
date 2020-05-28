@@ -2,12 +2,12 @@ version: 2.1
 jobs:
   code_style:
     docker:
-      - image: circleci/node:11
+      - image: circleci/node:12
     steps:
       - checkout
       - run:
           name: "Install dependencies"
-          command: "yarn install"
+          command: "npm ci"
       - run:
           name: "Check code style"
           command: "bin/check-code-style.sh"
