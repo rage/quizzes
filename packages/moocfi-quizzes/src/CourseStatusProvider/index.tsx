@@ -26,8 +26,6 @@ interface CourseStatusProviderProps {
   languageId: string
 }
 
-const ToastType = toast.TYPE
-
 enum MessageType {
   PROGRESS_UPDATED = "PROGRESS_UPDATED",
   PEER_REVIEW_RECEIVED = "PEER_REVIEW_RECEIVED",
@@ -125,7 +123,7 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
         console.log("Could not fetch course progress data")
         notifySticky(
           languageOptions[languageId].error.progressFetchError,
-          ToastType.ERROR,
+          "error",
         )
       }
     }
@@ -228,7 +226,7 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
     }
 
     const notifyError = (message: string) => {
-      notifySticky(message, ToastType.ERROR)
+      notifySticky(message, "error")
     }
 
     const progress: CourseProgressProviderInterface = {
@@ -253,14 +251,14 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
             autoClose={false}
             hideProgressBar
             containerId={"sticky"}
-            position={toast.POSITION.TOP_LEFT}
+            position="top-left"
           />
           <ToastContainer
             enableMultiContainer
             newestOnTop={false}
             hideProgressBar
             containerId={"regular"}
-            position={toast.POSITION.TOP_RIGHT}
+            position="top-right"
           />
           {children}
         </CourseStatusProviderContext.Provider>
