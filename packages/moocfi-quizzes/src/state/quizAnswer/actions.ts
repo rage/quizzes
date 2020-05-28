@@ -6,7 +6,12 @@ import * as feedbackDisplayedActions from "../feedbackDisplayed/actions"
 import * as userActions from "../user/actions"
 import * as quizActions from "../quiz/actions"
 import * as messageActions from "../message/actions"
-import { QuizAnswer, QuizAnswerStatePayload, QuizItem } from "../../modelTypes"
+import {
+  Quiz,
+  QuizAnswer,
+  QuizAnswerStatePayload,
+  QuizItem,
+} from "../../modelTypes"
 import { wordCount } from "../../utils/string_tools"
 
 export const setAnswer = createAction("quizAnswer/SET", resolve => {
@@ -78,7 +83,7 @@ export const changeChosenOption: ActionCreator<ThunkAction> = (
   itemId: string,
   optionId: string,
 ) => (dispatch, getState) => {
-  const item = getState().quiz.items.find(i => i.id === itemId)
+  const item = getState().quiz?.items.find(i => i.id === itemId)
   if (!item) {
     return
   }
@@ -116,7 +121,7 @@ export const changeTextData: ActionCreator<ThunkAction> = (
   itemId: string,
   newValue: string,
 ) => (dispatch, getState) => {
-  const item = getState().quiz.items.find(i => i.id === itemId)
+  const item = getState().quiz?.items.find(i => i.id === itemId)
   if (item === undefined) {
     return
   }
@@ -141,7 +146,7 @@ export const submit: ActionCreator<ThunkAction> = () => async (
 
     // wrong answer -> quiz not returned
     if (!quiz) {
-      quiz = getState().quiz
+      quiz = getState().quiz as Quiz
     }
 
     dispatch(userActions.setUserQuizState(userQuizState))

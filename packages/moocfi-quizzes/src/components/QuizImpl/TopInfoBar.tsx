@@ -39,7 +39,7 @@ const PointsContainer = styled.div`
 
 const QuizStatusMessage = styled(Typography)``
 
-const PointsText = styled(Typography)`
+const PointsText = styled(Typography)<{ component: string }>`
   font-size: 1.5rem !important;
   text-align: end;
   display: inline;
@@ -50,7 +50,7 @@ const PointsText = styled(Typography)`
   }
 `
 
-const PointsLabelText = styled(Typography)`
+const PointsLabelText = styled(Typography)<{ component: string }>`
   font-size: 1rem !important;
 
   @media (max-width: 550px) {

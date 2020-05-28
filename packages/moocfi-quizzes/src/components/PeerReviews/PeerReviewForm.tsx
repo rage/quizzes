@@ -337,9 +337,9 @@ const TextualPeerReviewFeedback: React.FunctionComponent<ITextualPeerReviewFeedb
   return (
     <StyledReviewEssayQuestion>
       <MarkdownText
-        component="p"
         Component={BoldTypographyMedium}
         variant="subtitle1"
+        variantMapping={{ subtitle1: "p" }}
       >
         {questionTexts.title}
       </MarkdownText>

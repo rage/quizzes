@@ -101,7 +101,10 @@ const PeerReviews: React.FunctionComponent = () => {
             <HiddenWrapper
               providedStyles={themeProvider.peerReviewContainerStyles}
             >
-              <BoldTypography component="p" variant="subtitle1">
+              <BoldTypography
+                variant="subtitle1"
+                variantMapping={{ subtitle1: "p" }}
+              >
                 {giveExtraPeerReviewsLabel}
               </BoldTypography>
               <Togglable

@@ -40,7 +40,10 @@ const DefaultLoginMessage: React.FunctionComponent<IDefaultLoginMessageProps> = 
   return (
     <>
       <MessageContainer fullQuizInfoShown={!!fullQuizInfoShown}>
-        <StyledTypography component="p" variant="subtitle1">
+        <StyledTypography
+          variant="subtitle1"
+          variantMapping={{ subtitle1: "p" }}
+        >
           {languageLabels
             ? languageLabels.general[labelPropertyName]
             : `Log in to ${fullQuizInfoShown ? "answer" : "view"} the quiz`}
