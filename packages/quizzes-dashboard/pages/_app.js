@@ -8,6 +8,11 @@ import {
 import Layout from "../components/Layout"
 import "@fortawesome/fontawesome-svg-core/styles.css"
 import { config as fontAwesomeConfig } from "@fortawesome/fontawesome-svg-core"
+import { Provider } from "react-redux"
+import { createStore } from "redux"
+import editReducer from "../store/edit/reducers"
+
+const store = createStore(editReducer)
 
 fontAwesomeConfig.autoAddCss = false
 
@@ -34,13 +39,15 @@ export default class App extends NextApp {
     const { Component, pageProps } = this.props
 
     return (
-      <StyledThemeProvider theme={theme}>
-        <MaterialThemeProvider theme={theme}>
-          <Layout>
-            <Component {...pageProps} />
-          </Layout>
-        </MaterialThemeProvider>
-      </StyledThemeProvider>
+      <Provider store={store}>
+        <StyledThemeProvider theme={theme}>
+          <MaterialThemeProvider theme={theme}>
+            <Layout>
+              <Component {...pageProps} />
+            </Layout>
+          </MaterialThemeProvider>
+        </StyledThemeProvider>
+      </Provider>
     )
   }
 }
