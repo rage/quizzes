@@ -136,21 +136,11 @@ const danishLabels: SingleLanguageLabels = {
     courseCompleted: "Du har gennemført kurset!",
   },
   error: {
-<<<<<<< HEAD
-    submitFailedError:
-      "Dit svar kunne ikke indsendes. Prøv igen senere.",
-    quizLoadFailedError: "Øvelsen kunne ikke indlæses",
-    progressFetchError:
-      "Data om kursusforløb kunne ikke hentes. Prøv igen senere.",
-    submitSpamFlagError:
-      "Spam kunne ikke rapporteres",
-=======
     submitFailedError: "Dit svar kunne ikke indsendes. Prøv igen senere.",
     quizLoadFailedError: "Øvelsen kunne ikke indlæses",
     progressFetchError:
       "Data om kursusforløb kunne ikke hentes. Prøv igen senere.",
     submitSpamFlagError: "Spam kunne ikke rapporteres",
->>>>>>> feb1f37e9ef7dbfb8df0d5f510b00a16a1b15546
     fetchReviewCandidatesError:
       "Der opstod en fejl under hentning af svar til peer review. Prøv igen senere.",
   },
