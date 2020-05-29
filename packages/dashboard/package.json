@@ -23,6 +23,7 @@
     "redux-thunk": "^2.3.0",
     "tmc-client-js": "0.0.9",
     "typesafe-actions": "^4.4.2",
+    "typescript": "^3.9.3",
     "xlsx": "^0.16.1"
   },
   "scripts": {
