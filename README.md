@@ -2,20 +2,33 @@
 
 [![CircleCI](https://circleci.com/gh/rage/quizzes/tree/master.svg?style=svg)](https://circleci.com/gh/rage/quizzes/tree/master)
 
+At the project root
+
+```bash
+npm ci
+```
+
 To start the dashboard:
 
 ```bash
-yarn install
-yarn start-dashboard
+cd packages/dashboard
+npm ci
+npm start
 ```
 
 To start the server:
 ```bash
-yarn serve
+cd packages/backend
+npm ci
+npm run build
+npm start
 ```
 
-Watch server and common code changes:
+To load widget in playground:
 ```bash
-cd packages/backend
-yarn run watch-ts
+cd packages/moocfi-quizzes
+npm ci
+cd example
+npm ci
+npm start
 ```
