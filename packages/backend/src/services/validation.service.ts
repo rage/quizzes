@@ -460,6 +460,8 @@ export default class ValidationService {
       if (flaggedButKeepInPeerReviewPool) {
         if (givenEnough && receivedEnough) {
           return "manual-review"
+        } else if (receivedEnough) {
+          return "manual-review-once-given-enough"
         } else {
           return "manual-review-once-given-and-received-enough"
         }
