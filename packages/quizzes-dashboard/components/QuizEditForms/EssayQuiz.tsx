@@ -14,8 +14,6 @@ interface ShowQuizPageProps {
 }
 
 const EssayQuizEditForm = ({ quiz, id }: ShowQuizPageProps) => {
-  console.log(quiz, ":", id)
-
   const QuizCard = styled(Card)`
     box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 40px -12px !important;
     border-radius: 1rem !important;

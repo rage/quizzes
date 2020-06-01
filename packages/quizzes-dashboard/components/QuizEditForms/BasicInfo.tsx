@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faInfoCircle, faPen } from "@fortawesome/free-solid-svg-icons"
 import { connect } from "react-redux"
 import { toggleEditable } from "../../store/edit/actions"
+import { EditorState } from "../../store/edit/reducers"
 
 interface ShowQuizPageProps {
   id: string
@@ -66,7 +67,16 @@ const StyledTextField = styled(TextField)`
   margin-top: 0.25rem !important;
 `
 
-const BasicInformation = ({ quiz, id, editable, startStopEditing }: any) => {
+const BasicInformation = ({
+  quiz,
+  id,
+  editable,
+  numberOfTries,
+  pointsToGain,
+  pointsGrantingPolicy,
+  deadline,
+  startStopEditing,
+}: any) => {
   return (
     <>
       <InfoCard>
@@ -81,7 +91,7 @@ const BasicInformation = ({ quiz, id, editable, startStopEditing }: any) => {
           <TextField
             id={quiz.id + "tries"}
             disabled={editable}
-            defaultValue={quiz.tries}
+            defaultValue={numberOfTries}
           />
         </InfoContainer>
         <InfoContainer>
@@ -89,7 +99,7 @@ const BasicInformation = ({ quiz, id, editable, startStopEditing }: any) => {
           <TextField
             id={quiz.id + "points"}
             disabled={editable}
-            defaultValue={quiz.points}
+            defaultValue={pointsToGain}
           />
         </InfoContainer>
         <InfoContainer>
@@ -97,7 +107,7 @@ const BasicInformation = ({ quiz, id, editable, startStopEditing }: any) => {
           <TextField
             id={quiz.id + "PGP"}
             disabled={editable}
-            defaultValue={quiz.grantPointsPolicy}
+            defaultValue={pointsGrantingPolicy}
           />
         </InfoContainer>
         <InfoContainer>
@@ -105,7 +115,7 @@ const BasicInformation = ({ quiz, id, editable, startStopEditing }: any) => {
           <TextField
             id={quiz.id + "deadline"}
             disabled={editable}
-            defaultValue={quiz.deadline}
+            defaultValue={deadline}
           />
         </InfoContainer>
         <IconButton size="medium" edge="end" onClick={() => startStopEditing()}>
@@ -120,9 +130,13 @@ export interface editState {
   editable: boolean
 }
 
-const mapStateToProps = (state: editState) => {
+const mapStateToProps = (state: EditorState) => {
   return {
     editable: state.editable,
+    numberOfTries: state.quiz.tries,
+    pointsToGain: state.quiz.points,
+    pointsGrantingPolicy: state.quiz.grantPointsPolicy,
+    deadline: state.quiz.deadline,
   }
 }
 
@@ -131,6 +145,7 @@ const mapDispatchToProps = (dispatch: any) => {
     startStopEditing: () => dispatch(toggleEditable),
   }
 }
+
 export default connect(
   mapStateToProps,
   mapDispatchToProps,

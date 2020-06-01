@@ -8,7 +8,6 @@ interface ShowQuizPageProps {
 }
 
 const CheckBoxQuizEditForm = ({ quiz, id }: any) => {
-  console.log(quiz, ":", id)
   return (
     <>
       <BasicInformation quiz={quiz} id={id} />
