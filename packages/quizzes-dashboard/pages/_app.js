@@ -9,10 +9,7 @@ import Layout from "../components/Layout"
 import "@fortawesome/fontawesome-svg-core/styles.css"
 import { config as fontAwesomeConfig } from "@fortawesome/fontawesome-svg-core"
 import { Provider } from "react-redux"
-import { createStore } from "redux"
-import editReducer from "../store/edit/reducers"
-
-const store = createStore(editReducer)
+import store from "../store/store"
 
 fontAwesomeConfig.autoAddCss = false
 
