@@ -8,7 +8,9 @@ import swedishLabels from "./swedish_options"
 import italianLabels from "./italian_options"
 import latvianLabels from "./latvian_options"
 import hungarianLabels from "./hungarian_options"
-import frenchBelgiumLabels from "./french_belgium_options"
+import dutchLabels from "./dutch_options"
+import danishLabels from "./danish_options"
+import lithuanianLabels from "./lithuanian_options"
 import { QuizPointsGrantingPolicy } from "../../modelTypes"
 
 export type GeneralLabels = {
@@ -149,8 +151,10 @@ export const languageOptions: LanguageLabels = {
   sv_SE: swedishLabels,
   nb_NO: norwegianLabels,
   fr_FR: frenchLabels,
-  fr_BE: frenchBelgiumLabels,
   it_IT: italianLabels,
   lv_LV: latvianLabels,
   hu_HU: hungarianLabels,
+  nl_NL: dutchLabels,
+  da_DA: danishLabels,
+  lt_LT: lithuanianLabels,
 }
