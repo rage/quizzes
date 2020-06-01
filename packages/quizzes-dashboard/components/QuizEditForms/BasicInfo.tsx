@@ -128,7 +128,7 @@ const mapStateToProps = (state: editState) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    startStopEditing: () => dispatch(toggleEditable()),
+    startStopEditing: () => dispatch(toggleEditable),
   }
 }
 export default connect(
