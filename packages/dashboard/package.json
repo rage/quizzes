@@ -24,7 +24,8 @@
     "tmc-client-js": "0.0.9",
     "typesafe-actions": "^4.4.2",
     "typescript": "^3.9.3",
-    "xlsx": "^0.16.1"
+    "xlsx": "^0.16.1",
+    "tslint": "^6.1.2"
   },
   "scripts": {
     "start": "PORT=5001 react-scripts-ts start",
