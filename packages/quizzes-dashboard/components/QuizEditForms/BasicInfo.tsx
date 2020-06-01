@@ -5,6 +5,7 @@ import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faInfoCircle, faPen } from "@fortawesome/free-solid-svg-icons"
 import { connect } from "react-redux"
+import { toggleEditable } from "../../store/edit/actions"
 
 interface ShowQuizPageProps {
   id: string
@@ -65,7 +66,7 @@ const StyledTextField = styled(TextField)`
   margin-top: 0.25rem !important;
 `
 
-const BasicInformation = ({ quiz, id, editable, toggleEditable }: any) => {
+const BasicInformation = ({ quiz, id, editable, startStopEditing }: any) => {
   return (
     <>
       <InfoCard>
@@ -107,7 +108,7 @@ const BasicInformation = ({ quiz, id, editable, toggleEditable }: any) => {
             defaultValue={quiz.deadline}
           />
         </InfoContainer>
-        <IconButton size="medium" edge="end" onClick={() => toggleEditable()}>
+        <IconButton size="medium" edge="end" onClick={() => startStopEditing()}>
           <FontAwesomeIcon icon={faPen} />
         </IconButton>
       </InfoCard>
@@ -127,7 +128,7 @@ const mapStateToProps = (state: editState) => {
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    toggleEditable: () => dispatch({ type: "TOGGLE_EDITABLE" }),
+    startStopEditing: () => dispatch(toggleEditable()),
   }
 }
 export default connect(

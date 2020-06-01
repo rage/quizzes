@@ -72,7 +72,7 @@ const SectionOfPart = ({ section, quizzes }: section) => {
       {quizzes.map(quiz => {
         return (
           <>
-            <Quiz key={quiz.courseId + quiz.id} quiz={quiz} />
+            <Quiz key={quiz.id} quiz={quiz} />
           </>
         )
       })}
@@ -115,7 +115,7 @@ ShowCoursePage.getInitialProps = async (ctx: any) => {
   const id: string = ctx.query.id.toString()
   const quizzes = await fetchCourseQuizzes(id)
   return {
-    id,
     quizzes,
+    id,
   }
 }
