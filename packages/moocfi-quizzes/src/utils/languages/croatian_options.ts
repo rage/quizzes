@@ -32,7 +32,8 @@ const croatianLabels: SingleLanguageLabels = {
   },
   peerReviews: {
     loadingLabel: "Učitavanje",
-    noPeerAnswersAvailableLabel: "Nema odgovorâ drugih polaznika za ocjenjivanje.",
+    noPeerAnswersAvailableLabel:
+      "Nema odgovorâ drugih polaznika za ocjenjivanje.",
     chooseButtonLabel: "Odaberi",
     unselectButtonLabel: "Poništi odabir",
     chooseEssayInstruction: "Odaberite odgovor koji ćete ocijeniti.",
@@ -89,8 +90,10 @@ const croatianLabels: SingleLanguageLabels = {
   },
   stage: {
     answerStageLabel: "U tijeku je rješavanje zadatka",
-    givingPeerReviewsStageLabel: "U tijeku je ocjenjivanje odgovorâ drugih polaznika",
-    receivingPeerReviewsStageLabel: "U tijeku je primanje ocjena od drugih polaznika",
+    givingPeerReviewsStageLabel:
+      "U tijeku je ocjenjivanje odgovorâ drugih polaznika",
+    receivingPeerReviewsStageLabel:
+      "U tijeku je primanje ocjena od drugih polaznika",
     evaluationStageLabel: "Čeka se ocjena nastavnog osoblja",
   },
   general: {
@@ -141,8 +144,7 @@ const croatianLabels: SingleLanguageLabels = {
     quizLoadFailedError: "Učitavanje zadatka nije uspjelo.",
     progressFetchError:
       "Dohvaćanje podataka o napretku nije uspjelo. Pokušajte ponovno poslije.",
-    submitSpamFlagError:
-      "Prijava neprimjerenog sadržaja nije uspjela.",
+    submitSpamFlagError: "Prijava neprimjerenog sadržaja nije uspjela.",
     fetchReviewCandidatesError:
       "Došlo je do pogreške pri učitavanju odgovorâ za ocjenjivanje. Pokušajte ponovno poslije.",
   },
