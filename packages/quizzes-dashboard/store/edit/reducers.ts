@@ -31,7 +31,7 @@ export interface EditorState {
 }
 
 const initialState: EditorState = {
-  editable: false,
+  editable: true,
   part: 0,
   section: 0,
   course: {
@@ -47,11 +47,16 @@ const editReducer = (
   action: actionType,
 ): EditorState => {
   switch (action.type) {
-    case "INITIALIZED_QUIZ": {
+    case "INITIALIZED_EDITOR": {
       return { ...initialState, ...action.payload.quiz }
     }
     case "TOGGLED_EDITABLE": {
       return { ...state, editable: !state.editable }
+    }
+    case "EDITED_QUIZ_BODY": {
+      let newState = state
+      newState.texts[0].body = action.payload
+      return { ...newState }
     }
     default: {
       return initialState

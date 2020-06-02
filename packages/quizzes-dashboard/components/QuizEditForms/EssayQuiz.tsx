@@ -7,6 +7,7 @@ import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons"
 import { EditableQuiz } from "../../types/EditQuiz"
 import BasicInformation from "./BasicInfo"
 import { EditorState } from "../../store/edit/reducers"
+import { editedQuizBody } from '../../store/edit/actions'
 import { connect } from "react-redux"
 
 interface ShowQuizPageProps {
@@ -62,14 +63,13 @@ const StyledTextField = styled(TextField)`
   margin-top: 0.25rem !important;
 `
 
-const EssayQuizEditForm = ({ props }: any) => {
-  console.log(props)
+const EssayQuizEditForm = ({ texts, points, id, editQuizBody }: any) => {
   return (
     <>
       <BasicInformation />
       <br />
       <Typography variant="h3">Editing quiz</Typography>
-      <StyledId>{props.id}</StyledId>
+      <StyledId>{id}</StyledId>
       <QuizCard>
         <QuizHeader>
           <IconWrapper>
@@ -80,7 +80,7 @@ const EssayQuizEditForm = ({ props }: any) => {
             <StyledTextField
               id="quiz-name"
               variant="outlined"
-              defaultValue={props.texts[0].title}
+              defaultValue={texts[0].title}
             />
           </TitleContainer>
           <PointsContainer>
@@ -89,7 +89,7 @@ const EssayQuizEditForm = ({ props }: any) => {
               id="quiz-points"
               type="number"
               variant="outlined"
-              defaultValue={props.points}
+              defaultValue={points}
             />
           </PointsContainer>
         </QuizHeader>
@@ -102,25 +102,34 @@ const EssayQuizEditForm = ({ props }: any) => {
             fullWidth
             rows="2"
             rowsMax="500"
-            defaultValue={props.texts[0].body}
+            defaultValue={texts[0].body}
+            onChange={(event) => editQuizBody(event.target.value)}
           />
           <br />
           <br />
           <Button variant="outlined">Add quiz item</Button>
         </QuizContent>
       </QuizCard>
-      <DebugDialog editable data={props} />
+      <DebugDialog />
     </>
   )
 }
 
-const mapStateToProps = (state: EditorState) => {
+const mapStateToProps = (state: EditorState): any => {
   return {
-    props: { ...state },
+    texts: state.texts,
+    points: state.points,
+    id: state.id
+  }
+}
+
+const mapDispatchToProps = (dispatch: any) => {
+  return {
+    editQuizBody: (newBody: string) => dispatch(editedQuizBody(newBody))
   }
 }
 
 export default connect(
   mapStateToProps,
-  null,
+  mapDispatchToProps,
 )(EssayQuizEditForm)
