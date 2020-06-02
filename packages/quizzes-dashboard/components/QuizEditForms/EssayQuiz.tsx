@@ -7,7 +7,7 @@ import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons"
 import { EditableQuiz } from "../../types/EditQuiz"
 import BasicInformation from "./BasicInfo"
 import { EditorState } from "../../store/edit/reducers"
-import { editedQuizBody } from '../../store/edit/actions'
+import { editedQuizBody } from "../../store/edit/actions"
 import { connect } from "react-redux"
 
 interface ShowQuizPageProps {
@@ -103,7 +103,7 @@ const EssayQuizEditForm = ({ texts, points, id, editQuizBody }: any) => {
             rows="2"
             rowsMax="500"
             defaultValue={texts[0].body}
-            onChange={(event) => editQuizBody(event.target.value)}
+            onChange={event => editQuizBody(event.target.value)}
           />
           <br />
           <br />
@@ -119,13 +119,13 @@ const mapStateToProps = (state: EditorState): any => {
   return {
     texts: state.texts,
     points: state.points,
-    id: state.id
+    id: state.id,
   }
 }
 
 const mapDispatchToProps = (dispatch: any) => {
   return {
-    editQuizBody: (newBody: string) => dispatch(editedQuizBody(newBody))
+    editQuizBody: (newBody: string) => dispatch(editedQuizBody(newBody)),
   }
 }
 

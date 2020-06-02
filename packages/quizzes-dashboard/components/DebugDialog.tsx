@@ -28,8 +28,8 @@ const StyledPreWrapper = styled.div`
 `
 
 interface DebugDialogProps {
-  data?: EditorState,
-  editable?: boolean,
+  data?: EditorState
+  editable?: boolean
 }
 
 const DebugDialog = ({ data, editable = false }: DebugDialogProps) => {
@@ -56,10 +56,10 @@ const DebugDialog = ({ data, editable = false }: DebugDialogProps) => {
           {editable ? (
             <EditableDebugField initialValue={content} />
           ) : (
-              <StyledPreWrapper>
-                <pre>{content}</pre>
-              </StyledPreWrapper>
-            )}
+            <StyledPreWrapper>
+              <pre>{content}</pre>
+            </StyledPreWrapper>
+          )}
         </ContentWrapper>
       </Dialog>
     </>
@@ -68,8 +68,11 @@ const DebugDialog = ({ data, editable = false }: DebugDialogProps) => {
 
 const mapStateToProps = (state: EditorState) => {
   return {
-    data: { ...state }
+    data: { ...state },
   }
 }
 
-export default connect(mapStateToProps, null)(DebugDialog)
+export default connect(
+  mapStateToProps,
+  null,
+)(DebugDialog)
