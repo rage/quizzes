@@ -4,70 +4,72 @@ import { Typography, Card, TextField, Button } from "@material-ui/core"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import DebugDialog from "./../DebugDialog"
 import { faQuestionCircle } from "@fortawesome/free-solid-svg-icons"
-import { get } from "lodash"
 import { EditableQuiz } from "../../types/EditQuiz"
 import BasicInformation from "./BasicInfo"
+import { EditorState } from "../../store/edit/reducers"
+import { connect } from "react-redux"
 
 interface ShowQuizPageProps {
   id: string
   quiz: EditableQuiz
 }
+const QuizCard = styled(Card)`
+  box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 40px -12px !important;
+  border-radius: 1rem !important;
+  margin: 0 auto;
+  margin-bottom: 1rem;
+  width: 800px;
+`
 
-const EssayQuizEditForm = ({ quiz, id }: ShowQuizPageProps) => {
-  const QuizCard = styled(Card)`
-    box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 40px -12px !important;
-    border-radius: 1rem !important;
-    margin: 0 auto;
-    margin-bottom: 1rem;
-    width: 800px;
-  `
+const IconWrapper = styled.div`
+  font-size: 3.5rem;
+  margin: 0 1.5rem 0 0.5rem;
+  @media (max-width: 550px) {
+    text-align: center;
+  }
+`
 
-  const IconWrapper = styled.div`
-    font-size: 3.5rem;
-    margin: 0 1.5rem 0 0.5rem;
-    @media (max-width: 550px) {
-      text-align: center;
-    }
-  `
+const QuizHeader = styled.div`
+  background-color: rgb(33, 48, 148);
+  color: white;
+  padding: 1rem;
+  display: flex;
+`
 
-  const QuizHeader = styled.div`
-    background-color: rgb(33, 48, 148);
-    color: white;
-    padding: 1rem;
-    display: flex;
-  `
+const StyledId = styled(Typography)`
+  margin-bottom: 1rem !important;
+`
 
-  const StyledId = styled(Typography)`
-    margin-bottom: 1rem !important;
-  `
+const TitleContainer = styled.div`
+  flex: 1;
+  margin-right: 1rem;
+`
 
-  const TitleContainer = styled.div`
-    flex: 1;
-    margin-right: 1rem;
-  `
+const PointsContainer = styled.div`
+  margin-right: 1.5rem;
+  width: 5rem;
+`
 
-  const PointsContainer = styled.div`
-    margin-right: 1.5rem;
-    width: 5rem;
-  `
+const QuizContent = styled.div`
+  padding: 1rem;
+`
 
-  const QuizContent = styled.div`
-    padding: 1rem;
-  `
+const StyledTextField = styled(TextField)`
+  background-color: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  width: 100%;
+  margin-top: 0.25rem !important;
+`
 
-  const StyledTextField = styled(TextField)`
-    background-color: white;
-    border-radius: 1rem;
-    overflow: hidden;
-    width: 100%;
-    margin-top: 0.25rem !important;
-  `
+const EssayQuizEditForm = ({ props }: any) => {
+  console.log(props)
   return (
     <>
-      <BasicInformation quiz={quiz} id={id} />
+      <BasicInformation />
       <br />
       <Typography variant="h3">Editing quiz</Typography>
-      <StyledId>{id}</StyledId>
+      <StyledId>{props.id}</StyledId>
       <QuizCard>
         <QuizHeader>
           <IconWrapper>
@@ -78,7 +80,7 @@ const EssayQuizEditForm = ({ quiz, id }: ShowQuizPageProps) => {
             <StyledTextField
               id="quiz-name"
               variant="outlined"
-              defaultValue={quiz.texts[0].title}
+              defaultValue={props.texts[0].title}
             />
           </TitleContainer>
           <PointsContainer>
@@ -87,7 +89,7 @@ const EssayQuizEditForm = ({ quiz, id }: ShowQuizPageProps) => {
               id="quiz-points"
               type="number"
               variant="outlined"
-              defaultValue={quiz.points}
+              defaultValue={props.points}
             />
           </PointsContainer>
         </QuizHeader>
@@ -100,16 +102,25 @@ const EssayQuizEditForm = ({ quiz, id }: ShowQuizPageProps) => {
             fullWidth
             rows="2"
             rowsMax="500"
-            defaultValue={get(quiz, "texts[0].body")}
+            defaultValue={props.texts[0].body}
           />
           <br />
           <br />
           <Button variant="outlined">Add quiz item</Button>
         </QuizContent>
       </QuizCard>
-      <DebugDialog editable data={quiz} />
+      <DebugDialog editable data={props} />
     </>
   )
 }
 
-export default EssayQuizEditForm
+const mapStateToProps = (state: EditorState) => {
+  return {
+    props: { ...state },
+  }
+}
+
+export default connect(
+  mapStateToProps,
+  null,
+)(EssayQuizEditForm)

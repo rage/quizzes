@@ -68,7 +68,6 @@ const StyledTextField = styled(TextField)`
 `
 
 const BasicInformation = ({
-  quiz,
   id,
   editable,
   numberOfTries,
@@ -89,7 +88,7 @@ const BasicInformation = ({
         <InfoContainer>
           <Typography variant="overline">Number of tries allowed:</Typography>
           <TextField
-            id={quiz.id + "tries"}
+            id={id + "tries"}
             disabled={editable}
             defaultValue={numberOfTries}
           />
@@ -97,7 +96,7 @@ const BasicInformation = ({
         <InfoContainer>
           <Typography variant="overline">Points to gain:</Typography>
           <TextField
-            id={quiz.id + "points"}
+            id={id + "points"}
             disabled={editable}
             defaultValue={pointsToGain}
           />
@@ -105,7 +104,7 @@ const BasicInformation = ({
         <InfoContainer>
           <Typography variant="overline">Points granting policy:</Typography>
           <TextField
-            id={quiz.id + "PGP"}
+            id={id + "PGP"}
             disabled={editable}
             defaultValue={pointsGrantingPolicy}
           />
@@ -113,7 +112,7 @@ const BasicInformation = ({
         <InfoContainer>
           <Typography variant="overline">Deadline:</Typography>
           <TextField
-            id={quiz.id + "deadline"}
+            id={id + "deadline"}
             disabled={editable}
             defaultValue={deadline}
           />
@@ -132,10 +131,12 @@ export interface editState {
 
 const mapStateToProps = (state: EditorState) => {
   return {
+    id: state.id,
     editable: state.editable,
     pointsToGain: state.points,
     pointsGrantingPolicy: state.grantPointsPolicy,
     deadline: state.deadline,
+    numberOfTries: state.tries,
   }
 }
 

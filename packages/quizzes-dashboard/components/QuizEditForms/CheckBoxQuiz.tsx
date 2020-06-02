@@ -7,10 +7,10 @@ interface ShowQuizPageProps {
   quiz: EditableQuiz
 }
 
-const CheckBoxQuizEditForm = ({ quiz, id }: any) => {
+const CheckBoxQuizEditForm = () => {
   return (
     <>
-      <BasicInformation quiz={quiz} id={id} />
+      <BasicInformation />
       <div>
         <h1>Checkbox type</h1>
       </div>

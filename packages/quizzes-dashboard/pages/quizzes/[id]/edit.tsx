@@ -4,31 +4,31 @@ import CheckBoxQuizEditForm from "../../../components/QuizEditForms/CheckBoxQuiz
 import EssayQuizEditForm from "../../../components/QuizEditForms/EssayQuiz"
 import { EditableQuiz } from "../../../types/EditQuiz"
 import { get } from "lodash"
-import { initializedQuiz } from "../../../store/edit/actions"
+import { initializedEditor } from "../../../store/edit/actions"
 import { connect } from "react-redux"
 
 interface ShowQuizPageProps {
   id: string
   quiz: EditableQuiz
-  initialQuiz: (quiz: EditableQuiz) => any
+  editableQuiz: (quiz: EditableQuiz) => any
 }
 
-const ShowQuizPage = ({ quiz, id, initialQuiz }: ShowQuizPageProps) => {
+const ShowQuizPage = ({ quiz, id, editableQuiz }: ShowQuizPageProps) => {
   const type = get(quiz, "items[0].type")
-  initialQuiz(quiz)
+  editableQuiz(quiz)
 
   switch (type) {
     case "checkbox": {
       return (
         <>
-          <CheckBoxQuizEditForm quiz={quiz} id={id} />
+          <CheckBoxQuizEditForm />
         </>
       )
     }
     default: {
       return (
         <>
-          <EssayQuizEditForm quiz={quiz} id={id} />
+          <EssayQuizEditForm />
         </>
       )
     }
@@ -46,7 +46,7 @@ ShowQuizPage.getInitialProps = async (ctx: any) => {
 
 const mapDispatchToProps = (dispatch: any, quiz: EditableQuiz) => {
   return {
-    initialQuiz: () => dispatch(initializedQuiz(quiz)),
+    editableQuiz: () => dispatch(initializedEditor(quiz)),
   }
 }
 
