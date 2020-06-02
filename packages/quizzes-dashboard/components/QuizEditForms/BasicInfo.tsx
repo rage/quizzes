@@ -133,10 +133,9 @@ export interface editState {
 const mapStateToProps = (state: EditorState) => {
   return {
     editable: state.editable,
-    numberOfTries: state.quiz.tries,
-    pointsToGain: state.quiz.points,
-    pointsGrantingPolicy: state.quiz.grantPointsPolicy,
-    deadline: state.quiz.deadline,
+    pointsToGain: state.points,
+    pointsGrantingPolicy: state.grantPointsPolicy,
+    deadline: state.deadline,
   }
 }
 

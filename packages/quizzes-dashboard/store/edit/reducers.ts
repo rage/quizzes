@@ -1,4 +1,9 @@
-import { EditableQuiz } from "../../types/EditQuiz"
+import { EditableQuiz, Item } from "../../types/EditQuiz"
+import {
+  QuizText,
+  IPeerReviewCollection,
+  QuizPointsGrantingPolicy,
+} from "../../types/Quiz"
 
 export interface actionType {
   type: string
@@ -7,31 +12,34 @@ export interface actionType {
 
 export interface EditorState {
   editable: boolean
-  quiz: EditableQuiz
+  id?: string
+  courseId?: string
+  part: number
+  section: number
+  points?: number
+  tries?: number
+  triesLimited?: boolean
+  deadline?: Date
+  open?: Date
+  autoConfirm?: boolean
+  excludedFromScore?: boolean
+  texts: QuizText[]
+  course: any
+  items: Item[]
+  grantPointsPolicy?: QuizPointsGrantingPolicy
+  peerReviewCollections?: IPeerReviewCollection[]
 }
 
 const initialState: EditorState = {
   editable: false,
-  quiz: {
-    open: null,
-    id: "",
-    courseId: "",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-    deadline: null,
-    part: 0,
-    section: 0,
-    tries: 1,
-    triesLimited: true,
-    autoConfirm: true,
-    grantPointsPolicy: "",
-    awardPointsEvenIfWrong: false,
-    excludedFromScore: false,
-    points: 1,
-    peerReviewCollections: [],
-    items: [],
-    texts: [],
+  part: 0,
+  section: 0,
+  course: {
+    languages: [],
   },
+  texts: [],
+  items: [],
+  peerReviewCollections: [],
 }
 
 const editReducer = (
@@ -40,10 +48,10 @@ const editReducer = (
 ): EditorState => {
   switch (action.type) {
     case "INITIALIZED_QUIZ": {
-      return { ...initialState, quiz: action.payload.quiz }
+      return { ...initialState, ...action.payload.quiz }
     }
-    case "TOGGLE_EDITABLE": {
-      return { editable: !state.editable, quiz: state.quiz }
+    case "TOGGLED_EDITABLE": {
+      return { ...state, editable: !state.editable }
     }
     default: {
       return initialState

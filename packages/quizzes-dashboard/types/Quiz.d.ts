@@ -74,9 +74,9 @@ export enum Title {
   OhjelmoinninMooc2020 = "Ohjelmoinnin Mooc 2020",
 }
 
-export enum GrantPointsPolicy {
-  GrantWheneverPossible = "grant_whenever_possible",
-}
+export type QuizPointsGrantingPolicy =
+  | "grant_whenever_possible"
+  | "grant_only_when_answer_fully_correct"
 
 export interface Item {
   id: string
@@ -133,4 +133,29 @@ export interface QuizText {
   body: string
   createdAt: Date
   updatedAt: Date
+}
+
+export interface IPeerReviewCollection {
+  id: string
+  quizId: string
+  questions: IPeerReviewCollectionQuestion[]
+  texts: IPeerReviewCollectionText[]
+}
+
+export interface IPeerReviewCollectionQuestionText {
+  peerReviewQuestionId: string
+  languageId: string
+  title: string
+  body: string
+}
+
+export interface IPeerReviewCollectionQuestion {
+  id: string
+  quizId: string
+  peerReviewCollectionId: string
+  default: boolean
+  type: PeerReviewQuestionType
+  answerRequired: boolean
+  order: number
+  texts: IPeerReviewCollectionQuestionText[]
 }
