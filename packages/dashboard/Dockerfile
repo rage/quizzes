@@ -8,11 +8,11 @@ COPY --chown=node . /app
 
 USER node
 
-ENV NODE_ENV=production
-
-WORKDIR /app/packages/dashboard
+WORKDIR /app
 
 RUN npm ci
+
+ENV NODE_ENV=production
 
 RUN npm run build
 
@@ -20,6 +20,6 @@ FROM nginx:1.15-alpine
 
 COPY --from=builder /app/build /usr/share/nginx/html
 
-COPY kubernetes/dashboard-nginx.conf /etc/nginx/conf.d/default.conf
+COPY dashboard-nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]

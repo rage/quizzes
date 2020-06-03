@@ -14,7 +14,7 @@ fi
 TAG="eu.gcr.io/moocfi/quizzes-dashboard:build-$REV"
 echo Building "$TAG"
 cd packages/dashboard
-docker build . -f Dockerfile.dashboard -t "$TAG"
+docker build . -t "$TAG"
 cd ../..
 
 echo "Successfully built image: $TAG"

@@ -11,15 +11,15 @@ COPY --chown=node . /app
 
 USER node
 
-ENV NODE_ENV=production
-
-WORKDIR /app/packages/backend
+WORKDIR /app
 
 RUN npm ci
 
 RUN npm run build
 
 EXPOSE 3000
+
+ENV NODE_ENV=production
 
 CMD [ "npm", "start" ]
 
