@@ -39,7 +39,7 @@ const PointsContainer = styled.div`
 
 const QuizStatusMessage = styled(Typography)``
 
-const PointsText = styled(Typography)`
+const PointsText = styled(Typography)<{ component: string }>`
   font-size: 1.5rem !important;
   text-align: end;
   display: inline;
@@ -50,7 +50,7 @@ const PointsText = styled(Typography)`
   }
 `
 
-const PointsLabelText = styled(Typography)`
+const PointsLabelText = styled(Typography)<{ component: string }>`
   font-size: 1rem !important;
 
   @media (max-width: 550px) {
@@ -156,10 +156,10 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
             animate={false}
             height={25}
             width={30}
-            primaryColor="#ffffff"
-            primaryOpacity={0.6}
-            secondaryColor="#dddddd"
-            secondaryOpacity={0.6}
+            backgroundColor="#ffffff"
+            backgroundOpacity={0.6}
+            foregroundColor="#dddddd"
+            foregroundOpacity={0.6}
           >
             <rect x="0" y="0" rx="10" ry="10" width="30" height="25" />
           </StyledShortPointContentLoader>
@@ -230,10 +230,10 @@ const QuizTitleLoadingBar: React.FunctionComponent<ILoadingBarProps> = ({
       height={40}
       width={100}
       speed={2}
-      primaryColor="#ffffff"
-      primaryOpacity={0.6}
-      secondaryColor="#dddddd"
-      secondaryOpacity={0.6}
+      backgroundColor="#ffffff"
+      backgroundOpacity={0.6}
+      foregroundColor="#dddddd"
+      foregroundOpacity={0.6}
     >
       <rect x="0" y="10" rx="4" ry="20" width="100" height="30" />
     </StyledQuizTitleContentLoader>
@@ -254,10 +254,10 @@ const QuizPointsLoadingBar: React.FunctionComponent<ILoadingBarProps> = ({
       height={40}
       width={100}
       speed={2}
-      primaryColor="#ffffff"
-      primaryOpacity={0.6}
-      secondaryColor="#dddddd"
-      secondaryOpacity={0.6}
+      backgroundColor="#ffffff"
+      backgroundOpacity={0.6}
+      foregroundColor="#dddddd"
+      foregroundOpacity={0.6}
     >
       <rect x="0" y="10" rx="25" ry="25" width="100" height="30" />
     </StyledQuizPointsContentLoader>

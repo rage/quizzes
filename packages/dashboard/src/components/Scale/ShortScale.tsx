@@ -24,7 +24,7 @@ const ShortScale: React.FunctionComponent<IShortScaleProps> = props => {
     <ShortWrapper toggleExpand={props.toggleExpand}>
       <Grid
         container={true}
-        spacing={16}
+        spacing={3}
         justify="flex-start"
         alignItems="center"
       >
@@ -48,7 +48,7 @@ const ShortScale: React.FunctionComponent<IShortScaleProps> = props => {
           </React.Fragment>
         )}
         <Grid item={true} xs={6}>
-          <Typography variant="title">{item.texts[0].title}</Typography>
+          <Typography variant="h6">{item.texts[0].title}</Typography>
         </Grid>
 
         <Grid item={true} xs={6}>

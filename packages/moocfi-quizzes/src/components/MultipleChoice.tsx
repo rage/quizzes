@@ -90,6 +90,8 @@ const LeftAlignedMarkdownText = styled(MarkdownText)`
   text-align: left;
 `
 
+const justADiv = styled.div``
+
 type MultipleChoiceProps = {
   item: QuizItem
 }
@@ -202,7 +204,6 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
           Component={SpaciousTypography}
           removeParagraphs
           variant="subtitle1"
-          component="p"
           id={`item-question-${title}`}
         >
           {title}
@@ -213,8 +214,8 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 
       {selectOptionsLabel && (
         <SelectOptionsLabelTypography
-          component="p"
           variant="subtitle1"
+          variantMapping={{ subtitle1: "p" }}
           onlyOneItem={onlyOneItem}
         >
           {selectOptionsLabel}
@@ -293,7 +294,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
           disabled={quizDisabled}
           aria-pressed={optionIsSelected}
         >
-          <MarkdownText Component={styled.div``} removeParagraphs>
+          <MarkdownText Component={justADiv} removeParagraphs>
             {text.title}
           </MarkdownText>
         </ChoiceButton>
@@ -324,7 +325,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
               option.correct ? "correct" : "incorrect"
             }`}
           >
-            <MarkdownText Component={styled.div``} removeParagraphs>
+            <MarkdownText Component={justADiv} removeParagraphs>
               {text.title}
             </MarkdownText>
           </ChoiceButton>
@@ -358,7 +359,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             option.correct ? "correct" : "incorrect"
           }`}
         >
-          <MarkdownText Component={styled.div``} removeParagraphs>
+          <MarkdownText Component={justADiv} removeParagraphs>
             {text.title}
           </MarkdownText>
         </ChoiceButton>

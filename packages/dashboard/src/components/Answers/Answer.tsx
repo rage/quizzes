@@ -123,7 +123,7 @@ class Answer extends React.Component<any, any> {
                     {this.props.answerData.status === "confirmed" ? (
                       ""
                     ) : (
-                      <Grid container={true} justify="flex-start" spacing={16}>
+                      <Grid container={true} justify="flex-start" spacing={3}>
                         <Grid item={true} xs="auto">
                           <Button
                             variant="contained"
@@ -326,7 +326,7 @@ class PeerReviewsSummary extends React.Component<any, any> {
     if (this.props.peerReviewsQuestions.length === 0) {
       return (
         <Grid item={true} xs="auto">
-          <Typography variant="title">Quiz involves no peer reviews</Typography>
+          <Typography variant="h6">Quiz involves no peer reviews</Typography>
         </Grid>
       )
     }
@@ -353,7 +353,7 @@ class PeerReviewsSummary extends React.Component<any, any> {
             <Grid
               container={true}
               direction="column"
-              spacing={24}
+              spacing={3}
               justify="space-around"
               alignItems="center"
             >
@@ -527,11 +527,8 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    decrementAttentionCount: decrement,
-    displayMessage,
-    setQuiz,
-  },
-)(Answer)
+export default connect(mapStateToProps, {
+  decrementAttentionCount: decrement,
+  displayMessage,
+  setQuiz,
+})(Answer)

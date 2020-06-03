@@ -27,7 +27,7 @@ export const setUserQuizState: ActionCreator<ThunkAction> = (
   return (dispatch, getState) => {
     dispatch(
       setQuizState({
-        quiz: getState().quiz,
+        quiz: getState().quiz as Quiz,
         quizAnswer: getState().quizAnswer.quizAnswer,
         userQuizState,
       }),
@@ -38,7 +38,7 @@ export const setUserQuizState: ActionCreator<ThunkAction> = (
 export const updateQuizState: ActionCreator<ThunkAction> = () => {
   return async (dispatch, getState) => {
     const responseData = (await getQuizInfo(
-      getState().quiz.id,
+      getState().quiz?.id || "",
       getState().user.accessToken,
       getState().backendAddress,
       true,

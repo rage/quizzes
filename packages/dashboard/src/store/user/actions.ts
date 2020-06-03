@@ -1,6 +1,6 @@
 import { Dispatch } from "redux"
 import { ActionType, createAction } from "typesafe-actions"
-import { ITMCProfile } from "../../../../common/src/types"
+import { ITMCProfile } from "../../interfaces"
 import { getOwnRoles } from "../../services/roles"
 import * as AnswerCounts from "../answerCounts/actions"
 import * as Courses from "../courses/actions"

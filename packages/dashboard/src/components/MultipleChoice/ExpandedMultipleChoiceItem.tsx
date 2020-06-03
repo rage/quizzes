@@ -73,7 +73,7 @@ class MultipleChoiceItem extends React.Component<
   public render() {
     const item = this.props.items[this.props.order]
     return (
-      <Grid container={true} spacing={16} justify="center" alignItems="center">
+      <Grid container={true} spacing={3} justify="center" alignItems="center">
         <Grid item={true} xs={12}>
           <Card>
             <Grid container={true} justify="flex-end" alignItems="center">
@@ -134,8 +134,9 @@ class MultipleChoiceItem extends React.Component<
                               onClick={this.createNewOption}
                             >
                               <AddCircle
+                                component="svg"
                                 fontSize="large"
-                                nativeColor="#E5E5E5"
+                                htmlColor="#E5E5E5"
                               />
                             </IconButton>
                           </Grid>
@@ -261,16 +262,13 @@ class MultipleChoiceItem extends React.Component<
   }
 }
 
-export default connect(
-  null,
-  {
-    addFinishedOption,
-    addOption,
-    changeAttr,
-    changeOrder,
-    modifyOption,
-    modifyOptionOrder,
-    save,
-    updateMultipleOptions,
-  },
-)(MultipleChoiceItem)
+export default connect(null, {
+  addFinishedOption,
+  addOption,
+  changeAttr,
+  changeOrder,
+  modifyOption,
+  modifyOptionOrder,
+  save,
+  updateMultipleOptions,
+})(MultipleChoiceItem)

@@ -25,9 +25,6 @@ import { WhereBuilder, stringContainsLongerWord } from "../util/index"
 // import PlainObjectToDatabaseEntityTransformer from "../../../../node_modules/typeorm/query-builder/transformer/PlainObjectToDatabaseEntityTransformer"
 
 // tslint:disable-next-line:max-line-length
-import { PlainObjectToDatabaseEntityTransformer } from "typeorm/query-builder/transformer/PlainObjectToDatabaseEntityTransformer"
-import { setCorrectValuesForAwardPointsEvenIfWrong1564678844323 } from "migration/1564678844323-set_correct_values_for_award_points_even_if_wrong"
-import { element } from "prop-types"
 import CourseService from "./course.service"
 
 @Service()
@@ -429,9 +426,9 @@ export default class QuizAnswerService {
       addSpamFlagNumber,
     } = query
 
-    const queryBuilder: SelectQueryBuilder<
-      QuizAnswer
-    > = QuizAnswer.createQueryBuilder("quiz_answer")
+    const queryBuilder: SelectQueryBuilder<QuizAnswer> = QuizAnswer.createQueryBuilder(
+      "quiz_answer",
+    )
 
     if (
       !id &&
