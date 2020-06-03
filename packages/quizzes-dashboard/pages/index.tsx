@@ -1,16 +1,7 @@
 import React from "react"
 import styled from "styled-components"
-import {
-  Typography,
-  Dialog,
-  Button,
-  DialogTitle,
-  DialogContent,
-  Card,
-  CardContent,
-} from "@material-ui/core"
+import { Typography, Card, CardContent } from "@material-ui/core"
 import { fetchCourses } from "../services/quizzes"
-import { useState } from "react"
 import Link from "next/link"
 import { get } from "lodash"
 import { Course } from "../types/Course"
@@ -47,7 +38,7 @@ const Home = ({ courses }: HomeProps) => {
           </CourseLink>
         </Link>
       ))}
-      <DebugDialog data={courses} />
+      <DebugDialog />
     </>
   )
 }

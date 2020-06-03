@@ -7,7 +7,8 @@ import {
 
 export interface actionType {
   type: string
-  payload: any
+  payload?: any
+  meta?: any
 }
 
 export interface EditorState {
@@ -53,10 +54,20 @@ const editReducer = (
     case "TOGGLED_EDITABLE": {
       return { ...state, editable: !state.editable }
     }
-    case "EDITED_QUIZ_BODY": {
+    case "EDITED_QUIZ_ITEM_BODY": {
       let newState = state
-      newState.texts[0].body = action.payload
-      return { ...newState }
+      let editedItem = newState.items.find(
+        item => item.id === action.payload.id,
+      )
+      if (editedItem === undefined) {
+        return state
+      }
+      editedItem.texts[0].body = action.payload.body
+      newState.items = [
+        ...newState.items.filter(item => item.id !== action.payload.id),
+        editedItem,
+      ]
+      return newState
     }
     default: {
       return initialState

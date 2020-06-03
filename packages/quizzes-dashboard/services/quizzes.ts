@@ -25,5 +25,7 @@ export const fetchCourseQuizzes = async (
 }
 
 export const fetchQuiz = async (id: string): Promise<EditableQuiz> => {
-  return (await api.get(`/quizzes/${id}`)).data.quiz
+  return (await api.get(
+    `/quizzes/${id}?course=true&items=true&options=true&peerreviews=true&stripped=false`,
+  )).data.quiz
 }

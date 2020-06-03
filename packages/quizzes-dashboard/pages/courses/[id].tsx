@@ -60,7 +60,7 @@ const ShowCoursePage = ({ quizzes, id }: ShowCoursePageProps) => {
           })}
         </div>
       ))}
-      <DebugDialog data={quizzes} />
+      <DebugDialog />
     </>
   )
 }

@@ -2,15 +2,13 @@ import React from "react"
 import BasicInformation from "./BasicInfo"
 import { EditableQuiz } from "../../types/EditQuiz"
 
-interface ShowQuizPageProps {
-  id: string
-  quiz: EditableQuiz
+interface contentBoxProps {
+  itemId: string
 }
 
-const CheckBoxQuizEditForm = () => {
+const CheckBoxContent = ({ itemId }: contentBoxProps) => {
   return (
     <>
-      <BasicInformation />
       <div>
         <h1>Checkbox type</h1>
       </div>
@@ -18,4 +16,4 @@ const CheckBoxQuizEditForm = () => {
   )
 }
 
-export default CheckBoxQuizEditForm
+export default CheckBoxContent

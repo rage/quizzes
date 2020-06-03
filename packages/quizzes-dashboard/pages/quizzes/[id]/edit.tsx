@@ -1,11 +1,13 @@
 import React from "react"
 import { fetchQuiz } from "../../../services/quizzes"
-import CheckBoxQuizEditForm from "../../../components/QuizEditForms/CheckBoxQuiz"
-import EssayQuizEditForm from "../../../components/QuizEditForms/EssayQuiz"
 import { EditableQuiz } from "../../../types/EditQuiz"
 import { get } from "lodash"
 import { initializedEditor } from "../../../store/edit/actions"
 import { connect } from "react-redux"
+import BasicInfo from "../../../components/QuizEditForms/BasicInfo"
+import Typography from "@material-ui/core/Typography"
+import styled from "styled-components"
+import QuizItem from "../../../components/QuizEditForms/QuizItem"
 
 interface ShowQuizPageProps {
   id: string
@@ -13,26 +15,27 @@ interface ShowQuizPageProps {
   editableQuiz: (quiz: EditableQuiz) => any
 }
 
-const ShowQuizPage = ({ quiz, id, editableQuiz }: ShowQuizPageProps) => {
-  const type = get(quiz, "items[0].type")
-  editableQuiz(quiz)
+const StyledId = styled(Typography)`
+  margin-bottom: 1rem !important;
+`
 
-  switch (type) {
-    case "checkbox": {
-      return (
-        <>
-          <CheckBoxQuizEditForm />
-        </>
-      )
-    }
-    default: {
-      return (
-        <>
-          <EssayQuizEditForm />
-        </>
-      )
-    }
-  }
+const ShowQuizPage = ({ quiz, id, editableQuiz }: ShowQuizPageProps) => {
+  editableQuiz(quiz)
+  return (
+    <>
+      <Typography variant="h3">Editing quiz</Typography>
+      <StyledId>{id}</StyledId>
+      <BasicInfo />
+
+      {quiz.items.map(item => {
+        return (
+          <>
+            <QuizItem key={item.id} item={item} />
+          </>
+        )
+      })}
+    </>
+  )
 }
 
 ShowQuizPage.getInitialProps = async (ctx: any) => {
