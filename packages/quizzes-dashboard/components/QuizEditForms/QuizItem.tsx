@@ -13,10 +13,9 @@ import MultipleChoiceContent from "./MultipleChoiceContent"
 import CheckBoxContent from "./CheckBoxContent"
 import OpenContent from "./OpenContent"
 import ScaleContent from "./ScaleContent"
-
-interface QuizItemProps {
-  item: Item
-}
+import { EditorState } from "../../store/edit/reducers"
+import { editedQuizTitle } from "../../store/edit/actions"
+import { connect } from "react-redux"
 
 const QuizCard = styled(Card)`
   box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 40px -12px !important;
@@ -74,8 +73,14 @@ const StyledSelectField = styled(Select)`
   width: 100%;
   margin-top: 0.25rem !important;
 `
+interface QuizItemProps {
+  item: Item
+  items: Item[]
+  editItemTitle: (newTitle: string, itemId: string) => any
+}
 
-const QuizItem = ({ item }: QuizItemProps) => {
+const QuizItem = ({ item, items, editItemTitle }: QuizItemProps) => {
+  console.log(items)
   console.log(item.type)
   return (
     <div>
@@ -87,6 +92,7 @@ const QuizItem = ({ item }: QuizItemProps) => {
               id={item.id}
               variant="outlined"
               defaultValue={item.texts[0].title}
+              onChange={event => editItemTitle(event.target.value, item.id)}
             />
           </TitleContainer>
           <TypeContainer>
@@ -133,4 +139,17 @@ const contentBasedOnType = (type: string, id: string) => {
   }
 }
 
-export default QuizItem
+const mapStateToProps = (state: EditorState) => {
+  return {
+    items: state.items,
+  }
+}
+
+const mapDispatchToProps = (dispatch: any) => {
+  return {
+    editItemTitle: (newTitle: string, itemId: string) =>
+      dispatch(editedQuizTitle(newTitle, itemId)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(QuizItem)

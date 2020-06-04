@@ -69,6 +69,22 @@ const editReducer = (
       ]
       return newState
     }
+    case "EDITED_QUIZ_ITEM_TITLE": {
+      console.log(action)
+      let newState = state
+      let editedItem = newState.items.find(
+        item => item.id === action.payload.id,
+      )
+      if (editedItem === undefined) {
+        return state
+      }
+      editedItem.texts[0].title = action.payload.title
+      newState.items = [
+        ...newState.items.filter(item => item.id !== action.payload.id),
+        editedItem,
+      ]
+      return newState
+    }
     default: {
       return initialState
     }
