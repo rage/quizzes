@@ -7,6 +7,7 @@ import api from "./src/controllers/api"
 import logger, { GlobalLogger } from "./src/middleware/logger"
 import errorHandler from "./src/middleware/error_handler"
 import { CustomContext, CustomState } from "./src/types"
+
 Model.knex(knex)
 Model.columnNameMappers = snakeCaseMappers()
 
