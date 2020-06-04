@@ -10,11 +10,7 @@ const widget = new Router<CustomState, CustomContext>({
 
   .get("/:quizId", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    ctx.body = await Quiz.query()
-      .withGraphJoined("texts")
-      .withGraphJoined("items.[texts, options.[texts]]")
-      .withGraphJoined("peerReviews.[texts, questions.[texts]]")
-      .where("quiz.id", quizId)
+    ctx.body = await Quiz.getQuizById(quizId)
   })
 
   .get("/:quizId/preview", accessControl({ unrestricted: true }), async ctx => {

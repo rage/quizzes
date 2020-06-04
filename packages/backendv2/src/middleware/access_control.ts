@@ -15,10 +15,11 @@ const accessControl = (options?: AccessControlOptions) => {
       return next()
     }
     try {
-      ctx.state.user = await getCurrentUserDetails(
+      const user = await getCurrentUserDetails(
         ctx.headers.authorization.toLocaleLowerCase().replace("bearer ", ""),
       )
-      if (options?.administator) {
+      ctx.state.user = user
+      if (options?.administator && !user.administrator) {
         throw new Error()
       }
     } catch (error) {

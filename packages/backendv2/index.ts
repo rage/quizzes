@@ -23,6 +23,6 @@ app.use(api.routes())
 
 http
   .createServer(app.callback())
-  .listen(3000, () => GlobalLogger.info("server running on port 3000"))
+  .listen(6000, () => GlobalLogger.info("server running on port 6000"))
 
 export type AppContext = typeof app.context
