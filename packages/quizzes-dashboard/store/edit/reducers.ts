@@ -86,6 +86,22 @@ const editReducer = (
       newState.texts[0].title = action.payload
       return newState
     }
+    case "EDITED_QUIZZES_NUMBER_OF_TRIES": {
+      let newState = state
+      newState.tries = action.payload
+      return newState
+    }
+    case "EDITED_QUIZZES_POINTS_TO_GAIN": {
+      let newState = state
+      newState.points = action.payload
+      return newState
+    }
+    case "EDITED_QUIZZES_POINTS_GRANTING_POLICY": {
+      console.log(action)
+      let newState = state
+      newState.grantPointsPolicy = action.payload
+      return newState
+    }
     default: {
       return initialState
     }

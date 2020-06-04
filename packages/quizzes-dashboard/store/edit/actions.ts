@@ -1,8 +1,6 @@
 import { action } from "typesafe-actions"
 import { EditableQuiz } from "../../types/EditQuiz"
 
-export const toggleEditable = action("TOGGLED_EDITABLE")
-
 export const initializedEditor = (quiz: EditableQuiz) =>
   action("INITIALIZED_EDITOR", quiz)
 
@@ -14,3 +12,12 @@ export const editedQuizItemTitle = (newTitle: string, itemId: string) =>
 
 export const editedQuizTitle = (newTitle: string) =>
   action("EDITED_QUIZ_TITLE", newTitle)
+
+export const editedQuizzesNumberOfTries = (numberOfTries: number) =>
+  action("EDITED_QUIZZES_NUMBER_OF_TRIES", numberOfTries)
+
+export const editedQuizzesPointsToGain = (pointsToGain: number) =>
+  action("EDITED_QUIZZES_POINTS_TO_GAIN", pointsToGain)
+
+export const editedQuizzesPointsGrantingPolicy = (policy: string) =>
+  action("EDITED_QUIZZES_POINTS_GRANTING_POLICY", policy)

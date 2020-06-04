@@ -11,7 +11,12 @@ import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faInfoCircle, faPen } from "@fortawesome/free-solid-svg-icons"
 import { connect } from "react-redux"
-import { toggleEditable, editedQuizTitle } from "../../store/edit/actions"
+import {
+  editedQuizTitle,
+  editedQuizzesNumberOfTries,
+  editedQuizzesPointsToGain,
+  editedQuizzesPointsGrantingPolicy,
+} from "../../store/edit/actions"
 import { EditorState } from "../../store/edit/reducers"
 import DebugDialog from "../DebugDialog"
 
@@ -81,6 +86,9 @@ const BasicInformation = ({
   deadline,
   texts,
   editedQuizTitle,
+  editedNumberOfTries,
+  editedPointsToGain,
+  editedPointsGrantingPolicy,
 }: any) => {
   return (
     <>
@@ -111,7 +119,11 @@ const BasicInformation = ({
         </InfoContainer>
         <InfoContainer>
           <Typography variant="overline">Number of tries allowed:</Typography>
-          <Select type="number" defaultValue={numberOfTries}>
+          <Select
+            type="number"
+            defaultValue={numberOfTries}
+            onChange={event => editedNumberOfTries(event.target.value)}
+          >
             <MenuItem value={1}>1</MenuItem>
             <MenuItem value={2}>2</MenuItem>
             <MenuItem value={3}>3</MenuItem>
@@ -121,7 +133,11 @@ const BasicInformation = ({
         </InfoContainer>
         <InfoContainer>
           <Typography variant="overline">Points to gain:</Typography>
-          <Select type="number" defaultValue={pointsToGain}>
+          <Select
+            type="number"
+            defaultValue={pointsToGain}
+            onChange={event => editedPointsToGain(event.target.value)}
+          >
             <MenuItem value={1}>1</MenuItem>
             <MenuItem value={2}>2</MenuItem>
             <MenuItem value={3}>3</MenuItem>
@@ -131,7 +147,11 @@ const BasicInformation = ({
         </InfoContainer>
         <InfoContainer>
           <Typography variant="overline">Points granting policy:</Typography>
-          <Select type="string" defaultValue={pointsGrantingPolicy}>
+          <Select
+            type="string"
+            defaultValue={pointsGrantingPolicy}
+            onChange={event => editedPointsGrantingPolicy(event.target.value)}
+          >
             <MenuItem value="grant_whenever_possible">
               grant_whenever_possible
             </MenuItem>
@@ -170,6 +190,12 @@ const mapStateToProps = (state: EditorState) => {
 const mapDispatchToProps = (dispatch: any) => {
   return {
     editedQuizTitle: (newTitle: string) => dispatch(editedQuizTitle(newTitle)),
+    editedNumberOfTries: (numberOfTries: number) =>
+      dispatch(editedQuizzesNumberOfTries(numberOfTries)),
+    editedPointsToGain: (pointsToGain: number) =>
+      dispatch(editedQuizzesPointsToGain(pointsToGain)),
+    editedPointsGrantingPolicy: (policy: string) =>
+      dispatch(editedQuizzesPointsGrantingPolicy(policy)),
   }
 }
 
