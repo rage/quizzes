@@ -7,7 +7,7 @@ import { displayMessage } from "../notification/actions"
 import * as quizActions from "../quizzes/actions"
 
 export const set = createAction("edit/SET", resolve => {
-  return quiz => resolve(quiz)
+  return (quiz: any) => resolve(quiz)
 })
 
 export const create = createAction("edit/NEW", resolve => {
