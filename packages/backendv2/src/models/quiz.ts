@@ -44,12 +44,18 @@ export class Quiz extends Model {
   }
 
   static async getQuizById(quizId: string) {
-    return await this.query()
-      .withGraphJoined("texts")
-      .withGraphJoined("items.[texts, options.[texts]]")
-      .withGraphJoined("peerReviews.[texts, questions.[texts]]")
-      .withGraphJoined("course.[texts]")
-      .where("quiz.id", quizId)
+    const quiz = (
+      await this.query()
+        .withGraphJoined("texts")
+        .withGraphJoined("items.[texts, options.[texts]]")
+        .withGraphJoined("peerReviews.[texts, questions.[texts]]")
+        .withGraphJoined("course.[texts]")
+        .where("quiz.id", quizId)
+    )[0]
+    if (!quiz) {
+      throw new Error()
+    }
+    return quiz
   }
 }
 
