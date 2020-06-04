@@ -1,7 +1,6 @@
 import React from "react"
 import { fetchQuiz } from "../../../services/quizzes"
 import { EditableQuiz } from "../../../types/EditQuiz"
-import { get } from "lodash"
 import { initializedEditor } from "../../../store/edit/actions"
 import { connect } from "react-redux"
 import BasicInfo from "../../../components/QuizEditForms/BasicInfo"

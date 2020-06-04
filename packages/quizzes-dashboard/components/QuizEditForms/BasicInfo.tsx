@@ -1,17 +1,19 @@
 import React from "react"
-import { EditableQuiz } from "../../types/EditQuiz"
-import { Typography, Card, TextField, IconButton } from "@material-ui/core"
+import {
+  Typography,
+  Card,
+  TextField,
+  IconButton,
+  Select,
+  MenuItem,
+} from "@material-ui/core"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faInfoCircle, faPen } from "@fortawesome/free-solid-svg-icons"
 import { connect } from "react-redux"
 import { toggleEditable } from "../../store/edit/actions"
 import { EditorState } from "../../store/edit/reducers"
-
-interface ShowQuizPageProps {
-  id: string
-  quiz: EditableQuiz
-}
+import DebugDialog from "../DebugDialog"
 
 const InfoCard = styled(Card)`
   box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 40px -12px !important;
@@ -41,6 +43,10 @@ const InfoContainer = styled.div`
   display: flex;
 `
 
+const InfoContainer2 = styled.div`
+  padding: 1rem;
+  display: flex;
+`
 const StyledId = styled(Typography)`
   margin-bottom: 1rem !important;
 `
@@ -69,12 +75,11 @@ const StyledTextField = styled(TextField)`
 
 const BasicInformation = ({
   id,
-  editable,
   numberOfTries,
   pointsToGain,
   pointsGrantingPolicy,
   deadline,
-  startStopEditing,
+  texts,
 }: any) => {
   return (
     <>
@@ -83,43 +88,67 @@ const BasicInformation = ({
           <IconWrapper>
             <FontAwesomeIcon icon={faInfoCircle} />
           </IconWrapper>
-          <Typography variant="h3">Basic Information</Typography>
+          <Typography variant="h3">Quiz Information</Typography>
         </InfoHeader>
         <InfoContainer>
-          <Typography variant="overline">Number of tries allowed:</Typography>
-          <TextField
-            id={id + "tries"}
-            disabled={editable}
-            defaultValue={numberOfTries}
+          <Typography>
+            Created at: {new Date(texts[0].createdAt).toDateString()}
+          </Typography>
+        </InfoContainer>
+        <InfoContainer>
+          <Typography>
+            Last updated at: {new Date(texts[0].updatedAt).toDateString()}
+          </Typography>
+        </InfoContainer>
+        <InfoContainer>
+          <Typography>Quiz title:</Typography>
+          <StyledTextField
+            variant="outlined"
+            multiline
+            defaultValue={texts[0].title}
           />
+        </InfoContainer>
+        <InfoContainer>
+          <Typography variant="overline">Number of tries allowed:</Typography>
+          <Select type="number" defaultValue={numberOfTries}>
+            <MenuItem value={1}>1</MenuItem>
+            <MenuItem value={2}>2</MenuItem>
+            <MenuItem value={3}>3</MenuItem>
+            <MenuItem value={4}>4</MenuItem>
+            <MenuItem value={5}>5</MenuItem>
+          </Select>
         </InfoContainer>
         <InfoContainer>
           <Typography variant="overline">Points to gain:</Typography>
-          <TextField
-            id={id + "points"}
-            disabled={editable}
-            defaultValue={pointsToGain}
-          />
+          <Select type="number" defaultValue={pointsToGain}>
+            <MenuItem value={1}>1</MenuItem>
+            <MenuItem value={2}>2</MenuItem>
+            <MenuItem value={3}>3</MenuItem>
+            <MenuItem value={4}>4</MenuItem>
+            <MenuItem value={5}>5</MenuItem>
+          </Select>
         </InfoContainer>
         <InfoContainer>
           <Typography variant="overline">Points granting policy:</Typography>
-          <TextField
-            id={id + "PGP"}
-            disabled={editable}
-            defaultValue={pointsGrantingPolicy}
-          />
+          <Select type="string" defaultValue={pointsGrantingPolicy}>
+            <MenuItem value="grant_whenever_possible">
+              grant_whenever_possible
+            </MenuItem>
+            <MenuItem value="grant_only_when_answer_fully_correct">
+              grant_only_when_answer_fully_correct
+            </MenuItem>
+          </Select>
         </InfoContainer>
         <InfoContainer>
           <Typography variant="overline">Deadline:</Typography>
-          <TextField
-            id={id + "deadline"}
-            disabled={editable}
-            defaultValue={deadline}
-          />
+          <TextField disabled={true} defaultValue={deadline}></TextField>
         </InfoContainer>
-        <IconButton size="medium" edge="end" onClick={() => startStopEditing()}>
-          <FontAwesomeIcon icon={faPen} />
-        </IconButton>
+        <InfoContainer>
+          <Typography>Language: {texts[0].languageId}</Typography>
+        </InfoContainer>
+        <InfoContainer>
+          <DebugDialog editable={true} />
+        </InfoContainer>
       </InfoCard>
     </>
   )
@@ -132,18 +161,12 @@ export interface editState {
 const mapStateToProps = (state: EditorState) => {
   return {
     id: state.id,
-    editable: state.editable,
     pointsToGain: state.points,
     pointsGrantingPolicy: state.grantPointsPolicy,
     deadline: state.deadline,
     numberOfTries: state.tries,
+    texts: state.texts,
   }
 }
 
-const mapDispatchToProps = (dispatch: any) => {
-  return {
-    startStopEditing: () => dispatch(toggleEditable),
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(BasicInformation)
+export default connect(mapStateToProps, null)(BasicInformation)

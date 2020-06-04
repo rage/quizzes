@@ -4,6 +4,7 @@ import styled from "styled-components"
 import EditableDebugField from "./EditableDebugField"
 import { EditorState } from "../store/edit/reducers"
 import { connect } from "react-redux"
+import { Item } from "../types/EditQuiz"
 
 const DialogTitleContainer = styled.div`
   display: flex;
@@ -28,11 +29,16 @@ const StyledPreWrapper = styled.div`
 `
 
 interface DebugDialogProps {
-  data?: EditorState
+  storeData?: EditorState
+  passedData?: Item
   editable?: boolean
 }
 
-const DebugDialog = ({ data, editable = false }: DebugDialogProps) => {
+const DebugDialog = ({ storeData, passedData, editable }: DebugDialogProps) => {
+  let data: EditorState | Item | undefined = storeData
+  if (passedData) {
+    data = passedData
+  }
   const [debugOpen, setDebugOpen] = useState(false)
   const content = JSON.stringify(data, undefined, 2)
   return (
@@ -68,7 +74,7 @@ const DebugDialog = ({ data, editable = false }: DebugDialogProps) => {
 
 const mapStateToProps = (state: EditorState) => {
   return {
-    data: { ...state },
+    storeData: { ...state },
   }
 }
 
