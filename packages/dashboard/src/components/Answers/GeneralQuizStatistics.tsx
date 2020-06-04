@@ -11,13 +11,13 @@ class GeneralStatistics extends React.Component<any, any> {
           xs={12}
           style={{ marginBottom: "1.5em", textAlign: "center" }}
         >
-          <Typography variant="title">QUIZ STATISTICS</Typography>
+          <Typography variant="h6">QUIZ STATISTICS</Typography>
         </Grid>
 
         <Grid item={true} xs="auto">
           <Grid
             container={true}
-            spacing={32}
+            spacing={8}
             style={{
               backgroundColor: "#49C7FB",
               marginBottom: "1em",

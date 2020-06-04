@@ -61,7 +61,7 @@ class PeerReviewQuestionCollection extends React.Component<any, any> {
     return (
       <Card style={{ marginBottom: 20 }}>
         {!this.state.expanded ? (
-          <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
+          <Grid style={{ flexGrow: 1 }} container={true} spacing={3}>
             <Grid item={true} xs={11}>
               <DragHandleWrapper>
                 <CardHeader
@@ -92,7 +92,7 @@ class PeerReviewQuestionCollection extends React.Component<any, any> {
         )}
         <Collapse in={this.state.expanded}>
           <CardContent>
-            <Grid style={{ flexGrow: 1 }} container={true} spacing={16}>
+            <Grid style={{ flexGrow: 1 }} container={true} spacing={3}>
               <Grid item={true} xs={12}>
                 <Card>
                   <CardHeader subheader="general" />
@@ -102,9 +102,7 @@ class PeerReviewQuestionCollection extends React.Component<any, any> {
                       value={this.props.title || undefined}
                       fullWidth={true}
                       onChange={this.props.handleChange(
-                        `peerReviewCollections[${this.props.index}].texts[${
-                          this.props.textIndex
-                        }].title`,
+                        `peerReviewCollections[${this.props.index}].texts[${this.props.textIndex}].title`,
                       )}
                       multiline={true}
                       margin="normal"
@@ -114,9 +112,7 @@ class PeerReviewQuestionCollection extends React.Component<any, any> {
                       value={this.props.body || undefined}
                       fullWidth={true}
                       onChange={this.props.handleChange(
-                        `peerReviewCollections[${this.props.index}].texts[${
-                          this.props.textIndex
-                        }].body`,
+                        `peerReviewCollections[${this.props.index}].texts[${this.props.textIndex}].body`,
                       )}
                       multiline={true}
                       margin="normal"
@@ -220,7 +216,4 @@ const mapDispatchToProps = {
   addReviewQuestion,
 }
 
-export default connect(
-  null,
-  mapDispatchToProps,
-)(PeerReviewQuestionCollection)
+export default connect(null, mapDispatchToProps)(PeerReviewQuestionCollection)

@@ -1,26 +1,19 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
     "lib": ["es2018", "dom", "esnext.asynciterable"],
-    "outDir": "../../dist",
-    "rootDir": "../",
+    "outDir": "./dist",
+    "rootDir": "./",
     "module": "commonjs",
-    // "baseUrl": "./src/",
+    "baseUrl": "./src/",
     "jsx": "react",
     "experimentalDecorators": true,
     "esModuleInterop": true,
     "declaration": true,
     "composite": true,
-    // "declarationMap": true,
+    "declarationMap": false,
     "allowSyntheticDefaultImports": true,
-    "paths": {
-      "@quizzes/common/*": ["../../common/src/*"],
-      "*": ["node_modules"]
-    },
+    "downlevelIteration": true
   },
-  "references": [
-    { "path": "../common" }
-  ],
-  "include": ["./src/**/*", "../common"],
+  "include": ["./src/**/*"],
   "exclude": ["node_modules", "dist"]
 }

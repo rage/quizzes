@@ -2,7 +2,7 @@ import { ActionType, getType } from "typesafe-actions"
 import * as quiz from "./actions"
 import { Quiz } from "../../modelTypes"
 
-type QuizState = Quiz | null
+export type QuizState = Quiz | null
 
 export const initialState = null
 

@@ -26,9 +26,9 @@ interface IDefaultLoginMessageProps {
   fullQuizInfoShown?: boolean
 }
 
-const DefaultLoginMessage: React.FunctionComponent<
-  IDefaultLoginMessageProps
-> = ({ fullQuizInfoShown }) => {
+const DefaultLoginMessage: React.FunctionComponent<IDefaultLoginMessageProps> = ({
+  fullQuizInfoShown,
+}) => {
   const languageLabels = useTypedSelector(
     state => state.language.languageLabels,
   )
@@ -40,7 +40,10 @@ const DefaultLoginMessage: React.FunctionComponent<
   return (
     <>
       <MessageContainer fullQuizInfoShown={!!fullQuizInfoShown}>
-        <StyledTypography component="p" variant="subtitle1">
+        <StyledTypography
+          variant="subtitle1"
+          variantMapping={{ subtitle1: "p" }}
+        >
           {languageLabels
             ? languageLabels.general[labelPropertyName]
             : `Log in to ${fullQuizInfoShown ? "answer" : "view"} the quiz`}

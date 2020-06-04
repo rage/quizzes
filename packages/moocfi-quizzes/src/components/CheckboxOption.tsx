@@ -67,9 +67,9 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
       <VertCenteredGrid item xs>
         {title && (
           <MarkdownTextWithoutMargin
-            component="p"
             Component={Typography}
             variant="subtitle1"
+            variantMapping={{ subtitle1: "p" }}
           >
             {title}
           </MarkdownTextWithoutMargin>

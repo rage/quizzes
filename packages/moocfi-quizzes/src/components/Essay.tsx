@@ -144,7 +144,11 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
   return (
     <ItemContent providedStyles={themeProvider.essayItemContentStyles}>
       {itemTitle && (
-        <MarkdownText component="p" Component={Typography} variant="h6">
+        <MarkdownText
+          Component={Typography}
+          variant="h6"
+          variantMapping={{ h6: "p" }}
+        >
           {itemTitle}
         </MarkdownText>
       )}

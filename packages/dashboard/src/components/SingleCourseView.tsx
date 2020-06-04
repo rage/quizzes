@@ -2,11 +2,11 @@ import { Button, Card, Grid, Typography } from "@material-ui/core"
 import React from "react"
 import { connect } from "react-redux"
 import { Link } from "react-router-dom"
-import { firstWords, wordCount } from "../../../common/src/util"
 import { ICourse, IDashboardFilter, IQuiz } from "../interfaces"
 import { newQuiz } from "../store/edit/actions"
 import { setCourse } from "../store/filter/actions"
 import { IUserState } from "../store/user/reducer"
+import { firstWords, wordCount } from "../util"
 import CourseDuplicateButton from "./CourseDuplicateButton"
 import LanguageBar from "./GeneralTools/LanguageBar"
 import QuizCorrespondenceFileDownloader from "./QuizCorrespondenceFileDownloader"
@@ -16,7 +16,7 @@ interface ISingleCoursePropsFromParent {
 }
 
 interface IStatePropsFromStore {
-  answerCounts: Array<{ quizId: string; count: number }>
+  answerCounts: { quizId: string; count: number }[]
   courses: ICourse[]
   filter: IDashboardFilter
   quizzesOfCourse: any
@@ -123,13 +123,13 @@ class SingleCourseView extends React.Component<
     }
 
     return (
-      <Grid container={true} justify="center" alignItems="center" spacing={16}>
+      <Grid container={true} justify="center" alignItems="center" spacing={3}>
         <Grid item={true} xs={10}>
           <Grid
             container={true}
             justify="center"
             alignItems="stretch"
-            spacing={16}
+            spacing={3}
           >
             <Grid item={true} sm={3}>
               {this.props.user.administrator && (
@@ -143,7 +143,7 @@ class SingleCourseView extends React.Component<
             </Grid>
 
             <Grid item={true} xs={12} sm={6} style={{ alignSelf: "center" }}>
-              <Typography variant="title" style={{ textAlign: "center" }}>
+              <Typography variant="h6" style={{ textAlign: "center" }}>
                 {currentCourse.texts[0] &&
                   currentCourse.texts[0].title.toUpperCase()}
               </Typography>
@@ -179,7 +179,7 @@ class SingleCourseView extends React.Component<
             <Grid item={true} xs={12} style={{ backgroundColor: "#F8F8F8" }}>
               <Grid
                 container={true}
-                spacing={24}
+                spacing={5}
                 justify="center"
                 alignItems="center"
                 style={{ paddingLeft: ".5em", paddingRight: ".5em" }}
@@ -208,12 +208,12 @@ const PartComponent = ({ sections, partNumber, answerCounts }) => {
   return (
     <React.Fragment>
       <Grid item={true} xs="auto">
-        <Typography variant="title">Part {partNumber} </Typography>
+        <Typography variant="h6">Part {partNumber} </Typography>
       </Grid>
       <Grid item={true} xs={12}>
         <Grid
           container={true}
-          spacing={16}
+          spacing={3}
           justify="flex-start"
           style={{ backgroundColor: "white" }}
         >
@@ -360,7 +360,4 @@ const quizItemTypes = (quiz: IQuiz): string => {
   return `[${[...new Set(quiz.items.map(qi => qi.type))].sort().join(", ")}]`
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SingleCourseView)
+export default connect(mapStateToProps, mapDispatchToProps)(SingleCourseView)

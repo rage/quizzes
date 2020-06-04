@@ -1,27 +1,63 @@
 import { useSelector, TypedUseSelectorHook } from "react-redux"
 import { applyMiddleware, combineReducers, createStore } from "redux"
+import { StateType, ActionType, getType } from "typesafe-actions"
 import { composeWithDevTools } from "redux-devtools-extension/developmentOnly"
 import thunk from "redux-thunk"
 
-import { backendAddressReducer } from "./backendAddress/reducer"
+import {
+  backendAddressReducer,
+  initialState as backendAddressInitialState,
+} from "./backendAddress/reducer"
 import {
   customizationReducer,
   ICustomizationState,
+  initialState as customizationInitialState,
 } from "./customization/reducer"
-import { feedbackDisplayedReducer } from "./feedbackDisplayed/reducer"
-import { languageReducer, LanguageState } from "./language/reducer"
-import { loadingBarsReducer } from "./loadingBars/reducer"
-import { messageReducer, MessageState } from "./message/reducer"
-import { peerReviewsReducer, PeerReviewsState } from "./peerReviews/reducer"
-import { quizReducer } from "./quiz/reducer"
-import { quizAnswerReducer, QuizAnswerState } from "./quizAnswer/reducer"
-import { userReducer, UserState } from "./user/reducer"
+import {
+  feedbackDisplayedReducer,
+  initialState as feedbackDisplayedInitialState,
+} from "./feedbackDisplayed/reducer"
+import {
+  languageReducer,
+  LanguageState,
+  initialState as languageInitialState,
+} from "./language/reducer"
+import {
+  loadingBarsReducer,
+  initialState as loadingBarsInitialState,
+} from "./loadingBars/reducer"
+import {
+  messageReducer,
+  MessageState,
+  initialState as messageInitialState,
+} from "./message/reducer"
+import {
+  peerReviewsReducer,
+  PeerReviewsState,
+  initialState as peerReviewsInitialState,
+} from "./peerReviews/reducer"
+import {
+  quizReducer,
+  QuizState,
+  initialState as quizInitialState,
+} from "./quiz/reducer"
+import {
+  quizAnswerReducer,
+  QuizAnswerState,
+  initialState as quizAnswerInitialState,
+} from "./quizAnswer/reducer"
+import {
+  userReducer,
+  UserState,
+  initialState as userInitialState,
+} from "./user/reducer"
 import {
   receivedReviewsReducer,
   IReceivedReviewsState,
+  initialState as receivedReviewsInitialState,
 } from "./receivedReviews/reducer"
-import { Quiz } from "../modelTypes"
 
+import * as rootActions from "./actions"
 import * as backendAddressActions from "./backendAddress/actions"
 import * as customizationActions from "./customization/actions"
 import * as feedbackDisplayedActions from "./feedbackDisplayed/actions"
@@ -34,7 +70,32 @@ import * as userActions from "./user/actions"
 import * as PeerReviewsActions from "./peerReviews/actions"
 import * as receivedReviewsActions from "./receivedReviews/actions"
 
-const rootReducerImpl = combineReducers({
+const initialState: State = {
+  backendAddress: backendAddressInitialState,
+  customization: customizationInitialState,
+  feedbackDisplayed: feedbackDisplayedInitialState,
+  language: languageInitialState,
+  loadingBars: loadingBarsInitialState,
+  peerReviews: peerReviewsInitialState,
+  message: messageInitialState,
+  quiz: quizInitialState,
+  quizAnswer: quizAnswerInitialState,
+  user: userInitialState,
+  receivedReviews: receivedReviewsInitialState,
+}
+
+const reducer = (
+  state: State = initialState,
+  action: ActionType<typeof rootActions>,
+) => {
+  if (getType(rootActions.clearActionCreator)) {
+    return initialState
+  }
+  return state
+}
+
+const rootReducer = combineReducers({
+  root: reducer,
   backendAddress: backendAddressReducer,
   customization: customizationReducer,
   feedbackDisplayed: feedbackDisplayedReducer,
@@ -48,7 +109,7 @@ const rootReducerImpl = combineReducers({
   user: userReducer,
 })
 
-const rootReducer: typeof rootReducerImpl = (state, action) => {
+/*const rootReducerD: typeof rootReducerImpl = (state, action) => {
   if (action.type === "CLEAR") {
     // @ts-ignore
     const bestState: State = undefined
@@ -56,9 +117,10 @@ const rootReducer: typeof rootReducerImpl = (state, action) => {
     return bestState
   }
   return rootReducerImpl(state, action)
-}
+}*/
 
 export const rootAction = {
+  rootAction: rootActions,
   backendAction: backendAddressActions,
   customization: customizationActions,
   feedbackDisplayed: feedbackDisplayedActions,
@@ -80,13 +142,11 @@ export interface State {
   loadingBars: boolean
   peerReviews: PeerReviewsState
   message: MessageState
-  quiz: Quiz
+  quiz: QuizState
   quizAnswer: QuizAnswerState
   user: UserState
   receivedReviews: IReceivedReviewsState
 }
-
-import { StateType, ActionType } from "typesafe-actions"
 
 export type Store = StateType<typeof createStoreCreator>
 export type RootState = StateType<typeof rootReducer>

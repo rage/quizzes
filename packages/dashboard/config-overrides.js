@@ -18,7 +18,7 @@ module.exports = function rewire(config, env) {
 
   delete tsLoader.include
 
-  tsLoader.use.options = {
+  /*tsLoader.use.options = {
     getCustomTransformers: () => ({
       before: [
         tsImportPluginFactory([
@@ -29,14 +29,14 @@ module.exports = function rewire(config, env) {
         ]),
       ],
     }),
-  }
+  }*/
 
   const oneOf = config.module.rules.find(rule => rule.oneOf).oneOf
   oneOf.unshift(tsLoader)
 
-  config.resolve.alias = Object.assign({}, config.resolve.alias, {
+  /*config.resolve.alias = Object.assign({}, config.resolve.alias, {
     "@quizzes/common": path.resolve("../common/src"),
-  })
+  })*/
 
   config.resolve.plugins = []
 

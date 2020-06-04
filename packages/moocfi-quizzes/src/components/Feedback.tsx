@@ -35,7 +35,11 @@ const Feedback: React.FunctionComponent<FeedbackProps> = ({ item }) => {
 
   return (
     <div style={{ marginBottom: 10 }}>
-      <MarkdownText Component={Typography} component="p" variant="subtitle1">
+      <MarkdownText
+        Component={Typography}
+        variant="subtitle1"
+        variantMapping={{ subtitle1: "p" }}
+      >
         {itemTitle}
       </MarkdownText>
       <MarkdownText Component={Typography}>{itemBody}</MarkdownText>

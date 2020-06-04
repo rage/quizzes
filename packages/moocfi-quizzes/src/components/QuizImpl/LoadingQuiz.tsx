@@ -42,10 +42,10 @@ const LoadingQuiz: React.FunctionComponent<ILoadingQuizProps> = ({
             height={200}
             width={400}
             speed={2}
-            primaryColor="#000000"
-            primaryOpacity={0.12}
-            secondaryColor="#000000"
-            secondaryOpacity={0.26}
+            backgroundColor="#000000"
+            backgroundOpacity={0.12}
+            foregroundColor="#000000"
+            foregroundOpacity={0.26}
             style={{ height: "400px" }}
           >
             <rect x="0" y="15" rx="4" ry="4" width="360" height="6" />
