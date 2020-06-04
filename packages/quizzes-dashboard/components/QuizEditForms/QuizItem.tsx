@@ -7,7 +7,7 @@ import MultipleChoiceContent from "./MultipleChoiceContent"
 import CheckBoxContent from "./CheckBoxContent"
 import OpenContent from "./OpenContent"
 import ScaleContent from "./ScaleContent"
-import { editedQuizTitle } from "../../store/edit/actions"
+import { editedQuizItemTitle } from "../../store/edit/actions"
 import { connect } from "react-redux"
 import DebugDialog from "../DebugDialog"
 
@@ -126,7 +126,7 @@ const contentBasedOnType = (type: string, item: Item) => {
 const mapDispatchToProps = (dispatch: any) => {
   return {
     editItemTitle: (newTitle: string, itemId: string) =>
-      dispatch(editedQuizTitle(newTitle, itemId)),
+      dispatch(editedQuizItemTitle(newTitle, itemId)),
   }
 }
 

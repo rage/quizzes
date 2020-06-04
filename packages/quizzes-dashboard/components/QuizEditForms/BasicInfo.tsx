@@ -11,7 +11,7 @@ import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faInfoCircle, faPen } from "@fortawesome/free-solid-svg-icons"
 import { connect } from "react-redux"
-import { toggleEditable } from "../../store/edit/actions"
+import { toggleEditable, editedQuizTitle } from "../../store/edit/actions"
 import { EditorState } from "../../store/edit/reducers"
 import DebugDialog from "../DebugDialog"
 
@@ -80,6 +80,7 @@ const BasicInformation = ({
   pointsGrantingPolicy,
   deadline,
   texts,
+  editedQuizTitle,
 }: any) => {
   return (
     <>
@@ -103,9 +104,9 @@ const BasicInformation = ({
         <InfoContainer>
           <Typography>Quiz title:</Typography>
           <StyledTextField
-            variant="outlined"
             multiline
             defaultValue={texts[0].title}
+            onChange={event => editedQuizTitle(event.target.value)}
           />
         </InfoContainer>
         <InfoContainer>
@@ -144,9 +145,6 @@ const BasicInformation = ({
           <TextField disabled={true} defaultValue={deadline}></TextField>
         </InfoContainer>
         <InfoContainer>
-          <Typography>Language: {texts[0].languageId}</Typography>
-        </InfoContainer>
-        <InfoContainer>
           <DebugDialog editable={true} />
         </InfoContainer>
       </InfoCard>
@@ -169,4 +167,10 @@ const mapStateToProps = (state: EditorState) => {
   }
 }
 
-export default connect(mapStateToProps, null)(BasicInformation)
+const mapDispatchToProps = (dispatch: any) => {
+  return {
+    editedQuizTitle: (newTitle: string) => dispatch(editedQuizTitle(newTitle)),
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(BasicInformation)

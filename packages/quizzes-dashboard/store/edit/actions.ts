@@ -9,5 +9,8 @@ export const initializedEditor = (quiz: EditableQuiz) =>
 export const editedQuizBody = (newBody: string, itemId: string) =>
   action("EDITED_QUIZ_ITEM_BODY", { body: newBody, id: itemId })
 
-export const editedQuizTitle = (newTitle: string, itemId: string) =>
+export const editedQuizItemTitle = (newTitle: string, itemId: string) =>
   action("EDITED_QUIZ_ITEM_TITLE", { title: newTitle, id: itemId })
+
+export const editedQuizTitle = (newTitle: string) =>
+  action("EDITED_QUIZ_TITLE", newTitle)

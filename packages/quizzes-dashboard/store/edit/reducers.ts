@@ -80,6 +80,12 @@ const editReducer = (
       ]
       return newState
     }
+    case "EDITED_QUIZ_TITLE": {
+      console.log(action)
+      let newState = state
+      newState.texts[0].title = action.payload
+      return newState
+    }
     default: {
       return initialState
     }
