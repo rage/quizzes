@@ -13,7 +13,7 @@ class QuizTranslation extends Model {
         from: "quiz_translation.quiz_id",
         to: "quiz.id",
       },
-    }
+    },
   }
 }
 

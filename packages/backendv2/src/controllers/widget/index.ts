@@ -11,8 +11,9 @@ const widget = new Router<CustomState, CustomContext>({
   .get("/:quizId", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
     ctx.body = await Quiz.query()
-      .withGraphJoined("items.[options]")
       .withGraphJoined("texts")
+      .withGraphJoined("items.[texts, options.[texts]]")
+      .withGraphJoined("peerReviews.[texts, questions.[texts]]")
       .where("quiz.id", quizId)
   })
 

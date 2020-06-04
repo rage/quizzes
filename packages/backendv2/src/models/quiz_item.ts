@@ -1,6 +1,7 @@
 import { Model } from "objection"
 import Quiz from "./quiz"
 import QuizOption from "./quiz_option"
+import QuizItemTranslation from "./quiz_item_translation"
 
 class QuizItem extends Model {
   static get tableName() {
@@ -21,6 +22,14 @@ class QuizItem extends Model {
       join: {
         from: "quiz_item.id",
         to: "quiz_option.quiz_item_id",
+      },
+    },
+    texts: {
+      relation: Model.HasManyRelation,
+      modelClass: QuizItemTranslation,
+      join: {
+        from: "quiz_item.id",
+        to: "quiz_item_translation.quiz_item_id",
       },
     },
   }
