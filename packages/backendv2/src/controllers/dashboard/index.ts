@@ -7,13 +7,7 @@ const dashboard = new Router<CustomState, CustomContext>({
   prefix: "/dashboard",
 }).get("/:quizId", accessControl({ administator: true }), async ctx => {
   const quizId = ctx.params.quizId
-  try {
-    ctx.body = await Quiz.getQuizById(quizId)
-  } catch (error) {
-    error.status = 404
-    error.message = `quiz not found: ${quizId}`
-    throw error
-  }
+  ctx.body = await Quiz.getQuizById(quizId)
 })
 
 export default dashboard

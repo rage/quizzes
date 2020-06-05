@@ -1,5 +1,6 @@
 import { CustomContext } from "../types"
 import { getCurrentUserDetails } from "../services/tmc"
+import { UnauthorizedError } from "../util/error"
 
 interface AccessControlOptions {
   administator?: boolean
@@ -22,13 +23,9 @@ const accessControl = (options?: AccessControlOptions) => {
       if (options?.administator && !user.administrator) {
         throw new Error()
       }
+      return next()
     } catch (error) {
-      error.status = 401
-      error.message = "unauthorized"
-      throw error
-    }
-    if (ctx.state.user) {
-      await next()
+      throw new UnauthorizedError("unauthorized")
     }
   }
   return accessControl

@@ -10,24 +10,12 @@ const widget = new Router<CustomState, CustomContext>({
 
   .get("/:quizId", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    try {
-      ctx.body = await Quiz.getQuizById(quizId)
-    } catch (error) {
-      error.status = 404
-      error.message = `quiz not found: ${quizId}`
-      throw error
-    }
+    ctx.body = await Quiz.getQuizById(quizId)
   })
 
   .get("/:quizId/preview", accessControl({ unrestricted: true }), async ctx => {
     const quizId = ctx.params.quizId
-    try {
-      ctx.body = await Quiz.getQuizPreviewById(quizId)
-    } catch (error) {
-      error.status = 404
-      error.message = "quiz not found"
-      throw error
-    }
+    ctx.body = await Quiz.getQuizPreviewById(quizId)
   })
 
   .post("/answer", accessControl(), async ctx => {

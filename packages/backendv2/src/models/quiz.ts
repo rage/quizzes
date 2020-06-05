@@ -1,8 +1,9 @@
-import { Model, QueryBuilder } from "objection"
+import { Model } from "objection"
 import QuizItem from "./quiz_item"
 import QuizTranslation from "./quiz_translation"
 import PeerReviewCollection from "./peer_review_collection"
 import Course from "./course"
+import { NotFoundError } from "../util/error"
 
 export class Quiz extends Model {
   static get tableName() {
@@ -61,7 +62,7 @@ export class Quiz extends Model {
         .where("quiz.id", quizId)
     )[0]
     if (!quiz) {
-      throw new Error()
+      throw new NotFoundError(`quiz not found: ${quizId}`)
     }
     return quiz
   }
@@ -74,7 +75,7 @@ export class Quiz extends Model {
         .where("quiz.id", quizId)
     )[0]
     if (!quiz) {
-      throw new Error()
+      throw new NotFoundError(`quiz not found: ${quizId}`)
     }
     return quiz
   }
