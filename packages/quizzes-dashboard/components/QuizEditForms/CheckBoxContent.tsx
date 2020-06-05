@@ -1,12 +1,12 @@
 import React from "react"
 import BasicInformation from "./BasicInfo"
-import { EditableQuiz } from "../../types/EditQuiz"
+import { EditableQuiz, Item } from "../../types/EditQuiz"
 
 interface contentBoxProps {
-  itemId: string
+  item: Item
 }
 
-const CheckBoxContent = ({ itemId }: contentBoxProps) => {
+const CheckBoxContent = ({ item }: contentBoxProps) => {
   return (
     <>
       <div>
