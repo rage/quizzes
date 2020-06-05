@@ -21,3 +21,14 @@ export const editedQuizzesPointsToGain = (pointsToGain: number) =>
 
 export const editedQuizzesPointsGrantingPolicy = (policy: string) =>
   action("EDITED_QUIZZES_POINTS_GRANTING_POLICY", policy)
+
+export const editedOptionTitle = (
+  newTitle: string,
+  itemId: string,
+  optionId: string,
+) =>
+  action("EDITED_OPTION_TITLE", {
+    title: newTitle,
+    itemId: itemId,
+    optionId: optionId,
+  })

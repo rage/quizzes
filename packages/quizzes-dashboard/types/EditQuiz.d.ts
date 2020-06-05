@@ -34,7 +34,7 @@ export interface Item {
   createdAt: Date
   updatedAt: Date
   texts: ItemText[]
-  options: any[]
+  options: Option[]
 }
 
 export interface ItemText {
@@ -56,4 +56,29 @@ export interface QuizText {
   body: string
   createdAt: Date
   updatedAt: Date
+}
+
+export interface Option {
+  id: string
+  quizItemId: string
+  order: number
+  correct: boolean
+  createdAt: Date
+  updatedAt: Date
+  texts: OptionText[]
+}
+
+export interface OptionText {
+  quizOptionId: string
+  languageId: LanguageID
+  title: string
+  body: null
+  successMessage: null | string
+  failureMessage: null | string
+  createdAt: Date
+  updatedAt: Date
+}
+
+export enum LanguageID {
+  FiFI = "fi_FI",
 }
