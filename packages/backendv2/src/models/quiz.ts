@@ -1,4 +1,4 @@
-import { Model } from "objection"
+import { Model, QueryBuilder } from "objection"
 import QuizItem from "./quiz_item"
 import QuizTranslation from "./quiz_translation"
 import PeerReviewCollection from "./peer_review_collection"
@@ -43,6 +43,14 @@ export class Quiz extends Model {
     },
   }
 
+  static get modifiers() {
+    return {
+      previewSelect: (query: any) => {
+        query.select("texts")
+      },
+    }
+  }
+
   static async getQuizById(quizId: string) {
     const quiz = (
       await this.query()
@@ -50,6 +58,19 @@ export class Quiz extends Model {
         .withGraphJoined("items.[texts, options.[texts]]")
         .withGraphJoined("peerReviews.[texts, questions.[texts]]")
         .withGraphJoined("course.[texts]")
+        .where("quiz.id", quizId)
+    )[0]
+    if (!quiz) {
+      throw new Error()
+    }
+    return quiz
+  }
+
+  static async getQuizPreviewById(quizId: string) {
+    const quiz = (
+      await this.query()
+        .modify("previewSelect")
+        .withGraphJoined("texts(previewSelect)")
         .where("quiz.id", quizId)
     )[0]
     if (!quiz) {

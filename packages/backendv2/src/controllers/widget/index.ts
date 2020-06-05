@@ -22,9 +22,7 @@ const widget = new Router<CustomState, CustomContext>({
   .get("/:quizId/preview", accessControl({ unrestricted: true }), async ctx => {
     const quizId = ctx.params.quizId
     try {
-      ctx.body = await Quiz.query()
-        .withGraphJoined("items.[options]")
-        .where("quiz.id", quizId)
+      ctx.body = await Quiz.getQuizPreviewById(quizId)
     } catch (error) {
       error.status = 404
       error.message = "quiz not found"

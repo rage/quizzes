@@ -5,6 +5,9 @@ class QuizTranslation extends Model {
   static get tableName() {
     return "quiz_translation"
   }
+  static get idColumn() {
+    return ["quiz_id", "language_id"]
+  }
   static relationMappings = {
     quiz: {
       relation: Model.BelongsToOneRelation,
@@ -14,6 +17,13 @@ class QuizTranslation extends Model {
         to: "quiz.id",
       },
     },
+  }
+  static get modifiers() {
+    return {
+      previewSelect: (query: any) => {
+        query.select("title", "body")
+      },
+    }
   }
 }
 
