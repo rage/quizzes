@@ -7,6 +7,7 @@ import api from "./src/controllers/api"
 import logger, { GlobalLogger } from "./src/middleware/logger"
 import errorHandler from "./src/middleware/error_handler"
 import { CustomContext, CustomState } from "./src/types"
+
 Model.knex(knex)
 Model.columnNameMappers = snakeCaseMappers()
 
@@ -22,6 +23,6 @@ app.use(api.routes())
 
 http
   .createServer(app.callback())
-  .listen(3000, () => GlobalLogger.info("server running on port 3000"))
+  .listen(6000, () => GlobalLogger.info("server running on port 6000"))
 
 export type AppContext = typeof app.context
