@@ -55,39 +55,30 @@ const StyledTextField = styled(TextField)`
   margin-top: 0.25rem !important;
 `
 interface contentBoxProps {
-  itemId: string
-  items: Item[]
+  item: Item
   editQuizBody: (arg1: string, arg2: string) => any
 }
 
-const EssayContent = ({ itemId, items, editQuizBody }: contentBoxProps) => {
-  const wantedItem = items.filter(item => item.id === itemId)
-  console.log(wantedItem)
+const EssayContent = ({ item, editQuizBody }: contentBoxProps) => {
   return (
     <>
       <QuizContent>
         <TextField
           id="quiz-body"
-          label="Body"
+          label="Quiz body"
           variant="outlined"
           multiline
           fullWidth
           rows="2"
           rowsMax="500"
-          defaultValue={wantedItem[0].texts[0].body}
-          onChange={event => editQuizBody(event.target.value, itemId)}
+          defaultValue={item.texts[0].body}
+          onChange={event => editQuizBody(event.target.value, item.id)}
         />
         <br />
         <br />
       </QuizContent>
     </>
   )
-}
-
-const mapStateToProps = (state: EditorState) => {
-  return {
-    items: state.items,
-  }
 }
 
 const mapDispatchToProps = (dispatch: any) => {
@@ -97,4 +88,4 @@ const mapDispatchToProps = (dispatch: any) => {
   }
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(EssayContent)
+export default connect(null, mapDispatchToProps)(EssayContent)

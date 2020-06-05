@@ -1,10 +1,11 @@
 import React from "react"
+import { Item } from "../../types/EditQuiz"
 
 interface contentBoxProps {
-  itemId: string
+  item: Item
 }
 
-const MultipleChoiceContent = ({ itemId }: contentBoxProps) => {
+const MultipleChoiceContent = ({ item }: contentBoxProps) => {
   return <h1>Multiple choice content</h1>
 }
 
