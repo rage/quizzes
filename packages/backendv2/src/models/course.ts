@@ -24,6 +24,9 @@ class Course extends Model {
       },
     },
   }
+  static async getAll() {
+    return await this.query().withGraphJoined("texts")
+  }
 }
 
 export default Course
