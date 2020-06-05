@@ -1,11 +1,8 @@
 import Router from "koa-router"
 import { knex } from "../../config/knex"
 import { CustomContext, CustomState } from "../../types"
-import Quiz from "../../models/quiz"
-import QuizAnswer from "../../models/quiz_answer"
-import QuizItemAnswer from "../../models/quiz_item_answer"
+import { Quiz, QuizAnswer, User } from "../../models/"
 import accessControl from "../../middleware/access_control"
-import User from "../../models/user"
 
 const widget = new Router<CustomState, CustomContext>({
   prefix: "/widget",
@@ -13,16 +10,12 @@ const widget = new Router<CustomState, CustomContext>({
 
   .get("/:quizId", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    ctx.body = await Quiz.query()
-      .withGraphJoined("items.[options]")
-      .where("quiz.id", quizId)
+    ctx.body = await Quiz.getQuizById(quizId)
   })
 
   .get("/:quizId/preview", accessControl({ unrestricted: true }), async ctx => {
     const quizId = ctx.params.quizId
-    ctx.body = await Quiz.query()
-      .withGraphJoined("items.[options]")
-      .where("quiz.id", quizId)
+    ctx.body = await Quiz.getQuizPreviewById(quizId)
   })
 
   .post("/answer", accessControl(), async ctx => {
