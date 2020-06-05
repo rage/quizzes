@@ -1,7 +1,10 @@
-/*import { Model } from "objection"
+import { Model } from "objection"
 
 class BaseModel extends Model {
+  public updatedAt!: string
   $beforeUpdate() {
-    this.updated_at = new Date().toISOString()
+    this.updatedAt = new Date().toISOString()
   }
-}*/
+}
+
+export default BaseModel

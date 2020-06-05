@@ -1,4 +1,4 @@
-import { Model } from "objection"
+import Model from "./base_model"
 import QuizAnswer from "./quiz_answer"
 
 class User extends Model {

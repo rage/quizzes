@@ -1,4 +1,4 @@
-import { Model } from "objection"
+import Model from "./base_model"
 import PeerReviewQuestion from "./peer_review_question"
 
 class PeerReviewQuestionTranslation extends Model {
