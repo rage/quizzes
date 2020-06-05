@@ -5,6 +5,9 @@ class CourseTranslation extends Model {
   static get tableName() {
     return "course_translation"
   }
+  static get idColumn() {
+    return ["course_id", "language_id"]
+  }
   static relationMappings = {
     course: {
       relation: Model.HasOneRelation,

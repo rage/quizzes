@@ -5,6 +5,9 @@ class QuizOptionTranslation extends Model {
   static get tableName() {
     return "quiz_option_translation"
   }
+  static get idColumn() {
+    return ["quiz_option_id", "language_id"]
+  }
   static relationMappings = {
     quizOption: {
       relation: Model.BelongsToOneRelation,
