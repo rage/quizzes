@@ -2,6 +2,8 @@
 
 [![CircleCI](https://circleci.com/gh/rage/quizzes/tree/master.svg?style=svg)](https://circleci.com/gh/rage/quizzes/tree/master)
 
+You can set up you shell to automatically switch node version between folders. [Instructions](https://github.com/nvm-sh/nvm#deeper-shell-integration).
+
 To run locally
 
 At the project root
