@@ -32,6 +32,7 @@ To start the dashboard:
 
 ```bash
 cd packages/dashboard
+nvm use
 npm ci
 npm start
 ```
@@ -39,6 +40,7 @@ npm start
 To load widget in playground:
 ```bash
 cd packages/moocfi-quizzes
+nvm use
 npm ci
 cd example
 npm ci
