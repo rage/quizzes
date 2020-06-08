@@ -100,8 +100,8 @@ const editReducer = (
       return newState
     }
     case "EDITED_OPTION_TITLE": {
-      let newSate = state
-      let wantedItem = newSate.items.find(
+      let newState = state
+      let wantedItem = newState.items.find(
         item => item.id == action.payload.itemId,
       )
       if (!wantedItem) {
@@ -119,11 +119,39 @@ const editReducer = (
       )
       wantedItem.options = [...wantedItem.options, wantedOption]
 
-      newSate.items = newSate.items.filter(
+      newState.items = newState.items.filter(
         item => item.id !== action.payload.itemId,
       )
-      newSate.items = [...newSate.items, wantedItem]
-      return newSate
+      newState.items = [...newState.items, wantedItem]
+      return newState
+    }
+    case "EDITED_OPTION_CORRECTNES": {
+      let newState = state
+      let wantedItem = newState.items.find(
+        item => item.id === action.payload.itemId,
+      )
+      if (!wantedItem) {
+        return state
+      }
+      let wantedOption = wantedItem.options.find(
+        option => option.id === action.payload.optionId,
+      )
+      if (!wantedOption) {
+        return state
+      }
+      wantedOption.correct = !wantedOption.correct
+      wantedItem.options = wantedItem.options.filter(
+        option => option.id !== action.payload.optionId,
+      )
+      wantedItem.options = [...wantedItem.options, wantedOption]
+      wantedItem.options.sort((a, b) => b.order - a.order)
+
+      newState.items = newState.items.filter(
+        item => item.id !== action.payload.itemId,
+      )
+      newState.items = [...newState.items, wantedItem]
+
+      return { ...newState, items: newState.items }
     }
     default: {
       return initialState

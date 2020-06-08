@@ -1,4 +1,4 @@
-import { action } from "typesafe-actions"
+import { action, createAction } from "typesafe-actions"
 import { EditableQuiz } from "../../types/EditQuiz"
 
 export const initializedEditor = (quiz: EditableQuiz) =>
@@ -32,3 +32,6 @@ export const editedOptionTitle = (
     itemId: itemId,
     optionId: optionId,
   })
+
+export const editedOptionCorrectnes = (itemId: string, optionId: string) =>
+  action("EDITED_OPTION_CORRECTNES", { itemId: itemId, optionId: optionId })
