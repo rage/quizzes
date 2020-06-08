@@ -1,4 +1,4 @@
-import { Model } from "objection"
+import Model from "./base_model"
 import QuizItem from "./quiz_item"
 import QuizTranslation from "./quiz_translation"
 import PeerReviewCollection from "./peer_review_collection"
@@ -50,6 +50,10 @@ export class Quiz extends Model {
         query.select("texts")
       },
     }
+  }
+
+  static async saveQuiz(data: any) {
+    return await Quiz.query().upsertGraphAndFetch(data)
   }
 
   static async getQuizById(quizId: string) {

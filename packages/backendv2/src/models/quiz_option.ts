@@ -1,4 +1,4 @@
-import { Model } from "objection"
+import Model from "./base_model"
 import QuizItem from "./quiz_item"
 import QuizOptionTranslation from "./quiz_option_translation"
 

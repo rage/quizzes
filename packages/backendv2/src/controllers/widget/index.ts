@@ -8,15 +8,19 @@ const widget = new Router<CustomState, CustomContext>({
   prefix: "/widget",
 })
 
-  .get("/:quizId", accessControl(), async ctx => {
+  .get("/quizzes/:quizId", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
     ctx.body = await Quiz.getQuizById(quizId)
   })
 
-  .get("/:quizId/preview", accessControl({ unrestricted: true }), async ctx => {
-    const quizId = ctx.params.quizId
-    ctx.body = await Quiz.getQuizPreviewById(quizId)
-  })
+  .get(
+    "/quizzes/:quizId/preview",
+    accessControl({ unrestricted: true }),
+    async ctx => {
+      const quizId = ctx.params.quizId
+      ctx.body = await Quiz.getQuizPreviewById(quizId)
+    },
+  )
 
   .post("/answer", accessControl(), async ctx => {
     const user = ctx.state.user

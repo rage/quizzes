@@ -1,4 +1,4 @@
-import { Model } from "objection"
+import Model from "./base_model"
 import PeerReviewCollection from "./peer_review_collection"
 import PeerReviewQuestionTranslation from "./peer_review_question_translation"
 
