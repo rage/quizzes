@@ -146,12 +146,14 @@ export type LanguageLabels = {
 
 export const languageOptions: LanguageLabels = {
   en_US: englishLabels,
+  en_IE: englishLabels,
   et_EE: estonianLabels,
   fi_FI: finnishLabels,
   de_DE: germanLabels,
   sv_SE: swedishLabels,
   nb_NO: norwegianLabels,
   fr_FR: frenchLabels,
+  fr_BE: frenchLabels,
   it_IT: italianLabels,
   lv_LV: latvianLabels,
   hu_HU: hungarianLabels,
