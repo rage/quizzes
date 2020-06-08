@@ -156,7 +156,7 @@ export const languageOptions: LanguageLabels = {
   lv_LV: latvianLabels,
   hu_HU: hungarianLabels,
   nl_NL: dutchLabels,
-  da_DA: danishLabels,
+  da_DK: danishLabels,
   lt_LT: lithuanianLabels,
   hr_HR: croatianLabels,
 }

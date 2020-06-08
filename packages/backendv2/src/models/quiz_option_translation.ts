@@ -1,9 +1,12 @@
-import { Model } from "objection"
+import Model from "./base_model"
 import QuizOption from "./quiz_option"
 
 class QuizOptionTranslation extends Model {
   static get tableName() {
     return "quiz_option_translation"
+  }
+  static get idColumn() {
+    return ["quiz_option_id", "language_id"]
   }
   static relationMappings = {
     quizOption: {
