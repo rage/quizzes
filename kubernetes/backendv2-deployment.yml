@@ -33,6 +33,8 @@ spec:
         - name: backendv2-http
           containerPort: 6000
         env:
+          - name: BASE_PATH
+            value: "/v2"
           - name: REDIS_HOST
             value: "quizzes-backend-redis-master.default.svc.cluster.local"
           - name: REDIS_PORT
