@@ -83,6 +83,15 @@ export class Quiz extends Model {
     }
     return quiz
   }
+
+  static async getQuizzesByCourseId(courseId: string) {
+    return await this.query()
+      .withGraphJoined("texts")
+      .withGraphJoined("items.[texts, options.[texts]]")
+      .withGraphJoined("peerReviews.[texts, questions.[texts]]")
+      .withGraphJoined("course.[texts]")
+      .where("quiz.course_id", courseId)
+  }
 }
 
 export default Quiz

@@ -65,7 +65,6 @@ const editReducer = (
       return newState
     }
     case "EDITED_QUIZ_ITEM_TITLE": {
-      console.log(action)
       let newState = state
       let editedItem = newState.items.find(
         item => item.id === action.payload.id,
@@ -81,7 +80,6 @@ const editReducer = (
       return newState
     }
     case "EDITED_QUIZ_TITLE": {
-      console.log(action)
       let newState = state
       newState.texts[0].title = action.payload
       return newState
@@ -97,10 +95,63 @@ const editReducer = (
       return newState
     }
     case "EDITED_QUIZZES_POINTS_GRANTING_POLICY": {
-      console.log(action)
       let newState = state
       newState.grantPointsPolicy = action.payload
       return newState
+    }
+    case "EDITED_OPTION_TITLE": {
+      let newState = state
+      let wantedItem = newState.items.find(
+        item => item.id == action.payload.itemId,
+      )
+      if (!wantedItem) {
+        return state
+      }
+      let wantedOption = wantedItem.options.find(
+        option => option.id == action.payload.optionId,
+      )
+      if (!wantedOption) {
+        return state
+      }
+      wantedOption.texts[0].title = action.payload.title
+      wantedItem.options = wantedItem.options.filter(
+        option => option.id !== action.payload.optionId,
+      )
+      wantedItem.options = [...wantedItem.options, wantedOption]
+
+      newState.items = newState.items.filter(
+        item => item.id !== action.payload.itemId,
+      )
+      newState.items = [...newState.items, wantedItem]
+      return newState
+    }
+    case "EDITED_OPTION_CORRECTNES": {
+      let newState = state
+      let wantedItem = newState.items.find(
+        item => item.id === action.payload.itemId,
+      )
+      if (!wantedItem) {
+        return state
+      }
+      let wantedOption = wantedItem.options.find(
+        option => option.id === action.payload.optionId,
+      )
+      if (!wantedOption) {
+        return state
+      }
+      wantedOption.correct = !wantedOption.correct
+      wantedItem.options = wantedItem.options.filter(
+        option => option.id !== action.payload.optionId,
+      )
+      wantedItem.options = [...wantedItem.options, wantedOption]
+      wantedItem.options.sort((a, b) => b.order - a.order)
+
+      newState.items = newState.items.filter(
+        item => item.id !== action.payload.itemId,
+      )
+      newState.items = [...newState.items, wantedItem]
+
+      return { ...newState, items: newState.items }
     }
     default: {
       return initialState

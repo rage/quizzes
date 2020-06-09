@@ -10,6 +10,7 @@ import ScaleContent from "./ScaleContent"
 import { editedQuizItemTitle } from "../../store/edit/actions"
 import { connect } from "react-redux"
 import DebugDialog from "../DebugDialog"
+import { EditorState } from "../../store/edit/reducers"
 
 const QuizCard = styled(Card)`
   box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 40px -12px !important;
@@ -81,12 +82,20 @@ const QuizItem = ({ item, editItemTitle }: QuizItemProps) => {
         </QuizHeader>
         <QuizHeader>
           <TitleContainer>
-            <Typography variant="h5">Quiz title:</Typography>
+            <Typography variant="h5">Quiz Title:</Typography>
             <StyledTextField
-              id={item.id}
               variant="outlined"
               defaultValue={item.texts[0].title}
               onChange={event => editItemTitle(event.target.value, item.id)}
+            />
+          </TitleContainer>
+        </QuizHeader>
+        <QuizHeader>
+          <TitleContainer>
+            <Typography variant="h5">Quiz Body:</Typography>
+            <StyledTextField
+              variant="outlined"
+              defaultValue={item.texts[0].body}
             />
           </TitleContainer>
         </QuizHeader>
@@ -130,4 +139,10 @@ const mapDispatchToProps = (dispatch: any) => {
   }
 }
 
-export default connect(null, mapDispatchToProps)(QuizItem)
+const mapStateToProps = (state: EditorState) => {
+  return {
+    items: state.items,
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(QuizItem)

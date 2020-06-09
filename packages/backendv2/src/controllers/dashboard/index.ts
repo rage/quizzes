@@ -15,6 +15,10 @@ const dashboard = new Router<CustomState, CustomContext>({
     const quizId = ctx.params.quizId
     ctx.body = await Quiz.getQuizById(quizId)
   })
+  .get("/courses/:courseId/quizzes", admin, async ctx => {
+    const courseId = ctx.params.courseId
+    ctx.body = await Quiz.getQuizzesByCourseId(courseId)
+  })
   .get("/courses", admin, async ctx => {
     ctx.body = await Course.getAll()
   })
