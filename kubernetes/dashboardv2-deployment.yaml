@@ -26,3 +26,6 @@ spec:
         ports:
         - name: dv2-http
           containerPort: 5000
+        env:
+          - name: BASE_PATH
+            value: "/v2"
