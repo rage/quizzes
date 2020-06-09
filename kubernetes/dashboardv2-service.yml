@@ -8,6 +8,6 @@ spec:
   type: NodePort
   ports:
   - port: 80
-    targetPort: dashboardv2-http
+    targetPort: dv2-http
   selector:
     app: quizzes-dashboardv2

@@ -16,7 +16,8 @@ fi
 
 export DASHBOARD_IMAGE="eu.gcr.io/moocfi/quizzes-dashboard:build-$REV"
 export BACKEND_IMAGE="eu.gcr.io/moocfi/quizzes-backend:build-$REV"
-
+export DASHBOARDV2_IMAGE="eu.gcr.io/moocfi/quizzes-dashboardv2:build-$REV"
+export BACKENDV2_IMAGE="eu.gcr.io/moocfi/quizzes-backendv2:build-$REV"
 
 echo "Building new Kubernetes configs"
 mkdir -p "$CURRENT_DIR/../updated-kubernetes-configs"
