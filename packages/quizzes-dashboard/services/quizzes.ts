@@ -25,17 +25,9 @@ export const fetchCourses = async (): Promise<Course[]> => {
 export const fetchCourseQuizzes = async (
   courseId: string,
 ): Promise<CourseListQuiz[]> => {
-  return (
-    await apiV1.get(
-      `/quizzes/?courseId=${courseId}&course=true&items=true&options=true&peerreviews=true&stripped=false`,
-    )
-  ).data
+  return (await apiV2.get(`/courses/${courseId}/quizzes`)).data
 }
 
 export const fetchQuiz = async (id: string): Promise<EditableQuiz> => {
-  return (
-    await apiV2.get(
-      `/quizzes/${id}?course=true&items=true&options=true&peerreviews=true&stripped=false`,
-    )
-  ).data
+  return (await apiV2.get(`/quizzes/${id}`)).data
 }

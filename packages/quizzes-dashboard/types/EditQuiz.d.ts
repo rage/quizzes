@@ -41,10 +41,10 @@ export interface ItemText {
   quizItemId: string
   languageId: string
   title: string
-  body: null
-  minLabel: null
-  maxLabel: null
-  sharedOptionFeedbackMessage: null
+  body: string | null
+  minLabel: string | null
+  maxLabel: string | null
+  sharedOptionFeedbackMessage: string | null
   createdAt: Date
   updatedAt: Date
 }

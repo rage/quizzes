@@ -153,6 +153,52 @@ const editReducer = (
 
       return { ...newState, items: newState.items }
     }
+    case "EDITED_SCALE_VALUE": {
+      console.log(action)
+      let newState = state
+      let wantedItem = newState.items.find(
+        item => item.id === action.payload.itemId,
+      )
+      if (!wantedItem) {
+        return state
+      }
+
+      if (action.payload.max) {
+        wantedItem.maxValue = action.payload.newValue
+      } else {
+        wantedItem.minValue = action.payload.newValue
+      }
+
+      newState.items = newState.items.filter(
+        item => item.id !== action.payload.itemId,
+      )
+      let newItems = [...newState.items, wantedItem]
+      newItems.sort((a, b) => a.order - b.order)
+      return { ...newState, items: newItems }
+    }
+    case "EDITED_SCALE_LABEL": {
+      console.log(action)
+      let newState = state
+      let wantedItem = newState.items.find(
+        item => item.id === action.payload.itemId,
+      )
+      if (!wantedItem) {
+        return state
+      }
+
+      if (action.payload.max) {
+        wantedItem.texts[0].maxLabel = action.payload.newLabel
+      } else {
+        wantedItem.texts[0].minLabel = action.payload.newLabel
+      }
+
+      newState.items = newState.items.filter(
+        item => item.id !== action.payload.itemId,
+      )
+      let newItems = [...newState.items, wantedItem]
+      newItems.sort((a, b) => a.order - b.order)
+      return { ...newState, items: newItems }
+    }
     default: {
       return initialState
     }

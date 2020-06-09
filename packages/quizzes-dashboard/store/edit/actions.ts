@@ -35,3 +35,21 @@ export const editedOptionTitle = (
 
 export const editedOptionCorrectnes = (itemId: string, optionId: string) =>
   action("EDITED_OPTION_CORRECTNES", { itemId: itemId, optionId: optionId })
+
+export const editedScaleMinMaxValue = createAction(
+  "EDITED_SCALE_VALUE",
+  (itemId: string, newValue: number, max: boolean) => ({
+    itemId: itemId,
+    newValue: newValue,
+    max: max,
+  }),
+)<{ itemId: string; newValue: number; max: boolean }>()
+
+export const editedScaleMinMaxLabel = createAction(
+  "EDITED_SCALE_LABEL",
+  (itemId: string, newLabel: string, max: boolean) => ({
+    itemId: itemId,
+    newLabel: newLabel,
+    max: max,
+  }),
+)<{ itemId: string; newLabel: string; max: boolean }>()
