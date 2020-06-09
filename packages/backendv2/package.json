@@ -16,8 +16,11 @@
     "@types/koa-router": "^7.4.1",
     "@types/uuid": "^7.0.4",
     "concurrently": "^5.2.0",
+    "jest": "^26.0.1",
     "nodemon": "^2.0.4",
     "prettier": "^1.19.1",
+    "supertest": "^4.0.2",
+    "ts-jest": "^26.1.0",
     "typescript": "^3.9.3"
   },
   "dependencies": {

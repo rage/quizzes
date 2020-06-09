@@ -1,4 +1,4 @@
-FROM node:13-alpine
+FROM node:11-alpine
 
 COPY --chown=node package.json package-lock.json /app/
 
@@ -11,6 +11,6 @@ COPY --chown=node . /app
 
 RUN npm run build
 
-EXPOSE 3000
+EXPOSE 6000
 
 CMD [ "npm", "run", "start" ]
