@@ -5,11 +5,7 @@ import { connect } from "react-redux"
 import { EditableQuiz } from "../types/EditQuiz"
 import { saveQuiz } from "../services/quizzes"
 
-interface SaveButtonProps {
-  quiz: EditableQuiz
-}
-
-const SaveButton = ({ quiz }: SaveButtonProps) => {
+const SaveButton = ({ quiz }: any) => {
   const handleClick = async (quiz: EditableQuiz) => {
     console.log(quiz)
     const response = await saveQuiz(quiz)
