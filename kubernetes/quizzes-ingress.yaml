@@ -18,9 +18,17 @@ spec:
           backend:
             serviceName: quizzes-backend-service
             servicePort: 80
+        - path: /api/v2/
+          backend:
+            serviceName: quizzes-backendv2-service
+            servicePort: 80
         - path: /
           backend:
             serviceName: quizzes-dashboard-service
+            servicePort: 80
+        - path: /v2
+          backend:
+            serviceName: quizzes-dashboardv2-service
             servicePort: 80
         - path: /ws
           backend:
