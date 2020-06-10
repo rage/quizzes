@@ -3,8 +3,10 @@ import { CourseListQuiz } from "../types/Quiz"
 import { Course } from "../types/Course"
 import { EditableQuiz } from "../types/EditQuiz"
 
+const HOST = process.env.HOST || "http://localhost:6000/"
+
 const api = axios.create({
-  baseURL: "http://localhost:6000/api/v2/dashboard",
+  baseURL: `${HOST}/api/v2/dashboard`,
   headers: {
     Authorization: "Bearer " + process.env.TOKEN,
   },

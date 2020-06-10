@@ -9,6 +9,8 @@ RUN npm ci
 
 COPY --chown=node . /app
 
+ENV BASE_PATH /v2
+
 RUN npm run build
 
 EXPOSE 5000
