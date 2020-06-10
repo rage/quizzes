@@ -7,6 +7,7 @@ import BasicInfo from "../../../components/QuizEditForms/BasicInfo"
 import Typography from "@material-ui/core/Typography"
 import styled from "styled-components"
 import QuizItem from "../../../components/QuizEditForms/QuizItem"
+import SaveButton from "../../../components/SaveButton"
 
 interface ShowQuizPageProps {
   id: string
@@ -22,6 +23,7 @@ const ShowQuizPage = ({ quiz, id, editableQuiz }: ShowQuizPageProps) => {
   editableQuiz(quiz)
   return (
     <>
+      <SaveButton />
       <Typography variant="h3">Editing quiz</Typography>
       <StyledId>{id}</StyledId>
       <BasicInfo />

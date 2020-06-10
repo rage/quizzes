@@ -12,25 +12,33 @@ export interface actionType {
 }
 
 export interface EditorState {
-  id?: string
-  courseId?: string
+  id: string
+  courseId: string
   part: number
   section: number
   points?: number
-  tries?: number
-  triesLimited?: boolean
-  deadline?: Date
-  open?: Date
-  autoConfirm?: boolean
-  excludedFromScore?: boolean
+  tries: number
+  triesLimited: boolean
+  deadline: Date
+  open: Date
+  autoConfirm: boolean
+  excludedFromScore: boolean
   texts: QuizText[]
   course: any
   items: Item[]
-  grantPointsPolicy?: QuizPointsGrantingPolicy
-  peerReviewCollections?: IPeerReviewCollection[]
+  grantPointsPolicy: QuizPointsGrantingPolicy
+  peerReviewCollections: IPeerReviewCollection[]
 }
 
 const initialState: EditorState = {
+  id: "1",
+  courseId: "2",
+  tries: 0,
+  triesLimited: true,
+  deadline: new Date(),
+  open: new Date(),
+  autoConfirm: true,
+  excludedFromScore: true,
   part: 0,
   section: 0,
   course: {
@@ -39,6 +47,8 @@ const initialState: EditorState = {
   texts: [],
   items: [],
   peerReviewCollections: [],
+  grantPointsPolicy: "grant_only_when_answer_fully_correct",
+  points: 1,
 }
 
 const editReducer = (

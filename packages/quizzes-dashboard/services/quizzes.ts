@@ -25,3 +25,7 @@ export const fetchCourseQuizzes = async (
 export const fetchQuiz = async (id: string): Promise<EditableQuiz> => {
   return (await api.get(`/quizzes/${id}`)).data
 }
+
+export const saveQuiz = async (quiz: EditableQuiz): Promise<string> => {
+  return (await api.post(`quizzes`, quiz)).data
+}
