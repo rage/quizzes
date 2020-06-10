@@ -12,6 +12,7 @@
     "@fortawesome/free-solid-svg-icons": "^5.12.0",
     "@fortawesome/react-fontawesome": "^0.1.8",
     "@material-ui/core": "^4.8.1",
+    "@material-ui/lab": "^4.0.0-alpha.55",
     "@monaco-editor/react": "^3.0.1",
     "@zeit/next-css": "^1.0.1",
     "axios": "^0.19.0",

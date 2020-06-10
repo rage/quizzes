@@ -20,6 +20,7 @@ const StyledId = styled(Typography)`
 `
 
 const ShowQuizPage = ({ quiz, id, editableQuiz }: ShowQuizPageProps) => {
+  console.log(quiz)
   editableQuiz(quiz)
   return (
     <>
@@ -48,9 +49,9 @@ ShowQuizPage.getInitialProps = async (ctx: any) => {
   }
 }
 
-const mapDispatchToProps = (dispatch: any, quiz: EditableQuiz) => {
+const mapDispatchToProps = (dispatch: any) => {
   return {
-    editableQuiz: () => dispatch(initializedEditor(quiz)),
+    editableQuiz: (quiz: EditableQuiz) => dispatch(initializedEditor(quiz)),
   }
 }
 

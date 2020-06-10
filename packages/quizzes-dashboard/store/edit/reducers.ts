@@ -27,7 +27,9 @@ export interface EditorState {
   course: any
   items: Item[]
   grantPointsPolicy: QuizPointsGrantingPolicy
-  peerReviewCollections: IPeerReviewCollection[]
+  peerReviews: IPeerReviewCollection[]
+  createdAt: Date
+  updatedAt: Date
 }
 
 const initialState: EditorState = {
@@ -46,9 +48,11 @@ const initialState: EditorState = {
   },
   texts: [],
   items: [],
-  peerReviewCollections: [],
+  peerReviews: [],
   grantPointsPolicy: "grant_only_when_answer_fully_correct",
   points: 1,
+  createdAt: new Date(),
+  updatedAt: new Date(),
 }
 
 const editReducer = (
@@ -57,7 +61,10 @@ const editReducer = (
 ): EditorState => {
   switch (action.type) {
     case "INITIALIZED_EDITOR": {
-      return { ...initialState, ...action.payload.quiz }
+      console.log(action)
+      let newState = { ...initialState, ...action.payload }
+      console.log(newState)
+      return newState
     }
     case "EDITED_QUIZ_ITEM_BODY": {
       let newState = state
