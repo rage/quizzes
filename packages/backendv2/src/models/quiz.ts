@@ -53,7 +53,12 @@ export class Quiz extends Model {
   }
 
   static async saveQuiz(data: any) {
-    return await Quiz.query().upsertGraphAndFetch(data)
+    try {
+      const result = await Quiz.query().upsertGraphAndFetch(data)
+      return result
+    } catch (e) {
+      return { errorMessage: "something went wrong", error: e }
+    }
   }
 
   static async getQuizById(quizId: string) {
