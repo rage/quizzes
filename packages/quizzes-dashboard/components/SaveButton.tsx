@@ -16,38 +16,52 @@ import { initializedEditor } from "../store/edit/actions"
 const SaveButton = ({ quiz, updateEditorState }: any) => {
   const [saved, setSaved] = useState(true)
   const [showMessage, setShowMessage] = useState(false)
+  const [showSpinner, setShowSpinner] = useState(false)
 
   const handleClick = async (quiz: EditableQuiz) => {
     setSaved(false)
+    setShowSpinner(true)
     const response = await saveQuiz(quiz)
-    setSaved(true)
+    setShowSpinner(false)
+    if (response.errorMessage === undefined) {
+      setSaved(true)
+      updateEditorState(response)
+    }
     setShowMessage(true)
-    console.log(response)
-    updateEditorState(response)
-  }
-
-  const style = {
-    margin: 0,
-    top: "auto",
-    right: 100,
-    left: "auto",
-    position: "fixed",
   }
 
   return (
     <>
       <Snackbar
         open={showMessage}
-        autoHideDuration={6000}
+        autoHideDuration={5000}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         onClose={() => setShowMessage(false)}
       >
-        <Alert severity="success" onClose={() => setShowMessage(false)}>
-          Quiz saved succesfully!
-        </Alert>
+        {saved ? (
+          <Alert severity="success" onClose={() => setShowMessage(false)}>
+            Quiz saved succesfully!
+          </Alert>
+        ) : (
+          <Alert severity="error" onClose={() => setShowMessage(false)}>
+            Something went wrong, couldn't save quiz!
+          </Alert>
+        )}
       </Snackbar>
 
-      {saved ? (
+      {showSpinner ? (
+        <CircularProgress
+          color="secondary"
+          style={{
+            padding: "1rem",
+            position: "fixed",
+            top: 100,
+            right: 100,
+            left: "auto",
+            bottom: "auto",
+          }}
+        />
+      ) : (
         <Fab
           color="primary"
           variant="extended"
@@ -63,18 +77,6 @@ const SaveButton = ({ quiz, updateEditorState }: any) => {
         >
           <Typography variant="h6">Save Quiz</Typography>
         </Fab>
-      ) : (
-        <CircularProgress
-          color="secondary"
-          style={{
-            padding: "1rem",
-            position: "fixed",
-            top: 100,
-            right: 100,
-            left: "auto",
-            bottom: "auto",
-          }}
-        />
       )}
     </>
   )
