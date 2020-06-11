@@ -82,7 +82,7 @@ const hungarianLabels: SingleLanguageLabels = {
   multipleChoice: {
     selectCorrectAnswerLabel: "Válaszd ki a helyes választ",
     chooseAllSuitableOptionsLabel:
-      "Kérjük, jelöld be az összes megfelelő választ",
+      "Kérjük, jelöld be az összes megfelelő választ!",
     answerCorrectLabel: "Helyes",
     answerIncorrectLabel: "Helytelen",
   },
