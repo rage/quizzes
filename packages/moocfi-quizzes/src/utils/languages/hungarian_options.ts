@@ -65,8 +65,7 @@ const hungarianLabels: SingleLanguageLabels = {
     noPeerReviewsReceivedlabel: "Válaszod még egy társ sem értékelte",
     noSupportForQuestionTypeLabel:
       "Ez a fajta társértékelési kérdés nem támogatott	",
-    numberOfPeerReviewsText: n =>
-      `Válaszod ${n} számú társ értékelte.`,
+    numberOfPeerReviewsText: n => `Válaszod ${n} számú társ értékelte.`,
     summaryViewLabel: "A kapott társértékelések:",
     toggleButtonExpandLabel: "Az összes társértékelés megjelenítése",
     toggleButtonShrinkLabel: "A társértékelések elrejtése",
