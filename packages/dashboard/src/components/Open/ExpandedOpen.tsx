@@ -163,7 +163,7 @@ class ExpandedOpen extends React.Component<any, any> {
     )
   }
 
-  private changeTempAttribute = (attributeName: string) => e => {
+  private changeTempAttribute = (attributeName: string) => (e) => {
     const value = e.target.value
 
     if (attributeName === "validityRegex") {

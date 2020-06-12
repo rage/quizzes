@@ -15,7 +15,9 @@ export interface PeerReviewSubmitButtonProps {
   onClick: any
 }
 
-const PeerReviewSubmitButton: React.FunctionComponent<PeerReviewSubmitButtonProps> = props => {
+const PeerReviewSubmitButton: React.FunctionComponent<PeerReviewSubmitButtonProps> = (
+  props,
+) => {
   const themeProvider = React.useContext(ThemeProviderContext)
 
   const ThemedButton = themeProvider.peerReviewSubmitButton

@@ -164,7 +164,7 @@ const ids: string[] = [
 ]
 
 void (() => {
-  ids.forEach(id => {
+  ids.forEach((id) => {
     console.log(`${id} ${getUUIDByString(id)}`)
   })
 })()

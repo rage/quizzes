@@ -2,7 +2,7 @@ import { ChangeEvent } from "react"
 
 export function stringContainsLongerWord(str: string, n: number): boolean {
   const words: string[] = str.split(" ")
-  return words.some(w => w.length > n)
+  return words.some((w) => w.length > n)
 }
 
 export function wordCount(str: string | null): number {

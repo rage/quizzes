@@ -47,7 +47,7 @@ export default class ValidationService {
     const items: QuizItem[] = quiz.items
     let points: number | null = null
     let pointsAwarded: number | null
-    const itemAnswerStatus = items.map(item => {
+    const itemAnswerStatus = items.map((item) => {
       const itemAnswer = quizAnswer.itemAnswers.find(
         (ia: QuizItemAnswer) => ia.quizItemId === item.id,
       )
@@ -58,7 +58,7 @@ export default class ValidationService {
       }
 
       const itemTranslation = item.texts.find(
-        text => text.languageId === quizAnswer.languageId,
+        (text) => text.languageId === quizAnswer.languageId,
       )
       let itemStatusObject: ItemStatusObject
       let optionAnswerStatus
@@ -127,12 +127,12 @@ export default class ValidationService {
           }
           break
         case "multiple-choice":
-          optionAnswerStatus = item.options.map(option => {
+          optionAnswerStatus = item.options.map((option) => {
             const optionAnswer = itemAnswer.optionAnswers.find(
               (oa: any) => oa.quizOptionId === option.id,
             )
             const optionTranslation = option.texts.find(
-              text => text.languageId === quizAnswer.languageId,
+              (text) => text.languageId === quizAnswer.languageId,
             )
             return {
               optionId: option.id,
@@ -147,14 +147,15 @@ export default class ValidationService {
 
           if (
             item.multi &&
-            optionAnswerStatus.filter(oas => oas.selected !== oas.correctAnswer)
-              .length === 0
+            optionAnswerStatus.filter(
+              (oas) => oas.selected !== oas.correctAnswer,
+            ).length === 0
           ) {
             correct = true
             points += 1
           } else if (
             !item.multi &&
-            optionAnswerStatus.some(oas => oas.selected && oas.correctAnswer)
+            optionAnswerStatus.some((oas) => oas.selected && oas.correctAnswer)
           ) {
             correct = true
             points += 1
@@ -193,7 +194,7 @@ export default class ValidationService {
         case "checkbox":
         case "research-agreement":
           points += 1
-          optionAnswerStatus = item.options.map(option => {
+          optionAnswerStatus = item.options.map((option) => {
             const optionAnswer = itemAnswer.optionAnswers.find(
               (oa: any) => oa.quizOptionId === option.id,
             )
@@ -258,7 +259,7 @@ export default class ValidationService {
           Math.abs(userQuizState.pointsAwarded - quiz.points) > 0.001
         ) {
           userQuizState.pointsAwarded = 0
-          quizAnswer.itemAnswers.forEach(ia => {
+          quizAnswer.itemAnswers.forEach((ia) => {
             ia.correct = undefined
           })
         }
@@ -316,8 +317,8 @@ export default class ValidationService {
       quiz.autoConfirm
     ) {
       const answers: number[] = [].concat(
-        ...peerReviews.map(pr =>
-          pr.answers.map(a => {
+        ...peerReviews.map((pr) =>
+          pr.answers.map((a) => {
             if (a.value) {
               return a.value
             }
@@ -486,9 +487,9 @@ export default class ValidationService {
 
     if (autoConfirm) {
       const answers = peerReviews
-        .map(pr => pr.answers.map(a => a.value))
+        .map((pr) => pr.answers.map((a) => a.value))
         .flat()
-        .filter(o => o !== undefined && o !== null)
+        .filter((o) => o !== undefined && o !== null)
 
       const sum: number = answers.reduce((prev, curr) => prev + curr, 0)
 

@@ -20,7 +20,7 @@ const LoadingQuiz: React.FunctionComponent<ILoadingQuizProps> = ({
   content,
   accessToken,
 }) => {
-  const displayBars = useTypedSelector(state => state.loadingBars)
+  const displayBars = useTypedSelector((state) => state.loadingBars)
 
   if (content && content.Loading) {
     return <>{content.Loading}</>

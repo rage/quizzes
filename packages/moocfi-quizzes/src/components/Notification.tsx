@@ -31,7 +31,7 @@ interface NotificationProps {
 const Notification: React.FunctionComponent<NotificationProps> = ({
   scrollRef,
 }) => {
-  const messageState = useTypedSelector(state => state.message)
+  const messageState = useTypedSelector((state) => state.message)
   if (messageState.message) {
     const color = (messageState.error && "red") || null
     scrollToRef(scrollRef)

@@ -1,7 +1,7 @@
 import axios from "axios"
 import { ICourse } from "../interfaces"
 
-export const getCourses = async user => {
+export const getCourses = async (user) => {
   const response = await axios.get(`/api/v1/courses?attentionAnswers=true`, {
     headers: { authorization: `Bearer ${user.accessToken}` },
   })

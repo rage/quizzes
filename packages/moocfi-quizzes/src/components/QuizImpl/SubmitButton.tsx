@@ -13,16 +13,22 @@ export interface SubmitButtonProps {
 const SubmitButton: React.FunctionComponent = () => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
-  const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
-  const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
-  const languageInfo = useTypedSelector(state => state.language.languageLabels)
-  const noChangesAfterSuccessfulAnswer = useTypedSelector(
-    state => state.quizAnswer.noChangesSinceSuccessfulSubmit,
+  const submitLocked = useTypedSelector(
+    (state) => state.quizAnswer.submitLocked,
   )
-  const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const pastDeadline = useTypedSelector(
+    (state) => state.quizAnswer.pastDeadline,
+  )
+  const languageInfo = useTypedSelector(
+    (state) => state.language.languageLabels,
+  )
+  const noChangesAfterSuccessfulAnswer = useTypedSelector(
+    (state) => state.quizAnswer.noChangesSinceSuccessfulSubmit,
+  )
+  const userQuizState = useTypedSelector((state) => state.user.userQuizState)
 
   const noChangesAfterLoading = useTypedSelector(
-    state => state.quizAnswer.noChangesAfterLoading,
+    (state) => state.quizAnswer.noChangesAfterLoading,
   )
 
   if (!languageInfo) {

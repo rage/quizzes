@@ -131,7 +131,7 @@ export class QuizAnswerController {
       userId: user.id,
     })
 
-    criteriaQuery.courseIds = roles.map(r => r.courseId)
+    criteriaQuery.courseIds = roles.map((r) => r.courseId)
     criteriaQuery.courseIdIncludedInCourseIds = true
 
     const result = await this.quizAnswerService.getAnswersCount(criteriaQuery)
@@ -369,7 +369,7 @@ export class QuizAnswerController {
     let newAnswer: QuizAnswer = null
     let userCoursePartState: UserCoursePartState = null
 
-    await this.entityManager.transaction(async manager => {
+    await this.entityManager.transaction(async (manager) => {
       const oldStatus = existingAnswer.status
       existingAnswer.status = newStatus
       newAnswer = await manager.save(existingAnswer)
@@ -430,10 +430,10 @@ export class QuizAnswerController {
       // make sure that new answer (and item/option answers) are created for each submission
       answer.userId = userId
       answer.id = undefined
-      answer.itemAnswers.forEach(ia => {
+      answer.itemAnswers.forEach((ia) => {
         ia.quizAnswerId = undefined
         ia.id = undefined
-        ia.optionAnswers.forEach(oa => {
+        ia.optionAnswers.forEach((oa) => {
           oa.quizItemAnswerId = undefined
           oa.id = undefined
         })
@@ -474,7 +474,7 @@ export class QuizAnswerController {
       let savedAnswer: QuizAnswer
       let savedUserQuizState: UserQuizState
 
-      await this.entityManager.transaction(async manager => {
+      await this.entityManager.transaction(async (manager) => {
         const {
           response,
           quizAnswer,
@@ -482,14 +482,14 @@ export class QuizAnswerController {
         } = this.validationService.validateQuizAnswer(answer, quiz, userQState)
 
         const erroneousItemAnswers = response.itemAnswerStatus.filter(
-          status => {
+          (status) => {
             return status.error ? true : false
           },
         )
 
         if (erroneousItemAnswers.length > 0) {
           throw new BadRequestError(
-            `${erroneousItemAnswers.map(x => {
+            `${erroneousItemAnswers.map((x) => {
               if (x.type === "essay") {
                 return `${x.error} Min: ${x.min}, max: ${x.max}. Your answer (${x.data.words} words): ${x.data.text}`
               } else if (x.type === "scale") {
@@ -568,7 +568,7 @@ export class QuizAnswerController {
   ) {
     const answered = await this.quizAnswerService.getAnswered(courseId, user.id)
     const answeredByQuizId: { [id: string]: any } = {}
-    answered.forEach(a => {
+    answered.forEach((a) => {
       answeredByQuizId[a.quiz_id] = {
         answered: a.answered,
         correct: a.correct,

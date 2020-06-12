@@ -86,7 +86,7 @@ const QuizItem = ({ item, editItemTitle }: QuizItemProps) => {
             <StyledTextField
               variant="outlined"
               defaultValue={item.texts[0].title}
-              onChange={event => editItemTitle(event.target.value, item.id)}
+              onChange={(event) => editItemTitle(event.target.value, item.id)}
             />
           </TitleContainer>
         </QuizHeader>

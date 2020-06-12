@@ -13,7 +13,7 @@ export interface IScaleItemProps {
   expanded: boolean
 }
 
-const ScaleItem: React.FunctionComponent<IScaleItemProps> = props => {
+const ScaleItem: React.FunctionComponent<IScaleItemProps> = (props) => {
   if (!props.expanded) {
     return <ShortScale {...props} />
   } else {

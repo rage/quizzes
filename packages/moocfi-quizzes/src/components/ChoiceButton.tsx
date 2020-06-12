@@ -68,7 +68,7 @@ const RevealedChoiceButton = styled(
     )
   },
 )`
-  ${props =>
+  ${(props) =>
     props.selected
       ? `
       color: white;

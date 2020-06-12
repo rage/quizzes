@@ -68,7 +68,7 @@ const italianLabels: SingleLanguageLabels = {
     loadingLabel: "Caricamento delle valutazioni tra pari ricevute...",
     noPeerReviewsReceivedlabel:
       "La tua risposta non ha ancora ricevuto valutazioni tra pari",
-    numberOfPeerReviewsText: n =>
+    numberOfPeerReviewsText: (n) =>
       `La tua risposta ha ricevuto ${n} valutazione / i tra pari.`,
     toggleButtonExpandLabel: "Mostrare tutte le valutazioni tra pari ricevute",
     toggleButtonShrinkLabel: "Nascondere le valutazioni tra pari",
@@ -119,7 +119,7 @@ const italianLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "Il numero di tentativi è illimitato",
     submitGeneralFeedbackLabel: "Invio effettuato",
     submitButtonAlreadyAnsweredLabel: "Risposta data",
-    pointsGrantingPolicyInformer: policy => {
+    pointsGrantingPolicyInformer: (policy) => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "Per ottenere punti, la risposta deve essere completamente esatta"

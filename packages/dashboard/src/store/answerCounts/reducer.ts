@@ -17,7 +17,7 @@ export const answerCountsReducer = (
       return []
     case getType(quizAnswerCounts.decrement):
       const quizId = action.payload
-      return state.map(ac => {
+      return state.map((ac) => {
         if (ac.quizId !== quizId) {
           return ac
         } else {

@@ -16,7 +16,7 @@ const PeerReviewQuestionContainer = SortableContainer((props: any) => {
   return (
     <div>
       {questions.map((prq, index) => {
-        const text = prq.texts.find(t => t.languageId === props.language)
+        const text = prq.texts.find((t) => t.languageId === props.language)
         return (
           <SortableWrapper
             key={prq.id || prq.type + index}
@@ -32,7 +32,7 @@ const PeerReviewQuestionContainer = SortableContainer((props: any) => {
               body={text.body}
               index={index}
               textIndex={prq.texts.findIndex(
-                t => t.languageId === props.language,
+                (t) => t.languageId === props.language,
               )}
               collectionIndex={props.collectionIndex}
               handleChange={props.handleChange}

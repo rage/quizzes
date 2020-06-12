@@ -67,7 +67,7 @@ const germanLabels: SingleLanguageLabels = {
     loadingLabel: "Die erhaltenen Peer-Evaluationen werden geladen...",
     noPeerReviewsReceivedlabel:
       "Deine Antwort hat noch keine Peer-Evaluationen erhalten",
-    numberOfPeerReviewsText: n =>
+    numberOfPeerReviewsText: (n) =>
       `Deine Antwort hat ${n} Peer-Evaluation${n > 0 && "en"} erhalten`,
     toggleButtonExpandLabel: "Alle erhaltenen Peer-Evaluationen anzeigen",
     toggleButtonShrinkLabel: "Peer-Evaluationen ausblenden",
@@ -119,7 +119,7 @@ const germanLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "Die Anzahl der Versuche ist nicht begrenzt",
     submitGeneralFeedbackLabel: "Gesendet",
     submitButtonAlreadyAnsweredLabel: "Beantwortet",
-    pointsGrantingPolicyInformer: policy => {
+    pointsGrantingPolicyInformer: (policy) => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "Punkte werden nur für komplett richtige Antworten vergeben"

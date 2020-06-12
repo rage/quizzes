@@ -28,7 +28,7 @@ export class CourseService {
       const roles = await this.userCourseRoleService.getUserCourseRoles({
         userId: user.id,
       })
-      const allowedCourseIds = [...new Set(roles.map(r => r.courseId))]
+      const allowedCourseIds = [...new Set(roles.map((r) => r.courseId))]
 
       // if id defined it will override - but that's fine
       queryBuilder.where("course.id IN (:...ids)", { ids: allowedCourseIds })
@@ -91,7 +91,7 @@ export class CourseService {
     const oldCourseId = courseId
     const newCourseId = uuidv4()
 
-    await this.entityManager.transaction(async manager => {
+    await this.entityManager.transaction(async (manager) => {
       // 1. create the course
 
       const builder = Knex({ client: "pg" })
@@ -332,7 +332,7 @@ export class CourseService {
     await course.texts
 
     if (query.language) {
-      course.texts = course.texts.filter(t => t.languageId === query.language)
+      course.texts = course.texts.filter((t) => t.languageId === query.language)
     }
 
     return await course

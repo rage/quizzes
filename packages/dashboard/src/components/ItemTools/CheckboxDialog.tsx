@@ -90,7 +90,7 @@ export default class CheckboxDialog extends React.Component<any, any> {
     )
   }
 
-  private handleTextFieldChange = fieldName => e => {
+  private handleTextFieldChange = (fieldName) => (e) => {
     if (fieldName === "title") {
       this.setState({ title: e.target.value })
     } else {
@@ -98,7 +98,7 @@ export default class CheckboxDialog extends React.Component<any, any> {
     }
   }
 
-  private handleSubmit = event => {
+  private handleSubmit = (event) => {
     this.props.onSubmit(this.state.optionData)(event)
     this.handleClose()
   }

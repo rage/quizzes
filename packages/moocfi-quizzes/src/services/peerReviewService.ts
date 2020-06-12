@@ -27,8 +27,9 @@ export const getReceivedReviews = async (
   address?: string,
 ): Promise<Array<IReceivedPeerReview>> => {
   const response = await axios.get(
-    `${address ||
-      BASE_URL}/api/v1/quizzes/peerreview/received/${quizAnswerId}?stripped=true`,
+    `${
+      address || BASE_URL
+    }/api/v1/quizzes/peerreview/received/${quizAnswerId}?stripped=true`,
     { headers: { authorization: `Bearer ${accessToken}` } },
   )
 

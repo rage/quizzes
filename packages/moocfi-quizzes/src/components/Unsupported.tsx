@@ -8,7 +8,7 @@ type UnsupportedProps = {
 
 export default ({ item }: UnsupportedProps) => {
   const languageLabels = useTypedSelector(
-    state => state.language.languageLabels,
+    (state) => state.language.languageLabels,
   )
   if (!languageLabels) {
     return <div />

@@ -128,7 +128,7 @@ const PageSelector = ({
   )
 }
 
-const PageButton = props => {
+const PageButton = (props) => {
   if (props.current) {
     return (
       <Button

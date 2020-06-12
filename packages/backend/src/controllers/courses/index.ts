@@ -65,8 +65,8 @@ export class CourseController {
       return courses
     }
 
-    const courseIdsForAllRoles = new Set(roles.map(r => r.courseId))
-    return courses.filter(course => courseIdsForAllRoles.has(course.id))
+    const courseIdsForAllRoles = new Set(roles.map((r) => r.courseId))
+    return courses.filter((course) => courseIdsForAllRoles.has(course.id))
   }
 
   @Get("/:id")
@@ -162,8 +162,8 @@ export class CourseController {
     }
 
     const result = await this.courseService.generateQuizTransitionFile(
-      courses.find(c => c.id === id),
-      courses.find(c => c.id === oldCourseId),
+      courses.find((c) => c.id === id),
+      courses.find((c) => c.id === oldCourseId),
     )
     return result
   }

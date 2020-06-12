@@ -57,7 +57,7 @@ export const peerReviewsReducer = (
 
       const newAnswer: PeerReviewAnswer = {
         ...currentAnswer,
-        answers: currentAnswer.answers.map(answer =>
+        answers: currentAnswer.answers.map((answer) =>
           answer.peerReviewQuestionId === peerReviewQuestionId
             ? { ...answer, value }
             : answer,
@@ -89,7 +89,7 @@ export const peerReviewsReducer = (
 
       const newAnswer: PeerReviewAnswer = {
         ...currentAnswer,
-        answers: currentAnswer.answers.map(answer =>
+        answers: currentAnswer.answers.map((answer) =>
           answer.peerReviewQuestionId === peerReviewQuestionId
             ? { ...answer, text }
             : answer,
@@ -118,14 +118,14 @@ export const peerReviewsReducer = (
       const answersToReview = state.options
       const rejected =
         (answersToReview &&
-          answersToReview.filter(answer => answer.id !== quizAnswerId)) ||
+          answersToReview.filter((answer) => answer.id !== quizAnswerId)) ||
         []
 
       const peerReviewAnswer: PeerReviewAnswer = {
         quizAnswerId,
         userId,
         peerReviewCollectionId,
-        rejectedQuizAnswerIds: rejected.map(x => {
+        rejectedQuizAnswerIds: rejected.map((x) => {
           const id = x.id
           if (!id) {
             console.log(
@@ -204,10 +204,10 @@ const submitShouldBeDisabled = (
   prAnswer: PeerReviewAnswer,
   peerReviewCollection: PeerReviewCollection,
 ): boolean => {
-  return prAnswer.answers.some(answer => {
+  return prAnswer.answers.some((answer) => {
     const questionId = answer.peerReviewQuestionId
     const peerReviewQuestion = peerReviewCollection.questions.find(
-      q => q.id === questionId,
+      (q) => q.id === questionId,
     )
 
     if (!peerReviewQuestion) {

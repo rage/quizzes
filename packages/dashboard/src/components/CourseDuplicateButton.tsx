@@ -162,9 +162,9 @@ class CourseDuplicateButton extends React.Component<
     this.props.createDuplicateCourse(this.props.course.id, title, abbreviation)
   }
 }
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   course: state.courses
-    ? state.courses.find(c => c.id === state.filter.course)
+    ? state.courses.find((c) => c.id === state.filter.course)
     : [],
   courseCount: state.courses ? state.courses.length : 0,
 })

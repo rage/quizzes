@@ -39,7 +39,9 @@ const ItemAnswer = ({ answer, idx, quiz, fullLength }) => {
               <ItemAnswerContent
                 type={qItem.type}
                 item={qItem}
-                answer={answer.itemAnswers.find(a => a.quizItemId === qItem.id)}
+                answer={answer.itemAnswers.find(
+                  (a) => a.quizItemId === qItem.id,
+                )}
                 fullLength={fullLength}
               />
             </Grid>
@@ -89,14 +91,14 @@ const ItemAnswerContent = ({ answer, fullLength, type, item }) => {
         answer &&
         answer.optionAnswers[0] &&
         answer.optionAnswers[0].quizOptionId
-      const optionsData = item.options.map(opt => ({
+      const optionsData = item.options.map((opt) => ({
         id: opt.id,
         correct: opt.correct,
         title: opt.texts[0].title,
       }))
-      const correctOptions = optionsData.filter(opt => opt.correct)
+      const correctOptions = optionsData.filter((opt) => opt.correct)
 
-      const chosen = optionsData.find(opt => opt.id === optionAnswerId)
+      const chosen = optionsData.find((opt) => opt.id === optionAnswerId)
 
       return (
         <React.Fragment>
@@ -104,7 +106,7 @@ const ItemAnswerContent = ({ answer, fullLength, type, item }) => {
             Correct option{correctOptions.length > 1 ? "s" : ""}
             {": "}
             <span style={{ fontWeight: "bold" }}>
-              {correctOptions.map(opt => opt.title).join(", ")}
+              {correctOptions.map((opt) => opt.title).join(", ")}
             </span>
           </Typography>
           <Typography variant="body1">
@@ -141,7 +143,7 @@ const ItemAnswerContent = ({ answer, fullLength, type, item }) => {
     case "research-agreement":
       return (
         <React.Fragment>
-          {item.options.map(opt => {
+          {item.options.map((opt) => {
             if (answer.optionAnswers.length === 0) {
               return (
                 <Typography key={opt.id}>
@@ -150,7 +152,7 @@ const ItemAnswerContent = ({ answer, fullLength, type, item }) => {
               )
             }
             const checked = answer.optionAnswers.some(
-              ao => ao.quizOptionId === opt.id,
+              (ao) => ao.quizOptionId === opt.id,
             )
 
             return (

@@ -58,23 +58,23 @@ export const editReducer = (
       if (!option) {
         return state
       }
-      const item = state.items.find(it => it.id === option.quizItemId)
+      const item = state.items.find((it) => it.id === option.quizItemId)
       if (!item) {
         return state
       }
-      newOptions = item.options.filter(opt => opt.id !== option.id)
+      newOptions = item.options.filter((opt) => opt.id !== option.id)
       let prevOrder = -1
-      newOptions.forEach(opt => (opt.order = ++prevOrder))
+      newOptions.forEach((opt) => (opt.order = ++prevOrder))
       return {
         ...state,
-        items: state.items.map(it =>
+        items: state.items.map((it) =>
           it.id !== item.id ? it : { ...it, options: newOptions },
         ),
       }
     case getType(edit.modifyOptionOrder):
       const { quizItem, optionIdx1, optionIdx2 } = action.payload
 
-      const oldQuizItem = state.items.find(qi => qi.id === quizItem.id)
+      const oldQuizItem = state.items.find((qi) => qi.id === quizItem.id)
 
       newOptions = createNewlyOrderedOptions(
         oldQuizItem,
@@ -88,7 +88,7 @@ export const editReducer = (
 
       return {
         ...state,
-        items: state.items.map(it =>
+        items: state.items.map((it) =>
           it.id !== quizItem.id ? it : { ...it, options: newOptions },
         ),
       }
@@ -113,7 +113,7 @@ const createNewlyOrderedOptions = (
   const min = oldIndex < newIndex ? oldIndex : newIndex
   const max = min === oldIndex ? newIndex : oldIndex
 
-  const options = quizItem.options.map(e => e)
+  const options = quizItem.options.map((e) => e)
 
   const start = options.slice(0, min)
   const middle = options.slice(min, max + 1)
@@ -122,14 +122,14 @@ const createNewlyOrderedOptions = (
   if (oldIndex === min) {
     const option = middle.shift()!
     option.order = newIndex
-    middle.forEach(opt => {
+    middle.forEach((opt) => {
       opt.order--
     })
     middle.push(option)
   } else {
     const option = middle.pop()!
     option.order = newIndex
-    middle.forEach(opt => {
+    middle.forEach((opt) => {
       opt.order++
     })
     middle.unshift(option)

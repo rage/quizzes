@@ -65,7 +65,7 @@ const englishLabels: SingleLanguageLabels = {
       "Your answer has not yet received any peer reviews",
     noSupportForQuestionTypeLabel:
       "This kind of peer review question is not supported",
-    numberOfPeerReviewsText: n =>
+    numberOfPeerReviewsText: (n) =>
       `Your answer has received ${n} peer review${n > 1 ? "s" : ""}.`,
     summaryViewLabel: "Received peer reviews:",
     toggleButtonExpandLabel: "Show all received peer reviews",
@@ -114,7 +114,7 @@ const englishLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "The number of tries is not limited",
     submitGeneralFeedbackLabel: "Submitted",
     submitButtonAlreadyAnsweredLabel: "Answered",
-    pointsGrantingPolicyInformer: policy => {
+    pointsGrantingPolicyInformer: (policy) => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "To receive points the answer must be fully correct"

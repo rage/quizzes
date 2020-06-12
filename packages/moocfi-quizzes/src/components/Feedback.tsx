@@ -14,18 +14,20 @@ type FeedbackProps = {
 const Feedback: React.FunctionComponent<FeedbackProps> = ({ item }) => {
   const dispatch = useDispatch()
 
-  const userQuizState = useTypedSelector(state => state.user.userQuizState)
-  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+  const userQuizState = useTypedSelector((state) => state.user.userQuizState)
+  const quizDisabled = useTypedSelector(
+    (state) => state.quizAnswer.quizDisabled,
+  )
 
   const handleTextDataChange = (e: MiscEvent) =>
     dispatch(quizAnswerActions.changeTextData(item.id, e.currentTarget.value))
 
-  const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+  const answer = useTypedSelector((state) => state.quizAnswer.quizAnswer)
   const answerLocked = userQuizState && userQuizState.status === "locked"
   const itemTitle = item.texts[0].title
   const itemBody = item.texts[0].body
 
-  const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
+  const itemAnswer = answer.itemAnswers.find((ia) => ia.quizItemId === item.id)
 
   if (!itemAnswer && quizDisabled) {
     return <LaterQuizItemAddition item={item} />

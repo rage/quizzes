@@ -22,7 +22,7 @@ const DataExporter: React.FunctionComponent<IDataExporterProps> = ({
   courseRoles,
 }) => {
   const allowedToExportData = () => {
-    return isAdmin || courseRoles.some(role => role.role === "teacher")
+    return isAdmin || courseRoles.some((role) => role.role === "teacher")
   }
 
   return !allowedToExportData() ? (
@@ -87,10 +87,10 @@ const DataExporter: React.FunctionComponent<IDataExporterProps> = ({
   )
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   isAdmin: state.user.administrator,
   courseRoles: state.user.roles
-    ? state.user.roles.filter(role => role.courseId === state.filter.course)
+    ? state.user.roles.filter((role) => role.courseId === state.filter.course)
     : [],
 })
 

@@ -26,7 +26,7 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
     super(props)
     const item = props.items[props.order]
 
-    const initOptionData = item.options.map(option => ({
+    const initOptionData = item.options.map((option) => ({
       title: option.texts[0].title,
       body: option.texts[0].body,
       titleHasBeenModified: item.id ? true : false,
@@ -134,9 +134,9 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
     this.props.addOption(this.props.order)
   }
 
-  private removeOption = (order: number) => e => {
+  private removeOption = (order: number) => (e) => {
     const item = this.props.items[this.props.order]
-    const optionToBeRemoved = item.options.find(opt => opt.order === order)
+    const optionToBeRemoved = item.options.find((opt) => opt.order === order)
     if (item.options.length <= 1 || !optionToBeRemoved) {
       return
     }
@@ -146,7 +146,7 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
   private changeTempOptionAttribute = (
     order: number,
     attributeName: string,
-  ) => e => {
+  ) => (e) => {
     const value = e.target.value
 
     /*
@@ -162,7 +162,7 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
     )
   }
 
-  private changeTempAttribute = (attributeName: string) => e => {
+  private changeTempAttribute = (attributeName: string) => (e) => {
     const value = e.target.value
     if (attributeName === "title") {
       this.props.changeAttr(`items[${this.props.order}].texts[0].title`, value)

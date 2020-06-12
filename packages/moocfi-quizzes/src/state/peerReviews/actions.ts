@@ -12,20 +12,20 @@ import { errorOccurred } from "../message/actions"
 import { ThunkAction } from "../store"
 import { PeerReviewAnswer, PeerReviewCollection } from "../../modelTypes"
 
-export const set = createAction("peerReviews/SET", resolve => {
+export const set = createAction("peerReviews/SET", (resolve) => {
   return (newState: PeerReviewsState) => resolve(newState)
 })
 
 export const setReviewAnswer = createAction(
   "peerReviews/SET_ANSWER",
-  resolve => {
+  (resolve) => {
     return (peerReview: PeerReviewAnswer | null) => resolve(peerReview)
   },
 )
 
 export const selectAnswer = createAction(
   "peerReview/SELECT_ANSWER",
-  resolve => {
+  (resolve) => {
     return (
       quizAnswerId: string,
       userId: number,
@@ -37,14 +37,14 @@ export const selectAnswer = createAction(
 
 export const setReviewOptions = createAction(
   "peerReviews/SET_OPTIONS",
-  resolve => {
+  (resolve) => {
     return (answerOptions: any[]) => resolve(answerOptions)
   },
 )
 
 export const changeGradeAction = createAction(
   "peerReviews/CHANGE_GRADE",
-  resolve => (
+  (resolve) => (
     peerReviewQuestionId: string,
     value: number,
     peerReviewCollection: PeerReviewCollection,
@@ -53,7 +53,7 @@ export const changeGradeAction = createAction(
 
 export const changeTextAction = createAction(
   "peerReviews/CHANGE_TEXT",
-  resolve => (
+  (resolve) => (
     peerReviewQuestionId: string,
     text: string,
     peerReviewCollection: PeerReviewCollection,
@@ -65,7 +65,7 @@ export const changeGrade: ActionCreator<ThunkAction> = (
   value: number,
 ) => (dispatch, getState) => {
   const peerReviewCollection = getState().quiz?.peerReviewCollections.find(
-    prc => prc.questions.some(q => q.id === peerReviewQuestionId),
+    (prc) => prc.questions.some((q) => q.id === peerReviewQuestionId),
   )
   if (!peerReviewCollection) {
     console.log("No answer that matches the id of the reviewed answer")
@@ -79,7 +79,7 @@ export const changeText: ActionCreator<ThunkAction> = (
   text: string,
 ) => (dispatch, getState) => {
   const peerReviewCollection = getState().quiz?.peerReviewCollections.find(
-    prc => prc.questions.some(q => q.id === peerReviewQuestionId),
+    (prc) => prc.questions.some((q) => q.id === peerReviewQuestionId),
   )
   if (!peerReviewCollection) {
     console.log("No answer that matches the id of the reviewed answer")
@@ -140,7 +140,7 @@ export const selectAnswerToReview: ActionCreator<ThunkAction> = (
       quizAnswerId,
       userId,
       prc?.id || "",
-      prc?.questions.map(q => q.id) || [],
+      prc?.questions.map((q) => q.id) || [],
     ),
   )
 }

@@ -21,30 +21,22 @@ export class PeerReviewQuestion extends BaseEntity {
   @PrimaryGeneratedColumn("uuid")
   public id: string
 
-  @ManyToOne(
-    type => Quiz,
-    quiz => quiz.id,
-    { onDelete: "CASCADE" },
-  )
+  @ManyToOne((type) => Quiz, (quiz) => quiz.id, { onDelete: "CASCADE" })
   @JoinColumn()
   public quiz: Quiz
   @Column({ nullable: true })
   public quizId: string | null
 
-  @ManyToOne(
-    type => PeerReviewCollection,
-    prqc => prqc.id,
-    {
-      nullable: true,
-    },
-  )
+  @ManyToOne((type) => PeerReviewCollection, (prqc) => prqc.id, {
+    nullable: true,
+  })
   public peerReviewCollection?: PeerReviewCollection
   @Column({ nullable: true })
   public peerReviewCollectionId: string | null
 
   @OneToMany(
-    type => PeerReviewQuestionTranslation,
-    prqt => prqt.peerReviewQuestion,
+    (type) => PeerReviewQuestionTranslation,
+    (prqt) => prqt.peerReviewQuestion,
     { eager: true, cascade: true },
   )
   public texts: PeerReviewQuestionTranslation[]
@@ -98,20 +90,15 @@ export class PeerReviewQuestion extends BaseEntity {
 
 @Entity()
 export class PeerReviewQuestionTranslation extends BaseEntity {
-  @ManyToOne(
-    type => PeerReviewQuestion,
-    prq => prq.id,
-    { onDelete: "CASCADE" },
-  )
+  @ManyToOne((type) => PeerReviewQuestion, (prq) => prq.id, {
+    onDelete: "CASCADE",
+  })
   @JoinColumn()
   public peerReviewQuestion: PeerReviewQuestion
   @PrimaryColumn()
   public peerReviewQuestionId: string
 
-  @ManyToOne(
-    type => Language,
-    lang => lang.id,
-  )
+  @ManyToOne((type) => Language, (lang) => lang.id)
   @JoinColumn()
   public language: Language
   @PrimaryColumn()

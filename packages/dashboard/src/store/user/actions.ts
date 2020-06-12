@@ -13,10 +13,10 @@ export const clear = createAction("user/CLEAR")
 
 export const setInitializationStatus = createAction(
   "user/SET_INITIALIZATION_STATUS",
-  resolve => (newStatus: InitializationStatus) => resolve(newStatus),
+  (resolve) => (newStatus: InitializationStatus) => resolve(newStatus),
 )
 
-export const set = createAction("user/SET", resolve => {
+export const set = createAction("user/SET", (resolve) => {
   return (newUserState: {
     username: string
     accessToken: string
@@ -25,7 +25,7 @@ export const set = createAction("user/SET", resolve => {
   }) => resolve(newUserState)
 })
 
-export const setRoles = createAction("user/SET_ROLES", resolve => {
+export const setRoles = createAction("user/SET_ROLES", (resolve) => {
   return ({ administrator, roles }) => resolve({ administrator, roles })
 })
 

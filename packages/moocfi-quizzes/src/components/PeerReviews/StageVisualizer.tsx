@@ -14,11 +14,15 @@ const StyledStepper = styled(Stepper)<StyledStepperProps>`
 
 const StageVisualizer = () => {
   const themeProvider = React.useContext(ThemeProviderContext)
-  const activeStep = useTypedSelector(state => state.peerReviews.activeStep)
-  const quiz = useTypedSelector(state => state.quiz)
-  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+  const activeStep = useTypedSelector((state) => state.peerReviews.activeStep)
+  const quiz = useTypedSelector((state) => state.quiz)
+  const quizDisabled = useTypedSelector(
+    (state) => state.quizAnswer.quizDisabled,
+  )
 
-  const languageInfo = useTypedSelector(state => state.language.languageLabels)
+  const languageInfo = useTypedSelector(
+    (state) => state.language.languageLabels,
+  )
   if (!languageInfo || !quiz) {
     return <div />
   }

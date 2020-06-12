@@ -66,7 +66,7 @@ const croatianLabels: SingleLanguageLabels = {
     loadingLabel: "Učitavanje ocjena dobivenih od drugih polaznika...",
     noPeerReviewsReceivedlabel:
       "Drugi polaznici još nisu ocijenili vaš odgovor.",
-    numberOfPeerReviewsText: n =>
+    numberOfPeerReviewsText: (n) =>
       `Broj ocjena dodijeljenih vašem odgovoru: ${n}.`,
     toggleButtonExpandLabel: "Prikaži sve ocjene dobivene od drugih polaznika",
     toggleButtonShrinkLabel: "Sakrij ocjene dobivene od drugih polaznika",
@@ -119,7 +119,7 @@ const croatianLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "Broj pokušaja nije ograničen.",
     submitGeneralFeedbackLabel: "Poslano",
     submitButtonAlreadyAnsweredLabel: "Odgovoreno",
-    pointsGrantingPolicyInformer: policy => {
+    pointsGrantingPolicyInformer: (policy) => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "Odgovor mora biti potpuno točan da bi se za njega dodijelili bodovi."

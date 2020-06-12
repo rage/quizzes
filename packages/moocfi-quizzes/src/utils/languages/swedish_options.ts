@@ -67,7 +67,7 @@ const swedishLabels: SingleLanguageLabels = {
     loadingLabel: "Laddar inkomna kollegiala bedömningar…",
     noPeerReviewsReceivedlabel:
       "Ditt svar har inte ännu fått kollegial bedömning",
-    numberOfPeerReviewsText: n =>
+    numberOfPeerReviewsText: (n) =>
       `Ditt svar har fått ${n} kollegial${n > 0 ? "a" : ""} bedömning${
         n > 0 ? "ar" : ""
       }`,
@@ -119,7 +119,7 @@ const swedishLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "Antalen försök är inte begränsade",
     submitGeneralFeedbackLabel: "Inlämnad",
     submitButtonAlreadyAnsweredLabel: "Besvarad",
-    pointsGrantingPolicyInformer: policy => {
+    pointsGrantingPolicyInformer: (policy) => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "För att få poäng måste svaret vara helt rätt"

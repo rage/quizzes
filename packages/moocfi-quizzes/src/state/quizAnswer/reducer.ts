@@ -43,7 +43,7 @@ export const quizAnswerReducer = (
     case getType(quizAnswer.setAnswer):
       let newItemAnswersReady: Record<string, boolean> = {}
       let newQuizAnswer = action.payload
-      newQuizAnswer.itemAnswers.forEach(ia => {
+      newQuizAnswer.itemAnswers.forEach((ia) => {
         newItemAnswersReady[ia.quizItemId] = ia.id !== undefined
       })
 
@@ -74,7 +74,7 @@ export const quizAnswerReducer = (
         itemAnswersReady: newItemAnswersReady,
         quizAnswer: {
           ...state.quizAnswer,
-          itemAnswers: state.quizAnswer.itemAnswers.map(ia =>
+          itemAnswers: state.quizAnswer.itemAnswers.map((ia) =>
             ia.quizItemId === action.payload.itemId
               ? { ...ia, intData: action.payload.newValue }
               : ia,
@@ -95,7 +95,7 @@ export const quizAnswerReducer = (
         quizAnswer: {
           ...state.quizAnswer,
 
-          itemAnswers: state.quizAnswer.itemAnswers.map(ia =>
+          itemAnswers: state.quizAnswer.itemAnswers.map((ia) =>
             ia.quizItemId === action.payload.itemId
               ? { ...ia, textData: action.payload.newValue }
               : ia,
@@ -115,15 +115,15 @@ export const quizAnswerReducer = (
         itemAnswersReady: newItemAnswersReady,
         quizAnswer: {
           ...state.quizAnswer,
-          itemAnswers: state.quizAnswer.itemAnswers.map(ia =>
+          itemAnswers: state.quizAnswer.itemAnswers.map((ia) =>
             ia.quizItemId === action.payload.itemId
               ? {
                   ...ia,
                   optionAnswers: ia.optionAnswers.some(
-                    oa => oa.quizOptionId === action.payload.optionId,
+                    (oa) => oa.quizOptionId === action.payload.optionId,
                   )
                     ? ia.optionAnswers.filter(
-                        oa => oa.quizOptionId !== action.payload.optionId,
+                        (oa) => oa.quizOptionId !== action.payload.optionId,
                       )
                     : ia.optionAnswers.concat({
                         quizOptionId: action.payload.optionId,
@@ -144,7 +144,7 @@ export const quizAnswerReducer = (
       const { itemId, optionId, multi } = action.payload
 
       const current = state.quizAnswer.itemAnswers.find(
-        ia => ia.quizItemId === itemId,
+        (ia) => ia.quizItemId === itemId,
       )
       if (current === undefined) {
         return state
@@ -152,11 +152,11 @@ export const quizAnswerReducer = (
       const newItemAnswer = { ...current }
 
       const previouslyChosen = newItemAnswer.optionAnswers.some(
-        oa => oa.quizOptionId === optionId,
+        (oa) => oa.quizOptionId === optionId,
       )
       if (previouslyChosen) {
         const remainingChosenOptions = current.optionAnswers.filter(
-          oa => oa.quizOptionId !== optionId,
+          (oa) => oa.quizOptionId !== optionId,
         ).length
 
         if (remainingChosenOptions <= 0) {
@@ -169,13 +169,13 @@ export const quizAnswerReducer = (
           itemAnswersReady: newItemAnswersReady,
           quizAnswer: {
             ...state.quizAnswer,
-            itemAnswers: state.quizAnswer.itemAnswers.map(ia =>
+            itemAnswers: state.quizAnswer.itemAnswers.map((ia) =>
               ia.quizItemId !== itemId
                 ? ia
                 : {
                     ...ia,
                     optionAnswers: ia.optionAnswers.filter(
-                      oa => oa.quizOptionId !== optionId,
+                      (oa) => oa.quizOptionId !== optionId,
                     ),
                   },
             ),
@@ -200,7 +200,7 @@ export const quizAnswerReducer = (
         itemAnswersReady: newItemAnswersReady,
         quizAnswer: {
           ...state.quizAnswer,
-          itemAnswers: state.quizAnswer.itemAnswers.map(ia =>
+          itemAnswers: state.quizAnswer.itemAnswers.map((ia) =>
             ia.quizItemId !== itemId
               ? ia
               : { ...ia, optionAnswers: newOptionAnswers },

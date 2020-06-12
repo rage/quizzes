@@ -2,7 +2,7 @@ import { Button, Grid, IconButton } from "@material-ui/core"
 import Flag from "@material-ui/icons/Flag"
 import React from "react"
 
-const LanguageBar = props => {
+const LanguageBar = (props) => {
   return (
     <Grid item={true} xs={12} style={{ backgroundColor: "#F8F8F8" }}>
       <Grid container={true} justify="space-between">

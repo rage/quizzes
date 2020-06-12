@@ -141,14 +141,14 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
             client.onopen = () => {
               resolve(client)
             }
-            client.onerror = err => {
+            client.onerror = (err) => {
               reject(err)
             }
           },
         )
         client.onmessage = onMessage
-        client.onerror = e => reconnect(host, setStatus)
-        client.onclose = e => reconnect(host, setStatus)
+        client.onerror = (e) => reconnect(host, setStatus)
+        client.onclose = (e) => reconnect(host, setStatus)
         client.send(JSON.stringify({ accessToken, courseId }))
         setClient(client)
         setStatus(ConnectionStatus.CONNECTED)

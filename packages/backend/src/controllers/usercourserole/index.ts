@@ -27,7 +27,7 @@ export class UserCourseRoleController {
         userId: user.id,
       })
 
-      const result = roles.map(r => ({
+      const result = roles.map((r) => ({
         role: r.role,
         courseId: r.courseId,
         courseTitle: r.course.texts[0].title,

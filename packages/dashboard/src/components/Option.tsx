@@ -31,7 +31,7 @@ class Option extends React.Component<any, any> {
 
   public shouldComponentUpdate(nextProps, nextState) {
     return Option.attributes.some(
-      attribute => nextProps[attribute] === this.props[attribute],
+      (attribute) => nextProps[attribute] === this.props[attribute],
     )
   }
 
@@ -164,7 +164,7 @@ class Option extends React.Component<any, any> {
     )
   }
 
-  private toggleExpand = event => {
+  private toggleExpand = (event) => {
     this.props.expansionChange(this.props.index)
   }
 }
@@ -181,7 +181,7 @@ const mapStateToProps = (state: any) => {
     edit: state.edit,
     filter: state.filter,
     quizzes: state.quizzes.courseInfos.find(
-      qi => qi.courseId === state.filter.course,
+      (qi) => qi.courseId === state.filter.course,
     ).quizzes,
     user: state.user,
   }

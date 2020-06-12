@@ -29,7 +29,7 @@ const MultipleChoiceContent = ({
 }: contentBoxProps) => {
   return (
     <>
-      {item.options.map(option => (
+      {item.options.map((option) => (
         <MultipleChoiceButton
           key={option.id}
           option={option}
@@ -74,7 +74,7 @@ const MultipleChoiceButton = ({
         {editOptionTitle ? (
           <TextField
             defaultValue={option.texts[0].title}
-            onChange={event =>
+            onChange={(event) =>
               saveOptionTitle(event.target.value, itemId, option.id)
             }
           />

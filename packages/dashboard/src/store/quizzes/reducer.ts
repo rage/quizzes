@@ -30,7 +30,7 @@ export const quizzesReducer = (
       }
     case getType(quizzes.set):
       const oldInfoExists = state.courseInfos.some(
-        qi => qi.courseId === action.payload.courseId,
+        (qi) => qi.courseId === action.payload.courseId,
       )
 
       if (!oldInfoExists) {
@@ -43,12 +43,12 @@ export const quizzesReducer = (
 
         let newQuizzes = [
           ...state.courseInfos.find(
-            qi => qi.courseId === action.payload.courseId,
+            (qi) => qi.courseId === action.payload.courseId,
           ).quizzes,
         ]
 
-        if (newQuizzes.some(quiz => quiz.id === updatedQuiz.id)) {
-          newQuizzes = newQuizzes.map(q =>
+        if (newQuizzes.some((quiz) => quiz.id === updatedQuiz.id)) {
+          newQuizzes = newQuizzes.map((q) =>
             q.id === updatedQuiz.id ? updatedQuiz : q,
           )
         } else {
@@ -57,7 +57,7 @@ export const quizzesReducer = (
 
         return {
           ...state,
-          courseInfos: state.courseInfos.map(qi => {
+          courseInfos: state.courseInfos.map((qi) => {
             return qi.courseId !== action.payload.courseId
               ? qi
               : { ...qi, quizzes: newQuizzes }
@@ -68,7 +68,7 @@ export const quizzesReducer = (
       // otherwise assuming that everything has been fetched from db
       return {
         ...state,
-        courseInfos: state.courseInfos.map(courseQuizzes =>
+        courseInfos: state.courseInfos.map((courseQuizzes) =>
           courseQuizzes.courseId === action.payload.courseId
             ? action.payload
             : courseQuizzes,
@@ -78,10 +78,12 @@ export const quizzesReducer = (
     case getType(quizzes.remove):
       return {
         ...state,
-        courseInfos: state.courseInfos.map(courseQuizzes => {
+        courseInfos: state.courseInfos.map((courseQuizzes) => {
           return {
             ...courseQuizzes,
-            quizzes: courseQuizzes.quizzes.filter(q => q.id !== action.payload),
+            quizzes: courseQuizzes.quizzes.filter(
+              (q) => q.id !== action.payload,
+            ),
           }
         }),
       }

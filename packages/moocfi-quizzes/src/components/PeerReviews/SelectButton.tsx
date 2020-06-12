@@ -11,10 +11,10 @@ export interface SelectButtonProps {
   disabled?: boolean
 }
 
-const SelectButton: React.FunctionComponent<SelectButtonProps> = props => {
+const SelectButton: React.FunctionComponent<SelectButtonProps> = (props) => {
   const themeProvider = React.useContext(ThemeProviderContext)
 
-  const error = useTypedSelector(state => state.message.error)
+  const error = useTypedSelector((state) => state.message.error)
 
   const ThemedButton = themeProvider.selectButton
 

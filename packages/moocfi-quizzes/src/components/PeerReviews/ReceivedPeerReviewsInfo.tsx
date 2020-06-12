@@ -43,12 +43,12 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
   const dispatch = useDispatch()
   const themeProvider = React.useContext(ThemeProviderContext)
   const receivedReviews = useTypedSelector(
-    state => state.receivedReviews.reviews,
+    (state) => state.receivedReviews.reviews,
   )
-  const error = useTypedSelector(state => state.message.error)
-  const quiz = useTypedSelector(state => state.quiz)
+  const error = useTypedSelector((state) => state.message.error)
+  const quiz = useTypedSelector((state) => state.quiz)
   const languageLabels = useTypedSelector(
-    state => state.language.languageLabels,
+    (state) => state.language.languageLabels,
   )
 
   if (!quiz) {
@@ -140,10 +140,10 @@ const ReceivedReviewsSummary: React.FunctionComponent<IReceivedReviewsProps> = (
   peerReviews,
   receivedReviewsLabels,
 }) => {
-  const gradeAnswers = peerReviews.flatMap(review =>
+  const gradeAnswers = peerReviews.flatMap((review) =>
     review.answers
-      .filter(a => typeof (a as PeerReviewGradeAnswer).value === "number")
-      .map(prqa => (prqa as PeerReviewGradeAnswer).value!),
+      .filter((a) => typeof (a as PeerReviewGradeAnswer).value === "number")
+      .map((prqa) => (prqa as PeerReviewGradeAnswer).value!),
   )
 
   let average: number | string = "-"

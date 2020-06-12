@@ -169,7 +169,7 @@ const mapStateToProps = (state: any): IQuizInfoPropsFromState => {
     //   quizTexts: state.edit.texts[0],
     part: state.edit.part,
     section: state.edit.section,
-    includesEssay: state.edit.items.some(i => i.type === "essay"),
+    includesEssay: state.edit.items.some((i) => i.type === "essay"),
     courses: state.courses,
     currentCourseId: state.filter.course,
     quizHasBeenSaved: state.edit.id ? true : false,

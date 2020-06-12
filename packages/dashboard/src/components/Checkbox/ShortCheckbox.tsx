@@ -2,7 +2,7 @@ import { Checkbox, Grid, Typography } from "@material-ui/core"
 import React from "react"
 import ShortWrapper from "../ItemTools/ShortWrapper"
 
-const ShortCheckbox = props => {
+const ShortCheckbox = (props) => {
   const item = props.items[props.order]
 
   return (

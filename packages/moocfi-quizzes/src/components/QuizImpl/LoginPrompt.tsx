@@ -30,7 +30,7 @@ const DefaultLoginMessage: React.FunctionComponent<IDefaultLoginMessageProps> = 
   fullQuizInfoShown,
 }) => {
   const languageLabels = useTypedSelector(
-    state => state.language.languageLabels,
+    (state) => state.language.languageLabels,
   )
 
   const labelPropertyName = `loginTo${

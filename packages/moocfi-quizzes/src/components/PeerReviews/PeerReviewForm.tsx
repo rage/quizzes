@@ -76,9 +76,9 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
   const themeProvider = useContext(ThemeProviderContext)
   const ref = useState(useRef(null))[0]
   const focusRef = useRef<HTMLParagraphElement>(null)
-  const answersToReview = useTypedSelector(state => state.peerReviews.options)
-  const peerReview = useTypedSelector(state => state.peerReviews.answer)
-  const error = useTypedSelector(state => state.message.error)
+  const answersToReview = useTypedSelector((state) => state.peerReviews.options)
+  const peerReview = useTypedSelector((state) => state.peerReviews.answer)
+  const error = useTypedSelector((state) => state.message.error)
   const dispatch = useDispatch()
   console.log(peerReview)
 
@@ -116,7 +116,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
   // choice has been made
   if (peerReview) {
     const chosenAnswer = answersToReview.find(
-      a => a.id === peerReview.quizAnswerId,
+      (a) => a.id === peerReview.quizAnswerId,
     )
     if (!chosenAnswer) {
       return <div>Chosen answer id doesn't belong to any of the options</div>
@@ -182,13 +182,13 @@ const PeerReviewQuestions: React.FunctionComponent<PeerReviewQuestionsProps> = (
   scrollRef,
 }) => {
   const themeProvider = useContext(ThemeProviderContext)
-  const quiz = useTypedSelector(state => state.quiz)
+  const quiz = useTypedSelector((state) => state.quiz)
   const submitDisabled = useTypedSelector(
-    state => state.peerReviews.submitDisabled,
+    (state) => state.peerReviews.submitDisabled,
   )
-  const error = useTypedSelector(state => state.message.error)
+  const error = useTypedSelector((state) => state.message.error)
   const dispatch = useDispatch()
-  const languages = useTypedSelector(state => state.language.languageLabels)
+  const languages = useTypedSelector((state) => state.language.languageLabels)
   const HiddenLikertDescription = styled.p`
     position: absolute;
     left: -10000px;
@@ -241,7 +241,7 @@ const PeerReviewQuestions: React.FunctionComponent<PeerReviewQuestionsProps> = (
 
   return (
     <div>
-      {blocks.map(block => {
+      {blocks.map((block) => {
         return (
           <QuestionBlockWrapper
             providedStyles={themeProvider.questionBlockWrapperStyles}
@@ -254,9 +254,9 @@ const PeerReviewQuestions: React.FunctionComponent<PeerReviewQuestionsProps> = (
             <HiddenLikertDescription id="peer-review-info">
               {languages && languages.peerReviews.peerReviewLikertDetails}
             </HiddenLikertDescription>
-            {block.map(question => {
+            {block.map((question) => {
               let currentPeerReviewAnswer = peerReview.answers.find(
-                answer => answer.peerReviewQuestionId === question.id,
+                (answer) => answer.peerReviewQuestionId === question.id,
               )
               if (!currentPeerReviewAnswer) {
                 return <div />
@@ -328,7 +328,7 @@ const TextualPeerReviewFeedback: React.FunctionComponent<ITextualPeerReviewFeedb
   handleTextChange,
   questionTexts,
 }) => {
-  const languages = useTypedSelector(state => state.language.languageLabels)
+  const languages = useTypedSelector((state) => state.language.languageLabels)
 
   if (!languages) {
     return <div />
@@ -377,7 +377,7 @@ const ReportOrSelect: React.FunctionComponent<ReportOrSelectProps> = ({
 }) => {
   const themeProvider = useContext(ThemeProviderContext)
 
-  const error = useTypedSelector(state => state.message.error)
+  const error = useTypedSelector((state) => state.message.error)
   const [disabled, setDisabled] = React.useState(false)
   const dispatch = useDispatch()
 

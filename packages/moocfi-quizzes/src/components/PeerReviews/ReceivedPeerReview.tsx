@@ -55,9 +55,9 @@ const ReceivedPeerReview: React.FunctionComponent<IReceivedPeerReviewProps> = ({
       </Title>
       {questions
         .sort((e1, e2) => e1.order - e2.order)
-        .map(question => {
+        .map((question) => {
           const questionAnswer = answer.answers.find(
-            a => a.peerReviewQuestionId === question.id,
+            (a) => a.peerReviewQuestionId === question.id,
           )
           if (!questionAnswer) {
             return <div />

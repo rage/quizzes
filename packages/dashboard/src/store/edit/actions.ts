@@ -6,29 +6,29 @@ import { post } from "../../services/quizzes"
 import { displayMessage } from "../notification/actions"
 import * as quizActions from "../quizzes/actions"
 
-export const set = createAction("edit/SET", resolve => {
+export const set = createAction("edit/SET", (resolve) => {
   return (quiz: any) => resolve(quiz)
 })
 
-export const create = createAction("edit/NEW", resolve => {
+export const create = createAction("edit/NEW", (resolve) => {
   return (course: any) => resolve(course)
 })
 
 export const modifyOptionOrder = createAction(
   "edit/OPTION_ORDER_MODIFIED",
-  resolve => (quizItem: IQuizItem, optionIdx1: number, optionIdx2: number) =>
+  (resolve) => (quizItem: IQuizItem, optionIdx1: number, optionIdx2: number) =>
     resolve({ quizItem, optionIdx1, optionIdx2 }),
 )
 
 export const swapOptionOrders = createAction(
   "edit/SWAP_OPTION_ORDER",
-  resolve => (quizItem: IQuizItem, optionIdx1: number, optionIdx2: number) =>
+  (resolve) => (quizItem: IQuizItem, optionIdx1: number, optionIdx2: number) =>
     resolve({ quizItem, optionIdx1, optionIdx2 }),
 )
 
 export const removeOption = createAction(
   "edit/REMOVE_OPTION",
-  resolve => (option: IQuizItemOption) => resolve({ option }),
+  (resolve) => (option: IQuizItemOption) => resolve({ option }),
 )
 
 export const setEdit = (quiz: any) => {
@@ -37,7 +37,7 @@ export const setEdit = (quiz: any) => {
     return
   }
   orderedQuiz.items = orderedQuiz.items.sort((i1, i2) => i1.order - i2.order)
-  orderedQuiz.items.map(item => {
+  orderedQuiz.items.map((item) => {
     const newItem = {
       options: item.options.sort((o1, o2) => o1.order - o2.order),
       ...item,
@@ -53,7 +53,7 @@ export const setEdit = (quiz: any) => {
     checkedQuiz.deadline = new Date(checkedQuiz.deadline)
   }
 
-  return dispatch => {
+  return (dispatch) => {
     dispatch(set(checkedQuiz))
   }
 }
@@ -83,7 +83,7 @@ export const save = () => {
 export const newQuiz = () => {
   return (dispatch, getState) => {
     const course = getState().courses.find(
-      c => c.id === getState().filter.course,
+      (c) => c.id === getState().filter.course,
     )
     const quiz: IQuiz & { peerReviewCollections: any[] } = {
       part: 0,
@@ -122,7 +122,7 @@ export const changeOrder = (path, current, next) => {
   }
 }
 
-export const addItem = type => {
+export const addItem = (type) => {
   return (dispatch, getState) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
 
@@ -168,7 +168,7 @@ export const updateMultipleOptions = (itemOrder, optionData) => {
     let quiz = JSON.parse(JSON.stringify(getState().edit))
     const item = quiz.items[itemOrder]
     const oldOptions = item.options
-    item.options = optionData.map(optData => {
+    item.options = optionData.map((optData) => {
       if (!optData.id) {
         return {
           order: optData.order,
@@ -177,7 +177,7 @@ export const updateMultipleOptions = (itemOrder, optionData) => {
           texts: [],
         }
       } else {
-        const modifiedOption = oldOptions.find(opt => opt.id === optData.id)
+        const modifiedOption = oldOptions.find((opt) => opt.id === optData.id)
         modifiedOption.order = optData.order
         return modifiedOption
       }
@@ -186,8 +186,8 @@ export const updateMultipleOptions = (itemOrder, optionData) => {
 
     quiz = JSON.parse(JSON.stringify(getState().edit))
 
-    quiz.items[itemOrder].options.forEach(option => {
-      const optData = optionData.find(od => od.order === option.order)
+    quiz.items[itemOrder].options.forEach((option) => {
+      const optData = optionData.find((od) => od.order === option.order)
       option.texts[0].title = optData.title
       option.texts[0].body = optData.body
       option.correct = optData.correct
@@ -226,8 +226,8 @@ export const addFinishedOption = (item, optionData) => {
 export const modifyOption = (item, optionData) => {
   return (dispatch, getState) => {
     const quiz = JSON.parse(JSON.stringify(getState().edit))
-    const option = quiz.items[item].options.find(o => o.id === optionData.id)
-    quiz.items[item].options = quiz.items[item].options.map(o =>
+    const option = quiz.items[item].options.find((o) => o.id === optionData.id)
+    quiz.items[item].options = quiz.items[item].options.map((o) =>
       o.id === option.id
         ? {
             ...o,
@@ -299,9 +299,9 @@ export const remove = (path, index) => {
 
 const checkForMissingTranslation = (paramQuiz: IQuiz) => {
   const quiz = JSON.parse(JSON.stringify(paramQuiz))
-  const languages = quiz.course.languages.map(l => l.id)
-  languages.map(language => {
-    if (!quiz.texts.find(text => text.languageId === language)) {
+  const languages = quiz.course.languages.map((l) => l.id)
+  languages.map((language) => {
+    if (!quiz.texts.find((text) => text.languageId === language)) {
       const newText = {
         languageId: language,
         title: `quiz title ${language}`,
@@ -313,7 +313,7 @@ const checkForMissingTranslation = (paramQuiz: IQuiz) => {
       quiz.texts.push(newText)
     }
     quiz.items.map((item, i) => {
-      if (!item.texts.find(text => text.languageId === language)) {
+      if (!item.texts.find((text) => text.languageId === language)) {
         const newText = {
           languageId: language,
           title: `${item.type} item ${item.order} title ${language}`,
@@ -327,7 +327,7 @@ const checkForMissingTranslation = (paramQuiz: IQuiz) => {
         quiz.items[i].texts.push(newText)
       }
       item.options.map((option, j) => {
-        if (!option.texts.find(text => text.languageId === language)) {
+        if (!option.texts.find((text) => text.languageId === language)) {
           const newText = {
             languageId: language,
             title: `option ${option.order} title ${language}`,
@@ -343,7 +343,7 @@ const checkForMissingTranslation = (paramQuiz: IQuiz) => {
       })
     })
     quiz.peerReviewCollections.map((prc, i) => {
-      if (!prc.texts.find(text => text.languageId === language)) {
+      if (!prc.texts.find((text) => text.languageId === language)) {
         const newText = {
           languageId: language,
           title: `peer review collection title ${language}`,
@@ -355,7 +355,7 @@ const checkForMissingTranslation = (paramQuiz: IQuiz) => {
         quiz.peerReviewCollections[i].texts.push(newText)
       }
       prc.questions.map((prq, j) => {
-        if (!prq.texts.find(text => text.languageId === language)) {
+        if (!prq.texts.find((text) => text.languageId === language)) {
           const newText = {
             languageId: language,
             title: `peer review question title ${language}`,

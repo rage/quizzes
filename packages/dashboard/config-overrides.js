@@ -13,7 +13,7 @@ module.exports = function rewire(config, env) {
 
   const tsLoader = getLoader(
     config.module.rules,
-    rule => rule.test && String(rule.test) === String(/\.(ts|tsx)$/),
+    (rule) => rule.test && String(rule.test) === String(/\.(ts|tsx)$/),
   )
 
   delete tsLoader.include
@@ -31,7 +31,7 @@ module.exports = function rewire(config, env) {
     }),
   }*/
 
-  const oneOf = config.module.rules.find(rule => rule.oneOf).oneOf
+  const oneOf = config.module.rules.find((rule) => rule.oneOf).oneOf
   oneOf.unshift(tsLoader)
 
   /*config.resolve.alias = Object.assign({}, config.resolve.alias, {

@@ -25,7 +25,7 @@ export class AuthenticationMiddleware implements ExpressMiddlewareInterface {
     console.log(req.url)
     let onWhiteList = false
 
-    whitelist.forEach(regex => {
+    whitelist.forEach((regex) => {
       if (req.url.match(regex)) {
         onWhiteList = true
       }
@@ -54,7 +54,7 @@ export class AuthenticationMiddleware implements ExpressMiddlewareInterface {
       }
     }
     if (process.env.SENTRY_DSN) {
-      Sentry.configureScope(scope => {
+      Sentry.configureScope((scope) => {
         scope.setUser({ id: `${user.id}` })
       })
     }

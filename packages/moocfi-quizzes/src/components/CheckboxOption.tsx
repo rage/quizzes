@@ -25,9 +25,11 @@ const MarkdownTextWithoutMargin = styled(MarkdownText)`
 const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
   item,
 }) => {
-  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
-  const userQuizState = useTypedSelector(state => state.user.userQuizState)
-  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+  const quizAnswer = useTypedSelector((state) => state.quizAnswer.quizAnswer)
+  const userQuizState = useTypedSelector((state) => state.user.userQuizState)
+  const quizDisabled = useTypedSelector(
+    (state) => state.quizAnswer.quizDisabled,
+  )
 
   const dispatch = useDispatch()
   const option = item.options[0]
@@ -40,7 +42,7 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
     userQuizState && userQuizState.status === "locked" ? true : false
 
   const itemAnswer = quizAnswer.itemAnswers.find(
-    ia => ia.quizItemId === item.id,
+    (ia) => ia.quizItemId === item.id,
   )
   if (!itemAnswer && !quizDisabled) {
     return <LaterQuizItemAddition item={item} />

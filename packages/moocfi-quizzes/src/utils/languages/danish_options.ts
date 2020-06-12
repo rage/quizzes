@@ -65,7 +65,7 @@ const danishLabels: SingleLanguageLabels = {
     loadingLabel: "Indlæser de modtagne peer reviews...",
     noPeerReviewsReceivedlabel:
       "Dit svar har endnu ikke modtaget nogen peer reviews",
-    numberOfPeerReviewsText: n =>
+    numberOfPeerReviewsText: (n) =>
       `Dit svar har modtaget ${n} peer review${n > 0 ? "s" : ""}.`,
     toggleButtonExpandLabel: "Vis alle modtagne peer reviews",
     toggleButtonShrinkLabel: "Skjul peer reviews",
@@ -116,7 +116,7 @@ const danishLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "Antal forsøg er ikke begrænset",
     submitGeneralFeedbackLabel: "Indsendt",
     submitButtonAlreadyAnsweredLabel: "Besvaret",
-    pointsGrantingPolicyInformer: policy => {
+    pointsGrantingPolicyInformer: (policy) => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "Du kan kun få point, hvis svaret er helt korrekt"

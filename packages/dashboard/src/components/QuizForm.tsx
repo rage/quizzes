@@ -86,10 +86,10 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
               this.props.filter.language === l.id && (
                 <TabContainer
                   text={this.props.edit.texts.find(
-                    text => text.languageId === l.id,
+                    (text) => text.languageId === l.id,
                   )}
                   textIndex={this.props.edit.texts.findIndex(
-                    text => text.languageId === l.id,
+                    (text) => text.languageId === l.id,
                   )}
                   handleChange={this.handleChange}
                   key={l.name}
@@ -118,7 +118,7 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
     this.props.save()
   }
 
-  private checker = location => {
+  private checker = (location) => {
     if (location.pathname !== this.props.history.location.pathname) {
       if (this.props.new && location.pathname.includes("/quizzes/")) {
         return true
@@ -132,8 +132,8 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
 
   private shouldPromptUser = () => {
     const savedQuizInfo = this.props.courseInfos
-      .find(ci => ci.courseId === this.props.filter.course)
-      .quizzes.find(q => q.id === this.props.filter.quiz)
+      .find((ci) => ci.courseId === this.props.filter.course)
+      .quizzes.find((q) => q.id === this.props.filter.quiz)
 
     const editInfo = this.props.edit
 
@@ -141,7 +141,7 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
     return unsaved
   }
 
-  private handleChange = path => event => {
+  private handleChange = (path) => (event) => {
     this.props.changeAttr(
       path,
       path.endsWith("correct") ||

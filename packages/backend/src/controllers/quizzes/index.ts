@@ -186,7 +186,7 @@ export class QuizController {
       language,
     })
     const titlesById: { [id: string]: string } = {}
-    quizzes.forEach(quiz => {
+    quizzes.forEach((quiz) => {
       titlesById[quiz.id] = quiz.texts[0].title
     })
     return titlesById

@@ -142,8 +142,9 @@ class DownloadButton extends React.Component<
 
     XLSX.writeFile(
       wb,
-      `${this.props.quiz.texts[0].title}_${this.props.filenameEnd}.${this.props
-        .fileFormat || "csv"}`,
+      `${this.props.quiz.texts[0].title}_${this.props.filenameEnd}.${
+        this.props.fileFormat || "csv"
+      }`,
     )
 
     this.setState({
@@ -152,7 +153,7 @@ class DownloadButton extends React.Component<
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     user: state.user,
   }

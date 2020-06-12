@@ -22,8 +22,8 @@ const PeerReviewsGuidance: React.FunctionComponent<PeerReviewsGuidanceProps> = (
   peerReviewsCompletedInfo,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
-  const quiz = useTypedSelector(state => state.quiz)
-  const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const quiz = useTypedSelector((state) => state.quiz)
+  const userQuizState = useTypedSelector((state) => state.user.userQuizState)
   const given = userQuizState ? userQuizState.peerReviewsGiven : 0
   const required = (quiz && quiz.course.minPeerReviewsGiven) || 0
 

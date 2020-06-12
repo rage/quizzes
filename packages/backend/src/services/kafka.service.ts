@@ -27,7 +27,7 @@ export enum RequiredAction {
 
 @Service()
 export default class KafkaService {
-  @Inject(type => QuizService)
+  @Inject((type) => QuizService)
   private quizService: QuizService
 
   @Inject()
@@ -107,7 +107,7 @@ export default class KafkaService {
     })
     const course = quizzes[0].course
 
-    const data: ExerciseData[] = quizzes.map(quiz => {
+    const data: ExerciseData[] = quizzes.map((quiz) => {
       return {
         name: quiz.texts[0].title,
         id: quiz.id,

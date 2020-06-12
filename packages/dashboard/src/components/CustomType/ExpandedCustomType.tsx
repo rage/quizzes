@@ -94,7 +94,7 @@ class ExpandedCustomType extends React.Component<any, any> {
     )
   }
 
-  private changeTempAttribute = (attributeName: string) => e => {
+  private changeTempAttribute = (attributeName: string) => (e) => {
     if (attributeName === "title") {
       this.setState({
         titleHasBeenModified: true,
@@ -109,7 +109,7 @@ class ExpandedCustomType extends React.Component<any, any> {
     })
   }
 
-  private saveItem = e => {
+  private saveItem = (e) => {
     this.props.toggleExpand(e)
     this.props.changeAttr(
       `items[${this.props.order}].texts[0].title`,

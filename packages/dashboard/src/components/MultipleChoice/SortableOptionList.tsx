@@ -14,7 +14,7 @@ interface ISortableOptionListProps {
 }
 
 const SortableOptionList = SortableContainer<ISortableOptionListProps>(
-  props => {
+  (props) => {
     console.log(
       "Sortable option list is rendered with the following props:",
       props,

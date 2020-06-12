@@ -5,11 +5,11 @@ import { duplicateCourse, getCourses } from "../../services/courses"
 import { setCourse } from "../filter/actions"
 import { displayMessage } from "../notification/actions"
 
-export const set = createAction("courses/SET", resolve => {
-  return courses => resolve(courses)
+export const set = createAction("courses/SET", (resolve) => {
+  return (courses) => resolve(courses)
 })
 
-export const add = createAction("courses/ADD", resolve => {
+export const add = createAction("courses/ADD", (resolve) => {
   return (course: ICourse) => resolve(course)
 })
 

@@ -68,11 +68,11 @@ export default class AuthorizationService {
       courseId,
     })
 
-    if (roles.some(r => r.role === "teacher")) {
+    if (roles.some((r) => r.role === "teacher")) {
       return true
     }
     if (
-      roles.some(r => r.role === "assistant") &&
+      roles.some((r) => r.role === "assistant") &&
       permission <= Permission.MODIFY
     ) {
       return true

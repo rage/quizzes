@@ -100,15 +100,17 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   item,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
-  const quiz = useTypedSelector(state => state.quiz)
-  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
-  const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+  const quiz = useTypedSelector((state) => state.quiz)
+  const quizDisabled = useTypedSelector(
+    (state) => state.quizAnswer.quizDisabled,
+  )
+  const answer = useTypedSelector((state) => state.quizAnswer.quizAnswer)
 
   if (!quiz) {
     return <div />
   }
 
-  const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
+  const itemAnswer = answer.itemAnswers.find((ia) => ia.quizItemId === item.id)
   if (!itemAnswer && !quizDisabled) {
     return <LaterQuizItemAddition item={item} />
   }
@@ -123,7 +125,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
 
   if (onlyOneItem) {
     const maxOptionLength = Math.max(
-      ...options.map(option => option.texts[0].title.length),
+      ...options.map((option) => option.texts[0].title.length),
     )
     direction = "column"
   }
@@ -178,9 +180,11 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
   onlyOneItem,
   item,
 }) => {
-  const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const userQuizState = useTypedSelector((state) => state.user.userQuizState)
   const answerLocked = userQuizState && userQuizState.status === "locked"
-  const languageInfo = useTypedSelector(state => state.language.languageLabels)
+  const languageInfo = useTypedSelector(
+    (state) => state.language.languageLabels,
+  )
   if (!languageInfo) {
     return <div />
   }
@@ -244,22 +248,24 @@ const Option: React.FunctionComponent<OptionProps> = ({
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
-  const items = useTypedSelector(state => state.quiz!.items)
-  const item = items.find(i => i.id === option.quizItemId)
-  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
-  const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const items = useTypedSelector((state) => state.quiz!.items)
+  const item = items.find((i) => i.id === option.quizItemId)
+  const quizAnswer = useTypedSelector((state) => state.quizAnswer.quizAnswer)
+  const userQuizState = useTypedSelector((state) => state.user.userQuizState)
   const languageLabels = useTypedSelector(
-    state => state.language.languageLabels,
+    (state) => state.language.languageLabels,
   )
-  const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
-  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+  const displayFeedback = useTypedSelector((state) => state.feedbackDisplayed)
+  const quizDisabled = useTypedSelector(
+    (state) => state.quizAnswer.quizDisabled,
+  )
 
   if (!item || !languageLabels) {
     // should be impossible
     return <div>Cannot find related item or language</div>
   }
   const itemAnswer = quizAnswer.itemAnswers.find(
-    ia => ia.quizItemId === item.id,
+    (ia) => ia.quizItemId === item.id,
   )
 
   const onlyOneItem = items.length === 1
@@ -276,7 +282,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
   const answerLocked = userQuizState && userQuizState.status === "locked"
 
   const optionIsSelected =
-    optionAnswers && optionAnswers.some(oa => oa.quizOptionId === option.id)
+    optionAnswers && optionAnswers.some((oa) => oa.quizOptionId === option.id)
 
   if (!displayFeedback) {
     return (
@@ -378,12 +384,12 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   item,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
-  const items = useTypedSelector(state => state.quiz!.items)
-  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+  const items = useTypedSelector((state) => state.quiz!.items)
+  const quizAnswer = useTypedSelector((state) => state.quizAnswer.quizAnswer)
   const languageLabels = useTypedSelector(
-    state => state.language.languageLabels,
+    (state) => state.language.languageLabels,
   )
-  const feedbackDisplayed = useTypedSelector(state => state.feedbackDisplayed)
+  const feedbackDisplayed = useTypedSelector((state) => state.feedbackDisplayed)
 
   if (!feedbackDisplayed) {
     return <div style={{ display: "none" }} />
@@ -394,7 +400,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
     return <div>Cannot find related item or language</div>
   }
   const itemAnswer = quizAnswer.itemAnswers.find(
-    ia => ia.quizItemId === item.id,
+    (ia) => ia.quizItemId === item.id,
   )
   if (!itemAnswer) {
     // should be impossible
@@ -409,7 +415,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   const optionAnswer = optionAnswers[0]
 
   const selectedOption = item.options.find(
-    o => o.id === optionAnswer.quizOptionId,
+    (o) => o.id === optionAnswer.quizOptionId,
   )
 
   let feedbackMessage

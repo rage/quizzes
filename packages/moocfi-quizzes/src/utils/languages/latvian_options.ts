@@ -63,7 +63,7 @@ const latvianLabels: SingleLanguageLabels = {
     noSupportForQuestionTypeLabel: "Tādi jautājumi recenzēšanā nav paredzēti.",
     loadingLabel: "Notiek saņemto atzinumu ielāde...",
     noPeerReviewsReceivedlabel: "Vēl nav neviena atzinuma par jūsu atbildi.",
-    numberOfPeerReviewsText: n =>
+    numberOfPeerReviewsText: (n) =>
       `Par jūsu atbildi saņemto atzinumu skaits: ${n}.`,
     toggleButtonExpandLabel: "Parādīt visus saņemtos atzinumus",
     toggleButtonShrinkLabel: "Paslēpt atzinumus",
@@ -114,7 +114,7 @@ const latvianLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "Mēģinājumu skaits nav ierobežots.",
     submitGeneralFeedbackLabel: "Iesniegts:",
     submitButtonAlreadyAnsweredLabel: "Atbildēts:",
-    pointsGrantingPolicyInformer: policy => {
+    pointsGrantingPolicyInformer: (policy) => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "Lai saņemtu punktus, atbildei jābūt pilnīgi pareizai."

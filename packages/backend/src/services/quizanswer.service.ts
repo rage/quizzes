@@ -124,10 +124,7 @@ export default class QuizAnswerService {
       .where({ quiz_id: quiz.id })
       .as("latest")
 
-    const query = this.knex
-      .select("id")
-      .from(latest)
-      .where("rn", 1)
+    const query = this.knex.select("id").from(latest).where("rn", 1)
 
     const result = await entityManager.query(query.toString())
 
@@ -184,7 +181,7 @@ export default class QuizAnswerService {
 
       // undefined for admins
       if (permittedCourseIds) {
-        elementsCourseIds = elementsCourseIds.filter(id =>
+        elementsCourseIds = elementsCourseIds.filter((id) =>
           permittedCourseIds.includes(id),
         )
       }
@@ -203,7 +200,7 @@ export default class QuizAnswerService {
 
       if (permittedCourseIds) {
         nonElementsCriteria.courseIds = permittedCourseIds.filter(
-          id => !elementsCourseIds.includes(id),
+          (id) => !elementsCourseIds.includes(id),
         )
       } else {
         nonElementsCriteria.courseIds = elementsCourseIds
@@ -369,7 +366,7 @@ export default class QuizAnswerService {
       )
 
     query = query.select(
-      ...selectedFields.map(field => `quiz_item_answer.${field}`),
+      ...selectedFields.map((field) => `quiz_item_answer.${field}`),
     )
 
     query = query.select("quiz_answer.created_at", "quiz_answer.updated_at")

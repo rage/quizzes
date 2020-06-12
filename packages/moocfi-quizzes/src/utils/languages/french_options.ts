@@ -69,7 +69,7 @@ const frenchLabels: SingleLanguageLabels = {
     loadingLabel: "Chargement des évaluations par les pairs reçues en cours...",
     noPeerReviewsReceivedlabel:
       "Votre réponse n'a pas encore fait l'objet d'une évaluation par les pairs",
-    numberOfPeerReviewsText: n =>
+    numberOfPeerReviewsText: (n) =>
       `Votre réponse a fait l'objet de ${n} évaluation${
         n > 0 ? "s" : ""
       } par les pairs..`,
@@ -124,7 +124,7 @@ const frenchLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "Le nombre de tentatives est illimité",
     submitGeneralFeedbackLabel: "Réponse soumise",
     submitButtonAlreadyAnsweredLabel: "Réponse reçue",
-    pointsGrantingPolicyInformer: policy => {
+    pointsGrantingPolicyInformer: (policy) => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "Pour pouvoir obtenir des points, la réponse doit être entièrement correcte "

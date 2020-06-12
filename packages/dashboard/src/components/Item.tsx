@@ -77,7 +77,7 @@ class Item extends React.Component<any, any> {
     ]
 
     return modificationFields.some(
-      fieldName => nextProps[fieldName] !== this.props[fieldName],
+      (fieldName) => nextProps[fieldName] !== this.props[fieldName],
     )
   }
 
@@ -97,11 +97,11 @@ class Item extends React.Component<any, any> {
     this.props.remove(path, index)
   }
 
-  private handleItemCancel = quizItemOrder => () => {
+  private handleItemCancel = (quizItemOrder) => () => {
     this.props.remove("items", quizItemOrder)
   }
 
-  private toggleExpand = event => {
+  private toggleExpand = (event) => {
     this.props.expandItem(this.props.order)
   }
 }

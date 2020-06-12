@@ -7,7 +7,7 @@ import { Provider } from "react-redux"
 import createStoreInstance from "../state/store"
 import quizzesTheme from "../themes"
 
-const Quiz: React.FunctionComponent<QuizProps> = props => {
+const Quiz: React.FunctionComponent<QuizProps> = (props) => {
   const store = createStoreInstance(props.id)
 
   return (

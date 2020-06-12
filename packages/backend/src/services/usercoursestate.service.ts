@@ -105,7 +105,7 @@ export default class UserCourseStateService {
     let nPoints = 0
     let maxPoints = 0
 
-    progress.forEach(part => {
+    progress.forEach((part) => {
       nPoints += part.n_points
       maxPoints += part.max_points
     })
@@ -145,7 +145,7 @@ export default class UserCourseStateService {
       exclude: true,
     })
     let pointsTotal: number = 0
-    const quizIds: string[] = quizzes.map(quiz => {
+    const quizIds: string[] = quizzes.map((quiz) => {
       pointsTotal += quiz.points
       return quiz.id
     })
@@ -156,7 +156,7 @@ export default class UserCourseStateService {
     )
     const userCourseState: UserCourseState = new UserCourseState()
     let pointsAwarded: number = 0
-    userQuizStates.map(uqs => {
+    userQuizStates.map((uqs) => {
       pointsAwarded += uqs.pointsAwarded
     })
     userCourseState.pointsAwarded = pointsAwarded
@@ -212,7 +212,7 @@ export default class UserCourseStateService {
         id: courseId,
       })
       let totalPoints: number = 0
-      quizzes.map(q => (totalPoints += q.points))
+      quizzes.map((q) => (totalPoints += q.points))
       userCourseState.pointsAwarded += userQuizState.pointsAwarded
       userCourseState.quizzesConfirmed += 1
       userCourseState.score =
@@ -240,7 +240,7 @@ export default class UserCourseStateService {
       courseId,
       items: true,
     })
-    const ids: string[] = quizzes.map(quiz => quiz.id)
+    const ids: string[] = quizzes.map((quiz) => quiz.id)
     const quizAnswers: QuizAnswer[] = await this.entityManager
       .createQueryBuilder(QuizAnswer, "quiz_answer")
       .where("quiz_answer.user_id = :userId", { userId })
@@ -253,10 +253,10 @@ export default class UserCourseStateService {
       .andWhere("user_quiz_state.quiz_id in (:...ids)", { ids })
       .getMany()
 
-    const requiredActions = userQuizStates.map(uqs => {
-      const quiz = quizzes.find(q => q.id === uqs.quizId)
+    const requiredActions = userQuizStates.map((uqs) => {
+      const quiz = quizzes.find((q) => q.id === uqs.quizId)
       const quizAnswer = quizAnswers.find(
-        qa => qa.userId === userId && qa.quizId === quiz.id,
+        (qa) => qa.userId === userId && qa.quizId === quiz.id,
       )
       const actionObject = {
         quizId: quiz.id,

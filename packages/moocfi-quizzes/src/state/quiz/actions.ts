@@ -5,13 +5,13 @@ import { ThunkAction } from "../store"
 import { Quiz } from "../../modelTypes"
 import * as loadingBarsActions from "../loadingBars/actions"
 
-export const set = createAction("quiz/SET", resolve => {
+export const set = createAction("quiz/SET", (resolve) => {
   return (quiz: Quiz) => resolve(quiz)
 })
 
 export const setTitle = createAction(
   "quiz/SET_TITLE",
-  resolve => (title: string) => resolve(title),
+  (resolve) => (title: string) => resolve(title),
 )
 
 export const clear = createAction("quiz/CLEAR")

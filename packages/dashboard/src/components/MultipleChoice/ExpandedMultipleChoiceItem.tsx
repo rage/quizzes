@@ -198,7 +198,7 @@ class MultipleChoiceItem extends React.Component<
     )
   }
 
-  private changeEditAttribute = (attributeName: string) => e => {
+  private changeEditAttribute = (attributeName: string) => (e) => {
     const value = e.target.value
     const itemsString = `items[${this.props.order}]`
 
@@ -221,7 +221,7 @@ class MultipleChoiceItem extends React.Component<
 
   private modifyOption = (optionOrder: number) => () => {
     const option = this.props.items[this.props.index].options.find(
-      opt => opt.order === optionOrder,
+      (opt) => opt.order === optionOrder,
     )
 
     if (!option) {
@@ -240,7 +240,7 @@ class MultipleChoiceItem extends React.Component<
     )
   }
 
-  private openOptionForModification = optionIdx => () => {
+  private openOptionForModification = (optionIdx) => () => {
     this.setState({
       dialogOpen: true,
       openIdx: optionIdx,

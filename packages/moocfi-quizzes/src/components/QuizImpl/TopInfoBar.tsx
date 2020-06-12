@@ -72,12 +72,14 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   staticBars,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
-  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
-  const userQuizState = useTypedSelector(state => state.user.userQuizState)
-  const loggedIn = !!useTypedSelector(state => state.user.accessToken)
-  const quiz = useTypedSelector(state => state.quiz)
-  const languageInfo = useTypedSelector(state => state.language.languageLabels)
-  const displayBars = useTypedSelector(state => state.loadingBars)
+  const quizAnswer = useTypedSelector((state) => state.quizAnswer.quizAnswer)
+  const userQuizState = useTypedSelector((state) => state.user.userQuizState)
+  const loggedIn = !!useTypedSelector((state) => state.user.accessToken)
+  const quiz = useTypedSelector((state) => state.quiz)
+  const languageInfo = useTypedSelector(
+    (state) => state.language.languageLabels,
+  )
+  const displayBars = useTypedSelector((state) => state.loadingBars)
 
   let title
   let quizLabel

@@ -6,17 +6,17 @@ import { Quiz, QuizAnswerStatePayload, UserQuizState } from "../../modelTypes"
 import { getQuizInfo, QuizResponse } from "../../services/quizService"
 import { setAnswer } from "../quizAnswer/actions"
 
-export const set = createAction("user/SET", resolve => {
+export const set = createAction("user/SET", (resolve) => {
   return (newState: UserState) => resolve(newState)
 })
 
-export const setToken = createAction("user/SET_ACCESS_TOKEN", resolve => {
+export const setToken = createAction("user/SET_ACCESS_TOKEN", (resolve) => {
   return (accessToken: string) => resolve(accessToken)
 })
 
 export const setQuizState = createAction(
   "user/SET_USER_QUIZ_STATE",
-  resolve => {
+  (resolve) => {
     return (payload: QuizAnswerStatePayload) => resolve(payload)
   },
 )

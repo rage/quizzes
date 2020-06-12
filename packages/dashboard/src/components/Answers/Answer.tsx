@@ -51,7 +51,7 @@ class Answer extends React.Component<any, any> {
     const peerSd = this.standardDeviation(this.props.answerData.peerReviews)
 
     const peerReviewCollections = this.props.quizzes.find(
-      q => q.id === this.props.answerData.quizId,
+      (q) => q.id === this.props.answerData.quizId,
     ).peerReviewCollections
 
     return (
@@ -99,7 +99,7 @@ class Answer extends React.Component<any, any> {
                     answer={this.props.answerData}
                     setQuiz={this.props.setQuiz}
                     course={this.props.courses.find(
-                      c => c.id === this.props.filter.course,
+                      (c) => c.id === this.props.filter.course,
                     )}
                   />
                   <Grid item={true} xs="auto">
@@ -255,16 +255,16 @@ class Answer extends React.Component<any, any> {
   private itemAnswersDisplayedInFull = (answer): boolean => {
     const limit = 1500
     return !answer.itemAnswers.some(
-      ia => ia.textData && ia.textData.length > limit,
+      (ia) => ia.textData && ia.textData.length > limit,
     )
   }
 
   private average = (allPeerReviews: any): number | undefined => {
     const allGrades = allPeerReviews
-      .map(pr => pr.answers)
+      .map((pr) => pr.answers)
       .flat()
-      .filter(pAnswer => pAnswer.value !== null)
-      .map(pAnswer => pAnswer.value)
+      .filter((pAnswer) => pAnswer.value !== null)
+      .map((pAnswer) => pAnswer.value)
     if (allGrades.length === 0) {
       return undefined
     }
@@ -275,10 +275,10 @@ class Answer extends React.Component<any, any> {
   // population sd, not sample
   private standardDeviation = (allPeerReviews: any): number | undefined => {
     const allGrades = allPeerReviews
-      .map(pr => pr.answers)
+      .map((pr) => pr.answers)
       .flat()
-      .filter(pAnswer => pAnswer.value !== null)
-      .map(pAnswer => pAnswer.value)
+      .filter((pAnswer) => pAnswer.value !== null)
+      .map((pAnswer) => pAnswer.value)
 
     if (allGrades.length === 0) {
       return undefined
@@ -476,7 +476,7 @@ class PeerReviewsSummary extends React.Component<any, any> {
     prAnswers: any[],
     questionIdx: number,
   ): number | undefined => {
-    const scores = prAnswers.map(a => a.answers[questionIdx].value)
+    const scores = prAnswers.map((a) => a.answers[questionIdx].value)
     if (scores.length === 0) {
       return undefined
     }
@@ -488,7 +488,7 @@ class PeerReviewsSummary extends React.Component<any, any> {
     prAnswers: any[],
     questionIdx: number,
   ): number | undefined => {
-    const scores = prAnswers.map(a => a.answers[questionIdx].value)
+    const scores = prAnswers.map((a) => a.answers[questionIdx].value)
     if (scores.length === 0) {
       return undefined
     }
@@ -516,10 +516,10 @@ class PeerReviewsSummary extends React.Component<any, any> {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     quizzes: state.quizzes.courseInfos.find(
-      qi => qi.courseId === state.filter.course,
+      (qi) => qi.courseId === state.filter.course,
     ).quizzes,
     courses: state.courses,
     filter: state.filter,

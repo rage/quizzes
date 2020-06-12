@@ -70,10 +70,12 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
   const matchesSmall = useMediaQuery(theme.breakpoints.down("xs"))
 
   const itemAnswers = useTypedSelector(
-    state => state.quizAnswer.quizAnswer.itemAnswers,
+    (state) => state.quizAnswer.quizAnswer.itemAnswers,
   )
-  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
-  const itemAnswer = itemAnswers.find(ia => ia.quizItemId === item.id)
+  const quizDisabled = useTypedSelector(
+    (state) => state.quizAnswer.quizDisabled,
+  )
+  const itemAnswer = itemAnswers.find((ia) => ia.quizItemId === item.id)
   const intData = itemAnswer && itemAnswer.intData
 
   if (!itemAnswer && !quizDisabled) {
@@ -120,8 +122,10 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
   intData,
 }) => {
   let number_of_options = 7
-  const userQuizState = useTypedSelector(state => state.user.userQuizState)
-  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+  const userQuizState = useTypedSelector((state) => state.user.userQuizState)
+  const quizDisabled = useTypedSelector(
+    (state) => state.quizAnswer.quizDisabled,
+  )
 
   const answerLocked = userQuizState && userQuizState.status === "locked"
   const minLabel = item.texts[0].minLabel
@@ -161,7 +165,7 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
             container={true}
             justify={number_of_options <= 12 ? "space-between" : "flex-start"}
           >
-            {alternatives.map(number => (
+            {alternatives.map((number) => (
               <StyledOptionItem key={number} role="radio">
                 <FormControlLabel
                   value={`${number}`}

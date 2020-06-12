@@ -22,7 +22,7 @@ export default class UserCoursePartStateService {
   @InjectManager()
   private entityManager: EntityManager
 
-  @Inject(type => QuizService)
+  @Inject((type) => QuizService)
   private quizService: QuizService
 
   @Inject()
@@ -78,7 +78,7 @@ export default class UserCoursePartStateService {
         courseId,
         userId,
       )
-      return userCoursePartStates.find(ucps => ucps.coursePart === coursePart)
+      return userCoursePartStates.find((ucps) => ucps.coursePart === coursePart)
     } else {
       userCoursePartState = await this.calculateProgressData(
         manager,
@@ -230,13 +230,13 @@ export default class UserCoursePartStateService {
     )
 
     const progress: PointsByGroup[] = userCoursePartStates
-      .filter(ucps => ucps.coursePart !== 0)
-      .map(ucps => {
+      .filter((ucps) => ucps.coursePart !== 0)
+      .map((ucps) => {
         const maxPoints = quizzes
           .filter(
-            quiz => quiz.part === ucps.coursePart && !quiz.excludedFromScore,
+            (quiz) => quiz.part === ucps.coursePart && !quiz.excludedFromScore,
           )
-          .map(quiz => quiz.points)
+          .map((quiz) => quiz.points)
           .reduce((acc, curr) => acc + curr)
 
         const coursePartString: string = ucps.coursePart.toString()
@@ -268,7 +268,7 @@ export default class UserCoursePartStateService {
     )
 
     let pointsTotal: number = 0
-    const quizIds: string[] = quizzesInPart.map(quiz => {
+    const quizIds: string[] = quizzesInPart.map((quiz) => {
       pointsTotal += quiz.points
       return quiz.id
     })
@@ -281,7 +281,7 @@ export default class UserCoursePartStateService {
 
     let pointsAwarded: number = 0
 
-    userQuizStates.forEach(uqs => {
+    userQuizStates.forEach((uqs) => {
       pointsAwarded += uqs.pointsAwarded
     })
 

@@ -8,7 +8,7 @@ export class alterQuizItemAddWordLimitsConstraints1553947075047
     if (
       !qiTable
         .findColumnChecks(qiTable.findColumnByName("quiz_item"))
-        .some(tc => tc.name === "min_cannot_exceed_max")
+        .some((tc) => tc.name === "min_cannot_exceed_max")
     ) {
       await queryRunner.createCheckConstraint(
         "quiz_item",

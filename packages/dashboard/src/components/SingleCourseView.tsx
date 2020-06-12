@@ -66,7 +66,7 @@ class SingleCourseView extends React.Component<
   public initialize = () => {
     const newParts = {}
 
-    this.props.quizzesOfCourse.quizzes.forEach(q => {
+    this.props.quizzesOfCourse.quizzes.forEach((q) => {
       let sections = newParts[`${q.part}`]
       if (!sections) {
         sections = {}
@@ -116,7 +116,7 @@ class SingleCourseView extends React.Component<
       return <div />
     }
     const currentCourse = this.props.courses.find(
-      course => this.props.match.params.id === course.id,
+      (course) => this.props.match.params.id === course.id,
     )
     if (!currentCourse) {
       return <div />
@@ -185,7 +185,7 @@ class SingleCourseView extends React.Component<
                 style={{ paddingLeft: ".5em", paddingRight: ".5em" }}
               >
                 {JSON.stringify(this.state.parts) !== "{}" &&
-                  Object.keys(this.state.parts).map(part => {
+                  Object.keys(this.state.parts).map((part) => {
                     return (
                       <PartComponent
                         answerCounts={this.props.answerCounts}
@@ -217,7 +217,7 @@ const PartComponent = ({ sections, partNumber, answerCounts }) => {
           justify="flex-start"
           style={{ backgroundColor: "white" }}
         >
-          {Object.keys(sections).map(section => {
+          {Object.keys(sections).map((section) => {
             return (
               <SectionComponent
                 key={section}
@@ -246,7 +246,7 @@ const SectionComponent = ({ quizzes, sectionNumber, answerCounts }) => {
             <CourseComponent
               idx={idx}
               quiz={q}
-              countData={answerCounts.find(a => a.quizId === q.id)}
+              countData={answerCounts.find((a) => a.quizId === q.id)}
             />
           </Grid>
         )
@@ -345,7 +345,7 @@ const mapStateToProps = (state: any) => {
     courses: state.courses,
     filter: state.filter,
     quizzesOfCourse: state.quizzes.courseInfos.find(
-      qi => qi.courseId === state.filter.course,
+      (qi) => qi.courseId === state.filter.course,
     ),
     user: state.user,
   }
@@ -357,7 +357,7 @@ const mapDispatchToProps = {
 }
 
 const quizItemTypes = (quiz: IQuiz): string => {
-  return `[${[...new Set(quiz.items.map(qi => qi.type))].sort().join(", ")}]`
+  return `[${[...new Set(quiz.items.map((qi) => qi.type))].sort().join(", ")}]`
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(SingleCourseView)

@@ -85,7 +85,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
           <FormControl variant="outlined">
             <InputLabel>Language</InputLabel>
             <Select value={this.props.filterLanguage}>
-              {this.props.courseLanguages.map(languageInfo => {
+              {this.props.courseLanguages.map((languageInfo) => {
                 return (
                   <MenuItem value={languageInfo.id} key={languageInfo.id}>
                     {languageInfo.name}
@@ -105,7 +105,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
                   value={this.props.courseId}
                   onChange={this.changeTempAttribute("courseId")}
                 >
-                  {this.props.courses.map(course => {
+                  {this.props.courses.map((course) => {
                     return (
                       <MenuItem value={course.id} key={course.id}>
                         {course.texts[0].title}
@@ -259,7 +259,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
     }
   }
 
-  private changeTempAttribute = (attributeName: string) => e => {
+  private changeTempAttribute = (attributeName: string) => (e) => {
     const value = e.target.value
 
     switch (attributeName) {

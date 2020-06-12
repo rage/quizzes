@@ -18,7 +18,7 @@ const CourseCard = ({ course }) => {
       <CardContent>
         <Typography variant="body1">
           Languages:{" "}
-          {course.languages.map(language => language.name).splice(", ")}
+          {course.languages.map((language) => language.name).splice(", ")}
         </Typography>
       </CardContent>
     </Card>
@@ -63,7 +63,7 @@ class CoursesView extends React.Component<any, any> {
               alignItems="center"
               justify="flex-start"
             >
-              {this.props.courses.map(course => (
+              {this.props.courses.map((course) => (
                 <Grid
                   key={course.id}
                   item={true}

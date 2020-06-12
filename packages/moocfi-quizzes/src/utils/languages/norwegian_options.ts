@@ -66,7 +66,7 @@ const norwegianLabels: SingleLanguageLabels = {
     loadingLabel: "Laster ned mottatte fagfellevurderinger...",
     noPeerReviewsReceivedlabel:
       "Svaret ditt har ikke fått noen fagfellevurderinger",
-    numberOfPeerReviewsText: n =>
+    numberOfPeerReviewsText: (n) =>
       `Svaret ditt har fått ${n} fagfellevurdering${n > 0 ? "er" : ""}.`,
     toggleButtonExpandLabel: "Vis alle fagfellevurderinger",
     toggleButtonShrinkLabel: "Skjul fagfellevurderinger",
@@ -118,7 +118,7 @@ const norwegianLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "Antall forsøk er ikke begrenset",
     submitGeneralFeedbackLabel: "Sendt",
     submitButtonAlreadyAnsweredLabel: "Besvart",
-    pointsGrantingPolicyInformer: policy => {
+    pointsGrantingPolicyInformer: (policy) => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "For å få poeng må svaret være 100% korrekt"

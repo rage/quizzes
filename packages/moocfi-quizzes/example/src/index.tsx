@@ -26,7 +26,7 @@ const FlexContainer = styled.div`
   justify-content: center;
 `
 
-const StyledQuizContainer = styled(props => <Paper {...props} />)`
+const StyledQuizContainer = styled((props) => <Paper {...props} />)`
   overflow: hidden;
   margin: 2rem 0;
   box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 40px -12px;
@@ -34,7 +34,7 @@ const StyledQuizContainer = styled(props => <Paper {...props} />)`
   flex-basis: 800px;
 `
 
-const StyledTextField = styled(props => (
+const StyledTextField = styled((props) => (
   <TextField variant="outlined" fullWidth {...props} />
 ))`
   margin: 1rem;

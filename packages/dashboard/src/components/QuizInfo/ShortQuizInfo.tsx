@@ -50,7 +50,7 @@ const ShortQuizInfo: React.FunctionComponent<IProps> = ({
         value={filterLanguage}
         input={<Input id="language-readonly" name="language" disabled={true} />}
       >
-        {courseLanguages.map(languageInfo => {
+        {courseLanguages.map((languageInfo) => {
           return (
             <MenuItem value={languageInfo.id} key={languageInfo.id}>
               {languageInfo.name}

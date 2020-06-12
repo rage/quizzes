@@ -8,12 +8,12 @@ export const getQuizzes = async (course, user) => {
   return response.data
 }
 
-export const getQuiz = async quizId => {
+export const getQuiz = async (quizId) => {
   const response = await axios.get(`/api/v1/quizzes/${quizId}`)
   return response.data
 }
 
-export const getAttentionAnswerCountsByQuizzes = async user => {
+export const getAttentionAnswerCountsByQuizzes = async (user) => {
   const response = await axios.get(`/api/v1/quizzes/answer/counts`, {
     headers: { authorization: `Bearer ${user.accessToken}` },
   })
@@ -40,7 +40,7 @@ export const getPeerReviewsDetailedData = async (quizId, user) => {
       },
     },
   )
-  return response.data.map(peerReviewRow => ({
+  return response.data.map((peerReviewRow) => ({
     ...peerReviewRow,
     rejected_quiz_answer_ids:
       peerReviewRow.rejected_quiz_answer_ids.length === 1
@@ -182,7 +182,7 @@ export const getDetailedEverythingData = async (quizId, user) => {
     },
 
     peerReviews: {
-      plainPeerReviews: responsePlainPeerReviews.data.map(peerReviewRow => ({
+      plainPeerReviews: responsePlainPeerReviews.data.map((peerReviewRow) => ({
         ...peerReviewRow,
         rejected_quiz_answer_ids:
           peerReviewRow.rejected_quiz_answer_ids.length === 1

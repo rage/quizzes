@@ -48,7 +48,7 @@ class App extends React.Component<any, any> {
     if (!this.props.filter.course) {
       return null
     }
-    return this.props.courses.find(c => c.id === this.props.filter.course)
+    return this.props.courses.find((c) => c.id === this.props.filter.course)
   }
 
   public currentQuizTitle: () => string | null = () => {
@@ -57,7 +57,7 @@ class App extends React.Component<any, any> {
     }
 
     const quiz = this.props.quizzesOfCourse.quizzes.find(
-      q => q.id === this.props.filter.quiz,
+      (q) => q.id === this.props.filter.quiz,
     )
     return quiz ? quiz.texts[0].title : null
   }
@@ -230,7 +230,7 @@ class App extends React.Component<any, any> {
     )
   }
 
-  private PathBreadcrumbs = props => {
+  private PathBreadcrumbs = (props) => {
     const history = props.history
 
     const Crumbify = (path: string | null, label: string | null) => () =>
@@ -284,12 +284,14 @@ class App extends React.Component<any, any> {
 
         {onSavedQuizPage && Crumbify(null, this.currentQuizTitle())()}
 
-        {// not a fourth, but an alternative to the third
-        onAnswerPage &&
-          Crumbify(
-            `/quizzes/${this.props.filter.quiz}/answers`,
-            this.currentQuizTitle(),
-          )()}
+        {
+          // not a fourth, but an alternative to the third
+          onAnswerPage &&
+            Crumbify(
+              `/quizzes/${this.props.filter.quiz}/answers`,
+              this.currentQuizTitle(),
+            )()
+        }
       </Breadcrumbs>
     )
   }
@@ -303,18 +305,18 @@ class App extends React.Component<any, any> {
     if (this.props.quizzesOfCourse) {
       quiz =
         this.props.quizzesOfCourse.quizzes &&
-        this.props.quizzesOfCourse.quizzes.find(q => q.id === match.params.id)
+        this.props.quizzesOfCourse.quizzes.find((q) => q.id === match.params.id)
     }
 
     const quizzesByCourses = this.props.quizzesByCourses
     // Second best: quiz loaded in memory, but under another course
     if (!quiz) {
-      quizzesByCourses.forEach(courseInfo => {
+      quizzesByCourses.forEach((courseInfo) => {
         if (quiz) {
           return
         }
         const possibleQuizOnCourse = courseInfo.quizzes.find(
-          q => q.id === quizIdInPath,
+          (q) => q.id === quizIdInPath,
         )
         if (possibleQuizOnCourse) {
           quiz = possibleQuizOnCourse
@@ -411,7 +413,7 @@ const mapStateToProps = (state: any) => {
     edit: state.edit,
     filter: state.filter,
     quizzesOfCourse: state.quizzes.courseInfos.find(
-      courseQuizInfo => courseQuizInfo.courseId === state.filter.course,
+      (courseQuizInfo) => courseQuizInfo.courseId === state.filter.course,
     ),
     quizzesByCourses: state.quizzes.courseInfos,
     user: state.user,

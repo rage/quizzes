@@ -190,19 +190,27 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const ref = useRef(null)
   const themeProvider = useContext(ThemeProviderContext)
   const courseStatusProvider = useContext(CourseStatusProviderContext)
-  const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
-  const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
-  const messageState = useTypedSelector(state => state.message)
-  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
-  const quiz = useTypedSelector(state => state.quiz)
-  const languageInfo = useTypedSelector(state => state.language.languageLabels)
-  const userQuizState = useTypedSelector(state => state.user.userQuizState)
-  const storeAccessToken = useTypedSelector(state => state.user.accessToken)
-  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
-  const showPoints = useTypedSelector(
-    state => state.customization.showPointsInfo,
+  const submitLocked = useTypedSelector(
+    (state) => state.quizAnswer.submitLocked,
   )
-  const activeStep = useTypedSelector(state => state.peerReviews.activeStep)
+  const pastDeadline = useTypedSelector(
+    (state) => state.quizAnswer.pastDeadline,
+  )
+  const messageState = useTypedSelector((state) => state.message)
+  const quizAnswer = useTypedSelector((state) => state.quizAnswer.quizAnswer)
+  const quiz = useTypedSelector((state) => state.quiz)
+  const languageInfo = useTypedSelector(
+    (state) => state.language.languageLabels,
+  )
+  const userQuizState = useTypedSelector((state) => state.user.userQuizState)
+  const storeAccessToken = useTypedSelector((state) => state.user.accessToken)
+  const quizDisabled = useTypedSelector(
+    (state) => state.quizAnswer.quizDisabled,
+  )
+  const showPoints = useTypedSelector(
+    (state) => state.customization.showPointsInfo,
+  )
+  const activeStep = useTypedSelector((state) => state.peerReviews.activeStep)
 
   const dispatch = useDispatch()
 
@@ -355,7 +363,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     quiz.items.length > 1 &&
     showPoints &&
     quiz.items.some(
-      qi =>
+      (qi) =>
         qi.type !== "checkbox" &&
         qi.type !== "scale" &&
         qi.type !== "feedback" &&
@@ -427,7 +435,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
               <SubmitGroup providedStyles={themeProvider.submitGroupStyles}>
                 <div />
                 <div
-                  onClick={e => {
+                  onClick={(e) => {
                     if ((submitLocked || pastDeadline) && !quizDisabled) {
                       dispatch(quizAnswerActions.noticeDisabledSubmitAttempt())
                     }

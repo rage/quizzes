@@ -1,6 +1,6 @@
 import { createAction } from "typesafe-actions"
 
-export const set = createAction("language/SET", resolve => {
+export const set = createAction("language/SET", (resolve) => {
   return (languageId: string) => resolve(languageId)
 })
 

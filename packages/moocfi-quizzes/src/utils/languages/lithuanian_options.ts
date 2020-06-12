@@ -65,7 +65,7 @@ const lithuanianLabels: SingleLanguageLabels = {
     loadingLabel: "Įkeliami gauti tarpusavio įvertinimai...",
     noPeerReviewsReceivedlabel:
       "Jūsų atsakymo tarpusavio įvertinimų kol kas negauta.",
-    numberOfPeerReviewsText: n =>
+    numberOfPeerReviewsText: (n) =>
       `Gautų jūsų atsakymo tarpusavio įvertinimų skaičius - ${n} ${
         n > 0 ? "" : ""
       }.`,
@@ -119,7 +119,7 @@ const lithuanianLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "Bandymų skaičius neribojamas.",
     submitGeneralFeedbackLabel: "Pateikta",
     submitButtonAlreadyAnsweredLabel: "Atsakyta",
-    pointsGrantingPolicyInformer: policy => {
+    pointsGrantingPolicyInformer: (policy) => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "Balai skiriami tik jei atsakymas visiškai teisingas."

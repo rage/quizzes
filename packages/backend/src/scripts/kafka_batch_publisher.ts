@@ -65,9 +65,7 @@ const publish = async () => {
       }
 
       console.log("removing task from database")
-      await knex("kafka_task")
-        .where("id", task.id)
-        .del()
+      await knex("kafka_task").where("id", task.id).del()
     }
 
     console.timeEnd("done in")
@@ -158,7 +156,7 @@ const publishQuizzes = async (course: ICourse): Promise<IQuiz[]> => {
       })
       .andWhereNot("part", 0)
 
-    const data: ExerciseData[] = quizzes.map(quiz => {
+    const data: ExerciseData[] = quizzes.map((quiz) => {
       return {
         name: quiz.title,
         id: quiz.id,
@@ -232,9 +230,7 @@ const publishAnswers = async (course: ICourse) => {
       .andWhere(
         "quiz_answer.id",
         "in",
-        knex(latest)
-          .select("id")
-          .where("rn", 1),
+        knex(latest).select("id").where("rn", 1),
       )
 
     let answer
@@ -313,7 +309,7 @@ const publishProgress = async (course: ICourse, quizzes: any[]) => {
     })
 
     for (group of groupedByUser) {
-      const progress: PointsByGroup[] = group.map(ucps => {
+      const progress: PointsByGroup[] = group.map((ucps) => {
         const coursePartString: string = ucps.course_part.toString()
         return {
           group: `${

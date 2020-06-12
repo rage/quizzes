@@ -60,15 +60,19 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
   const handleTextDataChange = (e: MiscEvent) =>
     dispatch(quizAnswerActions.changeTextData(item.id, e.currentTarget.value))
 
-  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
-  const languageInfo = useTypedSelector(state => state.language.languageLabels)
-  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
-
-  const recentlyAttemptedDisabledSubmit = useTypedSelector(
-    state => state.quizAnswer.attemptedDisabledSubmit,
+  const quizAnswer = useTypedSelector((state) => state.quizAnswer.quizAnswer)
+  const languageInfo = useTypedSelector(
+    (state) => state.language.languageLabels,
+  )
+  const quizDisabled = useTypedSelector(
+    (state) => state.quizAnswer.quizDisabled,
   )
 
-  const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const recentlyAttemptedDisabledSubmit = useTypedSelector(
+    (state) => state.quizAnswer.attemptedDisabledSubmit,
+  )
+
+  const userQuizState = useTypedSelector((state) => state.user.userQuizState)
 
   if (!languageInfo) {
     return <div />
@@ -77,7 +81,9 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
   const itemBody = item.texts[0].body
   const itemTitle = item.texts[0].title
 
-  let itemAnswer = quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id)
+  let itemAnswer = quizAnswer.itemAnswers.find(
+    (ia) => ia.quizItemId === item.id,
+  )
 
   let possibleToSubmit = true
 

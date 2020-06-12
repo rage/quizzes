@@ -114,7 +114,7 @@ const BasicInformation = ({
           <StyledTextField
             multiline
             defaultValue={texts[0].title}
-            onChange={event => editedQuizTitle(event.target.value)}
+            onChange={(event) => editedQuizTitle(event.target.value)}
           />
         </InfoContainer>
         <InfoContainer>
@@ -122,7 +122,7 @@ const BasicInformation = ({
           <Select
             type="number"
             defaultValue={numberOfTries}
-            onChange={event => editedNumberOfTries(event.target.value)}
+            onChange={(event) => editedNumberOfTries(event.target.value)}
           >
             <MenuItem value={1}>1</MenuItem>
             <MenuItem value={2}>2</MenuItem>
@@ -136,7 +136,7 @@ const BasicInformation = ({
           <Select
             type="number"
             defaultValue={pointsToGain}
-            onChange={event => editedPointsToGain(event.target.value)}
+            onChange={(event) => editedPointsToGain(event.target.value)}
           >
             <MenuItem value={1}>1</MenuItem>
             <MenuItem value={2}>2</MenuItem>
@@ -150,7 +150,7 @@ const BasicInformation = ({
           <Select
             type="string"
             defaultValue={pointsGrantingPolicy}
-            onChange={event => editedPointsGrantingPolicy(event.target.value)}
+            onChange={(event) => editedPointsGrantingPolicy(event.target.value)}
           >
             <MenuItem value="grant_whenever_possible">
               grant_whenever_possible

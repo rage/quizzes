@@ -16,7 +16,7 @@ const ResultInformation: React.FunctionComponent<ResultInformationProps> = ({
 }) => {
   const hasCorrectAnswer = (quiz: Quiz) => {
     return quiz.items.some(
-      item =>
+      (item) =>
         item.type === "essay" ||
         item.type === "multiple-choice" ||
         item.type === "open",
@@ -24,9 +24,9 @@ const ResultInformation: React.FunctionComponent<ResultInformationProps> = ({
   }
 
   const atLeastOneCorrect = (itemAnswers: QuizItemAnswer[]) =>
-    itemAnswers.some(ia => ia.correct === true)
+    itemAnswers.some((ia) => ia.correct === true)
 
-  const types = quiz.items.map(item => item.type)
+  const types = quiz.items.map((item) => item.type)
 
   let feedback: string | undefined = undefined
 
@@ -42,9 +42,9 @@ const ResultInformation: React.FunctionComponent<ResultInformationProps> = ({
   }
 
   const quizItems = quiz.items
-  const numberOfNotIncorrectAnswers = quizAnswer.itemAnswers.filter(ia => {
+  const numberOfNotIncorrectAnswers = quizAnswer.itemAnswers.filter((ia) => {
     if (ia.correct === true) return true
-    const item = quizItems.find(i => i.id === ia.quizItemId)
+    const item = quizItems.find((i) => i.id === ia.quizItemId)
     return (
       item &&
       (item.type === "checkbox" ||

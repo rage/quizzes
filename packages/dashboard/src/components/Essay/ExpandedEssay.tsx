@@ -123,7 +123,7 @@ class ExpandedEssay extends React.Component<any, any> {
     )
   }
 
-  private changeTempAttribute = (attributeName: string) => e => {
+  private changeTempAttribute = (attributeName: string) => (e) => {
     let value = e.target.value
 
     if (attributeName === "title" || attributeName === "body") {

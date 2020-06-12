@@ -183,7 +183,7 @@ class PeerReviewQuestion extends React.Component<
     )
   }
 
-  private handleExpand = event => {
+  private handleExpand = (event) => {
     this.setState({ expanded: !this.state.expanded })
   }
 }

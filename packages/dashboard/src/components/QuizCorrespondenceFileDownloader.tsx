@@ -103,7 +103,7 @@ class CorrespondenceIdFileDownloader extends React.Component<
                     }
                     return 0
                   })
-                  .map(course => {
+                  .map((course) => {
                     const { courseId, title, abbreviation } = course.texts[0]
 
                     return (
@@ -189,7 +189,7 @@ class CorrespondenceIdFileDownloader extends React.Component<
   }
 }
 
-const mapStateToProps = state => ({
+const mapStateToProps = (state) => ({
   courses: state.courses,
   newCourseId: state.filter.course,
   user: state.user,

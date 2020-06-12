@@ -246,13 +246,13 @@ export default class PeerReviewService {
       .getMany()
 
     const rejected: string[] = [].concat(
-      ...givenPeerReviews.map(pr => pr.rejectedQuizAnswerIds),
-      ...givenSpamFlags.map(spamFlag => spamFlag.quizAnswerId),
+      ...givenPeerReviews.map((pr) => pr.rejectedQuizAnswerIds),
+      ...givenSpamFlags.map((spamFlag) => spamFlag.quizAnswerId),
     )
     // query will fail if this array is empty
     rejected.push(randomUUID())
 
-    const alreadyReviewed = givenPeerReviews.map(pr => pr.quizAnswerId)
+    const alreadyReviewed = givenPeerReviews.map((pr) => pr.quizAnswerId)
     alreadyReviewed.push(randomUUID())
 
     let allCandidates: any[] = []
@@ -298,7 +298,7 @@ export default class PeerReviewService {
     return await this.entityManager
       .createQueryBuilder(QuizAnswer, "quiz_answer")
       .where("quiz_answer.id in (:...ids)", {
-        ids: allCandidates.map(c => c.id),
+        ids: allCandidates.map((c) => c.id),
       })
       .getMany()
   }

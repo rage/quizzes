@@ -65,7 +65,7 @@ const hungarianLabels: SingleLanguageLabels = {
     noPeerReviewsReceivedlabel: "Válaszát még egy partner sem értékelte",
     noSupportForQuestionTypeLabel:
       "Ez a fajta partneri értékelési kérdés nem támogatott",
-    numberOfPeerReviewsText: n =>
+    numberOfPeerReviewsText: (n) =>
       `Válaszát ${n} számú partner értékelte${n > 1 ? "s" : ""}.`,
     summaryViewLabel: "A kapott partneri értékelések:",
     toggleButtonExpandLabel: "Az összes partneri értékelések megjelenítése",
@@ -115,7 +115,7 @@ const hungarianLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "A próbálkozások száma korlátlan",
     submitGeneralFeedbackLabel: "Beküldve",
     submitButtonAlreadyAnsweredLabel: "Megválaszolva",
-    pointsGrantingPolicyInformer: policy => {
+    pointsGrantingPolicyInformer: (policy) => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "Csak teljesen helyes válasz esetén kap pontot."

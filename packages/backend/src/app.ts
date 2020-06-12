@@ -79,7 +79,7 @@ export class App {
       ],
     })
 
-    this.handlers.forEach(handler => this.application.use(handler))
+    this.handlers.forEach((handler) => this.application.use(handler))
   }
 
   public getApp(): Application {

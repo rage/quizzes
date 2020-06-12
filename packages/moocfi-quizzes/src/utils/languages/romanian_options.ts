@@ -66,7 +66,7 @@ const romanianLabels: SingleLanguageLabels = {
     loadingLabel: "Se încarcă evaluările colegiale primite...",
     noPeerReviewsReceivedlabel:
       "Răspunsul dumneavoastră nu a primit încă nicio evaluare colegială",
-    numberOfPeerReviewsText: n =>
+    numberOfPeerReviewsText: (n) =>
       `Răspunsul dumneavoastră a primit ${n} evaluări colegiale/evaluări arvio.`,
     toggleButtonExpandLabel: "Arătați toate evaluările colegiale primite",
     toggleButtonShrinkLabel: "Ascundeți evaluările colegiale",
@@ -118,7 +118,7 @@ const romanianLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "Numărul de încercări nu este limitat",
     submitGeneralFeedbackLabel: "Trimise",
     submitButtonAlreadyAnsweredLabel: "Răspunsuri trimise",
-    pointsGrantingPolicyInformer: policy => {
+    pointsGrantingPolicyInformer: (policy) => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "Pentru a primi puncte, răspunsul trebuie să fie întru totul corect"

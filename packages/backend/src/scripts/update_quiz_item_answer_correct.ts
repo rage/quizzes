@@ -6,10 +6,7 @@ const update = async () => {
     console.log(new Date())
 
     const dateString = (
-      await knex("migration")
-        .select("date")
-        .orderBy("date", "desc")
-        .limit(2)
+      await knex("migration").select("date").orderBy("date", "desc").limit(2)
     )[1].date
     const date = new Date(dateString).toISOString()
 

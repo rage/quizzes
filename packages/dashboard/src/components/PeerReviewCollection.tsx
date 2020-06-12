@@ -52,7 +52,7 @@ class PeerReviewQuestionCollection extends React.Component<any, any> {
   public render() {
     // console.log("collection")
 
-    const renderOptions = type => {
+    const renderOptions = (type) => {
       return ["multiple-choice", "checkbox", "research-agreement"].includes(
         type,
       )
@@ -194,17 +194,17 @@ class PeerReviewQuestionCollection extends React.Component<any, any> {
     )
   }
 
-  private handleExpand = event => {
+  private handleExpand = (event) => {
     this.setState({ expanded: !this.state.expanded })
   }
 
-  private handleMenu = event => {
+  private handleMenu = (event) => {
     this.setState({
       menuOpen: event.currentTarget.id,
       menuAnchor: event.currentTarget,
     })
   }
-  private addReviewQuestion = type => event => {
+  private addReviewQuestion = (type) => (event) => {
     this.setState({
       menuOpen: null,
     })

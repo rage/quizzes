@@ -27,18 +27,18 @@ const PeerReviewOption: React.FunctionComponent<PeerReviewOptionProps> = ({
 }) => {
   const themeProvider = useContext(ThemeProviderContext)
 
-  const quiz = useTypedSelector(state => state.quiz)
+  const quiz = useTypedSelector((state) => state.quiz)
   if (!quiz) {
     return <div />
   }
   const quizItems = quiz.items
 
-  const quizItemById = (id: string) => quizItems.find(qi => qi.id === id)
+  const quizItemById = (id: string) => quizItems.find((qi) => qi.id === id)
 
   return (
     <div style={{ padding: ".5rem 1rem" }}>
       {answer.itemAnswers
-        .filter(ia => {
+        .filter((ia) => {
           const item = quizItemById(ia.quizItemId)
           return !item || item.type === "essay"
         })
@@ -50,7 +50,7 @@ const PeerReviewOption: React.FunctionComponent<PeerReviewOptionProps> = ({
           }
           return qi1.order - qi2.order
         })
-        .map(ia => {
+        .map((ia) => {
           const quizItem = quizItemById(ia.quizItemId)
           const quizTitle = quizItem ? quizItem.texts[0].title : ""
 

@@ -1,7 +1,7 @@
 import { Dispatch } from "redux"
 import { ActionType, createAction } from "typesafe-actions"
 
-export const set = createAction("notification/SET", resolve => {
+export const set = createAction("notification/SET", (resolve) => {
   return (message: string, isError: boolean) => resolve({ message, isError })
 })
 

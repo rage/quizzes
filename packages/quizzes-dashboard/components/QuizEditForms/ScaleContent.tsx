@@ -46,7 +46,7 @@ const ScaleContent = ({
             defaultValue={item.maxValue}
             variant="standard"
             type="number"
-            onChange={event =>
+            onChange={(event) =>
               editedScaleMinMaxValue(
                 item.id,
                 parseInt(event.target.value),
@@ -65,7 +65,7 @@ const ScaleContent = ({
             defaultValue={item.minValue}
             variant="standard"
             type="number"
-            onChange={event =>
+            onChange={(event) =>
               editedScaleMinMaxValue(
                 item.id,
                 parseInt(event.target.value),
@@ -83,7 +83,7 @@ const ScaleContent = ({
           <TextField
             defaultValue={item.texts[0].maxLabel}
             variant="standard"
-            onChange={event =>
+            onChange={(event) =>
               editedScaleMinMaxLabel(item.id, event.target.value, true)
             }
           ></TextField>
@@ -97,7 +97,7 @@ const ScaleContent = ({
           <TextField
             defaultValue={item.texts[0].minLabel}
             variant="standard"
-            onChange={event =>
+            onChange={(event) =>
               editedScaleMinMaxLabel(item.id, event.target.value, false)
             }
           ></TextField>

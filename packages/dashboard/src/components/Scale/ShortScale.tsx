@@ -15,7 +15,7 @@ interface IShortScaleProps {
   toggleExpand: () => void
 }
 
-const ShortScale: React.FunctionComponent<IShortScaleProps> = props => {
+const ShortScale: React.FunctionComponent<IShortScaleProps> = (props) => {
   const item = props.items[props.order]
 
   const minimum = item.minValue || 1
@@ -61,7 +61,7 @@ const ShortScale: React.FunctionComponent<IShortScaleProps> = props => {
             {Array.from(
               new Array(maximum - minimum + 1),
               (x, i) => Number(i) + Number(minimum),
-            ).map(n => (
+            ).map((n) => (
               <FormControlLabel
                 key={n}
                 value={`${n}`}

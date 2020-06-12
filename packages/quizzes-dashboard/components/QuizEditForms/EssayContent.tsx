@@ -72,7 +72,7 @@ const EssayContent = ({ item, editQuizBody }: contentBoxProps) => {
           rows="2"
           rowsMax="500"
           defaultValue={item.texts[0].body}
-          onChange={event => editQuizBody(event.target.value, item.id)}
+          onChange={(event) => editQuizBody(event.target.value, item.id)}
         />
         <br />
         <br />

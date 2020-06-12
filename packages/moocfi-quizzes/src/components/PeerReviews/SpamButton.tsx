@@ -8,7 +8,7 @@ export interface SpamButtonProps {
   disabled: boolean
 }
 
-const SpamButton: React.FunctionComponent<SpamButtonProps> = props => {
+const SpamButton: React.FunctionComponent<SpamButtonProps> = (props) => {
   const themeProvider = React.useContext(ThemeProviderContext)
 
   const ThemedButton = themeProvider.spamButton

@@ -27,7 +27,7 @@ const Home = ({ courses }: HomeProps) => {
       <Typography variant="h3" component="h1">
         Quizzes
       </Typography>
-      {courses.map(course => (
+      {courses.map((course) => (
         <Link key={course.id} href="/courses/[id]" as={`/courses/${course.id}`}>
           <CourseLink>
             <StyledCard key={course.id}>
@@ -48,7 +48,7 @@ const Container = styled.div`
   height: 100vh;
   margin: 2rem auto;
   padding: 2rem;
-  background: ${props => props.theme.primary};
+  background: ${(props) => props.theme.primary};
 `
 
 export default Home

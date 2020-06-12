@@ -10,7 +10,9 @@ type Props = {
 }
 
 const LaterQuizItemAddition: React.FunctionComponent<Props> = ({ item }) => {
-  const languageInfo = useTypedSelector(state => state.language.languageLabels)
+  const languageInfo = useTypedSelector(
+    (state) => state.language.languageLabels,
+  )
   // should not occur - QuizImpl will not render items if language not set
   if (!languageInfo) {
     return <div>Language not set</div>

@@ -14,13 +14,13 @@ import {
 } from "../../modelTypes"
 import { wordCount } from "../../utils/string_tools"
 
-export const setAnswer = createAction("quizAnswer/SET", resolve => {
+export const setAnswer = createAction("quizAnswer/SET", (resolve) => {
   return (payload: QuizAnswer) => resolve(payload)
 })
 
 export const setQuizDisabled = createAction(
   "quizAnswer/SET_QUIZ_DISABLED",
-  resolve => (newValue: boolean) => resolve(newValue),
+  (resolve) => (newValue: boolean) => resolve(newValue),
 )
 
 export const clear = createAction("quizAnswer/CLEAR")
@@ -37,7 +37,7 @@ export const pastDeadline = createAction("quizAnswer/PAST_DEADLINE")
 
 export const setAttemptedSubmit = createAction(
   "quizAnswer/ATTEMPT_DISABLED_SUBMIT",
-  resolve => {
+  (resolve) => {
     return () => resolve()
   },
 )
@@ -48,25 +48,25 @@ export const clearAttemptedSubmit = createAction(
 
 export const changeTextDataAction = createAction(
   "quizAnswer/UPDATE_TEXT_VALUE",
-  resolve => (itemId: string, newValue: string, readyToSubmit: boolean) =>
+  (resolve) => (itemId: string, newValue: string, readyToSubmit: boolean) =>
     resolve({ itemId, newValue, readyToSubmit }),
 )
 
 export const changeIntDataAction = createAction(
   "quizAnswer/UPDATE_INT_VALUE",
-  resolve => (itemId: string, newValue: number) =>
+  (resolve) => (itemId: string, newValue: number) =>
     resolve({ itemId, newValue }),
 )
 
 export const changeCheckboxDataAction = createAction(
   "quizAnswer/TOGGLE_CHECKBOX_VALUE",
-  resolve => (itemId: string, optionId: string) =>
+  (resolve) => (itemId: string, optionId: string) =>
     resolve({ itemId, optionId }),
 )
 
 export const chooseOptionAction = createAction(
   "quizAnswer/CHOOSE_OPTION",
-  resolve => (itemId: string, optionId: string, multi: boolean) =>
+  (resolve) => (itemId: string, optionId: string, multi: boolean) =>
     resolve({ itemId, optionId, multi }),
 )
 
@@ -83,7 +83,7 @@ export const changeChosenOption: ActionCreator<ThunkAction> = (
   itemId: string,
   optionId: string,
 ) => (dispatch, getState) => {
-  const item = getState().quiz?.items.find(i => i.id === itemId)
+  const item = getState().quiz?.items.find((i) => i.id === itemId)
   if (!item) {
     return
   }
@@ -121,7 +121,7 @@ export const changeTextData: ActionCreator<ThunkAction> = (
   itemId: string,
   newValue: string,
 ) => (dispatch, getState) => {
-  const item = getState().quiz?.items.find(i => i.id === itemId)
+  const item = getState().quiz?.items.find((i) => i.id === itemId)
   if (item === undefined) {
     return
   }

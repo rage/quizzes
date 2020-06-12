@@ -25,7 +25,9 @@ interface IOptionDialogProps {
   changeAttr: any
 }
 
-const OptionDialogFunc: React.FunctionComponent<IOptionDialogProps> = props => {
+const OptionDialogFunc: React.FunctionComponent<IOptionDialogProps> = (
+  props,
+) => {
   const options = props.item.options
   if (!options) {
     return <></>
@@ -35,7 +37,7 @@ const OptionDialogFunc: React.FunctionComponent<IOptionDialogProps> = props => {
     return <div />
   }
 
-  const handleAttributeChange = attributeName => e => {
+  const handleAttributeChange = (attributeName) => (e) => {
     const value = e.target.value
 
     const baseString = `items[${props.item.order}].options[${props.optionIdx}]`

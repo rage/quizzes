@@ -2,7 +2,7 @@ import { Grid, TextField, Typography } from "@material-ui/core"
 import React from "react"
 import ShortWrapper from "../ItemTools/ShortWrapper"
 
-const ShortOpen = props => {
+const ShortOpen = (props) => {
   const item = props.items[props.order]
 
   return (

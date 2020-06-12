@@ -2,7 +2,7 @@ import { createAction } from "typesafe-actions"
 import { IQuiz } from "../../interfaces"
 import { getQuiz, getQuizzes } from "../../services/quizzes"
 
-export const set = createAction("quizzes/SET", resolve => {
+export const set = createAction("quizzes/SET", (resolve) => {
   return (quizzes: ICourseQuizzes) => resolve(quizzes)
 })
 
@@ -10,19 +10,19 @@ export const clear = createAction("quizzes/CLEAR")
 
 export const startSetting = createAction(
   "quizzes/START_SETTING_COURSE",
-  resolve => {
+  (resolve) => {
     return (courseId: string) => resolve(courseId)
   },
 )
 
 export const haveBeenSet = createAction(
   "quizzes/COURSE_QUIZZES_HAVE_BEEN_SET",
-  resolve => {
+  (resolve) => {
     return (courseId: string) => resolve(courseId)
   },
 )
 
-export const remove = createAction("quizzes/REMOVE", resolve => {
+export const remove = createAction("quizzes/REMOVE", (resolve) => {
   return (quizId: string) => resolve(quizId)
 })
 
@@ -72,7 +72,7 @@ const getQuizFromStoreOrBackend = async (
   const courseQuizCollections = storeStateGetter().quizzes.courseInfos
   let quiz: IQuiz
   for (let i = 0; i < courseQuizCollections.legnth; i++) {
-    quiz = courseQuizCollections[i].quizzes.find(q => q.id === quizId)
+    quiz = courseQuizCollections[i].quizzes.find((q) => q.id === quizId)
     if (quiz) {
       return quiz
     }

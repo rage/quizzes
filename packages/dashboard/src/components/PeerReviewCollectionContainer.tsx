@@ -8,7 +8,7 @@ const PeerReviewCollectionContainer = SortableContainer((props: any) => {
   return (
     <div>
       {props.peerReviewCollections.map((prqc, index) => {
-        const text = prqc.texts.find(t => t.languageId === props.language)
+        const text = prqc.texts.find((t) => t.languageId === props.language)
         return (
           <PeerReviewCollection
             key={prqc.id || text.title * index}
@@ -17,7 +17,7 @@ const PeerReviewCollectionContainer = SortableContainer((props: any) => {
             index={index}
             questions={prqc.questions}
             textIndex={prqc.texts.findIndex(
-              t => t.languageId === props.language,
+              (t) => t.languageId === props.language,
             )}
             handleChange={props.handleChange}
             remove={props.remove}

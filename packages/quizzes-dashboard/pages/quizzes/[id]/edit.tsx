@@ -26,7 +26,7 @@ const ShowQuizPage = ({ quiz, id, editableQuiz }: ShowQuizPageProps) => {
       <StyledId>{id}</StyledId>
       <BasicInfo />
 
-      {quiz.items.map(item => {
+      {quiz.items.map((item) => {
         return (
           <>
             <QuizItem key={item.id} item={item} />

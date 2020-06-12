@@ -94,10 +94,10 @@ class QuizStatistics extends React.Component<any, any> {
       return <p />
     }
     const quiz = this.props.quizzesOfCourse.quizzes.find(
-      c => c.id === this.props.match.params.id,
+      (c) => c.id === this.props.match.params.id,
     )
     const currentCourse = this.props.courses.find(
-      c => c.id === this.props.filter.course,
+      (c) => c.id === this.props.filter.course,
     )
 
     if (!quiz) {
@@ -105,7 +105,7 @@ class QuizStatistics extends React.Component<any, any> {
     }
 
     const countInfo = this.props.answerCounts.find(
-      ci => ci.quizId === this.props.match.params.id,
+      (ci) => ci.quizId === this.props.match.params.id,
     )
 
     let totalNumberOfResults = 0
@@ -118,7 +118,7 @@ class QuizStatistics extends React.Component<any, any> {
     const isAdmin = this.props.user.administrator
     const roles = this.props.user.roles
       ? this.props.user.roles.filter(
-          role => role.courseId === this.props.filter.course,
+          (role) => role.courseId === this.props.filter.course,
         )
       : []
 
@@ -218,7 +218,7 @@ class QuizStatistics extends React.Component<any, any> {
                   item={true}
                   xs={12}
                   md={
-                    isAdmin || roles.some(role => role.role === "teacher")
+                    isAdmin || roles.some((role) => role.role === "teacher")
                       ? 4
                       : 12
                   }
@@ -327,7 +327,7 @@ class QuizStatistics extends React.Component<any, any> {
     }
 
     const countInfo = this.props.answerCounts.find(
-      ci => ci.quizId === this.props.match.params.id,
+      (ci) => ci.quizId === this.props.match.params.id,
     )
     const pages = Math.ceil(
       (this.state.showingAll ? countInfo.totalCount : countInfo.count) /
@@ -363,7 +363,7 @@ const mapStateToProps = (state: any) => {
     answerCounts: state.answerCounts,
     answers: state.answers.data,
     quizzesOfCourse: state.quizzes.courseInfos.find(
-      qi => qi.courseId === state.filter.course,
+      (qi) => qi.courseId === state.filter.course,
     ),
     answersLoading: state.answers.loading,
     courses: state.courses,

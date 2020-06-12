@@ -51,7 +51,7 @@ export const quizContentsDiffer = (quiz1?: IQuiz, quiz2?: IQuiz): boolean => {
     return true
   }
 
-  if (quizFields.some(field => quiz1[field] !== quiz2[field])) {
+  if (quizFields.some((field) => quiz1[field] !== quiz2[field])) {
     return true
   }
 
@@ -144,13 +144,13 @@ const itemsDiffer = (items1: IQuizItem[], items2: IQuizItem[]): boolean => {
     return true
   }
 
-  if (items1.some(item => item.usesSharedOptionFeedbackMessage)) {
+  if (items1.some((item) => item.usesSharedOptionFeedbackMessage)) {
     const textArrays1 = items1
-      .filter(item => item.usesSharedOptionFeedbackMessage)
-      .map(item => item.texts)
+      .filter((item) => item.usesSharedOptionFeedbackMessage)
+      .map((item) => item.texts)
     const textArrays2 = items2
-      .filter(item => item.usesSharedOptionFeedbackMessage)
-      .map(item => item.texts)
+      .filter((item) => item.usesSharedOptionFeedbackMessage)
+      .map((item) => item.texts)
     if (textArrays1.length !== textArrays2.length) {
       return true
     }
@@ -341,10 +341,10 @@ const elementsHaveSamePropertyValues = (
   arr2: any[],
   propertyNames: string[],
 ): boolean => {
-  return arr1.every(elem1 =>
-    arr2.some(elem2 => {
+  return arr1.every((elem1) =>
+    arr2.some((elem2) => {
       return propertyNames.every(
-        propName =>
+        (propName) =>
           (!elem1[propName] && !elem2[propName]) ||
           elem1[propName] === elem2[propName],
       )

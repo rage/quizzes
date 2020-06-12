@@ -73,7 +73,7 @@ export class SpamFlagController {
     )
     userquizstate.spamFlags += 1
     let response
-    await this.entityManager.transaction(async manager => {
+    await this.entityManager.transaction(async (manager) => {
       const validated = await this.validationService.validateEssayAnswer(
         quiz,
         quizAnswer,

@@ -2,13 +2,13 @@ import { createAction } from "typesafe-actions"
 import { getTotalNumberOfAnswers } from "../../services/quizAnswers"
 import { getAttentionAnswerCountsByQuizzes } from "../../services/quizzes"
 
-export const set = createAction("answerCounts/SET", resolve => {
+export const set = createAction("answerCounts/SET", (resolve) => {
   return (quizzes: any[]) => resolve(quizzes)
 })
 
 export const clear = createAction("answerCounts/CLEAR")
 
-export const decrement = createAction("answerCounts/DECREMENT", resolve => {
+export const decrement = createAction("answerCounts/DECREMENT", (resolve) => {
   return (quizId: string) => resolve(quizId)
 })
 
@@ -37,14 +37,14 @@ export const setAllAnswersCount = (quizId: string) => {
       }
 
       let newData
-      if (!oldData.some(ci => ci.quizId === quizId)) {
+      if (!oldData.some((ci) => ci.quizId === quizId)) {
         newData = oldData.concat({
           quizId: totalCountInfo.quizId,
           count: 0,
           totalCount: totalCountInfo.count,
         })
       } else {
-        newData = oldData.map(countInfo => {
+        newData = oldData.map((countInfo) => {
           if (countInfo.quizId !== totalCountInfo.quizId) {
             return countInfo
           }

@@ -3,7 +3,7 @@ import Create from "@material-ui/icons/Create"
 import React from "react"
 import DragHandleWrapper from "../DragHandleWrapper"
 
-const ShortItemWrapper = props => (
+const ShortItemWrapper = (props) => (
   <Grid
     container={true}
     spacing={3}

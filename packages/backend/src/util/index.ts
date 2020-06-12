@@ -15,7 +15,7 @@ export async function save<T extends BaseEntity>(
   data: any[],
 ) {
   const saved = Promise.all(
-    data.map(async item => {
+    data.map(async (item) => {
       return await type.create(item).save()
     }),
   )
@@ -34,11 +34,11 @@ export async function insert<T extends BaseEntity>(
 
   const properties = getConnection()
     .getMetadata(type)
-    .columns.map(c => snakeCase(c.propertyName))
+    .columns.map((c) => snakeCase(c.propertyName))
 
   let updateString = ""
 
-  properties.forEach(p => {
+  properties.forEach((p) => {
     let property = p
     if (property === "order") {
       property = `"order"`
@@ -103,7 +103,7 @@ export class WhereBuilder<T extends BaseEntity> {
 
 export function stringContainsLongerWord(str: string, n: number): boolean {
   const words: string[] = str.split(" ")
-  return words.some(w => w.length > n)
+  return words.some((w) => w.length > n)
 }
 
 export function wordCount(str: string | null): number {

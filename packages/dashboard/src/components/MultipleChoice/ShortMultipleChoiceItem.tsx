@@ -43,7 +43,7 @@ class FinishedMultipleChoiceItem extends React.Component<any, any> {
               alignItems="center"
               spacing={3}
             >
-              {item.options.map(opt => (
+              {item.options.map((opt) => (
                 <Grid
                   item={true}
                   xs={12}

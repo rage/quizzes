@@ -65,7 +65,7 @@ const finnishLabels: SingleLanguageLabels = {
     loadingLabel: "Ladataan saamiasi vertaisarvioita...",
     noPeerReviewsReceivedlabel:
       "Vastauksesi ei ole vielä saanut vertaisarvioita",
-    numberOfPeerReviewsText: n =>
+    numberOfPeerReviewsText: (n) =>
       `Vastauksesi on saanut ${n} arvio${n > 0 ? "ta" : "n"}.`,
     toggleButtonExpandLabel: "Näytä kaikki saamasi vertaisarviot",
     toggleButtonShrinkLabel: "Piilota saamasi vertaisarviot",
@@ -116,7 +116,7 @@ const finnishLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "Yritysten lukumäärää ei rajattu",
     submitGeneralFeedbackLabel: "Vastattu",
     submitButtonAlreadyAnsweredLabel: "Vastattu",
-    pointsGrantingPolicyInformer: policy => {
+    pointsGrantingPolicyInformer: (policy) => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "Vastauksen on oltava täysin oikein saadaksesi pisteitä"

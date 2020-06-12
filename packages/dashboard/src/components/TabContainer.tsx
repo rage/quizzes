@@ -87,7 +87,7 @@ class TabContainer extends Component<ITabContainerProps, ITabContainerState> {
     const copy = JSON.parse(JSON.stringify(this.props.items))
     copy.sort((i1, i2) => i2.order - i1.order)
     // this.setState({ justAdded: false })
-    return copy.find(i => !i.id)
+    return copy.find((i) => !i.id)
   }
 
   public expandItem = (index: number) => {
@@ -139,7 +139,7 @@ class TabContainer extends Component<ITabContainerProps, ITabContainerState> {
           itemsExist={this.props.items && this.props.items.length > 0}
         />
 
-        {this.props.items.find(item => item.type === "essay") && (
+        {this.props.items.find((item) => item.type === "essay") && (
           <Grid item={true} xs={12}>
             <Paper style={{ padding: 30 }}>
               <Typography variant="h6" style={{ marginBottom: 10 }}>
@@ -162,18 +162,18 @@ class TabContainer extends Component<ITabContainerProps, ITabContainerState> {
     )
   }
 
-  private addItem = type => event => {
+  private addItem = (type) => (event) => {
     this.setState({
       justAdded: true,
     })
     this.props.addItem(type)
   }
 
-  private addReview = event => {
+  private addReview = (event) => {
     this.props.addReview()
   }
 
-  private remove = (path, index) => event => {
+  private remove = (path, index) => (event) => {
     this.props.remove(path, index)
   }
 

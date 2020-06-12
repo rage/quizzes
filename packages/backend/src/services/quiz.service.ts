@@ -28,10 +28,10 @@ export default class QuizService {
   @Inject()
   private userQuizStateService: UserQuizStateService
 
-  @Inject(type => UserCoursePartStateService)
+  @Inject((type) => UserCoursePartStateService)
   private userCoursePartStateService: UserCoursePartStateService
 
-  @Inject(type => KafkaService)
+  @Inject((type) => KafkaService)
   private kafkaService: KafkaService
 
   private knex = Knex({ client: "pg" })
@@ -170,7 +170,7 @@ export default class QuizService {
     let oldQuiz: Quiz | undefined
     let savedQuiz: Quiz | undefined
 
-    await this.entityManager.transaction(async manager => {
+    await this.entityManager.transaction(async (manager) => {
       if (quiz!.id) {
         oldQuiz = await manager.findOne(Quiz, { id: quiz.id })
 
@@ -443,7 +443,7 @@ export default class QuizService {
     data[0] = { ...data[0], ...newInfo }
 
     if (quiz.peerReviewCollections.length > 0) {
-      data = data.map(d => {
+      data = data.map((d) => {
         const newD = { ...d }
         for (let i = 0; i < quiz.peerReviewCollections.length; i++) {
           newD[`peer_review_collection_${i}_id`] =
@@ -505,14 +505,14 @@ export default class QuizService {
       const oldTextIds: Array<{
         quizId: string | undefined
         languageId: string
-      }> = oldQuiz.texts.map(text => ({
+      }> = oldQuiz.texts.map((text) => ({
         quizId: text.quizId,
         languageId: text.languageId,
       }))
       const newTextIds: Array<{
         quizId: string | undefined
         languageId: string
-      }> = (newQuiz!.texts || []).map(text => ({
+      }> = (newQuiz!.texts || []).map((text) => ({
         quizId: text.quizId,
         languageId: text.languageId,
       }))
@@ -527,7 +527,9 @@ export default class QuizService {
             arrayId.languageId === id.languageId,
         )
 
-      toBeRemoved.textIds = oldTextIds.filter(id => !includesId(newTextIds, id))
+      toBeRemoved.textIds = oldTextIds.filter(
+        (id) => !includesId(newTextIds, id),
+      )
     }
 
     if (oldQuiz.items) {
@@ -536,21 +538,23 @@ export default class QuizService {
       const newItemIds: string[] = []
       const newOptionIds: string[] = []
 
-      oldQuiz.items.forEach(item => {
-        ;(item.options || []).forEach(o => oldOptionIds.push(o.id))
+      oldQuiz.items.forEach((item) => {
+        ;(item.options || []).forEach((o) => oldOptionIds.push(o.id))
         oldItemIds.push(item.id)
       })
 
       if (newQuiz) {
-        ;(newQuiz!.items || []).forEach(item => {
-          ;(item.options || []).forEach(o => newOptionIds.push(o.id))
+        ;(newQuiz!.items || []).forEach((item) => {
+          ;(item.options || []).forEach((o) => newOptionIds.push(o.id))
           newItemIds.push(item.id)
         })
       }
 
-      toBeRemoved.itemIds = oldItemIds.filter(id => !_.includes(newItemIds, id))
+      toBeRemoved.itemIds = oldItemIds.filter(
+        (id) => !_.includes(newItemIds, id),
+      )
       toBeRemoved.optionIds = oldOptionIds.filter(
-        id => !_.includes(newOptionIds, id),
+        (id) => !_.includes(newOptionIds, id),
       )
     }
 
@@ -560,23 +564,25 @@ export default class QuizService {
       const newCollectionIds: string[] = []
       const newQuestionIds: string[] = []
 
-      oldQuiz.peerReviewCollections.forEach(collection => {
-        ;(collection.questions || []).forEach(o => oldQuestionIds.push(o.id))
+      oldQuiz.peerReviewCollections.forEach((collection) => {
+        ;(collection.questions || []).forEach((o) => oldQuestionIds.push(o.id))
         oldCollectionIds.push(collection.id)
       })
 
       if (newQuiz) {
-        ;(newQuiz!.peerReviewCollections || []).forEach(collection => {
-          ;(collection.questions || []).forEach(o => newQuestionIds.push(o.id))
+        ;(newQuiz!.peerReviewCollections || []).forEach((collection) => {
+          ;(collection.questions || []).forEach((o) =>
+            newQuestionIds.push(o.id),
+          )
           newCollectionIds.push(collection.id)
         })
       }
 
       toBeRemoved.prCollectionIds = oldCollectionIds.filter(
-        id => !_.includes(newCollectionIds, id),
+        (id) => !_.includes(newCollectionIds, id),
       )
       toBeRemoved.prQuestionIds = oldQuestionIds.filter(
-        id => !_.includes(newQuestionIds, id),
+        (id) => !_.includes(newQuestionIds, id),
       )
     }
 
@@ -607,11 +613,11 @@ export default class QuizService {
     quiz: Quiz,
     oldQuiz: Quiz,
   ): QuizValidation {
-    const badWordLimit = oldQuiz.items.some(qi => {
+    const badWordLimit = oldQuiz.items.some((qi) => {
       if (qi.type !== "essay") {
         return false
       }
-      const qi2 = quiz.items.find(x => x.id === qi.id)
+      const qi2 = quiz.items.find((x) => x.id === qi.id)
 
       if (!qi2) {
         return false

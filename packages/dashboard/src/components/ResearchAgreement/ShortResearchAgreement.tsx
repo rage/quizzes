@@ -2,7 +2,7 @@ import { Checkbox, Grid, Typography } from "@material-ui/core"
 import React from "react"
 import ShortWrapper from "../ItemTools/ShortWrapper"
 
-const ShortResearchAgreement = props => {
+const ShortResearchAgreement = (props) => {
   const item = props.items[props.order]
 
   return (
@@ -25,7 +25,7 @@ const ShortResearchAgreement = props => {
             justify="flex-start"
             alignItems="center"
           >
-            {item.options.map(option => {
+            {item.options.map((option) => {
               return (
                 <React.Fragment key={"option" + option.order}>
                   <Grid item={true} xs="auto">

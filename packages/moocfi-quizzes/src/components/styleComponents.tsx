@@ -63,7 +63,8 @@ interface IStyledTextFieldProps {
 }
 
 export const StyledTextField = styled(TextField)<IStyledTextFieldProps>`
-  background-color: ${props => (props.rowNumber === 2 ? "inherit" : "#fdfdff")};
+  background-color: ${(props) =>
+    props.rowNumber === 2 ? "inherit" : "#fdfdff"};
 
   .MuiOutlinedInput-notchedOutline {
     border-color: #595959;

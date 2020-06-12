@@ -12,11 +12,13 @@ const ResearchAgreement: React.FunctionComponent<ResearchAgreementProps> = ({
   item,
 }) => {
   const options = item.options
-  const quizAnswer = useTypedSelector(state => state.quizAnswer)
+  const quizAnswer = useTypedSelector((state) => state.quizAnswer)
   const itemAnswer = quizAnswer.quizAnswer.itemAnswers.find(
-    ia => ia.quizItemId === item.id,
+    (ia) => ia.quizItemId === item.id,
   )
-  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+  const quizDisabled = useTypedSelector(
+    (state) => state.quizAnswer.quizDisabled,
+  )
 
   if (!itemAnswer && !quizDisabled) {
     return <LaterQuizItemAddition item={item} />
@@ -24,7 +26,7 @@ const ResearchAgreement: React.FunctionComponent<ResearchAgreementProps> = ({
 
   return (
     <>
-      {options.map(option => {
+      {options.map((option) => {
         return <CheckboxOption key={option.id} item={item} />
       })}
     </>

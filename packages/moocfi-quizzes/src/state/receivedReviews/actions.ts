@@ -10,12 +10,13 @@ export type LoadingState = "began" | "loading" | "done" | "error"
 
 export const setReviews = createAction(
   "receivedReviews/SET_REVIEWS",
-  resolve => (peerReviews: Array<IReceivedPeerReview>) => resolve(peerReviews),
+  (resolve) => (peerReviews: Array<IReceivedPeerReview>) =>
+    resolve(peerReviews),
 )
 
 export const setLoadingState = createAction(
   "receivedReviews/SET_LOADING_STATE",
-  resolve => (loadingState: LoadingState) => resolve(loadingState),
+  (resolve) => (loadingState: LoadingState) => resolve(loadingState),
 )
 
 export const requestReviews: ActionCreator<ThunkAction> = () => async (

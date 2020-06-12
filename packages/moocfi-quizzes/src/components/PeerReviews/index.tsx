@@ -30,17 +30,23 @@ const PeerReviews: React.FunctionComponent = () => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
 
-  const quiz = useTypedSelector(state => state.quiz)
+  const quiz = useTypedSelector((state) => state.quiz)
   if (!quiz) {
     return <div />
   }
 
-  const activeStep = useTypedSelector(state => state.peerReviews.activeStep)
-  const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
-  const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const activeStep = useTypedSelector((state) => state.peerReviews.activeStep)
+  const pastDeadline = useTypedSelector(
+    (state) => state.quizAnswer.pastDeadline,
+  )
+  const userQuizState = useTypedSelector((state) => state.user.userQuizState)
   const peerReviewQuestions = quiz.peerReviewCollections
-  const languageInfo = useTypedSelector(state => state.language.languageLabels)
-  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+  const languageInfo = useTypedSelector(
+    (state) => state.language.languageLabels,
+  )
+  const quizDisabled = useTypedSelector(
+    (state) => state.quizAnswer.quizDisabled,
+  )
 
   if (!languageInfo) {
     return <div />

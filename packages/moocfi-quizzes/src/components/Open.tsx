@@ -20,7 +20,7 @@ interface SolutionPaperProps {
 }
 
 const SolutionPaper = styled(SpaciousPaper)<SolutionPaperProps>`
-  border-left: 1rem solid ${props => (props.correct ? "#047500" : "#DB0000")};
+  border-left: 1rem solid ${(props) => (props.correct ? "#047500" : "#DB0000")};
 
   p {
     margin: 0;
@@ -31,12 +31,16 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
 
-  const languageInfo = useTypedSelector(state => state.language.languageLabels)
-  const quiz = useTypedSelector(state => state.quiz)
-  const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
-  const userQuizState = useTypedSelector(state => state.user.userQuizState)
-  const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
-  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+  const languageInfo = useTypedSelector(
+    (state) => state.language.languageLabels,
+  )
+  const quiz = useTypedSelector((state) => state.quiz)
+  const answer = useTypedSelector((state) => state.quizAnswer.quizAnswer)
+  const userQuizState = useTypedSelector((state) => state.user.userQuizState)
+  const displayFeedback = useTypedSelector((state) => state.feedbackDisplayed)
+  const quizDisabled = useTypedSelector(
+    (state) => state.quizAnswer.quizDisabled,
+  )
 
   if (!languageInfo) {
     return <div />
@@ -46,7 +50,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
     dispatch(quizAnswerActions.changeTextData(item.id, e.currentTarget.value))
   }
 
-  const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
+  const itemAnswer = answer.itemAnswers.find((ia) => ia.quizItemId === item.id)
   if (!itemAnswer && !quizDisabled) {
     return <LaterQuizItemAddition item={item} />
   }

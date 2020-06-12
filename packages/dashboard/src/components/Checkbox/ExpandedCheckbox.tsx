@@ -96,7 +96,7 @@ class ExpandedCheckbox extends React.Component<any, IExpandedCheckboxState> {
 
   private changeTempAttribute = (
     attributeName: "title" | "optionTitle" | "optionBody",
-  ) => e => {
+  ) => (e) => {
     const value = e.target.value
 
     switch (attributeName) {

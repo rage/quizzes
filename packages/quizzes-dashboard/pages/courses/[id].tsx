@@ -69,7 +69,7 @@ const SectionOfPart = ({ section, quizzes }: section) => {
   return (
     <>
       <Typography variant="h6">Section {section}</Typography>
-      {quizzes.map(quiz => {
+      {quizzes.map((quiz) => {
         return (
           <>
             <Quiz key={quiz.id} quiz={quiz} />

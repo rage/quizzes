@@ -64,7 +64,7 @@ const dutchLabels: SingleLanguageLabels = {
       "Een dergelijke beoordelingsvraag wordt niet ondersteund",
     loadingLabel: "Ontvangen beoordelingen laden...",
     noPeerReviewsReceivedlabel: "Uw antwoord is nog niet beoordeeld",
-    numberOfPeerReviewsText: n => `Uw antwoord is ${n} keer beoordeeld.`,
+    numberOfPeerReviewsText: (n) => `Uw antwoord is ${n} keer beoordeeld.`,
     toggleButtonExpandLabel: "Toon alle ontvangen beoordelingen",
     toggleButtonShrinkLabel: "Verberg beoordelingen",
     averageOfGradesLabel:
@@ -115,7 +115,7 @@ const dutchLabels: SingleLanguageLabels = {
     triesNotLimitedLabel: "U kunt zo vaak proberen als u wilt",
     submitGeneralFeedbackLabel: "Verzonden",
     submitButtonAlreadyAnsweredLabel: "Beantwoord",
-    pointsGrantingPolicyInformer: policy => {
+    pointsGrantingPolicyInformer: (policy) => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
           return "U krijgt pas punten als het antwoord helemaal juist is"

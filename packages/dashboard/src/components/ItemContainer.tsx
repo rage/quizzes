@@ -9,7 +9,7 @@ const ItemContainer: ComponentClass<any, any> = SortableContainer(
     return (
       <div>
         {props.items.map((item, index) => {
-          const text = item.texts.find(t => t.languageId === props.language)
+          const text = item.texts.find((t) => t.languageId === props.language)
           return (
             <SortableWrapper
               key={
@@ -30,7 +30,7 @@ const ItemContainer: ComponentClass<any, any> = SortableContainer(
                   handleChange={props.handleChange}
                   index={index}
                   textIndex={item.texts.findIndex(
-                    t => t.languageId === props.language,
+                    (t) => t.languageId === props.language,
                   )}
                   items={props.items}
                   onSortEnd={props.onSortEnd}

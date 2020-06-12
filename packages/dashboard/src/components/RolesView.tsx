@@ -24,7 +24,7 @@ class RolesView extends React.Component<any, any> {
 
     return (
       <List>
-        {this.props.user.roles.map(role => (
+        {this.props.user.roles.map((role) => (
           <ListItem key={role.courseId + role.role}>
             <Typography variant="body1">
               <span style={stylingObjectForTextEmphasis}>

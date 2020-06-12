@@ -52,13 +52,13 @@ class PeerReviewsModal extends React.Component<any, any> {
                     idx={idx}
                     peerReviewQuestions={
                       this.props.quizzes.find(
-                        q => q.id === this.props.answer.quizId,
+                        (q) => q.id === this.props.answer.quizId,
                       ).peerReviewCollections[0]
                     }
                     peerReviewTitle={extractCommonEnding(
                       this.props.quizzes
-                        .find(q => q.id === this.props.answer.quizId)
-                        .peerReviewCollections.map(prc => prc.texts[0].title),
+                        .find((q) => q.id === this.props.answer.quizId)
+                        .peerReviewCollections.map((prc) => prc.texts[0].title),
                     )}
                   />
                 </Grid>
@@ -95,9 +95,9 @@ const PeerReview = ({
             </Typography>
           </Grid>
 
-          {peerReviewQuestions.questions.map(question => {
+          {peerReviewQuestions.questions.map((question) => {
             const answer = peerReviewAnswer.answers.find(
-              pra => pra.peerReviewQuestionId === question.id,
+              (pra) => pra.peerReviewQuestionId === question.id,
             )
 
             return (
@@ -128,13 +128,13 @@ const extractCommonEnding = (strings: string[]): string => {
 
   let shortest = 1000
   strings.forEach(
-    str => (shortest = str.length < shortest ? str.length : shortest),
+    (str) => (shortest = str.length < shortest ? str.length : shortest),
   )
 
   for (let i = 0; i < shortest; i++) {
     let first = strings[0].substring(i)
 
-    if (strings.every(str => str.substring(i) === first)) {
+    if (strings.every((str) => str.substring(i) === first)) {
       while (
         first.length > 0 &&
         (first.charAt(0) === " " || first.charAt(0) === ":")
@@ -163,7 +163,7 @@ const PeerReviewQuestionAnswer = ({ type, questionAnswer, title }) => {
       <FormControl fullWidth={true}>
         <FormLabel>{title}</FormLabel>
         <RadioGroup value={`${questionAnswer.value}`} row={true}>
-          {[1, 2, 3, 4, 5].map(n => {
+          {[1, 2, 3, 4, 5].map((n) => {
             return (
               <FormControlLabel
                 key={"radio" + n}
@@ -182,11 +182,11 @@ const PeerReviewQuestionAnswer = ({ type, questionAnswer, title }) => {
   }
 }
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
     answers: state.answers.data,
     quizzes: state.quizzes.courseInfos.find(
-      qi => qi.courseId === state.filter.course,
+      (qi) => qi.courseId === state.filter.course,
     ).quizzes,
   }
 }

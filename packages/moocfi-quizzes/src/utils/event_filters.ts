@@ -14,7 +14,7 @@ const executeIfChangeMatches = (test: EventPredicate) => (
 }
 
 export const executeIfOnlyDigitsInTextField = (callback: EventFunction) =>
-  executeIfChangeMatches(e => e.currentTarget.value.match(/^\d*$ /) !== null)(
+  executeIfChangeMatches((e) => e.currentTarget.value.match(/^\d*$ /) !== null)(
     callback,
   )
 
@@ -23,7 +23,7 @@ export const executeIfTextFieldBetweenNumOfWords = (
   prevText: string,
   maxWords: number,
 ) =>
-  executeIfChangeMatches(e => {
+  executeIfChangeMatches((e) => {
     if (maxWords === null) {
       return true
     }

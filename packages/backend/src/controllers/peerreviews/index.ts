@@ -86,11 +86,11 @@ export class PeerReviewController {
       false,
     )
     if (stripped) {
-      const strippedResult = result.map(prAnswer => ({
+      const strippedResult = result.map((prAnswer) => ({
         id: prAnswer.id,
         peerReviewCollectionId: prAnswer.peerReviewCollectionId,
         createdAt: prAnswer.createdAt,
-        answers: prAnswer.answers.map(prqa => {
+        answers: prAnswer.answers.map((prqa) => {
           const { createdAt, updatedAt, ...relevant } = prqa
           return relevant
         }),
@@ -107,7 +107,7 @@ export class PeerReviewController {
     @EntityFromBody() peerReview: PeerReview,
     @HeaderParam("authorization") user: ITMCProfileDetails,
   ): Promise<any> {
-    peerReview.answers.forEach(answer => {
+    peerReview.answers.forEach((answer) => {
       if (answer.text) {
         return
       }
@@ -168,7 +168,7 @@ export class PeerReviewController {
     let responseQuizAnswer: QuizAnswer
     let responseUserQuizState: UserQuizState
 
-    await this.entityManager.transaction(async manager => {
+    await this.entityManager.transaction(async (manager) => {
       responsePeerReview = await this.peerReviewService.createPeerReview(
         manager,
         peerReview,
@@ -202,7 +202,7 @@ export class PeerReviewController {
         }
       }
 
-      messages.forEach(message => {
+      messages.forEach((message) => {
         pushMessageToClient(
           receivingQuizAnswer.userId,
           quiz.course.moocfiId,
