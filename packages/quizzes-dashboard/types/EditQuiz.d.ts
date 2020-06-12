@@ -28,7 +28,7 @@ export interface Item {
   maxWords: null
   minValue: number | null
   maxValue: number | null
-  validityRegex
+  validityRegex: string | null
   formatRegex: null
   multi: boolean
   usesSharedOptionFeedbackMessage: boolean
