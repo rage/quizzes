@@ -9,6 +9,7 @@ spec:
   tls:
   - hosts:
     - quizzes.mooc.fi
+    - quizzes2.mooc.fi
     secretName: quizzes-cert-secret
   rules:
     - host: quizzes.mooc.fi
@@ -26,11 +27,18 @@ spec:
           backend:
             serviceName: quizzes-dashboard-service
             servicePort: 80
-        - path: /v2
+    - host: quizzes2.mooc.fi
+      http:
+        paths:
+        - path: /api/
+          backend:
+            serviceName: quizzes-backend-service
+            servicePort: 80
+        - path: /api/v2/
+          backend:
+            serviceName: quizzes-backendv2-service
+            servicePort: 80
+        - path: /
           backend:
             serviceName: quizzes-dashboardv2-service
             servicePort: 80
-        - path: /ws
-          backend:
-            serviceName: ws
-            servicePort: 7000

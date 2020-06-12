@@ -4,14 +4,7 @@ const withCSS = require("@zeit/next-css")
 
 require("dotenv").config()
 
-const basePath = process.env.BASE_PATH || ""
-
-const nextConfiguration = {
-  assetPrefix: basePath,
-  publicRuntimeConfig: {
-    basePath: basePath,
-  },
-}
+const nextConfiguration = {}
 
 module.exports = withPlugins(
   [

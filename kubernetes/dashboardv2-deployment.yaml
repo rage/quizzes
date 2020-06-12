@@ -27,7 +27,5 @@ spec:
         - name: dv2-http
           containerPort: 5000
         env:
-          - name: BASE_PATH
-            value: "/v2"
           - name: HOST
-            value: "https://quizzes.mooc.fi"
+            value: "https://quizzes2.mooc.fi"
