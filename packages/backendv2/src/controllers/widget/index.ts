@@ -1,5 +1,5 @@
 import Router from "koa-router"
-import { knex } from "../../config/knex"
+import knex from "../../../database/knex"
 import { CustomContext, CustomState } from "../../types"
 import { Quiz, QuizAnswer, User } from "../../models/"
 import accessControl from "../../middleware/access_control"
