@@ -1,5 +1,6 @@
 import { action, createAction } from "typesafe-actions"
 import { EditableQuiz } from "../../types/EditQuiz"
+import { mergeWith } from "lodash"
 
 export const initializedEditor = (quiz: EditableQuiz) =>
   action("INITIALIZED_EDITOR", quiz)
@@ -53,3 +54,27 @@ export const editedScaleMinMaxLabel = createAction(
     max: max,
   }),
 )<{ itemId: string; newLabel: string; max: boolean }>()
+
+export const editedValidityRegex = createAction(
+  "EDITED_VALIDITY_REGEX",
+  (itemId: string, newRegex: string) => ({
+    itemId: itemId,
+    newRegex: newRegex,
+  }),
+)<{ itemId: string; newRegex: string }>()
+
+export const toggledMultiOptions = createAction(
+  "TOGGLED_MULTI_OPTIONS",
+  (itemId: string) => ({
+    itemId: itemId,
+  }),
+)<{ itemId: string }>()
+
+export const editedItemMessage = createAction(
+  "EDITED_ITEM_MESSAGE",
+  (itemId: string, newMessage: string, success: boolean) => ({
+    itemId: itemId,
+    newMessage: newMessage,
+    success: success,
+  }),
+)<{ itemId: string; newMessage: string; success: boolean }>()
