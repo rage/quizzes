@@ -29,3 +29,5 @@ http
   .listen(3003, () => GlobalLogger.info("server running on port 3003"))
 
 export type AppContext = typeof app.context
+
+export default app
