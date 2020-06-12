@@ -97,7 +97,7 @@ class ExpandedQuizInfo extends React.Component<IProps, IState> {
         </Grid>
 
         <Grid item={true} xs={12}>
-          <Grid container={true} justify="space-between" spacing={16}>
+          <Grid container={true} justify="space-between" spacing={3}>
             <Grid item={true} xs="auto">
               <FormControl variant="outlined" style={{ marginRight: "5px" }}>
                 <InputLabel>Course</InputLabel>

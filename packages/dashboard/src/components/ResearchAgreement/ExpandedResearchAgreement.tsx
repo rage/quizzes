@@ -48,7 +48,7 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
     const item = this.props.items[this.props.order]
 
     return (
-      <Grid container={true} spacing={16} justify="center" alignItems="center">
+      <Grid container={true} spacing={3} justify="center" alignItems="center">
         <Grid item={true} xs={12}>
           <Card>
             <Grid container={true} justify="flex-end" alignItems="center">
@@ -95,7 +95,11 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
                         disableRipple={true}
                         onClick={this.addOption}
                       >
-                        <AddCircle fontSize="large" nativeColor="#E5E5E5" />
+                        <AddCircle
+                          component="svg"
+                          fontSize="large"
+                          htmlColor="#E5E5E5"
+                        />
                       </IconButton>
                     </Grid>
                     <Grid item={true} xs="auto">
@@ -166,13 +170,10 @@ class ExpandedResearchAgreement extends React.Component<any, any> {
   }
 }
 
-export default connect(
-  null,
-  {
-    addOption,
-    changeAttr,
-    removeOption,
-    modifyOptionOrder,
-    updateMultipleOptions,
-  },
-)(ExpandedResearchAgreement)
+export default connect(null, {
+  addOption,
+  changeAttr,
+  removeOption,
+  modifyOptionOrder,
+  updateMultipleOptions,
+})(ExpandedResearchAgreement)

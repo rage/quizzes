@@ -30,7 +30,6 @@ class QuizStatistics extends React.Component<any, any> {
       displayingPage: 1,
       answersPerPage: 10,
       scrollDownAfterUpdate: false,
-      waitingForNewAnswers: false,
     }
   }
 
@@ -71,12 +70,12 @@ class QuizStatistics extends React.Component<any, any> {
     const showing = queryParams.all && queryParams.all === "true"
 
     if (showing) {
+      await this.props.setAllAnswersCount(this.props.match.params.id)
       this.props.setAllAnswers(
         this.props.match.params.id,
         this.state.displayingPage,
         this.state.answersPerPage,
       )
-      this.props.setAllAnswersCount(this.props.match.params.id)
     } else {
       this.props.setAttentionRequiringAnswers(
         this.props.match.params.id,
@@ -124,14 +123,14 @@ class QuizStatistics extends React.Component<any, any> {
       : []
 
     return (
-      <Grid container={true} justify="center" alignItems="center" spacing={16}>
+      <Grid container={true} justify="center" alignItems="center" spacing={3}>
         <Grid item={true} xs={12} md={10}>
           <Grid
             container={true}
             direction="row-reverse"
             justify="center"
             alignItems="stretch"
-            spacing={16}
+            spacing={3}
           >
             <Grid item={true} xs={12}>
               <Link
@@ -159,7 +158,7 @@ class QuizStatistics extends React.Component<any, any> {
                 alignItems="center"
               >
                 <Grid item={true}>
-                  <Typography variant="title">
+                  <Typography variant="h6">
                     {currentCourse &&
                       currentCourse.texts[0] &&
                       currentCourse.texts[0].title.toUpperCase()}
@@ -185,7 +184,7 @@ class QuizStatistics extends React.Component<any, any> {
                       padding: "1.5em",
                     }}
                   >
-                    <Grid container={true} justify="center" spacing={24}>
+                    <Grid container={true} justify="center" spacing={5}>
                       <Grid item={true} xs={12}>
                         <Typography
                           variant="h5"
@@ -245,7 +244,7 @@ class QuizStatistics extends React.Component<any, any> {
 
                 <Grid item={true} xs={12} md={8}>
                   <Answers
-                    inWaitingState={this.state.waitingForNewAnswers}
+                    inWaitingState={this.props.answersLoading}
                     answers={this.props.answers}
                     quiz={quiz}
                     showingAll={this.state.showingAll}
@@ -341,7 +340,6 @@ class QuizStatistics extends React.Component<any, any> {
 
     this.setState({
       displayingPage: newPage,
-      waitingForNewAnswers: true,
     })
 
     if (this.state.showingAll) {
@@ -357,31 +355,26 @@ class QuizStatistics extends React.Component<any, any> {
         this.state.answersPerPage,
       )
     }
-    this.setState({
-      waitingForNewAnswers: false,
-    })
   }
 }
 
 const mapStateToProps = (state: any) => {
   return {
     answerCounts: state.answerCounts,
-    answers: state.answers,
+    answers: state.answers.data,
     quizzesOfCourse: state.quizzes.courseInfos.find(
       qi => qi.courseId === state.filter.course,
     ),
+    answersLoading: state.answers.loading,
     courses: state.courses,
     filter: state.filter,
     user: state.user,
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    setAllAnswers,
-    setAllAnswersCount,
-    setAttentionRequiringAnswers,
-    setQuiz,
-  },
-)(QuizStatistics)
+export default connect(mapStateToProps, {
+  setAllAnswers,
+  setAllAnswersCount,
+  setAttentionRequiringAnswers,
+  setQuiz,
+})(QuizStatistics)

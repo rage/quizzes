@@ -2,8 +2,8 @@ import { Button, Grid, IconButton, Typography } from "@material-ui/core"
 import AddCircle from "@material-ui/icons/AddCircle"
 import React from "react"
 import { SortableContainer } from "react-sortable-hoc"
-import { stringContainsLongerWord } from "../../../../common/src/util/index"
 import { IQuizItemOption } from "../../interfaces"
+import { stringContainsLongerWord } from "../../util/index"
 import SortableWrapper from "../SortableWrapper"
 
 interface ISortableOptionListProps {
@@ -23,7 +23,7 @@ const SortableOptionList = SortableContainer<ISortableOptionListProps>(
     return (
       <Grid
         container={true}
-        spacing={16}
+        spacing={3}
         justify="space-evenly"
         alignItems="center"
       >
@@ -66,7 +66,7 @@ const SortableOptionList = SortableContainer<ISortableOptionListProps>(
             disableRipple={true}
             onClick={props.createNewOption}
           >
-            <AddCircle fontSize="large" nativeColor="#E5E5E5" />
+            <AddCircle component="svg" fontSize="large" htmlColor="#E5E5E5" />
           </IconButton>
         </Grid>
       </Grid>

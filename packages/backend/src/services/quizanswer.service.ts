@@ -25,9 +25,6 @@ import { WhereBuilder, stringContainsLongerWord } from "../util/index"
 // import PlainObjectToDatabaseEntityTransformer from "../../../../node_modules/typeorm/query-builder/transformer/PlainObjectToDatabaseEntityTransformer"
 
 // tslint:disable-next-line:max-line-length
-import { PlainObjectToDatabaseEntityTransformer } from "typeorm/query-builder/transformer/PlainObjectToDatabaseEntityTransformer"
-import { setCorrectValuesForAwardPointsEvenIfWrong1564678844323 } from "migration/1564678844323-set_correct_values_for_award_points_even_if_wrong"
-import { element } from "prop-types"
 import CourseService from "./course.service"
 
 @Service()
@@ -172,6 +169,8 @@ export default class QuizAnswerService {
   public async getAnswersCount(query: IQuizAnswerQuery): Promise<any> {
     let result
 
+    const permittedCourseIds = query.courseIds
+
     // Temporarily check elements courses counts differently from others
     // Later: save the attention criteria in database for each course
     // (and maybe don't request the numbers for all the courses in one request)
@@ -181,26 +180,44 @@ export default class QuizAnswerService {
       // Assuming that all the relevant quizzes on all elements courses use the same values, which are hard-coded below
       // TODO: change query building to support option "course-minimum" for the relevant properties
 
-      const elementsCourseIds: string[] = await this.courseService.getElementsCourseIds()
-      const elementsCriteria: IQuizAnswerQuery = {
-        courseIds: elementsCourseIds,
-        courseIdIncludedInCourseIds: true,
-        statuses: ["spam", "submitted", "enough-received-but-not-given"],
-        minPeerReviewsGiven: 3,
-        minPeerReviewsReceived: 2,
-        minSpamFlagsOr: 1,
+      let elementsCourseIds: string[] = await this.courseService.getElementsCourseIds()
+
+      // undefined for admins
+      if (permittedCourseIds) {
+        elementsCourseIds = elementsCourseIds.filter(id =>
+          permittedCourseIds.includes(id),
+        )
       }
-      elementsCriteria.courseIdIncludedInCourseIds = true
+
+      let elementsCriteria: IQuizAnswerQuery
+      if (elementsCourseIds.length > 0) {
+        elementsCriteria = {
+          courseIds: elementsCourseIds,
+          courseIdIncludedInCourseIds: true,
+          statuses: ["manual-review"],
+        }
+        elementsCriteria.courseIdIncludedInCourseIds = true
+      }
 
       const nonElementsCriteria = { ...query }
 
-      nonElementsCriteria.courseIds = elementsCourseIds
-      nonElementsCriteria.courseIdIncludedInCourseIds = false
+      if (permittedCourseIds) {
+        nonElementsCriteria.courseIds = permittedCourseIds.filter(
+          id => !elementsCourseIds.includes(id),
+        )
+      } else {
+        nonElementsCriteria.courseIds = elementsCourseIds
+        nonElementsCriteria.courseIdIncludedInCourseIds = false
+      }
 
-      const [result1, result2] = await Promise.all([
-        this.getQuizCounts(elementsCriteria),
-        this.getQuizCounts(nonElementsCriteria),
-      ])
+      const promise1: Promise<any> | [] =
+        elementsCourseIds.length > 0 ? this.getQuizCounts(elementsCriteria) : []
+      const promise2: Promise<any> | [] =
+        nonElementsCriteria.courseIds.length > 0
+          ? this.getQuizCounts(nonElementsCriteria)
+          : []
+
+      const [result1, result2] = await Promise.all([promise1, promise2])
       result = result1.concat(result2)
     }
 
@@ -409,9 +426,9 @@ export default class QuizAnswerService {
       addSpamFlagNumber,
     } = query
 
-    const queryBuilder: SelectQueryBuilder<
-      QuizAnswer
-    > = QuizAnswer.createQueryBuilder("quiz_answer")
+    const queryBuilder: SelectQueryBuilder<QuizAnswer> = QuizAnswer.createQueryBuilder(
+      "quiz_answer",
+    )
 
     if (
       !id &&
@@ -589,7 +606,6 @@ export default class QuizAnswerService {
       }
     }
 
-    console.log("SQL: ", queryBuilder.getQueryAndParameters())
     return queryBuilder
   }
 

@@ -9,12 +9,12 @@ const ShortResearchAgreement = props => {
     <ShortWrapper toggleExpand={props.toggleExpand}>
       <Grid
         container={true}
-        spacing={16}
+        spacing={3}
         justify="flex-start"
         alignItems="flex-start"
       >
         <Grid item={true} xs={6} xl={4}>
-          <Typography variant="title">
+          <Typography variant="h6">
             {item.texts[0].title} ({item.type})
           </Typography>
         </Grid>

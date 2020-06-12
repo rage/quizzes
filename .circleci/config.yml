@@ -2,12 +2,12 @@ version: 2.1
 jobs:
   code_style:
     docker:
-      - image: circleci/node:11
+      - image: circleci/node:12
     steps:
       - checkout
       - run:
           name: "Install dependencies"
-          command: "yarn install"
+          command: "npm ci"
       - run:
           name: "Check code style"
           command: "bin/check-code-style.sh"
@@ -19,16 +19,25 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          name: "Build backend image"
+          name: "Build dashboard image"
           command: "bin/build-docker-dashboard.sh"
-      - when:
-          name: "Push dashboard image"
-          condition:
-            branches:
-              only:
-                - master
-          steps:
-            - run: "bin/push-docker-dashboard-image.sh"
+      - run:
+          name: "Push image if on master"
+          command: "bin/push-docker-dashboard-image.sh"
+
+  build_dashboardv2:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: "Build dashboard v2 image"
+          command: "bin/build-docker-dashboardv2.sh"
+      - run:
+          name: "Push image if on master"
+          command: "bin/push-docker-dashboardv2-image.sh"
+
 
   build_widgets:
     docker:
@@ -48,16 +57,24 @@ jobs:
       - checkout
       - setup_remote_docker
       - run:
-          name: "Build dashboard image"
+          name: "Build backend image"
           command: "bin/build-docker-backend.sh"
-      - when:
-          name: "Push backend image"
-          condition:
-            branches:
-              only:
-                - master
-          steps:
-            - run: "bin/push-docker-backend-image.sh"
+      - run:
+          name: "Push image if on master"
+          command: "bin/push-docker-backend-image.sh"
+
+  build_backendv2:
+    docker:
+      - image: google/cloud-sdk
+    steps:
+      - checkout
+      - setup_remote_docker
+      - run:
+          name: "Build backend v2 image"
+          command: "bin/build-docker-backendv2.sh"
+      - run:
+          name: "Push image if on master"
+          command: "bin/push-docker-backendv2-image.sh"
 
   deploy_to_production:
     docker:
@@ -78,12 +95,16 @@ workflows:
     jobs:
       - build_dashboard
       - build_backend
+      - build_dashboardv2
+      - build_backendv2
       - build_widgets
       - code_style
       - deploy_to_production:
           requires:
             - build_dashboard
             - build_backend
+            - build_dashboardv2
+            - build_backendv2
             - build_widgets
             - code_style
           filters:

@@ -38,7 +38,7 @@ class PeerReviewsModal extends React.Component<any, any> {
         </DialogTitle>
 
         <DialogContent>
-          <Grid container={true} spacing={16}>
+          <Grid container={true} spacing={3}>
             {this.props.peerReviews !== null &&
               this.props.peerReviews.map((pr, idx) => (
                 <Grid
@@ -81,12 +81,12 @@ const PeerReview = ({
   peerReviewTitle,
 }) => {
   return (
-    <Grid container={true} spacing={16}>
+    <Grid container={true} spacing={3}>
       <Grid item={true} xs={12}>
-        <Typography variant="headline">Peer review {idx + 1}</Typography>
+        <Typography variant="h5">Peer review {idx + 1}</Typography>
       </Grid>
       <Grid item={true} xs={12} style={{ backgroundColor: "#DDDDDD" }}>
-        <Grid container={true} spacing={16}>
+        <Grid container={true} spacing={3}>
           <Grid item={true} xs={12} style={{ borderBottom: "1px solid black" }}>
             <Typography variant="subtitle1">{peerReviewTitle}</Typography>
             <Typography variant="body1">
@@ -152,7 +152,7 @@ const PeerReviewQuestionAnswer = ({ type, questionAnswer, title }) => {
   if (type === "essay") {
     return (
       <React.Fragment>
-        <Typography variant="subheading">{title}</Typography>
+        <Typography variant="subtitle1">{title}</Typography>
         <Typography variant="body1" style={{ wordBreak: "break-word" }}>
           {questionAnswer.text}
         </Typography>
@@ -184,14 +184,11 @@ const PeerReviewQuestionAnswer = ({ type, questionAnswer, title }) => {
 
 const mapStateToProps = state => {
   return {
-    answers: state.answers,
+    answers: state.answers.data,
     quizzes: state.quizzes.courseInfos.find(
       qi => qi.courseId === state.filter.course,
     ).quizzes,
   }
 }
 
-export default connect(
-  mapStateToProps,
-  { setQuiz },
-)(PeerReviewsModal)
+export default connect(mapStateToProps, { setQuiz })(PeerReviewsModal)

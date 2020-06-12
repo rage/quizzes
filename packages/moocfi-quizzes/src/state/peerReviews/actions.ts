@@ -64,8 +64,8 @@ export const changeGrade: ActionCreator<ThunkAction> = (
   peerReviewQuestionId: string,
   value: number,
 ) => (dispatch, getState) => {
-  const peerReviewCollection = getState().quiz.peerReviewCollections.find(prc =>
-    prc.questions.some(q => q.id === peerReviewQuestionId),
+  const peerReviewCollection = getState().quiz?.peerReviewCollections.find(
+    prc => prc.questions.some(q => q.id === peerReviewQuestionId),
   )
   if (!peerReviewCollection) {
     console.log("No answer that matches the id of the reviewed answer")
@@ -78,8 +78,8 @@ export const changeText: ActionCreator<ThunkAction> = (
   peerReviewQuestionId: string,
   text: string,
 ) => (dispatch, getState) => {
-  const peerReviewCollection = getState().quiz.peerReviewCollections.find(prc =>
-    prc.questions.some(q => q.id === peerReviewQuestionId),
+  const peerReviewCollection = getState().quiz?.peerReviewCollections.find(
+    prc => prc.questions.some(q => q.id === peerReviewQuestionId),
   )
   if (!peerReviewCollection) {
     console.log("No answer that matches the id of the reviewed answer")
@@ -134,9 +134,14 @@ export const selectAnswerToReview: ActionCreator<ThunkAction> = (
   }
 
   const userId = user.userQuizState.userId
-  const prc = getState().quiz.peerReviewCollections[0]
+  const prc = getState().quiz?.peerReviewCollections[0]
   dispatch(
-    selectAnswer(quizAnswerId, userId, prc.id, prc.questions.map(q => q.id)),
+    selectAnswer(
+      quizAnswerId,
+      userId,
+      prc?.id || "",
+      prc?.questions.map(q => q.id) || [],
+    ),
   )
 }
 
@@ -162,9 +167,10 @@ export const postSpam: ActionCreator<ThunkAction> = (
   }
 }
 
-export const fetchPeerReviewAlternatives: ActionCreator<
-  ThunkAction
-> = () => async (dispatch, getState) => {
+export const fetchPeerReviewAlternatives: ActionCreator<ThunkAction> = () => async (
+  dispatch,
+  getState,
+) => {
   try {
     const accessToken = getState().user.accessToken
     const quiz = getState().quiz
@@ -172,7 +178,7 @@ export const fetchPeerReviewAlternatives: ActionCreator<
 
     const address = getState().backendAddress
     const answerAlternatives = await getPeerReviewInfo(
-      quiz.id,
+      quiz?.id || "",
       languageId,
       accessToken,
       address,

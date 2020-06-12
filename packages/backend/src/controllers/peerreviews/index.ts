@@ -142,16 +142,27 @@ export class PeerReviewController {
       {
         userId: peerReview.userId,
         quizId: receivingQuizAnswer.quizId,
-        statuses: ["confirmed", "submitted", "enough-received-but-not-given"],
+        statuses: [
+          "given-more-than-enough",
+          "given-enough",
+          "confirmed",
+          "submitted",
+          "enough-received-but-not-given",
+          "manual-review",
+          "manual-review-once-given-enough",
+          "manual-review-once-given-and-received-enough",
+        ],
       },
       this.entityManager,
     )
 
-    const quiz: Quiz = (await this.QuizService.getQuizzes({
-      id: receivingQuizAnswer.quizId,
-      course: true,
-      items: true,
-    }))[0]
+    const quiz: Quiz = (
+      await this.QuizService.getQuizzes({
+        id: receivingQuizAnswer.quizId,
+        course: true,
+        items: true,
+      })
+    )[0]
 
     let responsePeerReview: PeerReview
     let responseQuizAnswer: QuizAnswer

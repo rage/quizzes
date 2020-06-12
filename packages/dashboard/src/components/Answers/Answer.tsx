@@ -31,6 +31,8 @@ class Answer extends React.Component<any, any> {
     confirmed: "#48fa5d",
     rejected: "#d80027",
     deprecated: "#9b9b9b",
+    "enough-received-but-not-given": "#FB6949",
+    "manual-review": "#FB6949",
   }
 
   constructor(props) {
@@ -121,7 +123,7 @@ class Answer extends React.Component<any, any> {
                     {this.props.answerData.status === "confirmed" ? (
                       ""
                     ) : (
-                      <Grid container={true} justify="flex-start" spacing={16}>
+                      <Grid container={true} justify="flex-start" spacing={3}>
                         <Grid item={true} xs="auto">
                           <Button
                             variant="contained"
@@ -192,8 +194,7 @@ class Answer extends React.Component<any, any> {
               <Button
                 onClick={this.modifyStatus(
                   this.state.confirmAction,
-                  this.props.answerData.status === "submitted" ||
-                    this.props.answerData.status === "spam",
+                  this.props.answerData.status === "manual-review",
                 )}
               >
                 Confirm
@@ -325,7 +326,7 @@ class PeerReviewsSummary extends React.Component<any, any> {
     if (this.props.peerReviewsQuestions.length === 0) {
       return (
         <Grid item={true} xs="auto">
-          <Typography variant="title">Quiz involves no peer reviews</Typography>
+          <Typography variant="h6">Quiz involves no peer reviews</Typography>
         </Grid>
       )
     }
@@ -352,7 +353,7 @@ class PeerReviewsSummary extends React.Component<any, any> {
             <Grid
               container={true}
               direction="column"
-              spacing={24}
+              spacing={3}
               justify="space-around"
               alignItems="center"
             >
@@ -526,11 +527,8 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(
-  mapStateToProps,
-  {
-    decrementAttentionCount: decrement,
-    displayMessage,
-    setQuiz,
-  },
-)(Answer)
+export default connect(mapStateToProps, {
+  decrementAttentionCount: decrement,
+  displayMessage,
+  setQuiz,
+})(Answer)

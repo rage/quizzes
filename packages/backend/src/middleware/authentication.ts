@@ -1,5 +1,4 @@
-import { NextFunction, Request, Response } from "express"
-// import redis from "redis"
+import * as Sentry from "@sentry/node"
 import {
   ExpressMiddlewareInterface,
   Middleware,
@@ -53,6 +52,11 @@ export class AuthenticationMiddleware implements ExpressMiddlewareInterface {
         }
         throw new UnauthorizedError()
       }
+    }
+    if (process.env.SENTRY_DSN) {
+      Sentry.configureScope(scope => {
+        scope.setUser({ id: `${user.id}` })
+      })
     }
     req.headers.authorization = user
     next()

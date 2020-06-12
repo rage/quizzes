@@ -1,6 +1,6 @@
 import { Button, Grid, Typography } from "@material-ui/core"
 import React from "react"
-import { stringContainsLongerWord } from "../../../../common/src/util/index"
+import { stringContainsLongerWord } from "../../util"
 import ShortWrapper from "../ItemTools/ShortWrapper"
 
 class FinishedMultipleChoiceItem extends React.Component<any, any> {
@@ -14,13 +14,13 @@ class FinishedMultipleChoiceItem extends React.Component<any, any> {
       <ShortWrapper toggleExpand={this.props.toggleExpand}>
         <Grid
           container={true}
-          spacing={16}
+          spacing={3}
           justify="flex-start"
           alignItems="center"
         >
           <Grid item={true} xs={6} lg={4}>
             <Typography
-              variant="title"
+              variant="h6"
               style={{
                 wordBreak: stringContainsLongerWord(item.texts[0].title, 22)
                   ? "break-all"
@@ -41,7 +41,7 @@ class FinishedMultipleChoiceItem extends React.Component<any, any> {
               container={true}
               justify="flex-start"
               alignItems="center"
-              spacing={16}
+              spacing={3}
             >
               {item.options.map(opt => (
                 <Grid

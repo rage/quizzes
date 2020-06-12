@@ -12,16 +12,22 @@ import express, {
   ErrorRequestHandler,
   RequestHandler,
 } from "express"
-import expressValidator from "express-validator"
 import morgan from "morgan"
 import path from "path"
 import { createExpressServer, useContainer } from "routing-controllers"
 import { Container, Service } from "typedi"
 import { logger } from "./config/winston"
 import controllers from "./controllers"
-import { AuthenticationMiddleware } from "./middleware/authentication"
 
 import * as typeorm from "typeorm"
+
+import { AuthenticationMiddleware } from "./middleware/authentication"
+import { SentryRequestHandlerMiddleware } from "./middleware/sentry"
+import { SentryErrorHandlerMiddleware } from "./middleware/sentry"
+
+import * as Sentry from "@sentry/node"
+
+import { get } from "lodash"
 
 if (process.env.NODE_ENV !== "production") {
   dotenv.config({ path: ".env" })
@@ -35,7 +41,6 @@ export class App {
     compression(),
     bodyParser.json(),
     bodyParser.urlencoded({ extended: true }),
-    expressValidator(),
     morgan("combined", {
       stream: {
         write: (meta: any) => logger.info(meta),
@@ -49,11 +54,29 @@ export class App {
     useContainer(Container)
     typeorm.useContainer(Container)
 
+    if (process.env.SENTRY_DSN) {
+      Sentry.init({
+        dsn: process.env.SENTRY_DSN,
+        release: `quizzes-backend@${process.env.GIT_COMMIT}`,
+        beforeSend(event) {
+          // Modify the event
+          if (get(event, "request.headers.user")) {
+            delete event.request.headers.user
+          }
+          return event
+        },
+      })
+    }
+
     this.application = createExpressServer({
       cors: true,
       // routePrefix: "/",
       controllers,
-      middlewares: [AuthenticationMiddleware],
+      middlewares: [
+        SentryRequestHandlerMiddleware,
+        AuthenticationMiddleware,
+        SentryErrorHandlerMiddleware,
+      ],
     })
 
     this.handlers.forEach(handler => this.application.use(handler))

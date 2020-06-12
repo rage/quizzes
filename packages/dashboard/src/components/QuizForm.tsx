@@ -58,7 +58,7 @@ class QuizForm extends React.Component<IQuizFormProps, any> {
 
   public render() {
     return (
-      <Grid container={true} spacing={16} justify="center">
+      <Grid container={true} spacing={3} justify="center">
         <Grid item={true} xs={12} sm={10} lg={8}>
           {this.props.edit.id && (
             <Link
@@ -174,7 +174,4 @@ const mapDispatchToProps = {
   setQuiz,
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(QuizForm)
+export default connect(mapStateToProps, mapDispatchToProps)(QuizForm)

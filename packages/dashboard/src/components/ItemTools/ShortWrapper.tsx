@@ -6,7 +6,7 @@ import DragHandleWrapper from "../DragHandleWrapper"
 const ShortItemWrapper = props => (
   <Grid
     container={true}
-    spacing={16}
+    spacing={3}
     justify="center"
     alignItems="center"
     style={{ marginTop: "2em", marginBottom: "2em" }}
@@ -22,7 +22,7 @@ const ShortItemWrapper = props => (
           disableRipple={true}
           onClick={props.toggleExpand}
         >
-          <Create fontSize="large" nativeColor="#B5B5B5" />
+          <Create component="svg" fontSize="large" htmlColor="#B5B5B5" />
         </IconButton>
       </Grid>
     </DragHandleWrapper>

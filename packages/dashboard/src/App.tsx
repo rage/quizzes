@@ -1,4 +1,5 @@
 import AppBar from "@material-ui/core/AppBar"
+import Breadcrumbs from "@material-ui/core/Breadcrumbs"
 import Button from "@material-ui/core/Button"
 import FormControl from "@material-ui/core/FormControl"
 import Grid from "@material-ui/core/Grid"
@@ -10,18 +11,17 @@ import Toolbar from "@material-ui/core/Toolbar"
 import Typography from "@material-ui/core/Typography"
 import Build from "@material-ui/icons/Build"
 import NavigateNextIcon from "@material-ui/icons/NavigateNext"
-import Breadcrumbs from "@material-ui/lab/Breadcrumbs"
 import * as React from "react"
 import { connect } from "react-redux"
 import { BrowserRouter as Router, Link, Route } from "react-router-dom"
-import TMCApi from "../../common/src/services/TMCApi"
-import { ITMCProfile, ITMCProfileDetails } from "../../common/src/types"
 import QuizStatistics from "./components/Answers/QuizStatistics"
 import CoursesView from "./components/CoursesView"
 import QuizForm from "./components/QuizForm"
 import RolesView from "./components/RolesView"
 import SingleCourseView from "./components/SingleCourseView"
 import SuccessNotification from "./components/SuccessNotification"
+import { ITMCProfile, ITMCProfileDetails } from "./interfaces"
+import TMCApi from "./services/TMCApi"
 import { setAnswerCounts } from "./store/answerCounts/actions"
 import { setCourses } from "./store/courses/actions"
 import { newQuiz, setEdit } from "./store/edit/actions"
@@ -147,7 +147,7 @@ class App extends React.Component<any, any> {
                             container={true}
                             justify="flex-end"
                             alignItems="center"
-                            spacing={16}
+                            spacing={3}
                           >
                             {developmentEnvironment && (
                               <Grid item={true}>

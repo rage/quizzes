@@ -1,6 +1,9 @@
 {
-  "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "resolveJsonModule": true,
+    "composite": true,
+    "declarationMap": false,
+    "strictPropertyInitialization": false,
     "strict": false,
     "module": "commonjs",
     "esModuleInterop": true,
@@ -11,8 +14,8 @@
     "emitDecoratorMetadata": true,
     "declaration": true,
     "sourceMap": true,
-    "outDir": "../../dist",
-    "rootDir": "../",
+    "outDir": "dist",
+    "rootDir": "./",
     "baseUrl": "src/",
     "paths": {
       "services/*": [

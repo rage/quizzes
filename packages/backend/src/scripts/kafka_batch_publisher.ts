@@ -42,10 +42,9 @@ const publish = async () => {
         }`,
       )
 
-      const course = (await knex<ICourse>("course").where(
-        "id",
-        task.course_id,
-      ))[0]
+      const course = (
+        await knex<ICourse>("course").where("id", task.course_id)
+      )[0]
 
       if (course_id) {
         if (recalculate_progress) {
@@ -377,6 +376,7 @@ interface ICourse {
   min_peer_reviews_given: number
   min_review_average: number
   max_spam_flags: number
+  max_review_spam_flags: number
   organization: any
 }
 
@@ -397,12 +397,9 @@ interface IQuiz {
 
 producer.on("ready", publish)
 
-producer.connect(
-  {},
-  (err: any) => {
-    if (err) {
-      console.log("Producer failed to connect")
-      console.log(err)
-    }
-  },
-)
+producer.connect({}, (err: any) => {
+  if (err) {
+    console.log("Producer failed to connect")
+    console.log(err)
+  }
+})

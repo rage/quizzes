@@ -1,5 +1,4 @@
 import { MigrationInterface, QueryRunner } from "typeorm"
-import { query } from "express-validator/check"
 
 export class createKafkaTaskTable1569938936236 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {

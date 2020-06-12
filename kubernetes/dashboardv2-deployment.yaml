@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: quizzes-dashboardv2-deployment
+spec:
+  selector:
+    matchLabels:
+      app: quizzes-dashboardv2
+  replicas: 2
+  template:
+    metadata:
+      labels:
+        app: quizzes-dashboardv2
+    spec:
+      containers:
+      - name: quizzes-dashboardv2
+        image: ${DASHBOARDV2_IMAGE}
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "100m"
+          limits:
+            memory: "1000Mi"
+            cpu: "500m"
+        ports:
+        - name: dv2-http
+          containerPort: 5000
+        env:
+          - name: HOST
+            value: "https://quizzes2.mooc.fi"

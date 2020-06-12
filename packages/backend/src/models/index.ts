@@ -8,7 +8,7 @@ export { Quiz, QuizTranslation } from "./quiz"
 export { QuizItem, QuizItemTranslation } from "./quiz_item"
 export { QuizOption, QuizOptionTranslation } from "./quiz_option"
 
-export { QuizAnswer } from "./quiz_answer"
+export { QuizAnswer, QuizAnswerStatusType } from "./quiz_answer"
 export { QuizItemAnswer } from "./quiz_item_answer"
 export { QuizOptionAnswer } from "./quiz_option_answer"
 

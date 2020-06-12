@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: quizzes-dashboardv2-service
+  labels:
+    app: quizzes-dashboardv2
+spec:
+  type: NodePort
+  ports:
+  - port: 80
+    targetPort: dv2-http
+  selector:
+    app: quizzes-dashboardv2

@@ -1,5 +1,4 @@
 import axios from "axios"
-import TMCApi from "../../../common/src/services/TMCApi"
 import { ICourse } from "../interfaces"
 
 export const getCourses = async user => {

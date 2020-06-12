@@ -56,6 +56,9 @@ export type QuizAnswer = {
     | "rejected"
     | "deprecated"
     | "enough-received-but-not-given"
+    | "manual-review"
+    | "given-more-than-enough"
+    | "given-enough"
   itemAnswers: QuizItemAnswer[]
 }
 
@@ -89,6 +92,7 @@ export type Course = {
   minPeerReviewsGiven: number
   minReviewAverage: number
   maxSpamFlags: number
+  maxReviewSpamFlags: number
   languages: CourseLanguage[]
   texts: CourseText[]
 }

@@ -91,6 +91,11 @@ spec:
               secretKeyRef:
                 name: backend-database-secret
                 key: SERVICE_ID
+          - name: SENTRY_DSN
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: SENTRY_DSN
       initContainers:
       - name: quizzes-backend-run-migrations
         image: ${BACKEND_IMAGE}
@@ -116,3 +121,8 @@ spec:
               secretKeyRef:
                 name: backend-database-secret
                 key: POSTGRES_USERNAME
+          - name: SENTRY_DSN
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: SENTRY_DSN

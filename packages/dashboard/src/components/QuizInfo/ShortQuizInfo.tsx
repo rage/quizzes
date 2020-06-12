@@ -40,7 +40,7 @@ const ShortQuizInfo: React.FunctionComponent<IProps> = ({
 }) => (
   <Grid container={true} justify="space-between">
     <Grid item={true} xs={3} style={{ marginBottom: "2em" }}>
-      <Typography variant="title" paragraph={true}>{`${title}`}</Typography>
+      <Typography variant="h6" paragraph={true}>{`${title}`}</Typography>
     </Grid>
 
     <Grid item={true} xs={6} />
