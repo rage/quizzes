@@ -125,7 +125,7 @@ const hungarianLabels: SingleLanguageLabels = {
       }
     },
     answered: "Megválaszolva",
-    unanswered: "Meg nem válaszolt",
+    unanswered: "Megoldandó",
     rejected: "Elutasított válasz, próbálkozzon újra",
     progressUpdated: "A tanfolyam során elért eredmények frissültek",
     answerConfirmed: "Válaszod megerősítették!",

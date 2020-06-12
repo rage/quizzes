@@ -124,13 +124,8 @@ const latvianLabels: SingleLanguageLabels = {
           return ""
       }
     },
-<<<<<<< HEAD
-    answered: "Atbildēja",
-    unanswered: "Nav izpildīts",
-=======
     answered: "Atbildēts",
     unanswered: "Neatbildēts",
->>>>>>> cc450fe339bc332ff5bc89e91e4b518bf5a901cc
     rejected: "Atbilde noraidīta. Lūdzu, mēģiniet vēlreiz",
     progressUpdated: "Atjaunināti dati par to, cik tālu kurss nokārtots.",
     answerConfirmed: "Jūsu atbilde ir apstiprināta!",
