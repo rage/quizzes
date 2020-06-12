@@ -199,6 +199,59 @@ const editReducer = (
       newItems.sort((a, b) => a.order - b.order)
       return { ...newState, items: newItems }
     }
+    case "EDITED_VALIDITY_REGEX": {
+      console.log(action)
+      let newState = state
+      let wantedItem = newState.items.find(
+        item => item.id === action.payload.itemId,
+      )
+      if (!wantedItem) {
+        return state
+      }
+      wantedItem.validityRegex = action.payload.newRegex
+      let newItems = newState.items.filter(
+        item => item.id !== action.payload.itemId,
+      )
+      newItems = [...newItems, wantedItem]
+      return { ...newState, items: newItems }
+    }
+    case "TOGGLED_MULTI_OPTIONS": {
+      console.log(action)
+      let newState = state
+      let wantedItem = newState.items.find(
+        item => item.id,
+        action.payload.itemId,
+      )
+      if (!wantedItem) {
+        return state
+      }
+      wantedItem.multi = !wantedItem.multi
+      let newItems = newState.items.filter(
+        item => item.id !== action.payload.itemId,
+      )
+      newItems = [...newItems, wantedItem]
+      return { ...newState, items: newItems }
+    }
+    case "EDITED_ITEM_MESSAGE": {
+      console.log(action)
+      let newState = state
+      let wantedItem = newState.items.find(
+        item => item.id === action.payload.itemId,
+      )
+      if (!wantedItem) {
+        return state
+      }
+      if (action.payload.success) {
+        wantedItem.texts[0].successMessage = action.payload.newMessage
+      } else {
+        wantedItem.texts[0].failureMessage = action.payload.newMessage
+      }
+      let newItems = newState.items.filter(
+        item => item.id !== action.payload.itemId,
+      )
+      newItems = [...newItems, wantedItem]
+      return { ...newState, items: newItems }
+    }
     default: {
       return initialState
     }

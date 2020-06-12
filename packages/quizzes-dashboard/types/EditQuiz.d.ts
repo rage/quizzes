@@ -28,6 +28,7 @@ export interface Item {
   maxWords: null
   minValue: number | null
   maxValue: number | null
+  validityRegex
   formatRegex: null
   multi: boolean
   usesSharedOptionFeedbackMessage: boolean
@@ -47,6 +48,8 @@ export interface ItemText {
   sharedOptionFeedbackMessage: string | null
   createdAt: Date
   updatedAt: Date
+  successMessage: string | null
+  failureMessage: string | null
 }
 
 export interface QuizText {
