@@ -47,11 +47,21 @@ jobs:
     steps:
     - checkout
     - run:
+        name: Waiting for Postgres to be ready
+        command: |
+          for i in `seq 1 10`;
+          do
+            nc -z localhost 5432 && echo Success && exit 0
+            echo -n .
+            sleep 1
+          done
+          echo Failed waiting for Postgres && exit 1
+    - run:
         name: install dependencies
         command: cd packages/backendv2 && npm ci
     - run:
         name: run tests
-        command: npm run test
+        command: cd packages/backendv2 && npm run test
   build_backendv2:
     docker:
     - image: google/cloud-sdk
@@ -186,7 +196,6 @@ workflows:
 #           command: \"bin/push-docker-backend-image.sh\"
 # 
 #   test_backend_v2:
-#     #working_directory: ./packages/backendv2
 #     docker:
 #       - image: circleci/node:11
 #       - image: circleci/postgres:9.6-alpine
@@ -197,11 +206,21 @@ workflows:
 #     steps:
 #       - checkout
 #       - run:
+#           name: Waiting for Postgres to be ready
+#           command: |
+#             for i in `seq 1 10`;
+#             do
+#               nc -z localhost 5432 && echo Success && exit 0
+#               echo -n .
+#               sleep 1
+#             done
+#             echo Failed waiting for Postgres && exit 1
+#       - run:
 #           name: \"install dependencies\"
 #           command: \"cd packages/backendv2 && npm ci\"
 #       - run:
 #           name: \"run tests\"
-#           command: \"npm run test\"
+#           command: \"cd packages/backendv2 && npm run test\"
 # 
 #   build_backendv2:
 #     docker:
