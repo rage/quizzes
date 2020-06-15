@@ -1,5 +1,5 @@
 import http from "http"
-import logger, { GlobalLogger } from "./src/middleware/logger"
+import { GlobalLogger } from "./src/middleware/logger"
 import app from "./app"
 
 http

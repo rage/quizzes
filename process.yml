@@ -1,0 +1,255 @@
+version: 2
+jobs:
+  build_dashboard:
+    docker:
+    - image: google/cloud-sdk
+    steps:
+    - checkout
+    - setup_remote_docker
+    - run:
+        name: Build dashboard image
+        command: bin/build-docker-dashboard.sh
+    - run:
+        name: Push image if on master
+        command: bin/push-docker-dashboard-image.sh
+  build_backend:
+    docker:
+    - image: google/cloud-sdk
+    steps:
+    - checkout
+    - setup_remote_docker
+    - run:
+        name: Build backend image
+        command: bin/build-docker-backend.sh
+    - run:
+        name: Push image if on master
+        command: bin/push-docker-backend-image.sh
+  build_dashboardv2:
+    docker:
+    - image: google/cloud-sdk
+    steps:
+    - checkout
+    - setup_remote_docker
+    - run:
+        name: Build dashboard v2 image
+        command: bin/build-docker-dashboardv2.sh
+    - run:
+        name: Push image if on master
+        command: bin/push-docker-dashboardv2-image.sh
+  test_backend_v2:
+    docker:
+    - image: circleci/node:11
+    - image: circleci/postgres:9.6-alpine
+      environment:
+        POSTGRES_USER: postgres
+        POSTGRES_PASSWORD: postgres
+        POSTGRES_DB: quizzes_test
+    steps:
+    - checkout
+    - run:
+        name: install dependencies
+        command: cd packages/backendv2 && npm ci
+    - run:
+        name: run tests
+        command: npm run test
+  build_backendv2:
+    docker:
+    - image: google/cloud-sdk
+    steps:
+    - checkout
+    - setup_remote_docker
+    - run:
+        name: Build backend v2 image
+        command: bin/build-docker-backendv2.sh
+    - run:
+        name: Push image if on master
+        command: bin/push-docker-backendv2-image.sh
+  build_widgets:
+    docker:
+    - image: google/cloud-sdk
+    steps:
+    - checkout
+    - setup_remote_docker
+    - run:
+        name: Build widgets image
+        command: bin/build-docker-widgets.sh
+  code_style:
+    docker:
+    - image: circleci/node:12
+    steps:
+    - checkout
+    - run:
+        name: Install dependencies
+        command: npm ci
+    - run:
+        name: Check code style
+        command: bin/check-code-style.sh
+  deploy_to_production:
+    docker:
+    - image: google/cloud-sdk
+    steps:
+    - checkout
+    - setup_remote_docker
+    - run:
+        name: install envsubst
+        command: apt-get install -qq -y gettext
+    - run:
+        name: Deploy
+        command: bin/ci-update-deployments.sh
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+    - build_dashboard
+    - build_backend
+    - build_dashboardv2
+    - test_backend_v2
+    - build_backendv2
+    - build_widgets
+    - code_style
+    - deploy_to_production:
+        filters:
+          branches:
+            only:
+            - master
+        requires:
+        - build_dashboard
+        - build_backend
+        - build_dashboardv2
+        - test_backend_v2
+        - build_backendv2
+        - build_widgets
+        - code_style
+
+# Original config.yml file:
+# version: 2.1
+# jobs:
+#   code_style:
+#     docker:
+#       - image: circleci/node:12
+#     steps:
+#       - checkout
+#       - run:
+#           name: \"Install dependencies\"
+#           command: \"npm ci\"
+#       - run:
+#           name: \"Check code style\"
+#           command: \"bin/check-code-style.sh\"
+# 
+#   build_dashboard:
+#     docker:
+#       - image: google/cloud-sdk
+#     steps:
+#       - checkout
+#       - setup_remote_docker
+#       - run:
+#           name: \"Build dashboard image\"
+#           command: \"bin/build-docker-dashboard.sh\"
+#       - run:
+#           name: \"Push image if on master\"
+#           command: \"bin/push-docker-dashboard-image.sh\"
+# 
+#   build_dashboardv2:
+#     docker:
+#       - image: google/cloud-sdk
+#     steps:
+#       - checkout
+#       - setup_remote_docker
+#       - run:
+#           name: \"Build dashboard v2 image\"
+#           command: \"bin/build-docker-dashboardv2.sh\"
+#       - run:
+#           name: \"Push image if on master\"
+#           command: \"bin/push-docker-dashboardv2-image.sh\"
+# 
+#   build_widgets:
+#     docker:
+#       - image: google/cloud-sdk
+#     steps:
+#       - checkout
+#       - setup_remote_docker
+#       - run:
+#           name: \"Build widgets image\"
+#           command: \"bin/build-docker-widgets.sh\"
+# 
+#   build_backend:
+#     docker:
+#       - image: google/cloud-sdk
+#     steps:
+#       - checkout
+#       - setup_remote_docker
+#       - run:
+#           name: \"Build backend image\"
+#           command: \"bin/build-docker-backend.sh\"
+#       - run:
+#           name: \"Push image if on master\"
+#           command: \"bin/push-docker-backend-image.sh\"
+# 
+#   test_backend_v2:
+#     #working_directory: ./packages/backendv2
+#     docker:
+#       - image: circleci/node:11
+#       - image: circleci/postgres:9.6-alpine
+#         environment:
+#           POSTGRES_USER: postgres
+#           POSTGRES_PASSWORD: postgres
+#           POSTGRES_DB: quizzes_test
+#     steps:
+#       - checkout
+#       - run:
+#           name: \"install dependencies\"
+#           command: \"cd packages/backendv2 && npm ci\"
+#       - run:
+#           name: \"run tests\"
+#           command: \"npm run test\"
+# 
+#   build_backendv2:
+#     docker:
+#       - image: google/cloud-sdk
+#     steps:
+#       - checkout
+#       - setup_remote_docker
+#       - run:
+#           name: \"Build backend v2 image\"
+#           command: \"bin/build-docker-backendv2.sh\"
+#       - run:
+#           name: \"Push image if on master\"
+#           command: \"bin/push-docker-backendv2-image.sh\"
+# 
+#   deploy_to_production:
+#     docker:
+#       - image: google/cloud-sdk
+#     steps:
+#       - checkout
+#       - setup_remote_docker
+#       - run:
+#           name: install envsubst
+#           command: apt-get install -qq -y gettext
+#       - run:
+#           name: \"Deploy\"
+#           command: \"bin/ci-update-deployments.sh\"
+# 
+# workflows:
+#   version: 2
+#   build-deploy:
+#     jobs:
+#       - build_dashboard
+#       - build_backend
+#       - build_dashboardv2
+#       - test_backend_v2
+#       - build_backendv2
+#       - build_widgets
+#       - code_style
+#       - deploy_to_production:
+#           requires:
+#             - build_dashboard
+#             - build_backend
+#             - build_dashboardv2
+#             - test_backend_v2
+#             - build_backendv2
+#             - build_widgets
+#             - code_style
+#           filters:
+#             branches:
+#               only:
+#                 - master
