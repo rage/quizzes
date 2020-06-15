@@ -71,7 +71,8 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: quizzes_test
     steps:
-      - checkout
+      - checkout:
+          path: ./packages/backendv2
       - run:
           name: "install dependencies"
           command: "npm ci"
