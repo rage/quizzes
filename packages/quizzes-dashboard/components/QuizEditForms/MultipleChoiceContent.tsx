@@ -6,27 +6,20 @@ import {
   editedOptionTitle,
   editedOptionCorrectnes,
 } from "../../store/edit/actions"
-import { connect } from "react-redux"
+import { useDispatch } from "react-redux"
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { EditorState } from "../../store/edit/reducers"
 
 const QuizContent = styled.div`
   padding: 1rem;
   display: flex;
 `
 
-interface contentBoxProps {
+interface multiplChoiceContentProps {
   item: Item
-  saveOptionTitle: (newTitle: string, itemId: string, optionId: string) => any
-  editOptionCorrectnes: (itemId: string, optionId: string) => any
 }
 
-const MultipleChoiceContent = ({
-  item,
-  saveOptionTitle,
-  editOptionCorrectnes,
-}: contentBoxProps) => {
+const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
   return (
     <>
       {item.options.map(option => (
@@ -34,8 +27,6 @@ const MultipleChoiceContent = ({
           key={option.id}
           option={option}
           itemId={item.id}
-          saveOptionTitle={saveOptionTitle}
-          editOptionCorrectnes={editOptionCorrectnes}
         />
       ))}
     </>
@@ -45,20 +36,20 @@ const MultipleChoiceContent = ({
 interface multipleChoiceButtonProps {
   option: Option
   itemId: string
-  saveOptionTitle: (newTitle: string, itemId: string, optionId: string) => any
-  editOptionCorrectnes: (itemId: string, optionId: string) => any
 }
 
 const MultipleChoiceButton = ({
   option,
   itemId,
-  saveOptionTitle,
-  editOptionCorrectnes,
 }: multipleChoiceButtonProps) => {
   const [editOptionTitle, setEditOptionTitle] = useState(false)
+  const dispatch = useDispatch()
+
   return (
     <QuizContent>
-      <Button onClick={() => editOptionCorrectnes(itemId, option.id)}>
+      <Button
+        onClick={() => dispatch(editedOptionCorrectnes(itemId, option.id))}
+      >
         <Typography>
           <FontAwesomeIcon icon={option.correct ? faCheck : faTimes} />
         </Typography>
@@ -75,7 +66,7 @@ const MultipleChoiceButton = ({
           <TextField
             defaultValue={option.texts[0].title}
             onChange={event =>
-              saveOptionTitle(event.target.value, itemId, option.id)
+              dispatch(editedOptionTitle(event.target.value, itemId, option.id))
             }
           />
         ) : (
@@ -86,23 +77,4 @@ const MultipleChoiceButton = ({
   )
 }
 
-const mapDispatchToProps = (dispatch: any) => {
-  return {
-    saveOptionTitle: (newTitle: string, itemId: string, optionId: string) =>
-      dispatch(editedOptionTitle(newTitle, itemId, optionId)),
-
-    editOptionCorrectnes: (itemId: string, optionId: string) =>
-      dispatch(editedOptionCorrectnes(itemId, optionId)),
-  }
-}
-
-const mapStateToProps = (state: EditorState) => {
-  return {
-    items: state.items,
-  }
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(MultipleChoiceContent)
+export default MultipleChoiceContent

@@ -1,4 +1,4 @@
-import { EditableQuiz, Item } from "../../types/EditQuiz"
+import { Item } from "../../types/EditQuiz"
 import {
   QuizText,
   IPeerReviewCollection,
@@ -16,11 +16,11 @@ export interface EditorState {
   courseId: string
   part: number
   section: number
-  points?: number
+  points: number
   tries: number
   triesLimited: boolean
-  deadline: Date
-  open: Date
+  deadline: Date | null
+  open: Date | null
   autoConfirm: boolean
   excludedFromScore: boolean
   texts: QuizText[]
@@ -30,6 +30,7 @@ export interface EditorState {
   peerReviews: IPeerReviewCollection[]
   createdAt: Date
   updatedAt: Date
+  awardPointsEvenIfWrong: boolean
 }
 
 const initialState: EditorState = {
@@ -37,8 +38,8 @@ const initialState: EditorState = {
   courseId: "2",
   tries: 0,
   triesLimited: true,
-  deadline: new Date(),
-  open: new Date(),
+  deadline: null,
+  open: null,
   autoConfirm: true,
   excludedFromScore: true,
   part: 0,
@@ -53,6 +54,7 @@ const initialState: EditorState = {
   points: 1,
   createdAt: new Date(),
   updatedAt: new Date(),
+  awardPointsEvenIfWrong: false,
 }
 
 const editReducer = (
@@ -61,9 +63,7 @@ const editReducer = (
 ): EditorState => {
   switch (action.type) {
     case "INITIALIZED_EDITOR": {
-      console.log(action)
-      let newState = { ...initialState, ...action.payload }
-      console.log(newState)
+      let newState = { ...initialState, ...action.payload.quiz }
       return newState
     }
     case "EDITED_QUIZ_ITEM_BODY": {
@@ -98,22 +98,22 @@ const editReducer = (
     }
     case "EDITED_QUIZ_TITLE": {
       let newState = state
-      newState.texts[0].title = action.payload
+      newState.texts[0].title = action.payload.title
       return newState
     }
     case "EDITED_QUIZZES_NUMBER_OF_TRIES": {
       let newState = state
-      newState.tries = action.payload
+      newState.tries = action.payload.numberOfTries
       return newState
     }
     case "EDITED_QUIZZES_POINTS_TO_GAIN": {
       let newState = state
-      newState.points = action.payload
+      newState.points = action.payload.pointsToGain
       return newState
     }
     case "EDITED_QUIZZES_POINTS_GRANTING_POLICY": {
       let newState = state
-      newState.grantPointsPolicy = action.payload
+      newState.grantPointsPolicy = action.payload.policy
       return newState
     }
     case "EDITED_OPTION_TITLE": {
@@ -130,7 +130,7 @@ const editReducer = (
       if (!wantedOption) {
         return state
       }
-      wantedOption.texts[0].title = action.payload.title
+      wantedOption.texts[0].title = action.payload.newTitle
       wantedItem.options = wantedItem.options.filter(
         option => option.id !== action.payload.optionId,
       )
@@ -166,12 +166,10 @@ const editReducer = (
       newState.items = newState.items.filter(
         item => item.id !== action.payload.itemId,
       )
-      newState.items = [...newState.items, wantedItem]
 
-      return { ...newState, items: newState.items }
+      return { ...newState, items: [...newState.items, wantedItem] }
     }
     case "EDITED_SCALE_VALUE": {
-      console.log(action)
       let newState = state
       let wantedItem = newState.items.find(
         item => item.id === action.payload.itemId,
@@ -194,7 +192,6 @@ const editReducer = (
       return { ...newState, items: newItems }
     }
     case "EDITED_SCALE_LABEL": {
-      console.log(action)
       let newState = state
       let wantedItem = newState.items.find(
         item => item.id === action.payload.itemId,
@@ -217,7 +214,6 @@ const editReducer = (
       return { ...newState, items: newItems }
     }
     case "EDITED_VALIDITY_REGEX": {
-      console.log(action)
       let newState = state
       let wantedItem = newState.items.find(
         item => item.id === action.payload.itemId,
@@ -233,7 +229,6 @@ const editReducer = (
       return { ...newState, items: newItems }
     }
     case "TOGGLED_MULTI_OPTIONS": {
-      console.log(action)
       let newState = state
       let wantedItem = newState.items.find(
         item => item.id,
@@ -250,7 +245,6 @@ const editReducer = (
       return { ...newState, items: newItems }
     }
     case "EDITED_ITEM_MESSAGE": {
-      console.log(action)
       let newState = state
       let wantedItem = newState.items.find(
         item => item.id === action.payload.itemId,

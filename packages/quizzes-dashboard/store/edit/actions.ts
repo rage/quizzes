@@ -1,41 +1,57 @@
-import { action, createAction } from "typesafe-actions"
+import { createAction } from "typesafe-actions"
 import { EditableQuiz } from "../../types/EditQuiz"
-import { mergeWith } from "lodash"
 
-export const initializedEditor = (quiz: EditableQuiz) =>
-  action("INITIALIZED_EDITOR", quiz)
+export const initializedEditor = createAction(
+  "INITIALIZED_EDITOR",
+  (quiz: EditableQuiz) => ({ quiz: quiz }),
+)<{ quiz: EditableQuiz }>()
 
-export const editedQuizBody = (newBody: string, itemId: string) =>
-  action("EDITED_QUIZ_ITEM_BODY", { body: newBody, id: itemId })
+export const editedQuizItemBody = createAction(
+  "EDITED_QUIZ_ITEM_BODY",
+  (newBody: string, itemId: string) => ({ body: newBody, id: itemId }),
+)<{ body: string; id: string }>()
 
-export const editedQuizItemTitle = (newTitle: string, itemId: string) =>
-  action("EDITED_QUIZ_ITEM_TITLE", { title: newTitle, id: itemId })
+export const editedQuizItemTitle = createAction(
+  "EDITED_QUIZ_ITEM_TITLE",
+  (newTitle: string, itemId: string) => ({ title: newTitle, id: itemId }),
+)<{ title: string; id: string }>()
 
-export const editedQuizTitle = (newTitle: string) =>
-  action("EDITED_QUIZ_TITLE", newTitle)
+export const editedQuizTitle = createAction(
+  "EDITED_QUIZ_TITLE",
+  (newTitle: string) => ({ title: newTitle }),
+)<{ title: string }>()
 
-export const editedQuizzesNumberOfTries = (numberOfTries: number) =>
-  action("EDITED_QUIZZES_NUMBER_OF_TRIES", numberOfTries)
+export const editedQuizzesNumberOfTries = createAction(
+  "EDITED_QUIZZES_NUMBER_OF_TRIES",
+  (numberOfTries: number) => ({ numberOfTries: numberOfTries }),
+)<{ numberOfTries: number }>()
 
-export const editedQuizzesPointsToGain = (pointsToGain: number) =>
-  action("EDITED_QUIZZES_POINTS_TO_GAIN", pointsToGain)
+export const editedQuizzesPointsToGain = createAction(
+  "EDITED_QUIZZES_POINTS_TO_GAIN",
+  (pointsToGain: number) => ({ pointsToGain: pointsToGain }),
+)<{ pointsToGain: number }>()
 
-export const editedQuizzesPointsGrantingPolicy = (policy: string) =>
-  action("EDITED_QUIZZES_POINTS_GRANTING_POLICY", policy)
+export const editedQuizzesPointsGrantingPolicy = createAction(
+  "EDITED_QUIZZES_POINTS_GRANTING_POLICY",
+  (policy: string) => ({ policy: policy }),
+)<{ policy: string }>()
 
-export const editedOptionTitle = (
-  newTitle: string,
-  itemId: string,
-  optionId: string,
-) =>
-  action("EDITED_OPTION_TITLE", {
-    title: newTitle,
+export const editedOptionTitle = createAction(
+  "EDITED_OPTION_TITLE",
+  (newTitle: string, itemId: string, optionId: string) => ({
+    newTitle: newTitle,
     itemId: itemId,
     optionId: optionId,
-  })
+  }),
+)<{ newTitle: string; itemId: string; optionId: string }>()
 
-export const editedOptionCorrectnes = (itemId: string, optionId: string) =>
-  action("EDITED_OPTION_CORRECTNES", { itemId: itemId, optionId: optionId })
+export const editedOptionCorrectnes = createAction(
+  "EDITED_OPTION_CORRECTNES",
+  (itemId: string, optionId: string) => ({
+    itemId: itemId,
+    optionId: optionId,
+  }),
+)<{ itemId: string; optionId: string }>()
 
 export const editedScaleMinMaxValue = createAction(
   "EDITED_SCALE_VALUE",

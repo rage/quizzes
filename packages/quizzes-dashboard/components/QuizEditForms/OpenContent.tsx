@@ -7,9 +7,9 @@ import {
   toggledMultiOptions,
   editedItemMessage,
 } from "../../store/edit/actions"
-import { connect } from "react-redux"
+import { useDispatch } from "react-redux"
 
-interface contentBoxProps {
+interface openContentProps {
   item: Item
 }
 
@@ -17,29 +17,27 @@ const Container = styled.div`
   display: flex;
   padding: 1rem;
 `
-const OpenContent = ({
-  item,
-  editedValidityRegex,
-  toggledMultiOptions,
-  editedItemMessage,
-}: any) => {
+const OpenContent = ({ item }: openContentProps) => {
+  const dispatch = useDispatch()
   return (
     <>
       <Container>
         <Typography variant="h6">
-          ValidityRegex:{" "}
+          ValidityRegex:
           <TextField
             defaultValue={item.validityRegex}
-            onChange={event => editedValidityRegex(item.id, event.target.value)}
+            onChange={event =>
+              dispatch(editedValidityRegex(item.id, event.target.value))
+            }
           />
         </Typography>
       </Container>
       <Container>
         <Typography variant="h6">
-          Multi:{" "}
+          Multi:
           <Checkbox
-            defaultChecked={item.multi}
-            onChange={event => toggledMultiOptions(item.id)}
+            checked={item.multi}
+            onChange={() => dispatch(toggledMultiOptions(item.id))}
           />
         </Typography>
       </Container>
@@ -49,7 +47,7 @@ const OpenContent = ({
           <TextField
             defaultValue={item.texts[0].successMessage}
             onChange={event =>
-              editedItemMessage(item.id, event.target.value, true)
+              dispatch(editedItemMessage(item.id, event.target.value, true))
             }
           />
         </Typography>
@@ -60,7 +58,7 @@ const OpenContent = ({
           <TextField
             defaultValue={item.texts[0].failureMessage}
             onChange={event =>
-              editedItemMessage(item.id, event.target.value, false)
+              dispatch(editedItemMessage(item.id, event.target.value, false))
             }
           />
         </Typography>
@@ -68,11 +66,4 @@ const OpenContent = ({
     </>
   )
 }
-
-const mapDispatchToProps = {
-  editedValidityRegex,
-  toggledMultiOptions,
-  editedItemMessage,
-}
-
-export default connect(null, mapDispatchToProps)(OpenContent)
+export default OpenContent

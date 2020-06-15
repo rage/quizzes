@@ -6,7 +6,7 @@ import {
 } from "../../store/edit/actions"
 import { Typography, TextField } from "@material-ui/core"
 import styled from "styled-components"
-import { connect } from "react-redux"
+import { useDispatch } from "react-redux"
 
 const ScaleContainer = styled.div`
   padding: 1rem;
@@ -19,22 +19,9 @@ const ComponentContainer = styled.div`
 `
 interface contentBoxProps {
   item: Item
-  editedScaleMinMaxValue: (
-    itemId: string,
-    newValue: number,
-    max: boolean,
-  ) => any
-  editedScaleMinMaxLabel: (
-    itemId: string,
-    newLabel: string,
-    max: boolean,
-  ) => any
 }
-const ScaleContent = ({
-  item,
-  editedScaleMinMaxValue,
-  editedScaleMinMaxLabel,
-}: contentBoxProps) => {
+const ScaleContent = ({ item }: contentBoxProps) => {
+  const dispatch = useDispatch()
   return (
     <>
       <ScaleContainer>
@@ -47,10 +34,12 @@ const ScaleContent = ({
             variant="standard"
             type="number"
             onChange={event =>
-              editedScaleMinMaxValue(
-                item.id,
-                parseInt(event.target.value),
-                true,
+              dispatch(
+                editedScaleMinMaxValue(
+                  item.id,
+                  parseInt(event.target.value),
+                  true,
+                ),
               )
             }
           ></TextField>
@@ -66,10 +55,12 @@ const ScaleContent = ({
             variant="standard"
             type="number"
             onChange={event =>
-              editedScaleMinMaxValue(
-                item.id,
-                parseInt(event.target.value),
-                false,
+              dispatch(
+                editedScaleMinMaxValue(
+                  item.id,
+                  parseInt(event.target.value),
+                  false,
+                ),
               )
             }
           ></TextField>
@@ -84,7 +75,9 @@ const ScaleContent = ({
             defaultValue={item.texts[0].maxLabel}
             variant="standard"
             onChange={event =>
-              editedScaleMinMaxLabel(item.id, event.target.value, true)
+              dispatch(
+                editedScaleMinMaxLabel(item.id, event.target.value, true),
+              )
             }
           ></TextField>
         </ComponentContainer>
@@ -98,7 +91,9 @@ const ScaleContent = ({
             defaultValue={item.texts[0].minLabel}
             variant="standard"
             onChange={event =>
-              editedScaleMinMaxLabel(item.id, event.target.value, false)
+              dispatch(
+                editedScaleMinMaxLabel(item.id, event.target.value, false),
+              )
             }
           ></TextField>
         </ComponentContainer>
@@ -107,6 +102,4 @@ const ScaleContent = ({
   )
 }
 
-const mapDispatchToProps = { editedScaleMinMaxValue, editedScaleMinMaxLabel }
-
-export default connect(null, mapDispatchToProps)(ScaleContent)
+export default ScaleContent
