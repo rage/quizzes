@@ -62,7 +62,6 @@ jobs:
           command: "bin/push-docker-backend-image.sh"
 
   test_backend_v2:
-    working_directory: ./packages/backendv2
     docker:
       - image: circleci/node:11
       - image: circleci/postgres:9.6-alpine
@@ -71,14 +70,13 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: quizzes_test
     steps:
-      - checkout:
-          path: ./packages/backendv2
+      - checkout
       - run:
           name: "install dependencies"
-          command: "npm ci"
+          command: "cd packages/backendv2 && npm ci"
       - run:
           name: "run tests"
-          command: "npm run test"
+          command: "cd packages/backendv2 && npm run test"
 
   build_backendv2:
     docker:
