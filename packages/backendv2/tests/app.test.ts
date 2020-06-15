@@ -16,6 +16,7 @@ afterEach(async () => {
 
 describe("saving quiz from dashboard", () => {
   test("test", async done => {
+    console.log(env)
     const response: any = request(app.callback())
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer ${env.TMC_ADMIN_TOKEN}`)
