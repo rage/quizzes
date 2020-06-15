@@ -1,11 +1,11 @@
 import React from "react"
 import styled from "styled-components"
-import { Typography, Card, CardContent } from "@material-ui/core"
+import { Typography, Card } from "@material-ui/core"
 import { fetchCourses } from "../services/quizzes"
-import Link from "next/link"
-import { get } from "lodash"
 import { Course } from "../types/Course"
 import DebugDialog from "../components/DebugDialog"
+import useSwr from "swr"
+import CourseList from "../components/CourseList"
 
 interface HomeProps {
   courses: Course[]
@@ -21,23 +21,14 @@ const CourseLink = styled.a`
   cursor: pointer;
 `
 
-const Home = ({ courses }: HomeProps) => {
+const Home = () => {
+  const { data, error } = useSwr("null", fetchCourses)
   return (
     <>
       <Typography variant="h3" component="h1">
         Quizzes
       </Typography>
-      {courses.map(course => (
-        <Link key={course.id} href="/courses/[id]" as={`/courses/${course.id}`}>
-          <CourseLink>
-            <StyledCard key={course.id}>
-              <CardContent>
-                {get(course, "texts[0].title") || course.id}
-              </CardContent>
-            </StyledCard>
-          </CourseLink>
-        </Link>
-      ))}
+      <CourseList courses={data} error={error} />
       <DebugDialog />
     </>
   )
@@ -53,9 +44,9 @@ const Container = styled.div`
 
 export default Home
 
-Home.getInitialProps = async () => {
-  const courses = await fetchCourses()
-  return {
-    courses,
-  }
-}
+// Home.getInitialProps = async () => {
+//   const courses = await fetchCourses()
+//   return {
+//     courses,
+//   }
+// }

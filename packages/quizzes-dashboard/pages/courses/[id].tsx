@@ -1,5 +1,4 @@
 import React from "react"
-import { NextPage } from "next"
 import { fetchCourseQuizzes } from "../../services/quizzes"
 import { CourseListQuiz } from "../../types/Quiz"
 
