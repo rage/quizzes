@@ -89,8 +89,7 @@ jobs:
           command: sudo npm install knex -g
       - run:
           name: "run migrations"
-          command: cd packages/backendv2 && export NODE_ENV=test
-          command: cd packages/backendv2 && knex migrate:latest
+          command: cd packages/backendv2 && export NODE_ENV=test && knex migrate:latest
       - run:
           name: "run tests"
           command: "cd packages/backendv2 && npm run test"
