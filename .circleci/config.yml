@@ -85,6 +85,9 @@ jobs:
           name: "install dependencies"
           command: "cd packages/backendv2 && npm ci"
       - run:
+          name: "install knex cli"
+          command: npm install knex -g
+      - run:
           name: "run migrations"
           command: cd packages/backendv2 && knex migrate:latest
       - run:
