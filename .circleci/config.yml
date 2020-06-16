@@ -88,13 +88,8 @@ jobs:
           name: "install knex cli"
           command: sudo npm install knex -g
       - run:
-          name: "set node env to test"
-          command: cd packages/backendv2 && export NODE_ENV=test
-      - run:
-          name: "check env"
-          command: echo $NODE_ENV
-      - run:
           name: "run migrations"
+          command: cd packages/backendv2 && export NODE_ENV=test
           command: cd packages/backendv2 && knex migrate:latest
       - run:
           name: "run tests"
