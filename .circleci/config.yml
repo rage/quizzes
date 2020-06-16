@@ -72,7 +72,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Waiting for Postgres to be ready
+          name: "Waiting for Postgres to be ready"
           command: |
             for i in `seq 1 10`;
             do
@@ -81,6 +81,9 @@ jobs:
               sleep 1
             done
             echo Failed waiting for Postgres && exit 1
+      - run:
+          name: "run migrations"
+          command: cd packages/backendv2 && knex migrate:latest
       - run:
           name: "install dependencies"
           command: "cd packages/backendv2 && npm ci"
