@@ -71,8 +71,6 @@ jobs:
           POSTGRES_DB: quizzes_test
     steps:
       - checkout
-      - run: sudo apt-get update
-      - run: sudo apt-get install postgresql-client-9.6
       - run:
           name: Waiting for Postgres to be ready
           command: |

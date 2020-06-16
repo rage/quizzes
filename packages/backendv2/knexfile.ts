@@ -18,7 +18,7 @@ const configOptions: { [env: string]: Config } = {
   test: {
     client: "pg",
     connection: {
-      host: "postgres://postgres@localhost:5432/postgres?sslmode=disable",
+      host: "postgres://postgres@localhost:5432/quizzes_test?sslmode=disable",
       database: "quizzes_test",
     },
     migrations: {
