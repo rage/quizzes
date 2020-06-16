@@ -5,7 +5,7 @@ import { Button, Typography, TextField } from "@material-ui/core"
 import {
   editedOptionTitle,
   editedOptionCorrectnes,
-} from "../../store/edit/actions"
+} from "../../store/edit/editActions"
 import { useDispatch } from "react-redux"
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"

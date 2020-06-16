@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { Button, Dialog, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import EditableDebugField from "./EditableDebugField"
-import { EditorState } from "../store/edit/reducers"
+import { EditorState } from "../store/edit/editReducer"
 import { Item } from "../types/EditQuiz"
 import { useTypedSelector } from "../store/store"
 
@@ -34,7 +34,7 @@ interface DebugDialogProps {
 }
 
 const DebugDialog = ({ passedData, editable }: DebugDialogProps) => {
-  let data: EditorState | Item = useTypedSelector(state => state)
+  let data: EditorState | Item = useTypedSelector(state => state.editor)
   if (passedData) {
     data = passedData
   }

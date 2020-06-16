@@ -9,7 +9,7 @@ import {
   editedQuizzesNumberOfTries,
   editedQuizzesPointsToGain,
   editedQuizzesPointsGrantingPolicy,
-} from "../../store/edit/actions"
+} from "../../store/edit/editActions"
 import DebugDialog from "../DebugDialog"
 import { useTypedSelector } from "../../store/store"
 
@@ -76,12 +76,12 @@ const BasicInformation = () => {
   const dispatch = useDispatch()
 
   const pointsGrantingPolicy = useTypedSelector(
-    state => state.grantPointsPolicy,
+    state => state.editor.grantPointsPolicy,
   )
-  const numberOfTries = useTypedSelector(state => state.tries)
-  const pointsToGain = useTypedSelector(state => state.points)
-  const deadline = useTypedSelector(state => state.deadline)
-  const texts = useTypedSelector(state => state.texts)
+  const numberOfTries = useTypedSelector(state => state.editor.tries)
+  const pointsToGain = useTypedSelector(state => state.editor.points)
+  const deadline = useTypedSelector(state => state.editor.deadline)
+  const texts = useTypedSelector(state => state.editor.texts)
 
   return (
     <>

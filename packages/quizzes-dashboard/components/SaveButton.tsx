@@ -4,12 +4,12 @@ import Alert from "@material-ui/lab/Alert"
 import { useDispatch } from "react-redux"
 import { EditableQuiz } from "../types/EditQuiz"
 import { saveQuiz } from "../services/quizzes"
-import { initializedEditor } from "../store/edit/actions"
+import { initializedEditor } from "../store/edit/editActions"
 import { useTypedSelector } from "../store/store"
 
 const SaveButton = () => {
   const dispatch = useDispatch()
-  const store = useTypedSelector(state => state)
+  const store = useTypedSelector(state => state.editor)
 
   const [saved, setSaved] = useState(true)
   const [showMessage, setShowMessage] = useState(false)

@@ -2,7 +2,6 @@ import * as React from "react"
 import {
   AppBar,
   Toolbar,
-  IconButton,
   Typography,
   Button,
   Container,
@@ -10,6 +9,10 @@ import {
 import styled from "styled-components"
 import Footer from "./Footer"
 import Link from "next/link"
+import { useTypedSelector } from "../store/store"
+import { clearUser } from "../store/user/userActions"
+import { useDispatch } from "react-redux"
+import { unauthenticate } from "../services/tmcApi"
 
 interface TemplateProps {
   children?: React.ReactNode
@@ -36,24 +39,39 @@ const FrontPageLink = styled.a`
   cursor: pointer;
 `
 
-const Template = ({ children }: TemplateProps) => (
-  <FooterDownPusherWrapper>
-    <div>
-      <StyledAppBar position="sticky">
-        <Toolbar>
-          <Link href="/">
-            <FrontPageLink>
-              <Typography variant="h6">Quizzes</Typography>
-            </FrontPageLink>
-          </Link>
-          <EmptySpace />
-          <Button color="inherit">Login</Button>
-        </Toolbar>
-      </StyledAppBar>
-      <Container maxWidth="md">{children}</Container>
-    </div>
-    <Footer />
-  </FooterDownPusherWrapper>
-)
+const Template = ({ children }: TemplateProps) => {
+  const dispatch = useDispatch()
+
+  const handleLogout = () => {
+    unauthenticate()
+    dispatch(clearUser())
+  }
+
+  return (
+    <FooterDownPusherWrapper>
+      <div>
+        <StyledAppBar position="sticky">
+          <Toolbar>
+            <Link href="/">
+              <FrontPageLink>
+                <Typography variant="h6">Quizzes</Typography>
+              </FrontPageLink>
+            </Link>
+            <EmptySpace />
+            {useTypedSelector(state => state.user.loggedIn) ? (
+              <Button color="inherit" onClick={handleLogout}>
+                Logout
+              </Button>
+            ) : (
+              <Button color="inherit">Login</Button>
+            )}
+          </Toolbar>
+        </StyledAppBar>
+        <Container maxWidth="md">{children}</Container>
+      </div>
+      <Footer />
+    </FooterDownPusherWrapper>
+  )
+}
 
 export default Template

@@ -1,7 +1,7 @@
 import React from "react"
 import { fetchQuiz } from "../../../services/quizzes"
 import { EditableQuiz } from "../../../types/EditQuiz"
-import { initializedEditor } from "../../../store/edit/actions"
+import { initializedEditor } from "../../../store/edit/editActions"
 import { useDispatch } from "react-redux"
 import BasicInfo from "../../../components/QuizEditForms/BasicInfo"
 import Typography from "@material-ui/core/Typography"

@@ -30,7 +30,6 @@ const CourseList = ({ courses, error }: Props) => {
     return <div>Error while fetching courses.</div>
   }
   if (!courses) {
-    
     return (
       <>
         <StyledSkeleton variant="rect" height={50} />

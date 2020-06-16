@@ -1,10 +1,18 @@
-import { createStore } from "redux"
+import { createStore, combineReducers } from "redux"
 import { composeWithDevTools } from "redux-devtools-extension"
-import editReducer, { EditorState } from "../store/edit/reducers"
+import editReducer, { EditorState } from "./edit/editReducer"
+import userReducer, { UserState } from "./user/userReducer"
 import { useSelector, TypedUseSelectorHook } from "react-redux"
 
-const store = createStore(editReducer, composeWithDevTools())
+const reducer = combineReducers({ editor: editReducer, user: userReducer })
 
-export const useTypedSelector: TypedUseSelectorHook<EditorState> = useSelector
+const store = createStore(reducer, composeWithDevTools())
+
+interface storeState {
+  editor: EditorState
+  user: UserState
+}
+
+export const useTypedSelector: TypedUseSelectorHook<storeState> = useSelector
 
 export default store
