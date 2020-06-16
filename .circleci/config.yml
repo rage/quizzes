@@ -82,11 +82,11 @@ jobs:
             done
             echo Failed waiting for Postgres && exit 1
       - run:
-          name: "run migrations"
-          command: cd packages/backendv2 && knex migrate:latest
-      - run:
           name: "install dependencies"
           command: "cd packages/backendv2 && npm ci"
+      - run:
+          name: "run migrations"
+          command: cd packages/backendv2 && knex migrate:latest
       - run:
           name: "run tests"
           command: "cd packages/backendv2 && npm run test"
