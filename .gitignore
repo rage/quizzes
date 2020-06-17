@@ -55,3 +55,7 @@ dump.rdb
 
 .cache
 dist
+
+# circleci
+
+/process.yml

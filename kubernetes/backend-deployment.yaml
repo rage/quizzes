@@ -99,7 +99,7 @@ spec:
       initContainers:
       - name: quizzes-backend-run-migrations
         image: ${BACKEND_IMAGE}
-        command: ['sh', '-c', 'cd /app && yarn typeorm migration:run']
+        command: ['sh', '-c', 'cd /app && npx typeorm migration:run']
         env:
           - name: DB_NAME
             valueFrom:
