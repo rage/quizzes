@@ -21,6 +21,7 @@ const configOptions: { [env: string]: Config } = {
       host: "localhost",
       port: 5432,
       user: "postgres",
+      password: "postgres",
       database: "quizzes_test",
     },
     migrations: {

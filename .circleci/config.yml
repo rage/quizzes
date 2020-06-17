@@ -85,11 +85,8 @@ jobs:
           name: "install dependencies"
           command: cd packages/backendv2 && npm ci
       - run:
-          name: "install knex cli"
-          command: sudo npm install knex -g
-      - run:
           name: "run migrations"
-          command: cd packages/backendv2 && export NODE_ENV=test && knex migrate:latest
+          command: cd packages/backendv2 && export NODE_ENV=test && npx knex migrate:latest
       - run:
           name: "run tests"
           command: "cd packages/backendv2 && npm run test"
