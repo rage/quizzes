@@ -63,7 +63,7 @@ const Template = ({ children }: TemplateProps) => {
                 Logout
               </Button>
             ) : (
-              <Button color="inherit">Login</Button>
+              <></>
             )}
           </Toolbar>
         </StyledAppBar>

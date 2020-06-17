@@ -23,20 +23,14 @@ export function getProfile(accessToken: string): Promise<TMCProfileDetails> {
     .catch((err: AxiosError) => Promise.reject(err))
 }
 
-export function authenticate(credentials: TMCCredentials): Promise<TMCProfile> {
-  return new Promise((resolve, reject) => {
-    tmcClient.authenticate(credentials).then(
-      (res: any) => {
-        // ok creds
-        console.log("hyvä")
-        resolve(res)
-      },
-      (err: any) => {
-        console.log("paha")
-        reject(err)
-      },
-    )
-  })
+export const authenticate = async (
+  credentials: TMCCredentials,
+): Promise<TMCProfile> => {
+  try {
+    return await tmcClient.authenticate(credentials)
+  } catch (e) {
+    return e
+  }
 }
 
 export function unauthenticate() {
