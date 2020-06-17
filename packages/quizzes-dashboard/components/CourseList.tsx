@@ -3,8 +3,9 @@ import styled from "styled-components"
 import { Card, CardContent } from "@material-ui/core"
 import Link from "next/link"
 import { get } from "lodash"
-import { Course } from "../types/Course"
 import Skeleton from "@material-ui/lab/Skeleton"
+import useSWR from "swr"
+import { fetchCourses } from "../services/quizzes"
 
 const StyledCard = styled(Card)`
   margin-bottom: 1rem;
@@ -20,16 +21,12 @@ const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
 `
 
-interface Props {
-  courses: Course[] | undefined
-  error: any
-}
-
-const CourseList = ({ courses, error }: Props) => {
+const CourseList = () => {
+  const { data, error } = useSWR("null", fetchCourses)
   if (error) {
     return <div>Error while fetching courses.</div>
   }
-  if (!courses) {
+  if (!data) {
     return (
       <>
         <StyledSkeleton variant="rect" height={50} />
@@ -49,7 +46,7 @@ const CourseList = ({ courses, error }: Props) => {
   }
   return (
     <>
-      {courses.map(course => (
+      {data.map(course => (
         <Link key={course.id} href="/courses/[id]" as={`/courses/${course.id}`}>
           <CourseLink>
             <StyledCard key={course.id}>

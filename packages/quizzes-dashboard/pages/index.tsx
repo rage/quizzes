@@ -1,6 +1,6 @@
 import React from "react"
 import LoginView from "../components/LoginView"
-import Home from "./Home"
+import CourseList from "../components/CourseList"
 import { checkStore, getProfile } from "../services/tmcApi"
 import { useTypedSelector } from "../store/store"
 import { initUserState, setUser } from "../store/user/userActions"
@@ -26,7 +26,7 @@ const Index = () => {
   return (
     <>
       {useTypedSelector(state => state.user.loggedIn) ? (
-        <Home />
+        <CourseList />
       ) : (
         <LoginView />
       )}
@@ -35,3 +35,4 @@ const Index = () => {
 }
 
 export default Index
+// <Home />
