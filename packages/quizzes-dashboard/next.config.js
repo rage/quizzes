@@ -4,16 +4,10 @@ const withCSS = require("@zeit/next-css")
 
 require("dotenv").config()
 
-const nextConfiguration = {}
+const nextConfiguration = {
+  env: {
+    TOKEN: process.env.TOKEN,
+  },
+}
 
-module.exports = withPlugins(
-  [
-    withCSS,
-    {
-      env: {
-        TOKEN: process.env.TOKEN,
-      },
-    },
-  ],
-  nextConfiguration,
-)
+module.exports = withPlugins([withCSS], nextConfiguration)

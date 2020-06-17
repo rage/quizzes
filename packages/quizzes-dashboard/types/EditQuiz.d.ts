@@ -7,8 +7,8 @@ export interface EditableQuiz {
   points: number
   tries: number
   triesLimited: boolean
-  deadline: null
-  open: null
+  deadline: Date | null
+  open: Date | null
   autoConfirm: boolean
   excludedFromScore: boolean
   awardPointsEvenIfWrong: boolean
@@ -16,7 +16,7 @@ export interface EditableQuiz {
   updatedAt: Date
   texts: QuizText[]
   items: Item[]
-  peerReviewCollections: any[]
+  peerReviews: any[]
 }
 
 export interface Item {
@@ -76,8 +76,8 @@ export interface OptionText {
   languageId: LanguageID
   title: string
   body: null
-  successMessage: null | string
-  failureMessage: null | string
+  successMessage: string | null
+  failureMessage: string | null
   createdAt: Date
   updatedAt: Date
 }

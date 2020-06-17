@@ -1,5 +1,4 @@
 import React from "react"
-import { NextPage } from "next"
 import { fetchCourseQuizzes } from "../../services/quizzes"
 import { CourseListQuiz } from "../../types/Quiz"
 
@@ -49,13 +48,11 @@ const ShowCoursePage = ({ quizzes, id }: ShowCoursePageProps) => {
           <Typography variant="h4">Part {part}</Typography>
           {Object.entries(section).map(([section, quizzes]) => {
             return (
-              <>
-                <SectionOfPart
-                  key={part + section}
-                  section={section}
-                  quizzes={quizzes}
-                />
-              </>
+              <SectionOfPart
+                key={part + "-" + section}
+                section={section}
+                quizzes={quizzes}
+              />
             )
           })}
         </div>
@@ -70,11 +67,7 @@ const SectionOfPart = ({ section, quizzes }: section) => {
     <>
       <Typography variant="h6">Section {section}</Typography>
       {quizzes.map(quiz => {
-        return (
-          <>
-            <Quiz key={quiz.id} quiz={quiz} />
-          </>
-        )
+        return <Quiz key={quiz.id} quiz={quiz} />
       })}
     </>
   )
@@ -83,11 +76,7 @@ const SectionOfPart = ({ section, quizzes }: section) => {
 const Quiz = ({ quiz }: quiz) => {
   const title = get(quiz, "texts[0].title") || quiz.id
   return (
-    <Link
-      key={quiz.id}
-      href="/quizzes/[id]/edit"
-      as={`/quizzes/${quiz.id}/edit`}
-    >
+    <Link href="/quizzes/[id]/edit" as={`/quizzes/${quiz.id}/edit`}>
       <QuizLink>
         <QuizCard>
           <CardContent>
