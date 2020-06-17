@@ -1,7 +1,8 @@
 import request from "supertest"
+import nock from "nock"
 import app from "../app"
 import knex from "../database/knex"
-import env from "../src/util/environment"
+import { UserInfo } from "../src/types"
 
 const knexCleaner = require("knex-cleaner")
 
@@ -16,10 +17,14 @@ afterEach(async () => {
 
 describe("saving quiz from dashboard", () => {
   test("test", async done => {
-    console.log(env)
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(200, {
+        administrator: true,
+      } as UserInfo)
     const response: any = request(app.callback())
       .post("/api/v2/dashboard/quizzes")
-      .set("Authorization", `bearer ${env.TMC_ADMIN_TOKEN}`)
+      .set("Authorization", `bearer ADMIN_TOKEN`)
       .set("Accept", "application/json")
       .send({
         id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
