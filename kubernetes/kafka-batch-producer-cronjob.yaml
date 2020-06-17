@@ -14,7 +14,7 @@ spec:
           containers:
             - name: kafka-batch-producer
               image: ${BACKEND_IMAGE}
-              command: ["sh", "-c", "cd /app/packages/backend && npm run kafka-batch-publish"]
+              command: ["sh", "-c", "cd /app && npm run kafka-batch-publish"]
               resources:
                 requests:
                   memory: "1000Mi"
@@ -71,7 +71,7 @@ spec:
           initContainers:
           - name: quizzes-backend-run-migrations
             image: ${BACKEND_IMAGE}
-            command: ['sh', '-c', 'cd /app/packages/backend && npx typeorm migration:run']
+            command: ['sh', '-c', 'cd /app && npx typeorm migration:run']
             env:
               - name: DB_NAME
                 valueFrom:
