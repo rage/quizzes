@@ -24,11 +24,9 @@ const userReducer = (
 ) => {
   switch (action.type) {
     case "INITIALIZED_USER_STATE": {
-      console.log(action)
       return initialUserState
     }
     case "SET_USER": {
-      console.log(action)
       return {
         loggedIn: true,
         userName: action.payload.userName,

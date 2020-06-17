@@ -17,6 +17,7 @@ const LoginFieldContainer = styled.div`
   left: 0px;
   right: 0px;
   display: flex;
+  flex-direction: column;
 `
 const LabelContainer = styled.div`
   display: flex;
@@ -31,7 +32,6 @@ const ButtonContainer = styled.div`
   float: right;
 `
 const TextFieldContainer = styled.div`
-  width: 100%;
   display: flex;
   padding: 1rem;
 `
@@ -72,7 +72,7 @@ const LoginView = () => {
           <LoginFieldContainer>
             <LabelContainer>
               <Typography variant="h5">
-                Give Username/Email and Password to login
+                Please log in with your MOOC.fi account
               </Typography>
             </LabelContainer>
           </LoginFieldContainer>
@@ -84,7 +84,7 @@ const LoginView = () => {
                 size="medium"
                 type="text"
                 variant="outlined"
-                label="Username/Email"
+                label="Email or username"
                 autoComplete="username"
                 onChange={event => setUserName(event.target.value)}
               />
