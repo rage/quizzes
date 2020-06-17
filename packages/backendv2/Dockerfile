@@ -13,6 +13,6 @@ ENV BASE_PATH /v2
 
 RUN npm run build
 
-EXPOSE 6000
+EXPOSE 3003
 
 CMD [ "npm", "run", "start" ]

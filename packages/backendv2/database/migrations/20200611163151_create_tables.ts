@@ -111,14 +111,9 @@ export async function up(knex: Knex): Promise<any> {
       table.integer("part").notNullable()
       table.integer("section")
       table.integer("points").notNullable()
-      table
-        .timestamp("deadline", { useTz: false })
-        .defaultTo(knex.fn.now())
-        .notNullable()
-      table
-        .timestamp("open", { useTz: false })
-        .defaultTo(knex.fn.now())
-        .notNullable()
+      table.timestamp("deadline", { useTz: false })
+
+      table.timestamp("open", { useTz: false })
       table
         .boolean("excluded_from_score")
         .notNullable()
