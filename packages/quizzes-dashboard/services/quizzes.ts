@@ -7,7 +7,7 @@ import { checkStore } from "./tmcApi"
 let HOST = "http://localhost:3003"
 
 if (process.env.NODE_ENV === "production") {
-  HOST = "https://quizzes.mooc.fi"
+  HOST = "https://quizzes2.mooc.fi"
 }
 
 const api = axios.create({
