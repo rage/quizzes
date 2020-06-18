@@ -12,6 +12,7 @@ import dutchLabels from "./dutch_options"
 import danishLabels from "./danish_options"
 import lithuanianLabels from "./lithuanian_options"
 import croatianLabels from "./croatian_options"
+import romanianLabels from "./romanian_options"
 import { QuizPointsGrantingPolicy } from "../../modelTypes"
 
 export type GeneralLabels = {
@@ -161,4 +162,5 @@ export const languageOptions: LanguageLabels = {
   da_DK: danishLabels,
   lt_LT: lithuanianLabels,
   hr_HR: croatianLabels,
+  ro_RO: romanianLabels,
 }
