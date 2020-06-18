@@ -2,12 +2,18 @@ import Model from "./base_model"
 import Quiz from "./quiz"
 
 class QuizTranslation extends Model {
+  title!: string
+  body!: string
+  submitMessage!: string
+
   static get tableName() {
     return "quiz_translation"
   }
+
   static get idColumn() {
     return ["quiz_id", "language_id"]
   }
+
   static relationMappings = {
     quiz: {
       relation: Model.BelongsToOneRelation,
@@ -18,6 +24,7 @@ class QuizTranslation extends Model {
       },
     },
   }
+
   static get modifiers() {
     return {
       previewSelect: (query: any) => {

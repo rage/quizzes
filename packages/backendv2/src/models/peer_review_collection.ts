@@ -4,9 +4,15 @@ import PeerReviewCollectionTranslation from "./peer_review_collection_translatio
 import PeerReviewQuestion from "./peer_review_question"
 
 export class PeerReviewCollection extends Model {
+  texts!: PeerReviewCollectionTranslation[]
+  questions!: PeerReviewQuestion[]
+  title!: string
+  body!: string
+
   static get tableName() {
     return "peer_review_collection"
   }
+
   static relationMappings = {
     quiz: {
       relation: Model.HasOneRelation,
