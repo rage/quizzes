@@ -4,7 +4,11 @@ import { Course } from "../types/Course"
 import { EditableQuiz } from "../types/EditQuiz"
 import { checkStore } from "./tmcApi"
 
-const HOST = process.env.HOST || "http://localhost:3003"
+let HOST = "http://localhost:3003"
+
+if (process.env.NODE_ENV === "production") {
+  HOST = "https://quizzes2.mooc.fi"
+}
 
 const api = axios.create({
   baseURL: `${HOST}/api/v2/dashboard`,

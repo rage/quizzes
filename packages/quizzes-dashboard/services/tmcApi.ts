@@ -41,7 +41,6 @@ export const checkStore = ():
   | { username: string; accessToken: string }
   | undefined => {
   const res = tmcClient.getUser()
-  console.log(res)
   return res
 }
 
