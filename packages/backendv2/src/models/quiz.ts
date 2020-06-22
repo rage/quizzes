@@ -6,9 +6,17 @@ import Course from "./course"
 import { NotFoundError } from "../util/error"
 
 export class Quiz extends Model {
+  texts!: QuizTranslation[]
+  items!: QuizItem[]
+  peerReviews!: PeerReviewCollection[]
+  title!: string
+  body!: string
+  submitMessage!: string
+
   static get tableName() {
     return "quiz"
   }
+
   static relationMappings = {
     items: {
       relation: Model.HasManyRelation,
@@ -53,12 +61,7 @@ export class Quiz extends Model {
   }
 
   static async saveQuiz(data: any) {
-    try {
-      const result = await Quiz.query().upsertGraphAndFetch(data)
-      return result
-    } catch (e) {
-      return { errorMessage: "something went wrong", error: e }
-    }
+    return await Quiz.query().upsertGraphAndFetch(data)
   }
 
   static async getQuizById(quizId: string) {
@@ -70,9 +73,50 @@ export class Quiz extends Model {
         .withGraphJoined("course.[texts]")
         .where("quiz.id", quizId)
     )[0]
+
+    const text = quiz.texts[0]
+    quiz.title = text.title
+    quiz.body = text.body
+    quiz.submitMessage = text.submitMessage
+    delete quiz.texts
+    quiz.items = quiz.items.map(item => {
+      const text = item.texts[0]
+      item.title = text.title
+      item.body = text.body
+      item.successMessage = text.successMessage
+      item.failureMessage = text.failureMessage
+      item.sharedOptionFeedbackMessage = text.sharedOptionFeedbackMessage
+      delete item.texts
+      item.options = item.options.map(option => {
+        const text = option.texts[0]
+        option.title = text.title
+        option.body = text.body
+        option.successMessage = text.successMessage
+        option.failureMessage = text.failureMessage
+        delete option.texts
+        return option
+      })
+      return item
+    })
+    quiz.peerReviews = quiz.peerReviews.map(prc => {
+      const text = prc.texts[0]
+      prc.title = text.title
+      prc.body = text.body
+      delete prc.texts
+      prc.questions = prc.questions.map(prq => {
+        const text = prq.texts[0]
+        prq.title = text.title
+        prq.body = text.body
+        delete prq.texts
+        return prq
+      })
+      return prc
+    })
+
     if (!quiz) {
       throw new NotFoundError(`quiz not found: ${quizId}`)
     }
+
     return quiz
   }
 
