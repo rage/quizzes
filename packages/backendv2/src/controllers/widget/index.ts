@@ -10,7 +10,7 @@ const widget = new Router<CustomState, CustomContext>({
 
   .get("/quizzes/:quizId", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    ctx.body = await Quiz.getQuizById(quizId)
+    ctx.body = await Quiz.getById(quizId)
   })
 
   .get(
@@ -18,7 +18,7 @@ const widget = new Router<CustomState, CustomContext>({
     accessControl({ unrestricted: true }),
     async ctx => {
       const quizId = ctx.params.quizId
-      ctx.body = await Quiz.getQuizPreviewById(quizId)
+      ctx.body = await Quiz.getPreviewById(quizId)
     },
   )
 

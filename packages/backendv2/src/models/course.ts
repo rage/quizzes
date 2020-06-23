@@ -3,9 +3,16 @@ import Quiz from "./quiz"
 import CourseTranslation from "./course_translation"
 
 class Course extends Model {
+  texts!: CourseTranslation[]
+  languageId!: string
+  title!: string
+  body!: string
+  abbreviation!: string
+
   static get tableName() {
     return "course"
   }
+
   static relationMappings = {
     quizzes: {
       relation: Model.HasManyRelation,
@@ -24,8 +31,24 @@ class Course extends Model {
       },
     },
   }
+
+  static async getById(id: string) {
+    return await this.query()
+      .withGraphJoined("texts")
+      .where("id", id)
+  }
+
   static async getAll() {
-    return await this.query().withGraphJoined("texts")
+    const courses = await this.query().withGraphJoined("texts")
+    return courses.map(course => {
+      const text = course.texts[0]
+      course.languageId = text.languageId
+      course.title = text.title
+      course.body = text.body
+      course.abbreviation = text.abbreviation
+      delete course.texts
+      return course
+    })
   }
 }
 
