@@ -62,7 +62,7 @@ const SaveButton = () => {
         <Fab
           color="primary"
           variant="extended"
-          onClick={() => handleClick(store)}
+          // onClick={() => handleClick(store)}
           style={{
             padding: "1rem",
             position: "fixed",
