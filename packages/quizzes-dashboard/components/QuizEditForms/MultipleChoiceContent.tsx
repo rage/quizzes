@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Item, Option } from "../../types/EditQuiz"
+import { Item, Option } from "../../types/NormalizedQuiz"
 import styled from "styled-components"
 import { Button, Typography, TextField } from "@material-ui/core"
 import {
@@ -9,6 +9,7 @@ import {
 import { useDispatch } from "react-redux"
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { useTypedSelector } from "../../store/store"
 
 const QuizContent = styled.div`
   padding: 1rem;
@@ -20,12 +21,13 @@ interface multiplChoiceContentProps {
 }
 
 const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
+  const storeOptions = useTypedSelector(state => state.editor.options)
   return (
     <>
       {item.options.map(option => (
         <MultipleChoiceButton
-          key={option.id}
-          option={option}
+          key={option}
+          option={storeOptions[option]}
           itemId={item.id}
         />
       ))}
@@ -56,7 +58,7 @@ const MultipleChoiceButton = ({
       </Button>
       <Button
         key={option.id}
-        defaultValue={option.texts[0].title}
+        defaultValue={option.title}
         variant="contained"
         disableRipple={editOptionTitle}
         onDoubleClick={() => setEditOptionTitle(!editOptionTitle)}
@@ -64,13 +66,13 @@ const MultipleChoiceButton = ({
       >
         {editOptionTitle ? (
           <TextField
-            defaultValue={option.texts[0].title}
+            defaultValue={option.title}
             onChange={event =>
               dispatch(editedOptionTitle(event.target.value, itemId, option.id))
             }
           />
         ) : (
-          <Typography>{option.texts[0].title}</Typography>
+          <Typography>{option.title}</Typography>
         )}
       </Button>
     </QuizContent>

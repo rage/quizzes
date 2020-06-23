@@ -1,5 +1,5 @@
 import React from "react"
-import { Item } from "../../types/EditQuiz"
+import { Item } from "../../types/NormalizedQuiz"
 import { Typography, TextField, Checkbox } from "@material-ui/core"
 import styled from "styled-components"
 import {
@@ -45,7 +45,7 @@ const OpenContent = ({ item }: openContentProps) => {
         <Typography variant="h6">
           Success message:
           <TextField
-            defaultValue={item.texts[0].successMessage}
+            defaultValue={item.successMessage}
             onChange={event =>
               dispatch(editedItemMessage(item.id, event.target.value, true))
             }
@@ -56,7 +56,7 @@ const OpenContent = ({ item }: openContentProps) => {
         <Typography variant="h6">
           Failure message:
           <TextField
-            defaultValue={item.texts[0].failureMessage}
+            defaultValue={item.failureMessage}
             onChange={event =>
               dispatch(editedItemMessage(item.id, event.target.value, false))
             }

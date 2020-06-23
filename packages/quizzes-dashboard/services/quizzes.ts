@@ -45,7 +45,8 @@ export const fetchQuiz = async (id: string): Promise<EditableQuiz> => {
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
-    return (await api.get(`/quizzes/${id}`, config)).data
+    const data = (await api.get(`/quizzes/${id}`, config)).data
+    return data
   }
   throw new Error()
 }

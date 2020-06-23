@@ -3,7 +3,7 @@ import { Button, Dialog, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import EditableDebugField from "./EditableDebugField"
 import { EditorState } from "../store/edit/editReducer"
-import { Item } from "../types/EditQuiz"
+import { Item, Quiz } from "../types/NormalizedQuiz"
 import { useTypedSelector } from "../store/store"
 
 const DialogTitleContainer = styled.div`
@@ -34,7 +34,9 @@ interface DebugDialogProps {
 }
 
 const DebugDialog = ({ passedData, editable }: DebugDialogProps) => {
-  let data: EditorState | Item = useTypedSelector(state => state.editor)
+  let data: { [quizId: string]: Quiz } | Item = useTypedSelector(
+    state => state.editor.quizzes,
+  )
   if (passedData) {
     data = passedData
   }

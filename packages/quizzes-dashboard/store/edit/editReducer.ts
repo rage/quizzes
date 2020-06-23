@@ -33,6 +33,15 @@ export interface EditorState {
   awardPointsEvenIfWrong: boolean
 }
 
+export interface EditorState2 {
+  //entities: {
+  course: {}
+  items: {}
+  quiz: {}
+  texts: {}
+  result: string
+}
+
 const initialState: EditorState = {
   id: "1",
   courseId: "2",
@@ -57,7 +66,32 @@ const initialState: EditorState = {
   awardPointsEvenIfWrong: false,
 }
 
-const editReducer = (
+export const editReducer2 = (
+  state: EditorState2 = {
+    course: {},
+    items: {},
+    quiz: {},
+    texts: {},
+    result: "",
+  },
+  action: actionType,
+): any => {
+  switch (action.type) {
+    case "INITIALIZED_EDITOR": {
+      console.log("initializer", action)
+      return {
+        ...state,
+        ...action.payload.quiz,
+      }
+    }
+    default: {
+      console.log("default", action)
+      return state
+    }
+  }
+}
+
+export const editReducer = (
   state: EditorState = initialState,
   action: actionType,
 ): EditorState => {

@@ -1,5 +1,5 @@
 import React from "react"
-import { Item } from "../../types/EditQuiz"
+import { Item } from "../../types/NormalizedQuiz"
 import {
   editedScaleMinMaxValue,
   editedScaleMinMaxLabel,
@@ -72,7 +72,7 @@ const ScaleContent = ({ item }: contentBoxProps) => {
         </ComponentContainer>
         <ComponentContainer>
           <TextField
-            defaultValue={item.texts[0].maxLabel}
+            defaultValue={item.maxWords}
             variant="standard"
             onChange={event =>
               dispatch(
@@ -88,7 +88,7 @@ const ScaleContent = ({ item }: contentBoxProps) => {
         </ComponentContainer>
         <ComponentContainer>
           <TextField
-            defaultValue={item.texts[0].minLabel}
+            defaultValue={item.minWords}
             variant="standard"
             onChange={event =>
               dispatch(

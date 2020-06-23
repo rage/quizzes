@@ -75,13 +75,30 @@ const StyledTextField = styled(TextField)`
 const BasicInformation = () => {
   const dispatch = useDispatch()
 
+  const quiz = useTypedSelector(state => state.editor.quizzes)
+  console.log("quiz", quiz)
+
+  const quizId = useTypedSelector(state => state.editor.quizId)
+
   const pointsGrantingPolicy = useTypedSelector(
-    state => state.editor.grantPointsPolicy,
+    state => state.editor.quizzes[quizId].grantPointsPolicy,
   )
-  const numberOfTries = useTypedSelector(state => state.editor.tries)
-  const pointsToGain = useTypedSelector(state => state.editor.points)
-  const deadline = useTypedSelector(state => state.editor.deadline)
-  const texts = useTypedSelector(state => state.editor.texts)
+  const numberOfTries = useTypedSelector(
+    state => state.editor.quizzes[quizId].tries,
+  )
+  const pointsToGain = useTypedSelector(
+    state => state.editor.quizzes[quizId].points,
+  )
+  const deadline = useTypedSelector(
+    state => state.editor.quizzes[quizId].deadline,
+  )
+  const createdAt = useTypedSelector(
+    state => state.editor.quizzes[quizId].createdAt,
+  )
+  const updatedAt = useTypedSelector(
+    state => state.editor.quizzes[quizId].updatedAt,
+  )
+  const title = useTypedSelector(state => state.editor.quizzes[quizId].title)
 
   return (
     <>
@@ -94,19 +111,19 @@ const BasicInformation = () => {
         </InfoHeader>
         <InfoContainer>
           <Typography>
-            Created at: {new Date(texts[0].createdAt).toDateString()}
+            Created at: {new Date(createdAt).toDateString()}
           </Typography>
         </InfoContainer>
         <InfoContainer>
           <Typography>
-            Last updated at: {new Date(texts[0].updatedAt).toDateString()}
+            Last updated at: {new Date(updatedAt).toDateString()}
           </Typography>
         </InfoContainer>
         <InfoContainer>
           <Typography>Quiz title:</Typography>
           <StyledTextField
             multiline
-            defaultValue={texts[0].title}
+            defaultValue={title}
             onChange={event => dispatch(editedQuizTitle(event.target.value))}
           />
         </InfoContainer>

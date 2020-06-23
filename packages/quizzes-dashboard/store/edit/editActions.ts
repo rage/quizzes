@@ -1,10 +1,9 @@
 import { createAction } from "typesafe-actions"
-import { EditableQuiz } from "../../types/EditQuiz"
 
 export const initializedEditor = createAction(
   "INITIALIZED_EDITOR",
-  (quiz: EditableQuiz) => ({ quiz: quiz }),
-)<{ quiz: EditableQuiz }>()
+  (quiz: any) => ({ quiz: quiz }),
+)<{ quiz: any }>()
 
 export const editedQuizItemBody = createAction(
   "EDITED_QUIZ_ITEM_BODY",

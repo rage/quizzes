@@ -8,6 +8,9 @@ import Typography from "@material-ui/core/Typography"
 import styled from "styled-components"
 import QuizItem from "../../../components/QuizEditForms/QuizItem"
 import SaveButton from "../../../components/SaveButton"
+import { normalizedQuiz } from "../../../schemas"
+import { normalize } from "normalizr"
+import { useTypedSelector } from "../../../store/store"
 
 interface ShowQuizPageProps {
   id: string
@@ -20,15 +23,22 @@ const StyledId = styled(Typography)`
 
 const ShowQuizPage = ({ quiz, id }: ShowQuizPageProps) => {
   const dispatch = useDispatch()
-  dispatch(initializedEditor(quiz))
+  const storeState = normalize(quiz, normalizedQuiz)
+  console.log(storeState)
+  dispatch(initializedEditor(storeState))
+
+  const storeItems = Object.values(
+    useTypedSelector(state => state.editor.items),
+  )
+
   return (
     <>
-      <SaveButton />
+      {/* <SaveButton /> */}
       <Typography variant="h3">Editing quiz</Typography>
       <StyledId>{id}</StyledId>
       <BasicInfo />
 
-      {quiz.items.map(item => {
+      {storeItems.map(item => {
         return <QuizItem key={item.id} item={item} />
       })}
     </>

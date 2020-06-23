@@ -3,7 +3,7 @@ import styled from "styled-components"
 import { Typography, Card, TextField } from "@material-ui/core"
 import { editedQuizItemBody } from "../../store/edit/editActions"
 import { useDispatch } from "react-redux"
-import { Item } from "../../types/EditQuiz"
+import { Item } from "../../types/NormalizedQuiz"
 
 const QuizCard = styled(Card)`
   box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 40px -12px !important;
@@ -70,7 +70,7 @@ const EssayContent = ({ item }: essayContentProps) => {
           fullWidth
           rows="2"
           rowsMax="5000"
-          defaultValue={item.texts[0].body}
+          defaultValue={item.body}
           onChange={event =>
             dispatch(editedQuizItemBody(event.target.value, item.id))
           }
