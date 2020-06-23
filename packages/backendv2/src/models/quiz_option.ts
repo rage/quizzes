@@ -3,9 +3,16 @@ import QuizItem from "./quiz_item"
 import QuizOptionTranslation from "./quiz_option_translation"
 
 class QuizOption extends Model {
+  texts!: QuizOptionTranslation[]
+  title!: string
+  body!: string
+  successMessage!: string
+  failureMessage!: string
+
   static get tableName() {
     return "quiz_option"
   }
+
   static relationMappings = {
     quizItem: {
       relation: Model.BelongsToOneRelation,

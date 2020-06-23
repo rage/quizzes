@@ -1,9 +1,8 @@
 import React from "react"
 import styled from "styled-components"
-import { Typography, Card, TextField, Button } from "@material-ui/core"
-import { EditorState } from "../../store/edit/reducers"
-import { editedQuizBody } from "../../store/edit/actions"
-import { connect } from "react-redux"
+import { Typography, Card, TextField } from "@material-ui/core"
+import { editedQuizItemBody } from "../../store/edit/editActions"
+import { useDispatch } from "react-redux"
 import { Item } from "../../types/EditQuiz"
 
 const QuizCard = styled(Card)`
@@ -54,12 +53,12 @@ const StyledTextField = styled(TextField)`
   width: 100%;
   margin-top: 0.25rem !important;
 `
-interface contentBoxProps {
+interface essayContentProps {
   item: Item
-  editQuizBody: (arg1: string, arg2: string) => any
 }
 
-const EssayContent = ({ item, editQuizBody }: contentBoxProps) => {
+const EssayContent = ({ item }: essayContentProps) => {
+  const dispatch = useDispatch()
   return (
     <>
       <QuizContent>
@@ -70,9 +69,11 @@ const EssayContent = ({ item, editQuizBody }: contentBoxProps) => {
           multiline
           fullWidth
           rows="2"
-          rowsMax="500"
+          rowsMax="5000"
           defaultValue={item.texts[0].body}
-          onChange={event => editQuizBody(event.target.value, item.id)}
+          onChange={event =>
+            dispatch(editedQuizItemBody(event.target.value, item.id))
+          }
         />
         <br />
         <br />
@@ -81,11 +82,4 @@ const EssayContent = ({ item, editQuizBody }: contentBoxProps) => {
   )
 }
 
-const mapDispatchToProps = (dispatch: any) => {
-  return {
-    editQuizBody: (newBody: string, id: string) =>
-      dispatch(editedQuizBody(newBody, id)),
-  }
-}
-
-export default connect(null, mapDispatchToProps)(EssayContent)
+export default EssayContent

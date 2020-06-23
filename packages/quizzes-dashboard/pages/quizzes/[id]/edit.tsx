@@ -1,8 +1,8 @@
 import React from "react"
 import { fetchQuiz } from "../../../services/quizzes"
 import { EditableQuiz } from "../../../types/EditQuiz"
-import { initializedEditor } from "../../../store/edit/actions"
-import { connect } from "react-redux"
+import { initializedEditor } from "../../../store/edit/editActions"
+import { useDispatch } from "react-redux"
 import BasicInfo from "../../../components/QuizEditForms/BasicInfo"
 import Typography from "@material-ui/core/Typography"
 import styled from "styled-components"
@@ -12,16 +12,15 @@ import SaveButton from "../../../components/SaveButton"
 interface ShowQuizPageProps {
   id: string
   quiz: EditableQuiz
-  editableQuiz: (quiz: EditableQuiz) => any
 }
 
 const StyledId = styled(Typography)`
   margin-bottom: 1rem !important;
 `
 
-const ShowQuizPage = ({ quiz, id, editableQuiz }: ShowQuizPageProps) => {
-  console.log(quiz)
-  editableQuiz(quiz)
+const ShowQuizPage = ({ quiz, id }: ShowQuizPageProps) => {
+  const dispatch = useDispatch()
+  dispatch(initializedEditor(quiz))
   return (
     <>
       <SaveButton />
@@ -30,11 +29,7 @@ const ShowQuizPage = ({ quiz, id, editableQuiz }: ShowQuizPageProps) => {
       <BasicInfo />
 
       {quiz.items.map(item => {
-        return (
-          <>
-            <QuizItem key={item.id} item={item} />
-          </>
-        )
+        return <QuizItem key={item.id} item={item} />
       })}
     </>
   )
@@ -49,10 +44,4 @@ ShowQuizPage.getInitialProps = async (ctx: any) => {
   }
 }
 
-const mapDispatchToProps = (dispatch: any) => {
-  return {
-    editableQuiz: (quiz: EditableQuiz) => dispatch(initializedEditor(quiz)),
-  }
-}
-
-export default connect(null, mapDispatchToProps)(ShowQuizPage)
+export default ShowQuizPage

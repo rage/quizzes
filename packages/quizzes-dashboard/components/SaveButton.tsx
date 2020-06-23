@@ -1,31 +1,28 @@
 import React, { Suspense, useState } from "react"
-import {
-  Typography,
-  Button,
-  CircularProgress,
-  Snackbar,
-  Fab,
-} from "@material-ui/core"
+import { Typography, CircularProgress, Snackbar, Fab } from "@material-ui/core"
 import Alert from "@material-ui/lab/Alert"
-import { EditorState } from "../store/edit/reducers"
-import { connect } from "react-redux"
+import { useDispatch } from "react-redux"
 import { EditableQuiz } from "../types/EditQuiz"
 import { saveQuiz } from "../services/quizzes"
-import { initializedEditor } from "../store/edit/actions"
+import { initializedEditor } from "../store/edit/editActions"
+import { useTypedSelector } from "../store/store"
 
-const SaveButton = ({ quiz, updateEditorState }: any) => {
+const SaveButton = () => {
+  const dispatch = useDispatch()
+  const store = useTypedSelector(state => state.editor)
+
   const [saved, setSaved] = useState(true)
   const [showMessage, setShowMessage] = useState(false)
   const [showSpinner, setShowSpinner] = useState(false)
 
-  const handleClick = async (quiz: EditableQuiz) => {
+  const handleClick = async (store: EditableQuiz) => {
     setSaved(false)
     setShowSpinner(true)
-    const response = await saveQuiz(quiz)
+    const response = await saveQuiz(store)
     setShowSpinner(false)
     if (response.errorMessage === undefined) {
       setSaved(true)
-      updateEditorState(response)
+      dispatch(initializedEditor(response))
     }
     setShowMessage(true)
   }
@@ -65,7 +62,7 @@ const SaveButton = ({ quiz, updateEditorState }: any) => {
         <Fab
           color="primary"
           variant="extended"
-          onClick={() => handleClick(quiz)}
+          onClick={() => handleClick(store)}
           style={{
             padding: "1rem",
             position: "fixed",
@@ -82,17 +79,4 @@ const SaveButton = ({ quiz, updateEditorState }: any) => {
   )
 }
 
-const mapStateToProps = (state: EditorState) => {
-  return {
-    quiz: state,
-  }
-}
-
-const mapDispatchToProps = (dispatch: any) => {
-  return {
-    updateEditorState: (quiz: EditableQuiz) =>
-      dispatch(initializedEditor(quiz)),
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(SaveButton)
+export default SaveButton

@@ -2,31 +2,61 @@ import axios from "axios"
 import { CourseListQuiz } from "../types/Quiz"
 import { Course } from "../types/Course"
 import { EditableQuiz } from "../types/EditQuiz"
+import { checkStore } from "./tmcApi"
 
-const HOST = process.env.HOST || "http://localhost:3003"
+let HOST = "http://localhost:3003"
+
+if (process.env.NODE_ENV === "production") {
+  HOST = "https://quizzes2.mooc.fi"
+}
 
 const api = axios.create({
   baseURL: `${HOST}/api/v2/dashboard`,
-  headers: {
-    Authorization: "Bearer " + process.env.TOKEN,
-  },
 })
 
 export const fetchCourses = async (): Promise<Course[]> => {
-  return (await api.get("/courses")).data
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const res = (await api.get("/courses", config)).data
+    return res
+  }
+  return []
 }
 
 export const fetchCourseQuizzes = async (
   courseId: string,
 ): Promise<CourseListQuiz[]> => {
-  return (await api.get(`/courses/${courseId}/quizzes`)).data
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (await api.get(`/courses/${courseId}/quizzes`, config)).data
+  }
+  return []
 }
 
 export const fetchQuiz = async (id: string): Promise<EditableQuiz> => {
-  return (await api.get(`/quizzes/${id}`)).data
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (await api.get(`/quizzes/${id}`, config)).data
+  }
+  throw new Error()
 }
 
 export const saveQuiz = async (quiz: EditableQuiz): Promise<any> => {
-  const response = (await api.post(`quizzes`, { quiz })).data
-  return response
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (await api.post(`quizzes`, quiz, config)).data
+    return response
+  }
 }
