@@ -1,4 +1,4 @@
-import { action } from "../../types/NormalizedQuiz"
+import { action } from "../../../types/NormalizedQuiz"
 
 export const itemReducer = (state: any = {}, action: action) => {
   switch (action.type) {
