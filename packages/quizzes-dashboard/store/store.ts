@@ -6,7 +6,7 @@ import { optionReducer } from "./editor/options/optionReducer"
 import { itemReducer } from "./editor/items/itemReducer"
 import { quizReducer } from "./editor/quiz/quizReducer"
 import { resultReducer } from "./editor/result/resultReducer"
-import { Quiz, Item, Option, Course } from "../types/NormalizedQuiz"
+import { Quiz, Item, Option } from "../types/NormalizedQuiz"
 
 //const reducer = combineReducers({ editor: editReducer2, user: userReducer })
 

@@ -6,7 +6,7 @@ import {
   editedValidityRegex,
   toggledMultiOptions,
   editedItemMessage,
-} from "../../store/edit/editActions"
+} from "../../store/editor/editorActions"
 import { useDispatch } from "react-redux"
 
 interface openContentProps {

@@ -1,5 +1,4 @@
 import React from "react"
-import BasicInformation from "./BasicInfo"
 import { Item } from "../../types/NormalizedQuiz"
 import styled from "styled-components"
 import { Typography } from "@material-ui/core"

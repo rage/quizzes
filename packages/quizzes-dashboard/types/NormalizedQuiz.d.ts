@@ -1,8 +1,15 @@
 export interface action {
   type: string
-  payload: any
+  payload?: any
+  meta?: any
 }
 
+export interface Entities {
+  quizzes: { [quizId: string]: Quiz }
+  items: { [itemId: string]: Item }
+  options?: { [optionId: string]: Option }
+  result: string
+}
 export interface Quiz {
   id: string
   courseId: string

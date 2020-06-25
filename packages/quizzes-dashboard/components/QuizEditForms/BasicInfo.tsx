@@ -9,7 +9,7 @@ import {
   editedQuizzesNumberOfTries,
   editedQuizzesPointsToGain,
   editedQuizzesPointsGrantingPolicy,
-} from "../../store/edit/editActions"
+} from "../../store/editor/editorActions"
 import DebugDialog from "../DebugDialog"
 import { useTypedSelector } from "../../store/store"
 
@@ -124,7 +124,9 @@ const BasicInformation = () => {
           <StyledTextField
             multiline
             defaultValue={title}
-            onChange={event => dispatch(editedQuizTitle(event.target.value))}
+            onChange={event =>
+              dispatch(editedQuizTitle(event.target.value, quizId))
+            }
           />
         </InfoContainer>
         <InfoContainer>
@@ -133,7 +135,9 @@ const BasicInformation = () => {
             type="number"
             defaultValue={numberOfTries}
             onChange={event =>
-              dispatch(editedQuizzesNumberOfTries(Number(event.target.value)))
+              dispatch(
+                editedQuizzesNumberOfTries(Number(event.target.value), quizId),
+              )
             }
           />
         </InfoContainer>
@@ -143,7 +147,9 @@ const BasicInformation = () => {
             type="number"
             defaultValue={pointsToGain}
             onChange={event =>
-              dispatch(editedQuizzesPointsToGain(Number(event.target.value)))
+              dispatch(
+                editedQuizzesPointsToGain(Number(event.target.value), quizId),
+              )
             }
           />
         </InfoContainer>
@@ -153,7 +159,9 @@ const BasicInformation = () => {
             select
             value={pointsGrantingPolicy}
             onChange={event =>
-              dispatch(editedQuizzesPointsGrantingPolicy(event.target.value))
+              dispatch(
+                editedQuizzesPointsGrantingPolicy(event.target.value, quizId),
+              )
             }
           >
             <MenuItem value="grant_whenever_possible">

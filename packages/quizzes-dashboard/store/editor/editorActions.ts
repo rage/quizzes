@@ -1,9 +1,10 @@
 import { createAction } from "typesafe-actions"
+import { Entities } from "../../types/NormalizedQuiz"
 
 export const initializedEditor = createAction(
   "INITIALIZED_EDITOR",
-  (quiz: any) => ({ quiz: quiz }),
-)<{ quiz: any }>()
+  (quiz: Entities) => ({ quiz: quiz }),
+)<{ quiz: Entities }>()
 
 export const editedQuizItemBody = createAction(
   "EDITED_QUIZ_ITEM_BODY",
@@ -17,32 +18,37 @@ export const editedQuizItemTitle = createAction(
 
 export const editedQuizTitle = createAction(
   "EDITED_QUIZ_TITLE",
-  (newTitle: string) => ({ title: newTitle }),
-)<{ title: string }>()
+  (newTitle: string, quizId: string) => ({ title: newTitle, id: quizId }),
+)<{ title: string; id: string }>()
 
 export const editedQuizzesNumberOfTries = createAction(
   "EDITED_QUIZZES_NUMBER_OF_TRIES",
-  (numberOfTries: number) => ({ numberOfTries: numberOfTries }),
-)<{ numberOfTries: number }>()
+  (numberOfTries: number, quizId: string) => ({
+    numberOfTries: numberOfTries,
+    id: quizId,
+  }),
+)<{ numberOfTries: number; id: string }>()
 
 export const editedQuizzesPointsToGain = createAction(
   "EDITED_QUIZZES_POINTS_TO_GAIN",
-  (pointsToGain: number) => ({ pointsToGain: pointsToGain }),
-)<{ pointsToGain: number }>()
+  (pointsToGain: number, quizId: string) => ({
+    pointsToGain: pointsToGain,
+    id: quizId,
+  }),
+)<{ pointsToGain: number; id: string }>()
 
 export const editedQuizzesPointsGrantingPolicy = createAction(
   "EDITED_QUIZZES_POINTS_GRANTING_POLICY",
-  (policy: string) => ({ policy: policy }),
-)<{ policy: string }>()
+  (policy: string, quizId: string) => ({ policy: policy, id: quizId }),
+)<{ policy: string; id: string }>()
 
 export const editedOptionTitle = createAction(
   "EDITED_OPTION_TITLE",
-  (newTitle: string, itemId: string, optionId: string) => ({
+  (newTitle: string, optionId: string) => ({
     newTitle: newTitle,
-    itemId: itemId,
     optionId: optionId,
   }),
-)<{ newTitle: string; itemId: string; optionId: string }>()
+)<{ newTitle: string; optionId: string }>()
 
 export const editedOptionCorrectnes = createAction(
   "EDITED_OPTION_CORRECTNES",

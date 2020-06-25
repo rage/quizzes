@@ -1,7 +1,7 @@
 import React from "react"
 import { fetchQuiz } from "../../../services/quizzes"
 import { EditableQuiz } from "../../../types/EditQuiz"
-import { initializedEditor } from "../../../store/edit/editActions"
+import { initializedEditor } from "../../../store/editor/editorActions"
 import { useDispatch } from "react-redux"
 import BasicInfo from "../../../components/QuizEditForms/BasicInfo"
 import Typography from "@material-ui/core/Typography"
@@ -23,7 +23,13 @@ const StyledId = styled(Typography)`
 const EditPage = ({ quiz, id }: EditPageProps) => {
   const dispatch = useDispatch()
   const storeState = normalize(quiz, normalizedQuiz)
-  dispatch(initializedEditor(storeState))
+  const data = {
+    quizzes: storeState.entities.quizzes ?? {},
+    items: storeState.entities.items ?? {},
+    options: storeState.entities.options ?? {},
+    result: storeState.result,
+  }
+  dispatch(initializedEditor(data))
 
   return (
     <>

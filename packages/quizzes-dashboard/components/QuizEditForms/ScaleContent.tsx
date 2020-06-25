@@ -3,7 +3,7 @@ import { Item } from "../../types/NormalizedQuiz"
 import {
   editedScaleMinMaxValue,
   editedScaleMinMaxLabel,
-} from "../../store/edit/editActions"
+} from "../../store/editor/editorActions"
 import { Typography, TextField } from "@material-ui/core"
 import styled from "styled-components"
 import { useDispatch } from "react-redux"

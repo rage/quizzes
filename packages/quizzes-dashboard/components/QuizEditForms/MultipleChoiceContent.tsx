@@ -5,7 +5,7 @@ import { Button, Typography, TextField } from "@material-ui/core"
 import {
   editedOptionTitle,
   editedOptionCorrectnes,
-} from "../../store/edit/editActions"
+} from "../../store/editor/editorActions"
 import { useDispatch } from "react-redux"
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -68,7 +68,7 @@ const MultipleChoiceButton = ({
           <TextField
             defaultValue={option.title}
             onChange={event =>
-              dispatch(editedOptionTitle(event.target.value, itemId, option.id))
+              dispatch(editedOptionTitle(event.target.value, option.id))
             }
           />
         ) : (

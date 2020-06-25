@@ -1,15 +1,30 @@
-import { action } from "../../../types/NormalizedQuiz"
+import { action, Option } from "../../../types/NormalizedQuiz"
+import { createReducer } from "typesafe-actions"
+import {
+  initializedEditor,
+  editedOptionTitle,
+  editedOptionCorrectnes,
+} from "../../editor/editorActions"
 
-export const optionReducer = (state: any = {}, action: action) => {
-  switch (action.type) {
-    case "INITIALIZED_EDITOR": {
-      console.log(action)
-      return { ...action.payload.quiz.entities.options }
-    }
-    default: {
-      return state
-    }
-  }
-}
+export const optionReducer = createReducer<
+  { [optionId: string]: Option },
+  action
+>({})
+  .handleAction(
+    initializedEditor,
+    (_state, action) => action.payload.quiz.options ?? {},
+  )
+  .handleAction(editedOptionTitle, (state, action) => {
+    let newState = state
+    newState[action.payload.optionId].title = action.payload.newTitle
+    return newState
+  })
+  .handleAction(editedOptionCorrectnes, (state, action) => {
+    let newState = state
+    newState[action.payload.optionId].correct = !newState[
+      action.payload.optionId
+    ].correct
+    return newState
+  })
 
 export default optionReducer

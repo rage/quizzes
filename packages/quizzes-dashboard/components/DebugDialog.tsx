@@ -2,7 +2,6 @@ import React, { useState } from "react"
 import { Button, Dialog, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import EditableDebugField from "./EditableDebugField"
-import { EditorState } from "../store/edit/editReducer"
 import { Item, Quiz } from "../types/NormalizedQuiz"
 import { useTypedSelector } from "../store/store"
 

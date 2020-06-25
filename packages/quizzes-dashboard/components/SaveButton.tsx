@@ -3,7 +3,7 @@ import { Typography, CircularProgress, Snackbar, Fab } from "@material-ui/core"
 import Alert from "@material-ui/lab/Alert"
 import { useDispatch } from "react-redux"
 import { saveQuiz } from "../services/quizzes"
-import { initializedEditor } from "../store/edit/editActions"
+import { initializedEditor } from "../store/editor/editorActions"
 import { useTypedSelector } from "../store/store"
 import { denormalize, normalize } from "normalizr"
 import { normalizedQuiz } from "../schemas"
@@ -27,7 +27,13 @@ const SaveButton = () => {
     setShowSpinner(false)
     if (response.errorMessage === undefined) {
       console.log("hep")
-      const data = normalize(response, normalizedQuiz)
+      const normalizedResponse = normalize(response, normalizedQuiz)
+      const data = {
+        quizzes: normalizedResponse.entities.quizzes ?? {},
+        items: normalizedResponse.entities.items ?? {},
+        options: normalizedResponse.entities.options ?? {},
+        result: normalizedResponse.result ?? "",
+      }
       dispatch(initializedEditor(data))
       setSaved(true)
     }
