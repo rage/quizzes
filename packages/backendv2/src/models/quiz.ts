@@ -4,7 +4,6 @@ import QuizTranslation from "./quiz_translation"
 import PeerReviewCollection from "./peer_review_collection"
 import Course from "./course"
 import { NotFoundError } from "../util/error"
-import { PeerReviewCollectionTranslation } from "."
 
 export class Quiz extends Model {
   texts!: QuizTranslation[]
@@ -180,41 +179,41 @@ export class Quiz extends Model {
 
   private static moveTextsToParent(quiz: any) {
     const text = quiz.texts[0]
-    quiz.title = text.title
-    quiz.body = text.body
-    quiz.submitMessage = text.submitMessage
+    quiz.title = text?.title
+    quiz.body = text?.body
+    quiz.submitMessage = text?.submitMessage
     delete quiz.texts
     quiz.items = quiz.items?.map((item: any) => {
       const text = item.texts[0]
-      item.title = text.title
-      item.body = text.body
-      item.successMessage = text.successMessage
-      item.failureMessage = text.failureMessage
-      item.sharedOptionFeedbackMessage = text.sharedOptionFeedbackMessage
+      item.title = text?.title
+      item.body = text?.body
+      item.successMessage = text?.successMessage
+      item.failureMessage = text?.failureMessage
+      item.sharedOptionFeedbackMessage = text?.sharedOptionFeedbackMessage
       delete item.texts
       item.options = item.options?.map((option: any) => {
         const text = option.texts[0]
-        option.title = text.title
-        option.body = text.body
-        option.successMessage = text.successMessage
-        option.failureMessage = text.failureMessage
+        option.title = text?.title
+        option.body = text?.body
+        option.successMessage = text?.successMessage
+        option.failureMessage = text?.failureMessage
         delete option.texts
         return option
       })
       return item
     })
     quiz.peerReviews = quiz.peerReviews?.map((prc: any) => {
-      const text = prc.texts[0]
-      prc.title = text.title
-      prc.body = text.body
-      delete prc.texts
       prc.questions = prc.questions?.map((prq: any) => {
         const text = prq.texts[0]
-        prq.title = text.title
-        prq.body = text.body
+        prq.title = text?.title
+        prq.body = text?.body
         delete prq.texts
         return prq
       })
+      const text = prc.texts[0]
+      prc.title = text?.title
+      prc.body = text?.body
+      delete prc.texts
       return prc
     })
     return quiz

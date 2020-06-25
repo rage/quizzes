@@ -53,11 +53,13 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("course")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .text("language_id")
         .references("id")
         .inTable("language")
         .notNullable()
+        .onDelete("CASCADE")
       table.primary(["course_id", "language_id"])
     })
   }
@@ -68,11 +70,13 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("course")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .text("language_id")
         .references("id")
         .inTable("language")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .text("abbreviation")
         .defaultTo("")
@@ -108,6 +112,7 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("course")
         .notNullable()
+        .onDelete("CASCADE")
       table.integer("part").notNullable()
       table.integer("section")
       table.integer("points").notNullable()
@@ -163,11 +168,13 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("quiz")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .text("language_id")
         .references("id")
         .inTable("language")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .text("title")
         .defaultTo("")
@@ -200,6 +207,7 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("quiz")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .enu(
           "type",
@@ -248,11 +256,13 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("quiz_item")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .text("language_id")
         .references("id")
         .inTable("language")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .text("title")
         .defaultTo("")
@@ -289,6 +299,7 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("quiz_item")
         .notNullable()
+        .onDelete("CASCADE")
       table.integer("order").notNullable()
       table.boolean("correct").notNullable()
       table
@@ -308,11 +319,13 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("quiz_option")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .text("language_id")
         .references("id")
         .inTable("language")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .text("title")
         .defaultTo("")
@@ -346,6 +359,7 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("quiz")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .timestamp("created_at", { useTz: false })
         .defaultTo(knex.fn.now())
@@ -365,11 +379,13 @@ export async function up(knex: Knex): Promise<any> {
           .references("id")
           .inTable("peer_review_collection")
           .notNullable()
+          .onDelete("CASCADE")
         table
           .text("language_id")
           .references("id")
           .inTable("language")
           .notNullable()
+          .onDelete("CASCADE")
         table
           .text("title")
           .defaultTo("")
@@ -401,12 +417,13 @@ export async function up(knex: Knex): Promise<any> {
         .uuid("quiz_id")
         .references("id")
         .inTable("quiz")
-        .notNullable()
+        .onDelete("CASCADE")
       table
         .uuid("peer_review_collection_id")
         .references("id")
         .inTable("peer_review_collection")
         .notNullable()
+        .onDelete("CASCADE")
       table.boolean("default").notNullable()
       table.integer("order").notNullable()
       table
@@ -436,11 +453,13 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("peer_review_question")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .text("language_id")
         .references("id")
         .inTable("language")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .text("title")
         .defaultTo("")
@@ -488,16 +507,19 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("quiz")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .integer("user_id")
         .references("id")
         .inTable("user")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .text("language_id")
         .references("id")
         .inTable("language")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .enu(
           "status",
@@ -543,11 +565,13 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("quiz_answer")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .uuid("quiz_item_id")
         .references("id")
         .inTable("quiz_item")
         .notNullable()
+        .onDelete("CASCADE")
       table.text("text_data")
       table.integer("int_data")
       table.boolean("correct")
@@ -573,11 +597,13 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("quiz_item_answer")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .uuid("quiz_option_id")
         .references("id")
         .inTable("quiz_option")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .timestamp("created_at", { useTz: false })
         .defaultTo(knex.fn.now())
@@ -600,16 +626,19 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("quiz_answer")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .integer("user_id")
         .references("id")
         .inTable("user")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .uuid("peer_review_collection_id")
         .references("id")
         .inTable("peer_review_collection")
         .notNullable()
+        .onDelete("CASCADE")
       table.specificType("rejected_quiz_answer_ids", "character varying[]")
       table
         .timestamp("created_at", { useTz: false })
@@ -628,11 +657,13 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("peer_review")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .uuid("peer_review_question_id")
         .references("id")
         .inTable("peer_review_question")
         .notNullable()
+        .onDelete("CASCADE")
       table.integer("value")
       table.text("text")
       table
@@ -658,11 +689,13 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("quiz_answer")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .integer("user_id")
         .references("id")
         .inTable("user")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .timestamp("created_at", { useTz: false })
         .defaultTo(knex.fn.now())
@@ -680,11 +713,13 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("user")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .uuid("quiz_id")
         .references("id")
         .inTable("quiz")
         .notNullable()
+        .onDelete("CASCADE")
       table.integer("peer_reviews_given")
       table.integer("peer_reviews_received")
       table.decimal("points_awarded")
@@ -715,11 +750,13 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("user")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .uuid("course_id")
         .references("id")
         .inTable("course")
         .notNullable()
+        .onDelete("CASCADE")
       table.integer("course_part").notNullable()
       table
         .decimal("progress")
@@ -756,11 +793,13 @@ export async function up(knex: Knex): Promise<any> {
         .references("id")
         .inTable("user")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .uuid("course_id")
         .references("id")
         .inTable("course")
         .notNullable()
+        .onDelete("CASCADE")
       table
         .enu("role", ["assistant", "teacher"], {
           useNative: true,
