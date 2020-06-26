@@ -169,12 +169,13 @@ export class Quiz extends Model {
   }
 
   static async getByCourseId(courseId: string) {
-    return await this.query()
-      .withGraphJoined("texts")
-      .withGraphJoined("items.[texts, options.[texts]]")
-      .withGraphJoined("peerReviews.[texts, questions.[texts]]")
-      .withGraphJoined("course.[texts]")
-      .where("quiz.course_id", courseId)
+    return (
+      await this.query()
+        .withGraphJoined("texts")
+        .withGraphJoined("items.[texts, options.[texts]]")
+        .withGraphJoined("peerReviews.[texts, questions.[texts]]")
+        .where("quiz.course_id", courseId)
+    ).map(quiz => this.moveTextsToParent(quiz))
   }
 
   private static moveTextsToParent(quiz: any) {
