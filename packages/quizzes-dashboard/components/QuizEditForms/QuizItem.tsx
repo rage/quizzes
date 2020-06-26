@@ -7,7 +7,7 @@ import MultipleChoiceContent from "./MultipleChoiceContent"
 import CheckBoxContent from "./CheckBoxContent"
 import OpenContent from "./OpenContent"
 import ScaleContent from "./ScaleContent"
-import { editedQuizItemTitle } from "../../store/editor/editorActions"
+import { editedQuizItemTitle } from "../../store/editor/items/itemAction"
 import { useDispatch } from "react-redux"
 import DebugDialog from "../DebugDialog"
 

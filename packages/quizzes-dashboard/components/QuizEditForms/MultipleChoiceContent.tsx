@@ -5,7 +5,7 @@ import { Button, Typography, TextField } from "@material-ui/core"
 import {
   editedOptionTitle,
   editedOptionCorrectnes,
-} from "../../store/editor/editorActions"
+} from "../../store/editor/options/optionActions"
 import { useDispatch } from "react-redux"
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -25,11 +25,7 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
   return (
     <>
       {item.options.map(option => (
-        <MultipleChoiceButton
-          key={option}
-          option={storeOptions[option]}
-          itemId={item.id}
-        />
+        <MultipleChoiceButton key={option} option={storeOptions[option]} />
       ))}
     </>
   )
@@ -37,21 +33,15 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
 
 interface multipleChoiceButtonProps {
   option: Option
-  itemId: string
 }
 
-const MultipleChoiceButton = ({
-  option,
-  itemId,
-}: multipleChoiceButtonProps) => {
+const MultipleChoiceButton = ({ option }: multipleChoiceButtonProps) => {
   const [editOptionTitle, setEditOptionTitle] = useState(false)
   const dispatch = useDispatch()
 
   return (
     <QuizContent>
-      <Button
-        onClick={() => dispatch(editedOptionCorrectnes(itemId, option.id))}
-      >
+      <Button onClick={() => dispatch(editedOptionCorrectnes(option.id))}>
         <Typography>
           <FontAwesomeIcon icon={option.correct ? faCheck : faTimes} />
         </Typography>

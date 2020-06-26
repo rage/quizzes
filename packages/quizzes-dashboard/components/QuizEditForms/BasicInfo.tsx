@@ -9,7 +9,7 @@ import {
   editedQuizzesNumberOfTries,
   editedQuizzesPointsToGain,
   editedQuizzesPointsGrantingPolicy,
-} from "../../store/editor/editorActions"
+} from "../../store/editor/quiz/quizActions"
 import DebugDialog from "../DebugDialog"
 import { useTypedSelector } from "../../store/store"
 

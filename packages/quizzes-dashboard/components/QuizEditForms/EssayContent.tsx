@@ -1,7 +1,7 @@
 import React from "react"
 import styled from "styled-components"
 import { Typography, Card, TextField } from "@material-ui/core"
-import { editedQuizItemBody } from "../../store/editor/editorActions"
+import { editedQuizItemBody } from "../../store/editor/items/itemAction"
 import { useDispatch } from "react-redux"
 import { Item } from "../../types/NormalizedQuiz"
 

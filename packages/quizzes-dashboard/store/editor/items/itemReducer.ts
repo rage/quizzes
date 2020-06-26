@@ -1,7 +1,6 @@
 import { action, Item } from "../../../types/NormalizedQuiz"
 import { createReducer } from "typesafe-actions"
 import {
-  initializedEditor,
   editedQuizItemBody,
   editedQuizItemTitle,
   editedScaleMinMaxLabel,
@@ -9,23 +8,27 @@ import {
   editedValidityRegex,
   toggledMultiOptions,
   editedItemMessage,
-} from "../../editor/editorActions"
+} from "./itemAction"
+import { initializedEditor } from "../editorActions"
 
 export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
   .handleAction(
     initializedEditor,
     (_state, action) => action.payload.quiz.items ?? {},
   )
+
   .handleAction(editedQuizItemBody, (state, action) => {
     let newState = state
     newState[action.payload.id].body = action.payload.body
     return newState
   })
+
   .handleAction(editedQuizItemTitle, (state, action) => {
     let newState = state
     newState[action.payload.id].title = action.payload.title
     return newState
   })
+
   .handleAction(editedScaleMinMaxValue, (state, action) => {
     let newState = state
     if (action.payload.max) {
@@ -35,6 +38,7 @@ export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
     }
     return newState
   })
+
   .handleAction(editedScaleMinMaxLabel, (state, action) => {
     let newState = state
     if (action.payload.max) {
@@ -44,17 +48,20 @@ export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
     }
     return newState
   })
+
   .handleAction(editedValidityRegex, (state, action) => {
     let newState = state
     newState[action.payload.itemId].validityRegex = action.payload.newRegex
     return newState
   })
+
   .handleAction(toggledMultiOptions, (state, action) => {
     let newState = state
     newState[action.payload.itemId].multi = !newState[action.payload.itemId]
       .multi
     return newState
   })
+
   .handleAction(editedItemMessage, (state, action) => {
     let newState = state
     if (action.payload.success) {
