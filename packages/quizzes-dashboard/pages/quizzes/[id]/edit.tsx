@@ -10,26 +10,42 @@ import SaveButton from "../../../components/SaveButton"
 import { normalizedQuiz } from "../../../schemas"
 import { normalize } from "normalizr"
 import QuizItems from "../../../components/QuizEditForms/QuizItems"
-
-interface EditPageProps {
-  id: string
-  quiz: EditableQuiz
-}
+import useSWR from "swr"
+import { withRouter } from "next/router"
+import { Skeleton } from "@material-ui/lab"
 
 const StyledId = styled(Typography)`
   margin-bottom: 1rem !important;
 `
+const StyledSkeleton = styled(Skeleton)`
+  margin-bottom: 1rem;
+`
 
-const EditPage = ({ quiz, id }: EditPageProps) => {
+const EditPage = ({ router }: any) => {
+  const id = router.query.id
+  const { data, error } = useSWR(id, fetchQuiz)
   const dispatch = useDispatch()
+  if (error) {
+    return <div>Something went wrong</div>
+  }
+  if (!data) {
+    return (
+      <>
+        <StyledSkeleton variant="text" width={900} height={50} />
+        <StyledSkeleton variant="rect" width={900} height={400} />
+        <StyledSkeleton variant="rect" width={900} height={400} />
+      </>
+    )
+  }
+  const quiz = data
   const storeState = normalize(quiz, normalizedQuiz)
-  const data = {
+  const normalizedData = {
     quizzes: storeState.entities.quizzes ?? {},
     items: storeState.entities.items ?? {},
     options: storeState.entities.options ?? {},
     result: storeState.result,
   }
-  dispatch(initializedEditor(data))
+  dispatch(initializedEditor(normalizedData))
 
   return (
     <>
@@ -42,13 +58,4 @@ const EditPage = ({ quiz, id }: EditPageProps) => {
   )
 }
 
-EditPage.getInitialProps = async (ctx: any) => {
-  const id: string = ctx.query.id.toString()
-  const quiz = await fetchQuiz(id)
-  return {
-    id,
-    quiz,
-  }
-}
-
-export default EditPage
+export default withRouter(EditPage)

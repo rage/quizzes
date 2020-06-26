@@ -46,7 +46,11 @@ const CourseList = () => {
   return (
     <>
       {data.map(course => (
-        <Link key={course.id} href="/courses/[id]" as={`/courses/${course.id}`}>
+        <Link
+          key={course.id}
+          href={{ pathname: "/courses/[id]", query: { id: `${course.id}` } }}
+          as={`/courses/${course.id}`}
+        >
           <CourseLink>
             <StyledCard key={course.id}>
               <CardContent>{course.title || course.id}</CardContent>
