@@ -1,9 +1,9 @@
 import React from "react"
-import { Item } from "../../types/EditQuiz"
+import { Item } from "../../types/NormalizedQuiz"
 import {
   editedScaleMinMaxValue,
   editedScaleMinMaxLabel,
-} from "../../store/edit/editActions"
+} from "../../store/editor/items/itemAction"
 import { Typography, TextField } from "@material-ui/core"
 import styled from "styled-components"
 import { useDispatch } from "react-redux"
@@ -72,7 +72,7 @@ const ScaleContent = ({ item }: contentBoxProps) => {
         </ComponentContainer>
         <ComponentContainer>
           <TextField
-            defaultValue={item.texts[0].maxLabel}
+            defaultValue={item.maxWords}
             variant="standard"
             onChange={event =>
               dispatch(
@@ -88,7 +88,7 @@ const ScaleContent = ({ item }: contentBoxProps) => {
         </ComponentContainer>
         <ComponentContainer>
           <TextField
-            defaultValue={item.texts[0].minLabel}
+            defaultValue={item.minWords}
             variant="standard"
             onChange={event =>
               dispatch(

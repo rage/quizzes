@@ -7,9 +7,12 @@ export interface Course {
   minReviewAverage: null | string
   maxSpamFlags: number | null
   moocfiId: null | string
+  languageId: ID
+  abbreviation: string
+  title: string
+  body: string
   createdAt: Date
   updatedAt: Date
-  texts: Text[]
   organization: null
   languages: Language[]
 }
@@ -41,14 +44,4 @@ export enum Name {
   Finnish = "Finnish",
   Swedish = "Swedish",
   Unknown = "Unknown",
-}
-
-export interface Text {
-  courseId: string
-  languageId: ID
-  abbreviation: string
-  title: string
-  body: string
-  createdAt: Date
-  updatedAt: Date
 }

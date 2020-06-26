@@ -1,10 +1,4 @@
 import { createAction } from "typesafe-actions"
-import { EditableQuiz } from "../../types/EditQuiz"
-
-export const initializedEditor = createAction(
-  "INITIALIZED_EDITOR",
-  (quiz: EditableQuiz) => ({ quiz: quiz }),
-)<{ quiz: EditableQuiz }>()
 
 export const editedQuizItemBody = createAction(
   "EDITED_QUIZ_ITEM_BODY",
@@ -15,43 +9,6 @@ export const editedQuizItemTitle = createAction(
   "EDITED_QUIZ_ITEM_TITLE",
   (newTitle: string, itemId: string) => ({ title: newTitle, id: itemId }),
 )<{ title: string; id: string }>()
-
-export const editedQuizTitle = createAction(
-  "EDITED_QUIZ_TITLE",
-  (newTitle: string) => ({ title: newTitle }),
-)<{ title: string }>()
-
-export const editedQuizzesNumberOfTries = createAction(
-  "EDITED_QUIZZES_NUMBER_OF_TRIES",
-  (numberOfTries: number) => ({ numberOfTries: numberOfTries }),
-)<{ numberOfTries: number }>()
-
-export const editedQuizzesPointsToGain = createAction(
-  "EDITED_QUIZZES_POINTS_TO_GAIN",
-  (pointsToGain: number) => ({ pointsToGain: pointsToGain }),
-)<{ pointsToGain: number }>()
-
-export const editedQuizzesPointsGrantingPolicy = createAction(
-  "EDITED_QUIZZES_POINTS_GRANTING_POLICY",
-  (policy: string) => ({ policy: policy }),
-)<{ policy: string }>()
-
-export const editedOptionTitle = createAction(
-  "EDITED_OPTION_TITLE",
-  (newTitle: string, itemId: string, optionId: string) => ({
-    newTitle: newTitle,
-    itemId: itemId,
-    optionId: optionId,
-  }),
-)<{ newTitle: string; itemId: string; optionId: string }>()
-
-export const editedOptionCorrectnes = createAction(
-  "EDITED_OPTION_CORRECTNES",
-  (itemId: string, optionId: string) => ({
-    itemId: itemId,
-    optionId: optionId,
-  }),
-)<{ itemId: string; optionId: string }>()
 
 export const editedScaleMinMaxValue = createAction(
   "EDITED_SCALE_VALUE",

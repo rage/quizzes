@@ -4,14 +4,12 @@ import { CourseListQuiz } from "../../types/Quiz"
 
 import { get, groupBy, Dictionary } from "lodash"
 import { Typography, Card, CardContent } from "@material-ui/core"
+import { Skeleton } from "@material-ui/lab"
 import DebugDialog from "../../components/DebugDialog"
 import Link from "next/link"
 import styled from "styled-components"
-
-interface ShowCoursePageProps {
-  id: string
-  quizzes: CourseListQuiz[]
-}
+import useSWR from "swr"
+import { withRouter } from "next/router"
 
 interface quiz {
   quiz: CourseListQuiz
@@ -31,8 +29,34 @@ const QuizLink = styled.a`
   text-decoration: none;
   cursor: pointer;
 `
-
-const ShowCoursePage = ({ quizzes, id }: ShowCoursePageProps) => {
+const StyledSkeleton = styled(Skeleton)`
+  margin-bottom: 1rem;
+`
+const ShowCoursePage = ({ router }: any) => {
+  const id = router.query.id
+  const { data, error } = useSWR(id, fetchCourseQuizzes)
+  if (error) {
+    return <div>Something went wrong</div>
+  }
+  if (!data) {
+    return (
+      <>
+        <StyledSkeleton variant="rect" height={50} />
+        <StyledSkeleton variant="rect" height={50} />
+        <StyledSkeleton variant="rect" height={50} />
+        <StyledSkeleton variant="rect" height={50} />
+        <StyledSkeleton variant="rect" height={50} />
+        <StyledSkeleton variant="rect" height={50} />
+        <StyledSkeleton variant="rect" height={50} />
+        <StyledSkeleton variant="rect" height={50} />
+        <StyledSkeleton variant="rect" height={50} />
+        <StyledSkeleton variant="rect" height={50} />
+        <StyledSkeleton variant="rect" height={50} />
+        <StyledSkeleton variant="rect" height={50} />
+      </>
+    )
+  }
+  const quizzes = data
   const name =
     get(quizzes, "[0].course.texts[0].title") || `Unknown course ${id}`
   const byPart = groupBy(quizzes, "part")
@@ -76,7 +100,10 @@ const SectionOfPart = ({ section, quizzes }: section) => {
 const Quiz = ({ quiz }: quiz) => {
   const title = get(quiz, "texts[0].title") || quiz.id
   return (
-    <Link href="/quizzes/[id]/edit" as={`/quizzes/${quiz.id}/edit`}>
+    <Link
+      href={{ pathname: "/quizzes/[id]/edit", query: { id: `${quiz.id}` } }}
+      as={`/quizzes/${quiz.id}/edit`}
+    >
       <QuizLink>
         <QuizCard>
           <CardContent>
@@ -97,14 +124,4 @@ const Quiz = ({ quiz }: quiz) => {
   )
 }
 
-export default ShowCoursePage
-
-ShowCoursePage.getInitialProps = async (ctx: any) => {
-  // TODO: ideally this should fetch course details, not quiz details
-  const id: string = ctx.query.id.toString()
-  const quizzes = await fetchCourseQuizzes(id)
-  return {
-    quizzes,
-    id,
-  }
-}
+export default withRouter(ShowCoursePage)
