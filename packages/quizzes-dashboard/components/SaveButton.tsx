@@ -1,28 +1,41 @@
-import React, { Suspense, useState } from "react"
+import React, { useState } from "react"
 import { Typography, CircularProgress, Snackbar, Fab } from "@material-ui/core"
 import Alert from "@material-ui/lab/Alert"
 import { useDispatch } from "react-redux"
-import { EditableQuiz } from "../types/EditQuiz"
 import { saveQuiz } from "../services/quizzes"
-import { initializedEditor } from "../store/edit/editActions"
+import { initializedEditor } from "../store/editor/editorActions"
 import { useTypedSelector } from "../store/store"
+import { denormalize, normalize } from "normalizr"
+import { normalizedQuiz } from "../schemas"
 
 const SaveButton = () => {
   const dispatch = useDispatch()
-  const store = useTypedSelector(state => state.editor)
 
   const [saved, setSaved] = useState(true)
   const [showMessage, setShowMessage] = useState(false)
   const [showSpinner, setShowSpinner] = useState(false)
 
-  const handleClick = async (store: EditableQuiz) => {
+  const store = useTypedSelector(state => state.editor)
+
+  const handleClick = async (store: any) => {
     setSaved(false)
     setShowSpinner(true)
-    const response = await saveQuiz(store)
+
+    const quiz = denormalize(store.quizId, normalizedQuiz, store)
+    const response = await saveQuiz(quiz)
+
     setShowSpinner(false)
     if (response.errorMessage === undefined) {
+      console.log("hep")
+      const normalizedResponse = normalize(response, normalizedQuiz)
+      const data = {
+        quizzes: normalizedResponse.entities.quizzes ?? {},
+        items: normalizedResponse.entities.items ?? {},
+        options: normalizedResponse.entities.options ?? {},
+        result: normalizedResponse.result ?? "",
+      }
+      dispatch(initializedEditor(data))
       setSaved(true)
-      dispatch(initializedEditor(response))
     }
     setShowMessage(true)
   }

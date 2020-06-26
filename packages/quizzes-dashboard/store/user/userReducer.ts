@@ -1,9 +1,6 @@
-export interface ActionType {
-  type: string
-  payload?: any
-  meta?: any
-}
-
+import { createReducer } from "typesafe-actions"
+import { action } from "../../types/NormalizedQuiz"
+import { initUserState, setUser, clearUser } from "./userActions"
 export interface UserState {
   loggedIn: boolean
   userName: string
@@ -18,28 +15,16 @@ const initialUserState: UserState = {
   admin: false,
 }
 
-const userReducer = (
-  state: UserState = initialUserState,
-  action: ActionType,
-) => {
-  switch (action.type) {
-    case "INITIALIZED_USER_STATE": {
-      return initialUserState
-    }
-    case "SET_USER": {
-      return {
-        loggedIn: true,
-        userName: action.payload.userName,
-        accessToken: action.payload.accessToken,
-        admin: action.payload.admin,
-      }
-    }
-    case "CLEAR_USER": {
-      return initialUserState
-    }
-    default:
-      return state
-  }
-}
+const userReducer = createReducer<UserState, action>(initialUserState)
+  .handleAction(initUserState, () => initialUserState)
+  .handleAction(setUser, (state, action) => {
+    let newState = state
+    newState.accessToken = action.payload.accessToken
+    newState.userName = action.payload.userName
+    newState.admin = action.payload.admin
+    newState.loggedIn = true
+    return newState
+  })
+  .handleAction(clearUser, () => initialUserState)
 
 export default userReducer

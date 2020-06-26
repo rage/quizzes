@@ -2,7 +2,6 @@ import React from "react"
 import styled from "styled-components"
 import { Card, CardContent } from "@material-ui/core"
 import Link from "next/link"
-import { get } from "lodash"
 import Skeleton from "@material-ui/lab/Skeleton"
 import useSWR from "swr"
 import { fetchCourses } from "../services/quizzes"
@@ -47,12 +46,14 @@ const CourseList = () => {
   return (
     <>
       {data.map(course => (
-        <Link key={course.id} href="/courses/[id]" as={`/courses/${course.id}`}>
+        <Link
+          key={course.id}
+          href={{ pathname: "/courses/[id]", query: { id: `${course.id}` } }}
+          as={`/courses/${course.id}`}
+        >
           <CourseLink>
             <StyledCard key={course.id}>
-              <CardContent>
-                {get(course, "texts[0].title") || course.id}
-              </CardContent>
+              <CardContent>{course.title || course.id}</CardContent>
             </StyledCard>
           </CourseLink>
         </Link>

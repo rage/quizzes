@@ -1,5 +1,5 @@
 import React from "react"
-import { Item } from "../../types/EditQuiz"
+import { Item } from "../../types/NormalizedQuiz"
 import styled from "styled-components"
 import EssayContent from "./EssayContent"
 import { Card, Typography, TextField, Select } from "@material-ui/core"
@@ -7,7 +7,7 @@ import MultipleChoiceContent from "./MultipleChoiceContent"
 import CheckBoxContent from "./CheckBoxContent"
 import OpenContent from "./OpenContent"
 import ScaleContent from "./ScaleContent"
-import { editedQuizItemTitle } from "../../store/edit/editActions"
+import { editedQuizItemTitle } from "../../store/editor/items/itemAction"
 import { useDispatch } from "react-redux"
 import DebugDialog from "../DebugDialog"
 
@@ -85,7 +85,7 @@ const QuizItem = ({ item }: QuizItemProps) => {
             <Typography variant="h5">Quiz Title:</Typography>
             <StyledTextField
               variant="outlined"
-              defaultValue={item.texts[0].title}
+              defaultValue={item.title}
               onChange={event =>
                 dispatch(editedQuizItemTitle(event.target.value, item.id))
               }
@@ -95,10 +95,7 @@ const QuizItem = ({ item }: QuizItemProps) => {
         <QuizHeader>
           <TitleContainer>
             <Typography variant="h5">Quiz Body:</Typography>
-            <StyledTextField
-              variant="outlined"
-              defaultValue={item.texts[0].body}
-            />
+            <StyledTextField variant="outlined" defaultValue={item.body} />
           </TitleContainer>
         </QuizHeader>
         <QuizContent>
