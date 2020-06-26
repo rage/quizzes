@@ -1,6 +1,5 @@
 import { createStore, combineReducers } from "redux"
 import { composeWithDevTools } from "redux-devtools-extension"
-import userReducer, { UserState } from "./user/userReducer"
 import { useSelector, TypedUseSelectorHook } from "react-redux"
 import { optionReducer } from "./editor/options/optionReducer"
 import { itemReducer } from "./editor/items/itemReducer"
@@ -19,7 +18,6 @@ const editorReducer = combineReducers({
 
 const reducer = combineReducers({
   editor: editorReducer,
-  user: userReducer,
 })
 
 const store = createStore(reducer, composeWithDevTools())
@@ -31,7 +29,6 @@ interface storeState {
     options: { [optionId: string]: Option }
     quizId: string
   }
-  user: UserState
 }
 
 export const useTypedSelector: TypedUseSelectorHook<storeState> = useSelector
