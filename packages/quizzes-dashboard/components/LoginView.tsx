@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useContext } from "react"
 import { useState } from "react"
 import styled from "styled-components"
 import {
@@ -8,10 +8,9 @@ import {
   Card,
   Snackbar,
 } from "@material-ui/core"
-import { authenticate, getProfile } from "../services/tmcApi"
-import { useDispatch } from "react-redux"
-import { setUser } from "../store/user/userActions"
+import { authenticate } from "../services/tmcApi"
 import Alert from "@material-ui/lab/Alert"
+import LoginStateContext from "../contexts/LoginStateContext"
 
 const LoginFieldContainer = styled.div`
   left: 0px;
@@ -37,17 +36,16 @@ const TextFieldContainer = styled.div`
 `
 
 const LoginView = () => {
-  const dispatch = useDispatch()
   const [userName, setUserName] = useState("")
   const [password, setPassword] = useState("")
   const [error, setError] = useState(false)
 
+  const { setLoggedIn } = useContext(LoginStateContext)
+
   const handleLogin = async () => {
     const res = await authenticate({ username: userName, password: password })
-    console.log(res)
     if (res.accessToken) {
-      const userInfo = await getProfile(res.accessToken)
-      dispatch(setUser(res.username, res.accessToken, userInfo.administrator))
+      setLoggedIn(true)
     } else {
       setError(true)
     }
