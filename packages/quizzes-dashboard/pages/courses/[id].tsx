@@ -1,8 +1,6 @@
 import React from "react"
 import { fetchCourseQuizzes } from "../../services/quizzes"
-import { CourseListQuiz } from "../../types/Quiz"
-
-import { get, groupBy, Dictionary } from "lodash"
+import { groupBy, Dictionary } from "lodash"
 import { Typography, Card, CardContent } from "@material-ui/core"
 import { Skeleton } from "@material-ui/lab"
 import DebugDialog from "../../components/DebugDialog"
@@ -10,14 +8,16 @@ import Link from "next/link"
 import styled from "styled-components"
 import useSWR from "swr"
 import { withRouter } from "next/router"
+import { Quizv2 } from "../../types/Quizv2"
+import useBreadcrumbs from "../../hooks/useBreadcrumbs"
 
 interface quiz {
-  quiz: CourseListQuiz
+  quiz: Quizv2
 }
 
 interface section {
   section: string
-  quizzes: CourseListQuiz[]
+  quizzes: Quizv2[]
 }
 
 const QuizCard = styled(Card)`
@@ -34,6 +34,10 @@ const StyledSkeleton = styled(Skeleton)`
 `
 const ShowCoursePage = ({ router }: any) => {
   const id = router.query.id
+  useBreadcrumbs([
+    { label: "Courses", as: "/", href: "/" },
+    { label: "Course" },
+  ])
   const { data, error } = useSWR(id, fetchCourseQuizzes)
   if (error) {
     return <div>Something went wrong</div>
@@ -41,32 +45,33 @@ const ShowCoursePage = ({ router }: any) => {
   if (!data) {
     return (
       <>
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
       </>
     )
   }
   const quizzes = data
-  const name =
-    get(quizzes, "[0].course.texts[0].title") || `Unknown course ${id}`
   const byPart = groupBy(quizzes, "part")
-  let byPartAndSection: Record<string, Dictionary<CourseListQuiz[]>> = {}
+  let byPartAndSection: Record<string, Dictionary<Quizv2[]>> = {}
   for (let [part, quizzes] of Object.entries(byPart)) {
     byPartAndSection[part] = groupBy(quizzes, "section")
   }
   return (
     <>
-      <Typography variant="h3">Edit {name}</Typography>
+      <Typography variant="h3">Edit {id}</Typography>
       {Object.entries(byPartAndSection).map(([part, section]) => (
         <div key={part}>
           <Typography variant="h4">Part {part}</Typography>
@@ -98,7 +103,7 @@ const SectionOfPart = ({ section, quizzes }: section) => {
 }
 
 const Quiz = ({ quiz }: quiz) => {
-  const title = get(quiz, "texts[0].title") || quiz.id
+  const title = quiz.title
   return (
     <Link
       href={{ pathname: "/quizzes/[id]/edit", query: { id: `${quiz.id}` } }}
