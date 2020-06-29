@@ -1,11 +1,9 @@
 import * as React from "react"
-import { AppBar, Toolbar, Typography, Button } from "@material-ui/core"
+import { AppBar, Toolbar, Button } from "@material-ui/core"
 import styled from "styled-components"
 import LoginStateContext from "../contexts/LoginStateContext"
 import { useContext } from "react"
 import { unauthenticate } from "../services/tmcApi"
-import Link from "next/link"
-
 interface TemplateProps {
   children?: React.ReactNode
 }
@@ -35,11 +33,6 @@ const TopBar = () => {
   return (
     <StyledAppBar position="sticky">
       <Toolbar>
-        <Link href="/">
-          <FrontPageLink>
-            <Typography variant="h6">Quizzes</Typography>
-          </FrontPageLink>
-        </Link>
         <EmptySpace />
         {loggedIn && (
           <Button color="inherit" onClick={handleLogout}>

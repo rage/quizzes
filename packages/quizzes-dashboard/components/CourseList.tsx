@@ -1,10 +1,9 @@
-import React from "react"
+import React, { useContext } from "react"
 import styled from "styled-components"
 import { Card, CardContent } from "@material-ui/core"
 import Link from "next/link"
 import Skeleton from "@material-ui/lab/Skeleton"
-import useSWR from "swr"
-import { fetchCourses } from "../services/quizzes"
+import { Course } from "../types/Course"
 
 const StyledCard = styled(Card)`
   margin-bottom: 1rem;
@@ -20,26 +19,33 @@ const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
 `
 
-const CourseList = () => {
-  const { data, error } = useSWR("null", fetchCourses)
+interface CourseListProps {
+  data: Course[] | undefined
+  error: any
+}
+
+const CourseList = ({ data, error }: CourseListProps) => {
   if (error) {
     return <div>Error while fetching courses.</div>
   }
   if (!data) {
     return (
       <>
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
-        <StyledSkeleton variant="rect" height={50} />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={50} animation="wave" />
       </>
     )
   }

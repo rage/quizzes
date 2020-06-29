@@ -1,8 +1,8 @@
 import axios from "axios"
-import { CourseListQuiz } from "../types/Quiz"
 import { Course } from "../types/Course"
 import { EditableQuiz } from "../types/EditQuiz"
 import { checkStore } from "./tmcApi"
+import { Quizv2 } from "../types/Quizv2"
 
 let HOST = "http://localhost:3003"
 
@@ -28,7 +28,7 @@ export const fetchCourses = async (): Promise<Course[]> => {
 
 export const fetchCourseQuizzes = async (
   courseId: string,
-): Promise<CourseListQuiz[]> => {
+): Promise<Quizv2[]> => {
   const userInfo = checkStore()
   if (userInfo) {
     const config = {

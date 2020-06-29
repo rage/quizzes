@@ -75,10 +75,10 @@ const StyledTextField = styled(TextField)`
 const BasicInformation = () => {
   const dispatch = useDispatch()
 
+  const quizId = useTypedSelector(state => state.editor.quizId)
+
   const quiz = useTypedSelector(state => state.editor.quizzes)
   console.log("quiz", quiz)
-
-  const quizId = useTypedSelector(state => state.editor.quizId)
 
   const pointsGrantingPolicy = useTypedSelector(
     state => state.editor.quizzes[quizId].grantPointsPolicy,

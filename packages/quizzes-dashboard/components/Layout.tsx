@@ -5,6 +5,8 @@ import Footer from "./Footer"
 import LoginStateWrapper from "./LoginStateWrapper"
 import { LoginChecker } from "../contexts/LoginStateContext"
 import TopBar from "./TopBar"
+import { BreadCrumbs } from "../contexts/BreadCrumbContext"
+import BreadCrumb from "./BreadCrumb"
 
 interface TemplateProps {
   children?: React.ReactNode
@@ -22,10 +24,13 @@ const Template = ({ children }: TemplateProps) => {
     <LoginChecker>
       <FooterDownPusherWrapper>
         <div>
-          <TopBar />
-          <Container maxWidth="md">
-            <LoginStateWrapper>{children}</LoginStateWrapper>
-          </Container>
+          <BreadCrumbs>
+            <TopBar />
+            <Container maxWidth="md">
+              <BreadCrumb />
+              <LoginStateWrapper>{children}</LoginStateWrapper>
+            </Container>
+          </BreadCrumbs>
         </div>
         <Footer />
       </FooterDownPusherWrapper>
