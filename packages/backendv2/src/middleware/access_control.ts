@@ -1,6 +1,6 @@
 import { CustomContext } from "../types"
 import { getCurrentUserDetails } from "../services/tmc"
-import { UnauthorizedError } from "../util/error"
+import { ForbiddenError, UnauthorizedError } from "../util/error"
 
 interface AccessControlOptions {
   administator?: boolean
@@ -15,18 +15,19 @@ const accessControl = (options?: AccessControlOptions) => {
     if (options?.unrestricted) {
       return next()
     }
+    let user
     try {
-      const user = await getCurrentUserDetails(
+      user = await getCurrentUserDetails(
         ctx.headers.authorization.toLocaleLowerCase().replace("bearer ", ""),
       )
-      ctx.state.user = user
-      if (options?.administator && !user.administrator) {
-        throw new Error()
-      }
-      return next()
     } catch (error) {
       throw new UnauthorizedError("unauthorized")
     }
+    ctx.state.user = user
+    if (options?.administator && !user.administrator) {
+      throw new ForbiddenError("forbidden")
+    }
+    return next()
   }
   return accessControl
 }

@@ -10,3 +10,5 @@ class CustomError extends Error {
 export class NotFoundError extends CustomError {}
 
 export class UnauthorizedError extends CustomError {}
+
+export class ForbiddenError extends CustomError {}
