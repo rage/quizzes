@@ -24,7 +24,7 @@ const dashboard = new Router<CustomState, CustomContext>({
   })
   .get("/courses/:courseId", admin, async ctx => {
     const courseId = ctx.params.courseId
-    ctx.body = await Course.getById(courseId)
+    ctx.body = await Course.getFlattenedById(courseId)
   })
 
 export default dashboard

@@ -32,25 +32,25 @@ class Course extends Model {
     },
   }
 
-  static async getById(id: string) {
+  static async getFlattenedById(id: string) {
     const courses = await this.query()
       .withGraphJoined("texts")
       .where("id", id)
+      .limit(1)
+    const course = courses[0]
+    const texts = course.texts[0]
+    course.languageId = texts.languageId
+    course.title = texts.title
+    course.body = texts.body
+    course.abbreviation = texts.abbreviation
+    delete course.texts
+    return course
+  }
 
-    if (courses.length === 0) {
-      throw new Error()
-    } else if (courses.length === 1) {
-      const course = courses[0]
-      const texts = course.texts[0]
-      course.languageId = texts.languageId
-      course.title = texts.title
-      course.body = texts.body
-      course.abbreviation = texts.abbreviation
-      delete course.texts
-      return course
-    } else {
-      throw new Error()
-    }
+  static async getById(id: string) {
+    return await this.query()
+      .withGraphJoined("texts")
+      .where("id", id)
   }
 
   static async getAll() {
