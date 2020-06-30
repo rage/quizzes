@@ -25,6 +25,14 @@ describe("dashboard: get courses", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
         if (auth === "Bearer admin_token") {
           return [
             200,
@@ -41,6 +49,13 @@ describe("dashboard: get courses", () => {
       .get("/api/v2/dashboard/courses")
       .set("Authorization", `bearer BAD_TOKEN`)
       .expect(401, done)
+  })
+
+  test("respond with 403 if insufficient priviledge", async done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/courses")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
   })
 
   test("reply with courses on valid request", async done => {
@@ -65,6 +80,14 @@ describe("dashboard: get quizzes by course id", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
         if (auth === "Bearer admin_token") {
           return [
             200,
@@ -83,6 +106,15 @@ describe("dashboard: get quizzes by course id", () => {
       )
       .set("Authorization", `bearer BAD_TOKEN`)
       .expect(401, done)
+  })
+
+  test("respond with 403 if insufficient credentials", async done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/quizzes",
+      )
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
   })
 
   test("reply with course quizzes on valid request", async done => {
@@ -109,6 +141,14 @@ describe("dashboard: get quiz by id", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
         if (auth === "Bearer admin_token") {
           return [
             200,
@@ -125,6 +165,13 @@ describe("dashboard: get quiz by id", () => {
       .get("/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
       .set("Authorization", `bearer BAD_TOKEN`)
       .expect(401, done)
+  })
+
+  test("respond with 403 if insufficient credentials", async done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
   })
 
   test("respond with 404 if invalid quiz id", async done => {
@@ -153,6 +200,14 @@ describe("dashboard: save quiz", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
         if (auth === "Bearer admin_token") {
           return [
             200,
@@ -180,6 +235,15 @@ describe("dashboard: save quiz", () => {
       .set("Accept", "application/json")
       .send(data.newQuiz)
       .expect(401, done)
+  })
+
+  test("respond with 403 if invalid credentials", async done => {
+    request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .set("Accept", "application/json")
+      .send(data.newQuiz)
+      .expect(403, done)
   })
 
   test("save valid quiz", async done => {

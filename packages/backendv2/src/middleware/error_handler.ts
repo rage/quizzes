@@ -1,5 +1,5 @@
 import { CustomContext } from "../types"
-import { NotFoundError, UnauthorizedError } from "../util/error"
+import { ForbiddenError, NotFoundError, UnauthorizedError } from "../util/error"
 
 const errorHandler = async (ctx: CustomContext, next: () => Promise<any>) => {
   try {
@@ -11,6 +11,9 @@ const errorHandler = async (ctx: CustomContext, next: () => Promise<any>) => {
     switch (error.constructor) {
       case UnauthorizedError:
         ctx.status = 401
+        break
+      case ForbiddenError:
+        ctx.status = 403
         break
       case NotFoundError:
         ctx.status = 404
