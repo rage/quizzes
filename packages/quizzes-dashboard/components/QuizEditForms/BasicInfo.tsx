@@ -1,4 +1,10 @@
 import React from "react"
+import "date-fns"
+import DateFnsUtils from "@date-io/date-fns"
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from "@material-ui/pickers"
 import { Typography, Card, TextField, MenuItem } from "@material-ui/core"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -9,6 +15,7 @@ import {
   editedQuizzesNumberOfTries,
   editedQuizzesPointsToGain,
   editedQuizzesPointsGrantingPolicy,
+  editedQuizzesDeadline,
 } from "../../store/editor/quiz/quizActions"
 import DebugDialog from "../DebugDialog"
 import { useTypedSelector } from "../../store/store"
@@ -100,6 +107,12 @@ const BasicInformation = () => {
   )
   const title = useTypedSelector(state => state.editor.quizzes[quizId].title)
 
+  const handleDateChange = (date: Date | null) => {
+    if (date) {
+      dispatch(editedQuizzesDeadline(date, quizId))
+    }
+  }
+
   return (
     <>
       <InfoCard>
@@ -110,16 +123,6 @@ const BasicInformation = () => {
           <Typography variant="h3">Quiz Information</Typography>
         </InfoHeader>
         <InfoContainer>
-          <Typography>
-            Created at: {new Date(createdAt).toDateString()}
-          </Typography>
-        </InfoContainer>
-        <InfoContainer>
-          <Typography>
-            Last updated at: {new Date(updatedAt).toDateString()}
-          </Typography>
-        </InfoContainer>
-        <InfoContainer>
           <Typography>Quiz title:</Typography>
           <StyledTextField
             multiline
@@ -128,6 +131,16 @@ const BasicInformation = () => {
               dispatch(editedQuizTitle(event.target.value, quizId))
             }
           />
+        </InfoContainer>
+        <InfoContainer>
+          <Typography>
+            Created at: {new Date(createdAt).toDateString()}
+          </Typography>
+        </InfoContainer>
+        <InfoContainer>
+          <Typography>
+            Last updated at: {new Date(updatedAt).toDateString()}
+          </Typography>
         </InfoContainer>
         <InfoContainer>
           <Typography variant="overline">Number of tries allowed:</Typography>
@@ -172,10 +185,24 @@ const BasicInformation = () => {
             </MenuItem>
           </TextField>
         </InfoContainer>
-        <InfoContainer>
-          <Typography variant="overline">Deadline:</Typography>
-          <TextField disabled={true} defaultValue={deadline}></TextField>
-        </InfoContainer>
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <InfoContainer>
+            <Typography variant="overline">Deadline:</Typography>
+            <KeyboardDatePicker
+              disableToolbar
+              variant="dialog"
+              format="dd/MM/yyyy"
+              margin="normal"
+              id="date-picker-inline"
+              label="Deadline"
+              value={deadline}
+              onChange={date => dispatch(editedQuizzesDeadline(date, quizId))}
+              KeyboardButtonProps={{
+                "aria-label": "change deadline",
+              }}
+            />
+          </InfoContainer>
+        </MuiPickersUtilsProvider>
         <InfoContainer>
           <DebugDialog editable={true} />
         </InfoContainer>

@@ -2,8 +2,10 @@ import React, { useState } from "react"
 import { Button, Dialog, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import EditableDebugField from "./EditableDebugField"
-import { Item, Quiz } from "../types/NormalizedQuiz"
+import { Item } from "../types/NormalizedQuiz"
 import { useTypedSelector } from "../store/store"
+import { normalizedQuiz, items } from "../schemas"
+import { denormalize } from "normalizr"
 
 const DialogTitleContainer = styled.div`
   display: flex;
@@ -33,9 +35,9 @@ interface DebugDialogProps {
 }
 
 const DebugDialog = ({ passedData, editable }: DebugDialogProps) => {
-  let data: { [quizId: string]: Quiz } | Item = useTypedSelector(
-    state => state.editor.quizzes,
-  )
+  let data: any | Item = useTypedSelector(state => state.editor)
+  const quizId = useTypedSelector(state => state.editor.quizId)
+  data = denormalize(quizId, normalizedQuiz, data)
   if (passedData) {
     data = passedData
   }

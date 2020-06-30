@@ -5,6 +5,7 @@ import {
   editedQuizzesNumberOfTries,
   editedQuizzesPointsToGain,
   editedQuizzesPointsGrantingPolicy,
+  editedQuizzesDeadline,
 } from "./quizActions"
 import { initializedEditor } from "../editorActions"
 
@@ -37,6 +38,12 @@ export const quizReducer = createReducer<{ [quizId: string]: Quiz }, action>({})
   .handleAction(editedQuizzesPointsGrantingPolicy, (state, action) => {
     let newState = state
     newState[action.payload.id].grantPointsPolicy = action.payload.policy
+    return newState
+  })
+
+  .handleAction(editedQuizzesDeadline, (state, action) => {
+    let newState = state
+    newState[action.payload.id].deadline = action.payload.deadline
     return newState
   })
 
