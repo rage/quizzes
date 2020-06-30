@@ -22,5 +22,9 @@ const dashboard = new Router<CustomState, CustomContext>({
   .get("/courses", admin, async ctx => {
     ctx.body = await Course.getAll()
   })
+  .get("/courses/:courseId", admin, async ctx => {
+    const courseId = ctx.params.courseId
+    ctx.body = await Course.getById(courseId)
+  })
 
 export default dashboard

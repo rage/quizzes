@@ -63,7 +63,8 @@ const ShowCoursePage = ({ router }: any) => {
       </>
     )
   }
-  const quizzes = data
+  const quizzes = data.quizzes
+  const course = data.course
   const byPart = groupBy(quizzes, "part")
   let byPartAndSection: Record<string, Dictionary<Quizv2[]>> = {}
   for (let [part, quizzes] of Object.entries(byPart)) {
@@ -71,7 +72,7 @@ const ShowCoursePage = ({ router }: any) => {
   }
   return (
     <>
-      <Typography variant="h3">Edit {id}</Typography>
+      <Typography variant="h3">Edit {course.title}</Typography>
       {Object.entries(byPartAndSection).map(([part, section]) => (
         <div key={part}>
           <Typography variant="h4">Part {part}</Typography>
