@@ -110,7 +110,7 @@ export default class ValidationService {
           itemStatusObject = {}
           break
         case "open":
-          const validator = new RegExp(item.validityRegex, "i")
+          const validator = new RegExp(item.validityRegex?.trim(), "i")
           itemAnswer.textData = itemAnswer.textData
             .replace(/\0/g, "")
             .replace(nonPrintingCharRegex, "")
