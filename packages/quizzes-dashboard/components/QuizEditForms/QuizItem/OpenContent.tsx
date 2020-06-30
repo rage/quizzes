@@ -1,12 +1,12 @@
 import React from "react"
-import { Item } from "../../types/NormalizedQuiz"
+import { Item } from "../../../types/NormalizedQuiz"
 import { Typography, TextField, Checkbox } from "@material-ui/core"
 import styled from "styled-components"
 import {
   editedValidityRegex,
   toggledMultiOptions,
   editedItemMessage,
-} from "../../store/editor/items/itemAction"
+} from "../../../store/editor/items/itemAction"
 import { useDispatch } from "react-redux"
 
 interface openContentProps {

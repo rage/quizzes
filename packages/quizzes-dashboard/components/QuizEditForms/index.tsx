@@ -5,9 +5,11 @@ import QuizItems from "./QuizItems"
 import BasicInfo from "./BasicInfo"
 import { useTypedSelector } from "../../store/store"
 import { Skeleton } from "@material-ui/lab"
+import DebugDialog from "../DebugDialog"
 
 const StyledId = styled(Typography)`
   margin-bottom: 1rem !important;
+  color: #333;
 `
 
 const StyledSkeleton = styled(Skeleton)`
@@ -28,9 +30,10 @@ const QuizEditForms = () => {
   }
   return (
     <>
-      <StyledId>{quizId}</StyledId>
+      <StyledId variant="subtitle1">{quizId}</StyledId>
       <BasicInfo />
       <QuizItems />
+      <DebugDialog />
     </>
   )
 }

@@ -1,9 +1,9 @@
 import React from "react"
-import { Item } from "../../types/NormalizedQuiz"
+import { Item } from "../../../types/NormalizedQuiz"
 import {
   editedScaleMinMaxValue,
   editedScaleMinMaxLabel,
-} from "../../store/editor/items/itemAction"
+} from "../../../store/editor/items/itemAction"
 import { Typography, TextField } from "@material-ui/core"
 import styled from "styled-components"
 import { useDispatch } from "react-redux"

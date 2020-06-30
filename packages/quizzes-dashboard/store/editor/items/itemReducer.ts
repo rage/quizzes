@@ -8,8 +8,11 @@ import {
   editedValidityRegex,
   toggledMultiOptions,
   editedItemMessage,
+  editedItemMaxWords,
+  editedItemMinWords,
 } from "./itemAction"
 import { initializedEditor } from "../editorActions"
+import produce from "immer"
 
 export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
   .handleAction(
@@ -18,58 +21,62 @@ export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
   )
 
   .handleAction(editedQuizItemBody, (state, action) => {
-    let newState = state
-    newState[action.payload.id].body = action.payload.body
-    return newState
+    return produce(state, draftState => {
+      draftState[action.payload.id].body = action.payload.body
+    })
   })
 
   .handleAction(editedQuizItemTitle, (state, action) => {
-    let newState = state
-    newState[action.payload.id].title = action.payload.title
-    return newState
+    return produce(state, draftState => {
+      draftState[action.payload.id].title = action.payload.title
+    })
   })
 
   .handleAction(editedScaleMinMaxValue, (state, action) => {
-    let newState = state
-    if (action.payload.max) {
-      newState[action.payload.itemId].maxValue = action.payload.newValue
-    } else {
-      newState[action.payload.itemId].minValue = action.payload.newValue
-    }
-    return newState
-  })
-
-  .handleAction(editedScaleMinMaxLabel, (state, action) => {
-    let newState = state
-    if (action.payload.max) {
-      newState[action.payload.itemId].maxWords = action.payload.newLabel
-    } else {
-      newState[action.payload.itemId].minWords = action.payload.newLabel
-    }
-    return newState
+    return produce(state, draftState => {
+      if (action.payload.max) {
+        draftState[action.payload.itemId].maxValue = action.payload.newValue
+      } else {
+        draftState[action.payload.itemId].minValue = action.payload.newValue
+      }
+    })
   })
 
   .handleAction(editedValidityRegex, (state, action) => {
-    let newState = state
-    newState[action.payload.itemId].validityRegex = action.payload.newRegex
-    return newState
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].validityRegex = action.payload.newRegex
+    })
   })
 
   .handleAction(toggledMultiOptions, (state, action) => {
-    let newState = state
-    newState[action.payload.itemId].multi = !newState[action.payload.itemId]
-      .multi
-    return newState
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].multi = !state[action.payload.itemId]
+        .multi
+    })
   })
 
   .handleAction(editedItemMessage, (state, action) => {
-    let newState = state
-    if (action.payload.success) {
-      newState[action.payload.itemId].successMessage = action.payload.newMessage
-    } else {
-      newState[action.payload.itemId].failureMessage = action.payload.newMessage
-    }
-    return newState
+    return produce(state, draftState => {
+      if (action.payload.success) {
+        draftState[action.payload.itemId].successMessage =
+          action.payload.newMessage
+      } else {
+        draftState[action.payload.itemId].failureMessage =
+          action.payload.newMessage
+      }
+    })
+  })
+
+  .handleAction(editedItemMaxWords, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].maxWords = action.payload.maxWords
+    })
+  })
+
+  .handleAction(editedItemMinWords, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].maxWords = action.payload.minWords
+    })
   })
 
 export default itemReducer

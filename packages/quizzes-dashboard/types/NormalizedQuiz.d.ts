@@ -45,10 +45,12 @@ export interface Item {
   multi: boolean
   createdAt: Date
   updatedAt: Date
-  minWords: string | null
-  maxWords: string | null
+  minWords: number | null
+  maxWords: number | null
   maxValue: number | null
   minValue: number | null
+  maxLabel: string | null
+  minLabel: string | null
   usesSharedOptionFeedbackMessage: boolean
   options: string[]
   title: string

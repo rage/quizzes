@@ -51,3 +51,19 @@ export const editedItemMessage = createAction(
     success: success,
   }),
 )<{ itemId: string; newMessage: string; success: boolean }>()
+
+export const editedItemMaxWords = createAction(
+  "EDITED_ITEM_MAX_WORDS",
+  (itemId: string, maxWords: number) => ({
+    itemId: itemId,
+    maxWords: maxWords,
+  }),
+)<{ itemId: string; maxWords: number }>()
+
+export const editedItemMinWords = createAction(
+  "EDITED_ITEM_MIN_WORDS",
+  (itemId: string, minWords: number) => ({
+    itemId: itemId,
+    minWords: minWords,
+  }),
+)<{ itemId: string; minWords: number }>()
