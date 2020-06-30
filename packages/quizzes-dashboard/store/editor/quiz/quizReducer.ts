@@ -5,8 +5,10 @@ import {
   editedQuizzesNumberOfTries,
   editedQuizzesPointsToGain,
   editedQuizzesPointsGrantingPolicy,
+  editedQuizzesDeadline,
 } from "./quizActions"
 import { initializedEditor } from "../editorActions"
+import produce from "immer"
 
 export const quizReducer = createReducer<{ [quizId: string]: Quiz }, action>({})
   .handleAction(
@@ -14,30 +16,34 @@ export const quizReducer = createReducer<{ [quizId: string]: Quiz }, action>({})
     (_quizzes, action) => action.payload.quiz.quizzes,
   )
 
-  .handleAction(editedQuizTitle, (quizzes, action) => {
-    console.log(quizzes)
-    console.log(action)
-    let newState = quizzes
-    newState[action.payload.id].title = action.payload.title
-    return newState
+  .handleAction(editedQuizTitle, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.id].title = action.payload.title
+    })
   })
 
   .handleAction(editedQuizzesNumberOfTries, (state, action) => {
-    let newState = state
-    newState[action.payload.id].tries = action.payload.numberOfTries
-    return newState
+    return produce(state, draftState => {
+      draftState[action.payload.id].tries = action.payload.numberOfTries
+    })
   })
 
   .handleAction(editedQuizzesPointsToGain, (state, action) => {
-    let newState = state
-    newState[action.payload.id].points = action.payload.pointsToGain
-    return newState
+    return produce(state, draftState => {
+      draftState[action.payload.id].points = action.payload.pointsToGain
+    })
   })
 
   .handleAction(editedQuizzesPointsGrantingPolicy, (state, action) => {
-    let newState = state
-    newState[action.payload.id].grantPointsPolicy = action.payload.policy
-    return newState
+    return produce(state, draftState => {
+      draftState[action.payload.id].grantPointsPolicy = action.payload.policy
+    })
+  })
+
+  .handleAction(editedQuizzesDeadline, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.id].deadline = action.payload.deadline
+    })
   })
 
 export default quizReducer

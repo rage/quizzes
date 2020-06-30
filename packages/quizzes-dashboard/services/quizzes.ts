@@ -26,17 +26,31 @@ export const fetchCourses = async (): Promise<Course[]> => {
   return []
 }
 
-export const fetchCourseQuizzes = async (
-  courseId: string,
-): Promise<Quizv2[]> => {
+export const fetchCourseById = async (id: string): Promise<Course> => {
   const userInfo = checkStore()
   if (userInfo) {
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
-    return (await api.get(`/courses/${courseId}/quizzes`, config)).data
+    return (await api.get(`/courses/${id}`, config)).data
   }
-  return []
+  throw new Error()
+}
+
+export const fetchCourseQuizzes = async (
+  courseId: string,
+): Promise<{ course: Course; quizzes: Quizv2[] }> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const quizzes = (await api.get(`/courses/${courseId}/quizzes`, config)).data
+    const course = (await api.get(`/courses/${courseId}`, config)).data
+
+    return { course: course, quizzes: quizzes }
+  }
+  throw new Error()
 }
 
 export const fetchQuiz = async (id: string): Promise<EditableQuiz> => {

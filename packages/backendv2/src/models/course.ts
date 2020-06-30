@@ -32,6 +32,21 @@ class Course extends Model {
     },
   }
 
+  static async getFlattenedById(id: string) {
+    const courses = await this.query()
+      .withGraphJoined("texts")
+      .where("id", id)
+      .limit(1)
+    const course = courses[0]
+    const texts = course.texts[0]
+    course.languageId = texts.languageId
+    course.title = texts.title
+    course.body = texts.body
+    course.abbreviation = texts.abbreviation
+    delete course.texts
+    return course
+  }
+
   static async getById(id: string) {
     return await this.query()
       .withGraphJoined("texts")

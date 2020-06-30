@@ -1,15 +1,15 @@
 import React, { useState } from "react"
-import { Item, Option } from "../../types/NormalizedQuiz"
+import { Item, Option } from "../../../types/NormalizedQuiz"
 import styled from "styled-components"
 import { Button, Typography, TextField } from "@material-ui/core"
 import {
   editedOptionTitle,
   editedOptionCorrectnes,
-} from "../../store/editor/options/optionActions"
+} from "../../../store/editor/options/optionActions"
 import { useDispatch } from "react-redux"
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useTypedSelector } from "../../store/store"
+import { useTypedSelector } from "../../../store/store"
 
 const QuizContent = styled.div`
   padding: 1rem;

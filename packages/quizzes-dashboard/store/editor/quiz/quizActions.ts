@@ -25,3 +25,11 @@ export const editedQuizzesPointsGrantingPolicy = createAction(
   "EDITED_QUIZZES_POINTS_GRANTING_POLICY",
   (policy: string, quizId: string) => ({ policy: policy, id: quizId }),
 )<{ policy: string; id: string }>()
+
+export const editedQuizzesDeadline = createAction(
+  "EDITED_QUIZZES_DEADLINE",
+  (deadline: Date | null, quizId: string) => ({
+    deadline: deadline,
+    id: quizId,
+  }),
+)<{ deadline: Date | null; id: string }>()

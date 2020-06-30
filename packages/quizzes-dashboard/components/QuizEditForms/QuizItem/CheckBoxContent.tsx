@@ -1,5 +1,5 @@
 import React from "react"
-import { Item } from "../../types/NormalizedQuiz"
+import { Item } from "../../../types/NormalizedQuiz"
 import styled from "styled-components"
 import { Typography } from "@material-ui/core"
 
