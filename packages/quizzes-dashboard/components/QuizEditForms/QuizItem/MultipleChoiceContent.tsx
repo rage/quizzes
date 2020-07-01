@@ -65,6 +65,7 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
       ))}
       <ItemInfo>
         <TextField
+          multiline
           label="Success message"
           value={item.successMessage}
           fullWidth
@@ -76,6 +77,7 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
       </ItemInfo>
       <ItemInfo>
         <TextField
+          multiline
           label="Failure message"
           value={item.failureMessage}
           fullWidth

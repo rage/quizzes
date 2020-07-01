@@ -26,7 +26,10 @@ const IconWrapper = styled.div`
   }
 `
 
-const QuizItemContainer = styled.div``
+const QuizItemContainer = styled.div`
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+`
 
 const StyledId = styled(Typography)`
   margin-bottom: 1rem !important;
