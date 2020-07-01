@@ -43,14 +43,21 @@ export const toggledMultiOptions = createAction(
   }),
 )<{ itemId: string }>()
 
-export const editedItemMessage = createAction(
-  "EDITED_ITEM_MESSAGE",
-  (itemId: string, newMessage: string, success: boolean) => ({
+export const editedItemSuccessMessage = createAction(
+  "EDITED_ITEM_SUCCESS_MESSAGE",
+  (itemId: string, newMessage: string) => ({
     itemId: itemId,
     newMessage: newMessage,
-    success: success,
   }),
-)<{ itemId: string; newMessage: string; success: boolean }>()
+)<{ itemId: string; newMessage: string }>()
+
+export const editedItemFailureMessage = createAction(
+  "EDITED_ITEM_FAILURE_MESSAGE",
+  (itemId: string, newMessage: string) => ({
+    itemId: itemId,
+    newMessage: newMessage,
+  }),
+)<{ itemId: string; newMessage: string }>()
 
 export const editedItemMaxWords = createAction(
   "EDITED_ITEM_MAX_WORDS",

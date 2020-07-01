@@ -5,7 +5,6 @@ import styled from "styled-components"
 import {
   editedValidityRegex,
   toggledMultiOptions,
-  editedItemMessage,
 } from "../../../store/editor/items/itemAction"
 import { useDispatch } from "react-redux"
 
@@ -44,23 +43,13 @@ const OpenContent = ({ item }: openContentProps) => {
       <Container>
         <Typography variant="h6">
           Success message:
-          <TextField
-            defaultValue={item.successMessage}
-            onChange={event =>
-              dispatch(editedItemMessage(item.id, event.target.value, true))
-            }
-          />
+          <TextField defaultValue={item.successMessage} />
         </Typography>
       </Container>
       <Container>
         <Typography variant="h6">
           Failure message:
-          <TextField
-            defaultValue={item.failureMessage}
-            onChange={event =>
-              dispatch(editedItemMessage(item.id, event.target.value, false))
-            }
-          />
+          <TextField defaultValue={item.failureMessage} />
         </Typography>
       </Container>
     </>
