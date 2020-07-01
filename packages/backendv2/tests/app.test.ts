@@ -12,6 +12,7 @@ beforeEach(async () => {
 })
 
 afterEach(async () => {
+  nock.cleanAll()
   await knexCleaner.clean(knex)
 })
 
@@ -271,6 +272,62 @@ describe("dashboard: save quiz", () => {
         const returned = response.body
         expect(returned).toStrictEqual(data.quizUpdateValidator)
       })
+      .end(done)
+  })
+})
+
+describe("widget: save quiz answer", () => {
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer 1234") {
+          return [
+            200,
+            {
+              id: 1234,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer 4321") {
+          return [
+            200,
+            {
+              id: 4321,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("no answer past deadline", async done => {
+    request(app.callback())
+      .post("/api/v2/widget/answer")
+      .set("Authorization", `bearer 1234`)
+      .set("Accept", "application/json")
+      .send({
+        quizId: "b03f05d3-ec14-47f4-9352-0be6a53b4a14",
+      })
+      .expect(500)
+      .expect(response =>
+        expect(response.body.message).toMatch("no submission past deadline"),
+      )
+      .end(done)
+  })
+
+  test("no answers exceeding number of tries", async done => {
+    request(app.callback())
+      .post("/api/v2/widget/answer")
+      .set("Authorization", `bearer 4321`)
+      .set("Accept", "application/json")
+      .send({
+        quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+      })
+      .expect(500)
+      .expect(response =>
+        expect(response.body.message).toMatch("no tries left"),
+      )
       .end(done)
   })
 })

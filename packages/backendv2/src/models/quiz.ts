@@ -4,8 +4,13 @@ import QuizTranslation from "./quiz_translation"
 import PeerReviewCollection from "./peer_review_collection"
 import Course from "./course"
 import { NotFoundError } from "../util/error"
+import QuizAnswer from "./quiz_answer"
+import UserQuizState from "./user_quiz_state"
 
 export class Quiz extends Model {
+  triesLimited!: boolean
+  tries!: number
+  deadline!: Date
   texts!: QuizTranslation[]
   items!: QuizItem[]
   peerReviews!: PeerReviewCollection[]
@@ -48,6 +53,22 @@ export class Quiz extends Model {
       join: {
         from: "quiz.course_id",
         to: "course.id",
+      },
+    },
+    answers: {
+      relation: Model.HasManyRelation,
+      modelClass: QuizAnswer,
+      join: {
+        from: "quiz.id",
+        to: "quiz_answer.quiz_id",
+      },
+    },
+    userQuizStates: {
+      relation: Model.HasManyRelation,
+      modelClass: UserQuizState,
+      join: {
+        from: "quiz.id",
+        to: "user_quiz_state.quiz_id",
       },
     },
   }

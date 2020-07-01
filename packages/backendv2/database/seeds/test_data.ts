@@ -106,6 +106,22 @@ export async function seed(knex: Knex): Promise<any> {
         grant_points_policy: "grant_whenever_possible",
         auto_reject: true,
       },
+      {
+        id: "b03f05d3-ec14-47f4-9352-0be6a53b4a14",
+        course_id: "51b66fc3-4da2-48aa-8eab-404370250ca3",
+        part: 1,
+        section: 1,
+        points: 1,
+        deadline: new Date(),
+        open: null,
+        excluded_from_score: false,
+        auto_confirm: true,
+        tries: 1,
+        tries_limited: true,
+        award_points_even_if_wrong: false,
+        grant_points_policy: "grant_whenever_possible",
+        auto_reject: true,
+      },
     ]),
   ])
   await knex.raw(`? ON CONFLICT (quiz_id, language_id) DO NOTHING`, [
@@ -340,4 +356,23 @@ export async function seed(knex: Knex): Promise<any> {
       ]),
     ],
   )
+  await knex.raw(`? ON CONFLICT (id) DO NOTHING`, [
+    knex("user").insert([
+      {
+        id: 1234,
+      },
+      {
+        id: 4321,
+      },
+    ]),
+  ])
+  await knex.raw(`? ON CONFLICT (user_id, quiz_id) DO NOTHING`, [
+    knex("user_quiz_state").insert([
+      {
+        user_id: 4321,
+        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        tries: 1,
+      },
+    ]),
+  ])
 }
