@@ -27,6 +27,7 @@ import {
   editedItemSuccessMessage,
   editedItemFailureMessage,
   editedQuizItemTitle,
+  editedSharedOptionsFeedbackMessage,
 } from "../../../store/editor/items/itemAction"
 
 const QuizContent = styled.div`
@@ -87,6 +88,20 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
           }
         />
       </ItemInfo>
+      <ItemInfo>
+        <TextField
+          multiline
+          label="Shared feedback message"
+          value={item.sharedOptionFeedbackMessage}
+          fullWidth
+          variant="outlined"
+          onChange={event =>
+            dispatch(
+              editedSharedOptionsFeedbackMessage(item.id, event.target.value),
+            )
+          }
+        />
+      </ItemInfo>
     </>
   )
 }
@@ -95,7 +110,7 @@ interface multipleChoiceButtonProps {
   option: Option
 }
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles(() =>
   createStyles({
     modal: {
       display: "flex",

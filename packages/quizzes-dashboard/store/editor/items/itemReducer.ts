@@ -10,6 +10,7 @@ import {
   editedItemMinWords,
   editedItemSuccessMessage,
   editedItemFailureMessage,
+  editedSharedOptionsFeedbackMessage,
 } from "./itemAction"
 import { initializedEditor } from "../editorActions"
 import produce from "immer"
@@ -78,6 +79,13 @@ export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
   .handleAction(editedItemMinWords, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.itemId].maxWords = action.payload.minWords
+    })
+  })
+
+  .handleAction(editedSharedOptionsFeedbackMessage, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].sharedOptionFeedbackMessage =
+        action.payload.newMessage
     })
   })
 

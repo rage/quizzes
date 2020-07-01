@@ -74,3 +74,11 @@ export const editedItemMinWords = createAction(
     minWords: minWords,
   }),
 )<{ itemId: string; minWords: number }>()
+
+export const editedSharedOptionsFeedbackMessage = createAction(
+  "EDITED_SHARED_OPTION_MESSAGE",
+  (itemId: string, newMessage: string) => ({
+    itemId: itemId,
+    newMessage: newMessage,
+  }),
+)<{ itemId: string; newMessage: string }>()
