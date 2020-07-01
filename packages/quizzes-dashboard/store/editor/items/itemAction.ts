@@ -38,10 +38,11 @@ export const editedValidityRegex = createAction(
 
 export const toggledMultiOptions = createAction(
   "TOGGLED_MULTI_OPTIONS",
-  (itemId: string) => ({
+  (itemId: string, checked: boolean) => ({
     itemId: itemId,
+    checked: checked,
   }),
-)<{ itemId: string }>()
+)<{ itemId: string; checked: boolean }>()
 
 export const editedItemSuccessMessage = createAction(
   "EDITED_ITEM_SUCCESS_MESSAGE",
