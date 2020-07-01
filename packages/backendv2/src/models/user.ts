@@ -3,6 +3,8 @@ import QuizAnswer from "./quiz_answer"
 import UserQuizState from "./user_quiz_state"
 
 class User extends Model {
+  id!: number
+
   static get tableName() {
     return "user"
   }

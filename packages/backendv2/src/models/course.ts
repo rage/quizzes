@@ -33,22 +33,28 @@ class Course extends Model {
   }
 
   static async getById(id: string) {
-    return await this.query()
-      .withGraphJoined("texts")
-      .where("id", id)
+    return this.moveTextsToParent(
+      (
+        await this.query()
+          .withGraphJoined("texts")
+          .where("id", id)
+      )[0],
+    )
   }
 
   static async getAll() {
     const courses = await this.query().withGraphJoined("texts")
-    return courses.map(course => {
-      const text = course.texts[0]
-      course.languageId = text.languageId
-      course.title = text.title
-      course.body = text.body
-      course.abbreviation = text.abbreviation
-      delete course.texts
-      return course
-    })
+    return courses.map(course => this.moveTextsToParent(course))
+  }
+
+  private static moveTextsToParent(course: any) {
+    const text = course.texts[0]
+    course.languageId = text.languageId
+    course.title = text.title
+    course.body = text.body
+    course.abbreviation = text.abbreviation
+    delete course.texts
+    return course
   }
 }
 

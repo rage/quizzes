@@ -11,6 +11,7 @@ export class Quiz extends Model {
   triesLimited!: boolean
   tries!: number
   deadline!: Date
+  points!: number
   texts!: QuizTranslation[]
   items!: QuizItem[]
   peerReviews!: PeerReviewCollection[]
@@ -81,10 +82,10 @@ export class Quiz extends Model {
     }
   }
 
-  static async saveQuiz(data: any) {
+  static async save(data: any) {
     const quiz = data
-    const course = (await Course.getById(quiz.courseId))[0]
-    const languageId = course.texts[0].languageId
+    const course = await Course.getById(quiz.courseId)
+    const languageId = course.languageId
     quiz.texts = [
       {
         quizId: quiz.id,

@@ -3,7 +3,11 @@ import Quiz from "./quiz"
 import User from "./user"
 
 class UserQuizState extends Model {
+  userId!: number
+  quizId!: string
   tries!: number
+  status!: "open" | "locked"
+  pointsAwarded!: number
 
   static get tableName() {
     return "user_quiz_state"
@@ -37,6 +41,13 @@ class UserQuizState extends Model {
     quizId: string,
   ): Promise<UserQuizState> {
     return await this.query().findById([userId, quizId])
+  }
+
+  public static async save(
+    userQuizState: UserQuizState,
+    trx: any,
+  ): Promise<UserQuizState> {
+    return await this.query(trx).insertGraphAndFetch(userQuizState)
   }
 }
 

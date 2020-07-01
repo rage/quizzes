@@ -25,7 +25,7 @@ const widget = new Router<CustomState, CustomContext>({
   .post("/answer", accessControl(), async ctx => {
     const user = ctx.state.user
     const answer = ctx.request.body
-    ctx.body = await QuizAnswer.saveQuizAnswer(user, answer)
+    ctx.body = await QuizAnswer.save(user, answer)
   })
 
 export default widget

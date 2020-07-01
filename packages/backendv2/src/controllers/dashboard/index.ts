@@ -9,7 +9,7 @@ const dashboard = new Router<CustomState, CustomContext>({
   prefix: "/dashboard",
 })
   .post("/quizzes", admin, async ctx => {
-    ctx.body = await Quiz.saveQuiz(ctx.request.body)
+    ctx.body = await Quiz.save(ctx.request.body)
   })
   .get("/quizzes/:quizId", admin, async ctx => {
     const quizId = ctx.params.quizId

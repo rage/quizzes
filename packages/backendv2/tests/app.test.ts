@@ -330,4 +330,23 @@ describe("widget: save quiz answer", () => {
       )
       .end(done)
   })
+
+  test("save", async done => {
+    request(app.callback())
+      .post("/api/v2/widget/answer")
+      .set("Authorization", `bearer 1234`)
+      .set("Accept", "application/json")
+      .send({
+        quizId: "2b8f05ac-2a47-436e-8675-35bfe9a5c0ac",
+        itemAnswers: [
+          {
+            quizItemId: "4a55eb54-6a9c-4245-843c-0577f3eafd9e",
+            textData: "koira",
+          },
+        ],
+      })
+      .expect(200)
+      .expect(response => console.log(response.body))
+      .end(done)
+  })
 })
