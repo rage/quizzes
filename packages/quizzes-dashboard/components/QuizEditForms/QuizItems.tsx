@@ -30,10 +30,10 @@ const QuizItems = () => {
       </SubsectionTitleWrapper>
       {storeItems.map(item => {
         return (
-          <>
-            <QuizItem key={item.id} item={item} />{" "}
+          <div key={item.id}>
+            <QuizItem item={item} />
             <Divider variant="fullWidth" />
-          </>
+          </div>
         )
       })}
     </>
