@@ -11,6 +11,8 @@ import {
   editedItemSuccessMessage,
   editedItemFailureMessage,
   editedSharedOptionsFeedbackMessage,
+  toggledSharedOptionFeedbackMessage,
+  deletedOptionFromItem,
 } from "./itemAction"
 import { initializedEditor } from "../editorActions"
 import produce from "immer"
@@ -86,6 +88,21 @@ export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
     return produce(state, draftState => {
       draftState[action.payload.itemId].sharedOptionFeedbackMessage =
         action.payload.newMessage
+    })
+  })
+
+  .handleAction(toggledSharedOptionFeedbackMessage, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].usesSharedOptionFeedbackMessage =
+        action.payload.sharedFeedback
+    })
+  })
+
+  .handleAction(deletedOptionFromItem, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].options = draftState[
+        action.payload.itemId
+      ].options.filter(optionId => optionId !== action.payload.optionId)
     })
   })
 

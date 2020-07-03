@@ -83,3 +83,19 @@ export const editedSharedOptionsFeedbackMessage = createAction(
     newMessage: newMessage,
   }),
 )<{ itemId: string; newMessage: string }>()
+
+export const toggledSharedOptionFeedbackMessage = createAction(
+  "TOGGLED_SHARED_OPTION_MESSAGE",
+  (itemId: string, sharedFeedback: boolean) => ({
+    itemId: itemId,
+    sharedFeedback: sharedFeedback,
+  }),
+)<{ itemId: string; sharedFeedback: boolean }>()
+
+export const deletedOptionFromItem = createAction(
+  "DELETED_OPTION_FROM_ITEM",
+  (itemId: string, optionId: string) => ({
+    itemId: itemId,
+    optionId: optionId,
+  }),
+)<{ itemId: string; optionId: string }>()

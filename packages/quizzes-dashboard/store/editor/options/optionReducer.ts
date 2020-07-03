@@ -5,6 +5,7 @@ import {
   editedOptionCorrectnes,
   editedOptionSuccessMessage,
   editedOptionFailureMessage,
+  deletedOptionFromOptions,
 } from "./optionActions"
 import { initializedEditor } from "../editorActions"
 import produce from "immer"
@@ -41,6 +42,12 @@ export const optionReducer = createReducer<
     return produce(state, draftState => {
       draftState[action.payload.optionId].failureMessage =
         action.payload.newMessage
+    })
+  })
+
+  .handleAction(deletedOptionFromOptions, (state, action) => {
+    return produce(state, draftState => {
+      delete draftState[action.payload.optionId]
     })
   })
 

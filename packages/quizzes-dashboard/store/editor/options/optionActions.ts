@@ -25,9 +25,14 @@ export const editedOptionSuccessMessage = createAction(
 )<{ optionId: string; newMessage: string }>()
 
 export const editedOptionFailureMessage = createAction(
-  "EDITED_OPTION_SUCCESS_MESSAGE",
+  "EDITED_OPTION_FAILURE_MESSAGE",
   (optionId: string, newMessage: string) => ({
     optionId: optionId,
     newMessage: newMessage,
   }),
 )<{ optionId: string; newMessage: string }>()
+
+export const deletedOptionFromOptions = createAction(
+  "DELETED_OPTION",
+  (optionId: string) => ({ optionId: optionId }),
+)<{ optionId: string }>()
