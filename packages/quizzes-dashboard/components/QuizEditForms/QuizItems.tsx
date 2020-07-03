@@ -4,7 +4,7 @@ import QuizItem from "./QuizItem"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faSitemap } from "@fortawesome/free-solid-svg-icons"
-import { Typography } from "@material-ui/core"
+import { Typography, Divider } from "@material-ui/core"
 
 const SubsectionTitleWrapper = styled.div`
   display: flex;
@@ -18,7 +18,6 @@ const TitleIcon = styled(FontAwesomeIcon)`
   height: 2rem;
   margin-right: 0.25rem;
 `
-
 const QuizItems = () => {
   const storeItems = Object.values(
     useTypedSelector(state => state.editor.items),
@@ -30,7 +29,12 @@ const QuizItems = () => {
         <Typography variant="h2">Quiz items</Typography>
       </SubsectionTitleWrapper>
       {storeItems.map(item => {
-        return <QuizItem key={item.id} item={item} />
+        return (
+          <div key={item.id}>
+            <QuizItem item={item} />
+            <Divider variant="fullWidth" />
+          </div>
+        )
       })}
     </>
   )

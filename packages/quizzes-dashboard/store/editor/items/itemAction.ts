@@ -38,19 +38,27 @@ export const editedValidityRegex = createAction(
 
 export const toggledMultiOptions = createAction(
   "TOGGLED_MULTI_OPTIONS",
-  (itemId: string) => ({
+  (itemId: string, checked: boolean) => ({
     itemId: itemId,
+    checked: checked,
   }),
-)<{ itemId: string }>()
+)<{ itemId: string; checked: boolean }>()
 
-export const editedItemMessage = createAction(
-  "EDITED_ITEM_MESSAGE",
-  (itemId: string, newMessage: string, success: boolean) => ({
+export const editedItemSuccessMessage = createAction(
+  "EDITED_ITEM_SUCCESS_MESSAGE",
+  (itemId: string, newMessage: string) => ({
     itemId: itemId,
     newMessage: newMessage,
-    success: success,
   }),
-)<{ itemId: string; newMessage: string; success: boolean }>()
+)<{ itemId: string; newMessage: string }>()
+
+export const editedItemFailureMessage = createAction(
+  "EDITED_ITEM_FAILURE_MESSAGE",
+  (itemId: string, newMessage: string) => ({
+    itemId: itemId,
+    newMessage: newMessage,
+  }),
+)<{ itemId: string; newMessage: string }>()
 
 export const editedItemMaxWords = createAction(
   "EDITED_ITEM_MAX_WORDS",
@@ -67,3 +75,27 @@ export const editedItemMinWords = createAction(
     minWords: minWords,
   }),
 )<{ itemId: string; minWords: number }>()
+
+export const editedSharedOptionsFeedbackMessage = createAction(
+  "EDITED_SHARED_OPTION_MESSAGE",
+  (itemId: string, newMessage: string) => ({
+    itemId: itemId,
+    newMessage: newMessage,
+  }),
+)<{ itemId: string; newMessage: string }>()
+
+export const toggledSharedOptionFeedbackMessage = createAction(
+  "TOGGLED_SHARED_OPTION_MESSAGE",
+  (itemId: string, sharedFeedback: boolean) => ({
+    itemId: itemId,
+    sharedFeedback: sharedFeedback,
+  }),
+)<{ itemId: string; sharedFeedback: boolean }>()
+
+export const deletedOptionFromItem = createAction(
+  "DELETED_OPTION_FROM_ITEM",
+  (itemId: string, optionId: string) => ({
+    itemId: itemId,
+    optionId: optionId,
+  }),
+)<{ itemId: string; optionId: string }>()
