@@ -6,6 +6,8 @@ import {
   editedQuizzesPointsToGain,
   editedQuizzesPointsGrantingPolicy,
   editedQuizzesDeadline,
+  editedQuizzesBody,
+  editedQuizzesSubmitmessage,
 } from "./quizActions"
 import { initializedEditor } from "../editorActions"
 import produce from "immer"
@@ -43,6 +45,19 @@ export const quizReducer = createReducer<{ [quizId: string]: Quiz }, action>({})
   .handleAction(editedQuizzesDeadline, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.id].deadline = action.payload.deadline
+    })
+  })
+
+  .handleAction(editedQuizzesBody, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.quizId].body = action.payload.newBody
+    })
+  })
+
+  .handleAction(editedQuizzesSubmitmessage, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.quizId].submitMessage =
+        action.payload.newMessage
     })
   })
 

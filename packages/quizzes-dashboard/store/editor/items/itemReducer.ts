@@ -3,7 +3,6 @@ import { createReducer } from "typesafe-actions"
 import {
   editedQuizItemBody,
   editedQuizItemTitle,
-  editedScaleMinMaxValue,
   editedValidityRegex,
   toggledMultiOptions,
   editedItemMaxWords,
@@ -13,6 +12,10 @@ import {
   editedSharedOptionsFeedbackMessage,
   toggledSharedOptionFeedbackMessage,
   deletedOptionFromItem,
+  editedScaleMaxLabel,
+  editedScaleMinLabel,
+  editedScaleMaxValue,
+  editedScaleMinValue,
 } from "./itemAction"
 import { initializedEditor } from "../editorActions"
 import produce from "immer"
@@ -35,13 +38,27 @@ export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
     })
   })
 
-  .handleAction(editedScaleMinMaxValue, (state, action) => {
+  .handleAction(editedScaleMaxValue, (state, action) => {
     return produce(state, draftState => {
-      if (action.payload.max) {
-        draftState[action.payload.itemId].maxValue = action.payload.newValue
-      } else {
-        draftState[action.payload.itemId].minValue = action.payload.newValue
-      }
+      draftState[action.payload.itemId].maxValue = action.payload.newValue
+    })
+  })
+
+  .handleAction(editedScaleMinValue, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].minValue = action.payload.newValue
+    })
+  })
+
+  .handleAction(editedScaleMaxLabel, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].maxLabel = action.payload.newLabel
+    })
+  })
+
+  .handleAction(editedScaleMinLabel, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].minLabel = action.payload.newLabel
     })
   })
 
