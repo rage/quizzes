@@ -1,47 +1,54 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { fetchQuiz } from "../../../services/quizzes"
-import { EditableQuiz } from "../../../types/EditQuiz"
-import { initializedEditor } from "../../../store/edit/editActions"
+import { initializedEditor } from "../../../store/editor/editorActions"
 import { useDispatch } from "react-redux"
-import BasicInfo from "../../../components/QuizEditForms/BasicInfo"
 import Typography from "@material-ui/core/Typography"
-import styled from "styled-components"
-import QuizItem from "../../../components/QuizEditForms/QuizItem"
 import SaveButton from "../../../components/SaveButton"
+import { normalizedQuiz } from "../../../schemas"
+import { normalize } from "normalizr"
+import useSWR from "swr"
+import { withRouter } from "next/router"
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
+import QuizEditForms from "../../../components/QuizEditForms"
 
-interface ShowQuizPageProps {
-  id: string
-  quiz: EditableQuiz
-}
-
-const StyledId = styled(Typography)`
-  margin-bottom: 1rem !important;
-`
-
-const ShowQuizPage = ({ quiz, id }: ShowQuizPageProps) => {
+const EditPage = ({ router }: any) => {
+  const id = router.query.id
+  const { data, error } = useSWR(id, fetchQuiz)
   const dispatch = useDispatch()
-  dispatch(initializedEditor(quiz))
+  useEffect(() => {
+    if (!data) {
+      return
+    }
+    const quiz = data
+    const storeState = normalize(quiz, normalizedQuiz)
+    const normalizedData = {
+      quizzes: storeState.entities.quizzes ?? {},
+      items: storeState.entities.items ?? {},
+      options: storeState.entities.options ?? {},
+      result: storeState.result,
+    }
+    dispatch(initializedEditor(normalizedData))
+  }, [data])
+  useBreadcrumbs([
+    { label: "Courses", as: "/", href: "/" },
+    {
+      label: "Course",
+      as: `/courses/${data?.courseId}`,
+      href: "/courses/[id]",
+    },
+    { label: "Quiz" },
+  ])
+  if (error) {
+    return <div>Something went wrong</div>
+  }
+
   return (
     <>
       <SaveButton />
-      <Typography variant="h3">Editing quiz</Typography>
-      <StyledId>{id}</StyledId>
-      <BasicInfo />
-
-      {quiz.items.map(item => {
-        return <QuizItem key={item.id} item={item} />
-      })}
+      <Typography variant="h1">Editing quiz</Typography>
+      <QuizEditForms />
     </>
   )
 }
 
-ShowQuizPage.getInitialProps = async (ctx: any) => {
-  const id: string = ctx.query.id.toString()
-  const quiz = await fetchQuiz(id)
-  return {
-    id,
-    quiz,
-  }
-}
-
-export default ShowQuizPage
+export default withRouter(EditPage)

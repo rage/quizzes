@@ -1,4 +1,10 @@
 import React from "react"
+import "date-fns"
+import DateFnsUtils from "@date-io/date-fns"
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDatePicker,
+} from "@material-ui/pickers"
 import { Typography, Card, TextField, MenuItem } from "@material-ui/core"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -9,7 +15,8 @@ import {
   editedQuizzesNumberOfTries,
   editedQuizzesPointsToGain,
   editedQuizzesPointsGrantingPolicy,
-} from "../../store/edit/editActions"
+  editedQuizzesDeadline,
+} from "../../store/editor/quiz/quizActions"
 import DebugDialog from "../DebugDialog"
 import { useTypedSelector } from "../../store/store"
 
@@ -21,23 +28,15 @@ const InfoCard = styled(Card)`
   width: 800px;
 `
 
-const IconWrapper = styled.div`
-  font-size: 3.5rem;
-  margin: 0 1.5rem 0 0.5rem;
-  @media (max-width: 550px) {
-    text-align: center;
-  }
-`
-
-const InfoHeader = styled.div`
-  background-color: rgb(56, 163, 245);
-  color: white;
-  padding: 1rem;
+const SubsectionTitleWrapper = styled.div`
   display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  justify-content: center;
 `
 
 const InfoContainer = styled.div`
-  padding: 1rem;
+  padding: 1rem 0;
   display: flex;
 `
 
@@ -60,8 +59,9 @@ const PointsContainer = styled.div`
 `
 
 const QuizContent = styled.div`
-  padding: 1rem;
-  editedQuizzesPointsGrantingPolicy,
+  padding: 0.5rem;
+  display: flex;
+  width: 100%;
 `
 
 const StyledTextField = styled(TextField)`
@@ -72,89 +72,144 @@ const StyledTextField = styled(TextField)`
   margin-top: 0.25rem !important;
 `
 
+const TitleIcon = styled(FontAwesomeIcon)`
+  width: 2rem;
+  height: 2rem;
+  margin-right: 0.25rem;
+`
+
 const BasicInformation = () => {
   const dispatch = useDispatch()
 
+  const quizId = useTypedSelector(state => state.editor.quizId)
+
+  const quiz = useTypedSelector(state => state.editor.quizzes)
+  console.log("quiz", quiz)
+
   const pointsGrantingPolicy = useTypedSelector(
-    state => state.editor.grantPointsPolicy,
+    state => state.editor.quizzes[quizId].grantPointsPolicy,
   )
-  const numberOfTries = useTypedSelector(state => state.editor.tries)
-  const pointsToGain = useTypedSelector(state => state.editor.points)
-  const deadline = useTypedSelector(state => state.editor.deadline)
-  const texts = useTypedSelector(state => state.editor.texts)
+  const numberOfTries = useTypedSelector(
+    state => state.editor.quizzes[quizId].tries,
+  )
+  const pointsToGain = useTypedSelector(
+    state => state.editor.quizzes[quizId].points,
+  )
+  const deadline = useTypedSelector(
+    state => state.editor.quizzes[quizId].deadline,
+  )
+  const createdAt = useTypedSelector(
+    state => state.editor.quizzes[quizId].createdAt,
+  )
+  const updatedAt = useTypedSelector(
+    state => state.editor.quizzes[quizId].updatedAt,
+  )
+  const title = useTypedSelector(state => state.editor.quizzes[quizId].title)
 
   return (
     <>
-      <InfoCard>
-        <InfoHeader>
-          <IconWrapper>
-            <FontAwesomeIcon icon={faInfoCircle} />
-          </IconWrapper>
-          <Typography variant="h3">Quiz Information</Typography>
-        </InfoHeader>
+      <SubsectionTitleWrapper>
+        <TitleIcon icon={faInfoCircle} />
+        <Typography variant="h2">Quiz Information</Typography>
+      </SubsectionTitleWrapper>
+
+      <InfoContainer>
+        <TextField
+          label="Quiz Title"
+          fullWidth
+          variant="outlined"
+          defaultValue={title}
+          onChange={event =>
+            dispatch(editedQuizTitle(event.target.value, quizId))
+          }
+        />
+      </InfoContainer>
+      <InfoContainer>
+        <TextField
+          label="Number of tries allowed"
+          fullWidth
+          variant="outlined"
+          type="number"
+          defaultValue={numberOfTries}
+          onChange={event =>
+            dispatch(
+              editedQuizzesNumberOfTries(Number(event.target.value), quizId),
+            )
+          }
+        />
+      </InfoContainer>
+      <InfoContainer>
+        <TextField
+          label="Points to gain"
+          fullWidth
+          variant="outlined"
+          type="number"
+          defaultValue={pointsToGain}
+          onChange={event =>
+            dispatch(
+              editedQuizzesPointsToGain(Number(event.target.value), quizId),
+            )
+          }
+        />
+      </InfoContainer>
+      <InfoContainer>
+        <TextField
+          fullWidth
+          label="Points granting policy"
+          variant="outlined"
+          select
+          value={pointsGrantingPolicy}
+          onChange={event =>
+            dispatch(
+              editedQuizzesPointsGrantingPolicy(event.target.value, quizId),
+            )
+          }
+        >
+          <MenuItem value="grant_whenever_possible">
+            grant_whenever_possible
+          </MenuItem>
+          <MenuItem value="grant_only_when_answer_fully_correct">
+            grant_only_when_fully_complete
+          </MenuItem>
+        </TextField>
+      </InfoContainer>
+      <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <InfoContainer>
-          <Typography>
-            Created at: {new Date(texts[0].createdAt).toDateString()}
-          </Typography>
-        </InfoContainer>
-        <InfoContainer>
-          <Typography>
-            Last updated at: {new Date(texts[0].updatedAt).toDateString()}
-          </Typography>
-        </InfoContainer>
-        <InfoContainer>
-          <Typography>Quiz title:</Typography>
-          <StyledTextField
-            multiline
-            defaultValue={texts[0].title}
-            onChange={event => dispatch(editedQuizTitle(event.target.value))}
+          <KeyboardDatePicker
+            disableToolbar
+            variant="dialog"
+            inputVariant="outlined"
+            fullWidth
+            format="dd/MM/yyyy"
+            margin="none"
+            id="date-picker-inline"
+            label="Deadline"
+            value={deadline}
+            onChange={date => dispatch(editedQuizzesDeadline(date, quizId))}
+            KeyboardButtonProps={{
+              "aria-label": "change deadline",
+            }}
           />
         </InfoContainer>
-        <InfoContainer>
-          <Typography variant="overline">Number of tries allowed:</Typography>
-          <TextField
-            type="number"
-            defaultValue={numberOfTries}
-            onChange={event =>
-              dispatch(editedQuizzesNumberOfTries(Number(event.target.value)))
-            }
-          />
-        </InfoContainer>
-        <InfoContainer>
-          <Typography variant="overline">Points to gain:</Typography>
-          <TextField
-            type="number"
-            defaultValue={pointsToGain}
-            onChange={event =>
-              dispatch(editedQuizzesPointsToGain(Number(event.target.value)))
-            }
-          />
-        </InfoContainer>
-        <InfoContainer>
-          <Typography variant="overline">Points granting policy:</Typography>
-          <TextField
-            select
-            value={pointsGrantingPolicy}
-            onChange={event =>
-              dispatch(editedQuizzesPointsGrantingPolicy(event.target.value))
-            }
-          >
-            <MenuItem value="grant_whenever_possible">
-              grant_whenever_possible
-            </MenuItem>
-            <MenuItem value="grant_only_when_answer_fully_correct">
-              grant_only_when_fully_complete
-            </MenuItem>
-          </TextField>
-        </InfoContainer>
-        <InfoContainer>
-          <Typography variant="overline">Deadline:</Typography>
-          <TextField disabled={true} defaultValue={deadline}></TextField>
-        </InfoContainer>
-        <InfoContainer>
-          <DebugDialog editable={true} />
-        </InfoContainer>
-      </InfoCard>
+      </MuiPickersUtilsProvider>
+      <InfoContainer>
+        <TextField
+          multiline
+          rows={5}
+          label="Description for the whole quiz"
+          fullWidth
+          variant="outlined"
+        />
+      </InfoContainer>
+      <InfoContainer>
+        <TextField
+          multiline
+          rows={5}
+          label="Submit message"
+          fullWidth
+          variant="outlined"
+        />
+      </InfoContainer>
     </>
   )
 }

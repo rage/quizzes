@@ -13,14 +13,18 @@ const dashboard = new Router<CustomState, CustomContext>({
   })
   .get("/quizzes/:quizId", admin, async ctx => {
     const quizId = ctx.params.quizId
-    ctx.body = await Quiz.getQuizById(quizId)
+    ctx.body = await Quiz.getById(quizId)
   })
   .get("/courses/:courseId/quizzes", admin, async ctx => {
     const courseId = ctx.params.courseId
-    ctx.body = await Quiz.getQuizzesByCourseId(courseId)
+    ctx.body = await Quiz.getByCourseId(courseId)
   })
   .get("/courses", admin, async ctx => {
     ctx.body = await Course.getAll()
+  })
+  .get("/courses/:courseId", admin, async ctx => {
+    const courseId = ctx.params.courseId
+    ctx.body = await Course.getFlattenedById(courseId)
   })
 
 export default dashboard

@@ -3,6 +3,7 @@ import nock from "nock"
 import app from "../app"
 import knex from "../database/knex"
 import { UserInfo } from "../src/types"
+import data from "./data"
 
 const knexCleaner = require("knex-cleaner")
 
@@ -12,39 +13,264 @@ beforeEach(async () => {
 
 afterEach(async () => {
   await knexCleaner.clean(knex)
+})
+
+afterAll(async () => {
   await knex.destroy()
 })
 
-describe("saving quiz from dashboard", () => {
-  test("test", async done => {
+describe("dashboard: get courses", () => {
+  beforeEach(async () => {
     nock("https://tmc.mooc.fi")
       .get("/api/v8/users/current?show_user_fields=true")
-      .reply(200, {
-        administrator: true,
-      } as UserInfo)
-    const response: any = request(app.callback())
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", async done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/courses")
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 403 if insufficient priviledge", async done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/courses")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
+  })
+
+  test("reply with courses on valid request", async done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/courses")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(200)
+      .expect(response => {
+        const returned = response.body
+        expect(returned).toHaveLength(2)
+        expect(
+          returned.sort((o1: any, o2: any) => o1.id.localeCompare(o2.id)),
+        ).toStrictEqual([data.courseValidator1, data.courseValidator2])
+      })
+      .end(done)
+  })
+})
+
+describe("dashboard: get quizzes by course id", () => {
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", async done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/quizzes",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 403 if insufficient credentials", async done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/quizzes",
+      )
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
+  })
+
+  test("reply with course quizzes on valid request", async done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/quizzes",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(200)
+      .expect(response => {
+        const returned = response.body
+        expect(returned).toHaveLength(2)
+        expect(
+          returned.sort((o1: any, o2: any) => -o1.id.localeCompare(o2.id)),
+        ).toStrictEqual([data.quizValidator1, data.quizValidator2])
+      })
+      .end(done)
+  })
+})
+
+describe("dashboard: get quiz by id", () => {
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", async done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 403 if insufficient credentials", async done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
+  })
+
+  test("respond with 404 if invalid quiz id", async done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af8")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(404, done)
+  })
+
+  test("reply with quiz on valid request", async done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(200)
+      .expect(response => {
+        const returned = response.body
+        expect(returned).toStrictEqual(data.quizValidator1)
+      })
+      .end(done)
+  })
+})
+
+describe("dashboard: save quiz", () => {
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with error if required field missing", async done => {
+    request(app.callback())
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .set("Accept", "application/json")
-      .send({
-        id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
-        course_id: "21356a26-7508-4705-9bab-39b239862632",
-        part: 1,
-        section: 1,
-        points: 1,
-        deadline: null,
-        open: null,
-        excluded_from_score: false,
-        created_at: "2018-05-04 10:57:33.447000",
-        updated_at: "2020-03-09 14:57:00.477000",
-        auto_confirm: true,
-        tries: 1,
-        tries_limited: true,
-        award_points_even_if_wrong: false,
-        grant_points_policy: "grant_whenever_possible",
-        auto_reject: true,
+      .send({ ...data.newQuiz, part: null })
+      .expect(500, done)
+  })
+
+  test("respond with 401 if invalid credentials", async done => {
+    request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .set("Accept", "application/json")
+      .send(data.newQuiz)
+      .expect(401, done)
+  })
+
+  test("respond with 403 if invalid credentials", async done => {
+    request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .set("Accept", "application/json")
+      .send(data.newQuiz)
+      .expect(403, done)
+  })
+
+  test("save valid quiz", async done => {
+    request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .send(data.newQuiz)
+      .expect(200)
+      .expect(response => {
+        const returned = response.body
+        expect(returned).toStrictEqual(data.newQuizValidator)
       })
       .end(done)
-    console.log(response.status)
+  })
+
+  test("update existing quiz", async done => {
+    request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .send(data.quizUpdate)
+      .expect(200)
+      .expect(response => {
+        const returned = response.body
+        expect(returned).toStrictEqual(data.quizUpdateValidator)
+      })
+      .end(done)
   })
 })

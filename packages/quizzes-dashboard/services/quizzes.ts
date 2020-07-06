@@ -1,8 +1,8 @@
 import axios from "axios"
-import { CourseListQuiz } from "../types/Quiz"
 import { Course } from "../types/Course"
 import { EditableQuiz } from "../types/EditQuiz"
 import { checkStore } from "./tmcApi"
+import { Quizv2 } from "../types/Quizv2"
 
 let HOST = "http://localhost:3003"
 
@@ -26,17 +26,31 @@ export const fetchCourses = async (): Promise<Course[]> => {
   return []
 }
 
-export const fetchCourseQuizzes = async (
-  courseId: string,
-): Promise<CourseListQuiz[]> => {
+export const fetchCourseById = async (id: string): Promise<Course> => {
   const userInfo = checkStore()
   if (userInfo) {
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
-    return (await api.get(`/courses/${courseId}/quizzes`, config)).data
+    return (await api.get(`/courses/${id}`, config)).data
   }
-  return []
+  throw new Error()
+}
+
+export const fetchCourseQuizzes = async (
+  courseId: string,
+): Promise<{ course: Course; quizzes: Quizv2[] }> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const quizzes = (await api.get(`/courses/${courseId}/quizzes`, config)).data
+    const course = (await api.get(`/courses/${courseId}`, config)).data
+
+    return { course: course, quizzes: quizzes }
+  }
+  throw new Error()
 }
 
 export const fetchQuiz = async (id: string): Promise<EditableQuiz> => {
@@ -45,7 +59,8 @@ export const fetchQuiz = async (id: string): Promise<EditableQuiz> => {
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
-    return (await api.get(`/quizzes/${id}`, config)).data
+    const data = (await api.get(`/quizzes/${id}`, config)).data
+    return data
   }
   throw new Error()
 }
