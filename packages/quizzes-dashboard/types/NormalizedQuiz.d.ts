@@ -88,3 +88,12 @@ export interface Course {
   maxReviewSpamFlags: number
   texts: string[]
 }
+
+export interface ItemVariables {
+  scaleMin: number
+  scaleMax: number
+  validMin: boolean
+  validMax: boolean
+  array: number[]
+  advancedEditing: boolean
+}

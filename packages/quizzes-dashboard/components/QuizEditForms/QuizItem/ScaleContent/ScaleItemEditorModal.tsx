@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React from "react"
 import { Item } from "../../../../types/NormalizedQuiz"
 import styled from "styled-components"
 import { useTypedSelector } from "../../../../store/store"
@@ -17,6 +17,10 @@ import {
   editedScaleMinValue,
 } from "../../../../store/editor/items/itemAction"
 import { useDispatch } from "react-redux"
+import {
+  setScaleMin,
+  setScaleMax,
+} from "../../../../store/editor/itemVariables/itemVariableActions"
 
 const ModalContent = styled.div`
   padding: 1rem;
@@ -54,48 +58,26 @@ interface ScaleItemEditorModalProps {
 export const ScaleItemEditorModal = ({ item }: ScaleItemEditorModalProps) => {
   const dispatch = useDispatch()
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
-  const [min, setMin] = useState(storeItem.minValue ?? 0)
-  const [max, setMax] = useState(storeItem.maxValue ?? 0)
-  const [validMin, setValidMin] = useState(
-    (storeItem.minValue ?? 0) < (storeItem.maxValue ?? 0),
-  )
-  const [validMax, setValidMax] = useState(
-    (storeItem.maxValue ?? 0) > (storeItem.minValue ?? 0),
-  )
-  const [array, setArray] = useState([0])
-  useEffect(() => createArray(), [min, max])
+  const variables = useTypedSelector(state => state.editor.variables[item.id])
 
   const handleMinValueChange = (value: number) => {
-    if (value >= 0 && value < max) {
-      setValidMin(true)
-      setMin(value)
+    if (value >= 0 && value < variables.scaleMax) {
+      dispatch(setScaleMin(storeItem.id, value, true))
       dispatch(editedScaleMinValue(storeItem.id, value))
     } else {
-      setMin(value)
-      setValidMin(false)
+      dispatch(setScaleMin(storeItem.id, value, false))
     }
   }
 
   const handleMaxValueChange = (value: number) => {
-    if (value >= 0 && value > min && value < 11) {
-      setValidMax(true)
-      setMax(value)
+    if (value >= 0 && value > variables.scaleMin && value < 11) {
+      dispatch(setScaleMax(storeItem.id, value, true))
       dispatch(editedScaleMaxValue(storeItem.id, value))
     } else {
-      setMax(value)
-      setValidMax(false)
+      dispatch(setScaleMax(storeItem.id, value, false))
     }
   }
 
-  const createArray = () => {
-    if (validMin && validMax) {
-      const newArray: number[] = []
-      for (var i = 0; i < max - min + 1; i++) {
-        newArray[i] = min + i
-      }
-      setArray(newArray)
-    }
-  }
   return (
     <>
       <ModalContent>
@@ -124,11 +106,11 @@ export const ScaleItemEditorModal = ({ item }: ScaleItemEditorModalProps) => {
           }
         />
         <ValueFieldContainer
-          error={!validMin}
-          helperText={!validMin ? "invalid min value" : ""}
+          error={!variables.validMin}
+          helperText={!variables.validMin ? "invalid min value" : ""}
           type="number"
           label="Min value"
-          value={min}
+          value={variables.scaleMin}
           fullWidth
           variant="outlined"
           onChange={event => handleMinValueChange(Number(event.target.value))}
@@ -145,11 +127,11 @@ export const ScaleItemEditorModal = ({ item }: ScaleItemEditorModalProps) => {
           }
         />
         <ValueFieldContainer
-          error={!validMax}
-          helperText={!validMax ? "invalid max value" : ""}
+          error={!variables.validMax}
+          helperText={!variables.validMax ? "invalid max value" : ""}
           type="number"
           label="Max value"
-          value={max}
+          value={variables.scaleMax}
           fullWidth
           variant="outlined"
           onChange={event => handleMaxValueChange(Number(event.target.value))}
@@ -160,7 +142,7 @@ export const ScaleItemEditorModal = ({ item }: ScaleItemEditorModalProps) => {
           <Typography variant="button">{storeItem.minLabel}</Typography>
         </PreviewLabelContainer>
         <FormGroup row>
-          {array.map(item => {
+          {variables.array.map(item => {
             return (
               <div key={item}>
                 <StyledFormLabel

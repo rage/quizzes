@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React from "react"
 import { Item } from "../../../../types/NormalizedQuiz"
 import {
   editedQuizItemTitle,
@@ -21,6 +21,11 @@ import { useTypedSelector } from "../../../../store/store"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPen, faWindowClose } from "@fortawesome/free-solid-svg-icons"
 import ScaleItemEditorModal from "./ScaleItemEditorModal"
+import {
+  setScaleMin,
+  setScaleMax,
+  setAdvancedEditing,
+} from "../../../../store/editor/itemVariables/itemVariableActions"
 
 const ScaleContainer = styled.div`
   padding-top: 1rem;
@@ -88,48 +93,24 @@ interface scaleContentProps {
 }
 const ScaleContent = ({ item }: scaleContentProps) => {
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
+  const variables = useTypedSelector(state => state.editor.variables[item.id])
   const dispatch = useDispatch()
-  const [min, setMin] = useState(storeItem.minValue ?? 0)
-  const [max, setMax] = useState(storeItem.maxValue ?? 0)
-  const [validMin, setValidMin] = useState(
-    (storeItem.minValue ?? 0) < (storeItem.maxValue ?? 0),
-  )
-  const [validMax, setValidMax] = useState(
-    (storeItem.maxValue ?? 0) > (storeItem.minValue ?? 0),
-  )
-  const [array, setArray] = useState([0])
-  const [advancedEditing, setAdvancedEditing] = useState(false)
-  useEffect(() => createArray(), [min, max])
 
   const handleMinValueChange = (value: number) => {
-    if (value >= 0 && value < max) {
-      setValidMin(true)
-      setMin(value)
+    if (value >= 0 && value < variables.scaleMax) {
+      dispatch(setScaleMin(storeItem.id, value, true))
       dispatch(editedScaleMinValue(storeItem.id, value))
     } else {
-      setMin(value)
-      setValidMin(false)
+      dispatch(setScaleMin(storeItem.id, value, false))
     }
   }
 
   const handleMaxValueChange = (value: number) => {
-    if (value >= 0 && value > min && value < 11) {
-      setValidMax(true)
-      setMax(value)
+    if (value >= 0 && value > variables.scaleMin && value < 11) {
+      dispatch(setScaleMax(storeItem.id, value, true))
       dispatch(editedScaleMaxValue(storeItem.id, value))
     } else {
-      setMax(value)
-      setValidMax(false)
-    }
-  }
-
-  const createArray = () => {
-    if (validMin && validMax) {
-      const newArray: number[] = []
-      for (var i = 0; i < max - min + 1; i++) {
-        newArray[i] = min + i
-      }
-      setArray(newArray)
+      dispatch(setScaleMax(storeItem.id, value, false))
     }
   }
 
@@ -137,19 +118,21 @@ const ScaleContent = ({ item }: scaleContentProps) => {
     <>
       <EditButtonWrapper>
         <EditItemButton
-          onClick={() => setAdvancedEditing(true)}
+          onClick={() => dispatch(setAdvancedEditing(storeItem.id, true))}
           title="edit item"
         >
           <FontAwesomeIcon icon={faPen} size="2x"></FontAwesomeIcon>
         </EditItemButton>
       </EditButtonWrapper>
       <StyledModal
-        open={advancedEditing}
-        onClose={() => setAdvancedEditing(false)}
+        open={variables.advancedEditing}
+        onClose={() => dispatch(setAdvancedEditing(storeItem.id, false))}
       >
-        <Fade in={advancedEditing}>
+        <Fade in={variables.advancedEditing}>
           <AdvancedBox>
-            <CloseButton onClick={() => setAdvancedEditing(false)}>
+            <CloseButton
+              onClick={() => dispatch(setAdvancedEditing(storeItem.id, false))}
+            >
               <FontAwesomeIcon icon={faWindowClose} size="2x" />
             </CloseButton>
             <ScaleItemEditorModal item={storeItem} />
@@ -169,7 +152,7 @@ const ScaleContent = ({ item }: scaleContentProps) => {
         />
         <PreviewContainer>
           <FormGroup row>
-            {array.map(item => {
+            {variables.array.map(item => {
               return (
                 <div key={item}>
                   <StyledFormLabel
@@ -186,19 +169,19 @@ const ScaleContent = ({ item }: scaleContentProps) => {
       </ScaleContainer>
       <MinMaxContainer>
         <MinField
-          error={!validMin}
-          helperText={!validMin ? "invalid min value" : ""}
+          error={!variables.validMin}
+          helperText={!variables.validMin ? "invalid min value" : ""}
           label="min"
-          value={min}
+          value={variables.scaleMin}
           variant="outlined"
           type="number"
           onChange={event => handleMinValueChange(Number(event.target.value))}
         />
         <MaxField
-          error={!validMax}
-          helperText={!validMax ? "invalid max value" : ""}
+          error={!variables.validMax}
+          helperText={!variables.validMax ? "invalid max value" : ""}
           label="max"
-          value={max}
+          value={variables.scaleMax}
           variant="outlined"
           type="number"
           onChange={event => handleMaxValueChange(Number(event.target.value))}
