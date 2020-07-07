@@ -6,6 +6,7 @@ class QuizItemAnswer extends Model {
   quizItemId!: string
   textData!: string
   correct!: boolean
+  optionAnswers!: QuizOptionAnswer[]
 
   static get tableName() {
     return "quiz_item_answer"

@@ -1,7 +1,7 @@
 const uuid = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/
 const dateTime = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?Z?/
 
-export default {
+export const input = {
   newQuiz: {
     courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
     part: 1,
@@ -66,7 +66,114 @@ export default {
       },
     ],
   },
-  newQuizValidator: {
+  quizUpdate: {
+    id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+    courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    part: 1,
+    section: 1,
+    points: 1,
+    deadline: null,
+    open: null,
+    excludedFromScore: false,
+    autoConfirm: true,
+    tries: 1,
+    triesLimited: true,
+    awardPointsEvenIfWrong: false,
+    grantPointsPolicy: "grant_whenever_possible",
+    autoReject: true,
+    title: "quiz",
+    body: "body",
+    submitMessage: "nice one!",
+    items: [
+      {
+        type: "open",
+        order: 1,
+        usesSharedOptionFeedbackMessage: false,
+        validityRegex: "kissa",
+        title: "open",
+        body: "item",
+        successMessage: "yay!",
+        failureMessage: "boo!",
+        sharedOptionFeedbackMessage: null,
+      },
+      {
+        id: "707195a3-aafe-4c06-bf23-854e54e084db",
+        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        type: "essay",
+        order: 2,
+        usesSharedOptionFeedbackMessage: false,
+        title: "essay",
+        body: "item",
+        successMessage: "yay!",
+        failureMessage: "boo!",
+        sharedOptionFeedbackMessage: null,
+      },
+    ],
+    peerReviews: [
+      {
+        id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        title: "pr",
+        body: "do this",
+        questions: [
+          {
+            id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+            peer_review_collection_id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+            default: true,
+            type: "grade",
+            order: 1,
+            title: "question",
+            body: "answer this",
+          },
+        ],
+      },
+    ],
+  },
+  quizAnswerPastDeadline: {
+    quizId: "b03f05d3-ec14-47f4-9352-0be6a53b4a14",
+  },
+  quizAnswerAlreadyAnswered: {
+    quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+  },
+  quizAnswerOpen: {
+    quizId: "2b8f05ac-2a47-436e-8675-35bfe9a5c0ac",
+    itemAnswers: [
+      {
+        quizItemId: "4a55eb54-6a9c-4245-843c-0577f3eafd9e",
+        textData: "koira",
+      },
+      {
+        quizItemId: "8e1fe9a3-f9ca-4bba-acdb-98d5c41060d3",
+        textData: "kissa",
+      },
+    ],
+  },
+}
+
+interface QuizValidator {
+  id: string
+  courseId: string
+  part: number
+  section: number
+  points: number
+  deadline: jest.Matchers<string, RegExp>
+  open: null
+  excludedFromScore: false
+  autoConfirm: true
+  tries: 1
+  triesLimited: true
+  awardPointsEvenIfWrong: false
+  grantPointsPolicy: "grant_whenever_possible"
+  autoReject: true
+  title: "quiz"
+  body: "body"
+  submitMessage: "nice one!"
+  createdAt: jest.Matchers<string, RegExp>
+  updatedAt: jest.Matchers<string, RegExp>
+}
+
+export const validation = {
+  newQuiz: {
     id: expect.stringMatching(uuid),
     courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
     part: 1,
@@ -189,69 +296,6 @@ export default {
     title: "quiz",
     body: "body",
     submitMessage: "nice one!",
-    items: [
-      {
-        type: "open",
-        order: 1,
-        usesSharedOptionFeedbackMessage: false,
-        validityRegex: "kissa",
-        title: "open",
-        body: "item",
-        successMessage: "yay!",
-        failureMessage: "boo!",
-        sharedOptionFeedbackMessage: null,
-      },
-      {
-        id: "707195a3-aafe-4c06-bf23-854e54e084db",
-        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
-        type: "essay",
-        order: 2,
-        usesSharedOptionFeedbackMessage: false,
-        title: "essay",
-        body: "item",
-        successMessage: "yay!",
-        failureMessage: "boo!",
-        sharedOptionFeedbackMessage: null,
-      },
-    ],
-    peerReviews: [
-      {
-        id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
-        title: "pr",
-        body: "do this",
-        questions: [
-          {
-            id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
-            peer_review_collection_id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-            default: true,
-            type: "grade",
-            order: 1,
-            title: "question",
-            body: "answer this",
-          },
-        ],
-      },
-    ],
-  },
-  quizUpdateValidator: {
-    id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
-    courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
-    part: 1,
-    section: 1,
-    points: 1,
-    deadline: null,
-    open: null,
-    excludedFromScore: false,
-    autoConfirm: true,
-    tries: 1,
-    triesLimited: true,
-    awardPointsEvenIfWrong: false,
-    grantPointsPolicy: "grant_whenever_possible",
-    autoReject: true,
-    title: "quiz",
-    body: "body",
-    submitMessage: "nice one!",
     createdAt: expect.stringMatching(dateTime),
     updatedAt: expect.stringMatching(dateTime),
     items: [
@@ -324,7 +368,7 @@ export default {
       },
     ],
   },
-  quizValidator1: {
+  quiz1: {
     id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
     courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
     part: 1,
@@ -344,7 +388,7 @@ export default {
     submitMessage: "nice one!",
     createdAt: expect.stringMatching(dateTime),
     updatedAt: expect.stringMatching(dateTime),
-    items: expect.arrayContaining([
+    items: [
       {
         id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
         quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
@@ -402,7 +446,7 @@ export default {
         updatedAt: expect.stringMatching(dateTime),
         options: [],
       },
-    ]),
+    ],
     peerReviews: [
       {
         id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
@@ -429,7 +473,7 @@ export default {
       },
     ],
   },
-  quizValidator2: {
+  quiz2: {
     id: "2b8f05ac-2a47-436e-8675-35bfe9a5c0ac",
     courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
     part: 2,
@@ -449,7 +493,29 @@ export default {
     submitMessage: "nice one!",
     createdAt: expect.stringMatching(dateTime),
     updatedAt: expect.stringMatching(dateTime),
-    items: expect.arrayContaining([
+    items: [
+      {
+        id: "8e1fe9a3-f9ca-4bba-acdb-98d5c41060d3",
+        quizId: "2b8f05ac-2a47-436e-8675-35bfe9a5c0ac",
+        type: "open",
+        order: 2,
+        validityRegex: "kissa",
+        formatRegex: null,
+        multi: false,
+        minWords: null,
+        maxWords: null,
+        minValue: null,
+        maxValue: null,
+        usesSharedOptionFeedbackMessage: false,
+        options: [],
+        title: "open",
+        body: "item",
+        successMessage: "yay!",
+        failureMessage: "boo!",
+        sharedOptionFeedbackMessage: null,
+        createdAt: expect.stringMatching(dateTime),
+        updatedAt: expect.stringMatching(dateTime),
+      },
       {
         id: "4a55eb54-6a9c-4245-843c-0577f3eafd9e",
         quizId: "2b8f05ac-2a47-436e-8675-35bfe9a5c0ac",
@@ -472,10 +538,10 @@ export default {
         updatedAt: expect.stringMatching(dateTime),
         options: [],
       },
-    ]),
+    ],
     peerReviews: [],
   },
-  courseValidator1: {
+  course1: {
     id: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
     minScoreToPass: null,
     minProgressToPass: null,
@@ -493,7 +559,7 @@ export default {
     createdAt: expect.stringMatching(dateTime),
     updatedAt: expect.stringMatching(dateTime),
   },
-  courseValidator2: {
+  course2: {
     id: "51b66fc3-4da2-48aa-8eab-404370250ca3",
     minScoreToPass: null,
     minProgressToPass: null,

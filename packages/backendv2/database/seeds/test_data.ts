@@ -174,6 +174,14 @@ export async function seed(knex: Knex): Promise<any> {
         uses_shared_option_feedback_message: false,
       },
       {
+        id: "8e1fe9a3-f9ca-4bba-acdb-98d5c41060d3",
+        quiz_id: "2b8f05ac-2a47-436e-8675-35bfe9a5c0ac",
+        type: "open",
+        order: 2,
+        validity_regex: "kissa",
+        uses_shared_option_feedback_message: false,
+      },
+      {
         id: "742c0e08-c884-4117-b9a9-05650e1606f2",
         quiz_id: "2a0c2270-011e-40b2-8796-625764828034",
         type: "multiple-choice",
@@ -211,6 +219,15 @@ export async function seed(knex: Knex): Promise<any> {
       },
       {
         quiz_item_id: "4a55eb54-6a9c-4245-843c-0577f3eafd9e",
+        language_id: "xy_YZ",
+        title: "open",
+        body: "item",
+        success_message: "yay!",
+        failure_message: "boo!",
+        shared_option_feedback_message: null,
+      },
+      {
+        quiz_item_id: "8e1fe9a3-f9ca-4bba-acdb-98d5c41060d3",
         language_id: "xy_YZ",
         title: "open",
         body: "item",
@@ -372,6 +389,7 @@ export async function seed(knex: Knex): Promise<any> {
         user_id: 4321,
         quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
         tries: 1,
+        status: "locked",
       },
     ]),
   ])

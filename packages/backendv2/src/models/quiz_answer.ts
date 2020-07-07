@@ -1,14 +1,14 @@
+import Knex from "knex"
 import Model from "./base_model"
 import QuizItemAnswer from "./quiz_item_answer"
 import User from "./user"
 import { UserInfo } from "../types"
 import UserQuizState from "./user_quiz_state"
 import Quiz from "./quiz"
-import { SubmissionError } from "../util/error"
+import { BadRequestError } from "../util/error"
 import { removeNonPrintingCharacters } from "../util/tools"
 import knex from "../../database/knex"
 import Course from "./course"
-import Knex from "knex"
 
 type QuizAnswerStatus =
   | "draft"
@@ -79,6 +79,7 @@ class QuizAnswer extends Model {
     let savedQuizAnswer
     let savedUserQuizState
     try {
+      await this.markPreviousAsDeprecated(userId, quizId, trx)
       savedQuizAnswer = await this.query(trx).insertGraphAndFetch(quizAnswer)
       savedUserQuizState = await UserQuizState.query(trx).upsertGraphAndFetch(
         userQuizState,
@@ -89,7 +90,7 @@ class QuizAnswer extends Model {
       await trx.commit()
     } catch (error) {
       await trx.rollback()
-      throw new SubmissionError(error)
+      throw new BadRequestError(error)
     }
     return {
       quiz,
@@ -100,13 +101,10 @@ class QuizAnswer extends Model {
 
   private static checkIfSubmittable(quiz: Quiz, userQuizState: UserQuizState) {
     if (userQuizState.status === "locked") {
-      throw new SubmissionError("already answered")
+      throw new BadRequestError("already answered")
     }
     if (quiz.deadline && quiz.deadline < new Date()) {
-      throw new SubmissionError("no submission past deadline")
-    }
-    if (quiz.triesLimited && userQuizState.tries >= quiz.tries) {
-      throw new SubmissionError("no tries left")
+      throw new BadRequestError("no submission past deadline")
     }
   }
 
@@ -114,35 +112,51 @@ class QuizAnswer extends Model {
     const quizItemAnswers = quizAnswer.itemAnswers
     const quizItems = quiz.items
     if (!quizItemAnswers || quizItemAnswers.length != quizItems.length) {
-      throw new SubmissionError("items answers missing")
+      throw new BadRequestError("item answers missing")
     }
     for (const quizItemAnswer of quizItemAnswers) {
       const quizItem = quizItems.find(
-        item => (item.id = quizItemAnswer.quizItemId),
+        item => item.id === quizItemAnswer.quizItemId,
       )
       if (!quizItem) {
-        throw new SubmissionError("invalid quiz item id")
+        throw new BadRequestError("invalid quiz item id")
       }
 
       switch (quizItem.type) {
         case "open":
-          quizItemAnswer.textData = removeNonPrintingCharacters(
-            quizItemAnswer.textData,
-          ).replace(/\0/g, "")
-          const textData = quizItemAnswer.textData
+          const textData = removeNonPrintingCharacters(quizItemAnswer.textData)
+            .replace(/\0/g, "")
+            .trim()
           if (!textData) {
-            throw new SubmissionError("no answer provided")
+            throw new BadRequestError("no answer provided")
           }
-          const validator = new RegExp(quizItem.validityRegex.trim(), "i")
-          quizItemAnswer.correct = validator.test(textData.trim())
-            ? true
-            : false
+          const validityRegex = quizItem.validityRegex.trim()
+          const validator = new RegExp(validityRegex, "i")
+          quizItemAnswer.correct = validator.test(textData) ? true : false
           break
         case "scale":
           break
         case "essay":
           break
         case "multiple-choice":
+          const quizOptionAnswers = quizItemAnswer.optionAnswers
+          const quizOptions = quizItem.options
+          if (
+            !quizOptionAnswers ||
+            quizOptionAnswers.length != quizOptions.length
+          ) {
+            throw new BadRequestError("option answers missing")
+          }
+          const correctOptionIds = quizOptions
+            .filter(quizOption => quizOption.correct === true)
+            .map(quizOption => quizOption.id)
+          const selectedCorrectOptions = quizOptionAnswers.filter(
+            quizOptionAnswer =>
+              correctOptionIds.includes(quizOptionAnswer.quizOptionId),
+          )
+          quizItemAnswer.correct = quizItem.multi
+            ? correctOptionIds.length === selectedCorrectOptions.length
+            : selectedCorrectOptions.length > 0
           break
         case "checkbox":
           break
@@ -190,7 +204,12 @@ class QuizAnswer extends Model {
     userId: number,
     quizId: string,
     trx: Knex.Transaction,
-  ) {}
+  ) {
+    await this.query(trx)
+      .update({ status: "deprecated" })
+      .where("user_id", userId)
+      .andWhere("quiz_id", quizId)
+  }
 }
 
 export default QuizAnswer

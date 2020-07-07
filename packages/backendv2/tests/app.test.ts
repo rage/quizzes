@@ -3,7 +3,8 @@ import nock from "nock"
 import app from "../app"
 import knex from "../database/knex"
 import { UserInfo } from "../src/types"
-import data from "./data"
+import { Quiz } from "../src/models"
+import { input, validation } from "./data"
 
 const knexCleaner = require("knex-cleaner")
 
@@ -19,6 +20,47 @@ afterEach(async () => {
 afterAll(async () => {
   await knex.destroy()
 })
+
+const expectQuizToEqual = (received: Quiz, expected: any) => {
+  const receivedItems = received.items
+  const expectedItems = expected.items
+  expect(receivedItems).toHaveLength(expectedItems.length)
+  for (const expectedItem of expectedItems) {
+    expect(receivedItems).toContainEqual(expectedItem)
+  }
+  const receivedOptions = receivedItems.map(item => item.options).flat()
+  const expectedOptions = expectedItems.map((item: any) => item.options).flat()
+  expect(receivedOptions).toHaveLength(expectedOptions.length)
+  for (const expectedOption of expectedOptions) {
+    expect(receivedOptions).toContainEqual(expectedOption)
+  }
+  const receivedPeerReviews = received.peerReviews
+  const expectedPeerReviews = expected.peerReviews
+  expect(receivedPeerReviews).toHaveLength(expectedPeerReviews.length)
+  for (const expectedPeerReview of expectedPeerReviews) {
+    expect(receivedPeerReviews).toContainEqual(expectedPeerReview)
+  }
+  const receivedPeerReviewQuestions = receivedPeerReviews
+    .map(peerReview => peerReview.questions)
+    .flat()
+  const expectedPeerReviewQuestions = expectedPeerReviews
+    .map((peerReview: any) => peerReview.questions)
+    .flat()
+  expect(receivedPeerReviewQuestions).toHaveLength(
+    expectedPeerReviewQuestions.length,
+  )
+  for (const expectedPeerReviewQuestion of expectedPeerReviewQuestions) {
+    expect(receivedPeerReviewQuestions).toContainEqual(
+      expectedPeerReviewQuestion,
+    )
+  }
+  const expectedClone = { ...expected }
+  delete received.items
+  delete expectedClone.items
+  delete received.peerReviews
+  delete expectedClone.peerReviews
+  expect(received).toStrictEqual(expectedClone)
+}
 
 describe("dashboard: get courses", () => {
   beforeEach(async () => {
@@ -65,11 +107,11 @@ describe("dashboard: get courses", () => {
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(200)
       .expect(response => {
-        const returned = response.body
-        expect(returned).toHaveLength(2)
+        const received = response.body
+        expect(received).toHaveLength(2)
         expect(
-          returned.sort((o1: any, o2: any) => o1.id.localeCompare(o2.id)),
-        ).toStrictEqual([data.courseValidator1, data.courseValidator2])
+          received.sort((o1: any, o2: any) => o1.id.localeCompare(o2.id)),
+        ).toStrictEqual([validation.course1, validation.course2])
       })
       .end(done)
   })
@@ -126,11 +168,12 @@ describe("dashboard: get quizzes by course id", () => {
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(200)
       .expect(response => {
-        const returned = response.body
-        expect(returned).toHaveLength(2)
-        expect(
-          returned.sort((o1: any, o2: any) => -o1.id.localeCompare(o2.id)),
-        ).toStrictEqual([data.quizValidator1, data.quizValidator2])
+        const received = response.body.sort(
+          (o1: any, o2: any) => -o1.id.localeCompare(o2.id),
+        )
+        expect(received).toHaveLength(2)
+        expectQuizToEqual(received[0], validation.quiz1)
+        expectQuizToEqual(received[1], validation.quiz2)
       })
       .end(done)
   })
@@ -188,8 +231,8 @@ describe("dashboard: get quiz by id", () => {
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(200)
       .expect(response => {
-        const returned = response.body
-        expect(returned).toStrictEqual(data.quizValidator1)
+        const received = response.body
+        expectQuizToEqual(received, validation.quiz1)
       })
       .end(done)
   })
@@ -225,7 +268,7 @@ describe("dashboard: save quiz", () => {
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .set("Accept", "application/json")
-      .send({ ...data.newQuiz, part: null })
+      .send({ ...input.newQuiz, part: null })
       .expect(500, done)
   })
 
@@ -234,7 +277,7 @@ describe("dashboard: save quiz", () => {
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer BAD_TOKEN`)
       .set("Accept", "application/json")
-      .send(data.newQuiz)
+      .send(input.newQuiz)
       .expect(401, done)
   })
 
@@ -243,7 +286,7 @@ describe("dashboard: save quiz", () => {
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer PLEB_TOKEN`)
       .set("Accept", "application/json")
-      .send(data.newQuiz)
+      .send(input.newQuiz)
       .expect(403, done)
   })
 
@@ -252,11 +295,11 @@ describe("dashboard: save quiz", () => {
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .set("Accept", "application/json")
-      .send(data.newQuiz)
+      .send(input.newQuiz)
       .expect(200)
       .expect(response => {
-        const returned = response.body
-        expect(returned).toStrictEqual(data.newQuizValidator)
+        const received = response.body
+        expectQuizToEqual(received, validation.newQuiz)
       })
       .end(done)
   })
@@ -266,11 +309,11 @@ describe("dashboard: save quiz", () => {
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .set("Accept", "application/json")
-      .send(data.quizUpdate)
+      .send(input.quizUpdate)
       .expect(200)
       .expect(response => {
-        const returned = response.body
-        expect(returned).toStrictEqual(data.quizUpdateValidator)
+        const received = response.body
+        expectQuizToEqual(received, validation.quizUpdate)
       })
       .end(done)
   })
@@ -306,10 +349,8 @@ describe("widget: save quiz answer", () => {
       .post("/api/v2/widget/answer")
       .set("Authorization", `bearer 1234`)
       .set("Accept", "application/json")
-      .send({
-        quizId: "b03f05d3-ec14-47f4-9352-0be6a53b4a14",
-      })
-      .expect(500)
+      .send(input.quizAnswerPastDeadline)
+      .expect(400)
       .expect(response =>
         expect(response.body.message).toMatch("no submission past deadline"),
       )
@@ -321,12 +362,25 @@ describe("widget: save quiz answer", () => {
       .post("/api/v2/widget/answer")
       .set("Authorization", `bearer 4321`)
       .set("Accept", "application/json")
-      .send({
-        quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
-      })
-      .expect(500)
+      .send(input.quizAnswerAlreadyAnswered)
+      .expect(400)
       .expect(response =>
-        expect(response.body.message).toMatch("no tries left"),
+        expect(response.body.message).toMatch("already answered"),
+      )
+      .end(done)
+  })
+
+  test("no answers without item answers", async done => {
+    const quizAnswer = { ...input.quizAnswerOpen }
+    delete quizAnswer.itemAnswers
+    request(app.callback())
+      .post("/api/v2/widget/answer")
+      .set("Authorization", `bearer 4321`)
+      .set("Accept", "application/json")
+      .send(quizAnswer)
+      .expect(400)
+      .expect(response =>
+        expect(response.body.message).toMatch("item answers missing"),
       )
       .end(done)
   })
@@ -336,17 +390,9 @@ describe("widget: save quiz answer", () => {
       .post("/api/v2/widget/answer")
       .set("Authorization", `bearer 1234`)
       .set("Accept", "application/json")
-      .send({
-        quizId: "2b8f05ac-2a47-436e-8675-35bfe9a5c0ac",
-        itemAnswers: [
-          {
-            quizItemId: "4a55eb54-6a9c-4245-843c-0577f3eafd9e",
-            textData: "koira",
-          },
-        ],
-      })
+      .send(input.quizAnswerOpen)
       .expect(200)
-      .expect(response => console.log(response.body))
+      // .expect(response => console.log(response.body))
       .end(done)
   })
 })

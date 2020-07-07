@@ -17,6 +17,7 @@ class QuizItem extends Model {
   id!: string
   type!: QuizItemType
   validityRegex!: string
+  multi!: string
   texts!: QuizItemTranslation[]
   options!: QuizOption[]
   title!: string
