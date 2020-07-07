@@ -340,4 +340,11 @@ export async function seed(knex: Knex): Promise<any> {
       ]),
     ],
   )
+  await knex.raw("? ON CONFLICT (id) DO NOTHING", [
+    knex("user").insert([
+      {
+        id: 1234,
+      },
+    ]),
+  ])
 }
