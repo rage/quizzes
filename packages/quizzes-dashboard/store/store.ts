@@ -11,9 +11,11 @@ import {
   Option,
   ItemVariables,
   OptionVariables,
+  QuizVariables,
 } from "../types/NormalizedQuiz"
 import { itemVariableReducers } from "./editor/itemVariables/itemVariableReducers"
 import { optionVariableReducers } from "./editor/optionVariables/optionVariableReducers"
+import { quizVariableReducers } from "./editor/quizVariables/quizVariableReducers"
 
 //const reducer = combineReducers({ editor: editReducer2, user: userReducer })
 
@@ -24,6 +26,7 @@ const editorReducer = combineReducers({
   quizId: resultReducer,
   itemVariables: itemVariableReducers,
   optionVariables: optionVariableReducers,
+  quizVariables: quizVariableReducers,
 })
 
 const reducer = combineReducers({
@@ -40,6 +43,7 @@ interface storeState {
     quizId: string
     itemVariables: { [itemId: string]: ItemVariables }
     optionVariables: { [optionId: string]: OptionVariables }
+    quizVariables: { [quizId: string]: QuizVariables }
   }
 }
 

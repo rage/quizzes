@@ -24,7 +24,7 @@ import produce from "immer"
 export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
   .handleAction(
     initializedEditor,
-    (_state, action) => action.payload.quiz.items ?? {},
+    (state, action) => action.payload.normalizedQuiz.items,
   )
 
   .handleAction(editedQuizItemBody, (state, action) => {

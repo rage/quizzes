@@ -19,9 +19,10 @@ export const itemVariableReducers = createReducer<
   action
 >({})
   .handleAction(initializedEditor, (state, action) => {
-    console.log(state)
     return produce(state, draftState => {
-      for (const [id, item] of Object.entries(action.payload.quiz.items)) {
+      for (const [id, item] of Object.entries(
+        action.payload.normalizedQuiz.items,
+      )) {
         let array: number[] = []
         if (item.minValue && item.maxValue) {
           array = _.range(item.minValue, item.maxValue + 1)

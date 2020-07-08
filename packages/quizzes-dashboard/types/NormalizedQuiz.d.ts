@@ -1,3 +1,5 @@
+import { EditableQuiz } from "./EditQuiz"
+
 export interface action {
   type: string
   payload?: any
@@ -104,4 +106,8 @@ export interface ItemVariables {
 
 export interface OptionVariables {
   optionEditing: boolean
+}
+
+export interface QuizVariables {
+  initialState: EditableQuiz
 }

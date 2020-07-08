@@ -16,7 +16,7 @@ export const optionReducer = createReducer<
 >({})
   .handleAction(
     initializedEditor,
-    (_state, action) => action.payload.quiz.options ?? {},
+    (state, action) => action.payload.normalizedQuiz.options ?? {},
   )
 
   .handleAction(editedOptionTitle, (state, action) => {

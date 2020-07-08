@@ -10,9 +10,9 @@ export const optionVariableReducers = createReducer<
 >({})
   .handleAction(initializedEditor, (state, action) => {
     return produce(state, draftState => {
-      if (action.payload.quiz.options) {
+      if (action.payload.normalizedQuiz.options) {
         for (const [id, option] of Object.entries(
-          action.payload.quiz.options,
+          action.payload.normalizedQuiz.options,
         )) {
           draftState[id] = { optionEditing: false }
         }
