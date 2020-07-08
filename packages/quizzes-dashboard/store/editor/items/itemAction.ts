@@ -113,3 +113,10 @@ export const deletedOptionFromItem = createAction(
     optionId: optionId,
   }),
 )<{ itemId: string; optionId: string }>()
+
+export const deletedItemFromItems = createAction(
+  "DELETED_QUIZ_ITEM",
+  (itemId: string) => ({
+    itemId: itemId,
+  }),
+)<{ itemId: string }>()

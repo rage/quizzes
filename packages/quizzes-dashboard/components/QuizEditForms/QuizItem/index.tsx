@@ -10,6 +10,7 @@ import ScaleContent from "./ScaleContent"
 import { editedQuizItemTitle } from "../../../store/editor/items/itemAction"
 import { useDispatch } from "react-redux"
 import DebugDialog from "../../DebugDialog"
+import CustomFrontend from "./CustomFrontend"
 
 const QuizItemContainer = styled.div`
   margin-top: 1.5rem;
@@ -50,6 +51,9 @@ const contentBasedOnType = (type: string, item: Item) => {
     }
     case "scale": {
       return <ScaleContent item={item} />
+    }
+    case "custom-frontend-accept-data": {
+      return <CustomFrontend item={item} />
     }
     default: {
       return <h1>Hi, I'm new/unknown</h1>

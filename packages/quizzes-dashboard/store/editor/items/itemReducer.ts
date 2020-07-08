@@ -16,6 +16,7 @@ import {
   editedScaleMinLabel,
   editedScaleMaxValue,
   editedScaleMinValue,
+  deletedItemFromItems,
 } from "./itemAction"
 import { initializedEditor } from "../editorActions"
 import produce from "immer"
@@ -120,6 +121,12 @@ export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
       draftState[action.payload.itemId].options = draftState[
         action.payload.itemId
       ].options.filter(optionId => optionId !== action.payload.optionId)
+    })
+  })
+
+  .handleAction(deletedItemFromItems, (state, action) => {
+    return produce(state, draftState => {
+      delete draftState[action.payload.itemId]
     })
   })
 

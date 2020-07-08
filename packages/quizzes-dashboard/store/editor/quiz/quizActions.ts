@@ -49,3 +49,11 @@ export const editedQuizzesSubmitmessage = createAction(
     newMessage: newMessage,
   }),
 )<{ quizId: string; newMessage: string }>()
+
+export const deletedItemFromQuiz = createAction(
+  "DELETED_QUIZ_ITEMID",
+  (quizId: string, itemId: string) => ({
+    quizId: quizId,
+    itemId: itemId,
+  }),
+)<{ quizId: string; itemId: string }>()
