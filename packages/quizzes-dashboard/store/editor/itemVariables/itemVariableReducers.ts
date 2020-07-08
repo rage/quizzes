@@ -28,7 +28,6 @@ export const itemVariableReducers = createReducer<
         }
         draftState[id] = {
           advancedEditing: false,
-          optionEditing: false,
           scaleMax: item.maxValue ?? 0,
           scaleMin: item.minValue ?? 0,
           validMax: true,

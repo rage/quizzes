@@ -58,7 +58,9 @@ interface ScaleItemEditorModalProps {
 export const ScaleItemEditorModal = ({ item }: ScaleItemEditorModalProps) => {
   const dispatch = useDispatch()
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
-  const variables = useTypedSelector(state => state.editor.variables[item.id])
+  const variables = useTypedSelector(
+    state => state.editor.itemVariables[item.id],
+  )
 
   const handleMinValueChange = (value: number) => {
     if (value >= 0 && value < variables.scaleMax) {

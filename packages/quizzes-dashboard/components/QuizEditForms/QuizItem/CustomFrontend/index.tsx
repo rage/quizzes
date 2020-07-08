@@ -42,7 +42,9 @@ const CloseButton = styled(Button)`
 
 export const CustomFrontend = ({ item }: customFrontend) => {
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
-  const variables = useTypedSelector(state => state.editor.variables[item.id])
+  const variables = useTypedSelector(
+    state => state.editor.itemVariables[item.id],
+  )
   const dispatch = useDispatch()
   return (
     <>

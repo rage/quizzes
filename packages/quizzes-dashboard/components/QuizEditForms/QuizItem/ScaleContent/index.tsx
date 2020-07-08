@@ -93,7 +93,9 @@ interface scaleContentProps {
 }
 const ScaleContent = ({ item }: scaleContentProps) => {
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
-  const variables = useTypedSelector(state => state.editor.variables[item.id])
+  const variables = useTypedSelector(
+    state => state.editor.itemVariables[item.id],
+  )
   const dispatch = useDispatch()
 
   const handleMinValueChange = (value: number) => {

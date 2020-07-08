@@ -9,6 +9,7 @@ import { useTypedSelector } from "../../../../store/store"
 import { deletedOptionFromItem } from "../../../../store/editor/items/itemAction"
 import { deletedOptionFromOptions } from "../../../../store/editor/options/optionActions"
 import { useDispatch } from "react-redux"
+import { setOptionEditing } from "../../../../store/editor/optionVariables/optionVariableActions"
 
 const StyledModal = styled(Modal)`
   display: flex;
@@ -52,21 +53,28 @@ interface multipleChoiceButtonProps {
 
 const MultipleChoiceButton = ({ option }: multipleChoiceButtonProps) => {
   const storeOption = useTypedSelector(state => state.editor.options[option.id])
-  const [editOption, setEditOption] = useState(false)
+  const variables = useTypedSelector(
+    state => state.editor.optionVariables[option.id],
+  )
   const dispatch = useDispatch()
 
   return (
     <>
-      <StyledModal open={editOption} onClose={() => setEditOption(false)}>
-        <Fade in={editOption}>
+      <StyledModal
+        open={variables.optionEditing}
+        onClose={() => dispatch(setOptionEditing(storeOption.id, false))}
+      >
+        <Fade in={variables.optionEditing}>
           <StyledBox>
-            <CloseButton onClick={() => setEditOption(false)}>
+            <CloseButton
+              onClick={() => dispatch(setOptionEditing(storeOption.id, false))}
+            >
               <FontAwesomeIcon icon={faWindowClose} size="2x" />
             </CloseButton>
             <OptionEditorModalContent option={storeOption} />
             <DeleteOptionButton
               onClick={() => {
-                setEditOption(false)
+                dispatch(setOptionEditing(storeOption.id, false))
                 dispatch(
                   deletedOptionFromItem(storeOption.quizItemId, storeOption.id),
                 )
@@ -80,14 +88,17 @@ const MultipleChoiceButton = ({ option }: multipleChoiceButtonProps) => {
       </StyledModal>
       {storeOption.correct ? (
         <>
-          <CorrectButton onClick={() => setEditOption(true)} variant="outlined">
+          <CorrectButton
+            onClick={() => dispatch(setOptionEditing(storeOption.id, true))}
+            variant="outlined"
+          >
             {storeOption.title}
           </CorrectButton>
         </>
       ) : (
         <>
           <IncorrectButton
-            onClick={() => setEditOption(true)}
+            onClick={() => dispatch(setOptionEditing(storeOption.id, true))}
             variant="outlined"
           >
             {storeOption.title}
