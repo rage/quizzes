@@ -16,6 +16,8 @@ import {
   editedQuizzesPointsToGain,
   editedQuizzesPointsGrantingPolicy,
   editedQuizzesDeadline,
+  editedQuizzesBody,
+  editedQuizzesSubmitmessage,
 } from "../../store/editor/quiz/quizActions"
 import DebugDialog from "../DebugDialog"
 import { useTypedSelector } from "../../store/store"
@@ -105,6 +107,12 @@ const BasicInformation = () => {
     state => state.editor.quizzes[quizId].updatedAt,
   )
   const title = useTypedSelector(state => state.editor.quizzes[quizId].title)
+
+  const body = useTypedSelector(state => state.editor.quizzes[quizId].body)
+
+  const submitMessage = useTypedSelector(
+    state => state.editor.quizzes[quizId].submitMessage,
+  )
 
   return (
     <>
@@ -199,6 +207,10 @@ const BasicInformation = () => {
           label="Description for the whole quiz"
           fullWidth
           variant="outlined"
+          value={body}
+          onChange={event =>
+            dispatch(editedQuizzesBody(quizId, event.target.value))
+          }
         />
       </InfoContainer>
       <InfoContainer>
@@ -208,6 +220,10 @@ const BasicInformation = () => {
           label="Submit message"
           fullWidth
           variant="outlined"
+          value={submitMessage}
+          onChange={event =>
+            dispatch(editedQuizzesSubmitmessage(quizId, event.target.value))
+          }
         />
       </InfoContainer>
     </>

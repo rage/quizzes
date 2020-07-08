@@ -66,6 +66,7 @@ export const fetchQuiz = async (id: string): Promise<EditableQuiz> => {
 }
 
 export const saveQuiz = async (quiz: EditableQuiz): Promise<any> => {
+  console.log(quiz)
   const userInfo = checkStore()
   if (userInfo) {
     const config = {

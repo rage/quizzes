@@ -33,3 +33,19 @@ export const editedQuizzesDeadline = createAction(
     id: quizId,
   }),
 )<{ deadline: Date | null; id: string }>()
+
+export const editedQuizzesBody = createAction(
+  "EDITED_QUIZZES_BODY",
+  (quizId: string, newBody: string) => ({
+    quizId: quizId,
+    newBody: newBody,
+  }),
+)<{ quizId: string; newBody: string }>()
+
+export const editedQuizzesSubmitmessage = createAction(
+  "EDITED_QUIZZES_SUBMITMESSAGE",
+  (quizId: string, newMessage: string) => ({
+    quizId: quizId,
+    newMessage: newMessage,
+  }),
+)<{ quizId: string; newMessage: string }>()

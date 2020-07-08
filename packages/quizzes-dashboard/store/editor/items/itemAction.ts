@@ -10,23 +10,37 @@ export const editedQuizItemTitle = createAction(
   (newTitle: string, itemId: string) => ({ title: newTitle, id: itemId }),
 )<{ title: string; id: string }>()
 
-export const editedScaleMinMaxValue = createAction(
-  "EDITED_SCALE_VALUE",
-  (itemId: string, newValue: number, max: boolean) => ({
+export const editedScaleMaxValue = createAction(
+  "EDITED_SCALE_MAX_VALUE",
+  (itemId: string, newValue: number) => ({
     itemId: itemId,
     newValue: newValue,
-    max: max,
   }),
-)<{ itemId: string; newValue: number; max: boolean }>()
+)<{ itemId: string; newValue: number }>()
 
-export const editedScaleMinMaxLabel = createAction(
-  "EDITED_SCALE_LABEL",
-  (itemId: string, newLabel: string, max: boolean) => ({
+export const editedScaleMinValue = createAction(
+  "EDITED_SCALE_MIN_VALUE",
+  (itemId: string, newValue: number) => ({
+    itemId: itemId,
+    newValue: newValue,
+  }),
+)<{ itemId: string; newValue: number }>()
+
+export const editedScaleMaxLabel = createAction(
+  "EDITED_SCALE_MAX_LABEL",
+  (itemId: string, newLabel: string) => ({
     itemId: itemId,
     newLabel: newLabel,
-    max: max,
   }),
-)<{ itemId: string; newLabel: string; max: boolean }>()
+)<{ itemId: string; newLabel: string }>()
+
+export const editedScaleMinLabel = createAction(
+  "EDITED_SCALE_MIN_LABEL",
+  (itemId: string, newLabel: string) => ({
+    itemId: itemId,
+    newLabel: newLabel,
+  }),
+)<{ itemId: string; newLabel: string }>()
 
 export const editedValidityRegex = createAction(
   "EDITED_VALIDITY_REGEX",
