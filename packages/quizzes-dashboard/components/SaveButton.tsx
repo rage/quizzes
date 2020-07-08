@@ -21,12 +21,18 @@ const SaveButton = () => {
     setSaved(false)
     setShowSpinner(true)
 
-    const quiz = denormalize(store.quizId, normalizedQuiz, store)
+    const quizData = {
+      quizzes: store.quizzes,
+      items: store.items,
+      options: store.options,
+      quizId: store.quizId,
+    }
+
+    const quiz = denormalize(quizData.quizId, normalizedQuiz, quizData)
     const response = await saveQuiz(quiz)
 
     setShowSpinner(false)
     if (response.errorMessage === undefined) {
-      console.log("hep")
       const normalizedResponse = normalize(response, normalizedQuiz)
       const data = {
         quizzes: normalizedResponse.entities.quizzes ?? {},

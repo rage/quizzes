@@ -1,6 +1,6 @@
 import Router from "koa-router"
 import { CustomContext, CustomState } from "../../types"
-import { Course, Quiz } from "../../models/"
+import { Course, Quiz, QuizAnswer } from "../../models/"
 import accessControl from "../../middleware/access_control"
 
 const admin = accessControl({ administator: true })
@@ -25,6 +25,11 @@ const dashboard = new Router<CustomState, CustomContext>({
   .get("/courses/:courseId", admin, async ctx => {
     const courseId = ctx.params.courseId
     ctx.body = await Course.getFlattenedById(courseId)
+  })
+  .get("/answers/manual-review/:quizId", admin, async ctx => {
+    const quizId = ctx.params.quizId
+    const { page, size } = ctx.request.query
+    ctx.body = await QuizAnswer.getManualReview(quizId, page, size)
   })
 
 export default dashboard
