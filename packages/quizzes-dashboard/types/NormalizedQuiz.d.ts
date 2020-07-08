@@ -96,4 +96,9 @@ export interface ItemVariables {
   validMax: boolean
   array: number[]
   advancedEditing: boolean
+  optionEditing: boolean
+  testingRegex: boolean
+  regexTestAnswer: string
+  regex: string
+  validRegex: boolean
 }

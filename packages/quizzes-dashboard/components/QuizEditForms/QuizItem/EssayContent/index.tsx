@@ -1,61 +1,12 @@
 import React from "react"
 import styled from "styled-components"
-import { Typography, Card, TextField } from "@material-ui/core"
+import { TextField } from "@material-ui/core"
 import { useDispatch } from "react-redux"
-import { Item } from "../../../types/NormalizedQuiz"
+import { Item } from "../../../../types/NormalizedQuiz"
 import {
   editedItemMaxWords,
   editedItemMinWords,
-} from "../../../store/editor/items/itemAction"
-
-const QuizCard = styled(Card)`
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 40px -12px !important;
-  border-radius: 1rem !important;
-  margin: 0 auto;
-  margin-bottom: 1rem;
-  width: 800px;
-`
-
-const IconWrapper = styled.div`
-  font-size: 3.5rem;
-  margin: 0 1.5rem 0 0.5rem;
-  @media (max-width: 550px) {
-    text-align: center;
-  }
-`
-
-const QuizHeader = styled.div`
-  background-color: rgb(33, 48, 148);
-  color: white;
-  padding: 1rem;
-  display: flex;
-`
-
-const StyledId = styled(Typography)`
-  margin-bottom: 1rem !important;
-`
-
-const TitleContainer = styled.div`
-  flex: 1;
-  margin-right: 1rem;
-`
-
-const PointsContainer = styled.div`
-  margin-right: 1.5rem;
-  width: 5rem;
-`
-
-const QuizContent = styled.div`
-  padding: 1rem;
-`
-
-const StyledTextField = styled(TextField)`
-  background-color: white;
-  border-radius: 1rem;
-  overflow: hidden;
-  width: 100%;
-  margin-top: 0.25rem !important;
-`
+} from "../../../../store/editor/items/itemAction"
 
 const InfoContainer = styled.div`
   padding: 1rem 0;
@@ -70,7 +21,6 @@ const InlineFieldWrapper = styled.div`
   &:not(:last-of-type) {
     margin-right: 1rem;
   }
-
   width: 100%;
 `
 

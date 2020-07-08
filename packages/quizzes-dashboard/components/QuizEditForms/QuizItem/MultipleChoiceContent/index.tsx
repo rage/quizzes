@@ -9,6 +9,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWindowClose, faPen, faPlus } from "@fortawesome/free-solid-svg-icons"
 import AdvancedEditorModal from "./AdvancedEditorModalContent"
 import MultipleChoiceButton from "./MultiplChoiceButton"
+import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
 
 const QuizContent = styled.div`
   padding: 1rem;
@@ -50,25 +51,27 @@ interface multiplChoiceContentProps {
 const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
   const storeOptions = useTypedSelector(state => state.editor.options)
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
-  const [advancedEditing, setAdvancedEditing] = useState(false)
+  const variables = useTypedSelector(state => state.editor.variables[item.id])
   const dispatch = useDispatch()
   return (
     <>
       <EditButtonWrapper>
         <EditItemButton
-          onClick={() => setAdvancedEditing(true)}
+          onClick={() => dispatch(setAdvancedEditing(storeItem.id, true))}
           title="edit item"
         >
           <FontAwesomeIcon icon={faPen} size="2x"></FontAwesomeIcon>
         </EditItemButton>
       </EditButtonWrapper>
       <StyledModal
-        open={advancedEditing}
-        onClose={() => setAdvancedEditing(false)}
+        open={variables.advancedEditing}
+        onClose={() => dispatch(setAdvancedEditing(storeItem.id, false))}
       >
-        <Fade in={advancedEditing}>
+        <Fade in={variables.advancedEditing}>
           <AdvancedBox>
-            <CloseButton onClick={() => setAdvancedEditing(false)}>
+            <CloseButton
+              onClick={() => dispatch(setAdvancedEditing(storeItem.id, false))}
+            >
               <FontAwesomeIcon icon={faWindowClose} size="2x" />
             </CloseButton>
             <AdvancedEditorModal item={storeItem} />
