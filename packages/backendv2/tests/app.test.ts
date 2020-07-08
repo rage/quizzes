@@ -8,7 +8,10 @@ import data from "./data"
 const knexCleaner = require("knex-cleaner")
 
 beforeEach(async () => {
-  await knex.seed.run()
+  await knex.seed.run({
+    directory: "./database/seeds",
+    specific: "a.ts",
+  })
 })
 
 afterEach(async () => {
@@ -64,10 +67,10 @@ describe("dashboard: get courses", () => {
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(200)
       .expect(response => {
-        const returned = response.body
-        expect(returned).toHaveLength(2)
+        const received = response.body
+        expect(received).toHaveLength(2)
         expect(
-          returned.sort((o1: any, o2: any) => o1.id.localeCompare(o2.id)),
+          received.sort((o1: any, o2: any) => o1.id.localeCompare(o2.id)),
         ).toStrictEqual([data.courseValidator1, data.courseValidator2])
       })
       .end(done)
@@ -125,10 +128,10 @@ describe("dashboard: get quizzes by course id", () => {
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(200)
       .expect(response => {
-        const returned = response.body
-        expect(returned).toHaveLength(2)
+        const received = response.body
+        expect(received).toHaveLength(2)
         expect(
-          returned.sort((o1: any, o2: any) => -o1.id.localeCompare(o2.id)),
+          received.sort((o1: any, o2: any) => -o1.id.localeCompare(o2.id)),
         ).toStrictEqual([data.quizValidator1, data.quizValidator2])
       })
       .end(done)
@@ -187,8 +190,8 @@ describe("dashboard: get quiz by id", () => {
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(200)
       .expect(response => {
-        const returned = response.body
-        expect(returned).toStrictEqual(data.quizValidator1)
+        const received = response.body
+        expect(received).toStrictEqual(data.quizValidator1)
       })
       .end(done)
   })
@@ -254,8 +257,8 @@ describe("dashboard: save quiz", () => {
       .send(data.newQuiz)
       .expect(200)
       .expect(response => {
-        const returned = response.body
-        expect(returned).toStrictEqual(data.newQuizValidator)
+        const received = response.body
+        expect(received).toStrictEqual(data.newQuizValidator)
       })
       .end(done)
   })
@@ -268,9 +271,80 @@ describe("dashboard: save quiz", () => {
       .send(data.quizUpdate)
       .expect(200)
       .expect(response => {
-        const returned = response.body
-        expect(returned).toStrictEqual(data.quizUpdateValidator)
+        const received = response.body
+        expect(received).toStrictEqual(data.quizUpdateValidator)
       })
       .end(done)
+  })
+})
+
+describe("dashboard: get manual review answers", () => {
+  beforeEach(async () => {
+    await knex.seed.run()
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", async done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/answers/manual-review/2a0c2270-011e-40b2-8796-625764828034?page=0&size=10",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 403 if insufficient credentials", async done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/answers/manual-review/2a0c2270-011e-40b2-8796-625764828034?page=0&size=10",
+      )
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
+  })
+
+  test("respond with correct page data 1", async done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/answers/manual-review/2a0c2270-011e-40b2-8796-625764828034?page=0&size=10",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        const received = response.body
+        expect(received).toHaveLength(10)
+      })
+      .expect(200, done)
+  })
+
+  test("respond with correct page data 2", async done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/answers/manual-review/2a0c2270-011e-40b2-8796-625764828034?page=1&size=10",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        const received = response.body
+        expect(received).toHaveLength(5)
+      })
+      .expect(200, done)
   })
 })
