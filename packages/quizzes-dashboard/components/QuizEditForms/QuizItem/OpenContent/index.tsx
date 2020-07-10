@@ -81,6 +81,11 @@ const IconContainer = styled.div`
   margin-right: 0.5rem;
 `
 
+const DeleteButton = styled(Button)`
+  display: flex !important;
+  align-self: flex-end !important;
+`
+
 const OpenContent = ({ item }: openContentProps) => {
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
   const variables = useTypedSelector(

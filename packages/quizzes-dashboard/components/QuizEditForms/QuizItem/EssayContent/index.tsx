@@ -1,12 +1,15 @@
 import React from "react"
 import styled from "styled-components"
-import { TextField } from "@material-ui/core"
+import { TextField, Button } from "@material-ui/core"
 import { useDispatch } from "react-redux"
 import { Item } from "../../../../types/NormalizedQuiz"
 import {
   editedItemMaxWords,
   editedItemMinWords,
 } from "../../../../store/editor/items/itemAction"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faTrash } from "@fortawesome/free-solid-svg-icons"
+import { deletedItem } from "../../../../store/editor/editorActions"
 
 const InfoContainer = styled.div`
   padding: 1rem 0;
@@ -24,6 +27,11 @@ const InlineFieldWrapper = styled.div`
   width: 100%;
 `
 
+const DeleteButton = styled(Button)`
+  display: flex !important;
+  align-self: flex-end !important;
+`
+
 interface essayContentProps {
   item: Item
 }
@@ -33,6 +41,13 @@ const EssayContent = ({ item }: essayContentProps) => {
   return (
     <>
       <InfoContainer>
+        <DeleteButton>
+          <FontAwesomeIcon
+            icon={faTrash}
+            color="red"
+            onClick={() => dispatch(deletedItem(item.id))}
+          />
+        </DeleteButton>
         <TextField
           fullWidth
           variant="outlined"

@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import { Item } from "../../../../types/NormalizedQuiz"
 import styled from "styled-components"
 import { Button, TextField, Modal, Fade, Box } from "@material-ui/core"
@@ -10,6 +10,7 @@ import { faWindowClose, faPen, faPlus } from "@fortawesome/free-solid-svg-icons"
 import AdvancedEditorModal from "./AdvancedEditorModalContent"
 import MultipleChoiceButton from "./MultiplChoiceButton"
 import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
+import { createdNewOption } from "../../../../store/editor/editorActions"
 
 const QuizContent = styled.div`
   padding: 1rem;
@@ -98,7 +99,10 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
           </QuizContent>
         ))}
         <QuizContent>
-          <AddOptionButton title="add option">
+          <AddOptionButton
+            title="add option"
+            onClick={() => dispatch(createdNewOption(storeItem.id))}
+          >
             <FontAwesomeIcon icon={faPlus} size="2x" color="blue" />
           </AddOptionButton>
         </QuizContent>

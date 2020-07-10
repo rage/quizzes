@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import styled from "styled-components"
 import { Modal, Box, Button, Fade } from "@material-ui/core"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -6,10 +6,9 @@ import { faWindowClose, faTrash } from "@fortawesome/free-solid-svg-icons"
 import { Option } from "../../../../types/NormalizedQuiz"
 import OptionEditorModalContent from "./OptionEditorModalContent"
 import { useTypedSelector } from "../../../../store/store"
-import { deletedOptionFromItem } from "../../../../store/editor/items/itemAction"
-import { deletedOptionFromOptions } from "../../../../store/editor/options/optionActions"
 import { useDispatch } from "react-redux"
 import { setOptionEditing } from "../../../../store/editor/optionVariables/optionVariableActions"
+import { deletedOption } from "../../../../store/editor/editorActions"
 
 const StyledModal = styled(Modal)`
   display: flex;
@@ -75,10 +74,7 @@ const MultipleChoiceButton = ({ option }: multipleChoiceButtonProps) => {
             <DeleteOptionButton
               onClick={() => {
                 dispatch(setOptionEditing(storeOption.id, false))
-                dispatch(
-                  deletedOptionFromItem(storeOption.quizItemId, storeOption.id),
-                )
-                dispatch(deletedOptionFromOptions(storeOption.id))
+                dispatch(deletedOption(storeOption.id, storeOption.quizItemId))
               }}
             >
               <FontAwesomeIcon icon={faTrash} size="2x" color="red" />

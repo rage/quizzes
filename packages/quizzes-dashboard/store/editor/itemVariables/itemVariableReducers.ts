@@ -1,7 +1,11 @@
 import { createReducer } from "typesafe-actions"
 import { ItemVariables } from "../../../types/NormalizedQuiz"
 import { action } from "../../../types/NormalizedQuiz"
-import { initializedEditor } from "../editorActions"
+import {
+  initializedEditor,
+  createdNewItem,
+  deletedItem,
+} from "../editorActions"
 import produce from "immer"
 import _ from "lodash"
 import {
@@ -97,5 +101,28 @@ export const itemVariableReducers = createReducer<
   .handleAction(setValidRegex, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.itemId].validRegex = action.payload.valid
+    })
+  })
+
+  .handleAction(createdNewItem, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId] = {
+        advancedEditing: false,
+        regex: "",
+        regexTestAnswer: "",
+        scaleMax: 0,
+        scaleMin: 0,
+        testingRegex: false,
+        validMax: true,
+        validMin: true,
+        validRegex: true,
+        array: [],
+      }
+    })
+  })
+
+  .handleAction(deletedItem, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].advancedEditing = false
     })
   })

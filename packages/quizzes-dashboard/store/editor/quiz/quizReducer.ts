@@ -8,11 +8,9 @@ import {
   editedQuizzesDeadline,
   editedQuizzesBody,
   editedQuizzesSubmitmessage,
-  deletedItemFromQuiz,
 } from "./quizActions"
-import { initializedEditor } from "../editorActions"
+import { initializedEditor, createdNewItem } from "../editorActions"
 import produce from "immer"
-
 export const quizReducer = createReducer<{ [quizId: string]: Quiz }, action>({})
   .handleAction(
     initializedEditor,
@@ -63,12 +61,9 @@ export const quizReducer = createReducer<{ [quizId: string]: Quiz }, action>({})
     })
   })
 
-  .handleAction(deletedItemFromQuiz, (state, action) => {
+  .handleAction(createdNewItem, (state, action) => {
     return produce(state, draftState => {
-      console.log(action)
-      draftState[action.payload.quizId].items = draftState[
-        action.payload.quizId
-      ].items.filter(itemId => itemId !== action.payload.itemId)
+      draftState[action.payload.quizId].items.push(action.payload.itemId)
     })
   })
 

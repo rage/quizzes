@@ -6,6 +6,7 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  Button,
 } from "@material-ui/core"
 import {
   editedQuizItemTitle,
@@ -18,6 +19,9 @@ import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import { Item } from "../../../../types/NormalizedQuiz"
 import MultipleChoiceButton from "./MultiplChoiceButton"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faTrash } from "@fortawesome/free-solid-svg-icons"
+import { deletedItem } from "../../../../store/editor/editorActions"
 
 const QuizContent = styled.div`
   padding: 1rem;
@@ -27,6 +31,11 @@ const QuizContent = styled.div`
 const ModalContent = styled.div`
   padding: 1rem;
   display: flex;
+`
+
+const DeleteButton = styled(Button)`
+  display: flex !important;
+  align-self: flex-end !important;
 `
 
 interface EditorModalProps {
@@ -116,6 +125,13 @@ export const AdvancedEditorModal = ({ item }: EditorModalProps) => {
           />
         </Fade>
       </ModalContent>
+      <DeleteButton>
+        <FontAwesomeIcon
+          icon={faTrash}
+          color="red"
+          onClick={() => dispatch(deletedItem(item.id))}
+        />
+      </DeleteButton>
     </>
   )
 }

@@ -6,9 +6,7 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons"
 import { Item } from "../../../../types/NormalizedQuiz"
 import { useDispatch } from "react-redux"
 import { useTypedSelector } from "../../../../store/store"
-import { deletedItemFromItems } from "../../../../store/editor/items/itemAction"
-import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
-import { deletedItemFromQuiz } from "../../../../store/editor/quiz/quizActions"
+import { deletedItem } from "../../../../store/editor/editorActions"
 
 const EmptyBox = styled(Box)`
   width: 100% !important;
@@ -20,31 +18,32 @@ const EditButtonWrapper = styled.div`
   justify-content: flex-end;
 `
 
+const DeleteButton = styled(Button)`
+  display: flex !important;
+  align-self: flex-end !important;
+`
+
 interface EditorModalProps {
   item: Item
 }
 
 export const ModalContent = ({ item }: EditorModalProps) => {
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
-  const quizId = useTypedSelector(state => state.editor.quizId)
   const dispatch = useDispatch()
 
   return (
     <>
       <EmptyBox />
       <EditButtonWrapper>
-        <Button>
+        <DeleteButton>
           <FontAwesomeIcon
             icon={faTrash}
             color="red"
-            size="2x"
             onClick={() => {
-              dispatch(setAdvancedEditing(storeItem.id, false))
-              dispatch(deletedItemFromQuiz(quizId, storeItem.id))
-              dispatch(deletedItemFromItems(storeItem.id))
+              dispatch(deletedItem(storeItem.id))
             }}
           />
-        </Button>
+        </DeleteButton>
       </EditButtonWrapper>
     </>
   )

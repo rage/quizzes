@@ -6,7 +6,6 @@ import {
   FormControlLabel,
   Checkbox,
   TextField,
-  Button,
 } from "@material-ui/core"
 import {
   editedOptionTitle,
@@ -17,8 +16,6 @@ import {
 import { useDispatch } from "react-redux"
 import { Option } from "../../../../types/NormalizedQuiz"
 import { useTypedSelector } from "../../../../store/store"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faTrash } from "@fortawesome/free-solid-svg-icons"
 
 const ModalContent = styled.div`
   padding: 1rem;

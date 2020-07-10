@@ -110,4 +110,43 @@ export interface OptionVariables {
 
 export interface QuizVariables {
   initialState: EditableQuiz
+  addingNewItem: boolean
+  newItemType: string
+  newItems: string[]
+}
+
+export interface newItem {
+  quizId: string
+  type: string
+  order: number
+  validityRegex: string | null
+  formatRegex: string | null
+  multi: boolean
+  createdAt: Date
+  updatedAt: Date
+  minWords: number | null
+  maxWords: number | null
+  maxValue: number | null
+  minValue: number | null
+  maxLabel: string | null
+  minLabel: string | null
+  usesSharedOptionFeedbackMessage: boolean
+  options: string[]
+  title: string
+  body: string
+  successMessage: string | null
+  failureMessage: string | null
+  sharedOptionFeedbackMessage: string | null
+}
+
+export interface newOption {
+  quizItemId: string
+  order: number
+  correct: boolean
+  createdAt: Date
+  updatedAt: Date
+  title: string
+  body: string | null
+  successMessage: null | string
+  failureMessage: null | string
 }

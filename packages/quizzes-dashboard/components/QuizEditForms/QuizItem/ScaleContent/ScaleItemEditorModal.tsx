@@ -8,6 +8,7 @@ import {
   FormGroup,
   Radio,
   FormControlLabel,
+  Button,
 } from "@material-ui/core"
 import {
   editedQuizItemTitle,
@@ -21,6 +22,9 @@ import {
   setScaleMin,
   setScaleMax,
 } from "../../../../store/editor/itemVariables/itemVariableActions"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faTrash } from "@fortawesome/free-solid-svg-icons"
+import { deletedItem } from "../../../../store/editor/editorActions"
 
 const ModalContent = styled.div`
   padding: 1rem;
@@ -50,6 +54,10 @@ const PreviewLabelContainer = styled.div`
   padding: 1rem;
   display: flex !important;
   align-items: center !important;
+`
+const DeleteButton = styled(Button)`
+  display: flex !important;
+  align-self: flex-end !important;
 `
 
 interface ScaleItemEditorModalProps {
@@ -161,6 +169,13 @@ export const ScaleItemEditorModal = ({ item }: ScaleItemEditorModalProps) => {
           <Typography variant="button">{storeItem.maxLabel}</Typography>
         </PreviewLabelContainer>
       </PreviewModalContainer>
+      <DeleteButton>
+        <FontAwesomeIcon
+          icon={faTrash}
+          color="red"
+          onClick={() => dispatch(deletedItem(item.id))}
+        />
+      </DeleteButton>
     </>
   )
 }

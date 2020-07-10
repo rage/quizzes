@@ -1,6 +1,10 @@
 import { createReducer } from "typesafe-actions"
 import { OptionVariables, action } from "../../../types/NormalizedQuiz"
-import { initializedEditor } from "../editorActions"
+import {
+  initializedEditor,
+  createdNewOption,
+  deletedOption,
+} from "../editorActions"
 import produce from "immer"
 import { setOptionEditing } from "./optionVariableActions"
 
@@ -23,5 +27,19 @@ export const optionVariableReducers = createReducer<
   .handleAction(setOptionEditing, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.optionId].optionEditing = action.payload.editing
+    })
+  })
+
+  .handleAction(createdNewOption, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.optionId] = {
+        optionEditing: false,
+      }
+    })
+  })
+
+  .handleAction(deletedOption, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.optionId].optionEditing = false
     })
   })
