@@ -5,6 +5,7 @@ import {
   initializedEditor,
   createdNewItem,
   deletedItem,
+  createdNewOption,
 } from "../editorActions"
 import produce from "immer"
 import _ from "lodash"
@@ -42,6 +43,7 @@ export const itemVariableReducers = createReducer<
           regex: item.validityRegex ?? "",
           regexTestAnswer: "",
           validRegex: true,
+          newOptions: [],
         }
       }
     })
@@ -117,6 +119,7 @@ export const itemVariableReducers = createReducer<
         validMin: true,
         validRegex: true,
         array: [],
+        newOptions: [],
       }
     })
   })
@@ -124,5 +127,11 @@ export const itemVariableReducers = createReducer<
   .handleAction(deletedItem, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.itemId].advancedEditing = false
+    })
+  })
+
+  .handleAction(createdNewOption, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].newOptions.push(action.payload.optionId)
     })
   })

@@ -102,6 +102,7 @@ export interface ItemVariables {
   regexTestAnswer: string
   regex: string
   validRegex: boolean
+  newOptions: string[]
 }
 
 export interface OptionVariables {
