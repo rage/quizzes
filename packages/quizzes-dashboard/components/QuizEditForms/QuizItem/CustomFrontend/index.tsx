@@ -4,10 +4,15 @@ import { useTypedSelector } from "../../../../store/store"
 import styled from "styled-components"
 import { Box, Button, Fade, Modal } from "@material-ui/core"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPen, faWindowClose } from "@fortawesome/free-solid-svg-icons"
+import {
+  faPen,
+  faWindowClose,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons"
 import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
 import { useDispatch } from "react-redux"
-import ModalContent from "./CustomFrontendModal"
+import CustomModalContent from "./CustomModalContent"
+import { deletedItem } from "../../../../store/editor/editorActions"
 
 interface customFrontend {
   item: Item
@@ -22,6 +27,7 @@ const EditButtonWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
 `
+const EditItemButton = styled(Button)``
 
 const StyledModal = styled(Modal)`
   display: flex;
@@ -36,8 +42,16 @@ const AdvancedBox = styled(Box)`
 `
 
 const CloseButton = styled(Button)`
-  padding: 1rem !important;
-  float: right;
+  display: flex !important;
+`
+
+const DeleteButton = styled(Button)`
+  display: flex !important;
+`
+
+const ModalButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
 `
 
 export const CustomFrontend = ({ item }: customFrontend) => {
@@ -54,24 +68,30 @@ export const CustomFrontend = ({ item }: customFrontend) => {
       >
         <Fade in={variables.advancedEditing}>
           <AdvancedBox>
-            <CloseButton
-              onClick={() => dispatch(setAdvancedEditing(storeItem.id, false))}
-            >
-              <FontAwesomeIcon icon={faWindowClose} size="2x" />
-            </CloseButton>
-            <ModalContent item={storeItem} />
+            <ModalButtonWrapper>
+              <CloseButton
+                onClick={() =>
+                  dispatch(setAdvancedEditing(storeItem.id, false))
+                }
+              >
+                <FontAwesomeIcon icon={faWindowClose} size="2x" />
+              </CloseButton>
+            </ModalButtonWrapper>
+            <CustomModalContent item={storeItem} />
+            <ModalButtonWrapper>
+              <DeleteButton onClick={() => dispatch(deletedItem(storeItem.id))}>
+                <FontAwesomeIcon icon={faTrash} size="2x" color="red" />
+              </DeleteButton>
+            </ModalButtonWrapper>
           </AdvancedBox>
         </Fade>
       </StyledModal>
-
       <EditButtonWrapper>
-        <Button>
-          <FontAwesomeIcon
-            icon={faPen}
-            size="2x"
-            onClick={() => dispatch(setAdvancedEditing(storeItem.id, true))}
-          />
-        </Button>
+        <EditItemButton
+          onClick={() => dispatch(setAdvancedEditing(storeItem.id, true))}
+        >
+          <FontAwesomeIcon icon={faPen} size="2x" />
+        </EditItemButton>
       </EditButtonWrapper>
       <EmptyBox />
     </>

@@ -26,7 +26,7 @@ interface OptionEditorProps {
   option: Option
 }
 
-export const OptionEditorModalContent = ({ option }: OptionEditorProps) => {
+export const OptionModalContent = ({ option }: OptionEditorProps) => {
   const storeOption = useTypedSelector(state => state.editor.options[option.id])
   const dispatch = useDispatch()
   return (
@@ -101,4 +101,4 @@ export const OptionEditorModalContent = ({ option }: OptionEditorProps) => {
   )
 }
 
-export default OptionEditorModalContent
+export default OptionModalContent

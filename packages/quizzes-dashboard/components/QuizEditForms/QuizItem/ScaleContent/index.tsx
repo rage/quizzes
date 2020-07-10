@@ -19,13 +19,18 @@ import styled from "styled-components"
 import { useDispatch } from "react-redux"
 import { useTypedSelector } from "../../../../store/store"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPen, faWindowClose } from "@fortawesome/free-solid-svg-icons"
-import ScaleItemEditorModal from "./ScaleItemEditorModal"
+import {
+  faPen,
+  faWindowClose,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons"
+import ScaleModalContent from "./ScaleModalContent"
 import {
   setScaleMin,
   setScaleMax,
   setAdvancedEditing,
 } from "../../../../store/editor/itemVariables/itemVariableActions"
+import { deletedItem } from "../../../../store/editor/editorActions"
 
 const ScaleContainer = styled.div`
   padding-top: 1rem;
@@ -82,8 +87,16 @@ const AdvancedBox = styled(Box)`
 `
 
 const CloseButton = styled(Button)`
-  padding: 1rem !important;
-  float: right;
+  display: flex !important;
+`
+
+const DeleteButton = styled(Button)`
+  display: flex !important;
+`
+
+const ModalButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
 `
 
 const EditItemButton = styled(Button)``
@@ -132,12 +145,25 @@ const ScaleContent = ({ item }: scaleContentProps) => {
       >
         <Fade in={variables.advancedEditing}>
           <AdvancedBox>
-            <CloseButton
-              onClick={() => dispatch(setAdvancedEditing(storeItem.id, false))}
-            >
-              <FontAwesomeIcon icon={faWindowClose} size="2x" />
-            </CloseButton>
-            <ScaleItemEditorModal item={storeItem} />
+            <ModalButtonWrapper>
+              <CloseButton
+                onClick={() =>
+                  dispatch(setAdvancedEditing(storeItem.id, false))
+                }
+              >
+                <FontAwesomeIcon icon={faWindowClose} size="2x" />
+              </CloseButton>
+            </ModalButtonWrapper>
+            <ScaleModalContent item={storeItem} />
+            <ModalButtonWrapper>
+              <DeleteButton
+                onClick={() => {
+                  dispatch(deletedItem(storeItem.id))
+                }}
+              >
+                <FontAwesomeIcon icon={faTrash} size="2x" color="red" />
+              </DeleteButton>
+            </ModalButtonWrapper>
           </AdvancedBox>
         </Fade>
       </StyledModal>

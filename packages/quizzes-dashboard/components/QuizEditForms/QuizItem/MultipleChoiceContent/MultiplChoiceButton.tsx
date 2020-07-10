@@ -4,7 +4,7 @@ import { Modal, Box, Button, Fade } from "@material-ui/core"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWindowClose, faTrash } from "@fortawesome/free-solid-svg-icons"
 import { Option } from "../../../../types/NormalizedQuiz"
-import OptionEditorModalContent from "./OptionEditorModalContent"
+import OptionModalContent from "./OptionModalContent"
 import { useTypedSelector } from "../../../../store/store"
 import { useDispatch } from "react-redux"
 import { setOptionEditing } from "../../../../store/editor/optionVariables/optionVariableActions"
@@ -70,7 +70,7 @@ const MultipleChoiceButton = ({ option }: multipleChoiceButtonProps) => {
             >
               <FontAwesomeIcon icon={faWindowClose} size="2x" />
             </CloseButton>
-            <OptionEditorModalContent option={storeOption} />
+            <OptionModalContent option={storeOption} />
             <DeleteOptionButton
               onClick={() => {
                 dispatch(setOptionEditing(storeOption.id, false))

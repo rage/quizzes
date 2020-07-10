@@ -1,6 +1,6 @@
 import React from "react"
 import styled from "styled-components"
-import { TextField, Button } from "@material-ui/core"
+import { TextField, Button, Modal, Box, Fade } from "@material-ui/core"
 import { useDispatch } from "react-redux"
 import { Item } from "../../../../types/NormalizedQuiz"
 import {
@@ -8,8 +8,15 @@ import {
   editedItemMinWords,
 } from "../../../../store/editor/items/itemAction"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faTrash } from "@fortawesome/free-solid-svg-icons"
+import {
+  faTrash,
+  faWindowClose,
+  faPen,
+} from "@fortawesome/free-solid-svg-icons"
 import { deletedItem } from "../../../../store/editor/editorActions"
+import { useTypedSelector } from "../../../../store/store"
+import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
+import EssayModalContent from "./EssayModalContent"
 
 const InfoContainer = styled.div`
   padding: 1rem 0;
@@ -27,9 +34,35 @@ const InlineFieldWrapper = styled.div`
   width: 100%;
 `
 
+const StyledModal = styled(Modal)`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+const AdvancedBox = styled(Box)`
+  background-color: #fafafa;
+  min-width: 1000px;
+  min-height: 800px;
+`
+
+const CloseButton = styled(Button)`
+  display: flex !important;
+`
+
+const ModalButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`
+
 const DeleteButton = styled(Button)`
   display: flex !important;
-  align-self: flex-end !important;
+`
+const EditItemButton = styled(Button)``
+
+const EditButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end !important;
 `
 
 interface essayContentProps {
@@ -37,17 +70,50 @@ interface essayContentProps {
 }
 
 const EssayContent = ({ item }: essayContentProps) => {
+  const storeItem = useTypedSelector(state => state.editor.items[item.id])
+  const variables = useTypedSelector(
+    state => state.editor.itemVariables[item.id],
+  )
   const dispatch = useDispatch()
   return (
     <>
+      <EditButtonWrapper>
+        <EditItemButton
+          onClick={() => dispatch(setAdvancedEditing(storeItem.id, true))}
+          title="edit item"
+        >
+          <FontAwesomeIcon icon={faPen} size="2x"></FontAwesomeIcon>
+        </EditItemButton>
+      </EditButtonWrapper>
+      <StyledModal
+        open={variables.advancedEditing}
+        onClose={() => dispatch(setAdvancedEditing(storeItem.id, false))}
+      >
+        <Fade in={variables.advancedEditing}>
+          <AdvancedBox>
+            <ModalButtonWrapper>
+              <CloseButton
+                onClick={() =>
+                  dispatch(setAdvancedEditing(storeItem.id, false))
+                }
+              >
+                <FontAwesomeIcon icon={faWindowClose} size="2x" />
+              </CloseButton>
+            </ModalButtonWrapper>
+            <EssayModalContent item={storeItem} />
+            <ModalButtonWrapper>
+              <DeleteButton
+                onClick={() => {
+                  dispatch(deletedItem(storeItem.id))
+                }}
+              >
+                <FontAwesomeIcon icon={faTrash} size="2x" color="red" />
+              </DeleteButton>
+            </ModalButtonWrapper>
+          </AdvancedBox>
+        </Fade>
+      </StyledModal>
       <InfoContainer>
-        <DeleteButton>
-          <FontAwesomeIcon
-            icon={faTrash}
-            color="red"
-            onClick={() => dispatch(deletedItem(item.id))}
-          />
-        </DeleteButton>
         <TextField
           fullWidth
           variant="outlined"

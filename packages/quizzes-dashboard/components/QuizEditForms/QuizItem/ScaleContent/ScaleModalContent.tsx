@@ -8,7 +8,6 @@ import {
   FormGroup,
   Radio,
   FormControlLabel,
-  Button,
 } from "@material-ui/core"
 import {
   editedQuizItemTitle,
@@ -22,9 +21,6 @@ import {
   setScaleMin,
   setScaleMax,
 } from "../../../../store/editor/itemVariables/itemVariableActions"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faTrash } from "@fortawesome/free-solid-svg-icons"
-import { deletedItem } from "../../../../store/editor/editorActions"
 
 const ModalContent = styled.div`
   padding: 1rem;
@@ -55,15 +51,17 @@ const PreviewLabelContainer = styled.div`
   display: flex !important;
   align-items: center !important;
 `
-const DeleteButton = styled(Button)`
-  display: flex !important;
-  align-self: flex-end !important;
+
+const ModalContentTitleWrapper = styled.div`
+  display: flex;
+  padding: 1rem;
+  justify-content: center;
 `
 
 interface ScaleItemEditorModalProps {
   item: Item
 }
-export const ScaleItemEditorModal = ({ item }: ScaleItemEditorModalProps) => {
+export const ScaleModalContent = ({ item }: ScaleItemEditorModalProps) => {
   const dispatch = useDispatch()
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
   const variables = useTypedSelector(
@@ -90,9 +88,9 @@ export const ScaleItemEditorModal = ({ item }: ScaleItemEditorModalProps) => {
 
   return (
     <>
-      <ModalContent>
+      <ModalContentTitleWrapper>
         <Typography variant="h4">Advanced editing</Typography>
-      </ModalContent>
+      </ModalContentTitleWrapper>
       <ModalContent>
         <TextField
           label="Title"
@@ -169,15 +167,8 @@ export const ScaleItemEditorModal = ({ item }: ScaleItemEditorModalProps) => {
           <Typography variant="button">{storeItem.maxLabel}</Typography>
         </PreviewLabelContainer>
       </PreviewModalContainer>
-      <DeleteButton>
-        <FontAwesomeIcon
-          icon={faTrash}
-          color="red"
-          onClick={() => dispatch(deletedItem(item.id))}
-        />
-      </DeleteButton>
     </>
   )
 }
 
-export default ScaleItemEditorModal
+export default ScaleModalContent

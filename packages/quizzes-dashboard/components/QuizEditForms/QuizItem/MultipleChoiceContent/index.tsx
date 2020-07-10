@@ -6,11 +6,19 @@ import { useDispatch } from "react-redux"
 import { useTypedSelector } from "../../../../store/store"
 import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faWindowClose, faPen, faPlus } from "@fortawesome/free-solid-svg-icons"
-import AdvancedEditorModal from "./AdvancedEditorModalContent"
+import {
+  faWindowClose,
+  faPen,
+  faPlus,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons"
+import MultipleChoiceModalContent from "./MultipleChoiceModalContent"
 import MultipleChoiceButton from "./MultiplChoiceButton"
 import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
-import { createdNewOption } from "../../../../store/editor/editorActions"
+import {
+  createdNewOption,
+  deletedItem,
+} from "../../../../store/editor/editorActions"
 
 const QuizContent = styled.div`
   padding: 1rem;
@@ -22,6 +30,7 @@ const QuizContentLineContainer = styled.div`
 `
 const EditButtonWrapper = styled.div`
   display: flex;
+  justify-content: flex-end !important;
 `
 
 const StyledModal = styled(Modal)`
@@ -37,8 +46,16 @@ const AdvancedBox = styled(Box)`
 `
 
 const CloseButton = styled(Button)`
-  padding: 1rem !important;
-  float: right;
+  display: flex !important;
+`
+
+const DeleteButton = styled(Button)`
+  display: flex !important;
+`
+
+const ModalButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
 `
 
 const AddOptionButton = styled(Button)``
@@ -72,12 +89,25 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
       >
         <Fade in={variables.advancedEditing}>
           <AdvancedBox>
-            <CloseButton
-              onClick={() => dispatch(setAdvancedEditing(storeItem.id, false))}
-            >
-              <FontAwesomeIcon icon={faWindowClose} size="2x" />
-            </CloseButton>
-            <AdvancedEditorModal item={storeItem} />
+            <ModalButtonWrapper>
+              <CloseButton
+                onClick={() =>
+                  dispatch(setAdvancedEditing(storeItem.id, false))
+                }
+              >
+                <FontAwesomeIcon icon={faWindowClose} size="2x" />
+              </CloseButton>
+            </ModalButtonWrapper>
+            <MultipleChoiceModalContent item={storeItem} />
+            <ModalButtonWrapper>
+              <DeleteButton
+                onClick={() => {
+                  dispatch(deletedItem(storeItem.id))
+                }}
+              >
+                <FontAwesomeIcon icon={faTrash} size="2x" color="red" />
+              </DeleteButton>
+            </ModalButtonWrapper>
           </AdvancedBox>
         </Fade>
       </StyledModal>
