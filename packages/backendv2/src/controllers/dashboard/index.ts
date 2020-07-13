@@ -26,10 +26,14 @@ const dashboard = new Router<CustomState, CustomContext>({
     const courseId = ctx.params.courseId
     ctx.body = await Course.getFlattenedById(courseId)
   })
+  .get("/answers/:answerId", admin, async ctx => {
+    const answerId = ctx.params.answerId
+    ctx.body = await QuizAnswer.getById(answerId)
+  })
   .get("/answers/manual-review/:quizId", admin, async ctx => {
     const quizId = ctx.params.quizId
     const { page, size } = ctx.request.query
-    ctx.body = await QuizAnswer.getManualReview(quizId, page, size)
+    ctx.body = await QuizAnswer.getAnswersForManualReview(quizId, page, size)
   })
 
 export default dashboard

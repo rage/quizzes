@@ -278,6 +278,57 @@ describe("dashboard: save quiz", () => {
   })
 })
 
+describe("dashboard: get answer by id", () => {
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", async done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 403 if insufficient credentials", async done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
+  })
+
+  test("get answer by id", async done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        const received = response.body
+        expect(received).toStrictEqual(data.quizAnswerValidator1)
+      })
+      .expect(200, done)
+  })
+})
+
 describe("dashboard: get manual review answers", () => {
   beforeEach(async () => {
     await knex.seed.run()

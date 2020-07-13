@@ -31,28 +31,38 @@ class QuizAnswer extends Model {
     },
   }
 
-  public static async getManualReview(
+  public static async getById(quizAnswerId: string) {
+    const quizAnswer = await this.query().findById(quizAnswerId)
+    await this.joinItemsAndOptions([quizAnswer])
+    return quizAnswer
+  }
+
+  public static async getAnswersForManualReview(
     quizId: string,
     page: number,
     pageSize: number,
   ) {
-    const answers = (
+    const quizAnswers = (
       await this.query()
         .where("quiz_id", quizId)
         .andWhere("status", "manual-review")
         .orderBy("created_at")
         .page(page, pageSize)
     ).results
-    for (const answer of answers) {
-      delete answer.languageId
-      answer.itemAnswers = await answer.$relatedQuery("itemAnswers")
-      for (const itemAnswer of answer.itemAnswers) {
+    await this.joinItemsAndOptions(quizAnswers)
+    return quizAnswers
+  }
+
+  private static async joinItemsAndOptions(quizAnswers: QuizAnswer[]) {
+    for (const quizAnswer of quizAnswers) {
+      delete quizAnswer.languageId
+      quizAnswer.itemAnswers = await quizAnswer.$relatedQuery("itemAnswers")
+      for (const itemAnswer of quizAnswer.itemAnswers) {
         itemAnswer.optionAnswers = await itemAnswer.$relatedQuery(
           "optionAnswers",
         )
       }
     }
-    return answers
   }
 }
 
