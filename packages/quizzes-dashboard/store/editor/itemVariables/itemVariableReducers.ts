@@ -127,6 +127,7 @@ export const itemVariableReducers = createReducer<
   .handleAction(deletedItem, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.itemId].advancedEditing = false
+      delete draftState[action.payload.itemId]
     })
   })
 
