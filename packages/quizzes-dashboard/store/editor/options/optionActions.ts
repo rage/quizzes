@@ -31,8 +31,3 @@ export const editedOptionFailureMessage = createAction(
     newMessage: newMessage,
   }),
 )<{ optionId: string; newMessage: string }>()
-
-export const deletedOptionFromOptions = createAction(
-  "DELETED_OPTION",
-  (optionId: string) => ({ optionId: optionId }),
-)<{ optionId: string }>()

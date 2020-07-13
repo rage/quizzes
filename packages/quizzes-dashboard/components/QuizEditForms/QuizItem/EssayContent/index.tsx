@@ -1,36 +1,37 @@
 import React from "react"
-import { Item } from "../../../../types/NormalizedQuiz"
 import styled from "styled-components"
-import { Button, TextField, Modal, Fade, Box } from "@material-ui/core"
+import { TextField, Button, Modal, Box, Fade } from "@material-ui/core"
 import { useDispatch } from "react-redux"
-import { useTypedSelector } from "../../../../store/store"
-import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
+import { Item } from "../../../../types/NormalizedQuiz"
+import {
+  editedItemMaxWords,
+  editedItemMinWords,
+} from "../../../../store/editor/items/itemAction"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
+  faTrash,
   faWindowClose,
   faPen,
-  faPlus,
-  faTrash,
 } from "@fortawesome/free-solid-svg-icons"
-import MultipleChoiceModalContent from "./MultipleChoiceModalContent"
-import MultipleChoiceButton from "./MultiplChoiceButton"
+import { deletedItem } from "../../../../store/editor/editorActions"
+import { useTypedSelector } from "../../../../store/store"
 import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
-import {
-  createdNewOption,
-  deletedItem,
-} from "../../../../store/editor/editorActions"
+import EssayModalContent from "./EssayModalContent"
 
-const QuizContent = styled.div`
-  padding: 1rem;
-  display: inline;
+const InfoContainer = styled.div`
+  padding: 1rem 0;
 `
 
-const QuizContentLineContainer = styled.div`
-  display: flex !important;
-`
-const EditButtonWrapper = styled.div`
+const OneLineInfoContainer = styled.div`
+  padding: 1rem 0;
   display: flex;
-  justify-content: flex-end !important;
+`
+
+const InlineFieldWrapper = styled.div`
+  &:not(:last-of-type) {
+    margin-right: 1rem;
+  }
+  width: 100%;
 `
 
 const StyledModal = styled(Modal)`
@@ -49,25 +50,26 @@ const CloseButton = styled(Button)`
   display: flex !important;
 `
 
-const DeleteButton = styled(Button)`
-  display: flex !important;
-`
-
 const ModalButtonWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
 `
 
-const AddOptionButton = styled(Button)``
-
+const DeleteButton = styled(Button)`
+  display: flex !important;
+`
 const EditItemButton = styled(Button)``
 
-interface multiplChoiceContentProps {
+const EditButtonWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end !important;
+`
+
+interface essayContentProps {
   item: Item
 }
 
-const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
-  const storeOptions = useTypedSelector(state => state.editor.options)
+const EssayContent = ({ item }: essayContentProps) => {
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
   const variables = useTypedSelector(
     state => state.editor.itemVariables[item.id],
@@ -98,7 +100,7 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
                 <FontAwesomeIcon icon={faWindowClose} size="2x" />
               </CloseButton>
             </ModalButtonWrapper>
-            <MultipleChoiceModalContent item={storeItem} />
+            <EssayModalContent item={storeItem} />
             <ModalButtonWrapper>
               <DeleteButton
                 onClick={() => {
@@ -111,34 +113,45 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
           </AdvancedBox>
         </Fade>
       </StyledModal>
-      <QuizContentLineContainer>
-        <QuizContent>
+      <InfoContainer>
+        <TextField
+          fullWidth
+          variant="outlined"
+          label="Description for this quiz item"
+          multiline
+          rows={1}
+          helperText="Use this if you cannot put the description in the 'Description for the whole quiz'-field. You may want to use this if have another quiz item before this one."
+          defaultValue={item.body}
+        />
+      </InfoContainer>
+      <OneLineInfoContainer>
+        <InlineFieldWrapper>
           <TextField
-            multiline
-            label="Title"
+            fullWidth
+            label="Max words"
             variant="outlined"
-            value={storeItem.title ?? ""}
+            defaultValue={item.maxWords}
+            type="number"
             onChange={event =>
-              dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
+              dispatch(editedItemMaxWords(item.id, Number(event.target.value)))
             }
           />
-        </QuizContent>
-        {storeItem.options.map(option => (
-          <QuizContent key={option}>
-            <MultipleChoiceButton option={storeOptions[option]} />
-          </QuizContent>
-        ))}
-        <QuizContent>
-          <AddOptionButton
-            title="add option"
-            onClick={() => dispatch(createdNewOption(storeItem.id))}
-          >
-            <FontAwesomeIcon icon={faPlus} size="2x" color="blue" />
-          </AddOptionButton>
-        </QuizContent>
-      </QuizContentLineContainer>
+        </InlineFieldWrapper>
+        <InlineFieldWrapper>
+          <TextField
+            fullWidth
+            label="Min words"
+            variant="outlined"
+            defaultValue={item.minValue}
+            type="number"
+            onChange={event =>
+              dispatch(editedItemMinWords(item.id, Number(event.target.value)))
+            }
+          />
+        </InlineFieldWrapper>
+      </OneLineInfoContainer>
     </>
   )
 }
 
-export default MultipleChoiceContent
+export default EssayContent

@@ -5,16 +5,20 @@ import { useDispatch } from "react-redux"
 import Typography from "@material-ui/core/Typography"
 import SaveButton from "../../../components/SaveButton"
 import { normalizedQuiz } from "../../../schemas"
-import { normalize } from "normalizr"
+import { normalize, denormalize } from "normalizr"
 import useSWR from "swr"
 import { withRouter } from "next/router"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import QuizEditForms from "../../../components/QuizEditForms"
+import { useTypedSelector } from "../../../store/store"
+import _ from "lodash"
+import { EditableQuiz } from "../../../types/EditQuiz"
 
 const EditPage = ({ router }: any) => {
   const id = router.query.id
   const { data, error } = useSWR(id, fetchQuiz)
   const dispatch = useDispatch()
+
   useEffect(() => {
     if (!data) {
       return
@@ -27,7 +31,7 @@ const EditPage = ({ router }: any) => {
       options: storeState.entities.options ?? {},
       result: storeState.result,
     }
-    dispatch(initializedEditor(normalizedData))
+    dispatch(initializedEditor(normalizedData, quiz))
   }, [data])
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
@@ -38,6 +42,7 @@ const EditPage = ({ router }: any) => {
     },
     { label: "Quiz" },
   ])
+
   if (error) {
     return <div>Something went wrong</div>
   }

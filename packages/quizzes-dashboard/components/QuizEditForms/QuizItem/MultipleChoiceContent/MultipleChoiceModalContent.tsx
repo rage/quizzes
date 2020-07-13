@@ -6,6 +6,7 @@ import {
   FormGroup,
   FormControlLabel,
   Checkbox,
+  Button,
 } from "@material-ui/core"
 import {
   editedQuizItemTitle,
@@ -18,30 +19,41 @@ import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import { Item } from "../../../../types/NormalizedQuiz"
 import MultipleChoiceButton from "./MultiplChoiceButton"
-
-const QuizContent = styled.div`
-  padding: 1rem;
-  display: inline;
-`
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faPlus } from "@fortawesome/free-solid-svg-icons"
+import { createdNewOption } from "../../../../store/editor/editorActions"
 
 const ModalContent = styled.div`
   padding: 1rem;
   display: flex;
 `
+const ModalContentTitleWrapper = styled.div`
+  display: flex;
+  padding: 1rem;
+  justify-content: center;
+`
+
+const ModalContentOptionWrapper = styled.div`
+  padding: 1rem;
+  display: flex !important;
+  justify-content: space-evenly !important;
+`
+
+const AddOptionButton = styled(Button)``
 
 interface EditorModalProps {
   item: Item
 }
 
-export const AdvancedEditorModal = ({ item }: EditorModalProps) => {
+export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
   const storeOptions = useTypedSelector(state => state.editor.options)
   const dispatch = useDispatch()
   return (
     <>
-      <ModalContent>
+      <ModalContentTitleWrapper>
         <Typography variant="h4">Advanced editing</Typography>
-      </ModalContent>
+      </ModalContentTitleWrapper>
       <ModalContent>
         <FormGroup row>
           <FormControlLabel
@@ -92,12 +104,20 @@ export const AdvancedEditorModal = ({ item }: EditorModalProps) => {
         />
       </ModalContent>
       <ModalContent>
-        {storeItem.options.map(option => (
-          <QuizContent key={option}>
-            <MultipleChoiceButton option={storeOptions[option]} />
-          </QuizContent>
-        ))}
+        <AddOptionButton
+          title="add option"
+          onClick={() => dispatch(createdNewOption(storeItem.id))}
+        >
+          <FontAwesomeIcon icon={faPlus} size="2x" color="blue" />
+        </AddOptionButton>
       </ModalContent>
+      <ModalContentOptionWrapper>
+        {storeItem.options.map(option => (
+          <ModalContent key={option}>
+            <MultipleChoiceButton option={storeOptions[option]} />
+          </ModalContent>
+        ))}
+      </ModalContentOptionWrapper>
       <ModalContent>
         <Fade in={storeItem.usesSharedOptionFeedbackMessage}>
           <TextField
@@ -120,4 +140,4 @@ export const AdvancedEditorModal = ({ item }: EditorModalProps) => {
   )
 }
 
-export default AdvancedEditorModal
+export default MultipleChoiceModalContent

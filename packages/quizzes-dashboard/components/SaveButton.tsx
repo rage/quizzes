@@ -40,7 +40,7 @@ const SaveButton = () => {
         options: normalizedResponse.entities.options ?? {},
         result: normalizedResponse.result ?? "",
       }
-      dispatch(initializedEditor(data))
+      dispatch(initializedEditor(data, response))
       setSaved(true)
     }
     setShowMessage(true)

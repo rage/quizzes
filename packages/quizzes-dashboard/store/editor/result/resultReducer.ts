@@ -4,7 +4,5 @@ import { initializedEditor } from "../editorActions"
 
 export const resultReducer = createReducer<string, action>("").handleAction(
   initializedEditor,
-  (_state: any, action: action) => action.payload.quiz.result,
+  (state, action) => action.payload.normalizedQuiz.result,
 )
-
-export default resultReducer

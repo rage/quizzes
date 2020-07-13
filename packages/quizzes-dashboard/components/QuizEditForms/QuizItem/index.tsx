@@ -2,14 +2,12 @@ import React from "react"
 import { Item } from "../../../types/NormalizedQuiz"
 import styled from "styled-components"
 import EssayContent from "./EssayContent"
-import { Card, Typography, TextField, Select } from "@material-ui/core"
+import { Typography } from "@material-ui/core"
 import MultipleChoiceContent from "./MultipleChoiceContent"
 import CheckBoxContent from "./CheckBoxContent"
 import OpenContent from "./OpenContent"
 import ScaleContent from "./ScaleContent"
-import { editedQuizItemTitle } from "../../../store/editor/items/itemAction"
-import { useDispatch } from "react-redux"
-import DebugDialog from "../../DebugDialog"
+import CustomFrontend from "./CustomFrontend"
 
 const QuizItemContainer = styled.div`
   margin-top: 1.5rem;
@@ -50,6 +48,9 @@ const contentBasedOnType = (type: string, item: Item) => {
     }
     case "scale": {
       return <ScaleContent item={item} />
+    }
+    case "custom-frontend-accept-data": {
+      return <CustomFrontend item={item} />
     }
     default: {
       return <h1>Hi, I'm new/unknown</h1>

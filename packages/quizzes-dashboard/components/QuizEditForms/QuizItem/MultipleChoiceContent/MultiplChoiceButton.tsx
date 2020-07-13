@@ -1,14 +1,14 @@
-import React, { useState } from "react"
+import React from "react"
 import styled from "styled-components"
 import { Modal, Box, Button, Fade } from "@material-ui/core"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWindowClose, faTrash } from "@fortawesome/free-solid-svg-icons"
 import { Option } from "../../../../types/NormalizedQuiz"
-import OptionEditorModalContent from "./OptionEditorModalContent"
-import store, { useTypedSelector } from "../../../../store/store"
-import { deletedOptionFromItem } from "../../../../store/editor/items/itemAction"
-import { deletedOptionFromOptions } from "../../../../store/editor/options/optionActions"
+import OptionModalContent from "./OptionModalContent"
+import { useTypedSelector } from "../../../../store/store"
 import { useDispatch } from "react-redux"
+import { setOptionEditing } from "../../../../store/editor/optionVariables/optionVariableActions"
+import { deletedOption } from "../../../../store/editor/editorActions"
 
 const StyledModal = styled(Modal)`
   display: flex;
@@ -52,25 +52,29 @@ interface multipleChoiceButtonProps {
 
 const MultipleChoiceButton = ({ option }: multipleChoiceButtonProps) => {
   const storeOption = useTypedSelector(state => state.editor.options[option.id])
-  const [editOption, setEditOption] = useState(false)
+  const variables = useTypedSelector(
+    state => state.editor.optionVariables[option.id],
+  )
   const dispatch = useDispatch()
 
   return (
     <>
-      <StyledModal open={editOption} onClose={() => setEditOption(false)}>
-        <Fade in={editOption}>
+      <StyledModal
+        open={variables.optionEditing}
+        onClose={() => dispatch(setOptionEditing(storeOption.id, false))}
+      >
+        <Fade in={variables.optionEditing}>
           <StyledBox>
-            <CloseButton onClick={() => setEditOption(false)}>
+            <CloseButton
+              onClick={() => dispatch(setOptionEditing(storeOption.id, false))}
+            >
               <FontAwesomeIcon icon={faWindowClose} size="2x" />
             </CloseButton>
-            <OptionEditorModalContent option={storeOption} />
+            <OptionModalContent option={storeOption} />
             <DeleteOptionButton
               onClick={() => {
-                setEditOption(false)
-                dispatch(
-                  deletedOptionFromItem(storeOption.quizItemId, storeOption.id),
-                )
-                dispatch(deletedOptionFromOptions(storeOption.id))
+                dispatch(setOptionEditing(storeOption.id, false))
+                dispatch(deletedOption(storeOption.id, storeOption.quizItemId))
               }}
             >
               <FontAwesomeIcon icon={faTrash} size="2x" color="red" />
@@ -80,14 +84,17 @@ const MultipleChoiceButton = ({ option }: multipleChoiceButtonProps) => {
       </StyledModal>
       {storeOption.correct ? (
         <>
-          <CorrectButton onClick={() => setEditOption(true)} variant="outlined">
+          <CorrectButton
+            onClick={() => dispatch(setOptionEditing(storeOption.id, true))}
+            variant="outlined"
+          >
             {storeOption.title}
           </CorrectButton>
         </>
       ) : (
         <>
           <IncorrectButton
-            onClick={() => setEditOption(true)}
+            onClick={() => dispatch(setOptionEditing(storeOption.id, true))}
             variant="outlined"
           >
             {storeOption.title}

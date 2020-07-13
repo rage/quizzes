@@ -1,13 +1,22 @@
 import { createReducer } from "typesafe-actions"
 import { ItemVariables } from "../../../types/NormalizedQuiz"
 import { action } from "../../../types/NormalizedQuiz"
-import { initializedEditor } from "../editorActions"
+import {
+  initializedEditor,
+  createdNewItem,
+  deletedItem,
+  createdNewOption,
+} from "../editorActions"
 import produce from "immer"
 import _ from "lodash"
 import {
   setAdvancedEditing,
   setScaleMax,
   setScaleMin,
+  setTestingRegex,
+  setRegex,
+  setRegexTestAnswer,
+  setValidRegex,
 } from "./itemVariableActions"
 
 export const itemVariableReducers = createReducer<
@@ -15,9 +24,10 @@ export const itemVariableReducers = createReducer<
   action
 >({})
   .handleAction(initializedEditor, (state, action) => {
-    console.log(state)
     return produce(state, draftState => {
-      for (const [id, item] of Object.entries(action.payload.quiz.items)) {
+      for (const [id, item] of Object.entries(
+        action.payload.normalizedQuiz.items,
+      )) {
         let array: number[] = []
         if (item.minValue && item.maxValue) {
           array = _.range(item.minValue, item.maxValue + 1)
@@ -29,6 +39,11 @@ export const itemVariableReducers = createReducer<
           validMax: true,
           validMin: true,
           array: array,
+          testingRegex: false,
+          regex: item.validityRegex ?? "",
+          regexTestAnswer: "",
+          validRegex: true,
+          newOptions: [],
         }
       }
     })
@@ -63,5 +78,60 @@ export const itemVariableReducers = createReducer<
           (state[action.payload.itemId].scaleMax ?? 0) + 1,
         )
       }
+    })
+  })
+
+  .handleAction(setTestingRegex, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].testingRegex = action.payload.testing
+    })
+  })
+
+  .handleAction(setRegex, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].regex = action.payload.testRegex
+    })
+  })
+
+  .handleAction(setRegexTestAnswer, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].regexTestAnswer =
+        action.payload.testAnswer
+    })
+  })
+
+  .handleAction(setValidRegex, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].validRegex = action.payload.valid
+    })
+  })
+
+  .handleAction(createdNewItem, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId] = {
+        advancedEditing: false,
+        regex: "",
+        regexTestAnswer: "",
+        scaleMax: 0,
+        scaleMin: 0,
+        testingRegex: false,
+        validMax: true,
+        validMin: true,
+        validRegex: true,
+        array: [],
+        newOptions: [],
+      }
+    })
+  })
+
+  .handleAction(deletedItem, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].advancedEditing = false
+    })
+  })
+
+  .handleAction(createdNewOption, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].newOptions.push(action.payload.optionId)
     })
   })

@@ -9,13 +9,12 @@ import {
   editedQuizzesBody,
   editedQuizzesSubmitmessage,
 } from "./quizActions"
-import { initializedEditor } from "../editorActions"
+import { initializedEditor, createdNewItem } from "../editorActions"
 import produce from "immer"
-
 export const quizReducer = createReducer<{ [quizId: string]: Quiz }, action>({})
   .handleAction(
     initializedEditor,
-    (_quizzes, action) => action.payload.quiz.quizzes,
+    (state, action) => action.payload.normalizedQuiz.quizzes,
   )
 
   .handleAction(editedQuizTitle, (state, action) => {
@@ -56,8 +55,15 @@ export const quizReducer = createReducer<{ [quizId: string]: Quiz }, action>({})
 
   .handleAction(editedQuizzesSubmitmessage, (state, action) => {
     return produce(state, draftState => {
+      console.log(draftState[action.payload.quizId])
       draftState[action.payload.quizId].submitMessage =
         action.payload.newMessage
+    })
+  })
+
+  .handleAction(createdNewItem, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.quizId].items.push(action.payload.itemId)
     })
   })
 

@@ -52,13 +52,21 @@ const PreviewLabelContainer = styled.div`
   align-items: center !important;
 `
 
+const ModalContentTitleWrapper = styled.div`
+  display: flex;
+  padding: 1rem;
+  justify-content: center;
+`
+
 interface ScaleItemEditorModalProps {
   item: Item
 }
-export const ScaleItemEditorModal = ({ item }: ScaleItemEditorModalProps) => {
+export const ScaleModalContent = ({ item }: ScaleItemEditorModalProps) => {
   const dispatch = useDispatch()
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
-  const variables = useTypedSelector(state => state.editor.variables[item.id])
+  const variables = useTypedSelector(
+    state => state.editor.itemVariables[item.id],
+  )
 
   const handleMinValueChange = (value: number) => {
     if (value >= 0 && value < variables.scaleMax) {
@@ -80,9 +88,9 @@ export const ScaleItemEditorModal = ({ item }: ScaleItemEditorModalProps) => {
 
   return (
     <>
-      <ModalContent>
+      <ModalContentTitleWrapper>
         <Typography variant="h4">Advanced editing</Typography>
-      </ModalContent>
+      </ModalContentTitleWrapper>
       <ModalContent>
         <TextField
           label="Title"
@@ -163,4 +171,4 @@ export const ScaleItemEditorModal = ({ item }: ScaleItemEditorModalProps) => {
   )
 }
 
-export default ScaleItemEditorModal
+export default ScaleModalContent

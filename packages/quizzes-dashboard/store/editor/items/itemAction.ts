@@ -105,11 +105,3 @@ export const toggledSharedOptionFeedbackMessage = createAction(
     sharedFeedback: sharedFeedback,
   }),
 )<{ itemId: string; sharedFeedback: boolean }>()
-
-export const deletedOptionFromItem = createAction(
-  "DELETED_OPTION_FROM_ITEM",
-  (itemId: string, optionId: string) => ({
-    itemId: itemId,
-    optionId: optionId,
-  }),
-)<{ itemId: string; optionId: string }>()

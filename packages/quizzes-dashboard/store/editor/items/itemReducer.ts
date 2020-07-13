@@ -11,19 +11,24 @@ import {
   editedItemFailureMessage,
   editedSharedOptionsFeedbackMessage,
   toggledSharedOptionFeedbackMessage,
-  deletedOptionFromItem,
   editedScaleMaxLabel,
   editedScaleMinLabel,
   editedScaleMaxValue,
   editedScaleMinValue,
 } from "./itemAction"
-import { initializedEditor } from "../editorActions"
+import {
+  initializedEditor,
+  createdNewItem,
+  deletedItem,
+  createdNewOption,
+  deletedOption,
+} from "../editorActions"
 import produce from "immer"
 
 export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
   .handleAction(
     initializedEditor,
-    (_state, action) => action.payload.quiz.items ?? {},
+    (state, action) => action.payload.normalizedQuiz.items,
   )
 
   .handleAction(editedQuizItemBody, (state, action) => {
@@ -115,7 +120,49 @@ export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
     })
   })
 
-  .handleAction(deletedOptionFromItem, (state, action) => {
+  .handleAction(createdNewItem, (state, action) => {
+    return produce(state, draftState => {
+      const newItem: Item = {
+        id: action.payload.itemId,
+        quizId: action.payload.quizId,
+        type: action.payload.type,
+        title: "",
+        body: "",
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        successMessage: null,
+        failureMessage: null,
+        formatRegex: null,
+        validityRegex: null,
+        maxLabel: null,
+        maxValue: null,
+        minLabel: null,
+        minValue: null,
+        maxWords: null,
+        minWords: null,
+        multi: false,
+        order: 0,
+        usesSharedOptionFeedbackMessage: false,
+        sharedOptionFeedbackMessage: null,
+        options: [],
+      }
+      draftState[action.payload.itemId] = newItem
+    })
+  })
+
+  .handleAction(deletedItem, (state, action) => {
+    return produce(state, draftState => {
+      delete draftState[action.payload.itemId]
+    })
+  })
+
+  .handleAction(createdNewOption, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].options.push(action.payload.optionId)
+    })
+  })
+
+  .handleAction(deletedOption, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.itemId].options = draftState[
         action.payload.itemId

@@ -6,7 +6,6 @@ import {
   FormControlLabel,
   Checkbox,
   TextField,
-  Button,
 } from "@material-ui/core"
 import {
   editedOptionTitle,
@@ -17,8 +16,6 @@ import {
 import { useDispatch } from "react-redux"
 import { Option } from "../../../../types/NormalizedQuiz"
 import { useTypedSelector } from "../../../../store/store"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faTrash } from "@fortawesome/free-solid-svg-icons"
 
 const ModalContent = styled.div`
   padding: 1rem;
@@ -29,7 +26,7 @@ interface OptionEditorProps {
   option: Option
 }
 
-export const OptionEditorModalContent = ({ option }: OptionEditorProps) => {
+export const OptionModalContent = ({ option }: OptionEditorProps) => {
   const storeOption = useTypedSelector(state => state.editor.options[option.id])
   const dispatch = useDispatch()
   return (
@@ -104,4 +101,4 @@ export const OptionEditorModalContent = ({ option }: OptionEditorProps) => {
   )
 }
 
-export default OptionEditorModalContent
+export default OptionModalContent

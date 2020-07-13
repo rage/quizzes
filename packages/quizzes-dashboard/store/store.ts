@@ -5,8 +5,17 @@ import { optionReducer } from "./editor/options/optionReducer"
 import { itemReducer } from "./editor/items/itemReducer"
 import { quizReducer } from "./editor/quiz/quizReducer"
 import { resultReducer } from "./editor/result/resultReducer"
-import { Quiz, Item, Option, ItemVariables } from "../types/NormalizedQuiz"
+import {
+  Quiz,
+  Item,
+  Option,
+  ItemVariables,
+  OptionVariables,
+  QuizVariables,
+} from "../types/NormalizedQuiz"
 import { itemVariableReducers } from "./editor/itemVariables/itemVariableReducers"
+import { optionVariableReducers } from "./editor/optionVariables/optionVariableReducers"
+import { quizVariableReducers } from "./editor/quizVariables/quizVariableReducers"
 
 //const reducer = combineReducers({ editor: editReducer2, user: userReducer })
 
@@ -15,7 +24,9 @@ const editorReducer = combineReducers({
   items: itemReducer,
   options: optionReducer,
   quizId: resultReducer,
-  variables: itemVariableReducers,
+  itemVariables: itemVariableReducers,
+  optionVariables: optionVariableReducers,
+  quizVariables: quizVariableReducers,
 })
 
 const reducer = combineReducers({
@@ -30,7 +41,9 @@ interface storeState {
     items: { [itemId: string]: Item }
     options: { [optionId: string]: Option }
     quizId: string
-    variables: { [quizId: string]: ItemVariables }
+    itemVariables: { [itemId: string]: ItemVariables }
+    optionVariables: { [optionId: string]: OptionVariables }
+    quizVariables: { [quizId: string]: QuizVariables }
   }
 }
 

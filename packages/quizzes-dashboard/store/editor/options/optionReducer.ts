@@ -5,9 +5,12 @@ import {
   editedOptionCorrectnes,
   editedOptionSuccessMessage,
   editedOptionFailureMessage,
-  deletedOptionFromOptions,
 } from "./optionActions"
-import { initializedEditor } from "../editorActions"
+import {
+  initializedEditor,
+  deletedOption,
+  createdNewOption,
+} from "../editorActions"
 import produce from "immer"
 
 export const optionReducer = createReducer<
@@ -16,7 +19,7 @@ export const optionReducer = createReducer<
 >({})
   .handleAction(
     initializedEditor,
-    (_state, action) => action.payload.quiz.options ?? {},
+    (state, action) => action.payload.normalizedQuiz.options ?? {},
   )
 
   .handleAction(editedOptionTitle, (state, action) => {
@@ -45,7 +48,24 @@ export const optionReducer = createReducer<
     })
   })
 
-  .handleAction(deletedOptionFromOptions, (state, action) => {
+  .handleAction(createdNewOption, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.optionId] = {
+        id: action.payload.optionId,
+        quizItemId: action.payload.itemId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        title: "",
+        body: "",
+        correct: false,
+        order: 0,
+        successMessage: "",
+        failureMessage: "",
+      }
+    })
+  })
+
+  .handleAction(deletedOption, (state, action) => {
     return produce(state, draftState => {
       delete draftState[action.payload.optionId]
     })
