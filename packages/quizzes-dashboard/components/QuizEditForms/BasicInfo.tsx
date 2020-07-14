@@ -151,7 +151,6 @@ const BasicInformation = () => {
             inputVariant="outlined"
             id="time-picker"
             label="Time picker"
-            format="dd.MM.yyyy 'klo.' hh:mm:ss"
             KeyboardButtonProps={{
               "aria-label": "change time",
             }}
