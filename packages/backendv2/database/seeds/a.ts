@@ -384,4 +384,11 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+  await knex.raw("? ON CONFLICT (user_id, quiz_id) DO NOTHING", [
+    knex("user_quiz_state").insert({
+      quiz_id: "2a0c2270-011e-40b2-8796-625764828034",
+      user_id: 1234,
+      status: "locked",
+    }),
+  ])
 }

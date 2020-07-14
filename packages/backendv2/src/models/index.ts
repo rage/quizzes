@@ -21,6 +21,8 @@ import PeerReviewQuestionTranslation from "./peer_review_question_translation"
 
 import User from "./user"
 
+import UserQuizState from "./user_quiz_state"
+
 import Course from "./course"
 import CourseTranslation from "./course_translation"
 
@@ -39,6 +41,7 @@ export {
   PeerReviewQuestion,
   PeerReviewQuestionTranslation,
   User,
+  UserQuizState,
   Course,
   CourseTranslation,
 }

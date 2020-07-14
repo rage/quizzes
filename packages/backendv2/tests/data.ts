@@ -558,5 +558,17 @@ export default {
         ],
       },
     ],
+    userQuizState: {
+      userId: 1234,
+      quizId: "2a0c2270-011e-40b2-8796-625764828034",
+      peerReviewsGiven: null,
+      peerReviewsReceived: null,
+      pointsAwarded: null,
+      spamFlags: null,
+      status: "locked",
+      tries: null,
+      createdAt: expect.stringMatching(dateTime),
+      updatedAt: expect.stringMatching(dateTime),
+    },
   },
 }
