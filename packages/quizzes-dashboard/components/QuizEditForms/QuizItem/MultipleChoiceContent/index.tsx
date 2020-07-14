@@ -67,6 +67,7 @@ interface multiplChoiceContentProps {
 }
 
 const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
+  const quizId = useTypedSelector(state => state.editor.quizId)
   const storeOptions = useTypedSelector(state => state.editor.options)
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
   const variables = useTypedSelector(
@@ -102,7 +103,7 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
             <ModalButtonWrapper>
               <DeleteButton
                 onClick={() => {
-                  dispatch(deletedItem(storeItem.id))
+                  dispatch(deletedItem(storeItem.id, quizId))
                 }}
               >
                 <FontAwesomeIcon icon={faTrash} size="2x" color="red" />

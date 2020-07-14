@@ -4,9 +4,10 @@ import Alert from "@material-ui/lab/Alert"
 import { useDispatch } from "react-redux"
 import { saveQuiz } from "../services/quizzes"
 import { initializedEditor } from "../store/editor/editorActions"
-import { useTypedSelector } from "../store/store"
+import { useTypedSelector, storeState } from "../store/store"
 import { denormalize, normalize } from "normalizr"
 import { normalizedQuiz } from "../schemas"
+import { EditableQuiz } from "../types/EditQuiz"
 
 const SaveButton = () => {
   const dispatch = useDispatch()
@@ -15,20 +16,51 @@ const SaveButton = () => {
   const [showMessage, setShowMessage] = useState(false)
   const [showSpinner, setShowSpinner] = useState(false)
 
-  const store = useTypedSelector(state => state.editor)
+  const store = useTypedSelector(state => state)
 
-  const handleClick = async (store: any) => {
+  const handleClick = async (store: storeState) => {
     setSaved(false)
     setShowSpinner(true)
 
-    const quizData = {
-      quizzes: store.quizzes,
-      items: store.items,
-      options: store.options,
-      quizId: store.quizId,
+    let quizData = {
+      quizzes: store.editor.quizzes,
+      items: store.editor.items,
+      options: store.editor.options,
+      quizId: store.editor.quizId,
     }
 
-    const quiz = denormalize(quizData.quizId, normalizedQuiz, quizData)
+    const quiz: EditableQuiz = denormalize(
+      quizData.quizId,
+      normalizedQuiz,
+      quizData,
+    )
+    for (let item of quiz.items) {
+      if (store.editor.itemVariables[item.id].newOptions.length > 0) {
+        for (let option of item.options) {
+          if (
+            store.editor.itemVariables[item.id].newOptions.some(
+              id => id === option.id,
+            )
+          ) {
+            delete option.id
+            if (
+              store.editor.quizVariables[store.editor.quizId].newItems.some(
+                id => id === item.id,
+              )
+            ) {
+              delete option.quizItemId
+            }
+          }
+        }
+      }
+      if (
+        store.editor.quizVariables[store.editor.quizId].newItems.some(
+          id => id === item.id,
+        )
+      ) {
+        delete item.id
+      }
+    }
     const response = await saveQuiz(quiz)
 
     setShowSpinner(false)

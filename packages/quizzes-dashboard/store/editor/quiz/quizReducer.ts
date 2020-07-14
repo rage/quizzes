@@ -9,7 +9,11 @@ import {
   editedQuizzesBody,
   editedQuizzesSubmitmessage,
 } from "./quizActions"
-import { initializedEditor, createdNewItem } from "../editorActions"
+import {
+  initializedEditor,
+  createdNewItem,
+  deletedItem,
+} from "../editorActions"
 import produce from "immer"
 export const quizReducer = createReducer<{ [quizId: string]: Quiz }, action>({})
   .handleAction(
@@ -64,6 +68,14 @@ export const quizReducer = createReducer<{ [quizId: string]: Quiz }, action>({})
   .handleAction(createdNewItem, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.quizId].items.push(action.payload.itemId)
+    })
+  })
+
+  .handleAction(deletedItem, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.quizId].items = draftState[
+        action.payload.quizId
+      ].items.filter(id => id !== action.payload.itemId)
     })
   })
 

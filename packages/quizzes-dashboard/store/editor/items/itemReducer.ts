@@ -55,17 +55,17 @@ export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
     })
   })
 
-  .handleAction(editedScaleMaxLabel, (state, action) => {
-    return produce(state, draftState => {
-      draftState[action.payload.itemId].maxLabel = action.payload.newLabel
-    })
-  })
+  // .handleAction(editedScaleMaxLabel, (state, action) => {
+  //   return produce(state, draftState => {
+  //     draftState[action.payload.itemId].maxLabel = action.payload.newLabel
+  //   })
+  // })
 
-  .handleAction(editedScaleMinLabel, (state, action) => {
-    return produce(state, draftState => {
-      draftState[action.payload.itemId].minLabel = action.payload.newLabel
-    })
-  })
+  // .handleAction(editedScaleMinLabel, (state, action) => {
+  //   return produce(state, draftState => {
+  //     draftState[action.payload.itemId].minLabel = action.payload.newLabel
+  //   })
+  // })
 
   .handleAction(editedValidityRegex, (state, action) => {
     return produce(state, draftState => {
@@ -134,9 +134,9 @@ export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
         failureMessage: null,
         formatRegex: null,
         validityRegex: null,
-        maxLabel: null,
+        // maxLabel: null,
         maxValue: null,
-        minLabel: null,
+        // minLabel: null,
         minValue: null,
         maxWords: null,
         minWords: null,

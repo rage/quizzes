@@ -41,5 +41,6 @@ export const optionVariableReducers = createReducer<
   .handleAction(deletedOption, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.optionId].optionEditing = false
+      delete draftState[action.payload.optionId]
     })
   })

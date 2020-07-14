@@ -51,8 +51,8 @@ export interface Item {
   maxWords: number | null
   maxValue: number | null
   minValue: number | null
-  maxLabel: string | null
-  minLabel: string | null
+  // maxLabel: string | null
+  // minLabel: string | null
   usesSharedOptionFeedbackMessage: boolean
   options: string[]
   title: string
@@ -129,8 +129,8 @@ export interface newItem {
   maxWords: number | null
   maxValue: number | null
   minValue: number | null
-  maxLabel: string | null
-  minLabel: string | null
+  // maxLabel: string | null
+  // minLabel: string | null
   usesSharedOptionFeedbackMessage: boolean
   options: string[]
   title: string

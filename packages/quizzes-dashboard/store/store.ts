@@ -17,8 +17,6 @@ import { itemVariableReducers } from "./editor/itemVariables/itemVariableReducer
 import { optionVariableReducers } from "./editor/optionVariables/optionVariableReducers"
 import { quizVariableReducers } from "./editor/quizVariables/quizVariableReducers"
 
-//const reducer = combineReducers({ editor: editReducer2, user: userReducer })
-
 const editorReducer = combineReducers({
   quizzes: quizReducer,
   items: itemReducer,
@@ -35,7 +33,7 @@ const reducer = combineReducers({
 
 const store = createStore(reducer, composeWithDevTools())
 
-interface storeState {
+export interface storeState {
   editor: {
     quizzes: { [quizId: string]: Quiz }
     items: { [itemId: string]: Item }

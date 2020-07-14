@@ -20,9 +20,13 @@ export const createdNewItem = createAction(
   }),
 )<{ quizId: string; type: string; itemId: string }>()
 
-export const deletedItem = createAction("DELETED_ITEM", (itemId: string) => ({
-  itemId: itemId,
-}))<{ itemId: string }>()
+export const deletedItem = createAction(
+  "DELETED_ITEM",
+  (itemId: string, quizId: string) => ({
+    itemId: itemId,
+    quizId: quizId,
+  }),
+)<{ itemId: string; quizId: string }>()
 
 export const createdNewOption = createAction(
   "CREATED_NEW_OPTION",

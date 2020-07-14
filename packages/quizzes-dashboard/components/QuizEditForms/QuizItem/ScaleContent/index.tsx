@@ -105,6 +105,7 @@ interface scaleContentProps {
   item: Item
 }
 const ScaleContent = ({ item }: scaleContentProps) => {
+  const quizId = useTypedSelector(state => state.editor.quizId)
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
   const variables = useTypedSelector(
     state => state.editor.itemVariables[item.id],
@@ -158,7 +159,7 @@ const ScaleContent = ({ item }: scaleContentProps) => {
             <ModalButtonWrapper>
               <DeleteButton
                 onClick={() => {
-                  dispatch(deletedItem(storeItem.id))
+                  dispatch(deletedItem(storeItem.id, quizId))
                 }}
               >
                 <FontAwesomeIcon icon={faTrash} size="2x" color="red" />

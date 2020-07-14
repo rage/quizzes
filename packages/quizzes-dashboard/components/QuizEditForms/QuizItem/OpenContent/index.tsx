@@ -81,6 +81,7 @@ interface openContentProps {
 }
 
 const OpenContent = ({ item }: openContentProps) => {
+  const quizId = useTypedSelector(state => state.editor.quizId)
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
   const variables = useTypedSelector(
     state => state.editor.itemVariables[item.id],
@@ -124,7 +125,9 @@ const OpenContent = ({ item }: openContentProps) => {
             </ModalButtonWrapper>
             <OpenModalContent item={storeItem} />
             <ModalButtonWrapper>
-              <DeleteButton onClick={() => dispatch(deletedItem(storeItem.id))}>
+              <DeleteButton
+                onClick={() => dispatch(deletedItem(storeItem.id, quizId))}
+              >
                 <FontAwesomeIcon icon={faTrash} color="red" size="2x" />
               </DeleteButton>
             </ModalButtonWrapper>
