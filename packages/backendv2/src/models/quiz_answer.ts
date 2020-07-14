@@ -6,6 +6,7 @@ class QuizAnswer extends Model {
   id!: string
   quizId!: string
   languageId!: string
+  status!: string
   itemAnswers!: QuizItemAnswer[]
 
   static get tableName() {
@@ -31,28 +32,54 @@ class QuizAnswer extends Model {
     },
   }
 
-  public static async getManualReview(
+  public static async getById(quizAnswerId: string) {
+    const quizAnswer = await this.query().findById(quizAnswerId)
+    await this.joinItemAndOptionAnswers([quizAnswer])
+    return quizAnswer
+  }
+
+  public static async getByQuizId(
     quizId: string,
     page: number,
     pageSize: number,
   ) {
-    const answers = (
+    const quizAnswers = (
+      await this.query()
+        .where("quiz_id", quizId)
+        .andWhereNot("status", "deprecated")
+        .orderBy("created_at")
+        .page(page, pageSize)
+    ).results
+    await this.joinItemAndOptionAnswers(quizAnswers)
+    return quizAnswers
+  }
+
+  public static async getAnswersForManualReview(
+    quizId: string,
+    page: number,
+    pageSize: number,
+  ) {
+    const quizAnswers = (
       await this.query()
         .where("quiz_id", quizId)
         .andWhere("status", "manual-review")
         .orderBy("created_at")
         .page(page, pageSize)
     ).results
-    for (const answer of answers) {
-      delete answer.languageId
-      answer.itemAnswers = await answer.$relatedQuery("itemAnswers")
-      for (const itemAnswer of answer.itemAnswers) {
+    await this.joinItemAndOptionAnswers(quizAnswers)
+    return quizAnswers
+  }
+
+  private static async joinItemAndOptionAnswers(quizAnswers: QuizAnswer[]) {
+    for (const quizAnswer of quizAnswers) {
+      delete quizAnswer.languageId
+      quizAnswer.itemAnswers = await quizAnswer.$relatedQuery("itemAnswers")
+      for (const itemAnswer of quizAnswer.itemAnswers) {
         itemAnswer.optionAnswers = await itemAnswer.$relatedQuery(
           "optionAnswers",
         )
       }
     }
-    return answers
   }
 }
 

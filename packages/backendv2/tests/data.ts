@@ -511,4 +511,52 @@ export default {
     createdAt: expect.stringMatching(dateTime),
     updatedAt: expect.stringMatching(dateTime),
   },
+  quizAnswerValidator1: {
+    id: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+    quizId: "2a0c2270-011e-40b2-8796-625764828034",
+    userId: 1234,
+    status: "confirmed",
+    createdAt: expect.stringMatching(dateTime),
+    updatedAt: expect.stringMatching(dateTime),
+    itemAnswers: [
+      {
+        id: "840ad4ff-8402-4c71-a57f-4b12e4b32bce",
+        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+        quizItemId: "742c0e08-c884-4117-b9a9-05650e1606f2",
+        textData: null,
+        intData: null,
+        correct: null,
+        createdAt: expect.stringMatching(dateTime),
+        updatedAt: expect.stringMatching(dateTime),
+        optionAnswers: [
+          {
+            id: "5e102499-42bc-43a1-98ab-de290d44a999",
+            quizItemAnswerId: "840ad4ff-8402-4c71-a57f-4b12e4b32bce",
+            quizOptionId: "1265f35e-77d9-4e20-9fdf-407b00cbd692",
+            createdAt: expect.stringMatching(dateTime),
+            updatedAt: expect.stringMatching(dateTime),
+          },
+        ],
+      },
+      {
+        id: "31941489-29a1-448d-bc59-418480d007d9",
+        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+        quizItemId: "4b3a9922-6b24-43f2-82bf-9ae9a0d34285",
+        textData: null,
+        intData: null,
+        correct: null,
+        createdAt: expect.stringMatching(dateTime),
+        updatedAt: expect.stringMatching(dateTime),
+        optionAnswers: [
+          {
+            id: "ab6c2932-193c-439c-a5b5-1694bebdc178",
+            quizItemAnswerId: "31941489-29a1-448d-bc59-418480d007d9",
+            quizOptionId: "1265f35e-77d9-4e20-9fdf-407b00cbd692",
+            createdAt: expect.stringMatching(dateTime),
+            updatedAt: expect.stringMatching(dateTime),
+          },
+        ],
+      },
+    ],
+  },
 }
