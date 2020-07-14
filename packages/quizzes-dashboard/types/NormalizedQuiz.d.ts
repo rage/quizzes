@@ -18,11 +18,11 @@ export interface Quiz {
   part: number
   section: number
   points: number
-  deadline: Date | null
-  open: Date | null
+  deadline: string | null
+  open: string | null
   excludedFromScore: boolean
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   autoConfirm: boolean
   tries: number
   triesLimited: boolean
@@ -45,8 +45,8 @@ export interface Item {
   validityRegex: string | null
   formatRegex: string | null
   multi: boolean
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   minWords: number | null
   maxWords: number | null
   maxValue: number | null
@@ -67,8 +67,8 @@ export interface Option {
   quizItemId: string
   order: number
   correct: boolean
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   title: string
   body: string | null
   successMessage: null | string
@@ -83,8 +83,8 @@ export interface Course {
   minPeerReviewsGiven: number | null
   minReviewAverage: number | null
   maxSpamFlags: number | null
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   organizationId: null
   moocfiId: string
   maxReviewSpamFlags: number
@@ -114,6 +114,7 @@ export interface QuizVariables {
   addingNewItem: boolean
   newItemType: string
   newItems: string[]
+  deadlineTimeZone: string
 }
 
 export interface newItem {
@@ -123,8 +124,8 @@ export interface newItem {
   validityRegex: string | null
   formatRegex: string | null
   multi: boolean
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   minWords: number | null
   maxWords: number | null
   maxValue: number | null
@@ -144,8 +145,8 @@ export interface newOption {
   quizItemId: string
   order: number
   correct: boolean
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   title: string
   body: string | null
   successMessage: null | string

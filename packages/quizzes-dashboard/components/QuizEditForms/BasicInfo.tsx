@@ -3,7 +3,7 @@ import "date-fns"
 import DateFnsUtils from "@date-io/date-fns"
 import {
   MuiPickersUtilsProvider,
-  KeyboardDatePicker,
+  KeyboardDateTimePicker,
 } from "@material-ui/pickers"
 import { Typography, Card, TextField, MenuItem } from "@material-ui/core"
 import styled from "styled-components"
@@ -19,16 +19,11 @@ import {
   editedQuizzesBody,
   editedQuizzesSubmitmessage,
 } from "../../store/editor/quiz/quizActions"
-import DebugDialog from "../DebugDialog"
 import { useTypedSelector } from "../../store/store"
-
-const InfoCard = styled(Card)`
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 40px -12px !important;
-  border-radius: 1rem !important;
-  margin: 0 auto;
-  margin-bottom: 1rem;
-  width: 800px;
-`
+import { listTimeZones } from "timezone-support"
+import { setTimezone } from "../../store/editor/editorActions"
+import { DateTime } from "luxon"
+import { isDate } from "lodash"
 
 const SubsectionTitleWrapper = styled.div`
   display: flex;
@@ -40,38 +35,6 @@ const SubsectionTitleWrapper = styled.div`
 const InfoContainer = styled.div`
   padding: 1rem 0;
   display: flex;
-`
-
-const InfoContainer2 = styled.div`
-  padding: 1rem;
-  display: flex;
-`
-const StyledId = styled(Typography)`
-  margin-bottom: 1rem !important;
-`
-
-const TitleContainer = styled.div`
-  flex: 1;
-  margin-right: 1rem;
-`
-
-const PointsContainer = styled.div`
-  margin-right: 1.5rem;
-  width: 5rem;
-`
-
-const QuizContent = styled.div`
-  padding: 0.5rem;
-  display: flex;
-  width: 100%;
-`
-
-const StyledTextField = styled(TextField)`
-  background-color: white;
-  border-radius: 1rem;
-  overflow: hidden;
-  width: 100%;
-  margin-top: 0.25rem !important;
 `
 
 const TitleIcon = styled(FontAwesomeIcon)`
@@ -100,18 +63,16 @@ const BasicInformation = () => {
   const deadline = useTypedSelector(
     state => state.editor.quizzes[quizId].deadline,
   )
-  const createdAt = useTypedSelector(
-    state => state.editor.quizzes[quizId].createdAt,
-  )
-  const updatedAt = useTypedSelector(
-    state => state.editor.quizzes[quizId].updatedAt,
-  )
   const title = useTypedSelector(state => state.editor.quizzes[quizId].title)
 
   const body = useTypedSelector(state => state.editor.quizzes[quizId].body)
 
   const submitMessage = useTypedSelector(
     state => state.editor.quizzes[quizId].submitMessage,
+  )
+
+  const variables = useTypedSelector(
+    state => state.editor.quizVariables[quizId],
   )
 
   return (
@@ -183,29 +144,51 @@ const BasicInformation = () => {
       </InfoContainer>
       <MuiPickersUtilsProvider utils={DateFnsUtils}>
         <InfoContainer>
-          <KeyboardDatePicker
-            disableToolbar
+          <KeyboardDateTimePicker
+            value={deadline}
+            fullWidth
             variant="dialog"
             inputVariant="outlined"
-            fullWidth
-            format="dd/MM/yyyy"
-            margin="none"
-            id="date-picker-inline"
-            label="Deadline"
-            value={deadline}
-            onChange={date => dispatch(editedQuizzesDeadline(date, quizId))}
+            id="time-picker"
+            label="Time picker"
+            format="dd.MM.yyyy 'klo.' hh:mm:ss"
             KeyboardButtonProps={{
-              "aria-label": "change deadline",
+              "aria-label": "change time",
+            }}
+            onChange={event => {
+              dispatch(
+                editedQuizzesDeadline(
+                  event,
+                  variables.deadlineTimeZone,
+                  quizId,
+                ),
+              )
             }}
           />
+          <TextField
+            select
+            fullWidth
+            label="timezone"
+            variant="outlined"
+            value={variables.deadlineTimeZone ?? ""}
+            onChange={event => {
+              dispatch(setTimezone(quizId, event.target.value))
+            }}
+          >
+            {listTimeZones().map(timezone => (
+              <MenuItem key={timezone} value={timezone}>
+                {timezone}
+              </MenuItem>
+            ))}
+          </TextField>
         </InfoContainer>
       </MuiPickersUtilsProvider>
       <InfoContainer>
         <TextField
           multiline
+          fullWidth
           rows={5}
           label="Description for the whole quiz"
-          fullWidth
           variant="outlined"
           value={body}
           onChange={event =>

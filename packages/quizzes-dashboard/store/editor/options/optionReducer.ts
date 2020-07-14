@@ -53,8 +53,8 @@ export const optionReducer = createReducer<
       draftState[action.payload.optionId] = {
         id: action.payload.optionId,
         quizItemId: action.payload.itemId,
-        createdAt: new Date(),
-        updatedAt: new Date(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
         title: "",
         body: "",
         correct: false,

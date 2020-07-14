@@ -7,13 +7,13 @@ export interface EditableQuiz {
   points: number
   tries: number
   triesLimited: boolean
-  deadline: Date | null
-  open: Date | null
+  deadline: string | null
+  open: string | null
   autoConfirm: boolean
   excludedFromScore: boolean
   awardPointsEvenIfWrong: boolean
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   texts: QuizText[]
   items: Item[]
   peerReviews: any[]
@@ -32,8 +32,8 @@ export interface Item {
   formatRegex: null
   multi: boolean
   usesSharedOptionFeedbackMessage: boolean
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   texts: ItemText[]
   options: Option[]
 }
