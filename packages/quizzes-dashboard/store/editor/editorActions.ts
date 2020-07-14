@@ -1,15 +1,15 @@
 import { createAction } from "typesafe-actions"
 import { Entities } from "../../types/NormalizedQuiz"
-import { EditableQuiz } from "../../types/EditQuiz"
 import { v4 } from "uuid"
+import { Quizv2 } from "../../types/Quizv2"
 
 export const initializedEditor = createAction(
   "INITIALIZED_EDITOR",
-  (normalizedQuiz: Entities, nestedQuiz: EditableQuiz) => ({
+  (normalizedQuiz: Entities, nestedQuiz: Quizv2) => ({
     normalizedQuiz: normalizedQuiz,
     nestedQuiz: nestedQuiz,
   }),
-)<{ normalizedQuiz: Entities; nestedQuiz: EditableQuiz }>()
+)<{ normalizedQuiz: Entities; nestedQuiz: Quizv2 }>()
 
 export const createdNewItem = createAction(
   "CREATED_NEW_ITEM",

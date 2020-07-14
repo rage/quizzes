@@ -1,4 +1,4 @@
-import { action, Item } from "../../../types/NormalizedQuiz"
+import { action, NormalizedItem } from "../../../types/NormalizedQuiz"
 import { createReducer } from "typesafe-actions"
 import {
   editedQuizItemBody,
@@ -25,7 +25,10 @@ import {
 } from "../editorActions"
 import produce from "immer"
 
-export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
+export const itemReducer = createReducer<
+  { [itemId: string]: NormalizedItem },
+  action
+>({})
   .handleAction(
     initializedEditor,
     (state, action) => action.payload.normalizedQuiz.items,
@@ -122,7 +125,7 @@ export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
 
   .handleAction(createdNewItem, (state, action) => {
     return produce(state, draftState => {
-      const newItem: Item = {
+      const newItem: NormalizedItem = {
         id: action.payload.itemId,
         quizId: action.payload.quizId,
         type: action.payload.type,

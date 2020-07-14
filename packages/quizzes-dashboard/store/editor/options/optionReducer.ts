@@ -1,4 +1,4 @@
-import { action, Option } from "../../../types/NormalizedQuiz"
+import { action, NormalizedOption } from "../../../types/NormalizedQuiz"
 import { createReducer } from "typesafe-actions"
 import {
   editedOptionTitle,
@@ -14,7 +14,7 @@ import {
 import produce from "immer"
 
 export const optionReducer = createReducer<
-  { [optionId: string]: Option },
+  { [optionId: string]: NormalizedOption },
   action
 >({})
   .handleAction(

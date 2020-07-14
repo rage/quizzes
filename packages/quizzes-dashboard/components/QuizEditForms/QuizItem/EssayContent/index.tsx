@@ -2,7 +2,7 @@ import React from "react"
 import styled from "styled-components"
 import { TextField, Button, Modal, Box, Fade } from "@material-ui/core"
 import { useDispatch } from "react-redux"
-import { Item } from "../../../../types/NormalizedQuiz"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import {
   editedItemMaxWords,
   editedItemMinWords,
@@ -66,7 +66,7 @@ const EditButtonWrapper = styled.div`
 `
 
 interface essayContentProps {
-  item: Item
+  item: NormalizedItem
 }
 
 const EssayContent = ({ item }: essayContentProps) => {

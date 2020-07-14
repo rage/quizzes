@@ -12,7 +12,6 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import QuizEditForms from "../../../components/QuizEditForms"
 import { useTypedSelector } from "../../../store/store"
 import _ from "lodash"
-import { EditableQuiz } from "../../../types/EditQuiz"
 
 const EditPage = ({ router }: any) => {
   const id = router.query.id

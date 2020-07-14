@@ -1,5 +1,5 @@
 import React from "react"
-import { Item } from "../../../../types/NormalizedQuiz"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import styled from "styled-components"
 import { Typography, TextField } from "@material-ui/core"
 import { useTypedSelector } from "../../../../store/store"
@@ -33,7 +33,7 @@ const IconContainer = styled.div`
 `
 
 interface ModalContentProps {
-  item: Item
+  item: NormalizedItem
 }
 
 export const RegexTesterModalContent = ({ item }: ModalContentProps) => {

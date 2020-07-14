@@ -1,7 +1,7 @@
 import React from "react"
 import { fetchCourseQuizzes } from "../../services/quizzes"
 import { groupBy, Dictionary } from "lodash"
-import { Typography, Card, CardContent } from "@material-ui/core"
+import { Typography, Card, CardContent, Button } from "@material-ui/core"
 import { Skeleton } from "@material-ui/lab"
 import DebugDialog from "../../components/DebugDialog"
 import Link from "next/link"
@@ -32,6 +32,7 @@ const QuizLink = styled.a`
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
 `
+
 const ShowCoursePage = ({ router }: any) => {
   const id = router.query.id
   useBreadcrumbs([

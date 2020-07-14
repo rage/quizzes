@@ -1,8 +1,8 @@
 import axios from "axios"
-import { Course } from "../types/Course"
-import { EditableQuiz } from "../types/EditQuiz"
+//import { Course } from "../types/Course"
+//import { EditableQuiz } from "../types/EditQuiz"
 import { checkStore } from "./tmcApi"
-import { Quizv2 } from "../types/Quizv2"
+import { Quizv2, Course } from "../types/Quizv2"
 
 let HOST = "http://localhost:3003"
 
@@ -53,7 +53,7 @@ export const fetchCourseQuizzes = async (
   throw new Error()
 }
 
-export const fetchQuiz = async (id: string): Promise<EditableQuiz> => {
+export const fetchQuiz = async (id: string): Promise<Quizv2> => {
   const userInfo = checkStore()
   if (userInfo) {
     const config = {
@@ -65,8 +65,7 @@ export const fetchQuiz = async (id: string): Promise<EditableQuiz> => {
   throw new Error()
 }
 
-export const saveQuiz = async (quiz: EditableQuiz): Promise<any> => {
-  console.log(quiz)
+export const saveQuiz = async (quiz: Quizv2): Promise<any> => {
   const userInfo = checkStore()
   if (userInfo) {
     const config = {

@@ -1,5 +1,5 @@
 import React from "react"
-import { Item } from "../../../../types/NormalizedQuiz"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import styled from "styled-components"
 import { Button, TextField, Modal, Fade, Box } from "@material-ui/core"
 import { useDispatch } from "react-redux"
@@ -63,7 +63,7 @@ const AddOptionButton = styled(Button)``
 const EditItemButton = styled(Button)``
 
 interface multiplChoiceContentProps {
-  item: Item
+  item: NormalizedItem
 }
 
 const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
