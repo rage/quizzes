@@ -8,17 +8,8 @@ import Link from "next/link"
 import styled from "styled-components"
 import useSWR from "swr"
 import { withRouter } from "next/router"
-import { Quizv2 } from "../../types/Quizv2"
+import { Quiz } from "../../types/Quiz"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
-
-interface quiz {
-  quiz: Quizv2
-}
-
-interface section {
-  section: string
-  quizzes: Quizv2[]
-}
 
 const QuizCard = styled(Card)`
   margin-bottom: 1rem;
@@ -67,7 +58,7 @@ const ShowCoursePage = ({ router }: any) => {
   const quizzes = data.quizzes
   const course = data.course
   const byPart = groupBy(quizzes, "part")
-  let byPartAndSection: Record<string, Dictionary<Quizv2[]>> = {}
+  let byPartAndSection: Record<string, Dictionary<Quiz[]>> = {}
   for (let [part, quizzes] of Object.entries(byPart)) {
     byPartAndSection[part] = groupBy(quizzes, "section")
   }
@@ -93,18 +84,27 @@ const ShowCoursePage = ({ router }: any) => {
   )
 }
 
-const SectionOfPart = ({ section, quizzes }: section) => {
+interface sectionProps {
+  section: string
+  quizzes: Quiz[]
+}
+
+const SectionOfPart = ({ section, quizzes }: sectionProps) => {
   return (
     <>
       <Typography variant="h6">Section {section}</Typography>
       {quizzes.map(quiz => {
-        return <Quiz key={quiz.id} quiz={quiz} />
+        return <QuizOfSection key={quiz.id} quiz={quiz} />
       })}
     </>
   )
 }
 
-const Quiz = ({ quiz }: quiz) => {
+interface quizProps {
+  quiz: Quiz
+}
+
+const QuizOfSection = ({ quiz }: quizProps) => {
   const title = quiz.title
   return (
     <Link

@@ -1,4 +1,4 @@
-export interface Quizv2 {
+export interface Quiz {
   id: string
   courseId: string
   part: number
@@ -39,12 +39,25 @@ export interface Item {
   maxLabel: string | null
   minLabel: string | null
   usesSharedOptionFeedbackMessage: boolean
-  options: any[]
+  options: Option[]
   title: null
   body: null
   successMessage: null
   failureMessage: null
   sharedOptionFeedbackMessage: null
+}
+
+export interface Option {
+  id: string
+  quizItemId: string
+  order: number
+  correct: boolean
+  createdAt: Date
+  updatedAt: Date
+  title: string
+  body: string | null
+  successMessage: null | string
+  failureMessage: null | string
 }
 
 export interface PeerReview {

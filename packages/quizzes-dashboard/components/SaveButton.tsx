@@ -8,7 +8,7 @@ import { useTypedSelector, storeState } from "../store/store"
 import { denormalize, normalize } from "normalizr"
 import { normalizedQuiz } from "../schemas"
 //import { EditableQuiz } from "../types/EditQuiz"
-import { Quizv2 } from "../types/Quizv2"
+import { Quiz } from "../types/Quiz"
 
 const SaveButton = () => {
   const dispatch = useDispatch()
@@ -30,7 +30,7 @@ const SaveButton = () => {
       quizId: store.editor.quizId,
     }
 
-    const quiz: Quizv2 = denormalize(quizData.quizId, normalizedQuiz, quizData)
+    const quiz: Quiz = denormalize(quizData.quizId, normalizedQuiz, quizData)
     for (let item of quiz.items) {
       if (store.editor.itemVariables[item.id].newOptions.length > 0) {
         for (let option of item.options) {
