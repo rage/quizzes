@@ -1,5 +1,5 @@
-import React from "react"
-import { fetchCourseQuizzes } from "../../services/quizzes"
+import React, { useState } from "react"
+import { fetchCourseQuizzes, saveQuiz } from "../../services/quizzes"
 import { groupBy, Dictionary } from "lodash"
 import { Typography, Card, CardContent, Button } from "@material-ui/core"
 import { Skeleton } from "@material-ui/lab"
@@ -10,6 +10,7 @@ import useSWR from "swr"
 import { withRouter } from "next/router"
 import { Quiz } from "../../types/Quiz"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
+import { NewQuiz } from "../../types/NormalizedQuiz"
 
 const QuizCard = styled(Card)`
   margin-bottom: 1rem;
@@ -31,6 +32,7 @@ const ShowCoursePage = ({ router }: any) => {
     { label: "Course" },
   ])
   const { data, error } = useSWR(id, fetchCourseQuizzes)
+
   if (error) {
     return <div>Something went wrong</div>
   }
@@ -55,6 +57,7 @@ const ShowCoursePage = ({ router }: any) => {
       </>
     )
   }
+
   const quizzes = data.quizzes
   const course = data.course
   const byPart = groupBy(quizzes, "part")
@@ -62,8 +65,39 @@ const ShowCoursePage = ({ router }: any) => {
   for (let [part, quizzes] of Object.entries(byPart)) {
     byPartAndSection[part] = groupBy(quizzes, "section")
   }
+  const createNewQuiz = async () => {
+    const newQuiz: NewQuiz = {
+      autoConfirm: false,
+      autoReject: false,
+      awardPointsEvenIfWrong: false,
+      body: "",
+      courseId: id,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deadline: null,
+      excludedFromScore: true,
+      grantPointsPolicy: "grant_whenever_possible",
+      items: [],
+      open: null,
+      part: 0,
+      peerReviews: [],
+      points: 0,
+      section: 0,
+      submitMessage: null,
+      title: "",
+      tries: 1,
+      triesLimited: true,
+    }
+    const res = await saveQuiz(newQuiz)
+    if (res !== undefined) {
+      quizzes.push(res)
+    }
+  }
   return (
     <>
+      <Button variant="outlined" onClick={() => createNewQuiz()}>
+        Add new Quiz
+      </Button>
       <Typography variant="h3">Edit {course.title}</Typography>
       {Object.entries(byPartAndSection).map(([part, section]) => (
         <div key={part}>
@@ -121,7 +155,7 @@ const QuizOfSection = ({ quiz }: quizProps) => {
             </div>
             <div>
               <Typography variant="overline" color="secondary">
-                [{quiz.items[0].type}]
+                {/* [{quiz.items[0].type}] */}
               </Typography>
             </div>
           </CardContent>

@@ -98,7 +98,30 @@ export interface QuizVariables {
   newItems: string[]
 }
 
-export interface newItem {
+export interface NewQuiz {
+  courseId: string
+  part: number
+  section: number
+  points: number
+  deadline: Date | null
+  open: Date | null
+  excludedFromScore: boolean
+  createdAt: Date
+  updatedAt: Date
+  autoConfirm: boolean
+  tries: number
+  triesLimited: boolean
+  awardPointsEvenIfWrong: boolean
+  grantPointsPolicy: string
+  autoReject: boolean
+  items: Item[]
+  peerReviews: PeerReview[]
+  title: string
+  body: string
+  submitMessage: string | null
+}
+
+export interface NewItem {
   quizId: string
   type: string
   order: number
@@ -111,8 +134,6 @@ export interface newItem {
   maxWords: number | null
   maxValue: number | null
   minValue: number | null
-  // maxLabel: string | null
-  // minLabel: string | null
   usesSharedOptionFeedbackMessage: boolean
   options: string[]
   title: string
@@ -122,7 +143,7 @@ export interface newItem {
   sharedOptionFeedbackMessage: string | null
 }
 
-export interface newOption {
+export interface NewOption {
   quizItemId: string
   order: number
   correct: boolean

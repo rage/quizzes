@@ -4,8 +4,8 @@ export interface Quiz {
   part: number
   section: number
   points: number
-  deadline: null
-  open: null
+  deadline: Date | null
+  open: Date | null
   excludedFromScore: boolean
   createdAt: Date
   updatedAt: Date
@@ -19,7 +19,7 @@ export interface Quiz {
   peerReviews: PeerReview[]
   title: string
   body: string
-  submitMessage: null
+  submitMessage: string | null
 }
 
 export interface Item {
