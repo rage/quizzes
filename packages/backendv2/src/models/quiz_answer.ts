@@ -2,6 +2,7 @@ import Model from "./base_model"
 import QuizItemAnswer from "./quiz_item_answer"
 import User from "./user"
 import UserQuizState from "./user_quiz_state"
+import PeerReview from "./peer_review"
 
 class QuizAnswer extends Model {
   id!: string
@@ -9,6 +10,7 @@ class QuizAnswer extends Model {
   languageId!: string
   status!: string
   itemAnswers!: QuizItemAnswer[]
+  peerReviews!: PeerReview[]
   userQuizState!: UserQuizState
 
   static get tableName() {
@@ -30,6 +32,14 @@ class QuizAnswer extends Model {
       join: {
         from: "quiz_answer.id",
         to: "quiz_item_answer.quiz_answer_id",
+      },
+    },
+    peerReviews: {
+      relation: Model.HasManyRelation,
+      modelClass: PeerReview,
+      join: {
+        from: "quiz_answer.id",
+        to: "peer_review.quiz_answer_id",
       },
     },
     userQuizState: {
@@ -89,6 +99,10 @@ class QuizAnswer extends Model {
         itemAnswer.optionAnswers = await itemAnswer.$relatedQuery(
           "optionAnswers",
         )
+      }
+      quizAnswer.peerReviews = await quizAnswer.$relatedQuery("peerReviews")
+      for (const peerReview of quizAnswer.peerReviews) {
+        peerReview.answers = await peerReview.$relatedQuery("answers")
       }
     }
   }
