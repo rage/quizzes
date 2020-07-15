@@ -151,7 +151,7 @@ const BasicInformation = () => {
               "aria-label": "change time",
             }}
             onChange={event => {
-              dispatch(editedQuizzesDeadline(event?.toISOString(), quizId))
+              dispatch(editedQuizzesDeadline(event, quizId))
             }}
           />
         </MuiPickersUtilsProvider>
@@ -166,7 +166,9 @@ const BasicInformation = () => {
             shrink: true,
           }}
           onChange={event => {
-            dispatch(editedQuizzesDeadline(event.target.value, quizId))
+            dispatch(
+              editedQuizzesDeadline(new Date(event.target.value), quizId),
+            )
           }}
         />
       </InfoContainer>

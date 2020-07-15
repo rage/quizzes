@@ -16,13 +16,19 @@ export const quizVariableReducers = createReducer<
       const deadline =
         action.payload.normalizedQuiz.quizzes[
           action.payload.normalizedQuiz.result
-        ].deadline ?? ""
+        ].deadline
+      let withOffset = ""
+      if (deadline) {
+        withOffset = DateTime.fromISO(deadline)
+          .toLocal()
+          .toISO()
+      }
       draftState[action.payload.normalizedQuiz.result] = {
         initialState: init,
         addingNewItem: false,
         newItemType: "",
         newItems: [],
-        deadline: deadline,
+        deadline: withOffset,
         validDeadline: true,
       }
     })
@@ -52,13 +58,22 @@ export const quizVariableReducers = createReducer<
         draftState[action.payload.id].validDeadline = true
         draftState[action.payload.id].deadline = ""
       }
-      if (action.payload.deadline) {
-        if (DateTime.fromISO(action.payload.deadline).isValid) {
+      if (action.payload.deadline !== null) {
+        if (DateTime.fromISO(action.payload.deadline.toISOString()).isValid) {
           draftState[action.payload.id].validDeadline = true
+          draftState[action.payload.id].deadline = DateTime.fromISO(
+            action.payload.deadline.toISOString(),
+          )
+            .toLocal()
+            .toISO()
         } else {
           draftState[action.payload.id].validDeadline = false
+          draftState[action.payload.id].deadline = draftState[
+            action.payload.id
+          ].deadline = DateTime.fromISO(action.payload.deadline.toISOString())
+            .toLocal()
+            .toISO()
         }
-        draftState[action.payload.id].deadline = action.payload.deadline ?? ""
       }
     })
   })

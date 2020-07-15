@@ -49,8 +49,10 @@ export const quizReducer = createReducer<{ [quizId: string]: Quiz }, action>({})
 
   .handleAction(editedQuizzesDeadline, (state, action) => {
     return produce(state, draftState => {
-      if (action.payload.deadline) {
-        const deadline = DateTime.fromISO(action.payload.deadline).toLocal()
+      if (action.payload.deadline !== null) {
+        const deadline = DateTime.fromISO(
+          action.payload.deadline.toISOString(),
+        ).toLocal()
         if (deadline.isValid) {
           draftState[action.payload.id].deadline = deadline.toISO()
         }
