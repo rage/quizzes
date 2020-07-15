@@ -3,6 +3,7 @@ import QuizItemAnswer from "./quiz_item_answer"
 import User from "./user"
 import UserQuizState from "./user_quiz_state"
 import PeerReview from "./peer_review"
+import { BadRequestError } from "../util/error"
 
 class QuizAnswer extends Model {
   id!: string
@@ -88,6 +89,16 @@ class QuizAnswer extends Model {
     ).results
     await this.addRelations(quizAnswers)
     return quizAnswers
+  }
+
+  public static async setManualReviewStatus(answerId: string, status: string) {
+    if (!["confirmed", "rejected"].includes(status)) {
+      throw new BadRequestError("invalid status")
+    }
+    const quizAnswer = await this.query().updateAndFetchById(answerId, {
+      status,
+    })
+    return quizAnswer
   }
 
   private static async addRelations(quizAnswers: QuizAnswer[]) {

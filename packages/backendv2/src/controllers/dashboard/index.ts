@@ -9,7 +9,8 @@ const dashboard = new Router<CustomState, CustomContext>({
   prefix: "/dashboard",
 })
   .post("/quizzes", admin, async ctx => {
-    ctx.body = await Quiz.saveQuiz(ctx.request.body)
+    const quizData = ctx.request.body
+    ctx.body = await Quiz.saveQuiz(quizData)
   })
   .get("/quizzes/:quizId", admin, async ctx => {
     const quizId = ctx.params.quizId
@@ -25,6 +26,11 @@ const dashboard = new Router<CustomState, CustomContext>({
   .get("/courses/:courseId", admin, async ctx => {
     const courseId = ctx.params.courseId
     ctx.body = await Course.getFlattenedById(courseId)
+  })
+  .post("/answers/:answerId", admin, async ctx => {
+    const answerId = ctx.params.answerId
+    const statusData = ctx.request.body.status
+    ctx.body = await QuizAnswer.setManualReviewStatus(answerId, statusData)
   })
   .get("/answers/:answerId", admin, async ctx => {
     const answerId = ctx.params.answerId

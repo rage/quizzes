@@ -541,3 +541,84 @@ describe("dashboard: get manual review answers", () => {
       .expect(200, done)
   })
 })
+
+describe("dashboard: update manual review status", () => {
+  beforeAll(() => {
+    return knex.seed.run({
+      directory: "./database/seeds",
+      specific: "a.ts",
+    })
+  })
+
+  afterAll(() => {
+    return knexCleaner.clean(knex)
+  })
+
+  beforeEach(() => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .post("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .set("Accept", "application/json")
+      .send({ status: "confirmed" })
+      .expect(401, done)
+  })
+
+  test("respond with 403 if insufficient credentials", done => {
+    request(app.callback())
+      .post("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .set("Accept", "application/json")
+      .send({ status: "confirmed" })
+      .expect(403, done)
+  })
+
+  test("respond with 400 if invalid status", done => {
+    request(app.callback())
+      .post("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .send({ status: "submitted" })
+      .expect(response => {
+        const received = response.body
+        expect(received.message).toMatch("invalid status")
+      })
+      .expect(400, done)
+  })
+
+  test("update valid status", done => {
+    request(app.callback())
+      .post("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .send({ status: "confirmed" })
+      .expect(response => {
+        const received: QuizAnswer = response.body
+        expect(received.status).toEqual("confirmed")
+      })
+      .expect(200, done)
+  })
+})
