@@ -114,7 +114,8 @@ export interface QuizVariables {
   addingNewItem: boolean
   newItemType: string
   newItems: string[]
-  deadlineTimeZone: string
+  deadline: string
+  validDeadline: boolean
 }
 
 export interface newItem {

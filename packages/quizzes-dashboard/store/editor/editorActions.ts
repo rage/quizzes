@@ -43,11 +43,3 @@ export const deletedOption = createAction(
     itemId: itemId,
   }),
 )<{ optionId: string; itemId: string }>()
-
-export const setTimezone = createAction(
-  "SET_TIMEZONE",
-  (quizId: string, timezone: string) => ({
-    quizId: quizId,
-    timezone: timezone,
-  }),
-)<{ quizId: string; timezone: string }>()

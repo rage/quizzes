@@ -13,11 +13,9 @@ import {
   initializedEditor,
   createdNewItem,
   deletedItem,
-  setTimezone,
 } from "../editorActions"
 import produce from "immer"
 import { DateTime } from "luxon"
-import { isValid } from "date-fns"
 
 export const quizReducer = createReducer<{ [quizId: string]: Quiz }, action>({})
   .handleAction(
@@ -51,33 +49,11 @@ export const quizReducer = createReducer<{ [quizId: string]: Quiz }, action>({})
 
   .handleAction(editedQuizzesDeadline, (state, action) => {
     return produce(state, draftState => {
-      if (
-        action.payload.deadline !== null &&
-        isValid(new Date(action.payload.deadline))
-      ) {
-        const withTimezone = DateTime.fromISO(
-          action.payload.deadline.toISOString(),
-          {
-            zone: action.payload.timezone,
-          },
-        )
-        draftState[action.payload.id].deadline = withTimezone.toISO()
-      } else {
-        draftState[action.payload.id].deadline = null
-      }
-    })
-  })
-
-  .handleAction(setTimezone, (state, action) => {
-    return produce(state, draftState => {
-      if (draftState[action.payload.quizId].deadline !== null) {
-        const withTimezone = DateTime.fromISO(
-          draftState[action.payload.quizId].deadline ?? "",
-          {
-            zone: action.payload.timezone,
-          },
-        )
-        draftState[action.payload.quizId].deadline = withTimezone.toISO()
+      if (action.payload.deadline) {
+        const deadline = DateTime.fromISO(action.payload.deadline).toLocal()
+        if (deadline.isValid) {
+          draftState[action.payload.id].deadline = deadline.toISO()
+        }
       }
     })
   })

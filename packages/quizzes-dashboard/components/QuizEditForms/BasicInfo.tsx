@@ -20,10 +20,6 @@ import {
   editedQuizzesSubmitmessage,
 } from "../../store/editor/quiz/quizActions"
 import { useTypedSelector } from "../../store/store"
-import { listTimeZones } from "timezone-support"
-import { setTimezone } from "../../store/editor/editorActions"
-import { DateTime } from "luxon"
-import { isDate } from "lodash"
 
 const SubsectionTitleWrapper = styled.div`
   display: flex;
@@ -142,46 +138,38 @@ const BasicInformation = () => {
           </MenuItem>
         </TextField>
       </InfoContainer>
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <InfoContainer>
+      <InfoContainer>
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <KeyboardDateTimePicker
-            value={deadline}
             fullWidth
+            value={variables.deadline}
+            error={!variables.validDeadline}
             variant="dialog"
             inputVariant="outlined"
-            id="time-picker"
-            label="Time picker"
+            label="Deadline"
             KeyboardButtonProps={{
               "aria-label": "change time",
             }}
             onChange={event => {
-              dispatch(
-                editedQuizzesDeadline(
-                  event,
-                  variables.deadlineTimeZone,
-                  quizId,
-                ),
-              )
+              dispatch(editedQuizzesDeadline(event?.toISOString(), quizId))
             }}
           />
-          <TextField
-            select
-            fullWidth
-            label="timezone"
-            variant="outlined"
-            value={variables.deadlineTimeZone ?? ""}
-            onChange={event => {
-              dispatch(setTimezone(quizId, event.target.value))
-            }}
-          >
-            {listTimeZones().map(timezone => (
-              <MenuItem key={timezone} value={timezone}>
-                {timezone}
-              </MenuItem>
-            ))}
-          </TextField>
-        </InfoContainer>
-      </MuiPickersUtilsProvider>
+        </MuiPickersUtilsProvider>
+        <TextField
+          variant="outlined"
+          fullWidth
+          label="Deadline, ISO"
+          id="datetime-local"
+          error={!variables.validDeadline}
+          value={variables.deadline}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          onChange={event => {
+            dispatch(editedQuizzesDeadline(event.target.value, quizId))
+          }}
+        />
+      </InfoContainer>
       <InfoContainer>
         <TextField
           multiline

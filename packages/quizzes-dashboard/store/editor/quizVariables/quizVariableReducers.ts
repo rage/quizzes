@@ -1,13 +1,10 @@
 import { createReducer } from "typesafe-actions"
 import { QuizVariables, action } from "../../../types/NormalizedQuiz"
 import produce from "immer"
-import {
-  initializedEditor,
-  createdNewItem,
-  setTimezone,
-} from "../editorActions"
+import { initializedEditor, createdNewItem } from "../editorActions"
 import { setAddNewQuizItem, setNewItemType } from "./quizVariableActions"
 import { DateTime } from "luxon"
+import { editedQuizzesDeadline } from "../quiz/quizActions"
 
 export const quizVariableReducers = createReducer<
   { [quizId: string]: QuizVariables },
@@ -19,17 +16,14 @@ export const quizVariableReducers = createReducer<
       const deadline =
         action.payload.normalizedQuiz.quizzes[
           action.payload.normalizedQuiz.result
-        ].deadline
-      let zone = DateTime.utc().zoneName
-      if (deadline !== null) {
-        zone = DateTime.fromISO(deadline).zoneName
-      }
+        ].deadline ?? ""
       draftState[action.payload.normalizedQuiz.result] = {
         initialState: init,
         addingNewItem: false,
         newItemType: "",
         newItems: [],
-        deadlineTimeZone: zone,
+        deadline: deadline,
+        validDeadline: true,
       }
     })
   })
@@ -52,9 +46,19 @@ export const quizVariableReducers = createReducer<
     })
   })
 
-  .handleAction(setTimezone, (state, action) => {
+  .handleAction(editedQuizzesDeadline, (state, action) => {
     return produce(state, draftState => {
-      draftState[action.payload.quizId].deadlineTimeZone =
-        action.payload.timezone
+      if (!action.payload.deadline) {
+        draftState[action.payload.id].validDeadline = true
+        draftState[action.payload.id].deadline = ""
+      }
+      if (action.payload.deadline) {
+        if (DateTime.fromISO(action.payload.deadline).isValid) {
+          draftState[action.payload.id].validDeadline = true
+        } else {
+          draftState[action.payload.id].validDeadline = false
+        }
+        draftState[action.payload.id].deadline = action.payload.deadline ?? ""
+      }
     })
   })
