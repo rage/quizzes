@@ -1,6 +1,8 @@
 import Model from "./base_model"
 import QuizItemAnswer from "./quiz_item_answer"
 import User from "./user"
+import UserQuizState from "./user_quiz_state"
+import PeerReview from "./peer_review"
 
 class QuizAnswer extends Model {
   id!: string
@@ -8,6 +10,8 @@ class QuizAnswer extends Model {
   languageId!: string
   status!: string
   itemAnswers!: QuizItemAnswer[]
+  peerReviews!: PeerReview[]
+  userQuizState!: UserQuizState
 
   static get tableName() {
     return "quiz_answer"
@@ -30,11 +34,27 @@ class QuizAnswer extends Model {
         to: "quiz_item_answer.quiz_answer_id",
       },
     },
+    peerReviews: {
+      relation: Model.HasManyRelation,
+      modelClass: PeerReview,
+      join: {
+        from: "quiz_answer.id",
+        to: "peer_review.quiz_answer_id",
+      },
+    },
+    userQuizState: {
+      relation: Model.BelongsToOneRelation,
+      modelClass: UserQuizState,
+      join: {
+        from: ["quiz_answer.user_id", "quiz_answer.quiz_id"],
+        to: ["user_quiz_state.user_id", "user_quiz_state.quiz_id"],
+      },
+    },
   }
 
   public static async getById(quizAnswerId: string) {
     const quizAnswer = await this.query().findById(quizAnswerId)
-    await this.joinItemAndOptionAnswers([quizAnswer])
+    await this.addRelations([quizAnswer])
     return quizAnswer
   }
 
@@ -50,7 +70,7 @@ class QuizAnswer extends Model {
         .orderBy("created_at")
         .page(page, pageSize)
     ).results
-    await this.joinItemAndOptionAnswers(quizAnswers)
+    await this.addRelations(quizAnswers)
     return quizAnswers
   }
 
@@ -66,18 +86,23 @@ class QuizAnswer extends Model {
         .orderBy("created_at")
         .page(page, pageSize)
     ).results
-    await this.joinItemAndOptionAnswers(quizAnswers)
+    await this.addRelations(quizAnswers)
     return quizAnswers
   }
 
-  private static async joinItemAndOptionAnswers(quizAnswers: QuizAnswer[]) {
+  private static async addRelations(quizAnswers: QuizAnswer[]) {
     for (const quizAnswer of quizAnswers) {
       delete quizAnswer.languageId
+      quizAnswer.userQuizState = await quizAnswer.$relatedQuery("userQuizState")
       quizAnswer.itemAnswers = await quizAnswer.$relatedQuery("itemAnswers")
       for (const itemAnswer of quizAnswer.itemAnswers) {
         itemAnswer.optionAnswers = await itemAnswer.$relatedQuery(
           "optionAnswers",
         )
+      }
+      quizAnswer.peerReviews = await quizAnswer.$relatedQuery("peerReviews")
+      for (const peerReview of quizAnswer.peerReviews) {
+        peerReview.answers = await peerReview.$relatedQuery("answers")
       }
     }
   }
