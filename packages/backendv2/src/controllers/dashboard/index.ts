@@ -27,7 +27,7 @@ const dashboard = new Router<CustomState, CustomContext>({
     const courseId = ctx.params.courseId
     ctx.body = await Course.getFlattenedById(courseId)
   })
-  .post("/answers/:answerId", admin, async ctx => {
+  .post("/answers/:answerId/status", admin, async ctx => {
     const answerId = ctx.params.answerId
     const statusData = ctx.request.body.status
     ctx.body = await QuizAnswer.setManualReviewStatus(answerId, statusData)
