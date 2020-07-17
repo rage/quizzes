@@ -155,6 +155,7 @@ export const languageOptions: LanguageLabels = {
   et_EE: estonianLabels,
   fi_FI: finnishLabels,
   de_DE: germanLabels,
+  de_AT: germanLabels,
   sv_SE: swedishLabels,
   nb_NO: norwegianLabels,
   fr_FR: frenchLabels,
