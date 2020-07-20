@@ -8,6 +8,8 @@ import {
   editedQuizzesDeadline,
   editedQuizzesBody,
   editedQuizzesSubmitmessage,
+  editedQuizzesPart,
+  editedQuizzesSection,
 } from "./quizActions"
 import {
   initializedEditor,
@@ -114,6 +116,18 @@ export const quizReducer = createReducer<
     const normalized = normalize(init, normalizedQuiz)
 
     return normalized.entities.quizzes ?? {}
+  })
+
+  .handleAction(editedQuizzesPart, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.quizId].part = action.payload.newPart
+    })
+  })
+
+  .handleAction(editedQuizzesSection, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.quizId].section = action.payload.newSection
+    })
   })
 
 export default quizReducer

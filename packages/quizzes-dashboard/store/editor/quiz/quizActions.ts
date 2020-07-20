@@ -49,3 +49,19 @@ export const editedQuizzesSubmitmessage = createAction(
     newMessage: newMessage,
   }),
 )<{ quizId: string; newMessage: string }>()
+
+export const editedQuizzesPart = createAction(
+  "EDITED_QUIZZES_PART",
+  (quizId: string, newPart: number) => ({
+    quizId: quizId,
+    newPart: newPart,
+  }),
+)<{ quizId: string; newPart: number }>()
+
+export const editedQuizzesSection = createAction(
+  "EDITED_QUIZZES_SECTION",
+  (quizId: string, newSection: number) => ({
+    quizId: quizId,
+    newSection: newSection,
+  }),
+)<{ quizId: string; newSection: number }>()
