@@ -17,6 +17,7 @@ import greekLabels from "./greek_options"
 import czechLabels from "./czech_options"
 import polishLabels from "./polish_options"
 import malteseLabels from "./maltese_options"
+import spanishLabels from "./spanish_options"
 import { QuizPointsGrantingPolicy } from "../../modelTypes"
 
 export type GeneralLabels = {
@@ -172,4 +173,5 @@ export const languageOptions: LanguageLabels = {
   cs_CZ: czechLabels,
   pl_PL: polishLabels,
   mt_MT: malteseLabels,
+  es_ES: spanishLabels,
 }
