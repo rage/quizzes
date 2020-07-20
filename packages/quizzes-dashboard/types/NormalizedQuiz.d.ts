@@ -49,8 +49,6 @@ export interface NormalizedItem {
   maxWords: number | null
   maxValue: number | null
   minValue: number | null
-  // maxLabel: string | null
-  // minLabel: string | null
   usesSharedOptionFeedbackMessage: boolean
   options: string[]
   title: string
@@ -92,10 +90,11 @@ export interface OptionVariables {
 }
 
 export interface QuizVariables {
-  initialState: EditableQuiz
+  initialState: Quiz | NewQuiz
   addingNewItem: boolean
   newItemType: string
   newItems: string[]
+  newQuiz: boolean
 }
 
 export interface NewQuiz {

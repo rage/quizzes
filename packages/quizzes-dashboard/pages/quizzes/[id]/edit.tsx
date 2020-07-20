@@ -5,12 +5,11 @@ import { useDispatch } from "react-redux"
 import Typography from "@material-ui/core/Typography"
 import SaveButton from "../../../components/SaveButton"
 import { normalizedQuiz } from "../../../schemas"
-import { normalize, denormalize } from "normalizr"
+import { normalize } from "normalizr"
 import useSWR from "swr"
 import { withRouter } from "next/router"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import QuizEditForms from "../../../components/QuizEditForms"
-import { useTypedSelector } from "../../../store/store"
 import _ from "lodash"
 
 const EditPage = ({ router }: any) => {

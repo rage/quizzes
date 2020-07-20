@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { fetchCourseQuizzes, saveQuiz } from "../../services/quizzes"
+import React from "react"
+import { fetchCourseQuizzes } from "../../services/quizzes"
 import { groupBy, Dictionary } from "lodash"
 import { Typography, Card, CardContent, Button } from "@material-ui/core"
 import { Skeleton } from "@material-ui/lab"
@@ -10,7 +10,8 @@ import useSWR from "swr"
 import { withRouter } from "next/router"
 import { Quiz } from "../../types/Quiz"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
-import { NewQuiz } from "../../types/NormalizedQuiz"
+import { useDispatch } from "react-redux"
+import { createdNewQuiz } from "../../store/editor/editorActions"
 
 const QuizCard = styled(Card)`
   margin-bottom: 1rem;
@@ -25,7 +26,13 @@ const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
 `
 
+const CourseTitleWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+`
+
 const ShowCoursePage = ({ router }: any) => {
+  const dispatch = useDispatch()
   const id = router.query.id
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
@@ -65,40 +72,26 @@ const ShowCoursePage = ({ router }: any) => {
   for (let [part, quizzes] of Object.entries(byPart)) {
     byPartAndSection[part] = groupBy(quizzes, "section")
   }
-  const createNewQuiz = async () => {
-    const newQuiz: NewQuiz = {
-      autoConfirm: false,
-      autoReject: false,
-      awardPointsEvenIfWrong: false,
-      body: "",
-      courseId: id,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      deadline: null,
-      excludedFromScore: true,
-      grantPointsPolicy: "grant_whenever_possible",
-      items: [],
-      open: null,
-      part: 0,
-      peerReviews: [],
-      points: 0,
-      section: 0,
-      submitMessage: null,
-      title: "",
-      tries: 1,
-      triesLimited: true,
-    }
-    const res = await saveQuiz(newQuiz)
-    if (res !== undefined) {
-      quizzes.push(res)
-    }
-  }
+
   return (
     <>
-      <Button variant="outlined" onClick={() => createNewQuiz()}>
-        Add new Quiz
-      </Button>
-      <Typography variant="h3">Edit {course.title}</Typography>
+      <CourseTitleWrapper>
+        <Typography variant="h3">Edit {course.title}</Typography>
+        <Link
+          href={{
+            pathname: "/courses/[id]/quizzes/new",
+            query: { courseId: `${id}` },
+          }}
+          as={`/courses/${id}/quizzes/new`}
+        >
+          <Button
+            variant="outlined"
+            onClick={() => dispatch(createdNewQuiz(id))}
+          >
+            <Typography variant="overline">Add New Quiz</Typography>
+          </Button>
+        </Link>
+      </CourseTitleWrapper>
       {Object.entries(byPartAndSection).map(([part, section]) => (
         <div key={part}>
           <Typography variant="h4">Part {part}</Typography>
@@ -154,9 +147,7 @@ const QuizOfSection = ({ quiz }: quizProps) => {
               </Typography>
             </div>
             <div>
-              <Typography variant="overline" color="secondary">
-                {/* [{quiz.items[0].type}] */}
-              </Typography>
+              <Typography variant="overline" color="secondary"></Typography>
             </div>
           </CardContent>
         </QuizCard>

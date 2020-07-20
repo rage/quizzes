@@ -10,8 +10,12 @@ import {
   initializedEditor,
   deletedOption,
   createdNewOption,
+  createdNewQuiz,
 } from "../editorActions"
 import produce from "immer"
+import { Quiz } from "../../../types/Quiz"
+import { normalizedQuiz } from "../../../schemas"
+import { normalize } from "normalizr"
 
 export const optionReducer = createReducer<
   { [optionId: string]: NormalizedOption },
@@ -69,6 +73,35 @@ export const optionReducer = createReducer<
     return produce(state, draftState => {
       delete draftState[action.payload.optionId]
     })
+  })
+
+  .handleAction(createdNewQuiz, (state, action) => {
+    const init: Quiz = {
+      id: action.payload.quizId,
+      autoConfirm: false,
+      autoReject: false,
+      awardPointsEvenIfWrong: false,
+      body: "",
+      courseId: action.payload.courseId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deadline: null,
+      excludedFromScore: true,
+      grantPointsPolicy: "grant_whenever_possible",
+      items: [],
+      open: null,
+      part: 0,
+      peerReviews: [],
+      points: 0,
+      section: 0,
+      submitMessage: null,
+      title: "",
+      tries: 1,
+      triesLimited: true,
+    }
+
+    const normalized = normalize(init, normalizedQuiz)
+    return normalized.entities.options ?? {}
   })
 
 export default optionReducer

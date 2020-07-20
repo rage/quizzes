@@ -1,5 +1,5 @@
 import { createAction } from "typesafe-actions"
-import { Entities } from "../../types/NormalizedQuiz"
+import { Entities, NewQuiz } from "../../types/NormalizedQuiz"
 import { v4 } from "uuid"
 import { Quiz } from "../../types/Quiz"
 
@@ -43,3 +43,8 @@ export const deletedOption = createAction(
     itemId: itemId,
   }),
 )<{ optionId: string; itemId: string }>()
+
+export const createdNewQuiz = createAction(
+  "CREATED_NEW_QUIZ",
+  (courseId: string) => ({ courseId: courseId, quizId: v4() }),
+)<{ courseId: string; quizId: string }>()
