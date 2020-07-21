@@ -7,14 +7,15 @@ import SaveButton from "../../../components/SaveButton"
 import { normalizedQuiz } from "../../../schemas"
 import { normalize } from "normalizr"
 import useSWR from "swr"
-import { withRouter } from "next/router"
+import { useRouter } from "next/router"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import QuizEditForms from "../../../components/QuizEditForms"
 import _ from "lodash"
 
-const EditPage = ({ router }: any) => {
-  const id = router.query.id
-  const { data, error } = useSWR(id, fetchQuiz)
+const EditPage = () => {
+  const router = useRouter()
+  const quizId: any = router.query.quizId
+  const { data, error } = useSWR(quizId, fetchQuiz)
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -54,4 +55,4 @@ const EditPage = ({ router }: any) => {
   )
 }
 
-export default withRouter(EditPage)
+export default EditPage

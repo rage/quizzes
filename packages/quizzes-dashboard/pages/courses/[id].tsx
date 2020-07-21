@@ -7,11 +7,9 @@ import DebugDialog from "../../components/DebugDialog"
 import Link from "next/link"
 import styled from "styled-components"
 import useSWR from "swr"
-import { withRouter } from "next/router"
+import { useRouter } from "next/router"
 import { Quiz } from "../../types/Quiz"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
-import { useDispatch } from "react-redux"
-import { createdNewQuiz } from "../../store/editor/editorActions"
 
 const QuizCard = styled(Card)`
   margin-bottom: 1rem;
@@ -31,9 +29,9 @@ const CourseTitleWrapper = styled.div`
   justify-content: space-between;
 `
 
-const ShowCoursePage = ({ router }: any) => {
-  const dispatch = useDispatch()
-  const id = router.query.id
+const ShowCoursePage = () => {
+  const router = useRouter()
+  const id: any = router.query.id
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     { label: "Course" },
@@ -84,10 +82,7 @@ const ShowCoursePage = ({ router }: any) => {
           }}
           as={`/courses/${id}/quizzes/new`}
         >
-          <Button
-            variant="outlined"
-            onClick={() => dispatch(createdNewQuiz(id))}
-          >
+          <Button variant="outlined">
             <Typography variant="overline">Add New Quiz</Typography>
           </Button>
         </Link>
@@ -135,7 +130,7 @@ const QuizOfSection = ({ quiz }: quizProps) => {
   const title = quiz.title
   return (
     <Link
-      href={{ pathname: "/quizzes/[id]/edit", query: { id: `${quiz.id}` } }}
+      href={{ pathname: "/quizzes/[id]/edit", query: { quizId: `${quiz.id}` } }}
       as={`/quizzes/${quiz.id}/edit`}
     >
       <QuizLink>
@@ -156,4 +151,4 @@ const QuizOfSection = ({ quiz }: quizProps) => {
   )
 }
 
-export default withRouter(ShowCoursePage)
+export default ShowCoursePage
