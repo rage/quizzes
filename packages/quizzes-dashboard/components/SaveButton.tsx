@@ -6,11 +6,12 @@ import { saveQuiz } from "../services/quizzes"
 import { initializedEditor } from "../store/editor/editorActions"
 import { useTypedSelector, storeState } from "../store/store"
 import { denormalize, normalize } from "normalizr"
-import { normalizedQuiz } from "../schemas"
+import { normalizedQuiz, options } from "../schemas"
 import { Quiz } from "../types/Quiz"
-import Router from "next/router"
+import Router, { useRouter } from "next/router"
 
 const SaveButton = () => {
+  const router = useRouter()
   const dispatch = useDispatch()
 
   const [saved, setSaved] = useState(true)
@@ -75,9 +76,17 @@ const SaveButton = () => {
       }
       dispatch(initializedEditor(data, response))
       setSaved(true)
+      router.push(
+        {
+          pathname: "/quizzes/[id]/edit",
+          query: {
+            quizId: data.result,
+          },
+        },
+        `/quizzes/${data.result}/edit`,
+      )
     }
     setShowMessage(true)
-    Router.push("/quizzes/[id]/edit", `/quizzes/${response.id}/edit`)
   }
 
   if (quizId) {

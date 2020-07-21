@@ -16,11 +16,11 @@ export interface NormalizedQuiz {
   part: number
   section: number
   points: number
-  deadline: Date | null
-  open: Date | null
+  deadline: string | null
+  open: string | null
   excludedFromScore: boolean
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   autoConfirm: boolean
   tries: number
   triesLimited: boolean
@@ -43,8 +43,8 @@ export interface NormalizedItem {
   validityRegex: string | null
   formatRegex: string | null
   multi: boolean
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   minWords: number | null
   maxWords: number | null
   maxValue: number | null
@@ -63,12 +63,28 @@ export interface NormalizedOption {
   quizItemId: string
   order: number
   correct: boolean
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   title: string
   body: string | null
   successMessage: null | string
   failureMessage: null | string
+}
+
+export interface Course {
+  id: string
+  minScoreToPass: number | null
+  minProgressToPass: number | null
+  minPeerReviewsReceived: number | null
+  minPeerReviewsGiven: number | null
+  minReviewAverage: number | null
+  maxSpamFlags: number | null
+  createdAt: string
+  updatedAt: string
+  organizationId: null
+  moocfiId: string
+  maxReviewSpamFlags: number
+  texts: string[]
 }
 
 export interface ItemVariables {
@@ -94,6 +110,8 @@ export interface QuizVariables {
   addingNewItem: boolean
   newItemType: string
   newItems: string[]
+  deadline: string
+  validDeadline: boolean
   newQuiz: boolean
 }
 
@@ -127,8 +145,8 @@ export interface NewItem {
   validityRegex: string | null
   formatRegex: string | null
   multi: boolean
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   minWords: number | null
   maxWords: number | null
   maxValue: number | null
@@ -146,8 +164,8 @@ export interface NewOption {
   quizItemId: string
   order: number
   correct: boolean
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   title: string
   body: string | null
   successMessage: null | string

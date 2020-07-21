@@ -54,7 +54,10 @@ const CourseList = ({ data, error }: CourseListProps) => {
       {data.map(course => (
         <Link
           key={course.id}
-          href={{ pathname: "/courses/[id]", query: { id: `${course.id}` } }}
+          href={{
+            pathname: "/courses/[id]",
+            query: { courseId: `${course.id}` },
+          }}
           as={`/courses/${course.id}`}
         >
           <CourseLink>

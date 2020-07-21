@@ -18,9 +18,11 @@ import {
   createdNewQuiz,
 } from "../editorActions"
 import produce from "immer"
+import { DateTime } from "luxon"
 import { Quiz } from "../../../types/Quiz"
 import { normalize } from "normalizr"
 import { normalizedQuiz } from "../../../schemas"
+
 export const quizReducer = createReducer<
   { [quizId: string]: NormalizedQuiz },
   action
@@ -56,7 +58,14 @@ export const quizReducer = createReducer<
 
   .handleAction(editedQuizzesDeadline, (state, action) => {
     return produce(state, draftState => {
-      draftState[action.payload.id].deadline = action.payload.deadline
+      if (action.payload.deadline !== null) {
+        const deadline = DateTime.fromISO(
+          action.payload.deadline.toISOString(),
+        ).toLocal()
+        if (deadline.isValid) {
+          draftState[action.payload.id].deadline = deadline.toISO()
+        }
+      }
     })
   })
 
@@ -68,7 +77,6 @@ export const quizReducer = createReducer<
 
   .handleAction(editedQuizzesSubmitmessage, (state, action) => {
     return produce(state, draftState => {
-      console.log(draftState[action.payload.quizId])
       draftState[action.payload.quizId].submitMessage =
         action.payload.newMessage
     })

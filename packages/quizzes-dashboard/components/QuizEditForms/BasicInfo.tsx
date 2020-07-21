@@ -3,7 +3,7 @@ import "date-fns"
 import DateFnsUtils from "@date-io/date-fns"
 import {
   MuiPickersUtilsProvider,
-  KeyboardDatePicker,
+  KeyboardDateTimePicker,
 } from "@material-ui/pickers"
 import { Typography, TextField, MenuItem } from "@material-ui/core"
 import styled from "styled-components"
@@ -81,6 +81,10 @@ const BasicInformation = () => {
 
   const section = useTypedSelector(
     state => state.editor.quizzes[quizId].section,
+  )
+
+  const variables = useTypedSelector(
+    state => state.editor.quizVariables[quizId],
   )
 
   return (
@@ -172,31 +176,31 @@ const BasicInformation = () => {
           </MenuItem>
         </TextField>
       </InfoContainer>
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <InfoContainer>
-          <KeyboardDatePicker
-            disableToolbar
+      <InfoContainer>
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <KeyboardDateTimePicker
+            fullWidth
+            value={variables.deadline}
+            error={!variables.validDeadline}
             variant="dialog"
             inputVariant="outlined"
-            fullWidth
-            format="dd/MM/yyyy"
-            margin="none"
-            id="date-picker-inline"
             label="Deadline"
-            value={deadline}
-            onChange={date => dispatch(editedQuizzesDeadline(date, quizId))}
             KeyboardButtonProps={{
-              "aria-label": "change deadline",
+              "aria-label": "change time",
             }}
+            onChange={event => {
+              dispatch(editedQuizzesDeadline(event, quizId))
+            }}
+            helperText={variables.deadline}
           />
-        </InfoContainer>
-      </MuiPickersUtilsProvider>
+        </MuiPickersUtilsProvider>
+      </InfoContainer>
       <InfoContainer>
         <TextField
           multiline
+          fullWidth
           rows={5}
           label="Description for the whole quiz"
-          fullWidth
           variant="outlined"
           value={body}
           onChange={event =>
