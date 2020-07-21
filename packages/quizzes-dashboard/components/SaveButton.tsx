@@ -7,7 +7,8 @@ import { initializedEditor } from "../store/editor/editorActions"
 import { useTypedSelector, storeState } from "../store/store"
 import { denormalize, normalize } from "normalizr"
 import { normalizedQuiz } from "../schemas"
-import { EditableQuiz } from "../types/EditQuiz"
+import { Quiz } from "../types/Quiz"
+import Router from "next/router"
 
 const SaveButton = () => {
   const dispatch = useDispatch()
@@ -17,6 +18,7 @@ const SaveButton = () => {
   const [showSpinner, setShowSpinner] = useState(false)
 
   const store = useTypedSelector(state => state)
+  const quizId = useTypedSelector(state => state.editor.quizId)
 
   const handleClick = async (store: storeState) => {
     setSaved(false)
@@ -29,11 +31,7 @@ const SaveButton = () => {
       quizId: store.editor.quizId,
     }
 
-    const quiz: EditableQuiz = denormalize(
-      quizData.quizId,
-      normalizedQuiz,
-      quizData,
-    )
+    const quiz: Quiz = denormalize(quizData.quizId, normalizedQuiz, quizData)
     for (let item of quiz.items) {
       if (store.editor.itemVariables[item.id].newOptions.length > 0) {
         for (let option of item.options) {
@@ -61,6 +59,9 @@ const SaveButton = () => {
         delete item.id
       }
     }
+    if (store.editor.quizVariables[store.editor.quizId].newQuiz) {
+      delete quiz.id
+    }
     const response = await saveQuiz(quiz)
 
     setShowSpinner(false)
@@ -76,58 +77,67 @@ const SaveButton = () => {
       setSaved(true)
     }
     setShowMessage(true)
+    Router.push("/quizzes/[id]/edit", `/quizzes/${response.id}/edit`)
   }
 
-  return (
-    <>
-      <Snackbar
-        open={showMessage}
-        autoHideDuration={5000}
-        anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        onClose={() => setShowMessage(false)}
-      >
-        {saved ? (
-          <Alert severity="success" onClose={() => setShowMessage(false)}>
-            Quiz saved succesfully!
-          </Alert>
-        ) : (
-          <Alert severity="error" onClose={() => setShowMessage(false)}>
-            Something went wrong, couldn't save quiz!
-          </Alert>
-        )}
-      </Snackbar>
-
-      {showSpinner ? (
-        <CircularProgress
-          color="secondary"
-          style={{
-            padding: "1rem",
-            position: "fixed",
-            top: 100,
-            right: 100,
-            left: "auto",
-            bottom: "auto",
-          }}
-        />
-      ) : (
-        <Fab
-          color="primary"
-          variant="extended"
-          onClick={() => handleClick(store)}
-          style={{
-            padding: "1rem",
-            position: "fixed",
-            top: 100,
-            right: 100,
-            left: "auto",
-            bottom: "auto",
-          }}
+  if (quizId) {
+    return (
+      <>
+        <Snackbar
+          open={showMessage}
+          autoHideDuration={5000}
+          anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          onClose={() => setShowMessage(false)}
         >
-          <Typography variant="h6">Save Quiz</Typography>
-        </Fab>
-      )}
-    </>
-  )
+          {saved ? (
+            <Alert severity="success" onClose={() => setShowMessage(false)}>
+              Quiz saved succesfully!
+            </Alert>
+          ) : (
+            <Alert severity="error" onClose={() => setShowMessage(false)}>
+              Something went wrong, couldn't save quiz!
+            </Alert>
+          )}
+        </Snackbar>
+
+        {showSpinner ? (
+          <CircularProgress
+            color="secondary"
+            style={{
+              padding: "1rem",
+              position: "fixed",
+              top: 100,
+              right: 100,
+              left: "auto",
+              bottom: "auto",
+            }}
+          />
+        ) : (
+          <Fab
+            color="primary"
+            variant="extended"
+            onClick={() => handleClick(store)}
+            style={{
+              padding: "1rem",
+              position: "fixed",
+              top: 100,
+              right: 100,
+              left: "auto",
+              bottom: "auto",
+            }}
+          >
+            {store.editor.quizVariables[store.editor.quizId].newQuiz ? (
+              <Typography variant="h6">Create Quiz</Typography>
+            ) : (
+              <Typography variant="h6">Save Quiz</Typography>
+            )}
+          </Fab>
+        )}
+      </>
+    )
+  } else {
+    return <div>Waiting...</div>
+  }
 }
 
 export default SaveButton

@@ -1,15 +1,15 @@
 import { createAction } from "typesafe-actions"
-import { Entities } from "../../types/NormalizedQuiz"
-import { EditableQuiz } from "../../types/EditQuiz"
+import { Entities, NewQuiz } from "../../types/NormalizedQuiz"
 import { v4 } from "uuid"
+import { Quiz } from "../../types/Quiz"
 
 export const initializedEditor = createAction(
   "INITIALIZED_EDITOR",
-  (normalizedQuiz: Entities, nestedQuiz: EditableQuiz) => ({
+  (normalizedQuiz: Entities, nestedQuiz: Quiz) => ({
     normalizedQuiz: normalizedQuiz,
     nestedQuiz: nestedQuiz,
   }),
-)<{ normalizedQuiz: Entities; nestedQuiz: EditableQuiz }>()
+)<{ normalizedQuiz: Entities; nestedQuiz: Quiz }>()
 
 export const createdNewItem = createAction(
   "CREATED_NEW_ITEM",
@@ -43,3 +43,8 @@ export const deletedOption = createAction(
     itemId: itemId,
   }),
 )<{ optionId: string; itemId: string }>()
+
+export const createdNewQuiz = createAction(
+  "CREATED_NEW_QUIZ",
+  (courseId: string) => ({ courseId: courseId, quizId: v4() }),
+)<{ courseId: string; quizId: string }>()

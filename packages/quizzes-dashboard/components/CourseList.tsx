@@ -3,7 +3,7 @@ import styled from "styled-components"
 import { Card, CardContent } from "@material-ui/core"
 import Link from "next/link"
 import Skeleton from "@material-ui/lab/Skeleton"
-import { Course } from "../types/Course"
+import { Course } from "../types/Quiz"
 
 const StyledCard = styled(Card)`
   margin-bottom: 1rem;

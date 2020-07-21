@@ -1,24 +1,15 @@
 import React from "react"
 import { fetchCourseQuizzes } from "../../services/quizzes"
 import { groupBy, Dictionary } from "lodash"
-import { Typography, Card, CardContent } from "@material-ui/core"
+import { Typography, Card, CardContent, Button } from "@material-ui/core"
 import { Skeleton } from "@material-ui/lab"
 import DebugDialog from "../../components/DebugDialog"
 import Link from "next/link"
 import styled from "styled-components"
 import useSWR from "swr"
-import { withRouter } from "next/router"
-import { Quizv2 } from "../../types/Quizv2"
+import { useRouter } from "next/router"
+import { Quiz } from "../../types/Quiz"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
-
-interface quiz {
-  quiz: Quizv2
-}
-
-interface section {
-  section: string
-  quizzes: Quizv2[]
-}
 
 const QuizCard = styled(Card)`
   margin-bottom: 1rem;
@@ -32,13 +23,21 @@ const QuizLink = styled.a`
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
 `
-const ShowCoursePage = ({ router }: any) => {
-  const id = router.query.id
+
+const CourseTitleWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+`
+
+const ShowCoursePage = () => {
+  const router = useRouter()
+  const id = router.query.id?.toString() ?? ""
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     { label: "Course" },
   ])
   const { data, error } = useSWR(id, fetchCourseQuizzes)
+
   if (error) {
     return <div>Something went wrong</div>
   }
@@ -63,16 +62,31 @@ const ShowCoursePage = ({ router }: any) => {
       </>
     )
   }
+
   const quizzes = data.quizzes
   const course = data.course
   const byPart = groupBy(quizzes, "part")
-  let byPartAndSection: Record<string, Dictionary<Quizv2[]>> = {}
+  let byPartAndSection: Record<string, Dictionary<Quiz[]>> = {}
   for (let [part, quizzes] of Object.entries(byPart)) {
     byPartAndSection[part] = groupBy(quizzes, "section")
   }
+
   return (
     <>
-      <Typography variant="h3">Edit {course.title}</Typography>
+      <CourseTitleWrapper>
+        <Typography variant="h3">Edit {course.title}</Typography>
+        <Link
+          href={{
+            pathname: "/courses/[id]/quizzes/new",
+            query: { courseId: `${id}` },
+          }}
+          as={`/courses/${id}/quizzes/new`}
+        >
+          <Button variant="outlined">
+            <Typography variant="overline">Add New Quiz</Typography>
+          </Button>
+        </Link>
+      </CourseTitleWrapper>
       {Object.entries(byPartAndSection).map(([part, section]) => (
         <div key={part}>
           <Typography variant="h4">Part {part}</Typography>
@@ -92,22 +106,31 @@ const ShowCoursePage = ({ router }: any) => {
   )
 }
 
-const SectionOfPart = ({ section, quizzes }: section) => {
+interface sectionProps {
+  section: string
+  quizzes: Quiz[]
+}
+
+const SectionOfPart = ({ section, quizzes }: sectionProps) => {
   return (
     <>
       <Typography variant="h6">Section {section}</Typography>
       {quizzes.map(quiz => {
-        return <Quiz key={quiz.id} quiz={quiz} />
+        return <QuizOfSection key={quiz.id} quiz={quiz} />
       })}
     </>
   )
 }
 
-const Quiz = ({ quiz }: quiz) => {
+interface quizProps {
+  quiz: Quiz
+}
+
+const QuizOfSection = ({ quiz }: quizProps) => {
   const title = quiz.title
   return (
     <Link
-      href={{ pathname: "/quizzes/[id]/edit", query: { id: `${quiz.id}` } }}
+      href={{ pathname: "/quizzes/[id]/edit", query: { quizId: `${quiz.id}` } }}
       as={`/quizzes/${quiz.id}/edit`}
     >
       <QuizLink>
@@ -119,9 +142,7 @@ const Quiz = ({ quiz }: quiz) => {
               </Typography>
             </div>
             <div>
-              <Typography variant="overline" color="secondary">
-                [{quiz.items[0].type}]
-              </Typography>
+              <Typography variant="overline" color="secondary"></Typography>
             </div>
           </CardContent>
         </QuizCard>
@@ -130,4 +151,4 @@ const Quiz = ({ quiz }: quiz) => {
   )
 }
 
-export default withRouter(ShowCoursePage)
+export default ShowCoursePage

@@ -1,100 +1,50 @@
-export interface CourseListQuiz {
+export interface Quiz {
   id: string
-  grantPointsPolicy: GrantPointsPolicy
   courseId: string
   part: number
   section: number
   points: number
+  deadline: Date | null
+  open: Date | null
+  excludedFromScore: boolean
+  createdAt: Date
+  updatedAt: Date
+  autoConfirm: boolean
   tries: number
   triesLimited: boolean
-  deadline: null
-  open: null
-  autoConfirm: boolean
-  autoReject: boolean
-  excludedFromScore: boolean
   awardPointsEvenIfWrong: boolean
-  createdAt: Date
-  updatedAt: Date
-  texts: QuizText[]
-  course: QuizCourse
+  grantPointsPolicy: string
+  autoReject: boolean
   items: Item[]
-  peerReviewCollections: any[]
-}
-
-export interface QuizCourse {
-  id: string
-  minScoreToPass: null
-  minProgressToPass: null
-  minPeerReviewsReceived: null
-  minPeerReviewsGiven: null
-  minReviewAverage: null
-  maxSpamFlags: null
-  moocfiId: null
-  createdAt: Date
-  updatedAt: Date
-  languages: Language[]
-  texts: CourseText[]
-}
-
-export interface Language {
-  id: LanguageID
-  country: Country
-  name: Name
-  createdAt: Date
-  updatedAt: Date
-}
-
-export enum Country {
-  Finland = "Finland",
-}
-
-export enum LanguageID {
-  FiFI = "fi_FI",
-}
-
-export enum Name {
-  Finnish = "Finnish",
-}
-
-export interface CourseText {
-  courseId: string
-  languageId: LanguageID
-  abbreviation: Abbreviation
-  title: Title
+  peerReviews: PeerReview[]
+  title: string
   body: string
-  createdAt: Date
-  updatedAt: Date
+  submitMessage: string | null
 }
-
-export enum Abbreviation {
-  OhjelmoinninMooc2020 = "ohjelmoinnin-mooc-2020",
-}
-
-export enum Title {
-  OhjelmoinninMooc2020 = "Ohjelmoinnin Mooc 2020",
-}
-
-export type QuizPointsGrantingPolicy =
-  | "grant_whenever_possible"
-  | "grant_only_when_answer_fully_correct"
 
 export interface Item {
   id: string
   quizId: string
-  type: Type
+  type: string
   order: number
-  minWords: number | null
-  maxWords: number | null
-  minValue: number | null
-  maxValue: number | null
-  validityRegex: null | string
+  validityRegex: null
   formatRegex: null
   multi: boolean
-  usesSharedOptionFeedbackMessage: boolean
   createdAt: Date
   updatedAt: Date
-  texts: { [key: string]: null | string }[]
+  minWords: number | null
+  maxWords: number | null
+  maxValue: number | null
+  minValue: number | null
+  maxLabel: string | null
+  minLabel: string | null
+  usesSharedOptionFeedbackMessage: boolean
   options: Option[]
+  title: null
+  body: null
+  successMessage: null
+  failureMessage: null
+  sharedOptionFeedbackMessage: null
 }
 
 export interface Option {
@@ -104,58 +54,51 @@ export interface Option {
   correct: boolean
   createdAt: Date
   updatedAt: Date
-  texts: OptionText[]
-}
-
-export interface OptionText {
-  quizOptionId: string
-  languageId: LanguageID
   title: string
-  body: null
+  body: string | null
   successMessage: null | string
   failureMessage: null | string
-  createdAt: Date
-  updatedAt: Date
 }
 
-export enum Type {
-  Checkbox = "checkbox",
-  Essay = "essay",
-  MultipleChoice = "multiple-choice",
-  Open = "open",
-  Scale = "scale",
-}
-
-export interface QuizText {
-  quizId: string
-  languageId: LanguageID
-  title: string
-  body: string
-  createdAt: Date
-  updatedAt: Date
-}
-
-export interface IPeerReviewCollection {
+export interface PeerReview {
   id: string
   quizId: string
-  questions: IPeerReviewCollectionQuestion[]
-  texts: IPeerReviewCollectionText[]
-}
-
-export interface IPeerReviewCollectionQuestionText {
-  peerReviewQuestionId: string
-  languageId: string
+  createdAt: Date
+  updatedAt: Date
+  questions: Question[]
   title: string
   body: string
 }
 
-export interface IPeerReviewCollectionQuestion {
+export interface Question {
   id: string
   quizId: string
   peerReviewCollectionId: string
   default: boolean
-  type: PeerReviewQuestionType
+  type: string
   answerRequired: boolean
   order: number
-  texts: IPeerReviewCollectionQuestionText[]
+  createdAt: Date
+  updatedAt: Date
+  title: string
+  body: string
+}
+
+export interface Course {
+  id: string
+  minScoreToPass: null
+  minProgressToPass: null
+  minPeerReviewsReceived: null
+  minPeerReviewsGiven: null
+  minReviewAverage: null
+  maxSpamFlags: null
+  createdAt: Date
+  updatedAt: Date
+  organizationId: null
+  moocfiId: null
+  maxReviewSpamFlags: number
+  languageId: string
+  title: string
+  body: string
+  abbreviation: string
 }

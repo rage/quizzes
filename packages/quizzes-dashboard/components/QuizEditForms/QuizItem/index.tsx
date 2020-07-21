@@ -1,5 +1,5 @@
 import React from "react"
-import { Item } from "../../../types/NormalizedQuiz"
+import { NormalizedItem } from "../../../types/NormalizedQuiz"
 import styled from "styled-components"
 import EssayContent from "./EssayContent"
 import { Typography } from "@material-ui/core"
@@ -20,7 +20,7 @@ const StyledText = styled(Typography)`
 `
 
 interface QuizItemProps {
-  item: Item
+  item: NormalizedItem
 }
 
 const QuizItem = ({ item }: QuizItemProps) => {
@@ -32,7 +32,7 @@ const QuizItem = ({ item }: QuizItemProps) => {
   )
 }
 
-const contentBasedOnType = (type: string, item: Item) => {
+const contentBasedOnType = (type: string, item: NormalizedItem) => {
   switch (type) {
     case "multiple-choice": {
       return <MultipleChoiceContent item={item} />

@@ -1,5 +1,5 @@
 import React from "react"
-import { Item } from "../../../../types/NormalizedQuiz"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import { TextField, Button, Modal, Box, Fade } from "@material-ui/core"
 import styled from "styled-components"
 import {
@@ -77,7 +77,7 @@ const ModalButtonWrapper = styled.div`
   justify-content: flex-end;
 `
 interface openContentProps {
-  item: Item
+  item: NormalizedItem
 }
 
 const OpenContent = ({ item }: openContentProps) => {

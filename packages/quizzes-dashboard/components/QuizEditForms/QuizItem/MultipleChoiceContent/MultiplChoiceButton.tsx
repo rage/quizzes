@@ -3,7 +3,7 @@ import styled from "styled-components"
 import { Modal, Box, Button, Fade } from "@material-ui/core"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWindowClose, faTrash } from "@fortawesome/free-solid-svg-icons"
-import { Option } from "../../../../types/NormalizedQuiz"
+import { NormalizedOption } from "../../../../types/NormalizedQuiz"
 import OptionModalContent from "./OptionModalContent"
 import { useTypedSelector } from "../../../../store/store"
 import { useDispatch } from "react-redux"
@@ -47,7 +47,7 @@ const IncorrectButton = styled(Button)`
 `
 
 interface multipleChoiceButtonProps {
-  option: Option
+  option: NormalizedOption
 }
 
 const MultipleChoiceButton = ({ option }: multipleChoiceButtonProps) => {

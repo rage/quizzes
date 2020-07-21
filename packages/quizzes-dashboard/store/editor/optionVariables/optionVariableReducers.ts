@@ -4,6 +4,7 @@ import {
   initializedEditor,
   createdNewOption,
   deletedOption,
+  createdNewQuiz,
 } from "../editorActions"
 import produce from "immer"
 import { setOptionEditing } from "./optionVariableActions"
@@ -43,4 +44,8 @@ export const optionVariableReducers = createReducer<
       draftState[action.payload.optionId].optionEditing = false
       delete draftState[action.payload.optionId]
     })
+  })
+
+  .handleAction(createdNewQuiz, (state, action) => {
+    return {}
   })
