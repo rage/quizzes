@@ -119,9 +119,7 @@ const Quiz = ({ quiz }: quiz) => {
               </Typography>
             </div>
             <div>
-              <Typography variant="overline" color="secondary">
-                [{quiz.items[0].type}]
-              </Typography>
+              <Typography variant="overline" color="secondary"></Typography>
             </div>
           </CardContent>
         </QuizCard>

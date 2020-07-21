@@ -153,24 +153,9 @@ const BasicInformation = () => {
             onChange={event => {
               dispatch(editedQuizzesDeadline(event, quizId))
             }}
+            helperText={variables.deadline}
           />
         </MuiPickersUtilsProvider>
-        <TextField
-          variant="outlined"
-          fullWidth
-          label="Deadline, ISO"
-          id="datetime-local"
-          error={!variables.validDeadline}
-          value={variables.deadline}
-          InputLabelProps={{
-            shrink: true,
-          }}
-          onChange={event => {
-            dispatch(
-              editedQuizzesDeadline(new Date(event.target.value), quizId),
-            )
-          }}
-        />
       </InfoContainer>
       <InfoContainer>
         <TextField
