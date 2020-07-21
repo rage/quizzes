@@ -1,5 +1,5 @@
 import React from "react"
-import { Item } from "../../../../types/NormalizedQuiz"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import styled from "styled-components"
 import { Typography, TextField, Checkbox } from "@material-ui/core"
 import { useTypedSelector } from "../../../../store/store"
@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux"
 import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
 
 interface contentBoxProps {
-  item: Item
+  item: NormalizedItem
 }
 
 const Container = styled.div`

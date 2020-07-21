@@ -1,7 +1,7 @@
 import React from "react"
 import { Box } from "@material-ui/core"
 import styled from "styled-components"
-import { Item } from "../../../../types/NormalizedQuiz"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import { useDispatch } from "react-redux"
 import { useTypedSelector } from "../../../../store/store"
 
@@ -11,7 +11,7 @@ const EmptyBox = styled(Box)`
 `
 
 interface EditorModalProps {
-  item: Item
+  item: NormalizedItem
 }
 
 export const CustomModalContent = ({ item }: EditorModalProps) => {

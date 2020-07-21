@@ -449,7 +449,7 @@ describe("dashboard: get answers by quiz id", () => {
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(response => {
         const received: QuizAnswer[] = response.body
-        expect(received).toHaveLength(16)
+        expect(received).toHaveLength(15)
         expect(
           received.map(answer => answer.status).includes("deprecated"),
         ).toBe(false)

@@ -6,6 +6,7 @@ import {
   createdNewItem,
   deletedItem,
   createdNewOption,
+  createdNewQuiz,
 } from "../editorActions"
 import produce from "immer"
 import _ from "lodash"
@@ -135,4 +136,8 @@ export const itemVariableReducers = createReducer<
     return produce(state, draftState => {
       draftState[action.payload.itemId].newOptions.push(action.payload.optionId)
     })
+  })
+
+  .handleAction(createdNewQuiz, (state, action) => {
+    return {}
   })

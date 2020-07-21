@@ -1,5 +1,5 @@
 import React from "react"
-import { Item } from "../../../../types/NormalizedQuiz"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import { useTypedSelector } from "../../../../store/store"
 import styled from "styled-components"
 import { Box, Button, Fade, Modal } from "@material-ui/core"
@@ -15,7 +15,7 @@ import CustomModalContent from "./CustomModalContent"
 import { deletedItem } from "../../../../store/editor/editorActions"
 
 interface customFrontend {
-  item: Item
+  item: NormalizedItem
 }
 
 const EmptyBox = styled(Box)`

@@ -6,9 +6,9 @@ import { itemReducer } from "./editor/items/itemReducer"
 import { quizReducer } from "./editor/quiz/quizReducer"
 import { resultReducer } from "./editor/result/resultReducer"
 import {
-  Quiz,
-  Item,
-  Option,
+  NormalizedQuiz,
+  NormalizedItem,
+  NormalizedOption,
   ItemVariables,
   OptionVariables,
   QuizVariables,
@@ -35,9 +35,9 @@ const store = createStore(reducer, composeWithDevTools())
 
 export interface storeState {
   editor: {
-    quizzes: { [quizId: string]: Quiz }
-    items: { [itemId: string]: Item }
-    options: { [optionId: string]: Option }
+    quizzes: { [quizId: string]: NormalizedQuiz }
+    items: { [itemId: string]: NormalizedItem }
+    options: { [optionId: string]: NormalizedOption }
     quizId: string
     itemVariables: { [itemId: string]: ItemVariables }
     optionVariables: { [optionId: string]: OptionVariables }

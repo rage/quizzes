@@ -1,5 +1,5 @@
 import React from "react"
-import { Item } from "../../../../types/NormalizedQuiz"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import styled from "styled-components"
 import { useTypedSelector } from "../../../../store/store"
 import { useDispatch } from "react-redux"
@@ -41,7 +41,7 @@ const ModalContentTitleWrapper = styled.div`
 `
 
 interface ModalContentProps {
-  item: Item
+  item: NormalizedItem
 }
 
 export const OpenModalContent = ({ item }: ModalContentProps) => {

@@ -1,4 +1,4 @@
-import { action, Item } from "../../../types/NormalizedQuiz"
+import { action, NormalizedItem } from "../../../types/NormalizedQuiz"
 import { createReducer } from "typesafe-actions"
 import {
   editedQuizItemBody,
@@ -11,8 +11,6 @@ import {
   editedItemFailureMessage,
   editedSharedOptionsFeedbackMessage,
   toggledSharedOptionFeedbackMessage,
-  editedScaleMaxLabel,
-  editedScaleMinLabel,
   editedScaleMaxValue,
   editedScaleMinValue,
 } from "./itemAction"
@@ -22,10 +20,17 @@ import {
   deletedItem,
   createdNewOption,
   deletedOption,
+  createdNewQuiz,
 } from "../editorActions"
 import produce from "immer"
+import { Quiz } from "../../../types/Quiz"
+import { normalizedQuiz } from "../../../schemas"
+import { normalize } from "normalizr"
 
-export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
+export const itemReducer = createReducer<
+  { [itemId: string]: NormalizedItem },
+  action
+>({})
   .handleAction(
     initializedEditor,
     (state, action) => action.payload.normalizedQuiz.items,
@@ -54,18 +59,6 @@ export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
       draftState[action.payload.itemId].minValue = action.payload.newValue
     })
   })
-
-  // .handleAction(editedScaleMaxLabel, (state, action) => {
-  //   return produce(state, draftState => {
-  //     draftState[action.payload.itemId].maxLabel = action.payload.newLabel
-  //   })
-  // })
-
-  // .handleAction(editedScaleMinLabel, (state, action) => {
-  //   return produce(state, draftState => {
-  //     draftState[action.payload.itemId].minLabel = action.payload.newLabel
-  //   })
-  // })
 
   .handleAction(editedValidityRegex, (state, action) => {
     return produce(state, draftState => {
@@ -122,7 +115,7 @@ export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
 
   .handleAction(createdNewItem, (state, action) => {
     return produce(state, draftState => {
-      const newItem: Item = {
+      const newItem: NormalizedItem = {
         id: action.payload.itemId,
         quizId: action.payload.quizId,
         type: action.payload.type,
@@ -134,9 +127,7 @@ export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
         failureMessage: null,
         formatRegex: null,
         validityRegex: null,
-        // maxLabel: null,
         maxValue: null,
-        // minLabel: null,
         minValue: null,
         maxWords: null,
         minWords: null,
@@ -168,6 +159,35 @@ export const itemReducer = createReducer<{ [itemId: string]: Item }, action>({})
         action.payload.itemId
       ].options.filter(optionId => optionId !== action.payload.optionId)
     })
+  })
+
+  .handleAction(createdNewQuiz, (state, action) => {
+    const init: Quiz = {
+      id: action.payload.quizId,
+      autoConfirm: false,
+      autoReject: false,
+      awardPointsEvenIfWrong: false,
+      body: "",
+      courseId: action.payload.courseId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deadline: null,
+      excludedFromScore: true,
+      grantPointsPolicy: "grant_whenever_possible",
+      items: [],
+      open: null,
+      part: 0,
+      peerReviews: [],
+      points: 0,
+      section: 0,
+      submitMessage: null,
+      title: "",
+      tries: 1,
+      triesLimited: true,
+    }
+
+    const normalized = normalize(init, normalizedQuiz)
+    return normalized.entities.items ?? {}
   })
 
 export default itemReducer

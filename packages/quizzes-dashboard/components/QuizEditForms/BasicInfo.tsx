@@ -5,7 +5,7 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDateTimePicker,
 } from "@material-ui/pickers"
-import { Typography, Card, TextField, MenuItem } from "@material-ui/core"
+import { Typography, TextField, MenuItem } from "@material-ui/core"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
@@ -18,6 +18,7 @@ import {
   editedQuizzesDeadline,
   editedQuizzesBody,
   editedQuizzesSubmitmessage,
+  editedQuizzesPart,
 } from "../../store/editor/quiz/quizActions"
 import { useTypedSelector } from "../../store/store"
 
@@ -37,6 +38,16 @@ const TitleIcon = styled(FontAwesomeIcon)`
   width: 2rem;
   height: 2rem;
   margin-right: 0.25rem;
+`
+
+const PartField = styled(TextField)`
+  display: flex;
+  margin-right: 0.5rem !important;
+`
+
+const SectionField = styled(TextField)`
+  display: flex;
+  margin-left: 0.5rem !important;
 `
 
 const BasicInformation = () => {
@@ -66,6 +77,11 @@ const BasicInformation = () => {
   const submitMessage = useTypedSelector(
     state => state.editor.quizzes[quizId].submitMessage,
   )
+  const part = useTypedSelector(state => state.editor.quizzes[quizId].part)
+
+  const section = useTypedSelector(
+    state => state.editor.quizzes[quizId].section,
+  )
 
   const variables = useTypedSelector(
     state => state.editor.quizVariables[quizId],
@@ -86,6 +102,28 @@ const BasicInformation = () => {
           defaultValue={title}
           onChange={event =>
             dispatch(editedQuizTitle(event.target.value, quizId))
+          }
+        />
+      </InfoContainer>
+      <InfoContainer>
+        <PartField
+          fullWidth
+          label="Part"
+          variant="outlined"
+          value={part}
+          type="number"
+          onChange={event =>
+            dispatch(editedQuizzesPart(quizId, Number(event.target.value)))
+          }
+        />
+        <SectionField
+          fullWidth
+          label="Section"
+          variant="outlined"
+          value={section}
+          type="number"
+          onChange={event =>
+            dispatch(editedQuizzesPart(quizId, Number(event.target.value)))
           }
         />
       </InfoContainer>

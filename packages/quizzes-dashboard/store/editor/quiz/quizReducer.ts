@@ -1,4 +1,4 @@
-import { Quiz, action } from "../../../types/NormalizedQuiz"
+import { NormalizedQuiz, action, Entities } from "../../../types/NormalizedQuiz"
 import { createReducer } from "typesafe-actions"
 import {
   editedQuizTitle,
@@ -8,19 +8,28 @@ import {
   editedQuizzesDeadline,
   editedQuizzesBody,
   editedQuizzesSubmitmessage,
+  editedQuizzesPart,
+  editedQuizzesSection,
 } from "./quizActions"
 import {
   initializedEditor,
   createdNewItem,
   deletedItem,
+  createdNewQuiz,
 } from "../editorActions"
 import produce from "immer"
 import { DateTime } from "luxon"
+import { Quiz } from "../../../types/Quiz"
+import { normalize } from "normalizr"
+import { normalizedQuiz } from "../../../schemas"
 
-export const quizReducer = createReducer<{ [quizId: string]: Quiz }, action>({})
+export const quizReducer = createReducer<
+  { [quizId: string]: NormalizedQuiz },
+  action
+>({})
   .handleAction(
     initializedEditor,
-    (state, action) => action.payload.normalizedQuiz.quizzes,
+    (_state, action) => action.payload.normalizedQuiz.quizzes,
   )
 
   .handleAction(editedQuizTitle, (state, action) => {
@@ -84,6 +93,48 @@ export const quizReducer = createReducer<{ [quizId: string]: Quiz }, action>({})
       draftState[action.payload.quizId].items = draftState[
         action.payload.quizId
       ].items.filter(id => id !== action.payload.itemId)
+    })
+  })
+
+  .handleAction(createdNewQuiz, (state, action) => {
+    const init: Quiz = {
+      id: action.payload.quizId,
+      autoConfirm: false,
+      autoReject: false,
+      awardPointsEvenIfWrong: false,
+      body: "",
+      courseId: action.payload.courseId,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      deadline: null,
+      excludedFromScore: true,
+      grantPointsPolicy: "grant_whenever_possible",
+      items: [],
+      open: null,
+      part: 0,
+      peerReviews: [],
+      points: 0,
+      section: 0,
+      submitMessage: null,
+      title: "",
+      tries: 1,
+      triesLimited: true,
+    }
+
+    const normalized = normalize(init, normalizedQuiz)
+
+    return normalized.entities.quizzes ?? {}
+  })
+
+  .handleAction(editedQuizzesPart, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.quizId].part = action.payload.newPart
+    })
+  })
+
+  .handleAction(editedQuizzesSection, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.quizId].section = action.payload.newSection
     })
   })
 

@@ -17,7 +17,7 @@ import {
 import { useTypedSelector } from "../../../../store/store"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { Item } from "../../../../types/NormalizedQuiz"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import MultipleChoiceButton from "./MultiplChoiceButton"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus } from "@fortawesome/free-solid-svg-icons"
@@ -42,7 +42,7 @@ const ModalContentOptionWrapper = styled.div`
 const AddOptionButton = styled(Button)``
 
 interface EditorModalProps {
-  item: Item
+  item: NormalizedItem
 }
 
 export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {

@@ -14,7 +14,7 @@ import {
   editedOptionCorrectnes,
 } from "../../../../store/editor/options/optionActions"
 import { useDispatch } from "react-redux"
-import { Option } from "../../../../types/NormalizedQuiz"
+import { NormalizedOption } from "../../../../types/NormalizedQuiz"
 import { useTypedSelector } from "../../../../store/store"
 
 const ModalContent = styled.div`
@@ -23,7 +23,7 @@ const ModalContent = styled.div`
 `
 
 interface OptionEditorProps {
-  option: Option
+  option: NormalizedOption
 }
 
 export const OptionModalContent = ({ option }: OptionEditorProps) => {
