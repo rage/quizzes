@@ -14,7 +14,7 @@ import _ from "lodash"
 
 const EditPage = () => {
   const router = useRouter()
-  const quizId: any = router.query.quizId
+  const quizId: string = router.query.quizId?.toString() ?? ""
   const { data, error } = useSWR(quizId, fetchQuiz)
   const dispatch = useDispatch()
 

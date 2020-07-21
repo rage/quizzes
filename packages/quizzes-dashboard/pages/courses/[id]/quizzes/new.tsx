@@ -10,7 +10,7 @@ import { createdNewQuiz } from "../../../../store/editor/editorActions"
 const NewQuiz = () => {
   const dispatch = useDispatch()
   const router = useRouter()
-  const courseId: any = router.query.courseId
+  const courseId: string = router.query.courseId?.toString() ?? ""
   useEffect(() => {
     dispatch(createdNewQuiz(courseId))
   }, [])
