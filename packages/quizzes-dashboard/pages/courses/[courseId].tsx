@@ -31,7 +31,7 @@ const CourseTitleWrapper = styled.div`
 
 const ShowCoursePage = () => {
   const router = useRouter()
-  const id = router.query.id?.toString() ?? ""
+  const id = router.query.courseId?.toString() ?? ""
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     { label: "Course" },

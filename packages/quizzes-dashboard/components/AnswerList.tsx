@@ -1,30 +1,21 @@
 import React from "react"
+import { Answer } from "../types/Answer"
 import styled from "styled-components"
-import { Card, CardContent } from "@material-ui/core"
-import Link from "next/link"
-import Skeleton from "@material-ui/lab/Skeleton"
-import { Course } from "../types/Quiz"
-
-const StyledCard = styled(Card)`
-  margin-bottom: 1rem;
-`
-
-const CourseLink = styled.a`
-  color: white;
-  text-decoration: none;
-  cursor: pointer;
-`
+import { Skeleton } from "@material-ui/lab"
+import AnswerCard from "./Answer"
 
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
 `
 
-interface CourseListProps {
-  data: Course[] | undefined
+export interface AnswerListProps {
+  data: Answer[] | undefined
   error: any
 }
 
-const CourseList = ({ data, error }: CourseListProps) => {
+export const AnswerList = ({ data, error }: AnswerListProps) => {
+  console.log(data)
+  console.log(error)
   if (error) {
     return <div>Error while fetching courses.</div>
   }
@@ -51,24 +42,9 @@ const CourseList = ({ data, error }: CourseListProps) => {
   }
   return (
     <>
-      {data.map(course => (
-        <Link
-          key={course.id}
-          href={{
-            pathname: "/courses/[id]",
-            query: { courseId: `${course.id}` },
-          }}
-          as={`/courses/${course.id}`}
-        >
-          <CourseLink>
-            <StyledCard key={course.id}>
-              <CardContent>{course.title || course.id}</CardContent>
-            </StyledCard>
-          </CourseLink>
-        </Link>
+      {data.map(answer => (
+        <AnswerCard key={answer.id} answer={answer} />
       ))}
     </>
   )
 }
-
-export default CourseList
