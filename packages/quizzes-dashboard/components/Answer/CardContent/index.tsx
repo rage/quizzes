@@ -5,12 +5,20 @@ import ItemAnswers from "./ItemAnswers"
 import PeerReviewStats from "./PeerReviewStats"
 import { Answer } from "../../../types/Answer"
 import CompactPeerReviewStats from "./CompactPeerReviewStats"
-import { Button } from "@material-ui/core"
+import { Button, Typography, Collapse } from "@material-ui/core"
+import Link from "next/link"
+import AnswerLink from "./AnswerLink"
 
 export const ContentContainer = styled.div`
   display: flex !important;
   margin-top: 1rem;
   justify-content: space-between !important;
+  width: 100%;
+`
+
+export const StatsContainer = styled.div`
+  display: flex;
+  justify-content: center;
   width: 100%;
 `
 
@@ -30,19 +38,24 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
 
   return (
     <>
-      <ContentContainer>
-        <AnswerOverView answer={answer} />
-      </ContentContainer>
-      <ContentContainer>
-        <ItemAnswers itemAnswers={answer.itemAnswers} />
-      </ContentContainer>
-      <ContentContainer>
+      <Collapse in={showMore} collapsedHeight={250}>
+        <ContentContainer>
+          <AnswerLink answer={answer} />
+        </ContentContainer>
+        <ContentContainer>
+          <AnswerOverView answer={answer} />
+        </ContentContainer>
+        <ContentContainer>
+          <ItemAnswers itemAnswers={answer.itemAnswers} />
+        </ContentContainer>
+      </Collapse>
+      <StatsContainer>
         {showMore ? (
           <PeerReviewStats peerReviews={answer.peerReviews} />
         ) : (
           <CompactPeerReviewStats answer={answer} />
         )}
-      </ContentContainer>
+      </StatsContainer>
       <StatButtonWrapper>
         {showMore ? (
           <Button variant="outlined" onClick={() => setShowMore(false)}>

@@ -14,29 +14,27 @@ export interface AnswerListProps {
 }
 
 export const AnswerList = ({ data, error }: AnswerListProps) => {
-  console.log(data)
-  console.log(error)
   if (error) {
-    return <div>Error while fetching courses.</div>
+    return <div>Error while fetching answers.</div>
   }
   if (!data) {
     return (
       <>
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <StyledSkeleton variant="rect" height={250} animation="wave" />
       </>
     )
   }

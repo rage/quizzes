@@ -15,7 +15,7 @@ export interface ItemAnswer {
   quizAnswerId: string
   quizItemId: string
   textData: string
-  intData: null
+  intData: number | null
   correct: boolean
   createdAt: Date
   updatedAt: Date

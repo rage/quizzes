@@ -76,14 +76,30 @@ export const saveQuiz = async (quiz: Quiz | NewQuiz): Promise<any> => {
   }
 }
 
-export const getAllAnswers = async (quizId: string): Promise<Answer[]> => {
+export const getAnswerById = async (answerId: string): Promise<Answer> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (await api.get(`/answers/${answerId}`, config)).data
+    return response
+  }
+  throw new Error()
+}
+
+export const getAllAnswers = async (
+  quizId: string,
+  page: number,
+  size: number,
+): Promise<Answer[]> => {
   const userInfo = checkStore()
   if (userInfo) {
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
     const response = (
-      await api.get(`/answers/${quizId}/all?page=1&size=10`, config)
+      await api.get(`/answers/${quizId}/all?page=${page}&size=${size}`, config)
     ).data
     return response
   }
@@ -92,6 +108,8 @@ export const getAllAnswers = async (quizId: string): Promise<Answer[]> => {
 
 export const getAnswersRequiringAttention = async (
   quizId: string,
+  page: number,
+  size: number,
 ): Promise<Answer[]> => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -99,7 +117,10 @@ export const getAnswersRequiringAttention = async (
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
     const response = (
-      await api.get(`/answers/${quizId}/manual-review?page=1&size=10`, config)
+      await api.get(
+        `/answers/${quizId}/manual-review?page=${page}&size=${size}`,
+        config,
+      )
     ).data
     return response
   }

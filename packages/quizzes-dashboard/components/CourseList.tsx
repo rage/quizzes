@@ -55,7 +55,7 @@ const CourseList = ({ data, error }: CourseListProps) => {
         <Link
           key={course.id}
           href={{
-            pathname: "/courses/[id]",
+            pathname: "/courses/[courseId]",
             query: { courseId: `${course.id}` },
           }}
           as={`/courses/${course.id}`}
