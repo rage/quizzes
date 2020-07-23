@@ -580,7 +580,9 @@ describe("dashboard: update manual review status", () => {
 
   test("respond with 401 if invalid credentials", done => {
     request(app.callback())
-      .post("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/status")
+      .post(
+        "/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/status",
+      )
       .set("Authorization", `bearer BAD_TOKEN`)
       .set("Accept", "application/json")
       .send({ status: "confirmed" })
@@ -589,7 +591,9 @@ describe("dashboard: update manual review status", () => {
 
   test("respond with 403 if insufficient credentials", done => {
     request(app.callback())
-      .post("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/status")
+      .post(
+        "/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/status",
+      )
       .set("Authorization", `bearer PLEB_TOKEN`)
       .set("Accept", "application/json")
       .send({ status: "confirmed" })
@@ -598,7 +602,9 @@ describe("dashboard: update manual review status", () => {
 
   test("respond with 400 if invalid status", done => {
     request(app.callback())
-      .post("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/status")
+      .post(
+        "/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/status",
+      )
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .set("Accept", "application/json")
       .send({ status: "submitted" })
@@ -611,7 +617,9 @@ describe("dashboard: update manual review status", () => {
 
   test("update valid status", done => {
     request(app.callback())
-      .post("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/status")
+      .post(
+        "/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/status",
+      )
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .set("Accept", "application/json")
       .send({ status: "confirmed" })
