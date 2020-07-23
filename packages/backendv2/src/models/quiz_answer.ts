@@ -71,8 +71,15 @@ class QuizAnswer extends Model {
         .orderBy("created_at")
         .page(page, pageSize)
     ).results
+
+    const answersAmount = (
+      await this.query()
+        .where("quiz_id", quizId)
+        .andWhereNot("status", "deprecated")
+    ).length
+
     await this.addRelations(quizAnswers)
-    return quizAnswers
+    return { quizAnswers, answersAmount }
   }
 
   public static async getAnswersForManualReview(
@@ -87,8 +94,15 @@ class QuizAnswer extends Model {
         .orderBy("created_at")
         .page(page, pageSize)
     ).results
+
+    const answersAmount = (
+      await this.query()
+        .where("quiz_id", quizId)
+        .andWhereNot("status", "deprecated")
+    ).length
+
     await this.addRelations(quizAnswers)
-    return quizAnswers
+    return { quizAnswers, answersAmount }
   }
 
   public static async setManualReviewStatus(answerId: string, status: string) {

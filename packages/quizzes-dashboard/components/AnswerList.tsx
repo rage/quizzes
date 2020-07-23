@@ -11,9 +11,10 @@ const StyledSkeleton = styled(Skeleton)`
 export interface AnswerListProps {
   data: Answer[] | undefined
   error: any
+  expandAll: boolean
 }
 
-export const AnswerList = ({ data, error }: AnswerListProps) => {
+export const AnswerList = ({ data, error, expandAll }: AnswerListProps) => {
   if (error) {
     return <div>Error while fetching answers.</div>
   }
@@ -41,7 +42,7 @@ export const AnswerList = ({ data, error }: AnswerListProps) => {
   return (
     <>
       {data.map(answer => (
-        <AnswerCard key={answer.id} answer={answer} />
+        <AnswerCard key={answer.id} answer={answer} expanded={expandAll} />
       ))}
     </>
   )

@@ -92,14 +92,17 @@ export const getAllAnswers = async (
   quizId: string,
   page: number,
   size: number,
-): Promise<Answer[]> => {
+): Promise<{ quizAnswers: Answer[]; answersAmount: number }> => {
   const userInfo = checkStore()
   if (userInfo) {
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
     const response = (
-      await api.get(`/answers/${quizId}/all?page=${page}&size=${size}`, config)
+      await api.get(
+        `/answers/${quizId}/all?page=${page - 1}&size=${size}`,
+        config,
+      )
     ).data
     return response
   }
@@ -110,7 +113,7 @@ export const getAnswersRequiringAttention = async (
   quizId: string,
   page: number,
   size: number,
-): Promise<Answer[]> => {
+): Promise<{ quizAnswers: Answer[]; answersAmount: number }> => {
   const userInfo = checkStore()
   if (userInfo) {
     const config = {
@@ -118,9 +121,26 @@ export const getAnswersRequiringAttention = async (
     }
     const response = (
       await api.get(
-        `/answers/${quizId}/manual-review?page=${page}&size=${size}`,
+        `/answers/${quizId}/manual-review?page=${page - 1}&size=${size}`,
         config,
       )
+    ).data
+    return response
+  }
+  throw new Error()
+}
+
+export const changeAnswerStatus = async (
+  answerId: string,
+  status: string,
+): Promise<Answer> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (
+      await api.post(`/answers/${answerId}/status`, status, config)
     ).data
     return response
   }

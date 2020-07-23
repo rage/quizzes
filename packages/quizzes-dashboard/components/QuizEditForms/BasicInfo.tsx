@@ -56,7 +56,6 @@ const BasicInformation = () => {
   const quizId = useTypedSelector(state => state.editor.quizId)
 
   const quiz = useTypedSelector(state => state.editor.quizzes)
-  console.log("quiz", quiz)
 
   const pointsGrantingPolicy = useTypedSelector(
     state => state.editor.quizzes[quizId].grantPointsPolicy,

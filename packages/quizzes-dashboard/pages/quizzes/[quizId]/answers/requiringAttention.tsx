@@ -8,14 +8,39 @@ import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
 import { AnswerList } from "../../../../components/AnswerList"
 import usePromise from "react-use-promise"
 import { Answer } from "../../../../types/Answer"
-import { TextField, MenuItem } from "@material-ui/core"
+import { TextField, MenuItem, Switch, Typography } from "@material-ui/core"
+import styled from "styled-components"
+import { Pagination } from "@material-ui/lab"
+
+export const SizeSelectorContainer = styled.div`
+  display: flex;
+  width: 100%;
+  margin-top: 0.5rem;
+  justify-content: flex-end;
+`
+
+export const SizeSelectorField = styled(TextField)`
+  display: flex !important;
+`
+
+export const PaginationField = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  padding: 1rem;
+`
+
+export const Paginator = styled(Pagination)`
+  display: flex !important;
+`
 
 export const RequiringAttention = () => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
   const [page, setPage] = useState(1)
   const [size, setSize] = useState(10)
-  let answers: Answer[] | undefined
+  const [expandAll, setExpandAll] = useState(false)
+  let answers: { quizAnswers: Answer[]; answersAmount: number } | undefined
   let error: any
   ;[answers, error] = usePromise(
     () => getAnswersRequiringAttention(quizId, page, size),
@@ -43,17 +68,64 @@ export const RequiringAttention = () => {
 
   return (
     <>
-      <TextField
-        label="answers per page"
-        variant="outlined"
-        type="select"
-        onChange={event => setSize(Number(event.target.value))}
-      >
-        <MenuItem value={10}>10</MenuItem>
-        <MenuItem value={15}>15</MenuItem>
-        <MenuItem value={20}>20</MenuItem>
-      </TextField>
-      <AnswerList data={answers} error={error} />
+      <SizeSelectorContainer>
+        <SizeSelectorField
+          value={size}
+          size="medium"
+          label="Answers"
+          variant="outlined"
+          select
+          onChange={event => setSize(Number(event.target.value))}
+        >
+          <MenuItem value={10}>10</MenuItem>
+          <MenuItem value={15}>15</MenuItem>
+          <MenuItem value={20}>20</MenuItem>
+        </SizeSelectorField>
+      </SizeSelectorContainer>
+      <PaginationField>
+        {answers ? (
+          <Paginator
+            siblingCount={2}
+            boundaryCount={2}
+            count={Math.ceil(answers.answersAmount / size)}
+            size="large"
+            color="primary"
+            showFirstButton
+            showLastButton
+            page={page}
+            onChange={(event, nextPage) => setPage(nextPage)}
+          ></Paginator>
+        ) : (
+          ""
+        )}
+      </PaginationField>
+      <Switch
+        checked={expandAll}
+        onChange={event => setExpandAll(event.target.checked)}
+      />
+      <Typography>Expand all</Typography>
+      <AnswerList
+        data={answers?.quizAnswers}
+        error={error}
+        expandAll={expandAll}
+      />
+      <PaginationField>
+        {answers ? (
+          <Paginator
+            siblingCount={2}
+            boundaryCount={2}
+            count={Math.ceil(answers.answersAmount / size)}
+            size="large"
+            color="primary"
+            showFirstButton
+            showLastButton
+            page={page}
+            onChange={(event, nextPage) => setPage(nextPage)}
+          ></Paginator>
+        ) : (
+          ""
+        )}
+      </PaginationField>
     </>
   )
 }

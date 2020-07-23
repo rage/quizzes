@@ -5,7 +5,7 @@ import { getAllAnswers, fetchQuiz } from "../../../../services/quizzes"
 import { AnswerList } from "../../../../components/AnswerList"
 import usePromise from "react-use-promise"
 import { Answer } from "../../../../types/Answer"
-import { TextField, MenuItem } from "@material-ui/core"
+import { TextField, MenuItem, Switch, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import { Pagination } from "@material-ui/lab"
 
@@ -27,6 +27,11 @@ export const PaginationField = styled.div`
   padding: 1rem;
 `
 
+export const SwitchField = styled.div`
+  display: flex;
+  align-items: baseline;
+`
+
 export const Paginator = styled(Pagination)`
   display: flex !important;
 `
@@ -36,7 +41,8 @@ export const AllAnswers = () => {
   const quizId = route.query.quizId?.toString() ?? ""
   const [page, setPage] = useState(1)
   const [size, setSize] = useState(10)
-  let answers: Answer[] | undefined
+  const [expandAll, setExpandAll] = useState(false)
+  let answers: { quizAnswers: Answer[]; answersAmount: number } | undefined
   let error: any
   ;[answers, error] = usePromise(() => getAllAnswers(quizId, page, size), [
     page,
@@ -78,27 +84,52 @@ export const AllAnswers = () => {
         </SizeSelectorField>
       </SizeSelectorContainer>
       <PaginationField>
-        <Paginator
-          count={10}
-          size="large"
-          color="primary"
-          showFirstButton
-          showLastButton
-          page={page}
-          onChange={(event, nextPage) => setPage(nextPage)}
-        ></Paginator>
+        {answers ? (
+          <Paginator
+            siblingCount={2}
+            boundaryCount={2}
+            count={Math.ceil(answers.answersAmount / size)}
+            size="large"
+            color="primary"
+            showFirstButton
+            showLastButton
+            page={page}
+            onChange={(event, nextPage) => setPage(nextPage)}
+          ></Paginator>
+        ) : (
+          ""
+        )}
       </PaginationField>
-      <AnswerList data={answers} error={error} />
+      <SwitchField>
+        <Typography>Expand all</Typography>
+        <Switch
+          checked={expandAll}
+          onChange={event => {
+            setExpandAll(event.target.checked)
+          }}
+        />
+      </SwitchField>
+      <AnswerList
+        data={answers?.quizAnswers}
+        error={error}
+        expandAll={expandAll}
+      />
       <PaginationField>
-        <Paginator
-          count={10}
-          size="large"
-          color="primary"
-          showFirstButton
-          showLastButton
-          page={page}
-          onChange={(event, nextPage) => setPage(nextPage)}
-        ></Paginator>
+        {answers ? (
+          <Paginator
+            siblingCount={2}
+            boundaryCount={2}
+            count={Math.ceil(answers.answersAmount / size)}
+            size="large"
+            color="primary"
+            showFirstButton
+            showLastButton
+            page={page}
+            onChange={(event, nextPage) => setPage(nextPage)}
+          ></Paginator>
+        ) : (
+          ""
+        )}
       </PaginationField>
     </>
   )

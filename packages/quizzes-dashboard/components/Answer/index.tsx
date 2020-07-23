@@ -12,13 +12,14 @@ export const StyledAnswerCard = styled(Card)`
 
 export interface AnswerProps {
   answer: Answer
+  expanded: boolean
 }
 
-export const AnswerCard = ({ answer }: AnswerProps) => {
+export const AnswerCard = ({ answer, expanded }: AnswerProps) => {
   return (
     <>
       <StyledAnswerCard>
-        <AnswerContent answer={answer} />
+        <AnswerContent answer={answer} expanded={expanded} />
       </StyledAnswerCard>
     </>
   )

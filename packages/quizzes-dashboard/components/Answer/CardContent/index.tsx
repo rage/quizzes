@@ -1,13 +1,13 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import styled from "styled-components"
 import AnswerOverView from "./AnswerOverView"
 import ItemAnswers from "./ItemAnswers"
 import PeerReviewStats from "./PeerReviewStats"
 import { Answer } from "../../../types/Answer"
 import CompactPeerReviewStats from "./CompactPeerReviewStats"
-import { Button, Typography, Collapse } from "@material-ui/core"
-import Link from "next/link"
+import { Button, Collapse } from "@material-ui/core"
 import AnswerLink from "./AnswerLink"
+import ManualReviewField from "./ManualReviewField"
 
 export const ContentContainer = styled.div`
   display: flex !important;
@@ -31,10 +31,13 @@ export const StatButtonWrapper = styled.div`
 
 export interface AnswerContentProps {
   answer: Answer
+  expanded: boolean
 }
 
-export const AnswerContent = ({ answer }: AnswerContentProps) => {
-  const [showMore, setShowMore] = useState(false)
+export const AnswerContent = ({ answer, expanded }: AnswerContentProps) => {
+  const [showMore, setShowMore] = useState(expanded)
+
+  useEffect(() => setShowMore(expanded), [expanded])
 
   return (
     <>
@@ -67,6 +70,11 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
           </Button>
         )}
       </StatButtonWrapper>
+      {answer.status === "confirmed" ? (
+        <ManualReviewField answer={answer} />
+      ) : (
+        ""
+      )}
     </>
   )
 }
