@@ -1,6 +1,12 @@
 import React from "react"
 import { ItemAnswer } from "../../../../types/Answer"
 import SingleItemAnswer from "./SingleItemAnswer"
+import styled from "styled-components"
+
+export const ItemAnswerWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+`
 
 export interface ItemAnswerProps {
   itemAnswers: ItemAnswer[]
@@ -9,9 +15,11 @@ export interface ItemAnswerProps {
 export const ItemAnswers = ({ itemAnswers }: ItemAnswerProps) => {
   return (
     <>
-      {itemAnswers.map(itemAnswer => (
-        <SingleItemAnswer itemAnswer={itemAnswer} key={itemAnswer.id} />
-      ))}
+      <ItemAnswerWrapper>
+        {itemAnswers.map(itemAnswer => (
+          <SingleItemAnswer itemAnswer={itemAnswer} key={itemAnswer.id} />
+        ))}
+      </ItemAnswerWrapper>
     </>
   )
 }

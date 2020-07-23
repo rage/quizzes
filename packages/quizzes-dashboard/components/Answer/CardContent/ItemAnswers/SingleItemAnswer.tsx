@@ -6,6 +6,7 @@ import styled from "styled-components"
 export const ItemAnswerContainer = styled.div`
   display: flex;
   flex-wrap: wrap;
+  width: 100%;
 `
 
 export const StyledTypo = styled(Typography)`
@@ -13,6 +14,10 @@ export const StyledTypo = styled(Typography)`
   margin-left: 0.5rem !important;
   margin-right: 0.5rem !important;
   width: 100%;
+`
+
+export const AnswerText = styled(Typography)`
+  white-space: pre-line;
 `
 
 export const AnswerContainer = styled.div`
@@ -39,7 +44,7 @@ export const SingleItemAnswer = ({ itemAnswer }: SingleAnswerProps) => {
         )}
         <StyledTypo variant="subtitle1">Answer: </StyledTypo>
         <AnswerContainer>
-          <Typography variant="overline">{itemAnswer.textData}</Typography>
+          <AnswerText>{itemAnswer.textData.trim()}</AnswerText>
         </AnswerContainer>
       </ItemAnswerContainer>
     </>
