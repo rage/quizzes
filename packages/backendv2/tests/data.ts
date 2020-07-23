@@ -515,7 +515,7 @@ export default {
     id: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
     quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
     userId: 1234,
-    status: "confirmed",
+    status: "given-enough",
     createdAt: expect.stringMatching(dateTime),
     updatedAt: expect.stringMatching(dateTime),
     itemAnswers: [
