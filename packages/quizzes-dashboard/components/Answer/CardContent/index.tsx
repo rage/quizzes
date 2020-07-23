@@ -70,7 +70,7 @@ export const AnswerContent = ({ answer, expanded }: AnswerContentProps) => {
           </Button>
         )}
       </StatButtonWrapper>
-      {answer.status === "confirmed" ? (
+      {answer.status === "manual-review" ? (
         <ManualReviewField answer={answer} />
       ) : (
         ""
