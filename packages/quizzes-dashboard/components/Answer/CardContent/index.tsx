@@ -20,12 +20,12 @@ export const StatsContainer = styled.div`
   display: flex;
   justify-content: center;
   width: 100%;
+  flex-wrap: wrap;
 `
 
 export const StatButtonWrapper = styled.div`
   display: flex;
   justify-content: center !important;
-  margin-top: 1rem;
   width: 100%;
 `
 

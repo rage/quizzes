@@ -44,7 +44,11 @@ export const SingleItemAnswer = ({ itemAnswer }: SingleAnswerProps) => {
         )}
         <StyledTypo variant="subtitle1">Answer: </StyledTypo>
         <AnswerContainer>
-          <AnswerText>{itemAnswer.textData.trim()}</AnswerText>
+          {itemAnswer && itemAnswer.textData !== null ? (
+            <AnswerText>{itemAnswer.textData.trim()}</AnswerText>
+          ) : (
+            ""
+          )}
         </AnswerContainer>
       </ItemAnswerContainer>
     </>
