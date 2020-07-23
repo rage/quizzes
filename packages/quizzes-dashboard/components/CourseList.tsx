@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React from "react"
 import styled from "styled-components"
 import { Card, CardContent } from "@material-ui/core"
 import Link from "next/link"
@@ -55,7 +55,7 @@ const CourseList = ({ data, error }: CourseListProps) => {
         <Link
           key={course.id}
           href={{
-            pathname: "/courses/[id]",
+            pathname: "/courses/[courseId]",
             query: { courseId: `${course.id}` },
           }}
           as={`/courses/${course.id}`}

@@ -11,6 +11,7 @@ import { useRouter } from "next/router"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import QuizEditForms from "../../../components/QuizEditForms"
 import _ from "lodash"
+import Link from "next/link"
 
 const EditPage = () => {
   const router = useRouter()
@@ -32,12 +33,13 @@ const EditPage = () => {
     }
     dispatch(initializedEditor(normalizedData, quiz))
   }, [data])
+
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
       label: "Course",
       as: `/courses/${data?.courseId}`,
-      href: "/courses/[id]",
+      href: "/courses/[courseId]",
     },
     { label: "Quiz" },
   ])
@@ -48,6 +50,26 @@ const EditPage = () => {
 
   return (
     <>
+      <Link
+        href={{
+          pathname: "/quizzes/[quizId]/answers/requiringAttention",
+        }}
+        as={`/quizzes/${quizId}/answers/requiringAttention`}
+      >
+        <a>
+          <Typography>Answers Requiring Attention</Typography>
+        </a>
+      </Link>
+      <Link
+        href={{
+          pathname: "/quizzes/[quizId]/answers/all",
+        }}
+        as={`/quizzes/${quizId}/answers/all`}
+      >
+        <a>
+          <Typography>All Answers</Typography>
+        </a>
+      </Link>
       <SaveButton />
       <Typography variant="h1">Editing quiz</Typography>
       <QuizEditForms />

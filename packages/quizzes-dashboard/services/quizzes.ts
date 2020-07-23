@@ -2,6 +2,7 @@ import axios from "axios"
 import { checkStore } from "./tmcApi"
 import { Quiz, Course } from "../types/Quiz"
 import { NewQuiz } from "../types/NormalizedQuiz"
+import { Answer } from "../types/Answer"
 
 let HOST = "http://localhost:3003"
 
@@ -73,4 +74,55 @@ export const saveQuiz = async (quiz: Quiz | NewQuiz): Promise<any> => {
     const response = (await api.post(`quizzes`, quiz, config)).data
     return response
   }
+}
+
+export const getAnswerById = async (answerId: string): Promise<Answer> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (await api.get(`/answers/${answerId}`, config)).data
+    return response
+  }
+  throw new Error()
+}
+
+export const getAllAnswers = async (
+  quizId: string,
+  page: number,
+  size: number,
+): Promise<Answer[]> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (
+      await api.get(`/answers/${quizId}/all?page=${page}&size=${size}`, config)
+    ).data
+    return response
+  }
+  throw new Error()
+}
+
+export const getAnswersRequiringAttention = async (
+  quizId: string,
+  page: number,
+  size: number,
+): Promise<Answer[]> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (
+      await api.get(
+        `/answers/${quizId}/manual-review?page=${page}&size=${size}`,
+        config,
+      )
+    ).data
+    return response
+  }
+  throw new Error()
 }
