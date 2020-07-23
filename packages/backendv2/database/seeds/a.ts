@@ -359,7 +359,7 @@ export async function seed(knex: Knex): Promise<any> {
       quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
       user_id: 1234,
       language_id: "xy_YZ",
-      status: "confirmed",
+      status: "given-enough",
     }),
   ])
   await knex.raw("? ON CONFLICT (id) DO NOTHING", [
