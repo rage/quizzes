@@ -23,10 +23,10 @@ const maltaOptions: SingleLanguageLabels = {
     },
   },
   open: {
-    placeholder: "Answer",
-    userAnswerLabel: "Your answer",
-    feedbackForSuccess: "Your answer is correct",
-    feedbackForFailure: "Your answer is not correct",
+    placeholder: "Tweġiba",
+    userAnswerLabel: "It-tweġiba tiegħek",
+    feedbackForSuccess: "It-tweġiba tiegħek mhix tajba",
+    feedbackForFailure: "It-tweġiba tiegħek hija tajba",
   },
   peerReviews: {
     loadingLabel: "Qed jillowdja",
@@ -52,9 +52,9 @@ const maltaOptions: SingleLanguageLabels = {
     answerFlaggedAsSpam: "It-tweġiba tiegħek ġiet irrappurtata bħala spam",
     answerConfirmed: "It-tweġiba tiegħek ġiet aċċettata!",
     manualReview: "It-tweġiba tiegħek qed janalizzaha l-persunal tal-kors",
-    peerReviewGroupTitle: "Peer review questions",
+    peerReviewGroupTitle: "Tweġibiet (Valutazzjoni bejn il-pari)",
     peerReviewLikertDetails:
-      "Evaluate each statement on a scale of 1-5. 1 means strongly disagree, 5 means strongly agree.",
+      "Evalwa kull dikjarazzjoni fuq skala ta '1-5. 1 tfisser li ma naqbilx sew, 5 ifisser naqbel bil-qawwa.",
   },
   receivedPeerReviews: {
     averageOfGradesLabel:
