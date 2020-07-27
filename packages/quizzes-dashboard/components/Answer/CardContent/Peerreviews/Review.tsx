@@ -1,46 +1,35 @@
 import React from "react"
 import { PeerReview } from "../../../../types/Answer"
 import { Typography, Divider } from "@material-ui/core"
-import ReviewAnswerElement from "./AnswerElement"
+import ReviewContent from "./ReviewContent"
 import styled from "styled-components"
-import { DateTime } from "luxon"
 
-export const PeerreviewContainer = styled.div`
-  display: flex;
+export const StyledDivider = styled(Divider)`
+  display: flex !important;
+  color: blue !important;
+  margin: 0.5rem !important;
+  width: 100%;
 `
 
-export const StyledReviewer = styled(Typography)`
+export const ReviewContainer = styled.div`
   display: flex;
-  margin-right: 0.5rem !important;
-`
-
-export const StyledCreatedAt = styled(Typography)`
-  display: flex;
-  margin-left: 0.5rem !important;
+  width: 100%;
+  padding: 0.5rem;
+  flex-wrap: wrap;
 `
 
 export interface reviewProps {
   review: PeerReview
+  number: number
 }
 
-export const Review = ({ review }: reviewProps) => {
+export const Review = ({ review, number }: reviewProps) => {
   return (
     <>
-      <PeerreviewContainer>
-        <StyledReviewer>reviewer: {review.userId}</StyledReviewer>
-        <StyledCreatedAt>
-          created at:{" "}
-          {DateTime.fromISO(review.createdAt)
-            .toLocal()
-            .toLocaleString(DateTime.DATETIME_SHORT)}
-        </StyledCreatedAt>
-      </PeerreviewContainer>
-      {review.answers.map(reviewAnswer => (
-        <ReviewAnswerElement
-          key={reviewAnswer.peerReviewQuestionId}
-          answerElement={reviewAnswer}
-        />
-      ))}
+      <ReviewContainer>
+        <Typography variant="h3">Review nro. {number}</Typography>
+        <ReviewContent review={review} />
+      </ReviewContainer>
     </>
   )
 }

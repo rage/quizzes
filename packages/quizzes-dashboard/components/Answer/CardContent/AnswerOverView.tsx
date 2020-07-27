@@ -20,9 +20,7 @@ export const AnswerOverView = ({ answer }: AnswerOverViewProps) => {
       <StyledTypo>Status: {answer.status}</StyledTypo>
       <StyledTypo>
         Points:{" "}
-        {answer.userQuizState
-          ? answer.userQuizState.pointsAwarded
-          : "No Points"}
+        {answer.userQuizState ? answer.userQuizState.pointsAwarded : "0"}
       </StyledTypo>
     </>
   )

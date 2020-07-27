@@ -11,12 +11,6 @@ export const PeerreviewWrapper = styled.div`
   justify-content: space-around;
 `
 
-export const StyledDivider = styled(Divider)`
-  display: flex;
-  color: blue !important;
-  margin: 0.5rem !important;
-`
-
 export interface peerreviewProps {
   peerreviews: PeerReview[]
 }
@@ -25,11 +19,8 @@ export const Peerreviews = ({ peerreviews }: peerreviewProps) => {
   return (
     <>
       <PeerreviewWrapper>
-        {peerreviews.map(review => (
-          <div key={review.id}>
-            <Review review={review} />
-            <StyledDivider variant="fullWidth" />
-          </div>
+        {peerreviews.map((review, index) => (
+          <Review key={review.id} review={review} number={index + 1} />
         ))}
       </PeerreviewWrapper>
     </>
