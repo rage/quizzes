@@ -432,7 +432,7 @@ describe("dashboard: get answers by quiz id", () => {
       )
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(response => {
-        const received: QuizAnswer[] = response.body
+        const received: QuizAnswer[] = response.body.quizAnswers
         expect(received).toHaveLength(20)
         expect(
           received.map(answer => answer.status).includes("deprecated"),
@@ -448,7 +448,7 @@ describe("dashboard: get answers by quiz id", () => {
       )
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(response => {
-        const received: QuizAnswer[] = response.body
+        const received: QuizAnswer[] = response.body.quizAnswers
         expect(received).toHaveLength(15)
         expect(
           received.map(answer => answer.status).includes("deprecated"),
@@ -516,7 +516,7 @@ describe("dashboard: get manual review answers", () => {
       )
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(response => {
-        const received: QuizAnswer[] = response.body
+        const received: QuizAnswer[] = response.body.quizAnswers
         expect(received).toHaveLength(10)
         expect(
           received.filter(answer => answer.status === "manual-review"),
@@ -532,7 +532,7 @@ describe("dashboard: get manual review answers", () => {
       )
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(response => {
-        const received: QuizAnswer[] = response.body
+        const received: QuizAnswer[] = response.body.quizAnswers
         expect(received).toHaveLength(5)
         expect(
           received.filter(answer => answer.status === "manual-review"),
