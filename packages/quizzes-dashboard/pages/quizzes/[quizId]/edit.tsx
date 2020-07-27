@@ -41,7 +41,12 @@ const EditPage = () => {
       as: `/courses/${data?.courseId}`,
       href: "/courses/[courseId]",
     },
-    { label: "Quiz" },
+    {
+      label: "Quiz Overview",
+      as: `/quizzes/${data?.id}/overview`,
+      href: "/quizzes/[quizzesId]/overview",
+    },
+    { label: "Edit" },
   ])
 
   if (error) {
