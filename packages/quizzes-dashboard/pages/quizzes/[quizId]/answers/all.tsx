@@ -42,7 +42,7 @@ export const AllAnswers = () => {
   const [page, setPage] = useState(1)
   const [size, setSize] = useState(10)
   const [expandAll, setExpandAll] = useState(false)
-  let answers: { quizAnswers: Answer[]; answersAmount: number } | undefined
+  let answers: { results: Answer[]; total: number } | undefined
   let error: any
   ;[answers, error] = usePromise(() => getAllAnswers(quizId, page, size), [
     page,
@@ -88,7 +88,7 @@ export const AllAnswers = () => {
           <Paginator
             siblingCount={2}
             boundaryCount={2}
-            count={Math.ceil(answers.answersAmount / size)}
+            count={Math.ceil(answers.total / size)}
             size="large"
             color="primary"
             showFirstButton
@@ -109,17 +109,13 @@ export const AllAnswers = () => {
           }}
         />
       </SwitchField>
-      <AnswerList
-        data={answers?.quizAnswers}
-        error={error}
-        expandAll={expandAll}
-      />
+      <AnswerList data={answers?.results} error={error} expandAll={expandAll} />
       <PaginationField>
         {answers ? (
           <Paginator
             siblingCount={2}
             boundaryCount={2}
-            count={Math.ceil(answers.answersAmount / size)}
+            count={Math.ceil(answers.total / size)}
             size="large"
             color="primary"
             showFirstButton

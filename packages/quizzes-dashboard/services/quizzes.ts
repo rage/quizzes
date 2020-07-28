@@ -92,7 +92,7 @@ export const getAllAnswers = async (
   quizId: string,
   page: number,
   size: number,
-): Promise<{ quizAnswers: Answer[]; answersAmount: number }> => {
+): Promise<{ results: Answer[]; total: number }> => {
   const userInfo = checkStore()
   if (userInfo) {
     const config = {
@@ -113,7 +113,7 @@ export const getAnswersRequiringAttention = async (
   quizId: string,
   page: number,
   size: number,
-): Promise<{ quizAnswers: Answer[]; answersAmount: number }> => {
+): Promise<{ results: Answer[]; total: number }> => {
   const userInfo = checkStore()
   if (userInfo) {
     const config = {

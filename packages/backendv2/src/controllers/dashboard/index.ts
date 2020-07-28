@@ -39,12 +39,12 @@ const dashboard = new Router<CustomState, CustomContext>({
   .get("/answers/:quizId/all", admin, async ctx => {
     const quizId = ctx.params.quizId
     const { page, size } = ctx.request.query
-    ctx.body = await QuizAnswer.getByQuizId(quizId, page, size)
+    ctx.body = await QuizAnswer.getPaginatedByQuizId(quizId, page, size)
   })
   .get("/answers/:quizId/manual-review", admin, async ctx => {
     const quizId = ctx.params.quizId
     const { page, size } = ctx.request.query
-    ctx.body = await QuizAnswer.getAnswersForManualReview(quizId, page, size)
+    ctx.body = await QuizAnswer.getPaginatedManualReview(quizId, page, size)
   })
 
 export default dashboard

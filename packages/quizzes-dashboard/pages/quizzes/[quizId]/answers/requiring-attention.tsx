@@ -40,7 +40,7 @@ export const RequiringAttention = () => {
   const [page, setPage] = useState(1)
   const [size, setSize] = useState(10)
   const [expandAll, setExpandAll] = useState(false)
-  let answers: { quizAnswers: Answer[]; answersAmount: number } | undefined
+  let answers: { results: Answer[]; total: number } | undefined
   let error: any
   ;[answers, error] = usePromise(
     () => getAnswersRequiringAttention(quizId, page, size),
@@ -48,6 +48,8 @@ export const RequiringAttention = () => {
   )
 
   const [quizResponse, quizError] = usePromise(() => fetchQuiz(quizId), [])
+
+  console.log(answers)
 
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
@@ -57,9 +59,9 @@ export const RequiringAttention = () => {
       href: "/courses/[courseId]",
     },
     {
-      label: "Quiz",
-      as: `/quizzes/${quizId}/edit`,
-      href: "/quizzes/[quizId]/edit",
+      label: "Quiz Overview",
+      as: `/quizzes/${quizId}/overview`,
+      href: "/quizzes/[quizId]/overview",
     },
     {
       label: "Answers Requiring Attention",
@@ -87,7 +89,7 @@ export const RequiringAttention = () => {
           <Paginator
             siblingCount={2}
             boundaryCount={2}
-            count={Math.ceil(answers.answersAmount / size)}
+            count={Math.ceil(answers.total / size)}
             size="large"
             color="primary"
             showFirstButton
@@ -104,17 +106,13 @@ export const RequiringAttention = () => {
         onChange={event => setExpandAll(event.target.checked)}
       />
       <Typography>Expand all</Typography>
-      <AnswerList
-        data={answers?.quizAnswers}
-        error={error}
-        expandAll={expandAll}
-      />
+      <AnswerList data={answers?.results} error={error} expandAll={expandAll} />
       <PaginationField>
         {answers ? (
           <Paginator
             siblingCount={2}
             boundaryCount={2}
-            count={Math.ceil(answers.answersAmount / size)}
+            count={Math.ceil(answers.total / size)}
             size="large"
             color="primary"
             showFirstButton
