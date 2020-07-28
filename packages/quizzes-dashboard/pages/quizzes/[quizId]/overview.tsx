@@ -115,13 +115,7 @@ export const OverView = () => {
     <>
       <LinkWrapper>
         <LinkContainer>
-          <Link
-            href={{
-              pathname: "/quizzes/[quizId]/edit",
-              query: { quizId: `${quiz.id}` },
-            }}
-            as={`/quizzes/${quiz.id}/edit`}
-          >
+          <Link href="/quizzes/[quizId]/edit" as={`/quizzes/${quiz.id}/edit`}>
             <a>
               <Typography>Edit quiz</Typography>
             </a>
@@ -129,10 +123,7 @@ export const OverView = () => {
         </LinkContainer>
         <LinkContainer>
           <Link
-            href={{
-              pathname: "/quizzes/[quizId]/answers/all",
-              query: { quizId: `${quiz.id}` },
-            }}
+            href="/quizzes/[quizId]/answers/all"
             as={`/quizzes/${quiz.id}/answers/all`}
           >
             <a>
@@ -142,11 +133,8 @@ export const OverView = () => {
         </LinkContainer>
         <LinkContainer>
           <Link
-            href={{
-              pathname: "/quizzes/[quizId]/answers/requiringAttention",
-              query: { quizId: `${quiz.id}` },
-            }}
-            as={`/quizzes/${quiz.id}/answers/requiringAttention`}
+            href="/quizzes/[quizId]/answers/requiring-attention"
+            as={`/quizzes/${quiz.id}/answers/requiring-attention`}
           >
             <a>
               <Typography>Answers requiring attention</Typography>
@@ -167,15 +155,6 @@ export const OverView = () => {
           <Typography variant="h3">{quiz.title}</Typography>
         </TitleContainer>
         <DescriptionContainer>
-          {/* <TextField
-            fullWidth
-            multiline
-            label="Description for the whole quiz"
-            disabled={true}
-            variant="outlined"
-            value={quiz.body}
-            color="primary"
-          ></TextField> */}
           <Typography>{quiz.body}</Typography>
         </DescriptionContainer>
       </StyledCard>

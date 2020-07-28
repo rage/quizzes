@@ -55,26 +55,6 @@ const EditPage = () => {
 
   return (
     <>
-      <Link
-        href={{
-          pathname: "/quizzes/[quizId]/answers/requiring-attention",
-        }}
-        as={`/quizzes/${quizId}/answers/requiring-attention`}
-      >
-        <a>
-          <Typography>Answers Requiring Attention</Typography>
-        </a>
-      </Link>
-      <Link
-        href={{
-          pathname: "/quizzes/[quizId]/answers/all",
-        }}
-        as={`/quizzes/${quizId}/answers/all`}
-      >
-        <a>
-          <Typography>All Answers</Typography>
-        </a>
-      </Link>
       <SaveButton />
       <Typography variant="h1">Editing quiz</Typography>
       <QuizEditForms />
