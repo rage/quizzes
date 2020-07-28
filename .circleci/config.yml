@@ -38,7 +38,6 @@ jobs:
           name: "Push image if on master"
           command: "bin/push-docker-dashboardv2-image.sh"
 
-
   build_widgets:
     docker:
       - image: google/cloud-sdk
@@ -48,7 +47,6 @@ jobs:
       - run:
           name: "Build widgets image"
           command: "bin/build-docker-widgets.sh"
-
 
   build_backend:
     docker:
@@ -62,6 +60,36 @@ jobs:
       - run:
           name: "Push image if on master"
           command: "bin/push-docker-backend-image.sh"
+
+  test_backend_v2:
+    docker:
+      - image: circleci/node:11
+      - image: circleci/postgres:9.6-alpine
+        environment:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: quizzes_test
+    steps:
+      - checkout
+      - run:
+          name: "Waiting for Postgres to be ready"
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z localhost 5432 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for Postgres && exit 1
+      - run:
+          name: "install dependencies"
+          command: cd packages/backendv2 && npm ci
+      - run:
+          name: "run migrations"
+          command: cd packages/backendv2 && export NODE_ENV=test && npx knex migrate:latest
+      - run:
+          name: "run tests"
+          command: "cd packages/backendv2 && npm run test"
 
   build_backendv2:
     docker:
@@ -96,6 +124,7 @@ workflows:
       - build_dashboard
       - build_backend
       - build_dashboardv2
+      - test_backend_v2
       - build_backendv2
       - build_widgets
       - code_style
@@ -104,6 +133,7 @@ workflows:
             - build_dashboard
             - build_backend
             - build_dashboardv2
+            - test_backend_v2
             - build_backendv2
             - build_widgets
             - code_style

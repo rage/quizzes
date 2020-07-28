@@ -3,9 +3,14 @@ import PeerReviewCollection from "./peer_review_collection"
 import PeerReviewQuestionTranslation from "./peer_review_question_translation"
 
 class PeerReviewQuestion extends Model {
+  texts!: PeerReviewQuestionTranslation[]
+  title!: string
+  body!: string
+
   static get tableName() {
     return "peer_review_question"
   }
+
   static relationMappings = {
     collection: {
       relation: Model.BelongsToOneRelation,

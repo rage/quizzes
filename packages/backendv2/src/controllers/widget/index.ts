@@ -1,5 +1,5 @@
 import Router from "koa-router"
-import { knex } from "../../config/knex"
+import knex from "../../../database/knex"
 import { CustomContext, CustomState } from "../../types"
 import { Quiz, QuizAnswer, User } from "../../models/"
 import accessControl from "../../middleware/access_control"
@@ -10,7 +10,7 @@ const widget = new Router<CustomState, CustomContext>({
 
   .get("/quizzes/:quizId", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    ctx.body = await Quiz.getQuizById(quizId)
+    ctx.body = await Quiz.getById(quizId)
   })
 
   .get(
@@ -18,7 +18,7 @@ const widget = new Router<CustomState, CustomContext>({
     accessControl({ unrestricted: true }),
     async ctx => {
       const quizId = ctx.params.quizId
-      ctx.body = await Quiz.getQuizPreviewById(quizId)
+      ctx.body = await Quiz.getPreviewById(quizId)
     },
   )
 

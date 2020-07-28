@@ -3,9 +3,12 @@ import QuizAnswer from "./quiz_answer"
 import QuizOptionAnswer from "./quiz_option_answer"
 
 class QuizItemAnswer extends Model {
+  optionAnswers!: QuizOptionAnswer[]
+
   static get tableName() {
     return "quiz_item_answer"
   }
+
   static relationMappings = {
     quizAnswer: {
       relation: Model.BelongsToOneRelation,

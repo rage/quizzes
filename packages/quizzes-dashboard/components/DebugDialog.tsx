@@ -2,9 +2,10 @@ import React, { useState } from "react"
 import { Button, Dialog, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import EditableDebugField from "./EditableDebugField"
-import { EditorState } from "../store/edit/reducers"
-import { connect } from "react-redux"
-import { Item } from "../types/EditQuiz"
+import { NormalizedItem } from "../types/NormalizedQuiz"
+import { useTypedSelector } from "../store/store"
+import { normalizedQuiz, items } from "../schemas"
+import { denormalize } from "normalizr"
 
 const DialogTitleContainer = styled.div`
   display: flex;
@@ -29,13 +30,14 @@ const StyledPreWrapper = styled.div`
 `
 
 interface DebugDialogProps {
-  storeData?: EditorState
-  passedData?: Item
+  passedData?: NormalizedItem
   editable?: boolean
 }
 
-const DebugDialog = ({ storeData, passedData, editable }: DebugDialogProps) => {
-  let data: EditorState | Item | undefined = storeData
+const DebugDialog = ({ passedData, editable }: DebugDialogProps) => {
+  let data: any | NormalizedItem = useTypedSelector(state => state.editor)
+  const quizId = useTypedSelector(state => state.editor.quizId)
+  data = denormalize(quizId, normalizedQuiz, data)
   if (passedData) {
     data = passedData
   }
@@ -72,10 +74,4 @@ const DebugDialog = ({ storeData, passedData, editable }: DebugDialogProps) => {
   )
 }
 
-const mapStateToProps = (state: EditorState) => {
-  return {
-    storeData: { ...state },
-  }
-}
-
-export default connect(mapStateToProps, null)(DebugDialog)
+export default DebugDialog
