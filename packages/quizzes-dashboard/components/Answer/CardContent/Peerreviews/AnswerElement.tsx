@@ -42,14 +42,11 @@ export interface reviewAnswerProps {
 }
 
 export const ReviewAnswerElement = ({ answerElement }: reviewAnswerProps) => {
-  console.log(answerElement)
   return (
     <>
       <AnswerElementContainer>
         <QuestionContainer>
-          <StyledText>
-            Question: {answerElement.peerReviewQuestionId}
-          </StyledText>
+          <StyledText>Question: {answerElement.question.title}</StyledText>
         </QuestionContainer>
         <AnswerContainer>
           {answerElement.text !== null ? (

@@ -49,8 +49,6 @@ export const RequiringAttention = () => {
 
   const [quizResponse, quizError] = usePromise(() => fetchQuiz(quizId), [])
 
-  console.log(answers)
-
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {

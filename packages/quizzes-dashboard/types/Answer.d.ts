@@ -2,6 +2,7 @@ export interface Answer {
   id: string
   quizId: string
   userId: number
+  languageId: string
   status: string
   createdAt: string
   updatedAt: string
@@ -15,7 +16,7 @@ export interface ItemAnswer {
   quizAnswerId: string
   quizItemId: string
   textData: string
-  intData: number | null
+  intData: null
   correct: boolean
   createdAt: string
   updatedAt: string
@@ -38,6 +39,31 @@ export interface AnswerElement {
   peerReviewQuestionId: string
   value: number
   text: null
+  createdAt: string
+  updatedAt: string
+  question: Question
+}
+
+export interface Question {
+  id: string
+  quizId: string
+  peerReviewCollectionId: string
+  default: boolean
+  type: string
+  answerRequired: boolean
+  order: number
+  createdAt: string
+  updatedAt: string
+  texts: Text[]
+  title: string
+  body: string
+}
+
+export interface Text {
+  peerReviewQuestionId: string
+  languageId: LanguageID
+  title: string
+  body: string
   createdAt: string
   updatedAt: string
 }
