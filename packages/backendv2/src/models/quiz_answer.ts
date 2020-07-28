@@ -59,50 +59,34 @@ class QuizAnswer extends Model {
     return quizAnswer
   }
 
-  public static async getByQuizId(
+  public static async getPaginatedByQuizId(
     quizId: string,
     page: number,
     pageSize: number,
   ) {
-    const quizAnswers = (
-      await this.query()
-        .where("quiz_id", quizId)
-        .andWhereNot("status", "deprecated")
-        .orderBy("created_at")
-        .page(page, pageSize)
-    ).results
+    const paginated = await this.query()
+      .where("quiz_id", quizId)
+      .andWhereNot("status", "deprecated")
+      .orderBy("created_at")
+      .page(page, pageSize)
 
-    const answersAmount = (
-      await this.query()
-        .where("quiz_id", quizId)
-        .andWhereNot("status", "deprecated")
-    ).length
-
-    await this.addRelations(quizAnswers)
-    return { quizAnswers, answersAmount }
+    await this.addRelations(paginated.results)
+    return paginated
   }
 
-  public static async getAnswersForManualReview(
+  public static async getPaginatedManualReview(
     quizId: string,
     page: number,
     pageSize: number,
   ) {
-    const quizAnswers = (
-      await this.query()
-        .where("quiz_id", quizId)
-        .andWhere("status", "manual-review")
-        .orderBy("created_at")
-        .page(page, pageSize)
-    ).results
+    const paginated = await this.query()
+      .where("quiz_id", quizId)
+      .andWhere("status", "manual-review")
+      .orderBy("created_at")
+      .page(page, pageSize)
 
-    const answersAmount = (
-      await this.query()
-        .where("quiz_id", quizId)
-        .andWhereNot("status", "deprecated")
-    ).length
-
-    await this.addRelations(quizAnswers)
-    return { quizAnswers, answersAmount }
+    await this.addRelations(paginated.results)
+    return paginated
   }
 
   public static async setManualReviewStatus(answerId: string, status: string) {
