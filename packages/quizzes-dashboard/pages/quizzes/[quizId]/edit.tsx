@@ -52,9 +52,9 @@ const EditPage = () => {
     <>
       <Link
         href={{
-          pathname: "/quizzes/[quizId]/answers/requiringAttention",
+          pathname: "/quizzes/[quizId]/answers/requiring-attention",
         }}
-        as={`/quizzes/${quizId}/answers/requiringAttention`}
+        as={`/quizzes/${quizId}/answers/requiring-attention`}
       >
         <a>
           <Typography>Answers Requiring Attention</Typography>

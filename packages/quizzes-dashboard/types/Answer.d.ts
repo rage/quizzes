@@ -3,8 +3,8 @@ export interface Answer {
   quizId: string
   userId: number
   status: string
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   userQuizState: UserQuizState
   itemAnswers: ItemAnswer[]
   peerReviews: PeerReview[]
@@ -17,8 +17,8 @@ export interface ItemAnswer {
   textData: string
   intData: number | null
   correct: boolean
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   optionAnswers: any[]
 }
 
@@ -28,8 +28,8 @@ export interface PeerReview {
   userId: number
   peerReviewCollectionId: string
   rejectedQuizAnswerIds: string[]
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   answers: AnswerElement[]
 }
 
@@ -38,8 +38,8 @@ export interface AnswerElement {
   peerReviewQuestionId: string
   value: number
   text: null
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
 }
 
 export interface UserQuizState {
@@ -51,6 +51,6 @@ export interface UserQuizState {
   spamFlags: number
   tries: number
   status: string
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
 }

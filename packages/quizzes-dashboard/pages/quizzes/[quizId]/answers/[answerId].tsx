@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
 import usePromise from "react-use-promise"
@@ -15,6 +15,7 @@ export const AnswerById = () => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
   const answerId = route.query.answerId?.toString() ?? ""
+  const [expanded, setExpanded] = useState(true)
   const [answerResponse, answerError] = usePromise(
     () => getAnswerById(answerId),
     [],
@@ -53,7 +54,7 @@ export const AnswerById = () => {
 
   return (
     <>
-      <AnswerCard answer={answerResponse} />
+      <AnswerCard answer={answerResponse} expanded={expanded} />
     </>
   )
 }

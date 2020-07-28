@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react"
-import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
-import { getAllAnswers, fetchQuiz } from "../../../../services/quizzes"
+import {
+  getAnswersRequiringAttention,
+  fetchQuiz,
+} from "../../../../services/quizzes"
+import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
 import { AnswerList } from "../../../../components/AnswerList"
 import usePromise from "react-use-promise"
 import { Answer } from "../../../../types/Answer"
@@ -27,16 +30,11 @@ export const PaginationField = styled.div`
   padding: 1rem;
 `
 
-export const SwitchField = styled.div`
-  display: flex;
-  align-items: baseline;
-`
-
 export const Paginator = styled(Pagination)`
   display: flex !important;
 `
 
-export const AllAnswers = () => {
+export const RequiringAttention = () => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
   const [page, setPage] = useState(1)
@@ -44,11 +42,14 @@ export const AllAnswers = () => {
   const [expandAll, setExpandAll] = useState(false)
   let answers: { results: Answer[]; total: number } | undefined
   let error: any
-  ;[answers, error] = usePromise(() => getAllAnswers(quizId, page, size), [
-    page,
-    size,
-  ])
+  ;[answers, error] = usePromise(
+    () => getAnswersRequiringAttention(quizId, page, size),
+    [page, size],
+  )
+
   const [quizResponse, quizError] = usePromise(() => fetchQuiz(quizId), [])
+
+  console.log(answers)
 
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
@@ -58,12 +59,12 @@ export const AllAnswers = () => {
       href: "/courses/[courseId]",
     },
     {
-      label: "Quiz",
-      as: `/quizzes/${quizId}/edit`,
-      href: "/quizzes/[quizId]/edit",
+      label: "Quiz Overview",
+      as: `/quizzes/${quizId}/overview`,
+      href: "/quizzes/[quizId]/overview",
     },
     {
-      label: "All Answers",
+      label: "Answers Requiring Attention",
     },
   ])
 
@@ -100,15 +101,11 @@ export const AllAnswers = () => {
           ""
         )}
       </PaginationField>
-      <SwitchField>
-        <Typography>Expand all</Typography>
-        <Switch
-          checked={expandAll}
-          onChange={event => {
-            setExpandAll(event.target.checked)
-          }}
-        />
-      </SwitchField>
+      <Switch
+        checked={expandAll}
+        onChange={event => setExpandAll(event.target.checked)}
+      />
+      <Typography>Expand all</Typography>
       <AnswerList data={answers?.results} error={error} expandAll={expandAll} />
       <PaginationField>
         {answers ? (
@@ -131,4 +128,4 @@ export const AllAnswers = () => {
   )
 }
 
-export default AllAnswers
+export default RequiringAttention
