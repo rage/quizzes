@@ -30,9 +30,9 @@ export const AnswerById = () => {
       href: "/courses/[courseId]",
     },
     {
-      label: "Quiz",
-      as: `/quizzes/${quizId}/edit`,
-      href: "/quizzes/[quizId]/edit",
+      label: "Quiz Overview",
+      as: `/quizzes/${quizId}/overview`,
+      href: "/quizzes/[quizId]/overview",
     },
     {
       label: "All Answers",

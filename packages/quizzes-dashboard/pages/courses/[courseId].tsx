@@ -131,10 +131,10 @@ const QuizOfSection = ({ quiz }: quizProps) => {
   return (
     <Link
       href={{
-        pathname: "/quizzes/[quizId]/edit",
+        pathname: "/quizzes/[quizId]/overview",
         query: { quizId: `${quiz.id}` },
       }}
-      as={`/quizzes/${quiz.id}/edit`}
+      as={`/quizzes/${quiz.id}/overview`}
     >
       <QuizLink>
         <QuizCard>
