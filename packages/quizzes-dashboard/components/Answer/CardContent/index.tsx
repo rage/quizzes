@@ -45,7 +45,7 @@ export const PeerreviewButton = styled(Button)`
 const PeerreviewBox = styled(Box)`
   display: flex !important;
   background-color: #fafafa;
-  max-width: 50% !important;
+  max-width: 70% !important;
   max-height: 80% !important;
 `
 
