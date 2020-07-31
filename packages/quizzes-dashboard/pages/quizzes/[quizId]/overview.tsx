@@ -104,6 +104,11 @@ export const OverView = () => {
 
   const userInfo = checkStore()
 
+  let HOST = "http://localhost:3003"
+  if (process.env.NODE_ENV === "production") {
+    HOST = "https://quizzes2.mooc.fi"
+  }
+
   if (!quiz || !course) {
     return (
       <>
@@ -180,7 +185,10 @@ export const OverView = () => {
       <FormContainer>
         <StyledForm
           method="post"
-          action="http://localhost:3003/api/v2/dashboard/quizzes/fb3e403f-300a-5698-a26f-6498f7d2a3d5/download-quiz-info"
+          action={
+            HOST +
+            "/api/v2/dashboard/quizzes/fb3e403f-300a-5698-a26f-6498f7d2a3d5/download-quiz-info"
+          }
         >
           <input
             value={userInfo?.accessToken}
@@ -194,7 +202,10 @@ export const OverView = () => {
         </StyledForm>
         <StyledForm
           method="post"
-          action="http://localhost:3003/api/v2/dashboard/quizzes/fb3e403f-300a-5698-a26f-6498f7d2a3d5/download-peerreview-info"
+          action={
+            HOST +
+            "/api/v2/dashboard/quizzes/fb3e403f-300a-5698-a26f-6498f7d2a3d5/download-peerreview-info"
+          }
         >
           <input
             value={userInfo?.accessToken}
@@ -208,7 +219,10 @@ export const OverView = () => {
         </StyledForm>
         <StyledForm
           method="post"
-          action="http://localhost:3003/api/v2/dashboard/quizzes/fb3e403f-300a-5698-a26f-6498f7d2a3d5/download-answer-info"
+          action={
+            HOST +
+            "/api/v2/dashboard/quizzes/fb3e403f-300a-5698-a26f-6498f7d2a3d5/download-answer-info"
+          }
         >
           <input
             value={userInfo?.accessToken}
