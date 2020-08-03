@@ -4,6 +4,7 @@ import User from "./user"
 import UserQuizState from "./user_quiz_state"
 import PeerReview from "./peer_review"
 import { BadRequestError } from "../util/error"
+import PeerReviewQuestion from "./peer_review_question"
 
 class QuizAnswer extends Model {
   id!: string
@@ -54,8 +55,22 @@ class QuizAnswer extends Model {
   }
 
   public static async getById(quizAnswerId: string) {
-    const quizAnswer = await this.query().findById(quizAnswerId)
-    await this.addRelations([quizAnswer])
+    const quizAnswer = await this.query()
+      .findById(quizAnswerId)
+      .withGraphFetched("userQuizState")
+      .withGraphFetched("itemAnswers.[optionAnswers]")
+      .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+
+    quizAnswer.peerReviews.map(peerReview => {
+      if (peerReview.answers.length > 0) {
+        return peerReview.answers.map(peerReviewAnswer => {
+          peerReviewAnswer.question = this.moveQuestionTextsToparent(
+            peerReviewAnswer.question,
+          )
+        })
+      }
+    })
+
     return quizAnswer
   }
 
@@ -69,8 +84,24 @@ class QuizAnswer extends Model {
       .andWhereNot("status", "deprecated")
       .orderBy("created_at")
       .page(page, pageSize)
+      .withGraphFetched("userQuizState")
+      .withGraphFetched("itemAnswers.[optionAnswers]")
+      .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
 
-    await this.addRelations(paginated.results)
+    paginated.results.map(answer => {
+      if (answer.peerReviews.length > 0) {
+        answer.peerReviews.map(peerReview => {
+          if (peerReview.answers.length > 0) {
+            peerReview.answers.map(peerReviewAnswer => {
+              peerReviewAnswer.question = this.moveQuestionTextsToparent(
+                peerReviewAnswer.question,
+              )
+            })
+          }
+        })
+      }
+    })
+
     return paginated
   }
 
@@ -84,8 +115,24 @@ class QuizAnswer extends Model {
       .andWhere("status", "manual-review")
       .orderBy("created_at")
       .page(page, pageSize)
+      .withGraphFetched("userQuizState")
+      .withGraphFetched("itemAnswers.[optionAnswers]")
+      .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
 
-    await this.addRelations(paginated.results)
+    paginated.results.map(answer => {
+      if (answer.peerReviews.length > 0) {
+        answer.peerReviews.map(peerReview => {
+          if (peerReview.answers.length > 0) {
+            peerReview.answers.map(peerReviewAnswer => {
+              peerReviewAnswer.question = this.moveQuestionTextsToparent(
+                peerReviewAnswer.question,
+              )
+            })
+          }
+        })
+      }
+    })
+
     return paginated
   }
 
@@ -99,21 +146,10 @@ class QuizAnswer extends Model {
     return quizAnswer
   }
 
-  private static async addRelations(quizAnswers: QuizAnswer[]) {
-    for (const quizAnswer of quizAnswers) {
-      delete quizAnswer.languageId
-      quizAnswer.userQuizState = await quizAnswer.$relatedQuery("userQuizState")
-      quizAnswer.itemAnswers = await quizAnswer.$relatedQuery("itemAnswers")
-      for (const itemAnswer of quizAnswer.itemAnswers) {
-        itemAnswer.optionAnswers = await itemAnswer.$relatedQuery(
-          "optionAnswers",
-        )
-      }
-      quizAnswer.peerReviews = await quizAnswer.$relatedQuery("peerReviews")
-      for (const peerReview of quizAnswer.peerReviews) {
-        peerReview.answers = await peerReview.$relatedQuery("answers")
-      }
-    }
+  private static moveQuestionTextsToparent = (question: PeerReviewQuestion) => {
+    question.title = question.texts[0].title
+    question.body = question.texts[0].body
+    return question
   }
 }
 

@@ -1,8 +1,10 @@
 import Model from "./base_model"
-import QuizAnswer from "./quiz_answer"
 import PeerReview from "./peer_review"
+import PeerReviewQuestion from "./peer_review_question"
 
 class PeerReviewQuestionAnswer extends Model {
+  question!: PeerReviewQuestion
+
   static get tableName() {
     return "peer_review_question_answer"
   }
@@ -14,6 +16,14 @@ class PeerReviewQuestionAnswer extends Model {
       join: {
         from: "peer_review_question_answer.peer_review_id",
         to: "peer_review.id",
+      },
+    },
+    question: {
+      relation: Model.BelongsToOneRelation,
+      modelClass: PeerReviewQuestion,
+      join: {
+        from: "peer_review_question_answer.peer_review_question_id",
+        to: "peer_review_question.id",
       },
     },
   }

@@ -4,6 +4,9 @@ import QuizTranslation from "./quiz_translation"
 import PeerReviewCollection from "./peer_review_collection"
 import Course from "./course"
 import { NotFoundError } from "../util/error"
+import moduleInitializer from "../util/initializer"
+import stringify from "csv-stringify"
+import QuizAnswer from "./quiz_answer"
 
 export class Quiz extends Model {
   texts!: QuizTranslation[]
@@ -48,6 +51,14 @@ export class Quiz extends Model {
       join: {
         from: "quiz.course_id",
         to: "course.id",
+      },
+    },
+    answers: {
+      relation: Model.HasManyRelation,
+      modelClass: QuizAnswer,
+      join: {
+        from: "quiz.id",
+        to: "quiz_answer.quiz_id",
       },
     },
   }
@@ -176,6 +187,65 @@ export class Quiz extends Model {
         .withGraphJoined("peerReviews.[texts, questions.[texts]]")
         .where("quiz.course_id", courseId)
     ).map(quiz => this.moveTextsToParent(quiz))
+  }
+
+  static async getQuizInfo(quizId: string) {
+    await moduleInitializer()
+
+    const stringifier = stringify({
+      delimiter: ",",
+      quoted: true,
+      header: true,
+    })
+
+    const stream = this.query()
+      .withGraphJoined("texts")
+      .withGraphJoined("items.[texts, options.[texts]]")
+      .withGraphJoined("peerReviews.[texts, questions.[texts]]")
+      .where("quiz.id", quizId)
+      .toKnexQuery()
+      .stream()
+      .pipe(stringifier)
+
+    return stream
+  }
+
+  static async getPeerReviewInfo(quizId: string) {
+    await moduleInitializer()
+
+    const stringifier = stringify({
+      delimiter: ",",
+      quoted: true,
+      header: true,
+    })
+
+    const stream = this.query()
+      .withGraphJoined("peerReviews.[texts, questions.[texts]]")
+      .where("quiz.id", quizId)
+      .toKnexQuery()
+      .stream()
+      .pipe(stringifier)
+
+    return stream
+  }
+
+  static async getQuizAnswerInfo(quizId: string) {
+    await moduleInitializer()
+
+    const stringifier = stringify({
+      delimiter: ",",
+      quoted: true,
+      header: true,
+    })
+
+    const stream = this.query()
+      .withGraphJoined("answers.[itemAnswers.[optionAnswers]]")
+      .where("quiz.id", quizId)
+      .toKnexQuery()
+      .stream()
+      .pipe(stringifier)
+
+    return stream
   }
 
   private static moveTextsToParent(quiz: any) {
