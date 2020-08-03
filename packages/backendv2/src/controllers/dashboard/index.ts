@@ -1,7 +1,7 @@
 import Router from "koa-router"
 import { CustomContext, CustomState } from "../../types"
 import { Course, Quiz, QuizAnswer } from "../../models/"
-import accessControl from "../../middleware/access_control"
+import accessControl, { validToken } from "../../middleware/access_control"
 
 const admin = accessControl({ administator: true })
 
@@ -45,6 +45,42 @@ const dashboard = new Router<CustomState, CustomContext>({
     const quizId = ctx.params.quizId
     const { page, size } = ctx.request.query
     ctx.body = await QuizAnswer.getPaginatedManualReview(quizId, page, size)
+  })
+  .post("/quizzes/:quizId/download-quiz-info", async ctx => {
+    const quizId = ctx.params.quizId
+    const token = ctx.request.body
+    if (!validToken(token)) {
+      ctx.body = "invalid token"
+    } else {
+      const stream = await Quiz.getQuizInfo(quizId)
+      ctx.response.set("Content-Type", "text/csv")
+      ctx.response.attachment("quiz-info.csv")
+      ctx.body = stream
+    }
+  })
+  .post("/quizzes/:quizId/download-peerreview-info", async ctx => {
+    const quizId = ctx.params.quizId
+    const token = ctx.request.body
+    if (!validToken(token)) {
+      ctx.body = "invalid token"
+    } else {
+      const stream = await Quiz.getPeerReviewInfo(quizId)
+      ctx.response.set("Content-Type", "text/csv")
+      ctx.response.attachment("quiz-peerreview-info.csv")
+      ctx.body = stream
+    }
+  })
+  .post("/quizzes/:quizId/download-answer-info", async ctx => {
+    const quizId = ctx.params.quizId
+    const token = ctx.request.body
+    if (!validToken(token)) {
+      ctx.body = "invalid token"
+    } else {
+      const stream = await Quiz.getQuizAnswerInfo(quizId)
+      ctx.response.set("Content-Type", "text/csv")
+      ctx.response.attachment("quiz-answer-info.csv")
+      ctx.body = stream
+    }
   })
 
 export default dashboard

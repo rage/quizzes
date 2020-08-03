@@ -1,9 +1,11 @@
 import Model from "./base_model"
 import QuizAnswer from "./quiz_answer"
 import PeerReviewQuestionAnswer from "./peer_review_question_answer"
+import PeerReviewQuestion from "./peer_review_question"
 
 class PeerReview extends Model {
   answers!: PeerReviewQuestionAnswer[]
+  questions!: PeerReviewQuestion[]
 
   static get tableName() {
     return "peer_review"
