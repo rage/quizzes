@@ -28,6 +28,8 @@ const QuizItems = () => {
   const storeItems = Object.values(
     useTypedSelector(state => state.editor.items),
   )
+
+  storeItems.sort((item1, item2) => item1.order - item2.order)
   return (
     <>
       <ItemsTitleContainer>
