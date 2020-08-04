@@ -1,6 +1,7 @@
 import Model from "./base_model"
 import Quiz from "./quiz"
 import User from "./user"
+import QuizAnswer from "./quiz_answer"
 
 class UserQuizState extends Model {
   userId!: number
@@ -32,6 +33,14 @@ class UserQuizState extends Model {
       join: {
         from: "user_quiz_state.quiz_id",
         to: "quiz.id",
+      },
+    },
+    quizAnswer: {
+      relation: Model.HasManyRelation,
+      modelClass: QuizAnswer,
+      join: {
+        from: ["user_quiz_state.user_id", "user_quiz_state.quiz_id"],
+        to: ["quiz_answer.user_id", "quiz_answer.quiz_id"],
       },
     },
   }

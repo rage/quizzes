@@ -381,16 +381,84 @@ export async function seed(knex: Knex): Promise<any> {
       {
         id: 4321,
       },
-    ]),
-  ])
-  await knex.raw(`? ON CONFLICT (user_id, quiz_id) DO NOTHING`, [
-    knex("user_quiz_state").insert([
       {
-        user_id: 4321,
-        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
-        tries: 1,
-        status: "locked",
+        id: 2345,
+      },
+      {
+        id: 3456,
       },
     ]),
   ])
+  await knex.raw("? ON CONFLICT (id) DO NOTHING", [
+    knex("quiz_answer").insert({
+      id: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+      user_id: 1234,
+      language_id: "xy_YZ",
+      status: "given-enough",
+    }),
+  ])
+  await knex.raw("? ON CONFLICT (id) DO NOTHING", [
+    knex("quiz_item_answer").insert([
+      {
+        id: "840ad4ff-8402-4c71-a57f-4b12e4b32bce",
+        quiz_answer_id: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+        quiz_item_id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+      },
+      {
+        id: "31941489-29a1-448d-bc59-418480d007d9",
+        quiz_answer_id: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+        quiz_item_id: "707195a3-aafe-4c06-bf23-854e54e084db",
+      },
+    ]),
+  ])
+  await knex.raw("? ON CONFLICT (id) DO NOTHING", [
+    knex("quiz_option_answer").insert([
+      {
+        id: "ab6c2932-193c-439c-a5b5-1694bebdc178",
+        quiz_item_answer_id: "840ad4ff-8402-4c71-a57f-4b12e4b32bce",
+        quiz_option_id: "7c802f5b-52f1-468e-a798-3028edc1d3fd",
+      },
+    ]),
+  ])
+  await knex.raw("? ON CONFLICT (user_id, quiz_id) DO NOTHING", [
+    knex("user_quiz_state").insert({
+      quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+      user_id: 1234,
+      status: "locked",
+    }),
+  ])
+  await knex.raw("? ON CONFLICT (id) DO NOTHING", [
+    knex("peer_review").insert([
+      {
+        id: "2a486ebb-900a-4a78-ada5-be0792610cf0",
+        quiz_answer_id: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+        peer_review_collection_id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+        user_id: 2345,
+      },
+      {
+        id: "8cf3efb8-f2ca-44ed-8f18-1e4bd49ee805",
+        quiz_answer_id: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+        peer_review_collection_id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+        user_id: 3456,
+      },
+    ]),
+  ])
+  await knex.raw(
+    "? ON CONFLICT (peer_review_id, peer_review_question_id) DO NOTHING",
+    [
+      knex("peer_review_question_answer").insert([
+        {
+          peer_review_id: "2a486ebb-900a-4a78-ada5-be0792610cf0",
+          peer_review_question_id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+          value: 1,
+        },
+        {
+          peer_review_id: "8cf3efb8-f2ca-44ed-8f18-1e4bd49ee805",
+          peer_review_question_id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+          value: 2,
+        },
+      ]),
+    ],
+  )
 }

@@ -7,14 +7,18 @@ import SaveButton from "../../../components/SaveButton"
 import { normalizedQuiz } from "../../../schemas"
 import { normalize } from "normalizr"
 import useSWR from "swr"
-import { withRouter } from "next/router"
+import { useRouter } from "next/router"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import QuizEditForms from "../../../components/QuizEditForms"
+import _ from "lodash"
+import Link from "next/link"
 
-const EditPage = ({ router }: any) => {
-  const id = router.query.id
-  const { data, error } = useSWR(id, fetchQuiz)
+const EditPage = () => {
+  const router = useRouter()
+  const quizId: string = router.query.quizId?.toString() ?? ""
+  const { data, error } = useSWR(quizId, fetchQuiz)
   const dispatch = useDispatch()
+
   useEffect(() => {
     if (!data) {
       return
@@ -27,17 +31,24 @@ const EditPage = ({ router }: any) => {
       options: storeState.entities.options ?? {},
       result: storeState.result,
     }
-    dispatch(initializedEditor(normalizedData))
+    dispatch(initializedEditor(normalizedData, quiz))
   }, [data])
+
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
       label: "Course",
       as: `/courses/${data?.courseId}`,
-      href: "/courses/[id]",
+      href: "/courses/[courseId]",
     },
-    { label: "Quiz" },
+    {
+      label: "Quiz Overview",
+      as: `/quizzes/${data?.id}/overview`,
+      href: "/quizzes/[quizzesId]/overview",
+    },
+    { label: "Edit" },
   ])
+
   if (error) {
     return <div>Something went wrong</div>
   }
@@ -51,4 +62,4 @@ const EditPage = ({ router }: any) => {
   )
 }
 
-export default withRouter(EditPage)
+export default EditPage

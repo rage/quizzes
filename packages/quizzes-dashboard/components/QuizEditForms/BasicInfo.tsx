@@ -1,5 +1,11 @@
 import React from "react"
-import { Typography, Card, TextField, MenuItem } from "@material-ui/core"
+import "date-fns"
+import DateFnsUtils from "@date-io/date-fns"
+import {
+  MuiPickersUtilsProvider,
+  KeyboardDateTimePicker,
+} from "@material-ui/pickers"
+import { Typography, TextField, MenuItem } from "@material-ui/core"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
@@ -9,67 +15,39 @@ import {
   editedQuizzesNumberOfTries,
   editedQuizzesPointsToGain,
   editedQuizzesPointsGrantingPolicy,
+  editedQuizzesDeadline,
+  editedQuizzesBody,
+  editedQuizzesSubmitmessage,
+  editedQuizzesPart,
 } from "../../store/editor/quiz/quizActions"
-import DebugDialog from "../DebugDialog"
 import { useTypedSelector } from "../../store/store"
 
-const InfoCard = styled(Card)`
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 40px -12px !important;
-  border-radius: 1rem !important;
-  margin: 0 auto;
-  margin-bottom: 1rem;
-  width: 800px;
-`
-
-const IconWrapper = styled.div`
-  font-size: 3.5rem;
-  margin: 0 1.5rem 0 0.5rem;
-  @media (max-width: 550px) {
-    text-align: center;
-  }
-`
-
-const InfoHeader = styled.div`
-  background-color: rgb(56, 163, 245);
-  color: white;
-  padding: 1rem;
+const SubsectionTitleWrapper = styled.div`
   display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  justify-content: center;
 `
 
 const InfoContainer = styled.div`
-  padding: 1rem;
+  padding: 1rem 0;
   display: flex;
 `
 
-const InfoContainer2 = styled.div`
-  padding: 1rem;
+const TitleIcon = styled(FontAwesomeIcon)`
+  width: 2rem;
+  height: 2rem;
+  margin-right: 0.25rem;
+`
+
+const PartField = styled(TextField)`
   display: flex;
-`
-const StyledId = styled(Typography)`
-  margin-bottom: 1rem !important;
+  margin-right: 0.5rem !important;
 `
 
-const TitleContainer = styled.div`
-  flex: 1;
-  margin-right: 1rem;
-`
-
-const PointsContainer = styled.div`
-  margin-right: 1.5rem;
-  width: 5rem;
-`
-
-const QuizContent = styled.div`
-  padding: 1rem;
-  editedQuizzesPointsGrantingPolicy,
-`
-
-const StyledTextField = styled(TextField)`
-  background-color: white;
-  border-radius: 1rem;
-  overflow: hidden;
-  width: 100%;
-  margin-top: 0.25rem !important;
+const SectionField = styled(TextField)`
+  display: flex;
+  margin-left: 0.5rem !important;
 `
 
 const BasicInformation = () => {
@@ -78,7 +56,6 @@ const BasicInformation = () => {
   const quizId = useTypedSelector(state => state.editor.quizId)
 
   const quiz = useTypedSelector(state => state.editor.quizzes)
-  console.log("quiz", quiz)
 
   const pointsGrantingPolicy = useTypedSelector(
     state => state.editor.quizzes[quizId].grantPointsPolicy,
@@ -92,94 +69,157 @@ const BasicInformation = () => {
   const deadline = useTypedSelector(
     state => state.editor.quizzes[quizId].deadline,
   )
-  const createdAt = useTypedSelector(
-    state => state.editor.quizzes[quizId].createdAt,
-  )
-  const updatedAt = useTypedSelector(
-    state => state.editor.quizzes[quizId].updatedAt,
-  )
   const title = useTypedSelector(state => state.editor.quizzes[quizId].title)
+
+  const body = useTypedSelector(state => state.editor.quizzes[quizId].body)
+
+  const submitMessage = useTypedSelector(
+    state => state.editor.quizzes[quizId].submitMessage,
+  )
+  const part = useTypedSelector(state => state.editor.quizzes[quizId].part)
+
+  const section = useTypedSelector(
+    state => state.editor.quizzes[quizId].section,
+  )
+
+  const variables = useTypedSelector(
+    state => state.editor.quizVariables[quizId],
+  )
 
   return (
     <>
-      <InfoCard>
-        <InfoHeader>
-          <IconWrapper>
-            <FontAwesomeIcon icon={faInfoCircle} />
-          </IconWrapper>
-          <Typography variant="h3">Quiz Information</Typography>
-        </InfoHeader>
-        <InfoContainer>
-          <Typography>
-            Created at: {new Date(createdAt).toDateString()}
-          </Typography>
-        </InfoContainer>
-        <InfoContainer>
-          <Typography>
-            Last updated at: {new Date(updatedAt).toDateString()}
-          </Typography>
-        </InfoContainer>
-        <InfoContainer>
-          <Typography>Quiz title:</Typography>
-          <StyledTextField
-            multiline
-            defaultValue={title}
-            onChange={event =>
-              dispatch(editedQuizTitle(event.target.value, quizId))
-            }
+      <SubsectionTitleWrapper>
+        <TitleIcon icon={faInfoCircle} />
+        <Typography variant="h2">Quiz Information</Typography>
+      </SubsectionTitleWrapper>
+
+      <InfoContainer>
+        <TextField
+          label="Quiz Title"
+          fullWidth
+          variant="outlined"
+          defaultValue={title}
+          onChange={event =>
+            dispatch(editedQuizTitle(event.target.value, quizId))
+          }
+        />
+      </InfoContainer>
+      <InfoContainer>
+        <PartField
+          fullWidth
+          label="Part"
+          variant="outlined"
+          value={part}
+          type="number"
+          onChange={event =>
+            dispatch(editedQuizzesPart(quizId, Number(event.target.value)))
+          }
+        />
+        <SectionField
+          fullWidth
+          label="Section"
+          variant="outlined"
+          value={section}
+          type="number"
+          onChange={event =>
+            dispatch(editedQuizzesPart(quizId, Number(event.target.value)))
+          }
+        />
+      </InfoContainer>
+      <InfoContainer>
+        <TextField
+          label="Number of tries allowed"
+          fullWidth
+          variant="outlined"
+          type="number"
+          defaultValue={numberOfTries}
+          onChange={event =>
+            dispatch(
+              editedQuizzesNumberOfTries(Number(event.target.value), quizId),
+            )
+          }
+        />
+      </InfoContainer>
+      <InfoContainer>
+        <TextField
+          label="Points to gain"
+          fullWidth
+          variant="outlined"
+          type="number"
+          defaultValue={pointsToGain}
+          onChange={event =>
+            dispatch(
+              editedQuizzesPointsToGain(Number(event.target.value), quizId),
+            )
+          }
+        />
+      </InfoContainer>
+      <InfoContainer>
+        <TextField
+          fullWidth
+          label="Points granting policy"
+          variant="outlined"
+          select
+          value={pointsGrantingPolicy}
+          onChange={event =>
+            dispatch(
+              editedQuizzesPointsGrantingPolicy(event.target.value, quizId),
+            )
+          }
+        >
+          <MenuItem value="grant_whenever_possible">
+            grant_whenever_possible
+          </MenuItem>
+          <MenuItem value="grant_only_when_answer_fully_correct">
+            grant_only_when_fully_complete
+          </MenuItem>
+        </TextField>
+      </InfoContainer>
+      <InfoContainer>
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <KeyboardDateTimePicker
+            fullWidth
+            value={variables.deadline}
+            error={!variables.validDeadline}
+            variant="dialog"
+            inputVariant="outlined"
+            label="Deadline"
+            KeyboardButtonProps={{
+              "aria-label": "change time",
+            }}
+            onChange={event => {
+              dispatch(editedQuizzesDeadline(event, quizId))
+            }}
+            helperText={variables.deadline}
           />
-        </InfoContainer>
-        <InfoContainer>
-          <Typography variant="overline">Number of tries allowed:</Typography>
-          <TextField
-            type="number"
-            defaultValue={numberOfTries}
-            onChange={event =>
-              dispatch(
-                editedQuizzesNumberOfTries(Number(event.target.value), quizId),
-              )
-            }
-          />
-        </InfoContainer>
-        <InfoContainer>
-          <Typography variant="overline">Points to gain:</Typography>
-          <TextField
-            type="number"
-            defaultValue={pointsToGain}
-            onChange={event =>
-              dispatch(
-                editedQuizzesPointsToGain(Number(event.target.value), quizId),
-              )
-            }
-          />
-        </InfoContainer>
-        <InfoContainer>
-          <Typography variant="overline">Points granting policy:</Typography>
-          <TextField
-            select
-            value={pointsGrantingPolicy}
-            onChange={event =>
-              dispatch(
-                editedQuizzesPointsGrantingPolicy(event.target.value, quizId),
-              )
-            }
-          >
-            <MenuItem value="grant_whenever_possible">
-              grant_whenever_possible
-            </MenuItem>
-            <MenuItem value="grant_only_when_answer_fully_correct">
-              grant_only_when_fully_complete
-            </MenuItem>
-          </TextField>
-        </InfoContainer>
-        <InfoContainer>
-          <Typography variant="overline">Deadline:</Typography>
-          <TextField disabled={true} defaultValue={deadline}></TextField>
-        </InfoContainer>
-        <InfoContainer>
-          <DebugDialog editable={true} />
-        </InfoContainer>
-      </InfoCard>
+        </MuiPickersUtilsProvider>
+      </InfoContainer>
+      <InfoContainer>
+        <TextField
+          multiline
+          fullWidth
+          rows={5}
+          label="Description for the whole quiz"
+          variant="outlined"
+          value={body}
+          onChange={event =>
+            dispatch(editedQuizzesBody(quizId, event.target.value))
+          }
+        />
+      </InfoContainer>
+      <InfoContainer>
+        <TextField
+          multiline
+          rows={5}
+          label="Submit message"
+          fullWidth
+          variant="outlined"
+          value={submitMessage}
+          onChange={event =>
+            dispatch(editedQuizzesSubmitmessage(quizId, event.target.value))
+          }
+        />
+      </InfoContainer>
     </>
   )
 }

@@ -222,6 +222,12 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     )
   }, [id, languageId, accessToken, backendAddress])
 
+  useEffect(() => {
+    if (accessToken) {
+      dispatch(quizAnswerActions.setQuizDisabled(false))
+    }
+  })
+
   if (fatal) {
     console.log("quiz")
     courseStatusProvider.notifyError &&
