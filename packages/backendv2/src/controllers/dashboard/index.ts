@@ -27,6 +27,37 @@ const dashboard = new Router<CustomState, CustomContext>({
     const courseId = ctx.params.courseId
     ctx.body = await Course.getFlattenedById(courseId)
   })
+  .post("/courses/:courseId/duplicate-course", async ctx => {
+    const oldCourseId = ctx.params.courseId
+    const token = ctx.request.body.token
+    const name = ctx.request.body.name
+    const abbr = ctx.request.body.abbr
+    const languageId = ctx.request.body.lang
+    if (!validToken(token)) {
+      ctx.body = "invalid token"
+    } else {
+      ctx.response.set("Content-Type", "text/csv")
+      ctx.response.attachment("quiz-transition.csv")
+      ctx.body = await Course.duplicateCourse(
+        oldCourseId,
+        name,
+        abbr,
+        languageId,
+      )
+    }
+  })
+  .post("/courses/download-correspondance-file", async ctx => {
+    const token = ctx.request.body.token
+    const oldCourseId = ctx.request.body.oldCourseId
+    const courseId = ctx.request.body.courseId
+    if (!validToken(token)) {
+      ctx.body = "invalid token"
+    } else {
+      ctx.response.set("Content-Type", "text/csv")
+      ctx.response.attachment("quiz-transition.csv")
+      ctx.body = await Course.getCorrespondanceFile(oldCourseId, courseId)
+    }
+  })
   .post("/answers/:answerId/status", admin, async ctx => {
     const answerId = ctx.params.answerId
     const statusData = ctx.request.body.status
@@ -81,6 +112,10 @@ const dashboard = new Router<CustomState, CustomContext>({
       ctx.response.attachment("quiz-answer-info.csv")
       ctx.body = stream
     }
+  })
+
+  .get("/languages/all", admin, async ctx => {
+    ctx.body = await Course.getAllLanguages()
   })
 
 export default dashboard

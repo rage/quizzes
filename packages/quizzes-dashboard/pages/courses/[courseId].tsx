@@ -10,6 +10,7 @@ import useSWR from "swr"
 import { useRouter } from "next/router"
 import { Quiz } from "../../types/Quiz"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
+import DuplicateCourseButton from "../../components/DuplicateCourse"
 
 const QuizCard = styled(Card)`
   margin-bottom: 1rem;
@@ -73,6 +74,7 @@ const ShowCoursePage = () => {
 
   return (
     <>
+      <DuplicateCourseButton course={course} />
       <CourseTitleWrapper>
         <Typography variant="h3">Edit {course.title}</Typography>
         <Link
