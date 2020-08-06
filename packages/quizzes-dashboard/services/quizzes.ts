@@ -147,7 +147,10 @@ export const changeAnswerStatus = async (
   throw new Error()
 }
 
-export const getAllLanguages = async (): Promise<{ id: string }[]> => {
+export const getAllLanguages = async (): Promise<{
+  id: string
+  name: string
+}[]> => {
   const userInfo = checkStore()
   if (userInfo) {
     const config = {

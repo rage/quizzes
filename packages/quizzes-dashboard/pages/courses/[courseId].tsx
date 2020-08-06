@@ -30,6 +30,10 @@ const CourseTitleWrapper = styled.div`
   justify-content: space-between;
 `
 
+const StyledType = styled(Typography)`
+  color: #f44336 !important;
+`
+
 const ShowCoursePage = () => {
   const router = useRouter()
   const id = router.query.courseId?.toString() ?? ""
@@ -130,6 +134,7 @@ interface quizProps {
 
 const QuizOfSection = ({ quiz }: quizProps) => {
   const title = quiz.title
+  const types = Array.from(new Set(quiz.items.map(item => item.type)))
   return (
     <Link
       href={{
@@ -149,6 +154,17 @@ const QuizOfSection = ({ quiz }: quizProps) => {
             <div>
               <Typography variant="overline" color="secondary"></Typography>
             </div>
+            {types.length > 0 ? (
+              <div>
+                [{" "}
+                {types.map(type => (
+                  <StyledType variant="overline">{type} </StyledType>
+                ))}
+                ]
+              </div>
+            ) : (
+              ""
+            )}
           </CardContent>
         </QuizCard>
       </QuizLink>

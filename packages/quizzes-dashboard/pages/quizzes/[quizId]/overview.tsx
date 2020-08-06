@@ -7,7 +7,7 @@ import { Typography, Card } from "@material-ui/core"
 import Link from "next/link"
 import { useRouter } from "next/router"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
-import { DownloadInfoForms } from "../../../components/DonwloadInfoForms"
+import DownloadInfoForms from "../../../components/DownloadInfoForms.tsx"
 
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
@@ -159,7 +159,7 @@ export const OverView = () => {
           <Typography>{quiz.body}</Typography>
         </DescriptionContainer>
       </StyledCard>
-      <DownloadInfoForms quizId={quiz.id} />
+      <DownloadInfoForms quiz={quiz} course={course} />
     </>
   )
 }

@@ -120,6 +120,20 @@ class Course extends Model {
 
         await trx.raw(
           `
+        INSERT INTO quiz_translation
+          (quiz_id, language_id, title, body, submit_message)
+        SELECT
+          uuid_generate_v5(:newCourseId, quiz_id::text), :language_id, title, body, submit_message
+        FROM quiz_translation WHERE quiz_id in (SELECT id FROM quiz WHERE course_id  = :oldCourseId);`,
+          {
+            newCourseId,
+            oldCourseId,
+            language_id,
+          },
+        )
+
+        await trx.raw(
+          `
         INSERT INTO quiz_item
           (id, quiz_id, type, "order", validity_regex, format_regex, multi, min_words, max_words, max_value, min_value)
 
@@ -292,7 +306,7 @@ class Course extends Model {
   }
 
   static async getAllLanguages() {
-    return await knex.from("language").select("id")
+    return await knex.from("language").select("id", "name")
   }
 }
 

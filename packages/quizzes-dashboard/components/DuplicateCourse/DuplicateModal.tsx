@@ -97,12 +97,15 @@ export const DuplicateModal = ({ course }: DuplicateModalProps) => {
               variant="outlined"
               select
               name="lang"
+              value={course.languageId}
             >
-              {langs?.map(lan => (
-                <MenuItem key={lan.id} value={lan.id}>
-                  {lan.id}
-                </MenuItem>
-              ))}
+              {langs?.map(lan => {
+                return (
+                  <MenuItem key={lan.id} value={lan.id}>
+                    {lan.name}
+                  </MenuItem>
+                )
+              })}
             </StyledTextField>
           </InputContainer>
           <SubmitButtonWrapper>
