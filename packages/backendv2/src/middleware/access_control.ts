@@ -35,7 +35,7 @@ export const accessControl = (options?: AccessControlOptions) => {
 export const validToken = async (token: string): Promise<boolean> => {
   try {
     const user = await getCurrentUserDetails(token)
-    if (user) {
+    if (user && user.administrator) {
       return true
     }
     return false

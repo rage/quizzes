@@ -53,8 +53,8 @@ const dashboard = new Router<CustomState, CustomContext>({
     if (!validToken(token)) {
       ctx.body = "invalid token"
     } else {
-      ctx.response.set("Content-Type", "text/csv")
-      ctx.response.attachment("quiz-transition.csv")
+      ctx.response.set("Content-Type", "text/plain")
+      ctx.response.attachment(`update_ids_from_${oldCourseId}_to_${courseId}`)
       ctx.body = await Course.getCorrespondanceFile(oldCourseId, courseId)
     }
   })
