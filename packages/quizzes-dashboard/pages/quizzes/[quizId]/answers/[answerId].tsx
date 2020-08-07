@@ -6,6 +6,8 @@ import { fetchQuiz, getAnswerById } from "../../../../services/quizzes"
 import AnswerCard from "../../../../components/Answer"
 import styled from "styled-components"
 import { Skeleton } from "@material-ui/lab"
+import Head from "next/head"
+import TabNavigator from "../../../../components/TabNavigator"
 
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
@@ -47,6 +49,15 @@ export const AnswerById = () => {
   if (!answerResponse) {
     return (
       <>
+        <div>
+          <Head>
+            <title>loading...</title>
+            <meta
+              name="quizzes"
+              content="initial-scale=1.0, width=device-width"
+            />
+          </Head>
+        </div>
         <StyledSkeleton variant="rect" height={300} animation="wave" />
       </>
     )
@@ -54,6 +65,16 @@ export const AnswerById = () => {
 
   return (
     <>
+      <div>
+        <Head>
+          <title>Singular answer</title>
+          <meta
+            name="quizzes"
+            content="initial-scale=1.0, width=device-width"
+          />
+        </Head>
+      </div>
+      <TabNavigator quizId={quizId} />
       <AnswerCard answer={answerResponse} expanded={expanded} />
     </>
   )

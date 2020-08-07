@@ -11,7 +11,8 @@ import { useRouter } from "next/router"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import QuizEditForms from "../../../components/QuizEditForms"
 import _ from "lodash"
-import Link from "next/link"
+import Head from "next/head"
+import TabNavigator from "../../../components/TabNavigator"
 
 const EditPage = () => {
   const router = useRouter()
@@ -50,11 +51,34 @@ const EditPage = () => {
   ])
 
   if (error) {
-    return <div>Something went wrong</div>
+    return (
+      <>
+        <div>
+          <Head>
+            <title>womp womp...</title>
+            <meta
+              name="quizzes"
+              content="initial-scale=1.0, width=device-width"
+            />
+          </Head>
+        </div>
+        <div>Something went wrong</div>
+      </>
+    )
   }
 
   return (
     <>
+      <div>
+        <Head>
+          <title>Editing {data?.title}</title>
+          <meta
+            name="quizzes"
+            content="initial-scale=1.0, width=device-width"
+          />
+        </Head>
+      </div>
+      <TabNavigator quizId={quizId} />
       <SaveButton />
       <Typography variant="h1">Editing quiz</Typography>
       <QuizEditForms />
