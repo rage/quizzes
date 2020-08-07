@@ -146,3 +146,17 @@ export const changeAnswerStatus = async (
   }
   throw new Error()
 }
+
+export const getAllLanguages = async (): Promise<{
+  id: string
+  name: string
+}[]> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (await api.get(`/languages/all`, config)).data
+  }
+  throw new Error()
+}

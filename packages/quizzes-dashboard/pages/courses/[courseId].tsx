@@ -10,6 +10,7 @@ import useSWR from "swr"
 import { useRouter } from "next/router"
 import { Quiz } from "../../types/Quiz"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
+import DuplicateCourseButton from "../../components/DuplicateCourse"
 
 const QuizCard = styled(Card)`
   margin-bottom: 1rem;
@@ -27,6 +28,10 @@ const StyledSkeleton = styled(Skeleton)`
 const CourseTitleWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+`
+
+const StyledType = styled(Typography)`
+  color: #f44336 !important;
 `
 
 const ShowCoursePage = () => {
@@ -73,6 +78,7 @@ const ShowCoursePage = () => {
 
   return (
     <>
+      <DuplicateCourseButton course={course} />
       <CourseTitleWrapper>
         <Typography variant="h3">Edit {course.title}</Typography>
         <Link
@@ -128,6 +134,7 @@ interface quizProps {
 
 const QuizOfSection = ({ quiz }: quizProps) => {
   const title = quiz.title
+  const types = Array.from(new Set(quiz.items.map(item => item.type)))
   return (
     <Link
       href={{
@@ -147,6 +154,17 @@ const QuizOfSection = ({ quiz }: quizProps) => {
             <div>
               <Typography variant="overline" color="secondary"></Typography>
             </div>
+            {types.length > 0 ? (
+              <div>
+                [{" "}
+                {types.map(type => (
+                  <StyledType variant="overline">{type} </StyledType>
+                ))}
+                ]
+              </div>
+            ) : (
+              ""
+            )}
           </CardContent>
         </QuizCard>
       </QuizLink>
