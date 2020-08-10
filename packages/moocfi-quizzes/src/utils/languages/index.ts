@@ -146,7 +146,7 @@ export type SingleLanguageLabels = {
 }
 
 export type LanguageLabels = {
-  [langugeId: string]: SingleLanguageLabels
+  [languageId: string]: SingleLanguageLabels
 }
 
 export const languageOptions: LanguageLabels = {
