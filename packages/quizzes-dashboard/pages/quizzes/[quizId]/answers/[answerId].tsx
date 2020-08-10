@@ -74,7 +74,7 @@ export const AnswerById = () => {
           />
         </Head>
       </div>
-      <TabNavigator quizId={quizId} />
+      <TabNavigator quizId={quizId} value={3} />
       <AnswerCard answer={answerResponse} expanded={expanded} />
     </>
   )
