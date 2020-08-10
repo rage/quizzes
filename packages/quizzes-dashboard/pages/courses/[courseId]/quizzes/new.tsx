@@ -28,7 +28,7 @@ const NewQuiz = () => {
     <>
       <div>
         <Head>
-          <title>Quizzes | Creating new quiz</title>
+          <title>Creating new quiz | Quizzes</title>
           <meta
             name="quizzes"
             content="initial-scale=1.0, width=device-width"

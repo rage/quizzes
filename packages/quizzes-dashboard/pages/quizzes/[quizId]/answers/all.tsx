@@ -77,7 +77,7 @@ export const AllAnswers = () => {
       <>
         <div>
           <Head>
-            <title>Quizzes | loading...</title>
+            <title>loading... | Quizzes</title>
             <meta
               name="quizzes"
               content="initial-scale=1.0, width=device-width"
@@ -108,7 +108,7 @@ export const AllAnswers = () => {
       <>
         <div>
           <Head>
-            <title>Quizzes | womp womp...</title>
+            <title>womp womp... | Quizzes</title>
             <meta
               name="quizzes"
               content="initial-scale=1.0, width=device-width"
@@ -124,7 +124,7 @@ export const AllAnswers = () => {
     <>
       <div>
         <Head>
-          <title>Quizzes | All answers</title>
+          <title>All answers | Quizzes</title>
           <meta
             name="quizzes"
             content="initial-scale=1.0, width=device-width"
