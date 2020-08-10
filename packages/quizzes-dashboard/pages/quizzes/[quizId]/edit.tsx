@@ -55,7 +55,7 @@ const EditPage = () => {
       <>
         <div>
           <Head>
-            <title>womp womp...</title>
+            <title>Quizzes | womp womp...</title>
             <meta
               name="quizzes"
               content="initial-scale=1.0, width=device-width"
@@ -71,7 +71,7 @@ const EditPage = () => {
     <>
       <div>
         <Head>
-          <title>Editing {data?.title}</title>
+          <title>Quizzes | Editing {data?.title}</title>
           <meta
             name="quizzes"
             content="initial-scale=1.0, width=device-width"

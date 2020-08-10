@@ -82,7 +82,7 @@ export const RequiringAttention = () => {
       <>
         <div>
           <Head>
-            <title>loading...</title>
+            <title>Quizzes | loading...</title>
             <meta
               name="quizzes"
               content="initial-scale=1.0, width=device-width"
@@ -113,7 +113,7 @@ export const RequiringAttention = () => {
       <>
         <div>
           <Head>
-            <title>womp womp...</title>
+            <title>Quizzes | womp womp...</title>
             <meta
               name="quizzes"
               content="initial-scale=1.0, width=device-width"
@@ -129,7 +129,7 @@ export const RequiringAttention = () => {
     <>
       <div>
         <Head>
-          <title>Answers requiring attention</title>
+          <title>Quizzes | Answers requiring attention</title>
           <meta
             name="quizzes"
             content="initial-scale=1.0, width=device-width"

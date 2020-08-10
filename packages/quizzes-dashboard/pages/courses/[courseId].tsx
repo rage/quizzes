@@ -49,7 +49,7 @@ const ShowCoursePage = () => {
       <>
         <div>
           <Head>
-            <title>womp womp...</title>
+            <title>Quizzes | womp womp...</title>
             <meta
               name="quizzes"
               content="initial-scale=1.0, width=device-width"
@@ -65,7 +65,7 @@ const ShowCoursePage = () => {
       <>
         <div>
           <Head>
-            <title>loading...</title>
+            <title>Quizzes | loading...</title>
             <meta
               name="quizzes"
               content="initial-scale=1.0, width=device-width"
@@ -103,7 +103,7 @@ const ShowCoursePage = () => {
     <>
       <div>
         <Head>
-          <title>{course.title}</title>
+          <title>Quizzes | {course.title}</title>
           <meta
             name="quizzes"
             content="initial-scale=1.0, width=device-width"

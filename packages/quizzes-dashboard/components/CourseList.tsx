@@ -19,7 +19,7 @@ const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
 `
 
-const StyledTitle = styled(Typography)`
+const StyledTitleWrapper = styled.div`
   display: flex !important;
   margin-top: 1.5rem !important;
   margin-bottom: 1.5rem !important;
@@ -57,7 +57,11 @@ const CourseList = ({ data, error }: CourseListProps) => {
   }
   return (
     <>
-      <StyledTitle variant="h2">All courses</StyledTitle>
+      <StyledTitleWrapper>
+        <Typography variant="h2" component="h1">
+          All courses
+        </Typography>
+      </StyledTitleWrapper>
       {data.map(course => (
         <Link
           key={course.id}

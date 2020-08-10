@@ -78,7 +78,7 @@ export const OverView = () => {
       <>
         <div>
           <Head>
-            <title>loading...</title>
+            <title>Quizzes | loading...</title>
             <meta
               name="quizzes"
               content="initial-scale=1.0, width=device-width"
@@ -109,7 +109,7 @@ export const OverView = () => {
       <>
         <div>
           <Head>
-            <title>womp womp...</title>
+            <title>Quizzes | womp womp...</title>
             <meta
               name="quizzes"
               content="initial-scale=1.0, width=device-width"
@@ -125,7 +125,7 @@ export const OverView = () => {
     <>
       <div>
         <Head>
-          <title>{quiz.title}</title>
+          <title>Quizzes | {quiz.title}</title>
           <meta
             name="quizzes"
             content="initial-scale=1.0, width=device-width"

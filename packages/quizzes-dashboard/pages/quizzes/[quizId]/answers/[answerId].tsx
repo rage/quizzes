@@ -51,7 +51,7 @@ export const AnswerById = () => {
       <>
         <div>
           <Head>
-            <title>loading...</title>
+            <title>Quizzes | loading...</title>
             <meta
               name="quizzes"
               content="initial-scale=1.0, width=device-width"
@@ -67,7 +67,7 @@ export const AnswerById = () => {
     <>
       <div>
         <Head>
-          <title>Singular answer</title>
+          <title>Quizzes | Singular answer</title>
           <meta
             name="quizzes"
             content="initial-scale=1.0, width=device-width"
