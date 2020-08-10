@@ -11,6 +11,7 @@ import { useRouter } from "next/router"
 import { Quiz } from "../../types/Quiz"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
 import DuplicateCourseButton from "../../components/DuplicateCourse"
+import Head from "next/head"
 
 const QuizCard = styled(Card)`
   margin-bottom: 1rem;
@@ -44,11 +45,33 @@ const ShowCoursePage = () => {
   const { data, error } = useSWR(id, fetchCourseQuizzes)
 
   if (error) {
-    return <div>Something went wrong</div>
+    return (
+      <>
+        <div>
+          <Head>
+            <title>womp womp... | Quizzes</title>
+            <meta
+              name="quizzes"
+              content="initial-scale=1.0, width=device-width"
+            />
+          </Head>
+        </div>
+        <div>Something went wrong</div>
+      </>
+    )
   }
   if (!data) {
     return (
       <>
+        <div>
+          <Head>
+            <title>loading... | Quizzes</title>
+            <meta
+              name="quizzes"
+              content="initial-scale=1.0, width=device-width"
+            />
+          </Head>
+        </div>
         <StyledSkeleton variant="rect" height={50} animation="wave" />
         <StyledSkeleton variant="rect" height={50} animation="wave" />
         <StyledSkeleton variant="rect" height={50} animation="wave" />
@@ -78,7 +101,15 @@ const ShowCoursePage = () => {
 
   return (
     <>
-      <DuplicateCourseButton course={course} />
+      <div>
+        <Head>
+          <title>{course.title} | Quizzes</title>
+          <meta
+            name="quizzes"
+            content="initial-scale=1.0, width=device-width"
+          />
+        </Head>
+      </div>
       <CourseTitleWrapper>
         <Typography variant="h3">Edit {course.title}</Typography>
         <Link
@@ -107,6 +138,7 @@ const ShowCoursePage = () => {
           })}
         </div>
       ))}
+      <DuplicateCourseButton course={course} />
       <DebugDialog />
     </>
   )

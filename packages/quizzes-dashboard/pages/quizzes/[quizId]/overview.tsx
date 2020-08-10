@@ -4,27 +4,14 @@ import { fetchQuiz, fetchCourseById } from "../../../services/quizzes"
 import { Skeleton } from "@material-ui/lab"
 import styled from "styled-components"
 import { Typography, Card } from "@material-ui/core"
-import Link from "next/link"
 import { useRouter } from "next/router"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import DownloadInfoForms from "../../../components/DownloadInfoForms.tsx"
+import Head from "next/head"
+import TabNavigator from "../../../components/TabNavigator"
 
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
-`
-
-const LinkWrapper = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  width: 100%;
-  justify-content: space-between !important;
-  padding: 1rem;
-`
-
-const LinkContainer = styled.div`
-  display: flex;
-  width: 30%;
-  justify-content: center;
 `
 
 const TitleContainer = styled.div`
@@ -89,6 +76,15 @@ export const OverView = () => {
   if (!quiz || !course) {
     return (
       <>
+        <div>
+          <Head>
+            <title>loading... | Quizzes</title>
+            <meta
+              name="quizzes"
+              content="initial-scale=1.0, width=device-width"
+            />
+          </Head>
+        </div>
         <StyledSkeleton variant="rect" height={250} animation="wave" />
         <StyledSkeleton variant="rect" height={250} animation="wave" />
         <StyledSkeleton variant="rect" height={250} animation="wave" />
@@ -109,40 +105,34 @@ export const OverView = () => {
   }
 
   if (quizError || courseError) {
-    return <>Something went wrong while fetching quiz</>
+    return (
+      <>
+        <div>
+          <Head>
+            <title>womp womp... | Quizzes</title>
+            <meta
+              name="quizzes"
+              content="initial-scale=1.0, width=device-width"
+            />
+          </Head>
+        </div>
+        Something went wrong while fetching quiz
+      </>
+    )
   }
 
   return (
     <>
-      <LinkWrapper>
-        <LinkContainer>
-          <Link href="/quizzes/[quizId]/edit" as={`/quizzes/${quiz.id}/edit`}>
-            <a>
-              <Typography>Edit quiz</Typography>
-            </a>
-          </Link>
-        </LinkContainer>
-        <LinkContainer>
-          <Link
-            href="/quizzes/[quizId]/answers/all"
-            as={`/quizzes/${quiz.id}/answers/all`}
-          >
-            <a>
-              <Typography>All answers</Typography>
-            </a>
-          </Link>
-        </LinkContainer>
-        <LinkContainer>
-          <Link
-            href="/quizzes/[quizId]/answers/requiring-attention"
-            as={`/quizzes/${quiz.id}/answers/requiring-attention`}
-          >
-            <a>
-              <Typography>Answers requiring attention</Typography>
-            </a>
-          </Link>
-        </LinkContainer>
-      </LinkWrapper>
+      <div>
+        <Head>
+          <title>{quiz.title} | Quizzes</title>
+          <meta
+            name="quizzes"
+            content="initial-scale=1.0, width=device-width"
+          />
+        </Head>
+      </div>
+      <TabNavigator quizId={quiz.id} value={1} />
       <HeaderContainer>
         <CourseName>
           <Typography>{course.title}</Typography>

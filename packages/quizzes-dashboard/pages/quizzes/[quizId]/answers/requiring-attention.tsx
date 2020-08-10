@@ -11,6 +11,8 @@ import { Answer } from "../../../../types/Answer"
 import { TextField, MenuItem, Switch, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import { Pagination, Skeleton } from "@material-ui/lab"
+import Head from "next/head"
+import TabNavigator from "../../../../components/TabNavigator"
 
 export const SizeSelectorContainer = styled.div`
   display: flex;
@@ -78,6 +80,15 @@ export const RequiringAttention = () => {
   if (!answers) {
     return (
       <>
+        <div>
+          <Head>
+            <title>loading... | Quizzes</title>
+            <meta
+              name="quizzes"
+              content="initial-scale=1.0, width=device-width"
+            />
+          </Head>
+        </div>
         <StyledSkeleton variant="rect" height={250} animation="wave" />
         <StyledSkeleton variant="rect" height={250} animation="wave" />
         <StyledSkeleton variant="rect" height={250} animation="wave" />
@@ -98,11 +109,34 @@ export const RequiringAttention = () => {
   }
 
   if (error) {
-    return <div>Error while fetching answers.</div>
+    return (
+      <>
+        <div>
+          <Head>
+            <title>womp womp... | Quizzes</title>
+            <meta
+              name="quizzes"
+              content="initial-scale=1.0, width=device-width"
+            />
+          </Head>
+        </div>
+        <div>Error while fetching answers.</div>
+      </>
+    )
   }
 
   return (
     <>
+      <div>
+        <Head>
+          <title>Answers requiring attention | Quizzes</title>
+          <meta
+            name="quizzes"
+            content="initial-scale=1.0, width=device-width"
+          />
+        </Head>
+      </div>
+      <TabNavigator quizId={quizId} value={4} />
       {answers.results.length === 0 ? (
         <>
           <Typography variant="h3">No answers requiring attention</Typography>

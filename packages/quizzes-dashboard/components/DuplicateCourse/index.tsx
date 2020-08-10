@@ -33,15 +33,16 @@ const ButtonWrapper = styled.div`
 
 const StyledButton = styled(Button)`
   display: flex;
-  background: #3f51b5 !important;
+  background: #90caf9 !important;
   margin-top: 1rem !important;
   margin-bottom: 1rem !important;
+  width: 30% !important;
 `
 
 const ButtonContainer = styled.div`
   display: flex;
-  width: 30%;
-  flex-wrap: wrap;
+  width: 100%;
+  justify-content: space-around;
 `
 
 interface DuplicateCourseProps {
@@ -53,29 +54,29 @@ export const DuplicateCourseButton = ({ course }: DuplicateCourseProps) => {
   const [correspondanceModal, showCorrespondanceModal] = useState(false)
   return (
     <>
-      <StyledModal open={duplicateModal}>
-        <AdvancedBox>
-          <ButtonWrapper>
-            <CloseButton onClick={() => showDuplicateModal(false)}>
-              <FontAwesomeIcon icon={faWindowClose} />
-            </CloseButton>
-          </ButtonWrapper>
-          <DuplicateModal course={course} />
-        </AdvancedBox>
-      </StyledModal>
-
-      <StyledModal open={correspondanceModal}>
-        <AdvancedBox>
-          <ButtonWrapper>
-            <CloseButton onClick={() => showCorrespondanceModal(false)}>
-              <FontAwesomeIcon icon={faWindowClose} />
-            </CloseButton>
-          </ButtonWrapper>
-          <CorrespondanceModal course={course} />
-        </AdvancedBox>
-      </StyledModal>
-
       <ButtonContainer>
+        <StyledModal open={duplicateModal}>
+          <AdvancedBox>
+            <ButtonWrapper>
+              <CloseButton onClick={() => showDuplicateModal(false)}>
+                <FontAwesomeIcon icon={faWindowClose} />
+              </CloseButton>
+            </ButtonWrapper>
+            <DuplicateModal course={course} />
+          </AdvancedBox>
+        </StyledModal>
+
+        <StyledModal open={correspondanceModal}>
+          <AdvancedBox>
+            <ButtonWrapper>
+              <CloseButton onClick={() => showCorrespondanceModal(false)}>
+                <FontAwesomeIcon icon={faWindowClose} />
+              </CloseButton>
+            </ButtonWrapper>
+            <CorrespondanceModal course={course} />
+          </AdvancedBox>
+        </StyledModal>
+
         <StyledButton
           variant="outlined"
           onClick={() => showDuplicateModal(true)}

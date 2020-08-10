@@ -8,7 +8,7 @@ import { getAllLanguages } from "../../services/quizzes"
 
 const SubmitButton = styled(Button)`
   display: flex !important;
-  background: #3f51b5 !important;
+  background: #90caf9 !important;
 `
 
 const StyledForm = styled.form`

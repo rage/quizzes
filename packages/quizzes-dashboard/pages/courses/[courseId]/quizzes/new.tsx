@@ -6,6 +6,7 @@ import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
 import { useDispatch } from "react-redux"
 import { createdNewQuiz } from "../../../../store/editor/editorActions"
+import Head from "next/head"
 
 const NewQuiz = () => {
   const dispatch = useDispatch()
@@ -25,6 +26,15 @@ const NewQuiz = () => {
   ])
   return (
     <>
+      <div>
+        <Head>
+          <title>Creating new quiz | Quizzes</title>
+          <meta
+            name="quizzes"
+            content="initial-scale=1.0, width=device-width"
+          />
+        </Head>
+      </div>
       <SaveButton />
       <Typography variant="h1">Editing new quiz</Typography>
       <QuizEditForms />
