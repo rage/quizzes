@@ -3,9 +3,9 @@ import "date-fns"
 import DateFnsUtils from "@date-io/date-fns"
 import {
   MuiPickersUtilsProvider,
-  KeyboardDatePicker,
+  KeyboardDateTimePicker,
 } from "@material-ui/pickers"
-import { Typography, Card, TextField, MenuItem } from "@material-ui/core"
+import { Typography, TextField, MenuItem } from "@material-ui/core"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
@@ -18,17 +18,9 @@ import {
   editedQuizzesDeadline,
   editedQuizzesBody,
   editedQuizzesSubmitmessage,
+  editedQuizzesPart,
 } from "../../store/editor/quiz/quizActions"
-import DebugDialog from "../DebugDialog"
 import { useTypedSelector } from "../../store/store"
-
-const InfoCard = styled(Card)`
-  box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 40px -12px !important;
-  border-radius: 1rem !important;
-  margin: 0 auto;
-  margin-bottom: 1rem;
-  width: 800px;
-`
 
 const SubsectionTitleWrapper = styled.div`
   display: flex;
@@ -42,42 +34,20 @@ const InfoContainer = styled.div`
   display: flex;
 `
 
-const InfoContainer2 = styled.div`
-  padding: 1rem;
-  display: flex;
-`
-const StyledId = styled(Typography)`
-  margin-bottom: 1rem !important;
-`
-
-const TitleContainer = styled.div`
-  flex: 1;
-  margin-right: 1rem;
-`
-
-const PointsContainer = styled.div`
-  margin-right: 1.5rem;
-  width: 5rem;
-`
-
-const QuizContent = styled.div`
-  padding: 0.5rem;
-  display: flex;
-  width: 100%;
-`
-
-const StyledTextField = styled(TextField)`
-  background-color: white;
-  border-radius: 1rem;
-  overflow: hidden;
-  width: 100%;
-  margin-top: 0.25rem !important;
-`
-
 const TitleIcon = styled(FontAwesomeIcon)`
   width: 2rem;
   height: 2rem;
   margin-right: 0.25rem;
+`
+
+const PartField = styled(TextField)`
+  display: flex;
+  margin-right: 0.5rem !important;
+`
+
+const SectionField = styled(TextField)`
+  display: flex;
+  margin-left: 0.5rem !important;
 `
 
 const BasicInformation = () => {
@@ -86,7 +56,6 @@ const BasicInformation = () => {
   const quizId = useTypedSelector(state => state.editor.quizId)
 
   const quiz = useTypedSelector(state => state.editor.quizzes)
-  console.log("quiz", quiz)
 
   const pointsGrantingPolicy = useTypedSelector(
     state => state.editor.quizzes[quizId].grantPointsPolicy,
@@ -100,18 +69,21 @@ const BasicInformation = () => {
   const deadline = useTypedSelector(
     state => state.editor.quizzes[quizId].deadline,
   )
-  const createdAt = useTypedSelector(
-    state => state.editor.quizzes[quizId].createdAt,
-  )
-  const updatedAt = useTypedSelector(
-    state => state.editor.quizzes[quizId].updatedAt,
-  )
   const title = useTypedSelector(state => state.editor.quizzes[quizId].title)
 
   const body = useTypedSelector(state => state.editor.quizzes[quizId].body)
 
   const submitMessage = useTypedSelector(
     state => state.editor.quizzes[quizId].submitMessage,
+  )
+  const part = useTypedSelector(state => state.editor.quizzes[quizId].part)
+
+  const section = useTypedSelector(
+    state => state.editor.quizzes[quizId].section,
+  )
+
+  const variables = useTypedSelector(
+    state => state.editor.quizVariables[quizId],
   )
 
   return (
@@ -129,6 +101,28 @@ const BasicInformation = () => {
           defaultValue={title}
           onChange={event =>
             dispatch(editedQuizTitle(event.target.value, quizId))
+          }
+        />
+      </InfoContainer>
+      <InfoContainer>
+        <PartField
+          fullWidth
+          label="Part"
+          variant="outlined"
+          value={part}
+          type="number"
+          onChange={event =>
+            dispatch(editedQuizzesPart(quizId, Number(event.target.value)))
+          }
+        />
+        <SectionField
+          fullWidth
+          label="Section"
+          variant="outlined"
+          value={section}
+          type="number"
+          onChange={event =>
+            dispatch(editedQuizzesPart(quizId, Number(event.target.value)))
           }
         />
       </InfoContainer>
@@ -181,31 +175,31 @@ const BasicInformation = () => {
           </MenuItem>
         </TextField>
       </InfoContainer>
-      <MuiPickersUtilsProvider utils={DateFnsUtils}>
-        <InfoContainer>
-          <KeyboardDatePicker
-            disableToolbar
+      <InfoContainer>
+        <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <KeyboardDateTimePicker
+            fullWidth
+            value={variables.deadline}
+            error={!variables.validDeadline}
             variant="dialog"
             inputVariant="outlined"
-            fullWidth
-            format="dd/MM/yyyy"
-            margin="none"
-            id="date-picker-inline"
             label="Deadline"
-            value={deadline}
-            onChange={date => dispatch(editedQuizzesDeadline(date, quizId))}
             KeyboardButtonProps={{
-              "aria-label": "change deadline",
+              "aria-label": "change time",
             }}
+            onChange={event => {
+              dispatch(editedQuizzesDeadline(event, quizId))
+            }}
+            helperText={variables.deadline}
           />
-        </InfoContainer>
-      </MuiPickersUtilsProvider>
+        </MuiPickersUtilsProvider>
+      </InfoContainer>
       <InfoContainer>
         <TextField
           multiline
+          fullWidth
           rows={5}
           label="Description for the whole quiz"
-          fullWidth
           variant="outlined"
           value={body}
           onChange={event =>

@@ -7,7 +7,7 @@ interface AccessControlOptions {
   unrestricted?: boolean
 }
 
-const accessControl = (options?: AccessControlOptions) => {
+export const accessControl = (options?: AccessControlOptions) => {
   const accessControl = async (
     ctx: CustomContext,
     next: () => Promise<any>,
@@ -30,6 +30,18 @@ const accessControl = (options?: AccessControlOptions) => {
     return next()
   }
   return accessControl
+}
+
+export const validToken = async (token: string): Promise<boolean> => {
+  try {
+    const user = await getCurrentUserDetails(token)
+    if (user && user.administrator) {
+      return true
+    }
+    return false
+  } catch (e) {
+    return false
+  }
 }
 
 export default accessControl

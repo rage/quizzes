@@ -2,7 +2,7 @@ import React from "react"
 import styled from "styled-components"
 import { TextField, Typography } from "@material-ui/core"
 import { useTypedSelector } from "../../../../store/store"
-import { Item } from "../../../../types/NormalizedQuiz"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import { useDispatch } from "react-redux"
 import {
   editedItemMinWords,
@@ -31,7 +31,7 @@ const MinWords = styled(TextField)`
 `
 
 interface ModalContentProps {
-  item: Item
+  item: NormalizedItem
 }
 export const EssayModalContent = ({ item }: ModalContentProps) => {
   const storeItem = useTypedSelector(state => state.editor.items[item.id])

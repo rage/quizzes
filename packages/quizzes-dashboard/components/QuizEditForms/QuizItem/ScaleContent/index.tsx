@@ -1,5 +1,5 @@
 import React from "react"
-import { Item } from "../../../../types/NormalizedQuiz"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import {
   editedQuizItemTitle,
   editedScaleMinValue,
@@ -102,7 +102,7 @@ const ModalButtonWrapper = styled.div`
 const EditItemButton = styled(Button)``
 
 interface scaleContentProps {
-  item: Item
+  item: NormalizedItem
 }
 const ScaleContent = ({ item }: scaleContentProps) => {
   const quizId = useTypedSelector(state => state.editor.quizId)

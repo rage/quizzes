@@ -5,18 +5,19 @@ import { useDispatch } from "react-redux"
 import Typography from "@material-ui/core/Typography"
 import SaveButton from "../../../components/SaveButton"
 import { normalizedQuiz } from "../../../schemas"
-import { normalize, denormalize } from "normalizr"
+import { normalize } from "normalizr"
 import useSWR from "swr"
-import { withRouter } from "next/router"
+import { useRouter } from "next/router"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import QuizEditForms from "../../../components/QuizEditForms"
-import { useTypedSelector } from "../../../store/store"
 import _ from "lodash"
-import { EditableQuiz } from "../../../types/EditQuiz"
+import Head from "next/head"
+import TabNavigator from "../../../components/TabNavigator"
 
-const EditPage = ({ router }: any) => {
-  const id = router.query.id
-  const { data, error } = useSWR(id, fetchQuiz)
+const EditPage = () => {
+  const router = useRouter()
+  const quizId: string = router.query.quizId?.toString() ?? ""
+  const { data, error } = useSWR(quizId, fetchQuiz)
   const dispatch = useDispatch()
 
   useEffect(() => {
@@ -33,22 +34,51 @@ const EditPage = ({ router }: any) => {
     }
     dispatch(initializedEditor(normalizedData, quiz))
   }, [data])
+
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
       label: "Course",
       as: `/courses/${data?.courseId}`,
-      href: "/courses/[id]",
+      href: "/courses/[courseId]",
     },
-    { label: "Quiz" },
+    {
+      label: "Quiz Overview",
+      as: `/quizzes/${data?.id}/overview`,
+      href: "/quizzes/[quizzesId]/overview",
+    },
+    { label: "Edit" },
   ])
 
   if (error) {
-    return <div>Something went wrong</div>
+    return (
+      <>
+        <div>
+          <Head>
+            <title>womp womp... | Quizzes</title>
+            <meta
+              name="quizzes"
+              content="initial-scale=1.0, width=device-width"
+            />
+          </Head>
+        </div>
+        <div>Something went wrong</div>
+      </>
+    )
   }
 
   return (
     <>
+      <div>
+        <Head>
+          <title>Editing {data?.title} | Quizzes</title>
+          <meta
+            name="quizzes"
+            content="initial-scale=1.0, width=device-width"
+          />
+        </Head>
+      </div>
+      <TabNavigator quizId={quizId} value={2} />
       <SaveButton />
       <Typography variant="h1">Editing quiz</Typography>
       <QuizEditForms />
@@ -56,4 +86,4 @@ const EditPage = ({ router }: any) => {
   )
 }
 
-export default withRouter(EditPage)
+export default EditPage

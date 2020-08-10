@@ -1,5 +1,5 @@
 import React from "react"
-import { Item } from "../../../../types/NormalizedQuiz"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import styled from "styled-components"
 import { useTypedSelector } from "../../../../store/store"
 import {
@@ -59,7 +59,7 @@ const ModalContentTitleWrapper = styled.div`
 `
 
 interface ScaleItemEditorModalProps {
-  item: Item
+  item: NormalizedItem
 }
 export const ScaleModalContent = ({ item }: ScaleItemEditorModalProps) => {
   const dispatch = useDispatch()

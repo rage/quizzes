@@ -3,6 +3,8 @@ import QuizItemAnswer from "./quiz_item_answer"
 import User from "./user"
 import UserQuizState from "./user_quiz_state"
 import PeerReview from "./peer_review"
+import { BadRequestError } from "../util/error"
+import PeerReviewQuestion from "./peer_review_question"
 
 class QuizAnswer extends Model {
   id!: string
@@ -53,58 +55,101 @@ class QuizAnswer extends Model {
   }
 
   public static async getById(quizAnswerId: string) {
-    const quizAnswer = await this.query().findById(quizAnswerId)
-    await this.addRelations([quizAnswer])
+    const quizAnswer = await this.query()
+      .findById(quizAnswerId)
+      .withGraphFetched("userQuizState")
+      .withGraphFetched("itemAnswers.[optionAnswers]")
+      .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+
+    quizAnswer.peerReviews.map(peerReview => {
+      if (peerReview.answers.length > 0) {
+        return peerReview.answers.map(peerReviewAnswer => {
+          peerReviewAnswer.question = this.moveQuestionTextsToparent(
+            peerReviewAnswer.question,
+          )
+        })
+      }
+    })
+
     return quizAnswer
   }
 
-  public static async getByQuizId(
+  public static async getPaginatedByQuizId(
     quizId: string,
     page: number,
     pageSize: number,
   ) {
-    const quizAnswers = (
-      await this.query()
-        .where("quiz_id", quizId)
-        .andWhereNot("status", "deprecated")
-        .orderBy("created_at")
-        .page(page, pageSize)
-    ).results
-    await this.addRelations(quizAnswers)
-    return quizAnswers
+    const paginated = await this.query()
+      .where("quiz_id", quizId)
+      .andWhereNot("status", "deprecated")
+      .orderBy("created_at")
+      .page(page, pageSize)
+      .withGraphFetched("userQuizState")
+      .withGraphFetched("itemAnswers.[optionAnswers]")
+      .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+
+    paginated.results.map(answer => {
+      if (answer.peerReviews.length > 0) {
+        answer.peerReviews.map(peerReview => {
+          if (peerReview.answers.length > 0) {
+            peerReview.answers.map(peerReviewAnswer => {
+              peerReviewAnswer.question = this.moveQuestionTextsToparent(
+                peerReviewAnswer.question,
+              )
+            })
+          }
+        })
+      }
+    })
+
+    return paginated
   }
 
-  public static async getAnswersForManualReview(
+  public static async getPaginatedManualReview(
     quizId: string,
     page: number,
     pageSize: number,
   ) {
-    const quizAnswers = (
-      await this.query()
-        .where("quiz_id", quizId)
-        .andWhere("status", "manual-review")
-        .orderBy("created_at")
-        .page(page, pageSize)
-    ).results
-    await this.addRelations(quizAnswers)
-    return quizAnswers
+    const paginated = await this.query()
+      .where("quiz_id", quizId)
+      .andWhere("status", "manual-review")
+      .orderBy("created_at")
+      .page(page, pageSize)
+      .withGraphFetched("userQuizState")
+      .withGraphFetched("itemAnswers.[optionAnswers]")
+      .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+
+    paginated.results.map(answer => {
+      if (answer.peerReviews.length > 0) {
+        answer.peerReviews.map(peerReview => {
+          if (peerReview.answers.length > 0) {
+            peerReview.answers.map(peerReviewAnswer => {
+              peerReviewAnswer.question = this.moveQuestionTextsToparent(
+                peerReviewAnswer.question,
+              )
+            })
+          }
+        })
+      }
+    })
+
+    return paginated
   }
 
-  private static async addRelations(quizAnswers: QuizAnswer[]) {
-    for (const quizAnswer of quizAnswers) {
-      delete quizAnswer.languageId
-      quizAnswer.userQuizState = await quizAnswer.$relatedQuery("userQuizState")
-      quizAnswer.itemAnswers = await quizAnswer.$relatedQuery("itemAnswers")
-      for (const itemAnswer of quizAnswer.itemAnswers) {
-        itemAnswer.optionAnswers = await itemAnswer.$relatedQuery(
-          "optionAnswers",
-        )
-      }
-      quizAnswer.peerReviews = await quizAnswer.$relatedQuery("peerReviews")
-      for (const peerReview of quizAnswer.peerReviews) {
-        peerReview.answers = await peerReview.$relatedQuery("answers")
-      }
+  public static async setManualReviewStatus(answerId: string, status: string) {
+    if (!["confirmed", "rejected"].includes(status)) {
+      throw new BadRequestError("invalid status")
     }
+    const quizAnswer = await this.query().updateAndFetchById(answerId, {
+      status,
+    })
+    return quizAnswer
+  }
+
+  private static moveQuestionTextsToparent = (question: PeerReviewQuestion) => {
+    question.title = question.texts[0].title
+    question.body = question.texts[0].body
+    return question
   }
 }
 
