@@ -78,7 +78,7 @@ const EditPage = () => {
           />
         </Head>
       </div>
-      <TabNavigator quizId={quizId} />
+      <TabNavigator quizId={quizId} value={2} />
       <SaveButton />
       <Typography variant="h1">Editing quiz</Typography>
       <QuizEditForms />

@@ -131,7 +131,7 @@ export const AllAnswers = () => {
           />
         </Head>
       </div>
-      <TabNavigator quizId={quizId} />
+      <TabNavigator quizId={quizId} value={3} />
       {answers.results.length === 0 ? (
         <>
           <Typography variant="h3">No Answers for this quiz</Typography>

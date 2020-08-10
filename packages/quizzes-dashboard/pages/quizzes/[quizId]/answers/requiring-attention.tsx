@@ -136,7 +136,7 @@ export const RequiringAttention = () => {
           />
         </Head>
       </div>
-      <TabNavigator quizId={quizId} />
+      <TabNavigator quizId={quizId} value={4} />
       {answers.results.length === 0 ? (
         <>
           <Typography variant="h3">No answers requiring attention</Typography>

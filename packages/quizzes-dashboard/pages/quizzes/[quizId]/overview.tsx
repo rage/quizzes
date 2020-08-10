@@ -132,7 +132,7 @@ export const OverView = () => {
           />
         </Head>
       </div>
-      <TabNavigator quizId={quiz.id} />
+      <TabNavigator quizId={quiz.id} value={1} />
       <HeaderContainer>
         <CourseName>
           <Typography>{course.title}</Typography>
