@@ -20,6 +20,7 @@ export const checkAccessOrThrow = async (
       await UserCourseRole.query()
         .where("user_id", userInfo.id)
         .andWhere("course_id", courseId)
+        .limit(1)
     )[0]?.role
     if (role && abilitiesByRole[role]?.includes(operation)) {
       return
