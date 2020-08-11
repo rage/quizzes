@@ -1,4 +1,4 @@
-import { createStore, combineReducers } from "redux"
+import { createStore, combineReducers, applyMiddleware } from "redux"
 import { composeWithDevTools } from "redux-devtools-extension"
 import { useSelector, TypedUseSelectorHook } from "react-redux"
 import { optionReducer } from "./editor/options/optionReducer"
@@ -16,6 +16,8 @@ import {
 import { itemVariableReducers } from "./editor/itemVariables/itemVariableReducers"
 import { optionVariableReducers } from "./editor/optionVariables/optionVariableReducers"
 import { quizVariableReducers } from "./editor/quizVariables/quizVariableReducers"
+import editorChangesReducer from "./editor/editorReducer"
+import thunk from "redux-thunk"
 
 const editorReducer = combineReducers({
   quizzes: quizReducer,
@@ -25,13 +27,14 @@ const editorReducer = combineReducers({
   itemVariables: itemVariableReducers,
   optionVariables: optionVariableReducers,
   quizVariables: quizVariableReducers,
+  editorChanges: editorChangesReducer,
 })
 
 const reducer = combineReducers({
   editor: editorReducer,
 })
 
-const store = createStore(reducer, composeWithDevTools())
+const store = createStore(reducer, composeWithDevTools(applyMiddleware(thunk)))
 
 export interface storeState {
   editor: {
@@ -42,6 +45,7 @@ export interface storeState {
     itemVariables: { [itemId: string]: ItemVariables }
     optionVariables: { [optionId: string]: OptionVariables }
     quizVariables: { [quizId: string]: QuizVariables }
+    editorChanges: { changes: boolean }
   }
 }
 

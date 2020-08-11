@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import "date-fns"
 import DateFnsUtils from "@date-io/date-fns"
 import {
@@ -21,6 +21,7 @@ import {
   editedQuizzesPart,
 } from "../../store/editor/quiz/quizActions"
 import { useTypedSelector } from "../../store/store"
+import { checkForChanges } from "../../store/editor/editorActions"
 
 const SubsectionTitleWrapper = styled.div`
   display: flex;
@@ -48,6 +49,11 @@ const PartField = styled(TextField)`
 const SectionField = styled(TextField)`
   display: flex;
   margin-left: 0.5rem !important;
+`
+
+const StyledWarningText = styled(Typography)`
+  display: flex !important;
+  color: #ff5252 !important;
 `
 
 const BasicInformation = () => {
@@ -86,11 +92,27 @@ const BasicInformation = () => {
     state => state.editor.quizVariables[quizId],
   )
 
+  const store = useTypedSelector(state => state)
+
+  const changes = useTypedSelector(state => state.editor.editorChanges.changes)
+
+  useEffect(() => {
+    dispatch(checkForChanges(store))
+  }, [store])
+
   return (
     <>
       <SubsectionTitleWrapper>
         <TitleIcon icon={faInfoCircle} />
         <Typography variant="h2">Quiz Information</Typography>
+      </SubsectionTitleWrapper>
+
+      <SubsectionTitleWrapper>
+        {changes ? (
+          <StyledWarningText>You have unsaved changes</StyledWarningText>
+        ) : (
+          ""
+        )}
       </SubsectionTitleWrapper>
 
       <InfoContainer>

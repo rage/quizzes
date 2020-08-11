@@ -2,6 +2,7 @@ import { createAction } from "typesafe-actions"
 import { Entities, NewQuiz } from "../../types/NormalizedQuiz"
 import { v4 } from "uuid"
 import { Quiz } from "../../types/Quiz"
+import { storeState } from "../store"
 
 export const initializedEditor = createAction(
   "INITIALIZED_EDITOR",
@@ -48,3 +49,10 @@ export const createdNewQuiz = createAction(
   "CREATED_NEW_QUIZ",
   (courseId: string) => ({ courseId: courseId, quizId: v4() }),
 )<{ courseId: string; quizId: string }>()
+
+export const checkForChanges = createAction(
+  "CHANGE_CHECK",
+  (store: storeState) => ({
+    store: store,
+  }),
+)<{ store: storeState }>()

@@ -13,12 +13,14 @@ import QuizEditForms from "../../../components/QuizEditForms"
 import _ from "lodash"
 import Head from "next/head"
 import TabNavigator from "../../../components/TabNavigator"
+import { useTypedSelector } from "../../../store/store"
 
 const EditPage = () => {
   const router = useRouter()
   const quizId: string = router.query.quizId?.toString() ?? ""
   const { data, error } = useSWR(quizId, fetchQuiz)
   const dispatch = useDispatch()
+  let saved = false
 
   useEffect(() => {
     if (!data) {
