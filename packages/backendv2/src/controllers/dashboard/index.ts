@@ -1,11 +1,12 @@
 import Router from "koa-router"
 import { CustomContext, CustomState } from "../../types"
-import { Course, Quiz, QuizAnswer, User } from "../../models/"
+import { Course, Quiz, QuizAnswer, User, UserCourseRole } from "../../models/"
 import accessControl, { validToken } from "../../middleware/access_control"
 import {
   checkAccessOrThrow,
   getCourseIdByAnswerId,
   getCourseIdByQuizId,
+  getAccessableCourses,
 } from "./util"
 
 const admin = accessControl({ administator: true })
@@ -30,8 +31,8 @@ const dashboard = new Router<CustomState, CustomContext>({
     ctx.body = await Quiz.getByCourseId(courseId)
   })
   .get("/courses", accessControl(), async ctx => {
-    await checkAccessOrThrow(ctx.state.user)
-    ctx.body = await Course.getAll()
+    const user = ctx.state.user
+    ctx.body = await getAccessableCourses(ctx.state.user, "view")
   })
   .get("/courses/:courseId", accessControl(), async ctx => {
     const courseId = ctx.params.courseId

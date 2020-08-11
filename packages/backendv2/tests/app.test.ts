@@ -34,6 +34,7 @@ describe("dashboard: get courses", () => {
           return [
             200,
             {
+              id: 2345,
               administrator: false,
             } as UserInfo,
           ]
@@ -56,11 +57,14 @@ describe("dashboard: get courses", () => {
       .expect(401, done)
   })
 
-  test("respond with 403 if insufficient priviledge", done => {
+  test("no roles receives empty array", done => {
     request(app.callback())
       .get("/api/v2/dashboard/courses")
       .set("Authorization", `bearer PLEB_TOKEN`)
-      .expect(403, done)
+      .expect(response => {
+        expect(response.body).toEqual([])
+      })
+      .expect(200, done)
   })
 
   test("reply with courses on valid request", done => {

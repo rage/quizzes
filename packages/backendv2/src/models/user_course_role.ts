@@ -2,6 +2,8 @@ import Model from "./base_model"
 import User from "./user"
 
 class UserCourseRole extends Model {
+  userId!: string
+  courseId!: string
   role!: string
   static get tableName() {
     return "user_course_role"
@@ -15,6 +17,9 @@ class UserCourseRole extends Model {
         to: "user.id",
       },
     },
+  }
+  public static async getByUserId(userId: number) {
+    return await this.query().where("user_id", userId)
   }
 }
 
