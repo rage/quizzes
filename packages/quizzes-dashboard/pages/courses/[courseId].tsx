@@ -10,6 +10,8 @@ import useSWR from "swr"
 import { useRouter } from "next/router"
 import { Quiz } from "../../types/Quiz"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
+import DuplicateCourseButton from "../../components/DuplicateCourse"
+import Head from "next/head"
 
 const QuizCard = styled(Card)`
   margin-bottom: 1rem;
@@ -29,6 +31,10 @@ const CourseTitleWrapper = styled.div`
   justify-content: space-between;
 `
 
+const StyledType = styled(Typography)`
+  color: #f44336 !important;
+`
+
 const ShowCoursePage = () => {
   const router = useRouter()
   const id = router.query.courseId?.toString() ?? ""
@@ -39,11 +45,33 @@ const ShowCoursePage = () => {
   const { data, error } = useSWR(id, fetchCourseQuizzes)
 
   if (error) {
-    return <div>Something went wrong</div>
+    return (
+      <>
+        <div>
+          <Head>
+            <title>womp womp... | Quizzes</title>
+            <meta
+              name="quizzes"
+              content="initial-scale=1.0, width=device-width"
+            />
+          </Head>
+        </div>
+        <div>Something went wrong</div>
+      </>
+    )
   }
   if (!data) {
     return (
       <>
+        <div>
+          <Head>
+            <title>loading... | Quizzes</title>
+            <meta
+              name="quizzes"
+              content="initial-scale=1.0, width=device-width"
+            />
+          </Head>
+        </div>
         <StyledSkeleton variant="rect" height={50} animation="wave" />
         <StyledSkeleton variant="rect" height={50} animation="wave" />
         <StyledSkeleton variant="rect" height={50} animation="wave" />
@@ -73,6 +101,15 @@ const ShowCoursePage = () => {
 
   return (
     <>
+      <div>
+        <Head>
+          <title>{course.title} | Quizzes</title>
+          <meta
+            name="quizzes"
+            content="initial-scale=1.0, width=device-width"
+          />
+        </Head>
+      </div>
       <CourseTitleWrapper>
         <Typography variant="h3">Edit {course.title}</Typography>
         <Link
@@ -101,6 +138,7 @@ const ShowCoursePage = () => {
           })}
         </div>
       ))}
+      <DuplicateCourseButton course={course} />
       <DebugDialog />
     </>
   )
@@ -128,6 +166,7 @@ interface quizProps {
 
 const QuizOfSection = ({ quiz }: quizProps) => {
   const title = quiz.title
+  const types = Array.from(new Set(quiz.items.map(item => item.type)))
   return (
     <Link
       href={{
@@ -147,6 +186,17 @@ const QuizOfSection = ({ quiz }: quizProps) => {
             <div>
               <Typography variant="overline" color="secondary"></Typography>
             </div>
+            {types.length > 0 ? (
+              <div>
+                [{" "}
+                {types.map(type => (
+                  <StyledType variant="overline">{type} </StyledType>
+                ))}
+                ]
+              </div>
+            ) : (
+              ""
+            )}
           </CardContent>
         </QuizCard>
       </QuizLink>

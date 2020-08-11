@@ -38,7 +38,38 @@ const dashboard = new Router<CustomState, CustomContext>({
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await Course.getFlattenedById(courseId)
   })
-  .post("/answers/:answerId/status", accessControl(), async ctx => {
+  .post("/courses/:courseId/duplicate-course", async ctx => {
+    const oldCourseId = ctx.params.courseId
+    const token = ctx.request.body.token
+    const name = ctx.request.body.name
+    const abbr = ctx.request.body.abbr
+    const languageId = ctx.request.body.lang
+    if (!validToken(token)) {
+      ctx.body = "invalid token"
+    } else {
+      ctx.response.set("Content-Type", "text/csv")
+      ctx.response.attachment(`update_ids_from_${oldCourseId}`)
+      ctx.body = await Course.duplicateCourse(
+        oldCourseId,
+        name,
+        abbr,
+        languageId,
+      )
+    }
+  })
+  .post("/courses/download-correspondance-file", async ctx => {
+    const token = ctx.request.body.token
+    const oldCourseId = ctx.request.body.oldCourseId
+    const courseId = ctx.request.body.courseId
+    if (!validToken(token)) {
+      ctx.body = "invalid token"
+    } else {
+      ctx.response.set("Content-Type", "text/plain")
+      ctx.response.attachment(`update_ids_from_${oldCourseId}_to_${courseId}`)
+      ctx.body = await Course.getCorrespondanceFile(oldCourseId, courseId)
+    }
+  })
+  .post("/answers/:answerId/status", admin, async ctx => {
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "edit")
@@ -67,42 +98,88 @@ const dashboard = new Router<CustomState, CustomContext>({
   })
   .post("/quizzes/:quizId/download-quiz-info", async ctx => {
     const quizId = ctx.params.quizId
-    await checkAccessOrThrow(ctx.state.user)
-    const token = ctx.request.body
+    const token = ctx.request.body.token
+    const quizName = ctx.request.body.quizName
+    const courseName = ctx.request.body.courseName
+    const current_datetime = new Date()
+    const isoDate =
+      current_datetime.getDate() +
+      "-" +
+      (current_datetime.getMonth() + 1) +
+      "-" +
+      current_datetime.getFullYear() +
+      "-" +
+      current_datetime.getHours() +
+      "-" +
+      current_datetime.getMinutes()
     if (!validToken(token)) {
       ctx.body = "invalid token"
     } else {
       const stream = await Quiz.getQuizInfo(quizId)
       ctx.response.set("Content-Type", "text/csv")
-      ctx.response.attachment("quiz-info.csv")
+      ctx.response.attachment(
+        `quiz-info-${quizName}-${courseName}-${isoDate}.csv`,
+      )
       ctx.body = stream
     }
   })
   .post("/quizzes/:quizId/download-peerreview-info", async ctx => {
     const quizId = ctx.params.quizId
-    await checkAccessOrThrow(ctx.state.user)
-    const token = ctx.request.body
+    const token = ctx.request.body.token
+    const quizName = ctx.request.body.quizName
+    const courseName = ctx.request.body.courseName
+    const current_datetime = new Date()
+    const isoDate =
+      current_datetime.getDate() +
+      "-" +
+      (current_datetime.getMonth() + 1) +
+      "-" +
+      current_datetime.getFullYear() +
+      "-" +
+      current_datetime.getHours() +
+      "-" +
+      current_datetime.getMinutes()
     if (!validToken(token)) {
       ctx.body = "invalid token"
     } else {
       const stream = await Quiz.getPeerReviewInfo(quizId)
       ctx.response.set("Content-Type", "text/csv")
-      ctx.response.attachment("quiz-peerreview-info.csv")
+      ctx.response.attachment(
+        `quiz-peerreview-info-${quizName}-${courseName}-${isoDate}.csv`,
+      )
       ctx.body = stream
     }
   })
   .post("/quizzes/:quizId/download-answer-info", async ctx => {
     const quizId = ctx.params.quizId
-    await checkAccessOrThrow(ctx.state.user)
-    const token = ctx.request.body
+    const token = ctx.request.body.token
+    const quizName = ctx.request.body.quizName
+    const courseName = ctx.request.body.courseName
+    const current_datetime = new Date()
+    const isoDate =
+      current_datetime.getDate() +
+      "-" +
+      (current_datetime.getMonth() + 1) +
+      "-" +
+      current_datetime.getFullYear() +
+      "-" +
+      current_datetime.getHours() +
+      "-" +
+      current_datetime.getMinutes()
     if (!validToken(token)) {
       ctx.body = "invalid token"
     } else {
       const stream = await Quiz.getQuizAnswerInfo(quizId)
       ctx.response.set("Content-Type", "text/csv")
-      ctx.response.attachment("quiz-answer-info.csv")
+      ctx.response.attachment(
+        `quiz-answer-info-${quizName}-${courseName}-${isoDate}.csv`,
+      )
       ctx.body = stream
     }
+  })
+
+  .get("/languages/all", admin, async ctx => {
+    ctx.body = await Course.getAllLanguages()
   })
 
 export default dashboard

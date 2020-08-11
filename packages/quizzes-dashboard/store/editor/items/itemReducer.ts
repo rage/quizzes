@@ -198,12 +198,10 @@ export const itemReducer = createReducer<
     return normalized.entities.items ?? {}
   })
   .handleAction(increasedItemOrder, (state, action) => {
-    console.log(state)
     return produce(state, draftState => {
       const order = draftState[action.payload.itemId].order
       if (order < Object.keys(state).length - 1) {
         for (let key in state) {
-          console.log(key)
           if (state[key].order - 1 === order) {
             draftState[key].order = state[key].order - 1
           }
@@ -214,12 +212,10 @@ export const itemReducer = createReducer<
     })
   })
   .handleAction(decreasedItemOrder, (state, action) => {
-    console.log(state)
     return produce(state, draftState => {
       const order = draftState[action.payload.itemId].order
       if (order > 0) {
         for (let key in state) {
-          console.log(key)
           if (state[key].order + 1 === order) {
             draftState[key].order = state[key].order + 1
           }

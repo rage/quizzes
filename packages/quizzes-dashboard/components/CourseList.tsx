@@ -1,6 +1,6 @@
 import React from "react"
 import styled from "styled-components"
-import { Card, CardContent } from "@material-ui/core"
+import { Card, CardContent, Typography } from "@material-ui/core"
 import Link from "next/link"
 import Skeleton from "@material-ui/lab/Skeleton"
 import { Course } from "../types/Quiz"
@@ -17,6 +17,12 @@ const CourseLink = styled.a`
 
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
+`
+
+const StyledTitleWrapper = styled.div`
+  display: flex !important;
+  margin-top: 1.5rem !important;
+  margin-bottom: 1.5rem !important;
 `
 
 interface CourseListProps {
@@ -51,6 +57,11 @@ const CourseList = ({ data, error }: CourseListProps) => {
   }
   return (
     <>
+      <StyledTitleWrapper>
+        <Typography variant="h2" component="h1">
+          All courses
+        </Typography>
+      </StyledTitleWrapper>
       {data.map(course => (
         <Link
           key={course.id}
