@@ -21,6 +21,7 @@ describe("dashboard: get courses", () => {
   })
 
   afterAll(() => {
+    nock.cleanAll()
     return knexCleaner.clean(knex)
   })
 
@@ -87,6 +88,7 @@ describe("dashboard: get quizzes by course id", () => {
   })
 
   afterAll(() => {
+    nock.cleanAll()
     return knexCleaner.clean(knex)
   })
 
@@ -99,6 +101,7 @@ describe("dashboard: get quizzes by course id", () => {
           return [
             200,
             {
+              id: 2345,
               administrator: false,
             } as UserInfo,
           ]
@@ -159,6 +162,7 @@ describe("dashboard: get quiz by id", () => {
   })
 
   afterAll(() => {
+    nock.cleanAll()
     return knexCleaner.clean(knex)
   })
 
@@ -171,6 +175,7 @@ describe("dashboard: get quiz by id", () => {
           return [
             200,
             {
+              id: 2345,
               administrator: false,
             } as UserInfo,
           ]
@@ -229,6 +234,7 @@ describe("dashboard: save quiz", () => {
   })
 
   afterAll(() => {
+    nock.cleanAll()
     return knexCleaner.clean(knex)
   })
 
@@ -241,6 +247,7 @@ describe("dashboard: save quiz", () => {
           return [
             200,
             {
+              id: 2345,
               administrator: false,
             } as UserInfo,
           ]
@@ -321,6 +328,7 @@ describe("dashboard: get answer by id", () => {
   })
 
   afterAll(() => {
+    nock.cleanAll()
     return knexCleaner.clean(knex)
   })
 
@@ -333,6 +341,7 @@ describe("dashboard: get answer by id", () => {
           return [
             200,
             {
+              id: 2345,
               administrator: false,
             } as UserInfo,
           ]
@@ -380,6 +389,7 @@ describe("dashboard: get answers by quiz id", () => {
   })
 
   afterAll(() => {
+    nock.cleanAll()
     return knexCleaner.clean(knex)
   })
 
@@ -392,6 +402,7 @@ describe("dashboard: get answers by quiz id", () => {
           return [
             200,
             {
+              id: 1234,
               administrator: false,
             } as UserInfo,
           ]
@@ -464,6 +475,7 @@ describe("dashboard: get manual review answers", () => {
   })
 
   afterAll(() => {
+    nock.cleanAll()
     return knexCleaner.clean(knex)
   })
 
@@ -476,6 +488,7 @@ describe("dashboard: get manual review answers", () => {
           return [
             200,
             {
+              id: 1234,
               administrator: false,
             } as UserInfo,
           ]
@@ -551,6 +564,7 @@ describe("dashboard: update manual review status", () => {
   })
 
   afterAll(() => {
+    nock.cleanAll()
     return knexCleaner.clean(knex)
   })
 
@@ -563,6 +577,7 @@ describe("dashboard: update manual review status", () => {
           return [
             200,
             {
+              id: 2345,
               administrator: false,
             } as UserInfo,
           ]

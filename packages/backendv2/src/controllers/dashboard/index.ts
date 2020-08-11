@@ -1,53 +1,73 @@
 import Router from "koa-router"
 import { CustomContext, CustomState } from "../../types"
-import { Course, Quiz, QuizAnswer } from "../../models/"
+import { Course, Quiz, QuizAnswer, User } from "../../models/"
 import accessControl, { validToken } from "../../middleware/access_control"
+import {
+  checkAccessOrThrow,
+  getCourseIdByAnswerId,
+  getCourseIdByQuizId,
+} from "./util"
 
 const admin = accessControl({ administator: true })
 
 const dashboard = new Router<CustomState, CustomContext>({
   prefix: "/dashboard",
 })
-  .post("/quizzes", admin, async ctx => {
+  .post("/quizzes", accessControl(), async ctx => {
+    await checkAccessOrThrow(ctx.state.user, ctx.request.body.courseId, "edit")
     const quizData = ctx.request.body
     ctx.body = await Quiz.saveQuiz(quizData)
   })
-  .get("/quizzes/:quizId", admin, async ctx => {
+  .get("/quizzes/:quizId", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    ctx.body = await Quiz.getById(quizId)
+    const quiz = await Quiz.getById(quizId)
+    await checkAccessOrThrow(ctx.state.user, quiz.courseId, "view")
+    ctx.body = quiz
   })
-  .get("/courses/:courseId/quizzes", admin, async ctx => {
+  .get("/courses/:courseId/quizzes", accessControl(), async ctx => {
     const courseId = ctx.params.courseId
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await Quiz.getByCourseId(courseId)
   })
-  .get("/courses", admin, async ctx => {
+  .get("/courses", accessControl(), async ctx => {
+    await checkAccessOrThrow(ctx.state.user)
     ctx.body = await Course.getAll()
   })
-  .get("/courses/:courseId", admin, async ctx => {
+  .get("/courses/:courseId", accessControl(), async ctx => {
     const courseId = ctx.params.courseId
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await Course.getFlattenedById(courseId)
   })
-  .post("/answers/:answerId/status", admin, async ctx => {
+  .post("/answers/:answerId/status", accessControl(), async ctx => {
     const answerId = ctx.params.answerId
+    const courseId = await getCourseIdByAnswerId(answerId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "edit")
     const statusData = ctx.request.body.status
     ctx.body = await QuizAnswer.setManualReviewStatus(answerId, statusData)
   })
-  .get("/answers/:answerId", admin, async ctx => {
+  .get("/answers/:answerId", accessControl(), async ctx => {
     const answerId = ctx.params.answerId
+    const courseId = await getCourseIdByAnswerId(answerId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await QuizAnswer.getById(answerId)
   })
-  .get("/answers/:quizId/all", admin, async ctx => {
+  .get("/answers/:quizId/all", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
+    const courseId = await getCourseIdByQuizId(quizId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
     const { page, size } = ctx.request.query
     ctx.body = await QuizAnswer.getPaginatedByQuizId(quizId, page, size)
   })
-  .get("/answers/:quizId/manual-review", admin, async ctx => {
+  .get("/answers/:quizId/manual-review", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
+    const courseId = await getCourseIdByQuizId(quizId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
     const { page, size } = ctx.request.query
     ctx.body = await QuizAnswer.getPaginatedManualReview(quizId, page, size)
   })
   .post("/quizzes/:quizId/download-quiz-info", async ctx => {
     const quizId = ctx.params.quizId
+    await checkAccessOrThrow(ctx.state.user)
     const token = ctx.request.body
     if (!validToken(token)) {
       ctx.body = "invalid token"
@@ -60,6 +80,7 @@ const dashboard = new Router<CustomState, CustomContext>({
   })
   .post("/quizzes/:quizId/download-peerreview-info", async ctx => {
     const quizId = ctx.params.quizId
+    await checkAccessOrThrow(ctx.state.user)
     const token = ctx.request.body
     if (!validToken(token)) {
       ctx.body = "invalid token"
@@ -72,6 +93,7 @@ const dashboard = new Router<CustomState, CustomContext>({
   })
   .post("/quizzes/:quizId/download-answer-info", async ctx => {
     const quizId = ctx.params.quizId
+    await checkAccessOrThrow(ctx.state.user)
     const token = ctx.request.body
     if (!validToken(token)) {
       ctx.body = "invalid token"

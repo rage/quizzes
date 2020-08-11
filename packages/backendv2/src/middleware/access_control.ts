@@ -23,6 +23,7 @@ export const accessControl = (options?: AccessControlOptions) => {
     } catch (error) {
       throw new UnauthorizedError("unauthorized")
     }
+    console.log(user)
     ctx.state.user = user
     if (options?.administator && !user.administrator) {
       throw new ForbiddenError("forbidden")
