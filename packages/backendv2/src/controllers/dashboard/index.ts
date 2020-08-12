@@ -1,30 +1,42 @@
 import Router from "koa-router"
 import { CustomContext, CustomState } from "../../types"
-import { Course, Quiz, QuizAnswer } from "../../models/"
+import { Course, Quiz, QuizAnswer, User, UserCourseRole } from "../../models/"
 import accessControl, { validToken } from "../../middleware/access_control"
+import {
+  checkAccessOrThrow,
+  getCourseIdByAnswerId,
+  getCourseIdByQuizId,
+  getAccessableCourses,
+} from "./util"
 
 const admin = accessControl({ administator: true })
 
 const dashboard = new Router<CustomState, CustomContext>({
   prefix: "/dashboard",
 })
-  .post("/quizzes", admin, async ctx => {
+  .post("/quizzes", accessControl(), async ctx => {
+    await checkAccessOrThrow(ctx.state.user, ctx.request.body.courseId, "edit")
     const quizData = ctx.request.body
     ctx.body = await Quiz.saveQuiz(quizData)
   })
-  .get("/quizzes/:quizId", admin, async ctx => {
+  .get("/quizzes/:quizId", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    ctx.body = await Quiz.getById(quizId)
+    const quiz = await Quiz.getById(quizId)
+    await checkAccessOrThrow(ctx.state.user, quiz.courseId, "view")
+    ctx.body = quiz
   })
-  .get("/courses/:courseId/quizzes", admin, async ctx => {
+  .get("/courses/:courseId/quizzes", accessControl(), async ctx => {
     const courseId = ctx.params.courseId
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await Quiz.getByCourseId(courseId)
   })
-  .get("/courses", admin, async ctx => {
-    ctx.body = await Course.getAll()
+  .get("/courses", accessControl(), async ctx => {
+    const user = ctx.state.user
+    ctx.body = await getAccessableCourses(ctx.state.user, "view")
   })
-  .get("/courses/:courseId", admin, async ctx => {
+  .get("/courses/:courseId", accessControl(), async ctx => {
     const courseId = ctx.params.courseId
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await Course.getFlattenedById(courseId)
   })
   .post("/courses/:courseId/duplicate-course", async ctx => {
@@ -60,20 +72,28 @@ const dashboard = new Router<CustomState, CustomContext>({
   })
   .post("/answers/:answerId/status", admin, async ctx => {
     const answerId = ctx.params.answerId
+    const courseId = await getCourseIdByAnswerId(answerId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "edit")
     const statusData = ctx.request.body.status
     ctx.body = await QuizAnswer.setManualReviewStatus(answerId, statusData)
   })
-  .get("/answers/:answerId", admin, async ctx => {
+  .get("/answers/:answerId", accessControl(), async ctx => {
     const answerId = ctx.params.answerId
+    const courseId = await getCourseIdByAnswerId(answerId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await QuizAnswer.getById(answerId)
   })
-  .get("/answers/:quizId/all", admin, async ctx => {
+  .get("/answers/:quizId/all", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
+    const courseId = await getCourseIdByQuizId(quizId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
     const { page, size } = ctx.request.query
     ctx.body = await QuizAnswer.getPaginatedByQuizId(quizId, page, size)
   })
-  .get("/answers/:quizId/manual-review", admin, async ctx => {
+  .get("/answers/:quizId/manual-review", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
+    const courseId = await getCourseIdByQuizId(quizId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
     const { page, size } = ctx.request.query
     ctx.body = await QuizAnswer.getPaginatedManualReview(quizId, page, size)
   })
