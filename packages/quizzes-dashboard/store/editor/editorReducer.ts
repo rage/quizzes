@@ -12,29 +12,33 @@ export const editorChangesReducer = createReducer<{ changes: boolean }, action>(
     changes: false,
   },
 ).handleAction(checkForChanges, (state, action) => {
-  return produce(state, draftState => {
-    const initState: Quiz =
-      action.payload.store.editor.quizVariables[
-        action.payload.store.editor.quizId
-      ].initialState
+  if (action.payload.store.editor.quizId !== "") {
+    return produce(state, draftState => {
+      const initState: Quiz =
+        action.payload.store.editor.quizVariables[
+          action.payload.store.editor.quizId
+        ].initialState
 
-    let quizData = {
-      quizzes: action.payload.store.editor.quizzes,
-      items: action.payload.store.editor.items,
-      options: action.payload.store.editor.options,
-      quizId: action.payload.store.editor.quizId,
-    }
+      let quizData = {
+        quizzes: action.payload.store.editor.quizzes,
+        items: action.payload.store.editor.items,
+        options: action.payload.store.editor.options,
+        quizId: action.payload.store.editor.quizId,
+      }
 
-    const newState: Quiz = denormalize(
-      quizData.quizId,
-      normalizedQuiz,
-      quizData,
-    )
+      const newState: Quiz = denormalize(
+        quizData.quizId,
+        normalizedQuiz,
+        quizData,
+      )
 
-    console.log(_.isEqual(initState, newState))
-
-    draftState.changes = !_.isEqual(initState, newState)
-  })
+      draftState.changes = !_.isEqual(initState, newState)
+    })
+  } else {
+    return produce(state, draftState => {
+      draftState.changes = false
+    })
+  }
 })
 
 export default editorChangesReducer

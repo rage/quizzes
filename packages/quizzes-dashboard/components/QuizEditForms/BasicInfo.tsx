@@ -5,10 +5,10 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDateTimePicker,
 } from "@material-ui/pickers"
-import { Typography, TextField, MenuItem } from "@material-ui/core"
+import { Typography, TextField, MenuItem, Fade } from "@material-ui/core"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
+import { faInfoCircle, faExclamation } from "@fortawesome/free-solid-svg-icons"
 import { useDispatch } from "react-redux"
 import {
   editedQuizTitle,
@@ -28,6 +28,25 @@ const SubsectionTitleWrapper = styled.div`
   align-items: center;
   margin-bottom: 1.5rem;
   justify-content: center;
+`
+
+const WarningWrapper = styled.div`
+  display: flex;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  height: 35px;
+  justify-content: center;
+`
+
+const WarningBox = styled.div`
+  display: flex;
+  border-style: solid;
+  border-width: 3px;
+  border-color: #f44336;
+  width: 50%;
+  justify-content: center;
+  align-items: baseline !important;
 `
 
 const InfoContainer = styled.div`
@@ -107,13 +126,15 @@ const BasicInformation = () => {
         <Typography variant="h2">Quiz Information</Typography>
       </SubsectionTitleWrapper>
 
-      <SubsectionTitleWrapper>
-        {changes ? (
-          <StyledWarningText>You have unsaved changes</StyledWarningText>
-        ) : (
-          ""
-        )}
-      </SubsectionTitleWrapper>
+      <WarningWrapper>
+        <Fade in={changes} timeout={500}>
+          <WarningBox>
+            <StyledWarningText variant="overline">
+              You have unsaved changes
+            </StyledWarningText>
+          </WarningBox>
+        </Fade>
+      </WarningWrapper>
 
       <InfoContainer>
         <TextField

@@ -1,20 +1,16 @@
 import { useEffect } from "react"
 import { useTypedSelector } from "../store/store"
 
-export const useBeforeUnload = () => {
+export const useBeforeUnload = (fn: (e: BeforeUnloadEvent) => void) => {
   const changes = useTypedSelector(state => state.editor.editorChanges.changes)
 
   useEffect(() => {
     if (changes) {
-      window.addEventListener("beforeunload", e => {
-        e.preventDefault()
-        e.returnValue = ""
-      })
-      return () =>
-        window.removeEventListener("beforeunload", e => {
-          e.preventDefault()
-          e.returnValue = ""
-        })
+      addEventListener("beforeunload", fn)
+
+      return () => {
+        removeEventListener("beforeunload", fn)
+      }
     }
   }, [changes])
 }
