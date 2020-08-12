@@ -119,3 +119,24 @@ export const increasedItemOrder = createAction(
     itemId: itemId,
   }),
 )<{ itemId: string }>()
+
+export const itemActions = [
+  editedQuizItemBody,
+  editedQuizItemTitle,
+  editedScaleMaxValue,
+  editedScaleMinValue,
+  editedScaleMaxLabel,
+  editedScaleMinLabel,
+  editedValidityRegex,
+  toggledMultiOptions,
+  editedItemSuccessMessage,
+  editedItemFailureMessage,
+  editedItemMaxWords,
+  editedItemMinWords,
+  editedSharedOptionsFeedbackMessage,
+  toggledSharedOptionFeedbackMessage,
+  decreasedItemOrder,
+  increasedItemOrder,
+]
+
+export default itemActions

@@ -1,14 +1,14 @@
-import React from "react"
+import React, { useEffect } from "react"
 import "date-fns"
 import DateFnsUtils from "@date-io/date-fns"
 import {
   MuiPickersUtilsProvider,
   KeyboardDateTimePicker,
 } from "@material-ui/pickers"
-import { Typography, TextField, MenuItem } from "@material-ui/core"
+import { Typography, TextField, MenuItem, Fade } from "@material-ui/core"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
+import { faInfoCircle, faExclamation } from "@fortawesome/free-solid-svg-icons"
 import { useDispatch } from "react-redux"
 import {
   editedQuizTitle,
@@ -21,12 +21,32 @@ import {
   editedQuizzesPart,
 } from "../../store/editor/quiz/quizActions"
 import { useTypedSelector } from "../../store/store"
+import { checkForChanges } from "../../store/editor/editorActions"
 
 const SubsectionTitleWrapper = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 1.5rem;
   justify-content: center;
+`
+
+const WarningWrapper = styled.div`
+  display: flex;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  height: 35px;
+  justify-content: center;
+`
+
+const WarningBox = styled.div`
+  display: flex;
+  border-style: solid;
+  border-width: 3px;
+  border-color: #f44336;
+  width: 50%;
+  justify-content: center;
+  align-items: baseline !important;
 `
 
 const InfoContainer = styled.div`
@@ -48,6 +68,11 @@ const PartField = styled(TextField)`
 const SectionField = styled(TextField)`
   display: flex;
   margin-left: 0.5rem !important;
+`
+
+const StyledWarningText = styled(Typography)`
+  display: flex !important;
+  color: #ff5252 !important;
 `
 
 const BasicInformation = () => {
@@ -86,12 +111,30 @@ const BasicInformation = () => {
     state => state.editor.quizVariables[quizId],
   )
 
+  const store = useTypedSelector(state => state)
+
+  const changes = useTypedSelector(state => state.editor.editorChanges.changes)
+
+  useEffect(() => {
+    dispatch(checkForChanges(store))
+  }, [store])
+
   return (
     <>
       <SubsectionTitleWrapper>
         <TitleIcon icon={faInfoCircle} />
         <Typography variant="h2">Quiz Information</Typography>
       </SubsectionTitleWrapper>
+
+      <WarningWrapper>
+        <Fade in={changes} timeout={500}>
+          <WarningBox>
+            <StyledWarningText variant="overline">
+              You have unsaved changes
+            </StyledWarningText>
+          </WarningBox>
+        </Fade>
+      </WarningWrapper>
 
       <InfoContainer>
         <TextField
