@@ -6,6 +6,10 @@ import PeerReview from "./peer_review"
 import { BadRequestError } from "../util/error"
 import PeerReviewQuestion from "./peer_review_question"
 
+interface CountObject {
+  quizId: number
+}
+
 class QuizAnswer extends Model {
   id!: string
   quizId!: string
@@ -144,6 +148,21 @@ class QuizAnswer extends Model {
       status,
     })
     return quizAnswer
+  }
+
+  public static async getManualReviewCountsByCourseId(courseId: string) {
+    const counts: any[] = await this.query()
+      .select(["quiz_id"])
+      .join("quiz", "quiz_answer.quiz_id", "=", "quiz.id")
+      .where("course_id", courseId)
+      .andWhere("status", "manual-review")
+      .count()
+      .groupBy("quiz_id")
+    const countByQuizId: { [quizId: string]: number } = {}
+    for (const count of counts) {
+      countByQuizId[count.quizId] = count.count
+    }
+    return countByQuizId
   }
 
   private static moveQuestionTextsToparent = (question: PeerReviewQuestion) => {
