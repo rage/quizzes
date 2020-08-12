@@ -191,11 +191,11 @@ const dashboard = new Router<CustomState, CustomContext>({
   })
   .get("/users/current/abilities", accessControl(), async ctx => {
     const courseRoles = await UserCourseRole.getByUserId(ctx.state.user.id)
-    ctx.body = courseRoles.map(courseRole => {
-      const abilitiesByCourse: { [courseId: string]: string[] } = {}
+    const abilitiesByCourse: { [courseId: string]: string[] } = {}
+    for (const courseRole of courseRoles) {
       abilitiesByCourse[courseRole.courseId] = abilitiesByRole[courseRole.role]
-      return abilitiesByCourse
-    })
+    }
+    ctx.body = abilitiesByCourse
   })
 
 export default dashboard
