@@ -39,6 +39,15 @@ const StyledType = styled(Typography)`
   color: #f44336 !important;
 `
 
+const WarningText = styled(Typography)`
+  display: flex !important;
+  color: #f44336 !important;
+`
+
+const Title = styled(Typography)`
+  display: flex !important;
+`
+
 const ShowCoursePage = () => {
   const router = useRouter()
   const id = router.query.courseId?.toString() ?? ""
@@ -206,13 +215,13 @@ const QuizOfSection = ({ quiz, requirinAttention }: quizProps) => {
         <QuizCard color={requirinAttention > 0 ? "red" : "inherit"}>
           <CardContent>
             <TitleContainer>
-              <Typography display="block" color="inherit" variant="body1">
+              <Title color="inherit" variant="body1">
                 {title}
-              </Typography>
+              </Title>
               {requirinAttention > 0 ? (
-                <Typography>
+                <WarningText variant="h5">
                   Answers requiring attention: {requirinAttention}
-                </Typography>
+                </WarningText>
               ) : (
                 ""
               )}
