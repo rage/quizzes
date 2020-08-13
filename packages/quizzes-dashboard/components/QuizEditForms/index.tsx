@@ -19,10 +19,11 @@ const StyledSkeleton = styled(Skeleton)`
 
 const QuizEditForms = () => {
   const quizId = useTypedSelector(state => state.editor.quizId)
+  const changes = useTypedSelector(state => state.editor.editorChanges.changes)
   useBeforeUnload((e: BeforeUnloadEvent) => {
     e.preventDefault()
     e.returnValue = ""
-  })
+  }, changes)
 
   if (!quizId) {
     return (

@@ -17,7 +17,6 @@ import { itemVariableReducers } from "./editor/itemVariables/itemVariableReducer
 import { optionVariableReducers } from "./editor/optionVariables/optionVariableReducers"
 import { quizVariableReducers } from "./editor/quizVariables/quizVariableReducers"
 import editorChangesReducer from "./editor/editorReducer"
-import thunk from "redux-thunk"
 
 const editorReducer = combineReducers({
   quizzes: quizReducer,
@@ -34,7 +33,7 @@ const reducer = combineReducers({
   editor: editorReducer,
 })
 
-const store = createStore(reducer, composeWithDevTools(applyMiddleware(thunk)))
+const store = createStore(reducer, composeWithDevTools())
 
 export interface storeState {
   editor: {

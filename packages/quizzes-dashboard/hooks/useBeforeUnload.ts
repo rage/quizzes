@@ -1,9 +1,9 @@
 import { useEffect } from "react"
-import { useTypedSelector } from "../store/store"
 
-export const useBeforeUnload = (fn: (e: BeforeUnloadEvent) => void) => {
-  const changes = useTypedSelector(state => state.editor.editorChanges.changes)
-
+export const useBeforeUnload = (
+  fn: (e: BeforeUnloadEvent) => void,
+  changes: boolean,
+) => {
   useEffect(() => {
     if (changes) {
       addEventListener("beforeunload", fn)
