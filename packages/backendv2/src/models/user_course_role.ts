@@ -21,6 +21,10 @@ class UserCourseRole extends Model {
   public static async getByUserId(userId: number) {
     return await this.query().where("user_id", userId)
   }
+
+  public static async getByUserIdAndCourseId(userId: number, courseId: string) {
+    return await this.query().where({ user_id: userId, course_id: courseId })
+  }
 }
 
 export default UserCourseRole

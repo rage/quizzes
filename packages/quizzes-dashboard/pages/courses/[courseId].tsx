@@ -3,6 +3,7 @@ import {
   fetchCourseQuizzes,
   getAnswersRequiringAttentionCounts,
   getUsersAbilities,
+  getUserAbilitiesForCourse,
 } from "../../services/quizzes"
 import { groupBy, Dictionary } from "lodash"
 import { Typography, Card, CardContent, Button } from "@material-ui/core"
@@ -59,9 +60,12 @@ const ShowCoursePage = () => {
   const { data, error } = useSWR(id, fetchCourseQuizzes)
   const [answersRequiringAttention, answersError] = usePromise(
     () => getAnswersRequiringAttentionCounts(id),
-    [],
+    [id],
   )
-  const [userAbilities, userError] = usePromise(() => getUsersAbilities(), [])
+  const [userAbilities, userError] = usePromise(
+    () => getUserAbilitiesForCourse(id),
+    [id],
+  )
 
   if (error || answersError || userError) {
     return (
@@ -144,6 +148,11 @@ const ShowCoursePage = () => {
           </Button>
         </Link>
       </CourseTitleWrapper>
+      {userAbilities.includes("duplicate") ? (
+        <DuplicateCourseButton course={course} />
+      ) : (
+        ""
+      )}
       {Object.entries(byPartAndSection).map(([part, section]) => (
         <div key={part}>
           <Typography variant="h4">Part {part}</Typography>
@@ -159,12 +168,6 @@ const ShowCoursePage = () => {
           })}
         </div>
       ))}
-      {userAbilities[course.id]?.includes("duplicate") ? (
-        <DuplicateCourseButton course={course} />
-      ) : (
-        ""
-      )}
-
       <DebugDialog />
     </>
   )
