@@ -3,13 +3,12 @@ import { CustomContext, CustomState } from "../../types"
 import { Course, Quiz, QuizAnswer, User, UserCourseRole } from "../../models/"
 import accessControl, { validToken } from "../../middleware/access_control"
 import {
+  abilitiesByRole,
   checkAccessOrThrow,
   getCourseIdByAnswerId,
   getCourseIdByQuizId,
   getAccessableCourses,
 } from "./util"
-
-const admin = accessControl({ administator: true })
 
 const dashboard = new Router<CustomState, CustomContext>({
   prefix: "/dashboard",
@@ -79,7 +78,7 @@ const dashboard = new Router<CustomState, CustomContext>({
       ctx.body = await Course.getCorrespondanceFile(oldCourseId, courseId)
     }
   })
-  .post("/answers/:answerId/status", admin, async ctx => {
+  .post("/answers/:answerId/status", accessControl(), async ctx => {
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "edit")
@@ -187,9 +186,16 @@ const dashboard = new Router<CustomState, CustomContext>({
       ctx.body = stream
     }
   })
-
-  .get("/languages/all", admin, async ctx => {
+  .get("/languages/all", accessControl(), async ctx => {
     ctx.body = await Course.getAllLanguages()
+  })
+  .get("/users/current/abilities", accessControl(), async ctx => {
+    const courseRoles = await UserCourseRole.getByUserId(ctx.state.user.id)
+    const abilitiesByCourse: { [courseId: string]: string[] } = {}
+    for (const courseRole of courseRoles) {
+      abilitiesByCourse[courseRole.courseId] = abilitiesByRole[courseRole.role]
+    }
+    ctx.body = abilitiesByCourse
   })
 
 export default dashboard
