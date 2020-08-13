@@ -6,6 +6,7 @@ import BasicInfo from "./BasicInfo"
 import { useTypedSelector } from "../../store/store"
 import { Skeleton } from "@material-ui/lab"
 import DebugDialog from "../DebugDialog"
+import useBeforeUnload from "../../hooks/useBeforeUnload"
 
 const StyledId = styled(Typography)`
   margin-bottom: 1rem !important;
@@ -18,6 +19,11 @@ const StyledSkeleton = styled(Skeleton)`
 
 const QuizEditForms = () => {
   const quizId = useTypedSelector(state => state.editor.quizId)
+  const changes = useTypedSelector(state => state.editor.editorChanges.changes)
+  useBeforeUnload((e: BeforeUnloadEvent) => {
+    e.preventDefault()
+    e.returnValue = ""
+  }, changes)
 
   if (!quizId) {
     return (

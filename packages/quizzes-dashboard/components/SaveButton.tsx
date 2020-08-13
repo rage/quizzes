@@ -1,17 +1,38 @@
-import React, { useState } from "react"
-import { Typography, CircularProgress, Snackbar, Fab } from "@material-ui/core"
+import React, { useState, useEffect } from "react"
+import {
+  Typography,
+  CircularProgress,
+  Snackbar,
+  Fab,
+  Zoom,
+} from "@material-ui/core"
 import Alert from "@material-ui/lab/Alert"
 import { useDispatch } from "react-redux"
 import { saveQuiz } from "../services/quizzes"
-import { initializedEditor } from "../store/editor/editorActions"
+import {
+  initializedEditor,
+  checkForChanges,
+} from "../store/editor/editorActions"
 import { useTypedSelector, storeState } from "../store/store"
 import { denormalize, normalize } from "normalizr"
-import { normalizedQuiz, options } from "../schemas"
+import { normalizedQuiz } from "../schemas"
 import { Quiz } from "../types/Quiz"
-import Router, { useRouter } from "next/router"
+import styled from "styled-components"
+
+const StyledFab = styled(Fab)`
+  display: flex !important;
+  position: fixed !important;
+  top: 10% !important;
+  right: 20% !important;
+`
+
+const StyledCircularProgress = styled(CircularProgress)`
+  position: fixed !important;
+  top: 10% !important;
+  right: 20% !important;
+`
 
 const SaveButton = () => {
-  const router = useRouter()
   const dispatch = useDispatch()
 
   const [saved, setSaved] = useState(true)
@@ -20,6 +41,7 @@ const SaveButton = () => {
 
   const store = useTypedSelector(state => state)
   const quizId = useTypedSelector(state => state.editor.quizId)
+  const changes = useTypedSelector(state => state.editor.editorChanges.changes)
 
   const handleClick = async (store: storeState) => {
     setSaved(false)
@@ -76,18 +98,13 @@ const SaveButton = () => {
       }
       dispatch(initializedEditor(data, response))
       setSaved(true)
-      router.push(
-        {
-          pathname: "/quizzes/[id]/edit",
-          query: {
-            quizId: data.result,
-          },
-        },
-        `/quizzes/${data.result}/edit`,
-      )
     }
     setShowMessage(true)
   }
+
+  useEffect(() => {
+    dispatch(checkForChanges(store))
+  }, [store])
 
   if (quizId) {
     return (
@@ -110,37 +127,23 @@ const SaveButton = () => {
         </Snackbar>
 
         {showSpinner ? (
-          <CircularProgress
-            color="secondary"
-            style={{
-              padding: "1rem",
-              position: "fixed",
-              top: 100,
-              right: 100,
-              left: "auto",
-              bottom: "auto",
-            }}
-          />
+          <StyledCircularProgress color="secondary" />
         ) : (
-          <Fab
-            color="primary"
-            variant="extended"
-            onClick={() => handleClick(store)}
-            style={{
-              padding: "1rem",
-              position: "fixed",
-              top: 100,
-              right: 100,
-              left: "auto",
-              bottom: "auto",
-            }}
-          >
-            {store.editor.quizVariables[store.editor.quizId].newQuiz ? (
-              <Typography variant="h6">Create Quiz</Typography>
-            ) : (
-              <Typography variant="h6">Save Quiz</Typography>
-            )}
-          </Fab>
+          <>
+            <Zoom in={changes}>
+              <StyledFab
+                color="primary"
+                variant="extended"
+                onClick={() => handleClick(store)}
+              >
+                {store.editor.quizVariables[store.editor.quizId].newQuiz ? (
+                  <Typography variant="h6">Create Quiz</Typography>
+                ) : (
+                  <Typography variant="h6">Save Quiz</Typography>
+                )}
+              </StyledFab>
+            </Zoom>
+          </>
         )}
       </>
     )

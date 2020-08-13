@@ -6,6 +6,7 @@ import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import {
   editedItemMaxWords,
   editedItemMinWords,
+  editedQuizItemTitle,
 } from "../../../../store/editor/items/itemAction"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
@@ -13,10 +14,10 @@ import {
   faWindowClose,
   faPen,
 } from "@fortawesome/free-solid-svg-icons"
-import { deletedItem } from "../../../../store/editor/editorActions"
 import { useTypedSelector } from "../../../../store/store"
 import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
 import EssayModalContent from "./EssayModalContent"
+import { deletedItem } from "../../../../store/editor/editorActions"
 
 const InfoContainer = styled.div`
   padding: 1rem 0;
@@ -123,6 +124,9 @@ const EssayContent = ({ item }: essayContentProps) => {
           rows={1}
           helperText="Use this if you cannot put the description in the 'Description for the whole quiz'-field. You may want to use this if have another quiz item before this one."
           defaultValue={item.body}
+          onChange={event =>
+            dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
+          }
         />
       </InfoContainer>
       <OneLineInfoContainer>

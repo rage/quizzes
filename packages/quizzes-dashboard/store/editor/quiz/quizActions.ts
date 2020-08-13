@@ -65,3 +65,17 @@ export const editedQuizzesSection = createAction(
     newSection: newSection,
   }),
 )<{ quizId: string; newSection: number }>()
+
+export const quizActions = [
+  editedQuizTitle,
+  editedQuizzesNumberOfTries,
+  editedQuizzesPointsToGain,
+  editedQuizzesPointsGrantingPolicy,
+  editedQuizzesDeadline,
+  editedQuizzesBody,
+  editedQuizzesSubmitmessage,
+  editedQuizzesPart,
+  editedQuizzesSection,
+]
+
+export default quizActions
