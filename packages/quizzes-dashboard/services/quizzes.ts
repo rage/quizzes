@@ -160,3 +160,34 @@ export const getAllLanguages = async (): Promise<{
   }
   throw new Error()
 }
+
+export const getAnswersRequiringAttentionCounts = async (
+  courseId: string,
+): Promise<{ [quizId: string]: number }> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (
+      await api.get(
+        `/courses/${courseId}/count-answers-requiring-attention`,
+        config,
+      )
+    ).data
+  }
+  throw new Error()
+}
+
+export const getUsersAbilities = async (): Promise<{
+  [courseId: string]: string[]
+}> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (await api.get(`/users/current/abilities`, config)).data
+  }
+  throw new Error()
+}

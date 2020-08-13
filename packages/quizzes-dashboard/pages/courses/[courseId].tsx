@@ -1,5 +1,9 @@
 import React from "react"
-import { fetchCourseQuizzes } from "../../services/quizzes"
+import {
+  fetchCourseQuizzes,
+  getAnswersRequiringAttentionCounts,
+  getUsersAbilities,
+} from "../../services/quizzes"
 import { groupBy, Dictionary } from "lodash"
 import { Typography, Card, CardContent, Button } from "@material-ui/core"
 import { Skeleton } from "@material-ui/lab"
@@ -12,6 +16,7 @@ import { Quiz } from "../../types/Quiz"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
 import DuplicateCourseButton from "../../components/DuplicateCourse"
 import Head from "next/head"
+import usePromise from "react-use-promise"
 
 const QuizCard = styled(Card)`
   margin-bottom: 1rem;
@@ -35,6 +40,15 @@ const StyledType = styled(Typography)`
   color: #f44336 !important;
 `
 
+const WarningText = styled(Typography)`
+  display: flex !important;
+  color: #f44336 !important;
+`
+
+const Title = styled(Typography)`
+  display: flex !important;
+`
+
 const ShowCoursePage = () => {
   const router = useRouter()
   const id = router.query.courseId?.toString() ?? ""
@@ -43,8 +57,13 @@ const ShowCoursePage = () => {
     { label: "Course" },
   ])
   const { data, error } = useSWR(id, fetchCourseQuizzes)
+  const [answersRequiringAttention, answersError] = usePromise(
+    () => getAnswersRequiringAttentionCounts(id),
+    [],
+  )
+  const [userAbilities, userError] = usePromise(() => getUsersAbilities(), [])
 
-  if (error) {
+  if (error || answersError || userError) {
     return (
       <>
         <div>
@@ -60,7 +79,7 @@ const ShowCoursePage = () => {
       </>
     )
   }
-  if (!data) {
+  if (!data || !answersRequiringAttention || !userAbilities) {
     return (
       <>
         <div>
@@ -91,6 +110,7 @@ const ShowCoursePage = () => {
     )
   }
 
+  const requirinAttention = answersRequiringAttention
   const quizzes = data.quizzes
   const course = data.course
   const byPart = groupBy(quizzes, "part")
@@ -133,12 +153,18 @@ const ShowCoursePage = () => {
                 key={part + "-" + section}
                 section={section}
                 quizzes={quizzes}
+                requiringAttention={requirinAttention}
               />
             )
           })}
         </div>
       ))}
-      <DuplicateCourseButton course={course} />
+      {userAbilities[course.id]?.includes("duplicate") ? (
+        <DuplicateCourseButton course={course} />
+      ) : (
+        ""
+      )}
+
       <DebugDialog />
     </>
   )
@@ -147,14 +173,25 @@ const ShowCoursePage = () => {
 interface sectionProps {
   section: string
   quizzes: Quiz[]
+  requiringAttention: { [quizId: string]: number }
 }
 
-const SectionOfPart = ({ section, quizzes }: sectionProps) => {
+const SectionOfPart = ({
+  section,
+  quizzes,
+  requiringAttention,
+}: sectionProps) => {
   return (
     <>
       <Typography variant="h6">Section {section}</Typography>
       {quizzes.map(quiz => {
-        return <QuizOfSection key={quiz.id} quiz={quiz} />
+        return (
+          <QuizOfSection
+            key={quiz.id}
+            quiz={quiz}
+            requirinAttention={requiringAttention[quiz.id]}
+          />
+        )
       })}
     </>
   )
@@ -162,9 +199,15 @@ const SectionOfPart = ({ section, quizzes }: sectionProps) => {
 
 interface quizProps {
   quiz: Quiz
+  requirinAttention: number
 }
 
-const QuizOfSection = ({ quiz }: quizProps) => {
+const TitleContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+`
+
+const QuizOfSection = ({ quiz, requirinAttention }: quizProps) => {
   const title = quiz.title
   const types = Array.from(new Set(quiz.items.map(item => item.type)))
   return (
@@ -176,13 +219,20 @@ const QuizOfSection = ({ quiz }: quizProps) => {
       as={`/quizzes/${quiz.id}/overview`}
     >
       <QuizLink>
-        <QuizCard>
+        <QuizCard color={requirinAttention > 0 ? "red" : "inherit"}>
           <CardContent>
-            <div>
-              <Typography display="block" color="inherit" variant="body1">
+            <TitleContainer>
+              <Title color="inherit" variant="body1">
                 {title}
-              </Typography>
-            </div>
+              </Title>
+              {requirinAttention > 0 ? (
+                <WarningText variant="h5">
+                  Answers requiring attention: {requirinAttention}
+                </WarningText>
+              ) : (
+                ""
+              )}
+            </TitleContainer>
             <div>
               <Typography variant="overline" color="secondary"></Typography>
             </div>

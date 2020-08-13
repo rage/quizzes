@@ -80,8 +80,6 @@ const BasicInformation = () => {
 
   const quizId = useTypedSelector(state => state.editor.quizId)
 
-  const quiz = useTypedSelector(state => state.editor.quizzes)
-
   const pointsGrantingPolicy = useTypedSelector(
     state => state.editor.quizzes[quizId].grantPointsPolicy,
   )
@@ -90,9 +88,6 @@ const BasicInformation = () => {
   )
   const pointsToGain = useTypedSelector(
     state => state.editor.quizzes[quizId].points,
-  )
-  const deadline = useTypedSelector(
-    state => state.editor.quizzes[quizId].deadline,
   )
   const title = useTypedSelector(state => state.editor.quizzes[quizId].title)
 
@@ -141,7 +136,7 @@ const BasicInformation = () => {
           label="Quiz Title"
           fullWidth
           variant="outlined"
-          defaultValue={title}
+          defaultValue={title ?? ""}
           onChange={event =>
             dispatch(editedQuizTitle(event.target.value, quizId))
           }
@@ -244,7 +239,7 @@ const BasicInformation = () => {
           rows={5}
           label="Description for the whole quiz"
           variant="outlined"
-          value={body}
+          value={body ?? ""}
           onChange={event =>
             dispatch(editedQuizzesBody(quizId, event.target.value))
           }
@@ -257,7 +252,7 @@ const BasicInformation = () => {
           label="Submit message"
           fullWidth
           variant="outlined"
-          value={submitMessage}
+          value={submitMessage ?? ""}
           onChange={event =>
             dispatch(editedQuizzesSubmitmessage(quizId, event.target.value))
           }
