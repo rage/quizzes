@@ -178,3 +178,16 @@ export const getAnswersRequiringAttentionCounts = async (
   }
   throw new Error()
 }
+
+export const getUsersAbilities = async (): Promise<{
+  [courseId: string]: string[]
+}> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (await api.get(`/users/current/abilities`, config)).data
+  }
+  throw new Error()
+}

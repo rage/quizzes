@@ -2,6 +2,7 @@ import React from "react"
 import {
   fetchCourseQuizzes,
   getAnswersRequiringAttentionCounts,
+  getUsersAbilities,
 } from "../../services/quizzes"
 import { groupBy, Dictionary } from "lodash"
 import { Typography, Card, CardContent, Button } from "@material-ui/core"
@@ -60,8 +61,9 @@ const ShowCoursePage = () => {
     () => getAnswersRequiringAttentionCounts(id),
     [],
   )
+  const [userAbilities, userError] = usePromise(() => getUsersAbilities(), [])
 
-  if (error || answersError) {
+  if (error || answersError || userError) {
     return (
       <>
         <div>
@@ -77,7 +79,7 @@ const ShowCoursePage = () => {
       </>
     )
   }
-  if (!data || !answersRequiringAttention) {
+  if (!data || !answersRequiringAttention || !userAbilities) {
     return (
       <>
         <div>
@@ -157,7 +159,12 @@ const ShowCoursePage = () => {
           })}
         </div>
       ))}
-      <DuplicateCourseButton course={course} />
+      {userAbilities[course.id]?.includes("duplicate") ? (
+        <DuplicateCourseButton course={course} />
+      ) : (
+        ""
+      )}
+
       <DebugDialog />
     </>
   )

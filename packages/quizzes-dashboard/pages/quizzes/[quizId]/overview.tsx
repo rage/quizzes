@@ -1,6 +1,10 @@
 import React from "react"
 import usePromise from "react-use-promise"
-import { fetchQuiz, fetchCourseById } from "../../../services/quizzes"
+import {
+  fetchQuiz,
+  fetchCourseById,
+  getUsersAbilities,
+} from "../../../services/quizzes"
 import { Skeleton } from "@material-ui/lab"
 import styled from "styled-components"
 import { Typography, Card } from "@material-ui/core"
@@ -60,6 +64,7 @@ export const OverView = () => {
     () => fetchCourseById(quiz?.courseId ?? ""),
     [quiz],
   )
+  const [userAbilities, userError] = usePromise(() => getUsersAbilities(), [])
 
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
@@ -73,7 +78,7 @@ export const OverView = () => {
     },
   ])
 
-  if (!quiz || !course) {
+  if (!quiz || !course || !userAbilities) {
     return (
       <>
         <div>
@@ -104,7 +109,7 @@ export const OverView = () => {
     )
   }
 
-  if (quizError || courseError) {
+  if (quizError || courseError || userError) {
     return (
       <>
         <div>
@@ -149,7 +154,11 @@ export const OverView = () => {
           <Typography>{quiz.body}</Typography>
         </DescriptionContainer>
       </StyledCard>
-      <DownloadInfoForms quiz={quiz} course={course} />
+      {userAbilities[course.id]?.includes("download") ? (
+        <DownloadInfoForms quiz={quiz} course={course} />
+      ) : (
+        ""
+      )}
     </>
   )
 }
