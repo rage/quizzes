@@ -4,6 +4,7 @@ import {
   fetchQuiz,
   fetchCourseById,
   getUsersAbilities,
+  getUserAbilitiesForCourse,
 } from "../../../services/quizzes"
 import { Skeleton } from "@material-ui/lab"
 import styled from "styled-components"
@@ -64,7 +65,10 @@ export const OverView = () => {
     () => fetchCourseById(quiz?.courseId ?? ""),
     [quiz],
   )
-  const [userAbilities, userError] = usePromise(() => getUsersAbilities(), [])
+  const [userAbilities, userError] = usePromise(
+    () => getUserAbilitiesForCourse(quiz?.courseId ?? ""),
+    [quiz],
+  )
 
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
@@ -154,7 +158,7 @@ export const OverView = () => {
           <Typography>{quiz.body}</Typography>
         </DescriptionContainer>
       </StyledCard>
-      {userAbilities[course.id]?.includes("download") ? (
+      {userAbilities.includes("download") ? (
         <DownloadInfoForms quiz={quiz} course={course} />
       ) : (
         ""

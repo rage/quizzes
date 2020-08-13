@@ -191,3 +191,16 @@ export const getUsersAbilities = async (): Promise<{
   }
   throw new Error()
 }
+
+export const getUserAbilitiesForCourse = async (
+  courseId: string,
+): Promise<string[]> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (await api.get(`/courses/${courseId}/user/abilities`, config)).data
+  }
+  throw new Error()
+}

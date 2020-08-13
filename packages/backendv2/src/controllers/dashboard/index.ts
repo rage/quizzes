@@ -197,5 +197,20 @@ const dashboard = new Router<CustomState, CustomContext>({
     }
     ctx.body = abilitiesByCourse
   })
+  .get("/courses/:courseId/user/abilities", accessControl(), async ctx => {
+    const courseRole = (
+      await UserCourseRole.getByUserIdAndCourseId(
+        ctx.state.user.id,
+        ctx.params.courseId,
+      )
+    ).map(role => role.role)
+    if (ctx.state.user.administrator) {
+      courseRole.push("admin")
+    }
+    const allAbilities = [
+      ...new Set(courseRole.map(role => abilitiesByRole[role]).flat()),
+    ]
+    ctx.body = allAbilities
+  })
 
 export default dashboard
