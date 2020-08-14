@@ -332,11 +332,11 @@ export default class PeerReviewService {
   }
 
   private statusesByPriority = [
-    "given-more-than-enough",
-    "given-enough",
+    ["given-more-than-enough",  "manual-review-once-received-enough-given-more-than-enough"],
+    ["given-enough", "manual-review-once-received-enough"],
     "submitted",
     "manual-review-once-given-enough",
-    "manual-review-once-given-and-received-enough",
+    "manual-review-once-given-and-received-enough", // "manual-review-but-not-given-and-not-received"
     "manual-review",
     "confirmed",
     "enough-received-but-not-given",
