@@ -82,11 +82,12 @@ class QuizAnswer extends Model {
     quizId: string,
     page: number,
     pageSize: number,
+    order: "asc" | "desc",
   ) {
     const paginated = await this.query()
       .where("quiz_id", quizId)
       .andWhereNot("status", "deprecated")
-      .orderBy("created_at")
+      .orderBy([{ column: "created_at", order: order }])
       .page(page, pageSize)
       .withGraphFetched("userQuizState")
       .withGraphFetched("itemAnswers.[optionAnswers]")
@@ -113,11 +114,12 @@ class QuizAnswer extends Model {
     quizId: string,
     page: number,
     pageSize: number,
+    order: "asc" | "desc",
   ) {
     const paginated = await this.query()
       .where("quiz_id", quizId)
       .andWhere("status", "manual-review")
-      .orderBy("created_at")
+      .orderBy([{ column: "created_at", order: order }])
       .page(page, pageSize)
       .withGraphFetched("userQuizState")
       .withGraphFetched("itemAnswers.[optionAnswers]")

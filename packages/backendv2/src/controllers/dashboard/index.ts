@@ -95,15 +95,20 @@ const dashboard = new Router<CustomState, CustomContext>({
     const quizId = ctx.params.quizId
     const courseId = await getCourseIdByQuizId(quizId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
-    const { page, size } = ctx.request.query
-    ctx.body = await QuizAnswer.getPaginatedByQuizId(quizId, page, size)
+    const { page, size, order } = ctx.request.query
+    ctx.body = await QuizAnswer.getPaginatedByQuizId(quizId, page, size, order)
   })
   .get("/answers/:quizId/manual-review", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
     const courseId = await getCourseIdByQuizId(quizId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
-    const { page, size } = ctx.request.query
-    ctx.body = await QuizAnswer.getPaginatedManualReview(quizId, page, size)
+    const { page, size, order } = ctx.request.query
+    ctx.body = await QuizAnswer.getPaginatedManualReview(
+      quizId,
+      page,
+      size,
+      order,
+    )
   })
   .post("/quizzes/:quizId/download-quiz-info", async ctx => {
     const quizId = ctx.params.quizId

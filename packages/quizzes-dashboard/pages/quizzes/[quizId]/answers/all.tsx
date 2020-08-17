@@ -41,18 +41,25 @@ const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
 `
 
+const OptionsContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+`
+
 export const AllAnswers = () => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
   const [page, setPage] = useState(1)
   const [size, setSize] = useState(10)
+  const [order, setOrder] = useState("desc")
   const [expandAll, setExpandAll] = useState(false)
   let answers: { results: Answer[]; total: number } | undefined
   let error: any
-  ;[answers, error] = usePromise(() => getAllAnswers(quizId, page, size), [
-    page,
-    size,
-  ])
+  ;[answers, error] = usePromise(
+    () => getAllAnswers(quizId, page, size, order),
+    [page, size, order],
+  )
   const [quizResponse, quizError] = usePromise(() => fetchQuiz(quizId), [])
 
   useBreadcrumbs([
@@ -120,6 +127,8 @@ export const AllAnswers = () => {
     )
   }
 
+  console.log(answers)
+
   return (
     <>
       <div>
@@ -165,15 +174,28 @@ export const AllAnswers = () => {
               onChange={(event, nextPage) => setPage(nextPage)}
             />
           </PaginationField>
-          <SwitchField>
-            <Typography>Expand all</Typography>
-            <Switch
-              checked={expandAll}
-              onChange={event => {
-                setExpandAll(event.target.checked)
-              }}
-            />
-          </SwitchField>
+          <OptionsContainer>
+            <SwitchField>
+              <Typography>Expand all</Typography>
+              <Switch
+                checked={expandAll}
+                onChange={event => {
+                  setExpandAll(event.target.checked)
+                }}
+              />
+            </SwitchField>
+            <TextField
+              label="Sort order"
+              variant="outlined"
+              select
+              helperText="Sorts answers by date they've been submitted"
+              value={order}
+              onChange={event => setOrder(event.target.value)}
+            >
+              <MenuItem value="desc">Latest first</MenuItem>
+              <MenuItem value="asc">Oldest first</MenuItem>
+            </TextField>
+          </OptionsContainer>
           <AnswerList
             data={answers.results}
             error={error}

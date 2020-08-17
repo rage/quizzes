@@ -92,6 +92,7 @@ export const getAllAnswers = async (
   quizId: string,
   page: number,
   size: number,
+  order: string,
 ): Promise<{ results: Answer[]; total: number }> => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -100,7 +101,7 @@ export const getAllAnswers = async (
     }
     const response = (
       await api.get(
-        `/answers/${quizId}/all?page=${page - 1}&size=${size}`,
+        `/answers/${quizId}/all?page=${page - 1}&size=${size}&order=${order}`,
         config,
       )
     ).data
@@ -113,6 +114,7 @@ export const getAnswersRequiringAttention = async (
   quizId: string,
   page: number,
   size: number,
+  order: string,
 ): Promise<{ results: Answer[]; total: number }> => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -121,7 +123,8 @@ export const getAnswersRequiringAttention = async (
     }
     const response = (
       await api.get(
-        `/answers/${quizId}/manual-review?page=${page - 1}&size=${size}`,
+        `/answers/${quizId}/manual-review?page=${page -
+          1}&size=${size}&order=${order}`,
         config,
       )
     ).data
