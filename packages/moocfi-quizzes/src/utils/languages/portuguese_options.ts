@@ -32,7 +32,8 @@ const portugueseLabels: SingleLanguageLabels = {
   },
   peerReviews: {
     loadingLabel: "A carregar",
-    noPeerAnswersAvailableLabel: "Não estão disponíveis respostas para avaliação de pares",
+    noPeerAnswersAvailableLabel:
+      "Não estão disponíveis respostas para avaliação de pares",
     chooseButtonLabel: "Selecionar",
     unselectButtonLabel: "Cancelar seleção",
     chooseEssayInstruction: "Escolha uma opção para avaliar",
@@ -43,7 +44,8 @@ const portugueseLabels: SingleLanguageLabels = {
     giveExtraPeerReviewsQuizConfirmed:
       "Pode continuar a realizar avaliações de pares para ajudar os outros",
     givenPeerReviewsLabel: "Avaliações de pares realizadas",
-    peerReviewsCompletedInfo: "Concluiu um número suficiente de avaliações de pares",
+    peerReviewsCompletedInfo:
+      "Concluiu um número suficiente de avaliações de pares",
     reportAsInappropriateLabel: "Denunciar como spam",
     submitPeerReviewLabel: "Enviar a avaliação",
     hidePeerReviewLabel: "Ocultar",
@@ -52,7 +54,8 @@ const portugueseLabels: SingleLanguageLabels = {
     answerRejected: "A sua resposta foi rejeitada",
     answerFlaggedAsSpam: "A sua resposta foi denunciada como spam",
     answerConfirmed: "A sua resposta foi aceite!",
-    manualReview: "A sua resposta está a ser avaliada pela equipa de formadores",
+    manualReview:
+      "A sua resposta está a ser avaliada pela equipa de formadores",
     peerReviewGroupTitle: "Perguntas de revisão por pares",
     peerReviewLikertDetails:
       "Avalie cada afirmação em uma escala de 1 a 5. 1 significa discordo totalmente, 5 significa concordo totalmente.",
@@ -66,7 +69,9 @@ const portugueseLabels: SingleLanguageLabels = {
     noPeerReviewsReceivedlabel:
       "A sua resposta ainda não foi sujeita a uma avaliação por pares",
     numberOfPeerReviewsText: n =>
-      `A sua resposta foi sujeita a ${n} ${n > 0 ? "avaliação" : "avaliações"} por pares.`,
+      `A sua resposta foi sujeita a ${n} ${
+        n > 0 ? "avaliação" : "avaliações"
+      } por pares.`,
     toggleButtonExpandLabel: "Mostrar todas as avaliações por pares recebidas",
     toggleButtonShrinkLabel: "Ocultar avaliações por pares",
     averageOfGradesLabel: "A nota média das avaliações recebidas é",
@@ -141,8 +146,7 @@ const portugueseLabels: SingleLanguageLabels = {
     quizLoadFailedError: "Não foi possível carregar o exercício",
     progressFetchError:
       "Não foi possível recuperar os dados de progresso do curso. Volte a tentar mais tarde.",
-    submitSpamFlagError:
-      "Não foi possível denunciar spam",
+    submitSpamFlagError: "Não foi possível denunciar spam",
     fetchReviewCandidatesError:
       "Algo correu mal durante a recuperação das respostas para avaliação por pares. Volte a tentar mais tarde.",
   },
