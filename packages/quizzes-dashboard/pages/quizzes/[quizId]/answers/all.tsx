@@ -127,8 +127,6 @@ export const AllAnswers = () => {
     )
   }
 
-  console.log(answers)
-
   return (
     <>
       <div>
