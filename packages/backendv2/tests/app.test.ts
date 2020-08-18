@@ -273,7 +273,7 @@ describe("dashboard: save quiz", () => {
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .set("Accept", "application/json")
       .send({ ...data.newQuiz, part: null })
-      .expect(500, done)
+      .expect(400, done)
   })
 
   test("respond with 401 if invalid credentials", done => {

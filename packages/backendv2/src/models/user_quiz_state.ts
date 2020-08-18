@@ -2,6 +2,7 @@ import Model from "./base_model"
 import Quiz from "./quiz"
 import User from "./user"
 import QuizAnswer from "./quiz_answer"
+import Knex from "knex"
 
 class UserQuizState extends Model {
   userId!: number
@@ -57,6 +58,27 @@ class UserQuizState extends Model {
     trx: any,
   ): Promise<UserQuizState> {
     return await this.query(trx).insertGraphAndFetch(userQuizState)
+  }
+
+  public static async updateAwardedPointsForQuiz(
+    oldQuiz: Quiz,
+    newQuiz: Quiz,
+    trx: Knex.Transaction,
+  ) {
+    const oldMaxPoints = oldQuiz.points
+    const maxPoints = newQuiz.points
+
+    await trx("user_quiz_state")
+      .update({
+        points_awarded:
+          oldMaxPoints === 0
+            ? trx.raw(":maxPoints", { maxPoints })
+            : trx.raw("(points_awarded * :maxPoints / :oldMaxPoints)", {
+                maxPoints,
+                oldMaxPoints,
+              }),
+      })
+      .where({ quiz_id: newQuiz.id })
   }
 }
 
