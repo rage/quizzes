@@ -53,7 +53,7 @@ export const DuplicateModal = ({ course }: DuplicateModalProps) => {
 
   let HOST = "http://localhost:3003"
   if (process.env.NODE_ENV === "production") {
-    HOST = "https://quizzes2.mooc.fi"
+    HOST = "https://quizzes.mooc.fi"
   }
 
   return (
