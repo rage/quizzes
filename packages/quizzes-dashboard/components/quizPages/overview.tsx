@@ -3,17 +3,15 @@ import usePromise from "react-use-promise"
 import {
   fetchQuiz,
   fetchCourseById,
-  getUsersAbilities,
   getUserAbilitiesForCourse,
-} from "../../../services/quizzes"
+} from "../../services/quizzes"
 import { Skeleton } from "@material-ui/lab"
 import styled from "styled-components"
 import { Typography, Card } from "@material-ui/core"
 import { useRouter } from "next/router"
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
-import DownloadInfoForms from "../../../components/DownloadInfoForms.tsx"
+import useBreadcrumbs from "../../hooks/useBreadcrumbs"
+import DownloadInfoForms from "../DownloadInfoForms.tsx"
 import Head from "next/head"
-import TabNavigator from "../../../components/TabNavigator"
 
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
@@ -59,13 +57,15 @@ const CourseName = styled.div`
 
 export const OverView = () => {
   const router = useRouter()
+  let userAbilities: string[] | undefined
+  let userError: any
   const quizId = router.query.quizId?.toString() ?? ""
   const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [])
   const [course, courseError] = usePromise(
     () => fetchCourseById(quiz?.courseId ?? ""),
     [quiz],
   )
-  const [userAbilities, userError] = usePromise(
+  ;[userAbilities, userError] = usePromise(
     () => getUserAbilitiesForCourse(quiz?.courseId ?? ""),
     [quiz],
   )
@@ -141,7 +141,6 @@ export const OverView = () => {
           />
         </Head>
       </div>
-      <TabNavigator quizId={quiz.id} value={1} />
       <HeaderContainer>
         <CourseName>
           <Typography>{course.title}</Typography>
