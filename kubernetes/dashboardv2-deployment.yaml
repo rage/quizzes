@@ -28,4 +28,4 @@ spec:
           containerPort: 5000
         env:
           - name: HOST
-            value: "https://quizzes2.mooc.fi"
+            value: "https://quizzes.mooc.fi"

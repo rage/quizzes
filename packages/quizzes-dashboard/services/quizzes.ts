@@ -7,7 +7,7 @@ import { Answer } from "../types/Answer"
 let HOST = "http://localhost:3003"
 
 if (process.env.NODE_ENV === "production") {
-  HOST = "https://quizzes2.mooc.fi"
+  HOST = "https://quizzes.mooc.fi"
 }
 
 const api = axios.create({

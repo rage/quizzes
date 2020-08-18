@@ -21,6 +21,7 @@ export BACKENDV2_IMAGE="eu.gcr.io/moocfi/quizzes-backendv2:build-$REV"
 
 echo "Building new Kubernetes configs"
 mkdir -p "$CURRENT_DIR/../updated-kubernetes-configs"
+envsubst < "$CURRENT_DIR/../kubernetes/quizzes-ingress.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/quizzes-ingress.yaml"
 envsubst < "$CURRENT_DIR/../kubernetes/backend-deployment.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/backend-deployment.yaml"
 envsubst < "$CURRENT_DIR/../kubernetes/backendv2-deployment.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/backendv2-deployment.yaml"
 # envsubst < "$CURRENT_DIR/../kubernetes/migrate-quiznator-data-cronjob.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/migrate-quiznator-data-cronjob.yaml"
