@@ -7,8 +7,17 @@ import { NotFoundError } from "../util/error"
 import moduleInitializer from "../util/initializer"
 import stringify from "csv-stringify"
 import QuizAnswer from "./quiz_answer"
+import knex from "../../database/knex"
+import { BadRequestError } from "../util/error"
+import Knex from "knex"
+import UserQuizState from "./user_quiz_state"
+import * as Kafka from "../services/kafka"
 
 export class Quiz extends Model {
+  id!: string
+  courseId!: string
+  part!: number
+  points!: number
   texts!: QuizTranslation[]
   items!: QuizItem[]
   peerReviews!: PeerReviewCollection[]
@@ -72,7 +81,7 @@ export class Quiz extends Model {
   }
 
   static async saveQuiz(data: any) {
-    const quiz = data
+    const quiz: Quiz = data
     const course = (await Course.getById(quiz.courseId))[0]
     const languageId = course.texts[0].languageId
     quiz.texts = [
@@ -147,7 +156,37 @@ export class Quiz extends Model {
       })
     })
 
-    return this.moveTextsToParent(await Quiz.query().upsertGraphAndFetch(quiz))
+    const trx = await knex.transaction()
+    let savedQuiz
+    try {
+      const oldQuiz = quiz.id
+        ? await this.query(trx).findById(quiz.id)
+        : undefined
+      savedQuiz = await this.query(trx).upsertGraphAndFetch(quiz)
+      await this.updateCourseProgressesIfNecessary(oldQuiz, savedQuiz, trx)
+      await trx.commit()
+    } catch (error) {
+      await trx.rollback()
+      throw new BadRequestError(error)
+    }
+
+    return this.moveTextsToParent(savedQuiz)
+  }
+
+  private static async updateCourseProgressesIfNecessary(
+    oldQuiz: Quiz | undefined,
+    newQuiz: Quiz,
+    trx: Knex.Transaction,
+  ) {
+    if (!oldQuiz) {
+      return
+    }
+    const shouldUpdate =
+      oldQuiz.points !== newQuiz.points || oldQuiz.part !== newQuiz.part
+    if (shouldUpdate) {
+      await UserQuizState.updateAwardedPointsForQuiz(oldQuiz, newQuiz, trx)
+      await Kafka.setTaskToUpdateAndBroadcast(oldQuiz.courseId, trx)
+    }
   }
 
   static async getById(quizId: string) {
