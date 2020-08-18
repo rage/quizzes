@@ -216,8 +216,8 @@ const QuizOfSection = ({ quiz, requirinAttention }: quizProps) => {
   return (
     <Link
       href={{
-        pathname: "/quizzes/[quizId]/overview",
-        query: { quizId: `${quiz.id}` },
+        pathname: "/quizzes/[quizId]/[page]",
+        query: { quizId: `${quiz.id}`, page: "overview" },
       }}
       as={`/quizzes/${quiz.id}/overview`}
     >

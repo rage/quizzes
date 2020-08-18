@@ -9,57 +9,59 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 
-interface NavigatorProps {
-  quizId: string
-  value: number
-}
-
-export const TabNavigator = ({ quizId, value }: NavigatorProps) => {
+export const TabNavigator = () => {
   const router = useRouter()
+  const quizId = router.query.quizId?.toString() ?? ""
+  const page = router.query.page
   return (
     <>
       <Tabs
         variant="fullWidth"
-        value={value}
+        value={page}
         indicatorColor="primary"
         textColor="primary"
-        aria-label="disabled tabs example"
       >
         <Tab
           icon={<FontAwesomeIcon icon={faChalkboard} />}
-          value={1}
+          value="overview"
           label="Overview"
           onClick={() =>
-            router.push("/quizzes/[id]/overview", `/quizzes/${quizId}/overview`)
+            router.push("/quizzes/[id]/[page]", `/quizzes/${quizId}/overview`, {
+              shallow: true,
+            })
           }
         />
         <Tab
           icon={<FontAwesomeIcon icon={faPen} />}
-          value={2}
+          value="edit"
           label="Edit quiz"
           onClick={() =>
-            router.push("/quizzes/[id]/edit", `/quizzes/${quizId}/edit`)
+            router.push("/quizzes/[id]/[page]", `/quizzes/${quizId}/edit`, {
+              shallow: true,
+            })
           }
         />
         <Tab
           icon={<FontAwesomeIcon icon={faScroll} />}
-          value={3}
+          value="all-answers"
           label="All answers"
           onClick={() =>
             router.push(
-              "/quizzes/[id]/answers/all",
-              `/quizzes/${quizId}/answers/all`,
+              "/quizzes/[id]/[page]",
+              `/quizzes/${quizId}/all-answers`,
+              { shallow: true },
             )
           }
         />
         <Tab
           icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
-          value={4}
+          value="answers-requiring-attention"
           label="Answers requiring attention"
           onClick={() =>
             router.push(
-              "/quizzes/[id]/answers/requiring-attention",
-              `/quizzes/${quizId}/answers/requiring-attention`,
+              "/quizzes/[id]/[page]",
+              `/quizzes/${quizId}/answers-requiring-attention`,
+              { shallow: true },
             )
           }
         />

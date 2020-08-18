@@ -3,16 +3,16 @@ import { useRouter } from "next/router"
 import {
   getAnswersRequiringAttention,
   fetchQuiz,
-} from "../../../../services/quizzes"
-import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
-import { AnswerList } from "../../../../components/AnswerList"
+} from "../../../services/quizzes"
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
+import { AnswerList } from "../../AnswerList"
 import usePromise from "react-use-promise"
-import { Answer } from "../../../../types/Answer"
+import { Answer } from "../../../types/Answer"
 import { TextField, MenuItem, Switch, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import { Pagination, Skeleton } from "@material-ui/lab"
 import Head from "next/head"
-import TabNavigator from "../../../../components/TabNavigator"
+import TabNavigator from "../../TabNavigator"
 
 export const SizeSelectorContainer = styled.div`
   display: flex;
@@ -75,12 +75,7 @@ export const RequiringAttention = () => {
       href: "/courses/[courseId]",
     },
     {
-      label: "Quiz Overview",
-      as: `/quizzes/${quizId}/overview`,
-      href: "/quizzes/[quizId]/overview",
-    },
-    {
-      label: "Answers Requiring Attention",
+      label: "Quiz answers requiring attention",
     },
   ])
 
@@ -143,7 +138,6 @@ export const RequiringAttention = () => {
           />
         </Head>
       </div>
-      <TabNavigator quizId={quizId} value={4} />
       {answers.results.length === 0 ? (
         <>
           <Typography variant="h3">No answers requiring attention</Typography>

@@ -1,15 +1,14 @@
 import React, { useState } from "react"
-import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
-import { getAllAnswers, fetchQuiz } from "../../../../services/quizzes"
-import { AnswerList } from "../../../../components/AnswerList"
+import { getAllAnswers, fetchQuiz } from "../../../services/quizzes"
+import { AnswerList } from "../../AnswerList"
 import usePromise from "react-use-promise"
-import { Answer } from "../../../../types/Answer"
+import { Answer } from "../../../types/Answer"
 import { TextField, MenuItem, Switch, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import { Pagination, Skeleton } from "@material-ui/lab"
 import Head from "next/head"
-import TabNavigator from "../../../../components/TabNavigator"
 
 export const SizeSelectorContainer = styled.div`
   display: flex;
@@ -70,12 +69,7 @@ export const AllAnswers = () => {
       href: "/courses/[courseId]",
     },
     {
-      label: "Quiz Overview",
-      as: `/quizzes/${quizId}/overview`,
-      href: "/quizzes/[quizId]/overview",
-    },
-    {
-      label: "All Answers",
+      label: "Quiz all answers",
     },
   ])
 
@@ -138,7 +132,6 @@ export const AllAnswers = () => {
           />
         </Head>
       </div>
-      <TabNavigator quizId={quizId} value={3} />
       {answers.results.length === 0 ? (
         <>
           <Typography variant="h3">No Answers for this quiz</Typography>

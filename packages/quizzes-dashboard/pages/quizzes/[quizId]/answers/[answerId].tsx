@@ -7,7 +7,6 @@ import AnswerCard from "../../../../components/Answer"
 import styled from "styled-components"
 import { Skeleton } from "@material-ui/lab"
 import Head from "next/head"
-import TabNavigator from "../../../../components/TabNavigator"
 
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
@@ -32,14 +31,14 @@ export const AnswerById = () => {
       href: "/courses/[courseId]",
     },
     {
-      label: "Quiz Overview",
+      label: "Quiz page",
       as: `/quizzes/${quizId}/overview`,
       href: "/quizzes/[quizId]/overview",
     },
     {
       label: "All Answers",
-      as: `/quizzes/${quizId}/answers/all`,
-      href: "/quizzes/[quizId]/answers/all",
+      as: `/quizzes/${quizId}/all-answers`,
+      href: "/quizzes/[quizId]/all-answers",
     },
     {
       label: "Answer",
@@ -74,7 +73,6 @@ export const AnswerById = () => {
           />
         </Head>
       </div>
-      <TabNavigator quizId={quizId} value={3} />
       <AnswerCard answer={answerResponse} expanded={expanded} />
     </>
   )

@@ -1,18 +1,18 @@
 import React, { useEffect } from "react"
-import { fetchQuiz } from "../../../services/quizzes"
-import { initializedEditor } from "../../../store/editor/editorActions"
+import { fetchQuiz } from "../../services/quizzes"
+import { initializedEditor } from "../../store/editor/editorActions"
 import { useDispatch } from "react-redux"
 import Typography from "@material-ui/core/Typography"
-import SaveButton from "../../../components/SaveButton"
-import { normalizedQuiz } from "../../../schemas"
+import SaveButton from "../SaveButton"
+import { normalizedQuiz } from "../../schemas"
 import { normalize } from "normalizr"
 import useSWR from "swr"
 import { useRouter } from "next/router"
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
-import QuizEditForms from "../../../components/QuizEditForms"
+import useBreadcrumbs from "../../hooks/useBreadcrumbs"
+import QuizEditForms from "../QuizEditForms"
 import _ from "lodash"
 import Head from "next/head"
-import TabNavigator from "../../../components/TabNavigator"
+import TabNavigator from "../TabNavigator"
 
 const EditPage = () => {
   const router = useRouter()
@@ -43,11 +43,8 @@ const EditPage = () => {
       href: "/courses/[courseId]",
     },
     {
-      label: "Quiz Overview",
-      as: `/quizzes/${data?.id}/overview`,
-      href: "/quizzes/[quizzesId]/overview",
+      label: "Edit quiz",
     },
-    { label: "Edit" },
   ])
 
   if (error) {
@@ -78,7 +75,6 @@ const EditPage = () => {
           />
         </Head>
       </div>
-      <TabNavigator quizId={quizId} value={2} />
       <SaveButton />
       <Typography variant="h1">Editing quiz</Typography>
       <QuizEditForms />
