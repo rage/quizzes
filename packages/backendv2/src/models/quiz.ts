@@ -85,13 +85,13 @@ export class Quiz extends Model {
     const course = (await Course.getById(quiz.courseId))[0]
     const languageId = course.texts[0].languageId
     quiz.texts = [
-      {
+      QuizTranslation.fromJson({
         quizId: quiz.id,
         languageId,
         title: quiz.title,
         body: quiz.body,
         submitMessage: quiz.submitMessage,
-      },
+      }),
     ]
     delete quiz.title
     delete quiz.body
