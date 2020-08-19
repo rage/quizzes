@@ -143,7 +143,7 @@ export const changeAnswerStatus = async (
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
     const response = (
-      await api.post(`/answers/${answerId}/status`, status, config)
+      await api.post(`/answers/${answerId}/status`, { status }, config)
     ).data
     return response
   }
