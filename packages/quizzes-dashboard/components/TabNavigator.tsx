@@ -63,13 +63,17 @@ export const TabNavigator = () => {
           icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
           value="answers-requiring-attention"
           label={
-            <Badge
-              variant="standard"
-              badgeContent={requiringAttention ? requiringAttention : "..."}
-              color="error"
-            >
-              Answers requiring attention
-            </Badge>
+            requiringAttention ? (
+              <Badge
+                variant="standard"
+                badgeContent={requiringAttention}
+                color="error"
+              >
+                Answers requiring attention
+              </Badge>
+            ) : (
+              "Answers requiring attention"
+            )
           }
           onClick={() =>
             router.push(
