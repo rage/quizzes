@@ -19,12 +19,6 @@ const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
 `
 
-const StyledTitleWrapper = styled.div`
-  display: flex !important;
-  margin-top: 1.5rem !important;
-  margin-bottom: 1.5rem !important;
-`
-
 interface CourseListProps {
   data: Course[] | undefined
   error: any
@@ -57,11 +51,6 @@ const CourseList = ({ data, error }: CourseListProps) => {
   }
   return (
     <>
-      <StyledTitleWrapper>
-        <Typography variant="h2" component="h1">
-          All courses
-        </Typography>
-      </StyledTitleWrapper>
       {data.map(course => (
         <Link
           key={course.id}
