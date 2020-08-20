@@ -205,15 +205,22 @@ interface quizProps {
   requirinAttention: number
 }
 
-const TitleContainer = styled.div`
+const TitleWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+`
+
+const TitleContainer = styled.div`
+  display: flex;
+  width: 60%;
+  margin-right: 0.5px;
 `
 
 const ButtonContainer = styled.div`
   display: flex;
   width: 40%;
   justify-content: space-between;
+  margin-left: 0.5px;
 `
 
 const QuizOfSection = ({ quiz, requirinAttention }: quizProps) => {
@@ -230,10 +237,12 @@ const QuizOfSection = ({ quiz, requirinAttention }: quizProps) => {
       <QuizLink>
         <QuizCard>
           <CardContent>
-            <TitleContainer>
-              <Title color="inherit" variant="body1">
-                {title}
-              </Title>
+            <TitleWrapper>
+              <TitleContainer>
+                <Title color="inherit" variant="body1">
+                  {title}
+                </Title>
+              </TitleContainer>
               <ButtonContainer>
                 <Badge
                   color="error"
@@ -269,7 +278,7 @@ const QuizOfSection = ({ quiz, requirinAttention }: quizProps) => {
                   <Button variant="outlined">Edit quiz</Button>
                 </Link>
               </ButtonContainer>
-            </TitleContainer>
+            </TitleWrapper>
             {types.length > 0 ? (
               <div>
                 [{" "}

@@ -111,7 +111,7 @@ export const AnswerContent = ({ answer, expanded }: AnswerContentProps) => {
         <ContentContainer>
           <ItemAnswers itemAnswers={answer.itemAnswers} />
         </ContentContainer>
-        {answer.peerReviews === null ? (
+        {answer.peerReviews.length > 0 ? (
           <PeerreviewButton
             variant="outlined"
             title=":D"
