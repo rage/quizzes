@@ -1,5 +1,5 @@
 import React from "react"
-import { Tabs, Tab } from "@material-ui/core"
+import { Tabs, Tab, Badge } from "@material-ui/core"
 import { useRouter } from "next/router"
 import {
   faPen,
@@ -8,11 +8,17 @@ import {
   faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { getAnswersRequiringAttentionByQuizId } from "../services/quizzes"
+import usePromise from "react-use-promise"
 
 export const TabNavigator = () => {
   const router = useRouter()
   const quizId = router.query.quizId?.toString() ?? ""
   const page = router.query.page
+  const [requiringAttention, error] = usePromise(
+    () => getAnswersRequiringAttentionByQuizId(quizId),
+    [quizId],
+  )
   return (
     <>
       <Tabs
@@ -56,7 +62,15 @@ export const TabNavigator = () => {
         <Tab
           icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
           value="answers-requiring-attention"
-          label="Answers requiring attention"
+          label={
+            <Badge
+              variant="standard"
+              badgeContent={requiringAttention ? requiringAttention : "..."}
+              color="error"
+            >
+              Answers requiring attention
+            </Badge>
+          }
           onClick={() =>
             router.push(
               "/quizzes/[id]/[page]",

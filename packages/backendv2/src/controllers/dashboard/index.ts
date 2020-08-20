@@ -47,6 +47,16 @@ const dashboard = new Router<CustomState, CustomContext>({
       ctx.body = await QuizAnswer.getManualReviewCountsByCourseId(courseId)
     },
   )
+  .get(
+    "/quizzes/:quizId/count-answers-requiring-attention",
+    accessControl(),
+    async ctx => {
+      const quizId = ctx.params.quizId
+      const quiz = await Quiz.getById(quizId)
+      await checkAccessOrThrow(ctx.state.user, quiz.courseId, "view")
+      ctx.body = await QuizAnswer.getManualReviewCountByQuizId(quizId)
+    },
+  )
   .post("/courses/:courseId/duplicate-course", async ctx => {
     const oldCourseId = ctx.params.courseId
     const token = ctx.request.body.token

@@ -207,3 +207,21 @@ export const getUserAbilitiesForCourse = async (
   }
   throw new Error()
 }
+
+export const getAnswersRequiringAttentionByQuizId = async (
+  quizId: string,
+): Promise<number> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (
+      await api.get(
+        `/quizzes/${quizId}/count-answers-requiring-attention`,
+        config,
+      )
+    ).data
+  }
+  throw new Error()
+}
