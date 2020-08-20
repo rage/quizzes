@@ -6,7 +6,7 @@ import {
   getUserAbilitiesForCourse,
 } from "../../services/quizzes"
 import { groupBy, Dictionary } from "lodash"
-import { Typography, Card, CardContent, Button } from "@material-ui/core"
+import { Typography, Card, CardContent, Button, Badge } from "@material-ui/core"
 import { Skeleton } from "@material-ui/lab"
 import DebugDialog from "../../components/DebugDialog"
 import Link from "next/link"
@@ -210,6 +210,12 @@ const TitleContainer = styled.div`
   justify-content: space-between;
 `
 
+const ButtonContainer = styled.div`
+  display: flex;
+  width: 40%;
+  justify-content: space-between;
+`
+
 const QuizOfSection = ({ quiz, requirinAttention }: quizProps) => {
   const title = quiz.title
   const types = Array.from(new Set(quiz.items.map(item => item.type)))
@@ -222,28 +228,55 @@ const QuizOfSection = ({ quiz, requirinAttention }: quizProps) => {
       as={`/quizzes/${quiz.id}/overview`}
     >
       <QuizLink>
-        <QuizCard color={requirinAttention > 0 ? "red" : "inherit"}>
+        <QuizCard>
           <CardContent>
             <TitleContainer>
               <Title color="inherit" variant="body1">
                 {title}
               </Title>
-              {requirinAttention > 0 ? (
-                <WarningText variant="h5">
-                  Answers requiring attention: {requirinAttention}
-                </WarningText>
-              ) : (
-                ""
-              )}
+              <ButtonContainer>
+                <Badge
+                  color="error"
+                  badgeContent={requirinAttention}
+                  invisible={requirinAttention === undefined}
+                  max={99}
+                >
+                  <Link
+                    href={{
+                      pathname: "/quizzes/[quizId]/[page]",
+                      query: {
+                        quizId: `${quiz.id}`,
+                        page: "answers-requiring-attention",
+                      },
+                    }}
+                    as={`/quizzes/${quiz.id}/answers-requiring-attention`}
+                  >
+                    <Button variant="outlined">
+                      <Typography>Answers requiring attention</Typography>
+                    </Button>
+                  </Link>
+                </Badge>
+                <Link
+                  href={{
+                    pathname: "/quizzes/[quizId]/[page]",
+                    query: {
+                      quizId: `${quiz.id}`,
+                      page: "edit",
+                    },
+                  }}
+                  as={`/quizzes/${quiz.id}/edit`}
+                >
+                  <Button variant="outlined">Edit quiz</Button>
+                </Link>
+              </ButtonContainer>
             </TitleContainer>
-            <div>
-              <Typography variant="overline" color="secondary"></Typography>
-            </div>
             {types.length > 0 ? (
               <div>
                 [{" "}
                 {types.map(type => (
-                  <StyledType variant="overline">{type} </StyledType>
+                  <StyledType key={type} variant="overline">
+                    {type}{" "}
+                  </StyledType>
                 ))}
                 ]
               </div>

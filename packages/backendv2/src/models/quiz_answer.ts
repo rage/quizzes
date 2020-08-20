@@ -167,6 +167,17 @@ class QuizAnswer extends Model {
     return countByQuizId
   }
 
+  public static async getManualReviewCountByQuizId(quizId: string) {
+    const count: any[] = await this.query()
+      .select(["quiz_id"])
+      .where("quiz_id", quizId)
+      .andWhere("status", "manual-review")
+      .count()
+      .groupBy("quiz_id")
+
+    return count[0].count
+  }
+
   private static moveQuestionTextsToparent = (question: PeerReviewQuestion) => {
     question.title = question.texts[0].title
     question.body = question.texts[0].body
