@@ -4,6 +4,7 @@ import Link from "next/link"
 import BreadCrumbContext from "../contexts/BreadCrumbContext"
 import { Alert, Skeleton } from "@material-ui/lab"
 import styled from "styled-components"
+import LoginStateContext from "../contexts/LoginStateContext"
 
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
@@ -11,6 +12,17 @@ const StyledSkeleton = styled(Skeleton)`
 
 const StyledBreadcrumbs = styled(Breadcrumbs)`
   margin-bottom: 1rem !important;
+`
+
+const BreadCrumbText = styled(Typography)`
+  display: flex !important;
+  color: lavender !important;
+`
+
+const BreadCrumbLink = styled.a`
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
 `
 
 const BreadCrumb = () => {
@@ -41,10 +53,10 @@ const BreadCrumb = () => {
         <div key={crumb.label}>
           {crumb.as && crumb.href ? (
             <Link href={crumb.href} as={crumb.as}>
-              <a>{crumb.label}</a>
+              <BreadCrumbLink>{crumb.label}</BreadCrumbLink>
             </Link>
           ) : (
-            <Typography>{crumb.label}</Typography>
+            <BreadCrumbText>{crumb.label}</BreadCrumbText>
           )}
         </div>
       ))}

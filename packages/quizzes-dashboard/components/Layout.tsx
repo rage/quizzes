@@ -27,7 +27,6 @@ const Template = ({ children }: TemplateProps) => {
           <BreadCrumbs>
             <TopBar />
             <Container maxWidth="md">
-              <BreadCrumb />
               <LoginStateWrapper>{children}</LoginStateWrapper>
             </Container>
           </BreadCrumbs>

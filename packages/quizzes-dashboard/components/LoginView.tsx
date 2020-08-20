@@ -11,6 +11,7 @@ import {
 import { authenticate } from "../services/tmcApi"
 import Alert from "@material-ui/lab/Alert"
 import LoginStateContext from "../contexts/LoginStateContext"
+import useBreadcrumbs from "../hooks/useBreadcrumbs"
 
 const LoginFieldContainer = styled.div`
   left: 0px;
@@ -52,6 +53,7 @@ const LoginView = () => {
     setUserName("")
     setPassword("")
   }
+  useBreadcrumbs([])
 
   return (
     <>

@@ -111,13 +111,17 @@ export const AnswerContent = ({ answer, expanded }: AnswerContentProps) => {
         <ContentContainer>
           <ItemAnswers itemAnswers={answer.itemAnswers} />
         </ContentContainer>
-        <PeerreviewButton
-          variant="outlined"
-          title=":D"
-          onClick={() => setShowPeerreviewModal(true)}
-        >
-          <Typography variant="subtitle2">Show Peerreviews</Typography>
-        </PeerreviewButton>
+        {answer.peerReviews === null ? (
+          <PeerreviewButton
+            variant="outlined"
+            title=":D"
+            onClick={() => setShowPeerreviewModal(true)}
+          >
+            <Typography variant="subtitle2">Show Peerreviews</Typography>
+          </PeerreviewButton>
+        ) : (
+          ""
+        )}
       </Collapse>
       <StatsContainer>
         <CompactPeerReviewStats answer={answer} />
