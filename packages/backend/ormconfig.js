@@ -8,7 +8,7 @@ module.exports = {
   username: process.env.DB_USER || undefined,
   migrations: ["dist/backend/src/migration/*.js"],
   cli: {
-    migrationsDir: "packages/backend/src/migration",
+    migrationsDir: "src/migration",
   },
   entities: ["./dist/src/models/**/*.js"],
   extra: {
