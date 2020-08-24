@@ -23,6 +23,7 @@ const StyledSkeleton = styled(Skeleton)`
 const SortSelector = styled(TextField)`
   display: flex !important;
   width: 25% !important;
+  margin-right: 1rem !important;
 `
 
 const OrderSelector = styled(TextField)`

@@ -74,13 +74,26 @@ const PeerreviewModal = styled(Modal)`
 export interface AnswerContentProps {
   answer: Answer
   expanded: boolean
+  setFaded: (faded: boolean) => void
+  setStatus: (accepted: string) => void
 }
 
-export const AnswerContent = ({ answer, expanded }: AnswerContentProps) => {
+export const AnswerContent = ({
+  answer,
+  expanded,
+  setFaded,
+  setStatus,
+}: AnswerContentProps) => {
   const [showMore, setShowMore] = useState(expanded)
   const [showPeerreviewModal, setShowPeerreviewModal] = useState(false)
+  const [handled, setHandled] = useState(false)
 
   useEffect(() => setShowMore(expanded), [expanded])
+  useEffect(() => {
+    if (handled) {
+      setFaded(true)
+    }
+  }, [handled])
 
   return (
     <>
@@ -138,7 +151,12 @@ export const AnswerContent = ({ answer, expanded }: AnswerContentProps) => {
         )}
       </StatButtonWrapper>
       {answer.status === "manual-review" ? (
-        <ManualReviewField answer={answer} />
+        <ManualReviewField
+          answer={answer}
+          handled={handled}
+          setHandled={setHandled}
+          setStatus={setStatus}
+        />
       ) : (
         ""
       )}

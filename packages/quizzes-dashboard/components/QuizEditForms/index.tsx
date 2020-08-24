@@ -8,11 +8,6 @@ import { Skeleton } from "@material-ui/lab"
 import DebugDialog from "../DebugDialog"
 import useBeforeUnload from "../../hooks/useBeforeUnload"
 
-const StyledId = styled(Typography)`
-  margin-bottom: 1rem !important;
-  color: #333;
-`
-
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
 `
@@ -36,7 +31,6 @@ const QuizEditForms = () => {
   }
   return (
     <>
-      <StyledId variant="subtitle1">{quizId}</StyledId>
       <BasicInfo />
       <QuizItems />
       <DebugDialog />

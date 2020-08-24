@@ -12,7 +12,15 @@ import useBreadcrumbs from "../../hooks/useBreadcrumbs"
 import QuizEditForms from "../QuizEditForms"
 import _ from "lodash"
 import Head from "next/head"
-import TabNavigator from "../TabNavigator"
+import styled from "styled-components"
+
+const QuizTitleWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+`
 
 const EditPage = () => {
   const router = useRouter()
@@ -76,7 +84,9 @@ const EditPage = () => {
         </Head>
       </div>
       <SaveButton />
-      <Typography variant="h1">Editing quiz</Typography>
+      <QuizTitleWrapper>
+        <Typography variant="h2">{data?.title}</Typography>
+      </QuizTitleWrapper>
       <QuizEditForms />
     </>
   )
