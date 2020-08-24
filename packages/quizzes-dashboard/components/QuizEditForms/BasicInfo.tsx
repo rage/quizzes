@@ -19,6 +19,7 @@ import {
   editedQuizzesBody,
   editedQuizzesSubmitmessage,
   editedQuizzesPart,
+  editedQuizzesSection,
 } from "../../store/editor/quiz/quizActions"
 import { useTypedSelector } from "../../store/store"
 import { checkForChanges } from "../../store/editor/editorActions"
@@ -160,7 +161,7 @@ const BasicInformation = () => {
           value={section}
           type="number"
           onChange={event =>
-            dispatch(editedQuizzesPart(quizId, Number(event.target.value)))
+            dispatch(editedQuizzesSection(quizId, Number(event.target.value)))
           }
         />
       </InfoContainer>
