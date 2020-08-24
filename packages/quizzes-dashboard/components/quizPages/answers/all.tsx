@@ -46,6 +46,14 @@ const OptionsContainer = styled.div`
   width: 100%;
 `
 
+const QuizTitleWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+`
+
 export const AllAnswers = () => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
@@ -138,6 +146,9 @@ export const AllAnswers = () => {
         </>
       ) : (
         <>
+          <QuizTitleWrapper>
+            <Typography variant="h2">{quizResponse?.title}</Typography>
+          </QuizTitleWrapper>
           <SizeSelectorContainer>
             <SizeSelectorField
               value={size}

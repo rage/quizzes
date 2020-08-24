@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { useRouter } from "next/router"
 import {
   getAnswersRequiringAttention,
@@ -12,7 +12,6 @@ import { TextField, MenuItem, Switch, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import { Pagination, Skeleton } from "@material-ui/lab"
 import Head from "next/head"
-import TabNavigator from "../../TabNavigator"
 
 export const SizeSelectorContainer = styled.div`
   display: flex;
@@ -49,6 +48,14 @@ const OptionsContainer = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
+`
+
+const QuizTitleWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
 `
 
 export const RequiringAttention = () => {
@@ -140,10 +147,16 @@ export const RequiringAttention = () => {
       </div>
       {answers.results.length === 0 ? (
         <>
+          <QuizTitleWrapper>
+            <Typography variant="h2">{quizResponse?.title}</Typography>
+          </QuizTitleWrapper>
           <Typography variant="h3">No answers requiring attention</Typography>
         </>
       ) : (
         <>
+          <QuizTitleWrapper>
+            <Typography variant="h1">{quizResponse?.title}</Typography>
+          </QuizTitleWrapper>
           <SizeSelectorContainer>
             <SizeSelectorField
               value={size}
@@ -154,8 +167,8 @@ export const RequiringAttention = () => {
               onChange={event => setSize(Number(event.target.value))}
             >
               <MenuItem value={10}>10</MenuItem>
-              <MenuItem value={15}>15</MenuItem>
-              <MenuItem value={20}>20</MenuItem>
+              <MenuItem value={50}>50</MenuItem>
+              <MenuItem value={100}>100</MenuItem>
             </SizeSelectorField>
           </SizeSelectorContainer>
           <PaginationField>

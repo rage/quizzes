@@ -148,7 +148,7 @@ const SaveButton = () => {
       </>
     )
   } else {
-    return <div>Waiting...</div>
+    return <></>
   }
 }
 

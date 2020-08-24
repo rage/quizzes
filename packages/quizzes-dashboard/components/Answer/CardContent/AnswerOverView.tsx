@@ -22,6 +22,7 @@ export const AnswerOverView = ({ answer }: AnswerOverViewProps) => {
         Points:{" "}
         {answer.userQuizState ? answer.userQuizState.pointsAwarded : "0"}
       </StyledTypo>
+      <StyledTypo>Spam flags: {answer.userQuizState.spamFlags}</StyledTypo>
     </>
   )
 }

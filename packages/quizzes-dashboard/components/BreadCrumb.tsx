@@ -10,9 +10,7 @@ const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
 `
 
-const StyledBreadcrumbs = styled(Breadcrumbs)`
-  margin-bottom: 1rem !important;
-`
+const StyledBreadcrumbs = styled(Breadcrumbs)``
 
 const BreadCrumbText = styled(Typography)`
   display: flex !important;
@@ -29,6 +27,7 @@ const BreadCrumb = () => {
   const [loading, setLoading] = useState(true)
   const { breadCrumbs } = useContext(BreadCrumbContext)
   const breadCrumbsNotDefined = breadCrumbs.length === 0
+  const { loggedIn } = useContext(LoginStateContext)
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       setLoading(false)
@@ -40,7 +39,7 @@ const BreadCrumb = () => {
   if (loading && breadCrumbsNotDefined) {
     return <StyledSkeleton variant="rect" height={50} />
   }
-  if (breadCrumbsNotDefined) {
+  if (breadCrumbsNotDefined && loggedIn) {
     return (
       <Alert severity="warning">
         This page has not specified the contents of breadcrumb.
