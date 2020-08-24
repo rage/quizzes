@@ -225,3 +225,16 @@ export const getAnswersRequiringAttentionByQuizId = async (
   }
   throw new Error()
 }
+
+export const QetQuizAnswerStatistics = async (
+  quizId: string,
+): Promise<{ [status: string]: number }> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (await api.get(`/quizzes/${quizId}/answerStatistics`, config)).data
+  }
+  throw new Error()
+}

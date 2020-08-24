@@ -227,5 +227,11 @@ const dashboard = new Router<CustomState, CustomContext>({
     ]
     ctx.body = allAbilities
   })
+  .get("/quizzes/:quizId/answerStatistics", accessControl(), async ctx => {
+    const quizId = ctx.params.quizId
+    const courseId = await getCourseIdByQuizId(quizId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
+    ctx.body = await QuizAnswer.getAnswerCountsByStatus(quizId)
+  })
 
 export default dashboard

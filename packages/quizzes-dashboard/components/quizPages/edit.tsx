@@ -1,38 +1,35 @@
 import React, { useEffect } from "react"
-import { fetchQuiz } from "../../services/quizzes"
+import { fetchQuiz, fetchCourseById } from "../../services/quizzes"
 import { initializedEditor } from "../../store/editor/editorActions"
 import { useDispatch } from "react-redux"
-import Typography from "@material-ui/core/Typography"
 import SaveButton from "../SaveButton"
 import { normalizedQuiz } from "../../schemas"
 import { normalize } from "normalizr"
-import useSWR from "swr"
 import { useRouter } from "next/router"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
 import QuizEditForms from "../QuizEditForms"
 import _ from "lodash"
-import Head from "next/head"
-import styled from "styled-components"
-
-const QuizTitleWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-`
+import QuizTitle from "./QuizTitleContainer"
+import usePromise from "react-use-promise"
+import { TabText, TabTextLoading, TabTextError } from "./TabHeaders"
 
 const EditPage = () => {
   const router = useRouter()
   const quizId: string = router.query.quizId?.toString() ?? ""
-  const { data, error } = useSWR(quizId, fetchQuiz)
+
+  const [quizData, error] = usePromise(() => fetchQuiz(quizId), [quizId])
+  const [course, courseError] = usePromise(
+    () => fetchCourseById(quizData?.courseId ?? ""),
+    [quizData],
+  )
+
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (!data) {
+    if (!quizData) {
       return
     }
-    const quiz = data
+    const quiz = quizData
     const storeState = normalize(quiz, normalizedQuiz)
     const normalizedData = {
       quizzes: storeState.entities.quizzes ?? {},
@@ -41,13 +38,13 @@ const EditPage = () => {
       result: storeState.result,
     }
     dispatch(initializedEditor(normalizedData, quiz))
-  }, [data])
+  }, [quizData])
 
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
       label: "Course",
-      as: `/courses/${data?.courseId}`,
+      as: `/courses/${quizData?.courseId}`,
       href: "/courses/[courseId]",
     },
     {
@@ -55,38 +52,29 @@ const EditPage = () => {
     },
   ])
 
-  if (error) {
+  if (error || courseError) {
     return (
       <>
-        <div>
-          <Head>
-            <title>womp womp... | Quizzes</title>
-            <meta
-              name="quizzes"
-              content="initial-scale=1.0, width=device-width"
-            />
-          </Head>
-        </div>
+        <TabTextError />
         <div>Something went wrong</div>
+      </>
+    )
+  }
+
+  if (!quizData || !course) {
+    return (
+      <>
+        <TabTextLoading />
+        <div>loading...</div>
       </>
     )
   }
 
   return (
     <>
-      <div>
-        <Head>
-          <title>Editing {data?.title} | Quizzes</title>
-          <meta
-            name="quizzes"
-            content="initial-scale=1.0, width=device-width"
-          />
-        </Head>
-      </div>
+      <TabText text={`Editing ${quizData?.title}`} />
       <SaveButton />
-      <QuizTitleWrapper>
-        <Typography variant="h2">{data?.title}</Typography>
-      </QuizTitleWrapper>
+      <QuizTitle quiz={quizData} course={course} />
       <QuizEditForms />
     </>
   )

@@ -178,6 +178,26 @@ class QuizAnswer extends Model {
     return count[0].count
   }
 
+  public static async getAnswerCountsByStatus(quizId: string) {
+    const counts: any[] = await this.query()
+      .select("status")
+      .where("quiz_id", quizId)
+      .count()
+      .groupBy("status")
+
+    const total: any[] = await this.query()
+      .where("quiz_id", quizId)
+      .count()
+
+    const countByStatus: { [status: string]: number } = {}
+    for (const count of counts) {
+      countByStatus[count.status] = Number(count.count)
+    }
+    countByStatus["total"] = Number(total[0].count)
+
+    return countByStatus
+  }
+
   private static moveQuestionTextsToparent = (question: PeerReviewQuestion) => {
     question.title = question.texts[0].title
     question.body = question.texts[0].body
