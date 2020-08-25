@@ -458,8 +458,14 @@ export default class ValidationService {
         }
       }
       if (flaggedButKeepInPeerReviewPool) {
-        if (givenEnough && receivedEnough) {
-          return "manual-review"
+        if (givenEnough) {
+          if (receivedEnough) {
+            return "manual-review"
+          } else if (givenExtra) {
+            return "manual-review-once-received-enough-given-more-than-enough"
+          } else {
+            return "manual-review-once-received-enough"
+          }
         } else if (receivedEnough) {
           return "manual-review-once-given-enough"
         } else {
