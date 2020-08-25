@@ -1,6 +1,6 @@
 import { MigrationInterface, QueryRunner } from "typeorm"
 
-export class addNewStatusValues1587368274093 implements MigrationInterface {
+export class addAnswerStatuses1597897789403 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     await queryRunner.query(
       "DROP MATERIALIZED VIEW IF EXISTS reaktor.spam_flag, reaktor.peer_review_question_answer; " +
