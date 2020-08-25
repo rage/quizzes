@@ -13,6 +13,7 @@ import {
   SpamFlag,
   UserQuizState,
 } from "../models"
+import { QuizAnswerStatusType } from "../models/quiz_answer"
 import { randomUUID } from "../util"
 import CourseService from "./course.service"
 import KafkaService from "./kafka.service"
@@ -331,15 +332,21 @@ export default class PeerReviewService {
     return await this.entityManager.query(query.toQuery())
   }
 
-  private statusesByPriority = [
-    "given-more-than-enough",
-    "given-enough",
-    "submitted",
-    "manual-review-once-given-enough",
-    "manual-review-once-given-and-received-enough",
-    "manual-review",
-    "confirmed",
-    "enough-received-but-not-given",
+  private statusesByPriority: (
+    | QuizAnswerStatusType
+    | QuizAnswerStatusType[]
+  )[] = [
+    [
+      "given-more-than-enough",
+      "manual-review-once-received-enough-given-more-than-enough",
+    ],
+    ["given-enough", "manual-review-once-received-enough"],
+    ["submitted"],
+    ["manual-review-once-given-enough"],
+    ["manual-review-once-given-and-received-enough"],
+    ["manual-review"],
+    ["confirmed"],
+    ["enough-received-but-not-given"],
   ]
 
   private addCriteriaBasedOnPriority(
@@ -351,14 +358,14 @@ export default class PeerReviewService {
     if (priority < this.statusesByPriority.length) {
       queryBuilder = queryBuilder
         .andWhere("quiz_answer.id", "NOT IN", rejected)
-        .andWhere("quiz_answer.status", this.statusesByPriority[priority])
+        .andWhere("quiz_answer.status", "IN", this.statusesByPriority[priority])
         .orderBy("quiz_answer.created_at", "asc")
     }
     // let's check the few rejected answers, too
     else if (priority === this.statusesByPriority.length) {
       queryBuilder = queryBuilder
         .andWhere("quiz_answer.id", "IN", rejected)
-        .andWhere("quiz_answer.status", "IN", this.statusesByPriority)
+        .andWhere("quiz_answer.status", "IN", this.statusesByPriority.flat())
     } else {
       return null
     }
