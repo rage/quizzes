@@ -92,8 +92,8 @@ const dashboard = new Router<CustomState, CustomContext>({
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "edit")
-    const statusData = ctx.request.body.status
-    ctx.body = await QuizAnswer.setManualReviewStatus(answerId, statusData)
+    const status = ctx.request.body.status
+    ctx.body = await QuizAnswer.setManualReviewStatus(answerId, status)
   })
   .get("/answers/:answerId", accessControl(), async ctx => {
     const answerId = ctx.params.answerId

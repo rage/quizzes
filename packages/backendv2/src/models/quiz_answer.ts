@@ -5,6 +5,7 @@ import UserQuizState from "./user_quiz_state"
 import PeerReview from "./peer_review"
 import { BadRequestError } from "../util/error"
 import PeerReviewQuestion from "./peer_review_question"
+import knex from "../../database/knex"
 
 interface CountObject {
   quizId: number
@@ -145,6 +146,10 @@ class QuizAnswer extends Model {
   public static async setManualReviewStatus(answerId: string, status: string) {
     if (!["confirmed", "rejected"].includes(status)) {
       throw new BadRequestError("invalid status")
+    }
+    const trx = await knex.transaction()
+    if (status === "confirmed") {
+      await trx("user_quiz_state").update({ points_awarded: })  
     }
     const quizAnswer = await this.query().updateAndFetchById(answerId, {
       status,
