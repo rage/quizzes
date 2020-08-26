@@ -1,12 +1,7 @@
 import React, { useState } from "react"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
-import {
-  getAllAnswers,
-  fetchQuiz,
-  fetchCourseById,
-} from "../../../services/quizzes"
-import { AnswerList } from "../../AnswerList"
+import { fetchQuiz, fetchCourseById } from "../../../services/quizzes"
 import usePromise from "react-use-promise"
 import {
   TextField,
@@ -16,24 +11,15 @@ import {
   Chip,
 } from "@material-ui/core"
 import styled from "styled-components"
-import { Pagination, Skeleton } from "@material-ui/lab"
+import { Skeleton } from "@material-ui/lab"
 import QuizTitle from "../QuizTitleContainer"
 import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
 import _ from "lodash"
+import AnswerListWrapper from "../../AnswerListWrapper"
 
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
-`
-
-export const PaginationField = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  padding: 1rem;
-`
-
-export const Paginator = styled(Pagination)`
-  display: flex !important;
+  margin-top: 1rem;
 `
 
 const OptionsContainer = styled.div`
@@ -88,7 +74,6 @@ export const AllAnswers = () => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
 
-  const [page, setPage] = useState(1)
   const [size, setSize] = useState(10)
   const [order, setOrder] = useState("desc")
   const [expandAll, setExpandAll] = useState(false)
@@ -109,10 +94,6 @@ export const AllAnswers = () => {
   }
   const [chipStates, setChipStates] = useState(states)
 
-  const [answers, error] = usePromise(
-    () => getAllAnswers(quizId, page, size, order, filterParameters),
-    [page, size, order, filterParameters],
-  )
   const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [])
   const [course, courseError] = usePromise(
     () => fetchCourseById(quiz?.courseId ?? ""),
@@ -131,30 +112,16 @@ export const AllAnswers = () => {
     },
   ])
 
-  if (!answers || !quiz || !course) {
+  if (!quiz || !course) {
     return (
       <>
         <TabTextLoading />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <StyledSkeleton variant="rect" animation="wave" height={500} />
       </>
     )
   }
 
-  if (error || quizError || courseError) {
+  if (quizError || courseError) {
     return (
       <>
         <TabTextError />
@@ -166,114 +133,80 @@ export const AllAnswers = () => {
   return (
     <>
       <TabText text="All answers" />
-      {answers.results.length === 0 ? (
-        <>
-          <QuizTitle quiz={quiz} course={course} />
-          <Typography variant="h3">No Answers for this quiz</Typography>
-        </>
-      ) : (
-        <>
-          <QuizTitle quiz={quiz} course={course} />
-          <PaginationField>
-            <Paginator
-              siblingCount={2}
-              boundaryCount={2}
-              count={Math.ceil(answers.total / size)}
-              size="large"
-              color="primary"
-              showFirstButton
-              showLastButton
-              page={page}
-              onChange={(event, nextPage) => setPage(nextPage)}
-            />
-          </PaginationField>
-          <OptionsContainer>
-            <SwitchField>
-              <Typography>Expand all</Typography>
-              <Switch
-                checked={expandAll}
-                onChange={event => {
-                  setExpandAll(event.target.checked)
-                }}
-              />
-            </SwitchField>
-            <SizeSelectorField
-              value={size}
-              size="medium"
-              label="Answers"
-              variant="outlined"
-              helperText="How many answers are shown per page"
-              select
-              onChange={event => {
-                setSize(Number(event.target.value))
-                setPage(1)
-              }}
-            >
-              <MenuItem value={10}>10</MenuItem>
-              <MenuItem value={50}>50</MenuItem>
-              <MenuItem value={100}>100</MenuItem>
-            </SizeSelectorField>
-            <SortOrderField
-              label="Sort order"
-              variant="outlined"
-              select
-              helperText="Sorts answers by date they've been submitted"
-              value={order}
-              onChange={event => setOrder(event.target.value)}
-            >
-              <MenuItem value="desc">Latest first</MenuItem>
-              <MenuItem value="asc">Oldest first</MenuItem>
-            </SortOrderField>
-          </OptionsContainer>
-          <FilterParamsField>
-            <StyledTitle variant="subtitle1">Status filters</StyledTitle>
-            {Object.keys(chipStates).map(state => {
-              return (
-                <StyledChip
-                  defaultValue={state}
-                  key={state}
-                  label={state}
-                  variant="outlined"
-                  checked={chipStates[state].checked}
-                  onClick={() => {
-                    const newStates = _.clone(chipStates)
-                    newStates[state].checked = !newStates[state].checked
-                    setChipStates(newStates)
-
-                    if (chipStates[state].checked) {
-                      const newParams = _.clone(filterParameters)
-                      setFilterParameters(newParams.concat(state))
-                    } else {
-                      const newParams = _.clone(filterParameters)
-                      setFilterParameters(
-                        newParams.filter(param => param !== state),
-                      )
-                    }
-                  }}
-                />
-              )
-            })}
-          </FilterParamsField>
-          <AnswerList
-            data={answers.results}
-            error={error}
-            expandAll={expandAll}
+      <QuizTitle quiz={quiz} course={course} />
+      <OptionsContainer>
+        <SwitchField>
+          <Typography>Expand all</Typography>
+          <Switch
+            checked={expandAll}
+            onChange={event => {
+              setExpandAll(event.target.checked)
+            }}
           />
-          <PaginationField>
-            <Paginator
-              siblingCount={2}
-              boundaryCount={2}
-              count={Math.ceil(answers.total / size)}
-              size="large"
-              color="primary"
-              showFirstButton
-              showLastButton
-              page={page}
-              onChange={(event, nextPage) => setPage(nextPage)}
+        </SwitchField>
+        <SizeSelectorField
+          value={size}
+          size="medium"
+          label="Answers"
+          variant="outlined"
+          helperText="How many answers are shown per page"
+          select
+          onChange={event => {
+            setSize(Number(event.target.value))
+          }}
+        >
+          <MenuItem value={10}>10</MenuItem>
+          <MenuItem value={50}>50</MenuItem>
+          <MenuItem value={100}>100</MenuItem>
+        </SizeSelectorField>
+        <SortOrderField
+          label="Sort order"
+          variant="outlined"
+          select
+          helperText="Sorts answers by date they've been submitted"
+          value={order}
+          onChange={event => setOrder(event.target.value)}
+        >
+          <MenuItem value="desc">Latest first</MenuItem>
+          <MenuItem value="asc">Oldest first</MenuItem>
+        </SortOrderField>
+      </OptionsContainer>
+      <FilterParamsField>
+        <StyledTitle variant="subtitle1">Status filters</StyledTitle>
+        {Object.keys(chipStates).map(state => {
+          return (
+            <StyledChip
+              defaultValue={state}
+              key={state}
+              label={state}
+              variant="outlined"
+              checked={chipStates[state].checked}
+              onClick={() => {
+                const newStates = _.clone(chipStates)
+                newStates[state].checked = !newStates[state].checked
+                setChipStates(newStates)
+
+                if (chipStates[state].checked) {
+                  const newParams = _.clone(filterParameters)
+                  setFilterParameters(newParams.concat(state))
+                } else {
+                  const newParams = _.clone(filterParameters)
+                  setFilterParameters(
+                    newParams.filter(param => param !== state),
+                  )
+                }
+              }}
             />
-          </PaginationField>
-        </>
-      )}
+          )
+        })}
+      </FilterParamsField>
+      <AnswerListWrapper
+        expandAll={expandAll}
+        filterparameters={filterParameters}
+        order={order}
+        quizId={quizId}
+        size={size}
+      />
     </>
   )
 }
