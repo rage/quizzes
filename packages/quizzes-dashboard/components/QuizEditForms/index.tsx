@@ -1,5 +1,4 @@
 import React from "react"
-import { Typography } from "@material-ui/core"
 import styled from "styled-components"
 import QuizItems from "./QuizItems"
 import BasicInfo from "./BasicInfo"

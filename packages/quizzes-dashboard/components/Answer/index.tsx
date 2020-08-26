@@ -1,6 +1,6 @@
 import React, { useState, ReactChildren } from "react"
 import { Answer } from "../../types/Answer"
-import { Card, CardProps } from "@material-ui/core"
+import { Card } from "@material-ui/core"
 import styled from "styled-components"
 import { AnswerContent } from "./CardContent"
 
@@ -16,15 +16,15 @@ export const StyledAnswerCard = styled(Card)<AdditionalAnswerCardProps>`
   flex-wrap: wrap;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 7px 0px,
     rgba(0, 0, 0, 0.15) 0px 3px 6px -2px, rgba(0, 0, 0, 0.25) 0px 1px 10px 0px !important;
-  background: ${props => {
+  background-color: ${props => {
     let rgba = "0, 0, 0, 0.3"
     if (props.status === "confirmed") {
-      rgba = "0, 255, 0, 0.4"
+      rgba = "76, 175, 80, 0.2"
     }
     if (props.status === "rejected") {
-      rgba = "255, 0, 0, 0.4"
+      rgba = "244, 67, 54, 0.2"
     }
-    return props.faded && `linear-gradient(rgba(0,0,0,0.4), rgba(${rgba}));`
+    return props.faded && `rgba(${rgba}) !important;`
   }};
 `
 
@@ -36,7 +36,6 @@ export interface AnswerProps {
 export const AnswerCard = ({ answer, expanded }: AnswerProps) => {
   const [faded, setFaded] = useState(false)
   const [status, setStatus] = useState("")
-  console.log(status)
   return (
     <>
       <StyledAnswerCard faded={faded} status={status}>
