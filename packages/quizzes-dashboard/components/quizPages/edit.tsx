@@ -43,12 +43,12 @@ const EditPage = () => {
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
-      label: "Course",
+      label: `${course ? course.title : ""}`,
       as: `/courses/${quizData?.courseId}`,
       href: "/courses/[courseId]",
     },
     {
-      label: "Edit quiz",
+      label: `${quizData ? quizData.title : ""}`,
     },
   ])
 

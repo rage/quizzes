@@ -114,13 +114,14 @@ export const AnswerContent = ({
           </PeerreviewBox>
         </Fade>
       </PeerreviewModal>
-      <Collapse in={showMore} collapsedHeight={250}>
-        <ContentContainer>
-          <AnswerLink answer={answer} />
-        </ContentContainer>
-        <ContentContainer>
-          <AnswerOverView answer={answer} />
-        </ContentContainer>
+
+      <ContentContainer>
+        <AnswerLink answer={answer} />
+      </ContentContainer>
+      <ContentContainer>
+        <AnswerOverView answer={answer} />
+      </ContentContainer>
+      <Collapse in={showMore} collapsedHeight={350}>
         <ContentContainer>
           <ItemAnswers itemAnswers={answer.itemAnswers} />
         </ContentContainer>

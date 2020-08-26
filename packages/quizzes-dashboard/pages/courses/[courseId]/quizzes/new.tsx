@@ -7,18 +7,23 @@ import { useRouter } from "next/router"
 import { useDispatch } from "react-redux"
 import { createdNewQuiz } from "../../../../store/editor/editorActions"
 import Head from "next/head"
+import usePromise from "react-use-promise"
+import { fetchCourseById } from "../../../../services/quizzes"
 
 const NewQuiz = () => {
   const dispatch = useDispatch()
   const router = useRouter()
   const courseId: string = router.query.courseId?.toString() ?? ""
+  const [course, error] = usePromise(() => fetchCourseById(courseId), [
+    courseId,
+  ])
   useEffect(() => {
     dispatch(createdNewQuiz(courseId))
   }, [])
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
-      label: "Course",
+      label: `${course ? course.title : ""}`,
       as: `/courses/${courseId}`,
       href: "/courses/[id]",
     },

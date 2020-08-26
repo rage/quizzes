@@ -105,8 +105,25 @@ const dashboard = new Router<CustomState, CustomContext>({
     const quizId = ctx.params.quizId
     const courseId = await getCourseIdByQuizId(quizId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
-    const { page, size, order } = ctx.request.query
-    ctx.body = await QuizAnswer.getPaginatedByQuizId(quizId, page, size, order)
+    const { page, size, order, filters } = ctx.request.query
+    console.log(filters)
+    let parsedFilters = []
+    if (filters && filters.length === 1) {
+      parsedFilters = filters
+    }
+    if (filters && filters.length > 1) {
+      parsedFilters = filters.split(",")
+    }
+
+    console.log(parsedFilters)
+
+    ctx.body = await QuizAnswer.getPaginatedByQuizId(
+      quizId,
+      page,
+      size,
+      order,
+      parsedFilters,
+    )
   })
   .get("/answers/:quizId/manual-review", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
@@ -232,6 +249,11 @@ const dashboard = new Router<CustomState, CustomContext>({
     const courseId = await getCourseIdByQuizId(quizId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await QuizAnswer.getAnswerCountsByStatus(quizId)
+  })
+  .get("/quizzes/answers/get-answer-states", accessControl(), async ctx => {
+    const result = await QuizAnswer.getStates()
+    console.log(result)
+    ctx.body = result
   })
 
 export default dashboard

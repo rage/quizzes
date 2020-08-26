@@ -93,6 +93,7 @@ export const getAllAnswers = async (
   page: number,
   size: number,
   order: string,
+  filters: string[],
 ): Promise<{ results: Answer[]; total: number }> => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -101,7 +102,8 @@ export const getAllAnswers = async (
     }
     const response = (
       await api.get(
-        `/answers/${quizId}/all?page=${page - 1}&size=${size}&order=${order}`,
+        `/answers/${quizId}/all?page=${page -
+          1}&size=${size}&order=${order}&filters=${filters}`,
         config,
       )
     ).data
@@ -235,6 +237,17 @@ export const QetQuizAnswerStatistics = async (
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
     return (await api.get(`/quizzes/${quizId}/answerStatistics`, config)).data
+  }
+  throw new Error()
+}
+
+export const getAnswerStates = async (): Promise<string[]> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (await api.get(`/quizzes/answer/get-answer-states`, config)).data
   }
   throw new Error()
 }

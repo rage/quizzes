@@ -53,11 +53,7 @@ const Title = styled(Typography)`
 const ShowCoursePage = () => {
   const router = useRouter()
   const id = router.query.courseId?.toString() ?? ""
-  useBreadcrumbs([
-    { label: "Courses", as: "/", href: "/" },
-    { label: "Course" },
-  ])
-  const { data, error } = useSWR(id, fetchCourseQuizzes)
+  const [data, error] = usePromise(() => fetchCourseQuizzes(id), [id])
   const [answersRequiringAttention, answersError] = usePromise(
     () => getAnswersRequiringAttentionCounts(id),
     [id],
@@ -66,6 +62,11 @@ const ShowCoursePage = () => {
     () => getUserAbilitiesForCourse(id),
     [id],
   )
+
+  useBreadcrumbs([
+    { label: "Courses", as: "/", href: "/" },
+    { label: `${data ? data.course.title : ""}` },
+  ])
 
   if (error || answersError || userError) {
     return (

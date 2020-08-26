@@ -3,8 +3,8 @@ import usePromise from "react-use-promise"
 import { useRouter } from "next/router"
 import { QetQuizAnswerStatistics } from "../../services/quizzes"
 import styled from "styled-components"
-import { List, ListItem, Typography } from "@material-ui/core"
-import { Doughnut, ChartData } from "react-chartjs-2"
+import { Typography } from "@material-ui/core"
+import { Doughnut } from "react-chartjs-2"
 import _ from "lodash"
 
 const AnswerStatsContainer = styled.div`
