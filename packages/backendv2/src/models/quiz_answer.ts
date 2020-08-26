@@ -148,21 +148,41 @@ class QuizAnswer extends Model {
       throw new BadRequestError("invalid status")
     }
     const trx = await knex.transaction()
-    if (status === "confirmed") {
-      await trx.raw(`
-        UPDATE user_quiz_state
+    /*if (status === "confirmed") {
+      await trx.raw(
+        `
+        UPDATE user_quiz_state uqs
         SET points_awarded = points
         FROM (
           SELECT user_id, quiz_id, points
           FROM quiz_answer
           JOIN quiz ON quiz_answer.quiz_id = quiz.id
           WHERE quiz_answer.id = :answerId
-          AND status != 'deprecated'
-        )
-        WHERE 
-      `)  
-    }
-    const quizAnswer = await this.query().updateAndFetchById(answerId, {
+        ) p
+        WHERE uqs.user_id = p.user_id and uqs.quiz_id = p.quiz_id;
+      `,
+        {
+          answerId,
+        },
+      )
+    } else {
+      await trx.raw(
+        `
+        UPDATE user_quiz_state uqs
+        SET points_awarded = points
+        FROM (
+          SELECT user_id, quiz_id
+          FROM quiz_answer
+          WHERE quiz_answer.id = :answerId
+        ) p
+        WHERE uqs.user_id = p.user_id and uqs.quiz_id = p.quiz_id;
+      `,
+        {
+          answerId,
+        },
+      )
+    }*/
+    const quizAnswer = await this.query(trx).updateAndFetchById(answerId, {
       status,
     })
     return quizAnswer
