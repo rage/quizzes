@@ -3,15 +3,17 @@ import { useRouter } from "next/router"
 import {
   getAnswersRequiringAttention,
   fetchQuiz,
+  fetchCourseById,
 } from "../../../services/quizzes"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { AnswerList } from "../../AnswerList"
 import usePromise from "react-use-promise"
-import { Answer } from "../../../types/Answer"
 import { TextField, MenuItem, Switch, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import { Pagination, Skeleton } from "@material-ui/lab"
 import Head from "next/head"
+import QuizTitle from "../QuizTitleContainer"
+import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
 
 export const SizeSelectorContainer = styled.div`
   display: flex;
@@ -50,35 +52,30 @@ const OptionsContainer = styled.div`
   width: 100%;
 `
 
-const QuizTitleWrapper = styled.div`
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-`
-
 export const RequiringAttention = () => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
+
   const [page, setPage] = useState(1)
   const [size, setSize] = useState(10)
   const [order, setOrder] = useState("desc")
   const [expandAll, setExpandAll] = useState(false)
-  let answers: { results: Answer[]; total: number } | undefined
-  let error: any
-  ;[answers, error] = usePromise(
+
+  const [answers, error] = usePromise(
     () => getAnswersRequiringAttention(quizId, page, size, order),
     [page, size, order],
   )
-
-  const [quizResponse, quizError] = usePromise(() => fetchQuiz(quizId), [])
+  const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [])
+  const [course, courseError] = usePromise(
+    () => fetchCourseById(quiz?.courseId ?? ""),
+    [quiz],
+  )
 
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
       label: "Course",
-      as: `/courses/${quizResponse?.courseId}`,
+      as: `/courses/${quiz?.courseId}`,
       href: "/courses/[courseId]",
     },
     {
@@ -86,18 +83,10 @@ export const RequiringAttention = () => {
     },
   ])
 
-  if (!answers) {
+  if (!answers || !quiz || !course) {
     return (
       <>
-        <div>
-          <Head>
-            <title>loading... | Quizzes</title>
-            <meta
-              name="quizzes"
-              content="initial-scale=1.0, width=device-width"
-            />
-          </Head>
-        </div>
+        <TabTextLoading />
         <StyledSkeleton variant="rect" height={250} animation="wave" />
         <StyledSkeleton variant="rect" height={250} animation="wave" />
         <StyledSkeleton variant="rect" height={250} animation="wave" />
@@ -117,18 +106,10 @@ export const RequiringAttention = () => {
     )
   }
 
-  if (error) {
+  if (error || quizError || courseError) {
     return (
       <>
-        <div>
-          <Head>
-            <title>womp womp... | Quizzes</title>
-            <meta
-              name="quizzes"
-              content="initial-scale=1.0, width=device-width"
-            />
-          </Head>
-        </div>
+        <TabTextError />
         <div>Error while fetching answers.</div>
       </>
     )
@@ -136,27 +117,15 @@ export const RequiringAttention = () => {
 
   return (
     <>
-      <div>
-        <Head>
-          <title>Answers requiring attention | Quizzes</title>
-          <meta
-            name="quizzes"
-            content="initial-scale=1.0, width=device-width"
-          />
-        </Head>
-      </div>
+      <TabText text="Answers requiring attention" />
       {answers.results.length === 0 ? (
         <>
-          <QuizTitleWrapper>
-            <Typography variant="h2">{quizResponse?.title}</Typography>
-          </QuizTitleWrapper>
+          <QuizTitle quiz={quiz} course={course} />
           <Typography variant="h3">No answers requiring attention</Typography>
         </>
       ) : (
         <>
-          <QuizTitleWrapper>
-            <Typography variant="h1">{quizResponse?.title}</Typography>
-          </QuizTitleWrapper>
+          <QuizTitle quiz={quiz} course={course} />
           <SizeSelectorContainer>
             <SizeSelectorField
               value={size}

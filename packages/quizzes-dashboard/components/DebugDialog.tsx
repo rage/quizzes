@@ -2,10 +2,11 @@ import React, { useState } from "react"
 import { Button, Dialog, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import EditableDebugField from "./EditableDebugField"
-import { NormalizedItem } from "../types/NormalizedQuiz"
+import { NormalizedItem, NormalizedQuiz } from "../types/NormalizedQuiz"
 import { useTypedSelector } from "../store/store"
 import { normalizedQuiz, items } from "../schemas"
 import { denormalize } from "normalizr"
+import { Quiz } from "../types/Quiz"
 
 const DialogTitleContainer = styled.div`
   display: flex;
@@ -24,23 +25,11 @@ const ContentWrapper = styled.div`
   overflow-y: hidden;
 `
 
-const StyledPreWrapper = styled.div`
-  overflow-y: auto;
-  height: 100%;
-`
-
-interface DebugDialogProps {
-  passedData?: NormalizedItem
-  editable?: boolean
-}
-
-const DebugDialog = ({ passedData, editable }: DebugDialogProps) => {
-  let data: any | NormalizedItem = useTypedSelector(state => state.editor)
+export const DebugDialog = () => {
   const quizId = useTypedSelector(state => state.editor.quizId)
-  data = denormalize(quizId, normalizedQuiz, data)
-  if (passedData) {
-    data = passedData
-  }
+  const quiz = useTypedSelector(state => state.editor)
+  const data: Quiz = denormalize(quizId, normalizedQuiz, quiz)
+
   const [debugOpen, setDebugOpen] = useState(false)
   const content = JSON.stringify(data, undefined, 2)
   return (
@@ -61,13 +50,7 @@ const DebugDialog = ({ passedData, editable }: DebugDialogProps) => {
           </CloseButton>
         </DialogTitleContainer>
         <ContentWrapper>
-          {editable ? (
-            <EditableDebugField initialValue={content} />
-          ) : (
-            <StyledPreWrapper>
-              <pre>{content}</pre>
-            </StyledPreWrapper>
-          )}
+          <EditableDebugField initialValue={content} />
         </ContentWrapper>
       </Dialog>
     </>
