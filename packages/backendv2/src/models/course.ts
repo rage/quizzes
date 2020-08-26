@@ -82,6 +82,8 @@ class Course extends Model {
 
     const newCourseId = v4()
 
+    console.log(newCourseId)
+
     await knex
       .transaction(async trx => {
         await trx("course").insert({ id: newCourseId })
@@ -248,8 +250,14 @@ class Course extends Model {
       SELECT uuid_generate_v5(:newCourseId, id::text), uuid_generate_v5(:newCourseId, quiz_id::text),
         uuid_generate_v5(:newCourseId, peer_review_collection_id::text),
         "default", type, answer_required, "order"
-      FROM peer_review_question WHERE quiz_id IN (
-        SELECT id FROM quiz WHERE course_id = :oldCourseId
+      FROM peer_review_question WHERE peer_review_collection_id IN (
+        SELECT id
+        FROM peer_review_collection
+        WHERE quiz_id IN (
+          SELECT id
+          FROM quiz
+          WHERE course_id = '4908eebe-584e-49e0-a580-c0d399c21ec3'
+        )
       );
       `,
           {
@@ -263,8 +271,15 @@ class Course extends Model {
       INSERT INTO peer_review_question_translation (peer_review_question_id, language_id, title, body)
       SELECT uuid_generate_v5(:newCourseId, peer_review_question_id::text), :language_id, title, body
       FROM peer_review_question_translation WHERE peer_review_question_id IN (
-        SELECT id FROM peer_review_question WHERE quiz_id IN (
-          SELECT id FROM quiz WHERE course_id = :oldCourseId
+        SELECT id
+        FROM peer_review_question WHERE peer_review_collection_id IN (
+          SELECT id
+          FROM peer_review_collection
+          WHERE quiz_id IN (
+            SELECT id
+            FROM quiz
+            WHERE course_id = '4908eebe-584e-49e0-a580-c0d399c21ec3'
+          )
         )
       );
       `,
