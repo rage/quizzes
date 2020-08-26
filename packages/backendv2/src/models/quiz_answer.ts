@@ -149,7 +149,18 @@ class QuizAnswer extends Model {
     }
     const trx = await knex.transaction()
     if (status === "confirmed") {
-      await trx("user_quiz_state").update({ points_awarded: })  
+      await trx.raw(`
+        UPDATE user_quiz_state
+        SET points_awarded = points
+        FROM (
+          SELECT user_id, quiz_id, points
+          FROM quiz_answer
+          JOIN quiz ON quiz_answer.quiz_id = quiz.id
+          WHERE quiz_answer.id = :answerId
+          AND status != 'deprecated'
+        )
+        WHERE 
+      `)  
     }
     const quizAnswer = await this.query().updateAndFetchById(answerId, {
       status,
