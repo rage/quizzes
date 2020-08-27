@@ -6,6 +6,8 @@ import PeerReview from "./peer_review"
 import { BadRequestError } from "../util/error"
 import PeerReviewQuestion from "./peer_review_question"
 import knex from "../../database/knex"
+import Quiz from "./quiz"
+import UserCoursePartState from "./user_course_part_state"
 
 interface CountObject {
   quizId: number
@@ -13,12 +15,14 @@ interface CountObject {
 
 class QuizAnswer extends Model {
   id!: string
+  userId!: number
   quizId!: string
   languageId!: string
   status!: string
   itemAnswers!: QuizItemAnswer[]
   peerReviews!: PeerReview[]
   userQuizState!: UserQuizState
+  quiz!: Quiz
 
   static get tableName() {
     return "quiz_answer"
@@ -55,6 +59,14 @@ class QuizAnswer extends Model {
       join: {
         from: ["quiz_answer.user_id", "quiz_answer.quiz_id"],
         to: ["user_quiz_state.user_id", "user_quiz_state.quiz_id"],
+      },
+    },
+    quiz: {
+      relation: Model.BelongsToOneRelation,
+      modelClass: `${__dirname}/quiz`,
+      join: {
+        from: "quiz_answer.quiz_id",
+        to: "quiz.id",
       },
     },
   }
@@ -148,44 +160,35 @@ class QuizAnswer extends Model {
       throw new BadRequestError("invalid status")
     }
     const trx = await knex.transaction()
-    /*if (status === "confirmed") {
-      await trx.raw(
-        `
-        UPDATE user_quiz_state uqs
-        SET points_awarded = points
-        FROM (
-          SELECT user_id, quiz_id, points
-          FROM quiz_answer
-          JOIN quiz ON quiz_answer.quiz_id = quiz.id
-          WHERE quiz_answer.id = :answerId
-        ) p
-        WHERE uqs.user_id = p.user_id and uqs.quiz_id = p.quiz_id;
-      `,
-        {
-          answerId,
-        },
+    try {
+      let quizAnswer = (
+        await this.query(trx)
+          .where("quiz_answer.id", answerId)
+          .withGraphJoined("userQuizState")
+          .withGraphJoined("quiz")
+      )[0]
+      const userQuizState = quizAnswer.userQuizState
+      const quiz = quizAnswer.quiz
+      if (status === "confirmed") {
+        await userQuizState.$query(trx).patch({ pointsAwarded: quiz.points })
+      } else {
+        await userQuizState
+          .$query(trx)
+          .patch({ peerReviewsReceived: 0, spamFlags: 0, status: "open" })
+      }
+      quizAnswer = await quizAnswer.$query(trx).patchAndFetch({ status })
+      await UserCoursePartState.update(
+        quizAnswer.userId,
+        quiz.courseId,
+        quiz.part,
+        trx,
       )
-    } else {
-      await trx.raw(
-        `
-        UPDATE user_quiz_state uqs
-        SET points_awarded = points
-        FROM (
-          SELECT user_id, quiz_id
-          FROM quiz_answer
-          WHERE quiz_answer.id = :answerId
-        ) p
-        WHERE uqs.user_id = p.user_id and uqs.quiz_id = p.quiz_id;
-      `,
-        {
-          answerId,
-        },
-      )
-    }*/
-    const quizAnswer = await this.query(trx).updateAndFetchById(answerId, {
-      status,
-    })
-    return quizAnswer
+      await trx.commit()
+      return quizAnswer
+    } catch (error) {
+      await trx.rollback()
+      throw new BadRequestError(error)
+    }
   }
 
   public static async getManualReviewCountsByCourseId(courseId: string) {
