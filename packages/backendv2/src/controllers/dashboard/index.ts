@@ -106,7 +106,6 @@ const dashboard = new Router<CustomState, CustomContext>({
     const courseId = await getCourseIdByQuizId(quizId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
     const { page, size, order, filters } = ctx.request.query
-    console.log(filters)
     let parsedFilters = []
     if (filters && filters.length === 1) {
       parsedFilters = filters
@@ -114,8 +113,6 @@ const dashboard = new Router<CustomState, CustomContext>({
     if (filters && filters.length > 1) {
       parsedFilters = filters.split(",")
     }
-
-    console.log(parsedFilters)
 
     ctx.body = await QuizAnswer.getPaginatedByQuizId(
       quizId,
@@ -252,7 +249,6 @@ const dashboard = new Router<CustomState, CustomContext>({
   })
   .get("/quizzes/answers/get-answer-states", accessControl(), async ctx => {
     const result = await QuizAnswer.getStates()
-    console.log(result)
     ctx.body = result
   })
 
