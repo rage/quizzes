@@ -1,13 +1,13 @@
 FROM node:11-alpine
 
-RUN apk add --no-cache python2
+RUN apk add --no-cache librdkafka
 
 COPY --chown=node package.json package-lock.json /app/
 
 USER node
 WORKDIR /app
 
-RUN npm ci
+RUN env BUILD_LIBRDKAFKA=0 npm ci
 
 COPY --chown=node . /app
 
