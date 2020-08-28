@@ -82,8 +82,8 @@ export class Quiz extends Model {
 
   static async saveQuiz(data: any) {
     const quiz: Quiz = data
-    const course = (await Course.getById(quiz.courseId))[0]
-    const languageId = course.texts[0].languageId
+    const course = await Course.getById(quiz.courseId)
+    const languageId = course.languageId
     quiz.texts = [
       QuizTranslation.fromJson({
         quizId: quiz.id,
