@@ -1,5 +1,7 @@
 FROM node:11-alpine
 
+RUN apk add --no-cache python2
+
 COPY --chown=node package.json package-lock.json /app/
 
 USER node
