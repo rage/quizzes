@@ -11,7 +11,7 @@ import cors from "koa-cors"
 import * as pg from "pg"
 
 pg.types.setTypeParser(1700, function(val: any) {
-    return parseFloat(val);
+  return parseFloat(val)
 })
 
 Model.knex(knex)
