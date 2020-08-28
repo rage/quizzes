@@ -13,55 +13,46 @@ import styled from "styled-components"
 import { Pagination, Skeleton } from "@material-ui/lab"
 import QuizTitle from "../QuizTitleContainer"
 import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
+import {
+  SizeSelectorContainer,
+  SizeSelectorField,
+  PaginationField,
+  Paginator,
+  StyledSkeleton,
+  OptionsContainer,
+  SwitchField,
+} from "./styles"
+import { IQueryParams, TSortOptions, TAnswersDisplayed } from "./types"
 
-export const SizeSelectorContainer = styled.div`
-  display: flex;
-  width: 100%;
-  margin-top: 0.5rem;
-  justify-content: flex-end;
-`
-
-export const SizeSelectorField = styled(TextField)`
-  display: flex !important;
-`
-
-export const PaginationField = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  padding: 1rem;
-`
-
-export const SwitchField = styled.div`
-  display: flex;
-  align-items: baseline;
-`
-
-export const Paginator = styled(Pagination)`
-  display: flex !important;
-`
-const StyledSkeleton = styled(Skeleton)`
-  margin-bottom: 1rem;
-`
-
-const OptionsContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-`
-
-export const AllAnswers = () => {
+export const AllAnswers = (props: IQueryParams) => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
 
-  const [page, setPage] = useState(1)
-  const [size, setSize] = useState(10)
-  const [order, setOrder] = useState("desc")
-  const [expandAll, setExpandAll] = useState(false)
+  // pull items from passed in query data
+  let {
+    queryParams: {
+      pageNo: paramPage,
+      size: paramSize,
+      expandAll: paramExpand,
+      sort: paramSort,
+    },
+  } = props
+
+  // normalise data format
+  paramSize = Number(paramSize) as TAnswersDisplayed
+  paramPage = Number(paramPage)
+  paramExpand = Boolean(paramExpand)
+
+  const [currentPage, setCurrentPage] = useState<number>(paramPage || 1)
+  const [answersDisplayed, setAnswersDisplayed] = useState<TAnswersDisplayed>(
+    paramSize || 10,
+  )
+  const [expandAll, setExpandAll] = useState<boolean>(paramExpand || false)
+  const [sortOrder, setSortOrder] = useState<TSortOptions>(paramSort || "desc")
 
   const [answers, error] = usePromise(
-    () => getAllAnswers(quizId, page, size, order),
-    [page, size, order],
+    () => getAllAnswers(quizId, currentPage, answersDisplayed, sortOrder),
+    [currentPage, answersDisplayed, sortOrder],
   )
   const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [])
   const [course, courseError] = usePromise(
@@ -113,6 +104,45 @@ export const AllAnswers = () => {
     )
   }
 
+  const handleChange = (event: any, nextPage?: number) => {
+    const URL_HREF = `/quizzes/[quizId]/[page]`
+    const pathname = `/quizzes/${quizId}/all-answers/`
+
+    let query = {
+      pageNo: currentPage,
+      size: answersDisplayed,
+      expandAll: expandAll,
+      sort: sortOrder,
+    }
+
+    if (nextPage) {
+      query = { ...query, pageNo: nextPage }
+      setCurrentPage(nextPage)
+      route.push(URL_HREF, { pathname, query }, { shallow: true })
+      return
+    }
+
+    switch (event.target.name) {
+      case "size-selector":
+        setAnswersDisplayed(Number(event.target.value) as TAnswersDisplayed)
+        query = { ...query, size: event.target.value }
+        break
+      case "expand-field":
+        setExpandAll(event.target.checked)
+        query = { ...query, expandAll: event.target.checked }
+        break
+      case "order-field":
+        setSortOrder(event.target.value)
+        query = { ...query, sort: event.target.value }
+        break
+      default:
+        break
+    }
+
+    // in all cases, push all the query params
+    route.push(URL_HREF, { pathname, query }, { shallow: true })
+  }
+
   return (
     <>
       <TabText text="All answers" />
@@ -126,12 +156,13 @@ export const AllAnswers = () => {
           <QuizTitle quiz={quiz} course={course} />
           <SizeSelectorContainer>
             <SizeSelectorField
-              value={size}
+              name="size-selector"
+              value={answersDisplayed}
               size="medium"
               label="Answers"
               variant="outlined"
               select
-              onChange={event => setSize(Number(event.target.value))}
+              onChange={event => handleChange(event)}
             >
               <MenuItem value={10}>10</MenuItem>
               <MenuItem value={50}>50</MenuItem>
@@ -142,32 +173,34 @@ export const AllAnswers = () => {
             <Paginator
               siblingCount={2}
               boundaryCount={2}
-              count={Math.ceil(answers.total / size)}
+              count={Math.ceil(answers.total / answersDisplayed)}
               size="large"
               color="primary"
               showFirstButton
               showLastButton
-              page={page}
-              onChange={(event, nextPage) => setPage(nextPage)}
+              page={currentPage}
+              onChange={(event, nextPage) => handleChange(event, nextPage)}
             />
           </PaginationField>
           <OptionsContainer>
             <SwitchField>
               <Typography>Expand all</Typography>
               <Switch
+                name="expand-field"
                 checked={expandAll}
                 onChange={event => {
-                  setExpandAll(event.target.checked)
+                  handleChange(event)
                 }}
               />
             </SwitchField>
             <TextField
+              name="order-field"
               label="Sort order"
               variant="outlined"
               select
               helperText="Sorts answers by date they've been submitted"
-              value={order}
-              onChange={event => setOrder(event.target.value)}
+              value={sortOrder}
+              onChange={event => handleChange(event)}
             >
               <MenuItem value="desc">Latest first</MenuItem>
               <MenuItem value="asc">Oldest first</MenuItem>
@@ -182,13 +215,13 @@ export const AllAnswers = () => {
             <Paginator
               siblingCount={2}
               boundaryCount={2}
-              count={Math.ceil(answers.total / size)}
+              count={Math.ceil(answers.total / answersDisplayed)}
               size="large"
               color="primary"
               showFirstButton
               showLastButton
-              page={page}
-              onChange={(event, nextPage) => setPage(nextPage)}
+              page={currentPage}
+              onChange={(event, nextPage) => handleChange(event, nextPage)}
             />
           </PaginationField>
         </>
