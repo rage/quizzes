@@ -11,20 +11,8 @@ import usePromise from "react-use-promise"
 import { TextField, MenuItem, Switch, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import { Pagination, Skeleton } from "@material-ui/lab"
-import Head from "next/head"
 import QuizTitle from "../QuizTitleContainer"
 import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
-
-export const SizeSelectorContainer = styled.div`
-  display: flex;
-  width: 100%;
-  margin-top: 0.5rem;
-  justify-content: flex-end;
-`
-
-export const SizeSelectorField = styled(TextField)`
-  display: flex !important;
-`
 
 export const PaginationField = styled.div`
   display: flex;
@@ -37,11 +25,6 @@ export const Paginator = styled(Pagination)`
   display: flex !important;
 `
 
-export const SwitchField = styled.div`
-  display: flex;
-  align-items: baseline;
-`
-
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
 `
@@ -50,6 +33,19 @@ const OptionsContainer = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
+`
+export const SwitchField = styled.div`
+  display: flex;
+  align-items: baseline;
+  width: 33%;
+`
+export const SortOrderField = styled(TextField)`
+  display: flex !important;
+  width: 33% !important;
+`
+export const SizeSelectorField = styled(TextField)`
+  display: flex !important;
+  width: 33% !important;
 `
 
 export const RequiringAttention = () => {
@@ -74,12 +70,12 @@ export const RequiringAttention = () => {
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
-      label: "Course",
+      label: `${course ? course.title : ""}`,
       as: `/courses/${quiz?.courseId}`,
       href: "/courses/[courseId]",
     },
     {
-      label: "Quiz answers requiring attention",
+      label: `${quiz ? quiz.title : ""}`,
     },
   ])
 
@@ -126,20 +122,6 @@ export const RequiringAttention = () => {
       ) : (
         <>
           <QuizTitle quiz={quiz} course={course} />
-          <SizeSelectorContainer>
-            <SizeSelectorField
-              value={size}
-              size="medium"
-              label="Answers"
-              variant="outlined"
-              select
-              onChange={event => setSize(Number(event.target.value))}
-            >
-              <MenuItem value={10}>10</MenuItem>
-              <MenuItem value={50}>50</MenuItem>
-              <MenuItem value={100}>100</MenuItem>
-            </SizeSelectorField>
-          </SizeSelectorContainer>
           <PaginationField>
             <Paginator
               siblingCount={2}
@@ -163,7 +145,20 @@ export const RequiringAttention = () => {
                 }}
               />
             </SwitchField>
-            <TextField
+            <SizeSelectorField
+              value={size}
+              size="medium"
+              label="Answers"
+              variant="outlined"
+              select
+              onChange={event => setSize(Number(event.target.value))}
+              helperText="How many answers are shown per page"
+            >
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={50}>50</MenuItem>
+              <MenuItem value={100}>100</MenuItem>
+            </SizeSelectorField>
+            <SortOrderField
               label="Sort order"
               variant="outlined"
               select
@@ -173,7 +168,7 @@ export const RequiringAttention = () => {
             >
               <MenuItem value="desc">Latest first</MenuItem>
               <MenuItem value="asc">Oldest first</MenuItem>
-            </TextField>
+            </SortOrderField>
           </OptionsContainer>
           <AnswerList
             data={answers.results}

@@ -440,18 +440,18 @@ describe("dashboard: get answers by quiz id", () => {
       .expect(403, done)
   })
 
-  test("get answers by quiz id: page 1", done => {
+  test("get answers by quiz id: page 1, filter confirmed", done => {
     request(app.callback())
       .get(
-        "/api/v2/dashboard/answers/2a0c2270-011e-40b2-8796-625764828034/all?page=0&size=20",
+        "/api/v2/dashboard/answers/2a0c2270-011e-40b2-8796-625764828034/all?page=0&size=20&order=asc&filters=confirmed",
       )
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(response => {
         const received: QuizAnswer[] = response.body.results
+        const states = new Set(received.map(answer => answer.status))
         expect(received).toHaveLength(20)
-        expect(
-          received.map(answer => answer.status).includes("deprecated"),
-        ).toBe(false)
+        expect(states.size).toBe(1)
+        expect(states.has("confirmed")).toBe(true)
       })
       .expect(200, done)
   })
@@ -459,15 +459,47 @@ describe("dashboard: get answers by quiz id", () => {
   test("get answers by quiz id: page 2", done => {
     request(app.callback())
       .get(
-        "/api/v2/dashboard/answers/2a0c2270-011e-40b2-8796-625764828034/all?page=1&size=20",
+        "/api/v2/dashboard/answers/2a0c2270-011e-40b2-8796-625764828034/all?page=0&size=20&order=asc&filters=deprecated",
       )
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(response => {
         const received: QuizAnswer[] = response.body.results
+        const states = new Set(received.map(answer => answer.status))
+        expect(received).toHaveLength(10)
+        expect(states.size).toBe(1)
+        expect(states.has("deprecated")).toBe(true)
+      })
+      .expect(200, done)
+  })
+
+  test("get answers by quiz id: page 3, one status filter", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/answers/2a0c2270-011e-40b2-8796-625764828034/all?page=0&size=20&order=asc&filters=manual-review",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        const received: QuizAnswer[] = response.body.results
+        const states = new Set(received.map(answer => answer.status))
         expect(received).toHaveLength(15)
-        expect(
-          received.map(answer => answer.status).includes("deprecated"),
-        ).toBe(false)
+        expect(states.size).toBe(1)
+        expect(states.has("manual-review")).toBe(true)
+      })
+      .expect(200, done)
+  })
+
+  test("get answers by quiz id: page 4, two status filter", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/answers/2a0c2270-011e-40b2-8796-625764828034/all?page=0&size=20&order=asc&filters=manual-review,confirmed",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        const received: QuizAnswer[] = response.body.results
+        const states = new Set(received.map(answer => answer.status))
+        expect(received).toHaveLength(20)
+        expect(states.size).toBe(2)
+        expect(states.has("deprecated")).toBe(false)
       })
       .expect(200, done)
   })
