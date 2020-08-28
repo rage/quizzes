@@ -8,6 +8,7 @@ import PeerReviewQuestion from "./peer_review_question"
 import knex from "../../database/knex"
 import Quiz from "./quiz"
 import UserCoursePartState from "./user_course_part_state"
+import * as Kafka from "../services/kafka"
 
 interface CountObject {
   quizId: number
@@ -171,7 +172,7 @@ class QuizAnswer extends Model {
       const quiz = quizAnswer.quiz
       if (status === "confirmed") {
         await userQuizState.$query(trx).patch({ pointsAwarded: quiz.points })
-      } else {
+      } else if (!quiz.triesLimited || userQuizState.tries < quiz.tries) {
         await userQuizState
           .$query(trx)
           .patch({ peerReviewsReceived: 0, spamFlags: 0, status: "open" })
@@ -181,6 +182,17 @@ class QuizAnswer extends Model {
         quizAnswer.userId,
         quiz.courseId,
         quiz.part,
+        trx,
+      )
+      await Kafka.broadcastQuizAnswerUpdated(
+        quizAnswer,
+        userQuizState,
+        quiz,
+        trx,
+      )
+      await Kafka.broadcastUserProgressUpdated(
+        quizAnswer.userId,
+        quiz.courseId,
         trx,
       )
       await trx.commit()

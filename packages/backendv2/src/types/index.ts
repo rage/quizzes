@@ -28,3 +28,54 @@ export interface UserField {
   organizational_id: string
   course_announcements: boolean
 }
+
+export interface ProgressMessage {
+  timestamp: string
+  user_id: number
+  course_id: string
+  service_id: string
+  progress: PointsByGroup[]
+  message_format_version: Number
+}
+
+export interface PointsByGroup {
+  group: string
+  max_points: number
+  n_points: number
+  progress: number
+}
+
+export interface QuizAnswerMessage {
+  timestamp: string
+  exercise_id: string
+  n_points: number
+  completed: boolean
+  user_id: number
+  course_id: string
+  service_id: string
+  required_actions: RequiredAction[] | null
+  message_format_version: number
+}
+
+export interface QuizMessage {
+  timestamp: string
+  course_id: string
+  service_id: string
+  data: ExerciseData[]
+  message_format_version: number
+}
+
+export interface ExerciseData {
+  name: string
+  id: string
+  part: number
+  section: number
+  max_points: number
+  deleted: boolean
+}
+
+export enum RequiredAction {
+  REJECTED = "REJECTED",
+  GIVE_PEER_REVIEW = "GIVE_PEER_REVIEW",
+  PENDING_PEER_REVIEW = "PENDING_PEER_REVIEW",
+}

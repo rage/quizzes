@@ -2,8 +2,13 @@ import Model from "./base_model"
 import User from "./user"
 import Knex from "knex"
 import Course from "./course"
+import { PointsByGroup } from "../types"
+import Quiz from "./quiz"
 
 class UserCoursePartState extends Model {
+  userId!: number
+  courseId!: string
+  coursePart!: number
   score!: number
   progress!: number
 
@@ -99,6 +104,48 @@ class UserCoursePartState extends Model {
         .$query(trx)
         .patch({ score: pointsAwarded, progress: pointsAwarded / totalPoints })
     }
+  }
+
+  public static async getProgress(
+    userId: number,
+    courseId: string,
+    trx: Knex.Transaction,
+  ) {
+    const userCoursePartStates = await this.query(trx)
+      .where({
+        user_id: userId,
+        course_id: courseId,
+      })
+      .andWhereNot("course_part", 0)
+
+    const quizzes = await Quiz.query(trx)
+      .where("course_id", courseId)
+      .andWhereNot("part", 0)
+
+    const progress: PointsByGroup[] = userCoursePartStates.map(ucps => {
+      const maxPoints = quizzes
+        .filter(
+          quiz =>
+            quiz.part === ucps.coursePart && quiz.excludedFromScore === false,
+        )
+        .map(quiz => quiz.points)
+        .reduce((acc, curr) => acc + curr)
+
+      const coursePartString = ucps.coursePart.toString()
+
+      return {
+        group: `${
+          coursePartString.length > 1 ? "osa" : "osa0"
+        }${coursePartString}`,
+        progress: Math.floor(ucps.progress * 100) / 100,
+        n_points: Number(ucps.score.toFixed(2)),
+        max_points: maxPoints,
+      }
+    })
+
+    return progress.sort((pbg1, pbg2) =>
+      pbg1.group < pbg2.group ? -1 : pbg1.group > pbg2.group ? 1 : 0,
+    )
   }
 }
 
