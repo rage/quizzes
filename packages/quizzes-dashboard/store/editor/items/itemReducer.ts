@@ -97,7 +97,7 @@ export const itemReducer = createReducer<
 
   .handleAction(editedItemMinWords, (state, action) => {
     return produce(state, draftState => {
-      draftState[action.payload.itemId].maxWords = action.payload.minWords
+      draftState[action.payload.itemId].minWords = action.payload.minWords
     })
   })
 
