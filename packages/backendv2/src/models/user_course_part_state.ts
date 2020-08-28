@@ -84,7 +84,7 @@ class UserCoursePartState extends Model {
             userId,
             courseId,
             coursePart,
-            score: pointsAwarded,
+            score: pointsAwarded || 0,
             progress: pointsAwarded / totalPoints,
           })
         },
@@ -132,7 +132,6 @@ class UserCoursePartState extends Model {
         .reduce((acc, curr) => acc + curr)
 
       const coursePartString = ucps.coursePart.toString()
-
       return {
         group: `${
           coursePartString.length > 1 ? "osa" : "osa0"

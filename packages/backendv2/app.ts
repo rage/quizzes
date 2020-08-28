@@ -8,6 +8,12 @@ import errorHandler from "./src/middleware/error_handler"
 import { CustomContext, CustomState } from "./src/types"
 import cors from "koa-cors"
 
+import * as pg from "pg"
+
+pg.types.setTypeParser(1700, function(val: any) {
+    return parseFloat(val);
+})
+
 Model.knex(knex)
 Model.columnNameMappers = snakeCaseMappers()
 

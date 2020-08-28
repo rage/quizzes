@@ -2,20 +2,13 @@ import Knex from "knex"
 import * as Kafka from "node-rdkafka"
 import { promisify } from "util"
 import {
-  PointsByGroup,
   ProgressMessage,
   QuizAnswerMessage,
   QuizMessage,
+  RequiredAction,
 } from "../types"
-import knex from "../../database/knex"
 import { Course, Quiz, QuizAnswer, UserQuizState } from "../models"
 import UserCoursePartState from "../models/user_course_part_state"
-
-export enum RequiredAction {
-  REJECTED = "REJECTED",
-  GIVE_PEER_REVIEW = "GIVE_PEER_REVIEW",
-  PENDING_PEER_REVIEW = "PENDING_PEER_REVIEW",
-}
 
 let producer: Kafka.Producer
 let flush: any
