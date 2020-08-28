@@ -1,13 +1,22 @@
 FROM node:11-alpine
 
-RUN apk add --no-cache librdkafka
+
+RUN apk --no-cache add \
+      bash \
+      g++ \
+      ca-certificates \
+      lz4-dev \
+      musl-dev \
+      cyrus-sasl-dev \
+      openssl-dev \
+      make \
+      python
 
 COPY --chown=node package.json package-lock.json /app/
 
 USER node
 WORKDIR /app
-
-RUN env BUILD_LIBRDKAFKA=0 npm ci
+RUN npm ci
 
 COPY --chown=node . /app
 
