@@ -102,7 +102,7 @@ class UserCoursePartState extends Model {
       )[0]
       await userCoursePartState.$query(trx).patch({
         score: pointsAwarded || 0,
-        progress: pointsAwarded || 0 / totalPoints,
+        progress: pointsAwarded ? pointsAwarded / totalPoints : 0 / totalPoints,
       })
     }
   }
