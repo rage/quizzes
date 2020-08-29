@@ -3,10 +3,6 @@ import { UserCourseRole, Course } from "../../models"
 import { UserInfo } from "../../types"
 import { ForbiddenError } from "../../util/error"
 
-const abilitiesToRoles = {
-  teacher: ["edit"],
-}
-
 export const checkAccessOrThrow = async (
   userInfo: UserInfo,
   courseId: string,

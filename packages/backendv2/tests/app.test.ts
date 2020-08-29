@@ -8,13 +8,25 @@ import { QuizAnswer } from "../src/models"
 
 const knexCleaner = require("knex-cleaner")
 
+const safeClean = () => {
+  if (process.env.NODE_ENV === "test") {
+    return knexCleaner.clean(knex)
+  }
+}
+
+const safeSeed = (config?: any) => {
+  if (process.env.NODE_ENV === "test") {
+    return knex.seed.run(config)
+  }
+}
+
 afterAll(() => {
   return knex.destroy()
 })
 
 describe("dashboard: get courses", () => {
   beforeAll(() => {
-    return knex.seed.run({
+    return safeSeed({
       directory: "./database/seeds",
       specific: "a.ts",
     })
@@ -22,7 +34,7 @@ describe("dashboard: get courses", () => {
 
   afterAll(() => {
     nock.cleanAll()
-    return knexCleaner.clean(knex)
+    return safeClean()
   })
 
   beforeEach(() => {
@@ -85,7 +97,7 @@ describe("dashboard: get courses", () => {
 
 describe("dashboard: get quizzes by course id", () => {
   beforeAll(() => {
-    return knex.seed.run({
+    return safeSeed({
       directory: "./database/seeds",
       specific: "a.ts",
     })
@@ -93,7 +105,7 @@ describe("dashboard: get quizzes by course id", () => {
 
   afterAll(() => {
     nock.cleanAll()
-    return knexCleaner.clean(knex)
+    return safeClean()
   })
 
   beforeEach(() => {
@@ -159,7 +171,7 @@ describe("dashboard: get quizzes by course id", () => {
 
 describe("dashboard: get quiz by id", () => {
   beforeAll(() => {
-    return knex.seed.run({
+    return safeSeed({
       directory: "./database/seeds",
       specific: "a.ts",
     })
@@ -167,7 +179,7 @@ describe("dashboard: get quiz by id", () => {
 
   afterAll(() => {
     nock.cleanAll()
-    return knexCleaner.clean(knex)
+    return safeClean()
   })
 
   beforeEach(() => {
@@ -231,7 +243,7 @@ describe("dashboard: get quiz by id", () => {
 
 describe("dashboard: save quiz", () => {
   beforeAll(() => {
-    return knex.seed.run({
+    return safeSeed({
       directory: "./database/seeds",
       specific: "a.ts",
     })
@@ -239,7 +251,7 @@ describe("dashboard: save quiz", () => {
 
   afterAll(() => {
     nock.cleanAll()
-    return knexCleaner.clean(knex)
+    return safeClean()
   })
 
   beforeEach(() => {
@@ -325,7 +337,7 @@ describe("dashboard: save quiz", () => {
 
 describe("dashboard: get answer by id", () => {
   beforeAll(() => {
-    return knex.seed.run({
+    return safeSeed({
       directory: "./database/seeds",
       specific: "a.ts",
     })
@@ -333,7 +345,7 @@ describe("dashboard: get answer by id", () => {
 
   afterAll(() => {
     nock.cleanAll()
-    return knexCleaner.clean(knex)
+    return safeClean()
   })
 
   beforeEach(() => {
@@ -389,12 +401,12 @@ describe("dashboard: get answer by id", () => {
 
 describe("dashboard: get answers by quiz id", () => {
   beforeAll(() => {
-    return knex.seed.run()
+    return safeSeed()
   })
 
   afterAll(() => {
     nock.cleanAll()
-    return knexCleaner.clean(knex)
+    return safeClean()
   })
 
   beforeEach(() => {
@@ -475,12 +487,12 @@ describe("dashboard: get answers by quiz id", () => {
 
 describe("dashboard: get manual review answers", () => {
   beforeAll(() => {
-    return knex.seed.run()
+    return safeSeed()
   })
 
   afterAll(() => {
     nock.cleanAll()
-    return knexCleaner.clean(knex)
+    return safeClean()
   })
 
   beforeEach(() => {
@@ -561,7 +573,7 @@ describe("dashboard: get manual review answers", () => {
 
 describe("dashboard: update manual review status", () => {
   beforeAll(() => {
-    return knex.seed.run({
+    return safeSeed({
       directory: "./database/seeds",
       specific: "a.ts",
     })
@@ -569,7 +581,7 @@ describe("dashboard: update manual review status", () => {
 
   afterAll(() => {
     nock.cleanAll()
-    return knexCleaner.clean(knex)
+    return safeClean()
   })
 
   beforeEach(() => {

@@ -29,7 +29,6 @@ const produce = async (
   topic: "user-course-progress" | "user-points-2" | "exercise",
   message: ProgressMessage | QuizAnswerMessage | QuizMessage,
 ) => {
-  console.log(process.env.NODE_ENV)
   if (process.env.NODE_ENV === "test") {
     return
   }

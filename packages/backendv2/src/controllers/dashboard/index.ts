@@ -215,6 +215,7 @@ const dashboard = new Router<CustomState, CustomContext>({
   })
   .get("/users/:userId/broadcast/:courseId", accessControl(), async ctx => {
     const { userId, courseId } = ctx.params
+    await checkAccessOrThrow(ctx.state.user, courseId, "edit")
     await Kafka.broadcastUserCourse(userId, courseId)
   })
   .get("/courses/:courseId/user/abilities", accessControl(), async ctx => {
