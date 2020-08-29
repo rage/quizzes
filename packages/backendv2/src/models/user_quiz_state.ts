@@ -10,6 +10,9 @@ class UserQuizState extends Model {
   tries!: number
   status!: "open" | "locked"
   pointsAwarded!: number
+  peerReviewsGiven!: number
+  peerReviewsReceived!: number
+  spamFlags!: number
 
   static get tableName() {
     return "user_quiz_state"

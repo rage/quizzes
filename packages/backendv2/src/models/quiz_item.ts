@@ -4,6 +4,7 @@ import QuizOption from "./quiz_option"
 import QuizItemTranslation from "./quiz_item_translation"
 
 class QuizItem extends Model {
+  type!: string
   texts!: QuizItemTranslation[]
   options!: QuizOption[]
   title!: string

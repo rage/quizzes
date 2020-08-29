@@ -18,6 +18,10 @@ export class Quiz extends Model {
   courseId!: string
   part!: number
   points!: number
+  triesLimited!: boolean
+  tries!: number
+  excludedFromScore!: boolean
+  course!: Course
   texts!: QuizTranslation[]
   items!: QuizItem[]
   peerReviews!: PeerReviewCollection[]
