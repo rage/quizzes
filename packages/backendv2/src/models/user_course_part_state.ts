@@ -51,7 +51,7 @@ class UserCoursePartState extends Model {
     if (!userCoursePartState) {
       const parts = await trx("quiz")
         .select("part as coursePart")
-        .sum("points_awarded as pointsAwarded")
+        .select(trx.raw("coalesce(sum(points_awarded), 0) as pointsAwarded)"))
         .sum("points as totalPoints")
         .leftJoin(
           trx.raw(
@@ -102,7 +102,10 @@ class UserCoursePartState extends Model {
       )[0]
       await userCoursePartState
         .$query(trx)
-        .patch({ score: pointsAwarded, progress: pointsAwarded / totalPoints })
+        .patch({
+          score: pointsAwarded || 0,
+          progress: pointsAwarded || 0 / totalPoints,
+        })
     }
   }
 
@@ -145,6 +148,17 @@ class UserCoursePartState extends Model {
     return progress.sort((pbg1, pbg2) =>
       pbg1.group < pbg2.group ? -1 : pbg1.group > pbg2.group ? 1 : 0,
     )
+  }
+
+  public static async refreshCourse(userId: number, courseId: string) {
+    const parts = await Course.getParts(courseId)
+    await this.knex().transaction(async trx => {
+      await Promise.all(
+        parts.map(async part => {
+          await this.update(userId, courseId, part, trx)
+        }),
+      )
+    })
   }
 }
 
