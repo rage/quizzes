@@ -51,7 +51,7 @@ class UserCoursePartState extends Model {
     if (!userCoursePartState) {
       const parts = await trx("quiz")
         .select("part as coursePart")
-        .select(trx.raw("coalesce(sum(points_awarded), 0) as pointsAwarded)"))
+        .select(trx.raw("coalesce(sum(points_awarded), 0) as pointsAwarded"))
         .sum("points as totalPoints")
         .leftJoin(
           trx.raw(
@@ -100,12 +100,10 @@ class UserCoursePartState extends Model {
           .andWhere("part", coursePart)
           .andWhere("user_id", userId)
       )[0]
-      await userCoursePartState
-        .$query(trx)
-        .patch({
-          score: pointsAwarded || 0,
-          progress: pointsAwarded || 0 / totalPoints,
-        })
+      await userCoursePartState.$query(trx).patch({
+        score: pointsAwarded || 0,
+        progress: pointsAwarded || 0 / totalPoints,
+      })
     }
   }
 
