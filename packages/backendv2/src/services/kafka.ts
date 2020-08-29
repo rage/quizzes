@@ -9,6 +9,7 @@ import {
 } from "../types"
 import { Course, Quiz, QuizAnswer, UserQuizState } from "../models"
 import UserCoursePartState from "../models/user_course_part_state"
+import knex from "../../database/knex"
 
 let producer: Kafka.Producer
 let flush: any
@@ -43,7 +44,7 @@ const produce = async (
     producer.produce(topic, null, Buffer.from(JSON.stringify(message)))
     await flush(1000)
   } catch (error) {
-    console.log("producer failed")
+    throw new Error(error)
   }
 }
 
@@ -105,6 +106,22 @@ export const broadcastQuizAnswerUpdated = async (
   if (course.moocfiId) {
     await produce("user-points-2", message)
   }
+}
+
+export const broadcastUserCourse = async (userId: number, courseId: string) => {
+  await UserCoursePartState.refreshCourse(userId, courseId)
+  const quizAnswers = await QuizAnswer.query()
+    .withGraphJoined("quiz")
+    .withGraphJoined("userQuizState")
+    .where("quiz_answer.user_id", userId)
+    .andWhere("course_id", courseId)
+  await knex.transaction(async trx => {
+    for (const quizAnswer of quizAnswers) {
+      const { quiz, userQuizState } = quizAnswer
+      await broadcastQuizAnswerUpdated(quizAnswer, userQuizState, quiz, trx)
+    }
+    await broadcastUserProgressUpdated(userId, courseId, trx)
+  })
 }
 
 export const setTaskToUpdateAndBroadcast = async (

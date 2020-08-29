@@ -9,6 +9,7 @@ import {
   getCourseIdByQuizId,
   getAccessableCourses,
 } from "./util"
+import * as Kafka from "../../services/kafka"
 
 const dashboard = new Router<CustomState, CustomContext>({
   prefix: "/dashboard",
@@ -225,6 +226,11 @@ const dashboard = new Router<CustomState, CustomContext>({
       abilitiesByCourse[courseRole.courseId] = abilitiesByRole[courseRole.role]
     }
     ctx.body = abilitiesByCourse
+  })
+  .get("/users/:userId/broadcast/:courseId", accessControl(), async ctx => {
+    const { userId, courseId } = ctx.params
+    await checkAccessOrThrow(ctx.state.user, courseId, "edit")
+    await Kafka.broadcastUserCourse(userId, courseId)
   })
   .get("/courses/:courseId/user/abilities", accessControl(), async ctx => {
     const courseRole = (

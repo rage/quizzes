@@ -336,6 +336,15 @@ class Course extends Model {
   static async getAllLanguages() {
     return await knex.from("language").select("id", "name")
   }
+
+  public static async getParts(courseId: string) {
+    return (
+      await Quiz.query()
+        .distinct("part")
+        .where({ course_id: courseId })
+        .andWhereNot("part", 0)
+    ).map(q => q.part)
+  }
 }
 
 export default Course
