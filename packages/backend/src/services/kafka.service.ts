@@ -63,7 +63,9 @@ export default class KafkaService {
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
     }
 
-    await this.produce("user-course-progress", message)
+    if (course.moocfiId) {
+      await this.produce("user-course-progress", message)
+    }
   }
 
   public async publishQuizAnswerUpdated(
@@ -97,7 +99,9 @@ export default class KafkaService {
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
     }
 
-    await this.produce("user-points-2", message)
+    if (course.moocfiId) {
+      await this.produce("user-points-2", message)
+    }
   }
 
   public async publishCourseQuizzesUpdated(courseId: string) {
@@ -125,8 +129,9 @@ export default class KafkaService {
       data,
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
     }
-
-    await this.produce("exercise", message)
+    if (course.moocfiId) {
+      await this.produce("exercise", message)
+    }
   }
 
   public async addTask(courseId: string, manager: EntityManager) {

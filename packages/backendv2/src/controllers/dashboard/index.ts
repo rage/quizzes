@@ -1,50 +1,260 @@
 import Router from "koa-router"
 import { CustomContext, CustomState } from "../../types"
-import { Course, Quiz, QuizAnswer } from "../../models/"
-import accessControl from "../../middleware/access_control"
-
-const admin = accessControl({ administator: true })
+import { Course, Quiz, QuizAnswer, User, UserCourseRole } from "../../models/"
+import accessControl, { validToken } from "../../middleware/access_control"
+import {
+  abilitiesByRole,
+  checkAccessOrThrow,
+  getCourseIdByAnswerId,
+  getCourseIdByQuizId,
+  getAccessableCourses,
+} from "./util"
+import * as Kafka from "../../services/kafka"
 
 const dashboard = new Router<CustomState, CustomContext>({
   prefix: "/dashboard",
 })
-  .post("/quizzes", admin, async ctx => {
+  .post("/quizzes", accessControl(), async ctx => {
+    await checkAccessOrThrow(ctx.state.user, ctx.request.body.courseId, "edit")
     const quizData = ctx.request.body
     ctx.body = await Quiz.save(quizData)
   })
-  .get("/quizzes/:quizId", admin, async ctx => {
+  .get("/quizzes/:quizId", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    ctx.body = await Quiz.getById(quizId)
+    const quiz = await Quiz.getById(quizId)
+    await checkAccessOrThrow(ctx.state.user, quiz.courseId, "view")
+    ctx.body = quiz
   })
-  .get("/courses/:courseId/quizzes", admin, async ctx => {
+  .get("/courses/:courseId/quizzes", accessControl(), async ctx => {
     const courseId = ctx.params.courseId
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await Quiz.getByCourseId(courseId)
   })
-  .get("/courses", admin, async ctx => {
-    ctx.body = await Course.getAll()
+  .get("/courses", accessControl(), async ctx => {
+    ctx.body = await getAccessableCourses(ctx.state.user, "view")
   })
-  .get("/courses/:courseId", admin, async ctx => {
+  .get("/courses/:courseId", accessControl(), async ctx => {
     const courseId = ctx.params.courseId
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await Course.getFlattenedById(courseId)
   })
-  .post("/answers/:answerId/status", admin, async ctx => {
-    const answerId = ctx.params.answerId
-    const statusData = ctx.request.body.status
-    ctx.body = await QuizAnswer.setManualReviewStatus(answerId, statusData)
+  .get(
+    "/courses/:courseId/count-answers-requiring-attention",
+    accessControl(),
+    async ctx => {
+      const courseId = ctx.params.courseId
+      await checkAccessOrThrow(ctx.state.user, courseId, "view")
+      ctx.body = await QuizAnswer.getManualReviewCountsByCourseId(courseId)
+    },
+  )
+  .get(
+    "/quizzes/:quizId/count-answers-requiring-attention",
+    accessControl(),
+    async ctx => {
+      const quizId = ctx.params.quizId
+      const quiz = await Quiz.getById(quizId)
+      await checkAccessOrThrow(ctx.state.user, quiz.courseId, "view")
+      ctx.body = await QuizAnswer.getManualReviewCountByQuizId(quizId)
+    },
+  )
+  .post("/courses/:courseId/duplicate-course", async ctx => {
+    const oldCourseId = ctx.params.courseId
+    const token = ctx.request.body.token
+    const name = ctx.request.body.name
+    const abbr = ctx.request.body.abbr
+    const languageId = ctx.request.body.lang
+    if (!validToken(token)) {
+      ctx.body = "invalid token"
+    } else {
+      ctx.response.set("Content-Type", "text/csv")
+      ctx.response.attachment(`update_ids_from_${oldCourseId}`)
+      ctx.body = await Course.duplicateCourse(
+        oldCourseId,
+        name,
+        abbr,
+        languageId,
+      )
+    }
   })
-  .get("/answers/:answerId", admin, async ctx => {
+  .post("/courses/download-correspondance-file", async ctx => {
+    const token = ctx.request.body.token
+    const oldCourseId = ctx.request.body.oldCourseId
+    const courseId = ctx.request.body.courseId
+    if (!validToken(token)) {
+      ctx.body = "invalid token"
+    } else {
+      ctx.response.set("Content-Type", "text/plain")
+      ctx.response.attachment(`update_ids_from_${oldCourseId}_to_${courseId}`)
+      ctx.body = await Course.getCorrespondanceFile(oldCourseId, courseId)
+    }
+  })
+  .post("/answers/:answerId/status", accessControl(), async ctx => {
     const answerId = ctx.params.answerId
+    const courseId = await getCourseIdByAnswerId(answerId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "edit")
+    const status = ctx.request.body.status
+    ctx.body = await QuizAnswer.setManualReviewStatus(answerId, status)
+  })
+  .get("/answers/:answerId", accessControl(), async ctx => {
+    const answerId = ctx.params.answerId
+    const courseId = await getCourseIdByAnswerId(answerId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await QuizAnswer.getById(answerId)
   })
-  .get("/answers/:quizId/all", admin, async ctx => {
+  .get("/answers/:quizId/all", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    const { page, size } = ctx.request.query
-    ctx.body = await QuizAnswer.getPaginatedByQuizId(quizId, page, size)
+    const courseId = await getCourseIdByQuizId(quizId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
+    const { page, size, order, filters } = ctx.request.query
+    let parsedFilters = []
+    if (filters && filters.length === 1) {
+      parsedFilters = filters
+    }
+    if (filters && filters.length > 1) {
+      parsedFilters = filters.split(",")
+    }
+
+    ctx.body = await QuizAnswer.getPaginatedByQuizId(
+      quizId,
+      page,
+      size,
+      order,
+      parsedFilters,
+    )
   })
-  .get("/answers/:quizId/manual-review", admin, async ctx => {
+  .get("/answers/:quizId/manual-review", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    const { page, size } = ctx.request.query
-    ctx.body = await QuizAnswer.getPaginatedManualReview(quizId, page, size)
+    const courseId = await getCourseIdByQuizId(quizId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
+    const { page, size, order } = ctx.request.query
+    ctx.body = await QuizAnswer.getPaginatedManualReview(
+      quizId,
+      page,
+      size,
+      order,
+    )
+  })
+  .post("/quizzes/:quizId/download-quiz-info", async ctx => {
+    const quizId = ctx.params.quizId
+    const token = ctx.request.body.token
+    const quizName = ctx.request.body.quizName
+    const courseName = ctx.request.body.courseName
+    const current_datetime = new Date()
+    const isoDate =
+      current_datetime.getDate() +
+      "-" +
+      (current_datetime.getMonth() + 1) +
+      "-" +
+      current_datetime.getFullYear() +
+      "-" +
+      current_datetime.getHours() +
+      "-" +
+      current_datetime.getMinutes()
+    if (!validToken(token)) {
+      ctx.body = "invalid token"
+    } else {
+      const stream = await Quiz.getQuizInfo(quizId)
+      ctx.response.set("Content-Type", "text/csv")
+      ctx.response.attachment(
+        `quiz-info-${quizName}-${courseName}-${isoDate}.csv`,
+      )
+      ctx.body = stream
+    }
+  })
+  .post("/quizzes/:quizId/download-peerreview-info", async ctx => {
+    const quizId = ctx.params.quizId
+    const token = ctx.request.body.token
+    const quizName = ctx.request.body.quizName
+    const courseName = ctx.request.body.courseName
+    const current_datetime = new Date()
+    const isoDate =
+      current_datetime.getDate() +
+      "-" +
+      (current_datetime.getMonth() + 1) +
+      "-" +
+      current_datetime.getFullYear() +
+      "-" +
+      current_datetime.getHours() +
+      "-" +
+      current_datetime.getMinutes()
+    if (!validToken(token)) {
+      ctx.body = "invalid token"
+    } else {
+      const stream = await Quiz.getPeerReviewInfo(quizId)
+      ctx.response.set("Content-Type", "text/csv")
+      ctx.response.attachment(
+        `quiz-peerreview-info-${quizName}-${courseName}-${isoDate}.csv`,
+      )
+      ctx.body = stream
+    }
+  })
+  .post("/quizzes/:quizId/download-answer-info", async ctx => {
+    const quizId = ctx.params.quizId
+    const token = ctx.request.body.token
+    const quizName = ctx.request.body.quizName
+    const courseName = ctx.request.body.courseName
+    const current_datetime = new Date()
+    const isoDate =
+      current_datetime.getDate() +
+      "-" +
+      (current_datetime.getMonth() + 1) +
+      "-" +
+      current_datetime.getFullYear() +
+      "-" +
+      current_datetime.getHours() +
+      "-" +
+      current_datetime.getMinutes()
+    if (!validToken(token)) {
+      ctx.body = "invalid token"
+    } else {
+      const stream = await Quiz.getQuizAnswerInfo(quizId)
+      ctx.response.set("Content-Type", "text/csv")
+      ctx.response.attachment(
+        `quiz-answer-info-${quizName}-${courseName}-${isoDate}.csv`,
+      )
+      ctx.body = stream
+    }
+  })
+  .get("/languages/all", accessControl(), async ctx => {
+    ctx.body = await Course.getAllLanguages()
+  })
+  .get("/users/current/abilities", accessControl(), async ctx => {
+    const courseRoles = await UserCourseRole.getByUserId(ctx.state.user.id)
+    const abilitiesByCourse: { [courseId: string]: string[] } = {}
+    for (const courseRole of courseRoles) {
+      abilitiesByCourse[courseRole.courseId] = abilitiesByRole[courseRole.role]
+    }
+    ctx.body = abilitiesByCourse
+  })
+  .get("/users/:userId/broadcast/:courseId", accessControl(), async ctx => {
+    const { userId, courseId } = ctx.params
+    await checkAccessOrThrow(ctx.state.user, courseId, "edit")
+    await Kafka.broadcastUserCourse(userId, courseId)
+  })
+  .get("/courses/:courseId/user/abilities", accessControl(), async ctx => {
+    const courseRole = (
+      await UserCourseRole.getByUserIdAndCourseId(
+        ctx.state.user.id,
+        ctx.params.courseId,
+      )
+    ).map(role => role.role)
+    if (ctx.state.user.administrator) {
+      courseRole.push("admin")
+    }
+    const allAbilities = [
+      ...new Set(courseRole.map(role => abilitiesByRole[role]).flat()),
+    ]
+    ctx.body = allAbilities
+  })
+  .get("/quizzes/:quizId/answerStatistics", accessControl(), async ctx => {
+    const quizId = ctx.params.quizId
+    const courseId = await getCourseIdByQuizId(quizId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
+    ctx.body = await QuizAnswer.getAnswerCountsByStatus(quizId)
+  })
+  .get("/quizzes/answers/get-answer-states", accessControl(), async ctx => {
+    const result = await QuizAnswer.getStates()
+    ctx.body = result
   })
 
 export default dashboard

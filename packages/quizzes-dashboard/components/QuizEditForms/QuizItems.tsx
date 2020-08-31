@@ -1,11 +1,13 @@
-import React from "react"
-import { useTypedSelector } from "../../store/store"
+import React, { useEffect } from "react"
+import store, { useTypedSelector } from "../../store/store"
 import QuizItem from "./QuizItem"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faSitemap } from "@fortawesome/free-solid-svg-icons"
 import { Typography, Divider } from "@material-ui/core"
 import AddQuizItem from "./AddQuizItem"
+import { useDispatch } from "react-redux"
+import { checkForChanges } from "../../store/editor/editorActions"
 
 const ItemsTitleContainer = styled.div`
   display: flex;
@@ -25,9 +27,17 @@ const TitleIcon = styled(FontAwesomeIcon)`
 `
 
 const QuizItems = () => {
+  const dispatch = useDispatch()
+  const store = useTypedSelector(state => state)
   const storeItems = Object.values(
     useTypedSelector(state => state.editor.items),
   )
+
+  useEffect(() => {
+    dispatch(checkForChanges(store))
+  }, [store])
+
+  storeItems.sort((item1, item2) => item1.order - item2.order)
   return (
     <>
       <ItemsTitleContainer>

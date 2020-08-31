@@ -4,14 +4,25 @@ import QuizTranslation from "./quiz_translation"
 import PeerReviewCollection from "./peer_review_collection"
 import Course from "./course"
 import { NotFoundError } from "../util/error"
+import moduleInitializer from "../util/initializer"
+import stringify from "csv-stringify"
 import QuizAnswer from "./quiz_answer"
+import knex from "../../database/knex"
+import { BadRequestError } from "../util/error"
+import Knex from "knex"
 import UserQuizState from "./user_quiz_state"
+import * as Kafka from "../services/kafka"
 
 export class Quiz extends Model {
+  id!: string
+  courseId!: string
+  part!: number
+  points!: number
+  deadline!: Date
   triesLimited!: boolean
   tries!: number
-  deadline!: Date
-  points!: number
+  excludedFromScore!: boolean
+  course!: Course
   texts!: QuizTranslation[]
   items!: QuizItem[]
   peerReviews!: PeerReviewCollection[]
@@ -87,13 +98,13 @@ export class Quiz extends Model {
     const course = await Course.getById(quiz.courseId)
     const languageId = course.languageId
     quiz.texts = [
-      {
+      QuizTranslation.fromJson({
         quizId: quiz.id,
         languageId,
         title: quiz.title,
         body: quiz.body,
         submitMessage: quiz.submitMessage,
-      },
+      }),
     ]
     delete quiz.title
     delete quiz.body
@@ -158,7 +169,45 @@ export class Quiz extends Model {
       })
     })
 
-    return this.moveTextsToParent(await Quiz.query().upsertGraphAndFetch(quiz))
+    const trx = await knex.transaction()
+    let savedQuiz
+    try {
+      const oldQuiz = quiz.id
+        ? await this.query(trx).findById(quiz.id)
+        : undefined
+      if (oldQuiz) {
+        await this.query(trx).upsertGraph(quiz)
+        savedQuiz = await this.query(trx)
+          .findById(quiz.id)
+          .withGraphJoined("texts")
+          .withGraphJoined("items.[texts, options.[texts]]")
+          .withGraphJoined("peerReviews.[texts, questions.[texts]]")
+      } else {
+        savedQuiz = await this.query(trx).insertGraphAndFetch(quiz)
+      }
+      await this.updateCourseProgressesIfNecessary(oldQuiz, savedQuiz, trx)
+      await trx.commit()
+    } catch (error) {
+      await trx.rollback()
+      throw new BadRequestError(error)
+    }
+    return this.moveTextsToParent(savedQuiz)
+  }
+
+  private static async updateCourseProgressesIfNecessary(
+    oldQuiz: Quiz | undefined,
+    newQuiz: Quiz,
+    trx: Knex.Transaction,
+  ) {
+    if (!oldQuiz) {
+      return
+    }
+    const shouldUpdate =
+      oldQuiz.points !== newQuiz.points || oldQuiz.part !== newQuiz.part
+    if (shouldUpdate) {
+      await UserQuizState.updateAwardedPointsForQuiz(oldQuiz, newQuiz, trx)
+      await Kafka.setTaskToUpdateAndBroadcast(oldQuiz.courseId, trx)
+    }
   }
 
   static async getById(quizId: string) {
@@ -200,7 +249,66 @@ export class Quiz extends Model {
     ).map(quiz => this.moveTextsToParent(quiz))
   }
 
-  private static moveTextsToParent(quiz: any) {
+  static async getQuizInfo(quizId: string) {
+    await moduleInitializer()
+
+    const stringifier = stringify({
+      delimiter: ",",
+      quoted: true,
+      header: true,
+    })
+
+    const stream = this.query()
+      .withGraphJoined("texts")
+      .withGraphJoined("items.[texts, options.[texts]]")
+      .withGraphJoined("peerReviews.[texts, questions.[texts]]")
+      .where("quiz.id", quizId)
+      .toKnexQuery()
+      .stream()
+      .pipe(stringifier)
+
+    return stream
+  }
+
+  static async getPeerReviewInfo(quizId: string) {
+    await moduleInitializer()
+
+    const stringifier = stringify({
+      delimiter: ",",
+      quoted: true,
+      header: true,
+    })
+
+    const stream = this.query()
+      .withGraphJoined("peerReviews.[texts, questions.[texts]]")
+      .where("quiz.id", quizId)
+      .toKnexQuery()
+      .stream()
+      .pipe(stringifier)
+
+    return stream
+  }
+
+  static async getQuizAnswerInfo(quizId: string) {
+    await moduleInitializer()
+
+    const stringifier = stringify({
+      delimiter: ",",
+      quoted: true,
+      header: true,
+    })
+
+    const stream = this.query()
+      .withGraphJoined("answers.[itemAnswers.[optionAnswers]]")
+      .where("quiz.id", quizId)
+      .toKnexQuery()
+      .stream()
+      .pipe(stringifier)
+
+    return stream
+  }
+
+  private static moveTextsToParent(quiz: Quiz) {
     const text = quiz.texts[0]
     quiz.title = text?.title
     quiz.body = text?.body

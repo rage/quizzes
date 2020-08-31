@@ -31,3 +31,12 @@ export const editedOptionFailureMessage = createAction(
     newMessage: newMessage,
   }),
 )<{ optionId: string; newMessage: string }>()
+
+export const optionActions = [
+  editedOptionTitle,
+  editedOptionCorrectnes,
+  editedOptionSuccessMessage,
+  editedOptionFailureMessage,
+]
+
+export default optionActions

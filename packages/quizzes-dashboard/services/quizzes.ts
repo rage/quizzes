@@ -7,7 +7,7 @@ import { Answer } from "../types/Answer"
 let HOST = "http://localhost:3003"
 
 if (process.env.NODE_ENV === "production") {
-  HOST = "https://quizzes2.mooc.fi"
+  HOST = "https://quizzes.mooc.fi"
 }
 
 const api = axios.create({
@@ -92,6 +92,8 @@ export const getAllAnswers = async (
   quizId: string,
   page: number,
   size: number,
+  order: string,
+  filters: string[],
 ): Promise<{ results: Answer[]; total: number }> => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -100,7 +102,8 @@ export const getAllAnswers = async (
     }
     const response = (
       await api.get(
-        `/answers/${quizId}/all?page=${page - 1}&size=${size}`,
+        `/answers/${quizId}/all?page=${page -
+          1}&size=${size}&order=${order}&filters=${filters}`,
         config,
       )
     ).data
@@ -113,6 +116,7 @@ export const getAnswersRequiringAttention = async (
   quizId: string,
   page: number,
   size: number,
+  order: string,
 ): Promise<{ results: Answer[]; total: number }> => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -121,7 +125,8 @@ export const getAnswersRequiringAttention = async (
     }
     const response = (
       await api.get(
-        `/answers/${quizId}/manual-review?page=${page - 1}&size=${size}`,
+        `/answers/${quizId}/manual-review?page=${page -
+          1}&size=${size}&order=${order}`,
         config,
       )
     ).data
@@ -140,9 +145,109 @@ export const changeAnswerStatus = async (
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
     const response = (
-      await api.post(`/answers/${answerId}/status`, status, config)
+      await api.post(`/answers/${answerId}/status`, { status }, config)
     ).data
     return response
+  }
+  throw new Error()
+}
+
+export const getAllLanguages = async (): Promise<{
+  id: string
+  name: string
+}[]> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (await api.get(`/languages/all`, config)).data
+  }
+  throw new Error()
+}
+
+export const getAnswersRequiringAttentionCounts = async (
+  courseId: string,
+): Promise<{ [quizId: string]: number }> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (
+      await api.get(
+        `/courses/${courseId}/count-answers-requiring-attention`,
+        config,
+      )
+    ).data
+  }
+  throw new Error()
+}
+
+export const getUsersAbilities = async (): Promise<{
+  [courseId: string]: string[]
+}> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (await api.get(`/users/current/abilities`, config)).data
+  }
+  throw new Error()
+}
+
+export const getUserAbilitiesForCourse = async (
+  courseId: string,
+): Promise<string[]> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (await api.get(`/courses/${courseId}/user/abilities`, config)).data
+  }
+  throw new Error()
+}
+
+export const getAnswersRequiringAttentionByQuizId = async (
+  quizId: string,
+): Promise<number> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (
+      await api.get(
+        `/quizzes/${quizId}/count-answers-requiring-attention`,
+        config,
+      )
+    ).data
+  }
+  throw new Error()
+}
+
+export const QetQuizAnswerStatistics = async (
+  quizId: string,
+): Promise<{ [status: string]: number }> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (await api.get(`/quizzes/${quizId}/answerStatistics`, config)).data
+  }
+  throw new Error()
+}
+
+export const getAnswerStates = async (): Promise<string[]> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (await api.get(`/quizzes/answer/get-answer-states`, config)).data
   }
   throw new Error()
 }

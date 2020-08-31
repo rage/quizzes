@@ -6,9 +6,9 @@ module.exports = {
   synchronize: false,
   type: "postgres",
   username: process.env.DB_USER || undefined,
-  migrations: ["dist/backend/src/migration/*.js"],
+  migrations: ["dist/src/migration/*.js"],
   cli: {
-    migrationsDir: "packages/backend/src/migration",
+    migrationsDir: "src/migration",
   },
   entities: ["./dist/src/models/**/*.js"],
   extra: {

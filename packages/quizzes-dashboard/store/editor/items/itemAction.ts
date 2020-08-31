@@ -105,3 +105,38 @@ export const toggledSharedOptionFeedbackMessage = createAction(
     sharedFeedback: sharedFeedback,
   }),
 )<{ itemId: string; sharedFeedback: boolean }>()
+
+export const decreasedItemOrder = createAction(
+  "DECREASED_ITEM_ORDER",
+  (itemId: string) => ({
+    itemId: itemId,
+  }),
+)<{ itemId: string }>()
+
+export const increasedItemOrder = createAction(
+  "INCREASED_ITEM_ORDER",
+  (itemId: string) => ({
+    itemId: itemId,
+  }),
+)<{ itemId: string }>()
+
+export const itemActions = [
+  editedQuizItemBody,
+  editedQuizItemTitle,
+  editedScaleMaxValue,
+  editedScaleMinValue,
+  editedScaleMaxLabel,
+  editedScaleMinLabel,
+  editedValidityRegex,
+  toggledMultiOptions,
+  editedItemSuccessMessage,
+  editedItemFailureMessage,
+  editedItemMaxWords,
+  editedItemMinWords,
+  editedSharedOptionsFeedbackMessage,
+  toggledSharedOptionFeedbackMessage,
+  decreasedItemOrder,
+  increasedItemOrder,
+]
+
+export default itemActions

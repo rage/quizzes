@@ -390,6 +390,15 @@ export async function seed(knex: Knex): Promise<any> {
     ]),
   ])
   await knex.raw("? ON CONFLICT (id) DO NOTHING", [
+    knex("user_course_role").insert([
+      {
+        user_id: 1234,
+        course_id: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+        role: "teacher",
+      },
+    ]),
+  ])
+  await knex.raw("? ON CONFLICT (id) DO NOTHING", [
     knex("quiz_answer").insert({
       id: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
       quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",

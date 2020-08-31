@@ -1,9 +1,11 @@
 import Model from "./base_model"
 import QuizAnswer from "./quiz_answer"
 import UserQuizState from "./user_quiz_state"
+import UserCourseRole from "./user_course_role"
 
 class User extends Model {
   id!: number
+  roles!: UserCourseRole[]
 
   static get tableName() {
     return "user"
@@ -24,6 +26,14 @@ class User extends Model {
       join: {
         from: "user.id",
         to: "user_quiz_state.user_id",
+      },
+    },
+    roles: {
+      relation: Model.HasManyRelation,
+      modelClass: UserCourseRole,
+      join: {
+        from: "user.id",
+        to: "user_course_role.user_id",
       },
     },
   }

@@ -18,6 +18,11 @@ export const ReviewContainer = styled.div`
   flex-wrap: wrap;
 `
 
+export const StyledTitle = styled(Typography)`
+  display: flex !important;
+  margin-top: 2rem !important;
+`
+
 export interface reviewProps {
   review: PeerReview
   number: number
@@ -27,7 +32,7 @@ export const Review = ({ review, number }: reviewProps) => {
   return (
     <>
       <ReviewContainer>
-        <Typography variant="h3">Review nro. {number}</Typography>
+        <StyledTitle variant="h3">Review nro. {number}</StyledTitle>
         <ReviewContent review={review} />
       </ReviewContainer>
     </>

@@ -2,21 +2,31 @@ import React from "react"
 import { NormalizedItem } from "../../../types/NormalizedQuiz"
 import styled from "styled-components"
 import EssayContent from "./EssayContent"
-import { Typography } from "@material-ui/core"
+import { Typography, Button } from "@material-ui/core"
 import MultipleChoiceContent from "./MultipleChoiceContent"
 import CheckBoxContent from "./CheckBoxContent"
 import OpenContent from "./OpenContent"
 import ScaleContent from "./ScaleContent"
 import CustomFrontend from "./CustomFrontend"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faAngleUp, faAngleDown } from "@fortawesome/free-solid-svg-icons"
+import { useDispatch } from "react-redux"
+import {
+  decreasedItemOrder,
+  increasedItemOrder,
+} from "../../../store/editor/items/itemAction"
+
+const TypeWrapper = styled.div`
+  display: flex;
+`
+const StyledText = styled(Typography)`
+  padding-top: 1rem !important;
+  padding-bottom: 1rem !important;
+`
 
 const QuizItemContainer = styled.div`
   margin-top: 1.5rem;
   margin-bottom: 1.5rem;
-`
-
-const StyledText = styled(Typography)`
-  padding-top: 1rem !important;
-  padding-bottom: 1rem !important;
 `
 
 interface QuizItemProps {
@@ -24,11 +34,22 @@ interface QuizItemProps {
 }
 
 const QuizItem = ({ item }: QuizItemProps) => {
+  const dispatch = useDispatch()
   return (
-    <QuizItemContainer>
-      <StyledText variant="h4">{item.type}</StyledText>
-      {contentBasedOnType(item.type, item)}
-    </QuizItemContainer>
+    <>
+      <TypeWrapper>
+        <StyledText variant="h4">{item.type}</StyledText>
+        <Button onClick={() => dispatch(decreasedItemOrder(item.id))}>
+          <FontAwesomeIcon icon={faAngleUp} size="2x" />
+        </Button>
+        <Button onClick={() => dispatch(increasedItemOrder(item.id))}>
+          <FontAwesomeIcon icon={faAngleDown} size="2x" />
+        </Button>
+      </TypeWrapper>
+      <QuizItemContainer>
+        {contentBasedOnType(item.type, item)}
+      </QuizItemContainer>
+    </>
   )
 }
 

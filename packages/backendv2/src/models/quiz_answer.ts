@@ -10,6 +10,9 @@ import { BadRequestError } from "../util/error"
 import { removeNonPrintingCharacters } from "../util/tools"
 import knex from "../../database/knex"
 import Course from "./course"
+import PeerReviewQuestion from "./peer_review_question"
+import UserCoursePartState from "./user_course_part_state"
+import * as Kafka from "../services/kafka"
 
 type QuizAnswerStatus =
   | "draft"
@@ -17,6 +20,8 @@ type QuizAnswerStatus =
   | "given-enough"
   | "manual-review-once-given-and-received-enough"
   | "manual-review-once-given-enough"
+  | "manual-review-once-received-enough"
+  | "manual-review-once-received-enough-given-more-than-enough"
   | "submitted"
   | "manual-review"
   | "confirmed"
@@ -24,6 +29,10 @@ type QuizAnswerStatus =
   | "spam"
   | "rejected"
   | "deprecated"
+
+interface CountObject {
+  quizId: number
+}
 
 class QuizAnswer extends Model {
   id!: string
@@ -35,6 +44,7 @@ class QuizAnswer extends Model {
   user!: User
   peerReviews!: PeerReview[]
   userQuizState!: UserQuizState
+  quiz!: Quiz
 
   static get tableName() {
     return "quiz_answer"
@@ -73,11 +83,33 @@ class QuizAnswer extends Model {
         to: ["user_quiz_state.user_id", "user_quiz_state.quiz_id"],
       },
     },
+    quiz: {
+      relation: Model.BelongsToOneRelation,
+      modelClass: `${__dirname}/quiz`,
+      join: {
+        from: "quiz_answer.quiz_id",
+        to: "quiz.id",
+      },
+    },
   }
 
   public static async getById(quizAnswerId: string) {
-    const quizAnswer = await this.query().findById(quizAnswerId)
-    await this.addRelations([quizAnswer])
+    const quizAnswer = await this.query()
+      .findById(quizAnswerId)
+      .withGraphFetched("userQuizState")
+      .withGraphFetched("itemAnswers.[optionAnswers]")
+      .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+
+    quizAnswer.peerReviews.map(peerReview => {
+      if (peerReview.answers.length > 0) {
+        return peerReview.answers.map(peerReviewAnswer => {
+          peerReviewAnswer.question = this.moveQuestionTextsToparent(
+            peerReviewAnswer.question,
+          )
+        })
+      }
+    })
+
     return quizAnswer
   }
 
@@ -85,14 +117,43 @@ class QuizAnswer extends Model {
     quizId: string,
     page: number,
     pageSize: number,
+    order: "asc" | "desc",
+    filters: string[],
   ) {
-    const paginated = await this.query()
-      .where("quiz_id", quizId)
-      .andWhereNot("status", "deprecated")
-      .orderBy("created_at")
-      .page(page, pageSize)
+    let paginated
+    if (filters.length === 0) {
+      paginated = await this.query()
+        .where("quiz_id", quizId)
+        .orderBy([{ column: "created_at", order: order }])
+        .page(page, pageSize)
+        .withGraphFetched("userQuizState")
+        .withGraphFetched("itemAnswers.[optionAnswers]")
+        .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+    } else {
+      paginated = await this.query()
+        .where("quiz_id", quizId)
+        .whereIn("status", filters)
+        .orderBy([{ column: "created_at", order: order }])
+        .page(page, pageSize)
+        .withGraphFetched("userQuizState")
+        .withGraphFetched("itemAnswers.[optionAnswers]")
+        .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+    }
 
-    await this.addRelations(paginated.results)
+    paginated.results.map(answer => {
+      if (answer.peerReviews.length > 0) {
+        answer.peerReviews.map(peerReview => {
+          if (peerReview.answers.length > 0) {
+            peerReview.answers.map(peerReviewAnswer => {
+              peerReviewAnswer.question = this.moveQuestionTextsToparent(
+                peerReviewAnswer.question,
+              )
+            })
+          }
+        })
+      }
+    })
+
     return paginated
   }
 
@@ -100,42 +161,142 @@ class QuizAnswer extends Model {
     quizId: string,
     page: number,
     pageSize: number,
+    order: "asc" | "desc",
   ) {
     const paginated = await this.query()
       .where("quiz_id", quizId)
       .andWhere("status", "manual-review")
-      .orderBy("created_at")
+      .orderBy([{ column: "created_at", order: order }])
       .page(page, pageSize)
+      .withGraphFetched("userQuizState")
+      .withGraphFetched("itemAnswers.[optionAnswers]")
+      .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
 
-    await this.addRelations(paginated.results)
+    paginated.results.map(answer => {
+      if (answer.peerReviews.length > 0) {
+        answer.peerReviews.map(peerReview => {
+          if (peerReview.answers.length > 0) {
+            peerReview.answers.map(peerReviewAnswer => {
+              peerReviewAnswer.question = this.moveQuestionTextsToparent(
+                peerReviewAnswer.question,
+              )
+            })
+          }
+        })
+      }
+    })
+
     return paginated
   }
 
-  public static async setManualReviewStatus(answerId: string, status: QuizAnswerStatus) {
+  public static async setManualReviewStatus(
+    answerId: string,
+    status: QuizAnswerStatus,
+  ) {
     if (!["confirmed", "rejected"].includes(status)) {
       throw new BadRequestError("invalid status")
     }
-    const quizAnswer = await this.query().updateAndFetchById(answerId, {
-      status,
-    })
-    return quizAnswer
+    const trx = await knex.transaction()
+    try {
+      let quizAnswer = (
+        await this.query(trx)
+          .where("quiz_answer.id", answerId)
+          .withGraphJoined("userQuizState")
+          .withGraphJoined("quiz")
+      )[0]
+      const userQuizState = quizAnswer.userQuizState
+      const quiz = quizAnswer.quiz
+      if (status === "confirmed") {
+        await userQuizState.$query(trx).patch({ pointsAwarded: quiz.points })
+      } else if (!quiz.triesLimited || userQuizState.tries < quiz.tries) {
+        await userQuizState
+          .$query(trx)
+          .patch({ peerReviewsReceived: 0, spamFlags: 0, status: "open" })
+      }
+      quizAnswer = await quizAnswer.$query(trx).patchAndFetch({ status })
+      await UserCoursePartState.update(
+        quizAnswer.userId,
+        quiz.courseId,
+        quiz.part,
+        trx,
+      )
+      await Kafka.broadcastQuizAnswerUpdated(
+        quizAnswer,
+        userQuizState,
+        quiz,
+        trx,
+      )
+      await Kafka.broadcastUserProgressUpdated(
+        quizAnswer.userId,
+        quiz.courseId,
+        trx,
+      )
+      await trx.commit()
+      return quizAnswer
+    } catch (error) {
+      await trx.rollback()
+      throw new BadRequestError(error)
+    }
   }
 
-  private static async addRelations(quizAnswers: QuizAnswer[]) {
-    for (const quizAnswer of quizAnswers) {
-      delete quizAnswer.languageId
-      quizAnswer.userQuizState = await quizAnswer.$relatedQuery("userQuizState")
-      quizAnswer.itemAnswers = await quizAnswer.$relatedQuery("itemAnswers")
-      for (const itemAnswer of quizAnswer.itemAnswers) {
-        itemAnswer.optionAnswers = await itemAnswer.$relatedQuery(
-          "optionAnswers",
-        )
-      }
-      quizAnswer.peerReviews = await quizAnswer.$relatedQuery("peerReviews")
-      for (const peerReview of quizAnswer.peerReviews) {
-        peerReview.answers = await peerReview.$relatedQuery("answers")
-      }
+  public static async getManualReviewCountsByCourseId(courseId: string) {
+    const counts: any[] = await this.query()
+      .select(["quiz_id"])
+      .join("quiz", "quiz_answer.quiz_id", "=", "quiz.id")
+      .where("course_id", courseId)
+      .andWhere("status", "manual-review")
+      .count()
+      .groupBy("quiz_id")
+    const countByQuizId: { [quizId: string]: number } = {}
+    for (const count of counts) {
+      countByQuizId[count.quizId] = count.count
     }
+    return countByQuizId
+  }
+
+  public static async getManualReviewCountByQuizId(quizId: string) {
+    const count: any[] = await this.query()
+      .select(["quiz_id"])
+      .where("quiz_id", quizId)
+      .andWhere("status", "manual-review")
+      .count()
+      .groupBy("quiz_id")
+
+    return count[0].count
+  }
+
+  public static async getAnswerCountsByStatus(quizId: string) {
+    const counts: any[] = await this.query()
+      .select("status")
+      .where("quiz_id", quizId)
+      .count()
+      .groupBy("status")
+
+    const total: any[] = await this.query()
+      .where("quiz_id", quizId)
+      .count()
+
+    const countByStatus: { [status: string]: number } = {}
+    for (const count of counts) {
+      countByStatus[count.status] = Number(count.count)
+    }
+    countByStatus["total"] = Number(total[0].count)
+
+    return countByStatus
+  }
+
+  public static async getStates() {
+    const states = await this.query()
+      .select("status")
+      .distinct("status")
+
+    return states.map(state => state.status)
+  }
+
+  private static moveQuestionTextsToparent = (question: PeerReviewQuestion) => {
+    question.title = question.texts[0].title
+    question.body = question.texts[0].body
+    return question
   }
 
   public static async save(user: UserInfo, quizAnswer: QuizAnswer) {

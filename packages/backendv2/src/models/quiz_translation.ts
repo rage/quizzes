@@ -2,6 +2,8 @@ import Model from "./base_model"
 import Quiz from "./quiz"
 
 class QuizTranslation extends Model {
+  quizId!: string
+  languageId!: string
   title!: string
   body!: string
   submitMessage!: string

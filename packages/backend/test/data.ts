@@ -1,15 +1,23 @@
-import { DeepPartial } from "typeorm"
+import { DeepPartial, Connection } from "typeorm"
 
-import { Quiz, UserQuizState, QuizAnswer, PeerReview } from "../src/models"
+import {
+  Course,
+  Quiz,
+  QuizItem,
+  UserQuizState,
+  QuizAnswer,
+  PeerReview,
+  User,
+} from "../src/models"
 
-interface TestData {
-  quiz: DeepPartial<Quiz>
-  quizAnswer: DeepPartial<QuizAnswer>
-  userQuizState: DeepPartial<UserQuizState>
-  passingPeerReviews: DeepPartial<PeerReview>[]
+export interface TestData {
+  quiz: Quiz
+  quizAnswer: QuizAnswer
+  userQuizState: UserQuizState
+  passingPeerReviews: PeerReview[]
 }
 
-const data: TestData = {
+export const data = {
   quiz: {
     id: "3c954097-268f-44bf-9d2e-1efaf9e8f122",
     courseId: "21356a26-7508-4705-9bab-39b239862632",
@@ -19,8 +27,6 @@ const data: TestData = {
     deadline: null,
     open: null,
     excludedFromScore: false,
-    createdAt: "2018-05-04 15:00:23.606000",
-    updatedAt: "2018-06-25 20:35:55.073000",
     autoConfirm: true,
     tries: 1,
     triesLimited: false,
@@ -35,13 +41,10 @@ const data: TestData = {
       minPeerReviewsGiven: 3,
       minReviewAverage: 2,
       maxSpamFlags: 1,
-      createdAt: "2019-03-10 21:19:54.081043",
-      updatedAt: "2019-03-10 21:19:54.081043",
       organizationId: null,
       moocfiId: "55dff8af-c06c-4a97-88e6-af7c04d252ca",
       maxReviewSpamFlags: 3,
     },
-
     items: [
       {
         id: "3c954097-268f-44bf-9d2e-1efaf9e8f122",
@@ -51,8 +54,6 @@ const data: TestData = {
         validityRegex: "{}",
         formatRegex: null,
         multi: false,
-        createdAt: "2018-05-04 15:00:23.606000",
-        updatedAt: "2020-04-23 14:01:31.890549",
         minWords: null,
         maxWords: null,
         maxValue: null,
@@ -60,20 +61,20 @@ const data: TestData = {
         usesSharedOptionFeedbackMessage: false,
       },
     ],
-  },
+  } as Quiz,
   quizAnswer: {
     quizId: "3c954097-268f-44bf-9d2e-1efaf9e8f122",
-    status: "confirmed",
-  },
+    status: "submitted",
+  } as QuizAnswer,
   userQuizState: {
     quizId: "3c954097-268f-44bf-9d2e-1efaf9e8f122",
-    peerReviewsGiven: 4,
-    peerReviewsReceived: 2,
-    pointsAwarded: 1,
+    peerReviewsGiven: 0,
+    peerReviewsReceived: 0,
+    pointsAwarded: 0,
     spamFlags: 0,
     tries: 1,
     status: "locked",
-  },
+  } as UserQuizState,
   passingPeerReviews: [
     {
       answers: [
@@ -109,7 +110,41 @@ const data: TestData = {
         },
       ],
     },
-  ],
+  ] as PeerReview[],
+  failingPeerReviews: [
+    {
+      answers: [
+        {
+          value: 2,
+        },
+        {
+          value: 2,
+        },
+        {
+          value: 2,
+          text: null,
+        },
+        {
+          value: 2,
+          text: null,
+        },
+      ],
+    },
+    {
+      answers: [
+        {
+          value: 2,
+        },
+        {
+          value: 2,
+        },
+        {
+          value: 2,
+        },
+        {
+          value: 1,
+        },
+      ],
+    },
+  ] as PeerReview[],
 }
-
-export default data

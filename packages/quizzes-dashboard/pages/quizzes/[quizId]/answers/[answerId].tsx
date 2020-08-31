@@ -6,6 +6,11 @@ import { fetchQuiz, getAnswerById } from "../../../../services/quizzes"
 import AnswerCard from "../../../../components/Answer"
 import styled from "styled-components"
 import { Skeleton } from "@material-ui/lab"
+import {
+  TabTextLoading,
+  TabText,
+  TabTextError,
+} from "../../../../components/quizPages/TabHeaders"
 
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
@@ -15,38 +20,51 @@ export const AnswerById = () => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
   const answerId = route.query.answerId?.toString() ?? ""
+
   const [expanded, setExpanded] = useState(true)
+
   const [answerResponse, answerError] = usePromise(
     () => getAnswerById(answerId),
     [],
   )
-  const [quizResponse, quizError] = usePromise(() => fetchQuiz(quizId), [])
+
+  const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [quizId])
 
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
       label: "Course",
-      as: `/courses/${quizResponse?.courseId}`,
+      as: `/courses/${quiz?.courseId}`,
       href: "/courses/[courseId]",
     },
     {
-      label: "Quiz Overview",
+      label: `${quiz?.title}`,
       as: `/quizzes/${quizId}/overview`,
       href: "/quizzes/[quizId]/overview",
     },
     {
       label: "All Answers",
-      as: `/quizzes/${quizId}/answers/all`,
-      href: "/quizzes/[quizId]/answers/all",
+      as: `/quizzes/${quizId}/all-answers`,
+      href: "/quizzes/[quizId]/all-answers",
     },
     {
       label: "Answer",
     },
   ])
 
-  if (!answerResponse) {
+  if (answerError || quizError) {
     return (
       <>
+        <TabTextError />
+        <div>Something went wrong...</div>
+      </>
+    )
+  }
+
+  if (!answerResponse || !quiz) {
+    return (
+      <>
+        <TabTextLoading />
         <StyledSkeleton variant="rect" height={300} animation="wave" />
       </>
     )
@@ -54,6 +72,7 @@ export const AnswerById = () => {
 
   return (
     <>
+      <TabText text="Singular answer" />
       <AnswerCard answer={answerResponse} expanded={expanded} />
     </>
   )

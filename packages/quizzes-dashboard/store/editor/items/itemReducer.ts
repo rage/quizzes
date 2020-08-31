@@ -13,6 +13,8 @@ import {
   toggledSharedOptionFeedbackMessage,
   editedScaleMaxValue,
   editedScaleMinValue,
+  increasedItemOrder,
+  decreasedItemOrder,
 } from "./itemAction"
 import {
   initializedEditor,
@@ -95,7 +97,7 @@ export const itemReducer = createReducer<
 
   .handleAction(editedItemMinWords, (state, action) => {
     return produce(state, draftState => {
-      draftState[action.payload.itemId].maxWords = action.payload.minWords
+      draftState[action.payload.itemId].minWords = action.payload.minWords
     })
   })
 
@@ -132,7 +134,7 @@ export const itemReducer = createReducer<
         maxWords: null,
         minWords: null,
         multi: false,
-        order: 0,
+        order: Object.keys(state).length,
         usesSharedOptionFeedbackMessage: false,
         sharedOptionFeedbackMessage: null,
         options: [],
@@ -143,7 +145,13 @@ export const itemReducer = createReducer<
 
   .handleAction(deletedItem, (state, action) => {
     return produce(state, draftState => {
+      const deletedOrder = state[action.payload.itemId].order
       delete draftState[action.payload.itemId]
+      for (let key in draftState) {
+        if (draftState[key].order > deletedOrder) {
+          draftState[key].order = draftState[key].order - 1
+        }
+      }
     })
   })
 
@@ -188,6 +196,34 @@ export const itemReducer = createReducer<
 
     const normalized = normalize(init, normalizedQuiz)
     return normalized.entities.items ?? {}
+  })
+  .handleAction(increasedItemOrder, (state, action) => {
+    return produce(state, draftState => {
+      const order = draftState[action.payload.itemId].order
+      if (order < Object.keys(state).length - 1) {
+        for (let key in state) {
+          if (state[key].order - 1 === order) {
+            draftState[key].order = state[key].order - 1
+          }
+        }
+        draftState[action.payload.itemId].order =
+          state[action.payload.itemId].order + 1
+      }
+    })
+  })
+  .handleAction(decreasedItemOrder, (state, action) => {
+    return produce(state, draftState => {
+      const order = draftState[action.payload.itemId].order
+      if (order > 0) {
+        for (let key in state) {
+          if (state[key].order + 1 === order) {
+            draftState[key].order = state[key].order + 1
+          }
+        }
+        draftState[action.payload.itemId].order =
+          state[action.payload.itemId].order - 1
+      }
+    })
   })
 
 export default itemReducer

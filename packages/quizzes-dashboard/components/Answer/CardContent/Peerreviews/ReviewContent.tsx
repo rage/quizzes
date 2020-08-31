@@ -39,9 +39,9 @@ export const ReviewContent = ({ review }: ContentProps) => {
             .toLocal()
             .toLocaleString(DateTime.DATETIME_SHORT)}
         </StyledCreatedAt>
-        {review.answers.map(reviewAnswer => (
+        {review.answers.map((reviewAnswer, index) => (
           <ReviewAnswerElement
-            key={reviewAnswer.peerReviewId}
+            key={reviewAnswer.peerReviewId + index.toString()}
             answerElement={reviewAnswer}
           />
         ))}

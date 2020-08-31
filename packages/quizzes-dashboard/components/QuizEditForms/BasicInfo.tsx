@@ -1,11 +1,11 @@
-import React from "react"
+import React, { useEffect } from "react"
 import "date-fns"
 import DateFnsUtils from "@date-io/date-fns"
 import {
   MuiPickersUtilsProvider,
   KeyboardDateTimePicker,
 } from "@material-ui/pickers"
-import { Typography, TextField, MenuItem } from "@material-ui/core"
+import { Typography, TextField, MenuItem, Fade } from "@material-ui/core"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
@@ -19,14 +19,35 @@ import {
   editedQuizzesBody,
   editedQuizzesSubmitmessage,
   editedQuizzesPart,
+  editedQuizzesSection,
 } from "../../store/editor/quiz/quizActions"
 import { useTypedSelector } from "../../store/store"
+import { checkForChanges } from "../../store/editor/editorActions"
 
 const SubsectionTitleWrapper = styled.div`
   display: flex;
   align-items: center;
   margin-bottom: 1.5rem;
   justify-content: center;
+`
+
+const WarningWrapper = styled.div`
+  display: flex;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  width: 100%;
+  height: 35px;
+  justify-content: center;
+`
+
+const WarningBox = styled.div`
+  display: flex;
+  border-style: solid;
+  border-width: 3px;
+  border-color: #f44336;
+  width: 50%;
+  justify-content: center;
+  align-items: baseline !important;
 `
 
 const InfoContainer = styled.div`
@@ -50,12 +71,15 @@ const SectionField = styled(TextField)`
   margin-left: 0.5rem !important;
 `
 
+const StyledWarningText = styled(Typography)`
+  display: flex !important;
+  color: #ff5252 !important;
+`
+
 const BasicInformation = () => {
   const dispatch = useDispatch()
 
   const quizId = useTypedSelector(state => state.editor.quizId)
-
-  const quiz = useTypedSelector(state => state.editor.quizzes)
 
   const pointsGrantingPolicy = useTypedSelector(
     state => state.editor.quizzes[quizId].grantPointsPolicy,
@@ -65,9 +89,6 @@ const BasicInformation = () => {
   )
   const pointsToGain = useTypedSelector(
     state => state.editor.quizzes[quizId].points,
-  )
-  const deadline = useTypedSelector(
-    state => state.editor.quizzes[quizId].deadline,
   )
   const title = useTypedSelector(state => state.editor.quizzes[quizId].title)
 
@@ -86,6 +107,14 @@ const BasicInformation = () => {
     state => state.editor.quizVariables[quizId],
   )
 
+  const store = useTypedSelector(state => state)
+
+  const changes = useTypedSelector(state => state.editor.editorChanges.changes)
+
+  useEffect(() => {
+    dispatch(checkForChanges(store))
+  }, [store])
+
   return (
     <>
       <SubsectionTitleWrapper>
@@ -93,12 +122,22 @@ const BasicInformation = () => {
         <Typography variant="h2">Quiz Information</Typography>
       </SubsectionTitleWrapper>
 
+      <WarningWrapper>
+        <Fade in={changes} timeout={500}>
+          <WarningBox>
+            <StyledWarningText variant="overline">
+              You have unsaved changes
+            </StyledWarningText>
+          </WarningBox>
+        </Fade>
+      </WarningWrapper>
+
       <InfoContainer>
         <TextField
           label="Quiz Title"
           fullWidth
           variant="outlined"
-          defaultValue={title}
+          defaultValue={title ?? ""}
           onChange={event =>
             dispatch(editedQuizTitle(event.target.value, quizId))
           }
@@ -122,7 +161,7 @@ const BasicInformation = () => {
           value={section}
           type="number"
           onChange={event =>
-            dispatch(editedQuizzesPart(quizId, Number(event.target.value)))
+            dispatch(editedQuizzesSection(quizId, Number(event.target.value)))
           }
         />
       </InfoContainer>
@@ -201,7 +240,7 @@ const BasicInformation = () => {
           rows={5}
           label="Description for the whole quiz"
           variant="outlined"
-          value={body}
+          value={body ?? ""}
           onChange={event =>
             dispatch(editedQuizzesBody(quizId, event.target.value))
           }
@@ -214,7 +253,7 @@ const BasicInformation = () => {
           label="Submit message"
           fullWidth
           variant="outlined"
-          value={submitMessage}
+          value={submitMessage ?? ""}
           onChange={event =>
             dispatch(editedQuizzesSubmitmessage(quizId, event.target.value))
           }

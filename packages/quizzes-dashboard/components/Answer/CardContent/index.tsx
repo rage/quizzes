@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react"
 import styled from "styled-components"
 import AnswerOverView from "./AnswerOverView"
 import ItemAnswers from "./ItemAnswers"
@@ -45,7 +45,7 @@ export const PeerreviewButton = styled(Button)`
 const PeerreviewBox = styled(Box)`
   display: flex !important;
   background-color: #fafafa;
-  max-width: 50% !important;
+  max-width: 70% !important;
   max-height: 80% !important;
 `
 
@@ -74,13 +74,33 @@ const PeerreviewModal = styled(Modal)`
 export interface AnswerContentProps {
   answer: Answer
   expanded: boolean
+  setFaded: (faded: boolean) => void
+  setStatus: (accepted: string) => void
 }
 
-export const AnswerContent = ({ answer, expanded }: AnswerContentProps) => {
+export const AnswerContent = ({
+  answer,
+  expanded,
+  setFaded,
+  setStatus,
+}: AnswerContentProps) => {
   const [showMore, setShowMore] = useState(expanded)
   const [showPeerreviewModal, setShowPeerreviewModal] = useState(false)
+  const [handled, setHandled] = useState(false)
+  const [height, setHeight] = useState(0)
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => setShowMore(expanded), [expanded])
+  useEffect(() => {
+    if (handled) {
+      setFaded(true)
+    }
+  }, [handled])
+  useLayoutEffect(() => {
+    if (ref.current !== null) {
+      setHeight(ref.current.clientHeight)
+    }
+  }, [])
 
   return (
     <>
@@ -101,40 +121,55 @@ export const AnswerContent = ({ answer, expanded }: AnswerContentProps) => {
           </PeerreviewBox>
         </Fade>
       </PeerreviewModal>
-      <Collapse in={showMore} collapsedHeight={250}>
-        <ContentContainer>
-          <AnswerLink answer={answer} />
-        </ContentContainer>
-        <ContentContainer>
-          <AnswerOverView answer={answer} />
-        </ContentContainer>
-        <ContentContainer>
+      <ContentContainer>
+        <AnswerLink answer={answer} />
+      </ContentContainer>
+      <ContentContainer>
+        <AnswerOverView answer={answer} />
+      </ContentContainer>
+      <Collapse in={showMore} collapsedHeight={300}>
+        <ContentContainer ref={ref}>
           <ItemAnswers itemAnswers={answer.itemAnswers} />
         </ContentContainer>
-        <PeerreviewButton
-          variant="outlined"
-          title=":D"
-          onClick={() => setShowPeerreviewModal(true)}
-        >
-          <Typography variant="subtitle2">Show Peerreviews</Typography>
-        </PeerreviewButton>
       </Collapse>
+      <ContentContainer>
+        {answer.peerReviews.length > 0 ? (
+          <PeerreviewButton
+            variant="outlined"
+            title=":D"
+            onClick={() => setShowPeerreviewModal(true)}
+          >
+            <Typography variant="subtitle2">Show Peerreviews</Typography>
+          </PeerreviewButton>
+        ) : (
+          ""
+        )}
+      </ContentContainer>
       <StatsContainer>
         <CompactPeerReviewStats answer={answer} />
       </StatsContainer>
       <StatButtonWrapper>
-        {showMore ? (
-          <Button variant="outlined" onClick={() => setShowMore(false)}>
-            Show Less
-          </Button>
-        ) : (
-          <Button variant="outlined" onClick={() => setShowMore(true)}>
-            Show More
-          </Button>
+        {height > 300 && (
+          <>
+            {showMore ? (
+              <Button variant="outlined" onClick={() => setShowMore(false)}>
+                Show Less
+              </Button>
+            ) : (
+              <Button variant="outlined" onClick={() => setShowMore(true)}>
+                Show More
+              </Button>
+            )}
+          </>
         )}
       </StatButtonWrapper>
       {answer.status === "manual-review" ? (
-        <ManualReviewField answer={answer} />
+        <ManualReviewField
+          answer={answer}
+          handled={handled}
+          setHandled={setHandled}
+          setStatus={setStatus}
+        />
       ) : (
         ""
       )}
