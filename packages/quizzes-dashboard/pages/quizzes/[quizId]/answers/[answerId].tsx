@@ -6,7 +6,11 @@ import { fetchQuiz, getAnswerById } from "../../../../services/quizzes"
 import AnswerCard from "../../../../components/Answer"
 import styled from "styled-components"
 import { Skeleton } from "@material-ui/lab"
-import Head from "next/head"
+import {
+  TabTextLoading,
+  TabText,
+  TabTextError,
+} from "../../../../components/quizPages/TabHeaders"
 
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
@@ -16,22 +20,25 @@ export const AnswerById = () => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
   const answerId = route.query.answerId?.toString() ?? ""
+
   const [expanded, setExpanded] = useState(true)
+
   const [answerResponse, answerError] = usePromise(
     () => getAnswerById(answerId),
     [],
   )
-  const [quizResponse, quizError] = usePromise(() => fetchQuiz(quizId), [])
+
+  const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [quizId])
 
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
       label: "Course",
-      as: `/courses/${quizResponse?.courseId}`,
+      as: `/courses/${quiz?.courseId}`,
       href: "/courses/[courseId]",
     },
     {
-      label: "Quiz page",
+      label: `${quiz?.title}`,
       as: `/quizzes/${quizId}/overview`,
       href: "/quizzes/[quizId]/overview",
     },
@@ -45,18 +52,19 @@ export const AnswerById = () => {
     },
   ])
 
-  if (!answerResponse) {
+  if (answerError || quizError) {
     return (
       <>
-        <div>
-          <Head>
-            <title>loading... | Quizzes</title>
-            <meta
-              name="quizzes"
-              content="initial-scale=1.0, width=device-width"
-            />
-          </Head>
-        </div>
+        <TabTextError />
+        <div>Something went wrong...</div>
+      </>
+    )
+  }
+
+  if (!answerResponse || !quiz) {
+    return (
+      <>
+        <TabTextLoading />
         <StyledSkeleton variant="rect" height={300} animation="wave" />
       </>
     )
@@ -64,15 +72,7 @@ export const AnswerById = () => {
 
   return (
     <>
-      <div>
-        <Head>
-          <title>Singular answer | Quizzes</title>
-          <meta
-            name="quizzes"
-            content="initial-scale=1.0, width=device-width"
-          />
-        </Head>
-      </div>
+      <TabText text="Singular answer" />
       <AnswerCard answer={answerResponse} expanded={expanded} />
     </>
   )

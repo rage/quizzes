@@ -51,9 +51,19 @@ class Course extends Model {
   }
 
   static async getById(id: string) {
-    return await this.query()
-      .withGraphJoined("texts")
-      .where("id", id)
+    const course = (
+      await this.query()
+        .withGraphJoined("texts")
+        .where("id", id)
+        .limit(1)
+    )[0]
+    const text = course.texts[0]
+    course.languageId = text.languageId
+    course.title = text.title
+    course.body = text.body
+    course.abbreviation = text.abbreviation
+    delete course.texts
+    return course
   }
 
   static async getAll() {
@@ -111,7 +121,7 @@ class Course extends Model {
           uuid_generate_v5(:newCourseId, id::text), :newCourseId, part, section, points, deadline,
           open, excluded_from_score, auto_confirm, tries, tries_limited,
           award_points_even_if_wrong
-         
+
         FROM quiz WHERE course_id = :oldCourseId;
       `,
           {

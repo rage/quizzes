@@ -8,7 +8,7 @@ import {
 import { Typography, TextField, MenuItem, Fade } from "@material-ui/core"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faInfoCircle, faExclamation } from "@fortawesome/free-solid-svg-icons"
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
 import { useDispatch } from "react-redux"
 import {
   editedQuizTitle,

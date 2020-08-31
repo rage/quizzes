@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useRef, useLayoutEffect } from "react"
 import styled from "styled-components"
 import AnswerOverView from "./AnswerOverView"
 import ItemAnswers from "./ItemAnswers"
@@ -87,6 +87,8 @@ export const AnswerContent = ({
   const [showMore, setShowMore] = useState(expanded)
   const [showPeerreviewModal, setShowPeerreviewModal] = useState(false)
   const [handled, setHandled] = useState(false)
+  const [height, setHeight] = useState(0)
+  const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => setShowMore(expanded), [expanded])
   useEffect(() => {
@@ -94,6 +96,11 @@ export const AnswerContent = ({
       setFaded(true)
     }
   }, [handled])
+  useLayoutEffect(() => {
+    if (ref.current !== null) {
+      setHeight(ref.current.clientHeight)
+    }
+  }, [])
 
   return (
     <>
@@ -114,16 +121,18 @@ export const AnswerContent = ({
           </PeerreviewBox>
         </Fade>
       </PeerreviewModal>
-      <Collapse in={showMore} collapsedHeight={250}>
-        <ContentContainer>
-          <AnswerLink answer={answer} />
-        </ContentContainer>
-        <ContentContainer>
-          <AnswerOverView answer={answer} />
-        </ContentContainer>
-        <ContentContainer>
+      <ContentContainer>
+        <AnswerLink answer={answer} />
+      </ContentContainer>
+      <ContentContainer>
+        <AnswerOverView answer={answer} />
+      </ContentContainer>
+      <Collapse in={showMore} collapsedHeight={300}>
+        <ContentContainer ref={ref}>
           <ItemAnswers itemAnswers={answer.itemAnswers} />
         </ContentContainer>
+      </Collapse>
+      <ContentContainer>
         {answer.peerReviews.length > 0 ? (
           <PeerreviewButton
             variant="outlined"
@@ -135,19 +144,23 @@ export const AnswerContent = ({
         ) : (
           ""
         )}
-      </Collapse>
+      </ContentContainer>
       <StatsContainer>
         <CompactPeerReviewStats answer={answer} />
       </StatsContainer>
       <StatButtonWrapper>
-        {showMore ? (
-          <Button variant="outlined" onClick={() => setShowMore(false)}>
-            Show Less
-          </Button>
-        ) : (
-          <Button variant="outlined" onClick={() => setShowMore(true)}>
-            Show More
-          </Button>
+        {height > 300 && (
+          <>
+            {showMore ? (
+              <Button variant="outlined" onClick={() => setShowMore(false)}>
+                Show Less
+              </Button>
+            ) : (
+              <Button variant="outlined" onClick={() => setShowMore(true)}>
+                Show More
+              </Button>
+            )}
+          </>
         )}
       </StatButtonWrapper>
       {answer.status === "manual-review" ? (

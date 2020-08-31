@@ -83,15 +83,27 @@ class QuizAnswer extends Model {
     page: number,
     pageSize: number,
     order: "asc" | "desc",
+    filters: string[],
   ) {
-    const paginated = await this.query()
-      .where("quiz_id", quizId)
-      .andWhereNot("status", "deprecated")
-      .orderBy([{ column: "created_at", order: order }])
-      .page(page, pageSize)
-      .withGraphFetched("userQuizState")
-      .withGraphFetched("itemAnswers.[optionAnswers]")
-      .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+    let paginated
+    if (filters.length === 0) {
+      paginated = await this.query()
+        .where("quiz_id", quizId)
+        .orderBy([{ column: "created_at", order: order }])
+        .page(page, pageSize)
+        .withGraphFetched("userQuizState")
+        .withGraphFetched("itemAnswers.[optionAnswers]")
+        .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+    } else {
+      paginated = await this.query()
+        .where("quiz_id", quizId)
+        .whereIn("status", filters)
+        .orderBy([{ column: "created_at", order: order }])
+        .page(page, pageSize)
+        .withGraphFetched("userQuizState")
+        .withGraphFetched("itemAnswers.[optionAnswers]")
+        .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+    }
 
     paginated.results.map(answer => {
       if (answer.peerReviews.length > 0) {
@@ -196,6 +208,14 @@ class QuizAnswer extends Model {
     countByStatus["total"] = Number(total[0].count)
 
     return countByStatus
+  }
+
+  public static async getStates() {
+    const states = await this.query()
+      .select("status")
+      .distinct("status")
+
+    return states.map(state => state.status)
   }
 
   private static moveQuestionTextsToparent = (question: PeerReviewQuestion) => {

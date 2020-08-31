@@ -8,7 +8,11 @@ export interface IQueryParams {
     quizId: string
     pageNo?: number
     size?: TAnswersDisplayed
-    expandAll?: boolean
+    expandAll?: string | boolean
     sort?: TSortOptions
   }
+}
+
+export interface ChipProps {
+  checked: boolean
 }

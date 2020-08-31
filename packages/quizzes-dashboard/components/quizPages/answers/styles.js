@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { TextField } from "@material-ui/core"
+import { TextField, Typography } from "@material-ui/core"
 import { Pagination, Skeleton } from "@material-ui/lab"
 
 export const SizeSelectorContainer = styled.div`
@@ -37,4 +37,22 @@ export const OptionsContainer = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
+`
+export const SortOrderField = styled(TextField)`
+  display: flex !important;
+  width: 33%;
+`
+
+export const FilterParamsField = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+`
+
+export const StyledTitle = styled(Typography)`
+  display: flex !important;
+  width: 100% !important;
 `

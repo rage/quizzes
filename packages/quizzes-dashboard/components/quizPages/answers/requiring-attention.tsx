@@ -9,6 +9,8 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { AnswerList } from "../../AnswerList"
 import usePromise from "react-use-promise"
 import { TextField, MenuItem, Switch, Typography } from "@material-ui/core"
+import styled from "styled-components"
+import { Pagination, Skeleton } from "@material-ui/lab"
 import QuizTitle from "../QuizTitleContainer"
 import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
 import {
@@ -19,12 +21,16 @@ import {
   SwitchField,
   Paginator,
   OptionsContainer,
+  SortOrderField,
 } from "./styles"
-import { IQueryParams, TAnswersDisplayed } from "./types"
+import { IQueryParams, TAnswersDisplayed, TSortOptions } from "./types"
 
 export const RequiringAttention = (props: IQueryParams) => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
+
+  const URL_HREF = `/quizzes/[quizId]/[page]`
+  const pathname = `/quizzes/${quizId}/all-answers/`
 
   // pull items from passed in query data
   let {
@@ -41,10 +47,12 @@ export const RequiringAttention = (props: IQueryParams) => {
   paramPage = Number(paramPage)
   paramExpand = Boolean(paramExpand)
 
-  const [currentPage, setCurrentPage] = useState(paramPage || 1)
-  const [answersDisplayed, setAnswersDisplayed] = useState(10)
-  const [expandAll, setExpandAll] = useState(false)
-  const [sortOrder, setSortOrder] = useState("desc")
+  const [currentPage, setCurrentPage] = useState<number>(paramPage || 1)
+  const [sortOrder, setSortOrder] = useState<TSortOptions>(paramSort || "desc")
+  const [expandAll, setExpandAll] = useState<boolean>(paramExpand || false)
+  const [answersDisplayed, setAnswersDisplayed] = useState<TAnswersDisplayed>(
+    paramSize || 10,
+  )
 
   const [answers, error] = usePromise(
     () =>
@@ -65,12 +73,12 @@ export const RequiringAttention = (props: IQueryParams) => {
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
-      label: "Course",
+      label: `${course ? course.title : ""}`,
       as: `/courses/${quiz?.courseId}`,
       href: "/courses/[courseId]",
     },
     {
-      label: "Quiz answers requiring attention",
+      label: `${quiz ? quiz.title : ""}`,
     },
   ])
 
@@ -106,10 +114,20 @@ export const RequiringAttention = (props: IQueryParams) => {
     )
   }
 
-  const handleChange = (event: any, nextPage?: number) => {
-    const URL_HREF = `/quizzes/[quizId]/[page]`
-    const pathname = `/quizzes/${quizId}/all-answers/`
+  const handlePageChange = (nextPage: number) => {
+    let query = {
+      pageNo: currentPage,
+      size: answersDisplayed,
+      expandAll: expandAll,
+      sort: sortOrder,
+    }
+    query = { ...query, pageNo: nextPage }
+    setCurrentPage(nextPage)
+    route.push(URL_HREF, { pathname, query }, { shallow: true })
+  }
 
+  const handleChange = (event: any, fieldType?: string, nextPage?: number) => {
+    console.log(route)
     let query = {
       pageNo: currentPage,
       size: answersDisplayed,
@@ -117,23 +135,16 @@ export const RequiringAttention = (props: IQueryParams) => {
       sort: sortOrder,
     }
 
-    if (nextPage) {
-      query = { ...query, pageNo: nextPage }
-      setCurrentPage(nextPage)
-      route.push(URL_HREF, { pathname, query }, { shallow: true })
-      return
-    }
-
-    switch (event.target.name) {
-      case "size-selector":
+    switch (fieldType) {
+      case "pages":
         setAnswersDisplayed(Number(event.target.value) as TAnswersDisplayed)
         query = { ...query, size: event.target.value }
         break
-      case "expand-field":
+      case "expand":
         setExpandAll(event.target.checked)
         query = { ...query, expandAll: event.target.checked }
         break
-      case "order-field":
+      case "order":
         setSortOrder(event.target.value)
         query = { ...query, sort: event.target.value }
         break
@@ -156,21 +167,6 @@ export const RequiringAttention = (props: IQueryParams) => {
       ) : (
         <>
           <QuizTitle quiz={quiz} course={course} />
-          <SizeSelectorContainer>
-            <SizeSelectorField
-              name="size-selector"
-              value={answersDisplayed}
-              size="medium"
-              label="Answers"
-              variant="outlined"
-              select
-              onChange={event => handleChange(event)}
-            >
-              <MenuItem value={10}>10</MenuItem>
-              <MenuItem value={50}>50</MenuItem>
-              <MenuItem value={100}>100</MenuItem>
-            </SizeSelectorField>
-          </SizeSelectorContainer>
           <PaginationField>
             <Paginator
               siblingCount={2}
@@ -181,7 +177,7 @@ export const RequiringAttention = (props: IQueryParams) => {
               showFirstButton
               showLastButton
               page={currentPage}
-              onChange={(event, nextPage) => handleChange(event, nextPage)}
+              onChange={(event, nextPage) => handlePageChange(nextPage)}
             />
           </PaginationField>
           <OptionsContainer>
@@ -191,22 +187,34 @@ export const RequiringAttention = (props: IQueryParams) => {
                 name="expand-field"
                 checked={expandAll}
                 onChange={event => {
-                  handleChange(event)
+                  handleChange(event, "expand")
                 }}
               />
             </SwitchField>
-            <TextField
-              name="order-field"
+            <SizeSelectorField
+              value={answersDisplayed}
+              size="medium"
+              label="Answers"
+              variant="outlined"
+              select
+              onChange={event => handleChange(event, "pages")}
+              helperText="How many answers are shown per page"
+            >
+              <MenuItem value={10}>10</MenuItem>
+              <MenuItem value={50}>50</MenuItem>
+              <MenuItem value={100}>100</MenuItem>
+            </SizeSelectorField>
+            <SortOrderField
               label="Sort order"
               variant="outlined"
               select
               helperText="Sorts answers by date they've been submitted"
               value={sortOrder}
-              onChange={event => handleChange(event)}
+              onChange={event => handleChange(event, "order")}
             >
               <MenuItem value="desc">Latest first</MenuItem>
               <MenuItem value="asc">Oldest first</MenuItem>
-            </TextField>
+            </SortOrderField>
           </OptionsContainer>
           <AnswerList
             data={answers.results}
@@ -223,7 +231,7 @@ export const RequiringAttention = (props: IQueryParams) => {
               showFirstButton
               showLastButton
               page={currentPage}
-              onChange={(event, nextPage) => handleChange(event, nextPage)}
+              onChange={(event, nextPage) => handlePageChange(nextPage)}
             />
           </PaginationField>
         </>

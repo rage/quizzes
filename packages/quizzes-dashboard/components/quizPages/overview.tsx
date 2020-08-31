@@ -55,12 +55,12 @@ export const OverView = () => {
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
-      label: "Course",
+      label: `${course ? course.title : ""}`,
       as: `/courses/${quiz?.courseId}`,
       href: "/courses/[courseId]",
     },
     {
-      label: "Quiz Overview",
+      label: `${quiz ? quiz.title : ""}`,
     },
   ])
 

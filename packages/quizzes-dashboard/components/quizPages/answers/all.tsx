@@ -1,32 +1,48 @@
 import React, { useState } from "react"
+import _ from "lodash"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
-import {
-  getAllAnswers,
-  fetchQuiz,
-  fetchCourseById,
-} from "../../../services/quizzes"
-import { AnswerList } from "../../AnswerList"
+import { fetchQuiz, fetchCourseById } from "../../../services/quizzes"
 import usePromise from "react-use-promise"
-import { TextField, MenuItem, Switch, Typography } from "@material-ui/core"
+import { MenuItem, Switch, Typography, Chip } from "@material-ui/core"
 import styled from "styled-components"
-import { Pagination, Skeleton } from "@material-ui/lab"
 import QuizTitle from "../QuizTitleContainer"
 import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
 import {
-  SizeSelectorContainer,
   SizeSelectorField,
-  PaginationField,
-  Paginator,
   StyledSkeleton,
   OptionsContainer,
   SwitchField,
+  SortOrderField,
+  FilterParamsField,
 } from "./styles"
-import { IQueryParams, TSortOptions, TAnswersDisplayed } from "./types"
+import {
+  IQueryParams,
+  TSortOptions,
+  TAnswersDisplayed,
+  ChipProps,
+} from "./types"
+import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
+import AnswerListWrapper from "../../AnswerListWrapper"
+
+const StyledChip = styled(Chip)<ChipProps>`
+  display: flex !important;
+  background: ${props => {
+    if (props.checked) {
+      return "linear-gradient(rgba(0, 0, 0, 0.2), rgba(63, 81, 181, 0.3)) !important"
+    }
+  }};
+  margin-left: 0.5rem !important;
+  margin-right: 0.5rem !important;
+  margin-bottom: 0.5rem !important;
+`
 
 export const AllAnswers = (props: IQueryParams) => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
+
+  const URL_HREF = `/quizzes/[quizId]/[page]`
+  const pathname = `/quizzes/${quizId}/all-answers/`
 
   // pull items from passed in query data
   let {
@@ -41,19 +57,31 @@ export const AllAnswers = (props: IQueryParams) => {
   // normalise data format
   paramSize = Number(paramSize) as TAnswersDisplayed
   paramPage = Number(paramPage)
-  paramExpand = Boolean(paramExpand)
+  paramExpand = paramExpand === "true" ? true : false
 
   const [currentPage, setCurrentPage] = useState<number>(paramPage || 1)
+  const [sortOrder, setSortOrder] = useState<TSortOptions>(paramSort || "desc")
+  const [expandAll, setExpandAll] = useState<boolean>(paramExpand || false)
   const [answersDisplayed, setAnswersDisplayed] = useState<TAnswersDisplayed>(
     paramSize || 10,
   )
-  const [expandAll, setExpandAll] = useState<boolean>(paramExpand || false)
-  const [sortOrder, setSortOrder] = useState<TSortOptions>(paramSort || "desc")
+  const [filterParameters, setFilterParameters] = useState<string[]>([])
+  const states: { [state: string]: { checked: boolean } } = {
+    "manual-review": { checked: false },
+    rejected: { checked: false },
+    "manual-review-once-given-and-received-enough": { checked: false },
+    draft: { checked: false },
+    "given-enough": { checked: false },
+    confirmed: { checked: false },
+    "given-more-than-enough": { checked: false },
+    deprecated: { checked: false },
+    "enough-received-but-not-given": { checked: false },
+    submitted: { checked: false },
+    "manual-review-once-given-enough": { checked: false },
+    spam: { checked: false },
+  }
+  const [chipStates, setChipStates] = useState(states)
 
-  const [answers, error] = usePromise(
-    () => getAllAnswers(quizId, currentPage, answersDisplayed, sortOrder),
-    [currentPage, answersDisplayed, sortOrder],
-  )
   const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [])
   const [course, courseError] = usePromise(
     () => fetchCourseById(quiz?.courseId ?? ""),
@@ -63,39 +91,25 @@ export const AllAnswers = (props: IQueryParams) => {
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
-      label: "Course",
+      label: `${course ? course.title : ""}`,
       as: `/courses/${quiz?.courseId}`,
       href: "/courses/[courseId]",
     },
     {
-      label: "Quiz all answers",
+      label: `${quiz ? quiz.title : ""}`,
     },
   ])
 
-  if (!answers || !quiz || !course) {
+  if (!quiz || !course) {
     return (
       <>
         <TabTextLoading />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <StyledSkeleton variant="rect" animation="wave" height={500} />
       </>
     )
   }
 
-  if (error || quizError || courseError) {
+  if (quizError || courseError) {
     return (
       <>
         <TabTextError />
@@ -104,10 +118,20 @@ export const AllAnswers = (props: IQueryParams) => {
     )
   }
 
-  const handleChange = (event: any, nextPage?: number) => {
-    const URL_HREF = `/quizzes/[quizId]/[page]`
-    const pathname = `/quizzes/${quizId}/all-answers/`
+  const handlePageChange = (nextPage: number) => {
+    let query = {
+      pageNo: currentPage,
+      size: answersDisplayed,
+      expandAll: expandAll,
+      sort: sortOrder,
+    }
+    query = { ...query, pageNo: nextPage }
+    setCurrentPage(nextPage)
+    route.push(URL_HREF, { pathname, query }, { shallow: true })
+  }
 
+  const handleChange = (event: any, fieldType?: string, nextPage?: number) => {
+    console.log(route)
     let query = {
       pageNo: currentPage,
       size: answersDisplayed,
@@ -115,23 +139,16 @@ export const AllAnswers = (props: IQueryParams) => {
       sort: sortOrder,
     }
 
-    if (nextPage) {
-      query = { ...query, pageNo: nextPage }
-      setCurrentPage(nextPage)
-      route.push(URL_HREF, { pathname, query }, { shallow: true })
-      return
-    }
-
-    switch (event.target.name) {
-      case "size-selector":
+    switch (fieldType) {
+      case "pages":
         setAnswersDisplayed(Number(event.target.value) as TAnswersDisplayed)
         query = { ...query, size: event.target.value }
         break
-      case "expand-field":
+      case "expand":
         setExpandAll(event.target.checked)
         query = { ...query, expandAll: event.target.checked }
         break
-      case "order-field":
+      case "order":
         setSortOrder(event.target.value)
         query = { ...query, sort: event.target.value }
         break
@@ -146,86 +163,82 @@ export const AllAnswers = (props: IQueryParams) => {
   return (
     <>
       <TabText text="All answers" />
-      {answers.results.length === 0 ? (
-        <>
-          <QuizTitle quiz={quiz} course={course} />
-          <Typography variant="h3">No Answers for this quiz</Typography>
-        </>
-      ) : (
-        <>
-          <QuizTitle quiz={quiz} course={course} />
-          <SizeSelectorContainer>
-            <SizeSelectorField
-              name="size-selector"
-              value={answersDisplayed}
-              size="medium"
-              label="Answers"
-              variant="outlined"
-              select
-              onChange={event => handleChange(event)}
-            >
-              <MenuItem value={10}>10</MenuItem>
-              <MenuItem value={50}>50</MenuItem>
-              <MenuItem value={100}>100</MenuItem>
-            </SizeSelectorField>
-          </SizeSelectorContainer>
-          <PaginationField>
-            <Paginator
-              siblingCount={2}
-              boundaryCount={2}
-              count={Math.ceil(answers.total / answersDisplayed)}
-              size="large"
-              color="primary"
-              showFirstButton
-              showLastButton
-              page={currentPage}
-              onChange={(event, nextPage) => handleChange(event, nextPage)}
-            />
-          </PaginationField>
-          <OptionsContainer>
-            <SwitchField>
-              <Typography>Expand all</Typography>
-              <Switch
-                name="expand-field"
-                checked={expandAll}
-                onChange={event => {
-                  handleChange(event)
-                }}
-              />
-            </SwitchField>
-            <TextField
-              name="order-field"
-              label="Sort order"
-              variant="outlined"
-              select
-              helperText="Sorts answers by date they've been submitted"
-              value={sortOrder}
-              onChange={event => handleChange(event)}
-            >
-              <MenuItem value="desc">Latest first</MenuItem>
-              <MenuItem value="asc">Oldest first</MenuItem>
-            </TextField>
-          </OptionsContainer>
-          <AnswerList
-            data={answers.results}
-            error={error}
-            expandAll={expandAll}
+      <QuizTitle quiz={quiz} course={course} />
+      <OptionsContainer>
+        <SwitchField>
+          <Typography>Expand all</Typography>
+          <Switch
+            checked={expandAll}
+            onChange={event => {
+              handleChange(event, "expand")
+            }}
           />
-          <PaginationField>
-            <Paginator
-              siblingCount={2}
-              boundaryCount={2}
-              count={Math.ceil(answers.total / answersDisplayed)}
-              size="large"
-              color="primary"
-              showFirstButton
-              showLastButton
-              page={currentPage}
-              onChange={(event, nextPage) => handleChange(event, nextPage)}
+        </SwitchField>
+        <SizeSelectorField
+          value={answersDisplayed}
+          size="medium"
+          label="Answers"
+          variant="outlined"
+          helperText="How many answers are shown per page"
+          select
+          onChange={event => {
+            handleChange(event, "pages")
+          }}
+        >
+          <MenuItem value={10}>10</MenuItem>
+          <MenuItem value={50}>50</MenuItem>
+          <MenuItem value={100}>100</MenuItem>
+        </SizeSelectorField>
+        <SortOrderField
+          label="Sort order"
+          variant="outlined"
+          select
+          helperText="Sorts answers by date they've been submitted"
+          value={sortOrder}
+          onChange={event => handleChange(event, "order")}
+        >
+          <MenuItem value="desc">Latest first</MenuItem>
+          <MenuItem value="asc">Oldest first</MenuItem>
+        </SortOrderField>
+      </OptionsContainer>
+      <StyledTitle variant="subtitle1">Status filters</StyledTitle>
+      <FilterParamsField>
+        {Object.keys(chipStates).map(state => {
+          return (
+            <StyledChip
+              defaultValue={state}
+              key={state}
+              label={state}
+              variant="outlined"
+              checked={chipStates[state].checked}
+              onClick={() => {
+                const newStates = _.clone(chipStates)
+                newStates[state].checked = !newStates[state].checked
+                setChipStates(newStates)
+
+                if (chipStates[state].checked) {
+                  const newParams = _.clone(filterParameters)
+                  setFilterParameters(newParams.concat(state))
+                } else {
+                  const newParams = _.clone(filterParameters)
+                  setFilterParameters(
+                    newParams.filter(param => param !== state),
+                  )
+                }
+              }}
             />
-          </PaginationField>
-        </>
-      )}
+          )
+        })}
+      </FilterParamsField>
+      <AnswerListWrapper
+        expandAll={expandAll}
+        filterparameters={filterParameters}
+        order={sortOrder}
+        quizId={quizId}
+        size={answersDisplayed}
+        handleChange={handlePageChange}
+        page={currentPage}
+      />
     </>
   )
 }
