@@ -36,7 +36,7 @@ export const RequiringAttention = (props: IQueryParams) => {
   let {
     queryParams: {
       pageNo: paramPage,
-      size: paramSize,
+      answers: paramSize,
       expandAll: paramExpand,
       sort: paramSort,
     },
@@ -69,6 +69,8 @@ export const RequiringAttention = (props: IQueryParams) => {
     () => fetchCourseById(quiz?.courseId ?? ""),
     [quiz],
   )
+
+  const [queryToPush, setQueryToPush] = useState({})
 
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
@@ -115,38 +117,39 @@ export const RequiringAttention = (props: IQueryParams) => {
   }
 
   const handlePageChange = (nextPage: number) => {
-    let query = {
-      pageNo: currentPage,
-      size: answersDisplayed,
-      expandAll: expandAll,
-      sort: sortOrder,
-    }
-    query = { ...query, pageNo: nextPage }
+    let query = null
+    setQueryToPush({ ...queryToPush, pageNo: nextPage })
     setCurrentPage(nextPage)
+    query = { ...queryToPush, pageNo: nextPage }
     route.push(URL_HREF, { pathname, query }, { shallow: true })
   }
 
   const handleChange = (event: any, fieldType?: string, nextPage?: number) => {
     console.log(route)
-    let query = {
-      pageNo: currentPage,
-      size: answersDisplayed,
-      expandAll: expandAll,
-      sort: sortOrder,
-    }
+    let query = null
+    let updatedQueryParams = null
 
     switch (fieldType) {
       case "pages":
+        updatedQueryParams = {
+          ...queryToPush,
+          answers: event.target.value,
+        }
+        setQueryToPush(updatedQueryParams)
         setAnswersDisplayed(Number(event.target.value) as TAnswersDisplayed)
-        query = { ...query, size: event.target.value }
+        query = updatedQueryParams
         break
       case "expand":
+        updatedQueryParams = { ...queryToPush, expandAll: event.target.checked }
+        setQueryToPush(updatedQueryParams)
         setExpandAll(event.target.checked)
-        query = { ...query, expandAll: event.target.checked }
+        query = updatedQueryParams
         break
       case "order":
+        updatedQueryParams = { ...queryToPush, sort: event.target.value }
+        setQueryToPush(updatedQueryParams)
         setSortOrder(event.target.value)
-        query = { ...query, sort: event.target.value }
+        query = updatedQueryParams
         break
       default:
         break

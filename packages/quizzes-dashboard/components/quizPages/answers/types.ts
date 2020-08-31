@@ -7,7 +7,7 @@ export interface IQueryParams {
     page: string
     quizId: string
     pageNo?: number
-    size?: TAnswersDisplayed
+    answers?: TAnswersDisplayed
     expandAll?: string | boolean
     sort?: TSortOptions
   }
