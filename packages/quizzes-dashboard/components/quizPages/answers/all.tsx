@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import _ from "lodash"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
@@ -16,12 +16,7 @@ import {
   SortOrderField,
   FilterParamsField,
 } from "./styles"
-import {
-  IQueryParams,
-  TSortOptions,
-  TAnswersDisplayed,
-  ChipProps,
-} from "./types"
+import { TSortOptions, TAnswersDisplayed, ChipProps } from "./types"
 import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
 import AnswerListWrapper from "../../AnswerListWrapper"
 
@@ -37,27 +32,25 @@ const StyledChip = styled(Chip)<ChipProps>`
   margin-bottom: 0.5rem !important;
 `
 
-export const AllAnswers = (props: IQueryParams) => {
+export const AllAnswers = () => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
 
   const URL_HREF = `/quizzes/[quizId]/[page]`
   const pathname = `/quizzes/${quizId}/all-answers/`
 
-  // pull items from passed in query data
-  let {
-    queryParams: {
-      pageNo: paramPage,
-      answers: paramSize,
-      expandAll: paramExpand,
-      sort: paramSort,
-    },
-  } = props
-
-  // normalise data format
-  paramSize = Number(paramSize) as TAnswersDisplayed
-  paramPage = Number(paramPage)
-  paramExpand = paramExpand === "true" ? true : false
+  let paramSize = Number(route.query.answers) as TAnswersDisplayed
+  let paramPage = Number(route.query.pageNo)
+  let paramSort: TSortOptions | null = null
+  if (route.query.sort) {
+    paramSort = route.query.sort as TSortOptions
+  }
+  let paramExpand = route.query.expandAll === "true" ? true : false
+  let paramFilters: any = null
+  if (route.query.filters !== undefined) {
+    let filtersAsString: string = route.query.filters.toString()
+    paramFilters = filtersAsString.split(",")
+  }
 
   const [currentPage, setCurrentPage] = useState<number>(paramPage || 1)
   const [sortOrder, setSortOrder] = useState<TSortOptions>(paramSort || "desc")
@@ -65,20 +58,40 @@ export const AllAnswers = (props: IQueryParams) => {
   const [answersDisplayed, setAnswersDisplayed] = useState<TAnswersDisplayed>(
     paramSize || 10,
   )
-  const [filterParameters, setFilterParameters] = useState<string[]>([])
+  const [filterParameters, setFilterParameters] = useState<string[]>(
+    paramFilters || [],
+  )
+
+  const isIncludedInFilter = (param: string) => {
+    if (!route.query.filters) {
+      return false
+    }
+    return route.query.filters?.includes(param)
+  }
+
   const states: { [state: string]: { checked: boolean } } = {
-    "manual-review": { checked: false },
-    rejected: { checked: false },
-    "manual-review-once-given-and-received-enough": { checked: false },
-    draft: { checked: false },
-    "given-enough": { checked: false },
-    confirmed: { checked: false },
-    "given-more-than-enough": { checked: false },
-    deprecated: { checked: false },
-    "enough-received-but-not-given": { checked: false },
-    submitted: { checked: false },
-    "manual-review-once-given-enough": { checked: false },
-    spam: { checked: false },
+    "manual-review": { checked: isIncludedInFilter("manual-review") },
+    rejected: { checked: isIncludedInFilter("rejected") },
+    "manual-review-once-given-and-received-enough": {
+      checked: isIncludedInFilter(
+        "manual-review-once-given-and-received-enough",
+      ),
+    },
+    draft: { checked: isIncludedInFilter("draft") },
+    "given-enough": { checked: isIncludedInFilter("given-enough") },
+    confirmed: { checked: isIncludedInFilter("confirmed") },
+    "given-more-than-enough": {
+      checked: isIncludedInFilter("given-more-than-enough"),
+    },
+    deprecated: { checked: isIncludedInFilter("deprecated") },
+    "enough-received-but-not-given": {
+      checked: isIncludedInFilter("enough-received-but-not-given"),
+    },
+    submitted: { checked: isIncludedInFilter("submitted") },
+    "manual-review-once-given-enough": {
+      checked: isIncludedInFilter("manual-review-once-given-enough"),
+    },
+    spam: { checked: isIncludedInFilter("spam") },
   }
   const [chipStates, setChipStates] = useState(states)
 
@@ -102,6 +115,29 @@ export const AllAnswers = (props: IQueryParams) => {
 
   const [queryToPush, setQueryToPush] = useState({})
 
+  // this needs to be run so that if the page with query params is loaded in
+  // another window, the params can be updated without clearing the rest first
+  useEffect(() => {
+    let initialQuery: any = {}
+
+    if (paramPage) {
+      initialQuery.pageNo = paramPage
+    }
+    if (paramSize) {
+      initialQuery.answers = paramSize
+    }
+    if (paramExpand) {
+      initialQuery.expandAll = paramExpand
+    }
+    if (paramSort) {
+      initialQuery.sort = paramSort
+    }
+    if (paramFilters as any) {
+      initialQuery.filters = paramFilters.toString()
+    }
+    setQueryToPush(initialQuery)
+  }, [])
+
   if (!quiz || !course) {
     return (
       <>
@@ -120,15 +156,26 @@ export const AllAnswers = (props: IQueryParams) => {
     )
   }
 
+  /**
+   *  handled separately since
+   * @param nextPage page being paginated to
+   */
   const handlePageChange = (nextPage: number) => {
-    let query = null
     setQueryToPush({ ...queryToPush, pageNo: nextPage })
     setCurrentPage(nextPage)
-    query = { ...queryToPush, pageNo: nextPage }
+    let query = { ...queryToPush, pageNo: nextPage }
     route.push(URL_HREF, { pathname, query }, { shallow: true })
   }
 
-  const handleChange = (event: any, fieldType?: string, nextPage?: number) => {
+  /**
+   *
+   * @param event
+   * @param fieldType - the field being interacted with
+   */
+  const handleFieldChange = (
+    event: React.ChangeEvent<any>,
+    fieldType?: string,
+  ) => {
     let query = null
     let updatedQueryParams = null
 
@@ -154,11 +201,42 @@ export const AllAnswers = (props: IQueryParams) => {
         setSortOrder(event.target.value)
         query = updatedQueryParams
         break
+      case "filter":
+        updatedQueryParams = { ...queryToPush, filters: event.target.value }
+        setQueryToPush(updatedQueryParams)
+        setSortOrder(event.target.value)
+        query = updatedQueryParams
+        break
       default:
         break
     }
 
     // in all cases, push all the query params
+    route.push(URL_HREF, { pathname, query }, { shallow: true })
+  }
+
+  /**
+   * filters pushed as a comma-separated list
+   * @param filters
+   */
+  const handleFilterChanges = (filters: string | string[]) => {
+    filters = filters.toString()
+    // if removing last filter
+    if (filters === "") {
+      let updatedQueryParams: any = { ...queryToPush }
+      // remove filter from query params so it doesn't display and empty filter query
+      if (updatedQueryParams.filters) {
+        delete updatedQueryParams.filters
+      }
+      setQueryToPush(updatedQueryParams)
+      let query = updatedQueryParams
+      route.push(URL_HREF, { pathname, query }, { shallow: true })
+      return
+    }
+
+    let updatedQueryParams = { ...queryToPush, filters: filters }
+    setQueryToPush(updatedQueryParams)
+    let query = updatedQueryParams
     route.push(URL_HREF, { pathname, query }, { shallow: true })
   }
 
@@ -172,7 +250,7 @@ export const AllAnswers = (props: IQueryParams) => {
           <Switch
             checked={expandAll}
             onChange={event => {
-              handleChange(event, "expand")
+              handleFieldChange(event, "expand")
             }}
           />
         </SwitchField>
@@ -184,7 +262,7 @@ export const AllAnswers = (props: IQueryParams) => {
           helperText="How many answers are shown per page"
           select
           onChange={event => {
-            handleChange(event, "pages")
+            handleFieldChange(event, "pages")
           }}
         >
           <MenuItem value={10}>10</MenuItem>
@@ -197,7 +275,7 @@ export const AllAnswers = (props: IQueryParams) => {
           select
           helperText="Sorts answers by date they've been submitted"
           value={sortOrder}
-          onChange={event => handleChange(event, "order")}
+          onChange={event => handleFieldChange(event, "order")}
         >
           <MenuItem value="desc">Latest first</MenuItem>
           <MenuItem value="asc">Oldest first</MenuItem>
@@ -217,16 +295,16 @@ export const AllAnswers = (props: IQueryParams) => {
                 const newStates = _.clone(chipStates)
                 newStates[state].checked = !newStates[state].checked
                 setChipStates(newStates)
-
+                let paramsToSet = _.clone(filterParameters)
                 if (chipStates[state].checked) {
-                  const newParams = _.clone(filterParameters)
-                  setFilterParameters(newParams.concat(state))
+                  paramsToSet = paramsToSet.concat(state)
+                  setFilterParameters(paramsToSet)
                 } else {
-                  const newParams = _.clone(filterParameters)
-                  setFilterParameters(
-                    newParams.filter(param => param !== state),
-                  )
+                  paramsToSet = paramsToSet.filter(param => param !== state)
+                  setFilterParameters(paramsToSet)
                 }
+                // update url
+                handleFilterChanges(paramsToSet)
               }}
             />
           )
@@ -238,7 +316,7 @@ export const AllAnswers = (props: IQueryParams) => {
         order={sortOrder}
         quizId={quizId}
         size={answersDisplayed}
-        handleChange={handlePageChange}
+        handlePageChange={handlePageChange}
         page={currentPage}
       />
     </>

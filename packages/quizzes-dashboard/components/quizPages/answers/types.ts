@@ -10,6 +10,7 @@ export interface IQueryParams {
     answers?: TAnswersDisplayed
     expandAll?: string | boolean
     sort?: TSortOptions
+    filters?: string | string[]
   }
 }
 

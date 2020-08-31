@@ -27,7 +27,7 @@ interface WrapperProps {
   filterparameters: string[]
   expandAll: boolean
   page: number
-  handleChange: any
+  handlePageChange: (nextPage: number) => void
 }
 
 export const AnswerListWrapper = ({
@@ -37,7 +37,7 @@ export const AnswerListWrapper = ({
   filterparameters,
   expandAll,
   page,
-  handleChange,
+  handlePageChange,
 }: WrapperProps) => {
   const [answers, answersError] = usePromise(
     () => getAllAnswers(quizId, page, size, order, filterparameters),
@@ -77,7 +77,7 @@ export const AnswerListWrapper = ({
           showFirstButton
           showLastButton
           page={page}
-          onChange={(event, nextPage) => handleChange(nextPage)}
+          onChange={(event, nextPage) => handlePageChange(nextPage)}
         />
       </PaginationField>
       <AnswerList
@@ -95,7 +95,7 @@ export const AnswerListWrapper = ({
           showFirstButton
           showLastButton
           page={page}
-          onChange={(event, nextPage) => handleChange(nextPage)}
+          onChange={(event, nextPage) => handlePageChange(nextPage)}
         />
       </PaginationField>
     </>

@@ -8,14 +8,11 @@ import {
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { AnswerList } from "../../AnswerList"
 import usePromise from "react-use-promise"
-import { TextField, MenuItem, Switch, Typography } from "@material-ui/core"
-import styled from "styled-components"
-import { Pagination, Skeleton } from "@material-ui/lab"
+import { MenuItem, Switch, Typography } from "@material-ui/core"
 import QuizTitle from "../QuizTitleContainer"
 import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
 import {
   StyledSkeleton,
-  SizeSelectorContainer,
   SizeSelectorField,
   PaginationField,
   SwitchField,
@@ -23,29 +20,22 @@ import {
   OptionsContainer,
   SortOrderField,
 } from "./styles"
-import { IQueryParams, TAnswersDisplayed, TSortOptions } from "./types"
+import { TAnswersDisplayed, TSortOptions } from "./types"
 
-export const RequiringAttention = (props: IQueryParams) => {
+export const RequiringAttention = () => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
 
   const URL_HREF = `/quizzes/[quizId]/[page]`
   const pathname = `/quizzes/${quizId}/all-answers/`
 
-  // pull items from passed in query data
-  let {
-    queryParams: {
-      pageNo: paramPage,
-      answers: paramSize,
-      expandAll: paramExpand,
-      sort: paramSort,
-    },
-  } = props
-
-  // normalise data format
-  paramSize = Number(paramSize) as TAnswersDisplayed
-  paramPage = Number(paramPage)
-  paramExpand = Boolean(paramExpand)
+  const paramSize = Number(route.query.answers) as TAnswersDisplayed
+  const paramPage = Number(route.query.pageNo)
+  let paramSort: TSortOptions | null = null
+  if (route.query.sort) {
+    paramSort = route.query.sort as TSortOptions
+  }
+  const paramExpand = route.query.expandAll === "true" ? true : false
 
   const [currentPage, setCurrentPage] = useState<number>(paramPage || 1)
   const [sortOrder, setSortOrder] = useState<TSortOptions>(paramSort || "desc")
@@ -117,15 +107,13 @@ export const RequiringAttention = (props: IQueryParams) => {
   }
 
   const handlePageChange = (nextPage: number) => {
-    let query = null
     setQueryToPush({ ...queryToPush, pageNo: nextPage })
     setCurrentPage(nextPage)
-    query = { ...queryToPush, pageNo: nextPage }
+    let query = { ...queryToPush, pageNo: nextPage }
     route.push(URL_HREF, { pathname, query }, { shallow: true })
   }
 
-  const handleChange = (event: any, fieldType?: string, nextPage?: number) => {
-    console.log(route)
+  const handleChange = (event: React.ChangeEvent<any>, fieldType?: string) => {
     let query = null
     let updatedQueryParams = null
 
