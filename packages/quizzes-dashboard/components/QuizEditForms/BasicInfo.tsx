@@ -218,7 +218,8 @@ const BasicInformation = () => {
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <KeyboardDateTimePicker
             fullWidth
-            value={variables.deadline}
+            InputLabelProps={{ shrink: !!variables.deadline }}
+            value={variables.deadline || ""}
             error={!variables.validDeadline}
             variant="dialog"
             inputVariant="outlined"
