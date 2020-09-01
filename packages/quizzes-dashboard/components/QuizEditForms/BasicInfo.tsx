@@ -223,6 +223,7 @@ const BasicInformation = () => {
             variant="dialog"
             inputVariant="outlined"
             label="Deadline"
+            format="dd-MM-yyyy hh:mm"
             KeyboardButtonProps={{
               "aria-label": "change time",
             }}
