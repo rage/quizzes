@@ -15,8 +15,8 @@ export const QuizPage = () => {
       <TabNavigator />
       {page === "overview" ? <OverView /> : ""}
       {page === "edit" ? <EditPage /> : ""}
-      {page === "all-answers" ? <AllAnswers /> : ""}
-      {page === "answers-requiring-attention" ? <RequiringAttention /> : ""}
+      {page === "all-answers" && <AllAnswers />}
+      {page === "answers-requiring-attention" && <RequiringAttention />}
     </>
   )
 }

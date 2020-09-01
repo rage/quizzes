@@ -59,6 +59,7 @@ export const TabNavigator = () => {
             )
           }
         />
+
         <Tab
           icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
           value="answers-requiring-attention"
