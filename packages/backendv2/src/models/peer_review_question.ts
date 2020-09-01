@@ -4,6 +4,7 @@ import PeerReviewQuestionTranslation from "./peer_review_question_translation"
 
 class PeerReviewQuestion extends Model {
   texts!: PeerReviewQuestionTranslation[]
+  collection!: PeerReviewCollection
   title!: string
   body!: string
 
@@ -29,6 +30,30 @@ class PeerReviewQuestion extends Model {
       },
     },
   }
+
+  // static async getPeerReviewQuestionsByQuizId(quizId: string) {
+  //   const questions: PeerReviewQuestion[] = await this.query()
+  //     .select("*")
+  //     .withGraphFetched("texts")
+  //     .where("quiz_id", quizId)
+
+  //   return PeerReviewQuestion.moveTextsToParent(questions)
+  // }
+
+  // private static moveTextsToParent(questions: PeerReviewQuestion[]) {
+  //   return questions.map(question => {
+  //     const moddedQuestion: any = question
+  //     moddedQuestion.peerReviewQuestionId =
+  //       question.texts[0].peerReviewQuestionId
+  //     moddedQuestion.languageId = question.texts[0].languageId
+  //     moddedQuestion.title = question.texts[0].title
+  //     moddedQuestion.body = question.texts[0].body
+  //     moddedQuestion.createdAt = question.texts[0].createdAt
+  //     moddedQuestion.updatedAt = question.texts[0].updatedAt
+  //     delete moddedQuestion.texts
+  //     return moddedQuestion
+  //   })
+  // }
 }
 
 export default PeerReviewQuestion

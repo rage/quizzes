@@ -1,6 +1,6 @@
 import axios from "axios"
 import { checkStore } from "./tmcApi"
-import { Quiz, Course } from "../types/Quiz"
+import { Quiz, Course, PeerReviewQuestion } from "../types/Quiz"
 import { NewQuiz } from "../types/NormalizedQuiz"
 import { Answer } from "../types/Answer"
 
@@ -251,3 +251,17 @@ export const getAnswerStates = async (): Promise<string[]> => {
   }
   throw new Error()
 }
+
+// export const getPeerReviewQuestionsByQuizId = async (
+//   quizId: string,
+// ): Promise<PeerReviewQuestion[]> => {
+//   const userInfo = checkStore()
+//   if (userInfo) {
+//     const config = {
+//       headers: { Authorization: "bearer " + userInfo.accessToken },
+//     }
+//     return (await api.get(`/quizzes/${quizId}/peer-review-questions`, config))
+//       .data
+//   }
+//   throw new Error()
+// }

@@ -124,6 +124,7 @@ const ShowCoursePage = () => {
     byPartAndSection[part] = groupBy(quizzes, "section")
   }
 
+  console.log(course)
   return (
     <>
       <div>

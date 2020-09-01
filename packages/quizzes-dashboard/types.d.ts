@@ -3,14 +3,16 @@ import * as editorActions from "./store/editor/editorActions"
 import * as itemActions from "./store/editor/items/itemActions"
 import * as optionActions from "./store/editor/options/optionActions"
 import * as quizActions from "./store/editor/quiz/quizActions"
-import * as resultActions from "./store/editor/result/resultActions"
+import * as peerReviewActions from "./store/editor/peerReviews/peerReviewActions"
+import * as questionActions from "./store/editor/questions/questionActions"
 
 const actionTypes = {
   ...editorActions,
   ...itemActions,
   ...optionActions,
   ...quizActions,
-  ...resultActions,
+  ...peerReviewActions,
+  ...questionActions,
 }
 
 export type RootAction = ActionType<typeof actionTypes>

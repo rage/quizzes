@@ -24,13 +24,16 @@ export const editorChangesReducer = createReducer<{ changes: boolean }, action>(
         items: action.payload.store.editor.items,
         options: action.payload.store.editor.options,
         quizId: action.payload.store.editor.quizId,
+        peerReviews: action.payload.store.editor.peerReviews,
+        questions: action.payload.store.editor.questions,
       }
-
+      console.log(quizData)
       const newState: Quiz = denormalize(
         quizData.quizId,
         normalizedQuiz,
         quizData,
       )
+      console.log(newState)
 
       draftState.changes = !_.isEqual(initState, newState)
     })

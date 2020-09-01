@@ -1,6 +1,13 @@
 import Router from "koa-router"
 import { CustomContext, CustomState } from "../../types"
-import { Course, Quiz, QuizAnswer, User, UserCourseRole } from "../../models/"
+import {
+  Course,
+  Quiz,
+  QuizAnswer,
+  User,
+  UserCourseRole,
+  PeerReviewQuestion,
+} from "../../models/"
 import accessControl, { validToken } from "../../middleware/access_control"
 import {
   abilitiesByRole,
@@ -16,6 +23,7 @@ const dashboard = new Router<CustomState, CustomContext>({
   .post("/quizzes", accessControl(), async ctx => {
     await checkAccessOrThrow(ctx.state.user, ctx.request.body.courseId, "edit")
     const quizData = ctx.request.body
+    console.log(quizData)
     ctx.body = await Quiz.saveQuiz(quizData)
   })
   .get("/quizzes/:quizId", accessControl(), async ctx => {
@@ -251,5 +259,11 @@ const dashboard = new Router<CustomState, CustomContext>({
     const result = await QuizAnswer.getStates()
     ctx.body = result
   })
+// .get("/quizzes/:quizId/peer-review-questions", accessControl(), async ctx => {
+//   const quizId = ctx.params.quizId
+//   const courseId = await getCourseIdByQuizId(quizId)
+//   await checkAccessOrThrow(ctx.state.user, courseId, "view")
+//   ctx.body = await PeerReviewQuestion.getPeerReviewQuestionsByQuizId(quizId)
+// })
 
 export default dashboard
