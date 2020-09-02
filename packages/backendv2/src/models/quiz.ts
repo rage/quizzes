@@ -17,6 +17,7 @@ export class Quiz extends Model {
   id!: string
   courseId!: string
   part!: number
+  section!: number
   points!: number
   triesLimited!: boolean
   tries!: number
@@ -168,6 +169,7 @@ export class Quiz extends Model {
         : undefined
       savedQuiz = await this.query(trx).upsertGraphAndFetch(quiz)
       await this.updateCourseProgressesIfNecessary(oldQuiz, savedQuiz, trx)
+      await Kafka.broadcastCourseQuizzesUpdated(course.id, trx)
       await trx.commit()
     } catch (error) {
       await trx.rollback()
