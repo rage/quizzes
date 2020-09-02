@@ -6,6 +6,7 @@ import knex from "../../database/knex"
 import stringify from "csv-stringify"
 
 class Course extends Model {
+  id!: string
   moocfiId!: string
   minPeerReviewsGiven!: number
   minPeerReviewsReceived!: number
