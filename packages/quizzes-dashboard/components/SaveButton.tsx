@@ -52,6 +52,8 @@ const SaveButton = () => {
       items: store.editor.items,
       options: store.editor.options,
       quizId: store.editor.quizId,
+      peerReviews: store.editor.peerReviews,
+      questions: store.editor.questions,
     }
 
     const quiz: Quiz = denormalize(quizData.quizId, normalizedQuiz, quizData)
@@ -82,6 +84,35 @@ const SaveButton = () => {
         delete item.id
       }
     }
+    for (let peerReview of quiz.peerReviews) {
+      if (
+        store.editor.peerReviewVariables[peerReview.id].newQuestions.length > 0
+      ) {
+        for (let question of peerReview.questions) {
+          if (
+            store.editor.peerReviewVariables[peerReview.id].newQuestions.some(
+              id => id === question.id,
+            )
+          ) {
+            delete question.id
+            if (
+              store.editor.quizVariables[
+                store.editor.quizId
+              ].newPeerReviews.some(id => id === peerReview.id)
+            ) {
+              delete question.peerReviewCollectionId
+            }
+          }
+        }
+      }
+      if (
+        store.editor.quizVariables[store.editor.quizId].newPeerReviews.some(
+          id => id === peerReview.id,
+        )
+      ) {
+        delete peerReview.id
+      }
+    }
     if (store.editor.quizVariables[store.editor.quizId].newQuiz) {
       delete quiz.id
     }
@@ -95,6 +126,8 @@ const SaveButton = () => {
         items: normalizedResponse.entities.items ?? {},
         options: normalizedResponse.entities.options ?? {},
         result: normalizedResponse.result ?? "",
+        peerReviews: normalizedResponse.entities.peerReviews ?? {},
+        questions: normalizedResponse.entities.questions ?? {},
       }
       dispatch(initializedEditor(data, response))
       setSaved(true)

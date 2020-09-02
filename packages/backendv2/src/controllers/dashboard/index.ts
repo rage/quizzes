@@ -1,6 +1,13 @@
 import Router from "koa-router"
 import { CustomContext, CustomState } from "../../types"
-import { Course, Quiz, QuizAnswer, User, UserCourseRole } from "../../models/"
+import {
+  Course,
+  Quiz,
+  QuizAnswer,
+  User,
+  UserCourseRole,
+  PeerReviewQuestion,
+} from "../../models/"
 import accessControl, { validToken } from "../../middleware/access_control"
 import {
   abilitiesByRole,

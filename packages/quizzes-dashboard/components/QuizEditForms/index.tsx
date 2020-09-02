@@ -6,9 +6,17 @@ import { useTypedSelector } from "../../store/store"
 import { Skeleton } from "@material-ui/lab"
 import DebugDialog from "../DebugDialog"
 import useBeforeUnload from "../../hooks/useBeforeUnload"
+import { Divider } from "@material-ui/core"
+import { PeerReviewEditForms } from "./PeerReviewEditForms"
 
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
+`
+const StyledDivider = styled(Divider)`
+  display: flex !important;
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
+  width: 100% !important;
 `
 
 const QuizEditForms = () => {
@@ -32,6 +40,8 @@ const QuizEditForms = () => {
     <>
       <BasicInfo />
       <QuizItems />
+      <StyledDivider />
+      <PeerReviewEditForms />
       <DebugDialog />
     </>
   )

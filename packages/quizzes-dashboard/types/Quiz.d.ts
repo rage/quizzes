@@ -78,8 +78,8 @@ export interface Question {
   type: string
   answerRequired: boolean
   order: number
-  createdAt: Date
-  updatedAt: Date
+  createdAt: string
+  updatedAt: string
   title: string
   body: string
 }
@@ -101,4 +101,20 @@ export interface Course {
   title: string
   body: string
   abbreviation: string
+}
+
+export interface PeerReviewQuestion {
+  id: string
+  quizId: string
+  peerReviewCollectionId: string
+  default: boolean
+  type: string
+  answerRequired: boolean
+  order: number
+  createdAt: Date
+  updatedAt: Date
+  peerReviewQuestionId: string
+  languageId: string
+  title: string
+  body: string
 }

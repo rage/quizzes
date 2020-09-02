@@ -12,6 +12,7 @@ import { BadRequestError } from "../util/error"
 import Knex from "knex"
 import UserQuizState from "./user_quiz_state"
 import * as Kafka from "../services/kafka"
+import PeerReviewQuestion from "./peer_review_question"
 
 export class Quiz extends Model {
   id!: string
@@ -73,6 +74,14 @@ export class Quiz extends Model {
       join: {
         from: "quiz.id",
         to: "quiz_answer.quiz_id",
+      },
+    },
+    peerReviewQuestions: {
+      relation: Model.HasManyRelation,
+      modelClass: PeerReviewQuestion,
+      join: {
+        from: "quiz.id",
+        to: "peer_review_question.quiz_id",
       },
     },
   }

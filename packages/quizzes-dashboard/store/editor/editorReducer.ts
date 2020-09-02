@@ -24,8 +24,9 @@ export const editorChangesReducer = createReducer<{ changes: boolean }, action>(
         items: action.payload.store.editor.items,
         options: action.payload.store.editor.options,
         quizId: action.payload.store.editor.quizId,
+        peerReviews: action.payload.store.editor.peerReviews,
+        questions: action.payload.store.editor.questions,
       }
-
       const newState: Quiz = denormalize(
         quizData.quizId,
         normalizedQuiz,

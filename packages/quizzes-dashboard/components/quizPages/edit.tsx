@@ -36,6 +36,8 @@ const EditPage = () => {
       items: storeState.entities.items ?? {},
       options: storeState.entities.options ?? {},
       result: storeState.result,
+      peerReviews: storeState.entities.peerReviews ?? {},
+      questions: storeState.entities.questions ?? {},
     }
     dispatch(initializedEditor(normalizedData, quiz))
   }, [quizData])

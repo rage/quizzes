@@ -1,6 +1,6 @@
 import axios from "axios"
 import { checkStore } from "./tmcApi"
-import { Quiz, Course } from "../types/Quiz"
+import { Quiz, Course, PeerReviewQuestion } from "../types/Quiz"
 import { NewQuiz } from "../types/NormalizedQuiz"
 import { Answer } from "../types/Answer"
 
