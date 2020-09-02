@@ -218,11 +218,13 @@ const BasicInformation = () => {
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <KeyboardDateTimePicker
             fullWidth
-            value={variables.deadline}
+            InputLabelProps={{ shrink: !!variables.deadline }}
+            value={variables.deadline || ""}
             error={!variables.validDeadline}
             variant="dialog"
             inputVariant="outlined"
             label="Deadline"
+            format="dd-MM-yyyy hh:mm"
             KeyboardButtonProps={{
               "aria-label": "change time",
             }}
