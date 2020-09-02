@@ -269,7 +269,7 @@ class Course extends Model {
         WHERE quiz_id IN (
           SELECT id
           FROM quiz
-          WHERE course_id = '4908eebe-584e-49e0-a580-c0d399c21ec3'
+          WHERE course_id = :oldCourseId
         )
       );
       `,
@@ -291,7 +291,7 @@ class Course extends Model {
           WHERE quiz_id IN (
             SELECT id
             FROM quiz
-            WHERE course_id = '4908eebe-584e-49e0-a580-c0d399c21ec3'
+            WHERE course_id = :oldCourseId
           )
         )
       );
