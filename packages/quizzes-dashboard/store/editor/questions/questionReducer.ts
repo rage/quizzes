@@ -99,16 +99,14 @@ export const questionReducer = createReducer<
 
   .handleAction(toggledQuestionDefault, (state, action) => {
     return produce(state, draftState => {
-      draftState[action.payload.questionId].default = !draftState[
-        action.payload.questionId
-      ].default
+      draftState[action.payload.questionId].default =
+        action.payload.questionDefault
     })
   })
 
   .handleAction(toggledQuestionAnswerRequired, (state, action) => {
     return produce(state, draftState => {
-      draftState[action.payload.questionId].answerRequired = !draftState[
-        action.payload.questionId
-      ].answerRequired
+      draftState[action.payload.questionId].answerRequired =
+        action.payload.answerRequired
     })
   })

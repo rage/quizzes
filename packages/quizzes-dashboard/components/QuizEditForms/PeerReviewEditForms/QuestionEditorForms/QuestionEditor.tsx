@@ -1,5 +1,12 @@
 import React from "react"
-import { TextField, MenuItem, Button } from "@material-ui/core"
+import {
+  TextField,
+  MenuItem,
+  Button,
+  Switch,
+  FormGroup,
+  FormControlLabel,
+} from "@material-ui/core"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import { useTypedSelector } from "../../../../store/store"
@@ -7,6 +14,8 @@ import {
   editedPeerReviewQuestionTitle,
   editedPeerReviewQuestionBody,
   editedPeerReviewQuestionType,
+  toggledQuestionDefault,
+  toggledQuestionAnswerRequired,
 } from "../../../../store/editor/questions/questionActions"
 
 const PRQWrapper = styled.div`
@@ -61,6 +70,36 @@ export const QuestionEditor = ({ id }: PRQEditorProps) => {
         <MenuItem value="grade">grade</MenuItem>
         <MenuItem value="essay">essay</MenuItem>
       </PRQTextfield>
+      <FormGroup row>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={prq.default}
+              onChange={event =>
+                dispatch(toggledQuestionDefault(prq.id, event.target.checked))
+              }
+              name="default"
+            />
+          }
+          label="Default"
+          labelPlacement="end"
+        />
+        <FormControlLabel
+          control={
+            <Switch
+              checked={prq.answerRequired}
+              onChange={event =>
+                dispatch(
+                  toggledQuestionAnswerRequired(prq.id, event.target.checked),
+                )
+              }
+              name="answer required"
+            />
+          }
+          label="Answer required"
+          labelPlacement="end"
+        />
+      </FormGroup>
     </PRQWrapper>
   )
 }

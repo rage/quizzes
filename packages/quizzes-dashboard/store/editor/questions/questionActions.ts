@@ -43,13 +43,19 @@ export const createdNewPeerReviewQuestion = createAction(
 
 export const toggledQuestionDefault = createAction(
   "TOGGLED_QUESTION_DEFAULT",
-  (questionId: string) => ({ questionId: questionId }),
-)<{ questionId: string }>()
+  (questionId: string, questionDefault: boolean) => ({
+    questionId: questionId,
+    questionDefault: questionDefault,
+  }),
+)<{ questionId: string; questionDefault: boolean }>()
 
 export const toggledQuestionAnswerRequired = createAction(
   "TOGGLED_QUESTION_ANSWER_REQUIRED",
-  (questionId: string) => ({ questionId: questionId }),
-)<{ questionId: string }>()
+  (questionId: string, answerRequired: boolean) => ({
+    questionId: questionId,
+    answerRequired: answerRequired,
+  }),
+)<{ questionId: string; answerRequired: boolean }>()
 
 export const prqActions = [
   editedPeerReviewQuestionTitle,

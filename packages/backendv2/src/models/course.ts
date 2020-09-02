@@ -82,8 +82,6 @@ class Course extends Model {
 
     const newCourseId = v4()
 
-    console.log(newCourseId)
-
     await knex
       .transaction(async trx => {
         await trx("course").insert({ id: newCourseId })

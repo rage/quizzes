@@ -30,9 +30,7 @@ const EditPage = () => {
       return
     }
     const quiz = quizData
-    console.log(quiz)
     const storeState = normalize(quiz, normalizedQuiz)
-    console.log(storeState)
     const normalizedData = {
       quizzes: storeState.entities.quizzes ?? {},
       items: storeState.entities.items ?? {},

@@ -4,10 +4,10 @@ import PeerReviewQuestion from "./peer_review_question"
 class PeerReviewQuestionTranslation extends Model {
   title!: string
   body!: string
-  // peerReviewQuestionId!: string
-  // languageId!: string
-  // createdAt!: string
-  // updatedAt!: string
+  peerReviewQuestionId!: string
+  languageId!: string
+  createdAt!: string
+  updatedAt!: string
 
   static get tableName() {
     return "peer_review_question_translation"

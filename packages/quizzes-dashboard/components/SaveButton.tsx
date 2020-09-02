@@ -57,7 +57,6 @@ const SaveButton = () => {
     }
 
     const quiz: Quiz = denormalize(quizData.quizId, normalizedQuiz, quizData)
-    console.log(quiz)
     for (let item of quiz.items) {
       if (store.editor.itemVariables[item.id].newOptions.length > 0) {
         for (let option of item.options) {
