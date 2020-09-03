@@ -27,7 +27,7 @@ export const RequiringAttention = () => {
   const quizId = route.query.quizId?.toString() ?? ""
 
   const URL_HREF = `/quizzes/[quizId]/[page]`
-  const pathname = `/quizzes/${quizId}/all-answers/`
+  const pathname = `/quizzes/${quizId}/answers-requiring-attention/`
 
   const paramSize = Number(route.query.answers) as TAnswersDisplayed
   const paramPage = Number(route.query.pageNo)
