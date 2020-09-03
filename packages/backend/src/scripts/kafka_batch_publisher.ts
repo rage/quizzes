@@ -53,14 +53,18 @@ const publish = async () => {
         }
 
         if (!recalculate_only) {
-          console.log("publishing quizzes")
-          const quizzes = await publishQuizzes(course)
+          if (course.moocfi_id) {
+            console.log("publishing quizzes")
+            const quizzes = await publishQuizzes(course)
 
-          console.log("publishing progress")
-          await publishProgress(course, quizzes)
+            console.log("publishing progress")
+            await publishProgress(course, quizzes)
 
-          console.log("publishing answers")
-          await publishAnswers(course)
+            console.log("publishing answers")
+            await publishAnswers(course)
+          } else {
+            console.error("No moocfi_id for task. Aborting.")
+          }
         }
       }
 
