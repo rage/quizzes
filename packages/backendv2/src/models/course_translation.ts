@@ -25,6 +25,17 @@ class CourseTranslation extends Model {
       },
     },
   }
+
+  static async getById(id: string) {
+    return await this.query().findOne({
+      course_id: id,
+    })
+  }
+
+  static async updateCourseTitle(id: string, newTitle: string) {
+    const courseTranslation = await this.getById(id)
+    return await courseTranslation.$query().patchAndFetch({ title: newTitle })
+  }
 }
 
 export default CourseTranslation

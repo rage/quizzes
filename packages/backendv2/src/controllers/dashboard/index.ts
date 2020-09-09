@@ -7,6 +7,7 @@ import {
   User,
   UserCourseRole,
   PeerReviewQuestion,
+  CourseTranslation,
 } from "../../models/"
 import accessControl, { validToken } from "../../middleware/access_control"
 import {
@@ -84,6 +85,7 @@ const dashboard = new Router<CustomState, CustomContext>({
       )
     }
   })
+
   .post("/courses/download-correspondance-file", async ctx => {
     const token = ctx.request.body.token
     const oldCourseId = ctx.request.body.oldCourseId
@@ -264,5 +266,18 @@ const dashboard = new Router<CustomState, CustomContext>({
     const result = await QuizAnswer.getStates()
     ctx.body = result
   })
+  .post(
+    "/courses/:courseId/modify-course-title",
+    accessControl(),
+    async ctx => {
+      const courseId = ctx.params.courseId
+      const newTitle = ctx.request.body.title
+
+      const courseTranslation = await CourseTranslation.updateCourseTitle(
+        courseId,
+        newTitle,
+      )
+    },
+  )
 
 export default dashboard
