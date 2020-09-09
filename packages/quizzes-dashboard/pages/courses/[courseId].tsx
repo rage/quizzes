@@ -249,7 +249,6 @@ const QuizOfSection = ({ quiz, requirinAttention }: quizProps) => {
                   color="error"
                   badgeContent={requirinAttention}
                   invisible={requirinAttention === undefined}
-                  max={99}
                 >
                   <Link
                     href={{
