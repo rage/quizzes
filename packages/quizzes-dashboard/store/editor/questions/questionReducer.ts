@@ -12,6 +12,7 @@ import {
   createdNewPeerReviewQuestion,
   toggledQuestionDefault,
   toggledQuestionAnswerRequired,
+  deletedQuestion,
 } from "./questionActions"
 
 export const questionReducer = createReducer<
@@ -108,5 +109,11 @@ export const questionReducer = createReducer<
     return produce(state, draftState => {
       draftState[action.payload.questionId].answerRequired =
         action.payload.answerRequired
+    })
+  })
+
+  .handleAction(deletedQuestion, (state, action) => {
+    return produce(state, draftState => {
+      delete draftState[action.payload.questionId]
     })
   })

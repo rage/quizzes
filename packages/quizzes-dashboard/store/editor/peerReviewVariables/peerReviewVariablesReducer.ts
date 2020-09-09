@@ -3,7 +3,10 @@ import { action, peerReviewVariables } from "../../../types/NormalizedQuiz"
 import { initializedEditor } from "../editorActions"
 import produce from "immer"
 import { createdNewPeerReviewQuestion } from "../questions/questionActions"
-import { createdNewPeerReview } from "../peerReviews/peerReviewActions"
+import {
+  createdNewPeerReview,
+  deletedPeerReview,
+} from "../peerReviews/peerReviewActions"
 
 export const peerReviewVariablesReducer = createReducer<
   { [peerReviewId: string]: peerReviewVariables },
@@ -28,5 +31,11 @@ export const peerReviewVariablesReducer = createReducer<
       draftState[action.payload.peerReviewCollectionId].newQuestions.push(
         action.payload.newId,
       )
+    })
+  })
+
+  .handleAction(deletedPeerReview, (state, action) => {
+    return produce(state, draftState => {
+      delete draftState[action.payload.peerReviewId]
     })
   })

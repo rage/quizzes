@@ -4,7 +4,12 @@ import { PeerReviewEditor } from "./PeerReviewEditor"
 import { Typography, Button } from "@material-ui/core"
 import styled from "styled-components"
 import { useDispatch } from "react-redux"
-import { createdNewPeerReview } from "../../../store/editor/peerReviews/peerReviewActions"
+import {
+  createdNewPeerReview,
+  deletedPeerReview,
+} from "../../../store/editor/peerReviews/peerReviewActions"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faTrash } from "@fortawesome/free-solid-svg-icons"
 
 const PeerReviewTitleWrapper = styled.div`
   display: flex !important;
@@ -50,6 +55,12 @@ export const PeerReviewEditForms = () => {
         <div key={peerReview.id}>
           <StyledTypography variant="h4">
             Peer review nro. {index + 1}
+            <Button
+              onClick={() => dispatch(deletedPeerReview(quizId, peerReview.id))}
+              title="delete peer review"
+            >
+              <FontAwesomeIcon icon={faTrash} color="red" />
+            </Button>
           </StyledTypography>
           <PeerReviewEditor id={peerReview.id} />
         </div>

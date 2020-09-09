@@ -5,8 +5,10 @@ import {
   editedPeerReviewTitle,
   editedPeerReviewBody,
   createdNewPeerReview,
+  deletedPeerReview,
 } from "./peerReviewActions"
 import produce from "immer"
+import { deletedQuestion } from "../questions/questionActions"
 
 export const peerReviewReducer = createReducer<
   { [peerReviewId: string]: NormalizedPeerReview },
@@ -41,5 +43,19 @@ export const peerReviewReducer = createReducer<
         questions: [],
       }
       draftState[action.payload.newId] = newPeerReview
+    })
+  })
+
+  .handleAction(deletedPeerReview, (state, action) => {
+    return produce(state, draftState => {
+      delete draftState[action.payload.peerReviewId]
+    })
+  })
+
+  .handleAction(deletedQuestion, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.peerReviewId].questions = draftState[
+        action.payload.peerReviewId
+      ].questions.filter(id => id !== action.payload.questionId)
     })
   })

@@ -22,7 +22,10 @@ import { DateTime } from "luxon"
 import { Quiz } from "../../../types/Quiz"
 import { normalize } from "normalizr"
 import { normalizedQuiz } from "../../../schemas"
-import { createdNewPeerReview } from "../peerReviews/peerReviewActions"
+import {
+  createdNewPeerReview,
+  deletedPeerReview,
+} from "../peerReviews/peerReviewActions"
 
 export const quizReducer = createReducer<
   { [quizId: string]: NormalizedQuiz },
@@ -142,6 +145,14 @@ export const quizReducer = createReducer<
   .handleAction(createdNewPeerReview, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.quizId].peerReviews.push(action.payload.newId)
+    })
+  })
+
+  .handleAction(deletedPeerReview, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.quizId].peerReviews = draftState[
+        action.payload.quizId
+      ].peerReviews.filter(id => id !== action.payload.peerReviewId)
     })
   })
 

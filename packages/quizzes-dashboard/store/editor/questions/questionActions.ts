@@ -57,12 +57,21 @@ export const toggledQuestionAnswerRequired = createAction(
   }),
 )<{ questionId: string; answerRequired: boolean }>()
 
+export const deletedQuestion = createAction(
+  "DELETED_QUESTION",
+  (peerReviewId: string, questionId: string) => ({
+    peerReviewId: peerReviewId,
+    questionId: questionId,
+  }),
+)<{ peerReviewId: string; questionId: string }>()
+
 export const prqActions = [
   editedPeerReviewQuestionTitle,
   editedPeerReviewQuestionBody,
   editedPeerReviewQuestionType,
   increasedPRQOrder,
   decreasedPRQOrder,
+  deletedQuestion,
 ]
 
 export default prqActions
