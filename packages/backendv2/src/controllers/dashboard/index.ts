@@ -266,16 +266,17 @@ const dashboard = new Router<CustomState, CustomContext>({
     const result = await QuizAnswer.getStates()
     ctx.body = result
   })
-  .post(
-    "/courses/:courseId/modify-course-title",
-    accessControl(),
-    async ctx => {
-      const courseId = ctx.params.courseId
-      const newTitle = ctx.request.body.title
+  .post("/courses/:courseId/modify-course-title", async ctx => {
+    const courseId = ctx.params.courseId
+    const newTitle = ctx.request.body.title
+    const token = ctx.request.body.token
 
+    if (!validToken(token)) {
+      ctx.body = "invalid token"
+    } else {
       ctx.body = await CourseTranslation.updateCourseTitle(courseId, newTitle)
-    },
-  )
+    }
+  })
   .post(
     "/courses/:courseId/modify-course-abbreviation",
     accessControl(),
