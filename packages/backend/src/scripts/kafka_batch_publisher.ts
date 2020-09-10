@@ -33,7 +33,12 @@ const publish = async () => {
     let task: IKafkaTask
 
     for (task of tasks) {
-      const { course_id, recalculate_progress, recalculate_only } = task
+      const {
+        course_id,
+        user_id,
+        recalculate_progress,
+        recalculate_only,
+      } = task
 
       console.count("task")
       console.log(
@@ -54,14 +59,31 @@ const publish = async () => {
 
         if (!recalculate_only) {
           if (course.moocfi_id) {
-            console.log("publishing quizzes")
-            const quizzes = await publishQuizzes(course)
+            if (user_id) {
+              const quizzes = await knex<IQuiz>("quiz")
+                .join("quiz_translation", {
+                  "quiz.id": "quiz_translation.quiz_id",
+                })
+                .where({
+                  course_id,
+                })
+                .andWhereNot("part", 0)
 
-            console.log("publishing progress")
-            await publishProgress(course, quizzes)
+              console.log("publishing progress for user: " + user_id)
+              await publishProgress(course, quizzes, user_id)
 
-            console.log("publishing answers")
-            await publishAnswers(course)
+              console.log("publishing answers for user: " + user_id)
+              await publishAnswers(course, user_id)
+            } else {
+              console.log("publishing quizzes")
+              const quizzes = await publishQuizzes(course)
+
+              console.log("publishing progress")
+              await publishProgress(course, quizzes)
+
+              console.log("publishing answers")
+              await publishAnswers(course)
+            }
           } else {
             console.error("No moocfi_id for task. Aborting.")
           }
@@ -193,7 +215,7 @@ const publishQuizzes = async (course: ICourse): Promise<IQuiz[]> => {
   }
 }
 
-const publishAnswers = async (course: ICourse) => {
+const publishAnswers = async (course: ICourse, userId?: string) => {
   try {
     const courseId = course.id
 
@@ -215,7 +237,7 @@ const publishAnswers = async (course: ICourse) => {
       ])
       .as("latest")
 
-    const answers = await knex("user_quiz_state")
+    const answersQuery = knex("user_quiz_state")
       .select([
         "quiz_answer.quiz_id",
         "user_quiz_state.points_awarded",
@@ -233,13 +255,13 @@ const publishAnswers = async (course: ICourse) => {
       .join("quiz", { "user_quiz_state.quiz_id": "quiz.id" })
       .join(distinctTypes, { "user_quiz_state.quiz_id": "types.id" })
       .where("quiz.course_id", courseId)
-      .andWhere(
-        "quiz_answer.id",
-        "in",
-        knex(latest)
-          .select("id")
-          .where("rn", 1),
-      )
+      .andWhereNot("quiz_answer.status", "deprecated")
+
+    if (userId) {
+      answersQuery.andWhere("quiz_answer.user_id", userId)
+    }
+
+    const answers = await answersQuery
 
     let answer
 
@@ -284,7 +306,11 @@ const publishAnswers = async (course: ICourse) => {
   }
 }
 
-const publishProgress = async (course: ICourse, quizzes: any[]) => {
+const publishProgress = async (
+  course: ICourse,
+  quizzes: any[],
+  userId?: string,
+) => {
   try {
     const courseId = course.id
 
@@ -296,12 +322,18 @@ const publishProgress = async (course: ICourse, quizzes: any[]) => {
         : (maxPointsByPart[part] = points),
     )
 
-    const userCoursePartStates = await knex<IUserCoursePartState>(
+    const userCoursePartStatesQuery = knex<IUserCoursePartState>(
       "user_course_part_state",
     )
       .where({ course_id: courseId })
       .andWhereNot("course_part", 0)
       .orderBy(["user_id", "course_part"])
+
+    if (userId) {
+      userCoursePartStatesQuery.andWhere("user_id", userId)
+    }
+
+    const userCoursePartStates = await userCoursePartStatesQuery
 
     let group: IUserCoursePartState[] = []
     const groupedByUser: IUserCoursePartState[][] = []
@@ -355,6 +387,7 @@ interface IKafkaTask {
   id: string
   course_id: string
   quiz_id: string
+  user_id: string
   recalculate_progress: boolean
   recalculate_only: boolean
   created_at: Date
