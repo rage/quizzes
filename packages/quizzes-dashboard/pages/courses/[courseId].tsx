@@ -5,6 +5,7 @@ import {
   getUsersAbilities,
   getUserAbilitiesForCourse,
 } from "../../services/quizzes"
+import usePromise from "react-use-promise"
 import { groupBy, Dictionary } from "lodash"
 import { Typography, Card, CardContent, Button, Badge } from "@material-ui/core"
 import { Skeleton } from "@material-ui/lab"
@@ -17,7 +18,8 @@ import { Quiz } from "../../types/Quiz"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
 import DuplicateCourseButton from "../../components/DuplicateCourse"
 import Head from "next/head"
-import usePromise from "react-use-promise"
+
+import { EditableCourseInfo } from "../../components/EditableCourseInfo"
 
 const QuizCard = styled(Card)`
   margin-bottom: 1rem;
@@ -35,6 +37,7 @@ const StyledSkeleton = styled(Skeleton)`
 const CourseTitleWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+  align-items: center;
 `
 
 const StyledType = styled(Typography)`
@@ -48,6 +51,11 @@ const WarningText = styled(Typography)`
 
 const Title = styled(Typography)`
   display: flex !important;
+`
+
+const CourseTitleAndAbbreviation = styled.section`
+  display: flex;
+  flex-direction: column;
 `
 
 const ShowCoursePage = () => {
@@ -136,7 +144,9 @@ const ShowCoursePage = () => {
         </Head>
       </div>
       <CourseTitleWrapper>
-        <Typography variant="h3">Edit {course.title}</Typography>
+        <CourseTitleAndAbbreviation>
+          <EditableCourseInfo course={course} />
+        </CourseTitleAndAbbreviation>
         <Link
           href={{
             pathname: "/courses/[id]/quizzes/new",
@@ -144,7 +154,7 @@ const ShowCoursePage = () => {
           }}
           as={`/courses/${id}/quizzes/new`}
         >
-          <Button variant="outlined">
+          <Button variant="outlined" style={{ maxHeight: "3rem" }}>
             <Typography variant="overline">Add New Quiz</Typography>
           </Button>
         </Link>
@@ -188,7 +198,7 @@ const SectionOfPart = ({
   return (
     <>
       <Typography variant="h6">Section {section}</Typography>
-      {quizzes.map(quiz => {
+      {quizzes.map((quiz) => {
         return (
           <QuizOfSection
             key={quiz.id}
@@ -226,7 +236,7 @@ const ButtonContainer = styled.div`
 
 const QuizOfSection = ({ quiz, requirinAttention }: quizProps) => {
   const title = quiz.title
-  const types = Array.from(new Set(quiz.items.map(item => item.type)))
+  const types = Array.from(new Set(quiz.items.map((item) => item.type)))
   return (
     <Link
       href={{
@@ -283,7 +293,7 @@ const QuizOfSection = ({ quiz, requirinAttention }: quizProps) => {
             {types.length > 0 ? (
               <div>
                 [{" "}
-                {types.map(type => (
+                {types.map((type) => (
                   <StyledType key={type} variant="overline">
                     {type}{" "}
                   </StyledType>
