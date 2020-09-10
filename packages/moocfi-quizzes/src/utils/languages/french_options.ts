@@ -27,8 +27,8 @@ const frenchLabels: SingleLanguageLabels = {
   open: {
     placeholder: "Réponse",
     userAnswerLabel: "Votre réponse",
-    feedbackForFailure: "Votre réponse est correcte",
-    feedbackForSuccess: "Votre réponse est incorrecte",
+    feedbackForFailure: "Votre réponse est incorrecte",
+    feedbackForSuccess: "Votre réponse est correcte",
   },
   peerReviews: {
     loadingLabel: "Chargement en cours",
