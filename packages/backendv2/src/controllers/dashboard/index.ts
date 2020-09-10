@@ -281,7 +281,7 @@ const dashboard = new Router<CustomState, CustomContext>({
     accessControl(),
     async ctx => {
       const courseId = ctx.params.courseId
-      const newAbbreviation = ctx.request.body.title
+      const newAbbreviation = ctx.request.body.abbreviation
 
       ctx.body = await CourseTranslation.updateCourseAbbreviation(
         courseId,
@@ -289,5 +289,11 @@ const dashboard = new Router<CustomState, CustomContext>({
       )
     },
   )
+  .post("/courses/:courseId/modify-moocId", accessControl(), async ctx => {
+    const courseId = ctx.params.courseId
+    const newMoocId = ctx.request.body.moocfiId
+
+    ctx.body = await Course.updateMoocfiId(courseId, newMoocId)
+  })
 
 export default dashboard

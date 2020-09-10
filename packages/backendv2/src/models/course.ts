@@ -344,6 +344,11 @@ class Course extends Model {
         .andWhereNot("part", 0)
     ).map(q => q.part)
   }
+
+  static async updateMoocfiId(id: string, newMoocfiId: string) {
+    const course = await this.getById(id)
+    return await course.$query().patchAndFetch({ moocfiId: newMoocfiId })
+  }
 }
 
 export default Course
