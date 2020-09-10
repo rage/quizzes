@@ -36,6 +36,13 @@ class CourseTranslation extends Model {
     const courseTranslation = await this.getById(id)
     return await courseTranslation.$query().patchAndFetch({ title: newTitle })
   }
+
+  static async updateCourseAbbreviation(id: string, newAbbreviation: string) {
+    const courseTranslation = await this.getById(id)
+    return await courseTranslation
+      .$query()
+      .patchAndFetch({ abbreviation: newAbbreviation })
+  }
 }
 
 export default CourseTranslation

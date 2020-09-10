@@ -273,9 +273,19 @@ const dashboard = new Router<CustomState, CustomContext>({
       const courseId = ctx.params.courseId
       const newTitle = ctx.request.body.title
 
-      const courseTranslation = await CourseTranslation.updateCourseTitle(
+      ctx.body = await CourseTranslation.updateCourseTitle(courseId, newTitle)
+    },
+  )
+  .post(
+    "/courses/:courseId/modify-course-abbreviation",
+    accessControl(),
+    async ctx => {
+      const courseId = ctx.params.courseId
+      const newAbbreviation = ctx.request.body.title
+
+      ctx.body = await CourseTranslation.updateCourseAbbreviation(
         courseId,
-        newTitle,
+        newAbbreviation,
       )
     },
   )
