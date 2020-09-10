@@ -74,6 +74,8 @@ export const QuestionEditorWrapper = ({
     question => question.peerReviewCollectionId === peerReviewId,
   )
 
+  filteredQuestions.sort((a, b) => a.order - b.order)
+
   const quizId = useTypedSelector(state => state.editor.quizId)
   const dispatch = useDispatch()
   return (
