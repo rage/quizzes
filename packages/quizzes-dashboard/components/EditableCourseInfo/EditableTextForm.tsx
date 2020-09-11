@@ -96,12 +96,12 @@ const EditableTextForm = ({
             token: userInfo?.accessToken,
             title: fieldValue,
           })
-          .then((response) => {
+          .then(response => {
             setFieldValue(response.data.title)
             setSavedValue(response.data.title)
             success = true
           })
-          .catch((error) => {
+          .catch(error => {
             setError(`Title ${fieldValue} is invalid`)
             return
           })
@@ -112,12 +112,12 @@ const EditableTextForm = ({
             token: userInfo?.accessToken,
             abbreviation: fieldValue,
           })
-          .then((response) => {
+          .then(response => {
             setFieldValue(response.data.abbreviation)
             setSavedValue(response.data.title)
             success = true
           })
-          .catch((error) => {
+          .catch(error => {
             setError(`Abbreviation ${fieldValue} is invalid`)
             return
           })
@@ -128,12 +128,12 @@ const EditableTextForm = ({
             token: userInfo?.accessToken,
             moocfiId: fieldValue,
           })
-          .then((response) => {
+          .then(response => {
             setFieldValue(response.data.moocfiId)
             setSavedValue(response.data.title)
             success = true
           })
-          .catch((error) => {
+          .catch(error => {
             setError(
               `${fieldValue} has invalid format. Please use a valid moocfi_id`,
             )
@@ -171,7 +171,7 @@ const EditableTextForm = ({
           {error}
         </Alert>
       </Snackbar>
-      <form onSubmit={(e) => handleSubmit(e)}>
+      <form onSubmit={e => handleSubmit(e)}>
         <input
           value={userInfo?.accessToken}
           type="hidden"

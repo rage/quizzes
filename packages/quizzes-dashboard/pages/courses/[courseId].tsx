@@ -198,7 +198,7 @@ const SectionOfPart = ({
   return (
     <>
       <Typography variant="h6">Section {section}</Typography>
-      {quizzes.map((quiz) => {
+      {quizzes.map(quiz => {
         return (
           <QuizOfSection
             key={quiz.id}
@@ -236,7 +236,7 @@ const ButtonContainer = styled.div`
 
 const QuizOfSection = ({ quiz, requirinAttention }: quizProps) => {
   const title = quiz.title
-  const types = Array.from(new Set(quiz.items.map((item) => item.type)))
+  const types = Array.from(new Set(quiz.items.map(item => item.type)))
   return (
     <Link
       href={{
@@ -292,7 +292,7 @@ const QuizOfSection = ({ quiz, requirinAttention }: quizProps) => {
             {types.length > 0 ? (
               <div>
                 [{" "}
-                {types.map((type) => (
+                {types.map(type => (
                   <StyledType key={type} variant="overline">
                     {type}{" "}
                   </StyledType>
