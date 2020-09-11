@@ -1,15 +1,9 @@
 import React, { useState } from "react"
 import EditableTextForm from "./EditableTextForm"
 import { Course } from "../../types/Quiz"
-import { Typography, Snackbar } from "@material-ui/core"
-import { InputLabel } from "@material-ui/core"
-import { FormControl } from "@material-ui/core"
-import { Alert } from "@material-ui/lab"
+import { Typography } from "@material-ui/core"
 
 export const EditableCourseInfo = ({ course }: { course: Course }) => {
-  const [showMessage, setShowMessage] = useState(false)
-  const [saved, setSaved] = useState(true)
-
   let HOST = "http://localhost:3003"
   const DASHBOARD_API = `/api/v2/dashboard/courses/${course.id}/`
 
@@ -20,7 +14,7 @@ export const EditableCourseInfo = ({ course }: { course: Course }) => {
   const editTitleUrl = HOST + DASHBOARD_API + `modify-course-title`
   const editAbbreviationUrl =
     HOST + DASHBOARD_API + `modify-course-abbreviation`
-  const editMoocFiUrl = HOST + DASHBOARD_API + `modify-modify-moocId`
+  const editMoocFiUrl = HOST + DASHBOARD_API + `modify-moocId`
 
   return (
     <>
@@ -39,7 +33,7 @@ export const EditableCourseInfo = ({ course }: { course: Course }) => {
       />
       <EditableTextForm
         formUrl={editAbbreviationUrl}
-        name="abbeviation"
+        name="abbreviation"
         label="abbreviation"
         value={course.abbreviation}
       />
