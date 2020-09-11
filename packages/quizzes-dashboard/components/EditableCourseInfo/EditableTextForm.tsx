@@ -44,8 +44,10 @@ const EditableTextForm = ({
 }) => {
   const [editMode, setEditMode] = useState<boolean>(false)
   const [mouseOver, setMouseOver] = useState<boolean>(false)
-  const [fieldValue, setFieldValue] = useState<string>(value || "")
-  const [saved, setSaved] = useState(false)
+  const [fieldValue, setFieldValue] = useState<string>(value || "-")
+  const [savedValue, setSavedValue] = useState(value)
+  const [saved, setSaved] = useState<boolean>(false)
+  const [error, setError] = useState<string | null>(null)
 
   const userInfo = checkStore()
 
@@ -67,7 +69,9 @@ const EditableTextForm = ({
   }
 
   const handleClickAway = (): void => {
+    // return field to last saved state
     setEditMode(false)
+    setFieldValue(savedValue)
   }
 
   const handleClick = (): void => {
@@ -77,6 +81,14 @@ const EditableTextForm = ({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    let success = false
+
+    if (fieldValue.length <= 3) {
+      setError(`Ensure the input is over 3 characters long`)
+      return
+    }
+
     switch (name) {
       case "title":
         await axios
@@ -86,9 +98,12 @@ const EditableTextForm = ({
           })
           .then((response) => {
             setFieldValue(response.data.title)
+            setSavedValue(response.data.title)
+            success = true
           })
           .catch((error) => {
-            console.log(error)
+            setError(`Title ${fieldValue} is invalid`)
+            return
           })
         break
       case "abbreviation":
@@ -99,9 +114,12 @@ const EditableTextForm = ({
           })
           .then((response) => {
             setFieldValue(response.data.abbreviation)
+            setSavedValue(response.data.title)
+            success = true
           })
           .catch((error) => {
-            console.log(error)
+            setError(`Abbreviation ${fieldValue} is invalid`)
+            return
           })
         break
       case "moocfiid":
@@ -112,15 +130,23 @@ const EditableTextForm = ({
           })
           .then((response) => {
             setFieldValue(response.data.moocfiId)
+            setSavedValue(response.data.title)
+            success = true
           })
           .catch((error) => {
-            console.log(error)
+            setError(
+              `${fieldValue} has invalid format. Please use a valid moocfi_id`,
+            )
+            return
           })
         break
       default:
         break
     }
-    setSaved(true)
+
+    if (success && !error) {
+      setSaved(true)
+    }
   }
 
   return (
@@ -133,6 +159,16 @@ const EditableTextForm = ({
       >
         <Alert onClose={() => setSaved(false)} severity="success">
           {label} successfully changed!
+        </Alert>
+      </Snackbar>
+      <Snackbar
+        open={error !== null}
+        autoHideDuration={5000}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
+        onClose={() => setError(null)}
+      >
+        <Alert onClose={() => setError(null)} severity="error">
+          {error}
         </Alert>
       </Snackbar>
       <form onSubmit={(e) => handleSubmit(e)}>
@@ -151,12 +187,12 @@ const EditableTextForm = ({
               id={name}
               name={name}
               value={fieldValue}
-              error={fieldValue === ""}
+              error={fieldValue.length < 3}
               onChange={handleChange}
               disabled={!editMode}
               onMouseEnter={handleMouseOver}
               onMouseLeave={handleMouseOut}
-              fullWidth="true"
+              // fullWidth="true"
               variant={editMode ? "outlined" : "standard"}
               InputProps={{
                 disableUnderline: true,
