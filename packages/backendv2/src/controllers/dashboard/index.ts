@@ -277,24 +277,30 @@ const dashboard = new Router<CustomState, CustomContext>({
       ctx.body = await CourseTranslation.updateCourseTitle(courseId, newTitle)
     }
   })
-  .post(
-    "/courses/:courseId/modify-course-abbreviation",
-    accessControl(),
-    async ctx => {
-      const courseId = ctx.params.courseId
-      const newAbbreviation = ctx.request.body.abbreviation
+  .post("/courses/:courseId/modify-course-abbreviation", async ctx => {
+    const courseId = ctx.params.courseId
+    const newAbbreviation = ctx.request.body.abbreviation
+    const token = ctx.request.body.token
 
+    if (!validToken(token)) {
+      ctx.body = "invalid token"
+    } else {
       ctx.body = await CourseTranslation.updateCourseAbbreviation(
         courseId,
         newAbbreviation,
       )
-    },
-  )
-  .post("/courses/:courseId/modify-moocId", accessControl(), async ctx => {
+    }
+  })
+  .post("/courses/:courseId/modify-moocId", async ctx => {
     const courseId = ctx.params.courseId
     const newMoocId = ctx.request.body.moocfiId
+    const token = ctx.request.body.token
 
-    ctx.body = await Course.updateMoocfiId(courseId, newMoocId)
+    if (!validToken(token)) {
+      ctx.body = "invalid token"
+    } else {
+      ctx.body = await Course.updateMoocfiId(courseId, newMoocId)
+    }
   })
 
 export default dashboard
