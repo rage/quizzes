@@ -105,7 +105,7 @@ export const broadcastQuizAnswerUpdated = async (
   }
 
   if (course.moocfiId) {
-    await produce("user-points-2", message)
+    await produce("user-points-realtime", message)
   }
 }
 
