@@ -18,6 +18,7 @@ import { Alert } from "@material-ui/lab"
 const StyledTextField = styled(TextField)`
   font-weight: bold;
   font-size: 2rem;
+  width: 100%;
 `
 const StyledButton = styled(Button)`
   margin: "0.5rem";
