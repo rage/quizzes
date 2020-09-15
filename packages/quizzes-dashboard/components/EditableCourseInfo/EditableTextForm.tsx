@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import axios from "axios"
+import axios, { AxiosResponse } from "axios"
 import TextField from "@material-ui/core/TextField"
 import IconButton from "@material-ui/core/IconButton"
 import InputAdornment from "@material-ui/core/InputAdornment"
@@ -90,60 +90,36 @@ const EditableTextForm = ({
       return
     }
 
-    switch (name) {
-      case "title":
-        await axios
-          .post(formUrl, {
-            token: userInfo?.accessToken,
-            title: fieldValue,
-          })
-          .then(response => {
-            setFieldValue(response.data.title)
-            setSavedValue(response.data.title)
-            success = true
-          })
-          .catch(error => {
-            setError(`Title ${fieldValue} is invalid`)
-            return
-          })
-        break
-      case "abbreviation":
-        await axios
-          .post(formUrl, {
-            token: userInfo?.accessToken,
-            abbreviation: fieldValue,
-          })
-          .then(response => {
-            setFieldValue(response.data.abbreviation)
-            setSavedValue(response.data.title)
-            success = true
-          })
-          .catch(error => {
-            setError(`Abbreviation ${fieldValue} is invalid`)
-            return
-          })
-        break
-      case "moocfiid":
-        await axios
-          .post(formUrl, {
-            token: userInfo?.accessToken,
-            moocfiId: fieldValue,
-          })
-          .then(response => {
-            setFieldValue(response.data.moocfiId)
-            setSavedValue(response.data.title)
-            success = true
-          })
-          .catch(error => {
-            setError(
-              `${fieldValue} has invalid format. Please use a valid moocfi_id`,
-            )
-            return
-          })
-        break
-      default:
-        break
+    let payload = {
+      token: userInfo?.accessToken,
+      ...(name === "title" && { title: fieldValue }),
+      ...(name === "abbreviation" && { abbreviation: fieldValue }),
+      ...(name === "moocfiid" && { moocfiId: fieldValue }),
     }
+
+    const handleResponse = (response: AxiosResponse<any>) => {
+      if (name === "title") {
+        setFieldValue(response.data.title)
+        setSavedValue(response.data.title)
+      }
+      if (name === "abbreviation") {
+        setFieldValue(response.data.abbreviation)
+        setSavedValue(response.data.abbreviation)
+      }
+      if (name === "moocfiid") {
+        setFieldValue(response.data.moocfiId)
+        setSavedValue(response.data.moocfiId)
+      }
+      success = true
+    }
+
+    await axios
+      .post(formUrl, payload)
+      .then(response => handleResponse(response))
+      .catch(e => {
+        setError(`Title ${fieldValue} is invalid`)
+        return
+      })
 
     if (success && !error) {
       setSaved(true)
