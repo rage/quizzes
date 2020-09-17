@@ -22,11 +22,13 @@ interface IQuizTabs {
 export const TabNavigator = () => {
   const router = useRouter()
   const quizId = router.query.quizId?.toString() ?? ""
+  const pageOnUrl = router.query.page?.[0] ?? "overview"
+
   const [requiringAttention, error] = usePromise(
     () => getAnswersRequiringAttentionByQuizId(quizId),
     [quizId],
   )
-  const [currentPage, setCurrentPage] = useState<string>("overview")
+  const [currentPage, setCurrentPage] = useState<string>(pageOnUrl)
 
   const URL_HREF = `/quizzes/[quizId]/[...page]`
   const pathname = `/quizzes/${quizId}`
