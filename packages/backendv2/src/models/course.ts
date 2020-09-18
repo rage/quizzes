@@ -306,7 +306,7 @@ class Course extends Model {
         throw new Error(e)
       })
 
-    return this.getCorrespondanceFile(oldCourseId, newCourseId)
+    return { success: true, newCourseId: newCourseId }
   }
 
   static async getCorrespondanceFile(oldCourseId: string, newCourseId: string) {
