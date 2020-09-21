@@ -27,7 +27,11 @@ const connect = () => {
 }
 
 const produce = async (
-  topic: "user-course-progress" | "user-points-2" | "exercise",
+  topic:
+    | "user-course-progress"
+    | "user-points-2"
+    | "exercise"
+    | "user-points-realtime",
   message: ProgressMessage | QuizAnswerMessage | QuizMessage,
 ) => {
   if (process.env.NODE_ENV === "test") {
@@ -105,7 +109,7 @@ export const broadcastQuizAnswerUpdated = async (
   }
 
   if (course.moocfiId) {
-    await produce("user-points-2", message)
+    await produce("user-points-realtime", message)
   }
 }
 
