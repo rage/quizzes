@@ -31,7 +31,7 @@ const OrderSelector = styled(TextField)`
   width: 25% !important;
 `
 
-const OptionWarapper = styled.div`
+const OptionWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
   margin-top: 1rem;
@@ -81,7 +81,7 @@ const CourseList = ({ data, error }: CourseListProps) => {
 
   return (
     <>
-      <OptionWarapper>
+      <OptionWrapper>
         <SortSelector
           variant="outlined"
           select
@@ -105,15 +105,15 @@ const CourseList = ({ data, error }: CourseListProps) => {
             {sortBy === "title" ? "[Z - A]" : "Latest  first"}
           </MenuItem>
         </OrderSelector>
-      </OptionWarapper>
+      </OptionWrapper>
       {courses.map(course => (
         <Link
           key={course.id}
           href={{
-            pathname: "/courses/[courseId]",
+            pathname: "/courses/[courseId]/[...page]",
             query: { courseId: `${course.id}` },
           }}
-          as={`/courses/${course.id}`}
+          as={`/courses/${course.id}/listing`}
         >
           <CourseLink>
             <StyledCard key={course.id}>

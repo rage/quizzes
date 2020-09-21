@@ -47,7 +47,7 @@ const EditPage = () => {
     {
       label: `${course ? course.title : ""}`,
       as: `/courses/${quizData?.courseId}`,
-      href: "/courses/[courseId]",
+      href: "/courses/[courseId]/[...page]",
     },
     {
       label: `${quizData ? quizData.title : ""}`,
