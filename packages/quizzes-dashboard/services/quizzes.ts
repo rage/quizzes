@@ -251,3 +251,56 @@ export const getAnswerStates = async (): Promise<string[]> => {
   }
   throw new Error()
 }
+
+export const duplicateCourse = async (
+  courseId: string,
+  name: string,
+  abbr: string,
+  lang: string,
+): Promise<{ success: boolean; newCourseId: string }> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (
+      await api.post(
+        `/courses/${courseId}/duplicate-course`,
+        { name: name, abbr: abbr, lang: lang },
+        config,
+      )
+    ).data
+  } else {
+    throw new Error()
+  }
+}
+
+export const getCorrespondanceFile = async (
+  newCourseId: string,
+  oldCourseId: string,
+) => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const res = (
+      await api.post(
+        `/courses/download-correspondance-file`,
+        { newCourseId: newCourseId, oldCourseId: oldCourseId },
+        config,
+      )
+    ).data
+    const url = window.URL.createObjectURL(new Blob([res]))
+    const link = document.createElement("a")
+    link.href = url
+    link.setAttribute(
+      "download",
+      `updated_ids_from${oldCourseId}_to_${newCourseId}.csv`,
+    )
+    document.body.appendChild(link)
+    link.click()
+  } else {
+    throw new Error()
+  }
+}

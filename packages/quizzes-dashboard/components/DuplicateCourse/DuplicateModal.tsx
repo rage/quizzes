@@ -1,21 +1,18 @@
-import React from "react"
+import React, { useState } from "react"
 import styled from "styled-components"
-import { Button, TextField, MenuItem } from "@material-ui/core"
-import { checkStore } from "../../services/tmcApi"
+import { Button, TextField, MenuItem, Snackbar } from "@material-ui/core"
 import usePromise from "react-use-promise"
 import { Course } from "../../types/Quiz"
-import { getAllLanguages } from "../../services/quizzes"
+import {
+  duplicateCourse,
+  getAllLanguages,
+  getCorrespondanceFile,
+} from "../../services/quizzes"
+import { Alert } from "@material-ui/lab"
 
 const SubmitButton = styled(Button)`
   display: flex !important;
   background: #90caf9 !important;
-`
-
-const StyledForm = styled.form`
-  display: flex !important;
-  justify-content: center;
-  width: 100% !important;
-  flex-wrap: wrap;
 `
 
 const InputWrapper = styled.div`
@@ -48,73 +45,91 @@ interface DuplicateModalProps {
 }
 
 export const DuplicateModal = ({ course }: DuplicateModalProps) => {
-  const userInfo = checkStore()
   const [langs, langsError] = usePromise(() => getAllLanguages(), [])
+  const [name, setName] = useState("")
+  const [abbr, setAbbr] = useState("")
+  const [lang, setLang] = useState(course.languageId)
+  const [response, showResponse] = useState(false)
+  const [success, setSuccess] = useState(false)
 
-  let HOST = "http://localhost:3003"
-  if (process.env.NODE_ENV === "production") {
-    HOST = "https://quizzes.mooc.fi"
+  const handleCourseDuplication = async () => {
+    const res = await duplicateCourse(course.id, name, abbr, lang)
+
+    if (res.success) {
+      showResponse(true)
+      setSuccess(true)
+      getCorrespondanceFile(res.newCourseId, course.id)
+    } else {
+      showResponse(true)
+      setSuccess(false)
+    }
   }
 
   return (
     <>
-      <StyledForm
-        method="POST"
-        action={
-          HOST + `/api/v2/dashboard/courses/${course.id}/duplicate-course`
-        }
+      <Snackbar
+        autoHideDuration={5000}
+        open={response}
+        anchorOrigin={{ vertical: "top", horizontal: "center" }}
       >
-        <InputWrapper>
-          <input
-            value={userInfo?.accessToken}
-            type="hidden"
-            name="token"
-            id="token"
+        {success ? (
+          <Alert severity="success">Course duplicated succesfully!</Alert>
+        ) : (
+          <Alert severity="error">Something went wrong!</Alert>
+        )}
+      </Snackbar>
+
+      <InputWrapper>
+        <InputContainer>
+          <StyledTextField
+            label="Name"
+            fullWidth
+            variant="outlined"
+            inputMode="text"
+            name="name"
+            onChange={event => {
+              setName(event.target.value)
+            }}
           />
-          <input value={course.id} type="hidden" name="oldCourseId" />
-          <InputContainer>
-            <StyledTextField
-              label="Name"
-              fullWidth
-              variant="outlined"
-              inputMode="text"
-              name="name"
-            />
-          </InputContainer>
-          <InputContainer>
-            <StyledTextField
-              label="Abbreviation"
-              fullWidth
-              variant="outlined"
-              inputMode="text"
-              name="abbr"
-            />
-          </InputContainer>
-          <InputContainer>
-            <StyledTextField
-              label="language"
-              fullWidth
-              variant="outlined"
-              select
-              name="lang"
-              value={course.languageId}
-            >
-              {langs?.map(lan => {
-                return (
-                  <MenuItem key={lan.id} value={lan.id}>
-                    {lan.name}
-                  </MenuItem>
-                )
-              })}
-            </StyledTextField>
-          </InputContainer>
-          <SubmitButtonWrapper>
-            <SubmitButton type="submit" variant="outlined">
-              Duplicate course
-            </SubmitButton>
-          </SubmitButtonWrapper>
-        </InputWrapper>
-      </StyledForm>
+        </InputContainer>
+        <InputContainer>
+          <StyledTextField
+            label="Abbreviation"
+            fullWidth
+            variant="outlined"
+            inputMode="text"
+            name="abbr"
+            onChange={event => setAbbr(event.target.value)}
+          />
+        </InputContainer>
+        <InputContainer>
+          <StyledTextField
+            label="language"
+            fullWidth
+            variant="outlined"
+            select
+            name="lang"
+            value={lang}
+            onChange={event => setLang(event.target.value)}
+          >
+            {langs?.map(lan => {
+              return (
+                <MenuItem key={lan.id} value={lan.id}>
+                  {lan.name}
+                </MenuItem>
+              )
+            })}
+          </StyledTextField>
+        </InputContainer>
+        <SubmitButtonWrapper>
+          <SubmitButton
+            variant="outlined"
+            onClick={() => handleCourseDuplication()}
+          >
+            Duplicate course
+          </SubmitButton>
+        </SubmitButtonWrapper>
+      </InputWrapper>
     </>
   )
 }

@@ -55,7 +55,10 @@ export const DuplicateCourseButton = ({ course }: DuplicateCourseProps) => {
   return (
     <>
       <ButtonContainer>
-        <StyledModal open={duplicateModal}>
+        <StyledModal
+          open={duplicateModal}
+          onClose={() => showDuplicateModal(false)}
+        >
           <AdvancedBox>
             <ButtonWrapper>
               <CloseButton onClick={() => showDuplicateModal(false)}>
@@ -66,7 +69,10 @@ export const DuplicateCourseButton = ({ course }: DuplicateCourseProps) => {
           </AdvancedBox>
         </StyledModal>
 
-        <StyledModal open={correspondanceModal}>
+        <StyledModal
+          open={correspondanceModal}
+          onClose={() => showCorrespondanceModal(false)}
+        >
           <AdvancedBox>
             <ButtonWrapper>
               <CloseButton onClick={() => showCorrespondanceModal(false)}>
