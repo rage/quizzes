@@ -4,7 +4,6 @@ import styled from "styled-components"
 import { Answer } from "../../../types/Answer"
 import { changeAnswerStatus } from "../../../services/quizzes"
 import { Alert } from "@material-ui/lab"
-import SlideTransition from "@material-ui/pickers/views/Calendar/SlideTransition"
 import { TransitionProps } from "@material-ui/core/transitions"
 
 export const ButtonField = styled.div`
@@ -41,6 +40,7 @@ export const ManualReviewField = ({
 }: ManualReviewProps) => {
   const [success, setSuccess] = useState(true)
   const [showSnacks, setShowSnacks] = useState(false)
+
   const handleAcceptOrReject = async (answerId: string, status: string) => {
     try {
       const res = await changeAnswerStatus(answerId, status)
@@ -56,7 +56,6 @@ export const ManualReviewField = ({
       }
     } catch (e) {
       setShowSnacks(true)
-      setHandled(true)
       setSuccess(false)
     }
   }
@@ -73,9 +72,11 @@ export const ManualReviewField = ({
       >
         <Alert severity={success ? "success" : "error"}>
           {success ? (
-            <Typography>Answer state saved succesfully</Typography>
+            <Typography>Answer status saved succesfully</Typography>
           ) : (
-            <Typography>Something went wrong while saving state</Typography>
+            <Typography>
+              Something went wrong while saving status, status not changed
+            </Typography>
           )}
         </Alert>
       </Snackbar>
