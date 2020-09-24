@@ -77,7 +77,7 @@ export const RegexTesterModalContent = ({ item }: ModalContentProps) => {
           multiline
           variant="outlined"
           label="Validity Regex"
-          value={variables.regex}
+          value={variables.regex ?? ""}
           onChange={event => {
             dispatch(setRegex(storeItem.id, event.target.value))
             handleRegexChange(event.target.value)

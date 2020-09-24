@@ -174,7 +174,7 @@ const ScaleContent = ({ item }: scaleContentProps) => {
           multiline
           label="Title"
           variant="outlined"
-          value={storeItem.title}
+          value={storeItem.title ?? ""}
           onChange={event =>
             dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
           }

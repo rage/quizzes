@@ -238,6 +238,10 @@ class QuizAnswer extends Model {
       .count()
       .groupBy("quiz_id")
 
+    if (count.length === 0) {
+      return 0
+    }
+
     return count[0].count
   }
 

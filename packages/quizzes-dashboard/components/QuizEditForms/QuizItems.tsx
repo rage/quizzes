@@ -1,5 +1,5 @@
 import React, { useEffect } from "react"
-import store, { useTypedSelector } from "../../store/store"
+import { useTypedSelector } from "../../store/store"
 import QuizItem from "./QuizItem"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"

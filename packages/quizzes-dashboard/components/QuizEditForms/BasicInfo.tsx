@@ -148,8 +148,7 @@ const BasicInformation = () => {
           fullWidth
           label="Part"
           variant="outlined"
-          value={part}
-          type="number"
+          value={part ?? ""}
           onChange={event =>
             dispatch(editedQuizzesPart(quizId, Number(event.target.value)))
           }
@@ -158,8 +157,7 @@ const BasicInformation = () => {
           fullWidth
           label="Section"
           variant="outlined"
-          value={section}
-          type="number"
+          value={section ?? ""}
           onChange={event =>
             dispatch(editedQuizzesSection(quizId, Number(event.target.value)))
           }
@@ -170,8 +168,7 @@ const BasicInformation = () => {
           label="Number of tries allowed"
           fullWidth
           variant="outlined"
-          type="number"
-          defaultValue={numberOfTries}
+          defaultValue={numberOfTries ?? ""}
           onChange={event =>
             dispatch(
               editedQuizzesNumberOfTries(Number(event.target.value), quizId),
@@ -184,8 +181,7 @@ const BasicInformation = () => {
           label="Points to gain"
           fullWidth
           variant="outlined"
-          type="number"
-          defaultValue={pointsToGain}
+          defaultValue={pointsToGain ?? ""}
           onChange={event =>
             dispatch(
               editedQuizzesPointsToGain(Number(event.target.value), quizId),
