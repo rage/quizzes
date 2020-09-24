@@ -46,7 +46,7 @@ const CourseTabNavigator = () => {
         <Tab
           icon={<FontAwesomeIcon icon={faPen} />}
           value="edit"
-          label="Edit Details"
+          label="Edit Course Details"
           onClick={() => {
             router.push(URL_HREF, `${pathname}/edit`)
             setCurrentTab("edit")
