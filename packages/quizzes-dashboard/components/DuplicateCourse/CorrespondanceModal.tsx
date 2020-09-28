@@ -1,9 +1,10 @@
 import React, { useState } from "react"
 import styled from "styled-components"
-import { Button, TextField, MenuItem } from "@material-ui/core"
+import { Button, TextField } from "@material-ui/core"
 import usePromise from "react-use-promise"
 import { fetchCourses, getCorrespondanceFile } from "../../services/quizzes"
 import { Course } from "../../types/Quiz"
+import { Autocomplete } from "@material-ui/lab"
 
 const SubmitButton = styled(Button)`
   display: flex !important;
@@ -12,21 +13,15 @@ const SubmitButton = styled(Button)`
 
 const InputWrapper = styled.div`
   display: flex;
-  width: 75%;
-  justify-content: space-around;
-  flex-wrap: wrap;
-`
-
-const InputContainer = styled.div`
-  display: flex;
   width: 100%;
-  justify-content: space-between;
+  justify-content: center;
+  flex-wrap: wrap;
 `
 
 const SubmitButtonWrapper = styled.div`
   display: flex;
   width: 100%;
-  justify-content: flex-end;
+  justify-content: center;
   margin-top: 1.5rem;
 `
 
@@ -48,35 +43,49 @@ export const CorrespondanceModal = ({ course }: CorrespondanceProps) => {
     getCorrespondanceFile(courseId, course.id)
     setCourseId("")
   }
+  interface CourseProps {
+    getOptionLabel: (value: Course) => string
+    onChange: (event: any, value: Course | null, reason: any) => void
+  }
+
+  const coursesProps: CourseProps = {
+    getOptionLabel: course => course.title,
+    onChange: (_event, value, _reason) => setCourseId(value ? value.id : ""),
+  }
+
+  if (coursesError) {
+    return <>Something went wrong</>
+  }
 
   return (
     <>
       <InputWrapper>
-        <InputContainer>
-          <StyledTextField
-            label="course"
-            fullWidth
-            variant="outlined"
-            select
-            name="courseId"
-            onChange={event => setCourseId(event.target.value)}
-          >
-            {courses?.map(course => (
-              <MenuItem key={course.id} value={course.id}>
-                {course.title}
-              </MenuItem>
-            ))}
-          </StyledTextField>
-        </InputContainer>
-        <SubmitButtonWrapper>
-          <SubmitButton
-            type="submit"
-            variant="outlined"
-            onClick={() => downloadCorrespondaceFile()}
-          >
-            Download the correspondance file
-          </SubmitButton>
-        </SubmitButtonWrapper>
+        {courses && (
+          <>
+            <Autocomplete
+              options={courses}
+              {...coursesProps}
+              renderInput={params => (
+                <StyledTextField
+                  {...params}
+                  label="Courses"
+                  variant="outlined"
+                  fullWidth
+                  helperText="Tip: You can type part of course name in the field to sort out options"
+                />
+              )}
+            />
+            <SubmitButtonWrapper>
+              <SubmitButton
+                type="submit"
+                variant="outlined"
+                onClick={() => downloadCorrespondaceFile()}
+              >
+                Download the correspondance file
+              </SubmitButton>
+            </SubmitButtonWrapper>
+          </>
+        )}
       </InputWrapper>
     </>
   )

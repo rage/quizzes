@@ -133,20 +133,6 @@ const EssayContent = ({ item }: essayContentProps) => {
         <InlineFieldWrapper>
           <TextField
             fullWidth
-            label="Max words"
-            variant="outlined"
-            defaultValue={storeItem.maxWords}
-            type="number"
-            onChange={event =>
-              dispatch(
-                editedItemMaxWords(storeItem.id, Number(event.target.value)),
-              )
-            }
-          />
-        </InlineFieldWrapper>
-        <InlineFieldWrapper>
-          <TextField
-            fullWidth
             label="Min words"
             variant="outlined"
             defaultValue={storeItem.minWords}
@@ -154,6 +140,20 @@ const EssayContent = ({ item }: essayContentProps) => {
             onChange={event =>
               dispatch(
                 editedItemMinWords(storeItem.id, Number(event.target.value)),
+              )
+            }
+          />
+        </InlineFieldWrapper>
+        <InlineFieldWrapper>
+          <TextField
+            fullWidth
+            label="Max words"
+            variant="outlined"
+            defaultValue={storeItem.maxWords}
+            type="number"
+            onChange={event =>
+              dispatch(
+                editedItemMaxWords(storeItem.id, Number(event.target.value)),
               )
             }
           />

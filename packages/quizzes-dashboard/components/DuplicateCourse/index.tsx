@@ -8,15 +8,17 @@ import DuplicateModal from "./DuplicateModal"
 import CorrespondanceModal from "./CorrespondanceModal"
 
 const StyledModal = styled(Modal)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 `
 
 const AdvancedBox = styled(Box)`
-  background-color: #fafafa;
-  min-width: 500px;
-  min-height: 400px;
+  background-color: #fafafa !important;
+  min-width: 600px !important;
+  max-width: 600px !important;
+  max-height: 500 px !important;
+  min-height: 500px !important;
 `
 
 const CloseButton = styled(Button)`

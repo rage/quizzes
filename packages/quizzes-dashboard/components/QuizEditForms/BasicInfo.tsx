@@ -5,7 +5,14 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDateTimePicker,
 } from "@material-ui/pickers"
-import { Typography, TextField, MenuItem, Fade } from "@material-ui/core"
+import {
+  Typography,
+  TextField,
+  MenuItem,
+  Fade,
+  Switch,
+  FormControlLabel,
+} from "@material-ui/core"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
@@ -20,6 +27,7 @@ import {
   editedQuizzesSubmitmessage,
   editedQuizzesPart,
   editedQuizzesSection,
+  editedQuizzesAutoconfirm,
 } from "../../store/editor/quiz/quizActions"
 import { useTypedSelector } from "../../store/store"
 import { checkForChanges } from "../../store/editor/editorActions"
@@ -76,6 +84,19 @@ const StyledWarningText = styled(Typography)`
   color: #ff5252 !important;
 `
 
+const HelperText = styled(Typography)`
+  display: flex !important;
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
+  color: #9e9e9e !important;
+`
+
+const AutoConfirmSwitch = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  width: 50%;
+`
+
 const BasicInformation = () => {
   const dispatch = useDispatch()
 
@@ -110,6 +131,10 @@ const BasicInformation = () => {
   const store = useTypedSelector(state => state)
 
   const changes = useTypedSelector(state => state.editor.editorChanges.changes)
+
+  const autoConfirm = useTypedSelector(
+    state => state.editor.quizzes[quizId].autoConfirm,
+  )
 
   useEffect(() => {
     dispatch(checkForChanges(store))
@@ -256,6 +281,28 @@ const BasicInformation = () => {
             dispatch(editedQuizzesSubmitmessage(quizId, event.target.value))
           }
         />
+      </InfoContainer>
+      <InfoContainer>
+        <AutoConfirmSwitch>
+          <FormControlLabel
+            label="Autoconfirm"
+            labelPlacement="end"
+            control={
+              <Switch
+                checked={autoConfirm}
+                onChange={event =>
+                  dispatch(
+                    editedQuizzesAutoconfirm(quizId, event.target.checked),
+                  )
+                }
+              />
+            }
+          />
+          <HelperText>
+            Check this to confirm submitted answers automatically, uncheck this
+            to confirm them manually
+          </HelperText>
+        </AutoConfirmSwitch>
       </InfoContainer>
     </>
   )
