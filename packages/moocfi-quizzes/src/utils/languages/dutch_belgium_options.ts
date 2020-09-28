@@ -2,156 +2,147 @@ import { SingleLanguageLabels } from "./index"
 
 const dutchBelgiumLabels: SingleLanguageLabels = {
   essay: {
-    exampleAnswerLabel: "Exemple de réponse",
-    userAnswerLabel: "Votre réponse",
-    currentNumberOfWordsLabel: "Mots",
-    textFieldLabel: "Votre réponse",
+    exampleAnswerLabel: "Voorbeeldantwoord",
+    userAnswerLabel: "Uw antwoord",
+    currentNumberOfWordsLabel: "Woorden",
+    textFieldLabel: "Uw antwoord",
     conformToLimitsToSubmitLabel:
-      "Modifiez votre réponse en respectant les limites de mots pour la soumettre",
+      "Zorg ervoor dat uw antwoord het juiste aantal woorden bevat",
     wordLimitsGuidance: (min, max) => {
       if (!min && !max) {
         return ""
       }
 
       if (!min) {
-        return `Votre réponse ne doit pas dépasser ${max} mots`
+        return `Uw antwoord mag niet langer zijn dan ${max} woorden`
       }
 
       if (!max) {
-        return `Votre réponse devra être composée de ${min} mots au minimum.`
+        return `Uw antwoord moet minstens ${min} woorden lang zijn`
       }
 
-      return `Votre réponse doit être composée d'entre ${min} et ${max} mots`
+      return `Uw antwoord moet tussen de  ${min} en ${max} woorden lang zijn`
     },
   },
   open: {
-    placeholder: "Réponse",
-    userAnswerLabel: "Votre réponse",
-    feedbackForFailure: "Votre réponse est incorrecte",
-    feedbackForSuccess: "Votre réponse est correcte",
+    placeholder: "Antwoord",
+    userAnswerLabel: "Uw antwoord",
+    feedbackForFailure: "Uw antwoord is onjuist",
+    feedbackForSuccess: "Uw antwoord is juist",
   },
   peerReviews: {
-    loadingLabel: "Chargement en cours",
-    noPeerAnswersAvailableLabel:
-      "Aucune réponse disponible pour une évaluation par les pairs",
-    chooseButtonLabel: "Sélectionner",
-    unselectButtonLabel: "Désélectionner",
-    chooseEssayInstruction:
-      "Choisissez un des essais pour l'évaluation par les pairs",
-    chosenEssayInstruction: "Revoir la réponse choisie:",
-    displayPeerReview: "Donner une évaluation par les pairs",
+    loadingLabel: "Laden",
+    noPeerAnswersAvailableLabel: "Geen antwoorden beschikbaar voor beoordeling",
+    chooseButtonLabel: "Selecteren",
+    unselectButtonLabel: "Selectie annuleren",
+    chooseEssayInstruction: "Kies één optie om te beoordelen",
+    chosenEssayInstruction: "Beoordeel het geselecteerde antwoord",
+    displayPeerReview: "Beoordelen",
     giveExtraPeerReviews:
-      "Vous avez donné le nombre requis d'évaluations par les pairs. En donnant plus d'évaluations par les pairs, votre réponse sera examinée plus rapidement !",
+      "U heeft het vereiste aantal antwoorden beoordeeld. Beoordeel meer antwoorden en uw eigen antwoord wordt sneller beoordeeld!",
     giveExtraPeerReviewsQuizConfirmed:
-      "Vous pouvez continuer à donner des évaluations par les pairs pour aider les autres",
-    givenPeerReviewsLabel: "évaluations par les pairs données",
-    peerReviewsCompletedInfo:
-      "Vous avez effectué les évaluations par les pairs requises",
-    reportAsInappropriateLabel: "Signaler comme inappropriée",
-    submitPeerReviewLabel: "Soumettre une évaluation",
-    hidePeerReviewLabel: "Cacher",
-    essayQuestionAnswerTextBoxLabel: "Rédiger une évaluation",
-    optionLabel: "Option",
-    answerRejected: "Votre réponse a été refusée",
-    answerFlaggedAsSpam: "Votre réponse a été refusée car jugée inappropriée.",
-    answerConfirmed: "Votre réponse a été confirmée !",
-    manualReview:
-      "Votre réponse est en cours d'examen par le personnel du cours",
-    peerReviewGroupTitle: "Vertaisarviointikysymykset",
+      "U kunt meer antwoorden beoordelen om anderen te helpen",
+    givenPeerReviewsLabel: "Verzonden beoordelingen",
+    peerReviewsCompletedInfo: "U heeft genoeg antwoorden beoordeeld",
+    reportAsInappropriateLabel: "Spam melden",
+    submitPeerReviewLabel: "Beoordeling verzenden",
+    hidePeerReviewLabel: "Verbergen",
+    essayQuestionAnswerTextBoxLabel: "Beoordeling schrijven",
+    optionLabel: "Optie",
+    answerRejected: "Uw antwoord is geweigerd",
+    answerFlaggedAsSpam: "Uw antwoord is gerapporteerd als spam",
+    answerConfirmed: "Uw antwoord is geaccepteerd!",
+    manualReview: "Uw antwoord wordt beoordeeld door een cursusmedewerker",
+    peerReviewGroupTitle: "Beoordeelde vragen",
     peerReviewLikertDetails:
-      "Arvioi jokainen väite asteikolla 1-5. 1 on vahvasti eri mieltä ja 5 on vahvasti samaa mieltä.",
+      "Evalueer elke stelling op een schaal van 1-5. Ik ben het er zeer mee oneens en 5 is het er volledig mee eens.",
   },
   receivedPeerReviews: {
     errorLabel:
-      "Une erreur s'est produite dans l'affichage des évaluations par les pairs que vous avez reçues. Le rechargement de la page pourrait vous aider.",
+      "Er is een fout opgetreden bij het weergeven van de ontvangen beoordelingen. Probeer de pagina opnieuw te laden.",
     noSupportForQuestionTypeLabel:
-      "Ce type de question d'évaluation par les pairs n'est pas accepté.",
-    loadingLabel: "Chargement des évaluations par les pairs reçues en cours...",
-    noPeerReviewsReceivedlabel:
-      "Votre réponse n'a pas encore fait l'objet d'une évaluation par les pairs",
-    numberOfPeerReviewsText: n =>
-      `Votre réponse a fait l'objet de ${n} évaluation${
-        n > 0 ? "s" : ""
-      } par les pairs..`,
-    toggleButtonExpandLabel:
-      "Afficher toutes les évaluations par les pairs reçues",
-    toggleButtonShrinkLabel: "Cacher les évaluations par les pairs",
-    averageOfGradesLabel: "La note moyenne des avis reçus est de",
-    detailedViewLabel: "Toutes les évaluations que votre réponse a reçues",
-    summaryViewLabel: "Les évaluations par les pairs reçues:",
-    peerReviewLabel: "Évaluation par les pairs",
-    peerReviewReceived: "Vous avez reçu un nouvel examen par les pairs",
+      "Een dergelijke beoordelingsvraag wordt niet ondersteund",
+    loadingLabel: "Ontvangen beoordelingen laden...",
+    noPeerReviewsReceivedlabel: "Uw antwoord is nog niet beoordeeld",
+    numberOfPeerReviewsText: n => `Uw antwoord is ${n} keer beoordeeld.`,
+    toggleButtonExpandLabel: "Toon alle ontvangen beoordelingen",
+    toggleButtonShrinkLabel: "Verberg beoordelingen",
+    averageOfGradesLabel:
+      "Het gemiddelde cijfer van de ontvangen beoordelingen is",
+    detailedViewLabel: "Alle ontvangen beoordelingen van uw antwoord",
+    summaryViewLabel: "Ontvangen beoordelingen:",
+    peerReviewLabel: "Beoordeling",
+    peerReviewReceived: "U heeft een nieuwe beoordeling ontvangen",
     peerReviewReceivedFor: (title: string) =>
-      `Vous avez reçu un nouvel examen par les pairs pour l'exercice ${title}`,
+      `U heeft een nieuwe beoordeling ontvangen voor oefening ${title}`,
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
-      `Une question de type '${itemType}' n'est pas acceptée.`,
+      `Vragen van het volgende type worden niet ondersteund: ${itemType}`,
   },
   multipleChoice: {
-    selectCorrectAnswerLabel: "Sélectionnez la bonne réponse",
-    chooseAllSuitableOptionsLabel:
-      "Sélectionnez toutes les options appropriées",
-    answerCorrectLabel: "Correcte",
-    answerIncorrectLabel: "Incorrecte",
+    selectCorrectAnswerLabel: "Kies het juiste antwoord",
+    chooseAllSuitableOptionsLabel: "Meer dan één antwoord mogelijk",
+    answerCorrectLabel: "Juist",
+    answerIncorrectLabel: "Onjuist",
   },
   stage: {
-    answerStageLabel: "Répondre au quiz",
-    givingPeerReviewsStageLabel: "Donner une évaluations par les pairs",
-    receivingPeerReviewsStageLabel: "Recevoir des évaluations par les pairs",
-    evaluationStageLabel: "Évaluer la réponse",
+    answerStageLabel: "Oefening aan het beantwoorden",
+    givingPeerReviewsStageLabel: "Beoordelen",
+    receivingPeerReviewsStageLabel: "Beoordelingen ontvangen",
+    evaluationStageLabel: "Aan het wachten op cijfer",
   },
   general: {
-    pastDeadline: "Vous ne pouvez plus soumettre de réponse.",
+    pastDeadline: "U kunt de oefening niet meer beantwoorden",
     answerMissingBecauseQuizModifiedLabel:
-      "Question sans réponse. Le quiz a probablement été modifié après votre réponse.",
-    submitButtonLabel: "Répondre",
-    errorLabel: "Une erreur s'est produite",
-    loginToViewPromptLabel: "Connectez-vous pour voir le quiz",
-    loginToAnswerPromptLabel: "Connectez-vous pour répondre au quiz",
-    loadingLabel: "Chargement en cours",
-    answerCorrectLabel: "La réponse est correcte",
-    alreadyAnsweredLabel: "Vous avez déjà répondu",
-    answerIncorrectLabel: "La réponse est incorrecte",
-    kOutOfNCorrect: (k, n) => `Vous avez ${k}/${n} réponses correctes`,
-    pointsAvailableLabel: "Points disponibles dans le quiz",
-    pointsReceivedLabel: "Points qui vous sont accordés",
+      "Vraag niet beantwoord. De quiz is waarschijnlijk gewijzigd nadat u hebt geantwoord.",
+    submitButtonLabel: "Verzenden",
+    errorLabel: "Fout",
+    loginToViewPromptLabel: "Log in om de oefening te bekijken",
+    loginToAnswerPromptLabel: "Log in om de oefening te beantwoorden",
+    loadingLabel: "Laden",
+    answerCorrectLabel: "Het antwoord is juist",
+    alreadyAnsweredLabel: "U heeft deze vraag al beantwoord",
+    answerIncorrectLabel: "Het antwoord is onjuist",
+    kOutOfNCorrect: (k, n) => `${k}/${n} antwoorden juist`,
+    pointsAvailableLabel: "Totaal aantal punten voor deze oefening",
+    pointsReceivedLabel: "Behaalde punten",
     incorrectSubmitWhileTriesLeftLabel:
-      "La réponse n'était pas tout à fait correcte - vous pouvez réessayer !",
-    triesRemainingLabel: "Tentatives restantes",
+      "Het antwoord is niet helemaal juist. Probeer het opnieuw!",
+    triesRemainingLabel: "Resterende pogingen",
     quizLabel: "Quiz",
-    pointsLabel: "Points",
-    triesNotLimitedLabel: "Le nombre de tentatives est illimité",
-    submitGeneralFeedbackLabel: "Réponse soumise",
-    submitButtonAlreadyAnsweredLabel: "Réponse reçue",
+    pointsLabel: "Punten",
+    triesNotLimitedLabel: "U kunt zo vaak proberen als u wilt",
+    submitGeneralFeedbackLabel: "Verzonden",
+    submitButtonAlreadyAnsweredLabel: "Beantwoord",
     pointsGrantingPolicyInformer: policy => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
-          return "Pour pouvoir obtenir des points, la réponse doit être entièrement correcte "
+          return "U krijgt pas punten als het antwoord helemaal juist is"
         case "grant_whenever_possible":
           return ""
         default:
           return ""
       }
     },
-    answered: "Répondue",
-    unanswered: "Sans réponse",
-    rejected: "Réponse refusée, réessayez",
-    progressUpdated: "Progression du cours mise à jour",
-    answerConfirmed: "Votre réponse a été confirmée!",
+    answered: "Beantwoord",
+    unanswered: "Onbeantwoord",
+    rejected: "Uw antwoord is geweigerd, probeer het opnieuw",
+    progressUpdated: "Voortgang is geüpdatet",
+    answerConfirmed: "Uw antwoord is bevestigd!",
     answerConfirmedFor: (title: string) =>
-      `Votre réponse à l'exercice ${title} a été confirmée!`,
-    courseCompleted: "Vous avez terminé le cours!",
+      `U antwoord voor oefening ${title} is bevestigd!`,
+    courseCompleted: "U heeft de cursus afgerond!",
   },
   error: {
     submitFailedError:
-      "Impossible d'envoyer votre réponse. Veuillez réessayer plus tard.",
-    quizLoadFailedError: "Impossible de charger l'exercice",
+      "Uw antwoord kon niet worden verzonden. Probeer het later opnieuw.",
+    quizLoadFailedError: "Kan oefening niet laden",
     progressFetchError:
-      "Impossible de récupérer les données de progression du cours. Veuillez réessayer plus tard.",
-    submitSpamFlagError: "Impossible de signaler le spam",
+      "Kan voortganggegevens niet ophalen. Probeer het later opnieuw.",
+    submitSpamFlagError: "Kan spam niet melden",
     fetchReviewCandidatesError:
-      "Une erreur s'est produite lors de la récupération des réponses pour examen par les pairs. Veuillez réessayer plus tard.",
+      "Er is iets misgegaan bij het ophalen van de antwoorden voor beoordeling. Probeer het later opnieuw.",
   },
 }
 
