@@ -44,7 +44,6 @@ export const TabNavigator = () => {
   const ComponentTag = quizTabs[currentPage]
     ? quizTabs[currentPage]
     : quizTabs["default_tab"]
-
   return (
     <>
       <Tabs
@@ -85,17 +84,13 @@ export const TabNavigator = () => {
           icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
           value="answers-requiring-attention"
           label={
-            requiringAttention ? (
-              <Badge
-                variant="standard"
-                badgeContent={requiringAttention}
-                color="error"
-              >
-                Answers requiring attention
-              </Badge>
-            ) : (
-              "Answers requiring attention"
-            )
+            <Badge
+              variant="standard"
+              badgeContent={requiringAttention}
+              color="error"
+            >
+              Answers requiring attention
+            </Badge>
           }
           onClick={() => {
             router.push(URL_HREF, `${pathname}/answers-requiring-attention`)

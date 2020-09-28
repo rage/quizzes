@@ -53,7 +53,7 @@ export const CheckBoxModalContent = ({ itemId }: CheckBoxModalProps) => {
             label="title"
             fullWidth
             multiline
-            value={Boolean(storeItem.title) ? storeItem.title : ""}
+            value={storeItem.title ?? ""}
             variant="outlined"
             onChange={event =>
               dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
