@@ -3,7 +3,14 @@ import { Formik, Form, Field, ErrorMessage, FormikHelpers } from "formik"
 import { useRouter } from "next/router"
 import usePromise from "react-use-promise"
 import { fetchCourseQuizzes } from "../../services/quizzes"
-import { Button, Snackbar, TextField } from "@material-ui/core"
+import {
+  Button,
+  Card,
+  CardContent,
+  Snackbar,
+  TextField,
+  Typography,
+} from "@material-ui/core"
 import styled from "styled-components"
 import { object, string } from "yup"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
@@ -31,6 +38,13 @@ const ErrorComponent = styled.span`
 const ButtonWrapper = styled.div`
   display: flex;
   justify-content: center;
+  align-items: center;
+  padding: 3rem;
+`
+
+const Content = styled(CardContent)`
+  display: flex;
+  justify-content: space-around;
   align-items: center;
   padding: 3rem;
 `
@@ -211,11 +225,25 @@ const EditCourseDetails = () => {
     languageId: data?.course.languageId || undefined,
   }
 
+  console.log(data.course)
+
   return (
-    <EditDetailsForm
-      initialValues={initialValues}
-      apiUrl={HOST + DASHBOARD_API + "edit"}
-    />
+    <>
+      <Card style={{ marginBottom: "2rem" }}>
+        <Content>
+          <Typography variant="h6">
+            Created at: {data.course.createdAt.toString().slice(0, 10)}
+          </Typography>
+          <Typography variant="h6">
+            Last updated: {data.course.updatedAt.toString().slice(0, 10)}
+          </Typography>
+        </Content>
+      </Card>
+      <EditDetailsForm
+        initialValues={initialValues}
+        apiUrl={HOST + DASHBOARD_API + "edit"}
+      />
+    </>
   )
 }
 
