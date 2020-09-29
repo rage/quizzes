@@ -18,6 +18,7 @@ import {
   getAccessableCourses,
 } from "./util"
 import * as Kafka from "../../services/kafka"
+import _ from "lodash"
 
 const dashboard = new Router<CustomState, CustomContext>({
   prefix: "/dashboard",
@@ -266,40 +267,23 @@ const dashboard = new Router<CustomState, CustomContext>({
     const result = await QuizAnswer.getStates()
     ctx.body = result
   })
-  .post("/courses/:courseId/modify-course-title", async ctx => {
+  .post("/courses/:courseId/edit", async ctx => {
     const courseId = ctx.params.courseId
-    const newTitle = ctx.request.body.title
+    const payload = ctx.request.body
     const token = ctx.request.body.token
+    const moocfiId = payload.moocfiId
 
     if (!validToken(token)) {
       ctx.body = "invalid token"
     } else {
-      ctx.body = await CourseTranslation.updateCourseTitle(courseId, newTitle)
-    }
-  })
-  .post("/courses/:courseId/modify-course-abbreviation", async ctx => {
-    const courseId = ctx.params.courseId
-    const newAbbreviation = ctx.request.body.abbreviation
-    const token = ctx.request.body.token
-
-    if (!validToken(token)) {
-      ctx.body = "invalid token"
-    } else {
-      ctx.body = await CourseTranslation.updateCourseAbbreviation(
+      const payloadWithoutMoocfiId = _.omit(payload, ["moocfiId"])
+      ctx.body = await CourseTranslation.updateCourseProperties(
         courseId,
-        newAbbreviation,
+        payloadWithoutMoocfiId,
       )
-    }
-  })
-  .post("/courses/:courseId/modify-moocId", async ctx => {
-    const courseId = ctx.params.courseId
-    const newMoocId = ctx.request.body.moocfiId
-    const token = ctx.request.body.token
-
-    if (!validToken(token)) {
-      ctx.body = "invalid token"
-    } else {
-      ctx.body = await Course.updateMoocfiId(courseId, newMoocId)
+      if (moocfiId) {
+        ctx.body = await Course.updateMoocfiId(courseId, moocfiId)
+      }
     }
   })
 
