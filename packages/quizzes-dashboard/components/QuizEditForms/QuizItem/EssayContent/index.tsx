@@ -122,8 +122,8 @@ const EssayContent = ({ item }: essayContentProps) => {
           label="Description for this quiz item"
           multiline
           rows={1}
-          helperText="Use this if you cannot put the description in the 'Description for the whole quiz'-field. You may want to use this if have another quiz item before this one."
-          defaultValue={item.body}
+          helperText="Use this if you cannot put the description in the 'Description for the whole quiz'-field. You may want to use this if you have another quiz item before this one."
+          defaultValue={storeItem.title ?? ""}
           onChange={event =>
             dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
           }
@@ -133,24 +133,28 @@ const EssayContent = ({ item }: essayContentProps) => {
         <InlineFieldWrapper>
           <TextField
             fullWidth
-            label="Max words"
+            label="Min words"
             variant="outlined"
-            defaultValue={item.maxWords}
+            defaultValue={storeItem.minWords}
             type="number"
             onChange={event =>
-              dispatch(editedItemMaxWords(item.id, Number(event.target.value)))
+              dispatch(
+                editedItemMinWords(storeItem.id, Number(event.target.value)),
+              )
             }
           />
         </InlineFieldWrapper>
         <InlineFieldWrapper>
           <TextField
             fullWidth
-            label="Min words"
+            label="Max words"
             variant="outlined"
-            defaultValue={item.minValue}
+            defaultValue={storeItem.maxWords}
             type="number"
             onChange={event =>
-              dispatch(editedItemMinWords(item.id, Number(event.target.value)))
+              dispatch(
+                editedItemMaxWords(storeItem.id, Number(event.target.value)),
+              )
             }
           />
         </InlineFieldWrapper>

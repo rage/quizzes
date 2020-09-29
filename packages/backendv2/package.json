@@ -37,6 +37,7 @@
     "@types/csv-parse": "^1.2.2",
     "@types/csv-stringify": "^3.1.0",
     "@types/jsonstream": "^0.8.30",
+    "@types/lodash": "^4.14.161",
     "JSONStream": "^1.3.5",
     "axios": "^0.19.2",
     "csv-parse": "^4.11.1",

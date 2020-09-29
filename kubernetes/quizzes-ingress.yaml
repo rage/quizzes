@@ -27,18 +27,18 @@ spec:
           backend:
             serviceName: quizzes-dashboardv2-service
             servicePort: 80
-    - host: quizzes2.mooc.fi
-      http:
-        paths:
-        - path: /api/
-          backend:
-            serviceName: quizzes-backend-service
-            servicePort: 80
-        - path: /api/v2/
-          backend:
-            serviceName: quizzes-backendv2-service
-            servicePort: 80
-        - path: /
-          backend:
-            serviceName: quizzes-dashboard-service
-            servicePort: 80
+    # - host: quizzes2.mooc.fi
+    #   http:
+    #     paths:
+    #     - path: /api/
+    #       backend:
+    #         serviceName: quizzes-backend-service
+    #         servicePort: 80
+    #     - path: /api/v2/
+    #       backend:
+    #         serviceName: quizzes-backendv2-service
+    #         servicePort: 80
+    #     - path: /
+    #       backend:
+    #         serviceName: quizzes-dashboard-service
+    #         servicePort: 80

@@ -1,40 +1,27 @@
-import React from "react"
+import React, { useState } from "react"
 import styled from "styled-components"
-import { Button, TextField, MenuItem } from "@material-ui/core"
-import { checkStore } from "../../services/tmcApi"
+import { Button, TextField } from "@material-ui/core"
 import usePromise from "react-use-promise"
-import { fetchCourses } from "../../services/quizzes"
+import { fetchCourses, getCorrespondanceFile } from "../../services/quizzes"
 import { Course } from "../../types/Quiz"
+import { Autocomplete } from "@material-ui/lab"
 
 const SubmitButton = styled(Button)`
   display: flex !important;
   background: #90caf9 !important;
 `
 
-const StyledForm = styled.form`
-  display: flex !important;
-  justify-content: center;
-  width: 100% !important;
-  flex-wrap: wrap;
-`
-
 const InputWrapper = styled.div`
   display: flex;
-  width: 75%;
-  justify-content: space-around;
-  flex-wrap: wrap;
-`
-
-const InputContainer = styled.div`
-  display: flex;
   width: 100%;
-  justify-content: space-between;
+  justify-content: center;
+  flex-wrap: wrap;
 `
 
 const SubmitButtonWrapper = styled.div`
   display: flex;
   width: 100%;
-  justify-content: flex-end;
+  justify-content: center;
   margin-top: 1.5rem;
 `
 
@@ -48,50 +35,58 @@ interface CorrespondanceProps {
 }
 
 export const CorrespondanceModal = ({ course }: CorrespondanceProps) => {
-  const userInfo = checkStore()
-
   const [courses, coursesError] = usePromise(() => fetchCourses(), [])
 
-  let HOST = "http://localhost:3003"
-  if (process.env.NODE_ENV === "production") {
-    HOST = "https://quizzes.mooc.fi"
+  const [courseId, setCourseId] = useState("")
+
+  const downloadCorrespondaceFile = () => {
+    getCorrespondanceFile(courseId, course.id)
+    setCourseId("")
   }
+  interface CourseProps {
+    getOptionLabel: (value: Course) => string
+    onChange: (event: any, value: Course | null, reason: any) => void
+  }
+
+  const coursesProps: CourseProps = {
+    getOptionLabel: course => course.title,
+    onChange: (_event, value, _reason) => setCourseId(value ? value.id : ""),
+  }
+
+  if (coursesError) {
+    return <>Something went wrong</>
+  }
+
   return (
     <>
-      <StyledForm
-        method="POST"
-        action={HOST + `/api/v2/dashboard/courses/download-correspondance-file`}
-      >
-        <InputWrapper>
-          <input
-            value={userInfo?.accessToken}
-            type="hidden"
-            name="token"
-            id="token"
-          />
-          <input value={course.id} type="hidden" name="oldCourseId" />
-          <InputContainer>
-            <StyledTextField
-              label="course"
-              fullWidth
-              variant="outlined"
-              select
-              name="courseId"
-            >
-              {courses?.map(course => (
-                <MenuItem key={course.id} value={course.id}>
-                  {course.title}
-                </MenuItem>
-              ))}
-            </StyledTextField>
-          </InputContainer>
-          <SubmitButtonWrapper>
-            <SubmitButton type="submit" variant="outlined">
-              Download the correspondance file
-            </SubmitButton>
-          </SubmitButtonWrapper>
-        </InputWrapper>
-      </StyledForm>
+      <InputWrapper>
+        {courses && (
+          <>
+            <Autocomplete
+              options={courses}
+              {...coursesProps}
+              renderInput={params => (
+                <StyledTextField
+                  {...params}
+                  label="Courses"
+                  variant="outlined"
+                  fullWidth
+                  helperText="Tip: You can type part of course name in the field to sort out options"
+                />
+              )}
+            />
+            <SubmitButtonWrapper>
+              <SubmitButton
+                type="submit"
+                variant="outlined"
+                onClick={() => downloadCorrespondaceFile()}
+              >
+                Download the correspondance file
+              </SubmitButton>
+            </SubmitButtonWrapper>
+          </>
+        )}
+      </InputWrapper>
     </>
   )
 }
