@@ -4,9 +4,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Tab, Tabs } from "@material-ui/core"
 import { ITabToComponent } from "../CoursePage/types"
 import { CoursePage } from "../CoursePage"
-import EditCourseDetails, {
-  EditDetailsForm,
-} from "../CoursePage/EditDetailsForm"
+import EditCourseDetails from "../CoursePage/EditDetailsForm"
 import { useRouter } from "next/router"
 
 const CourseTabNavigator = () => {
@@ -35,6 +33,7 @@ const CourseTabNavigator = () => {
         value={currentTab}
         indicatorColor="primary"
         textColor="primary"
+        style={{ marginBottom: "3rem" }}
       >
         <Tab
           icon={<FontAwesomeIcon icon={faChalkboard} />}
