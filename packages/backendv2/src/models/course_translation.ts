@@ -1,3 +1,4 @@
+import { EditCoursePayloadFields } from "./../types/index"
 import Model from "./base_model"
 import Course from "./course"
 
@@ -32,16 +33,17 @@ class CourseTranslation extends Model {
     })
   }
 
-  static async updateCourseTitle(id: string, newTitle: string) {
+  /**
+   * updates the properties of the course included in the payload
+   * @param id
+   * @param payload
+   */
+  static async updateCourseProperties(
+    id: string,
+    payload: EditCoursePayloadFields,
+  ) {
     const courseTranslation = await this.getById(id)
-    return await courseTranslation.$query().patchAndFetch({ title: newTitle })
-  }
-
-  static async updateCourseAbbreviation(id: string, newAbbreviation: string) {
-    const courseTranslation = await this.getById(id)
-    return await courseTranslation
-      .$query()
-      .patchAndFetch({ abbreviation: newAbbreviation })
+    return await courseTranslation.$query().patchAndFetch(payload)
   }
 }
 

@@ -4,7 +4,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Tab, Tabs } from "@material-ui/core"
 import { ITabToComponent } from "../CoursePage/types"
 import { CoursePage } from "../CoursePage"
-import { EditDetailsForm } from "../CoursePage/EditDetailsForm"
+import EditCourseDetails, {
+  EditDetailsForm,
+} from "../CoursePage/EditDetailsForm"
 import { useRouter } from "next/router"
 
 const CourseTabNavigator = () => {
@@ -18,7 +20,7 @@ const CourseTabNavigator = () => {
 
   const coursePageTabs: ITabToComponent = {
     listing: CoursePage,
-    edit: EditDetailsForm,
+    edit: EditCourseDetails,
     default_tab: CoursePage,
   }
 
