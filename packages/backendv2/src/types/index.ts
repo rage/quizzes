@@ -88,3 +88,11 @@ export enum RequiredAction {
   GIVE_PEER_REVIEW = "GIVE_PEER_REVIEW",
   PENDING_PEER_REVIEW = "PENDING_PEER_REVIEW",
 }
+
+export interface EditCoursePayloadFields {
+  courseId?: string
+  moocfiId?: string
+  title?: string
+  abbreviation?: string
+  languageId?: string
+}
