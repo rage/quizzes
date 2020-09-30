@@ -183,7 +183,7 @@ export const EditDetailsForm = ({
                 color="primary"
                 disabled={isSubmitting || isValidating}
               >
-                Submit
+                Update
               </Button>
             </ButtonWrapper>
           </Form>
@@ -224,8 +224,6 @@ const EditCourseDetails = () => {
     abbreviation: data?.course.abbreviation || undefined,
     languageId: data?.course.languageId || undefined,
   }
-
-  console.log(data.course)
 
   return (
     <>
