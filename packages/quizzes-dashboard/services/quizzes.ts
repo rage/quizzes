@@ -275,7 +275,7 @@ export const duplicateCourse = async (
   }
 }
 
-export const getCorrespondanceFile = async (
+export const getCorrespondenceFile = async (
   newCourseId: string,
   oldCourseId: string,
 ) => {
@@ -286,7 +286,7 @@ export const getCorrespondanceFile = async (
     }
     const res = (
       await api.post(
-        `/courses/download-correspondance-file`,
+        `/courses/download-correspondence-file`,
         { newCourseId: newCourseId, oldCourseId: oldCourseId },
         config,
       )
