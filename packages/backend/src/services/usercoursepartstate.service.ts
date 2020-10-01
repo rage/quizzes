@@ -232,12 +232,16 @@ export default class UserCoursePartStateService {
     const progress: PointsByGroup[] = userCoursePartStates
       .filter(ucps => ucps.coursePart !== 0)
       .map(ucps => {
-        const maxPoints = quizzes
+        let maxPoints = 0
+        const pointsArr = quizzes
           .filter(
             quiz => quiz.part === ucps.coursePart && !quiz.excludedFromScore,
           )
           .map(quiz => quiz.points)
-          .reduce((acc, curr) => acc + curr)
+
+        if (pointsArr.length > 0) {
+          maxPoints = pointsArr.reduce((acc, curr) => acc + curr)
+        }
 
         const coursePartString: string = ucps.coursePart.toString()
 
