@@ -28,7 +28,6 @@ export const editorChangesReducer = createReducer<{ changes: boolean }, action>(
         questions: action.payload.store.editor.questions,
       }
 
-      console.log(quizData)
       const newState: Quiz = denormalize(
         quizData.quizId,
         normalizedQuiz,
