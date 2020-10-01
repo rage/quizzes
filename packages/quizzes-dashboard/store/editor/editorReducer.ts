@@ -35,8 +35,6 @@ export const editorChangesReducer = createReducer<{ changes: boolean }, action>(
         quizData,
       )
 
-      console.log(newState)
-
       draftState.changes = !_.isEqual(initState, newState)
     })
   } else {
