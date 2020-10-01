@@ -1,6 +1,6 @@
 import { createReducer } from "typesafe-actions"
 import { Question } from "../../../types/Quiz"
-import { action } from "../../../types/NormalizedQuiz"
+import { action, NormalizedQuestion } from "../../../types/NormalizedQuiz"
 import { initializedEditor } from "../editorActions"
 import produce from "immer"
 import {
@@ -80,7 +80,7 @@ export const questionReducer = createReducer<
           question.peerReviewCollectionId ===
           action.payload.peerReviewCollectionId,
       ).length
-      const newPRQ: Question = {
+      const newPRQ: NormalizedQuestion = {
         id: action.payload.newId,
         quizId: action.payload.quizId,
         peerReviewCollectionId: action.payload.peerReviewCollectionId,

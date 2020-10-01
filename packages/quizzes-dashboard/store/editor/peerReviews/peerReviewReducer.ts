@@ -7,6 +7,7 @@ import {
   createdNewPeerReview,
 } from "./peerReviewActions"
 import produce from "immer"
+import { createdNewPeerReviewQuestion } from "../questions/questionActions"
 
 export const peerReviewReducer = createReducer<
   { [peerReviewId: string]: NormalizedPeerReview },
@@ -41,5 +42,13 @@ export const peerReviewReducer = createReducer<
         questions: [],
       }
       draftState[action.payload.newId] = newPeerReview
+    })
+  })
+
+  .handleAction(createdNewPeerReviewQuestion, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.peerReviewCollectionId].questions.push(
+        action.payload.newId,
+      )
     })
   })

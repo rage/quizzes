@@ -63,6 +63,9 @@ export const prqActions = [
   editedPeerReviewQuestionType,
   increasedPRQOrder,
   decreasedPRQOrder,
+  createdNewPeerReviewQuestion,
+  toggledQuestionDefault,
+  toggledQuestionAnswerRequired,
 ]
 
 export default prqActions

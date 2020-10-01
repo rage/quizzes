@@ -260,7 +260,6 @@ const BasicInformation = () => {
         <TextField
           multiline
           fullWidth
-          rows={5}
           label="Description for the whole quiz"
           variant="outlined"
           value={body ?? ""}
@@ -272,7 +271,6 @@ const BasicInformation = () => {
       <InfoContainer>
         <TextField
           multiline
-          rows={5}
           label="Submit message"
           fullWidth
           variant="outlined"
