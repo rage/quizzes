@@ -81,7 +81,7 @@ export const CorrespondanceModal = ({ course }: CorrespondanceProps) => {
                 variant="outlined"
                 onClick={() => downloadCorrespondaceFile()}
               >
-                Download the correspondance file
+                Download the correspond file
               </SubmitButton>
             </SubmitButtonWrapper>
           </>
