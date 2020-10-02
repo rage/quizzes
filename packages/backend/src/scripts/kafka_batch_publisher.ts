@@ -289,6 +289,7 @@ const publishAnswers = async (course: ICourse, userId?: string) => {
         service_id: process.env.SERVICE_ID,
         required_actions: messages,
         message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
+        attempted: true,
       }
 
       producer.produce(
