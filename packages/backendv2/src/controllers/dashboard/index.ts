@@ -8,6 +8,7 @@ import {
   UserCourseRole,
   PeerReviewQuestion,
   CourseTranslation,
+  Language,
 } from "../../models/"
 import accessControl, { validToken } from "../../middleware/access_control"
 import {
@@ -272,11 +273,13 @@ const dashboard = new Router<CustomState, CustomContext>({
     const result = await QuizAnswer.getStates()
     ctx.body = result
   })
-  .post("/courses/:courseId/edit", async ctx => {
+  .post("/courses/:courseId/edit", accessControl(), async ctx => {
     const courseId = ctx.params.courseId
     const payload = ctx.request.body
     const token = ctx.request.body.token
     const moocfiId = payload.moocfiId
+
+    await checkAccessOrThrow(ctx.state.user, courseId, "edit")
 
     if (!validToken(token)) {
       ctx.body = "invalid token"
@@ -290,6 +293,10 @@ const dashboard = new Router<CustomState, CustomContext>({
         ctx.body = await Course.updateMoocfiId(courseId, moocfiId)
       }
     }
+  })
+  .get("/languages/ids", accessControl(), async ctx => {
+    const result = await Language.getAll()
+    ctx.body = result
   })
 
 export default dashboard
