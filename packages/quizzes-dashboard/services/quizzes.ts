@@ -1,6 +1,6 @@
 import axios from "axios"
 import { checkStore } from "./tmcApi"
-import { Quiz, Course, PeerReviewQuestion } from "../types/Quiz"
+import { Quiz, Course, PeerReviewQuestion, Language } from "../types/Quiz"
 import { NewQuiz } from "../types/NormalizedQuiz"
 import { Answer } from "../types/Answer"
 
@@ -303,4 +303,17 @@ export const getCorrespondenceFile = async (
   } else {
     throw new Error()
   }
+}
+
+export const fetchLanguages = async (): Promise<Language[]> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (await api.get(`/languages/ids`, config)).data
+
+    return response
+  }
+  throw new Error()
 }
