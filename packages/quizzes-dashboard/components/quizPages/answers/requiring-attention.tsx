@@ -67,7 +67,7 @@ export const RequiringAttention = () => {
     {
       label: `${course ? course.title : ""}`,
       as: `/courses/${quiz?.courseId}`,
-      href: "/courses/[courseId]",
+      href: "/courses/[courseId]/[...page]",
     },
     {
       label: `${quiz ? quiz.title : ""}`,

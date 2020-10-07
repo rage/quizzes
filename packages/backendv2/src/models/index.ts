@@ -28,6 +28,8 @@ import UserCourseRole from "./user_course_role"
 import Course from "./course"
 import CourseTranslation from "./course_translation"
 
+import Language from "./language"
+
 export {
   Quiz,
   QuizTranslation,
@@ -47,4 +49,5 @@ export {
   UserCourseRole,
   Course,
   CourseTranslation,
+  Language,
 }

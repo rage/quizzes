@@ -1,3 +1,4 @@
+import { MalformedPayloadError } from "./../util/error"
 import Model from "./base_model"
 import Quiz from "./quiz"
 import CourseTranslation from "./course_translation"
@@ -343,6 +344,12 @@ class Course extends Model {
         .where({ course_id: courseId })
         .andWhereNot("part", 0)
     ).map(q => q.part)
+  }
+
+  static async updateMoocfiId(id: string, newMoocfiId: string) {
+    const course = await this.getById(id)
+
+    return await course.$query().patchAndFetch({ moocfiId: newMoocfiId })
   }
 }
 

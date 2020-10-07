@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import styled from "styled-components"
 import { Button, TextField } from "@material-ui/core"
 import usePromise from "react-use-promise"
-import { fetchCourses, getCorrespondanceFile } from "../../services/quizzes"
+import { fetchCourses, getCorrespondenceFile } from "../../services/quizzes"
 import { Course } from "../../types/Quiz"
 import { Autocomplete } from "@material-ui/lab"
 
@@ -30,17 +30,17 @@ const StyledTextField = styled(TextField)`
   margin-top: 1.5rem !important;
 `
 
-interface CorrespondanceProps {
+interface CorrespondenceProps {
   course: Course
 }
 
-export const CorrespondanceModal = ({ course }: CorrespondanceProps) => {
+export const CorrespondenceModal = ({ course }: CorrespondenceProps) => {
   const [courses, coursesError] = usePromise(() => fetchCourses(), [])
 
   const [courseId, setCourseId] = useState("")
 
   const downloadCorrespondaceFile = () => {
-    getCorrespondanceFile(courseId, course.id)
+    getCorrespondenceFile(courseId, course.id)
     setCourseId("")
   }
   interface CourseProps {
@@ -81,7 +81,7 @@ export const CorrespondanceModal = ({ course }: CorrespondanceProps) => {
                 variant="outlined"
                 onClick={() => downloadCorrespondaceFile()}
               >
-                Download the correspond file
+                Download the correspondence file
               </SubmitButton>
             </SubmitButtonWrapper>
           </>
@@ -91,4 +91,4 @@ export const CorrespondanceModal = ({ course }: CorrespondanceProps) => {
   )
 }
 
-export default CorrespondanceModal
+export default CorrespondenceModal

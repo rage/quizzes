@@ -8,16 +8,13 @@ import {
   faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { getAnswersRequiringAttentionByQuizId } from "../services/quizzes"
+import { getAnswersRequiringAttentionByQuizId } from "../../services/quizzes"
 import usePromise from "react-use-promise"
-import OverView from "./quizPages/overview"
-import EditPage from "./quizPages/edit"
-import AllAnswers from "./quizPages/answers/all"
-import RequiringAttention from "./quizPages/answers/requiring-attention"
-
-interface IQuizTabs {
-  [key: string]: () => JSX.Element
-}
+import OverView from "../quizPages/overview"
+import EditPage from "../quizPages/edit"
+import AllAnswers from "../quizPages/answers/all"
+import RequiringAttention from "../quizPages/answers/requiring-attention"
+import { ITabToComponent } from "../CoursePage/types"
 
 export const TabNavigator = () => {
   const router = useRouter()
@@ -33,7 +30,7 @@ export const TabNavigator = () => {
   const URL_HREF = `/quizzes/[quizId]/[...page]`
   const pathname = `/quizzes/${quizId}`
 
-  const quizTabs: IQuizTabs = {
+  const quizTabs: ITabToComponent = {
     overview: OverView,
     edit: EditPage,
     "all-answers": AllAnswers,

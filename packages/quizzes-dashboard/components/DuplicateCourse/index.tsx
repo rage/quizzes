@@ -5,7 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWindowClose } from "@fortawesome/free-solid-svg-icons"
 import { Course } from "../../types/Quiz"
 import DuplicateModal from "./DuplicateModal"
-import CorrespondanceModal from "./CorrespondanceModal"
+import CorrespondenceModal from "./CorrespondenceModal"
 
 const StyledModal = styled(Modal)`
   display: flex !important;
@@ -53,7 +53,7 @@ interface DuplicateCourseProps {
 
 export const DuplicateCourseButton = ({ course }: DuplicateCourseProps) => {
   const [duplicateModal, showDuplicateModal] = useState(false)
-  const [correspondanceModal, showCorrespondanceModal] = useState(false)
+  const [correspondenceModal, showCorrespondenceModal] = useState(false)
   return (
     <>
       <ButtonContainer>
@@ -72,16 +72,16 @@ export const DuplicateCourseButton = ({ course }: DuplicateCourseProps) => {
         </StyledModal>
 
         <StyledModal
-          open={correspondanceModal}
-          onClose={() => showCorrespondanceModal(false)}
+          open={correspondenceModal}
+          onClose={() => showCorrespondenceModal(false)}
         >
           <AdvancedBox>
             <ButtonWrapper>
-              <CloseButton onClick={() => showCorrespondanceModal(false)}>
+              <CloseButton onClick={() => showCorrespondenceModal(false)}>
                 <FontAwesomeIcon icon={faWindowClose} />
               </CloseButton>
             </ButtonWrapper>
-            <CorrespondanceModal course={course} />
+            <CorrespondenceModal course={course} />
           </AdvancedBox>
         </StyledModal>
 
@@ -93,9 +93,9 @@ export const DuplicateCourseButton = ({ course }: DuplicateCourseProps) => {
         </StyledButton>
         <StyledButton
           variant="outlined"
-          onClick={() => showCorrespondanceModal(true)}
+          onClick={() => showCorrespondenceModal(true)}
         >
-          Download the correspondance file
+          Download the correspondence file
         </StyledButton>
       </ButtonContainer>
     </>

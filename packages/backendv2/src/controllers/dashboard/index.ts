@@ -1,6 +1,15 @@
 import Router from "koa-router"
 import { CustomContext, CustomState } from "../../types"
-import { Course, Quiz, QuizAnswer, UserCourseRole } from "../../models/"
+import {
+  Course,
+  Quiz,
+  QuizAnswer,
+  User,
+  UserCourseRole,
+  PeerReviewQuestion,
+  CourseTranslation,
+  Language,
+} from "../../models/"
 import accessControl, { validToken } from "../../middleware/access_control"
 import {
   abilitiesByRole,
@@ -10,6 +19,7 @@ import {
   getAccessableCourses,
 } from "./util"
 import * as Kafka from "../../services/kafka"
+import _ from "lodash"
 
 const dashboard = new Router<CustomState, CustomContext>({
   prefix: "/dashboard",
@@ -261,6 +271,31 @@ const dashboard = new Router<CustomState, CustomContext>({
 
   .get("/quizzes/answers/get-answer-states", accessControl(), async ctx => {
     const result = await QuizAnswer.getStates()
+    ctx.body = result
+  })
+  .post("/courses/:courseId/edit", accessControl(), async ctx => {
+    const courseId = ctx.params.courseId
+    const payload = ctx.request.body
+    const token = ctx.request.body.token
+    const moocfiId = payload.moocfiId
+
+    await checkAccessOrThrow(ctx.state.user, courseId, "edit")
+
+    if (!validToken(token)) {
+      ctx.body = "invalid token"
+    } else {
+      const payloadWithoutMoocfiId = _.omit(payload, ["moocfiId"])
+      ctx.body = await CourseTranslation.updateCourseProperties(
+        courseId,
+        payloadWithoutMoocfiId,
+      )
+      if (moocfiId) {
+        ctx.body = await Course.updateMoocfiId(courseId, moocfiId)
+      }
+    }
+  })
+  .get("/languages/ids", accessControl(), async ctx => {
+    const result = await Language.getAll()
     ctx.body = result
   })
 
