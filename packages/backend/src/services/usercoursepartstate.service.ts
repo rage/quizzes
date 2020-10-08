@@ -102,7 +102,7 @@ export default class UserCoursePartStateService {
         parts.user_id as user_id,
         parts.course_id as course_id,
         parts.part as course_part,
-        coalesce(points.points / max.max_points, 0) as progress,
+        coalesce(points.points / (case when max.max_points = 0 then 1 else max.max_points end), 0),
         coalesce(points.points, 0) as score
       from (
         select
