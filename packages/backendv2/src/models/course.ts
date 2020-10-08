@@ -310,7 +310,7 @@ class Course extends Model {
     return { success: true, newCourseId: newCourseId }
   }
 
-  static async getCorrespondanceFile(oldCourseId: string, newCourseId: string) {
+  static async getCorrespondenceFile(oldCourseId: string, newCourseId: string) {
     const stringifier = stringify({
       delimiter: " ",
     })
