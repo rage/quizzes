@@ -14,6 +14,7 @@ import QuizItemAnswer from "./quiz_item_answer"
 import QuizOptionAnswer from "./quiz_option_answer"
 
 import PeerReview from "./peer_review"
+import PeerReviewQuestionAnswer from "./peer_review_question_answer"
 import PeerReviewCollection from "./peer_review_collection"
 import PeerReviewCollectionTranslation from "./peer_review_collection_translation"
 
@@ -45,6 +46,7 @@ export {
   PeerReviewCollectionTranslation,
   PeerReviewQuestion,
   PeerReviewQuestionTranslation,
+  PeerReviewQuestionAnswer,
   PeerReview,
   User,
   UserQuizState,
