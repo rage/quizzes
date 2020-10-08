@@ -1,14 +1,15 @@
 import Router from "koa-router"
-import { CustomContext, CustomState } from "../../types"
+import { CustomContext, CustomState, IPeerReview } from "../../types"
 import {
   Course,
   Quiz,
   QuizAnswer,
   User,
   UserCourseRole,
-  PeerReviewQuestion,
   CourseTranslation,
   Language,
+  PeerReviewQuestionAnswer,
+  PeerReview,
 } from "../../models/"
 import accessControl, { validToken } from "../../middleware/access_control"
 import {
@@ -297,6 +298,25 @@ const dashboard = new Router<CustomState, CustomContext>({
   .get("/languages/ids", accessControl(), async ctx => {
     const result = await Language.getAll()
     ctx.body = result
+  })
+  .get("/answers/:answerId/peer-reviews", accessControl(), async ctx => {
+    const answerId = ctx.params.answerId
+    const courseId = await getCourseIdByAnswerId(answerId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
+
+    const peerReviews = await PeerReview.getWithAnswersByAnswerId(answerId)
+
+    const receivedPeerReviews = peerReviews.map((pr: any) => ({
+      id: pr.id,
+      peerReviewCollectionId: pr.peerReviewCollectionId,
+      createdAt: pr.createdAt,
+      answers: pr.answers.map((prAnswer: any) => {
+        const { createdAt, updatedAt, ...rest } = prAnswer
+        return rest
+      }),
+    }))
+
+    ctx.body = receivedPeerReviews
   })
 
 export default dashboard
