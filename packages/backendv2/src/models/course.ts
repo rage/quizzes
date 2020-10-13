@@ -15,6 +15,9 @@ class Course extends Model {
   title!: string
   body!: string
   abbreviation!: string
+  maxSpamFlags!: number
+  maxReviewSpamFlags!: number
+  minReviewAverage!: number
 
   static get tableName() {
     return "course"

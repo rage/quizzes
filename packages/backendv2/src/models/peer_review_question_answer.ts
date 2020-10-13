@@ -4,9 +4,14 @@ import PeerReviewQuestion from "./peer_review_question"
 
 class PeerReviewQuestionAnswer extends Model {
   question!: PeerReviewQuestion
+  value!: number
+  text!: string
 
   static get tableName() {
     return "peer_review_question_answer"
+  }
+  static get idColumn() {
+    return ["peer_review_id", "peer_review_question_id"]
   }
 
   static relationMappings = {
