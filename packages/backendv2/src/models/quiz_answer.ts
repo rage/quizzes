@@ -9,6 +9,8 @@ import knex from "../../database/knex"
 import Quiz from "./quiz"
 import UserCoursePartState from "./user_course_part_state"
 import * as Kafka from "../services/kafka"
+import { Transaction } from "objection"
+import Course from "./course"
 
 interface CountObject {
   quizId: number
@@ -273,10 +275,166 @@ class QuizAnswer extends Model {
     return states.map(state => state.status)
   }
 
+  public static async validatePeerReviewedAnswer(
+    quiz: Quiz,
+    quizAnswer: QuizAnswer,
+    userQuizState: UserQuizState,
+    trx: Transaction,
+    peerReviews: PeerReview[] = [],
+  ): Promise<QuizAnswer> {
+    const oldStatus = quizAnswer.status
+    const newStatus = await this.assessAnswerStatus(
+      quiz,
+      quizAnswer,
+      userQuizState,
+      peerReviews,
+    )
+
+    if (
+      (newStatus === "spam" || newStatus === "rejected") &&
+      !(quiz.triesLimited && userQuizState.tries >= quiz.tries)
+    ) {
+      userQuizState.spamFlags = 0
+      userQuizState.peerReviewsReceived = 0
+      userQuizState.pointsAwarded = 0
+      userQuizState.status = "open"
+    }
+
+    if (newStatus === "confirmed") {
+      // TODO: Different multiplier for quizzes that have varying quiz item types
+      userQuizState.pointsAwarded = 1 * quiz.points
+    }
+
+    quizAnswer.status = newStatus
+
+    await this.query(trx)
+      .update({ status: quizAnswer.status })
+      .where({ id: quizAnswer.id })
+
+    await UserQuizState.query(trx)
+      .update({
+        spamFlags: userQuizState.spamFlags,
+        peerReviewsReceived: userQuizState.peerReviewsReceived,
+        pointsAwarded: userQuizState.pointsAwarded,
+        status: userQuizState.status,
+      })
+      .where({ user_id: userQuizState.userId, quiz_id: userQuizState.quizId })
+
+    if (newStatus !== oldStatus) {
+      Kafka.broadcastQuizAnswerUpdated(quizAnswer, userQuizState, quiz, trx)
+    }
+
+    return await this.query().findById(quizAnswer.id)
+  }
+
   private static moveQuestionTextsToparent = (question: PeerReviewQuestion) => {
     question.title = question.texts[0].title
     question.body = question.texts[0].body
     return question
+  }
+
+  private static async assessAnswerStatus(
+    quiz: Quiz,
+    quizAnswer: QuizAnswer,
+    userQuizState: UserQuizState,
+    peerReviews: PeerReview[],
+  ): Promise<string> {
+    const course = await Course.getById(quiz.courseId)
+
+    const autoConfirm = quiz.autoConfirm
+    const autoReject = quiz.autoReject
+
+    const maxSpamFlags = course.maxSpamFlags
+    const maxReviewSpamFlags = course.maxReviewSpamFlags
+
+    const spamFlagsReceived = userQuizState.spamFlags
+
+    const givenEnough =
+      userQuizState.peerReviewsGiven >= course.minPeerReviewsGiven
+
+    const givenExtra =
+      userQuizState.peerReviewsGiven > course.minPeerReviewsGiven
+
+    const receivedEnough =
+      userQuizState.peerReviewsReceived >= course.minPeerReviewsReceived
+
+    const flaggedButKeepInPeerReviewPool =
+      spamFlagsReceived >= maxSpamFlags &&
+      spamFlagsReceived < maxReviewSpamFlags
+
+    const flaggedAndRemoveFromPeerReviewPool =
+      spamFlagsReceived >= maxReviewSpamFlags
+
+    if (autoReject && flaggedAndRemoveFromPeerReviewPool) {
+      return "spam"
+    }
+
+    if (!autoReject) {
+      if (flaggedAndRemoveFromPeerReviewPool) {
+        if (givenEnough) {
+          return "manual-review"
+        } else {
+          return "manual-review-once-given-enough"
+        }
+      }
+      if (flaggedButKeepInPeerReviewPool) {
+        if (givenEnough) {
+          if (receivedEnough) {
+            return "manual-review"
+          } else if (givenExtra) {
+            return "manual-review-once-received-enough-given-more-than-enough"
+          } else {
+            return "manual-review-once-received-enough"
+          }
+        } else if (receivedEnough) {
+          return "manual-review-once-given-enough"
+        } else {
+          return "manual-review-once-given-and-received-enough"
+        }
+      }
+    }
+
+    if (!givenEnough && !receivedEnough) {
+      return quizAnswer.status
+    }
+
+    if (!givenEnough && receivedEnough) {
+      return "enough-received-but-not-given"
+    }
+
+    if (givenEnough && !receivedEnough) {
+      if (givenExtra) {
+        return "given-more-than-enough"
+      } else {
+        return "given-enough"
+      }
+    }
+
+    if (autoConfirm) {
+      const answers = peerReviews
+        .map(pr => pr.answers.map(a => a.value))
+        .flat()
+        .filter(o => o !== undefined && o !== null)
+
+      const sum: number = answers.reduce((prev, curr) => prev + curr, 0)
+
+      if (answers.length === 0) {
+        console.warn("Assessing an essay with 0 numeric peer review answers")
+        return quizAnswer.status
+      }
+
+      if (sum / answers.length >= course.minReviewAverage) {
+        return "confirmed"
+      } else if (autoReject) {
+        return "rejected"
+      } else {
+        return "manual-review"
+      }
+    }
+
+    // TODO: if not auto confirm move to manual review once widget smart enough
+
+    return quizAnswer.status
   }
 }
 

@@ -3,6 +3,7 @@ import knex from "../../../database/knex"
 import { CustomContext, CustomState } from "../../types"
 import { Quiz, QuizAnswer, User } from "../../models/"
 import accessControl from "../../middleware/access_control"
+import SpamFlag from "../../models/spam_flag"
 
 const widget = new Router<CustomState, CustomContext>({
   prefix: "/widget",
@@ -39,6 +40,12 @@ const widget = new Router<CustomState, CustomContext>({
       error.status = 500
       throw error
     }
+  })
+
+  .post("/answers/:answerId/report-spam", accessControl(), async ctx => {
+    const quizAnswerId = ctx.params.answerId
+    const userId = ctx.request.body.userId
+    ctx.body = await SpamFlag.reportSpam(quizAnswerId, userId)
   })
 
 const validateQuizAnswer = async (quizAnswer: QuizAnswer) => {
