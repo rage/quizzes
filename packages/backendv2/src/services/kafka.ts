@@ -28,7 +28,7 @@ const connect = () => {
 
 const produce = async (
   topic:
-    | "user-course-progress"
+    | "user-course-progress-realtime"
     | "user-points-2"
     | "exercise"
     | "user-points-realtime",
@@ -71,7 +71,7 @@ export const broadcastUserProgressUpdated = async (
   }
 
   if (course.moocfiId) {
-    await produce("user-course-progress", message)
+    await produce("user-course-progress-realtime", message)
   }
 }
 
