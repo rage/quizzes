@@ -105,7 +105,7 @@ export interface IPeerReview {
   rejectedQuizAnswerIds: string[]
   createdAt: Date
   updatedAt: Date
-  answers: IPeerReviewAnswer[]
+  answers: IPeerReviewAnswer[] | TReturnedPeerReviewAnswer[]
 }
 export interface IPeerReviewAnswer {
   peerReviewId: string
@@ -115,3 +115,8 @@ export interface IPeerReviewAnswer {
   createdAt: Date
   updatedAt: Date
 }
+
+export type TReturnedPeerReviewAnswer = Omit<
+  IPeerReviewAnswer,
+  "createdAt" | "updatedAt"
+>
