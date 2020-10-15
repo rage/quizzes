@@ -96,3 +96,27 @@ export interface EditCoursePayloadFields {
   abbreviation?: string
   languageId?: string
 }
+
+export interface IPeerReview {
+  id: string
+  quizAnswerId: string
+  userId: number
+  peerReviewCollectionId: string
+  rejectedQuizAnswerIds: string[]
+  createdAt: Date
+  updatedAt: Date
+  answers: IPeerReviewAnswer[] | TReturnedPeerReviewAnswer[]
+}
+export interface IPeerReviewAnswer {
+  peerReviewId: string
+  peerReviewQuestionId: string
+  value: number
+  text: null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type TReturnedPeerReviewAnswer = Omit<
+  IPeerReviewAnswer,
+  "createdAt" | "updatedAt"
+>

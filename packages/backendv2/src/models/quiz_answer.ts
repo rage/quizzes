@@ -1,3 +1,4 @@
+import { NotFoundError } from "./../util/error"
 import Model from "./base_model"
 import QuizItemAnswer from "./quiz_item_answer"
 import User from "./user"
@@ -80,6 +81,10 @@ class QuizAnswer extends Model {
       .withGraphFetched("userQuizState")
       .withGraphFetched("itemAnswers.[optionAnswers]")
       .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+
+    if (!quizAnswer) {
+      throw new NotFoundError(`quiz answer not found: ${quizAnswerId}`)
+    }
 
     quizAnswer.peerReviews.map(peerReview => {
       if (peerReview.answers.length > 0) {

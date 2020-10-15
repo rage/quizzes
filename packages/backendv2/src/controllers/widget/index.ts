@@ -1,7 +1,7 @@
 import Router from "koa-router"
 import knex from "../../../database/knex"
 import { CustomContext, CustomState } from "../../types"
-import { Quiz, QuizAnswer, User } from "../../models/"
+import { Quiz, QuizAnswer, User, PeerReview } from "../../models/"
 import accessControl from "../../middleware/access_control"
 import SpamFlag from "../../models/spam_flag"
 
@@ -22,6 +22,31 @@ const widget = new Router<CustomState, CustomContext>({
       ctx.body = await Quiz.getPreviewById(quizId)
     },
   )
+
+  .get("/answers/:answerId/peer-reviews", accessControl(), async ctx => {
+    const answerId = ctx.params.answerId
+
+    // check that answerId exists
+    try {
+      await QuizAnswer.getById(answerId)
+    } catch (error) {
+      throw error
+    }
+
+    const peerReviews = await PeerReview.getWithAnswersByAnswerId(answerId)
+
+    const receivedPeerReviews = peerReviews.map((pr: any) => ({
+      id: pr.id,
+      peerReviewCollectionId: pr.peerReviewCollectionId,
+      createdAt: pr.createdAt,
+      answers: pr.answers.map((prAnswer: any) => {
+        const { createdAt, updatedAt, ...rest } = prAnswer
+        return rest
+      }),
+    }))
+
+    ctx.body = receivedPeerReviews
+  })
 
   .post("/answer", accessControl(), async ctx => {
     const user = ctx.state.user
