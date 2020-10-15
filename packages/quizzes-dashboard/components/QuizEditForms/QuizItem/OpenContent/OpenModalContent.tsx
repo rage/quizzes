@@ -8,6 +8,8 @@ import {
   editedQuizItemBody,
   toggledMultiOptions,
   editedValidityRegex,
+  editedItemSuccessMessage,
+  editedItemFailureMessage,
 } from "../../../../store/editor/items/itemAction"
 import {
   setRegex,
@@ -129,6 +131,30 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
             }
           />
         </FormControl>
+      </ModalContent>
+      <ModalContent>
+        <TextField
+          fullWidth
+          multiline
+          variant="outlined"
+          label="Success message"
+          value={storeItem.successMessage ?? ""}
+          onChange={event =>
+            dispatch(editedItemSuccessMessage(storeItem.id, event.target.value))
+          }
+        />
+      </ModalContent>
+      <ModalContent>
+        <TextField
+          fullWidth
+          multiline
+          variant="outlined"
+          label="Failure message"
+          value={storeItem.failureMessage ?? ""}
+          onChange={event =>
+            dispatch(editedItemFailureMessage(storeItem.id, event.target.value))
+          }
+        />
       </ModalContent>
     </>
   )
