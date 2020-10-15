@@ -12,16 +12,21 @@ import { BadRequestError } from "../util/error"
 import Knex from "knex"
 import UserQuizState from "./user_quiz_state"
 import * as Kafka from "../services/kafka"
+import PeerReviewQuestion from "./peer_review_question"
 
 export class Quiz extends Model {
   id!: string
   courseId!: string
   part!: number
+  section!: number
   points!: number
   deadline!: Date
   triesLimited!: boolean
   tries!: number
   excludedFromScore!: boolean
+  awardPointsEvenIfWrong!: boolean
+  autoConfirm!: boolean
+  autoReject!: boolean
   course!: Course
   texts!: QuizTranslation[]
   items!: QuizItem[]
@@ -81,6 +86,14 @@ export class Quiz extends Model {
       join: {
         from: "quiz.id",
         to: "user_quiz_state.quiz_id",
+      },
+    },
+    peerReviewQuestions: {
+      relation: Model.HasManyRelation,
+      modelClass: PeerReviewQuestion,
+      join: {
+        from: "quiz.id",
+        to: "peer_review_question.quiz_id",
       },
     },
   }
@@ -186,6 +199,7 @@ export class Quiz extends Model {
         savedQuiz = await this.query(trx).insertGraphAndFetch(quiz)
       }
       await this.updateCourseProgressesIfNecessary(oldQuiz, savedQuiz, trx)
+      await Kafka.broadcastCourseQuizzesUpdated(course.id, trx)
       await trx.commit()
     } catch (error) {
       await trx.rollback()
@@ -210,9 +224,9 @@ export class Quiz extends Model {
     }
   }
 
-  static async getById(quizId: string) {
+  static async getById(quizId: string, trx?: Knex.Transaction) {
     const quiz = (
-      await this.query()
+      await this.query(trx)
         .withGraphJoined("texts")
         .withGraphJoined("items.[texts, options.[texts]]")
         .withGraphJoined("peerReviews.[texts, questions.[texts]]")

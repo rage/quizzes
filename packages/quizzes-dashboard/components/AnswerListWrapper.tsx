@@ -19,12 +19,6 @@ export const Paginator = styled(Pagination)`
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
 `
-const SkeletonContainer = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  margin-bottom: 1rem;
-`
 
 interface WrapperProps {
   quizId: string
@@ -32,6 +26,8 @@ interface WrapperProps {
   order: string
   filterparameters: string[]
   expandAll: boolean
+  page: number
+  handlePageChange: (nextPage: number) => void
 }
 
 export const AnswerListWrapper = ({
@@ -40,15 +36,13 @@ export const AnswerListWrapper = ({
   order,
   filterparameters,
   expandAll,
+  page,
+  handlePageChange,
 }: WrapperProps) => {
-  const [page, setPage] = useState(1)
-
   const [answers, answersError] = usePromise(
     () => getAllAnswers(quizId, page, size, order, filterparameters),
     [quizId, page, size, order, filterparameters],
   )
-
-  useEffect(() => setPage(1), [size])
 
   if (!answers) {
     return (
@@ -83,7 +77,7 @@ export const AnswerListWrapper = ({
           showFirstButton
           showLastButton
           page={page}
-          onChange={(event, nextPage) => setPage(nextPage)}
+          onChange={(event, nextPage) => handlePageChange(nextPage)}
         />
       </PaginationField>
       <AnswerList
@@ -101,7 +95,7 @@ export const AnswerListWrapper = ({
           showFirstButton
           showLastButton
           page={page}
-          onChange={(event, nextPage) => setPage(nextPage)}
+          onChange={(event, nextPage) => handlePageChange(nextPage)}
         />
       </PaginationField>
     </>

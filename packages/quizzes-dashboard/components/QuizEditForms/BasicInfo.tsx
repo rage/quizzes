@@ -5,7 +5,14 @@ import {
   MuiPickersUtilsProvider,
   KeyboardDateTimePicker,
 } from "@material-ui/pickers"
-import { Typography, TextField, MenuItem, Fade } from "@material-ui/core"
+import {
+  Typography,
+  TextField,
+  MenuItem,
+  Fade,
+  Switch,
+  FormControlLabel,
+} from "@material-ui/core"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
@@ -20,6 +27,7 @@ import {
   editedQuizzesSubmitmessage,
   editedQuizzesPart,
   editedQuizzesSection,
+  editedQuizzesAutoconfirm,
 } from "../../store/editor/quiz/quizActions"
 import { useTypedSelector } from "../../store/store"
 import { checkForChanges } from "../../store/editor/editorActions"
@@ -76,6 +84,19 @@ const StyledWarningText = styled(Typography)`
   color: #ff5252 !important;
 `
 
+const HelperText = styled(Typography)`
+  display: flex !important;
+  margin-top: 1rem !important;
+  margin-bottom: 1rem !important;
+  color: #9e9e9e !important;
+`
+
+const AutoConfirmSwitch = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  width: 50%;
+`
+
 const BasicInformation = () => {
   const dispatch = useDispatch()
 
@@ -110,6 +131,10 @@ const BasicInformation = () => {
   const store = useTypedSelector(state => state)
 
   const changes = useTypedSelector(state => state.editor.editorChanges.changes)
+
+  const autoConfirm = useTypedSelector(
+    state => state.editor.quizzes[quizId].autoConfirm,
+  )
 
   useEffect(() => {
     dispatch(checkForChanges(store))
@@ -148,8 +173,7 @@ const BasicInformation = () => {
           fullWidth
           label="Part"
           variant="outlined"
-          value={part}
-          type="number"
+          value={part ?? ""}
           onChange={event =>
             dispatch(editedQuizzesPart(quizId, Number(event.target.value)))
           }
@@ -158,8 +182,7 @@ const BasicInformation = () => {
           fullWidth
           label="Section"
           variant="outlined"
-          value={section}
-          type="number"
+          value={section ?? ""}
           onChange={event =>
             dispatch(editedQuizzesSection(quizId, Number(event.target.value)))
           }
@@ -170,8 +193,7 @@ const BasicInformation = () => {
           label="Number of tries allowed"
           fullWidth
           variant="outlined"
-          type="number"
-          defaultValue={numberOfTries}
+          defaultValue={numberOfTries ?? ""}
           onChange={event =>
             dispatch(
               editedQuizzesNumberOfTries(Number(event.target.value), quizId),
@@ -184,8 +206,7 @@ const BasicInformation = () => {
           label="Points to gain"
           fullWidth
           variant="outlined"
-          type="number"
-          defaultValue={pointsToGain}
+          defaultValue={pointsToGain ?? ""}
           onChange={event =>
             dispatch(
               editedQuizzesPointsToGain(Number(event.target.value), quizId),
@@ -218,11 +239,13 @@ const BasicInformation = () => {
         <MuiPickersUtilsProvider utils={DateFnsUtils}>
           <KeyboardDateTimePicker
             fullWidth
-            value={variables.deadline}
+            InputLabelProps={{ shrink: !!variables.deadline }}
+            value={variables.deadline || ""}
             error={!variables.validDeadline}
             variant="dialog"
             inputVariant="outlined"
             label="Deadline"
+            format="dd-MM-yyyy hh:mm"
             KeyboardButtonProps={{
               "aria-label": "change time",
             }}
@@ -237,7 +260,6 @@ const BasicInformation = () => {
         <TextField
           multiline
           fullWidth
-          rows={5}
           label="Description for the whole quiz"
           variant="outlined"
           value={body ?? ""}
@@ -249,7 +271,6 @@ const BasicInformation = () => {
       <InfoContainer>
         <TextField
           multiline
-          rows={5}
           label="Submit message"
           fullWidth
           variant="outlined"
@@ -258,6 +279,28 @@ const BasicInformation = () => {
             dispatch(editedQuizzesSubmitmessage(quizId, event.target.value))
           }
         />
+      </InfoContainer>
+      <InfoContainer>
+        <AutoConfirmSwitch>
+          <FormControlLabel
+            label="Autoconfirm"
+            labelPlacement="end"
+            control={
+              <Switch
+                checked={autoConfirm}
+                onChange={event =>
+                  dispatch(
+                    editedQuizzesAutoconfirm(quizId, event.target.checked),
+                  )
+                }
+              />
+            }
+          />
+          <HelperText>
+            Check this to confirm submitted answers automatically, uncheck this
+            to confirm them manually
+          </HelperText>
+        </AutoConfirmSwitch>
       </InfoContainer>
     </>
   )

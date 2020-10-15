@@ -74,8 +74,25 @@ export interface ExerciseData {
   deleted: boolean
 }
 
+export interface ExerciseData {
+  name: string
+  id: string
+  part: number
+  section: number
+  max_points: number
+  deleted: boolean
+}
+
 export enum RequiredAction {
   REJECTED = "REJECTED",
   GIVE_PEER_REVIEW = "GIVE_PEER_REVIEW",
   PENDING_PEER_REVIEW = "PENDING_PEER_REVIEW",
+}
+
+export interface EditCoursePayloadFields {
+  courseId?: string
+  moocfiId?: string
+  title?: string
+  abbreviation?: string
+  languageId?: string
 }

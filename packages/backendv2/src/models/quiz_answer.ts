@@ -30,10 +30,6 @@ type QuizAnswerStatus =
   | "rejected"
   | "deprecated"
 
-interface CountObject {
-  quizId: number
-}
-
 class QuizAnswer extends Model {
   id!: string
   userId!: number
@@ -262,6 +258,10 @@ class QuizAnswer extends Model {
       .count()
       .groupBy("quiz_id")
 
+    if (count.length === 0) {
+      return 0
+    }
+
     return count[0].count
   }
 
@@ -299,37 +299,43 @@ class QuizAnswer extends Model {
     return question
   }
 
-  public static async save(user: UserInfo, quizAnswer: QuizAnswer) {
+  public static async save(
+    user: UserInfo,
+    quizAnswer: QuizAnswer,
+    updateTransaction?: Knex.Transaction,
+  ) {
+    const trx = updateTransaction || (await knex.transaction())
     const userId = user.id
     const quizId = quizAnswer.quizId
-    const isUserInDb = await User.getById(userId)
+    const isUserInDb = await User.getById(userId, trx)
     if (!isUserInDb) {
       quizAnswer.user = User.fromJson({ id: userId })
     }
     quizAnswer.userId = user.id
-    const quiz = await Quiz.getById(quizId)
-    const course = await Course.getById(quiz.courseId)
+    const quiz = await Quiz.getById(quizId, trx)
+    const course = await Course.getById(quiz.courseId, trx)
     quizAnswer.languageId = course.languageId
     const userQuizState =
-      (await UserQuizState.getByUserAndQuiz(userId, quizId)) ??
+      (await UserQuizState.getByUserAndQuiz(userId, quizId, trx)) ??
       UserQuizState.fromJson({ userId, quizId })
-    this.checkIfSubmittable(quiz, userQuizState)
+    if (!updateTransaction) {
+      this.checkIfSubmittable(quiz, userQuizState)
+    }
+    await this.assessAnswerStatus(quizAnswer, userQuizState, quiz, course, trx)
     this.assessAnswer(quizAnswer, quiz)
-    this.assessAnswerStatus(quizAnswer, quiz)
     this.gradeAnswer(quizAnswer, userQuizState, quiz)
-    this.assessUserQuizStatus(userQuizState, quiz)
-    const trx = await knex.transaction()
+    this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
     let savedQuizAnswer
     let savedUserQuizState
+    await this.markPreviousAsDeprecated(userId, quizId, trx)
+    savedQuizAnswer = await this.query(trx).upsertGraphAndFetch(quizAnswer)
+    savedUserQuizState = await UserQuizState.query(trx).upsertGraphAndFetch(
+      userQuizState,
+      {
+        insertMissing: true,
+      },
+    )
     try {
-      await this.markPreviousAsDeprecated(userId, quizId, trx)
-      savedQuizAnswer = await this.query(trx).insertGraphAndFetch(quizAnswer)
-      savedUserQuizState = await UserQuizState.query(trx).upsertGraphAndFetch(
-        userQuizState,
-        {
-          insertMissing: true,
-        },
-      )
       await trx.commit()
     } catch (error) {
       await trx.rollback()
@@ -377,9 +383,10 @@ class QuizAnswer extends Model {
           const validator = new RegExp(validityRegex, "i")
           quizItemAnswer.correct = validator.test(textData) ? true : false
           break
-        case "scale":
-          break
         case "essay":
+          if (quizAnswer.status === "confirmed") {
+            quizItemAnswer.correct = true
+          }
           break
         case "multiple-choice":
           const quizOptionAnswers = quizItemAnswer.optionAnswers
@@ -401,21 +408,40 @@ class QuizAnswer extends Model {
             ? correctOptionIds.length === selectedCorrectOptions.length
             : selectedCorrectOptions.length > 0
           break
-        case "checkbox":
-          break
-        case "research-agreement":
-          break
-        case "feedback":
-          break
         case "custom-frontend-accept-data":
+          break
+        case "checkbox":
+          quizItemAnswer.correct = true
+          break
+        case "scale":
+        case "research-agreement":
+        case "feedback":
+          quizItemAnswer.correct = true
           break
       }
     }
   }
 
-  private static assessAnswerStatus(quizAnswer: QuizAnswer, quiz: Quiz) {
+  private static async assessAnswerStatus(
+    quizAnswer: QuizAnswer,
+    userQuizState: UserQuizState,
+    quiz: Quiz,
+    course: Course,
+    trx: Knex.Transaction,
+  ) {
     const hasPeerReviews = quiz.peerReviews.length > 0
-    quizAnswer.status = hasPeerReviews ? "submitted" : "confirmed"
+    if (hasPeerReviews) {
+      const peerReviews = await quizAnswer.$relatedQuery("peerReviews", trx)
+      quizAnswer.status = this.assessAnswerWithPeerReviewsStatus(
+        quiz,
+        quizAnswer,
+        userQuizState,
+        peerReviews,
+        course,
+      )
+    } else {
+      quizAnswer.status = "confirmed"
+    }
   }
 
   private static gradeAnswer(
@@ -423,24 +449,151 @@ class QuizAnswer extends Model {
     userQuizState: UserQuizState,
     quiz: Quiz,
   ) {
-    const quizItemAnswers = quizAnswer.itemAnswers
-    const nCorrect = quizItemAnswers.filter(
-      itemAnswer => itemAnswer.correct === true,
-    ).length
-    const total = quizItemAnswers.length
-    const points = (nCorrect / total) * quiz.points
-    const pointsAwarded = userQuizState.pointsAwarded ?? 0
-    userQuizState.pointsAwarded =
-      points > pointsAwarded ? points : pointsAwarded
+    if (quizAnswer.status === "confirmed") {
+      if (quiz.awardPointsEvenIfWrong) {
+        userQuizState.pointsAwarded = quiz.points
+        return
+      }
+      const quizItemAnswers = quizAnswer.itemAnswers
+      const nCorrect = quizItemAnswers.filter(
+        itemAnswer => itemAnswer.correct === true,
+      ).length
+      const total = quizItemAnswers.length
+      const points = (nCorrect / total) * quiz.points
+      const pointsAwarded = userQuizState.pointsAwarded ?? 0
+      userQuizState.pointsAwarded =
+        points > pointsAwarded ? points : pointsAwarded
+    }
   }
 
   private static assessUserQuizStatus(
+    quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
     quiz: Quiz,
   ) {
     userQuizState.tries = (userQuizState.tries ?? 0) + 1
     const hasTriesLeft = !quiz.triesLimited || userQuizState.tries < quiz.tries
-    userQuizState.status = hasTriesLeft ? "open" : "locked"
+    const hasPeerReviews = quiz.peerReviews.length > 0
+    if (hasTriesLeft) {
+      if (hasPeerReviews) {
+        if (["rejected", "spam"].includes(quizAnswer.status)) {
+          userQuizState.peerReviewsReceived = null
+          userQuizState.spamFlags = null
+          userQuizState.status = "open"
+        } else {
+          userQuizState.status = "locked"
+        }
+        return
+      }
+      userQuizState.status = "open"
+    } else {
+      userQuizState.status = "locked"
+    }
+  }
+
+  public static assessAnswerWithPeerReviewsStatus(
+    quiz: Quiz,
+    quizAnswer: QuizAnswer,
+    userQuizState: UserQuizState,
+    peerReviews: PeerReview[],
+    course: Course,
+  ): QuizAnswerStatus {
+    const status = quizAnswer.status || "submitted"
+
+    if (["confirmed", "rejected", "spam"].includes(status)) {
+      return status
+    }
+
+    const autoConfirm = quiz.autoConfirm
+    const autoReject = quiz.autoReject
+
+    const maxSpamFlags = course.maxSpamFlags
+    const maxReviewSpamFlags = course.maxReviewSpamFlags
+
+    const spamFlagsReceived = userQuizState.spamFlags ?? 0
+
+    const givenEnough =
+      userQuizState.peerReviewsGiven >= course.minPeerReviewsGiven
+    const givenExtra =
+      userQuizState.peerReviewsGiven > course.minPeerReviewsGiven
+    const receivedEnough =
+      userQuizState.peerReviewsReceived ?? 0 >= course.minPeerReviewsReceived
+
+    const flaggedButKeepInPeerReviewPool =
+      spamFlagsReceived >= maxSpamFlags &&
+      spamFlagsReceived < maxReviewSpamFlags
+    const flaggedAndRemoveFromPeerReviewPool =
+      spamFlagsReceived >= maxReviewSpamFlags
+
+    if (autoReject && flaggedAndRemoveFromPeerReviewPool) {
+      return "spam"
+    }
+
+    if (!autoReject) {
+      if (flaggedAndRemoveFromPeerReviewPool) {
+        if (givenEnough) {
+          return "manual-review"
+        } else {
+          return "manual-review-once-given-enough"
+        }
+      }
+      if (flaggedButKeepInPeerReviewPool) {
+        if (givenEnough) {
+          if (receivedEnough) {
+            return "manual-review"
+          } else if (givenExtra) {
+            return "manual-review-once-received-enough-given-more-than-enough"
+          } else {
+            return "manual-review-once-received-enough"
+          }
+        } else if (receivedEnough) {
+          return "manual-review-once-given-enough"
+        } else {
+          return "manual-review-once-given-and-received-enough"
+        }
+      }
+    }
+
+    if (!givenEnough && !receivedEnough) {
+      return status
+    }
+
+    if (!givenEnough && receivedEnough) {
+      return "enough-received-but-not-given"
+    }
+
+    if (givenEnough && !receivedEnough) {
+      if (givenExtra) {
+        return "given-more-than-enough"
+      } else {
+        return "given-enough"
+      }
+    }
+
+    if (autoConfirm) {
+      const answers = peerReviews
+        .map(pr => pr.answers.map(a => a.value))
+        .flat()
+        .filter(o => o !== undefined && o !== null)
+
+      const sum: number = answers.reduce((prev, curr) => prev + curr, 0)
+
+      if (answers.length === 0) {
+        console.warn("Assessing an essay with 0 numeric peer review answers")
+        return status
+      }
+
+      if (sum / answers.length >= quiz.course.minReviewAverage) {
+        return "confirmed"
+      } else if (autoReject) {
+        return "rejected"
+      } else {
+        return "manual-review"
+      }
+    }
+
+    // TODO: if not auto confirm move to manual review once widget smart enough
+    return status
   }
 
   private static async markPreviousAsDeprecated(

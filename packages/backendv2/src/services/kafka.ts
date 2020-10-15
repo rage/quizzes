@@ -2,6 +2,7 @@ import Knex from "knex"
 import * as Kafka from "node-rdkafka"
 import { promisify } from "util"
 import {
+  ExerciseData,
   ProgressMessage,
   QuizAnswerMessage,
   QuizMessage,
@@ -26,7 +27,11 @@ const connect = () => {
 }
 
 const produce = async (
-  topic: "user-course-progress" | "user-points-2" | "exercise",
+  topic:
+    | "user-course-progress"
+    | "user-points-2"
+    | "exercise"
+    | "user-points-realtime",
   message: ProgressMessage | QuizAnswerMessage | QuizMessage,
 ) => {
   if (process.env.NODE_ENV === "test") {
@@ -104,7 +109,39 @@ export const broadcastQuizAnswerUpdated = async (
   }
 
   if (course.moocfiId) {
-    await produce("user-points-2", message)
+    await produce("user-points-realtime", message)
+  }
+}
+
+export const broadcastCourseQuizzesUpdated = async (
+  courseId: string,
+  trx: Knex.Transaction,
+) => {
+  const quizzes = await Quiz.query(trx)
+    .where("course_id", courseId)
+    .withGraphJoined("texts")
+  const course = await Course.query(trx).findById(courseId)
+
+  const data: ExerciseData[] = quizzes.map(quiz => {
+    return {
+      name: quiz.texts[0].title,
+      id: quiz.id,
+      part: quiz.part,
+      section: quiz.section,
+      max_points: quiz.excludedFromScore ? 0 : quiz.points,
+      deleted: false,
+    }
+  })
+
+  const message: QuizMessage = {
+    timestamp: new Date().toISOString(),
+    course_id: course.moocfiId,
+    service_id: process.env.SERVICE_ID ?? "",
+    data,
+    message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
+  }
+  if (course.moocfiId) {
+    await produce("exercise", message)
   }
 }
 

@@ -1,4 +1,4 @@
-import { NormalizedQuiz, action, Entities } from "../../../types/NormalizedQuiz"
+import { NormalizedQuiz, action } from "../../../types/NormalizedQuiz"
 import { createReducer } from "typesafe-actions"
 import {
   editedQuizTitle,
@@ -10,6 +10,7 @@ import {
   editedQuizzesSubmitmessage,
   editedQuizzesPart,
   editedQuizzesSection,
+  editedQuizzesAutoconfirm,
 } from "./quizActions"
 import {
   initializedEditor,
@@ -22,6 +23,7 @@ import { DateTime } from "luxon"
 import { Quiz } from "../../../types/Quiz"
 import { normalize } from "normalizr"
 import { normalizedQuiz } from "../../../schemas"
+import { createdNewPeerReview } from "../peerReviews/peerReviewActions"
 
 export const quizReducer = createReducer<
   { [quizId: string]: NormalizedQuiz },
@@ -135,6 +137,18 @@ export const quizReducer = createReducer<
   .handleAction(editedQuizzesSection, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.quizId].section = action.payload.newSection
+    })
+  })
+
+  .handleAction(createdNewPeerReview, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.quizId].peerReviews.push(action.payload.newId)
+    })
+  })
+
+  .handleAction(editedQuizzesAutoconfirm, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.quizId].autoConfirm = action.payload.autoConfirm
     })
   })
 

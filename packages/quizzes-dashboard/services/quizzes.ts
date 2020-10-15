@@ -1,6 +1,6 @@
 import axios from "axios"
 import { checkStore } from "./tmcApi"
-import { Quiz, Course } from "../types/Quiz"
+import { Quiz, Course, PeerReviewQuestion, Language } from "../types/Quiz"
 import { NewQuiz } from "../types/NormalizedQuiz"
 import { Answer } from "../types/Answer"
 
@@ -248,6 +248,72 @@ export const getAnswerStates = async (): Promise<string[]> => {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
     return (await api.get(`/quizzes/answer/get-answer-states`, config)).data
+  }
+  throw new Error()
+}
+
+export const duplicateCourse = async (
+  courseId: string,
+  name: string,
+  abbr: string,
+  lang: string,
+): Promise<{ success: boolean; newCourseId: string }> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (
+      await api.post(
+        `/courses/${courseId}/duplicate-course`,
+        { name: name, abbr: abbr, lang: lang },
+        config,
+      )
+    ).data
+  } else {
+    throw new Error()
+  }
+}
+
+export const getCorrespondenceFile = async (
+  newCourseId: string,
+  oldCourseId: string,
+) => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const res = (
+      await api.post(
+        `/courses/download-correspondence-file`,
+        { newCourseId: newCourseId, oldCourseId: oldCourseId },
+        config,
+      )
+    ).data
+    const url = window.URL.createObjectURL(new Blob([res]))
+    const link = document.createElement("a")
+    link.href = url
+    link.setAttribute(
+      "download",
+      `updated_ids_from${oldCourseId}_to_${newCourseId}.csv`,
+    )
+    document.body.appendChild(link)
+    link.click()
+  } else {
+    throw new Error()
+  }
+}
+
+export const fetchLanguages = async (): Promise<Language[]> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (await api.get(`/languages/ids`, config)).data
+
+    return response
   }
   throw new Error()
 }

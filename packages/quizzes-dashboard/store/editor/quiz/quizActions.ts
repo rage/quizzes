@@ -66,6 +66,14 @@ export const editedQuizzesSection = createAction(
   }),
 )<{ quizId: string; newSection: number }>()
 
+export const editedQuizzesAutoconfirm = createAction(
+  "EDITED_QUIZZES_AUTOCONFIRM",
+  (quizId: string, autoConfirm: boolean) => ({
+    quizId: quizId,
+    autoConfirm: autoConfirm,
+  }),
+)<{ quizId: string; autoConfirm: boolean }>()
+
 export const quizActions = [
   editedQuizTitle,
   editedQuizzesNumberOfTries,
@@ -76,6 +84,7 @@ export const quizActions = [
   editedQuizzesSubmitmessage,
   editedQuizzesPart,
   editedQuizzesSection,
+  editedQuizzesAutoconfirm,
 ]
 
 export default quizActions

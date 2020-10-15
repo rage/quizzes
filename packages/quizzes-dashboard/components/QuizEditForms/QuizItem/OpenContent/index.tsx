@@ -152,7 +152,7 @@ const OpenContent = ({ item }: openContentProps) => {
       </StyledModal>
       <ItemInfo>
         <TextField
-          value={storeItem.title}
+          value={storeItem.title ?? ""}
           multiline
           fullWidth
           variant="outlined"
@@ -164,7 +164,7 @@ const OpenContent = ({ item }: openContentProps) => {
       </ItemInfo>
       <ItemInfo>
         <TextField
-          value={storeItem.body}
+          value={storeItem.body ?? ""}
           multiline
           fullWidth
           variant="outlined"
@@ -180,7 +180,7 @@ const OpenContent = ({ item }: openContentProps) => {
           fullWidth
           label="Validity regex"
           variant="outlined"
-          value={variables.regex}
+          value={variables.regex ?? ""}
           helperText={!variables.validRegex && "Invalid regex"}
           onChange={event => {
             dispatch(setRegex(storeItem.id, event.target.value))

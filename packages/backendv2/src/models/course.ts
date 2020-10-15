@@ -1,14 +1,20 @@
+import { MalformedPayloadError } from "./../util/error"
 import Model from "./base_model"
 import Quiz from "./quiz"
 import CourseTranslation from "./course_translation"
 import { v4 } from "uuid"
 import knex from "../../database/knex"
 import stringify from "csv-stringify"
+import Knex from "knex"
 
 class Course extends Model {
+  id!: string
   moocfiId!: string
   minPeerReviewsGiven!: number
   minPeerReviewsReceived!: number
+  maxSpamFlags!: number
+  maxReviewSpamFlags!: number
+  minReviewAverage!: number
   texts!: CourseTranslation[]
   languageId!: string
   title!: string
@@ -53,10 +59,10 @@ class Course extends Model {
     return course
   }
 
-  static async getById(id: string) {
+  static async getById(id: string, trx?: Knex.Transaction) {
     return this.moveTextsToParent(
       (
-        await this.query()
+        await this.query(trx)
           .withGraphJoined("texts")
           .where("id", id)
       )[0],
@@ -263,7 +269,7 @@ class Course extends Model {
         WHERE quiz_id IN (
           SELECT id
           FROM quiz
-          WHERE course_id = '4908eebe-584e-49e0-a580-c0d399c21ec3'
+          WHERE course_id = :oldCourseId
         )
       );
       `,
@@ -285,7 +291,7 @@ class Course extends Model {
           WHERE quiz_id IN (
             SELECT id
             FROM quiz
-            WHERE course_id = '4908eebe-584e-49e0-a580-c0d399c21ec3'
+            WHERE course_id = :oldCourseId
           )
         )
       );
@@ -301,7 +307,7 @@ class Course extends Model {
         throw new Error(e)
       })
 
-    return this.getCorrespondanceFile(oldCourseId, newCourseId)
+    return { success: true, newCourseId: newCourseId }
   }
 
   static async getCorrespondanceFile(oldCourseId: string, newCourseId: string) {
@@ -338,6 +344,12 @@ class Course extends Model {
         .where({ course_id: courseId })
         .andWhereNot("part", 0)
     ).map(q => q.part)
+  }
+
+  static async updateMoocfiId(id: string, newMoocfiId: string) {
+    const course = await this.getById(id)
+
+    return await course.$query().patchAndFetch({ moocfiId: newMoocfiId })
   }
 }
 

@@ -1,3 +1,5 @@
+import { PeerReviewQuestion, PeerReview, Question } from "./Quiz"
+
 export interface action {
   type: string
   payload?: any
@@ -9,6 +11,8 @@ export interface Entities {
   items: { [itemId: string]: NormalizedItem }
   options?: { [optionId: string]: NormalizedOption }
   result: string
+  peerReviews: { [peerReviewId: string]: NormalizedPeerReview }
+  questions: { [questionId: string]: NormalizedQuestion }
 }
 export interface NormalizedQuiz {
   id: string
@@ -71,6 +75,30 @@ export interface NormalizedOption {
   failureMessage: null | string
 }
 
+export interface NormalizedPeerReview {
+  id: string
+  quizId: string
+  createdAt: string
+  updatedAt: string
+  questions: string[]
+  title: string
+  body: string
+}
+
+export interface NormalizedQuestion {
+  id: string
+  quizId: string
+  peerReviewCollectionId: string
+  default: boolean
+  type: string
+  answerRequired: boolean
+  order: number
+  createdAt: string
+  updatedAt: string
+  title: string
+  body: string
+}
+
 export interface Course {
   id: string
   minScoreToPass: number | null
@@ -113,6 +141,11 @@ export interface QuizVariables {
   deadline: string
   validDeadline: boolean
   newQuiz: boolean
+  newPeerReviews: string[]
+}
+
+export interface peerReviewVariables {
+  newQuestions: string[]
 }
 
 export interface NewQuiz {

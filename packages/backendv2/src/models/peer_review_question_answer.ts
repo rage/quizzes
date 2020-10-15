@@ -3,6 +3,7 @@ import PeerReview from "./peer_review"
 import PeerReviewQuestion from "./peer_review_question"
 
 class PeerReviewQuestionAnswer extends Model {
+  value!: number
   question!: PeerReviewQuestion
 
   static get tableName() {

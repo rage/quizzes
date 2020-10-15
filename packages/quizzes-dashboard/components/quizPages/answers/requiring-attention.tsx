@@ -8,58 +8,51 @@ import {
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { AnswerList } from "../../AnswerList"
 import usePromise from "react-use-promise"
-import { TextField, MenuItem, Switch, Typography } from "@material-ui/core"
-import styled from "styled-components"
-import { Pagination, Skeleton } from "@material-ui/lab"
+import { MenuItem, Switch, Typography } from "@material-ui/core"
 import QuizTitle from "../QuizTitleContainer"
 import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
-
-export const PaginationField = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: center;
-  padding: 1rem;
-`
-
-export const Paginator = styled(Pagination)`
-  display: flex !important;
-`
-
-const StyledSkeleton = styled(Skeleton)`
-  margin-bottom: 1rem;
-`
-
-const OptionsContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  width: 100%;
-`
-export const SwitchField = styled.div`
-  display: flex;
-  align-items: baseline;
-  width: 33%;
-`
-export const SortOrderField = styled(TextField)`
-  display: flex !important;
-  width: 33% !important;
-`
-export const SizeSelectorField = styled(TextField)`
-  display: flex !important;
-  width: 33% !important;
-`
+import {
+  StyledSkeleton,
+  SizeSelectorField,
+  PaginationField,
+  SwitchField,
+  Paginator,
+  OptionsContainer,
+  SortOrderField,
+} from "./styles"
+import { TAnswersDisplayed, TSortOptions } from "./types"
 
 export const RequiringAttention = () => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
 
-  const [page, setPage] = useState(1)
-  const [size, setSize] = useState(10)
-  const [order, setOrder] = useState("desc")
-  const [expandAll, setExpandAll] = useState(false)
+  const URL_HREF = `/quizzes/[quizId]/[...page]`
+  const pathname = `/quizzes/${quizId}/answers-requiring-attention/`
+
+  const paramSize = Number(route.query.answers) as TAnswersDisplayed
+  const paramPage = Number(route.query.pageNo)
+  let paramSort: TSortOptions | null = null
+  if (route.query.sort) {
+    paramSort = route.query.sort as TSortOptions
+  }
+  const paramExpand = route.query.expandAll === "true" ? true : false
+
+  const [currentPage, setCurrentPage] = useState<number>(paramPage || 1)
+  const [sortOrder, setSortOrder] = useState<TSortOptions>(paramSort || "desc")
+  const [expandAll, setExpandAll] = useState<boolean>(paramExpand || false)
+  const [answersDisplayed, setAnswersDisplayed] = useState<TAnswersDisplayed>(
+    paramSize || 10,
+  )
 
   const [answers, error] = usePromise(
-    () => getAnswersRequiringAttention(quizId, page, size, order),
-    [page, size, order],
+    () =>
+      getAnswersRequiringAttention(
+        quizId,
+        currentPage,
+        answersDisplayed,
+        sortOrder,
+      ),
+    [currentPage, answersDisplayed, sortOrder],
   )
   const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [])
   const [course, courseError] = usePromise(
@@ -67,12 +60,14 @@ export const RequiringAttention = () => {
     [quiz],
   )
 
+  const [queryToPush, setQueryToPush] = useState({})
+
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
       label: `${course ? course.title : ""}`,
       as: `/courses/${quiz?.courseId}`,
-      href: "/courses/[courseId]",
+      href: "/courses/[courseId]/[...page]",
     },
     {
       label: `${quiz ? quiz.title : ""}`,
@@ -111,6 +106,47 @@ export const RequiringAttention = () => {
     )
   }
 
+  const handlePageChange = (nextPage: number) => {
+    setQueryToPush({ ...queryToPush, pageNo: nextPage })
+    setCurrentPage(nextPage)
+    let query = { ...queryToPush, pageNo: nextPage }
+    route.push(URL_HREF, { pathname, query }, { shallow: true })
+  }
+
+  const handleChange = (event: React.ChangeEvent<any>, fieldType?: string) => {
+    let query = null
+    let updatedQueryParams = null
+
+    switch (fieldType) {
+      case "pages":
+        updatedQueryParams = {
+          ...queryToPush,
+          answers: event.target.value,
+        }
+        setQueryToPush(updatedQueryParams)
+        setAnswersDisplayed(Number(event.target.value) as TAnswersDisplayed)
+        query = updatedQueryParams
+        break
+      case "expand":
+        updatedQueryParams = { ...queryToPush, expandAll: event.target.checked }
+        setQueryToPush(updatedQueryParams)
+        setExpandAll(event.target.checked)
+        query = updatedQueryParams
+        break
+      case "order":
+        updatedQueryParams = { ...queryToPush, sort: event.target.value }
+        setQueryToPush(updatedQueryParams)
+        setSortOrder(event.target.value)
+        query = updatedQueryParams
+        break
+      default:
+        break
+    }
+
+    // in all cases, push all the query params
+    route.push(URL_HREF, { pathname, query }, { shallow: true })
+  }
+
   return (
     <>
       <TabText text="Answers requiring attention" />
@@ -126,32 +162,33 @@ export const RequiringAttention = () => {
             <Paginator
               siblingCount={2}
               boundaryCount={2}
-              count={Math.ceil(answers.total / size)}
+              count={Math.ceil(answers.total / answersDisplayed)}
               size="large"
               color="primary"
               showFirstButton
               showLastButton
-              page={page}
-              onChange={(event, nextPage) => setPage(nextPage)}
+              page={currentPage}
+              onChange={(event, nextPage) => handlePageChange(nextPage)}
             />
           </PaginationField>
           <OptionsContainer>
             <SwitchField>
               <Typography>Expand all</Typography>
               <Switch
+                name="expand-field"
                 checked={expandAll}
                 onChange={event => {
-                  setExpandAll(event.target.checked)
+                  handleChange(event, "expand")
                 }}
               />
             </SwitchField>
             <SizeSelectorField
-              value={size}
+              value={answersDisplayed}
               size="medium"
               label="Answers"
               variant="outlined"
               select
-              onChange={event => setSize(Number(event.target.value))}
+              onChange={event => handleChange(event, "pages")}
               helperText="How many answers are shown per page"
             >
               <MenuItem value={10}>10</MenuItem>
@@ -163,8 +200,8 @@ export const RequiringAttention = () => {
               variant="outlined"
               select
               helperText="Sorts answers by date they've been submitted"
-              value={order}
-              onChange={event => setOrder(event.target.value)}
+              value={sortOrder}
+              onChange={event => handleChange(event, "order")}
             >
               <MenuItem value="desc">Latest first</MenuItem>
               <MenuItem value="asc">Oldest first</MenuItem>
@@ -179,13 +216,13 @@ export const RequiringAttention = () => {
             <Paginator
               siblingCount={2}
               boundaryCount={2}
-              count={Math.ceil(answers.total / size)}
+              count={Math.ceil(answers.total / answersDisplayed)}
               size="large"
               color="primary"
               showFirstButton
               showLastButton
-              page={page}
-              onChange={(event, nextPage) => setPage(nextPage)}
+              page={currentPage}
+              onChange={(event, nextPage) => handlePageChange(nextPage)}
             />
           </PaginationField>
         </>

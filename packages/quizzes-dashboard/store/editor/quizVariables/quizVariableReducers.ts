@@ -10,6 +10,7 @@ import { setAddNewQuizItem, setNewItemType } from "./quizVariableActions"
 import { DateTime } from "luxon"
 import { editedQuizzesDeadline } from "../quiz/quizActions"
 import { Quiz } from "../../../types/Quiz"
+import { createdNewPeerReview } from "../peerReviews/peerReviewActions"
 
 export const quizVariableReducers = createReducer<
   { [quizId: string]: QuizVariables },
@@ -36,6 +37,7 @@ export const quizVariableReducers = createReducer<
         deadline: withOffset,
         validDeadline: true,
         newQuiz: false,
+        newPeerReviews: [],
       }
     })
   })
@@ -73,6 +75,7 @@ export const quizVariableReducers = createReducer<
         newQuiz: true,
         deadline: "",
         validDeadline: true,
+        newPeerReviews: [],
       }
     })
   })
@@ -118,5 +121,13 @@ export const quizVariableReducers = createReducer<
             .toISO()
         }
       }
+    })
+  })
+
+  .handleAction(createdNewPeerReview, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.quizId].newPeerReviews.push(
+        action.payload.newId,
+      )
     })
   })

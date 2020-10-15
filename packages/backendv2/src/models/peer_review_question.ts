@@ -4,6 +4,7 @@ import PeerReviewQuestionTranslation from "./peer_review_question_translation"
 
 class PeerReviewQuestion extends Model {
   texts!: PeerReviewQuestionTranslation[]
+  collection!: PeerReviewCollection
   title!: string
   body!: string
 
