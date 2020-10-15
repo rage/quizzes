@@ -34,11 +34,13 @@ const StyledModal = styled(Modal)`
   align-items: center;
   justify-content: center;
 `
-
 const AdvancedBox = styled(Box)`
-  background-color: #fafafa;
-  min-width: 1000px;
-  min-height: 800px;
+  background-color: #fafafa !important;
+  min-width: 1000px !important;
+  min-height: 800px !important;
+  max-width: 1000px !important;
+  max-height: 800px !important;
+  overflow-y: scroll !important;
 `
 
 const CloseButton = styled(Button)`
