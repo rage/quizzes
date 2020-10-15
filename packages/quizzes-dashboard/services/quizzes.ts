@@ -71,7 +71,7 @@ export const saveQuiz = async (quiz: Quiz | NewQuiz): Promise<any> => {
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
-    const response = (await api.post(`quizzes`, quiz, config)).data
+    const response = (await api.post(`/quizzes`, quiz, config)).data
     return response
   }
 }
