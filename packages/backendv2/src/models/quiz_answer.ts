@@ -305,46 +305,52 @@ class QuizAnswer extends Model {
     updateTransaction?: Knex.Transaction,
   ) {
     const trx = updateTransaction || (await knex.transaction())
-    const userId = user.id
-    const quizId = quizAnswer.quizId
-    const isUserInDb = await User.getById(userId, trx)
-    if (!isUserInDb) {
-      quizAnswer.user = User.fromJson({ id: userId })
-    }
-    quizAnswer.userId = user.id
-    const quiz = await Quiz.getById(quizId, trx)
-    const course = await Course.getById(quiz.courseId, trx)
-    quizAnswer.languageId = course.languageId
-    const userQuizState =
-      (await UserQuizState.getByUserAndQuiz(userId, quizId, trx)) ??
-      UserQuizState.fromJson({ userId, quizId })
-    if (!updateTransaction) {
-      this.checkIfSubmittable(quiz, userQuizState)
-    }
-    await this.assessAnswerStatus(quizAnswer, userQuizState, quiz, course, trx)
-    this.assessAnswer(quizAnswer, quiz)
-    this.gradeAnswer(quizAnswer, userQuizState, quiz)
-    this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
-    let savedQuizAnswer
-    let savedUserQuizState
-    await this.markPreviousAsDeprecated(userId, quizId, trx)
-    savedQuizAnswer = await this.query(trx).upsertGraphAndFetch(quizAnswer)
-    savedUserQuizState = await UserQuizState.query(trx).upsertGraphAndFetch(
-      userQuizState,
-      {
-        insertMissing: true,
-      },
-    )
     try {
+      const userId = user.id
+      const quizId = quizAnswer.quizId
+      const isUserInDb = await User.getById(userId, trx)
+      if (!isUserInDb) {
+        quizAnswer.user = User.fromJson({ id: userId })
+      }
+      quizAnswer.userId = user.id
+      const quiz = await Quiz.getById(quizId, trx)
+      const course = await Course.getById(quiz.courseId, trx)
+      quizAnswer.languageId = course.languageId
+      const userQuizState =
+        (await UserQuizState.getByUserAndQuiz(userId, quizId, trx)) ??
+        UserQuizState.fromJson({ userId, quizId })
+      if (!updateTransaction) {
+        this.checkIfSubmittable(quiz, userQuizState)
+      }
+      await this.assessAnswerStatus(
+        quizAnswer,
+        userQuizState,
+        quiz,
+        course,
+        trx,
+      )
+      this.assessAnswer(quizAnswer, quiz)
+      this.gradeAnswer(quizAnswer, userQuizState, quiz)
+      this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
+      let savedQuizAnswer
+      let savedUserQuizState
+      await this.markPreviousAsDeprecated(userId, quizId, trx)
+      savedQuizAnswer = await this.query(trx).upsertGraphAndFetch(quizAnswer)
+      savedUserQuizState = await UserQuizState.query(trx).upsertGraphAndFetch(
+        userQuizState,
+        {
+          insertMissing: true,
+        },
+      )
       await trx.commit()
+      return {
+        quiz,
+        quizAnswer: savedQuizAnswer,
+        userQuizState: savedUserQuizState,
+      }
     } catch (error) {
       await trx.rollback()
       throw new BadRequestError(error)
-    }
-    return {
-      quiz,
-      quizAnswer: savedQuizAnswer,
-      userQuizState: savedUserQuizState,
     }
   }
 
