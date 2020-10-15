@@ -1,4 +1,4 @@
-FROM node:12-alpine
+FROM node:12.8.1-alpine
 
 COPY --chown=node package.json package-lock.json /app/
 

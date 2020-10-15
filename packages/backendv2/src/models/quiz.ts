@@ -30,6 +30,8 @@ export class Quiz extends Model {
   title!: string
   body!: string
   submitMessage!: string
+  autoConfirm!: boolean
+  autoReject!: boolean
 
   static get tableName() {
     return "quiz"
@@ -204,7 +206,7 @@ export class Quiz extends Model {
     }
   }
 
-  static async getById(quizId: string) {
+  static async getById(quizId: string): Promise<Quiz> {
     const quiz = (
       await this.query()
         .withGraphJoined("texts")

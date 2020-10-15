@@ -64,7 +64,7 @@ export default class KafkaService {
     }
 
     if (course.moocfiId) {
-      await this.produce("user-course-progress", message)
+      await this.produce("user-course-progress-realtime", message)
     }
   }
 
@@ -152,7 +152,10 @@ export default class KafkaService {
   }
 
   private async produce(
-    topic: "user-course-progress" | "user-points-realtime" | "exercise",
+    topic:
+      | "user-course-progress-realtime"
+      | "user-points-realtime"
+      | "exercise",
     message: ProgressMessage | QuizAnswerMessage | QuizMessage,
   ) {
     try {

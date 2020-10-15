@@ -10,6 +10,7 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+
   await knex.raw(`? ON CONFLICT (id) DO NOTHING`, [
     knex("course").insert([
       {
@@ -38,6 +39,7 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+
   await knex.raw(`? ON CONFLICT (course_id, language_id) DO NOTHING`, [
     knex("course_translation").insert([
       {
@@ -56,6 +58,7 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+
   await knex.raw(`? ON CONFLICT (id) DO NOTHING`, [
     knex("quiz").insert([
       {
@@ -108,6 +111,7 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+
   await knex.raw(`? ON CONFLICT (quiz_id, language_id) DO NOTHING`, [
     knex("quiz_translation").insert([
       {
@@ -133,6 +137,7 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+
   await knex.raw(`? ON CONFLICT (id) DO NOTHING`, [
     knex("quiz_item").insert([
       {
@@ -173,6 +178,7 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+
   await knex.raw(`? ON CONFLICT (quiz_item_id, language_id) DO NOTHING`, [
     knex("quiz_item_translation").insert([
       {
@@ -222,6 +228,7 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+
   await knex.raw(`? ON CONFLICT (id) DO NOTHING`, [
     knex("quiz_option").insert([
       {
@@ -256,6 +263,7 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+
   await knex.raw(`? ON CONFLICT (quiz_option_id, language_id) DO NOTHING`, [
     knex("quiz_option_translation").insert([
       {
@@ -295,6 +303,7 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+
   await knex.raw(`? ON CONFLICT (id) DO NOTHING`, [
     knex("peer_review_collection").insert([
       {
@@ -303,6 +312,7 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+
   await knex.raw(
     `? ON CONFLICT (peer_review_collection_id, language_id) DO NOTHING`,
     [
@@ -316,6 +326,7 @@ export async function seed(knex: Knex): Promise<any> {
       ]),
     ],
   )
+
   await knex.raw(`? ON CONFLICT (id) DO NOTHING`, [
     knex("peer_review_question").insert([
       {
@@ -327,6 +338,7 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+
   await knex.raw(
     `? ON CONFLICT (peer_review_question_id, language_id) DO NOTHING`,
     [
@@ -340,6 +352,7 @@ export async function seed(knex: Knex): Promise<any> {
       ]),
     ],
   )
+
   await knex.raw("? ON CONFLICT (id) DO NOTHING", [
     knex("user").insert([
       {
@@ -351,8 +364,12 @@ export async function seed(knex: Knex): Promise<any> {
       {
         id: 3456,
       },
+      {
+        id: 4567,
+      },
     ]),
   ])
+
   await knex.raw("? ON CONFLICT (id) DO NOTHING", [
     knex("user_course_role").insert([
       {
@@ -362,15 +379,26 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+
   await knex.raw("? ON CONFLICT (id) DO NOTHING", [
-    knex("quiz_answer").insert({
-      id: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
-      quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
-      user_id: 1234,
-      language_id: "xy_YZ",
-      status: "given-enough",
-    }),
+    knex("quiz_answer").insert([
+      {
+        id: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        user_id: 1234,
+        language_id: "xy_YZ",
+        status: "given-enough",
+      },
+      {
+        id: "ae29c3be-b5b6-4901-8588-5b0e88774748",
+        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        user_id: 2345,
+        language_id: "xy_YZ",
+        status: "given-enough",
+      },
+    ]),
   ])
+
   await knex.raw("? ON CONFLICT (id) DO NOTHING", [
     knex("quiz_item_answer").insert([
       {
@@ -385,6 +413,7 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+
   await knex.raw("? ON CONFLICT (id) DO NOTHING", [
     knex("quiz_option_answer").insert([
       {
@@ -394,13 +423,22 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+
   await knex.raw("? ON CONFLICT (user_id, quiz_id) DO NOTHING", [
-    knex("user_quiz_state").insert({
-      quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
-      user_id: 1234,
-      status: "locked",
-    }),
+    knex("user_quiz_state").insert([
+      {
+        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        user_id: 1234,
+        status: "locked",
+      },
+      {
+        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        user_id: 2345,
+        status: "locked",
+      },
+    ]),
   ])
+
   await knex.raw("? ON CONFLICT (id) DO NOTHING", [
     knex("peer_review").insert([
       {
@@ -417,6 +455,7 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+
   await knex.raw(
     "? ON CONFLICT (peer_review_id, peer_review_question_id) DO NOTHING",
     [
@@ -434,4 +473,14 @@ export async function seed(knex: Knex): Promise<any> {
       ]),
     ],
   )
+
+  await knex.raw("? ON CONFLICT (id) DO NOTHING", [
+    knex("spam_flag").insert([
+      {
+        id: "ba78b819-fca0-4c59-b2ad-1b36f173a657",
+        user_id: 1234,
+        quiz_answer_id: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      },
+    ]),
+  ])
 }
