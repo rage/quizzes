@@ -26,9 +26,12 @@ import { deletedItem } from "../../../../store/editor/editorActions"
 import RegexTesterModalContent from "./RegexTesterModalContent"
 
 const AdvancedBox = styled(Box)`
-  background-color: #fafafa;
-  min-width: 1000px;
-  min-height: 800px;
+  background-color: #fafafa !important;
+  min-width: 1000px !important;
+  min-height: 800px !important;
+  max-width: 1000px !important;
+  max-height: 800px !important;
+  overflow-y: scroll !important;
 `
 
 const EditItemButton = styled(Button)``
@@ -61,8 +64,10 @@ const StyledModal = styled(Modal)`
 
 const StyledBox = styled(Box)`
   background-color: #fafafa;
-  min-width: 300px;
-  min-height: 300px;
+  min-width: 300px !important;
+  min-height: 300px !important;
+  max-height: 300px !important;
+  max-width: 300px !important;
 `
 const CloseButton = styled(Button)`
   display: flex !important;
