@@ -298,24 +298,5 @@ const dashboard = new Router<CustomState, CustomContext>({
     const result = await Language.getAll()
     ctx.body = result
   })
-  .get("/answers/:answerId/peer-reviews", accessControl(), async ctx => {
-    const answerId = ctx.params.answerId
-    const courseId = await getCourseIdByAnswerId(answerId)
-    await checkAccessOrThrow(ctx.state.user, courseId, "view")
-
-    const peerReviews = await PeerReview.getWithAnswersByAnswerId(answerId)
-
-    const receivedPeerReviews = peerReviews.map((pr: any) => ({
-      id: pr.id,
-      peerReviewCollectionId: pr.peerReviewCollectionId,
-      createdAt: pr.createdAt,
-      answers: pr.answers.map((prAnswer: any) => {
-        const { createdAt, updatedAt, ...rest } = prAnswer
-        return rest
-      }),
-    }))
-
-    ctx.body = receivedPeerReviews
-  })
 
 export default dashboard
