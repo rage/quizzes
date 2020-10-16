@@ -29,6 +29,14 @@ class PeerReview extends Model {
       },
     },
   }
+
+  public static async getWithAnswersByAnswerId(quizAnswerId: string) {
+    const peerReviews = await this.query()
+      .where("quiz_answer_id", quizAnswerId)
+      .withGraphJoined("answers")
+
+    return peerReviews
+  }
 }
 
 export default PeerReview

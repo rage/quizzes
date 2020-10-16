@@ -2,10 +2,14 @@ import request from "supertest"
 import nock from "nock"
 import app from "../app"
 import knex from "../database/knex"
-import { UserInfo } from "../src/types"
 import { Quiz, QuizAnswer } from "../src/models"
 import { input, validation } from "./data"
-import { BadRequestError } from "../src/util/error"
+import { TReturnedPeerReviewAnswer, UserInfo } from "../src/types"
+import {
+  BadRequestError,
+  NotFoundError,
+  UnauthorizedError,
+} from "../src/util/error"
 
 const knexCleaner = require("knex-cleaner")
 
@@ -972,5 +976,111 @@ describe("Answer: spam flags", () => {
         expect(response.body.status).toEqual("spam")
       })
       .expect(200, done)
+  })
+})
+
+describe("widget: a fetch for peer reviews for some quiz answer...", () => {
+  beforeAll(() => {
+    return safeSeed({
+      directory: "./database/seeds",
+      specific: "a.ts",
+    })
+  })
+
+  afterAll(() => {
+    nock.cleanAll()
+    return safeClean()
+  })
+
+  beforeEach(() => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 2345,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("responds with 401 if invalid credentials", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/peer-reviews",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(response => {
+        const received: UnauthorizedError = response.body
+        expect(received.message).toEqual("unauthorized")
+      })
+      .expect(401, done)
+  })
+
+  test("responds with 404 if invalid answer id", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/widget/answers/1cb3e4de-fc11-4aac-be45-06312aa4677c/peer-reviews",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        const received: NotFoundError = response.body
+        expect(received.message).toEqual(
+          "quiz answer not found: 1cb3e4de-fc11-4aac-be45-06312aa4677c",
+        )
+      })
+      .expect(404, done)
+  })
+
+  describe("on a valid request", () => {
+    test("returns an empty array if no peer reviews received", done => {
+      request(app.callback())
+        .get(
+          "/api/v2/widget/answers/ae29c3be-b5b6-4901-8588-5b0e88774748/peer-reviews",
+        )
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .expect(response => {
+          expect(response.body).toEqual([])
+        })
+        .expect(200, done)
+    })
+
+    test("returns correct number of peer reviews on valid request", done => {
+      request(app.callback())
+        .get(
+          "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/peer-reviews",
+        )
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .expect(response => {
+          expect(response.body.length).toEqual(2)
+        })
+        .expect(200, done)
+    })
+    test("returns peer reviews that are of correct shape", done => {
+      request(app.callback())
+        .get(
+          "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/peer-reviews",
+        )
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .expect(response => {
+          expect(response.body).toStrictEqual(
+            validation.receivedPeerReviewsValidator,
+          )
+        })
+        .expect(200, done)
+    })
   })
 })

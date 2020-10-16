@@ -739,4 +739,32 @@ export const validation = {
     createdAt: expect.stringMatching(dateTime),
     updatedAt: expect.stringMatching(dateTime),
   },
+  receivedPeerReviewsValidator: [
+    {
+      id: "2a486ebb-900a-4a78-ada5-be0792610cf0",
+      peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+      createdAt: expect.stringMatching(dateTime),
+      answers: [
+        {
+          peerReviewId: "2a486ebb-900a-4a78-ada5-be0792610cf0",
+          peerReviewQuestionId: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+          value: 1,
+          text: null,
+        },
+      ],
+    },
+    {
+      id: "8cf3efb8-f2ca-44ed-8f18-1e4bd49ee805",
+      peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+      createdAt: expect.stringMatching(dateTime),
+      answers: [
+        {
+          peerReviewId: "8cf3efb8-f2ca-44ed-8f18-1e4bd49ee805",
+          peerReviewQuestionId: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+          value: 2,
+          text: null,
+        },
+      ],
+    },
+  ],
 }

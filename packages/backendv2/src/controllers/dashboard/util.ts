@@ -24,7 +24,7 @@ export const checkAccessOrThrow = async (
   throw new ForbiddenError("forbidden")
 }
 
-export const getAccessableCourses = async (
+export const getAccessibleCourses = async (
   userInfo: UserInfo,
   operation: string,
 ) => {
