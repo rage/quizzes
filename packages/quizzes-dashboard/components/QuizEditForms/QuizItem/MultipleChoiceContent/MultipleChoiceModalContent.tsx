@@ -13,6 +13,8 @@ import {
   toggledSharedOptionFeedbackMessage,
   toggledMultiOptions,
   editedSharedOptionsFeedbackMessage,
+  editedItemSuccessMessage,
+  editedItemFailureMessage,
 } from "../../../../store/editor/items/itemAction"
 import { useTypedSelector } from "../../../../store/store"
 import { useDispatch } from "react-redux"
@@ -118,8 +120,8 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
           </ModalContent>
         ))}
       </ModalContentOptionWrapper>
-      <ModalContent>
-        <Fade in={storeItem.usesSharedOptionFeedbackMessage}>
+      {storeItem.usesSharedOptionFeedbackMessage ? (
+        <ModalContent>
           <TextField
             label="Shared option feedback message"
             variant="outlined"
@@ -134,8 +136,39 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
               )
             }
           />
-        </Fade>
-      </ModalContent>
+        </ModalContent>
+      ) : (
+        <>
+          <ModalContent>
+            <TextField
+              label="Success message"
+              variant="outlined"
+              fullWidth
+              multiline
+              value={storeItem.successMessage ?? ""}
+              onChange={event =>
+                dispatch(
+                  editedItemSuccessMessage(storeItem.id, event.target.value),
+                )
+              }
+            />
+          </ModalContent>
+          <ModalContent>
+            <TextField
+              label="Failure message"
+              variant="outlined"
+              fullWidth
+              multiline
+              value={storeItem.failureMessage ?? ""}
+              onChange={event =>
+                dispatch(
+                  editedItemFailureMessage(storeItem.id, event.target.value),
+                )
+              }
+            />
+          </ModalContent>
+        </>
+      )}
     </>
   )
 }

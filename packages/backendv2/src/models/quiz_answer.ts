@@ -2,7 +2,6 @@ import Knex from "knex"
 import Model from "./base_model"
 import QuizItemAnswer from "./quiz_item_answer"
 import User from "./user"
-import { UserInfo } from "../types"
 import PeerReview from "./peer_review"
 import Quiz from "./quiz"
 import UserQuizState from "./user_quiz_state"
@@ -106,6 +105,13 @@ class QuizAnswer extends Model {
       }
     })
 
+    return quizAnswer
+  }
+
+  public static async getById2(quizAnswerId: string) {
+    const quizAnswer = await this.query()
+      .findById(quizAnswerId)
+      .withGraphFetched("itemAnswers.[optionAnswers]")
     return quizAnswer
   }
 
@@ -299,29 +305,22 @@ class QuizAnswer extends Model {
     return question
   }
 
-  public static async save(
-    user: UserInfo,
-    quizAnswer: QuizAnswer,
-    updateTransaction?: Knex.Transaction,
-  ) {
-    const trx = updateTransaction || (await knex.transaction())
+  public static async newAnswer(userId: number, quizAnswer: QuizAnswer) {
+    const trx = await knex.transaction()
     try {
-      const userId = user.id
       const quizId = quizAnswer.quizId
       const isUserInDb = await User.getById(userId, trx)
       if (!isUserInDb) {
         quizAnswer.user = User.fromJson({ id: userId })
       }
-      quizAnswer.userId = user.id
+      quizAnswer.userId = userId
       const quiz = await Quiz.getById(quizId, trx)
       const course = await Course.getById(quiz.courseId, trx)
       quizAnswer.languageId = course.languageId
       const userQuizState =
         (await UserQuizState.getByUserAndQuiz(userId, quizId, trx)) ??
         UserQuizState.fromJson({ userId, quizId })
-      if (!updateTransaction) {
-        this.checkIfSubmittable(quiz, userQuizState)
-      }
+      this.checkIfSubmittable(quiz, userQuizState)
       await this.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -352,6 +351,19 @@ class QuizAnswer extends Model {
       await trx.rollback()
       throw new BadRequestError(error)
     }
+  }
+
+  public static async update(
+    quizAnswer: QuizAnswer,
+    userQuizState: UserQuizState,
+    quiz: Quiz,
+    trx: Knex.Transaction,
+  ) {
+    const course = await Course.getById(quiz.courseId, trx)
+    await this.assessAnswerStatus(quizAnswer, userQuizState, quiz, course, trx)
+    this.assessAnswer(quizAnswer, quiz)
+    this.gradeAnswer(quizAnswer, userQuizState, quiz)
+    this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
   }
 
   private static checkIfSubmittable(quiz: Quiz, userQuizState: UserQuizState) {

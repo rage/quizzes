@@ -28,7 +28,7 @@ const connect = () => {
 
 const produce = async (
   topic:
-    | "user-course-progress"
+    | "user-course-progress-realtime"
     | "user-points-2"
     | "exercise"
     | "user-points-realtime",
@@ -71,7 +71,7 @@ export const broadcastUserProgressUpdated = async (
   }
 
   if (course.moocfiId) {
-    await produce("user-course-progress", message)
+    await produce("user-course-progress-realtime", message)
   }
 }
 
@@ -91,7 +91,10 @@ export const broadcastQuizAnswerUpdated = async (
     if (userQuizState.peerReviewsGiven < course.minPeerReviewsGiven) {
       messages.push(RequiredAction.GIVE_PEER_REVIEW)
     }
-    if (userQuizState.peerReviewsReceived < course.minPeerReviewsReceived) {
+    if (
+      userQuizState.peerReviewsReceived ??
+      0 < course.minPeerReviewsReceived
+    ) {
       messages.push(RequiredAction.PENDING_PEER_REVIEW)
     }
   }
@@ -99,7 +102,7 @@ export const broadcastQuizAnswerUpdated = async (
   const message: QuizAnswerMessage = {
     timestamp: new Date().toISOString(),
     exercise_id: quizAnswer.quizId,
-    n_points: quiz.excludedFromScore ? 0 : userQuizState.pointsAwarded,
+    n_points: quiz.excludedFromScore ? 0 : userQuizState.pointsAwarded ?? 0,
     completed: quizAnswer.status === "confirmed",
     user_id: quizAnswer.userId,
     course_id: course.moocfiId,

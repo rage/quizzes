@@ -718,4 +718,25 @@ export const validation = {
       },
     ],
   },
+  spamFlagValidator1: {
+    id: expect.stringMatching(uuid),
+    quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+    userId: 2345,
+    createdAt: expect.stringMatching(dateTime),
+    updatedAt: expect.stringMatching(dateTime),
+  },
+  spamFlagValidator2: {
+    id: expect.stringMatching(uuid),
+    quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+    userId: 3456,
+    createdAt: expect.stringMatching(dateTime),
+    updatedAt: expect.stringMatching(dateTime),
+  },
+  spamFlagValidator3: {
+    id: expect.stringMatching(uuid),
+    quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+    userId: 4567,
+    createdAt: expect.stringMatching(dateTime),
+    updatedAt: expect.stringMatching(dateTime),
+  },
 }

@@ -31,5 +31,4 @@ class PeerReviewQuestion extends Model {
     },
   }
 }
-
 export default PeerReviewQuestion
