@@ -29,10 +29,9 @@ const widget = new Router<CustomState, CustomContext>({
     ctx.body = await QuizAnswer.newAnswer(user.id, QuizAnswer.fromJson(answer))
   })
 
-  .post("/answers/:answerId/report-spam", accessControl(), async ctx => {
-    console.log("hep")
-    const quizAnswerId = ctx.params.answerId
-    const userId = ctx.request.body.userId
+  .post("/answers/report-spam", accessControl(), async ctx => {
+    const quizAnswerId = ctx.request.body.quizAnswerId
+    const userId = ctx.state.user.id
     ctx.body = await SpamFlag.reportSpam(quizAnswerId, userId)
   })
 

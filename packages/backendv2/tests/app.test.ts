@@ -834,11 +834,38 @@ describe("Answer: spam flags", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer pleb_token_1") {
+          return [
+            200,
+            {
+              id: 1234,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer pleb_token_2") {
           return [
             200,
             {
               id: 2345,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer pleb_token_3") {
+          return [
+            200,
+            {
+              id: 3456,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer pleb_token_4") {
+          return [
+            200,
+            {
+              id: 4567,
               administrator: false,
             } as UserInfo,
           ]
@@ -856,13 +883,10 @@ describe("Answer: spam flags", () => {
 
   test("spam flag already given", done => {
     request(app.callback())
-      .post(
-        "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/report-spam",
-      )
-      .set("Authorization", "bearer ADMIN_TOKEN")
+      .post("/api/v2/widget/answers/report-spam")
+      .set("Authorization", "bearer PLEB_TOKEN_1")
       .set("Accept", "application/json")
       .send({
-        userId: 1234,
         quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
       })
       .expect(response => {
@@ -874,13 +898,10 @@ describe("Answer: spam flags", () => {
 
   test("First spam flag", done => {
     request(app.callback())
-      .post(
-        "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/report-spam",
-      )
-      .set("Authorization", "bearer ADMIN_TOKEN")
+      .post("/api/v2/widget/answers/report-spam")
+      .set("Authorization", "bearer PLEB_TOKEN_2")
       .set("Accept", "application/json")
       .send({
-        userId: 2345,
         quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
       })
       .expect(res => {
@@ -903,13 +924,10 @@ describe("Answer: spam flags", () => {
 
   test("Second spam flag", done => {
     request(app.callback())
-      .post(
-        "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/report-spam",
-      )
-      .set("Authorization", "bearer ADMIN_TOKEN")
+      .post("/api/v2/widget/answers/report-spam")
+      .set("Authorization", "bearer PLEB_TOKEN_3")
       .set("Accept", "application/json")
       .send({
-        userId: 3456,
         quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
       })
       .expect(response => {
@@ -932,13 +950,10 @@ describe("Answer: spam flags", () => {
 
   test("Third spam flag", done => {
     request(app.callback())
-      .post(
-        "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/report-spam",
-      )
-      .set("Authorization", "bearer ADMIN_TOKEN")
+      .post("/api/v2/widget/answers/report-spam")
+      .set("Authorization", "bearer PLEB_TOKEN_4")
       .set("Accept", "application/json")
       .send({
-        userId: 4567,
         quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
       })
       .expect(response => {
@@ -953,7 +968,7 @@ describe("Answer: spam flags", () => {
       .set("Authorization", "bearer ADMIN_TOKEN")
       .set("Accept", "application/json")
       .expect(response => {
-        expect(response.body.userQuizState.spamFlags).toEqual(0)
+        expect(response.body.userQuizState.spamFlags).toEqual(3)
         expect(response.body.status).toEqual("spam")
       })
       .expect(200, done)

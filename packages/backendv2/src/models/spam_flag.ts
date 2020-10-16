@@ -38,7 +38,6 @@ class SpamFlag extends Model {
     quizAnswerId: string,
     userId: number,
   ): Promise<SpamFlag | BadRequestError> {
-    console.log(quizAnswerId)
     if (await this.getSpamFlagByUserIdAndQuizAnswerId(userId, quizAnswerId)) {
       throw new BadRequestError("Can only give one spam flag")
     } else {
@@ -57,13 +56,15 @@ class SpamFlag extends Model {
       }
       const trx = await knex.transaction()
       try {
-        const newSpamFlag = await this.query(trx).upsertGraphAndFetch({
-          user_id: userId,
-          quiz_answer_id: quizAnswerId,
-        })
+        const newSpamFlag = await this.query(trx).insertAndFetch(
+          this.fromJson({
+            userId,
+            quizAnswerId,
+          }),
+        )
         await QuizAnswer.update(quizAnswer, userQuizState, quiz, trx)
         await QuizAnswer.query(trx).upsertGraph(quizAnswer)
-        await UserQuizState.query(trx).update(userQuizState)
+        await UserQuizState.query(trx).upsertGraph(userQuizState)
         trx.commit()
         return newSpamFlag
       } catch (err) {
