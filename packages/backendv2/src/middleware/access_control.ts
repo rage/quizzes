@@ -2,6 +2,8 @@ import { CustomContext } from "../types"
 import { getCurrentUserDetails } from "../services/tmc"
 import { ForbiddenError, UnauthorizedError } from "../util/error"
 
+import redis from "../../config/redis"
+
 interface AccessControlOptions {
   administator?: boolean
   unrestricted?: boolean
@@ -15,14 +17,23 @@ export const accessControl = (options?: AccessControlOptions) => {
     if (options?.unrestricted) {
       return next()
     }
-    let user
-    try {
-      user = await getCurrentUserDetails(
-        ctx.headers.authorization.toLocaleLowerCase().replace("bearer ", ""),
-      )
-    } catch (error) {
-      throw new UnauthorizedError("unauthorized")
+
+    const token: string =
+      ctx.headers.authorization.toLocaleLowerCase().replace("bearer ", "") || ""
+
+    // attempt retrieval of user from cache
+    let user = JSON.parse((await redis.get(token)) as string)
+
+    if (!user) {
+      try {
+        // fetch user from TMC server and cache details
+        user = await getCurrentUserDetails(token)
+        redis.setex(token, 3600, JSON.stringify(user))
+      } catch (error) {
+        throw new UnauthorizedError("unauthorized")
+      }
     }
+
     ctx.state.user = user
     if (options?.administator && !user.administrator) {
       throw new ForbiddenError("forbidden")
