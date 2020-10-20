@@ -105,7 +105,7 @@ const dashboard = new Router<CustomState, CustomContext>({
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
-    ctx.body = await QuizAnswer.getById(answerId)
+    ctx.body = await QuizAnswer.getByIdWithPeerReviews(answerId)
   })
 
   .get("/answers/:quizId/all", accessControl(), async ctx => {

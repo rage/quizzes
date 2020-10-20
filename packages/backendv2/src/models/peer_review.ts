@@ -4,6 +4,8 @@ import PeerReviewQuestionAnswer from "./peer_review_question_answer"
 import PeerReviewQuestion from "./peer_review_question"
 
 class PeerReview extends Model {
+  quizAnswerId!: string
+  rejectedQuizAnswerIds!: string[]
   answers!: PeerReviewQuestionAnswer[]
   questions!: PeerReviewQuestion[]
 

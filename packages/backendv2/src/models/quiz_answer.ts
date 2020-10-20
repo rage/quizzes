@@ -13,6 +13,8 @@ import Course from "./course"
 import PeerReviewQuestion from "./peer_review_question"
 import UserCoursePartState from "./user_course_part_state"
 import * as Kafka from "../services/kafka"
+import SpamFlag from "./spam_flag"
+import _ from "lodash"
 
 type QuizAnswerStatus =
   | "draft"
@@ -87,9 +89,17 @@ class QuizAnswer extends Model {
         to: "quiz.id",
       },
     },
+    spamFlags: {
+      relation: Model.HasManyRelation,
+      modelClass: SpamFlag,
+      join: {
+        from: "quiz_answer.id",
+        to: "spam_flag.quiz_answer_id",
+      },
+    },
   }
 
-  public static async getById(quizAnswerId: string) {
+  public static async getByIdWithPeerReviews(quizAnswerId: string) {
     const quizAnswer = await this.query()
       .findById(quizAnswerId)
       .withGraphFetched("userQuizState")
@@ -113,7 +123,7 @@ class QuizAnswer extends Model {
     return quizAnswer
   }
 
-  public static async getById2(quizAnswerId: string) {
+  public static async getById(quizAnswerId: string) {
     const quizAnswer = await this.query()
       .findById(quizAnswerId)
       .withGraphFetched("itemAnswers.[optionAnswers]")
@@ -617,6 +627,146 @@ class QuizAnswer extends Model {
 
     // TODO: if not auto confirm move to manual review once widget smart enough
     return status
+  }
+
+  public static async getAnswersToReview(reviewerId: number, quizId: string) {
+    const answerIds = this.query()
+      .select("id")
+      .where("quiz_id", quizId)
+
+    const givenPeerReviews = await PeerReview.query()
+      .whereIn("quiz_answer_id", answerIds)
+      .andWhere("user_id", reviewerId)
+
+    const givenSpamFlags = await SpamFlag.query().where("user_id", reviewerId)
+
+    givenPeerReviews.map(pr => pr.rejectedQuizAnswerIds)
+
+    const rejected: string[] = [
+      ...givenPeerReviews.map(pr => pr.rejectedQuizAnswerIds).flat(),
+      ...givenSpamFlags.map(spamFlag => spamFlag.quizAnswerId),
+    ]
+
+    // query will fail if this array is empty
+    rejected.push("d28359ed-fe18-4f79-b1a1-b33ee157d004")
+
+    const alreadyReviewed = givenPeerReviews.map(pr => pr.quizAnswerId)
+    alreadyReviewed.push("cc633ea9-c1e4-4fbd-8627-c6e12daecc96")
+
+    let allCandidates: any[] = []
+    let candidates
+    let priority = 0
+
+    console.count("kissa")
+
+    while (allCandidates.length < 2) {
+      candidates = await this.getCandidates(
+        priority,
+        quizId,
+        reviewerId,
+        rejected,
+        alreadyReviewed,
+      )
+
+      if (candidates === null) {
+        break
+      }
+
+      candidates = _.shuffle(candidates)
+
+      allCandidates = allCandidates.concat(candidates)
+      priority++
+    }
+
+    if (allCandidates.length < 1) {
+      return []
+    }
+
+    allCandidates = allCandidates.sort((a, b): number => {
+      if (a.status < b.status) {
+        return 1
+      } else if (a.status > b.status) {
+        return -1
+      } else {
+        return 0
+      }
+    })
+
+    allCandidates = allCandidates.slice(0, 2)
+
+    return await this.query()
+      .withGraphJoined("itemAnswers")
+      .whereIn(
+        "quiz_answer.id",
+        allCandidates.map(c => c.id),
+      )
+  }
+
+  private static async getCandidates(
+    priority: number,
+    quizId: string,
+    reviewerId: number,
+    rejected: string[],
+    alreadyReviewed: string[],
+  ): Promise<Array<{ id: string; status: string }> | null> {
+    const builder = knex
+
+    let query: Knex.QueryBuilder | null = builder("quiz_answer")
+      .select("quiz_answer.id", "quiz_answer.status")
+      .where("quiz_answer.quiz_id", quizId)
+      .andWhere("quiz_answer.user_id", "!=", reviewerId)
+      .andWhere("quiz_answer.id", "NOT IN", alreadyReviewed)
+
+    query = this.addCriteriaBasedOnPriority(priority, query, rejected)
+
+    if (query === null) {
+      return null
+    }
+
+    query = query.limit(20)
+
+    return await query
+  }
+
+  private static statusesByPriority: (
+    | QuizAnswerStatus
+    | QuizAnswerStatus[]
+  )[] = [
+    [
+      "given-more-than-enough",
+      "manual-review-once-received-enough-given-more-than-enough",
+    ],
+    ["given-enough", "manual-review-once-received-enough"],
+    ["submitted"],
+    ["manual-review-once-given-enough"],
+    ["manual-review-once-given-and-received-enough"],
+    ["manual-review"],
+    ["confirmed"],
+    ["enough-received-but-not-given"],
+  ]
+
+  private static addCriteriaBasedOnPriority(
+    priority: number,
+    queryBuilder: Knex.QueryBuilder,
+    rejected: string[],
+  ) {
+    // we won't consider rejected answers
+    if (priority < this.statusesByPriority.length) {
+      queryBuilder = queryBuilder
+        .andWhere("quiz_answer.id", "NOT IN", rejected)
+        .andWhere("quiz_answer.status", "IN", this.statusesByPriority[priority])
+        .orderBy("quiz_answer.created_at", "asc")
+    }
+    // let's check the few rejected answers, too
+    else if (priority === this.statusesByPriority.length) {
+      queryBuilder = queryBuilder
+        .andWhere("quiz_answer.id", "IN", rejected)
+        .andWhere("quiz_answer.status", "IN", this.statusesByPriority.flat())
+    } else {
+      return null
+    }
+
+    return queryBuilder
   }
 
   private static async markPreviousAsDeprecated(
