@@ -18,17 +18,24 @@ export const accessControl = (options?: AccessControlOptions) => {
       return next()
     }
 
+    const redisIsAvailable = redis !== null
+
     const token: string =
       ctx.headers.authorization.toLocaleLowerCase().replace("bearer ", "") || ""
 
     // attempt retrieval of user from cache
-    let user = JSON.parse((await redis.get(token)) as string)
+    let user
+    if (redisIsAvailable && redis.get) {
+      JSON.parse((await redis.get(token)) as string)
+    }
 
     if (!user) {
       try {
         // fetch user from TMC server and cache details
         user = await getCurrentUserDetails(token)
-        redis.setex(token, 3600, JSON.stringify(user))
+        if (redisIsAvailable && redis.setex) {
+          redis.setex(token, 3600, JSON.stringify(user))
+        }
       } catch (error) {
         throw new UnauthorizedError("unauthorized")
       }

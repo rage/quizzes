@@ -7,19 +7,32 @@ if (process.env.NODE_ENV !== "production") {
   dotenv.config({ path: ".env" })
 }
 
-export const client = redis.createClient({
-  host: process.env.REDIS_HOST,
-  port: Number.parseInt(process.env.REDIS_PORT as string, 10),
-  password: process.env.REDIS_PASSWORD && process.env.REDIS_PASSWORD,
-})
+let client = null
 
-const get = promisify(client.get).bind(client)
+/* Create client if variables available */
+if (process.env.REDIS_HOST && process.env.REDIS_PORT) {
+  client = redis.createClient({
+    host: process.env.REDIS_HOST,
+    port: Number.parseInt(process.env.REDIS_PORT as string, 10),
+    password: process.env.REDIS_PASSWORD && process.env.REDIS_PASSWORD,
+  })
+  client.on("error", err => {
+    console.log(err)
+  })
 
-const set = promisify(client.set).bind(client)
+  client.on("connect", () => {
+    console.log(
+      `Connected to Redis running on - HOST: ${process.env.REDIS_HOST} PORT: ${process.env.REDIS_PORT} `,
+    )
+  })
+}
 
-const setex = promisify(client.setex).bind(client)
+let get = client ? promisify(client.get).bind(client) : null
+let set = client ? promisify(client.get).bind(client) : null
+let setex = client ? promisify(client.setex).bind(client) : null
 
 export default {
+  client,
   get,
   set,
   setex,
