@@ -32,13 +32,17 @@ export const getAccessibleCourses = async (
     return await Course.getAll()
   }
   const userCourseRoles = await UserCourseRole.getByUserId(userInfo.id)
-  return await Promise.all(
+  const courses = await Promise.all(
     userCourseRoles.map(async userCourseRole => {
       if (abilitiesByRole[userCourseRole.role]?.includes(operation)) {
         return await Course.getById(userCourseRole.courseId)
       }
     }),
   )
+  if (courses.length === 0) {
+    throw new ForbiddenError("forbidden")
+  }
+  return courses
 }
 
 export const abilitiesByRole: { [role: string]: string[] } = {

@@ -3,8 +3,8 @@ import PeerReview from "./peer_review"
 import PeerReviewQuestion from "./peer_review_question"
 
 class PeerReviewQuestionAnswer extends Model {
-  question!: PeerReviewQuestion
   value!: number
+  question!: PeerReviewQuestion
   text!: string
 
   static get tableName() {

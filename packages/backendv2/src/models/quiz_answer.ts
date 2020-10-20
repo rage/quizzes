@@ -1,29 +1,43 @@
+import Knex from "knex"
 import { NotFoundError } from "./../util/error"
 import Model from "./base_model"
 import QuizItemAnswer from "./quiz_item_answer"
 import User from "./user"
-import UserQuizState from "./user_quiz_state"
 import PeerReview from "./peer_review"
-import { BadRequestError } from "../util/error"
-import PeerReviewQuestion from "./peer_review_question"
-import knex from "../../database/knex"
 import Quiz from "./quiz"
+import UserQuizState from "./user_quiz_state"
+import { BadRequestError } from "../util/error"
+import { removeNonPrintingCharacters } from "../util/tools"
+import knex from "../../database/knex"
+import Course from "./course"
+import PeerReviewQuestion from "./peer_review_question"
 import UserCoursePartState from "./user_course_part_state"
 import * as Kafka from "../services/kafka"
-import { Transaction } from "objection"
-import Course from "./course"
 
-interface CountObject {
-  quizId: number
-}
+type QuizAnswerStatus =
+  | "draft"
+  | "given-more-than-enough"
+  | "given-enough"
+  | "manual-review-once-given-and-received-enough"
+  | "manual-review-once-given-enough"
+  | "manual-review-once-received-enough"
+  | "manual-review-once-received-enough-given-more-than-enough"
+  | "submitted"
+  | "manual-review"
+  | "confirmed"
+  | "enough-received-but-not-given"
+  | "spam"
+  | "rejected"
+  | "deprecated"
 
 class QuizAnswer extends Model {
   id!: string
   userId!: number
   quizId!: string
   languageId!: string
-  status!: string
+  status!: QuizAnswerStatus
   itemAnswers!: QuizItemAnswer[]
+  user!: User
   peerReviews!: PeerReview[]
   userQuizState!: UserQuizState
   quiz!: Quiz
@@ -96,6 +110,13 @@ class QuizAnswer extends Model {
       }
     })
 
+    return quizAnswer
+  }
+
+  public static async getById2(quizAnswerId: string) {
+    const quizAnswer = await this.query()
+      .findById(quizAnswerId)
+      .withGraphFetched("itemAnswers.[optionAnswers]")
     return quizAnswer
   }
 
@@ -175,7 +196,10 @@ class QuizAnswer extends Model {
     return paginated
   }
 
-  public static async setManualReviewStatus(answerId: string, status: string) {
+  public static async setManualReviewStatus(
+    answerId: string,
+    status: QuizAnswerStatus,
+  ) {
     if (!["confirmed", "rejected"].includes(status)) {
       throw new BadRequestError("invalid status")
     }
@@ -280,71 +304,228 @@ class QuizAnswer extends Model {
     return states.map(state => state.status)
   }
 
-  public static async validatePeerReviewedAnswer(
-    quiz: Quiz,
-    quizAnswer: QuizAnswer,
-    userQuizState: UserQuizState,
-    trx: Transaction,
-    peerReviews: PeerReview[] = [],
-  ): Promise<QuizAnswer> {
-    const oldStatus = quizAnswer.status
-    const newStatus = await this.assessAnswerStatus(
-      quiz,
-      quizAnswer,
-      userQuizState,
-      peerReviews,
-    )
-
-    if (
-      (newStatus === "spam" || newStatus === "rejected") &&
-      !(quiz.triesLimited && userQuizState.tries >= quiz.tries)
-    ) {
-      userQuizState.spamFlags = 0
-      userQuizState.peerReviewsReceived = 0
-      userQuizState.pointsAwarded = 0
-      userQuizState.status = "open"
-    }
-
-    if (newStatus === "confirmed") {
-      // TODO: Different multiplier for quizzes that have varying quiz item types
-      userQuizState.pointsAwarded = 1 * quiz.points
-    }
-
-    quizAnswer.status = newStatus
-
-    await this.query(trx)
-      .update({ status: quizAnswer.status })
-      .where({ id: quizAnswer.id })
-
-    await UserQuizState.query(trx)
-      .update({
-        spamFlags: userQuizState.spamFlags,
-        peerReviewsReceived: userQuizState.peerReviewsReceived,
-        pointsAwarded: userQuizState.pointsAwarded,
-        status: userQuizState.status,
-      })
-      .where({ user_id: userQuizState.userId, quiz_id: userQuizState.quizId })
-
-    if (newStatus !== oldStatus) {
-      Kafka.broadcastQuizAnswerUpdated(quizAnswer, userQuizState, quiz, trx)
-    }
-
-    return await this.query().findById(quizAnswer.id)
-  }
-
   private static moveQuestionTextsToparent = (question: PeerReviewQuestion) => {
     question.title = question.texts[0].title
     question.body = question.texts[0].body
     return question
   }
 
+  public static async newAnswer(userId: number, quizAnswer: QuizAnswer) {
+    const trx = await knex.transaction()
+    try {
+      const quizId = quizAnswer.quizId
+      const isUserInDb = await User.getById(userId, trx)
+      if (!isUserInDb) {
+        quizAnswer.user = User.fromJson({ id: userId })
+      }
+      quizAnswer.userId = userId
+      const quiz = await Quiz.getById(quizId, trx)
+      const course = await Course.getById(quiz.courseId, trx)
+      quizAnswer.languageId = course.languageId
+      const userQuizState =
+        (await UserQuizState.getByUserAndQuiz(userId, quizId, trx)) ??
+        UserQuizState.fromJson({ userId, quizId })
+      this.checkIfSubmittable(quiz, userQuizState)
+      await this.assessAnswerStatus(
+        quizAnswer,
+        userQuizState,
+        quiz,
+        course,
+        trx,
+      )
+      this.assessAnswer(quizAnswer, quiz)
+      this.gradeAnswer(quizAnswer, userQuizState, quiz)
+      this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
+      let savedQuizAnswer
+      let savedUserQuizState
+      await this.markPreviousAsDeprecated(userId, quizId, trx)
+      savedQuizAnswer = await this.query(trx).upsertGraphAndFetch(quizAnswer)
+      savedUserQuizState = await UserQuizState.query(trx).upsertGraphAndFetch(
+        userQuizState,
+        {
+          insertMissing: true,
+        },
+      )
+      await trx.commit()
+      return {
+        quiz,
+        quizAnswer: savedQuizAnswer,
+        userQuizState: savedUserQuizState,
+      }
+    } catch (error) {
+      await trx.rollback()
+      throw new BadRequestError(error)
+    }
+  }
+
+  public static async update(
+    quizAnswer: QuizAnswer,
+    userQuizState: UserQuizState,
+    quiz: Quiz,
+    trx: Knex.Transaction,
+  ) {
+    const course = await Course.getById(quiz.courseId, trx)
+    await this.assessAnswerStatus(quizAnswer, userQuizState, quiz, course, trx)
+    this.assessAnswer(quizAnswer, quiz)
+    this.gradeAnswer(quizAnswer, userQuizState, quiz)
+    this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
+  }
+
+  private static checkIfSubmittable(quiz: Quiz, userQuizState: UserQuizState) {
+    if (userQuizState.status === "locked") {
+      throw new BadRequestError("already answered")
+    }
+    if (quiz.deadline && quiz.deadline < new Date()) {
+      throw new BadRequestError("no submission past deadline")
+    }
+  }
+
+  private static assessAnswer(quizAnswer: QuizAnswer, quiz: Quiz) {
+    const quizItemAnswers = quizAnswer.itemAnswers
+    const quizItems = quiz.items
+    if (!quizItemAnswers || quizItemAnswers.length != quizItems.length) {
+      throw new BadRequestError("item answers missing")
+    }
+    for (const quizItemAnswer of quizItemAnswers) {
+      const quizItem = quizItems.find(
+        item => item.id === quizItemAnswer.quizItemId,
+      )
+      if (!quizItem) {
+        throw new BadRequestError("invalid quiz item id")
+      }
+
+      switch (quizItem.type) {
+        case "open":
+          const textData = removeNonPrintingCharacters(quizItemAnswer.textData)
+            .replace(/\0/g, "")
+            .trim()
+          if (!textData) {
+            throw new BadRequestError("no answer provided")
+          }
+          const validityRegex = quizItem.validityRegex.trim()
+          const validator = new RegExp(validityRegex, "i")
+          quizItemAnswer.correct = validator.test(textData) ? true : false
+          break
+        case "essay":
+          if (quizAnswer.status === "confirmed") {
+            quizItemAnswer.correct = true
+          }
+          break
+        case "multiple-choice":
+          const quizOptionAnswers = quizItemAnswer.optionAnswers
+          const quizOptions = quizItem.options
+          if (
+            !quizOptionAnswers ||
+            quizOptionAnswers.length != quizOptions.length
+          ) {
+            throw new BadRequestError("option answers missing")
+          }
+          const correctOptionIds = quizOptions
+            .filter(quizOption => quizOption.correct === true)
+            .map(quizOption => quizOption.id)
+          const selectedCorrectOptions = quizOptionAnswers.filter(
+            quizOptionAnswer =>
+              correctOptionIds.includes(quizOptionAnswer.quizOptionId),
+          )
+          quizItemAnswer.correct = quizItem.multi
+            ? correctOptionIds.length === selectedCorrectOptions.length
+            : selectedCorrectOptions.length > 0
+          break
+        case "custom-frontend-accept-data":
+          break
+        case "checkbox":
+          quizItemAnswer.correct = true
+          break
+        case "scale":
+        case "research-agreement":
+        case "feedback":
+          quizItemAnswer.correct = true
+          break
+      }
+    }
+  }
+
   private static async assessAnswerStatus(
+    quizAnswer: QuizAnswer,
+    userQuizState: UserQuizState,
+    quiz: Quiz,
+    course: Course,
+    trx: Knex.Transaction,
+  ) {
+    const hasPeerReviews = quiz.peerReviews.length > 0
+    if (hasPeerReviews) {
+      const peerReviews = await quizAnswer.$relatedQuery("peerReviews", trx)
+      quizAnswer.status = this.assessAnswerWithPeerReviewsStatus(
+        quiz,
+        quizAnswer,
+        userQuizState,
+        peerReviews,
+        course,
+      )
+    } else {
+      quizAnswer.status = "confirmed"
+    }
+  }
+
+  private static gradeAnswer(
+    quizAnswer: QuizAnswer,
+    userQuizState: UserQuizState,
+    quiz: Quiz,
+  ) {
+    if (quizAnswer.status === "confirmed") {
+      if (quiz.awardPointsEvenIfWrong) {
+        userQuizState.pointsAwarded = quiz.points
+        return
+      }
+      const quizItemAnswers = quizAnswer.itemAnswers
+      const nCorrect = quizItemAnswers.filter(
+        itemAnswer => itemAnswer.correct === true,
+      ).length
+      const total = quizItemAnswers.length
+      const points = (nCorrect / total) * quiz.points
+      const pointsAwarded = userQuizState.pointsAwarded ?? 0
+      userQuizState.pointsAwarded =
+        points > pointsAwarded ? points : pointsAwarded
+    }
+  }
+
+  private static assessUserQuizStatus(
+    quizAnswer: QuizAnswer,
+    userQuizState: UserQuizState,
+    quiz: Quiz,
+  ) {
+    userQuizState.tries = (userQuizState.tries ?? 0) + 1
+    const hasTriesLeft = !quiz.triesLimited || userQuizState.tries < quiz.tries
+    const hasPeerReviews = quiz.peerReviews.length > 0
+    if (hasTriesLeft) {
+      if (hasPeerReviews) {
+        if (["rejected", "spam"].includes(quizAnswer.status)) {
+          userQuizState.peerReviewsReceived = null
+          userQuizState.spamFlags = null
+          userQuizState.status = "open"
+        } else {
+          userQuizState.status = "locked"
+        }
+        return
+      }
+      userQuizState.status = "open"
+    } else {
+      userQuizState.status = "locked"
+    }
+  }
+
+  public static assessAnswerWithPeerReviewsStatus(
     quiz: Quiz,
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
     peerReviews: PeerReview[],
-  ): Promise<string> {
-    const course = await Course.getById(quiz.courseId)
+    course: Course,
+  ): QuizAnswerStatus {
+    const status = quizAnswer.status || "submitted"
+
+    if (["confirmed", "rejected", "spam"].includes(status)) {
+      return status
+    }
 
     const autoConfirm = quiz.autoConfirm
     const autoReject = quiz.autoReject
@@ -352,21 +533,18 @@ class QuizAnswer extends Model {
     const maxSpamFlags = course.maxSpamFlags
     const maxReviewSpamFlags = course.maxReviewSpamFlags
 
-    const spamFlagsReceived = userQuizState.spamFlags
+    const spamFlagsReceived = userQuizState.spamFlags ?? 0
 
     const givenEnough =
       userQuizState.peerReviewsGiven >= course.minPeerReviewsGiven
-
     const givenExtra =
       userQuizState.peerReviewsGiven > course.minPeerReviewsGiven
-
     const receivedEnough =
-      userQuizState.peerReviewsReceived >= course.minPeerReviewsReceived
+      userQuizState.peerReviewsReceived ?? 0 >= course.minPeerReviewsReceived
 
     const flaggedButKeepInPeerReviewPool =
       spamFlagsReceived >= maxSpamFlags &&
       spamFlagsReceived < maxReviewSpamFlags
-
     const flaggedAndRemoveFromPeerReviewPool =
       spamFlagsReceived >= maxReviewSpamFlags
 
@@ -400,7 +578,7 @@ class QuizAnswer extends Model {
     }
 
     if (!givenEnough && !receivedEnough) {
-      return quizAnswer.status
+      return status
     }
 
     if (!givenEnough && receivedEnough) {
@@ -425,10 +603,10 @@ class QuizAnswer extends Model {
 
       if (answers.length === 0) {
         console.warn("Assessing an essay with 0 numeric peer review answers")
-        return quizAnswer.status
+        return status
       }
 
-      if (sum / answers.length >= course.minReviewAverage) {
+      if (sum / answers.length >= quiz.course.minReviewAverage) {
         return "confirmed"
       } else if (autoReject) {
         return "rejected"
@@ -438,8 +616,18 @@ class QuizAnswer extends Model {
     }
 
     // TODO: if not auto confirm move to manual review once widget smart enough
+    return status
+  }
 
-    return quizAnswer.status
+  private static async markPreviousAsDeprecated(
+    userId: number,
+    quizId: string,
+    trx: Knex.Transaction,
+  ) {
+    await this.query(trx)
+      .update({ status: "deprecated" })
+      .where("user_id", userId)
+      .andWhere("quiz_id", quizId)
   }
 }
 

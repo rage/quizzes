@@ -5,20 +5,21 @@ import CourseTranslation from "./course_translation"
 import { v4 } from "uuid"
 import knex from "../../database/knex"
 import stringify from "csv-stringify"
+import Knex from "knex"
 
 class Course extends Model {
   id!: string
   moocfiId!: string
   minPeerReviewsGiven!: number
   minPeerReviewsReceived!: number
+  maxSpamFlags!: number
+  maxReviewSpamFlags!: number
+  minReviewAverage!: number
   texts!: CourseTranslation[]
   languageId!: string
   title!: string
   body!: string
   abbreviation!: string
-  maxSpamFlags!: number
-  maxReviewSpamFlags!: number
-  minReviewAverage!: number
 
   static get tableName() {
     return "course"
@@ -58,13 +59,22 @@ class Course extends Model {
     return course
   }
 
-  static async getById(id: string) {
-    const course = (
-      await this.query()
-        .withGraphJoined("texts")
-        .where("id", id)
-        .limit(1)
-    )[0]
+  static async getById(id: string, trx?: Knex.Transaction) {
+    return this.moveTextsToParent(
+      (
+        await this.query(trx)
+          .withGraphJoined("texts")
+          .where("id", id)
+      )[0],
+    )
+  }
+
+  static async getAll() {
+    const courses = await this.query().withGraphJoined("texts")
+    return courses.map(course => this.moveTextsToParent(course))
+  }
+
+  private static moveTextsToParent(course: any) {
     const text = course.texts[0]
     course.languageId = text.languageId
     course.title = text.title
@@ -72,19 +82,6 @@ class Course extends Model {
     course.abbreviation = text.abbreviation
     delete course.texts
     return course
-  }
-
-  static async getAll() {
-    const courses = await this.query().withGraphJoined("texts")
-    return courses.map(course => {
-      const text = course.texts[0]
-      course.languageId = text.languageId
-      course.title = text.title
-      course.body = text.body
-      course.abbreviation = text.abbreviation
-      delete course.texts
-      return course
-    })
   }
 
   static async duplicateCourse(

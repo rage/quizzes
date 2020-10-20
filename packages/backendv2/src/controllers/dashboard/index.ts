@@ -28,7 +28,7 @@ const dashboard = new Router<CustomState, CustomContext>({
   .post("/quizzes", accessControl(), async ctx => {
     await checkAccessOrThrow(ctx.state.user, ctx.request.body.courseId, "edit")
     const quizData = ctx.request.body
-    ctx.body = await Quiz.saveQuiz(quizData)
+    ctx.body = await Quiz.save(quizData)
   })
 
   .get("/quizzes/:quizId", accessControl(), async ctx => {
