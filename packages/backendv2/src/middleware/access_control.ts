@@ -30,7 +30,7 @@ export const accessControl = (options?: AccessControlOptions) => {
     }
 
     // catches null and undefined
-    if (user !== null) {
+    if (user === null) {
       try {
         // fetch user from TMC server and cache details
         user = await getCurrentUserDetails(token)
