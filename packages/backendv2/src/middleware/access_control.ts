@@ -24,12 +24,13 @@ export const accessControl = (options?: AccessControlOptions) => {
       ctx.headers.authorization.toLocaleLowerCase().replace("bearer ", "") || ""
 
     // attempt retrieval of user from cache
-    let user
+    let user = null
     if (redisIsAvailable && redis.get) {
-      JSON.parse((await redis.get(token)) as string)
+      user = JSON.parse((await redis.get(token)) as string)
     }
 
-    if (!user) {
+    // catches null and undefined
+    if (user !== null) {
       try {
         // fetch user from TMC server and cache details
         user = await getCurrentUserDetails(token)
