@@ -4,7 +4,11 @@ import { Alert } from "@material-ui/lab"
 import { FormHelperText, MenuItem } from "@material-ui/core"
 import { useRouter } from "next/router"
 import usePromise from "react-use-promise"
-import { fetchCourseQuizzes, fetchLanguages } from "../../services/quizzes"
+import {
+  fetchCourseQuizzes,
+  fetchLanguages,
+  updateCourseProperties,
+} from "../../services/quizzes"
 import {
   Button,
   Card,
@@ -47,11 +51,11 @@ const Content = styled(CardContent)`
 
 export const EditDetailsForm = ({
   initialValues,
-  apiUrl,
+  courseId,
   languageIds,
 }: {
   initialValues: EditCoursePayloadFields
-  apiUrl: string
+  courseId: string
   languageIds: string[]
 }) => {
   const [saved, setSaved] = useState<string | null>(null)
@@ -77,12 +81,8 @@ export const EditDetailsForm = ({
     }
 
     if (!_.isEmpty(changedProperties)) {
-      await axios
-        .post(apiUrl, changedProperties)
-        .then(res => setSaved(Object.keys(changedProperties).toString()))
-        .catch(e => {
-          console.log(e)
-        })
+      await updateCourseProperties(courseId, changedProperties)
+      setSaved(Object.keys(changedProperties).toString())
     }
   }
 
@@ -150,14 +150,14 @@ export const EditDetailsForm = ({
                 error={errors.abbreviation}
                 helperText={errors.abbreviation}
               />
-              <Field
+              {/* <Field
                 name="courseId"
                 type="string"
                 as={TextField}
                 label="Id"
                 error={errors.courseId}
                 helperText={errors.courseId}
-              />
+              /> */}
               <Field
                 name="moocfiId"
                 type="string"
@@ -210,12 +210,6 @@ const EditCourseDetails = () => {
     [],
   )
 
-  const DASHBOARD_API = `/api/v2/dashboard/courses/${id}/`
-  const HOST =
-    process.env.NODE_ENV === "production"
-      ? "https://quizzes.mooc.fi"
-      : "http://localhost:3003"
-
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     { label: `${courseData ? courseData.course.title : ""}` },
@@ -254,7 +248,7 @@ const EditCourseDetails = () => {
       </Card>
       <EditDetailsForm
         initialValues={initialValues}
-        apiUrl={HOST + DASHBOARD_API + "edit"}
+        courseId={id}
         languageIds={languageIds}
       />
     </>
