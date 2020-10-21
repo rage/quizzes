@@ -28,7 +28,7 @@ const widget = new Router<CustomState, CustomContext>({
 
     // check that answerId exists
     try {
-      await QuizAnswer.getById(answerId)
+      await QuizAnswer.getByIdWithPeerReviews(answerId)
     } catch (error) {
       throw error
     }
@@ -58,6 +58,12 @@ const widget = new Router<CustomState, CustomContext>({
     const quizAnswerId = ctx.request.body.quizAnswerId
     const userId = ctx.state.user.id
     ctx.body = await SpamFlag.reportSpam(quizAnswerId, userId)
+  })
+
+  .get("/answers/:quizId/get-candidates", accessControl(), async ctx => {
+    const quizId = ctx.params.quizId
+    const userId = ctx.state.user.id
+    ctx.body = await QuizAnswer.getAnswersToReview(userId, quizId)
   })
 
 export default widget
