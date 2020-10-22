@@ -107,11 +107,11 @@ class PeerReview extends Model {
       )
 
       await QuizAnswer.update(quizAnswer, sourceUserQuizState, quiz, trx)
-      await QuizAnswer.update(quizAnswer, targetUserQuizState, quiz, trx)
 
       await QuizAnswer.query(trx).upsertGraph(quizAnswer)
 
       await UserQuizState.query(trx).upsertGraph(sourceUserQuizState)
+      await UserQuizState.query(trx).upsertGraph(targetUserQuizState)
 
       trx.commit()
 
