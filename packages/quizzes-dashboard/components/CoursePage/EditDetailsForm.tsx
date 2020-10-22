@@ -212,8 +212,9 @@ const EditCourseDetails = () => {
 
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
-    { label: `${courseData ? courseData.course.title : ""}` },
-    { label: `edit` },
+    {
+      label: `${courseData ? courseData.course.title : ""}`,
+    },
   ])
 
   if (courseFetchError || languagesFetchError) {

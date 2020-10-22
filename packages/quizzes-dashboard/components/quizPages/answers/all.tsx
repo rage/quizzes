@@ -105,7 +105,7 @@ export const AllAnswers = () => {
     { label: "Courses", as: "/", href: "/" },
     {
       label: `${course ? course.title : ""}`,
-      as: `/courses/${quiz?.courseId}`,
+      as: `/courses/${quiz?.courseId}/listing`,
       href: "/courses/[courseId]/[...page]",
     },
     {

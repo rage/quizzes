@@ -8,7 +8,6 @@ import { Doughnut } from "react-chartjs-2"
 import _ from "lodash"
 
 const AnswerStatsContainer = styled.div`
-  dispaly: flex;
   flex-wrap: wrap;
   width: 100%;
   padding: 1rem;
