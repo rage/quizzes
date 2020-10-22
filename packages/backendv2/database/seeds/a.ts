@@ -483,4 +483,17 @@ export async function seed(knex: Knex): Promise<any> {
       },
     ]),
   ])
+
+  await knex.raw("? ON CONFLICT (user_id, course_id, course_part) DO NOTHING", [
+    knex("user_course_part_state").insert([
+      {
+        user_id: 2345,
+        course_id: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+        course_part: 1,
+        progress: 0,
+        score: 0,
+        completed: false,
+      },
+    ]),
+  ])
 }

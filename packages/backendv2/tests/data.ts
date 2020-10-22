@@ -671,4 +671,13 @@ export default {
     createdAt: expect.stringMatching(dateTime),
     updatedAt: expect.stringMatching(dateTime),
   },
+
+  userProgressValidator: [
+    {
+      group: "osa01",
+      progress: 0,
+      n_points: 0,
+      max_points: 1,
+    },
+  ],
 }

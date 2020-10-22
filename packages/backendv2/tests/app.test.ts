@@ -838,3 +838,68 @@ describe("Answer: spam flags", () => {
       .expect(200, done)
   })
 })
+
+describe("test user progress", () => {
+  beforeAll(() => {
+    return safeSeed({
+      directory: "./database/seeds",
+      specific: "a.ts",
+    })
+  })
+
+  afterAll(() => {
+    nock.cleanAll()
+    return safeClean()
+  })
+
+  beforeEach(() => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 2345,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("no user progress", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/current/progress",
+      )
+      .set("Authorization", "bearer PLEB_TOKEN")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual([])
+      })
+      .expect(200, done)
+  })
+
+  test("user progress", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/user/current/progress",
+      )
+      .set("Authorization", "bearer PLEB_TOKEN")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual(data.userProgressValidator)
+      })
+      .expect(200, done)
+  })
+})
