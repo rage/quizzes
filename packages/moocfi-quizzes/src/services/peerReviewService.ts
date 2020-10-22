@@ -7,14 +7,14 @@ import {
   IReceivedPeerReview,
 } from "../modelTypes"
 
-export const getPeerReviewInfo = async (
+export const getPeerReviewCandidates = async (
   quizId: string,
   languageId: string,
   accessToken: string,
   address?: string,
 ): Promise<QuizAnswer[]> => {
   const response = await axios.get(
-    `${address || BASE_URL}/api/v1/quizzes/peerreview/${quizId}/${languageId}`,
+    `${address || BASE_URL}/api/v2/widget/answers/${quizId}/get-candidates`,
     { headers: { authorization: `Bearer ${accessToken}` } },
   )
 
@@ -27,8 +27,7 @@ export const getReceivedReviews = async (
   address?: string,
 ): Promise<Array<IReceivedPeerReview>> => {
   const response = await axios.get(
-    `${address ||
-      BASE_URL}/api/v1/quizzes/peerreview/received/${quizAnswerId}?stripped=true`,
+    `${address || BASE_URL}/api/v2/widget/answers/${quizAnswerId}peer-reviews`,
     { headers: { authorization: `Bearer ${accessToken}` } },
   )
 
@@ -47,7 +46,7 @@ export const postSpamFlag = async (
   address?: string,
 ): Promise<SpamFlag> => {
   let response = await axios.post(
-    `${address || BASE_URL}/api/v1/quizzes/spamflag`,
+    `${address || BASE_URL}/api/v2/widget/answers/report-spam`,
     { quizAnswerId },
     { headers: { authorization: `Bearer ${accessToken}` } },
   )

@@ -92,7 +92,7 @@ const Scale: React.FunctionComponent<ScaleProps> = ({ item }) => {
         >
           <StyledFormLabel>
             <MarkdownText Component={Typography} variant="body1" id="info">
-              {item.texts[0].title}
+              {item.title}
             </MarkdownText>
           </StyledFormLabel>
         </SmallCenteredGrid>
@@ -124,8 +124,8 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
 
   const answerLocked = userQuizState && userQuizState.status === "locked"
-  const minLabel = item.texts[0].minLabel
-  const maxLabel = item.texts[0].maxLabel
+  const minLabel = item.minLabel
+  const maxLabel = item.maxLabel
   const theme = useTheme()
 
   if (item.minValue && item.maxValue) {
@@ -151,8 +151,8 @@ const ScaleOptions: React.FunctionComponent<ScaleOptionsProps> = ({
       <WideGridItem>
         <RadioGroup
           row={true}
-          aria-label={item.texts[0].title}
-          name={item.texts[0].title}
+          aria-label={item.title}
+          name={item.title}
           value={`${intData}`}
           onChange={handleIntDataChange}
           aria-describedy="info "

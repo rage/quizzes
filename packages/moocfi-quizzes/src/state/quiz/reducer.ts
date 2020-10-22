@@ -23,7 +23,7 @@ export const quizReducer = (
       if (!state) {
         return state
       }
-      let newTexts = state && { ...state.texts[0] }
+      let newTexts = state && { ...state }
       if (!newTexts) {
         return state
       }

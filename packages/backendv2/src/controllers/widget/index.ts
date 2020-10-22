@@ -1,7 +1,14 @@
 import Router from "koa-router"
 import knex from "../../../database/knex"
 import { CustomContext, CustomState } from "../../types"
-import { Quiz, QuizAnswer, User, PeerReview } from "../../models/"
+import {
+  Quiz,
+  QuizAnswer,
+  User,
+  PeerReview,
+  UserQuizState,
+  Course,
+} from "../../models/"
 import accessControl from "../../middleware/access_control"
 import SpamFlag from "../../models/spam_flag"
 
@@ -11,7 +18,17 @@ const widget = new Router<CustomState, CustomContext>({
 
   .get("/quizzes/:quizId", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    ctx.body = await Quiz.getById(quizId)
+    const user = ctx.state.user
+    const userQuizState = await UserQuizState.getByUserAndQuiz(user.id, quizId)
+    const quizAnswer = await QuizAnswer.getByUserAndQuiz(user.id, quizId)
+    const quiz = await Quiz.getById(quizId)
+    const course = await Course.getById(quiz.courseId)
+    quiz.course = course
+    ctx.body = {
+      quiz,
+      quizAnswer,
+      userQuizState,
+    }
   })
 
   .get(

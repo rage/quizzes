@@ -22,8 +22,8 @@ const Feedback: React.FunctionComponent<FeedbackProps> = ({ item }) => {
 
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const answerLocked = userQuizState && userQuizState.status === "locked"
-  const itemTitle = item.texts[0].title
-  const itemBody = item.texts[0].body
+  const itemTitle = item.title
+  const itemBody = item.body
 
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
 

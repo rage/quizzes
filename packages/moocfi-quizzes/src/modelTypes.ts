@@ -62,22 +62,6 @@ export type QuizAnswer = {
   itemAnswers: QuizItemAnswer[]
 }
 
-export type QuizText = {
-  quizId: string
-  languageId: string
-  title: string
-  body: string
-  submitMessage: string
-}
-
-export type CourseText = {
-  courseId: string
-  languageId: string
-  abbreviation: string
-  title: string
-  body: string
-}
-
 export type CourseLanguage = {
   id: string
   country: string
@@ -94,16 +78,9 @@ export type Course = {
   maxSpamFlags: number
   maxReviewSpamFlags: number
   languages: CourseLanguage[]
-  texts: CourseText[]
-}
-
-export type QuizItemOptionText = {
-  quizOptionId: string
-  languageId: string
+  abbreviation: string
   title: string
   body: string
-  successMessage: string
-  failureMessage: string
 }
 
 export type QuizItemOption = {
@@ -111,19 +88,10 @@ export type QuizItemOption = {
   quizItemId: string
   order: number
   correct: boolean
-  texts: QuizItemOptionText[]
-}
-
-export type QuizItemText = {
-  quizItemId: string
-  languageId: string
   title: string
   body: string
   successMessage: string
   failureMessage: string
-  minLabel: string
-  maxLabel: string
-  sharedOptionFeedbackMessage?: string
 }
 
 export type QuizItem = {
@@ -138,22 +106,14 @@ export type QuizItem = {
   formatRegex: string
   usesSharedOptionFeedbackMessage: boolean
   multi: boolean
-  texts: QuizItemText[]
   options: QuizItemOption[]
-}
-
-export type PeerReviewQuestionText = {
-  peerReviewQuestionId: string
-  languageId: string
   title: string
   body: string
-}
-
-export type PeerReviewCollectionText = {
-  peerReviewCollectionId: string
-  languageId: string
-  title: string
-  body: string
+  successMessage: string
+  failureMessage: string
+  minLabel: string
+  maxLabel: string
+  sharedOptionFeedbackMessage?: string
 }
 
 export type PeerReviewQuestion = {
@@ -164,14 +124,16 @@ export type PeerReviewQuestion = {
   type: "grade" | "essay"
   answerRequired: boolean
   order: number
-  texts: PeerReviewQuestionText[]
+  title: string
+  body: string
 }
 
 export type PeerReviewCollection = {
   id: string
   quizId: string
   questions: PeerReviewQuestion[]
-  texts: PeerReviewCollectionText[]
+  title: string
+  body: string
 }
 
 export type Quiz = {
@@ -186,7 +148,6 @@ export type Quiz = {
   excludedFromScore: boolean
   createdAt: Date
   updatedAt: Date
-  texts: QuizText[]
   course: Course
   items: QuizItem[]
   peerReviewCollections: PeerReviewCollection[]
@@ -194,6 +155,9 @@ export type Quiz = {
   triesLimited: boolean
   grantPointsPolicy: QuizPointsGrantingPolicy
   awardPointsEvenIfWrong: boolean
+  title: string
+  body: string
+  submitMessage: string
 }
 
 export type PeerReviewGradeAnswer = {

@@ -130,6 +130,16 @@ class QuizAnswer extends Model {
     return quizAnswer
   }
 
+  public static async getByUserAndQuiz(userId: number, quizId: string) {
+    return (
+      await this.query()
+        .withGraphFetched("itemAnswers.[optionAnswers]")
+        .where("user_id", userId)
+        .andWhere("quiz_id", quizId)
+        .andWhereNot("status", "deprecated")
+    )[0]
+  }
+
   public static async getPaginatedByQuizId(
     quizId: string,
     page: number,

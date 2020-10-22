@@ -2,7 +2,7 @@ import { ActionCreator } from "redux"
 import { createAction } from "typesafe-actions"
 import { PeerReviewsState } from "./reducer"
 import {
-  getPeerReviewInfo,
+  getPeerReviewCandidates,
   postPeerReview,
   postSpamFlag,
 } from "../../services/peerReviewService"
@@ -64,8 +64,8 @@ export const changeGrade: ActionCreator<ThunkAction> = (
   peerReviewQuestionId: string,
   value: number,
 ) => (dispatch, getState) => {
-  const peerReviewCollection = getState().quiz?.peerReviewCollections.find(
-    prc => prc.questions.some(q => q.id === peerReviewQuestionId),
+  const peerReviewCollection = getState().quiz?.peerReviews.find(prc =>
+    prc.questions.some(q => q.id === peerReviewQuestionId),
   )
   if (!peerReviewCollection) {
     console.log("No answer that matches the id of the reviewed answer")
@@ -78,8 +78,8 @@ export const changeText: ActionCreator<ThunkAction> = (
   peerReviewQuestionId: string,
   text: string,
 ) => (dispatch, getState) => {
-  const peerReviewCollection = getState().quiz?.peerReviewCollections.find(
-    prc => prc.questions.some(q => q.id === peerReviewQuestionId),
+  const peerReviewCollection = getState().quiz?.peerReviews.find(prc =>
+    prc.questions.some(q => q.id === peerReviewQuestionId),
   )
   if (!peerReviewCollection) {
     console.log("No answer that matches the id of the reviewed answer")
@@ -134,7 +134,7 @@ export const selectAnswerToReview: ActionCreator<ThunkAction> = (
   }
 
   const userId = user.userQuizState.userId
-  const prc = getState().quiz?.peerReviewCollections[0]
+  const prc = getState().quiz?.peerReviews[0]
   dispatch(
     selectAnswer(
       quizAnswerId,
@@ -177,7 +177,7 @@ export const fetchPeerReviewAlternatives: ActionCreator<ThunkAction> = () => asy
     const languageId = getState().language.languageId
 
     const address = getState().backendAddress
-    const answerAlternatives = await getPeerReviewInfo(
+    const answerAlternatives = await getPeerReviewCandidates(
       quiz?.id || "",
       languageId,
       accessToken,
