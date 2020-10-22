@@ -58,25 +58,29 @@ class PeerReview extends Model {
       }
     })
 
-    const { quizAnswerId, userId } = peerReview
+    const { quizAnswerId, userId: sourceUserId } = peerReview
 
     // check if peer review already given by this user for this quiz answer
     const peerReviewAlreadyGiven = await this.getByUserIdAndQuizAnswerId(
-      userId,
+      sourceUserId,
       quizAnswerId,
     )
     if (peerReviewAlreadyGiven) {
       throw new BadRequestError("Answer can only be peer reviewed once")
     }
 
-    const quizAnswer = await QuizAnswer.getById(quizAnswerId)
+    const sourceQuizAnswer = await QuizAnswer.getByUserAndQuiz(
+      sourceUserId,
+      quizAnswerId,
+    )
+    const targetQuizAnswer = await QuizAnswer.getById(quizAnswerId)
 
-    const { userId: targetUserId } = quizAnswer
+    const { userId: targetUserId } = targetQuizAnswer
 
-    const quiz = await Quiz.getById(quizAnswer.quizId)
+    const quiz = await Quiz.getById(targetQuizAnswer.quizId)
 
     const sourceUserQuizState = await UserQuizState.getByUserAndQuiz(
-      userId,
+      sourceUserId,
       quiz.id,
     )
     const targetUserQuizState = await UserQuizState.getByUserAndQuiz(
@@ -100,16 +104,22 @@ class PeerReview extends Model {
     const trx = await knex.transaction()
 
     try {
+      // create the peer review
       const newPeerReview = await this.query(trx).insertAndFetch(
         this.fromJson({
           peerReview,
         }),
       )
 
-      await QuizAnswer.update(quizAnswer, sourceUserQuizState, quiz, trx)
+      // update quiz answers for both users
+      await QuizAnswer.update(sourceQuizAnswer, sourceUserQuizState, quiz, trx)
+      await QuizAnswer.update(targetQuizAnswer, targetUserQuizState, quiz, trx)
 
-      await QuizAnswer.query(trx).upsertGraph(quizAnswer)
+      // TODO: upsert needed until QuizAnswer.update() saves to db
+      await QuizAnswer.query(trx).upsertGraph(sourceQuizAnswer)
+      await QuizAnswer.query(trx).upsertGraph(targetQuizAnswer)
 
+      // update quiz states for both users
       await UserQuizState.query(trx).upsertGraph(sourceUserQuizState)
       await UserQuizState.query(trx).upsertGraph(targetUserQuizState)
 

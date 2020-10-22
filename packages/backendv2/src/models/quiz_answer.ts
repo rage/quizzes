@@ -779,6 +779,15 @@ class QuizAnswer extends Model {
       .where("user_id", userId)
       .andWhere("quiz_id", quizId)
   }
+
+  public static async getByUserAndQuiz(userId: number, quizId: string) {
+    return (
+      await this.query()
+        .where("user_id", userId)
+        .andWhere("quiz_id", quizId)
+        .andWhereNot("status", "deprecated")
+    )[0]
+  }
 }
 
 export default QuizAnswer
