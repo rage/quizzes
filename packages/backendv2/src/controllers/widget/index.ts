@@ -66,4 +66,11 @@ const widget = new Router<CustomState, CustomContext>({
     ctx.body = await QuizAnswer.getAnswersToReview(userId, quizId)
   })
 
+  .post("/answers/:answerId/give-review", accessControl(), async ctx => {
+    const userId = ctx.state.user.id
+    const peerReview = ctx.request.body.peerReview
+    peerReview.userId = userId
+    ctx.body = await PeerReview.givePeerReview(peerReview)
+  })
+
 export default widget
