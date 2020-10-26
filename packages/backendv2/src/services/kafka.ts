@@ -27,10 +27,7 @@ const connect = () => {
 }
 
 const produce = async (
-  topic:
-    | "user-course-progress-realtime"
-    | "exercise"
-    | "user-points-realtime",
+  topic: "user-course-progress-realtime" | "exercise" | "user-points-realtime",
   message: ProgressMessage | QuizAnswerMessage | QuizMessage,
 ) => {
   if (process.env.NODE_ENV === "test") {
