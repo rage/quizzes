@@ -28,10 +28,9 @@ export const selectAnswer = createAction(
   resolve => {
     return (
       quizAnswerId: string,
-      userId: number,
       peerReviewCollectionId: string,
       questionIds: string[],
-    ) => resolve({ quizAnswerId, userId, peerReviewCollectionId, questionIds })
+    ) => resolve({ quizAnswerId, peerReviewCollectionId, questionIds })
   },
 )
 
@@ -138,7 +137,6 @@ export const selectAnswerToReview: ActionCreator<ThunkAction> = (
   dispatch(
     selectAnswer(
       quizAnswerId,
-      userId,
       prc?.id || "",
       prc?.questions.map(q => q.id) || [],
     ),

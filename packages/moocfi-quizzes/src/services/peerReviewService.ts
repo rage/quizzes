@@ -27,7 +27,7 @@ export const getReceivedReviews = async (
   address?: string,
 ): Promise<Array<IReceivedPeerReview>> => {
   const response = await axios.get(
-    `${address || BASE_URL}/api/v2/widget/answers/${quizAnswerId}peer-reviews`,
+    `${address || BASE_URL}/api/v2/widget/answers/${quizAnswerId}/peer-reviews`,
     { headers: { authorization: `Bearer ${accessToken}` } },
   )
 
@@ -59,7 +59,7 @@ export const postPeerReview = async (
   address?: string,
 ): Promise<{ quizAnswer: QuizAnswer; userQuizState: UserQuizState }> => {
   const response = await axios.post(
-    `${address || BASE_URL}/api/v1/quizzes/peerreview`,
+    `${address || BASE_URL}/api/v2/widget/answers/give-review`,
     peerReview,
     { headers: { authorization: `Bearer ${accessToken}` } },
   )

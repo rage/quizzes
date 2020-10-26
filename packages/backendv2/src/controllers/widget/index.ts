@@ -4,13 +4,12 @@ import { CustomContext, CustomState } from "../../types"
 import {
   Quiz,
   QuizAnswer,
-  User,
   PeerReview,
   UserQuizState,
   Course,
+  SpamFlag,
 } from "../../models/"
 import accessControl from "../../middleware/access_control"
-import SpamFlag from "../../models/spam_flag"
 
 const widget = new Router<CustomState, CustomContext>({
   prefix: "/widget",
@@ -18,9 +17,9 @@ const widget = new Router<CustomState, CustomContext>({
 
   .get("/quizzes/:quizId", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    const user = ctx.state.user
-    const userQuizState = await UserQuizState.getByUserAndQuiz(user.id, quizId)
-    const quizAnswer = await QuizAnswer.getByUserAndQuiz(user.id, quizId)
+    const userId = ctx.state.user.id
+    const userQuizState = await UserQuizState.getByUserAndQuiz(userId, quizId)
+    const quizAnswer = await QuizAnswer.getByUserAndQuiz(userId, quizId)
     const quiz = await Quiz.getById(quizId)
     const course = await Course.getById(quiz.courseId)
     quiz.course = course
@@ -83,9 +82,9 @@ const widget = new Router<CustomState, CustomContext>({
     ctx.body = await QuizAnswer.getAnswersToReview(userId, quizId)
   })
 
-  .post("/answers/:answerId/give-review", accessControl(), async ctx => {
+  .post("/answers/give-review", accessControl(), async ctx => {
     const userId = ctx.state.user.id
-    const peerReview = ctx.request.body.peerReview
+    const peerReview = ctx.request.body
     peerReview.userId = userId
     ctx.body = await PeerReview.givePeerReview(peerReview)
   })

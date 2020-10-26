@@ -1,4 +1,3 @@
-import { TPeerReviewGiven, TPeerReviewQuestionAnswer } from "./../types/index"
 import { BadRequestError } from "./../util/error"
 import Model from "./base_model"
 import QuizAnswer from "./quiz_answer"
@@ -9,6 +8,7 @@ import PeerReviewQuestion from "./peer_review_question"
 import knex from "../../database/knex"
 
 class PeerReview extends Model {
+  userId!: number
   quizAnswerId!: string
   rejectedQuizAnswerIds!: string[]
   answers!: PeerReviewQuestionAnswer[]
@@ -45,9 +45,7 @@ class PeerReview extends Model {
     return peerReviews
   }
 
-  public static async givePeerReview(
-    peerReview: TPeerReviewGiven,
-  ): Promise<PeerReview | BadRequestError> {
+  public static async givePeerReview(peerReview: PeerReview) {
     // TODO: type callback argument ?
     peerReview.answers.forEach((answer: any): void => {
       if (answer.text) {
@@ -69,23 +67,27 @@ class PeerReview extends Model {
       throw new BadRequestError("Answer can only be peer reviewed once")
     }
 
+    const targetQuizAnswer = await QuizAnswer.getById(quizAnswerId)
+
+    const quizId = targetQuizAnswer.quizId
+
     const sourceQuizAnswer = await QuizAnswer.getByUserAndQuiz(
       sourceUserId,
-      quizAnswerId,
+      quizId,
     )
-    const targetQuizAnswer = await QuizAnswer.getById(quizAnswerId)
+
+    const quiz = await Quiz.getById(quizId)
+    quiz.course = await quiz.$relatedQuery("course")
 
     const { userId: targetUserId } = targetQuizAnswer
 
-    const quiz = await Quiz.getById(targetQuizAnswer.quizId)
-
     const sourceUserQuizState = await UserQuizState.getByUserAndQuiz(
       sourceUserId,
-      quiz.id,
+      quizId,
     )
     const targetUserQuizState = await UserQuizState.getByUserAndQuiz(
       targetUserId,
-      quiz.id,
+      quizId,
     )
 
     // increment peer review stats for both source and target users
@@ -105,10 +107,8 @@ class PeerReview extends Model {
 
     try {
       // create the peer review
-      const newPeerReview = await this.query(trx).insertAndFetch(
-        this.fromJson({
-          peerReview,
-        }),
+      const newPeerReview = await this.query(trx).insertGraphAndFetch(
+        this.fromJson(peerReview),
       )
 
       // update quiz answers for both users
@@ -125,7 +125,11 @@ class PeerReview extends Model {
 
       trx.commit()
 
-      return newPeerReview
+      return {
+        peerReview: newPeerReview,
+        quizAnswer: sourceQuizAnswer,
+        userQuizState: sourceUserQuizState,
+      }
     } catch (err) {
       trx.rollback()
       throw new BadRequestError(err)
@@ -138,10 +142,7 @@ class PeerReview extends Model {
   ): Promise<PeerReview | undefined> {
     return (
       await this.query()
-        .select("*")
         .where({ user_id: userId, quiz_answer_id: quizAnswerId })
-        .withGraphFetched("user")
-        .withGraphFetched("quizAnswer")
         .limit(1)
     )[0]
   }

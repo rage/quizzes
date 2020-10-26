@@ -434,10 +434,7 @@ class QuizAnswer extends Model {
         case "multiple-choice":
           const quizOptionAnswers = quizItemAnswer.optionAnswers
           const quizOptions = quizItem.options
-          if (
-            !quizOptionAnswers ||
-            quizOptionAnswers.length != quizOptions.length
-          ) {
+          if (!quizOptionAnswers || quizOptionAnswers.length === 0) {
             throw new BadRequestError("option answers missing")
           }
           const correctOptionIds = quizOptions
@@ -474,7 +471,9 @@ class QuizAnswer extends Model {
   ) {
     const hasPeerReviews = quiz.peerReviews.length > 0
     if (hasPeerReviews) {
-      const peerReviews = await quizAnswer.$relatedQuery("peerReviews", trx)
+      const peerReviews = await PeerReview.query(trx)
+        .where("quiz_answer_id", quizAnswer.id)
+        .withGraphJoined("answers")
       quizAnswer.status = this.assessAnswerWithPeerReviewsStatus(
         quiz,
         quizAnswer,
@@ -667,8 +666,6 @@ class QuizAnswer extends Model {
     let candidates
     let priority = 0
 
-    console.count("kissa")
-
     while (allCandidates.length < 2) {
       candidates = await this.getCandidates(
         priority,
@@ -788,15 +785,6 @@ class QuizAnswer extends Model {
       .update({ status: "deprecated" })
       .where("user_id", userId)
       .andWhere("quiz_id", quizId)
-  }
-
-  public static async getByUserAndQuiz(userId: number, quizId: string) {
-    return (
-      await this.query()
-        .where("user_id", userId)
-        .andWhere("quiz_id", quizId)
-        .andWhereNot("status", "deprecated")
-    )[0]
   }
 }
 
