@@ -57,9 +57,9 @@ const frenchLabels: SingleLanguageLabels = {
     answerConfirmed: "Votre réponse a été confirmée !",
     manualReview:
       "Votre réponse est en cours d'examen par le personnel du cours",
-    peerReviewGroupTitle: "Vertaisarviointikysymykset",
+    peerReviewGroupTitle: "Peer review questions",
     peerReviewLikertDetails:
-      "Arvioi jokainen väite asteikolla 1-5. 1 on vahvasti eri mieltä ja 5 on vahvasti samaa mieltä.",
+      "Evaluate each statement on a scale of 1-5. 1 means strongly disagree, 5 means strongly agree.",
   },
   receivedPeerReviews: {
     errorLabel:
