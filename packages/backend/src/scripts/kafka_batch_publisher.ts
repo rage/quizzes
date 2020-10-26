@@ -293,7 +293,7 @@ const publishAnswers = async (course: ICourse, userId?: string) => {
       }
 
       producer.produce(
-        "user-points-2",
+        "user-points-batch",
         null,
         Buffer.from(JSON.stringify(message)),
       )
@@ -370,7 +370,7 @@ const publishProgress = async (
         message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
       }
       producer.produce(
-        "user-course-progress",
+        "user-course-progress-batch",
         null,
         Buffer.from(JSON.stringify(message)),
       )

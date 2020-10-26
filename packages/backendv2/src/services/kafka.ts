@@ -29,7 +29,6 @@ const connect = () => {
 const produce = async (
   topic:
     | "user-course-progress-realtime"
-    | "user-points-2"
     | "exercise"
     | "user-points-realtime",
   message: ProgressMessage | QuizAnswerMessage | QuizMessage,
