@@ -9,10 +9,10 @@ class UserQuizState extends Model {
   quizId!: string
   tries!: number
   status!: "open" | "locked"
-  pointsAwarded!: number
+  pointsAwarded!: number | null
   peerReviewsGiven!: number
-  peerReviewsReceived!: number
-  spamFlags!: number
+  peerReviewsReceived!: number | null
+  spamFlags!: number | null
 
   static get tableName() {
     return "user_quiz_state"
@@ -52,8 +52,9 @@ class UserQuizState extends Model {
   public static async getByUserAndQuiz(
     userId: number,
     quizId: string,
+    trx?: Knex.Transaction,
   ): Promise<UserQuizState> {
-    return await this.query().findById([userId, quizId])
+    return await this.query(trx).findById([userId, quizId])
   }
 
   public static async save(

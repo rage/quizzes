@@ -4,11 +4,12 @@ import Quiz from "./quiz"
 import QuizAnswer from "./quiz_answer"
 import User from "./user"
 import UserQuizState from "./user_quiz_state"
+import knex from "../../database/knex"
 
 class SpamFlag extends Model {
   id!: string
-  user_id!: number
-  quiz_answer_id!: string
+  userId!: number
+  quizAnswerId!: string
 
   static get tableName() {
     return "spam_flag"
@@ -24,8 +25,8 @@ class SpamFlag extends Model {
       },
     },
     quizAnswer: {
-      relation: Model.HasManyRelation,
-      modelClass: QuizAnswer,
+      relation: Model.BelongsToOneRelation,
+      modelClass: `${__dirname}/quiz_answer`,
       join: {
         from: "spam_flag.quiz_answer_id",
         to: "quiz_answer.id",
@@ -41,6 +42,7 @@ class SpamFlag extends Model {
       throw new BadRequestError("Can only give one spam flag")
     } else {
       const quizAnswer = await QuizAnswer.getById(quizAnswerId)
+
       const quiz = await Quiz.getById(quizAnswer.quizId)
 
       const userQuizState = await UserQuizState.getByUserAndQuiz(
@@ -53,22 +55,24 @@ class SpamFlag extends Model {
       } else {
         userQuizState.spamFlags += 1
       }
+      const trx = await knex.transaction()
       try {
-        return this.transaction(async trx => {
-          const newSpamFlag = await this.query(trx).upsertGraphAndFetch({
-            user_id: userId,
-            quiz_answer_id: quizAnswerId,
-          })
+        const newSpamFlag = await this.query(trx).insertAndFetch(
+          this.fromJson({
+            userId,
+            quizAnswerId,
+          }),
+        )
 
-          await QuizAnswer.validatePeerReviewedAnswer(
-            quiz,
-            quizAnswer,
-            userQuizState,
-            trx,
-          )
-          return newSpamFlag
-        })
+        await QuizAnswer.update(quizAnswer, userQuizState, quiz, trx)
+
+        await QuizAnswer.query(trx).upsertGraph(quizAnswer)
+
+        await UserQuizState.query(trx).upsertGraph(userQuizState)
+        trx.commit()
+        return newSpamFlag
       } catch (err) {
+        trx.rollback()
         throw new BadRequestError(err)
       }
     }

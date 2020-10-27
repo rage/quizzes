@@ -275,6 +275,31 @@ export const duplicateCourse = async (
   }
 }
 
+interface ChangedProperties {
+  moocfiId?: string | undefined
+  languageId?: string | undefined
+  courseId?: string | undefined
+  abbreviation?: string | undefined
+  title?: string | undefined
+}
+
+export const updateCourseProperties = async (
+  courseId: string,
+  changedProperties: ChangedProperties,
+): Promise<{ success: boolean; newCourseId: string }> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (
+      await api.post(`/courses/${courseId}/edit`, changedProperties, config)
+    ).data
+  } else {
+    throw new Error()
+  }
+}
+
 export const getCorrespondenceFile = async (
   newCourseId: string,
   oldCourseId: string,

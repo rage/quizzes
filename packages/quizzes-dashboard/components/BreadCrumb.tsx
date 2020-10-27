@@ -10,7 +10,11 @@ const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
 `
 
-const StyledBreadcrumbs = styled(Breadcrumbs)``
+const StyledBreadcrumbs = styled(Breadcrumbs)`
+  .MuiBreadcrumbs-separator {
+    color: white;
+  }
+`
 
 const BreadCrumbText = styled(Typography)`
   display: flex !important;

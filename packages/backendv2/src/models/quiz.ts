@@ -20,9 +20,13 @@ export class Quiz extends Model {
   part!: number
   section!: number
   points!: number
+  deadline!: Date
   triesLimited!: boolean
   tries!: number
   excludedFromScore!: boolean
+  awardPointsEvenIfWrong!: boolean
+  autoConfirm!: boolean
+  autoReject!: boolean
   course!: Course
   texts!: QuizTranslation[]
   items!: QuizItem[]
@@ -30,8 +34,6 @@ export class Quiz extends Model {
   title!: string
   body!: string
   submitMessage!: string
-  autoConfirm!: boolean
-  autoReject!: boolean
 
   static get tableName() {
     return "quiz"
@@ -78,6 +80,14 @@ export class Quiz extends Model {
         to: "quiz_answer.quiz_id",
       },
     },
+    userQuizStates: {
+      relation: Model.HasManyRelation,
+      modelClass: UserQuizState,
+      join: {
+        from: "quiz.id",
+        to: "user_quiz_state.quiz_id",
+      },
+    },
     peerReviewQuestions: {
       relation: Model.HasManyRelation,
       modelClass: PeerReviewQuestion,
@@ -96,8 +106,8 @@ export class Quiz extends Model {
     }
   }
 
-  static async saveQuiz(data: any) {
-    const quiz: Quiz = data
+  static async save(data: any) {
+    const quiz = data
     const course = await Course.getById(quiz.courseId)
     const languageId = course.languageId
     quiz.texts = [
@@ -178,7 +188,16 @@ export class Quiz extends Model {
       const oldQuiz = quiz.id
         ? await this.query(trx).findById(quiz.id)
         : undefined
-      savedQuiz = await this.query(trx).upsertGraphAndFetch(quiz)
+      if (oldQuiz) {
+        await this.query(trx).upsertGraph(quiz)
+        savedQuiz = await this.query(trx)
+          .findById(quiz.id)
+          .withGraphJoined("texts")
+          .withGraphJoined("items.[texts, options.[texts]]")
+          .withGraphJoined("peerReviews.[texts, questions.[texts]]")
+      } else {
+        savedQuiz = await this.query(trx).insertGraphAndFetch(quiz)
+      }
       await this.updateCourseProgressesIfNecessary(oldQuiz, savedQuiz, trx)
       await Kafka.broadcastCourseQuizzesUpdated(course.id, trx)
       await trx.commit()
@@ -186,7 +205,6 @@ export class Quiz extends Model {
       await trx.rollback()
       throw new BadRequestError(error)
     }
-
     return this.moveTextsToParent(savedQuiz)
   }
 
@@ -206,9 +224,9 @@ export class Quiz extends Model {
     }
   }
 
-  static async getById(quizId: string): Promise<Quiz> {
+  static async getById(quizId: string, trx?: Knex.Transaction) {
     const quiz = (
-      await this.query()
+      await this.query(trx)
         .withGraphJoined("texts")
         .withGraphJoined("items.[texts, options.[texts]]")
         .withGraphJoined("peerReviews.[texts, questions.[texts]]")
@@ -304,7 +322,7 @@ export class Quiz extends Model {
     return stream
   }
 
-  private static moveTextsToParent(quiz: any) {
+  private static moveTextsToParent(quiz: Quiz) {
     const text = quiz.texts[0]
     quiz.title = text?.title
     quiz.body = text?.body

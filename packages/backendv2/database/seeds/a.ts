@@ -109,6 +109,22 @@ export async function seed(knex: Knex): Promise<any> {
         grant_points_policy: "grant_whenever_possible",
         auto_reject: true,
       },
+      {
+        id: "b03f05d3-ec14-47f4-9352-0be6a53b4a14",
+        course_id: "51b66fc3-4da2-48aa-8eab-404370250ca3",
+        part: 1,
+        section: 1,
+        points: 1,
+        deadline: new Date(),
+        open: null,
+        excluded_from_score: false,
+        auto_confirm: true,
+        tries: 1,
+        tries_limited: true,
+        award_points_even_if_wrong: false,
+        grant_points_policy: "grant_whenever_possible",
+        auto_reject: true,
+      },
     ]),
   ])
 
@@ -163,6 +179,14 @@ export async function seed(knex: Knex): Promise<any> {
         uses_shared_option_feedback_message: false,
       },
       {
+        id: "8e1fe9a3-f9ca-4bba-acdb-98d5c41060d3",
+        quiz_id: "2b8f05ac-2a47-436e-8675-35bfe9a5c0ac",
+        type: "open",
+        order: 2,
+        validity_regex: "kissa",
+        uses_shared_option_feedback_message: false,
+      },
+      {
         id: "742c0e08-c884-4117-b9a9-05650e1606f2",
         quiz_id: "2a0c2270-011e-40b2-8796-625764828034",
         type: "multiple-choice",
@@ -201,6 +225,15 @@ export async function seed(knex: Knex): Promise<any> {
       },
       {
         quiz_item_id: "4a55eb54-6a9c-4245-843c-0577f3eafd9e",
+        language_id: "xy_YZ",
+        title: "open",
+        body: "item",
+        success_message: "yay!",
+        failure_message: "boo!",
+        shared_option_feedback_message: null,
+      },
+      {
+        quiz_item_id: "8e1fe9a3-f9ca-4bba-acdb-98d5c41060d3",
         language_id: "xy_YZ",
         title: "open",
         body: "item",
@@ -352,11 +385,13 @@ export async function seed(knex: Knex): Promise<any> {
       ]),
     ],
   )
-
-  await knex.raw("? ON CONFLICT (id) DO NOTHING", [
+  await knex.raw(`? ON CONFLICT (id) DO NOTHING`, [
     knex("user").insert([
       {
         id: 1234,
+      },
+      {
+        id: 4321,
       },
       {
         id: 2345,

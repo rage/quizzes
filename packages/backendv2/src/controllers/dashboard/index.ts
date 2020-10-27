@@ -6,9 +6,9 @@ import {
   QuizAnswer,
   User,
   UserCourseRole,
-  PeerReviewQuestion,
   CourseTranslation,
   Language,
+  PeerReview,
 } from "../../models/"
 import accessControl, { validToken } from "../../middleware/access_control"
 import {
@@ -16,7 +16,7 @@ import {
   checkAccessOrThrow,
   getCourseIdByAnswerId,
   getCourseIdByQuizId,
-  getAccessableCourses,
+  getAccessibleCourses,
 } from "./util"
 import * as Kafka from "../../services/kafka"
 import _ from "lodash"
@@ -31,7 +31,7 @@ const dashboard = new Router<CustomState, CustomContext>({
   .post("/quizzes", accessControl(), async ctx => {
     await checkAccessOrThrow(ctx.state.user, ctx.request.body.courseId, "edit")
     const quizData = ctx.request.body
-    ctx.body = await Quiz.saveQuiz(quizData)
+    ctx.body = await Quiz.save(quizData)
   })
 
   .get("/quizzes/:quizId", accessControl(), async ctx => {
@@ -49,7 +49,7 @@ const dashboard = new Router<CustomState, CustomContext>({
 
   .get("/courses", accessControl(), async ctx => {
     const user = ctx.state.user
-    ctx.body = await getAccessableCourses(ctx.state.user, "view")
+    ctx.body = await getAccessibleCourses(user, "view")
   })
 
   .get("/courses/:courseId", accessControl(), async ctx => {
@@ -87,12 +87,12 @@ const dashboard = new Router<CustomState, CustomContext>({
     ctx.body = await Course.duplicateCourse(oldCourseId, name, abbr, languageId)
   })
 
-  .post("/courses/download-correspondance-file", accessControl(), async ctx => {
+  .post("/courses/download-correspondence-file", accessControl(), async ctx => {
     const oldCourseId = ctx.request.body.oldCourseId
     const courseId = ctx.request.body.newCourseId
     ctx.response.set("Content-Type", "text/csv")
     ctx.response.attachment(`update_ids_from_${oldCourseId}_to_${courseId}.csv`)
-    const stream = await Course.getCorrespondanceFile(oldCourseId, courseId)
+    const stream = await Course.getCorrespondenceFile(oldCourseId, courseId)
     ctx.body = stream
   })
 
@@ -125,7 +125,7 @@ const dashboard = new Router<CustomState, CustomContext>({
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
-    ctx.body = await QuizAnswer.getById(answerId)
+    ctx.body = await QuizAnswer.getByIdWithPeerReviews(answerId)
   })
 
   .get("/answers/:quizId/all", accessControl(), async ctx => {
