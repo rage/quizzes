@@ -1044,43 +1044,143 @@ describe("widget: a fetch for peer reviews for some quiz answer...", () => {
       })
       .expect(404, done)
   })
+})
 
-  describe("on a valid request", () => {
-    test("returns an empty array if no peer reviews received", done => {
-      request(app.callback())
-        .get(
-          "/api/v2/widget/answers/ae29c3be-b5b6-4901-8588-5b0e88774748/peer-reviews",
-        )
-        .set("Authorization", `bearer ADMIN_TOKEN`)
-        .expect(response => {
-          expect(response.body).toEqual([])
-        })
-        .expect(200, done)
+describe("on a valid request", () => {
+  beforeAll(() => {
+    return safeSeed({
+      directory: "./database/seeds",
+      specific: "a.ts",
     })
+  })
 
-    test("returns correct number of peer reviews on valid request", done => {
-      request(app.callback())
-        .get(
-          "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/peer-reviews",
+  afterAll(() => {
+    nock.cleanAll()
+    return safeClean()
+  })
+
+  beforeEach(() => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 2345,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+  test("returns an empty array if no peer reviews received", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/widget/answers/ae29c3be-b5b6-4901-8588-5b0e88774748/peer-reviews",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        expect(response.body).toEqual([])
+      })
+      .expect(200, done)
+  })
+
+  test("returns correct number of peer reviews on valid request", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/peer-reviews",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        expect(response.body.length).toEqual(2)
+      })
+      .expect(200, done)
+  })
+  test("returns peer reviews that are of correct shape", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/peer-reviews",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        expect(response.body).toStrictEqual(
+          validation.receivedPeerReviewsValidator,
         )
-        .set("Authorization", `bearer ADMIN_TOKEN`)
-        .expect(response => {
-          expect(response.body.length).toEqual(2)
-        })
-        .expect(200, done)
+      })
+      .expect(200, done)
+  })
+})
+
+describe("test user progress", () => {
+  beforeAll(() => {
+    return safeSeed({
+      directory: "./database/seeds",
+      specific: "a.ts",
     })
-    test("returns peer reviews that are of correct shape", done => {
-      request(app.callback())
-        .get(
-          "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/peer-reviews",
-        )
-        .set("Authorization", `bearer ADMIN_TOKEN`)
-        .expect(response => {
-          expect(response.body).toStrictEqual(
-            validation.receivedPeerReviewsValidator,
-          )
-        })
-        .expect(200, done)
-    })
+  })
+
+  afterAll(() => {
+    nock.cleanAll()
+    return safeClean()
+  })
+
+  beforeEach(() => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 2345,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+  test("no user progress", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/current/progress",
+      )
+      .set("Authorization", "bearer PLEB_TOKEN")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual([])
+      })
+      .expect(200, done)
+  })
+
+  test("user progress", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/user/current/progress",
+      )
+      .set("Authorization", "bearer PLEB_TOKEN")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual(validation.userProgressValidator)
+      })
+      .expect(200, done)
   })
 })

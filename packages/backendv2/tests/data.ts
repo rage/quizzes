@@ -739,6 +739,15 @@ export const validation = {
     createdAt: expect.stringMatching(dateTime),
     updatedAt: expect.stringMatching(dateTime),
   },
+
+  userProgressValidator: [
+    {
+      group: "osa01",
+      progress: 0,
+      n_points: 0,
+      max_points: 1,
+    },
+  ],
   receivedPeerReviewsValidator: [
     {
       id: "2a486ebb-900a-4a78-ada5-be0792610cf0",

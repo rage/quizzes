@@ -20,6 +20,9 @@ import {
 } from "./util"
 import * as Kafka from "../../services/kafka"
 import _ from "lodash"
+import UserCoursePartState from "../../models/user_course_part_state"
+import knex from "../../../database/knex"
+import { BadRequestError } from "../../util/error"
 
 const dashboard = new Router<CustomState, CustomContext>({
   prefix: "/dashboard",
@@ -92,6 +95,23 @@ const dashboard = new Router<CustomState, CustomContext>({
     const stream = await Course.getCorrespondenceFile(oldCourseId, courseId)
     ctx.body = stream
   })
+
+  .get(
+    "/courses/:courseId/user/current/progress",
+    accessControl(),
+    async ctx => {
+      const courseId = ctx.params.courseId
+      const user = ctx.state.user
+      try {
+        ctx.body = await knex.transaction(
+          async trx =>
+            await UserCoursePartState.getProgress(user.id, courseId, trx),
+        )
+      } catch (err) {
+        throw new BadRequestError(err)
+      }
+    },
+  )
 
   .post("/answers/:answerId/status", accessControl(), async ctx => {
     const answerId = ctx.params.answerId
