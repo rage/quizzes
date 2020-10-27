@@ -1,4 +1,4 @@
-import commonmark from "commonmark"
+import * as commonmark from "commonmark"
 import * as React from "react"
 import styled from "styled-components"
 import { Typography } from "@material-ui/core"
