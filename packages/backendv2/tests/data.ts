@@ -148,6 +148,54 @@ export const input = {
       },
     ],
   },
+  peerReview1: {
+    quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+    peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+    userId: 1234,
+    rejectedQuizAnswerIds: null,
+    answers: [
+      {
+        peerReviewQuestionId: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+        value: 5,
+      },
+    ],
+  },
+  peerReview2: {
+    quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+    peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+    userId: 2345,
+    rejectedQuizAnswerIds: null,
+    answers: [
+      {
+        peerReviewQuestionId: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+        value: 4,
+      },
+    ],
+  },
+  peerReview3: {
+    quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+    peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+    userId: 4567,
+    rejectedQuizAnswerIds: null,
+    answers: [
+      {
+        peerReviewQuestionId: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+        value: 3,
+      },
+    ],
+  },
+  peerReview4: {
+    quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
+    peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+    userId: 2345,
+    rejectedQuizAnswerIds: null,
+    answers: [
+      {
+        peerReviewQuestionId: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+        value: 3,
+      },
+    ],
+  },
 }
 
 interface QuizValidator {
@@ -765,6 +813,82 @@ export const validation = {
           text: null,
         },
       ],
+    },
+  ],
+  givenPeerReviewsValidator: [
+    {
+      peerReview: {
+        id: expect.stringMatching(uuid),
+        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+        userId: 1234,
+        peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+        rejectedQuizAnswerIds: null,
+        createdAt: expect.stringMatching(dateTime),
+        updatedAt: expect.stringMatching(dateTime),
+        answers: [
+          {
+            peerReviewId: expect.stringMatching(uuid),
+            peerReviewQuestionId: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+            value: 5,
+            text: null,
+            createdAt: expect.stringMatching(dateTime),
+            updatedAt: expect.stringMatching(dateTime),
+          },
+        ],
+      },
+      quizAnswer: {
+        id: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+        quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        userId: 1234,
+        languageId: "xy_YZ",
+        status: "given-enough",
+        createdAt: expect.stringMatching(dateTime),
+        updatedAt: expect.stringMatching(dateTime),
+        itemAnswers: [
+          {
+            id: "840ad4ff-8402-4c71-a57f-4b12e4b32bce",
+            quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+            quizItemId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+            textData: null,
+            intData: null,
+            correct: false,
+            createdAt: expect.stringMatching(dateTime),
+            updatedAt: expect.stringMatching(dateTime),
+            optionAnswers: [
+              {
+                id: "ab6c2932-193c-439c-a5b5-1694bebdc178",
+                quizItemAnswerId: "840ad4ff-8402-4c71-a57f-4b12e4b32bce",
+                quizOptionId: "7c802f5b-52f1-468e-a798-3028edc1d3fd",
+                createdAt: expect.stringMatching(dateTime),
+                updatedAt: expect.stringMatching(dateTime),
+              },
+            ],
+          },
+          {
+            id: "31941489-29a1-448d-bc59-418480d007d9",
+            quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+            quizItemId: "707195a3-aafe-4c06-bf23-854e54e084db",
+            textData: null,
+            intData: null,
+            correct: null,
+            createdAt: expect.stringMatching(dateTime),
+            updatedAt: expect.stringMatching(dateTime),
+            optionAnswers: [],
+          },
+        ],
+      },
+      userQuizState: {
+        userId: 1234,
+        quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        peerReviewsGiven: 1,
+        peerReviewsReceived: null,
+        pointsAwarded: null,
+        spamFlags: null,
+        tries: 1,
+        status: "locked",
+        createdAt: expect.stringMatching(dateTime),
+        updatedAt: expect.stringMatching(dateTime),
+      },
     },
   ],
 }
