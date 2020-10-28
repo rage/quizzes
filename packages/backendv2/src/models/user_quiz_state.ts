@@ -3,6 +3,7 @@ import Quiz from "./quiz"
 import User from "./user"
 import QuizAnswer from "./quiz_answer"
 import Knex from "knex"
+import { NotFoundError } from "../util/error"
 
 class UserQuizState extends Model {
   userId!: number
