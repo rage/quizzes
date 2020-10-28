@@ -1,4 +1,4 @@
-import { BadRequestError } from "./../util/error"
+import { BadRequestError, NotFoundError } from "./../util/error"
 import Model from "./base_model"
 import QuizAnswer from "./quiz_answer"
 import UserQuizState from "./user_quiz_state"
@@ -38,6 +38,13 @@ class PeerReview extends Model {
   }
 
   public static async getWithAnswersByAnswerId(quizAnswerId: string) {
+    // check that answerId exists
+    try {
+      await QuizAnswer.getByIdWithPeerReviews(quizAnswerId)
+    } catch (error) {
+      throw error
+    }
+
     const peerReviews = await this.query()
       .where("quiz_answer_id", quizAnswerId)
       .withGraphJoined("answers")
@@ -58,15 +65,24 @@ class PeerReview extends Model {
 
     const { quizAnswerId, userId: sourceUserId } = peerReview
 
+    // validate quiz answer id
+    try {
+      await QuizAnswer.getById(quizAnswerId)
+    } catch (error) {
+      throw error
+    }
+
     // check if peer review already given by this user for this quiz answer
     const peerReviewAlreadyGiven = await this.getByUserIdAndQuizAnswerId(
       sourceUserId,
       quizAnswerId,
     )
+
     if (peerReviewAlreadyGiven) {
       throw new BadRequestError("Answer can only be peer reviewed once")
     }
 
+    // TODO: check target quiz answer id is valid
     const targetQuizAnswer = await QuizAnswer.getById(quizAnswerId)
 
     const quizId = targetQuizAnswer.quizId
@@ -81,14 +97,20 @@ class PeerReview extends Model {
 
     const { userId: targetUserId } = targetQuizAnswer
 
-    const sourceUserQuizState = await UserQuizState.getByUserAndQuiz(
+    let sourceUserQuizState, targetUserQuizState
+
+    sourceUserQuizState = await UserQuizState.getByUserAndQuiz(
       sourceUserId,
       quizId,
     )
-    const targetUserQuizState = await UserQuizState.getByUserAndQuiz(
+    targetUserQuizState = await UserQuizState.getByUserAndQuiz(
       targetUserId,
       quizId,
     )
+
+    if (!sourceUserQuizState || !targetUserQuizState) {
+      throw new NotFoundError(`User quiz state not found.`)
+    }
 
     // increment peer review stats for both source and target users
     if (sourceUserQuizState.peerReviewsGiven === null) {
@@ -140,11 +162,18 @@ class PeerReview extends Model {
     userId: number,
     quizAnswerId: string,
   ): Promise<PeerReview | undefined> {
-    return (
+    if (!userId || !quizAnswerId) {
+      throw new BadRequestError(
+        `user_id or quiz_answer_id invalid: user_id: ${userId}, quiz_answer_id: ${quizAnswerId}`,
+      )
+    }
+    const peerReview = (
       await this.query()
         .where({ user_id: userId, quiz_answer_id: quizAnswerId })
         .limit(1)
     )[0]
+
+    return peerReview
   }
 }
 
