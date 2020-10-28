@@ -127,6 +127,11 @@ class QuizAnswer extends Model {
     const quizAnswer = await this.query()
       .findById(quizAnswerId)
       .withGraphFetched("itemAnswers.[optionAnswers]")
+
+    if (!quizAnswer) {
+      throw new NotFoundError(`quiz answer not found: ${quizAnswerId}`)
+    }
+
     return quizAnswer
   }
 

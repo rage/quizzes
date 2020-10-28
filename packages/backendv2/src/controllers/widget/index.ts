@@ -42,13 +42,6 @@ const widget = new Router<CustomState, CustomContext>({
   .get("/answers/:answerId/peer-reviews", accessControl(), async ctx => {
     const answerId = ctx.params.answerId
 
-    // check that answerId exists
-    try {
-      await QuizAnswer.getByIdWithPeerReviews(answerId)
-    } catch (error) {
-      throw error
-    }
-
     const peerReviews = await PeerReview.getWithAnswersByAnswerId(answerId)
 
     const receivedPeerReviews = peerReviews.map((pr: any) => ({
@@ -85,7 +78,9 @@ const widget = new Router<CustomState, CustomContext>({
   .post("/answers/give-review", accessControl(), async ctx => {
     const userId = ctx.state.user.id
     const peerReview = ctx.request.body
-    peerReview.userId = userId
+    if (userId) {
+      peerReview.userId = userId
+    }
     ctx.body = await PeerReview.givePeerReview(peerReview)
   })
 
