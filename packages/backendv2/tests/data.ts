@@ -148,6 +148,54 @@ export const input = {
       },
     ],
   },
+  peerReview1: {
+    quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+    peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+    userId: 1234,
+    rejectedQuizAnswerIds: null,
+    answers: [
+      {
+        peerReviewQuestionId: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+        value: 5,
+      },
+    ],
+  },
+  peerReview2: {
+    quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+    peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+    userId: 2345,
+    rejectedQuizAnswerIds: null,
+    answers: [
+      {
+        peerReviewQuestionId: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+        value: 4,
+      },
+    ],
+  },
+  peerReview3: {
+    quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+    peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+    userId: 4567,
+    rejectedQuizAnswerIds: null,
+    answers: [
+      {
+        peerReviewQuestionId: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+        value: 3,
+      },
+    ],
+  },
+  peerReview4: {
+    quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
+    peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+    userId: 2345,
+    rejectedQuizAnswerIds: null,
+    answers: [
+      {
+        peerReviewQuestionId: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+        value: 3,
+      },
+    ],
+  },
 }
 
 interface QuizValidator {
