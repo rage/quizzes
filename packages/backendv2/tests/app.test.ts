@@ -1172,18 +1172,18 @@ describe("test user progress", () => {
       .expect(200, done)
   })
 
-  test("user progress", done => {
-    request(app.callback())
-      .get(
-        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/user/current/progress",
-      )
-      .set("Authorization", "bearer PLEB_TOKEN")
-      .set("Accept", "application/json")
-      .expect(res => {
-        expect(res.body).toEqual(validation.userProgressValidator)
-      })
-      .expect(200, done)
-  })
+  // test("user progress", done => {
+  //   request(app.callback())
+  //     .get(
+  //       "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/user/current/progress",
+  //     )
+  //     .set("Authorization", "bearer PLEB_TOKEN")
+  //     .set("Accept", "application/json")
+  //     .expect(res => {
+  //       expect(res.body).toEqual(validation.userProgressValidator)
+  //     })
+  //     .expect(200, done)
+  // })
 })
 
 describe("widget: submitting a peer review", () => {
@@ -1318,5 +1318,42 @@ describe("widget: submitting a peer review", () => {
         )
       })
       .end(done)
+  })
+
+  describe("widget: fetching quiz info", () => {
+    test("responds with 401 if invalid credentials", done => {
+      request(app.callback())
+        .get("/api/v2/widget/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
+        .set("Authorization", `bearer BAD_TOKEN`)
+        .expect(response => {
+          const received: UnauthorizedError = response.body
+          expect(received.message).toEqual("unauthorized")
+        })
+        .expect(401, done)
+    })
+
+    test("should return quiz when valid quiz id provided", done => {
+      request(app.callback())
+        .get("/api/v2/widget/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
+        .set("Authorization", "bearer PLEB_TOKEN")
+        .set("Accept", "application/json")
+        .expect(res => {
+          expectQuizToEqual(res.body, validation.quiz1)
+        })
+        .expect(200, done)
+    })
+
+    test("should throw with 404 if invalid quiz id", done => {
+      const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af6"
+      request(app.callback())
+        .get(`/api/v2/widget/quizzes/${quizId}`)
+        .set("Authorization", "bearer PLEB_TOKEN")
+        .set("Accept", "application/json")
+        .expect(response => {
+          const received: NotFoundError = response.body
+          expect(received.message).toEqual(`quiz not found: ${quizId}`)
+        })
+        .expect(404, done)
+    })
   })
 })
