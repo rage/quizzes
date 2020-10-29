@@ -1295,11 +1295,7 @@ describe("widget: submitting a peer review", () => {
       .expect(response => {
         const {
           userQuizState: { peerReviewsGiven },
-          quizAnswer: { itemAnswers },
         } = response.body
-        itemAnswers.forEach((itemAnswer: any) => {
-          console.log("💩: itemAnswer", itemAnswer)
-        })
         expect(peerReviewsGiven).toEqual(1)
         expect(response.body).toStrictEqual(
           validation.givenPeerReviewsValidator[0],
