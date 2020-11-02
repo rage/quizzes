@@ -455,7 +455,7 @@ class QuizAnswer extends Model {
     }
   }
 
-  private static async assessAnswerStatus(
+  public static async assessAnswerStatus(
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
     quiz: Quiz,
@@ -464,7 +464,10 @@ class QuizAnswer extends Model {
   ) {
     const hasPeerReviews = quiz.peerReviews.length > 0
     if (hasPeerReviews) {
-      const peerReviews = await quizAnswer.$relatedQuery("peerReviews", trx)
+      const peerReviews = await quizAnswer
+        .$relatedQuery("peerReviews", trx)
+        .withGraphJoined("answers")
+
       quizAnswer.status = this.assessAnswerWithPeerReviewsStatus(
         quiz,
         quizAnswer,
@@ -616,7 +619,7 @@ class QuizAnswer extends Model {
         return status
       }
 
-      if (sum / answers.length >= quiz.course.minReviewAverage) {
+      if (sum / answers.length >= course.minReviewAverage) {
         return "confirmed"
       } else if (autoReject) {
         return "rejected"
