@@ -1,4 +1,5 @@
 import request from "supertest"
+import { v4 as uuidv4 } from "uuid"
 import nock from "nock"
 import app from "../app"
 import knex from "../database/knex"
@@ -1182,5 +1183,140 @@ describe("test user progress", () => {
         expect(res.body).toEqual(validation.userProgressValidator)
       })
       .expect(200, done)
+  })
+})
+
+describe("widget: submitting a peer review", () => {
+  beforeAll(() => {
+    return safeSeed({
+      directory: "./database/seeds",
+      specific: "a.ts",
+    })
+  })
+
+  afterAll(() => {
+    nock.cleanAll()
+    return safeClean()
+  })
+
+  beforeEach(() => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 2345,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("responds with 401 if invalid credentials", done => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/give-review")
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(response => {
+        const received: UnauthorizedError = response.body
+        expect(received.message).toEqual("unauthorized")
+      })
+      .expect(401, done)
+  })
+
+  test("responds with 404 if invalid answer id", done => {
+    const randomUuid = uuidv4()
+    request(app.callback())
+      .post("/api/v2/widget/answers/give-review")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .send({
+        ...input.peerReview1,
+        quizAnswerId: randomUuid,
+      })
+      .expect(response => {
+        const received: NotFoundError = response.body
+        expect(received.message).toEqual(`quiz answer not found: ${randomUuid}`)
+      })
+      .expect(404, done)
+  })
+
+  test("throws when peer review answer contains no text or value", done => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/give-review")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .send({
+        ...input.peerReview1,
+        answers: [
+          {
+            peerReviewQuestionId: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+            value: null,
+          },
+        ],
+      })
+      .expect(response => {
+        const received: BadRequestError = response.body
+        expect(received.message).toEqual(`review must contain values`)
+      })
+      .expect(400, done)
+  })
+  test("throws when user quiz state not found", done => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/give-review")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .send(input.peerReview3)
+      .expect(response => {
+        const received: NotFoundError = response.body
+        expect(received.message).toEqual(`User quiz state not found.`)
+      })
+      .expect(404, done)
+  })
+
+  test("returns peer review in correct shape when request successful", done => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/give-review")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .send(input.peerReview1)
+      .expect(200)
+      .expect(response => {
+        const {
+          userQuizState: { peerReviewsGiven },
+        } = response.body
+        expect(peerReviewsGiven).toEqual(1)
+        expect(response.body).toStrictEqual(
+          validation.givenPeerReviewsValidator[0],
+        )
+      })
+      .end(done)
+  })
+
+  test("does not allow the same answer to be reviewed twice by the same user", done => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/give-review")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .send(input.peerReview1)
+      .expect(400)
+      .expect(response => {
+        const received: BadRequestError = response.body
+        expect(received.message).toEqual(
+          `Answer can only be peer reviewed once`,
+        )
+      })
+      .end(done)
   })
 })
