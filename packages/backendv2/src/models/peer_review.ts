@@ -77,6 +77,8 @@ class PeerReview extends Model {
       sourceUserId,
       quizAnswerId,
     )
+    console.log("💩: PeerReview -> sourceUserId", sourceUserId)
+    console.log("💩: PeerReview -> quizAnswerId", quizAnswerId)
 
     if (peerReviewAlreadyGiven) {
       throw new BadRequestError("Answer can only be peer reviewed once")
@@ -103,10 +105,13 @@ class PeerReview extends Model {
       sourceUserId,
       quizId,
     )
+    console.log("💩: PeerReview -> sourceUserQuizState", sourceUserQuizState)
+
     targetUserQuizState = await UserQuizState.getByUserAndQuiz(
       targetUserId,
       quizId,
     )
+    console.log("💩: PeerReview -> targetUserQuizState", targetUserQuizState)
 
     if (!sourceUserQuizState || !targetUserQuizState) {
       throw new NotFoundError(`User quiz state not found.`)
