@@ -480,7 +480,6 @@ describe("widget: save quiz answer", () => {
       .set("Accept", "application/json")
       .send(input.quizAnswerOpen)
       .expect(200)
-      // .expect(response => console.log(response.body))
       .end(done)
   })
 })
@@ -1230,6 +1229,15 @@ describe("widget: submitting a peer review", () => {
             } as UserInfo,
           ]
         }
+        if (auth === "Bearer pleb_token_2") {
+          return [
+            200,
+            {
+              id: 1234,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
       })
   })
 
@@ -1294,39 +1302,50 @@ describe("widget: submitting a peer review", () => {
       .expect(404, done)
   })
 
-  // test("returns peer review in correct shape when request successful", done => {
-  //   request(app.callback())
-  //     .post("/api/v2/widget/answers/give-review")
-  //     .set("Authorization", `bearer PLEB_TOKEN`)
-  //     .set("Accept", "application/json")
-  //     .send(input.peerReview1)
-  //     .expect(200)
-  //     .expect(response => {
-  //       const {
-  //         userQuizState: { peerReviewsGiven },
-  //       } = response.body
-  //       console.log("💩: response.body", response.body)
-  //       expect(peerReviewsGiven).toEqual(1)
-  //       expect(response.body).toStrictEqual(
-  //         validation.givenPeerReviewsValidator[0],
-  //       )
-  //     })
-  //     .end(done)
-  // })
+  test("returns peer review in correct shape when request successful", done => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/give-review")
+      .set("Authorization", `bearer PLEB_TOKEN_2`)
+      .set("Accept", "application/json")
+      .send(input.peerReview2)
+      .expect(200)
+      .expect(response => {
+        const {
+          userQuizState: { peerReviewsGiven },
+        } = response.body
+        expect(peerReviewsGiven).toEqual(1)
+        expect(response.body).toStrictEqual(
+          validation.givenPeerReviewsValidator[0],
+        )
+      })
+      .end(done)
+  })
+  test("throws if user reviewing their own answer", done => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/give-review")
+      .set("Authorization", `bearer PLEB_TOKEN_2`)
+      .set("Accept", "application/json")
+      .send(input.peerReview1)
+      .expect(response => {
+        const received: BadRequestError = response.body
+        expect(received.message).toEqual(`User cannot review their own answer`)
+      })
+      .expect(400, done)
+  })
 
-  // test("does not allow the same answer to be reviewed twice by the same user", done => {
-  //   request(app.callback())
-  //     .post("/api/v2/widget/answers/give-review")
-  //     .set("Authorization", `bearer ADMIN_TOKEN`)
-  //     .set("Accept", "application/json")
-  //     .send(input.peerReview1)
-  //     .expect(400)
-  //     .expect(response => {
-  //       const received: BadRequestError = response.body
-  //       expect(received.message).toEqual(
-  //         `Answer can only be peer reviewed once`,
-  //       )
-  //     })
-  //     .end(done)
-  // })
+  test("does not allow the same answer to be reviewed twice by the same user", done => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/give-review")
+      .set("Authorization", `bearer PLEB_TOKEN_2`)
+      .set("Accept", "application/json")
+      .send(input.peerReview2)
+      .expect(400)
+      .expect(response => {
+        const received: BadRequestError = response.body
+        expect(received.message).toEqual(
+          `Answer can only be peer reviewed once`,
+        )
+      })
+      .end(done)
+  })
 })

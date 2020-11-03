@@ -151,7 +151,7 @@ export const input = {
   peerReview1: {
     quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
     peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-    userId: 1234,
+    // userId: 1234,
     rejectedQuizAnswerIds: null,
     answers: [
       {
@@ -161,9 +161,9 @@ export const input = {
     ],
   },
   peerReview2: {
-    quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+    quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
     peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-    userId: 2345,
+    // userId: 2345,
     rejectedQuizAnswerIds: null,
     answers: [
       {
@@ -175,7 +175,7 @@ export const input = {
   peerReview3: {
     quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
     peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-    userId: 4567,
+    // userId: 4567,
     rejectedQuizAnswerIds: null,
     answers: [
       {
@@ -187,7 +187,7 @@ export const input = {
   peerReview4: {
     quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
     peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-    userId: 2345,
+    // userId: 2345,
     rejectedQuizAnswerIds: null,
     answers: [
       {
@@ -828,7 +828,7 @@ export const validation = {
     {
       peerReview: {
         id: expect.stringMatching(uuid),
-        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+        quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
         userId: 1234,
         peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
         rejectedQuizAnswerIds: null,
@@ -838,7 +838,7 @@ export const validation = {
           {
             peerReviewId: expect.stringMatching(uuid),
             peerReviewQuestionId: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
-            value: 5,
+            value: 4,
             text: null,
             createdAt: expect.stringMatching(dateTime),
             updatedAt: expect.stringMatching(dateTime),

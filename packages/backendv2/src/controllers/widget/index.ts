@@ -67,7 +67,6 @@ const widget = new Router<CustomState, CustomContext>({
   })
   .post("/answers/give-review", accessControl(), async ctx => {
     const userId = ctx.state.user.id
-    console.log("💩: userId", userId)
     const peerReview = ctx.request.body
     if (userId) {
       peerReview.userId = userId
