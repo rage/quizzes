@@ -1307,7 +1307,7 @@ describe("widget: submitting a peer review", () => {
   test("does not allow the same answer to be reviewed twice by the same user", done => {
     request(app.callback())
       .post("/api/v2/widget/answers/give-review")
-      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Authorization", `bearer PLEB_TOKEN`)
       .set("Accept", "application/json")
       .send(input.peerReview1)
       .expect(400)
