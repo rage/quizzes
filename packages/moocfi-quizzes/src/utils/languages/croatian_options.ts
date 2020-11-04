@@ -68,7 +68,8 @@ const croatianLabels: SingleLanguageLabels = {
       "Drugi polaznici još nisu ocijenili vaš odgovor.",
     numberOfPeerReviewsText: n =>
       `Broj ocjena dodijeljenih vašem odgovoru: ${n}.`,
-    toggleButtonExpandLabel: "Prikažite sve ocjene dobivene od drugih polaznika",
+    toggleButtonExpandLabel:
+      "Prikažite sve ocjene dobivene od drugih polaznika",
     toggleButtonShrinkLabel: "Sakrijte ocjene dobivene od drugih polaznika",
     averageOfGradesLabel: "Prosjek dobivenih ocjena:",
     detailedViewLabel: "Sve ocjene dodijeljene vašem odgovoru",
