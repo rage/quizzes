@@ -1,19 +1,18 @@
-import nock from "nock"
 import knex from "../database/knex"
 import { Model, snakeCaseMappers } from "objection"
 import { Quiz, QuizAnswer, UserQuizState, Course } from "../src/models"
 
 const knexCleaner = require("knex-cleaner")
 
-const safeClean = () => {
+const safeClean = async () => {
   if (process.env.NODE_ENV === "test") {
-    return knexCleaner.clean(knex)
+    return await knexCleaner.clean(knex)
   }
 }
 
-const safeSeed = (config?: any) => {
+const safeSeed = async (config?: any) => {
   if (process.env.NODE_ENV === "test") {
-    return knex.seed.run(config)
+    await knex.seed.run(config)
   }
 }
 
@@ -22,8 +21,9 @@ beforeAll(() => {
   Model.columnNameMappers = snakeCaseMappers()
 })
 
-afterAll(() => {
-  return knex.destroy()
+afterAll(async () => {
+  await safeClean()
+  await knex.destroy()
 })
 
 let quiz: Quiz
@@ -32,16 +32,15 @@ let userQuizState: UserQuizState
 let course: Course
 
 describe("autoreject off 1", () => {
-  beforeAll(() => {
-    return safeSeed({
+  beforeAll(async () => {
+    await safeSeed({
       directory: "./database/seeds",
-      specific: "answerStatusData.ts",
+      specific: "answerStatusDataPassing.ts",
     })
   })
 
-  afterAll(() => {
-    nock.cleanAll()
-    return safeClean()
+  afterAll(async () => {
+    await safeClean()
   })
 
   beforeEach(async () => {
@@ -146,7 +145,31 @@ describe("autoreject off 1", () => {
     })
     expect(status).toBe("confirmed")
   })
+})
 
+describe("autoreject off 1, failing", () => {
+  beforeAll(async () => {
+    await safeSeed({
+      directory: "./database/seeds",
+      specific: "answerStatusDataFailing.ts",
+    })
+  })
+
+  afterAll(async () => {
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    quiz = await Quiz.getById("3c954097-268f-44bf-9d2e-1efaf9e8f122")
+    quizAnswer = await QuizAnswer.getById(
+      "baa83266-2194-43f4-be37-177c273c82b1",
+    )
+    userQuizState = await UserQuizState.getByUserAndQuiz(
+      1234,
+      "3c954097-268f-44bf-9d2e-1efaf9e8f122",
+    )
+    course = await Course.getById(quiz.courseId)
+  })
   test("given 4, received 2, fail", async () => {
     userQuizState.peerReviewsGiven = 4
     userQuizState.peerReviewsReceived = 2
@@ -165,16 +188,15 @@ describe("autoreject off 1", () => {
 })
 
 describe("autoreject off 2", () => {
-  beforeAll(() => {
-    return safeSeed({
+  beforeAll(async () => {
+    await safeSeed({
       directory: "./database/seeds",
-      specific: "answerStatusData.ts",
+      specific: "answerStatusDataPassing.ts",
     })
   })
 
-  afterAll(() => {
-    nock.cleanAll()
-    return safeClean()
+  afterAll(async () => {
+    await safeClean()
   })
 
   beforeEach(async () => {
@@ -252,16 +274,15 @@ describe("autoreject off 2", () => {
 })
 
 describe("autoreject of 3", () => {
-  beforeAll(() => {
-    return safeSeed({
+  beforeAll(async () => {
+    await safeSeed({
       directory: "./database/seeds",
-      specific: "answerStatusData.ts",
+      specific: "answerStatusDataPassing.ts",
     })
   })
 
-  afterAll(() => {
-    nock.cleanAll()
-    return safeClean()
+  afterAll(async () => {
+    await safeClean()
   })
 
   beforeEach(async () => {
@@ -345,16 +366,15 @@ describe("autoreject of 3", () => {
 })
 
 describe("autoreject on 1", () => {
-  beforeAll(() => {
-    return safeSeed({
+  beforeAll(async () => {
+    await safeSeed({
       directory: "./database/seeds",
-      specific: "answerStatusData.ts",
+      specific: "answerStatusDataFailing.ts",
     })
   })
 
-  afterAll(() => {
-    nock.cleanAll()
-    return safeClean()
+  afterAll(async () => {
+    await safeClean()
   })
 
   beforeEach(async () => {
@@ -388,16 +408,15 @@ describe("autoreject on 1", () => {
 })
 
 describe("autoreject on 2", () => {
-  beforeAll(() => {
-    return safeSeed({
+  beforeAll(async () => {
+    await safeSeed({
       directory: "./database/seeds",
-      specific: "answerStatusData.ts",
+      specific: "answerStatusDataFailing.ts",
     })
   })
 
-  afterAll(() => {
-    nock.cleanAll()
-    return safeClean()
+  afterAll(async () => {
+    await safeClean()
   })
 
   beforeEach(async () => {

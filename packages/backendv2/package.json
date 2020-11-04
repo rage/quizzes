@@ -9,7 +9,7 @@
     "ts-watch": "tsc --preserveWatchOutput -w -p tsconfig.json",
     "watch": "nodemon ./dist/server.js",
     "dev": "concurrently npm:ts-watch npm:watch",
-    "test": "jest --runInBand",
+    "test": "env NODE_ENV=test jest --runInBand",
     "migrate": "knex migrate:latest"
   },
   "devDependencies": {

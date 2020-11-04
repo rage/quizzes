@@ -563,8 +563,9 @@ class QuizAnswer extends Model {
       userQuizState.peerReviewsGiven >= course.minPeerReviewsGiven
     const givenExtra =
       userQuizState.peerReviewsGiven > course.minPeerReviewsGiven
-    const receivedEnough =
-      userQuizState.peerReviewsReceived ?? 0 >= course.minPeerReviewsReceived
+    const receivedEnough = userQuizState.peerReviewsReceived
+      ? userQuizState.peerReviewsReceived >= course.minPeerReviewsReceived
+      : false
 
     const flaggedButKeepInPeerReviewPool =
       spamFlagsReceived >= maxSpamFlags &&

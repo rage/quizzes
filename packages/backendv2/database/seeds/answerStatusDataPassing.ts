@@ -132,6 +132,12 @@ export async function seed(knex: Knex): Promise<any> {
         peer_review_collection_id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
         user_id: 1234,
       },
+      {
+        id: "3fa39c7a-d045-437c-b0cd-8dce349e95fc",
+        quiz_answer_id: "baa83266-2194-43f4-be37-177c273c82b1",
+        peer_review_collection_id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+        user_id: 1234,
+      },
     ]),
   ])
 
@@ -139,6 +145,27 @@ export async function seed(knex: Knex): Promise<any> {
     knex("peer_review_question").insert([
       {
         id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+        peer_review_collection_id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+        default: true,
+        type: "grade",
+        order: 1,
+      },
+      {
+        id: "c59593ea-f6a7-4857-aa7a-1be9762522da",
+        peer_review_collection_id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+        default: true,
+        type: "grade",
+        order: 1,
+      },
+      {
+        id: "be725960-b262-4f01-852c-4bba77c82f85",
+        peer_review_collection_id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+        default: true,
+        type: "grade",
+        order: 1,
+      },
+      {
+        id: "1a4e7dea-564d-417a-85dd-f6976f51860b",
         peer_review_collection_id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
         default: true,
         type: "grade",
@@ -158,19 +185,41 @@ export async function seed(knex: Knex): Promise<any> {
         },
         {
           peer_review_id: "2a486ebb-900a-4a78-ada5-be0792610cf0",
-          peer_review_question_id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+          peer_review_question_id: "c59593ea-f6a7-4857-aa7a-1be9762522da",
           value: 2,
         },
         {
           peer_review_id: "2a486ebb-900a-4a78-ada5-be0792610cf0",
-          peer_review_question_id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+          peer_review_question_id: "be725960-b262-4f01-852c-4bba77c82f85",
           value: 2,
           text: null,
         },
         {
           peer_review_id: "2a486ebb-900a-4a78-ada5-be0792610cf0",
-          peer_review_question_id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+          peer_review_question_id: "1a4e7dea-564d-417a-85dd-f6976f51860b",
           value: 3,
+          text: null,
+        },
+        {
+          peer_review_id: "3fa39c7a-d045-437c-b0cd-8dce349e95fc",
+          peer_review_question_id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+          value: 5,
+        },
+        {
+          peer_review_id: "3fa39c7a-d045-437c-b0cd-8dce349e95fc",
+          peer_review_question_id: "c59593ea-f6a7-4857-aa7a-1be9762522da",
+          value: 5,
+        },
+        {
+          peer_review_id: "3fa39c7a-d045-437c-b0cd-8dce349e95fc",
+          peer_review_question_id: "be725960-b262-4f01-852c-4bba77c82f85",
+          value: 4,
+          text: null,
+        },
+        {
+          peer_review_id: "3fa39c7a-d045-437c-b0cd-8dce349e95fc",
+          peer_review_question_id: "1a4e7dea-564d-417a-85dd-f6976f51860b",
+          value: 5,
           text: null,
         },
       ]),
