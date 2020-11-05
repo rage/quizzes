@@ -4,11 +4,9 @@ import {
   Course,
   Quiz,
   QuizAnswer,
-  User,
   UserCourseRole,
   CourseTranslation,
   Language,
-  PeerReview,
 } from "../../models/"
 import accessControl, { validToken } from "../../middleware/access_control"
 import {

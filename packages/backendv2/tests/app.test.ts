@@ -80,7 +80,7 @@ describe("dashboard: get courses", () => {
       .end(done)
   })
 })
-describe("dashboard: get single course", () => {
+describe("dashboard: get single course should", () => {
   beforeAll(async () => {
     await safeSeed(configA)
   })
@@ -128,14 +128,8 @@ describe("dashboard: get single course", () => {
       .set("Authorization", `bearer PLEB_TOKEN`)
       .expect(403, done)
   })
-  test("respond with 403 if insufficient privilege", done => {
-    request(app.callback())
-      .get("/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b")
-      .set("Authorization", `bearer PLEB_TOKEN`)
-      .expect(403, done)
-  })
 
-  test("responds with 404 if invalid course id", done => {
+  test("respond with 404 if invalid course id", done => {
     const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44c"
     request(app.callback())
       .get(`/api/v2/dashboard/courses/${courseId}`)
@@ -146,7 +140,6 @@ describe("dashboard: get single course", () => {
       })
       .expect(404, done)
   })
-
   describe("on valid request: ", () => {
     test("reply with course on valid request", done => {
       request(app.callback())
@@ -156,6 +149,105 @@ describe("dashboard: get single course", () => {
         .expect(response => {
           const received = response.body
           expect(received).toStrictEqual(validation.singleCourse)
+        })
+        .end(done)
+    })
+  })
+})
+
+describe("dashboard - courses: count answers requiring attention should", () => {
+  beforeAll(async () => {
+    await safeSeed({ directory: "./database/seeds" })
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 6666,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/count-answers-requiring-attention",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 403 if insufficient privilege", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/count-answers-requiring-attention",
+      )
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
+  })
+
+  test("respond with 404 if invalid course id", done => {
+    const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44c"
+    request(app.callback())
+      .get(
+        `/api/v2/dashboard/courses/${courseId}/count-answers-requiring-attention`,
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        const received: NotFoundError = response.body
+        expect(received.message).toEqual(`course not found: ${courseId}`)
+      })
+      .expect(404, done)
+  })
+
+  describe("on valid request:", () => {
+    test("to return 0 when none require attention", done => {
+      request(app.callback())
+        .get(
+          "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/count-answers-requiring-attention",
+        )
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .expect(200)
+        .expect(response => {
+          const received = response.body
+          expect(received).toMatchObject({})
+        })
+        .end(done)
+    })
+    test("to return correct quiz id and count when there are answers requiring attention", done => {
+      request(app.callback())
+        .get(
+          "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/count-answers-requiring-attention",
+        )
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .expect(200)
+        .expect(response => {
+          const received = response.body
+          expect(received).toMatchObject({
+            "2a0c2270-011e-40b2-8796-625764828034": "15",
+          })
         })
         .end(done)
     })
