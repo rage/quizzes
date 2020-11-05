@@ -485,3 +485,95 @@ describe("widget: fetching quiz info", () => {
       .expect(200, done)
   })
 })
+
+describe("widget: fetching peer review candidates", () => {
+  beforeAll(() => {
+    return safeSeed({
+      directory: "./database/seeds",
+      specific: "a.ts",
+    })
+  })
+
+  afterAll(() => {
+    nock.cleanAll()
+    return safeClean()
+  })
+
+  beforeEach(() => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 1234,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("responds with 401 if invalid credentials", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/widget/answers/4bf4cf2f-3058-4311-8d16-26d781261af7/get-candidates",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(response => {
+        const received: UnauthorizedError = response.body
+        expect(received.message).toEqual("unauthorized")
+      })
+      .expect(401, done)
+  })
+
+  test("should throw with 404 if invalid quiz id", done => {
+    const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af6"
+    request(app.callback())
+      .get(`/api/v2/widget/answers/${quizId}/get-candidates`)
+      .set("Authorization", "bearer PLEB_TOKEN")
+      .set("Accept", "application/json")
+      .expect(response => {
+        const received: NotFoundError = response.body
+        expect(received.message).toEqual(`quiz not found: ${quizId}`)
+      })
+      .expect(404, done)
+  })
+
+  describe("on successful request", () => {
+    test("returns correct number of candidates", done => {
+      request(app.callback())
+        .get(
+          "/api/v2/widget/answers/4bf4cf2f-3058-4311-8d16-26d781261af7/get-candidates",
+        )
+        .set("Authorization", "bearer PLEB_TOKEN")
+        .set("Accept", "application/json")
+        .expect(res => {
+          expect(res.body.length).toEqual(1)
+        })
+        .expect(200, done)
+    })
+    test("returns candidates for review in correct shape", done => {
+      request(app.callback())
+        .get(
+          "/api/v2/widget/answers/4bf4cf2f-3058-4311-8d16-26d781261af7/get-candidates",
+        )
+        .set("Authorization", "bearer PLEB_TOKEN")
+        .set("Accept", "application/json")
+        .expect(res => {
+          expect(res.body[0]).toStrictEqual(validation.quizAnswerValidator2)
+        })
+        .expect(200, done)
+    })
+  })
+})

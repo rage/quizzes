@@ -27,6 +27,7 @@ describe("dashboard: get courses", () => {
     nock.cleanAll()
     return safeClean()
   })
+
   beforeEach(async () => {
     nock("https://tmc.mooc.fi")
       .get("/api/v8/users/current?show_user_fields=true")
@@ -87,6 +88,11 @@ describe("dashboard: get quizzes by course id", () => {
       directory: "./database/seeds",
       specific: "a.ts",
     })
+  })
+
+  afterAll(() => {
+    nock.cleanAll()
+    return safeClean()
   })
 
   beforeEach(() => {
