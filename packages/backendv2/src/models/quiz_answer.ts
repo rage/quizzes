@@ -644,6 +644,13 @@ class QuizAnswer extends Model {
   }
 
   public static async getAnswersToReview(reviewerId: number, quizId: string) {
+    // validate quiz id
+    try {
+      await Quiz.getById(quizId)
+    } catch (error) {
+      throw error
+    }
+
     const answerIds = this.query()
       .select("id")
       .where("quiz_id", quizId)
