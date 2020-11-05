@@ -1,11 +1,11 @@
-import { MalformedPayloadError } from "./../util/error"
+import Knex from "knex"
+import { v4 } from "uuid"
+import { MalformedPayloadError, NotFoundError } from "./../util/error"
+import stringify from "csv-stringify"
 import Model from "./base_model"
 import Quiz from "./quiz"
 import CourseTranslation from "./course_translation"
-import { v4 } from "uuid"
 import knex from "../../database/knex"
-import stringify from "csv-stringify"
-import Knex from "knex"
 
 class Course extends Model {
   id!: string
@@ -50,6 +50,12 @@ class Course extends Model {
       .where("id", id)
       .limit(1)
     const course = courses[0]
+
+    // validate course
+    if (!course) {
+      throw new NotFoundError(`course not found: ${id}`)
+    }
+
     const texts = course.texts[0]
     course.languageId = texts.languageId
     course.title = texts.title

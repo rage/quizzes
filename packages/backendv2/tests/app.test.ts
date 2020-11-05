@@ -7,7 +7,7 @@ import knex from "../database/knex"
 import { QuizAnswer } from "../src/models"
 import { input, validation } from "./data"
 import { UserInfo } from "../src/types"
-import { BadRequestError } from "../src/util/error"
+import { BadRequestError, NotFoundError } from "../src/util/error"
 
 import { safeClean, safeSeed, expectQuizToEqual, configA } from "./util"
 
@@ -58,7 +58,7 @@ describe("dashboard: get courses", () => {
       .expect(401, done)
   })
 
-  test("respond with 403 if insufficient priviledge", done => {
+  test("respond with 403 if insufficient privilege", done => {
     request(app.callback())
       .get("/api/v2/dashboard/courses")
       .set("Authorization", `bearer PLEB_TOKEN`)
@@ -80,6 +80,88 @@ describe("dashboard: get courses", () => {
       .end(done)
   })
 })
+describe("dashboard: get single course", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 6666,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b")
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 403 if insufficient privilege", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
+  })
+  test("respond with 403 if insufficient privilege", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
+  })
+
+  test("responds with 404 if invalid course id", done => {
+    const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44c"
+    request(app.callback())
+      .get(`/api/v2/dashboard/courses/${courseId}`)
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        const received: NotFoundError = response.body
+        expect(received.message).toEqual(`course not found: ${courseId}`)
+      })
+      .expect(404, done)
+  })
+
+  describe("on valid request: ", () => {
+    test("reply with course on valid request", done => {
+      request(app.callback())
+        .get("/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b")
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .expect(200)
+        .expect(response => {
+          const received = response.body
+          expect(received).toStrictEqual(validation.singleCourse)
+        })
+        .end(done)
+    })
+  })
+})
+
 describe("dashboard: get quizzes by course id", () => {
   beforeAll(async () => {
     await safeSeed(configA)

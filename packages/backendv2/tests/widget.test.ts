@@ -544,6 +544,7 @@ describe("widget: fetching peer review candidates", () => {
         .set("Authorization", "bearer PLEB_TOKEN")
         .set("Accept", "application/json")
         .expect(res => {
+          console.log("💩: res", res.body)
           expect(res.body.length).toEqual(1)
         })
         .expect(200, done)
