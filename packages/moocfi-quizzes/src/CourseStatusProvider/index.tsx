@@ -14,7 +14,7 @@ import {
 import { languageOptions } from "../utils/languages"
 import { ToastContainer, toast, TypeOptions } from "react-toastify"
 import {
-  getCompletion,
+  // getCompletion,
   getUserCourseData,
 } from "../services/courseProgressService"
 
@@ -110,9 +110,9 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
     const fetchProgressData = async () => {
       try {
         const progressData = await getUserCourseData(courseId, accessToken)
-        const completionData = await getCompletion(courseId, accessToken)
+        /*const completionData = await getCompletion(courseId, accessToken)
         progressData.currentUser.completions =
-          completionData.currentUser.completions
+          completionData.currentUser.completions*/
         const data = transformData(progressData)
         setData(data)
         setLoading(false)
@@ -276,7 +276,7 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
   return <Component {...props} {...injectProps} />
 }
 
-const transformData = (data: any): ProgressData => {
+/*const transformData2 = (data: any): ProgressData => {
   const courseProgress = data.currentUser.user_course_progresses[0]
   const completed = data.currentUser.completions.length > 0
   let points_to_pass = 0
@@ -310,13 +310,13 @@ const transformData = (data: any): ProgressData => {
     required_actions,
     progressByGroup,
     //exercisesByPart,
-    //answersByPart,
+    // answersByPart,
     exercise_completions_by_section,
   }
-}
+}*/
 
-/*const transformData = (data: any): ProgressData => {
-  const courseProgress = data.currentUser.user_course_progresses[0]
+const transformData = (data: any): ProgressData => {
+  const courseProgress = data.currentUser.user_course_progressess
   const completed = data.currentUser.completions.length > 0
   let points_to_pass = 0
   let n_points
@@ -341,6 +341,7 @@ const transformData = (data: any): ProgressData => {
       exercisesByPart[exercise.part] = [...partExercises, exercise]
     }
     for (const exercise of exerciseData.withAnswer) {
+      console.log("haer")
       const answer = exercise.exercise_completions[0]
       if (answer) {
         exercise_completions += 1
@@ -354,18 +355,26 @@ const transformData = (data: any): ProgressData => {
             section: exercise.section,
             n_points: answer.n_points,
             completed: answer.completed,
-            required_actions: answer.required_actions.map((action: any) => {
-              if (action.value in RequiredAction) {
-                distinctActions.add(action.value)
-                return action.value
-              }
-            }),
+            required_actions: answer.exercise_completion_required_actions.map(
+              (action: any) => {
+                if (action.value in RequiredAction) {
+                  distinctActions.add(action.value)
+                  return action.value
+                }
+              },
+            ),
           },
         ]
       }
     }
   }
   const required_actions = Array.from(distinctActions) as RequiredAction[]
+
+  console.log(answersByPart)
+
+  const exercise_completions_by_section = Object.values(answersByPart).flat()
+
+  console.log(exercise_completions_by_section)
 
   return {
     completed,
@@ -378,5 +387,6 @@ const transformData = (data: any): ProgressData => {
     progressByGroup,
     exercisesByPart,
     answersByPart,
+    exercise_completions_by_section,
   }
-}*/
+}
