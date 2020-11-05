@@ -127,6 +127,11 @@ class QuizAnswer extends Model {
     const quizAnswer = await this.query()
       .findById(quizAnswerId)
       .withGraphFetched("itemAnswers.[optionAnswers]")
+
+    if (!quizAnswer) {
+      throw new NotFoundError(`quiz answer not found: ${quizAnswerId}`)
+    }
+
     return quizAnswer
   }
 
@@ -463,7 +468,7 @@ class QuizAnswer extends Model {
     }
   }
 
-  private static async assessAnswerStatus(
+  public static async assessAnswerStatus(
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
     quiz: Quiz,
@@ -559,8 +564,9 @@ class QuizAnswer extends Model {
       userQuizState.peerReviewsGiven >= course.minPeerReviewsGiven
     const givenExtra =
       userQuizState.peerReviewsGiven > course.minPeerReviewsGiven
-    const receivedEnough =
-      userQuizState.peerReviewsReceived ?? 0 >= course.minPeerReviewsReceived
+    const receivedEnough = userQuizState.peerReviewsReceived
+      ? userQuizState.peerReviewsReceived >= course.minPeerReviewsReceived
+      : false
 
     const flaggedButKeepInPeerReviewPool =
       spamFlagsReceived >= maxSpamFlags &&
@@ -626,7 +632,7 @@ class QuizAnswer extends Model {
         return status
       }
 
-      if (sum / answers.length >= quiz.course.minReviewAverage) {
+      if (sum / answers.length >= course.minReviewAverage) {
         return "confirmed"
       } else if (autoReject) {
         return "rejected"
