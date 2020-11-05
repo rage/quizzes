@@ -2,17 +2,19 @@ const knexCleaner = require("knex-cleaner")
 import knex from "../database/knex"
 import { Quiz } from "../src/models"
 
-export const safeClean = () => {
+export const safeClean = async () => {
   if (process.env.NODE_ENV === "test") {
-    return knexCleaner.clean(knex)
+    await knexCleaner.clean(knex)
   }
 }
 
-export const safeSeed = (config?: any) => {
+export const safeSeed = async (config?: any) => {
   if (process.env.NODE_ENV === "test") {
-    return knex.seed.run(config)
+    await knex.seed.run(config)
   }
 }
+
+export const configA = { directory: "./database/seeds", specific: "a.ts" }
 
 export const expectQuizToEqual = (received: Quiz, expected: any) => {
   const receivedItems = received.items
