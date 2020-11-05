@@ -15,6 +15,7 @@ import ResearchAgreement from "../ResearchAgreement"
 import Scale from "../Scale"
 import Open from "../Open"
 import Essay from "../Essay"
+import MultipleChoiceDropdown from "../MultipleChoiceDropdown"
 import StageVisualizer from "../PeerReviews/StageVisualizer"
 import PeerReviews from "../PeerReviews"
 import Unsupported from "../Unsupported"
@@ -46,6 +47,7 @@ const componentsByTypeNames = (typeName: QuizItemType) => {
     "research-agreement": ResearchAgreement,
     feedback: Feedback,
     "custom-frontend-accept-data": Unsupported,
+    "multiple-choice-dropdown": MultipleChoiceDropdown,
   }
 
   return mapTypeToComponent[typeName]
