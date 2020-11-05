@@ -19,7 +19,7 @@ export const quizReducer = (
       return action.payload
     case getType(quiz.clear):
       return initialState
-    case getType(quiz.setTitle):
+    /*case getType(quiz.setTitle):
       if (!state) {
         return state
       }
@@ -32,7 +32,7 @@ export const quizReducer = (
       return {
         ...state,
         texts: [newTexts],
-      }
+      }*/
     default:
       return state
   }

@@ -15,7 +15,6 @@ import {
   PeerReviewEssayAnswer,
   PeerReviewGradeAnswer,
   PeerReviewQuestion,
-  PeerReviewQuestionText,
   MiscEvent,
 } from "../../modelTypes"
 import {
@@ -316,7 +315,7 @@ interface ITextualPeerReviewFeedback {
   handleTextChange: (a: any) => any
   key: string
   currentText: string
-  questionTexts: PeerReviewQuestionText
+  questionTexts: any
 }
 
 const StyledReviewEssayQuestion = styled.div`

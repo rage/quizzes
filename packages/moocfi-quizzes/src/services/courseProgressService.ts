@@ -31,7 +31,7 @@ const request = async (accessToken: string, query: string) => {
   return response.data
 }*/
 
-export const getCompletion = async (
+/*export const getCompletion = async (
   courseId: string,
   accessToken: string,
 ): Promise<any> => {
@@ -47,7 +47,7 @@ export const getCompletion = async (
     }
   `
   return await request(accessToken, query)
-}
+}*/
 
 export const getUserCourseData = async (
   courseId: string,
@@ -83,7 +83,7 @@ export const getUserCourseData = async (
             }
           }
         }
-        completions(course_id: "${courseId}") {
+        completions(course_id: "55dff8af-c06c-4a97-88e6-af7c04d252ca") {
           id
         }
       }
