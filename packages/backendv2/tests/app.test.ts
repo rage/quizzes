@@ -5,7 +5,7 @@ import app from "../app"
 import knex from "../database/knex"
 import { Quiz, QuizAnswer } from "../src/models"
 import { input, validation } from "./data"
-import { TReturnedPeerReviewAnswer, UserInfo } from "../src/types"
+import { UserInfo } from "../src/types"
 import {
   BadRequestError,
   NotFoundError,
@@ -14,20 +14,23 @@ import {
 
 const knexCleaner = require("knex-cleaner")
 
-const safeClean = () => {
+const safeClean = async () => {
   if (process.env.NODE_ENV === "test") {
-    return knexCleaner.clean(knex)
+    await knexCleaner.clean(knex)
   }
 }
 
-const safeSeed = (config?: any) => {
+const safeSeed = async (config?: any) => {
   if (process.env.NODE_ENV === "test") {
-    return knex.seed.run(config)
+    await knex.seed.run(config)
   }
 }
 
-afterAll(() => {
-  return knex.destroy()
+const configA = { directory: "./database/seeds", specific: "a.ts" }
+
+afterAll(async () => {
+  await safeClean()
+  await knex.destroy()
 })
 
 const expectQuizToEqual = (received: Quiz, expected: any) => {
@@ -72,16 +75,13 @@ const expectQuizToEqual = (received: Quiz, expected: any) => {
 }
 
 describe("dashboard: get courses", () => {
-  beforeAll(() => {
-    return safeSeed({
-      directory: "./database/seeds",
-      specific: "a.ts",
-    })
+  beforeAll(async () => {
+    await safeSeed(configA)
   })
 
-  afterAll(() => {
+  afterAll(async () => {
     nock.cleanAll()
-    return safeClean()
+    await safeClean()
   })
   beforeEach(async () => {
     nock("https://tmc.mooc.fi")
@@ -138,11 +138,8 @@ describe("dashboard: get courses", () => {
   })
 })
 describe("dashboard: get quizzes by course id", () => {
-  beforeAll(() => {
-    return safeSeed({
-      directory: "./database/seeds",
-      specific: "a.ts",
-    })
+  beforeAll(async () => {
+    await safeSeed(configA)
   })
 
   beforeEach(() => {
@@ -178,9 +175,9 @@ describe("dashboard: get quizzes by course id", () => {
       .set("Authorization", `bearer BAD_TOKEN`)
       .expect(401, done)
   })
-  afterAll(() => {
+  afterAll(async () => {
     nock.cleanAll()
-    return safeClean()
+    await safeClean()
   })
 
   beforeEach(() => {
@@ -237,16 +234,13 @@ describe("dashboard: get quizzes by course id", () => {
 })
 
 describe("dashboard: get quiz by id", () => {
-  beforeAll(() => {
-    return safeSeed({
-      directory: "./database/seeds",
-      specific: "a.ts",
-    })
+  beforeAll(async () => {
+    await safeSeed(configA)
   })
 
-  afterAll(() => {
+  afterAll(async () => {
     nock.cleanAll()
-    return safeClean()
+    await safeClean()
   })
 
   beforeEach(() => {
@@ -302,16 +296,13 @@ describe("dashboard: get quiz by id", () => {
 })
 
 describe("dashboard: save quiz", () => {
-  beforeAll(() => {
-    return safeSeed({
-      directory: "./database/seeds",
-      specific: "a.ts",
-    })
+  beforeAll(async () => {
+    await safeSeed(configA)
   })
 
-  afterAll(() => {
+  afterAll(async () => {
     nock.cleanAll()
-    return safeClean()
+    await safeClean()
   })
 
   beforeEach(() => {
@@ -397,15 +388,13 @@ describe("dashboard: save quiz", () => {
 })
 
 describe("widget: save quiz answer", () => {
-  beforeAll(() => {
-    return safeSeed({
-      directory: "./database/seeds",
-    })
+  beforeAll(async () => {
+    await safeSeed(configA)
   })
 
-  afterAll(() => {
+  afterAll(async () => {
     nock.cleanAll()
-    return safeClean()
+    await safeClean()
   })
 
   beforeEach(async () => {
@@ -486,12 +475,13 @@ describe("widget: save quiz answer", () => {
 })
 
 describe("dashboard: get answer by id", () => {
-  beforeAll(() => {
-    return safeSeed()
+  beforeAll(async () => {
+    await safeSeed(configA)
   })
 
-  afterAll(() => {
-    return knexCleaner.clean(knex)
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
   })
 
   beforeEach(() => {
@@ -546,13 +536,13 @@ describe("dashboard: get answer by id", () => {
 })
 
 describe("dashboard: get answers by quiz id", () => {
-  beforeAll(() => {
-    return safeSeed()
+  beforeAll(async () => {
+    await safeSeed()
   })
 
-  afterAll(() => {
+  afterAll(async () => {
     nock.cleanAll()
-    return safeClean()
+    await safeClean()
   })
 
   beforeEach(() => {
@@ -646,13 +636,13 @@ describe("dashboard: get answers by quiz id", () => {
 })
 
 describe("dashboard: get manual review answers", () => {
-  beforeAll(() => {
-    return safeSeed()
+  beforeAll(async () => {
+    await safeSeed()
   })
 
-  afterAll(() => {
+  afterAll(async () => {
     nock.cleanAll()
-    return safeClean()
+    await safeClean()
   })
 
   beforeEach(() => {
@@ -732,15 +722,12 @@ describe("dashboard: get manual review answers", () => {
 })
 
 describe("dashboard: update manual review status", () => {
-  beforeAll(() => {
-    return safeSeed({
-      directory: "./database/seeds",
-      specific: "a.ts",
-    })
+  beforeAll(async () => {
+    await safeSeed(configA)
   })
-  afterAll(() => {
+  afterAll(async () => {
     nock.cleanAll()
-    return safeClean()
+    await safeClean()
   })
 
   beforeEach(() => {
@@ -822,16 +809,13 @@ describe("dashboard: update manual review status", () => {
 })
 
 describe("Answer: spam flags", () => {
-  beforeAll(() => {
-    return safeSeed({
-      directory: "./database/seeds",
-      specific: "a.ts",
-    })
+  beforeAll(async () => {
+    await safeSeed(configA)
   })
 
-  afterAll(() => {
+  afterAll(async () => {
     nock.cleanAll()
-    return safeClean()
+    await safeClean()
   })
 
   beforeEach(() => {
@@ -981,16 +965,13 @@ describe("Answer: spam flags", () => {
 })
 
 describe("widget: a fetch for peer reviews for some quiz answer...", () => {
-  beforeAll(() => {
-    return safeSeed({
-      directory: "./database/seeds",
-      specific: "a.ts",
-    })
+  beforeAll(async () => {
+    await safeSeed(configA)
   })
 
-  afterAll(() => {
+  afterAll(async () => {
     nock.cleanAll()
-    return safeClean()
+    await safeClean()
   })
 
   beforeEach(() => {
@@ -1048,16 +1029,13 @@ describe("widget: a fetch for peer reviews for some quiz answer...", () => {
 })
 
 describe("on a valid request", () => {
-  beforeAll(() => {
-    return safeSeed({
-      directory: "./database/seeds",
-      specific: "a.ts",
-    })
+  beforeAll(async () => {
+    await safeSeed(configA)
   })
 
-  afterAll(() => {
+  afterAll(async () => {
     nock.cleanAll()
-    return safeClean()
+    await safeClean()
   })
 
   beforeEach(() => {
@@ -1123,16 +1101,13 @@ describe("on a valid request", () => {
 })
 
 describe("test user progress", () => {
-  beforeAll(() => {
-    return safeSeed({
-      directory: "./database/seeds",
-      specific: "a.ts",
-    })
+  beforeAll(async () => {
+    await safeSeed(configA)
   })
 
-  afterAll(() => {
+  afterAll(async () => {
     nock.cleanAll()
-    return safeClean()
+    await safeClean()
   })
 
   beforeEach(() => {
@@ -1187,16 +1162,13 @@ describe("test user progress", () => {
 })
 
 describe("widget: submitting a peer review", () => {
-  beforeAll(() => {
-    return safeSeed({
-      directory: "./database/seeds",
-      specific: "a.ts",
-    })
+  beforeAll(async () => {
+    await safeSeed(configA)
   })
 
-  afterAll(() => {
+  afterAll(async () => {
     nock.cleanAll()
-    return safeClean()
+    await safeClean()
   })
 
   beforeEach(() => {
