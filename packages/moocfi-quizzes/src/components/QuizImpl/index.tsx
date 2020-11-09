@@ -15,6 +15,7 @@ import ResearchAgreement from "../ResearchAgreement"
 import Scale from "../Scale"
 import Open from "../Open"
 import Essay from "../Essay"
+import ClickableMultipleChoice from "../ClickableMultipleChoice"
 import MultipleChoiceDropdown from "../MultipleChoiceDropdown"
 import StageVisualizer from "../PeerReviews/StageVisualizer"
 import PeerReviews from "../PeerReviews"
@@ -48,6 +49,7 @@ const componentsByTypeNames = (typeName: QuizItemType) => {
     feedback: Feedback,
     "custom-frontend-accept-data": Unsupported,
     "multiple-choice-dropdown": MultipleChoiceDropdown,
+    "clickable-multiple-choice": ClickableMultipleChoice,
   }
 
   return mapTypeToComponent[typeName]
