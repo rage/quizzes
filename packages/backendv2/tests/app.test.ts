@@ -4,12 +4,18 @@ import nock from "nock"
 const knexCleaner = require("knex-cleaner")
 import app from "../app"
 import knex from "../database/knex"
-import { QuizAnswer } from "../src/models"
+import { QuizAnswer, Course } from "../src/models"
 import { input, validation } from "./data"
 import { UserInfo } from "../src/types"
 import { BadRequestError, NotFoundError } from "../src/util/error"
 
-import { safeClean, safeSeed, expectQuizToEqual, configA } from "./util"
+import {
+  safeClean,
+  safeSeed,
+  expectQuizToEqual,
+  configA,
+  uuid as uuidPattern,
+} from "./util"
 
 afterAll(async () => {
   await safeClean()
@@ -1113,19 +1119,61 @@ describe("dashboard - courses: duplicating course should", () => {
       .expect(403, done)
   })
 
-  // test("respond with 404 if invalid course id", done => {
-  //   const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44c"
-  //   request(app.callback())
-  //     .post(
-  //       `/api/v2/dashboard/courses/${courseId}/duplicate-course`,
-  //     )
-  //     .set("Authorization", `bearer ADMIN_TOKEN`)
-  //     .expect(response => {
-  //       const received: NotFoundError = response.body
-  //       expect(received.message).toEqual(`course not found: ${courseId}`)
-  //     })
-  //     .expect(404, done)
-  // })
+  test("respond with 404 if invalid course id", done => {
+    const invalidCourseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44c"
+    request(app.callback())
+      .post(`/api/v2/dashboard/courses/${invalidCourseId}/duplicate-course`)
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        const received: NotFoundError = response.body
+        expect(received.message).toEqual(`course not found: ${invalidCourseId}`)
+      })
+      .expect(404, done)
+  })
+  test("throw BadRequestError if provided language id does not exist in db", done => {
+    const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44b"
+    const langIdInvalid = "ff_YY"
+    request(app.callback())
+      .post(`/api/v2/dashboard/courses/${courseId}/duplicate-course`)
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send({ ...input.duplicateCourseValid, lang: langIdInvalid })
+      .expect(response => {
+        const received: BadRequestError = response.body
+        expect(received.message).toEqual(
+          `Invalid language id provided: ${langIdInvalid}`,
+        )
+      })
+      .expect(400, done)
+  })
 
-  describe("on valid request:", () => {})
+  describe("on valid request:", () => {
+    test("return success and the id of the duplicate ", done => {
+      const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44b"
+      request(app.callback())
+        .post(`/api/v2/dashboard/courses/${courseId}/duplicate-course`)
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .send(input.duplicateCourseValid)
+        .expect(response => {
+          expect(response.body).toStrictEqual(validation.duplicateCourse)
+        })
+        .expect(200, done)
+    })
+    test("set defaults for new course when title and abbreviation missing ", async done => {
+      const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44b"
+      request(app.callback())
+        .post(`/api/v2/dashboard/courses/${courseId}/duplicate-course`)
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .send({ ...input.duplicateCourseValid, name: null, abbr: null })
+        .expect(async response => {
+          const duplicate = await Course.getFlattenedById(
+            response.body.newCourseId,
+          )
+          expect(duplicate.title).toContain("(duplicate) [title not set]")
+          expect(duplicate.abbreviation).toContain(
+            "(duplicate) [title not set]",
+          )
+        })
+        .expect(200, done)
+    })
+  })
 })

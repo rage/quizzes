@@ -1,9 +1,10 @@
 import Knex from "knex"
 import { v4 } from "uuid"
-import { MalformedPayloadError, NotFoundError } from "./../util/error"
+import { BadRequestError, NotFoundError } from "./../util/error"
 import stringify from "csv-stringify"
 import Model from "./base_model"
 import Quiz from "./quiz"
+import Language from "./language"
 import CourseTranslation from "./course_translation"
 import knex from "../../database/knex"
 
@@ -96,9 +97,30 @@ class Course extends Model {
     abbreviation: string,
     language_id: string,
   ) {
-    const courseToBeDuplicated = await Course.getFlattenedById(oldCourseId)
-    if (!courseToBeDuplicated) {
-      return null
+    // validate old course id corresponds to existing course
+    let oldCourse
+    try {
+      oldCourse = await Course.getFlattenedById(oldCourseId)
+    } catch (error) {
+      throw error
+    }
+
+    // provide fallback for course name if one is not provided
+    const newCourseTitle =
+      name ?? `${oldCourse.title} (duplicate) [title not set]`
+
+    // default abbreviation to course name if one is not provided
+    const newCourseAbbreviation = abbreviation ?? newCourseTitle
+
+    // ensure language id exists in the db
+    const existingLanguages = await Language.getAll()
+
+    const isLanguageIdinExistingIds = existingLanguages.some(
+      (language: any) => language.id === language_id,
+    )
+
+    if (!isLanguageIdinExistingIds) {
+      throw new BadRequestError(`Invalid language id provided: ${language_id}`)
     }
 
     const newCourseId = v4()
@@ -110,8 +132,8 @@ class Course extends Model {
         await trx("course_translation").insert({
           course_id: newCourseId,
           language_id: language_id,
-          abbreviation,
-          title: name,
+          abbreviation: newCourseAbbreviation,
+          title: newCourseTitle,
         })
 
         await trx("course_language").insert({

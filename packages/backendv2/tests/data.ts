@@ -1,5 +1,4 @@
-const uuid = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/
-const dateTime = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?Z?/
+import { uuid, dateTime } from "./util"
 
 export const input = {
   newQuiz: {
@@ -195,6 +194,12 @@ export const input = {
         value: 3,
       },
     ],
+  },
+  duplicateCourseValid: {
+    oldCourseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    name: "Some Duplicate",
+    abbr: "Some Duplicate",
+    lang: "xy_YZ",
   },
 }
 
@@ -948,5 +953,9 @@ export const validation = {
     title: "course 1",
     body: "course",
     abbreviation: "course",
+  },
+  duplicateCourse: {
+    success: true,
+    newCourseId: expect.stringMatching(uuid),
   },
 }
