@@ -9,7 +9,7 @@ export class newQuestionTypeClickableMultipleChoice1604930831074 implements Migr
           )
           await queryRunner.query(
             // tslint:disable-next-line:max-line-length
-            "alter table quiz_item alter column type set data type quiz_item_type_enum_new using (status::text::quiz_item_type_enum_new)",
+            "alter table quiz_item alter column type set data type quiz_item_type_enum_new using (type::text::quiz_item_type_enum_new)",
           )
           await queryRunner.query("drop type quiz_item_type_enum")
           await queryRunner.query(
@@ -24,7 +24,7 @@ export class newQuestionTypeClickableMultipleChoice1604930831074 implements Migr
           )
           await queryRunner.query(
             // tslint:disable-next-line:max-line-length
-            "alter table quiz_item alter column type set data type quiz_item_type_enum_new using (status::text::quiz_item_type_enum_new)",
+            "alter table quiz_item alter column type set data type quiz_item_type_enum_new using (type::text::quiz_item_type_enum_new)",
           )
           await queryRunner.query("drop type quiz_item_type_enum")
           await queryRunner.query(
