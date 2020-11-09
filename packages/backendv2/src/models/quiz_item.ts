@@ -13,6 +13,7 @@ export type QuizItemType =
   | "feedback"
   | "custom-frontend-accept-data"
   | "multiple-choice-dropdown"
+  | "clickable-multiple-choice"
 
 class QuizItem extends Model {
   id!: string
