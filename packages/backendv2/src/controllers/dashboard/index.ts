@@ -82,6 +82,7 @@ const dashboard = new Router<CustomState, CustomContext>({
     const name = ctx.request.body.name
     const abbr = ctx.request.body.abbr
     const languageId = ctx.request.body.lang
+    await checkAccessOrThrow(ctx.state.user, oldCourseId, "duplicate")
     ctx.body = await Course.duplicateCourse(oldCourseId, name, abbr, languageId)
   })
 
