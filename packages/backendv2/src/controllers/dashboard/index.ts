@@ -91,6 +91,7 @@ const dashboard = new Router<CustomState, CustomContext>({
     const courseId = ctx.request.body.newCourseId
     ctx.response.set("Content-Type", "text/csv")
     ctx.response.attachment(`update_ids_from_${oldCourseId}_to_${courseId}.csv`)
+    await checkAccessOrThrow(ctx.state.user, oldCourseId, "download")
     const stream = await Course.getCorrespondenceFile(oldCourseId, courseId)
     ctx.body = stream
   })

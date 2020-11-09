@@ -1177,3 +1177,66 @@ describe("dashboard - courses: duplicating course should", () => {
     })
   })
 })
+
+//TODO: figure out how to parse the csv stream
+describe("dashboard - courses: downloading a correspondence file should", () => {
+  beforeAll(async () => {
+    await safeSeed({ directory: "./database/seeds" })
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 6666,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .post("/api/v2/dashboard/courses/download-correspondence-file")
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 403 if insufficient privilege", done => {
+    request(app.callback())
+      .post("/api/v2/dashboard/courses/download-correspondence-file")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
+  })
+
+  test("should return 200 on successful request", done => {
+    request(app.callback())
+      .post("/api/v2/dashboard/courses/download-correspondence-file")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send(input.correspondenceIds)
+      .expect(async response => {
+        //TODO: asserts on response
+        console.log(response.body)
+      })
+      .expect(200, done)
+  })
+})

@@ -201,6 +201,10 @@ export const input = {
     abbr: "Some Duplicate",
     lang: "xy_YZ",
   },
+  correspondenceIds: {
+    oldCourseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    newCourseId: "51b66fc3-4da2-48aa-8eab-404370250ca3",
+  },
 }
 
 interface QuizValidator {

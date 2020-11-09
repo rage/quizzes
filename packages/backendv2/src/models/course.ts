@@ -346,9 +346,9 @@ class Course extends Model {
     const stream = knex
       .raw(
         `
-        SELECT id AS old_id, uuid_generate_v5(:newCourseId, id::text) AS new_id
-        FROM quiz
-        WHERE course_id = :oldCourseId
+      SELECT id AS old_id, uuid_generate_v5(:newCourseId, id::text) AS new_id
+      FROM quiz
+      WHERE course_id = :oldCourseId
       `,
         {
           newCourseId: newCourseId,
