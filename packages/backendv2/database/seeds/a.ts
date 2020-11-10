@@ -446,6 +446,16 @@ export async function seed(knex: Knex): Promise<any> {
         quiz_answer_id: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
         quiz_item_id: "707195a3-aafe-4c06-bf23-854e54e084db",
       },
+      {
+        id: "7f92ac20-f9f2-44eb-a5ea-5192254c394d",
+        quiz_answer_id: "ae29c3be-b5b6-4901-8588-5b0e88774748",
+        quiz_item_id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+      },
+      {
+        id: "1e39c9ac-b9d9-4156-8c79-6eb9bf9eabb4",
+        quiz_answer_id: "ae29c3be-b5b6-4901-8588-5b0e88774748",
+        quiz_item_id: "707195a3-aafe-4c06-bf23-854e54e084db",
+      },
     ]),
   ])
 
@@ -454,6 +464,11 @@ export async function seed(knex: Knex): Promise<any> {
       {
         id: "ab6c2932-193c-439c-a5b5-1694bebdc178",
         quiz_item_answer_id: "840ad4ff-8402-4c71-a57f-4b12e4b32bce",
+        quiz_option_id: "7c802f5b-52f1-468e-a798-3028edc1d3fd",
+      },
+      {
+        id: "942584cd-1cb1-4d2a-a0c4-3b3f19495b75",
+        quiz_item_answer_id: "7f92ac20-f9f2-44eb-a5ea-5192254c394d",
         quiz_option_id: "7c802f5b-52f1-468e-a798-3028edc1d3fd",
       },
     ]),

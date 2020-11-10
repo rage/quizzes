@@ -65,12 +65,11 @@ const widget = new Router<CustomState, CustomContext>({
     const userId = ctx.state.user.id
     ctx.body = await QuizAnswer.getAnswersToReview(userId, quizId)
   })
+
   .post("/answers/give-review", accessControl(), async ctx => {
     const userId = ctx.state.user.id
     const peerReview = ctx.request.body
-    if (userId) {
-      peerReview.userId = userId
-    }
+    peerReview.userId = userId
     ctx.body = await PeerReview.givePeerReview(peerReview)
   })
 

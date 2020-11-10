@@ -1,11 +1,12 @@
-import { MalformedPayloadError } from "./../util/error"
+import Knex from "knex"
+import { v4 } from "uuid"
+import { BadRequestError, NotFoundError } from "./../util/error"
+import stringify from "csv-stringify"
 import Model from "./base_model"
 import Quiz from "./quiz"
+import Language from "./language"
 import CourseTranslation from "./course_translation"
-import { v4 } from "uuid"
 import knex from "../../database/knex"
-import stringify from "csv-stringify"
-import Knex from "knex"
 
 class Course extends Model {
   id!: string
@@ -50,6 +51,12 @@ class Course extends Model {
       .where("id", id)
       .limit(1)
     const course = courses[0]
+
+    // validate course
+    if (!course) {
+      throw new NotFoundError(`course not found: ${id}`)
+    }
+
     const texts = course.texts[0]
     course.languageId = texts.languageId
     course.title = texts.title
@@ -90,9 +97,30 @@ class Course extends Model {
     abbreviation: string,
     language_id: string,
   ) {
-    const courseToBeDuplicated = await Course.getFlattenedById(oldCourseId)
-    if (!courseToBeDuplicated) {
-      return null
+    // validate old course id corresponds to existing course
+    let oldCourse
+    try {
+      oldCourse = await Course.getFlattenedById(oldCourseId)
+    } catch (error) {
+      throw error
+    }
+
+    // provide fallback for course name if one is not provided
+    const newCourseTitle =
+      name ?? `${oldCourse.title} (duplicate) [title not set]`
+
+    // default abbreviation to course name if one is not provided
+    const newCourseAbbreviation = abbreviation ?? newCourseTitle
+
+    // ensure language id exists in the db
+    const existingLanguages = await Language.getAll()
+
+    const isLanguageIdinExistingIds = existingLanguages.some(
+      (language: any) => language.id === language_id,
+    )
+
+    if (!isLanguageIdinExistingIds) {
+      throw new BadRequestError(`Invalid language id provided: ${language_id}`)
     }
 
     const newCourseId = v4()
@@ -104,8 +132,8 @@ class Course extends Model {
         await trx("course_translation").insert({
           course_id: newCourseId,
           language_id: language_id,
-          abbreviation,
-          title: name,
+          abbreviation: newCourseAbbreviation,
+          title: newCourseTitle,
         })
 
         await trx("course_language").insert({
@@ -318,9 +346,9 @@ class Course extends Model {
     const stream = knex
       .raw(
         `
-        SELECT id AS old_id, uuid_generate_v5(:newCourseId, id::text) AS new_id
-        FROM quiz
-        WHERE course_id = :oldCourseId
+      SELECT id AS old_id, uuid_generate_v5(:newCourseId, id::text) AS new_id
+      FROM quiz
+      WHERE course_id = :oldCourseId
       `,
         {
           newCourseId: newCourseId,

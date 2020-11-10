@@ -97,12 +97,18 @@ class PeerReview extends Model {
 
     const { userId: targetUserId } = targetQuizAnswer
 
+    // cannot peer review own answer
+    if (sourceUserId === targetUserId) {
+      throw new BadRequestError("User cannot review their own answer")
+    }
+
     let sourceUserQuizState, targetUserQuizState
 
     sourceUserQuizState = await UserQuizState.getByUserAndQuiz(
       sourceUserId,
       quizId,
     )
+
     targetUserQuizState = await UserQuizState.getByUserAndQuiz(
       targetUserId,
       quizId,

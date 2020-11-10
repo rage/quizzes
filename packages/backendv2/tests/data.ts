@@ -1,5 +1,4 @@
-const uuid = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/
-const dateTime = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?Z?/
+import { uuid, dateTime } from "./util"
 
 export const input = {
   newQuiz: {
@@ -151,7 +150,7 @@ export const input = {
   peerReview1: {
     quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
     peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-    userId: 1234,
+    // userId: 1234,
     rejectedQuizAnswerIds: null,
     answers: [
       {
@@ -161,9 +160,9 @@ export const input = {
     ],
   },
   peerReview2: {
-    quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+    quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
     peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-    userId: 2345,
+    // userId: 2345,
     rejectedQuizAnswerIds: null,
     answers: [
       {
@@ -175,7 +174,7 @@ export const input = {
   peerReview3: {
     quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
     peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-    userId: 4567,
+    // userId: 4567,
     rejectedQuizAnswerIds: null,
     answers: [
       {
@@ -187,7 +186,7 @@ export const input = {
   peerReview4: {
     quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
     peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-    userId: 2345,
+    // userId: 2345,
     rejectedQuizAnswerIds: null,
     answers: [
       {
@@ -195,6 +194,16 @@ export const input = {
         value: 3,
       },
     ],
+  },
+  duplicateCourseValid: {
+    oldCourseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    name: "Some Duplicate",
+    abbr: "Some Duplicate",
+    lang: "xy_YZ",
+  },
+  correspondenceIds: {
+    oldCourseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    newCourseId: "51b66fc3-4da2-48aa-8eab-404370250ca3",
   },
 }
 
@@ -766,6 +775,37 @@ export const validation = {
       },
     ],
   },
+  quizAnswerValidator2: {
+    id: "ae29c3be-b5b6-4901-8588-5b0e88774748",
+    quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+    userId: 2345,
+    languageId: "xy_YZ",
+    status: "given-enough",
+    createdAt: expect.stringMatching(dateTime),
+    updatedAt: expect.stringMatching(dateTime),
+    itemAnswers: [
+      {
+        id: "7f92ac20-f9f2-44eb-a5ea-5192254c394d",
+        quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
+        quizItemId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+        textData: null,
+        intData: null,
+        correct: null,
+        createdAt: expect.stringMatching(dateTime),
+        updatedAt: expect.stringMatching(dateTime),
+      },
+      {
+        id: "1e39c9ac-b9d9-4156-8c79-6eb9bf9eabb4",
+        quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
+        quizItemId: "707195a3-aafe-4c06-bf23-854e54e084db",
+        textData: null,
+        intData: null,
+        correct: null,
+        createdAt: expect.stringMatching(dateTime),
+        updatedAt: expect.stringMatching(dateTime),
+      },
+    ],
+  },
   spamFlagValidator1: {
     id: expect.stringMatching(uuid),
     quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
@@ -828,7 +868,7 @@ export const validation = {
     {
       peerReview: {
         id: expect.stringMatching(uuid),
-        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+        quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
         userId: 1234,
         peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
         rejectedQuizAnswerIds: null,
@@ -838,7 +878,7 @@ export const validation = {
           {
             peerReviewId: expect.stringMatching(uuid),
             peerReviewQuestionId: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
-            value: 5,
+            value: 4,
             text: null,
             createdAt: expect.stringMatching(dateTime),
             updatedAt: expect.stringMatching(dateTime),
@@ -900,4 +940,26 @@ export const validation = {
       },
     },
   ],
+  singleCourse: {
+    id: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    moocfiId: "aa141326-fc86-4c8f-b7d8-b7778fc56f26",
+    organizationId: null,
+    minScoreToPass: null,
+    minProgressToPass: null,
+    minPeerReviewsReceived: 2,
+    minPeerReviewsGiven: 3,
+    minReviewAverage: 2,
+    maxSpamFlags: 1,
+    maxReviewSpamFlags: 3,
+    createdAt: expect.stringMatching(dateTime),
+    updatedAt: expect.stringMatching(dateTime),
+    languageId: "xy_YZ",
+    title: "course 1",
+    body: "course",
+    abbreviation: "course",
+  },
+  duplicateCourse: {
+    success: true,
+    newCourseId: expect.stringMatching(uuid),
+  },
 }

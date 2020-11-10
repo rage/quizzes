@@ -272,6 +272,13 @@ class QuizAnswer extends Model {
   }
 
   public static async getManualReviewCountsByCourseId(courseId: string) {
+    // validate course id
+    try {
+      await Course.getFlattenedById(courseId)
+    } catch (error) {
+      throw error
+    }
+
     const counts: any[] = await this.query()
       .select(["quiz_id"])
       .join("quiz", "quiz_answer.quiz_id", "=", "quiz.id")
@@ -279,7 +286,9 @@ class QuizAnswer extends Model {
       .andWhere("status", "manual-review")
       .count()
       .groupBy("quiz_id")
-    const countByQuizId: { [quizId: string]: number } = {}
+    const countByQuizId: {
+      [quizId: string]: number
+    } = {}
     for (const count of counts) {
       countByQuizId[count.quizId] = count.count
     }
@@ -645,6 +654,13 @@ class QuizAnswer extends Model {
   }
 
   public static async getAnswersToReview(reviewerId: number, quizId: string) {
+    // validate quiz id
+    try {
+      await Quiz.getById(quizId)
+    } catch (error) {
+      throw error
+    }
+
     const answerIds = this.query()
       .select("id")
       .where("quiz_id", quizId)
