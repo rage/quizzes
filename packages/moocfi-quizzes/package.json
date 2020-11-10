@@ -32,9 +32,9 @@
     "likert-react": "^0.0.0-beta6",
     "parcel": "^1.12.3",
     "prop-types": "^15.7.2",
-    "react": "16.x",
+    "react": "^16.14.0",
     "react-content-loader": "^5.0.4",
-    "react-dom": ">= 16.3.0",
+    "react-dom": "^16.14.0",
     "react-redux": "^7.1.0",
     "react-toastify": "^6.0.5",
     "reduce-reducers": "^1.0.4",
@@ -77,5 +77,8 @@
     "typesafe-actions": "^4.4.2",
     "watch": "^1.0.2",
     "prop-types": "^15.7.2"
+  },
+  "dependencies": {
+    "material-ui": "^0.20.2"
   }
 }
