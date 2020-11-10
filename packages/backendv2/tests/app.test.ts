@@ -5,7 +5,7 @@ const knexCleaner = require("knex-cleaner")
 import app from "../app"
 import knex from "../database/knex"
 import { QuizAnswer, Course } from "../src/models"
-import { input, validation } from "./data"
+import { input, userAbilities, validation } from "./data"
 import { UserInfo } from "../src/types"
 import { BadRequestError, NotFoundError } from "../src/util/error"
 
@@ -1236,6 +1236,84 @@ describe("dashboard - courses: downloading a correspondence file should", () => 
       .expect(async response => {
         //TODO: asserts on response
         console.log(response.body)
+      })
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: get current users abilities", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async done => {
+    nock.cleanAll()
+    await safeClean()
+    done()
+  })
+
+  test("dashboard: get current users abilities, teacher", done => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 9876,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+    request(app.callback())
+      .get("/api/v2/dashboard/users/current/abilities")
+      .set("Authorization", "bearer pleb_token")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual(userAbilities.abilities.teacher)
+      })
+      .expect(200, done)
+  })
+
+  test("dashboard: get current user abilities, assistant", done => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 8765,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+    request(app.callback())
+      .get("/api/v2/dashboard/users/current/abilities")
+      .set("Authorization", "bearer pleb_token")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual(userAbilities.abilities.assistant)
       })
       .expect(200, done)
   })

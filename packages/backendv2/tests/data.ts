@@ -963,3 +963,14 @@ export const validation = {
     newCourseId: expect.stringMatching(uuid),
   },
 }
+
+export const userAbilities = {
+  abilities: {
+    teacher: {
+      "51b66fc3-4da2-48aa-8eab-404370250ca3": ["view", "edit", "grade"],
+    },
+    assistant: {
+      "51b66fc3-4da2-48aa-8eab-404370250ca3": ["view", "edit", "grade"],
+    },
+  },
+}
