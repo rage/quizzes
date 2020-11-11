@@ -1,5 +1,9 @@
 import Router from "koa-router"
-import { CustomContext, CustomState } from "../../types"
+import {
+  CustomContext,
+  CustomState,
+  EditCoursePayloadFields,
+} from "../../types"
 import {
   Course,
   Quiz,
@@ -293,26 +297,33 @@ const dashboard = new Router<CustomState, CustomContext>({
     const result = await QuizAnswer.getStates()
     ctx.body = result
   })
+
   .post("/courses/:courseId/edit", accessControl(), async ctx => {
     const courseId = ctx.params.courseId
     const payload = ctx.request.body
-    const token = ctx.request.body.token
     const moocfiId = payload.moocfiId
-
     await checkAccessOrThrow(ctx.state.user, courseId, "edit")
 
-    if (!validToken(token)) {
-      ctx.body = "invalid token"
-    } else {
-      const payloadWithoutMoocfiId = _.omit(payload, ["moocfiId"])
-      ctx.body = await CourseTranslation.updateCourseProperties(
-        courseId,
-        payloadWithoutMoocfiId,
-      )
-      if (moocfiId) {
-        ctx.body = await Course.updateMoocfiId(courseId, moocfiId)
+    let moocfiIdEdited: string | null = null
+
+    const payloadWithoutMoocfiId = _.omit(payload, ["moocfiId"])
+
+    const coursePropertiesEdited: EditCoursePayloadFields = await CourseTranslation.updateCourseProperties(
+      courseId,
+      payloadWithoutMoocfiId,
+    )
+
+    // moocfi id separated from rest since it is a property of Course entity
+    if (moocfiId) {
+      try {
+        moocfiIdEdited = await Course.updateMoocfiId(courseId, moocfiId)
+        coursePropertiesEdited.moocfiId = moocfiIdEdited
+      } catch (error) {
+        throw error
       }
     }
+
+    ctx.body = coursePropertiesEdited
   })
 
 export default dashboard
