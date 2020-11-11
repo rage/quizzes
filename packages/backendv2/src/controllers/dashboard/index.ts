@@ -4,11 +4,9 @@ import {
   Course,
   Quiz,
   QuizAnswer,
-  User,
   UserCourseRole,
   CourseTranslation,
   Language,
-  PeerReview,
 } from "../../models/"
 import accessControl, { validToken } from "../../middleware/access_control"
 import {
@@ -84,6 +82,7 @@ const dashboard = new Router<CustomState, CustomContext>({
     const name = ctx.request.body.name
     const abbr = ctx.request.body.abbr
     const languageId = ctx.request.body.lang
+    await checkAccessOrThrow(ctx.state.user, oldCourseId, "duplicate")
     ctx.body = await Course.duplicateCourse(oldCourseId, name, abbr, languageId)
   })
 
@@ -92,6 +91,7 @@ const dashboard = new Router<CustomState, CustomContext>({
     const courseId = ctx.request.body.newCourseId
     ctx.response.set("Content-Type", "text/csv")
     ctx.response.attachment(`update_ids_from_${oldCourseId}_to_${courseId}.csv`)
+    await checkAccessOrThrow(ctx.state.user, oldCourseId, "download")
     const stream = await Course.getCorrespondenceFile(oldCourseId, courseId)
     ctx.body = stream
   })
