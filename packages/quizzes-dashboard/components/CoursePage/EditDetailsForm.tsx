@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Formik, Form, Field } from "formik"
+import { Formik, Form, Field, FormikHelpers } from "formik"
 import { Alert } from "@material-ui/lab"
 import { FormHelperText, MenuItem } from "@material-ui/core"
 import { useRouter } from "next/router"
@@ -58,31 +58,58 @@ export const EditDetailsForm = ({
   courseId: string
   languageIds: string[]
 }) => {
+  // for letting user know which course properties were edited
   const [saved, setSaved] = useState<string | null>(null)
   const [formError, setFormError] = useState<string | null>(null)
+  // initialValues not updated by parent after edits so need to be kept in sync here
+  const [syncedInitialValues, setSyncedInitialValues] = useState(initialValues)
 
-  const handleSubmit = async (values: EditCoursePayloadFields) => {
+  const handleSubmit = async (
+    values: EditCoursePayloadFields,
+    actions: any,
+  ) => {
+    // this is the payload sent to be updated
+    // properties added if they are 'dirty'
     const changedProperties = {
-      ...(values.title !== initialValues.title && {
+      ...(values.title !== syncedInitialValues.title && {
         title: values.title,
       }),
-      ...(values.abbreviation !== initialValues.abbreviation && {
+      ...(values.abbreviation !== syncedInitialValues.abbreviation && {
         abbreviation: values.abbreviation,
       }),
-      ...(values.courseId !== initialValues.courseId && {
+      ...(values.courseId !== syncedInitialValues.courseId && {
         courseId: values.courseId,
       }),
-      ...(values.languageId !== initialValues.languageId && {
+      ...(values.languageId !== syncedInitialValues.languageId && {
         languageId: values.languageId,
       }),
-      ...(values.moocfiId !== initialValues.moocfiId && {
+      ...(values.moocfiId !== syncedInitialValues.moocfiId && {
         moocfiId: values.moocfiId,
       }),
     }
 
     if (!_.isEmpty(changedProperties)) {
-      await updateCourseProperties(courseId, changedProperties)
+      // server update
+      const courseEdited: any = await updateCourseProperties(
+        courseId,
+        changedProperties,
+      )
+      // use returned values to re-populate initial values to prevent multiple submissions of changes
+      const newValues = {
+        title: courseEdited.title,
+        abbreviation: courseEdited.abbreviation,
+        courseId: courseEdited.id,
+        languageId: courseEdited.languageId,
+        moocfiId: courseEdited.moocfiId,
+      }
+
+      // see: https://formik.org/docs/api/formik
+      await actions.resetForm({
+        values: newValues,
+      })
+
       setSaved(Object.keys(changedProperties).toString())
+      setSyncedInitialValues(newValues)
     }
   }
 
@@ -127,10 +154,12 @@ export const EditDetailsForm = ({
             .min(5)
             .max(5),
         })}
-        initialValues={initialValues}
-        onSubmit={values => handleSubmit(values)}
+        initialValues={syncedInitialValues}
+        onSubmit={(values, actions) => {
+          handleSubmit(values, actions)
+        }}
       >
-        {({ errors, isSubmitting, isValidating, values }) => (
+        {({ errors, isValidating, dirty }) => (
           <Form>
             <FieldSet>
               <Field
@@ -150,14 +179,6 @@ export const EditDetailsForm = ({
                 error={errors.abbreviation}
                 helperText={errors.abbreviation}
               />
-              {/* <Field
-                name="courseId"
-                type="string"
-                as={TextField}
-                label="Id"
-                error={errors.courseId}
-                helperText={errors.courseId}
-              /> */}
               <Field
                 name="moocfiId"
                 type="string"
@@ -185,7 +206,7 @@ export const EditDetailsForm = ({
                 type="submit"
                 variant="contained"
                 color="primary"
-                disabled={isSubmitting || isValidating}
+                disabled={!dirty || isValidating}
               >
                 Update
               </Button>
