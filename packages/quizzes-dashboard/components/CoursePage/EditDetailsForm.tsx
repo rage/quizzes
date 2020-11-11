@@ -6,7 +6,7 @@ import { useRouter } from "next/router"
 import usePromise from "react-use-promise"
 import {
   fetchCourseQuizzes,
-  fetchLanguages,
+  getAllLanguages,
   updateCourseProperties,
 } from "../../services/quizzes"
 import {
@@ -206,7 +206,7 @@ const EditCourseDetails = () => {
     [id],
   )
   const [languageData, languagesFetchError] = usePromise(
-    () => fetchLanguages(),
+    () => getAllLanguages(),
     [],
   )
 

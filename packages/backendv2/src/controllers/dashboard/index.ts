@@ -314,9 +314,5 @@ const dashboard = new Router<CustomState, CustomContext>({
       }
     }
   })
-  .get("/languages/ids", accessControl(), async ctx => {
-    const result = await Language.getAll()
-    ctx.body = result
-  })
 
 export default dashboard
