@@ -371,9 +371,16 @@ class Course extends Model {
   }
 
   static async updateMoocfiId(id: string, newMoocfiId: string) {
-    const course = await this.getById(id)
+    let course
+    try {
+      course = await this.query().patchAndFetchById(id, {
+        moocfiId: newMoocfiId,
+      })
+    } catch (error) {
+      throw error
+    }
 
-    return await course.$query().patchAndFetch({ moocfiId: newMoocfiId })
+    return course.moocfiId
   }
 }
 
