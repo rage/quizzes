@@ -1241,14 +1241,48 @@ describe("dashboard - courses: downloading a correspondence file should", () => 
       .expect(403, done)
   })
 
+  //TODO: asserts on response
   test("should return 200 on successful request", done => {
     request(app.callback())
       .post("/api/v2/dashboard/courses/download-correspondence-file")
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .send(input.correspondenceIds)
-      .expect(async response => {
-        //TODO: asserts on response
-        // console.log(response.body)
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: a get request for all languages", () => {
+  beforeAll(async () => {
+    await safeSeed({ directory: "./database/seeds" })
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("should return all languages on valid request", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/languages/all")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        expect(response.body).toStrictEqual(validation.allLanguages)
       })
       .expect(200, done)
   })

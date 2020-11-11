@@ -8,6 +8,11 @@ export async function seed(knex: Knex): Promise<any> {
         country: "country",
         name: "language",
       },
+      {
+        id: "aa_BB",
+        country: "another country",
+        name: "language",
+      },
     ]),
   ])
 

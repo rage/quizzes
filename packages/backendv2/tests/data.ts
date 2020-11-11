@@ -962,4 +962,20 @@ export const validation = {
     success: true,
     newCourseId: expect.stringMatching(uuid),
   },
+  allLanguages: [
+    {
+      id: "xy_YZ",
+      name: "language",
+      country: "country",
+      createdAt: expect.stringMatching(dateTime),
+      updatedAt: expect.stringMatching(dateTime),
+    },
+    {
+      id: "aa_BB",
+      name: "language",
+      country: "another country",
+      createdAt: expect.stringMatching(dateTime),
+      updatedAt: expect.stringMatching(dateTime),
+    },
+  ],
 }
