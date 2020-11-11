@@ -1,3 +1,4 @@
+import { BadRequestError } from "./../util/error"
 import Model from "./base_model"
 import User from "./user"
 import Knex from "knex"
@@ -112,12 +113,25 @@ class UserCoursePartState extends Model {
     courseId: string,
     trx: Knex.Transaction,
   ) {
-    const userCoursePartStates = await this.query(trx)
-      .where({
-        user_id: userId,
-        course_id: courseId,
-      })
-      .andWhereNot("course_part", 0)
+    let userCoursePartStates
+
+    // validate course id and user id
+    try {
+      await Course.getFlattenedById(courseId)
+    } catch (error) {
+      throw error
+    }
+
+    try {
+      userCoursePartStates = await this.query(trx)
+        .where({
+          user_id: userId,
+          course_id: courseId,
+        })
+        .andWhereNot("course_part", 0)
+    } catch (error) {
+      throw error
+    }
 
     const quizzes = await Quiz.query(trx)
       .where("course_id", courseId)

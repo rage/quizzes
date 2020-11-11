@@ -108,7 +108,7 @@ const dashboard = new Router<CustomState, CustomContext>({
             await UserCoursePartState.getProgress(user.id, courseId, trx),
         )
       } catch (err) {
-        throw new BadRequestError(err)
+        throw err
       }
     },
   )
