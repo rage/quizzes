@@ -304,11 +304,21 @@ const dashboard = new Router<CustomState, CustomContext>({
     const moocfiId = payload.moocfiId
     await checkAccessOrThrow(ctx.state.user, courseId, "edit")
 
-    let moocfiIdEdited: string | null = null
+    // TODO: prbably good idea to check if moocfi id is a valid one (exists in DB)
+
+    try {
+      await Course.getFlattenedById(courseId)
+    } catch (error) {
+      throw error
+    }
+
+    if (!moocfiId && !payload) {
+      throw new BadRequestError("No edited properties provided.")
+    }
 
     const payloadWithoutMoocfiId = _.omit(payload, ["moocfiId"])
 
-    const coursePropertiesEdited: EditCoursePayloadFields = await CourseTranslation.updateCourseProperties(
+    await CourseTranslation.updateCourseProperties(
       courseId,
       payloadWithoutMoocfiId,
     )
@@ -316,14 +326,13 @@ const dashboard = new Router<CustomState, CustomContext>({
     // moocfi id separated from rest since it is a property of Course entity
     if (moocfiId) {
       try {
-        moocfiIdEdited = await Course.updateMoocfiId(courseId, moocfiId)
-        coursePropertiesEdited.moocfiId = moocfiIdEdited
+        await Course.updateMoocfiId(courseId, moocfiId)
       } catch (error) {
         throw error
       }
     }
 
-    ctx.body = coursePropertiesEdited
+    ctx.body = await Course.getFlattenedById(courseId)
   })
 
 export default dashboard
