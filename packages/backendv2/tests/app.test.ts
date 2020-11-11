@@ -1251,7 +1251,7 @@ describe("dashboard - courses: downloading a correspondence file should", () => 
   })
 })
 
-describe("dashboard: a get request for all languages", () => {
+describe("dashboard: fetching all exisiting languages languages", () => {
   beforeAll(async () => {
     await safeSeed({ directory: "./database/seeds" })
   })
@@ -1283,6 +1283,56 @@ describe("dashboard: a get request for all languages", () => {
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(response => {
         expect(response.body).toStrictEqual(validation.allLanguages)
+      })
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: an edit made to a course should", () => {
+  beforeAll(async () => {
+    await safeSeed({ directory: "./database/seeds" })
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/edit",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with course that reflects edits", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/edit",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send(input.editedCourse)
+      .expect(response => {
+        const course = response.body
+        expect(course).toStrictEqual(validation.editedCourse)
       })
       .expect(200, done)
   })
