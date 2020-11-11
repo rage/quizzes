@@ -248,7 +248,7 @@ const dashboard = new Router<CustomState, CustomContext>({
   })
 
   .get("/languages/all", accessControl(), async ctx => {
-    ctx.body = await Course.getAllLanguages()
+    ctx.body = await Language.getAll()
   })
 
   .get("/users/current/abilities", accessControl(), async ctx => {

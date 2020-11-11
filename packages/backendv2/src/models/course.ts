@@ -361,10 +361,6 @@ class Course extends Model {
     return stream
   }
 
-  static async getAllLanguages() {
-    return await knex.from("language").select("id", "name")
-  }
-
   public static async getParts(courseId: string) {
     return (
       await Quiz.query()

@@ -115,9 +115,10 @@ class UserCoursePartState extends Model {
   ) {
     let userCoursePartStates
 
-    // validate course id and user id
+    // validate course id
     try {
       await Course.getFlattenedById(courseId)
+      await User.getById(userId)
     } catch (error) {
       throw error
     }
