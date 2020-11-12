@@ -272,6 +272,13 @@ class QuizAnswer extends Model {
   }
 
   public static async getManualReviewCountsByCourseId(courseId: string) {
+    // validate course id
+    try {
+      await Course.getFlattenedById(courseId)
+    } catch (error) {
+      throw error
+    }
+
     const counts: any[] = await this.query()
       .select(["quiz_id"])
       .join("quiz", "quiz_answer.quiz_id", "=", "quiz.id")
@@ -279,7 +286,9 @@ class QuizAnswer extends Model {
       .andWhere("status", "manual-review")
       .count()
       .groupBy("quiz_id")
-    const countByQuizId: { [quizId: string]: number } = {}
+    const countByQuizId: {
+      [quizId: string]: number
+    } = {}
     for (const count of counts) {
       countByQuizId[count.quizId] = count.count
     }
@@ -364,7 +373,7 @@ class QuizAnswer extends Model {
       let savedQuizAnswer
       let savedUserQuizState
       await this.markPreviousAsDeprecated(userId, quizId, trx)
-      savedQuizAnswer = await this.query(trx).upsertGraphAndFetch(quizAnswer)
+      savedQuizAnswer = await this.query(trx).insertGraphAndFetch(quizAnswer)
       savedUserQuizState = await UserQuizState.query(trx).upsertGraphAndFetch(
         userQuizState,
         {
@@ -408,7 +417,11 @@ class QuizAnswer extends Model {
   private static assessAnswer(quizAnswer: QuizAnswer, quiz: Quiz) {
     const quizItemAnswers = quizAnswer.itemAnswers
     const quizItems = quiz.items
-    if (!quizItemAnswers || quizItemAnswers.length != quizItems.length) {
+    if (
+      !quizItemAnswers ||
+      quizItemAnswers.length === 0 ||
+      quizItemAnswers.length != quizItems.length
+    ) {
       throw new BadRequestError("item answers missing")
     }
     for (const quizItemAnswer of quizItemAnswers) {
@@ -647,6 +660,13 @@ class QuizAnswer extends Model {
   }
 
   public static async getAnswersToReview(reviewerId: number, quizId: string) {
+    // validate quiz id
+    try {
+      await Quiz.getById(quizId)
+    } catch (error) {
+      throw error
+    }
+
     const answerIds = this.query()
       .select("id")
       .where("quiz_id", quizId)

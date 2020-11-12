@@ -6,7 +6,6 @@ import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
 
-
 export interface MenuItemProps {
   revealed: boolean
   children: any
@@ -49,10 +48,7 @@ const StyledMenuItem = styled.span<ButtonProps>`
 const RevealedMenuItem = styled(
   ({ selected, correct, ...others }: RevealedMenuItemProps) => {
     return (
-      <StyledMenuItem
-        selected={selected}
-        {...others}
-      >
+      <StyledMenuItem selected={selected} {...others}>
         {selected ? correct ? <SuccessIcon /> : <FailureIcon /> : ""}
         {others.children}
       </StyledMenuItem>
@@ -80,7 +76,7 @@ export default (props: MenuItemProps) => {
   const ThemedMenuItem = themeProvider.menuItem
 
   if (ThemedMenuItem) {
-    return <ThemedMenuItem {...props}/>
+    return <ThemedMenuItem {...props} />
   }
 
   return revealed ? (

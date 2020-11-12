@@ -32,8 +32,7 @@ interface ChoicesContainerProps {
   providedStyles: string | undefined
 }
 
-const StyledSelect = styled(Select)<ChoicesContainerProps>`
-`
+const StyledSelect = styled(Select)<ChoicesContainerProps>``
 
 const CentralizedOnSmallScreenTypography = styled(Typography)`
   @media only screen and (max-width: 600px) {
@@ -54,7 +53,7 @@ const ItemContent = styled.div<ItemContentProps>`
   margin-bottom: 10px;
   > div:first-of-type {
     display: grid;
-    grid-template-columns: 1fr 40%;;
+    grid-template-columns: 1fr 40%;
     justify-content: space-between;
     flex-direction: ${({ direction }) => direction};
   }
@@ -100,7 +99,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   const quiz = useTypedSelector(state => state.quiz)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
-  const [option, setOption] = React.useState('');
+  const [option, setOption] = React.useState("")
 
 
 
@@ -124,9 +123,9 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
     return <LaterQuizItemAddition item={item} />
   }
 
-  const handleChange = (event: React.ChangeEvent<{value: unknown}>) => {
+  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setOption(event.target.value as string)
-    console.log('Working....')
+    console.log("Working....")
   }
 
   const options = item.options
@@ -236,13 +235,11 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
       )}
 
       {body && <MarkdownText>{body}</MarkdownText>}
-
     </QuestionContainer>
   )
 }
 
-const SelectOptionsLabelTypography = styled(Typography)<{
-}>`
+const SelectOptionsLabelTypography = styled(Typography)<{}>`
   color: 6b6b6b;
 `
 
@@ -252,7 +249,6 @@ type OptionProps = {
   optionWidth: GridSize
   shouldBeGray: boolean
 }
-
 
 
 interface IFeedbackPortionProps {
@@ -356,7 +352,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 }
 
 const OptionWrapper = styled(MenuItem)<OptionWrapperProps>`
-      margin-left: 1rem;     
+  margin-left: 1rem;
 `
 
 type OptionWrapperProps = {

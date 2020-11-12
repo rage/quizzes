@@ -49,19 +49,18 @@ const FailureIcon = () => (
 
 const ChoiceButton = styled(SecondaryStyledButton)<ButtonProps>`
   ${({ onlyOneItem }) => onlyOneItem && `width: 90%;`}
-  ${({ state }) => state && `background-color: #E3B599;` }
+  ${({ state }) => state && `background-color: #E3B599;`}
   margin: 0.5em 0;
 
-  &:hover{
-    background: #E5C7B5;
+  &:hover {
+    background: #e5c7b5;
     box-shadow: none;
   }
 
-  &:focus{
-    ${({ state }) => state ? `background-color: #E3B599;` : `background-color: #E0E0E0;`}
+  &:focus {
+    ${({ state }) =>
+      state ? `background-color: #E3B599;` : `background-color: #E0E0E0;`}
   }
-
-
 `
 
 const RevealedChoiceButton = styled(

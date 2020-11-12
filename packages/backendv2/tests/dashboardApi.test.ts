@@ -1,78 +1,26 @@
 import request from "supertest"
 import { v4 as uuidv4 } from "uuid"
 import nock from "nock"
+const knexCleaner = require("knex-cleaner")
 import app from "../app"
 import knex from "../database/knex"
-import { Quiz, QuizAnswer } from "../src/models"
-import { input, validation } from "./data"
+import { QuizAnswer, Course } from "../src/models"
+import { input, userAbilities, validation } from "./data"
 import { UserInfo } from "../src/types"
+import { BadRequestError, NotFoundError } from "../src/util/error"
+
 import {
-  BadRequestError,
-  NotFoundError,
-  UnauthorizedError,
-} from "../src/util/error"
-
-const knexCleaner = require("knex-cleaner")
-
-const safeClean = async () => {
-  if (process.env.NODE_ENV === "test") {
-    await knexCleaner.clean(knex)
-  }
-}
-
-const safeSeed = async (config?: any) => {
-  if (process.env.NODE_ENV === "test") {
-    await knex.seed.run(config)
-  }
-}
-
-const configA = { directory: "./database/seeds", specific: "a.ts" }
+  safeClean,
+  safeSeed,
+  expectQuizToEqual,
+  configA,
+  uuid as uuidPattern,
+} from "./util"
 
 afterAll(async () => {
   await safeClean()
   await knex.destroy()
 })
-
-const expectQuizToEqual = (received: Quiz, expected: any) => {
-  const receivedItems = received.items
-  const expectedItems = expected.items
-  expect(receivedItems).toHaveLength(expectedItems.length)
-  for (const expectedItem of expectedItems) {
-    expect(receivedItems).toContainEqual(expectedItem)
-  }
-  const receivedOptions = receivedItems.map(item => item.options).flat()
-  const expectedOptions = expectedItems.map((item: any) => item.options).flat()
-  expect(receivedOptions).toHaveLength(expectedOptions.length)
-  for (const expectedOption of expectedOptions) {
-    expect(receivedOptions).toContainEqual(expectedOption)
-  }
-  const receivedPeerReviews = received.peerReviews
-  const expectedPeerReviews = expected.peerReviews
-  expect(receivedPeerReviews).toHaveLength(expectedPeerReviews.length)
-  for (const expectedPeerReview of expectedPeerReviews) {
-    expect(receivedPeerReviews).toContainEqual(expectedPeerReview)
-  }
-  const receivedPeerReviewQuestions = receivedPeerReviews
-    .map(peerReview => peerReview.questions)
-    .flat()
-  const expectedPeerReviewQuestions = expectedPeerReviews
-    .map((peerReview: any) => peerReview.questions)
-    .flat()
-  expect(receivedPeerReviewQuestions).toHaveLength(
-    expectedPeerReviewQuestions.length,
-  )
-  for (const expectedPeerReviewQuestion of expectedPeerReviewQuestions) {
-    expect(receivedPeerReviewQuestions).toContainEqual(
-      expectedPeerReviewQuestion,
-    )
-  }
-  const expectedClone = { ...expected }
-  delete received.items
-  delete expectedClone.items
-  delete received.peerReviews
-  delete expectedClone.peerReviews
-  expect(received).toStrictEqual(expectedClone)
-}
 
 describe("dashboard: get courses", () => {
   beforeAll(async () => {
@@ -83,6 +31,7 @@ describe("dashboard: get courses", () => {
     nock.cleanAll()
     await safeClean()
   })
+
   beforeEach(async () => {
     nock("https://tmc.mooc.fi")
       .get("/api/v8/users/current?show_user_fields=true")
@@ -115,7 +64,7 @@ describe("dashboard: get courses", () => {
       .expect(401, done)
   })
 
-  test("respond with 403 if insufficient priviledge", done => {
+  test("respond with 403 if insufficient privilege", done => {
     request(app.callback())
       .get("/api/v2/dashboard/courses")
       .set("Authorization", `bearer PLEB_TOKEN`)
@@ -137,9 +86,188 @@ describe("dashboard: get courses", () => {
       .end(done)
   })
 })
+describe("dashboard: get single course should", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 6666,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b")
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 403 if insufficient privilege", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
+  })
+
+  test("respond with 404 if invalid course id", done => {
+    const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44c"
+    request(app.callback())
+      .get(`/api/v2/dashboard/courses/${courseId}`)
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        const received: NotFoundError = response.body
+        expect(received.message).toEqual(`course not found: ${courseId}`)
+      })
+      .expect(404, done)
+  })
+  describe("on valid request: ", () => {
+    test("reply with course on valid request", done => {
+      request(app.callback())
+        .get("/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b")
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .expect(200)
+        .expect(response => {
+          const received = response.body
+          expect(received).toStrictEqual(validation.singleCourse)
+        })
+        .end(done)
+    })
+  })
+})
+
+describe("dashboard - courses: count answers requiring attention should", () => {
+  beforeAll(async () => {
+    await safeSeed({ directory: "./database/seeds" })
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 6666,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/count-answers-requiring-attention",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 403 if insufficient privilege", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/count-answers-requiring-attention",
+      )
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
+  })
+
+  test("respond with 404 if invalid course id", done => {
+    const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44c"
+    request(app.callback())
+      .get(
+        `/api/v2/dashboard/courses/${courseId}/count-answers-requiring-attention`,
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        const received: NotFoundError = response.body
+        expect(received.message).toEqual(`course not found: ${courseId}`)
+      })
+      .expect(404, done)
+  })
+
+  describe("on valid request:", () => {
+    test("return 0 when none require attention", done => {
+      request(app.callback())
+        .get(
+          "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/count-answers-requiring-attention",
+        )
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .expect(200)
+        .expect(response => {
+          const received = response.body
+          expect(received).toMatchObject({})
+        })
+        .end(done)
+    })
+    test("return correct quiz id and count when there are answers requiring attention", done => {
+      request(app.callback())
+        .get(
+          "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/count-answers-requiring-attention",
+        )
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .expect(200)
+        .expect(response => {
+          const received = response.body
+          expect(received).toMatchObject({
+            "2a0c2270-011e-40b2-8796-625764828034": "15",
+          })
+        })
+        .end(done)
+    })
+  })
+})
+
 describe("dashboard: get quizzes by course id", () => {
   beforeAll(async () => {
     await safeSeed(configA)
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
   })
 
   beforeEach(() => {
@@ -383,93 +511,6 @@ describe("dashboard: save quiz", () => {
         const received = response.body
         expectQuizToEqual(received, validation.quizUpdate)
       })
-      .end(done)
-  })
-})
-
-describe("widget: save quiz answer", () => {
-  beforeAll(async () => {
-    await safeSeed(configA)
-  })
-
-  afterAll(async () => {
-    nock.cleanAll()
-    await safeClean()
-  })
-
-  beforeEach(async () => {
-    nock("https://tmc.mooc.fi")
-      .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
-        const auth = this.req.headers.authorization
-        if (auth === "Bearer 1234") {
-          return [
-            200,
-            {
-              id: 1234,
-            } as UserInfo,
-          ]
-        }
-        if (auth === "Bearer 4321") {
-          return [
-            200,
-            {
-              id: 4321,
-            } as UserInfo,
-          ]
-        }
-      })
-  })
-
-  test("no answer past deadline", async done => {
-    request(app.callback())
-      .post("/api/v2/widget/answer")
-      .set("Authorization", `bearer 1234`)
-      .set("Accept", "application/json")
-      .send(input.quizAnswerPastDeadline)
-      .expect(400)
-      .expect(response =>
-        expect(response.body.message).toMatch("no submission past deadline"),
-      )
-      .end(done)
-  })
-
-  test("no answers exceeding number of tries", async done => {
-    request(app.callback())
-      .post("/api/v2/widget/answer")
-      .set("Authorization", `bearer 1234`)
-      .set("Accept", "application/json")
-      .send(input.quizAnswerAlreadyAnswered)
-      .expect(400)
-      .expect(response =>
-        expect(response.body.message).toMatch("already answered"),
-      )
-      .end(done)
-  })
-
-  test("no answers without item answers", async done => {
-    const quizAnswer = { ...input.quizAnswerOpen }
-    delete quizAnswer.itemAnswers
-    request(app.callback())
-      .post("/api/v2/widget/answer")
-      .set("Authorization", `bearer 4321`)
-      .set("Accept", "application/json")
-      .send(quizAnswer)
-      .expect(400)
-      .expect(response =>
-        expect(response.body.message).toMatch("item answers missing"),
-      )
-      .end(done)
-  })
-
-  test("save", async done => {
-    request(app.callback())
-      .post("/api/v2/widget/answer")
-      .set("Authorization", `bearer 1234`)
-      .set("Accept", "application/json")
-      .send(input.quizAnswerOpen)
-      .expect(200)
-      // .expect(response => console.log(response.body))
       .end(done)
   })
 })
@@ -808,298 +849,6 @@ describe("dashboard: update manual review status", () => {
   })
 })
 
-describe("Answer: spam flags", () => {
-  beforeAll(async () => {
-    await safeSeed(configA)
-  })
-
-  afterAll(async () => {
-    nock.cleanAll()
-    await safeClean()
-  })
-
-  beforeEach(() => {
-    nock("https://tmc.mooc.fi")
-      .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
-        const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token_1") {
-          return [
-            200,
-            {
-              id: 1234,
-              administrator: false,
-            } as UserInfo,
-          ]
-        }
-        if (auth === "Bearer pleb_token_2") {
-          return [
-            200,
-            {
-              id: 2345,
-              administrator: false,
-            } as UserInfo,
-          ]
-        }
-        if (auth === "Bearer pleb_token_3") {
-          return [
-            200,
-            {
-              id: 3456,
-              administrator: false,
-            } as UserInfo,
-          ]
-        }
-        if (auth === "Bearer pleb_token_4") {
-          return [
-            200,
-            {
-              id: 4567,
-              administrator: false,
-            } as UserInfo,
-          ]
-        }
-        if (auth === "Bearer admin_token") {
-          return [
-            200,
-            {
-              administrator: true,
-            } as UserInfo,
-          ]
-        }
-      })
-  })
-
-  test("spam flag already given", done => {
-    request(app.callback())
-      .post("/api/v2/widget/answers/report-spam")
-      .set("Authorization", "bearer PLEB_TOKEN_1")
-      .set("Accept", "application/json")
-      .send({
-        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
-      })
-      .expect(response => {
-        const received: BadRequestError = response.body
-        expect(received.message).toEqual("Can only give one spam flag")
-      })
-      .expect(400, done)
-  })
-
-  test("First spam flag", done => {
-    request(app.callback())
-      .post("/api/v2/widget/answers/report-spam")
-      .set("Authorization", "bearer PLEB_TOKEN_2")
-      .set("Accept", "application/json")
-      .send({
-        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
-      })
-      .expect(res => {
-        expect(res.body).toEqual(validation.spamFlagValidator1)
-      })
-      .expect(200, done)
-  })
-
-  test("check the answers status", done => {
-    request(app.callback())
-      .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
-      .set("Authorization", "bearer ADMIN_TOKEN")
-      .set("Accept", "application/json")
-      .expect(response => {
-        expect(response.body.status).toEqual("given-enough")
-        expect(response.body.userQuizState.spamFlags).toEqual(1)
-      })
-      .expect(200, done)
-  })
-
-  test("Second spam flag", done => {
-    request(app.callback())
-      .post("/api/v2/widget/answers/report-spam")
-      .set("Authorization", "bearer PLEB_TOKEN_3")
-      .set("Accept", "application/json")
-      .send({
-        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
-      })
-      .expect(response => {
-        expect(response.body).toEqual(validation.spamFlagValidator2)
-      })
-      .expect(200, done)
-  })
-
-  test("check the answer status", done => {
-    request(app.callback())
-      .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
-      .set("Authorization", "bearer ADMIN_TOKEN")
-      .set("Accept", "application/json")
-      .expect(response => {
-        expect(response.body.userQuizState.spamFlags).toEqual(2)
-        expect(response.body.status).toEqual("given-enough")
-      })
-      .expect(200, done)
-  })
-
-  test("Third spam flag", done => {
-    request(app.callback())
-      .post("/api/v2/widget/answers/report-spam")
-      .set("Authorization", "bearer PLEB_TOKEN_4")
-      .set("Accept", "application/json")
-      .send({
-        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
-      })
-      .expect(response => {
-        expect(response.body).toEqual(validation.spamFlagValidator3)
-      })
-      .expect(200, done)
-  })
-
-  test("check the answer status", done => {
-    request(app.callback())
-      .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
-      .set("Authorization", "bearer ADMIN_TOKEN")
-      .set("Accept", "application/json")
-      .expect(response => {
-        expect(response.body.userQuizState.spamFlags).toEqual(3)
-        expect(response.body.status).toEqual("spam")
-      })
-      .expect(200, done)
-  })
-})
-
-describe("widget: a fetch for peer reviews for some quiz answer...", () => {
-  beforeAll(async () => {
-    await safeSeed(configA)
-  })
-
-  afterAll(async () => {
-    nock.cleanAll()
-    await safeClean()
-  })
-
-  beforeEach(() => {
-    nock("https://tmc.mooc.fi")
-      .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
-        const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
-          return [
-            200,
-            {
-              id: 2345,
-              administrator: false,
-            } as UserInfo,
-          ]
-        }
-        if (auth === "Bearer admin_token") {
-          return [
-            200,
-            {
-              administrator: true,
-            } as UserInfo,
-          ]
-        }
-      })
-  })
-
-  test("responds with 401 if invalid credentials", done => {
-    request(app.callback())
-      .get(
-        "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/peer-reviews",
-      )
-      .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(response => {
-        const received: UnauthorizedError = response.body
-        expect(received.message).toEqual("unauthorized")
-      })
-      .expect(401, done)
-  })
-
-  test("responds with 404 if invalid answer id", done => {
-    request(app.callback())
-      .get(
-        "/api/v2/widget/answers/1cb3e4de-fc11-4aac-be45-06312aa4677c/peer-reviews",
-      )
-      .set("Authorization", `bearer ADMIN_TOKEN`)
-      .expect(response => {
-        const received: NotFoundError = response.body
-        expect(received.message).toEqual(
-          "quiz answer not found: 1cb3e4de-fc11-4aac-be45-06312aa4677c",
-        )
-      })
-      .expect(404, done)
-  })
-})
-
-describe("on a valid request", () => {
-  beforeAll(async () => {
-    await safeSeed(configA)
-  })
-
-  afterAll(async () => {
-    nock.cleanAll()
-    await safeClean()
-  })
-
-  beforeEach(() => {
-    nock("https://tmc.mooc.fi")
-      .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
-        const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
-          return [
-            200,
-            {
-              id: 2345,
-              administrator: false,
-            } as UserInfo,
-          ]
-        }
-        if (auth === "Bearer admin_token") {
-          return [
-            200,
-            {
-              administrator: true,
-            } as UserInfo,
-          ]
-        }
-      })
-  })
-  test("returns an empty array if no peer reviews received", done => {
-    request(app.callback())
-      .get(
-        "/api/v2/widget/answers/ae29c3be-b5b6-4901-8588-5b0e88774748/peer-reviews",
-      )
-      .set("Authorization", `bearer ADMIN_TOKEN`)
-      .expect(response => {
-        expect(response.body).toEqual([])
-      })
-      .expect(200, done)
-  })
-
-  test("returns correct number of peer reviews on valid request", done => {
-    request(app.callback())
-      .get(
-        "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/peer-reviews",
-      )
-      .set("Authorization", `bearer ADMIN_TOKEN`)
-      .expect(response => {
-        expect(response.body.length).toEqual(2)
-      })
-      .expect(200, done)
-  })
-  test("returns peer reviews that are of correct shape", done => {
-    request(app.callback())
-      .get(
-        "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/peer-reviews",
-      )
-      .set("Authorization", `bearer ADMIN_TOKEN`)
-      .expect(response => {
-        expect(response.body).toStrictEqual(
-          validation.receivedPeerReviewsValidator,
-        )
-      })
-      .expect(200, done)
-  })
-})
-
 describe("test user progress", () => {
   beforeAll(async () => {
     await safeSeed(configA)
@@ -1161,9 +910,9 @@ describe("test user progress", () => {
   })
 })
 
-describe("widget: submitting a peer review", () => {
+describe("dashboard - courses: duplicating course should", () => {
   beforeAll(async () => {
-    await safeSeed(configA)
+    await safeSeed({ directory: "./database/seeds" })
   })
 
   afterAll(async () => {
@@ -1171,7 +920,7 @@ describe("widget: submitting a peer review", () => {
     await safeClean()
   })
 
-  beforeEach(() => {
+  beforeEach(async () => {
     nock("https://tmc.mooc.fi")
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
@@ -1180,7 +929,7 @@ describe("widget: submitting a peer review", () => {
           return [
             200,
             {
-              id: 2345,
+              id: 6666,
               administrator: false,
             } as UserInfo,
           ]
@@ -1196,99 +945,220 @@ describe("widget: submitting a peer review", () => {
       })
   })
 
-  test("responds with 401 if invalid credentials", done => {
+  test("respond with 401 if invalid credentials", done => {
     request(app.callback())
-      .post("/api/v2/widget/answers/give-review")
+      .post(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/duplicate-course",
+      )
       .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(response => {
-        const received: UnauthorizedError = response.body
-        expect(received.message).toEqual("unauthorized")
-      })
       .expect(401, done)
   })
 
-  test("responds with 404 if invalid answer id", done => {
-    const randomUuid = uuidv4()
+  test("respond with 403 if insufficient privilege", done => {
     request(app.callback())
-      .post("/api/v2/widget/answers/give-review")
+      .post(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/duplicate-course",
+      )
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
+  })
+
+  test("respond with 404 if invalid course id", done => {
+    const invalidCourseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44c"
+    request(app.callback())
+      .post(`/api/v2/dashboard/courses/${invalidCourseId}/duplicate-course`)
       .set("Authorization", `bearer ADMIN_TOKEN`)
-      .set("Accept", "application/json")
-      .send({
-        ...input.peerReview1,
-        quizAnswerId: randomUuid,
-      })
       .expect(response => {
         const received: NotFoundError = response.body
-        expect(received.message).toEqual(`quiz answer not found: ${randomUuid}`)
+        expect(received.message).toEqual(`course not found: ${invalidCourseId}`)
       })
       .expect(404, done)
   })
-
-  test("throws when peer review answer contains no text or value", done => {
+  test("throw BadRequestError if provided language id does not exist in db", done => {
+    const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44b"
+    const langIdInvalid = "ff_YY"
     request(app.callback())
-      .post("/api/v2/widget/answers/give-review")
+      .post(`/api/v2/dashboard/courses/${courseId}/duplicate-course`)
       .set("Authorization", `bearer ADMIN_TOKEN`)
-      .set("Accept", "application/json")
-      .send({
-        ...input.peerReview1,
-        answers: [
-          {
-            peerReviewQuestionId: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
-            value: null,
-          },
-        ],
-      })
-      .expect(response => {
-        const received: BadRequestError = response.body
-        expect(received.message).toEqual(`review must contain values`)
-      })
-      .expect(400, done)
-  })
-  test("throws when user quiz state not found", done => {
-    request(app.callback())
-      .post("/api/v2/widget/answers/give-review")
-      .set("Authorization", `bearer ADMIN_TOKEN`)
-      .set("Accept", "application/json")
-      .send(input.peerReview3)
-      .expect(response => {
-        const received: NotFoundError = response.body
-        expect(received.message).toEqual(`User quiz state not found.`)
-      })
-      .expect(404, done)
-  })
-
-  test("returns peer review in correct shape when request successful", done => {
-    request(app.callback())
-      .post("/api/v2/widget/answers/give-review")
-      .set("Authorization", `bearer ADMIN_TOKEN`)
-      .set("Accept", "application/json")
-      .send(input.peerReview1)
-      .expect(200)
-      .expect(response => {
-        const {
-          userQuizState: { peerReviewsGiven },
-        } = response.body
-        expect(peerReviewsGiven).toEqual(1)
-        expect(response.body).toStrictEqual(
-          validation.givenPeerReviewsValidator[0],
-        )
-      })
-      .end(done)
-  })
-
-  test("does not allow the same answer to be reviewed twice by the same user", done => {
-    request(app.callback())
-      .post("/api/v2/widget/answers/give-review")
-      .set("Authorization", `bearer ADMIN_TOKEN`)
-      .set("Accept", "application/json")
-      .send(input.peerReview1)
-      .expect(400)
+      .send({ ...input.duplicateCourseValid, lang: langIdInvalid })
       .expect(response => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual(
-          `Answer can only be peer reviewed once`,
+          `Invalid language id provided: ${langIdInvalid}`,
         )
       })
-      .end(done)
+      .expect(400, done)
+  })
+
+  describe("on valid request:", () => {
+    test("return success and the id of the duplicate ", done => {
+      const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44b"
+      request(app.callback())
+        .post(`/api/v2/dashboard/courses/${courseId}/duplicate-course`)
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .send(input.duplicateCourseValid)
+        .expect(response => {
+          expect(response.body).toStrictEqual(validation.duplicateCourse)
+        })
+        .expect(200, done)
+    })
+    test("set defaults for new course when title and abbreviation missing ", async done => {
+      const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44b"
+      request(app.callback())
+        .post(`/api/v2/dashboard/courses/${courseId}/duplicate-course`)
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .send({ ...input.duplicateCourseValid, name: null, abbr: null })
+        .expect(async response => {
+          const duplicate = await Course.getFlattenedById(
+            response.body.newCourseId,
+          )
+          expect(duplicate.title).toContain("(duplicate) [title not set]")
+          expect(duplicate.abbreviation).toContain(
+            "(duplicate) [title not set]",
+          )
+        })
+        .expect(200, done)
+    })
+  })
+})
+
+//TODO: figure out how to parse the csv stream
+describe("dashboard - courses: downloading a correspondence file should", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 6666,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .post("/api/v2/dashboard/courses/download-correspondence-file")
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 403 if insufficient privilege", done => {
+    request(app.callback())
+      .post("/api/v2/dashboard/courses/download-correspondence-file")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
+  })
+
+  test("should return 200 on successful request", done => {
+    request(app.callback())
+      .post("/api/v2/dashboard/courses/download-correspondence-file")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send(input.correspondenceIds)
+      .expect(async response => {
+        //TODO: asserts on response
+        console.log(response.body)
+      })
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: get current users abilities", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async done => {
+    nock.cleanAll()
+    await safeClean()
+    done()
+  })
+
+  test("dashboard: get current users abilities, teacher", done => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 9876,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+    request(app.callback())
+      .get("/api/v2/dashboard/users/current/abilities")
+      .set("Authorization", "bearer pleb_token")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual(userAbilities.abilities.teacher)
+      })
+      .expect(200, done)
+  })
+
+  test("dashboard: get current user abilities, assistant", done => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 8765,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+    request(app.callback())
+      .get("/api/v2/dashboard/users/current/abilities")
+      .set("Authorization", "bearer pleb_token")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual(userAbilities.abilities.assistant)
+      })
+      .expect(200, done)
   })
 })

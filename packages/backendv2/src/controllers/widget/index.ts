@@ -20,7 +20,10 @@ const widget = new Router<CustomState, CustomContext>({
     const userId = ctx.state.user.id
     const userQuizState = await UserQuizState.getByUserAndQuiz(userId, quizId)
     const quizAnswer = await QuizAnswer.getByUserAndQuiz(userId, quizId)
-    const quiz = await Quiz.getById(quizId)
+    const quiz =
+      userQuizState?.status === "locked"
+        ? await Quiz.getById(quizId)
+        : await Quiz.getByIdStripped(quizId)
     const course = await Course.getById(quiz.courseId)
     quiz.course = course
     ctx.body = {
@@ -80,14 +83,6 @@ const widget = new Router<CustomState, CustomContext>({
     const quizId = ctx.params.quizId
     const userId = ctx.state.user.id
     ctx.body = await QuizAnswer.getAnswersToReview(userId, quizId)
-  })
-  .post("/answers/give-review", accessControl(), async ctx => {
-    const userId = ctx.state.user.id
-    const peerReview = ctx.request.body
-    if (userId) {
-      peerReview.userId = userId
-    }
-    ctx.body = await PeerReview.givePeerReview(peerReview)
   })
 
   .post("/answers/give-review", accessControl(), async ctx => {
