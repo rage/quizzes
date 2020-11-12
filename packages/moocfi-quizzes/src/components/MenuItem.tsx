@@ -10,6 +10,7 @@ import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
 export interface MenuItemProps {
   revealed: boolean
   children: any
+  value: any
   selected: boolean
   correct: boolean
   onClick?: any
@@ -42,7 +43,7 @@ const FailureIcon = () => (
   </IconWrapper>
 )
 
-const StyledMenuItem = styled(MenuItem)<ButtonProps>`
+const StyledMenuItem = styled.span<ButtonProps>`
 `
 
 const RevealedMenuItem = styled(

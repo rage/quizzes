@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { Typography, Select, FormControl, InputLabel} from "@material-ui/core"
+import { Typography, Select, MenuItem, FormControl, InputLabel} from "@material-ui/core"
 import { GridDirection, GridSize } from "@material-ui/core/Grid"
 import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
@@ -13,7 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons"
 import ThemeProviderContext from "../contexes/themeProviderContext"
 import ChoiceButton from "./ChoiceButton"
-import MenuItem from "./MenuItem"
+import MenuItems from "./MenuItem"
 
 const QuestionContainer = styled.div`
   display: flex;
@@ -96,17 +96,31 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   item,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
+  const dispatch = useDispatch()
   const quiz = useTypedSelector(state => state.quiz)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const [option, setOption] = React.useState('');
 
+
+
+  const items = useTypedSelector(state => state.quiz!.items)
+ /*  const item = items.find(i => i.id === option.quizItemId) */
+  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const languageLabels = useTypedSelector(
+    state => state.language.languageLabels,
+  )
+  const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
+
+
+
   if (!quiz) {
     return <div />
   }
 
-  const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
-  if (!itemAnswer && !quizDisabled) {
+  const ItemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
+  if (!ItemAnswer && !quizDisabled) {
     return <LaterQuizItemAddition item={item} />
   }
 
@@ -120,6 +134,25 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   let direction: GridDirection = "row"
   let questionWidth: 5 | 12 = 5
   let optionWidth: GridSize = "auto"
+
+  const itemAnswer = quizAnswer.itemAnswers.find(
+    ia => ia.quizItemId === item.id,
+  )
+
+  const text = option
+
+  if (!itemAnswer && !quizDisabled) {
+    return <div>Answer cannot be retrieved</div>
+  }
+
+  const handleOptionChange = (optionId: string) => () =>
+    dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))
+
+  const optionAnswers = itemAnswer && itemAnswer.optionAnswers
+  const answerLocked = userQuizState && userQuizState.status === "locked"
+
+  const optionIsSelected =
+    optionAnswers && optionAnswers.some(oa => oa.quizOptionId === option.id)
 
 
   return (
@@ -148,13 +181,16 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
               .sort((o1, o2) => o1.order - o2.order)
               .map((option, index) => {
                 return (
-                  <Option
-                  key={option.id}
-                  option={option}
-                  value={option.title}
-                  optionWidth={optionWidth}
-                  shouldBeGray={index % 2 === 0}
-                  >{option.title}</Option>
+                  <MenuItem
+                    selected={!!optionIsSelected}
+                    onClick={handleOptionChange(option.id)}
+                    disabled={quizDisabled}
+                    aria-pressed={optionIsSelected}
+                    key={option.id}
+                    value={option.title}
+/*                     optionWidth={optionWidth}
+                    shouldBeGray={false} */
+                  >{option.title}</MenuItem>
                 )
               })}
           </StyledSelect>
@@ -218,94 +254,6 @@ type OptionProps = {
 }
 
 
-const Option: React.FunctionComponent<OptionProps> = ({
-  option,
-  value,
-  shouldBeGray,
-}) => {
-  const themeProvider = React.useContext(ThemeProviderContext)
-  const dispatch = useDispatch()
-  const items = useTypedSelector(state => state.quiz!.items)
-  const item = items.find(i => i.id === option.quizItemId)
-  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
-  const userQuizState = useTypedSelector(state => state.user.userQuizState)
-  const languageLabels = useTypedSelector(
-    state => state.language.languageLabels,
-  )
-  const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
-  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
-
-  if (!item || !languageLabels) {
-    // should be impossible
-    return <div>Cannot find related item or language</div>
-  }
-  const itemAnswer = quizAnswer.itemAnswers.find(
-    ia => ia.quizItemId === item.id,
-  )
-
-  const text = option
-
-  if (!itemAnswer && !quizDisabled) {
-    return <div>Answer cannot be retrieved</div>
-  }
-
-  const handleOptionChange = (optionId: string) => () =>
-    dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))
-
-  const optionAnswers = itemAnswer && itemAnswer.optionAnswers
-  const answerLocked = userQuizState && userQuizState.status === "locked"
-
-  const optionIsSelected =
-    optionAnswers && optionAnswers.some(oa => oa.quizOptionId === option.id)
-
-  if (!displayFeedback) {
-    return (
-/*       <OptionWrapper
-        shouldBeGray={shouldBeGray}
-        providedStyles={themeProvider.optionWrapperStyles}
-      > */
-        <MenuItem
-          selected={!!optionIsSelected}
-          revealed={false}
-          correct={false}
-          onClick={handleOptionChange(option.id)}
-          disabled={quizDisabled}
-          aria-pressed={optionIsSelected}
-        >
-          <MarkdownText Component={justADiv} removeParagraphs>
-            {text.title}
-          </MarkdownText>
-        </MenuItem>
-/*       </OptionWrapper> */
-    )
-  }
-
-  const clickOptions = answerLocked
-    ? {}
-    : { onClick: handleOptionChange(option.id) }
-
-  // multiple items
-  return (
-    <>
-   {/*    <OptionWrapper shouldBeGray={shouldBeGray}> */}
-        <MenuItem
-          revealed
-          selected={!!optionIsSelected}
-          correct={option.correct}
-          {...clickOptions}
-          aria-selected={optionIsSelected}
-          aria-label={`${text.title}-${
-            option.correct ? "correct" : "incorrect"
-          }`}
-        >
-          <MarkdownText Component={justADiv} removeParagraphs>
-            {text.title}
-          </MarkdownText>
-        </MenuItem>
-{/*       </OptionWrapper> */}
-    </>
-  )
-}
 
 interface IFeedbackPortionProps {
   item: QuizItem
