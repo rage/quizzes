@@ -1878,7 +1878,10 @@ describe("dashboard: get all answer states", () => {
       .get("/api/v2/dashboard/quizzes/answers/get-answer-states")
       .set("Authorization", `bearer pleb_token`)
       .expect(response => {
-        expect(response.body).toIncludeAnyMembers(possibleAnswerStates)
+        const result: string[] = response.body.filter(
+          (state: string) => !possibleAnswerStates.includes(state),
+        )
+        expect(result).toEqual([])
       })
       .expect(200, done)
   })
