@@ -670,6 +670,8 @@ class QuizAnswer extends Model {
       .select("id")
       .where("quiz_id", quizId)
 
+    console.log(await answerIds)
+
     const givenPeerReviews = await PeerReview.query()
       .whereIn("quiz_answer_id", answerIds)
       .andWhere("user_id", reviewerId)

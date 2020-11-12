@@ -21,9 +21,9 @@ const widget = new Router<CustomState, CustomContext>({
     const userQuizState = await UserQuizState.getByUserAndQuiz(userId, quizId)
     const quizAnswer = await QuizAnswer.getByUserAndQuiz(userId, quizId)
     const quiz =
-      userQuizState?.status === "open"
-        ? await Quiz.getByIdStripped(quizId)
-        : await Quiz.getById(quizId)
+      userQuizState?.status === "locked"
+        ? await Quiz.getById(quizId)
+        : await Quiz.getByIdStripped(quizId)
     const course = await Course.getById(quiz.courseId)
     quiz.course = course
     ctx.body = {
@@ -82,12 +82,13 @@ const widget = new Router<CustomState, CustomContext>({
   .get("/answers/:quizId/get-candidates", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
     const userId = ctx.state.user.id
+    console.log(quizId)
+    console.log(userId)
     ctx.body = await QuizAnswer.getAnswersToReview(userId, quizId)
   })
 
   .post("/answers/give-review", accessControl(), async ctx => {
     const userId = ctx.state.user.id
-    console.log(userId)
     const peerReview = ctx.request.body
     peerReview.userId = userId
     ctx.body = await PeerReview.givePeerReview(peerReview)
