@@ -18,8 +18,6 @@ import MarkdownText from "./MarkdownText"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons"
 import ThemeProviderContext from "../contexes/themeProviderContext"
-import ChoiceButton from "./ChoiceButton"
-import MenuItems from "./MenuItem"
 
 const QuestionContainer = styled.div`
   display: flex;
@@ -91,8 +89,6 @@ const LeftAlignedMarkdownText = styled(MarkdownText)`
   text-align: left;
 `
 
-const justADiv = styled.div``
-
 type MultipleChoiceProps = {
   item: QuizItem
 }
@@ -105,10 +101,9 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   const quiz = useTypedSelector(state => state.quiz)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
-  const [option, setOption] = React.useState("")
+  const [selectedOption, setSelectedOption] = React.useState("")
 
   const items = useTypedSelector(state => state.quiz!.items)
-  /*  const item = items.find(i => i.id === option.quizItemId) */
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const languageLabels = useTypedSelector(
@@ -126,8 +121,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   }
 
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setOption(event.target.value as string)
-    console.log("Working....")
+    setSelectedOption(event.target.value as string)
   }
 
   const options = item.options
@@ -140,8 +134,6 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
     ia => ia.quizItemId === item.id,
   )
 
-  const text = option
-
   if (!itemAnswer && !quizDisabled) {
     return <div>Answer cannot be retrieved</div>
   }
@@ -150,10 +142,8 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
     dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))
 
   const optionAnswers = itemAnswer && itemAnswer.optionAnswers
+  // TODO: Handle if quiz is locked
   const answerLocked = userQuizState && userQuizState.status === "locked"
-
-  const optionIsSelected =
-    optionAnswers && optionAnswers.some(oa => oa.quizOptionId === option.id)
 
   return (
     <div role="group" aria-label={item.title}>
@@ -175,13 +165,14 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
               labelId="demo-simple-select-outlined-label"
               id="demo-simple-select-filled"
               direction={direction}
-              value={option}
+              value={selectedOption}
               providedStyles={themeProvider.optionContainerStyles}
               onChange={handleChange}
             >
               {options
                 .sort((o1, o2) => o1.order - o2.order)
                 .map((option, index) => {
+                  const optionIsSelected = option.id === selectedOption
                   return (
                     <MenuItem
                       selected={!!optionIsSelected}
@@ -189,9 +180,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
                       disabled={quizDisabled}
                       aria-pressed={optionIsSelected}
                       key={option.id}
-                      value={option.title}
-                      /*                     optionWidth={optionWidth}
-                    shouldBeGray={false} */
+                      value={option.id}
                     >
                       {option.title}
                     </MenuItem>
@@ -222,8 +211,6 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
     return <div />
   }
 
-  const multipleChoiceLabels = languageInfo.multipleChoice
-
   const { title, body } = item
 
   return (
@@ -242,17 +229,6 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
       {body && <MarkdownText>{body}</MarkdownText>}
     </QuestionContainer>
   )
-}
-
-const SelectOptionsLabelTypography = styled(Typography)<{}>`
-  color: 6b6b6b;
-`
-
-type OptionProps = {
-  value: string
-  option: QuizItemOption
-  optionWidth: GridSize
-  shouldBeGray: boolean
 }
 
 interface IFeedbackPortionProps {
@@ -354,10 +330,6 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
     </FeedbackDiv>
   )
 }
-
-const OptionWrapper = styled(MenuItem)<OptionWrapperProps>`
-  margin-left: 1rem;
-`
 
 type OptionWrapperProps = {
   shouldBeGray: boolean
