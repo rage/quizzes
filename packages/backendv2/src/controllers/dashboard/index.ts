@@ -298,8 +298,7 @@ const dashboard = new Router<CustomState, CustomContext>({
   })
 
   .get("/quizzes/answers/get-answer-states", accessControl(), async ctx => {
-    const result = await QuizAnswer.getStates()
-    ctx.body = result
+    ctx.body = await QuizAnswer.getStates()
   })
 
   .post("/courses/:courseId/edit", accessControl(), async ctx => {

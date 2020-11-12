@@ -1820,3 +1820,66 @@ describe("dashboard: get quizzes answer statistics", () => {
       .expect(200, done)
   })
 })
+
+describe("dashboard: get all answer states", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async done => {
+    nock.cleanAll()
+    await safeClean()
+    done()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer insufficient_token") {
+          return [
+            200,
+            {
+              id: 9876,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 1234,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/quizzes/answers/get-answer-states")
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 200 with succesfull request", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/quizzes/answers/get-answer-states")
+      .set("Authorization", `bearer pleb_token`)
+      .expect(response => {
+        expect(response.body).toIncludeAnyMembers(possibleAnswerStates)
+      })
+      .expect(200, done)
+  })
+})
