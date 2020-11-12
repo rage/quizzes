@@ -15,6 +15,8 @@ import ResearchAgreement from "../ResearchAgreement"
 import Scale from "../Scale"
 import Open from "../Open"
 import Essay from "../Essay"
+import ClickableMultipleChoice from "../ClickableMultipleChoice"
+import MultipleChoiceDropdown from "../MultipleChoiceDropdown"
 import StageVisualizer from "../PeerReviews/StageVisualizer"
 import PeerReviews from "../PeerReviews"
 import Unsupported from "../Unsupported"
@@ -46,6 +48,8 @@ const componentsByTypeNames = (typeName: QuizItemType) => {
     "research-agreement": ResearchAgreement,
     feedback: Feedback,
     "custom-frontend-accept-data": Unsupported,
+    "multiple-choice-dropdown": MultipleChoiceDropdown,
+    "clickable-multiple-choice": ClickableMultipleChoice,
   }
 
   return mapTypeToComponent[typeName]
@@ -295,13 +299,13 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     )
   }
 
-  if (quiz.texts.length === 0) {
+  /*if (quiz.texts.length === 0) {
     const message =
       "Error: quiz has no texts. (Likely the quiz does not match the requested " +
       "language id)"
     dispatch(messageActions.errorOccurred(message))
     return <div />
-  }
+  }*/
 
   let triesRemaining = quiz.tries
 
@@ -328,7 +332,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   }
 
   const containsPeerReviews =
-    quiz.peerReviewCollections !== null && quiz.peerReviewCollections.length > 0
+    quiz.peerReviews !== null && quiz.peerReviews.length > 0
 
   const answerStatus = quizAnswer.status ? quizAnswer.status : null
 
@@ -340,7 +344,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       : false
     : false
 
-  const submitMessage = quiz.texts[0].submitMessage
+  const submitMessage = quiz.submitMessage
 
   const exerciseFinishedMessage =
     activeStep === 4
@@ -376,7 +380,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   return (
     <OuterDiv
       providedStyles={themeProvider.mainDivStyles}
-      aria-label={quiz.texts[0].title}
+      aria-label={quiz.title}
       role="form"
     >
       <TopInfoBar />
@@ -389,7 +393,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           {containsPeerReviews && <StageVisualizer />}
 
           <QuizBody providedStyles={themeProvider.quizBodyStyles}>
-            {quiz.texts[0].body}
+            {quiz.body}
           </QuizBody>
           {children}
         </UpperContent>

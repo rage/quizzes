@@ -199,7 +199,9 @@ export class Quiz extends Model {
         savedQuiz = await this.query(trx).insertGraphAndFetch(quiz)
       }
       await this.updateCourseProgressesIfNecessary(oldQuiz, savedQuiz, trx)
-      await Kafka.broadcastCourseQuizzesUpdated(course.id, trx)
+      if (process.env.KAFKA_HOST) {
+        await Kafka.broadcastCourseQuizzesUpdated(course.id, trx)
+      }
       await trx.commit()
     } catch (error) {
       await trx.rollback()
@@ -238,6 +240,23 @@ export class Quiz extends Model {
     }
 
     return this.moveTextsToParent(quiz)
+  }
+
+  static async getByIdStripped(quizId: string) {
+    const quiz = await this.getById(quizId)
+    delete quiz.submitMessage
+    for (const quizItem of quiz.items) {
+      delete quizItem.successMessage
+      delete quizItem.failureMessage
+      delete quizItem.sharedOptionFeedbackMessage
+      delete quizItem.validityRegex
+      for (const quizOption of quizItem.options) {
+        delete quizOption.successMessage
+        delete quizOption.failureMessage
+        delete quizOption.correct
+      }
+    }
+    return quiz
   }
 
   static async getPreviewById(quizId: string) {

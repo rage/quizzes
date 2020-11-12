@@ -15,7 +15,6 @@ import {
   PeerReviewEssayAnswer,
   PeerReviewGradeAnswer,
   PeerReviewQuestion,
-  PeerReviewQuestionText,
   MiscEvent,
 } from "../../modelTypes"
 import {
@@ -197,7 +196,7 @@ const PeerReviewQuestions: React.FunctionComponent<PeerReviewQuestionsProps> = (
   if (!quiz) {
     return <div />
   }
-  const peerReviewQuestions = quiz.peerReviewCollections
+  const peerReviewQuestions = quiz.peerReviews
   const changeInPeerReviewGrade = (peerReviewQuestionId: string) => (
     name: string,
     value: string,
@@ -270,7 +269,7 @@ const PeerReviewQuestions: React.FunctionComponent<PeerReviewQuestionsProps> = (
                       handleTextChange={changeInPeerReviewText(question.id)}
                       key={question.id}
                       currentText={currentPeerReviewAnswer.text}
-                      questionTexts={question.texts[0]}
+                      questionTexts={question}
                     />
                   )
                   break
@@ -285,7 +284,7 @@ const PeerReviewQuestions: React.FunctionComponent<PeerReviewQuestionsProps> = (
                       }
                       reviews={[
                         {
-                          question: question.texts[0].title,
+                          question: question.title,
                           review: currentPeerReviewAnswer.value,
                         },
                       ]}
@@ -316,7 +315,7 @@ interface ITextualPeerReviewFeedback {
   handleTextChange: (a: any) => any
   key: string
   currentText: string
-  questionTexts: PeerReviewQuestionText
+  questionTexts: any
 }
 
 const StyledReviewEssayQuestion = styled.div`

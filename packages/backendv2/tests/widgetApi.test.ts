@@ -454,7 +454,7 @@ describe("widget: fetching quiz info", () => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af6"
     request(app.callback())
       .get(`/api/v2/widget/quizzes/${quizId}`)
-      .set("Authorization", "bearer ADMIN_TOKEN")
+      .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
       .expect(response => {
         const received: NotFoundError = response.body
@@ -464,14 +464,14 @@ describe("widget: fetching quiz info", () => {
   })
 
   //TODO: validate the returned quiz when sure what it should return
-  test("as admin should return quiz with all info when valid quiz id provided", done => {
+  /*test("as admin should return quiz with all info when valid quiz id provided", done => {
     request(app.callback())
       .get("/api/v2/widget/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
       .set("Authorization", "bearer ADMIN_TOKEN")
       .set("Accept", "application/json")
       .expect(res => {})
       .expect(200, done)
-  })
+  })*/
 })
 
 describe("widget: fetching peer review candidates", () => {
@@ -535,30 +535,184 @@ describe("widget: fetching peer review candidates", () => {
       .expect(404, done)
   })
 
-  describe("on successful request", () => {
-    test("returns correct number of candidates", done => {
-      request(app.callback())
-        .get(
-          "/api/v2/widget/answers/4bf4cf2f-3058-4311-8d16-26d781261af7/get-candidates",
-        )
-        .set("Authorization", "bearer PLEB_TOKEN")
-        .set("Accept", "application/json")
-        .expect(res => {
-          expect(res.body.length).toEqual(1)
-        })
-        .expect(200, done)
-    })
-    test("returns candidates for review in correct shape", done => {
-      request(app.callback())
-        .get(
-          "/api/v2/widget/answers/4bf4cf2f-3058-4311-8d16-26d781261af7/get-candidates",
-        )
-        .set("Authorization", "bearer PLEB_TOKEN")
-        .set("Accept", "application/json")
-        .expect(res => {
-          expect(res.body[0]).toStrictEqual(validation.quizAnswerValidator2)
-        })
-        .expect(200, done)
-    })
+  test("returns correct number of candidates", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/widget/answers/4bf4cf2f-3058-4311-8d16-26d781261af7/get-candidates",
+      )
+      .set("Authorization", "bearer PLEB_TOKEN")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body.length).toEqual(1)
+      })
+      .expect(200, done)
+  })
+  test("returns candidates for review in correct shape", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/widget/answers/4bf4cf2f-3058-4311-8d16-26d781261af7/get-candidates",
+      )
+      .set("Authorization", "bearer PLEB_TOKEN")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body[0]).toStrictEqual(validation.quizAnswerValidator2)
+      })
+      .expect(200, done)
+  })
+})
+
+describe("Answer: spam flags", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(() => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token_1") {
+          return [
+            200,
+            {
+              id: 1234,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer pleb_token_2") {
+          return [
+            200,
+            {
+              id: 2345,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer pleb_token_3") {
+          return [
+            200,
+            {
+              id: 3456,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer pleb_token_4") {
+          return [
+            200,
+            {
+              id: 4567,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("spam flag already given", done => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/report-spam")
+      .set("Authorization", "bearer PLEB_TOKEN_1")
+      .set("Accept", "application/json")
+      .send({
+        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      })
+      .expect(response => {
+        const received: BadRequestError = response.body
+        expect(received.message).toEqual("Can only give one spam flag")
+      })
+      .expect(400, done)
+  })
+
+  test("First spam flag", done => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/report-spam")
+      .set("Authorization", "bearer PLEB_TOKEN_2")
+      .set("Accept", "application/json")
+      .send({
+        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      })
+      .expect(res => {
+        expect(res.body).toEqual(validation.spamFlagValidator1)
+      })
+      .expect(200, done)
+  })
+
+  test("check the answers status", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
+      .set("Authorization", "bearer ADMIN_TOKEN")
+      .set("Accept", "application/json")
+      .expect(response => {
+        expect(response.body.status).toEqual("given-enough")
+        expect(response.body.userQuizState.spamFlags).toEqual(1)
+      })
+      .expect(200, done)
+  })
+
+  test("Second spam flag", done => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/report-spam")
+      .set("Authorization", "bearer PLEB_TOKEN_3")
+      .set("Accept", "application/json")
+      .send({
+        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      })
+      .expect(response => {
+        expect(response.body).toEqual(validation.spamFlagValidator2)
+      })
+      .expect(200, done)
+  })
+
+  test("check the answer status", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
+      .set("Authorization", "bearer ADMIN_TOKEN")
+      .set("Accept", "application/json")
+      .expect(response => {
+        expect(response.body.userQuizState.spamFlags).toEqual(2)
+        expect(response.body.status).toEqual("given-enough")
+      })
+      .expect(200, done)
+  })
+
+  test("Third spam flag", done => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/report-spam")
+      .set("Authorization", "bearer PLEB_TOKEN_4")
+      .set("Accept", "application/json")
+      .send({
+        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      })
+      .expect(response => {
+        expect(response.body).toEqual(validation.spamFlagValidator3)
+      })
+      .expect(200, done)
+  })
+
+  test("check the answer status", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
+      .set("Authorization", "bearer ADMIN_TOKEN")
+      .set("Accept", "application/json")
+      .expect(response => {
+        expect(response.body.userQuizState.spamFlags).toEqual(3)
+        expect(response.body.status).toEqual("spam")
+      })
+      .expect(200, done)
   })
 })

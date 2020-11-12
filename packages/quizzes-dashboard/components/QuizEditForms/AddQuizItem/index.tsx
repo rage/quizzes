@@ -26,6 +26,8 @@ const types = [
   "multiple-choice",
   "checkbox",
   "custom-frontend-accept-data",
+  "multiple-choice-dropdown",
+  "clickable-multiple-choice",
 ]
 
 export const AddQuizItem = () => {

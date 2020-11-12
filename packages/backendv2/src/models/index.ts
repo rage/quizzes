@@ -32,6 +32,8 @@ import CourseTranslation from "./course_translation"
 
 import Language from "./language"
 
+import SpamFlag from "./spam_flag"
+
 export {
   Quiz,
   QuizTranslation,
@@ -54,4 +56,5 @@ export {
   Course,
   CourseTranslation,
   Language,
+  SpamFlag,
 }

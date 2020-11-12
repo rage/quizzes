@@ -122,3 +122,25 @@ export type TReturnedPeerReviewAnswer = Omit<
   IPeerReviewAnswer,
   "createdAt" | "updatedAt"
 >
+
+export type TPeerReviewGradeAnswer = {
+  peerReviewQuestionId: string
+  value: number | null
+}
+
+export type TPeerReviewEssayAnswer = {
+  peerReviewQuestionId: string
+  text: string
+}
+
+export type TPeerReviewQuestionAnswer =
+  | TPeerReviewGradeAnswer
+  | TPeerReviewEssayAnswer
+
+export type TPeerReviewGiven = {
+  quizAnswerId: string
+  peerReviewCollectionId: string
+  userId: number
+  rejectedQuizAnswerIds: string[]
+  answers: TPeerReviewQuestionAnswer[]
+}
