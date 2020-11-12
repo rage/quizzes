@@ -77,7 +77,6 @@ class PeerReview extends Model {
       sourceUserId,
       quizAnswerId,
     )
-
     if (peerReviewAlreadyGiven) {
       throw new BadRequestError("Answer can only be peer reviewed once")
     }

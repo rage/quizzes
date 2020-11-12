@@ -6,15 +6,17 @@ import {
   CourseStatusProviderContext,
   CourseStatusProviderInterface,
   ProgressData,
-  ProgressByGroup,
-  ExercisesByPart,
-  AnswersByPart,
+  ExerciseCompletion,
   RequiredAction,
+  Exercise,
+  ProgressResponse,
+  ExerciseCompletionsBySection,
 } from "../contexes/courseStatusProviderContext"
+import { PointsByGroup } from "../modelTypes"
 import { languageOptions } from "../utils/languages"
 import { ToastContainer, toast, TypeOptions } from "react-toastify"
 import {
-  getCompletion,
+  // getCompletion,
   getUserCourseData,
 } from "../services/courseProgressService"
 
@@ -110,10 +112,10 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
     const fetchProgressData = async () => {
       try {
         const progressData = await getUserCourseData(courseId, accessToken)
-        const completionData = await getCompletion(courseId, accessToken)
+        /*const completionData = await getCompletion(courseId, accessToken)
         progressData.currentUser.completions =
-          completionData.currentUser.completions
-        const data = transformData(progressData)
+          completionData.currentUser.completions*/
+        const data = transformData(progressData.currentUser)
         setData(data)
         setLoading(false)
       } catch (error) {
@@ -276,7 +278,7 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
   return <Component {...props} {...injectProps} />
 }
 
-const transformData = (data: any): ProgressData => {
+/*const transformData2 = (data: any): ProgressData => {
   const courseProgress = data.currentUser.user_course_progresses[0]
   const completed = data.currentUser.completions.length > 0
   let points_to_pass = 0
@@ -310,58 +312,63 @@ const transformData = (data: any): ProgressData => {
     required_actions,
     progressByGroup,
     //exercisesByPart,
-    //answersByPart,
+    // answersByPart,
     exercise_completions_by_section,
   }
-}
+}*/
 
-/*const transformData = (data: any): ProgressData => {
-  const courseProgress = data.currentUser.user_course_progresses[0]
-  const completed = data.currentUser.completions.length > 0
+const transformData = (data: ProgressResponse): ProgressData => {
+  const courseProgress = data.user_course_progressess
+  const completed = data.completions.length > 0
   let points_to_pass = 0
-  let n_points
-  let max_points
+  let n_points = 0
+  let max_points = 0
   let exercise_completions = 0
   let total_exercises = 0
   let distinctActions = new Set()
-  const progressByGroup: ProgressByGroup = {}
-  const exercisesByPart: ExercisesByPart = {}
-  const answersByPart: AnswersByPart = {}
+  let progress: PointsByGroup[] = []
+  let exercises: Exercise[] = []
+  const answers: ExerciseCompletion[] = []
+  const exercise_completions_by_section: ExerciseCompletionsBySection[] = []
   if (courseProgress) {
     n_points = courseProgress.n_points
     max_points = courseProgress.max_points
-    for (const groupProgress of courseProgress.progress) {
-      progressByGroup[groupProgress.group] = groupProgress
-    }
-    const exerciseData = courseProgress.course
-    points_to_pass = exerciseData.points_needed || 0
-    for (const exercise of exerciseData.exercises) {
-      total_exercises += 1
-      const partExercises = exercisesByPart[exercise.part] || []
-      exercisesByPart[exercise.part] = [...partExercises, exercise]
-    }
-    for (const exercise of exerciseData.withAnswer) {
+    progress = courseProgress.progress
+    exercises = courseProgress.course.exercises
+    points_to_pass = courseProgress.course.points_needed || 0
+    total_exercises += exercises.length
+    for (const exercise of courseProgress.course.exercises) {
+      let section = exercise_completions_by_section.find(
+        (sec: any) =>
+          sec.part === exercise.part && sec.section === exercise.section,
+      )
+      if (!section) {
+        section = {
+          part: exercise.part,
+          section: exercise.section,
+          exercises_total: 0,
+          exercises_completed: 0,
+          required_actions: [],
+        }
+        exercise_completions_by_section.push(section)
+      }
+      section.exercises_total += 1
       const answer = exercise.exercise_completions[0]
       if (answer) {
-        exercise_completions += 1
-        const partAnswers = answersByPart[exercise.part] || []
-        answersByPart[exercise.part] = [
-          ...partAnswers,
-          {
-            exercise_id: exercise.id,
-            exercise_quizzes_id: exercise.custom_id,
-            part: exercise.part,
-            section: exercise.section,
-            n_points: answer.n_points,
-            completed: answer.completed,
-            required_actions: answer.required_actions.map((action: any) => {
-              if (action.value in RequiredAction) {
-                distinctActions.add(action.value)
-                return action.value
-              }
-            }),
-          },
-        ]
+        section.exercises_completed = answer.completed
+          ? section.exercises_completed + 1
+          : section.exercises_completed
+        const requiredActions = answer.exercise_completion_required_actions.map(
+          rao => rao.value,
+        )
+        section.required_actions = section.required_actions.concat(
+          requiredActions,
+        )
+        requiredActions.forEach(ra => distinctActions.add(ra))
+        exercise_completions = answer.completed
+          ? exercise_completions + 1
+          : exercise_completions
+        answers.push(answer)
       }
     }
   }
@@ -375,8 +382,9 @@ const transformData = (data: any): ProgressData => {
     exercise_completions,
     total_exercises,
     required_actions,
-    progressByGroup,
-    exercisesByPart,
-    answersByPart,
+    progress,
+    exercises,
+    answers,
+    exercise_completions_by_section,
   }
-}*/
+}

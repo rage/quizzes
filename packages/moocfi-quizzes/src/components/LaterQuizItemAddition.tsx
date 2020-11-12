@@ -20,7 +20,7 @@ const LaterQuizItemAddition: React.FunctionComponent<Props> = ({ item }) => {
   return (
     <Grid container={true}>
       <Grid item={true} xs={12} md={6}>
-        <MarkdownText>{`${item.texts[0].title} (${item.type})`}</MarkdownText>
+        <MarkdownText>{`${item.title} (${item.type})`}</MarkdownText>
       </Grid>
       <Grid item={true} xs={12} md={6}>
         <SpaciousPaper style={{ backgroundColor: "lightgray" }}>

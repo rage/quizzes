@@ -1,6 +1,11 @@
 import { createContext } from "react"
 import { PointsByGroup } from "../modelTypes"
 
+export interface ProgressResponse {
+  user_course_progressess: UserCourseProgress
+  completions: Completion[]
+}
+
 export interface ProgressData {
   completed: boolean
   points_to_pass: number
@@ -9,35 +14,58 @@ export interface ProgressData {
   exercise_completions: number
   total_exercises: number
   required_actions: RequiredAction[]
-  progressByGroup: ProgressByGroup
-  // exercisesByPart: ExercisesByPart
-  // answersByPart: AnswersByPart
-  exercise_completions_by_section: any
+  progress: PointsByGroup[]
+  exercises: Exercise[]
+  answers: ExerciseCompletion[]
+  exercise_completions_by_section: ExerciseCompletionsBySection[]
 }
 
-export type ProgressByGroup = { [group: string]: PointsByGroup }
+export interface UserCourseProgress {
+  max_points: number
+  n_points: number
+  progress: PointsByGroup[]
+  course: Course
+}
 
-export type ExercisesByPart = { [part: number]: Exercise[] }
+export interface Completion {
+  id: string
+}
 
-export type AnswersByPart = { [part: number]: ExerciseCompletion[] }
+export interface Course {
+  points_needed: number
+  exercises: Exercise[]
+}
 
-type Exercise = {
+export type Exercise = {
   id: string
   quizzes_id: string
   name: string
   part: number
   section: number
   max_points: number
+  exercise_completions: ExerciseCompletion[]
 }
 
-type ExerciseCompletion = {
+export type ExerciseCompletion = {
   exercise_id: string
   exercise_quizzes_id: string
   part: number
   section: number
   n_points: number
   completed: boolean
+  exercise_completion_required_actions: RequiredActionObject[]
+}
+
+export interface ExerciseCompletionsBySection {
+  part: number
+  section: number
+  exercises_total: number
+  exercises_completed: number
   required_actions: RequiredAction[]
+}
+
+export interface RequiredActionObject {
+  value: RequiredAction
 }
 
 export enum RequiredAction {

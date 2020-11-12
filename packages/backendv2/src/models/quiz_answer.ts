@@ -373,7 +373,7 @@ class QuizAnswer extends Model {
       let savedQuizAnswer
       let savedUserQuizState
       await this.markPreviousAsDeprecated(userId, quizId, trx)
-      savedQuizAnswer = await this.query(trx).upsertGraphAndFetch(quizAnswer)
+      savedQuizAnswer = await this.query(trx).insertGraphAndFetch(quizAnswer)
       savedUserQuizState = await UserQuizState.query(trx).upsertGraphAndFetch(
         userQuizState,
         {
@@ -417,7 +417,11 @@ class QuizAnswer extends Model {
   private static assessAnswer(quizAnswer: QuizAnswer, quiz: Quiz) {
     const quizItemAnswers = quizAnswer.itemAnswers
     const quizItems = quiz.items
-    if (!quizItemAnswers || quizItemAnswers.length != quizItems.length) {
+    if (
+      !quizItemAnswers ||
+      quizItemAnswers.length === 0 ||
+      quizItemAnswers.length != quizItems.length
+    ) {
       throw new BadRequestError("item answers missing")
     }
     for (const quizItemAnswer of quizItemAnswers) {
@@ -445,6 +449,7 @@ class QuizAnswer extends Model {
             quizItemAnswer.correct = true
           }
           break
+        case "multiple-choice-dropdown":
         case "multiple-choice":
           const quizOptionAnswers = quizItemAnswer.optionAnswers
           const quizOptions = quizItem.options
