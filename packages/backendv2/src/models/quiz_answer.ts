@@ -380,6 +380,25 @@ class QuizAnswer extends Model {
           insertMissing: true,
         },
       )
+      if (savedQuizAnswer.status === "confirmed") {
+        await UserCoursePartState.update(
+          savedQuizAnswer.userId,
+          quiz.courseId,
+          quiz.part,
+          trx,
+        )
+        await Kafka.broadcastQuizAnswerUpdated(
+          savedQuizAnswer,
+          userQuizState,
+          quiz,
+          trx,
+        )
+        await Kafka.broadcastUserProgressUpdated(
+          savedQuizAnswer.userId,
+          quiz.courseId,
+          trx,
+        )
+      }
       await trx.commit()
       return {
         quiz,
@@ -403,6 +422,25 @@ class QuizAnswer extends Model {
     this.assessAnswer(quizAnswer, quiz)
     this.gradeAnswer(quizAnswer, userQuizState, quiz)
     this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
+    if (quizAnswer.status === "confirmed") {
+      await UserCoursePartState.update(
+        quizAnswer.userId,
+        quiz.courseId,
+        quiz.part,
+        trx,
+      )
+      await Kafka.broadcastQuizAnswerUpdated(
+        quizAnswer,
+        userQuizState,
+        quiz,
+        trx,
+      )
+      await Kafka.broadcastUserProgressUpdated(
+        quizAnswer.userId,
+        quiz.courseId,
+        trx,
+      )
+    }
   }
 
   private static checkIfSubmittable(quiz: Quiz, userQuizState: UserQuizState) {
