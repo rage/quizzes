@@ -69,7 +69,9 @@ interface clickableMultiplChoiceContentProps {
   item: NormalizedItem
 }
 
-const ClickableMultipleChoiceContent = ({ item }: clickableMultiplChoiceContentProps) => {
+const ClickableMultipleChoiceContent = ({
+  item,
+}: clickableMultiplChoiceContentProps) => {
   const quizId = useTypedSelector(state => state.editor.quizId)
   const storeOptions = useTypedSelector(state => state.editor.options)
   const storeItem = useTypedSelector(state => state.editor.items[item.id])

@@ -32,7 +32,7 @@ const ChoicesContainer = styled.div<ChoicesContainerProps>`
   display: grid;
   grid-template-columns: 1fr 1fr;
   padding: 15px 10px;
-  background: #F5F5F5;
+  background: #f5f5f5;
   border-radius: 7px;
   ${({ onlyOneItem }) => onlyOneItem && "width: 100%"}
   ${({ onlyOneItem, providedStyles }) =>

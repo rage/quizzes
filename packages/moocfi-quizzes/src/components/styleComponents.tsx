@@ -1,5 +1,12 @@
 import styled from "styled-components"
-import { Button, Paper, TextField, Typography, Select, MenuItem } from "@material-ui/core"
+import {
+  Button,
+  Paper,
+  TextField,
+  Typography,
+  Select,
+  MenuItem,
+} from "@material-ui/core"
 
 export const BaseButton = styled(Button)`
   text-transform: none;
@@ -89,7 +96,6 @@ export const SecondaryStyledButton = styled(BaseButton)`
 export const WhiteSpacePreservingTypography = styled(Typography)`
   white-space: pre-line;
 `
-
 
 interface ItemContentProps {
   providedStyles: string | undefined

@@ -50,7 +50,9 @@ interface clickableMultipleChoiceButtonProps {
   option: NormalizedOption
 }
 
-const ClickableMultipleChoiceButton = ({ option }: clickableMultipleChoiceButtonProps) => {
+const ClickableMultipleChoiceButton = ({
+  option,
+}: clickableMultipleChoiceButtonProps) => {
   const storeOption = useTypedSelector(state => state.editor.options[option.id])
   const variables = useTypedSelector(
     state => state.editor.optionVariables[option.id],

@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { Typography, Select, FormControl, InputLabel} from "@material-ui/core"
+import { Typography, Select, FormControl, InputLabel } from "@material-ui/core"
 import { GridDirection, GridSize } from "@material-ui/core/Grid"
 import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
@@ -32,8 +32,7 @@ interface ChoicesContainerProps {
   providedStyles: string | undefined
 }
 
-const StyledSelect = styled(Select)<ChoicesContainerProps>`
-`
+const StyledSelect = styled(Select)<ChoicesContainerProps>``
 
 const CentralizedOnSmallScreenTypography = styled(Typography)`
   @media only screen and (max-width: 600px) {
@@ -54,7 +53,7 @@ const ItemContent = styled.div<ItemContentProps>`
   margin-bottom: 10px;
   > div:first-of-type {
     display: grid;
-    grid-template-columns: 1fr 40%;;
+    grid-template-columns: 1fr 40%;
     justify-content: space-between;
     flex-direction: ${({ direction }) => direction};
   }
@@ -99,7 +98,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   const quiz = useTypedSelector(state => state.quiz)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
-  const [option, setOption] = React.useState('');
+  const [option, setOption] = React.useState("")
 
   if (!quiz) {
     return <div />
@@ -110,9 +109,9 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
     return <LaterQuizItemAddition item={item} />
   }
 
-  const handleChange = (event: React.ChangeEvent<{value: unknown}>) => {
+  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
     setOption(event.target.value as string)
-    console.log('Working....')
+    console.log("Working....")
   }
 
   const options = item.options
@@ -120,7 +119,6 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   let direction: GridDirection = "row"
   let questionWidth: 5 | 12 = 5
   let optionWidth: GridSize = "auto"
-
 
   return (
     <div role="group" aria-label={item.title}>
@@ -134,30 +132,34 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
             itemAnswer={itemAnswer}
             questionWidth={questionWidth}
           />
-        <FormControl variant="outlined">
-         <InputLabel id="demo-simple-select-outlined-label">select an option</InputLabel>
-          <StyledSelect
-          labelId="demo-simple-select-outlined-label"
-          id="demo-simple-select-filled"
-            direction={direction}
-            value={option}
-            providedStyles={themeProvider.optionContainerStyles}
-            onChange={handleChange}
-          >
-            {options
-              .sort((o1, o2) => o1.order - o2.order)
-              .map((option, index) => {
-                return (
-                  <Option
-                  key={option.id}
-                  option={option}
-                  value={option.title}
-                  optionWidth={optionWidth}
-                  shouldBeGray={index % 2 === 0}
-                  >{option.title}</Option>
-                )
-              })}
-          </StyledSelect>
+          <FormControl variant="outlined">
+            <InputLabel id="demo-simple-select-outlined-label">
+              select an option
+            </InputLabel>
+            <StyledSelect
+              labelId="demo-simple-select-outlined-label"
+              id="demo-simple-select-filled"
+              direction={direction}
+              value={option}
+              providedStyles={themeProvider.optionContainerStyles}
+              onChange={handleChange}
+            >
+              {options
+                .sort((o1, o2) => o1.order - o2.order)
+                .map((option, index) => {
+                  return (
+                    <Option
+                      key={option.id}
+                      option={option}
+                      value={option.title}
+                      optionWidth={optionWidth}
+                      shouldBeGray={index % 2 === 0}
+                    >
+                      {option.title}
+                    </Option>
+                  )
+                })}
+            </StyledSelect>
           </FormControl>
         </div>
         {<FeedbackPortion item={item} />}
@@ -200,13 +202,11 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
       )}
 
       {body && <MarkdownText>{body}</MarkdownText>}
-
     </QuestionContainer>
   )
 }
 
-const SelectOptionsLabelTypography = styled(Typography)<{
-}>`
+const SelectOptionsLabelTypography = styled(Typography)<{}>`
   color: 6b6b6b;
 `
 
@@ -216,7 +216,6 @@ type OptionProps = {
   optionWidth: GridSize
   shouldBeGray: boolean
 }
-
 
 const Option: React.FunctionComponent<OptionProps> = ({
   option,
@@ -260,23 +259,23 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
   if (!displayFeedback) {
     return (
-/*       <OptionWrapper
+      /*       <OptionWrapper
         shouldBeGray={shouldBeGray}
         providedStyles={themeProvider.optionWrapperStyles}
       > */
-        <MenuItem
-          selected={!!optionIsSelected}
-          revealed={false}
-          correct={false}
-          onClick={handleOptionChange(option.id)}
-          disabled={quizDisabled}
-          aria-pressed={optionIsSelected}
-        >
-          <MarkdownText Component={justADiv} removeParagraphs>
-            {text.title}
-          </MarkdownText>
-        </MenuItem>
-/*       </OptionWrapper> */
+      <MenuItem
+        selected={!!optionIsSelected}
+        revealed={false}
+        correct={false}
+        onClick={handleOptionChange(option.id)}
+        disabled={quizDisabled}
+        aria-pressed={optionIsSelected}
+      >
+        <MarkdownText Component={justADiv} removeParagraphs>
+          {text.title}
+        </MarkdownText>
+      </MenuItem>
+      /*       </OptionWrapper> */
     )
   }
 
@@ -287,22 +286,20 @@ const Option: React.FunctionComponent<OptionProps> = ({
   // multiple items
   return (
     <>
-   {/*    <OptionWrapper shouldBeGray={shouldBeGray}> */}
-        <MenuItem
-          revealed
-          selected={!!optionIsSelected}
-          correct={option.correct}
-          {...clickOptions}
-          aria-selected={optionIsSelected}
-          aria-label={`${text.title}-${
-            option.correct ? "correct" : "incorrect"
-          }`}
-        >
-          <MarkdownText Component={justADiv} removeParagraphs>
-            {text.title}
-          </MarkdownText>
-        </MenuItem>
-{/*       </OptionWrapper> */}
+      {/*    <OptionWrapper shouldBeGray={shouldBeGray}> */}
+      <MenuItem
+        revealed
+        selected={!!optionIsSelected}
+        correct={option.correct}
+        {...clickOptions}
+        aria-selected={optionIsSelected}
+        aria-label={`${text.title}-${option.correct ? "correct" : "incorrect"}`}
+      >
+        <MarkdownText Component={justADiv} removeParagraphs>
+          {text.title}
+        </MarkdownText>
+      </MenuItem>
+      {/*       </OptionWrapper> */}
     </>
   )
 }
@@ -408,7 +405,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 }
 
 const OptionWrapper = styled(MenuItem)<OptionWrapperProps>`
-      margin-left: 1rem;     
+  margin-left: 1rem;
 `
 
 type OptionWrapperProps = {
