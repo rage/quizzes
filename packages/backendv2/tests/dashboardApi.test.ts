@@ -1025,7 +1025,7 @@ describe("dashboard - courses: duplicating course should", () => {
 //TODO: figure out how to parse the csv stream
 describe("dashboard - courses: downloading a correspondence file should", () => {
   beforeAll(async () => {
-    await safeSeed({ directory: "./database/seeds" })
+    await safeSeed(configA)
   })
 
   afterAll(async () => {
