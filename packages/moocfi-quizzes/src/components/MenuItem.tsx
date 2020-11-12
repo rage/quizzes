@@ -42,8 +42,7 @@ const FailureIcon = () => (
   </IconWrapper>
 )
 
-const StyledMenuItem = styled.span<ButtonProps>`
-`
+const StyledMenuItem = styled.span<ButtonProps>``
 
 const RevealedMenuItem = styled(
   ({ selected, correct, ...others }: RevealedMenuItemProps) => {

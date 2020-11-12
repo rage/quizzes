@@ -1,7 +1,13 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { Typography, Select, MenuItem, FormControl, InputLabel} from "@material-ui/core"
+import {
+  Typography,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from "@material-ui/core"
 import { GridDirection, GridSize } from "@material-ui/core/Grid"
 import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
@@ -101,18 +107,14 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const [option, setOption] = React.useState("")
 
-
-
   const items = useTypedSelector(state => state.quiz!.items)
- /*  const item = items.find(i => i.id === option.quizItemId) */
+  /*  const item = items.find(i => i.id === option.quizItemId) */
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const languageLabels = useTypedSelector(
     state => state.language.languageLabels,
   )
   const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
-
-
 
   if (!quiz) {
     return <div />
@@ -153,7 +155,6 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   const optionIsSelected =
     optionAnswers && optionAnswers.some(oa => oa.quizOptionId === option.id)
 
-
   return (
     <div role="group" aria-label={item.title}>
       <ItemContent
@@ -166,33 +167,37 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
             itemAnswer={itemAnswer}
             questionWidth={questionWidth}
           />
-        <FormControl variant="outlined">
-         <InputLabel id="demo-simple-select-outlined-label">select an option</InputLabel>
-          <StyledSelect
-          labelId="demo-simple-select-outlined-label"
-          id="demo-simple-select-filled"
-            direction={direction}
-            value={option}
-            providedStyles={themeProvider.optionContainerStyles}
-            onChange={handleChange}
-          >
-            {options
-              .sort((o1, o2) => o1.order - o2.order)
-              .map((option, index) => {
-                return (
-                  <MenuItem
-                    selected={!!optionIsSelected}
-                    onClick={handleOptionChange(option.id)}
-                    disabled={quizDisabled}
-                    aria-pressed={optionIsSelected}
-                    key={option.id}
-                    value={option.title}
-/*                     optionWidth={optionWidth}
+          <FormControl variant="outlined">
+            <InputLabel id="demo-simple-select-outlined-label">
+              select an option
+            </InputLabel>
+            <StyledSelect
+              labelId="demo-simple-select-outlined-label"
+              id="demo-simple-select-filled"
+              direction={direction}
+              value={option}
+              providedStyles={themeProvider.optionContainerStyles}
+              onChange={handleChange}
+            >
+              {options
+                .sort((o1, o2) => o1.order - o2.order)
+                .map((option, index) => {
+                  return (
+                    <MenuItem
+                      selected={!!optionIsSelected}
+                      onClick={handleOptionChange(option.id)}
+                      disabled={quizDisabled}
+                      aria-pressed={optionIsSelected}
+                      key={option.id}
+                      value={option.title}
+                      /*                     optionWidth={optionWidth}
                     shouldBeGray={false} */
-                  >{option.title}</MenuItem>
-                )
-              })}
-          </StyledSelect>
+                    >
+                      {option.title}
+                    </MenuItem>
+                  )
+                })}
+            </StyledSelect>
           </FormControl>
         </div>
         {<FeedbackPortion item={item} />}
@@ -249,7 +254,6 @@ type OptionProps = {
   optionWidth: GridSize
   shouldBeGray: boolean
 }
-
 
 interface IFeedbackPortionProps {
   item: QuizItem
