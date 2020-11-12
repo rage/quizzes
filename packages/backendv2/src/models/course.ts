@@ -361,10 +361,6 @@ class Course extends Model {
     return stream
   }
 
-  static async getAllLanguages() {
-    return await knex.from("language").select("id", "name")
-  }
-
   public static async getParts(courseId: string) {
     return (
       await Quiz.query()
@@ -375,9 +371,16 @@ class Course extends Model {
   }
 
   static async updateMoocfiId(id: string, newMoocfiId: string) {
-    const course = await this.getById(id)
+    let course
+    try {
+      course = await this.query().patchAndFetchById(id, {
+        moocfiId: newMoocfiId,
+      })
+    } catch (error) {
+      throw error
+    }
 
-    return await course.$query().patchAndFetch({ moocfiId: newMoocfiId })
+    return course.moocfiId
   }
 }
 

@@ -1,5 +1,9 @@
 import Router from "koa-router"
-import { CustomContext, CustomState } from "../../types"
+import {
+  CustomContext,
+  CustomState,
+  EditCoursePayloadFields,
+} from "../../types"
 import {
   Course,
   Quiz,
@@ -108,7 +112,7 @@ const dashboard = new Router<CustomState, CustomContext>({
             await UserCoursePartState.getProgress(user.id, courseId, trx),
         )
       } catch (err) {
-        throw new BadRequestError(err)
+        throw err
       }
     },
   )
@@ -252,7 +256,7 @@ const dashboard = new Router<CustomState, CustomContext>({
   })
 
   .get("/languages/all", accessControl(), async ctx => {
-    ctx.body = await Course.getAllLanguages()
+    ctx.body = await Language.getAll()
   })
 
   .get("/users/current/abilities", accessControl(), async ctx => {
@@ -297,30 +301,42 @@ const dashboard = new Router<CustomState, CustomContext>({
     const result = await QuizAnswer.getStates()
     ctx.body = result
   })
+
   .post("/courses/:courseId/edit", accessControl(), async ctx => {
     const courseId = ctx.params.courseId
     const payload = ctx.request.body
-    const token = ctx.request.body.token
     const moocfiId = payload.moocfiId
-
     await checkAccessOrThrow(ctx.state.user, courseId, "edit")
 
-    if (!validToken(token)) {
-      ctx.body = "invalid token"
-    } else {
-      const payloadWithoutMoocfiId = _.omit(payload, ["moocfiId"])
-      ctx.body = await CourseTranslation.updateCourseProperties(
-        courseId,
-        payloadWithoutMoocfiId,
-      )
-      if (moocfiId) {
-        ctx.body = await Course.updateMoocfiId(courseId, moocfiId)
+    // TODO: prbably good idea to check if moocfi id is a valid one (exists in DB)
+
+    try {
+      await Course.getFlattenedById(courseId)
+    } catch (error) {
+      throw error
+    }
+
+    if (!moocfiId && !payload) {
+      throw new BadRequestError("No edited properties provided.")
+    }
+
+    const payloadWithoutMoocfiId = _.omit(payload, ["moocfiId"])
+
+    await CourseTranslation.updateCourseProperties(
+      courseId,
+      payloadWithoutMoocfiId,
+    )
+
+    // moocfi id separated from rest since it is a property of Course entity
+    if (moocfiId) {
+      try {
+        await Course.updateMoocfiId(courseId, moocfiId)
+      } catch (error) {
+        throw error
       }
     }
-  })
-  .get("/languages/ids", accessControl(), async ctx => {
-    const result = await Language.getAll()
-    ctx.body = result
+
+    ctx.body = await Course.getFlattenedById(courseId)
   })
 
 export default dashboard

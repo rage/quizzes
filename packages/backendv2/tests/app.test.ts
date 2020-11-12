@@ -1005,7 +1005,7 @@ describe("Answer: spam flags", () => {
   })
 })
 
-describe("test user progress", () => {
+describe("fetching user progress should", () => {
   beforeAll(async () => {
     await safeSeed(configA)
   })
@@ -1039,7 +1039,7 @@ describe("test user progress", () => {
         }
       })
   })
-  test("no user progress", done => {
+  test("return empty when user has no progress", done => {
     request(app.callback())
       .get(
         "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/current/progress",
@@ -1052,7 +1052,7 @@ describe("test user progress", () => {
       .expect(200, done)
   })
 
-  test("user progress", done => {
+  test("return user's progress in correct shape when user has prgress", done => {
     request(app.callback())
       .get(
         "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/user/current/progress",
@@ -1063,6 +1063,19 @@ describe("test user progress", () => {
         expect(res.body).toEqual(validation.userProgressValidator)
       })
       .expect(200, done)
+  })
+
+  test("throw if invalid course id provided", done => {
+    const invalidCourseId = "7966ffd1-692b-41fd-974f-50a43173743c"
+    request(app.callback())
+      .get(`/api/v2/dashboard/courses/${invalidCourseId}/user/current/progress`)
+      .set("Authorization", "bearer PLEB_TOKEN")
+      .set("Accept", "application/json")
+      .expect(response => {
+        const received: NotFoundError = response.body
+        expect(received.message).toEqual(`course not found: ${invalidCourseId}`)
+      })
+      .expect(404, done)
   })
 })
 
@@ -1228,14 +1241,98 @@ describe("dashboard - courses: downloading a correspondence file should", () => 
       .expect(403, done)
   })
 
+  //TODO: asserts on response
   test("should return 200 on successful request", done => {
     request(app.callback())
       .post("/api/v2/dashboard/courses/download-correspondence-file")
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .send(input.correspondenceIds)
-      .expect(async response => {
-        //TODO: asserts on response
-        console.log(response.body)
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: fetching all exisiting languages languages", () => {
+  beforeAll(async () => {
+    await safeSeed({ directory: "./database/seeds" })
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("should return all languages on valid request", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/languages/all")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        expect(response.body).toStrictEqual(validation.allLanguages)
+      })
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: an edit made to a course should", () => {
+  beforeAll(async () => {
+    await safeSeed({ directory: "./database/seeds" })
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/edit",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with course that reflects edits", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/edit",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send(input.editedCourse)
+      .expect(response => {
+        const course = response.body
+        expect(course).toStrictEqual(validation.editedCourse)
       })
       .expect(200, done)
   })
