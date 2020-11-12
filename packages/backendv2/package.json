@@ -52,6 +52,7 @@
     "koa-bodyparser": "^4.3.0",
     "koa-cors": "0.0.16",
     "koa-router": "^8.0.8",
+    "newrelic": "^7.0.0",
     "node-rdkafka": "^2.9.1",
     "objection": "^2.2.1",
     "pg": "^7.18.2",
