@@ -78,11 +78,21 @@ export const getUserCourseData = async (
             }
           }
         }
-        completions(course_id: "55dff8af-c06c-4a97-88e6-af7c04d252ca") {
+        completions(course_id: "${courseId}") {
           id
         }
       }
-    }  
+      course(id: "${courseId}") {
+        exercises {
+          id
+          quizzes_id: custom_id
+          name
+          part
+          section
+          max_points
+        }
+      }
+    }
   `
   const data = await request(accessToken, query)
 
