@@ -106,11 +106,6 @@ export default (props: ChoiceButtonProps) => {
   return revealed ? (
     <RevealedChoiceButton {...others} />
   ) : (
-    <ChoiceButton
-      variant="contained"
-      color={props.selected ? "#E3B599" : "default"}
-      fullWidth
-      {...others}
-    />
+    <ChoiceButton variant="contained" fullWidth {...others} />
   )
 }
