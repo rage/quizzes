@@ -81,6 +81,7 @@ export type Course = {
   abbreviation: string
   title: string
   body: string
+  languageId: string
 }
 
 export type QuizItemOption = {

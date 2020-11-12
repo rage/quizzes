@@ -58,6 +58,7 @@ export const getUserCourseData = async (
       currentUser {
         user_course_progressess(course_id: "${courseId}") {
           max_points
+          n_points
           progress
           course {
             exercises {
@@ -67,12 +68,6 @@ export const getUserCourseData = async (
               part
               section
               max_points
-            }
-            withAnswer: exercises {
-              id
-              custom_id
-              part
-              section
               exercise_completions(orderBy: { updated_at: desc}) {
                 completed
                 n_points
