@@ -1,8 +1,13 @@
 import { MigrationInterface, QueryRunner } from "typeorm"
 
-export class newQuestionTypeClickableMultipleChoice1604930831074
+export class NewQuestionTypeClickableMultipleChoice1604930831074
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
+    await queryRunner.query(
+      // tslint:disable-next-line:max-line-length
+      "drop materialized view reaktor.quiz_item cascade",
+    )
+
     await queryRunner.query(
       // tslint:disable-next-line:max-line-length
       "create type quiz_item_type_enum_new as enum ('open','scale','essay','multiple-choice','checkbox','research-agreement','feedback','custom-frontend-accept-data','multiple-choice-dropdown','clickable-multiple-choice')",
