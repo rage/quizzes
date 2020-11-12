@@ -82,8 +82,6 @@ const widget = new Router<CustomState, CustomContext>({
   .get("/answers/:quizId/get-candidates", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
     const userId = ctx.state.user.id
-    console.log(quizId)
-    console.log(userId)
     ctx.body = await QuizAnswer.getAnswersToReview(userId, quizId)
   })
 
