@@ -1,4 +1,5 @@
 import Koa from "koa"
+import * as Sentry from "@sentry/node"
 import { Model, snakeCaseMappers } from "objection"
 import bodyParser from "koa-bodyparser"
 import knex from "./database/knex"
@@ -7,6 +8,7 @@ import logger from "./src/middleware/logger"
 import errorHandler from "./src/middleware/error_handler"
 import { CustomContext, CustomState } from "./src/types"
 import cors from "koa-cors"
+import { get } from "lodash"
 
 import * as pg from "pg"
 
@@ -18,6 +20,22 @@ Model.knex(knex)
 Model.columnNameMappers = snakeCaseMappers()
 
 const app = new Koa<CustomState, CustomContext>()
+
+if (process.env.SENTRY_DSN) {
+  Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    release: `quizzes-backend@${process.env.GIT_COMMIT}`,
+  })
+
+  app.on("error", (err, ctx) => {
+    Sentry.withScope(function(scope) {
+      scope.addEventProcessor(function(event) {
+        return Sentry.Handlers.parseRequest(event, ctx.request)
+      })
+      Sentry.captureException(err)
+    })
+  })
+}
 
 app.use(cors())
 
