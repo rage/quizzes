@@ -1,7 +1,5 @@
 import request from "supertest"
-import { v4 as uuidv4 } from "uuid"
 import nock from "nock"
-const knexCleaner = require("knex-cleaner")
 import app from "../app"
 import knex from "../database/knex"
 import { QuizAnswer, Course } from "../src/models"
@@ -9,13 +7,7 @@ import { input, userAbilities, validation } from "./data"
 import { UserInfo } from "../src/types"
 import { BadRequestError, NotFoundError } from "../src/util/error"
 
-import {
-  safeClean,
-  safeSeed,
-  expectQuizToEqual,
-  configA,
-  uuid as uuidPattern,
-} from "./util"
+import { safeClean, safeSeed, expectQuizToEqual, configA } from "./util"
 
 afterAll(async () => {
   await safeClean()
@@ -1583,6 +1575,164 @@ describe("dashboard: get current users abilities", () => {
       .set("Accept", "application/json")
       .expect(res => {
         expect(res.body).toEqual(userAbilities.abilities.assistant)
+      })
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: get user abilities for course", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async done => {
+    nock.cleanAll()
+    await safeClean()
+    done()
+  })
+
+  test("get user abilities, assistant", done => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 8765,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/abilities",
+      )
+      .set("Authorization", "bearer pleb_token")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual(["view", "edit", "grade"])
+      })
+      .expect(200, done)
+  })
+
+  test("get user abilities, teacher", done => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 9876,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/abilities",
+      )
+      .set("Authorization", "bearer pleb_token")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual(["view", "edit", "grade"])
+      })
+      .expect(200, done)
+  })
+
+  test("get user abilities, admin", done => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              id: 9876,
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/abilities",
+      )
+      .set("Authorization", "bearer admin_token")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual([
+          "view",
+          "edit",
+          "grade",
+          "download",
+          "duplicate",
+        ])
+      })
+      .expect(200, done)
+  })
+
+  test("get user abilities, no-body", done => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 1234,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/abilities",
+      )
+      .set("Authorization", "bearer pleb_token")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual([])
       })
       .expect(200, done)
   })
