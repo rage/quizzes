@@ -1,7 +1,13 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { Typography } from "@material-ui/core"
+import {
+  Typography,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+} from "@material-ui/core"
 import { GridDirection, GridSize } from "@material-ui/core/Grid"
 import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
@@ -12,31 +18,25 @@ import MarkdownText from "./MarkdownText"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons"
 import ThemeProviderContext from "../contexes/themeProviderContext"
-import ChoiceButton from "./ChoiceButton"
 
 const QuestionContainer = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
+  justify-content: center;
   font-size: 1.25rem;
-  margin-right: 0.25rem;
+  margin-right: 0.8rem;
+  padding-left: 10px;
+  border-radius: 5px;
+  min-height: 2rem;
 `
 
 interface ChoicesContainerProps {
   direction: string
-  onlyOneItem: boolean
   providedStyles: string | undefined
 }
 
-const ChoicesContainer = styled.div<ChoicesContainerProps>`
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: ${({ direction }) => direction};
-  padding-top: 7;
-  ${({ onlyOneItem }) => onlyOneItem && "width: 100%"}
-  ${({ onlyOneItem, providedStyles }) =>
-    providedStyles && onlyOneItem && providedStyles}
-`
+const StyledSelect = styled(Select)<ChoicesContainerProps>``
 
 const CentralizedOnSmallScreenTypography = styled(Typography)`
   @media only screen and (max-width: 600px) {
@@ -56,7 +56,8 @@ interface ItemContentProps {
 const ItemContent = styled.div<ItemContentProps>`
   margin-bottom: 10px;
   > div:first-of-type {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 40%;
     justify-content: space-between;
     flex-direction: ${({ direction }) => direction};
   }
@@ -65,7 +66,6 @@ const ItemContent = styled.div<ItemContentProps>`
 
 export interface LeftBorderedDivProps {
   correct: boolean | undefined
-  onlyOneItem?: boolean
   message?: string
 }
 
@@ -83,14 +83,11 @@ const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
     margin-top: -0.25rem;
     padding: 0 0 0 0.5rem;
   }
-  ${({ onlyOneItem }) => onlyOneItem && "width: 70%;"}
 `
 
 const LeftAlignedMarkdownText = styled(MarkdownText)`
   text-align: left;
 `
-
-const justADiv = styled.div``
 
 type MultipleChoiceProps = {
   item: QuizItem
@@ -100,20 +97,32 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   item,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
+  const dispatch = useDispatch()
   const quiz = useTypedSelector(state => state.quiz)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+  const [selectedOption, setSelectedOption] = React.useState("")
+
+  const items = useTypedSelector(state => state.quiz!.items)
+  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+  const userQuizState = useTypedSelector(state => state.user.userQuizState)
+  const languageLabels = useTypedSelector(
+    state => state.language.languageLabels,
+  )
+  const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
 
   if (!quiz) {
     return <div />
   }
 
-  const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
-  if (!itemAnswer && !quizDisabled) {
+  const ItemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
+  if (!ItemAnswer && !quizDisabled) {
     return <LaterQuizItemAddition item={item} />
   }
 
-  const onlyOneItem = quiz.items.length === 1
+  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    setSelectedOption(event.target.value as string)
+  }
 
   const options = item.options
 
@@ -121,12 +130,20 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   let questionWidth: 5 | 12 = 5
   let optionWidth: GridSize = "auto"
 
-  if (onlyOneItem) {
-    const maxOptionLength = Math.max(
-      ...options.map(option => option.title.length),
-    )
-    direction = "column"
+  const itemAnswer = quizAnswer.itemAnswers.find(
+    ia => ia.quizItemId === item.id,
+  )
+
+  if (!itemAnswer && !quizDisabled) {
+    return <div>Answer cannot be retrieved</div>
   }
+
+  const handleOptionChange = (optionId: string) => () =>
+    dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))
+
+  const optionAnswers = itemAnswer && itemAnswer.optionAnswers
+  // TODO: Handle if quiz is locked
+  const answerLocked = userQuizState && userQuizState.status === "locked"
 
   return (
     <div role="group" aria-label={item.title}>
@@ -138,30 +155,41 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
           <ItemInformation
             item={item}
             itemAnswer={itemAnswer}
-            onlyOneItem={onlyOneItem}
             questionWidth={questionWidth}
           />
-
-          <ChoicesContainer
-            direction={direction}
-            onlyOneItem={onlyOneItem}
-            providedStyles={themeProvider.optionContainerStyles}
-          >
-            {options
-              .sort((o1, o2) => o1.order - o2.order)
-              .map((option, index) => {
-                return (
-                  <Option
-                    key={option.id}
-                    option={option}
-                    optionWidth={optionWidth}
-                    shouldBeGray={index % 2 === 0}
-                  />
-                )
-              })}
-          </ChoicesContainer>
+          <FormControl variant="outlined">
+            <InputLabel id="demo-simple-select-outlined-label">
+              select an option
+            </InputLabel>
+            <StyledSelect
+              labelId="demo-simple-select-outlined-label"
+              id="demo-simple-select-filled"
+              direction={direction}
+              value={selectedOption}
+              providedStyles={themeProvider.optionContainerStyles}
+              onChange={handleChange}
+            >
+              {options
+                .sort((o1, o2) => o1.order - o2.order)
+                .map((option, index) => {
+                  const optionIsSelected = option.id === selectedOption
+                  return (
+                    <MenuItem
+                      selected={!!optionIsSelected}
+                      onClick={handleOptionChange(option.id)}
+                      disabled={quizDisabled}
+                      aria-pressed={optionIsSelected}
+                      key={option.id}
+                      value={option.id}
+                    >
+                      {option.title}
+                    </MenuItem>
+                  )
+                })}
+            </StyledSelect>
+          </FormControl>
         </div>
-        {/*!onlyOneItem && */ <FeedbackPortion item={item} />}
+        {<FeedbackPortion item={item} />}
       </ItemContent>
     </div>
   )
@@ -171,11 +199,9 @@ type ItemInformationProps = {
   questionWidth: 5 | 12
   itemAnswer: QuizItemAnswer | undefined
   item: QuizItem
-  onlyOneItem: boolean
 }
 
 const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
-  onlyOneItem,
   item,
 }) => {
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
@@ -185,21 +211,11 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
     return <div />
   }
 
-  const multipleChoiceLabels = languageInfo.multipleChoice
-
-  const selectOptionsLabel = answerLocked
-    ? ""
-    : item.multi
-    ? multipleChoiceLabels.chooseAllSuitableOptionsLabel
-    : onlyOneItem
-    ? multipleChoiceLabels.selectCorrectAnswerLabel
-    : ""
-
   const { title, body } = item
 
   return (
     <QuestionContainer>
-      {!onlyOneItem && title && (
+      {title && (
         <LeftAlignedMarkdownText
           Component={SpaciousTypography}
           removeParagraphs
@@ -211,167 +227,13 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
       )}
 
       {body && <MarkdownText>{body}</MarkdownText>}
-
-      {selectOptionsLabel && (
-        <SelectOptionsLabelTypography
-          variant="subtitle1"
-          variantMapping={{ subtitle1: "p" }}
-          onlyOneItem={onlyOneItem}
-        >
-          {selectOptionsLabel}
-        </SelectOptionsLabelTypography>
-      )}
     </QuestionContainer>
-  )
-}
-
-const SelectOptionsLabelTypography = styled(Typography)<{
-  onlyOneItem: boolean
-}>`
-  color: 6b6b6b;
-  ${({ onlyOneItem }) => onlyOneItem && "margin: 0 auto 1rem;"}
-`
-
-type OptionProps = {
-  option: QuizItemOption
-  optionWidth: GridSize
-  shouldBeGray: boolean
-}
-
-const Option: React.FunctionComponent<OptionProps> = ({
-  option,
-  shouldBeGray,
-}) => {
-  const themeProvider = React.useContext(ThemeProviderContext)
-  const dispatch = useDispatch()
-  const items = useTypedSelector(state => state.quiz!.items)
-  const item = items.find(i => i.id === option.quizItemId)
-  const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
-  const userQuizState = useTypedSelector(state => state.user.userQuizState)
-  const languageLabels = useTypedSelector(
-    state => state.language.languageLabels,
-  )
-  const displayFeedback = useTypedSelector(state => state.feedbackDisplayed)
-  const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
-
-  if (!item || !languageLabels) {
-    // should be impossible
-    return <div>Cannot find related item or language</div>
-  }
-  const itemAnswer = quizAnswer.itemAnswers.find(
-    ia => ia.quizItemId === item.id,
-  )
-
-  const onlyOneItem = items.length === 1
-  const text = option
-
-  if (!itemAnswer && !quizDisabled) {
-    return <div>Answer cannot be retrieved</div>
-  }
-
-  const handleOptionChange = (optionId: string) => () =>
-    dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))
-
-  const optionAnswers = itemAnswer && itemAnswer.optionAnswers
-  const answerLocked = userQuizState && userQuizState.status === "locked"
-
-  const optionIsSelected =
-    optionAnswers && optionAnswers.some(oa => oa.quizOptionId === option.id)
-
-  if (!displayFeedback) {
-    return (
-      <OptionWrapper
-        onlyOneItem={onlyOneItem}
-        shouldBeGray={shouldBeGray}
-        providedStyles={themeProvider.optionWrapperStyles}
-      >
-        <ChoiceButton
-          onlyOneItem={onlyOneItem}
-          selected={!!optionIsSelected}
-          revealed={false}
-          correct={false}
-          onClick={handleOptionChange(option.id)}
-          disabled={quizDisabled}
-          aria-pressed={optionIsSelected}
-        >
-          <MarkdownText Component={justADiv} removeParagraphs>
-            {text.title}
-          </MarkdownText>
-        </ChoiceButton>
-      </OptionWrapper>
-    )
-  }
-
-  const clickOptions = answerLocked
-    ? {}
-    : { onClick: handleOptionChange(option.id) }
-
-  if (onlyOneItem) {
-    return (
-      <React.Fragment>
-        <OptionWrapper
-          onlyOneItem={onlyOneItem}
-          shouldBeGray={shouldBeGray}
-          providedStyles={themeProvider.optionWrapperStyles}
-        >
-          <ChoiceButton
-            revealed
-            onlyOneItem={onlyOneItem}
-            selected={!!optionIsSelected}
-            correct={option.correct}
-            {...clickOptions}
-            aria-selected={optionIsSelected}
-            aria-label={`${text.title}-${
-              option.correct ? "correct" : "incorrect"
-            }`}
-          >
-            <MarkdownText Component={justADiv} removeParagraphs>
-              {text.title}
-            </MarkdownText>
-          </ChoiceButton>
-        </OptionWrapper>
-
-        {optionIsSelected && (
-          <OptionWrapper
-            onlyOneItem={onlyOneItem}
-            shouldBeGray={shouldBeGray}
-            providedStyles={themeProvider.optionWrapperStyles}
-          >
-            {/*<FeedbackPortion item={item} selectedOption={option} />*/}
-          </OptionWrapper>
-        )}
-      </React.Fragment>
-    )
-  }
-
-  // multiple items
-  return (
-    <>
-      <OptionWrapper onlyOneItem={onlyOneItem} shouldBeGray={shouldBeGray}>
-        <ChoiceButton
-          revealed
-          onlyOneItem={onlyOneItem}
-          selected={!!optionIsSelected}
-          correct={option.correct}
-          {...clickOptions}
-          aria-selected={optionIsSelected}
-          aria-label={`${text.title}-${
-            option.correct ? "correct" : "incorrect"
-          }`}
-        >
-          <MarkdownText Component={justADiv} removeParagraphs>
-            {text.title}
-          </MarkdownText>
-        </ChoiceButton>
-      </OptionWrapper>
-    </>
   )
 }
 
 interface IFeedbackPortionProps {
   item: QuizItem
   selectedOption?: QuizItemOption
-  onlyOneItem?: boolean
 }
 
 const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
@@ -401,7 +263,6 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
     return <div>Cannot find related item answer</div>
   }
 
-  const onlyOneItem = items.length === 1
   const generalLabels = languageLabels.general
 
   const optionAnswers = itemAnswer && itemAnswer.optionAnswers
@@ -445,7 +306,6 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
     return (
       <ThemedDiv
         correct={correct}
-        onlyOneItem={onlyOneItem}
         message={
           correct
             ? generalLabels.answerCorrectLabel
@@ -460,7 +320,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   }
 
   return (
-    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem}>
+    <FeedbackDiv correct={correct}>
       <CentralizedOnSmallScreenTypography variant="body1">
         <AttentionIcon icon={faExclamationCircle} />
       </CentralizedOnSmallScreenTypography>
@@ -471,22 +331,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   )
 }
 
-const OptionWrapper = styled.div<OptionWrapperProps>`
-  ${({ onlyOneItem, shouldBeGray, providedStyles }) =>
-    onlyOneItem
-      ? `
-      display: flex;
-      justify-content: center;
-      background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
-      ${providedStyles}
-    `
-      : `
-      margin-left: 1rem;
-      `}
-`
-
 type OptionWrapperProps = {
-  onlyOneItem: boolean
   shouldBeGray: boolean
   providedStyles?: string
 }

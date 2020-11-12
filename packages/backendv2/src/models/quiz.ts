@@ -199,7 +199,9 @@ export class Quiz extends Model {
         savedQuiz = await this.query(trx).insertGraphAndFetch(quiz)
       }
       await this.updateCourseProgressesIfNecessary(oldQuiz, savedQuiz, trx)
-      await Kafka.broadcastCourseQuizzesUpdated(course.id, trx)
+      if (process.env.KAFKA_HOST) {
+        await Kafka.broadcastCourseQuizzesUpdated(course.id, trx)
+      }
       await trx.commit()
     } catch (error) {
       await trx.rollback()

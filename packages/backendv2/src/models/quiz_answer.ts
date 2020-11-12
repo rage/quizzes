@@ -450,6 +450,7 @@ class QuizAnswer extends Model {
           }
           break
         case "multiple-choice-dropdown":
+        case "clickable-multiple-choice":
         case "multiple-choice":
           const quizOptionAnswers = quizItemAnswer.optionAnswers
           const quizOptions = quizItem.options

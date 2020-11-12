@@ -221,6 +221,7 @@ export async function up(knex: Knex): Promise<any> {
             "feedback",
             "custom-frontend-accept-data",
             "multiple-choice-dropdown",
+            "clickable-multiple-choice",
           ],
           {
             useNative: true,
