@@ -1181,7 +1181,7 @@ describe("dashboard - courses: duplicating course should", () => {
 //TODO: figure out how to parse the csv stream
 describe("dashboard - courses: downloading a correspondence file should", () => {
   beforeAll(async () => {
-    await safeSeed({ directory: "./database/seeds" })
+    await safeSeed(configA)
   })
 
   afterAll(async () => {
@@ -1237,6 +1237,178 @@ describe("dashboard - courses: downloading a correspondence file should", () => 
         //TODO: asserts on response
         console.log(response.body)
       })
+      .expect(200, done)
+  })
+})
+
+describe("dashboard - courses: downloading quiz info should", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 6666,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-quiz-info",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("should return 200 on successful request", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-quiz-info",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send({
+        quizName: "test",
+        courseName: "test",
+      })
+      .expect(async response => {
+        //TODO: asserts on response
+        console.log(response.body)
+      })
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: downloading peer review info should", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 6666,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-peerreview-info",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 200 on succesfull request", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-peerreview-info",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect("Content-type", "text/csv; charset=utf-8")
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: downloading answer info should", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 6666,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-answer-info",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 200 on succesfull request", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-answer-info",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect("Content-type", "text/csv; charset=utf-8")
       .expect(200, done)
   })
 })

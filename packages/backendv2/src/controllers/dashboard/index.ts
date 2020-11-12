@@ -163,7 +163,7 @@ const dashboard = new Router<CustomState, CustomContext>({
     )
   })
 
-  .post("/quizzes/:quizId/download-quiz-info", async ctx => {
+  .post("/quizzes/:quizId/download-quiz-info", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
     const token = ctx.request.body.token
     const quizName = ctx.request.body.quizName
@@ -191,35 +191,39 @@ const dashboard = new Router<CustomState, CustomContext>({
     }
   })
 
-  .post("/quizzes/:quizId/download-peerreview-info", async ctx => {
-    const quizId = ctx.params.quizId
-    const token = ctx.request.body.token
-    const quizName = ctx.request.body.quizName
-    const courseName = ctx.request.body.courseName
-    const current_datetime = new Date()
-    const isoDate =
-      current_datetime.getDate() +
-      "-" +
-      (current_datetime.getMonth() + 1) +
-      "-" +
-      current_datetime.getFullYear() +
-      "-" +
-      current_datetime.getHours() +
-      "-" +
-      current_datetime.getMinutes()
-    if (!validToken(token)) {
-      ctx.body = "invalid token"
-    } else {
-      const stream = await Quiz.getPeerReviewInfo(quizId)
-      ctx.response.set("Content-Type", "text/csv")
-      ctx.response.attachment(
-        `quiz-peerreview-info-${quizName}-${courseName}-${isoDate}.csv`,
-      )
-      ctx.body = stream
-    }
-  })
+  .post(
+    "/quizzes/:quizId/download-peerreview-info",
+    accessControl(),
+    async ctx => {
+      const quizId = ctx.params.quizId
+      const token = ctx.request.body.token
+      const quizName = ctx.request.body.quizName
+      const courseName = ctx.request.body.courseName
+      const current_datetime = new Date()
+      const isoDate =
+        current_datetime.getDate() +
+        "-" +
+        (current_datetime.getMonth() + 1) +
+        "-" +
+        current_datetime.getFullYear() +
+        "-" +
+        current_datetime.getHours() +
+        "-" +
+        current_datetime.getMinutes()
+      if (!validToken(token)) {
+        ctx.body = "invalid token"
+      } else {
+        const stream = await Quiz.getPeerReviewInfo(quizId)
+        ctx.response.set("Content-Type", "text/csv")
+        ctx.response.attachment(
+          `quiz-peerreview-info-${quizName}-${courseName}-${isoDate}.csv`,
+        )
+        ctx.body = stream
+      }
+    },
+  )
 
-  .post("/quizzes/:quizId/download-answer-info", async ctx => {
+  .post("/quizzes/:quizId/download-answer-info", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
     const token = ctx.request.body.token
     const quizName = ctx.request.body.quizName
