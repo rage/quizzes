@@ -1,16 +1,17 @@
 import * as React from "react"
 import { useContext } from "react"
-import { MenuItem } from "@material-ui/core"
 import ThemeProviderContext from "../contexes/themeProviderContext"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
 
-import { StyledButton } from "./styleComponents"
+import { SecondaryStyledButton } from "./styleComponents"
 
 export interface ChoiceButtonProps {
   revealed: boolean
   children: any
+  onlyOneItem: boolean
+  state: boolean
   selected: boolean
   correct: boolean
   onClick?: any
@@ -18,10 +19,13 @@ export interface ChoiceButtonProps {
 }
 
 interface ButtonProps {
+  onlyOneItem: boolean
   selected: boolean
+  state: boolean
 }
 
 interface RevealedButtonProps {
+  onlyOneItem: boolean
   selected: boolean
   correct: boolean
   children: any
@@ -43,16 +47,31 @@ const FailureIcon = () => (
   </IconWrapper>
 )
 
-const ChoiceButton = styled(MenuItem)<ButtonProps>`
-  ${({ selected }) => !selected && `background-color: white;`}
-    ${({ selected }) => (selected ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.23)")};
+const ChoiceButton = styled(SecondaryStyledButton)<ButtonProps>`
+  ${({ onlyOneItem }) => onlyOneItem && `width: 90%;`}
+  ${({ state }) => state && `background-color: #E3B599;` }
+  margin: 0.5em 0;
+
+  &:hover{
+    background: #E5C7B5;
+    box-shadow: none;
+  }
+
+  &:focus{
+    ${({ state }) => state ? `background-color: #E3B599;` : `background-color: #E0E0E0;`}
+  }
+
+
 `
 
 const RevealedChoiceButton = styled(
   ({ selected, correct, ...others }: RevealedButtonProps) => {
     return (
       <ChoiceButton
+        state={false} // TODO
+        variant={"contained"}
         selected={selected}
+        fullWidth
         {...others}
       >
         {selected ? correct ? <SuccessIcon /> : <FailureIcon /> : ""}
@@ -64,7 +83,7 @@ const RevealedChoiceButton = styled(
   ${props =>
     props.selected
       ? `
-      color: white;
+      color: blue;
       background-color: ${props.correct ? "#047500" : "#DB0000"};
       `
       : props.correct
@@ -82,14 +101,16 @@ export default (props: ChoiceButtonProps) => {
   const ThemedButton = themeProvider.choiceButton
 
   if (ThemedButton) {
-    return <ThemedButton {...props} onlyOneItem={false}/>
+    return <ThemedButton {...props} />
   }
 
   return revealed ? (
     <RevealedChoiceButton {...others} />
   ) : (
     <ChoiceButton
-      color={props.selected ? "primary" : "default"}
+      variant="contained"
+      color={props.selected ? "#E3B599" : "default"}
+      fullWidth
       {...others}
     />
   )

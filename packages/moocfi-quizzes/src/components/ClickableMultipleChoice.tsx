@@ -12,7 +12,7 @@ import MarkdownText from "./MarkdownText"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons"
 import ThemeProviderContext from "../contexes/themeProviderContext"
-import ChoiceButton from "./ChoiceButton"
+import ClickableChoiceButton from "./ClickableChoiceButton"
 
 const QuestionContainer = styled.div`
   display: flex;
@@ -29,10 +29,11 @@ interface ChoicesContainerProps {
 }
 
 const ChoicesContainer = styled.div<ChoicesContainerProps>`
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: ${({ direction }) => direction};
-  padding-top: 7;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  padding: 15px 10px;
+  background: #F5F5F5;
+  border-radius: 7px;
   ${({ onlyOneItem }) => onlyOneItem && "width: 100%"}
   ${({ onlyOneItem, providedStyles }) =>
     providedStyles && onlyOneItem && providedStyles}
@@ -243,6 +244,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
   shouldBeGray,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
+  const [click, setClick] = React.useState(false)
   const dispatch = useDispatch()
   const items = useTypedSelector(state => state.quiz!.items)
   const item = items.find(i => i.id === option.quizItemId)
@@ -269,9 +271,10 @@ const Option: React.FunctionComponent<OptionProps> = ({
     return <div>Answer cannot be retrieved</div>
   }
 
-  const handleOptionChange = (optionId: string) => () =>
+  const handleOptionChange = (optionId: string) => () => {
+    setClick(!click)
     dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))
-
+  }
   const optionAnswers = itemAnswer && itemAnswer.optionAnswers
   const answerLocked = userQuizState && userQuizState.status === "locked"
 
@@ -285,11 +288,12 @@ const Option: React.FunctionComponent<OptionProps> = ({
         shouldBeGray={shouldBeGray}
         providedStyles={themeProvider.optionWrapperStyles}
       >
-        <ChoiceButton
+        <ClickableChoiceButton
           onlyOneItem={onlyOneItem}
           selected={!!optionIsSelected}
           revealed={false}
           correct={false}
+          state={click}
           onClick={handleOptionChange(option.id)}
           disabled={quizDisabled}
           aria-pressed={optionIsSelected}
@@ -297,7 +301,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
           <MarkdownText Component={justADiv} removeParagraphs>
             {text.title}
           </MarkdownText>
-        </ChoiceButton>
+        </ClickableChoiceButton>
       </OptionWrapper>
     )
   }
@@ -314,8 +318,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
           shouldBeGray={shouldBeGray}
           providedStyles={themeProvider.optionWrapperStyles}
         >
-          <ChoiceButton
+          <ClickableChoiceButton
             revealed
+            state={click}
             onlyOneItem={onlyOneItem}
             selected={!!optionIsSelected}
             correct={option.correct}
@@ -328,7 +333,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
             <MarkdownText Component={justADiv} removeParagraphs>
               {text.title}
             </MarkdownText>
-          </ChoiceButton>
+          </ClickableChoiceButton>
         </OptionWrapper>
 
         {optionIsSelected && (
@@ -348,8 +353,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
   return (
     <>
       <OptionWrapper onlyOneItem={onlyOneItem} shouldBeGray={shouldBeGray}>
-        <ChoiceButton
+        <ClickableChoiceButton
           revealed
+          state={click}
           onlyOneItem={onlyOneItem}
           selected={!!optionIsSelected}
           correct={option.correct}
@@ -362,7 +368,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
           <MarkdownText Component={justADiv} removeParagraphs>
             {text.title}
           </MarkdownText>
-        </ChoiceButton>
+        </ClickableChoiceButton>
       </OptionWrapper>
     </>
   )
@@ -477,7 +483,7 @@ const OptionWrapper = styled.div<OptionWrapperProps>`
       ? `
       display: flex;
       justify-content: center;
-      background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
+      background-color: #F5F5F5;
       ${providedStyles}
     `
       : `

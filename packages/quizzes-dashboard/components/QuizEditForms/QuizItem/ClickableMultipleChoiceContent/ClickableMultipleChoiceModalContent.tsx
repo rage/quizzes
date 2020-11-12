@@ -47,7 +47,7 @@ interface EditorModalProps {
   item: NormalizedItem
 }
 
-export const ClickableMultipleChoiceModalContent = ({ item }: EditorModalProps) => {
+export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
   const storeOptions = useTypedSelector(state => state.editor.options)
   const dispatch = useDispatch()
@@ -173,4 +173,4 @@ export const ClickableMultipleChoiceModalContent = ({ item }: EditorModalProps) 
   )
 }
 
-export default ClickableMultipleChoiceModalContent
+export default MultipleChoiceModalContent

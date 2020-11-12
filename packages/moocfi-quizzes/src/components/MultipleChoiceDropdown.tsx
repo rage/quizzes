@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { Typography, Select, MenuItem} from "@material-ui/core"
+import { Typography, Select, FormControl, InputLabel} from "@material-ui/core"
 import { GridDirection, GridSize } from "@material-ui/core/Grid"
 import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
@@ -13,14 +13,18 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons"
 import ThemeProviderContext from "../contexes/themeProviderContext"
 import ChoiceButton from "./ChoiceButton"
-import ChoiceSelect from "./ChoiceSelect"
+import MenuItem from "./MenuItem"
 
 const QuestionContainer = styled.div`
   display: flex;
   flex-direction: column;
   flex: 1;
+  justify-content: center;
   font-size: 1.25rem;
-  margin-right: 0.25rem;
+  margin-right: 0.8rem;
+  padding-left: 10px;
+  border-radius: 5px;
+  min-height: 2rem;
 `
 
 interface ChoicesContainerProps {
@@ -28,11 +32,7 @@ interface ChoicesContainerProps {
   providedStyles: string | undefined
 }
 
-const ChoicesContainer = styled(Select)<ChoicesContainerProps>`
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: ${({ direction }) => direction};
-  padding-top: 7;
+const StyledSelect = styled(Select)<ChoicesContainerProps>`
 `
 
 const CentralizedOnSmallScreenTypography = styled(Typography)`
@@ -53,7 +53,8 @@ interface ItemContentProps {
 const ItemContent = styled.div<ItemContentProps>`
   margin-bottom: 10px;
   > div:first-of-type {
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 40%;;
     justify-content: space-between;
     flex-direction: ${({ direction }) => direction};
   }
@@ -98,6 +99,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   const quiz = useTypedSelector(state => state.quiz)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+  const [option, setOption] = React.useState('');
 
   if (!quiz) {
     return <div />
@@ -108,6 +110,10 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
     return <LaterQuizItemAddition item={item} />
   }
 
+  const handleChange = (event: React.ChangeEvent<{value: unknown}>) => {
+    setOption(event.target.value as string)
+    console.log('Working....')
+  }
 
   const options = item.options
 
@@ -128,24 +134,31 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
             itemAnswer={itemAnswer}
             questionWidth={questionWidth}
           />
-
-          <ChoicesContainer
+        <FormControl variant="outlined">
+         <InputLabel id="demo-simple-select-outlined-label">select an option</InputLabel>
+          <StyledSelect
+          labelId="demo-simple-select-outlined-label"
+          id="demo-simple-select-filled"
             direction={direction}
+            value={option}
             providedStyles={themeProvider.optionContainerStyles}
+            onChange={handleChange}
           >
             {options
               .sort((o1, o2) => o1.order - o2.order)
               .map((option, index) => {
                 return (
                   <Option
-                    key={option.id}
-                    option={option}
-                    optionWidth={optionWidth}
-                    shouldBeGray={index % 2 === 0}
-                  />
+                  key={option.id}
+                  option={option}
+                  value={option.title}
+                  optionWidth={optionWidth}
+                  shouldBeGray={index % 2 === 0}
+                  >{option.title}</Option>
                 )
               })}
-          </ChoicesContainer>
+          </StyledSelect>
+          </FormControl>
         </div>
         {<FeedbackPortion item={item} />}
       </ItemContent>
@@ -198,13 +211,16 @@ const SelectOptionsLabelTypography = styled(Typography)<{
 `
 
 type OptionProps = {
+  value: string
   option: QuizItemOption
   optionWidth: GridSize
   shouldBeGray: boolean
 }
 
+
 const Option: React.FunctionComponent<OptionProps> = ({
   option,
+  value,
   shouldBeGray,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
@@ -244,11 +260,11 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
   if (!displayFeedback) {
     return (
-      <OptionWrapper
+/*       <OptionWrapper
         shouldBeGray={shouldBeGray}
         providedStyles={themeProvider.optionWrapperStyles}
-      >
-        <ChoiceSelect
+      > */
+        <MenuItem
           selected={!!optionIsSelected}
           revealed={false}
           correct={false}
@@ -259,8 +275,8 @@ const Option: React.FunctionComponent<OptionProps> = ({
           <MarkdownText Component={justADiv} removeParagraphs>
             {text.title}
           </MarkdownText>
-        </ChoiceSelect>
-      </OptionWrapper>
+        </MenuItem>
+/*       </OptionWrapper> */
     )
   }
 
@@ -271,8 +287,8 @@ const Option: React.FunctionComponent<OptionProps> = ({
   // multiple items
   return (
     <>
-      <OptionWrapper shouldBeGray={shouldBeGray}>
-        <ChoiceSelect
+   {/*    <OptionWrapper shouldBeGray={shouldBeGray}> */}
+        <MenuItem
           revealed
           selected={!!optionIsSelected}
           correct={option.correct}
@@ -285,8 +301,8 @@ const Option: React.FunctionComponent<OptionProps> = ({
           <MarkdownText Component={justADiv} removeParagraphs>
             {text.title}
           </MarkdownText>
-        </ChoiceSelect>
-      </OptionWrapper>
+        </MenuItem>
+{/*       </OptionWrapper> */}
     </>
   )
 }
