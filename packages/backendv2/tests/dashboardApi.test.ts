@@ -3,7 +3,7 @@ import nock from "nock"
 import app from "../app"
 import knex from "../database/knex"
 import { QuizAnswer, Course } from "../src/models"
-import { input, userAbilities, validation } from "./data"
+import { input, userAbilities, validation, possibleAnswerStates } from "./data"
 import { UserInfo } from "../src/types"
 import { BadRequestError, NotFoundError } from "../src/util/error"
 
@@ -1733,6 +1733,89 @@ describe("dashboard: get user abilities for course", () => {
       .set("Accept", "application/json")
       .expect(res => {
         expect(res.body).toEqual([])
+      })
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: get quizzes answer statistics", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async done => {
+    nock.cleanAll()
+    await safeClean()
+    done()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer insufficient_token") {
+          return [
+            200,
+            {
+              id: 9876,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 1234,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/answerStatistics",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 401 if insufficient credentials", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/answerStatistics",
+      )
+      .set("Authorization", `bearer insufficient_token`)
+      .expect(403, done)
+  })
+
+  test("respond with 200 on succesfull request", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/answerStatistics",
+      )
+      .set("Authorization", `bearer pleb_token`)
+      .expect(response => {
+        let checked: string[] = []
+        for (const key in response.body) {
+          expect(key).toBeString()
+          expect(possibleAnswerStates).toContain(key)
+          expect(checked).not.toContain(key)
+          checked.push(key)
+          expect(response.body[key]).toBeNumber()
+        }
       })
       .expect(200, done)
   })

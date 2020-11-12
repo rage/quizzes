@@ -1,3 +1,4 @@
+import { isNumber } from "lodash"
 import { uuid, dateTime } from "./util"
 
 export const input = {
@@ -1011,3 +1012,19 @@ export const userAbilities = {
     },
   },
 }
+
+export const possibleAnswerStates = [
+  "manual-review",
+  "rejected",
+  "manual-review-once-given-and-received-enough",
+  "draft",
+  "given-enough",
+  "confirmed",
+  "given-more-than-enough",
+  "deprecated",
+  "enough-received-but-not-given",
+  "submitted",
+  "manual-review-once-given-enough",
+  "spam",
+  "total",
+]
