@@ -5,6 +5,7 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../util/error"
+import * as Sentry from "@sentry/node"
 
 const errorHandler = async (ctx: CustomContext, next: () => Promise<any>) => {
   try {
@@ -29,6 +30,13 @@ const errorHandler = async (ctx: CustomContext, next: () => Promise<any>) => {
       default:
         ctx.status = 500
     }
+
+    Sentry.withScope(function(scope) {
+      scope.addEventProcessor(function(event) {
+        return Sentry.Handlers.parseRequest(event, ctx.request)
+      })
+      Sentry.captureException(error)
+    })
   }
 }
 
