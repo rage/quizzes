@@ -262,7 +262,6 @@ export class Quiz extends Model {
   static async getPreviewById(quizId: string) {
     const quiz = (
       await this.query()
-        .modify("previewSelect")
         .withGraphJoined("texts(previewSelect)")
         .where("quiz.id", quizId)
     )[0]
