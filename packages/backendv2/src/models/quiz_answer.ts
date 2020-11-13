@@ -529,16 +529,20 @@ class QuizAnswer extends Model {
   ) {
     const hasPeerReviews = quiz.peerReviews.length > 0
     if (hasPeerReviews) {
-      const peerReviews = await PeerReview.query(trx)
-        .where("quiz_answer_id", quizAnswer.id)
-        .withGraphJoined("answers")
-      quizAnswer.status = this.assessAnswerWithPeerReviewsStatus(
-        quiz,
-        quizAnswer,
-        userQuizState,
-        peerReviews,
-        course,
-      )
+      if (quizAnswer.id) {
+        const peerReviews = await PeerReview.query(trx)
+          .where("quiz_answer_id", quizAnswer.id)
+          .withGraphJoined("answers")
+        quizAnswer.status = this.assessAnswerWithPeerReviewsStatus(
+          quiz,
+          quizAnswer,
+          userQuizState,
+          peerReviews,
+          course,
+        )
+      } else {
+        quizAnswer.status = "submitted"
+      }
     } else {
       quizAnswer.status = "confirmed"
     }
