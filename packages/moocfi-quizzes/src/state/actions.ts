@@ -113,6 +113,7 @@ export const initialize: ActionCreator<ThunkAction> = (
       dispatch(userActions.setUserQuizState(userQuizState))
     }
   } catch (e) {
+    console.log(e)
     dispatch(
       messageActions.fatalErrorOccurred(
         getState().language.languageLabels!.error.quizLoadFailedError ||
