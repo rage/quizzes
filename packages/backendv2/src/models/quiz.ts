@@ -13,6 +13,7 @@ import Knex from "knex"
 import UserQuizState from "./user_quiz_state"
 import * as Kafka from "../services/kafka"
 import PeerReviewQuestion from "./peer_review_question"
+import { NotNullViolationError } from "objection"
 
 export class Quiz extends Model {
   id!: string
@@ -205,6 +206,9 @@ export class Quiz extends Model {
       await trx.commit()
     } catch (error) {
       await trx.rollback()
+      if (error instanceof NotNullViolationError) {
+        throw new BadRequestError(error)
+      }
       throw error
     }
     return this.moveTextsToParent(savedQuiz)
