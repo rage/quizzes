@@ -47,8 +47,8 @@ const loggerMiddleware = async (
     const ms = Date.now() - start
     log.error(`Crashed ${ctx.request.method} ${ctx.req.url} in ${ms}ms`, {
       error: e.message,
+      stack: e.stack,
     })
-    log.error(e)
     throw e
   }
   const ms = Date.now() - start
