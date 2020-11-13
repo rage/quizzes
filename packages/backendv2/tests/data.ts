@@ -1,3 +1,4 @@
+import { isNumber } from "lodash"
 import { uuid, dateTime } from "./util"
 
 export const input = {
@@ -150,7 +151,6 @@ export const input = {
   peerReview1: {
     quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
     peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-    // userId: 1234,
     rejectedQuizAnswerIds: null,
     answers: [
       {
@@ -162,7 +162,6 @@ export const input = {
   peerReview2: {
     quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
     peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-    // userId: 2345,
     rejectedQuizAnswerIds: null,
     answers: [
       {
@@ -174,7 +173,6 @@ export const input = {
   peerReview3: {
     quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
     peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-    // userId: 4567,
     rejectedQuizAnswerIds: null,
     answers: [
       {
@@ -186,7 +184,6 @@ export const input = {
   peerReview4: {
     quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
     peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-    // userId: 2345,
     rejectedQuizAnswerIds: null,
     answers: [
       {
@@ -204,6 +201,13 @@ export const input = {
   correspondenceIds: {
     oldCourseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
     newCourseId: "51b66fc3-4da2-48aa-8eab-404370250ca3",
+  },
+  editedCourse: {
+    courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    moocfiId: "d7a4e8ae-f586-4f2e-9d1f-b9ea0969bf1d",
+    title: "edited title",
+    abbreviation: "edited abbreviation",
+    languageId: "aa_BB",
   },
 }
 
@@ -962,6 +966,40 @@ export const validation = {
     success: true,
     newCourseId: expect.stringMatching(uuid),
   },
+  allLanguages: [
+    {
+      id: "xy_YZ",
+      name: "language",
+      country: "country",
+      createdAt: expect.stringMatching(dateTime),
+      updatedAt: expect.stringMatching(dateTime),
+    },
+    {
+      id: "aa_BB",
+      name: "language",
+      country: "another country",
+      createdAt: expect.stringMatching(dateTime),
+      updatedAt: expect.stringMatching(dateTime),
+    },
+  ],
+  editedCourse: {
+    id: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    moocfiId: "d7a4e8ae-f586-4f2e-9d1f-b9ea0969bf1d",
+    organizationId: null,
+    minScoreToPass: null,
+    minProgressToPass: null,
+    minPeerReviewsReceived: 2,
+    minPeerReviewsGiven: 3,
+    minReviewAverage: 2,
+    maxSpamFlags: 1,
+    maxReviewSpamFlags: 3,
+    createdAt: expect.stringMatching(dateTime),
+    updatedAt: expect.stringMatching(dateTime),
+    languageId: "aa_BB",
+    title: "edited title",
+    body: "course",
+    abbreviation: "edited abbreviation",
+  },
 }
 
 export const userAbilities = {
@@ -974,3 +1012,19 @@ export const userAbilities = {
     },
   },
 }
+
+export const possibleAnswerStates = [
+  "manual-review",
+  "rejected",
+  "manual-review-once-given-and-received-enough",
+  "draft",
+  "given-enough",
+  "confirmed",
+  "given-more-than-enough",
+  "deprecated",
+  "enough-received-but-not-given",
+  "submitted",
+  "manual-review-once-given-enough",
+  "spam",
+  "total",
+]

@@ -1,21 +1,13 @@
 import request from "supertest"
-import { v4 as uuidv4 } from "uuid"
 import nock from "nock"
-const knexCleaner = require("knex-cleaner")
 import app from "../app"
 import knex from "../database/knex"
 import { QuizAnswer, Course } from "../src/models"
-import { input, userAbilities, validation } from "./data"
+import { input, userAbilities, validation, possibleAnswerStates } from "./data"
 import { UserInfo } from "../src/types"
 import { BadRequestError, NotFoundError } from "../src/util/error"
 
-import {
-  safeClean,
-  safeSeed,
-  expectQuizToEqual,
-  configA,
-  uuid as uuidPattern,
-} from "./util"
+import { safeClean, safeSeed, expectQuizToEqual, configA } from "./util"
 
 afterAll(async () => {
   await safeClean()
@@ -849,7 +841,163 @@ describe("dashboard: update manual review status", () => {
   })
 })
 
-describe("test user progress", () => {
+describe("Answer: spam flags", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(() => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token_1") {
+          return [
+            200,
+            {
+              id: 1234,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer pleb_token_2") {
+          return [
+            200,
+            {
+              id: 2345,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer pleb_token_3") {
+          return [
+            200,
+            {
+              id: 3456,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer pleb_token_4") {
+          return [
+            200,
+            {
+              id: 4567,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("spam flag already given", done => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/report-spam")
+      .set("Authorization", "bearer PLEB_TOKEN_1")
+      .set("Accept", "application/json")
+      .send({
+        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      })
+      .expect(response => {
+        const received: BadRequestError = response.body
+        expect(received.message).toEqual("Can only give one spam flag")
+      })
+      .expect(400, done)
+  })
+
+  test("First spam flag", done => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/report-spam")
+      .set("Authorization", "bearer PLEB_TOKEN_2")
+      .set("Accept", "application/json")
+      .send({
+        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      })
+      .expect(res => {
+        expect(res.body).toEqual(validation.spamFlagValidator1)
+      })
+      .expect(200, done)
+  })
+
+  test("check the answers status", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
+      .set("Authorization", "bearer ADMIN_TOKEN")
+      .set("Accept", "application/json")
+      .expect(response => {
+        expect(response.body.status).toEqual("given-enough")
+        expect(response.body.userQuizState.spamFlags).toEqual(1)
+      })
+      .expect(200, done)
+  })
+
+  test("Second spam flag", done => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/report-spam")
+      .set("Authorization", "bearer PLEB_TOKEN_3")
+      .set("Accept", "application/json")
+      .send({
+        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      })
+      .expect(response => {
+        expect(response.body).toEqual(validation.spamFlagValidator2)
+      })
+      .expect(200, done)
+  })
+
+  test("check the answer status", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
+      .set("Authorization", "bearer ADMIN_TOKEN")
+      .set("Accept", "application/json")
+      .expect(response => {
+        expect(response.body.userQuizState.spamFlags).toEqual(2)
+        expect(response.body.status).toEqual("given-enough")
+      })
+      .expect(200, done)
+  })
+
+  test("Third spam flag", done => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/report-spam")
+      .set("Authorization", "bearer PLEB_TOKEN_4")
+      .set("Accept", "application/json")
+      .send({
+        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      })
+      .expect(response => {
+        expect(response.body).toEqual(validation.spamFlagValidator3)
+      })
+      .expect(200, done)
+  })
+
+  test("check the answer status", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
+      .set("Authorization", "bearer ADMIN_TOKEN")
+      .set("Accept", "application/json")
+      .expect(response => {
+        expect(response.body.userQuizState.spamFlags).toEqual(3)
+        expect(response.body.status).toEqual("spam")
+      })
+      .expect(200, done)
+  })
+})
+
+describe("fetching user progress should", () => {
   beforeAll(async () => {
     await safeSeed(configA)
   })
@@ -883,7 +1031,7 @@ describe("test user progress", () => {
         }
       })
   })
-  test("no user progress", done => {
+  test("return empty when user has no progress", done => {
     request(app.callback())
       .get(
         "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/current/progress",
@@ -896,7 +1044,7 @@ describe("test user progress", () => {
       .expect(200, done)
   })
 
-  test("user progress", done => {
+  test("return user's progress in correct shape when user has prgress", done => {
     request(app.callback())
       .get(
         "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/user/current/progress",
@@ -907,6 +1055,19 @@ describe("test user progress", () => {
         expect(res.body).toEqual(validation.userProgressValidator)
       })
       .expect(200, done)
+  })
+
+  test("throw if invalid course id provided", done => {
+    const invalidCourseId = "7966ffd1-692b-41fd-974f-50a43173743c"
+    request(app.callback())
+      .get(`/api/v2/dashboard/courses/${invalidCourseId}/user/current/progress`)
+      .set("Authorization", "bearer PLEB_TOKEN")
+      .set("Accept", "application/json")
+      .expect(response => {
+        const received: NotFoundError = response.body
+        expect(received.message).toEqual(`course not found: ${invalidCourseId}`)
+      })
+      .expect(404, done)
   })
 })
 
@@ -1072,15 +1233,271 @@ describe("dashboard - courses: downloading a correspondence file should", () => 
       .expect(403, done)
   })
 
+  //TODO: asserts on response
   test("should return 200 on successful request", done => {
     request(app.callback())
       .post("/api/v2/dashboard/courses/download-correspondence-file")
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .send(input.correspondenceIds)
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: fetching all exisiting languages languages", () => {
+  beforeAll(async () => {
+    await safeSeed({ directory: "./database/seeds" })
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("should return all languages on valid request", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/languages/all")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        expect(response.body).toStrictEqual(validation.allLanguages)
+      })
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: an edit made to a course should", () => {
+  beforeAll(async () => {
+    await safeSeed({ directory: "./database/seeds" })
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/edit",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with course that reflects edits", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/edit",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send(input.editedCourse)
+      .expect(response => {
+        const course = response.body
+        expect(course).toStrictEqual(validation.editedCourse)
+      })
+      .expect(200, done)
+  })
+})
+
+describe("dashboard - courses: downloading quiz info should", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 6666,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-quiz-info",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("should return 200 on successful request", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-quiz-info",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send({
+        quizName: "test",
+        courseName: "test",
+      })
       .expect(async response => {
         //TODO: asserts on response
         console.log(response.body)
       })
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: downloading peer review info should", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 6666,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-peerreview-info",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 200 on succesfull request", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-peerreview-info",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect("Content-type", "text/csv; charset=utf-8")
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: downloading answer info should", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 6666,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-answer-info",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 200 on succesfull request", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-answer-info",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect("Content-type", "text/csv; charset=utf-8")
       .expect(200, done)
   })
 })
@@ -1158,6 +1575,313 @@ describe("dashboard: get current users abilities", () => {
       .set("Accept", "application/json")
       .expect(res => {
         expect(res.body).toEqual(userAbilities.abilities.assistant)
+      })
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: get user abilities for course", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async done => {
+    nock.cleanAll()
+    await safeClean()
+    done()
+  })
+
+  test("get user abilities, assistant", done => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 8765,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/abilities",
+      )
+      .set("Authorization", "bearer pleb_token")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual(["view", "edit", "grade"])
+      })
+      .expect(200, done)
+  })
+
+  test("get user abilities, teacher", done => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 9876,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/abilities",
+      )
+      .set("Authorization", "bearer pleb_token")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual(["view", "edit", "grade"])
+      })
+      .expect(200, done)
+  })
+
+  test("get user abilities, admin", done => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              id: 9876,
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/abilities",
+      )
+      .set("Authorization", "bearer admin_token")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual([
+          "view",
+          "edit",
+          "grade",
+          "download",
+          "duplicate",
+        ])
+      })
+      .expect(200, done)
+  })
+
+  test("get user abilities, no-body", done => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 1234,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/abilities",
+      )
+      .set("Authorization", "bearer pleb_token")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual([])
+      })
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: get quizzes answer statistics", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async done => {
+    nock.cleanAll()
+    await safeClean()
+    done()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer insufficient_token") {
+          return [
+            200,
+            {
+              id: 9876,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 1234,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/answerStatistics",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 401 if insufficient credentials", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/answerStatistics",
+      )
+      .set("Authorization", `bearer insufficient_token`)
+      .expect(403, done)
+  })
+
+  test("respond with 200 on succesfull request", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/answerStatistics",
+      )
+      .set("Authorization", `bearer pleb_token`)
+      .expect(response => {
+        let checked: string[] = []
+        for (const key in response.body) {
+          expect(key).toBeString()
+          expect(possibleAnswerStates).toContain(key)
+          expect(checked).not.toContain(key)
+          checked.push(key)
+          expect(response.body[key]).toBeNumber()
+        }
+      })
+      .expect(200, done)
+  })
+})
+
+describe("dashboard: get all answer states", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async done => {
+    nock.cleanAll()
+    await safeClean()
+    done()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer insufficient_token") {
+          return [
+            200,
+            {
+              id: 9876,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 1234,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/quizzes/answers/get-answer-states")
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 200 with succesfull request", done => {
+    request(app.callback())
+      .get("/api/v2/dashboard/quizzes/answers/get-answer-states")
+      .set("Authorization", `bearer pleb_token`)
+      .expect(response => {
+        const result: string[] = response.body.filter(
+          (state: string) => !possibleAnswerStates.includes(state),
+        )
+        expect(result).toEqual([])
       })
       .expect(200, done)
   })
