@@ -267,7 +267,7 @@ class QuizAnswer extends Model {
       return quizAnswer
     } catch (error) {
       await trx.rollback()
-      throw new BadRequestError(error)
+      throw error
     }
   }
 
@@ -407,7 +407,7 @@ class QuizAnswer extends Model {
       }
     } catch (error) {
       await trx.rollback()
-      throw new BadRequestError(error)
+      throw error
     }
   }
 

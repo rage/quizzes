@@ -73,7 +73,7 @@ class SpamFlag extends Model {
         return newSpamFlag
       } catch (err) {
         trx.rollback()
-        throw new BadRequestError(err)
+        throw err
       }
     }
   }

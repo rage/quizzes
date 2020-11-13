@@ -205,7 +205,7 @@ export class Quiz extends Model {
       await trx.commit()
     } catch (error) {
       await trx.rollback()
-      throw new BadRequestError(error)
+      throw error
     }
     return this.moveTextsToParent(savedQuiz)
   }
