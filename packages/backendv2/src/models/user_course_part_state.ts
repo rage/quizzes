@@ -130,7 +130,7 @@ class UserCoursePartState extends Model {
             quiz.part === ucps.coursePart && quiz.excludedFromScore === false,
         )
         .map(quiz => quiz.points)
-        .reduce((acc, curr) => acc + curr)
+        .reduce((acc, curr) => acc + curr, 0)
 
       const coursePartString = ucps.coursePart.toString()
       return {
