@@ -1465,12 +1465,8 @@ describe("dashboard - courses: downloading quiz info should", () => {
       )
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .send({
-        quizName: "test",
-        courseName: "test",
-      })
-      .expect(async response => {
-        //TODO: asserts on response
-        // console.log(response.body)
+        quizName: "quiz 1",
+        courseName: "course 1",
       })
       .expect(200, done)
   })

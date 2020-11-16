@@ -1,9 +1,5 @@
 import Router from "koa-router"
-import {
-  CustomContext,
-  CustomState,
-  EditCoursePayloadFields,
-} from "../../types"
+import { CustomContext, CustomState } from "../../types"
 import {
   Course,
   Quiz,
@@ -12,7 +8,7 @@ import {
   CourseTranslation,
   Language,
 } from "../../models/"
-import accessControl, { validToken } from "../../middleware/access_control"
+import accessControl from "../../middleware/access_control"
 import {
   abilitiesByRole,
   checkAccessOrThrow,
@@ -172,7 +168,6 @@ const dashboard = new Router<CustomState, CustomContext>({
 
   .post("/quizzes/:quizId/download-quiz-info", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    const token = ctx.request.body.token
     const quizName = ctx.request.body.quizName
     const courseName = ctx.request.body.courseName
     const current_datetime = new Date()
@@ -186,16 +181,17 @@ const dashboard = new Router<CustomState, CustomContext>({
       current_datetime.getHours() +
       "-" +
       current_datetime.getMinutes()
-    if (!validToken(token)) {
-      ctx.body = "invalid token"
-    } else {
-      const stream = await Quiz.getQuizInfo(quizId)
-      ctx.response.set("Content-Type", "text/csv")
-      ctx.response.attachment(
-        `quiz-info-${quizName}-${courseName}-${isoDate}.csv`,
-      )
-      ctx.body = stream
-    }
+
+    const course = await Course.getByTitle(courseName)
+
+    await checkAccessOrThrow(ctx.state.user, course.id, "download")
+
+    const stream = await Quiz.getQuizInfo(quizId)
+    ctx.response.set("Content-Type", "text/csv")
+    ctx.response.attachment(
+      `quiz-info-${quizName}-${courseName}-${isoDate}.csv`,
+    )
+    ctx.body = stream
   })
 
   .post(
@@ -203,7 +199,6 @@ const dashboard = new Router<CustomState, CustomContext>({
     accessControl(),
     async ctx => {
       const quizId = ctx.params.quizId
-      const token = ctx.request.body.token
       const quizName = ctx.request.body.quizName
       const courseName = ctx.request.body.courseName
       const current_datetime = new Date()
@@ -217,22 +212,22 @@ const dashboard = new Router<CustomState, CustomContext>({
         current_datetime.getHours() +
         "-" +
         current_datetime.getMinutes()
-      if (!validToken(token)) {
-        ctx.body = "invalid token"
-      } else {
-        const stream = await Quiz.getPeerReviewInfo(quizId)
-        ctx.response.set("Content-Type", "text/csv")
-        ctx.response.attachment(
-          `quiz-peerreview-info-${quizName}-${courseName}-${isoDate}.csv`,
-        )
-        ctx.body = stream
-      }
+
+      const course = await Course.getByTitle(courseName)
+
+      await checkAccessOrThrow(ctx.state.user, course.id, "download")
+
+      const stream = await Quiz.getPeerReviewInfo(quizId)
+      ctx.response.set("Content-Type", "text/csv")
+      ctx.response.attachment(
+        `quiz-peerreview-info-${quizName}-${courseName}-${isoDate}.csv`,
+      )
+      ctx.body = stream
     },
   )
 
   .post("/quizzes/:quizId/download-answer-info", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    const token = ctx.request.body.token
     const quizName = ctx.request.body.quizName
     const courseName = ctx.request.body.courseName
     const current_datetime = new Date()
@@ -246,16 +241,17 @@ const dashboard = new Router<CustomState, CustomContext>({
       current_datetime.getHours() +
       "-" +
       current_datetime.getMinutes()
-    if (!validToken(token)) {
-      ctx.body = "invalid token"
-    } else {
-      const stream = await Quiz.getQuizAnswerInfo(quizId)
-      ctx.response.set("Content-Type", "text/csv")
-      ctx.response.attachment(
-        `quiz-answer-info-${quizName}-${courseName}-${isoDate}.csv`,
-      )
-      ctx.body = stream
-    }
+
+    const course = await Course.getByTitle(courseName)
+
+    await checkAccessOrThrow(ctx.state.user, course.id, "download")
+
+    const stream = await Quiz.getQuizAnswerInfo(quizId)
+    ctx.response.set("Content-Type", "text/csv")
+    ctx.response.attachment(
+      `quiz-answer-info-${quizName}-${courseName}-${isoDate}.csv`,
+    )
+    ctx.body = stream
   })
 
   .get("/languages/all", accessControl(), async ctx => {
