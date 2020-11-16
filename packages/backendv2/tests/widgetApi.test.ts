@@ -1,3 +1,4 @@
+import { ForbiddenError } from "./../src/util/error"
 import request from "supertest"
 import { v4 as uuidv4 } from "uuid"
 import nock from "nock"
@@ -470,6 +471,31 @@ describe("widget: fetching quiz info", () => {
       .set("Accept", "application/json")
       .expect(res => {
         expect(res.body).toStrictEqual(validation.quizForWidget1)
+      })
+      .expect(200, done)
+  })
+
+  test("should throw when not-logged in", done => {
+    request(app.callback())
+      .get("/api/v2/widget/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
+      .set("Authorization", "bearer BAD_TOKEN")
+      .set("Accept", "application/json")
+      .expect(res => {
+        const received: UnauthorizedError = res.body
+        expect(received.message).toEqual("unauthorized")
+      })
+      .expect(401, done)
+  })
+
+  test("should return title and body as preview when not logged in and fetching info ", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/widget/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/preview",
+      )
+      .set("Authorization", "bearer BAD_TOKEN")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toStrictEqual(validation.quizPreview)
       })
       .expect(200, done)
   })

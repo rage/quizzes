@@ -1178,6 +1178,25 @@ export const validation = {
       updatedAt: expect.stringMatching(dateTime),
     },
   },
+  quizPreview: {
+    id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+    courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    part: 1,
+    section: 1,
+    points: 1,
+    deadline: null,
+    open: null,
+    excludedFromScore: false,
+    autoConfirm: true,
+    autoReject: true,
+    triesLimited: true,
+    tries: 1,
+    grantPointsPolicy: "grant_whenever_possible",
+    awardPointsEvenIfWrong: false,
+    createdAt: expect.stringMatching(dateTime),
+    updatedAt: expect.stringMatching(dateTime),
+    texts: [{ title: "quiz 1", body: "body" }],
+  },
 }
 
 export const userAbilities = {
