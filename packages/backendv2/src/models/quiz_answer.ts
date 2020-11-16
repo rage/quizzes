@@ -860,12 +860,10 @@ class QuizAnswer extends Model {
 
   private static removeIds(quizAnswer: QuizAnswer) {
     delete quizAnswer.id
-    for (const itemAnswer of quizAnswer.itemAnswers) {
+    quizAnswer.itemAnswers?.forEach(itemAnswer => {
       delete itemAnswer.id
-      for (const optionAnswer of itemAnswer.optionAnswers) {
-        delete optionAnswer.id
-      }
-    }
+      itemAnswer.optionAnswers?.forEach(optionAnswer => delete optionAnswer.id)
+    })
   }
 }
 
