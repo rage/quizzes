@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Formik, Form, Field, FormikHelpers } from "formik"
+import { Formik, Form, Field } from "formik"
 import { Alert } from "@material-ui/lab"
 import { FormHelperText, MenuItem } from "@material-ui/core"
 import { useRouter } from "next/router"
@@ -20,9 +20,9 @@ import {
 import styled from "styled-components"
 import { object, string } from "yup"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
-import axios from "axios"
 import _ from "lodash"
 import { EditCoursePayloadFields } from "./types"
+import DebugDialog from "../DebugDialog"
 
 const FieldSet = styled.fieldset`
   display: flex;
@@ -273,6 +273,7 @@ const EditCourseDetails = () => {
         courseId={id}
         languageIds={languageIds}
       />
+      <DebugDialog object={courseData.course} />
     </>
   )
 }
