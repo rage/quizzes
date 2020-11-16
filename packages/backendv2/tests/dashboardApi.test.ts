@@ -1522,6 +1522,10 @@ describe("dashboard: downloading peer review info should", () => {
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-peerreview-info",
       )
       .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send({
+        quizName: "quiz 1",
+        courseName: "course 1",
+      })
       .expect("Content-type", "text/csv; charset=utf-8")
       .expect(200, done)
   })
@@ -1577,6 +1581,10 @@ describe("dashboard: downloading answer info should", () => {
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-answer-info",
       )
       .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send({
+        quizName: "quiz 1",
+        courseName: "course 1",
+      })
       .expect("Content-type", "text/csv; charset=utf-8")
       .expect(200, done)
   })
