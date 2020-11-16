@@ -77,7 +77,10 @@ const dashboard = new Router<CustomState, CustomContext>({
       const quizId = ctx.params.quizId
       const quiz = await Quiz.getById(quizId)
       await checkAccessOrThrow(ctx.state.user, quiz.courseId, "view")
-      ctx.body = await QuizAnswer.getManualReviewCountByQuizId(quizId)
+      const requiringAttention = await QuizAnswer.getManualReviewCountByQuizId(
+        quizId,
+      )
+      ctx.body = requiringAttention
     },
   )
 

@@ -463,15 +463,16 @@ describe("widget: fetching quiz info", () => {
       .expect(404, done)
   })
 
-  //TODO: validate the returned quiz when sure what it should return
-  /*test("as admin should return quiz with all info when valid quiz id provided", done => {
+  test("should return quiz with all info when valid quiz id provided", done => {
     request(app.callback())
       .get("/api/v2/widget/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
-      .set("Authorization", "bearer ADMIN_TOKEN")
+      .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
-      .expect(res => {})
+      .expect(res => {
+        expect(res.body).toStrictEqual(validation.quizForWidget1)
+      })
       .expect(200, done)
-  })*/
+  })
 })
 
 describe("widget: fetching peer review candidates", () => {

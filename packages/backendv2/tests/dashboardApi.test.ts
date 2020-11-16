@@ -252,6 +252,90 @@ describe("dashboard - courses: count answers requiring attention should", () => 
   })
 })
 
+describe("dashboard - quizzes: count answers requiring attention should", () => {
+  beforeAll(async () => {
+    await safeSeed({ directory: "./database/seeds" })
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 6666,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("respond with 401 if invalid credentials", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/quizzes/44bf4cf2f-3058-4311-8d16-26d781261af7/count-answers-requiring-attention",
+      )
+      .set("Authorization", `bearer BAD_TOKEN`)
+      .expect(401, done)
+  })
+
+  test("respond with 403 if insufficient privilege", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/count-answers-requiring-attention",
+      )
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(403, done)
+  })
+
+  test("respond with 404 if invalid quiz id", done => {
+    const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af8"
+    request(app.callback())
+      .get(
+        `/api/v2/dashboard/quizzes/${quizId}/count-answers-requiring-attention`,
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(response => {
+        const received: NotFoundError = response.body
+        expect(received.message).toEqual(`quiz not found: ${quizId}`)
+      })
+      .expect(404, done)
+  })
+
+  describe("on valid request:", () => {
+    test("return 0 when none require attention", done => {
+      request(app.callback())
+        .get(
+          "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/count-answers-requiring-attention",
+        )
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .expect(200)
+        .expect(response => {
+          const received = response.body
+          expect(received).toEqual(0)
+        })
+        .end(done)
+    })
+  })
+})
+
 describe("dashboard: get quizzes by course id", () => {
   beforeAll(async () => {
     await safeSeed(configA)
@@ -1386,7 +1470,7 @@ describe("dashboard - courses: downloading quiz info should", () => {
       })
       .expect(async response => {
         //TODO: asserts on response
-        console.log(response.body)
+        // console.log(response.body)
       })
       .expect(200, done)
   })
