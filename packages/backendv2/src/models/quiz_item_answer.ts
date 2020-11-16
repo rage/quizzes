@@ -3,6 +3,7 @@ import QuizAnswer from "./quiz_answer"
 import QuizOptionAnswer from "./quiz_option_answer"
 
 class QuizItemAnswer extends Model {
+  id!: string
   quizItemId!: string
   textData!: string
   correct!: boolean

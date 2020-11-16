@@ -373,6 +373,7 @@ class QuizAnswer extends Model {
       let savedQuizAnswer
       let savedUserQuizState
       await this.markPreviousAsDeprecated(userId, quizId, trx)
+      this.removeIds(quizAnswer)
       savedQuizAnswer = await this.query(trx).insertGraphAndFetch(quizAnswer)
       savedUserQuizState = await UserQuizState.query(trx).upsertGraphAndFetch(
         userQuizState,
@@ -855,6 +856,16 @@ class QuizAnswer extends Model {
       .update({ status: "deprecated" })
       .where("user_id", userId)
       .andWhere("quiz_id", quizId)
+  }
+
+  private static removeIds(quizAnswer: QuizAnswer) {
+    delete quizAnswer.id
+    for (const itemAnswer of quizAnswer.itemAnswers) {
+      delete itemAnswer.id
+      for (const optionAnswer of itemAnswer.optionAnswers) {
+        delete optionAnswer.id
+      }
+    }
   }
 }
 
