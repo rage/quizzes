@@ -27,8 +27,8 @@ const frenchLabels: SingleLanguageLabels = {
   open: {
     placeholder: "Réponse",
     userAnswerLabel: "Votre réponse",
-    feedbackForFailure: "Votre réponse est correcte",
-    feedbackForSuccess: "Votre réponse est incorrecte",
+    feedbackForFailure: "Votre réponse est incorrecte",
+    feedbackForSuccess: "Votre réponse est correcte",
   },
   peerReviews: {
     loadingLabel: "Chargement en cours",
@@ -110,7 +110,7 @@ const frenchLabels: SingleLanguageLabels = {
     loginToViewPromptLabel: "Connectez-vous pour voir le quiz",
     loginToAnswerPromptLabel: "Connectez-vous pour répondre au quiz",
     loadingLabel: "Chargement en cours",
-    answerCorrectLabel: "La réponse est correcten",
+    answerCorrectLabel: "La réponse est correcte",
     alreadyAnsweredLabel: "Vous avez déjà répondu",
     answerIncorrectLabel: "La réponse est incorrecte",
     kOutOfNCorrect: (k, n) => `Vous avez ${k}/${n} réponses correctes`,

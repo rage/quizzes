@@ -25,7 +25,7 @@ const NewQuiz = () => {
     {
       label: `${course ? course.title : ""}`,
       as: `/courses/${courseId}`,
-      href: "/courses/[id]",
+      href: "/courses/[courseId]/[...page]",
     },
     { label: "New Quiz" },
   ])

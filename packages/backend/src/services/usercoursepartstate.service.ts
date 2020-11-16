@@ -102,7 +102,7 @@ export default class UserCoursePartStateService {
         parts.user_id as user_id,
         parts.course_id as course_id,
         parts.part as course_part,
-        coalesce(points.points / max.max_points, 0) as progress,
+        coalesce(points.points / (case when max.max_points = 0 then 1 else max.max_points end), 0),
         coalesce(points.points, 0) as score
       from (
         select
@@ -232,12 +232,16 @@ export default class UserCoursePartStateService {
     const progress: PointsByGroup[] = userCoursePartStates
       .filter(ucps => ucps.coursePart !== 0)
       .map(ucps => {
-        const maxPoints = quizzes
+        let maxPoints = 0
+        const pointsArr = quizzes
           .filter(
             quiz => quiz.part === ucps.coursePart && !quiz.excludedFromScore,
           )
           .map(quiz => quiz.points)
-          .reduce((acc, curr) => acc + curr)
+
+        if (pointsArr.length > 0) {
+          maxPoints = pointsArr.reduce((acc, curr) => acc + curr)
+        }
 
         const coursePartString: string = ucps.coursePart.toString()
 

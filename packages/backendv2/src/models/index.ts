@@ -13,6 +13,8 @@ import QuizItemAnswer from "./quiz_item_answer"
 
 import QuizOptionAnswer from "./quiz_option_answer"
 
+import PeerReview from "./peer_review"
+import PeerReviewQuestionAnswer from "./peer_review_question_answer"
 import PeerReviewCollection from "./peer_review_collection"
 import PeerReviewCollectionTranslation from "./peer_review_collection_translation"
 
@@ -28,6 +30,10 @@ import UserCourseRole from "./user_course_role"
 import Course from "./course"
 import CourseTranslation from "./course_translation"
 
+import Language from "./language"
+
+import SpamFlag from "./spam_flag"
+
 export {
   Quiz,
   QuizTranslation,
@@ -42,9 +48,13 @@ export {
   PeerReviewCollectionTranslation,
   PeerReviewQuestion,
   PeerReviewQuestionTranslation,
+  PeerReviewQuestionAnswer,
+  PeerReview,
   User,
   UserQuizState,
   UserCourseRole,
   Course,
   CourseTranslation,
+  Language,
+  SpamFlag,
 }

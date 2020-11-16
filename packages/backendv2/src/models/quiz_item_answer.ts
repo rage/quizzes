@@ -3,6 +3,9 @@ import QuizAnswer from "./quiz_answer"
 import QuizOptionAnswer from "./quiz_option_answer"
 
 class QuizItemAnswer extends Model {
+  quizItemId!: string
+  textData!: string
+  correct!: boolean
   optionAnswers!: QuizOptionAnswer[]
 
   static get tableName() {

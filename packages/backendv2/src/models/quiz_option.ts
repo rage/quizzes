@@ -3,6 +3,8 @@ import QuizItem from "./quiz_item"
 import QuizOptionTranslation from "./quiz_option_translation"
 
 class QuizOption extends Model {
+  id!: string
+  correct!: boolean
   texts!: QuizOptionTranslation[]
   title!: string
   body!: string

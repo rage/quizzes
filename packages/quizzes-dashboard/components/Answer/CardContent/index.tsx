@@ -96,6 +96,17 @@ export const AnswerContent = ({
   const [height, setHeight] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
 
+  const editableAnswerStates = [
+    "manual-review",
+    "given-enough",
+    "given-more-than-enough",
+    "manual-review-once-given-and-received-enough",
+    "manual-review-once-given-enough",
+    "enough-received-but-not-given",
+    "submitted",
+    "rejected",
+  ]
+
   useEffect(() => setShowMore(expanded), [expanded])
   useEffect(() => {
     if (handled) {
@@ -172,7 +183,7 @@ export const AnswerContent = ({
           </>
         )}
       </StatButtonWrapper>
-      {answer.status === "manual-review" ? (
+      {editableAnswerStates.includes(answer.status) ? (
         <ManualReviewField
           answer={answer}
           handled={handled}

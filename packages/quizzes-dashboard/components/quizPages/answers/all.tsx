@@ -36,7 +36,7 @@ export const AllAnswers = () => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
 
-  const URL_HREF = `/quizzes/[quizId]/[page]`
+  const URL_HREF = `/quizzes/[quizId]/[...page]`
   const pathname = `/quizzes/${quizId}/all-answers/`
 
   let paramSize = Number(route.query.answers) as TAnswersDisplayed
@@ -105,8 +105,8 @@ export const AllAnswers = () => {
     { label: "Courses", as: "/", href: "/" },
     {
       label: `${course ? course.title : ""}`,
-      as: `/courses/${quiz?.courseId}`,
-      href: "/courses/[courseId]",
+      as: `/courses/${quiz?.courseId}/listing`,
+      href: "/courses/[courseId]/[...page]",
     },
     {
       label: `${quiz ? quiz.title : ""}`,

@@ -83,10 +83,10 @@ export const initialize: ActionCreator<ThunkAction> = (
       dispatch(quizAnswerActions.pastDeadline())
     }
 
-    if (!quizAnswer) {
+    if (!quizAnswer || userQuizState?.status === "open") {
       quizAnswer = {
         quizId: quiz.id,
-        languageId, // This can lead to wrong language id in answer. Needs to be fixed.
+        languageId: quiz.course.languageId, // This can lead to wrong language id in answer. Needs to be fixed.
         itemAnswers: quiz.items.map(item => {
           return {
             quizItemId: item.id,
@@ -113,6 +113,7 @@ export const initialize: ActionCreator<ThunkAction> = (
       dispatch(userActions.setUserQuizState(userQuizState))
     }
   } catch (e) {
+    console.log(e)
     dispatch(
       messageActions.fatalErrorOccurred(
         getState().language.languageLabels!.error.quizLoadFailedError ||

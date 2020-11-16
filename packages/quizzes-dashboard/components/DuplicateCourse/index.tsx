@@ -5,18 +5,20 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWindowClose } from "@fortawesome/free-solid-svg-icons"
 import { Course } from "../../types/Quiz"
 import DuplicateModal from "./DuplicateModal"
-import CorrespondanceModal from "./CorrespondanceModal"
+import CorrespondenceModal from "./CorrespondenceModal"
 
 const StyledModal = styled(Modal)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 `
 
 const AdvancedBox = styled(Box)`
-  background-color: #fafafa;
-  min-width: 500px;
-  min-height: 400px;
+  background-color: #fafafa !important;
+  min-width: 600px !important;
+  max-width: 600px !important;
+  max-height: 500 px !important;
+  min-height: 500px !important;
 `
 
 const CloseButton = styled(Button)`
@@ -51,11 +53,14 @@ interface DuplicateCourseProps {
 
 export const DuplicateCourseButton = ({ course }: DuplicateCourseProps) => {
   const [duplicateModal, showDuplicateModal] = useState(false)
-  const [correspondanceModal, showCorrespondanceModal] = useState(false)
+  const [correspondenceModal, showCorrespondenceModal] = useState(false)
   return (
     <>
       <ButtonContainer>
-        <StyledModal open={duplicateModal}>
+        <StyledModal
+          open={duplicateModal}
+          onClose={() => showDuplicateModal(false)}
+        >
           <AdvancedBox>
             <ButtonWrapper>
               <CloseButton onClick={() => showDuplicateModal(false)}>
@@ -66,14 +71,17 @@ export const DuplicateCourseButton = ({ course }: DuplicateCourseProps) => {
           </AdvancedBox>
         </StyledModal>
 
-        <StyledModal open={correspondanceModal}>
+        <StyledModal
+          open={correspondenceModal}
+          onClose={() => showCorrespondenceModal(false)}
+        >
           <AdvancedBox>
             <ButtonWrapper>
-              <CloseButton onClick={() => showCorrespondanceModal(false)}>
+              <CloseButton onClick={() => showCorrespondenceModal(false)}>
                 <FontAwesomeIcon icon={faWindowClose} />
               </CloseButton>
             </ButtonWrapper>
-            <CorrespondanceModal course={course} />
+            <CorrespondenceModal course={course} />
           </AdvancedBox>
         </StyledModal>
 
@@ -85,9 +93,9 @@ export const DuplicateCourseButton = ({ course }: DuplicateCourseProps) => {
         </StyledButton>
         <StyledButton
           variant="outlined"
-          onClick={() => showCorrespondanceModal(true)}
+          onClick={() => showCorrespondenceModal(true)}
         >
-          Download the correspondance file
+          Download the correspondence file
         </StyledButton>
       </ButtonContainer>
     </>

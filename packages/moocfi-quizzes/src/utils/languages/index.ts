@@ -9,6 +9,7 @@ import italianLabels from "./italian_options"
 import latvianLabels from "./latvian_options"
 import hungarianLabels from "./hungarian_options"
 import dutchLabels from "./dutch_options"
+import dutchBelgiumLabels from "./dutch_belgium_options"
 import danishLabels from "./danish_options"
 import lithuanianLabels from "./lithuanian_options"
 import croatianLabels from "./croatian_options"
@@ -169,6 +170,7 @@ export const languageOptions: LanguageLabels = {
   lv_LV: latvianLabels,
   hu_HU: hungarianLabels,
   nl_NL: dutchLabels,
+  nl_BE: dutchBelgiumLabels,
   da_DK: danishLabels,
   lt_LT: lithuanianLabels,
   hr_HR: croatianLabels,

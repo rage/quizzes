@@ -8,6 +8,8 @@ import {
   editedQuizItemBody,
   toggledMultiOptions,
   editedValidityRegex,
+  editedItemSuccessMessage,
+  editedItemFailureMessage,
 } from "../../../../store/editor/items/itemAction"
 import {
   setRegex,
@@ -68,7 +70,7 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
       </ModalContentTitleWrapper>
       <ModalContent>
         <TextField
-          value={storeItem.title}
+          value={storeItem.title ?? ""}
           multiline
           fullWidth
           variant="outlined"
@@ -80,7 +82,7 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
       </ModalContent>
       <ModalContent>
         <TextField
-          value={storeItem.body}
+          value={storeItem.body ?? ""}
           multiline
           fullWidth
           variant="outlined"
@@ -96,7 +98,7 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
           fullWidth
           label="Validity regex"
           variant="outlined"
-          value={variables.regex}
+          value={variables.regex ?? ""}
           helperText={!variables.validRegex && "Invalid regex"}
           onChange={event => {
             dispatch(setRegex(storeItem.id, event.target.value))
@@ -129,6 +131,30 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
             }
           />
         </FormControl>
+      </ModalContent>
+      <ModalContent>
+        <TextField
+          fullWidth
+          multiline
+          variant="outlined"
+          label="Success message"
+          value={storeItem.successMessage ?? ""}
+          onChange={event =>
+            dispatch(editedItemSuccessMessage(storeItem.id, event.target.value))
+          }
+        />
+      </ModalContent>
+      <ModalContent>
+        <TextField
+          fullWidth
+          multiline
+          variant="outlined"
+          label="Failure message"
+          value={storeItem.failureMessage ?? ""}
+          onChange={event =>
+            dispatch(editedItemFailureMessage(storeItem.id, event.target.value))
+          }
+        />
       </ModalContent>
     </>
   )

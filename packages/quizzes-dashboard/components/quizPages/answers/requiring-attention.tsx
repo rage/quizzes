@@ -26,8 +26,8 @@ export const RequiringAttention = () => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
 
-  const URL_HREF = `/quizzes/[quizId]/[page]`
-  const pathname = `/quizzes/${quizId}/all-answers/`
+  const URL_HREF = `/quizzes/[quizId]/[...page]`
+  const pathname = `/quizzes/${quizId}/answers-requiring-attention/`
 
   const paramSize = Number(route.query.answers) as TAnswersDisplayed
   const paramPage = Number(route.query.pageNo)
@@ -66,8 +66,8 @@ export const RequiringAttention = () => {
     { label: "Courses", as: "/", href: "/" },
     {
       label: `${course ? course.title : ""}`,
-      as: `/courses/${quiz?.courseId}`,
-      href: "/courses/[courseId]",
+      as: `/courses/${quiz?.courseId}/listing`,
+      href: "/courses/[courseId]/[...page]",
     },
     {
       label: `${quiz ? quiz.title : ""}`,

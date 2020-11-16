@@ -52,7 +52,7 @@ const PeerReviewOption: React.FunctionComponent<PeerReviewOptionProps> = ({
         })
         .map(ia => {
           const quizItem = quizItemById(ia.quizItemId)
-          const quizTitle = quizItem ? quizItem.texts[0].title : ""
+          const quizTitle = quizItem ? quizItem.title : ""
 
           return (
             <React.Fragment key={ia.id}>

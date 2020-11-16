@@ -68,9 +68,12 @@ const StyledModal = styled(Modal)`
 `
 
 const AdvancedBox = styled(Box)`
-  background-color: #fafafa;
-  min-width: 1000px;
-  min-height: 800px;
+  background-color: #fafafa !important;
+  min-width: 1000px !important;
+  min-height: 800px !important;
+  max-width: 1000px !important;
+  max-height: 800px !important;
+  overflow-y: scroll !important;
 `
 
 const CloseButton = styled(Button)`
@@ -143,7 +146,7 @@ const CheckBoxContent = ({ item }: contentBoxProps) => {
             label="title"
             fullWidth
             multiline
-            value={Boolean(storeItem.title) ? storeItem.title : ""}
+            value={storeItem.title ?? ""}
             variant="outlined"
             onChange={event =>
               dispatch(editedQuizItemTitle(event.target.value, storeItem.id))

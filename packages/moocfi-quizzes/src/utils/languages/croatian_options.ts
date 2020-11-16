@@ -38,16 +38,16 @@ const croatianLabels: SingleLanguageLabels = {
     unselectButtonLabel: "Poništi odabir",
     chooseEssayInstruction: "Odaberite odgovor koji ćete ocijeniti.",
     chosenEssayInstruction: "Ocijenite odgovor koji ste odabrali.",
-    displayPeerReview: "Ocijeni odgovore drugih polaznika",
+    displayPeerReview: "Ocijenite odgovore drugih polaznika",
     giveExtraPeerReviews:
       "Ocijenili ste potreban broj odgovora drugih polaznika. Što više odgovora drugih polaznika ocijenite, to brže će vaši odgovori doći na red za ocjenjivanje!",
     giveExtraPeerReviewsQuizConfirmed:
       "I dalje možete ocjenjivati odgovore drugih polaznika kako biste im pomogli.",
     givenPeerReviewsLabel: "Ocjene dane drugim polaznicima",
     peerReviewsCompletedInfo: "Ocijenili ste dovoljan broj odgovora.",
-    reportAsInappropriateLabel: "Prijavi neprimjeren sadržaj",
-    submitPeerReviewLabel: "Pošalji ocjenu",
-    hidePeerReviewLabel: "Sakrij",
+    reportAsInappropriateLabel: "Prijavite neprimjeren sadržaj",
+    submitPeerReviewLabel: "Pošaljite ocjenu",
+    hidePeerReviewLabel: "Sakrijte",
     essayQuestionAnswerTextBoxLabel: "Ocijenite odgovor",
     optionLabel: "Odgovor",
     answerRejected: "Vaš odgovor je odbijen.",
@@ -68,8 +68,9 @@ const croatianLabels: SingleLanguageLabels = {
       "Drugi polaznici još nisu ocijenili vaš odgovor.",
     numberOfPeerReviewsText: n =>
       `Broj ocjena dodijeljenih vašem odgovoru: ${n}.`,
-    toggleButtonExpandLabel: "Prikaži sve ocjene dobivene od drugih polaznika",
-    toggleButtonShrinkLabel: "Sakrij ocjene dobivene od drugih polaznika",
+    toggleButtonExpandLabel:
+      "Prikažite sve ocjene dobivene od drugih polaznika",
+    toggleButtonShrinkLabel: "Sakrijte ocjene dobivene od drugih polaznika",
     averageOfGradesLabel: "Prosjek dobivenih ocjena:",
     detailedViewLabel: "Sve ocjene dodijeljene vašem odgovoru",
     summaryViewLabel: "Ocjene dobivene od drugih polaznika",
@@ -100,7 +101,7 @@ const croatianLabels: SingleLanguageLabels = {
     pastDeadline: "Na taj zadatak više nije moguće odgovoriti.",
     answerMissingBecauseQuizModifiedLabel:
       "Neodgovoreno pitanje. Test je vjerojatno izmijenjen nakon što ste unijeli odgovor.",
-    submitButtonLabel: "Pošalji",
+    submitButtonLabel: "Pošaljite",
     errorLabel: "Pogreška",
     loginToViewPromptLabel: "Prijavite se za prikaz zadatka",
     loginToAnswerPromptLabel: "Prijavite se za unos odgovora",

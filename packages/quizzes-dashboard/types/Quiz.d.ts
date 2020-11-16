@@ -118,3 +118,11 @@ export interface PeerReviewQuestion {
   title: string
   body: string
 }
+
+export interface Language {
+  country: string
+  createdAt: Date
+  id: string
+  name: string
+  updatedAt: Date
+}

@@ -5,7 +5,7 @@ const czechLabels: SingleLanguageLabels = {
     exampleAnswerLabel: "Příklad odpovědi",
     userAnswerLabel: "Vaše odpověď",
     currentNumberOfWordsLabel: "Počet slov",
-    textFieldLabel: "Your answerVaše odpověď",
+    textFieldLabel: "Vaše odpověď",
     conformToLimitsToSubmitLabel:
       "To be able to submit the answer, make sure it conforms to the word limitsAbyste bylo možné odpověď odeslat, ujistěte se, že nepřekračuje maximální možný počet slov",
     wordLimitsGuidance: (min, max) => {

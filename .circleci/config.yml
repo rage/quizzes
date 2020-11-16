@@ -89,7 +89,10 @@ jobs:
           command: cd packages/backendv2 && export NODE_ENV=test && npx knex migrate:latest
       - run:
           name: "run tests"
-          command: "cd packages/backendv2 && npm run test"
+          command: "cd packages/backendv2 && npm run test -- --coverage"
+      - run:
+          name: "Upload coverage"
+          command: "cd packages/backendv2 && bash <(curl -s https://codecov.io/bash)"
 
   build_backendv2:
     docker:
