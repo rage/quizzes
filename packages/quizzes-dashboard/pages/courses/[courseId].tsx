@@ -2,7 +2,6 @@ import React from "react"
 import {
   fetchCourseQuizzes,
   getAnswersRequiringAttentionCounts,
-  getUsersAbilities,
   getUserAbilitiesForCourse,
 } from "../../services/quizzes"
 import { groupBy, Dictionary } from "lodash"
@@ -11,7 +10,6 @@ import { Skeleton } from "@material-ui/lab"
 import DebugDialog from "../../components/DebugDialog"
 import Link from "next/link"
 import styled from "styled-components"
-import useSWR from "swr"
 import { useRouter } from "next/router"
 import { Quiz } from "../../types/Quiz"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
@@ -169,7 +167,7 @@ const ShowCoursePage = () => {
           })}
         </div>
       ))}
-      <DebugDialog />
+      <DebugDialog object={course} />
     </>
   )
 }
