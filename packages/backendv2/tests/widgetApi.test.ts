@@ -101,9 +101,6 @@ describe("widget: save quiz answer", () => {
       .set("Authorization", `bearer 1234`)
       .set("Accept", "application/json")
       .send(input.quizAnswerOpen)
-      .expect(response => {
-        console.log(response.body.message)
-      })
       .expect(200)
       .end(done)
   })
