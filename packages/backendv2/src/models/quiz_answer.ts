@@ -401,6 +401,7 @@ class QuizAnswer extends Model {
         )
       }
       await trx.commit()
+      quiz.course = course
       return {
         quiz,
         quizAnswer: savedQuizAnswer,
