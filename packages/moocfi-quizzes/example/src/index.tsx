@@ -201,15 +201,14 @@ const App = () => {
           <Typography variant="h5" component="h1">
             Quiz
           </Typography>
-          <SimpleErrorBoundary>
-            {containerUsed === "true" ? (
-              <FlexContainer>
-                <StyledQuizContainer>{quizPortion}</StyledQuizContainer>
-              </FlexContainer>
-            ) : (
-              quizPortion
-            )}
-          </SimpleErrorBoundary>
+
+          {containerUsed === "true" ? (
+            <FlexContainer>
+              <StyledQuizContainer>{quizPortion}</StyledQuizContainer>
+            </FlexContainer>
+          ) : (
+            quizPortion
+          )}
         </TallContainer>
       </CourseStatusProvider>
     </ThemeProviderContext.Provider>
