@@ -16,39 +16,6 @@ const request = async (accessToken: string, query: string) => {
   return await graphQLClient.request(query)
 }
 
-/*export const getUserCourseData = async (
-  courseId: string,
-  accessToken: string,
-): Promise<any> => {
-  const response = await axios.get(
-    `https://quizzes.mooc.fi/api/v1/quizzes/usercoursestate/${courseId}`,
-    {
-      headers: {
-        authorization: `Bearer ${accessToken}`,
-      },
-    },
-  )
-  return response.data
-}*/
-
-/*export const getCompletion = async (
-  courseId: string,
-  accessToken: string,
-): Promise<any> => {
-  const query = `
-    {
-      currentUser {
-        completions(
-          course_id: "55dff8af-c06c-4a97-88e6-af7c04d252ca"
-        ) {
-          id
-        }
-      }
-    }
-  `
-  return await request(accessToken, query)
-}*/
-
 export const getUserCourseData = async (
   courseId: string,
   accessToken: string,
@@ -78,7 +45,7 @@ export const getUserCourseData = async (
             }
           }
         }
-        completions(course_id: "55dff8af-c06c-4a97-88e6-af7c04d252ca") {
+        completions(course_id: "${courseId}") {
           id
         }
       }
