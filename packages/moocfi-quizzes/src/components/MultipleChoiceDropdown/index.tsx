@@ -128,7 +128,6 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   }
 
   const optionAnswers = itemAnswer && itemAnswer.optionAnswers
-  // TODO: Handle if quiz is locked
   const answerLocked = userQuizState && userQuizState.status === "locked"
 
   return (
