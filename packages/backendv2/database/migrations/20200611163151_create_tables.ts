@@ -221,6 +221,7 @@ export async function up(knex: Knex): Promise<any> {
             "feedback",
             "custom-frontend-accept-data",
             "multiple-choice-dropdown",
+            "clickable-multiple-choice",
           ],
           {
             useNative: true,
@@ -527,10 +528,12 @@ export async function up(knex: Knex): Promise<any> {
           [
             "draft",
             "given-more-than-enough",
+            "manual-review-once-received-enough-given-more-than-enough",
             "given-enough",
-            "manual-review-once-given-and-received-enough",
-            "manual-review-once-given-enough",
+            "manual-review-once-received-enough",
             "submitted",
+            "manual-review-once-given-enough",
+            "manual-review-once-given-and-received-enough",
             "manual-review",
             "confirmed",
             "enough-received-but-not-given",

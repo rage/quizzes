@@ -1,5 +1,12 @@
 import styled from "styled-components"
-import { Button, Paper, TextField, Typography } from "@material-ui/core"
+import {
+  Button,
+  Paper,
+  TextField,
+  Typography,
+  Select,
+  MenuItem,
+} from "@material-ui/core"
 
 export const BaseButton = styled(Button)`
   text-transform: none;
@@ -79,6 +86,11 @@ export const StyledButton = styled(BaseButton)`
   border-radius: 15px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
     0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
+`
+export const SecondaryStyledButton = styled(BaseButton)`
+  padding: 10px 20px;
+  border-radius: 6px;
+  box-shadow: none;
 `
 
 export const WhiteSpacePreservingTypography = styled(Typography)`

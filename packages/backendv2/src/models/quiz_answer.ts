@@ -267,11 +267,18 @@ class QuizAnswer extends Model {
       return quizAnswer
     } catch (error) {
       await trx.rollback()
-      throw new BadRequestError(error)
+      throw error
     }
   }
 
   public static async getManualReviewCountsByCourseId(courseId: string) {
+    // validate course id
+    try {
+      await Course.getFlattenedById(courseId)
+    } catch (error) {
+      throw error
+    }
+
     const counts: any[] = await this.query()
       .select(["quiz_id"])
       .join("quiz", "quiz_answer.quiz_id", "=", "quiz.id")
@@ -279,7 +286,9 @@ class QuizAnswer extends Model {
       .andWhere("status", "manual-review")
       .count()
       .groupBy("quiz_id")
-    const countByQuizId: { [quizId: string]: number } = {}
+    const countByQuizId: {
+      [quizId: string]: number
+    } = {}
     for (const count of counts) {
       countByQuizId[count.quizId] = count.count
     }
@@ -364,14 +373,35 @@ class QuizAnswer extends Model {
       let savedQuizAnswer
       let savedUserQuizState
       await this.markPreviousAsDeprecated(userId, quizId, trx)
-      savedQuizAnswer = await this.query(trx).upsertGraphAndFetch(quizAnswer)
+      this.removeIds(quizAnswer)
+      savedQuizAnswer = await this.query(trx).insertGraphAndFetch(quizAnswer)
       savedUserQuizState = await UserQuizState.query(trx).upsertGraphAndFetch(
         userQuizState,
         {
           insertMissing: true,
         },
       )
+      if (savedQuizAnswer.status === "confirmed") {
+        await UserCoursePartState.update(
+          savedQuizAnswer.userId,
+          quiz.courseId,
+          quiz.part,
+          trx,
+        )
+        await Kafka.broadcastQuizAnswerUpdated(
+          savedQuizAnswer,
+          userQuizState,
+          quiz,
+          trx,
+        )
+        await Kafka.broadcastUserProgressUpdated(
+          savedQuizAnswer.userId,
+          quiz.courseId,
+          trx,
+        )
+      }
       await trx.commit()
+      quiz.course = course
       return {
         quiz,
         quizAnswer: savedQuizAnswer,
@@ -379,7 +409,7 @@ class QuizAnswer extends Model {
       }
     } catch (error) {
       await trx.rollback()
-      throw new BadRequestError(error)
+      throw error
     }
   }
 
@@ -394,6 +424,25 @@ class QuizAnswer extends Model {
     this.assessAnswer(quizAnswer, quiz)
     this.gradeAnswer(quizAnswer, userQuizState, quiz)
     this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
+    if (quizAnswer.status === "confirmed") {
+      await UserCoursePartState.update(
+        quizAnswer.userId,
+        quiz.courseId,
+        quiz.part,
+        trx,
+      )
+      await Kafka.broadcastQuizAnswerUpdated(
+        quizAnswer,
+        userQuizState,
+        quiz,
+        trx,
+      )
+      await Kafka.broadcastUserProgressUpdated(
+        quizAnswer.userId,
+        quiz.courseId,
+        trx,
+      )
+    }
   }
 
   private static checkIfSubmittable(quiz: Quiz, userQuizState: UserQuizState) {
@@ -408,7 +457,11 @@ class QuizAnswer extends Model {
   private static assessAnswer(quizAnswer: QuizAnswer, quiz: Quiz) {
     const quizItemAnswers = quizAnswer.itemAnswers
     const quizItems = quiz.items
-    if (!quizItemAnswers || quizItemAnswers.length != quizItems.length) {
+    if (
+      !quizItemAnswers ||
+      quizItemAnswers.length === 0 ||
+      quizItemAnswers.length != quizItems.length
+    ) {
       throw new BadRequestError("item answers missing")
     }
     for (const quizItemAnswer of quizItemAnswers) {
@@ -437,6 +490,7 @@ class QuizAnswer extends Model {
           }
           break
         case "multiple-choice-dropdown":
+        case "clickable-multiple-choice":
         case "multiple-choice":
           const quizOptionAnswers = quizItemAnswer.optionAnswers
           const quizOptions = quizItem.options
@@ -477,16 +531,20 @@ class QuizAnswer extends Model {
   ) {
     const hasPeerReviews = quiz.peerReviews.length > 0
     if (hasPeerReviews) {
-      const peerReviews = await PeerReview.query(trx)
-        .where("quiz_answer_id", quizAnswer.id)
-        .withGraphJoined("answers")
-      quizAnswer.status = this.assessAnswerWithPeerReviewsStatus(
-        quiz,
-        quizAnswer,
-        userQuizState,
-        peerReviews,
-        course,
-      )
+      if (quizAnswer.id) {
+        const peerReviews = await PeerReview.query(trx)
+          .where("quiz_answer_id", quizAnswer.id)
+          .withGraphJoined("answers")
+        quizAnswer.status = this.assessAnswerWithPeerReviewsStatus(
+          quiz,
+          quizAnswer,
+          userQuizState,
+          peerReviews,
+          course,
+        )
+      } else {
+        quizAnswer.status = "submitted"
+      }
     } else {
       quizAnswer.status = "confirmed"
     }
@@ -646,6 +704,13 @@ class QuizAnswer extends Model {
   }
 
   public static async getAnswersToReview(reviewerId: number, quizId: string) {
+    // validate quiz id
+    try {
+      await Quiz.getById(quizId)
+    } catch (error) {
+      throw error
+    }
+
     const answerIds = this.query()
       .select("id")
       .where("quiz_id", quizId)
@@ -792,6 +857,14 @@ class QuizAnswer extends Model {
       .update({ status: "deprecated" })
       .where("user_id", userId)
       .andWhere("quiz_id", quizId)
+  }
+
+  private static removeIds(quizAnswer: QuizAnswer) {
+    delete quizAnswer.id
+    quizAnswer.itemAnswers?.forEach(itemAnswer => {
+      delete itemAnswer.id
+      itemAnswer.optionAnswers?.forEach(optionAnswer => delete optionAnswer.id)
+    })
   }
 }
 

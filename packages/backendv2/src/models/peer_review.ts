@@ -96,12 +96,18 @@ class PeerReview extends Model {
 
     const { userId: targetUserId } = targetQuizAnswer
 
+    // cannot peer review own answer
+    if (sourceUserId === targetUserId) {
+      throw new BadRequestError("User cannot review their own answer")
+    }
+
     let sourceUserQuizState, targetUserQuizState
 
     sourceUserQuizState = await UserQuizState.getByUserAndQuiz(
       sourceUserId,
       quizId,
     )
+
     targetUserQuizState = await UserQuizState.getByUserAndQuiz(
       targetUserId,
       quizId,
@@ -153,7 +159,7 @@ class PeerReview extends Model {
       }
     } catch (err) {
       trx.rollback()
-      throw new BadRequestError(err)
+      throw err
     }
   }
 

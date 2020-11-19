@@ -1,16 +1,16 @@
 import { MigrationInterface, QueryRunner } from "typeorm"
 
-export class newQuestionTypeMultipleChoiceDropdown1604578472166
+export class NewQuestionTypeClickableMultipleChoice1604930831074
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     await queryRunner.query(
       // tslint:disable-next-line:max-line-length
-      "drop materialized view reaktor.quiz_item cascade",
+      "drop materialized view if exists reaktor.quiz_item cascade",
     )
 
     await queryRunner.query(
       // tslint:disable-next-line:max-line-length
-      "create type quiz_item_type_enum_new as enum ('open', 'scale', 'essay', 'multiple-choice', 'checkbox', 'research-agreement', 'feedback', 'custom-frontend-accept-data', 'multiple-choice-dropdown')",
+      "create type quiz_item_type_enum_new as enum ('open','scale','essay','multiple-choice','checkbox','research-agreement','feedback','custom-frontend-accept-data','multiple-choice-dropdown','clickable-multiple-choice')",
     )
     await queryRunner.query(
       // tslint:disable-next-line:max-line-length
@@ -20,7 +20,6 @@ export class newQuestionTypeMultipleChoiceDropdown1604578472166
     await queryRunner.query(
       "alter type quiz_item_type_enum_new rename to quiz_item_type_enum",
     )
-
     await queryRunner.query(
       `
       CREATE materialized VIEW reaktor.quiz_item AS
@@ -63,12 +62,17 @@ export class newQuestionTypeMultipleChoiceDropdown1604578472166
   public async down(queryRunner: QueryRunner): Promise<any> {
     await queryRunner.query(
       // tslint:disable-next-line:max-line-length
-      "drop materialized view reaktor.quiz_item cascade",
+      "drop materialized view if exists reaktor.quiz_item cascade",
     )
 
     await queryRunner.query(
       // tslint:disable-next-line:max-line-length
-      "create type quiz_item_type_enum_new as enum ('open', 'scale', 'essay', 'multiple-choice', 'checkbox', 'research-agreement', 'feedback', 'custom-frontend-accept-data')",
+      "drop materialized view if exists reaktor.quiz_item cascade",
+    )
+
+    await queryRunner.query(
+      // tslint:disable-next-line:max-line-length
+      "create type quiz_item_type_enum_new as enum ('open','scale','essay','multiple-choice','checkbox','research-agreement','feedback','custom-frontend-accept-data','multiple-choice-dropdown')",
     )
     await queryRunner.query(
       // tslint:disable-next-line:max-line-length
@@ -78,7 +82,6 @@ export class newQuestionTypeMultipleChoiceDropdown1604578472166
     await queryRunner.query(
       "alter type quiz_item_type_enum_new rename to quiz_item_type_enum",
     )
-
     await queryRunner.query(
       `
       CREATE materialized VIEW reaktor.quiz_item AS

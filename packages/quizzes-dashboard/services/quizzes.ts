@@ -329,16 +329,3 @@ export const getCorrespondenceFile = async (
     throw new Error()
   }
 }
-
-export const fetchLanguages = async (): Promise<Language[]> => {
-  const userInfo = checkStore()
-  if (userInfo) {
-    const config = {
-      headers: { Authorization: "bearer " + userInfo.accessToken },
-    }
-    const response = (await api.get(`/languages/ids`, config)).data
-
-    return response
-  }
-  throw new Error()
-}

@@ -49,7 +49,17 @@ export const getUserCourseData = async (
           id
         }
       }
-    }  
+      course(id: "${courseId}") {
+        exercises {
+          id
+          quizzes_id: custom_id
+          name
+          part
+          section
+          max_points
+        }
+      }
+    }
   `
   const data = await request(accessToken, query)
 

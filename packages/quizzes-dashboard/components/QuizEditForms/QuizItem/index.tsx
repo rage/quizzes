@@ -9,6 +9,7 @@ import OpenContent from "./OpenContent"
 import ScaleContent from "./ScaleContent"
 import CustomFrontend from "./CustomFrontend"
 import MultipleChoiceDropdownContent from "./MultipleChoiceDropdownContent"
+import ClickableMultipleChoiceContent from "./ClickableMultipleChoiceContent"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faAngleUp, faAngleDown } from "@fortawesome/free-solid-svg-icons"
 import { useDispatch } from "react-redux"
@@ -76,6 +77,9 @@ const contentBasedOnType = (type: string, item: NormalizedItem) => {
     }
     case "multiple-choice-dropdown": {
       return <MultipleChoiceDropdownContent item={item} />
+    }
+    case "clickable-multiple-choice": {
+      return <ClickableMultipleChoiceContent item={item} />
     }
     default: {
       return <h1>Hi, I'm new/unknown</h1>

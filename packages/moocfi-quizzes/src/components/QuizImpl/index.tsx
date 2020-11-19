@@ -15,6 +15,7 @@ import ResearchAgreement from "../ResearchAgreement"
 import Scale from "../Scale"
 import Open from "../Open"
 import Essay from "../Essay"
+import ClickableMultipleChoice from "../ClickableMultipleChoice"
 import MultipleChoiceDropdown from "../MultipleChoiceDropdown"
 import StageVisualizer from "../PeerReviews/StageVisualizer"
 import PeerReviews from "../PeerReviews"
@@ -29,7 +30,7 @@ import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
 import LoginPrompt from "./LoginPrompt"
 import MarkdownText from "../MarkdownText"
-import Notification from "../Notification"
+import SimpleErrorBoundary from "./SimpleErrorBoundary"
 import { BoldTypographyMedium } from "../styleComponents"
 
 import ThemeProviderContext from "../../contexes/themeProviderContext"
@@ -48,6 +49,7 @@ const componentsByTypeNames = (typeName: QuizItemType) => {
     feedback: Feedback,
     "custom-frontend-accept-data": Unsupported,
     "multiple-choice-dropdown": MultipleChoiceDropdown,
+    "clickable-multiple-choice": ClickableMultipleChoice,
   }
 
   return mapTypeToComponent[typeName]
@@ -169,7 +171,7 @@ const SubmitMessage = styled.div<SubmitMessageProps>`
   ${({ providedStyles }) => providedStyles}
 `
 
-const Error = styled.div`
+const ErrorMessage = styled.div`
   display: flex;
   width: auto;
   padding: 4rem;
@@ -235,9 +237,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     courseStatusProvider.notifyError &&
       courseStatusProvider.notifyError(messageState.message)
     return (
-      <Error>
+      <ErrorMessage>
         <p>{messageState.message}</p>
-      </Error>
+      </ErrorMessage>
     )
   }
 
@@ -482,4 +484,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   )
 }
 
-export default FuncQuizImpl
+export default (props: QuizProps) => (
+  <SimpleErrorBoundary>
+    <FuncQuizImpl {...props} />
+  </SimpleErrorBoundary>
+)
