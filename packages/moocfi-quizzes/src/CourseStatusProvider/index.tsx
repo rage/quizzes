@@ -282,45 +282,6 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
   return <Component {...props} {...injectProps} />
 }
 
-/*const transformData2 = (data: any): ProgressData => {
-  const courseProgress = data.currentUser.user_course_progresses[0]
-  const completed = data.currentUser.completions.length > 0
-  let points_to_pass = 0
-  let n_points
-  let max_points
-  let exercise_completions = 0
-  let total_exercises = 0
-  let distinctActions = new Set()
-  const progressByGroup: ProgressByGroup = {}
-  // const exercisesByPart: ExercisesByPart = {}
-  // const answersByPart: AnswersByPart = {}
-  let exercise_completions_by_section: any
-  if (courseProgress) {
-    n_points = courseProgress.n_points
-    max_points = courseProgress.max_points
-    exercise_completions_by_section =
-      courseProgress.exercise_completions_by_section
-    for (const groupProgress of courseProgress.progress) {
-      progressByGroup[groupProgress.group] = groupProgress
-    }
-  }
-  const required_actions = Array.from(distinctActions) as RequiredAction[]
-
-  return {
-    completed,
-    points_to_pass,
-    n_points,
-    max_points,
-    exercise_completions,
-    total_exercises,
-    required_actions,
-    progressByGroup,
-    //exercisesByPart,
-    // answersByPart,
-    exercise_completions_by_section,
-  }
-}*/
-
 const transformData = (
   data: ProgressResponse,
   courseData: CourseResponse,
@@ -339,11 +300,9 @@ const transformData = (
   const exercise_completions_by_section: ExerciseCompletionsBySection[] = []
   if (courseProgress) {
     n_points = courseProgress.n_points
-    max_points = courseProgress.max_points
     progress = courseProgress.progress
     exercises = courseProgress.course.exercises
     points_to_pass = courseProgress.course.points_needed || 0
-    total_exercises += exercises.length
     for (const exercise of courseProgress.course.exercises) {
       let section = exercise_completions_by_section.find(
         (sec: any) =>
