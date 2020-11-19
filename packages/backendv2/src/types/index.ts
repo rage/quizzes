@@ -95,6 +95,8 @@ export interface EditCoursePayloadFields {
   title?: string
   abbreviation?: string
   languageId?: string
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface IPeerReview {

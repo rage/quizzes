@@ -13,6 +13,7 @@ import Knex from "knex"
 import UserQuizState from "./user_quiz_state"
 import * as Kafka from "../services/kafka"
 import PeerReviewQuestion from "./peer_review_question"
+import { NotNullViolationError } from "objection"
 
 export class Quiz extends Model {
   id!: string
@@ -199,13 +200,14 @@ export class Quiz extends Model {
         savedQuiz = await this.query(trx).insertGraphAndFetch(quiz)
       }
       await this.updateCourseProgressesIfNecessary(oldQuiz, savedQuiz, trx)
-      if (process.env.KAFKA_HOST) {
-        await Kafka.broadcastCourseQuizzesUpdated(course.id, trx)
-      }
+      await Kafka.broadcastCourseQuizzesUpdated(course.id, trx)
       await trx.commit()
     } catch (error) {
       await trx.rollback()
-      throw new BadRequestError(error)
+      if (error instanceof NotNullViolationError) {
+        throw new BadRequestError(error)
+      }
+      throw error
     }
     return this.moveTextsToParent(savedQuiz)
   }
@@ -262,7 +264,6 @@ export class Quiz extends Model {
   static async getPreviewById(quizId: string) {
     const quiz = (
       await this.query()
-        .modify("previewSelect")
         .withGraphJoined("texts(previewSelect)")
         .where("quiz.id", quizId)
     )[0]

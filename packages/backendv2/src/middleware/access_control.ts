@@ -1,6 +1,10 @@
 import { CustomContext } from "../types"
 import { getCurrentUserDetails } from "../services/tmc"
-import { ForbiddenError, UnauthorizedError } from "../util/error"
+import {
+  ForbiddenError,
+  UnauthorizedError,
+  BadRequestError,
+} from "../util/error"
 
 import redis from "../../config/redis"
 
@@ -16,6 +20,10 @@ export const accessControl = (options?: AccessControlOptions) => {
   ) => {
     if (options?.unrestricted) {
       return next()
+    }
+
+    if (!ctx.headers.authorization) {
+      throw new BadRequestError("No Authorization header provided.")
     }
 
     const redisIsAvailable = redis !== null

@@ -6,6 +6,10 @@ export interface ProgressResponse {
   completions: Completion[]
 }
 
+export interface CourseResponse {
+  exercises: Omit<Exercise, "exercise_completions">[]
+}
+
 export interface ProgressData {
   completed: boolean
   points_to_pass: number

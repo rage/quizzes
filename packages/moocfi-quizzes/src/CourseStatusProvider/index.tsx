@@ -11,6 +11,7 @@ import {
   Exercise,
   ProgressResponse,
   ExerciseCompletionsBySection,
+  CourseResponse,
 } from "../contexes/courseStatusProviderContext"
 import { PointsByGroup } from "../modelTypes"
 import { languageOptions } from "../utils/languages"
@@ -115,7 +116,10 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
         /*const completionData = await getCompletion(courseId, accessToken)
         progressData.currentUser.completions =
           completionData.currentUser.completions*/
-        const data = transformData(progressData.currentUser)
+        const data = transformData(
+          progressData.currentUser,
+          progressData.course,
+        )
         setData(data)
         setLoading(false)
       } catch (error) {
@@ -317,7 +321,10 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
   }
 }*/
 
-const transformData = (data: ProgressResponse): ProgressData => {
+const transformData = (
+  data: ProgressResponse,
+  courseData: CourseResponse,
+): ProgressData => {
   const courseProgress = data.user_course_progressess
   const completed = data.completions.length > 0
   let points_to_pass = 0
@@ -373,6 +380,14 @@ const transformData = (data: ProgressResponse): ProgressData => {
     }
   }
   const required_actions = Array.from(distinctActions) as RequiredAction[]
+
+  if (courseData) {
+    total_exercises = courseData.exercises.filter(ex => ex.part !== 0).length
+    max_points = courseData.exercises
+      .filter(ex => ex.part !== 0)
+      .map(ex => ex.max_points)
+      .reduce((a, b) => a + b, 0)
+  }
 
   return {
     completed,

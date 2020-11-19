@@ -1,3 +1,4 @@
+import { checkAccessOrThrow } from "./../dashboard/util"
 import Router from "koa-router"
 import knex from "../../../database/knex"
 import { CustomContext, CustomState } from "../../types"

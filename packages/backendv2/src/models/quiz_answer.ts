@@ -267,7 +267,7 @@ class QuizAnswer extends Model {
       return quizAnswer
     } catch (error) {
       await trx.rollback()
-      throw new BadRequestError(error)
+      throw error
     }
   }
 
@@ -373,6 +373,7 @@ class QuizAnswer extends Model {
       let savedQuizAnswer
       let savedUserQuizState
       await this.markPreviousAsDeprecated(userId, quizId, trx)
+      this.removeIds(quizAnswer)
       savedQuizAnswer = await this.query(trx).insertGraphAndFetch(quizAnswer)
       savedUserQuizState = await UserQuizState.query(trx).upsertGraphAndFetch(
         userQuizState,
@@ -380,7 +381,27 @@ class QuizAnswer extends Model {
           insertMissing: true,
         },
       )
+      if (savedQuizAnswer.status === "confirmed") {
+        await UserCoursePartState.update(
+          savedQuizAnswer.userId,
+          quiz.courseId,
+          quiz.part,
+          trx,
+        )
+        await Kafka.broadcastQuizAnswerUpdated(
+          savedQuizAnswer,
+          userQuizState,
+          quiz,
+          trx,
+        )
+        await Kafka.broadcastUserProgressUpdated(
+          savedQuizAnswer.userId,
+          quiz.courseId,
+          trx,
+        )
+      }
       await trx.commit()
+      quiz.course = course
       return {
         quiz,
         quizAnswer: savedQuizAnswer,
@@ -388,7 +409,7 @@ class QuizAnswer extends Model {
       }
     } catch (error) {
       await trx.rollback()
-      throw new BadRequestError(error)
+      throw error
     }
   }
 
@@ -403,6 +424,25 @@ class QuizAnswer extends Model {
     this.assessAnswer(quizAnswer, quiz)
     this.gradeAnswer(quizAnswer, userQuizState, quiz)
     this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
+    if (quizAnswer.status === "confirmed") {
+      await UserCoursePartState.update(
+        quizAnswer.userId,
+        quiz.courseId,
+        quiz.part,
+        trx,
+      )
+      await Kafka.broadcastQuizAnswerUpdated(
+        quizAnswer,
+        userQuizState,
+        quiz,
+        trx,
+      )
+      await Kafka.broadcastUserProgressUpdated(
+        quizAnswer.userId,
+        quiz.courseId,
+        trx,
+      )
+    }
   }
 
   private static checkIfSubmittable(quiz: Quiz, userQuizState: UserQuizState) {
@@ -491,16 +531,20 @@ class QuizAnswer extends Model {
   ) {
     const hasPeerReviews = quiz.peerReviews.length > 0
     if (hasPeerReviews) {
-      const peerReviews = await PeerReview.query(trx)
-        .where("quiz_answer_id", quizAnswer.id)
-        .withGraphJoined("answers")
-      quizAnswer.status = this.assessAnswerWithPeerReviewsStatus(
-        quiz,
-        quizAnswer,
-        userQuizState,
-        peerReviews,
-        course,
-      )
+      if (quizAnswer.id) {
+        const peerReviews = await PeerReview.query(trx)
+          .where("quiz_answer_id", quizAnswer.id)
+          .withGraphJoined("answers")
+        quizAnswer.status = this.assessAnswerWithPeerReviewsStatus(
+          quiz,
+          quizAnswer,
+          userQuizState,
+          peerReviews,
+          course,
+        )
+      } else {
+        quizAnswer.status = "submitted"
+      }
     } else {
       quizAnswer.status = "confirmed"
     }
@@ -813,6 +857,14 @@ class QuizAnswer extends Model {
       .update({ status: "deprecated" })
       .where("user_id", userId)
       .andWhere("quiz_id", quizId)
+  }
+
+  private static removeIds(quizAnswer: QuizAnswer) {
+    delete quizAnswer.id
+    quizAnswer.itemAnswers?.forEach(itemAnswer => {
+      delete itemAnswer.id
+      itemAnswer.optionAnswers?.forEach(optionAnswer => delete optionAnswer.id)
+    })
   }
 }
 
