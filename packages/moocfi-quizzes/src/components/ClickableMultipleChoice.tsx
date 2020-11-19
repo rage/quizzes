@@ -245,6 +245,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const [click, setClick] = React.useState(false)
+  const [clickCount, setClickCount] = React.useState(0)
   const dispatch = useDispatch()
   const items = useTypedSelector(state => state.quiz!.items)
   const item = items.find(i => i.id === option.quizItemId)
@@ -273,7 +274,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
   const handleOptionChange = (optionId: string) => () => {
     setClick(!click)
+    setClickCount(clickCount + 1)
     dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))
+    console.log(clickCount)
   }
   const optionAnswers = itemAnswer && itemAnswer.optionAnswers
   const answerLocked = userQuizState && userQuizState.status === "locked"
@@ -294,6 +297,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
           revealed={false}
           correct={false}
           state={click}
+          /* disable={clickCount >= 5} */
           onClick={handleOptionChange(option.id)}
           disabled={quizDisabled}
           aria-pressed={optionIsSelected}
