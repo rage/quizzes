@@ -30,7 +30,7 @@ import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
 import LoginPrompt from "./LoginPrompt"
 import MarkdownText from "../MarkdownText"
-import Notification from "../Notification"
+import SimpleErrorBoundary from "./SimpleErrorBoundary"
 import { BoldTypographyMedium } from "../styleComponents"
 
 import ThemeProviderContext from "../../contexes/themeProviderContext"
@@ -171,7 +171,7 @@ const SubmitMessage = styled.div<SubmitMessageProps>`
   ${({ providedStyles }) => providedStyles}
 `
 
-const Error = styled.div`
+const ErrorMessage = styled.div`
   display: flex;
   width: auto;
   padding: 4rem;
@@ -237,9 +237,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     courseStatusProvider.notifyError &&
       courseStatusProvider.notifyError(messageState.message)
     return (
-      <Error>
+      <ErrorMessage>
         <p>{messageState.message}</p>
-      </Error>
+      </ErrorMessage>
     )
   }
 
@@ -484,4 +484,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   )
 }
 
-export default FuncQuizImpl
+export default (props: QuizProps) => (
+  <SimpleErrorBoundary>
+    <FuncQuizImpl {...props} />
+  </SimpleErrorBoundary>
+)
