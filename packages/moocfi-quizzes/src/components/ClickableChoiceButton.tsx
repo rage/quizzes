@@ -20,7 +20,6 @@ export interface ChoiceButtonProps {
   correct: boolean
   onClick?: any
   disabled?: boolean
-/*   disable: boolean */
 }
 
 interface ButtonProps {
@@ -55,6 +54,7 @@ const FailureIcon = () => (
 const ChoiceButton = styled(SecondaryStyledButton)<ButtonProps>`
   ${({ onlyOneItem }) => onlyOneItem && `width: 90%;`}
   ${({ state }) => state && `background-color: #E3B599;`}
+  
   margin: 0.5em 0;
 
   &:hover {

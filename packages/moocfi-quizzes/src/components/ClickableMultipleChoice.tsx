@@ -274,12 +274,16 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
   const handleOptionChange = (optionId: string) => () => {
     setClick(!click)
-    setClickCount(clickCount + 1)
     dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))
     console.log(clickCount)
+    console.log(lengthOfSelectedOption)
   }
   const optionAnswers = itemAnswer && itemAnswer.optionAnswers
+  /* please use optionAnswers.length to make your life easier */
   const answerLocked = userQuizState && userQuizState.status === "locked"
+
+  
+  const lengthOfSelectedOption = itemAnswer?.optionAnswers.length;
 
   const optionIsSelected =
     optionAnswers && optionAnswers.some(oa => oa.quizOptionId === option.id)
@@ -299,7 +303,8 @@ const Option: React.FunctionComponent<OptionProps> = ({
           state={click}
           /* disable={clickCount >= 5} */
           onClick={handleOptionChange(option.id)}
-          disabled={quizDisabled}
+          /* disabled={quizDisabled} */
+          disabled={!optionIsSelected && lengthOfSelectedOption >= 5}
           aria-pressed={optionIsSelected}
         >
           <MarkdownText Component={justADiv} removeParagraphs>
