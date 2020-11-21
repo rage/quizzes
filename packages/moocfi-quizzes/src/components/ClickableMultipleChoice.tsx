@@ -283,7 +283,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
   const answerLocked = userQuizState && userQuizState.status === "locked"
 
   
-  const lengthOfSelectedOption = itemAnswer?.optionAnswers.length;
+  const lengthOfSelectedOption: any = itemAnswer?.optionAnswers.length;
 
   const optionIsSelected =
     optionAnswers && optionAnswers.some(oa => oa.quizOptionId === option.id)
