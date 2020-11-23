@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import { faChalkboard, faPen } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { Tab, Tabs } from "@material-ui/core"
+import { Tab, Tabs, Typography } from "@material-ui/core"
 import { ITabToComponent } from "../CoursePage/types"
 import { CoursePage } from "../CoursePage"
 import EditCourseDetails from "../CoursePage/EditDetailsForm"
@@ -38,7 +38,7 @@ const CourseTabNavigator = () => {
         <Tab
           icon={<FontAwesomeIcon icon={faChalkboard} />}
           value="listing"
-          label="Part Listing"
+          label={<Typography>Part Listing</Typography>}
           onClick={() => {
             router.push(URL_HREF, `${pathname}/listing`)
             setCurrentTab("listing")
@@ -47,7 +47,7 @@ const CourseTabNavigator = () => {
         <Tab
           icon={<FontAwesomeIcon icon={faPen} />}
           value="edit"
-          label="Edit Course Details"
+          label={<Typography>Edit Course Details</Typography>}
           onClick={() => {
             router.push(URL_HREF, `${pathname}/edit`)
             setCurrentTab("edit")
