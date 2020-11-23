@@ -3,9 +3,10 @@ import * as React from "react"
 class SimpleErrorBoundary extends React.Component<any, any> {
   state = {
     error: null,
+    stack: null,
   }
   static getDerivedStateFromError(error) {
-    return { error: error.toString() }
+    return { error: error.toString(), stack: error.stack }
   }
 
   componentDidCatch(error, info) {
@@ -16,8 +17,9 @@ class SimpleErrorBoundary extends React.Component<any, any> {
     if (this.state.error) {
       return (
         <div>
-          Quiz crashed:
-          <pre>{this.state.error}</pre>
+          <h2>Crash:</h2>
+          <p>{this.state.error}</p>
+          {this.state.stack && <pre>{this.state.stack}</pre>}
         </div>
       )
     }

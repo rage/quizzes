@@ -2,6 +2,9 @@ import Model from "./base_model"
 import QuizItemAnswer from "./quiz_item_answer"
 
 class QuizOptionAnswer extends Model {
+  id!: string
+  quizOptionId!: string
+
   static get tableName() {
     return "quiz_option_answer"
   }

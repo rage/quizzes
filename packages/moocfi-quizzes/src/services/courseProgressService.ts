@@ -16,7 +16,7 @@ const request = async (accessToken: string, query: string) => {
   return await graphQLClient.request(query)
 }
 
-export const getUserCourseData = async (
+/*export const getUserCourseData = async (
   courseId: string,
   accessToken: string,
 ): Promise<any> => {
@@ -29,9 +29,9 @@ export const getUserCourseData = async (
     },
   )
   return response.data
-}
+}*/
 
-export const getCompletion = async (
+/*export const getCompletion = async (
   courseId: string,
   accessToken: string,
 ): Promise<any> => {
@@ -47,20 +47,18 @@ export const getCompletion = async (
     }
   `
   return await request(accessToken, query)
-}
+}*/
 
-/*export const getUserCourseData = async (
+export const getUserCourseData = async (
   courseId: string,
   accessToken: string,
 ): Promise<any> => {
   const query = `
     {
       currentUser {
-        user_course_progresses(
-          where: { course: { id: "${courseId}" } }
-        ) {
-          n_points
+        user_course_progressess(course_id: "${courseId}") {
           max_points
+          n_points
           progress
           course {
             exercises {
@@ -70,26 +68,28 @@ export const getCompletion = async (
               part
               section
               max_points
-            }
-            withAnswer: exercises(orderBy: part_ASC) {
-              id
-              custom_id
-              part
-              section
-              exercise_completions(orderBy: updated_at_DESC, first: 1) {
+              exercise_completions(orderBy: { updated_at: desc}) {
                 completed
                 n_points
-                required_actions {
+                exercise_completion_required_actions {
                   value
                 }
               }
             }
           }
         }
-        completions(
-          where: { course: { id: "${courseId}" } }
-        ) {
+        completions(course_id: "${courseId}") {
           id
+        }
+      }
+      course(id: "${courseId}") {
+        exercises {
+          id
+          quizzes_id: custom_id
+          name
+          part
+          section
+          max_points
         }
       }
     }
@@ -97,4 +97,4 @@ export const getCompletion = async (
   const data = await request(accessToken, query)
 
   return data
-}*/
+}

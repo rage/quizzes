@@ -1,15 +1,26 @@
 import Router from "koa-router"
 import { CustomContext, CustomState } from "../../types"
-import { Course, Quiz, QuizAnswer, UserCourseRole } from "../../models/"
-import accessControl, { validToken } from "../../middleware/access_control"
+import {
+  Course,
+  Quiz,
+  QuizAnswer,
+  UserCourseRole,
+  CourseTranslation,
+  Language,
+} from "../../models/"
+import accessControl from "../../middleware/access_control"
 import {
   abilitiesByRole,
   checkAccessOrThrow,
   getCourseIdByAnswerId,
   getCourseIdByQuizId,
-  getAccessableCourses,
+  getAccessibleCourses,
 } from "./util"
 import * as Kafka from "../../services/kafka"
+import _ from "lodash"
+import UserCoursePartState from "../../models/user_course_part_state"
+import knex from "../../../database/knex"
+import { BadRequestError } from "../../util/error"
 
 const dashboard = new Router<CustomState, CustomContext>({
   prefix: "/dashboard",
@@ -18,7 +29,7 @@ const dashboard = new Router<CustomState, CustomContext>({
   .post("/quizzes", accessControl(), async ctx => {
     await checkAccessOrThrow(ctx.state.user, ctx.request.body.courseId, "edit")
     const quizData = ctx.request.body
-    ctx.body = await Quiz.saveQuiz(quizData)
+    ctx.body = await Quiz.save(quizData)
   })
 
   .get("/quizzes/:quizId", accessControl(), async ctx => {
@@ -36,7 +47,7 @@ const dashboard = new Router<CustomState, CustomContext>({
 
   .get("/courses", accessControl(), async ctx => {
     const user = ctx.state.user
-    ctx.body = await getAccessableCourses(ctx.state.user, "view")
+    ctx.body = await getAccessibleCourses(user, "view")
   })
 
   .get("/courses/:courseId", accessControl(), async ctx => {
@@ -62,7 +73,10 @@ const dashboard = new Router<CustomState, CustomContext>({
       const quizId = ctx.params.quizId
       const quiz = await Quiz.getById(quizId)
       await checkAccessOrThrow(ctx.state.user, quiz.courseId, "view")
-      ctx.body = await QuizAnswer.getManualReviewCountByQuizId(quizId)
+      const requiringAttention = await QuizAnswer.getManualReviewCountByQuizId(
+        quizId,
+      )
+      ctx.body = requiringAttention
     },
   )
 
@@ -71,17 +85,36 @@ const dashboard = new Router<CustomState, CustomContext>({
     const name = ctx.request.body.name
     const abbr = ctx.request.body.abbr
     const languageId = ctx.request.body.lang
+    await checkAccessOrThrow(ctx.state.user, oldCourseId, "duplicate")
     ctx.body = await Course.duplicateCourse(oldCourseId, name, abbr, languageId)
   })
 
-  .post("/courses/download-correspondance-file", accessControl(), async ctx => {
+  .post("/courses/download-correspondence-file", accessControl(), async ctx => {
     const oldCourseId = ctx.request.body.oldCourseId
     const courseId = ctx.request.body.newCourseId
     ctx.response.set("Content-Type", "text/csv")
     ctx.response.attachment(`update_ids_from_${oldCourseId}_to_${courseId}.csv`)
-    const stream = await Course.getCorrespondanceFile(oldCourseId, courseId)
+    await checkAccessOrThrow(ctx.state.user, oldCourseId, "download")
+    const stream = await Course.getCorrespondenceFile(oldCourseId, courseId)
     ctx.body = stream
   })
+
+  .get(
+    "/courses/:courseId/user/current/progress",
+    accessControl(),
+    async ctx => {
+      const courseId = ctx.params.courseId
+      const user = ctx.state.user
+      try {
+        ctx.body = await knex.transaction(
+          async trx =>
+            await UserCoursePartState.getProgress(user.id, courseId, trx),
+        )
+      } catch (err) {
+        throw err
+      }
+    },
+  )
 
   .post("/answers/:answerId/status", accessControl(), async ctx => {
     const answerId = ctx.params.answerId
@@ -95,7 +128,7 @@ const dashboard = new Router<CustomState, CustomContext>({
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
-    ctx.body = await QuizAnswer.getById(answerId)
+    ctx.body = await QuizAnswer.getByIdWithPeerReviews(answerId)
   })
 
   .get("/answers/:quizId/all", accessControl(), async ctx => {
@@ -133,9 +166,8 @@ const dashboard = new Router<CustomState, CustomContext>({
     )
   })
 
-  .post("/quizzes/:quizId/download-quiz-info", async ctx => {
+  .post("/quizzes/:quizId/download-quiz-info", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    const token = ctx.request.body.token
     const quizName = ctx.request.body.quizName
     const courseName = ctx.request.body.courseName
     const current_datetime = new Date()
@@ -149,49 +181,53 @@ const dashboard = new Router<CustomState, CustomContext>({
       current_datetime.getHours() +
       "-" +
       current_datetime.getMinutes()
-    if (!validToken(token)) {
-      ctx.body = "invalid token"
-    } else {
-      const stream = await Quiz.getQuizInfo(quizId)
-      ctx.response.set("Content-Type", "text/csv")
-      ctx.response.attachment(
-        `quiz-info-${quizName}-${courseName}-${isoDate}.csv`,
-      )
-      ctx.body = stream
-    }
+
+    const course = await Course.getByTitle(courseName)
+
+    await checkAccessOrThrow(ctx.state.user, course.id, "download")
+
+    const stream = await Quiz.getQuizInfo(quizId)
+    ctx.response.set("Content-Type", "text/csv")
+    ctx.response.attachment(
+      `quiz-info-${quizName}-${courseName}-${isoDate}.csv`,
+    )
+    ctx.body = stream
   })
 
-  .post("/quizzes/:quizId/download-peerreview-info", async ctx => {
-    const quizId = ctx.params.quizId
-    const token = ctx.request.body.token
-    const quizName = ctx.request.body.quizName
-    const courseName = ctx.request.body.courseName
-    const current_datetime = new Date()
-    const isoDate =
-      current_datetime.getDate() +
-      "-" +
-      (current_datetime.getMonth() + 1) +
-      "-" +
-      current_datetime.getFullYear() +
-      "-" +
-      current_datetime.getHours() +
-      "-" +
-      current_datetime.getMinutes()
-    if (!validToken(token)) {
-      ctx.body = "invalid token"
-    } else {
+  .post(
+    "/quizzes/:quizId/download-peerreview-info",
+    accessControl(),
+    async ctx => {
+      const quizId = ctx.params.quizId
+      const quizName = ctx.request.body.quizName
+      const courseName = ctx.request.body.courseName
+      const current_datetime = new Date()
+      const isoDate =
+        current_datetime.getDate() +
+        "-" +
+        (current_datetime.getMonth() + 1) +
+        "-" +
+        current_datetime.getFullYear() +
+        "-" +
+        current_datetime.getHours() +
+        "-" +
+        current_datetime.getMinutes()
+
+      const course = await Course.getByTitle(courseName)
+
+      await checkAccessOrThrow(ctx.state.user, course.id, "download")
+
       const stream = await Quiz.getPeerReviewInfo(quizId)
       ctx.response.set("Content-Type", "text/csv")
       ctx.response.attachment(
         `quiz-peerreview-info-${quizName}-${courseName}-${isoDate}.csv`,
       )
       ctx.body = stream
-    }
-  })
+    },
+  )
 
-  .post("/quizzes/:quizId/download-answer-info", async ctx => {
+  .post("/quizzes/:quizId/download-answer-info", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    const token = ctx.request.body.token
     const quizName = ctx.request.body.quizName
     const courseName = ctx.request.body.courseName
     const current_datetime = new Date()
@@ -205,20 +241,21 @@ const dashboard = new Router<CustomState, CustomContext>({
       current_datetime.getHours() +
       "-" +
       current_datetime.getMinutes()
-    if (!validToken(token)) {
-      ctx.body = "invalid token"
-    } else {
-      const stream = await Quiz.getQuizAnswerInfo(quizId)
-      ctx.response.set("Content-Type", "text/csv")
-      ctx.response.attachment(
-        `quiz-answer-info-${quizName}-${courseName}-${isoDate}.csv`,
-      )
-      ctx.body = stream
-    }
+
+    const course = await Course.getByTitle(courseName)
+
+    await checkAccessOrThrow(ctx.state.user, course.id, "download")
+
+    const stream = await Quiz.getQuizAnswerInfo(quizId)
+    ctx.response.set("Content-Type", "text/csv")
+    ctx.response.attachment(
+      `quiz-answer-info-${quizName}-${courseName}-${isoDate}.csv`,
+    )
+    ctx.body = stream
   })
 
   .get("/languages/all", accessControl(), async ctx => {
-    ctx.body = await Course.getAllLanguages()
+    ctx.body = await Language.getAll()
   })
 
   .get("/users/current/abilities", accessControl(), async ctx => {
@@ -260,8 +297,44 @@ const dashboard = new Router<CustomState, CustomContext>({
   })
 
   .get("/quizzes/answers/get-answer-states", accessControl(), async ctx => {
-    const result = await QuizAnswer.getStates()
-    ctx.body = result
+    ctx.body = await QuizAnswer.getStates()
+  })
+
+  .post("/courses/:courseId/edit", accessControl(), async ctx => {
+    const courseId = ctx.params.courseId
+    const payload = ctx.request.body
+    const moocfiId = payload.moocfiId
+    await checkAccessOrThrow(ctx.state.user, courseId, "edit")
+
+    // TODO: prbably good idea to check if moocfi id is a valid one (exists in DB)
+
+    try {
+      await Course.getFlattenedById(courseId)
+    } catch (error) {
+      throw error
+    }
+
+    if (!moocfiId && !payload) {
+      throw new BadRequestError("No edited properties provided.")
+    }
+
+    const payloadWithoutMoocfiId = _.omit(payload, ["moocfiId"])
+
+    await CourseTranslation.updateCourseProperties(
+      courseId,
+      payloadWithoutMoocfiId,
+    )
+
+    // moocfi id separated from rest since it is a property of Course entity
+    if (moocfiId) {
+      try {
+        await Course.updateMoocfiId(courseId, moocfiId)
+      } catch (error) {
+        throw error
+      }
+    }
+
+    ctx.body = await Course.getFlattenedById(courseId)
   })
 
 export default dashboard

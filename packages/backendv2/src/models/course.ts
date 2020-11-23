@@ -1,15 +1,21 @@
+import Knex from "knex"
+import { v4 } from "uuid"
+import { BadRequestError, NotFoundError } from "./../util/error"
+import stringify from "csv-stringify"
 import Model from "./base_model"
 import Quiz from "./quiz"
+import Language from "./language"
 import CourseTranslation from "./course_translation"
-import { v4 } from "uuid"
 import knex from "../../database/knex"
-import stringify from "csv-stringify"
 
 class Course extends Model {
   id!: string
   moocfiId!: string
   minPeerReviewsGiven!: number
   minPeerReviewsReceived!: number
+  maxSpamFlags!: number
+  maxReviewSpamFlags!: number
+  minReviewAverage!: number
   texts!: CourseTranslation[]
   languageId!: string
   title!: string
@@ -45,6 +51,12 @@ class Course extends Model {
       .where("id", id)
       .limit(1)
     const course = courses[0]
+
+    // validate course
+    if (!course) {
+      throw new NotFoundError(`course not found: ${id}`)
+    }
+
     const texts = course.texts[0]
     course.languageId = texts.languageId
     course.title = texts.title
@@ -54,13 +66,30 @@ class Course extends Model {
     return course
   }
 
-  static async getById(id: string) {
-    const course = (
+  static async getById(id: string, trx?: Knex.Transaction) {
+    return this.moveTextsToParent(
+      (
+        await this.query(trx)
+          .withGraphJoined("texts")
+          .where("id", id)
+      )[0],
+    )
+  }
+
+  static async getByTitle(title: string) {
+    return (
       await this.query()
         .withGraphJoined("texts")
-        .where("id", id)
-        .limit(1)
+        .where("title", title)
     )[0]
+  }
+
+  static async getAll() {
+    const courses = await this.query().withGraphJoined("texts")
+    return courses.map(course => this.moveTextsToParent(course))
+  }
+
+  private static moveTextsToParent(course: any) {
     const text = course.texts[0]
     course.languageId = text.languageId
     course.title = text.title
@@ -70,28 +99,36 @@ class Course extends Model {
     return course
   }
 
-  static async getAll() {
-    const courses = await this.query().withGraphJoined("texts")
-    return courses.map(course => {
-      const text = course.texts[0]
-      course.languageId = text.languageId
-      course.title = text.title
-      course.body = text.body
-      course.abbreviation = text.abbreviation
-      delete course.texts
-      return course
-    })
-  }
-
   static async duplicateCourse(
     oldCourseId: string,
     name: string,
     abbreviation: string,
     language_id: string,
   ) {
-    const courseToBeDuplicated = await Course.getFlattenedById(oldCourseId)
-    if (!courseToBeDuplicated) {
-      return null
+    // validate old course id corresponds to existing course
+    let oldCourse
+    try {
+      oldCourse = await Course.getFlattenedById(oldCourseId)
+    } catch (error) {
+      throw error
+    }
+
+    // provide fallback for course name if one is not provided
+    const newCourseTitle =
+      name ?? `${oldCourse.title} (duplicate) [title not set]`
+
+    // default abbreviation to course name if one is not provided
+    const newCourseAbbreviation = abbreviation ?? newCourseTitle
+
+    // ensure language id exists in the db
+    const existingLanguages = await Language.getAll()
+
+    const isLanguageIdinExistingIds = existingLanguages.some(
+      (language: any) => language.id === language_id,
+    )
+
+    if (!isLanguageIdinExistingIds) {
+      throw new BadRequestError(`Invalid language id provided: ${language_id}`)
     }
 
     const newCourseId = v4()
@@ -103,8 +140,8 @@ class Course extends Model {
         await trx("course_translation").insert({
           course_id: newCourseId,
           language_id: language_id,
-          abbreviation,
-          title: name,
+          abbreviation: newCourseAbbreviation,
+          title: newCourseTitle,
         })
 
         await trx("course_language").insert({
@@ -309,7 +346,7 @@ class Course extends Model {
     return { success: true, newCourseId: newCourseId }
   }
 
-  static async getCorrespondanceFile(oldCourseId: string, newCourseId: string) {
+  static async getCorrespondenceFile(oldCourseId: string, newCourseId: string) {
     const stringifier = stringify({
       delimiter: " ",
     })
@@ -317,9 +354,9 @@ class Course extends Model {
     const stream = knex
       .raw(
         `
-        SELECT id AS old_id, uuid_generate_v5(:newCourseId, id::text) AS new_id
-        FROM quiz
-        WHERE course_id = :oldCourseId
+      SELECT id AS old_id, uuid_generate_v5(:newCourseId, id::text) AS new_id
+      FROM quiz
+      WHERE course_id = :oldCourseId
       `,
         {
           newCourseId: newCourseId,
@@ -332,10 +369,6 @@ class Course extends Model {
     return stream
   }
 
-  static async getAllLanguages() {
-    return await knex.from("language").select("id", "name")
-  }
-
   public static async getParts(courseId: string) {
     return (
       await Quiz.query()
@@ -343,6 +376,19 @@ class Course extends Model {
         .where({ course_id: courseId })
         .andWhereNot("part", 0)
     ).map(q => q.part)
+  }
+
+  static async updateMoocfiId(id: string, newMoocfiId: string) {
+    let course
+    try {
+      course = await this.query().patchAndFetchById(id, {
+        moocfiId: newMoocfiId,
+      })
+    } catch (error) {
+      throw error
+    }
+
+    return course.moocfiId
   }
 }
 

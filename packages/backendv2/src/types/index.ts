@@ -88,3 +88,59 @@ export enum RequiredAction {
   GIVE_PEER_REVIEW = "GIVE_PEER_REVIEW",
   PENDING_PEER_REVIEW = "PENDING_PEER_REVIEW",
 }
+
+export interface EditCoursePayloadFields {
+  courseId?: string
+  moocfiId?: string
+  title?: string
+  abbreviation?: string
+  languageId?: string
+  createdAt?: string
+  updatedAt?: string
+}
+
+export interface IPeerReview {
+  id: string
+  quizAnswerId: string
+  userId: number
+  peerReviewCollectionId: string
+  rejectedQuizAnswerIds: string[]
+  createdAt: Date
+  updatedAt: Date
+  answers: IPeerReviewAnswer[] | TReturnedPeerReviewAnswer[]
+}
+export interface IPeerReviewAnswer {
+  peerReviewId: string
+  peerReviewQuestionId: string
+  value: number
+  text: null
+  createdAt: Date
+  updatedAt: Date
+}
+
+export type TReturnedPeerReviewAnswer = Omit<
+  IPeerReviewAnswer,
+  "createdAt" | "updatedAt"
+>
+
+export type TPeerReviewGradeAnswer = {
+  peerReviewQuestionId: string
+  value: number | null
+}
+
+export type TPeerReviewEssayAnswer = {
+  peerReviewQuestionId: string
+  text: string
+}
+
+export type TPeerReviewQuestionAnswer =
+  | TPeerReviewGradeAnswer
+  | TPeerReviewEssayAnswer
+
+export type TPeerReviewGiven = {
+  quizAnswerId: string
+  peerReviewCollectionId: string
+  userId: number
+  rejectedQuizAnswerIds: string[]
+  answers: TPeerReviewQuestionAnswer[]
+}

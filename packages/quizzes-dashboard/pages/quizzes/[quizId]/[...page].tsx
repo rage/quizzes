@@ -1,6 +1,6 @@
 import React from "react"
 
-import TabNavigator from "../../../components/TabNavigator"
+import TabNavigator from "../../../components/TabNavigators/QuizTabNavigator"
 
 export const QuizPage = () => <TabNavigator />
 

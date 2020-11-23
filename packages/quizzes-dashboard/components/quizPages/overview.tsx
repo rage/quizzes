@@ -10,7 +10,7 @@ import styled from "styled-components"
 import { Typography, Card } from "@material-ui/core"
 import { useRouter } from "next/router"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
-import DownloadInfoForms from "../DownloadInfoForms.tsx"
+import DownloadInfoForms from "../DownloadInfoForms"
 import QuizTitle from "./QuizTitleContainer"
 import { TabTextError, TabText, TabTextLoading } from "./TabHeaders"
 import { AnswerStatistics } from "./AnswerStatistics"
@@ -56,8 +56,8 @@ export const OverView = () => {
     { label: "Courses", as: "/", href: "/" },
     {
       label: `${course ? course.title : ""}`,
-      as: `/courses/${quiz?.courseId}`,
-      href: "/courses/[courseId]",
+      as: `/courses/${quiz?.courseId}/listing`,
+      href: "/courses/[courseId]/[...page]",
     },
     {
       label: `${quiz ? quiz.title : ""}`,

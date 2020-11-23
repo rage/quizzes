@@ -1,6 +1,6 @@
 import axios from "axios"
 import { checkStore } from "./tmcApi"
-import { Quiz, Course, PeerReviewQuestion } from "../types/Quiz"
+import { Quiz, Course, PeerReviewQuestion, Language } from "../types/Quiz"
 import { NewQuiz } from "../types/NormalizedQuiz"
 import { Answer } from "../types/Answer"
 
@@ -71,7 +71,7 @@ export const saveQuiz = async (quiz: Quiz | NewQuiz): Promise<any> => {
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
-    const response = (await api.post(`quizzes`, quiz, config)).data
+    const response = (await api.post(`/quizzes`, quiz, config)).data
     return response
   }
 }
@@ -275,7 +275,32 @@ export const duplicateCourse = async (
   }
 }
 
-export const getCorrespondanceFile = async (
+interface ChangedProperties {
+  moocfiId?: string | undefined
+  languageId?: string | undefined
+  courseId?: string | undefined
+  abbreviation?: string | undefined
+  title?: string | undefined
+}
+
+export const updateCourseProperties = async (
+  courseId: string,
+  changedProperties: ChangedProperties,
+): Promise<{ success: boolean; newCourseId: string }> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (
+      await api.post(`/courses/${courseId}/edit`, changedProperties, config)
+    ).data
+  } else {
+    throw new Error()
+  }
+}
+
+export const getCorrespondenceFile = async (
   newCourseId: string,
   oldCourseId: string,
 ) => {
@@ -286,7 +311,7 @@ export const getCorrespondanceFile = async (
     }
     const res = (
       await api.post(
-        `/courses/download-correspondance-file`,
+        `/courses/download-correspondence-file`,
         { newCourseId: newCourseId, oldCourseId: oldCourseId },
         config,
       )

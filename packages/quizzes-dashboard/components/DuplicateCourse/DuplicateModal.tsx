@@ -12,7 +12,7 @@ import { Course } from "../../types/Quiz"
 import {
   duplicateCourse,
   getAllLanguages,
-  getCorrespondanceFile,
+  getCorrespondenceFile,
 } from "../../services/quizzes"
 import { Alert, Autocomplete } from "@material-ui/lab"
 
@@ -83,7 +83,7 @@ export const DuplicateModal = ({ course }: DuplicateModalProps) => {
     if (res.success) {
       showResponse(true)
       setSuccess(true)
-      getCorrespondanceFile(res.newCourseId, course.id)
+      getCorrespondenceFile(res.newCourseId, course.id)
       setTimeout(() => showResponse(false), 3000)
     } else {
       showResponse(true)

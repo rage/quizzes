@@ -38,7 +38,7 @@ const PeerReviews: React.FunctionComponent = () => {
   const activeStep = useTypedSelector(state => state.peerReviews.activeStep)
   const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
-  const peerReviewQuestions = quiz.peerReviewCollections
+  const peerReviewQuestions = quiz.peerReviews
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
 
@@ -88,7 +88,7 @@ const PeerReviews: React.FunctionComponent = () => {
         ? !pastDeadline && (
             <>
               <PeerReviewsGuidance
-                guidanceText={peerReviewQuestions[0].texts[0].body}
+                guidanceText={peerReviewQuestions[0].body}
                 givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
                 peerReviewsCompletedInfo={
                   peerReviewsLabels.peerReviewsCompletedInfo
@@ -115,7 +115,7 @@ const PeerReviews: React.FunctionComponent = () => {
               >
                 <TopMarginDivSmall>
                   <PeerReviewsGuidance
-                    guidanceText={peerReviewQuestions[0].texts[0].body}
+                    guidanceText={peerReviewQuestions[0].body}
                     givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
                     peerReviewsCompletedInfo={
                       peerReviewsLabels.peerReviewsCompletedInfo

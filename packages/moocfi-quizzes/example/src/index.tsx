@@ -15,6 +15,8 @@ import {
   CourseStatusProvider,
   injectCourseProgress,
 } from "../../src/CourseStatusProvider"
+import { ThemeProviderContext } from "../../src"
+import ThemeProviderImpl from "./ThemeProviderImpl"
 
 const TallContainer = styled.div`
   padding-bottom: 1000px;
@@ -66,6 +68,11 @@ const App = () => {
     setShowFullInfoWhenLoggedOut,
   ] = useLocalStorage("showFullInfoWhenLoggedOut", "true")
 
+  const [useProvidedTheme, setUseProvidedTheme] = useLocalStorage(
+    "useProvidedTheme",
+    "true",
+  )
+
   const toggleContainerUse = () =>
     setContainerUsed(containerUsed === "true" ? "false" : "true")
 
@@ -77,6 +84,10 @@ const App = () => {
 
   const toggleShowAlwaysPoints = () => {
     setShowAlwaysPoints(showAlwaysPoints === "true" ? "false" : "true")
+  }
+
+  const toggleUseProvidedTheme = () => {
+    setUseProvidedTheme(useProvidedTheme === "true" ? "false" : "true")
   }
 
   const quizPortion = (
@@ -102,7 +113,7 @@ const App = () => {
     }
   `
 
-  const DataTest = (props: any) => {
+  /*const DataTest = (props: any) => {
     if (props.error) {
       return (
         <Div>
@@ -119,74 +130,89 @@ const App = () => {
     }
     return <Div>{JSON.stringify(props.courseProgressData)}</Div>
   }
-  const Progress = injectCourseProgress(DataTest)
+  const Progress = injectCourseProgress(DataTest)*/
 
   return (
-    <CourseStatusProvider
-      courseId="08c4757a-51ec-4551-bdb6-46fba3da765b"
-      accessToken={accessToken.value}
-      languageId={languageId.value}
+    <ThemeProviderContext.Provider
+      value={useProvidedTheme === "true" && ThemeProviderImpl}
     >
-      <Typography variant="h4" component="h1">
-        Quizzes testing
-      </Typography>
-      <Progress />
-      <StyledTextField {...id} label="Quiz id" />
-      <StyledTextField {...languageId} label="Language id" />
-      <StyledTextField {...accessToken} label="Access token" />
-      <StyledTextField {...baseUrl} label="Base url" />
-
-      <StyledFormControlLabel
-        label="Use a paper container"
-        control={
-          <Checkbox
-            checked={containerUsed === "true"}
-            onChange={toggleContainerUse}
-            value={containerUsed.value}
-            color="primary"
-          />
-        }
-      />
-
-      <StyledFormControlLabel
-        label="Show full quiz info when logged out"
-        control={
-          <Checkbox
-            checked={showFullInfoWhenLoggedOut === "true"}
-            onChange={toggleShowFullInfo}
-            value={showFullInfoWhenLoggedOut.value}
-            color="primary"
-          />
-        }
-      />
-
-      <StyledFormControlLabel
-        label="Show points info even if quiz points == 1"
-        control={
-          <Checkbox
-            checked={showAlwaysPoints === "true"}
-            onChange={toggleShowAlwaysPoints}
-            value={showAlwaysPoints.value}
-            color="primary"
-          />
-        }
-      />
-
-      <TallContainer>
-        <Typography variant="h5" component="h1">
-          Quiz
+      <CourseStatusProvider
+        courseId="08c4757a-51ec-4551-bdb6-46fba3da765b"
+        accessToken={accessToken.value}
+        languageId={languageId.value}
+      >
+        <Typography variant="h4" component="h1">
+          Quizzes testing
         </Typography>
-        <SimpleErrorBoundary>
-          {containerUsed === "true" ? (
-            <FlexContainer>
-              <StyledQuizContainer>{quizPortion}</StyledQuizContainer>
-            </FlexContainer>
-          ) : (
-            quizPortion
-          )}
-        </SimpleErrorBoundary>
-      </TallContainer>
-    </CourseStatusProvider>
+        <StyledTextField {...id} label="Quiz id" />
+        <StyledTextField {...languageId} label="Language id" />
+        <StyledTextField {...accessToken} label="Access token" />
+        <StyledTextField {...baseUrl} label="Base url" />
+
+        <StyledFormControlLabel
+          label="Use a paper container"
+          control={
+            <Checkbox
+              checked={containerUsed === "true"}
+              onChange={toggleContainerUse}
+              value={containerUsed.value}
+              color="primary"
+            />
+          }
+        />
+
+        <StyledFormControlLabel
+          label="Show full quiz info when logged out"
+          control={
+            <Checkbox
+              checked={showFullInfoWhenLoggedOut === "true"}
+              onChange={toggleShowFullInfo}
+              value={showFullInfoWhenLoggedOut.value}
+              color="primary"
+            />
+          }
+        />
+
+        <StyledFormControlLabel
+          label="Show points info even if quiz points == 1"
+          control={
+            <Checkbox
+              checked={showAlwaysPoints === "true"}
+              onChange={toggleShowAlwaysPoints}
+              value={showAlwaysPoints.value}
+              color="primary"
+            />
+          }
+        />
+
+        <StyledFormControlLabel
+          label="Use provided theme"
+          control={
+            <Checkbox
+              checked={useProvidedTheme === "true"}
+              onChange={toggleUseProvidedTheme}
+              value={useProvidedTheme.value}
+              color="primary"
+            />
+          }
+        />
+
+        <TallContainer>
+          <Typography variant="h5" component="h1">
+            Quiz
+          </Typography>
+          <SimpleErrorBoundary>
+            {containerUsed === "true" ? (
+              <FlexContainer>
+                <StyledQuizContainer>{quizPortion}</StyledQuizContainer>
+              </FlexContainer>
+            ) : (
+              quizPortion
+            )}
+          </SimpleErrorBoundary>
+        </TallContainer>
+      </CourseStatusProvider>
+    </ThemeProviderContext.Provider>
   )
 }
 

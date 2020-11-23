@@ -13,6 +13,7 @@ import Knex from "knex"
 import UserQuizState from "./user_quiz_state"
 import * as Kafka from "../services/kafka"
 import PeerReviewQuestion from "./peer_review_question"
+import { NotNullViolationError } from "objection"
 
 export class Quiz extends Model {
   id!: string
@@ -20,9 +21,13 @@ export class Quiz extends Model {
   part!: number
   section!: number
   points!: number
+  deadline!: Date
   triesLimited!: boolean
   tries!: number
   excludedFromScore!: boolean
+  awardPointsEvenIfWrong!: boolean
+  autoConfirm!: boolean
+  autoReject!: boolean
   course!: Course
   texts!: QuizTranslation[]
   items!: QuizItem[]
@@ -76,6 +81,14 @@ export class Quiz extends Model {
         to: "quiz_answer.quiz_id",
       },
     },
+    userQuizStates: {
+      relation: Model.HasManyRelation,
+      modelClass: UserQuizState,
+      join: {
+        from: "quiz.id",
+        to: "user_quiz_state.quiz_id",
+      },
+    },
     peerReviewQuestions: {
       relation: Model.HasManyRelation,
       modelClass: PeerReviewQuestion,
@@ -94,8 +107,8 @@ export class Quiz extends Model {
     }
   }
 
-  static async saveQuiz(data: any) {
-    const quiz: Quiz = data
+  static async save(data: any) {
+    const quiz = data
     const course = await Course.getById(quiz.courseId)
     const languageId = course.languageId
     quiz.texts = [
@@ -176,15 +189,26 @@ export class Quiz extends Model {
       const oldQuiz = quiz.id
         ? await this.query(trx).findById(quiz.id)
         : undefined
-      savedQuiz = await this.query(trx).upsertGraphAndFetch(quiz)
+      if (oldQuiz) {
+        await this.query(trx).upsertGraph(quiz)
+        savedQuiz = await this.query(trx)
+          .findById(quiz.id)
+          .withGraphJoined("texts")
+          .withGraphJoined("items.[texts, options.[texts]]")
+          .withGraphJoined("peerReviews.[texts, questions.[texts]]")
+      } else {
+        savedQuiz = await this.query(trx).insertGraphAndFetch(quiz)
+      }
       await this.updateCourseProgressesIfNecessary(oldQuiz, savedQuiz, trx)
       await Kafka.broadcastCourseQuizzesUpdated(course.id, trx)
       await trx.commit()
     } catch (error) {
       await trx.rollback()
-      throw new BadRequestError(error)
+      if (error instanceof NotNullViolationError) {
+        throw new BadRequestError(error)
+      }
+      throw error
     }
-
     return this.moveTextsToParent(savedQuiz)
   }
 
@@ -204,9 +228,9 @@ export class Quiz extends Model {
     }
   }
 
-  static async getById(quizId: string) {
+  static async getById(quizId: string, trx?: Knex.Transaction) {
     const quiz = (
-      await this.query()
+      await this.query(trx)
         .withGraphJoined("texts")
         .withGraphJoined("items.[texts, options.[texts]]")
         .withGraphJoined("peerReviews.[texts, questions.[texts]]")
@@ -220,10 +244,26 @@ export class Quiz extends Model {
     return this.moveTextsToParent(quiz)
   }
 
+  static async getByIdStripped(quizId: string) {
+    const quiz = await this.getById(quizId)
+    delete quiz.submitMessage
+    for (const quizItem of quiz.items) {
+      delete quizItem.successMessage
+      delete quizItem.failureMessage
+      delete quizItem.sharedOptionFeedbackMessage
+      delete quizItem.validityRegex
+      for (const quizOption of quizItem.options) {
+        delete quizOption.successMessage
+        delete quizOption.failureMessage
+        delete quizOption.correct
+      }
+    }
+    return quiz
+  }
+
   static async getPreviewById(quizId: string) {
     const quiz = (
       await this.query()
-        .modify("previewSelect")
         .withGraphJoined("texts(previewSelect)")
         .where("quiz.id", quizId)
     )[0]
@@ -302,7 +342,7 @@ export class Quiz extends Model {
     return stream
   }
 
-  private static moveTextsToParent(quiz: any) {
+  private static moveTextsToParent(quiz: Quiz) {
     const text = quiz.texts[0]
     quiz.title = text?.title
     quiz.body = text?.body

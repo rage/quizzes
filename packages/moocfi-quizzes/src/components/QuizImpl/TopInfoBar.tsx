@@ -131,7 +131,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
         <SpaceFillerDiv />
       )
   } else {
-    title = quiz.texts[0].title
+    title = quiz.title
     availablePoints = quiz.points
 
     if (loggedIn) {
