@@ -8,7 +8,7 @@ import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
 import { SecondaryStyledButton } from "./styleComponents"
 
 // create a state that manage the no. of selected button
-// if the number of selected are more than 5 
+// if the number of selected are more than 5
 // disable all other buttons apart from the selected
 
 export interface ChoiceButtonProps {

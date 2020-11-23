@@ -48,6 +48,7 @@ const theme = createMuiTheme({
       srOnly: textScalar,
       subtitle1: textScalar,
       subtitle2: textScalar,
+      button: textScalar,
     },
     MuiButton: {
       label: {

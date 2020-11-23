@@ -46,6 +46,10 @@ const AddPRQButton = styled(Button)`
   display: flex !important;
   width: 33% !important;
   background: #e0e0e0 !important;
+  margin-bottom: 1rem !important;
+  @media only screen and (max-width: 600px) {
+    width: 100% !important;
+  }
 `
 const QuestionContainer = styled.div`
   display: flex;
