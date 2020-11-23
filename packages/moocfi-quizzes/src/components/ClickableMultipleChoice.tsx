@@ -245,6 +245,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const [click, setClick] = React.useState(false)
+  const [clickCount, setClickCount] = React.useState(0)
   const dispatch = useDispatch()
   const items = useTypedSelector(state => state.quiz!.items)
   const item = items.find(i => i.id === option.quizItemId)
@@ -274,9 +275,15 @@ const Option: React.FunctionComponent<OptionProps> = ({
   const handleOptionChange = (optionId: string) => () => {
     setClick(!click)
     dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))
+    console.log(clickCount)
+    console.log(lengthOfSelectedOption)
   }
   const optionAnswers = itemAnswer && itemAnswer.optionAnswers
+  /* please use optionAnswers.length to make your life easier */
   const answerLocked = userQuizState && userQuizState.status === "locked"
+
+  
+  const lengthOfSelectedOption: any = itemAnswer?.optionAnswers.length;
 
   const optionIsSelected =
     optionAnswers && optionAnswers.some(oa => oa.quizOptionId === option.id)
@@ -294,8 +301,10 @@ const Option: React.FunctionComponent<OptionProps> = ({
           revealed={false}
           correct={false}
           state={click}
+          /* disable={clickCount >= 5} */
           onClick={handleOptionChange(option.id)}
-          disabled={quizDisabled}
+          /* disabled={quizDisabled} */
+          disabled={!optionIsSelected && lengthOfSelectedOption >= 5}
           aria-pressed={optionIsSelected}
         >
           <MarkdownText Component={justADiv} removeParagraphs>

@@ -9,15 +9,16 @@ import {
   InputLabel,
 } from "@material-ui/core"
 import { GridDirection, GridSize } from "@material-ui/core/Grid"
-import { SpaciousTypography } from "./styleComponents"
-import { useTypedSelector } from "../state/store"
-import * as quizAnswerActions from "../state/quizAnswer/actions"
-import { QuizItem, QuizItemOption, QuizItemAnswer } from "../modelTypes"
-import LaterQuizItemAddition from "./LaterQuizItemAddition"
-import MarkdownText from "./MarkdownText"
+import { SpaciousTypography } from "../styleComponents"
+import { useTypedSelector } from "../../state/store"
+import { QuizItem, QuizItemOption, QuizItemAnswer } from "../../modelTypes"
+import LaterQuizItemAddition from "../LaterQuizItemAddition"
+import MarkdownText from "../MarkdownText"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faExclamationCircle } from "@fortawesome/free-solid-svg-icons"
-import ThemeProviderContext from "../contexes/themeProviderContext"
+import ThemeProviderContext from "../../contexes/themeProviderContext"
+import AnswerComponent from "./AnswerComponent"
+import AnswerLockedComponent from "./AnswerLockedComponent"
 
 const QuestionContainer = styled.div`
   display: flex;
@@ -30,13 +31,6 @@ const QuestionContainer = styled.div`
   border-radius: 5px;
   min-height: 2rem;
 `
-
-interface ChoicesContainerProps {
-  direction: string
-  providedStyles: string | undefined
-}
-
-const StyledSelect = styled(Select)<ChoicesContainerProps>``
 
 const CentralizedOnSmallScreenTypography = styled(Typography)`
   @media only screen and (max-width: 600px) {
@@ -101,7 +95,6 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   const quiz = useTypedSelector(state => state.quiz)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
-  const [selectedOption, setSelectedOption] = React.useState("")
 
   const items = useTypedSelector(state => state.quiz!.items)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
@@ -120,10 +113,6 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
     return <LaterQuizItemAddition item={item} />
   }
 
-  const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setSelectedOption(event.target.value as string)
-  }
-
   const options = item.options
 
   let direction: GridDirection = "row"
@@ -138,11 +127,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
     return <div>Answer cannot be retrieved</div>
   }
 
-  const handleOptionChange = (optionId: string) => () =>
-    dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))
-
   const optionAnswers = itemAnswer && itemAnswer.optionAnswers
-  // TODO: Handle if quiz is locked
   const answerLocked = userQuizState && userQuizState.status === "locked"
 
   return (
@@ -158,35 +143,17 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
             questionWidth={questionWidth}
           />
           <FormControl variant="outlined">
-            <InputLabel id="demo-simple-select-outlined-label">
-              select an option
-            </InputLabel>
-            <StyledSelect
-              labelId="demo-simple-select-outlined-label"
-              id="demo-simple-select-filled"
-              direction={direction}
-              value={selectedOption}
-              providedStyles={themeProvider.optionContainerStyles}
-              onChange={handleChange}
-            >
-              {options
-                .sort((o1, o2) => o1.order - o2.order)
-                .map((option, index) => {
-                  const optionIsSelected = option.id === selectedOption
-                  return (
-                    <MenuItem
-                      selected={!!optionIsSelected}
-                      onClick={handleOptionChange(option.id)}
-                      disabled={quizDisabled}
-                      aria-pressed={optionIsSelected}
-                      key={option.id}
-                      value={option.id}
-                    >
-                      {option.title}
-                    </MenuItem>
-                  )
-                })}
-            </StyledSelect>
+            {answerLocked ? (
+              <AnswerLockedComponent options={options} quizItemId={item.id} />
+            ) : (
+              <AnswerComponent
+                direction={direction}
+                themeProvider={themeProvider}
+                options={options}
+                quizItemId={item.id}
+                quizDisabled={quizDisabled}
+              />
+            )}
           </FormControl>
         </div>
         {<FeedbackPortion item={item} />}
@@ -268,6 +235,10 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   const optionAnswers = itemAnswer && itemAnswer.optionAnswers
 
   const optionAnswer = optionAnswers[0]
+
+  if (!optionAnswer) {
+    return <div>No option selected.</div>
+  }
 
   const selectedOption = item.options.find(
     o => o.id === optionAnswer.quizOptionId,
