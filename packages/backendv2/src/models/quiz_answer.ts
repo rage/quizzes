@@ -457,12 +457,14 @@ class QuizAnswer extends Model {
   private static assessAnswer(quizAnswer: QuizAnswer, quiz: Quiz) {
     const quizItemAnswers = quizAnswer.itemAnswers
     const quizItems = quiz.items
-    if (
-      !quizItemAnswers ||
-      quizItemAnswers.length === 0 ||
-      quizItemAnswers.length != quizItems.length
-    ) {
+    if (!quizItemAnswers || quizItemAnswers.length === 0) {
       throw new BadRequestError("item answers missing")
+    }
+    // TODO: this kinda problematic when editing quizzes with existing answers
+    if (quizItemAnswers.length != quizItems.length) {
+      throw new BadRequestError(
+        "cannot assess answer because not all quiz items have answers",
+      )
     }
     for (const quizItemAnswer of quizItemAnswers) {
       const quizItem = quizItems.find(
