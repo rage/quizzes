@@ -12,12 +12,22 @@ interface quizProps {
 const TitleWrapper = styled.div`
   display: flex;
   justify-content: space-between;
+  flex-wrap: no-wrap;
+  @media only screen and (max-width: 535px) {
+    flex-wrap: wrap;
+    justify-content: space-around;
+  }
 `
 
 const TitleContainer = styled.div`
   display: flex;
   width: 60%;
   margin-right: 0.5px;
+  @media only screen and (max-width: 535px) {
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
 `
 
 const ButtonContainer = styled.div`
@@ -25,6 +35,11 @@ const ButtonContainer = styled.div`
   width: 40%;
   justify-content: space-between;
   margin-left: 0.5px;
+  @media only screen and (max-width: 535px) {
+    width: 100%;
+    margin-top: 5px;
+    margin-bottom: 5px;
+  }
 `
 
 const QuizCard = styled(Card)`
@@ -39,10 +54,6 @@ const QuizLink = styled.a`
 
 const StyledType = styled(Typography)`
   color: #f44336 !important;
-`
-
-const Title = styled(Typography)`
-  display: flex !important;
 `
 
 export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
@@ -61,9 +72,9 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
           <CardContent>
             <TitleWrapper>
               <TitleContainer>
-                <Title color="inherit" variant="body1">
+                <Typography color="inherit" variant="body1">
                   {title}
-                </Title>
+                </Typography>
               </TitleContainer>
               <ButtonContainer>
                 <Badge
@@ -96,7 +107,9 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
                   }}
                   as={`/quizzes/${quiz.id}/edit`}
                 >
-                  <Button variant="outlined">Edit quiz</Button>
+                  <Button variant="outlined">
+                    <Typography>Edit quiz</Typography>
+                  </Button>
                 </Link>
               </ButtonContainer>
             </TitleWrapper>
