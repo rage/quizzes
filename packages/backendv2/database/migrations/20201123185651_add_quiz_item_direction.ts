@@ -15,6 +15,20 @@ export async function up(knex: Knex): Promise<void> {
     })
 
     await knex.raw(`
+        UPDATE quiz_item
+        SET direction = 'column'
+        WHERE quiz_id IN (
+            SELECT quiz_id
+            FROM (
+                SELECT quiz_id, count(id)
+                FROM quiz_item
+                GROUP BY quiz_id
+            ) c
+            WHERE count = 1
+        )
+    `)
+
+    await knex.raw(`
         CREATE MATERIALIZED VIEW reaktor.quiz_item AS
         SELECT *
         FROM quiz_item
