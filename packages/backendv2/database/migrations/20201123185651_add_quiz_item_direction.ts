@@ -120,15 +120,15 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
   if (process.env.NODE_ENV !== "test") {
-      await knex.raw("DROP MATERIALIZED VIEW reaktor.quiz_item CASCADE")
+    await knex.raw("DROP MATERIALIZED VIEW reaktor.quiz_item CASCADE")
 
-  await knex.schema.alterTable("quiz_item", table => {
-    table.dropColumn("direction")
-  })
+    await knex.schema.alterTable("quiz_item", table => {
+      table.dropColumn("direction")
+    })
 
-  await knex.raw("DROP TYPE quiz_item_direction_enum")
+    await knex.raw("DROP TYPE quiz_item_direction_enum")
 
-  await knex.raw(`
+    await knex.raw(`
         CREATE MATERIALIZED VIEW reaktor.quiz_item AS
         SELECT *
         FROM quiz_item
@@ -138,11 +138,11 @@ export async function down(knex: Knex): Promise<void> {
         )
     `)
 
-  await knex.raw(`
+    await knex.raw(`
         CREATE INDEX ON reaktor.quiz_item (id)
     `)
 
-  await knex.raw(`
+    await knex.raw(`
         CREATE MATERIALIZED VIEW reaktor.quiz_option AS
         SELECT *
         FROM quiz_option
@@ -152,11 +152,11 @@ export async function down(knex: Knex): Promise<void> {
         )
     `)
 
-  await knex.raw(`
+    await knex.raw(`
         CREATE INDEX ON reaktor.quiz_option (id)
     `)
 
-  await knex.raw(`
+    await knex.raw(`
         CREATE MATERIALIZED VIEW reaktor.quiz_item_translation AS
         SELECT *
         FROM quiz_item_translation
@@ -166,11 +166,11 @@ export async function down(knex: Knex): Promise<void> {
         )  
     `)
 
-  await knex.raw(`
+    await knex.raw(`
         CREATE INDEX ON reaktor.quiz_item_translation (quiz_item_id, language_id)
     `)
 
-  await knex.raw(`
+    await knex.raw(`
         CREATE MATERIALIZED VIEW reaktor.quiz_option_translation AS
         SELECT *
         FROM quiz_option_translation
@@ -180,11 +180,11 @@ export async function down(knex: Knex): Promise<void> {
         )
     `)
 
-  await knex.raw(`
+    await knex.raw(`
         CREATE INDEX ON reaktor.quiz_option_translation (quiz_option_id, language_id)
     `)
 
-  await knex.raw(`
+    await knex.raw(`
         CREATE MATERIALIZED VIEW reaktor.quiz_item_answer AS
         SELECT *
         FROM quiz_item_answer
@@ -194,11 +194,11 @@ export async function down(knex: Knex): Promise<void> {
         )
     `)
 
-  await knex.raw(`
+    await knex.raw(`
         CREATE INDEX ON reaktor.quiz_item_answer (id)  
     `)
 
-  await knex.raw(`
+    await knex.raw(`
         CREATE MATERIALIZED VIEW reaktor.quiz_option_answer AS
         SELECT *
         FROM quiz_option_answer
@@ -208,12 +208,12 @@ export async function down(knex: Knex): Promise<void> {
         )
     `)
 
-  await knex.raw(`
+    await knex.raw(`
         CREATE INDEX ON reaktor.quiz_option_answer (id)
     `)
 
-  await knex.raw(`
+    await knex.raw(`
         GRANT SELECT ON ALL TABLES IN SCHEMA reaktor TO reaktor
     `)
-}
+  }
 }
