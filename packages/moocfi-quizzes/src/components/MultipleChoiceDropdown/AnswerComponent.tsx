@@ -4,6 +4,7 @@ import { InputLabel, MenuItem, Select } from "@material-ui/core"
 import { QuizItemOption } from "../../modelTypes"
 import { useDispatch } from "react-redux"
 import * as quizAnswerActions from "../../state/quizAnswer/actions"
+import { useTypedSelector } from "../../state/store"
 
 interface ChoicesContainerProps {
   direction: string
@@ -28,12 +29,21 @@ const AnswerComponent = ({
   quizItemId,
 }: Props) => {
   const dispatch = useDispatch()
-  const handleOptionChange = (optionId: string) => () =>
-    dispatch(quizAnswerActions.changeChosenOption(quizItemId, optionId))
-  const [selectedOption, setSelectedOption] = React.useState("")
+
   const handleChange = (event: React.ChangeEvent<{ value: unknown }>) => {
-    setSelectedOption(event.target.value as string)
+    const optionId = event.target.value as string
+    dispatch(quizAnswerActions.changeChosenOption(quizItemId, optionId))
   }
+
+  const quizItemAnswer = useTypedSelector(state =>
+    state.quizAnswer.quizAnswer.itemAnswers.find(ia => ia.id === quizItemId),
+  )
+
+  const selectedOptionIds =
+    quizItemAnswer?.optionAnswers.map(oA => oA.quizOptionId) || []
+
+  // This does not support selecting multiple options at the moment.
+  const selectedOption = selectedOptionIds[0]
 
   return (
     <>
@@ -55,9 +65,6 @@ const AnswerComponent = ({
             return (
               <MenuItem
                 selected={!!optionIsSelected}
-                onClick={() => {
-                  handleOptionChange(option.id)
-                }}
                 disabled={quizDisabled}
                 aria-pressed={optionIsSelected}
                 key={option.id}

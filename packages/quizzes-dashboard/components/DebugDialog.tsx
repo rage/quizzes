@@ -2,9 +2,8 @@ import React, { useState } from "react"
 import { Button, Dialog, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import EditableDebugField from "./EditableDebugField"
-import { NormalizedItem, NormalizedQuiz } from "../types/NormalizedQuiz"
 import { useTypedSelector } from "../store/store"
-import { normalizedQuiz, items } from "../schemas"
+import { normalizedQuiz } from "../schemas"
 import { denormalize } from "normalizr"
 import { Quiz } from "../types/Quiz"
 
@@ -25,10 +24,20 @@ const ContentWrapper = styled.div`
   overflow-y: hidden;
 `
 
-export const DebugDialog = () => {
-  const quizId = useTypedSelector(state => state.editor.quizId)
-  const quiz = useTypedSelector(state => state.editor)
-  const data: Quiz = denormalize(quizId, normalizedQuiz, quiz)
+interface DebugDialogProps {
+  object?: Object
+}
+
+export const DebugDialog = ({ object }: DebugDialogProps) => {
+  let data: Object | Quiz
+
+  if (object) {
+    data = object
+  } else {
+    const quizId = useTypedSelector(state => state.editor.quizId)
+    const quiz = useTypedSelector(state => state.editor)
+    data = denormalize(quizId, normalizedQuiz, quiz)
+  }
 
   const [debugOpen, setDebugOpen] = useState(false)
   const content = JSON.stringify(data, undefined, 2)

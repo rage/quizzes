@@ -218,6 +218,7 @@ export const getAnswersRequiringAttentionByQuizId = async (
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
+    console.log(quizId)
     return (
       await api.get(
         `/quizzes/${quizId}/count-answers-requiring-attention`,

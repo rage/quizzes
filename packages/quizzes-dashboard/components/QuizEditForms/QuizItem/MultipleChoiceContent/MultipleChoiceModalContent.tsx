@@ -1,6 +1,5 @@
 import React from "react"
 import {
-  Fade,
   Typography,
   TextField,
   FormGroup,
@@ -26,19 +25,30 @@ import { faPlus } from "@fortawesome/free-solid-svg-icons"
 import { createdNewOption } from "../../../../store/editor/editorActions"
 
 const ModalContent = styled.div`
-  padding: 1rem;
   display: flex;
+  padding: 1rem;
+  justify-content: center;
+  @media only screen and (max-width: 600px) {
+    width: 100%;
+  }
 `
 const ModalContentTitleWrapper = styled.div`
   display: flex;
   padding: 1rem;
   justify-content: center;
+  @media only screen and (max-width: 600px) {
+    width: auto !important;
+  }
 `
 
 const ModalContentOptionWrapper = styled.div`
   padding: 1rem;
   display: flex !important;
   justify-content: space-evenly !important;
+  @media only screen and (max-width: 600px) {
+    flex-wrap: wrap;
+    width: auto;
+  }
 `
 
 const AddOptionButton = styled(Button)``
