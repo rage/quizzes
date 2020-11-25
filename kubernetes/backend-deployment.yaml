@@ -126,3 +126,5 @@ spec:
                 secretKeyRef:
                   name: backend-database-secret
                   key: SENTRY_DSN
+            - name: NODE_ENV
+              value: production
