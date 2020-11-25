@@ -97,32 +97,32 @@ spec:
                 name: backend-database-secret
                 key: SENTRY_DSN
       initContainers:
-      - name: quizzes-backend-run-migrations
-        image: ${BACKEND_IMAGE}
-        command: ['sh', '-c', 'cd /app && npx typeorm migration:run']
-        env:
-          - name: DB_NAME
-            valueFrom:
-              secretKeyRef:
-                name: backend-database-secret
-                key: POSTGRES_DATABASE
-          - name: DB_HOST
-            valueFrom:
-              secretKeyRef:
-                name: backend-database-secret
-                key: POSTGRES_HOST
-          - name: DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: backend-database-secret
-                key: POSTGRES_PASSWORD
-          - name: DB_USER
-            valueFrom:
-              secretKeyRef:
-                name: backend-database-secret
-                key: POSTGRES_USERNAME
-          - name: SENTRY_DSN
-            valueFrom:
-              secretKeyRef:
-                name: backend-database-secret
-                key: SENTRY_DSN
+        - name: quizzes-backendv2-run-migrations
+          image: ${BACKENDV2_IMAGE}
+          command: ['sh', '-c', 'cd packages/backendv2 && npx knex migrate:latest']
+          env:
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: backend-database-secret
+                  key: POSTGRES_DATABASE
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: backend-database-secret
+                  key: POSTGRES_HOST
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: backend-database-secret
+                  key: POSTGRES_PASSWORD
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: backend-database-secret
+                  key: POSTGRES_USERNAME
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: backend-database-secret
+                  key: SENTRY_DSN
