@@ -15,6 +15,7 @@ import UserCoursePartState from "./user_course_part_state"
 import * as Kafka from "../services/kafka"
 import SpamFlag from "./spam_flag"
 import _ from "lodash"
+import Objection, { raw } from "objection"
 
 type QuizAnswerStatus =
   | "draft"
@@ -170,6 +171,76 @@ class QuizAnswer extends Model {
         .withGraphFetched("userQuizState")
         .withGraphFetched("itemAnswers.[optionAnswers]")
         .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+    }
+
+    paginated.results.map(answer => {
+      if (answer.peerReviews.length > 0) {
+        answer.peerReviews.map(peerReview => {
+          if (peerReview.answers.length > 0) {
+            peerReview.answers.map(peerReviewAnswer => {
+              peerReviewAnswer.question = this.moveQuestionTextsToparent(
+                peerReviewAnswer.question,
+              )
+            })
+          }
+        })
+      }
+    })
+
+    return paginated
+  }
+
+  public static async getPaginatedByQuizIdAndSearchQuery(
+    quizId: string,
+    page: number,
+    pageSize: number,
+    order: "asc" | "desc",
+    filters: string[],
+    searchQuery?: string,
+  ) {
+    let paginated
+    const filtersProvided = filters.length > 0
+
+    // no filter, no search
+    if (!filtersProvided) {
+      console.log("called 1")
+      paginated = await this.query()
+        .where("quiz_answer.quiz_id", quizId)
+        .orderBy([{ column: "created_at", order: order }])
+        .page(page, pageSize)
+        .withGraphFetched("userQuizState")
+        .withGraphFetched("itemAnswers.[optionAnswers]")
+        .join(
+          raw("quiz_item_answer as qia on quiz_answer.id = qia.quiz_answer_id"),
+        )
+        .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+        .where(
+          raw(
+            `qia.document is not null and qia.document @@ phraseto_tsquery(?)`,
+            [searchQuery],
+          ),
+        )
+        .limit(100)
+    } else {
+      console.log("called 2")
+      paginated = await this.query()
+        .where("quiz_answer.quiz_id", quizId)
+        .whereIn("status", filters)
+        .orderBy([{ column: "created_at", order: order }])
+        .page(page, pageSize)
+        .withGraphFetched("userQuizState")
+        .withGraphFetched("itemAnswers.[optionAnswers]")
+        .join(
+          raw("quiz_item_answer as qia on quiz_answer.id = qia.quiz_answer_id"),
+        )
+        .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+        .where(
+          raw(
+            `qia.document is not null and qia.document @@ phraseto_tsquery(?)`,
+            [searchQuery],
+          ),
+        )
+        .limit(100)
     }
 
     paginated.results.map(answer => {
@@ -373,6 +444,7 @@ class QuizAnswer extends Model {
       let savedQuizAnswer
       let savedUserQuizState
       await this.markPreviousAsDeprecated(userId, quizId, trx)
+      this.removeIds(quizAnswer)
       savedQuizAnswer = await this.query(trx).insertGraphAndFetch(quizAnswer)
       savedUserQuizState = await UserQuizState.query(trx).upsertGraphAndFetch(
         userQuizState,
@@ -400,6 +472,7 @@ class QuizAnswer extends Model {
         )
       }
       await trx.commit()
+      quiz.course = course
       return {
         quiz,
         quizAnswer: savedQuizAnswer,
@@ -455,11 +528,7 @@ class QuizAnswer extends Model {
   private static assessAnswer(quizAnswer: QuizAnswer, quiz: Quiz) {
     const quizItemAnswers = quizAnswer.itemAnswers
     const quizItems = quiz.items
-    if (
-      !quizItemAnswers ||
-      quizItemAnswers.length === 0 ||
-      quizItemAnswers.length != quizItems.length
-    ) {
+    if (!quizItemAnswers || quizItemAnswers.length === 0) {
       throw new BadRequestError("item answers missing")
     }
     for (const quizItemAnswer of quizItemAnswers) {
@@ -467,7 +536,9 @@ class QuizAnswer extends Model {
         item => item.id === quizItemAnswer.quizItemId,
       )
       if (!quizItem) {
-        throw new BadRequestError("invalid quiz item id")
+        // If the quiz item has been deleted
+        quizItemAnswer.correct = false
+        continue
       }
 
       switch (quizItem.type) {
@@ -553,21 +624,22 @@ class QuizAnswer extends Model {
     userQuizState: UserQuizState,
     quiz: Quiz,
   ) {
-    if (quizAnswer.status === "confirmed") {
-      if (quiz.awardPointsEvenIfWrong) {
-        userQuizState.pointsAwarded = quiz.points
-        return
-      }
-      const quizItemAnswers = quizAnswer.itemAnswers
-      const nCorrect = quizItemAnswers.filter(
-        itemAnswer => itemAnswer.correct === true,
-      ).length
-      const total = quizItemAnswers.length
-      const points = (nCorrect / total) * quiz.points
-      const pointsAwarded = userQuizState.pointsAwarded ?? 0
-      userQuizState.pointsAwarded =
-        points > pointsAwarded ? points : pointsAwarded
+    if (quizAnswer.status !== "confirmed") {
+      return
     }
+    if (quiz.awardPointsEvenIfWrong) {
+      userQuizState.pointsAwarded = quiz.points
+      return
+    }
+    const quizItemAnswers = quizAnswer.itemAnswers
+    const nCorrect = quizItemAnswers.filter(
+      itemAnswer => itemAnswer.correct === true,
+    ).length
+    const total = quizItemAnswers.length
+    const points = (nCorrect / total) * quiz.points
+    const pointsAwarded = userQuizState.pointsAwarded ?? 0
+    userQuizState.pointsAwarded =
+      points > pointsAwarded ? points : pointsAwarded
   }
 
   private static assessUserQuizStatus(
@@ -855,6 +927,14 @@ class QuizAnswer extends Model {
       .update({ status: "deprecated" })
       .where("user_id", userId)
       .andWhere("quiz_id", quizId)
+  }
+
+  private static removeIds(quizAnswer: QuizAnswer) {
+    delete quizAnswer.id
+    quizAnswer.itemAnswers?.forEach(itemAnswer => {
+      delete itemAnswer.id
+      itemAnswer.optionAnswers?.forEach(optionAnswer => delete optionAnswer.id)
+    })
   }
 }
 

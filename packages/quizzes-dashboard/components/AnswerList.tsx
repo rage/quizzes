@@ -11,7 +11,7 @@ export interface AnswerListProps {
 export const AnswerList = ({ data, error, expandAll }: AnswerListProps) => {
   return (
     <>
-      {data.map(answer => (
+      {data?.map(answer => (
         <AnswerCard key={answer.id} answer={answer} expanded={expandAll} />
       ))}
     </>

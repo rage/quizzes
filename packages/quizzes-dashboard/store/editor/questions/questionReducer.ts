@@ -12,7 +12,9 @@ import {
   createdNewPeerReviewQuestion,
   toggledQuestionDefault,
   toggledQuestionAnswerRequired,
+  deletedPRQ,
 } from "./questionActions"
+import { deletePeerReview } from "../peerReviews/peerReviewActions"
 
 export const questionReducer = createReducer<
   {
@@ -108,5 +110,23 @@ export const questionReducer = createReducer<
     return produce(state, draftState => {
       draftState[action.payload.questionId].answerRequired =
         action.payload.answerRequired
+    })
+  })
+
+  .handleAction(deletePeerReview, (state, action) => {
+    return produce(state, draftState => {
+      for (const key in draftState) {
+        if (
+          draftState[key].peerReviewCollectionId === action.payload.peerReviewId
+        ) {
+          delete draftState[key]
+        }
+      }
+    })
+  })
+
+  .handleAction(deletedPRQ, (state, action) => {
+    return produce(state, draftState => {
+      delete draftState[action.payload.questionId]
     })
   })

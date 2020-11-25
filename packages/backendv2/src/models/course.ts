@@ -76,6 +76,14 @@ class Course extends Model {
     )
   }
 
+  static async getByTitle(title: string) {
+    return (
+      await this.query()
+        .withGraphJoined("texts")
+        .where("title", title)
+    )[0]
+  }
+
   static async getAll() {
     const courses = await this.query().withGraphJoined("texts")
     return courses.map(course => this.moveTextsToParent(course))

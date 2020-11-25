@@ -1,11 +1,12 @@
 import React, { useState } from "react"
-import { Tabs, Tab, Badge } from "@material-ui/core"
+import { Tabs, Tab, Badge, Typography } from "@material-ui/core"
 import { useRouter } from "next/router"
 import {
   faPen,
   faChalkboard,
   faScroll,
   faExclamationTriangle,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { getAnswersRequiringAttentionByQuizId } from "../../services/quizzes"
@@ -13,6 +14,7 @@ import usePromise from "react-use-promise"
 import OverView from "../quizPages/overview"
 import EditPage from "../quizPages/edit"
 import AllAnswers from "../quizPages/answers/all"
+import AnswerSearch from "../quizPages/answers/search"
 import RequiringAttention from "../quizPages/answers/requiring-attention"
 import { ITabToComponent } from "../CoursePage/types"
 
@@ -33,6 +35,7 @@ export const TabNavigator = () => {
   const quizTabs: ITabToComponent = {
     overview: OverView,
     edit: EditPage,
+    search: AnswerSearch,
     "all-answers": AllAnswers,
     "answers-requiring-attention": RequiringAttention,
     default_tab: OverView,
@@ -52,7 +55,7 @@ export const TabNavigator = () => {
         <Tab
           icon={<FontAwesomeIcon icon={faChalkboard} />}
           value="overview"
-          label="Overview"
+          label={<Typography>Overview</Typography>}
           onClick={() => {
             router.push(URL_HREF, `${pathname}/overview`)
             setCurrentPage("overview")
@@ -61,7 +64,7 @@ export const TabNavigator = () => {
         <Tab
           icon={<FontAwesomeIcon icon={faPen} />}
           value="edit"
-          label="Edit quiz"
+          label={<Typography>Edit quiz</Typography>}
           onClick={() => {
             router.push(URL_HREF, `${pathname}/edit`)
             setCurrentPage("edit")
@@ -70,7 +73,7 @@ export const TabNavigator = () => {
         <Tab
           icon={<FontAwesomeIcon icon={faScroll} />}
           value="all-answers"
-          label="All answers"
+          label={<Typography>All answers</Typography>}
           onClick={() => {
             router.push(URL_HREF, `${pathname}/all-answers`)
             setCurrentPage("all-answers")
@@ -86,12 +89,21 @@ export const TabNavigator = () => {
               badgeContent={requiringAttention}
               color="error"
             >
-              Answers requiring attention
+              <Typography>Answers requiring attention</Typography>
             </Badge>
           }
           onClick={() => {
             router.push(URL_HREF, `${pathname}/answers-requiring-attention`)
             setCurrentPage("answers-requiring-attention")
+          }}
+        />
+        <Tab
+          icon={<FontAwesomeIcon icon={faSearch} />}
+          value="search"
+          label="Search Answers"
+          onClick={() => {
+            router.push(URL_HREF, `${pathname}/search`)
+            setCurrentPage("search")
           }}
         />
       </Tabs>

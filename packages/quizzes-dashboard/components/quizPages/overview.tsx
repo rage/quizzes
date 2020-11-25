@@ -96,9 +96,11 @@ export const OverView = () => {
       <TabText text={quiz.title} />
       <QuizTitle quiz={quiz} course={course} />
       <StyledCard>
-        <DescriptionContainer>
-          <Typography>{quiz.body}</Typography>
-        </DescriptionContainer>
+        {quiz.body && (
+          <DescriptionContainer>
+            <Typography>{quiz.body}</Typography>
+          </DescriptionContainer>
+        )}
       </StyledCard>
       <StyledCard>
         <Typography variant="h3">Quiz answer by status</Typography>

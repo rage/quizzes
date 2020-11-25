@@ -56,6 +56,9 @@ const WarningBox = styled.div`
   width: 50%;
   justify-content: center;
   align-items: baseline !important;
+  @media only screen and (max-width: 600px) {
+    width: 100%;
+  }
 `
 
 const InfoContainer = styled.div`

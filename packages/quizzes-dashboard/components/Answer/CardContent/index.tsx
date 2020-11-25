@@ -17,6 +17,7 @@ import ManualReviewField from "./ManualReviewField"
 import Peerreviews from "./Peerreviews"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWindowClose } from "@fortawesome/free-solid-svg-icons"
+import DebugDialog from "../../DebugDialog"
 
 export const ContentContainer = styled.div`
   display: flex !important;
@@ -69,6 +70,11 @@ const PeerreviewModal = styled(Modal)`
   display: flex !important;
   align-items: center;
   justify-content: center;
+`
+
+const DebugDialogWrapper = styled.div`
+  display: flex;
+  margin-right: 1rem;
 `
 
 export interface AnswerContentProps {
@@ -134,6 +140,9 @@ export const AnswerContent = ({
       </PeerreviewModal>
       <ContentContainer>
         <AnswerLink answer={answer} />
+        <DebugDialogWrapper>
+          <DebugDialog object={answer} />
+        </DebugDialogWrapper>
       </ContentContainer>
       <ContentContainer>
         <AnswerOverView answer={answer} />

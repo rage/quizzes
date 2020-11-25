@@ -18,8 +18,8 @@ const StyledModal = styled(Modal)`
 
 const StyledBox = styled(Box)`
   background-color: #fafafa;
-  min-width: 700px;
-  min-height: 500px;
+  min-width: 50% !important;
+  min-height: 50% !important;
 `
 
 const CloseButton = styled(Button)`
@@ -28,22 +28,27 @@ const CloseButton = styled(Button)`
 `
 
 const DeleteOptionButton = styled(Button)`
-  display: flex;
+  display: flex !important;
   padding: 1rem !important;
-  position: relative !important;
-  left: 85% !important;
+  float: right;
 `
 
 const CorrectButton = styled(Button)`
   display: flex;
   border-width: 5px 5px 5px 5px !important;
   border-color: green !important;
+  @media only screen and (max-width: 600px) {
+    width: 100% !important;
+  }
 `
 
 const IncorrectButton = styled(Button)`
   display: flex;
   border-width: 5px 5px 5px 5px !important;
   border-color: red !important;
+  @media only screen and (max-width: 600px) {
+    width: 100% !important;
+  }
 `
 
 interface multipleChoiceButtonProps {

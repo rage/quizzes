@@ -112,6 +112,32 @@ export const getAllAnswers = async (
   throw new Error()
 }
 
+export const getAnswersMatchingQuery = async (
+  quizId: string,
+  page: number,
+  size: number,
+  order: string,
+  filters: string[],
+  searchQuery: string,
+): Promise<{ results: Answer[]; total: number }> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (
+      await api.post(
+        `/answers/${quizId}/all?page=${page -
+          1}&size=${size}&order=${order}&filters=${filters}`,
+        { searchQuery },
+        config,
+      )
+    ).data
+    return response
+  }
+  throw new Error()
+}
+
 export const getAnswersRequiringAttention = async (
   quizId: string,
   page: number,
@@ -218,6 +244,7 @@ export const getAnswersRequiringAttentionByQuizId = async (
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
+    console.log(quizId)
     return (
       await api.get(
         `/quizzes/${quizId}/count-answers-requiring-attention`,
