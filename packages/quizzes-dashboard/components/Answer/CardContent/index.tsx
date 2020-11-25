@@ -36,6 +36,9 @@ export const StatButtonWrapper = styled.div`
   display: flex;
   justify-content: center !important;
   width: 100%;
+  button {
+    margin: 2rem;
+  }
 `
 
 export const PeerreviewButton = styled(Button)`
@@ -165,9 +168,6 @@ export const AnswerContent = ({
           ""
         )}
       </ContentContainer>
-      <StatsContainer>
-        <CompactPeerReviewStats answer={answer} />
-      </StatsContainer>
       <StatButtonWrapper>
         {height > 300 && (
           <>
@@ -183,6 +183,9 @@ export const AnswerContent = ({
           </>
         )}
       </StatButtonWrapper>
+      <StatsContainer>
+        <CompactPeerReviewStats answer={answer} />
+      </StatsContainer>
       {editableAnswerStates.includes(answer.status) ? (
         <ManualReviewField
           answer={answer}
