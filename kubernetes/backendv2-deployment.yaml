@@ -99,7 +99,7 @@ spec:
       initContainers:
         - name: quizzes-backendv2-run-migrations
           image: ${BACKENDV2_IMAGE}
-          command: ['sh', '-c', 'cd packages/backendv2 && npx knex migrate:latest']
+          command: ['sh', '-c', 'npx knex migrate:latest']
           env:
             - name: DB_NAME
               valueFrom:
