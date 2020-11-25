@@ -4,6 +4,7 @@ import {
   getAnswersRequiringAttention,
   fetchQuiz,
   fetchCourseById,
+  getAnswersRequiringAttentionMatchingQuery,
 } from "../../../services/quizzes"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import usePromise from "react-use-promise"
@@ -12,15 +13,14 @@ import QuizTitle from "../QuizTitleContainer"
 import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
 import {
   SizeSelectorField,
-  PaginationField,
   SwitchField,
-  Paginator,
   OptionsContainer,
   SortOrderField,
 } from "./styles"
 import { TAnswersDisplayed, TSortOptions } from "./types"
-import { AnswerList } from "../../Answer/AnswerList"
 import SkeletonLoader from "../../Shared/SkeletonLoader"
+import AnswerSearchForm from "../../AnswerSearchForm"
+import AnswerListWrapper from "../../Answer/AnswerListWrapper"
 
 export const RequiringAttention = () => {
   const route = useRouter()
@@ -44,7 +44,7 @@ export const RequiringAttention = () => {
     paramSize || 10,
   )
 
-  const [answers, error] = usePromise(
+  const [answers, answersError] = usePromise(
     () =>
       getAnswersRequiringAttention(
         quizId,
@@ -54,6 +54,10 @@ export const RequiringAttention = () => {
       ),
     [currentPage, answersDisplayed, sortOrder],
   )
+
+  const [searchResults, setSearchResults] = useState<any>(null)
+  const [fetchingAnswers, setFetchingAnswers] = useState(false)
+
   const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [])
   const [course, courseError] = usePromise(
     () => fetchCourseById(quiz?.courseId ?? ""),
@@ -83,7 +87,7 @@ export const RequiringAttention = () => {
     )
   }
 
-  if (error || quizError || courseError) {
+  if (answersError || quizError || courseError) {
     return (
       <>
         <TabTextError />
@@ -133,6 +137,28 @@ export const RequiringAttention = () => {
     route.push(URL_HREF, { pathname, query }, { shallow: true })
   }
 
+  const handleSubmit = async (searchQuery: string) => {
+    try {
+      setFetchingAnswers(true)
+      if (!searchQuery) {
+        setSearchResults(null)
+      } else {
+        const response = await getAnswersRequiringAttentionMatchingQuery(
+          quizId,
+          currentPage,
+          answersDisplayed,
+          sortOrder,
+          searchQuery,
+        )
+        setSearchResults(response)
+      }
+    } catch (err) {
+      // setAnswersError(err)
+    } finally {
+      setFetchingAnswers(false)
+    }
+  }
+
   return (
     <>
       <TabText text="Answers requiring attention" />
@@ -144,19 +170,6 @@ export const RequiringAttention = () => {
       ) : (
         <>
           <QuizTitle quiz={quiz} course={course} />
-          <PaginationField>
-            <Paginator
-              siblingCount={2}
-              boundaryCount={2}
-              count={Math.ceil(answers.total / answersDisplayed)}
-              size="large"
-              color="primary"
-              showFirstButton
-              showLastButton
-              page={currentPage}
-              onChange={(event, nextPage) => handlePageChange(nextPage)}
-            />
-          </PaginationField>
           <OptionsContainer>
             <SwitchField>
               <Typography>Expand all</Typography>
@@ -193,20 +206,18 @@ export const RequiringAttention = () => {
               <MenuItem value="asc">Oldest first</MenuItem>
             </SortOrderField>
           </OptionsContainer>
-          <AnswerList data={answers.results} expandAll={expandAll} />
-          <PaginationField>
-            <Paginator
-              siblingCount={2}
-              boundaryCount={2}
-              count={Math.ceil(answers.total / answersDisplayed)}
-              size="large"
-              color="primary"
-              showFirstButton
-              showLastButton
-              page={currentPage}
-              onChange={(event, nextPage) => handlePageChange(nextPage)}
-            />
-          </PaginationField>
+          <AnswerSearchForm handleSubmit={handleSubmit} />
+          <AnswerListWrapper
+            expandAll={expandAll}
+            order={sortOrder}
+            quizId={quizId}
+            size={answersDisplayed}
+            handlePageChange={handlePageChange}
+            page={currentPage}
+            answersError={answersError}
+            fetchingAnswers={fetchingAnswers}
+            answers={searchResults ? searchResults : answers}
+          />
         </>
       )}
     </>

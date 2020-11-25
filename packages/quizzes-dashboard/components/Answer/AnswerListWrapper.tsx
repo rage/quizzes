@@ -15,10 +15,10 @@ interface WrapperProps {
   quizId: string
   size: number
   order: string
-  filterparameters: string[]
   expandAll: boolean
   page: number
-  answersError: Error | undefined
+  answersError?: Error | undefined
+  fetchingAnswers: Boolean
   answers: any
   handlePageChange: (nextPage: number) => void
 }
@@ -30,8 +30,10 @@ export const AnswerListWrapper = ({
   handlePageChange,
   answersError,
   answers,
+  fetchingAnswers,
 }: WrapperProps) => {
-  if (!answers) return <SkeletonLoader height={400} skeletonCount={10} />
+  if (!answers || fetchingAnswers)
+    return <SkeletonLoader height={400} skeletonCount={10} />
 
   if (answersError) {
     return <>Something went wrong...</>

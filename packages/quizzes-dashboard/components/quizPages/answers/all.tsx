@@ -6,6 +6,7 @@ import {
   fetchQuiz,
   fetchCourseById,
   getAllAnswers,
+  getAllAnswersMatchingQuery,
 } from "../../../services/quizzes"
 import usePromise from "react-use-promise"
 import { MenuItem, Switch, Typography, Chip } from "@material-ui/core"
@@ -23,7 +24,9 @@ import { TSortOptions, TAnswersDisplayed, ChipProps } from "./types"
 import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
 import AnswerListWrapper from "../../Answer/AnswerListWrapper"
 import SkeletonLoader from "../../Shared/SkeletonLoader"
+import AnswerSearchForm from "../../AnswerSearchForm"
 
+// TODO: refactor/move
 const StyledChip = styled(Chip)<ChipProps>`
   display: flex !important;
   background: ${props => {
@@ -66,7 +69,7 @@ export const AllAnswers = () => {
     paramFilters || [],
   )
 
-  const [answers, answersError] = usePromise(
+  const [allAnswers, answersError] = usePromise(
     () =>
       getAllAnswers(
         quizId,
@@ -78,6 +81,33 @@ export const AllAnswers = () => {
     [quizId, currentPage, answersDisplayed, sortOrder, filterParameters],
   )
 
+  const [searchResults, setSearchResults] = useState<any>(null)
+
+  const [fetchingAnswers, setFetchingAnswers] = useState(false)
+
+  const handleSubmit = async (searchQuery: string) => {
+    try {
+      setFetchingAnswers(true)
+      if (!searchQuery) {
+        setSearchResults(null)
+      } else {
+        const response = await getAllAnswersMatchingQuery(
+          quizId,
+          currentPage,
+          answersDisplayed,
+          sortOrder,
+          filterParameters,
+          searchQuery,
+        )
+        setSearchResults(response)
+      }
+    } catch (err) {
+      // setAnswersError(err)
+    } finally {
+      setFetchingAnswers(false)
+    }
+  }
+
   const isIncludedInFilter = (param: string) => {
     if (!route.query.filters) {
       return false
@@ -85,6 +115,7 @@ export const AllAnswers = () => {
     return route.query.filters?.includes(param)
   }
 
+  //TODO: move
   const states: { [state: string]: { checked: boolean } } = {
     "manual-review": { checked: isIncludedInFilter("manual-review") },
     rejected: { checked: isIncludedInFilter("rejected") },
@@ -109,6 +140,7 @@ export const AllAnswers = () => {
     },
     spam: { checked: isIncludedInFilter("spam") },
   }
+
   const [chipStates, setChipStates] = useState(states)
 
   const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [])
@@ -326,16 +358,17 @@ export const AllAnswers = () => {
           )
         })}
       </FilterParamsField>
+      <AnswerSearchForm handleSubmit={handleSubmit} />
       <AnswerListWrapper
         expandAll={expandAll}
-        filterparameters={filterParameters}
         order={sortOrder}
         quizId={quizId}
         size={answersDisplayed}
         handlePageChange={handlePageChange}
         page={currentPage}
         answersError={answersError}
-        answers={answers}
+        fetchingAnswers={fetchingAnswers}
+        answers={searchResults ? searchResults : allAnswers}
       />
     </>
   )
