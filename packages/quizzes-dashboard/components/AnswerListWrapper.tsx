@@ -27,6 +27,8 @@ interface WrapperProps {
   filterparameters: string[]
   expandAll: boolean
   page: number
+  answersError: Error | undefined
+  answers: any
   handlePageChange: (nextPage: number) => void
 }
 
@@ -38,13 +40,16 @@ export const AnswerListWrapper = ({
   expandAll,
   page,
   handlePageChange,
+  answersError,
+  answers,
 }: WrapperProps) => {
-  const [answers, answersError] = usePromise(
-    () => getAllAnswers(quizId, page, size, order, filterparameters),
-    [quizId, page, size, order, filterparameters],
-  )
+  // const [answers, answersError] = usePromise(
+  //   () => getAllAnswers(quizId, page, size, order, filterparameters),
+  //   [quizId, page, size, order, filterparameters],
+  // )
 
   if (!answers) {
+    // TODO: extract this to make it reusable
     return (
       <>
         <StyledSkeleton variant="rect" height={400} animation="wave" />

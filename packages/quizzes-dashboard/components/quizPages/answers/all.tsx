@@ -2,7 +2,11 @@ import React, { useState, useEffect } from "react"
 import _ from "lodash"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
-import { fetchQuiz, fetchCourseById } from "../../../services/quizzes"
+import {
+  fetchQuiz,
+  fetchCourseById,
+  getAllAnswers,
+} from "../../../services/quizzes"
 import usePromise from "react-use-promise"
 import { MenuItem, Switch, Typography, Chip } from "@material-ui/core"
 import styled from "styled-components"
@@ -60,6 +64,18 @@ export const AllAnswers = () => {
   )
   const [filterParameters, setFilterParameters] = useState<string[]>(
     paramFilters || [],
+  )
+
+  const [answers, answersError] = usePromise(
+    () =>
+      getAllAnswers(
+        quizId,
+        currentPage,
+        answersDisplayed,
+        sortOrder,
+        filterParameters,
+      ),
+    [quizId, currentPage, answersDisplayed, sortOrder, filterParameters],
   )
 
   const isIncludedInFilter = (param: string) => {
@@ -318,6 +334,8 @@ export const AllAnswers = () => {
         size={answersDisplayed}
         handlePageChange={handlePageChange}
         page={currentPage}
+        answersError={answersError}
+        answers={answers}
       />
     </>
   )

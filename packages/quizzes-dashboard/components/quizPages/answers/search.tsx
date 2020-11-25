@@ -317,7 +317,6 @@ export const AnswerSearch = () => {
           )
         })}
       </FilterParamsField>
-
       <Results
         expandAll={expandAll}
         filterparameters={filterParameters}
