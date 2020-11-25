@@ -1,5 +1,6 @@
 import { createAction } from "typesafe-actions"
 import { v4 } from "uuid"
+import { string } from "yup"
 
 export const editedPeerReviewQuestionTitle = createAction(
   "EDITED_PRQ_TITLE",
@@ -57,6 +58,14 @@ export const toggledQuestionAnswerRequired = createAction(
   }),
 )<{ questionId: string; answerRequired: boolean }>()
 
+export const deletedPRQ = createAction(
+  "DELETED_PRQ",
+  (questionId: string, peerReviewId: string) => ({
+    questionId: questionId,
+    peerReviewId: peerReviewId,
+  }),
+)<{ questionId: string; peerReviewId: string }>()
+
 export const prqActions = [
   editedPeerReviewQuestionTitle,
   editedPeerReviewQuestionBody,
@@ -66,6 +75,7 @@ export const prqActions = [
   createdNewPeerReviewQuestion,
   toggledQuestionDefault,
   toggledQuestionAnswerRequired,
+  deletedPRQ,
 ]
 
 export default prqActions
