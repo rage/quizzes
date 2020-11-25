@@ -422,7 +422,9 @@ class QuizAnswer extends Model {
     const course = await Course.getById(quiz.courseId, trx)
     await this.assessAnswerStatus(quizAnswer, userQuizState, quiz, course, trx)
     this.assessAnswer(quizAnswer, quiz)
-    this.gradeAnswer(quizAnswer, userQuizState, quiz)
+    if (quizAnswer.status !== "spam") {
+      this.gradeAnswer(quizAnswer, userQuizState, quiz)
+    }
     this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
     if (quizAnswer.status === "confirmed") {
       await UserCoursePartState.update(
@@ -557,21 +559,22 @@ class QuizAnswer extends Model {
     userQuizState: UserQuizState,
     quiz: Quiz,
   ) {
-    if (quizAnswer.status === "confirmed") {
-      if (quiz.awardPointsEvenIfWrong) {
-        userQuizState.pointsAwarded = quiz.points
-        return
-      }
-      const quizItemAnswers = quizAnswer.itemAnswers
-      const nCorrect = quizItemAnswers.filter(
-        itemAnswer => itemAnswer.correct === true,
-      ).length
-      const total = quizItemAnswers.length
-      const points = (nCorrect / total) * quiz.points
-      const pointsAwarded = userQuizState.pointsAwarded ?? 0
-      userQuizState.pointsAwarded =
-        points > pointsAwarded ? points : pointsAwarded
+    if (quizAnswer.status !== "confirmed") {
+      return
     }
+    if (quiz.awardPointsEvenIfWrong) {
+      userQuizState.pointsAwarded = quiz.points
+      return
+    }
+    const quizItemAnswers = quizAnswer.itemAnswers
+    const nCorrect = quizItemAnswers.filter(
+      itemAnswer => itemAnswer.correct === true,
+    ).length
+    const total = quizItemAnswers.length
+    const points = (nCorrect / total) * quiz.points
+    const pointsAwarded = userQuizState.pointsAwarded ?? 0
+    userQuizState.pointsAwarded =
+      points > pointsAwarded ? points : pointsAwarded
   }
 
   private static assessUserQuizStatus(
