@@ -3,6 +3,7 @@ import styled from "styled-components"
 import { Pagination } from "@material-ui/lab"
 import { AnswerList } from "./AnswerList"
 import SkeletonLoader from "../Shared/SkeletonLoader"
+import { Typography } from "@material-ui/core"
 
 export const PaginationField = styled.div`
   display: flex;
@@ -39,35 +40,45 @@ export const AnswerListWrapper = ({
     return <>Something went wrong...</>
   }
 
+  const resultsAvailable = answers?.results.length > 0
+
   return (
     <>
-      <PaginationField>
-        <Pagination
-          siblingCount={2}
-          boundaryCount={2}
-          count={Math.ceil(answers.total / size)}
-          size="large"
-          color="primary"
-          showFirstButton
-          showLastButton
-          page={page}
-          onChange={(_, nextPage) => handlePageChange(nextPage)}
-        />
-      </PaginationField>
-      <AnswerList data={answers.results} expandAll={expandAll} />
-      <PaginationField>
-        <Pagination
-          siblingCount={2}
-          boundaryCount={2}
-          count={Math.ceil(answers.total / size)}
-          size="large"
-          color="primary"
-          showFirstButton
-          showLastButton
-          page={page}
-          onChange={(_, nextPage) => handlePageChange(nextPage)}
-        />
-      </PaginationField>
+      {resultsAvailable ? (
+        <>
+          <PaginationField>
+            <Pagination
+              siblingCount={2}
+              boundaryCount={2}
+              count={Math.ceil(answers.total / size)}
+              size="large"
+              color="primary"
+              showFirstButton
+              showLastButton
+              page={page}
+              onChange={(_, nextPage) => handlePageChange(nextPage)}
+            />
+          </PaginationField>
+          <AnswerList data={answers.results} expandAll={expandAll} />
+          <PaginationField>
+            <Pagination
+              siblingCount={2}
+              boundaryCount={2}
+              count={Math.ceil(answers.total / size)}
+              size="large"
+              color="primary"
+              showFirstButton
+              showLastButton
+              page={page}
+              onChange={(_, nextPage) => handlePageChange(nextPage)}
+            />
+          </PaginationField>
+        </>
+      ) : (
+        <>
+          <Typography variant="h3">No answers found.</Typography>
+        </>
+      )}
     </>
   )
 }
