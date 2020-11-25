@@ -4,17 +4,13 @@ import { useRouter } from "next/router"
 import usePromise from "react-use-promise"
 import { fetchQuiz, getAnswerById } from "../../../../services/quizzes"
 import AnswerCard from "../../../../components/Answer"
-import styled from "styled-components"
-import { Skeleton } from "@material-ui/lab"
+
 import {
   TabTextLoading,
   TabText,
   TabTextError,
 } from "../../../../components/quizPages/TabHeaders"
-
-const StyledSkeleton = styled(Skeleton)`
-  margin-bottom: 1rem;
-`
+import SkeletonLoader from "../../../../components/Shared/SkeletonLoader"
 
 export const AnswerById = () => {
   const route = useRouter()
@@ -65,7 +61,7 @@ export const AnswerById = () => {
     return (
       <>
         <TabTextLoading />
-        <StyledSkeleton variant="rect" height={300} animation="wave" />
+        <SkeletonLoader height={300} skeletonCount={1} />
       </>
     )
   }

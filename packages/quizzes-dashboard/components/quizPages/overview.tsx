@@ -5,7 +5,6 @@ import {
   fetchCourseById,
   getUserAbilitiesForCourse,
 } from "../../services/quizzes"
-import { Skeleton } from "@material-ui/lab"
 import styled from "styled-components"
 import { Typography, Card } from "@material-ui/core"
 import { useRouter } from "next/router"
@@ -14,10 +13,7 @@ import DownloadInfoForms from "../DownloadInfoForms"
 import QuizTitle from "./QuizTitleContainer"
 import { TabTextError, TabText, TabTextLoading } from "./TabHeaders"
 import { AnswerStatistics } from "./AnswerStatistics"
-
-const StyledSkeleton = styled(Skeleton)`
-  margin-bottom: 1rem;
-`
+import SkeletonLoader from "../Shared/SkeletonLoader"
 
 const DescriptionContainer = styled.div`
   display: flex;
@@ -68,21 +64,7 @@ export const OverView = () => {
     return (
       <>
         <TabTextLoading />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <SkeletonLoader height={250} skeletonCount={15} />
       </>
     )
   }

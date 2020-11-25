@@ -4,20 +4,12 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
 import { fetchQuiz, fetchCourseById } from "../../../services/quizzes"
 import usePromise from "react-use-promise"
-import {
-  MenuItem,
-  Switch,
-  Typography,
-  Chip,
-  TextField,
-  Button,
-} from "@material-ui/core"
+import { MenuItem, Switch, Typography, Chip } from "@material-ui/core"
 import styled from "styled-components"
 import QuizTitle from "../QuizTitleContainer"
 import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
 import {
   SizeSelectorField,
-  StyledSkeleton,
   OptionsContainer,
   SwitchField,
   SortOrderField,
@@ -26,6 +18,7 @@ import {
 import { TSortOptions, TAnswersDisplayed, ChipProps } from "./types"
 import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
 import { Results } from "./results"
+import SkeletonLoader from "../../Shared/SkeletonLoader"
 
 const StyledChip = styled(Chip)<ChipProps>`
   display: flex !important;
@@ -149,7 +142,7 @@ export const AnswerSearch = () => {
     return (
       <>
         <TabTextLoading />
-        <StyledSkeleton variant="rect" animation="wave" height={500} />
+        <SkeletonLoader height={500} skeletonCount={1} />
       </>
     )
   }

@@ -6,13 +6,11 @@ import {
   fetchCourseById,
 } from "../../../services/quizzes"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
-import { AnswerList } from "../../AnswerList"
 import usePromise from "react-use-promise"
 import { MenuItem, Switch, Typography } from "@material-ui/core"
 import QuizTitle from "../QuizTitleContainer"
 import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
 import {
-  StyledSkeleton,
   SizeSelectorField,
   PaginationField,
   SwitchField,
@@ -21,6 +19,8 @@ import {
   SortOrderField,
 } from "./styles"
 import { TAnswersDisplayed, TSortOptions } from "./types"
+import { AnswerList } from "../../Answer/AnswerList"
+import SkeletonLoader from "../../Shared/SkeletonLoader"
 
 export const RequiringAttention = () => {
   const route = useRouter()
@@ -78,21 +78,7 @@ export const RequiringAttention = () => {
     return (
       <>
         <TabTextLoading />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
+        <SkeletonLoader height={250} skeletonCount={15} />
       </>
     )
   }
@@ -207,11 +193,7 @@ export const RequiringAttention = () => {
               <MenuItem value="asc">Oldest first</MenuItem>
             </SortOrderField>
           </OptionsContainer>
-          <AnswerList
-            data={answers.results}
-            error={error}
-            expandAll={expandAll}
-          />
+          <AnswerList data={answers.results} expandAll={expandAll} />
           <PaginationField>
             <Paginator
               siblingCount={2}

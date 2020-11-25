@@ -14,7 +14,6 @@ import QuizTitle from "../QuizTitleContainer"
 import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
 import {
   SizeSelectorField,
-  StyledSkeleton,
   OptionsContainer,
   SwitchField,
   SortOrderField,
@@ -22,7 +21,8 @@ import {
 } from "./styles"
 import { TSortOptions, TAnswersDisplayed, ChipProps } from "./types"
 import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
-import AnswerListWrapper from "../../AnswerListWrapper"
+import AnswerListWrapper from "../../Answer/AnswerListWrapper"
+import SkeletonLoader from "../../Shared/SkeletonLoader"
 
 const StyledChip = styled(Chip)<ChipProps>`
   display: flex !important;
@@ -158,7 +158,7 @@ export const AllAnswers = () => {
     return (
       <>
         <TabTextLoading />
-        <StyledSkeleton variant="rect" animation="wave" height={500} />
+        <SkeletonLoader height={500} skeletonCount={1} />
       </>
     )
   }

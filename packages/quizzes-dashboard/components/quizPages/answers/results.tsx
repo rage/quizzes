@@ -1,12 +1,9 @@
-import React, { useState, useEffect } from "react"
-import usePromise from "react-use-promise"
+import React, { useState } from "react"
 import { getAnswersMatchingQuery } from "../../../services/quizzes"
-import { AnswerList } from "../../AnswerList"
 import styled from "styled-components"
-import { Button, TextField, Typography } from "@material-ui/core"
-import { Pagination, Skeleton } from "@material-ui/lab"
-import { StyledSkeleton } from "./styles"
-
+import { Button, TextField } from "@material-ui/core"
+import { Pagination } from "@material-ui/lab"
+import SkeletonLoader from "../../Shared/SkeletonLoader"
 export const PaginationField = styled.div`
   display: flex;
   width: 100%;
@@ -63,8 +60,7 @@ export const Results = ({
     }
   }
 
-  if (fetchingAnswers)
-    return <StyledSkeleton variant="rect" height={400} animation="wave" />
+  if (fetchingAnswers) return <SkeletonLoader height={400} skeletonCount={1} />
 
   if (error) {
     return <>Something went wrong...Error</>
@@ -111,11 +107,11 @@ export const Results = ({
               onChange={(event, nextPage) => handlePageChange(nextPage)}
             />
           </PaginationField>
-          <AnswerList
+          {/* <AnswerList
             data={searchResults?.results}
             error={error}
             expandAll={expandAll}
-          />
+          /> */}
           <PaginationField>
             <Paginator
               siblingCount={2}
