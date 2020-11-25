@@ -422,9 +422,7 @@ class QuizAnswer extends Model {
     const course = await Course.getById(quiz.courseId, trx)
     await this.assessAnswerStatus(quizAnswer, userQuizState, quiz, course, trx)
     this.assessAnswer(quizAnswer, quiz)
-    if (quizAnswer.status !== "spam") {
-      this.gradeAnswer(quizAnswer, userQuizState, quiz)
-    }
+    this.gradeAnswer(quizAnswer, userQuizState, quiz)
     this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
     if (quizAnswer.status === "confirmed") {
       await UserCoursePartState.update(
@@ -462,18 +460,14 @@ class QuizAnswer extends Model {
     if (!quizItemAnswers || quizItemAnswers.length === 0) {
       throw new BadRequestError("item answers missing")
     }
-    // TODO: this kinda problematic when editing quizzes with existing answers
-    if (quizItemAnswers.length != quizItems.length) {
-      throw new BadRequestError(
-        "cannot assess answer because not all quiz items have answers",
-      )
-    }
     for (const quizItemAnswer of quizItemAnswers) {
       const quizItem = quizItems.find(
         item => item.id === quizItemAnswer.quizItemId,
       )
       if (!quizItem) {
-        throw new BadRequestError("invalid quiz item id")
+        // If the quiz item has been deleted
+        quizItemAnswer.correct = false
+        continue
       }
 
       switch (quizItem.type) {
