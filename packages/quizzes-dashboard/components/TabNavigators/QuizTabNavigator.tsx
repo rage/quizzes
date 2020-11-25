@@ -14,7 +14,6 @@ import usePromise from "react-use-promise"
 import OverView from "../quizPages/overview"
 import EditPage from "../quizPages/edit"
 import AllAnswers from "../quizPages/answers/all"
-import AnswerSearch from "../quizPages/answers/search"
 import RequiringAttention from "../quizPages/answers/requiring-attention"
 import { ITabToComponent } from "../CoursePage/types"
 
@@ -35,7 +34,6 @@ export const TabNavigator = () => {
   const quizTabs: ITabToComponent = {
     overview: OverView,
     edit: EditPage,
-    search: AnswerSearch,
     "all-answers": AllAnswers,
     "answers-requiring-attention": RequiringAttention,
     default_tab: OverView,
@@ -95,15 +93,6 @@ export const TabNavigator = () => {
           onClick={() => {
             router.push(URL_HREF, `${pathname}/answers-requiring-attention`)
             setCurrentPage("answers-requiring-attention")
-          }}
-        />
-        <Tab
-          icon={<FontAwesomeIcon icon={faSearch} />}
-          value="search"
-          label="Search Answers"
-          onClick={() => {
-            router.push(URL_HREF, `${pathname}/search`)
-            setCurrentPage("search")
           }}
         />
       </Tabs>
