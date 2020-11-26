@@ -1,9 +1,9 @@
-import Model from "./base_model"
 import Quiz from "./quiz_item"
 import PeerReviewCollectionTranslation from "./peer_review_collection_translation"
 import PeerReviewQuestion from "./peer_review_question"
+import BaseModel from "./base_model"
 
-export class PeerReviewCollection extends Model {
+export class PeerReviewCollection extends BaseModel {
   texts!: PeerReviewCollectionTranslation[]
   questions!: PeerReviewQuestion[]
   title!: string
@@ -15,7 +15,7 @@ export class PeerReviewCollection extends Model {
 
   static relationMappings = {
     quiz: {
-      relation: Model.HasOneRelation,
+      relation: BaseModel.HasOneRelation,
       modelClass: Quiz,
       join: {
         from: "peer_review_collection.quiz_id",
@@ -23,7 +23,7 @@ export class PeerReviewCollection extends Model {
       },
     },
     texts: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: PeerReviewCollectionTranslation,
       join: {
         from: "peer_review_collection.id",
@@ -31,7 +31,7 @@ export class PeerReviewCollection extends Model {
       },
     },
     questions: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: PeerReviewQuestion,
       join: {
         from: "peer_review_collection.id",

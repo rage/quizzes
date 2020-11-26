@@ -1,10 +1,10 @@
-import Model from "./base_model"
 import Quiz from "./quiz"
 import User from "./user"
 import QuizAnswer from "./quiz_answer"
 import Knex from "knex"
+import BaseModel from "./base_model"
 
-class UserQuizState extends Model {
+class UserQuizState extends BaseModel {
   userId!: number
   quizId!: string
   tries!: number
@@ -24,7 +24,7 @@ class UserQuizState extends Model {
 
   static relationMappings = {
     user: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: User,
       join: {
         from: "quiz_answer.user_id",
@@ -32,7 +32,7 @@ class UserQuizState extends Model {
       },
     },
     quiz: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: Quiz,
       join: {
         from: "user_quiz_state.quiz_id",
@@ -40,7 +40,7 @@ class UserQuizState extends Model {
       },
     },
     quizAnswer: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizAnswer,
       join: {
         from: ["user_quiz_state.user_id", "user_quiz_state.quiz_id"],

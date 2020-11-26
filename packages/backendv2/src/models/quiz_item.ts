@@ -1,7 +1,7 @@
-import Model from "./base_model"
 import Quiz from "./quiz"
 import QuizOption from "./quiz_option"
 import QuizItemTranslation from "./quiz_item_translation"
+import BaseModel from "./base_model"
 
 export type QuizItemType =
   | "open"
@@ -15,7 +15,7 @@ export type QuizItemType =
   | "multiple-choice-dropdown"
   | "clickable-multiple-choice"
 
-class QuizItem extends Model {
+class QuizItem extends BaseModel {
   id!: string
   type!: QuizItemType
   validityRegex!: string
@@ -35,7 +35,7 @@ class QuizItem extends Model {
 
   static relationMappings = {
     quiz: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: Quiz,
       join: {
         from: "quiz_item.quiz_id",
@@ -43,7 +43,7 @@ class QuizItem extends Model {
       },
     },
     options: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizOption,
       join: {
         from: "quiz_item.id",
@@ -51,7 +51,7 @@ class QuizItem extends Model {
       },
     },
     texts: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizItemTranslation,
       join: {
         from: "quiz_item.id",
