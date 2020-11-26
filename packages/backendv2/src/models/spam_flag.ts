@@ -71,21 +71,18 @@ class SpamFlag extends BaseModel {
 
         await QuizAnswer.update(quizAnswer, userQuizState, quiz, trx)
 
-        await QuizAnswer.query(trx).upsertGraph(quizAnswer)
+        await QuizAnswer.save(quizAnswer, trx)
 
         // await UserQuizState.query(trx).upsertGraph(userQuizState)
 
         const { userId, quizId, ...data } = userQuizState
 
-        await UserQuizState.query(trx)
-          .update(data)
-          .where("user_id", userId)
-          .andWhere("quiz_id", quizId)
+        await UserQuizState.upsert(userQuizState, trx)
 
-        trx.commit()
+        await trx.commit()
         return newSpamFlag
       } catch (err) {
-        trx.rollback()
+        await trx.rollback()
         throw err
       }
     }
