@@ -140,9 +140,6 @@ const SubmitGroup = styled.div<SubmitGroupProps>`
 `
 
 const OuterDiv = styled.div<{ providedStyles: string | undefined }>`
-  p {
-    margin-bottom: 0 !important;
-  }
   ul {
     padding-inline-start: 30px;
   }

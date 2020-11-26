@@ -794,6 +794,15 @@ export const validation = {
         quizItemId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
         textData: null,
         intData: null,
+        optionAnswers: [
+          {
+            createdAt: expect.stringMatching(dateTime),
+            updatedAt: expect.stringMatching(dateTime),
+            id: "942584cd-1cb1-4d2a-a0c4-3b3f19495b75",
+            quizItemAnswerId: "7f92ac20-f9f2-44eb-a5ea-5192254c394d",
+            quizOptionId: "7c802f5b-52f1-468e-a798-3028edc1d3fd",
+          },
+        ],
         correct: null,
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
@@ -803,6 +812,7 @@ export const validation = {
         quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
         quizItemId: "707195a3-aafe-4c06-bf23-854e54e084db",
         textData: null,
+        optionAnswers: [],
         intData: null,
         correct: null,
         createdAt: expect.stringMatching(dateTime),
