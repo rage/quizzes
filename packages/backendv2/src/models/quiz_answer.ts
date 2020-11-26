@@ -773,7 +773,7 @@ class QuizAnswer extends Model {
     allCandidates = allCandidates.slice(0, 2)
 
     return await this.query()
-      .withGraphJoined("itemAnswers")
+      .withGraphJoined("itemAnswers.[optionAnswers]")
       .whereIn(
         "quiz_answer.id",
         allCandidates.map(c => c.id),

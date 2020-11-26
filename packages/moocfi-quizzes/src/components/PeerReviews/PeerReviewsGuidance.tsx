@@ -14,17 +14,19 @@ type PeerReviewsGuidanceProps = {
   givenLabel: string
   peerReviewsCompletedInfo: string
   guidanceText: string
+  instructionStartRef: React.Ref<HTMLDivElement>
 }
 
 const PeerReviewsGuidance: React.FunctionComponent<PeerReviewsGuidanceProps> = ({
   givenLabel,
   guidanceText,
   peerReviewsCompletedInfo,
+  instructionStartRef,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const quiz = useTypedSelector(state => state.quiz)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
-  const given = userQuizState ? userQuizState.peerReviewsGiven : 0
+  const given = userQuizState?.peerReviewsGiven ?? 0
   const required = (quiz && quiz.course.minPeerReviewsGiven) || 0
 
   const GivenCount = withMargin(BoldTypographyLarge, "2rem 0 0 ")
@@ -32,8 +34,15 @@ const PeerReviewsGuidance: React.FunctionComponent<PeerReviewsGuidanceProps> = (
   React.useEffect(() => console.log("Title rerenders"))
 
   return (
-    <Guidance providedStyles={themeProvider.peerReviewGuidanceStyles}>
-      <GivenCount component="p" variant="subtitle1">
+    <Guidance
+      ref={instructionStartRef}
+      providedStyles={themeProvider.peerReviewGuidanceStyles}
+    >
+      <GivenCount
+        class="scroll-here-when-peer-review-starts"
+        component="p"
+        variant="subtitle1"
+      >
         {givenLabel}: {given}/{required}
       </GivenCount>
       <Instructions Component="p">{guidanceText}</Instructions>

@@ -9,6 +9,7 @@ import {
   WhiteSpacePreservingTypography,
 } from "../styleComponents"
 import { QuizAnswer } from "../../modelTypes"
+import MarkdownText from "../MarkdownText"
 
 interface AnswerPaperProps {
   providedStyles: string | undefined
@@ -39,8 +40,7 @@ const PeerReviewOption: React.FunctionComponent<PeerReviewOptionProps> = ({
     <div style={{ padding: ".5rem 1rem" }}>
       {answer.itemAnswers
         .filter(ia => {
-          const item = quizItemById(ia.quizItemId)
-          return !item || item.type === "essay"
+          return quizItemById(ia.quizItemId)
         })
         .sort((ia1, ia2) => {
           const qi1 = quizItemById(ia1.quizItemId)
@@ -56,9 +56,7 @@ const PeerReviewOption: React.FunctionComponent<PeerReviewOptionProps> = ({
 
           return (
             <React.Fragment key={ia.id}>
-              <Typography component="p" variant="subtitle2">
-                {quizTitle}
-              </Typography>
+              <MarkdownText>{quizTitle}</MarkdownText>
               <AnswerPaper
                 key={ia.id}
                 providedStyles={themeProvider.answerPaperStyles}

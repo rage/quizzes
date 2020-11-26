@@ -67,13 +67,14 @@ const QuestionBlockWrapper = styled.div<QuestionBlockWrapperProps>`
 
 type PeerReviewFormProps = {
   languageInfo: PeerReviewLabels
+  instructionStartRef: React.Ref<HTMLElement>
 }
 
 const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
   languageInfo,
+  instructionStartRef,
 }) => {
   const themeProvider = useContext(ThemeProviderContext)
-  const ref = useState(useRef(null))[0]
   const focusRef = useRef<HTMLParagraphElement>(null)
   const answersToReview = useTypedSelector(state => state.peerReviews.options)
   const peerReview = useTypedSelector(state => state.peerReviews.answer)
@@ -88,7 +89,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
   const unselectAnswer = () => {
     dispatch(peerReviewsActions.unselectAnswer())
 
-    scrollToRef(ref)
+    scrollToRef(instructionStartRef)
   }
 
   if (!answersToReview) {
@@ -123,7 +124,6 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 
     return (
       <Form providedStyles={themeProvider.peerReviewFormStyles}>
-        <div ref={ref} />
         <Instructions ref={focusRef} tabIndex={-1}>
           {languageInfo.chosenEssayInstruction}
         </Instructions>
@@ -137,7 +137,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
           <PeerReviewQuestions
             peerReview={peerReview}
             languageInfo={languageInfo}
-            scrollRef={ref}
+            scrollRef={instructionStartRef}
           />
         </TopMarginDivLarge>
       </Form>
@@ -146,7 +146,6 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
 
   return (
     <Form providedStyles={themeProvider.peerReviewFormStyles}>
-      <div ref={ref} />
       <TopMarginDivLarge>
         <BoldTypographyMedium ref={focusRef} tabIndex={-1}>
           {languageInfo.chooseEssayInstruction}
@@ -161,7 +160,7 @@ const PeerReviewForm: React.FunctionComponent<PeerReviewFormProps> = ({
           <ReportOrSelect
             answer={answer}
             languageInfo={languageInfo}
-            scrollRef={ref}
+            scrollRef={instructionStartRef}
           />
         </TopMarginDivLarge>
       ))}
