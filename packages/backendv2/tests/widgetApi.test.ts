@@ -590,6 +590,10 @@ describe("widget: fetching peer review candidates", () => {
 
 describe("Answer: spam flags", () => {
   beforeAll(async () => {
+    try {
+      nock.cleanAll()
+      await safeClean()
+    } catch (e) {}
     await safeSeed(configA)
   })
 
@@ -600,6 +604,7 @@ describe("Answer: spam flags", () => {
 
   beforeEach(() => {
     nock("https://tmc.mooc.fi")
+      .persist()
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
@@ -650,8 +655,8 @@ describe("Answer: spam flags", () => {
       })
   })
 
-  test("spam flag already given", done => {
-    request(app.callback())
+  test("spam flag already given", async () => {
+    await request(app.callback())
       .post("/api/v2/widget/answers/report-spam")
       .set("Authorization", "bearer PLEB_TOKEN_1")
       .set("Accept", "application/json")
@@ -662,84 +667,72 @@ describe("Answer: spam flags", () => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual("Can only give one spam flag")
       })
-      .expect(400, done)
+      .expect(400)
   })
 
-  test("First spam flag", done => {
-    request(app.callback())
+  test("spam flags lifecycle", async () => {
+    // First spam flag
+    const firstSpamResponse = await request(app.callback())
       .post("/api/v2/widget/answers/report-spam")
       .set("Authorization", "bearer PLEB_TOKEN_2")
       .set("Accept", "application/json")
       .send({
         quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
       })
-      .expect(res => {
-        expect(res.body).toEqual(validation.spamFlagValidator1)
-      })
-      .expect(200, done)
-  })
+    expect(firstSpamResponse.body).toEqual(validation.spamFlagValidator1)
+    expect(firstSpamResponse.status).toEqual(200)
 
-  test("check the answers status", done => {
-    request(app.callback())
+    // check the answers status
+    const answerStatus1 = await request(app.callback())
       .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
       .set("Authorization", "bearer ADMIN_TOKEN")
       .set("Accept", "application/json")
-      .expect(response => {
-        expect(response.body.status).toEqual("given-enough")
-        expect(response.body.userQuizState.spamFlags).toEqual(1)
-      })
-      .expect(200, done)
-  })
+    console.log(answerStatus1.body)
 
-  test("Second spam flag", done => {
-    request(app.callback())
+    expect(answerStatus1.body.status).toEqual("given-enough")
+    expect(answerStatus1.body.userQuizState.spamFlags).toEqual(1)
+    expect(answerStatus1.status).toEqual(200)
+
+    // Second spam flag
+    const secondSpamResponse = await request(app.callback())
       .post("/api/v2/widget/answers/report-spam")
       .set("Authorization", "bearer PLEB_TOKEN_3")
       .set("Accept", "application/json")
       .send({
         quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
       })
-      .expect(response => {
-        expect(response.body).toEqual(validation.spamFlagValidator2)
-      })
-      .expect(200, done)
-  })
+    expect(secondSpamResponse.body).toEqual(validation.spamFlagValidator2)
+    expect(secondSpamResponse.status).toEqual(200)
 
-  test("check the answer status", done => {
-    request(app.callback())
+    // check the answer status
+    const answerStatus2 = await request(app.callback())
       .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
       .set("Authorization", "bearer ADMIN_TOKEN")
       .set("Accept", "application/json")
-      .expect(response => {
-        expect(response.body.userQuizState.spamFlags).toEqual(2)
-        expect(response.body.status).toEqual("given-enough")
-      })
-      .expect(200, done)
-  })
+    console.log(answerStatus2.body)
+    expect(answerStatus2.body.userQuizState.spamFlags).toEqual(2)
+    expect(answerStatus2.body.status).toEqual("given-enough")
+    expect(answerStatus2.status).toEqual(200)
 
-  test("Third spam flag", done => {
-    request(app.callback())
+    // Third spam flag
+    const thirdSpamResponse = await request(app.callback())
       .post("/api/v2/widget/answers/report-spam")
       .set("Authorization", "bearer PLEB_TOKEN_4")
       .set("Accept", "application/json")
       .send({
         quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
       })
-      .expect(response => {
-        expect(response.body).toEqual(validation.spamFlagValidator3)
-      })
-      .expect(200, done)
-  })
+    expect(thirdSpamResponse.body).toEqual(validation.spamFlagValidator3)
+    expect(thirdSpamResponse.status).toEqual(200)
 
-  test("check the answer status", done => {
-    request(app.callback())
+    // check the answer status
+    const answerStatus3 = await request(app.callback())
       .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
       .set("Authorization", "bearer ADMIN_TOKEN")
       .set("Accept", "application/json")
-      .expect(response => {
-        expect(response.body.userQuizState.spamFlags).toEqual(3)
-        expect(response.body.status).toEqual("spam")
-      })
-      .expect(200, done)
+    console.log(answerStatus3.body)
+    expect(answerStatus3.body.userQuizState.spamFlags).toEqual(3)
+    expect(answerStatus3.body.status).toEqual("spam")
+    expect(answerStatus3.status).toEqual(200)
   })
 })

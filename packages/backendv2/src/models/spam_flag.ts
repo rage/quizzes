@@ -1,12 +1,12 @@
-import { Model } from "objection"
 import { BadRequestError } from "../util/error"
 import Quiz from "./quiz"
 import QuizAnswer from "./quiz_answer"
 import User from "./user"
 import UserQuizState from "./user_quiz_state"
 import knex from "../../database/knex"
+import BaseModel from "./base_model"
 
-class SpamFlag extends Model {
+class SpamFlag extends BaseModel {
   id!: string
   userId!: number
   quizAnswerId!: string

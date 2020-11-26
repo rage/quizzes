@@ -27,6 +27,7 @@ class QuizItem extends Model {
   successMessage!: string
   failureMessage!: string
   sharedOptionFeedbackMessage!: string
+  allAnswersCorrect!: string
 
   static get tableName() {
     return "quiz_item"

@@ -1,7 +1,7 @@
 import * as Knex from "knex"
 
 export async function up(knex: Knex): Promise<void> {
-  if (process.env.NODE_ENV !== "test") {
+  if (process.env.NODE_ENV === "production") {
     await knex.raw("DROP MATERIALIZED VIEW reaktor.quiz_item CASCADE")
 
     await knex.schema.alterTable("quiz_item", table => {
@@ -63,7 +63,7 @@ export async function up(knex: Knex): Promise<void> {
         WHERE quiz_item_id IN (
             SELECT id
             FROM reaktor.quiz_item
-        )  
+        )
     `)
 
     await knex.raw(`
@@ -95,7 +95,7 @@ export async function up(knex: Knex): Promise<void> {
     `)
 
     await knex.raw(`
-        CREATE INDEX ON reaktor.quiz_item_answer (id)  
+        CREATE INDEX ON reaktor.quiz_item_answer (id)
     `)
 
     await knex.raw(`
@@ -119,7 +119,7 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-  if (process.env.NODE_ENV !== "test") {
+  if (process.env.NODE_ENV === "production") {
     await knex.raw("DROP MATERIALIZED VIEW reaktor.quiz_item CASCADE")
 
     await knex.schema.alterTable("quiz_item", table => {
@@ -163,7 +163,7 @@ export async function down(knex: Knex): Promise<void> {
         WHERE quiz_item_id IN (
             SELECT id
             FROM reaktor.quiz_item
-        )  
+        )
     `)
 
     await knex.raw(`
@@ -195,7 +195,7 @@ export async function down(knex: Knex): Promise<void> {
     `)
 
     await knex.raw(`
-        CREATE INDEX ON reaktor.quiz_item_answer (id)  
+        CREATE INDEX ON reaktor.quiz_item_answer (id)
     `)
 
     await knex.raw(`

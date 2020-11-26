@@ -470,6 +470,11 @@ class QuizAnswer extends Model {
         continue
       }
 
+      if (quizItem.allAnswersCorrect) {
+        quizItemAnswer.correct = true
+        continue
+      }
+
       switch (quizItem.type) {
         case "open":
           const textData = removeNonPrintingCharacters(quizItemAnswer.textData)
