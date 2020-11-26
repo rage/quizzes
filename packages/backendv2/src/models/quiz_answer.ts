@@ -722,16 +722,18 @@ class QuizAnswer extends Model {
 
     givenPeerReviews.map(pr => pr.rejectedQuizAnswerIds)
 
-    const rejected: string[] = [
-      ...givenPeerReviews.map(pr => pr.rejectedQuizAnswerIds).flat(),
-      ...givenSpamFlags.map(spamFlag => spamFlag.quizAnswerId),
-    ]
+    const rejected: string[] = givenPeerReviews
+      .map(pr => pr.rejectedQuizAnswerIds)
+      .flat()
+
+    const flagged = givenSpamFlags.map(spamFlag => spamFlag.quizAnswerId)
+
+    const alreadyReviewed = givenPeerReviews.map(pr => pr.quizAnswerId)
 
     // query will fail if this array is empty
     rejected.push("d28359ed-fe18-4f79-b1a1-b33ee157d004")
-
-    const alreadyReviewed = givenPeerReviews.map(pr => pr.quizAnswerId)
-    alreadyReviewed.push("cc633ea9-c1e4-4fbd-8627-c6e12daecc96")
+    flagged.push("d28359ed-fe18-4f79-b1a1-b33ee157d004")
+    alreadyReviewed.push("d28359ed-fe18-4f79-b1a1-b33ee157d004")
 
     let allCandidates: any[] = []
     let candidates
@@ -743,6 +745,7 @@ class QuizAnswer extends Model {
         quizId,
         reviewerId,
         rejected,
+        flagged,
         alreadyReviewed,
       )
 
@@ -785,6 +788,7 @@ class QuizAnswer extends Model {
     quizId: string,
     reviewerId: number,
     rejected: string[],
+    flagged: string[],
     alreadyReviewed: string[],
   ): Promise<Array<{ id: string; status: string }> | null> {
     const builder = knex
@@ -794,6 +798,7 @@ class QuizAnswer extends Model {
       .where("quiz_answer.quiz_id", quizId)
       .andWhere("quiz_answer.user_id", "!=", reviewerId)
       .andWhere("quiz_answer.id", "NOT IN", alreadyReviewed)
+      .andWhere("quiz_answer.id", "NOT IN", flagged)
 
     query = this.addCriteriaBasedOnPriority(priority, query, rejected)
 
