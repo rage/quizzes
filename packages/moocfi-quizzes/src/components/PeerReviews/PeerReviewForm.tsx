@@ -37,6 +37,7 @@ interface ButtonWrapperProps {
 const ButtonWrapper = styled.div<ButtonWrapperProps>`
   display: flex;
   margin: 1rem 0 2rem;
+  margin-top: 0;
   button:last-of-type {
     margin-left: auto;
   }

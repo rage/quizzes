@@ -29,7 +29,9 @@ const PeerReviewsGuidance: React.FunctionComponent<PeerReviewsGuidanceProps> = (
   const given = userQuizState?.peerReviewsGiven ?? 0
   const required = (quiz && quiz.course.minPeerReviewsGiven) || 0
 
-  const GivenCount = withMargin(BoldTypographyLarge, "2rem 0 0 ")
+  const GivenCount = styled.b<{ class: string }>`
+    font-size: 1.5rem;
+  `
   const Instructions = withMargin(MarkdownText, "1.5rem 0 0 ")
   React.useEffect(() => console.log("Title rerenders"))
 
@@ -38,11 +40,7 @@ const PeerReviewsGuidance: React.FunctionComponent<PeerReviewsGuidanceProps> = (
       ref={instructionStartRef}
       providedStyles={themeProvider.peerReviewGuidanceStyles}
     >
-      <GivenCount
-        class="scroll-here-when-peer-review-starts"
-        component="p"
-        variant="subtitle1"
-      >
+      <GivenCount class="scroll-here-when-peer-review-starts">
         {givenLabel}: {given}/{required}
       </GivenCount>
       <Instructions Component="p">{guidanceText}</Instructions>
