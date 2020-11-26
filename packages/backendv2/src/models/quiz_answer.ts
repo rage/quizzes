@@ -358,7 +358,7 @@ class QuizAnswer extends BaseModel {
       quizAnswer.languageId = course.languageId
       const userQuizState =
         (await UserQuizState.getByUserAndQuiz(userId, quizId, trx)) ??
-        UserQuizState.fromJson({ userId, quizId })
+        UserQuizState.fromJson({ userId, quizId, tries: 0 })
       this.checkIfSubmittable(quiz, userQuizState)
       await this.assessAnswerStatus(
         quizAnswer,
@@ -369,7 +369,7 @@ class QuizAnswer extends BaseModel {
       )
       this.assessAnswer(quizAnswer, quiz)
       this.gradeAnswer(quizAnswer, userQuizState, quiz)
-      this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
+      this.assessUserQuizStatus(quizAnswer, userQuizState, quiz, false)
       let savedQuizAnswer
       let savedUserQuizState
       await this.markPreviousAsDeprecated(userId, quizId, trx)
@@ -423,7 +423,7 @@ class QuizAnswer extends BaseModel {
     await this.assessAnswerStatus(quizAnswer, userQuizState, quiz, course, trx)
     this.assessAnswer(quizAnswer, quiz)
     this.gradeAnswer(quizAnswer, userQuizState, quiz)
-    this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
+    this.assessUserQuizStatus(quizAnswer, userQuizState, quiz, true)
     if (quizAnswer.status === "confirmed") {
       await UserCoursePartState.update(
         quizAnswer.userId,
@@ -580,8 +580,11 @@ class QuizAnswer extends BaseModel {
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
     quiz: Quiz,
+    update: boolean,
   ) {
-    userQuizState.tries = (userQuizState.tries ?? 0) + 1
+    if (!update) {
+      userQuizState.tries += 1
+    }
     const hasTriesLeft = !quiz.triesLimited || userQuizState.tries < quiz.tries
     const hasPeerReviews = quiz.peerReviews.length > 0
     if (hasTriesLeft) {
