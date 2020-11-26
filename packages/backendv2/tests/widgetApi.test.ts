@@ -688,10 +688,10 @@ describe("Answer: spam flags", () => {
       .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
       .set("Authorization", "bearer ADMIN_TOKEN")
       .set("Accept", "application/json")
-    console.log(answerStatus1.body)
 
     expect(answerStatus1.body.status).toEqual("given-enough")
     expect(answerStatus1.body.userQuizState.spamFlags).toEqual(1)
+    expect(answerStatus1.body.userQuizState.tries).toEqual(1)
     expect(answerStatus1.status).toEqual(200)
 
     // Second spam flag
@@ -710,9 +710,9 @@ describe("Answer: spam flags", () => {
       .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
       .set("Authorization", "bearer ADMIN_TOKEN")
       .set("Accept", "application/json")
-    console.log(answerStatus2.body)
     expect(answerStatus2.body.userQuizState.spamFlags).toEqual(2)
     expect(answerStatus2.body.status).toEqual("given-enough")
+    expect(answerStatus2.body.userQuizState.tries).toEqual(1)
     expect(answerStatus2.status).toEqual(200)
 
     // Third spam flag
@@ -731,9 +731,9 @@ describe("Answer: spam flags", () => {
       .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
       .set("Authorization", "bearer ADMIN_TOKEN")
       .set("Accept", "application/json")
-    console.log(answerStatus3.body)
     expect(answerStatus3.body.userQuizState.spamFlags).toEqual(3)
     expect(answerStatus3.body.status).toEqual("spam")
+    expect(answerStatus3.body.userQuizState.tries).toEqual(1)
     expect(answerStatus3.status).toEqual(200)
   })
 })
