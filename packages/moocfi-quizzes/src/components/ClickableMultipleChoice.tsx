@@ -40,6 +40,8 @@ const ChoicesContainer = styled.div<ChoicesContainerProps>`
 `
 
 const CentralizedOnSmallScreenTypography = styled(Typography)`
+  position: relative;
+  top: 2px;
   @media only screen and (max-width: 600px) {
     text-align: center;
   }
@@ -76,6 +78,7 @@ const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
   box-sizing: border-box;
   padding: 3px;
   padding: 0.5rem 0 0.5rem 0.5rem;
+  margin-top: 1rem;
   margin-bottom: 5px !important;
   p:nth-of-type(1) {
     display: none;
@@ -244,8 +247,6 @@ const Option: React.FunctionComponent<OptionProps> = ({
   shouldBeGray,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
-  const [click, setClick] = React.useState(false)
-  const [clickCount, setClickCount] = React.useState(0)
   const dispatch = useDispatch()
   const items = useTypedSelector(state => state.quiz!.items)
   const item = items.find(i => i.id === option.quizItemId)
@@ -273,10 +274,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
   }
 
   const handleOptionChange = (optionId: string) => () => {
-    setClick(!click)
     dispatch(quizAnswerActions.changeChosenOption(item.id, optionId))
-    console.log(clickCount)
-    console.log(lengthOfSelectedOption)
   }
   const optionAnswers = itemAnswer && itemAnswer.optionAnswers
   /* please use optionAnswers.length to make your life easier */
@@ -285,7 +283,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
   const lengthOfSelectedOption: any = itemAnswer?.optionAnswers.length
 
   const optionIsSelected =
-    optionAnswers && optionAnswers.some(oa => oa.quizOptionId === option.id)
+    (optionAnswers &&
+      optionAnswers.some(oa => oa.quizOptionId === option.id)) ||
+    false
 
   if (!displayFeedback) {
     return (
@@ -299,10 +299,8 @@ const Option: React.FunctionComponent<OptionProps> = ({
           selected={!!optionIsSelected}
           revealed={false}
           correct={false}
-          state={click}
-          /* disable={clickCount >= 5} */
+          state={optionIsSelected}
           onClick={handleOptionChange(option.id)}
-          /* disabled={quizDisabled} */
           disabled={!optionIsSelected && lengthOfSelectedOption >= 5}
           aria-pressed={optionIsSelected}
         >
@@ -328,10 +326,11 @@ const Option: React.FunctionComponent<OptionProps> = ({
         >
           <ClickableChoiceButton
             revealed
-            state={click}
+            state={optionIsSelected}
             onlyOneItem={onlyOneItem}
             selected={!!optionIsSelected}
             correct={option.correct}
+            disabled={!optionIsSelected && lengthOfSelectedOption >= 5}
             {...clickOptions}
             aria-selected={optionIsSelected}
             aria-label={`${text.title}-${
@@ -343,16 +342,6 @@ const Option: React.FunctionComponent<OptionProps> = ({
             </MarkdownText>
           </ClickableChoiceButton>
         </OptionWrapper>
-
-        {optionIsSelected && (
-          <OptionWrapper
-            onlyOneItem={onlyOneItem}
-            shouldBeGray={shouldBeGray}
-            providedStyles={themeProvider.optionWrapperStyles}
-          >
-            {/*<FeedbackPortion item={item} selectedOption={option} />*/}
-          </OptionWrapper>
-        )}
       </React.Fragment>
     )
   }
@@ -363,10 +352,11 @@ const Option: React.FunctionComponent<OptionProps> = ({
       <OptionWrapper onlyOneItem={onlyOneItem} shouldBeGray={shouldBeGray}>
         <ClickableChoiceButton
           revealed
-          state={click}
+          state={optionIsSelected}
           onlyOneItem={onlyOneItem}
           selected={!!optionIsSelected}
           correct={option.correct}
+          disabled={!optionIsSelected && lengthOfSelectedOption >= 5}
           {...clickOptions}
           aria-selected={optionIsSelected}
           aria-label={`${text.title}-${

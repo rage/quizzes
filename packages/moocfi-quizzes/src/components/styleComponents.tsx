@@ -55,7 +55,7 @@ export const BoldTypographyLarge = styled(BoldTypography)`
 `
 
 export const SpaciousDiv = styled.div`
-  padding-bottom: 0.75rem;
+  padding-bottom: 0;
 `
 
 export const withMargin = (
