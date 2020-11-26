@@ -1,8 +1,8 @@
 import { EditCoursePayloadFields } from "./../types/index"
-import Model from "./base_model"
+import BaseModel from "./base_model"
 import Course from "./course"
 
-class CourseTranslation extends Model {
+class CourseTranslation extends BaseModel {
   languageId!: string
   title!: string
   body!: string
@@ -18,7 +18,7 @@ class CourseTranslation extends Model {
 
   static relationMappings = {
     course: {
-      relation: Model.HasOneRelation,
+      relation: BaseModel.HasOneRelation,
       modelClass: Course,
       join: {
         from: "course_translation.course_id",

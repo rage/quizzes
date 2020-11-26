@@ -1,12 +1,12 @@
 import { BadRequestError } from "./../util/error"
-import Model from "./base_model"
 import User from "./user"
 import Knex from "knex"
 import Course from "./course"
 import { PointsByGroup } from "../types"
 import Quiz from "./quiz"
+import BaseModel from "./base_model"
 
-class UserCoursePartState extends Model {
+class UserCoursePartState extends BaseModel {
   userId!: number
   courseId!: string
   coursePart!: number
@@ -23,7 +23,7 @@ class UserCoursePartState extends Model {
 
   static relationMappings = {
     user: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: User,
       join: {
         from: "user_course_part_state.user_id",
@@ -31,7 +31,7 @@ class UserCoursePartState extends Model {
       },
     },
     quiz: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: Course,
       join: {
         from: "user_course_part_state.course_id",

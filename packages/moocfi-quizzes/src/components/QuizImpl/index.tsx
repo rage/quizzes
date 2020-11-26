@@ -133,6 +133,7 @@ interface SubmitGroupProps {
 const SubmitGroup = styled.div<SubmitGroupProps>`
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   > :last-child {
     margin-left: 1rem;
   }
