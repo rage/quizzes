@@ -4,9 +4,9 @@ import QuizAnswer from "./quiz_answer"
 import User from "./user"
 import UserQuizState from "./user_quiz_state"
 import knex from "../../database/knex"
-import BaseModel from "./base_model"
+import Model from "./base_model"
 
-class SpamFlag extends BaseModel {
+class SpamFlag extends Model {
   id!: string
   userId!: number
   quizAnswerId!: string
@@ -36,9 +36,14 @@ class SpamFlag extends BaseModel {
 
   public static async reportSpam(
     quizAnswerId: string,
-    userId: number,
+    flaggingUserId: number,
   ): Promise<SpamFlag | BadRequestError> {
-    if (await this.getSpamFlagByUserIdAndQuizAnswerId(userId, quizAnswerId)) {
+    if (
+      await this.getSpamFlagByUserIdAndQuizAnswerId(
+        flaggingUserId,
+        quizAnswerId,
+      )
+    ) {
       throw new BadRequestError("Can only give one spam flag")
     } else {
       const quizAnswer = await QuizAnswer.getById(quizAnswerId)
@@ -59,7 +64,7 @@ class SpamFlag extends BaseModel {
       try {
         const newSpamFlag = await this.query(trx).insertAndFetch(
           this.fromJson({
-            userId,
+            userId: flaggingUserId,
             quizAnswerId,
           }),
         )
@@ -68,7 +73,15 @@ class SpamFlag extends BaseModel {
 
         await QuizAnswer.query(trx).upsertGraph(quizAnswer)
 
-        await UserQuizState.query(trx).upsertGraph(userQuizState)
+        // await UserQuizState.query(trx).upsertGraph(userQuizState)
+
+        const { userId, quizId, ...data } = userQuizState
+
+        await UserQuizState.query(trx)
+          .update(data)
+          .where("user_id", userId)
+          .andWhere("quiz_id", quizId)
+
         trx.commit()
         return newSpamFlag
       } catch (err) {

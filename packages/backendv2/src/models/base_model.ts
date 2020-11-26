@@ -1,9 +1,9 @@
 import { Model } from "objection"
 
 class BaseModel extends Model {
-  public updatedAt!: string
+  public updatedAt!: Date
   $beforeUpdate() {
-    this.updatedAt = new Date().toISOString()
+    this.updatedAt = new Date()
   }
 }
 
