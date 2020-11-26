@@ -82,10 +82,10 @@ class SpamFlag extends BaseModel {
           .where("user_id", userId)
           .andWhere("quiz_id", quizId)
 
-        trx.commit()
+        await trx.commit()
         return newSpamFlag
       } catch (err) {
-        trx.rollback()
+        await trx.rollback()
         throw err
       }
     }

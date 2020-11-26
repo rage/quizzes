@@ -150,7 +150,7 @@ class PeerReview extends BaseModel {
       await UserQuizState.query(trx).upsertGraph(sourceUserQuizState)
       await UserQuizState.query(trx).upsertGraph(targetUserQuizState)
 
-      trx.commit()
+      await trx.commit()
 
       return {
         peerReview: newPeerReview,
@@ -158,7 +158,7 @@ class PeerReview extends BaseModel {
         userQuizState: sourceUserQuizState,
       }
     } catch (err) {
-      trx.rollback()
+      await trx.rollback()
       throw err
     }
   }
