@@ -389,6 +389,8 @@ const transformData = (
       .reduce((a, b) => a + b, 0)
   }
 
+  n_points = Math.floor(n_points * 100) / 100
+
   return {
     completed,
     points_to_pass,
