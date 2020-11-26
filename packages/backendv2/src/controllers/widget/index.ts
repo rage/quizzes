@@ -21,10 +21,15 @@ const widget = new Router<CustomState, CustomContext>({
     const userId = ctx.state.user.id
     const userQuizState = await UserQuizState.getByUserAndQuiz(userId, quizId)
     const quizAnswer = await QuizAnswer.getByUserAndQuiz(userId, quizId)
-    const quiz =
-      userQuizState?.status === "locked"
-        ? await Quiz.getById(quizId)
-        : await Quiz.getByIdStripped(quizId)
+    let canSeeAnswers = false
+    const strippedQuiz = await Quiz.getByIdStripped(quizId)
+    if (
+      userQuizState?.status === "locked" ||
+      (userQuizState?.pointsAwarded || 0) >= strippedQuiz.points
+    ) {
+      canSeeAnswers = true
+    }
+    const quiz = canSeeAnswers ? await Quiz.getById(quizId) : strippedQuiz
     const course = await Course.getById(quiz.courseId)
     quiz.course = course
     ctx.body = {
