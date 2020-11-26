@@ -1,7 +1,7 @@
-import Model from "./base_model"
+import BaseModel from "./base_model"
 import PeerReviewQuestion from "./peer_review_question"
 
-class PeerReviewQuestionTranslation extends Model {
+class PeerReviewQuestionTranslation extends BaseModel {
   title!: string
   body!: string
   peerReviewQuestionId!: string
@@ -19,7 +19,7 @@ class PeerReviewQuestionTranslation extends Model {
 
   static relationMappings = {
     question: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: PeerReviewQuestion,
       join: {
         from: "peer_review_question_translation.peer_review_question_id",

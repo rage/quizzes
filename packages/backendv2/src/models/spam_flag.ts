@@ -17,7 +17,7 @@ class SpamFlag extends Model {
 
   static relationMappings = {
     user: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: User,
       join: {
         from: "spam_flag.user_id",
@@ -25,7 +25,7 @@ class SpamFlag extends Model {
       },
     },
     quizAnswer: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: `${__dirname}/quiz_answer`,
       join: {
         from: "spam_flag.quiz_answer_id",

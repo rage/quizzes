@@ -1,6 +1,5 @@
 import Knex from "knex"
 import { NotFoundError } from "./../util/error"
-import Model from "./base_model"
 import QuizItemAnswer from "./quiz_item_answer"
 import User from "./user"
 import PeerReview from "./peer_review"
@@ -15,6 +14,7 @@ import UserCoursePartState from "./user_course_part_state"
 import * as Kafka from "../services/kafka"
 import SpamFlag from "./spam_flag"
 import _ from "lodash"
+import BaseModel from "./base_model"
 
 type QuizAnswerStatus =
   | "draft"
@@ -32,7 +32,7 @@ type QuizAnswerStatus =
   | "rejected"
   | "deprecated"
 
-class QuizAnswer extends Model {
+class QuizAnswer extends BaseModel {
   id!: string
   userId!: number
   quizId!: string
@@ -50,7 +50,7 @@ class QuizAnswer extends Model {
 
   static relationMappings = {
     user: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: User,
       join: {
         from: "quiz_answer.user_id",
@@ -58,7 +58,7 @@ class QuizAnswer extends Model {
       },
     },
     itemAnswers: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizItemAnswer,
       join: {
         from: "quiz_answer.id",
@@ -66,7 +66,7 @@ class QuizAnswer extends Model {
       },
     },
     peerReviews: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: PeerReview,
       join: {
         from: "quiz_answer.id",
@@ -74,7 +74,7 @@ class QuizAnswer extends Model {
       },
     },
     userQuizState: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: UserQuizState,
       join: {
         from: ["quiz_answer.user_id", "quiz_answer.quiz_id"],
@@ -82,7 +82,7 @@ class QuizAnswer extends Model {
       },
     },
     quiz: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: `${__dirname}/quiz`,
       join: {
         from: "quiz_answer.quiz_id",
@@ -90,7 +90,7 @@ class QuizAnswer extends Model {
       },
     },
     spamFlags: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: SpamFlag,
       join: {
         from: "quiz_answer.id",

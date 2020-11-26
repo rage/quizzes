@@ -1,7 +1,7 @@
-import Model from "./base_model"
+import BaseModel from "./base_model"
 import QuizItem from "./quiz_item"
 
-class QuizItemTranslation extends Model {
+class QuizItemTranslation extends BaseModel {
   title!: string
   body!: string
   successMessage!: string
@@ -18,7 +18,7 @@ class QuizItemTranslation extends Model {
 
   static relationMappings = {
     quizItem: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: QuizItem,
       join: {
         from: "quiz_item_translation.quiz_item_id",

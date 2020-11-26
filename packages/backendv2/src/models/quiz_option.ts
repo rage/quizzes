@@ -1,8 +1,8 @@
-import Model from "./base_model"
+import BaseModel from "./base_model"
 import QuizItem from "./quiz_item"
 import QuizOptionTranslation from "./quiz_option_translation"
 
-class QuizOption extends Model {
+class QuizOption extends BaseModel {
   id!: string
   correct!: boolean
   texts!: QuizOptionTranslation[]
@@ -17,7 +17,7 @@ class QuizOption extends Model {
 
   static relationMappings = {
     quizItem: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: QuizItem,
       join: {
         from: "quiz_option.quiz_item_id",
@@ -25,7 +25,7 @@ class QuizOption extends Model {
       },
     },
     texts: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizOptionTranslation,
       join: {
         from: "quiz_option.id",

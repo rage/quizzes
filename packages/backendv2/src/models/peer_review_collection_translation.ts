@@ -1,7 +1,7 @@
-import Model from "./base_model"
+import BaseModel from "./base_model"
 import PeerReviewCollection from "./peer_review_collection"
 
-class PeerReviewCollectionTranslation extends Model {
+class PeerReviewCollectionTranslation extends BaseModel {
   title!: string
   body!: string
 
@@ -15,7 +15,7 @@ class PeerReviewCollectionTranslation extends Model {
 
   static relationMappings = {
     collection: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: PeerReviewCollection,
       join: {
         from: "peer_review_collection_translation.peer_review_collection_id",
