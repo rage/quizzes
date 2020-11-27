@@ -719,7 +719,6 @@ describe("Answer: spam flags", () => {
 
     console.log(answerStatus2.body)
 
-
     // Third spam flag
     const thirdSpamResponse = await request(app.callback())
       .post("/api/v2/widget/answers/report-spam")

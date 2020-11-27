@@ -820,34 +820,6 @@ export async function up(knex: Knex): Promise<any> {
         .notNullable()
     })
   }
-
-  await knex.raw(`
-    CREATE OR REPLACE FUNCTION trigger_set_timestamp()
-    RETURNS TRIGGER AS $$
-    BEGIN
-      IF row(NEW.*) IS DISTINCT FROM row(OLD.*) THEN
-          NEW.updated_at = now();
-          RETURN NEW;
-      ELSE
-          RETURN OLD;
-      END IF;
-    END;
-    $$ language 'plpgsql'
-  `)
-
-  await knex.raw(`
-    CREATE TRIGGER set_timestamp
-    BEFORE UPDATE ON quiz_item
-    FOR EACH ROW
-    EXECUTE PROCEDURE trigger_set_timestamp()
-  `)
-
-  await knex.raw(`
-    CREATE TRIGGER set_timestamp
-    BEFORE UPDATE ON user_quiz_state
-    FOR EACH ROW
-    EXECUTE PROCEDURE trigger_set_timestamp()
-  `)
 }
 
 export async function down(knex: Knex): Promise<any> {}
