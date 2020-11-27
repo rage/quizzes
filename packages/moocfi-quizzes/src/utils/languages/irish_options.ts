@@ -32,7 +32,8 @@ const finnishLabels: SingleLanguageLabels = {
   },
   peerReviews: {
     loadingLabel: "Ag lódáil",
-    noPeerAnswersAvailableLabel: "Níl aon fhreagra ar fáil don athbhreithniú piaraí",
+    noPeerAnswersAvailableLabel:
+      "Níl aon fhreagra ar fáil don athbhreithniú piaraí",
     chooseButtonLabel: "Roghnaigh",
     unselectButtonLabel: "Cuir an roghnú ar ceal",
     chooseEssayInstruction: "Pioc rogha amháin le hathbhreithniú",
@@ -52,7 +53,8 @@ const finnishLabels: SingleLanguageLabels = {
     answerRejected: "Diúltaíodh don fhreagra uait",
     answerFlaggedAsSpam: "Tuairiscíodh an freagra uait mar thurscar",
     answerConfirmed: "Glacadh leis an bhfreagra uait!",
-    manualReview: "Tá an freagra uait á athbhreithniú ag baill foirne an chúrsa",
+    manualReview:
+      "Tá an freagra uait á athbhreithniú ag baill foirne an chúrsa",
     peerReviewGroupTitle: "Vertaisarviointikysymykset",
     peerReviewLikertDetails:
       "Arvioi jokainen väite asteikolla 1-5. 1 on vahvasti eri mieltä ja 5 on vahvasti samaa mieltä.",
@@ -70,7 +72,8 @@ const finnishLabels: SingleLanguageLabels = {
     toggleButtonExpandLabel: "Taispeáin gach athbhreithniú piaraí a fuarthas",
     toggleButtonShrinkLabel: "Cuir na hathbhreithnithe piaraí i bhfolach",
     averageOfGradesLabel: "Is é meánghrád na n-athbhreithnithe a fuarthas ná",
-    detailedViewLabel: "Gach athbhreithniú atá faighte i leith an fhreagra uait",
+    detailedViewLabel:
+      "Gach athbhreithniú atá faighte i leith an fhreagra uait",
     summaryViewLabel: "Athbhreithnithe piaraí atá faighte:",
     peerReviewLabel: "Athbhreithniú piaraí",
     peerReviewReceived: "Fuair tú athbhreithniú piaraí nua",
@@ -94,7 +97,8 @@ const finnishLabels: SingleLanguageLabels = {
     evaluationStageLabel: "Ag fanacht ar ghrádú",
   },
   general: {
-    pastDeadline: "Ní féidir leat freagra a thabhairt ar an gcleachtadh seo a thuilleadh",
+    pastDeadline:
+      "Ní féidir leat freagra a thabhairt ar an gcleachtadh seo a thuilleadh",
     answerMissingBecauseQuizModifiedLabel:
       "Ceist nár freagraíodh. Is dócha gur athraíodh an cleachtadh tar éis duit freagra a thabhairt.",
     submitButtonLabel: "Seol",
@@ -141,8 +145,7 @@ const finnishLabels: SingleLanguageLabels = {
     quizLoadFailedError: "Níorbh fhéidir an cleachtadh a lódáil",
     progressFetchError:
       "Níorbh fhéidir na sonraí faoin dul chun cinn sa chúrsa a aisghabháil. Bain triail as arís ar ball.",
-    submitSpamFlagError:
-      "Níorbh fhéidir turscar a thuairisciú",
+    submitSpamFlagError: "Níorbh fhéidir turscar a thuairisciú",
     fetchReviewCandidatesError:
       "Tharla fadhb agus na freagraí don athbhreithniú piaraí á n-aisghabháil. Bain triail as arís ar ball.",
   },
