@@ -103,6 +103,7 @@ describe("widget: save quiz answer", () => {
       .set("Accept", "application/json")
       .send(input.quizAnswerOpen)
       .expect(200)
+      .expect(response => console.log(response.body))
       .end(done)
   })
 })
