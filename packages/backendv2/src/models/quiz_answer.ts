@@ -360,6 +360,7 @@ class QuizAnswer extends BaseModel {
         (await UserQuizState.getByUserAndQuiz(userId, quizId, trx)) ??
         UserQuizState.fromJson({ userId, quizId, tries: 0 })
       this.checkIfSubmittable(quiz, userQuizState)
+      this.removeIds(quizAnswer)
       await this.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -373,7 +374,6 @@ class QuizAnswer extends BaseModel {
       let savedQuizAnswer
       let savedUserQuizState
       await this.markPreviousAsDeprecated(userId, quizId, trx)
-      this.removeIds(quizAnswer)
       savedQuizAnswer = await this.query(trx).insertGraphAndFetch(quizAnswer)
       savedUserQuizState = await UserQuizState.query(trx).upsertGraphAndFetch(
         userQuizState,
