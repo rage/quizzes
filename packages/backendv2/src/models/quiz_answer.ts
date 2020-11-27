@@ -15,6 +15,7 @@ import * as Kafka from "../services/kafka"
 import SpamFlag from "./spam_flag"
 import _ from "lodash"
 import BaseModel from "./base_model"
+import QuizOptionAnswer from "./quiz_option_answer"
 
 type QuizAnswerStatus =
   | "draft"
@@ -123,8 +124,8 @@ class QuizAnswer extends BaseModel {
     return quizAnswer
   }
 
-  public static async getById(quizAnswerId: string) {
-    const quizAnswer = await this.query()
+  public static async getById(quizAnswerId: string, trx?: Knex.Transaction) {
+    const quizAnswer = await this.query(trx)
       .findById(quizAnswerId)
       .withGraphFetched("itemAnswers.[optionAnswers]")
 
@@ -143,6 +144,28 @@ class QuizAnswer extends BaseModel {
         .andWhere("quiz_id", quizId)
         .andWhereNot("status", "deprecated")
     )[0]
+  }
+
+  public static async save(quizAnswer: QuizAnswer, trx: Knex.Transaction) {
+    const { id, itemAnswers, ...parentData } = quizAnswer
+    await this.query(trx)
+      .update(parentData)
+      .where("id", id)
+    for (const itemAnswer of itemAnswers) {
+      const { id, optionAnswers, ...itemAnswerData } = itemAnswer
+      await QuizItemAnswer.query(trx)
+        .update(itemAnswerData)
+        .where("id", id)
+      if (optionAnswers) {
+        for (const optionAnswer of optionAnswers) {
+          const { id, ...optionAnswerData } = optionAnswer
+          await QuizOptionAnswer.query(trx)
+            .update(optionAnswerData)
+            .where("id", id)
+        }
+      }
+    }
+    return await this.getById(id, trx)
   }
 
   public static async getPaginatedByQuizId(
@@ -375,12 +398,7 @@ class QuizAnswer extends BaseModel {
       let savedUserQuizState
       await this.markPreviousAsDeprecated(userId, quizId, trx)
       savedQuizAnswer = await this.query(trx).insertGraphAndFetch(quizAnswer)
-      savedUserQuizState = await UserQuizState.query(trx).upsertGraphAndFetch(
-        userQuizState,
-        {
-          insertMissing: true,
-        },
-      )
+      savedUserQuizState = await UserQuizState.upsert(userQuizState, trx)
       if (savedQuizAnswer.status === "confirmed") {
         await UserCoursePartState.update(
           savedQuizAnswer.userId,

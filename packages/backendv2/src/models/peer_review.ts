@@ -143,12 +143,12 @@ class PeerReview extends BaseModel {
       await QuizAnswer.update(targetQuizAnswer, targetUserQuizState, quiz, trx)
 
       // TODO: upsert needed until QuizAnswer.update() saves to db
-      await QuizAnswer.query(trx).upsertGraph(sourceQuizAnswer)
-      await QuizAnswer.query(trx).upsertGraph(targetQuizAnswer)
+      await QuizAnswer.save(sourceQuizAnswer, trx)
+      await QuizAnswer.save(targetQuizAnswer, trx)
 
       // update quiz states for both users
-      await UserQuizState.query(trx).upsertGraph(sourceUserQuizState)
-      await UserQuizState.query(trx).upsertGraph(targetUserQuizState)
+      await UserQuizState.upsert(sourceUserQuizState, trx)
+      await UserQuizState.upsert(targetUserQuizState, trx)
 
       await trx.commit()
 
