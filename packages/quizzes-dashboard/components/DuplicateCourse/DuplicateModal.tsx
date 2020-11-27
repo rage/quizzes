@@ -1,6 +1,12 @@
 import React, { useState } from "react"
 import styled from "styled-components"
-import { Button, TextField, Snackbar } from "@material-ui/core"
+import {
+  Button,
+  TextField,
+  Snackbar,
+  Typography,
+  Fade,
+} from "@material-ui/core"
 import usePromise from "react-use-promise"
 import { Course } from "../../types/Quiz"
 import {
@@ -41,6 +47,24 @@ const StyledTextField = styled(TextField)`
   margin-top: 1.5rem !important;
 `
 
+const MessageBox = styled.div<{ success: boolean }>`
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  width: 40%;
+  border-style: solid;
+  border-radius: 5px !important;
+  border-width: 5px !important;
+  border-color: ${props => {
+    if (props.success) {
+      return "#76ff03"
+    } else {
+      return "#ef5350"
+    }
+  }};
+`
+
 interface DuplicateModalProps {
   course: Course
 }
@@ -60,9 +84,11 @@ export const DuplicateModal = ({ course }: DuplicateModalProps) => {
       showResponse(true)
       setSuccess(true)
       getCorrespondenceFile(res.newCourseId, course.id)
+      setTimeout(() => showResponse(false), 3000)
     } else {
       showResponse(true)
       setSuccess(false)
+      setTimeout(() => showResponse(false), 3000)
     }
   }
 
@@ -132,7 +158,7 @@ export const DuplicateModal = ({ course }: DuplicateModalProps) => {
                 renderInput={params => (
                   <StyledTextField
                     {...params}
-                    label="Courses"
+                    label="Languages"
                     variant="outlined"
                     fullWidth
                     helperText="Tip: You can type part of language in the field to sort out options"
@@ -148,6 +174,15 @@ export const DuplicateModal = ({ course }: DuplicateModalProps) => {
                 Duplicate course
               </SubmitButton>
             </SubmitButtonWrapper>
+            <Fade in={response}>
+              <MessageBox success={success}>
+                {success ? (
+                  <Typography>Course duplicated succesfully!</Typography>
+                ) : (
+                  <Typography>Something went wrong!</Typography>
+                )}
+              </MessageBox>
+            </Fade>
           </InputWrapper>
         </>
       )}

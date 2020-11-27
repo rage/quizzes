@@ -31,7 +31,7 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
 
   const dispatch = useDispatch()
   const option = item.options[0]
-  const { body, title } = option.texts[0]
+  const { body, title } = option
 
   const toggle = () =>
     dispatch(quizAnswerActions.changeCheckboxData(item.id, option.id))

@@ -13,6 +13,7 @@ const AddQuizItemWrapper = styled.div`
 
 const TypeContainer = styled.div`
   display: flex;
+  flex-wrap: wrap;
   justify-content: space-between;
   width: 100%;
   margin-top: 1rem;
@@ -26,6 +27,8 @@ const types = [
   "multiple-choice",
   "checkbox",
   "custom-frontend-accept-data",
+  "multiple-choice-dropdown",
+  "clickable-multiple-choice",
 ]
 
 export const AddQuizItem = () => {

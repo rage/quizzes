@@ -14,7 +14,7 @@ export const postAnswer = async (
   address?: string,
 ): Promise<AnswerResponse> => {
   const response = await axios.post(
-    `${address || BASE_URL}/api/v1/quizzes/answer`,
+    `${address || BASE_URL}/api/v2/widget/answer`,
     quizAnswer,
     {
       headers: { authorization: `Bearer ${accessToken}` },

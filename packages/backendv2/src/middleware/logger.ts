@@ -3,11 +3,15 @@ import winston, { format } from "winston"
 import { v4 as uuidv4 } from "uuid"
 
 const myFormat = format.printf(
-  ({ level, message, timestamp, requestId, ...metadata }) => {
-    return `${timestamp} [${requestId ||
+  ({ level, message, timestamp, requestId, stack, ...metadata }) => {
+    const logMessage = `${timestamp} [${requestId ||
       "00000000-0000-0000-0000-000000000000"}] ${level}: ${message}, ${JSON.stringify(
       metadata,
     )}`
+    if (stack) {
+      return `${logMessage}\n${stack}`
+    }
+    return logMessage
   },
 )
 
@@ -18,6 +22,7 @@ export const GlobalLogger = winston.createLogger({
       format: "YYYY-MM-DD HH:mm:ss",
     }),
     format.colorize(),
+    format.errors({ stack: true }),
     myFormat,
   ),
   transports: [new winston.transports.Console()],
@@ -42,6 +47,7 @@ const loggerMiddleware = async (
     const ms = Date.now() - start
     log.error(`Crashed ${ctx.request.method} ${ctx.req.url} in ${ms}ms`, {
       error: e.message,
+      stack: e.stack,
     })
     throw e
   }

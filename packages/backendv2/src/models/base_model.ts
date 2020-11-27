@@ -2,7 +2,8 @@ import { Model } from "objection"
 
 class BaseModel extends Model {
   public updatedAt!: string
-  $beforeUpdate() {
+  async $beforeUpdate(opt: any, queryContext: any) {
+    await super.$beforeUpdate(opt, queryContext)
     this.updatedAt = new Date().toISOString()
   }
 }

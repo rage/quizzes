@@ -123,13 +123,13 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
 
   if (onlyOneItem) {
     const maxOptionLength = Math.max(
-      ...options.map(option => option.texts[0].title.length),
+      ...options.map(option => option.title.length),
     )
     direction = "column"
   }
 
   return (
-    <div role="group" aria-label={item.texts[0].title}>
+    <div role="group" aria-label={item.title}>
       <ItemContent
         direction={direction}
         providedStyles={themeProvider.multipleChoiceItemContentStyles}
@@ -195,7 +195,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
     ? multipleChoiceLabels.selectCorrectAnswerLabel
     : ""
 
-  const { title, body } = item.texts[0]
+  const { title, body } = item
 
   return (
     <QuestionContainer>
@@ -263,7 +263,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
   )
 
   const onlyOneItem = items.length === 1
-  const text = option.texts[0]
+  const text = option
 
   if (!itemAnswer && !quizDisabled) {
     return <div>Answer cannot be retrieved</div>
@@ -415,18 +415,18 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   let feedbackMessage
   if (
     item.usesSharedOptionFeedbackMessage &&
-    item.texts[0].sharedOptionFeedbackMessage !== undefined
+    item.sharedOptionFeedbackMessage !== undefined
   ) {
-    feedbackMessage = item.texts[0].sharedOptionFeedbackMessage
+    feedbackMessage = item.sharedOptionFeedbackMessage
   } else {
     const optionSuccess = selectedOption
-      ? selectedOption.texts[0].successMessage
+      ? selectedOption.successMessage
       : undefined
     const optionFailure = selectedOption
-      ? selectedOption.texts[0].failureMessage
+      ? selectedOption.failureMessage
       : undefined
 
-    const text = item.texts[0]
+    const text = item
     const successMessage =
       optionSuccess || text.successMessage || generalLabels.answerCorrectLabel
     const failureMessage =

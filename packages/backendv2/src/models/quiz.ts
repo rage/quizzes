@@ -1,4 +1,3 @@
-import Model from "./base_model"
 import QuizItem from "./quiz_item"
 import QuizTranslation from "./quiz_translation"
 import PeerReviewCollection from "./peer_review_collection"
@@ -13,8 +12,10 @@ import Knex from "knex"
 import UserQuizState from "./user_quiz_state"
 import * as Kafka from "../services/kafka"
 import PeerReviewQuestion from "./peer_review_question"
+import { NotNullViolationError } from "objection"
+import BaseModel from "./base_model"
 
-export class Quiz extends Model {
+export class Quiz extends BaseModel {
   id!: string
   courseId!: string
   part!: number
@@ -41,7 +42,7 @@ export class Quiz extends Model {
 
   static relationMappings = {
     items: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizItem,
       join: {
         from: "quiz.id",
@@ -49,7 +50,7 @@ export class Quiz extends Model {
       },
     },
     texts: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizTranslation,
       join: {
         from: "quiz.id",
@@ -57,7 +58,7 @@ export class Quiz extends Model {
       },
     },
     peerReviews: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: PeerReviewCollection,
       join: {
         from: "quiz.id",
@@ -65,7 +66,7 @@ export class Quiz extends Model {
       },
     },
     course: {
-      relation: Model.HasOneRelation,
+      relation: BaseModel.HasOneRelation,
       modelClass: Course,
       join: {
         from: "quiz.course_id",
@@ -73,7 +74,7 @@ export class Quiz extends Model {
       },
     },
     answers: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizAnswer,
       join: {
         from: "quiz.id",
@@ -81,7 +82,7 @@ export class Quiz extends Model {
       },
     },
     userQuizStates: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: UserQuizState,
       join: {
         from: "quiz.id",
@@ -89,7 +90,7 @@ export class Quiz extends Model {
       },
     },
     peerReviewQuestions: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: PeerReviewQuestion,
       join: {
         from: "quiz.id",
@@ -203,7 +204,10 @@ export class Quiz extends Model {
       await trx.commit()
     } catch (error) {
       await trx.rollback()
-      throw new BadRequestError(error)
+      if (error instanceof NotNullViolationError) {
+        throw new BadRequestError(error)
+      }
+      throw error
     }
     return this.moveTextsToParent(savedQuiz)
   }
@@ -240,10 +244,26 @@ export class Quiz extends Model {
     return this.moveTextsToParent(quiz)
   }
 
+  static async getByIdStripped(quizId: string) {
+    const quiz = await this.getById(quizId)
+    delete quiz.submitMessage
+    for (const quizItem of quiz.items) {
+      delete quizItem.successMessage
+      delete quizItem.failureMessage
+      delete quizItem.sharedOptionFeedbackMessage
+      delete quizItem.validityRegex
+      for (const quizOption of quizItem.options) {
+        delete quizOption.successMessage
+        delete quizOption.failureMessage
+        delete quizOption.correct
+      }
+    }
+    return quiz
+  }
+
   static async getPreviewById(quizId: string) {
     const quiz = (
       await this.query()
-        .modify("previewSelect")
         .withGraphJoined("texts(previewSelect)")
         .where("quiz.id", quizId)
     )[0]

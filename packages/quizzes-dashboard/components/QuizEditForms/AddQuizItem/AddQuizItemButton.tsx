@@ -10,6 +10,13 @@ const StyledButton = styled(Button)`
   background: #e0e0e0 !important;
   width: 16% !important;
   overflow: hidden !important;
+  margin-top: 1rem !important;
+  @media only screen and (max-width: 600px) {
+    display: flex !important;
+    background: #e0e0e0 !important;
+    width: 100% !important;
+    overflow: hidden !important;
+  },
 `
 
 interface ButtonProps {

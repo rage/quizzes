@@ -57,9 +57,9 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
   const openLabels = languageInfo.open
 
   const answerLocked = userQuizState && userQuizState.status === "locked"
-  const itemTitle = item.texts[0].title
+  const itemTitle = item.title
 
-  const { successMessage, failureMessage } = item.texts[0]
+  const { successMessage, failureMessage } = item
 
   const singleItemQuiz = quiz && quiz.items.length === 1
 
@@ -76,7 +76,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
       >
         {itemTitle}
       </MarkdownText>
-      <MarkdownText variant="body1">{item.texts[0].body}</MarkdownText>
+      <MarkdownText variant="body1">{item.body}</MarkdownText>
     </>
   )
 
