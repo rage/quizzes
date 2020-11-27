@@ -103,7 +103,6 @@ describe("widget: save quiz answer", () => {
       .set("Accept", "application/json")
       .send(input.quizAnswerOpen)
       .expect(200)
-      .expect(response => console.log(response.body))
       .end(done)
   })
 })
@@ -689,8 +688,6 @@ describe("Answer: spam flags", () => {
       .set("Authorization", "bearer ADMIN_TOKEN")
       .set("Accept", "application/json")
 
-    console.log(answerStatus1.body)
-
     expect(answerStatus1.body.status).toEqual("given-enough")
     expect(answerStatus1.body.userQuizState.spamFlags).toEqual(1)
     expect(answerStatus1.body.userQuizState.tries).toEqual(1)
@@ -716,8 +713,6 @@ describe("Answer: spam flags", () => {
     expect(answerStatus2.body.status).toEqual("given-enough")
     expect(answerStatus2.body.userQuizState.tries).toEqual(1)
     expect(answerStatus2.status).toEqual(200)
-
-    console.log(answerStatus2.body)
 
     // Third spam flag
     const thirdSpamResponse = await request(app.callback())
