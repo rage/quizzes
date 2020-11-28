@@ -11,6 +11,10 @@ export const SizeSelectorContainer = styled.div`
 
 export const SizeSelectorField = styled(TextField)`
   display: flex !important;
+  @media only screen and (max-width: 600px) {
+    width: 100% !important;
+    margin-top: 1rem !important;
+  }
 `
 
 export const PaginationField = styled.div`
@@ -37,10 +41,18 @@ export const OptionsContainer = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
+  @media only screen and (max-width: 600px) {
+    width: 100% !important;
+    flex-wrap: wrap;
+  }
 `
 export const SortOrderField = styled(TextField)`
   display: flex !important;
   width: 33%;
+  @media only screen and (max-width: 600px) {
+    width: 100% !important;
+    margin-top: 1rem !important;
+  }
 `
 
 export const FilterParamsField = styled.div`

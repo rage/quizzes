@@ -44,6 +44,9 @@ export const AnswerListWrapper = ({
     [quizId, page, size, order, filterparameters],
   )
 
+  const number: Number = window.innerWidth
+  console.log(number)
+
   if (!answers) {
     return (
       <>
@@ -69,8 +72,8 @@ export const AnswerListWrapper = ({
     <>
       <PaginationField>
         <Paginator
-          siblingCount={2}
-          boundaryCount={2}
+          // siblingCount={2}
+          // boundaryCount={2}
           count={Math.ceil(answers.total / size)}
           size="large"
           color="primary"
@@ -95,7 +98,7 @@ export const AnswerListWrapper = ({
           showFirstButton
           showLastButton
           page={page}
-          onChange={(event, nextPage) => handlePageChange(nextPage)}
+          onChange={(_event, nextPage) => handlePageChange(nextPage)}
         />
       </PaginationField>
     </>

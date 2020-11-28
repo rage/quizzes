@@ -25,11 +25,17 @@ const SortSelector = styled(TextField)`
   display: flex !important;
   width: 25% !important;
   margin-right: 1rem !important;
+  @media only screen and (max-width: 600px) {
+    width: 100% !important;
+  }
 `
 
 const OrderSelector = styled(TextField)`
   display: flex !important;
   width: 25% !important;
+  @media only screen and (max-width: 600px) {
+    width: 100% !important;
+  }
 `
 
 const OptionWrapper = styled.div`
@@ -38,6 +44,9 @@ const OptionWrapper = styled.div`
   margin-top: 1rem;
   margin-bottom: 1rem;
   width: 100%;
+  @media only screen and (max-width: 600px) {
+    justify-content: space-between;
+  }
 `
 
 interface CourseListProps {

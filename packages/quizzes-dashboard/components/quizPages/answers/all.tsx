@@ -245,15 +245,6 @@ export const AllAnswers = () => {
       <TabText text="All answers" />
       <QuizTitle quiz={quiz} course={course} />
       <OptionsContainer>
-        <SwitchField>
-          <Typography>Expand all</Typography>
-          <Switch
-            checked={expandAll}
-            onChange={event => {
-              handleFieldChange(event, "expand")
-            }}
-          />
-        </SwitchField>
         <SizeSelectorField
           value={answersDisplayed}
           size="medium"
@@ -310,6 +301,15 @@ export const AllAnswers = () => {
           )
         })}
       </FilterParamsField>
+      <SwitchField>
+        <Typography>Expand all</Typography>
+        <Switch
+          checked={expandAll}
+          onChange={event => {
+            handleFieldChange(event, "expand")
+          }}
+        />
+      </SwitchField>
       <AnswerListWrapper
         expandAll={expandAll}
         filterparameters={filterParameters}

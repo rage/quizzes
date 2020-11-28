@@ -15,19 +15,7 @@ fontAwesomeConfig.autoAddCss = false
 
 const textScalar = {
   "@media only screen and (max-width:600px)": {
-    fontSize: "60%",
-  },
-  "@media only screen and (min-width:600px)": {
-    fontSize: "70%",
-  },
-  "@media only screen and (min-width:768px)": {
-    fontSize: "80%",
-  },
-  "@media only screen and (min-width:992px)": {
     fontSize: "90%",
-  },
-  "@media only screen and (min-width:1200px)": {
-    fontSize: "100%",
   },
 }
 
