@@ -20,7 +20,9 @@ CREATE INDEX idx_fts_answer ON public.quiz_item_answer USING gin(document);
 `
 
 export async function up(knex: Knex): Promise<any> {
-  await knex.schema.raw(addAnswerIndex)
+  if (process.env.NODE_ENV !== "test") {
+    await knex.schema.raw(addAnswerIndex)
+  }
 }
 
 export async function down(knex: Knex): Promise<any> {}
