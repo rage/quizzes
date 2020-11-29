@@ -19,6 +19,10 @@ const FormElementContainer = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+
+  button {
+    margin-left: 2rem;
+  }
 `
 
 const AnswerSearchForm = (props: IFormProps) => {
@@ -29,8 +33,9 @@ const AnswerSearchForm = (props: IFormProps) => {
 
   const { handleSubmit } = props
 
-  const handleClick = () => {
+  const handleSearchClearance = () => {
     handleSubmit("")
+    setSearchQuery("")
     setDisplayingResultsFor(null)
   }
 
@@ -51,23 +56,17 @@ const AnswerSearchForm = (props: IFormProps) => {
             value={searchQuery}
             onChange={event => setSearchQuery(event.target.value)}
             variant="outlined"
-            helperText="Enter a keyphrase to search for"
+            helperText="Enter a search phrase"
           />
           <Button
             type="submit"
             variant="contained"
             color="primary"
             disabled={props.fetchingAnswers || false}
-            style={{ marginLeft: 30 }}
           >
             Search
           </Button>
-          <Button
-            onClick={handleClick}
-            variant="contained"
-            disabled={props.fetchingAnswers || false}
-            style={{ marginLeft: 30 }}
-          >
+          <Button onClick={handleSearchClearance} variant="contained">
             Clear Search
           </Button>
         </FormElementContainer>

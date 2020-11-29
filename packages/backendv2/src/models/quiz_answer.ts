@@ -367,6 +367,7 @@ class QuizAnswer extends BaseModel {
     }
     const trx = await knex.transaction()
     try {
+      // get quizAnswer by provided id
       let quizAnswer = (
         await this.query(trx)
           .where("quiz_answer.id", answerId)
@@ -375,32 +376,42 @@ class QuizAnswer extends BaseModel {
       )[0]
       const userQuizState = quizAnswer.userQuizState
       const quiz = quizAnswer.quiz
+
+      const triesAreNotLimited = !quiz.triesLimited
+      const userHasTriesLeft = userQuizState.tries < quiz.tries
+
       if (status === "confirmed") {
         await userQuizState.$query(trx).patch({ pointsAwarded: quiz.points })
-      } else if (!quiz.triesLimited || userQuizState.tries < quiz.tries) {
+      } else if (triesAreNotLimited || userHasTriesLeft) {
         await userQuizState
           .$query(trx)
           .patch({ peerReviewsReceived: 0, spamFlags: 0, status: "open" })
       }
+
       quizAnswer = await quizAnswer.$query(trx).patchAndFetch({ status })
+
       await UserCoursePartState.update(
         quizAnswer.userId,
         quiz.courseId,
         quiz.part,
         trx,
       )
+
       await Kafka.broadcastQuizAnswerUpdated(
         quizAnswer,
         userQuizState,
         quiz,
         trx,
       )
+
       await Kafka.broadcastUserProgressUpdated(
         quizAnswer.userId,
         quiz.courseId,
         trx,
       )
+
       await trx.commit()
+
       return quizAnswer
     } catch (error) {
       await trx.rollback()
