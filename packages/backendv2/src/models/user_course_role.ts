@@ -1,7 +1,7 @@
-import Model from "./base_model"
+import BaseModel from "./base_model"
 import User from "./user"
 
-class UserCourseRole extends Model {
+class UserCourseRole extends BaseModel {
   userId!: string
   courseId!: string
   role!: string
@@ -10,7 +10,7 @@ class UserCourseRole extends Model {
   }
   static relationMappings = {
     user: {
-      relation: Model.HasOneRelation,
+      relation: BaseModel.HasOneRelation,
       modelClass: User,
       join: {
         from: "user_course_role.user_id",

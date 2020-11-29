@@ -619,6 +619,7 @@ describe("dashboard: get answer by id", () => {
           return [
             200,
             {
+              id: 999889,
               administrator: true,
             } as UserInfo,
           ]
@@ -646,6 +647,7 @@ describe("dashboard: get answer by id", () => {
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(response => {
         const received = response.body
+        console.log(received)
         expect(received).toStrictEqual(validation.quizAnswerValidator1)
       })
       .expect(200, done)

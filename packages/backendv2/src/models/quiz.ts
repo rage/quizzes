@@ -1,4 +1,3 @@
-import Model from "./base_model"
 import QuizItem from "./quiz_item"
 import QuizTranslation from "./quiz_translation"
 import PeerReviewCollection from "./peer_review_collection"
@@ -14,8 +13,9 @@ import UserQuizState from "./user_quiz_state"
 import * as Kafka from "../services/kafka"
 import PeerReviewQuestion from "./peer_review_question"
 import { NotNullViolationError } from "objection"
+import BaseModel from "./base_model"
 
-export class Quiz extends Model {
+export class Quiz extends BaseModel {
   id!: string
   courseId!: string
   part!: number
@@ -42,7 +42,7 @@ export class Quiz extends Model {
 
   static relationMappings = {
     items: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizItem,
       join: {
         from: "quiz.id",
@@ -50,7 +50,7 @@ export class Quiz extends Model {
       },
     },
     texts: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizTranslation,
       join: {
         from: "quiz.id",
@@ -58,7 +58,7 @@ export class Quiz extends Model {
       },
     },
     peerReviews: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: PeerReviewCollection,
       join: {
         from: "quiz.id",
@@ -66,7 +66,7 @@ export class Quiz extends Model {
       },
     },
     course: {
-      relation: Model.HasOneRelation,
+      relation: BaseModel.HasOneRelation,
       modelClass: Course,
       join: {
         from: "quiz.course_id",
@@ -74,7 +74,7 @@ export class Quiz extends Model {
       },
     },
     answers: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizAnswer,
       join: {
         from: "quiz.id",
@@ -82,7 +82,7 @@ export class Quiz extends Model {
       },
     },
     userQuizStates: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: UserQuizState,
       join: {
         from: "quiz.id",
@@ -90,7 +90,7 @@ export class Quiz extends Model {
       },
     },
     peerReviewQuestions: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: PeerReviewQuestion,
       join: {
         from: "quiz.id",

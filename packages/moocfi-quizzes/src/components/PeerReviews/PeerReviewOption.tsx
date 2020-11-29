@@ -8,13 +8,15 @@ import {
   SpaciousPaper,
   WhiteSpacePreservingTypography,
 } from "../styleComponents"
-import { QuizAnswer } from "../../modelTypes"
+import { QuizAnswer, QuizItemOption } from "../../modelTypes"
+import MarkdownText from "../MarkdownText"
 
 interface AnswerPaperProps {
   providedStyles: string | undefined
 }
 
 const AnswerPaper = styled(SpaciousPaper)<AnswerPaperProps>`
+  margin-bottom: 2rem;
   ${({ providedStyles }) => providedStyles}
 `
 
@@ -39,8 +41,7 @@ const PeerReviewOption: React.FunctionComponent<PeerReviewOptionProps> = ({
     <div style={{ padding: ".5rem 1rem" }}>
       {answer.itemAnswers
         .filter(ia => {
-          const item = quizItemById(ia.quizItemId)
-          return !item || item.type === "essay"
+          return quizItemById(ia.quizItemId)
         })
         .sort((ia1, ia2) => {
           const qi1 = quizItemById(ia1.quizItemId)
@@ -53,19 +54,37 @@ const PeerReviewOption: React.FunctionComponent<PeerReviewOptionProps> = ({
         .map(ia => {
           const quizItem = quizItemById(ia.quizItemId)
           const quizTitle = quizItem ? quizItem.title : ""
+          let chosenOptions = null
+
+          if (ia.optionAnswers && ia.optionAnswers.length > 0) {
+            const selectedQuizOptionIds = ia.optionAnswers.map(
+              oa => oa.quizOptionId,
+            )
+            const selectedOptions = quizItem?.options?.filter(option =>
+              selectedQuizOptionIds.includes(option.id),
+            )
+            if (selectedOptions && selectedOptions.length > 0) {
+              chosenOptions = selectedOptions.map(o => o.title).join(", ")
+            }
+          }
 
           return (
             <React.Fragment key={ia.id}>
-              <Typography component="p" variant="subtitle2">
-                {quizTitle}
-              </Typography>
+              <MarkdownText>{quizTitle}</MarkdownText>
               <AnswerPaper
                 key={ia.id}
                 providedStyles={themeProvider.answerPaperStyles}
               >
-                <WhiteSpacePreservingTypography variant="body1">
-                  {ia.textData}
-                </WhiteSpacePreservingTypography>
+                {chosenOptions && (
+                  <WhiteSpacePreservingTypography variant="body1">
+                    {chosenOptions}
+                  </WhiteSpacePreservingTypography>
+                )}
+                {ia.textData && (
+                  <WhiteSpacePreservingTypography variant="body1">
+                    {ia.textData}
+                  </WhiteSpacePreservingTypography>
+                )}
               </AnswerPaper>
             </React.Fragment>
           )

@@ -3,7 +3,7 @@ import * as React from "react"
 import styled from "styled-components"
 import { Typography } from "@material-ui/core"
 import { TypographyProps } from "@material-ui/core/Typography"
-import { SpaciousTypography } from "./styleComponents"
+import { SpaciousDiv, SpaciousTypography } from "./styleComponents"
 
 interface IMarkdownTextProps extends TypographyProps {
   children: string
@@ -15,7 +15,7 @@ interface IMarkdownTextProps extends TypographyProps {
 const MarkdownText: React.FunctionComponent<IMarkdownTextProps> = ({
   children,
   text,
-  Component = SpaciousTypography,
+  Component = SpaciousDiv,
   removeParagraphs,
   ...others
 }) => {
