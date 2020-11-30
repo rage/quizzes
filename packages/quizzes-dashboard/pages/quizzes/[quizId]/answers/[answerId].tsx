@@ -69,7 +69,13 @@ export const AnswerById = () => {
   return (
     <>
       <TabText text="Singular answer" />
-      <AnswerCard answer={answerResponse} expanded={expanded} />
+      <AnswerCard
+        answer={answerResponse}
+        expanded={expanded}
+        bulkSelectMode={false}
+        bulkStatus=""
+        selectedAnswerIds={[]}
+      />
     </>
   )
 }

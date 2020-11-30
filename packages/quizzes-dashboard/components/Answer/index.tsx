@@ -57,7 +57,7 @@ export interface AnswerProps {
   bulkSelectMode: boolean
   bulkStatus: string
   selectedAnswerIds: string[]
-  setSelectedAnswerIds: React.Dispatch<React.SetStateAction<string[]>>
+  setSelectedAnswerIds?: React.Dispatch<React.SetStateAction<string[]>>
 }
 
 export const AnswerCard = ({
@@ -73,20 +73,20 @@ export const AnswerCard = ({
   const [checked, setChecked] = useState(false)
 
   useEffect(() => {
-    setStatus(bulkStatus)
+    bulkStatus && setStatus(bulkStatus)
     setChecked(selectedAnswerIds.includes(answer.id))
   }, [selectedAnswerIds, bulkStatus])
 
   const handleAnswerSelection = () => {
-    let updatedIds
+    let updatedIds = []
 
-    if (selectedAnswerIds.includes(answer.id)) {
+    if (selectedAnswerIds?.includes(answer.id)) {
       updatedIds = selectedAnswerIds.filter(id => id !== answer.id)
     } else {
-      updatedIds = [...selectedAnswerIds, answer.id]
+      updatedIds = [...(selectedAnswerIds || []), answer.id]
     }
 
-    setSelectedAnswerIds(updatedIds)
+    setSelectedAnswerIds && setSelectedAnswerIds(updatedIds)
 
     setChecked(!checked)
   }
@@ -109,7 +109,7 @@ export const AnswerCard = ({
         faded={
           faded ||
           (bulkStatus === ("confirmed" || "rejected") &&
-            selectedAnswerIds.includes(answer.id))
+            selectedAnswerIds?.includes(answer.id))
         }
         status={status}
       >

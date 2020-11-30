@@ -21,6 +21,7 @@ import { TAnswersDisplayed, TSortOptions } from "./types"
 import SkeletonLoader from "../../Shared/SkeletonLoader"
 import AnswerSearchForm from "../../AnswerSearchForm"
 import AnswerListWrapper from "../../Answer/AnswerListWrapper"
+import { Answer } from "../../../types/Answer"
 
 export const RequiringAttention = () => {
   const route = useRouter()
@@ -55,7 +56,14 @@ export const RequiringAttention = () => {
     [currentPage, answersDisplayed, sortOrder],
   )
 
-  const [searchResults, setSearchResults] = useState<any>(null)
+  const [searchResults, setSearchResults] = useState<
+    | {
+        results: Answer[]
+        total: number
+      }
+    | undefined
+    | null
+  >(null)
   const [fetchingAnswers, setFetchingAnswers] = useState(false)
 
   const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [])
