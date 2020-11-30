@@ -23,6 +23,13 @@ const FormElementContainer = styled.div`
   button {
     margin-left: 2rem;
   }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    button {
+      margin: 1rem 0;
+    }
+  }
 `
 
 const AnswerSearchForm = (props: IFormProps) => {
