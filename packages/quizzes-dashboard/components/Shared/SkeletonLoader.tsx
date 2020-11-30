@@ -10,9 +10,14 @@ export const SkeletonLoader = ({
 }) => {
   return (
     <>
-      {Array(skeletonCount).fill(
-        <StyledSkeleton variant="rect" height={height} animation="wave" />,
-      )}
+      {Array.from({ length: skeletonCount }, (_, i) => (
+        <StyledSkeleton
+          key={i}
+          variant="rect"
+          height={height}
+          animation="wave"
+        />
+      ))}
     </>
   )
 }

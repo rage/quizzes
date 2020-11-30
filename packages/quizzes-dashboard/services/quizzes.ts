@@ -203,6 +203,23 @@ export const changeAnswerStatus = async (
   throw new Error()
 }
 
+export const changeAnswerStatusForMany = async (
+  answerIds: string[],
+  status: string,
+): Promise<Answer[]> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (
+      await api.post(`/answers/status`, { status, answerIds }, config)
+    ).data
+    return response
+  }
+  throw new Error()
+}
+
 export const getAllLanguages = async (): Promise<{
   id: string
   name: string
