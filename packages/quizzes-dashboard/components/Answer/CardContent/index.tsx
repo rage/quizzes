@@ -18,6 +18,7 @@ import Peerreviews from "./Peerreviews"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWindowClose } from "@fortawesome/free-solid-svg-icons"
 import DebugDialog from "../../DebugDialog"
+import { editableAnswerStates } from "../constants"
 
 export const ContentContainer = styled.div`
   display: flex !important;
@@ -96,23 +97,14 @@ export const AnswerContent = ({
   const [height, setHeight] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
 
-  const editableAnswerStates = [
-    "manual-review",
-    "given-enough",
-    "given-more-than-enough",
-    "manual-review-once-given-and-received-enough",
-    "manual-review-once-given-enough",
-    "enough-received-but-not-given",
-    "submitted",
-    "rejected",
-  ]
-
   useEffect(() => setShowMore(expanded), [expanded])
+
   useEffect(() => {
     if (handled) {
       setFaded(true)
     }
   }, [handled])
+
   useLayoutEffect(() => {
     if (ref.current !== null) {
       setHeight(ref.current.clientHeight)
@@ -153,7 +145,7 @@ export const AnswerContent = ({
         </ContentContainer>
       </Collapse>
       <ContentContainer>
-        {answer.peerReviews.length > 0 ? (
+        {answer.peerReviews.length > 0 && (
           <PeerreviewButton
             variant="outlined"
             title=":D"
@@ -161,8 +153,6 @@ export const AnswerContent = ({
           >
             <Typography variant="subtitle2">Show Peerreviews</Typography>
           </PeerreviewButton>
-        ) : (
-          ""
         )}
       </ContentContainer>
       <StatsContainer>
@@ -183,15 +173,13 @@ export const AnswerContent = ({
           </>
         )}
       </StatButtonWrapper>
-      {editableAnswerStates.includes(answer.status) ? (
+      {editableAnswerStates.includes(answer.status) && (
         <ManualReviewField
           answer={answer}
           handled={handled}
           setHandled={setHandled}
           setStatus={setStatus}
         />
-      ) : (
-        ""
       )}
     </>
   )

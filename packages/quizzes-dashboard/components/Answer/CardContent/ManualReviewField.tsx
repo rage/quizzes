@@ -9,8 +9,8 @@ import { TransitionProps } from "@material-ui/core/transitions"
 export const ButtonField = styled.div`
   padding: 1rem;
   display: flex;
-  width: 100%;
   justify-content: space-around;
+  width: 100%;
 `
 
 export const AcceptButton = styled(Button)`
@@ -27,14 +27,13 @@ export const RejectButton = styled(Button)`
 
 export interface ManualReviewProps {
   answer: Answer
-  handled: boolean
+  handled?: boolean
   setHandled: (handled: boolean) => void
   setStatus: (accepted: string) => void
 }
 
 export const ManualReviewField = ({
   answer,
-  handled,
   setHandled,
   setStatus,
 }: ManualReviewProps) => {
