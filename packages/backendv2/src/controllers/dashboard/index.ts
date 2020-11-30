@@ -124,6 +124,14 @@ const dashboard = new Router<CustomState, CustomContext>({
     ctx.body = await QuizAnswer.setManualReviewStatus(answerId, status)
   })
 
+  .post("/answers/status", accessControl(), async ctx => {
+    const answerIds = ctx.request.body.answerIds
+    const status = ctx.request.body.status
+    const courseId = await getCourseIdByAnswerId(answerIds[0])
+    await checkAccessOrThrow(ctx.state.user, courseId, "edit")
+    ctx.body = await QuizAnswer.setManualReviewStatusForMany(answerIds, status)
+  })
+
   .get("/answers/:answerId", accessControl(), async ctx => {
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
