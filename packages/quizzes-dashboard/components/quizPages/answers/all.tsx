@@ -25,6 +25,7 @@ import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
 import AnswerListWrapper from "../../Answer/AnswerListWrapper"
 import SkeletonLoader from "../../Shared/SkeletonLoader"
 import AnswerSearchForm from "../../AnswerSearchForm"
+import { Answer } from "../../../types/Answer"
 
 // TODO: refactor/move
 const StyledChip = styled(Chip)<ChipProps>`
@@ -81,7 +82,14 @@ export const AllAnswers = () => {
     [quizId, currentPage, answersDisplayed, sortOrder, filterParameters],
   )
 
-  const [searchResults, setSearchResults] = useState<any>(null)
+  const [searchResults, setSearchResults] = useState<
+    | {
+        results: Answer[]
+        total: number
+      }
+    | undefined
+    | null
+  >(null)
 
   const [fetchingAnswers, setFetchingAnswers] = useState(false)
 
@@ -368,7 +376,13 @@ export const AllAnswers = () => {
         page={currentPage}
         answersError={answersError}
         fetchingAnswers={fetchingAnswers}
-        answers={searchResults ? searchResults : allAnswers}
+        answers={
+          searchResults
+            ? searchResults
+            : allAnswers
+            ? allAnswers
+            : { results: [], total: 0 }
+        }
       />
     </>
   )
