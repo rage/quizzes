@@ -358,6 +358,19 @@ class QuizAnswer extends BaseModel {
     return paginated
   }
 
+  public static async setManualReviewStatusForMany(
+    answerIds: string[],
+    status: QuizAnswerStatus,
+  ) {
+    let promises: Promise<QuizAnswer>[] = []
+
+    answerIds.forEach(answerId => {
+      promises.push(this.setManualReviewStatus(answerId, status))
+    })
+
+    return Promise.all(promises)
+  }
+
   public static async setManualReviewStatus(
     answerId: string,
     status: QuizAnswerStatus,
