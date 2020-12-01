@@ -55,6 +55,7 @@ export interface QuizAnswerMessage {
   service_id: string
   required_actions: RequiredAction[] | null
   message_format_version: number
+  attempted: boolean
 }
 
 export interface QuizMessage {

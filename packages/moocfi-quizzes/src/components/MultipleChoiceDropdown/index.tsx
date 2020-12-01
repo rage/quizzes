@@ -51,7 +51,7 @@ const ItemContent = styled.div<ItemContentProps>`
   margin-bottom: 10px;
   > div:first-of-type {
     display: grid;
-    grid-template-columns: 1fr 40%;
+    grid-template-columns: 1fr 30%;
     justify-content: space-between;
     flex-direction: ${({ direction }) => direction};
   }

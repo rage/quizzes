@@ -25,10 +25,16 @@ export const createdNewPeerReview = createAction(
   }),
 )<{ newId: string; quizId: string }>()
 
+export const deletePeerReview = createAction(
+  "DELETED_PEER_REVIEW",
+  (peerReviewId: string) => ({ peerReviewId: peerReviewId }),
+)<{ peerReviewId: string }>()
+
 const peerReviewActions = [
   editedPeerReviewTitle,
   editedPeerReviewBody,
   createdNewPeerReview,
+  deletePeerReview,
 ]
 
 export default peerReviewActions

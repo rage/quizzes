@@ -3,13 +3,18 @@ import { useTypedSelector } from "../../../../store/store"
 import { QuestionEditor } from "./QuestionEditor"
 import styled from "styled-components"
 import { Typography, Divider, Button } from "@material-ui/core"
-import { faAngleUp, faAngleDown } from "@fortawesome/free-solid-svg-icons"
+import {
+  faAngleUp,
+  faAngleDown,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useDispatch } from "react-redux"
 import {
   decreasedPRQOrder,
   increasedPRQOrder,
   createdNewPeerReviewQuestion,
+  deletedPRQ,
 } from "../../../../store/editor/questions/questionActions"
 
 const StyledPRQEditor = styled.div`
@@ -102,6 +107,16 @@ export const QuestionEditorWrapper = ({
                   onClick={() => dispatch(increasedPRQOrder(question.id))}
                 >
                   <FontAwesomeIcon icon={faAngleDown} size="2x" />
+                </Button>
+                <Button
+                  title="delete question"
+                  onClick={() =>
+                    dispatch(
+                      deletedPRQ(question.id, question.peerReviewCollectionId),
+                    )
+                  }
+                >
+                  <FontAwesomeIcon icon={faTrash} size="2x" color="red" />
                 </Button>
               </QuestionTitleWrapper>
               <QuestionEditor key={question.id} id={question.id} />

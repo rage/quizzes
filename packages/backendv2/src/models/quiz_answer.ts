@@ -1,6 +1,5 @@
 import Knex from "knex"
 import { NotFoundError } from "./../util/error"
-import Model from "./base_model"
 import QuizItemAnswer from "./quiz_item_answer"
 import User from "./user"
 import PeerReview from "./peer_review"
@@ -15,6 +14,8 @@ import UserCoursePartState from "./user_course_part_state"
 import * as Kafka from "../services/kafka"
 import SpamFlag from "./spam_flag"
 import _ from "lodash"
+import BaseModel from "./base_model"
+import QuizOptionAnswer from "./quiz_option_answer"
 
 type QuizAnswerStatus =
   | "draft"
@@ -32,7 +33,7 @@ type QuizAnswerStatus =
   | "rejected"
   | "deprecated"
 
-class QuizAnswer extends Model {
+class QuizAnswer extends BaseModel {
   id!: string
   userId!: number
   quizId!: string
@@ -50,7 +51,7 @@ class QuizAnswer extends Model {
 
   static relationMappings = {
     user: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: User,
       join: {
         from: "quiz_answer.user_id",
@@ -58,7 +59,7 @@ class QuizAnswer extends Model {
       },
     },
     itemAnswers: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizItemAnswer,
       join: {
         from: "quiz_answer.id",
@@ -66,7 +67,7 @@ class QuizAnswer extends Model {
       },
     },
     peerReviews: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: PeerReview,
       join: {
         from: "quiz_answer.id",
@@ -74,7 +75,7 @@ class QuizAnswer extends Model {
       },
     },
     userQuizState: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: UserQuizState,
       join: {
         from: ["quiz_answer.user_id", "quiz_answer.quiz_id"],
@@ -82,7 +83,7 @@ class QuizAnswer extends Model {
       },
     },
     quiz: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: `${__dirname}/quiz`,
       join: {
         from: "quiz_answer.quiz_id",
@@ -90,7 +91,7 @@ class QuizAnswer extends Model {
       },
     },
     spamFlags: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: SpamFlag,
       join: {
         from: "quiz_answer.id",
@@ -123,8 +124,8 @@ class QuizAnswer extends Model {
     return quizAnswer
   }
 
-  public static async getById(quizAnswerId: string) {
-    const quizAnswer = await this.query()
+  public static async getById(quizAnswerId: string, trx?: Knex.Transaction) {
+    const quizAnswer = await this.query(trx)
       .findById(quizAnswerId)
       .withGraphFetched("itemAnswers.[optionAnswers]")
 
@@ -143,6 +144,28 @@ class QuizAnswer extends Model {
         .andWhere("quiz_id", quizId)
         .andWhereNot("status", "deprecated")
     )[0]
+  }
+
+  public static async save(quizAnswer: QuizAnswer, trx: Knex.Transaction) {
+    const { id, itemAnswers, ...parentData } = quizAnswer
+    await this.query(trx)
+      .update(parentData)
+      .where("id", id)
+    for (const itemAnswer of itemAnswers) {
+      const { id, optionAnswers, ...itemAnswerData } = itemAnswer
+      await QuizItemAnswer.query(trx)
+        .update(itemAnswerData)
+        .where("id", id)
+      if (optionAnswers) {
+        for (const optionAnswer of optionAnswers) {
+          const { id, ...optionAnswerData } = optionAnswer
+          await QuizOptionAnswer.query(trx)
+            .update(optionAnswerData)
+            .where("id", id)
+        }
+      }
+    }
+    return await this.getById(id, trx)
   }
 
   public static async getPaginatedByQuizId(
@@ -358,8 +381,9 @@ class QuizAnswer extends Model {
       quizAnswer.languageId = course.languageId
       const userQuizState =
         (await UserQuizState.getByUserAndQuiz(userId, quizId, trx)) ??
-        UserQuizState.fromJson({ userId, quizId })
+        UserQuizState.fromJson({ userId, quizId, tries: 0 })
       this.checkIfSubmittable(quiz, userQuizState)
+      this.removeIds(quizAnswer)
       await this.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -369,18 +393,12 @@ class QuizAnswer extends Model {
       )
       this.assessAnswer(quizAnswer, quiz)
       this.gradeAnswer(quizAnswer, userQuizState, quiz)
-      this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
+      this.assessUserQuizStatus(quizAnswer, userQuizState, quiz, false)
       let savedQuizAnswer
       let savedUserQuizState
       await this.markPreviousAsDeprecated(userId, quizId, trx)
-      this.removeIds(quizAnswer)
       savedQuizAnswer = await this.query(trx).insertGraphAndFetch(quizAnswer)
-      savedUserQuizState = await UserQuizState.query(trx).upsertGraphAndFetch(
-        userQuizState,
-        {
-          insertMissing: true,
-        },
-      )
+      savedUserQuizState = await UserQuizState.upsert(userQuizState, trx)
       if (savedQuizAnswer.status === "confirmed") {
         await UserCoursePartState.update(
           savedQuizAnswer.userId,
@@ -423,7 +441,7 @@ class QuizAnswer extends Model {
     await this.assessAnswerStatus(quizAnswer, userQuizState, quiz, course, trx)
     this.assessAnswer(quizAnswer, quiz)
     this.gradeAnswer(quizAnswer, userQuizState, quiz)
-    this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
+    this.assessUserQuizStatus(quizAnswer, userQuizState, quiz, true)
     if (quizAnswer.status === "confirmed") {
       await UserCoursePartState.update(
         quizAnswer.userId,
@@ -460,18 +478,19 @@ class QuizAnswer extends Model {
     if (!quizItemAnswers || quizItemAnswers.length === 0) {
       throw new BadRequestError("item answers missing")
     }
-    // TODO: this kinda problematic when editing quizzes with existing answers
-    if (quizItemAnswers.length != quizItems.length) {
-      throw new BadRequestError(
-        "cannot assess answer because not all quiz items have answers",
-      )
-    }
     for (const quizItemAnswer of quizItemAnswers) {
       const quizItem = quizItems.find(
         item => item.id === quizItemAnswer.quizItemId,
       )
       if (!quizItem) {
-        throw new BadRequestError("invalid quiz item id")
+        // If the quiz item has been deleted
+        quizItemAnswer.correct = false
+        continue
+      }
+
+      if (quizItem.allAnswersCorrect) {
+        quizItemAnswer.correct = true
+        continue
       }
 
       switch (quizItem.type) {
@@ -557,29 +576,33 @@ class QuizAnswer extends Model {
     userQuizState: UserQuizState,
     quiz: Quiz,
   ) {
-    if (quizAnswer.status === "confirmed") {
-      if (quiz.awardPointsEvenIfWrong) {
-        userQuizState.pointsAwarded = quiz.points
-        return
-      }
-      const quizItemAnswers = quizAnswer.itemAnswers
-      const nCorrect = quizItemAnswers.filter(
-        itemAnswer => itemAnswer.correct === true,
-      ).length
-      const total = quizItemAnswers.length
-      const points = (nCorrect / total) * quiz.points
-      const pointsAwarded = userQuizState.pointsAwarded ?? 0
-      userQuizState.pointsAwarded =
-        points > pointsAwarded ? points : pointsAwarded
+    if (quizAnswer.status !== "confirmed") {
+      return
     }
+    if (quiz.awardPointsEvenIfWrong) {
+      userQuizState.pointsAwarded = quiz.points
+      return
+    }
+    const quizItemAnswers = quizAnswer.itemAnswers
+    const nCorrect = quizItemAnswers.filter(
+      itemAnswer => itemAnswer.correct === true,
+    ).length
+    const total = quizItemAnswers.length
+    const points = (nCorrect / total) * quiz.points
+    const pointsAwarded = userQuizState.pointsAwarded ?? 0
+    userQuizState.pointsAwarded =
+      points > pointsAwarded ? points : pointsAwarded
   }
 
   private static assessUserQuizStatus(
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
     quiz: Quiz,
+    update: boolean,
   ) {
-    userQuizState.tries = (userQuizState.tries ?? 0) + 1
+    if (!update) {
+      userQuizState.tries += 1
+    }
     const hasTriesLeft = !quiz.triesLimited || userQuizState.tries < quiz.tries
     const hasPeerReviews = quiz.peerReviews.length > 0
     if (hasTriesLeft) {
@@ -725,16 +748,18 @@ class QuizAnswer extends Model {
 
     givenPeerReviews.map(pr => pr.rejectedQuizAnswerIds)
 
-    const rejected: string[] = [
-      ...givenPeerReviews.map(pr => pr.rejectedQuizAnswerIds).flat(),
-      ...givenSpamFlags.map(spamFlag => spamFlag.quizAnswerId),
-    ]
+    const rejected: string[] = givenPeerReviews
+      .map(pr => pr.rejectedQuizAnswerIds)
+      .flat()
+
+    const flagged = givenSpamFlags.map(spamFlag => spamFlag.quizAnswerId)
+
+    const alreadyReviewed = givenPeerReviews.map(pr => pr.quizAnswerId)
 
     // query will fail if this array is empty
     rejected.push("d28359ed-fe18-4f79-b1a1-b33ee157d004")
-
-    const alreadyReviewed = givenPeerReviews.map(pr => pr.quizAnswerId)
-    alreadyReviewed.push("cc633ea9-c1e4-4fbd-8627-c6e12daecc96")
+    flagged.push("d28359ed-fe18-4f79-b1a1-b33ee157d004")
+    alreadyReviewed.push("d28359ed-fe18-4f79-b1a1-b33ee157d004")
 
     let allCandidates: any[] = []
     let candidates
@@ -746,6 +771,7 @@ class QuizAnswer extends Model {
         quizId,
         reviewerId,
         rejected,
+        flagged,
         alreadyReviewed,
       )
 
@@ -776,7 +802,7 @@ class QuizAnswer extends Model {
     allCandidates = allCandidates.slice(0, 2)
 
     return await this.query()
-      .withGraphJoined("itemAnswers")
+      .withGraphJoined("itemAnswers.[optionAnswers]")
       .whereIn(
         "quiz_answer.id",
         allCandidates.map(c => c.id),
@@ -788,6 +814,7 @@ class QuizAnswer extends Model {
     quizId: string,
     reviewerId: number,
     rejected: string[],
+    flagged: string[],
     alreadyReviewed: string[],
   ): Promise<Array<{ id: string; status: string }> | null> {
     const builder = knex
@@ -797,6 +824,7 @@ class QuizAnswer extends Model {
       .where("quiz_answer.quiz_id", quizId)
       .andWhere("quiz_answer.user_id", "!=", reviewerId)
       .andWhere("quiz_answer.id", "NOT IN", alreadyReviewed)
+      .andWhere("quiz_answer.id", "NOT IN", flagged)
 
     query = this.addCriteriaBasedOnPriority(priority, query, rejected)
 

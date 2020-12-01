@@ -1,8 +1,8 @@
-import Model from "./base_model"
+import BaseModel from "./base_model"
 import QuizAnswer from "./quiz_answer"
 import QuizOptionAnswer from "./quiz_option_answer"
 
-class QuizItemAnswer extends Model {
+class QuizItemAnswer extends BaseModel {
   id!: string
   quizItemId!: string
   textData!: string
@@ -15,7 +15,7 @@ class QuizItemAnswer extends Model {
 
   static relationMappings = {
     quizAnswer: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: QuizAnswer,
       join: {
         from: "quiz_item_answer.quiz_answer_id",
@@ -23,7 +23,7 @@ class QuizItemAnswer extends Model {
       },
     },
     optionAnswers: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizOptionAnswer,
       join: {
         from: "quiz_item_answer.id",

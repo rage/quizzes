@@ -1,12 +1,12 @@
-import { Model } from "objection"
 import { BadRequestError } from "../util/error"
 import Quiz from "./quiz"
 import QuizAnswer from "./quiz_answer"
 import User from "./user"
 import UserQuizState from "./user_quiz_state"
 import knex from "../../database/knex"
+import BaseModel from "./base_model"
 
-class SpamFlag extends Model {
+class SpamFlag extends BaseModel {
   id!: string
   userId!: number
   quizAnswerId!: string
@@ -17,7 +17,7 @@ class SpamFlag extends Model {
 
   static relationMappings = {
     user: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: User,
       join: {
         from: "spam_flag.user_id",
@@ -25,7 +25,7 @@ class SpamFlag extends Model {
       },
     },
     quizAnswer: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: `${__dirname}/quiz_answer`,
       join: {
         from: "spam_flag.quiz_answer_id",
@@ -36,9 +36,14 @@ class SpamFlag extends Model {
 
   public static async reportSpam(
     quizAnswerId: string,
-    userId: number,
+    flaggingUserId: number,
   ): Promise<SpamFlag | BadRequestError> {
-    if (await this.getSpamFlagByUserIdAndQuizAnswerId(userId, quizAnswerId)) {
+    if (
+      await this.getSpamFlagByUserIdAndQuizAnswerId(
+        flaggingUserId,
+        quizAnswerId,
+      )
+    ) {
       throw new BadRequestError("Can only give one spam flag")
     } else {
       const quizAnswer = await QuizAnswer.getById(quizAnswerId)
@@ -59,20 +64,25 @@ class SpamFlag extends Model {
       try {
         const newSpamFlag = await this.query(trx).insertAndFetch(
           this.fromJson({
-            userId,
+            userId: flaggingUserId,
             quizAnswerId,
           }),
         )
 
         await QuizAnswer.update(quizAnswer, userQuizState, quiz, trx)
 
-        await QuizAnswer.query(trx).upsertGraph(quizAnswer)
+        await QuizAnswer.save(quizAnswer, trx)
 
-        await UserQuizState.query(trx).upsertGraph(userQuizState)
-        trx.commit()
+        // await UserQuizState.query(trx).upsertGraph(userQuizState)
+
+        const { userId, quizId, ...data } = userQuizState
+
+        await UserQuizState.upsert(userQuizState, trx)
+
+        await trx.commit()
         return newSpamFlag
       } catch (err) {
-        trx.rollback()
+        await trx.rollback()
         throw err
       }
     }
