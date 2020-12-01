@@ -26,7 +26,7 @@ const configOptions: { [env: string]: Config } = {
       host: env.DB_HOST || "localhost",
       port: 5432,
       user: env.DB_USER || "postgres",
-      password: env.DB_PASSWORD ||"postgres",
+      password: env.DB_PASSWORD || "postgres",
       database: "quizzes_test",
       timezone: "UTC",
     },
