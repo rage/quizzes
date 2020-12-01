@@ -55,9 +55,9 @@ const finnishLabels: SingleLanguageLabels = {
     answerConfirmed: "Glacadh leis an bhfreagra uait!",
     manualReview:
       "Tá an freagra uait á athbhreithniú ag baill foirne an chúrsa",
-    peerReviewGroupTitle: "Vertaisarviointikysymykset",
+    peerReviewGroupTitle: "Peer review questions",
     peerReviewLikertDetails:
-      "Arvioi jokainen väite asteikolla 1-5. 1 on vahvasti eri mieltä ja 5 on vahvasti samaa mieltä.",
+      "Evaluate each statement on a scale of 1-5. 1 means strongly disagree, 5 means strongly agree.",
   },
   receivedPeerReviews: {
     errorLabel:
@@ -131,8 +131,8 @@ const finnishLabels: SingleLanguageLabels = {
       }
     },
     answered: "Freagartha",
-    unanswered: "Vastaamaton",
-    rejected: "Vastaus hylätty, yritä uudelleen",
+    unanswered: "Unanswered",
+    rejected: "Rejected answer, try again",
     progressUpdated: "Tugadh an dul chun cinn sa chúrsa cothrom le dáta",
     answerConfirmed: "Deimhníodh an freagra uait!",
     answerConfirmedFor: (title: string) =>
