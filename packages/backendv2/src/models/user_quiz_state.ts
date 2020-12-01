@@ -13,6 +13,7 @@ class UserQuizState extends BaseModel {
   peerReviewsGiven!: number
   peerReviewsReceived!: number | null
   spamFlags!: number | null
+  createdAt!: string
 
   static get tableName() {
     return "user_quiz_state"
@@ -62,6 +63,17 @@ class UserQuizState extends BaseModel {
     trx: any,
   ): Promise<UserQuizState> {
     return await this.query(trx).insertGraphAndFetch(userQuizState)
+  }
+
+  public static async upsert(
+    userQuizState: UserQuizState,
+    trx: any,
+  ): Promise<UserQuizState> {
+    if (!userQuizState.createdAt) {
+      return await this.query(trx).insertAndFetch(userQuizState)
+    }
+    const { userId, quizId, ...data } = userQuizState
+    return await this.query(trx).updateAndFetchById([userId, quizId], data)
   }
 
   public static async updateAwardedPointsForQuiz(

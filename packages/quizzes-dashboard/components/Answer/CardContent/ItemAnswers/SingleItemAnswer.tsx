@@ -6,6 +6,7 @@ import styled from "styled-components"
 export const ItemAnswerContainer = styled.div`
   display: flex;
   width: 100%;
+  margin: 1rem 0;
 `
 
 export const ItemAnswerTextContainer = styled.div`
@@ -56,14 +57,11 @@ export const SingleItemAnswer = ({ itemAnswer }: SingleAnswerProps) => {
         {itemAnswer.correct ? <CorrectAnswer /> : <IncorrectAnswer />}
         <ItemAnswerTextContainer>
           <StyledTypo variant="subtitle1">
-            Quiz Item ID: {itemAnswer.quizItemId}
+            <strong>Quiz Item ID: </strong> &nbsp; {itemAnswer.quizItemId}
           </StyledTypo>
-          {itemAnswer.correct ? (
-            <StyledTypo>Correct</StyledTypo>
-          ) : (
-            <StyledTypo>Incorrect</StyledTypo>
-          )}
-          <StyledTypo variant="subtitle1">Answer: </StyledTypo>
+          <StyledTypo variant="subtitle1" style={{ margin: "0.35rem 0" }}>
+            <strong>Answer: </strong>
+          </StyledTypo>
           <AnswerContainer>
             {itemAnswer && itemAnswer.textData !== null ? (
               <AnswerText>{itemAnswer.textData.trim()}</AnswerText>
