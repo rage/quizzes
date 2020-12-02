@@ -10,7 +10,7 @@ export const ButtonField = styled.div`
   padding: 1rem;
   display: flex;
   justify-content: space-around;
-
+  width: 100%;
   .MuiButton-label {
     font-size: 1rem;
     padding: 0.2rem;

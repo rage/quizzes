@@ -93,7 +93,7 @@ export const AllAnswers = () => {
 
   const [fetchingAnswers, setFetchingAnswers] = useState(false)
 
-  const handleSubmit = async (searchQuery: string) => {
+  const hanldeTextSearch = async (searchQuery: string) => {
     try {
       setFetchingAnswers(true)
       if (!searchQuery) {
@@ -110,6 +110,7 @@ export const AllAnswers = () => {
         setSearchResults(response)
       }
     } catch (err) {
+      //TODO: handle this
       // setAnswersError(err)
     } finally {
       setFetchingAnswers(false)
@@ -366,7 +367,7 @@ export const AllAnswers = () => {
           )
         })}
       </FilterParamsField>
-      <AnswerSearchForm handleSubmit={handleSubmit} />
+      <AnswerSearchForm handleSubmit={hanldeTextSearch} />
       <AnswerListWrapper
         expandAll={expandAll}
         order={sortOrder}

@@ -252,7 +252,7 @@ class QuizAnswer extends BaseModel {
         .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
         .where(
           raw(
-            `qia.document is not null and qia.document @@ phraseto_tsquery(?)`,
+            `to_tsvector('english', coalesce(text_data, '')) @@ phraseto_tsquery(?)`,
             [searchQuery],
           ),
         )
@@ -271,7 +271,7 @@ class QuizAnswer extends BaseModel {
         .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
         .where(
           raw(
-            `qia.document is not null and qia.document @@ phraseto_tsquery(?)`,
+            `to_tsvector('english', coalesce(text_data, '')) @@ phraseto_tsquery(?)`,
             [searchQuery],
           ),
         )
@@ -340,7 +340,7 @@ class QuizAnswer extends BaseModel {
       .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
       .where(
         raw(
-          `qia.document is not null and qia.document @@ phraseto_tsquery(?)`,
+          `to_tsvector('english', coalesce(text_data, '')) @@ phraseto_tsquery(?)`,
           [searchQuery],
         ),
       )

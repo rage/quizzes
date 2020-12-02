@@ -64,12 +64,10 @@ export const AnswerList = ({
     try {
       const res = await changeAnswerStatusForMany(selectedAnswerIds, actionType)
       if (res[0].status === actionType) {
-        // setHandled(true)
         setSuccess(true)
         setShowSnacks(true)
         setStatus(actionType)
       } else {
-        // setHandled(true)
         setSuccess(false)
         setShowSnacks(true)
       }
