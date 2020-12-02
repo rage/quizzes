@@ -1,4 +1,4 @@
-import { QuizAnswer } from "./../../moocfi-quizzes/src/modelTypes"
+import { QuizAnswer } from "../src/models"
 import { BadRequestError, NotFoundError } from "./../src/util/error"
 import nock from "nock"
 import request from "supertest"
