@@ -34,12 +34,13 @@ export const AnswerList = ({
 }: AnswerListProps) => {
   const [selectedAnswerIds, setSelectedAnswerIds] = useState<string[]>([])
   const [showSnacks, setShowSnacks] = useState(false)
-  const [success, setSuccess] = useState(true)
-  // status for answer card styling
+  const [updatedAnswers, setUpdatedAnswers] = useState<null | Answer[]>(null)
   const [status, setStatus] = useState("")
+  const [answers, setAnswers] = useState<Answer[]>([])
 
   useEffect(() => {
     setSelectedAnswerIds(bulkSelectedIds)
+    data && setAnswers(data)
   }, [bulkSelectedIds])
 
   const numberOfAnswersSelected = selectedAnswerIds.length
@@ -49,11 +50,23 @@ export const AnswerList = ({
     try {
       const res = await changeAnswerStatusForMany(selectedAnswerIds, actionType)
       if (res[0].status === actionType) {
-        setSuccess(true)
+        setUpdatedAnswers(res)
         setShowSnacks(true)
         setStatus(actionType)
+        setSelectedAnswerIds([])
+
+        const returnedIds = res.map(updated => updated.id)
+
+        setAnswers(
+          answers.map(answer => {
+            if (returnedIds.includes(answer.id)) {
+              return { ...answer, status: actionType }
+            }
+            return answer
+          }),
+        )
       } else {
-        setSuccess(false)
+        setUpdatedAnswers(res)
         setShowSnacks(true)
       }
     } catch (e) {
@@ -72,9 +85,12 @@ export const AnswerList = ({
           return <Slide {...props} direction="down" />
         }}
       >
-        <Alert severity={success ? "success" : "error"}>
-          {success ? (
-            <Typography>Answer statuses saved succesfully</Typography>
+        <Alert severity={updatedAnswers ? "success" : "error"}>
+          {updatedAnswers ? (
+            <Typography>
+              {updatedAnswers.length} answer(s) marked as{" "}
+              {updatedAnswers[0].status}
+            </Typography>
           ) : (
             <Typography>
               Something went wrong while saving statuses, statuses not changed
@@ -105,7 +121,7 @@ export const AnswerList = ({
           </ButtonFieldWrapper>
         </BulkActionWrapper>
       )}
-      {data?.map(answer => (
+      {answers.map(answer => (
         <AnswerCard
           key={answer.id}
           answer={answer}
