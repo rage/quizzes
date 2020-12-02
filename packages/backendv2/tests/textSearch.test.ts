@@ -255,19 +255,5 @@ describe("dashboard: searching for manual review answers based on text content s
         })
         .expect(200, done)
     })
-
-    // test("return 0 answers when no content matching search query ", done => {
-    //   request(app.callback())
-    //     .post(
-    //       "/api/v2/dashboard/answers/4bf4cf2f-3058-4311-8d16-26d781261af7/manual-review?page=0",
-    //     )
-    //     .set("Authorization", `bearer ADMIN_TOKEN`)
-    //     .set("Accept", "application/json")
-    //     .send({ searchQuery: "king of kings" })
-    //     .expect(response => {
-    //       expect(response.body.total).toEqual(0)
-    //     })
-    //     .expect(200, done)
-    // })
   })
 })

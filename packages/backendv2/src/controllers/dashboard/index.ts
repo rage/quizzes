@@ -126,9 +126,19 @@ const dashboard = new Router<CustomState, CustomContext>({
 
   .post("/answers/status", accessControl(), async ctx => {
     const answerIds = ctx.request.body.answerIds
-    const status = ctx.request.body.status
-    const courseId = await getCourseIdByAnswerId(answerIds[0])
+
+    if (!answerIds || !answerIds[0]) {
+      throw new BadRequestError("No answer ids provided.")
+    }
+    let courseId
+    try {
+      courseId = await getCourseIdByAnswerId(answerIds[0])
+    } catch (error) {
+      throw error
+    }
+
     await checkAccessOrThrow(ctx.state.user, courseId, "edit")
+    const status = ctx.request.body.status
     ctx.body = await QuizAnswer.setManualReviewStatusForMany(answerIds, status)
   })
 

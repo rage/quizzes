@@ -362,6 +362,10 @@ class QuizAnswer extends BaseModel {
     answerIds: string[],
     status: QuizAnswerStatus,
   ) {
+    if (!status || !["confirmed", "rejected"].includes(status)) {
+      throw new BadRequestError("Invalid answer status provided.")
+    }
+
     let promises: Promise<QuizAnswer>[] = []
 
     answerIds.forEach(answerId => {

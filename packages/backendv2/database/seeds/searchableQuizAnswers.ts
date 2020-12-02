@@ -10,6 +10,20 @@ export async function seed(knex: Knex): Promise<any> {
         language_id: "xy_YZ",
         status: "manual-review",
       },
+      {
+        id: "1440c6ac-109b-4fd3-af47-7c39c24f2a5c",
+        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        user_id: 1234,
+        language_id: "xy_YZ",
+        status: "manual-review",
+      },
+      {
+        id: "3b17d66d-b309-4958-b8b8-4364f0f90b1e",
+        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        user_id: 1234,
+        language_id: "xy_YZ",
+        status: "manual-review",
+      },
     ]),
   ])
 
