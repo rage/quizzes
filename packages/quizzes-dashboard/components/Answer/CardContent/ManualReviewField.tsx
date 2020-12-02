@@ -5,30 +5,7 @@ import { Answer } from "../../../types/Answer"
 import { changeAnswerStatus } from "../../../services/quizzes"
 import { Alert } from "@material-ui/lab"
 import { TransitionProps } from "@material-ui/core/transitions"
-
-export const ButtonField = styled.div`
-  padding: 1rem;
-  display: flex;
-  justify-content: space-around;
-  width: 100%;
-  .MuiButton-label {
-    font-size: 1rem;
-    padding: 0.2rem;
-  }
-
-  #button-accept {
-    background-color: #78ab46;
-    color: white;
-  }
-  #button-reject {
-    background-color: #f44336;
-    color: white;
-  }
-`
-
-export const AcceptButton = styled(Button)`
-  display: flex !important;
-`
+import { ButtonFieldWrapper } from "../../Shared/ButtonFieldWrapper"
 
 export const RejectButton = styled(Button)`
   display: flex !important;
@@ -90,22 +67,20 @@ export const ManualReviewField = ({
           )}
         </Alert>
       </Snackbar>
-      <ButtonField>
-        <AcceptButton
-          id="button-accept"
-          variant="outlined"
+      <ButtonFieldWrapper>
+        <Button
+          className="button-accept"
           onClick={() => handleAcceptOrReject(answer.id, "confirmed")}
         >
           <Typography>Accept</Typography>
-        </AcceptButton>
-        <RejectButton
-          id="button-reject"
-          variant="outlined"
+        </Button>
+        <Button
+          className="button-reject"
           onClick={() => handleAcceptOrReject(answer.id, "rejected")}
         >
           <Typography>Reject</Typography>
-        </RejectButton>
-      </ButtonField>
+        </Button>
+      </ButtonFieldWrapper>
     </>
   )
 }

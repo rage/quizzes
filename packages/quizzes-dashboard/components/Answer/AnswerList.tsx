@@ -6,7 +6,7 @@ import styled from "styled-components"
 import { changeAnswerStatusForMany } from "../../services/quizzes"
 import { Answer } from "../../types/Answer"
 import AnswerCard from "../Answer"
-import { AcceptButton, RejectButton } from "./CardContent/ManualReviewField"
+import { ButtonFieldWrapper } from "../Shared/ButtonFieldWrapper"
 
 export interface AnswerListProps {
   data: Answer[]
@@ -23,21 +23,6 @@ const BulkActionWrapper = styled.div`
 
   @media (max-width: 480px) {
     flex-direction: column;
-  }
-`
-
-const ButtonContainer = styled.div`
-  padding: 1rem;
-  display: flex;
-  justify-content: space-around;
-  width: 100%;
-
-  @media (max-width: 480px) {
-    flex-direction: column;
-
-    button {
-      margin: 1rem 0;
-    }
   }
 `
 
@@ -102,22 +87,22 @@ export const AnswerList = ({
           <Typography variant="h4">
             {numberOfAnswersSelected} answer(s) selected{" "}
           </Typography>
-          <ButtonContainer>
-            <AcceptButton
-              variant="outlined"
+          <ButtonFieldWrapper>
+            <Button
+              className="button-accept"
               onClick={() => handleBulkAction("confirmed")}
             >
               {" "}
-              <Typography variant="overline">Accept All</Typography>
-            </AcceptButton>
-            <RejectButton
-              variant="outlined"
+              <Typography>Accept all</Typography>
+            </Button>
+            <Button
+              className="button-reject"
               onClick={() => handleBulkAction("rejected")}
             >
               {" "}
-              <Typography variant="overline">Reject All</Typography>
-            </RejectButton>
-          </ButtonContainer>
+              <Typography>Reject all</Typography>
+            </Button>
+          </ButtonFieldWrapper>
         </BulkActionWrapper>
       )}
       {data?.map(answer => (
