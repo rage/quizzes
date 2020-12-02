@@ -500,8 +500,12 @@ class QuizAnswer extends BaseModel {
   }
 
   private static moveQuestionTextsToparent = (question: PeerReviewQuestion) => {
-    question.title = question.texts[0].title
-    question.body = question.texts[0].body
+    if (question.texts[0]?.title) {
+      question.title = question.texts[0].title
+    }
+    if (question.texts[0]?.body) {
+      question.body = question.texts[0].body
+    }
     return question
   }
 

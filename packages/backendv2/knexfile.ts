@@ -5,10 +5,10 @@ const configOptions: { [env: string]: Config } = {
   development: {
     client: "pg",
     connection: {
-      host: "127.0.0.1",
-      user: "",
-      password: "",
-      database: env.DB_NAME || "quizzes_dev",
+      host: env.DB_HOST || "/var/run/postgresql",
+      database: env.DB_USER || "quizzes_dev",
+      password: env.DB_PASSWORD || "",
+      timezone: "UTC",
     },
     pool: {
       afterCreate: setTimeZoneToUTC,

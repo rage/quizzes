@@ -102,7 +102,7 @@ export const AnswerCard = ({
           color="primary"
           checked={checked}
           onChange={handleAnswerSelection}
-          inputProps={{ "aria-label": "primary checkbox" }}
+          inputProps={{ "aria-label": "Select answer" }}
         />
       )}
       <StyledAnswerCard
