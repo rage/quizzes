@@ -6,8 +6,13 @@ import PeerReviewQuestionAnswer from "./peer_review_question_answer"
 import PeerReviewQuestion from "./peer_review_question"
 import knex from "../../database/knex"
 import BaseModel from "./base_model"
+import softDelete from "objection-soft-delete"
+import { mixin } from "objection"
+import { Transaction } from "knex"
 
-class PeerReview extends BaseModel {
+class PeerReview extends mixin(BaseModel, [
+  softDelete({ columnName: "deleted" }),
+]) {
   userId!: number
   quizAnswerId!: string
   rejectedQuizAnswerIds!: string[]
@@ -179,6 +184,17 @@ class PeerReview extends BaseModel {
     )[0]
 
     return peerReview
+  }
+
+  public static async deletePeerReview(
+    peerReviewId: string,
+    trx?: Transaction,
+  ): Promise<Boolean> {
+    const result = await this.query(trx)
+      .where("peer_review_id", peerReviewId)
+      .delete()
+    console.log(result)
+    return true
   }
 }
 

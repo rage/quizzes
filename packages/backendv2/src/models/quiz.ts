@@ -234,6 +234,8 @@ export class Quiz extends BaseModel {
         .withGraphJoined("texts")
         .withGraphJoined("items.[texts, options.[texts]]")
         .withGraphJoined("peerReviews.[texts, questions.[texts]]")
+        .where("peerReviews.deleted", false)
+        .where("peerReviews:questions.deleted", false)
         .where("quiz.id", quizId)
     )[0]
 
