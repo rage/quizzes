@@ -172,12 +172,12 @@ export const RequiringAttention = () => {
       <TabText text="Answers requiring attention" />
       {answers.results.length === 0 ? (
         <>
-          <QuizTitle quiz={quiz} course={course} />
+          <QuizTitle quiz={quiz} />
           <Typography variant="h3">No answers requiring attention</Typography>
         </>
       ) : (
         <>
-          <QuizTitle quiz={quiz} course={course} />
+          <QuizTitle quiz={quiz} />
           <OptionsContainer>
             <SwitchField>
               <Typography>Expand all</Typography>

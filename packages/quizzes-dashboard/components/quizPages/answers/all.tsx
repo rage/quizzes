@@ -20,7 +20,7 @@ import {
   SortOrderField,
   FilterParamsField,
 } from "./styles"
-import { TSortOptions, TAnswersDisplayed, ChipProps } from "./types"
+import { TAnswersDisplayed, ChipProps } from "./types"
 import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
 import AnswerListWrapper from "../../Answer/AnswerListWrapper"
 import SkeletonLoader from "../../Shared/SkeletonLoader"
@@ -291,7 +291,7 @@ export const AllAnswers = () => {
   return (
     <>
       <TabText text="All answers" />
-      <QuizTitle quiz={quiz} course={course} />
+      <QuizTitle quiz={quiz} />
       <OptionsContainer>
         <SwitchField>
           <Typography>Expand all</Typography>

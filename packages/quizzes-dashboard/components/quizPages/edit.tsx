@@ -76,7 +76,7 @@ const EditPage = () => {
     <>
       <TabText text={`Editing ${quizData?.title}`} />
       <SaveButton />
-      <QuizTitle quiz={quizData} course={course} />
+      <QuizTitle quiz={quizData} />
       <QuizEditForms />
     </>
   )

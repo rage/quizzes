@@ -76,7 +76,7 @@ export const OverView = () => {
   return (
     <>
       <TabText text={quiz.title} />
-      <QuizTitle quiz={quiz} course={course} />
+      <QuizTitle quiz={quiz} />
       <StyledCard>
         {quiz.body && (
           <DescriptionContainer>
