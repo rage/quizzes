@@ -26,6 +26,7 @@ import AnswerListWrapper from "../../Answer/AnswerListWrapper"
 import SkeletonLoader from "../../Shared/SkeletonLoader"
 import AnswerSearchForm from "../../AnswerSearchForm"
 import { Answer } from "../../../types/Answer"
+import { AnswerListProvider } from "../../../contexts/AnswerListContext"
 
 // TODO: refactor/move
 const StyledChip = styled(Chip)<ChipProps>`
@@ -47,28 +48,11 @@ export const AllAnswers = () => {
   const URL_HREF = `/quizzes/[quizId]/[...page]`
   const pathname = `/quizzes/${quizId}/all-answers/`
 
-  let paramSize = Number(route.query.answers) as TAnswersDisplayed
-  let paramPage = Number(route.query.pageNo)
-  let paramSort: TSortOptions | null = null
-  if (route.query.sort) {
-    paramSort = route.query.sort as TSortOptions
-  }
-  let paramExpand = route.query.expandAll === "true" ? true : false
-  let paramFilters: any = null
-  if (route.query.filters !== undefined) {
-    let filtersAsString: string = route.query.filters.toString()
-    paramFilters = filtersAsString.split(",")
-  }
-
-  const [currentPage, setCurrentPage] = useState<number>(paramPage || 1)
-  const [sortOrder, setSortOrder] = useState<TSortOptions>(paramSort || "desc")
-  const [expandAll, setExpandAll] = useState<boolean>(paramExpand || false)
-  const [answersDisplayed, setAnswersDisplayed] = useState<TAnswersDisplayed>(
-    paramSize || 10,
-  )
-  const [filterParameters, setFilterParameters] = useState<string[]>(
-    paramFilters || [],
-  )
+  const [currentPage, setCurrentPage] = useState(1)
+  const [sortOrder, setSortOrder] = useState("desc")
+  const [expandAll, setExpandAll] = useState(false)
+  const [answersDisplayed, setAnswersDisplayed] = useState(10)
+  const [filterParameters, setFilterParameters] = useState<string[]>([])
 
   const [allAnswers, answersError] = usePromise(
     () =>
@@ -175,22 +159,29 @@ export const AllAnswers = () => {
   // this needs to be run so that if the page with query params is loaded in
   // another window, the params can be updated without clearing the rest first
   useEffect(() => {
+    const { pageNo, sort, answers, expandAll, filters } = route.query
     let initialQuery: any = {}
 
-    if (paramPage) {
-      initialQuery.pageNo = paramPage
+    if (pageNo) {
+      setCurrentPage(Number(pageNo))
+      initialQuery.pageNo = pageNo
     }
-    if (paramSize) {
-      initialQuery.answers = paramSize
+    if (answers) {
+      setAnswersDisplayed(Number(answers))
+      initialQuery.answers = answers
     }
-    if (paramExpand) {
-      initialQuery.expandAll = paramExpand
+    if (expandAll) {
+      setExpandAll(true)
+      initialQuery.expandAll = expandAll
     }
-    if (paramSort) {
-      initialQuery.sort = paramSort
+    if (sort) {
+      setSortOrder(sort as string)
+      initialQuery.sort = sort
     }
-    if (paramFilters as any) {
-      initialQuery.filters = paramFilters.toString()
+    if (filters) {
+      let filtersAsStringArray: string[] = filters.toString().split(",")
+      setFilterParameters(filtersAsStringArray)
+      initialQuery.filters = filtersAsStringArray
     }
     setQueryToPush(initialQuery)
   }, [])
@@ -368,23 +359,25 @@ export const AllAnswers = () => {
         })}
       </FilterParamsField>
       <AnswerSearchForm handleSubmit={hanldeTextSearch} />
-      <AnswerListWrapper
-        expandAll={expandAll}
-        order={sortOrder}
-        quizId={quizId}
-        size={answersDisplayed}
-        handlePageChange={handlePageChange}
-        page={currentPage}
-        answersError={answersError}
-        fetchingAnswers={fetchingAnswers}
-        answers={
-          searchResults
-            ? searchResults
-            : allAnswers
-            ? allAnswers
-            : { results: [], total: 0 }
-        }
-      />
+      <AnswerListProvider>
+        <AnswerListWrapper
+          expandAll={expandAll}
+          order={sortOrder}
+          quizId={quizId}
+          size={answersDisplayed}
+          handlePageChange={handlePageChange}
+          page={currentPage}
+          answersError={answersError}
+          fetchingAnswers={fetchingAnswers}
+          answers={
+            searchResults
+              ? searchResults
+              : allAnswers
+              ? allAnswers
+              : { results: [], total: 0 }
+          }
+        />
+      </AnswerListProvider>
     </>
   )
 }
