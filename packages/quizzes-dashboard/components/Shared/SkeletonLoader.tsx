@@ -1,5 +1,5 @@
 import React from "react"
-import { StyledSkeleton } from "../QuizPages/answers/styles"
+import { StyledSkeleton } from "../quizPages/answers/styles"
 
 export const SkeletonLoader = ({
   height,

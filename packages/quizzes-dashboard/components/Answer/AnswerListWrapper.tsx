@@ -4,7 +4,7 @@ import { Pagination } from "@material-ui/lab"
 import { AnswerList } from "./AnswerList"
 import SkeletonLoader from "../Shared/SkeletonLoader"
 import { Button, Switch, Typography } from "@material-ui/core"
-import { SwitchField } from "../QuizPages/answers/styles"
+import { SwitchField } from "../quizPages/answers/styles"
 import { editableAnswerStates } from "./constants"
 import { Answer } from "../../types/Answer"
 
