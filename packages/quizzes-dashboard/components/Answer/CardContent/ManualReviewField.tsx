@@ -6,6 +6,11 @@ import { changeAnswerStatus } from "../../../services/quizzes"
 import { Alert } from "@material-ui/lab"
 import { TransitionProps } from "@material-ui/core/transitions"
 import { ButtonFieldWrapper } from "../../Shared/ButtonFieldWrapper"
+import {
+  setStatusUpdateType,
+  setUpdatedAnswersIds,
+  useAnswerListState,
+} from "../../../contexts/AnswerListContext"
 
 export const RejectButton = styled(Button)`
   display: flex !important;
@@ -15,29 +20,24 @@ export const RejectButton = styled(Button)`
 
 export interface ManualReviewProps {
   answer: Answer
-  handled?: boolean
-  setHandled: (handled: boolean) => void
-  setStatus: (accepted: string) => void
 }
 
-export const ManualReviewField = ({
-  answer,
-  setHandled,
-  setStatus,
-}: ManualReviewProps) => {
+export const ManualReviewField = ({ answer }: ManualReviewProps) => {
   const [success, setSuccess] = useState(true)
   const [showSnacks, setShowSnacks] = useState(false)
+
+  const [, dispatch] = useAnswerListState()
 
   const handleAcceptOrReject = async (answerId: string, status: string) => {
     try {
       const res = await changeAnswerStatus(answerId, status)
       if (res.status === status) {
-        setHandled(true)
+        dispatch(setUpdatedAnswersIds([answer.id]))
         setSuccess(true)
         setShowSnacks(true)
-        setStatus(status)
+        dispatch(setStatusUpdateType(status))
       } else {
-        setHandled(true)
+        dispatch(setUpdatedAnswersIds([answer.id]))
         setSuccess(false)
         setShowSnacks(true)
       }

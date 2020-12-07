@@ -19,6 +19,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWindowClose } from "@fortawesome/free-solid-svg-icons"
 import DebugDialog from "../../DebugDialog"
 import { editableAnswerStates } from "../constants"
+import { useAnswerListState } from "../../../contexts/AnswerListContext"
 
 export const ContentContainer = styled.div`
   display: flex !important;
@@ -83,30 +84,30 @@ const DebugDialogWrapper = styled.div`
 
 export interface AnswerContentProps {
   answer: Answer
-  expanded: boolean
   setFaded: (faded: boolean) => void
   setStatus: (accepted: string) => void
 }
 
 export const AnswerContent = ({
   answer,
-  expanded,
   setFaded,
   setStatus,
 }: AnswerContentProps) => {
-  const [showMore, setShowMore] = useState(expanded)
+  const [showMore, setShowMore] = useState(false)
   const [showPeerreviewModal, setShowPeerreviewModal] = useState(false)
   const [handled, setHandled] = useState(false)
   const [height, setHeight] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
 
-  useEffect(() => setShowMore(expanded), [expanded])
+  const [{ expandAll, updatedAnswersIds }, _] = useAnswerListState()
+
+  useEffect(() => setShowMore(expandAll), [expandAll])
 
   useEffect(() => {
-    if (handled) {
+    if (handled || updatedAnswersIds.includes(answer.id)) {
       setFaded(true)
     }
-  }, [handled])
+  }, [handled, updatedAnswersIds])
 
   useLayoutEffect(() => {
     if (ref.current !== null) {
@@ -174,12 +175,7 @@ export const AnswerContent = ({
         )}
       </StatButtonWrapper>
       {editableAnswerStates.includes(answer.status) && (
-        <ManualReviewField
-          answer={answer}
-          handled={handled}
-          setHandled={setHandled}
-          setStatus={setStatus}
-        />
+        <ManualReviewField answer={answer} setStatus={setStatus} />
       )}
     </>
   )

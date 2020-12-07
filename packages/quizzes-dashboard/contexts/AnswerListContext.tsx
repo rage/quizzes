@@ -1,18 +1,22 @@
-import React, { useReducer } from "react"
+import React, { useContext, useReducer } from "react"
 import { Answer } from "../types/Answer"
 
 interface IAnswerListState {
   answers: Answer[]
   bulkSelectedIds: string[]
+  updatedAnswersIds: string[]
   bulkSelectMode: boolean
   enableSearch: boolean
   expandAll: boolean
+  statusUpdateType: string
 }
 
 const initialState: IAnswerListState = {
   answers: [],
   bulkSelectedIds: [],
-  bulkSelectMode: false,
+  updatedAnswersIds: [],
+  statusUpdateType: "",
+  bulkSelectMode: true,
   enableSearch: false,
   expandAll: false,
 }
@@ -23,24 +27,58 @@ enum AnswerListTypes {
   TOGGLE_BULK_SELECT_MODE = "TOGGLE_BULK_SELECT_MODE",
   SET_ANSWERS = "SET_ANSWERS",
   SET_BULK_SELECTED_IDS = "SET_BULK_SELECTED_IDS",
+  SET_UPDATED_ANSWERS_IDS = "SET_UPDATED_ANSWERS_IDS",
+  SET_STATUS_UPDATE_TYPE = "SET_STATUS_UPDATE_TYPE",
 }
 
 type AnswerListActionTypes =
-  | { type: AnswerListTypes.TOGGLE_ENABLE_SEARCH }
-  | { type: AnswerListTypes.TOGGLE_EXPAND_ALL }
+  // | { type: AnswerListTypes.TOGGLE_ENABLE_SEARCH }
+  // | { type: AnswerListTypes.TOGGLE_EXPAND_ALL }
+  // | { type: AnswerListTypes.SET_ANSWERS; answers: Answer[] }
+  // | { type: AnswerListTypes.TOGGLE_BULK_SELECT_MODE }
+  | { type: AnswerListTypes.SET_BULK_SELECTED_IDS; payload: string[] }
+  | { type: AnswerListTypes.SET_UPDATED_ANSWERS_IDS; payload: string[] }
   | { type: AnswerListTypes.TOGGLE_BULK_SELECT_MODE }
-  | { type: AnswerListTypes.SET_ANSWERS; answers: Answer[] }
-  | { type: AnswerListTypes.SET_BULK_SELECTED_IDS; ids: string[] }
+  | {
+      type: AnswerListTypes.SET_STATUS_UPDATE_TYPE
+      payload: string
+    }
 
 let reducer = (
   state: IAnswerListState,
   action: AnswerListActionTypes,
 ): IAnswerListState => {
   switch (action.type) {
-    case AnswerListTypes.TOGGLE_ENABLE_SEARCH:
-      return { ...state, enableSearch: !state.enableSearch }
+    case AnswerListTypes.SET_BULK_SELECTED_IDS:
+      return { ...state, bulkSelectedIds: [...action.payload] }
+    case AnswerListTypes.TOGGLE_BULK_SELECT_MODE:
+      return { ...state, bulkSelectMode: !state.bulkSelectMode }
+    case AnswerListTypes.SET_UPDATED_ANSWERS_IDS:
+      return { ...state, updatedAnswersIds: [...action.payload] }
+    case AnswerListTypes.SET_STATUS_UPDATE_TYPE:
+      return { ...state, statusUpdateType: action.payload }
     default:
       throw new Error()
+  }
+}
+
+export const setBulkSelectedIds = (ids: string[]): AnswerListActionTypes => {
+  return {
+    type: AnswerListTypes.SET_BULK_SELECTED_IDS,
+    payload: ids,
+  }
+}
+
+export const setUpdatedAnswersIds = (ids: string[]): AnswerListActionTypes => {
+  return {
+    type: AnswerListTypes.SET_UPDATED_ANSWERS_IDS,
+    payload: ids,
+  }
+}
+
+export const toggleBulkSelectMode = (): AnswerListActionTypes => {
+  return {
+    type: AnswerListTypes.TOGGLE_BULK_SELECT_MODE,
   }
 }
 
@@ -48,16 +86,26 @@ export const setEnableSearch = () => ({
   type: AnswerListTypes.TOGGLE_ENABLE_SEARCH,
 })
 
-const AnswerListContext = React.createContext(initialState)
+export const setStatusUpdateType = (type: string): AnswerListActionTypes => ({
+  type: AnswerListTypes.SET_STATUS_UPDATE_TYPE,
+  payload: type,
+})
 
-function AnswerListProvider({ children }: { children: any }) {
+const AnswerListContext = React.createContext<
+  [IAnswerListState, React.Dispatch<AnswerListActionTypes>]
+>([initialState, () => initialState])
+
+export const AnswerListProvider = ({
+  children,
+}: {
+  children: React.ReactElement
+}) => {
   const [state, dispatch] = useReducer(reducer, initialState)
-  // TODO: figure out how to type value
-  const value: any = { state, dispatch }
   return (
-    <AnswerListContext.Provider value={value}>
+    <AnswerListContext.Provider value={[state, dispatch]}>
       {children}
     </AnswerListContext.Provider>
   )
 }
-export { AnswerListContext, AnswerListProvider }
+
+export const useAnswerListState = () => useContext(AnswerListContext)

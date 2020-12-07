@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react"
+import React from "react"
 import styled from "styled-components"
 import { Pagination } from "@material-ui/lab"
 import { AnswerList } from "./AnswerList"
@@ -8,7 +8,11 @@ import { SwitchField } from "../QuizPages/answers/styles"
 import { editableAnswerStates } from "./constants"
 import { Answer } from "../../types/Answer"
 
-import { AnswerListContext } from "../../contexts/AnswerListContext"
+import {
+  setBulkSelectedIds,
+  toggleBulkSelectMode,
+  useAnswerListState,
+} from "../../contexts/AnswerListContext"
 
 export const PaginationField = styled.div`
   display: flex;
@@ -21,7 +25,6 @@ interface WrapperProps {
   quizId: string
   size: number
   order: string
-  expandAll: boolean
   page: number
   answersError?: Error | undefined
   fetchingAnswers: Boolean
@@ -50,21 +53,13 @@ const BulkSelectWrapper = styled.div`
 
 export const AnswerListWrapper = ({
   size,
-  expandAll,
   page,
   handlePageChange,
   answersError,
   answers,
   fetchingAnswers,
 }: WrapperProps) => {
-  const [bulkSelectMode, setBulkSelectMode] = useState(false)
-  const [bulkSelectedIds, setBulkSelectedIds] = useState<string[]>([])
-
-  const { enableSearch } = useContext(AnswerListContext)
-  console.log(
-    "💩 ~ file: AnswerListWrapper.tsx ~ line 64 ~ enableSearch",
-    enableSearch,
-  )
+  const [{ bulkSelectMode }, dispatch] = useAnswerListState()
 
   if (answersError) {
     return <>Something went wrong...</>
@@ -76,8 +71,7 @@ export const AnswerListWrapper = ({
     const allSelected = answers?.results
       .filter(answer => editableAnswerStates.includes(answer.status))
       .map(editableAnswer => editableAnswer.id)
-
-    setBulkSelectedIds(allSelected)
+    dispatch(setBulkSelectedIds(allSelected))
   }
 
   return (
@@ -88,7 +82,7 @@ export const AnswerListWrapper = ({
           <Switch
             checked={bulkSelectMode}
             onChange={_ => {
-              setBulkSelectMode(!bulkSelectMode)
+              dispatch(toggleBulkSelectMode())
             }}
           />
         </SwitchField>
@@ -106,7 +100,9 @@ export const AnswerListWrapper = ({
             <Button
               variant="contained"
               style={{ marginLeft: "2rem" }}
-              onClick={() => setBulkSelectedIds([])}
+              onClick={() => {
+                dispatch(setBulkSelectedIds([]))
+              }}
             >
               Clear Selection
             </Button>
@@ -128,12 +124,7 @@ export const AnswerListWrapper = ({
               onChange={(_, nextPage) => handlePageChange(nextPage)}
             />
           </PaginationField>
-          <AnswerList
-            data={answers.results}
-            expandAll={expandAll}
-            bulkSelectMode={bulkSelectMode}
-            bulkSelectedIds={bulkSelectedIds}
-          />
+          <AnswerList data={answers.results} />
           <PaginationField>
             <Pagination
               siblingCount={2}

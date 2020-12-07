@@ -7,4 +7,5 @@ export const editableAnswerStates = [
   "enough-received-but-not-given",
   "submitted",
   "rejected",
+  "confirmed",
 ]

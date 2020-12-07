@@ -26,6 +26,7 @@ import AnswerListWrapper from "../../Answer/AnswerListWrapper"
 import AnswerSearchForm from "../../AnswerSearchForm"
 import { Answer } from "../../../types/Answer"
 import SkeletonLoader from "../../Shared/SkeletonLoader"
+import { AnswerListProvider } from "../../../contexts/AnswerListContext"
 
 // TODO: refactor/move
 const StyledChip = styled(Chip)<ChipProps>`
@@ -349,23 +350,24 @@ export const AllAnswers = () => {
         })}
       </FilterParamsField>
       <AnswerSearchForm handleSubmit={hanldeTextSearch} />
-      <AnswerListWrapper
-        expandAll={expandAll}
-        order={sortOrder}
-        quizId={quizId}
-        size={answersDisplayed}
-        handlePageChange={handlePageChange}
-        page={currentPage}
-        answersError={answersError}
-        fetchingAnswers={fetchingAnswers}
-        answers={
-          searchResults
-            ? searchResults
-            : allAnswers
-            ? allAnswers
-            : { results: [], total: 0 }
-        }
-      />
+      <AnswerListProvider>
+        <AnswerListWrapper
+          order={sortOrder}
+          quizId={quizId}
+          size={answersDisplayed}
+          handlePageChange={handlePageChange}
+          page={currentPage}
+          answersError={answersError}
+          fetchingAnswers={fetchingAnswers}
+          answers={
+            searchResults
+              ? searchResults
+              : allAnswers
+              ? allAnswers
+              : { results: [], total: 0 }
+          }
+        />
+      </AnswerListProvider>
     </>
   )
 }

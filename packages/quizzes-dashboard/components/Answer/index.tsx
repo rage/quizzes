@@ -6,6 +6,10 @@ import { Card } from "@material-ui/core"
 import styled from "styled-components"
 import { AnswerContent } from "./CardContent"
 import { editableAnswerStates } from "./constants"
+import {
+  setBulkSelectedIds,
+  useAnswerListState,
+} from "../../contexts/AnswerListContext"
 
 interface AdditionalAnswerCardProps {
   faded: boolean
@@ -14,17 +18,22 @@ interface AdditionalAnswerCardProps {
 
 const AnswerCardWrapper = styled.div`
   display: flex;
+  .PrivateSwitchBase-root-5 {
+    &:hover {
+      background: transparent !important;
+    }
+  }
 
   .custom-checkbox-root .MuiSvgIcon-root {
-    width: 3rem;
-    height: 3rem;
+    width: 2rem;
+    height: 2rem;
     margin-right: 2rem;
   }
 
   @media (max-width: 480px) {
     .custom-checkbox-root .MuiSvgIcon-root {
-      width: 2rem;
-      height: 2rem;
+      width: 1rem;
+      height: 1rem;
       margin-right: 0;
     }
 
@@ -53,40 +62,35 @@ export const StyledAnswerCard = styled(Card)<AdditionalAnswerCardProps>`
 
 export interface AnswerProps {
   answer: Answer
-  expanded: boolean
-  bulkSelectMode: boolean
-  bulkStatus: string
-  selectedAnswerIds: string[]
+  expanded?: boolean
+  bulkSelectMode?: boolean
+  selectedAnswerIds?: string[]
   setSelectedAnswerIds?: React.Dispatch<React.SetStateAction<string[]>>
 }
 
-export const AnswerCard = ({
-  answer,
-  expanded,
-  bulkSelectMode,
-  bulkStatus,
-  selectedAnswerIds,
-  setSelectedAnswerIds,
-}: AnswerProps) => {
+export const AnswerCard = ({ answer }: AnswerProps) => {
   const [faded, setFaded] = useState(false)
-  const [status, setStatus] = useState("")
   const [checked, setChecked] = useState(false)
 
+  const [
+    { bulkSelectMode, bulkSelectedIds, statusUpdateType },
+    dispatch,
+  ] = useAnswerListState()
+
   useEffect(() => {
-    bulkStatus && setStatus(bulkStatus)
-    setChecked(selectedAnswerIds.includes(answer.id))
-  }, [selectedAnswerIds, bulkStatus])
+    setChecked(bulkSelectedIds.includes(answer.id))
+  }, [bulkSelectedIds])
 
   const handleAnswerSelection = () => {
     let updatedIds = []
 
-    if (selectedAnswerIds?.includes(answer.id)) {
-      updatedIds = selectedAnswerIds.filter(id => id !== answer.id)
+    if (bulkSelectedIds?.includes(answer.id)) {
+      updatedIds = bulkSelectedIds.filter(id => id !== answer.id)
     } else {
-      updatedIds = [...(selectedAnswerIds || []), answer.id]
+      updatedIds = [...(bulkSelectedIds || []), answer.id]
     }
 
-    setSelectedAnswerIds && setSelectedAnswerIds(updatedIds)
+    dispatch(setBulkSelectedIds(updatedIds))
 
     setChecked(!checked)
   }
@@ -105,20 +109,8 @@ export const AnswerCard = ({
           inputProps={{ "aria-label": "Select answer" }}
         />
       )}
-      <StyledAnswerCard
-        faded={
-          faded ||
-          (bulkStatus === ("confirmed" || "rejected") &&
-            selectedAnswerIds?.includes(answer.id))
-        }
-        status={status}
-      >
-        <AnswerContent
-          answer={answer}
-          expanded={expanded}
-          setFaded={setFaded}
-          setStatus={setStatus}
-        />
+      <StyledAnswerCard faded={faded} status={statusUpdateType}>
+        <AnswerContent answer={answer} setFaded={setFaded} />
       </StyledAnswerCard>
     </AnswerCardWrapper>
   )

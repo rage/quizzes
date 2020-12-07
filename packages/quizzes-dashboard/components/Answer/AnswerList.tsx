@@ -3,6 +3,12 @@ import { TransitionProps } from "@material-ui/core/transitions"
 import { Alert } from "@material-ui/lab"
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
+import {
+  setBulkSelectedIds,
+  setStatusUpdateType,
+  setUpdatedAnswersIds,
+  useAnswerListState,
+} from "../../contexts/AnswerListContext"
 import { changeAnswerStatusForMany } from "../../services/quizzes"
 import { Answer } from "../../types/Answer"
 import AnswerCard from "../Answer"
@@ -10,9 +16,6 @@ import { ButtonFieldWrapper } from "../Shared/ButtonFieldWrapper"
 
 export interface AnswerListProps {
   data: Answer[]
-  expandAll: boolean
-  bulkSelectMode: boolean
-  bulkSelectedIds: string[]
 }
 
 const BulkActionWrapper = styled.div`
@@ -26,34 +29,29 @@ const BulkActionWrapper = styled.div`
   }
 `
 
-export const AnswerList = ({
-  data,
-  expandAll,
-  bulkSelectMode,
-  bulkSelectedIds,
-}: AnswerListProps) => {
-  const [selectedAnswerIds, setSelectedAnswerIds] = useState<string[]>([])
+export const AnswerList = ({ data }: AnswerListProps) => {
   const [showSnacks, setShowSnacks] = useState(false)
   const [updatedAnswers, setUpdatedAnswers] = useState<null | Answer[]>(null)
-  const [status, setStatus] = useState("")
   const [answers, setAnswers] = useState<Answer[]>([])
 
-  useEffect(() => {
-    setSelectedAnswerIds(bulkSelectedIds)
-    data && setAnswers(data)
-  }, [bulkSelectedIds])
+  const [{ bulkSelectedIds, statusUpdateType }, dispatch] = useAnswerListState()
 
-  const numberOfAnswersSelected = selectedAnswerIds.length
-  const answersHaveBeenSelected = selectedAnswerIds.length > 0
+  useEffect(() => {
+    if (data) setAnswers(data)
+  }, [data])
+
+  const numberOfAnswersSelected = bulkSelectedIds?.length
+  const answersHaveBeenSelected = bulkSelectedIds?.length > 0
 
   const handleBulkAction = async (actionType: string) => {
     try {
-      const res = await changeAnswerStatusForMany(selectedAnswerIds, actionType)
+      const res = await changeAnswerStatusForMany(bulkSelectedIds, actionType)
       if (res[0].status === actionType) {
         setUpdatedAnswers(res)
         setShowSnacks(true)
-        setStatus(actionType)
-        setSelectedAnswerIds([])
+        dispatch(setStatusUpdateType(actionType))
+        dispatch(setBulkSelectedIds([]))
+        dispatch(setUpdatedAnswersIds(bulkSelectedIds))
 
         const returnedIds = res.map(updated => updated.id)
 
@@ -122,15 +120,7 @@ export const AnswerList = ({
         </BulkActionWrapper>
       )}
       {answers.map(answer => (
-        <AnswerCard
-          key={answer.id}
-          answer={answer}
-          expanded={expandAll}
-          bulkSelectMode={bulkSelectMode}
-          bulkStatus={status}
-          selectedAnswerIds={selectedAnswerIds}
-          setSelectedAnswerIds={setSelectedAnswerIds}
-        />
+        <AnswerCard key={answer.id} answer={answer} />
       ))}
     </>
   )
