@@ -1,6 +1,8 @@
 import { Button, TextField, Typography } from "@material-ui/core"
 import React, { useState } from "react"
 import styled from "styled-components"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faSearch } from "@fortawesome/free-solid-svg-icons"
 
 interface IFormProps {
   handleSubmit: (searchQuery: string) => Promise<void>
@@ -37,13 +39,23 @@ const AnswerSearchForm = (props: IFormProps) => {
   const [displayingResultsFor, setDisplayingResultsFor] = useState<
     null | string
   >(null)
-
+  const [enableSearch, setEnableSearch] = useState(false)
   const { handleSubmit } = props
 
   const handleSearchClearance = () => {
     handleSubmit("")
     setSearchQuery("")
     setDisplayingResultsFor(null)
+  }
+
+  if (!enableSearch) {
+    return (
+      <>
+        <div onClick={() => setEnableSearch(true)}>
+          <FontAwesomeIcon icon={faSearch} size="2x" />
+        </div>
+      </>
+    )
   }
 
   return (

@@ -1,12 +1,14 @@
-import React, { useState } from "react"
+import React, { useContext, useState } from "react"
 import styled from "styled-components"
 import { Pagination } from "@material-ui/lab"
 import { AnswerList } from "./AnswerList"
 import SkeletonLoader from "../Shared/SkeletonLoader"
 import { Button, Switch, Typography } from "@material-ui/core"
-import { SwitchField } from "../quizPages/answers/styles"
+import { SwitchField } from "../QuizPages/answers/styles"
 import { editableAnswerStates } from "./constants"
 import { Answer } from "../../types/Answer"
+
+import { AnswerListContext } from "../../contexts/AnswerListContext"
 
 export const PaginationField = styled.div`
   display: flex;
@@ -57,6 +59,12 @@ export const AnswerListWrapper = ({
 }: WrapperProps) => {
   const [bulkSelectMode, setBulkSelectMode] = useState(false)
   const [bulkSelectedIds, setBulkSelectedIds] = useState<string[]>([])
+
+  const { enableSearch } = useContext(AnswerListContext)
+  console.log(
+    "💩 ~ file: AnswerListWrapper.tsx ~ line 64 ~ enableSearch",
+    enableSearch,
+  )
 
   if (answersError) {
     return <>Something went wrong...</>

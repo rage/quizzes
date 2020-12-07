@@ -11,10 +11,10 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { getAnswersRequiringAttentionByQuizId } from "../../services/quizzes"
 import usePromise from "react-use-promise"
-import OverView from "../quizPages/overview"
-import EditPage from "../quizPages/edit"
-import AllAnswers from "../quizPages/answers/all"
-import RequiringAttention from "../quizPages/answers/requiring-attention"
+import OverView from "../QuizPages/overview"
+import EditPage from "../QuizPages/edit"
+import AllAnswers from "../QuizPages/answers/all"
+import RequiringAttention from "../QuizPages/answers/requiring-attention"
 import { ITabToComponent } from "../CoursePage/types"
 
 export const TabNavigator = () => {
