@@ -41,6 +41,7 @@ const CourseTabNavigator = () => {
         style={{ marginBottom: "3rem" }}
       >
         <Tab
+          key="listing"
           icon={<FontAwesomeIcon icon={faChalkboard} />}
           value="listing"
           label={<Typography>Part Listing</Typography>}
@@ -50,6 +51,7 @@ const CourseTabNavigator = () => {
           }}
         />
         <Tab
+          key="edit"
           icon={<FontAwesomeIcon icon={faPen} />}
           value="edit"
           label={<Typography>Edit Course Details</Typography>}
