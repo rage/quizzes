@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Tabs, Tab, Badge, Typography } from "@material-ui/core"
 import { useRouter } from "next/router"
 import {
@@ -20,16 +20,20 @@ import { ITabToComponent } from "../CoursePage/types"
 export const TabNavigator = () => {
   const router = useRouter()
   const quizId = router.query.quizId?.toString() ?? ""
-  const pageOnUrl = router.query.page?.[0] ?? "overview"
+  const URL_HREF = `/quizzes/[quizId]/[...page]`
+  const pathname = `/quizzes/${quizId}`
 
-  const [requiringAttention, error] = usePromise(
+  const [requiringAttention, _] = usePromise(
     () => getAnswersRequiringAttentionByQuizId(quizId),
     [quizId],
   )
-  const [currentPage, setCurrentPage] = useState<string>(pageOnUrl)
+  const [currentTab, setCurrentTab] = useState("overview")
 
-  const URL_HREF = `/quizzes/[quizId]/[...page]`
-  const pathname = `/quizzes/${quizId}`
+  useEffect(() => {
+    if (router.query.page) {
+      setCurrentTab(router.query.page[0])
+    }
+  }, [router.query.page])
 
   const quizTabs: ITabToComponent = {
     overview: OverView,
@@ -39,46 +43,51 @@ export const TabNavigator = () => {
     default_tab: OverView,
   }
 
-  const ComponentTag = quizTabs[currentPage]
-    ? quizTabs[currentPage]
+  const ComponentTag = quizTabs[currentTab]
+    ? quizTabs[currentTab]
     : quizTabs["default_tab"]
+
   return (
     <>
       <Tabs
         variant="fullWidth"
-        value={currentPage}
+        value={currentTab}
         indicatorColor="primary"
         textColor="primary"
       >
         <Tab
+          key="overview"
           icon={<FontAwesomeIcon icon={faChalkboard} />}
           value="overview"
           label={<Typography>Overview</Typography>}
           onClick={() => {
             router.push(URL_HREF, `${pathname}/overview`)
-            setCurrentPage("overview")
+            setCurrentTab("overview")
           }}
         />
         <Tab
+          key="edit"
           icon={<FontAwesomeIcon icon={faPen} />}
           value="edit"
           label={<Typography>Edit quiz</Typography>}
           onClick={() => {
             router.push(URL_HREF, `${pathname}/edit`)
-            setCurrentPage("edit")
+            setCurrentTab("edit")
           }}
         />
         <Tab
+          key="all-answers"
           icon={<FontAwesomeIcon icon={faScroll} />}
           value="all-answers"
           label={<Typography>All answers</Typography>}
           onClick={() => {
             router.push(URL_HREF, `${pathname}/all-answers`)
-            setCurrentPage("all-answers")
+            setCurrentTab("all-answers")
           }}
         />
 
         <Tab
+          key="answers-requiring-attention"
           icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
           value="answers-requiring-attention"
           label={
@@ -92,7 +101,7 @@ export const TabNavigator = () => {
           }
           onClick={() => {
             router.push(URL_HREF, `${pathname}/answers-requiring-attention`)
-            setCurrentPage("answers-requiring-attention")
+            setCurrentTab("answers-requiring-attention")
           }}
         />
       </Tabs>

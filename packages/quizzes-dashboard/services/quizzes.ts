@@ -269,7 +269,7 @@ export const getUserAbilitiesForCourse = async (
   courseId: string,
 ): Promise<string[]> => {
   const userInfo = checkStore()
-  if (userInfo) {
+  if (userInfo && courseId) {
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
