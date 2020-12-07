@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import usePromise from "react-use-promise"
 import {
   fetchQuiz,
@@ -60,38 +60,38 @@ export const OverView = () => {
     },
   ])
 
-  if (!quiz || !course || !userAbilities) {
-    return (
-      <>
-        <TabTextLoading />
-        <SkeletonLoader height={250} skeletonCount={15} />
-      </>
-    )
-  }
-
-  if (quizError || courseError || userError) {
-    return <TabTextError />
-  }
-
   return (
     <>
-      <TabText text={quiz.title} />
-      <QuizTitle quiz={quiz} />
-      <StyledCard>
-        {quiz.body && (
-          <DescriptionContainer>
-            <Typography>{quiz.body}</Typography>
-          </DescriptionContainer>
-        )}
-      </StyledCard>
-      <StyledCard>
-        <Typography variant="h3">Quiz answer by status</Typography>
-        <AnswerStatistics />
-      </StyledCard>
-      {userAbilities.includes("download") ? (
-        <DownloadInfoForms quiz={quiz} course={course} />
+      {quiz && (
+        <>
+          <TabText text={quiz.title} />
+          <QuizTitle quiz={quiz} />
+        </>
+      )}
+      {!quiz || !course || !userAbilities ? (
+        <>
+          <TabTextLoading />
+          <SkeletonLoader height={250} skeletonCount={15} />
+        </>
+      ) : quizError || courseError || userError ? (
+        <TabTextError />
       ) : (
-        ""
+        <>
+          <StyledCard>
+            {quiz.body && (
+              <DescriptionContainer>
+                <Typography>{quiz.body}</Typography>
+              </DescriptionContainer>
+            )}
+          </StyledCard>
+          <StyledCard>
+            <Typography variant="h3">Quiz answer by status</Typography>
+            <AnswerStatistics />
+          </StyledCard>
+          {userAbilities.includes("download") && (
+            <DownloadInfoForms quiz={quiz} course={course} />
+          )}
+        </>
       )}
     </>
   )
