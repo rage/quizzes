@@ -63,20 +63,11 @@ const EditPage = () => {
     )
   }
 
-  if (!quizData || !course) {
-    return (
-      <>
-        <TabTextLoading />
-        <div>loading...</div>
-      </>
-    )
-  }
-
   return (
     <>
-      <TabText text={`Editing ${quizData?.title}`} />
+      {quizData && <TabText text={`Editing ${quizData?.title}`} />}
       <SaveButton />
-      <QuizTitle quiz={quizData} />
+      {quizData && <QuizTitle quiz={quizData} />}
       <QuizEditForms />
     </>
   )
