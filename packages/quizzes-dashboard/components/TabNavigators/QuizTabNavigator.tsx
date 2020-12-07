@@ -26,12 +26,11 @@ export const TabNavigator = () => {
     () => getAnswersRequiringAttentionByQuizId(quizId),
     [quizId],
   )
-  const [currentPage, setCurrentPage] = useState("overview")
+  const [currentTab, setCurrentTab] = useState("overview")
 
   useEffect(() => {
-    const { page } = router.query
-    if (page) {
-      setCurrentPage(page as string)
+    if (router.query.page) {
+      setCurrentTab(router.query.page[0])
     }
   }, [router.query.page])
 
@@ -43,15 +42,15 @@ export const TabNavigator = () => {
     default_tab: OverView,
   }
 
-  const ComponentTag = quizTabs[currentPage]
-    ? quizTabs[currentPage]
+  const ComponentTag = quizTabs[currentTab]
+    ? quizTabs[currentTab]
     : quizTabs["default_tab"]
 
   return (
     <>
       <Tabs
         variant="fullWidth"
-        value={currentPage}
+        value={currentTab}
         indicatorColor="primary"
         textColor="primary"
       >
@@ -62,7 +61,7 @@ export const TabNavigator = () => {
           label={<Typography>Overview</Typography>}
           onClick={() => {
             router.push(URL_HREF, `${pathname}/overview`)
-            setCurrentPage("overview")
+            setCurrentTab("overview")
           }}
         />
         <Tab
@@ -72,7 +71,7 @@ export const TabNavigator = () => {
           label={<Typography>Edit quiz</Typography>}
           onClick={() => {
             router.push(URL_HREF, `${pathname}/edit`)
-            setCurrentPage("edit")
+            setCurrentTab("edit")
           }}
         />
         <Tab
@@ -82,7 +81,7 @@ export const TabNavigator = () => {
           label={<Typography>All answers</Typography>}
           onClick={() => {
             router.push(URL_HREF, `${pathname}/all-answers`)
-            setCurrentPage("all-answers")
+            setCurrentTab("all-answers")
           }}
         />
 
@@ -101,7 +100,7 @@ export const TabNavigator = () => {
           }
           onClick={() => {
             router.push(URL_HREF, `${pathname}/answers-requiring-attention`)
-            setCurrentPage("answers-requiring-attention")
+            setCurrentTab("answers-requiring-attention")
           }}
         />
       </Tabs>

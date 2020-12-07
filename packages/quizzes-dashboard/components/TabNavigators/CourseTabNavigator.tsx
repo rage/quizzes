@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { faChalkboard, faPen } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Tab, Tabs, Typography } from "@material-ui/core"
@@ -9,8 +9,7 @@ import { useRouter } from "next/router"
 
 const CourseTabNavigator = () => {
   const router = useRouter()
-  const pageOnUrl = router.query.page?.[0] ?? "listing"
-  const [currentTab, setCurrentTab] = useState(pageOnUrl)
+  const [currentTab, setCurrentTab] = useState("listing")
   const courseId = router.query.courseId?.toString() ?? ""
 
   const URL_HREF = `/courses/[courseId]/[...page]`
@@ -25,6 +24,12 @@ const CourseTabNavigator = () => {
   const ComponentTag = coursePageTabs[currentTab]
     ? coursePageTabs[currentTab]
     : coursePageTabs["default_tab"]
+
+  useEffect(() => {
+    if (router.query.page) {
+      setCurrentTab(router.query.page[0])
+    }
+  }, [router.query.page])
 
   return (
     <>
