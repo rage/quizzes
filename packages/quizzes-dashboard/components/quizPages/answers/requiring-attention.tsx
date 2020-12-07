@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import {
   getAnswersRequiringAttention,
@@ -10,15 +10,14 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import usePromise from "react-use-promise"
 import { MenuItem, Switch, Typography } from "@material-ui/core"
 import QuizTitle from "../QuizTitleContainer"
-import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
+import { TabTextError, TabText } from "../TabHeaders"
 import {
   SizeSelectorField,
   SwitchField,
   OptionsContainer,
   SortOrderField,
 } from "./styles"
-import { TAnswersDisplayed, TSortOptions } from "./types"
-import SkeletonLoader from "../../Shared/SkeletonLoader"
+import { TAnswersDisplayed } from "./types"
 import AnswerSearchForm from "../../AnswerSearchForm"
 import AnswerListWrapper from "../../Answer/AnswerListWrapper"
 import { Answer } from "../../../types/Answer"
@@ -30,20 +29,10 @@ export const RequiringAttention = () => {
   const URL_HREF = `/quizzes/[quizId]/[...page]`
   const pathname = `/quizzes/${quizId}/answers-requiring-attention/`
 
-  const paramSize = Number(route.query.answers) as TAnswersDisplayed
-  const paramPage = Number(route.query.pageNo)
-  let paramSort: TSortOptions | null = null
-  if (route.query.sort) {
-    paramSort = route.query.sort as TSortOptions
-  }
-  const paramExpand = route.query.expandAll === "true" ? true : false
-
-  const [currentPage, setCurrentPage] = useState<number>(paramPage || 1)
-  const [sortOrder, setSortOrder] = useState<TSortOptions>(paramSort || "desc")
-  const [expandAll, setExpandAll] = useState<boolean>(paramExpand || false)
-  const [answersDisplayed, setAnswersDisplayed] = useState<TAnswersDisplayed>(
-    paramSize || 10,
-  )
+  const [currentPage, setCurrentPage] = useState(1)
+  const [sortOrder, setSortOrder] = useState("desc")
+  const [expandAll, setExpandAll] = useState(false)
+  const [answersDisplayed, setAnswersDisplayed] = useState(10)
 
   const [answers, answersError] = usePromise(
     () =>
@@ -74,6 +63,30 @@ export const RequiringAttention = () => {
 
   const [queryToPush, setQueryToPush] = useState({})
 
+  useEffect(() => {
+    const { pageNo, sort, answers, expandAll } = route.query
+    let initialQuery: any = {}
+
+    if (pageNo) {
+      setCurrentPage(Number(pageNo))
+      initialQuery.pageNo = pageNo
+    }
+    if (answers) {
+      setAnswersDisplayed(Number(answers))
+      initialQuery.answers = answers
+    }
+    if (expandAll) {
+      setExpandAll(true)
+      initialQuery.expandAll = expandAll
+    }
+    if (sort) {
+      setSortOrder(sort as string)
+      initialQuery.sort = sort
+    }
+
+    setQueryToPush(initialQuery)
+  }, [route.query])
+
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
@@ -85,15 +98,6 @@ export const RequiringAttention = () => {
       label: `${quiz ? quiz.title : ""}`,
     },
   ])
-
-  // if (!quiz) {
-  //   return (
-  //     <>
-  //       <TabTextLoading />
-  //       <SkeletonLoader height={250} skeletonCount={15} />
-  //     </>
-  //   )
-  // }
 
   if (answersError || quizError || courseError) {
     return (
@@ -111,7 +115,10 @@ export const RequiringAttention = () => {
     route.push(URL_HREF, { pathname, query }, { shallow: true })
   }
 
-  const handleChange = (event: React.ChangeEvent<any>, fieldType?: string) => {
+  const handleFieldChange = (
+    event: React.ChangeEvent<any>,
+    fieldType?: string,
+  ) => {
     let query = null
     let updatedQueryParams = null
 
@@ -185,7 +192,7 @@ export const RequiringAttention = () => {
                 name="expand-field"
                 checked={expandAll}
                 onChange={event => {
-                  handleChange(event, "expand")
+                  handleFieldChange(event, "expand")
                 }}
               />
             </SwitchField>
@@ -195,7 +202,7 @@ export const RequiringAttention = () => {
               label="Answers"
               variant="outlined"
               select
-              onChange={event => handleChange(event, "pages")}
+              onChange={event => handleFieldChange(event, "pages")}
               helperText="How many answers are shown per page"
             >
               <MenuItem value={10}>10</MenuItem>
@@ -208,7 +215,7 @@ export const RequiringAttention = () => {
               select
               helperText="Sorts answers by date they've been submitted"
               value={sortOrder}
-              onChange={event => handleChange(event, "order")}
+              onChange={event => handleFieldChange(event, "order")}
             >
               <MenuItem value="desc">Latest first</MenuItem>
               <MenuItem value="asc">Oldest first</MenuItem>
@@ -224,7 +231,13 @@ export const RequiringAttention = () => {
             page={currentPage}
             answersError={answersError}
             fetchingAnswers={fetchingAnswers}
-            answers={searchResults ? searchResults : answers}
+            answers={
+              searchResults
+                ? searchResults
+                : answers
+                ? answers
+                : { results: [], total: 0 }
+            }
           />
         </>
       )}

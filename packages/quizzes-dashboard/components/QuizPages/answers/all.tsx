@@ -23,10 +23,9 @@ import {
 import { TAnswersDisplayed, ChipProps } from "./types"
 import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
 import AnswerListWrapper from "../../Answer/AnswerListWrapper"
-import SkeletonLoader from "../../Shared/SkeletonLoader"
 import AnswerSearchForm from "../../AnswerSearchForm"
 import { Answer } from "../../../types/Answer"
-import { AnswerListProvider } from "../../../contexts/AnswerListContext"
+import SkeletonLoader from "../../Shared/SkeletonLoader"
 
 // TODO: refactor/move
 const StyledChip = styled(Chip)<ChipProps>`
@@ -184,16 +183,7 @@ export const AllAnswers = () => {
       initialQuery.filters = filtersAsStringArray
     }
     setQueryToPush(initialQuery)
-  }, [])
-
-  // if (!quiz) {
-  //   return (
-  //     <>
-  //       <TabTextLoading />
-  //       <SkeletonLoader height={500} skeletonCount={1} />
-  //     </>
-  //   )
-  // }
+  }, [route.query])
 
   if (quizError || courseError) {
     return (
@@ -359,25 +349,23 @@ export const AllAnswers = () => {
         })}
       </FilterParamsField>
       <AnswerSearchForm handleSubmit={hanldeTextSearch} />
-      <AnswerListProvider>
-        <AnswerListWrapper
-          expandAll={expandAll}
-          order={sortOrder}
-          quizId={quizId}
-          size={answersDisplayed}
-          handlePageChange={handlePageChange}
-          page={currentPage}
-          answersError={answersError}
-          fetchingAnswers={fetchingAnswers}
-          answers={
-            searchResults
-              ? searchResults
-              : allAnswers
-              ? allAnswers
-              : { results: [], total: 0 }
-          }
-        />
-      </AnswerListProvider>
+      <AnswerListWrapper
+        expandAll={expandAll}
+        order={sortOrder}
+        quizId={quizId}
+        size={answersDisplayed}
+        handlePageChange={handlePageChange}
+        page={currentPage}
+        answersError={answersError}
+        fetchingAnswers={fetchingAnswers}
+        answers={
+          searchResults
+            ? searchResults
+            : allAnswers
+            ? allAnswers
+            : { results: [], total: 0 }
+        }
+      />
     </>
   )
 }
