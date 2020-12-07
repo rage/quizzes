@@ -6,7 +6,6 @@ import {
   faChalkboard,
   faScroll,
   faExclamationTriangle,
-  faSearch,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { getAnswersRequiringAttentionByQuizId } from "../../services/quizzes"
@@ -16,6 +15,7 @@ import EditPage from "../QuizPages/edit"
 import AllAnswers from "../QuizPages/answers/all"
 import RequiringAttention from "../QuizPages/answers/requiring-attention"
 import { ITabToComponent } from "../CoursePage/types"
+import { AnswerListProvider } from "../../contexts/AnswerListContext"
 
 export const TabNavigator = () => {
   const router = useRouter()
@@ -105,7 +105,9 @@ export const TabNavigator = () => {
           }}
         />
       </Tabs>
-      <ComponentTag />
+      <AnswerListProvider>
+        <ComponentTag />
+      </AnswerListProvider>
     </>
   )
 }

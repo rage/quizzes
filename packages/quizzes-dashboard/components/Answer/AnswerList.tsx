@@ -34,7 +34,7 @@ export const AnswerList = ({ data }: AnswerListProps) => {
   const [updatedAnswers, setUpdatedAnswers] = useState<null | Answer[]>(null)
   const [answers, setAnswers] = useState<Answer[]>([])
 
-  const [{ bulkSelectedIds, statusUpdateType }, dispatch] = useAnswerListState()
+  const [{ bulkSelectedIds }, dispatch] = useAnswerListState()
 
   useEffect(() => {
     if (data) setAnswers(data)
@@ -46,6 +46,7 @@ export const AnswerList = ({ data }: AnswerListProps) => {
   const handleBulkAction = async (actionType: string) => {
     try {
       const res = await changeAnswerStatusForMany(bulkSelectedIds, actionType)
+
       if (res[0].status === actionType) {
         setUpdatedAnswers(res)
         setShowSnacks(true)

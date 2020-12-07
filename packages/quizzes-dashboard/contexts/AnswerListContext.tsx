@@ -23,7 +23,7 @@ const initialState: IAnswerListState = {
 
 enum AnswerListTypes {
   TOGGLE_ENABLE_SEARCH = "TOGGLE_ENABLE_SEARCH",
-  TOGGLE_EXPAND_ALL = "TOGGLE_EXPAND_ALL",
+  SET_EXPAND_ALL = "SET_EXPAND_ALL",
   TOGGLE_BULK_SELECT_MODE = "TOGGLE_BULK_SELECT_MODE",
   SET_ANSWERS = "SET_ANSWERS",
   SET_BULK_SELECTED_IDS = "SET_BULK_SELECTED_IDS",
@@ -32,10 +32,7 @@ enum AnswerListTypes {
 }
 
 type AnswerListActionTypes =
-  // | { type: AnswerListTypes.TOGGLE_ENABLE_SEARCH }
-  // | { type: AnswerListTypes.TOGGLE_EXPAND_ALL }
-  // | { type: AnswerListTypes.SET_ANSWERS; answers: Answer[] }
-  // | { type: AnswerListTypes.TOGGLE_BULK_SELECT_MODE }
+  | { type: AnswerListTypes.SET_EXPAND_ALL; payload: boolean }
   | { type: AnswerListTypes.SET_BULK_SELECTED_IDS; payload: string[] }
   | { type: AnswerListTypes.SET_UPDATED_ANSWERS_IDS; payload: string[] }
   | { type: AnswerListTypes.TOGGLE_BULK_SELECT_MODE }
@@ -57,6 +54,8 @@ let reducer = (
       return { ...state, updatedAnswersIds: [...action.payload] }
     case AnswerListTypes.SET_STATUS_UPDATE_TYPE:
       return { ...state, statusUpdateType: action.payload }
+    case AnswerListTypes.SET_EXPAND_ALL:
+      return { ...state, expandAll: action.payload }
     default:
       throw new Error()
   }
@@ -79,6 +78,13 @@ export const setUpdatedAnswersIds = (ids: string[]): AnswerListActionTypes => {
 export const toggleBulkSelectMode = (): AnswerListActionTypes => {
   return {
     type: AnswerListTypes.TOGGLE_BULK_SELECT_MODE,
+  }
+}
+
+export const setExpandAll = (value: boolean): AnswerListActionTypes => {
+  return {
+    type: AnswerListTypes.SET_EXPAND_ALL,
+    payload: value,
   }
 }
 

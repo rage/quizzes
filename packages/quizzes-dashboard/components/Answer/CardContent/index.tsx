@@ -85,21 +85,15 @@ const DebugDialogWrapper = styled.div`
 export interface AnswerContentProps {
   answer: Answer
   setFaded: (faded: boolean) => void
-  setStatus: (accepted: string) => void
 }
 
-export const AnswerContent = ({
-  answer,
-  setFaded,
-  setStatus,
-}: AnswerContentProps) => {
-  const [showMore, setShowMore] = useState(false)
+export const AnswerContent = ({ answer, setFaded }: AnswerContentProps) => {
+  const [{ expandAll, updatedAnswersIds }] = useAnswerListState()
+  const [showMore, setShowMore] = useState(expandAll)
   const [showPeerreviewModal, setShowPeerreviewModal] = useState(false)
-  const [handled, setHandled] = useState(false)
+  const [handled] = useState(false)
   const [height, setHeight] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
-
-  const [{ expandAll, updatedAnswersIds }, _] = useAnswerListState()
 
   useEffect(() => setShowMore(expandAll), [expandAll])
 
@@ -107,7 +101,7 @@ export const AnswerContent = ({
     if (handled || updatedAnswersIds.includes(answer.id)) {
       setFaded(true)
     }
-  }, [handled, updatedAnswersIds])
+  }, [handled, updatedAnswersIds, expandAll])
 
   useLayoutEffect(() => {
     if (ref.current !== null) {
@@ -175,7 +169,7 @@ export const AnswerContent = ({
         )}
       </StatButtonWrapper>
       {editableAnswerStates.includes(answer.status) && (
-        <ManualReviewField answer={answer} setStatus={setStatus} />
+        <ManualReviewField answer={answer} />
       )}
     </>
   )

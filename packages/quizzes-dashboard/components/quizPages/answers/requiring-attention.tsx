@@ -21,8 +21,14 @@ import { TAnswersDisplayed } from "./types"
 import AnswerSearchForm from "../../AnswerSearchForm"
 import AnswerListWrapper from "../../Answer/AnswerListWrapper"
 import { Answer } from "../../../types/Answer"
+import {
+  setExpandAll,
+  useAnswerListState,
+} from "../../../contexts/AnswerListContext"
 
 export const RequiringAttention = () => {
+  const [{ expandAll }, dispatch] = useAnswerListState()
+
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
 
@@ -31,7 +37,6 @@ export const RequiringAttention = () => {
 
   const [currentPage, setCurrentPage] = useState(1)
   const [sortOrder, setSortOrder] = useState("desc")
-  const [expandAll, setExpandAll] = useState(false)
   const [answersDisplayed, setAnswersDisplayed] = useState(10)
 
   const [answers, answersError] = usePromise(
@@ -76,7 +81,7 @@ export const RequiringAttention = () => {
       initialQuery.answers = answers
     }
     if (expandAll) {
-      setExpandAll(true)
+      dispatch(setExpandAll(true))
       initialQuery.expandAll = expandAll
     }
     if (sort) {
@@ -135,7 +140,7 @@ export const RequiringAttention = () => {
       case "expand":
         updatedQueryParams = { ...queryToPush, expandAll: event.target.checked }
         setQueryToPush(updatedQueryParams)
-        setExpandAll(event.target.checked)
+        dispatch(setExpandAll(event.target.checked))
         query = updatedQueryParams
         break
       case "order":
@@ -168,7 +173,7 @@ export const RequiringAttention = () => {
         setSearchResults(response)
       }
     } catch (err) {
-      // setAnswersError(err)
+      console.log(err)
     } finally {
       setFetchingAnswers(false)
     }
@@ -223,7 +228,6 @@ export const RequiringAttention = () => {
           </OptionsContainer>
           <AnswerSearchForm handleSubmit={handleSubmit} />
           <AnswerListWrapper
-            expandAll={expandAll}
             order={sortOrder}
             quizId={quizId}
             size={answersDisplayed}

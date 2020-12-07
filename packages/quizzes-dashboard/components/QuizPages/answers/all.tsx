@@ -26,7 +26,10 @@ import AnswerListWrapper from "../../Answer/AnswerListWrapper"
 import AnswerSearchForm from "../../AnswerSearchForm"
 import { Answer } from "../../../types/Answer"
 import SkeletonLoader from "../../Shared/SkeletonLoader"
-import { AnswerListProvider } from "../../../contexts/AnswerListContext"
+import {
+  useAnswerListState,
+  setExpandAll,
+} from "../../../contexts/AnswerListContext"
 
 // TODO: refactor/move
 const StyledChip = styled(Chip)<ChipProps>`
@@ -42,6 +45,8 @@ const StyledChip = styled(Chip)<ChipProps>`
 `
 
 export const AllAnswers = () => {
+  const [{ expandAll }, dispatch] = useAnswerListState()
+
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
 
@@ -50,7 +55,6 @@ export const AllAnswers = () => {
 
   const [currentPage, setCurrentPage] = useState(1)
   const [sortOrder, setSortOrder] = useState("desc")
-  const [expandAll, setExpandAll] = useState(false)
   const [answersDisplayed, setAnswersDisplayed] = useState(10)
   const [filterParameters, setFilterParameters] = useState<string[]>([])
 
@@ -94,8 +98,7 @@ export const AllAnswers = () => {
         setSearchResults(response)
       }
     } catch (err) {
-      //TODO: handle this
-      // setAnswersError(err)
+      console.log(err)
     } finally {
       setFetchingAnswers(false)
     }
@@ -171,7 +174,7 @@ export const AllAnswers = () => {
       initialQuery.answers = answers
     }
     if (expandAll) {
-      setExpandAll(true)
+      dispatch(setExpandAll(true))
       initialQuery.expandAll = expandAll
     }
     if (sort) {
@@ -231,7 +234,7 @@ export const AllAnswers = () => {
       case "expand":
         updatedQueryParams = { ...queryToPush, expandAll: event.target.checked }
         setQueryToPush(updatedQueryParams)
-        setExpandAll(event.target.checked)
+        dispatch(setExpandAll(!expandAll))
         query = updatedQueryParams
         break
       case "order":
@@ -350,24 +353,22 @@ export const AllAnswers = () => {
         })}
       </FilterParamsField>
       <AnswerSearchForm handleSubmit={hanldeTextSearch} />
-      <AnswerListProvider>
-        <AnswerListWrapper
-          order={sortOrder}
-          quizId={quizId}
-          size={answersDisplayed}
-          handlePageChange={handlePageChange}
-          page={currentPage}
-          answersError={answersError}
-          fetchingAnswers={fetchingAnswers}
-          answers={
-            searchResults
-              ? searchResults
-              : allAnswers
-              ? allAnswers
-              : { results: [], total: 0 }
-          }
-        />
-      </AnswerListProvider>
+      <AnswerListWrapper
+        order={sortOrder}
+        quizId={quizId}
+        size={answersDisplayed}
+        handlePageChange={handlePageChange}
+        page={currentPage}
+        answersError={answersError}
+        fetchingAnswers={fetchingAnswers}
+        answers={
+          searchResults
+            ? searchResults
+            : allAnswers
+            ? allAnswers
+            : { results: [], total: 0 }
+        }
+      />
     </>
   )
 }
