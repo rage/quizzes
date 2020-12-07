@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Tabs, Tab, Badge, Typography } from "@material-ui/core"
 import { useRouter } from "next/router"
 import {
@@ -10,25 +10,30 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { getAnswersRequiringAttentionByQuizId } from "../../services/quizzes"
 import usePromise from "react-use-promise"
-import OverView from "../quizPages/overview"
-import EditPage from "../quizPages/edit"
-import AllAnswers from "../quizPages/answers/all"
-import RequiringAttention from "../quizPages/answers/requiring-attention"
+import OverView from "../QuizPages/overview"
+import EditPage from "../QuizPages/edit"
+import AllAnswers from "../QuizPages/answers/all"
+import RequiringAttention from "../QuizPages/answers/requiring-attention"
 import { ITabToComponent } from "../CoursePage/types"
 
 export const TabNavigator = () => {
   const router = useRouter()
   const quizId = router.query.quizId?.toString() ?? ""
-  const pageOnUrl = router.query.page?.[0] ?? "overview"
+  const URL_HREF = `/quizzes/[quizId]/[...page]`
+  const pathname = `/quizzes/${quizId}`
 
-  const [requiringAttention, error] = usePromise(
+  const [requiringAttention, _] = usePromise(
     () => getAnswersRequiringAttentionByQuizId(quizId),
     [quizId],
   )
-  const [currentPage, setCurrentPage] = useState<string>(pageOnUrl)
+  const [currentPage, setCurrentPage] = useState("overview")
 
-  const URL_HREF = `/quizzes/[quizId]/[...page]`
-  const pathname = `/quizzes/${quizId}`
+  useEffect(() => {
+    const { page } = router.query
+    if (page) {
+      setCurrentPage(page as string)
+    }
+  }, [router.query.page])
 
   const quizTabs: ITabToComponent = {
     overview: OverView,
@@ -41,6 +46,7 @@ export const TabNavigator = () => {
   const ComponentTag = quizTabs[currentPage]
     ? quizTabs[currentPage]
     : quizTabs["default_tab"]
+
   return (
     <>
       <Tabs
@@ -50,6 +56,7 @@ export const TabNavigator = () => {
         textColor="primary"
       >
         <Tab
+          key="overview"
           icon={<FontAwesomeIcon icon={faChalkboard} />}
           value="overview"
           label={<Typography>Overview</Typography>}
@@ -59,6 +66,7 @@ export const TabNavigator = () => {
           }}
         />
         <Tab
+          key="edit"
           icon={<FontAwesomeIcon icon={faPen} />}
           value="edit"
           label={<Typography>Edit quiz</Typography>}
@@ -68,6 +76,7 @@ export const TabNavigator = () => {
           }}
         />
         <Tab
+          key="all-answers"
           icon={<FontAwesomeIcon icon={faScroll} />}
           value="all-answers"
           label={<Typography>All answers</Typography>}
@@ -78,6 +87,7 @@ export const TabNavigator = () => {
         />
 
         <Tab
+          key="answers-requiring-attention"
           icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
           value="answers-requiring-attention"
           label={
