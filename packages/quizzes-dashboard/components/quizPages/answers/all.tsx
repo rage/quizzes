@@ -186,14 +186,14 @@ export const AllAnswers = () => {
     setQueryToPush(initialQuery)
   }, [])
 
-  if (!quiz || !course) {
-    return (
-      <>
-        <TabTextLoading />
-        <SkeletonLoader height={500} skeletonCount={1} />
-      </>
-    )
-  }
+  // if (!quiz) {
+  //   return (
+  //     <>
+  //       <TabTextLoading />
+  //       <SkeletonLoader height={500} skeletonCount={1} />
+  //     </>
+  //   )
+  // }
 
   if (quizError || courseError) {
     return (
@@ -291,7 +291,7 @@ export const AllAnswers = () => {
   return (
     <>
       <TabText text="All answers" />
-      <QuizTitle quiz={quiz} />
+      {quiz ? <QuizTitle quiz={quiz} /> : <TabTextLoading />}
       <OptionsContainer>
         <SwitchField>
           <Typography>Expand all</Typography>

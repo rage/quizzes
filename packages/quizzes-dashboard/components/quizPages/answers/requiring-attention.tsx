@@ -86,14 +86,14 @@ export const RequiringAttention = () => {
     },
   ])
 
-  if (!answers || !quiz || !course) {
-    return (
-      <>
-        <TabTextLoading />
-        <SkeletonLoader height={250} skeletonCount={15} />
-      </>
-    )
-  }
+  // if (!quiz) {
+  //   return (
+  //     <>
+  //       <TabTextLoading />
+  //       <SkeletonLoader height={250} skeletonCount={15} />
+  //     </>
+  //   )
+  // }
 
   if (answersError || quizError || courseError) {
     return (
@@ -170,14 +170,14 @@ export const RequiringAttention = () => {
   return (
     <>
       <TabText text="Answers requiring attention" />
-      {answers.results.length === 0 ? (
+      {answers?.results.length === 0 && quiz ? (
         <>
           <QuizTitle quiz={quiz} />
           <Typography variant="h3">No answers requiring attention</Typography>
         </>
       ) : (
         <>
-          <QuizTitle quiz={quiz} />
+          {quiz && <QuizTitle quiz={quiz} />}
           <OptionsContainer>
             <SwitchField>
               <Typography>Expand all</Typography>
