@@ -17,8 +17,6 @@ export const AnswerById = () => {
   const quizId = route.query.quizId?.toString() ?? ""
   const answerId = route.query.answerId?.toString() ?? ""
 
-  const [expanded, setExpanded] = useState(true)
-
   const [answerResponse, answerError] = usePromise(
     () => getAnswerById(answerId),
     [],
@@ -69,13 +67,7 @@ export const AnswerById = () => {
   return (
     <>
       <TabText text="Singular answer" />
-      <AnswerCard
-        answer={answerResponse}
-        expanded={expanded}
-        bulkSelectMode={false}
-        bulkStatus=""
-        selectedAnswerIds={[]}
-      />
+      <AnswerCard answer={answerResponse} />
     </>
   )
 }

@@ -48,7 +48,7 @@ export const StyledAnswerCard = styled(Card)<AdditionalAnswerCardProps>`
   padding: 2.5rem;
   box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 7px 0px,
     rgba(0, 0, 0, 0.15) 0px 3px 6px -2px, rgba(0, 0, 0, 0.25) 0px 1px 10px 0px !important;
-  background-color: ${props => {
+  background-color: ${(props) => {
     let rgba = "0, 0, 0, 0.3"
     if (props.status === "confirmed") {
       rgba = "76, 175, 80, 0.2"
@@ -62,10 +62,6 @@ export const StyledAnswerCard = styled(Card)<AdditionalAnswerCardProps>`
 
 export interface AnswerProps {
   answer: Answer
-  expanded?: boolean
-  bulkSelectMode?: boolean
-  selectedAnswerIds?: string[]
-  setSelectedAnswerIds?: React.Dispatch<React.SetStateAction<string[]>>
 }
 
 export const AnswerCard = ({ answer }: AnswerProps) => {
@@ -85,7 +81,7 @@ export const AnswerCard = ({ answer }: AnswerProps) => {
     let updatedIds = []
 
     if (bulkSelectedIds?.includes(answer.id)) {
-      updatedIds = bulkSelectedIds.filter(id => id !== answer.id)
+      updatedIds = bulkSelectedIds.filter((id: string) => id !== answer.id)
     } else {
       updatedIds = [...(bulkSelectedIds || []), answer.id]
     }
