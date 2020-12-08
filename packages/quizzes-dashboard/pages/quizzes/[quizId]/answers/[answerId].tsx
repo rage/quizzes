@@ -9,7 +9,7 @@ import {
   TabTextLoading,
   TabText,
   TabTextError,
-} from "../../../../components/QuizPages/TabHeaders"
+} from "../../../../components/quizPages/TabHeaders"
 import SkeletonLoader from "../../../../components/Shared/SkeletonLoader"
 
 export const AnswerById = () => {
