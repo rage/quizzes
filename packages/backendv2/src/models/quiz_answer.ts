@@ -702,30 +702,25 @@ class QuizAnswer extends BaseModel {
       }
     }
 
-    if (autoConfirm) {
-      const answers = peerReviews
-        .map(pr => pr.answers.map(a => a.value))
-        .flat()
-        .filter(o => o !== undefined && o !== null)
+    const answers = peerReviews
+      .map(pr => pr.answers.map(a => a.value))
+      .flat()
+      .filter(o => o !== undefined && o !== null)
 
-      const sum: number = answers.reduce((prev, curr) => prev + curr, 0)
+    const sum: number = answers.reduce((prev, curr) => prev + curr, 0)
 
-      if (answers.length === 0) {
-        console.warn("Assessing an essay with 0 numeric peer review answers")
-        return status
-      }
-
-      if (sum / answers.length >= course.minReviewAverage) {
-        return "confirmed"
-      } else if (autoReject) {
-        return "rejected"
-      } else {
-        return "manual-review"
-      }
+    if (answers.length === 0) {
+      console.warn("Assessing an essay with 0 numeric peer review answers")
+      return status
     }
 
-    // TODO: if not auto confirm move to manual review once widget smart enough
-    return status
+    const passingGrade = sum / answers.length >= course.minReviewAverage
+
+    if (passingGrade) {
+      return autoConfirm ? "confirmed" : "manual-review"
+    } else {
+      return autoReject ? "rejected" : "manual-review"
+    }
   }
 
   public static async getAnswersToReview(reviewerId: number, quizId: string) {
