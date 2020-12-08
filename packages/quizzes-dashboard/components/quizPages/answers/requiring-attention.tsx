@@ -10,7 +10,7 @@ import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import usePromise from "react-use-promise"
 import { MenuItem, Switch, Typography } from "@material-ui/core"
 import QuizTitle from "../QuizTitleContainer"
-import { TabTextError, TabText } from "../TabHeaders"
+import { TabTextError, TabText, TabTextLoading } from "../TabHeaders"
 import {
   SizeSelectorField,
   SwitchField,
@@ -25,6 +25,7 @@ import {
   setExpandAll,
   useAnswerListState,
 } from "../../../contexts/AnswerListContext"
+import SkeletonLoader from "../../Shared/SkeletonLoader"
 
 export const RequiringAttention = () => {
   const [{ expandAll }, dispatch] = useAnswerListState()
@@ -189,7 +190,14 @@ export const RequiringAttention = () => {
         </>
       ) : (
         <>
-          {quiz && <QuizTitle quiz={quiz} />}
+          {quiz ? (
+            <QuizTitle quiz={quiz} />
+          ) : (
+            <>
+              <TabTextLoading />
+              <SkeletonLoader height={250} skeletonCount={15} />
+            </>
+          )}
           <OptionsContainer>
             <SwitchField>
               <Typography>Expand all</Typography>

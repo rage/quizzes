@@ -285,7 +285,14 @@ export const AllAnswers = () => {
   return (
     <>
       <TabText text="All answers" />
-      {quiz ? <QuizTitle quiz={quiz} /> : <TabTextLoading />}
+      {quiz ? (
+        <QuizTitle quiz={quiz} />
+      ) : (
+        <>
+          <TabTextLoading />
+          <SkeletonLoader height={250} skeletonCount={15} />
+        </>
+      )}
       <OptionsContainer>
         <SwitchField>
           <Typography>Expand all</Typography>

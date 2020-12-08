@@ -12,6 +12,7 @@ import _ from "lodash"
 import QuizTitle from "./QuizTitleContainer"
 import usePromise from "react-use-promise"
 import { TabText, TabTextLoading, TabTextError } from "./TabHeaders"
+import SkeletonLoader from "../Shared/SkeletonLoader"
 
 const EditPage = () => {
   const router = useRouter()
@@ -65,7 +66,14 @@ const EditPage = () => {
 
   return (
     <>
-      {quizData && <TabText text={`Editing ${quizData?.title}`} />}
+      {quizData ? (
+        <TabText text={`Editing ${quizData?.title}`} />
+      ) : (
+        <>
+          <TabTextLoading />
+          <SkeletonLoader height={250} skeletonCount={15} />
+        </>
+      )}
       <SaveButton />
       {quizData && <QuizTitle quiz={quizData} />}
       <QuizEditForms />
