@@ -14,7 +14,6 @@ const FormWrapper = styled.form`
   display: flex;
   justify-content: center;
   align-items: center;
-  margin: 4rem 0;
 `
 
 const FormElementContainer = styled.div`
