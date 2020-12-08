@@ -3,7 +3,6 @@ import styled from "styled-components"
 import AnswerOverView from "./AnswerOverView"
 import ItemAnswers from "./ItemAnswers"
 import { Answer } from "../../../types/Answer"
-import CompactPeerReviewStats from "./CompactPeerReviewStats"
 import {
   Button,
   Collapse,
