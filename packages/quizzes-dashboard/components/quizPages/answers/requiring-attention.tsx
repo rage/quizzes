@@ -26,6 +26,7 @@ import {
   useAnswerListState,
 } from "../../../contexts/AnswerListContext"
 import SkeletonLoader from "../../Shared/SkeletonLoader"
+import AnswerListOptions from "../../Answer/AnswerListOptions"
 
 export const RequiringAttention = () => {
   const [{ expandAll }, dispatch] = useAnswerListState()
@@ -180,6 +181,12 @@ export const RequiringAttention = () => {
     }
   }
 
+  const availableAnswers = searchResults
+    ? searchResults
+    : answers
+    ? answers
+    : { results: [], total: 0 }
+
   return (
     <>
       <TabText text="Answers requiring attention" />
@@ -234,7 +241,10 @@ export const RequiringAttention = () => {
               <MenuItem value="asc">Oldest first</MenuItem>
             </SortOrderField>
           </OptionsContainer>
-          <AnswerSearchForm handleSubmit={handleSubmit} />
+          <AnswerListOptions
+            answers={availableAnswers}
+            handleTextSearch={handleSubmit}
+          />
           <AnswerListWrapper
             order={sortOrder}
             quizId={quizId}
@@ -243,13 +253,7 @@ export const RequiringAttention = () => {
             page={currentPage}
             answersError={answersError}
             fetchingAnswers={fetchingAnswers}
-            answers={
-              searchResults
-                ? searchResults
-                : answers
-                ? answers
-                : { results: [], total: 0 }
-            }
+            answers={availableAnswers}
           />
         </>
       )}

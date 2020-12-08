@@ -3,16 +3,9 @@ import styled from "styled-components"
 import { Pagination } from "@material-ui/lab"
 import { AnswerList } from "./AnswerList"
 import SkeletonLoader from "../Shared/SkeletonLoader"
-import { Button, Switch, Typography } from "@material-ui/core"
-import { SwitchField } from "../quizPages/answers/styles"
-import { editableAnswerStates } from "./constants"
-import { Answer } from "../../types/Answer"
+import { Typography } from "@material-ui/core"
 
-import {
-  setBulkSelectedIds,
-  toggleBulkSelectMode,
-  useAnswerListState,
-} from "../../contexts/AnswerListContext"
+import { Answer } from "../../types/Answer"
 
 export const PaginationField = styled.div`
   display: flex;
@@ -35,22 +28,6 @@ interface WrapperProps {
   handlePageChange: (nextPage: number) => void
 }
 
-const BulkSelectWrapper = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 2rem 0;
-  div:nth-of-type(1) {
-    margin-right: 3rem;
-  }
-
-  @media (max-width: 480px) {
-    flex-direction: column;
-    > button {
-      margin: 1rem 0;
-    }
-  }
-`
-
 export const AnswerListWrapper = ({
   size,
   page,
@@ -59,56 +36,14 @@ export const AnswerListWrapper = ({
   answers,
   fetchingAnswers,
 }: WrapperProps) => {
-  const [{ bulkSelectMode }, dispatch] = useAnswerListState()
-
   if (answersError) {
     return <>Something went wrong...</>
   }
 
   const resultsAvailable = answers?.results.length > 0
 
-  const handleSelectAll = () => {
-    const allSelected = answers?.results
-      .filter(answer => editableAnswerStates.includes(answer.status))
-      .map(editableAnswer => editableAnswer.id)
-    dispatch(setBulkSelectedIds(allSelected))
-  }
-
   return (
     <>
-      <BulkSelectWrapper>
-        <SwitchField>
-          <Typography>Bulk select answers</Typography>
-          <Switch
-            checked={bulkSelectMode}
-            onChange={_ => {
-              dispatch(toggleBulkSelectMode())
-            }}
-          />
-        </SwitchField>
-        {bulkSelectMode && (
-          <>
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              style={{ minWidth: "7rem" }}
-              onClick={handleSelectAll}
-            >
-              Select all
-            </Button>
-            <Button
-              variant="contained"
-              style={{ marginLeft: "2rem" }}
-              onClick={() => {
-                dispatch(setBulkSelectedIds([]))
-              }}
-            >
-              Clear Selection
-            </Button>
-          </>
-        )}
-      </BulkSelectWrapper>
       {resultsAvailable ? (
         <>
           <PaginationField>

@@ -39,23 +39,12 @@ const AnswerSearchForm = (props: IFormProps) => {
   const [displayingResultsFor, setDisplayingResultsFor] = useState<
     null | string
   >(null)
-  const [enableSearch, setEnableSearch] = useState(false)
   const { handleSubmit } = props
 
   const handleSearchClearance = () => {
     handleSubmit("")
     setSearchQuery("")
     setDisplayingResultsFor(null)
-  }
-
-  if (!enableSearch) {
-    return (
-      <>
-        <div onClick={() => setEnableSearch(true)}>
-          <FontAwesomeIcon icon={faSearch} size="2x" />
-        </div>
-      </>
-    )
   }
 
   return (

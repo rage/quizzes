@@ -54,7 +54,7 @@ export const AnswerList = ({ data }: AnswerListProps) => {
         dispatch(setBulkSelectedIds([]))
         dispatch(setUpdatedAnswersIds(bulkSelectedIds))
 
-        const returnedIds = res.map(updated => updated.id)
+        const returnedIds = res.map((updated: Answer) => updated.id)
 
         setAnswers(
           answers.map(answer => {

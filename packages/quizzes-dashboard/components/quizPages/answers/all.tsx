@@ -23,13 +23,13 @@ import {
 import { TAnswersDisplayed, ChipProps } from "./types"
 import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
 import AnswerListWrapper from "../../Answer/AnswerListWrapper"
-import AnswerSearchForm from "../../AnswerSearchForm"
 import { Answer } from "../../../types/Answer"
 import SkeletonLoader from "../../Shared/SkeletonLoader"
 import {
   useAnswerListState,
   setExpandAll,
 } from "../../../contexts/AnswerListContext"
+import AnswerListOptions from "../../Answer/AnswerListOptions"
 
 // TODO: refactor/move
 const StyledChip = styled(Chip)<ChipProps>`
@@ -81,7 +81,7 @@ export const AllAnswers = () => {
 
   const [fetchingAnswers, setFetchingAnswers] = useState(false)
 
-  const hanldeTextSearch = async (searchQuery: string) => {
+  const handleTextSearch = async (searchQuery: string) => {
     try {
       setFetchingAnswers(true)
       if (!searchQuery) {
@@ -282,6 +282,12 @@ export const AllAnswers = () => {
     route.push(URL_HREF, { pathname, query }, { shallow: true })
   }
 
+  const availableAnswers = searchResults
+    ? searchResults
+    : allAnswers
+    ? allAnswers
+    : { results: [], total: 0 }
+
   return (
     <>
       <TabText text="All answers" />
@@ -359,7 +365,10 @@ export const AllAnswers = () => {
           )
         })}
       </FilterParamsField>
-      <AnswerSearchForm handleSubmit={hanldeTextSearch} />
+      <AnswerListOptions
+        answers={availableAnswers}
+        handleTextSearch={handleTextSearch}
+      />
       <AnswerListWrapper
         order={sortOrder}
         quizId={quizId}
@@ -368,13 +377,7 @@ export const AllAnswers = () => {
         page={currentPage}
         answersError={answersError}
         fetchingAnswers={fetchingAnswers}
-        answers={
-          searchResults
-            ? searchResults
-            : allAnswers
-            ? allAnswers
-            : { results: [], total: 0 }
-        }
+        answers={availableAnswers}
       />
     </>
   )
