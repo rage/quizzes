@@ -17,6 +17,7 @@ import {
   toggledQuestionDefault,
   toggledQuestionAnswerRequired,
 } from "../../../../store/editor/questions/questionActions"
+import MarkdownEditor from "../../../MarkdownEditor"
 
 const PRQWrapper = styled.div`
   display: flex;
@@ -48,11 +49,18 @@ export const QuestionEditor = ({ id }: PRQEditorProps) => {
           dispatch(editedPeerReviewQuestionTitle(event.target.value, id))
         }
       />
-      <PRQTextfield
+      {/* <PRQTextfield
         label="Question body"
         variant="outlined"
         fullWidth
         value={prq.body}
+        onChange={event =>
+          dispatch(editedPeerReviewQuestionBody(event.target.value, id))
+        }
+      /> */}
+      <MarkdownEditor
+        label="Question body"
+        text={prq.body ?? ""}
         onChange={event =>
           dispatch(editedPeerReviewQuestionBody(event.target.value, id))
         }

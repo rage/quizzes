@@ -19,6 +19,7 @@ import {
   createdNewOption,
   deletedItem,
 } from "../../../../store/editor/editorActions"
+import MarkdownEditor from "../../../MarkdownEditor"
 
 const QuizContent = styled.div`
   padding: 1rem;

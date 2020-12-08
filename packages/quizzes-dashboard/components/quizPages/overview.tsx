@@ -14,6 +14,8 @@ import DownloadInfoForms from "../DownloadInfoForms"
 import QuizTitle from "./QuizTitleContainer"
 import { TabTextError, TabText, TabTextLoading } from "./TabHeaders"
 import { AnswerStatistics } from "./AnswerStatistics"
+import { Parser, HtmlRenderer } from "commonmark"
+import { MarkDownText } from "../MarkDownText"
 
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
@@ -22,7 +24,6 @@ const StyledSkeleton = styled(Skeleton)`
 const DescriptionContainer = styled.div`
   display: flex;
   justify-content: center;
-  white-space: pre-line;
   flex-wrap: wrap;
   width: 100%;
   padding: 1rem;
@@ -98,7 +99,7 @@ export const OverView = () => {
       <StyledCard>
         {quiz.body && (
           <DescriptionContainer>
-            <Typography>{quiz.body}</Typography>
+            <MarkDownText text={quiz.body} />
           </DescriptionContainer>
         )}
       </StyledCard>

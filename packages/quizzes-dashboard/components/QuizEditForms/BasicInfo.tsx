@@ -31,6 +31,7 @@ import {
 } from "../../store/editor/quiz/quizActions"
 import { useTypedSelector } from "../../store/store"
 import { checkForChanges } from "../../store/editor/editorActions"
+import MarkdownEditor from "../MarkdownEditor"
 
 const SubsectionTitleWrapper = styled.div`
   display: flex;
@@ -260,26 +261,20 @@ const BasicInformation = () => {
         </MuiPickersUtilsProvider>
       </InfoContainer>
       <InfoContainer>
-        <TextField
-          multiline
-          fullWidth
-          label="Description for the whole quiz"
-          variant="outlined"
-          value={body ?? ""}
+        <MarkdownEditor
+          text={body ?? ""}
+          label="Quiz description"
           onChange={event =>
             dispatch(editedQuizzesBody(quizId, event.target.value))
           }
         />
       </InfoContainer>
       <InfoContainer>
-        <TextField
-          multiline
+        <MarkdownEditor
+          text={submitMessage ?? ""}
           label="Submit message"
-          fullWidth
-          variant="outlined"
-          value={submitMessage ?? ""}
           onChange={event =>
-            dispatch(editedQuizzesSubmitmessage(quizId, event.target.value))
+            dispatch(editedQuizzesBody(quizId, event.target.value))
           }
         />
       </InfoContainer>

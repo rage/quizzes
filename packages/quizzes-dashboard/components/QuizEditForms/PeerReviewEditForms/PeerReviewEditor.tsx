@@ -8,6 +8,7 @@ import {
   editedPeerReviewBody,
 } from "../../../store/editor/peerReviews/peerReviewActions"
 import QuestionEditorWrapper from "./QuestionEditorForms/QuestionEditorWrapper"
+import MarkdownEditor from "../../MarkdownEditor"
 
 const PeerReviewField = styled(TextField)`
   display: flex !important;
@@ -33,11 +34,9 @@ export const PeerReviewEditor = ({ id }: PeerReviewEditorProps) => {
           dispatch(editedPeerReviewTitle(id, event.target.value))
         }}
       />
-      <PeerReviewField
-        variant="outlined"
+      <MarkdownEditor
         label="Peer review body"
-        value={peerReview.body}
-        multiline
+        text={peerReview.body ?? ""}
         onChange={event => {
           dispatch(editedPeerReviewBody(id, event.target.value))
         }}
