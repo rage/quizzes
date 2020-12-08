@@ -93,7 +93,7 @@ const AnswerListOptions = ({
         style={{ cursor: "pointer" }}
       >
         <FontAwesomeIcon icon={faSearch} size="2x" />
-        <Typography>Search</Typography>
+        <Typography>{enableSearch ? "Hide" : "Search"}</Typography>
       </div>
       {enableSearch && <AnswerSearchForm handleSubmit={handleTextSearch} />}
     </OptionsWrapper>
