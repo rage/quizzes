@@ -20,6 +20,7 @@ import { useDispatch } from "react-redux"
 import {
   editedQuizTitle,
   editedQuizzesNumberOfTries,
+  editedQuizTriesLimited,
   editedQuizzesPointsToGain,
   editedQuizzesPointsGrantingPolicy,
   editedQuizzesDeadline,
@@ -59,6 +60,25 @@ const WarningBox = styled.div`
   @media only screen and (max-width: 600px) {
     width: 100%;
   }
+`
+
+const NumberOfTriesContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+  /* flex-wrap: wrap; */
+
+  #label {
+    width: 120%;
+  }
+`
+const ToggleAndHelperWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 50vw;
+  padding-right: 7rem;
 `
 
 const InfoContainer = styled.div`
@@ -108,9 +128,15 @@ const BasicInformation = () => {
   const pointsGrantingPolicy = useTypedSelector(
     state => state.editor.quizzes[quizId].grantPointsPolicy,
   )
+
   const numberOfTries = useTypedSelector(
     state => state.editor.quizzes[quizId].tries,
   )
+
+  const triesAreLimited = useTypedSelector(
+    state => state.editor.quizzes[quizId].triesLimited,
+  )
+
   const pointsToGain = useTypedSelector(
     state => state.editor.quizzes[quizId].points,
   )
@@ -191,19 +217,41 @@ const BasicInformation = () => {
           }
         />
       </InfoContainer>
-      <InfoContainer>
-        <TextField
-          label="Number of tries allowed"
-          fullWidth
-          variant="outlined"
-          defaultValue={numberOfTries ?? ""}
-          onChange={event =>
-            dispatch(
-              editedQuizzesNumberOfTries(Number(event.target.value), quizId),
-            )
-          }
-        />
-      </InfoContainer>
+      <NumberOfTriesContainer>
+        <ToggleAndHelperWrapper>
+          <FormControlLabel
+            id="label"
+            control={
+              <Switch
+                checked={triesAreLimited}
+                onChange={event =>
+                  dispatch(editedQuizTriesLimited(event.target.checked, quizId))
+                }
+                color="secondary"
+                inputProps={{ "aria-label": "check tries allowed" }}
+              />
+            }
+            label="Limit tries"
+            labelPlacement="end"
+          />
+          <HelperText>
+            Check this to limit the number of attempts at this quiz
+          </HelperText>
+        </ToggleAndHelperWrapper>
+        {triesAreLimited && (
+          <TextField
+            label="Number of tries allowed"
+            fullWidth
+            variant="outlined"
+            defaultValue={numberOfTries ?? ""}
+            onChange={event =>
+              dispatch(
+                editedQuizzesNumberOfTries(Number(event.target.value), quizId),
+              )
+            }
+          />
+        )}
+      </NumberOfTriesContainer>
       <InfoContainer>
         <TextField
           label="Points to gain"
