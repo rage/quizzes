@@ -22,7 +22,9 @@ const FormElementContainer = styled.div`
   align-items: center;
 
   button {
+    white-space: nowrap;
     margin-left: 2rem;
+    padding: 0.5rem 2.5rem;
   }
 
   @media (max-width: 480px) {
@@ -64,6 +66,7 @@ const AnswerSearchForm = (props: IFormProps) => {
             onChange={event => setSearchQuery(event.target.value)}
             variant="outlined"
             helperText="Enter a search phrase"
+            fullWidth={true}
           />
           <Button
             type="submit"
