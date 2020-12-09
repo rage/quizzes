@@ -120,6 +120,7 @@ export async function seed(knex: Knex): Promise<any> {
       {
         id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
         quiz_id: "3c954097-268f-44bf-9d2e-1efaf9e8f122",
+        deleted: false,
       },
     ]),
   ])
@@ -149,6 +150,7 @@ export async function seed(knex: Knex): Promise<any> {
         default: true,
         type: "grade",
         order: 1,
+        deleted: false,
       },
       {
         id: "c59593ea-f6a7-4857-aa7a-1be9762522da",
@@ -156,6 +158,7 @@ export async function seed(knex: Knex): Promise<any> {
         default: true,
         type: "grade",
         order: 1,
+        deleted: false,
       },
       {
         id: "be725960-b262-4f01-852c-4bba77c82f85",
@@ -163,6 +166,7 @@ export async function seed(knex: Knex): Promise<any> {
         default: true,
         type: "grade",
         order: 1,
+        deleted: false,
       },
       {
         id: "1a4e7dea-564d-417a-85dd-f6976f51860b",
@@ -170,6 +174,7 @@ export async function seed(knex: Knex): Promise<any> {
         default: true,
         type: "grade",
         order: 1,
+        deleted: false,
       },
     ]),
   ])

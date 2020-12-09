@@ -1,4 +1,3 @@
-import { isNumber } from "lodash"
 import { uuid, dateTime } from "./util"
 
 export const input = {
@@ -56,9 +55,11 @@ export const input = {
       {
         title: "pr",
         body: "do this",
+        deleted: false,
         questions: [
           {
             default: true,
+            deleted: false,
             type: "grade",
             order: 1,
             title: "question",
@@ -119,6 +120,7 @@ export const input = {
         quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
         title: "pr",
         body: "do this",
+        deleted: false,
         questions: [
           {
             id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
@@ -128,6 +130,7 @@ export const input = {
             order: 1,
             title: "question",
             body: "answer this",
+            deleted: false,
           },
         ],
       },
@@ -327,6 +330,7 @@ export const validation = {
         body: "do this",
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
+        deleted: false,
         questions: [
           {
             id: expect.stringMatching(uuid),
@@ -338,6 +342,7 @@ export const validation = {
             order: 1,
             title: "question",
             body: "answer this",
+            deleted: false,
             createdAt: expect.stringMatching(dateTime),
             updatedAt: expect.stringMatching(dateTime),
           },
@@ -419,6 +424,7 @@ export const validation = {
         quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
         title: "pr",
         body: "do this",
+        deleted: false,
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
         questions: [
@@ -427,6 +433,7 @@ export const validation = {
             peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
             quizId: null,
             answerRequired: true,
+            deleted: false,
             default: true,
             type: "grade",
             order: 1,
@@ -528,6 +535,7 @@ export const validation = {
         body: "do this",
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
+        deleted: false,
         questions: [
           {
             id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
@@ -535,6 +543,7 @@ export const validation = {
             quizId: null,
             answerRequired: true,
             default: true,
+            deleted: false,
             type: "grade",
             order: 1,
             title: "question",
@@ -730,6 +739,7 @@ export const validation = {
               order: 1,
               peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
               quizId: null,
+              deleted: false,
               texts: [
                 {
                   body: "answer this",
@@ -768,6 +778,7 @@ export const validation = {
               order: 1,
               peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
               quizId: null,
+              deleted: false,
               texts: [
                 {
                   body: "answer this",
@@ -1107,6 +1118,7 @@ export const validation = {
           quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
           createdAt: expect.stringMatching(dateTime),
           updatedAt: expect.stringMatching(dateTime),
+          deleted: false,
           questions: [
             {
               id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
@@ -1120,6 +1132,7 @@ export const validation = {
               updatedAt: expect.stringMatching(dateTime),
               title: "question",
               body: "answer this",
+              deleted: false,
             },
           ],
           title: "pr",

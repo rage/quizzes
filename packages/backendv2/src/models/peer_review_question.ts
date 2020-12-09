@@ -35,16 +35,5 @@ class PeerReviewQuestion extends mixin(BaseModel, [
       },
     },
   }
-
-  public static async deletePeerReviewQuestionById(
-    peerReviewQuestionId: string,
-    trx?: Transaction,
-  ): Promise<Boolean> {
-    const result = await this.query(trx)
-      .where("peer_review_question_id", peerReviewQuestionId)
-      .delete()
-    console.log(result)
-    return true
-  }
 }
 export default PeerReviewQuestion

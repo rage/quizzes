@@ -12,7 +12,7 @@ import Knex from "knex"
 import UserQuizState from "./user_quiz_state"
 import * as Kafka from "../services/kafka"
 import PeerReviewQuestion from "./peer_review_question"
-import { NotNullViolationError } from "objection"
+import { NotNullViolationError, QueryBuilder } from "objection"
 import BaseModel from "./base_model"
 
 export class Quiz extends BaseModel {
@@ -234,8 +234,15 @@ export class Quiz extends BaseModel {
         .withGraphJoined("texts")
         .withGraphJoined("items.[texts, options.[texts]]")
         .withGraphJoined("peerReviews.[texts, questions.[texts]]")
-        .where("peerReviews.deleted", false)
-        .where("peerReviews:questions.deleted", false)
+        // filter out deleted peer reviews and peer review questions
+        // if none on the right side of the join all fields are null
+        // because of that null rows also included, otherwise would return nothing
+        .whereRaw(
+          `("peerReviews"."deleted" = false or "peerReviews"."deleted" is null)`,
+        )
+        .whereRaw(
+          `("peerReviews:questions"."deleted" = false or "peerReviews:questions"."deleted" is null)`,
+        )
         .where("quiz.id", quizId)
     )[0]
 

@@ -1,20 +1,7 @@
 import knex from "../database/knex"
 import { Model, snakeCaseMappers } from "objection"
 import { Quiz, QuizAnswer, UserQuizState, Course } from "../src/models"
-
-const knexCleaner = require("knex-cleaner")
-
-const safeClean = async () => {
-  if (process.env.NODE_ENV === "test") {
-    return await knexCleaner.clean(knex)
-  }
-}
-
-const safeSeed = async (config?: any) => {
-  if (process.env.NODE_ENV === "test") {
-    await knex.seed.run(config)
-  }
-}
+import { safeClean, safeSeed } from "./util"
 
 beforeAll(() => {
   Model.knex(knex)
