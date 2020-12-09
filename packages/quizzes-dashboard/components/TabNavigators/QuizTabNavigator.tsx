@@ -62,7 +62,7 @@ export const TabNavigator = () => {
     default_tab: OverView,
   }
 
-  const dataFetching =
+  const dataIsBeingFetched =
     quizLoading ||
     userAbilitiesLoading ||
     courseLoading ||
@@ -133,10 +133,9 @@ export const TabNavigator = () => {
           }}
         />
       </Tabs>
-
       {errorFetchingData ? (
         <TabTextError />
-      ) : dataFetching ? (
+      ) : dataIsBeingFetched ? (
         <>
           <TabTextLoading />
           <SkeletonLoader height={250} skeletonCount={1} />

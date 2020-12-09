@@ -10,7 +10,7 @@ import usePromise from "react-use-promise"
 import { MenuItem, Switch, Typography, Chip } from "@material-ui/core"
 import styled from "styled-components"
 import QuizTitle from "../QuizTitleContainer"
-import { TabTextLoading, TabText } from "../TabHeaders"
+import { TabText } from "../TabHeaders"
 import {
   SizeSelectorField,
   OptionsContainer,
@@ -18,18 +18,16 @@ import {
   SortOrderField,
   FilterParamsField,
 } from "./styles"
-import { TAnswersDisplayed, ChipProps, IQuizTabProps } from "./types"
+import { ChipProps, IQuizTabProps, TAnswersDisplayed } from "./types"
 import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
 import AnswerListWrapper from "../../Answer/AnswerListWrapper"
 import { Answer } from "../../../types/Answer"
-import SkeletonLoader from "../../Shared/SkeletonLoader"
 import {
   useAnswerListState,
   setExpandAll,
 } from "../../../contexts/AnswerListContext"
 import AnswerListOptions from "../../Answer/AnswerListOptions"
 
-// TODO: refactor/move
 const StyledChip = styled(Chip)<ChipProps>`
   display: flex !important;
   background: ${props => {
@@ -109,7 +107,6 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
     return route.query.filters?.includes(param)
   }
 
-  //TODO: move
   const states: { [state: string]: { checked: boolean } } = {
     "manual-review": { checked: isIncludedInFilter("manual-review") },
     rejected: { checked: isIncludedInFilter("rejected") },
@@ -151,12 +148,12 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
 
   const [queryToPush, setQueryToPush] = useState({})
 
+  const { pageNo, sort, answers, filters } = route.query
+
   // this needs to be run so that if the page with query params is loaded in
   // another window, the params can be updated without clearing the rest first
   useEffect(() => {
-    const { pageNo, sort, answers, expandAll, filters } = route.query
     let initialQuery: any = {}
-
     if (pageNo) {
       setCurrentPage(Number(pageNo))
       initialQuery.pageNo = pageNo
@@ -179,7 +176,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
       initialQuery.filters = filtersAsStringArray
     }
     setQueryToPush(initialQuery)
-  }, [route.query])
+  }, [])
 
   /**
    *  handled separately since
@@ -202,12 +199,12 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
     fieldType?: string,
   ) => {
     let query = null
-    let updatedQueryParams = null
+    let updatedQueryParams = queryToPush
 
     switch (fieldType) {
       case "pages":
         updatedQueryParams = {
-          ...queryToPush,
+          ...updatedQueryParams,
           answers: event.target.value,
         }
         setQueryToPush(updatedQueryParams)
@@ -216,7 +213,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
         break
       case "expand":
         updatedQueryParams = {
-          ...queryToPush,
+          ...updatedQueryParams,
           expandAll: event.target.checked,
         }
         setQueryToPush(updatedQueryParams)
@@ -224,25 +221,24 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
         query = updatedQueryParams
         break
       case "order":
-        updatedQueryParams = { ...queryToPush, sort: event.target.value }
+        updatedQueryParams = { ...updatedQueryParams, sort: event.target.value }
         setQueryToPush(updatedQueryParams)
         setSortOrder(event.target.value)
         query = updatedQueryParams
         break
       case "filter":
         updatedQueryParams = {
-          ...queryToPush,
+          ...updatedQueryParams,
           filters: event.target.value,
         }
         setQueryToPush(updatedQueryParams)
-        setSortOrder(event.target.value)
         query = updatedQueryParams
         break
       default:
         break
     }
 
-    // in all cases, push all the query params
+    setQueryToPush(updatedQueryParams)
     route.push(URL_HREF, { pathname, query }, { shallow: true })
   }
 
@@ -285,7 +281,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
         <SwitchField>
           <Typography>Expand all</Typography>
           <Switch
-            checked={expandAll}
+            checked={route.query.expandAll ? true : expandAll}
             onChange={event => {
               handleFieldChange(event, "expand")
             }}

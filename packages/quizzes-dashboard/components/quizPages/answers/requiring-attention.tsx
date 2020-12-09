@@ -82,7 +82,7 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
     }
 
     setQueryToPush(initialQuery)
-  }, [route.query])
+  }, [])
 
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
@@ -196,7 +196,7 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
               <Typography>Expand all</Typography>
               <Switch
                 name="expand-field"
-                checked={expandAll}
+                checked={route.query.expandAll ? true : expandAll}
                 onChange={event => {
                   handleFieldChange(event, "expand")
                 }}

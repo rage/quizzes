@@ -59,7 +59,11 @@ export const AnswerListWrapper = ({
               onChange={(_, nextPage) => handlePageChange(nextPage)}
             />
           </PaginationField>
-          <AnswerList data={answers.results} />
+          {!answers ? (
+            <SkeletonLoader height={250} skeletonCount={1} />
+          ) : (
+            <AnswerList data={answers.results} />
+          )}
           <PaginationField>
             <Pagination
               siblingCount={2}
