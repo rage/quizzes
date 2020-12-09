@@ -91,6 +91,9 @@ class Course extends BaseModel {
 
   private static moveTextsToParent(course: any) {
     const text = course.texts[0]
+    if (!text) {
+      return
+    }
     course.languageId = text.languageId
     course.title = text.title
     course.body = text.body

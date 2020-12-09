@@ -119,17 +119,8 @@ export const quizAnswerReducer = (
             ia.quizItemId === action.payload.itemId
               ? {
                   ...ia,
-                  optionAnswers: ia.optionAnswers.some(
-                    oa => oa.quizOptionId === action.payload.optionId,
-                  )
-                    ? ia.optionAnswers.filter(
-                        oa => oa.quizOptionId !== action.payload.optionId,
-                      )
-                    : ia.optionAnswers.concat({
-                        quizOptionId: action.payload.optionId,
-                        quizItemAnswerId:
-                          state.quizAnswer.itemAnswers[0].quizAnswerId,
-                      }),
+                  // 1 is selected and 0 is not selected. When intData is undefined toggle it to 1.
+                  intData: ia.intData === 1 ? 0 : 1,
                 }
               : ia,
           ),
