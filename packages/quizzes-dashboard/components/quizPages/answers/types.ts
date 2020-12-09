@@ -1,4 +1,5 @@
 import { Answer } from "../../../types/Answer"
+import { Course, Quiz } from "../../../types/Quiz"
 
 export type TAnswersDisplayed = 10 | 50 | 100
 
@@ -24,4 +25,10 @@ export interface AnswerListProps {
   data: Answer[]
   error: any
   expandAll: boolean
+}
+
+export interface IQuizTabProps {
+  quiz: Quiz
+  course: Course
+  userAbilities?: string[] | undefined
 }

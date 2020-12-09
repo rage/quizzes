@@ -2,33 +2,29 @@ import React, { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import {
   getAnswersRequiringAttention,
-  fetchQuiz,
-  fetchCourseById,
   getAnswersRequiringAttentionMatchingQuery,
 } from "../../../services/quizzes"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import usePromise from "react-use-promise"
 import { MenuItem, Switch, Typography } from "@material-ui/core"
 import QuizTitle from "../QuizTitleContainer"
-import { TabTextError, TabText, TabTextLoading } from "../TabHeaders"
+import { TabTextError, TabText } from "../TabHeaders"
 import {
   SizeSelectorField,
   SwitchField,
   OptionsContainer,
   SortOrderField,
 } from "./styles"
-import { TAnswersDisplayed } from "./types"
-import AnswerSearchForm from "../../AnswerSearchForm"
+import { IQuizTabProps, TAnswersDisplayed } from "./types"
 import AnswerListWrapper from "../../Answer/AnswerListWrapper"
 import { Answer } from "../../../types/Answer"
 import {
   setExpandAll,
   useAnswerListState,
 } from "../../../contexts/AnswerListContext"
-import SkeletonLoader from "../../Shared/SkeletonLoader"
 import AnswerListOptions from "../../Answer/AnswerListOptions"
 
-export const RequiringAttention = () => {
+export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
   const [{ expandAll }, dispatch] = useAnswerListState()
 
   const route = useRouter()
@@ -61,12 +57,6 @@ export const RequiringAttention = () => {
     | null
   >(null)
   const [fetchingAnswers, setFetchingAnswers] = useState(false)
-
-  const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [])
-  const [course, courseError] = usePromise(
-    () => fetchCourseById(quiz?.courseId ?? ""),
-    [quiz],
-  )
 
   const [queryToPush, setQueryToPush] = useState({})
 
@@ -106,7 +96,7 @@ export const RequiringAttention = () => {
     },
   ])
 
-  if (answersError || quizError || courseError) {
+  if (answersError) {
     return (
       <>
         <TabTextError />
@@ -140,7 +130,10 @@ export const RequiringAttention = () => {
         query = updatedQueryParams
         break
       case "expand":
-        updatedQueryParams = { ...queryToPush, expandAll: event.target.checked }
+        updatedQueryParams = {
+          ...queryToPush,
+          expandAll: event.target.checked,
+        }
         setQueryToPush(updatedQueryParams)
         dispatch(setExpandAll(event.target.checked))
         query = updatedQueryParams
@@ -190,21 +183,14 @@ export const RequiringAttention = () => {
   return (
     <>
       <TabText text="Answers requiring attention" />
-      {answers?.results.length === 0 && quiz ? (
+      {answers?.results.length === 0 ? (
         <>
           <QuizTitle quiz={quiz} />
           <Typography variant="h3">No answers requiring attention</Typography>
         </>
       ) : (
         <>
-          {quiz ? (
-            <QuizTitle quiz={quiz} />
-          ) : (
-            <>
-              <TabTextLoading />
-              <SkeletonLoader height={250} skeletonCount={15} />
-            </>
-          )}
+          <QuizTitle quiz={quiz} />
           <OptionsContainer>
             <SwitchField>
               <Typography>Expand all</Typography>

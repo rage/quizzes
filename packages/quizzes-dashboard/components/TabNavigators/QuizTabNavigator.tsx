@@ -8,14 +8,18 @@ import {
   faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { getAnswersRequiringAttentionByQuizId } from "../../services/quizzes"
-import usePromise from "react-use-promise"
 import OverView from "../quizPages/overview"
 import EditPage from "../quizPages/edit"
 import AllAnswers from "../quizPages/answers/all"
 import RequiringAttention from "../quizPages/answers/requiring-attention"
 import { ITabToComponent } from "../CoursePage/types"
 import { AnswerListProvider } from "../../contexts/AnswerListContext"
+import { useQuiz } from "../../hooks/useQuiz"
+import { useCourse } from "../../hooks/useCourse"
+import { useUserAbilities } from "../../hooks/useUserAbilities"
+import { TabTextError, TabTextLoading } from "../quizPages/TabHeaders"
+import SkeletonLoader from "../Shared/SkeletonLoader"
+import { useRequiringAttention } from "../../hooks/useRequiringAttention"
 
 export const TabNavigator = () => {
   const router = useRouter()
@@ -23,18 +27,33 @@ export const TabNavigator = () => {
   const URL_HREF = `/quizzes/[quizId]/[...page]`
   const pathname = `/quizzes/${quizId}`
 
-  const [requiringAttention, _] = usePromise(
-    () => getAnswersRequiringAttentionByQuizId(quizId),
-    [quizId],
+  /* tokens passed to hooks are for swr caching  */
+  const { quiz, quizLoading, quizError } = useQuiz(quizId, "quiz")
+  const { course, courseLoading, courseError } = useCourse(
+    quiz?.courseId ?? "",
+    "course",
   )
+  const {
+    userAbilities,
+    userAbilitiesLoading,
+    userAbilitiesError,
+  } = useUserAbilities(quiz?.courseId ?? "", "user-abilities")
+  const {
+    requiringAttention,
+    requiringAttentionLoading,
+    requiringAttentionError,
+  } = useRequiringAttention(quizId, "requiring-attention")
+
   const [currentTab, setCurrentTab] = useState("overview")
 
+  /* for when tab is loaded through url*/
   useEffect(() => {
     if (router.query.page) {
       setCurrentTab(router.query.page[0])
     }
-  }, [router.query.page])
+  }, [router])
 
+  /* dynamically map tabs to their respective contents */
   const quizTabs: ITabToComponent = {
     overview: OverView,
     edit: EditPage,
@@ -42,6 +61,16 @@ export const TabNavigator = () => {
     "answers-requiring-attention": RequiringAttention,
     default_tab: OverView,
   }
+
+  const dataFetching =
+    quizLoading ||
+    userAbilitiesLoading ||
+    courseLoading ||
+    userAbilitiesLoading ||
+    requiringAttentionLoading
+
+  const errorFetchingData =
+    quizError || courseError || userAbilitiesError || requiringAttentionError
 
   const ComponentTag = quizTabs[currentTab]
     ? quizTabs[currentTab]
@@ -85,7 +114,6 @@ export const TabNavigator = () => {
             setCurrentTab("all-answers")
           }}
         />
-
         <Tab
           key="answers-requiring-attention"
           icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
@@ -105,9 +133,23 @@ export const TabNavigator = () => {
           }}
         />
       </Tabs>
-      <AnswerListProvider>
-        <ComponentTag />
-      </AnswerListProvider>
+
+      {errorFetchingData ? (
+        <TabTextError />
+      ) : dataFetching ? (
+        <>
+          <TabTextLoading />
+          <SkeletonLoader height={250} skeletonCount={1} />
+        </>
+      ) : (
+        <AnswerListProvider>
+          <ComponentTag
+            quiz={quiz}
+            course={course}
+            userAbilities={userAbilities}
+          />
+        </AnswerListProvider>
+      )}
     </>
   )
 }

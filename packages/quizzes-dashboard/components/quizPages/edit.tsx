@@ -1,36 +1,23 @@
 import React, { useEffect } from "react"
-import { fetchQuiz, fetchCourseById } from "../../services/quizzes"
 import { initializedEditor } from "../../store/editor/editorActions"
 import { useDispatch } from "react-redux"
 import SaveButton from "../SaveButton"
 import { normalizedQuiz } from "../../schemas"
 import { normalize } from "normalizr"
-import { useRouter } from "next/router"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
 import QuizEditForms from "../QuizEditForms"
 import _ from "lodash"
 import QuizTitle from "./QuizTitleContainer"
-import usePromise from "react-use-promise"
-import { TabText, TabTextLoading, TabTextError } from "./TabHeaders"
-import SkeletonLoader from "../Shared/SkeletonLoader"
+import { TabText } from "./TabHeaders"
+import { IQuizTabProps } from "./answers/types"
 
-const EditPage = () => {
-  const router = useRouter()
-  const quizId: string = router.query.quizId?.toString() ?? ""
-
-  const [quizData, error] = usePromise(() => fetchQuiz(quizId), [quizId])
-  const [course, courseError] = usePromise(
-    () => fetchCourseById(quizData?.courseId ?? ""),
-    [quizData],
-  )
-
+const EditPage = ({ quiz, course }: IQuizTabProps) => {
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (!quizData) {
+    if (!quiz) {
       return
     }
-    const quiz = quizData
     const storeState = normalize(quiz, normalizedQuiz)
     const normalizedData = {
       quizzes: storeState.entities.quizzes ?? {},
@@ -41,41 +28,25 @@ const EditPage = () => {
       questions: storeState.entities.questions ?? {},
     }
     dispatch(initializedEditor(normalizedData, quiz))
-  }, [quizData])
+  }, [quiz])
 
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
       label: `${course ? course.title : ""}`,
-      as: `/courses/${quizData?.courseId}/listing`,
+      as: `/courses/${quiz?.courseId}/listing`,
       href: "/courses/[courseId]/[...page]",
     },
     {
-      label: `${quizData ? quizData.title : ""}`,
+      label: `${quiz ? quiz.title : ""}`,
     },
   ])
 
-  if (error || courseError) {
-    return (
-      <>
-        <TabTextError />
-        <div>Something went wrong</div>
-      </>
-    )
-  }
-
   return (
     <>
-      {quizData ? (
-        <TabText text={`Editing ${quizData?.title}`} />
-      ) : (
-        <>
-          <TabTextLoading />
-          <SkeletonLoader height={250} skeletonCount={15} />
-        </>
-      )}
+      <TabText text={`Editing ${quiz?.title}`} />
       <SaveButton />
-      {quizData && <QuizTitle quiz={quizData} />}
+      {quiz && <QuizTitle quiz={quiz} />}
       <QuizEditForms />
     </>
   )

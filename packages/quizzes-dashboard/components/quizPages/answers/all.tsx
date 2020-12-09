@@ -3,8 +3,6 @@ import _ from "lodash"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
 import {
-  fetchQuiz,
-  fetchCourseById,
   getAllAnswers,
   getAllAnswersMatchingQuery,
 } from "../../../services/quizzes"
@@ -12,7 +10,7 @@ import usePromise from "react-use-promise"
 import { MenuItem, Switch, Typography, Chip } from "@material-ui/core"
 import styled from "styled-components"
 import QuizTitle from "../QuizTitleContainer"
-import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
+import { TabTextLoading, TabText } from "../TabHeaders"
 import {
   SizeSelectorField,
   OptionsContainer,
@@ -20,7 +18,7 @@ import {
   SortOrderField,
   FilterParamsField,
 } from "./styles"
-import { TAnswersDisplayed, ChipProps } from "./types"
+import { TAnswersDisplayed, ChipProps, IQuizTabProps } from "./types"
 import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
 import AnswerListWrapper from "../../Answer/AnswerListWrapper"
 import { Answer } from "../../../types/Answer"
@@ -44,11 +42,11 @@ const StyledChip = styled(Chip)<ChipProps>`
   margin-bottom: 0.5rem !important;
 `
 
-export const AllAnswers = () => {
+export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
   const [{ expandAll }, dispatch] = useAnswerListState()
 
   const route = useRouter()
-  const quizId = route.query.quizId?.toString() ?? ""
+  const quizId = quiz?.id
 
   const URL_HREF = `/quizzes/[quizId]/[...page]`
   const pathname = `/quizzes/${quizId}/all-answers/`
@@ -139,12 +137,6 @@ export const AllAnswers = () => {
 
   const [chipStates, setChipStates] = useState(states)
 
-  const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [])
-  const [course, courseError] = usePromise(
-    () => fetchCourseById(quiz?.courseId ?? ""),
-    [quiz],
-  )
-
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
@@ -189,15 +181,6 @@ export const AllAnswers = () => {
     setQueryToPush(initialQuery)
   }, [route.query])
 
-  if (quizError || courseError) {
-    return (
-      <>
-        <TabTextError />
-        <div>Error while fetching answers.</div>
-      </>
-    )
-  }
-
   /**
    *  handled separately since
    * @param nextPage page being paginated to
@@ -232,7 +215,10 @@ export const AllAnswers = () => {
         query = updatedQueryParams
         break
       case "expand":
-        updatedQueryParams = { ...queryToPush, expandAll: event.target.checked }
+        updatedQueryParams = {
+          ...queryToPush,
+          expandAll: event.target.checked,
+        }
         setQueryToPush(updatedQueryParams)
         dispatch(setExpandAll(!expandAll))
         query = updatedQueryParams
@@ -244,7 +230,10 @@ export const AllAnswers = () => {
         query = updatedQueryParams
         break
       case "filter":
-        updatedQueryParams = { ...queryToPush, filters: event.target.value }
+        updatedQueryParams = {
+          ...queryToPush,
+          filters: event.target.value,
+        }
         setQueryToPush(updatedQueryParams)
         setSortOrder(event.target.value)
         query = updatedQueryParams
@@ -291,14 +280,7 @@ export const AllAnswers = () => {
   return (
     <>
       <TabText text="All answers" />
-      {quiz ? (
-        <QuizTitle quiz={quiz} />
-      ) : (
-        <>
-          <TabTextLoading />
-          <SkeletonLoader height={250} skeletonCount={15} />
-        </>
-      )}
+      <QuizTitle quiz={quiz} />
       <OptionsContainer>
         <SwitchField>
           <Typography>Expand all</Typography>
