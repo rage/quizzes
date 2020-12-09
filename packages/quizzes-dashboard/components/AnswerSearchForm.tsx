@@ -1,8 +1,6 @@
 import { Button, TextField, Typography } from "@material-ui/core"
 import React, { useState } from "react"
 import styled from "styled-components"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faSearch } from "@fortawesome/free-solid-svg-icons"
 
 interface IFormProps {
   handleSubmit: (searchQuery: string) => Promise<void>
@@ -14,16 +12,16 @@ const FormWrapper = styled.form`
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
 `
 
 const FormElementContainer = styled.div`
   display: flex;
   justify-content: center;
-  align-items: center;
-
+  align-items: flex-start;
   button {
     white-space: nowrap;
-    margin-left: 2rem;
+    margin-left: 1rem;
     padding: 0.5rem 2.5rem;
   }
 
