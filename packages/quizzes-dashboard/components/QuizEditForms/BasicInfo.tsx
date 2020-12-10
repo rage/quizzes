@@ -113,6 +113,12 @@ const HelperText = styled(Typography)`
   color: #9e9e9e !important;
 `
 
+const MarginlessHelperText = styled(Typography)`
+  display: flex !important;
+  margin-bottom: 1rem !important;
+  color: #9e9e9e !important;
+`
+
 const AutoConfirmSwitch = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -233,9 +239,9 @@ const BasicInformation = () => {
             label="Limit tries"
             labelPlacement="end"
           />
-          <HelperText>
+          <MarginlessHelperText>
             Check this to limit the number of attempts at this quiz
-          </HelperText>
+          </MarginlessHelperText>
         </ToggleAndHelperWrapper>
         <TryLimitNumberContainer>
           {triesAreLimited && (
