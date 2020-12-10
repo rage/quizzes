@@ -12,7 +12,7 @@
     "test": "export NODE_ENV=test && jest --runInBand",
     "reset-test-db": "export NODE_ENV=test && (dropdb quizzes_test || true) && createdb quizzes_test && knex migrate:latest",
     "migrate": "knex migrate:latest",
-    "seed": "knex:seed --specific a.ts"
+    "seed": "knex run:seed --specific a.ts"
   },
   "devDependencies": {
     "@types/jest": "^26.0.0",
