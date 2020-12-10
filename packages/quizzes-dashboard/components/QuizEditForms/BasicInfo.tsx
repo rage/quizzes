@@ -68,17 +68,16 @@ const NumberOfTriesContainer = styled.div`
   justify-content: space-between;
   position: relative;
   width: 100%;
-  /* flex-wrap: wrap; */
-
-  #label {
-    width: 120%;
-  }
 `
+const TryLimitNumberContainer = styled.div`
+  width: 50%;
+  padding-left: 1rem;
+`
+
 const ToggleAndHelperWrapper = styled.div`
   display: flex;
   flex-direction: column;
-  width: 50vw;
-  padding-right: 7rem;
+  width: 50%;
 `
 
 const InfoContainer = styled.div`
@@ -238,19 +237,24 @@ const BasicInformation = () => {
             Check this to limit the number of attempts at this quiz
           </HelperText>
         </ToggleAndHelperWrapper>
-        {triesAreLimited && (
-          <TextField
-            label="Number of tries allowed"
-            fullWidth
-            variant="outlined"
-            defaultValue={numberOfTries ?? ""}
-            onChange={event =>
-              dispatch(
-                editedQuizzesNumberOfTries(Number(event.target.value), quizId),
-              )
-            }
-          />
-        )}
+        <TryLimitNumberContainer>
+          {triesAreLimited && (
+            <TextField
+              label="Number of tries allowed"
+              variant="outlined"
+              defaultValue={numberOfTries ?? ""}
+              fullWidth
+              onChange={event =>
+                dispatch(
+                  editedQuizzesNumberOfTries(
+                    Number(event.target.value),
+                    quizId,
+                  ),
+                )
+              }
+            />
+          )}
+        </TryLimitNumberContainer>
       </NumberOfTriesContainer>
       <InfoContainer>
         <TextField
