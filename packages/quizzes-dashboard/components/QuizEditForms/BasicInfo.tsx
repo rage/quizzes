@@ -352,8 +352,8 @@ const BasicInformation = () => {
             }
           />
           <HelperText>
-            Check this to confirm submitted answers automatically, uncheck this
-            to confirm them manually
+            When unchecked for a peer reviewed exercise, all answers must be
+            reviewed manually
           </HelperText>
         </AutoConfirmSwitch>
       </InfoContainer>
