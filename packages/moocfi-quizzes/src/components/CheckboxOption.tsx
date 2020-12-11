@@ -12,8 +12,15 @@ export type CheckboxOptionProps = {
   item: QuizItem
 }
 
-const VertCenteredGrid = styled(Grid)`
+const CheckboxRowTextContainer = styled.div`
   align-self: center;
+  flex: 1;
+  position: relative;
+  top: 1px;
+`
+
+const CheckboxRowContainer = styled.div`
+  display: flex;
 `
 
 const MarkdownTextWithoutMargin = styled(MarkdownText)`
@@ -22,6 +29,9 @@ const MarkdownTextWithoutMargin = styled(MarkdownText)`
   }
 `
 
+// Checkboxes used to have options but it made no sense since we always rendered
+// only the first option anyway. New checkboxes can no longer have any options
+// so this component should be refactored to not depend on options.
 const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
   item,
 }) => {
@@ -31,13 +41,27 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
 
   const dispatch = useDispatch()
   const option = item.options[0]
-  const { body, title } = option.texts[0]
 
-  const toggle = () =>
-    dispatch(quizAnswerActions.changeCheckboxData(item.id, option.id))
+  let body
+  let title
+
+  if (option) {
+    body = option.body
+    title = option.title
+  } else {
+    body = item.body
+    title = item.title
+  }
 
   const answerLocked =
     userQuizState && userQuizState.status === "locked" ? true : false
+
+  const toggle = () => {
+    if (answerLocked) {
+      return
+    }
+    dispatch(quizAnswerActions.changeCheckboxData(item.id, option?.id))
+  }
 
   const itemAnswer = quizAnswer.itemAnswers.find(
     ia => ia.quizItemId === item.id,
@@ -47,24 +71,27 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
   }
 
   const optionAnswer = itemAnswer && itemAnswer.optionAnswers[0]
-
+  let answer = optionAnswer?.quizOptionId !== undefined
+  if (!answer) {
+    answer = itemAnswer?.intData === 1
+  }
   const checkboxOptions = {
     disabled: answerLocked || quizDisabled,
-    checked: optionAnswer !== undefined && !quizDisabled,
+    checked: answer && !quizDisabled,
   }
 
   return (
-    <Grid container style={{ marginBottom: 10 }}>
-      <Grid item xs={1}>
+    <CheckboxRowContainer>
+      <div>
         <Checkbox
-          value={optionAnswer ? optionAnswer.quizOptionId : ""}
+          value={answer}
           color="primary"
           onChange={toggle}
           {...checkboxOptions}
           inputProps={{ "aria-label": `${title}` }}
         />
-      </Grid>
-      <VertCenteredGrid item xs>
+      </div>
+      <CheckboxRowTextContainer onClick={toggle}>
         {title && (
           <MarkdownTextWithoutMargin
             Component={Typography}
@@ -79,8 +106,8 @@ const CheckboxOption: React.FunctionComponent<CheckboxOptionProps> = ({
             {body}
           </MarkdownTextWithoutMargin>
         )}
-      </VertCenteredGrid>
-    </Grid>
+      </CheckboxRowTextContainer>
+    </CheckboxRowContainer>
   )
 }
 

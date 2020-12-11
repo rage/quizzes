@@ -110,7 +110,6 @@ export const peerReviewsReducer = (
     case getType(peerReviews.selectAnswer):
       const {
         quizAnswerId,
-        userId,
         peerReviewCollectionId,
         questionIds,
       } = action.payload
@@ -123,7 +122,6 @@ export const peerReviewsReducer = (
 
       const peerReviewAnswer: PeerReviewAnswer = {
         quizAnswerId,
-        userId,
         peerReviewCollectionId,
         rejectedQuizAnswerIds: rejected.map(x => {
           const id = x.id

@@ -1,10 +1,10 @@
-import Model from "./base_model"
 import QuizAnswer from "./quiz_answer"
 import UserQuizState from "./user_quiz_state"
 import UserCourseRole from "./user_course_role"
 import Knex from "knex"
+import BaseModel from "./base_model"
 
-class User extends Model {
+class User extends BaseModel {
   id!: number
   roles!: UserCourseRole[]
 
@@ -14,7 +14,7 @@ class User extends Model {
 
   static relationMappings = {
     answers: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizAnswer,
       join: {
         from: "user.id",
@@ -22,7 +22,7 @@ class User extends Model {
       },
     },
     userQuizStates: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: UserQuizState,
       join: {
         from: "user.id",
@@ -30,7 +30,7 @@ class User extends Model {
       },
     },
     roles: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: UserCourseRole,
       join: {
         from: "user.id",

@@ -67,8 +67,8 @@ const ReceivedPeerReview: React.FunctionComponent<IReceivedPeerReviewProps> = ({
             <div key={question.id}>
               <PeerReviewQuestionAnswer
                 questionAnswer={questionAnswer}
-                questionTitle={question.texts[0].title}
-                questionBody={question.texts[0].body}
+                questionTitle={question.title}
+                questionBody={question.body}
               />
             </div>
           )

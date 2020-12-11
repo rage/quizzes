@@ -27,20 +27,24 @@ const HiddenWrapper = styled(TopMarginDivLarge)<{ providedStyles?: string }>`
 
 const PeerReviews: React.FunctionComponent = () => {
   const ref = useState(useRef(null))[0]
+  const instructionStartRef = useRef(null)
   const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
 
+  useEffect(() => {
+    dispatch(peerReviewsActions.fetchPeerReviewAlternatives())
+  }, [])
   const quiz = useTypedSelector(state => state.quiz)
-  if (!quiz) {
-    return <div />
-  }
-
   const activeStep = useTypedSelector(state => state.peerReviews.activeStep)
   const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
-  const peerReviewQuestions = quiz.peerReviewCollections
+  const peerReviewQuestions = quiz?.peerReviews
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
+
+  if (!quiz) {
+    return <div />
+  }
 
   if (!languageInfo) {
     return <div />
@@ -61,15 +65,11 @@ const PeerReviews: React.FunctionComponent = () => {
       ? peerReviewsLabels.giveExtraPeerReviewsQuizConfirmed
       : peerReviewsLabels.giveExtraPeerReviews
 
-  useEffect(() => {
-    dispatch(peerReviewsActions.fetchPeerReviewAlternatives())
-  }, [])
-
   const morePeerReviewsRequired =
     (userQuizState ? userQuizState.peerReviewsGiven : 0) <
     quiz.course.minPeerReviewsGiven
 
-  if (peerReviewQuestions.length === 0) {
+  if (!peerReviewQuestions || peerReviewQuestions.length === 0) {
     return (
       <Typography component="p" variant="subtitle1">
         {/*peerReviewsLabels.quizInvolvesNoPeerReviewsInstruction*/}
@@ -88,13 +88,17 @@ const PeerReviews: React.FunctionComponent = () => {
         ? !pastDeadline && (
             <>
               <PeerReviewsGuidance
-                guidanceText={peerReviewQuestions[0].texts[0].body}
+                guidanceText={peerReviewQuestions[0].body}
                 givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
                 peerReviewsCompletedInfo={
                   peerReviewsLabels.peerReviewsCompletedInfo
                 }
+                instructionStartRef={instructionStartRef}
               />
-              <PeerReviewForm languageInfo={peerReviewsLabels} />
+              <PeerReviewForm
+                languageInfo={peerReviewsLabels}
+                instructionStartRef={instructionStartRef}
+              />
             </>
           )
         : !pastDeadline && (
@@ -115,13 +119,17 @@ const PeerReviews: React.FunctionComponent = () => {
               >
                 <TopMarginDivSmall>
                   <PeerReviewsGuidance
-                    guidanceText={peerReviewQuestions[0].texts[0].body}
+                    guidanceText={peerReviewQuestions[0].body}
                     givenLabel={peerReviewsLabels.givenPeerReviewsLabel}
                     peerReviewsCompletedInfo={
                       peerReviewsLabels.peerReviewsCompletedInfo
                     }
+                    instructionStartRef={instructionStartRef}
                   />
-                  <PeerReviewForm languageInfo={peerReviewsLabels} />
+                  <PeerReviewForm
+                    languageInfo={peerReviewsLabels}
+                    instructionStartRef={instructionStartRef}
+                  />
                 </TopMarginDivSmall>
               </Togglable>
             </HiddenWrapper>

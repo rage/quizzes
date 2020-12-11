@@ -17,12 +17,11 @@ export const getQuizInfo = async (
   const parameterEnding = fullInfo ? "" : "?fullInfo=false"
 
   const response = accessToken
-    ? await axios.get(
-        `${address || BASE_URL}/api/v1/quizzes/${id}${parameterEnding}`,
-        { headers: { authorization: `Bearer ${accessToken}` } },
-      )
+    ? await axios.get(`${address || BASE_URL}/api/v2/widget/quizzes/${id}`, {
+        headers: { authorization: `Bearer ${accessToken}` },
+      })
     : await axios.get(
-        `${address || BASE_URL}/api/v1/quizzes/${id}${parameterEnding}`,
+        `${address || BASE_URL}/api/v2/widget/quizzes/${id}/preview`,
       )
 
   return response.data

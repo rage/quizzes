@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Tabs, Tab, Badge } from "@material-ui/core"
+import { Tabs, Tab, Badge, Typography } from "@material-ui/core"
 import { useRouter } from "next/router"
 import {
   faPen,
@@ -52,7 +52,7 @@ export const TabNavigator = () => {
         <Tab
           icon={<FontAwesomeIcon icon={faChalkboard} />}
           value="overview"
-          label="Overview"
+          label={<Typography>Overview</Typography>}
           onClick={() => {
             router.push(URL_HREF, `${pathname}/overview`)
             setCurrentPage("overview")
@@ -61,7 +61,7 @@ export const TabNavigator = () => {
         <Tab
           icon={<FontAwesomeIcon icon={faPen} />}
           value="edit"
-          label="Edit quiz"
+          label={<Typography>Edit quiz</Typography>}
           onClick={() => {
             router.push(URL_HREF, `${pathname}/edit`)
             setCurrentPage("edit")
@@ -70,7 +70,7 @@ export const TabNavigator = () => {
         <Tab
           icon={<FontAwesomeIcon icon={faScroll} />}
           value="all-answers"
-          label="All answers"
+          label={<Typography>All answers</Typography>}
           onClick={() => {
             router.push(URL_HREF, `${pathname}/all-answers`)
             setCurrentPage("all-answers")
@@ -86,7 +86,7 @@ export const TabNavigator = () => {
               badgeContent={requiringAttention}
               color="error"
             >
-              Answers requiring attention
+              <Typography>Answers requiring attention</Typography>
             </Badge>
           }
           onClick={() => {

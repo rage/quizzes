@@ -4,6 +4,7 @@ import {
   LowerContentProps,
   QuizContentProps,
 } from "../components/QuizImpl/"
+import { MenuItemProps } from "../components/MenuItem"
 import { ChoiceButtonProps } from "../components/ChoiceButton"
 import { SubmitButtonProps } from "../components/QuizImpl/SubmitButton"
 import { LeftBorderedDivProps } from "../components/MultipleChoice"
@@ -13,6 +14,7 @@ import { PeerReviewSubmitButtonProps } from "../components/PeerReviews/PeerRevie
 import { TopInfoBarContainerProps } from "../components/QuizImpl/TopInfoBar"
 
 export interface ThemeProviderInterface {
+  menuItem?: React.FunctionComponent<MenuItemProps>
   choiceButton?: React.FunctionComponent<ChoiceButtonProps>
   submitButton?: React.FunctionComponent<SubmitButtonProps>
   spamButton?: React.FunctionComponent<SpamButtonProps>

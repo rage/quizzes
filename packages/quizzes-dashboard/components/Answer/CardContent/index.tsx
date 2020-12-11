@@ -17,6 +17,7 @@ import ManualReviewField from "./ManualReviewField"
 import Peerreviews from "./Peerreviews"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWindowClose } from "@fortawesome/free-solid-svg-icons"
+import DebugDialog from "../../DebugDialog"
 
 export const ContentContainer = styled.div`
   display: flex !important;
@@ -35,6 +36,9 @@ export const StatButtonWrapper = styled.div`
   display: flex;
   justify-content: center !important;
   width: 100%;
+  button {
+    margin: 2rem;
+  }
 `
 
 export const PeerreviewButton = styled(Button)`
@@ -69,6 +73,11 @@ const PeerreviewModal = styled(Modal)`
   display: flex !important;
   align-items: center;
   justify-content: center;
+`
+
+const DebugDialogWrapper = styled.div`
+  display: flex;
+  margin-right: 1rem;
 `
 
 export interface AnswerContentProps {
@@ -134,6 +143,9 @@ export const AnswerContent = ({
       </PeerreviewModal>
       <ContentContainer>
         <AnswerLink answer={answer} />
+        <DebugDialogWrapper>
+          <DebugDialog object={answer} />
+        </DebugDialogWrapper>
       </ContentContainer>
       <ContentContainer>
         <AnswerOverView answer={answer} />
@@ -156,9 +168,6 @@ export const AnswerContent = ({
           ""
         )}
       </ContentContainer>
-      <StatsContainer>
-        <CompactPeerReviewStats answer={answer} />
-      </StatsContainer>
       <StatButtonWrapper>
         {height > 300 && (
           <>
@@ -174,6 +183,9 @@ export const AnswerContent = ({
           </>
         )}
       </StatButtonWrapper>
+      <StatsContainer>
+        <CompactPeerReviewStats answer={answer} />
+      </StatsContainer>
       {editableAnswerStates.includes(answer.status) ? (
         <ManualReviewField
           answer={answer}

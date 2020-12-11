@@ -26,6 +26,16 @@ const CourseTitleWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  @media only screen and (max-width: 535px) {
+    flex-wrap: wrap;
+  }
+`
+
+const StyledButton = styled(Button)`
+  max-height: 3rem;
+  @media only screen and (max-width: 535px) {
+    align-self: flex-end !important;
+  }
 `
 
 export const CoursePage = () => {
@@ -114,11 +124,7 @@ export const CoursePage = () => {
         </Head>
       </div>
       <CourseTitleWrapper>
-        <Typography
-          variant="h3"
-          component="h1"
-          style={{ marginBottom: "0.75rem" }}
-        >
+        <Typography variant="h3" component="h1">
           {course.title}
         </Typography>
 
@@ -129,9 +135,9 @@ export const CoursePage = () => {
           }}
           as={`/courses/${id}/quizzes/new`}
         >
-          <Button variant="outlined" style={{ maxHeight: "3rem" }}>
+          <StyledButton variant="outlined">
             <Typography variant="overline">Add New Quiz</Typography>
-          </Button>
+          </StyledButton>
         </Link>
       </CourseTitleWrapper>
       {userAbilities.includes("duplicate") ? (
@@ -154,7 +160,7 @@ export const CoursePage = () => {
           })}
         </div>
       ))}
-      <DebugDialog />
+      <DebugDialog object={course} />
     </>
   )
 }

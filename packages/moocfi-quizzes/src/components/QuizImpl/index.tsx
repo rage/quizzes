@@ -15,6 +15,8 @@ import ResearchAgreement from "../ResearchAgreement"
 import Scale from "../Scale"
 import Open from "../Open"
 import Essay from "../Essay"
+import ClickableMultipleChoice from "../ClickableMultipleChoice"
+import MultipleChoiceDropdown from "../MultipleChoiceDropdown"
 import StageVisualizer from "../PeerReviews/StageVisualizer"
 import PeerReviews from "../PeerReviews"
 import Unsupported from "../Unsupported"
@@ -28,7 +30,7 @@ import TopInfoBar from "./TopInfoBar"
 import SubmitButton from "./SubmitButton"
 import LoginPrompt from "./LoginPrompt"
 import MarkdownText from "../MarkdownText"
-import Notification from "../Notification"
+import SimpleErrorBoundary from "./SimpleErrorBoundary"
 import { BoldTypographyMedium } from "../styleComponents"
 
 import ThemeProviderContext from "../../contexes/themeProviderContext"
@@ -46,6 +48,8 @@ const componentsByTypeNames = (typeName: QuizItemType) => {
     "research-agreement": ResearchAgreement,
     feedback: Feedback,
     "custom-frontend-accept-data": Unsupported,
+    "multiple-choice-dropdown": MultipleChoiceDropdown,
+    "clickable-multiple-choice": ClickableMultipleChoice,
   }
 
   return mapTypeToComponent[typeName]
@@ -79,7 +83,7 @@ const ItemWrapper = styled.div<IItemWrapperProps>`
   background-color: ${({ rowNumber }) =>
     rowNumber % 2 === 0 ? "inherit" : "#605c980d"};
   border-radius: 10px;
-  padding: 1rem 2rem 1rem 1rem;
+  padding: 0.7rem 2rem 1rem 1rem;
 `
 
 export interface QuizContentProps {
@@ -87,7 +91,7 @@ export interface QuizContentProps {
 }
 
 const QuizContent = styled.div<QuizContentProps>`
-  margin-top: 1rem;
+  margin-top: 1.5rem;
   padding: 1rem;
   ${({ disabled }) =>
     disabled &&
@@ -102,6 +106,7 @@ interface UpperContentProps {
 }
 
 const UpperContent = styled.div<UpperContentProps>`
+  padding: 0 1rem;
   ${({ providedStyles }) => providedStyles}
 `
 
@@ -129,6 +134,7 @@ interface SubmitGroupProps {
 const SubmitGroup = styled.div<SubmitGroupProps>`
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   > :last-child {
     margin-left: 1rem;
   }
@@ -136,9 +142,6 @@ const SubmitGroup = styled.div<SubmitGroupProps>`
 `
 
 const OuterDiv = styled.div<{ providedStyles: string | undefined }>`
-  p {
-    margin-bottom: 0 !important;
-  }
   ul {
     padding-inline-start: 30px;
   }
@@ -150,7 +153,6 @@ interface QuizBodyProps {
 }
 
 const QuizBody = styled(MarkdownText)<QuizBodyProps>`
-  padding: 0 1rem 1rem;
   ${({ providedStyles }) => providedStyles}
 `
 interface SubmitMessageProps {
@@ -167,7 +169,7 @@ const SubmitMessage = styled.div<SubmitMessageProps>`
   ${({ providedStyles }) => providedStyles}
 `
 
-const Error = styled.div`
+const ErrorMessage = styled.div`
   display: flex;
   width: auto;
   padding: 4rem;
@@ -233,9 +235,9 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     courseStatusProvider.notifyError &&
       courseStatusProvider.notifyError(messageState.message)
     return (
-      <Error>
+      <ErrorMessage>
         <p>{messageState.message}</p>
-      </Error>
+      </ErrorMessage>
     )
   }
 
@@ -295,13 +297,13 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     )
   }
 
-  if (quiz.texts.length === 0) {
+  /*if (quiz.texts.length === 0) {
     const message =
       "Error: quiz has no texts. (Likely the quiz does not match the requested " +
       "language id)"
     dispatch(messageActions.errorOccurred(message))
     return <div />
-  }
+  }*/
 
   let triesRemaining = quiz.tries
 
@@ -328,7 +330,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   }
 
   const containsPeerReviews =
-    quiz.peerReviewCollections !== null && quiz.peerReviewCollections.length > 0
+    quiz.peerReviews !== null && quiz.peerReviews.length > 0
 
   const answerStatus = quizAnswer.status ? quizAnswer.status : null
 
@@ -340,7 +342,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       : false
     : false
 
-  const submitMessage = quiz.texts[0].submitMessage
+  const submitMessage = quiz.submitMessage
 
   const exerciseFinishedMessage =
     activeStep === 4
@@ -376,7 +378,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   return (
     <OuterDiv
       providedStyles={themeProvider.mainDivStyles}
-      aria-label={quiz.texts[0].title}
+      aria-label={quiz.title}
       role="form"
     >
       <TopInfoBar />
@@ -389,7 +391,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
           {containsPeerReviews && <StageVisualizer />}
 
           <QuizBody providedStyles={themeProvider.quizBodyStyles}>
-            {quiz.texts[0].body}
+            {quiz.body}
           </QuizBody>
           {children}
         </UpperContent>
@@ -480,4 +482,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   )
 }
 
-export default FuncQuizImpl
+export default (props: QuizProps) => (
+  <SimpleErrorBoundary>
+    <FuncQuizImpl {...props} />
+  </SimpleErrorBoundary>
+)

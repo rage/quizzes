@@ -30,7 +30,7 @@ const produce = async (
   topic: "user-course-progress-realtime" | "exercise" | "user-points-realtime",
   message: ProgressMessage | QuizAnswerMessage | QuizMessage,
 ) => {
-  if (process.env.NODE_ENV === "test") {
+  if (!process.env.KAFKA_HOST) {
     return
   }
   try {
@@ -105,6 +105,7 @@ export const broadcastQuizAnswerUpdated = async (
     service_id: process.env.SERVICE_ID || "",
     required_actions: messages,
     message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
+    attempted: true,
   }
 
   if (course.moocfiId) {

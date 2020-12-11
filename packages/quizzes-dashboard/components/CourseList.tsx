@@ -5,6 +5,7 @@ import Link from "next/link"
 import Skeleton from "@material-ui/lab/Skeleton"
 import { Course } from "../types/Quiz"
 import _ from "lodash"
+import DebugDialog from "./DebugDialog"
 
 const StyledCard = styled(Card)`
   margin-bottom: 1rem;
@@ -122,6 +123,8 @@ const CourseList = ({ data, error }: CourseListProps) => {
           </CourseLink>
         </Link>
       ))}
+
+      <DebugDialog object={courses} />
     </>
   )
 }

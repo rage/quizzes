@@ -218,6 +218,7 @@ export const getAnswersRequiringAttentionByQuizId = async (
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
+    console.log(quizId)
     return (
       await api.get(
         `/quizzes/${quizId}/count-answers-requiring-attention`,
@@ -328,17 +329,4 @@ export const getCorrespondenceFile = async (
   } else {
     throw new Error()
   }
-}
-
-export const fetchLanguages = async (): Promise<Language[]> => {
-  const userInfo = checkStore()
-  if (userInfo) {
-    const config = {
-      headers: { Authorization: "bearer " + userInfo.accessToken },
-    }
-    const response = (await api.get(`/languages/ids`, config)).data
-
-    return response
-  }
-  throw new Error()
 }

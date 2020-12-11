@@ -1,9 +1,16 @@
+import { checkAccessOrThrow } from "./../dashboard/util"
 import Router from "koa-router"
 import knex from "../../../database/knex"
 import { CustomContext, CustomState } from "../../types"
-import { Quiz, QuizAnswer, User, PeerReview } from "../../models/"
+import {
+  Quiz,
+  QuizAnswer,
+  PeerReview,
+  UserQuizState,
+  Course,
+  SpamFlag,
+} from "../../models/"
 import accessControl from "../../middleware/access_control"
-import SpamFlag from "../../models/spam_flag"
 
 const widget = new Router<CustomState, CustomContext>({
   prefix: "/widget",
@@ -11,7 +18,25 @@ const widget = new Router<CustomState, CustomContext>({
 
   .get("/quizzes/:quizId", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    ctx.body = await Quiz.getById(quizId)
+    const userId = ctx.state.user.id
+    const userQuizState = await UserQuizState.getByUserAndQuiz(userId, quizId)
+    const quizAnswer = await QuizAnswer.getByUserAndQuiz(userId, quizId)
+    let canSeeAnswers = false
+    const strippedQuiz = await Quiz.getByIdStripped(quizId)
+    if (
+      userQuizState?.status === "locked" ||
+      (userQuizState?.pointsAwarded || 0) >= strippedQuiz.points
+    ) {
+      canSeeAnswers = true
+    }
+    const quiz = canSeeAnswers ? await Quiz.getById(quizId) : strippedQuiz
+    const course = await Course.getById(quiz.courseId)
+    quiz.course = course
+    ctx.body = {
+      quiz,
+      quizAnswer,
+      userQuizState,
+    }
   })
 
   .get(
@@ -65,12 +90,11 @@ const widget = new Router<CustomState, CustomContext>({
     const userId = ctx.state.user.id
     ctx.body = await QuizAnswer.getAnswersToReview(userId, quizId)
   })
+
   .post("/answers/give-review", accessControl(), async ctx => {
     const userId = ctx.state.user.id
     const peerReview = ctx.request.body
-    if (userId) {
-      peerReview.userId = userId
-    }
+    peerReview.userId = userId
     ctx.body = await PeerReview.givePeerReview(peerReview)
   })
 

@@ -11,12 +11,24 @@ export const ButtonField = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-around;
+
+  .MuiButton-label {
+    font-size: 1rem;
+    padding: 0.2rem;
+  }
+
+  #button-accept {
+    background-color: #78ab46;
+    color: white;
+  }
+  #button-reject {
+    background-color: #f44336;
+    color: white;
+  }
 `
 
 export const AcceptButton = styled(Button)`
   display: flex !important;
-  border-color: green !important;
-  border-width: 5px !important;
 `
 
 export const RejectButton = styled(Button)`
@@ -82,16 +94,18 @@ export const ManualReviewField = ({
       </Snackbar>
       <ButtonField>
         <AcceptButton
+          id="button-accept"
           variant="outlined"
           onClick={() => handleAcceptOrReject(answer.id, "confirmed")}
         >
-          <Typography variant="overline">Accept</Typography>
+          <Typography>Accept</Typography>
         </AcceptButton>
         <RejectButton
+          id="button-reject"
           variant="outlined"
           onClick={() => handleAcceptOrReject(answer.id, "rejected")}
         >
-          <Typography variant="overline">Reject</Typography>
+          <Typography>Reject</Typography>
         </RejectButton>
       </ButtonField>
     </>

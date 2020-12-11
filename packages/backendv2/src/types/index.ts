@@ -55,6 +55,7 @@ export interface QuizAnswerMessage {
   service_id: string
   required_actions: RequiredAction[] | null
   message_format_version: number
+  attempted: boolean
 }
 
 export interface QuizMessage {
@@ -95,6 +96,8 @@ export interface EditCoursePayloadFields {
   title?: string
   abbreviation?: string
   languageId?: string
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface IPeerReview {
@@ -120,3 +123,25 @@ export type TReturnedPeerReviewAnswer = Omit<
   IPeerReviewAnswer,
   "createdAt" | "updatedAt"
 >
+
+export type TPeerReviewGradeAnswer = {
+  peerReviewQuestionId: string
+  value: number | null
+}
+
+export type TPeerReviewEssayAnswer = {
+  peerReviewQuestionId: string
+  text: string
+}
+
+export type TPeerReviewQuestionAnswer =
+  | TPeerReviewGradeAnswer
+  | TPeerReviewEssayAnswer
+
+export type TPeerReviewGiven = {
+  quizAnswerId: string
+  peerReviewCollectionId: string
+  userId: number
+  rejectedQuizAnswerIds: string[]
+  answers: TPeerReviewQuestionAnswer[]
+}

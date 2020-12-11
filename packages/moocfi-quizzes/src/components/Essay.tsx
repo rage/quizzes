@@ -40,6 +40,7 @@ const AnswerField = styled(StyledTextField)<AnswerFieldProps>`
 `
 
 const SubmitHelperTypography = styled(Typography)<ISubmitHelperTypographyProps>`
+  margin-bottom: 0.5rem;
   && {
     height: 1rem;
     padding-top: 1rem;
@@ -74,8 +75,8 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
     return <div />
   }
   const essayLabels = languageInfo.essay
-  const itemBody = item.texts[0].body
-  const itemTitle = item.texts[0].title
+  const itemBody = item.body
+  const itemTitle = item.title
 
   let itemAnswer = quizAnswer.itemAnswers.find(ia => ia.quizItemId === item.id)
 

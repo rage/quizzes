@@ -1,11 +1,12 @@
-import Model from "./base_model"
+import { BadRequestError } from "./../util/error"
 import User from "./user"
 import Knex from "knex"
 import Course from "./course"
 import { PointsByGroup } from "../types"
 import Quiz from "./quiz"
+import BaseModel from "./base_model"
 
-class UserCoursePartState extends Model {
+class UserCoursePartState extends BaseModel {
   userId!: number
   courseId!: string
   coursePart!: number
@@ -22,7 +23,7 @@ class UserCoursePartState extends Model {
 
   static relationMappings = {
     user: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: User,
       join: {
         from: "user_course_part_state.user_id",
@@ -30,7 +31,7 @@ class UserCoursePartState extends Model {
       },
     },
     quiz: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: Course,
       join: {
         from: "user_course_part_state.course_id",
@@ -112,12 +113,26 @@ class UserCoursePartState extends Model {
     courseId: string,
     trx: Knex.Transaction,
   ) {
-    const userCoursePartStates = await this.query(trx)
-      .where({
-        user_id: userId,
-        course_id: courseId,
-      })
-      .andWhereNot("course_part", 0)
+    let userCoursePartStates
+
+    // validate course id
+    try {
+      await Course.getFlattenedById(courseId)
+      await User.getById(userId)
+    } catch (error) {
+      throw error
+    }
+
+    try {
+      userCoursePartStates = await this.query(trx)
+        .where({
+          user_id: userId,
+          course_id: courseId,
+        })
+        .andWhereNot("course_part", 0)
+    } catch (error) {
+      throw error
+    }
 
     const quizzes = await Quiz.query(trx)
       .where("course_id", courseId)
@@ -130,7 +145,7 @@ class UserCoursePartState extends Model {
             quiz.part === ucps.coursePart && quiz.excludedFromScore === false,
         )
         .map(quiz => quiz.points)
-        .reduce((acc, curr) => acc + curr)
+        .reduce((acc, curr) => acc + curr, 0)
 
       const coursePartString = ucps.coursePart.toString()
       return {
