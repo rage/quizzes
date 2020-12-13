@@ -27,6 +27,8 @@ import UserQuizState from "./user_quiz_state"
 
 import UserCourseRole from "./user_course_role"
 
+import UserCoursePartState from "./user_course_part_state"
+
 import Course from "./course"
 import CourseTranslation from "./course_translation"
 
@@ -57,4 +59,5 @@ export {
   CourseTranslation,
   Language,
   SpamFlag,
+  UserCoursePartState,
 }
