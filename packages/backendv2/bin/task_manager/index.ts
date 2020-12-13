@@ -15,84 +15,100 @@ export const sleep_ms = (ms: number) => {
   })
 }
 
-export class Manager {
-  // WHY NO PRIVATE???
-  private queue: any[] = []
-  // private tasksRunning: any[] = []
-  private tasks: { [id: string]: any } = {}
-  private running: boolean = false
-  private progress = new Multiprogress()
+interface Task {
+  type: TaskType
+  id?: string
+  quizId?: string
+}
+
+enum TaskType {
+  RE_EVAL = "re_eval",
+}
+
+export default class Manager {
+  queue: Task[] = []
+  tasks: { [id: string]: { task: Task; hook?: () => void } } = {}
+  running: boolean = false
+  progress = new Multiprogress()
+
   async run() {
     if (this.running) {
       return
     }
-
     this.running = true
     ;(async () => {
       while (this.running) {
-        ;(await knex("background_task").select()).forEach(task =>
-          this.queue.push(task),
-        )
+        ;(await knex("background_task").select()).forEach(t => {
+          const { quiz_id, ...rest } = t
+          const task = { quizId: quiz_id, ...rest }
+          this.queue.push(task)
+        })
         while (this.queue.length > 0) {
           const task = this.queue.shift()
+          if (!task) {
+            break
+          }
+          const { type, id, quizId } = task
           try {
-            switch (task.type) {
-              case "re_eval":
-                const quizId = task.quiz_id
-                if (!quizId) break
-                const id = task.type + "_" + quizId
-                this.runTask(id, task, reEvaluate, [quizId])
-                break
-              case "destroy":
-                console.log("destroying")
-                await sleep_ms(3000)
-                console.log("destroyed")
+            switch (type) {
+              case TaskType.RE_EVAL:
+                if (!quizId) {
+                  break
+                }
+                this.runTask(task, reEvaluate, [quizId])
                 break
             }
           } catch (error) {
             console.log(error)
           }
-
-          /* FIX
-          if (task.id) {
+          if (id) {
             await knex("background_task")
-              .where("id", task.id)
+              .where("id", id)
               .del()
           }
-          */
         }
         await sleep_ms(1000)
       }
     })()
   }
-  runTask(id: string, task: any, action: any, params: any[]) {
-    if (this.tasks[id]) {
+
+  runTask(task: Task, action: any, params: any[]) {
+    const id = task.type + "_" + task.quizId
+    if (id in this.tasks) {
       console.log("task already running")
       return
     }
-    this.tasks[id] = { task: task }
+    this.tasks[id] = { task }
     const add = (f: any) => {
-      this.tasks[id] = { handle: f, ...this.tasks[id] }
+      this.tasks[id] = { hook: f, ...this.tasks[id] }
     }
     return action(...params, this.progress, add)
   }
+
   stop() {
     this.running = false
     console.log("event loop stopped")
   }
-  add(task: any) {
+  add(task: Task) {
     this.queue.push(task)
   }
   list() {
     console.log("in queue")
-    this.queue.forEach(task => console.log(task))
+    console.log(this.queue)
     console.log("in progress")
     console.log(this.tasks)
   }
   cancel(id: string) {
-    const cancel = this.tasks[id].handle
-    cancel()
+    const cancel = this.tasks[id].hook
+    cancel?.apply([])
     delete this.tasks[id]
+  }
+  cancelAll() {
+    Object.keys(this.tasks).forEach(id => {
+      const cancel = this.tasks[id].hook
+      cancel?.apply([])
+      delete this.tasks[id]
+    })
   }
 }
 

@@ -5,7 +5,7 @@ import lodash from "lodash"
 import knex from "../database/knex"
 import { Model, snakeCaseMappers } from "objection"
 import * as pg from "pg"
-import { Manager } from "./task_manager"
+import Manager from "./task_manager"
 
 pg.types.setTypeParser(1700, function(val: any) {
   return parseFloat(val)
@@ -45,4 +45,4 @@ Object.entries(services).forEach(([modelName, model]) => {
 
 addReplGlobal("lodash", lodash)
 addReplGlobal("knex", knex)
-addReplGlobal("manager", new Manager())
+addReplGlobal("tm", new Manager())
