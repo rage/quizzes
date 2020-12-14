@@ -85,12 +85,12 @@ export default async function reEvaluate(quizId: string, passToCaller: any) {
     await trx.commit()
     console.log("re_eval done")
   } catch (error) {
+    await trx.rollback()
     if (error.constructor === Abort) {
-      console.log("re_eval terminating")
+      console.log("re_eval terminated")
     } else {
       console.log(error)
     }
-    await trx.rollback()
     return false
   }
   return true

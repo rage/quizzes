@@ -1,27 +1,28 @@
 import knex from "../../database/knex"
 import { Model, snakeCaseMappers } from "objection"
 import reEvaluate from "../re_evaluate"
+import recalculate from "../recalculate"
 import { sleep_ms } from "./util"
+import { TaskType } from "../../src/types"
+import { BackgroundTask } from "../../src/models"
 
 Model.knex(knex)
 Model.columnNameMappers = snakeCaseMappers()
 
-interface Task {
-  type: TaskType
-  id?: string
-  quizId?: string
-}
-
-enum TaskType {
-  RE_EVAL = "re_eval",
-}
-
 export default class Manager {
-  queue: Task[] = []
+  queue: BackgroundTask[] = []
   tasks: {
-    [id: string]: { task: Task; cancel?: () => void; report?: () => number }
+    [id: string]: {
+      task: BackgroundTask
+      cancel?: () => void
+      report?: () => number
+    }
   } = {}
   running: boolean = false
+
+  constructor() {
+    this.run()
+  }
 
   async run() {
     if (this.running) {
@@ -29,41 +30,40 @@ export default class Manager {
     }
     this.running = true
     while (this.running) {
-      ;(await knex("background_task").select()).forEach(t => {
-        const { quiz_id, ...rest } = t
-        const task = { quizId: quiz_id, ...rest }
-        this.queue.push(task)
-      })
-      while (this.queue.length > 0) {
-        const task = this.queue.shift()
-        if (!task) {
-          break
-        }
-        const { type, id, quizId } = task
+      const tasks = await BackgroundTask.getAll()
+      this.queue = [...this.queue, ...tasks]
+      const task = this.queue.shift()
+      if (task) {
+        const { type, id, quizId, courseId } = task
         try {
           switch (type) {
             case TaskType.RE_EVAL:
               if (!quizId) {
                 break
               }
-              this.runTask(task, reEvaluate, [quizId])
+              this.runTask(reEvaluate, task, [quizId])
+              break
+            case TaskType.RECALC:
+              if (!courseId) {
+                break
+              }
+              this.runTask(recalculate, task, [courseId])
               break
           }
         } catch (error) {
-          // console.log(error)
+          console.log(error)
         }
         if (id) {
-          await knex("background_task")
-            .where("id", id)
-            .del()
+          await BackgroundTask.delete(id)
         }
       }
       await sleep_ms(1000)
     }
   }
 
-  runTask(task: Task, action: any, params: any[]) {
-    const id = task.type + "_" + task.quizId
+  async runTask(action: any, task: BackgroundTask, params: any[]) {
+    const idString = task.quizId || task.courseId
+    const id = task.type + "_" + idString
     if (id in this.tasks) {
       console.log("task already running")
       return
@@ -72,14 +72,15 @@ export default class Manager {
     const add = (hooks: any) => {
       this.tasks[id] = { ...hooks, ...this.tasks[id] }
     }
-    return action(...params, add)
+    await action(...params, add)
+    delete this.tasks[id]
   }
 
   stop() {
     this.running = false
     console.log("event loop stopped")
   }
-  add(task: Task) {
+  add(task: BackgroundTask) {
     this.queue.push(task)
   }
   list() {
@@ -110,7 +111,7 @@ const manager = new Manager()
 manager.run()
 manager.add({
   type: "re_eval",
-  quiz_id: "2718851a-f8d6-404e-8acb-c7eca1ba0b9c",
+  quizId: "2718851a-f8d6-404e-8acb-c7eca1ba0b9c",
   // quiz_id: "6fb9b7cf-471c-45ca-b3fd-392214260eeb",
   // quiz_id: "48a56234-e92d-541f-b333-8f17fd01fb99"
 })

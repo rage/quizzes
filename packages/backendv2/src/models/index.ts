@@ -36,6 +36,8 @@ import Language from "./language"
 
 import SpamFlag from "./spam_flag"
 
+import BackgroundTask from "./background_task"
+
 export {
   Quiz,
   QuizTranslation,
@@ -60,4 +62,5 @@ export {
   Language,
   SpamFlag,
   UserCoursePartState,
+  BackgroundTask,
 }

@@ -145,3 +145,8 @@ export type TPeerReviewGiven = {
   rejectedQuizAnswerIds: string[]
   answers: TPeerReviewQuestionAnswer[]
 }
+
+export enum TaskType {
+  RE_EVAL = "re_eval",
+  RECALC = "recalc",
+}
