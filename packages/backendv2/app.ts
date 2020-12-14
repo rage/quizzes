@@ -8,7 +8,6 @@ import logger from "./src/middleware/logger"
 import errorHandler from "./src/middleware/error_handler"
 import { CustomContext, CustomState } from "./src/types"
 import cors from "koa-cors"
-import { get } from "lodash"
 
 import * as pg from "pg"
 

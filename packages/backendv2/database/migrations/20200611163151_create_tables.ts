@@ -820,6 +820,17 @@ export async function up(knex: Knex): Promise<any> {
         .notNullable()
     })
   }
+  if (!(await knex.schema.hasTable("background_task"))) {
+    await knex.schema.createTable("background_task", table => {
+      table
+        .uuid("id")
+        .primary()
+        .defaultTo(knex.raw("uuid_generate_v4()"))
+        .notNullable()
+      table.text("type")
+      table.uuid("quiz_id")
+    })
+  }
 }
 
 export async function down(knex: Knex): Promise<any> {}

@@ -27,12 +27,16 @@ import UserQuizState from "./user_quiz_state"
 
 import UserCourseRole from "./user_course_role"
 
+import UserCoursePartState from "./user_course_part_state"
+
 import Course from "./course"
 import CourseTranslation from "./course_translation"
 
 import Language from "./language"
 
 import SpamFlag from "./spam_flag"
+
+import BackgroundTask from "./background_task"
 
 export {
   Quiz,
@@ -57,4 +61,6 @@ export {
   CourseTranslation,
   Language,
   SpamFlag,
+  UserCoursePartState,
+  BackgroundTask,
 }

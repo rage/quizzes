@@ -1,11 +1,10 @@
 import Knex from "knex"
-import { NotFoundError } from "./../util/error"
+import { BadRequestError, NotFoundError } from "./../util/error"
 import QuizItemAnswer from "./quiz_item_answer"
 import User from "./user"
 import PeerReview from "./peer_review"
 import Quiz from "./quiz"
 import UserQuizState from "./user_quiz_state"
-import { BadRequestError } from "../util/error"
 import { removeNonPrintingCharacters } from "../util/tools"
 import knex from "../../database/knex"
 import Course from "./course"
@@ -472,7 +471,7 @@ class QuizAnswer extends BaseModel {
     }
   }
 
-  private static assessAnswer(quizAnswer: QuizAnswer, quiz: Quiz) {
+  public static assessAnswer(quizAnswer: QuizAnswer, quiz: Quiz) {
     const quizItemAnswers = quizAnswer.itemAnswers
     const quizItems = quiz.items
     if (!quizItemAnswers || quizItemAnswers.length === 0) {
@@ -498,9 +497,12 @@ class QuizAnswer extends BaseModel {
           const textData = removeNonPrintingCharacters(quizItemAnswer.textData)
             .replace(/\0/g, "")
             .trim()
-          if (!textData) {
+          /*if (!textData) {
+            if (quizItemAnswer.textData) {
+              throw new BadRequestError("invalid input")
+            }
             throw new BadRequestError("no answer provided")
-          }
+          }*/
           const validityRegex = quizItem.validityRegex.trim()
           const validator = new RegExp(validityRegex, "i")
           quizItemAnswer.correct = validator.test(textData) ? true : false
@@ -571,7 +573,7 @@ class QuizAnswer extends BaseModel {
     }
   }
 
-  private static gradeAnswer(
+  public static gradeAnswer(
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
     quiz: Quiz,
@@ -594,7 +596,7 @@ class QuizAnswer extends BaseModel {
       points > pointsAwarded ? points : pointsAwarded
   }
 
-  private static assessUserQuizStatus(
+  public static assessUserQuizStatus(
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
     quiz: Quiz,
