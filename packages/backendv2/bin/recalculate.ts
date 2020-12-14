@@ -4,9 +4,11 @@ import {} from "../src/models"
 export default async function recalculate(courseId: string, passToCaller: any) {
   const pgClient = await pool.connect()
   const started = new Date().getSeconds()
+  let cancelled = false
   passToCaller({
     report: () => new Date().getSeconds() - started + " s",
     cancel: async () => {
+      cancelled = true
       const pgCancel = await pool.connect()
       await pgCancel.query("SELECT pg_cancel_backend($1)", [pgClient.processID])
       pgClient.release()
@@ -74,7 +76,11 @@ export default async function recalculate(courseId: string, passToCaller: any) {
     )
     console.log("recalc_" + courseId + " done")
   } catch (error) {
-    console.log("error while recalculating progress")
-    throw error
+    if (cancelled) {
+      console.log("recalc terminated")
+    } else {
+      console.log("error while recalculating progress")
+      throw error
+    }
   }
 }
