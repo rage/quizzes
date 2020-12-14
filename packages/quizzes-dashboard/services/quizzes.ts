@@ -330,3 +330,25 @@ export const getCorrespondenceFile = async (
     throw new Error()
   }
 }
+
+export const downloadQuizInfo = async (
+  quizId: string,
+  quizName: string,
+  courseName: string,
+) => {
+  console.log("downloading...")
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    console.log("💩 ~ file: quizzes.ts ~ line 341 ~ config", config)
+    return await api.post(
+      `/quizzes/${quizId}/download-quiz-info`,
+      { quizName, courseName },
+      config,
+    )
+  } else {
+    throw new Error()
+  }
+}
