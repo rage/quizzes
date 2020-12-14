@@ -1,19 +1,10 @@
 import knex from "../../database/knex"
 import { Model, snakeCaseMappers } from "objection"
-import Multiprogress from "multi-progress"
 import reEvaluate from "../re_evaluate"
-import { v4 as uuidv4 } from "uuid"
+import { sleep_ms } from "./util"
 
 Model.knex(knex)
 Model.columnNameMappers = snakeCaseMappers()
-
-export const sleep_ms = (ms: number) => {
-  return new Promise((resolve, reject) => {
-    setTimeout(() => {
-      resolve("")
-    }, ms)
-  })
-}
 
 interface Task {
   type: TaskType
@@ -27,49 +18,48 @@ enum TaskType {
 
 export default class Manager {
   queue: Task[] = []
-  tasks: { [id: string]: { task: Task; hook?: () => void } } = {}
+  tasks: {
+    [id: string]: { task: Task; cancel?: () => void; report?: () => number }
+  } = {}
   running: boolean = false
-  progress = new Multiprogress()
 
   async run() {
     if (this.running) {
       return
     }
     this.running = true
-    ;(async () => {
-      while (this.running) {
-        ;(await knex("background_task").select()).forEach(t => {
-          const { quiz_id, ...rest } = t
-          const task = { quizId: quiz_id, ...rest }
-          this.queue.push(task)
-        })
-        while (this.queue.length > 0) {
-          const task = this.queue.shift()
-          if (!task) {
-            break
-          }
-          const { type, id, quizId } = task
-          try {
-            switch (type) {
-              case TaskType.RE_EVAL:
-                if (!quizId) {
-                  break
-                }
-                this.runTask(task, reEvaluate, [quizId])
-                break
-            }
-          } catch (error) {
-            console.log(error)
-          }
-          if (id) {
-            await knex("background_task")
-              .where("id", id)
-              .del()
-          }
+    while (this.running) {
+      ;(await knex("background_task").select()).forEach(t => {
+        const { quiz_id, ...rest } = t
+        const task = { quizId: quiz_id, ...rest }
+        this.queue.push(task)
+      })
+      while (this.queue.length > 0) {
+        const task = this.queue.shift()
+        if (!task) {
+          break
         }
-        await sleep_ms(1000)
+        const { type, id, quizId } = task
+        try {
+          switch (type) {
+            case TaskType.RE_EVAL:
+              if (!quizId) {
+                break
+              }
+              this.runTask(task, reEvaluate, [quizId])
+              break
+          }
+        } catch (error) {
+          // console.log(error)
+        }
+        if (id) {
+          await knex("background_task")
+            .where("id", id)
+            .del()
+        }
       }
-    })()
+      await sleep_ms(1000)
+    }
   }
 
   runTask(task: Task, action: any, params: any[]) {
@@ -79,10 +69,10 @@ export default class Manager {
       return
     }
     this.tasks[id] = { task }
-    const add = (f: any) => {
-      this.tasks[id] = { hook: f, ...this.tasks[id] }
+    const add = (hooks: any) => {
+      this.tasks[id] = { ...hooks, ...this.tasks[id] }
     }
-    return action(...params, this.progress, add)
+    return action(...params, add)
   }
 
   stop() {
@@ -98,16 +88,19 @@ export default class Manager {
     console.log("in progress")
     console.log(this.tasks)
   }
+  show() {
+    Object.keys(this.tasks).forEach(id => {
+      console.log(id + " " + this.tasks[id].report?.())
+    })
+  }
   cancel(id: string) {
-    const cancel = this.tasks[id].hook
-    cancel?.apply([])
+    console.log("cancelling " + id)
+    this.tasks[id].cancel?.()
     delete this.tasks[id]
   }
   cancelAll() {
     Object.keys(this.tasks).forEach(id => {
-      const cancel = this.tasks[id].hook
-      cancel?.apply([])
-      delete this.tasks[id]
+      this.cancel(id)
     })
   }
 }
