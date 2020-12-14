@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import styled from "styled-components"
 import Button from "@material-ui/core/Button"
 import { downloadPeerReviewInfo } from "../../services/quizzes"
@@ -25,11 +25,15 @@ export const PeerreviewInfoForm = ({
   quizName,
   courseName,
 }: PeerreviewInfoFormProps) => {
+  const [downloading, setDownloading] = useState(false)
+
   const handlePeerReviewInfoDownload = async (
     e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault()
+    setDownloading(true)
     const res = await downloadPeerReviewInfo(quizId, quizName, courseName)
+    setDownloading(false)
     const blob = new Blob([res.data], { type: res.headers["content-type"] })
     const link = document.createElement("a")
     link.href = window.URL.createObjectURL(blob)
@@ -41,8 +45,8 @@ export const PeerreviewInfoForm = ({
 
   return (
     <StyledForm onSubmit={handlePeerReviewInfoDownload}>
-      <SubmitButton type="submit" variant="outlined">
-        Download peerreview info
+      <SubmitButton type="submit" variant="outlined" disabled={downloading}>
+        {downloading ? "Downloading" : "Download peerreview info"}
       </SubmitButton>
     </StyledForm>
   )

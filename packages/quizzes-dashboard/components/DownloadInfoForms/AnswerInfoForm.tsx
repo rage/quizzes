@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { Button } from "@material-ui/core"
 import styled from "styled-components"
 import { downloadAnswerInfo } from "../../services/quizzes"
@@ -25,11 +25,15 @@ export const AnswerInfoForm = ({
   quizName,
   courseName,
 }: AnswerInfoFormProps) => {
+  const [downloading, setDownloading] = useState(false)
+
   const handleAnswerInfoDownload = async (
     e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault()
+    setDownloading(true)
     const res = await downloadAnswerInfo(quizId, quizName, courseName)
+    setDownloading(false)
     const blob = new Blob([res.data], { type: res.headers["content-type"] })
     const link = document.createElement("a")
     link.href = window.URL.createObjectURL(blob)
@@ -40,7 +44,7 @@ export const AnswerInfoForm = ({
   }
   return (
     <StyledForm onSubmit={handleAnswerInfoDownload}>
-      <SubmitButton type="submit" variant="outlined">
+      <SubmitButton type="submit" variant="outlined" disabled={downloading}>
         Download answer info
       </SubmitButton>
     </StyledForm>
