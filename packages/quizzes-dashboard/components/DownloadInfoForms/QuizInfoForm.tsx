@@ -1,7 +1,6 @@
 import React from "react"
 import styled from "styled-components"
 import Button from "@material-ui/core/Button"
-import { checkStore } from "../../services/tmcApi"
 import { downloadQuizInfo } from "../../services/quizzes"
 
 const SubmitButton = styled(Button)`
@@ -41,7 +40,7 @@ export const QuizInfoForm = ({
   }
 
   return (
-    <StyledForm onSubmit={event => handleQuizInfoDownload(event)}>
+    <StyledForm onSubmit={handleQuizInfoDownload}>
       <SubmitButton type="submit" variant="outlined">
         Download quiz info
       </SubmitButton>

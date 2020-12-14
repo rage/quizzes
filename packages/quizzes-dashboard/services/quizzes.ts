@@ -336,15 +336,53 @@ export const downloadQuizInfo = async (
   quizName: string,
   courseName: string,
 ) => {
-  console.log("downloading...")
   const userInfo = checkStore()
   if (userInfo) {
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
-    console.log("💩 ~ file: quizzes.ts ~ line 341 ~ config", config)
     return await api.post(
       `/quizzes/${quizId}/download-quiz-info`,
+      { quizName, courseName },
+      config,
+    )
+  } else {
+    throw new Error()
+  }
+}
+
+export const downloadPeerReviewInfo = async (
+  quizId: string,
+  quizName: string,
+  courseName: string,
+) => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return await api.post(
+      `/quizzes/${quizId}/download-peerreview-info`,
+      { quizName, courseName },
+      config,
+    )
+  } else {
+    throw new Error()
+  }
+}
+
+export const downloadAnswerInfo = async (
+  quizId: string,
+  quizName: string,
+  courseName: string,
+) => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return await api.post(
+      `/quizzes/${quizId}/download-answer-info`,
       { quizName, courseName },
       config,
     )
