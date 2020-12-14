@@ -205,6 +205,7 @@ const BasicInformation = () => {
       <InfoContainer>
         <PartField
           fullWidth
+          type="number"
           label="Part"
           variant="outlined"
           value={part ?? ""}
@@ -214,6 +215,7 @@ const BasicInformation = () => {
         />
         <SectionField
           fullWidth
+          type="number"
           label="Section"
           variant="outlined"
           value={section ?? ""}
@@ -267,6 +269,7 @@ const BasicInformation = () => {
       <InfoContainer>
         <TextField
           label="Points to gain"
+          type="number"
           fullWidth
           variant="outlined"
           defaultValue={pointsToGain ?? ""}
