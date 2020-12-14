@@ -246,6 +246,8 @@ const BasicInformation = () => {
         <TryLimitNumberContainer>
           {triesAreLimited && (
             <TextField
+              type="number"
+              InputProps={{ inputProps: { min: 1, max: null } }}
               label="Number of tries allowed"
               variant="outlined"
               defaultValue={numberOfTries ?? ""}
