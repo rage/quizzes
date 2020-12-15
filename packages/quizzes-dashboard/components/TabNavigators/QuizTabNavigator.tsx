@@ -66,7 +66,6 @@ export const TabNavigator = () => {
     quizLoading ||
     userAbilitiesLoading ||
     courseLoading ||
-    userAbilitiesLoading ||
     requiringAttentionLoading
 
   const errorFetchingData =

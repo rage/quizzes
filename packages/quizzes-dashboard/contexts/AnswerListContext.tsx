@@ -16,7 +16,7 @@ const initialState: IAnswerListState = {
   bulkSelectedIds: [],
   updatedAnswersIds: [],
   statusUpdateType: "",
-  bulkSelectMode: true,
+  bulkSelectMode: false,
   enableSearch: false,
   expandAll: false,
 }
