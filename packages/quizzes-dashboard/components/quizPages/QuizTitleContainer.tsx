@@ -1,11 +1,10 @@
 import React from "react"
-import { Course, Quiz } from "../../types/Quiz"
+import { Quiz } from "../../types/Quiz"
 import styled from "styled-components"
 import { Typography } from "@material-ui/core"
 
 interface QuizTitleProps {
   quiz: Quiz
-  course: Course
 }
 
 const HeaderContainer = styled.div`
@@ -21,22 +20,13 @@ const TitleContainer = styled.div`
   padding: 1rem;
   justify-content: space-around;
   width: 100%;
+  margin: 4rem;
 `
-const CourseName = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: center;
-`
-export const QuizTitle = ({ quiz, course }: QuizTitleProps) => {
+
+export const QuizTitle = ({ quiz }: QuizTitleProps) => {
   return (
     <>
       <HeaderContainer>
-        <CourseName>
-          <Typography>{course.title}</Typography>
-        </CourseName>
-        <Typography>
-          Part {quiz.part}, Section {quiz.section}
-        </Typography>
         <TitleContainer>
           <Typography variant="h2">{quiz.title}</Typography>
         </TitleContainer>

@@ -8,7 +8,6 @@ import Head from "next/head"
 import usePromise from "react-use-promise"
 import { groupBy, Dictionary } from "lodash"
 import { Typography, Button } from "@material-ui/core"
-import { Skeleton } from "@material-ui/lab"
 import DebugDialog from "../DebugDialog"
 import Link from "next/link"
 import styled from "styled-components"
@@ -17,10 +16,7 @@ import { Quiz } from "../../types/Quiz"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
 import DuplicateCourseButton from "../DuplicateCourse"
 import { SectionOfPart } from "./PartSection"
-
-const StyledSkeleton = styled(Skeleton)`
-  margin-bottom: 1rem;
-`
+import SkeletonLoader from "../Shared/SkeletonLoader"
 
 const CourseTitleWrapper = styled.div`
   display: flex;
@@ -84,21 +80,7 @@ export const CoursePage = () => {
             />
           </Head>
         </div>
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <SkeletonLoader height={50} skeletonCount={15} />
       </>
     )
   }

@@ -53,8 +53,7 @@ class PeerReview extends BaseModel {
   }
 
   public static async givePeerReview(peerReview: PeerReview) {
-    // TODO: type callback argument ?
-    peerReview.answers.forEach((answer: any): void => {
+    peerReview.answers.forEach((answer: PeerReviewQuestionAnswer): void => {
       if (answer.text) {
         return
       }
@@ -81,7 +80,6 @@ class PeerReview extends BaseModel {
       throw new BadRequestError("Answer can only be peer reviewed once")
     }
 
-    // TODO: check target quiz answer id is valid
     const targetQuizAnswer = await QuizAnswer.getById(quizAnswerId)
 
     const quizId = targetQuizAnswer.quizId
@@ -142,7 +140,6 @@ class PeerReview extends BaseModel {
       await QuizAnswer.update(sourceQuizAnswer, sourceUserQuizState, quiz, trx)
       await QuizAnswer.update(targetQuizAnswer, targetUserQuizState, quiz, trx)
 
-      // TODO: upsert needed until QuizAnswer.update() saves to db
       await QuizAnswer.save(sourceQuizAnswer, trx)
       await QuizAnswer.save(targetQuizAnswer, trx)
 
