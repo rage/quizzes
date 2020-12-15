@@ -1,13 +1,15 @@
 import * as React from "react"
 import styled from "styled-components"
 
-const Message = styled.p`
+const Message = styled.div`
   margin: auto;
-  width: auto;
-  height 100px;
-  padding-top: 40px;
-  font-size: 2.5rem;
-  text-align: center;
+  width: 100%;
+  padding: 2rem;
+  h2 {
+    font-size: 2rem;
+    text-align: center;
+    margin-top: 0;
+  }
 `
 
 class SimpleErrorBoundary extends React.Component<any, any> {
@@ -25,7 +27,13 @@ class SimpleErrorBoundary extends React.Component<any, any> {
 
   render() {
     if (this.state.error) {
-      return <Message>Something went wrong</Message>
+      return (
+        <Message>
+          <h2>Something went wrong</h2>
+          <p>{this.state.error}</p>
+          <pre>{this.state.stack}</pre>
+        </Message>
+      )
     }
 
     return this.props.children
