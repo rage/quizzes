@@ -13,6 +13,14 @@ export const editedQuizzesNumberOfTries = createAction(
   }),
 )<{ numberOfTries: number; id: string }>()
 
+export const editedQuizTriesLimited = createAction(
+  "EDITED_QUIZ_TRIES_LIMITED",
+  (triesLimited: boolean, quizId: string) => ({
+    triesLimited: triesLimited,
+    id: quizId,
+  }),
+)<{ triesLimited: boolean; id: string }>()
+
 export const editedQuizzesPointsToGain = createAction(
   "EDITED_QUIZZES_POINTS_TO_GAIN",
   (pointsToGain: number, quizId: string) => ({
