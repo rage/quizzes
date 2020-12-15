@@ -2,23 +2,31 @@ import React, { useState, useEffect } from "react"
 import _ from "lodash"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
-import { fetchQuiz, fetchCourseById } from "../../../services/quizzes"
+import {
+  getAllAnswers,
+  getAllAnswersMatchingQuery,
+} from "../../../services/quizzes"
 import usePromise from "react-use-promise"
 import { MenuItem, Switch, Typography, Chip } from "@material-ui/core"
 import styled from "styled-components"
 import QuizTitle from "../QuizTitleContainer"
-import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
+import { TabText } from "../TabHeaders"
 import {
   SizeSelectorField,
-  StyledSkeleton,
   OptionsContainer,
   SwitchField,
   SortOrderField,
   FilterParamsField,
 } from "./styles"
-import { TSortOptions, TAnswersDisplayed, ChipProps } from "./types"
+import { ChipProps, IQuizTabProps, TAnswersDisplayed } from "./types"
 import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
-import AnswerListWrapper from "../../AnswerListWrapper"
+import AnswerListWrapper from "../../Answer/AnswerListWrapper"
+import { Answer } from "../../../types/Answer"
+import {
+  useAnswerListState,
+  setExpandAll,
+} from "../../../contexts/AnswerListContext"
+import AnswerListOptions from "../../Answer/AnswerListOptions"
 
 const StyledChip = styled(Chip)<ChipProps>`
   display: flex !important;
@@ -32,35 +40,65 @@ const StyledChip = styled(Chip)<ChipProps>`
   margin-bottom: 0.5rem !important;
 `
 
-export const AllAnswers = () => {
+export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
+  const [{ expandAll }, dispatch] = useAnswerListState()
+
   const route = useRouter()
-  const quizId = route.query.quizId?.toString() ?? ""
+  const quizId = quiz?.id
 
   const URL_HREF = `/quizzes/[quizId]/[...page]`
   const pathname = `/quizzes/${quizId}/all-answers/`
 
-  let paramSize = Number(route.query.answers) as TAnswersDisplayed
-  let paramPage = Number(route.query.pageNo)
-  let paramSort: TSortOptions | null = null
-  if (route.query.sort) {
-    paramSort = route.query.sort as TSortOptions
-  }
-  let paramExpand = route.query.expandAll === "true" ? true : false
-  let paramFilters: any = null
-  if (route.query.filters !== undefined) {
-    let filtersAsString: string = route.query.filters.toString()
-    paramFilters = filtersAsString.split(",")
-  }
+  const [currentPage, setCurrentPage] = useState(1)
+  const [sortOrder, setSortOrder] = useState("desc")
+  const [answersDisplayed, setAnswersDisplayed] = useState(10)
+  const [filterParameters, setFilterParameters] = useState<string[]>([])
 
-  const [currentPage, setCurrentPage] = useState<number>(paramPage || 1)
-  const [sortOrder, setSortOrder] = useState<TSortOptions>(paramSort || "desc")
-  const [expandAll, setExpandAll] = useState<boolean>(paramExpand || false)
-  const [answersDisplayed, setAnswersDisplayed] = useState<TAnswersDisplayed>(
-    paramSize || 10,
+  const [allAnswers, answersError] = usePromise(
+    () =>
+      getAllAnswers(
+        quizId,
+        currentPage,
+        answersDisplayed,
+        sortOrder,
+        filterParameters,
+      ),
+    [quizId, currentPage, answersDisplayed, sortOrder, filterParameters],
   )
-  const [filterParameters, setFilterParameters] = useState<string[]>(
-    paramFilters || [],
-  )
+
+  const [searchResults, setSearchResults] = useState<
+    | {
+        results: Answer[]
+        total: number
+      }
+    | undefined
+    | null
+  >(null)
+
+  const [fetchingAnswers, setFetchingAnswers] = useState(false)
+
+  const handleTextSearch = async (searchQuery: string) => {
+    try {
+      setFetchingAnswers(true)
+      if (!searchQuery) {
+        setSearchResults(null)
+      } else {
+        const response = await getAllAnswersMatchingQuery(
+          quizId,
+          currentPage,
+          answersDisplayed,
+          sortOrder,
+          filterParameters,
+          searchQuery,
+        )
+        setSearchResults(response)
+      }
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setFetchingAnswers(false)
+    }
+  }
 
   const isIncludedInFilter = (param: string) => {
     if (!route.query.filters) {
@@ -93,13 +131,8 @@ export const AllAnswers = () => {
     },
     spam: { checked: isIncludedInFilter("spam") },
   }
-  const [chipStates, setChipStates] = useState(states)
 
-  const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [])
-  const [course, courseError] = usePromise(
-    () => fetchCourseById(quiz?.courseId ?? ""),
-    [quiz],
-  )
+  const [chipStates, setChipStates] = useState(states)
 
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
@@ -115,46 +148,35 @@ export const AllAnswers = () => {
 
   const [queryToPush, setQueryToPush] = useState({})
 
+  const { pageNo, sort, answers, filters } = route.query
+
   // this needs to be run so that if the page with query params is loaded in
   // another window, the params can be updated without clearing the rest first
   useEffect(() => {
     let initialQuery: any = {}
-
-    if (paramPage) {
-      initialQuery.pageNo = paramPage
+    if (pageNo) {
+      setCurrentPage(Number(pageNo))
+      initialQuery.pageNo = pageNo
     }
-    if (paramSize) {
-      initialQuery.answers = paramSize
+    if (answers) {
+      setAnswersDisplayed(Number(answers))
+      initialQuery.answers = answers
     }
-    if (paramExpand) {
-      initialQuery.expandAll = paramExpand
+    if (expandAll) {
+      dispatch(setExpandAll(true))
+      initialQuery.expandAll = expandAll
     }
-    if (paramSort) {
-      initialQuery.sort = paramSort
+    if (sort) {
+      setSortOrder(sort as string)
+      initialQuery.sort = sort
     }
-    if (paramFilters as any) {
-      initialQuery.filters = paramFilters.toString()
+    if (filters) {
+      let filtersAsStringArray: string[] = filters.toString().split(",")
+      setFilterParameters(filtersAsStringArray)
+      initialQuery.filters = filtersAsStringArray
     }
     setQueryToPush(initialQuery)
   }, [])
-
-  if (!quiz || !course) {
-    return (
-      <>
-        <TabTextLoading />
-        <StyledSkeleton variant="rect" animation="wave" height={500} />
-      </>
-    )
-  }
-
-  if (quizError || courseError) {
-    return (
-      <>
-        <TabTextError />
-        <div>Error while fetching answers.</div>
-      </>
-    )
-  }
 
   /**
    *  handled separately since
@@ -177,12 +199,12 @@ export const AllAnswers = () => {
     fieldType?: string,
   ) => {
     let query = null
-    let updatedQueryParams = null
+    let updatedQueryParams = queryToPush
 
     switch (fieldType) {
       case "pages":
         updatedQueryParams = {
-          ...queryToPush,
+          ...updatedQueryParams,
           answers: event.target.value,
         }
         setQueryToPush(updatedQueryParams)
@@ -190,28 +212,33 @@ export const AllAnswers = () => {
         query = updatedQueryParams
         break
       case "expand":
-        updatedQueryParams = { ...queryToPush, expandAll: event.target.checked }
+        updatedQueryParams = {
+          ...updatedQueryParams,
+          expandAll: event.target.checked,
+        }
         setQueryToPush(updatedQueryParams)
-        setExpandAll(event.target.checked)
+        dispatch(setExpandAll(!expandAll))
         query = updatedQueryParams
         break
       case "order":
-        updatedQueryParams = { ...queryToPush, sort: event.target.value }
+        updatedQueryParams = { ...updatedQueryParams, sort: event.target.value }
         setQueryToPush(updatedQueryParams)
         setSortOrder(event.target.value)
         query = updatedQueryParams
         break
       case "filter":
-        updatedQueryParams = { ...queryToPush, filters: event.target.value }
+        updatedQueryParams = {
+          ...updatedQueryParams,
+          filters: event.target.value,
+        }
         setQueryToPush(updatedQueryParams)
-        setSortOrder(event.target.value)
         query = updatedQueryParams
         break
       default:
         break
     }
 
-    // in all cases, push all the query params
+    setQueryToPush(updatedQueryParams)
     route.push(URL_HREF, { pathname, query }, { shallow: true })
   }
 
@@ -240,15 +267,21 @@ export const AllAnswers = () => {
     route.push(URL_HREF, { pathname, query }, { shallow: true })
   }
 
+  const availableAnswers = searchResults
+    ? searchResults
+    : allAnswers
+    ? allAnswers
+    : { results: [], total: 0 }
+
   return (
     <>
       <TabText text="All answers" />
-      <QuizTitle quiz={quiz} course={course} />
+      <QuizTitle quiz={quiz} />
       <OptionsContainer>
         <SwitchField>
           <Typography>Expand all</Typography>
           <Switch
-            checked={expandAll}
+            checked={route.query.expandAll ? true : expandAll}
             onChange={event => {
               handleFieldChange(event, "expand")
             }}
@@ -310,14 +343,19 @@ export const AllAnswers = () => {
           )
         })}
       </FilterParamsField>
+      <AnswerListOptions
+        answers={availableAnswers}
+        handleTextSearch={handleTextSearch}
+      />
       <AnswerListWrapper
-        expandAll={expandAll}
-        filterparameters={filterParameters}
         order={sortOrder}
         quizId={quizId}
         size={answersDisplayed}
         handlePageChange={handlePageChange}
         page={currentPage}
+        answersError={answersError}
+        fetchingAnswers={fetchingAnswers}
+        answers={availableAnswers}
       />
     </>
   )

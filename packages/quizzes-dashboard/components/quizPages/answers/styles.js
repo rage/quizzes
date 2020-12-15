@@ -37,6 +37,14 @@ export const OptionsContainer = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: center;
+    div {
+      margin: 0.5rem 0;
+    }
+  }
 `
 export const SortOrderField = styled(TextField)`
   display: flex !important;

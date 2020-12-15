@@ -329,7 +329,7 @@ describe("dashboard - quizzes: count answers requiring attention should", () => 
         .expect(200)
         .expect(response => {
           const received = response.body
-          expect(received).toEqual(0)
+          expect(received).toEqual({})
         })
         .end(done)
     })

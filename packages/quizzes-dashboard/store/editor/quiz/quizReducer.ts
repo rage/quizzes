@@ -3,6 +3,7 @@ import { createReducer } from "typesafe-actions"
 import {
   editedQuizTitle,
   editedQuizzesNumberOfTries,
+  editedQuizTriesLimited,
   editedQuizzesPointsToGain,
   editedQuizzesPointsGrantingPolicy,
   editedQuizzesDeadline,
@@ -43,6 +44,12 @@ export const quizReducer = createReducer<
   .handleAction(editedQuizzesNumberOfTries, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.id].tries = action.payload.numberOfTries
+    })
+  })
+
+  .handleAction(editedQuizTriesLimited, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.id].triesLimited = action.payload.triesLimited
     })
   })
 
