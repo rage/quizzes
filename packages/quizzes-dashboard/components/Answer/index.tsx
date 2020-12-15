@@ -1,13 +1,45 @@
-import React, { useState, ReactChildren } from "react"
+import React, { useEffect, useState } from "react"
+import { Checkbox } from "@material-ui/core"
+
 import { Answer } from "../../types/Answer"
 import { Card } from "@material-ui/core"
 import styled from "styled-components"
 import { AnswerContent } from "./CardContent"
+import { editableAnswerStates } from "./constants"
+import {
+  setBulkSelectedIds,
+  useAnswerListState,
+} from "../../contexts/AnswerListContext"
 
 interface AdditionalAnswerCardProps {
   faded: boolean
   status: string
 }
+
+const AnswerCardWrapper = styled.div`
+  display: flex;
+  .PrivateSwitchBase-root-5 {
+    &:hover {
+      background: transparent !important;
+    }
+  }
+
+  .custom-checkbox-root .MuiSvgIcon-root {
+    width: 2rem;
+    height: 2rem;
+    margin-right: 2rem;
+  }
+
+  @media (max-width: 480px) {
+    .custom-checkbox-root .MuiSvgIcon-root {
+      width: 1rem;
+      height: 1rem;
+      margin-right: 0;
+    }
+
+    flex-direction: column-reverse;
+  }
+`
 
 export const StyledAnswerCard = styled(Card)<AdditionalAnswerCardProps>`
   display: flex;
@@ -30,23 +62,53 @@ export const StyledAnswerCard = styled(Card)<AdditionalAnswerCardProps>`
 
 export interface AnswerProps {
   answer: Answer
-  expanded: boolean
 }
 
-export const AnswerCard = ({ answer, expanded }: AnswerProps) => {
+export const AnswerCard = ({ answer }: AnswerProps) => {
   const [faded, setFaded] = useState(false)
-  const [status, setStatus] = useState("")
+  const [checked, setChecked] = useState(false)
+
+  const [
+    { bulkSelectMode, bulkSelectedIds, statusUpdateType },
+    dispatch,
+  ] = useAnswerListState()
+
+  useEffect(() => {
+    setChecked(bulkSelectedIds.includes(answer.id))
+  }, [bulkSelectedIds])
+
+  const handleAnswerSelection = () => {
+    let updatedIds = []
+
+    if (bulkSelectedIds?.includes(answer.id)) {
+      updatedIds = bulkSelectedIds.filter((id: string) => id !== answer.id)
+    } else {
+      updatedIds = [...(bulkSelectedIds || []), answer.id]
+    }
+
+    dispatch(setBulkSelectedIds(updatedIds))
+
+    setChecked(!checked)
+  }
+
+  const bulkSelectedAndStatusEditable =
+    bulkSelectMode && editableAnswerStates.includes(answer.status)
+
   return (
-    <>
-      <StyledAnswerCard faded={faded} status={status}>
-        <AnswerContent
-          answer={answer}
-          expanded={expanded}
-          setFaded={setFaded}
-          setStatus={setStatus}
+    <AnswerCardWrapper>
+      {bulkSelectedAndStatusEditable && (
+        <Checkbox
+          classes={{ root: "custom-checkbox-root" }}
+          color="primary"
+          checked={checked}
+          onChange={handleAnswerSelection}
+          inputProps={{ "aria-label": "Select answer" }}
         />
+      )}
+      <StyledAnswerCard faded={faded} status={statusUpdateType}>
+        <AnswerContent answer={answer} setFaded={setFaded} />
       </StyledAnswerCard>
-    </>
+    </AnswerCardWrapper>
   )
 }
 

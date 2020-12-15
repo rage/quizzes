@@ -5,9 +5,9 @@ import LoginStateContext from "../contexts/LoginStateContext"
 import { useContext } from "react"
 import { unauthenticate } from "../services/tmcApi"
 import BreadCrumb from "./BreadCrumb"
-interface TemplateProps {
-  children?: React.ReactNode
-}
+import Link from "next/link"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faHome } from "@fortawesome/free-solid-svg-icons"
 
 const StyledAppBar = styled(AppBar)`
   margin-bottom: 2rem;
@@ -17,10 +17,10 @@ const EmptySpace = styled.div`
   flex: 1;
 `
 
-const FrontPageLink = styled.a`
-  color: white;
-  text-decoration: none;
+const LinkWrapper = styled.div`
   cursor: pointer;
+  display: flex;
+  align-items: center;
 `
 
 const TopBar = () => {
@@ -34,7 +34,12 @@ const TopBar = () => {
   return (
     <StyledAppBar position="sticky">
       <Toolbar>
-        <Typography>Quizzes</Typography>
+        <Link href="/">
+          <LinkWrapper>
+            <Typography>Quizzes</Typography>
+            <FontAwesomeIcon icon={faHome} style={{ marginLeft: "0.5rem" }} />
+          </LinkWrapper>
+        </Link>
         <EmptySpace />
         <BreadCrumb />
         <EmptySpace />

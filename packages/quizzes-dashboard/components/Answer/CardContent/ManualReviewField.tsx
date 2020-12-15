@@ -5,31 +5,12 @@ import { Answer } from "../../../types/Answer"
 import { changeAnswerStatus } from "../../../services/quizzes"
 import { Alert } from "@material-ui/lab"
 import { TransitionProps } from "@material-ui/core/transitions"
-
-export const ButtonField = styled.div`
-  padding: 1rem;
-  display: flex;
-  width: 100%;
-  justify-content: space-around;
-
-  .MuiButton-label {
-    font-size: 1rem;
-    padding: 0.2rem;
-  }
-
-  #button-accept {
-    background-color: #78ab46;
-    color: white;
-  }
-  #button-reject {
-    background-color: #f44336;
-    color: white;
-  }
-`
-
-export const AcceptButton = styled(Button)`
-  display: flex !important;
-`
+import { ButtonFieldWrapper } from "../../Shared/ButtonFieldWrapper"
+import {
+  setStatusUpdateType,
+  setUpdatedAnswersIds,
+  useAnswerListState,
+} from "../../../contexts/AnswerListContext"
 
 export const RejectButton = styled(Button)`
   display: flex !important;
@@ -39,30 +20,24 @@ export const RejectButton = styled(Button)`
 
 export interface ManualReviewProps {
   answer: Answer
-  handled: boolean
-  setHandled: (handled: boolean) => void
-  setStatus: (accepted: string) => void
 }
 
-export const ManualReviewField = ({
-  answer,
-  handled,
-  setHandled,
-  setStatus,
-}: ManualReviewProps) => {
+export const ManualReviewField = ({ answer }: ManualReviewProps) => {
   const [success, setSuccess] = useState(true)
   const [showSnacks, setShowSnacks] = useState(false)
+
+  const [, dispatch] = useAnswerListState()
 
   const handleAcceptOrReject = async (answerId: string, status: string) => {
     try {
       const res = await changeAnswerStatus(answerId, status)
       if (res.status === status) {
-        setHandled(true)
+        dispatch(setUpdatedAnswersIds([answer.id]))
         setSuccess(true)
         setShowSnacks(true)
-        setStatus(status)
+        dispatch(setStatusUpdateType(status))
       } else {
-        setHandled(true)
+        dispatch(setUpdatedAnswersIds([answer.id]))
         setSuccess(false)
         setShowSnacks(true)
       }
@@ -92,22 +67,20 @@ export const ManualReviewField = ({
           )}
         </Alert>
       </Snackbar>
-      <ButtonField>
-        <AcceptButton
-          id="button-accept"
-          variant="outlined"
+      <ButtonFieldWrapper>
+        <Button
+          className="button-accept"
           onClick={() => handleAcceptOrReject(answer.id, "confirmed")}
         >
           <Typography>Accept</Typography>
-        </AcceptButton>
-        <RejectButton
-          id="button-reject"
-          variant="outlined"
+        </Button>
+        <Button
+          className="button-reject"
           onClick={() => handleAcceptOrReject(answer.id, "rejected")}
         >
           <Typography>Reject</Typography>
-        </RejectButton>
-      </ButtonField>
+        </Button>
+      </ButtonFieldWrapper>
     </>
   )
 }
