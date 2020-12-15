@@ -398,3 +398,63 @@ export const getCorrespondenceFile = async (
     throw new Error()
   }
 }
+
+export const downloadQuizInfo = async (
+  quizId: string,
+  quizName: string,
+  courseName: string,
+) => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return await api.post(
+      `/quizzes/${quizId}/download-quiz-info`,
+      { quizName, courseName },
+      config,
+    )
+  } else {
+    throw new Error()
+  }
+}
+
+export const downloadPeerReviewInfo = async (
+  quizId: string,
+  quizName: string,
+  courseName: string,
+) => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return await api.post(
+      `/quizzes/${quizId}/download-peerreview-info`,
+      { quizName, courseName },
+      config,
+    )
+  } else {
+    throw new Error()
+  }
+}
+
+export const downloadAnswerInfo = async (
+  quizId: string,
+  quizName: string,
+  courseName: string,
+) => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return await api.post(
+      `/quizzes/${quizId}/download-answer-info`,
+      { quizName, courseName },
+      config,
+    )
+  } else {
+    throw new Error()
+  }
+}
