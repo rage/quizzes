@@ -135,6 +135,57 @@ export const getAnswersRequiringAttention = async (
   throw new Error()
 }
 
+export const getAnswersRequiringAttentionMatchingQuery = async (
+  quizId: string,
+  page: number,
+  size: number,
+  order: string,
+  searchQuery: string,
+): Promise<{ results: Answer[]; total: number }> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (
+      await api.post(
+        `/answers/${quizId}/manual-review?page=${page -
+          1}&size=${size}&order=${order}`,
+        { searchQuery },
+        config,
+      )
+    ).data
+    return response
+  }
+  throw new Error()
+}
+
+export const getAllAnswersMatchingQuery = async (
+  quizId: string,
+  page: number,
+  size: number,
+  order: string,
+  filters: string[],
+  searchQuery: string,
+): Promise<{ results: Answer[]; total: number }> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (
+      await api.post(
+        `/answers/${quizId}/all?page=${page -
+          1}&size=${size}&order=${order}&filters=${filters}`,
+        { searchQuery },
+        config,
+      )
+    ).data
+    return response
+  }
+  throw new Error()
+}
+
 export const changeAnswerStatus = async (
   answerId: string,
   status: string,
@@ -146,6 +197,23 @@ export const changeAnswerStatus = async (
     }
     const response = (
       await api.post(`/answers/${answerId}/status`, { status }, config)
+    ).data
+    return response
+  }
+  throw new Error()
+}
+
+export const changeAnswerStatusForMany = async (
+  answerIds: string[],
+  status: string,
+): Promise<Answer[]> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (
+      await api.post(`/answers/status`, { status, answerIds }, config)
     ).data
     return response
   }
@@ -170,7 +238,7 @@ export const getAnswersRequiringAttentionCounts = async (
   courseId: string,
 ): Promise<{ [quizId: string]: number }> => {
   const userInfo = checkStore()
-  if (userInfo) {
+  if (userInfo && courseId) {
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
@@ -201,7 +269,7 @@ export const getUserAbilitiesForCourse = async (
   courseId: string,
 ): Promise<string[]> => {
   const userInfo = checkStore()
-  if (userInfo) {
+  if (userInfo && courseId) {
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
