@@ -10,9 +10,7 @@ import softDelete from "objection-soft-delete"
 import { mixin } from "objection"
 import { Transaction } from "knex"
 
-class PeerReview extends mixin(BaseModel, [
-  softDelete({ columnName: "deleted" }),
-]) {
+class PeerReview extends BaseModel {
   userId!: number
   quizAnswerId!: string
   rejectedQuizAnswerIds!: string[]
@@ -184,17 +182,6 @@ class PeerReview extends mixin(BaseModel, [
     )[0]
 
     return peerReview
-  }
-
-  public static async deletePeerReview(
-    peerReviewId: string,
-    trx?: Transaction,
-  ): Promise<Boolean> {
-    const result = await this.query(trx)
-      .where("peer_review_id", peerReviewId)
-      .delete()
-    console.log(result)
-    return true
   }
 }
 

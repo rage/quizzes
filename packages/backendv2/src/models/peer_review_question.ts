@@ -3,7 +3,6 @@ import PeerReviewCollection from "./peer_review_collection"
 import PeerReviewQuestionTranslation from "./peer_review_question_translation"
 import { mixin } from "objection"
 import softDelete from "objection-soft-delete"
-import { Transaction } from "knex"
 
 class PeerReviewQuestion extends mixin(BaseModel, [
   softDelete({ columnName: "deleted" }),

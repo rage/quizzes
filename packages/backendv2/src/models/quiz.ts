@@ -6,14 +6,14 @@ import { NotFoundError } from "../util/error"
 import moduleInitializer from "../util/initializer"
 import stringify from "csv-stringify"
 import QuizAnswer from "./quiz_answer"
-import knex from "../../database/knex"
 import { BadRequestError } from "../util/error"
 import Knex from "knex"
 import UserQuizState from "./user_quiz_state"
 import * as Kafka from "../services/kafka"
 import PeerReviewQuestion from "./peer_review_question"
-import { NotNullViolationError, QueryBuilder } from "objection"
+import { NotNullViolationError } from "objection"
 import BaseModel from "./base_model"
+import knex from "../../database/knex"
 
 export class Quiz extends BaseModel {
   id!: string
@@ -31,7 +31,7 @@ export class Quiz extends BaseModel {
   course!: Course
   texts!: QuizTranslation[]
   items!: QuizItem[]
-  peerReviews!: PeerReviewCollection[]
+  peerReviewCollections!: PeerReviewCollection[]
   title!: string
   body!: string
   submitMessage!: string
@@ -57,7 +57,7 @@ export class Quiz extends BaseModel {
         to: "quiz_translation.quiz_id",
       },
     },
-    peerReviews: {
+    peerReviewCollections: {
       relation: BaseModel.HasManyRelation,
       modelClass: PeerReviewCollection,
       join: {
@@ -158,7 +158,7 @@ export class Quiz extends BaseModel {
       })
     })
 
-    quiz.peerReviews?.forEach((peerReviewCollection: any) => {
+    quiz.peerReviewCollections?.forEach((peerReviewCollection: any) => {
       peerReviewCollection.texts = [
         {
           peerReviewCollectionId: peerReviewCollection.id,
@@ -184,18 +184,18 @@ export class Quiz extends BaseModel {
     })
 
     const trx = await knex.transaction()
-    let savedQuiz
+    let savedQuiz: Quiz | Quiz[]
+
     try {
       const oldQuiz = quiz.id
         ? await this.query(trx).findById(quiz.id)
         : undefined
       if (oldQuiz) {
-        await this.query(trx).upsertGraph(quiz)
-        savedQuiz = await this.query(trx)
-          .findById(quiz.id)
-          .withGraphJoined("texts")
-          .withGraphJoined("items.[texts, options.[texts]]")
-          .withGraphJoined("peerReviews.[texts, questions.[texts]]")
+        savedQuiz = await this.query(trx).upsertGraphAndFetch(quiz)
+
+        if (Array.isArray(savedQuiz)) {
+          savedQuiz = savedQuiz[0]
+        }
       } else {
         savedQuiz = await this.query(trx).insertGraphAndFetch(quiz)
       }
@@ -209,7 +209,8 @@ export class Quiz extends BaseModel {
       }
       throw error
     }
-    return this.moveTextsToParent(savedQuiz)
+    const updatedQuiz: Quiz = await Quiz.getById(savedQuiz.id)
+    return updatedQuiz
   }
 
   private static async updateCourseProgressesIfNecessary(
@@ -228,28 +229,24 @@ export class Quiz extends BaseModel {
     }
   }
 
-  static async getById(quizId: string, trx?: Knex.Transaction) {
+  static async getById(quizId: string, trx?: Knex.Transaction): Promise<Quiz> {
     const quiz = (
-      await this.query(trx)
+      await this.query()
         .withGraphJoined("texts")
         .withGraphJoined("items.[texts, options.[texts]]")
-        .withGraphJoined("peerReviews.[texts, questions.[texts]]")
-        // filter out deleted peer reviews and peer review questions
-        // if none on the right side of the join all fields are null
-        // because of that null rows also included, otherwise would return nothing
-        .whereRaw(
-          `("peerReviews"."deleted" = false or "peerReviews"."deleted" is null)`,
-        )
-        .whereRaw(
-          `("peerReviews:questions"."deleted" = false or "peerReviews:questions"."deleted" is null)`,
-        )
+        .withGraphJoined("peerReviewCollections.[texts, questions.[texts]]")
+        .modifyGraph("peerReviewCollections.[questions]", question => {
+          question.where("deleted", false)
+        })
+        .modifyGraph("peerReviewCollections", peerReviewCollection => {
+          peerReviewCollection.where("deleted", false)
+        })
         .where("quiz.id", quizId)
     )[0]
 
     if (!quiz) {
       throw new NotFoundError(`quiz not found: ${quizId}`)
     }
-
     return this.moveTextsToParent(quiz)
   }
 
@@ -287,7 +284,7 @@ export class Quiz extends BaseModel {
       await this.query()
         .withGraphJoined("texts")
         .withGraphJoined("items.[texts, options.[texts]]")
-        .withGraphJoined("peerReviews.[texts, questions.[texts]]")
+        .withGraphJoined("peerReviewCollections.[texts, questions.[texts]]")
         .where("quiz.course_id", courseId)
     ).map(quiz => this.moveTextsToParent(quiz))
   }
@@ -304,7 +301,7 @@ export class Quiz extends BaseModel {
     const stream = this.query()
       .withGraphJoined("texts")
       .withGraphJoined("items.[texts, options.[texts]]")
-      .withGraphJoined("peerReviews.[texts, questions.[texts]]")
+      .withGraphJoined("peerReviewCollections.[texts, questions.[texts]]")
       .where("quiz.id", quizId)
       .toKnexQuery()
       .stream()
@@ -323,7 +320,7 @@ export class Quiz extends BaseModel {
     })
 
     const stream = this.query()
-      .withGraphJoined("peerReviews.[texts, questions.[texts]]")
+      .withGraphJoined("peerReviewCollections.[texts, questions.[texts]]")
       .where("quiz.id", quizId)
       .toKnexQuery()
       .stream()
@@ -376,7 +373,7 @@ export class Quiz extends BaseModel {
       })
       return item
     })
-    quiz.peerReviews = quiz.peerReviews?.map((prc: any) => {
+    quiz.peerReviewCollections = quiz.peerReviewCollections?.map((prc: any) => {
       prc.questions = prc.questions?.map((prq: any) => {
         const text = prq.texts[0]
         prq.title = text?.title
