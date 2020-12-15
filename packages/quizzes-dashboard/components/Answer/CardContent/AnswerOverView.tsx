@@ -17,6 +17,9 @@ const OverviewWrapper = styled.div`
   display: flex;
   flex-wrap: wrap;
 `
+const roundTo2DP = (num: number) => {
+  return Math.round((num + Number.EPSILON) * 100) / 100
+}
 
 export const AnswerOverView = ({ answer }: AnswerOverViewProps) => {
   const formattedAnswerDate = answer.userQuizState?.createdAt
@@ -35,7 +38,9 @@ export const AnswerOverView = ({ answer }: AnswerOverViewProps) => {
       </StyledTypo>
       <StyledTypo>
         <strong>Points: &nbsp;</strong>
-        {answer.userQuizState ? answer.userQuizState.pointsAwarded : "0"}
+        {answer.userQuizState
+          ? roundTo2DP(answer.userQuizState.pointsAwarded)
+          : 0}
       </StyledTypo>
       <StyledTypo>
         <strong>Spam flags: &nbsp;</strong>
