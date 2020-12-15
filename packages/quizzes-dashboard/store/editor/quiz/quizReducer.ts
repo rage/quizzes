@@ -24,7 +24,7 @@ import { DateTime } from "luxon"
 import { Quiz } from "../../../types/Quiz"
 import { normalize } from "normalizr"
 import { normalizedQuiz } from "../../../schemas"
-import { createdNewPeerReview } from "../peerReviews/peerReviewActions"
+import { createdNewPeerReview } from "../peerReviewCollections/peerReviewCollectionActions"
 
 export const quizReducer = createReducer<
   { [quizId: string]: NormalizedQuiz },
@@ -121,7 +121,7 @@ export const quizReducer = createReducer<
       items: [],
       open: null,
       part: 0,
-      peerReviews: [],
+      peerReviewCollections: [],
       points: 1,
       section: 0,
       submitMessage: null,
