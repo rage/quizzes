@@ -7,7 +7,7 @@ export const useRequiringAttention = (quizId: string, token: string) => {
   const { data, error } = useSWR([quizId, token], fetcher)
   return {
     requiringAttention: data,
-    requiringAttentionLoading: !error && !data,
+    requiringAttentionLoading: !error && data === undefined,
     requiringAttentionError: error,
   }
 }

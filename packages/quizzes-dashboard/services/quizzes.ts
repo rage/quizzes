@@ -55,7 +55,7 @@ export const fetchCourseQuizzes = async (
 
 export const fetchQuiz = async (id: string): Promise<Quiz> => {
   const userInfo = checkStore()
-  if (userInfo) {
+  if (userInfo && id) {
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
@@ -282,11 +282,10 @@ export const getAnswersRequiringAttentionByQuizId = async (
   quizId: string,
 ): Promise<number> => {
   const userInfo = checkStore()
-  if (userInfo) {
+  if (userInfo && quizId) {
     const config = {
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
-    console.log(quizId)
     return (
       await api.get(
         `/quizzes/${quizId}/count-answers-requiring-attention`,
