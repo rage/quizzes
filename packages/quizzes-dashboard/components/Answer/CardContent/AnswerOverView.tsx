@@ -23,10 +23,8 @@ const roundTo2DP = (num: number) => {
 
 export const AnswerOverView = ({ answer }: AnswerOverViewProps) => {
   const formattedAnswerDate = answer.userQuizState?.createdAt
-    .substring(0, 10)
-    .split("-")
-    .reverse()
-    .join("-")
+    .substring(0, 16)
+    .replace("T", " ")
 
   return (
     <OverviewWrapper>
