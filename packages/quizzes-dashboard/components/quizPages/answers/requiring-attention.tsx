@@ -1,11 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/router"
-import {
-  getAnswersRequiringAttention,
-  getAnswersRequiringAttentionMatchingQuery,
-} from "../../../services/quizzes"
+import { getAnswersRequiringAttentionMatchingQuery } from "../../../services/quizzes"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
-import usePromise from "react-use-promise"
 import { MenuItem, Switch, Typography } from "@material-ui/core"
 import QuizTitle from "../QuizTitleContainer"
 import { TabTextError, TabText } from "../TabHeaders"
@@ -20,9 +16,11 @@ import AnswerListWrapper from "../../Answer/AnswerListWrapper"
 import { Answer } from "../../../types/Answer"
 import {
   setExpandAll,
+  setRequiringAttention,
   useAnswerListState,
 } from "../../../contexts/AnswerListContext"
 import AnswerListOptions from "../../Answer/AnswerListOptions"
+import { useRequiringAttention } from "../../../hooks/useRequiringAttention"
 
 export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
   const [{ expandAll }, dispatch] = useAnswerListState()
@@ -37,16 +35,22 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
   const [sortOrder, setSortOrder] = useState("desc")
   const [answersDisplayed, setAnswersDisplayed] = useState(10)
 
-  const [answers, answersError] = usePromise(
-    () =>
-      getAnswersRequiringAttention(
-        quizId,
-        currentPage,
-        answersDisplayed,
-        sortOrder,
-      ),
-    [currentPage, answersDisplayed, sortOrder],
+  const {
+    requiringAttention: answers,
+    requiringAttentionError: answersError,
+  } = useRequiringAttention(
+    quizId,
+    currentPage,
+    answersDisplayed,
+    sortOrder,
+    "answers-requiring-attention",
   )
+
+  useEffect(() => {
+    if (answers) {
+      dispatch(setRequiringAttention(answers))
+    }
+  }, [answers])
 
   const [searchResults, setSearchResults] = useState<
     | {

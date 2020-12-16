@@ -7,6 +7,7 @@ import {
   setBulkSelectedIds,
   setStatusUpdateType,
   setUpdatedAnswersIds,
+  setHandledAnswersIds,
   useAnswerListState,
 } from "../../contexts/AnswerListContext"
 import { changeAnswerStatusForMany } from "../../services/quizzes"
@@ -31,10 +32,12 @@ const BulkActionWrapper = styled.div`
 
 export const AnswerList = ({ data }: AnswerListProps) => {
   const [showSnacks, setShowSnacks] = useState(false)
-  const [updatedAnswers, setUpdatedAnswers] = useState<null | Answer[]>(null)
   const [answers, setAnswers] = useState<Answer[]>([])
 
-  const [{ bulkSelectedIds }, dispatch] = useAnswerListState()
+  const [
+    { bulkSelectedIds, updatedAnswersIds, statusUpdateType },
+    dispatch,
+  ] = useAnswerListState()
 
   useEffect(() => {
     if (data) setAnswers(data)
@@ -48,11 +51,11 @@ export const AnswerList = ({ data }: AnswerListProps) => {
       const res = await changeAnswerStatusForMany(bulkSelectedIds, actionType)
 
       if (res[0].status === actionType) {
-        setUpdatedAnswers(res)
         setShowSnacks(true)
         dispatch(setStatusUpdateType(actionType))
         dispatch(setBulkSelectedIds([]))
         dispatch(setUpdatedAnswersIds(bulkSelectedIds))
+        dispatch(setHandledAnswersIds(bulkSelectedIds))
 
         const returnedIds = res.map((updated: Answer) => updated.id)
 
@@ -65,7 +68,6 @@ export const AnswerList = ({ data }: AnswerListProps) => {
           }),
         )
       } else {
-        setUpdatedAnswers(res)
         setShowSnacks(true)
       }
     } catch (e) {
@@ -84,11 +86,10 @@ export const AnswerList = ({ data }: AnswerListProps) => {
           return <Slide {...props} direction="down" />
         }}
       >
-        <Alert severity={updatedAnswers ? "success" : "error"}>
-          {updatedAnswers ? (
+        <Alert severity={updatedAnswersIds ? "success" : "error"}>
+          {updatedAnswersIds ? (
             <Typography>
-              {updatedAnswers.length} answer(s) marked as{" "}
-              {updatedAnswers[0].status}
+              {updatedAnswersIds.length} answer(s) marked as {statusUpdateType}
             </Typography>
           ) : (
             <Typography>

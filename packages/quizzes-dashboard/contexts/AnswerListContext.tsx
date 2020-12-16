@@ -2,9 +2,11 @@ import React, { useContext, useReducer } from "react"
 import { Answer } from "../types/Answer"
 
 interface IAnswerListState {
-  answers: Answer[]
+  allAnswers: { results: Answer[]; total: number }
+  answersRequiringAttention: { results: Answer[]; total: number }
   bulkSelectedIds: string[]
   updatedAnswersIds: string[]
+  handledAnswersIds: string[]
   bulkSelectMode: boolean
   enableSearch: boolean
   expandAll: boolean
@@ -12,9 +14,11 @@ interface IAnswerListState {
 }
 
 const initialState: IAnswerListState = {
-  answers: [],
+  allAnswers: { results: [], total: 0 },
+  answersRequiringAttention: { results: [], total: 0 },
   bulkSelectedIds: [],
   updatedAnswersIds: [],
+  handledAnswersIds: [],
   statusUpdateType: "",
   bulkSelectMode: false,
   enableSearch: false,
@@ -23,18 +27,28 @@ const initialState: IAnswerListState = {
 
 enum AnswerListTypes {
   TOGGLE_ENABLE_SEARCH = "TOGGLE_ENABLE_SEARCH",
-  SET_EXPAND_ALL = "SET_EXPAND_ALL",
   TOGGLE_BULK_SELECT_MODE = "TOGGLE_BULK_SELECT_MODE",
-  SET_ANSWERS = "SET_ANSWERS",
+  SET_EXPAND_ALL = "SET_EXPAND_ALL",
+  SET_ALL_ANSWERS = "SET_ALL_ANSWERS",
+  SET_ANSWERS_REQUIRING_ATTENTION = "SET_ANSWERS_REQUIRING_ATTENTION",
   SET_BULK_SELECTED_IDS = "SET_BULK_SELECTED_IDS",
   SET_UPDATED_ANSWERS_IDS = "SET_UPDATED_ANSWERS_IDS",
+  SET_HANDLED_ANSWERS_IDS = "SET_HANDLED_ANSWERS_IDS",
   SET_STATUS_UPDATE_TYPE = "SET_STATUS_UPDATE_TYPE",
 }
 
+type AnswerType = { results: Answer[]; total: number }
+
 type AnswerListActionTypes =
+  | { type: AnswerListTypes.SET_ALL_ANSWERS; payload: AnswerType }
+  | {
+      type: AnswerListTypes.SET_ANSWERS_REQUIRING_ATTENTION
+      payload: AnswerType
+    }
   | { type: AnswerListTypes.SET_EXPAND_ALL; payload: boolean }
   | { type: AnswerListTypes.SET_BULK_SELECTED_IDS; payload: string[] }
   | { type: AnswerListTypes.SET_UPDATED_ANSWERS_IDS; payload: string[] }
+  | { type: AnswerListTypes.SET_HANDLED_ANSWERS_IDS; payload: string[] }
   | { type: AnswerListTypes.TOGGLE_BULK_SELECT_MODE }
   | {
       type: AnswerListTypes.SET_STATUS_UPDATE_TYPE
@@ -46,18 +60,41 @@ let reducer = (
   action: AnswerListActionTypes,
 ): IAnswerListState => {
   switch (action.type) {
+    case AnswerListTypes.SET_ALL_ANSWERS:
+      // return { ...state, allAnswers: [...action.payload] }
+      return { ...state, allAnswers: { ...action.payload } }
+    case AnswerListTypes.SET_ANSWERS_REQUIRING_ATTENTION:
+      return { ...state, answersRequiringAttention: { ...action.payload } }
     case AnswerListTypes.SET_BULK_SELECTED_IDS:
       return { ...state, bulkSelectedIds: [...action.payload] }
     case AnswerListTypes.TOGGLE_BULK_SELECT_MODE:
       return { ...state, bulkSelectMode: !state.bulkSelectMode }
     case AnswerListTypes.SET_UPDATED_ANSWERS_IDS:
       return { ...state, updatedAnswersIds: [...action.payload] }
+    case AnswerListTypes.SET_HANDLED_ANSWERS_IDS:
+      return { ...state, handledAnswersIds: [...action.payload] }
     case AnswerListTypes.SET_STATUS_UPDATE_TYPE:
       return { ...state, statusUpdateType: action.payload }
     case AnswerListTypes.SET_EXPAND_ALL:
       return { ...state, expandAll: action.payload }
     default:
       throw new Error()
+  }
+}
+
+export const setAllAnswers = (answers: AnswerType): AnswerListActionTypes => {
+  return {
+    type: AnswerListTypes.SET_ALL_ANSWERS,
+    payload: answers,
+  }
+}
+
+export const setRequiringAttention = (
+  answers: AnswerType,
+): AnswerListActionTypes => {
+  return {
+    type: AnswerListTypes.SET_ANSWERS_REQUIRING_ATTENTION,
+    payload: answers,
   }
 }
 
@@ -71,6 +108,13 @@ export const setBulkSelectedIds = (ids: string[]): AnswerListActionTypes => {
 export const setUpdatedAnswersIds = (ids: string[]): AnswerListActionTypes => {
   return {
     type: AnswerListTypes.SET_UPDATED_ANSWERS_IDS,
+    payload: ids,
+  }
+}
+
+export const setHandledAnswersIds = (ids: string[]): AnswerListActionTypes => {
+  return {
+    type: AnswerListTypes.SET_HANDLED_ANSWERS_IDS,
     payload: ids,
   }
 }

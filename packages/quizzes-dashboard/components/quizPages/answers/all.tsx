@@ -2,11 +2,7 @@ import React, { useState, useEffect } from "react"
 import _ from "lodash"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
-import {
-  getAllAnswers,
-  getAllAnswersMatchingQuery,
-} from "../../../services/quizzes"
-import usePromise from "react-use-promise"
+import { getAllAnswersMatchingQuery } from "../../../services/quizzes"
 import { MenuItem, Switch, Typography, Chip } from "@material-ui/core"
 import styled from "styled-components"
 import QuizTitle from "../QuizTitleContainer"
@@ -25,8 +21,10 @@ import { Answer } from "../../../types/Answer"
 import {
   useAnswerListState,
   setExpandAll,
+  setAllAnswers,
 } from "../../../contexts/AnswerListContext"
 import AnswerListOptions from "../../Answer/AnswerListOptions"
+import { useAllAnswers } from "../../../hooks/useAllAnswers"
 
 const StyledChip = styled(Chip)<ChipProps>`
   display: flex !important;
@@ -41,7 +39,10 @@ const StyledChip = styled(Chip)<ChipProps>`
 `
 
 export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
-  const [{ expandAll }, dispatch] = useAnswerListState()
+  const [
+    { expandAll, allAnswers: allAnswersInContext },
+    dispatch,
+  ] = useAnswerListState()
 
   const route = useRouter()
   const quizId = quiz?.id
@@ -54,17 +55,20 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
   const [answersDisplayed, setAnswersDisplayed] = useState(10)
   const [filterParameters, setFilterParameters] = useState<string[]>([])
 
-  const [allAnswers, answersError] = usePromise(
-    () =>
-      getAllAnswers(
-        quizId,
-        currentPage,
-        answersDisplayed,
-        sortOrder,
-        filterParameters,
-      ),
-    [quizId, currentPage, answersDisplayed, sortOrder, filterParameters],
+  const { allAnswers, allAnswersError: answersError } = useAllAnswers(
+    quizId,
+    currentPage,
+    answersDisplayed,
+    sortOrder,
+    filterParameters,
+    "all-answers",
   )
+
+  useEffect(() => {
+    if (allAnswers) {
+      dispatch(setAllAnswers(allAnswers))
+    }
+  }, [allAnswers])
 
   const [searchResults, setSearchResults] = useState<
     | {
@@ -344,7 +348,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
         })}
       </FilterParamsField>
       <AnswerListOptions
-        answers={availableAnswers}
+        answers={allAnswersInContext}
         handleTextSearch={handleTextSearch}
       />
       <AnswerListWrapper
@@ -355,7 +359,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
         page={currentPage}
         answersError={answersError}
         fetchingAnswers={fetchingAnswers}
-        answers={availableAnswers}
+        answers={allAnswersInContext}
       />
     </>
   )

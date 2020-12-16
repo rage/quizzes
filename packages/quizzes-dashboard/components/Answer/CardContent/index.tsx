@@ -87,20 +87,18 @@ export interface AnswerContentProps {
 }
 
 export const AnswerContent = ({ answer, setFaded }: AnswerContentProps) => {
-  const [{ expandAll, updatedAnswersIds }] = useAnswerListState()
+  const [{ expandAll, handledAnswersIds }] = useAnswerListState()
   const [showMore, setShowMore] = useState(expandAll)
   const [showPeerreviewModal, setShowPeerreviewModal] = useState(false)
-  const [handled] = useState(false)
   const [height, setHeight] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
 
-  useEffect(() => setShowMore(expandAll), [expandAll])
-
   useEffect(() => {
-    if (handled || updatedAnswersIds.includes(answer.id)) {
+    if (handledAnswersIds.includes(answer.id)) {
       setFaded(true)
     }
-  }, [handled, updatedAnswersIds, expandAll])
+    setShowMore(expandAll)
+  }, [handledAnswersIds, expandAll])
 
   useLayoutEffect(() => {
     if (ref.current !== null) {
