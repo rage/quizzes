@@ -18,7 +18,9 @@ const DescriptionContainer = styled.div`
 `
 
 const StyledCard = styled(Card)`
-  padding: 3rem;
+  @media (min-width: 768px) {
+    padding: 3rem;
+  }
   margin: 2rem 0;
   display: flex;
   justify-content: space-around !important;
