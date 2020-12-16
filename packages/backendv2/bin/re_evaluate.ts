@@ -60,7 +60,7 @@ export default async function reEvaluate(quizId: string, passToCaller: any) {
           .update(data)
           .whereComposite(["user_id", "quiz_id"], [userId, quizId])
       }
-      if (quizAnswer.status === "confirmed") {
+      /*if (quizAnswer.status === "confirmed") {
         await UserCoursePartState.update(
           quizAnswer.userId,
           quiz.courseId,
@@ -78,7 +78,7 @@ export default async function reEvaluate(quizId: string, passToCaller: any) {
           quiz.courseId,
           trx,
         )
-      }
+      }*/
       tick++
     }
     console.log("re_eval committing")

@@ -15,7 +15,7 @@ export default class Manager {
     [id: string]: {
       task: BackgroundTask
       cancel?: () => void
-      report?: () => number
+      report?: () => any
     }
   } = {}
   running: boolean = false
@@ -57,7 +57,7 @@ export default class Manager {
           await BackgroundTask.delete(id)
         }
       }
-      await sleep_ms(1000)
+      await sleep_ms(100)
     }
   }
 
@@ -106,33 +106,3 @@ export default class Manager {
   }
 }
 
-/*
-const manager = new Manager()
-manager.run()
-manager.add({
-  type: "re_eval",
-  quizId: "2718851a-f8d6-404e-8acb-c7eca1ba0b9c",
-  // quiz_id: "6fb9b7cf-471c-45ca-b3fd-392214260eeb",
-  // quiz_id: "48a56234-e92d-541f-b333-8f17fd01fb99"
-})
-*/
-
-/*
-const manager = new Manager()
-manager.run()
-manager.list()
-manager.cancel(1)
-manager.run()
-manager.add({
-  type: "re_eval",
-  quiz_id: "2718851a-f8d6-404e-8acb-c7eca1ba0b9c"
-  // quiz_id: "6fb9b7cf-471c-45ca-b3fd-392214260eeb",
-  // quiz_id: "48a56234-e92d-541f-b333-8f17fd01fb99"
-})
-manager.add({
-  type: "re_eval",
-  // quiz_id: "2718851a-f8d6-404e-8acb-c7eca1ba0b9c"
-  quiz_id: "6fb9b7cf-471c-45ca-b3fd-392214260eeb",
-  // quiz_id: "48a56234-e92d-541f-b333-8f17fd01fb99"
-})
-*/
