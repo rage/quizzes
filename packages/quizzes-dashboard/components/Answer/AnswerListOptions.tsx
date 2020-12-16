@@ -53,17 +53,17 @@ const AnswerListOptions = ({
     dispatch(setBulkSelectedIds(allSelected))
   }
 
+  const handleBulkSelectToggle = () => {
+    dispatch(setBulkSelectedIds([]))
+    dispatch(toggleBulkSelectMode())
+  }
+
   return (
     <OptionsWrapper>
       <BulkSelectWrapper>
         <SwitchField>
           <Typography>Bulk select answers</Typography>
-          <Switch
-            checked={bulkSelectMode}
-            onChange={_ => {
-              dispatch(toggleBulkSelectMode())
-            }}
-          />
+          <Switch checked={bulkSelectMode} onChange={handleBulkSelectToggle} />
         </SwitchField>
         {bulkSelectMode && (
           <>
