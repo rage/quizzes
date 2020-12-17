@@ -7,9 +7,7 @@ import { Alert } from "@material-ui/lab"
 import { TransitionProps } from "@material-ui/core/transitions"
 import { ButtonFieldWrapper } from "../../Shared/ButtonFieldWrapper"
 import {
-  setHandledAnswersIds,
-  setStatusUpdateType,
-  setUpdatedAnswersIds,
+  setHandledAnswers,
   useAnswerListState,
 } from "../../../contexts/AnswerListContext"
 
@@ -26,18 +24,15 @@ export interface ManualReviewProps {
 export const ManualReviewField = ({ answer }: ManualReviewProps) => {
   const [success, setSuccess] = useState(true)
   const [showSnacks, setShowSnacks] = useState(false)
-
   const [, dispatch] = useAnswerListState()
 
   const handleAcceptOrReject = async (answerId: string, status: string) => {
     try {
       const res = await changeAnswerStatus(answerId, status)
       if (res.status === status) {
-        dispatch(setUpdatedAnswersIds([answer.id]))
         setSuccess(true)
         setShowSnacks(true)
-        dispatch(setStatusUpdateType(status))
-        dispatch(setHandledAnswersIds([answer.id]))
+        dispatch(setHandledAnswers([res]))
       } else {
         setSuccess(false)
         setShowSnacks(true)

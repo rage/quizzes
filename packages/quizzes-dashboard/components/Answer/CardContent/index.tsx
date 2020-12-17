@@ -83,22 +83,18 @@ const DebugDialogWrapper = styled.div`
 
 export interface AnswerContentProps {
   answer: Answer
-  setFaded: (faded: boolean) => void
 }
 
-export const AnswerContent = ({ answer, setFaded }: AnswerContentProps) => {
-  const [{ expandAll, handledAnswersIds }] = useAnswerListState()
+export const AnswerContent = ({ answer }: AnswerContentProps) => {
+  const [{ expandAll, handledAnswers }] = useAnswerListState()
   const [showMore, setShowMore] = useState(expandAll)
   const [showPeerreviewModal, setShowPeerreviewModal] = useState(false)
   const [height, setHeight] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (handledAnswersIds.includes(answer.id)) {
-      setFaded(true)
-    }
     setShowMore(expandAll)
-  }, [handledAnswersIds, expandAll])
+  }, [handledAnswers, expandAll])
 
   useLayoutEffect(() => {
     if (ref.current !== null) {

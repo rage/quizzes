@@ -4,7 +4,6 @@ import { Alert } from "@material-ui/lab"
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import {
-  setStatusUpdateType,
   setHandledAnswers,
   useAnswerListState,
 } from "../../contexts/AnswerListContext"
@@ -32,10 +31,7 @@ export const AnswerList = ({ data }: AnswerListProps) => {
   const [showSnacks, setShowSnacks] = useState(false)
   const [answers, setAnswers] = useState<Answer[]>([])
 
-  const [
-    { bulkSelectedIds, handledAnswers, statusUpdateType },
-    dispatch,
-  ] = useAnswerListState()
+  const [{ bulkSelectedIds, handledAnswers }, dispatch] = useAnswerListState()
 
   useEffect(() => {
     if (data) setAnswers(data)
@@ -50,7 +46,6 @@ export const AnswerList = ({ data }: AnswerListProps) => {
 
       if (res[0].status === actionType) {
         setShowSnacks(true)
-        dispatch(setStatusUpdateType(actionType))
         dispatch(setHandledAnswers(res))
 
         const returnedIds = res.map((updated: Answer) => updated.id)
@@ -85,7 +80,8 @@ export const AnswerList = ({ data }: AnswerListProps) => {
         <Alert severity={handledAnswers ? "success" : "error"}>
           {handledAnswers ? (
             <Typography>
-              {handledAnswers.length} answer(s) marked as {statusUpdateType}
+              {handledAnswers.length} answer(s) marked as{" "}
+              {handledAnswers[0]?.status}
             </Typography>
           ) : (
             <Typography>

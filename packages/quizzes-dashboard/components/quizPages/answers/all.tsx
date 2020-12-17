@@ -273,8 +273,8 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
 
   const availableAnswers = searchResults
     ? searchResults
-    : allAnswers
-    ? allAnswers
+    : allAnswersInContext
+    ? allAnswersInContext
     : { results: [], total: 0 }
 
   return (
@@ -348,7 +348,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
         })}
       </FilterParamsField>
       <AnswerListOptions
-        answers={allAnswersInContext}
+        answers={availableAnswers}
         handleTextSearch={handleTextSearch}
       />
       <AnswerListWrapper
@@ -359,7 +359,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
         page={currentPage}
         answersError={answersError}
         fetchingAnswers={fetchingAnswers}
-        answers={allAnswersInContext}
+        answers={availableAnswers}
       />
     </>
   )
