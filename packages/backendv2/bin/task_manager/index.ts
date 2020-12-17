@@ -19,7 +19,7 @@ export default class Manager {
     }
   } = {}
   running = false
-  slotsAvailable = new Set(["re_evaluate", "recalculate", "broadcast"])
+  availableSlots = ["re-evaluate", "recalculate", "broadcast"]
 
   constructor() {
     this.start()
@@ -30,35 +30,55 @@ export default class Manager {
       return
     }
     this.running = true
-    while (this.slotsAvailable.size > 0) {
+    while (this.running) {
       if (this.queue.length > 0) {
         const task = this.queue.shift()
         if (task) {
+          console.log("running a task from queue")
           this.run(task)
         }
         continue
       }
-      let task = await BackgroundTask.getOne()
-      let { dependsOn } = task
-
-      while (dependsOn) {
-        const dependency = await BackgroundTask.getById(dependsOn)
-        if (!dependency) {
-          break
+      for (const allocatable of this.availableSlots) {
+        let task = await BackgroundTask.getByType(allocatable)
+        if (!task) {
+          continue
         }
-        task = dependency
-        dependsOn = task.dependsOn
+        let { dependsOn } = task
+        if (this.tasks[dependsOn]) {
+          continue
+        }
+        while (dependsOn) {
+          const dependency = await BackgroundTask.getById(dependsOn)
+          if (!dependency) {
+            break
+          }
+          task = dependency
+          dependsOn = task.dependsOn
+        }
+        if (this.availableSlots.includes(task?.type)) {
+          console.log("allocating: " + task.type)
+          this.queue.push(task)
+          this.availableSlots = this.availableSlots.filter(
+            slot => slot !== task.type,
+          )
+          console.log("task added to queue")
+        }
       }
-      console.log(task)
-
-      this.queue.push(task)
-
-      break
       await sleep_ms(100)
     }
   }
 
   async run(task: BackgroundTask) {
+    const { id } = task
+    this.tasks[id] = { task }
+    await task.run()
+    await BackgroundTask.delete(task.id)
+    delete this.tasks[id]
+    this.release(task.type)
+  }
+
+  async run2(task: BackgroundTask) {
     const { id, type, dependsOn, quizId, courseId } = task
     if (dependsOn) {
       BackgroundTask.getById
@@ -80,9 +100,6 @@ export default class Manager {
       }
     } catch (error) {
       console.log(error)
-    }
-    if (id) {
-      // await BackgroundTask.delete(id)
     }
   }
 
@@ -128,6 +145,13 @@ export default class Manager {
     Object.keys(this.tasks).forEach(id => {
       this.cancel(id)
     })
+  }
+  private release(slot: string) {
+    let slotsAvailable: string[] | Set<string> = new Set(this.availableSlots)
+    slotsAvailable.add(slot)
+    slotsAvailable = Array.from(slotsAvailable).sort()
+    this.availableSlots = [...slotsAvailable]
+    console.log("released: " + slot)
   }
 }
 
