@@ -6,7 +6,7 @@ interface IAnswerListState {
   answersRequiringAttention: { results: Answer[]; total: number }
   bulkSelectedIds: string[]
   updatedAnswersIds: string[]
-  handledAnswersIds: string[]
+  handledAnswers: Answer[]
   bulkSelectMode: boolean
   enableSearch: boolean
   expandAll: boolean
@@ -18,7 +18,7 @@ const initialState: IAnswerListState = {
   answersRequiringAttention: { results: [], total: 0 },
   bulkSelectedIds: [],
   updatedAnswersIds: [],
-  handledAnswersIds: [],
+  handledAnswers: [],
   statusUpdateType: "",
   bulkSelectMode: false,
   enableSearch: false,
@@ -33,7 +33,7 @@ enum AnswerListTypes {
   SET_ANSWERS_REQUIRING_ATTENTION = "SET_ANSWERS_REQUIRING_ATTENTION",
   SET_BULK_SELECTED_IDS = "SET_BULK_SELECTED_IDS",
   SET_UPDATED_ANSWERS_IDS = "SET_UPDATED_ANSWERS_IDS",
-  SET_HANDLED_ANSWERS_IDS = "SET_HANDLED_ANSWERS_IDS",
+  SET_HANDLED_ANSWERS = "SET_HANDLED_ANSWERS",
   SET_STATUS_UPDATE_TYPE = "SET_STATUS_UPDATE_TYPE",
 }
 
@@ -48,7 +48,7 @@ type AnswerListActionTypes =
   | { type: AnswerListTypes.SET_EXPAND_ALL; payload: boolean }
   | { type: AnswerListTypes.SET_BULK_SELECTED_IDS; payload: string[] }
   | { type: AnswerListTypes.SET_UPDATED_ANSWERS_IDS; payload: string[] }
-  | { type: AnswerListTypes.SET_HANDLED_ANSWERS_IDS; payload: string[] }
+  | { type: AnswerListTypes.SET_HANDLED_ANSWERS; payload: Answer[] }
   | { type: AnswerListTypes.TOGGLE_BULK_SELECT_MODE }
   | {
       type: AnswerListTypes.SET_STATUS_UPDATE_TYPE
@@ -71,8 +71,8 @@ let reducer = (
       return { ...state, bulkSelectMode: !state.bulkSelectMode }
     case AnswerListTypes.SET_UPDATED_ANSWERS_IDS:
       return { ...state, updatedAnswersIds: [...action.payload] }
-    case AnswerListTypes.SET_HANDLED_ANSWERS_IDS:
-      return { ...state, handledAnswersIds: [...action.payload] }
+    case AnswerListTypes.SET_HANDLED_ANSWERS:
+      return { ...state, handledAnswers: [...action.payload] }
     case AnswerListTypes.SET_STATUS_UPDATE_TYPE:
       return { ...state, statusUpdateType: action.payload }
     case AnswerListTypes.SET_EXPAND_ALL:
@@ -112,10 +112,10 @@ export const setUpdatedAnswersIds = (ids: string[]): AnswerListActionTypes => {
   }
 }
 
-export const setHandledAnswersIds = (ids: string[]): AnswerListActionTypes => {
+export const setHandledAnswers = (answers: Answer[]): AnswerListActionTypes => {
   return {
-    type: AnswerListTypes.SET_HANDLED_ANSWERS_IDS,
-    payload: ids,
+    type: AnswerListTypes.SET_HANDLED_ANSWERS,
+    payload: answers,
   }
 }
 
