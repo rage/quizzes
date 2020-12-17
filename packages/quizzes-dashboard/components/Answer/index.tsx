@@ -66,16 +66,23 @@ export interface AnswerProps {
 
 export const AnswerCard = ({ answer }: AnswerProps) => {
   const [faded, setFaded] = useState(false)
+  const [statusChange, setStatusChange] = useState("")
   const [checked, setChecked] = useState(false)
-
   const [
-    { bulkSelectMode, bulkSelectedIds, statusUpdateType },
+    { bulkSelectMode, bulkSelectedIds, handledAnswers },
     dispatch,
   ] = useAnswerListState()
 
   useEffect(() => {
     setChecked(bulkSelectedIds.includes(answer.id))
-  }, [bulkSelectedIds])
+    handledAnswers.forEach(a => {
+      if (a.id === answer.id) {
+        setStatusChange(a.status)
+        setFaded(true)
+        return
+      }
+    })
+  }, [handledAnswers, bulkSelectedIds, bulkSelectMode])
 
   const handleAnswerSelection = () => {
     let updatedIds = []
@@ -105,8 +112,8 @@ export const AnswerCard = ({ answer }: AnswerProps) => {
           inputProps={{ "aria-label": "Select answer" }}
         />
       )}
-      <StyledAnswerCard faded={faded} status={statusUpdateType}>
-        <AnswerContent answer={answer} setFaded={setFaded} />
+      <StyledAnswerCard faded={faded} status={statusChange}>
+        <AnswerContent answer={answer} />
       </StyledAnswerCard>
     </AnswerCardWrapper>
   )

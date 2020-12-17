@@ -4,10 +4,8 @@ import { Alert } from "@material-ui/lab"
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import {
-  setBulkSelectedIds,
   setStatusUpdateType,
-  setUpdatedAnswersIds,
-  setHandledAnswersIds,
+  setHandledAnswers,
   useAnswerListState,
 } from "../../contexts/AnswerListContext"
 import { changeAnswerStatusForMany } from "../../services/quizzes"
@@ -35,7 +33,7 @@ export const AnswerList = ({ data }: AnswerListProps) => {
   const [answers, setAnswers] = useState<Answer[]>([])
 
   const [
-    { bulkSelectedIds, updatedAnswersIds, statusUpdateType },
+    { bulkSelectedIds, handledAnswers, statusUpdateType },
     dispatch,
   ] = useAnswerListState()
 
@@ -53,9 +51,7 @@ export const AnswerList = ({ data }: AnswerListProps) => {
       if (res[0].status === actionType) {
         setShowSnacks(true)
         dispatch(setStatusUpdateType(actionType))
-        dispatch(setBulkSelectedIds([]))
-        dispatch(setUpdatedAnswersIds(bulkSelectedIds))
-        dispatch(setHandledAnswersIds(bulkSelectedIds))
+        dispatch(setHandledAnswers(res))
 
         const returnedIds = res.map((updated: Answer) => updated.id)
 
@@ -86,10 +82,10 @@ export const AnswerList = ({ data }: AnswerListProps) => {
           return <Slide {...props} direction="down" />
         }}
       >
-        <Alert severity={updatedAnswersIds ? "success" : "error"}>
-          {updatedAnswersIds ? (
+        <Alert severity={handledAnswers ? "success" : "error"}>
+          {handledAnswers ? (
             <Typography>
-              {updatedAnswersIds.length} answer(s) marked as {statusUpdateType}
+              {handledAnswers.length} answer(s) marked as {statusUpdateType}
             </Typography>
           ) : (
             <Typography>
