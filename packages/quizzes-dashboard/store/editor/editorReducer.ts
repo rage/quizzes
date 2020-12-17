@@ -24,7 +24,8 @@ export const editorChangesReducer = createReducer<{ changes: boolean }, action>(
         items: action.payload.store.editor.items,
         options: action.payload.store.editor.options,
         quizId: action.payload.store.editor.quizId,
-        peerReviews: action.payload.store.editor.peerReviews,
+        peerReviewCollections:
+          action.payload.store.editor.peerReviewCollections,
         questions: action.payload.store.editor.questions,
       }
 

@@ -24,7 +24,7 @@ const EditPage = ({ quiz, course }: IQuizTabProps) => {
       items: storeState.entities.items ?? {},
       options: storeState.entities.options ?? {},
       result: storeState.result,
-      peerReviews: storeState.entities.peerReviews ?? {},
+      peerReviewCollections: storeState.entities.peerReviewCollections ?? {},
       questions: storeState.entities.questions ?? {},
     }
     dispatch(initializedEditor(normalizedData, quiz))

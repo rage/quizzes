@@ -8,11 +8,14 @@ export const items = new schema.Entity("items", {
 
 export const questions = new schema.Entity("questions")
 
-export const peerReviews = new schema.Entity("peerReviews", {
-  questions: [questions],
-})
+export const peerReviewCollections = new schema.Entity(
+  "peerReviewCollections",
+  {
+    questions: [questions],
+  },
+)
 
 export const normalizedQuiz = new schema.Entity("quizzes", {
   items: [items],
-  peerReviews: [peerReviews],
+  peerReviewCollections: [peerReviewCollections],
 })

@@ -12,7 +12,7 @@ import {
   ItemVariables,
   OptionVariables,
   QuizVariables,
-  NormalizedPeerReview,
+  NormalizedPeerReviewCollection,
   NormalizedQuestion,
   peerReviewVariables,
 } from "../types/NormalizedQuiz"
@@ -20,9 +20,9 @@ import { itemVariableReducers } from "./editor/itemVariables/itemVariableReducer
 import { optionVariableReducers } from "./editor/optionVariables/optionVariableReducers"
 import { quizVariableReducers } from "./editor/quizVariables/quizVariableReducers"
 import editorChangesReducer from "./editor/editorReducer"
-import { peerReviewReducer } from "./editor/peerReviews/peerReviewReducer"
+import { peerReviewReducer } from "./editor/peerReviewCollections/peerReviewCollectionReducer"
 import { questionReducer } from "./editor/questions/questionReducer"
-import { peerReviewVariablesReducer } from "./editor/peerReviewVariables/peerReviewVariablesReducer"
+import { peerReviewVariablesReducer } from "./editor/peerReviewVariables/peerReviewCollectionsVariablesReducer"
 
 const editorReducer = combineReducers({
   quizzes: quizReducer,
@@ -33,9 +33,9 @@ const editorReducer = combineReducers({
   optionVariables: optionVariableReducers,
   quizVariables: quizVariableReducers,
   editorChanges: editorChangesReducer,
-  peerReviews: peerReviewReducer,
+  peerReviewCollections: peerReviewReducer,
   questions: questionReducer,
-  peerReviewVariables: peerReviewVariablesReducer,
+  peerReviewCollectionVariables: peerReviewVariablesReducer,
 })
 
 const reducer = combineReducers({
@@ -54,9 +54,13 @@ export interface storeState {
     optionVariables: { [optionId: string]: OptionVariables }
     quizVariables: { [quizId: string]: QuizVariables }
     editorChanges: { changes: boolean }
-    peerReviews: { [peerReviewId: string]: NormalizedPeerReview }
+    peerReviewCollections: {
+      [peerReviewCollectionId: string]: NormalizedPeerReviewCollection
+    }
     questions: { [questionId: string]: NormalizedQuestion }
-    peerReviewVariables: { [peerReviewId: string]: peerReviewVariables }
+    peerReviewCollectionVariables: {
+      [peerReviewCollectionId: string]: peerReviewVariables
+    }
   }
 }
 

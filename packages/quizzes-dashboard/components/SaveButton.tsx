@@ -18,6 +18,7 @@ import { denormalize, normalize } from "normalizr"
 import { normalizedQuiz } from "../schemas"
 import { Quiz } from "../types/Quiz"
 import styled from "styled-components"
+import { NormalizedQuiz } from "../types/NormalizedQuiz"
 
 const StyledFab = styled(Fab)`
   display: flex !important;
@@ -63,7 +64,7 @@ const SaveButton = () => {
       items: store.editor.items,
       options: store.editor.options,
       quizId: store.editor.quizId,
-      peerReviews: store.editor.peerReviews,
+      peerReviewCollections: store.editor.peerReviewCollections,
       questions: store.editor.questions,
     }
 
@@ -95,21 +96,22 @@ const SaveButton = () => {
         delete item.id
       }
     }
-    for (let peerReview of quiz.peerReviews) {
+    for (let peerReviewCollection of quiz.peerReviewCollections) {
       if (
-        store.editor.peerReviewVariables[peerReview.id].newQuestions.length > 0
+        store.editor.peerReviewCollectionVariables[peerReviewCollection.id]
+          .newQuestions.length > 0
       ) {
-        for (let question of peerReview.questions) {
+        for (let question of peerReviewCollection.questions) {
           if (
-            store.editor.peerReviewVariables[peerReview.id].newQuestions.some(
-              id => id === question.id,
-            )
+            store.editor.peerReviewCollectionVariables[
+              peerReviewCollection.id
+            ].newQuestions.some(id => id === question.id)
           ) {
             delete question.id
             if (
               store.editor.quizVariables[
                 store.editor.quizId
-              ].newPeerReviews.some(id => id === peerReview.id)
+              ].newPeerReviews.some(id => id === peerReviewCollection.id)
             ) {
               delete question.peerReviewCollectionId
             }
@@ -118,10 +120,10 @@ const SaveButton = () => {
       }
       if (
         store.editor.quizVariables[store.editor.quizId].newPeerReviews.some(
-          id => id === peerReview.id,
+          id => id === peerReviewCollection.id,
         )
       ) {
-        delete peerReview.id
+        delete peerReviewCollection.id
       }
     }
     if (store.editor.quizVariables[store.editor.quizId].newQuiz) {
@@ -137,7 +139,8 @@ const SaveButton = () => {
         items: normalizedResponse.entities.items ?? {},
         options: normalizedResponse.entities.options ?? {},
         result: normalizedResponse.result ?? "",
-        peerReviews: normalizedResponse.entities.peerReviews ?? {},
+        peerReviewCollections:
+          normalizedResponse.entities.peerReviewCollections ?? {},
         questions: normalizedResponse.entities.questions ?? {},
       }
       dispatch(initializedEditor(data, response))

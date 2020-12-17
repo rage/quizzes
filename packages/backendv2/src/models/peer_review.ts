@@ -6,6 +6,9 @@ import PeerReviewQuestionAnswer from "./peer_review_question_answer"
 import PeerReviewQuestion from "./peer_review_question"
 import knex from "../../database/knex"
 import BaseModel from "./base_model"
+import softDelete from "objection-soft-delete"
+import { mixin } from "objection"
+import { Transaction } from "knex"
 
 class PeerReview extends BaseModel {
   userId!: number

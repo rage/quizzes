@@ -696,7 +696,7 @@ class QuizAnswer extends BaseModel {
     course: Course,
     trx: Knex.Transaction,
   ) {
-    const hasPeerReviews = quiz.peerReviews.length > 0
+    const hasPeerReviews = quiz.peerReviewCollections.length > 0
     if (hasPeerReviews) {
       if (quizAnswer.id) {
         const peerReviews = await PeerReview.query(trx)
@@ -750,7 +750,7 @@ class QuizAnswer extends BaseModel {
       userQuizState.tries += 1
     }
     const hasTriesLeft = !quiz.triesLimited || userQuizState.tries < quiz.tries
-    const hasPeerReviews = quiz.peerReviews.length > 0
+    const hasPeerReviews = quiz.peerReviewCollections.length > 0
     if (hasTriesLeft) {
       if (hasPeerReviews) {
         if (["rejected", "spam"].includes(quizAnswer.status)) {

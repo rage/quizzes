@@ -1,4 +1,4 @@
-import { PeerReviewQuestion, PeerReview, Question } from "./Quiz"
+import { PeerReviewQuestion, PeerReviewCollection, Question } from "./Quiz"
 
 export interface action {
   type: string
@@ -11,7 +11,9 @@ export interface Entities {
   items: { [itemId: string]: NormalizedItem }
   options?: { [optionId: string]: NormalizedOption }
   result: string
-  peerReviews: { [peerReviewId: string]: NormalizedPeerReview }
+  peerReviewCollections: {
+    [peerReviewCollectionId: string]: NormalizedPeerReviewCollection
+  }
   questions: { [questionId: string]: NormalizedQuestion }
 }
 export interface NormalizedQuiz {
@@ -75,7 +77,7 @@ export interface NormalizedOption {
   failureMessage: null | string
 }
 
-export interface NormalizedPeerReview {
+export interface NormalizedPeerReviewCollection {
   id: string
   quizId: string
   createdAt: string
@@ -165,7 +167,7 @@ export interface NewQuiz {
   grantPointsPolicy: string
   autoReject: boolean
   items: Item[]
-  peerReviews: PeerReview[]
+  peerReviews: PeerReviewCollection[]
   title: string
   body: string
   submitMessage: string | null

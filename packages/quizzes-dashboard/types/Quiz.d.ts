@@ -16,7 +16,7 @@ export interface Quiz {
   grantPointsPolicy: string
   autoReject: boolean
   items: Item[]
-  peerReviews: PeerReview[]
+  peerReviewCollections: PeerReviewCollection[]
   title: string
   body: string
   submitMessage: string | null
@@ -60,7 +60,7 @@ export interface Option {
   failureMessage: null | string
 }
 
-export interface PeerReview {
+export interface PeerReviewCollection {
   id: string
   quizId: string
   createdAt: Date
