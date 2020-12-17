@@ -63,8 +63,8 @@ export const changeGrade: ActionCreator<ThunkAction> = (
   peerReviewQuestionId: string,
   value: number,
 ) => (dispatch, getState) => {
-  const peerReviewCollection = getState().quiz?.peerReviewCollections.find(prc =>
-    prc.questions.some(q => q.id === peerReviewQuestionId),
+  const peerReviewCollection = getState().quiz?.peerReviewCollections.find(
+    prc => prc.questions.some(q => q.id === peerReviewQuestionId),
   )
   if (!peerReviewCollection) {
     console.log("No answer that matches the id of the reviewed answer")
@@ -77,8 +77,8 @@ export const changeText: ActionCreator<ThunkAction> = (
   peerReviewQuestionId: string,
   text: string,
 ) => (dispatch, getState) => {
-  const peerReviewCollection = getState().quiz?.peerReviewCollections.find(prc =>
-    prc.questions.some(q => q.id === peerReviewQuestionId),
+  const peerReviewCollection = getState().quiz?.peerReviewCollections.find(
+    prc => prc.questions.some(q => q.id === peerReviewQuestionId),
   )
   if (!peerReviewCollection) {
     console.log("No answer that matches the id of the reviewed answer")
