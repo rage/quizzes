@@ -18,11 +18,8 @@ export default class Manager {
       report?: () => any
     }
   } = {}
-  running: { [type: string]: any } = {
-    recalculate: undefined,
-    re_evaluate: undefined,
-    broadcast: undefined,
-  }
+  running = false
+  slotsAvailable = new Set(["re_evaluate", "recalculate", "broadcast"])
 
   constructor() {
     this.start()
@@ -33,7 +30,7 @@ export default class Manager {
       return
     }
     this.running = true
-    while (this.slotsAvalable()) {
+    while (this.slotsAvailable.size > 0) {
       if (this.queue.length > 0) {
         const task = this.queue.shift()
         if (task) {
@@ -102,10 +99,6 @@ export default class Manager {
     }
     await action(...params, add)
     delete this.tasks[id]
-  }
-
-  slotsAvalable() {
-    return Object.values(this.running).some(task => task === undefined)
   }
 
   stop() {
