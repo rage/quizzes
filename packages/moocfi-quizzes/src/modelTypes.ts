@@ -151,7 +151,7 @@ export type Quiz = {
   updatedAt: Date
   course: Course
   items: QuizItem[]
-  peerReviews: PeerReviewCollection[]
+  peerReviewCollections: PeerReviewCollection[]
   tries: number
   triesLimited: boolean
   grantPointsPolicy: QuizPointsGrantingPolicy
