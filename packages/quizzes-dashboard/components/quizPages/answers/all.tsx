@@ -22,6 +22,8 @@ import {
   useAnswerListState,
   setExpandAll,
   setAllAnswers,
+  setBulkSelectedIds,
+  setHandledAnswers,
 } from "../../../contexts/AnswerListContext"
 import AnswerListOptions from "../../Answer/AnswerListOptions"
 import { useAllAnswers } from "../../../hooks/useAllAnswers"
@@ -65,6 +67,8 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
   )
 
   useEffect(() => {
+    dispatch(setBulkSelectedIds([]))
+    dispatch(setHandledAnswers([]))
     if (allAnswers) {
       dispatch(setAllAnswers(allAnswers))
     }

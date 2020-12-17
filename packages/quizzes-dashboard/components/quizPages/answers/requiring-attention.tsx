@@ -15,7 +15,9 @@ import { IQuizTabProps, TAnswersDisplayed } from "./types"
 import AnswerListWrapper from "../../Answer/AnswerListWrapper"
 import { Answer } from "../../../types/Answer"
 import {
+  setBulkSelectedIds,
   setExpandAll,
+  setHandledAnswers,
   setRequiringAttention,
   useAnswerListState,
 } from "../../../contexts/AnswerListContext"
@@ -23,7 +25,10 @@ import AnswerListOptions from "../../Answer/AnswerListOptions"
 import { useRequiringAttention } from "../../../hooks/useRequiringAttention"
 
 export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
-  const [{ expandAll }, dispatch] = useAnswerListState()
+  const [
+    { expandAll, answersRequiringAttention },
+    dispatch,
+  ] = useAnswerListState()
 
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
@@ -47,6 +52,8 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
   )
 
   useEffect(() => {
+    dispatch(setBulkSelectedIds([]))
+    dispatch(setHandledAnswers([]))
     if (answers) {
       dispatch(setRequiringAttention(answers))
     }
@@ -180,8 +187,8 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
 
   const availableAnswers = searchResults
     ? searchResults
-    : answers
-    ? answers
+    : answersRequiringAttention
+    ? answersRequiringAttention
     : { results: [], total: 0 }
 
   return (
