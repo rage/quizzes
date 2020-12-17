@@ -43,7 +43,7 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "styled-components": "^4.4.1",
-    "swr": "^0.2.2",
+    "swr": "^0.2.3",
     "timezone-support": "^2.0.2",
     "tmc-client-js": "0.0.9",
     "typesafe-actions": "^5.1.0",

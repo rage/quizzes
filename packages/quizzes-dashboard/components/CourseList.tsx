@@ -2,10 +2,10 @@ import React, { useState } from "react"
 import styled from "styled-components"
 import { Card, CardContent, TextField, MenuItem } from "@material-ui/core"
 import Link from "next/link"
-import Skeleton from "@material-ui/lab/Skeleton"
 import { Course } from "../types/Quiz"
 import _ from "lodash"
 import DebugDialog from "./DebugDialog"
+import SkeletonLoader from "./Shared/SkeletonLoader"
 
 const StyledCard = styled(Card)`
   margin-bottom: 1rem;
@@ -15,10 +15,6 @@ const CourseLink = styled.a`
   color: white;
   text-decoration: none;
   cursor: pointer;
-`
-
-const StyledSkeleton = styled(Skeleton)`
-  margin-bottom: 1rem;
 `
 
 const SortSelector = styled(TextField)`
@@ -52,27 +48,8 @@ const CourseList = ({ data, error }: CourseListProps) => {
   if (error) {
     return <div>Error while fetching courses.</div>
   }
-  if (!data) {
-    return (
-      <>
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-      </>
-    )
-  }
+
+  if (!data) return <SkeletonLoader height={50} skeletonCount={15} />
 
   let order: "asc" | "desc" = "asc"
   if (sortOrder === "desc") {

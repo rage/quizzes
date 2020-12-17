@@ -1,20 +1,7 @@
 import knex from "../database/knex"
 import { Model, snakeCaseMappers } from "objection"
 import { Quiz, QuizAnswer, UserQuizState, Course } from "../src/models"
-
-const knexCleaner = require("knex-cleaner")
-
-const safeClean = async () => {
-  if (process.env.NODE_ENV === "test") {
-    return await knexCleaner.clean(knex)
-  }
-}
-
-const safeSeed = async (config?: any) => {
-  if (process.env.NODE_ENV === "test") {
-    await knex.seed.run(config)
-  }
-}
+import { safeClean, safeSeed } from "./util"
 
 beforeAll(() => {
   Model.knex(knex)
@@ -144,6 +131,48 @@ describe("autoreject off 1", () => {
       return quizAnswer.status
     })
     expect(status).toBe("confirmed")
+  })
+})
+
+describe("auto confirm off 1", () => {
+  beforeAll(async () => {
+    await safeSeed({
+      directory: "./database/seeds",
+      specific: "answerStatusDataPassing.ts",
+    })
+  })
+
+  afterAll(async () => {
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    quiz = await Quiz.getById("3c954097-268f-44bf-9d2e-1efaf9e8f122")
+    quiz.autoConfirm = false
+    quizAnswer = await QuizAnswer.getById(
+      "baa83266-2194-43f4-be37-177c273c82b1",
+    )
+    userQuizState = await UserQuizState.getByUserAndQuiz(
+      1234,
+      "3c954097-268f-44bf-9d2e-1efaf9e8f122",
+    )
+    course = await Course.getById(quiz.courseId)
+  })
+
+  test("given 3, received 2", async () => {
+    userQuizState.peerReviewsGiven = 3
+    userQuizState.peerReviewsReceived = 2
+    const status = await knex.transaction(async trx => {
+      await QuizAnswer.assessAnswerStatus(
+        quizAnswer,
+        userQuizState,
+        quiz,
+        course,
+        trx,
+      )
+      return quizAnswer.status
+    })
+    expect(status).toBe("manual-review")
   })
 })
 

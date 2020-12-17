@@ -185,7 +185,7 @@ export const itemReducer = createReducer<
       items: [],
       open: null,
       part: 0,
-      peerReviews: [],
+      peerReviewCollections: [],
       points: 1,
       section: 0,
       submitMessage: null,

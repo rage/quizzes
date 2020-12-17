@@ -1,8 +1,12 @@
 import BaseModel from "./base_model"
 import PeerReviewCollection from "./peer_review_collection"
 import PeerReviewQuestionTranslation from "./peer_review_question_translation"
+import { mixin } from "objection"
+import softDelete from "objection-soft-delete"
 
-class PeerReviewQuestion extends BaseModel {
+class PeerReviewQuestion extends mixin(BaseModel, [
+  softDelete({ columnName: "deleted" }),
+]) {
   texts!: PeerReviewQuestionTranslation[]
   collection!: PeerReviewCollection
   title!: string

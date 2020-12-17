@@ -2,7 +2,7 @@ import request from "supertest"
 import nock from "nock"
 import app from "../app"
 import knex from "../database/knex"
-import { QuizAnswer, Course } from "../src/models"
+import { QuizAnswer, Course, Quiz } from "../src/models"
 import { input, userAbilities, validation, possibleAnswerStates } from "./data"
 import { UserInfo } from "../src/types"
 import { BadRequestError, NotFoundError } from "../src/util/error"
@@ -329,7 +329,7 @@ describe("dashboard - quizzes: count answers requiring attention should", () => 
         .expect(200)
         .expect(response => {
           const received = response.body
-          expect(received).toEqual(0)
+          expect(received).toEqual({})
         })
         .end(done)
     })
@@ -589,6 +589,38 @@ describe("dashboard: save quiz", () => {
       })
       .end(done)
   })
+
+  test("delete quiz peer review question", done => {
+    let testInput = input.quizUpdate
+    testInput.peerReviewCollections[0].questions = []
+    request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .send(testInput)
+      .expect(200)
+      .expect(response => {
+        const received = response.body
+        expectQuizToEqual(received, validation.quizWithoutPeerReviewQuestions)
+      })
+      .end(done)
+  })
+
+  test("delete quiz peer review", done => {
+    let testInput = input.quizUpdate
+    testInput.peerReviewCollections = []
+    request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .send(testInput)
+      .expect(200)
+      .expect(response => {
+        const received = response.body
+        expectQuizToEqual(received, validation.quizWithoutPeerReviews)
+      })
+      .end(done)
+  })
 })
 
 describe("dashboard: get answer by id", () => {
@@ -647,7 +679,6 @@ describe("dashboard: get answer by id", () => {
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(response => {
         const received = response.body
-        console.log(received)
         expect(received).toStrictEqual(validation.quizAnswerValidator1)
       })
       .expect(200, done)
