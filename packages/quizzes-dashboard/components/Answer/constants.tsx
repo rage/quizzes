@@ -6,5 +6,4 @@ export const editableAnswerStates = [
   "manual-review-once-given-enough",
   "enough-received-but-not-given",
   "submitted",
-  "rejected",
 ]
