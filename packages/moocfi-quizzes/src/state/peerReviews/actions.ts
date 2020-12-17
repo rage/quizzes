@@ -63,7 +63,7 @@ export const changeGrade: ActionCreator<ThunkAction> = (
   peerReviewQuestionId: string,
   value: number,
 ) => (dispatch, getState) => {
-  const peerReviewCollection = getState().quiz?.peerReviews.find(prc =>
+  const peerReviewCollection = getState().quiz?.peerReviewCollections.find(prc =>
     prc.questions.some(q => q.id === peerReviewQuestionId),
   )
   if (!peerReviewCollection) {
@@ -77,7 +77,7 @@ export const changeText: ActionCreator<ThunkAction> = (
   peerReviewQuestionId: string,
   text: string,
 ) => (dispatch, getState) => {
-  const peerReviewCollection = getState().quiz?.peerReviews.find(prc =>
+  const peerReviewCollection = getState().quiz?.peerReviewCollections.find(prc =>
     prc.questions.some(q => q.id === peerReviewQuestionId),
   )
   if (!peerReviewCollection) {
@@ -133,7 +133,7 @@ export const selectAnswerToReview: ActionCreator<ThunkAction> = (
   }
 
   const userId = user.userQuizState.userId
-  const prc = getState().quiz?.peerReviews[0]
+  const prc = getState().quiz?.peerReviewCollections[0]
   dispatch(
     selectAnswer(
       quizAnswerId,

@@ -329,7 +329,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     stillSubmittable = false
   }
 
-  const containsPeerReviews = quiz.peerReviews?.length > 0
+  const containsPeerReviews = quiz.peerReviewCollections?.length > 0
 
   const answerStatus = quizAnswer.status ? quizAnswer.status : null
 
