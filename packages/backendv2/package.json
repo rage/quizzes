@@ -12,7 +12,8 @@
     "test": "export NODE_ENV=test && jest --runInBand",
     "reset-test-db": "export NODE_ENV=test && (dropdb quizzes_test || true) && createdb quizzes_test && knex migrate:latest",
     "migrate": "knex migrate:latest",
-    "seed": "knex run:seed --specific a.ts"
+    "rollback": "knex migrate:rollback",
+    "seed": "knex:seed --specific a.ts"
   },
   "devDependencies": {
     "@types/jest": "^26.0.0",
@@ -57,7 +58,8 @@
     "newrelic": "^7.0.0",
     "node-rdkafka": "^2.9.1",
     "objection": "^2.2.1",
-    "pg": "^8.0.3",
+    "objection-soft-delete": "^1.0.7",
+    "pg": "^7.18.2",
     "pg-escape": "^0.2.0",
     "pg-query-stream": "^3.2.0",
     "redis": "^3.0.2",

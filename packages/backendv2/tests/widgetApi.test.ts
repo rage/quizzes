@@ -314,7 +314,7 @@ describe("widget: submitting a peer review", () => {
       .set("Authorization", `bearer PLEB_TOKEN`)
       .set("Accept", "application/json")
       .send({
-        ...input.peerReview1,
+        ...input.peerReviewCollection1,
         quizAnswerId: randomUuid,
       })
       .expect(response => {
@@ -330,7 +330,7 @@ describe("widget: submitting a peer review", () => {
       .set("Authorization", `bearer PLEB_TOKEN`)
       .set("Accept", "application/json")
       .send({
-        ...input.peerReview1,
+        ...input.peerReviewCollection1,
         answers: [
           {
             peerReviewQuestionId: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
@@ -349,7 +349,7 @@ describe("widget: submitting a peer review", () => {
       .post("/api/v2/widget/answers/give-review")
       .set("Authorization", `bearer PLEB_TOKEN_1`)
       .set("Accept", "application/json")
-      .send(input.peerReview3)
+      .send(input.peerReviewCollection3)
       .expect(response => {
         const received: NotFoundError = response.body
         expect(received.message).toEqual(`User quiz state not found.`)
@@ -362,7 +362,7 @@ describe("widget: submitting a peer review", () => {
       .post("/api/v2/widget/answers/give-review")
       .set("Authorization", `bearer PLEB_TOKEN_2`)
       .set("Accept", "application/json")
-      .send(input.peerReview2)
+      .send(input.peerReviewCollection2)
       .expect(200)
       .expect(response => {
         const {
@@ -380,7 +380,7 @@ describe("widget: submitting a peer review", () => {
       .post("/api/v2/widget/answers/give-review")
       .set("Authorization", `bearer PLEB_TOKEN_2`)
       .set("Accept", "application/json")
-      .send(input.peerReview1)
+      .send(input.peerReviewCollection1)
       .expect(response => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual(`User cannot review their own answer`)
@@ -393,7 +393,7 @@ describe("widget: submitting a peer review", () => {
       .post("/api/v2/widget/answers/give-review")
       .set("Authorization", `bearer PLEB_TOKEN_2`)
       .set("Accept", "application/json")
-      .send(input.peerReview2)
+      .send(input.peerReviewCollection2)
       .expect(400)
       .expect(response => {
         const received: BadRequestError = response.body

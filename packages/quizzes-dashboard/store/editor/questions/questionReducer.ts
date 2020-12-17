@@ -14,7 +14,7 @@ import {
   toggledQuestionAnswerRequired,
   deletedPRQ,
 } from "./questionActions"
-import { deletePeerReview } from "../peerReviews/peerReviewActions"
+import { deletePeerReview } from "../peerReviewCollections/peerReviewCollectionActions"
 
 export const questionReducer = createReducer<
   {
