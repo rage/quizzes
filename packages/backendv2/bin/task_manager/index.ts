@@ -18,46 +18,74 @@ export default class Manager {
       report?: () => any
     }
   } = {}
-  running: boolean = false
-
-  constructor() {
-    this.run()
+  running: { [type: string]: any } = {
+    recalculate: undefined,
+    re_evaluate: undefined,
+    broadcast: undefined,
   }
 
-  async run() {
+  constructor() {
+    this.start()
+  }
+
+  async start() {
     if (this.running) {
       return
     }
     this.running = true
-    while (this.running) {
-      const tasks = await BackgroundTask.getAll()
-      this.queue = [...this.queue, ...tasks]
-      const task = this.queue.shift()
-      if (task) {
-        const { type, id, quizId, courseId } = task
-        try {
-          switch (type) {
-            case TaskType.RE_EVAL:
-              if (!quizId) {
-                break
-              }
-              this.runTask(reEvaluate, task, [quizId])
-              break
-            case TaskType.RECALC:
-              if (!courseId) {
-                break
-              }
-              this.runTask(recalculate, task, [courseId])
-              break
-          }
-        } catch (error) {
-          console.log(error)
+    while (this.slotsAvalable()) {
+      if (this.queue.length > 0) {
+        const task = this.queue.shift()
+        if (task) {
+          this.run(task)
         }
-        if (id) {
-          await BackgroundTask.delete(id)
-        }
+        continue
       }
+      let task = await BackgroundTask.getOne()
+      let { dependsOn } = task
+
+      while (dependsOn) {
+        const dependency = await BackgroundTask.getById(dependsOn)
+        if (!dependency) {
+          break
+        }
+        task = dependency
+        dependsOn = task.dependsOn
+      }
+      console.log(task)
+
+      this.queue.push(task)
+
+      break
       await sleep_ms(100)
+    }
+  }
+
+  async run(task: BackgroundTask) {
+    const { id, type, dependsOn, quizId, courseId } = task
+    if (dependsOn) {
+      BackgroundTask.getById
+    }
+    try {
+      switch (type) {
+        case TaskType.RE_EVAL:
+          if (!quizId) {
+            break
+          }
+          this.runTask(reEvaluate, task, [quizId])
+          break
+        case TaskType.RECALC:
+          if (!courseId) {
+            break
+          }
+          this.runTask(recalculate, task, [courseId])
+          break
+      }
+    } catch (error) {
+      console.log(error)
+    }
+    if (id) {
+      // await BackgroundTask.delete(id)
     }
   }
 
@@ -74,6 +102,10 @@ export default class Manager {
     }
     await action(...params, add)
     delete this.tasks[id]
+  }
+
+  slotsAvalable() {
+    return Object.values(this.running).some(task => task === undefined)
   }
 
   stop() {
@@ -106,3 +138,4 @@ export default class Manager {
   }
 }
 
+new Manager()
