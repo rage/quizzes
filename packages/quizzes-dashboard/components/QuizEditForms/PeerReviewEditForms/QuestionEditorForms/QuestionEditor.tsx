@@ -2,7 +2,6 @@ import React from "react"
 import {
   TextField,
   MenuItem,
-  Button,
   Switch,
   FormGroup,
   FormControlLabel,
@@ -40,11 +39,18 @@ export const QuestionEditor = ({ id }: PRQEditorProps) => {
   const prq = useTypedSelector(state => state.editor.questions[id])
   return (
     <PRQWrapper>
-      <PRQTextfield
+      {/* <PRQTextfield
         label="Question title"
         variant="outlined"
         fullWidth
         value={prq.title}
+        onChange={event =>
+          dispatch(editedPeerReviewQuestionTitle(event.target.value, id))
+        }
+      /> */}
+      <MarkdownEditor
+        label="Question title"
+        text={prq.title ?? ""}
         onChange={event =>
           dispatch(editedPeerReviewQuestionTitle(event.target.value, id))
         }

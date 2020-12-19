@@ -28,10 +28,17 @@ export const PeerReviewEditor = ({ id }: PeerReviewEditorProps) => {
 
   return (
     <>
-      <PeerReviewField
+      {/* <PeerReviewField
         variant="outlined"
         label="Peer review title"
         value={peerReview.title}
+        onChange={event => {
+          dispatch(editedPeerReviewTitle(id, event.target.value))
+        }}
+      /> */}
+      <MarkdownEditor
+        label="Peer review title"
+        text={peerReview.title ?? ""}
         onChange={event => {
           dispatch(editedPeerReviewTitle(id, event.target.value))
         }}
