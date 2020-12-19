@@ -5,6 +5,7 @@ import React, { useState } from "react"
 import styled from "styled-components"
 import {
   setBulkSelectedIds,
+  setHandledAnswers,
   toggleBulkSelectMode,
   useAnswerListState,
 } from "../../contexts/AnswerListContext"
@@ -53,17 +54,17 @@ const AnswerListOptions = ({
     dispatch(setBulkSelectedIds(allSelected))
   }
 
+  const handleBulkSelectToggle = () => {
+    dispatch(setBulkSelectedIds([]))
+    dispatch(toggleBulkSelectMode())
+  }
+
   return (
     <OptionsWrapper>
       <BulkSelectWrapper>
         <SwitchField>
           <Typography>Bulk select answers</Typography>
-          <Switch
-            checked={bulkSelectMode}
-            onChange={_ => {
-              dispatch(toggleBulkSelectMode())
-            }}
-          />
+          <Switch checked={bulkSelectMode} onChange={handleBulkSelectToggle} />
         </SwitchField>
         {bulkSelectMode && (
           <>
@@ -81,6 +82,7 @@ const AnswerListOptions = ({
               style={{ marginLeft: "2rem" }}
               onClick={() => {
                 dispatch(setBulkSelectedIds([]))
+                dispatch(setHandledAnswers([]))
               }}
             >
               Clear Selection

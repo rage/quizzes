@@ -38,7 +38,7 @@ const PeerReviews: React.FunctionComponent = () => {
   const activeStep = useTypedSelector(state => state.peerReviews.activeStep)
   const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
-  const peerReviewQuestions = quiz?.peerReviews
+  const peerReviewQuestions = quiz?.peerReviewCollections
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
 
