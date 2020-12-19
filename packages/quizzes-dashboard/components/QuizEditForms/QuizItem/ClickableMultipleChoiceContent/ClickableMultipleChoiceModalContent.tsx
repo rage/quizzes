@@ -196,11 +196,11 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
               }
             /> */}
             <MarkdownEditor
-              label="Success message"
-              text={storeItem.successMessage ?? ""}
+              label="Failure message"
+              text={storeItem.failureMessage ?? ""}
               onChange={event =>
                 dispatch(
-                  editedItemSuccessMessage(storeItem.id, event.target.value),
+                  editedItemFailureMessage(storeItem.id, event.target.value),
                 )
               }
             />
