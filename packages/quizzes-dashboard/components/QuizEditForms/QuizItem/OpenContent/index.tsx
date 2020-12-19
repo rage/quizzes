@@ -157,12 +157,19 @@ const OpenContent = ({ item }: openContentProps) => {
         </StyledBox>
       </StyledModal>
       <ItemInfo>
-        <TextField
+        {/* <TextField
           value={storeItem.title ?? ""}
           multiline
           fullWidth
           variant="outlined"
           label="title"
+          onChange={event =>
+            dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
+          }
+        /> */}
+        <MarkdownEditor
+          label="Title"
+          text={storeItem.title ?? ""}
           onChange={event =>
             dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
           }

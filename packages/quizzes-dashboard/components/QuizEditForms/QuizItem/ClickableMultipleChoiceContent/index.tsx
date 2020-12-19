@@ -119,7 +119,7 @@ const ClickableMultipleChoiceContent = ({
         </Fade>
       </StyledModal>
       <QuizContentLineContainer>
-        <QuizContent>
+        {/* <QuizContent>
           <TextField
             multiline
             label="Title"
@@ -129,7 +129,14 @@ const ClickableMultipleChoiceContent = ({
               dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
             }
           />
-        </QuizContent>
+        </QuizContent> */}
+        <MarkdownEditor
+          label="Title"
+          text={storeItem.title ?? ""}
+          onChange={event =>
+            dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
+          }
+        />
         {storeItem.options.map(option => (
           <QuizContent key={option}>
             <ClickableMultipleChoiceButton option={storeOptions[option]} />

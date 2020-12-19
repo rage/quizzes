@@ -24,6 +24,7 @@ import {
   Button,
   Typography,
 } from "@material-ui/core"
+import MarkdownEditor from "../../../MarkdownEditor"
 
 const ModalContent = styled.div`
   padding: 1rem;
@@ -69,7 +70,7 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
         <Typography variant="h3">Advanced Editing</Typography>
       </ModalContentTitleWrapper>
       <ModalContent>
-        <TextField
+        {/* <TextField
           value={storeItem.title ?? ""}
           multiline
           fullWidth
@@ -78,15 +79,29 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
           onChange={event =>
             dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
           }
+        /> */}
+        <MarkdownEditor
+          label="Title"
+          text={storeItem.title ?? ""}
+          onChange={event =>
+            dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
+          }
         />
       </ModalContent>
       <ModalContent>
-        <TextField
+        {/* <TextField
           value={storeItem.body ?? ""}
           multiline
           fullWidth
           variant="outlined"
           label="Body"
+          onChange={event =>
+            dispatch(editedQuizItemBody(event.target.value, storeItem.id))
+          }
+        /> */}
+        <MarkdownEditor
+          label="Body"
+          text={storeItem.body ?? ""}
           onChange={event =>
             dispatch(editedQuizItemBody(event.target.value, storeItem.id))
           }
@@ -133,7 +148,7 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
         </FormControl>
       </ModalContent>
       <ModalContent>
-        <TextField
+        {/* <TextField
           fullWidth
           multiline
           variant="outlined"
@@ -142,15 +157,29 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
           onChange={event =>
             dispatch(editedItemSuccessMessage(storeItem.id, event.target.value))
           }
+        /> */}
+        <MarkdownEditor
+          label="Success message"
+          text={storeItem.successMessage ?? ""}
+          onChange={event =>
+            dispatch(editedItemSuccessMessage(storeItem.id, event.target.value))
+          }
         />
       </ModalContent>
       <ModalContent>
-        <TextField
+        {/* <TextField
           fullWidth
           multiline
           variant="outlined"
           label="Failure message"
           value={storeItem.failureMessage ?? ""}
+          onChange={event =>
+            dispatch(editedItemFailureMessage(storeItem.id, event.target.value))
+          }
+        /> */}
+        <MarkdownEditor
+          label="Failure message"
+          text={storeItem.failureMessage ?? ""}
           onChange={event =>
             dispatch(editedItemFailureMessage(storeItem.id, event.target.value))
           }

@@ -193,11 +193,18 @@ const BasicInformation = () => {
       </WarningWrapper>
 
       <InfoContainer>
-        <TextField
+        {/* <TextField
           label="Quiz Title"
           fullWidth
           variant="outlined"
           defaultValue={title ?? ""}
+          onChange={event =>
+            dispatch(editedQuizTitle(event.target.value, quizId))
+          }
+        /> */}
+        <MarkdownEditor
+          label="Quiz title"
+          text={title ?? ""}
           onChange={event =>
             dispatch(editedQuizTitle(event.target.value, quizId))
           }
@@ -337,7 +344,7 @@ const BasicInformation = () => {
           text={submitMessage ?? ""}
           label="Submit message"
           onChange={event =>
-            dispatch(editedQuizzesBody(quizId, event.target.value))
+            dispatch(editedQuizzesSubmitmessage(quizId, event.target.value))
           }
         />
       </InfoContainer>

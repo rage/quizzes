@@ -2,9 +2,7 @@ import React from "react"
 import { HtmlRenderer, Parser } from "commonmark"
 import styled from "styled-components"
 
-const PreviewDiv = styled.div`
-  min-height: 400px;
-`
+const PreviewDiv = styled.div``
 
 interface MarkDownTextProps {
   text: string

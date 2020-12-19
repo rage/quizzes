@@ -23,6 +23,7 @@ import MultipleChoiceButton from "./MultiplChoiceButton"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus } from "@fortawesome/free-solid-svg-icons"
 import { createdNewOption } from "../../../../store/editor/editorActions"
+import MarkdownEditor from "../../../MarkdownEditor"
 
 const ModalContent = styled.div`
   display: flex;
@@ -104,7 +105,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
         </FormGroup>
       </ModalContent>
       <ModalContent>
-        <TextField
+        {/* <TextField
           label="Title"
           value={storeItem.title}
           fullWidth
@@ -113,6 +114,13 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
           onChange={event =>
             dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
           }
+        /> */}
+        <MarkdownEditor
+          label="Title"
+          onChange={event =>
+            dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
+          }
+          text={storeItem.title}
         />
       </ModalContent>
       <ModalContent>
@@ -132,7 +140,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
       </ModalContentOptionWrapper>
       {storeItem.usesSharedOptionFeedbackMessage ? (
         <ModalContent>
-          <TextField
+          {/* <TextField
             label="Shared option feedback message"
             variant="outlined"
             fullWidth
@@ -145,12 +153,24 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
                 ),
               )
             }
+          /> */}
+          <MarkdownEditor
+            label="Shared option feedback message"
+            onChange={event =>
+              dispatch(
+                editedSharedOptionsFeedbackMessage(
+                  storeItem.id,
+                  event.target.value,
+                ),
+              )
+            }
+            text={storeItem.sharedOptionFeedbackMessage ?? ""}
           />
         </ModalContent>
       ) : (
         <>
           <ModalContent>
-            <TextField
+            {/* <TextField
               label="Success message"
               variant="outlined"
               fullWidth
@@ -161,10 +181,19 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
                   editedItemSuccessMessage(storeItem.id, event.target.value),
                 )
               }
+            /> */}
+            <MarkdownEditor
+              label="Success message"
+              onChange={event =>
+                dispatch(
+                  editedItemSuccessMessage(storeItem.id, event.target.value),
+                )
+              }
+              text={storeItem.successMessage ?? ""}
             />
           </ModalContent>
           <ModalContent>
-            <TextField
+            {/* <TextField
               label="Failure message"
               variant="outlined"
               fullWidth
@@ -175,6 +204,15 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
                   editedItemFailureMessage(storeItem.id, event.target.value),
                 )
               }
+            /> */}
+            <MarkdownEditor
+              label="Failure message"
+              onChange={event =>
+                dispatch(
+                  editedItemFailureMessage(storeItem.id, event.target.value),
+                )
+              }
+              text={storeItem.failureMessage ?? ""}
             />
           </ModalContent>
         </>

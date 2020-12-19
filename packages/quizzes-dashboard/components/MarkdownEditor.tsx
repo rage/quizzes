@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import {
   TextField,
   Tab,
@@ -8,7 +8,7 @@ import {
   Link,
 } from "@material-ui/core"
 import styled from "styled-components"
-import { Parser, HtmlRenderer } from "commonmark"
+import { MarkDownText } from "./MarkDownText"
 
 const StyledAppBar = styled(Paper)`
   margin-bottom: 1rem;
@@ -26,10 +26,6 @@ const HelperText = styled(Typography)`
   margin-bottom: 1rem !important;
   margin-left: 1rem !important;
   margin-right: 1rem !important;
-`
-
-const PreviewDiv = styled.div`
-  min-height: 400px;
 `
 
 const EditorWrapper = styled.div`
@@ -50,8 +46,11 @@ export const MarkdownEditor = ({
   onChange,
 }: ExerciseEditorProps) => {
   const [activeTab, setActiveTab] = useState(0)
-  const reader = new Parser()
-  const writer = new HtmlRenderer()
+  const [showTabs, setShowTabs] = useState(text.length > 0)
+
+  useEffect(() => {
+    setShowTabs(text.length > 0)
+  }, [text])
   return (
     <>
       <EditorWrapper>
@@ -82,20 +81,13 @@ export const MarkdownEditor = ({
             variant="outlined"
             type="text"
             value={text}
-            onChange={() => onChange}
-            rows={20}
+            onChange={onChange}
             rowsMax={1000}
             multiline
             required
           />
         )}
-        {activeTab === 1 && (
-          <PreviewDiv
-            dangerouslySetInnerHTML={{
-              __html: writer.render(reader.parse(text)),
-            }}
-          />
-        )}
+        {activeTab === 1 && <MarkDownText text={text} />}
       </EditorWrapper>
     </>
   )

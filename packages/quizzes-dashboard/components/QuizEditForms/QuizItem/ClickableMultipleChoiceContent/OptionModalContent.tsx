@@ -5,7 +5,6 @@ import {
   FormControl,
   FormControlLabel,
   Checkbox,
-  TextField,
 } from "@material-ui/core"
 import {
   editedOptionTitle,
@@ -16,6 +15,7 @@ import {
 import { useDispatch } from "react-redux"
 import { NormalizedOption } from "../../../../types/NormalizedQuiz"
 import { useTypedSelector } from "../../../../store/store"
+import MarkdownEditor from "../../../MarkdownEditor"
 
 const ModalContent = styled.div`
   padding: 1rem;
@@ -57,7 +57,7 @@ export const OptionModalContent = ({ option }: OptionEditorProps) => {
         </FormControl>
       </ModalContent>
       <ModalContent>
-        <TextField
+        {/* <TextField
           label="Option Title"
           value={storeOption.title}
           fullWidth
@@ -65,10 +65,17 @@ export const OptionModalContent = ({ option }: OptionEditorProps) => {
           onChange={event =>
             dispatch(editedOptionTitle(event.target.value, storeOption.id))
           }
+        /> */}
+        <MarkdownEditor
+          label="Option title"
+          text={storeOption.title ?? ""}
+          onChange={event =>
+            dispatch(editedOptionTitle(event.target.value, storeOption.id))
+          }
         />
       </ModalContent>
       <ModalContent>
-        <TextField
+        {/* <TextField
           multiline
           label={storeOption.correct ? "Success message" : "Failure message"}
           value={
@@ -78,6 +85,31 @@ export const OptionModalContent = ({ option }: OptionEditorProps) => {
           }
           fullWidth
           variant="outlined"
+          onChange={
+            storeOption.correct
+              ? event =>
+                  dispatch(
+                    editedOptionSuccessMessage(
+                      storeOption.id,
+                      event.target.value,
+                    ),
+                  )
+              : event =>
+                  dispatch(
+                    editedOptionFailureMessage(
+                      storeOption.id,
+                      event.target.value,
+                    ),
+                  )
+          }
+        /> */}
+        <MarkdownEditor
+          label={storeOption.correct ? "Success message" : "Failure message"}
+          text={
+            storeOption.correct
+              ? storeOption.successMessage ?? ""
+              : storeOption.failureMessage ?? ""
+          }
           onChange={
             storeOption.correct
               ? event =>
