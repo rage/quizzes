@@ -1,6 +1,6 @@
 import { SingleLanguageLabels } from "./index"
 
-const finnishLabels: SingleLanguageLabels = {
+const irishLabels: SingleLanguageLabels = {
   essay: {
     exampleAnswerLabel: "Freagra samplach",
     userAnswerLabel: "An freagra uait",
@@ -132,7 +132,7 @@ const finnishLabels: SingleLanguageLabels = {
     },
     answered: "Freagartha",
     unanswered: "Gan freagra",
-    rejected: "Rejected answer, try again",
+    rejected: "Diúltaíodh don fhreagra, bain triail as arís",
     progressUpdated: "Tugadh an dul chun cinn sa chúrsa cothrom le dáta",
     answerConfirmed: "Deimhníodh an freagra uait!",
     answerConfirmedFor: (title: string) =>
@@ -151,4 +151,4 @@ const finnishLabels: SingleLanguageLabels = {
   },
 }
 
-export default finnishLabels
+export default irishLabels
