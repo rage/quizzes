@@ -131,7 +131,7 @@ const finnishLabels: SingleLanguageLabels = {
       }
     },
     answered: "Freagartha",
-    unanswered: "Unanswered",
+    unanswered: "Gan freagra",
     rejected: "Rejected answer, try again",
     progressUpdated: "Tugadh an dul chun cinn sa chúrsa cothrom le dáta",
     answerConfirmed: "Deimhníodh an freagra uait!",
