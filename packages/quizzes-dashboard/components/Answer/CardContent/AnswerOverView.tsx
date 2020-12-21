@@ -1,7 +1,8 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { Answer } from "../../../types/Answer"
 import { Typography } from "@material-ui/core"
 import styled from "styled-components"
+import { useAnswerListState } from "../../../contexts/AnswerListContext"
 
 export interface AnswerOverViewProps {
   answer: Answer
@@ -25,6 +26,16 @@ export const AnswerOverView = ({ answer }: AnswerOverViewProps) => {
   const formattedAnswerDate = answer.userQuizState?.createdAt
     .substring(0, 16)
     .replace("T", " ")
+
+  const [{ handledAnswers }] = useAnswerListState()
+
+  useEffect(() => {
+    handledAnswers.forEach(a => {
+      if (a.id === answer.id) {
+        answer.status = a.status
+      }
+    })
+  }, [handledAnswers])
 
   return (
     <OverviewWrapper>
