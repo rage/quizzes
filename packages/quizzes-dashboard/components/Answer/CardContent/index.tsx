@@ -3,7 +3,6 @@ import styled from "styled-components"
 import AnswerOverView from "./AnswerOverView"
 import ItemAnswers from "./ItemAnswers"
 import { Answer } from "../../../types/Answer"
-import CompactPeerReviewStats from "./CompactPeerReviewStats"
 import {
   Button,
   Collapse,
@@ -18,6 +17,8 @@ import Peerreviews from "./Peerreviews"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWindowClose } from "@fortawesome/free-solid-svg-icons"
 import DebugDialog from "../../DebugDialog"
+import { editableAnswerStates } from "../constants"
+import { useAnswerListState } from "../../../contexts/AnswerListContext"
 
 export const ContentContainer = styled.div`
   display: flex !important;
@@ -82,40 +83,19 @@ const DebugDialogWrapper = styled.div`
 
 export interface AnswerContentProps {
   answer: Answer
-  expanded: boolean
-  setFaded: (faded: boolean) => void
-  setStatus: (accepted: string) => void
 }
 
-export const AnswerContent = ({
-  answer,
-  expanded,
-  setFaded,
-  setStatus,
-}: AnswerContentProps) => {
-  const [showMore, setShowMore] = useState(expanded)
+export const AnswerContent = ({ answer }: AnswerContentProps) => {
+  const [{ expandAll, handledAnswers }] = useAnswerListState()
+  const [showMore, setShowMore] = useState(expandAll)
   const [showPeerreviewModal, setShowPeerreviewModal] = useState(false)
-  const [handled, setHandled] = useState(false)
   const [height, setHeight] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
 
-  const editableAnswerStates = [
-    "manual-review",
-    "given-enough",
-    "given-more-than-enough",
-    "manual-review-once-given-and-received-enough",
-    "manual-review-once-given-enough",
-    "enough-received-but-not-given",
-    "submitted",
-    "rejected",
-  ]
-
-  useEffect(() => setShowMore(expanded), [expanded])
   useEffect(() => {
-    if (handled) {
-      setFaded(true)
-    }
-  }, [handled])
+    setShowMore(expandAll)
+  }, [handledAnswers, expandAll])
+
   useLayoutEffect(() => {
     if (ref.current !== null) {
       setHeight(ref.current.clientHeight)
@@ -156,7 +136,7 @@ export const AnswerContent = ({
         </ContentContainer>
       </Collapse>
       <ContentContainer>
-        {answer.peerReviews.length > 0 ? (
+        {answer.peerReviews.length > 0 && (
           <PeerreviewButton
             variant="outlined"
             title=":D"
@@ -164,8 +144,6 @@ export const AnswerContent = ({
           >
             <Typography variant="subtitle2">Show Peerreviews</Typography>
           </PeerreviewButton>
-        ) : (
-          ""
         )}
       </ContentContainer>
       <StatButtonWrapper>
@@ -183,18 +161,8 @@ export const AnswerContent = ({
           </>
         )}
       </StatButtonWrapper>
-      <StatsContainer>
-        <CompactPeerReviewStats answer={answer} />
-      </StatsContainer>
-      {editableAnswerStates.includes(answer.status) ? (
-        <ManualReviewField
-          answer={answer}
-          handled={handled}
-          setHandled={setHandled}
-          setStatus={setStatus}
-        />
-      ) : (
-        ""
+      {editableAnswerStates.includes(answer.status) && (
+        <ManualReviewField answer={answer} />
       )}
     </>
   )

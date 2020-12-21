@@ -196,7 +196,7 @@ const PeerReviewQuestions: React.FunctionComponent<PeerReviewQuestionsProps> = (
   if (!quiz) {
     return <div />
   }
-  const peerReviewQuestions = quiz.peerReviews
+  const peerReviewQuestions = quiz.peerReviewCollections
   const changeInPeerReviewGrade = (peerReviewQuestionId: string) => (
     name: string,
     value: string,

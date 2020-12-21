@@ -4,31 +4,33 @@ import { useRouter } from "next/router"
 import usePromise from "react-use-promise"
 import { fetchQuiz, getAnswerById } from "../../../../services/quizzes"
 import AnswerCard from "../../../../components/Answer"
-import styled from "styled-components"
-import { Skeleton } from "@material-ui/lab"
+
 import {
   TabTextLoading,
   TabText,
   TabTextError,
 } from "../../../../components/quizPages/TabHeaders"
-
-const StyledSkeleton = styled(Skeleton)`
-  margin-bottom: 1rem;
-`
+import SkeletonLoader from "../../../../components/Shared/SkeletonLoader"
 
 export const AnswerById = () => {
   const route = useRouter()
-  const quizId = route.query.quizId?.toString() ?? ""
-  const answerId = route.query.answerId?.toString() ?? ""
+  const quizId = route.query.quizId?.toString()
+  // When doing a full reload answerId is briefly undefined
+  const answerId = route.query.answerId?.toString()
 
-  const [expanded, setExpanded] = useState(true)
+  const [answerResponse, answerError] = usePromise(async () => {
+    if (!answerId) {
+      return
+    }
+    return await getAnswerById(answerId)
+  }, [answerId])
 
-  const [answerResponse, answerError] = usePromise(
-    () => getAnswerById(answerId),
-    [],
-  )
-
-  const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [quizId])
+  const [quiz, quizError] = usePromise(async () => {
+    if (!quizId) {
+      return
+    }
+    return await fetchQuiz(quizId)
+  }, [quizId])
 
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
@@ -65,7 +67,7 @@ export const AnswerById = () => {
     return (
       <>
         <TabTextLoading />
-        <StyledSkeleton variant="rect" height={300} animation="wave" />
+        <SkeletonLoader height={300} skeletonCount={1} />
       </>
     )
   }
@@ -73,7 +75,7 @@ export const AnswerById = () => {
   return (
     <>
       <TabText text="Singular answer" />
-      <AnswerCard answer={answerResponse} expanded={expanded} />
+      <AnswerCard answer={answerResponse} />
     </>
   )
 }

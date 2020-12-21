@@ -7,7 +7,7 @@ import { useDispatch } from "react-redux"
 import {
   createdNewPeerReview,
   deletePeerReview,
-} from "../../../store/editor/peerReviews/peerReviewActions"
+} from "../../../store/editor/peerReviewCollections/peerReviewCollectionActions"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faTrash } from "@fortawesome/free-solid-svg-icons"
 
@@ -47,7 +47,7 @@ const PeerReviewWrapper = styled.div`
 export const PeerReviewEditForms = () => {
   const quizId = useTypedSelector(state => state.editor.quizId)
   const peerReviews = Object.values(
-    useTypedSelector(state => state.editor.peerReviews),
+    useTypedSelector(state => state.editor.peerReviewCollections),
   )
 
   const dispatch = useDispatch()

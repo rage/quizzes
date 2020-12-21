@@ -6,7 +6,7 @@ import { useDispatch } from "react-redux"
 import {
   editedPeerReviewTitle,
   editedPeerReviewBody,
-} from "../../../store/editor/peerReviews/peerReviewActions"
+} from "../../../store/editor/peerReviewCollections/peerReviewCollectionActions"
 import QuestionEditorWrapper from "./QuestionEditorForms/QuestionEditorWrapper"
 
 const PeerReviewField = styled(TextField)`
@@ -20,7 +20,9 @@ interface PeerReviewEditorProps {
 }
 
 export const PeerReviewEditor = ({ id }: PeerReviewEditorProps) => {
-  const peerReview = useTypedSelector(state => state.editor.peerReviews[id])
+  const peerReview = useTypedSelector(
+    state => state.editor.peerReviewCollections[id],
+  )
   const dispatch = useDispatch()
 
   return (

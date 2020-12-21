@@ -3,6 +3,7 @@ import { createReducer } from "typesafe-actions"
 import {
   editedQuizTitle,
   editedQuizzesNumberOfTries,
+  editedQuizTriesLimited,
   editedQuizzesPointsToGain,
   editedQuizzesPointsGrantingPolicy,
   editedQuizzesDeadline,
@@ -23,7 +24,7 @@ import { DateTime } from "luxon"
 import { Quiz } from "../../../types/Quiz"
 import { normalize } from "normalizr"
 import { normalizedQuiz } from "../../../schemas"
-import { createdNewPeerReview } from "../peerReviews/peerReviewActions"
+import { createdNewPeerReview } from "../peerReviewCollections/peerReviewCollectionActions"
 
 export const quizReducer = createReducer<
   { [quizId: string]: NormalizedQuiz },
@@ -43,6 +44,12 @@ export const quizReducer = createReducer<
   .handleAction(editedQuizzesNumberOfTries, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.id].tries = action.payload.numberOfTries
+    })
+  })
+
+  .handleAction(editedQuizTriesLimited, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.id].triesLimited = action.payload.triesLimited
     })
   })
 
@@ -114,7 +121,7 @@ export const quizReducer = createReducer<
       items: [],
       open: null,
       part: 0,
-      peerReviews: [],
+      peerReviewCollections: [],
       points: 1,
       section: 0,
       submitMessage: null,
