@@ -103,7 +103,7 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
                     </Button>
                   </Link>
                 </Badge>
-                {!userAbilities?.includes("edit") && (
+                {userAbilities?.includes("edit") && (
                   <Link
                     href={{
                       pathname: "/quizzes/[quizId]/[...page]",
