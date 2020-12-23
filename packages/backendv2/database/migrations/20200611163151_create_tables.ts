@@ -805,7 +805,7 @@ export async function up(knex: Knex): Promise<any> {
         .notNullable()
         .onDelete("CASCADE")
       table
-        .enu("role", ["assistant", "teacher"], {
+        .enu("role", ["assistant", "teacher", "reviewer"], {
           useNative: true,
           enumName: "role_enum",
         })
