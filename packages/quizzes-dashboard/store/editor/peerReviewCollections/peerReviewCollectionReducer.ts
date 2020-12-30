@@ -1,12 +1,15 @@
 import { createReducer } from "typesafe-actions"
-import { action, NormalizedPeerReview } from "../../../types/NormalizedQuiz"
+import {
+  action,
+  NormalizedPeerReviewCollection,
+} from "../../../types/NormalizedQuiz"
 import { initializedEditor } from "../editorActions"
 import {
   editedPeerReviewTitle,
   editedPeerReviewBody,
   createdNewPeerReview,
   deletePeerReview,
-} from "./peerReviewActions"
+} from "./peerReviewCollectionActions"
 import produce from "immer"
 import {
   createdNewPeerReviewQuestion,
@@ -14,12 +17,12 @@ import {
 } from "../questions/questionActions"
 
 export const peerReviewReducer = createReducer<
-  { [peerReviewId: string]: NormalizedPeerReview },
+  { [peerReviewCollectionId: string]: NormalizedPeerReviewCollection },
   action
 >({})
   .handleAction(
     initializedEditor,
-    (state, action) => action.payload.normalizedQuiz.peerReviews,
+    (state, action) => action.payload.normalizedQuiz.peerReviewCollections,
   )
 
   .handleAction(editedPeerReviewTitle, (state, action) => {
@@ -36,7 +39,7 @@ export const peerReviewReducer = createReducer<
 
   .handleAction(createdNewPeerReview, (state, action) => {
     return produce(state, draftState => {
-      const newPeerReview: NormalizedPeerReview = {
+      const newPeerReview: NormalizedPeerReviewCollection = {
         id: action.payload.newId,
         quizId: action.payload.quizId,
         createdAt: new Date().toISOString(),

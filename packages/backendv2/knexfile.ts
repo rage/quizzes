@@ -6,7 +6,7 @@ const configOptions: { [env: string]: Config } = {
     client: "pg",
     connection: {
       host: env.DB_HOST || "/var/run/postgresql",
-      database: env.DB_USER || "quizzes_dev",
+      database: env.DB_NAME || "quizzes_dev",
       password: env.DB_PASSWORD || "",
       timezone: "UTC",
     },

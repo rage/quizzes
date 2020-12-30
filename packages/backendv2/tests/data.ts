@@ -1,4 +1,3 @@
-import { isNumber } from "lodash"
 import { uuid, dateTime } from "./util"
 
 export const input = {
@@ -52,13 +51,15 @@ export const input = {
         sharedOptionFeedbackMessage: null,
       },
     ],
-    peerReviews: [
+    peerReviewCollections: [
       {
         title: "pr",
         body: "do this",
+        deleted: false,
         questions: [
           {
             default: true,
+            deleted: false,
             type: "grade",
             order: 1,
             title: "question",
@@ -101,7 +102,7 @@ export const input = {
       },
       {
         id: "707195a3-aafe-4c06-bf23-854e54e084db",
-        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
         type: "essay",
         order: 2,
         allAnswersCorrect: true,
@@ -113,21 +114,23 @@ export const input = {
         sharedOptionFeedbackMessage: null,
       },
     ],
-    peerReviews: [
+    peerReviewCollections: [
       {
         id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
         title: "pr",
         body: "do this",
+        deleted: false,
         questions: [
           {
             id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
-            peer_review_collection_id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+            peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
             default: true,
             type: "grade",
             order: 1,
             title: "question",
             body: "answer this",
+            deleted: false,
           },
         ],
       },
@@ -152,7 +155,7 @@ export const input = {
       },
     ],
   },
-  peerReview1: {
+  peerReviewCollection1: {
     quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
     peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
     rejectedQuizAnswerIds: null,
@@ -163,7 +166,7 @@ export const input = {
       },
     ],
   },
-  peerReview2: {
+  peerReviewCollection2: {
     quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
     peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
     rejectedQuizAnswerIds: null,
@@ -174,7 +177,7 @@ export const input = {
       },
     ],
   },
-  peerReview3: {
+  peerReviewCollection3: {
     quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
     peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
     rejectedQuizAnswerIds: null,
@@ -185,7 +188,7 @@ export const input = {
       },
     ],
   },
-  peerReview4: {
+  peerReviewCollection4: {
     quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
     peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
     rejectedQuizAnswerIds: null,
@@ -319,7 +322,7 @@ export const validation = {
         options: [],
       },
     ],
-    peerReviews: [
+    peerReviewCollections: [
       {
         id: expect.stringMatching(uuid),
         quizId: expect.stringMatching(uuid),
@@ -327,6 +330,7 @@ export const validation = {
         body: "do this",
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
+        deleted: false,
         questions: [
           {
             id: expect.stringMatching(uuid),
@@ -338,6 +342,7 @@ export const validation = {
             order: 1,
             title: "question",
             body: "answer this",
+            deleted: false,
             createdAt: expect.stringMatching(dateTime),
             updatedAt: expect.stringMatching(dateTime),
           },
@@ -413,12 +418,13 @@ export const validation = {
         options: [],
       },
     ],
-    peerReviews: [
+    peerReviewCollections: [
       {
         id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
         quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
         title: "pr",
         body: "do this",
+        deleted: false,
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
         questions: [
@@ -427,6 +433,7 @@ export const validation = {
             peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
             quizId: null,
             answerRequired: true,
+            deleted: false,
             default: true,
             type: "grade",
             order: 1,
@@ -520,7 +527,7 @@ export const validation = {
         options: [],
       },
     ],
-    peerReviews: [
+    peerReviewCollections: [
       {
         id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
         quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
@@ -528,6 +535,7 @@ export const validation = {
         body: "do this",
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
+        deleted: false,
         questions: [
           {
             id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
@@ -535,6 +543,7 @@ export const validation = {
             quizId: null,
             answerRequired: true,
             default: true,
+            deleted: false,
             type: "grade",
             order: 1,
             title: "question",
@@ -614,7 +623,158 @@ export const validation = {
         options: [],
       },
     ],
-    peerReviews: [],
+    peerReviewCollections: [],
+  },
+  quizWithoutPeerReviews: {
+    id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+    courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    part: 1,
+    section: 1,
+    points: 1,
+    deadline: null,
+    open: null,
+    excludedFromScore: false,
+    autoConfirm: true,
+    tries: 1,
+    triesLimited: true,
+    awardPointsEvenIfWrong: false,
+    grantPointsPolicy: "grant_whenever_possible",
+    autoReject: true,
+    title: "quiz",
+    body: "body",
+    submitMessage: "nice one!",
+    createdAt: expect.stringMatching(dateTime),
+    updatedAt: expect.stringMatching(dateTime),
+    items: [
+      {
+        id: "707195a3-aafe-4c06-bf23-854e54e084db",
+        quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        type: "essay",
+        order: 2,
+        validityRegex: null,
+        formatRegex: null,
+        allAnswersCorrect: true,
+        multi: false,
+        minWords: null,
+        maxWords: null,
+        minValue: null,
+        maxValue: null,
+        usesSharedOptionFeedbackMessage: false,
+        title: "essay",
+        body: "item",
+        successMessage: "yay!",
+        failureMessage: "boo!",
+        sharedOptionFeedbackMessage: null,
+        createdAt: expect.stringMatching(dateTime),
+        updatedAt: expect.stringMatching(dateTime),
+        options: [],
+      },
+      {
+        id: expect.stringMatching(uuid),
+        quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        type: "open",
+        order: 1,
+        validityRegex: "kissa",
+        formatRegex: null,
+        allAnswersCorrect: false,
+        multi: false,
+        minWords: null,
+        maxWords: null,
+        minValue: null,
+        maxValue: null,
+        usesSharedOptionFeedbackMessage: false,
+        title: "open",
+        body: "item",
+        successMessage: "yay!",
+        failureMessage: "boo!",
+        sharedOptionFeedbackMessage: null,
+        createdAt: expect.stringMatching(dateTime),
+        updatedAt: expect.stringMatching(dateTime),
+        options: [],
+      },
+    ],
+    peerReviewCollections: [],
+  },
+  quizWithoutPeerReviewQuestions: {
+    id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+    courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    part: 1,
+    section: 1,
+    points: 1,
+    deadline: null,
+    open: null,
+    excludedFromScore: false,
+    autoConfirm: true,
+    tries: 1,
+    triesLimited: true,
+    awardPointsEvenIfWrong: false,
+    grantPointsPolicy: "grant_whenever_possible",
+    autoReject: true,
+    title: "quiz",
+    body: "body",
+    submitMessage: "nice one!",
+    createdAt: expect.stringMatching(dateTime),
+    updatedAt: expect.stringMatching(dateTime),
+    items: [
+      {
+        id: "707195a3-aafe-4c06-bf23-854e54e084db",
+        quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        type: "essay",
+        order: 2,
+        validityRegex: null,
+        formatRegex: null,
+        allAnswersCorrect: true,
+        multi: false,
+        minWords: null,
+        maxWords: null,
+        minValue: null,
+        maxValue: null,
+        usesSharedOptionFeedbackMessage: false,
+        title: "essay",
+        body: "item",
+        successMessage: "yay!",
+        failureMessage: "boo!",
+        sharedOptionFeedbackMessage: null,
+        createdAt: expect.stringMatching(dateTime),
+        updatedAt: expect.stringMatching(dateTime),
+        options: [],
+      },
+      {
+        id: expect.stringMatching(uuid),
+        quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        type: "open",
+        order: 1,
+        validityRegex: "kissa",
+        formatRegex: null,
+        allAnswersCorrect: false,
+        multi: false,
+        minWords: null,
+        maxWords: null,
+        minValue: null,
+        maxValue: null,
+        usesSharedOptionFeedbackMessage: false,
+        title: "open",
+        body: "item",
+        successMessage: "yay!",
+        failureMessage: "boo!",
+        sharedOptionFeedbackMessage: null,
+        createdAt: expect.stringMatching(dateTime),
+        updatedAt: expect.stringMatching(dateTime),
+        options: [],
+      },
+    ],
+    peerReviewCollections: [
+      {
+        id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
+        quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        title: "pr",
+        body: "do this",
+        deleted: false,
+        createdAt: expect.stringMatching(dateTime),
+        updatedAt: expect.stringMatching(dateTime),
+        questions: [],
+      },
+    ],
   },
   course1: {
     id: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
@@ -730,6 +890,7 @@ export const validation = {
               order: 1,
               peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
               quizId: null,
+              deleted: false,
               texts: [
                 {
                   body: "answer this",
@@ -768,6 +929,7 @@ export const validation = {
               order: 1,
               peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
               quizId: null,
+              deleted: false,
               texts: [
                 {
                   body: "answer this",
@@ -1101,12 +1263,13 @@ export const validation = {
           sharedOptionFeedbackMessage: null,
         },
       ],
-      peerReviews: [
+      peerReviewCollections: [
         {
           id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
           quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
           createdAt: expect.stringMatching(dateTime),
           updatedAt: expect.stringMatching(dateTime),
+          deleted: false,
           questions: [
             {
               id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
@@ -1120,6 +1283,7 @@ export const validation = {
               updatedAt: expect.stringMatching(dateTime),
               title: "question",
               body: "answer this",
+              deleted: false,
             },
           ],
           title: "pr",

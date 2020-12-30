@@ -1,5 +1,5 @@
 export interface ITabToComponent {
-  [key: string]: () => JSX.Element
+  [key: string]: (any) => JSX.Element
 }
 
 export interface EditCoursePayloadFields {

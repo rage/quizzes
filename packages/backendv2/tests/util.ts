@@ -32,8 +32,8 @@ export const expectQuizToEqual = (received: Quiz, expected: any) => {
   for (const expectedOption of expectedOptions) {
     expect(receivedOptions).toContainEqual(expectedOption)
   }
-  const receivedPeerReviews = received.peerReviews
-  const expectedPeerReviews = expected.peerReviews
+  const receivedPeerReviews = received.peerReviewCollections
+  const expectedPeerReviews = expected.peerReviewCollections
   expect(receivedPeerReviews).toHaveLength(expectedPeerReviews.length)
   for (const expectedPeerReview of expectedPeerReviews) {
     expect(receivedPeerReviews).toContainEqual(expectedPeerReview)
@@ -55,7 +55,7 @@ export const expectQuizToEqual = (received: Quiz, expected: any) => {
   const expectedClone = { ...expected }
   delete received.items
   delete expectedClone.items
-  delete received.peerReviews
-  delete expectedClone.peerReviews
+  delete received.peerReviewCollections
+  delete expectedClone.peerReviewCollections
   expect(received).toStrictEqual(expectedClone)
 }

@@ -8,6 +8,7 @@ class QuizItemAnswer extends BaseModel {
   textData!: string
   correct!: boolean
   optionAnswers!: QuizOptionAnswer[]
+  document!: any
 
   static get tableName() {
     return "quiz_item_answer"

@@ -1,66 +1,99 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter } from "next/router"
-import {
-  getAnswersRequiringAttention,
-  fetchQuiz,
-  fetchCourseById,
-} from "../../../services/quizzes"
+import { getAnswersRequiringAttentionMatchingQuery } from "../../../services/quizzes"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
-import { AnswerList } from "../../AnswerList"
-import usePromise from "react-use-promise"
 import { MenuItem, Switch, Typography } from "@material-ui/core"
 import QuizTitle from "../QuizTitleContainer"
-import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
+import { TabTextError, TabText } from "../TabHeaders"
 import {
-  StyledSkeleton,
   SizeSelectorField,
-  PaginationField,
   SwitchField,
-  Paginator,
   OptionsContainer,
   SortOrderField,
 } from "./styles"
-import { TAnswersDisplayed, TSortOptions } from "./types"
+import { IQuizTabProps, TAnswersDisplayed } from "./types"
+import AnswerListWrapper from "../../Answer/AnswerListWrapper"
+import { Answer } from "../../../types/Answer"
+import {
+  setBulkSelectedIds,
+  setExpandAll,
+  setHandledAnswers,
+  setRequiringAttention,
+  useAnswerListState,
+} from "../../../contexts/AnswerListContext"
+import AnswerListOptions from "../../Answer/AnswerListOptions"
+import { useRequiringAttention } from "../../../hooks/useRequiringAttention"
 
-export const RequiringAttention = () => {
+export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
+  const [
+    { expandAll, answersRequiringAttention },
+    dispatch,
+  ] = useAnswerListState()
+
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
 
   const URL_HREF = `/quizzes/[quizId]/[...page]`
   const pathname = `/quizzes/${quizId}/answers-requiring-attention/`
 
-  const paramSize = Number(route.query.answers) as TAnswersDisplayed
-  const paramPage = Number(route.query.pageNo)
-  let paramSort: TSortOptions | null = null
-  if (route.query.sort) {
-    paramSort = route.query.sort as TSortOptions
-  }
-  const paramExpand = route.query.expandAll === "true" ? true : false
+  const [currentPage, setCurrentPage] = useState(1)
+  const [sortOrder, setSortOrder] = useState("desc")
+  const [answersDisplayed, setAnswersDisplayed] = useState(10)
 
-  const [currentPage, setCurrentPage] = useState<number>(paramPage || 1)
-  const [sortOrder, setSortOrder] = useState<TSortOptions>(paramSort || "desc")
-  const [expandAll, setExpandAll] = useState<boolean>(paramExpand || false)
-  const [answersDisplayed, setAnswersDisplayed] = useState<TAnswersDisplayed>(
-    paramSize || 10,
+  const {
+    requiringAttention: answers,
+    requiringAttentionError: answersError,
+  } = useRequiringAttention(
+    quizId,
+    currentPage,
+    answersDisplayed,
+    sortOrder,
+    "answers-requiring-attention",
   )
 
-  const [answers, error] = usePromise(
-    () =>
-      getAnswersRequiringAttention(
-        quizId,
-        currentPage,
-        answersDisplayed,
-        sortOrder,
-      ),
-    [currentPage, answersDisplayed, sortOrder],
-  )
-  const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [])
-  const [course, courseError] = usePromise(
-    () => fetchCourseById(quiz?.courseId ?? ""),
-    [quiz],
-  )
+  useEffect(() => {
+    dispatch(setBulkSelectedIds([]))
+    dispatch(setHandledAnswers([]))
+    if (answers) {
+      dispatch(setRequiringAttention(answers))
+    }
+  }, [answers])
+
+  const [searchResults, setSearchResults] = useState<
+    | {
+        results: Answer[]
+        total: number
+      }
+    | undefined
+    | null
+  >(null)
+  const [fetchingAnswers, setFetchingAnswers] = useState(false)
 
   const [queryToPush, setQueryToPush] = useState({})
+
+  useEffect(() => {
+    const { pageNo, sort, answers, expandAll } = route.query
+    let initialQuery: any = {}
+
+    if (pageNo) {
+      setCurrentPage(Number(pageNo))
+      initialQuery.pageNo = pageNo
+    }
+    if (answers) {
+      setAnswersDisplayed(Number(answers))
+      initialQuery.answers = answers
+    }
+    if (expandAll) {
+      dispatch(setExpandAll(true))
+      initialQuery.expandAll = expandAll
+    }
+    if (sort) {
+      setSortOrder(sort as string)
+      initialQuery.sort = sort
+    }
+
+    setQueryToPush(initialQuery)
+  }, [])
 
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
@@ -74,30 +107,7 @@ export const RequiringAttention = () => {
     },
   ])
 
-  if (!answers || !quiz || !course) {
-    return (
-      <>
-        <TabTextLoading />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-      </>
-    )
-  }
-
-  if (error || quizError || courseError) {
+  if (answersError) {
     return (
       <>
         <TabTextError />
@@ -113,7 +123,10 @@ export const RequiringAttention = () => {
     route.push(URL_HREF, { pathname, query }, { shallow: true })
   }
 
-  const handleChange = (event: React.ChangeEvent<any>, fieldType?: string) => {
+  const handleFieldChange = (
+    event: React.ChangeEvent<any>,
+    fieldType?: string,
+  ) => {
     let query = null
     let updatedQueryParams = null
 
@@ -128,9 +141,12 @@ export const RequiringAttention = () => {
         query = updatedQueryParams
         break
       case "expand":
-        updatedQueryParams = { ...queryToPush, expandAll: event.target.checked }
+        updatedQueryParams = {
+          ...queryToPush,
+          expandAll: event.target.checked,
+        }
         setQueryToPush(updatedQueryParams)
-        setExpandAll(event.target.checked)
+        dispatch(setExpandAll(event.target.checked))
         query = updatedQueryParams
         break
       case "order":
@@ -147,38 +163,53 @@ export const RequiringAttention = () => {
     route.push(URL_HREF, { pathname, query }, { shallow: true })
   }
 
+  const handleSubmit = async (searchQuery: string) => {
+    try {
+      setFetchingAnswers(true)
+      if (!searchQuery) {
+        setSearchResults(null)
+      } else {
+        const response = await getAnswersRequiringAttentionMatchingQuery(
+          quizId,
+          currentPage,
+          answersDisplayed,
+          sortOrder,
+          searchQuery,
+        )
+        setSearchResults(response)
+      }
+    } catch (err) {
+      console.log(err)
+    } finally {
+      setFetchingAnswers(false)
+    }
+  }
+
+  const availableAnswers = searchResults
+    ? searchResults
+    : answersRequiringAttention
+    ? answersRequiringAttention
+    : { results: [], total: 0 }
+
   return (
     <>
       <TabText text="Answers requiring attention" />
-      {answers.results.length === 0 ? (
+      {answers?.results.length === 0 ? (
         <>
-          <QuizTitle quiz={quiz} course={course} />
+          <QuizTitle quiz={quiz} />
           <Typography variant="h3">No answers requiring attention</Typography>
         </>
       ) : (
         <>
-          <QuizTitle quiz={quiz} course={course} />
-          <PaginationField>
-            <Paginator
-              siblingCount={2}
-              boundaryCount={2}
-              count={Math.ceil(answers.total / answersDisplayed)}
-              size="large"
-              color="primary"
-              showFirstButton
-              showLastButton
-              page={currentPage}
-              onChange={(event, nextPage) => handlePageChange(nextPage)}
-            />
-          </PaginationField>
+          <QuizTitle quiz={quiz} />
           <OptionsContainer>
             <SwitchField>
               <Typography>Expand all</Typography>
               <Switch
                 name="expand-field"
-                checked={expandAll}
+                checked={route.query.expandAll ? true : expandAll}
                 onChange={event => {
-                  handleChange(event, "expand")
+                  handleFieldChange(event, "expand")
                 }}
               />
             </SwitchField>
@@ -188,7 +219,7 @@ export const RequiringAttention = () => {
               label="Answers"
               variant="outlined"
               select
-              onChange={event => handleChange(event, "pages")}
+              onChange={event => handleFieldChange(event, "pages")}
               helperText="How many answers are shown per page"
             >
               <MenuItem value={10}>10</MenuItem>
@@ -201,30 +232,26 @@ export const RequiringAttention = () => {
               select
               helperText="Sorts answers by date they've been submitted"
               value={sortOrder}
-              onChange={event => handleChange(event, "order")}
+              onChange={event => handleFieldChange(event, "order")}
             >
               <MenuItem value="desc">Latest first</MenuItem>
               <MenuItem value="asc">Oldest first</MenuItem>
             </SortOrderField>
           </OptionsContainer>
-          <AnswerList
-            data={answers.results}
-            error={error}
-            expandAll={expandAll}
+          <AnswerListOptions
+            answers={availableAnswers}
+            handleTextSearch={handleSubmit}
           />
-          <PaginationField>
-            <Paginator
-              siblingCount={2}
-              boundaryCount={2}
-              count={Math.ceil(answers.total / answersDisplayed)}
-              size="large"
-              color="primary"
-              showFirstButton
-              showLastButton
-              page={currentPage}
-              onChange={(event, nextPage) => handlePageChange(nextPage)}
-            />
-          </PaginationField>
+          <AnswerListWrapper
+            order={sortOrder}
+            quizId={quizId}
+            size={answersDisplayed}
+            handlePageChange={handlePageChange}
+            page={currentPage}
+            answersError={answersError}
+            fetchingAnswers={fetchingAnswers}
+            answers={availableAnswers}
+          />
         </>
       )}
     </>

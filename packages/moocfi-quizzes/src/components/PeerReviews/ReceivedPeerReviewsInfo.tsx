@@ -64,7 +64,7 @@ const ReceivedPeerReviews: React.FunctionComponent<any> = () => {
     dispatch(requestReviews())
   }, [])
 
-  const peerReviewQuestions = quiz.peerReviews[0].questions
+  const peerReviewQuestions = quiz.peerReviewCollections[0].questions
 
   if (!receivedReviews) {
     return (
