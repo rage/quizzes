@@ -24,7 +24,7 @@
     "date-fns": "^2.16.1",
     "date-fns-timezone": "^0.1.4",
     "dotenv": "^8.2.0",
-    "formik": "^2.1.5",
+    "formik": "^2.2.6",
     "immer": "^7.0.5",
     "lodash": "^4.17.19",
     "luxon": "^1.24.1",
