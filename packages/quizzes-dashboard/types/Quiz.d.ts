@@ -1,5 +1,5 @@
 export interface Quiz {
-  id: string
+  id?: string
   courseId: string
   part: number
   section: number
@@ -23,7 +23,7 @@ export interface Quiz {
 }
 
 export interface Item {
-  id: string
+  id?: string
   quizId: string
   type: string
   order: number
@@ -48,8 +48,8 @@ export interface Item {
 }
 
 export interface Option {
-  id: string
-  quizItemId: string
+  id?: string
+  quizItemId?: string
   order: number
   correct: boolean
   createdAt: Date
@@ -61,7 +61,7 @@ export interface Option {
 }
 
 export interface PeerReviewCollection {
-  id: string
+  id?: string
   quizId: string
   createdAt: Date
   updatedAt: Date
@@ -71,9 +71,9 @@ export interface PeerReviewCollection {
 }
 
 export interface Question {
-  id: string
+  id?: string
   quizId: string
-  peerReviewCollectionId: string
+  peerReviewCollectionId?: string
   default: boolean
   type: string
   answerRequired: boolean
