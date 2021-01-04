@@ -33,7 +33,6 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
   const route = useRouter()
   const quizId = route.query.quizId?.toString() ?? ""
 
-  const URL_HREF = `/quizzes/[quizId]/[...page]`
   const pathname = `/quizzes/${quizId}/answers-requiring-attention/`
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -96,11 +95,10 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
   }, [])
 
   useBreadcrumbs([
-    { label: "Courses", as: "/", href: "/" },
+    { label: "Courses", as: "/" },
     {
       label: `${course ? course.title : ""}`,
       as: `/courses/${quiz?.courseId}/listing`,
-      href: "/courses/[courseId]/[...page]",
     },
     {
       label: `${quiz ? quiz.title : ""}`,
@@ -120,7 +118,7 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
     setQueryToPush({ ...queryToPush, pageNo: nextPage })
     setCurrentPage(nextPage)
     let query = { ...queryToPush, pageNo: nextPage }
-    route.push(URL_HREF, { pathname, query }, { shallow: true })
+    route.push(pathname, { pathname, query }, { shallow: true })
   }
 
   const handleFieldChange = (
@@ -160,7 +158,7 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
     }
 
     // in all cases, push all the query params
-    route.push(URL_HREF, { pathname, query }, { shallow: true })
+    route.push(pathname, { pathname, query }, { shallow: true })
   }
 
   const handleSubmit = async (searchQuery: string) => {

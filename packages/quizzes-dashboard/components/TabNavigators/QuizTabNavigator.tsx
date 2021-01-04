@@ -24,7 +24,6 @@ import { useRequiringAttentionCount } from "../../hooks/useRequiringAttention"
 export const TabNavigator = () => {
   const router = useRouter()
   const quizId = router.query.quizId?.toString() ?? ""
-  const URL_HREF = `/quizzes/[quizId]/[...page]`
   const pathname = `/quizzes/${quizId}`
 
   /* tokens passed to hooks are for swr caching  */
@@ -89,8 +88,7 @@ export const TabNavigator = () => {
           value="overview"
           label={<Typography>Overview</Typography>}
           onClick={() => {
-            router.push(URL_HREF, `${pathname}/overview`)
-            setCurrentTab("overview")
+            router.push(`${pathname}/overview`, undefined, { shallow: true })
           }}
         />
         <Tab
@@ -99,8 +97,7 @@ export const TabNavigator = () => {
           value="edit"
           label={<Typography>Edit quiz</Typography>}
           onClick={() => {
-            router.push(URL_HREF, `${pathname}/edit`)
-            setCurrentTab("edit")
+            router.push(`${pathname}/edit`, undefined, { shallow: true })
           }}
         />
         <Tab
@@ -109,8 +106,7 @@ export const TabNavigator = () => {
           value="all-answers"
           label={<Typography>All answers</Typography>}
           onClick={() => {
-            router.push(URL_HREF, `${pathname}/all-answers`)
-            setCurrentTab("all-answers")
+            router.push(`${pathname}/all-answers`, undefined, { shallow: true })
           }}
         />
         <Tab
@@ -127,8 +123,9 @@ export const TabNavigator = () => {
             </Badge>
           }
           onClick={() => {
-            router.push(URL_HREF, `${pathname}/answers-requiring-attention`)
-            setCurrentTab("answers-requiring-attention")
+            router.push(`${pathname}/answers-requiring-attention`, undefined, {
+              shallow: true,
+            })
           }}
         />
       </Tabs>

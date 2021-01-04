@@ -1,7 +1,7 @@
 import React from "react"
 import { Answer } from "../../../types/Answer"
 import Link from "next/link"
-import { Typography } from "@material-ui/core"
+import { Link as LinkTypography } from "@material-ui/core"
 import styled from "styled-components"
 
 export const AnswerLinkContainer = styled.div`
@@ -17,15 +17,14 @@ export interface AnswerLinkProps {
 export const AnswerLink = ({ answer }: AnswerLinkProps) => {
   return (
     <AnswerLinkContainer>
-      <Link
-        href={{
-          pathname: "/quizzes/[quizId]/answers/[answerId]",
-        }}
-        as={`/quizzes/${answer.quizId}/answers/${answer.id}`}
-      >
-        <a>
-          <Typography>View Answer: {answer.id}</Typography>
-        </a>
+      <Link href={`/quizzes/${answer.quizId}/answers/${answer.id}`}>
+        <LinkTypography
+          component="span"
+          variant="body2"
+          style={{ cursor: "pointer" }}
+        >
+          View Answer: {answer.id}
+        </LinkTypography>
       </Link>
     </AnswerLinkContainer>
   )

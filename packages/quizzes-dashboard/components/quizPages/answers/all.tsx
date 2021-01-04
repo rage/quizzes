@@ -49,7 +49,6 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
   const route = useRouter()
   const quizId = quiz?.id
 
-  const URL_HREF = `/quizzes/[quizId]/[...page]`
   const pathname = `/quizzes/${quizId}/all-answers/`
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -143,11 +142,10 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
   const [chipStates, setChipStates] = useState(states)
 
   useBreadcrumbs([
-    { label: "Courses", as: "/", href: "/" },
+    { label: "Courses", as: "/" },
     {
       label: `${course ? course.title : ""}`,
       as: `/courses/${quiz?.courseId}/listing`,
-      href: "/courses/[courseId]/[...page]",
     },
     {
       label: `${quiz ? quiz.title : ""}`,
@@ -194,7 +192,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
     setQueryToPush({ ...queryToPush, pageNo: nextPage })
     setCurrentPage(nextPage)
     let query = { ...queryToPush, pageNo: nextPage }
-    route.push(URL_HREF, { pathname, query }, { shallow: true })
+    route.push(pathname, { pathname, query }, { shallow: true })
   }
 
   /**
@@ -247,7 +245,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
     }
 
     setQueryToPush(updatedQueryParams)
-    route.push(URL_HREF, { pathname, query }, { shallow: true })
+    route.push(pathname, { pathname, query }, { shallow: true })
   }
 
   /**
@@ -265,14 +263,14 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
       }
       setQueryToPush(updatedQueryParams)
       let query = updatedQueryParams
-      route.push(URL_HREF, { pathname, query }, { shallow: true })
+      route.push(pathname, { pathname, query }, { shallow: true })
       return
     }
 
     let updatedQueryParams = { ...queryToPush, filters: filters }
     setQueryToPush(updatedQueryParams)
     let query = updatedQueryParams
-    route.push(URL_HREF, { pathname, query }, { shallow: true })
+    route.push(pathname, { pathname, query }, { shallow: true })
   }
 
   const availableAnswers = searchResults

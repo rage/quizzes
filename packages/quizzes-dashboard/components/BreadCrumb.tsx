@@ -54,8 +54,8 @@ const BreadCrumb = () => {
     <StyledBreadcrumbs separator=">">
       {breadCrumbs.map(crumb => (
         <div key={crumb.label}>
-          {crumb.as && crumb.href ? (
-            <Link href={crumb.href} as={crumb.as}>
+          {crumb.as ? (
+            <Link href={crumb.as}>
               <BreadCrumbLink>{crumb.label}</BreadCrumbLink>
             </Link>
           ) : (

@@ -33,11 +33,10 @@ const StyledCard = styled(Card)`
 
 export const OverView = ({ quiz, course, userAbilities }: IQuizTabProps) => {
   useBreadcrumbs([
-    { label: "Courses", as: "/", href: "/" },
+    { label: "Courses", as: "/" },
     {
       label: `${course ? course.title : ""}`,
       as: `/courses/${quiz?.courseId}/listing`,
-      href: "/courses/[courseId]/[...page]",
     },
     {
       label: `${quiz ? quiz.title : ""}`,

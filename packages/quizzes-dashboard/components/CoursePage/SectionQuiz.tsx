@@ -60,13 +60,7 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
   const title = quiz.title
   const types = Array.from(new Set(quiz.items.map(item => item.type)))
   return (
-    <Link
-      href={{
-        pathname: "/quizzes/[quizId]/[...page]",
-        query: { quizId: `${quiz.id}`, page: "overview" },
-      }}
-      as={`/quizzes/${quiz.id}/overview`}
-    >
+    <Link href={`/quizzes/${quiz.id}/overview`}>
       <QuizLink>
         <QuizCard>
           <CardContent>
@@ -83,30 +77,14 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
                   invisible={requiringAttention === undefined}
                 >
                   <Link
-                    href={{
-                      pathname: "/quizzes/[quizId]/[...page]",
-                      query: {
-                        quizId: `${quiz.id}`,
-                        page: "answers-requiring-attention",
-                      },
-                    }}
-                    as={`/quizzes/${quiz.id}/answers-requiring-attention`}
+                    href={`/quizzes/${quiz.id}/answers-requiring-attention`}
                   >
                     <Button variant="outlined">
                       <Typography>Answers requiring attention</Typography>
                     </Button>
                   </Link>
                 </Badge>
-                <Link
-                  href={{
-                    pathname: "/quizzes/[quizId]/[...page]",
-                    query: {
-                      quizId: `${quiz.id}`,
-                      page: "edit",
-                    },
-                  }}
-                  as={`/quizzes/${quiz.id}/edit`}
-                >
+                <Link href={`/quizzes/${quiz.id}/edit`}>
                   <Button variant="outlined">
                     <Typography>Edit quiz</Typography>
                   </Button>
