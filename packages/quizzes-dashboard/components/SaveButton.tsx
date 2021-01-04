@@ -15,9 +15,16 @@ import {
 } from "../store/editor/editorActions"
 import { useTypedSelector, storeState } from "../store/store"
 import { denormalize, normalize } from "normalizr"
-import { normalizedQuiz } from "../schemas"
-import { Quiz } from "../types/Quiz"
 import styled from "styled-components"
+import { normalizedQuiz } from "../schemas"
+import {
+  TEditorItem,
+  TEditorPeerReviewCollection,
+  TEditorOption,
+  TEditorQuestion,
+  TEditorQuiz,
+  Quiz,
+} from "../types/Quiz"
 
 const StyledFab = styled(Fab)`
   display: flex !important;
@@ -69,17 +76,14 @@ const SaveButton = () => {
 
     const quiz: Quiz = denormalize(quizData.quizId, normalizedQuiz, quizData)
     for (let item of quiz.items) {
-      if (
-        item.id &&
-        store.editor.itemVariables[item.id].newOptions.length > 0
-      ) {
+      if (store.editor.itemVariables[item.id].newOptions.length > 0) {
         for (let option of item.options) {
           if (
-            store.editor.itemVariables[item.id]?.newOptions.some(
+            store.editor.itemVariables[item.id].newOptions.some(
               id => id === option.id,
             )
           ) {
-            delete option.id
+            delete (option as TEditorOption).id
             if (
               store.editor.quizVariables[store.editor.quizId].newItems.some(
                 id => id === item.id,
@@ -95,7 +99,7 @@ const SaveButton = () => {
           id => id === item.id,
         )
       ) {
-        delete item.id
+        delete (item as TEditorItem).id
       }
     }
     for (let peerReviewCollection of quiz.peerReviewCollections) {
@@ -110,7 +114,7 @@ const SaveButton = () => {
               peerReviewCollection.id
             ].newQuestions.some(id => id === question.id)
           ) {
-            delete question.id
+            delete (question as TEditorQuestion).id
             if (
               store.editor.quizVariables[
                 store.editor.quizId
@@ -126,11 +130,11 @@ const SaveButton = () => {
           id => id === peerReviewCollection.id,
         )
       ) {
-        delete peerReviewCollection.id
+        delete (peerReviewCollection as TEditorPeerReviewCollection).id
       }
     }
     if (store.editor.quizVariables[store.editor.quizId].newQuiz) {
-      delete quiz.id
+      delete (quiz as TEditorQuiz).id
     }
     const response = await saveQuiz(quiz)
 
