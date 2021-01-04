@@ -1,5 +1,5 @@
 export interface Quiz {
-  id?: string
+  id: string
   courseId: string
   part: number
   section: number
@@ -23,7 +23,7 @@ export interface Quiz {
 }
 
 export interface Item {
-  id?: string
+  id: string
   quizId: string
   type: string
   order: number
@@ -48,7 +48,7 @@ export interface Item {
 }
 
 export interface Option {
-  id?: string
+  id: string
   quizItemId?: string
   order: number
   correct: boolean
@@ -61,7 +61,7 @@ export interface Option {
 }
 
 export interface PeerReviewCollection {
-  id?: string
+  id: string
   quizId: string
   createdAt: Date
   updatedAt: Date
@@ -71,7 +71,7 @@ export interface PeerReviewCollection {
 }
 
 export interface Question {
-  id?: string
+  id: string
   quizId: string
   peerReviewCollectionId?: string
   default: boolean
@@ -126,3 +126,9 @@ export interface Language {
   name: string
   updatedAt: Date
 }
+
+export type TEditorQuiz = Optional<Quiz, "id">
+export type TEditorPeerReviewCollection = Optional<PeerReviewCollection, "id">
+export type TEditorOption = Optional<Option, "id">
+export type TEditorItem = Optional<Item, "id">
+export type TEditorQuestion = Optional<Question, "id">
