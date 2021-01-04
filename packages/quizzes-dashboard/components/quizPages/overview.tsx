@@ -48,13 +48,13 @@ export const OverView = ({ quiz, course, userAbilities }: IQuizTabProps) => {
     <>
       <TabText text={quiz.title} />
       <QuizTitle quiz={quiz} />
-      <StyledCard>
-        {quiz.body && (
+      {quiz.body && (
+        <StyledCard>
           <DescriptionContainer>
             <Typography>{quiz.body}</Typography>
           </DescriptionContainer>
-        )}
-      </StyledCard>
+        </StyledCard>
+      )}
       <StyledCard>
         <Typography variant="h3">Quiz answer by status</Typography>
         <AnswerStatistics />
