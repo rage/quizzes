@@ -41,11 +41,11 @@
     "redux": "^4.0.5",
     "redux-thunk": "^2.3.0",
     "styled-components": "^4.4.1",
-    "swr": "^0.2.3",
+    "swr": "^0.3.11",
     "timezone-support": "^2.0.2",
     "tmc-client-js": "0.0.9",
     "typesafe-actions": "^5.1.0",
-    "uuid": "^8.2.0",
+    "uuid": "^8.3.2",
     "yup": "^0.32.8"
   },
   "devDependencies": {
