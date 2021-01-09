@@ -17,7 +17,7 @@ import Peerreviews from "./Peerreviews"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWindowClose } from "@fortawesome/free-solid-svg-icons"
 import DebugDialog from "../../DebugDialog"
-import { editableAnswerStates } from "../constants"
+import { editableAnswerStates } from "../../constants"
 import { useAnswerListState } from "../../../contexts/AnswerListContext"
 
 export const ContentContainer = styled.div`

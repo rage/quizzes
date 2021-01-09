@@ -1,11 +1,14 @@
 import useSWR from "swr"
-import { getAllAnswersMatchingQuery } from "../services/quizzes"
+import {
+  getAllAnswersMatchingQuery,
+  getAnswersRequiringAttentionMatchingQuery,
+} from "../services/quizzes"
 
 const isEmpty = (str: string) => {
   return !str || 0 === str.length
 }
 
-const fetcher = (
+const fetchAll = (
   quizId: string,
   answersDisplayed: number,
   sortOrder: string,
@@ -20,12 +23,25 @@ const fetcher = (
     searchQuery,
   )
 
-export const useSearchResults = (
+const fetchRequiringAttention = (
   quizId: string,
   answersDisplayed: number,
   sortOrder: string,
-  filterParameters: string[],
   searchQuery: string,
+) =>
+  getAnswersRequiringAttentionMatchingQuery(
+    quizId,
+    answersDisplayed,
+    sortOrder,
+    searchQuery,
+  )
+
+export const useSearchResultsAllAnswers = (
+  quizId: string,
+  answersDisplayed: number,
+  sortOrder: string,
+  searchQuery: string,
+  filterParameters: string[],
   token: string,
 ) => {
   const searchQueryProvided = !isEmpty(searchQuery)
@@ -41,7 +57,30 @@ export const useSearchResults = (
           token,
         ]
       : null,
-    fetcher,
+    fetchAll,
+  )
+
+  return {
+    searchResults: data,
+    searchResultsLoading: searchQueryProvided && !error && data === undefined,
+    searchResultsError: error,
+  }
+}
+
+export const useSearchResultsRequiringAttention = (
+  quizId: string,
+  answersDisplayed: number,
+  sortOrder: string,
+  searchQuery: string,
+  token: string,
+) => {
+  const searchQueryProvided = !isEmpty(searchQuery)
+
+  const { data, error } = useSWR(
+    searchQuery
+      ? [quizId, answersDisplayed, sortOrder, searchQuery, token]
+      : null,
+    fetchRequiringAttention,
   )
 
   return {

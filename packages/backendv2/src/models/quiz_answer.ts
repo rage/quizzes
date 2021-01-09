@@ -238,7 +238,6 @@ class QuizAnswer extends BaseModel {
     let paginated
     const filtersProvided = filters.length > 0
 
-    // no filter, no search
     if (!filtersProvided) {
       paginated = await this.query()
         .where("quiz_answer.quiz_id", quizId)
