@@ -4,6 +4,7 @@ import styled from "styled-components"
 
 interface IFormProps {
   handleSubmit: (searchQuery: string) => Promise<void>
+  searchResultCount?: number
   fetchingAnswers?: boolean
 }
 
@@ -13,6 +14,13 @@ const FormWrapper = styled.form`
   justify-content: center;
   align-items: center;
   width: 100%;
+`
+
+const ResultsInfoContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: left;
+  margin-bottom: 2rem;
 `
 
 const FormElementContainer = styled.div`
@@ -38,7 +46,7 @@ const AnswerSearchForm = (props: IFormProps) => {
   const [displayingResultsFor, setDisplayingResultsFor] = useState<
     null | string
   >(null)
-  const { handleSubmit } = props
+  const { handleSubmit, searchResultCount } = props
 
   const handleSearchClearance = () => {
     handleSubmit("")
@@ -80,9 +88,17 @@ const AnswerSearchForm = (props: IFormProps) => {
         </FormElementContainer>
       </FormWrapper>
       {displayingResultsFor && (
-        <Typography variant="h2" style={{ margin: "3rem 0" }}>
-          Displaying results for: "{displayingResultsFor}"
-        </Typography>
+        <ResultsInfoContainer>
+          <Typography variant="h2" style={{ margin: "3rem 0" }}>
+            Displaying results for: "<em>{displayingResultsFor}</em>"
+          </Typography>
+          {searchResultCount ? (
+            <Typography variant="h3">
+              There were a total of <strong>{searchResultCount}</strong>{" "}
+              matches.
+            </Typography>
+          ) : null}
+        </ResultsInfoContainer>
       )}
     </>
   )
