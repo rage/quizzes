@@ -89,15 +89,12 @@ const AnswerSearchForm = (props: IFormProps) => {
       </FormWrapper>
       {displayingResultsFor && (
         <ResultsInfoContainer>
-          <Typography variant="h2" style={{ margin: "3rem 0" }}>
-            Displaying results for: "<em>{displayingResultsFor}</em>"
-          </Typography>
-          {searchResultCount ? (
-            <Typography variant="h3">
-              There were a total of <strong>{searchResultCount}</strong>{" "}
-              matches.
+          <>
+            <Typography variant="h2" style={{ margin: "3rem 0" }}>
+              Results for: " <em>{displayingResultsFor}</em> "
+              {searchResultCount ? ` Matches: (${searchResultCount})` : null}
             </Typography>
-          ) : null}
+          </>
         </ResultsInfoContainer>
       )}
     </>

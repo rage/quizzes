@@ -19,7 +19,7 @@ import { useCourse } from "../../hooks/useCourse"
 import { useUserAbilities } from "../../hooks/useUserAbilities"
 import { TabTextError, TabTextLoading } from "../quizPages/TabHeaders"
 import SkeletonLoader from "../Shared/SkeletonLoader"
-import { useRequiringAttentionCount } from "../../hooks/useRequiringAttention"
+import { useAnswersRequiringAttentionCount } from "../../hooks/useAnswersRequiringAttention"
 
 export const TabNavigator = () => {
   const router = useRouter()
@@ -42,7 +42,7 @@ export const TabNavigator = () => {
     requiringAttention,
     requiringAttentionLoading,
     requiringAttentionError,
-  } = useRequiringAttentionCount(quizId, "requiring-attention")
+  } = useAnswersRequiringAttentionCount(quizId, "requiring-attention")
 
   const [currentTab, setCurrentTab] = useState("overview")
 
