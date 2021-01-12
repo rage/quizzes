@@ -54,6 +54,12 @@ const AnswerSearchForm = (props: IFormProps) => {
     setDisplayingResultsFor(null)
   }
 
+  const displayMatchCount = (
+    <span>
+      Matches: <strong>{searchResultCount}</strong>
+    </span>
+  )
+
   return (
     <>
       <FormWrapper
@@ -92,7 +98,8 @@ const AnswerSearchForm = (props: IFormProps) => {
           <>
             <Typography variant="h2" style={{ margin: "3rem 0" }}>
               Results for: " <em>{displayingResultsFor}</em> "
-              {searchResultCount ? ` Matches: (${searchResultCount})` : null}
+              <br />
+              {searchResultCount ? displayMatchCount : null}
             </Typography>
           </>
         </ResultsInfoContainer>
