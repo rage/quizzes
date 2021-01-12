@@ -4,7 +4,7 @@ export class CreateTableUserCourseRole1566807284426
   implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<any> {
     await queryRunner.query(
-      "CREATE TYPE role_enum AS ENUM ('teacher', 'assistant', 'reviewer');",
+      "CREATE TYPE role_enum AS ENUM ('teacher', 'assistant');",
     )
 
     await queryRunner.query(
