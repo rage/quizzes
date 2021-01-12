@@ -1,4 +1,6 @@
+import { getFormattedIsoDate } from "./../../util/tools"
 import Router from "koa-router"
+import crypto from "crypto"
 import { CustomContext, CustomState } from "../../types"
 import {
   Course,
@@ -21,6 +23,7 @@ import _ from "lodash"
 import UserCoursePartState from "../../models/user_course_part_state"
 import knex from "../../../database/knex"
 import { BadRequestError } from "../../util/error"
+import redis from "../../../config/redis"
 
 const dashboard = new Router<CustomState, CustomContext>({
   prefix: "/dashboard",
@@ -231,17 +234,7 @@ const dashboard = new Router<CustomState, CustomContext>({
     const quizId = ctx.params.quizId
     const quizName = ctx.request.body.quizName
     const courseName = ctx.request.body.courseName
-    const current_datetime = new Date()
-    const isoDate =
-      current_datetime.getDate() +
-      "-" +
-      (current_datetime.getMonth() + 1) +
-      "-" +
-      current_datetime.getFullYear() +
-      "-" +
-      current_datetime.getHours() +
-      "-" +
-      current_datetime.getMinutes()
+    const isoDate = getFormattedIsoDate()
 
     const course = await Course.getByTitle(courseName)
 
@@ -262,17 +255,7 @@ const dashboard = new Router<CustomState, CustomContext>({
       const quizId = ctx.params.quizId
       const quizName = ctx.request.body.quizName
       const courseName = ctx.request.body.courseName
-      const current_datetime = new Date()
-      const isoDate =
-        current_datetime.getDate() +
-        "-" +
-        (current_datetime.getMonth() + 1) +
-        "-" +
-        current_datetime.getFullYear() +
-        "-" +
-        current_datetime.getHours() +
-        "-" +
-        current_datetime.getMinutes()
+      const isoDate = getFormattedIsoDate()
 
       const course = await Course.getByTitle(courseName)
 
@@ -291,17 +274,7 @@ const dashboard = new Router<CustomState, CustomContext>({
     const quizId = ctx.params.quizId
     const quizName = ctx.request.body.quizName
     const courseName = ctx.request.body.courseName
-    const current_datetime = new Date()
-    const isoDate =
-      current_datetime.getDate() +
-      "-" +
-      (current_datetime.getMonth() + 1) +
-      "-" +
-      current_datetime.getFullYear() +
-      "-" +
-      current_datetime.getHours() +
-      "-" +
-      current_datetime.getMinutes()
+    const isoDate = getFormattedIsoDate()
 
     const course = await Course.getByTitle(courseName)
 
