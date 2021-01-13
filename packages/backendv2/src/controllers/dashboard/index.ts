@@ -1,6 +1,5 @@
 import { getFormattedIsoDate } from "./../../util/tools"
 import Router from "koa-router"
-import crypto from "crypto"
 import { CustomContext, CustomState } from "../../types"
 import {
   Course,
@@ -17,6 +16,7 @@ import {
   getCourseIdByAnswerId,
   getCourseIdByQuizId,
   getAccessibleCourses,
+  getDownloadTokenFromRedis,
 } from "./util"
 import * as Kafka from "../../services/kafka"
 import _ from "lodash"
@@ -240,21 +240,7 @@ const dashboard = new Router<CustomState, CustomContext>({
     await checkAccessOrThrow(ctx.state.user, course.id, "download")
 
     // attempt retrieval of download token from cache
-    let downloadToken = ""
-
-    if (redis && redis.get) {
-      const cachedToken = JSON.parse((await redis.get(username)) as string)
-      if (cachedToken) {
-        downloadToken = cachedToken
-      } else if (redis.setex) {
-        // generate token for authorised user
-        const randomToken = JSON.stringify(
-          crypto.randomBytes(100).toString("hex"),
-        )
-        await redis.setex(username, 600, randomToken)
-        downloadToken = randomToken
-      }
-    }
+    let downloadToken = getDownloadTokenFromRedis(redis, username)
 
     // since permission checked and token ready, return download url & token
     if (downloadToken) {

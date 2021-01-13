@@ -1,3 +1,4 @@
+import crypto from "crypto"
 import { NotFoundError } from "./../../util/error"
 import knex from "../../../database/knex"
 import { UserCourseRole, Course } from "../../models"
@@ -76,4 +77,26 @@ export const getCourseIdByQuizId = async (quizId: string) => {
       .select("course_id")
       .where("quiz.id", quizId)
   )[0].course_id
+}
+
+export const getDownloadTokenFromRedis = async (
+  redis: any,
+  username: string,
+): Promise<string> => {
+  let downloadToken = ""
+  if (redis && redis.get) {
+    const cachedToken = JSON.parse((await redis.get(username)) as string)
+    if (cachedToken) {
+      downloadToken = cachedToken
+    } else if (redis.setex) {
+      // generate token for authorised user
+      const randomToken = JSON.stringify(
+        crypto.randomBytes(100).toString("hex"),
+      )
+      await redis.setex(username, 600, randomToken)
+      downloadToken = randomToken
+    }
+  }
+  // will return empty string if no redis
+  return downloadToken
 }
