@@ -2,6 +2,7 @@ import React, { useState } from "react"
 import styled from "styled-components"
 import Button from "@material-ui/core/Button"
 import { downloadQuizInfo } from "../../services/quizzes"
+import { HOST, createAndSubmitDownloadForm } from "./util"
 
 const SubmitButton = styled(Button)`
   display: flex !important;
@@ -25,27 +26,25 @@ export const QuizInfoForm = ({
   quizName,
   courseName,
 }: QuizInfoFormProps) => {
-  const [downloading, setDownloading] = useState(false)
   const handleQuizInfoDownload = async (
     e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault()
-    setDownloading(true)
     const res = await downloadQuizInfo(quizId, quizName, courseName)
-    setDownloading(false)
-    const blob = new Blob([res.data], { type: res.headers["content-type"] })
-    const link = document.createElement("a")
-    link.href = window.URL.createObjectURL(blob)
-    link.download = `quiz-info-${quizName}-${courseName}-${new Date()
-      .toLocaleString()
-      .replace(/[ , _]/g, "-")}`
-    link.click()
+    const { downloadUrl, username } = res.data
+    const completeDownloadUrl = HOST + downloadUrl
+    createAndSubmitDownloadForm(
+      username,
+      completeDownloadUrl,
+      quizName,
+      courseName,
+    )
   }
 
   return (
     <StyledForm onSubmit={handleQuizInfoDownload}>
-      <SubmitButton type="submit" variant="outlined" disabled={downloading}>
-        {downloading ? "Downloading" : "Download quiz info"}
+      <SubmitButton type="submit" variant="outlined">
+        Download quiz info
       </SubmitButton>
     </StyledForm>
   )

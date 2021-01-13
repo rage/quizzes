@@ -232,20 +232,60 @@ const dashboard = new Router<CustomState, CustomContext>({
 
   .post("/quizzes/:quizId/download-quiz-info", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
-    const quizName = ctx.request.body.quizName
     const courseName = ctx.request.body.courseName
-    const isoDate = getFormattedIsoDate()
-
+    const username = ctx.state.user.username
     const course = await Course.getByTitle(courseName)
 
+    // check permissions
     await checkAccessOrThrow(ctx.state.user, course.id, "download")
 
-    const stream = await Quiz.getQuizInfo(quizId)
-    ctx.response.set("Content-Type", "text/csv")
-    ctx.response.attachment(
-      `quiz-info-${quizName}-${courseName}-${isoDate}.csv`,
-    )
-    ctx.body = stream
+    // attempt retrieval of download token from cache
+    let downloadToken = ""
+
+    if (redis && redis.get) {
+      const cachedToken = JSON.parse((await redis.get(username)) as string)
+      if (cachedToken) {
+        downloadToken = cachedToken
+      } else if (redis.setex) {
+        // generate token for authorised user
+        const randomToken = JSON.stringify(
+          crypto.randomBytes(100).toString("hex"),
+        )
+        await redis.setex(username, 600, randomToken)
+        downloadToken = randomToken
+      }
+    }
+
+    // since permission checked and token ready, return download url & token
+    if (downloadToken) {
+      ctx.body = {
+        downloadUrl: `/api/v2/dashboard/quizzes/download/download-quiz-info/${quizId}?&downloadToken=${downloadToken}`,
+        username,
+      }
+    } else {
+      throw new BadRequestError("Failed to generate download token.")
+    }
+  })
+
+  .post("/quizzes/download/download-quiz-info/:quizId", async ctx => {
+    const { downloadToken } = ctx.query
+    const { quizId } = ctx.params
+    const isoDate = getFormattedIsoDate()
+
+    const { username, quizName, courseName } = ctx.request.body
+
+    // validate token
+    if (downloadToken && redis && redis.get) {
+      const cachedToken = JSON.parse((await redis.get(username)) as string)
+      if (cachedToken) {
+        const stream = await Quiz.getQuizInfo(quizId)
+        ctx.response.set("Content-Type", "text/csv")
+        ctx.response.attachment(
+          `quiz-info-${quizName}-${courseName}-${isoDate}.csv`,
+        )
+        ctx.body = stream
+      }
+    }
   })
 
   .post(

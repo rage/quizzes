@@ -1,6 +1,7 @@
 import dotenv from "dotenv"
 import redis from "redis"
 
+// promise support to node-redis v4 onward: https://github.com/NodeRedis/node-redis
 import { promisify } from "util"
 
 if (process.env.NODE_ENV !== "production") {
@@ -9,7 +10,7 @@ if (process.env.NODE_ENV !== "production") {
 
 let client = null
 
-/* Create client if variables available */
+// Create client if variables available
 if (process.env.REDIS_HOST && process.env.REDIS_PORT) {
   client = redis.createClient({
     host: process.env.REDIS_HOST,
@@ -27,9 +28,9 @@ if (process.env.REDIS_HOST && process.env.REDIS_PORT) {
   })
 }
 
-let get = client ? promisify(client.get).bind(client) : null
-let set = client ? promisify(client.get).bind(client) : null
-let setex = client ? promisify(client.setex).bind(client) : null
+const get = client ? promisify(client.get).bind(client) : null
+const set = client ? promisify(client.get).bind(client) : null
+const setex = client ? promisify(client.setex).bind(client) : null
 
 export default {
   client,

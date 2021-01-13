@@ -26,14 +26,12 @@ export const accessControl = (options?: AccessControlOptions) => {
       throw new BadRequestError("No Authorization header provided.")
     }
 
-    const redisIsAvailable = redis !== null
-
     const token: string =
       ctx.headers.authorization.toLocaleLowerCase().replace("bearer ", "") || ""
 
     // attempt retrieval of user from cache
     let user = null
-    if (redisIsAvailable && redis.get) {
+    if (redis && redis.get) {
       user = JSON.parse((await redis.get(token)) as string)
     }
 
@@ -42,8 +40,8 @@ export const accessControl = (options?: AccessControlOptions) => {
       try {
         // fetch user from TMC server and cache details
         user = await getCurrentUserDetails(token)
-        if (redisIsAvailable && redis.setex) {
-          redis.setex(token, 3600, JSON.stringify(user))
+        if (redis && redis.setex) {
+          await redis.setex(token, 3600, JSON.stringify(user))
         }
       } catch (error) {
         throw new UnauthorizedError("unauthorized")
