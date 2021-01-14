@@ -2,6 +2,8 @@ import Quiz from "./quiz"
 import QuizOption from "./quiz_option"
 import QuizItemTranslation from "./quiz_item_translation"
 import BaseModel from "./base_model"
+import { mixin } from "objection"
+import softDelete from "objection-soft-delete"
 
 export type QuizItemType =
   | "open"
@@ -15,7 +17,9 @@ export type QuizItemType =
   | "multiple-choice-dropdown"
   | "clickable-multiple-choice"
 
-class QuizItem extends BaseModel {
+class QuizItem extends mixin(BaseModel, [
+  softDelete({ columnName: "deleted" }),
+]) {
   id!: string
   type!: QuizItemType
   validityRegex!: string

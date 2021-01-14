@@ -1,8 +1,11 @@
 import BaseModel from "./base_model"
 import QuizItem from "./quiz_item"
 import QuizOptionTranslation from "./quiz_option_translation"
-
-class QuizOption extends BaseModel {
+import { mixin } from "objection"
+import softDelete from "objection-soft-delete"
+class QuizOption extends mixin(BaseModel, [
+  softDelete({ columnName: "deleted" }),
+]) {
   id!: string
   correct!: boolean
   texts!: QuizOptionTranslation[]

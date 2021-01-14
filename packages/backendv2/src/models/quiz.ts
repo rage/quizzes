@@ -234,6 +234,12 @@ export class Quiz extends BaseModel {
       await this.query()
         .withGraphJoined("texts")
         .withGraphJoined("items.[texts, options.[texts]]")
+        .modifyGraph("items.[options]", option => {
+          option.where("deleted", false)
+        })
+        .modifyGraph("items", item => {
+          item.where("deleted", false)
+        })
         .withGraphJoined("peerReviewCollections.[texts, questions.[texts]]")
         .modifyGraph("peerReviewCollections.[questions]", question => {
           question.where("deleted", false)
