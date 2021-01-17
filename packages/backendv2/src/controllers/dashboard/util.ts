@@ -1,9 +1,11 @@
+import IORedis, { Redis } from "ioredis"
 import crypto from "crypto"
 import { NotFoundError } from "./../../util/error"
 import knex from "../../../database/knex"
 import { UserCourseRole, Course } from "../../models"
 import { UserInfo } from "../../types"
 import { ForbiddenError } from "../../util/error"
+import redis from "../../../config/redis"
 
 export const checkAccessOrThrow = async (
   userInfo: UserInfo,
@@ -80,20 +82,21 @@ export const getCourseIdByQuizId = async (quizId: string) => {
 }
 
 export const getDownloadTokenFromRedis = async (
-  redis: any,
   username: string,
 ): Promise<string> => {
   let downloadToken = ""
-  if (redis && redis.get) {
-    const cachedToken = JSON.parse((await redis.get(username)) as string)
+  if (redis.client) {
+    console.log("client available")
+    const cachedToken = JSON.parse((await redis.client.get(username)) as string)
+    console.log("💩 ~ file: util.ts ~ line 90 ~ cachedToken", cachedToken)
     if (cachedToken) {
       downloadToken = cachedToken
-    } else if (redis.setex) {
+    } else {
       // generate token for authorised user
       const randomToken = JSON.stringify(
         crypto.randomBytes(100).toString("hex"),
       )
-      await redis.setex(username, 600, randomToken)
+      await redis.client.set(username, randomToken, "EX", 600)
       downloadToken = randomToken
     }
   }

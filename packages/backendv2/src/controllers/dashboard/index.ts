@@ -239,7 +239,7 @@ const dashboard = new Router<CustomState, CustomContext>({
     await checkAccessOrThrow(ctx.state.user, courseId, "download")
 
     // attempt retrieval of download token from cache
-    const downloadToken = getDownloadTokenFromRedis(redis, username)
+    const downloadToken = await getDownloadTokenFromRedis(username)
 
     if (downloadToken) {
       // since permission checked and token ready, return download url & token
@@ -260,8 +260,10 @@ const dashboard = new Router<CustomState, CustomContext>({
     const { username, quizName, courseName } = ctx.request.body
 
     // validate token
-    if (downloadToken && redis && redis.get) {
-      const cachedToken = JSON.parse((await redis.get(username)) as string)
+    if (downloadToken && redis.client) {
+      const cachedToken = JSON.parse(
+        (await redis.client.get(username)) as string,
+      )
       if (cachedToken) {
         const stream = await Quiz.getQuizInfo(quizId)
         ctx.response.set("Content-Type", "text/csv")
@@ -285,7 +287,7 @@ const dashboard = new Router<CustomState, CustomContext>({
       await checkAccessOrThrow(ctx.state.user, courseId, "download")
 
       // attempt retrieval of download token from cache
-      const downloadToken = getDownloadTokenFromRedis(redis, username)
+      const downloadToken = await getDownloadTokenFromRedis(username)
 
       if (downloadToken) {
         // since permission checked and token ready, return download url & token
@@ -307,8 +309,10 @@ const dashboard = new Router<CustomState, CustomContext>({
     const { username, quizName, courseName } = ctx.request.body
 
     // validate token
-    if (downloadToken && redis && redis.get) {
-      const cachedToken = JSON.parse((await redis.get(username)) as string)
+    if (downloadToken && redis.client && username) {
+      const cachedToken = JSON.parse(
+        (await redis.client.get(username)) as string,
+      )
       if (cachedToken) {
         const stream = await Quiz.getQuizInfo(quizId)
         ctx.response.set("Content-Type", "text/csv")
@@ -325,11 +329,15 @@ const dashboard = new Router<CustomState, CustomContext>({
     const { courseId } = ctx.request.body
     const username = ctx.state.user.username
 
+    if (!username) {
+      throw new BadRequestError("No username provided.")
+    }
+
     // check permissions
     await checkAccessOrThrow(ctx.state.user, courseId, "download")
 
     // attempt retrieval of download token from cache
-    const downloadToken = getDownloadTokenFromRedis(redis, username)
+    const downloadToken = await getDownloadTokenFromRedis(username)
 
     if (downloadToken) {
       // since permission checked and token ready, return download url & token
@@ -350,8 +358,10 @@ const dashboard = new Router<CustomState, CustomContext>({
     const { username, quizName, courseName } = ctx.request.body
 
     // validate token
-    if (downloadToken && redis && redis.get) {
-      const cachedToken = JSON.parse((await redis.get(username)) as string)
+    if (downloadToken && redis.client) {
+      const cachedToken = JSON.parse(
+        (await redis.client.get(username)) as string,
+      )
       if (cachedToken) {
         const stream = await Quiz.getQuizInfo(quizId)
         ctx.response.set("Content-Type", "text/csv")

@@ -31,8 +31,8 @@ export const accessControl = (options?: AccessControlOptions) => {
 
     // attempt retrieval of user from cache
     let user = null
-    if (redis && redis.get) {
-      user = JSON.parse((await redis.get(token)) as string)
+    if (redis.client) {
+      user = JSON.parse((await redis.client.get(token)) as string)
     }
 
     // catches null and undefined
@@ -40,8 +40,8 @@ export const accessControl = (options?: AccessControlOptions) => {
       try {
         // fetch user from TMC server and cache details
         user = await getCurrentUserDetails(token)
-        if (redis && redis.setex) {
-          await redis.setex(token, 3600, JSON.stringify(user))
+        if (redis.client) {
+          await redis.client.set(token, JSON.stringify(user), "EX", 3600)
         }
       } catch (error) {
         throw new UnauthorizedError("unauthorized")
