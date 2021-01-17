@@ -97,6 +97,6 @@ export const getDownloadTokenFromRedis = async (
       downloadToken = randomToken
     }
   }
-  // will return empty string if no redis
+  // will return empty string if redis unavailable
   return downloadToken
 }

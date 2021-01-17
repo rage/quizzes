@@ -2,6 +2,7 @@ export const createAndSubmitDownloadForm = (
   username: string,
   url: string,
   quizName: string,
+  courseId: string,
   courseName: string,
 ) => {
   const f = document.createElement("form")
@@ -19,6 +20,12 @@ export const createAndSubmitDownloadForm = (
   quizNameInput.name = "quizName"
   quizNameInput.value = quizName
   f.appendChild(quizNameInput)
+
+  const courseIdInput = document.createElement("input")
+  courseIdInput.type = "hidden"
+  courseIdInput.name = "courseId"
+  courseIdInput.value = courseId
+  f.appendChild(courseIdInput)
 
   const courseNameInput = document.createElement("input")
   courseNameInput.type = "hidden"

@@ -1,7 +1,7 @@
 import React from "react"
 import styled from "styled-components"
 import { QuizInfoForm } from "./QuizInfoForm"
-import PeerreviewInfoForm from "./PeerreviewInfoForm"
+import PeerReviewInfoForm from "./PRInfoForm"
 import AnswerInfoForm from "./AnswerInfoForm"
 import { Quiz, Course } from "../../types/Quiz"
 
@@ -21,20 +21,16 @@ export const DownloadInfoForms = ({ quiz, course }: DownloadInfoFormProps) => {
   return (
     <>
       <FormContainer>
-        <QuizInfoForm
+        <QuizInfoForm quizId={quiz.id} quizName={quiz.title} course={course} />
+        <PeerReviewInfoForm
           quizId={quiz.id}
           quizName={quiz.title}
-          courseName={course.title}
-        />
-        <PeerreviewInfoForm
-          quizId={quiz.id}
-          quizName={quiz.title}
-          courseName={course.title}
+          course={course}
         />
         <AnswerInfoForm
           quizId={quiz.id}
           quizName={quiz.title}
-          courseName={course.title}
+          course={course}
         />
       </FormContainer>
     </>

@@ -1,7 +1,7 @@
 import React from "react"
-import { Button } from "@material-ui/core"
 import styled from "styled-components"
-import { downloadAnswerInfo } from "../../services/quizzes"
+import Button from "@material-ui/core/Button"
+import { downloadPeerReviewInfo } from "../../services/quizzes"
 import { createAndSubmitDownloadForm, HOST } from "./util"
 import { Course } from "../../types/Quiz"
 
@@ -16,23 +16,23 @@ const StyledForm = styled.form`
   width: 30% !important;
 `
 
-interface AnswerInfoFormProps {
+interface PeerReviewInfoFormProps {
   quizId: string
   quizName: string
   course: Course
 }
 
-export const AnswerInfoForm = ({
+export const PeerReviewInfoForm = ({
   quizId,
   quizName,
   course,
-}: AnswerInfoFormProps) => {
-  const handleAnswerInfoDownload = async (
+}: PeerReviewInfoFormProps) => {
+  const handlePeerReviewInfoDownload = async (
     e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault()
     const { id: courseId, title: courseName } = course
-    const res = await downloadAnswerInfo(quizId, quizName, courseId)
+    const res = await downloadPeerReviewInfo(quizId, quizName, courseId)
     const { downloadUrl, username } = res.data
     const completeDownloadUrl = HOST + downloadUrl
     createAndSubmitDownloadForm(
@@ -43,13 +43,14 @@ export const AnswerInfoForm = ({
       courseName,
     )
   }
+
   return (
-    <StyledForm onSubmit={handleAnswerInfoDownload}>
+    <StyledForm onSubmit={handlePeerReviewInfoDownload}>
       <SubmitButton type="submit" variant="outlined">
-        Download answer info
+        Download peer review info
       </SubmitButton>
     </StyledForm>
   )
 }
 
-export default AnswerInfoForm
+export default PeerReviewInfoForm
