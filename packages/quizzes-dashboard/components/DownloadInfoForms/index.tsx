@@ -1,7 +1,7 @@
 import React from "react"
 import styled from "styled-components"
 import { QuizInfoForm } from "./QuizInfoForm"
-import PeerReviewInfoForm from "./PRInfoForm"
+import PeerReviewInfoForm from "./PeerReviewInfoForm"
 import AnswerInfoForm from "./AnswerInfoForm"
 import { Quiz, Course } from "../../types/Quiz"
 
