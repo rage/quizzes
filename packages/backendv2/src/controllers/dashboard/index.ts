@@ -278,20 +278,24 @@ const dashboard = new Router<CustomState, CustomContext>({
     accessControl(),
     async ctx => {
       const quizId = ctx.params.quizId
-      const quizName = ctx.request.body.quizName
-      const courseName = ctx.request.body.courseName
-      const isoDate = getFormattedIsoDate()
+      const { courseId } = ctx.request.body
+      const username = ctx.state.user.username
 
-      const course = await Course.getByTitle(courseName)
+      // check permissions
+      await checkAccessOrThrow(ctx.state.user, courseId, "download")
 
-      await checkAccessOrThrow(ctx.state.user, course.id, "download")
+      // attempt retrieval of download token from cache
+      const downloadToken = getDownloadTokenFromRedis(redis, username)
 
-      const stream = await Quiz.getPeerReviewInfo(quizId)
-      ctx.response.set("Content-Type", "text/csv")
-      ctx.response.attachment(
-        `quiz-peerreview-info-${quizName}-${courseName}-${isoDate}.csv`,
-      )
-      ctx.body = stream
+      if (downloadToken) {
+        // since permission checked and token ready, return download url & token
+        ctx.body = {
+          downloadUrl: `/api/v2/dashboard/quizzes/download/download-peerreview-info/${quizId}?&downloadToken=${downloadToken}`,
+          username,
+        }
+      } else {
+        throw new BadRequestError("Failed to generate download token.")
+      }
     },
   )
 

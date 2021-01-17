@@ -126,3 +126,9 @@ export interface Language {
   name: string
   updatedAt: Date
 }
+
+export interface DownloadFormProps {
+  quizId: string
+  quizName: string
+  course: Course
+}

@@ -1,32 +1,14 @@
 import React from "react"
-import styled from "styled-components"
-import Button from "@material-ui/core/Button"
 import { downloadPeerReviewInfo } from "../../services/quizzes"
+import { DownloadFormProps } from "../../types/Quiz"
 import { createAndSubmitDownloadForm, HOST } from "./util"
-import { Course } from "../../types/Quiz"
-
-const SubmitButton = styled(Button)`
-  display: flex !important;
-  background: #00e676 !important;
-`
-
-const StyledForm = styled.form`
-  display: flex !important;
-  justify-content: center;
-  width: 30% !important;
-`
-
-interface PeerReviewInfoFormProps {
-  quizId: string
-  quizName: string
-  course: Course
-}
+import { StyledForm, SubmitButton } from "./"
 
 export const PeerReviewInfoForm = ({
   quizId,
   quizName,
   course,
-}: PeerReviewInfoFormProps) => {
+}: DownloadFormProps) => {
   const handlePeerReviewInfoDownload = async (
     e: React.FormEvent<HTMLFormElement>,
   ) => {
