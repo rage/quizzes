@@ -33,11 +33,10 @@ const StyledCard = styled(Card)`
 
 export const OverView = ({ quiz, course, userAbilities }: IQuizTabProps) => {
   useBreadcrumbs([
-    { label: "Courses", as: "/", href: "/" },
+    { label: "Courses", as: "/" },
     {
       label: `${course ? course.title : ""}`,
       as: `/courses/${quiz?.courseId}/listing`,
-      href: "/courses/[courseId]/[...page]",
     },
     {
       label: `${quiz ? quiz.title : ""}`,
@@ -48,13 +47,13 @@ export const OverView = ({ quiz, course, userAbilities }: IQuizTabProps) => {
     <>
       <TabText text={quiz.title} />
       <QuizTitle quiz={quiz} />
-      <StyledCard>
-        {quiz.body && (
+      {quiz.body && (
+        <StyledCard>
           <DescriptionContainer>
             <MarkDownText text={quiz.body} />
           </DescriptionContainer>
-        )}
-      </StyledCard>
+        </StyledCard>
+      )}
       <StyledCard>
         <Typography variant="h3">Quiz answer by status</Typography>
         <AnswerStatistics />

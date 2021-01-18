@@ -85,14 +85,7 @@ const CourseList = ({ data, error }: CourseListProps) => {
         </OrderSelector>
       </OptionWrapper>
       {courses.map(course => (
-        <Link
-          key={course.id}
-          href={{
-            pathname: "/courses/[courseId]/[...page]",
-            query: { courseId: `${course.id}` },
-          }}
-          as={`/courses/${course.id}/listing`}
-        >
+        <Link key={course.id} href={`/courses/${course.id}/listing`}>
           <CourseLink>
             <StyledCard key={course.id}>
               <CardContent>{course.title || course.id}</CardContent>

@@ -1,6 +1,5 @@
 import { createAction } from "typesafe-actions"
 import { v4 } from "uuid"
-import { string } from "yup"
 
 export const editedPeerReviewQuestionTitle = createAction(
   "EDITED_PRQ_TITLE",

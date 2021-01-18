@@ -2,10 +2,10 @@ import React, { useEffect, useState } from "react"
 import { faChalkboard, faPen } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Tab, Tabs, Typography } from "@material-ui/core"
+import { useRouter } from "next/router"
 import { ITabToComponent } from "../CoursePage/types"
 import { CoursePage } from "../CoursePage"
 import EditCourseDetails from "../CoursePage/EditDetailsForm"
-import { useRouter } from "next/router"
 import { useUserAbilities } from "../../hooks/useUserAbilities"
 
 const CourseTabNavigator = () => {
@@ -13,7 +13,6 @@ const CourseTabNavigator = () => {
   const [currentTab, setCurrentTab] = useState("listing")
   const courseId = router.query.courseId?.toString() ?? ""
 
-  const URL_HREF = `/courses/[courseId]/[...page]`
   const pathname = `/courses/${courseId}`
 
   const {
@@ -53,8 +52,7 @@ const CourseTabNavigator = () => {
           value="listing"
           label={<Typography>Part Listing</Typography>}
           onClick={() => {
-            router.push(URL_HREF, `${pathname}/listing`)
-            setCurrentTab("listing")
+            router.push(`${pathname}/listing`, undefined, { shallow: true })
           }}
         />
         {userAbilities?.includes("edit") && (
@@ -64,8 +62,7 @@ const CourseTabNavigator = () => {
             value="edit"
             label={<Typography>Edit Course Details</Typography>}
             onClick={() => {
-              router.push(URL_HREF, `${pathname}/edit`)
-              setCurrentTab("edit")
+              router.push(`${pathname}/edit`, undefined, { shallow: true })
             }}
           />
         )}
