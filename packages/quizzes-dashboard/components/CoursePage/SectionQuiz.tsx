@@ -3,7 +3,7 @@ import Link from "next/link"
 import React from "react"
 import styled from "styled-components"
 import { Quiz } from "../../types/Quiz"
-
+import { useUserAbilities } from "../../hooks/useUserAbilities"
 interface quizProps {
   quiz: Quiz
   requiringAttention: number
@@ -59,6 +59,12 @@ const StyledType = styled(Typography)`
 export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
   const title = quiz.title
   const types = Array.from(new Set(quiz.items.map(item => item.type)))
+  const {
+    userAbilities,
+    userAbilitiesLoading,
+    userAbilitiesError,
+  } = useUserAbilities(quiz?.courseId ?? "", "user-abilities")
+
   return (
     <Link
       href={{
@@ -97,20 +103,22 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
                     </Button>
                   </Link>
                 </Badge>
-                <Link
-                  href={{
-                    pathname: "/quizzes/[quizId]/[...page]",
-                    query: {
-                      quizId: `${quiz.id}`,
-                      page: "edit",
-                    },
-                  }}
-                  as={`/quizzes/${quiz.id}/edit`}
-                >
-                  <Button variant="outlined">
-                    <Typography>Edit quiz</Typography>
-                  </Button>
-                </Link>
+                {userAbilities?.includes("edit") && (
+                  <Link
+                    href={{
+                      pathname: "/quizzes/[quizId]/[...page]",
+                      query: {
+                        quizId: `${quiz.id}`,
+                        page: "edit",
+                      },
+                    }}
+                    as={`/quizzes/${quiz.id}/edit`}
+                  >
+                    <Button variant="outlined">
+                      <Typography>Edit quiz</Typography>
+                    </Button>
+                  </Link>
+                )}
               </ButtonContainer>
             </TitleWrapper>
             {types.length > 0 ? (

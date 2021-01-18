@@ -93,16 +93,19 @@ export const TabNavigator = () => {
             setCurrentTab("overview")
           }}
         />
-        <Tab
-          key="edit"
-          icon={<FontAwesomeIcon icon={faPen} />}
-          value="edit"
-          label={<Typography>Edit quiz</Typography>}
-          onClick={() => {
-            router.push(URL_HREF, `${pathname}/edit`)
-            setCurrentTab("edit")
-          }}
-        />
+        {userAbilities?.includes("edit") && (
+          <Tab
+            key="edit"
+            icon={<FontAwesomeIcon icon={faPen} />}
+            value="edit"
+            label={<Typography>Edit quiz</Typography>}
+            onClick={() => {
+              router.push(URL_HREF, `${pathname}/edit`)
+              setCurrentTab("edit")
+            }}
+          />
+        )}
+
         <Tab
           key="all-answers"
           icon={<FontAwesomeIcon icon={faScroll} />}
