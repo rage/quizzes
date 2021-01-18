@@ -22,7 +22,7 @@ import {
 import AnswerListOptions from "../../Answer/AnswerListOptions"
 import { useRequiringAttention } from "../../../hooks/useAnswersRequiringAttention"
 import { useSearchResultsRequiringAttention } from "../../../hooks/useSearchResults"
-import DisplayAnswers from "../../Answer/DisplayAnswers"
+import SkeletonLoader from "../../Shared/SkeletonLoader"
 
 export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
   const [{ expandAll }, dispatch] = useAnswerListState()
@@ -65,22 +65,9 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
     "search-answers-requiring-attention",
   )
 
-  const [availableAnswers, setAvailableAnswers] = useState<{
-    results: Answer[]
-    total: number
-  }>({
-    results: [],
-    total: 0,
-  })
-
   useEffect(() => {
     dispatch(setBulkSelectedIds([]))
     dispatch(setHandledAnswers([]))
-    if (searchResults) {
-      setAvailableAnswers(searchResults)
-    } else if (answersRequiringAttention) {
-      setAvailableAnswers(answersRequiringAttention)
-    }
   }, [answers])
 
   const [queryToPush, setQueryToPush] = useState({})
@@ -147,12 +134,14 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
     setSearchQuery(searchQuery)
   }
 
-  const answersAreAvailable = availableAnswers.results.length > 0
   const answersAreBeingFetched =
     searchResultsLoading || answersRequiringAttentionLoading
   const errorFetchingAnswers =
     answersRequiringAttentionError || searchResultsError
-  const noResults = !answersAreBeingFetched && !answersAreAvailable
+
+  const answersToDisplay = searchResults
+    ? searchResults
+    : answersRequiringAttention
 
   return (
     <>
@@ -195,26 +184,31 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
           <MenuItem value="asc">Oldest first</MenuItem>
         </SortOrderField>
       </OptionsContainer>
-      <AnswerListOptions
-        answers={availableAnswers}
-        handleTextSearch={handleTextSearch}
-        searchResultCount={searchResults?.total || 0}
-      />
-      <DisplayAnswers
-        answersAreBeingFetched={answersAreBeingFetched}
-        answersAreAvailable={answersAreAvailable}
-        errorFetchingAnswers={errorFetchingAnswers}
-        noResults={noResults}
-      >
-        <AnswerListWrapper
-          order={sortOrder}
-          quizId={quizId}
-          size={answersDisplayed}
-          handlePageChange={handlePageChange}
-          page={currentPage}
-          answers={availableAnswers}
-        />
-      </DisplayAnswers>
+      {answersToDisplay ? (
+        <>
+          <AnswerListOptions
+            answers={answersToDisplay}
+            handleTextSearch={handleTextSearch}
+            searchResultCount={searchResults?.total || 0}
+          />
+          <AnswerListWrapper
+            order={sortOrder}
+            quizId={quizId}
+            size={answersDisplayed}
+            handlePageChange={handlePageChange}
+            page={currentPage}
+            answers={answersToDisplay}
+          />
+        </>
+      ) : answersAreBeingFetched ? (
+        <SkeletonLoader height={250} skeletonCount={4} />
+      ) : errorFetchingAnswers ? (
+        <Typography variant="h3">
+          Something went wrong while retrieving answers.
+        </Typography>
+      ) : (
+        <Typography variant="h3">No answers available.</Typography>
+      )}
     </>
   )
 }

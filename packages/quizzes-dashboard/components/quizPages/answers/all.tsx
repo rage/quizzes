@@ -16,7 +16,6 @@ import {
 import { ChipProps, IQuizTabProps, TAnswersDisplayed } from "./types"
 import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
 import AnswerListWrapper from "../../Answer/AnswerListWrapper"
-import { Answer } from "../../../types/Answer"
 import {
   useAnswerListState,
   setExpandAll,
@@ -26,7 +25,7 @@ import {
 import AnswerListOptions from "../../Answer/AnswerListOptions"
 import { useAllAnswers } from "../../../hooks/useAllAnswers"
 import { useSearchResultsAllAnswers } from "../../../hooks/useSearchResults"
-import DisplayAnswers from "../../Answer/DisplayAnswers"
+import SkeletonLoader from "../../Shared/SkeletonLoader"
 
 const StyledChip = styled(Chip)<ChipProps>`
   display: flex !important;
@@ -98,14 +97,6 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
     "search-all-answers",
   )
 
-  const [availableAnswers, setAvailableAnswers] = useState<{
-    results: Answer[]
-    total: number
-  }>({
-    results: [],
-    total: 0,
-  })
-
   const isIncludedInFilter = (param: string) => {
     if (!route.query.filters) {
       return false
@@ -171,17 +162,9 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
     },
   ])
 
-  // this needs to be run so that if the page with query params is loaded in
-  // another window, the params can be updated without clearing the rest first
   useEffect(() => {
-    console.log("first use effect ran")
     dispatch(setBulkSelectedIds([]))
     dispatch(setHandledAnswers([]))
-    if (searchResults) {
-      setAvailableAnswers(searchResults)
-    } else if (allAnswers) {
-      setAvailableAnswers(allAnswers)
-    }
 
     if (filtersAsStringArray) {
       setFilterParameters(filtersAsStringArray)
@@ -292,11 +275,11 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
     route.push(pathname, { pathname, query }, { shallow: true })
   }
 
-  const answersAreAvailable = availableAnswers.results.length > 0
   const answersAreBeingFetched = searchResultsLoading || allAnswersLoading
 
   const errorFetchingAnswers = allAnswersError || searchResultsError
-  const noResults = !answersAreBeingFetched && !answersAreAvailable
+
+  const answersToDisplay = searchResults ? searchResults : allAnswers
 
   return (
     <>
@@ -368,26 +351,31 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
           )
         })}
       </FilterParamsField>
-      <AnswerListOptions
-        answers={availableAnswers}
-        handleTextSearch={handleTextSearch}
-        searchResultCount={searchResults?.total || 0}
-      />
-      <DisplayAnswers
-        answersAreBeingFetched={answersAreBeingFetched}
-        answersAreAvailable={answersAreAvailable}
-        errorFetchingAnswers={errorFetchingAnswers}
-        noResults={noResults}
-      >
-        <AnswerListWrapper
-          order={sortOrder}
-          quizId={quizId}
-          size={answersDisplayed}
-          handlePageChange={handlePageChange}
-          page={currentPage}
-          answers={availableAnswers}
-        />
-      </DisplayAnswers>
+      {answersToDisplay ? (
+        <>
+          <AnswerListOptions
+            answers={answersToDisplay}
+            handleTextSearch={handleTextSearch}
+            searchResultCount={searchResults?.total || 0}
+          />
+          <AnswerListWrapper
+            order={sortOrder}
+            quizId={quizId}
+            size={answersDisplayed}
+            handlePageChange={handlePageChange}
+            page={currentPage}
+            answers={answersToDisplay}
+          />
+        </>
+      ) : answersAreBeingFetched ? (
+        <SkeletonLoader height={250} skeletonCount={4} />
+      ) : errorFetchingAnswers ? (
+        <Typography variant="h3">
+          Something went wrong while retrieving answers.
+        </Typography>
+      ) : (
+        <Typography variant="h3">No answers available.</Typography>
+      )}
     </>
   )
 }
