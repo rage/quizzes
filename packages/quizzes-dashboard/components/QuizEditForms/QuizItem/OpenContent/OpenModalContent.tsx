@@ -24,6 +24,7 @@ import {
   Button,
   Typography,
 } from "@material-ui/core"
+import MarkdownEditor from "../../../MarkdownEditor"
 
 const ModalContent = styled.div`
   padding: 1rem;
@@ -69,24 +70,18 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
         <Typography variant="h3">Advanced Editing</Typography>
       </ModalContentTitleWrapper>
       <ModalContent>
-        <TextField
-          value={storeItem.title ?? ""}
-          multiline
-          fullWidth
-          variant="outlined"
-          label="title"
+        <MarkdownEditor
+          label="Title"
+          text={storeItem.title ?? ""}
           onChange={event =>
             dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
           }
         />
       </ModalContent>
       <ModalContent>
-        <TextField
-          value={storeItem.body ?? ""}
-          multiline
-          fullWidth
-          variant="outlined"
+        <MarkdownEditor
           label="Body"
+          text={storeItem.body ?? ""}
           onChange={event =>
             dispatch(editedQuizItemBody(event.target.value, storeItem.id))
           }
@@ -133,24 +128,18 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
         </FormControl>
       </ModalContent>
       <ModalContent>
-        <TextField
-          fullWidth
-          multiline
-          variant="outlined"
+        <MarkdownEditor
           label="Success message"
-          value={storeItem.successMessage ?? ""}
+          text={storeItem.successMessage ?? ""}
           onChange={event =>
             dispatch(editedItemSuccessMessage(storeItem.id, event.target.value))
           }
         />
       </ModalContent>
       <ModalContent>
-        <TextField
-          fullWidth
-          multiline
-          variant="outlined"
+        <MarkdownEditor
           label="Failure message"
-          value={storeItem.failureMessage ?? ""}
+          text={storeItem.failureMessage ?? ""}
           onChange={event =>
             dispatch(editedItemFailureMessage(storeItem.id, event.target.value))
           }

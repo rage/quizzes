@@ -6,12 +6,12 @@ import DownloadInfoForms from "../DownloadInfoForms"
 import QuizTitle from "./QuizTitleContainer"
 import { TabText } from "./TabHeaders"
 import { AnswerStatistics } from "./AnswerStatistics"
+import { MarkDownText } from "../MarkDownText"
 import { IQuizTabProps } from "./answers/types"
 
 const DescriptionContainer = styled.div`
   display: flex;
   justify-content: center;
-  white-space: pre-line;
   flex-wrap: wrap;
   width: 100%;
   padding: 1rem;
@@ -50,7 +50,7 @@ export const OverView = ({ quiz, course, userAbilities }: IQuizTabProps) => {
       {quiz.body && (
         <StyledCard>
           <DescriptionContainer>
-            <Typography>{quiz.body}</Typography>
+            <MarkDownText text={quiz.body} />
           </DescriptionContainer>
         </StyledCard>
       )}
