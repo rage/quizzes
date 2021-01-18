@@ -19,7 +19,7 @@ import { useCourse } from "../../hooks/useCourse"
 import { useUserAbilities } from "../../hooks/useUserAbilities"
 import { TabTextError, TabTextLoading } from "../quizPages/TabHeaders"
 import SkeletonLoader from "../Shared/SkeletonLoader"
-import { useRequiringAttentionCount } from "../../hooks/useRequiringAttention"
+import { useAnswersRequiringAttentionCount } from "../../hooks/useAnswersRequiringAttention"
 
 export const TabNavigator = () => {
   const router = useRouter()
@@ -42,7 +42,7 @@ export const TabNavigator = () => {
     requiringAttention,
     requiringAttentionLoading,
     requiringAttentionError,
-  } = useRequiringAttentionCount(quizId, "requiring-attention")
+  } = useAnswersRequiringAttentionCount(quizId, "requiring-attention")
 
   const [currentTab, setCurrentTab] = useState("overview")
 
@@ -93,16 +93,19 @@ export const TabNavigator = () => {
             setCurrentTab("overview")
           }}
         />
-        <Tab
-          key="edit"
-          icon={<FontAwesomeIcon icon={faPen} />}
-          value="edit"
-          label={<Typography>Edit quiz</Typography>}
-          onClick={() => {
-            router.push(URL_HREF, `${pathname}/edit`)
-            setCurrentTab("edit")
-          }}
-        />
+        {userAbilities?.includes("edit") && (
+          <Tab
+            key="edit"
+            icon={<FontAwesomeIcon icon={faPen} />}
+            value="edit"
+            label={<Typography>Edit quiz</Typography>}
+            onClick={() => {
+              router.push(URL_HREF, `${pathname}/edit`)
+              setCurrentTab("edit")
+            }}
+          />
+        )}
+
         <Tab
           key="all-answers"
           icon={<FontAwesomeIcon icon={faScroll} />}

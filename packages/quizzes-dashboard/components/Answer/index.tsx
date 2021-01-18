@@ -5,7 +5,7 @@ import { Answer } from "../../types/Answer"
 import { Card } from "@material-ui/core"
 import styled from "styled-components"
 import { AnswerContent } from "./CardContent"
-import { editableAnswerStates } from "./constants"
+import { editableAnswerStates } from "../constants"
 import {
   setBulkSelectedIds,
   useAnswerListState,
