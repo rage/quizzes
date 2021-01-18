@@ -173,16 +173,6 @@ const ScaleContent = ({ item }: scaleContentProps) => {
         </Fade>
       </StyledModal>
       <ScaleContainer>
-        {/* <TitleField
-          fullWidth
-          multiline
-          label="Title"
-          variant="outlined"
-          value={storeItem.title ?? ""}
-          onChange={event =>
-            dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
-          }
-        /> */}
         <MarkdownEditor
           label="Title"
           text={storeItem.title ?? ""}

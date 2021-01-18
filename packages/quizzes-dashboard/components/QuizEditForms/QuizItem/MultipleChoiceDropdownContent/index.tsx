@@ -118,15 +118,6 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
       </StyledModal>
       <QuizContentLineContainer>
         <QuizContent>
-          {/* <TextField
-            multiline
-            label="Title"
-            variant="outlined"
-            value={storeItem.title ?? ""}
-            onChange={event =>
-              dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
-            }
-          /> */}
           <MarkdownEditor
             label="Title"
             text={storeItem.title ?? ""}

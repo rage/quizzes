@@ -193,15 +193,6 @@ const BasicInformation = () => {
       </WarningWrapper>
 
       <InfoContainer>
-        {/* <TextField
-          label="Quiz Title"
-          fullWidth
-          variant="outlined"
-          defaultValue={title ?? ""}
-          onChange={event =>
-            dispatch(editedQuizTitle(event.target.value, quizId))
-          }
-        /> */}
         <MarkdownEditor
           label="Quiz title"
           text={title ?? ""}

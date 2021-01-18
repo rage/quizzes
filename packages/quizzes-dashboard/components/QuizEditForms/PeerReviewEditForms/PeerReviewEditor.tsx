@@ -1,7 +1,5 @@
 import React from "react"
 import { useTypedSelector } from "../../../store/store"
-import styled from "styled-components"
-import { TextField } from "@material-ui/core"
 import { useDispatch } from "react-redux"
 import {
   editedPeerReviewTitle,
@@ -9,12 +7,6 @@ import {
 } from "../../../store/editor/peerReviewCollections/peerReviewCollectionActions"
 import QuestionEditorWrapper from "./QuestionEditorForms/QuestionEditorWrapper"
 import MarkdownEditor from "../../MarkdownEditor"
-
-const PeerReviewField = styled(TextField)`
-  display: flex !important;
-  margin-top. 1rem !important;
-  margin-bottom: 1rem !important;
-`
 
 interface PeerReviewEditorProps {
   id: string
@@ -28,14 +20,6 @@ export const PeerReviewEditor = ({ id }: PeerReviewEditorProps) => {
 
   return (
     <>
-      {/* <PeerReviewField
-        variant="outlined"
-        label="Peer review title"
-        value={peerReview.title}
-        onChange={event => {
-          dispatch(editedPeerReviewTitle(id, event.target.value))
-        }}
-      /> */}
       <MarkdownEditor
         label="Peer review title"
         text={peerReview.title ?? ""}

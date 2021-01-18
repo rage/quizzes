@@ -70,16 +70,6 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
         <Typography variant="h3">Advanced Editing</Typography>
       </ModalContentTitleWrapper>
       <ModalContent>
-        {/* <TextField
-          value={storeItem.title ?? ""}
-          multiline
-          fullWidth
-          variant="outlined"
-          label="title"
-          onChange={event =>
-            dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
-          }
-        /> */}
         <MarkdownEditor
           label="Title"
           text={storeItem.title ?? ""}
@@ -89,16 +79,6 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
         />
       </ModalContent>
       <ModalContent>
-        {/* <TextField
-          value={storeItem.body ?? ""}
-          multiline
-          fullWidth
-          variant="outlined"
-          label="Body"
-          onChange={event =>
-            dispatch(editedQuizItemBody(event.target.value, storeItem.id))
-          }
-        /> */}
         <MarkdownEditor
           label="Body"
           text={storeItem.body ?? ""}
@@ -148,16 +128,6 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
         </FormControl>
       </ModalContent>
       <ModalContent>
-        {/* <TextField
-          fullWidth
-          multiline
-          variant="outlined"
-          label="Success message"
-          value={storeItem.successMessage ?? ""}
-          onChange={event =>
-            dispatch(editedItemSuccessMessage(storeItem.id, event.target.value))
-          }
-        /> */}
         <MarkdownEditor
           label="Success message"
           text={storeItem.successMessage ?? ""}
@@ -167,16 +137,6 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
         />
       </ModalContent>
       <ModalContent>
-        {/* <TextField
-          fullWidth
-          multiline
-          variant="outlined"
-          label="Failure message"
-          value={storeItem.failureMessage ?? ""}
-          onChange={event =>
-            dispatch(editedItemFailureMessage(storeItem.id, event.target.value))
-          }
-        /> */}
         <MarkdownEditor
           label="Failure message"
           text={storeItem.failureMessage ?? ""}

@@ -39,15 +39,6 @@ export const QuestionEditor = ({ id }: PRQEditorProps) => {
   const prq = useTypedSelector(state => state.editor.questions[id])
   return (
     <PRQWrapper>
-      {/* <PRQTextfield
-        label="Question title"
-        variant="outlined"
-        fullWidth
-        value={prq.title}
-        onChange={event =>
-          dispatch(editedPeerReviewQuestionTitle(event.target.value, id))
-        }
-      /> */}
       <MarkdownEditor
         label="Question title"
         text={prq.title ?? ""}
@@ -55,15 +46,6 @@ export const QuestionEditor = ({ id }: PRQEditorProps) => {
           dispatch(editedPeerReviewQuestionTitle(event.target.value, id))
         }
       />
-      {/* <PRQTextfield
-        label="Question body"
-        variant="outlined"
-        fullWidth
-        value={prq.body}
-        onChange={event =>
-          dispatch(editedPeerReviewQuestionBody(event.target.value, id))
-        }
-      /> */}
       <MarkdownEditor
         label="Question body"
         text={prq.body ?? ""}

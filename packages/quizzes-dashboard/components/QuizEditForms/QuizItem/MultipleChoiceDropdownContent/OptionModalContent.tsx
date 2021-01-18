@@ -58,15 +58,6 @@ export const OptionModalContent = ({ option }: OptionEditorProps) => {
         </FormControl>
       </ModalContent>
       <ModalContent>
-        {/* <TextField
-          label="Option Title"
-          value={storeOption.title}
-          fullWidth
-          variant="outlined"
-          onChange={event =>
-            dispatch(editedOptionTitle(event.target.value, storeOption.id))
-          }
-        /> */}
         <MarkdownEditor
           label="Option title"
           text={storeOption.title ?? ""}
@@ -76,34 +67,6 @@ export const OptionModalContent = ({ option }: OptionEditorProps) => {
         />
       </ModalContent>
       <ModalContent>
-        {/* <TextField
-          multiline
-          label={storeOption.correct ? "Success message" : "Failure message"}
-          value={
-            storeOption.correct
-              ? storeOption.successMessage ?? ""
-              : storeOption.failureMessage ?? ""
-          }
-          fullWidth
-          variant="outlined"
-          onChange={
-            storeOption.correct
-              ? event =>
-                  dispatch(
-                    editedOptionSuccessMessage(
-                      storeOption.id,
-                      event.target.value,
-                    ),
-                  )
-              : event =>
-                  dispatch(
-                    editedOptionFailureMessage(
-                      storeOption.id,
-                      event.target.value,
-                    ),
-                  )
-          }
-        /> */}
         <MarkdownEditor
           label={storeOption.correct ? "Success message" : "Failure message"}
           text={

@@ -128,18 +128,6 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
           </AdvancedBox>
         </Fade>
       </StyledModal>
-      {/* <TitleWrapper>
-        <TextField
-          fullWidth
-          multiline
-          label="Title"
-          variant="outlined"
-          value={storeItem.title ?? ""}
-          onChange={event =>
-            dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
-          }
-        />
-      </TitleWrapper> */}
       <MarkdownEditor
         label="title"
         onChange={event =>
