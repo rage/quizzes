@@ -48,7 +48,7 @@ export const CoursePage = () => {
   )
 
   useBreadcrumbs([
-    { label: "Courses", as: "/", href: "/" },
+    { label: "Courses", as: "/" },
     { label: `${data ? data.course.title : ""}` },
   ])
 
@@ -110,13 +110,7 @@ export const CoursePage = () => {
           {course.title}
         </Typography>
 
-        <Link
-          href={{
-            pathname: "/courses/[id]/quizzes/new",
-            query: { courseId: `${id}` },
-          }}
-          as={`/courses/${id}/quizzes/new`}
-        >
+        <Link href={`/courses/${id}/quizzes/new`}>
           <StyledButton variant="outlined">
             <Typography variant="overline">Add New Quiz</Typography>
           </StyledButton>

@@ -160,6 +160,19 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
 
   const [chipStates, setChipStates] = useState(states)
 
+  useBreadcrumbs([
+    { label: "Courses", as: "/" },
+    {
+      label: `${course ? course.title : ""}`,
+      as: `/courses/${quiz?.courseId}/listing`,
+    },
+    {
+      label: `${quiz ? quiz.title : ""}`,
+    },
+  ])
+
+  // this needs to be run so that if the page with query params is loaded in
+  // another window, the params can be updated without clearing the rest first
   useEffect(() => {
     console.log("first use effect ran")
     dispatch(setBulkSelectedIds([]))
@@ -189,20 +202,8 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
       pageNo: nextPage,
     })
     setCurrentPage(nextPage)
-    let query = {
-      ...queryToPush,
-      pageNo: nextPage,
-    }
-    route.push(
-      pathname,
-      {
-        pathname,
-        query,
-      },
-      {
-        shallow: true,
-      },
-    )
+    let query = { ...queryToPush, pageNo: nextPage }
+    route.push(pathname, { pathname, query }, { shallow: true })
   }
 
   /**
@@ -258,16 +259,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
     }
 
     setQueryToPush(updatedQueryParams)
-    route.push(
-      pathname,
-      {
-        pathname,
-        query,
-      },
-      {
-        shallow: true,
-      },
-    )
+    route.push(pathname, { pathname, query }, { shallow: true })
   }
 
   /**
@@ -287,16 +279,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
       }
       setQueryToPush(updatedQueryParams)
       let query = updatedQueryParams
-      route.push(
-        pathname,
-        {
-          pathname,
-          query,
-        },
-        {
-          shallow: true,
-        },
-      )
+      route.push(pathname, { pathname, query }, { shallow: true })
       return
     }
 
@@ -306,16 +289,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
     }
     setQueryToPush(updatedQueryParams)
     let query = updatedQueryParams
-    route.push(
-      pathname,
-      {
-        pathname,
-        query,
-      },
-      {
-        shallow: true,
-      },
-    )
+    route.push(pathname, { pathname, query }, { shallow: true })
   }
 
   const answersAreAvailable = availableAnswers.results.length > 0
