@@ -6,6 +6,7 @@ import { useRouter } from "next/router"
 import { ITabToComponent } from "../CoursePage/types"
 import { CoursePage } from "../CoursePage"
 import EditCourseDetails from "../CoursePage/EditDetailsForm"
+import { useUserAbilities } from "../../hooks/useUserAbilities"
 
 const CourseTabNavigator = () => {
   const router = useRouter()
@@ -13,6 +14,12 @@ const CourseTabNavigator = () => {
   const courseId = router.query.courseId?.toString() ?? ""
 
   const pathname = `/courses/${courseId}`
+
+  const {
+    userAbilities,
+    userAbilitiesLoading,
+    userAbilitiesError,
+  } = useUserAbilities(courseId ?? "", "user-abilities")
 
   const coursePageTabs: ITabToComponent = {
     listing: CoursePage,
@@ -48,15 +55,17 @@ const CourseTabNavigator = () => {
             router.push(`${pathname}/listing`, undefined, { shallow: true })
           }}
         />
-        <Tab
-          key="edit"
-          icon={<FontAwesomeIcon icon={faPen} />}
-          value="edit"
-          label={<Typography>Edit Course Details</Typography>}
-          onClick={() => {
-            router.push(`${pathname}/edit`, undefined, { shallow: true })
-          }}
-        />
+        {userAbilities?.includes("edit") && (
+          <Tab
+            key="edit"
+            icon={<FontAwesomeIcon icon={faPen} />}
+            value="edit"
+            label={<Typography>Edit Course Details</Typography>}
+            onClick={() => {
+              router.push(`${pathname}/edit`, undefined, { shallow: true })
+            }}
+          />
+        )}
       </Tabs>
       <ComponentTag />
     </>

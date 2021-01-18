@@ -47,6 +47,7 @@ class QuizAnswer extends BaseModel {
   quiz!: Quiz
 
   static SEARCH_RESULT_LIMIT = 100
+  static FIRST_PAGE_INDEX = 0
 
   static get tableName() {
     return "quiz_answer"
@@ -225,7 +226,6 @@ class QuizAnswer extends BaseModel {
 
   public static async getPaginatedByQuizIdAndSearchQuery(
     quizId: string,
-    page: number,
     pageSize: number,
     order: "asc" | "desc",
     filters: string[],
@@ -238,12 +238,11 @@ class QuizAnswer extends BaseModel {
     let paginated
     const filtersProvided = filters.length > 0
 
-    // no filter, no search
     if (!filtersProvided) {
       paginated = await this.query()
         .where("quiz_answer.quiz_id", quizId)
         .orderBy([{ column: "created_at", order: order }])
-        .page(page, pageSize)
+        .page(this.FIRST_PAGE_INDEX, pageSize)
         .withGraphFetched("userQuizState")
         .withGraphFetched("itemAnswers.[optionAnswers]")
         .join(
@@ -262,7 +261,7 @@ class QuizAnswer extends BaseModel {
         .where("quiz_answer.quiz_id", quizId)
         .whereIn("status", filters)
         .orderBy([{ column: "created_at", order: order }])
-        .page(page, pageSize)
+        .page(this.FIRST_PAGE_INDEX, pageSize)
         .withGraphFetched("userQuizState")
         .withGraphFetched("itemAnswers.[optionAnswers]")
         .join(
@@ -318,7 +317,6 @@ class QuizAnswer extends BaseModel {
 
   public static async getPaginatedManualReviewBySearchQuery(
     quizId: string,
-    page: number,
     pageSize: number,
     order: "asc" | "desc",
     searchQuery: string,
@@ -331,7 +329,7 @@ class QuizAnswer extends BaseModel {
       .where("quiz_answer.quiz_id", quizId)
       .andWhere("status", "manual-review")
       .orderBy([{ column: "created_at", order: order }])
-      .page(page, pageSize)
+      .page(this.FIRST_PAGE_INDEX, pageSize)
       .withGraphFetched("userQuizState")
       .withGraphFetched("itemAnswers.[optionAnswers]")
       .join(

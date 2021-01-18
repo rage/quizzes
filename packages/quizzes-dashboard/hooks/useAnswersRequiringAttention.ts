@@ -2,12 +2,15 @@ import useSWR from "swr"
 import {
   getAnswersRequiringAttentionByQuizId,
   getAnswersRequiringAttention,
-} from "./../services/quizzes"
+} from "../services/quizzes"
 
 const countFetcher = (quizId: string) =>
   getAnswersRequiringAttentionByQuizId(quizId)
 
-export const useRequiringAttentionCount = (quizId: string, token: string) => {
+export const useAnswersRequiringAttentionCount = (
+  quizId: string,
+  token: string,
+) => {
   const { data, error } = useSWR([quizId, token], countFetcher)
 
   return {
@@ -38,8 +41,8 @@ export const useRequiringAttention = (
   )
 
   return {
-    requiringAttention: data,
-    requiringAttentionLoading: !error && data === undefined,
-    requiringAttentionError: error,
+    answersRequiringAttention: data,
+    answersRequiringAttentionLoading: !error && data === undefined,
+    answersRequiringAttentionError: error,
   }
 }

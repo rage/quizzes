@@ -177,7 +177,7 @@ const dashboard = new Router<CustomState, CustomContext>({
 
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
 
-    const { page, size, order, filters } = ctx.request.query
+    const { size, order, filters } = ctx.request.query
 
     const { searchQuery } = ctx.request.body
 
@@ -191,7 +191,6 @@ const dashboard = new Router<CustomState, CustomContext>({
 
     ctx.body = await QuizAnswer.getPaginatedByQuizIdAndSearchQuery(
       quizId,
-      page,
       size,
       order,
       parsedFilters,
@@ -216,11 +215,10 @@ const dashboard = new Router<CustomState, CustomContext>({
     const quizId = ctx.params.quizId
     const courseId = await getCourseIdByQuizId(quizId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
-    const { page, size, order } = ctx.request.query
+    const { size, order } = ctx.request.query
     const { searchQuery } = ctx.request.body
     ctx.body = await QuizAnswer.getPaginatedManualReviewBySearchQuery(
       quizId,
-      page,
       size,
       order,
       searchQuery,
