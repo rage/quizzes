@@ -78,6 +78,7 @@ describe("dashboard: get courses", () => {
       .end(done)
   })
 })
+
 describe("dashboard: get single course should", () => {
   beforeAll(async () => {
     await safeSeed(configA)

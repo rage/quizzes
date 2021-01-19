@@ -25,14 +25,14 @@ describe("Soft delete peer review questions", () => {
   beforeEach(() => userSetup())
 
   it("Responds with 401 on bad token", done => {
-    request(app.callback()).get("")
     const quiz = input.newQuiz
     request(app.callback())
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer BAD_TOKEN`)
       .set("Accept", "application/json")
       .send(quiz)
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
 
   it("Soft deletes peer review question", done => {
@@ -70,7 +70,8 @@ describe("Soft delete peer review collections", () => {
       .set("Authorization", `bearer BAD_TOKEN`)
       .set("Accept", "application/json")
       .send(quiz)
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
 
   it("Soft deletes peer review collection", done => {
@@ -108,7 +109,8 @@ describe("Soft delete quiz item options", () => {
       .set("Authorization", `bearer BAD_TOKEN`)
       .set("Accept", "application/json")
       .send(quiz)
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
 
   it("Soft deletes quiz item option", done => {
@@ -146,7 +148,8 @@ describe("Soft delete quiz items", () => {
       .set("Authorization", `bearer BAD_TOKEN`)
       .set("Accept", "application/json")
       .send(quiz1)
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
 
   it("Soft deletes quiz item", done => {

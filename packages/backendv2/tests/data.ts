@@ -283,6 +283,7 @@ export const validation = {
         sharedOptionFeedbackMessage: null,
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
+        deleted: false,
         options: [
           {
             id: expect.stringMatching(uuid),
@@ -295,6 +296,7 @@ export const validation = {
             failureMessage: "false",
             createdAt: expect.stringMatching(dateTime),
             updatedAt: expect.stringMatching(dateTime),
+            deleted: false,
           },
         ],
       },
@@ -319,6 +321,7 @@ export const validation = {
         sharedOptionFeedbackMessage: null,
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
+        deleted: false,
         options: [],
       },
     ],
@@ -392,6 +395,7 @@ export const validation = {
         sharedOptionFeedbackMessage: null,
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
+        deleted: false,
         options: [],
       },
       {
@@ -415,6 +419,7 @@ export const validation = {
         sharedOptionFeedbackMessage: null,
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
+        deleted: false,
         options: [],
       },
     ],
@@ -488,6 +493,7 @@ export const validation = {
         sharedOptionFeedbackMessage: null,
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
+        deleted: false,
         options: [
           {
             id: "7c802f5b-52f1-468e-a798-3028edc1d3fd",
@@ -500,6 +506,7 @@ export const validation = {
             failureMessage: "false",
             createdAt: expect.stringMatching(dateTime),
             updatedAt: expect.stringMatching(dateTime),
+            deleted: false,
           },
         ],
       },
@@ -525,6 +532,7 @@ export const validation = {
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
         options: [],
+        deleted: false,
       },
     ],
     peerReviewCollections: [
@@ -598,6 +606,7 @@ export const validation = {
         sharedOptionFeedbackMessage: null,
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
+        deleted: false,
       },
       {
         id: "4a55eb54-6a9c-4245-843c-0577f3eafd9e",
@@ -621,6 +630,7 @@ export const validation = {
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
         options: [],
+        deleted: false,
       },
     ],
     peerReviewCollections: [],
@@ -667,6 +677,7 @@ export const validation = {
         sharedOptionFeedbackMessage: null,
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
+        deleted: false,
         options: [],
       },
       {
@@ -690,6 +701,7 @@ export const validation = {
         sharedOptionFeedbackMessage: null,
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
+        deleted: false,
         options: [],
       },
     ],
@@ -737,6 +749,7 @@ export const validation = {
         sharedOptionFeedbackMessage: null,
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
+        deleted: false,
         options: [],
       },
       {
@@ -760,6 +773,7 @@ export const validation = {
         sharedOptionFeedbackMessage: null,
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
+        deleted: false,
         options: [],
       },
     ],
@@ -1225,6 +1239,7 @@ export const validation = {
           successMessage: "yay!",
           failureMessage: "boo!",
           sharedOptionFeedbackMessage: null,
+          deleted: false,
         },
         {
           id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
@@ -1242,6 +1257,7 @@ export const validation = {
           createdAt: expect.stringMatching(dateTime),
           updatedAt: expect.stringMatching(dateTime),
           allAnswersCorrect: false,
+          deleted: false,
           options: [
             {
               id: "7c802f5b-52f1-468e-a798-3028edc1d3fd",
@@ -1254,6 +1270,7 @@ export const validation = {
               body: "",
               successMessage: "true",
               failureMessage: "false",
+              deleted: false,
             },
           ],
           title: "multiple-choice",

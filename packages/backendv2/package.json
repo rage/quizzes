@@ -45,7 +45,7 @@
     "@types/lodash": "^4.14.161",
     "@types/redis": "^2.8.28",
     "JSONStream": "^1.3.5",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "csv-parse": "^4.11.1",
     "csv-stringify": "^5.5.0",
     "dotenv": "^8.2.0",
