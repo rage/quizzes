@@ -405,6 +405,7 @@ class QuizAnswer extends BaseModel {
 
       quizAnswer = await quizAnswer.$query(trx).patchAndFetch({ status })
 
+      await UserQuizState.upsert(userQuizState, trx)
       await UserCoursePartState.update(
         quizAnswer.userId,
         quiz.courseId,
@@ -587,6 +588,8 @@ class QuizAnswer extends BaseModel {
     this.gradeAnswer(quizAnswer, userQuizState, quiz)
     this.assessUserQuizStatus(quizAnswer, userQuizState, quiz, true)
     if (quizAnswer.status === "confirmed") {
+      // UserCoursePartState.update depends on user quiz state being up to date
+      await UserQuizState.upsert(userQuizState, trx)
       await UserCoursePartState.update(
         quizAnswer.userId,
         quiz.courseId,
