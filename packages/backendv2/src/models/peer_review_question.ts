@@ -7,10 +7,12 @@ import softDelete from "objection-soft-delete"
 class PeerReviewQuestion extends mixin(BaseModel, [
   softDelete({ columnName: "deleted" }),
 ]) {
+  id!: string
   texts!: PeerReviewQuestionTranslation[]
   collection!: PeerReviewCollection
   title!: string
   body!: string
+  deleted!: boolean
 
   static get tableName() {
     return "peer_review_question"
@@ -33,6 +35,10 @@ class PeerReviewQuestion extends mixin(BaseModel, [
         to: "peer_review_question_translation.peer_review_question_id",
       },
     },
+  }
+
+  static async getById(id: string): Promise<PeerReviewQuestion> {
+    return await this.query().findById(id)
   }
 }
 export default PeerReviewQuestion

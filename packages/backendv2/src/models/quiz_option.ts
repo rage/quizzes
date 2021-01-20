@@ -13,6 +13,7 @@ class QuizOption extends mixin(BaseModel, [
   body!: string
   successMessage!: string
   failureMessage!: string
+  deleted!: boolean
 
   static get tableName() {
     return "quiz_option"
@@ -35,6 +36,10 @@ class QuizOption extends mixin(BaseModel, [
         to: "quiz_option_translation.quiz_option_id",
       },
     },
+  }
+
+  static async getById(id: string): Promise<QuizOption> {
+    return await this.query().findById(id)
   }
 }
 
