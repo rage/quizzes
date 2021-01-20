@@ -32,7 +32,7 @@ class QuizItem extends mixin(BaseModel, [
   failureMessage!: string
   sharedOptionFeedbackMessage!: string
   allAnswersCorrect!: string
-  deleted!:boolean
+  deleted!: boolean
 
   static get tableName() {
     return "quiz_item"

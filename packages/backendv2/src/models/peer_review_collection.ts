@@ -47,7 +47,7 @@ export class PeerReviewCollection extends mixin(BaseModel, [
   }
 
   static async getById(id: string): Promise<PeerReviewCollection> {
-    return await this.query().findById(id);
+    return await this.query().findById(id)
   }
 }
 

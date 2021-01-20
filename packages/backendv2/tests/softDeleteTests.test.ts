@@ -8,7 +8,13 @@ import { UserInfo } from "../src/types"
 import { safeClean, safeSeed, configA } from "./util"
 import _ from "lodash"
 import { Model, snakeCaseMappers } from "objection"
-import { PeerReviewCollection, PeerReviewQuestion, Quiz, QuizItem, QuizOption } from "../src/models"
+import {
+  PeerReviewCollection,
+  PeerReviewQuestion,
+  Quiz,
+  QuizItem,
+  QuizOption,
+} from "../src/models"
 
 beforeAll(() => {
   Model.knex(knex)
@@ -57,7 +63,9 @@ describe("Soft delete peer review questions", () => {
         _.isEqual(received, quiz)
       })
       .end(async () => {
-        const deletedQuestion = await PeerReviewQuestion.getById(peerReviewQuestionId)
+        const deletedQuestion = await PeerReviewQuestion.getById(
+          peerReviewQuestionId,
+        )
         expect(deletedQuestion.deleted).toEqual(true)
         done()
       })
@@ -101,7 +109,9 @@ describe("Soft delete peer review collections", () => {
         _.isEqual(received, quiz)
       })
       .end(async () => {
-        const deletedPeerReviewCollection = await PeerReviewCollection.getById(peerReviewCollectionId)
+        const deletedPeerReviewCollection = await PeerReviewCollection.getById(
+          peerReviewCollectionId,
+        )
         expect(deletedPeerReviewCollection.deleted).toEqual(true)
         done()
       })
@@ -199,7 +209,7 @@ describe("Soft delete quiz items", () => {
 const userSetup = () => {
   nock("https://tmc.mooc.fi")
     .get("/api/v8/users/current?show_user_fields=true")
-    .reply(function () {
+    .reply(function() {
       const auth = this.req.headers.authorization
       if (auth === "Bearer pleb_token") {
         return [
