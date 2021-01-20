@@ -1748,6 +1748,50 @@ describe("dashboard: get user abilities for course", () => {
       .expect(200, done)
   })
 
+  test("get user abilities, reviewer", done => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer pleb_token") {
+          return [
+            200,
+            {
+              id: 8765,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer admin_token") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer reviewer_token") {
+          return [
+            200,
+            {
+              id: 2020,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+      })
+    request(app.callback())
+      .get(
+        "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/abilities",
+      )
+      .set("Authorization", "bearer reviewer_token")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body).toEqual(["view", "grade"])
+      })
+      .expect(200, done)
+  })
+
   test("get user abilities, teacher", done => {
     nock("https://tmc.mooc.fi")
       .get("/api/v8/users/current?show_user_fields=true")

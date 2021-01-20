@@ -19,12 +19,11 @@ import { useCourse } from "../../hooks/useCourse"
 import { useUserAbilities } from "../../hooks/useUserAbilities"
 import { TabTextError, TabTextLoading } from "../quizPages/TabHeaders"
 import SkeletonLoader from "../Shared/SkeletonLoader"
-import { useRequiringAttentionCount } from "../../hooks/useRequiringAttention"
+import { useAnswersRequiringAttentionCount } from "../../hooks/useAnswersRequiringAttention"
 
 export const TabNavigator = () => {
   const router = useRouter()
   const quizId = router.query.quizId?.toString() ?? ""
-  const URL_HREF = `/quizzes/[quizId]/[...page]`
   const pathname = `/quizzes/${quizId}`
 
   /* tokens passed to hooks are for swr caching  */
@@ -42,7 +41,7 @@ export const TabNavigator = () => {
     requiringAttention,
     requiringAttentionLoading,
     requiringAttentionError,
-  } = useRequiringAttentionCount(quizId, "requiring-attention")
+  } = useAnswersRequiringAttentionCount(quizId, "requiring-attention")
 
   const [currentTab, setCurrentTab] = useState("overview")
 
@@ -89,28 +88,28 @@ export const TabNavigator = () => {
           value="overview"
           label={<Typography>Overview</Typography>}
           onClick={() => {
-            router.push(URL_HREF, `${pathname}/overview`)
-            setCurrentTab("overview")
+            router.push(`${pathname}/overview`, undefined, { shallow: true })
           }}
         />
-        <Tab
-          key="edit"
-          icon={<FontAwesomeIcon icon={faPen} />}
-          value="edit"
-          label={<Typography>Edit quiz</Typography>}
-          onClick={() => {
-            router.push(URL_HREF, `${pathname}/edit`)
-            setCurrentTab("edit")
-          }}
-        />
+        {userAbilities?.includes("edit") && (
+          <Tab
+            key="edit"
+            icon={<FontAwesomeIcon icon={faPen} />}
+            value="edit"
+            label={<Typography>Edit quiz</Typography>}
+            onClick={() => {
+              router.push(`${pathname}/edit`, undefined, { shallow: true })
+            }}
+          />
+        )}
+
         <Tab
           key="all-answers"
           icon={<FontAwesomeIcon icon={faScroll} />}
           value="all-answers"
           label={<Typography>All answers</Typography>}
           onClick={() => {
-            router.push(URL_HREF, `${pathname}/all-answers`)
-            setCurrentTab("all-answers")
+            router.push(`${pathname}/all-answers`, undefined, { shallow: true })
           }}
         />
         <Tab
@@ -127,8 +126,9 @@ export const TabNavigator = () => {
             </Badge>
           }
           onClick={() => {
-            router.push(URL_HREF, `${pathname}/answers-requiring-attention`)
-            setCurrentTab("answers-requiring-attention")
+            router.push(`${pathname}/answers-requiring-attention`, undefined, {
+              shallow: true,
+            })
           }}
         />
       </Tabs>

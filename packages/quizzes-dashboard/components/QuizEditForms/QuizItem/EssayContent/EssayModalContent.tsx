@@ -7,7 +7,9 @@ import { useDispatch } from "react-redux"
 import {
   editedItemMinWords,
   editedItemMaxWords,
+  editedQuizItemBody,
 } from "../../../../store/editor/items/itemAction"
+import MarkdownEditor from "../../../MarkdownEditor"
 
 const ModalContent = styled.div`
   padding: 1rem;
@@ -42,14 +44,12 @@ export const EssayModalContent = ({ item }: ModalContentProps) => {
         <Typography variant="h3">Advanced Editing</Typography>
       </ModalContentTitleWrapper>
       <ModalContent>
-        <TextField
-          fullWidth
-          variant="outlined"
+        <MarkdownEditor
           label="Description for this quiz item"
-          multiline
-          rows={1}
-          helperText="Use this if you cannot put the description in the 'Description for the whole quiz'-field. You may want to use this if have another quiz item before this one."
-          defaultValue={storeItem.body}
+          text={storeItem.body ?? ""}
+          onChange={event =>
+            dispatch(editedQuizItemBody(event.target.value, storeItem.id))
+          }
         />
       </ModalContent>
       <ModalContent>

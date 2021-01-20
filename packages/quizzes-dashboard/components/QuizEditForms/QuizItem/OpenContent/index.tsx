@@ -24,6 +24,7 @@ import {
 import OpenModalContent from "./OpenModalContent"
 import { deletedItem } from "../../../../store/editor/editorActions"
 import RegexTesterModalContent from "./RegexTesterModalContent"
+import MarkdownEditor from "../../../MarkdownEditor"
 
 const AdvancedBox = styled(Box)`
   background-color: #fafafa !important;
@@ -156,24 +157,18 @@ const OpenContent = ({ item }: openContentProps) => {
         </StyledBox>
       </StyledModal>
       <ItemInfo>
-        <TextField
-          value={storeItem.title ?? ""}
-          multiline
-          fullWidth
-          variant="outlined"
-          label="title"
+        <MarkdownEditor
+          label="Title"
+          text={storeItem.title ?? ""}
           onChange={event =>
             dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
           }
         />
       </ItemInfo>
       <ItemInfo>
-        <TextField
-          value={storeItem.body ?? ""}
-          multiline
-          fullWidth
-          variant="outlined"
+        <MarkdownEditor
           label="Body"
+          text={storeItem.body ?? ""}
           onChange={event =>
             dispatch(editedQuizItemBody(event.target.value, storeItem.id))
           }

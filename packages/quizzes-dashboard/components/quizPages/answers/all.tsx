@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react"
 import _ from "lodash"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
-import { getAllAnswersMatchingQuery } from "../../../services/quizzes"
 import { MenuItem, Switch, Typography, Chip } from "@material-ui/core"
 import styled from "styled-components"
 import QuizTitle from "../QuizTitleContainer"
@@ -17,16 +16,16 @@ import {
 import { ChipProps, IQuizTabProps, TAnswersDisplayed } from "./types"
 import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
 import AnswerListWrapper from "../../Answer/AnswerListWrapper"
-import { Answer } from "../../../types/Answer"
 import {
   useAnswerListState,
   setExpandAll,
-  setAllAnswers,
   setBulkSelectedIds,
   setHandledAnswers,
 } from "../../../contexts/AnswerListContext"
 import AnswerListOptions from "../../Answer/AnswerListOptions"
 import { useAllAnswers } from "../../../hooks/useAllAnswers"
+import { useSearchResultsAllAnswers } from "../../../hooks/useSearchResults"
+import SkeletonLoader from "../../Shared/SkeletonLoader"
 
 const StyledChip = styled(Chip)<ChipProps>`
   display: flex !important;
@@ -41,23 +40,42 @@ const StyledChip = styled(Chip)<ChipProps>`
 `
 
 export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
-  const [
-    { expandAll, allAnswers: allAnswersInContext },
-    dispatch,
-  ] = useAnswerListState()
+  // all answers from context
+  const [{ expandAll }, dispatch] = useAnswerListState()
 
   const route = useRouter()
+  const { pageNo, sort, answers, filters } = route.query
+  const filtersAsStringArray = filters?.toString().split(",")
+
   const quizId = quiz?.id
 
-  const URL_HREF = `/quizzes/[quizId]/[...page]`
   const pathname = `/quizzes/${quizId}/all-answers/`
 
-  const [currentPage, setCurrentPage] = useState(1)
-  const [sortOrder, setSortOrder] = useState("desc")
-  const [answersDisplayed, setAnswersDisplayed] = useState(10)
-  const [filterParameters, setFilterParameters] = useState<string[]>([])
+  const [currentPage, setCurrentPage] = useState(Number(pageNo) || 1)
+  const [sortOrder, setSortOrder] = useState((sort as string) || "desc")
+  const [answersDisplayed, setAnswersDisplayed] = useState(
+    Number(answers) || 10,
+  )
+  const [filterParameters, setFilterParameters] = useState<string[]>(
+    filtersAsStringArray || [],
+  )
+  const [searchQuery, setSearchQuery] = useState("")
+  const [queryToPush, setQueryToPush] = useState({})
+  useBreadcrumbs([
+    {
+      label: "Courses",
+      as: "/",
+    },
+    {
+      label: `${course ? course.title : ""}`,
+      as: `/courses/${quiz?.courseId}/listing`,
+    },
+    {
+      label: `${quiz ? quiz.title : ""}`,
+    },
+  ])
 
-  const { allAnswers, allAnswersError: answersError } = useAllAnswers(
+  const { allAnswers, allAnswersLoading, allAnswersError } = useAllAnswers(
     quizId,
     currentPage,
     answersDisplayed,
@@ -66,47 +84,18 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
     "all-answers",
   )
 
-  useEffect(() => {
-    dispatch(setBulkSelectedIds([]))
-    dispatch(setHandledAnswers([]))
-    if (allAnswers) {
-      dispatch(setAllAnswers(allAnswers))
-    }
-  }, [allAnswers])
-
-  const [searchResults, setSearchResults] = useState<
-    | {
-        results: Answer[]
-        total: number
-      }
-    | undefined
-    | null
-  >(null)
-
-  const [fetchingAnswers, setFetchingAnswers] = useState(false)
-
-  const handleTextSearch = async (searchQuery: string) => {
-    try {
-      setFetchingAnswers(true)
-      if (!searchQuery) {
-        setSearchResults(null)
-      } else {
-        const response = await getAllAnswersMatchingQuery(
-          quizId,
-          currentPage,
-          answersDisplayed,
-          sortOrder,
-          filterParameters,
-          searchQuery,
-        )
-        setSearchResults(response)
-      }
-    } catch (err) {
-      console.log(err)
-    } finally {
-      setFetchingAnswers(false)
-    }
-  }
+  const {
+    searchResults,
+    searchResultsLoading,
+    searchResultsError,
+  } = useSearchResultsAllAnswers(
+    quizId,
+    answersDisplayed,
+    sortOrder,
+    searchQuery,
+    filterParameters,
+    "search-all-answers",
+  )
 
   const isIncludedInFilter = (param: string) => {
     if (!route.query.filters) {
@@ -115,86 +104,89 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
     return route.query.filters?.includes(param)
   }
 
-  const states: { [state: string]: { checked: boolean } } = {
-    "manual-review": { checked: isIncludedInFilter("manual-review") },
-    rejected: { checked: isIncludedInFilter("rejected") },
+  const states: {
+    [state: string]: {
+      checked: boolean
+    }
+  } = {
+    "manual-review": {
+      checked: isIncludedInFilter("manual-review"),
+    },
+    rejected: {
+      checked: isIncludedInFilter("rejected"),
+    },
     "manual-review-once-given-and-received-enough": {
       checked: isIncludedInFilter(
         "manual-review-once-given-and-received-enough",
       ),
     },
-    draft: { checked: isIncludedInFilter("draft") },
-    "given-enough": { checked: isIncludedInFilter("given-enough") },
-    confirmed: { checked: isIncludedInFilter("confirmed") },
+    draft: {
+      checked: isIncludedInFilter("draft"),
+    },
+    "given-enough": {
+      checked: isIncludedInFilter("given-enough"),
+    },
+    confirmed: {
+      checked: isIncludedInFilter("confirmed"),
+    },
     "given-more-than-enough": {
       checked: isIncludedInFilter("given-more-than-enough"),
     },
-    deprecated: { checked: isIncludedInFilter("deprecated") },
+    deprecated: {
+      checked: isIncludedInFilter("deprecated"),
+    },
     "enough-received-but-not-given": {
       checked: isIncludedInFilter("enough-received-but-not-given"),
     },
-    submitted: { checked: isIncludedInFilter("submitted") },
+    submitted: {
+      checked: isIncludedInFilter("submitted"),
+    },
     "manual-review-once-given-enough": {
       checked: isIncludedInFilter("manual-review-once-given-enough"),
     },
-    spam: { checked: isIncludedInFilter("spam") },
+    spam: {
+      checked: isIncludedInFilter("spam"),
+    },
   }
 
   const [chipStates, setChipStates] = useState(states)
 
   useBreadcrumbs([
-    { label: "Courses", as: "/", href: "/" },
+    { label: "Courses", as: "/" },
     {
       label: `${course ? course.title : ""}`,
       as: `/courses/${quiz?.courseId}/listing`,
-      href: "/courses/[courseId]/[...page]",
     },
     {
       label: `${quiz ? quiz.title : ""}`,
     },
   ])
 
-  const [queryToPush, setQueryToPush] = useState({})
-
-  const { pageNo, sort, answers, filters } = route.query
-
-  // this needs to be run so that if the page with query params is loaded in
-  // another window, the params can be updated without clearing the rest first
   useEffect(() => {
-    let initialQuery: any = {}
-    if (pageNo) {
-      setCurrentPage(Number(pageNo))
-      initialQuery.pageNo = pageNo
-    }
-    if (answers) {
-      setAnswersDisplayed(Number(answers))
-      initialQuery.answers = answers
-    }
-    if (expandAll) {
-      dispatch(setExpandAll(true))
-      initialQuery.expandAll = expandAll
-    }
-    if (sort) {
-      setSortOrder(sort as string)
-      initialQuery.sort = sort
-    }
-    if (filters) {
-      let filtersAsStringArray: string[] = filters.toString().split(",")
+    dispatch(setBulkSelectedIds([]))
+    dispatch(setHandledAnswers([]))
+
+    if (filtersAsStringArray) {
       setFilterParameters(filtersAsStringArray)
-      initialQuery.filters = filtersAsStringArray
     }
-    setQueryToPush(initialQuery)
-  }, [])
+  }, [allAnswers, searchResults])
+
+  const handleTextSearch = async (searchQuery: string) => {
+    setSearchQuery(searchQuery)
+  }
 
   /**
    *  handled separately since
    * @param nextPage page being paginated to
    */
   const handlePageChange = (nextPage: number) => {
-    setQueryToPush({ ...queryToPush, pageNo: nextPage })
+    setQueryToPush({
+      ...queryToPush,
+      pageNo: nextPage,
+    })
     setCurrentPage(nextPage)
     let query = { ...queryToPush, pageNo: nextPage }
-    route.push(URL_HREF, { pathname, query }, { shallow: true })
+    route.push(pathname, { pathname, query }, { shallow: true })
   }
 
   /**
@@ -229,7 +221,10 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
         query = updatedQueryParams
         break
       case "order":
-        updatedQueryParams = { ...updatedQueryParams, sort: event.target.value }
+        updatedQueryParams = {
+          ...updatedQueryParams,
+          sort: event.target.value,
+        }
         setQueryToPush(updatedQueryParams)
         setSortOrder(event.target.value)
         query = updatedQueryParams
@@ -247,7 +242,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
     }
 
     setQueryToPush(updatedQueryParams)
-    route.push(URL_HREF, { pathname, query }, { shallow: true })
+    route.push(pathname, { pathname, query }, { shallow: true })
   }
 
   /**
@@ -258,28 +253,33 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
     filters = filters.toString()
     // if removing last filter
     if (filters === "") {
-      let updatedQueryParams: any = { ...queryToPush }
+      let updatedQueryParams: any = {
+        ...queryToPush,
+      }
       // remove filter from query params so it doesn't display and empty filter query
       if (updatedQueryParams.filters) {
         delete updatedQueryParams.filters
       }
       setQueryToPush(updatedQueryParams)
       let query = updatedQueryParams
-      route.push(URL_HREF, { pathname, query }, { shallow: true })
+      route.push(pathname, { pathname, query }, { shallow: true })
       return
     }
 
-    let updatedQueryParams = { ...queryToPush, filters: filters }
+    let updatedQueryParams = {
+      ...queryToPush,
+      filters: filters,
+    }
     setQueryToPush(updatedQueryParams)
     let query = updatedQueryParams
-    route.push(URL_HREF, { pathname, query }, { shallow: true })
+    route.push(pathname, { pathname, query }, { shallow: true })
   }
 
-  const availableAnswers = searchResults
-    ? searchResults
-    : allAnswersInContext
-    ? allAnswersInContext
-    : { results: [], total: 0 }
+  const answersAreBeingFetched = searchResultsLoading || allAnswersLoading
+
+  const errorFetchingAnswers = allAnswersError || searchResultsError
+
+  const answersToDisplay = searchResults ? searchResults : allAnswers
 
   return (
     <>
@@ -351,20 +351,31 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
           )
         })}
       </FilterParamsField>
-      <AnswerListOptions
-        answers={availableAnswers}
-        handleTextSearch={handleTextSearch}
-      />
-      <AnswerListWrapper
-        order={sortOrder}
-        quizId={quizId}
-        size={answersDisplayed}
-        handlePageChange={handlePageChange}
-        page={currentPage}
-        answersError={answersError}
-        fetchingAnswers={fetchingAnswers}
-        answers={availableAnswers}
-      />
+      {answersToDisplay ? (
+        <>
+          <AnswerListOptions
+            answers={answersToDisplay}
+            handleTextSearch={handleTextSearch}
+            searchResultCount={searchResults?.total || 0}
+          />
+          <AnswerListWrapper
+            order={sortOrder}
+            quizId={quizId}
+            size={answersDisplayed}
+            handlePageChange={handlePageChange}
+            page={currentPage}
+            answers={answersToDisplay}
+          />
+        </>
+      ) : answersAreBeingFetched ? (
+        <SkeletonLoader height={250} skeletonCount={4} />
+      ) : errorFetchingAnswers ? (
+        <Typography variant="h3">
+          Something went wrong while retrieving answers.
+        </Typography>
+      ) : (
+        <Typography variant="h3">No answers available.</Typography>
+      )}
     </>
   )
 }

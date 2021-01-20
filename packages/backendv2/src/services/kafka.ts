@@ -119,6 +119,7 @@ export const broadcastCourseQuizzesUpdated = async (
 ) => {
   const quizzes = await Quiz.query(trx)
     .where("course_id", courseId)
+    .whereNot("part", 0)
     .withGraphJoined("texts")
   const course = await Course.query(trx).findById(courseId)
 

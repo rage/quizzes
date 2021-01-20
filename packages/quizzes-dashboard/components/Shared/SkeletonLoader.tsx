@@ -4,9 +4,11 @@ import { StyledSkeleton } from "../quizPages/answers/styles"
 export const SkeletonLoader = ({
   height,
   skeletonCount,
+  ...props
 }: {
   height: number
   skeletonCount: number
+  props?: any
 }) => {
   return (
     <>
@@ -16,6 +18,7 @@ export const SkeletonLoader = ({
           variant="rect"
           height={height}
           animation="wave"
+          {...props}
         />
       ))}
     </>

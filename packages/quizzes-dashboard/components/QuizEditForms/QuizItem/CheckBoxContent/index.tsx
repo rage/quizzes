@@ -22,6 +22,7 @@ import {
   faPen,
 } from "@fortawesome/free-solid-svg-icons"
 import { deletedItem } from "../../../../store/editor/editorActions"
+import MarkdownEditor from "../../../MarkdownEditor"
 
 interface contentBoxProps {
   item: NormalizedItem
@@ -142,15 +143,12 @@ const CheckBoxContent = ({ item }: contentBoxProps) => {
       </StyledModal>
       <Container>
         <TitleField>
-          <TextField
+          <MarkdownEditor
             label="title"
-            fullWidth
-            multiline
-            value={storeItem.title ?? ""}
-            variant="outlined"
             onChange={event =>
               dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
             }
+            text={storeItem.title ?? ""}
           />
         </TitleField>
         <PreviewField>

@@ -12,7 +12,7 @@ import {
 import { Answer } from "../../types/Answer"
 import AnswerSearchForm from "../AnswerSearchForm"
 import { SwitchField } from "../quizPages/answers/styles"
-import { editableAnswerStates } from "./constants"
+import { editableAnswerStates } from "../constants"
 
 const BulkSelectWrapper = styled.div`
   display: flex;
@@ -40,9 +40,11 @@ const OptionsWrapper = styled.div`
 const AnswerListOptions = ({
   answers,
   handleTextSearch,
+  searchResultCount,
 }: {
   answers: { results: Answer[]; total: number }
   handleTextSearch: (searchQuery: string) => Promise<void>
+  searchResultCount: number
 }) => {
   const [{ bulkSelectMode }, dispatch] = useAnswerListState()
   const [enableSearch, setEnableSearch] = useState(false)
@@ -97,7 +99,12 @@ const AnswerListOptions = ({
         <FontAwesomeIcon icon={faSearch} size="2x" />
         <Typography>{enableSearch ? "Hide" : "Search"}</Typography>
       </div>
-      {enableSearch && <AnswerSearchForm handleSubmit={handleTextSearch} />}
+      {enableSearch && (
+        <AnswerSearchForm
+          handleSubmit={handleTextSearch}
+          searchResultCount={searchResultCount}
+        />
+      )}
     </OptionsWrapper>
   )
 }

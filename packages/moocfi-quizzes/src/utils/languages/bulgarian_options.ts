@@ -127,7 +127,7 @@ const bulgarianLabels: SingleLanguageLabels = {
       }
     },
     answered: "Отговорено",
-    unanswered: "Отговорено",
+    unanswered: "Без отговор",
     rejected: "Отхвърлен отговор, опитайте отново",
     progressUpdated: "Актуализирани са данните за достигнатия етап в курса",
     answerConfirmed: "Отговорът е приет!",
