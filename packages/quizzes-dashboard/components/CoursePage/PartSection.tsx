@@ -22,7 +22,7 @@ export const SectionOfPart = ({
           <QuizOfSection
             key={quiz.id}
             quiz={quiz}
-            requiringAttention={requiringAttention[quiz.id]}
+            requiringAttention={requiringAttention[quiz.id!]}
           />
         )
       })}

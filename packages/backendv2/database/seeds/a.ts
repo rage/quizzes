@@ -412,6 +412,9 @@ export async function seed(knex: Knex): Promise<any> {
       {
         id: 8765,
       },
+      {
+        id: 2020,
+      },
     ]),
   ])
 
@@ -431,6 +434,11 @@ export async function seed(knex: Knex): Promise<any> {
         user_id: 8765,
         course_id: "51b66fc3-4da2-48aa-8eab-404370250ca3",
         role: "assistant",
+      },
+      {
+        user_id: 2020,
+        course_id: "51b66fc3-4da2-48aa-8eab-404370250ca3",
+        role: "reviewer",
       },
     ]),
   ])

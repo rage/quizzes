@@ -18,6 +18,7 @@ import { useTypedSelector } from "../../../../store/store"
 import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
 import EssayModalContent from "./EssayModalContent"
 import { deletedItem } from "../../../../store/editor/editorActions"
+import MarkdownEditor from "../../../MarkdownEditor"
 
 const InfoContainer = styled.div`
   padding: 1rem 0;
@@ -119,17 +120,12 @@ const EssayContent = ({ item }: essayContentProps) => {
         </Fade>
       </StyledModal>
       <InfoContainer>
-        <TextField
-          fullWidth
-          variant="outlined"
+        <MarkdownEditor
           label="Description for this quiz item"
-          multiline
-          rows={1}
-          helperText="Use this if you cannot put the description in the 'Description for the whole quiz'-field. You may want to use this if you have another quiz item before this one."
-          defaultValue={storeItem.title ?? ""}
           onChange={event =>
             dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
           }
+          text={storeItem.title ?? ""}
         />
       </InfoContainer>
       <OneLineInfoContainer>
