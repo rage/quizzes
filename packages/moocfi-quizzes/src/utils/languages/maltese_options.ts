@@ -1,6 +1,6 @@
 import { SingleLanguageLabels } from "./index"
 
-const maltaOptions: SingleLanguageLabels = {
+const malteseLabels: SingleLanguageLabels = {
   essay: {
     exampleAnswerLabel: "Eżempju ta’ tweġiba",
     userAnswerLabel: "Eżempju ta’ tweġiba",
@@ -149,4 +149,4 @@ const maltaOptions: SingleLanguageLabels = {
   },
 }
 
-export default maltaOptions
+export default malteseLabels

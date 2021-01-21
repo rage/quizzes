@@ -53,6 +53,7 @@ export const abilitiesByRole: { [role: string]: string[] } = {
   admin: ["view", "edit", "grade", "download", "duplicate"],
   assistant: ["view", "edit", "grade"],
   teacher: ["view", "edit", "grade"],
+  reviewer: ["view", "grade"],
 }
 
 export const getCourseIdByAnswerId = async (answerId: string) => {

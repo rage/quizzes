@@ -137,7 +137,6 @@ export const getAnswersRequiringAttention = async (
 
 export const getAnswersRequiringAttentionMatchingQuery = async (
   quizId: string,
-  page: number,
   size: number,
   order: string,
   searchQuery: string,
@@ -149,8 +148,7 @@ export const getAnswersRequiringAttentionMatchingQuery = async (
     }
     const response = (
       await api.post(
-        `/answers/${quizId}/manual-review?page=${page -
-          1}&size=${size}&order=${order}`,
+        `/answers/${quizId}/manual-review?size=${size}&order=${order}`,
         { searchQuery },
         config,
       )
@@ -162,7 +160,6 @@ export const getAnswersRequiringAttentionMatchingQuery = async (
 
 export const getAllAnswersMatchingQuery = async (
   quizId: string,
-  page: number,
   size: number,
   order: string,
   filters: string[],
@@ -175,8 +172,7 @@ export const getAllAnswersMatchingQuery = async (
     }
     const response = (
       await api.post(
-        `/answers/${quizId}/all?page=${page -
-          1}&size=${size}&order=${order}&filters=${filters}`,
+        `/answers/${quizId}/all?size=${size}&order=${order}&filters=${filters}`,
         { searchQuery },
         config,
       )

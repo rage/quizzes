@@ -232,7 +232,7 @@ const EditCourseDetails = () => {
   )
 
   useBreadcrumbs([
-    { label: "Courses", as: "/", href: "/" },
+    { label: "Courses", as: "/" },
     {
       label: `${courseData ? courseData.course.title : ""}`,
     },

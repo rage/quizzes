@@ -1,7 +1,7 @@
 import React from "react"
 import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import styled from "styled-components"
-import { Button, TextField, Modal, Fade, Box } from "@material-ui/core"
+import { Button, Modal, Fade, Box } from "@material-ui/core"
 import { useDispatch } from "react-redux"
 import { useTypedSelector } from "../../../../store/store"
 import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
@@ -19,6 +19,7 @@ import {
   createdNewOption,
   deletedItem,
 } from "../../../../store/editor/editorActions"
+import MarkdownEditor from "../../../MarkdownEditor"
 
 const QuizContent = styled.div`
   padding: 1rem;
@@ -118,17 +119,13 @@ const ClickableMultipleChoiceContent = ({
         </Fade>
       </StyledModal>
       <QuizContentLineContainer>
-        <QuizContent>
-          <TextField
-            multiline
-            label="Title"
-            variant="outlined"
-            value={storeItem.title ?? ""}
-            onChange={event =>
-              dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
-            }
-          />
-        </QuizContent>
+        <MarkdownEditor
+          label="Title"
+          text={storeItem.title ?? ""}
+          onChange={event =>
+            dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
+          }
+        />
         {storeItem.options.map(option => (
           <QuizContent key={option}>
             <ClickableMultipleChoiceButton option={storeOptions[option]} />

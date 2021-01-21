@@ -6,12 +6,12 @@ import DownloadInfoForms from "../DownloadInfoForms"
 import QuizTitle from "./QuizTitleContainer"
 import { TabText } from "./TabHeaders"
 import { AnswerStatistics } from "./AnswerStatistics"
+import { MarkDownText } from "../MarkDownText"
 import { IQuizTabProps } from "./answers/types"
 
 const DescriptionContainer = styled.div`
   display: flex;
   justify-content: center;
-  white-space: pre-line;
   flex-wrap: wrap;
   width: 100%;
   padding: 1rem;
@@ -33,11 +33,10 @@ const StyledCard = styled(Card)`
 
 export const OverView = ({ quiz, course, userAbilities }: IQuizTabProps) => {
   useBreadcrumbs([
-    { label: "Courses", as: "/", href: "/" },
+    { label: "Courses", as: "/" },
     {
       label: `${course ? course.title : ""}`,
       as: `/courses/${quiz?.courseId}/listing`,
-      href: "/courses/[courseId]/[...page]",
     },
     {
       label: `${quiz ? quiz.title : ""}`,
@@ -48,13 +47,13 @@ export const OverView = ({ quiz, course, userAbilities }: IQuizTabProps) => {
     <>
       <TabText text={quiz.title} />
       <QuizTitle quiz={quiz} />
-      <StyledCard>
-        {quiz.body && (
+      {quiz.body && (
+        <StyledCard>
           <DescriptionContainer>
-            <Typography>{quiz.body}</Typography>
+            <MarkDownText text={quiz.body} />
           </DescriptionContainer>
-        )}
-      </StyledCard>
+        </StyledCard>
+      )}
       <StyledCard>
         <Typography variant="h3">Quiz answer by status</Typography>
         <AnswerStatistics />

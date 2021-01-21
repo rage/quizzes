@@ -31,11 +31,10 @@ const EditPage = ({ quiz, course }: IQuizTabProps) => {
   }, [quiz])
 
   useBreadcrumbs([
-    { label: "Courses", as: "/", href: "/" },
+    { label: "Courses", as: "/" },
     {
       label: `${course ? course.title : ""}`,
       as: `/courses/${quiz?.courseId}/listing`,
-      href: "/courses/[courseId]/[...page]",
     },
     {
       label: `${quiz ? quiz.title : ""}`,

@@ -19,6 +19,7 @@ import {
   createdNewOption,
   deletedItem,
 } from "../../../../store/editor/editorActions"
+import MarkdownEditor from "../../../MarkdownEditor"
 
 const QuizContent = styled.div`
   padding: 1rem;
@@ -127,21 +128,16 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
           </AdvancedBox>
         </Fade>
       </StyledModal>
-      <TitleWrapper>
-        <TextField
-          fullWidth
-          multiline
-          label="Title"
-          variant="outlined"
-          value={storeItem.title ?? ""}
-          onChange={event =>
-            dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
-          }
-        />
-      </TitleWrapper>
+      <MarkdownEditor
+        label="title"
+        onChange={event =>
+          dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
+        }
+        text={storeItem.title ?? ""}
+      />
       <QuizContentLineContainer>
         {storeItem.options.map(option => (
-          <QuizContent>
+          <QuizContent key={option}>
             <MultipleChoiceButton option={storeOptions[option]} />
           </QuizContent>
         ))}
