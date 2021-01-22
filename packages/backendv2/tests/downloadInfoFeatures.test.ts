@@ -11,8 +11,11 @@ import redis from "../config/redis"
 afterAll(async () => {
   await safeClean()
   await knex.destroy()
-  await redis.client?.flushall()
   await redis.client?.quit()
+})
+
+afterEach(async () => {
+  await redis.client?.flushall()
 })
 
 describe("dashboard - courses: downloading quiz info should", () => {

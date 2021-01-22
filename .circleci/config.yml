@@ -37,6 +37,9 @@ jobs:
       - run:
           name: "Push image if on master"
           command: "bin/push-docker-dashboardv2-image.sh"
+      - run:
+          name: "install redis"
+          command: "apt-get update && apt-get install -y redis-server"
 
   build_widgets:
     docker:
