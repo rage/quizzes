@@ -7,6 +7,7 @@ import knex from "../database/knex"
 import { Model, snakeCaseMappers } from "objection"
 
 import { UserInfo } from "../src/types"
+import redis from "../config/redis"
 
 const knexCleaner = require("knex-cleaner")
 
@@ -27,9 +28,14 @@ beforeAll(() => {
   Model.columnNameMappers = snakeCaseMappers()
 })
 
+afterEach(async () => {
+  return redis.client?.flushall()
+})
+
 afterAll(async () => {
   await safeClean()
   await knex.destroy()
+  await redis.client?.quit()
 })
 
 describe("dashboard: updating the status of multiple quiz answers should", () => {

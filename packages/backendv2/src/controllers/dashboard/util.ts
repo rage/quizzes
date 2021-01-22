@@ -1,4 +1,3 @@
-import IORedis, { Redis } from "ioredis"
 import crypto from "crypto"
 import { NotFoundError } from "./../../util/error"
 import knex from "../../../database/knex"
@@ -87,9 +86,7 @@ export const getDownloadTokenFromRedis = async (
 ): Promise<string> => {
   let downloadToken = ""
   if (redis.client) {
-    console.log("client available")
     const cachedToken = JSON.parse((await redis.client.get(username)) as string)
-    console.log("💩 ~ file: util.ts ~ line 90 ~ cachedToken", cachedToken)
     if (cachedToken) {
       downloadToken = cachedToken
     } else {
