@@ -327,10 +327,6 @@ const dashboard = new Router<CustomState, CustomContext>({
     const { courseId } = ctx.request.body
     const username = ctx.state.user.username
 
-    if (!username) {
-      throw new BadRequestError("No username provided.")
-    }
-
     // check permissions
     await checkAccessOrThrow(ctx.state.user, courseId, "download")
 
