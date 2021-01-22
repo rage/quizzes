@@ -9,7 +9,7 @@ import {
 import redis from "../../config/redis"
 
 interface AccessControlOptions {
-  administator?: boolean
+  administrator?: boolean
   unrestricted?: boolean
 }
 
@@ -49,24 +49,12 @@ export const accessControl = (options?: AccessControlOptions) => {
     }
 
     ctx.state.user = user
-    if (options?.administator && !user.administrator) {
+    if (options?.administrator && !user.administrator) {
       throw new ForbiddenError("forbidden")
     }
     return next()
   }
   return accessControl
-}
-
-export const validToken = async (token: string): Promise<boolean> => {
-  try {
-    const user = await getCurrentUserDetails(token)
-    if (user && user.administrator) {
-      return true
-    }
-    return false
-  } catch (e) {
-    return false
-  }
 }
 
 export default accessControl
