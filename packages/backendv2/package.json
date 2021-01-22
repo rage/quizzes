@@ -10,6 +10,7 @@
     "watch": "nodemon ./dist/server.js",
     "dev": "concurrently npm:ts-watch npm:watch",
     "test": "export NODE_ENV=test && jest --runInBand",
+    "test-open-conn": "export NODE_ENV=test && jest --runInBand --detectOpenHandles ",
     "reset-test-db": "export NODE_ENV=test && (dropdb quizzes_test || true) && createdb quizzes_test && knex migrate:latest",
     "migrate": "knex migrate:latest",
     "seed": "knex seed:run --specific a.ts"
