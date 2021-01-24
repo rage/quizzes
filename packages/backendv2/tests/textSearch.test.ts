@@ -228,9 +228,6 @@ describe("dashboard: searching for manual review answers based on text content s
         .set("Authorization", `bearer ADMIN_TOKEN`)
         .set("Accept", "application/json")
         .send({ searchQuery: "test" })
-        .expect(response => {
-          console.log(response.body)
-        })
         .expect(200, done)
     })
 
