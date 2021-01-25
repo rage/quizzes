@@ -70,9 +70,7 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: quizzes_test
       - image: circleci/redis:6.0.8-alpine
-        environment:
-          REDIS_HOST: localhost
-          REDIS_PORT: 6379
+
     steps:
       - checkout
       - run:
@@ -115,6 +113,9 @@ jobs:
       - run:
           name: "run tests"
           command: "cd packages/backendv2 && npm run test -- --coverage"
+          environment:
+            REDIS_HOST: localhost
+            REDIS_PORT: 6379
       - run:
           name: "Upload coverage"
           command: "cd packages/backendv2 && bash <(curl -s https://codecov.io/bash)"
