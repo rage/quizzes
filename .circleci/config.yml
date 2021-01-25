@@ -69,7 +69,7 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: quizzes_test
-      - image: circleci/redis:alpine-ram
+      - image: circleci/redis:6.0.8-alpine
         environment:
           REDIS_HOST: localhost
           REDIS_PORT: 6379
