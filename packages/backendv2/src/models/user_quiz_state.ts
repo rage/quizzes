@@ -89,7 +89,7 @@ class UserQuizState extends BaseModel {
         points_awarded:
           oldMaxPoints === 0
             ? trx.raw(":maxPoints", { maxPoints })
-            : trx.raw("(points_awarded * :maxPoints / :oldMaxPoints)", {
+            : trx.raw("(points_awarded * :oldMaxPoints / :maxPoints)", {
                 maxPoints,
                 oldMaxPoints,
               }),
