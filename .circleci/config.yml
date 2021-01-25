@@ -71,7 +71,7 @@ jobs:
           POSTGRES_DB: quizzes_test
       - image: circleci/redis:alpine-ram
         environment:
-          REDIS_HOST: $REDIS_HOST
+          REDIS_HOST: localhost
           REDIS_PORT: 6379
     steps:
       - checkout
