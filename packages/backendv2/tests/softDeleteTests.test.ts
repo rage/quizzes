@@ -5,7 +5,7 @@ import knex from "../database/knex"
 import { input } from "./data"
 import { UserInfo } from "../src/types"
 
-import { safeClean, safeSeed, configA } from "./util"
+import { safeClean, safeSeed, configA, expectQuizToEqual } from "./util"
 import _ from "lodash"
 import { Model, snakeCaseMappers } from "objection"
 import {
@@ -37,38 +37,34 @@ describe("Soft delete peer review questions", () => {
 
   beforeEach(() => userSetup())
 
-  it("Responds with 401 on bad token", done => {
+  it("Responds with 401 on bad token", async () => {
     const quiz = input.newQuiz
-    request(app.callback())
+    const res = await request(app.callback())
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer BAD_TOKEN`)
       .set("Accept", "application/json")
       .send(quiz)
-      .expect(401)
-      .end(done)
+
+    expect(res.status).toEqual(401)
   })
 
-  it("Soft deletes peer review question", async done => {
+  it("Soft deletes peer review question", async () => {
     const quiz = await Quiz.getById("4bf4cf2f-3058-4311-8d16-26d781261af7")
     const peerReviewQuestionId = quiz.peerReviewCollections[0].questions[0].id
     quiz.peerReviewCollections[0].questions.shift()
-    request(app.callback())
+    const res = await request(app.callback())
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .set("Accept", "application/json")
       .send(quiz)
-      .expect(200)
-      .expect(response => {
-        const received = response.body
-        _.isEqual(received, quiz)
-      })
-      .end(async () => {
-        const deletedQuestion = await PeerReviewQuestion.getById(
-          peerReviewQuestionId,
-        )
-        expect(deletedQuestion.deleted).toEqual(true)
-        done()
-      })
+
+    expect(res.status).toEqual(200)
+    expectQuizToEqual(res.body, quiz)
+
+    const deletedQuestion = await PeerReviewQuestion.getById(
+      peerReviewQuestionId,
+    )
+    expect(deletedQuestion.deleted).toEqual(true)
   })
 })
 
@@ -83,38 +79,34 @@ describe("Soft delete peer review collections", () => {
 
   beforeEach(() => userSetup())
 
-  it("Responds with 401 on bad token", done => {
+  it("Responds with 401 on bad token", async () => {
     const quiz = input.newQuiz
-    request(app.callback())
+    const res = await request(app.callback())
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer BAD_TOKEN`)
       .set("Accept", "application/json")
       .send(quiz)
-      .expect(401)
-      .end(done)
+
+    expect(res.status).toEqual(401)
   })
 
-  it("Soft deletes peer review collection", async done => {
+  it("Soft deletes peer review collection", async () => {
     const quiz = await Quiz.getById("4bf4cf2f-3058-4311-8d16-26d781261af7")
     const peerReviewCollectionId = quiz.peerReviewCollections[0].id
     quiz.peerReviewCollections.shift()
-    request(app.callback())
+    const res = await request(app.callback())
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .set("Accept", "application/json")
       .send(quiz)
-      .expect(200)
-      .expect(response => {
-        const received = response.body
-        _.isEqual(received, quiz)
-      })
-      .end(async () => {
-        const deletedPeerReviewCollection = await PeerReviewCollection.getById(
-          peerReviewCollectionId,
-        )
-        expect(deletedPeerReviewCollection.deleted).toEqual(true)
-        done()
-      })
+
+    expect(res.status).toEqual(200)
+    expectQuizToEqual(res.body[0], quiz)
+
+    const deletedPeerReviewCollection = await PeerReviewCollection.getById(
+      peerReviewCollectionId,
+    )
+    expect(deletedPeerReviewCollection.deleted).toEqual(true)
   })
 })
 
@@ -129,36 +121,32 @@ describe("Soft delete quiz item options", () => {
 
   beforeEach(() => userSetup())
 
-  it("Responds with 401 on bad token", done => {
+  it("Responds with 401 on bad token", async () => {
     const quiz = input.newQuiz
-    request(app.callback())
+    const res = await request(app.callback())
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer BAD_TOKEN`)
       .set("Accept", "application/json")
       .send(quiz)
-      .expect(401)
-      .end(done)
+
+    expect(res.status).toEqual(401)
   })
 
-  it("Soft deletes quiz item option", async done => {
+  it("Soft deletes quiz item option", async () => {
     const quiz = await Quiz.getById("4bf4cf2f-3058-4311-8d16-26d781261af7")
     const quizOptionId = quiz.items[1].options[0].id
     quiz.items[1].options.shift()
-    request(app.callback())
+    const res = await request(app.callback())
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .set("Accept", "application/json")
       .send(quiz)
-      .expect(200)
-      .expect(response => {
-        const received = response.body
-        _.isEqual(received, quiz)
-      })
-      .end(async () => {
-        const deletedQuizOption = await QuizOption.getById(quizOptionId)
-        expect(deletedQuizOption.deleted).toEqual(true)
-        done()
-      })
+
+    expect(res.status).toEqual(200)
+    expectQuizToEqual(res.body[0], quiz)
+
+    const deletedQuizOption = await QuizOption.getById(quizOptionId)
+    expect(deletedQuizOption.deleted).toEqual(true)
   })
 })
 
@@ -173,36 +161,32 @@ describe("Soft delete quiz items", () => {
 
   beforeEach(() => userSetup())
 
-  it("Responds with 401 on bad token", done => {
+  it("Responds with 401 on bad token", async () => {
     const quiz1 = input.newQuiz
-    request(app.callback())
+    const res = await request(app.callback())
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer BAD_TOKEN`)
       .set("Accept", "application/json")
       .send(quiz1)
-      .expect(401)
-      .end(done)
+
+    expect(res.status).toEqual(401)
   })
 
-  it("Soft deletes quiz item", async done => {
+  it("Soft deletes quiz item", async () => {
     const quiz = await Quiz.getById("4bf4cf2f-3058-4311-8d16-26d781261af7")
     const quizItemId = quiz.items[0].id
     quiz.items.shift()
-    request(app.callback())
+    const res = await request(app.callback())
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .set("Accept", "application/json")
       .send(quiz)
-      .expect(200)
-      .expect(response => {
-        const received = response.body
-        _.isEqual(received, quiz)
-      })
-      .end(async () => {
-        const deletedQuizItem = await QuizItem.getById(quizItemId)
-        expect(deletedQuizItem.deleted).toEqual(true)
-        done()
-      })
+
+    expect(res.status).toEqual(200)
+    expectQuizToEqual(res.body[0], quiz)
+
+    const deletedQuizItem = await QuizItem.getById(quizItemId)
+    expect(deletedQuizItem.deleted).toEqual(true)
   })
 })
 
