@@ -8,7 +8,7 @@ if (process.env.REDIS_HOST && process.env.REDIS_PORT) {
   })
   if (client) {
     console.log(
-      `Redis client initialised and running on ${process.env.REDIS_HOS}:${process.env.REDIS_PORT}`,
+      `Redis client initialized and running on ${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
     )
   }
 }

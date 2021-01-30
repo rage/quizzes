@@ -14,10 +14,6 @@ afterAll(async () => {
   await redis.client?.quit()
 })
 
-afterEach(async () => {
-  await redis.client?.flushall()
-})
-
 describe("dashboard - courses: downloading quiz info should", () => {
   beforeAll(async () => {
     await safeSeed(configA)
@@ -88,12 +84,34 @@ describe("dashboard - courses: downloading quiz info should", () => {
       .expect(200)
       .expect(response => {
         const { downloadUrl, username } = response.body
+        const downloadToken = downloadUrl.substring(
+          downloadUrl.lastIndexOf("=") + 1,
+        )
         expect(username).toEqual("admin")
         expect(downloadUrl).toInclude(
           `/download/download-quiz-info/${quizId}?&downloadToken=`,
         )
+        expect(downloadToken)
       })
       .end(done)
+  })
+  describe("attempting to download with a download token", () => {
+    test("should return csv content on success ", async done => {
+      const downloadToken = await redis.client?.get("admin")
+      const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
+      request(app.callback())
+        .post(
+          `/api/v2/dashboard/quizzes/download/download-quiz-info/${quizId}?&downloadToken=${downloadToken}`,
+        )
+        .send({
+          username: "admin",
+          quizName: "test",
+          courseName: "test",
+        })
+        .expect("Content-Type", "text/csv; charset=utf-8")
+        .expect(200)
+        .end(done)
+    })
   })
 })
 
@@ -167,12 +185,35 @@ describe("dashboard: downloading peer review info should", () => {
       .expect(200)
       .expect(response => {
         const { downloadUrl, username } = response.body
+        const downloadToken = downloadUrl.substring(
+          downloadUrl.lastIndexOf("=") + 1,
+        )
         expect(username).toEqual("admin")
         expect(downloadUrl).toInclude(
           `/download/download-peerreview-info/${quizId}?&downloadToken=`,
         )
+        expect(downloadToken)
       })
       .end(done)
+  })
+
+  describe("attempting to download with a download token", () => {
+    test("should return csv content on success ", async done => {
+      const downloadToken = await redis.client?.get("admin")
+      const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
+      request(app.callback())
+        .post(
+          `/api/v2/dashboard/quizzes/download/download-peerreview-info/${quizId}?&downloadToken=${downloadToken}`,
+        )
+        .send({
+          username: "admin",
+          quizName: "test",
+          courseName: "test",
+        })
+        .expect("Content-Type", "text/csv; charset=utf-8")
+        .expect(200)
+        .end(done)
+    })
   })
 })
 
@@ -236,7 +277,7 @@ describe("dashboard: downloading answer info should", () => {
       .end(done)
   })
 
-  test("return a valid download url and username on successful request", done => {
+  test("return a download url and username on successful request", done => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
     request(app.callback())
       .post(`/api/v2/dashboard/quizzes/${quizId}/download-answer-info`)
@@ -247,12 +288,35 @@ describe("dashboard: downloading answer info should", () => {
       .expect(200)
       .expect(response => {
         const { downloadUrl, username } = response.body
+        const downloadToken = downloadUrl.substring(
+          downloadUrl.lastIndexOf("=") + 1,
+        )
         expect(username).toEqual("admin")
         expect(downloadUrl).toInclude(
           `/download/download-answer-info/${quizId}?&downloadToken=`,
         )
+        expect(downloadToken)
       })
       .end(done)
+  })
+
+  describe("attempting to download with a download token", () => {
+    test("should return csv content on success ", async done => {
+      const downloadToken = await redis.client?.get("admin")
+      const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
+      request(app.callback())
+        .post(
+          `/api/v2/dashboard/quizzes/download/download-answer-info/${quizId}?&downloadToken=${downloadToken}`,
+        )
+        .send({
+          username: "admin",
+          quizName: "test",
+          courseName: "test",
+        })
+        .expect("Content-Type", "text/csv; charset=utf-8")
+        .expect(200)
+        .end(done)
+    })
   })
 })
 
