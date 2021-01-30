@@ -558,16 +558,6 @@ describe("dashboard: save quiz", () => {
       })
   })
 
-  test("respond with error if required field missing", done => {
-    request(app.callback())
-      .post("/api/v2/dashboard/quizzes")
-      .set("Authorization", `bearer ADMIN_TOKEN`)
-      .set("Accept", "application/json")
-      .send({ ...input.newQuiz, part: null })
-      .expect(400)
-      .end(done)
-  })
-
   test("respond with 401 if invalid credentials", done => {
     request(app.callback())
       .post("/api/v2/dashboard/quizzes")
