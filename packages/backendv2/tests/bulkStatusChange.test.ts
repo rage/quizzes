@@ -57,7 +57,7 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {

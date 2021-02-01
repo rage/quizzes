@@ -38,7 +38,7 @@ describe("dashboard: get courses", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -102,7 +102,7 @@ describe("dashboard: get single course should", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -177,7 +177,7 @@ describe("dashboard - courses: count answers requiring attention should", () => 
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -276,7 +276,7 @@ describe("dashboard - quizzes: count answers requiring attention should", () => 
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -360,7 +360,7 @@ describe("dashboard: get quizzes by course id", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -398,7 +398,7 @@ describe("dashboard: get quizzes by course id", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -461,7 +461,7 @@ describe("dashboard: get quiz by id", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -523,7 +523,7 @@ describe("dashboard: save quiz", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -647,7 +647,7 @@ describe("dashboard: get answer by id", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -709,7 +709,7 @@ describe("dashboard: get answers by quiz id", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -809,7 +809,7 @@ describe("dashboard: get manual review answers", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -894,7 +894,7 @@ describe("dashboard: update manual review status", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1009,7 +1009,7 @@ describe("Answer: spam flags", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1138,7 +1138,7 @@ describe("fetching user progress should", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1212,7 +1212,7 @@ describe("dashboard - courses: duplicating course should", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1325,7 +1325,7 @@ describe("dashboard - courses: downloading a correspondence file should", () => 
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1375,7 +1375,7 @@ describe("dashboard: fetching all exisiting languages languages", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1412,7 +1412,7 @@ describe("dashboard: an edit made to a course should", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1471,7 +1471,7 @@ describe("dashboard - courses: downloading quiz info should", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1529,7 +1529,7 @@ describe("dashboard: downloading peer review info should", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1588,7 +1588,7 @@ describe("dashboard: downloading answer info should", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1648,7 +1648,7 @@ describe("dashboard: get current users abilities", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1681,7 +1681,7 @@ describe("dashboard: get current users abilities", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1726,7 +1726,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1761,7 +1761,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1769,7 +1769,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer reviewer_token") {
+        if (auth === "Bearer REVIEWER_TOKEN") {
           return [
             200,
             {
@@ -1783,7 +1783,7 @@ describe("dashboard: get user abilities for course", () => {
       .get(
         "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/abilities",
       )
-      .set("Authorization", "bearer reviewer_token")
+      .set("Authorization", "bearer REVIEWER_TOKEN")
       .set("Accept", "application/json")
       .expect(res => {
         expect(res.body).toEqual(["view", "grade"])
@@ -1805,7 +1805,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1839,7 +1839,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1853,7 +1853,7 @@ describe("dashboard: get user abilities for course", () => {
       .get(
         "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/abilities",
       )
-      .set("Authorization", "bearer admin_token")
+      .set("Authorization", "bearer ADMIN_TOKEN")
       .set("Accept", "application/json")
       .expect(res => {
         expect(res.body).toEqual([
@@ -1881,7 +1881,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1919,7 +1919,7 @@ describe("dashboard: get quizzes answer statistics", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer insufficient_token") {
+        if (auth === "Bearer INSUFFICIENT_TOKEN") {
           return [
             200,
             {
@@ -1928,7 +1928,7 @@ describe("dashboard: get quizzes answer statistics", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1962,7 +1962,7 @@ describe("dashboard: get quizzes answer statistics", () => {
       .get(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/answerStatistics",
       )
-      .set("Authorization", `bearer insufficient_token`)
+      .set("Authorization", `bearer INSUFFICIENT_TOKEN`)
       .expect(403, done)
   })
 
@@ -2002,7 +2002,7 @@ describe("dashboard: get all answer states", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer insufficient_token") {
+        if (auth === "Bearer INSUFFICIENT_TOKEN") {
           return [
             200,
             {
@@ -2011,7 +2011,7 @@ describe("dashboard: get all answer states", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
