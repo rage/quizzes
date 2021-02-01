@@ -11,6 +11,8 @@ if (process.env.REDIS_HOST && process.env.REDIS_PORT) {
       `Redis client initialized and running on ${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
     )
   }
+} else {
+  console.log("Redis uninitialized. Configuration missing.")
 }
 
 export default { client }
