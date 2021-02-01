@@ -59,7 +59,7 @@ describe("Soft delete peer review questions", () => {
       .send(quiz)
 
     expect(res.status).toEqual(200)
-    // expectQuizToEqual(res.body, quiz)
+    expectQuizToEqual(res.body, quiz)
 
     const deletedQuestion = await PeerReviewQuestion.getById(
       peerReviewQuestionId,
@@ -101,7 +101,7 @@ describe("Soft delete peer review collections", () => {
       .send(quiz)
 
     expect(res.status).toEqual(200)
-    // expectQuizToEqual(res.body[0], quiz)
+    expectQuizToEqual(res.body, quiz)
 
     const deletedPeerReviewCollection = await PeerReviewCollection.getById(
       peerReviewCollectionId,
@@ -143,7 +143,7 @@ describe("Soft delete quiz item options", () => {
       .send(quiz)
 
     expect(res.status).toEqual(200)
-    // expectQuizToEqual(res.body[0], quiz)
+    expectQuizToEqual(res.body, quiz)
 
     const deletedQuizOption = await QuizOption.getById(quizOptionId)
     expect(deletedQuizOption.deleted).toEqual(true)
@@ -183,7 +183,7 @@ describe("Soft delete quiz items", () => {
       .send(quiz)
 
     expect(res.status).toEqual(200)
-    // expectQuizToEqual(res.body[0], quiz)
+    expectQuizToEqual(res.body, quiz)
 
     const deletedQuizItem = await QuizItem.getById(quizItemId)
     expect(deletedQuizItem.deleted).toEqual(true)
