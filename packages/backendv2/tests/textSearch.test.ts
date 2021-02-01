@@ -56,7 +56,7 @@ describe("dashboard: searching for all answers based on text content should", ()
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -168,7 +168,7 @@ describe("dashboard: searching for manual review answers based on text content s
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {

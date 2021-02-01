@@ -131,7 +131,7 @@ describe("widget: a fetch for peer reviews for some quiz answer...", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -195,7 +195,7 @@ describe("on a valid request", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -267,7 +267,7 @@ describe("widget: submitting a peer review", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -429,7 +429,7 @@ describe("widget: fetching quiz info", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -525,7 +525,7 @@ describe("widget: fetching peer review candidates", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -644,7 +644,7 @@ describe("Answer: spam flags", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
