@@ -53,7 +53,7 @@ describe("dashboard: searching for all answers based on text content should", ()
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -62,7 +62,7 @@ describe("dashboard: searching for all answers based on text content should", ()
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -165,7 +165,7 @@ describe("dashboard: searching for manual review answers based on text content s
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -174,7 +174,7 @@ describe("dashboard: searching for manual review answers based on text content s
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {

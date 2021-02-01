@@ -36,7 +36,7 @@ describe("dashboard: get courses", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -45,7 +45,7 @@ describe("dashboard: get courses", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -103,7 +103,7 @@ describe("dashboard: get single course should", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -112,7 +112,7 @@ describe("dashboard: get single course should", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -181,7 +181,7 @@ describe("dashboard - courses: count answers requiring attention should", () => 
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -190,7 +190,7 @@ describe("dashboard - courses: count answers requiring attention should", () => 
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -283,7 +283,7 @@ describe("dashboard - quizzes: count answers requiring attention should", () => 
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -292,7 +292,7 @@ describe("dashboard - quizzes: count answers requiring attention should", () => 
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -370,7 +370,7 @@ describe("dashboard: get quizzes by course id", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -379,7 +379,7 @@ describe("dashboard: get quizzes by course id", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -409,7 +409,7 @@ describe("dashboard: get quizzes by course id", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -418,7 +418,7 @@ describe("dashboard: get quizzes by course id", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -473,7 +473,7 @@ describe("dashboard: get quiz by id", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -482,7 +482,7 @@ describe("dashboard: get quiz by id", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -537,7 +537,7 @@ describe("dashboard: save quiz", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -546,7 +546,7 @@ describe("dashboard: save quiz", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -654,7 +654,7 @@ describe("dashboard: get answer by id", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -663,7 +663,7 @@ describe("dashboard: get answer by id", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -719,7 +719,7 @@ describe("dashboard: get answers by quiz id", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -728,7 +728,7 @@ describe("dashboard: get answers by quiz id", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -823,7 +823,7 @@ describe("dashboard: get manual review answers", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -832,7 +832,7 @@ describe("dashboard: get manual review answers", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -912,7 +912,7 @@ describe("dashboard: update manual review status", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -921,7 +921,7 @@ describe("dashboard: update manual review status", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1004,7 +1004,7 @@ describe("Answer: spam flags", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token_1") {
+        if (auth === "Bearer PLEB_TOKEN_1") {
           return [
             200,
             {
@@ -1013,7 +1013,7 @@ describe("Answer: spam flags", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer pleb_token_2") {
+        if (auth === "Bearer PLEB_TOKEN_2") {
           return [
             200,
             {
@@ -1022,7 +1022,7 @@ describe("Answer: spam flags", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer pleb_token_3") {
+        if (auth === "Bearer PLEB_TOKEN_3") {
           return [
             200,
             {
@@ -1031,7 +1031,7 @@ describe("Answer: spam flags", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer pleb_token_4") {
+        if (auth === "Bearer PLEB_TOKEN_4") {
           return [
             200,
             {
@@ -1040,7 +1040,7 @@ describe("Answer: spam flags", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1167,7 +1167,7 @@ describe("fetching user progress should", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -1176,7 +1176,7 @@ describe("fetching user progress should", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1244,7 +1244,7 @@ describe("dashboard - courses: duplicating course should", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -1253,7 +1253,7 @@ describe("dashboard - courses: duplicating course should", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1362,7 +1362,7 @@ describe("dashboard - courses: downloading a correspondence file should", () => 
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -1371,7 +1371,7 @@ describe("dashboard - courses: downloading a correspondence file should", () => 
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1424,7 +1424,7 @@ describe("dashboard: fetching all exisiting languages languages", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1462,7 +1462,7 @@ describe("dashboard: an edit made to a course should", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1515,7 +1515,7 @@ describe("dashboard: get current users abilities", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -1524,7 +1524,7 @@ describe("dashboard: get current users abilities", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1535,7 +1535,7 @@ describe("dashboard: get current users abilities", () => {
       })
     request(app.callback())
       .get("/api/v2/dashboard/users/current/abilities")
-      .set("Authorization", "bearer pleb_token")
+      .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
       .expect(res => {
         expect(res.body).toEqual(userAbilities.abilities.teacher)
@@ -1549,7 +1549,7 @@ describe("dashboard: get current users abilities", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -1558,7 +1558,7 @@ describe("dashboard: get current users abilities", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1569,7 +1569,7 @@ describe("dashboard: get current users abilities", () => {
       })
     request(app.callback())
       .get("/api/v2/dashboard/users/current/abilities")
-      .set("Authorization", "bearer pleb_token")
+      .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
       .expect(res => {
         expect(res.body).toEqual(userAbilities.abilities.assistant)
@@ -1595,7 +1595,7 @@ describe("dashboard: get user abilities for course", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -1604,7 +1604,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1617,7 +1617,7 @@ describe("dashboard: get user abilities for course", () => {
       .get(
         "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/abilities",
       )
-      .set("Authorization", "bearer pleb_token")
+      .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
       .expect(res => {
         expect(res.body).toEqual(["view", "edit", "grade"])
@@ -1631,7 +1631,7 @@ describe("dashboard: get user abilities for course", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -1640,7 +1640,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1648,7 +1648,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer reviewer_token") {
+        if (auth === "Bearer REVIEWER_TOKEN") {
           return [
             200,
             {
@@ -1662,7 +1662,7 @@ describe("dashboard: get user abilities for course", () => {
       .get(
         "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/abilities",
       )
-      .set("Authorization", "bearer reviewer_token")
+      .set("Authorization", "bearer REVIEWER_TOKEN")
       .set("Accept", "application/json")
       .expect(res => {
         expect(res.body).toEqual(["view", "grade"])
@@ -1676,7 +1676,7 @@ describe("dashboard: get user abilities for course", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -1685,7 +1685,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1698,7 +1698,7 @@ describe("dashboard: get user abilities for course", () => {
       .get(
         "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/abilities",
       )
-      .set("Authorization", "bearer pleb_token")
+      .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
       .expect(res => {
         expect(res.body).toEqual(["view", "edit", "grade"])
@@ -1712,7 +1712,7 @@ describe("dashboard: get user abilities for course", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -1720,7 +1720,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1734,7 +1734,7 @@ describe("dashboard: get user abilities for course", () => {
       .get(
         "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/abilities",
       )
-      .set("Authorization", "bearer admin_token")
+      .set("Authorization", "bearer ADMIN_TOKEN")
       .set("Accept", "application/json")
       .expect(res => {
         expect(res.body).toEqual([
@@ -1754,7 +1754,7 @@ describe("dashboard: get user abilities for course", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -1763,7 +1763,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1776,7 +1776,7 @@ describe("dashboard: get user abilities for course", () => {
       .get(
         "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/abilities",
       )
-      .set("Authorization", "bearer pleb_token")
+      .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
       .expect(res => {
         expect(res.body).toEqual([])
@@ -1802,7 +1802,7 @@ describe("dashboard: get quizzes answer statistics", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer insufficient_token") {
+        if (auth === "Bearer INSUFFICIENT_TOKEN") {
           return [
             200,
             {
@@ -1811,7 +1811,7 @@ describe("dashboard: get quizzes answer statistics", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1819,7 +1819,7 @@ describe("dashboard: get quizzes answer statistics", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -1845,7 +1845,7 @@ describe("dashboard: get quizzes answer statistics", () => {
       .get(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/answerStatistics",
       )
-      .set("Authorization", `bearer insufficient_token`)
+      .set("Authorization", `bearer INSUFFICIENT_TOKEN`)
       .expect(403, done)
   })
 
@@ -1854,7 +1854,7 @@ describe("dashboard: get quizzes answer statistics", () => {
       .get(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/answerStatistics",
       )
-      .set("Authorization", `bearer pleb_token`)
+      .set("Authorization", `bearer PLEB_TOKEN`)
       .expect(response => {
         let checked: string[] = []
         for (const key in response.body) {
@@ -1886,7 +1886,7 @@ describe("dashboard: get all answer states", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer insufficient_token") {
+        if (auth === "Bearer INSUFFICIENT_TOKEN") {
           return [
             200,
             {
@@ -1895,7 +1895,7 @@ describe("dashboard: get all answer states", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -1903,7 +1903,7 @@ describe("dashboard: get all answer states", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -1926,7 +1926,7 @@ describe("dashboard: get all answer states", () => {
   test("respond with 200 with succesfull request", done => {
     request(app.callback())
       .get("/api/v2/dashboard/quizzes/answers/get-answer-states")
-      .set("Authorization", `bearer pleb_token`)
+      .set("Authorization", `bearer PLEB_TOKEN`)
       .expect(response => {
         const result: string[] = response.body.filter(
           (state: string) => !possibleAnswerStates.includes(state),

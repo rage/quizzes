@@ -32,8 +32,7 @@ export class AuthenticationMiddleware implements ExpressMiddlewareInterface {
     })
 
     const authorization: string = req.headers.authorization || ""
-    const token: string =
-      authorization.toLocaleLowerCase().replace("bearer ", "") || ""
+    const token: string = authorization.replace(/bearer /i, "") || ""
 
     if (onWhiteList && !token) {
       return next()
