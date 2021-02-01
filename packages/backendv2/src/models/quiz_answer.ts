@@ -951,6 +951,18 @@ class QuizAnswer extends BaseModel {
       )
   }
 
+  public static async deleteAnswer(answerId: string): Promise<QuizAnswer> {
+    const trx = await knex.transaction()
+
+    try {
+      await trx.commit()
+      return await this.query().findById(answerId)
+    } catch (error) {
+      await trx.rollback()
+      throw error
+    }
+  }
+
   private static async getCandidates(
     priority: number,
     quizId: string,
