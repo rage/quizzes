@@ -17,6 +17,7 @@ import {
   getCourseIdByQuizId,
   getAccessibleCourses,
   getDownloadTokenFromRedis,
+  setDownloadToken,
 } from "./util"
 import * as Kafka from "../../services/kafka"
 import _ from "lodash"
@@ -231,19 +232,18 @@ const dashboard = new Router<CustomState, CustomContext>({
   .post("/quizzes/:quizId/download-quiz-info", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
     const { courseId } = ctx.request.body
-    const username = ctx.state.user.username
+
+    const userId = ctx.state.user.id.toString()
 
     // check permissions
     await checkAccessOrThrow(ctx.state.user, courseId, "download")
 
     // attempt retrieval of download token from cache
-    const downloadToken = await getDownloadTokenFromRedis(username)
+    const downloadToken = await getDownloadTokenFromRedis(userId)
 
     if (downloadToken) {
-      // since permission checked and token ready, return download url & token
       ctx.body = {
         downloadUrl: `/api/v2/dashboard/quizzes/download/download-quiz-info/${quizId}?&downloadToken=${downloadToken}`,
-        username,
       }
     } else {
       throw new BadRequestError("Failed to generate download token.")
@@ -251,24 +251,26 @@ const dashboard = new Router<CustomState, CustomContext>({
   })
 
   .post("/quizzes/download/download-quiz-info/:quizId", async ctx => {
-    const { downloadToken } = ctx.query
+    const downloadToken = ctx.query.downloadToken.toString()
     const { quizId } = ctx.params
     const isoDate = getFormattedIsoDate()
 
-    const { username, quizName, courseName } = ctx.request.body
+    const { quizName, courseName } = ctx.request.body
+    const userId = ctx.request.body.userId.toString()
 
     // validate token
     if (downloadToken && redis.client) {
-      const cachedToken = JSON.parse(
-        (await redis.client.get(username)) as string,
-      )
-      if (cachedToken) {
+      const cachedToken = JSON.parse((await redis.client.get(userId)) as string)
+
+      if (cachedToken === downloadToken) {
         const stream = await Quiz.getQuizInfo(quizId)
         ctx.response.set("Content-Type", "text/csv")
         ctx.response.attachment(
           `quiz-info-${quizName}-${courseName}-${isoDate}.csv`,
         )
         ctx.body = stream
+      } else {
+        throw new BadRequestError("Download token does not match cached token.")
       }
     }
   })
@@ -279,19 +281,19 @@ const dashboard = new Router<CustomState, CustomContext>({
     async ctx => {
       const quizId = ctx.params.quizId
       const { courseId } = ctx.request.body
-      const username = ctx.state.user.username
+
+      const userId = ctx.state.user.id.toString()
 
       // check permissions
       await checkAccessOrThrow(ctx.state.user, courseId, "download")
 
       // attempt retrieval of download token from cache
-      const downloadToken = await getDownloadTokenFromRedis(username)
+      const downloadToken = await getDownloadTokenFromRedis(userId)
 
       if (downloadToken) {
         // since permission checked and token ready, return download url & token
         ctx.body = {
           downloadUrl: `/api/v2/dashboard/quizzes/download/download-peerreview-info/${quizId}?&downloadToken=${downloadToken}`,
-          username,
         }
       } else {
         throw new BadRequestError("Failed to generate download token.")
@@ -300,24 +302,26 @@ const dashboard = new Router<CustomState, CustomContext>({
   )
 
   .post("/quizzes/download/download-peerreview-info/:quizId", async ctx => {
-    const { downloadToken } = ctx.query
+    const downloadToken = ctx.query.downloadToken.toString()
     const { quizId } = ctx.params
     const isoDate = getFormattedIsoDate()
 
-    const { username, quizName, courseName } = ctx.request.body
+    const { quizName, courseName } = ctx.request.body
+    const userId = ctx.request.body.userId.toString()
 
     // validate token
-    if (downloadToken && redis.client && username) {
-      const cachedToken = JSON.parse(
-        (await redis.client.get(username)) as string,
-      )
-      if (cachedToken) {
+    if (downloadToken && redis.client) {
+      const cachedToken = JSON.parse((await redis.client.get(userId)) as string)
+
+      if (cachedToken === downloadToken) {
         const stream = await Quiz.getQuizInfo(quizId)
         ctx.response.set("Content-Type", "text/csv")
         ctx.response.attachment(
           `quiz-peer_review-info-${quizName}-${courseName}-${isoDate}.csv`,
         )
         ctx.body = stream
+      } else {
+        throw new BadRequestError("Download token does not match cached token.")
       }
     }
   })
@@ -325,19 +329,19 @@ const dashboard = new Router<CustomState, CustomContext>({
   .post("/quizzes/:quizId/download-answer-info", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
     const { courseId } = ctx.request.body
-    const username = ctx.state.user.username
+
+    const userId = ctx.state.user.id.toString()
 
     // check permissions
     await checkAccessOrThrow(ctx.state.user, courseId, "download")
 
     // attempt retrieval of download token from cache
-    const downloadToken = await getDownloadTokenFromRedis(username)
+    const downloadToken = await getDownloadTokenFromRedis(userId)
 
     if (downloadToken) {
       // since permission checked and token ready, return download url & token
       ctx.body = {
         downloadUrl: `/api/v2/dashboard/quizzes/download/download-answer-info/${quizId}?&downloadToken=${downloadToken}`,
-        username,
       }
     } else {
       throw new BadRequestError("Failed to generate download token.")
@@ -345,24 +349,25 @@ const dashboard = new Router<CustomState, CustomContext>({
   })
 
   .post("/quizzes/download/download-answer-info/:quizId", async ctx => {
-    const { downloadToken } = ctx.query
+    const downloadToken = ctx.query.downloadToken.toString()
     const { quizId } = ctx.params
     const isoDate = getFormattedIsoDate()
 
-    const { username, quizName, courseName } = ctx.request.body
+    const { quizName, courseName } = ctx.request.body
+    const userId = ctx.request.body.userId.toString()
 
     // validate token
     if (downloadToken && redis.client) {
-      const cachedToken = JSON.parse(
-        (await redis.client.get(username)) as string,
-      )
-      if (cachedToken) {
+      const cachedToken = JSON.parse((await redis.client.get(userId)) as string)
+      if (cachedToken === downloadToken) {
         const stream = await Quiz.getQuizInfo(quizId)
         ctx.response.set("Content-Type", "text/csv")
         ctx.response.attachment(
           `quiz-answer-info-${quizName}-${courseName}-${isoDate}.csv`,
         )
         ctx.body = stream
+      } else {
+        throw new BadRequestError("Download token does not match cached token.")
       }
     }
   })

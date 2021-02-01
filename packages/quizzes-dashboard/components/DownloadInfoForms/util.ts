@@ -1,5 +1,5 @@
 export const createAndSubmitDownloadForm = (
-  username: string,
+  userId: string,
   url: string,
   quizName: string,
   courseId: string,
@@ -9,11 +9,11 @@ export const createAndSubmitDownloadForm = (
   f.action = url
   f.method = "POST"
 
-  const usernameInput = document.createElement("input")
-  usernameInput.type = "hidden"
-  usernameInput.name = "username"
-  usernameInput.value = username
-  f.appendChild(usernameInput)
+  const userIdInput = document.createElement("input")
+  userIdInput.type = "hidden"
+  userIdInput.name = "userId"
+  userIdInput.value = userId
+  f.appendChild(userIdInput)
 
   const quizNameInput = document.createElement("input")
   quizNameInput.type = "hidden"

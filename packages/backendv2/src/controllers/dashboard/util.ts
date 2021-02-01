@@ -82,11 +82,11 @@ export const getCourseIdByQuizId = async (quizId: string) => {
 }
 
 export const getDownloadTokenFromRedis = async (
-  username: string,
+  userId: string,
 ): Promise<string> => {
   let downloadToken = ""
   if (redis.client) {
-    const cachedToken = JSON.parse((await redis.client.get(username)) as string)
+    const cachedToken = JSON.parse((await redis.client.get(userId)) as string)
     if (cachedToken) {
       downloadToken = cachedToken
     } else {
@@ -94,7 +94,7 @@ export const getDownloadTokenFromRedis = async (
       const randomToken = JSON.stringify(
         crypto.randomBytes(100).toString("hex"),
       )
-      await redis.client.set(username, randomToken, "EX", 600)
+      await redis.client.set(userId, randomToken, "EX", 600)
       downloadToken = randomToken
     }
   }

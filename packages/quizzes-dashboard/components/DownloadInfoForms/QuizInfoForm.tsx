@@ -3,6 +3,7 @@ import { downloadQuizInfo } from "../../services/quizzes"
 import { HOST, createAndSubmitDownloadForm } from "./util"
 import { StyledForm, SubmitButton } from "./"
 import { DownloadFormProps } from "../../types/Quiz"
+import { checkStore, getProfile } from "../../services/tmcApi"
 
 export const QuizInfoForm = ({
   quizId,
@@ -15,15 +16,21 @@ export const QuizInfoForm = ({
     e.preventDefault()
     const { id: courseId, title: courseName } = course
     const res = await downloadQuizInfo(quizId, quizName, courseId)
-    const { downloadUrl, username } = res.data
+    const { downloadUrl } = res.data
     const completeDownloadUrl = HOST + downloadUrl
-    createAndSubmitDownloadForm(
-      username,
-      completeDownloadUrl,
-      quizName,
-      courseId,
-      courseName,
-    )
+
+    const storeInfo = checkStore()
+    if (storeInfo?.accessToken) {
+      const userProfile = await getProfile(storeInfo?.accessToken)
+      const userId = userProfile.id.toString()
+      createAndSubmitDownloadForm(
+        userId,
+        completeDownloadUrl,
+        quizName,
+        courseId,
+        courseName,
+      )
+    }
   }
 
   return (
