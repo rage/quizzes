@@ -48,7 +48,7 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
