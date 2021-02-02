@@ -1,8 +1,6 @@
-import { ForbiddenError } from "./../src/util/error"
 import request from "supertest"
 import { v4 as uuidv4 } from "uuid"
 import nock from "nock"
-const knexCleaner = require("knex-cleaner")
 import app from "../app"
 import knex from "../database/knex"
 import { input, validation } from "./data"
@@ -12,7 +10,6 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../src/util/error"
-
 import { safeClean, safeSeed, configA } from "./util"
 
 afterAll(async () => {
@@ -122,7 +119,7 @@ describe("widget: a fetch for peer reviews for some quiz answer...", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -131,7 +128,7 @@ describe("widget: a fetch for peer reviews for some quiz answer...", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -186,7 +183,7 @@ describe("on a valid request", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -195,7 +192,7 @@ describe("on a valid request", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -258,7 +255,7 @@ describe("widget: submitting a peer review", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -267,7 +264,7 @@ describe("widget: submitting a peer review", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -275,7 +272,7 @@ describe("widget: submitting a peer review", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer pleb_token_1") {
+        if (auth === "Bearer PLEB_TOKEN_1") {
           return [
             200,
             {
@@ -284,7 +281,7 @@ describe("widget: submitting a peer review", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer pleb_token_2") {
+        if (auth === "Bearer PLEB_TOKEN_2") {
           return [
             200,
             {
@@ -420,7 +417,7 @@ describe("widget: fetching quiz info", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -429,7 +426,7 @@ describe("widget: fetching quiz info", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -516,7 +513,7 @@ describe("widget: fetching peer review candidates", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -525,7 +522,7 @@ describe("widget: fetching peer review candidates", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
@@ -608,7 +605,7 @@ describe("Answer: spam flags", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token_1") {
+        if (auth === "Bearer PLEB_TOKEN_1") {
           return [
             200,
             {
@@ -617,7 +614,7 @@ describe("Answer: spam flags", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer pleb_token_2") {
+        if (auth === "Bearer PLEB_TOKEN_2") {
           return [
             200,
             {
@@ -626,7 +623,7 @@ describe("Answer: spam flags", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer pleb_token_3") {
+        if (auth === "Bearer PLEB_TOKEN_3") {
           return [
             200,
             {
@@ -635,7 +632,7 @@ describe("Answer: spam flags", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer pleb_token_4") {
+        if (auth === "Bearer PLEB_TOKEN_4") {
           return [
             200,
             {
@@ -644,7 +641,7 @@ describe("Answer: spam flags", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
