@@ -54,7 +54,7 @@ describe("Soft delete peer review questions", () => {
     quiz.peerReviewCollections[0].questions.shift()
     const res = await request(app.callback())
       .post("/api/v2/dashboard/quizzes")
-      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Authorization", `bearer admin_token`)
       .set("Accept", "application/json")
       .send(quiz)
 
@@ -96,7 +96,7 @@ describe("Soft delete peer review collections", () => {
     quiz.peerReviewCollections.shift()
     const res = await request(app.callback())
       .post("/api/v2/dashboard/quizzes")
-      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Authorization", `bearer admin_token`)
       .set("Accept", "application/json")
       .send(quiz)
 
@@ -138,7 +138,7 @@ describe("Soft delete quiz item options", () => {
     quiz.items[1].options.shift()
     const res = await request(app.callback())
       .post("/api/v2/dashboard/quizzes")
-      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Authorization", `bearer admin_token`)
       .set("Accept", "application/json")
       .send(quiz)
 
@@ -178,7 +178,7 @@ describe("Soft delete quiz items", () => {
     quiz.items.shift()
     const res = await request(app.callback())
       .post("/api/v2/dashboard/quizzes")
-      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Authorization", `bearer admin_token`)
       .set("Accept", "application/json")
       .send(quiz)
 
