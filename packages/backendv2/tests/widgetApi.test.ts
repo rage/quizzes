@@ -10,7 +10,6 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../src/util/error"
-
 import { safeClean, safeSeed, configA } from "./util"
 import redis from "../config/redis"
 
