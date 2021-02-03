@@ -49,9 +49,11 @@ export const accessControl = (options?: AccessControlOptions) => {
     }
 
     ctx.state.user = user
+
     if (options?.administrator && !user.administrator) {
       throw new ForbiddenError("forbidden")
     }
+
     return next()
   }
   return accessControl

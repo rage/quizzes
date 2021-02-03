@@ -11,6 +11,7 @@ import redis from "../config/redis"
 afterAll(async () => {
   await safeClean()
   await knex.destroy()
+  await redis.client?.flushall()
   await redis.client?.quit()
 })
 
@@ -29,7 +30,7 @@ describe("dashboard - courses: downloading quiz info should", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -38,12 +39,12 @@ describe("dashboard - courses: downloading quiz info should", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
+              id: 2222,
               administrator: true,
-              username: "admin",
             } as UserInfo,
           ]
         }
@@ -55,7 +56,7 @@ describe("dashboard - courses: downloading quiz info should", () => {
       .post(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-quiz-info",
       )
-      .set("Authorization", `bearer BAD_TOKEN`)
+      .set("Authorization", `Bearer BAD_TOKEN`)
       .expect(401)
       .end(done)
   })
@@ -65,7 +66,7 @@ describe("dashboard - courses: downloading quiz info should", () => {
       .post(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-quiz-info",
       )
-      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Authorization", `Bearer ADMIN_TOKEN`)
       .send({
         courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
       })
@@ -77,17 +78,16 @@ describe("dashboard - courses: downloading quiz info should", () => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
     request(app.callback())
       .post(`/api/v2/dashboard/quizzes/${quizId}/download-quiz-info`)
-      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Authorization", `Bearer ADMIN_TOKEN`)
       .send({
         courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
       })
       .expect(200)
       .expect(response => {
-        const { downloadUrl, username } = response.body
+        const { downloadUrl } = response.body
         const downloadToken = downloadUrl.substring(
           downloadUrl.lastIndexOf("=") + 1,
         )
-        expect(username).toEqual("admin")
         expect(downloadUrl).toInclude(
           `/download/download-quiz-info/${quizId}?&downloadToken=`,
         )
@@ -97,14 +97,15 @@ describe("dashboard - courses: downloading quiz info should", () => {
   })
   describe("attempting to download with a download token", () => {
     test("should return csv content on success ", async done => {
-      const downloadToken = await redis.client?.get("admin")
+      const downloadToken = await redis.client?.get("2222")
+
       const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
       request(app.callback())
         .post(
           `/api/v2/dashboard/quizzes/download/download-quiz-info/${quizId}?&downloadToken=${downloadToken}`,
         )
         .send({
-          username: "admin",
+          userId: 2222,
           quizName: "test",
           courseName: "test",
         })
@@ -130,7 +131,7 @@ describe("dashboard: downloading peer review info should", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -139,12 +140,12 @@ describe("dashboard: downloading peer review info should", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
+              id: 2222,
               administrator: true,
-              username: "admin",
             } as UserInfo,
           ]
         }
@@ -156,7 +157,7 @@ describe("dashboard: downloading peer review info should", () => {
       .post(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-peerreview-info",
       )
-      .set("Authorization", `bearer BAD_TOKEN`)
+      .set("Authorization", `Bearer BAD_TOKEN`)
       .expect(401)
       .end(done)
   })
@@ -166,7 +167,7 @@ describe("dashboard: downloading peer review info should", () => {
       .post(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-peerreview-info",
       )
-      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Authorization", `Bearer ADMIN_TOKEN`)
       .send({
         courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
       })
@@ -174,21 +175,20 @@ describe("dashboard: downloading peer review info should", () => {
       .end(done)
   })
 
-  test("return a valid download url and username on successful request", done => {
+  test("return a valid download url on successful request", done => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
     request(app.callback())
       .post(`/api/v2/dashboard/quizzes/${quizId}/download-peerreview-info`)
-      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Authorization", `Bearer ADMIN_TOKEN`)
       .send({
         courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
       })
       .expect(200)
       .expect(response => {
-        const { downloadUrl, username } = response.body
+        const { downloadUrl } = response.body
         const downloadToken = downloadUrl.substring(
           downloadUrl.lastIndexOf("=") + 1,
         )
-        expect(username).toEqual("admin")
         expect(downloadUrl).toInclude(
           `/download/download-peerreview-info/${quizId}?&downloadToken=`,
         )
@@ -199,16 +199,16 @@ describe("dashboard: downloading peer review info should", () => {
 
   describe("attempting to download with a download token", () => {
     test("should return csv content on success ", async done => {
-      const downloadToken = await redis.client?.get("admin")
+      const downloadToken = await redis.client?.get("2222")
       const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
       request(app.callback())
         .post(
           `/api/v2/dashboard/quizzes/download/download-peerreview-info/${quizId}?&downloadToken=${downloadToken}`,
         )
         .send({
-          username: "admin",
           quizName: "test",
           courseName: "test",
+          userId: 2222,
         })
         .expect("Content-Type", "text/csv; charset=utf-8")
         .expect(200)
@@ -233,7 +233,7 @@ describe("dashboard: downloading answer info should", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer pleb_token") {
+        if (auth === "Bearer PLEB_TOKEN") {
           return [
             200,
             {
@@ -242,12 +242,12 @@ describe("dashboard: downloading answer info should", () => {
             } as UserInfo,
           ]
         }
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
+              id: 2222,
               administrator: true,
-              username: "admin",
             } as UserInfo,
           ]
         }
@@ -259,7 +259,7 @@ describe("dashboard: downloading answer info should", () => {
       .post(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-answer-info",
       )
-      .set("Authorization", `bearer BAD_TOKEN`)
+      .set("Authorization", `Bearer BAD_TOKEN`)
       .expect(401)
       .end(done)
   })
@@ -269,7 +269,7 @@ describe("dashboard: downloading answer info should", () => {
       .post(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-answer-info",
       )
-      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Authorization", `Bearer ADMIN_TOKEN`)
       .send({
         courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
       })
@@ -277,21 +277,20 @@ describe("dashboard: downloading answer info should", () => {
       .end(done)
   })
 
-  test("return a download url and username on successful request", done => {
+  test("return a download url on successful request", done => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
     request(app.callback())
       .post(`/api/v2/dashboard/quizzes/${quizId}/download-answer-info`)
-      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Authorization", `Bearer ADMIN_TOKEN`)
       .send({
         courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
       })
       .expect(200)
       .expect(response => {
-        const { downloadUrl, username } = response.body
+        const { downloadUrl } = response.body
         const downloadToken = downloadUrl.substring(
           downloadUrl.lastIndexOf("=") + 1,
         )
-        expect(username).toEqual("admin")
         expect(downloadUrl).toInclude(
           `/download/download-answer-info/${quizId}?&downloadToken=`,
         )
@@ -302,14 +301,14 @@ describe("dashboard: downloading answer info should", () => {
 
   describe("attempting to download with a download token", () => {
     test("should return csv content on success ", async done => {
-      const downloadToken = await redis.client?.get("admin")
+      const downloadToken = await redis.client?.get("2222")
       const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
       request(app.callback())
         .post(
           `/api/v2/dashboard/quizzes/download/download-answer-info/${quizId}?&downloadToken=${downloadToken}`,
         )
         .send({
-          username: "admin",
+          userId: "2222",
           quizName: "test",
           courseName: "test",
         })
@@ -328,12 +327,12 @@ describe("downloading info when redis unavailable", () => {
       .get("/api/v8/users/current?show_user_fields=true")
       .reply(function() {
         const auth = this.req.headers.authorization
-        if (auth === "Bearer admin_token") {
+        if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
             {
+              id: 6666,
               administrator: true,
-              username: "admin",
             } as UserInfo,
           ]
         }
@@ -348,7 +347,7 @@ describe("downloading info when redis unavailable", () => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
     request(app.callback())
       .post(`/api/v2/dashboard/quizzes/${quizId}/download-quiz-info`)
-      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Authorization", `Bearer ADMIN_TOKEN`)
       .send({
         courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
       })
@@ -363,7 +362,7 @@ describe("downloading info when redis unavailable", () => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
     request(app.callback())
       .post(`/api/v2/dashboard/quizzes/${quizId}/download-peerreview-info`)
-      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Authorization", `Bearer ADMIN_TOKEN`)
       .send({
         courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
       })
@@ -378,7 +377,7 @@ describe("downloading info when redis unavailable", () => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
     request(app.callback())
       .post(`/api/v2/dashboard/quizzes/${quizId}/download-answer-info`)
-      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Authorization", `Bearer ADMIN_TOKEN`)
       .send({
         courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
       })

@@ -232,13 +232,18 @@ const dashboard = new Router<CustomState, CustomContext>({
     const quizId = ctx.params.quizId
     const { courseId } = ctx.request.body
 
-    const userId = ctx.state.user.id.toString()
+    if (!ctx.state.user.id) {
+      throw new BadRequestError("No user id provided.")
+    }
+
+    const userId = ctx.state.user.id.toString() as string
 
     // check permissions
     await checkAccessOrThrow(ctx.state.user, courseId, "download")
 
     // attempt retrieval of download token from cache
     const downloadToken = await getDownloadTokenFromRedis(userId)
+    console.log("💩 ~ file: index.ts ~ line 246 ~ downloadToken", downloadToken)
 
     if (downloadToken) {
       ctx.body = {
@@ -250,7 +255,7 @@ const dashboard = new Router<CustomState, CustomContext>({
   })
 
   .post("/quizzes/download/download-quiz-info/:quizId", async ctx => {
-    const downloadToken = ctx.query.downloadToken.toString()
+    const downloadToken = ctx.query.downloadToken
     const { quizId } = ctx.params
     const isoDate = getFormattedIsoDate()
 
@@ -259,7 +264,9 @@ const dashboard = new Router<CustomState, CustomContext>({
 
     // validate token
     if (downloadToken && redis.client) {
-      const cachedToken = JSON.parse((await redis.client.get(userId)) as string)
+      const cachedToken = JSON.stringify(
+        JSON.parse((await redis.client.get(userId)) as string),
+      )
 
       if (cachedToken === downloadToken) {
         const stream = await Quiz.getQuizInfo(quizId)
@@ -280,6 +287,10 @@ const dashboard = new Router<CustomState, CustomContext>({
     async ctx => {
       const quizId = ctx.params.quizId
       const { courseId } = ctx.request.body
+
+      if (!ctx.state.user.id) {
+        throw new BadRequestError("No user id provided.")
+      }
 
       const userId = ctx.state.user.id.toString()
 
@@ -310,7 +321,9 @@ const dashboard = new Router<CustomState, CustomContext>({
 
     // validate token
     if (downloadToken && redis.client) {
-      const cachedToken = JSON.parse((await redis.client.get(userId)) as string)
+      const cachedToken = JSON.stringify(
+        JSON.parse((await redis.client.get(userId)) as string),
+      )
 
       if (cachedToken === downloadToken) {
         const stream = await Quiz.getQuizInfo(quizId)
@@ -328,6 +341,10 @@ const dashboard = new Router<CustomState, CustomContext>({
   .post("/quizzes/:quizId/download-answer-info", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
     const { courseId } = ctx.request.body
+
+    if (!ctx.state.user.id) {
+      throw new BadRequestError("No user id provided.")
+    }
 
     const userId = ctx.state.user.id.toString()
 
@@ -357,7 +374,9 @@ const dashboard = new Router<CustomState, CustomContext>({
 
     // validate token
     if (downloadToken && redis.client) {
-      const cachedToken = JSON.parse((await redis.client.get(userId)) as string)
+      const cachedToken = JSON.stringify(
+        JSON.parse((await redis.client.get(userId)) as string),
+      )
       if (cachedToken === downloadToken) {
         const stream = await Quiz.getQuizInfo(quizId)
         ctx.response.set("Content-Type", "text/csv")
