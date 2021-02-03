@@ -17,7 +17,6 @@ import {
   getCourseIdByQuizId,
   getAccessibleCourses,
   getDownloadTokenFromRedis,
-  setDownloadToken,
 } from "./util"
 import * as Kafka from "../../services/kafka"
 import _ from "lodash"
