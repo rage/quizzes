@@ -243,7 +243,6 @@ const dashboard = new Router<CustomState, CustomContext>({
 
     // attempt retrieval of download token from cache
     const downloadToken = await getDownloadTokenFromRedis(userId)
-    console.log("💩 ~ file: index.ts ~ line 246 ~ downloadToken", downloadToken)
 
     if (downloadToken) {
       ctx.body = {
