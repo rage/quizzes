@@ -48,6 +48,14 @@ describe("dashboard - courses: downloading quiz info should", () => {
             } as UserInfo,
           ]
         }
+        if (auth === "Bearer ADMIN_TOKEN_NO_ID") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
       })
   })
 
@@ -58,6 +66,21 @@ describe("dashboard - courses: downloading quiz info should", () => {
       )
       .set("Authorization", `Bearer BAD_TOKEN`)
       .expect(401)
+      .end(done)
+  })
+
+  test("respond with BadRequestError if user id not provided", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-quiz-info",
+      )
+      .set("Authorization", `Bearer ADMIN_TOKEN_NO_ID`)
+      .expect(400)
+
+      .expect(response => {
+        const received: BadRequestError = response.body
+        expect(received.message).toEqual("No user id provided.")
+      })
       .end(done)
   })
 
@@ -149,6 +172,15 @@ describe("dashboard: downloading peer review info should", () => {
             } as UserInfo,
           ]
         }
+        if (auth === "Bearer ADMIN_TOKEN_NO_ID") {
+          return [
+            200,
+            {
+              id: 2222,
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
       })
   })
 
@@ -159,6 +191,21 @@ describe("dashboard: downloading peer review info should", () => {
       )
       .set("Authorization", `Bearer BAD_TOKEN`)
       .expect(401)
+      .end(done)
+  })
+
+  test("respond with BadRequestError if user id not provided", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-peerreview-info",
+      )
+      .set("Authorization", `Bearer ADMIN_TOKEN_NO_ID`)
+      .expect(400)
+
+      .expect(response => {
+        const received: BadRequestError = response.body
+        expect(received.message).toEqual("No user id provided.")
+      })
       .end(done)
   })
 
@@ -251,6 +298,14 @@ describe("dashboard: downloading answer info should", () => {
             } as UserInfo,
           ]
         }
+        if (auth === "Bearer ADMIN_TOKEN_NO_ID") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
       })
   })
 
@@ -261,6 +316,20 @@ describe("dashboard: downloading answer info should", () => {
       )
       .set("Authorization", `Bearer BAD_TOKEN`)
       .expect(401)
+      .end(done)
+  })
+
+  test("respond with BadRequestError if user id not provided", done => {
+    request(app.callback())
+      .post(
+        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-answer-info",
+      )
+      .set("Authorization", `Bearer ADMIN_TOKEN_NO_ID`)
+      .expect(400)
+      .expect(response => {
+        const received: BadRequestError = response.body
+        expect(received.message).toEqual("No user id provided.")
+      })
       .end(done)
   })
 
