@@ -961,8 +961,7 @@ class QuizAnswer extends mixin(BaseModel, [
     const trx = await knex.transaction()
 
     try {
-      const quizAnswer = await this.query(trx)
-        .findById(answerId)
+      const quizAnswer = await this.query(trx).findById(answerId)
 
       await this.query(trx)
         .delete()
@@ -989,11 +988,10 @@ class QuizAnswer extends mixin(BaseModel, [
         .andWhere("quiz_id", quizAnswer.quizId)
         .limit(1)
 
-      await UserQuizState.query(trx)
-        .update({
-          status: "open",
-          tries: userQuizState[0].tries > 0 ? userQuizState[0].tries - 1 : 0,
-        })
+      await UserQuizState.query(trx).update({
+        status: "open",
+        tries: userQuizState[0].tries > 0 ? userQuizState[0].tries - 1 : 0,
+      })
 
       await Kafka.broadcastQuizAnswerUpdated(
         nextBestQuizAnswer,
