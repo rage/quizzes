@@ -47,9 +47,9 @@ export const getAccessibleCourses = async (
 }
 
 export const abilitiesByRole: { [role: string]: string[] } = {
-  admin: ["view", "edit", "grade", "download", "duplicate"],
-  assistant: ["view", "edit", "grade"],
-  teacher: ["view", "edit", "grade"],
+  admin: ["view", "edit", "grade", "download", "duplicate", "delete"],
+  assistant: ["view", "edit", "grade", "delete"],
+  teacher: ["view", "edit", "grade", "delete"],
   reviewer: ["view", "grade"],
 }
 

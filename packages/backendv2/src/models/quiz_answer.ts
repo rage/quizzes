@@ -50,6 +50,7 @@ class QuizAnswer extends mixin(BaseModel, [
   userQuizState!: UserQuizState
   quiz!: Quiz
   correctnessCoefficient!: number
+  deleted!: boolean
 
   static SEARCH_RESULT_LIMIT = 100
   static FIRST_PAGE_INDEX = 0
@@ -960,7 +961,12 @@ class QuizAnswer extends mixin(BaseModel, [
     const trx = await knex.transaction()
 
     try {
-      const quizAnswer = await this.query(trx).findById(answerId)
+      const quizAnswer = await this.query(trx)
+        .findById(answerId)
+
+      await this.query(trx)
+        .delete()
+        .where("id", answerId)
 
       const nextBestQuizAnswer = (
         await QuizAnswer.query(trx)
@@ -969,7 +975,11 @@ class QuizAnswer extends mixin(BaseModel, [
           .limit(1)
       ).sort((a, b) => a.correctnessCoefficient - b.correctnessCoefficient)[0]
 
+      const maxPoints = (await Quiz.query(trx).findById(quizAnswer.quizId))
+        .points
+
       await UserQuizState.updateAwardedPoints(
+        maxPoints,
         nextBestQuizAnswer.correctnessCoefficient,
         trx,
       )
@@ -979,14 +989,11 @@ class QuizAnswer extends mixin(BaseModel, [
         .andWhere("quiz_id", quizAnswer.quizId)
         .limit(1)
 
-      await UserQuizState.query(trx).update({
-        status: "open",
-        tries: userQuizState[0].tries > 0 ? userQuizState[0].tries - 1 : 0,
-      })
-
-      await this.query(trx)
-        .delete()
-        .where("id", answerId)
+      await UserQuizState.query(trx)
+        .update({
+          status: "open",
+          tries: userQuizState[0].tries > 0 ? userQuizState[0].tries - 1 : 0,
+        })
 
       await Kafka.broadcastQuizAnswerUpdated(
         nextBestQuizAnswer,

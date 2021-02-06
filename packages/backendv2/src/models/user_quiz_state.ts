@@ -98,13 +98,12 @@ class UserQuizState extends BaseModel {
   }
 
   public static async updateAwardedPoints(
+    maxPoints: number,
     nextBestCorrectnessCoefficient: number,
     trx: Transaction,
   ) {
     await trx("user_quiz_state").update({
-      points_awarded: trx.raw("max_points * :nextBestCorrectnessCoefficient", {
-        nextBestCorrectnessCoefficient,
-      }),
+      points_awarded: maxPoints * nextBestCorrectnessCoefficient,
     })
   }
 }

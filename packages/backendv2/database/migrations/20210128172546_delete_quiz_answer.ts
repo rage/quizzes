@@ -1,7 +1,7 @@
 import * as Knex from "knex"
 
 export async function up(knex: Knex): Promise<void> {
-  knex.schema.table("quiz_answer", table => {
+  await knex.schema.table("quiz_answer", table => {
     table
       .boolean("deleted")
       .defaultTo(false)
@@ -14,7 +14,7 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-  knex.schema.table("quiz_answer", table => {
+  await knex.schema.table("quiz_answer", table => {
     table.dropColumn("deleted")
     table.dropColumn("correctness_coefficient")
   })

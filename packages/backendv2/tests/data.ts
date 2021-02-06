@@ -833,6 +833,8 @@ export const validation = {
     status: "given-enough",
     createdAt: expect.stringMatching(dateTime),
     updatedAt: expect.stringMatching(dateTime),
+    deleted: false,
+    correctnessCoefficient: 0,
     itemAnswers: [
       {
         id: "840ad4ff-8402-4c71-a57f-4b12e4b32bce",
@@ -975,6 +977,8 @@ export const validation = {
     status: "given-enough",
     createdAt: expect.stringMatching(dateTime),
     updatedAt: expect.stringMatching(dateTime),
+    deleted: false,
+    correctnessCoefficient: 0,
     itemAnswers: [
       {
         id: "7f92ac20-f9f2-44eb-a5ea-5192254c394d",
@@ -1095,6 +1099,8 @@ export const validation = {
         status: "given-enough",
         createdAt: expect.stringMatching(dateTime),
         updatedAt: expect.stringMatching(dateTime),
+        deleted: false,
+        correctnessCoefficient: 0,
         itemAnswers: [
           {
             id: "840ad4ff-8402-4c71-a57f-4b12e4b32bce",
@@ -1176,6 +1182,13 @@ export const validation = {
       id: "aa_BB",
       name: "language",
       country: "another country",
+      createdAt: expect.stringMatching(dateTime),
+      updatedAt: expect.stringMatching(dateTime),
+    },
+    {
+      id: "xx_XX",
+      name: "language",
+      country: "country",
       createdAt: expect.stringMatching(dateTime),
       updatedAt: expect.stringMatching(dateTime),
     },
@@ -1337,6 +1350,8 @@ export const validation = {
       status: "given-enough",
       createdAt: expect.stringMatching(dateTime),
       updatedAt: expect.stringMatching(dateTime),
+      deleted: false,
+      correctnessCoefficient: 0,
       itemAnswers: [
         {
           id: "7f92ac20-f9f2-44eb-a5ea-5192254c394d",
@@ -1407,10 +1422,20 @@ export const validation = {
 export const userAbilities = {
   abilities: {
     teacher: {
-      "51b66fc3-4da2-48aa-8eab-404370250ca3": ["view", "edit", "grade"],
+      "51b66fc3-4da2-48aa-8eab-404370250ca3": [
+        "view",
+        "edit",
+        "grade",
+        "delete",
+      ],
     },
     assistant: {
-      "51b66fc3-4da2-48aa-8eab-404370250ca3": ["view", "edit", "grade"],
+      "51b66fc3-4da2-48aa-8eab-404370250ca3": [
+        "view",
+        "edit",
+        "grade",
+        "delete",
+      ],
     },
   },
 }

@@ -1361,7 +1361,7 @@ describe("dashboard - courses: downloading a correspondence file should", () => 
   })
 })
 
-describe("dashboard: fetching all exisiting languages languages", () => {
+describe("dashboard: fetching all exisiting languages", () => {
   beforeAll(async () => {
     await safeSeed({ directory: "./database/seeds" })
   })
@@ -1743,7 +1743,7 @@ describe("dashboard: get user abilities for course", () => {
       .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
       .expect(res => {
-        expect(res.body).toEqual(["view", "edit", "grade"])
+        expect(res.body).toEqual(["view", "edit", "grade", "delete"])
       })
       .expect(200, done)
   })
@@ -1822,7 +1822,7 @@ describe("dashboard: get user abilities for course", () => {
       .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
       .expect(res => {
-        expect(res.body).toEqual(["view", "edit", "grade"])
+        expect(res.body).toEqual(["view", "edit", "grade", "delete"])
       })
       .expect(200, done)
   })
@@ -1861,6 +1861,7 @@ describe("dashboard: get user abilities for course", () => {
           "view",
           "edit",
           "grade",
+          "delete",
           "download",
           "duplicate",
         ])
