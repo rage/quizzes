@@ -1,12 +1,9 @@
 import * as Knex from "knex"
 
-const createOperationEnum = `CREATE TYPE IF NOT EXISTS quiz_answer_state_modification_operations_enum AS ENUM ('teacher-accept', 'teacher-reject', 'teacher-suspects-plagiarism', 'peer-review-accept', 'peer-review-reject', 'peer-review-spam' )`
-
-const dropOperationEnum = `DROP TYPE quiz_answer_state_modification_operations_enum`
+const dropOperationEnum =
+  "DROP TYPE quiz_answer_state_modification_operations_enum"
 
 export async function up(knex: Knex): Promise<void> {
-  await knex.schema.raw(createOperationEnum)
-
   if (!(await knex.schema.hasTable("quiz_answer_state_modification"))) {
     await knex.schema.createTable("quiz_answer_state_modification", table => {
       table
