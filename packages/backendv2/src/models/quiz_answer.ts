@@ -17,6 +17,7 @@ import _ from "lodash"
 import { raw } from "objection"
 import BaseModel from "./base_model"
 import QuizOptionAnswer from "./quiz_option_answer"
+import QuizAnswerStatusModification from "./quiz_answer_status_modification"
 
 type QuizAnswerStatus =
   | "draft"
@@ -376,6 +377,7 @@ class QuizAnswer extends BaseModel {
   public static async setManualReviewStatus(
     answerId: string,
     status: QuizAnswerStatus,
+    modifierId?: number,
   ) {
     if (!["confirmed", "rejected"].includes(status)) {
       throw new BadRequestError("invalid status")
@@ -404,6 +406,18 @@ class QuizAnswer extends BaseModel {
       }
 
       quizAnswer = await quizAnswer.$query(trx).patchAndFetch({ status })
+
+      // log quiz answer status change
+      if (modifierId != null) {
+        console.log("modifier id provided")
+        const operation =
+          status === "confirmed" ? "teacher-accept" : "teacher-reject"
+        await QuizAnswerStatusModification.logStatusChange(
+          answerId,
+          modifierId,
+          operation,
+        )
+      }
 
       await UserQuizState.upsert(userQuizState, trx)
       await UserCoursePartState.update(

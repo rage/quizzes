@@ -6,6 +6,7 @@ import {
   QuizAnswer,
   UserCourseRole,
   CourseTranslation,
+  QuizAnswerStatusModification,
   Language,
 } from "../../models/"
 import accessControl from "../../middleware/access_control"
@@ -17,7 +18,7 @@ import {
   getAccessibleCourses,
 } from "./util"
 import * as Kafka from "../../services/kafka"
-import _ from "lodash"
+import _, { findLast } from "lodash"
 import UserCoursePartState from "../../models/user_course_part_state"
 import knex from "../../../database/knex"
 import { BadRequestError } from "../../util/error"
@@ -121,7 +122,13 @@ const dashboard = new Router<CustomState, CustomContext>({
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "edit")
     const status = ctx.request.body.status
-    ctx.body = await QuizAnswer.setManualReviewStatus(answerId, status)
+    // ctx.body = await QuizAnswer.setManualReviewStatus(answerId, status)
+
+    ctx.body = await QuizAnswer.setManualReviewStatus(
+      answerId,
+      status,
+      ctx.state.user.id,
+    )
   })
 
   .post("/answers/status", accessControl(), async ctx => {
