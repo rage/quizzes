@@ -1,8 +1,6 @@
-import { ForbiddenError } from "./../src/util/error"
 import request from "supertest"
 import { v4 as uuidv4 } from "uuid"
 import nock from "nock"
-const knexCleaner = require("knex-cleaner")
 import app from "../app"
 import knex from "../database/knex"
 import { input, validation } from "./data"
@@ -12,7 +10,6 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../src/util/error"
-
 import { safeClean, safeSeed, configA } from "./util"
 
 afterAll(async () => {

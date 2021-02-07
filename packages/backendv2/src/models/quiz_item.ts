@@ -2,6 +2,8 @@ import Quiz from "./quiz"
 import QuizOption from "./quiz_option"
 import QuizItemTranslation from "./quiz_item_translation"
 import BaseModel from "./base_model"
+import { mixin } from "objection"
+import softDelete from "objection-soft-delete"
 
 export type QuizItemType =
   | "open"
@@ -15,7 +17,9 @@ export type QuizItemType =
   | "multiple-choice-dropdown"
   | "clickable-multiple-choice"
 
-class QuizItem extends BaseModel {
+class QuizItem extends mixin(BaseModel, [
+  softDelete({ columnName: "deleted" }),
+]) {
   id!: string
   type!: QuizItemType
   validityRegex!: string
@@ -28,6 +32,7 @@ class QuizItem extends BaseModel {
   failureMessage!: string
   sharedOptionFeedbackMessage!: string
   allAnswersCorrect!: string
+  deleted!: boolean
 
   static get tableName() {
     return "quiz_item"
@@ -58,6 +63,10 @@ class QuizItem extends BaseModel {
         to: "quiz_item_translation.quiz_item_id",
       },
     },
+  }
+
+  static async getById(id: string): Promise<QuizItem> {
+    return await this.query().findById(id)
   }
 }
 
