@@ -1,7 +1,8 @@
 import BaseModel from "./base_model"
+import QuizAnswer from "./quiz_answer"
+import User from "./user"
 
 type StateModificationOperation =
-  | "draft"
   | "teacher-accept"
   | "teacher-reject"
   | "teacher-suspects-plagiarism"
@@ -19,7 +20,29 @@ class QuizAnswerStateModification extends BaseModel {
     return "quiz_answer_state_modification"
   }
 
-  static relationMappings = {}
+  static relationMappings = {
+    user: {
+      relation: BaseModel.BelongsToOneRelation,
+      modelClass: User,
+      join: {
+        from: "quiz_answer_state_modification.modifier_id",
+        to: "user.id",
+      },
+    },
+    quizAnswer: {
+      relation: BaseModel.BelongsToOneRelation,
+      modelClass: QuizAnswer,
+      join: {
+        from: "quiz_answer_state_modification.quiz_answer_id",
+        to: "quiz_answer.id",
+      },
+    },
+  }
+
+  static async getAll() {
+    const loggedChanges = await this.query()
+    return loggedChanges
+  }
 }
 
 export default QuizAnswerStateModification
