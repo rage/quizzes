@@ -3,8 +3,8 @@
   "license": "Apache-2.0 OR MIT",
   "private": true,
   "scripts": {
-    "prettier": "prettier --write \"packages/**/*.js\" \"packages/**/*.ts\" \"packages/**/*.jsx\" \"packages/**/*.tsx\"",
-    "prettier-check": "prettier  --list-different \"packages/**/*.js\" \"packages/**/*.ts\" \"packages/**/*.jsx\" \"packages/**/*.tsx\""
+    "prettier": "npx prettier --write \"packages/**/*.js\" \"packages/**/*.ts\" \"packages/**/*.jsx\" \"packages/**/*.tsx\"",
+    "prettier-check": "npx prettier  --list-different \"packages/**/*.js\" \"packages/**/*.ts\" \"packages/**/*.jsx\" \"packages/**/*.tsx\""
   },
   "devDependencies": {
     "husky": "^4.2.5",
