@@ -11,12 +11,6 @@ const StyledCard = styled(Card)`
   margin-bottom: 1rem;
 `
 
-const CourseLink = styled.a`
-  color: white;
-  text-decoration: none;
-  cursor: pointer;
-`
-
 const SortSelector = styled(TextField)`
   display: flex !important;
   width: 25% !important;
