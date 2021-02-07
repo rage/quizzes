@@ -1,11 +1,11 @@
 import * as Knex from "knex"
 
 const dropOperationEnum =
-  "DROP TYPE quiz_answer_state_modification_operations_enum"
+  "DROP TYPE quiz_answer_status_modification_operations_enum"
 
 export async function up(knex: Knex): Promise<void> {
-  if (!(await knex.schema.hasTable("quiz_answer_state_modification"))) {
-    await knex.schema.createTable("quiz_answer_state_modification", table => {
+  if (!(await knex.schema.hasTable("quiz_answer_status_modification"))) {
+    await knex.schema.createTable("quiz_answer_status_modification", table => {
       table
         .uuid("id")
         .primary()
@@ -44,7 +44,7 @@ export async function up(knex: Knex): Promise<void> {
           ],
           {
             useNative: true,
-            enumName: "quiz_answer_state_modification_operations_enum",
+            enumName: "quiz_answer_status_modification_operations_enum",
           },
         )
         .notNullable()
@@ -54,5 +54,5 @@ export async function up(knex: Knex): Promise<void> {
 
 export async function down(knex: Knex): Promise<void> {
   await knex.schema.raw(dropOperationEnum)
-  return knex.schema.dropTable("quiz_answer_state_modification")
+  return knex.schema.dropTable("quiz_answer_status_modification")
 }
