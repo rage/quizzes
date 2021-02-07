@@ -46,19 +46,13 @@ const QuizCard = styled(Card)`
   margin-bottom: 1rem;
 `
 
-const QuizLink = styled.a`
-  color: white;
-  text-decoration: none;
-  cursor: pointer;
-`
-
 const StyledType = styled(Typography)`
   color: #f44336 !important;
 `
 
 export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
   const title = quiz.title
-  const types = Array.from(new Set(quiz.items.map(item => item.type)))
+  const types = Array.from(new Set(quiz.items.map((item) => item.type)))
   const {
     userAbilities,
     userAbilitiesLoading,
@@ -67,7 +61,7 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
 
   return (
     <Link href={`/quizzes/${quiz.id}/overview`}>
-      <QuizLink>
+      <a style={{ textDecoration: "none" }}>
         <QuizCard>
           <CardContent>
             <TitleWrapper>
@@ -102,7 +96,7 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
             {types.length > 0 ? (
               <div>
                 [{" "}
-                {types.map(type => (
+                {types.map((type) => (
                   <StyledType key={type} variant="overline">
                     {type}{" "}
                   </StyledType>
@@ -114,7 +108,7 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
             )}
           </CardContent>
         </QuizCard>
-      </QuizLink>
+      </a>
     </Link>
   )
 }
