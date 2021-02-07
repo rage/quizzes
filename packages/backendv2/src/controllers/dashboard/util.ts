@@ -92,7 +92,7 @@ export const getDownloadTokenFromRedis = async (
     } else {
       // generate token for authorised user
       const randomToken = JSON.stringify(
-        crypto.randomBytes(100).toString("hex"),
+        `dl_tkn_${crypto.randomBytes(100).toString("hex")}`,
       )
       await redis.client.set(userId, randomToken, "EX", 600)
       downloadToken = randomToken

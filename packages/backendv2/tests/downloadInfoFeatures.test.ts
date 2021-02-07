@@ -97,7 +97,7 @@ describe("dashboard - courses: downloading quiz info should", () => {
       .end(done)
   })
 
-  test("return a valid download url and username on successful request", done => {
+  test("return a valid download url on successful request", done => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
     request(app.callback())
       .post(`/api/v2/dashboard/quizzes/${quizId}/download-quiz-info`)
@@ -201,7 +201,6 @@ describe("dashboard: downloading peer review info should", () => {
       )
       .set("Authorization", `Bearer ADMIN_TOKEN_NO_ID`)
       .expect(400)
-
       .expect(response => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual("No user id provided.")
