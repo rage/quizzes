@@ -58,7 +58,7 @@ const CourseList = ({ data, error }: CourseListProps) => {
           variant="outlined"
           select
           value={sortBy}
-          onChange={(event) => setSortBy(event.target.value)}
+          onChange={event => setSortBy(event.target.value)}
         >
           <MenuItem value="title">Alphabetical</MenuItem>
           <MenuItem value="createdAt">Created at</MenuItem>
@@ -68,7 +68,7 @@ const CourseList = ({ data, error }: CourseListProps) => {
           variant="outlined"
           select
           value={sortOrder}
-          onChange={(event) => setSortOrder(event.target.value)}
+          onChange={event => setSortOrder(event.target.value)}
         >
           <MenuItem value="asc">
             {sortBy === "title" ? "[A - Z]" : "Oldest first"}
@@ -78,7 +78,7 @@ const CourseList = ({ data, error }: CourseListProps) => {
           </MenuItem>
         </OrderSelector>
       </OptionWrapper>
-      {courses.map((course) => (
+      {courses.map(course => (
         <Link key={course.id} href={`/courses/${course.id}/listing`}>
           <a>
             <StyledCard key={course.id}>

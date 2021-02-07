@@ -52,7 +52,7 @@ const StyledType = styled(Typography)`
 
 export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
   const title = quiz.title
-  const types = Array.from(new Set(quiz.items.map((item) => item.type)))
+  const types = Array.from(new Set(quiz.items.map(item => item.type)))
   const {
     userAbilities,
     userAbilitiesLoading,
@@ -96,7 +96,7 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
             {types.length > 0 ? (
               <div>
                 [{" "}
-                {types.map((type) => (
+                {types.map(type => (
                   <StyledType key={type} variant="overline">
                     {type}{" "}
                   </StyledType>
