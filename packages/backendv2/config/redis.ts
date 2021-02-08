@@ -5,6 +5,7 @@ if (process.env.REDIS_HOST && process.env.REDIS_PORT) {
   client = new Redis({
     port: Number(process.env.REDIS_PORT),
     host: process.env.REDIS_HOST,
+    password: process.env.REDIS_PASSWORD && process.env.REDIS_PASSWORD,
   })
   if (client) {
     console.log(
