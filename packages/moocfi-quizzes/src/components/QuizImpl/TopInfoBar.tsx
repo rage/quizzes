@@ -20,13 +20,13 @@ const Container = styled.div<TopInfoBarContainerProps>`
   justify-content: center;
   padding: 1.5rem 2rem;
   color: white;
-  background: #1473E6;
+  background: #1473e6;
 `
 
 const IconContainer = styled.div`
   margin-right: 1rem;
   font-size: 3.5rem;
-  color: #15447D;
+  color: #15447d;
 `
 
 const TitleContainer = styled.div`
@@ -194,7 +194,12 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
         )}
       </IconContainer>
       <TitleContainer>
-        <Typography component="div" variant="subtitle1" id="quiz-type-label" style={{ lineHeight:'1.2', opacity: '0.8' }}>
+        <Typography
+          component="div"
+          variant="subtitle1"
+          id="quiz-type-label"
+          style={{ lineHeight: "1.2", opacity: "0.8" }}
+        >
           {quizLabel}:
         </Typography>
         {quiz ? (

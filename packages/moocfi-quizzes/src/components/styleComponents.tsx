@@ -39,25 +39,25 @@ export const SpaciousPaper = styled(Paper)`
 `
 /**** WORK ON THIS ****/
 export const SpaciousTypography = styled(Typography)`
-/*   padding-bottom: 0.75rem; */
+  /*   padding-bottom: 0.75rem; */
   padding-bottom: 0.5rem !Important;
   text-align: center;
   font-size: 1.2rem;
   font-weight: 400;
-  color: rgba(0,0,0,0.8);
+  color: rgba(0, 0, 0, 0.8);
   line-height: normal;
   margin-top: 2rem;
 `
 export const HeadingTypography = styled(Typography)`
-    /* padding-bottom: 0.5rem !Important; */
-    text-align: center;
-    font-size: 1rem;
-    font-weight: 400;
-    color: rgba(0,0,0,0.8);
-    line-height: normal;
-    margin: 1rem 0;
-    display: flex;
-    align-items: center;
+  /* padding-bottom: 0.5rem !Important; */
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(0, 0, 0, 0.8);
+  line-height: normal;
+  margin: 1rem 0;
+  display: flex;
+  align-items: center;
 `
 
 export const BoldTypographyNormal = styled(BoldTypography)`
@@ -105,7 +105,7 @@ export const StyledTextField = styled(TextField)<IStyledTextFieldProps>`
 
 export const StyledButton = styled(BaseButton)`
   padding: 10px 20px;
-/*   border-radius: 15px; */
+  /*   border-radius: 15px; */
   border-radius: 45px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
     0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);

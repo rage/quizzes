@@ -230,9 +230,9 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 
 const SelectOptionsLabelTypography = styled(Typography)<{
   onlyOneItem: boolean
-}>` 
+}>`
   font-weight: 400;
-  color: rgba(0,0,0,0.6);
+  color: rgba(0, 0, 0, 0.6);
   font-size: 16px;
   ${({ onlyOneItem }) => onlyOneItem && "margin: 0 auto 1rem;"}
 `
@@ -497,5 +497,3 @@ type OptionWrapperProps = {
 }
 
 export default MultipleChoice
-
-

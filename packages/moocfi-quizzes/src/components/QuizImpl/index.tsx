@@ -93,7 +93,7 @@ export interface QuizContentProps {
 
 const QuizContent = styled.div<QuizContentProps>`
   margin-top: 3rem;
-/*   padding: 1rem; */
+  /*   padding: 1rem; */
   ${({ disabled }) =>
     disabled &&
     `
@@ -432,7 +432,10 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
             </MessageGroup>
           ) : (
             <>
-              <SubmitGroup providedStyles={themeProvider.submitGroupStyles} style={{display:'block'}}>
+              <SubmitGroup
+                providedStyles={themeProvider.submitGroupStyles}
+                style={{ display: "block" }}
+              >
                 <div />
                 <div
                   onClick={e => {
@@ -444,14 +447,18 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                   <SubmitButton />
                 </div>
 
-   
                 {!quizDisabled && (
-                  <div style={{paddingTop:'1rem'}}>
+                  <div style={{ paddingTop: "1rem" }}>
                     {pastDeadline ? (
                       <Typography>{generalLabels.pastDeadline}</Typography>
                     ) : (
                       <React.Fragment>
-                        <Typography style={{ color: 'rgba(0,0,0,0.7)', fontSize: '0.9rem'}}>
+                        <Typography
+                          style={{
+                            color: "rgba(0,0,0,0.7)",
+                            fontSize: "0.9rem",
+                          }}
+                        >
                           {quiz.triesLimited
                             ? `${generalLabels.triesRemainingLabel}: ${triesRemaining}`
                             : generalLabels.triesNotLimitedLabel}
@@ -466,7 +473,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                       </React.Fragment>
                     )}
                   </div>
-                
                 )}
               </SubmitGroup>
             </>
