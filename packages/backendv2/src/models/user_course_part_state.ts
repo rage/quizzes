@@ -51,9 +51,9 @@ class UserCoursePartState extends BaseModel {
     )[0]
     if (!userCoursePartState) {
       const parts = await trx("quiz")
-        .select("part as coursePart")
-        .select(trx.raw("coalesce(sum(points_awarded), 0) as pointsAwarded"))
-        .sum("points as totalPoints")
+        .select("part as course_part")
+        .select(trx.raw("coalesce(sum(points_awarded), 0) as points_awarded"))
+        .sum("points as total_points")
         .leftJoin(
           trx.raw(
             `
@@ -80,13 +80,13 @@ class UserCoursePartState extends BaseModel {
         .andWhereNot("part", 0)
         .groupBy("part")
       const userCoursePartStates = parts.map(
-        ({ coursePart, pointsAwarded, totalPoints }) => {
+        ({ course_part, points_awarded, total_points }) => {
           return this.fromJson({
             userId,
             courseId,
-            coursePart,
-            score: pointsAwarded || 0,
-            progress: pointsAwarded / totalPoints,
+            coursePart: course_part,
+            score: points_awarded || 0,
+            progress: total_points === 0 ? 0 : points_awarded / total_points,
           })
         },
       )
