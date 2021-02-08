@@ -30,6 +30,12 @@ const OptionWrapper = styled.div`
   width: 100%;
 `
 
+const CourseLink = styled.a`
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+`
+
 interface CourseListProps {
   data: Course[] | undefined
   error: any
@@ -79,12 +85,12 @@ const CourseList = ({ data, error }: CourseListProps) => {
         </OrderSelector>
       </OptionWrapper>
       {courses.map(course => (
-        <Link key={course.id} href={`/courses/${course.id}/listing`}>
-          <a>
+        <Link key={course.id} href={`/courses/${course.id}/listing`} passHref>
+          <CourseLink>
             <StyledCard key={course.id}>
               <CardContent>{course.title || course.id}</CardContent>
             </StyledCard>
-          </a>
+          </CourseLink>
         </Link>
       ))}
 

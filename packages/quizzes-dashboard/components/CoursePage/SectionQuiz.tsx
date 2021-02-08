@@ -50,18 +50,23 @@ const StyledType = styled(Typography)`
   color: #f44336 !important;
 `
 
+const QuizLink = styled.a`
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+`
+
 export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
   const title = quiz.title
   const types = Array.from(new Set(quiz.items.map(item => item.type)))
-  const {
-    userAbilities,
-    userAbilitiesLoading,
-    userAbilitiesError,
-  } = useUserAbilities(quiz?.courseId ?? "", "user-abilities")
+  const { userAbilities } = useUserAbilities(
+    quiz?.courseId ?? "",
+    "user-abilities",
+  )
 
   return (
-    <Link href={`/quizzes/${quiz.id}/overview`}>
-      <a style={{ textDecoration: "none" }}>
+    <Link href={`/quizzes/${quiz.id}/overview`} passHref>
+      <QuizLink>
         <QuizCard>
           <CardContent>
             <TitleWrapper>
@@ -108,7 +113,7 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
             )}
           </CardContent>
         </QuizCard>
-      </a>
+      </QuizLink>
     </Link>
   )
 }
