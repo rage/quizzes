@@ -152,7 +152,7 @@ class UserCoursePartState extends BaseModel {
         group: `${
           coursePartString.length > 1 ? "osa" : "osa0"
         }${coursePartString}`,
-        progress: Math.floor(ucps.progress * 100) / 100,
+        progress: Math.round(((ucps.score / maxPoints) * 100) / 100),
         n_points: Number(ucps.score.toFixed(2)),
         max_points: maxPoints,
       }
