@@ -82,14 +82,9 @@ export interface IItemWrapperProps {
 const ItemWrapper = styled.div<IItemWrapperProps>`
   background-color: ${({ rowNumber }) =>
     rowNumber % 2 === 0 ? "inherit" : "#605c980d"};
-<<<<<<< HEAD
   /* border-radius: 10px; */
   /* padding: 1rem 2rem 1rem 1rem; */
   padding: 0 1rem;
-=======
-  border-radius: 10px;
-  padding: 0.7rem 2rem 1rem 1rem;
->>>>>>> 9edd8982fd64cafcb21fa7e09a721c4cba2aaf4f
 `
 
 export interface QuizContentProps {
@@ -97,13 +92,8 @@ export interface QuizContentProps {
 }
 
 const QuizContent = styled.div<QuizContentProps>`
-<<<<<<< HEAD
   margin-top: 3rem;
 /*   padding: 1rem; */
-=======
-  margin-top: 1.5rem;
-  padding: 1rem;
->>>>>>> 9edd8982fd64cafcb21fa7e09a721c4cba2aaf4f
   ${({ disabled }) =>
     disabled &&
     `
