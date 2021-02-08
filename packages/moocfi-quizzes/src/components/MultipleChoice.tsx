@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import { Typography } from "@material-ui/core"
 import { GridDirection, GridSize } from "@material-ui/core/Grid"
-import { SpaciousTypography } from "./styleComponents"
+import { HeadingTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { QuizItem, QuizItemOption, QuizItemAnswer } from "../modelTypes"
@@ -16,10 +16,13 @@ import ChoiceButton from "./ChoiceButton"
 
 const QuestionContainer = styled.div`
   display: flex;
+  justify-content: center;
   flex-direction: column;
   flex: 1;
   font-size: 1.25rem;
   margin-right: 0.25rem;
+  margin-bottom: 1rem;
+  margin-top: 1rem;
 `
 
 interface ChoicesContainerProps {
@@ -201,7 +204,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
     <QuestionContainer>
       {!onlyOneItem && title && (
         <LeftAlignedMarkdownText
-          Component={SpaciousTypography}
+          Component={HeadingTypography}
           removeParagraphs
           variant="subtitle1"
           id={`item-question-${title}`}
@@ -227,8 +230,10 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 
 const SelectOptionsLabelTypography = styled(Typography)<{
   onlyOneItem: boolean
-}>`
-  color: 6b6b6b;
+}>` 
+  font-weight: 400;
+  color: rgba(0,0,0,0.6);
+  font-size: 16px;
   ${({ onlyOneItem }) => onlyOneItem && "margin: 0 auto 1rem;"}
 `
 
@@ -477,7 +482,7 @@ const OptionWrapper = styled.div<OptionWrapperProps>`
       ? `
       display: flex;
       justify-content: center;
-      background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
+      background-color: ${shouldBeGray ? `#f5f9fb` : `inherit`};
       ${providedStyles}
     `
       : `
@@ -492,3 +497,5 @@ type OptionWrapperProps = {
 }
 
 export default MultipleChoice
+
+
