@@ -1,7 +1,6 @@
 import knex from "../../database/knex"
 import { BadRequestError } from "../util/error"
 import BaseModel from "./base_model"
-import QuizAnswer from "./quiz_answer"
 import User from "./user"
 
 type StatusModificationOperation =
@@ -33,7 +32,7 @@ class QuizAnswerStatusModification extends BaseModel {
     },
     quizAnswer: {
       relation: BaseModel.BelongsToOneRelation,
-      modelClass: QuizAnswer,
+      modelClass: `${__dirname}/quiz_answer`,
       join: {
         from: "quiz_answer_status_modification.quiz_answer_id",
         to: "quiz_answer.id",
@@ -46,12 +45,20 @@ class QuizAnswerStatusModification extends BaseModel {
     return loggedChanges
   }
 
+  static async getAllByQuizAnswerId(
+    quizAnswerId: string,
+  ): Promise<QuizAnswerStatusModification[] | undefined> {
+    return await this.query()
+      .select("*")
+      .where({ quiz_answer_id: quizAnswerId })
+      .withGraphFetched("quizAnswer")
+  }
+
   static async logStatusChange(
     quizAnswerId: string,
     modifierId: number,
     operation: StatusModificationOperation,
   ): Promise<QuizAnswerStatusModification | BadRequestError> {
-    console.log("logging change")
     const trx = await knex.transaction()
     try {
       const newQuizAnswerStatusChangeLog = await this.query(trx).insertAndFetch(

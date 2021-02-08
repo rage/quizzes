@@ -409,7 +409,6 @@ class QuizAnswer extends BaseModel {
 
       // log quiz answer status change
       if (modifierId != null) {
-        console.log("modifier id provided")
         const operation =
           status === "confirmed" ? "teacher-accept" : "teacher-reject"
         await QuizAnswerStatusModification.logStatusChange(

@@ -3,7 +3,7 @@ import nock from "nock"
 import app from "../app"
 import knex from "../database/knex"
 import { UserInfo } from "../src/types"
-import { safeClean, safeSeed, configA } from "./util"
+import { safeClean, safeSeed, configA, dateTime, uuid } from "./util"
 import _ from "lodash"
 import { Model, snakeCaseMappers } from "objection"
 import { QuizAnswerStatusModification } from "../src/models"
@@ -40,18 +40,42 @@ describe("Dashboard: updating status of a quiz answer", () => {
     expect(res.status).toEqual(401)
   })
 
-  test("results in status change being recorded when answer status changed", async () => {
+  test("teacher accept operation results in operation being logged", async () => {
+    const quizAnswerId = "0cb3e4de-fc11-4aac-be45-06312aa4677c"
     const res = await request(app.callback())
-      .post(
-        "/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/status",
-      )
+      .post(`/api/v2/dashboard/answers/${quizAnswerId}/status`)
       .set("Authorization", `bearer admin_token`)
       .set("Accept", "application/json")
       .send({ status: "confirmed" })
-
-    const log = await QuizAnswerStatusModification.getAll()
-
     expect(res.status).toEqual(200)
+
+    const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
+      quizAnswerId,
+    )
+
+    if (logs != null) {
+      expect(logs[0].modifierId).toEqual(1234)
+      expect(logs[0].operation).toEqual("teacher-accept")
+    }
+  })
+
+  test("teacher reject operation results in operation being logged", async () => {
+    const quizAnswerId = "0cb3e4de-fc11-4aac-be45-06312aa4677c"
+    const res = await request(app.callback())
+      .post(`/api/v2/dashboard/answers/${quizAnswerId}/status`)
+      .set("Authorization", `bearer admin_token`)
+      .set("Accept", "application/json")
+      .send({ status: "rejected" })
+    expect(res.status).toEqual(200)
+
+    const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
+      quizAnswerId,
+    )
+
+    if (logs != null) {
+      expect(logs[1].modifierId).toEqual(1234)
+      expect(logs[1].operation).toEqual("teacher-reject")
+    }
   })
 })
 
