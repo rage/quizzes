@@ -2,16 +2,23 @@ import request from "supertest"
 import nock from "nock"
 import app from "../app"
 import knex from "../database/knex"
-import { QuizAnswer, Course, Quiz } from "../src/models"
+import { QuizAnswer, Course } from "../src/models"
 import { input, userAbilities, validation, possibleAnswerStates } from "./data"
 import { UserInfo } from "../src/types"
 import { BadRequestError, NotFoundError } from "../src/util/error"
+
+import redis from "../config/redis"
 
 import { safeClean, safeSeed, expectQuizToEqual, configA } from "./util"
 
 afterAll(async () => {
   await safeClean()
   await knex.destroy()
+  await redis.client?.quit()
+})
+
+afterEach(async () => {
+  await redis.client?.flushall()
 })
 
 describe("dashboard: get courses", () => {
@@ -53,14 +60,16 @@ describe("dashboard: get courses", () => {
     request(app.callback())
       .get("/api/v2/dashboard/courses")
       .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
 
   test("respond with 403 if insufficient privilege", done => {
     request(app.callback())
       .get("/api/v2/dashboard/courses")
       .set("Authorization", `bearer PLEB_TOKEN`)
-      .expect(403, done)
+      .expect(403)
+      .end(done)
   })
 
   test("reply with courses on valid request", done => {
@@ -118,14 +127,16 @@ describe("dashboard: get single course should", () => {
     request(app.callback())
       .get("/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b")
       .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
 
   test("respond with 403 if insufficient privilege", done => {
     request(app.callback())
       .get("/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b")
       .set("Authorization", `bearer PLEB_TOKEN`)
-      .expect(403, done)
+      .expect(403)
+      .end(done)
   })
 
   test("respond with 404 if invalid course id", done => {
@@ -137,7 +148,8 @@ describe("dashboard: get single course should", () => {
         const received: NotFoundError = response.body
         expect(received.message).toEqual(`course not found: ${courseId}`)
       })
-      .expect(404, done)
+      .expect(404)
+      .end(done)
   })
   describe("on valid request: ", () => {
     test("reply with course on valid request", done => {
@@ -195,7 +207,8 @@ describe("dashboard - courses: count answers requiring attention should", () => 
         "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/count-answers-requiring-attention",
       )
       .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
 
   test("respond with 403 if insufficient privilege", done => {
@@ -204,7 +217,8 @@ describe("dashboard - courses: count answers requiring attention should", () => 
         "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/count-answers-requiring-attention",
       )
       .set("Authorization", `bearer PLEB_TOKEN`)
-      .expect(403, done)
+      .expect(403)
+      .end(done)
   })
 
   test("respond with 404 if invalid course id", done => {
@@ -218,7 +232,8 @@ describe("dashboard - courses: count answers requiring attention should", () => 
         const received: NotFoundError = response.body
         expect(received.message).toEqual(`course not found: ${courseId}`)
       })
-      .expect(404, done)
+      .expect(404)
+      .end(done)
   })
 
   describe("on valid request:", () => {
@@ -294,7 +309,8 @@ describe("dashboard - quizzes: count answers requiring attention should", () => 
         "/api/v2/dashboard/quizzes/44bf4cf2f-3058-4311-8d16-26d781261af7/count-answers-requiring-attention",
       )
       .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
 
   test("respond with 403 if insufficient privilege", done => {
@@ -303,7 +319,8 @@ describe("dashboard - quizzes: count answers requiring attention should", () => 
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/count-answers-requiring-attention",
       )
       .set("Authorization", `bearer PLEB_TOKEN`)
-      .expect(403, done)
+      .expect(403)
+      .end(done)
   })
 
   test("respond with 404 if invalid quiz id", done => {
@@ -317,7 +334,8 @@ describe("dashboard - quizzes: count answers requiring attention should", () => 
         const received: NotFoundError = response.body
         expect(received.message).toEqual(`quiz not found: ${quizId}`)
       })
-      .expect(404, done)
+      .expect(404)
+      .end(done)
   })
 
   describe("on valid request:", () => {
@@ -378,7 +396,8 @@ describe("dashboard: get quizzes by course id", () => {
         "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/quizzes",
       )
       .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
   afterAll(async () => {
     nock.cleanAll()
@@ -416,7 +435,8 @@ describe("dashboard: get quizzes by course id", () => {
         "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/quizzes",
       )
       .set("Authorization", `bearer PLEB_TOKEN`)
-      .expect(403, done)
+      .expect(403)
+      .end(done)
   })
 
   test("reply with course quizzes on valid request", done => {
@@ -477,14 +497,16 @@ describe("dashboard: get quiz by id", () => {
     request(app.callback())
       .get("/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
       .set("Authorization", `bearer PLEB_TOKEN`)
-      .expect(403, done)
+      .expect(403)
+      .end(done)
   })
 
   test("respond with 404 if invalid quiz id", done => {
     request(app.callback())
       .get("/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af8")
       .set("Authorization", `bearer ADMIN_TOKEN`)
-      .expect(404, done)
+      .expect(404)
+      .end(done)
   })
 
   test("reply with quiz on valid request", done => {
@@ -536,22 +558,14 @@ describe("dashboard: save quiz", () => {
       })
   })
 
-  test("respond with error if required field missing", done => {
-    request(app.callback())
-      .post("/api/v2/dashboard/quizzes")
-      .set("Authorization", `bearer ADMIN_TOKEN`)
-      .set("Accept", "application/json")
-      .send({ ...input.newQuiz, part: null })
-      .expect(400, done)
-  })
-
   test("respond with 401 if invalid credentials", done => {
     request(app.callback())
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer BAD_TOKEN`)
       .set("Accept", "application/json")
       .send(input.newQuiz)
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
 
   test("respond with 403 if invalid credentials", done => {
@@ -560,7 +574,8 @@ describe("dashboard: save quiz", () => {
       .set("Authorization", `bearer PLEB_TOKEN`)
       .set("Accept", "application/json")
       .send(input.newQuiz)
-      .expect(403, done)
+      .expect(403)
+      .end(done)
   })
 
   test("save valid quiz", done => {
@@ -664,14 +679,16 @@ describe("dashboard: get answer by id", () => {
     request(app.callback())
       .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
       .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
 
   test("respond with 403 if insufficient credentials", done => {
     request(app.callback())
       .get("/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c")
       .set("Authorization", `bearer PLEB_TOKEN`)
-      .expect(403, done)
+      .expect(403)
+      .end(done)
   })
 
   test("get answer by id", done => {
@@ -682,7 +699,8 @@ describe("dashboard: get answer by id", () => {
         const received = response.body
         expect(received).toStrictEqual(validation.quizAnswerValidator1)
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 })
 
@@ -734,7 +752,8 @@ describe("dashboard: get answers by quiz id", () => {
         expect(states.size).toBe(1)
         expect(states.has("confirmed")).toBe(true)
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 
   test("get answers by quiz id: page 2", done => {
@@ -750,7 +769,8 @@ describe("dashboard: get answers by quiz id", () => {
         expect(states.size).toBe(1)
         expect(states.has("deprecated")).toBe(true)
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 
   test("get answers by quiz id: page 3, one status filter", done => {
@@ -766,7 +786,8 @@ describe("dashboard: get answers by quiz id", () => {
         expect(states.size).toBe(1)
         expect(states.has("manual-review")).toBe(true)
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 
   test("get answers by quiz id: page 4, two status filter", done => {
@@ -782,7 +803,8 @@ describe("dashboard: get answers by quiz id", () => {
         expect(states.size).toBe(2)
         expect(states.has("deprecated")).toBe(false)
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 })
 
@@ -827,7 +849,8 @@ describe("dashboard: get manual review answers", () => {
         "/api/v2/dashboard/answers/2a0c2270-011e-40b2-8796-625764828034/manual-review?page=0&size=10",
       )
       .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
 
   test("respond with 403 if insufficient credentials", done => {
@@ -836,7 +859,8 @@ describe("dashboard: get manual review answers", () => {
         "/api/v2/dashboard/answers/2a0c2270-011e-40b2-8796-625764828034/manual-review?page=0&size=10",
       )
       .set("Authorization", `bearer PLEB_TOKEN`)
-      .expect(403, done)
+      .expect(403)
+      .end(done)
   })
 
   test("respond with correct page data 1", done => {
@@ -852,7 +876,8 @@ describe("dashboard: get manual review answers", () => {
           received.filter(answer => answer.status === "manual-review"),
         ).toHaveLength(received.length)
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 
   test("respond with correct page data 2", done => {
@@ -868,7 +893,8 @@ describe("dashboard: get manual review answers", () => {
           received.filter(answer => answer.status === "manual-review"),
         ).toHaveLength(received.length)
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 })
 
@@ -914,7 +940,8 @@ describe("dashboard: update manual review status", () => {
       .set("Authorization", `bearer BAD_TOKEN`)
       .set("Accept", "application/json")
       .send({ status: "confirmed" })
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
 
   test("respond with 403 if insufficient credentials", done => {
@@ -925,7 +952,8 @@ describe("dashboard: update manual review status", () => {
       .set("Authorization", `bearer PLEB_TOKEN`)
       .set("Accept", "application/json")
       .send({ status: "confirmed" })
-      .expect(403, done)
+      .expect(403)
+      .end(done)
   })
 
   test("respond with 400 if invalid status", done => {
@@ -940,7 +968,8 @@ describe("dashboard: update manual review status", () => {
         const received = response.body
         expect(received.message).toMatch("invalid status")
       })
-      .expect(400, done)
+      .expect(400)
+      .end(done)
   })
 
   test("update valid status", done => {
@@ -955,7 +984,8 @@ describe("dashboard: update manual review status", () => {
         const received: QuizAnswer = response.body
         expect(received.status).toEqual("confirmed")
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 })
 
@@ -1033,7 +1063,8 @@ describe("Answer: spam flags", () => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual("Can only give one spam flag")
       })
-      .expect(400, done)
+      .expect(400)
+      .end(done)
   })
 
   test("First spam flag", done => {
@@ -1047,7 +1078,8 @@ describe("Answer: spam flags", () => {
       .expect(res => {
         expect(res.body).toEqual(validation.spamFlagValidator1)
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 
   test("check the answers status", done => {
@@ -1059,7 +1091,8 @@ describe("Answer: spam flags", () => {
         expect(response.body.status).toEqual("given-enough")
         expect(response.body.userQuizState.spamFlags).toEqual(1)
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 
   test("Second spam flag", done => {
@@ -1073,7 +1106,8 @@ describe("Answer: spam flags", () => {
       .expect(response => {
         expect(response.body).toEqual(validation.spamFlagValidator2)
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 
   test("check the answer status", done => {
@@ -1085,7 +1119,8 @@ describe("Answer: spam flags", () => {
         expect(response.body.userQuizState.spamFlags).toEqual(2)
         expect(response.body.status).toEqual("given-enough")
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 
   test("Third spam flag", done => {
@@ -1099,7 +1134,8 @@ describe("Answer: spam flags", () => {
       .expect(response => {
         expect(response.body).toEqual(validation.spamFlagValidator3)
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 
   test("check the answer status", done => {
@@ -1111,7 +1147,8 @@ describe("Answer: spam flags", () => {
         expect(response.body.userQuizState.spamFlags).toEqual(3)
         expect(response.body.status).toEqual("spam")
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 })
 
@@ -1159,7 +1196,8 @@ describe("fetching user progress should", () => {
       .expect(res => {
         expect(res.body).toEqual([])
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 
   test("return user's progress in correct shape when user has prgress", done => {
@@ -1172,7 +1210,8 @@ describe("fetching user progress should", () => {
       .expect(res => {
         expect(res.body).toEqual(validation.userProgressValidator)
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 
   test("throw if invalid course id provided", done => {
@@ -1185,7 +1224,8 @@ describe("fetching user progress should", () => {
         const received: NotFoundError = response.body
         expect(received.message).toEqual(`course not found: ${invalidCourseId}`)
       })
-      .expect(404, done)
+      .expect(404)
+      .end(done)
   })
 })
 
@@ -1230,7 +1270,8 @@ describe("dashboard - courses: duplicating course should", () => {
         "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/duplicate-course",
       )
       .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
 
   test("respond with 403 if insufficient privilege", done => {
@@ -1239,7 +1280,8 @@ describe("dashboard - courses: duplicating course should", () => {
         "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/duplicate-course",
       )
       .set("Authorization", `bearer PLEB_TOKEN`)
-      .expect(403, done)
+      .expect(403)
+      .end(done)
   })
 
   test("respond with 404 if invalid course id", done => {
@@ -1251,7 +1293,8 @@ describe("dashboard - courses: duplicating course should", () => {
         const received: NotFoundError = response.body
         expect(received.message).toEqual(`course not found: ${invalidCourseId}`)
       })
-      .expect(404, done)
+      .expect(404)
+      .end(done)
   })
   test("throw BadRequestError if provided language id does not exist in db", done => {
     const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44b"
@@ -1279,7 +1322,8 @@ describe("dashboard - courses: duplicating course should", () => {
         .expect(response => {
           expect(response.body).toStrictEqual(validation.duplicateCourse)
         })
-        .expect(200, done)
+        .expect(200)
+        .end(done)
     })
     test("set defaults for new course when title and abbreviation missing ", async done => {
       const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44b"
@@ -1296,7 +1340,8 @@ describe("dashboard - courses: duplicating course should", () => {
             "(duplicate) [title not set]",
           )
         })
-        .expect(200, done)
+        .expect(200)
+        .end(done)
     })
   })
 })
@@ -1341,14 +1386,16 @@ describe("dashboard - courses: downloading a correspondence file should", () => 
     request(app.callback())
       .post("/api/v2/dashboard/courses/download-correspondence-file")
       .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
 
   test("respond with 403 if insufficient privilege", done => {
     request(app.callback())
       .post("/api/v2/dashboard/courses/download-correspondence-file")
       .set("Authorization", `bearer PLEB_TOKEN`)
-      .expect(403, done)
+      .expect(403)
+      .end(done)
   })
 
   //TODO: asserts on response
@@ -1357,7 +1404,8 @@ describe("dashboard - courses: downloading a correspondence file should", () => 
       .post("/api/v2/dashboard/courses/download-correspondence-file")
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .send(input.correspondenceIds)
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 })
 
@@ -1394,7 +1442,8 @@ describe("dashboard: fetching all exisiting languages languages", () => {
       .expect(response => {
         expect(response.body).toStrictEqual(validation.allLanguages)
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 })
 
@@ -1430,7 +1479,8 @@ describe("dashboard: an edit made to a course should", () => {
         "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/edit",
       )
       .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
 
   test("respond with course that reflects edits", done => {
@@ -1444,183 +1494,8 @@ describe("dashboard: an edit made to a course should", () => {
         const course = response.body
         expect(course).toStrictEqual(validation.editedCourse)
       })
-      .expect(200, done)
-  })
-})
-
-describe("dashboard - courses: downloading quiz info should", () => {
-  beforeAll(async () => {
-    await safeSeed(configA)
-  })
-
-  afterAll(async () => {
-    nock.cleanAll()
-    await safeClean()
-  })
-
-  beforeEach(async () => {
-    nock("https://tmc.mooc.fi")
-      .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
-        const auth = this.req.headers.authorization
-        if (auth === "Bearer PLEB_TOKEN") {
-          return [
-            200,
-            {
-              id: 6666,
-              administrator: false,
-            } as UserInfo,
-          ]
-        }
-        if (auth === "Bearer ADMIN_TOKEN") {
-          return [
-            200,
-            {
-              administrator: true,
-            } as UserInfo,
-          ]
-        }
-      })
-  })
-
-  test("respond with 401 if invalid credentials", done => {
-    request(app.callback())
-      .post(
-        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-quiz-info",
-      )
-      .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(401, done)
-  })
-
-  test("should return 200 on successful request", done => {
-    request(app.callback())
-      .post(
-        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-quiz-info",
-      )
-      .set("Authorization", `bearer ADMIN_TOKEN`)
-      .send({
-        quizName: "quiz 1",
-        courseName: "course 1",
-      })
-      .expect(200, done)
-  })
-})
-
-describe("dashboard: downloading peer review info should", () => {
-  beforeAll(async () => {
-    await safeSeed(configA)
-  })
-
-  afterAll(async () => {
-    nock.cleanAll()
-    await safeClean()
-  })
-
-  beforeEach(async () => {
-    nock("https://tmc.mooc.fi")
-      .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
-        const auth = this.req.headers.authorization
-        if (auth === "Bearer PLEB_TOKEN") {
-          return [
-            200,
-            {
-              id: 6666,
-              administrator: false,
-            } as UserInfo,
-          ]
-        }
-        if (auth === "Bearer ADMIN_TOKEN") {
-          return [
-            200,
-            {
-              administrator: true,
-            } as UserInfo,
-          ]
-        }
-      })
-  })
-
-  test("respond with 401 if invalid credentials", done => {
-    request(app.callback())
-      .post(
-        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-peerreview-info",
-      )
-      .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(401, done)
-  })
-
-  test("respond with 200 on succesfull request", done => {
-    request(app.callback())
-      .post(
-        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-peerreview-info",
-      )
-      .set("Authorization", `bearer ADMIN_TOKEN`)
-      .send({
-        quizName: "quiz 1",
-        courseName: "course 1",
-      })
-      .expect("Content-type", "text/csv; charset=utf-8")
-      .expect(200, done)
-  })
-})
-
-describe("dashboard: downloading answer info should", () => {
-  beforeAll(async () => {
-    await safeSeed(configA)
-  })
-
-  afterAll(async () => {
-    nock.cleanAll()
-    await safeClean()
-  })
-
-  beforeEach(async () => {
-    nock("https://tmc.mooc.fi")
-      .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
-        const auth = this.req.headers.authorization
-        if (auth === "Bearer PLEB_TOKEN") {
-          return [
-            200,
-            {
-              id: 6666,
-              administrator: false,
-            } as UserInfo,
-          ]
-        }
-        if (auth === "Bearer ADMIN_TOKEN") {
-          return [
-            200,
-            {
-              administrator: true,
-            } as UserInfo,
-          ]
-        }
-      })
-  })
-
-  test("respond with 401 if invalid credentials", done => {
-    request(app.callback())
-      .post(
-        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-answer-info",
-      )
-      .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(401, done)
-  })
-
-  test("respond with 200 on succesfull request", done => {
-    request(app.callback())
-      .post(
-        "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-answer-info",
-      )
-      .set("Authorization", `bearer ADMIN_TOKEN`)
-      .send({
-        quizName: "quiz 1",
-        courseName: "course 1",
-      })
-      .expect("Content-type", "text/csv; charset=utf-8")
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 })
 
@@ -1665,7 +1540,8 @@ describe("dashboard: get current users abilities", () => {
       .expect(res => {
         expect(res.body).toEqual(userAbilities.abilities.teacher)
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 
   test("dashboard: get current user abilities, assistant", done => {
@@ -1698,7 +1574,8 @@ describe("dashboard: get current users abilities", () => {
       .expect(res => {
         expect(res.body).toEqual(userAbilities.abilities.assistant)
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 })
 
@@ -1745,7 +1622,8 @@ describe("dashboard: get user abilities for course", () => {
       .expect(res => {
         expect(res.body).toEqual(["view", "edit", "grade"])
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 
   test("get user abilities, reviewer", done => {
@@ -1789,7 +1667,8 @@ describe("dashboard: get user abilities for course", () => {
       .expect(res => {
         expect(res.body).toEqual(["view", "grade"])
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 
   test("get user abilities, teacher", done => {
@@ -1824,7 +1703,8 @@ describe("dashboard: get user abilities for course", () => {
       .expect(res => {
         expect(res.body).toEqual(["view", "edit", "grade"])
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 
   test("get user abilities, admin", done => {
@@ -1865,7 +1745,8 @@ describe("dashboard: get user abilities for course", () => {
           "duplicate",
         ])
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 
   test("get user abilities, no-body", done => {
@@ -1900,7 +1781,8 @@ describe("dashboard: get user abilities for course", () => {
       .expect(res => {
         expect(res.body).toEqual([])
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 })
 
@@ -1983,7 +1865,8 @@ describe("dashboard: get quizzes answer statistics", () => {
           expect(response.body[key]).toBeNumber()
         }
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 })
 
@@ -2036,7 +1919,8 @@ describe("dashboard: get all answer states", () => {
     request(app.callback())
       .get("/api/v2/dashboard/quizzes/answers/get-answer-states")
       .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(401, done)
+      .expect(401)
+      .end(done)
   })
 
   test("respond with 200 with succesfull request", done => {
@@ -2049,6 +1933,7 @@ describe("dashboard: get all answer states", () => {
         )
         expect(result).toEqual([])
       })
-      .expect(200, done)
+      .expect(200)
+      .end(done)
   })
 })

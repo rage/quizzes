@@ -1,24 +1,23 @@
 import React from "react"
-import { downloadQuizInfo } from "../../services/quizzes"
-import { HOST, createAndSubmitDownloadForm } from "./util"
-import { StyledForm, SubmitButton } from "./"
+import { downloadPeerReviewInfo } from "../../services/quizzes"
 import { DownloadFormProps } from "../../types/Quiz"
+import { createAndSubmitDownloadForm, HOST } from "./util"
+import { StyledForm, SubmitButton } from "./"
 import { checkStore, getProfile } from "../../services/tmcApi"
 
-export const QuizInfoForm = ({
+export const PeerReviewInfoForm = ({
   quizId,
   quizName,
   course,
 }: DownloadFormProps) => {
-  const handleQuizInfoDownload = async (
+  const handlePeerReviewInfoDownload = async (
     e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault()
     const { id: courseId, title: courseName } = course
-    const res = await downloadQuizInfo(quizId, quizName, courseId)
+    const res = await downloadPeerReviewInfo(quizId, quizName, courseId)
     const { downloadUrl } = res.data
     const completeDownloadUrl = HOST + downloadUrl
-
     const storeInfo = checkStore()
     if (storeInfo?.accessToken) {
       const userProfile = await getProfile(storeInfo?.accessToken)
@@ -34,10 +33,12 @@ export const QuizInfoForm = ({
   }
 
   return (
-    <StyledForm onSubmit={handleQuizInfoDownload}>
+    <StyledForm onSubmit={handlePeerReviewInfoDownload}>
       <SubmitButton type="submit" variant="outlined">
-        Download quiz info
+        Download peer review info
       </SubmitButton>
     </StyledForm>
   )
 }
+
+export default PeerReviewInfoForm

@@ -69,6 +69,8 @@ jobs:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: quizzes_test
+      - image: circleci/redis:6.0.8-alpine
+
     steps:
       - checkout
       - run:
@@ -82,14 +84,38 @@ jobs:
             done
             echo Failed waiting for Postgres && exit 1
       - run:
+          name: "Waiting for Redis to be ready"
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z localhost 6379 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for Redis && exit 1
+      - run:
           name: "install dependencies"
           command: cd packages/backendv2 && npm ci
       - run:
           name: "run migrations"
           command: cd packages/backendv2 && export NODE_ENV=test && npx knex migrate:latest
       - run:
+          name: install dockerize
+          command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
+          environment:
+            DOCKERIZE_VERSION: v0.3.0
+      - run:
+          name: Wait for redis
+          command: dockerize -wait tcp://localhost:6379 -timeout 1m
+      - run:
+          name: Wait for db
+          command: dockerize -wait tcp://localhost:5432 -timeout 1m
+      - run:
           name: "run tests"
           command: "cd packages/backendv2 && npm run test -- --coverage"
+          environment:
+            REDIS_HOST: localhost
+            REDIS_PORT: 6379
       - run:
           name: "Upload coverage"
           command: "cd packages/backendv2 && bash <(curl -s https://codecov.io/bash)"

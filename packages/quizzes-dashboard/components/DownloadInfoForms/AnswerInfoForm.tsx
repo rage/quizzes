@@ -1,50 +1,39 @@
-import React, { useState } from "react"
-import { Button } from "@material-ui/core"
-import styled from "styled-components"
+import React from "react"
 import { downloadAnswerInfo } from "../../services/quizzes"
-
-const SubmitButton = styled(Button)`
-  display: flex !important;
-  background: #00e676 !important;
-`
-
-const StyledForm = styled.form`
-  display: flex !important;
-  justify-content: center;
-  width: 30% !important;
-`
-
-interface AnswerInfoFormProps {
-  quizId: string
-  quizName: string
-  courseName: string
-}
+import { createAndSubmitDownloadForm, HOST } from "./util"
+import { DownloadFormProps } from "../../types/Quiz"
+import { StyledForm, SubmitButton } from "./"
+import { checkStore, getProfile } from "../../services/tmcApi"
 
 export const AnswerInfoForm = ({
   quizId,
   quizName,
-  courseName,
-}: AnswerInfoFormProps) => {
-  const [downloading, setDownloading] = useState(false)
-
+  course,
+}: DownloadFormProps) => {
   const handleAnswerInfoDownload = async (
     e: React.FormEvent<HTMLFormElement>,
   ) => {
     e.preventDefault()
-    setDownloading(true)
-    const res = await downloadAnswerInfo(quizId, quizName, courseName)
-    setDownloading(false)
-    const blob = new Blob([res.data], { type: res.headers["content-type"] })
-    const link = document.createElement("a")
-    link.href = window.URL.createObjectURL(blob)
-    link.download = `answer-info-${quizName}-${courseName}-${new Date()
-      .toLocaleString()
-      .replace(/[ , _]/g, "-")}`
-    link.click()
+    const { id: courseId, title: courseName } = course
+    const res = await downloadAnswerInfo(quizId, quizName, courseId)
+    const { downloadUrl } = res.data
+    const completeDownloadUrl = HOST + downloadUrl
+    const storeInfo = checkStore()
+    if (storeInfo?.accessToken) {
+      const userProfile = await getProfile(storeInfo?.accessToken)
+      const userId = userProfile.id.toString()
+      createAndSubmitDownloadForm(
+        userId,
+        completeDownloadUrl,
+        quizName,
+        courseId,
+        courseName,
+      )
+    }
   }
   return (
     <StyledForm onSubmit={handleAnswerInfoDownload}>
-      <SubmitButton type="submit" variant="outlined" disabled={downloading}>
+      <SubmitButton type="submit" variant="outlined">
         Download answer info
       </SubmitButton>
     </StyledForm>
