@@ -5,6 +5,7 @@ import User from "./user"
 import UserQuizState from "./user_quiz_state"
 import knex from "../../database/knex"
 import BaseModel from "./base_model"
+import QuizAnswerStatusModification from "./quiz_answer_status_modification"
 
 class SpamFlag extends BaseModel {
   id!: string
@@ -73,13 +74,20 @@ class SpamFlag extends BaseModel {
 
         await QuizAnswer.save(quizAnswer, trx)
 
-        // await UserQuizState.query(trx).upsertGraph(userQuizState)
-
         const { userId, quizId, ...data } = userQuizState
 
         await UserQuizState.upsert(userQuizState, trx)
 
         await trx.commit()
+
+        // log spam flag operation
+        const operation = "peer-review-spam"
+        await QuizAnswerStatusModification.logStatusChange(
+          quizAnswerId,
+          flaggingUserId,
+          operation,
+        )
+
         return newSpamFlag
       } catch (err) {
         await trx.rollback()

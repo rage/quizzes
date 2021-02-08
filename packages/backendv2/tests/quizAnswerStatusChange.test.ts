@@ -29,17 +29,6 @@ describe("Dashboard: updating status of a quiz answer", () => {
 
   beforeEach(() => checkTmcCredentials())
 
-  test("responds with 401 when bad token provided", async () => {
-    const res = await request(app.callback())
-      .post(
-        "/api/v2/dashboard/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/status",
-      )
-      .set("Authorization", `bearer BAD_TOKEN`)
-      .set("Accept", "application/json")
-
-    expect(res.status).toEqual(401)
-  })
-
   test("teacher accept operation results in operation being logged", async () => {
     const quizAnswerId = "0cb3e4de-fc11-4aac-be45-06312aa4677c"
     const res = await request(app.callback())
@@ -75,6 +64,37 @@ describe("Dashboard: updating status of a quiz answer", () => {
     if (logs != null) {
       expect(logs[1].modifierId).toEqual(1234)
       expect(logs[1].operation).toEqual("teacher-reject")
+    }
+  })
+})
+
+describe("Widget: updating status of a quiz answer through widget actions", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+  })
+
+  afterAll(async () => {
+    await safeClean()
+  })
+
+  beforeEach(() => checkTmcCredentials())
+
+  test("peer review spam flag operation is logged when answer flagged as spam", async () => {
+    const quizAnswerId = "ae29c3be-b5b6-4901-8588-5b0e88774748"
+    const res = await request(app.callback())
+      .post(`/api/v2/widget/answers/report-spam`)
+      .set("Authorization", `bearer admin_token`)
+      .set("Accept", "application/json")
+      .send({ quizAnswerId })
+    expect(res.status).toEqual(200)
+
+    const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
+      quizAnswerId,
+    )
+
+    if (logs != null) {
+      expect(logs[0].modifierId).toEqual(1234)
+      expect(logs[0].operation).toEqual("peer-review-spam")
     }
   })
 })
