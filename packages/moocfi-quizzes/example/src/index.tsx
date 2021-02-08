@@ -34,6 +34,7 @@ const StyledQuizContainer = styled(props => <Paper {...props} />)`
   box-shadow: rgba(0, 0, 0, 0.3) 0px 8px 40px -12px;
   border-radius: 1rem;
   flex-basis: 800px;
+  background: #f5f9fb;
 `
 
 const StyledTextField = styled(props => (
