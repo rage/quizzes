@@ -40,6 +40,7 @@ const AnswerField = styled(StyledTextField)<AnswerFieldProps>`
 `
 
 const SubmitHelperTypography = styled(Typography)<ISubmitHelperTypographyProps>`
+  margin-bottom: 0.5rem;
   && {
     height: 1rem;
     padding-top: 1rem;

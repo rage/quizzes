@@ -1,3 +1,4 @@
+import { NotFoundError } from "./../../util/error"
 import knex from "../../../database/knex"
 import { UserCourseRole, Course } from "../../models"
 import { UserInfo } from "../../types"
@@ -49,15 +50,25 @@ export const abilitiesByRole: { [role: string]: string[] } = {
   admin: ["view", "edit", "grade", "download", "duplicate"],
   assistant: ["view", "edit", "grade"],
   teacher: ["view", "edit", "grade"],
+  reviewer: ["view", "grade"],
 }
 
 export const getCourseIdByAnswerId = async (answerId: string) => {
-  return (
-    await knex("quiz")
+  let courses
+  try {
+    courses = await knex("quiz")
       .select("course_id")
       .innerJoin("quiz_answer", "quiz.id", "quiz_answer.quiz_id")
       .where("quiz_answer.id", answerId)
-  )[0].course_id
+  } catch (error) {
+    throw error
+  }
+
+  if (courses[0]) {
+    return courses[0].course_id
+  } else {
+    throw new NotFoundError(`No course found for answer id: ${answerId}`)
+  }
 }
 
 export const getCourseIdByQuizId = async (quizId: string) => {

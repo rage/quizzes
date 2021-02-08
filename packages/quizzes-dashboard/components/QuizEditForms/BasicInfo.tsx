@@ -20,6 +20,7 @@ import { useDispatch } from "react-redux"
 import {
   editedQuizTitle,
   editedQuizzesNumberOfTries,
+  editedQuizTriesLimited,
   editedQuizzesPointsToGain,
   editedQuizzesPointsGrantingPolicy,
   editedQuizzesDeadline,
@@ -31,6 +32,7 @@ import {
 } from "../../store/editor/quiz/quizActions"
 import { useTypedSelector } from "../../store/store"
 import { checkForChanges } from "../../store/editor/editorActions"
+import MarkdownEditor from "../MarkdownEditor"
 
 const SubsectionTitleWrapper = styled.div`
   display: flex;
@@ -56,6 +58,27 @@ const WarningBox = styled.div`
   width: 50%;
   justify-content: center;
   align-items: baseline !important;
+  @media only screen and (max-width: 600px) {
+    width: 100%;
+  }
+`
+
+const NumberOfTriesContainer = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+  width: 100%;
+`
+const TryLimitNumberContainer = styled.div`
+  width: 50%;
+  padding-left: 1rem;
+`
+
+const ToggleAndHelperWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  width: 50%;
 `
 
 const InfoContainer = styled.div`
@@ -91,6 +114,12 @@ const HelperText = styled(Typography)`
   color: #9e9e9e !important;
 `
 
+const MarginlessHelperText = styled(Typography)`
+  display: flex !important;
+  margin-bottom: 1rem !important;
+  color: #9e9e9e !important;
+`
+
 const AutoConfirmSwitch = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -105,9 +134,15 @@ const BasicInformation = () => {
   const pointsGrantingPolicy = useTypedSelector(
     state => state.editor.quizzes[quizId].grantPointsPolicy,
   )
+
   const numberOfTries = useTypedSelector(
     state => state.editor.quizzes[quizId].tries,
   )
+
+  const triesAreLimited = useTypedSelector(
+    state => state.editor.quizzes[quizId].triesLimited,
+  )
+
   const pointsToGain = useTypedSelector(
     state => state.editor.quizzes[quizId].points,
   )
@@ -158,11 +193,9 @@ const BasicInformation = () => {
       </WarningWrapper>
 
       <InfoContainer>
-        <TextField
-          label="Quiz Title"
-          fullWidth
-          variant="outlined"
-          defaultValue={title ?? ""}
+        <MarkdownEditor
+          label="Quiz title"
+          text={title ?? ""}
           onChange={event =>
             dispatch(editedQuizTitle(event.target.value, quizId))
           }
@@ -171,6 +204,7 @@ const BasicInformation = () => {
       <InfoContainer>
         <PartField
           fullWidth
+          type="number"
           label="Part"
           variant="outlined"
           value={part ?? ""}
@@ -180,6 +214,7 @@ const BasicInformation = () => {
         />
         <SectionField
           fullWidth
+          type="number"
           label="Section"
           variant="outlined"
           value={section ?? ""}
@@ -188,22 +223,52 @@ const BasicInformation = () => {
           }
         />
       </InfoContainer>
-      <InfoContainer>
-        <TextField
-          label="Number of tries allowed"
-          fullWidth
-          variant="outlined"
-          defaultValue={numberOfTries ?? ""}
-          onChange={event =>
-            dispatch(
-              editedQuizzesNumberOfTries(Number(event.target.value), quizId),
-            )
-          }
-        />
-      </InfoContainer>
+      <NumberOfTriesContainer>
+        <ToggleAndHelperWrapper>
+          <FormControlLabel
+            id="label"
+            control={
+              <Switch
+                checked={triesAreLimited}
+                onChange={event =>
+                  dispatch(editedQuizTriesLimited(event.target.checked, quizId))
+                }
+                color="secondary"
+                inputProps={{ "aria-label": "check tries allowed" }}
+              />
+            }
+            label="Limit tries"
+            labelPlacement="end"
+          />
+          <MarginlessHelperText>
+            Check this to limit the number of attempts at this quiz
+          </MarginlessHelperText>
+        </ToggleAndHelperWrapper>
+        <TryLimitNumberContainer>
+          {triesAreLimited && (
+            <TextField
+              type="number"
+              InputProps={{ inputProps: { min: 1, max: null } }}
+              label="Number of tries allowed"
+              variant="outlined"
+              defaultValue={numberOfTries ?? ""}
+              fullWidth
+              onChange={event =>
+                dispatch(
+                  editedQuizzesNumberOfTries(
+                    Number(event.target.value),
+                    quizId,
+                  ),
+                )
+              }
+            />
+          )}
+        </TryLimitNumberContainer>
+      </NumberOfTriesContainer>
       <InfoContainer>
         <TextField
           label="Points to gain"
+          type="number"
           fullWidth
           variant="outlined"
           defaultValue={pointsToGain ?? ""}
@@ -257,24 +322,18 @@ const BasicInformation = () => {
         </MuiPickersUtilsProvider>
       </InfoContainer>
       <InfoContainer>
-        <TextField
-          multiline
-          fullWidth
-          label="Description for the whole quiz"
-          variant="outlined"
-          value={body ?? ""}
+        <MarkdownEditor
+          text={body ?? ""}
+          label="Quiz description"
           onChange={event =>
             dispatch(editedQuizzesBody(quizId, event.target.value))
           }
         />
       </InfoContainer>
       <InfoContainer>
-        <TextField
-          multiline
+        <MarkdownEditor
+          text={submitMessage ?? ""}
           label="Submit message"
-          fullWidth
-          variant="outlined"
-          value={submitMessage ?? ""}
           onChange={event =>
             dispatch(editedQuizzesSubmitmessage(quizId, event.target.value))
           }
@@ -297,8 +356,8 @@ const BasicInformation = () => {
             }
           />
           <HelperText>
-            Check this to confirm submitted answers automatically, uncheck this
-            to confirm them manually
+            When unchecked for a peer reviewed exercise, all answers must be
+            reviewed manually
           </HelperText>
         </AutoConfirmSwitch>
       </InfoContainer>

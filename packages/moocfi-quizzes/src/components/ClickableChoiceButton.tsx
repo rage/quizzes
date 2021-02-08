@@ -8,7 +8,7 @@ import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
 import { SecondaryStyledButton } from "./styleComponents"
 
 // create a state that manage the no. of selected button
-// if the number of selected are more than 5 
+// if the number of selected are more than 5
 // disable all other buttons apart from the selected
 
 export interface ChoiceButtonProps {
@@ -54,7 +54,7 @@ const FailureIcon = () => (
 const ChoiceButton = styled(SecondaryStyledButton)<ButtonProps>`
   ${({ onlyOneItem }) => onlyOneItem && `width: 90%;`}
   ${({ state }) => state && `background-color: #E3B599;`}
-  
+
   margin: 0.5em 0;
 
   &:hover {
@@ -87,7 +87,7 @@ const RevealedChoiceButton = styled(
   ${props =>
     props.selected
       ? `
-      color: blue;
+      color: #fff;
       background-color: ${props.correct ? "#047500" : "#DB0000"};
       `
       : props.correct

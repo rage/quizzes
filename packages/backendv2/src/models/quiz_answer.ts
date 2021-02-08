@@ -1,6 +1,5 @@
 import Knex from "knex"
 import { NotFoundError } from "./../util/error"
-import Model from "./base_model"
 import QuizItemAnswer from "./quiz_item_answer"
 import User from "./user"
 import PeerReview from "./peer_review"
@@ -15,6 +14,9 @@ import UserCoursePartState from "./user_course_part_state"
 import * as Kafka from "../services/kafka"
 import SpamFlag from "./spam_flag"
 import _ from "lodash"
+import { raw } from "objection"
+import BaseModel from "./base_model"
+import QuizOptionAnswer from "./quiz_option_answer"
 
 type QuizAnswerStatus =
   | "draft"
@@ -32,7 +34,7 @@ type QuizAnswerStatus =
   | "rejected"
   | "deprecated"
 
-class QuizAnswer extends Model {
+class QuizAnswer extends BaseModel {
   id!: string
   userId!: number
   quizId!: string
@@ -44,13 +46,16 @@ class QuizAnswer extends Model {
   userQuizState!: UserQuizState
   quiz!: Quiz
 
+  static SEARCH_RESULT_LIMIT = 100
+  static FIRST_PAGE_INDEX = 0
+
   static get tableName() {
     return "quiz_answer"
   }
 
   static relationMappings = {
     user: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: User,
       join: {
         from: "quiz_answer.user_id",
@@ -58,7 +63,7 @@ class QuizAnswer extends Model {
       },
     },
     itemAnswers: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizItemAnswer,
       join: {
         from: "quiz_answer.id",
@@ -66,7 +71,7 @@ class QuizAnswer extends Model {
       },
     },
     peerReviews: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: PeerReview,
       join: {
         from: "quiz_answer.id",
@@ -74,7 +79,7 @@ class QuizAnswer extends Model {
       },
     },
     userQuizState: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: UserQuizState,
       join: {
         from: ["quiz_answer.user_id", "quiz_answer.quiz_id"],
@@ -82,7 +87,7 @@ class QuizAnswer extends Model {
       },
     },
     quiz: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: `${__dirname}/quiz`,
       join: {
         from: "quiz_answer.quiz_id",
@@ -90,13 +95,28 @@ class QuizAnswer extends Model {
       },
     },
     spamFlags: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: SpamFlag,
       join: {
         from: "quiz_answer.id",
         to: "spam_flag.quiz_answer_id",
       },
     },
+  }
+
+  private static async showQuestionInPeerReview(peerReviews: PeerReview[]) {
+    peerReviews.map(peerReview => {
+      const peerReviewHasAnswers = peerReview.answers.length > 0
+      if (peerReviewHasAnswers) {
+        return peerReview.answers.map(peerReviewAnswer => {
+          peerReviewAnswer.question = this.moveQuestionTextsToparent(
+            peerReviewAnswer.question,
+          )
+        })
+      }
+    })
+
+    return peerReviews
   }
 
   public static async getByIdWithPeerReviews(quizAnswerId: string) {
@@ -110,21 +130,17 @@ class QuizAnswer extends Model {
       throw new NotFoundError(`quiz answer not found: ${quizAnswerId}`)
     }
 
-    quizAnswer.peerReviews.map(peerReview => {
-      if (peerReview.answers.length > 0) {
-        return peerReview.answers.map(peerReviewAnswer => {
-          peerReviewAnswer.question = this.moveQuestionTextsToparent(
-            peerReviewAnswer.question,
-          )
-        })
-      }
-    })
+    if (quizAnswer.peerReviews) {
+      quizAnswer.peerReviews = await this.showQuestionInPeerReview(
+        quizAnswer.peerReviews,
+      )
+    }
 
     return quizAnswer
   }
 
-  public static async getById(quizAnswerId: string) {
-    const quizAnswer = await this.query()
+  public static async getById(quizAnswerId: string, trx?: Knex.Transaction) {
+    const quizAnswer = await this.query(trx)
       .findById(quizAnswerId)
       .withGraphFetched("itemAnswers.[optionAnswers]")
 
@@ -145,6 +161,28 @@ class QuizAnswer extends Model {
     )[0]
   }
 
+  public static async save(quizAnswer: QuizAnswer, trx: Knex.Transaction) {
+    const { id, itemAnswers, ...parentData } = quizAnswer
+    await this.query(trx)
+      .update(parentData)
+      .where("id", id)
+    for (const itemAnswer of itemAnswers) {
+      const { id, optionAnswers, ...itemAnswerData } = itemAnswer
+      await QuizItemAnswer.query(trx)
+        .update(itemAnswerData)
+        .where("id", id)
+      if (optionAnswers) {
+        for (const optionAnswer of optionAnswers) {
+          const { id, ...optionAnswerData } = optionAnswer
+          await QuizOptionAnswer.query(trx)
+            .update(optionAnswerData)
+            .where("id", id)
+        }
+      }
+    }
+    return await this.getById(id, trx)
+  }
+
   public static async getPaginatedByQuizId(
     quizId: string,
     page: number,
@@ -153,7 +191,9 @@ class QuizAnswer extends Model {
     filters: string[],
   ) {
     let paginated
-    if (filters.length === 0) {
+    const noFiltersProvided = filters.length === 0
+
+    if (noFiltersProvided) {
       paginated = await this.query()
         .where("quiz_id", quizId)
         .orderBy([{ column: "created_at", order: order }])
@@ -172,17 +212,77 @@ class QuizAnswer extends Model {
         .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
     }
 
-    paginated.results.map(answer => {
-      if (answer.peerReviews.length > 0) {
-        answer.peerReviews.map(peerReview => {
-          if (peerReview.answers.length > 0) {
-            peerReview.answers.map(peerReviewAnswer => {
-              peerReviewAnswer.question = this.moveQuestionTextsToparent(
-                peerReviewAnswer.question,
-              )
-            })
-          }
-        })
+    paginated.results.map(async answer => {
+      const answerHasPeerReviews = answer.peerReviews.length > 0
+      if (answerHasPeerReviews) {
+        answer.peerReviews = await this.showQuestionInPeerReview(
+          answer.peerReviews,
+        )
+      }
+    })
+
+    return paginated
+  }
+
+  public static async getPaginatedByQuizIdAndSearchQuery(
+    quizId: string,
+    pageSize: number,
+    order: "asc" | "desc",
+    filters: string[],
+    searchQuery?: string,
+  ) {
+    if (!searchQuery) {
+      throw new BadRequestError("No search query provided.")
+    }
+
+    let paginated
+    const filtersProvided = filters.length > 0
+
+    if (!filtersProvided) {
+      paginated = await this.query()
+        .where("quiz_answer.quiz_id", quizId)
+        .orderBy([{ column: "created_at", order: order }])
+        .page(this.FIRST_PAGE_INDEX, pageSize)
+        .withGraphFetched("userQuizState")
+        .withGraphFetched("itemAnswers.[optionAnswers]")
+        .join(
+          raw("quiz_item_answer as qia on quiz_answer.id = qia.quiz_answer_id"),
+        )
+        .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+        .where(
+          raw(
+            `to_tsvector('english', coalesce(text_data, '')) @@ phraseto_tsquery(?)`,
+            [searchQuery],
+          ),
+        )
+        .limit(this.SEARCH_RESULT_LIMIT)
+    } else {
+      paginated = await this.query()
+        .where("quiz_answer.quiz_id", quizId)
+        .whereIn("status", filters)
+        .orderBy([{ column: "created_at", order: order }])
+        .page(this.FIRST_PAGE_INDEX, pageSize)
+        .withGraphFetched("userQuizState")
+        .withGraphFetched("itemAnswers.[optionAnswers]")
+        .join(
+          raw("quiz_item_answer as qia on quiz_answer.id = qia.quiz_answer_id"),
+        )
+        .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+        .where(
+          raw(
+            `to_tsvector('english', coalesce(text_data, '')) @@ phraseto_tsquery(?)`,
+            [searchQuery],
+          ),
+        )
+        .limit(this.SEARCH_RESULT_LIMIT)
+    }
+
+    paginated.results.map(async answer => {
+      const answerHasPeerReviews = answer.peerReviews.length > 0
+      if (answerHasPeerReviews) {
+        answer.peerReviews = await this.showQuestionInPeerReview(
+          answer.peerReviews,
+        )
       }
     })
 
@@ -204,21 +304,73 @@ class QuizAnswer extends Model {
       .withGraphFetched("itemAnswers.[optionAnswers]")
       .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
 
-    paginated.results.map(answer => {
+    paginated.results.map(async answer => {
       if (answer.peerReviews.length > 0) {
-        answer.peerReviews.map(peerReview => {
-          if (peerReview.answers.length > 0) {
-            peerReview.answers.map(peerReviewAnswer => {
-              peerReviewAnswer.question = this.moveQuestionTextsToparent(
-                peerReviewAnswer.question,
-              )
-            })
-          }
-        })
+        answer.peerReviews = await this.showQuestionInPeerReview(
+          answer.peerReviews,
+        )
       }
     })
 
     return paginated
+  }
+
+  public static async getPaginatedManualReviewBySearchQuery(
+    quizId: string,
+    pageSize: number,
+    order: "asc" | "desc",
+    searchQuery: string,
+  ) {
+    if (!searchQuery) {
+      throw new BadRequestError("No search query provided.")
+    }
+
+    const paginated = await this.query()
+      .where("quiz_answer.quiz_id", quizId)
+      .andWhere("status", "manual-review")
+      .orderBy([{ column: "created_at", order: order }])
+      .page(this.FIRST_PAGE_INDEX, pageSize)
+      .withGraphFetched("userQuizState")
+      .withGraphFetched("itemAnswers.[optionAnswers]")
+      .join(
+        raw("quiz_item_answer as qia on quiz_answer.id = qia.quiz_answer_id"),
+      )
+      .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+      .where(
+        raw(
+          `to_tsvector('english', coalesce(text_data, '')) @@ phraseto_tsquery(?)`,
+          [searchQuery],
+        ),
+      )
+      .limit(this.SEARCH_RESULT_LIMIT)
+
+    paginated.results.map(async answer => {
+      const answerHasPeerReviews = answer.peerReviews.length > 0
+      if (answerHasPeerReviews) {
+        answer.peerReviews = await this.showQuestionInPeerReview(
+          answer.peerReviews,
+        )
+      }
+    })
+
+    return paginated
+  }
+
+  public static async setManualReviewStatusForMany(
+    answerIds: string[],
+    status: QuizAnswerStatus,
+  ) {
+    if (!status || !["confirmed", "rejected"].includes(status)) {
+      throw new BadRequestError("Invalid answer status provided.")
+    }
+
+    let promises: Promise<QuizAnswer>[] = []
+
+    answerIds.forEach(answerId => {
+      promises.push(this.setManualReviewStatus(answerId, status))
+    })
+
+    return Promise.all(promises)
   }
 
   public static async setManualReviewStatus(
@@ -230,6 +382,7 @@ class QuizAnswer extends Model {
     }
     const trx = await knex.transaction()
     try {
+      // get quizAnswer by provided id
       let quizAnswer = (
         await this.query(trx)
           .where("quiz_answer.id", answerId)
@@ -238,32 +391,43 @@ class QuizAnswer extends Model {
       )[0]
       const userQuizState = quizAnswer.userQuizState
       const quiz = quizAnswer.quiz
+
+      const triesAreNotLimited = !quiz.triesLimited
+      const userHasTriesLeft = userQuizState.tries < quiz.tries
+
       if (status === "confirmed") {
         await userQuizState.$query(trx).patch({ pointsAwarded: quiz.points })
-      } else if (!quiz.triesLimited || userQuizState.tries < quiz.tries) {
+      } else if (triesAreNotLimited || userHasTriesLeft) {
         await userQuizState
           .$query(trx)
           .patch({ peerReviewsReceived: 0, spamFlags: 0, status: "open" })
       }
+
       quizAnswer = await quizAnswer.$query(trx).patchAndFetch({ status })
+
+      await UserQuizState.upsert(userQuizState, trx)
       await UserCoursePartState.update(
         quizAnswer.userId,
         quiz.courseId,
         quiz.part,
         trx,
       )
+
       await Kafka.broadcastQuizAnswerUpdated(
         quizAnswer,
         userQuizState,
         quiz,
         trx,
       )
+
       await Kafka.broadcastUserProgressUpdated(
         quizAnswer.userId,
         quiz.courseId,
         trx,
       )
+
       await trx.commit()
+
       return quizAnswer
     } catch (error) {
       await trx.rollback()
@@ -339,8 +503,12 @@ class QuizAnswer extends Model {
   }
 
   private static moveQuestionTextsToparent = (question: PeerReviewQuestion) => {
-    question.title = question.texts[0].title
-    question.body = question.texts[0].body
+    if (question.texts[0]?.title) {
+      question.title = question.texts[0].title
+    }
+    if (question.texts[0]?.body) {
+      question.body = question.texts[0].body
+    }
     return question
   }
 
@@ -358,8 +526,9 @@ class QuizAnswer extends Model {
       quizAnswer.languageId = course.languageId
       const userQuizState =
         (await UserQuizState.getByUserAndQuiz(userId, quizId, trx)) ??
-        UserQuizState.fromJson({ userId, quizId })
+        UserQuizState.fromJson({ userId, quizId, tries: 0 })
       this.checkIfSubmittable(quiz, userQuizState)
+      this.removeIds(quizAnswer)
       await this.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -369,18 +538,12 @@ class QuizAnswer extends Model {
       )
       this.assessAnswer(quizAnswer, quiz)
       this.gradeAnswer(quizAnswer, userQuizState, quiz)
-      this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
+      this.assessUserQuizStatus(quizAnswer, userQuizState, quiz, false)
       let savedQuizAnswer
       let savedUserQuizState
       await this.markPreviousAsDeprecated(userId, quizId, trx)
-      this.removeIds(quizAnswer)
       savedQuizAnswer = await this.query(trx).insertGraphAndFetch(quizAnswer)
-      savedUserQuizState = await UserQuizState.query(trx).upsertGraphAndFetch(
-        userQuizState,
-        {
-          insertMissing: true,
-        },
-      )
+      savedUserQuizState = await UserQuizState.upsert(userQuizState, trx)
       if (savedQuizAnswer.status === "confirmed") {
         await UserCoursePartState.update(
           savedQuizAnswer.userId,
@@ -423,8 +586,10 @@ class QuizAnswer extends Model {
     await this.assessAnswerStatus(quizAnswer, userQuizState, quiz, course, trx)
     this.assessAnswer(quizAnswer, quiz)
     this.gradeAnswer(quizAnswer, userQuizState, quiz)
-    this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
+    this.assessUserQuizStatus(quizAnswer, userQuizState, quiz, true)
     if (quizAnswer.status === "confirmed") {
+      // UserCoursePartState.update depends on user quiz state being up to date
+      await UserQuizState.upsert(userQuizState, trx)
       await UserCoursePartState.update(
         quizAnswer.userId,
         quiz.courseId,
@@ -457,11 +622,7 @@ class QuizAnswer extends Model {
   private static assessAnswer(quizAnswer: QuizAnswer, quiz: Quiz) {
     const quizItemAnswers = quizAnswer.itemAnswers
     const quizItems = quiz.items
-    if (
-      !quizItemAnswers ||
-      quizItemAnswers.length === 0 ||
-      quizItemAnswers.length != quizItems.length
-    ) {
+    if (!quizItemAnswers || quizItemAnswers.length === 0) {
       throw new BadRequestError("item answers missing")
     }
     for (const quizItemAnswer of quizItemAnswers) {
@@ -469,7 +630,14 @@ class QuizAnswer extends Model {
         item => item.id === quizItemAnswer.quizItemId,
       )
       if (!quizItem) {
-        throw new BadRequestError("invalid quiz item id")
+        // If the quiz item has been deleted
+        quizItemAnswer.correct = false
+        continue
+      }
+
+      if (quizItem.allAnswersCorrect) {
+        quizItemAnswer.correct = true
+        continue
       }
 
       switch (quizItem.type) {
@@ -529,7 +697,7 @@ class QuizAnswer extends Model {
     course: Course,
     trx: Knex.Transaction,
   ) {
-    const hasPeerReviews = quiz.peerReviews.length > 0
+    const hasPeerReviews = quiz.peerReviewCollections.length > 0
     if (hasPeerReviews) {
       if (quizAnswer.id) {
         const peerReviews = await PeerReview.query(trx)
@@ -555,31 +723,35 @@ class QuizAnswer extends Model {
     userQuizState: UserQuizState,
     quiz: Quiz,
   ) {
-    if (quizAnswer.status === "confirmed") {
-      if (quiz.awardPointsEvenIfWrong) {
-        userQuizState.pointsAwarded = quiz.points
-        return
-      }
-      const quizItemAnswers = quizAnswer.itemAnswers
-      const nCorrect = quizItemAnswers.filter(
-        itemAnswer => itemAnswer.correct === true,
-      ).length
-      const total = quizItemAnswers.length
-      const points = (nCorrect / total) * quiz.points
-      const pointsAwarded = userQuizState.pointsAwarded ?? 0
-      userQuizState.pointsAwarded =
-        points > pointsAwarded ? points : pointsAwarded
+    if (quizAnswer.status !== "confirmed") {
+      return
     }
+    if (quiz.awardPointsEvenIfWrong) {
+      userQuizState.pointsAwarded = quiz.points
+      return
+    }
+    const quizItemAnswers = quizAnswer.itemAnswers
+    const nCorrect = quizItemAnswers.filter(
+      itemAnswer => itemAnswer.correct === true,
+    ).length
+    const total = quizItemAnswers.length
+    const points = (nCorrect / total) * quiz.points
+    const pointsAwarded = userQuizState.pointsAwarded ?? 0
+    userQuizState.pointsAwarded =
+      points > pointsAwarded ? points : pointsAwarded
   }
 
   private static assessUserQuizStatus(
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
     quiz: Quiz,
+    update: boolean,
   ) {
-    userQuizState.tries = (userQuizState.tries ?? 0) + 1
+    if (!update) {
+      userQuizState.tries += 1
+    }
     const hasTriesLeft = !quiz.triesLimited || userQuizState.tries < quiz.tries
-    const hasPeerReviews = quiz.peerReviews.length > 0
+    const hasPeerReviews = quiz.peerReviewCollections.length > 0
     if (hasTriesLeft) {
       if (hasPeerReviews) {
         if (["rejected", "spam"].includes(quizAnswer.status)) {
@@ -677,30 +849,25 @@ class QuizAnswer extends Model {
       }
     }
 
-    if (autoConfirm) {
-      const answers = peerReviews
-        .map(pr => pr.answers.map(a => a.value))
-        .flat()
-        .filter(o => o !== undefined && o !== null)
+    const answers = peerReviews
+      .map(pr => pr.answers.map(a => a.value))
+      .flat()
+      .filter(o => o !== undefined && o !== null)
 
-      const sum: number = answers.reduce((prev, curr) => prev + curr, 0)
+    const sum: number = answers.reduce((prev, curr) => prev + curr, 0)
 
-      if (answers.length === 0) {
-        console.warn("Assessing an essay with 0 numeric peer review answers")
-        return status
-      }
-
-      if (sum / answers.length >= course.minReviewAverage) {
-        return "confirmed"
-      } else if (autoReject) {
-        return "rejected"
-      } else {
-        return "manual-review"
-      }
+    if (answers.length === 0) {
+      console.warn("Assessing an essay with 0 numeric peer review answers")
+      return status
     }
 
-    // TODO: if not auto confirm move to manual review once widget smart enough
-    return status
+    const passingGrade = sum / answers.length >= course.minReviewAverage
+
+    if (passingGrade) {
+      return autoConfirm ? "confirmed" : "manual-review"
+    } else {
+      return autoReject ? "rejected" : "manual-review"
+    }
   }
 
   public static async getAnswersToReview(reviewerId: number, quizId: string) {
@@ -723,16 +890,18 @@ class QuizAnswer extends Model {
 
     givenPeerReviews.map(pr => pr.rejectedQuizAnswerIds)
 
-    const rejected: string[] = [
-      ...givenPeerReviews.map(pr => pr.rejectedQuizAnswerIds).flat(),
-      ...givenSpamFlags.map(spamFlag => spamFlag.quizAnswerId),
-    ]
+    const rejected: string[] = givenPeerReviews
+      .map(pr => pr.rejectedQuizAnswerIds)
+      .flat()
+
+    const flagged = givenSpamFlags.map(spamFlag => spamFlag.quizAnswerId)
+
+    const alreadyReviewed = givenPeerReviews.map(pr => pr.quizAnswerId)
 
     // query will fail if this array is empty
     rejected.push("d28359ed-fe18-4f79-b1a1-b33ee157d004")
-
-    const alreadyReviewed = givenPeerReviews.map(pr => pr.quizAnswerId)
-    alreadyReviewed.push("cc633ea9-c1e4-4fbd-8627-c6e12daecc96")
+    flagged.push("d28359ed-fe18-4f79-b1a1-b33ee157d004")
+    alreadyReviewed.push("d28359ed-fe18-4f79-b1a1-b33ee157d004")
 
     let allCandidates: any[] = []
     let candidates
@@ -744,6 +913,7 @@ class QuizAnswer extends Model {
         quizId,
         reviewerId,
         rejected,
+        flagged,
         alreadyReviewed,
       )
 
@@ -774,7 +944,7 @@ class QuizAnswer extends Model {
     allCandidates = allCandidates.slice(0, 2)
 
     return await this.query()
-      .withGraphJoined("itemAnswers")
+      .withGraphJoined("itemAnswers.[optionAnswers]")
       .whereIn(
         "quiz_answer.id",
         allCandidates.map(c => c.id),
@@ -786,6 +956,7 @@ class QuizAnswer extends Model {
     quizId: string,
     reviewerId: number,
     rejected: string[],
+    flagged: string[],
     alreadyReviewed: string[],
   ): Promise<Array<{ id: string; status: string }> | null> {
     const builder = knex
@@ -795,6 +966,7 @@ class QuizAnswer extends Model {
       .where("quiz_answer.quiz_id", quizId)
       .andWhere("quiz_answer.user_id", "!=", reviewerId)
       .andWhere("quiz_answer.id", "NOT IN", alreadyReviewed)
+      .andWhere("quiz_answer.id", "NOT IN", flagged)
 
     query = this.addCriteriaBasedOnPriority(priority, query, rejected)
 

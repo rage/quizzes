@@ -104,15 +104,6 @@ export const ScaleModalContent = ({ item }: ScaleItemEditorModalProps) => {
         />
       </ModalContent>
       <ModalContent>
-        {/* <LabelFieldContainer
-          label="Min value label"
-          value={storeItem.minLabel}
-          fullWidth
-          variant="outlined"
-          onChange={event =>
-            dispatch(editedScaleMinLabel(storeItem.id, event.target.value))
-          }
-        /> */}
         <ValueFieldContainer
           error={!variables.validMin}
           helperText={!variables.validMin ? "invalid min value" : ""}
@@ -125,15 +116,6 @@ export const ScaleModalContent = ({ item }: ScaleItemEditorModalProps) => {
         />
       </ModalContent>
       <ModalContent>
-        {/* <LabelFieldContainer
-          label="Max value label"
-          value={storeItem.maxLabel}
-          fullWidth
-          variant="outlined"
-          onChange={event =>
-            dispatch(editedScaleMaxLabel(storeItem.id, event.target.value))
-          }
-        /> */}
         <ValueFieldContainer
           error={!variables.validMax}
           helperText={!variables.validMax ? "invalid max value" : ""}
@@ -146,9 +128,6 @@ export const ScaleModalContent = ({ item }: ScaleItemEditorModalProps) => {
         />
       </ModalContent>
       <PreviewModalContainer>
-        {/* <PreviewLabelContainer>
-          <Typography variant="button">{storeItem.minLabel}</Typography>
-        </PreviewLabelContainer> */}
         <FormGroup row>
           {variables.array.map(item => {
             return (
@@ -163,9 +142,6 @@ export const ScaleModalContent = ({ item }: ScaleItemEditorModalProps) => {
             )
           })}
         </FormGroup>
-        {/* <PreviewLabelContainer>
-          <Typography variant="button">{storeItem.maxLabel}</Typography>
-        </PreviewLabelContainer> */}
       </PreviewModalContainer>
     </>
   )

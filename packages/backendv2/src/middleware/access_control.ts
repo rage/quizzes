@@ -29,7 +29,7 @@ export const accessControl = (options?: AccessControlOptions) => {
     const redisIsAvailable = redis !== null
 
     const token: string =
-      ctx.headers.authorization.toLocaleLowerCase().replace("bearer ", "") || ""
+      ctx.headers.authorization.replace(/bearer /i, "") || ""
 
     // attempt retrieval of user from cache
     let user = null

@@ -5,19 +5,11 @@ import { Answer } from "../../../types/Answer"
 import { changeAnswerStatus } from "../../../services/quizzes"
 import { Alert } from "@material-ui/lab"
 import { TransitionProps } from "@material-ui/core/transitions"
-
-export const ButtonField = styled.div`
-  padding: 1rem;
-  display: flex;
-  width: 100%;
-  justify-content: space-around;
-`
-
-export const AcceptButton = styled(Button)`
-  display: flex !important;
-  border-color: green !important;
-  border-width: 5px !important;
-`
+import { ButtonFieldWrapper } from "../../Shared/ButtonFieldWrapper"
+import {
+  setHandledAnswers,
+  useAnswerListState,
+} from "../../../contexts/AnswerListContext"
 
 export const RejectButton = styled(Button)`
   display: flex !important;
@@ -27,30 +19,21 @@ export const RejectButton = styled(Button)`
 
 export interface ManualReviewProps {
   answer: Answer
-  handled: boolean
-  setHandled: (handled: boolean) => void
-  setStatus: (accepted: string) => void
 }
 
-export const ManualReviewField = ({
-  answer,
-  handled,
-  setHandled,
-  setStatus,
-}: ManualReviewProps) => {
+export const ManualReviewField = ({ answer }: ManualReviewProps) => {
   const [success, setSuccess] = useState(true)
   const [showSnacks, setShowSnacks] = useState(false)
+  const [, dispatch] = useAnswerListState()
 
   const handleAcceptOrReject = async (answerId: string, status: string) => {
     try {
       const res = await changeAnswerStatus(answerId, status)
       if (res.status === status) {
-        setHandled(true)
         setSuccess(true)
         setShowSnacks(true)
-        setStatus(status)
+        dispatch(setHandledAnswers([res]))
       } else {
-        setHandled(true)
         setSuccess(false)
         setShowSnacks(true)
       }
@@ -80,20 +63,20 @@ export const ManualReviewField = ({
           )}
         </Alert>
       </Snackbar>
-      <ButtonField>
-        <AcceptButton
-          variant="outlined"
+      <ButtonFieldWrapper>
+        <Button
+          className="button-accept"
           onClick={() => handleAcceptOrReject(answer.id, "confirmed")}
         >
-          <Typography variant="overline">Accept</Typography>
-        </AcceptButton>
-        <RejectButton
-          variant="outlined"
+          <Typography>Accept</Typography>
+        </Button>
+        <Button
+          className="button-reject"
           onClick={() => handleAcceptOrReject(answer.id, "rejected")}
         >
-          <Typography variant="overline">Reject</Typography>
-        </RejectButton>
-      </ButtonField>
+          <Typography>Reject</Typography>
+        </Button>
+      </ButtonFieldWrapper>
     </>
   )
 }

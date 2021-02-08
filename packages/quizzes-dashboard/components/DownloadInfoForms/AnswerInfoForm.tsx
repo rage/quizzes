@@ -1,7 +1,7 @@
-import React from "react"
-import { checkStore } from "../../services/tmcApi"
+import React, { useState } from "react"
 import { Button } from "@material-ui/core"
 import styled from "styled-components"
+import { downloadAnswerInfo } from "../../services/quizzes"
 
 const SubmitButton = styled(Button)`
   display: flex !important;
@@ -25,27 +25,26 @@ export const AnswerInfoForm = ({
   quizName,
   courseName,
 }: AnswerInfoFormProps) => {
-  let HOST = "http://localhost:3003"
-  if (process.env.NODE_ENV === "production") {
-    HOST = "https://quizzes.mooc.fi"
+  const [downloading, setDownloading] = useState(false)
+
+  const handleAnswerInfoDownload = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
+    e.preventDefault()
+    setDownloading(true)
+    const res = await downloadAnswerInfo(quizId, quizName, courseName)
+    setDownloading(false)
+    const blob = new Blob([res.data], { type: res.headers["content-type"] })
+    const link = document.createElement("a")
+    link.href = window.URL.createObjectURL(blob)
+    link.download = `answer-info-${quizName}-${courseName}-${new Date()
+      .toLocaleString()
+      .replace(/[ , _]/g, "-")}`
+    link.click()
   }
-
-  const userInfo = checkStore()
-
   return (
-    <StyledForm
-      method="post"
-      action={HOST + `/api/v2/dashboard/quizzes/${quizId}/download-answer-info`}
-    >
-      <input
-        value={userInfo?.accessToken}
-        type="hidden"
-        name="token"
-        id="token"
-      />
-      <input value={quizName} type="hidden" name="quizName" />
-      <input value={courseName} type="hidden" name="courseName" />
-      <SubmitButton type="submit" variant="outlined">
+    <StyledForm onSubmit={handleAnswerInfoDownload}>
+      <SubmitButton type="submit" variant="outlined" disabled={downloading}>
         Download answer info
       </SubmitButton>
     </StyledForm>

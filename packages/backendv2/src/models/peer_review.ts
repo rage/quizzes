@@ -1,13 +1,16 @@
 import { BadRequestError, NotFoundError } from "./../util/error"
-import Model from "./base_model"
 import QuizAnswer from "./quiz_answer"
 import UserQuizState from "./user_quiz_state"
 import Quiz from "./quiz"
 import PeerReviewQuestionAnswer from "./peer_review_question_answer"
 import PeerReviewQuestion from "./peer_review_question"
 import knex from "../../database/knex"
+import BaseModel from "./base_model"
+import softDelete from "objection-soft-delete"
+import { mixin } from "objection"
+import { Transaction } from "knex"
 
-class PeerReview extends Model {
+class PeerReview extends BaseModel {
   userId!: number
   quizAnswerId!: string
   rejectedQuizAnswerIds!: string[]
@@ -20,7 +23,7 @@ class PeerReview extends Model {
 
   static relationMappings = {
     quizAnswer: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: QuizAnswer,
       join: {
         from: "peer_review.quiz_answer_id",
@@ -28,7 +31,7 @@ class PeerReview extends Model {
       },
     },
     answers: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: PeerReviewQuestionAnswer,
       join: {
         from: "peer_review.id",
@@ -53,8 +56,7 @@ class PeerReview extends Model {
   }
 
   public static async givePeerReview(peerReview: PeerReview) {
-    // TODO: type callback argument ?
-    peerReview.answers.forEach((answer: any): void => {
+    peerReview.answers.forEach((answer: PeerReviewQuestionAnswer): void => {
       if (answer.text) {
         return
       }
@@ -81,7 +83,6 @@ class PeerReview extends Model {
       throw new BadRequestError("Answer can only be peer reviewed once")
     }
 
-    // TODO: check target quiz answer id is valid
     const targetQuizAnswer = await QuizAnswer.getById(quizAnswerId)
 
     const quizId = targetQuizAnswer.quizId
@@ -142,15 +143,14 @@ class PeerReview extends Model {
       await QuizAnswer.update(sourceQuizAnswer, sourceUserQuizState, quiz, trx)
       await QuizAnswer.update(targetQuizAnswer, targetUserQuizState, quiz, trx)
 
-      // TODO: upsert needed until QuizAnswer.update() saves to db
-      await QuizAnswer.query(trx).upsertGraph(sourceQuizAnswer)
-      await QuizAnswer.query(trx).upsertGraph(targetQuizAnswer)
+      await QuizAnswer.save(sourceQuizAnswer, trx)
+      await QuizAnswer.save(targetQuizAnswer, trx)
 
       // update quiz states for both users
-      await UserQuizState.query(trx).upsertGraph(sourceUserQuizState)
-      await UserQuizState.query(trx).upsertGraph(targetUserQuizState)
+      await UserQuizState.upsert(sourceUserQuizState, trx)
+      await UserQuizState.upsert(targetUserQuizState, trx)
 
-      trx.commit()
+      await trx.commit()
 
       return {
         peerReview: newPeerReview,
@@ -158,7 +158,7 @@ class PeerReview extends Model {
         userQuizState: sourceUserQuizState,
       }
     } catch (err) {
-      trx.rollback()
+      await trx.rollback()
       throw err
     }
   }

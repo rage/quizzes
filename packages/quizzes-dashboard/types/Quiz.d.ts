@@ -16,7 +16,7 @@ export interface Quiz {
   grantPointsPolicy: string
   autoReject: boolean
   items: Item[]
-  peerReviews: PeerReview[]
+  peerReviewCollections: PeerReviewCollection[]
   title: string
   body: string
   submitMessage: string | null
@@ -49,7 +49,7 @@ export interface Item {
 
 export interface Option {
   id: string
-  quizItemId: string
+  quizItemId?: string
   order: number
   correct: boolean
   createdAt: Date
@@ -60,7 +60,7 @@ export interface Option {
   failureMessage: null | string
 }
 
-export interface PeerReview {
+export interface PeerReviewCollection {
   id: string
   quizId: string
   createdAt: Date
@@ -73,7 +73,7 @@ export interface PeerReview {
 export interface Question {
   id: string
   quizId: string
-  peerReviewCollectionId: string
+  peerReviewCollectionId?: string
   default: boolean
   type: string
   answerRequired: boolean
@@ -126,3 +126,9 @@ export interface Language {
   name: string
   updatedAt: Date
 }
+
+export type TEditorQuiz = Optional<Quiz, "id">
+export type TEditorPeerReviewCollection = Optional<PeerReviewCollection, "id">
+export type TEditorOption = Optional<Option, "id">
+export type TEditorItem = Optional<Item, "id">
+export type TEditorQuestion = Optional<Question, "id">

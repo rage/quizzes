@@ -2,13 +2,13 @@ import Knex from "knex"
 import { v4 } from "uuid"
 import { BadRequestError, NotFoundError } from "./../util/error"
 import stringify from "csv-stringify"
-import Model from "./base_model"
 import Quiz from "./quiz"
 import Language from "./language"
 import CourseTranslation from "./course_translation"
 import knex from "../../database/knex"
+import BaseModel from "./base_model"
 
-class Course extends Model {
+class Course extends BaseModel {
   id!: string
   moocfiId!: string
   minPeerReviewsGiven!: number
@@ -28,7 +28,7 @@ class Course extends Model {
 
   static relationMappings = {
     quizzes: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: Quiz,
       join: {
         from: "course.id",
@@ -36,7 +36,7 @@ class Course extends Model {
       },
     },
     texts: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: CourseTranslation,
       join: {
         from: "course.id",
@@ -91,6 +91,9 @@ class Course extends Model {
 
   private static moveTextsToParent(course: any) {
     const text = course.texts[0]
+    if (!text) {
+      return
+    }
     course.languageId = text.languageId
     course.title = text.title
     course.body = text.body

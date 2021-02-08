@@ -17,6 +17,7 @@ export const AnswerStatistics = () => {
   const router = useRouter()
   const quizId = router.query.quizId?.toString() ?? ""
 
+  //TODO: use swr
   const [stats, statsError] = usePromise(
     () => QetQuizAnswerStatistics(quizId),
     [quizId],

@@ -8,7 +8,6 @@ import Head from "next/head"
 import usePromise from "react-use-promise"
 import { groupBy, Dictionary } from "lodash"
 import { Typography, Button } from "@material-ui/core"
-import { Skeleton } from "@material-ui/lab"
 import DebugDialog from "../DebugDialog"
 import Link from "next/link"
 import styled from "styled-components"
@@ -17,15 +16,22 @@ import { Quiz } from "../../types/Quiz"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
 import DuplicateCourseButton from "../DuplicateCourse"
 import { SectionOfPart } from "./PartSection"
-
-const StyledSkeleton = styled(Skeleton)`
-  margin-bottom: 1rem;
-`
+import SkeletonLoader from "../Shared/SkeletonLoader"
 
 const CourseTitleWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  @media only screen and (max-width: 535px) {
+    flex-wrap: wrap;
+  }
+`
+
+const StyledButton = styled(Button)`
+  max-height: 3rem;
+  @media only screen and (max-width: 535px) {
+    align-self: flex-end !important;
+  }
 `
 
 export const CoursePage = () => {
@@ -42,7 +48,7 @@ export const CoursePage = () => {
   )
 
   useBreadcrumbs([
-    { label: "Courses", as: "/", href: "/" },
+    { label: "Courses", as: "/" },
     { label: `${data ? data.course.title : ""}` },
   ])
 
@@ -74,21 +80,7 @@ export const CoursePage = () => {
             />
           </Head>
         </div>
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
+        <SkeletonLoader height={50} skeletonCount={15} />
       </>
     )
   }
@@ -114,24 +106,14 @@ export const CoursePage = () => {
         </Head>
       </div>
       <CourseTitleWrapper>
-        <Typography
-          variant="h3"
-          component="h1"
-          style={{ marginBottom: "0.75rem" }}
-        >
+        <Typography variant="h3" component="h1">
           {course.title}
         </Typography>
 
-        <Link
-          href={{
-            pathname: "/courses/[id]/quizzes/new",
-            query: { courseId: `${id}` },
-          }}
-          as={`/courses/${id}/quizzes/new`}
-        >
-          <Button variant="outlined" style={{ maxHeight: "3rem" }}>
+        <Link href={`/courses/${id}/quizzes/new`}>
+          <StyledButton variant="outlined">
             <Typography variant="overline">Add New Quiz</Typography>
-          </Button>
+          </StyledButton>
         </Link>
       </CourseTitleWrapper>
       {userAbilities.includes("duplicate") ? (
@@ -154,7 +136,7 @@ export const CoursePage = () => {
           })}
         </div>
       ))}
-      <DebugDialog />
+      <DebugDialog object={course} />
     </>
   )
 }

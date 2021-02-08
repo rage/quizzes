@@ -15,21 +15,39 @@ import {
 } from "../store/editor/editorActions"
 import { useTypedSelector, storeState } from "../store/store"
 import { denormalize, normalize } from "normalizr"
-import { normalizedQuiz } from "../schemas"
-import { Quiz } from "../types/Quiz"
 import styled from "styled-components"
+import { normalizedQuiz } from "../schemas"
+import {
+  TEditorItem,
+  TEditorPeerReviewCollection,
+  TEditorOption,
+  TEditorQuestion,
+  TEditorQuiz,
+  Quiz,
+} from "../types/Quiz"
 
 const StyledFab = styled(Fab)`
   display: flex !important;
   position: fixed !important;
   top: 10% !important;
-  right: 20% !important;
+  right: 5% !important;
+  z-index: 1 !important;
+  @media only screen and (max-width: 600px) {
+    top: 90% !important;
+    right: 5% !important;
+  }
 `
 
 const StyledCircularProgress = styled(CircularProgress)`
+  display: flex !important;
   position: fixed !important;
   top: 10% !important;
-  right: 20% !important;
+  right: 5% !important;
+  z-index: 1 !important;
+  @media only screen and (max-width: 600px) {
+    top: 90% !important;
+    right: 5% !important;
+  }
 `
 
 const SaveButton = () => {
@@ -52,7 +70,7 @@ const SaveButton = () => {
       items: store.editor.items,
       options: store.editor.options,
       quizId: store.editor.quizId,
-      peerReviews: store.editor.peerReviews,
+      peerReviewCollections: store.editor.peerReviewCollections,
       questions: store.editor.questions,
     }
 
@@ -65,7 +83,7 @@ const SaveButton = () => {
               id => id === option.id,
             )
           ) {
-            delete option.id
+            delete (option as TEditorOption).id
             if (
               store.editor.quizVariables[store.editor.quizId].newItems.some(
                 id => id === item.id,
@@ -81,24 +99,26 @@ const SaveButton = () => {
           id => id === item.id,
         )
       ) {
-        delete item.id
+        delete (item as TEditorItem).id
       }
     }
-    for (let peerReview of quiz.peerReviews) {
+    for (let peerReviewCollection of quiz.peerReviewCollections) {
       if (
-        store.editor.peerReviewVariables[peerReview.id].newQuestions.length > 0
+        peerReviewCollection.id &&
+        store.editor.peerReviewCollectionVariables[peerReviewCollection.id]
+          .newQuestions.length > 0
       ) {
-        for (let question of peerReview.questions) {
+        for (let question of peerReviewCollection.questions) {
           if (
-            store.editor.peerReviewVariables[peerReview.id].newQuestions.some(
-              id => id === question.id,
-            )
+            store.editor.peerReviewCollectionVariables[
+              peerReviewCollection.id
+            ].newQuestions.some(id => id === question.id)
           ) {
-            delete question.id
+            delete (question as TEditorQuestion).id
             if (
               store.editor.quizVariables[
                 store.editor.quizId
-              ].newPeerReviews.some(id => id === peerReview.id)
+              ].newPeerReviews.some(id => id === peerReviewCollection.id)
             ) {
               delete question.peerReviewCollectionId
             }
@@ -107,14 +127,14 @@ const SaveButton = () => {
       }
       if (
         store.editor.quizVariables[store.editor.quizId].newPeerReviews.some(
-          id => id === peerReview.id,
+          id => id === peerReviewCollection.id,
         )
       ) {
-        delete peerReview.id
+        delete (peerReviewCollection as TEditorPeerReviewCollection).id
       }
     }
     if (store.editor.quizVariables[store.editor.quizId].newQuiz) {
-      delete quiz.id
+      delete (quiz as TEditorQuiz).id
     }
     const response = await saveQuiz(quiz)
 
@@ -126,7 +146,8 @@ const SaveButton = () => {
         items: normalizedResponse.entities.items ?? {},
         options: normalizedResponse.entities.options ?? {},
         result: normalizedResponse.result ?? "",
-        peerReviews: normalizedResponse.entities.peerReviews ?? {},
+        peerReviewCollections:
+          normalizedResponse.entities.peerReviewCollections ?? {},
         questions: normalizedResponse.entities.questions ?? {},
       }
       dispatch(initializedEditor(data, response))

@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Button, Modal, Box } from "@material-ui/core"
+import { Button, Modal, Box, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWindowClose } from "@fortawesome/free-solid-svg-icons"
@@ -89,13 +89,13 @@ export const DuplicateCourseButton = ({ course }: DuplicateCourseProps) => {
           variant="outlined"
           onClick={() => showDuplicateModal(true)}
         >
-          Duplicate course
+          <Typography>Duplicate course</Typography>
         </StyledButton>
         <StyledButton
           variant="outlined"
           onClick={() => showCorrespondenceModal(true)}
         >
-          Download the correspondence file
+          <Typography>Download the correspondence file</Typography>
         </StyledButton>
       </ButtonContainer>
     </>

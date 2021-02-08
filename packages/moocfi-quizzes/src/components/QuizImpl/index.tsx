@@ -82,9 +82,14 @@ export interface IItemWrapperProps {
 const ItemWrapper = styled.div<IItemWrapperProps>`
   background-color: ${({ rowNumber }) =>
     rowNumber % 2 === 0 ? "inherit" : "#605c980d"};
+<<<<<<< HEAD
   /* border-radius: 10px; */
   /* padding: 1rem 2rem 1rem 1rem; */
   padding: 0 1rem;
+=======
+  border-radius: 10px;
+  padding: 0.7rem 2rem 1rem 1rem;
+>>>>>>> 9edd8982fd64cafcb21fa7e09a721c4cba2aaf4f
 `
 
 export interface QuizContentProps {
@@ -92,8 +97,13 @@ export interface QuizContentProps {
 }
 
 const QuizContent = styled.div<QuizContentProps>`
+<<<<<<< HEAD
   margin-top: 3rem;
 /*   padding: 1rem; */
+=======
+  margin-top: 1.5rem;
+  padding: 1rem;
+>>>>>>> 9edd8982fd64cafcb21fa7e09a721c4cba2aaf4f
   ${({ disabled }) =>
     disabled &&
     `
@@ -107,6 +117,7 @@ interface UpperContentProps {
 }
 
 const UpperContent = styled.div<UpperContentProps>`
+  padding: 0 1rem;
   ${({ providedStyles }) => providedStyles}
 `
 
@@ -134,6 +145,7 @@ interface SubmitGroupProps {
 const SubmitGroup = styled.div<SubmitGroupProps>`
   display: flex;
   flex-wrap: wrap;
+  align-items: center;
   > :last-child {
     margin-left: 1rem;
   }
@@ -141,9 +153,6 @@ const SubmitGroup = styled.div<SubmitGroupProps>`
 `
 
 const OuterDiv = styled.div<{ providedStyles: string | undefined }>`
-  p {
-    margin-bottom: 0 !important;
-  }
   ul {
     padding-inline-start: 30px;
   }
@@ -155,7 +164,6 @@ interface QuizBodyProps {
 }
 
 const QuizBody = styled(MarkdownText)<QuizBodyProps>`
-  padding: 0 1rem 1rem;
   ${({ providedStyles }) => providedStyles}
 `
 interface SubmitMessageProps {
@@ -332,8 +340,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     stillSubmittable = false
   }
 
-  const containsPeerReviews =
-    quiz.peerReviews !== null && quiz.peerReviews.length > 0
+  const containsPeerReviews = quiz.peerReviewCollections?.length > 0
 
   const answerStatus = quizAnswer.status ? quizAnswer.status : null
 

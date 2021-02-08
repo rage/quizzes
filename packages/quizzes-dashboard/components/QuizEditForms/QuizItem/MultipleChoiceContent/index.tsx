@@ -19,14 +19,22 @@ import {
   createdNewOption,
   deletedItem,
 } from "../../../../store/editor/editorActions"
+import MarkdownEditor from "../../../MarkdownEditor"
 
 const QuizContent = styled.div`
   padding: 1rem;
-  display: inline;
+  display: flex;
+  @media only screen and (max-width: 600px) {
+    width: 100%;
+  }
 `
 
 const QuizContentLineContainer = styled.div`
   display: flex !important;
+  justify-content: space-around;
+  @media only screen and (max-width: 600px) {
+    flex-wrap: wrap;
+  }
 `
 const EditButtonWrapper = styled.div`
   display: flex;
@@ -34,17 +42,17 @@ const EditButtonWrapper = styled.div`
 `
 
 const StyledModal = styled(Modal)`
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  max-width: 100% !important;
+  max-height: 100% !important;
 `
 
 const AdvancedBox = styled(Box)`
   background-color: #fafafa !important;
-  min-width: 1000px !important;
-  min-height: 800px !important;
-  max-width: 1000px !important;
-  max-height: 800px !important;
+  max-width: 60% !important;
+  max-height: 50% !important;
   overflow-y: scroll !important;
 `
 
@@ -59,6 +67,11 @@ const DeleteButton = styled(Button)`
 const ModalButtonWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
+`
+
+const TitleWrapper = styled.div`
+  display: flex;
+  width: 100%;
 `
 
 const AddOptionButton = styled(Button)``
@@ -115,24 +128,21 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
           </AdvancedBox>
         </Fade>
       </StyledModal>
+      <MarkdownEditor
+        label="title"
+        onChange={event =>
+          dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
+        }
+        text={storeItem.title ?? ""}
+      />
       <QuizContentLineContainer>
-        <QuizContent>
-          <TextField
-            multiline
-            label="Title"
-            variant="outlined"
-            value={storeItem.title ?? ""}
-            onChange={event =>
-              dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
-            }
-          />
-        </QuizContent>
         {storeItem.options.map(option => (
           <QuizContent key={option}>
             <MultipleChoiceButton option={storeOptions[option]} />
           </QuizContent>
         ))}
         <QuizContent>
+          {" "}
           <AddOptionButton
             title="add option"
             onClick={() => dispatch(createdNewOption(storeItem.id))}

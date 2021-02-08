@@ -1,23 +1,27 @@
 import { createReducer } from "typesafe-actions"
-import { action, peerReviewVariables } from "../../../types/NormalizedQuiz"
+import {
+  action,
+  peerReviewVariables as peerReviewCollectionVariables,
+} from "../../../types/NormalizedQuiz"
 import { initializedEditor } from "../editorActions"
 import produce from "immer"
 import { createdNewPeerReviewQuestion } from "../questions/questionActions"
-import { createdNewPeerReview } from "../peerReviews/peerReviewActions"
+import { createdNewPeerReview as createdNewPeerReviewCollection } from "../peerReviewCollections/peerReviewCollectionActions"
 
 export const peerReviewVariablesReducer = createReducer<
-  { [peerReviewId: string]: peerReviewVariables },
+  { [peerReviewCollectionId: string]: peerReviewCollectionVariables },
   action
 >({})
   .handleAction(initializedEditor, (state, action) => {
     return produce(state, draftState => {
-      for (const peerReview in action.payload.normalizedQuiz.peerReviews) {
-        draftState[peerReview] = { newQuestions: [] }
+      for (const peerReviewCollection in action.payload.normalizedQuiz
+        .peerReviewCollections) {
+        draftState[peerReviewCollection] = { newQuestions: [] }
       }
     })
   })
 
-  .handleAction(createdNewPeerReview, (state, action) => {
+  .handleAction(createdNewPeerReviewCollection, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.newId] = { newQuestions: [] }
     })

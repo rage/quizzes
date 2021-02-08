@@ -9,7 +9,6 @@ import italianLabels from "./italian_options"
 import latvianLabels from "./latvian_options"
 import hungarianLabels from "./hungarian_options"
 import dutchLabels from "./dutch_options"
-import dutchBelgiumLabels from "./dutch_belgium_options"
 import danishLabels from "./danish_options"
 import lithuanianLabels from "./lithuanian_options"
 import croatianLabels from "./croatian_options"
@@ -23,6 +22,8 @@ import slovenianLabels from "./slovenian_options"
 import bulgarianLabels from "./bulgarian_options"
 import slovakLabels from "./slovak_options"
 import portugueseLabels from "./portuguese_options"
+import irishLabels from "./irish_options"
+import icelandicLabels from "./icelandic_options"
 import { QuizPointsGrantingPolicy } from "../../modelTypes"
 
 export type GeneralLabels = {
@@ -158,6 +159,7 @@ export type LanguageLabels = {
 export const languageOptions: LanguageLabels = {
   en_US: englishLabels,
   en_IE: englishLabels,
+  en_LU: englishLabels,
   et_EE: estonianLabels,
   fi_FI: finnishLabels,
   de_DE: germanLabels,
@@ -170,7 +172,7 @@ export const languageOptions: LanguageLabels = {
   lv_LV: latvianLabels,
   hu_HU: hungarianLabels,
   nl_NL: dutchLabels,
-  nl_BE: dutchBelgiumLabels,
+  nl_BE: dutchLabels,
   da_DK: danishLabels,
   lt_LT: lithuanianLabels,
   hr_HR: croatianLabels,
@@ -184,4 +186,6 @@ export const languageOptions: LanguageLabels = {
   bg_BG: bulgarianLabels,
   sk_SK: slovakLabels,
   pt_PT: portugueseLabels,
+  ga_IE: irishLabels,
+  is_IS: icelandicLabels,
 }

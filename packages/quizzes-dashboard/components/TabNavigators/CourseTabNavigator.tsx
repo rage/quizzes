@@ -1,20 +1,25 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { faChalkboard, faPen } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { Tab, Tabs } from "@material-ui/core"
+import { Tab, Tabs, Typography } from "@material-ui/core"
+import { useRouter } from "next/router"
 import { ITabToComponent } from "../CoursePage/types"
 import { CoursePage } from "../CoursePage"
 import EditCourseDetails from "../CoursePage/EditDetailsForm"
-import { useRouter } from "next/router"
+import { useUserAbilities } from "../../hooks/useUserAbilities"
 
 const CourseTabNavigator = () => {
   const router = useRouter()
-  const pageOnUrl = router.query.page?.[0] ?? "listing"
-  const [currentTab, setCurrentTab] = useState(pageOnUrl)
+  const [currentTab, setCurrentTab] = useState("listing")
   const courseId = router.query.courseId?.toString() ?? ""
 
-  const URL_HREF = `/courses/[courseId]/[...page]`
   const pathname = `/courses/${courseId}`
+
+  const {
+    userAbilities,
+    userAbilitiesLoading,
+    userAbilitiesError,
+  } = useUserAbilities(courseId ?? "", "user-abilities")
 
   const coursePageTabs: ITabToComponent = {
     listing: CoursePage,
@@ -26,6 +31,12 @@ const CourseTabNavigator = () => {
     ? coursePageTabs[currentTab]
     : coursePageTabs["default_tab"]
 
+  useEffect(() => {
+    if (router.query.page) {
+      setCurrentTab(router.query.page[0])
+    }
+  }, [router.query.page])
+
   return (
     <>
       <Tabs
@@ -36,23 +47,25 @@ const CourseTabNavigator = () => {
         style={{ marginBottom: "3rem" }}
       >
         <Tab
+          key="listing"
           icon={<FontAwesomeIcon icon={faChalkboard} />}
           value="listing"
-          label="Part Listing"
+          label={<Typography>Part Listing</Typography>}
           onClick={() => {
-            router.push(URL_HREF, `${pathname}/listing`)
-            setCurrentTab("listing")
+            router.push(`${pathname}/listing`, undefined, { shallow: true })
           }}
         />
-        <Tab
-          icon={<FontAwesomeIcon icon={faPen} />}
-          value="edit"
-          label="Edit Course Details"
-          onClick={() => {
-            router.push(URL_HREF, `${pathname}/edit`)
-            setCurrentTab("edit")
-          }}
-        />
+        {userAbilities?.includes("edit") && (
+          <Tab
+            key="edit"
+            icon={<FontAwesomeIcon icon={faPen} />}
+            value="edit"
+            label={<Typography>Edit Course Details</Typography>}
+            onClick={() => {
+              router.push(`${pathname}/edit`, undefined, { shallow: true })
+            }}
+          />
+        )}
       </Tabs>
       <ComponentTag />
     </>

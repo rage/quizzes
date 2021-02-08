@@ -1,8 +1,8 @@
-import Model from "./base_model"
+import BaseModel from "./base_model"
 import PeerReview from "./peer_review"
 import PeerReviewQuestion from "./peer_review_question"
 
-class PeerReviewQuestionAnswer extends Model {
+class PeerReviewQuestionAnswer extends BaseModel {
   value!: number
   question!: PeerReviewQuestion
   text!: string
@@ -16,7 +16,7 @@ class PeerReviewQuestionAnswer extends Model {
 
   static relationMappings = {
     peerReview: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: PeerReview,
       join: {
         from: "peer_review_question_answer.peer_review_id",
@@ -24,7 +24,7 @@ class PeerReviewQuestionAnswer extends Model {
       },
     },
     question: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: PeerReviewQuestion,
       join: {
         from: "peer_review_question_answer.peer_review_question_id",

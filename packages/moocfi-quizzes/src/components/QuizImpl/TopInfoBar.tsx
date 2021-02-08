@@ -194,7 +194,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
         )}
       </IconContainer>
       <TitleContainer>
-        <Typography component="p" variant="subtitle1" id="quiz-type-label" style={{ lineHeight:'1.2', opacity: '0.8' }}>
+        <Typography component="div" variant="subtitle1" id="quiz-type-label" style={{ lineHeight:'1.2', opacity: '0.8' }}>
           {quizLabel}:
         </Typography>
         {quiz ? (

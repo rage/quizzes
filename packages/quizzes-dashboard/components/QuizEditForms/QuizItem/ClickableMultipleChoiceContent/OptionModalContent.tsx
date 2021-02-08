@@ -5,7 +5,6 @@ import {
   FormControl,
   FormControlLabel,
   Checkbox,
-  TextField,
 } from "@material-ui/core"
 import {
   editedOptionTitle,
@@ -16,6 +15,7 @@ import {
 import { useDispatch } from "react-redux"
 import { NormalizedOption } from "../../../../types/NormalizedQuiz"
 import { useTypedSelector } from "../../../../store/store"
+import MarkdownEditor from "../../../MarkdownEditor"
 
 const ModalContent = styled.div`
   padding: 1rem;
@@ -57,27 +57,22 @@ export const OptionModalContent = ({ option }: OptionEditorProps) => {
         </FormControl>
       </ModalContent>
       <ModalContent>
-        <TextField
-          label="Option Title"
-          value={storeOption.title}
-          fullWidth
-          variant="outlined"
+        <MarkdownEditor
+          label="Option title"
+          text={storeOption.title ?? ""}
           onChange={event =>
             dispatch(editedOptionTitle(event.target.value, storeOption.id))
           }
         />
       </ModalContent>
       <ModalContent>
-        <TextField
-          multiline
+        <MarkdownEditor
           label={storeOption.correct ? "Success message" : "Failure message"}
-          value={
+          text={
             storeOption.correct
               ? storeOption.successMessage ?? ""
               : storeOption.failureMessage ?? ""
           }
-          fullWidth
-          variant="outlined"
           onChange={
             storeOption.correct
               ? event =>

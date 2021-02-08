@@ -2,9 +2,10 @@ import React, { useState } from "react"
 import styled from "styled-components"
 import { Card, CardContent, TextField, MenuItem } from "@material-ui/core"
 import Link from "next/link"
-import Skeleton from "@material-ui/lab/Skeleton"
 import { Course } from "../types/Quiz"
 import _ from "lodash"
+import DebugDialog from "./DebugDialog"
+import SkeletonLoader from "./Shared/SkeletonLoader"
 
 const StyledCard = styled(Card)`
   margin-bottom: 1rem;
@@ -14,10 +15,6 @@ const CourseLink = styled.a`
   color: white;
   text-decoration: none;
   cursor: pointer;
-`
-
-const StyledSkeleton = styled(Skeleton)`
-  margin-bottom: 1rem;
 `
 
 const SortSelector = styled(TextField)`
@@ -51,27 +48,8 @@ const CourseList = ({ data, error }: CourseListProps) => {
   if (error) {
     return <div>Error while fetching courses.</div>
   }
-  if (!data) {
-    return (
-      <>
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-        <StyledSkeleton variant="rect" height={50} animation="wave" />
-      </>
-    )
-  }
+
+  if (!data) return <SkeletonLoader height={50} skeletonCount={15} />
 
   let order: "asc" | "desc" = "asc"
   if (sortOrder === "desc") {
@@ -107,14 +85,7 @@ const CourseList = ({ data, error }: CourseListProps) => {
         </OrderSelector>
       </OptionWrapper>
       {courses.map(course => (
-        <Link
-          key={course.id}
-          href={{
-            pathname: "/courses/[courseId]/[...page]",
-            query: { courseId: `${course.id}` },
-          }}
-          as={`/courses/${course.id}/listing`}
-        >
+        <Link key={course.id} href={`/courses/${course.id}/listing`}>
           <CourseLink>
             <StyledCard key={course.id}>
               <CardContent>{course.title || course.id}</CardContent>
@@ -122,6 +93,8 @@ const CourseList = ({ data, error }: CourseListProps) => {
           </CourseLink>
         </Link>
       ))}
+
+      <DebugDialog object={courses} />
     </>
   )
 }

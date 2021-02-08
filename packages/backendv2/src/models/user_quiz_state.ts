@@ -1,10 +1,10 @@
-import Model from "./base_model"
 import Quiz from "./quiz"
 import User from "./user"
 import QuizAnswer from "./quiz_answer"
 import Knex from "knex"
+import BaseModel from "./base_model"
 
-class UserQuizState extends Model {
+class UserQuizState extends BaseModel {
   userId!: number
   quizId!: string
   tries!: number
@@ -13,6 +13,7 @@ class UserQuizState extends Model {
   peerReviewsGiven!: number
   peerReviewsReceived!: number | null
   spamFlags!: number | null
+  createdAt!: string
 
   static get tableName() {
     return "user_quiz_state"
@@ -24,7 +25,7 @@ class UserQuizState extends Model {
 
   static relationMappings = {
     user: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: User,
       join: {
         from: "quiz_answer.user_id",
@@ -32,7 +33,7 @@ class UserQuizState extends Model {
       },
     },
     quiz: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: Quiz,
       join: {
         from: "user_quiz_state.quiz_id",
@@ -40,7 +41,7 @@ class UserQuizState extends Model {
       },
     },
     quizAnswer: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizAnswer,
       join: {
         from: ["user_quiz_state.user_id", "user_quiz_state.quiz_id"],
@@ -64,6 +65,17 @@ class UserQuizState extends Model {
     return await this.query(trx).insertGraphAndFetch(userQuizState)
   }
 
+  public static async upsert(
+    userQuizState: UserQuizState,
+    trx: any,
+  ): Promise<UserQuizState> {
+    if (!userQuizState.createdAt) {
+      return await this.query(trx).insertAndFetch(userQuizState)
+    }
+    const { userId, quizId, ...data } = userQuizState
+    return await this.query(trx).updateAndFetchById([userId, quizId], data)
+  }
+
   public static async updateAwardedPointsForQuiz(
     oldQuiz: Quiz,
     newQuiz: Quiz,
@@ -77,7 +89,7 @@ class UserQuizState extends Model {
         points_awarded:
           oldMaxPoints === 0
             ? trx.raw(":maxPoints", { maxPoints })
-            : trx.raw("(points_awarded * :maxPoints / :oldMaxPoints)", {
+            : trx.raw("(points_awarded * :oldMaxPoints / :maxPoints)", {
                 maxPoints,
                 oldMaxPoints,
               }),

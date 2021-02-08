@@ -1,6 +1,6 @@
-import Model from "./base_model"
+import BaseModel from "./base_model"
 
-class Language extends Model {
+class Language extends BaseModel {
   static get tableName() {
     return "language"
   }

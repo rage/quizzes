@@ -72,6 +72,10 @@ export const BoldTypographyLarge = styled(BoldTypography)`
   font-size: 1.5rem;
 `
 
+export const SpaciousDiv = styled.div`
+  padding-bottom: 0;
+`
+
 export const withMargin = (
   Component: React.ComponentType<any>,
   margin: string,

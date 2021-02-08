@@ -1,8 +1,11 @@
-import Model from "./base_model"
+import BaseModel from "./base_model"
 import QuizItem from "./quiz_item"
 import QuizOptionTranslation from "./quiz_option_translation"
-
-class QuizOption extends Model {
+import { mixin } from "objection"
+import softDelete from "objection-soft-delete"
+class QuizOption extends mixin(BaseModel, [
+  softDelete({ columnName: "deleted" }),
+]) {
   id!: string
   correct!: boolean
   texts!: QuizOptionTranslation[]
@@ -10,6 +13,7 @@ class QuizOption extends Model {
   body!: string
   successMessage!: string
   failureMessage!: string
+  deleted!: boolean
 
   static get tableName() {
     return "quiz_option"
@@ -17,7 +21,7 @@ class QuizOption extends Model {
 
   static relationMappings = {
     quizItem: {
-      relation: Model.BelongsToOneRelation,
+      relation: BaseModel.BelongsToOneRelation,
       modelClass: QuizItem,
       join: {
         from: "quiz_option.quiz_item_id",
@@ -25,13 +29,17 @@ class QuizOption extends Model {
       },
     },
     texts: {
-      relation: Model.HasManyRelation,
+      relation: BaseModel.HasManyRelation,
       modelClass: QuizOptionTranslation,
       join: {
         from: "quiz_option.id",
         to: "quiz_option_translation.quiz_option_id",
       },
     },
+  }
+
+  static async getById(id: string): Promise<QuizOption> {
+    return await this.query().findById(id)
   }
 }
 

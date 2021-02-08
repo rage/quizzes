@@ -1,119 +1,99 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useRouter } from "next/router"
-import {
-  getAnswersRequiringAttention,
-  fetchQuiz,
-  fetchCourseById,
-} from "../../../services/quizzes"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
-import { AnswerList } from "../../AnswerList"
-import usePromise from "react-use-promise"
 import { MenuItem, Switch, Typography } from "@material-ui/core"
 import QuizTitle from "../QuizTitleContainer"
-import { TabTextLoading, TabTextError, TabText } from "../TabHeaders"
+import { TabText } from "../TabHeaders"
 import {
-  StyledSkeleton,
   SizeSelectorField,
-  PaginationField,
   SwitchField,
-  Paginator,
   OptionsContainer,
   SortOrderField,
 } from "./styles"
-import { TAnswersDisplayed, TSortOptions } from "./types"
+import { IQuizTabProps, TAnswersDisplayed } from "./types"
+import AnswerListWrapper from "../../Answer/AnswerListWrapper"
+import { Answer } from "../../../types/Answer"
+import {
+  setBulkSelectedIds,
+  setExpandAll,
+  setHandledAnswers,
+  useAnswerListState,
+} from "../../../contexts/AnswerListContext"
+import AnswerListOptions from "../../Answer/AnswerListOptions"
+import { useRequiringAttention } from "../../../hooks/useAnswersRequiringAttention"
+import { useSearchResultsRequiringAttention } from "../../../hooks/useSearchResults"
+import SkeletonLoader from "../../Shared/SkeletonLoader"
 
-export const RequiringAttention = () => {
+export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
+  const [{ expandAll }, dispatch] = useAnswerListState()
+
   const route = useRouter()
+  const { pageNo, sort, answers } = route.query
   const quizId = route.query.quizId?.toString() ?? ""
 
-  const URL_HREF = `/quizzes/[quizId]/[...page]`
   const pathname = `/quizzes/${quizId}/answers-requiring-attention/`
 
-  const paramSize = Number(route.query.answers) as TAnswersDisplayed
-  const paramPage = Number(route.query.pageNo)
-  let paramSort: TSortOptions | null = null
-  if (route.query.sort) {
-    paramSort = route.query.sort as TSortOptions
-  }
-  const paramExpand = route.query.expandAll === "true" ? true : false
-
-  const [currentPage, setCurrentPage] = useState<number>(paramPage || 1)
-  const [sortOrder, setSortOrder] = useState<TSortOptions>(paramSort || "desc")
-  const [expandAll, setExpandAll] = useState<boolean>(paramExpand || false)
-  const [answersDisplayed, setAnswersDisplayed] = useState<TAnswersDisplayed>(
-    paramSize || 10,
+  const [currentPage, setCurrentPage] = useState(Number(pageNo) || 1)
+  const [sortOrder, setSortOrder] = useState((sort as string) || "desc")
+  const [answersDisplayed, setAnswersDisplayed] = useState(
+    Number(answers) || 10,
   )
 
-  const [answers, error] = usePromise(
-    () =>
-      getAnswersRequiringAttention(
-        quizId,
-        currentPage,
-        answersDisplayed,
-        sortOrder,
-      ),
-    [currentPage, answersDisplayed, sortOrder],
+  const [searchQuery, setSearchQuery] = useState("")
+
+  const {
+    answersRequiringAttention,
+    answersRequiringAttentionLoading,
+    answersRequiringAttentionError,
+  } = useRequiringAttention(
+    quizId,
+    currentPage,
+    answersDisplayed,
+    sortOrder,
+    "answers-requiring-attention",
   )
-  const [quiz, quizError] = usePromise(() => fetchQuiz(quizId), [])
-  const [course, courseError] = usePromise(
-    () => fetchCourseById(quiz?.courseId ?? ""),
-    [quiz],
+
+  const {
+    searchResults,
+    searchResultsLoading,
+    searchResultsError,
+  } = useSearchResultsRequiringAttention(
+    quizId,
+    answersDisplayed,
+    sortOrder,
+    searchQuery,
+    "search-answers-requiring-attention",
   )
+
+  useEffect(() => {
+    dispatch(setBulkSelectedIds([]))
+    dispatch(setHandledAnswers([]))
+  }, [answers])
 
   const [queryToPush, setQueryToPush] = useState({})
 
   useBreadcrumbs([
-    { label: "Courses", as: "/", href: "/" },
+    { label: "Courses", as: "/" },
     {
       label: `${course ? course.title : ""}`,
       as: `/courses/${quiz?.courseId}/listing`,
-      href: "/courses/[courseId]/[...page]",
     },
     {
       label: `${quiz ? quiz.title : ""}`,
     },
   ])
 
-  if (!answers || !quiz || !course) {
-    return (
-      <>
-        <TabTextLoading />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-        <StyledSkeleton variant="rect" height={250} animation="wave" />
-      </>
-    )
-  }
-
-  if (error || quizError || courseError) {
-    return (
-      <>
-        <TabTextError />
-        <div>Error while fetching answers.</div>
-      </>
-    )
-  }
-
   const handlePageChange = (nextPage: number) => {
     setQueryToPush({ ...queryToPush, pageNo: nextPage })
     setCurrentPage(nextPage)
     let query = { ...queryToPush, pageNo: nextPage }
-    route.push(URL_HREF, { pathname, query }, { shallow: true })
+    route.push(pathname, { pathname, query }, { shallow: true })
   }
 
-  const handleChange = (event: React.ChangeEvent<any>, fieldType?: string) => {
+  const handleFieldChange = (
+    event: React.ChangeEvent<any>,
+    fieldType?: string,
+  ) => {
     let query = null
     let updatedQueryParams = null
 
@@ -128,9 +108,12 @@ export const RequiringAttention = () => {
         query = updatedQueryParams
         break
       case "expand":
-        updatedQueryParams = { ...queryToPush, expandAll: event.target.checked }
+        updatedQueryParams = {
+          ...queryToPush,
+          expandAll: event.target.checked,
+        }
         setQueryToPush(updatedQueryParams)
-        setExpandAll(event.target.checked)
+        dispatch(setExpandAll(event.target.checked))
         query = updatedQueryParams
         break
       case "order":
@@ -144,88 +127,87 @@ export const RequiringAttention = () => {
     }
 
     // in all cases, push all the query params
-    route.push(URL_HREF, { pathname, query }, { shallow: true })
+    route.push(pathname, { pathname, query }, { shallow: true })
   }
+
+  const handleTextSearch = async (searchQuery: string) => {
+    setSearchQuery(searchQuery)
+  }
+
+  const answersAreBeingFetched =
+    searchResultsLoading || answersRequiringAttentionLoading
+  const errorFetchingAnswers =
+    answersRequiringAttentionError || searchResultsError
+
+  const answersToDisplay = searchResults
+    ? searchResults
+    : answersRequiringAttention
 
   return (
     <>
       <TabText text="Answers requiring attention" />
-      {answers.results.length === 0 ? (
-        <>
-          <QuizTitle quiz={quiz} course={course} />
-          <Typography variant="h3">No answers requiring attention</Typography>
-        </>
-      ) : (
-        <>
-          <QuizTitle quiz={quiz} course={course} />
-          <PaginationField>
-            <Paginator
-              siblingCount={2}
-              boundaryCount={2}
-              count={Math.ceil(answers.total / answersDisplayed)}
-              size="large"
-              color="primary"
-              showFirstButton
-              showLastButton
-              page={currentPage}
-              onChange={(event, nextPage) => handlePageChange(nextPage)}
-            />
-          </PaginationField>
-          <OptionsContainer>
-            <SwitchField>
-              <Typography>Expand all</Typography>
-              <Switch
-                name="expand-field"
-                checked={expandAll}
-                onChange={event => {
-                  handleChange(event, "expand")
-                }}
-              />
-            </SwitchField>
-            <SizeSelectorField
-              value={answersDisplayed}
-              size="medium"
-              label="Answers"
-              variant="outlined"
-              select
-              onChange={event => handleChange(event, "pages")}
-              helperText="How many answers are shown per page"
-            >
-              <MenuItem value={10}>10</MenuItem>
-              <MenuItem value={50}>50</MenuItem>
-              <MenuItem value={100}>100</MenuItem>
-            </SizeSelectorField>
-            <SortOrderField
-              label="Sort order"
-              variant="outlined"
-              select
-              helperText="Sorts answers by date they've been submitted"
-              value={sortOrder}
-              onChange={event => handleChange(event, "order")}
-            >
-              <MenuItem value="desc">Latest first</MenuItem>
-              <MenuItem value="asc">Oldest first</MenuItem>
-            </SortOrderField>
-          </OptionsContainer>
-          <AnswerList
-            data={answers.results}
-            error={error}
-            expandAll={expandAll}
+
+      <QuizTitle quiz={quiz} />
+      <OptionsContainer>
+        <SwitchField>
+          <Typography>Expand all</Typography>
+          <Switch
+            name="expand-field"
+            checked={route.query.expandAll ? true : expandAll}
+            onChange={event => {
+              handleFieldChange(event, "expand")
+            }}
           />
-          <PaginationField>
-            <Paginator
-              siblingCount={2}
-              boundaryCount={2}
-              count={Math.ceil(answers.total / answersDisplayed)}
-              size="large"
-              color="primary"
-              showFirstButton
-              showLastButton
-              page={currentPage}
-              onChange={(event, nextPage) => handlePageChange(nextPage)}
-            />
-          </PaginationField>
+        </SwitchField>
+        <SizeSelectorField
+          value={answersDisplayed}
+          size="medium"
+          label="Answers"
+          variant="outlined"
+          select
+          onChange={event => handleFieldChange(event, "pages")}
+          helperText="How many answers are shown per page"
+        >
+          <MenuItem value={10}>10</MenuItem>
+          <MenuItem value={50}>50</MenuItem>
+          <MenuItem value={100}>100</MenuItem>
+        </SizeSelectorField>
+        <SortOrderField
+          label="Sort order"
+          variant="outlined"
+          select
+          helperText="Sorts answers by date they've been submitted"
+          value={sortOrder}
+          onChange={event => handleFieldChange(event, "order")}
+        >
+          <MenuItem value="desc">Latest first</MenuItem>
+          <MenuItem value="asc">Oldest first</MenuItem>
+        </SortOrderField>
+      </OptionsContainer>
+      {answersToDisplay ? (
+        <>
+          <AnswerListOptions
+            answers={answersToDisplay}
+            handleTextSearch={handleTextSearch}
+            searchResultCount={searchResults?.total || 0}
+          />
+          <AnswerListWrapper
+            order={sortOrder}
+            quizId={quizId}
+            size={answersDisplayed}
+            handlePageChange={handlePageChange}
+            page={currentPage}
+            answers={answersToDisplay}
+          />
         </>
+      ) : answersAreBeingFetched ? (
+        <SkeletonLoader height={250} skeletonCount={4} />
+      ) : errorFetchingAnswers ? (
+        <Typography variant="h3">
+          Something went wrong while retrieving answers.
+        </Typography>
+      ) : (
+        <Typography variant="h3">No answers available.</Typography>
       )}
     </>
   )

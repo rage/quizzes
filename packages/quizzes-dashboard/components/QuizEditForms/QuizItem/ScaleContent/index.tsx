@@ -31,6 +31,7 @@ import {
   setAdvancedEditing,
 } from "../../../../store/editor/itemVariables/itemVariableActions"
 import { deletedItem } from "../../../../store/editor/editorActions"
+import MarkdownEditor from "../../../MarkdownEditor"
 
 const ScaleContainer = styled.div`
   padding-top: 1rem;
@@ -172,12 +173,9 @@ const ScaleContent = ({ item }: scaleContentProps) => {
         </Fade>
       </StyledModal>
       <ScaleContainer>
-        <TitleField
-          fullWidth
-          multiline
+        <MarkdownEditor
           label="Title"
-          variant="outlined"
-          value={storeItem.title ?? ""}
+          text={storeItem.title ?? ""}
           onChange={event =>
             dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
           }

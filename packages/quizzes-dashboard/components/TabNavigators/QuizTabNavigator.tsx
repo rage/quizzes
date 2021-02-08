@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { Tabs, Tab, Badge } from "@material-ui/core"
+import React, { useEffect, useState } from "react"
+import { Tabs, Tab, Badge, Typography } from "@material-ui/core"
 import { useRouter } from "next/router"
 import {
   faPen,
@@ -8,28 +8,51 @@ import {
   faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { getAnswersRequiringAttentionByQuizId } from "../../services/quizzes"
-import usePromise from "react-use-promise"
 import OverView from "../quizPages/overview"
 import EditPage from "../quizPages/edit"
 import AllAnswers from "../quizPages/answers/all"
 import RequiringAttention from "../quizPages/answers/requiring-attention"
 import { ITabToComponent } from "../CoursePage/types"
+import { AnswerListProvider } from "../../contexts/AnswerListContext"
+import { useQuiz } from "../../hooks/useQuiz"
+import { useCourse } from "../../hooks/useCourse"
+import { useUserAbilities } from "../../hooks/useUserAbilities"
+import { TabTextError, TabTextLoading } from "../quizPages/TabHeaders"
+import SkeletonLoader from "../Shared/SkeletonLoader"
+import { useAnswersRequiringAttentionCount } from "../../hooks/useAnswersRequiringAttention"
 
 export const TabNavigator = () => {
   const router = useRouter()
   const quizId = router.query.quizId?.toString() ?? ""
-  const pageOnUrl = router.query.page?.[0] ?? "overview"
-
-  const [requiringAttention, error] = usePromise(
-    () => getAnswersRequiringAttentionByQuizId(quizId),
-    [quizId],
-  )
-  const [currentPage, setCurrentPage] = useState<string>(pageOnUrl)
-
-  const URL_HREF = `/quizzes/[quizId]/[...page]`
   const pathname = `/quizzes/${quizId}`
 
+  /* tokens passed to hooks are for swr caching  */
+  const { quiz, quizLoading, quizError } = useQuiz(quizId, "quiz")
+  const { course, courseLoading, courseError } = useCourse(
+    quiz?.courseId ?? "",
+    "course",
+  )
+  const {
+    userAbilities,
+    userAbilitiesLoading,
+    userAbilitiesError,
+  } = useUserAbilities(quiz?.courseId ?? "", "user-abilities")
+  const {
+    requiringAttention,
+    requiringAttentionLoading,
+    requiringAttentionError,
+  } = useAnswersRequiringAttentionCount(quizId, "requiring-attention")
+
+  const [currentTab, setCurrentTab] = useState("overview")
+
+  /* for when tab is loaded through url*/
+  useEffect(() => {
+    if (router.query.page) {
+      setCurrentTab(router.query.page[0])
+    }
+  }, [router])
+
+  /* dynamically map tabs to their respective contents */
   const quizTabs: ITabToComponent = {
     overview: OverView,
     edit: EditPage,
@@ -38,46 +61,59 @@ export const TabNavigator = () => {
     default_tab: OverView,
   }
 
-  const ComponentTag = quizTabs[currentPage]
-    ? quizTabs[currentPage]
+  const dataIsBeingFetched =
+    quizLoading ||
+    userAbilitiesLoading ||
+    courseLoading ||
+    requiringAttentionLoading
+
+  const errorFetchingData =
+    quizError || courseError || userAbilitiesError || requiringAttentionError
+
+  const ComponentTag = quizTabs[currentTab]
+    ? quizTabs[currentTab]
     : quizTabs["default_tab"]
+
   return (
     <>
       <Tabs
         variant="fullWidth"
-        value={currentPage}
+        value={currentTab}
         indicatorColor="primary"
         textColor="primary"
       >
         <Tab
+          key="overview"
           icon={<FontAwesomeIcon icon={faChalkboard} />}
           value="overview"
-          label="Overview"
+          label={<Typography>Overview</Typography>}
           onClick={() => {
-            router.push(URL_HREF, `${pathname}/overview`)
-            setCurrentPage("overview")
+            router.push(`${pathname}/overview`, undefined, { shallow: true })
           }}
         />
-        <Tab
-          icon={<FontAwesomeIcon icon={faPen} />}
-          value="edit"
-          label="Edit quiz"
-          onClick={() => {
-            router.push(URL_HREF, `${pathname}/edit`)
-            setCurrentPage("edit")
-          }}
-        />
-        <Tab
-          icon={<FontAwesomeIcon icon={faScroll} />}
-          value="all-answers"
-          label="All answers"
-          onClick={() => {
-            router.push(URL_HREF, `${pathname}/all-answers`)
-            setCurrentPage("all-answers")
-          }}
-        />
+        {userAbilities?.includes("edit") && (
+          <Tab
+            key="edit"
+            icon={<FontAwesomeIcon icon={faPen} />}
+            value="edit"
+            label={<Typography>Edit quiz</Typography>}
+            onClick={() => {
+              router.push(`${pathname}/edit`, undefined, { shallow: true })
+            }}
+          />
+        )}
 
         <Tab
+          key="all-answers"
+          icon={<FontAwesomeIcon icon={faScroll} />}
+          value="all-answers"
+          label={<Typography>All answers</Typography>}
+          onClick={() => {
+            router.push(`${pathname}/all-answers`, undefined, { shallow: true })
+          }}
+        />
+        <Tab
+          key="answers-requiring-attention"
           icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
           value="answers-requiring-attention"
           label={
@@ -86,16 +122,32 @@ export const TabNavigator = () => {
               badgeContent={requiringAttention}
               color="error"
             >
-              Answers requiring attention
+              <Typography>Answers requiring attention</Typography>
             </Badge>
           }
           onClick={() => {
-            router.push(URL_HREF, `${pathname}/answers-requiring-attention`)
-            setCurrentPage("answers-requiring-attention")
+            router.push(`${pathname}/answers-requiring-attention`, undefined, {
+              shallow: true,
+            })
           }}
         />
       </Tabs>
-      <ComponentTag />
+      {errorFetchingData ? (
+        <TabTextError />
+      ) : dataIsBeingFetched ? (
+        <>
+          <TabTextLoading />
+          <SkeletonLoader height={250} skeletonCount={1} />
+        </>
+      ) : (
+        <AnswerListProvider>
+          <ComponentTag
+            quiz={quiz}
+            course={course}
+            userAbilities={userAbilities}
+          />
+        </AnswerListProvider>
+      )}
     </>
   )
 }

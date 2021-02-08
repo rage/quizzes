@@ -4,7 +4,12 @@ import { PeerReviewEditor } from "./PeerReviewEditor"
 import { Typography, Button } from "@material-ui/core"
 import styled from "styled-components"
 import { useDispatch } from "react-redux"
-import { createdNewPeerReview } from "../../../store/editor/peerReviews/peerReviewActions"
+import {
+  createdNewPeerReview,
+  deletePeerReview,
+} from "../../../store/editor/peerReviewCollections/peerReviewCollectionActions"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faTrash } from "@fortawesome/free-solid-svg-icons"
 
 const PeerReviewTitleWrapper = styled.div`
   display: flex !important;
@@ -33,10 +38,16 @@ const AddPeerReviewButtonWrapper = styled.div`
   justify-content: center;
 `
 
+const PeerReviewWrapper = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: no-wrap;
+`
+
 export const PeerReviewEditForms = () => {
   const quizId = useTypedSelector(state => state.editor.quizId)
   const peerReviews = Object.values(
-    useTypedSelector(state => state.editor.peerReviews),
+    useTypedSelector(state => state.editor.peerReviewCollections),
   )
 
   const dispatch = useDispatch()
@@ -47,12 +58,24 @@ export const PeerReviewEditForms = () => {
         <Typography variant="h2">Peer reviews</Typography>
       </PeerReviewTitleWrapper>
       {peerReviews.map((peerReview, index) => (
-        <div key={peerReview.id}>
-          <StyledTypography variant="h4">
-            Peer review nro. {index + 1}
-          </StyledTypography>
+        <>
+          <PeerReviewWrapper key={peerReview.id}>
+            <StyledTypography variant="h4">
+              Peer review nro. {index + 1}
+            </StyledTypography>
+            <Button
+              title="delete peer review"
+              onClick={() => dispatch(deletePeerReview(peerReview.id))}
+            >
+              <FontAwesomeIcon
+                icon={faTrash}
+                size="2x"
+                color="red"
+              ></FontAwesomeIcon>
+            </Button>
+          </PeerReviewWrapper>
           <PeerReviewEditor id={peerReview.id} />
-        </div>
+        </>
       ))}
       <AddPeerReviewButtonWrapper>
         <AddPeerReviewButton
