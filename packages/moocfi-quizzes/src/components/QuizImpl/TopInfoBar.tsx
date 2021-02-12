@@ -20,13 +20,12 @@ const Container = styled.div<TopInfoBarContainerProps>`
   justify-content: center;
   padding: 1.5rem 2rem;
   color: white;
-  background: #1473e6;
+  background-color: #213094;
 `
 
 const IconContainer = styled.div`
   margin-right: 1rem;
   font-size: 3.5rem;
-  color: #15447d;
 `
 
 const TitleContainer = styled.div`
@@ -42,8 +41,7 @@ const QuizStatusMessage = styled(Typography)``
 
 const PointsText = styled(Typography)<{ component: string }>`
   font-size: 1.5rem !important;
-  text-align: center;
-  font-weight: 400;
+  text-align: end;
   display: inline;
   max-height: 100%;
 
@@ -53,9 +51,7 @@ const PointsText = styled(Typography)<{ component: string }>`
 `
 
 const PointsLabelText = styled(Typography)<{ component: string }>`
-  font-size: 0.9rem !important;
-  opacity: 0.8;
-  line-height: 1;
+  font-size: 1rem !important;
 
   @media (max-width: 550px) {
     text-align: start;
@@ -194,12 +190,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
         )}
       </IconContainer>
       <TitleContainer>
-        <Typography
-          component="div"
-          variant="subtitle1"
-          id="quiz-type-label"
-          style={{ lineHeight: "1.2", opacity: "0.8" }}
-        >
+        <Typography component="div" variant="subtitle1" id="quiz-type-label">
           {quizLabel}:
         </Typography>
         {quiz ? (

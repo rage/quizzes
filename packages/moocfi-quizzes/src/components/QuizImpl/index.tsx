@@ -82,9 +82,8 @@ export interface IItemWrapperProps {
 const ItemWrapper = styled.div<IItemWrapperProps>`
   background-color: ${({ rowNumber }) =>
     rowNumber % 2 === 0 ? "inherit" : "#605c980d"};
-  /* border-radius: 10px; */
-  /* padding: 1rem 2rem 1rem 1rem; */
-  padding: 0 1rem;
+  border-radius: 10px;
+  padding: 0.7rem 2rem 1rem 1rem;
 `
 
 export interface QuizContentProps {
@@ -92,8 +91,8 @@ export interface QuizContentProps {
 }
 
 const QuizContent = styled.div<QuizContentProps>`
-  margin-top: 3rem;
-  /*   padding: 1rem; */
+  margin-top: 1.5rem;
+  padding: 1rem;
   ${({ disabled }) =>
     disabled &&
     `
@@ -432,10 +431,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
             </MessageGroup>
           ) : (
             <>
-              <SubmitGroup
-                providedStyles={themeProvider.submitGroupStyles}
-                style={{ display: "block" }}
-              >
+              <SubmitGroup providedStyles={themeProvider.submitGroupStyles}>
                 <div />
                 <div
                   onClick={e => {
@@ -448,17 +444,12 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                 </div>
 
                 {!quizDisabled && (
-                  <div style={{ paddingTop: "1rem" }}>
+                  <div>
                     {pastDeadline ? (
                       <Typography>{generalLabels.pastDeadline}</Typography>
                     ) : (
                       <React.Fragment>
-                        <Typography
-                          style={{
-                            color: "rgba(0,0,0,0.7)",
-                            fontSize: "0.9rem",
-                          }}
-                        >
+                        <Typography>
                           {quiz.triesLimited
                             ? `${generalLabels.triesRemainingLabel}: ${triesRemaining}`
                             : generalLabels.triesNotLimitedLabel}

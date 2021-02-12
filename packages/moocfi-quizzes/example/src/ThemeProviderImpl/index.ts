@@ -14,7 +14,7 @@ import TopInfoBarContainer from "./TopInfoBarContainer"
 
 const ThemeProviderImpl: ThemeProviderInterface = {
   // choiceButton: ChoiceButton,
-  submitButton: SubmitButton,
+  // submitButton: SubmitButton,
   // spamButton: SpamButton,
   // selectButton: SelectButton,
   // peerReviewSubmitButton: PeerReviewSubmitButton,
@@ -29,7 +29,7 @@ const ThemeProviderImpl: ThemeProviderInterface = {
   // wideOpenItemContentStyles: styles.wideOpenItemContent,
   // narrowOpenItemContentStyles: styles.narrowOpenItemContent,
   // upperContentStyles: styles.upperContent,
-  lowerContent: LowerContent,
+  // lowerContent: LowerContent,
   // submitMessageDivStyles: styles.submitMessageDiv,
   // answerPaperStyles: styles.answerPaper,
   // answerFieldStyles: styles.answerField,
