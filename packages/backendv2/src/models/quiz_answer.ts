@@ -704,6 +704,34 @@ class QuizAnswer extends BaseModel {
     }
   }
 
+  public static async logAnswerStatusChange(
+    oldAnswerStatus: QuizAnswerStatus,
+    newAnswerStatus: QuizAnswerStatus,
+    quizAnswerId: string,
+  ) {
+    const statusHasChanged = newAnswerStatus !== oldAnswerStatus
+
+    const mapStatusToOperation: {
+      [key: string]: TStatusModificationOperation
+    } = {
+      spam: "peer-review-spam",
+      rejected: "peer-review-reject",
+      confirmed: "peer-review-accept",
+    }
+
+    if (statusHasChanged) {
+      let operation: TStatusModificationOperation | null =
+        mapStatusToOperation[newAnswerStatus]
+
+      if (operation != null) {
+        await QuizAnswerStatusModification.logStatusChange(
+          quizAnswerId,
+          operation,
+        )
+      }
+    }
+  }
+
   public static async assessAnswerStatus(
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
@@ -726,25 +754,11 @@ class QuizAnswer extends BaseModel {
           course,
         )
 
-        // log quiz answer status change
-        const statusHasChanged =
-          quizAnswerStatusAfterAssessment !== quizAnswer.status
-        if (statusHasChanged) {
-          let operation: TStatusModificationOperation | null = null
-          if (quizAnswerStatusAfterAssessment === "spam") {
-            operation = "peer-review-spam"
-          } else if (quizAnswerStatusAfterAssessment === "rejected") {
-            operation = "peer-review-reject"
-          } else if (quizAnswerStatusAfterAssessment === "confirmed") {
-            operation = "peer-review-accept"
-          }
-          if (operation != null) {
-            await QuizAnswerStatusModification.logStatusChange(
-              quizAnswer.id,
-              operation,
-            )
-          }
-        }
+        await this.logAnswerStatusChange(
+          quizAnswer.status,
+          quizAnswerStatusAfterAssessment,
+          quizAnswer.id,
+        )
 
         quizAnswer.status = quizAnswerStatusAfterAssessment
       } else {
