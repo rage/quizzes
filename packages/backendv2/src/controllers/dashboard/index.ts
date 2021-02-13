@@ -7,7 +7,6 @@ import {
   QuizAnswer,
   UserCourseRole,
   CourseTranslation,
-  QuizAnswerStatusModification,
   Language,
 } from "../../models/"
 import accessControl from "../../middleware/access_control"
@@ -125,7 +124,6 @@ const dashboard = new Router<CustomState, CustomContext>({
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "grade")
     const status = ctx.request.body.status
-    // ctx.body = await QuizAnswer.setManualReviewStatus(answerId, status)
 
     ctx.body = await QuizAnswer.setManualReviewStatus(
       answerId,
