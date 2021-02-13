@@ -3,10 +3,15 @@ import nock from "nock"
 import app from "../app"
 import knex from "../database/knex"
 import { UserInfo } from "../src/types"
-import { safeClean, safeSeed, configA, dateTime, uuid } from "./util"
+import { safeClean, safeSeed, configA } from "./util"
 import _ from "lodash"
 import { Model, snakeCaseMappers } from "objection"
-import { QuizAnswerStatusModification } from "../src/models"
+import {
+  QuizAnswerStatusModification,
+  SpamFlag,
+  QuizAnswer,
+} from "../src/models"
+import redis from "../config/redis"
 
 beforeAll(() => {
   Model.knex(knex)
@@ -16,9 +21,11 @@ beforeAll(() => {
 afterAll(async () => {
   await safeClean()
   await knex.destroy()
+  await redis.client?.flushall()
+  await redis.client?.quit()
 })
 
-describe("Dashboard: updating status of a quiz answer", () => {
+describe("Dashboard: when the status of a quiz answer is manually changed", () => {
   beforeAll(async () => {
     await safeSeed(configA)
   })
@@ -68,32 +75,57 @@ describe("Dashboard: updating status of a quiz answer", () => {
   })
 })
 
-describe("Widget: updating status of a quiz answer through widget actions", () => {
+describe("Peer review assessment:", () => {
   beforeAll(async () => {
-    await safeSeed(configA)
+    await safeSeed({
+      directory: "./database/seeds",
+      specific: "a.ts",
+    })
+    await safeSeed({
+      directory: "./database/seeds",
+      specific: "quizAnswerStatusChange.ts",
+    })
   })
 
   afterAll(async () => {
     await safeClean()
   })
+  test("should not log a change when quiz answer status has not changed", async () => {
+    const quizAnswerId = "0cb3e4de-fc11-4aac-be45-06312aa4677c"
 
-  beforeEach(() => checkTmcCredentials())
+    const quizAnswerBeforeSpamFlag = await QuizAnswer.getById(quizAnswerId)
 
-  test("peer review spam flag operation is logged when answer flagged as spam", async () => {
-    const quizAnswerId = "ae29c3be-b5b6-4901-8588-5b0e88774748"
-    const res = await request(app.callback())
-      .post(`/api/v2/widget/answers/report-spam`)
-      .set("Authorization", `bearer admin_token`)
-      .set("Accept", "application/json")
-      .send({ quizAnswerId })
-    expect(res.status).toEqual(200)
+    await SpamFlag.reportSpam(quizAnswerId, 2345)
+
+    const quizAnswerAfterSpamFlag = await QuizAnswer.getById(quizAnswerId)
 
     const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
       quizAnswerId,
     )
 
-    if (logs != null) {
-      expect(logs[0].modifierId).toEqual(1234)
+    expect(quizAnswerAfterSpamFlag.status).toEqual(
+      quizAnswerBeforeSpamFlag.status,
+    )
+
+    expect(logs).toEqual([])
+  })
+
+  test("should log a peer review spam operation when status has changed due to review spam threshold being exceeded", async () => {
+    const quizAnswerId = "0cb3e4de-fc11-4aac-be45-06312aa4677c"
+
+    // log two more spams
+    await SpamFlag.reportSpam(quizAnswerId, 3456)
+    await SpamFlag.reportSpam(quizAnswerId, 4321)
+
+    const quizAnswerAfterSpamFlag = await QuizAnswer.getById(quizAnswerId)
+
+    const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
+      quizAnswerId,
+    )
+
+    expect(quizAnswerAfterSpamFlag.status).toEqual("spam")
+
+    if (logs) {
       expect(logs[0].operation).toEqual("peer-review-spam")
     }
   })

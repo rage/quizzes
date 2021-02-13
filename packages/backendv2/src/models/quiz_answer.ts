@@ -18,6 +18,7 @@ import { raw } from "objection"
 import BaseModel from "./base_model"
 import QuizOptionAnswer from "./quiz_option_answer"
 import QuizAnswerStatusModification from "./quiz_answer_status_modification"
+import { TStatusModificationOperation } from "./../types/index"
 
 type QuizAnswerStatus =
   | "draft"
@@ -413,8 +414,8 @@ class QuizAnswer extends BaseModel {
           status === "confirmed" ? "teacher-accept" : "teacher-reject"
         await QuizAnswerStatusModification.logStatusChange(
           answerId,
-          modifierId,
           operation,
+          modifierId,
         )
       }
 
@@ -716,13 +717,36 @@ class QuizAnswer extends BaseModel {
         const peerReviews = await PeerReview.query(trx)
           .where("quiz_answer_id", quizAnswer.id)
           .withGraphJoined("answers")
-        quizAnswer.status = this.assessAnswerWithPeerReviewsStatus(
+
+        const quizAnswerStatusAfterAssessment = this.assessAnswerWithPeerReviewsStatus(
           quiz,
           quizAnswer,
           userQuizState,
           peerReviews,
           course,
         )
+
+        // log quiz answer status change
+        const statusHasChanged =
+          quizAnswerStatusAfterAssessment !== quizAnswer.status
+        if (statusHasChanged) {
+          let operation: TStatusModificationOperation | null = null
+          if (quizAnswerStatusAfterAssessment === "spam") {
+            operation = "peer-review-spam"
+          } else if (quizAnswerStatusAfterAssessment === "rejected") {
+            operation = "peer-review-reject"
+          } else if (quizAnswerStatusAfterAssessment === "confirmed") {
+            operation = "peer-review-accept"
+          }
+          if (operation != null) {
+            await QuizAnswerStatusModification.logStatusChange(
+              quizAnswer.id,
+              operation,
+            )
+          }
+        }
+
+        quizAnswer.status = quizAnswerStatusAfterAssessment
       } else {
         quizAnswer.status = "submitted"
       }

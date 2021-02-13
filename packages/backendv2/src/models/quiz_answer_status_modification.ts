@@ -1,21 +1,14 @@
+import { TStatusModificationOperation } from "./../types/index"
 import knex from "../../database/knex"
 import { BadRequestError } from "../util/error"
 import BaseModel from "./base_model"
 import User from "./user"
 
-type StatusModificationOperation =
-  | "teacher-accept"
-  | "teacher-reject"
-  | "teacher-suspects-plagiarism"
-  | "peer-review-accept"
-  | "peer-review-reject"
-  | "peer-review-spam"
-
 class QuizAnswerStatusModification extends BaseModel {
   id!: string
   quizAnswerId!: string
   modifierId!: number
-  operation!: StatusModificationOperation
+  operation!: TStatusModificationOperation
 
   static get tableName() {
     return "quiz_answer_status_modification"
@@ -56,8 +49,8 @@ class QuizAnswerStatusModification extends BaseModel {
 
   static async logStatusChange(
     quizAnswerId: string,
-    modifierId: number,
-    operation: StatusModificationOperation,
+    operation: TStatusModificationOperation,
+    modifierId?: number,
   ): Promise<QuizAnswerStatusModification | BadRequestError> {
     const trx = await knex.transaction()
     try {
