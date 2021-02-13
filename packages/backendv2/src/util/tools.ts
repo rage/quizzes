@@ -3,3 +3,18 @@ const nonPrintingCharRegex = /[\0-\x1F\x7F-\x9F\xAD\u0378\u0379\u037F-\u0383\u03
 export const removeNonPrintingCharacters = (string: string): string => {
   return string.replace(nonPrintingCharRegex, "")
 }
+
+export const getFormattedIsoDate = () => {
+  const currentDateTime = new Date()
+  const isoDate =
+    currentDateTime.getDate() +
+    "-" +
+    (currentDateTime.getMonth() + 1) +
+    "-" +
+    currentDateTime.getFullYear() +
+    "-" +
+    currentDateTime.getHours() +
+    "-" +
+    currentDateTime.getMinutes()
+  return isoDate
+}

@@ -38,7 +38,7 @@ const errorHandler = async (ctx: CustomContext, next: () => Promise<any>) => {
     if (reportError) {
       Sentry.withScope(function(scope) {
         scope.addEventProcessor(function(event) {
-          return Sentry.Handlers.parseRequest(event, ctx.request)
+          return Sentry.Handlers.parseRequest(event, ctx.request as any)
         })
         Sentry.captureException(error)
       })

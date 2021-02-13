@@ -11,9 +11,15 @@ import {
   UnauthorizedError,
 } from "../src/util/error"
 import { safeClean, safeSeed, configA } from "./util"
+import redis from "../config/redis"
 
 afterAll(async () => {
+  await redis.client?.quit()
   return knex.destroy()
+})
+
+afterEach(async () => {
+  return redis.client?.flushall()
 })
 
 describe("widget: save quiz answer", () => {

@@ -1,6 +1,6 @@
 import axios from "axios"
 import { checkStore } from "./tmcApi"
-import { Quiz, Course, PeerReviewQuestion, Language } from "../types/Quiz"
+import { Quiz, Course } from "../types/Quiz"
 import { NewQuiz } from "../types/NormalizedQuiz"
 import { Answer } from "../types/Answer"
 
@@ -397,7 +397,7 @@ export const getCorrespondenceFile = async (
 export const downloadQuizInfo = async (
   quizId: string,
   quizName: string,
-  courseName: string,
+  courseId: string,
 ) => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -406,7 +406,7 @@ export const downloadQuizInfo = async (
     }
     return await api.post(
       `/quizzes/${quizId}/download-quiz-info`,
-      { quizName, courseName },
+      { quizName, courseId },
       config,
     )
   } else {
@@ -417,7 +417,7 @@ export const downloadQuizInfo = async (
 export const downloadPeerReviewInfo = async (
   quizId: string,
   quizName: string,
-  courseName: string,
+  courseId: string,
 ) => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -426,7 +426,7 @@ export const downloadPeerReviewInfo = async (
     }
     return await api.post(
       `/quizzes/${quizId}/download-peerreview-info`,
-      { quizName, courseName },
+      { quizName, courseId },
       config,
     )
   } else {
@@ -437,7 +437,7 @@ export const downloadPeerReviewInfo = async (
 export const downloadAnswerInfo = async (
   quizId: string,
   quizName: string,
-  courseName: string,
+  courseId: string,
 ) => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -446,7 +446,7 @@ export const downloadAnswerInfo = async (
     }
     return await api.post(
       `/quizzes/${quizId}/download-answer-info`,
-      { quizName, courseName },
+      { quizName, courseId },
       config,
     )
   } else {

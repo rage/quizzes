@@ -11,12 +11,6 @@ const StyledCard = styled(Card)`
   margin-bottom: 1rem;
 `
 
-const CourseLink = styled.a`
-  color: white;
-  text-decoration: none;
-  cursor: pointer;
-`
-
 const SortSelector = styled(TextField)`
   display: flex !important;
   width: 25% !important;
@@ -34,6 +28,12 @@ const OptionWrapper = styled.div`
   margin-top: 1rem;
   margin-bottom: 1rem;
   width: 100%;
+`
+
+const CourseLink = styled.a`
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
 `
 
 interface CourseListProps {
@@ -85,7 +85,7 @@ const CourseList = ({ data, error }: CourseListProps) => {
         </OrderSelector>
       </OptionWrapper>
       {courses.map(course => (
-        <Link key={course.id} href={`/courses/${course.id}/listing`}>
+        <Link key={course.id} href={`/courses/${course.id}/listing`} passHref>
           <CourseLink>
             <StyledCard key={course.id}>
               <CardContent>{course.title || course.id}</CardContent>
