@@ -80,14 +80,6 @@ class SpamFlag extends BaseModel {
 
         await trx.commit()
 
-        // log spam flag operation
-        const operation = "peer-review-spam"
-        await QuizAnswerStatusModification.logStatusChange(
-          quizAnswerId,
-          flaggingUserId,
-          operation,
-        )
-
         return newSpamFlag
       } catch (err) {
         await trx.rollback()
