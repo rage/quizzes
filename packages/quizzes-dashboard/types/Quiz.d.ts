@@ -127,6 +127,11 @@ export interface Language {
   updatedAt: Date
 }
 
+export interface DownloadFormProps {
+  quizId: string
+  quizName: string
+  course: Course
+}
 export type TEditorQuiz = Optional<Quiz, "id">
 export type TEditorPeerReviewCollection = Optional<PeerReviewCollection, "id">
 export type TEditorOption = Optional<Option, "id">

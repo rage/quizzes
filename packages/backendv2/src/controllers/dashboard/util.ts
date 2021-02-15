@@ -1,8 +1,10 @@
+import crypto from "crypto"
 import { NotFoundError } from "./../../util/error"
 import knex from "../../../database/knex"
 import { UserCourseRole, Course } from "../../models"
 import { UserInfo } from "../../types"
 import { ForbiddenError } from "../../util/error"
+import redis from "../../../config/redis"
 
 export const checkAccessOrThrow = async (
   userInfo: UserInfo,
@@ -77,4 +79,25 @@ export const getCourseIdByQuizId = async (quizId: string) => {
       .select("course_id")
       .where("quiz.id", quizId)
   )[0].course_id
+}
+
+export const getDownloadTokenFromRedis = async (
+  userId: string,
+): Promise<string> => {
+  let downloadToken = ""
+  if (redis.client) {
+    const cachedToken = JSON.parse((await redis.client.get(userId)) as string)
+    if (cachedToken) {
+      downloadToken = cachedToken
+    } else {
+      // generate token for authorised user
+      const randomToken = JSON.stringify(
+        `dl_tkn_${crypto.randomBytes(100).toString("hex")}`,
+      )
+      await redis.client.set(userId, randomToken, "EX", 600)
+      downloadToken = randomToken
+    }
+  }
+  // will return empty string if redis unavailable
+  return downloadToken
 }

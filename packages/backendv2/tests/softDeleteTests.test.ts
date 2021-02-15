@@ -15,6 +15,7 @@ import {
   QuizItem,
   QuizOption,
 } from "../src/models"
+import redis from "../config/redis"
 
 beforeAll(() => {
   Model.knex(knex)
@@ -24,6 +25,7 @@ beforeAll(() => {
 afterAll(async () => {
   await safeClean()
   await knex.destroy()
+  await redis.client?.quit()
 })
 
 describe("Soft delete peer review questions", () => {

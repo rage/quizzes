@@ -9,7 +9,7 @@ import {
 import redis from "../../config/redis"
 
 interface AccessControlOptions {
-  administator?: boolean
+  administrator?: boolean
   unrestricted?: boolean
 }
 
@@ -26,15 +26,13 @@ export const accessControl = (options?: AccessControlOptions) => {
       throw new BadRequestError("No Authorization header provided.")
     }
 
-    const redisIsAvailable = redis !== null
-
     const token: string =
       ctx.headers.authorization.replace(/bearer /i, "") || ""
 
     // attempt retrieval of user from cache
     let user = null
-    if (redisIsAvailable && redis.get) {
-      user = JSON.parse((await redis.get(token)) as string)
+    if (redis.client) {
+      user = JSON.parse((await redis.client.get(token)) as string)
     }
 
     // catches null and undefined
@@ -42,8 +40,8 @@ export const accessControl = (options?: AccessControlOptions) => {
       try {
         // fetch user from TMC server and cache details
         user = await getCurrentUserDetails(token)
-        if (redisIsAvailable && redis.setex) {
-          redis.setex(token, 3600, JSON.stringify(user))
+        if (redis.client) {
+          await redis.client.set(token, JSON.stringify(user), "EX", 3600)
         }
       } catch (error) {
         throw new UnauthorizedError("unauthorized")
@@ -51,24 +49,14 @@ export const accessControl = (options?: AccessControlOptions) => {
     }
 
     ctx.state.user = user
-    if (options?.administator && !user.administrator) {
+
+    if (options?.administrator && !user.administrator) {
       throw new ForbiddenError("forbidden")
     }
+
     return next()
   }
   return accessControl
-}
-
-export const validToken = async (token: string): Promise<boolean> => {
-  try {
-    const user = await getCurrentUserDetails(token)
-    if (user && user.administrator) {
-      return true
-    }
-    return false
-  } catch (e) {
-    return false
-  }
 }
 
 export default accessControl
