@@ -103,7 +103,7 @@ const slovakLabels: SingleLanguageLabels = {
     alreadyAnsweredLabel: "Na túto otázku ste už odpovedali.",
     answerIncorrectLabel: "Odpoveď je nesprávna.",
     kOutOfNCorrect: (k, n) =>
-      `${k}/${n} answers correctPočet správnych odpovedí je k/n.`,
+      `Počet správnych odpovedí je ${k}/${n}.`,
     pointsAvailableLabel: "Celkový počet bodov, ktoré možno získať za cvičenie",
     pointsReceivedLabel: "Počet získaných bodov",
     incorrectSubmitWhileTriesLeftLabel:
