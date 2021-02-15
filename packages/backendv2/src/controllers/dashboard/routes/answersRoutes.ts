@@ -125,7 +125,12 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "delete")
-    ctx.body = await QuizAnswer.deleteAnswer(answerId)
+    const quizAnswer = await QuizAnswer.query().findById(answerId)
+    if (quizAnswer.deleted) {
+      ctx.body = quizAnswer
+    } else {
+      ctx.body = await QuizAnswer.deleteAnswer(answerId)
+    }
   })
 
 export default answersRoutes

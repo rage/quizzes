@@ -64,7 +64,20 @@ export async function seed(knex: Knex): Promise<void> {
 
   await knex("user").insert([
     {
+      // Student
       id: 12345,
+    },
+    {
+      // Teacher
+      id: 23456,
+    },
+    {
+      // Assistant
+      id: 34567,
+    },
+    {
+      // Reviewer
+      id: 45678,
     },
   ])
 
@@ -102,6 +115,36 @@ export async function seed(knex: Knex): Promise<void> {
       language_id: "xx_XX",
       status: "submitted",
       correctness_coefficient: 0.5,
+    },
+    {
+      id: "38140980-0bcb-4fec-b5a0-43c46312817b",
+      user_id: 12345,
+      quiz_id: "f98cd4b0-41b1-4a15-89a2-4c991ec67264",
+      language_id: "xx_XX",
+      status: "submitted",
+      correctness_coefficient: 1,
+      deleted: true,
+    },
+  ])
+
+  await knex("user_course_role").insert([
+    {
+      id: "77b8a32f-f195-4001-b66e-8a4f00ac72d5",
+      user_id: 23456,
+      course_id: "fd2acb31-b722-4ff0-8f05-da668001113c",
+      role: "teacher",
+    },
+    {
+      id: "14662e14-bc8c-48ad-967f-a4ae2a0413d4",
+      user_id: 34567,
+      course_id: "fd2acb31-b722-4ff0-8f05-da668001113c",
+      role: "assistant",
+    },
+    {
+      id: "a4a9aafc-4aa5-4fe9-96a8-220b4e1108c2",
+      user_id: 45678,
+      course_id: "fd2acb31-b722-4ff0-8f05-da668001113c",
+      role: "reviewer",
     },
   ])
 }

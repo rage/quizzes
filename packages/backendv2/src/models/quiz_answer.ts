@@ -19,6 +19,7 @@ import BaseModel from "./base_model"
 import QuizOptionAnswer from "./quiz_option_answer"
 import softDelete from "objection-soft-delete"
 import { mixin } from "objection"
+import { Http } from "winston/lib/winston/transports"
 
 type QuizAnswerStatus =
   | "draft"
@@ -967,21 +968,28 @@ class QuizAnswer extends mixin(BaseModel, [
         .delete()
         .where("id", answerId)
 
-      const nextBestQuizAnswer = (
-        await QuizAnswer.query(trx)
-          .where("user_id", quizAnswer.userId)
-          .andWhere("quiz_id", quizAnswer.quizId)
-          .limit(1)
-      ).sort((a, b) => a.correctnessCoefficient - b.correctnessCoefficient)[0]
+      const quizAnswers = await QuizAnswer.query(trx)
+        .where("user_id", quizAnswer.userId)
+        .andWhere("quiz_id", quizAnswer.quizId)
+        .andWhere("deleted", false)
+
+      const nextBestQuizAnswer =
+        quizAnswers.length > 0
+          ? quizAnswers.sort(
+              (a, b) => b.correctnessCoefficient - a.correctnessCoefficient,
+            )[0]
+          : undefined
 
       const maxPoints = (await Quiz.query(trx).findById(quizAnswer.quizId))
         .points
 
-      await UserQuizState.updateAwardedPoints(
-        maxPoints,
-        nextBestQuizAnswer.correctnessCoefficient,
-        trx,
-      )
+      nextBestQuizAnswer
+        ? await UserQuizState.updateAwardedPoints(
+            maxPoints,
+            nextBestQuizAnswer.correctnessCoefficient,
+            trx,
+          )
+        : await UserQuizState.updateAwardedPoints(maxPoints, 0, trx)
 
       const userQuizState = await UserQuizState.query(trx)
         .where("user_id", quizAnswer.userId)
@@ -993,12 +1001,15 @@ class QuizAnswer extends mixin(BaseModel, [
         tries: userQuizState[0].tries > 0 ? userQuizState[0].tries - 1 : 0,
       })
 
-      await Kafka.broadcastQuizAnswerUpdated(
-        nextBestQuizAnswer,
-        userQuizState[0],
-        await Quiz.query(trx).findById(quizAnswer.quizId),
-        trx,
-      )
+      //what todo, when no quizAnswer
+      if (nextBestQuizAnswer) {
+        await Kafka.broadcastQuizAnswerUpdated(
+          nextBestQuizAnswer,
+          userQuizState[0],
+          await Quiz.query(trx).findById(quizAnswer.quizId),
+          trx,
+        )
+      }
 
       await Kafka.broadcastUserProgressUpdated(
         quizAnswer.userId,
