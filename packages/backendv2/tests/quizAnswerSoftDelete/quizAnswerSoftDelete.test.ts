@@ -2,6 +2,7 @@ import nock from "nock"
 import { Model, snakeCaseMappers } from "objection"
 import request from "supertest"
 import app from "../../app"
+import redis from "../../config/redis"
 import knex from "../../database/knex"
 import { QuizAnswer, UserQuizState } from "../../src/models"
 import { UserInfo } from "../../src/types"
@@ -17,6 +18,8 @@ describe("Soft delete quiz answer and update user quiz state", () => {
     afterAll(async () => {
       await safeClean()
       await knex.destroy()
+      await redis.client?.flushall()
+      await redis.client?.quit()
     })
     describe("When no-body or reviewer deletes answer", () => {
       beforeEach(() => userSetup())

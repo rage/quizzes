@@ -5,11 +5,14 @@ import { configQuizAnswerSoftDelete, safeClean, safeSeed } from "../util"
 import request from "supertest"
 import app from "../../app"
 import { QuizAnswer, UserQuizState } from "../../src/models"
+import redis from "../../config/redis"
 
 describe("test", () => {
   afterAll(async () => {
     await safeClean()
     await knex.destroy()
+    await redis.client?.flushall()
+    await redis.client?.quit()
   })
 
   describe("deleting already deleted answer", () => {

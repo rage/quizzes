@@ -6,11 +6,14 @@ import { safeClean, safeSeed, configQuizAnswerSoftDelete } from "../util"
 import request from "supertest"
 import QuizAnswer from "../../src/models/quiz_answer"
 import UserQuizState from "../../src/models/user_quiz_state"
+import redis from "../../config/redis"
 
 describe("Deleting multiple of users answers", () => {
   afterAll(async () => {
     await safeClean()
     await knex.destroy()
+    await redis.client?.flushall()
+    await redis.client?.quit()
   })
   describe("teacher deletes same users different answers to same quiz", () => {
     beforeAll(async () => {
