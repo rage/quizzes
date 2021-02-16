@@ -4,8 +4,8 @@ const slovakLabels: SingleLanguageLabels = {
   essay: {
     exampleAnswerLabel: "Vzorová odpoveď",
     userAnswerLabel: "Vaša odpoveď",
-    currentNumberOfWordsLabel: "Vzorová odpoveď",
-    textFieldLabel: "Počet slov",
+    currentNumberOfWordsLabel: "Počet slov",
+    textFieldLabel: "Vaša odpoveď",
     conformToLimitsToSubmitLabel:
       "Aby ste mohli odoslať odpoveď, uistite sa, že ste dodržali počet slov.",
     wordLimitsGuidance: (min, max) => {
