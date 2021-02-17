@@ -1400,10 +1400,10 @@ export const validation = {
     awardPointsEvenIfWrong: false,
     createdAt: expect.stringMatching(dateTime),
     updatedAt: expect.stringMatching(dateTime),
-    title: "quiz",
+    title: "quiz 1",
     body: "body",
     submitMessage: "nice one!",
-    items: expect.toBeArrayOfSize(0)
+    items: expect.toBeArrayOfSize(0),
   },
 }
 
