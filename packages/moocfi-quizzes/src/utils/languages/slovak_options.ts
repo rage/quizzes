@@ -124,7 +124,7 @@ const slovakLabels: SingleLanguageLabels = {
       }
     },
     answered: "Zodpovedané",
-    unanswered: "Nezodpovedaný",
+    unanswered: "Nezodpovedané",
     rejected: "Odmietnutá odpoveď, skúste znova",
     progressUpdated: "Pokrok v kurze aktualizovaný.",
     answerConfirmed: "Vaša odpoveď bola potvrdená.",
