@@ -79,6 +79,9 @@ export async function seed(knex: Knex): Promise<void> {
       // Reviewer
       id: 45678,
     },
+    { id: 123456789 },
+    { id: 234567891 },
+    { id: 345678912 },
   ])
 
   await knex("user_quiz_state").insert([
@@ -145,6 +148,24 @@ export async function seed(knex: Knex): Promise<void> {
       user_id: 45678,
       course_id: "fd2acb31-b722-4ff0-8f05-da668001113c",
       role: "reviewer",
+    },
+  ])
+
+  await knex("spam_flag").insert([
+    {
+      id: "632286dc-d1a4-41b9-8f4e-d50ee56b78d3",
+      user_id: 123456789,
+      quiz_answer_id: "444bc441-3c97-45a0-be7a-db1516539871",
+    },
+    {
+      id: "67ec2d3c-e1ff-4630-b4c3-63966823865b",
+      user_id: 234567891,
+      quiz_answer_id: "08e91588-e1df-4497-8ec3-368cebeb1f79",
+    },
+    {
+      id: "1ed2919d-e1d4-4c9b-96c5-69299ce5fe70",
+      user_id: 345678912,
+      quiz_answer_id: "08e91588-e1df-4497-8ec3-368cebeb1f79",
     },
   ])
 }

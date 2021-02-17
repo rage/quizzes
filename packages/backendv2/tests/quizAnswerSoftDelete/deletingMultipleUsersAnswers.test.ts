@@ -48,6 +48,7 @@ describe("Deleting multiple of users answers", () => {
       expect(userQuizState.pointsAwarded).toEqual(2.25)
       expect(userQuizState.status).toEqual("open")
       expect(userQuizState.tries).toEqual(2)
+      expect(userQuizState.spamFlags).toEqual(1)
     })
 
     test("deleting second answer", async () => {
@@ -74,6 +75,7 @@ describe("Deleting multiple of users answers", () => {
       expect(userQuizState.pointsAwarded).toEqual(1.5)
       expect(userQuizState.status).toEqual("open")
       expect(userQuizState.tries).toEqual(1)
+      expect(userQuizState.spamFlags).toEqual(2)
     })
 
     test("deleting last answer", async () => {
@@ -100,6 +102,7 @@ describe("Deleting multiple of users answers", () => {
       expect(userQuizState.pointsAwarded).toEqual(0)
       expect(userQuizState.status).toEqual("open")
       expect(userQuizState.tries).toEqual(0)
+      expect(userQuizState.spamFlags).toEqual(0)
     })
   })
 })

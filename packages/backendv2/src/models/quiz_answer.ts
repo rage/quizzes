@@ -983,33 +983,43 @@ class QuizAnswer extends mixin(BaseModel, [
       const maxPoints = (await Quiz.query(trx).findById(quizAnswer.quizId))
         .points
 
+      const userQuizState = (
+        await UserQuizState.query(trx)
+          .where("user_id", quizAnswer.userId)
+          .andWhere("quiz_id", quizAnswer.quizId)
+      )[0]
+
+      const updatedUserQuizState = await userQuizState
+        .$query(trx)
+        .updateAndFetch({
+          status: "open",
+          tries: userQuizState.tries > 0 ? userQuizState.tries - 1 : 0,
+          spamFlags: nextBestQuizAnswer
+            ? (
+                await SpamFlag.query(trx).where(
+                  "quiz_answer_id",
+                  nextBestQuizAnswer.id,
+                )
+              ).length
+            : 0,
+          pointsAwarded: nextBestQuizAnswer
+            ? maxPoints * nextBestQuizAnswer.correctnessCoefficient
+            : 0,
+        })
+
       nextBestQuizAnswer
-        ? await UserQuizState.updateAwardedPoints(
-            maxPoints,
-            nextBestQuizAnswer.correctnessCoefficient,
+        ? await Kafka.broadcastQuizAnswerUpdated(
+            nextBestQuizAnswer,
+            updatedUserQuizState,
+            await Quiz.query(trx).findById(quizAnswer.quizId),
             trx,
           )
-        : await UserQuizState.updateAwardedPoints(maxPoints, 0, trx)
-
-      const userQuizState = await UserQuizState.query(trx)
-        .where("user_id", quizAnswer.userId)
-        .andWhere("quiz_id", quizAnswer.quizId)
-        .limit(1)
-
-      await UserQuizState.query(trx).update({
-        status: "open",
-        tries: userQuizState[0].tries > 0 ? userQuizState[0].tries - 1 : 0,
-      })
-
-      //what todo, when no quizAnswer
-      if (nextBestQuizAnswer) {
-        await Kafka.broadcastQuizAnswerUpdated(
-          nextBestQuizAnswer,
-          userQuizState[0],
-          await Quiz.query(trx).findById(quizAnswer.quizId),
-          trx,
-        )
-      }
+        : await Kafka.broadcastQuizAnswerUpdated(
+            quizAnswer,
+            updatedUserQuizState,
+            await Quiz.query(trx).findById(quizAnswer.quizId),
+            trx,
+          )
 
       await Kafka.broadcastUserProgressUpdated(
         quizAnswer.userId,

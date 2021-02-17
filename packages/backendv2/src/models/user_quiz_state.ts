@@ -97,15 +97,15 @@ class UserQuizState extends BaseModel {
       .where({ quiz_id: newQuiz.id })
   }
 
-  public static async updateAwardedPoints(
-    maxPoints: number,
-    nextBestCorrectnessCoefficient: number,
-    trx: Transaction,
-  ) {
-    await trx("user_quiz_state").update({
-      points_awarded: maxPoints * nextBestCorrectnessCoefficient,
-    })
-  }
+  // public static async updateAwardedPoints(
+  //   maxPoints: number,
+  //   nextBestCorrectnessCoefficient: number,
+  //   trx: Transaction,
+  // ) {
+  //   await trx("user_quiz_state").update({
+  //     points_awarded: maxPoints * nextBestCorrectnessCoefficient,
+  //   })
+  // }
 }
 
 export default UserQuizState
