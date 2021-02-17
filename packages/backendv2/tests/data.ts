@@ -1402,7 +1402,6 @@ export const validation = {
     updatedAt: expect.stringMatching(dateTime),
     title: "quiz 1",
     body: "body",
-    submitMessage: "nice one!",
     items: expect.toBeArrayOfSize(0),
   },
 }
