@@ -1,6 +1,5 @@
+import Knex from "knex"
 import { TStatusModificationOperation } from "./../types/index"
-import knex from "../../database/knex"
-import { BadRequestError } from "../util/error"
 import BaseModel from "./base_model"
 import User from "./user"
 
@@ -50,24 +49,16 @@ class QuizAnswerStatusModification extends BaseModel {
   static async logStatusChange(
     quizAnswerId: string,
     operation: TStatusModificationOperation,
+    trx: Knex.Transaction,
     modifierId?: number,
-  ): Promise<QuizAnswerStatusModification | BadRequestError> {
-    const trx = await knex.transaction()
-    try {
-      const newQuizAnswerStatusChangeLog = await this.query(trx).insertAndFetch(
-        this.fromJson({
-          quizAnswerId,
-          modifierId,
-          operation,
-        }),
-      )
-
-      await trx.commit()
-      return newQuizAnswerStatusChangeLog
-    } catch (err) {
-      await trx.rollback()
-      throw err
-    }
+  ) {
+    await this.query(trx).insertAndFetch(
+      this.fromJson({
+        quizAnswerId,
+        modifierId,
+        operation,
+      }),
+    )
   }
 }
 

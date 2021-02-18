@@ -409,12 +409,13 @@ class QuizAnswer extends BaseModel {
       quizAnswer = await quizAnswer.$query(trx).patchAndFetch({ status })
 
       // log quiz answer status change
-      if (modifierId != null) {
+      if (modifierId !== null) {
         const operation =
           status === "confirmed" ? "teacher-accept" : "teacher-reject"
         await QuizAnswerStatusModification.logStatusChange(
           answerId,
           operation,
+          trx,
           modifierId,
         )
       }
@@ -708,6 +709,7 @@ class QuizAnswer extends BaseModel {
     oldAnswerStatus: QuizAnswerStatus,
     newAnswerStatus: QuizAnswerStatus,
     quizAnswerId: string,
+    trx: Knex.Transaction,
   ) {
     const statusHasChanged = newAnswerStatus !== oldAnswerStatus
 
@@ -720,13 +722,14 @@ class QuizAnswer extends BaseModel {
     }
 
     if (statusHasChanged) {
-      let operation: TStatusModificationOperation | null =
+      let operation: TStatusModificationOperation | undefined =
         mapStatusToOperation[newAnswerStatus]
 
-      if (operation != null) {
+      if (operation) {
         await QuizAnswerStatusModification.logStatusChange(
           quizAnswerId,
           operation,
+          trx,
         )
       }
     }
@@ -758,6 +761,7 @@ class QuizAnswer extends BaseModel {
           quizAnswer.status,
           quizAnswerStatusAfterAssessment,
           quizAnswer.id,
+          trx,
         )
 
         quizAnswer.status = quizAnswerStatusAfterAssessment
