@@ -8,6 +8,7 @@ import {
   UserCourseRole,
   CourseTranslation,
   Language,
+  QuizAnswerStatusModification,
 } from "../../models/"
 import accessControl from "../../middleware/access_control"
 import {
@@ -475,6 +476,13 @@ const dashboard = new Router<CustomState, CustomContext>({
     }
 
     ctx.body = await Course.getFlattenedById(courseId)
+  })
+
+  .get("/answers/:answerId/status-changes", accessControl(), async ctx => {
+    const answerId = ctx.params.answerId
+    const courseId = await getCourseIdByAnswerId(answerId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
+    ctx.body = await QuizAnswerStatusModification.getAllByQuizAnswerId(answerId)
   })
 
 export default dashboard
