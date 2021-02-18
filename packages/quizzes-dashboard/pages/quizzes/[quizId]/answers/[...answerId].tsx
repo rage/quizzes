@@ -2,18 +2,19 @@ import React, { useEffect, useState } from "react"
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
 import usePromise from "react-use-promise"
+import { Tab, Tabs, Typography } from "@material-ui/core"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faChalkboard, faScroll } from "@fortawesome/free-solid-svg-icons"
 import { fetchQuiz, getAnswerById } from "../../../../services/quizzes"
 import AnswerCard from "../../../../components/Answer"
-
 import {
   TabTextLoading,
   TabText,
   TabTextError,
 } from "../../../../components/quizPages/TabHeaders"
 import SkeletonLoader from "../../../../components/Shared/SkeletonLoader"
-import { Tab, Tabs, Typography } from "@material-ui/core"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faChalkboard, faScroll } from "@fortawesome/free-solid-svg-icons"
+import { useQuiz } from "../../../../hooks/useQuiz"
+import { useAnswer } from "../../../../hooks/useAnswer"
 
 const Log = () => {
   return <div>hhhh</div>
@@ -29,19 +30,9 @@ export const AnswerById = () => {
 
   const [currentTab, setCurrentTab] = useState("overview")
 
-  const [answerResponse, answerError] = usePromise(async () => {
-    if (!answerId) {
-      return
-    }
-    return await getAnswerById(answerId)
-  }, [answerId])
-
-  const [quiz, quizError] = usePromise(async () => {
-    if (!quizId) {
-      return
-    }
-    return await fetchQuiz(quizId)
-  }, [quizId])
+  // conditional fetches
+  const { answer, answerLoading, answerError } = useAnswer(answerId, "quiz")
+  const { quiz, quizLoading, quizError } = useQuiz(quizId, "quiz")
 
   /* for when tab is loaded through url*/
   useEffect(() => {
@@ -81,7 +72,7 @@ export const AnswerById = () => {
     )
   }
 
-  if (!answerResponse || !quiz) {
+  if (answerLoading || quizLoading) {
     return (
       <>
         <TabTextLoading />
@@ -105,7 +96,7 @@ export const AnswerById = () => {
           value="overview"
           label={<Typography>Overview</Typography>}
           onClick={() => {
-            route.push(`${pathname}/overview`)
+            route.push(`${pathname}/overview`, undefined, { shallow: true })
           }}
         />
         <Tab
@@ -114,12 +105,14 @@ export const AnswerById = () => {
           value="status-change-log"
           label={<Typography>Status Change Log</Typography>}
           onClick={() => {
-            route.push(`${pathname}/status-change-log`)
+            route.push(`${pathname}/status-change-log`, undefined, {
+              shallow: true,
+            })
           }}
         />
       </Tabs>
-      {currentTab === "overview" ? (
-        <AnswerCard answer={answerResponse} />
+      {currentTab === "overview" && answer ? (
+        <AnswerCard answer={answer} />
       ) : (
         <Log />
       )}
