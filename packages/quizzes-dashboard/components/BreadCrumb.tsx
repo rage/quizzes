@@ -55,7 +55,7 @@ const BreadCrumb = () => {
       {breadCrumbs.map(crumb => (
         <div key={crumb.label}>
           {crumb.as ? (
-            <Link href={crumb.as}>
+            <Link href={crumb.as} passHref>
               <BreadCrumbLink>{crumb.label}</BreadCrumbLink>
             </Link>
           ) : (
