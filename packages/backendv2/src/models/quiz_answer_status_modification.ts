@@ -52,7 +52,7 @@ class QuizAnswerStatusModification extends BaseModel {
     trx: Knex.Transaction,
     modifierId?: number,
   ) {
-    await this.query(trx).insertAndFetch(
+    await this.query(trx).insert(
       this.fromJson({
         quizAnswerId,
         modifierId,
