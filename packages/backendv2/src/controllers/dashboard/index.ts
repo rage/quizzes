@@ -20,7 +20,7 @@ import {
   getDownloadTokenFromRedis,
 } from "./util"
 import * as Kafka from "../../services/kafka"
-import _, { findLast } from "lodash"
+import _ from "lodash"
 import UserCoursePartState from "../../models/user_course_part_state"
 import knex from "../../../database/knex"
 import { BadRequestError } from "../../util/error"
