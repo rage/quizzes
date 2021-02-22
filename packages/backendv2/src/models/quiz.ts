@@ -279,10 +279,11 @@ export class Quiz extends BaseModel {
         .withGraphJoined("texts(previewSelect)")
         .where("quiz.id", quizId)
     )[0]
+    quiz.items = []
     if (!quiz) {
       throw new NotFoundError(`quiz not found: ${quizId}`)
     }
-    return quiz
+    return this.moveTextsToParent(quiz)
   }
 
   static async getByCourseId(courseId: string) {

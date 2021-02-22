@@ -4,8 +4,8 @@ const slovakLabels: SingleLanguageLabels = {
   essay: {
     exampleAnswerLabel: "Vzorová odpoveď",
     userAnswerLabel: "Vaša odpoveď",
-    currentNumberOfWordsLabel: "Vzorová odpoveď",
-    textFieldLabel: "Počet slov",
+    currentNumberOfWordsLabel: "Počet slov",
+    textFieldLabel: "Vaša odpoveď",
     conformToLimitsToSubmitLabel:
       "Aby ste mohli odoslať odpoveď, uistite sa, že ste dodržali počet slov.",
     wordLimitsGuidance: (min, max) => {
@@ -34,7 +34,7 @@ const slovakLabels: SingleLanguageLabels = {
     unselectButtonLabel: "Zrušiť výber",
     chooseEssayInstruction: "Vybrať jednu možnosť na hodnotenie",
     chosenEssayInstruction: "Ohodnotiť odpoveď, ktorú ste vybrali",
-    givenPeerReviewsLabel: "Počet poskytnutých hodnotení.",
+    givenPeerReviewsLabel: "Počet poskytnutých hodnotení",
     noPeerAnswersAvailableLabel:
       "Nie sú k dispozícii žiadne odpovede na hodnotenie.",
     reportAsInappropriateLabel: "Nahlásiť ako spam",
@@ -102,8 +102,7 @@ const slovakLabels: SingleLanguageLabels = {
     answerCorrectLabel: "Odpoveď je správna.",
     alreadyAnsweredLabel: "Na túto otázku ste už odpovedali.",
     answerIncorrectLabel: "Odpoveď je nesprávna.",
-    kOutOfNCorrect: (k, n) =>
-      `${k}/${n} answers correctPočet správnych odpovedí je k/n.`,
+    kOutOfNCorrect: (k, n) => `Počet správnych odpovedí je ${k}/${n}.`,
     pointsAvailableLabel: "Celkový počet bodov, ktoré možno získať za cvičenie",
     pointsReceivedLabel: "Počet získaných bodov",
     incorrectSubmitWhileTriesLeftLabel:
@@ -125,7 +124,7 @@ const slovakLabels: SingleLanguageLabels = {
       }
     },
     answered: "Zodpovedané",
-    unanswered: "Nezodpovedaný",
+    unanswered: "Nezodpovedané",
     rejected: "Odmietnutá odpoveď, skúste znova",
     progressUpdated: "Pokrok v kurze aktualizovaný.",
     answerConfirmed: "Vaša odpoveď bola potvrdená.",
