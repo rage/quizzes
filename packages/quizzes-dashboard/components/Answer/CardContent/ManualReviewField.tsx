@@ -31,6 +31,9 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
   const [, dispatch] = useAnswerListState()
 
   const { mutate } = useAnswer(answer.id, `answer-${answer.id}}`)
+  useEffect(() => {
+    setShowSnacks(false)
+  }, [answer])
 
   const handleAcceptOrReject = async (
     answerId: string,
