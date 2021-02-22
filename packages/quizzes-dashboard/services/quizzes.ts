@@ -199,6 +199,22 @@ export const changeAnswerStatus = async (
   throw new Error()
 }
 
+export const logPlagiarismSuspicion = async (
+  answerId: string,
+): Promise<any> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (
+      await api.post(`/answers/${answerId}/suspect-plagiarism`, config)
+    ).data
+    return response
+  }
+  throw new Error()
+}
+
 export const changeAnswerStatusForMany = async (
   answerIds: string[],
   status: string,
