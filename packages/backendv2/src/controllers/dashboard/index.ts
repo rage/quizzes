@@ -124,13 +124,28 @@ const dashboard = new Router<CustomState, CustomContext>({
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "grade")
-    const status = ctx.request.body.status
+    const { status, plagiarismSuspected } = ctx.request.body
 
-    ctx.body = await QuizAnswer.setManualReviewStatus(
-      answerId,
-      status,
-      ctx.state.user.id,
+    const quizAnswer = await QuizAnswer.setManualReviewStatus(answerId, status)
+
+    // log status change
+    const operation = plagiarismSuspected
+      ? "teacher-suspects-plagiarism"
+      : status === "confirmed"
+      ? "teacher-accept"
+      : "teacher-reject"
+
+    await knex.transaction(
+      async trx =>
+        await QuizAnswerStatusModification.logStatusChange(
+          answerId,
+          operation,
+          trx,
+          ctx.state.user.id,
+        ),
     )
+
+    ctx.body = quizAnswer
   })
 
   .post("/answers/status", accessControl(), async ctx => {
