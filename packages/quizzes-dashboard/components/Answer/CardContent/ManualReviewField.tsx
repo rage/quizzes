@@ -76,6 +76,14 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
         >
           <Typography>Reject</Typography>
         </Button>
+        <Button
+          className="button-plagiarism"
+          onClick={() => {
+            handleAcceptOrReject(answer.id, "plagiarism-suspected")
+          }}
+        >
+          <Typography>Suspect plagiarism</Typography>
+        </Button>
       </ButtonFieldWrapper>
     </>
   )
