@@ -32,6 +32,7 @@ const StyledTable = styled.table`
   text-align: left;
   margin: 5rem 0;
   overflow-x: auto;
+  border-collapse: collapse;
 
   td {
     padding: 0.5rem;
@@ -63,6 +64,8 @@ const Loader = () => (
 )
 
 const Log = ({ answerId }: { answerId: string | undefined }) => {
+  const LOG_LIST_SIZE = 10
+
   const {
     answerStatusChanges,
     answerStatusChangesLoading,
@@ -93,26 +96,29 @@ const Log = ({ answerId }: { answerId: string | undefined }) => {
       </tr>
 
       {answerStatusChanges &&
-        answerStatusChanges.map((log: IAnswerStatusChange) => {
-          const { operation, modifierId, createdAt } = log
-          const formattedOperationDate = createdAt
-            .toLocaleString()
-            .substring(0, 16)
-            .replace("T", " ")
+        answerStatusChanges
+          .slice(0, LOG_LIST_SIZE)
+          .map((log: IAnswerStatusChange) => {
+            const { operation, modifierId, createdAt } = log
+            const formattedOperationDate = createdAt
+              .toLocaleString()
+              .substring(0, 16)
+              .replace("T", " ")
 
-          const bgColor =
-            operation === "teacher-accept" || operation === "peer-review-reject"
-              ? "#bbffb9"
-              : "#ff7f8a"
+            const bgColor =
+              operation === "teacher-accept" ||
+              operation === "peer-review-reject"
+                ? "#bbffb9"
+                : "#ff7f8a"
 
-          return (
-            <StyledTableRow bgColor={bgColor}>
-              <td>{operation}</td>
-              <td>{modifierId}</td>
-              <td>{formattedOperationDate}</td>
-            </StyledTableRow>
-          )
-        })}
+            return (
+              <StyledTableRow bgColor={bgColor}>
+                <td>{operation}</td>
+                <td>{modifierId}</td>
+                <td>{formattedOperationDate}</td>
+              </StyledTableRow>
+            )
+          })}
     </StyledTable>
   )
 }
