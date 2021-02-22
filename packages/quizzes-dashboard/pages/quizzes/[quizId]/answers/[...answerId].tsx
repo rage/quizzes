@@ -9,8 +9,6 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableContainerProps,
-  TableContainerTypeMap,
   TableHead,
   TableRow,
   Tabs,
@@ -133,7 +131,10 @@ export const AnswerById = () => {
   const [currentTab, setCurrentTab] = useState("overview")
 
   // conditional fetches
-  const { answer, answerLoading, answerError } = useAnswer(answerId, "answer")
+  const { answer, answerLoading, answerError } = useAnswer(
+    answerId,
+    `answer-${answerId}}`,
+  )
   const { quiz, quizLoading, quizError } = useQuiz(quizId, "quiz")
 
   /* for when tab is loaded through url*/

@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { Button, Typography, Snackbar, Slide } from "@material-ui/core"
 import styled from "styled-components"
 import { Answer } from "../../../types/Answer"
@@ -44,10 +44,10 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
         plagiarismSuspected,
       )
       if (res.status === status) {
+        mutate()
         setSuccess(true)
         setShowSnacks(true)
         dispatch(setHandledAnswers([res]))
-        mutate()
       } else {
         setSuccess(false)
         setShowSnacks(true)
@@ -62,6 +62,7 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
       <Snackbar
         open={showSnacks}
         autoHideDuration={5000}
+        onClose={() => setShowSnacks(false)}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
         TransitionComponent={(props: TransitionProps) => {
           return <Slide {...props} direction="down" />
