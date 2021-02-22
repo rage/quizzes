@@ -40,12 +40,15 @@ const StyledTable = styled.table`
 `
 
 interface ITableRowProps {
-  bgColor: string | undefined
+  operation: string | undefined
 }
 
 const StyledTableRow = styled.tr<ITableRowProps>`
   :not(:first-child) {
-    background-color: ${({ bgColor }) => bgColor};
+    background-color: ${({ operation }) =>
+      operation === "teacher-accept" || operation === "peer-review-reject"
+        ? "#bbffb9"
+        : "#ff7f8a"};
   }
 `
 
@@ -62,6 +65,12 @@ const Loader = () => (
     <SkeletonLoader height={300} skeletonCount={1} />
   </>
 )
+
+function sortFunction(a: any, b: any) {
+  var dateA = new Date(a.date).getTime()
+  var dateB = new Date(b.date).getTime()
+  return dateA > dateB ? 1 : -1
+}
 
 const Log = ({ answerId }: { answerId: string | undefined }) => {
   const LOG_LIST_SIZE = 10
@@ -97,6 +106,7 @@ const Log = ({ answerId }: { answerId: string | undefined }) => {
 
       {answerStatusChanges &&
         answerStatusChanges
+          .sort(sortFunction)
           .slice(0, LOG_LIST_SIZE)
           .map((log: IAnswerStatusChange) => {
             const { operation, modifierId, createdAt } = log
@@ -105,14 +115,8 @@ const Log = ({ answerId }: { answerId: string | undefined }) => {
               .substring(0, 16)
               .replace("T", " ")
 
-            const bgColor =
-              operation === "teacher-accept" ||
-              operation === "peer-review-reject"
-                ? "#bbffb9"
-                : "#ff7f8a"
-
             return (
-              <StyledTableRow bgColor={bgColor}>
+              <StyledTableRow operation={operation}>
                 <td>{operation}</td>
                 <td>{modifierId}</td>
                 <td>{formattedOperationDate}</td>
