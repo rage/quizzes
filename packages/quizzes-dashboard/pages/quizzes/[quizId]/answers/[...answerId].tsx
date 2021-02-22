@@ -2,7 +2,20 @@ import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
-import { Tab, Tabs, Typography } from "@material-ui/core"
+import {
+  Paper,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableContainerProps,
+  TableContainerTypeMap,
+  TableHead,
+  TableRow,
+  Tabs,
+  Typography,
+} from "@material-ui/core"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faChalkboard, faScroll } from "@fortawesome/free-solid-svg-icons"
 import AnswerCard from "../../../../components/Answer"
@@ -27,29 +40,10 @@ interface IAnswerStatusChange {
   updatedAt: Date
 }
 
-const StyledTable = styled.table`
-  width: 100%;
-  text-align: left;
-  margin: 5rem 0;
-  overflow-x: auto;
-  border-collapse: collapse;
-
-  td {
-    padding: 0.5rem;
-  }
-`
-
-interface ITableRowProps {
-  operation: string | undefined
-}
-
-const StyledTableRow = styled.tr<ITableRowProps>`
-  :not(:first-child) {
-    background-color: ${({ operation }) =>
-      operation === "teacher-accept" || operation === "peer-review-reject"
-        ? "#bbffb9"
-        : "#ff7f8a"};
-  }
+const StyledTableContainer = styled(TableContainer)<{
+  component: React.ReactNode
+}>`
+  margin-top: 3rem;
 `
 
 const StyledTypography = styled(Typography)`
@@ -73,8 +67,6 @@ function sortFunction(a: any, b: any) {
 }
 
 const Log = ({ answerId }: { answerId: string | undefined }) => {
-  const LOG_LIST_SIZE = 10
-
   const {
     answerStatusChanges,
     answerStatusChangesLoading,
@@ -97,33 +89,36 @@ const Log = ({ answerId }: { answerId: string | undefined }) => {
     )
 
   return (
-    <StyledTable>
-      <tr>
-        <th>Operation</th>
-        <th>Modifier ID</th>
-        <th>Occurred at</th>
-      </tr>
-
-      {answerStatusChanges &&
-        answerStatusChanges
-          .sort(sortFunction)
-          .slice(0, LOG_LIST_SIZE)
-          .map((log: IAnswerStatusChange) => {
-            const { operation, modifierId, createdAt } = log
-            const formattedOperationDate = createdAt
-              .toLocaleString()
-              .substring(0, 16)
-              .replace("T", " ")
-
-            return (
-              <StyledTableRow operation={operation}>
-                <td>{operation}</td>
-                <td>{modifierId}</td>
-                <td>{formattedOperationDate}</td>
-              </StyledTableRow>
-            )
-          })}
-    </StyledTable>
+    <StyledTableContainer component={Paper}>
+      <Table>
+        <TableHead>
+          <TableRow>
+            <TableCell>Occurred at</TableCell>
+            <TableCell>Operation</TableCell>
+            <TableCell>Modifier ID</TableCell>
+          </TableRow>
+        </TableHead>
+        <TableBody>
+          {answerStatusChanges &&
+            answerStatusChanges
+              .sort(sortFunction)
+              .map((log: IAnswerStatusChange, index: number) => {
+                const { operation, modifierId, createdAt } = log
+                const formattedOperationDate = createdAt
+                  .toLocaleString()
+                  .substring(0, 16)
+                  .replace("T", " ")
+                return (
+                  <TableRow key={index}>
+                    <TableCell>{formattedOperationDate}</TableCell>
+                    <TableCell>{operation}</TableCell>
+                    <TableCell>{modifierId}</TableCell>
+                  </TableRow>
+                )
+              })}
+        </TableBody>
+      </Table>
+    </StyledTableContainer>
   )
 }
 
