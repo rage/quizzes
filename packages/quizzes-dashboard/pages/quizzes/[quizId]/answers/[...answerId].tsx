@@ -118,7 +118,7 @@ const Log = ({ answerId }: { answerId: string | undefined }) => {
             return (
               <StyledTableRow operation={operation}>
                 <td>{operation}</td>
-                <td>{modifierId}</td>
+                <td>{modifierId ? modifierId : "automatic"}</td>
                 <td>{formattedOperationDate}</td>
               </StyledTableRow>
             )
