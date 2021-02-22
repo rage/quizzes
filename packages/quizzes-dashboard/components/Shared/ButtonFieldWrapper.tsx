@@ -32,11 +32,11 @@ export const ButtonFieldWrapper = styled.div`
     }
   }
   .button-plagiarism {
-    background-color: #b2102f;
+    background-color: #b26500;
     color: white;
 
     :hover {
-      background-color: #b2102f;
+      background-color: #b26500;
       opacity: 0.6;
       color: #000;
     }

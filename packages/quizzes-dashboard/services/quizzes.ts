@@ -185,6 +185,7 @@ export const getAllAnswersMatchingQuery = async (
 export const changeAnswerStatus = async (
   answerId: string,
   status: string,
+  plagiarismSuspected: boolean,
 ): Promise<Answer> => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -192,7 +193,11 @@ export const changeAnswerStatus = async (
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
     const response = (
-      await api.post(`/answers/${answerId}/status`, { status }, config)
+      await api.post(
+        `/answers/${answerId}/status`,
+        { status, plagiarismSuspected },
+        config,
+      )
     ).data
     return response
   }
@@ -478,6 +483,20 @@ export const getQuizAnswerStatusChangeLog = async (answerId: string) => {
     }
     const response = (
       await api.get(`/answers/${answerId}/status-changes`, config)
+    ).data
+    return response
+  }
+  throw new Error()
+}
+
+export const logSuspectedPlagiarism = async (answerId: string) => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (
+      await api.post(`/answers/${answerId}/suspect-plagiarism`, {}, config)
     ).data
     return response
   }
