@@ -485,4 +485,21 @@ const dashboard = new Router<CustomState, CustomContext>({
     ctx.body = await QuizAnswerStatusModification.getAllByQuizAnswerId(answerId)
   })
 
+  .post("/answers/:answerId/suspect-plagiarism", accessControl(), async ctx => {
+    const answerId = ctx.params.answerId
+    const courseId = await getCourseIdByAnswerId(answerId)
+    const userId = ctx.state.user.id
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
+
+    ctx.body = await knex.transaction(
+      async trx =>
+        await QuizAnswerStatusModification.logStatusChange(
+          answerId,
+          "teacher-suspects-plagiarism",
+          trx,
+          userId,
+        ),
+    )
+  })
+
 export default dashboard
