@@ -131,7 +131,7 @@ export default class KafkaService {
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
     }
     if (course.moocfiId) {
-      await this.produce("exercise", message)
+      await this.produce("exercises-realtime", message)
     }
   }
 
@@ -155,7 +155,7 @@ export default class KafkaService {
     topic:
       | "user-course-progress-realtime"
       | "user-points-realtime"
-      | "exercise",
+      | "exercises-realtime",
     message: ProgressMessage | QuizAnswerMessage | QuizMessage,
   ) {
     try {
