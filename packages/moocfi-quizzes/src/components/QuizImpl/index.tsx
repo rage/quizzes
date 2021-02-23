@@ -84,7 +84,7 @@ const ItemWrapper = styled.div<IItemWrapperProps>`
     rowNumber % 2 === 0 ? "inherit" : "#EFF4F7"};
   /* border-radius: 10px; */
   /* padding: 1rem 2rem 1rem 1rem; */
-  padding:  0.5rem 1.5rem;
+  padding: 0.5rem 1.5rem;
 `
 
 export interface QuizContentProps {
@@ -117,7 +117,7 @@ export interface LowerContentProps {
 
 const LowerContent = styled.div<LowerContentProps>`
   margin-bottom: 1rem;
-  padding: .5rem 1.5rem;
+  padding: 0.5rem 1.5rem;
 `
 
 interface MessageGroupProps {
@@ -385,17 +385,17 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       <div ref={ref} />
       {/*<Notification scrollRef={ref} />*/}
       <QuizContentWrapper disabled={quizDisabled || wrongLocale}>
-        <UpperContent providedStyles={themeProvider.upperContentStyles} >
+        <UpperContent providedStyles={themeProvider.upperContentStyles}>
           <Deadline deadline={quiz.deadline} />
 
           {containsPeerReviews && <StageVisualizer />}
 
-          <QuizBody providedStyles={themeProvider.quizBodyStyles} >
+          <QuizBody providedStyles={themeProvider.quizBodyStyles}>
             {quiz.body}
           </QuizBody>
           {children}
         </UpperContent>
-        <QuizItemContainerDiv >
+        <QuizItemContainerDiv>
           {quizItemComponents(quiz, languageId)}
         </QuizItemContainerDiv>
         <LowerContentWrapper nItems={quiz.items.length}>

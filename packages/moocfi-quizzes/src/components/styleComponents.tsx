@@ -57,7 +57,7 @@ export const HeadingTypography = styled(Typography)`
   line-height: normal;
   /* margin: 1rem 0; */
   display: flex;
-  align-items: center; 
+  align-items: center;
 `
 
 export const BoldTypographyNormal = styled(BoldTypography)`

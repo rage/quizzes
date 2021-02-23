@@ -21,7 +21,6 @@ const QuestionContainer = styled.div`
   flex: 1;
   font-size: 1.25rem;
   margin-right: 0.25rem;
-
 `
 
 interface ChoicesContainerProps {
@@ -89,8 +88,7 @@ const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
 
 const LeftAlignedMarkdownText = styled(MarkdownText)`
   text-align: left;
-  flex: 0.;
-
+  flex: 0;
 `
 
 const justADiv = styled.div``
@@ -132,7 +130,11 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   }
 
   return (
-    <div role="group" aria-label={item.title}  style={{ paddingTop: '1rem !important' }}>
+    <div
+      role="group"
+      aria-label={item.title}
+      style={{ paddingTop: "1rem !important" }}
+    >
       <ItemContent
         direction={direction}
         providedStyles={themeProvider.multipleChoiceItemContentStyles}
@@ -149,7 +151,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
             direction={direction}
             onlyOneItem={onlyOneItem}
             providedStyles={themeProvider.optionContainerStyles}
-            style={{flex: '1.5'}}
+            style={{ flex: "1.5" }}
           >
             {options
               .sort((o1, o2) => o1.order - o2.order)

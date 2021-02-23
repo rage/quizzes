@@ -3,9 +3,7 @@ export default {
   itemWrapper: ``,
   optionContainer: ``,
   optionWrapper: ``,
-  multipleChoiceItemContent: `
-
-  `,
+  multipleChoiceItemContent: ``,
   narrowOpenItemContent: ``,
   wideOpenItemContent: ``,
   essayItemContent: ``,

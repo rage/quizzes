@@ -131,7 +131,9 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
         id="essay-text-field"
       />
       <div>
-        <Typography style={{ marginTop: '.5rem', fontWeight: 'bold', opacity: '.8'}}>
+        <Typography
+          style={{ marginTop: ".5rem", fontWeight: "bold", opacity: ".8" }}
+        >
           {essayLabels.currentNumberOfWordsLabel}: {numOfWords}
         </Typography>
 
@@ -145,7 +147,10 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
   )
 
   return (
-    <ItemContent providedStyles={themeProvider.essayItemContentStyles} style={{ padding: '1.4rem 0'}}>
+    <ItemContent
+      providedStyles={themeProvider.essayItemContentStyles}
+      style={{ padding: "1.4rem 0" }}
+    >
       {itemTitle && (
         <MarkdownText
           Component={Typography}
