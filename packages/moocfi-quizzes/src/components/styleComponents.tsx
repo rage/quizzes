@@ -55,9 +55,9 @@ export const HeadingTypography = styled(Typography)`
   font-weight: 400;
   color: rgba(0, 0, 0, 0.8);
   line-height: normal;
-  margin: 1rem 0;
+  /* margin: 1rem 0; */
   display: flex;
-  align-items: center;
+  align-items: center; 
 `
 
 export const BoldTypographyNormal = styled(BoldTypography)`

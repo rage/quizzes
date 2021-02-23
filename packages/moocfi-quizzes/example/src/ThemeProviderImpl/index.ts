@@ -33,7 +33,7 @@ const ThemeProviderImpl: ThemeProviderInterface = {
   // submitMessageDivStyles: styles.submitMessageDiv,
   // answerPaperStyles: styles.answerPaper,
   // answerFieldStyles: styles.answerField,
-  // quizBodyStyles: styles.quizBody,
+  quizBodyStyles: styles.quizBody,
   // stepperStyles: styles.stepper,
   // submitGroupStyles: styles.submitGroup,
   // messageGroupStyles: styles.messageGroup,

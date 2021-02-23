@@ -3,7 +3,9 @@ export default {
   itemWrapper: ``,
   optionContainer: ``,
   optionWrapper: ``,
-  multipleChoiceItemContent: ``,
+  multipleChoiceItemContent: `
+
+  `,
   narrowOpenItemContent: ``,
   wideOpenItemContent: ``,
   essayItemContent: ``,
@@ -11,7 +13,11 @@ export default {
   submitMessageDiv: ``,
   answerPaper: ``,
   answerField: ``,
-  quizBody: ``,
+  quizBody: `
+  text-align: center;
+  font-family: 'Poppins';
+  font-size: 18px;
+  `,
   stepper: ``,
   submitGroup: ``,
   messageGroup: ``,
