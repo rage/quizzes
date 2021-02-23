@@ -66,10 +66,12 @@ const SpaceFillerDiv = styled.div`
 interface ITopInfoBarProps {
   // when the user is not logged in
   staticBars?: boolean
+  alternativeQuizLabel?: string
 }
 
 const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   staticBars,
+  alternativeQuizLabel,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
@@ -90,7 +92,10 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   let availablePoints
 
   if (languageInfo) {
-    quizLabel = languageInfo.general.quizLabel
+    quizLabel =
+      alternativeQuizLabel === undefined
+        ? languageInfo.general.quizLabel
+        : alternativeQuizLabel
     pointsLabel = languageInfo.general.pointsLabel
     answeredLabel = languageInfo.general.answered
     unansweredLabel = languageInfo.general.unanswered
