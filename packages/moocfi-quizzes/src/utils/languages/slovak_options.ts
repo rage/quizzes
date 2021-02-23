@@ -34,7 +34,7 @@ const slovakLabels: SingleLanguageLabels = {
     unselectButtonLabel: "Zrušiť výber",
     chooseEssayInstruction: "Vybrať jednu možnosť na hodnotenie",
     chosenEssayInstruction: "Ohodnotiť odpoveď, ktorú ste vybrali",
-    givenPeerReviewsLabel: "Počet poskytnutých hodnotení.",
+    givenPeerReviewsLabel: "Počet poskytnutých hodnotení",
     noPeerAnswersAvailableLabel:
       "Nie sú k dispozícii žiadne odpovede na hodnotenie.",
     reportAsInappropriateLabel: "Nahlásiť ako spam",
