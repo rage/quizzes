@@ -61,6 +61,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
   )
   const [searchQuery, setSearchQuery] = useState("")
   const [queryToPush, setQueryToPush] = useState({})
+
   useBreadcrumbs([
     {
       label: "Courses",

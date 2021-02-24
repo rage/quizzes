@@ -15,16 +15,24 @@ import AnswerLink from "./AnswerLink"
 import ManualReviewField from "./ManualReviewField"
 import Peerreviews from "./Peerreviews"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faWindowClose } from "@fortawesome/free-solid-svg-icons"
+import { faWindowClose, faTrash } from "@fortawesome/free-solid-svg-icons"
 import DebugDialog from "../../DebugDialog"
 import { editableAnswerStates } from "../../constants"
 import { useAnswerListState } from "../../../contexts/AnswerListContext"
+import AnswerDeletionDialog from "./AnswerDeletionDialog"
 
 export const ContentContainer = styled.div`
   display: flex !important;
   margin-top: 1rem;
   justify-content: space-between !important;
   width: 100%;
+  align-items: center;
+`
+
+export const ButtonContainer = styled.div`
+  display: flex !important;
+  margin-top: 1rem;
+  justify-content: flex-end !important;
 `
 
 export const StatsContainer = styled.div`
@@ -76,9 +84,19 @@ const PeerreviewModal = styled(Modal)`
   justify-content: center;
 `
 
-const DebugDialogWrapper = styled.div`
+const ButtonWrapper = styled.div`
   display: flex;
   margin-right: 1rem;
+`
+
+const DeleteButton = styled(Button)`
+  display: flex !important;
+  background-color: #c62828 !important;
+  :hover {
+    background-color: #c62828;
+    opacity: 0.6;
+    color: #000;
+  }
 `
 
 export interface AnswerContentProps {
@@ -91,6 +109,7 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
   const [showPeerreviewModal, setShowPeerreviewModal] = useState(false)
   const [height, setHeight] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
+  const [showAnswerDeletionModal, setShowAnswerDeletionModal] = useState(false)
 
   useEffect(() => {
     setShowMore(expandAll)
@@ -121,11 +140,28 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
           </PeerreviewBox>
         </Fade>
       </PeerreviewModal>
+      <AnswerDeletionDialog
+        answer={answer}
+        setShowAnswerDeletionModal={setShowAnswerDeletionModal}
+        showAnswerDeletionModal={showAnswerDeletionModal}
+      />{" "}
       <ContentContainer>
         <AnswerLink answer={answer} />
-        <DebugDialogWrapper>
-          <DebugDialog object={answer} />
-        </DebugDialogWrapper>
+        <ButtonContainer>
+          <ButtonWrapper>
+            <DeleteButton
+              title="Delete answer"
+              variant="outlined"
+              disabled={answer.deleted}
+              onClick={() => setShowAnswerDeletionModal(true)}
+            >
+              <FontAwesomeIcon icon={faTrash}></FontAwesomeIcon>
+            </DeleteButton>
+          </ButtonWrapper>
+          <ButtonWrapper>
+            <DebugDialog object={answer} />
+          </ButtonWrapper>
+        </ButtonContainer>
       </ContentContainer>
       <ContentContainer>
         <AnswerOverView answer={answer} />
@@ -150,11 +186,19 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
         {height > 300 && (
           <>
             {showMore ? (
-              <Button variant="outlined" onClick={() => setShowMore(false)}>
+              <Button
+                variant="outlined"
+                size="medium"
+                onClick={() => setShowMore(false)}
+              >
                 Show Less
               </Button>
             ) : (
-              <Button variant="outlined" onClick={() => setShowMore(true)}>
+              <Button
+                variant="outlined"
+                size="medium"
+                onClick={() => setShowMore(true)}
+              >
                 Show More
               </Button>
             )}

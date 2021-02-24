@@ -14,12 +14,11 @@ import UserCoursePartState from "./user_course_part_state"
 import * as Kafka from "../services/kafka"
 import SpamFlag from "./spam_flag"
 import _ from "lodash"
-import { raw } from "objection"
+import Objection, { raw } from "objection"
 import BaseModel from "./base_model"
 import QuizOptionAnswer from "./quiz_option_answer"
 import softDelete from "objection-soft-delete"
 import { mixin } from "objection"
-import { Http } from "winston/lib/winston/transports"
 
 type QuizAnswerStatus =
   | "draft"
@@ -197,7 +196,7 @@ class QuizAnswer extends mixin(BaseModel, [
     order: "asc" | "desc",
     filters: string[],
   ) {
-    let paginated
+    let paginated: Objection.Page<QuizAnswer>
     const noFiltersProvided = filters.length === 0
 
     if (noFiltersProvided) {

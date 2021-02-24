@@ -9,6 +9,7 @@ export interface Answer {
   userQuizState: UserQuizState
   itemAnswers: ItemAnswer[]
   peerReviews: PeerReview[]
+  deleted: boolean
 }
 
 export interface ItemAnswer {

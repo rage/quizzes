@@ -453,3 +453,15 @@ export const downloadAnswerInfo = async (
     throw new Error()
   }
 }
+
+export const deleteQuizAnswer = async (quizAnswerId: string) => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return await api.delete(`answers/${quizAnswerId}`, config)
+  } else {
+    throw new Error()
+  }
+}
