@@ -27,10 +27,7 @@ const connect = () => {
 }
 
 const produce = async (
-  topic:
-    | "user-course-progress-realtime"
-    | "exercises-realtime"
-    | "user-points-realtime",
+  topic: "user-course-progress-realtime" | "exercise" | "user-points-realtime",
   message: ProgressMessage | QuizAnswerMessage | QuizMessage,
 ) => {
   if (!process.env.KAFKA_HOST) {
@@ -145,7 +142,7 @@ export const broadcastCourseQuizzesUpdated = async (
     message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
   }
   if (course.moocfiId) {
-    await produce("exercises-realtime", message)
+    await produce("exercise", message)
   }
 }
 

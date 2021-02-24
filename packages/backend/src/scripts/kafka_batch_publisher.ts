@@ -203,11 +203,7 @@ const publishQuizzes = async (course: ICourse): Promise<IQuiz[]> => {
       message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
     }
 
-    producer.produce(
-      "exercises-realtime",
-      null,
-      Buffer.from(JSON.stringify(message)),
-    )
+    producer.produce("exercise", null, Buffer.from(JSON.stringify(message)))
     await flush(10000)
 
     console.log(`published ${quizzes.length} quizzes`)
