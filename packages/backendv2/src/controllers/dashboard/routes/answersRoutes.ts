@@ -49,7 +49,14 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     const quizId = ctx.params.quizId
     const courseId = await getCourseIdByQuizId(quizId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
-    const { page, size, order, filters } = ctx.request.query
+    const {
+      page,
+      size,
+      order,
+      filters,
+      deleted,
+      notDeleted,
+    } = ctx.request.query
     let parsedFilters = []
     if (filters && filters.length === 1) {
       parsedFilters = filters
@@ -64,6 +71,8 @@ const answersRoutes = new Router<CustomState, CustomContext>({
       size,
       order,
       parsedFilters,
+      deleted === "true",
+      notDeleted === "true",
     )
   })
 

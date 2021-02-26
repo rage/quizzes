@@ -13,7 +13,7 @@ import PeerReviewQuestion from "./peer_review_question"
 import UserCoursePartState from "./user_course_part_state"
 import * as Kafka from "../services/kafka"
 import SpamFlag from "./spam_flag"
-import _ from "lodash"
+import _, { cond } from "lodash"
 import Objection, { raw } from "objection"
 import BaseModel from "./base_model"
 import QuizOptionAnswer from "./quiz_option_answer"
@@ -195,13 +195,20 @@ class QuizAnswer extends mixin(BaseModel, [
     pageSize: number,
     order: "asc" | "desc",
     filters: string[],
+    deleted: boolean,
+    notDeleted: boolean,
   ) {
     let paginated: Objection.Page<QuizAnswer>
     const noFiltersProvided = filters.length === 0
+    let deleteConditions: boolean[] = [
+      ...(deleted ? [true] : []),
+      ...(notDeleted ? [false] : []),
+    ]
 
     if (noFiltersProvided) {
       paginated = await this.query()
         .where("quiz_id", quizId)
+        .whereIn("deleted", deleteConditions)
         .orderBy([{ column: "created_at", order: order }])
         .page(page, pageSize)
         .withGraphFetched("userQuizState")
@@ -210,6 +217,7 @@ class QuizAnswer extends mixin(BaseModel, [
     } else {
       paginated = await this.query()
         .where("quiz_id", quizId)
+        .whereIn("deleted", deleteConditions)
         .whereIn("status", filters)
         .orderBy([{ column: "created_at", order: order }])
         .page(page, pageSize)

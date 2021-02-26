@@ -12,9 +12,9 @@ import {
 } from "../../contexts/AnswerListContext"
 
 interface AdditionalAnswerCardProps {
-  faded: boolean
-  status: string
-  deleted: boolean
+  $faded: boolean
+  $status: string
+  $deleted: boolean
 }
 
 const AnswerCardWrapper = styled.div`
@@ -50,17 +50,17 @@ export const StyledAnswerCard = styled(Card)<AdditionalAnswerCardProps>`
   box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 7px 0px,
     rgba(0, 0, 0, 0.15) 0px 3px 6px -2px, rgba(0, 0, 0, 0.25) 0px 1px 10px 0px !important;
   background-color: ${props => {
-    if (props.deleted) {
+    if (props.$deleted) {
       return `rgba(110, 110, 110, 0.2) !important;`
     }
     let rgba = "0, 0, 0, 0.3"
-    if (props.status === "confirmed") {
+    if (props.$status === "confirmed") {
       rgba = "76, 175, 80, 0.2"
     }
-    if (props.status === "rejected") {
+    if (props.$status === "rejected") {
       rgba = "244, 67, 54, 0.2"
     }
-    return props.faded && `rgba(${rgba}) !important;`
+    return props.$faded && `rgba(${rgba}) !important;`
   }};
 `
 
@@ -117,9 +117,9 @@ export const AnswerCard = ({ answer }: AnswerProps) => {
         />
       )}
       <StyledAnswerCard
-        faded={faded}
-        status={statusChange}
-        deleted={answer.deleted}
+        $faded={faded}
+        $status={statusChange}
+        $deleted={answer.deleted}
       >
         <AnswerContent answer={answer} />
       </StyledAnswerCard>

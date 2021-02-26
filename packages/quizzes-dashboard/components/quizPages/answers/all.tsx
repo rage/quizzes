@@ -2,7 +2,14 @@ import React, { useState, useEffect } from "react"
 import _ from "lodash"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
-import { MenuItem, Switch, Typography, Chip } from "@material-ui/core"
+import {
+  MenuItem,
+  Switch,
+  Typography,
+  Chip,
+  FormGroup,
+  FormControlLabel,
+} from "@material-ui/core"
 import styled from "styled-components"
 import QuizTitle from "../QuizTitleContainer"
 import { TabText } from "../TabHeaders"
@@ -61,6 +68,8 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
   )
   const [searchQuery, setSearchQuery] = useState("")
   const [queryToPush, setQueryToPush] = useState({})
+  const [deleted, setDeleted] = useState(false)
+  const [notDeleted, setNotDeleted] = useState(true)
 
   useBreadcrumbs([
     {
@@ -82,6 +91,8 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
     answersDisplayed,
     sortOrder,
     filterParameters,
+    deleted,
+    notDeleted,
     "all-answers",
   )
 
@@ -95,6 +106,8 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
     sortOrder,
     searchQuery,
     filterParameters,
+    deleted,
+    notDeleted,
     "search-all-answers",
   )
 
@@ -238,6 +251,24 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
         setQueryToPush(updatedQueryParams)
         query = updatedQueryParams
         break
+      case "deleted":
+        updatedQueryParams = {
+          ...updatedQueryParams,
+          deleted: event.target.checked,
+        }
+        setDeleted(event.target.checked)
+        setQueryToPush(updatedQueryParams)
+        query = updatedQueryParams
+        break
+      case "not-deleted":
+        updatedQueryParams = {
+          ...updatedQueryParams,
+          notDeleted: event.target.checked,
+        }
+        setNotDeleted(event.target.checked)
+        setQueryToPush(updatedQueryParams)
+        query = updatedQueryParams
+        break
       default:
         break
     }
@@ -352,6 +383,28 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
           )
         })}
       </FilterParamsField>
+      <FormGroup row>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={notDeleted}
+              onChange={event => handleFieldChange(event, "not-deleted")}
+              name="not-deleted switch"
+            ></Switch>
+          }
+          label="show not-deleted"
+        ></FormControlLabel>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={deleted}
+              onChange={event => handleFieldChange(event, "deleted")}
+              name="deleted switch"
+            ></Switch>
+          }
+          label="Show deleted"
+        ></FormControlLabel>
+      </FormGroup>
       {answersToDisplay ? (
         <>
           <AnswerListOptions
