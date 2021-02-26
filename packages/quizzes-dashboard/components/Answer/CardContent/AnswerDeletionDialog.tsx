@@ -7,6 +7,8 @@ import {
   DialogContent,
   DialogActions,
   Grow,
+  Divider,
+  FormHelperText,
 } from "@material-ui/core"
 import { Alert } from "@material-ui/lab"
 import React, { useState } from "react"
@@ -16,7 +18,8 @@ import { Answer } from "../../../types/Answer"
 
 const TextWrapper = styled.div`
   display: flex;
-  padding: 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
 `
 
 const YesButton = styled(Button)`
@@ -63,13 +66,13 @@ const AnswerDeletionDialog = ({
   return (
     <Dialog open={showAnswerDeletionDialog} fullWidth>
       <DialogTitle>
-        <Typography variant="h5">
-          Are you sure you want to delete this answer?
-        </Typography>
+        <Typography>Are you sure you want to delete this answer?</Typography>
       </DialogTitle>
       <DialogContent>
         {!deleting && (
           <>
+            <Divider />
+            <FormHelperText>Basic info</FormHelperText>
             <TextWrapper>
               <Typography variant="caption">id: {answer.id}</Typography>
             </TextWrapper>
@@ -78,6 +81,18 @@ const AnswerDeletionDialog = ({
                 user_id: {answer.userId}
               </Typography>
             </TextWrapper>
+            <TextWrapper>
+              <Typography variant="caption">status: {answer.status}</Typography>
+            </TextWrapper>
+            {answer.itemAnswers[0]?.textData && (
+              <>
+                <Divider />
+                <FormHelperText>Answer text</FormHelperText>
+                <TextWrapper>
+                  <Typography>{answer.itemAnswers[0].textData}</Typography>
+                </TextWrapper>
+              </>
+            )}
           </>
         )}
         {deleting && !failure && !success && (
