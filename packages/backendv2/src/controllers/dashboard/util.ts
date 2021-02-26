@@ -86,14 +86,11 @@ export const getDownloadTokenFromRedis = async (
 ): Promise<string> => {
   let downloadToken = ""
   if (redis.client) {
-    const cachedToken = JSON.parse((await redis.client.get(userId)) as string)
+    const cachedToken = await redis.client.get(userId)
     if (cachedToken) {
       downloadToken = cachedToken
     } else {
-      // generate token for authorised user
-      const randomToken = JSON.stringify(
-        `dl_tkn_${crypto.randomBytes(100).toString("hex")}`,
-      )
+      const randomToken = `dl_tkn_${crypto.randomBytes(100).toString("hex")}`
       await redis.client.set(userId, randomToken, "EX", 600)
       downloadToken = randomToken
     }

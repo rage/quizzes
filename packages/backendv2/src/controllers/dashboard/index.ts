@@ -263,9 +263,7 @@ const dashboard = new Router<CustomState, CustomContext>({
 
     // validate token
     if (downloadToken && redis.client) {
-      const cachedToken = JSON.stringify(
-        JSON.parse((await redis.client.get(userId)) as string),
-      )
+      const cachedToken = await redis.client.get(userId)
 
       if (cachedToken === downloadToken) {
         const stream = await Quiz.getQuizInfo(quizId)
@@ -320,9 +318,7 @@ const dashboard = new Router<CustomState, CustomContext>({
 
     // validate token
     if (downloadToken && redis.client) {
-      const cachedToken = JSON.stringify(
-        JSON.parse((await redis.client.get(userId)) as string),
-      )
+      const cachedToken = await redis.client.get(userId)
 
       if (cachedToken === downloadToken) {
         const stream = await Quiz.getQuizInfo(quizId)
@@ -373,9 +369,7 @@ const dashboard = new Router<CustomState, CustomContext>({
 
     // validate token
     if (downloadToken && redis.client) {
-      const cachedToken = JSON.stringify(
-        JSON.parse((await redis.client.get(userId)) as string),
-      )
+      const cachedToken = await redis.client.get(userId)
       if (cachedToken === downloadToken) {
         const stream = await Quiz.getQuizInfo(quizId)
         ctx.response.set("Content-Type", "text/csv")
