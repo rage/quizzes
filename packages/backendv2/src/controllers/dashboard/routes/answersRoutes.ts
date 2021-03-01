@@ -1,6 +1,6 @@
 import Router from "koa-router"
 import accessControl from "../../../middleware/access_control"
-import { QuizAnswer } from "../../../models"
+import { QuizAnswer, QuizAnswerStatusModification } from "../../../models"
 import { CustomState, CustomContext } from "../../../types"
 import { BadRequestError } from "../../../util/error"
 import {
@@ -17,7 +17,12 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "grade")
     const status = ctx.request.body.status
-    ctx.body = await QuizAnswer.setManualReviewStatus(answerId, status)
+
+    ctx.body = await QuizAnswer.setManualReviewStatus(
+      answerId,
+      status,
+      ctx.state.user.id,
+    )
   })
 
   .post("/status", accessControl(), async ctx => {
@@ -140,6 +145,13 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     } else {
       ctx.body = await QuizAnswer.deleteAnswer(answerId)
     }
+  })
+
+  .get("/:answerId/status-changes", accessControl(), async ctx => {
+    const answerId = ctx.params.answerId
+    const courseId = await getCourseIdByAnswerId(answerId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
+    ctx.body = await QuizAnswerStatusModification.getAllByQuizAnswerId(answerId)
   })
 
 export default answersRoutes

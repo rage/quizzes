@@ -34,6 +34,8 @@ import Language from "./language"
 
 import SpamFlag from "./spam_flag"
 
+import QuizAnswerStatusModification from "./quiz_answer_status_modification"
+
 export {
   Quiz,
   QuizTranslation,
@@ -44,6 +46,7 @@ export {
   QuizAnswer,
   QuizItemAnswer,
   QuizOptionAnswer,
+  QuizAnswerStatusModification,
   PeerReviewCollection,
   PeerReviewCollectionTranslation,
   PeerReviewQuestion,

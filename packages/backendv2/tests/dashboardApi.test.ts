@@ -1266,7 +1266,7 @@ describe("fetching user progress should", () => {
       .end(done)
   })
 
-  test("return user's progress in correct shape when user has prgress", done => {
+  test("return user's progress in correct shape when user has progress", done => {
     request(app.callback())
       .get(
         "/api/v2/dashboard/courses/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/user/current/progress",
@@ -1475,7 +1475,7 @@ describe("dashboard - courses: downloading a correspondence file should", () => 
   })
 })
 
-describe("dashboard: fetching all exisiting languages", () => {
+describe("dashboard: fetching all existing languages", () => {
   beforeAll(async () => {
     await safeSeed({ directory: "./database/seeds" })
   })

@@ -456,6 +456,20 @@ export const downloadAnswerInfo = async (
   }
 }
 
+export const getQuizAnswerStatusChangeLog = async (answerId: string) => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (
+      await api.get(`/answers/${answerId}/status-changes`, config)
+    ).data
+    return response
+  }
+  throw new Error()
+}
+
 export const deleteQuizAnswer = async (quizAnswerId: string) => {
   const userInfo = checkStore()
   if (userInfo) {

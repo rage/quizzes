@@ -19,6 +19,8 @@ import BaseModel from "./base_model"
 import QuizOptionAnswer from "./quiz_option_answer"
 import softDelete from "objection-soft-delete"
 import { mixin } from "objection"
+import QuizAnswerStatusModification from "./quiz_answer_status_modification"
+import { TStatusModificationOperation } from "./../types/index"
 
 type QuizAnswerStatus =
   | "draft"
@@ -390,6 +392,7 @@ class QuizAnswer extends mixin(BaseModel, [
   public static async setManualReviewStatus(
     answerId: string,
     status: QuizAnswerStatus,
+    modifierId?: number,
   ) {
     if (!["confirmed", "rejected"].includes(status)) {
       throw new BadRequestError("invalid status")
@@ -418,6 +421,18 @@ class QuizAnswer extends mixin(BaseModel, [
       }
 
       quizAnswer = await quizAnswer.$query(trx).patchAndFetch({ status })
+
+      // log quiz answer status change
+      if (modifierId !== null) {
+        const operation =
+          status === "confirmed" ? "teacher-accept" : "teacher-reject"
+        await QuizAnswerStatusModification.logStatusChange(
+          answerId,
+          operation,
+          trx,
+          modifierId,
+        )
+      }
 
       await UserQuizState.upsert(userQuizState, trx)
       await UserCoursePartState.update(
@@ -602,7 +617,6 @@ class QuizAnswer extends mixin(BaseModel, [
     this.gradeAnswer(quizAnswer, userQuizState, quiz)
     this.assessUserQuizStatus(quizAnswer, userQuizState, quiz, true)
     if (quizAnswer.status === "confirmed") {
-      // UserCoursePartState.update depends on user quiz state being up to date
       await UserQuizState.upsert(userQuizState, trx)
       await UserCoursePartState.update(
         quizAnswer.userId,
@@ -704,6 +718,36 @@ class QuizAnswer extends mixin(BaseModel, [
     }
   }
 
+  public static async logAnswerStatusChange(
+    oldAnswerStatus: QuizAnswerStatus,
+    newAnswerStatus: QuizAnswerStatus,
+    quizAnswerId: string,
+    trx: Knex.Transaction,
+  ) {
+    const statusHasChanged = newAnswerStatus !== oldAnswerStatus
+
+    const mapStatusToOperation: {
+      [key: string]: TStatusModificationOperation
+    } = {
+      spam: "peer-review-spam",
+      rejected: "peer-review-reject",
+      confirmed: "peer-review-accept",
+    }
+
+    if (statusHasChanged) {
+      let operation: TStatusModificationOperation | undefined =
+        mapStatusToOperation[newAnswerStatus]
+
+      if (operation) {
+        await QuizAnswerStatusModification.logStatusChange(
+          quizAnswerId,
+          operation,
+          trx,
+        )
+      }
+    }
+  }
+
   public static async assessAnswerStatus(
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
@@ -717,13 +761,23 @@ class QuizAnswer extends mixin(BaseModel, [
         const peerReviews = await PeerReview.query(trx)
           .where("quiz_answer_id", quizAnswer.id)
           .withGraphJoined("answers")
-        quizAnswer.status = this.assessAnswerWithPeerReviewsStatus(
+
+        const quizAnswerStatusAfterAssessment = this.assessAnswerWithPeerReviewsStatus(
           quiz,
           quizAnswer,
           userQuizState,
           peerReviews,
           course,
         )
+
+        await this.logAnswerStatusChange(
+          quizAnswer.status,
+          quizAnswerStatusAfterAssessment,
+          quizAnswer.id,
+          trx,
+        )
+
+        quizAnswer.status = quizAnswerStatusAfterAssessment
       } else {
         quizAnswer.status = "submitted"
       }
