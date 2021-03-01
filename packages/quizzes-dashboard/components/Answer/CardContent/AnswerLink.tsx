@@ -1,8 +1,9 @@
 import React from "react"
-import { Answer } from "../../../types/Answer"
 import Link from "next/link"
 import { Link as LinkTypography } from "@material-ui/core"
 import styled from "styled-components"
+import { useRouter } from "next/router"
+import { Answer } from "../../../types/Answer"
 
 export const AnswerLinkContainer = styled.div`
   display: flex;
@@ -15,9 +16,14 @@ export interface AnswerLinkProps {
 }
 
 export const AnswerLink = ({ answer }: AnswerLinkProps) => {
+  const route = useRouter()
+  const singularAnswerIsBeingViewed = route.query.answerId ? true : false
+  if (singularAnswerIsBeingViewed) return null
+  const answerOverviewHref = `/quizzes/${answer.quizId}/answers/${answer.id}/overview`
+
   return (
     <AnswerLinkContainer>
-      <Link href={`/quizzes/${answer.quizId}/answers/${answer.id}`}>
+      <Link href={answerOverviewHref}>
         <LinkTypography
           component="span"
           variant="body2"

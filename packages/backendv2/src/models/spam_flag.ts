@@ -5,6 +5,7 @@ import User from "./user"
 import UserQuizState from "./user_quiz_state"
 import knex from "../../database/knex"
 import BaseModel from "./base_model"
+import QuizAnswerStatusModification from "./quiz_answer_status_modification"
 
 class SpamFlag extends BaseModel {
   id!: string
@@ -73,13 +74,12 @@ class SpamFlag extends BaseModel {
 
         await QuizAnswer.save(quizAnswer, trx)
 
-        // await UserQuizState.query(trx).upsertGraph(userQuizState)
-
         const { userId, quizId, ...data } = userQuizState
 
         await UserQuizState.upsert(userQuizState, trx)
 
         await trx.commit()
+
         return newSpamFlag
       } catch (err) {
         await trx.rollback()

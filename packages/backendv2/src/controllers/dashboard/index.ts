@@ -8,6 +8,7 @@ import {
   UserCourseRole,
   CourseTranslation,
   Language,
+  QuizAnswerStatusModification,
 } from "../../models/"
 import accessControl from "../../middleware/access_control"
 import {
@@ -19,7 +20,7 @@ import {
   getDownloadTokenFromRedis,
 } from "./util"
 import * as Kafka from "../../services/kafka"
-import _ from "lodash"
+import _, { findLast } from "lodash"
 import UserCoursePartState from "../../models/user_course_part_state"
 import knex from "../../../database/knex"
 import { BadRequestError } from "../../util/error"
@@ -124,7 +125,12 @@ const dashboard = new Router<CustomState, CustomContext>({
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "grade")
     const status = ctx.request.body.status
-    ctx.body = await QuizAnswer.setManualReviewStatus(answerId, status)
+
+    ctx.body = await QuizAnswer.setManualReviewStatus(
+      answerId,
+      status,
+      ctx.state.user.id,
+    )
   })
 
   .post("/answers/status", accessControl(), async ctx => {
@@ -464,6 +470,13 @@ const dashboard = new Router<CustomState, CustomContext>({
     }
 
     ctx.body = await Course.getFlattenedById(courseId)
+  })
+
+  .get("/answers/:answerId/status-changes", accessControl(), async ctx => {
+    const answerId = ctx.params.answerId
+    const courseId = await getCourseIdByAnswerId(answerId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
+    ctx.body = await QuizAnswerStatusModification.getAllByQuizAnswerId(answerId)
   })
 
 export default dashboard
