@@ -1,41 +1,19 @@
 import React from "react"
 import { ControlledEditor } from "@monaco-editor/react"
-import { normalize } from "normalizr"
-import { normalizedQuiz } from "../schemas"
-import { initializedEditor } from "../store/editor/editorActions"
-
-import { useDispatch } from "react-redux"
-import { useTypedSelector } from "../store/store"
-import { useQuiz } from "../hooks/useQuiz"
 
 interface EditableDebugFieldProps {
   initialValue: string
+  setDebugViewChanges: React.Dispatch<React.SetStateAction<string | null>>
 }
 
-const EditableDebugField = ({ initialValue }: EditableDebugFieldProps) => {
-  const dispatch = useDispatch()
-  const quizId = useTypedSelector(state => state.editor.quizId)
-  const { quiz } = useQuiz(quizId, `quiz-${quizId}`)
-
+const EditableDebugField = ({
+  initialValue,
+  setDebugViewChanges,
+}: EditableDebugFieldProps) => {
   const handleEditorChange = (_unusedParam: any, value: string | undefined) => {
-    const changedData = JSON.parse(value as string)
-
-    // normalize quiz
-    const normalizedUpdatedQuizData = normalize(changedData, normalizedQuiz)
-
-    // cherry pick data pieces to put in state
-    const normalizedDataToBeSentToEditorState = {
-      quizzes: normalizedUpdatedQuizData.entities.quizzes ?? {},
-      items: normalizedUpdatedQuizData.entities.items ?? {},
-      options: normalizedUpdatedQuizData.entities.options ?? {},
-      result: normalizedUpdatedQuizData.result,
-      peerReviewCollections:
-        normalizedUpdatedQuizData.entities.peerReviewCollections ?? {},
-      questions: normalizedUpdatedQuizData.entities.questions ?? {},
-    }
-
-    // send to state
-    dispatch(initializedEditor(normalizedDataToBeSentToEditorState, quiz!))
+    const editedQuiz = JSON.parse(value as string)
+    // send changes to parent
+    setDebugViewChanges(editedQuiz)
   }
 
   return (
