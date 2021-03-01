@@ -17,8 +17,6 @@ import {
   decreasedItemOrder,
   increasedItemOrder,
 } from "../../../store/editor/items/itemAction"
-import { checkForChanges } from "../../../store/editor/editorActions"
-import { useTypedSelector } from "../../../store/store"
 
 const TypeWrapper = styled.div`
   display: flex;
