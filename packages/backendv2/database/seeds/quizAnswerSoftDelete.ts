@@ -30,6 +30,7 @@ export async function seed(knex: Knex): Promise<void> {
       course_id: "fd2acb31-b722-4ff0-8f05-da668001113c",
       points: 3,
       part: 1,
+      tries: 3,
     },
   ])
 

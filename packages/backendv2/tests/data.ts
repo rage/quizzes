@@ -1428,7 +1428,7 @@ export const userAbilities = {
         "view",
         "edit",
         "grade",
-        "delete",
+        "delete-answer",
       ],
     },
     assistant: {
@@ -1436,7 +1436,7 @@ export const userAbilities = {
         "view",
         "edit",
         "grade",
-        "delete",
+        "delete-answer",
       ],
     },
   },

@@ -1686,7 +1686,7 @@ describe("dashboard: get user abilities for course", () => {
       .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
       .expect(res => {
-        expect(res.body).toEqual(["view", "edit", "grade", "delete"])
+        expect(res.body).toEqual(["view", "edit", "grade", "delete-answer"])
       })
       .expect(200)
       .end(done)
@@ -1767,7 +1767,7 @@ describe("dashboard: get user abilities for course", () => {
       .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
       .expect(res => {
-        expect(res.body).toEqual(["view", "edit", "grade", "delete"])
+        expect(res.body).toEqual(["view", "edit", "grade", "delete-answer"])
       })
       .expect(200)
       .end(done)
@@ -1807,7 +1807,7 @@ describe("dashboard: get user abilities for course", () => {
           "view",
           "edit",
           "grade",
-          "delete",
+          "delete-answer",
           "download",
           "duplicate",
         ])

@@ -51,8 +51,6 @@ describe("Dashboard: when the status of a quiz answer is manually changed", () =
       quizAnswerId,
     )
 
-    console.log(logs)
-
     if (logs != null) {
       expect(logs[0].modifierId).toEqual(1234)
       expect(logs[0].operation).toEqual("teacher-accept")
@@ -71,7 +69,7 @@ describe("Dashboard: when the status of a quiz answer is manually changed", () =
     const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
       quizAnswerId,
     )
-    console.log(logs)
+
     if (logs != null) {
       expect(logs[1].modifierId).toEqual(1234)
       expect(logs[1].operation).toEqual("teacher-reject")

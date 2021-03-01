@@ -138,7 +138,7 @@ const answersRoutes = new Router<CustomState, CustomContext>({
   .delete("/:answerId", accessControl(), async ctx => {
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
-    await checkAccessOrThrow(ctx.state.user, courseId, "delete")
+    await checkAccessOrThrow(ctx.state.user, courseId, "delete-answer")
     const quizAnswer = await QuizAnswer.query().findById(answerId)
     if (quizAnswer.deleted) {
       ctx.body = quizAnswer

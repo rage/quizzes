@@ -1050,11 +1050,17 @@ class QuizAnswer extends mixin(BaseModel, [
           .andWhere("quiz_id", quizAnswer.quizId)
       )[0]
 
+      const newTries = userQuizState.tries > 0 ? userQuizState.tries - 1 : 0
+
       const updatedUserQuizState = await userQuizState
         .$query(trx)
         .updateAndFetch({
-          status: "open",
-          tries: userQuizState.tries > 0 ? userQuizState.tries - 1 : 0,
+          status:
+            newTries >=
+            (await Quiz.query(trx).findById(quizAnswer.quizId)).tries
+              ? "locked"
+              : "open",
+          tries: newTries,
           spamFlags: nextBestQuizAnswer
             ? (
                 await SpamFlag.query(trx).where(
