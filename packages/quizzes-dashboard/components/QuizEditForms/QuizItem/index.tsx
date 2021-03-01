@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { NormalizedItem } from "../../../types/NormalizedQuiz"
 import styled from "styled-components"
 import EssayContent from "./EssayContent"
@@ -17,6 +17,8 @@ import {
   decreasedItemOrder,
   increasedItemOrder,
 } from "../../../store/editor/items/itemAction"
+import { checkForChanges } from "../../../store/editor/editorActions"
+import { useTypedSelector } from "../../../store/store"
 
 const TypeWrapper = styled.div`
   display: flex;
@@ -36,7 +38,13 @@ interface QuizItemProps {
 }
 
 const QuizItem = ({ item }: QuizItemProps) => {
+  const store = useTypedSelector(state => state)
+
   const dispatch = useDispatch()
+  useEffect(() => {
+    dispatch(checkForChanges(store))
+  }, [store])
+
   return (
     <>
       <TypeWrapper>

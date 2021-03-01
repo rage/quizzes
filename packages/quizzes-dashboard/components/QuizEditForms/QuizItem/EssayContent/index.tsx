@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import styled from "styled-components"
 import { TextField, Button, Modal, Box, Fade } from "@material-ui/core"
 import { useDispatch } from "react-redux"
@@ -16,6 +16,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import { useTypedSelector } from "../../../../store/store"
 import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
+import { checkForChanges } from "../../../../store/editor/editorActions"
 import EssayModalContent from "./EssayModalContent"
 import { deletedItem } from "../../../../store/editor/editorActions"
 import MarkdownEditor from "../../../MarkdownEditor"
@@ -75,14 +76,19 @@ interface essayContentProps {
 }
 
 const EssayContent = ({ item }: essayContentProps) => {
+  console.log("💩 ~ file: index.tsx ~ line 79 ~ item", item)
   const quizId = useTypedSelector(state => state.editor.quizId)
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
+  console.log("💩 ~ file: index.tsx ~ line 81 ~ storeItem", storeItem)
   const variables = useTypedSelector(
     state => state.editor.itemVariables[item.id],
   )
+
   const dispatch = useDispatch()
+
   return (
     <>
+      <pre>{JSON.stringify(storeItem, null, 4)}</pre>
       <EditButtonWrapper>
         <EditItemButton
           onClick={() => dispatch(setAdvancedEditing(storeItem.id, true))}
@@ -134,7 +140,7 @@ const EssayContent = ({ item }: essayContentProps) => {
             fullWidth
             label="Min words"
             variant="outlined"
-            defaultValue={storeItem.minWords}
+            value={storeItem.minWords ?? ""}
             type="number"
             onChange={event =>
               dispatch(
@@ -148,7 +154,7 @@ const EssayContent = ({ item }: essayContentProps) => {
             fullWidth
             label="Max words"
             variant="outlined"
-            defaultValue={storeItem.maxWords}
+            value={storeItem.maxWords ?? ""}
             type="number"
             onChange={event =>
               dispatch(

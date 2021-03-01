@@ -202,7 +202,7 @@ const ScaleContent = ({ item }: scaleContentProps) => {
           error={!variables.validMin}
           helperText={!variables.validMin ? "invalid min value" : ""}
           label="min"
-          value={variables.scaleMin}
+          value={variables.scaleMin ?? ""}
           variant="outlined"
           type="number"
           onChange={event => handleMinValueChange(Number(event.target.value))}
@@ -211,7 +211,7 @@ const ScaleContent = ({ item }: scaleContentProps) => {
           error={!variables.validMax}
           helperText={!variables.validMax ? "invalid max value" : ""}
           label="max"
-          value={variables.scaleMax}
+          value={variables.scaleMax ?? ""}
           variant="outlined"
           type="number"
           onChange={event => handleMaxValueChange(Number(event.target.value))}

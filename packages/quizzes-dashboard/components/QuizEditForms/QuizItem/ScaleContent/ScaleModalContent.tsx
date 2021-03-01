@@ -109,7 +109,7 @@ export const ScaleModalContent = ({ item }: ScaleItemEditorModalProps) => {
           helperText={!variables.validMin ? "invalid min value" : ""}
           type="number"
           label="Min value"
-          value={variables.scaleMin}
+          value={variables.scaleMin ?? ""}
           fullWidth
           variant="outlined"
           onChange={event => handleMinValueChange(Number(event.target.value))}
@@ -121,7 +121,7 @@ export const ScaleModalContent = ({ item }: ScaleItemEditorModalProps) => {
           helperText={!variables.validMax ? "invalid max value" : ""}
           type="number"
           label="Max value"
-          value={variables.scaleMax}
+          value={variables.scaleMax ?? ""}
           fullWidth
           variant="outlined"
           onChange={event => handleMaxValueChange(Number(event.target.value))}
