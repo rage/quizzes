@@ -76,10 +76,8 @@ interface essayContentProps {
 }
 
 const EssayContent = ({ item }: essayContentProps) => {
-  console.log("💩 ~ file: index.tsx ~ line 79 ~ item", item)
   const quizId = useTypedSelector(state => state.editor.quizId)
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
-  console.log("💩 ~ file: index.tsx ~ line 81 ~ storeItem", storeItem)
   const variables = useTypedSelector(
     state => state.editor.itemVariables[item.id],
   )
