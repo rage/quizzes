@@ -102,6 +102,7 @@ export async function seed(knex: Knex): Promise<void> {
       language_id: "xx_XX",
       status: "submitted",
       correctness_coefficient: 1,
+      deleted: false,
     },
     {
       id: "444bc441-3c97-45a0-be7a-db1516539871",
@@ -110,6 +111,7 @@ export async function seed(knex: Knex): Promise<void> {
       language_id: "xx_XX",
       status: "submitted",
       correctness_coefficient: 0.75,
+      deleted: false,
     },
     {
       id: "08e91588-e1df-4497-8ec3-368cebeb1f79",
@@ -118,6 +120,7 @@ export async function seed(knex: Knex): Promise<void> {
       language_id: "xx_XX",
       status: "submitted",
       correctness_coefficient: 0.5,
+      deleted: false,
     },
     {
       id: "38140980-0bcb-4fec-b5a0-43c46312817b",

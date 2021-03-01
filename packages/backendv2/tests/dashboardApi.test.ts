@@ -898,6 +898,72 @@ describe("dashboard: get manual review answers", () => {
   })
 })
 
+describe("get deleted/not deleted answers only", () => {
+  beforeAll(async () => {
+    await safeSeed({
+      directory: "./database/seeds",
+      specific: "quizAnswerSoftDelete.ts",
+    })
+  })
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(() => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer PLEB_TOKEN") {
+          return [
+            200,
+            {
+              id: 1234,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer ADMIN_TOKEN") {
+          return [
+            200,
+            {
+              administrator: true,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("get only deleted answers", async () => {
+    const response = await request(app.callback())
+      .get(
+        "/api/v2/dashboard/answers/f98cd4b0-41b1-4a15-89a2-4c991ec67264/all?page=0&size=10&deleted=true",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+
+    expect(response.status).toEqual(200)
+    expect(response.body.results).toHaveLength(1)
+    response.body.results.forEach((answer: QuizAnswer) => {
+      expect(answer.deleted).toEqual(true)
+    })
+  })
+
+  test("get only not-deleted answers", async () => {
+    const response = await request(app.callback())
+      .get(
+        "/api/v2/dashboard/answers/f98cd4b0-41b1-4a15-89a2-4c991ec67264/all?page=0&size=10&notDeleted=true",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+
+    expect(response.status).toEqual(200)
+    expect(response.body.results).toHaveLength(3)
+    response.body.results.forEach((answer: QuizAnswer) => {
+      expect(answer.deleted).toEqual(false)
+    })
+  })
+})
+
 describe("dashboard: update manual review status", () => {
   beforeAll(async () => {
     await safeSeed(configA)
