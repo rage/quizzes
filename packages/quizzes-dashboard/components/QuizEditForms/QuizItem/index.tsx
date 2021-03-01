@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { NormalizedItem } from "../../../types/NormalizedQuiz"
 import styled from "styled-components"
 import EssayContent from "./EssayContent"
@@ -38,12 +38,7 @@ interface QuizItemProps {
 }
 
 const QuizItem = ({ item }: QuizItemProps) => {
-  const store = useTypedSelector(state => state)
-
   const dispatch = useDispatch()
-  useEffect(() => {
-    dispatch(checkForChanges(store))
-  }, [store])
 
   return (
     <>
