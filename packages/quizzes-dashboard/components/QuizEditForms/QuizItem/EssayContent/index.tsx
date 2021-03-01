@@ -88,7 +88,6 @@ const EssayContent = ({ item }: essayContentProps) => {
 
   return (
     <>
-      <pre>{JSON.stringify(storeItem, null, 4)}</pre>
       <EditButtonWrapper>
         <EditItemButton
           onClick={() => dispatch(setAdvancedEditing(storeItem.id, true))}
