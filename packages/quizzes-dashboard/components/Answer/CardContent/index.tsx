@@ -23,7 +23,7 @@ import AnswerDeletionDialog from "./AnswerDeletionDialog"
 
 export const ContentContainer = styled.div`
   display: flex !important;
-  margin-top: 1rem;
+  margin-bottom: 1rem;
   justify-content: space-between !important;
   width: 100%;
   align-items: center;
@@ -31,7 +31,6 @@ export const ContentContainer = styled.div`
 
 export const ButtonContainer = styled.div`
   display: flex !important;
-  margin-top: 1rem;
   justify-content: flex-end !important;
 `
 
@@ -144,7 +143,7 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
         answer={answer}
         setShowAnswerDeletionModal={setShowAnswerDeletionModal}
         showAnswerDeletionModal={showAnswerDeletionModal}
-      />{" "}
+      />
       <ContentContainer>
         <AnswerLink answer={answer} />
         <ButtonContainer>
