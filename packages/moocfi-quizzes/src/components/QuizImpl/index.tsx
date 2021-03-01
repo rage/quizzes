@@ -63,6 +63,7 @@ export interface QuizProps {
   customContent?: CustomContent
   fullInfoWithoutLogin?: boolean
   showZeroPointsInfo?: boolean
+  alternativeQuizLabel?: string
 }
 
 export type CustomContent = {
@@ -188,6 +189,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   fullInfoWithoutLogin,
   showZeroPointsInfo = false,
   children,
+  alternativeQuizLabel,
 }) => {
   const ref = useRef(null)
   const themeProvider = useContext(ThemeProviderContext)
@@ -380,7 +382,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       aria-label={quiz.title}
       role="form"
     >
-      <TopInfoBar />
+      <TopInfoBar alternativeQuizLabel={alternativeQuizLabel} />
       <div ref={ref} />
       {/*<Notification scrollRef={ref} />*/}
       <QuizContentWrapper disabled={quizDisabled || wrongLocale}>

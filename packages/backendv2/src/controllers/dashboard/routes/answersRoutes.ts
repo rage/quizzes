@@ -15,7 +15,7 @@ const answersRoutes = new Router<CustomState, CustomContext>({
   .post("/:answerId/status", accessControl(), async ctx => {
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
-    await checkAccessOrThrow(ctx.state.user, courseId, "edit")
+    await checkAccessOrThrow(ctx.state.user, courseId, "grade")
     const status = ctx.request.body.status
     ctx.body = await QuizAnswer.setManualReviewStatus(answerId, status)
   })
@@ -33,7 +33,7 @@ const answersRoutes = new Router<CustomState, CustomContext>({
       throw error
     }
 
-    await checkAccessOrThrow(ctx.state.user, courseId, "edit")
+    await checkAccessOrThrow(ctx.state.user, courseId, "grade")
     const status = ctx.request.body.status
     ctx.body = await QuizAnswer.setManualReviewStatusForMany(answerIds, status)
   })

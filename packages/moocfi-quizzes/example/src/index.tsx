@@ -94,6 +94,7 @@ const App = () => {
     <Quiz
       id={id.value}
       languageId={languageId.value}
+      alternativeQuizLabel={undefined}
       accessToken={accessToken.value}
       backendAddress={baseUrl.value}
       fullInfoWithoutLogin={showFullInfoWhenLoggedOut === "true"}
