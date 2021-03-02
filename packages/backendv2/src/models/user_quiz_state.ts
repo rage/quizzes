@@ -1,7 +1,7 @@
 import Quiz from "./quiz"
 import User from "./user"
 import QuizAnswer from "./quiz_answer"
-import Knex from "knex"
+import Knex, { Transaction } from "knex"
 import BaseModel from "./base_model"
 
 class UserQuizState extends BaseModel {
@@ -96,6 +96,16 @@ class UserQuizState extends BaseModel {
       })
       .where({ quiz_id: newQuiz.id })
   }
+
+  // public static async updateAwardedPoints(
+  //   maxPoints: number,
+  //   nextBestCorrectnessCoefficient: number,
+  //   trx: Transaction,
+  // ) {
+  //   await trx("user_quiz_state").update({
+  //     points_awarded: maxPoints * nextBestCorrectnessCoefficient,
+  //   })
+  // }
 }
 
 export default UserQuizState
