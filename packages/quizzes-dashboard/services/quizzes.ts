@@ -94,6 +94,8 @@ export const getAllAnswers = async (
   size: number,
   order: string,
   filters: string[],
+  deleted: boolean,
+  notDeleted: boolean,
 ): Promise<{ results: Answer[]; total: number }> => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -103,7 +105,7 @@ export const getAllAnswers = async (
     const response = (
       await api.get(
         `/answers/${quizId}/all?page=${page -
-          1}&size=${size}&order=${order}&filters=${filters}`,
+          1}&size=${size}&order=${order}&filters=${filters}&deleted=${deleted}&notDeleted=${notDeleted}`,
         config,
       )
     ).data
@@ -466,4 +468,16 @@ export const getQuizAnswerStatusChangeLog = async (answerId: string) => {
     return response
   }
   throw new Error()
+}
+
+export const deleteQuizAnswer = async (quizAnswerId: string) => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return await api.delete(`answers/${quizAnswerId}`, config)
+  } else {
+    throw new Error()
+  }
 }

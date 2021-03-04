@@ -42,6 +42,8 @@ export const useSearchResultsAllAnswers = (
   sortOrder: string,
   searchQuery: string,
   filterParameters: string[],
+  deleted: boolean,
+  notDeleted: boolean,
   token: string,
 ) => {
   const searchQueryProvided = !isEmpty(searchQuery)
@@ -54,6 +56,8 @@ export const useSearchResultsAllAnswers = (
           sortOrder,
           filterParameters,
           searchQuery,
+          deleted,
+          notDeleted,
           token,
         ]
       : null,
