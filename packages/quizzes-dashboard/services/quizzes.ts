@@ -225,6 +225,7 @@ export const logPlagiarismSuspicion = async (
 export const changeAnswerStatusForMany = async (
   answerIds: string[],
   status: string,
+  plagiarismSuspected: boolean,
 ): Promise<Answer[]> => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -232,7 +233,11 @@ export const changeAnswerStatusForMany = async (
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
     const response = (
-      await api.post(`/answers/status`, { status, answerIds }, config)
+      await api.post(
+        `/answers/status`,
+        { status, answerIds, plagiarismSuspected },
+        config,
+      )
     ).data
     return response
   }
