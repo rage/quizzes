@@ -30,6 +30,7 @@ afterAll(async () => {
 describe("Dashboard: when the status of a quiz answer is manually changed", () => {
   beforeAll(async () => {
     await safeSeed(configA)
+    await QuizAnswerStatusModification.query().delete()
   })
 
   afterAll(async () => {
@@ -40,13 +41,16 @@ describe("Dashboard: when the status of a quiz answer is manually changed", () =
 
   test("teacher accept operation results in operation being logged", async () => {
     const quizAnswerId = "0cb3e4de-fc11-4aac-be45-06312aa4677c"
+    // confirm the answer in question
     const res = await request(app.callback())
       .post(`/api/v2/dashboard/answers/${quizAnswerId}/status`)
       .set("Authorization", `bearer admin_token`)
       .set("Accept", "application/json")
       .send({ status: "confirmed" })
+
     expect(res.status).toEqual(200)
 
+    // fetch now updated logs
     const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
       quizAnswerId,
     )
@@ -68,6 +72,10 @@ describe("Dashboard: when the status of a quiz answer is manually changed", () =
 
     const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
       quizAnswerId,
+    )
+    console.log(
+      "💩 ~ file: logQuizAnswerStatusChange.test.ts ~ line 76 ~ logs",
+      logs,
     )
 
     if (logs != null) {
