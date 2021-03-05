@@ -9,6 +9,7 @@ export const AnswerLinkContainer = styled.div`
   display: flex;
   margin-left: 0.5rem;
   margin-right: 0.5rem;
+  width: 100%;
 `
 
 export interface AnswerLinkProps {

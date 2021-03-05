@@ -9,6 +9,7 @@ export interface Answer {
   userQuizState: UserQuizState
   itemAnswers: ItemAnswer[]
   peerReviews: PeerReview[]
+  deleted: boolean
 }
 
 export interface ItemAnswer {
@@ -20,7 +21,15 @@ export interface ItemAnswer {
   correct: boolean
   createdAt: string
   updatedAt: string
-  optionAnswers: any[]
+  optionAnswers: OptionAnswer[]
+}
+
+export interface OptionAnswer {
+  id: string
+  quizItemAnswerId: string
+  quizOptionId: string
+  createdAt: string
+  updatedAt: string
 }
 
 export interface PeerReview {

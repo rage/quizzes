@@ -105,7 +105,7 @@ export const broadcastQuizAnswerUpdated = async (
     service_id: process.env.SERVICE_ID || "",
     required_actions: messages,
     message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
-    attempted: true,
+    attempted: quizAnswer.deleted ? false : true,
   }
 
   if (course.moocfiId) {
