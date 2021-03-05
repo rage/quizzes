@@ -55,6 +55,14 @@ export const DebugDialog = ({ object }: DebugDialogProps) => {
   const handleEditorChanges = () => {
     if (!debugViewChanges) return
 
+    // check if JSON changes are valid
+    try {
+      JSON.parse(debugViewChanges as string)
+    } catch (err) {
+      setDebugViewChanges(null)
+      return
+    }
+
     // normalize quiz
     const normalizedUpdatedQuizData = normalize(
       debugViewChanges,
