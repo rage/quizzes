@@ -102,13 +102,11 @@ const Log = ({ answerId }: { answerId: string | undefined }) => {
               .sort(sortFunction)
               .map((log: IAnswerStatusChange, index: number) => {
                 const { operation, modifierId, createdAt } = log
-                const formattedOperationDate = createdAt
-                  .toLocaleString()
-                  .substring(0, 16)
-                  .replace("T", " ")
+                const dateUTC = new Date(createdAt).toUTCString() + " + 0"
+
                 return (
                   <TableRow key={index}>
-                    <TableCell>{formattedOperationDate}</TableCell>
+                    <TableCell>{dateUTC}</TableCell>
                     <TableCell>{operation}</TableCell>
                     <TableCell>{modifierId}</TableCell>
                   </TableRow>
