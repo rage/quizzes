@@ -38,7 +38,7 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
   const handleAcceptOrReject = async (
     answerId: string,
     status: string,
-    plagiarismSuspected: boolean,
+    plagiarismSuspected = false,
   ) => {
     try {
       const res = await changeAnswerStatus(
@@ -84,13 +84,13 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
       <ButtonFieldWrapper>
         <Button
           className="button-accept"
-          onClick={() => handleAcceptOrReject(answer.id, "confirmed", false)}
+          onClick={() => handleAcceptOrReject(answer.id, "confirmed")}
         >
           <Typography>Accept</Typography>
         </Button>
         <Button
           className="button-reject"
-          onClick={() => handleAcceptOrReject(answer.id, "rejected", false)}
+          onClick={() => handleAcceptOrReject(answer.id, "rejected")}
         >
           <Typography>Reject</Typography>
         </Button>
