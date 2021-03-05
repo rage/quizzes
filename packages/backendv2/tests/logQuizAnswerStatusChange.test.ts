@@ -73,14 +73,29 @@ describe("Dashboard: when the status of a quiz answer is manually changed", () =
     const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
       quizAnswerId,
     )
-    console.log(
-      "💩 ~ file: logQuizAnswerStatusChange.test.ts ~ line 76 ~ logs",
-      logs,
-    )
 
     if (logs != null) {
       expect(logs[1].modifierId).toEqual(1234)
       expect(logs[1].operation).toEqual("teacher-reject")
+    }
+  })
+
+  test("teacher suspect plagiarism operation results in operation being logged", async () => {
+    const quizAnswerId = "0cb3e4de-fc11-4aac-be45-06312aa4677c"
+    const res = await request(app.callback())
+      .post(`/api/v2/dashboard/answers/${quizAnswerId}/status`)
+      .set("Authorization", `bearer admin_token`)
+      .set("Accept", "application/json")
+      .send({ status: "rejected", plagiarismSuspected: true })
+    expect(res.status).toEqual(200)
+
+    const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
+      quizAnswerId,
+    )
+
+    if (logs != null) {
+      expect(logs[2].modifierId).toEqual(1234)
+      expect(logs[2].operation).toEqual("teacher-suspects-plagiarism")
     }
   })
 })
@@ -228,6 +243,92 @@ describe("Peer review acceptance or rejection", () => {
 
     if (logs) {
       expect(logs[0].operation).toEqual("peer-review-reject")
+    }
+  })
+})
+
+describe("When the status of answers are modified in batch", () => {
+  beforeAll(async () => {
+    await safeSeed(configA)
+    await safeSeed({
+      directory: "./database/seeds",
+      specific: "quizAnswerStatusChange.ts",
+    })
+  })
+
+  afterAll(async () => {
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    await QuizAnswerStatusModification.query().delete()
+    checkTmcCredentials()
+  })
+
+  test("manually accepting 2 answers should result in teacher-accept operation being logged for 2 answers", async () => {
+    const quizAnswerIds = [
+      "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      "1f5fd7e2-1d70-414c-8ef8-49a1de7ccbbf",
+    ]
+
+    await request(app.callback())
+      .post("/api/v2/dashboard/answers/status")
+      .set("Authorization", `bearer admin_token`)
+      .set("Accept", "application/json")
+      .send({ status: "confirmed", answerIds: quizAnswerIds })
+      .expect(200)
+
+    const logs = await QuizAnswerStatusModification.getAll()
+
+    if (logs != null) {
+      expect(logs[0].operation).toEqual("teacher-accept")
+      expect(logs[1].operation).toEqual("teacher-accept")
+    }
+  })
+
+  test("manually rejecting 2 answers should result in teacher-reject operation being logged for 2 answers", async () => {
+    const quizAnswerIds = [
+      "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      "1f5fd7e2-1d70-414c-8ef8-49a1de7ccbbf",
+    ]
+
+    await request(app.callback())
+      .post("/api/v2/dashboard/answers/status")
+      .set("Authorization", `bearer admin_token`)
+      .set("Accept", "application/json")
+      .send({ status: "rejected", answerIds: quizAnswerIds })
+      .expect(200)
+
+    const logs = await QuizAnswerStatusModification.getAll()
+
+    if (logs != null) {
+      expect(logs[0].operation).toEqual("teacher-reject")
+      expect(logs[1].operation).toEqual("teacher-reject")
+    }
+  })
+
+  test("manually suspecting 2 answers as plagiarism should result in teacher-suspects-plagiarism operation being logged for 2 answers", async () => {
+    const quizAnswerIds = [
+      "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      "1f5fd7e2-1d70-414c-8ef8-49a1de7ccbbf",
+    ]
+
+    await request(app.callback())
+      .post("/api/v2/dashboard/answers/status")
+      .set("Authorization", `bearer admin_token`)
+      .set("Accept", "application/json")
+      .send({
+        status: "rejected",
+        answerIds: quizAnswerIds,
+        plagiarismSuspected: true,
+      })
+      .expect(200)
+
+    const logs = await QuizAnswerStatusModification.getAll()
+
+    if (logs != null) {
+      expect(logs[0].operation).toEqual("teacher-suspects-plagiarism")
+      expect(logs[1].operation).toEqual("teacher-suspects-plagiarism")
     }
   })
 })
