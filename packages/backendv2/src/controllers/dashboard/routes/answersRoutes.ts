@@ -10,6 +10,17 @@ import {
   getCourseIdByQuizId,
 } from "../util"
 
+const getStatusChangeOperation = (
+  status: string,
+  plagiarismSuspected: boolean,
+) => {
+  return plagiarismSuspected
+    ? "teacher-suspects-plagiarism"
+    : status === "confirmed"
+    ? "teacher-accept"
+    : "teacher-reject"
+}
+
 const answersRoutes = new Router<CustomState, CustomContext>({
   prefix: "/answers",
 })
@@ -23,11 +34,7 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     const quizAnswer = await QuizAnswer.setManualReviewStatus(answerId, status)
 
     // log status change
-    const operation = plagiarismSuspected
-      ? "teacher-suspects-plagiarism"
-      : status === "confirmed"
-      ? "teacher-accept"
-      : "teacher-reject"
+    const operation = getStatusChangeOperation(status, plagiarismSuspected)
 
     await knex.transaction(
       async trx =>
@@ -43,12 +50,15 @@ const answersRoutes = new Router<CustomState, CustomContext>({
   })
 
   .post("/status", accessControl(), async ctx => {
-    const answerIds = ctx.request.body.answerIds
+    const { status, answerIds, plagiarismSuspected } = ctx.request.body
+    const modifierId = ctx.state.user.id
 
     if (!answerIds || !answerIds[0]) {
       throw new BadRequestError("No answer ids provided.")
     }
+
     let courseId
+
     try {
       courseId = await getCourseIdByAnswerId(answerIds[0])
     } catch (error) {
@@ -56,8 +66,24 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     }
 
     await checkAccessOrThrow(ctx.state.user, courseId, "grade")
-    const status = ctx.request.body.status
-    ctx.body = await QuizAnswer.setManualReviewStatusForMany(answerIds, status)
+    const quizAnswers = await QuizAnswer.setManualReviewStatusForMany(
+      answerIds,
+      status,
+    )
+
+    const operation = getStatusChangeOperation(status, plagiarismSuspected)
+
+    await knex.transaction(
+      async trx =>
+        await QuizAnswerStatusModification.logStatusChangeForMany(
+          answerIds,
+          operation,
+          trx,
+          modifierId,
+        ),
+    )
+
+    ctx.body = quizAnswers
   })
 
   .get("/:answerId", accessControl(), async ctx => {
