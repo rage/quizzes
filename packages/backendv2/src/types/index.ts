@@ -145,3 +145,11 @@ export type TPeerReviewGiven = {
   rejectedQuizAnswerIds: string[]
   answers: TPeerReviewQuestionAnswer[]
 }
+
+export type TStatusModificationOperation =
+  | "teacher-accept"
+  | "teacher-reject"
+  | "teacher-suspects-plagiarism"
+  | "peer-review-accept"
+  | "peer-review-reject"
+  | "peer-review-spam"
