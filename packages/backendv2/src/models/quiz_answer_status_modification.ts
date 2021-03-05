@@ -60,6 +60,20 @@ class QuizAnswerStatusModification extends BaseModel {
       }),
     )
   }
+
+  static async logStatusChangeForMany(
+    quizAnswerIds: [string],
+    operation: TStatusModificationOperation,
+    trx: Knex.Transaction,
+    modifierId?: number,
+  ) {
+    const logsToInsert = quizAnswerIds.map(quizAnswerId => ({
+      quizAnswerId,
+      modifierId,
+      operation,
+    }))
+    await this.query(trx).insert(logsToInsert)
+  }
 }
 
 export default QuizAnswerStatusModification
