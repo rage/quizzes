@@ -101,6 +101,7 @@ export interface Course {
   title: string
   body: string
   abbreviation: string
+  status: string
 }
 
 export interface PeerReviewQuestion {

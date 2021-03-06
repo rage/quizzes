@@ -7,8 +7,20 @@ import _ from "lodash"
 import DebugDialog from "./DebugDialog"
 import SkeletonLoader from "./Shared/SkeletonLoader"
 
-const StyledCard = styled(Card)`
+const StyledCard = styled(Card)<{ status: string }>`
   margin-bottom: 1rem;
+  background: ${props => {
+    if (props.status === "active") {
+      return "#b9f6ca !important"
+    }
+    if (props.status === "ended") {
+      return "#ffccbc !important"
+    }
+  }};
+`
+
+const StyledCardContent = styled(CardContent)`
+  display: flex !important;
 `
 
 const SortSelector = styled(TextField)`
@@ -34,6 +46,18 @@ const CourseLink = styled.a`
   color: white;
   text-decoration: none;
   cursor: pointer;
+`
+
+const QuizNameWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  width: 100%;
+`
+
+const QuizStatusWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  width: 100%;
 `
 
 interface CourseListProps {
@@ -87,8 +111,11 @@ const CourseList = ({ data, error }: CourseListProps) => {
       {courses.map(course => (
         <Link key={course.id} href={`/courses/${course.id}/listing`} passHref>
           <CourseLink>
-            <StyledCard key={course.id}>
-              <CardContent>{course.title || course.id}</CardContent>
+            <StyledCard key={course.id} status={course.status}>
+              <StyledCardContent>
+                <QuizNameWrapper>{course.title || course.id}</QuizNameWrapper>
+                <QuizStatusWrapper>{course.status}</QuizStatusWrapper>
+              </StyledCardContent>
             </StyledCard>
           </CourseLink>
         </Link>
