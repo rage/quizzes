@@ -62,6 +62,7 @@ export interface NormalizedItem {
   successMessage: string | null
   failureMessage: string | null
   sharedOptionFeedbackMessage: string | null
+  allAnswersCorrect: boolean
 }
 
 export interface NormalizedOption {

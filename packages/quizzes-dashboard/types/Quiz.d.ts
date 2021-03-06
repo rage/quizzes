@@ -45,6 +45,7 @@ export interface Item {
   successMessage: null
   failureMessage: null
   sharedOptionFeedbackMessage: null
+  allAnswersCorrect: boolean
 }
 
 export interface Option {

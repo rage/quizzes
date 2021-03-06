@@ -1,10 +1,21 @@
 import React from "react"
 import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import styled from "styled-components"
-import { Button, TextField, Modal, Fade, Box } from "@material-ui/core"
+import {
+  Button,
+  Modal,
+  Fade,
+  Box,
+  FormControlLabel,
+  FormGroup,
+  Switch,
+} from "@material-ui/core"
 import { useDispatch } from "react-redux"
 import { useTypedSelector } from "../../../../store/store"
-import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
+import {
+  editedQuizItemTitle,
+  toggledAllAnswersCorrect,
+} from "../../../../store/editor/items/itemAction"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faWindowClose,
@@ -69,11 +80,6 @@ const ModalButtonWrapper = styled.div`
   justify-content: flex-end;
 `
 
-const TitleWrapper = styled.div`
-  display: flex;
-  width: 100%;
-`
-
 const AddOptionButton = styled(Button)``
 
 const EditItemButton = styled(Button)``
@@ -135,6 +141,21 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
         }
         text={storeItem.title ?? ""}
       />
+      <QuizContent>
+        <FormGroup row>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={storeItem.allAnswersCorrect}
+                onChange={() =>
+                  dispatch(toggledAllAnswersCorrect(storeItem.id))
+                }
+              />
+            }
+            label="All answer correct"
+          />
+        </FormGroup>
+      </QuizContent>
       <QuizContentLineContainer>
         {storeItem.options.map(option => (
           <QuizContent key={option}>
@@ -142,7 +163,6 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
           </QuizContent>
         ))}
         <QuizContent>
-          {" "}
           <AddOptionButton
             title="add option"
             onClick={() => dispatch(createdNewOption(storeItem.id))}
