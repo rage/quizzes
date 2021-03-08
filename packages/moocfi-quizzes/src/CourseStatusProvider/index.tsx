@@ -362,19 +362,18 @@ const transformData = (
       section.exercises_total += 1
       const answer = exercise.exercise_completions[0]
       if (answer) {
-        section.exercises_completed = answer.completed
-          ? section.exercises_completed + 1
-          : section.exercises_completed
-        const requiredActions = answer.exercise_completion_required_actions.map(
-          rao => rao.value,
-        )
-        section.required_actions = section.required_actions.concat(
-          requiredActions,
-        )
-        requiredActions.forEach(ra => distinctActions.add(ra))
-        exercise_completions = answer.completed
-          ? exercise_completions + 1
-          : exercise_completions
+        if (answer.completed) {
+          section.exercises_completed += 1
+          exercise_completions += 1
+        } else {
+          const requiredActions = answer.exercise_completion_required_actions.map(
+            rao => rao.value,
+          )
+          section.required_actions = section.required_actions.concat(
+            requiredActions,
+          )
+          requiredActions.forEach(ra => distinctActions.add(ra))
+        }
         answers.push(answer)
       }
     }
