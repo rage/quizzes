@@ -27,15 +27,9 @@ const TitleIcon = styled(FontAwesomeIcon)`
 `
 
 const QuizItems = () => {
-  const dispatch = useDispatch()
-  const store = useTypedSelector(state => state)
   const storeItems = Object.values(
     useTypedSelector(state => state.editor.items),
   )
-
-  useEffect(() => {
-    dispatch(checkForChanges(store))
-  }, [store])
 
   storeItems.sort((item1, item2) => item1.order - item2.order)
   return (

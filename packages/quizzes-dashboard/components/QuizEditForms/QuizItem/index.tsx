@@ -37,6 +37,7 @@ interface QuizItemProps {
 
 const QuizItem = ({ item }: QuizItemProps) => {
   const dispatch = useDispatch()
+
   return (
     <>
       <TypeWrapper>

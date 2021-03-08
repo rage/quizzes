@@ -57,7 +57,7 @@ export const EssayModalContent = ({ item }: ModalContentProps) => {
           fullWidth
           label="Max words"
           variant="outlined"
-          defaultValue={item.maxWords}
+          value={item.maxWords ?? ""}
           type="number"
           onChange={event =>
             dispatch(editedItemMaxWords(item.id, Number(event.target.value)))
@@ -67,7 +67,7 @@ export const EssayModalContent = ({ item }: ModalContentProps) => {
           fullWidth
           label="Min words"
           variant="outlined"
-          defaultValue={item.minValue}
+          value={item.minValue ?? ""}
           type="number"
           onChange={event =>
             dispatch(editedItemMinWords(item.id, Number(event.target.value)))
