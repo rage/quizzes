@@ -61,4 +61,23 @@ describe("general: course progress", () => {
       .end(done)
   })
 
+  test("returns quiz titles on request", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/quiz-titles"
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(200)
+      .end(done)
+  })
+
+  test("returns course progress on request", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/progress"
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(200)
+      .end(done)
+  })
 })
