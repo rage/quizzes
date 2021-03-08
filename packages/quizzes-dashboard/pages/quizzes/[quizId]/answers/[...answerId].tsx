@@ -102,8 +102,9 @@ const Log = ({ answerId }: { answerId: string | undefined }) => {
               .sort(sortFunction)
               .map((log: IAnswerStatusChange, index: number) => {
                 const { operation, modifierId, createdAt } = log
-                const dateUTC = new Date(createdAt).toUTCString() + " + 0"
-
+                const dateUTC = new Date(createdAt)
+                  .toUTCString()
+                  .replace("GMT", "(UTC + 0)")
                 return (
                   <TableRow key={index}>
                     <TableCell>{dateUTC}</TableCell>
