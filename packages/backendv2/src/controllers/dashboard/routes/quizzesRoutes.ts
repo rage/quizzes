@@ -130,7 +130,7 @@ const quizzesRoutes = new Router<CustomState, CustomContext>({
       const cachedToken = await redis.client.get(userId)
 
       if (cachedToken === downloadToken) {
-        const stream = await Quiz.getQuizInfo(quizId)
+        const stream = await Quiz.getPeerReviewInfo(quizId)
         ctx.response.set("Content-Type", "text/csv")
         ctx.response.attachment(
           `quiz-peer_review-info-${quizName}-${courseName}-${isoDate}.csv`,
@@ -180,7 +180,7 @@ const quizzesRoutes = new Router<CustomState, CustomContext>({
     if (downloadToken && redis.client) {
       const cachedToken = await redis.client.get(userId)
       if (cachedToken === downloadToken) {
-        const stream = await Quiz.getQuizInfo(quizId)
+        const stream = await Quiz.getQuizAnswerInfo(quizId)
         ctx.response.set("Content-Type", "text/csv")
         ctx.response.attachment(
           `quiz-answer-info-${quizName}-${courseName}-${isoDate}.csv`,
