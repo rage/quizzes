@@ -215,6 +215,7 @@ export const input = {
     title: "edited title",
     abbreviation: "edited abbreviation",
     languageId: "aa_BB",
+    status: "ended",
   },
 }
 
@@ -1213,7 +1214,7 @@ export const validation = {
     title: "edited title",
     body: "course",
     abbreviation: "edited abbreviation",
-    status: "active",
+    status: "ended",
   },
   quizForWidget1: {
     quiz: {
