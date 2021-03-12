@@ -6,17 +6,11 @@ import { Course } from "../types/Quiz"
 import _ from "lodash"
 import DebugDialog from "./DebugDialog"
 import SkeletonLoader from "./Shared/SkeletonLoader"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faCircle } from "@fortawesome/free-solid-svg-icons"
 
-const StyledCard = styled(Card)<{ status: string }>`
+const StyledCard = styled(Card)`
   margin-bottom: 1rem;
-  background: ${props => {
-    if (props.status === "active") {
-      return "#b9f6ca !important"
-    }
-    if (props.status === "ended") {
-      return "#ffccbc !important"
-    }
-  }};
 `
 
 const StyledCardContent = styled(CardContent)`
@@ -51,13 +45,19 @@ const CourseLink = styled.a`
 const QuizNameWrapper = styled.div`
   display: flex;
   justify-content: flex-start;
-  width: 100%;
+  width: 80%;
 `
 
 const QuizStatusWrapper = styled.div`
   display: flex;
+  justify-content: center;
+  width: 15%;
+`
+
+const StatusCircleContainer = styled.div`
+  display: flex;
   justify-content: flex-end;
-  width: 100%;
+  width: 5%;
 `
 
 interface CourseListProps {
@@ -111,9 +111,15 @@ const CourseList = ({ data, error }: CourseListProps) => {
       {courses.map(course => (
         <Link key={course.id} href={`/courses/${course.id}/listing`} passHref>
           <CourseLink>
-            <StyledCard key={course.id} status={course.status}>
+            <StyledCard key={course.id}>
               <StyledCardContent>
                 <QuizNameWrapper>{course.title || course.id}</QuizNameWrapper>
+                <StatusCircleContainer>
+                  <FontAwesomeIcon
+                    icon={faCircle}
+                    color={course.status === "active" ? "green" : "red"}
+                  />
+                </StatusCircleContainer>
                 <QuizStatusWrapper>{course.status}</QuizStatusWrapper>
               </StyledCardContent>
             </StyledCard>
