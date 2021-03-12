@@ -805,6 +805,7 @@ export const validation = {
     title: "course 1",
     body: "course",
     abbreviation: "course",
+    status: "active",
     createdAt: expect.stringMatching(dateTime),
     updatedAt: expect.stringMatching(dateTime),
   },
@@ -823,6 +824,7 @@ export const validation = {
     title: "course 2",
     body: "course",
     abbreviation: "course",
+    status: "active",
     createdAt: expect.stringMatching(dateTime),
     updatedAt: expect.stringMatching(dateTime),
   },
@@ -1165,6 +1167,7 @@ export const validation = {
     title: "course 1",
     body: "course",
     abbreviation: "course",
+    status: "active",
   },
   duplicateCourse: {
     success: true,
@@ -1210,6 +1213,7 @@ export const validation = {
     title: "edited title",
     body: "course",
     abbreviation: "edited abbreviation",
+    status: "active",
   },
   quizForWidget1: {
     quiz: {
@@ -1340,6 +1344,7 @@ export const validation = {
         title: "course 1",
         body: "course",
         abbreviation: "course",
+        status: "active",
       },
     },
     quizAnswer: {
