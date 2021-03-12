@@ -1,6 +1,14 @@
 import React, { useState } from "react"
 import styled from "styled-components"
-import { Card, CardContent, TextField, MenuItem } from "@material-ui/core"
+import {
+  Card,
+  CardContent,
+  TextField,
+  MenuItem,
+  FormGroup,
+  FormControlLabel,
+  Switch,
+} from "@material-ui/core"
 import Link from "next/link"
 import { Course } from "../types/Quiz"
 import _ from "lodash"
@@ -68,6 +76,8 @@ interface CourseListProps {
 const CourseList = ({ data, error }: CourseListProps) => {
   const [sortBy, setSortBy] = useState("title")
   const [sortOrder, setSortOrder] = useState("asc")
+  const [showActiveCourses, setShowActiveCourses] = useState(true)
+  const [showEndedCourses, setShowEndedCourses] = useState(false)
 
   if (error) {
     return <div>Error while fetching courses.</div>
@@ -79,11 +89,40 @@ const CourseList = ({ data, error }: CourseListProps) => {
   if (sortOrder === "desc") {
     order = "desc"
   }
-  const courses = _.orderBy(data, [sortBy], [order])
+  const statusFilters = [
+    ...(showActiveCourses ? ["active"] : []),
+    ...(showEndedCourses ? ["ended"] : []),
+  ]
+  const courses = _.chain(data)
+    .filter(course => {
+      return statusFilters.includes(course.status)
+    })
+    .orderBy([sortBy], [order])
+    .value()
 
   return (
     <>
       <OptionWrapper>
+        <FormGroup row>
+          <FormControlLabel
+            label="show active"
+            control={
+              <Switch
+                checked={showActiveCourses}
+                onChange={event => setShowActiveCourses(event.target.checked)}
+              ></Switch>
+            }
+          ></FormControlLabel>
+          <FormControlLabel
+            label="show ended"
+            control={
+              <Switch
+                checked={showEndedCourses}
+                onChange={event => setShowEndedCourses(event.target.checked)}
+              ></Switch>
+            }
+          ></FormControlLabel>
+        </FormGroup>
         <SortSelector
           variant="outlined"
           select
