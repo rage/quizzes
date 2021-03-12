@@ -139,21 +139,6 @@ const MultipleChoiceContent = ({ item }: multipleChoiceContentProps) => {
         }
         text={storeItem.title ?? ""}
       />
-      <QuizContent>
-        <FormGroup row>
-          <FormControlLabel
-            control={
-              <Switch
-                checked={storeItem.allAnswersCorrect}
-                onChange={() =>
-                  dispatch(toggledAllAnswersCorrect(storeItem.id))
-                }
-              />
-            }
-            label="All answer correct"
-          />
-        </FormGroup>
-      </QuizContent>
       <QuizContentLineContainer>
         {storeItem.options.map(option => (
           <QuizContent key={option}>

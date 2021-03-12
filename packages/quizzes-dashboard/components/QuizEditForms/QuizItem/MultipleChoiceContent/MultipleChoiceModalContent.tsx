@@ -6,6 +6,7 @@ import {
   FormControlLabel,
   Checkbox,
   Button,
+  Switch,
 } from "@material-ui/core"
 import {
   editedQuizItemTitle,
@@ -14,6 +15,7 @@ import {
   editedSharedOptionsFeedbackMessage,
   editedItemSuccessMessage,
   editedItemFailureMessage,
+  toggledAllAnswersCorrect,
 } from "../../../../store/editor/items/itemAction"
 import { useTypedSelector } from "../../../../store/store"
 import { useDispatch } from "react-redux"
@@ -27,7 +29,7 @@ import MarkdownEditor from "../../../MarkdownEditor"
 
 const ModalContent = styled.div`
   display: flex;
-  padding: 1rem;
+  padding: 0.5rem;
   justify-content: center;
   @media only screen and (max-width: 600px) {
     width: 100%;
@@ -43,7 +45,7 @@ const ModalContentTitleWrapper = styled.div`
 `
 
 const ModalContentOptionWrapper = styled.div`
-  padding: 1rem;
+  padding: 0.5rem;
   display: flex !important;
   justify-content: space-evenly !important;
   @media only screen and (max-width: 600px) {
@@ -52,7 +54,10 @@ const ModalContentOptionWrapper = styled.div`
   }
 `
 
-const AddOptionButton = styled(Button)``
+const AllAnswersCorrectField = styled.div`
+  display: flex;
+  width: 100%;
+`
 
 interface EditorModalProps {
   item: NormalizedItem
@@ -114,12 +119,29 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
         />
       </ModalContent>
       <ModalContent>
-        <AddOptionButton
+        <AllAnswersCorrectField>
+          <FormGroup row>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={storeItem.allAnswersCorrect}
+                  onChange={() =>
+                    dispatch(toggledAllAnswersCorrect(storeItem.id))
+                  }
+                />
+              }
+              label="All answer correct"
+            />
+          </FormGroup>
+        </AllAnswersCorrectField>
+      </ModalContent>
+      <ModalContent>
+        <Button
           title="add option"
           onClick={() => dispatch(createdNewOption(storeItem.id))}
         >
           <FontAwesomeIcon icon={faPlus} size="2x" color="blue" />
-        </AddOptionButton>
+        </Button>
       </ModalContent>
       <ModalContentOptionWrapper>
         {storeItem.options.map(option => (
