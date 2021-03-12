@@ -27,7 +27,7 @@ export const TabNavigator = () => {
   const pathname = `/quizzes/${quizId}`
 
   /* tokens passed to hooks are for swr caching  */
-  const { quiz, quizLoading, quizError } = useQuiz(quizId, "quiz")
+  const { quiz, quizLoading, quizError } = useQuiz(quizId, `quiz-${quizId}}`)
   const { course, courseLoading, courseError } = useCourse(
     quiz?.courseId ?? "",
     "course",

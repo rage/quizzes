@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import styled from "styled-components"
 import {
@@ -27,6 +27,7 @@ import MultipleChoiceModalContent from "./MultipleChoiceModalContent"
 import MultipleChoiceButton from "./MultiplChoiceButton"
 import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
 import {
+  checkForChanges,
   createdNewOption,
   deletedItem,
 } from "../../../../store/editor/editorActions"
@@ -80,15 +81,11 @@ const ModalButtonWrapper = styled.div`
   justify-content: flex-end;
 `
 
-const AddOptionButton = styled(Button)``
-
-const EditItemButton = styled(Button)``
-
-interface multiplChoiceContentProps {
+interface multipleChoiceContentProps {
   item: NormalizedItem
 }
 
-const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
+const MultipleChoiceContent = ({ item }: multipleChoiceContentProps) => {
   const quizId = useTypedSelector(state => state.editor.quizId)
   const storeOptions = useTypedSelector(state => state.editor.options)
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
@@ -96,15 +93,16 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
     state => state.editor.itemVariables[item.id],
   )
   const dispatch = useDispatch()
+
   return (
     <>
       <EditButtonWrapper>
-        <EditItemButton
+        <Button
           onClick={() => dispatch(setAdvancedEditing(storeItem.id, true))}
           title="edit item"
         >
           <FontAwesomeIcon icon={faPen} size="2x"></FontAwesomeIcon>
-        </EditItemButton>
+        </Button>
       </EditButtonWrapper>
       <StyledModal
         open={variables.advancedEditing}
@@ -163,12 +161,12 @@ const MultipleChoiceContent = ({ item }: multiplChoiceContentProps) => {
           </QuizContent>
         ))}
         <QuizContent>
-          <AddOptionButton
+          <Button
             title="add option"
             onClick={() => dispatch(createdNewOption(storeItem.id))}
           >
             <FontAwesomeIcon icon={faPlus} size="2x" color="blue" />
-          </AddOptionButton>
+          </Button>
         </QuizContent>
       </QuizContentLineContainer>
     </>
