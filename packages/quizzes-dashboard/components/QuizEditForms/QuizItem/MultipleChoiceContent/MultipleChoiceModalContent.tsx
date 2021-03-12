@@ -130,7 +130,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
                   }
                 />
               }
-              label="All answer correct"
+              label="All answers correct"
             />
           </FormGroup>
         </AllAnswersCorrectField>

@@ -12,10 +12,7 @@ import {
 } from "@material-ui/core"
 import { useDispatch } from "react-redux"
 import { useTypedSelector } from "../../../../store/store"
-import {
-  editedQuizItemTitle,
-  toggledAllAnswersCorrect,
-} from "../../../../store/editor/items/itemAction"
+import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faWindowClose,
