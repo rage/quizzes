@@ -83,9 +83,9 @@ class UserCoursePartState extends BaseModel {
       const userCoursePartStateUpsertObjects = parts.map(
         ({ course_part, points_awarded, total_points }) => {
           return {
-            userId,
-            courseId,
-            coursePart: course_part,
+            user_id: userId,
+            course_id: courseId,
+            course_part: course_part,
             score: points_awarded || 0,
             progress: total_points === 0 ? 0 : points_awarded / total_points,
           }
