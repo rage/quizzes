@@ -14,6 +14,7 @@ export default (props: SubmitButtonProps) => {
     text-transform: uppercase;
     background: #0d1212;
     color: #f5f9fb;
+    font-family: Poppins;
 
     :disabled {
       background: #b7b6bc;

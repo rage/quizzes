@@ -56,8 +56,10 @@ const ChoiceButton = styled(UpdatedStyledButton)<ButtonProps>`
   border-radius: 4px;
   color: rgba(0, 0, 0, 0.6);
   font-weight: 500;
+  padding: 1rem 4rem;
   border: 2px solid #dce1e4;
   transition: all 0.15s ease-in;
+  font-family: Poppins;
 
   &:hover {
     color: rgba(0, 0, 0, 0.9);

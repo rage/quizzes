@@ -31,6 +31,7 @@ import SubmitButton from "./SubmitButton"
 import LoginPrompt from "./LoginPrompt"
 import MarkdownText from "../MarkdownText"
 import SimpleErrorBoundary from "./SimpleErrorBoundary"
+import Notification from "../Notification"
 import { BoldTypographyMedium } from "../styleComponents"
 
 import ThemeProviderContext from "../../contexes/themeProviderContext"
@@ -72,7 +73,8 @@ export type CustomContent = {
 }
 
 const QuizItemContainerDiv = styled.div`
-  padding-bottom: 20px;
+
+  padding-bottom: 2px;
 `
 
 export interface IItemWrapperProps {
@@ -383,7 +385,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
     >
       <TopInfoBar />
       <div ref={ref} />
-      {/*<Notification scrollRef={ref} />*/}
       <QuizContentWrapper disabled={quizDisabled || wrongLocale}>
         <UpperContent providedStyles={themeProvider.upperContentStyles}>
           <Deadline deadline={quiz.deadline} />
@@ -457,7 +458,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                           style={{
                             color: "rgba(0,0,0,0.6)",
                             fontSize: "0.9rem",
-                            fontWeight: "bold",
+                            fontWeight: "normal",
+                            fontFamily: 'Poppins'
                           }}
                         >
                           {quiz.triesLimited
@@ -479,6 +481,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
             </>
           )}
         </LowerContentWrapper>
+        <Notification scrollRef={ref} />
       </QuizContentWrapper>
       {customContent && customContent.WrongLocale}
       {quizDisabled && (
