@@ -79,18 +79,19 @@ class UserCoursePartState extends BaseModel {
         .where("course_id", courseId)
         .andWhereNot("part", 0)
         .groupBy("part")
-      const userCoursePartStates = parts.map(
+
+      const userCoursePartStateUpsertObjects = parts.map(
         ({ course_part, points_awarded, total_points }) => {
-          return this.fromJson({
+          return {
             userId,
             courseId,
             coursePart: course_part,
             score: points_awarded || 0,
             progress: total_points === 0 ? 0 : points_awarded / total_points,
-          })
+          }
         },
       )
-      await this.query(trx).insert(userCoursePartStates)
+      await this.query(trx).upsertGraph(userCoursePartStateUpsertObjects)
     } else {
       const { pointsAwarded, totalPoints } = (
         await trx("quiz")
