@@ -23,6 +23,7 @@ const StyledCard = styled(Card)`
 
 const StyledCardContent = styled(CardContent)`
   display: flex !important;
+  align-items: baseline;
 `
 
 const SortSelector = styled(TextField)`
@@ -53,19 +54,25 @@ const CourseLink = styled.a`
 const QuizNameWrapper = styled.div`
   display: flex;
   justify-content: flex-start;
-  width: 80%;
+  width: 85%;
+  align-items: center;
 `
 
 const QuizStatusWrapper = styled.div`
   display: flex;
-  justify-content: center;
+  justify-content: flex-end;
   width: 15%;
+  align-items: center;
 `
 
 const StatusCircleContainer = styled.div`
   display: flex;
-  justify-content: flex-end;
-  width: 5%;
+  margin-right: 0.5rem;
+`
+
+const StatusTextWrapper = styled.div`
+  display: flex;
+  width: 50%;
 `
 
 interface CourseListProps {
@@ -153,13 +160,15 @@ const CourseList = ({ data, error }: CourseListProps) => {
             <StyledCard key={course.id}>
               <StyledCardContent>
                 <QuizNameWrapper>{course.title || course.id}</QuizNameWrapper>
-                <StatusCircleContainer>
-                  <FontAwesomeIcon
-                    icon={faCircle}
-                    color={course.status === "active" ? "green" : "red"}
-                  />
-                </StatusCircleContainer>
-                <QuizStatusWrapper>{course.status}</QuizStatusWrapper>
+                <QuizStatusWrapper>
+                  <StatusCircleContainer>
+                    <FontAwesomeIcon
+                      icon={faCircle}
+                      color={course.status === "active" ? "green" : "red"}
+                    />
+                  </StatusCircleContainer>
+                  <StatusTextWrapper>{course.status}</StatusTextWrapper>
+                </QuizStatusWrapper>
               </StyledCardContent>
             </StyledCard>
           </CourseLink>
