@@ -1,10 +1,7 @@
 import * as React from "react"
-import { useContext, useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState, useReducer } from "react"
 import {
-  CourseProgressProviderContext,
   CourseProgressProviderInterface,
-  CourseStatusProviderContext,
-  CourseStatusProviderInterface,
   ProgressData,
   ExerciseCompletion,
   RequiredAction,
@@ -12,7 +9,10 @@ import {
   ProgressResponse,
   ExerciseCompletionsBySection,
   CourseResponse,
-} from "../contexes/courseStatusProviderContext"
+  CourseProgressProvider,
+  useCourseProgressState,
+  setAll,
+} from "../contexes/courseProgressProviderContext"
 import { PointsByGroup } from "../modelTypes"
 import { languageOptions } from "../utils/languages"
 import { ToastContainer, toast, TypeOptions } from "react-toastify"
@@ -22,6 +22,12 @@ import {
 } from "../services/courseProgressService"
 
 import "react-toastify/dist/ReactToastify.css"
+
+import { useOnScreen } from "./UseOnScreen.js"
+import {
+  CourseStatusProviderContext,
+  CourseStatusProviderInterface,
+} from "../contexes/courseStatusProviderContext"
 
 interface CourseStatusProviderProps {
   accessToken: string
@@ -238,7 +244,6 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
     const progress: CourseProgressProviderInterface = {
       error,
       loading,
-      // notifyError,
       courseProgressData: data,
     }
 
@@ -249,7 +254,7 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
     }
 
     return (
-      <CourseProgressProviderContext.Provider value={progress}>
+      <CourseProgressProvider courseProgress={progress}>
         <CourseStatusProviderContext.Provider value={status}>
           <ToastContainer
             enableMultiContainer
@@ -268,7 +273,7 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
           />
           {children}
         </CourseStatusProviderContext.Provider>
-      </CourseProgressProviderContext.Provider>
+      </CourseProgressProvider>
     )
   },
 )
@@ -278,8 +283,25 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
 ): React.FunctionComponent<P & CourseProgressProviderInterface> => (
   props: P,
 ) => {
-  const injectProps = useContext(CourseProgressProviderContext)
-  return <Component {...props} {...injectProps} />
+  const { state, dispatch } = useCourseProgressState()
+
+  // Ref for the wrapped element
+  const ref: any = useRef<HTMLElement>()
+
+  // Hook informs us when we should re-fetch data
+  const progressShouldUpdate = useOnScreen(ref)
+
+  useEffect(() => {
+    if (progressShouldUpdate) {
+      // fetchProgressData()
+    }
+  }, [progressShouldUpdate])
+
+  return (
+    <div ref={ref}>
+      <Component {...props} {...state} />
+    </div>
+  )
 }
 
 /*const transformData2 = (data: any): ProgressData => {
