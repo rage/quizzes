@@ -392,7 +392,6 @@ class QuizAnswer extends mixin(BaseModel, [
   public static async setManualReviewStatus(
     answerId: string,
     status: QuizAnswerStatus,
-    modifierId?: number,
   ) {
     if (!["confirmed", "rejected"].includes(status)) {
       throw new BadRequestError("invalid status")
@@ -421,18 +420,6 @@ class QuizAnswer extends mixin(BaseModel, [
       }
 
       quizAnswer = await quizAnswer.$query(trx).patchAndFetch({ status })
-
-      // log quiz answer status change
-      if (modifierId !== null) {
-        const operation =
-          status === "confirmed" ? "teacher-accept" : "teacher-reject"
-        await QuizAnswerStatusModification.logStatusChange(
-          answerId,
-          operation,
-          trx,
-          modifierId,
-        )
-      }
 
       await UserQuizState.upsert(userQuizState, trx)
       await UserCoursePartState.update(
