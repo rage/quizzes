@@ -8,4 +8,5 @@ export interface EditCoursePayloadFields {
   title?: string
   abbreviation?: string
   languageId?: string
+  status?: string
 }

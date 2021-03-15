@@ -86,6 +86,9 @@ export const EditDetailsForm = ({
       ...(values.moocfiId !== syncedInitialValues.moocfiId && {
         moocfiId: values.moocfiId,
       }),
+      ...(values.status !== syncedInitialValues.status && {
+        status: values.status,
+      }),
     }
 
     if (!_.isEmpty(changedProperties)) {
@@ -101,6 +104,7 @@ export const EditDetailsForm = ({
         courseId: courseEdited.id,
         languageId: courseEdited.languageId,
         moocfiId: courseEdited.moocfiId,
+        status: courseEdited.status,
       }
 
       // see: https://formik.org/docs/api/formik
@@ -142,17 +146,23 @@ export const EditDetailsForm = ({
           courseId: string()
             .uuid()
             .required(),
+
           moocfiId: string().uuid(),
+
           title: string()
             .required()
             .min(3),
+
           abbreviation: string()
             .required()
             .min(3),
+
           languageId: string()
             .required()
             .min(5)
             .max(5),
+
+          status: string().required(),
         })}
         initialValues={syncedInitialValues}
         onSubmit={(values, actions) => {
@@ -199,6 +209,14 @@ export const EditDetailsForm = ({
                       {id}{" "}
                     </MenuItem>
                   ))}
+              </Field>
+              <Field name="status" label="status" as={TextField} select>
+                <MenuItem key="active" value="active">
+                  active
+                </MenuItem>
+                <MenuItem key="ended" value="ended">
+                  ended
+                </MenuItem>
               </Field>
             </FieldSet>
             <ButtonWrapper>
@@ -252,6 +270,7 @@ const EditCourseDetails = () => {
     title: courseData?.course.title || undefined,
     abbreviation: courseData?.course.abbreviation || undefined,
     languageId: courseData?.course.languageId || undefined,
+    status: courseData?.course.status || undefined,
   }
 
   const languageIds = languageData.map(l => l.id) || []

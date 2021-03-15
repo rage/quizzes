@@ -1,7 +1,15 @@
 import React, { useEffect } from "react"
 import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import styled from "styled-components"
-import { Button, Modal, Fade, Box } from "@material-ui/core"
+import {
+  Button,
+  Modal,
+  Fade,
+  Box,
+  FormControlLabel,
+  FormGroup,
+  Switch,
+} from "@material-ui/core"
 import { useDispatch } from "react-redux"
 import { useTypedSelector } from "../../../../store/store"
 import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
@@ -135,7 +143,6 @@ const MultipleChoiceContent = ({ item }: multipleChoiceContentProps) => {
           </QuizContent>
         ))}
         <QuizContent>
-          {" "}
           <Button
             title="add option"
             onClick={() => dispatch(createdNewOption(storeItem.id))}
