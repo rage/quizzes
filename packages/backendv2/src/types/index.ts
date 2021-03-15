@@ -98,6 +98,7 @@ export interface EditCoursePayloadFields {
   languageId?: string
   createdAt?: string
   updatedAt?: string
+  status?: string
 }
 
 export interface IPeerReview {

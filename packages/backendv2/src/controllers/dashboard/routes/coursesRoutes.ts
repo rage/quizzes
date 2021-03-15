@@ -111,7 +111,7 @@ const coursesRoutes = new Router<CustomState, CustomContext>({
       throw new BadRequestError("No edited properties provided.")
     }
 
-    const payloadWithoutMoocfiId = _.omit(payload, ["moocfiId"])
+    const payloadWithoutMoocfiId = _.omit(payload, ["moocfiId", "status"])
 
     await CourseTranslation.updateCourseProperties(
       courseId,
@@ -127,6 +127,16 @@ const coursesRoutes = new Router<CustomState, CustomContext>({
       }
     }
 
+    if (
+      payload.status &&
+      (await Course.getFlattenedById(courseId)).status !== payload.status
+    ) {
+      try {
+        await Course.updateCourseActiveStatus(courseId, payload.status)
+      } catch (error) {
+        throw error
+      }
+    }
     ctx.body = await Course.getFlattenedById(courseId)
   })
 

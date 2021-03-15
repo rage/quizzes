@@ -1,14 +1,29 @@
 import React, { useState } from "react"
 import styled from "styled-components"
-import { Card, CardContent, TextField, MenuItem } from "@material-ui/core"
+import {
+  Card,
+  CardContent,
+  TextField,
+  MenuItem,
+  FormGroup,
+  FormControlLabel,
+  Switch,
+} from "@material-ui/core"
 import Link from "next/link"
 import { Course } from "../types/Quiz"
 import _ from "lodash"
 import DebugDialog from "./DebugDialog"
 import SkeletonLoader from "./Shared/SkeletonLoader"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faCircle } from "@fortawesome/free-solid-svg-icons"
 
 const StyledCard = styled(Card)`
   margin-bottom: 1rem;
+`
+
+const StyledCardContent = styled(CardContent)`
+  display: flex !important;
+  align-items: baseline;
 `
 
 const SortSelector = styled(TextField)`
@@ -36,6 +51,30 @@ const CourseLink = styled.a`
   cursor: pointer;
 `
 
+const QuizNameWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  width: 85%;
+  align-items: center;
+`
+
+const QuizStatusWrapper = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  width: 15%;
+  align-items: center;
+`
+
+const StatusCircleContainer = styled.div`
+  display: flex;
+  margin-right: 0.5rem;
+`
+
+const StatusTextWrapper = styled.div`
+  display: flex;
+  width: 50%;
+`
+
 interface CourseListProps {
   data: Course[] | undefined
   error: any
@@ -44,6 +83,8 @@ interface CourseListProps {
 const CourseList = ({ data, error }: CourseListProps) => {
   const [sortBy, setSortBy] = useState("title")
   const [sortOrder, setSortOrder] = useState("asc")
+  const [showActiveCourses, setShowActiveCourses] = useState(true)
+  const [showEndedCourses, setShowEndedCourses] = useState(false)
 
   if (error) {
     return <div>Error while fetching courses.</div>
@@ -55,11 +96,40 @@ const CourseList = ({ data, error }: CourseListProps) => {
   if (sortOrder === "desc") {
     order = "desc"
   }
-  const courses = _.orderBy(data, [sortBy], [order])
+  const statusFilters = [
+    ...(showActiveCourses ? ["active"] : []),
+    ...(showEndedCourses ? ["ended"] : []),
+  ]
+  const courses = _.chain(data)
+    .filter(course => {
+      return statusFilters.includes(course.status)
+    })
+    .orderBy([sortBy], [order])
+    .value()
 
   return (
     <>
       <OptionWrapper>
+        <FormGroup row>
+          <FormControlLabel
+            label="show active"
+            control={
+              <Switch
+                checked={showActiveCourses}
+                onChange={event => setShowActiveCourses(event.target.checked)}
+              ></Switch>
+            }
+          ></FormControlLabel>
+          <FormControlLabel
+            label="show ended"
+            control={
+              <Switch
+                checked={showEndedCourses}
+                onChange={event => setShowEndedCourses(event.target.checked)}
+              ></Switch>
+            }
+          ></FormControlLabel>
+        </FormGroup>
         <SortSelector
           variant="outlined"
           select
@@ -88,7 +158,18 @@ const CourseList = ({ data, error }: CourseListProps) => {
         <Link key={course.id} href={`/courses/${course.id}/listing`} passHref>
           <CourseLink>
             <StyledCard key={course.id}>
-              <CardContent>{course.title || course.id}</CardContent>
+              <StyledCardContent>
+                <QuizNameWrapper>{course.title || course.id}</QuizNameWrapper>
+                <QuizStatusWrapper>
+                  <StatusCircleContainer>
+                    <FontAwesomeIcon
+                      icon={faCircle}
+                      color={course.status === "active" ? "green" : "red"}
+                    />
+                  </StatusCircleContainer>
+                  <StatusTextWrapper>{course.status}</StatusTextWrapper>
+                </QuizStatusWrapper>
+              </StyledCardContent>
             </StyledCard>
           </CourseLink>
         </Link>

@@ -116,6 +116,7 @@ export interface Course {
   moocfiId: string
   maxReviewSpamFlags: number
   texts: string[]
+  status: string
 }
 
 export interface ItemVariables {
