@@ -133,7 +133,7 @@ const greekLabels: SingleLanguageLabels = {
       }
     },
     answered: "Απαντήθηκε",
-    unanswered: "Αναπάντητος",
+    unanswered: "Αναπάντητη",
     rejected: "Η απάντησή σας απορρίφθηκε",
     progressUpdated:
       "Η πρόοδος όσον αφορά την ολοκλήρωση του κύκλου μαθημάτων ενημερώθηκε",
