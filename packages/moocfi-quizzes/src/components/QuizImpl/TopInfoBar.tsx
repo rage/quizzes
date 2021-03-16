@@ -94,6 +94,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   let receivedPoints
   let formattedReceivedPoints
   let availablePoints
+  let colon
 
   if (languageInfo) {
     quizLabel =
@@ -104,6 +105,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
     answeredLabel = languageInfo.general.answered
     unansweredLabel = languageInfo.general.unanswered
     rejectedLabel = languageInfo.general.rejected
+    colon = quizLabel.length > 0 ? ":" : ""
   }
 
   const answerStatus = quizAnswer.status
@@ -200,7 +202,8 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
       </IconContainer>
       <TitleContainer>
         <Typography component="div" variant="subtitle1" id="quiz-type-label">
-          {quizLabel}:
+          {quizLabel}
+          {colon}
         </Typography>
         {quiz ? (
           <Typography
