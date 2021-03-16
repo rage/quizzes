@@ -25,7 +25,7 @@ const germanLabels: SingleLanguageLabels = {
     },
   },
   open: {
-    placeholder: "Wörter",
+    placeholder: "Deine Antwort",
     userAnswerLabel: "Deine Antwort",
     feedbackForFailure: "Deine Antwort ist nicht richtig",
     feedbackForSuccess: "Deine Antwort ist richtig",
