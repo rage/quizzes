@@ -85,8 +85,8 @@ const germanLabels: SingleLanguageLabels = {
       `Der Fragetyp '${itemType}' wird nicht unterstützt.`,
   },
   multipleChoice: {
-    selectCorrectAnswerLabel: "Die richtige Antwort auswählen",
-    chooseAllSuitableOptionsLabel: "Alle passenden Alternativen wählen.",
+    selectCorrectAnswerLabel: "Bitte wähle die richtige Antwort",
+    chooseAllSuitableOptionsLabel: "Bitte wähle alle passenden Alternativen.",
     answerCorrectLabel: "Richtig",
     answerIncorrectLabel: "Falsch",
   },
