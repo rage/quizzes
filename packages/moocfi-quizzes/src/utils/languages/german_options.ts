@@ -25,7 +25,7 @@ const germanLabels: SingleLanguageLabels = {
     },
   },
   open: {
-    placeholder: "Wörter",
+    placeholder: "Deine Antwort",
     userAnswerLabel: "Deine Antwort",
     feedbackForFailure: "Deine Antwort ist nicht richtig",
     feedbackForSuccess: "Deine Antwort ist richtig",
@@ -85,8 +85,8 @@ const germanLabels: SingleLanguageLabels = {
       `Der Fragetyp '${itemType}' wird nicht unterstützt.`,
   },
   multipleChoice: {
-    selectCorrectAnswerLabel: "Die richtige Antwort auswählen",
-    chooseAllSuitableOptionsLabel: "Alle passenden Alternativen wählen.",
+    selectCorrectAnswerLabel: "Bitte wähle die richtige Antwort",
+    chooseAllSuitableOptionsLabel: "Bitte wähle alle passenden Alternativen.",
     answerCorrectLabel: "Richtig",
     answerIncorrectLabel: "Falsch",
   },

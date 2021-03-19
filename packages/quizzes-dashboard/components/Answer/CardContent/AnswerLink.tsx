@@ -24,9 +24,9 @@ export const AnswerLink = ({ answer }: AnswerLinkProps) => {
 
   return (
     <AnswerLinkContainer>
-      <Link href={answerOverviewHref}>
+      <Link href={answerOverviewHref} passHref>
         <LinkTypography
-          component="span"
+          component="a"
           variant="body2"
           style={{ cursor: "pointer" }}
         >

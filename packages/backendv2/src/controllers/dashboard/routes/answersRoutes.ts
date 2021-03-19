@@ -1,4 +1,5 @@
 import Router from "koa-router"
+import knex from "../../../../database/knex"
 import accessControl from "../../../middleware/access_control"
 import { QuizAnswer, QuizAnswerStatusModification } from "../../../models"
 import { CustomState, CustomContext } from "../../../types"
@@ -9,6 +10,17 @@ import {
   getCourseIdByQuizId,
 } from "../util"
 
+const getStatusChangeOperation = (
+  status: string,
+  plagiarismSuspected: boolean,
+) => {
+  return plagiarismSuspected
+    ? "teacher-suspects-plagiarism"
+    : status === "confirmed"
+    ? "teacher-accept"
+    : "teacher-reject"
+}
+
 const answersRoutes = new Router<CustomState, CustomContext>({
   prefix: "/answers",
 })
@@ -16,22 +28,37 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "grade")
-    const status = ctx.request.body.status
+    const { status, plagiarismSuspected } = ctx.request.body
+    const modifierId = ctx.state.user.id
 
-    ctx.body = await QuizAnswer.setManualReviewStatus(
-      answerId,
-      status,
-      ctx.state.user.id,
+    const quizAnswer = await QuizAnswer.setManualReviewStatus(answerId, status)
+
+    // log status change
+    const operation = getStatusChangeOperation(status, plagiarismSuspected)
+
+    await knex.transaction(
+      async trx =>
+        await QuizAnswerStatusModification.logStatusChange(
+          answerId,
+          operation,
+          trx,
+          modifierId,
+        ),
     )
+
+    ctx.body = quizAnswer
   })
 
   .post("/status", accessControl(), async ctx => {
-    const answerIds = ctx.request.body.answerIds
+    const { status, answerIds, plagiarismSuspected } = ctx.request.body
+    const modifierId = ctx.state.user.id
 
     if (!answerIds || !answerIds[0]) {
       throw new BadRequestError("No answer ids provided.")
     }
+
     let courseId
+
     try {
       courseId = await getCourseIdByAnswerId(answerIds[0])
     } catch (error) {
@@ -39,8 +66,24 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     }
 
     await checkAccessOrThrow(ctx.state.user, courseId, "grade")
-    const status = ctx.request.body.status
-    ctx.body = await QuizAnswer.setManualReviewStatusForMany(answerIds, status)
+    const quizAnswers = await QuizAnswer.setManualReviewStatusForMany(
+      answerIds,
+      status,
+    )
+
+    const operation = getStatusChangeOperation(status, plagiarismSuspected)
+
+    await knex.transaction(
+      async trx =>
+        await QuizAnswerStatusModification.logStatusChangeForMany(
+          answerIds,
+          operation,
+          trx,
+          modifierId,
+        ),
+    )
+
+    ctx.body = quizAnswers
   })
 
   .get("/:answerId", accessControl(), async ctx => {
@@ -152,6 +195,23 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await QuizAnswerStatusModification.getAllByQuizAnswerId(answerId)
+  })
+
+  .post("/answers/:answerId/suspect-plagiarism", accessControl(), async ctx => {
+    const answerId = ctx.params.answerId
+    const courseId = await getCourseIdByAnswerId(answerId)
+    const userId = ctx.state.user.id
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
+
+    ctx.body = await knex.transaction(
+      async trx =>
+        await QuizAnswerStatusModification.logStatusChange(
+          answerId,
+          "teacher-suspects-plagiarism",
+          trx,
+          userId,
+        ),
+    )
   })
 
 export default answersRoutes

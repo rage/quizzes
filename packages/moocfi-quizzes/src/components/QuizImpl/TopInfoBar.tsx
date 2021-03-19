@@ -20,16 +20,20 @@ const Container = styled.div<TopInfoBarContainerProps>`
   justify-content: center;
   padding: 1.5rem 2rem;
   color: white;
-  background-color: #213094;
+  background: #1473e6;
+  font-family: Poppins !important;
 `
 
 const IconContainer = styled.div`
   margin-right: 1rem;
   font-size: 3.5rem;
+  line-height: 1.2;
+  color: #15447d;
 `
 
 const TitleContainer = styled.div`
   margin-right: auto;
+  text-align: start;
 `
 
 const PointsContainer = styled.div`
@@ -90,6 +94,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   let receivedPoints
   let formattedReceivedPoints
   let availablePoints
+  let colon
 
   if (languageInfo) {
     quizLabel =
@@ -100,6 +105,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
     answeredLabel = languageInfo.general.answered
     unansweredLabel = languageInfo.general.unanswered
     rejectedLabel = languageInfo.general.rejected
+    colon = quizLabel.length > 0 ? ":" : ""
   }
 
   const answerStatus = quizAnswer.status
@@ -196,7 +202,8 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
       </IconContainer>
       <TitleContainer>
         <Typography component="div" variant="subtitle1" id="quiz-type-label">
-          {quizLabel}:
+          {quizLabel}
+          {colon}
         </Typography>
         {quiz ? (
           <Typography

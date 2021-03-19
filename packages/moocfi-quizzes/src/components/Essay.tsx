@@ -43,7 +43,9 @@ const SubmitHelperTypography = styled(Typography)<ISubmitHelperTypographyProps>`
   margin-bottom: 0.5rem;
   && {
     height: 1rem;
-    padding-top: 1rem;
+    padding-top: .6rem;
+    opacity: 0.8;
+    font-size: 0.9rem;
     color: ${({ attemptWasRecentlyMade }) =>
       attemptWasRecentlyMade ? "#AD0000" : "#595959"};
     font-weight: ${({ attemptWasRecentlyMade }) =>
@@ -129,7 +131,9 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
         id="essay-text-field"
       />
       <div>
-        <Typography>
+        <Typography
+          style={{ marginTop: ".5rem", fontWeight: "bold", opacity: ".8" }}
+        >
           {essayLabels.currentNumberOfWordsLabel}: {numOfWords}
         </Typography>
 
@@ -143,7 +147,10 @@ const Essay: React.FunctionComponent<EssayProps> = ({ item }) => {
   )
 
   return (
-    <ItemContent providedStyles={themeProvider.essayItemContentStyles}>
+    <ItemContent
+      providedStyles={themeProvider.essayItemContentStyles}
+      style={{ padding: "1.4rem 0" }}
+    >
       {itemTitle && (
         <MarkdownText
           Component={Typography}

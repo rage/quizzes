@@ -28,7 +28,7 @@ const AddPeerReviewButton = styled(Button)`
   display: flex !important;
   margin-top: 1rem !important;
   margin-bottom: 1rem !important;
-  width 33% !important;
+  width: 33% !important;
   background: #e0e0e0 !important;
 `
 
@@ -58,8 +58,8 @@ export const PeerReviewEditForms = () => {
         <Typography variant="h2">Peer reviews</Typography>
       </PeerReviewTitleWrapper>
       {peerReviews.map((peerReview, index) => (
-        <>
-          <PeerReviewWrapper key={peerReview.id}>
+        <React.Fragment key={peerReview.id}>
+          <PeerReviewWrapper>
             <StyledTypography variant="h4">
               Peer review nro. {index + 1}
             </StyledTypography>
@@ -75,7 +75,7 @@ export const PeerReviewEditForms = () => {
             </Button>
           </PeerReviewWrapper>
           <PeerReviewEditor id={peerReview.id} />
-        </>
+        </React.Fragment>
       ))}
       <AddPeerReviewButtonWrapper>
         <AddPeerReviewButton

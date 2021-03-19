@@ -9,8 +9,6 @@ import {
   TableBody,
   TableCell,
   TableContainer,
-  TableContainerProps,
-  TableContainerTypeMap,
   TableHead,
   TableRow,
   Tabs,
@@ -104,13 +102,12 @@ const Log = ({ answerId }: { answerId: string | undefined }) => {
               .sort(sortFunction)
               .map((log: IAnswerStatusChange, index: number) => {
                 const { operation, modifierId, createdAt } = log
-                const formattedOperationDate = createdAt
-                  .toLocaleString()
-                  .substring(0, 16)
-                  .replace("T", " ")
+                const dateUTC = new Date(createdAt)
+                  .toUTCString()
+                  .replace("GMT", "(UTC + 0)")
                 return (
                   <TableRow key={index}>
-                    <TableCell>{formattedOperationDate}</TableCell>
+                    <TableCell>{dateUTC}</TableCell>
                     <TableCell>{operation}</TableCell>
                     <TableCell>{modifierId}</TableCell>
                   </TableRow>
@@ -133,7 +130,10 @@ export const AnswerById = () => {
   const [currentTab, setCurrentTab] = useState("overview")
 
   // conditional fetches
-  const { answer, answerLoading, answerError } = useAnswer(answerId, "answer")
+  const { answer, answerLoading, answerError } = useAnswer(
+    answerId,
+    `answer-${answerId}}`,
+  )
   const { quiz, quizLoading, quizError } = useQuiz(quizId, "quiz")
 
   /* for when tab is loaded through url*/

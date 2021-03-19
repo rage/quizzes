@@ -45,6 +45,7 @@ export interface Item {
   successMessage: null
   failureMessage: null
   sharedOptionFeedbackMessage: null
+  allAnswersCorrect: boolean
 }
 
 export interface Option {
@@ -101,6 +102,7 @@ export interface Course {
   title: string
   body: string
   abbreviation: string
+  status: string
 }
 
 export interface PeerReviewQuestion {

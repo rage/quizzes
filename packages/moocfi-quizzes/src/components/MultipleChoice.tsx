@@ -54,7 +54,7 @@ interface ItemContentProps {
 }
 
 const ItemContent = styled.div<ItemContentProps>`
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   > div:first-of-type {
     display: flex;
     justify-content: space-between;
@@ -73,7 +73,6 @@ const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
   display: flex;
   border-left: 6px solid ${({ correct }) => (correct ? "#047500" : "#DB0000")};
   box-sizing: border-box;
-  padding: 3px;
   padding: 0.5rem 0 0.5rem 0.5rem;
   margin-bottom: 5px !important;
   p:nth-of-type(1) {
@@ -88,6 +87,7 @@ const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
 
 const LeftAlignedMarkdownText = styled(MarkdownText)`
   text-align: left;
+  flex: 0;
 `
 
 const justADiv = styled.div``
@@ -129,7 +129,11 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   }
 
   return (
-    <div role="group" aria-label={item.title}>
+    <div
+      role="group"
+      aria-label={item.title}
+      style={{ paddingTop: "1rem !important" }}
+    >
       <ItemContent
         direction={direction}
         providedStyles={themeProvider.multipleChoiceItemContentStyles}
@@ -146,6 +150,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
             direction={direction}
             onlyOneItem={onlyOneItem}
             providedStyles={themeProvider.optionContainerStyles}
+            style={{ flex: "1.5" }}
           >
             {options
               .sort((o1, o2) => o1.order - o2.order)
