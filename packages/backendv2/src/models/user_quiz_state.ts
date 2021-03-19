@@ -61,10 +61,11 @@ class UserQuizState extends BaseModel {
 
   public static async getByUserAndCourse(
     userId: number,
-    courseId: string
+    courseId: string,
   ): Promise<UserQuizState[]> {
     const trx = await knex.transaction()
-    const userQuizStates = await trx.raw(`
+    const userQuizStates = await trx.raw(
+      `
     SELECT quiz_id,
           COALESCE(peer_reviews_given, 0)    as peer_reviews_given,
           COALESCE(peer_reviews_received, 0) as peer_reviews_received,
@@ -77,9 +78,12 @@ class UserQuizState extends BaseModel {
             JOIN quiz q on user_quiz_state.quiz_id = q.id
             JOIN course c on q.course_id = c.id
     WHERE user_id = :userId AND course_id = :courseId
-    `, {
-      userId, courseId
-    })
+    `,
+      {
+        userId,
+        courseId,
+      },
+    )
 
     return userQuizStates.rows
   }
