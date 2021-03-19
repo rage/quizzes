@@ -8,12 +8,12 @@ import redis from "../config/redis"
 import { safeClean, safeSeed, configA } from "./util"
 
 afterAll(async () => {
-    await knex.destroy()
-    await redis.client?.flushall()
+  await knex.destroy()
+  await redis.client?.flushall()
 })
 
 afterEach(async () => {
-    await redis.client?.flushall()
+  await redis.client?.flushall()
 })
 
 describe("general: course progress", () => {
@@ -64,7 +64,7 @@ describe("general: course progress", () => {
   test("returns quiz titles on request", done => {
     request(app.callback())
       .get(
-        "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/quiz-titles"
+        "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/quiz-titles",
       )
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(200)
@@ -74,7 +74,7 @@ describe("general: course progress", () => {
   test("returns course progress on request", done => {
     request(app.callback())
       .get(
-        "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/progress"
+        "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/progress",
       )
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .expect(200)
