@@ -15,31 +15,15 @@ const general = new Router<CustomState, CustomContext>({
     .get("/course/:courseId/progress", accessControl(), async ctx => {
         const courseId = ctx.params.courseId
         const user = ctx.state.user
-        // await checkAccessOrThrow(ctx.state.user, ctx.request.body.courseId, "view")
-        
-        let progress = []
-        
-        const result = await Quiz.getByCourseId(courseId)
-        for (const quiz of result) {
-            const quizProgress = await UserQuizState.getByUserAndQuiz(user.id, quiz.id)
-            if (quizProgress) {
-                progress.push(quizProgress)
-            }
-        }
-
-        ctx.body = progress
+        ctx.body = await UserQuizState.getByUserAndCourse(user.id, courseId)
     })
 
     .get("/course/:courseId/quiz-titles", accessControl(), async ctx => {
         const courseId = ctx.params.courseId
-        // const user = ctx.state.user
-        // await checkAccessOrThrow(ctx.state.user, ctx.request.body.courseId, "view")
-
         let quiz_titles: {[key: string]: string}  = {}
 
         const result = await Quiz.getByCourseId(courseId)
         for (const quiz of result) {
-            quiz_titles[quiz.id] = quiz.title
             for (const quizItem of quiz.items) {
                 quiz_titles[quizItem.id] = quizItem.title
             }

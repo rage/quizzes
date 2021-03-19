@@ -3,6 +3,7 @@ import User from "./user"
 import QuizAnswer from "./quiz_answer"
 import Knex, { Transaction } from "knex"
 import BaseModel from "./base_model"
+import knex from "../../database/knex"
 
 class UserQuizState extends BaseModel {
   userId!: number
@@ -56,6 +57,31 @@ class UserQuizState extends BaseModel {
     trx?: Knex.Transaction,
   ): Promise<UserQuizState> {
     return await this.query(trx).findById([userId, quizId])
+  }
+
+  public static async getByUserAndCourse(
+    userId: number,
+    courseId: string
+  ): Promise<UserQuizState[]> {
+    const trx = await knex.transaction()
+    const userQuizStates = await trx.raw(`
+    SELECT quiz_id,
+          COALESCE(peer_reviews_given, 0)    as peer_reviews_given,
+          COALESCE(peer_reviews_received, 0) as peer_reviews_received,
+          COALESCE(points_awarded, 0)        as points_awarded,
+          user_quiz_state.spam_flags,
+          COALESCE(user_quiz_state.tries, 0) as tries,
+          status,
+          course_id
+    FROM user_quiz_state
+            JOIN quiz q on user_quiz_state.quiz_id = q.id
+            JOIN course c on q.course_id = c.id
+    WHERE user_id = :userId AND course_id = :courseId
+    `, {
+      userId, courseId
+    })
+
+    return userQuizStates.rows
   }
 
   public static async save(
