@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useContext, useEffect, useRef, useState, useReducer } from "react"
+import {useEffect, useRef, useState} from "react"
 import {
   CourseProgressProviderInterface,
   ProgressData,
@@ -11,19 +11,16 @@ import {
   CourseResponse,
   CourseProgressProvider,
   useCourseProgressState,
-  setAll,
 } from "../contexes/courseProgressProviderContext"
 import { PointsByGroup } from "../modelTypes"
 import { languageOptions } from "../utils/languages"
 import { ToastContainer, toast, TypeOptions } from "react-toastify"
 import {
-  // getCompletion,
   getUserCourseData,
 } from "../services/courseProgressService"
 
 import "react-toastify/dist/ReactToastify.css"
 
-import { useOnScreen } from "./UseOnScreen.js"
 import {
   CourseStatusProviderContext,
   CourseStatusProviderInterface,
@@ -35,313 +32,202 @@ interface CourseStatusProviderProps {
   languageId: string
 }
 
-enum MessageType {
-  PROGRESS_UPDATED = "PROGRESS_UPDATED",
-  PEER_REVIEW_RECEIVED = "PEER_REVIEW_RECEIVED",
-  QUIZ_CONFIRMED = "QUIZ_CONFIRMED",
-  QUIZ_REJECTED = "QUIZ_REJECTED",
-  COURSE_CONFIRMED = "COURSE_CONFIRMED",
-}
+export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderProps> = ({
+  children,
+  ...props
+}) => {
+  const { accessToken, courseId, languageId } = props
 
-enum ConnectionStatus {
-  CONNECTED = "CONNECTED",
-  CONNECTING = "CONNECTING",
-  DISCONNECTED = "DISCONNECTED",
-}
+  const prevProps = useRef({
+    accessToken: "",
+    courseId: "",
+    languageId: "",
+  })
 
-interface Message {
-  type: MessageType
-  payload: string
-}
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(false)
+  const [updateQuiz, setUpdateQuiz] = useState({})
+  const [data, setData] = useState<ProgressData | undefined>()
 
-const isMessage = (message: any): message is Message => {
-  return "type" in message && message.type in MessageType
-}
 
-export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderProps> = React.memo(
-  ({ children, ...props }) => {
-    const { accessToken, courseId, languageId } = props
+  const [moocfiClient, setMoocfiClient] = useState<WebSocket | undefined>()
+  const [quizzesClient, setQuizzesClient] = useState<WebSocket | undefined>()
+    
+  const shouldFetch =
+    accessToken !== prevProps.current.accessToken ||
+    courseId !== prevProps.current.courseId ||
+    languageId !== prevProps.current.languageId
 
-    const prevProps = useRef({
+  useEffect(() => {
+    if (accessToken && courseId) {
+      if (shouldFetch) {
+        prevProps.current = props
+        fetchProgressData()
+      }
+    } else {
+      logout()
+    }
+  })
+
+  const fetchProgressData = async () => {
+    try {
+      const progressData = await getUserCourseData(courseId, accessToken)
+
+      const data = transformData(progressData.currentUser, progressData.course)
+      setData(data)
+      setLoading(false)
+    } catch (error) {
+      setError(true)
+      setLoading(false)
+      console.log(error)
+      console.log("Could not fetch course progress data")
+      notifySticky(
+        languageOptions[languageId].error.progressFetchError,
+        "error",
+      )
+    }
+  }
+
+
+  const logout = () => {
+    setLoading(true)
+    setError(false)
+    setData(undefined)
+    moocfiClient && moocfiClient.close()
+    quizzesClient && quizzesClient.close()
+    setMoocfiClient(undefined)
+    setQuizzesClient(undefined)
+    prevProps.current = {
       accessToken: "",
       courseId: "",
       languageId: "",
-    })
-
-    const [loading, setLoading] = useState(true)
-    const [error, setError] = useState(false)
-    const [updateQuiz, setUpdateQuiz] = useState({})
-    const [data, setData] = useState<ProgressData | undefined>()
-
-    const [moocfiStatus, setMoocfiStatus] = useState<ConnectionStatus>(
-      ConnectionStatus.DISCONNECTED,
-    )
-    const [quizzesStatus, setQuizzesStatus] = useState<ConnectionStatus>(
-      ConnectionStatus.DISCONNECTED,
-    )
-    const [moocfiClient, setMoocfiClient] = useState<WebSocket | undefined>()
-    const [quizzesClient, setQuizzesClient] = useState<WebSocket | undefined>()
-
-    const shouldFetch =
-      accessToken !== prevProps.current.accessToken ||
-      courseId !== prevProps.current.courseId ||
-      languageId !== prevProps.current.languageId
-    const shouldConnectMoocfi =
-      !loading && !error && moocfiStatus === ConnectionStatus.DISCONNECTED
-    const shouldConnectQuizzes =
-      !loading && !error && quizzesStatus === ConnectionStatus.DISCONNECTED
-
-    useEffect(() => {
-      if (accessToken && courseId) {
-        if (shouldFetch) {
-          prevProps.current = props
-          fetchProgressData()
-        }
-        /*if (shouldConnectMoocfi) {
-        connect(
-          "wss://www.mooc.fi/ws",
-          setMoocfiClient,
-          setMoocfiStatus,
-        )
-      }
-      if (shouldConnectQuizzes) {
-        connect(
-          "wss://quizzes.mooc.fi/ws",
-          setQuizzesClient,
-          setQuizzesStatus,
-        )
-      }*/
-      } else {
-        logout()
-      }
-    })
-
-    const fetchProgressData = async () => {
-      try {
-        const progressData = await getUserCourseData(courseId, accessToken)
-        /*const completionData = await getCompletion(courseId, accessToken)
-        progressData.currentUser.completions =
-          completionData.currentUser.completions*/
-        const data = transformData(
-          progressData.currentUser,
-          progressData.course,
-        )
-        setData(data)
-        setLoading(false)
-      } catch (error) {
-        setError(true)
-        setLoading(false)
-        console.log(error)
-        console.log("Could not fetch course progress data")
-        notifySticky(
-          languageOptions[languageId].error.progressFetchError,
-          "error",
-        )
-      }
     }
+  }
 
-    const connect = async (
-      host: string,
-      setClient: React.Dispatch<React.SetStateAction<WebSocket | undefined>>,
-      setStatus: React.Dispatch<React.SetStateAction<ConnectionStatus>>,
-    ) => {
-      setStatus(ConnectionStatus.CONNECTING)
-      try {
-        const client: WebSocket = await new Promise(
-          (resolve: any, reject: any) => {
-            const client = new WebSocket(host, "echo-protocol")
-            client.onopen = () => {
-              resolve(client)
-            }
-            client.onerror = err => {
-              reject(err)
-            }
-          },
-        )
-        client.onmessage = onMessage
-        client.onerror = e => reconnect(host, setStatus)
-        client.onclose = e => reconnect(host, setStatus)
-        client.send(JSON.stringify({ accessToken, courseId }))
-        setClient(client)
-        setStatus(ConnectionStatus.CONNECTED)
-        console.log(`connected to ${host}`)
-      } catch (error) {
-        reconnect(host, setStatus)
-      }
-    }
+  const notifySticky = (message: string, type?: TypeOptions) =>
+    toast(message, { containerId: "sticky", type })
 
-    const reconnect = (
-      host: string,
-      setStatus: React.Dispatch<React.SetStateAction<ConnectionStatus>>,
-    ) => {
-      console.log(`could not connect to ${host}, attempting to reconnect...`)
-      setTimeout(() => setStatus(ConnectionStatus.DISCONNECTED), 10000)
-    }
+  const quizUpdated = (id: string) => {
+    setUpdateQuiz({ ...updateQuiz, [id]: false })
+  }
 
-    const logout = () => {
-      setLoading(true)
-      setError(false)
-      setData(undefined)
-      moocfiClient && moocfiClient.close()
-      quizzesClient && quizzesClient.close()
-      setMoocfiClient(undefined)
-      setQuizzesClient(undefined)
-      prevProps.current = {
-        accessToken: "",
-        courseId: "",
-        languageId: "",
-      }
-    }
+  const progress: CourseProgressProviderInterface = {
+    error,
+    loading,
+    courseProgressData: data,
+    courseId,
+    accessToken
+  }
 
-    const onMessage = (inbound: any) => {
-      const message = JSON.parse(inbound.data)
-      if (isMessage(message)) {
-        switch (message.type) {
-          case MessageType.PROGRESS_UPDATED:
-            fetchProgressData()
-            break
-          case MessageType.PEER_REVIEW_RECEIVED:
-            setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
-            /*notifyRegular(
-            languageOptions[languageId].receivedPeerReviews.peerReviewReceived,
-            ToastType.SUCCESS,
-          )*/
-            break
-          case MessageType.QUIZ_CONFIRMED:
-            setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
-            /*notifyRegular(
-            languageOptions[languageId].general.answerConfirmed,
-            ToastType.SUCCESS,
-          )
-          notifyRegular(
-            languageOptions[languageId].general.progressUpdated,
-            ToastType.SUCCESS,
-          )*/
-            break
-          case MessageType.QUIZ_REJECTED:
-            setUpdateQuiz({ ...updateQuiz, [message.payload]: true })
-            break
-          case MessageType.COURSE_CONFIRMED:
-            fetchProgressData()
-            break
-        }
-      }
-    }
+  const status: CourseStatusProviderInterface = {
+    updateQuiz,
+    quizUpdated,
+  }
 
-    const notifyRegular = (message: string, type?: TypeOptions) =>
-      toast(message, { containerId: "regular", type })
-    const notifySticky = (message: string, type?: TypeOptions) =>
-      toast(message, { containerId: "sticky", type })
-
-    const quizUpdated = (id: string) => {
-      setUpdateQuiz({ ...updateQuiz, [id]: false })
-    }
-
-    const notifyError = (message: string) => {
-      notifySticky(message, "error")
-    }
-
-    const progress: CourseProgressProviderInterface = {
-      error,
-      loading,
-      courseProgressData: data,
-    }
-
-    const status: CourseStatusProviderInterface = {
-      updateQuiz,
-      quizUpdated,
-      // notifyError,
-    }
-
-    return (
-      <CourseProgressProvider courseProgress={progress}>
-        <CourseStatusProviderContext.Provider value={status}>
-          <ToastContainer
-            enableMultiContainer
-            newestOnTop={false}
-            autoClose={false}
-            hideProgressBar
-            containerId={"sticky"}
-            position="top-left"
-          />
-          <ToastContainer
-            enableMultiContainer
-            newestOnTop={false}
-            hideProgressBar
-            containerId={"regular"}
-            position="top-right"
-          />
-          {children}
-        </CourseStatusProviderContext.Provider>
-      </CourseProgressProvider>
-    )
-  },
-)
+  return (
+    <CourseProgressProvider courseProgress={progress}>
+      <CourseStatusProviderContext.Provider value={status}>
+        <ToastContainer
+          enableMultiContainer
+          newestOnTop={false}
+          autoClose={false}
+          hideProgressBar
+          containerId={"sticky"}
+          position="top-left"
+        />
+        <ToastContainer
+          enableMultiContainer
+          newestOnTop={false}
+          hideProgressBar
+          containerId={"regular"}
+          position="top-right"
+        />
+        {children}
+      </CourseStatusProviderContext.Provider>
+    </CourseProgressProvider>
+  )
+}
 
 export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
   Component: React.FunctionComponent<P> | React.ComponentType<P>,
 ): React.FunctionComponent<P & CourseProgressProviderInterface> => (
   props: P,
 ) => {
-  const { state, dispatch } = useCourseProgressState()
+  // initial course progress
+  const { state } = useCourseProgressState()
+  // course progress with updates
+  const {courseId, accessToken, ...rest} = state
+  const [injectProps, setInjectProps] = useState(rest)
 
   // Ref for the wrapped element
   const ref: any = useRef<HTMLElement>()
+  const rootMargin = "0px"
+  const outOfViewThreshold = 10
 
-  // Hook informs us when we should re-fetch data
-  const progressShouldUpdate = useOnScreen(ref)
-
-  useEffect(() => {
-    if (progressShouldUpdate) {
-      // fetchProgressData()
+  const refetchData = async () => {
+    if (courseId && accessToken) {
+      // fetch data
+      setInjectProps({ ...injectProps, loading: true })
+      const progressData = await getUserCourseData(
+        courseId,
+        accessToken,
+      )
+      const data = transformData(progressData.currentUser, progressData.course)
+      setInjectProps({ ...injectProps, courseProgressData: data, loading: false })
     }
-  }, [progressShouldUpdate])
+  }
+
+  /**
+   * Triggers a refetch of progress after given time interval
+   *  */ 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      async ([entry]) => {
+        if (entry.isIntersecting) {
+          const entryTarget = entry.target as HTMLElement
+
+          // a time stamp has been marked
+          if (entryTarget.dataset.lastInteractionStarted) {
+            // check if it has been long enough
+            const secondsOutOfView =
+              (performance.now() -
+                Number.parseFloat(entryTarget.dataset.lastInteractionStarted)) /
+              1000
+
+            if (secondsOutOfView >= outOfViewThreshold) {
+                await refetchData()
+            }
+
+            // reset off view counter
+            entryTarget.dataset.lastInteractionStarted = performance
+              .now()
+              .toString()
+          } else {
+            // no stamp, so mark when this intersection started
+            entryTarget.dataset.lastInteractionStarted = performance
+              .now()
+              .toString()
+          }
+        }
+      },
+      {
+        rootMargin,
+      },
+    )
+    if (ref.current) {
+      observer.observe(ref.current)
+    }
+    return () => {
+      observer.unobserve(ref.current)
+    }
+  }, [])
 
   return (
     <div ref={ref}>
-      <Component {...props} {...state} />
+      {!state.loading && <Component {...props} {...injectProps} />}
     </div>
   )
 }
-
-/*const transformData2 = (data: any): ProgressData => {
-  const courseProgress = data.currentUser.user_course_progresses[0]
-  const completed = data.currentUser.completions.length > 0
-  let points_to_pass = 0
-  let n_points
-  let max_points
-  let exercise_completions = 0
-  let total_exercises = 0
-  let distinctActions = new Set()
-  const progressByGroup: ProgressByGroup = {}
-  // const exercisesByPart: ExercisesByPart = {}
-  // const answersByPart: AnswersByPart = {}
-  let exercise_completions_by_section: any
-  if (courseProgress) {
-    n_points = courseProgress.n_points
-    max_points = courseProgress.max_points
-    exercise_completions_by_section =
-      courseProgress.exercise_completions_by_section
-    for (const groupProgress of courseProgress.progress) {
-      progressByGroup[groupProgress.group] = groupProgress
-    }
-  }
-  const required_actions = Array.from(distinctActions) as RequiredAction[]
-
-  return {
-    completed,
-    points_to_pass,
-    n_points,
-    max_points,
-    exercise_completions,
-    total_exercises,
-    required_actions,
-    progressByGroup,
-    //exercisesByPart,
-    // answersByPart,
-    exercise_completions_by_section,
-  }
-}*/
 
 const transformData = (
   data: ProgressResponse,
