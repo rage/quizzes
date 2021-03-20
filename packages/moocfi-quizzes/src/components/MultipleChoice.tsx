@@ -157,12 +157,20 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
               .sort((o1, o2) => o1.order - o2.order)
               .map((option, index) => {
                 return (
-                  <Option
+                  onlyOneItem ?
+                    <Option
                     key={option.id}
                     option={option}
                     optionWidth={optionWidth}
-                    shouldBeGray={index % 2 === 0}
-                  />
+                    shouldBeGray={false}
+                  /> : 
+                  <Option
+                  key={option.id}
+                  option={option}
+                  optionWidth={optionWidth}
+                  shouldBeGray={index % 2 === 0}
+                />
+
                 )
               })}
           </ChoicesContainer>
