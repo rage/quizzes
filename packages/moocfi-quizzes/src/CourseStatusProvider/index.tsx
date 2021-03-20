@@ -1,5 +1,5 @@
 import * as React from "react"
-import {useEffect, useRef, useState} from "react"
+import { useEffect, useRef, useState } from "react"
 import {
   CourseProgressProviderInterface,
   ProgressData,
@@ -15,9 +15,7 @@ import {
 import { PointsByGroup } from "../modelTypes"
 import { languageOptions } from "../utils/languages"
 import { ToastContainer, toast, TypeOptions } from "react-toastify"
-import {
-  getUserCourseData,
-} from "../services/courseProgressService"
+import { getUserCourseData } from "../services/courseProgressService"
 
 import "react-toastify/dist/ReactToastify.css"
 
@@ -49,10 +47,9 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
   const [updateQuiz, setUpdateQuiz] = useState({})
   const [data, setData] = useState<ProgressData | undefined>()
 
-
   const [moocfiClient, setMoocfiClient] = useState<WebSocket | undefined>()
   const [quizzesClient, setQuizzesClient] = useState<WebSocket | undefined>()
-    
+
   const shouldFetch =
     accessToken !== prevProps.current.accessToken ||
     courseId !== prevProps.current.courseId ||
@@ -88,7 +85,6 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
     }
   }
 
-
   const logout = () => {
     setLoading(true)
     setError(false)
@@ -116,7 +112,7 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
     loading,
     courseProgressData: data,
     courseId,
-    accessToken
+    accessToken,
   }
 
   const status: CourseStatusProviderInterface = {
@@ -156,7 +152,7 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
   // initial course progress
   const { state } = useCourseProgressState()
   // course progress with updates
-  const {courseId, accessToken, ...rest} = state
+  const { courseId, accessToken, ...rest } = state
   const [injectProps, setInjectProps] = useState(rest)
 
   // Ref for the wrapped element
@@ -168,18 +164,20 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
     if (courseId && accessToken) {
       // fetch data
       setInjectProps({ ...injectProps, loading: true })
-      const progressData = await getUserCourseData(
-        courseId,
-        accessToken,
-      )
+      const progressData = await getUserCourseData(courseId, accessToken)
       const data = transformData(progressData.currentUser, progressData.course)
-      setInjectProps({ ...injectProps, courseProgressData: data, loading: false })
+      setInjectProps({
+        ...injectProps,
+        courseProgressData: data,
+        loading: false,
+      })
     }
   }
 
   /**
    * Triggers a refetch of progress after given time interval
-   *  */ 
+   *  */
+
   useEffect(() => {
     const observer = new IntersectionObserver(
       async ([entry]) => {
@@ -195,7 +193,7 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
               1000
 
             if (secondsOutOfView >= outOfViewThreshold) {
-                await refetchData()
+              await refetchData()
             }
 
             // reset off view counter
