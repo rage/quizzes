@@ -93,12 +93,12 @@ const RevealedChoiceButton = styled(
     props.selected
       ? `
       color: white;
-      background-color: ${props.correct ? "#047500" : "#DB0000"};
+      background-color: ${props.correct ? "#047500" : "#F24A5B"};
       `
       : props.correct
       ? `
       color: #047500;
-      border-color: #047500;
+      border-color: #37BC9B;
       border-width: 3px
       `
       : ``}
