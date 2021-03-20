@@ -4,6 +4,7 @@ import { ThemeProvider as StyledThemeProvider } from "styled-components"
 import {
   ThemeProvider as MaterialThemeProvider,
   createMuiTheme,
+  StylesProvider,
 } from "@material-ui/core/styles"
 import Layout from "../components/Layout"
 import "@fortawesome/fontawesome-svg-core/styles.css"
@@ -73,13 +74,15 @@ export default class App extends NextApp {
 
     return (
       <Provider store={store}>
-        <StyledThemeProvider theme={theme}>
-          <MaterialThemeProvider theme={theme}>
-            <Layout>
-              <Component {...pageProps} />
-            </Layout>
-          </MaterialThemeProvider>
-        </StyledThemeProvider>
+        <StylesProvider injectFirst>
+          <StyledThemeProvider theme={theme}>
+            <MaterialThemeProvider theme={theme}>
+              <Layout>
+                <Component {...pageProps} />
+              </Layout>
+            </MaterialThemeProvider>
+          </StyledThemeProvider>
+        </StylesProvider>
       </Provider>
     )
   }
