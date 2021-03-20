@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useReducer } from "react"
+
 import { ProviderBaseInterface } from "./courseStatusProviderContext"
 import { PointsByGroup } from "../modelTypes"
 
@@ -83,6 +84,8 @@ export interface CourseProgressProviderInterface extends ProviderBaseInterface {
   error?: boolean
   loading?: boolean
   courseProgressData?: ProgressData
+  courseId?: string
+  accessToken?: string
 }
 
 type CourseProgressProviderActionTypes =
