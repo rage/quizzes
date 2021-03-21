@@ -29,7 +29,6 @@ interface ChoicesContainerProps {
   providedStyles: string | undefined
 }
 
-
 const ChoicesContainer = styled.div<ChoicesContainerProps>`
   display: flex;
   flex-wrap: wrap;
@@ -76,7 +75,7 @@ const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
   box-sizing: border-box;
   padding: 0.6rem 1rem 0.6rem 0.5rem;
   margin-top: 10px !important;
-  background: ${({ correct }) => (correct ? "#D4F1E9" : "#F8E8EB")};;
+  background: ${({ correct }) => (correct ? "#D4F1E9" : "#F8E8EB")};
   p:nth-of-type(1) {
     display: none;
   }
@@ -85,8 +84,8 @@ const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
     padding: 0 0 0 0.5rem;
     font-family: Poppins;
     font-weight: 500;
-    opacity: .8;
-    font-size: .9rem;
+    opacity: 0.8;
+    font-size: 0.9rem;
   }
   ${({ onlyOneItem }) => onlyOneItem && "width: auto; display: inline-block;"}
 `
@@ -100,7 +99,7 @@ interface CenteredDivProps {
 }
 
 const CenteredDiv = styled.div<CenteredDivProps>`
-  text-align: ${({ onlyOneItem }) => onlyOneItem && "center"}
+  text-align: ${({ onlyOneItem }) => onlyOneItem && "center"};
 `
 
 const justADiv = styled.div``
@@ -168,21 +167,20 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
             {options
               .sort((o1, o2) => o1.order - o2.order)
               .map((option, index) => {
-                return (
-                  onlyOneItem ?
-                    <Option
+                return onlyOneItem ? (
+                  <Option
                     key={option.id}
                     option={option}
                     optionWidth={optionWidth}
                     shouldBeGray={false}
-                  /> : 
+                  />
+                ) : (
                   <Option
-                  key={option.id}
-                  option={option}
-                  optionWidth={optionWidth}
-                  shouldBeGray={index % 2 === 0}
-                />
-
+                    key={option.id}
+                    option={option}
+                    optionWidth={optionWidth}
+                    shouldBeGray={index % 2 === 0}
+                  />
                 )
               })}
           </ChoicesContainer>
@@ -490,14 +488,14 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 
   return (
     <CenteredDiv onlyOneItem={onlyOneItem}>
-    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem} >
-      <CentralizedOnSmallScreenTypography variant="body1">
-        <AttentionIcon icon={faExclamationCircle} />
-      </CentralizedOnSmallScreenTypography>
-      <CentralizedOnSmallScreenTypography variant="body1">
-        {feedbackMessage}
-      </CentralizedOnSmallScreenTypography>
-    </FeedbackDiv>
+      <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem}>
+        <CentralizedOnSmallScreenTypography variant="body1">
+          <AttentionIcon icon={faExclamationCircle} />
+        </CentralizedOnSmallScreenTypography>
+        <CentralizedOnSmallScreenTypography variant="body1">
+          {feedbackMessage}
+        </CentralizedOnSmallScreenTypography>
+      </FeedbackDiv>
     </CenteredDiv>
   )
 }

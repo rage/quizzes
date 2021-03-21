@@ -73,7 +73,6 @@ export type CustomContent = {
 }
 
 const QuizItemContainerDiv = styled.div`
-
   padding-bottom: 2px;
 `
 
@@ -459,7 +458,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                             color: "rgba(0,0,0,0.6)",
                             fontSize: "0.9rem",
                             fontWeight: "normal",
-                            fontFamily: 'Poppins'
+                            fontFamily: "Poppins",
                           }}
                         >
                           {quiz.triesLimited
