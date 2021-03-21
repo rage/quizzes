@@ -29,6 +29,7 @@ interface ChoicesContainerProps {
   providedStyles: string | undefined
 }
 
+
 const ChoicesContainer = styled.div<ChoicesContainerProps>`
   display: flex;
   flex-wrap: wrap;
@@ -71,24 +72,35 @@ export interface LeftBorderedDivProps {
 }
 
 const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
-  display: flex;
-  border-left: 6px solid ${({ correct }) => (correct ? "#047500" : "#DB0000")};
+  border-left: 4px solid ${({ correct }) => (correct ? "#37BC9B" : "#F24A5B")};
   box-sizing: border-box;
-  padding: 0.5rem 0 0.5rem 0.5rem;
-  margin-bottom: 5px !important;
+  padding: 0.6rem 1rem 0.6rem 0.5rem;
+  margin-top: 10px !important;
+  background: ${({ correct }) => (correct ? "#D4F1E9" : "#F8E8EB")};;
   p:nth-of-type(1) {
     display: none;
   }
   p:nth-of-type(2) {
     margin-top: -0.25rem;
     padding: 0 0 0 0.5rem;
+    font-family: Poppins;
+    font-weight: 500;
+    opacity: .8;
+    font-size: .9rem;
   }
-  ${({ onlyOneItem }) => onlyOneItem && "width: 70%;"}
+  ${({ onlyOneItem }) => onlyOneItem && "width: auto; display: inline-block;"}
 `
 
 const LeftAlignedMarkdownText = styled(MarkdownText)`
   text-align: left;
   flex: 0;
+`
+interface CenteredDivProps {
+  onlyOneItem: boolean
+}
+
+const CenteredDiv = styled.div<CenteredDivProps>`
+  text-align: ${({ onlyOneItem }) => onlyOneItem && "center"}
 `
 
 const justADiv = styled.div``
@@ -245,6 +257,7 @@ const SelectOptionsLabelTypography = styled(Typography)<{
   font-weight: 400;
   color: rgba(0, 0, 0, 0.6);
   font-size: 16px;
+  font-family: Poppins;
   ${({ onlyOneItem }) => onlyOneItem && "margin: 0 auto 1rem;"}
 `
 
@@ -476,7 +489,8 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   }
 
   return (
-    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem}>
+    <CenteredDiv onlyOneItem={onlyOneItem}>
+    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem} >
       <CentralizedOnSmallScreenTypography variant="body1">
         <AttentionIcon icon={faExclamationCircle} />
       </CentralizedOnSmallScreenTypography>
@@ -484,6 +498,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
         {feedbackMessage}
       </CentralizedOnSmallScreenTypography>
     </FeedbackDiv>
+    </CenteredDiv>
   )
 }
 

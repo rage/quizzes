@@ -42,7 +42,7 @@ const Notification: React.FunctionComponent<NotificationProps> = ({
 }) => {
   const messageState = useTypedSelector(state => state.message)
   if (messageState.message) {
-    const color = (messageState.error && "#F76D82") || 'green'
+    const color = (messageState.error && "#F76D82") || '#333'
     scrollToRef(scrollRef)
     return (
       <Message msgColor={color}>
