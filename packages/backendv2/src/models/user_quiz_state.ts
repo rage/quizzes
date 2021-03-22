@@ -72,6 +72,7 @@ class UserQuizState extends BaseModel {
       .select("user_quiz_state.peer_reviews_given")
       .select("user_quiz_state.peer_reviews_received")
       .select("user_quiz_state.tries")
+      .select("user_quiz_state.points_awarded")
       .select("user_quiz_state.status")
       .where("user_id", userId)
       .where("course_id", courseId)
