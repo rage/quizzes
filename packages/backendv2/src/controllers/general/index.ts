@@ -19,9 +19,7 @@ const general = new Router<CustomState, CustomContext>({
 
     const result = await Quiz.getByCourseId(courseId)
     for (const quiz of result) {
-      for (const quizItem of quiz.items) {
-        quiz_titles[quizItem.id] = quizItem.title
-      }
+      quiz_titles[quiz.id] = quiz.title
     }
 
     ctx.body = quiz_titles
