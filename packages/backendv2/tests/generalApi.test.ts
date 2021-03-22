@@ -10,6 +10,7 @@ import { safeClean, safeSeed, configA } from "./util"
 afterAll(async () => {
   await knex.destroy()
   await redis.client?.flushall()
+  await redis.client?.quit()
 })
 
 afterEach(async () => {
