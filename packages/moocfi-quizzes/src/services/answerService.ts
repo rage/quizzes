@@ -1,6 +1,5 @@
 import axios from "axios"
 import BASE_URL from "../config"
-console.log("💩 ~ file: answerService.ts ~ line 3 ~ BASE_URL", BASE_URL)
 import { Quiz, QuizAnswer, UserQuizState } from "../modelTypes"
 
 type AnswerResponse = {
