@@ -10,7 +10,8 @@ const general = new Router<CustomState, CustomContext>({
   .get("/course/:courseId/progress", accessControl(), async ctx => {
     const courseId = ctx.params.courseId
     const user = ctx.state.user
-    ctx.body = await UserQuizState.getByUserAndCourse(user.id, courseId)
+    const progress = await UserQuizState.getByUserAndCourse(user.id, courseId)
+    ctx.body = progress
   })
 
   .get("/course/:courseId/quiz-titles", accessControl(), async ctx => {

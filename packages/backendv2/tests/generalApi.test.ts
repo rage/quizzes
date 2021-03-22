@@ -44,6 +44,7 @@ describe("general-api", () => {
           return [
             200,
             {
+              id: 1234,
               administrator: true,
             } as UserInfo,
           ]
@@ -87,6 +88,17 @@ describe("general-api", () => {
       .expect(response => {
         const data = response.body
         expect(data).toBeArray()
+        expect(data.length).toBe(1)
+        // Check element of array
+        const progress = data[0]
+        expect(progress).toBeObject()
+        expect(progress).toContainAllKeys([
+          "quizId",
+          "peerReviewsGiven",
+          "peerReviewsReceived",
+          "tries",
+          "status",
+        ])
       })
       .end(done)
   })

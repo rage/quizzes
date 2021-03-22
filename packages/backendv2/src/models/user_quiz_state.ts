@@ -62,7 +62,7 @@ class UserQuizState extends BaseModel {
   public static async getByUserAndCourse(
     userId: number,
     courseId: string,
-    trx: Knex.Transaction,
+    trx?: Knex.Transaction,
   ): Promise<UserQuizState[]> {
     const result = await this.query(trx)
       .from("user_quiz_state")
