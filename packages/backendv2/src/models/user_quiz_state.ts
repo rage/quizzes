@@ -72,8 +72,7 @@ class UserQuizState extends BaseModel {
           COALESCE(points_awarded, 0)        as points_awarded,
           user_quiz_state.spam_flags,
           COALESCE(user_quiz_state.tries, 0) as tries,
-          status,
-          course_id
+          user_quiz_state.status
     FROM user_quiz_state
             JOIN quiz q on user_quiz_state.quiz_id = q.id
             JOIN course c on q.course_id = c.id
