@@ -62,9 +62,7 @@ describe("general-api", () => {
       .expect(200)
       .expect(response => {
         const data = response.body
-        expect(data["aeb6d4f1-a691-45e4-a900-2f7654a004cf"]).toEqual(
-          "multiple-choice",
-        )
+        expect(data["4bf4cf2f-3058-4311-8d16-26d781261af7"]).toEqual("quiz 1")
       })
       .end(done)
   })
@@ -99,6 +97,7 @@ describe("general-api", () => {
           "peerReviewsReceived",
           "tries",
           "status",
+          "pointsAwarded",
         ])
       })
       .end(done)
