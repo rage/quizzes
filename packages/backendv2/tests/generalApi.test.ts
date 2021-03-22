@@ -16,7 +16,7 @@ afterEach(async () => {
   await redis.client?.flushall()
 })
 
-describe("general: course progress", () => {
+describe("general-api", () => {
   beforeAll(async () => {
     await safeSeed(configA)
   })
@@ -51,33 +51,29 @@ describe("general: course progress", () => {
       })
   })
 
-  test("respond with 401 if invalid credentials", done => {
+  it("returns quiz titles of specified course", done => {
     request(app.callback())
       .get(
-        "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/progress",
+        "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/quiz-titles"
       )
-      .set("Authorization", `bearer BAD_TOKEN`)
+      .set("Authorization", "bearer ADMIN_TOKEN")
+      .expect(200)
+      .expect(response => {
+        const data = response.body
+        expect(data['aeb6d4f1-a691-45e4-a900-2f7654a004cf']).toEqual("multiple-choice")
+      })
+      .end(done)
+  })
+
+  it("progress api doesn't allow unauthorized access", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/progress"
+      )
+      .set("Authorization", "bearer BAD_TOKEN")
       .expect(401)
       .end(done)
   })
 
-  test("returns quiz titles on request", done => {
-    request(app.callback())
-      .get(
-        "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/quiz-titles",
-      )
-      .set("Authorization", `bearer ADMIN_TOKEN`)
-      .expect(200)
-      .end(done)
-  })
 
-  test("returns course progress on request", done => {
-    request(app.callback())
-      .get(
-        "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/progress",
-      )
-      .set("Authorization", `bearer ADMIN_TOKEN`)
-      .expect(200)
-      .end(done)
-  })
 })
