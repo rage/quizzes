@@ -54,13 +54,15 @@ describe("general-api", () => {
   it("returns quiz titles of specified course", done => {
     request(app.callback())
       .get(
-        "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/quiz-titles"
+        "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/quiz-titles",
       )
       .set("Authorization", "bearer ADMIN_TOKEN")
       .expect(200)
       .expect(response => {
         const data = response.body
-        expect(data['aeb6d4f1-a691-45e4-a900-2f7654a004cf']).toEqual("multiple-choice")
+        expect(data["aeb6d4f1-a691-45e4-a900-2f7654a004cf"]).toEqual(
+          "multiple-choice",
+        )
       })
       .end(done)
   })
@@ -68,12 +70,24 @@ describe("general-api", () => {
   it("progress api doesn't allow unauthorized access", done => {
     request(app.callback())
       .get(
-        "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/progress"
+        "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/progress",
       )
       .set("Authorization", "bearer BAD_TOKEN")
       .expect(401)
       .end(done)
   })
 
-
+  it("progress api returns an array", done => {
+    request(app.callback())
+      .get(
+        "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/progress",
+      )
+      .set("Authorization", "bearer ADMIN_TOKEN")
+      .expect(200)
+      .expect(response => {
+        const data = response.body
+        expect(data).toBeArray()
+      })
+      .end(done)
+  })
 })
