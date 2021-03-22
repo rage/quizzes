@@ -62,29 +62,21 @@ class UserQuizState extends BaseModel {
   public static async getByUserAndCourse(
     userId: number,
     courseId: string,
+    trx: Knex.Transaction,
   ): Promise<UserQuizState[]> {
-    const trx = await knex.transaction()
-    const userQuizStates = await trx.raw(
-      `
-    SELECT quiz_id,
-          COALESCE(peer_reviews_given, 0)    as peer_reviews_given,
-          COALESCE(peer_reviews_received, 0) as peer_reviews_received,
-          COALESCE(points_awarded, 0)        as points_awarded,
-          user_quiz_state.spam_flags,
-          COALESCE(user_quiz_state.tries, 0) as tries,
-          user_quiz_state.status
-    FROM user_quiz_state
-            JOIN quiz q on user_quiz_state.quiz_id = q.id
-            JOIN course c on q.course_id = c.id
-    WHERE user_id = :userId AND course_id = :courseId
-    `,
-      {
-        userId,
-        courseId,
-      },
-    )
+    const result = await this.query(trx)
+      .from("user_quiz_state")
+      .join("quiz", "user_quiz_state.quiz_id", "quiz.id")
+      .join("course", "quiz.course_id", "course.id")
+      .select("user_quiz_state.quiz_id")
+      .select("user_quiz_state.peer_reviews_given")
+      .select("user_quiz_state.peer_reviews_received")
+      .select("user_quiz_state.tries")
+      .select("user_quiz_state.status")
+      .where("user_id", userId)
+      .where("course_id", courseId)
 
-    return userQuizStates.rows
+    return result
   }
 
   public static async save(
