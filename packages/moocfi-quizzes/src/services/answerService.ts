@@ -1,5 +1,6 @@
 import axios from "axios"
 import BASE_URL from "../config"
+console.log("💩 ~ file: answerService.ts ~ line 3 ~ BASE_URL", BASE_URL)
 import { Quiz, QuizAnswer, UserQuizState } from "../modelTypes"
 
 type AnswerResponse = {
@@ -15,7 +16,7 @@ export const postAnswer = async (
 ): Promise<AnswerResponse> => {
   const response = await axios.post(
     `${address || BASE_URL}/api/v2/widget/answer`,
-    quizAnswer,
+    { ...quizAnswer, deleted: false },
     {
       headers: { authorization: `Bearer ${accessToken}` },
     },
