@@ -76,8 +76,8 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
   )
   const [searchQuery, setSearchQuery] = useState("")
   const [queryToPush, setQueryToPush] = useState({})
-  const [deleted, setDeleted] = useState(!!del)
-  const [notDeleted, setNotDeleted] = useState(!!notDel)
+  const [deleted, setDeleted] = useState(del ? !!del : false)
+  const [notDeleted, setNotDeleted] = useState(notDel ? !!notDel : true)
 
   useBreadcrumbs([
     {
@@ -323,6 +323,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
 
   return (
     <>
+      <pre>{JSON.stringify([deleted, notDeleted], null, 4)}</pre>
       <TabText text="All answers" />
       <QuizTitle quiz={quiz} />
       <OptionsContainer>
