@@ -62,6 +62,7 @@ export interface NormalizedItem {
   successMessage: string | null
   failureMessage: string | null
   sharedOptionFeedbackMessage: string | null
+  allAnswersCorrect: boolean
 }
 
 export interface NormalizedOption {
@@ -115,6 +116,7 @@ export interface Course {
   moocfiId: string
   maxReviewSpamFlags: number
   texts: string[]
+  status: string
 }
 
 export interface ItemVariables {

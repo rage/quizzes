@@ -31,6 +31,7 @@ import SubmitButton from "./SubmitButton"
 import LoginPrompt from "./LoginPrompt"
 import MarkdownText from "../MarkdownText"
 import SimpleErrorBoundary from "./SimpleErrorBoundary"
+import Notification from "../Notification"
 import { BoldTypographyMedium } from "../styleComponents"
 
 import ThemeProviderContext from "../../contexes/themeProviderContext"
@@ -63,6 +64,7 @@ export interface QuizProps {
   customContent?: CustomContent
   fullInfoWithoutLogin?: boolean
   showZeroPointsInfo?: boolean
+  alternativeQuizLabel?: string
 }
 
 export type CustomContent = {
@@ -72,7 +74,7 @@ export type CustomContent = {
 }
 
 const QuizItemContainerDiv = styled.div`
-  padding-bottom: 20px;
+  padding-bottom: 2px;
 `
 
 export interface IItemWrapperProps {
@@ -81,9 +83,10 @@ export interface IItemWrapperProps {
 
 const ItemWrapper = styled.div<IItemWrapperProps>`
   background-color: ${({ rowNumber }) =>
-    rowNumber % 2 === 0 ? "inherit" : "#605c980d"};
-  border-radius: 10px;
-  padding: 0.7rem 2rem 1rem 1rem;
+    rowNumber % 2 === 0 ? "inherit" : "#EFF4F7"};
+  /* border-radius: 10px; */
+  /* padding: 1rem 2rem 1rem 1rem; */
+  padding: 0.5rem 1.5rem;
 `
 
 export interface QuizContentProps {
@@ -116,7 +119,7 @@ export interface LowerContentProps {
 
 const LowerContent = styled.div<LowerContentProps>`
   margin-bottom: 1rem;
-  padding-left: 1rem;
+  padding: 0.5rem 1.5rem;
 `
 
 interface MessageGroupProps {
@@ -136,7 +139,7 @@ const SubmitGroup = styled.div<SubmitGroupProps>`
   flex-wrap: wrap;
   align-items: center;
   > :last-child {
-    margin-left: 1rem;
+    /* margin-left: 1rem; */
   }
   ${({ providedStyles }) => providedStyles}
 `
@@ -188,6 +191,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   fullInfoWithoutLogin,
   showZeroPointsInfo = false,
   children,
+  alternativeQuizLabel,
 }) => {
   const ref = useRef(null)
   const themeProvider = useContext(ThemeProviderContext)
@@ -380,9 +384,8 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       aria-label={quiz.title}
       role="form"
     >
-      <TopInfoBar />
+      <TopInfoBar alternativeQuizLabel={alternativeQuizLabel} />
       <div ref={ref} />
-      {/*<Notification scrollRef={ref} />*/}
       <QuizContentWrapper disabled={quizDisabled || wrongLocale}>
         <UpperContent providedStyles={themeProvider.upperContentStyles}>
           <Deadline deadline={quiz.deadline} />
@@ -449,7 +452,14 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                       <Typography>{generalLabels.pastDeadline}</Typography>
                     ) : (
                       <React.Fragment>
-                        <Typography>
+                        <Typography
+                          style={{
+                            color: "rgba(0,0,0,0.6)",
+                            fontSize: "0.9rem",
+                            fontWeight: "normal",
+                            fontFamily: "Poppins",
+                          }}
+                        >
                           {quiz.triesLimited
                             ? `${generalLabels.triesRemainingLabel}: ${triesRemaining}`
                             : generalLabels.triesNotLimitedLabel}
@@ -469,6 +479,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
             </>
           )}
         </LowerContentWrapper>
+        <Notification scrollRef={ref} />
       </QuizContentWrapper>
       {customContent && customContent.WrongLocale}
       {quizDisabled && (

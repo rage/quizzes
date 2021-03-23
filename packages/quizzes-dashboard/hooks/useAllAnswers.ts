@@ -1,4 +1,5 @@
 import useSWR from "swr"
+import { boolean } from "yup/lib/locale"
 import { getAllAnswers } from "./../services/quizzes"
 
 const fetcher = (
@@ -7,6 +8,8 @@ const fetcher = (
   answersDisplayed: number,
   sortOrder: string,
   filterParameters: string[],
+  deleted: boolean,
+  notDeleted: boolean,
 ) =>
   getAllAnswers(
     quizId,
@@ -14,6 +17,8 @@ const fetcher = (
     answersDisplayed,
     sortOrder,
     filterParameters,
+    deleted,
+    notDeleted,
   )
 
 export const useAllAnswers = (
@@ -22,10 +27,21 @@ export const useAllAnswers = (
   answersDisplayed: number,
   sortOrder: string,
   filterParameters: string[],
+  deleted: boolean,
+  notDeleted: boolean,
   token: string,
 ) => {
   const { data, error } = useSWR(
-    [quizId, currentPage, answersDisplayed, sortOrder, filterParameters, token],
+    [
+      quizId,
+      currentPage,
+      answersDisplayed,
+      sortOrder,
+      filterParameters,
+      deleted,
+      notDeleted,
+      token,
+    ],
     fetcher,
   )
 

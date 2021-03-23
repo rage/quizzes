@@ -57,6 +57,9 @@ interface multipleChoiceButtonProps {
 
 const MultipleChoiceButton = ({ option }: multipleChoiceButtonProps) => {
   const storeOption = useTypedSelector(state => state.editor.options[option.id])
+  const storeItem = useTypedSelector(
+    state => state.editor.items[option.quizItemId],
+  )
   const variables = useTypedSelector(
     state => state.editor.optionVariables[option.id],
   )
@@ -87,7 +90,7 @@ const MultipleChoiceButton = ({ option }: multipleChoiceButtonProps) => {
           </StyledBox>
         </Fade>
       </StyledModal>
-      {storeOption.correct ? (
+      {storeItem.allAnswersCorrect ? (
         <>
           <CorrectButton
             onClick={() => dispatch(setOptionEditing(storeOption.id, true))}
@@ -98,12 +101,25 @@ const MultipleChoiceButton = ({ option }: multipleChoiceButtonProps) => {
         </>
       ) : (
         <>
-          <IncorrectButton
-            onClick={() => dispatch(setOptionEditing(storeOption.id, true))}
-            variant="outlined"
-          >
-            {storeOption.title}
-          </IncorrectButton>
+          {storeOption.correct ? (
+            <>
+              <CorrectButton
+                onClick={() => dispatch(setOptionEditing(storeOption.id, true))}
+                variant="outlined"
+              >
+                {storeOption.title}
+              </CorrectButton>
+            </>
+          ) : (
+            <>
+              <IncorrectButton
+                onClick={() => dispatch(setOptionEditing(storeOption.id, true))}
+                variant="outlined"
+              >
+                {storeOption.title}
+              </IncorrectButton>
+            </>
+          )}
         </>
       )}
     </>

@@ -13,10 +13,14 @@ import PeerReviewQuestion from "./peer_review_question"
 import UserCoursePartState from "./user_course_part_state"
 import * as Kafka from "../services/kafka"
 import SpamFlag from "./spam_flag"
-import _ from "lodash"
-import { raw } from "objection"
+import _, { cond } from "lodash"
+import Objection, { raw } from "objection"
 import BaseModel from "./base_model"
 import QuizOptionAnswer from "./quiz_option_answer"
+import softDelete from "objection-soft-delete"
+import { mixin } from "objection"
+import QuizAnswerStatusModification from "./quiz_answer_status_modification"
+import { TStatusModificationOperation } from "./../types/index"
 
 type QuizAnswerStatus =
   | "draft"
@@ -34,7 +38,9 @@ type QuizAnswerStatus =
   | "rejected"
   | "deprecated"
 
-class QuizAnswer extends BaseModel {
+class QuizAnswer extends mixin(BaseModel, [
+  softDelete({ columnName: "deleted" }),
+]) {
   id!: string
   userId!: number
   quizId!: string
@@ -45,6 +51,8 @@ class QuizAnswer extends BaseModel {
   peerReviews!: PeerReview[]
   userQuizState!: UserQuizState
   quiz!: Quiz
+  correctnessCoefficient!: number
+  deleted!: boolean
 
   static SEARCH_RESULT_LIMIT = 100
   static FIRST_PAGE_INDEX = 0
@@ -189,13 +197,20 @@ class QuizAnswer extends BaseModel {
     pageSize: number,
     order: "asc" | "desc",
     filters: string[],
+    deleted: boolean,
+    notDeleted: boolean,
   ) {
-    let paginated
+    let paginated: Objection.Page<QuizAnswer>
     const noFiltersProvided = filters.length === 0
+    let deleteConditions: boolean[] = [
+      ...(deleted ? [true] : []),
+      ...(notDeleted ? [false] : []),
+    ]
 
     if (noFiltersProvided) {
       paginated = await this.query()
         .where("quiz_id", quizId)
+        .whereIn("deleted", deleteConditions)
         .orderBy([{ column: "created_at", order: order }])
         .page(page, pageSize)
         .withGraphFetched("userQuizState")
@@ -204,6 +219,7 @@ class QuizAnswer extends BaseModel {
     } else {
       paginated = await this.query()
         .where("quiz_id", quizId)
+        .whereIn("deleted", deleteConditions)
         .whereIn("status", filters)
         .orderBy([{ column: "created_at", order: order }])
         .page(page, pageSize)
@@ -588,7 +604,6 @@ class QuizAnswer extends BaseModel {
     this.gradeAnswer(quizAnswer, userQuizState, quiz)
     this.assessUserQuizStatus(quizAnswer, userQuizState, quiz, true)
     if (quizAnswer.status === "confirmed") {
-      // UserCoursePartState.update depends on user quiz state being up to date
       await UserQuizState.upsert(userQuizState, trx)
       await UserCoursePartState.update(
         quizAnswer.userId,
@@ -690,6 +705,36 @@ class QuizAnswer extends BaseModel {
     }
   }
 
+  public static async logAnswerStatusChange(
+    oldAnswerStatus: QuizAnswerStatus,
+    newAnswerStatus: QuizAnswerStatus,
+    quizAnswerId: string,
+    trx: Knex.Transaction,
+  ) {
+    const statusHasChanged = newAnswerStatus !== oldAnswerStatus
+
+    const mapStatusToOperation: {
+      [key: string]: TStatusModificationOperation
+    } = {
+      spam: "peer-review-spam",
+      rejected: "peer-review-reject",
+      confirmed: "peer-review-accept",
+    }
+
+    if (statusHasChanged) {
+      let operation: TStatusModificationOperation | undefined =
+        mapStatusToOperation[newAnswerStatus]
+
+      if (operation) {
+        await QuizAnswerStatusModification.logStatusChange(
+          quizAnswerId,
+          operation,
+          trx,
+        )
+      }
+    }
+  }
+
   public static async assessAnswerStatus(
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
@@ -703,13 +748,23 @@ class QuizAnswer extends BaseModel {
         const peerReviews = await PeerReview.query(trx)
           .where("quiz_answer_id", quizAnswer.id)
           .withGraphJoined("answers")
-        quizAnswer.status = this.assessAnswerWithPeerReviewsStatus(
+
+        const quizAnswerStatusAfterAssessment = this.assessAnswerWithPeerReviewsStatus(
           quiz,
           quizAnswer,
           userQuizState,
           peerReviews,
           course,
         )
+
+        await this.logAnswerStatusChange(
+          quizAnswer.status,
+          quizAnswerStatusAfterAssessment,
+          quizAnswer.id,
+          trx,
+        )
+
+        quizAnswer.status = quizAnswerStatusAfterAssessment
       } else {
         quizAnswer.status = "submitted"
       }
@@ -949,6 +1004,89 @@ class QuizAnswer extends BaseModel {
         "quiz_answer.id",
         allCandidates.map(c => c.id),
       )
+  }
+
+  public static async deleteAnswer(answerId: string): Promise<QuizAnswer> {
+    const trx = await knex.transaction()
+
+    try {
+      const quizAnswer = await this.query(trx).findById(answerId)
+
+      await this.query(trx)
+        .delete()
+        .where("id", answerId)
+
+      const quizAnswers = await QuizAnswer.query(trx)
+        .where("user_id", quizAnswer.userId)
+        .andWhere("quiz_id", quizAnswer.quizId)
+        .andWhere("deleted", false)
+
+      const nextBestQuizAnswer =
+        quizAnswers.length > 0
+          ? quizAnswers.sort(
+              (a, b) => b.correctnessCoefficient - a.correctnessCoefficient,
+            )[0]
+          : undefined
+
+      const maxPoints = (await Quiz.query(trx).findById(quizAnswer.quizId))
+        .points
+
+      const userQuizState = (
+        await UserQuizState.query(trx)
+          .where("user_id", quizAnswer.userId)
+          .andWhere("quiz_id", quizAnswer.quizId)
+      )[0]
+
+      const newTries = userQuizState.tries > 0 ? userQuizState.tries - 1 : 0
+
+      const updatedUserQuizState = await userQuizState
+        .$query(trx)
+        .updateAndFetch({
+          status:
+            newTries >=
+            (await Quiz.query(trx).findById(quizAnswer.quizId)).tries
+              ? "locked"
+              : "open",
+          tries: newTries,
+          spamFlags: nextBestQuizAnswer
+            ? (
+                await SpamFlag.query(trx).where(
+                  "quiz_answer_id",
+                  nextBestQuizAnswer.id,
+                )
+              ).length
+            : 0,
+          pointsAwarded: nextBestQuizAnswer
+            ? maxPoints * nextBestQuizAnswer.correctnessCoefficient
+            : 0,
+        })
+
+      nextBestQuizAnswer
+        ? await Kafka.broadcastQuizAnswerUpdated(
+            nextBestQuizAnswer,
+            updatedUserQuizState,
+            await Quiz.query(trx).findById(quizAnswer.quizId),
+            trx,
+          )
+        : await Kafka.broadcastQuizAnswerUpdated(
+            quizAnswer,
+            updatedUserQuizState,
+            await Quiz.query(trx).findById(quizAnswer.quizId),
+            trx,
+          )
+
+      await Kafka.broadcastUserProgressUpdated(
+        quizAnswer.userId,
+        (await Quiz.query(trx).findById(quizAnswer.quizId)).courseId,
+        trx,
+      )
+
+      await trx.commit()
+      return await this.query().findById(answerId)
+    } catch (error) {
+      await trx.rollback()
+      throw error
+    }
   }
 
   private static async getCandidates(

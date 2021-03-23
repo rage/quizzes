@@ -40,9 +40,16 @@ export const AnswerList = ({ data }: AnswerListProps) => {
   const numberOfAnswersSelected = bulkSelectedIds?.length
   const answersHaveBeenSelected = bulkSelectedIds?.length > 0
 
-  const handleBulkAction = async (actionType: string) => {
+  const handleBulkAction = async (
+    actionType: string,
+    plagiarismSuspected = false,
+  ) => {
     try {
-      const res = await changeAnswerStatusForMany(bulkSelectedIds, actionType)
+      const res = await changeAnswerStatusForMany(
+        bulkSelectedIds,
+        actionType,
+        plagiarismSuspected,
+      )
 
       if (res[0].status === actionType) {
         setShowSnacks(true)
@@ -109,6 +116,13 @@ export const AnswerList = ({ data }: AnswerListProps) => {
             >
               {" "}
               <Typography>Reject all</Typography>
+            </Button>
+            <Button
+              className="button-plagiarism"
+              onClick={() => handleBulkAction("rejected", true)}
+            >
+              {" "}
+              <Typography>Mark all as plagiarized</Typography>
             </Button>
           </ButtonFieldWrapper>
         </BulkActionWrapper>
