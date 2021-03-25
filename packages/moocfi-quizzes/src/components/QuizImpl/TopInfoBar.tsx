@@ -207,7 +207,8 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
           id="quiz-type-label"
           style={{ lineHeight: "1.2", opacity: "0.8" }}
         >
-          {quizLabel}{colon}
+          {quizLabel}
+          {colon}
         </Typography>
         {quiz ? (
           <Typography
