@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import { Typography } from "@material-ui/core"
 import { GridDirection, GridSize } from "@material-ui/core/Grid"
-import { HeadingTypography } from "./styleComponents"
+import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
 import { QuizItem, QuizItemOption, QuizItemAnswer } from "../modelTypes"
@@ -16,7 +16,6 @@ import ChoiceButton from "./ChoiceButton"
 
 const QuestionContainer = styled.div`
   display: flex;
-  justify-content: center;
   flex-direction: column;
   flex: 1;
   font-size: 1.25rem;
@@ -225,7 +224,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
     <QuestionContainer>
       {!onlyOneItem && title && (
         <LeftAlignedMarkdownText
-          Component={HeadingTypography}
+          Component={SpaciousTypography}
           removeParagraphs
           variant="subtitle1"
           id={`item-question-${title}`}
@@ -506,7 +505,7 @@ const OptionWrapper = styled.div<OptionWrapperProps>`
       ? `
       display: flex;
       justify-content: center;
-      background-color: ${shouldBeGray ? `#f5f9fb` : `inherit`};
+      background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
       ${providedStyles}
     `
       : `

@@ -4,7 +4,6 @@ metadata:
   name: quizzes-ingress
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.org/websocket-services: "ws"
 spec:
   tls:
   - hosts:

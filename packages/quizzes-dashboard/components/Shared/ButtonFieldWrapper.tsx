@@ -22,11 +22,21 @@ export const ButtonFieldWrapper = styled.div`
   }
 
   .button-reject {
-    background-color: #c62828;
+    background-color: #ff1744;
     color: white;
 
     :hover {
-      background-color: #c62828;
+      background-color: #ff1744;
+      opacity: 0.6;
+      color: #000;
+    }
+  }
+  .button-plagiarism {
+    background-color: #b26500;
+    color: white;
+
+    :hover {
+      background-color: #b26500;
       opacity: 0.6;
       color: #000;
     }

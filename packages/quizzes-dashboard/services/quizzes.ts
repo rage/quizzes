@@ -94,6 +94,8 @@ export const getAllAnswers = async (
   size: number,
   order: string,
   filters: string[],
+  deleted: boolean,
+  notDeleted: boolean,
 ): Promise<{ results: Answer[]; total: number }> => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -103,7 +105,7 @@ export const getAllAnswers = async (
     const response = (
       await api.get(
         `/answers/${quizId}/all?page=${page -
-          1}&size=${size}&order=${order}&filters=${filters}`,
+          1}&size=${size}&order=${order}&filters=${filters}&deleted=${deleted}&notDeleted=${notDeleted}`,
         config,
       )
     ).data
@@ -185,6 +187,7 @@ export const getAllAnswersMatchingQuery = async (
 export const changeAnswerStatus = async (
   answerId: string,
   status: string,
+  plagiarismSuspected: boolean,
 ): Promise<Answer> => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -192,7 +195,27 @@ export const changeAnswerStatus = async (
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
     const response = (
-      await api.post(`/answers/${answerId}/status`, { status }, config)
+      await api.post(
+        `/answers/${answerId}/status`,
+        { status, plagiarismSuspected },
+        config,
+      )
+    ).data
+    return response
+  }
+  throw new Error()
+}
+
+export const logPlagiarismSuspicion = async (
+  answerId: string,
+): Promise<any> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (
+      await api.post(`/answers/${answerId}/suspect-plagiarism`, config)
     ).data
     return response
   }
@@ -202,6 +225,7 @@ export const changeAnswerStatus = async (
 export const changeAnswerStatusForMany = async (
   answerIds: string[],
   status: string,
+  plagiarismSuspected: boolean,
 ): Promise<Answer[]> => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -209,7 +233,11 @@ export const changeAnswerStatusForMany = async (
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
     const response = (
-      await api.post(`/answers/status`, { status, answerIds }, config)
+      await api.post(
+        `/answers/status`,
+        { status, answerIds, plagiarismSuspected },
+        config,
+      )
     ).data
     return response
   }
@@ -452,4 +480,44 @@ export const downloadAnswerInfo = async (
   } else {
     throw new Error()
   }
+}
+
+export const getQuizAnswerStatusChangeLog = async (answerId: string) => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (
+      await api.get(`/answers/${answerId}/status-changes`, config)
+    ).data
+    return response
+  }
+  throw new Error()
+}
+
+export const deleteQuizAnswer = async (quizAnswerId: string) => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return await api.delete(`answers/${quizAnswerId}`, config)
+  } else {
+    throw new Error()
+  }
+}
+
+export const logSuspectedPlagiarism = async (answerId: string) => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (
+      await api.post(`/answers/${answerId}/suspect-plagiarism`, {}, config)
+    ).data
+    return response
+  }
+  throw new Error()
 }

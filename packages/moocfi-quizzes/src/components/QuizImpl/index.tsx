@@ -64,6 +64,7 @@ export interface QuizProps {
   customContent?: CustomContent
   fullInfoWithoutLogin?: boolean
   showZeroPointsInfo?: boolean
+  alternativeQuizLabel?: string
 }
 
 export type CustomContent = {
@@ -93,8 +94,8 @@ export interface QuizContentProps {
 }
 
 const QuizContent = styled.div<QuizContentProps>`
-  margin-top: 3rem;
-  /*   padding: 1rem; */
+  margin-top: 1.5rem;
+  padding: 1rem;
   ${({ disabled }) =>
     disabled &&
     `
@@ -190,6 +191,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   fullInfoWithoutLogin,
   showZeroPointsInfo = false,
   children,
+  alternativeQuizLabel,
 }) => {
   const ref = useRef(null)
   const themeProvider = useContext(ThemeProviderContext)
@@ -382,7 +384,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
       aria-label={quiz.title}
       role="form"
     >
-      <TopInfoBar />
+      <TopInfoBar alternativeQuizLabel={alternativeQuizLabel} />
       <div ref={ref} />
       <QuizContentWrapper disabled={quizDisabled || wrongLocale}>
         <UpperContent providedStyles={themeProvider.upperContentStyles}>
@@ -432,10 +434,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
             </MessageGroup>
           ) : (
             <>
-              <SubmitGroup
-                providedStyles={themeProvider.submitGroupStyles}
-                style={{ display: "block" }}
-              >
+              <SubmitGroup providedStyles={themeProvider.submitGroupStyles}>
                 <div />
                 <div
                   onClick={e => {
@@ -448,7 +447,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                 </div>
 
                 {!quizDisabled && (
-                  <div style={{ paddingTop: "1rem" }}>
+                  <div>
                     {pastDeadline ? (
                       <Typography>{generalLabels.pastDeadline}</Typography>
                     ) : (

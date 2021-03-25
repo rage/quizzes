@@ -251,7 +251,7 @@ const BasicInformation = () => {
               InputProps={{ inputProps: { min: 1, max: null } }}
               label="Number of tries allowed"
               variant="outlined"
-              defaultValue={numberOfTries ?? ""}
+              value={numberOfTries ?? ""}
               fullWidth
               onChange={event =>
                 dispatch(
@@ -271,7 +271,7 @@ const BasicInformation = () => {
           type="number"
           fullWidth
           variant="outlined"
-          defaultValue={pointsToGain ?? ""}
+          value={pointsToGain ?? ""}
           onChange={event =>
             dispatch(
               editedQuizzesPointsToGain(Number(event.target.value), quizId),

@@ -120,6 +120,11 @@ export const increasedItemOrder = createAction(
   }),
 )<{ itemId: string }>()
 
+export const toggledAllAnswersCorrect = createAction(
+  "TOGGLED_ALL_ANSWERS_CORRECT",
+  (itemId: string) => ({ itemId: itemId }),
+)<{ itemId: string }>()
+
 export const itemActions = [
   editedQuizItemBody,
   editedQuizItemTitle,
@@ -137,6 +142,7 @@ export const itemActions = [
   toggledSharedOptionFeedbackMessage,
   decreasedItemOrder,
   increasedItemOrder,
+  toggledAllAnswersCorrect,
 ]
 
 export default itemActions

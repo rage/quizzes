@@ -45,8 +45,7 @@ const QuizStatusMessage = styled(Typography)``
 
 const PointsText = styled(Typography)<{ component: string }>`
   font-size: 1.5rem !important;
-  text-align: center;
-  font-weight: 400;
+  text-align: end;
   display: inline;
   max-height: 100%;
 
@@ -56,9 +55,7 @@ const PointsText = styled(Typography)<{ component: string }>`
 `
 
 const PointsLabelText = styled(Typography)<{ component: string }>`
-  font-size: 0.9rem !important;
-  opacity: 0.8;
-  line-height: 1;
+  font-size: 1rem !important;
 
   @media (max-width: 550px) {
     text-align: start;
@@ -73,10 +70,12 @@ const SpaceFillerDiv = styled.div`
 interface ITopInfoBarProps {
   // when the user is not logged in
   staticBars?: boolean
+  alternativeQuizLabel?: string
 }
 
 const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   staticBars,
+  alternativeQuizLabel,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
@@ -95,13 +94,18 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
   let receivedPoints
   let formattedReceivedPoints
   let availablePoints
+  let colon
 
   if (languageInfo) {
-    quizLabel = languageInfo.general.quizLabel
+    quizLabel =
+      alternativeQuizLabel === undefined
+        ? languageInfo.general.quizLabel
+        : alternativeQuizLabel
     pointsLabel = languageInfo.general.pointsLabel
     answeredLabel = languageInfo.general.answered
     unansweredLabel = languageInfo.general.unanswered
     rejectedLabel = languageInfo.general.rejected
+    colon = quizLabel.length > 0 ? ":" : ""
   }
 
   const answerStatus = quizAnswer.status
@@ -203,7 +207,7 @@ const TopInfoBar: React.FunctionComponent<ITopInfoBarProps> = ({
           id="quiz-type-label"
           style={{ lineHeight: "1.2", opacity: "0.8" }}
         >
-          {quizLabel}:
+          {quizLabel}{colon}
         </Typography>
         {quiz ? (
           <Typography

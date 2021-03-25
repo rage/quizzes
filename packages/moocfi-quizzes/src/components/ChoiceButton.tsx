@@ -5,7 +5,7 @@ import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons"
 
-import { UpdatedStyledButton } from "./styleComponents"
+import { StyledButton } from "./styleComponents"
 
 export interface ChoiceButtonProps {
   revealed: boolean
@@ -45,7 +45,7 @@ const FailureIcon = () => (
   </IconWrapper>
 )
 
-const ChoiceButton = styled(UpdatedStyledButton)<ButtonProps>`
+const ChoiceButton = styled(StyledButton)<ButtonProps>`
   ${({ onlyOneItem }) => onlyOneItem && `width: 70%;`}
   ${({ selected }) =>
     !selected
@@ -123,7 +123,6 @@ export default (props: ChoiceButtonProps) => {
       color={props.selected ? "primary" : "default"}
       fullWidth
       {...others}
-      disableRipple
     />
   )
 }

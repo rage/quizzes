@@ -21,6 +21,7 @@ class Course extends BaseModel {
   title!: string
   body!: string
   abbreviation!: string
+  status!: string
 
   static get tableName() {
     return "course"
@@ -379,6 +380,17 @@ class Course extends BaseModel {
         .where({ course_id: courseId })
         .andWhereNot("part", 0)
     ).map(q => q.part)
+  }
+
+  public static async updateCourseActiveStatus(
+    courseId: string,
+    newStatus: string,
+  ) {
+    if (newStatus !== "active" && newStatus !== "ended") {
+      throw new Error("invalid status")
+    }
+    const course = await Course.query().findById(courseId)
+    return course.$query().patchAndFetch({ status: newStatus })
   }
 
   static async updateMoocfiId(id: string, newMoocfiId: string) {

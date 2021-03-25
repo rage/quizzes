@@ -15,6 +15,7 @@ import {
   editedScaleMinValue,
   increasedItemOrder,
   decreasedItemOrder,
+  toggledAllAnswersCorrect,
 } from "./itemAction"
 import {
   initializedEditor,
@@ -138,6 +139,7 @@ export const itemReducer = createReducer<
         usesSharedOptionFeedbackMessage: false,
         sharedOptionFeedbackMessage: null,
         options: [],
+        allAnswersCorrect: false,
       }
       draftState[action.payload.itemId] = newItem
     })
@@ -197,6 +199,7 @@ export const itemReducer = createReducer<
     const normalized = normalize(init, normalizedQuiz)
     return normalized.entities.items ?? {}
   })
+
   .handleAction(increasedItemOrder, (state, action) => {
     return produce(state, draftState => {
       const order = draftState[action.payload.itemId].order
@@ -211,6 +214,7 @@ export const itemReducer = createReducer<
       }
     })
   })
+
   .handleAction(decreasedItemOrder, (state, action) => {
     return produce(state, draftState => {
       const order = draftState[action.payload.itemId].order
@@ -223,6 +227,14 @@ export const itemReducer = createReducer<
         draftState[action.payload.itemId].order =
           state[action.payload.itemId].order - 1
       }
+    })
+  })
+
+  .handleAction(toggledAllAnswersCorrect, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].allAnswersCorrect = !draftState[
+        action.payload.itemId
+      ].allAnswersCorrect
     })
   })
 

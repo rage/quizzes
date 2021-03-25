@@ -37,7 +37,7 @@ export const SpaciousPaper = styled(Paper)`
   padding: 1rem;
   margin: 0.5rem;
 `
-/**** WORK ON THIS ****/
+
 export const SpaciousTypography = styled(Typography)`
   /*   padding-bottom: 0.75rem; */
   padding-bottom: 0.5rem !Important;
@@ -105,15 +105,9 @@ export const StyledTextField = styled(TextField)<IStyledTextFieldProps>`
 
 export const StyledButton = styled(BaseButton)`
   padding: 10px 20px;
-  /*   border-radius: 15px; */
-  border-radius: 45px;
+  border-radius: 15px;
   box-shadow: 0 2px 2px 0 rgba(0, 0, 0, 0.14),
     0 3px 1px -2px rgba(0, 0, 0, 0.12), 0 1px 5px 0 rgba(0, 0, 0, 0.2);
-`
-export const UpdatedStyledButton = styled(BaseButton)`
-  padding: 10px 20px;
-  border-radius: 4px;
-  box-shadow: none;
 `
 export const SecondaryStyledButton = styled(BaseButton)`
   padding: 10px 20px;
