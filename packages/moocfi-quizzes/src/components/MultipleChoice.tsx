@@ -70,35 +70,24 @@ export interface LeftBorderedDivProps {
 }
 
 const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
-  border-left: 4px solid ${({ correct }) => (correct ? "#37BC9B" : "#F24A5B")};
+  display: flex;
+  border-left: 6px solid ${({ correct }) => (correct ? "#047500" : "#DB0000")};
   box-sizing: border-box;
-  padding: 0.6rem 1rem 0.6rem 0.5rem;
-  margin-top: 10px !important;
-  background: ${({ correct }) => (correct ? "#D4F1E9" : "#F8E8EB")};
+  padding: 0.5rem 0 0.5rem 0.5rem;
+  margin-bottom: 5px !important;
   p:nth-of-type(1) {
     display: none;
   }
   p:nth-of-type(2) {
     margin-top: -0.25rem;
     padding: 0 0 0 0.5rem;
-    font-family: Poppins;
-    font-weight: 500;
-    opacity: 0.8;
-    font-size: 0.9rem;
   }
-  ${({ onlyOneItem }) => onlyOneItem && "width: auto; display: inline-block;"}
+  ${({ onlyOneItem }) => onlyOneItem && "width: 70%;"}
 `
 
 const LeftAlignedMarkdownText = styled(MarkdownText)`
   text-align: left;
   flex: 0;
-`
-interface CenteredDivProps {
-  onlyOneItem: boolean
-}
-
-const CenteredDiv = styled.div<CenteredDivProps>`
-  text-align: ${({ onlyOneItem }) => onlyOneItem && "center"};
 `
 
 const justADiv = styled.div``
@@ -166,14 +155,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
             {options
               .sort((o1, o2) => o1.order - o2.order)
               .map((option, index) => {
-                return onlyOneItem ? (
-                  <Option
-                    key={option.id}
-                    option={option}
-                    optionWidth={optionWidth}
-                    shouldBeGray={false}
-                  />
-                ) : (
+                return (
                   <Option
                     key={option.id}
                     option={option}
@@ -251,10 +233,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 const SelectOptionsLabelTypography = styled(Typography)<{
   onlyOneItem: boolean
 }>`
-  font-weight: 400;
-  color: rgba(0, 0, 0, 0.6);
-  font-size: 16px;
-  font-family: Poppins;
+  color: 6b6b6b;
   ${({ onlyOneItem }) => onlyOneItem && "margin: 0 auto 1rem;"}
 `
 
@@ -486,16 +465,14 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   }
 
   return (
-    <CenteredDiv onlyOneItem={onlyOneItem}>
-      <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem}>
-        <CentralizedOnSmallScreenTypography variant="body1">
-          <AttentionIcon icon={faExclamationCircle} />
-        </CentralizedOnSmallScreenTypography>
-        <CentralizedOnSmallScreenTypography variant="body1">
-          {feedbackMessage}
-        </CentralizedOnSmallScreenTypography>
-      </FeedbackDiv>
-    </CenteredDiv>
+    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem}>
+      <CentralizedOnSmallScreenTypography variant="body1">
+        <AttentionIcon icon={faExclamationCircle} />
+      </CentralizedOnSmallScreenTypography>
+      <CentralizedOnSmallScreenTypography variant="body1">
+        {feedbackMessage}
+      </CentralizedOnSmallScreenTypography>
+    </FeedbackDiv>
   )
 }
 
