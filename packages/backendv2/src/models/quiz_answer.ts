@@ -529,6 +529,10 @@ class QuizAnswer extends mixin(BaseModel, [
   }
 
   public static async newAnswer(userId: number, quizAnswer: QuizAnswer) {
+    if (quizAnswer.deleted) {
+      throw new BadRequestError("A new answer cannot be marked as deleted.")
+    }
+
     const trx = await knex.transaction()
     try {
       const quizId = quizAnswer.quizId
