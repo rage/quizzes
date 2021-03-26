@@ -220,7 +220,7 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
     }
   }, [])
 
-  const isLoggedInAndLoading = accessToken && state.loading 
+  const isLoggedInAndLoading = accessToken && state.loading
 
   return (
     <div ref={ref}>
