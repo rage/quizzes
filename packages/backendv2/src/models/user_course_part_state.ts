@@ -127,8 +127,6 @@ class UserCoursePartState extends BaseModel {
         })
         .andWhereNot("course_part", 0)
 
-      console.log(userCoursePartStates)
-
       const quizzes = await Quiz.query(trx)
         .where("course_id", courseId)
         .andWhereNot("part", 0)
@@ -149,7 +147,7 @@ class UserCoursePartState extends BaseModel {
             coursePartString.length > 1 ? "osa" : "osa0"
           }${coursePartString}`,
           progress: Math.round(((ucps.score / maxPoints) * 100) / 100),
-          n_points: ucps.score,
+          n_points: Number(ucps.score.toFixed(2)),
           max_points: maxPoints,
         }
       })
