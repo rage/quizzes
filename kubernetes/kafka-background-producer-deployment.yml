@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kafka-background-producer-deployment
+spec:
+  selector:
+    matchLabels:
+      app: kafka-background-producer
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: kafka-background-producer
+    spec:
+      containers:
+      - name: kafka-background-producer
+        image: ${BACKENDV2_IMAGE}
+        command: ["npm", "run", "background-producer"]
+        imagePullPolicy: Always
+        resources:
+          requests:
+            memory: "200Mi"
+            cpu: "100m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        env:
+          - name: NODE_ENV
+            value: "production"
+          - name: REDIS_HOST
+            value: "quizzes-backend-redis-master.default.svc.cluster.local"
+          - name: REDIS_PORT
+            value: "6379"
+          - name: REDIS_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: quizzes-backend-redis
+                key: redis-password
+          - name: DB_NAME
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: POSTGRES_DATABASE
+          - name: DB_HOST
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: POSTGRES_HOST
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: POSTGRES_PASSWORD
+          - name: DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: POSTGRES_USERNAME
+          - name: KAFKA_HOST
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: KAFKA_HOST
+          - name: MESSAGE_FORMAT_VERSION
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: MESSAGE_FORMAT_VERSION
+          - name: NEW_RELIC_LICENSE_KEY
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: NEW_RELIC_LICENSE_KEY
+          - name: NEW_RELIC_APP_NAME
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: NEW_RELIC_APP_NAME
+          - name: NEW_RELIC_NO_CONFIG_FILE
+            value: "true"
+          - name: SERVICE_ID
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: SERVICE_ID
+          - name: SENTRY_DSN
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: SENTRY_DSN
+

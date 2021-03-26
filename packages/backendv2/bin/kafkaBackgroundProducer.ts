@@ -2,6 +2,7 @@ import * as Kafka from "node-rdkafka"
 import { promisify } from "util"
 import { KafkaMessage } from "../src/models"
 import { setUpDB } from "../database/knex"
+import { GlobalLogger } from "../src/middleware/logger"
 
 let producer: Kafka.Producer
 let flush: any
@@ -43,24 +44,26 @@ const produce = async (topic: string, message: string) => {
 
 export const kafkaBackgroundMessageProducer = async () => {
   if (!process.env.KAFKA_HOST) {
-    console.error("No kafka host defined")
+    GlobalLogger.error("No kafka host defined")
     process.exit(-1)
   }
-  console.log("Starting...")
+  GlobalLogger.info("Starting...")
   while (true) {
     try {
       const messages = await KafkaMessage.fetchSomeMessage(100)
-      console.log("Producing", messages.length, " messages")
-      for (const msg of messages) {
-        await produce(msg.topic, msg.message)
+      if (messages.length > 0) {
+        GlobalLogger.info(`Producing ${messages.length} messages`)
+        for (const msg of messages) {
+          await produce(msg.topic, msg.message)
+        }
+        GlobalLogger.info("Message production completed")
+        await flush(1000)
+        GlobalLogger.info("deleting", messages.length, " messages")
+        await KafkaMessage.batchDelete(messages)
+        GlobalLogger.info("Messages deleted succesfully")
       }
-      console.log("Message production completed")
-      await flush(1000)
-      console.log("deleting", messages.length, " messages")
-      await KafkaMessage.batchDelete(messages)
-      console.log("Messages deleted succesfully")
     } catch (error) {
-      console.error(error)
+      GlobalLogger.error(error)
     }
     await sleep(10)
   }
