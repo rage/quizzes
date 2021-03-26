@@ -36,6 +36,8 @@ import SpamFlag from "./spam_flag"
 
 import QuizAnswerStatusModification from "./quiz_answer_status_modification"
 
+import KafkaMessage from "./kafka_message"
+
 export {
   Quiz,
   QuizTranslation,
@@ -60,4 +62,5 @@ export {
   CourseTranslation,
   Language,
   SpamFlag,
+  KafkaMessage,
 }

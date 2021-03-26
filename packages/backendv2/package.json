@@ -13,7 +13,8 @@
     "test-open-conn": "export NODE_ENV=test && jest --runInBand --detectOpenHandles ",
     "reset-test-db": "export NODE_ENV=test && (dropdb quizzes_test || true) && createdb quizzes_test && knex migrate:latest",
     "migrate": "knex migrate:latest",
-    "seed": "knex seed:run --specific a.ts"
+    "seed": "knex seed:run --specific a.ts",
+    "background-producer": "node ./dist/bin/kafkaBackgroundProducer.js"
   },
   "devDependencies": {
     "@types/ioredis": "^4.17.11",
