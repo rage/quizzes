@@ -127,6 +127,8 @@ class UserCoursePartState extends BaseModel {
         })
         .andWhereNot("course_part", 0)
 
+      console.log(userCoursePartStates)
+
       const quizzes = await Quiz.query(trx)
         .where("course_id", courseId)
         .andWhereNot("part", 0)
