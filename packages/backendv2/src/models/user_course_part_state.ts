@@ -1,4 +1,3 @@
-import { BadRequestError } from "./../util/error"
 import User from "./user"
 import Knex from "knex"
 import Course from "./course"
@@ -49,6 +48,7 @@ class UserCoursePartState extends BaseModel {
     const userCoursePartState = (
       await this.query(trx).findByIds([userId, courseId, coursePart])
     )[0]
+
     if (!userCoursePartState) {
       const parts = await trx("quiz")
         .select("part as course_part")
@@ -102,9 +102,10 @@ class UserCoursePartState extends BaseModel {
           .andWhere("part", coursePart)
           .andWhere("user_id", userId)
       )[0]
+
       await userCoursePartState.$query(trx).patch({
         score: pointsAwarded || 0,
-        progress: pointsAwarded ? pointsAwarded / totalPoints : 0 / totalPoints,
+        progress: pointsAwarded ? pointsAwarded / totalPoints : 0,
       })
     }
   }
@@ -113,55 +114,50 @@ class UserCoursePartState extends BaseModel {
     userId: number,
     courseId: string,
     trx: Knex.Transaction,
-  ) {
-    let userCoursePartStates
-
-    // validate course id
+  ): Promise<PointsByGroup[]> {
     try {
+      // course validation
       await Course.getFlattenedById(courseId)
       await User.getById(userId)
-    } catch (error) {
-      throw error
-    }
 
-    try {
-      userCoursePartStates = await this.query(trx)
+      const userCoursePartStates = await this.query(trx)
         .where({
           user_id: userId,
           course_id: courseId,
         })
         .andWhereNot("course_part", 0)
+
+      const quizzes = await Quiz.query(trx)
+        .where("course_id", courseId)
+        .andWhereNot("part", 0)
+
+      const progress: PointsByGroup[] = userCoursePartStates.map(ucps => {
+        const maxPoints = quizzes
+          .filter(
+            quiz =>
+              quiz.part === ucps.coursePart && quiz.excludedFromScore === false,
+          )
+          .map(quiz => quiz.points)
+          .reduce((acc, curr) => acc + curr, 0)
+
+        const coursePartString = ucps.coursePart.toString()
+
+        return {
+          group: `${
+            coursePartString.length > 1 ? "osa" : "osa0"
+          }${coursePartString}`,
+          progress: Math.round(((ucps.score / maxPoints) * 100) / 100),
+          n_points: Number(ucps.score.toFixed(2)),
+          max_points: maxPoints,
+        }
+      })
+
+      return progress.sort((pbg1, pbg2) =>
+        pbg1.group < pbg2.group ? -1 : pbg1.group > pbg2.group ? 1 : 0,
+      )
     } catch (error) {
       throw error
     }
-
-    const quizzes = await Quiz.query(trx)
-      .where("course_id", courseId)
-      .andWhereNot("part", 0)
-
-    const progress: PointsByGroup[] = userCoursePartStates.map(ucps => {
-      const maxPoints = quizzes
-        .filter(
-          quiz =>
-            quiz.part === ucps.coursePart && quiz.excludedFromScore === false,
-        )
-        .map(quiz => quiz.points)
-        .reduce((acc, curr) => acc + curr, 0)
-
-      const coursePartString = ucps.coursePart.toString()
-      return {
-        group: `${
-          coursePartString.length > 1 ? "osa" : "osa0"
-        }${coursePartString}`,
-        progress: Math.round(((ucps.score / maxPoints) * 100) / 100),
-        n_points: Number(ucps.score.toFixed(2)),
-        max_points: maxPoints,
-      }
-    })
-
-    return progress.sort((pbg1, pbg2) =>
-      pbg1.group < pbg2.group ? -1 : pbg1.group > pbg2.group ? 1 : 0,
-    )
   }
 
   public static async refreshCourse(userId: number, courseId: string) {

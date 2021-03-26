@@ -18,6 +18,7 @@ export const safeSeed = async (config?: any) => {
 }
 
 export const configA = { directory: "./database/seeds", specific: "a.ts" }
+
 export const configQuizAnswerSoftDelete = {
   directory: "./database/seeds",
   specific: "quizAnswerSoftDelete.ts",
