@@ -1,6 +1,4 @@
 import Knex from "knex"
-import * as Kafka from "node-rdkafka"
-import { promisify } from "util"
 import {
   ExerciseData,
   ProgressMessage,
@@ -8,46 +6,15 @@ import {
   QuizMessage,
   RequiredAction,
 } from "../types"
-import { Course, Quiz, QuizAnswer, UserQuizState } from "../models"
+import {
+  Course,
+  KafkaMessage,
+  Quiz,
+  QuizAnswer,
+  UserQuizState,
+} from "../models"
 import UserCoursePartState from "../models/user_course_part_state"
 import knex from "../../database/knex"
-
-let producer: Kafka.Producer
-let flush: any
-
-const connect = () => {
-  return new Promise((resolve, reject) => {
-    producer.connect({}, (err: Kafka.LibrdKafkaError, data: Kafka.Metadata) => {
-      if (err) {
-        reject(err)
-      }
-      resolve(data)
-    })
-  })
-}
-
-const produce = async (
-  topic: "user-course-progress-realtime" | "exercise" | "user-points-realtime",
-  message: ProgressMessage | QuizAnswerMessage | QuizMessage,
-) => {
-  if (!process.env.KAFKA_HOST) {
-    return
-  }
-  try {
-    if (!producer) {
-      producer = new Kafka.Producer({
-        "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
-        dr_cb: false,
-      })
-      await connect()
-      flush = promisify(producer.flush.bind(producer))
-    }
-    producer.produce(topic, null, Buffer.from(JSON.stringify(message)))
-    await flush(1000)
-  } catch (error) {
-    throw new Error(error)
-  }
-}
 
 export const broadcastUserProgressUpdated = async (
   userId: number,
@@ -67,7 +34,11 @@ export const broadcastUserProgressUpdated = async (
   }
 
   if (course.moocfiId) {
-    await produce("user-course-progress-realtime", message)
+    await KafkaMessage.createMessageEntry(
+      "user-course-progress-realtime",
+      message,
+      trx,
+    )
   }
 }
 
@@ -109,7 +80,7 @@ export const broadcastQuizAnswerUpdated = async (
   }
 
   if (course.moocfiId) {
-    await produce("user-points-realtime", message)
+    await KafkaMessage.createMessageEntry("user-points-realtime", message, trx)
   }
 }
 
@@ -142,7 +113,7 @@ export const broadcastCourseQuizzesUpdated = async (
     message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
   }
   if (course.moocfiId) {
-    await produce("exercise", message)
+    await KafkaMessage.createMessageEntry("exercise", message, trx)
   }
 }
 
