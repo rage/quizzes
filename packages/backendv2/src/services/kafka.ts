@@ -113,7 +113,7 @@ export const broadcastCourseQuizzesUpdated = async (
     message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
   }
   if (course.moocfiId) {
-    KafkaMessage.createMessageEntry("exercise", message, trx)
+    await KafkaMessage.createMessageEntry("exercise", message, trx)
   }
 }
 
