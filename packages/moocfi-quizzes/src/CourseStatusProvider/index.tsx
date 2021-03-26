@@ -220,9 +220,11 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
     }
   }, [])
 
+  const isLoggedInAndLoading = accessToken && state.loading 
+
   return (
     <div ref={ref}>
-      {!state.loading && <Component {...props} {...injectProps} />}
+      {!isLoggedInAndLoading && <Component {...props} {...injectProps} />}
     </div>
   )
 }
