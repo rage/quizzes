@@ -125,7 +125,7 @@ const greekLabels: SingleLanguageLabels = {
     pointsGrantingPolicyInformer: policy => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
-          return "To receive points the answer must be fully correct"
+          return "Για να λάβει βαθμούς η απάντηση πρέπει να είναι απολύτως σωστή"
         case "grant_whenever_possible":
           return ""
         default:
@@ -133,14 +133,14 @@ const greekLabels: SingleLanguageLabels = {
       }
     },
     answered: "Απαντήθηκε",
-    unanswered: "Αναπάντητος",
+    unanswered: "Αναπάντητη",
     rejected: "Η απάντησή σας απορρίφθηκε",
     progressUpdated:
       "Η πρόοδος όσον αφορά την ολοκλήρωση του κύκλου μαθημάτων ενημερώθηκε",
     answerConfirmed: "Η απάντησή σας επιβεβαιώθηκε!",
     answerConfirmedFor: (title: string) =>
       `Η απάντησή σας στην άσκηση ${title} επιβεβαιώθηκε!`,
-    courseCompleted: "You have completed the course!",
+    courseCompleted: "Ολοκληρώσατε τον κύκλο μαθημάτων!",
   },
   error: {
     submitFailedError:
