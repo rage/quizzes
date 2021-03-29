@@ -12,6 +12,7 @@ import {
 } from "../src/util/error"
 import { safeClean, safeSeed, configA } from "./util"
 import redis from "../config/redis"
+import { QuizAnswer } from "../src/models"
 
 afterAll(async () => {
   await redis.client?.quit()
@@ -105,6 +106,96 @@ describe("widget: save quiz answer", () => {
       .set("Authorization", `bearer 1234`)
       .set("Accept", "application/json")
       .send(input.quizAnswerOpen)
+      .expect(200)
+      .end(done)
+  })
+})
+
+describe("widget: quiz answers marked as deleted", () => {
+  beforeAll(async () => {
+    await safeSeed({
+      directory: "./database/seeds",
+    })
+  })
+
+  afterAll(async () => {
+    nock.cleanAll()
+    await safeClean()
+  })
+
+  beforeEach(async () => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(function() {
+        const auth = this.req.headers.authorization
+        if (auth === "Bearer 1234") {
+          return [
+            200,
+            {
+              id: 1234,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer 4321") {
+          return [
+            200,
+            {
+              id: 4321,
+            } as UserInfo,
+          ]
+        }
+        if (auth === "Bearer 2345") {
+          return [
+            200,
+            {
+              id: 2345,
+            } as UserInfo,
+          ]
+        }
+      })
+  })
+
+  test("should throw when submitted", async done => {
+    request(app.callback())
+      .post("/api/v2/widget/answer")
+      .set("Authorization", `bearer 4321`)
+      .set("Accept", "application/json")
+      .send({
+        quizId: "2b8f05ac-2a47-436e-8675-35bfe9a5c0ac",
+        deleted: true,
+        itemAnswers: [
+          {
+            quizItemId: "4a55eb54-6a9c-4245-843c-0577f3eafd9e",
+            textData: "koira",
+          },
+          {
+            quizItemId: "8e1fe9a3-f9ca-4bba-acdb-98d5c41060d3",
+            textData: "kissa",
+          },
+        ],
+      })
+      .expect(400)
+      .expect(response => {
+        const received: BadRequestError = response.body
+        expect(received.message).toEqual(
+          `A new answer cannot be marked as deleted.`,
+        )
+      })
+      .end(done)
+  })
+
+  test("should not be returned when fetched", async done => {
+    await QuizAnswer.query().patchAndFetchById(
+      "ae29c3be-b5b6-4901-8588-5b0e88774748",
+      { deleted: true },
+    )
+    request(app.callback())
+      .get("/api/v2/widget/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
+      .set("Authorization", "bearer 2345")
+      .set("Accept", "application/json")
+      .expect(res => {
+        expect(res.body.quizAnswer).toBeNull()
+      })
       .expect(200)
       .end(done)
   })

@@ -20,7 +20,13 @@ const widget = new Router<CustomState, CustomContext>({
     const quizId = ctx.params.quizId
     const userId = ctx.state.user.id
     const userQuizState = await UserQuizState.getByUserAndQuiz(userId, quizId)
-    const quizAnswer = await QuizAnswer.getByUserAndQuiz(userId, quizId)
+    let quizAnswer: QuizAnswer | null = await QuizAnswer.getByUserAndQuiz(
+      userId,
+      quizId,
+    )
+    if (quizAnswer?.deleted) {
+      quizAnswer = null
+    }
     let canSeeAnswers = false
     const strippedQuiz = await Quiz.getByIdStripped(quizId)
     if (
