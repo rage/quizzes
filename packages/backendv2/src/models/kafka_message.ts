@@ -37,6 +37,17 @@ class KafkaMessage extends BaseModel {
       )
       .delete()
   }
+
+  public static async getCurrentCountByTopic(topic?: string) {
+    if (topic) {
+      return this.query()
+        .where("topic", topic)
+        .resultSize()
+    }
+    return this.query()
+      .where("topic", "user-points-realtime")
+      .resultSize()
+  }
 }
 
 export default KafkaMessage
