@@ -31,7 +31,7 @@ envsubst < "$CURRENT_DIR/../kubernetes/dashboardv2-deployment.yaml" > "$CURRENT_
 envsubst < "$CURRENT_DIR/../kubernetes/kafka-batch-producer-cronjob.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/kafka-batch-producer-cronjob.yaml"
 # envsubst < "$CURRENT_DIR/../kubernetes/update-quiz-item-answer-correct-cronjob.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/update-quiz-item-answer-correct-cronjob.yaml"
 envsubst < "$CURRENT_DIR/../kubernetes/refresh-reaktor-view-cronjob.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/refresh-reaktor-view-cronjob.yaml"
-envsubst < "$CURRENT_DIR/../kubernetes/kafka-background-producer-deployment.yaml" > "$CURRENT_DIR/../kubernetes/kafka-background-producer-deployment.yaml"
+envsubst < "$CURRENT_DIR/../kubernetes/kafka-background-producer-deployment.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/kafka-background-producer-deployment.yaml"
 
 echo "Applying changes"
 kubectl replace -f "$CURRENT_DIR/../updated-kubernetes-configs"
