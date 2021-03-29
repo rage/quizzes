@@ -33,4 +33,23 @@ describe("test", () => {
       expect(typeof result[0].n_points).toEqual("number")
     })
   })
+
+  test("correct update", async () => {
+    await knex.transaction(async trx => {
+      const result = await UserCoursePartState.update(
+        2345,
+        "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+        1,
+        trx,
+      )
+
+      const updatedCoursePart = await UserCoursePartState.query().findById([
+        2345,
+        "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+        1,
+      ])
+
+      expect(typeof updatedCoursePart.progress).toEqual("number")
+    })
+  })
 })

@@ -4,6 +4,7 @@ import Course from "./course"
 import { PointsByGroup } from "../types"
 import Quiz from "./quiz"
 import BaseModel from "./base_model"
+import UserQuizState from "./user_quiz_state"
 
 class UserCoursePartState extends BaseModel {
   userId!: number
@@ -80,20 +81,27 @@ class UserCoursePartState extends BaseModel {
         .andWhereNot("part", 0)
         .groupBy("part")
 
+      console.log(parts)
+
       const userCoursePartStateUpsertObjects = parts.map(
         ({ course_part, points_awarded, total_points }) => {
           return {
             user_id: userId,
             course_id: courseId,
             course_part: course_part,
-            score: points_awarded || 0,
-            progress: total_points === 0 ? 0 : points_awarded / total_points,
+            score: Number(points_awarded) || 0,
+            progress:
+              total_points === 0
+                ? 0
+                : Number(points_awarded) / Number(total_points),
           }
         },
       )
-      await this.query(trx).upsertGraph(userCoursePartStateUpsertObjects)
+      return await this.query(trx).upsertGraphAndFetch(
+        userCoursePartStateUpsertObjects,
+      )
     } else {
-      const { pointsAwarded, totalPoints } = (
+      const result: { [key: string]: number } = (
         await trx("quiz")
           .sum("points_awarded as pointsAwarded")
           .sum("points as totalPoints")
@@ -103,9 +111,22 @@ class UserCoursePartState extends BaseModel {
           .andWhere("user_id", userId)
       )[0]
 
+      console.log(result)
+
+      const newSQL = await UserQuizState.query(trx)
+        .select("points_awarded")
+        .select("q.points")
+        .joinRelated("quiz", { alias: "q" })
+        .where({ user_id: userId })
+        .debug()
+
+      console.log(newSQL)
+
       await userCoursePartState.$query(trx).patch({
-        score: pointsAwarded || 0,
-        progress: pointsAwarded ? pointsAwarded / totalPoints : 0,
+        score: result.pointsAwarded || 0,
+        progress: result.pointsAwarded
+          ? result.pointsAwarded / result.totalPoints
+          : 0,
       })
     }
   }
