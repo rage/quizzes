@@ -57,7 +57,17 @@ export const kafkaBackgroundMessageProducer = async () => {
           await produce(msg.topic, msg.message)
         }
         GlobalLogger.info("Message production completed")
-        await flush(1000)
+        try {
+          await flush(10000)
+        } catch (e) {
+          try {
+            await flush(100000)
+          } catch (e) {
+            console.error("Unable to flush produced messages")
+            process.exit(-1)
+          }
+        }
+
         GlobalLogger.info("deleting", messages.length, " messages")
         await KafkaMessage.batchDelete(messages)
         GlobalLogger.info("Messages deleted succesfully")
