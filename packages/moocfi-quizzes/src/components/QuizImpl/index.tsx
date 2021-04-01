@@ -165,7 +165,7 @@ interface SubmitMessageProps {
 const SubmitMessage = styled.div<SubmitMessageProps>`
   border-left: 6px solid #047500;
   padding: 0.25rem 0 0 1rem;
-  margin 0 0 3rem 0;
+  margin: 0 0 3rem 0;
   p {
     margin: 1rem 0px !important;
   }
@@ -204,6 +204,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
   const storeAccessToken = useTypedSelector(state => state.user.accessToken)
+
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
   const showPoints = useTypedSelector(
     state => state.customization.showPointsInfo,
