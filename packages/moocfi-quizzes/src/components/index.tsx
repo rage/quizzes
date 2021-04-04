@@ -9,6 +9,7 @@ import quizzesTheme from "../themes"
 
 const Quiz: React.FunctionComponent<QuizProps> = props => {
   const store = createStoreInstance(props.id)
+  console.log("💩 ~ file: index.tsx ~ line 12 ~ store", store)
 
   return (
     <Provider store={store}>
