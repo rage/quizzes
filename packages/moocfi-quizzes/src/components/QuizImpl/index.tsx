@@ -165,7 +165,7 @@ interface SubmitMessageProps {
 const SubmitMessage = styled.div<SubmitMessageProps>`
   border-left: 6px solid #047500;
   padding: 0.25rem 0 0 1rem;
-  margin 0 0 3rem 0;
+  margin: 0 0 3rem 0;
   p {
     margin: 1rem 0px !important;
   }
