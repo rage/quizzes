@@ -32,7 +32,10 @@ const ChoicesContainer = styled.div<ChoicesContainerProps>`
   display: flex;
   flex-wrap: wrap;
   flex-direction: ${({ direction }) => direction};
-  padding-top: 7;
+  max-width: ${({ direction }) => (direction === "column" ? "150px" : null)};
+  margin: ${({ direction }) => (direction === "column" ? "0 auto" : 0)};
+  padding-top: 7px;
+
   ${({ onlyOneItem }) => onlyOneItem && "width: 100%"}
   ${({ onlyOneItem, providedStyles }) =>
     providedStyles && onlyOneItem && providedStyles}
@@ -114,13 +117,13 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
     return <LaterQuizItemAddition item={item} />
   }
 
-  let direction: GridDirection = "row"
+  const quizHasSingleItem = quiz.items.length === 1
+
+  let direction: GridDirection = item.direction || "row"
   let questionWidth: 5 | 12 = 5
   let optionWidth: GridSize = "auto"
 
-  const onlyOneItem = quiz.items.length === 1
-
-  if (onlyOneItem) {
+  if (quizHasSingleItem) {
     direction = "column"
   }
 
@@ -138,13 +141,12 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
           <ItemInformation
             item={item}
             itemAnswer={itemAnswer}
-            onlyOneItem={onlyOneItem}
+            onlyOneItem={quizHasSingleItem}
             questionWidth={questionWidth}
           />
-
           <ChoicesContainer
             direction={direction}
-            onlyOneItem={onlyOneItem}
+            onlyOneItem={quizHasSingleItem}
             providedStyles={themeProvider.optionContainerStyles}
             style={{ flex: "1.5" }}
           >
