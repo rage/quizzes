@@ -15,7 +15,10 @@ import {
 } from "@material-ui/core"
 import { useDispatch } from "react-redux"
 import { useTypedSelector } from "../../../../store/store"
-import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
+import {
+  editedQuizItemTitle,
+  editedItemDirection,
+} from "../../../../store/editor/items/itemAction"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faWindowClose,
@@ -95,6 +98,7 @@ const MultipleChoiceContent = ({ item }: multipleChoiceContentProps) => {
   const variables = useTypedSelector(
     state => state.editor.itemVariables[item.id],
   )
+
   const dispatch = useDispatch()
 
   return (
@@ -163,8 +167,10 @@ const MultipleChoiceContent = ({ item }: multipleChoiceContentProps) => {
         <RadioGroup
           aria-label="direction"
           name="direction"
-          value="row"
-          // onChange={handleChange}
+          value={storeItem.direction}
+          onChange={e =>
+            dispatch(editedItemDirection(storeItem.id, e.target.value))
+          }
         >
           <FormHelperText>
             Choose the direction in which the quiz item options will be layed
