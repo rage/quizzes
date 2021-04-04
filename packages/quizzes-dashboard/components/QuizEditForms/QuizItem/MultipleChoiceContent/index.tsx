@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import styled from "styled-components"
 import {
@@ -7,8 +7,11 @@ import {
   Fade,
   Box,
   FormControlLabel,
-  FormGroup,
-  Switch,
+  FormLabel,
+  Radio,
+  RadioGroup,
+  FormControl,
+  FormHelperText,
 } from "@material-ui/core"
 import { useDispatch } from "react-redux"
 import { useTypedSelector } from "../../../../store/store"
@@ -24,7 +27,6 @@ import MultipleChoiceModalContent from "./MultipleChoiceModalContent"
 import MultipleChoiceButton from "./MultiplChoiceButton"
 import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
 import {
-  checkForChanges,
   createdNewOption,
   deletedItem,
 } from "../../../../store/editor/editorActions"
@@ -76,6 +78,10 @@ const DeleteButton = styled(Button)`
 const ModalButtonWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
+`
+
+const Spacer = styled.div`
+  margin: 5% 0;
 `
 
 interface multipleChoiceContentProps {
@@ -151,6 +157,23 @@ const MultipleChoiceContent = ({ item }: multipleChoiceContentProps) => {
           </Button>
         </QuizContent>
       </QuizContentLineContainer>
+      <Spacer />
+      <FormControl component="fieldset">
+        <FormLabel component="legend">Options Layout</FormLabel>
+        <RadioGroup
+          aria-label="direction"
+          name="direction"
+          value="row"
+          // onChange={handleChange}
+        >
+          <FormHelperText>
+            Choose the direction in which the quiz item options will be layed
+            out on the embedded widget.
+          </FormHelperText>
+          <FormControlLabel value="row" control={<Radio />} label="Row" />
+          <FormControlLabel value="column" control={<Radio />} label="Column" />
+        </RadioGroup>
+      </FormControl>
     </>
   )
 }
