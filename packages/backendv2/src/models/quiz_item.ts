@@ -33,6 +33,7 @@ class QuizItem extends mixin(BaseModel, [
   sharedOptionFeedbackMessage!: string
   allAnswersCorrect!: string
   deleted!: boolean
+  direction!: "row" | "column"
 
   static get tableName() {
     return "quiz_item"
