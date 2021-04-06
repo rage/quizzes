@@ -46,7 +46,10 @@ export const kafkaBackgroundMessageProducer = async () => {
     try {
       const messages = await KafkaMessage.fetchSomeMessage(100)
       if (messages.length > 0) {
+        const topics = [...new Set(messages.map(msg => msg.topic))]
         GlobalLogger.info(`Producing ${messages.length} messages`)
+        GlobalLogger.info(`Topics: ${topics}`)
+        GlobalLogger.info(`Timestamp: ${messages[0].createdAt}`)
         for (const msg of messages) {
           await produce(producer, msg.topic, msg.message)
         }
