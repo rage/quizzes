@@ -323,7 +323,6 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
 
   return (
     <>
-      <pre>{JSON.stringify([deleted, notDeleted], null, 4)}</pre>
       <TabText text="All answers" />
       <QuizTitle quiz={quiz} />
       <OptionsContainer>

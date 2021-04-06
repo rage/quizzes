@@ -54,7 +54,7 @@ const spanishLabels: SingleLanguageLabels = {
     manualReview: "El equipo del curso está revisando tu respuesta",
     peerReviewGroupTitle: "Peer review questions",
     peerReviewLikertDetails:
-      "Evaluate each statement on a scale of 1-5. 1 means strongly disagree, 5 means strongly agree.",
+      "Valora cada sentencia en base a una escala del 5-1, donde 1 significa totalmente en desacuerdo, 5 significa totalmente deacuerdo.",
   },
   receivedPeerReviews: {
     averageOfGradesLabel: "La nota media de las revisiones recibidas es",
@@ -125,24 +125,24 @@ const spanishLabels: SingleLanguageLabels = {
           return ""
       }
     },
-    answered: "Respondido",
-    unanswered: "Sin respuesta",
-    rejected: "Respuesta rechazada, intente nuevamente",
-    progressUpdated: "Se ha actualizado el progreso del curso",
-    answerConfirmed: "¡Han confirmado tu respuesta!",
+    answered: "Contestado",
+    unanswered: "Sin contestación",
+    rejected: "Respuesta incorrecta, inténtalo de nuevo",
+    progressUpdated: "Progreso del curso actualizado",
+    answerConfirmed: "¡Se ha confirmado tu respuesta!",
     answerConfirmedFor: (title: string) =>
-      `¡Han confirmado tu respuesta al ejercicio ${title}!`,
+      `¡Tu respueta al ejericicio ${title} se ha confirmado!`,
     courseCompleted: "¡Has completado el curso!",
   },
   error: {
     submitFailedError:
-      "No se ha podido enviar la respuesta. Inténtalo de nuevo más tarde.",
+      "No se ha podido enviar tu respuesta. Por favor, inténtalo más tarde.",
     quizLoadFailedError: "No se ha podido cargar el ejercicio",
     progressFetchError:
-      "No se han podido recuperar los datos de progreso del curso. Inténtalo de nuevo más tarde.",
-    submitSpamFlagError: "No se ha podido marcar como no deseado",
+      "No se puede obtener el progreso del curso en estos instantes. Por favor inténtalo más tarde.",
+    submitSpamFlagError: "No es posible denunciar como no deseado",
     fetchReviewCandidatesError:
-      "Se ha producido un error al recuperar las respuestas para la revisión entre compañeros. Inténtalo de nuevo más tarde.",
+      "Se ha producido un error consultando las respuestas disponibles para la revisión entre compañeros. Por favor, inténtalo más tarde.",
   },
 }
 
