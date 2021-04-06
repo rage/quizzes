@@ -84,3 +84,11 @@ producer.connect({}, (err: Kafka.LibrdKafkaError, data: Kafka.Metadata) => {
 producer.on("ready", async () => {
   await kafkaBackgroundMessageProducer()
 })
+
+producer.on("connection.failure", (err: any, metrics: any) => {
+  GlobalLogger.error(err)
+  GlobalLogger.info(metrics)
+  GlobalLogger.info("restarting...")
+  //restarting pod
+  process.exit(-1)
+})
