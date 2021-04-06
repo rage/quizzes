@@ -36,7 +36,6 @@ class KafkaMessage extends BaseModel {
         messages.map(msg => msg.id),
       )
       .delete()
-      .debug()
   }
 }
 
