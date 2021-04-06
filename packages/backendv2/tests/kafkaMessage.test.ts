@@ -36,4 +36,15 @@ describe("Kafka message", () => {
     const result = await KafkaMessage.getCurrentCountByTopic("something-else")
     expect(result).toEqual(1)
   })
+
+  test("deletes kafka messages", async () => {
+    const messagesBeforeDeletion = await KafkaMessage.fetchSomeMessage(100)
+    const countBeforeDeletion = messagesBeforeDeletion.length
+    await KafkaMessage.batchDelete(messagesBeforeDeletion)
+    const messagesAfterDeletion = await KafkaMessage.fetchSomeMessage(100)
+    const countAfterDeletion = messagesAfterDeletion.length
+
+    expect(countBeforeDeletion).toEqual(4)
+    expect(countAfterDeletion).toEqual(0)
+  })
 })
