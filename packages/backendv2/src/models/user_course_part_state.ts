@@ -4,7 +4,6 @@ import Course from "./course"
 import { PointsByGroup } from "../types"
 import Quiz from "./quiz"
 import BaseModel from "./base_model"
-import UserQuizState from "./user_quiz_state"
 
 class UserCoursePartState extends BaseModel {
   userId!: number
@@ -50,7 +49,7 @@ class UserCoursePartState extends BaseModel {
       await this.query(trx).findByIds([userId, courseId, coursePart])
     )[0]
 
-    if (!userCoursePartState) {
+    if (userCoursePartState === undefined) {
       const parts = await trx("quiz")
         .select("part as course_part")
         .select(trx.raw("coalesce(sum(points_awarded), 0) as points_awarded"))
@@ -81,8 +80,6 @@ class UserCoursePartState extends BaseModel {
         .andWhereNot("part", 0)
         .groupBy("part")
 
-      console.log(parts)
-
       const userCoursePartStateUpsertObjects = parts.map(
         ({ course_part, points_awarded, total_points }) => {
           return {
@@ -110,17 +107,6 @@ class UserCoursePartState extends BaseModel {
           .andWhere("part", coursePart)
           .andWhere("user_id", userId)
       )[0]
-
-      console.log(result)
-
-      const newSQL = await UserQuizState.query(trx)
-        .select("points_awarded")
-        .select("q.points")
-        .joinRelated("quiz", { alias: "q" })
-        .where({ user_id: userId })
-        .debug()
-
-      console.log(newSQL)
 
       await userCoursePartState.$query(trx).patch({
         score: result.pointsAwarded || 0,
@@ -168,7 +154,7 @@ class UserCoursePartState extends BaseModel {
             coursePartString.length > 1 ? "osa" : "osa0"
           }${coursePartString}`,
           progress: Math.round(((ucps.score / maxPoints) * 100) / 100),
-          n_points: Number(ucps.score.toFixed(2)),
+          n_points: ucps.score,
           max_points: maxPoints,
         }
       })

@@ -1,8 +1,10 @@
 import { Config } from "knex"
 import env from "./src/util/environment"
-import pg from "pg"
+import { types } from "pg"
 
-pg.types.setTypeParser(1700, parseFloat)
+types.setTypeParser(types.builtins.NUMERIC, value => parseFloat(value))
+types.setTypeParser(types.builtins.FLOAT8, value => parseFloat(value))
+types.setTypeParser(types.builtins.INT8, value => parseInt(value))
 
 const configOptions: { [env: string]: Config } = {
   development: {
