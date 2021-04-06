@@ -59,7 +59,7 @@ describe("kafka routes tests", () => {
 
   test("response with 401 if PLEB_TOKEN", async () => {
     const response = await request(app.callback())
-      .get("/api/v2/dashboard/kafka/health")
+      .get("/api/v2/kafka/health")
       .set("Authorization", `bearer BAD_TOKEN`)
 
     expect(response.status).toEqual(401)
@@ -67,7 +67,7 @@ describe("kafka routes tests", () => {
 
   test("response with 200 if messages less than 1000", async () => {
     const response = await request(app.callback())
-      .get("/api/v2/dashboard/kafka/health")
+      .get("/api/v2/kafka/health")
       .set("Authorization", `bearer ADMIN_TOKEN`)
 
     expect(response.status).toEqual(200)
@@ -105,7 +105,7 @@ describe("kafka routes tests", () => {
 
     test("respond with 500 if over 1000 messages", async () => {
       const response = await request(app.callback())
-        .get("/api/v2/dashboard/kafka/health")
+        .get("/api/v2/kafka/health")
         .set("Authorization", `bearer ADMIN_TOKEN`)
 
       expect(response.status).toEqual(500)

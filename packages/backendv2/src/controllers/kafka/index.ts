@@ -1,7 +1,7 @@
 import Router from "koa-router"
-import accessControl from "../../../middleware/access_control"
-import { KafkaMessage } from "../../../models"
-import { CustomState, CustomContext } from "../../../types"
+import accessControl from "../../middleware/access_control"
+import { KafkaMessage } from "../../models"
+import { CustomState, CustomContext } from "../../types"
 
 const kafkaRoutes = new Router<CustomState, CustomContext>({
   prefix: "/kafka",
