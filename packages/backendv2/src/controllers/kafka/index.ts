@@ -8,7 +8,6 @@ const kafkaRoutes = new Router<CustomState, CustomContext>({
 }).get("/health/:topic?", accessControl(), async ctx => {
   const topic = ctx.params.topic
   const kafkaMessageCount = await KafkaMessage.getCurrentCountByTopic(topic)
-  console.log(kafkaMessageCount)
   if (kafkaMessageCount <= 1000) {
     ctx.status = 200
   } else {
