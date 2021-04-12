@@ -27,6 +27,16 @@ describe("Kafka message", () => {
     await safeClean()
   })
 
+  test("correct kafka message count, default topic", async () => {
+    const result = await KafkaMessage.getCurrentCountByTopic()
+    expect(result).toEqual(3)
+  })
+
+  test("correct kafka message count, different topic", async () => {
+    const result = await KafkaMessage.getCurrentCountByTopic("something-else")
+    expect(result).toEqual(1)
+  })
+
   test("deletes kafka messages", async () => {
     const messagesBeforeDeletion = await KafkaMessage.fetchSomeMessage(100)
     const countBeforeDeletion = messagesBeforeDeletion.length

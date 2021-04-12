@@ -691,9 +691,15 @@ class QuizAnswer extends mixin(BaseModel, [
             quizOptionAnswer =>
               correctOptionIds.includes(quizOptionAnswer.quizOptionId),
           )
+          const allSelectedOptionsAreCorrect = quizOptionAnswers.every(
+            quizOptionAnswer =>
+              correctOptionIds.includes(quizOptionAnswer.quizOptionId),
+          )
           quizItemAnswer.correct = quizItem.multi
-            ? correctOptionIds.length === selectedCorrectOptions.length
-            : selectedCorrectOptions.length > 0
+            ? correctOptionIds.length === selectedCorrectOptions.length &&
+              allSelectedOptionsAreCorrect
+            : selectedCorrectOptions.length > 0 &&
+              quizOptionAnswers.length === 1
           break
         case "custom-frontend-accept-data":
           break
