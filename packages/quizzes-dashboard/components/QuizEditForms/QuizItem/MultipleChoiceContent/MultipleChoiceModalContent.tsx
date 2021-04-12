@@ -31,10 +31,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus } from "@fortawesome/free-solid-svg-icons"
 import { createdNewOption } from "../../../../store/editor/editorActions"
 import MarkdownEditor from "../../../MarkdownEditor"
+import { ModalWrapper } from "../../../Shared/Modal"
 
 const ModalContent = styled.div`
   display: flex;
-  padding: 0.5rem;
+  padding: 1rem;
   justify-content: center;
   @media only screen and (max-width: 600px) {
     width: 100%;
@@ -77,7 +78,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
   const storeOptions = useTypedSelector(state => state.editor.options)
   const dispatch = useDispatch()
   return (
-    <>
+    <ModalWrapper>
       <ModalContentTitleWrapper>
         <Typography variant="h4">Advanced editing</Typography>
       </ModalContentTitleWrapper>
@@ -219,7 +220,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
           </ModalContent>
         </>
       )}
-    </>
+    </ModalWrapper>
   )
 }
 

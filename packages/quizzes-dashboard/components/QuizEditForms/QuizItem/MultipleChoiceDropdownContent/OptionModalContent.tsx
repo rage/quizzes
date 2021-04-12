@@ -17,11 +17,7 @@ import { useDispatch } from "react-redux"
 import { NormalizedOption } from "../../../../types/NormalizedQuiz"
 import { useTypedSelector } from "../../../../store/store"
 import MarkdownEditor from "../../../MarkdownEditor"
-
-const ModalContent = styled.div`
-  padding: 1rem;
-  display: flex;
-`
+import { ModalContent } from "../../../Shared/Modal"
 
 interface OptionEditorProps {
   option: NormalizedOption
