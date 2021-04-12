@@ -1,12 +1,16 @@
 import React from "react"
 import {
   Typography,
-  TextField,
   FormGroup,
   FormControlLabel,
   Checkbox,
   Button,
   Switch,
+  FormLabel,
+  Radio,
+  RadioGroup,
+  FormControl,
+  FormHelperText,
 } from "@material-ui/core"
 import {
   editedQuizItemTitle,
@@ -16,6 +20,7 @@ import {
   editedItemSuccessMessage,
   editedItemFailureMessage,
   toggledAllAnswersCorrect,
+  editedItemDirection,
 } from "../../../../store/editor/items/itemAction"
 import { useTypedSelector } from "../../../../store/store"
 import { useDispatch } from "react-redux"
@@ -57,6 +62,10 @@ const ModalContentOptionWrapper = styled.div`
 const AllAnswersCorrectField = styled.div`
   display: flex;
   width: 100%;
+`
+
+const Spacer = styled.div`
+  margin: 5% 0;
 `
 
 interface EditorModalProps {
@@ -150,6 +159,25 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
           </ModalContent>
         ))}
       </ModalContentOptionWrapper>
+      <Spacer />
+      <FormControl component="fieldset">
+        <FormLabel component="legend">Layout of options</FormLabel>
+        <RadioGroup
+          aria-label="direction"
+          name="direction"
+          value={storeItem.direction}
+          onChange={e =>
+            dispatch(editedItemDirection(storeItem.id, e.target.value))
+          }
+        >
+          <FormHelperText>
+            Choose the direction in which the quiz item options will be layed
+            out in the embedded widget.
+          </FormHelperText>
+          <FormControlLabel value="row" control={<Radio />} label="Row" />
+          <FormControlLabel value="column" control={<Radio />} label="Column" />
+        </RadioGroup>
+      </FormControl>
       {storeItem.usesSharedOptionFeedbackMessage ? (
         <ModalContent>
           <MarkdownEditor
