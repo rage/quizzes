@@ -174,12 +174,12 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
                   </div>
                 )
               })}
-            {quiz.triesLimited === true ||
-            item.sharedOptionFeedbackMessage !== null ? (
-              /*!onlyOneItem && */ <FeedbackPortion item={item} />
-            ) : null}
           </ChoicesContainer>
         </div>
+        {quiz.triesLimited === true ||
+        item.sharedOptionFeedbackMessage !== null ? (
+          /*!onlyOneItem && */ <FeedbackPortion item={item} />
+        ) : null}
       </ItemContent>
     </div>
   )
