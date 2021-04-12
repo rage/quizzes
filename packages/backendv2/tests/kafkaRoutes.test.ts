@@ -57,14 +57,6 @@ describe("kafka routes tests", () => {
       })
   })
 
-  test("response with 401 if PLEB_TOKEN", async () => {
-    const response = await request(app.callback())
-      .get("/api/v2/kafka/healthz")
-      .set("Authorization", `bearer BAD_TOKEN`)
-
-    expect(response.status).toEqual(401)
-  })
-
   test("response with 200 if messages less than 1000", async () => {
     const response = await request(app.callback())
       .get("/api/v2/kafka/healthz")
