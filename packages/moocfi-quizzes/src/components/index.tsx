@@ -4,11 +4,11 @@ import { ThemeProvider } from "@material-ui/styles"
 import { QuizProps } from "./QuizImpl"
 import QuizImpl from "./QuizImpl"
 import { Provider } from "react-redux"
-import createStoreInstance from "../state/store"
+import { createStoreCreator } from "../state/store"
 import quizzesTheme from "../themes"
 
 const Quiz: React.FunctionComponent<QuizProps> = props => {
-  const store = createStoreInstance(props.id)
+  const store = createStoreCreator()
 
   return (
     <Provider store={store}>
