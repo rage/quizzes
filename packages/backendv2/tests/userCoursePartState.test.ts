@@ -52,4 +52,23 @@ describe("test", () => {
       expect(typeof updatedCoursePart.progress).toEqual("number")
     })
   })
+
+  test("correct update if no existing userCoursePart", async () => {
+    await knex.transaction(async trx => {
+      const result = await UserCoursePartState.update(
+        2021,
+        "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+        1,
+        trx,
+      )
+    })
+
+    const updatedCoursePart = await UserCoursePartState.query().findById([
+      2021,
+      "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+      1,
+    ])
+
+    expect(typeof updatedCoursePart.progress).toEqual("number")
+  })
 })

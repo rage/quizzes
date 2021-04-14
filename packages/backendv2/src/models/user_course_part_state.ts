@@ -49,7 +49,7 @@ class UserCoursePartState extends BaseModel {
       await this.query(trx).findByIds([userId, courseId, coursePart])
     )[0]
 
-    if (userCoursePartState === undefined) {
+    if (!userCoursePartState) {
       const parts = await trx("quiz")
         .select("part as course_part")
         .select(trx.raw("coalesce(sum(points_awarded), 0) as points_awarded"))
@@ -154,7 +154,7 @@ class UserCoursePartState extends BaseModel {
             coursePartString.length > 1 ? "osa" : "osa0"
           }${coursePartString}`,
           progress: Math.round(((ucps.score / maxPoints) * 100) / 100),
-          n_points: ucps.score,
+          n_points: Number(ucps.score.toFixed(2)),
           max_points: maxPoints,
         }
       })
