@@ -64,7 +64,7 @@ const swedishLabels: SingleLanguageLabels = {
       "Det förekom ett fel i visningen av inlämnade bedömningar. Vänligen försök ladda sidan på nytt.",
     noSupportForQuestionTypeLabel:
       "Den här typen av kollegial bedömningsfråga stöds inte",
-    loadingLabel: "Laddar inkomna kollegiala bedömningar…",
+    loadingLabel: "Laddar inkomna kollegiala bedömningar...",
     noPeerReviewsReceivedlabel:
       "Ditt svar har inte ännu fått kollegial bedömning",
     numberOfPeerReviewsText: n =>

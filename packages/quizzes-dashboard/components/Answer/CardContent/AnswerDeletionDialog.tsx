@@ -105,7 +105,7 @@ const AnswerDeletionDialog = ({
             <Grow in={success}>
               <Alert severity="success">
                 <Typography variant="caption">
-                  Answer deleted succesfully
+                  Answer deleted successfully
                 </Typography>
               </Alert>
             </Grow>

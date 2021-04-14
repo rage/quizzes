@@ -2,145 +2,148 @@ import { SingleLanguageLabels } from "./index"
 
 const icelandicLabels: SingleLanguageLabels = {
   essay: {
-    exampleAnswerLabel: "Example answer",
-    userAnswerLabel: "Your answer",
-    currentNumberOfWordsLabel: "Words",
-    textFieldLabel: "Your answer",
+    exampleAnswerLabel: "Dæmi um svar",
+    userAnswerLabel: "Svar þitt",
+    currentNumberOfWordsLabel: "Orðafjöldi",
+    textFieldLabel: "Svar þitt",
     conformToLimitsToSubmitLabel:
-      "To be able to submit the answer, make sure it conforms to the word limits",
+      "Til þess að þú getir vistað svarið verður orðafjöldinn að vera innan settra marka",
     wordLimitsGuidance: (min, max) => {
       if (!min && !max) {
         return ""
       }
       if (!min) {
-        return `Your answer should not exceed ${max} words`
+        return `Svarið má ekki vera meira en ${max} orð að lengd`
       }
 
       if (!max) {
-        return `Your answer should be at least ${min} words`
+        return `Svarið verður að vera a.m.k. ${min} orð að lengd`
       }
-      return `Your answer should be between ${min} and ${max} words`
+      return `Svarið verður að vera ${min} til ${max} orð að lengd`
     },
   },
   open: {
-    placeholder: "Answer",
-    userAnswerLabel: "Your answer",
-    feedbackForSuccess: "Your answer is correct",
-    feedbackForFailure: "Your answer is not correct",
+    placeholder: "Svar",
+    userAnswerLabel: "Svar þitt",
+    feedbackForSuccess: "Svarið er rétt",
+    feedbackForFailure: "Svarið er rangt",
   },
   peerReviews: {
-    loadingLabel: "Loading",
-    chooseButtonLabel: "Select",
-    unselectButtonLabel: "Cancel selection",
-    chooseEssayInstruction: "Choose one option to review",
-    chosenEssayInstruction: "Review the answer you selected",
-    givenPeerReviewsLabel: "Peer reviews given",
-    noPeerAnswersAvailableLabel: "No answers available for peer review",
-    reportAsInappropriateLabel: "Report as spam",
-    submitPeerReviewLabel: "Submit review",
-    peerReviewsCompletedInfo: "You have given enough peer reviews",
+    loadingLabel: "Sæki...",
+    chooseButtonLabel: "Velja",
+    unselectButtonLabel: "Afturkalla val",
+    chooseEssayInstruction: "Veldu eitt svar til umsagnar",
+    chosenEssayInstruction: "Farðu vandlega yfir svarið sem þú valdir",
+    givenPeerReviewsLabel: "Umsagnir um úrlausnir annarra nemenda",
+    noPeerAnswersAvailableLabel: "Engar úrlausnir fundust sem umsögn vantar um",
+    reportAsInappropriateLabel: "Senda tilkynningu um ógilda úrlausn",
+    submitPeerReviewLabel: "Senda umsögn",
+    peerReviewsCompletedInfo:
+      "Þú hefur gefið nægilega margar umsagnir um úrlausnir annarra",
     giveExtraPeerReviews:
-      "You have given the required number of peer reviews. If you give more peer reviews your answer will be reviewed faster!",
+      "Þú hefur gefið nægilega margar umsagnir um úrlausnir annarra. Ef þú gefur enn fleiri umsagnir fær svarið þitt umsögn fyrr!",
     giveExtraPeerReviewsQuizConfirmed:
-      "You may still give peer reviews to help others",
-    displayPeerReview: "Give peer review",
-    hidePeerReviewLabel: "Hide",
-    essayQuestionAnswerTextBoxLabel: "Write a review",
-    optionLabel: "Option",
-    answerRejected: "Your answer has been rejected",
-    answerFlaggedAsSpam: "Your answer has been reported as spam",
-    answerConfirmed: "Your answer has been accepted!",
-    manualReview: "Your answer is being reviewed by course staff",
-    peerReviewGroupTitle: "Peer review questions",
+      "Þú getur haldið áfram að gefa umsagnir til að hjálpa öðrum nemendum",
+    displayPeerReview: "Gefðu umsögn",
+    hidePeerReviewLabel: "Fela",
+    essayQuestionAnswerTextBoxLabel: "Skrifaðu umsögn",
+    optionLabel: "Val",
+    answerRejected: "Svarinu þínu var hafnað",
+    answerFlaggedAsSpam: "Svarið þitt var tilkynnt sem ógilt svar",
+    answerConfirmed: "Svarið þitt var samþykkt!",
+    manualReview: "Svarið þitt verður yfirfarið hjá starfsmönnum námskeiðsins",
+    peerReviewGroupTitle: "Æfingar sem metnar eru með umsögn annarra nemenda",
     peerReviewLikertDetails:
-      "Evaluate each statement on a scale of 1-5. 1 means strongly disagree, 5 means strongly agree.",
+      "Merktu við hversu sammála þú ert hverri fullyrðingu. Talan 1 merkir „mjög ósammála“; talan 5 merkir „mjög sammála“.",
   },
   receivedPeerReviews: {
-    averageOfGradesLabel: "The average grade of received reviews is",
-    detailedViewLabel: "All the reviews your answer has received",
+    averageOfGradesLabel: "Meðaleinkunn samkvæmt umsögnunum sem borist hafa er",
+    detailedViewLabel: "Allar umsagnir sem svarið þitt hefur fengið",
     errorLabel:
-      "An error occurred in displaying the peer reviews you've received. Reloading the page could help",
-    loadingLabel: "Loading the received peer reviews...",
+      "Kerfisvilla kom upp þegar reynt var að sækja umsagnir annarra nemenda. Vænlegast er að endurhlaða síðuna.",
+    loadingLabel: "Sæki umsagnir frá öðrum nemendum...",
     noPeerReviewsReceivedlabel:
-      "Your answer has not yet received any peer reviews",
+      "Svarið þitt hefur ekki fengið neina umsögn enn sem komið er",
     noSupportForQuestionTypeLabel:
-      "This kind of peer review question is not supported",
+      "Kerfið styður ekki spurningar af þessu tagi",
     numberOfPeerReviewsText: n =>
-      `Your answer has received ${n} peer review${n > 1 ? "s" : ""}.`,
-    summaryViewLabel: "Received peer reviews:",
-    toggleButtonExpandLabel: "Show all received peer reviews",
-    toggleButtonShrinkLabel: "Hide",
-    peerReviewLabel: "Peer review",
-    peerReviewReceived: "You have received a new peer review",
+      `Svarið þitt hefur fengið n ${n} ${
+        n > 1 ? "umsagnir" : "umsögn"
+      } frá öðrum nemendum.`,
+    summaryViewLabel: "Umsagnir annarra nemenda:",
+    toggleButtonExpandLabel: "Sýna allar umsagnir annarra nemenda",
+    toggleButtonShrinkLabel: "Fela umsagnir annarra nemenda",
+    peerReviewLabel: "Umsögn frá öðrum nemanda",
+    peerReviewReceived: "Þú hefur fengið nýja umsögn",
     peerReviewReceivedFor: (title: string) =>
-      `You have received a new peer review in the exercise ${title}`,
+      `Þú hefur fengið nýja umsögn um æfingu ${title} frá öðrum nemanda`,
   },
   unsupported: {
     notSupportedInsert: (itemType: string) =>
-      `Question of type '${itemType}' is not supported.`,
+      `Kerfið styður ekki spurningar af gerðinni '${itemType}'.`,
   },
   multipleChoice: {
-    selectCorrectAnswerLabel: "Select the correct answer",
-    chooseAllSuitableOptionsLabel: "Select all that apply",
-    answerCorrectLabel: "Correct",
-    answerIncorrectLabel: "Incorrect",
+    selectCorrectAnswerLabel: "Veldu rétt svar",
+    chooseAllSuitableOptionsLabel: "Veldu allt sem við á",
+    answerCorrectLabel: "Rétt",
+    answerIncorrectLabel: "Rangt",
   },
   stage: {
-    answerStageLabel: "Answering the exercise",
-    givingPeerReviewsStageLabel: "Giving peer reviews",
-    receivingPeerReviewsStageLabel: "Receiving peer reviews",
-    evaluationStageLabel: "Waiting to be graded",
+    answerStageLabel: "Svarar æfingunni",
+    givingPeerReviewsStageLabel: "Gefur umsagnir um svör annarra nemenda",
+    receivingPeerReviewsStageLabel: "Bíður umsagnar annarra nemenda",
+    evaluationStageLabel: "Bíður einkunnargjafar",
   },
   general: {
-    pastDeadline: "You can no longer give an answer to this exercise",
+    pastDeadline: "Þú getur ekki lengur skráð svar við þessari spurningu.",
     answerMissingBecauseQuizModifiedLabel:
-      "Question not answered. Quiz has probably been modified after your answer.",
-    submitButtonLabel: "Submit",
-    errorLabel: "Error",
-    loginToViewPromptLabel: "Log in to view the exercise",
-    loginToAnswerPromptLabel: "Log in to answer the exercise",
-    loadingLabel: "Loading",
-    answerCorrectLabel: "The answer is correct",
-    alreadyAnsweredLabel: "You have already answered this",
-    answerIncorrectLabel: "The answer is not correct",
-    kOutOfNCorrect: (k, n) => `${k}/${n} answers correct`,
-    pointsAvailableLabel: "Points available for the exercise",
-    pointsReceivedLabel: "Received points",
+      "Spurningunni hefur ekki verið svarað. Æfingunni hefur sennilega verið breytt eftir að svarið þitt var vistað.",
+    submitButtonLabel: "Vista",
+    errorLabel: "Villa",
+    loginToViewPromptLabel: "Skráðu þig inn til að sjá æfinguna",
+    loginToAnswerPromptLabel: "Skráðu þig inn til að leysa æfinguna",
+    loadingLabel: "Sæki",
+    answerCorrectLabel: "Svarið er rétt",
+    alreadyAnsweredLabel: "Þú hefur þegar vistað svar við þessu",
+    answerIncorrectLabel: "Svarið er rangt",
+    kOutOfNCorrect: (k, n) => `${k}/${n} rétt svör`,
+    pointsAvailableLabel: "Hámarksstigafjöldi fyrir æfinguna",
+    pointsReceivedLabel: "Stig fyrir æfinguna",
     incorrectSubmitWhileTriesLeftLabel:
-      "The answer was not fully correct. Please try again!",
-    triesRemainingLabel: "Tries remaining",
-    quizLabel: "Quiz",
-    pointsLabel: "Points",
-    triesNotLimitedLabel: "The number of tries is not limited",
-    submitGeneralFeedbackLabel: "Submitted",
-    submitButtonAlreadyAnsweredLabel: "Answered",
+      "Svarið var ekki fullkomlega rétt. Reyndu aftur!",
+    triesRemainingLabel: "Tilraunir sem þú átt eftir",
+    quizLabel: "Æfing",
+    pointsLabel: "Stig",
+    triesNotLimitedLabel: "Fjöldi tilrauna er ekki takmarkaður",
+    submitGeneralFeedbackLabel: "Vistað",
+    submitButtonAlreadyAnsweredLabel: "Svarað",
     pointsGrantingPolicyInformer: policy => {
       switch (policy) {
         case "grant_only_when_answer_fully_correct":
-          return "To receive points the answer must be fully correct"
+          return "Engin stig fást nema svarið sé fullkomlega rétt"
         case "grant_whenever_possible":
           return ""
         default:
           return ""
       }
     },
-    answered: "Answered",
-    unanswered: "Unanswered",
-    rejected: "Rejected answer, try again",
-    progressUpdated: "Course progress updated",
-    answerConfirmed: "Your answer was confirmed!",
+    answered: "Svarað",
+    unanswered: "Ósvarað",
+    rejected: "Svarið fékk neikvæða umsögn — reyndu aftur",
+    progressUpdated: "Námskeiðsframvinda uppfærð",
+    answerConfirmed: "Svarið þitt var staðfest!",
     answerConfirmedFor: (title: string) =>
-      `Your answer to exercise ${title} was confirmed!`,
-    courseCompleted: "You have completed the course!",
+      `Svarið þitt við æfingu ${title} var staðfest!`,
+    courseCompleted: "Þú hefur lokið námskeiðinu!",
   },
   error: {
-    submitFailedError: "Could not send your answer. Please try again later.",
-    quizLoadFailedError: "Could not load the exercise",
+    submitFailedError: "Svarið þitt vistaðist ekki. Reyndu aftur seinna.",
+    quizLoadFailedError: "Æfingin hlóðst ekki",
     progressFetchError:
-      "Could not fetch course progress data. Please try again later.",
-    submitSpamFlagError: "Could not report spam.",
+      "Gat ekki sótt framfaragögn. Vinsamlegast reyndu aftur síðar.",
+    submitSpamFlagError: "Gat ekki tilkynnt ruslpóst.",
     fetchReviewCandidatesError:
-      "Something went wrong while retrieving answers for peer review. Please try again later.",
+      "Eitthvað fór úrskeiðis við að sækja svör til jafningjamats. Vinsamlegast reyndu aftur síðar.",
   },
 }
 

@@ -1,15 +1,16 @@
 import Redis from "ioredis"
+import env from "../src/util/environment"
 
 let client
-if (process.env.REDIS_HOST && process.env.REDIS_PORT) {
+if (env.REDIS_HOST && env.REDIS_PORT) {
   client = new Redis({
-    port: Number(process.env.REDIS_PORT),
-    host: process.env.REDIS_HOST,
-    password: process.env.REDIS_PASSWORD && process.env.REDIS_PASSWORD,
+    port: Number(env.REDIS_PORT),
+    host: env.REDIS_HOST,
+    password: env.REDIS_PASSWORD && env.REDIS_PASSWORD,
   })
   if (client) {
     console.log(
-      `Redis client initialized and running on ${process.env.REDIS_HOST}:${process.env.REDIS_PORT}`,
+      `Redis client initialized and running on ${env.REDIS_HOST}:${env.REDIS_PORT}`,
     )
   }
 } else {

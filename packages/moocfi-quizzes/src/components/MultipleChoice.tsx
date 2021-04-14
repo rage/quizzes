@@ -156,17 +156,30 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
               .sort((o1, o2) => o1.order - o2.order)
               .map((option, index) => {
                 return (
-                  <Option
-                    key={option.id}
-                    option={option}
-                    optionWidth={optionWidth}
-                    shouldBeGray={index % 2 === 0}
-                  />
+                  <div key={option.id}>
+                    <Option
+                      key={option.id}
+                      option={option}
+                      optionWidth={optionWidth}
+                      shouldBeGray={index % 2 === 0}
+                    />
+                    {item.sharedOptionFeedbackMessage === null &&
+                    quiz.triesLimited === false ? (
+                      <FeedbackPortion
+                        item={item}
+                        optionId={option.id}
+                        showAllFeedback={true}
+                      />
+                    ) : null}
+                  </div>
                 )
               })}
           </ChoicesContainer>
         </div>
-        {/*!onlyOneItem && */ <FeedbackPortion item={item} />}
+        {quiz.triesLimited === true ||
+        item.sharedOptionFeedbackMessage !== null ? (
+          /*!onlyOneItem && */ <FeedbackPortion item={item} />
+        ) : null}
       </ItemContent>
     </div>
   )
@@ -374,6 +387,8 @@ const Option: React.FunctionComponent<OptionProps> = ({
 }
 
 interface IFeedbackPortionProps {
+  showAllFeedback?: boolean
+  optionId?: string
   item: QuizItem
   selectedOption?: QuizItemOption
   onlyOneItem?: boolean
@@ -381,6 +396,8 @@ interface IFeedbackPortionProps {
 
 const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   item,
+  optionId,
+  showAllFeedback,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const items = useTypedSelector(state => state.quiz!.items)
@@ -412,10 +429,15 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   const optionAnswers = itemAnswer && itemAnswer.optionAnswers
 
   const optionAnswer = optionAnswers[0]
+  const selectedOption =
+    showAllFeedback === true
+      ? items[0].options.find(o => o.id === optionId)
+      : item.options.find(o => o.id === optionAnswer.quizOptionId)
 
-  const selectedOption = item.options.find(
-    o => o.id === optionAnswer.quizOptionId,
-  )
+  const itemAnswersUnlimitedTries =
+    showAllFeedback === true
+      ? items[0].options.find(o => o.id === optionId)
+      : itemAnswer
 
   let feedbackMessage
   if (
@@ -423,6 +445,23 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
     item.sharedOptionFeedbackMessage !== undefined
   ) {
     feedbackMessage = item.sharedOptionFeedbackMessage
+  } else if (showAllFeedback === true) {
+    const optionSuccess = selectedOption
+      ? selectedOption.successMessage
+      : undefined
+    const optionFailure = selectedOption
+      ? selectedOption.failureMessage
+      : undefined
+
+    const text = item
+    const successMessage =
+      optionSuccess || text.successMessage || generalLabels.answerCorrectLabel
+    const failureMessage =
+      optionFailure || text.failureMessage || generalLabels.answerIncorrectLabel
+
+    feedbackMessage = itemAnswersUnlimitedTries!.correct
+      ? successMessage
+      : failureMessage
   } else {
     const optionSuccess = selectedOption
       ? selectedOption.successMessage
@@ -439,9 +478,10 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 
     feedbackMessage = itemAnswer.correct ? successMessage : failureMessage
   }
-
-  const correct = (itemAnswer.correct && true) || false
-
+  const correct =
+    showAllFeedback === true
+      ? (itemAnswersUnlimitedTries!.correct && true) || false
+      : (itemAnswer.correct && true) || false
   const ThemedDiv = themeProvider.feedbackMessage
 
   const FeedbackDiv = ThemedDiv || LeftBorderedDiv

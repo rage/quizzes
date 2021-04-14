@@ -55,9 +55,9 @@ const greekLabels: SingleLanguageLabels = {
     answerConfirmed: "Η απάντησή σας έγινε δεκτή!",
     manualReview:
       "Η απάντησή σας αξιολογείται από το προσωπικό του κύκλου μαθημάτων",
-    peerReviewGroupTitle: "Peer review questions",
+    peerReviewGroupTitle: "Ερωτήσεις αξιολόγησης",
     peerReviewLikertDetails:
-      "Evaluate each statement on a scale of 1-5. 1 means strongly disagree, 5 means strongly agree.",
+      "Αξιολογήστε κάθε πρόταση στην κλίμακα 1 έως 5. Το 1 σημαίνει σοβαρή διαφωνία, το 5 σημαίνει απόλυτη συμφωνία.",
   },
   receivedPeerReviews: {
     averageOfGradesLabel:

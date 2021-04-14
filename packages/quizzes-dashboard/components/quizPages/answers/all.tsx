@@ -51,7 +51,15 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
   const [{ expandAll }, dispatch] = useAnswerListState()
 
   const route = useRouter()
-  const { pageNo, sort, answers, filters } = route.query
+  const {
+    pageNo,
+    sort,
+    answers,
+    filters,
+    deleted: del,
+    notDeleted: notDel,
+  } = route.query
+
   const filtersAsStringArray = filters?.toString().split(",")
 
   const quizId = quiz?.id
@@ -68,8 +76,8 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
   )
   const [searchQuery, setSearchQuery] = useState("")
   const [queryToPush, setQueryToPush] = useState({})
-  const [deleted, setDeleted] = useState(false)
-  const [notDeleted, setNotDeleted] = useState(true)
+  const [deleted, setDeleted] = useState(del ? !!del : false)
+  const [notDeleted, setNotDeleted] = useState(notDel ? !!notDel : true)
 
   useBreadcrumbs([
     {
@@ -392,7 +400,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
               name="not-deleted switch"
             ></Switch>
           }
-          label="show not-deleted"
+          label="Show not-deleted"
         ></FormControlLabel>
         <FormControlLabel
           control={
