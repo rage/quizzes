@@ -140,8 +140,8 @@ const icelandicLabels: SingleLanguageLabels = {
     submitFailedError: "Svarið þitt vistaðist ekki. Reyndu aftur seinna.",
     quizLoadFailedError: "Æfingin hlóðst ekki",
     progressFetchError:
-      "Gat ekki sótt framfaragögn. Vinsamlegast reyndu aftur síðar.",
-    submitSpamFlagError: "Gat ekki tilkynnt ruslpóst.",
+      "Gat ekki sótt gögn um frammistöðu í námskeiðinu. Vinsamlegast reyndu aftur síðar.",
+    submitSpamFlagError: "Gat ekki tilkynnt um ruslpóst.",
     fetchReviewCandidatesError:
       "Eitthvað fór úrskeiðis við að sækja svör til jafningjamats. Vinsamlegast reyndu aftur síðar.",
   },
