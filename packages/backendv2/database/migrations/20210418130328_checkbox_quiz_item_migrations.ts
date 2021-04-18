@@ -5,7 +5,6 @@ const moveQuizOptionAnswerRows = `
         DELETE FROM quiz_option_answer qoa
             USING quiz_item_answer qia
         WHERE qia.quiz_item_id IN (SELECT id FROM quiz_item WHERE type = 'checkbox');
-            # return old option id, and quiz_answer_id and quiz_item_if from item answer 
         RETURNING qoa.id, qia.quiz_answer_id, qoa.quiz_option_id
     )
 
