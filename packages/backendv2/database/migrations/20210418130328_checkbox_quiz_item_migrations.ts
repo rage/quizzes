@@ -1,5 +1,26 @@
 import * as Knex from "knex"
 
+// indexes on the foreign key fields in referencing tables
+const createAnswerIdIndexQia = `
+ CREATE INDEX quiz_item_answer_quiz_answer_id
+    ON quiz_item_answer(quiz_answer_id);
+`
+const createItemIdIndexQia = `
+ CREATE INDEX quiz_item_answer_quiz_item_id
+    ON quiz_item_answer(quiz_item_id);
+`
+
+const createItemIdIndexQo = `
+ CREATE INDEX quiz_option_quiz_item_id
+    ON quiz_option(quiz_item_id);
+`
+
+const dropIndexes = `
+    DROP INDEX quiz_item_answer_quiz_answer_id;
+    DROP INDEX quiz_item_answer_quiz_item_id;
+    DROP INDEX quiz_option_quiz_item_id;
+`
+
 const moveQuizOptionAnswerRows = `
     WITH moved_quiz_option_answer_rows AS (
         DELETE FROM quiz_option_answer qoa
@@ -30,9 +51,14 @@ const deleteQuizOptionChildren = `
 `
 
 export async function up(knex: Knex): Promise<void> {
+  await knex.raw(createAnswerIdIndexQia)
+  await knex.raw(createItemIdIndexQia)
+  await knex.raw(createItemIdIndexQo)
   await knex.raw(moveQuizOptionAnswerRows)
   await knex.raw(deleteQuizOptionChildren)
   await knex.raw(moveQuizOptionRows)
 }
 
-export async function down(knex: Knex): Promise<void> {}
+export async function down(knex: Knex): Promise<void> {
+  await knex.raw(dropIndexes)
+}
