@@ -4,7 +4,7 @@ const moveQuizOptionAnswerRows = `
     WITH moved_quiz_option_answer_rows AS (
         DELETE FROM quiz_option_answer qoa
             USING quiz_item_answer qia
-        WHERE qia.quiz_item_id IN (SELECT id FROM quiz_item WHERE type = 'checkbox');
+        WHERE qia.quiz_item_id IN (SELECT id FROM quiz_item WHERE type = 'checkbox')
         RETURNING qoa.id, qia.quiz_answer_id, qoa.quiz_option_id
     )
 
