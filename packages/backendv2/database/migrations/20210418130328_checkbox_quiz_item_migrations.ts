@@ -25,9 +25,8 @@ const moveQuizOptionRows = `
 `
 const deleteQuizOptionChildren = `
     DELETE FROM quiz_option_translation qot
-            USING quiz_item qi, quiz_option qo
-            WHERE qi.type = 'checkbox'::quiz_item_type_enum 
-            AND qo.id IN (SELECT id FROM qi)
+        USING quiz_item qi, quiz_option qo
+        WHERE qo.id IN (SELECT id FROM quiz_item WHERE type = 'checkbox'::quiz_item_type_enum);
 `
 
 export async function up(knex: Knex): Promise<void> {
