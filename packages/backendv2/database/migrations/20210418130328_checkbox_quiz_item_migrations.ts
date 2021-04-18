@@ -17,7 +17,7 @@ const moveQuizOptionRows = `
         DELETE FROM quiz_option qo
             USING quiz_item qi
         WHERE qi.type = 'checkbox'
-        RETURNING qo.id qo."order", qo.deleted, 'checkbox'::quiz_item_type_enum, qi.quiz_id  
+        RETURNING qo.id, qo."order", qo.deleted, 'checkbox'::quiz_item_type_enum, qi.quiz_id  
     )
 
     INSERT INTO quiz_item (id, "order", deleted, type, quiz_id) 
