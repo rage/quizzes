@@ -12,6 +12,17 @@ const moveQuizOptionAnswerRows = `
     SELECT * FROM moved_quiz_option_answer_rows
 
 `
+const moveQuizOptionTranslationRows = `
+    WITH moved_quiz_option_translation_rows AS (
+        DELETE FROM quiz_option_translation qot
+            USING quiz_option qo 
+        WHERE qo.quiz_item_id IN (SELECT id FROM quiz_item WHERE type = 'checkbox')
+        RETURNING qot.quiz_option_id, qot.language_id, qot.title, qot.body, qot.success_message, qot.failure_message
+    )
+    
+    INSERT INTO quiz_item_translation (quiz_item_id, language_id, title, body, success_message, failure_message)
+    SELECT * FROM moved_quiz_option_translation_rows
+`
 
 const moveQuizOptionRows = `
     WITH moved_quiz_option_rows AS (
@@ -35,17 +46,26 @@ const deleteQuizOptionChildren = `
 const reEnableTableTriggers = `
 ALTER TABLE quiz_option_answer ENABLE TRIGGER ALL
 ALTER TABLE quiz_option ENABLE TRIGGER ALL
+ALTER TABLE quiz_item ENABLE TRIGGER ALL
+ALTER TABLE quiz_item_answer ENABLE TRIGGER ALL
+ALTER TABLE quiz_option_translation ENABLE TRIGGER ALL
+ALTER TABLE quiz_item_translation ENABLE TRIGGER ALL
 `
 
 const disableTableTriggers = `
 ALTER TABLE quiz_option_answer DISABLE TRIGGER ALL
 ALTER TABLE quiz_option DISABLE TRIGGER ALL 
+ALTER TABLE quiz_item DISABLE TRIGGER ALL
+ALTER TABLE quiz_item_answer DISABLE TRIGGER ALL
+ALTER TABLE quiz_option_translation DISABLE TRIGGER ALL
+ALTER TABLE quiz_item_translation DISABLE TRIGGER ALL
 
 `
 
 export async function up(knex: Knex): Promise<void> {
   await knex.raw(disableTableTriggers)
   await knex.raw(moveQuizOptionAnswerRows)
+  await knex.raw(moveQuizOptionTranslationRows)
   await knex.raw(deleteQuizOptionChildren)
   await knex.raw(moveQuizOptionRows)
 }
