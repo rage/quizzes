@@ -124,7 +124,7 @@ const slovenianLabels: SingleLanguageLabels = {
       }
     },
     answered: "Odgovorjeno",
-    unanswered: "Neodgovoren",
+    unanswered: "Neodgovorjen",
     rejected: "Zavrnjen odgovor, poskusite znova",
     progressUpdated: "Napredek tečaja je posodobljen",
     answerConfirmed: "Vaš odgovor je potrjen",

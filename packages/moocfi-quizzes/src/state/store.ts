@@ -109,16 +109,6 @@ const rootReducer = combineReducers({
   user: userReducer,
 })
 
-/*const rootReducerD: typeof rootReducerImpl = (state, action) => {
-  if (action.type === "CLEAR") {
-    // @ts-ignore
-    const bestState: State = undefined
-
-    return bestState
-  }
-  return rootReducerImpl(state, action)
-}*/
-
 export const rootAction = {
   rootAction: rootActions,
   backendAction: backendAddressActions,
@@ -177,7 +167,7 @@ const createStoreInstance = (id: string): Store => {
   return store
 }
 
-const createStoreCreator = () => {
+export const createStoreCreator = () => {
   return createStore(rootReducer, composeWithDevTools(applyMiddleware(thunk)))
 }
 
