@@ -34,7 +34,6 @@ const moveQuizOptionRows = `
 
     INSERT INTO quiz_item (id, "order", deleted, type, quiz_id) 
     SELECT * FROM moved_quiz_option_rows
-
 `
 
 const deleteQuizOptionChildren = `
@@ -44,22 +43,21 @@ const deleteQuizOptionChildren = `
 `
 
 const reEnableTableTriggers = `
-ALTER TABLE quiz_option_answer ENABLE TRIGGER ALL
-ALTER TABLE quiz_option ENABLE TRIGGER ALL
-ALTER TABLE quiz_item ENABLE TRIGGER ALL
-ALTER TABLE quiz_item_answer ENABLE TRIGGER ALL
-ALTER TABLE quiz_option_translation ENABLE TRIGGER ALL
-ALTER TABLE quiz_item_translation ENABLE TRIGGER ALL
+ALTER TABLE quiz_option_answer ENABLE TRIGGER ALL;
+ALTER TABLE quiz_option ENABLE TRIGGER ALL;
+ALTER TABLE quiz_item ENABLE TRIGGER ALL;
+ALTER TABLE quiz_item_answer ENABLE TRIGGER ALL;
+ALTER TABLE quiz_option_translation ENABLE TRIGGER ALL;
+ALTER TABLE quiz_item_translation ENABLE TRIGGER ALL;
 `
 
 const disableTableTriggers = `
-ALTER TABLE quiz_option_answer DISABLE TRIGGER ALL
-ALTER TABLE quiz_option DISABLE TRIGGER ALL 
-ALTER TABLE quiz_item DISABLE TRIGGER ALL
-ALTER TABLE quiz_item_answer DISABLE TRIGGER ALL
-ALTER TABLE quiz_option_translation DISABLE TRIGGER ALL
-ALTER TABLE quiz_item_translation DISABLE TRIGGER ALL
-
+ALTER TABLE quiz_option_answer DISABLE TRIGGER ALL;
+ALTER TABLE quiz_option DISABLE TRIGGER ALL;
+ALTER TABLE quiz_item DISABLE TRIGGER ALL;
+ALTER TABLE quiz_item_answer DISABLE TRIGGER ALL;
+ALTER TABLE quiz_option_translation DISABLE TRIGGER ALL;
+ALTER TABLE quiz_item_translation DISABLE TRIGGER ALL;
 `
 
 export async function up(knex: Knex): Promise<void> {
