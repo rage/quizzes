@@ -21,7 +21,6 @@ export const initialize: ActionCreator<ThunkAction> = (
   languageId: string,
   accessToken: string,
   backendAddress?: string,
-  fullInfoWithoutLogin?: boolean,
   showZeroPointsInfo?: boolean,
 ) => async (dispatch: Dispatch, getState) => {
   if (showZeroPointsInfo === undefined) {
@@ -36,15 +35,8 @@ export const initialize: ActionCreator<ThunkAction> = (
   }
 
   try {
-    const fullInfo = !!(accessToken || fullInfoWithoutLogin)
-
     dispatch(loadingBars.InitializeLoadingBarsAfterDelay())
-    const responseData = await getQuizInfo(
-      id,
-      accessToken,
-      backendAddress,
-      fullInfo,
-    )
+    const responseData = await getQuizInfo(id, accessToken, backendAddress)
 
     let quiz, quizAnswer, userQuizState
 

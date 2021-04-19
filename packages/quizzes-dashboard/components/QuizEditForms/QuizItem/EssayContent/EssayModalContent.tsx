@@ -10,17 +10,7 @@ import {
   editedQuizItemBody,
 } from "../../../../store/editor/items/itemAction"
 import MarkdownEditor from "../../../MarkdownEditor"
-
-const ModalContent = styled.div`
-  padding: 1rem;
-  display: flex;
-`
-
-const ModalContentTitleWrapper = styled.div`
-  display: flex;
-  padding: 1rem;
-  justify-content: center;
-`
+import { ModalContent, ModalContentTitleWrapper } from "../../../Shared/Modal"
 
 const MaxWords = styled(TextField)`
   display: flex !important;
@@ -35,6 +25,7 @@ const MinWords = styled(TextField)`
 interface ModalContentProps {
   item: NormalizedItem
 }
+
 export const EssayModalContent = ({ item }: ModalContentProps) => {
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
   const dispatch = useDispatch()

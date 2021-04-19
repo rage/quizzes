@@ -23,24 +23,13 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus } from "@fortawesome/free-solid-svg-icons"
 import { createdNewOption } from "../../../../store/editor/editorActions"
 import MarkdownEditor from "../../../MarkdownEditor"
-
-const ModalContent = styled.div`
-  padding: 1rem;
-  display: flex;
-`
-const ModalContentTitleWrapper = styled.div`
-  display: flex;
-  padding: 1rem;
-  justify-content: center;
-`
+import { ModalContent, ModalContentTitleWrapper } from "../../../Shared/Modal"
 
 const ModalContentOptionWrapper = styled.div`
   padding: 1rem;
-  display: flex !important;
-  justify-content: space-evenly !important;
+  display: flex;
+  justify-content: space-evenly;
 `
-
-const AddOptionButton = styled(Button)``
 
 interface EditorModalProps {
   item: NormalizedItem
@@ -102,12 +91,12 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
         />
       </ModalContent>
       <ModalContent>
-        <AddOptionButton
+        <Button
           title="add option"
           onClick={() => dispatch(createdNewOption(storeItem.id))}
         >
           <FontAwesomeIcon icon={faPlus} size="2x" color="blue" />
-        </AddOptionButton>
+        </Button>
       </ModalContent>
       <ModalContentOptionWrapper>
         {storeItem.options.map(option => (

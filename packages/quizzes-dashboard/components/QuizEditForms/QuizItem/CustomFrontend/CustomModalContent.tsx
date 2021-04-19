@@ -2,12 +2,10 @@ import React from "react"
 import { Box } from "@material-ui/core"
 import styled from "styled-components"
 import { NormalizedItem } from "../../../../types/NormalizedQuiz"
-import { useDispatch } from "react-redux"
-import { useTypedSelector } from "../../../../store/store"
 
 const EmptyBox = styled(Box)`
-  width: 100% !important;
-  height: 200px !important;
+  width: 100%;
+  height: 200px;
 `
 
 interface EditorModalProps {
@@ -15,9 +13,6 @@ interface EditorModalProps {
 }
 
 export const CustomModalContent = ({ item }: EditorModalProps) => {
-  const storeItem = useTypedSelector(state => state.editor.items[item.id])
-  const dispatch = useDispatch()
-
   return (
     <>
       <EmptyBox />

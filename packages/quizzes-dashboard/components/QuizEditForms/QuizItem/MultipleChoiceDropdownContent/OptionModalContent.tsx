@@ -11,17 +11,13 @@ import {
   editedOptionTitle,
   editedOptionSuccessMessage,
   editedOptionFailureMessage,
-  editedOptionCorrectnes,
+  editedOptionCorrectness,
 } from "../../../../store/editor/options/optionActions"
 import { useDispatch } from "react-redux"
 import { NormalizedOption } from "../../../../types/NormalizedQuiz"
 import { useTypedSelector } from "../../../../store/store"
 import MarkdownEditor from "../../../MarkdownEditor"
-
-const ModalContent = styled.div`
-  padding: 1rem;
-  display: flex;
-`
+import { ModalContent } from "../../../Shared/Modal"
 
 interface OptionEditorProps {
   option: NormalizedOption
@@ -46,7 +42,7 @@ export const OptionModalContent = ({ option }: OptionEditorProps) => {
                 checked={storeOption.correct}
                 onChange={event =>
                   dispatch(
-                    editedOptionCorrectnes(
+                    editedOptionCorrectness(
                       storeOption.id,
                       event.target.checked,
                     ),

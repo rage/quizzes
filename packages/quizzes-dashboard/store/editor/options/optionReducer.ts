@@ -2,7 +2,7 @@ import { action, NormalizedOption } from "../../../types/NormalizedQuiz"
 import { createReducer } from "typesafe-actions"
 import {
   editedOptionTitle,
-  editedOptionCorrectnes,
+  editedOptionCorrectness,
   editedOptionSuccessMessage,
   editedOptionFailureMessage,
 } from "./optionActions"
@@ -32,7 +32,7 @@ export const optionReducer = createReducer<
     })
   })
 
-  .handleAction(editedOptionCorrectnes, (state, action) => {
+  .handleAction(editedOptionCorrectness, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.optionId].correct = action.payload.correct
     })
