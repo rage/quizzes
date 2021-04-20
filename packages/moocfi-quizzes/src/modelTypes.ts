@@ -12,6 +12,11 @@ export type QuizPointsGrantingPolicy =
   | "grant_whenever_possible"
   | "grant_only_when_answer_fully_correct"
 
+export enum QuizItemDirection {
+  row = "row",
+  column = "column",
+}
+
 export type MiscEvent = React.FormEvent<
   HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
 >
@@ -115,6 +120,7 @@ export type QuizItem = {
   minLabel: string
   maxLabel: string
   sharedOptionFeedbackMessage?: string
+  direction: QuizItemDirection
 }
 
 export type PeerReviewQuestion = {

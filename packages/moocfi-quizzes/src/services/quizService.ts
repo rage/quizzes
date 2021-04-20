@@ -12,10 +12,7 @@ export const getQuizInfo = async (
   id: string,
   accessToken?: string,
   address?: string,
-  fullInfo?: boolean,
 ): Promise<QuizResponse | Quiz> => {
-  const parameterEnding = fullInfo ? "" : "?fullInfo=false"
-
   const response = accessToken
     ? await axios.get(`${address || BASE_URL}/api/v2/widget/quizzes/${id}`, {
         headers: { authorization: `Bearer ${accessToken}` },

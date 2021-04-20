@@ -415,6 +415,7 @@ export async function seed(knex: Knex): Promise<any> {
       {
         id: 2020,
       },
+      { id: 2021 },
     ]),
   ])
 

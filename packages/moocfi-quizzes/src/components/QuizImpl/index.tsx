@@ -217,19 +217,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   const error = messageState.error
 
   useEffect(() => {
-    dispatch(
-      initialize(
-        id,
-        languageId,
-        accessToken,
-        backendAddress,
-        fullInfoWithoutLogin,
-        showZeroPointsInfo,
-      ),
-    )
-  }, [id, languageId, accessToken, backendAddress])
-
-  useEffect(() => {
     if (accessToken) {
       dispatch(quizAnswerActions.setQuizDisabled(false))
     }

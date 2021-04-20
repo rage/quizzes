@@ -32,7 +32,10 @@ const ChoicesContainer = styled.div<ChoicesContainerProps>`
   display: flex;
   flex-wrap: wrap;
   flex-direction: ${({ direction }) => direction};
-  padding-top: 7;
+  max-width: ${({ direction }) => (direction === "column" ? "150px" : null)};
+  margin: ${({ direction }) => (direction === "column" ? "0 auto" : 0)};
+  padding-top: 7px;
+
   ${({ onlyOneItem }) => onlyOneItem && "width: 100%"}
   ${({ onlyOneItem, providedStyles }) =>
     providedStyles && onlyOneItem && providedStyles}
@@ -103,6 +106,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   const quiz = useTypedSelector(state => state.quiz)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+  const options = item.options
 
   if (!quiz) {
     return <div />
@@ -113,18 +117,13 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
     return <LaterQuizItemAddition item={item} />
   }
 
-  const onlyOneItem = quiz.items.length === 1
+  const quizHasSingleItem = quiz.items.length === 1
 
-  const options = item.options
-
-  let direction: GridDirection = "row"
+  let direction: GridDirection = item.direction || "row"
   let questionWidth: 5 | 12 = 5
   let optionWidth: GridSize = "auto"
 
-  if (onlyOneItem) {
-    const maxOptionLength = Math.max(
-      ...options.map(option => option.title.length),
-    )
+  if (quizHasSingleItem) {
     direction = "column"
   }
 
@@ -142,13 +141,12 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
           <ItemInformation
             item={item}
             itemAnswer={itemAnswer}
-            onlyOneItem={onlyOneItem}
+            onlyOneItem={quizHasSingleItem}
             questionWidth={questionWidth}
           />
-
           <ChoicesContainer
             direction={direction}
-            onlyOneItem={onlyOneItem}
+            onlyOneItem={quizHasSingleItem}
             providedStyles={themeProvider.optionContainerStyles}
             style={{ flex: "1.5" }}
           >
@@ -254,6 +252,26 @@ type OptionProps = {
   option: QuizItemOption
   optionWidth: GridSize
   shouldBeGray: boolean
+}
+
+const OptionWrapper = styled.div<OptionWrapperProps>`
+  ${({ onlyOneItem, shouldBeGray, providedStyles }) =>
+    onlyOneItem
+      ? `
+      display: flex;
+      justify-content: center;
+      background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
+      ${providedStyles}
+    `
+      : `
+      margin-left: 1rem;
+      `}
+`
+
+type OptionWrapperProps = {
+  onlyOneItem: boolean
+  shouldBeGray: boolean
+  providedStyles?: string
 }
 
 const Option: React.FunctionComponent<OptionProps> = ({
@@ -514,26 +532,6 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
       </CentralizedOnSmallScreenTypography>
     </FeedbackDiv>
   )
-}
-
-const OptionWrapper = styled.div<OptionWrapperProps>`
-  ${({ onlyOneItem, shouldBeGray, providedStyles }) =>
-    onlyOneItem
-      ? `
-      display: flex;
-      justify-content: center;
-      background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
-      ${providedStyles}
-    `
-      : `
-      margin-left: 1rem;
-      `}
-`
-
-type OptionWrapperProps = {
-  onlyOneItem: boolean
-  shouldBeGray: boolean
-  providedStyles?: string
 }
 
 export default MultipleChoice

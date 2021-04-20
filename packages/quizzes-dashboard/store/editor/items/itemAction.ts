@@ -125,6 +125,11 @@ export const toggledAllAnswersCorrect = createAction(
   (itemId: string) => ({ itemId: itemId }),
 )<{ itemId: string }>()
 
+export const editedItemDirection = createAction(
+  "EDITED_ITEM_DIRECTION",
+  (itemId: string, newDirection) => ({ itemId, newDirection }),
+)<{ itemId: string; newDirection: "row" | "column" }>()
+
 export const itemActions = [
   editedQuizItemBody,
   editedQuizItemTitle,
@@ -143,6 +148,7 @@ export const itemActions = [
   decreasedItemOrder,
   increasedItemOrder,
   toggledAllAnswersCorrect,
+  editedItemDirection,
 ]
 
 export default itemActions

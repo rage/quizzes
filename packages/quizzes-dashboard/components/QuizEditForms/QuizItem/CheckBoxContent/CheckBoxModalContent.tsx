@@ -4,6 +4,7 @@ import { Checkbox, Typography, TextField } from "@material-ui/core"
 import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
 import { useDispatch } from "react-redux"
 import { useTypedSelector } from "../../../../store/store"
+import { ModalWrapper } from "../../../Shared/Modal"
 
 const Container = styled.div`
   display: flex;
@@ -12,31 +13,31 @@ const Container = styled.div`
 `
 
 const TitleField = styled.div`
-  display: flex !important;
+  display: flex;
   width: 50%;
 `
 
 const PreviewField = styled.div`
-  display: flex !important;
+  display: flex;
   justify-content: center;
   align-items: center;
   width: 50%;
 `
 
 const StyledCheckBox = styled(Checkbox)`
-  display: flex !important;
-  justify-content: flex-end !important;
-  width: 20% !important;
+  display: flex;
+  justify-content: flex-end;
+  width: 20%;
 `
 
 const CheckBoxTitleField = styled.div`
-  display: flex !important;
-  width: 80% !important;
+  display: flex;
+  width: 80%;
 `
 
 const StyledTypo = styled(Typography)`
-  display: flex !important;
-  align-self: flex-start !important;
+  display: flex;
+  align-self: flex-start;
 `
 interface CheckBoxModalProps {
   itemId: string
@@ -46,7 +47,7 @@ export const CheckBoxModalContent = ({ itemId }: CheckBoxModalProps) => {
   const dispatch = useDispatch()
   const storeItem = useTypedSelector(state => state.editor.items[itemId])
   return (
-    <>
+    <ModalWrapper>
       <Container>
         <TitleField>
           <TextField
@@ -67,7 +68,7 @@ export const CheckBoxModalContent = ({ itemId }: CheckBoxModalProps) => {
           </CheckBoxTitleField>
         </PreviewField>
       </Container>
-    </>
+    </ModalWrapper>
   )
 }
 

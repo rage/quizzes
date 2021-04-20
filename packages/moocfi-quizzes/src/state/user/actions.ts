@@ -41,7 +41,6 @@ export const updateQuizState: ActionCreator<ThunkAction> = () => {
       getState().quiz?.id || "",
       getState().user.accessToken,
       getState().backendAddress,
-      true,
     )) as QuizAnswerStatePayload
     dispatch(setQuizState(responseData))
     dispatch(setAnswer(responseData.quizAnswer))

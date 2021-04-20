@@ -260,7 +260,7 @@ describe("dashboard - courses: count answers requiring attention should", () => 
         .expect(response => {
           const received = response.body
           expect(received).toMatchObject({
-            "2a0c2270-011e-40b2-8796-625764828034": "15",
+            "2a0c2270-011e-40b2-8796-625764828034": 15,
           })
         })
         .end(done)
@@ -270,7 +270,7 @@ describe("dashboard - courses: count answers requiring attention should", () => 
 
 describe("dashboard - quizzes: count answers requiring attention should", () => {
   beforeAll(async () => {
-    await safeSeed({ directory: "./database/seeds" })
+    await safeSeed({ directory: "./database/seeds", specific: "a.ts" })
   })
 
   afterAll(async () => {
@@ -348,7 +348,7 @@ describe("dashboard - quizzes: count answers requiring attention should", () => 
         .expect(200)
         .expect(response => {
           const received = response.body
-          expect(received).toEqual({})
+          expect(received).toEqual(0)
         })
         .end(done)
     })
