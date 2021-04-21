@@ -129,7 +129,11 @@ export const AnswerList = ({ data, quizItemTypes }: AnswerListProps) => {
         </BulkActionWrapper>
       )}
       {answers.map(answer => (
-        <AnswerCard key={answer.id} answer={answer} quizItemTypes={quizItemTypes}/>
+        <AnswerCard
+          key={answer.id}
+          answer={answer}
+          quizItemTypes={quizItemTypes}
+        />
       ))}
     </>
   )
