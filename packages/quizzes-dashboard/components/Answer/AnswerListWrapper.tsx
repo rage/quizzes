@@ -21,6 +21,7 @@ interface WrapperProps {
     total: number
   }
   handlePageChange: (nextPage: number) => void
+  quizItemTypes: { [quizItemId: string]: string }[]
 }
 
 export const AnswerListWrapper = ({
@@ -28,6 +29,7 @@ export const AnswerListWrapper = ({
   page,
   handlePageChange,
   answers,
+  quizItemTypes,
 }: WrapperProps) => {
   return (
     <>
@@ -44,7 +46,7 @@ export const AnswerListWrapper = ({
           onChange={(_, nextPage) => handlePageChange(nextPage)}
         />
       </PaginationField>
-      <AnswerList data={answers.results} />
+      <AnswerList data={answers.results} quizItemTypes={quizItemTypes} />
       <PaginationField>
         <Pagination
           siblingCount={2}

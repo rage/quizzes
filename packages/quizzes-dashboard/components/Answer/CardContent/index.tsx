@@ -109,7 +109,7 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
   const [height, setHeight] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
   const [showAnswerDeletionModal, setShowAnswerDeletionModal] = useState(false)
-
+  
   useEffect(() => {
     setShowMore(expandAll)
   }, [handledAnswers, expandAll])

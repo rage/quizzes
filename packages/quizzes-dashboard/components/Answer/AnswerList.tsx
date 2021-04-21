@@ -14,6 +14,7 @@ import { ButtonFieldWrapper } from "../Shared/ButtonFieldWrapper"
 
 export interface AnswerListProps {
   data: Answer[]
+  quizItemTypes: { [quizItemId: string]: string }[]
 }
 
 const BulkActionWrapper = styled.div`
@@ -27,7 +28,7 @@ const BulkActionWrapper = styled.div`
   }
 `
 
-export const AnswerList = ({ data }: AnswerListProps) => {
+export const AnswerList = ({ data, quizItemTypes }: AnswerListProps) => {
   const [showSnacks, setShowSnacks] = useState(false)
   const [answers, setAnswers] = useState<Answer[]>([])
 
@@ -128,7 +129,7 @@ export const AnswerList = ({ data }: AnswerListProps) => {
         </BulkActionWrapper>
       )}
       {answers.map(answer => (
-        <AnswerCard key={answer.id} answer={answer} />
+        <AnswerCard key={answer.id} answer={answer} quizItemTypes={quizItemTypes}/>
       ))}
     </>
   )

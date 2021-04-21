@@ -66,9 +66,10 @@ export const StyledAnswerCard = styled(Card)<AdditionalAnswerCardProps>`
 
 export interface AnswerProps {
   answer: Answer
+  quizItemTypes: { [quizItemId: string]: string }[]
 }
 
-export const AnswerCard = ({ answer }: AnswerProps) => {
+export const AnswerCard = ({ answer, quizItemTypes }: AnswerProps) => {
   const [faded, setFaded] = useState(false)
   const [statusChange, setStatusChange] = useState("")
   const [checked, setChecked] = useState(false)
