@@ -368,6 +368,7 @@ interface IFeedbackPortionProps {
 
 const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   item,
+  direction,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const items = useTypedSelector(state => state.quiz!.items)
@@ -436,7 +437,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
     return (
       <ThemedDiv
         correct={correct}
-        direction={item.direction}
+        direction={direction}
         message={
           correct
             ? generalLabels.answerCorrectLabel
@@ -451,7 +452,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   }
 
   return (
-    <FeedbackDiv correct={correct} direction={item.direction}>
+    <FeedbackDiv correct={correct} direction={direction}>
       <CentralizedOnSmallScreenTypography variant="body1">
         <AttentionIcon icon={faExclamationCircle} />
       </CentralizedOnSmallScreenTypography>

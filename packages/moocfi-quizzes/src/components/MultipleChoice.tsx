@@ -31,11 +31,11 @@ const ChoicesContainer = styled.div<ChoicesContainerProps>`
   display: flex;
   flex-wrap: wrap;
   flex-direction: ${({ direction }) => direction};
-  max-width: ${({ direction }) => (direction === "row" ? "150px" : null)};
-  margin: ${({ direction }) => (direction === "row" ? "0 auto" : 0)};
+  max-width: ${({ direction }) => (direction === "column" ? "150px" : null)};
+  margin: ${({ direction }) => (direction === "column" ? "0 auto" : 0)};
   padding-top: 7px;
 
-  ${({ direction }) => direction === "row" && "width: 100%"}
+  ${({ direction }) => direction === "column" && "width: 100%"}
   ${({ providedStyles }) => providedStyles && providedStyles}
 `
 
@@ -129,43 +129,41 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
         direction={direction}
         providedStyles={themeProvider.multipleChoiceItemContentStyles}
       >
-        <div>
-          <ItemInformation
-            item={item}
-            itemAnswer={itemAnswer}
-            direction={direction}
-            questionWidth={questionWidth}
-          />
-          <ChoicesContainer
-            direction={direction}
-            providedStyles={themeProvider.optionContainerStyles}
-            style={{ flex: "1.5" }}
-          >
-            {options
-              .sort((o1, o2) => o1.order - o2.order)
-              .map((option, index) => {
-                return (
-                  <div key={option.id}>
-                    <Option
-                      key={option.id}
-                      option={option}
-                      direction={direction}
-                      optionWidth={optionWidth}
-                      shouldBeGray={index % 2 === 0}
+        <ItemInformation
+          item={item}
+          itemAnswer={itemAnswer}
+          direction={direction}
+          questionWidth={questionWidth}
+        />
+        <ChoicesContainer
+          direction={direction}
+          providedStyles={themeProvider.optionContainerStyles}
+          style={{ flex: "1.5" }}
+        >
+          {options
+            .sort((o1, o2) => o1.order - o2.order)
+            .map((option, index) => {
+              return (
+                <div key={option.id}>
+                  <Option
+                    key={option.id}
+                    option={option}
+                    direction={direction}
+                    optionWidth={optionWidth}
+                    shouldBeGray={index % 2 === 0}
+                  />
+                  {item.sharedOptionFeedbackMessage === null &&
+                  quiz.triesLimited === false ? (
+                    <FeedbackPortion
+                      item={item}
+                      optionId={option.id}
+                      showAllFeedback={true}
                     />
-                    {item.sharedOptionFeedbackMessage === null &&
-                    quiz.triesLimited === false ? (
-                      <FeedbackPortion
-                        item={item}
-                        optionId={option.id}
-                        showAllFeedback={true}
-                      />
-                    ) : null}
-                  </div>
-                )
-              })}
-          </ChoicesContainer>
-        </div>
+                  ) : null}
+                </div>
+              )
+            })}
+        </ChoicesContainer>
         {quiz.triesLimited === true ||
         item.sharedOptionFeedbackMessage !== null ? (
           <FeedbackPortion item={item} />
@@ -409,6 +407,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   item,
   optionId,
   showAllFeedback,
+  direction,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const items = useTypedSelector(state => state.quiz!.items)
@@ -500,7 +499,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
     return (
       <ThemedDiv
         correct={correct}
-        direction={item.direction}
+        direction={direction}
         message={
           correct
             ? generalLabels.answerCorrectLabel
@@ -515,7 +514,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   }
 
   return (
-    <FeedbackDiv correct={correct} direction={item.direction}>
+    <FeedbackDiv correct={correct} direction={direction}>
       <CentralizedOnSmallScreenTypography variant="body1">
         <AttentionIcon icon={faExclamationCircle} />
       </CentralizedOnSmallScreenTypography>
