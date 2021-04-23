@@ -14,7 +14,7 @@ import { SecondaryStyledButton } from "./styleComponents"
 export interface ChoiceButtonProps {
   revealed: boolean
   children: any
-  onlyOneItem: boolean
+  direction: string
   state: boolean
   selected: boolean
   correct: boolean
@@ -23,13 +23,13 @@ export interface ChoiceButtonProps {
 }
 
 interface ButtonProps {
-  onlyOneItem: boolean
+  direction: string
   selected: boolean
   state: boolean
 }
 
 interface RevealedButtonProps {
-  onlyOneItem: boolean
+  direction: string
   selected: boolean
   correct: boolean
   children: any
@@ -52,7 +52,7 @@ const FailureIcon = () => (
 )
 
 const ChoiceButton = styled(SecondaryStyledButton)<ButtonProps>`
-  ${({ onlyOneItem }) => onlyOneItem && `width: 90%;`}
+  ${({ direction }) => direction === "row" && `width: 90%;`}
   ${({ state }) => state && `background-color: #E3B599;`}
 
   margin: 0.5em 0;
