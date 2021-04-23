@@ -36,8 +36,7 @@ const ChoicesContainer = styled.div<ChoicesContainerProps>`
   padding-top: 7px;
 
   ${({ direction }) => direction === "row" && "width: 100%"}
-  ${({ providedStyles }) =>
-    providedStyles && providedStyles}
+  ${({ providedStyles }) => providedStyles && providedStyles}
 `
 
 const CentralizedOnSmallScreenTypography = styled(Typography)`
@@ -169,7 +168,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
         </div>
         {quiz.triesLimited === true ||
         item.sharedOptionFeedbackMessage !== null ? (
-         <FeedbackPortion item={item} />
+          <FeedbackPortion item={item} />
         ) : null}
       </ItemContent>
     </div>
@@ -363,7 +362,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
         {optionIsSelected && (
           <OptionWrapper
-          direction={direction}
+            direction={direction}
             shouldBeGray={shouldBeGray}
             providedStyles={themeProvider.optionWrapperStyles}
           >
@@ -410,7 +409,6 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   item,
   optionId,
   showAllFeedback,
-
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const items = useTypedSelector(state => state.quiz!.items)
