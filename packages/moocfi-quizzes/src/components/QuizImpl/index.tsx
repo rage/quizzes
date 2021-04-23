@@ -444,6 +444,7 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
                           style={{
                             color: "rgba(0,0,0,0.6)",
                             fontSize: "0.9rem",
+                            marginLeft:"0.5rem",
                             fontWeight: "normal",
                             fontFamily: "Poppins",
                           }}
