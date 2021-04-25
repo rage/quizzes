@@ -1,17 +1,40 @@
 import * as Knex from "knex"
 
 const moveQuizOptionAnswerRows = `
-    WITH moved_quiz_option_answer_rows AS (
-        DELETE FROM quiz_option_answer qoa
-            USING quiz_item_answer qia
-        WHERE qia.quiz_item_id IN (SELECT id FROM quiz_item WHERE type = 'checkbox')
-        RETURNING qoa.id, qia.quiz_answer_id, qoa.quiz_option_id
-    )
-    
-    INSERT INTO quiz_item_answer (id, quiz_answer_id, quiz_item_id)
-    SELECT * FROM moved_quiz_option_answer_rows
+    DROP INDEX idx_fts_answer;
+    DROP INDEX trgm_idx;
+    DROP INDEX quiz_option_answer_sort_order;
 
+    SET random_page_cost = 1.1;
+
+    INSERT
+    INTO quiz_item_answer as qia (id, quiz_answer_id, quiz_item_id, created_at, updated_at)
+    SELECT qoa.id, qia.quiz_answer_id, qoa.quiz_option_id, qoa.created_at, qoa.updated_at
+    FROM quiz_option_answer as qoa
+            JOIN quiz_item_answer qia on qia.id = qoa.quiz_item_answer_id
+            JOIN quiz_item qi on qi.id = qia.quiz_item_id
+    WHERE qi.type = 'checkbox';
+
+    DELETE
+    FROM quiz_option_answer as qoa
+    WHERE id IN (SELECT qoa.id
+             from quiz_option_answer qoa
+                      join quiz_option qo on qo.id = qoa.quiz_option_id
+                      join quiz_item qi on qi.id = qo.quiz_item_id
+             where qi.type = 'checkbox');
+
+    SET random_page_cost = 4;
+
+    create index trgm_idx
+	    on quiz_item_answer using gin (text_data gin_trgm_ops);
+
+    create index idx_fts_answer
+        on quiz_item_answer using gin (to_tsvector('english'::regconfig, COALESCE(text_data, ''::text)));
+
+    create index quiz_item_answer_sort_order
+	    on quiz_item_answer (quiz_answer_id, created_at);
 `
+
 const moveQuizOptionTranslationRows = `
     WITH moved_quiz_option_translation_rows AS (
         DELETE FROM quiz_option_translation qot
@@ -36,38 +59,29 @@ const moveQuizOptionRows = `
     SELECT * FROM moved_quiz_option_rows
 `
 
-const deleteQuizOptionChildren = `
-    DELETE FROM quiz_option_translation qot
-        USING quiz_item qi, quiz_option qo
-        WHERE qo.id IN (SELECT id FROM quiz_item WHERE type = 'checkbox'::quiz_item_type_enum);
-`
-
-const reEnableTableTriggers = `
-ALTER TABLE quiz_option_answer ENABLE TRIGGER ALL;
-ALTER TABLE quiz_option ENABLE TRIGGER ALL;
-ALTER TABLE quiz_item ENABLE TRIGGER ALL;
-ALTER TABLE quiz_item_answer ENABLE TRIGGER ALL;
-ALTER TABLE quiz_option_translation ENABLE TRIGGER ALL;
-ALTER TABLE quiz_item_translation ENABLE TRIGGER ALL;
-`
-
 const disableTableTriggers = `
-ALTER TABLE quiz_option_answer DISABLE TRIGGER ALL;
-ALTER TABLE quiz_option DISABLE TRIGGER ALL;
-ALTER TABLE quiz_item DISABLE TRIGGER ALL;
-ALTER TABLE quiz_item_answer DISABLE TRIGGER ALL;
-ALTER TABLE quiz_option_translation DISABLE TRIGGER ALL;
-ALTER TABLE quiz_item_translation DISABLE TRIGGER ALL;
+ALTER TABLE quiz_option_answer
+    DISABLE TRIGGER ALL;
+ALTER TABLE quiz_item
+    DISABLE TRIGGER ALL;
+ALTER TABLE quiz_item_answer
+    DISABLE TRIGGER ALL;
+`
+const reEnableTableTriggers = `
+ALTER TABLE quiz_option_answer
+    ENABLE TRIGGER ALL;
+ALTER TABLE quiz_item
+    ENABLE TRIGGER ALL;
+ALTER TABLE quiz_item_answer
+    ENABLE TRIGGER ALL;
 `
 
 export async function up(knex: Knex): Promise<void> {
   await knex.raw(disableTableTriggers)
   await knex.raw(moveQuizOptionAnswerRows)
   await knex.raw(moveQuizOptionTranslationRows)
-  await knex.raw(deleteQuizOptionChildren)
   await knex.raw(moveQuizOptionRows)
-}
-
-export async function down(knex: Knex): Promise<void> {
   await knex.raw(reEnableTableTriggers)
 }
+
+export async function down(knex: Knex): Promise<void> {}
