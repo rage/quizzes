@@ -28,7 +28,6 @@ const moveQuizOptionAnswerRows = `
                       join quiz_option qo on qo.id = qoa.quiz_option_id
                       join quiz_item qi on qi.id = qo.quiz_item_id
              where qi.type = 'checkbox');
-
     SET random_page_cost = 4;
 
     DELETE
@@ -117,14 +116,14 @@ CREATE TEMP TABLE qi_to_delete(
 insert into qia_to_delete (select qia.id
       from quiz_item_answer qia
                join quiz_item qi on qi.id = qia.quiz_item_id
-               join quiz_option_answer qoa on qoa.quiz_item_answer_id = qia.id)
-               where qi.type ='checkbox';
+               join quiz_option_answer qoa on qoa.quiz_item_answer_id = qia.id
+               where qi.type ='checkbox');
 
 insert into qi_to_delete (select qi.id
       from quiz_item qi
                join quiz_option qo on qo.quiz_item_id = qi.id
-               join quiz_option_answer qoa on qoa.quiz_option_id = qo.id)
-               where qi.type ='checkbox';
+               join quiz_option_answer qoa on qoa.quiz_option_id = qo.id
+               where qi.type ='checkbox');
 `
 
 const dropTempTables = `
