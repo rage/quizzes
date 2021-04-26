@@ -11,6 +11,7 @@ import "@fortawesome/fontawesome-svg-core/styles.css"
 import { config as fontAwesomeConfig } from "@fortawesome/fontawesome-svg-core"
 import { Provider } from "react-redux"
 import store from "../store/store"
+import "./index.css"
 
 fontAwesomeConfig.autoAddCss = false
 
