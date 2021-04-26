@@ -8,9 +8,9 @@ const moveQuizOptionAnswerRows = `
 
     SET random_page_cost = 1.1;
 
-    DROP INDEX idx_fts_answer;
-    DROP INDEX quiz_item_answer_sort_order;
-    DROP INDEX trgm_idx;
+    DROP INDEX IF EXISTS idx_fts_answer;
+    DROP INDEX IF EXISTS quiz_item_answer_sort_order;
+    DROP INDEX IF EXISTS trgm_idx;
 
     INSERT
     INTO quiz_item_answer as qia (id, quiz_answer_id, quiz_item_id, created_at, updated_at)
@@ -87,14 +87,14 @@ const moveQuizOptionRows = `
 `
 
 const reCreateIndexes = `
-create index trgm_idx
-    on quiz_item_answer using gin (text_data gin_trgm_ops);
+CREATE INDEX trgm_idx
+    ON quiz_item_answer using gin (text_data gin_trgm_ops);
 
-create index idx_fts_answer
-    on quiz_item_answer using gin (to_tsvector('english'::regconfig, COALESCE(text_data, ''::text)));
+CREATE INDEX idx_fts_answer
+    ON quiz_item_answer using gin (to_tsvector('english'::regconfig, COALESCE(text_data, ''::text)));
 
-create index quiz_item_answer_sort_order
-    on quiz_item_answer (quiz_answer_id, created_at);
+CREATE INDEX quiz_item_answer_sort_order
+    ON quiz_item_answer (quiz_answer_id, created_at);
 
 `
 
