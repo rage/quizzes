@@ -13,8 +13,8 @@ const moveQuizOptionAnswerRows = `
     DROP INDEX IF EXISTS trgm_idx;
 
     INSERT
-    INTO quiz_item_answer as qia (id, quiz_answer_id, quiz_item_id, created_at, updated_at)
-    SELECT qoa.id, qia.quiz_answer_id, qoa.quiz_option_id, qoa.created_at, qoa.updated_at
+    INTO quiz_item_answer as qia (id, quiz_answer_id, quiz_item_id, int_data, created_at, updated_at)
+    SELECT qoa.id, qia.quiz_answer_id, qoa.quiz_option_id, 1, qoa.created_at, qoa.updated_at
     FROM quiz_option_answer as qoa
             JOIN quiz_item_answer qia on qia.id = qoa.quiz_item_answer_id
             JOIN quiz_item qi on qi.id = qia.quiz_item_id
@@ -35,7 +35,6 @@ const moveQuizOptionAnswerRows = `
         ENABLE TRIGGER ALL;
     ALTER TABLE quiz_option_answer
         ENABLE TRIGGER ALL;
-
 `
 
 const moveQuizOptionTranslationRows = `
@@ -95,7 +94,6 @@ CREATE INDEX idx_fts_answer
 
 CREATE INDEX quiz_item_answer_sort_order
     ON quiz_item_answer (quiz_answer_id, created_at);
-
 `
 
 export async function up(knex: Knex): Promise<void> {
