@@ -31,6 +31,10 @@ const moveQuizOptionAnswerRows = `
 
     SET random_page_cost = 4;
 
+    DELETE
+    FROM quiz_item_answer qia
+    WHERE id IN (SELECT id from qia_to_delete);
+
     ALTER TABLE quiz_item_answer
         ENABLE TRIGGER ALL;
     ALTER TABLE quiz_option_answer
@@ -81,6 +85,11 @@ const moveQuizOptionRows = `
         USING quiz_item qi
     WHERE qi.type = 'checkbox';
 
+    DELETE 
+    FROM quiz_item qi
+        WHERE qi.id IN (SELECT id FROM qi_to_delete);
+    
+
     ALTER TABLE quiz_option
         ENABLE TRIGGER ALL;
 `
@@ -96,12 +105,41 @@ CREATE INDEX quiz_item_answer_sort_order
     ON quiz_item_answer (quiz_answer_id, created_at);
 `
 
+const createTempTables = `
+CREATE TEMP TABLE qia_to_delete(
+    id uuid
+);
+
+CREATE TEMP TABLE qi_to_delete(
+    id uuid
+);
+
+insert into qia_to_delete (select qia.id
+      from quiz_item_answer qia
+               join quiz_item qi on qi.id = qia.quiz_item_id
+               join quiz_option_answer qoa on qoa.quiz_item_answer_id = qia.id)
+               where qi.type ='checkbox';
+
+insert into qi_to_delete (select qi.id
+      from quiz_item qi
+               join quiz_option qo on qo.quiz_item_id = qi.id
+               join quiz_option_answer qoa on qoa.quiz_option_id = qo.id)
+               where qi.type ='checkbox';
+`
+
+const dropTempTables = `
+    DROP TABLE IF EXISTS qia_to_delete;
+    DROP TABLE IF EXISTS qi_to_delete;
+`
+
 export async function up(knex: Knex): Promise<void> {
+  await knex.raw(createTempTables)
   await knex.raw(moveQuizOptionAnswerRows)
   await knex.raw(moveQuizOptionTranslationRows)
   await knex.raw(moveQuizOptionRows)
 }
 
 export async function down(knex: Knex): Promise<void> {
+  await knex.raw(dropTempTables)
   await knex.raw(reCreateIndexes)
 }
