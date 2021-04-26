@@ -77,9 +77,13 @@ export default class App extends NextApp {
         <StylesProvider injectFirst>
           <StyledThemeProvider theme={theme}>
             <MaterialThemeProvider theme={theme}>
-              <Layout>
+              {Component.noLayout ? (
                 <Component {...pageProps} />
-              </Layout>
+              ) : (
+                <Layout>
+                  <Component {...pageProps} />
+                </Layout>
+              )}
             </MaterialThemeProvider>
           </StyledThemeProvider>
         </StylesProvider>
