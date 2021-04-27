@@ -30,7 +30,8 @@ interface ChoicesContainerProps {
 const ChoicesContainer = styled.div<ChoicesContainerProps>`
   display: flex;
   flex-wrap: wrap;
-  flex-direction: ${({ direction }) => direction};
+  flex-direction: ${({ direction }) =>
+    direction === "column" ? "row" : "column"};
   max-width: ${({ direction }) => (direction === "column" ? "150px" : null)};
   margin: ${({ direction }) => (direction === "column" ? "0 auto" : 0)};
   padding-top: 7px;
