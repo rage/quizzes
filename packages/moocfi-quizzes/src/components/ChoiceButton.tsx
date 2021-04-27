@@ -46,7 +46,7 @@ const FailureIcon = () => (
 )
 
 const ChoiceButton = styled(StyledButton)<ButtonProps>`
-  ${({ direction }) => direction === "row" && `width: 70%;`}
+  ${({ direction }) => direction === "column" && `width: 70%;`}
   ${({ selected }) =>
     !selected
       ? `background-color: transparent;`

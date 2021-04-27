@@ -52,7 +52,7 @@ const FailureIcon = () => (
 )
 
 const ChoiceButton = styled(SecondaryStyledButton)<ButtonProps>`
-  ${({ direction }) => direction === "row" && `width: 90%;`}
+  ${({ direction }) => direction === "column" && `width: 90%;`}
   ${({ state }) => state && `background-color: #E3B599;`}
 
   margin: 0.5em 0;

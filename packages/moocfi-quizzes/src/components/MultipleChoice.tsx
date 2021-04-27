@@ -83,7 +83,7 @@ const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
     margin-top: -0.25rem;
     padding: 0 0 0 0.5rem;
   }
-  ${({ direction }) => direction === "row" && "width: 70%;"}
+  ${({ direction }) => direction === "column" && "width: 70%;"}
 `
 
 const LeftAlignedMarkdownText = styled(MarkdownText)`
@@ -197,7 +197,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
     ? ""
     : item.multi
     ? multipleChoiceLabels.chooseAllSuitableOptionsLabel
-    : direction === "row"
+    : direction === "column"
     ? multipleChoiceLabels.selectCorrectAnswerLabel
     : ""
 
@@ -235,7 +235,7 @@ const SelectOptionsLabelTypography = styled(Typography)<{
   direction: string
 }>`
   color: 6b6b6b;
-  ${({ direction }) => direction === "row" && "margin: 0 auto 1rem;"}
+  ${({ direction }) => direction === "column" && "margin: 0 auto 1rem;"}
 `
 
 type OptionProps = {
@@ -249,14 +249,14 @@ const OptionWrapper = styled.div<OptionWrapperProps>`
   ${({ direction, shouldBeGray, providedStyles }) =>
     direction
       ? `
-      display: flex;
-      justify-content: center;
-      background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
-      ${providedStyles}
-    `
+display: flex;
+justify-content: center;
+background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
+${providedStyles}
+`
       : `
-      margin-left: 1rem;
-      `}
+margin-left: 1rem;
+`}
 `
 
 type OptionWrapperProps = {
@@ -333,7 +333,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
     ? {}
     : { onClick: handleOptionChange(option.id) }
 
-  if (direction === "row") {
+  if (direction === "column") {
     return (
       <React.Fragment>
         <OptionWrapper
