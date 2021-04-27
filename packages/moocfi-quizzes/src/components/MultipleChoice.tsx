@@ -120,6 +120,10 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   let questionWidth: 5 | 12 = 5
   let optionWidth: GridSize = "auto"
 
+  if (quiz.items.length > 1) {
+    direction = "column"
+  }
+
   return (
     <div
       role="group"
