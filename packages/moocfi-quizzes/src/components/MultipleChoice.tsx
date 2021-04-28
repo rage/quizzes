@@ -30,12 +30,11 @@ interface ChoicesContainerProps {
 const ChoicesContainer = styled.div<ChoicesContainerProps>`
   display: flex;
   flex-wrap: wrap;
-  flex-direction: ${({ direction }) =>
-    direction === "column" ? "row" : "column"};
+  flex-direction: ${({ direction }) => direction};
   padding-top: 7px;
-
   ${({ direction }) => direction === "column" && "width: 100%"}
-  ${({ providedStyles }) => providedStyles && providedStyles}
+  ${({ direction, providedStyles }) =>
+    providedStyles && direction === "column" && providedStyles}
 `
 
 const CentralizedOnSmallScreenTypography = styled(Typography)`
@@ -54,7 +53,6 @@ interface ItemContentProps {
 }
 
 const ItemContent = styled.div<ItemContentProps>`
-  display: flex;
   margin-bottom: 20px;
   > div:first-of-type {
     display: flex;
@@ -115,11 +113,13 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
     return <LaterQuizItemAddition item={item} />
   }
 
+  const quizHasSingleItem = quiz.items.length === 1
+
   let direction: GridDirection = item.direction || "row"
   let questionWidth: 5 | 12 = 5
   let optionWidth: GridSize = "auto"
 
-  if (quiz.items.length > 1) {
+  if (quizHasSingleItem) {
     direction = "column"
   }
 
@@ -133,41 +133,43 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
         direction={direction}
         providedStyles={themeProvider.multipleChoiceItemContentStyles}
       >
-        <ItemInformation
-          item={item}
-          itemAnswer={itemAnswer}
-          direction={direction}
-          questionWidth={questionWidth}
-        />
-        <ChoicesContainer
-          direction={direction}
-          providedStyles={themeProvider.optionContainerStyles}
-          style={{ flex: "1.5" }}
-        >
-          {options
-            .sort((o1, o2) => o1.order - o2.order)
-            .map((option, index) => {
-              return (
-                <div key={option.id}>
-                  <Option
-                    key={option.id}
-                    option={option}
-                    direction={direction}
-                    optionWidth={optionWidth}
-                    shouldBeGray={index % 2 === 0}
-                  />
-                  {item.sharedOptionFeedbackMessage === null &&
-                  quiz.triesLimited === false ? (
-                    <FeedbackPortion
-                      item={item}
-                      optionId={option.id}
-                      showAllFeedback={true}
+        <div>
+          <ItemInformation
+            item={item}
+            itemAnswer={itemAnswer}
+            direction={direction}
+            questionWidth={questionWidth}
+          />
+          <ChoicesContainer
+            direction={direction}
+            providedStyles={themeProvider.optionContainerStyles}
+            style={{ flex: "1.5" }}
+          >
+            {options
+              .sort((o1, o2) => o1.order - o2.order)
+              .map((option, index) => {
+                return (
+                  <div key={option.id}>
+                    <Option
+                      direction={direction}
+                      key={option.id}
+                      option={option}
+                      optionWidth={optionWidth}
+                      shouldBeGray={index % 2 === 0}
                     />
-                  ) : null}
-                </div>
-              )
-            })}
-        </ChoicesContainer>
+                    {item.sharedOptionFeedbackMessage === null &&
+                    quiz.triesLimited === false ? (
+                      <FeedbackPortion
+                        item={item}
+                        optionId={option.id}
+                        showAllFeedback={true}
+                      />
+                    ) : null}
+                  </div>
+                )
+              })}
+          </ChoicesContainer>
+        </div>
         {quiz.triesLimited === true ||
         item.sharedOptionFeedbackMessage !== null ? (
           <FeedbackPortion item={item} />
@@ -209,7 +211,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 
   return (
     <QuestionContainer>
-      {direction !== "row" && title && (
+      {direction !== "column" && title && (
         <LeftAlignedMarkdownText
           Component={SpaciousTypography}
           removeParagraphs
@@ -225,8 +227,8 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
       {selectOptionsLabel && (
         <SelectOptionsLabelTypography
           variant="subtitle1"
-          direction={direction}
           variantMapping={{ subtitle1: "p" }}
+          direction={direction}
         >
           {selectOptionsLabel}
         </SelectOptionsLabelTypography>
@@ -243,24 +245,24 @@ const SelectOptionsLabelTypography = styled(Typography)<{
 `
 
 type OptionProps = {
-  direction: string
   option: QuizItemOption
   optionWidth: GridSize
   shouldBeGray: boolean
+  direction: string
 }
 
 const OptionWrapper = styled.div<OptionWrapperProps>`
   ${({ direction, shouldBeGray, providedStyles }) =>
-    direction
+    direction === "column"
       ? `
-display: flex;
-justify-content: center;
-background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
-${providedStyles}
-`
+      display: flex;
+      justify-content: center;
+      background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
+      ${providedStyles}
+    `
       : `
-margin-left: 1rem;
-`}
+      margin-left: 1rem;
+      `}
 `
 
 type OptionWrapperProps = {
