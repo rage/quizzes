@@ -32,8 +32,6 @@ const ChoicesContainer = styled.div<ChoicesContainerProps>`
   flex-wrap: wrap;
   flex-direction: ${({ direction }) =>
     direction === "column" ? "row" : "column"};
-  max-width: ${({ direction }) => (direction === "column" ? "150px" : null)};
-  margin: ${({ direction }) => (direction === "column" ? "0 auto" : 0)};
   padding-top: 7px;
 
   ${({ direction }) => direction === "column" && "width: 100%"}
@@ -56,6 +54,7 @@ interface ItemContentProps {
 }
 
 const ItemContent = styled.div<ItemContentProps>`
+  display: flex;
   margin-bottom: 20px;
   > div:first-of-type {
     display: flex;
