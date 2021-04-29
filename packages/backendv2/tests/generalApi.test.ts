@@ -45,7 +45,7 @@ describe("general-api", () => {
           return [
             200,
             {
-              id: 1234,
+              id: 2345,
               administrator: true,
             } as UserInfo,
           ]
