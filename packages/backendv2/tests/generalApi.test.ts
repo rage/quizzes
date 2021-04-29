@@ -95,7 +95,7 @@ describe("general-api", () => {
           "group",
           "progress",
           "n_points",
-          "max_points"
+          "max_points",
         ])
       })
       .end(done)
