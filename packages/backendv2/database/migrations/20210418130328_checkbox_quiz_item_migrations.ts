@@ -78,6 +78,9 @@ const moveQuizOptionRows = `
 
     ALTER TABLE quiz_option
         DISABLE TRIGGER ALL;
+
+    ALTER TABLE quiz_item
+        DISABLE TRIGGER ALL;
         
     DELETE
     FROM quiz_option qo
@@ -90,6 +93,9 @@ const moveQuizOptionRows = `
     
 
     ALTER TABLE quiz_option
+        ENABLE TRIGGER ALL;
+
+    ALTER TABLE quiz_item
         ENABLE TRIGGER ALL;
 `
 
