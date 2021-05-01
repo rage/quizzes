@@ -122,7 +122,6 @@ insert into qia_to_delete (select qia.id
 insert into qi_to_delete (select qi.id
       from quiz_item qi
                join quiz_option qo on qo.quiz_item_id = qi.id
-               join quiz_option_answer qoa on qoa.quiz_option_id = qo.id
                where qi.type ='checkbox');
 `
 
