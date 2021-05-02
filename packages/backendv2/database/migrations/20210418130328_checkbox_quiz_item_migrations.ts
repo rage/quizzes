@@ -141,9 +141,8 @@ export async function up(knex: Knex): Promise<void> {
   await knex.raw(moveQuizOptionAnswerRows)
   await knex.raw(moveQuizOptionTranslationRows)
   await knex.raw(moveQuizOptionRows)
-}
-
-export async function down(knex: Knex): Promise<void> {
   await knex.raw(dropTempTables)
   await knex.raw(reCreateIndexes)
 }
+
+export async function down(knex: Knex): Promise<void> {}
