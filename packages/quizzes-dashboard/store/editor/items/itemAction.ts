@@ -50,6 +50,14 @@ export const editedValidityRegex = createAction(
   }),
 )<{ itemId: string; newRegex: string }>()
 
+export const editedFormatRegex = createAction(
+  "EDITED_FORMAT_REGEX",
+  (itemId: string, newRegex: string) => ({
+    itemId: itemId,
+    newRegex: newRegex,
+  }),
+)<{ itemId: string; newRegex: string }>()
+
 export const toggledMultiOptions = createAction(
   "TOGGLED_MULTI_OPTIONS",
   (itemId: string, checked: boolean) => ({
@@ -138,6 +146,7 @@ export const itemActions = [
   editedScaleMaxLabel,
   editedScaleMinLabel,
   editedValidityRegex,
+  editedFormatRegex,
   toggledMultiOptions,
   editedItemSuccessMessage,
   editedItemFailureMessage,
