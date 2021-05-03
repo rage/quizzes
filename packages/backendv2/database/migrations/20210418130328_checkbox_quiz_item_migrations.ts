@@ -100,8 +100,6 @@ const moveQuizOptionRows = `
 `
 
 const reCreateIndexes = `
-CREATE INDEX trgm_idx
-    ON quiz_item_answer using gin (text_data gin_trgm_ops);
 
 CREATE INDEX idx_fts_answer
     ON quiz_item_answer using gin (to_tsvector('english'::regconfig, COALESCE(text_data, ''::text)));
