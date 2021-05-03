@@ -12,9 +12,9 @@ import {
   editedItemFailureMessage,
 } from "../../../../store/editor/items/itemAction"
 import {
-  setRegex,
-  setTestingRegex,
-  setValidRegex,
+  setValidityTestRegex,
+  toggleValidRegexTestingState,
+  setValidValidityRegex,
 } from "../../../../store/editor/itemVariables/itemVariableActions"
 import {
   TextField,
@@ -58,9 +58,9 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
     try {
       const newRegex = new RegExp(input)
       dispatch(editedValidityRegex(item.id, input))
-      dispatch(setValidRegex(storeItem.id, true))
+      dispatch(setValidValidityRegex(storeItem.id, true))
     } catch (err) {
-      dispatch(setValidRegex(storeItem.id, false))
+      dispatch(setValidValidityRegex(storeItem.id, false))
     }
   }
 
@@ -96,13 +96,15 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
           value={variables.regex ?? ""}
           helperText={!variables.validRegex && "Invalid regex"}
           onChange={event => {
-            dispatch(setRegex(storeItem.id, event.target.value))
+            dispatch(setValidityTestRegex(storeItem.id, event.target.value))
             handleRegexChange(event.target.value)
           }}
         />
         <StyledButton
           variant="outlined"
-          onClick={() => dispatch(setTestingRegex(storeItem.id, true))}
+          onClick={() =>
+            dispatch(toggleValidRegexTestingState(storeItem.id, true))
+          }
           size="large"
         >
           Test Regex
