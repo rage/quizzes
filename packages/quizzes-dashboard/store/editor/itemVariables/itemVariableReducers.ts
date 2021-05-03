@@ -14,10 +14,14 @@ import {
   setAdvancedEditing,
   setScaleMax,
   setScaleMin,
-  setTestingRegex,
-  setRegex,
-  setRegexTestAnswer,
-  setValidRegex,
+  toggleValidRegexTestingState,
+  toggleFormatRegexTestingState,
+  setValidityTestRegex,
+  setFormatTestRegex,
+  setValidityRegexTestAnswer,
+  setFormatRegexTestAnswer,
+  setValidValidityRegex,
+  setFormatValidityRegex,
 } from "./itemVariableActions"
 
 export const itemVariableReducers = createReducer<
@@ -34,16 +38,20 @@ export const itemVariableReducers = createReducer<
           array = _.range(item.minValue, item.maxValue + 1)
         }
         draftState[id] = {
-          advancedEditing: false,
           scaleMax: item.maxValue ?? 0,
           scaleMin: item.minValue ?? 0,
           validMax: true,
           validMin: true,
           array: array,
+          advancedEditing: false,
           testingRegex: false,
+          testingFormatRegex: false,
           regex: item.validityRegex ?? "",
-          regexTestAnswer: "",
+          formatRegex: item.formatRegex ?? "",
+          validityRegexTestAnswer: "",
+          formatRegexTestAnswer: "",
           validRegex: true,
+          validFormatRegex: true,
           newOptions: [],
         }
       }
@@ -82,28 +90,54 @@ export const itemVariableReducers = createReducer<
     })
   })
 
-  .handleAction(setTestingRegex, (state, action) => {
+  .handleAction(toggleValidRegexTestingState, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.itemId].testingRegex = action.payload.testing
     })
   })
 
-  .handleAction(setRegex, (state, action) => {
+  .handleAction(toggleFormatRegexTestingState, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].testingFormatRegex =
+        action.payload.testing
+    })
+  })
+
+  .handleAction(setValidityTestRegex, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.itemId].regex = action.payload.testRegex
     })
   })
 
-  .handleAction(setRegexTestAnswer, (state, action) => {
+  .handleAction(setFormatTestRegex, (state, action) => {
     return produce(state, draftState => {
-      draftState[action.payload.itemId].regexTestAnswer =
+      draftState[action.payload.itemId].formatRegex = action.payload.testRegex
+    })
+  })
+
+  .handleAction(setValidityRegexTestAnswer, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].validityRegexTestAnswer =
         action.payload.testAnswer
     })
   })
 
-  .handleAction(setValidRegex, (state, action) => {
+  .handleAction(setFormatRegexTestAnswer, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].formatRegexTestAnswer =
+        action.payload.testAnswer
+    })
+  })
+
+  .handleAction(setValidValidityRegex, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.itemId].validRegex = action.payload.valid
+    })
+  })
+
+  .handleAction(setFormatValidityRegex, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].validFormatRegex = action.payload.valid
     })
   })
 
@@ -112,13 +146,17 @@ export const itemVariableReducers = createReducer<
       draftState[action.payload.itemId] = {
         advancedEditing: false,
         regex: "",
-        regexTestAnswer: "",
+        formatRegex: "",
+        validityRegexTestAnswer: "",
+        formatRegexTestAnswer: "",
         scaleMax: 0,
         scaleMin: 0,
         testingRegex: false,
+        testingFormatRegex: false,
         validMax: true,
         validMin: true,
         validRegex: true,
+        validFormatRegex: true,
         array: [],
         newOptions: [],
       }
