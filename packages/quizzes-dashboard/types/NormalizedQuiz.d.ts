@@ -128,9 +128,13 @@ export interface ItemVariables {
   array: number[]
   advancedEditing: boolean
   testingRegex: boolean
-  regexTestAnswer: string
+  testingFormatRegex: boolean
+  validityRegexTestAnswer: string
+  formatRegexTestAnswer: string
   regex: string
+  formatRegex: string
   validRegex: boolean
+  validFormatRegex: boolean
   newOptions: string[]
 }
 
