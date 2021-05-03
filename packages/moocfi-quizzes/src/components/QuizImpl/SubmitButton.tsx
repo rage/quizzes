@@ -51,7 +51,10 @@ const SubmitButton: React.FunctionComponent = () => {
 
   if (ThemedSubmitButton) {
     return (
-      <ThemedSubmitButton disabled={submitLocked} onClick={handleSubmit}>
+      <ThemedSubmitButton
+        disabled={submitLocked || !answerFormatIsValid}
+        onClick={handleSubmit}
+      >
         {buttonText}
       </ThemedSubmitButton>
     )

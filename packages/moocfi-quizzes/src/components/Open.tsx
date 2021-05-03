@@ -27,6 +27,10 @@ const SolutionPaper = styled(SpaciousPaper)<SolutionPaperProps>`
   }
 `
 
+const InvalidFormatErrorText = styled.span`
+  color: #f44336;
+`
+
 const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
@@ -155,11 +159,6 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
       <div className="open">
         {guidance}
         <StyledTextField
-          error={!answerFormatIsValid}
-          helperText={
-            !answerFormatIsValid &&
-            "The answer does not match the answer format specified for this exercise."
-          }
           rowNumber={item.order}
           value={textData}
           onChange={handleTextDataChange}
@@ -172,6 +171,12 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
           id={`${itemTitle}-textfield`}
         />
       </div>
+      {!answerFormatIsValid && (
+        <InvalidFormatErrorText>
+          The answer does not match the answer format specified for this
+          exercise.
+        </InvalidFormatErrorText>
+      )}
     </ItemContent>
   )
 }
