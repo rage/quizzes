@@ -44,6 +44,8 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
     state => state.quizAnswer.answerFormatIsValid,
   )
 
+  const [showFormatError, setShowFormatError] = React.useState(false)
+
   if (!languageInfo) {
     return <div />
   }
@@ -165,18 +167,19 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
           fullWidth
           margin="normal"
           variant="outlined"
-          //label={itemTitle ? itemTitle : openLabels.placeholder}
           label={openLabels.placeholder}
           disabled={quizDisabled}
           id={`${itemTitle}-textfield`}
+          onFocus={() => setShowFormatError(false)}
+          onBlur={() => setShowFormatError(true)}
         />
+        {showFormatError && textData && !answerFormatIsValid && (
+          <InvalidFormatErrorText>
+            The answer does not match the answer format specified for this
+            exercise.
+          </InvalidFormatErrorText>
+        )}
       </div>
-      {!answerFormatIsValid && (
-        <InvalidFormatErrorText>
-          The answer does not match the answer format specified for this
-          exercise.
-        </InvalidFormatErrorText>
-      )}
     </ItemContent>
   )
 }
