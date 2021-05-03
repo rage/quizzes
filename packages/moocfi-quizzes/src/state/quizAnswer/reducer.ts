@@ -98,6 +98,7 @@ export const quizAnswerReducer = (
       return {
         ...state,
         submitLocked: !readyToSubmit(newItemAnswersReady),
+        answerFormatIsValid: state.answerFormatIsValid,
         itemAnswersReady: newItemAnswersReady,
         quizAnswer: {
           ...state.quizAnswer,
