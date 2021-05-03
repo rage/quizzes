@@ -9,6 +9,7 @@ export const initialState: QuizAnswerState = {
     itemAnswers: [],
   },
   submitLocked: true,
+  answerFormatIsValid: true,
   itemAnswersReady: {},
   attemptedDisabledSubmit: false,
   noChangesSinceSuccessfulSubmit: false,
@@ -20,6 +21,7 @@ export const initialState: QuizAnswerState = {
 export type QuizAnswerState = {
   quizAnswer: QuizAnswer
   submitLocked: boolean
+  answerFormatIsValid: boolean
   itemAnswersReady: Record<string, boolean>
   attemptedDisabledSubmit: boolean
   noChangesSinceSuccessfulSubmit: boolean
@@ -33,6 +35,11 @@ export const quizAnswerReducer = (
   action: ActionType<typeof quizAnswer>,
 ): QuizAnswerState => {
   switch (action.type) {
+    case getType(quizAnswer.setAnswerFormatIsValid):
+      return {
+        ...state,
+        answerFormatIsValid: action.payload,
+      }
     case getType(quizAnswer.setUnlocked):
       return {
         ...state,

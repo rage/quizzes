@@ -18,6 +18,13 @@ export const setAnswer = createAction("quizAnswer/SET", resolve => {
   return (payload: QuizAnswer) => resolve(payload)
 })
 
+export const setAnswerFormatIsValid = createAction(
+  "quizAnswer/ANSWER_FORMAT_IS_VALID",
+  resolve => {
+    return (payload: boolean) => resolve(payload)
+  },
+)
+
 export const setQuizDisabled = createAction(
   "quizAnswer/SET_QUIZ_DISABLED",
   resolve => (newValue: boolean) => resolve(newValue),
