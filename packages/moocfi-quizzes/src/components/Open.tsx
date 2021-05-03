@@ -56,10 +56,12 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
   }
 
   const handleTextDataChange = (e: MiscEvent) => {
-    if (answerFormatIsValidAgainstRegex(e.currentTarget.value)) {
-      dispatch(quizAnswerActions.setAnswerFormatIsValid(true))
-    } else {
-      dispatch(quizAnswerActions.setAnswerFormatIsValid(false))
+    if (item.formatRegex) {
+      if (answerFormatIsValidAgainstRegex(e.currentTarget.value)) {
+        dispatch(quizAnswerActions.setAnswerFormatIsValid(true))
+      } else {
+        dispatch(quizAnswerActions.setAnswerFormatIsValid(false))
+      }
     }
     dispatch(quizAnswerActions.changeTextData(item.id, e.currentTarget.value))
   }
