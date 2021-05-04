@@ -55,7 +55,7 @@ const irishLabels: SingleLanguageLabels = {
     answerConfirmed: "Glacadh leis an bhfreagra uait!",
     manualReview:
       "Tá an freagra uait á athbhreithniú ag baill foirne an chúrsa",
-    peerReviewGroupTitle: "Peer review questions",
+    peerReviewGroupTitle: "Ceisteanna athbhreithnithe piaraí",
     peerReviewLikertDetails:
       "Evaluate each statement on a scale of 1-5. 1 means strongly disagree, 5 means strongly agree.",
   },
