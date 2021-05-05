@@ -11,11 +11,7 @@ export default {
   submitMessageDiv: ``,
   answerPaper: ``,
   answerField: ``,
-  quizBody: `
-  text-align: center;
-  font-family: 'Poppins';
-  font-size: 18px;
-  `,
+  quizBody: ``,
   stepper: ``,
   submitGroup: ``,
   messageGroup: ``,

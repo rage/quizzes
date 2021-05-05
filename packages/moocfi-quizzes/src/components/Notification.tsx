@@ -10,20 +10,12 @@ const Message = styled.div<{ msgColor: string | null }>`
   border-width: 0.25rem;
   border-color: ${msgColor}
   padding: 1rem 0;
-  text-align: center;
-  margin: 0 auto;
-  width: 50%;
   p {
     margin: auto;
-    padding: .4rem 0;
     color: ${msgColor};
-    font-size: .8rem;
-    font-weight: 500;
-    font-family: Poppins;
-    border-left: 3px solid red;
-    background: #ECF6FB;
-
-    }
+    font-size: 1.25rem;
+    font-weight: bold;
+  }
   `}
 `
 
@@ -41,7 +33,7 @@ const Notification: React.FunctionComponent<NotificationProps> = ({
 }) => {
   const messageState = useTypedSelector(state => state.message)
   if (messageState.message) {
-    const color = (messageState.error && "#F76D82") || null
+    const color = (messageState.error && "red") || null
     scrollToRef(scrollRef)
     return (
       <Message msgColor={color}>
