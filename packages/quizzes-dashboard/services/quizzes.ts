@@ -4,7 +4,7 @@ import { Quiz, Course } from "../types/Quiz"
 import { NewQuiz } from "../types/NormalizedQuiz"
 import { Answer } from "../types/Answer"
 
-let HOST = "http://localhost:5001"
+let HOST = "http://localhost:3003"
 
 if (process.env.NODE_ENV === "production") {
   HOST = "https://quizzes.mooc.fi"
