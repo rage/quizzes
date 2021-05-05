@@ -1,15 +1,7 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import styled from "styled-components"
-import {
-  Button,
-  Modal,
-  Fade,
-  Box,
-  FormControlLabel,
-  FormGroup,
-  Switch,
-} from "@material-ui/core"
+import { Button, Modal, Fade, Box } from "@material-ui/core"
 import { useDispatch } from "react-redux"
 import { useTypedSelector } from "../../../../store/store"
 import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
@@ -24,7 +16,6 @@ import MultipleChoiceModalContent from "./MultipleChoiceModalContent"
 import MultipleChoiceButton from "./MultiplChoiceButton"
 import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
 import {
-  checkForChanges,
   createdNewOption,
   deletedItem,
 } from "../../../../store/editor/editorActions"
@@ -89,6 +80,7 @@ const MultipleChoiceContent = ({ item }: multipleChoiceContentProps) => {
   const variables = useTypedSelector(
     state => state.editor.itemVariables[item.id],
   )
+
   const dispatch = useDispatch()
 
   return (

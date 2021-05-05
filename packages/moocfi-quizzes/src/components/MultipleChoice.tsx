@@ -24,7 +24,6 @@ const QuestionContainer = styled.div`
 
 interface ChoicesContainerProps {
   direction: string
-  onlyOneItem: boolean
   providedStyles: string | undefined
 }
 
@@ -32,10 +31,10 @@ const ChoicesContainer = styled.div<ChoicesContainerProps>`
   display: flex;
   flex-wrap: wrap;
   flex-direction: ${({ direction }) => direction};
-  padding-top: 7;
-  ${({ onlyOneItem }) => onlyOneItem && "width: 100%"}
-  ${({ onlyOneItem, providedStyles }) =>
-    providedStyles && onlyOneItem && providedStyles}
+  padding-top: 7px;
+  ${({ direction }) => direction === "column" && "width: 100%"}
+  ${({ direction, providedStyles }) =>
+    providedStyles && direction === "column" && providedStyles}
 `
 
 const CentralizedOnSmallScreenTypography = styled(Typography)`
@@ -65,7 +64,7 @@ const ItemContent = styled.div<ItemContentProps>`
 
 export interface LeftBorderedDivProps {
   correct: boolean | undefined
-  onlyOneItem?: boolean
+  direction?: string
   message?: string
 }
 
@@ -82,7 +81,7 @@ const LeftBorderedDiv = styled.div<LeftBorderedDivProps>`
     margin-top: -0.25rem;
     padding: 0 0 0 0.5rem;
   }
-  ${({ onlyOneItem }) => onlyOneItem && "width: 70%;"}
+  ${({ direction }) => direction === "column" && "width: 70%;"}
 `
 
 const LeftAlignedMarkdownText = styled(MarkdownText)`
@@ -103,6 +102,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   const quiz = useTypedSelector(state => state.quiz)
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
+  const options = item.options
 
   if (!quiz) {
     return <div />
@@ -113,18 +113,13 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
     return <LaterQuizItemAddition item={item} />
   }
 
-  const onlyOneItem = quiz.items.length === 1
+  const quizHasSingleItem = quiz.items.length === 1
 
-  const options = item.options
-
-  let direction: GridDirection = "row"
+  let direction: GridDirection = item.direction || "row"
   let questionWidth: 5 | 12 = 5
   let optionWidth: GridSize = "auto"
 
-  if (onlyOneItem) {
-    const maxOptionLength = Math.max(
-      ...options.map(option => option.title.length),
-    )
+  if (quizHasSingleItem) {
     direction = "column"
   }
 
@@ -142,13 +137,11 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
           <ItemInformation
             item={item}
             itemAnswer={itemAnswer}
-            onlyOneItem={onlyOneItem}
+            direction={direction}
             questionWidth={questionWidth}
           />
-
           <ChoicesContainer
             direction={direction}
-            onlyOneItem={onlyOneItem}
             providedStyles={themeProvider.optionContainerStyles}
             style={{ flex: "1.5" }}
           >
@@ -158,6 +151,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
                 return (
                   <div key={option.id}>
                     <Option
+                      direction={direction}
                       key={option.id}
                       option={option}
                       optionWidth={optionWidth}
@@ -178,7 +172,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
         </div>
         {quiz.triesLimited === true ||
         item.sharedOptionFeedbackMessage !== null ? (
-          /*!onlyOneItem && */ <FeedbackPortion item={item} />
+          <FeedbackPortion item={item} />
         ) : null}
       </ItemContent>
     </div>
@@ -189,11 +183,11 @@ type ItemInformationProps = {
   questionWidth: 5 | 12
   itemAnswer: QuizItemAnswer | undefined
   item: QuizItem
-  onlyOneItem: boolean
+  direction: string
 }
 
 const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
-  onlyOneItem,
+  direction,
   item,
 }) => {
   const userQuizState = useTypedSelector(state => state.user.userQuizState)
@@ -209,7 +203,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
     ? ""
     : item.multi
     ? multipleChoiceLabels.chooseAllSuitableOptionsLabel
-    : onlyOneItem
+    : direction === "column"
     ? multipleChoiceLabels.selectCorrectAnswerLabel
     : ""
 
@@ -217,7 +211,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 
   return (
     <QuestionContainer>
-      {!onlyOneItem && title && (
+      {direction !== "column" && title && (
         <LeftAlignedMarkdownText
           Component={SpaciousTypography}
           removeParagraphs
@@ -234,7 +228,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
         <SelectOptionsLabelTypography
           variant="subtitle1"
           variantMapping={{ subtitle1: "p" }}
-          onlyOneItem={onlyOneItem}
+          direction={direction}
         >
           {selectOptionsLabel}
         </SelectOptionsLabelTypography>
@@ -244,21 +238,43 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 }
 
 const SelectOptionsLabelTypography = styled(Typography)<{
-  onlyOneItem: boolean
+  direction: string
 }>`
   color: 6b6b6b;
-  ${({ onlyOneItem }) => onlyOneItem && "margin: 0 auto 1rem;"}
+  ${({ direction }) => direction === "column" && "margin: 0 auto 1rem;"}
 `
 
 type OptionProps = {
   option: QuizItemOption
   optionWidth: GridSize
   shouldBeGray: boolean
+  direction: string
+}
+
+const OptionWrapper = styled.div<OptionWrapperProps>`
+  ${({ direction, shouldBeGray, providedStyles }) =>
+    direction === "column"
+      ? `
+      display: flex;
+      justify-content: center;
+      background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
+      ${providedStyles}
+    `
+      : `
+      margin-left: 1rem;
+      `}
+`
+
+type OptionWrapperProps = {
+  direction: string
+  shouldBeGray: boolean
+  providedStyles?: string
 }
 
 const Option: React.FunctionComponent<OptionProps> = ({
   option,
   shouldBeGray,
+  direction,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
@@ -280,7 +296,6 @@ const Option: React.FunctionComponent<OptionProps> = ({
     ia => ia.quizItemId === item.id,
   )
 
-  const onlyOneItem = items.length === 1
   const text = option
 
   if (!itemAnswer && !quizDisabled) {
@@ -299,12 +314,12 @@ const Option: React.FunctionComponent<OptionProps> = ({
   if (!displayFeedback) {
     return (
       <OptionWrapper
-        onlyOneItem={onlyOneItem}
+        direction={direction}
         shouldBeGray={shouldBeGray}
         providedStyles={themeProvider.optionWrapperStyles}
       >
         <ChoiceButton
-          onlyOneItem={onlyOneItem}
+          direction={direction}
           selected={!!optionIsSelected}
           revealed={false}
           correct={false}
@@ -324,17 +339,17 @@ const Option: React.FunctionComponent<OptionProps> = ({
     ? {}
     : { onClick: handleOptionChange(option.id) }
 
-  if (onlyOneItem) {
+  if (direction === "column") {
     return (
       <React.Fragment>
         <OptionWrapper
-          onlyOneItem={onlyOneItem}
+          direction={direction}
           shouldBeGray={shouldBeGray}
           providedStyles={themeProvider.optionWrapperStyles}
         >
           <ChoiceButton
             revealed
-            onlyOneItem={onlyOneItem}
+            direction={direction}
             selected={!!optionIsSelected}
             correct={option.correct}
             {...clickOptions}
@@ -351,7 +366,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
         {optionIsSelected && (
           <OptionWrapper
-            onlyOneItem={onlyOneItem}
+            direction={direction}
             shouldBeGray={shouldBeGray}
             providedStyles={themeProvider.optionWrapperStyles}
           >
@@ -365,10 +380,10 @@ const Option: React.FunctionComponent<OptionProps> = ({
   // multiple items
   return (
     <>
-      <OptionWrapper onlyOneItem={onlyOneItem} shouldBeGray={shouldBeGray}>
+      <OptionWrapper direction={direction} shouldBeGray={shouldBeGray}>
         <ChoiceButton
           revealed
-          onlyOneItem={onlyOneItem}
+          direction={direction}
           selected={!!optionIsSelected}
           correct={option.correct}
           {...clickOptions}
@@ -391,13 +406,14 @@ interface IFeedbackPortionProps {
   optionId?: string
   item: QuizItem
   selectedOption?: QuizItemOption
-  onlyOneItem?: boolean
+  direction?: string
 }
 
 const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   item,
   optionId,
   showAllFeedback,
+  direction,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const items = useTypedSelector(state => state.quiz!.items)
@@ -423,7 +439,6 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
     return <div>Cannot find related item answer</div>
   }
 
-  const onlyOneItem = items.length === 1
   const generalLabels = languageLabels.general
 
   const optionAnswers = itemAnswer && itemAnswer.optionAnswers
@@ -490,7 +505,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
     return (
       <ThemedDiv
         correct={correct}
-        onlyOneItem={onlyOneItem}
+        direction={direction}
         message={
           correct
             ? generalLabels.answerCorrectLabel
@@ -505,7 +520,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   }
 
   return (
-    <FeedbackDiv correct={correct} onlyOneItem={onlyOneItem}>
+    <FeedbackDiv correct={correct} direction={direction}>
       <CentralizedOnSmallScreenTypography variant="body1">
         <AttentionIcon icon={faExclamationCircle} />
       </CentralizedOnSmallScreenTypography>
@@ -514,26 +529,6 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
       </CentralizedOnSmallScreenTypography>
     </FeedbackDiv>
   )
-}
-
-const OptionWrapper = styled.div<OptionWrapperProps>`
-  ${({ onlyOneItem, shouldBeGray, providedStyles }) =>
-    onlyOneItem
-      ? `
-      display: flex;
-      justify-content: center;
-      background-color: ${shouldBeGray ? `#605c980d` : `inherit`};
-      ${providedStyles}
-    `
-      : `
-      margin-left: 1rem;
-      `}
-`
-
-type OptionWrapperProps = {
-  onlyOneItem: boolean
-  shouldBeGray: boolean
-  providedStyles?: string
 }
 
 export default MultipleChoice

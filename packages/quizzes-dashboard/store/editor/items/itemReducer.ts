@@ -16,6 +16,7 @@ import {
   increasedItemOrder,
   decreasedItemOrder,
   toggledAllAnswersCorrect,
+  editedItemDirection,
 } from "./itemAction"
 import {
   initializedEditor,
@@ -140,6 +141,7 @@ export const itemReducer = createReducer<
         sharedOptionFeedbackMessage: null,
         options: [],
         allAnswersCorrect: false,
+        direction: "row",
       }
       draftState[action.payload.itemId] = newItem
     })
@@ -235,6 +237,12 @@ export const itemReducer = createReducer<
       draftState[action.payload.itemId].allAnswersCorrect = !draftState[
         action.payload.itemId
       ].allAnswersCorrect
+    })
+  })
+
+  .handleAction(editedItemDirection, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].direction = action.payload.newDirection
     })
   })
 

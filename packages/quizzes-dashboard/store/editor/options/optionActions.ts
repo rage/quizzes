@@ -8,8 +8,8 @@ export const editedOptionTitle = createAction(
   }),
 )<{ newTitle: string; optionId: string }>()
 
-export const editedOptionCorrectnes = createAction(
-  "EDITED_OPTION_CORRECTNES",
+export const editedOptionCorrectness = createAction(
+  "EDITED_OPTION_CORRECTNESS",
   (optionId: string, correct: boolean) => ({
     optionId: optionId,
     correct: correct,
@@ -34,7 +34,7 @@ export const editedOptionFailureMessage = createAction(
 
 export const optionActions = [
   editedOptionTitle,
-  editedOptionCorrectnes,
+  editedOptionCorrectness,
   editedOptionSuccessMessage,
   editedOptionFailureMessage,
 ]

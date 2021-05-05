@@ -10,7 +10,7 @@ import { StyledButton } from "./styleComponents"
 export interface ChoiceButtonProps {
   revealed: boolean
   children: any
-  onlyOneItem: boolean
+  direction: string
   selected: boolean
   correct: boolean
   onClick?: any
@@ -18,12 +18,12 @@ export interface ChoiceButtonProps {
 }
 
 interface ButtonProps {
-  onlyOneItem: boolean
+  direction: string
   selected: boolean
 }
 
 interface RevealedButtonProps {
-  onlyOneItem: boolean
+  direction: string
   selected: boolean
   correct: boolean
   children: any
@@ -46,7 +46,7 @@ const FailureIcon = () => (
 )
 
 const ChoiceButton = styled(StyledButton)<ButtonProps>`
-  ${({ onlyOneItem }) => onlyOneItem && `width: 70%;`}
+  ${({ direction }) => direction === "column" && `width: 70%;`}
   ${({ selected }) =>
     !selected
       ? `background-color: transparent;`

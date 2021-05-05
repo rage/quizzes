@@ -51,9 +51,9 @@ const slovenianLabels: SingleLanguageLabels = {
     answerFlaggedAsSpam: "Vaš odgovor je bil prijavljen kot neželena vsebina",
     answerConfirmed: "Vaš odgovor je sprejet.",
     manualReview: "Osebje tečaja pregleduje vaš odgovor",
-    peerReviewGroupTitle: "Peer review questions",
+    peerReviewGroupTitle: "Vprašanja, ki so del medvrstniškega vrednotenja",
     peerReviewLikertDetails:
-      "Evaluate each statement on a scale of 1-5. 1 means strongly disagree, 5 means strongly agree.",
+      "Ovrednotite vsako trditev na lestvici od 1 do 5. 1 pomeni se nikakor ne strinjam, 5 pomeni se popolnoma strinjam.",
   },
   receivedPeerReviews: {
     averageOfGradesLabel: "Povprečna ocena prejetih pregledov jeis",
@@ -70,7 +70,7 @@ const slovenianLabels: SingleLanguageLabels = {
     toggleButtonExpandLabel: "Prikaži vse prejete medsebojne preglede",
     toggleButtonShrinkLabel: "Skrij",
     peerReviewLabel: "Medsebojni pregled",
-    peerReviewReceived: "Prejeli ste nov medsebojni pregled",
+    peerReviewReceived: "Prejeli ste novo medvrstniško ovrednotenje",
     peerReviewReceivedFor: (title: string) =>
       `Prejeli ste nov medsebojni pregled za nalogo ${title}`,
   },
@@ -125,22 +125,21 @@ const slovenianLabels: SingleLanguageLabels = {
     },
     answered: "Odgovorjeno",
     unanswered: "Neodgovorjen",
-    rejected: "Zavrnjen odgovor, poskusite znova",
-    progressUpdated: "Napredek tečaja je posodobljen",
-    answerConfirmed: "Vaš odgovor je potrjen",
+    rejected: "Zavrnjen odgovor, poskusite ponovno",
+    progressUpdated: "Vaš napredek v tečaju je posodobljen",
+    answerConfirmed: "Vaš odgovor je bil sprejet!",
     answerConfirmedFor: (title: string) =>
-      `Vaš odgovor na nalogo ${title}  je potrjen.`,
-    courseCompleted: "Tečaj ste zaključili.",
+      `Vaš odgovor pri nalogi ${title} je bil sprejet!`,
+    courseCompleted: "Uspešno ste zaključili s tečajem!",
   },
   error: {
-    submitFailedError:
-      "Odgovora ni bilo mogoče poslati. Poskusite ponovno pozneje.",
-    quizLoadFailedError: "Naloge ni bilo mogoče naložiti",
+    submitFailedError: "Vaš odgovor ni bil poslan. Prosimo, poskusite pozneje.",
+    quizLoadFailedError: "Nalaganje naloge ni bilo uspešno",
     progressFetchError:
-      "Podatkov o napredku tečaja ni bilo mogoče pridobiti. Poskusite ponovno pozneje.",
-    submitSpamFlagError: "Neželene vsebine ni bilo mogoče prijaviti",
+      "Neuspešno pridobivanje podatkov o napredku v tečaju. Prosimo, poskusite ponovno pozneje. ",
+    submitSpamFlagError: "Neuspešna prijava neprimerne vsebine.",
     fetchReviewCandidatesError:
-      "Napaka pri priklicu odgovorov za medsebojni pregled. Poskusite ponovno pozneje.",
+      "Prišlo je do napake pri pridobivanju odgovorov za medvrstniško vrednotenje. Prosimo, poskusite ponovno pozneje.",
   },
 }
 

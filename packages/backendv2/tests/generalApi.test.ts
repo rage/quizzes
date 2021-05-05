@@ -45,7 +45,7 @@ describe("general-api", () => {
           return [
             200,
             {
-              id: 1234,
+              id: 2345,
               administrator: true,
             } as UserInfo,
           ]
@@ -92,12 +92,10 @@ describe("general-api", () => {
         const progress = data[0]
         expect(progress).toBeObject()
         expect(progress).toContainAllKeys([
-          "quizId",
-          "peerReviewsGiven",
-          "peerReviewsReceived",
-          "tries",
-          "status",
-          "pointsAwarded",
+          "group",
+          "progress",
+          "n_points",
+          "max_points",
         ])
       })
       .end(done)

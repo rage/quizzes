@@ -1,8 +1,9 @@
 import Router from "koa-router"
 import { CustomContext, CustomState } from "../../types"
-import { checkAccessOrThrow } from "../dashboard/util"
-import { UserQuizState, Quiz } from "../../models/"
+import Quiz from "../../models/quiz"
+import UserCoursePartState from "../../models/user_course_part_state"
 import accessControl from "../../middleware/access_control"
+import knex from "../../../database/knex"
 
 const general = new Router<CustomState, CustomContext>({
   prefix: "/general",
@@ -10,7 +11,14 @@ const general = new Router<CustomState, CustomContext>({
   .get("/course/:courseId/progress", accessControl(), async ctx => {
     const courseId = ctx.params.courseId
     const user = ctx.state.user
-    ctx.body = await UserQuizState.getByUserAndCourse(user.id, courseId)
+    try {
+      ctx.body = await knex.transaction(
+        async trx =>
+          await UserCoursePartState.getProgress(user.id, courseId, trx),
+      )
+    } catch (err) {
+      throw err
+    }
   })
 
   .get("/course/:courseId/quiz-titles", accessControl(), async ctx => {
