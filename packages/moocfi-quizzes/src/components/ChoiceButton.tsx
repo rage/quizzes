@@ -10,7 +10,7 @@ import { StyledButton } from "./styleComponents"
 export interface ChoiceButtonProps {
   revealed: boolean
   children: any
-  onlyOneItem: boolean
+  direction: string
   selected: boolean
   correct: boolean
   onClick?: any
@@ -18,12 +18,12 @@ export interface ChoiceButtonProps {
 }
 
 interface ButtonProps {
-  onlyOneItem: boolean
+  direction: string
   selected: boolean
 }
 
 interface RevealedButtonProps {
-  onlyOneItem: boolean
+  direction: string
   selected: boolean
   correct: boolean
   children: any
@@ -46,32 +46,12 @@ const FailureIcon = () => (
 )
 
 const ChoiceButton = styled(StyledButton)<ButtonProps>`
-  ${({ onlyOneItem }) => onlyOneItem && `width: 70%;`}
-  ${({ selected }) =>
-    !selected
-      ? `background-color: transparent;`
-      : `{background-color: white; color: #1373E6; font-weight: 500; border: 1px solid white; box-shadow: 0 1.6px 1.3px -6px rgba(0,0,0,0.022), 0 4px 3.3px -6px rgba(0,0,0,0.031), 0 8.2px 6.7px -6px rgba(0,0,0,0.039), 0 16.8px 13.9px -6px rgba(0,0,0,0.048), 0 46px 38px -6px rgba(0,0,0,0.07);}`}
+  ${({ direction }) => direction === "column" && `width: 70%;`}
+  ${({ selected }) => !selected && `background-color: white;`}
 
   margin: 0.5em 0;
-  border-radius: 4px;
-  color: rgba(0, 0, 0, 0.6);
-  font-weight: 500;
-  padding: 1rem 4rem;
-  border: 2px solid #dce1e4;
-  transition: all 0.15s ease-in;
-  font-family: Poppins;
-
-  &:hover {
-    color: rgba(0, 0, 0, 0.9);
-    font-weight: 500;
-    background: white;
-    border: 1px solid white;
-    box-shadow: 0 1.6px 1.3px -6px rgba(0, 0, 0, 0.055),
-      0 4px 3.3px -6px rgba(0, 0, 0, 0.031),
-      0 8.2px 6.7px -6px rgba(0, 0, 0, 0.039),
-      0 16.8px 13.9px -6px rgba(0, 0, 0, 0.048),
-      0 46px 38px -6px rgba(0, 0, 0, 0.07);
-  }
+  border: 1px solid
+    ${({ selected }) => (selected ? "rgba(0, 0, 0, 0)" : "rgba(0, 0, 0, 0.23)")};
 `
 
 const RevealedChoiceButton = styled(

@@ -63,6 +63,7 @@ export interface NormalizedItem {
   failureMessage: string | null
   sharedOptionFeedbackMessage: string | null
   allAnswersCorrect: boolean
+  direction: "row" | "column"
 }
 
 export interface NormalizedOption {

@@ -20,20 +20,16 @@ const Container = styled.div<TopInfoBarContainerProps>`
   justify-content: center;
   padding: 1.5rem 2rem;
   color: white;
-  background: #1473e6;
-  font-family: Poppins !important;
+  background-color: #213094;
 `
 
 const IconContainer = styled.div`
   margin-right: 1rem;
   font-size: 3.5rem;
-  line-height: 1.2;
-  color: #15447d;
 `
 
 const TitleContainer = styled.div`
   margin-right: auto;
-  text-align: start;
 `
 
 const PointsContainer = styled.div`

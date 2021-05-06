@@ -46,6 +46,7 @@ export interface Item {
   failureMessage: null
   sharedOptionFeedbackMessage: null
   allAnswersCorrect: boolean
+  direction: "row" | "column"
 }
 
 export interface Option {

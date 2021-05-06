@@ -476,18 +476,10 @@ class QuizAnswer extends mixin(BaseModel, [
   }
 
   public static async getManualReviewCountByQuizId(quizId: string) {
-    const count: any[] = await this.query()
-      .select(["quiz_id"])
+    return await this.query()
       .where("quiz_id", quizId)
       .andWhere("status", "manual-review")
-      .count()
-      .groupBy("quiz_id")
-
-    if (count.length === 0) {
-      return 0
-    }
-
-    return count[0].count
+      .resultSize()
   }
 
   public static async getAnswerCountsByStatus(quizId: string) {

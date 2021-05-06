@@ -11,7 +11,7 @@ import {
   editedOptionTitle,
   editedOptionSuccessMessage,
   editedOptionFailureMessage,
-  editedOptionCorrectnes,
+  editedOptionCorrectness,
 } from "../../../../store/editor/options/optionActions"
 import { useDispatch } from "react-redux"
 import { NormalizedOption } from "../../../../types/NormalizedQuiz"
@@ -46,7 +46,7 @@ export const OptionModalContent = ({ option }: OptionEditorProps) => {
                 checked={storeOption.correct}
                 onChange={event =>
                   dispatch(
-                    editedOptionCorrectnes(
+                    editedOptionCorrectness(
                       storeOption.id,
                       event.target.checked,
                     ),

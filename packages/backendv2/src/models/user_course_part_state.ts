@@ -86,14 +86,19 @@ class UserCoursePartState extends BaseModel {
             user_id: userId,
             course_id: courseId,
             course_part: course_part,
-            score: points_awarded || 0,
-            progress: total_points === 0 ? 0 : points_awarded / total_points,
+            score: Number(points_awarded) || 0,
+            progress:
+              total_points === 0
+                ? 0
+                : Number(points_awarded) / Number(total_points),
           }
         },
       )
-      await this.query(trx).upsertGraph(userCoursePartStateUpsertObjects)
+      return await this.query(trx).upsertGraphAndFetch(
+        userCoursePartStateUpsertObjects,
+      )
     } else {
-      const { pointsAwarded, totalPoints } = (
+      const result: { [key: string]: number } = (
         await trx("quiz")
           .sum("points_awarded as pointsAwarded")
           .sum("points as totalPoints")
@@ -104,8 +109,10 @@ class UserCoursePartState extends BaseModel {
       )[0]
 
       await userCoursePartState.$query(trx).patch({
-        score: pointsAwarded || 0,
-        progress: pointsAwarded ? pointsAwarded / totalPoints : 0,
+        score: result.pointsAwarded || 0,
+        progress: result.pointsAwarded
+          ? result.pointsAwarded / result.totalPoints
+          : 0,
       })
     }
   }
@@ -146,7 +153,7 @@ class UserCoursePartState extends BaseModel {
           group: `${
             coursePartString.length > 1 ? "osa" : "osa0"
           }${coursePartString}`,
-          progress: Math.round(((ucps.score / maxPoints) * 100) / 100),
+          progress: Math.round((ucps.score / maxPoints) * 100) / 100,
           n_points: Number(ucps.score.toFixed(2)),
           max_points: maxPoints,
         }

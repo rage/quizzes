@@ -1,12 +1,16 @@
 import React from "react"
 import {
   Typography,
-  TextField,
   FormGroup,
   FormControlLabel,
   Checkbox,
   Button,
   Switch,
+  FormLabel,
+  Radio,
+  RadioGroup,
+  FormControl,
+  FormHelperText,
 } from "@material-ui/core"
 import {
   editedQuizItemTitle,
@@ -16,6 +20,7 @@ import {
   editedItemSuccessMessage,
   editedItemFailureMessage,
   toggledAllAnswersCorrect,
+  editedItemDirection,
 } from "../../../../store/editor/items/itemAction"
 import { useTypedSelector } from "../../../../store/store"
 import { useDispatch } from "react-redux"
@@ -26,10 +31,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faPlus } from "@fortawesome/free-solid-svg-icons"
 import { createdNewOption } from "../../../../store/editor/editorActions"
 import MarkdownEditor from "../../../MarkdownEditor"
+import { ModalWrapper } from "../../../Shared/Modal"
 
 const ModalContent = styled.div`
   display: flex;
-  padding: 0.5rem;
+  padding: 1rem;
   justify-content: center;
   @media only screen and (max-width: 600px) {
     width: 100%;
@@ -59,6 +65,10 @@ const AllAnswersCorrectField = styled.div`
   width: 100%;
 `
 
+const Spacer = styled.div`
+  margin: 5% 0;
+`
+
 interface EditorModalProps {
   item: NormalizedItem
 }
@@ -68,7 +78,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
   const storeOptions = useTypedSelector(state => state.editor.options)
   const dispatch = useDispatch()
   return (
-    <>
+    <ModalWrapper>
       <ModalContentTitleWrapper>
         <Typography variant="h4">Advanced editing</Typography>
       </ModalContentTitleWrapper>
@@ -130,7 +140,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
                   }
                 />
               }
-              label="All answers correct"
+              label="All answers correct (no matter what one answers it is correct)"
             />
           </FormGroup>
         </AllAnswersCorrectField>
@@ -150,6 +160,25 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
           </ModalContent>
         ))}
       </ModalContentOptionWrapper>
+      <Spacer />
+      <FormControl component="fieldset">
+        <FormLabel component="legend">Layout of options</FormLabel>
+        <RadioGroup
+          aria-label="direction"
+          name="direction"
+          value={storeItem.direction}
+          onChange={e =>
+            dispatch(editedItemDirection(storeItem.id, e.target.value))
+          }
+        >
+          <FormHelperText>
+            Choose the direction in which the quiz item options will be layed
+            out in the embedded widget.
+          </FormHelperText>
+          <FormControlLabel value="row" control={<Radio />} label="Row" />
+          <FormControlLabel value="column" control={<Radio />} label="Column" />
+        </RadioGroup>
+      </FormControl>
       {storeItem.usesSharedOptionFeedbackMessage ? (
         <ModalContent>
           <MarkdownEditor
@@ -191,7 +220,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
           </ModalContent>
         </>
       )}
-    </>
+    </ModalWrapper>
   )
 }
 

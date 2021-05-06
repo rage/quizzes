@@ -1,5 +1,4 @@
-import * as React from "react"
-import { useEffect, useRef, useState } from "react"
+import React, { useContext, useEffect, useRef, useState } from "react"
 import {
   CourseProgressProviderInterface,
   ProgressData,
@@ -9,9 +8,8 @@ import {
   ProgressResponse,
   ExerciseCompletionsBySection,
   CourseResponse,
-  CourseProgressProvider,
-  useCourseProgressState,
 } from "../contexes/courseProgressProviderContext"
+import { CourseProgressProviderContext } from "../contexes/courseProgressProviderContext"
 import { PointsByGroup } from "../modelTypes"
 import { languageOptions } from "../utils/languages"
 import { ToastContainer, toast, TypeOptions } from "react-toastify"
@@ -69,7 +67,6 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
   const fetchProgressData = async () => {
     try {
       const progressData = await getUserCourseData(courseId, accessToken)
-
       const data = transformData(progressData.currentUser, progressData.course)
       setData(data)
       setLoading(false)
@@ -83,6 +80,12 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
         "error",
       )
     }
+  }
+
+  const progress: CourseProgressProviderInterface = {
+    error,
+    loading,
+    courseProgressData: data,
   }
 
   const logout = () => {
@@ -107,21 +110,15 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
     setUpdateQuiz({ ...updateQuiz, [id]: false })
   }
 
-  const progress: CourseProgressProviderInterface = {
-    error,
-    loading,
-    courseProgressData: data,
-    courseId,
-    accessToken,
-  }
-
   const status: CourseStatusProviderInterface = {
     updateQuiz,
     quizUpdated,
   }
 
   return (
-    <CourseProgressProvider courseProgress={progress}>
+    <CourseProgressProviderContext.Provider
+      value={{ progress, fetchProgressData }}
+    >
       <CourseStatusProviderContext.Provider value={status}>
         <ToastContainer
           enableMultiContainer
@@ -140,7 +137,7 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
         />
         {children}
       </CourseStatusProviderContext.Provider>
-    </CourseProgressProvider>
+    </CourseProgressProviderContext.Provider>
   )
 }
 
@@ -150,34 +147,18 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
   props: P,
 ) => {
   // initial course progress
-  const { state } = useCourseProgressState()
-  // course progress with updates
-  const { courseId, accessToken, ...rest } = state
-  const [injectProps, setInjectProps] = useState(rest)
+  const { progress: injectProps, fetchProgressData } = useContext(
+    CourseProgressProviderContext,
+  )
 
   // Ref for the wrapped element
   const ref: any = useRef<HTMLElement>()
   const rootMargin = "0px"
-  const outOfViewThreshold = 10
-
-  const refetchData = async () => {
-    if (courseId && accessToken) {
-      // fetch data
-      setInjectProps({ ...injectProps, loading: true })
-      const progressData = await getUserCourseData(courseId, accessToken)
-      const data = transformData(progressData.currentUser, progressData.course)
-      setInjectProps({
-        ...injectProps,
-        courseProgressData: data,
-        loading: false,
-      })
-    }
-  }
+  const outOfViewThreshold = 4
 
   /**
    * Triggers a refetch of progress after given time interval
    *  */
-
   useEffect(() => {
     const observer = new IntersectionObserver(
       async ([entry]) => {
@@ -193,7 +174,7 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
               1000
 
             if (secondsOutOfView >= outOfViewThreshold) {
-              await refetchData()
+              await fetchProgressData()
             }
 
             // reset off view counter
@@ -220,13 +201,7 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
     }
   }, [])
 
-  const isLoggedInAndLoading = accessToken && state.loading
-
-  return (
-    <div ref={ref}>
-      {!isLoggedInAndLoading && <Component {...props} {...injectProps} />}
-    </div>
-  )
+  return <div ref={ref}>{<Component {...props} {...injectProps} />}</div>
 }
 
 const transformData = (
