@@ -66,7 +66,7 @@ export const StyledAnswerCard = styled(Card)<AdditionalAnswerCardProps>`
 
 export interface AnswerProps {
   answer: Answer
-  quizItemTypes: { [quizItemId: string]: string }[]
+  quizItemTypes: string[]
 }
 
 export const AnswerCard = ({ answer, quizItemTypes }: AnswerProps) => {
@@ -122,7 +122,7 @@ export const AnswerCard = ({ answer, quizItemTypes }: AnswerProps) => {
         $status={statusChange}
         $deleted={answer.deleted}
       >
-        <AnswerContent answer={answer} />
+        <AnswerContent answer={answer} quizItemTypes={quizItemTypes} />
       </StyledAnswerCard>
     </AnswerCardWrapper>
   )

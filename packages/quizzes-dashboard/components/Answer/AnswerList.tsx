@@ -14,7 +14,7 @@ import { ButtonFieldWrapper } from "../Shared/ButtonFieldWrapper"
 
 export interface AnswerListProps {
   data: Answer[]
-  quizItemTypes: { [quizItemId: string]: string }[]
+  quizItemTypes: string[]
 }
 
 const BulkActionWrapper = styled.div`

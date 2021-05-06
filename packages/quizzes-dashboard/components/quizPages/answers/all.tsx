@@ -64,13 +64,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
 
   const quizId = quiz?.id
 
-  const quizItemTypes: {
-    [itemId: string]: string
-  }[] = quiz.items.map(item => {
-    return { [item.id]: item.type }
-  })
-
-  console.log(quizItemTypes)
+  const quizItemTypes = quiz.items.map(i => i.type)
 
   const pathname = `/quizzes/${quizId}/all-answers/`
 

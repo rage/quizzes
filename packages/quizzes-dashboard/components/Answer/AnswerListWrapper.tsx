@@ -21,7 +21,7 @@ interface WrapperProps {
     total: number
   }
   handlePageChange: (nextPage: number) => void
-  quizItemTypes: { [quizItemId: string]: string }[]
+  quizItemTypes: string[]
 }
 
 export const AnswerListWrapper = ({
