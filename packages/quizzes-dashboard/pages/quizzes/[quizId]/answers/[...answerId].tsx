@@ -38,7 +38,7 @@ interface IAnswerStatusChange {
   updatedAt: Date
 }
 
-const StyledTableContainer = styled(TableContainer)<{
+const StyledTableContainer = styled(TableContainer) <{
   component: React.ReactNode
 }>`
   margin-top: 3rem;
@@ -136,6 +136,13 @@ export const AnswerById = () => {
   )
   const { quiz, quizLoading, quizError } = useQuiz(quizId, "quiz")
 
+  let quizItemTypes: string[] = []
+
+  if (quiz) {
+    quizItemTypes = quiz.items.map(i => i.type)
+  }
+
+
   /* for when tab is loaded through url*/
   useEffect(() => {
     if (route.query.answerId) {
@@ -214,7 +221,7 @@ export const AnswerById = () => {
         />
       </Tabs>
       {currentTab === "overview" && answer ? (
-        <AnswerCard answer={answer} />
+        <AnswerCard answer={answer} quizItemTypes={quizItemTypes} />
       ) : (
         <Log answerId={answerId} />
       )}
