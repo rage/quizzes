@@ -39,25 +39,7 @@ export const SpaciousPaper = styled(Paper)`
 `
 
 export const SpaciousTypography = styled(Typography)`
-  /*   padding-bottom: 0.75rem; */
-  padding-bottom: 0.5rem !Important;
-  text-align: center;
-  font-size: 1.2rem;
-  font-weight: 400;
-  color: rgba(0, 0, 0, 0.8);
-  line-height: normal;
-  margin-top: 2rem;
-`
-export const HeadingTypography = styled(Typography)`
-  /* padding-bottom: 0.5rem !Important; */
-  text-align: center;
-  font-size: 1rem;
-  font-weight: 400;
-  color: rgba(0, 0, 0, 0.8);
-  line-height: normal;
-  /* margin: 1rem 0; */
-  display: flex;
-  align-items: center;
+  padding-bottom: 0.75rem;
 `
 
 export const BoldTypographyNormal = styled(BoldTypography)`
