@@ -38,7 +38,7 @@ interface IAnswerStatusChange {
   updatedAt: Date
 }
 
-const StyledTableContainer = styled(TableContainer) <{
+const StyledTableContainer = styled(TableContainer)<{
   component: React.ReactNode
 }>`
   margin-top: 3rem;
@@ -141,7 +141,6 @@ export const AnswerById = () => {
   if (quiz) {
     quizItemTypes = quiz.items.map(i => i.type)
   }
-
 
   /* for when tab is loaded through url*/
   useEffect(() => {

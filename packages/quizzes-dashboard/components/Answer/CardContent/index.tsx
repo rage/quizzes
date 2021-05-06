@@ -124,8 +124,6 @@ export const AnswerContent = ({
     }
   }, [])
 
-  const values = Object.values(quizItemTypes)
-
   return (
     <>
       <PeerreviewModal
@@ -211,8 +209,8 @@ export const AnswerContent = ({
         )}
       </StatButtonWrapper>
       {editableAnswerStates.includes(answer.status) &&
-        !values.includes("open") &&
-        !values.includes("multiple-choice") && (
+        !quizItemTypes.includes("open") &&
+        !quizItemTypes.includes("multiple-choice") && (
           <ManualReviewField answer={answer} />
         )}
     </>
