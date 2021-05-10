@@ -441,12 +441,12 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   const optionAnswer = optionAnswers[0]
   const selectedOption =
     showAllFeedback === true
-      ? item.options.find(o => o.id === optionId)
+      ? items[0].options.find(o => o.id === optionId)
       : item.options.find(o => o.id === optionAnswer.quizOptionId)
 
   const itemAnswersUnlimitedTries =
     showAllFeedback === true
-      ? item.options.find(o => o.id === optionId)
+      ? items[0].options.find(o => o.id === optionId)
       : itemAnswer
 
   let feedbackMessage
@@ -469,7 +469,7 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
     const failureMessage =
       optionFailure || text.failureMessage || generalLabels.answerIncorrectLabel
 
-    feedbackMessage = itemAnswersUnlimitedTries?.correct
+    feedbackMessage = itemAnswersUnlimitedTries!.correct
       ? successMessage
       : failureMessage
   } else {
