@@ -157,7 +157,7 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
                       <FeedbackPortion
                         quizItem={item}
                         optionId={option.id}
-                        // We should get a setting for this and it should be default false.
+                        // We should get a setting for this and it should be default false?
                         showFeedbackForEachAnswerOption={true}
                       />
                     ) : null}
@@ -166,6 +166,8 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
               })}
           </ChoicesContainer>
         </div>
+        {/* When we get a setting for feedback for each option, we need to 
+        add it here aswell, if it is true, we don't want this Feedbackportion */}
         {item.sharedOptionFeedbackMessage !== null ? (
           <FeedbackPortion quizItem={item} />
         ) : null}
