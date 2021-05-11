@@ -155,9 +155,10 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
                     {item.sharedOptionFeedbackMessage === null &&
                     quiz.triesLimited === false ? (
                       <FeedbackPortion
-                        item={item}
+                        quizItem={item}
                         optionId={option.id}
-                        showAllFeedback={true}
+                        // We should get a setting for this and it should be default false.
+                        showFeedbackForEachAnswerOption={true}
                       />
                     ) : null}
                   </div>
@@ -165,9 +166,8 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
               })}
           </ChoicesContainer>
         </div>
-        {quiz.triesLimited === true ||
-        item.sharedOptionFeedbackMessage !== null ? (
-          <FeedbackPortion item={item} />
+        {item.sharedOptionFeedbackMessage !== null ? (
+          <FeedbackPortion quizItem={item} />
         ) : null}
       </ItemContent>
     </div>
@@ -397,21 +397,21 @@ const Option: React.FunctionComponent<OptionProps> = ({
 }
 
 interface IFeedbackPortionProps {
-  showAllFeedback?: boolean
+  quizItem: QuizItem
+  showFeedbackForEachAnswerOption?: boolean
   optionId?: string
-  item: QuizItem
   selectedOption?: QuizItemOption
   direction?: string
 }
 
 const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
-  item,
+  quizItem,
   optionId,
-  showAllFeedback,
+  showFeedbackForEachAnswerOption,
   direction,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
-  const items = useTypedSelector(state => state.quiz!.items)
+  const quizItems = useTypedSelector(state => state.quiz!.items)
   const quizAnswer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const languageLabels = useTypedSelector(
     state => state.language.languageLabels,
@@ -422,12 +422,12 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
     return <div style={{ display: "none" }} />
   }
 
-  if (!item || !languageLabels) {
+  if (!quizItem || !languageLabels) {
     // should be impossible
     return <div>Cannot find related item or language</div>
   }
   const itemAnswer = quizAnswer.itemAnswers.find(
-    ia => ia.quizItemId === item.id,
+    ia => ia.quizItemId === quizItem.id,
   )
   if (!itemAnswer) {
     // should be impossible
@@ -440,58 +440,47 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
 
   const optionAnswer = optionAnswers[0]
   const selectedOption =
-    showAllFeedback === true
-      ? items[0].options.find(o => o.id === optionId)
-      : item.options.find(o => o.id === optionAnswer.quizOptionId)
+    showFeedbackForEachAnswerOption ?? false
+      ? quizItems
+          .find(i => i.id === quizItem.id)
+          ?.options.find(o => o.id === optionId)
+      : quizItem.options.find(o => o.id === optionAnswer.quizOptionId)
 
   const itemAnswersUnlimitedTries =
-    showAllFeedback === true
-      ? items[0].options.find(o => o.id === optionId)
+    showFeedbackForEachAnswerOption ?? false
+      ? quizItems
+          .find(i => i.id === quizItem.id)
+          ?.options.find(o => o.id === optionId)
       : itemAnswer
+
+  const optionSuccess = selectedOption?.successMessage
+  const optionFailure = selectedOption?.failureMessage
+
+  const successMessage =
+    optionSuccess || quizItem.successMessage || generalLabels.answerCorrectLabel
+  const failureMessage =
+    optionFailure ||
+    quizItem.failureMessage ||
+    generalLabels.answerIncorrectLabel
 
   let feedbackMessage
   if (
-    item.usesSharedOptionFeedbackMessage &&
-    item.sharedOptionFeedbackMessage !== undefined
+    quizItem.usesSharedOptionFeedbackMessage &&
+    quizItem.sharedOptionFeedbackMessage !== undefined
   ) {
-    feedbackMessage = item.sharedOptionFeedbackMessage
-  } else if (showAllFeedback === true) {
-    const optionSuccess = selectedOption
-      ? selectedOption.successMessage
-      : undefined
-    const optionFailure = selectedOption
-      ? selectedOption.failureMessage
-      : undefined
-
-    const text = item
-    const successMessage =
-      optionSuccess || text.successMessage || generalLabels.answerCorrectLabel
-    const failureMessage =
-      optionFailure || text.failureMessage || generalLabels.answerIncorrectLabel
-
+    feedbackMessage = quizItem.sharedOptionFeedbackMessage
+  } else if (showFeedbackForEachAnswerOption) {
     feedbackMessage = itemAnswersUnlimitedTries!.correct
       ? successMessage
       : failureMessage
   } else {
-    const optionSuccess = selectedOption
-      ? selectedOption.successMessage
-      : undefined
-    const optionFailure = selectedOption
-      ? selectedOption.failureMessage
-      : undefined
-
-    const text = item
-    const successMessage =
-      optionSuccess || text.successMessage || generalLabels.answerCorrectLabel
-    const failureMessage =
-      optionFailure || text.failureMessage || generalLabels.answerIncorrectLabel
-
     feedbackMessage = itemAnswer.correct ? successMessage : failureMessage
   }
-  const correct =
-    showAllFeedback === true
-      ? (itemAnswersUnlimitedTries!.correct && true) || false
-      : (itemAnswer.correct && true) || false
+
+  const correct = showFeedbackForEachAnswerOption
+    ? itemAnswersUnlimitedTries!.correct ?? false
+    : itemAnswer.correct ?? false
+
   const ThemedDiv = themeProvider.feedbackMessage
 
   const FeedbackDiv = ThemedDiv || LeftBorderedDiv
