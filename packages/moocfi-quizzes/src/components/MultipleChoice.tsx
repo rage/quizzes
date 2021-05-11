@@ -208,7 +208,7 @@ const ItemInformation: React.FunctionComponent<ItemInformationProps> = ({
 
   return (
     <QuestionContainer>
-      {direction !== "column" && title && (
+      {title && (
         <LeftAlignedMarkdownText
           Component={SpaciousTypography}
           removeParagraphs
