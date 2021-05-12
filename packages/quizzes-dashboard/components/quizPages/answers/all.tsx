@@ -64,8 +64,6 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
 
   const quizId = quiz?.id
 
-  const quizItemTypes = quiz.items.map(i => i.type)
-
   const pathname = `/quizzes/${quizId}/all-answers/`
 
   const [currentPage, setCurrentPage] = useState(Number(pageNo) || 1)
@@ -429,7 +427,6 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
             handlePageChange={handlePageChange}
             page={currentPage}
             answers={answersToDisplay}
-            quizItemTypes={quizItemTypes}
           />
         </>
       ) : answersAreBeingFetched ? (

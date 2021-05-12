@@ -143,8 +143,6 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
     ? searchResults
     : answersRequiringAttention
 
-  const quizItemTypes = quiz.items.map(i => i.type)
-
   return (
     <>
       <TabText text="Answers requiring attention" />
@@ -200,7 +198,6 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
             handlePageChange={handlePageChange}
             page={currentPage}
             answers={answersToDisplay}
-            quizItemTypes={quizItemTypes}
           />
         </>
       ) : answersAreBeingFetched ? (
