@@ -66,10 +66,9 @@ export const StyledAnswerCard = styled(Card)<AdditionalAnswerCardProps>`
 
 export interface AnswerProps {
   answer: Answer
-  quizItemTypes: string[]
 }
 
-export const AnswerCard = ({ answer, quizItemTypes }: AnswerProps) => {
+export const AnswerCard = ({ answer }: AnswerProps) => {
   const [faded, setFaded] = useState(false)
   const [statusChange, setStatusChange] = useState("")
   const [checked, setChecked] = useState(false)
@@ -122,7 +121,7 @@ export const AnswerCard = ({ answer, quizItemTypes }: AnswerProps) => {
         $status={statusChange}
         $deleted={answer.deleted}
       >
-        <AnswerContent answer={answer} quizItemTypes={quizItemTypes} />
+        <AnswerContent answer={answer} />
       </StyledAnswerCard>
     </AnswerCardWrapper>
   )

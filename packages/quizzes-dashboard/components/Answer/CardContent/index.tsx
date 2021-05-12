@@ -100,13 +100,9 @@ const DeleteButton = styled(Button)`
 
 export interface AnswerContentProps {
   answer: Answer
-  quizItemTypes: string[]
 }
 
-export const AnswerContent = ({
-  answer,
-  quizItemTypes,
-}: AnswerContentProps) => {
+export const AnswerContent = ({ answer }: AnswerContentProps) => {
   const [{ expandAll, handledAnswers }] = useAnswerListState()
   const [showMore, setShowMore] = useState(expandAll)
   const [showPeerreviewModal, setShowPeerreviewModal] = useState(false)
@@ -209,8 +205,7 @@ export const AnswerContent = ({
         )}
       </StatButtonWrapper>
       {editableAnswerStates.includes(answer.status) &&
-        !quizItemTypes.includes("open") &&
-        !quizItemTypes.includes("multiple-choice") && (
+        answer.quiz.peerReviewCollections.length > 0 && (
           <ManualReviewField answer={answer} />
         )}
     </>
