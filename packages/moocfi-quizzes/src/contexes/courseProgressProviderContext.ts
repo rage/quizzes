@@ -85,7 +85,7 @@ export interface CourseProgressProviderInterface extends ProviderBaseInterface {
   loading?: boolean
   courseProgressData?: ProgressData
   courseId?: string
-  accessToken?: string
+  loggedIn?: boolean
 }
 
 interface CourseProgressProviderContextInterface {
