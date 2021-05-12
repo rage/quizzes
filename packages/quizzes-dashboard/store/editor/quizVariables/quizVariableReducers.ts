@@ -23,6 +23,7 @@ export const quizVariableReducers = createReducer<
         action.payload.normalizedQuiz.quizzes[
           action.payload.normalizedQuiz.result
         ].deadline
+
       let withOffset = ""
       if (deadline) {
         withOffset = DateTime.fromISO(deadline)
