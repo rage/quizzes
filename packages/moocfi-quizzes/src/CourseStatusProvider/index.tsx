@@ -54,7 +54,7 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
     languageId !== prevProps.current.languageId
 
   useEffect(() => {
-    if (accessToken && courseId) {
+    if (accessToken && accessToken !== "" && courseId) {
       if (shouldFetch) {
         prevProps.current = props
         fetchProgressData()
