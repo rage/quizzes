@@ -1,11 +1,13 @@
 import Quiz from "./quiz"
-import QuizOption from "./quiz_option"
-import QuizItemTranslation from "./quiz_item_translation"
+import QuizOption, { QuizOptionType } from "./quiz_option"
+import QuizItemTranslation, {
+  QuizItemTranslationType,
+} from "./quiz_item_translation"
 import BaseModel from "./base_model"
-import { mixin } from "objection"
+import { mixin, ModelObject } from "objection"
 import softDelete from "objection-soft-delete"
 
-export type QuizItemType =
+export type itemType =
   | "open"
   | "scale"
   | "essay"
@@ -17,13 +19,17 @@ export type QuizItemType =
   | "multiple-choice-dropdown"
   | "clickable-multiple-choice"
 
+export type MultipleChoiceGradingPolicy =
+  | "NeedToSelectAllCorrectOptions"
+  | "NeedToSelectNCorrectOptions"
+
 class QuizItem extends mixin(BaseModel, [
   softDelete({ columnName: "deleted" }),
 ]) {
   id!: string
-  type!: QuizItemType
+  type!: itemType
   validityRegex!: string
-  multi!: string
+  multi!: boolean
   texts!: QuizItemTranslation[]
   options!: QuizOption[]
   title!: string
@@ -34,6 +40,7 @@ class QuizItem extends mixin(BaseModel, [
   allAnswersCorrect!: string
   deleted!: boolean
   direction!: "row" | "column"
+  multipleChoiceGradingPolicy!: MultipleChoiceGradingPolicy
 
   static get tableName() {
     return "quiz_item"
@@ -70,5 +77,7 @@ class QuizItem extends mixin(BaseModel, [
     return await this.query().findById(id)
   }
 }
+
+export type QuizItemType = ModelObject<QuizItem>
 
 export default QuizItem

@@ -1,10 +1,10 @@
 import Knex from "knex"
 import { NotFoundError } from "./../util/error"
-import QuizItemAnswer from "./quiz_item_answer"
-import User from "./user"
-import PeerReview from "./peer_review"
-import Quiz from "./quiz"
-import UserQuizState from "./user_quiz_state"
+import QuizItemAnswer, { QuizItemAnswerType } from "./quiz_item_answer"
+import User, { UserType } from "./user"
+import PeerReview, { PeerReviewType } from "./peer_review"
+import Quiz, { QuizType } from "./quiz"
+import UserQuizState, { UserQuizStateType } from "./user_quiz_state"
 import { BadRequestError } from "../util/error"
 import { removeNonPrintingCharacters } from "../util/tools"
 import knex from "../../database/knex"
@@ -14,7 +14,7 @@ import UserCoursePartState from "./user_course_part_state"
 import * as Kafka from "../services/kafka"
 import SpamFlag from "./spam_flag"
 import _, { cond } from "lodash"
-import Objection, { raw } from "objection"
+import Objection, { ModelObject, raw } from "objection"
 import BaseModel from "./base_model"
 import QuizOptionAnswer from "./quiz_option_answer"
 import softDelete from "objection-soft-delete"
@@ -647,7 +647,6 @@ class QuizAnswer extends mixin(BaseModel, [
         quizItemAnswer.correct = false
         continue
       }
-
       if (quizItem.allAnswersCorrect) {
         quizItemAnswer.correct = true
         continue
@@ -1181,5 +1180,7 @@ class QuizAnswer extends mixin(BaseModel, [
     })
   }
 }
+
+export type QuizAnswerType = ModelObject<QuizAnswer>
 
 export default QuizAnswer

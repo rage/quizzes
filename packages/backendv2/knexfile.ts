@@ -8,6 +8,7 @@ types.setTypeParser(types.builtins.INT8, value => parseInt(value))
 
 const configOptions: { [env: string]: Config } = {
   development: {
+    debug: true,
     client: "pg",
     connection: {
       host: env.DB_HOST || "/var/run/postgresql",

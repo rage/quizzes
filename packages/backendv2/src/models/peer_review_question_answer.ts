@@ -1,6 +1,9 @@
+import { ModelObject } from "objection"
 import BaseModel from "./base_model"
 import PeerReview from "./peer_review"
-import PeerReviewQuestion from "./peer_review_question"
+import PeerReviewQuestion, {
+  PeerReviewQuestionType,
+} from "./peer_review_question"
 
 class PeerReviewQuestionAnswer extends BaseModel {
   value!: number
@@ -33,5 +36,7 @@ class PeerReviewQuestionAnswer extends BaseModel {
     },
   }
 }
+
+export type PeerReviewQuestionAnswerType = ModelObject<PeerReviewQuestionAnswer>
 
 export default PeerReviewQuestionAnswer

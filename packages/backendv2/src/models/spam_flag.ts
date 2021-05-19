@@ -6,6 +6,7 @@ import UserQuizState from "./user_quiz_state"
 import knex from "../../database/knex"
 import BaseModel from "./base_model"
 import QuizAnswerStatusModification from "./quiz_answer_status_modification"
+import { ModelObject } from "objection"
 
 class SpamFlag extends BaseModel {
   id!: string
@@ -102,5 +103,7 @@ class SpamFlag extends BaseModel {
     )[0]
   }
 }
+
+export type SpamFlagType = ModelObject<SpamFlag>
 
 export default SpamFlag

@@ -4,9 +4,10 @@ import { BadRequestError, NotFoundError } from "./../util/error"
 import stringify from "csv-stringify"
 import Quiz from "./quiz"
 import Language from "./language"
-import CourseTranslation from "./course_translation"
+import CourseTranslation, { CourseTranslationType } from "./course_translation"
 import knex from "../../database/knex"
 import BaseModel from "./base_model"
+import { ModelObject } from "objection"
 
 class Course extends BaseModel {
   id!: string
@@ -406,5 +407,7 @@ class Course extends BaseModel {
     return course.moocfiId
   }
 }
+
+export type CourseType = ModelObject<Course>
 
 export default Course

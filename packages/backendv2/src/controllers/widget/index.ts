@@ -82,7 +82,8 @@ const widget = new Router<CustomState, CustomContext>({
   .post("/answer", accessControl(), async ctx => {
     const user = ctx.state.user
     const answer = ctx.request.body
-    ctx.body = await QuizAnswer.newAnswer(user.id, QuizAnswer.fromJson(answer))
+    const newQuizAnswer = QuizAnswer.fromJson(answer)
+    ctx.body = await QuizAnswer.newAnswer(user.id, newQuizAnswer)
   })
 
   .post("/answers/report-spam", accessControl(), async ctx => {

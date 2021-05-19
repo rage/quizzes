@@ -1,3 +1,4 @@
+import { ModelObject } from "objection"
 import BaseModel from "./base_model"
 
 class Language extends BaseModel {
@@ -10,5 +11,7 @@ class Language extends BaseModel {
     return languages
   }
 }
+
+export type LanguageType = ModelObject<Language>
 
 export default Language

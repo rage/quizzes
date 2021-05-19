@@ -1,3 +1,4 @@
+import { ModelObject } from "objection"
 import BaseModel from "./base_model"
 import User from "./user"
 
@@ -26,5 +27,7 @@ class UserCourseRole extends BaseModel {
     return await this.query().where({ user_id: userId, course_id: courseId })
   }
 }
+
+export type UserCourseRoleType = ModelObject<UserCourseRole>
 
 export default UserCourseRole

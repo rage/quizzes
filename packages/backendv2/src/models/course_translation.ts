@@ -1,3 +1,4 @@
+import { ModelObject } from "objection"
 import { EditCoursePayloadFields } from "./../types/index"
 import BaseModel from "./base_model"
 import Course from "./course"
@@ -46,5 +47,7 @@ class CourseTranslation extends BaseModel {
     return await courseTranslation.$query().patchAndFetch(payload)
   }
 }
+
+export type CourseTranslationType = ModelObject<CourseTranslation>
 
 export default CourseTranslation

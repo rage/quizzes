@@ -1,8 +1,12 @@
 import Quiz from "./quiz_item"
-import PeerReviewCollectionTranslation from "./peer_review_collection_translation"
-import PeerReviewQuestion from "./peer_review_question"
+import PeerReviewCollectionTranslation, {
+  PeerReviewCollectionTranslationType,
+} from "./peer_review_collection_translation"
+import PeerReviewQuestion, {
+  PeerReviewQuestionType,
+} from "./peer_review_question"
 import BaseModel from "./base_model"
-import { mixin } from "objection"
+import { mixin, ModelObject } from "objection"
 import softDelete from "objection-soft-delete"
 
 export class PeerReviewCollection extends mixin(BaseModel, [
@@ -50,5 +54,7 @@ export class PeerReviewCollection extends mixin(BaseModel, [
     return await this.query().findById(id)
   }
 }
+
+export type PeerReviewCollectionType = ModelObject<PeerReviewCollection>
 
 export default PeerReviewCollection
