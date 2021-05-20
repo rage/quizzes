@@ -54,7 +54,7 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
     languageId !== prevProps.current.languageId
 
   useEffect(() => {
-    if (accessToken && courseId) {
+    if (accessToken && accessToken !== "" && courseId) {
       if (shouldFetch) {
         prevProps.current = props
         fetchProgressData()
@@ -86,6 +86,7 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
     error,
     loading,
     courseProgressData: data,
+    loggedIn: accessToken ? true : false,
   }
 
   const logout = () => {
@@ -160,6 +161,9 @@ export const injectCourseProgress = <P extends CourseProgressProviderInterface>(
    * Triggers a refetch of progress after given time interval
    *  */
   useEffect(() => {
+    if (!injectProps.loggedIn) {
+      return
+    }
     const observer = new IntersectionObserver(
       async ([entry]) => {
         if (entry.isIntersecting) {
