@@ -11,7 +11,7 @@ import {
   RadioGroup,
   FormControl,
   FormHelperText,
-  TextField,
+  Select,
   MenuItem,
 } from "@material-ui/core"
 import {
@@ -123,11 +123,10 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
         </FormGroup>
       </ModalContent>
       <ModalContent>
-        <TextField
+        <Select
           fullWidth
           label="Feedback display policy"
           variant="outlined"
-          select
           value={storeItem.feedbackDisplayPolicy}
           onChange={event =>
             dispatch(
@@ -142,7 +141,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
           <MenuItem value="DisplayFeedbackOnAllOptions">
             On each quiz item answer option
           </MenuItem>
-        </TextField>
+        </Select>
       </ModalContent>
       <ModalContent>
         <MarkdownEditor
