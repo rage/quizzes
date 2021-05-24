@@ -15,4 +15,4 @@ const update_expired_courses = async (client: Knex) => {
     `)
 }
 
-update_expired_courses(knex)
+await update_expired_courses(knex)
