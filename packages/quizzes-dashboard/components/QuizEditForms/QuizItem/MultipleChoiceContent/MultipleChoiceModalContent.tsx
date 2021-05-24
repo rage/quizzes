@@ -128,7 +128,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
           label="Feedback display policy"
           variant="outlined"
           select
-          value={storeItem.quizItemFeedbackDisplayPolicy}
+          value={storeItem.feedbackDisplayPolicy}
           onChange={event =>
             dispatch(
               editedQuizItemFeedbackDisplayPolicy(
