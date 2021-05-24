@@ -1,3 +1,5 @@
+import { Quiz } from "./Quiz"
+
 export interface Answer {
   id: string
   quizId: string
@@ -9,6 +11,7 @@ export interface Answer {
   userQuizState: UserQuizState
   itemAnswers: ItemAnswer[]
   peerReviews: PeerReview[]
+  quiz: Quiz
   deleted: boolean
 }
 

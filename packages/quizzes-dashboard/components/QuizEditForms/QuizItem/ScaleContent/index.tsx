@@ -83,10 +83,10 @@ const StyledModal = styled(Modal)`
 
 const AdvancedBox = styled(Box)`
   background-color: #fafafa !important;
-  min-width: 1000px !important;
-  min-height: 800px !important;
-  max-width: 1000px !important;
-  max-height: 800px !important;
+  min-width: 80% !important;
+  min-height: 50% !important;
+  max-width: 80% !important;
+  max-height: 50% !important;
   overflow-y: scroll !important;
 `
 

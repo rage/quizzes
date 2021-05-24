@@ -133,6 +133,7 @@ class QuizAnswer extends mixin(BaseModel, [
       .withGraphFetched("userQuizState")
       .withGraphFetched("itemAnswers.[optionAnswers]")
       .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+      .withGraphFetched("quiz.[peerReviewCollections]")
 
     if (!quizAnswer) {
       throw new NotFoundError(`quiz answer not found: ${quizAnswerId}`)
@@ -213,8 +214,9 @@ class QuizAnswer extends mixin(BaseModel, [
         .whereIn("deleted", deleteConditions)
         .orderBy([{ column: "created_at", order: order }])
         .page(page, pageSize)
+        .withGraphFetched("quiz.[peerReviewCollections]")
         .withGraphFetched("userQuizState")
-        .withGraphFetched("itemAnswers.[optionAnswers]")
+        .withGraphFetched("itemAnswers.[quizItem, optionAnswers]")
         .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
     } else {
       paginated = await this.query()
@@ -223,8 +225,9 @@ class QuizAnswer extends mixin(BaseModel, [
         .whereIn("status", filters)
         .orderBy([{ column: "created_at", order: order }])
         .page(page, pageSize)
+        .withGraphFetched("quiz.[peerReviewCollections]")
         .withGraphFetched("userQuizState")
-        .withGraphFetched("itemAnswers.[optionAnswers]")
+        .withGraphFetched("itemAnswers.[quizItem, optionAnswers]")
         .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
     }
 
@@ -319,6 +322,7 @@ class QuizAnswer extends mixin(BaseModel, [
       .withGraphFetched("userQuizState")
       .withGraphFetched("itemAnswers.[optionAnswers]")
       .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+      .withGraphFetched("quiz.[peerReviewCollections]")
 
     paginated.results.map(async answer => {
       if (answer.peerReviews.length > 0) {

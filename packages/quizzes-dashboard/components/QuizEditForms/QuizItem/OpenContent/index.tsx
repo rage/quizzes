@@ -32,12 +32,12 @@ import MarkdownEditor from "../../../MarkdownEditor"
 import FormatRegexTesterModalContent from "./FormatRegexTesterModalContent"
 
 const AdvancedBox = styled(Box)`
-  background-color: #fafafa;
-  min-width: 1000px;
-  min-height: 800px;
-  max-width: 1000px;
-  max-height: 800px;
-  overflow-y: scroll;
+  background-color: #fafafa !important;
+  min-width: 80% !important;
+  min-height: 50% !important;
+  max-width: 80% !important;
+  max-height: 50% !important;
+  overflow-y: scroll !important;
 `
 
 const EditItemButton = styled(Button)``

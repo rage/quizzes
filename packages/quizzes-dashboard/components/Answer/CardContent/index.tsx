@@ -204,9 +204,10 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
           </>
         )}
       </StatButtonWrapper>
-      {editableAnswerStates.includes(answer.status) && (
-        <ManualReviewField answer={answer} />
-      )}
+      {editableAnswerStates.includes(answer.status) &&
+        answer.quiz.peerReviewCollections.length > 0 && (
+          <ManualReviewField answer={answer} />
+        )}
     </>
   )
 }

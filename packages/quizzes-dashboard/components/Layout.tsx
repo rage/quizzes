@@ -6,7 +6,6 @@ import LoginStateWrapper from "./LoginStateWrapper"
 import { LoginChecker } from "../contexts/LoginStateContext"
 import TopBar from "./TopBar"
 import { BreadCrumbs } from "../contexts/BreadCrumbContext"
-import BreadCrumb from "./BreadCrumb"
 
 interface TemplateProps {
   children?: React.ReactNode
