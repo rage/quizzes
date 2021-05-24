@@ -495,6 +495,7 @@ export const validation = {
         minValue: null,
         maxValue: null,
         usesSharedOptionFeedbackMessage: false,
+        feedbackDisplayPolicy: "DisplayFeedbackOnQuizItem",
         title: "multiple-choice",
         body: "item",
         successMessage: "yay!",
