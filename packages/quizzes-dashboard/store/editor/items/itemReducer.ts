@@ -120,7 +120,7 @@ export const itemReducer = createReducer<
 
   .handleAction(editedQuizItemFeedbackDisplayPolicy, (state, action) => {
     return produce(state, draftState => {
-      draftState[action.payload.itemId].quizItemFeedbackDisplayPolicy =
+      draftState[action.payload.itemId].feedbackDisplayPolicy =
         action.payload.newPolicy
     })
   })
@@ -150,7 +150,7 @@ export const itemReducer = createReducer<
         options: [],
         allAnswersCorrect: false,
         direction: "row",
-        quizItemFeedbackDisplayPolicy: "DisplayFeedbackOnQuizItem",
+        feedbackDisplayPolicy: "DisplayFeedbackOnQuizItem",
       }
       draftState[action.payload.itemId] = newItem
     })

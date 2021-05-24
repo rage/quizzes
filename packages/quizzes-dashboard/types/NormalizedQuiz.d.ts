@@ -64,7 +64,7 @@ export interface NormalizedItem {
   sharedOptionFeedbackMessage: string | null
   allAnswersCorrect: boolean
   direction: "row" | "column"
-  quizItemFeedbackDisplayPolicy:
+  feedbackDisplayPolicy:
     | "DisplayFeedbackOnQuizItem"
     | "DisplayFeedbackOnAllOptions"
 }
