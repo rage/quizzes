@@ -11,6 +11,8 @@ import {
   RadioGroup,
   FormControl,
   FormHelperText,
+  TextField,
+  MenuItem,
 } from "@material-ui/core"
 import {
   editedQuizItemTitle,
@@ -21,6 +23,7 @@ import {
   editedItemFailureMessage,
   toggledAllAnswersCorrect,
   editedItemDirection,
+  editedQuizItemFeedbackDisplayPolicy,
 } from "../../../../store/editor/items/itemAction"
 import { useTypedSelector } from "../../../../store/store"
 import { useDispatch } from "react-redux"
@@ -118,6 +121,28 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
             }
           />
         </FormGroup>
+      </ModalContent>
+      <ModalContent>
+        <TextField
+          fullWidth
+          label="Feedback display policy"
+          variant="outlined"
+          select
+          value={storeItem.quizItemFeedbackDisplayPolicy}
+          onChange={event =>
+            dispatch(
+              editedQuizItemFeedbackDisplayPolicy(
+                storeItem.id,
+                event.target.value,
+              ),
+            )
+          }
+        >
+          <MenuItem value="DisplayFeedbackOnQuizItem">On quiz item</MenuItem>
+          <MenuItem value="DisplayFeedbackOnAllOptions">
+            On each quiz item answer option
+          </MenuItem>
+        </TextField>
       </ModalContent>
       <ModalContent>
         <MarkdownEditor

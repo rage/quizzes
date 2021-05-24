@@ -12,7 +12,6 @@ export async function up(knex: Knex): Promise<void> {
         },
       )
       .defaultTo("DisplayFeedbackOnQuizItem")
-      .notNullable()
   })
 }
 
