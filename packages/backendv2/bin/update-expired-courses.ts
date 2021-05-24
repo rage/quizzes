@@ -1,8 +1,8 @@
-import knex from 'backendv2/database/knex'
-import * as Knex from 'Knex'
+import knex from "backendv2/database/knex"
+import * as Knex from "Knex"
 
 const update_expired_courses = async (client: Knex) => {
-    await client.raw(`
+  await client.raw(`
         update course as c
         set status = 'ended'
         from (select result.course_id
@@ -12,5 +12,7 @@ const update_expired_courses = async (client: Knex) => {
         group by q.course_id) as result
         where now() - result.latest_course_submission >= interval '1 year') as ended_courses
         where ended_courses.course_id = c.id;
-    `)    
+    `)
 }
+
+update_expired_courses(knex)
