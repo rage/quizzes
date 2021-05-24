@@ -23,7 +23,8 @@ export const setScaleMin = createAction(
   }),
 )<{ itemId: string; newValue: number; valid: boolean }>()
 
-export const setTestingRegex = createAction(
+// regex testing state
+export const toggleValidRegexTestingState = createAction(
   "SET_TESTING_REGEX",
   (itemId: string, testing: boolean) => ({
     itemId: itemId,
@@ -31,7 +32,16 @@ export const setTestingRegex = createAction(
   }),
 )<{ itemId: string; testing: boolean }>()
 
-export const setRegex = createAction(
+export const toggleFormatRegexTestingState = createAction(
+  "SET_FORMAT_TESTING_REGEX",
+  (itemId: string, testing: boolean) => ({
+    itemId: itemId,
+    testing: testing,
+  }),
+)<{ itemId: string; testing: boolean }>()
+
+// input test regexes
+export const setValidityTestRegex = createAction(
   "SET_TEST_REGEX",
   (itemId: string, testRegex: string) => ({
     itemId: itemId,
@@ -39,7 +49,16 @@ export const setRegex = createAction(
   }),
 )<{ itemId: string; testRegex: string }>()
 
-export const setRegexTestAnswer = createAction(
+export const setFormatTestRegex = createAction(
+  "SET_FORMAT_TEST_REGEX",
+  (itemId: string, testRegex: string) => ({
+    itemId: itemId,
+    testRegex: testRegex,
+  }),
+)<{ itemId: string; testRegex: string }>()
+
+// regex test answers
+export const setValidityRegexTestAnswer = createAction(
   "SETREGEX_TESTANSWER",
   (itemId: string, testAnswer: string) => ({
     itemId: itemId,
@@ -47,8 +66,25 @@ export const setRegexTestAnswer = createAction(
   }),
 )<{ itemId: string; testAnswer: string }>()
 
-export const setValidRegex = createAction(
+export const setFormatRegexTestAnswer = createAction(
+  "SET_FORMAT_REGEX_TESTANSWER",
+  (itemId: string, testAnswer: string) => ({
+    itemId: itemId,
+    testAnswer: testAnswer,
+  }),
+)<{ itemId: string; testAnswer: string }>()
+
+// are the regexes valid
+export const setValidValidityRegex = createAction(
   "SET_VALIDREGEX",
+  (itemId: string, valid: boolean) => ({
+    itemId: itemId,
+    valid: valid,
+  }),
+)<{ itemId: string; valid: boolean }>()
+
+export const setFormatValidityRegex = createAction(
+  "SET_VALIDFORMATREGEX",
   (itemId: string, valid: boolean) => ({
     itemId: itemId,
     valid: valid,

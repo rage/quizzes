@@ -4,6 +4,7 @@ import {
   editedQuizItemBody,
   editedQuizItemTitle,
   editedValidityRegex,
+  editedFormatRegex,
   toggledMultiOptions,
   editedItemMaxWords,
   editedItemMinWords,
@@ -67,6 +68,12 @@ export const itemReducer = createReducer<
   .handleAction(editedValidityRegex, (state, action) => {
     return produce(state, draftState => {
       draftState[action.payload.itemId].validityRegex = action.payload.newRegex
+    })
+  })
+
+  .handleAction(editedFormatRegex, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].formatRegex = action.payload.newRegex
     })
   })
 

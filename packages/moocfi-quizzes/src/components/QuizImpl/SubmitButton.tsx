@@ -14,6 +14,9 @@ const SubmitButton: React.FunctionComponent = () => {
   const themeProvider = React.useContext(ThemeProviderContext)
   const dispatch = useDispatch()
   const submitLocked = useTypedSelector(state => state.quizAnswer.submitLocked)
+  const answerFormatIsValid = useTypedSelector(
+    state => state.quizAnswer.answerFormatIsValid,
+  )
   const pastDeadline = useTypedSelector(state => state.quizAnswer.pastDeadline)
   const languageInfo = useTypedSelector(state => state.language.languageLabels)
   const noChangesAfterSuccessfulAnswer = useTypedSelector(
@@ -48,7 +51,10 @@ const SubmitButton: React.FunctionComponent = () => {
 
   if (ThemedSubmitButton) {
     return (
-      <ThemedSubmitButton disabled={submitLocked} onClick={handleSubmit}>
+      <ThemedSubmitButton
+        disabled={submitLocked || !answerFormatIsValid}
+        onClick={handleSubmit}
+      >
         {buttonText}
       </ThemedSubmitButton>
     )
@@ -58,7 +64,7 @@ const SubmitButton: React.FunctionComponent = () => {
     <StyledButton
       variant="contained"
       color="primary"
-      disabled={submitLocked || pastDeadline}
+      disabled={submitLocked || pastDeadline || !answerFormatIsValid}
       onClick={handleSubmit}
       aria-label={buttonText}
     >
