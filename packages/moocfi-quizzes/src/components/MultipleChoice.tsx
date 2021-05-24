@@ -400,7 +400,6 @@ const Option: React.FunctionComponent<OptionProps> = ({
 interface IFeedbackPortionProps {
   quizItem: QuizItem
   optionId?: string
-  selectedOption?: QuizItemOption
   direction?: string
 }
 
@@ -438,23 +437,23 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
     quizItem.feedbackDisplayPolicy ===
     QuizItemFeedbackDisplayPolicy.onAllOptions
 
+  // TODO: Support QuizItemFeedbackDisplayPolicy.onSelectedOptions
   const optionAnswers = itemAnswer && itemAnswer.optionAnswers
-
   const optionAnswer = optionAnswers[0]
-  const selectedOption = showFeedbackForEachAnswerOption
+
+  const quizItemOption = showFeedbackForEachAnswerOption
     ? quizItems
         .find(i => i.id === quizItem.id)
         ?.options.find(o => o.id === optionId)
     : quizItem.options.find(o => o.id === optionAnswer.quizOptionId)
 
-  const itemAnswersUnlimitedTries = showFeedbackForEachAnswerOption
-    ? quizItems
-        .find(i => i.id === quizItem.id)
-        ?.options.find(o => o.id === optionId)
-    : itemAnswer
+  if (!quizItemOption) {
+    // should be mission impossible
+    return <div>Cannot find related quiz option</div>
+  }
 
-  const optionSuccess = selectedOption?.successMessage
-  const optionFailure = selectedOption?.failureMessage
+  const optionSuccess = quizItemOption.successMessage
+  const optionFailure = quizItemOption.failureMessage
 
   const successMessage =
     optionSuccess || quizItem.successMessage || generalLabels.answerCorrectLabel
@@ -470,15 +469,13 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   ) {
     feedbackMessage = quizItem.sharedOptionFeedbackMessage
   } else if (showFeedbackForEachAnswerOption) {
-    feedbackMessage = itemAnswersUnlimitedTries!.correct
-      ? successMessage
-      : failureMessage
+    feedbackMessage = quizItemOption!.correct ? successMessage : failureMessage
   } else {
     feedbackMessage = itemAnswer.correct ? successMessage : failureMessage
   }
 
   const correct = showFeedbackForEachAnswerOption
-    ? itemAnswersUnlimitedTries!.correct ?? false
+    ? quizItemOption!.correct ?? false
     : itemAnswer.correct ?? false
 
   const ThemedDiv = themeProvider.feedbackMessage
