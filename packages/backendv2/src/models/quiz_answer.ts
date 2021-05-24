@@ -133,6 +133,7 @@ class QuizAnswer extends mixin(BaseModel, [
       .withGraphFetched("userQuizState")
       .withGraphFetched("itemAnswers.[optionAnswers]")
       .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+      .withGraphFetched("quiz.[peerReviewCollections]")
 
     if (!quizAnswer) {
       throw new NotFoundError(`quiz answer not found: ${quizAnswerId}`)
@@ -321,6 +322,7 @@ class QuizAnswer extends mixin(BaseModel, [
       .withGraphFetched("userQuizState")
       .withGraphFetched("itemAnswers.[optionAnswers]")
       .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+      .withGraphFetched("quiz.[peerReviewCollections]")
 
     paginated.results.map(async answer => {
       if (answer.peerReviews.length > 0) {
