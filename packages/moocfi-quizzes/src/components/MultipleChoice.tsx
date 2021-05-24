@@ -6,7 +6,12 @@ import { GridDirection, GridSize } from "@material-ui/core/Grid"
 import { SpaciousTypography } from "./styleComponents"
 import { useTypedSelector } from "../state/store"
 import * as quizAnswerActions from "../state/quizAnswer/actions"
-import { QuizItem, QuizItemOption, QuizItemAnswer } from "../modelTypes"
+import {
+  QuizItem,
+  QuizItemOption,
+  QuizItemAnswer,
+  QuizItemFeedbackDisplayPolicy,
+} from "../modelTypes"
 import LaterQuizItemAddition from "./LaterQuizItemAddition"
 import MarkdownText from "./MarkdownText"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -152,25 +157,19 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
                       optionWidth={optionWidth}
                       shouldBeGray={index % 2 === 0}
                     />
-                    {item.sharedOptionFeedbackMessage === null &&
-                    quiz.triesLimited === false ? (
-                      <FeedbackPortion
-                        quizItem={item}
-                        optionId={option.id}
-                        // We should get a setting for this and it should be default false?
-                        showFeedbackForEachAnswerOption={true}
-                      />
-                    ) : null}
+                    {item.feedbackDisplayPolicy ===
+                      QuizItemFeedbackDisplayPolicy.onAllOptions && (
+                      <FeedbackPortion quizItem={item} optionId={option.id} />
+                    )}
                   </div>
                 )
               })}
           </ChoicesContainer>
         </div>
-        {/* When we get a setting for feedback for each option, we need to 
-        add it here aswell, if it is true, we don't want this Feedbackportion */}
-        {item.sharedOptionFeedbackMessage !== null ? (
+        {item.feedbackDisplayPolicy ===
+          QuizItemFeedbackDisplayPolicy.onQuizItem && (
           <FeedbackPortion quizItem={item} />
-        ) : null}
+        )}
       </ItemContent>
     </div>
   )
@@ -400,7 +399,6 @@ const Option: React.FunctionComponent<OptionProps> = ({
 
 interface IFeedbackPortionProps {
   quizItem: QuizItem
-  showFeedbackForEachAnswerOption?: boolean
   optionId?: string
   selectedOption?: QuizItemOption
   direction?: string
@@ -409,7 +407,6 @@ interface IFeedbackPortionProps {
 const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   quizItem,
   optionId,
-  showFeedbackForEachAnswerOption,
   direction,
 }) => {
   const themeProvider = React.useContext(ThemeProviderContext)
@@ -437,23 +434,24 @@ const FeedbackPortion: React.FunctionComponent<IFeedbackPortionProps> = ({
   }
 
   const generalLabels = languageLabels.general
+  const showFeedbackForEachAnswerOption =
+    quizItem.feedbackDisplayPolicy ===
+    QuizItemFeedbackDisplayPolicy.onAllOptions
 
   const optionAnswers = itemAnswer && itemAnswer.optionAnswers
 
   const optionAnswer = optionAnswers[0]
-  const selectedOption =
-    showFeedbackForEachAnswerOption ?? false
-      ? quizItems
-          .find(i => i.id === quizItem.id)
-          ?.options.find(o => o.id === optionId)
-      : quizItem.options.find(o => o.id === optionAnswer.quizOptionId)
+  const selectedOption = showFeedbackForEachAnswerOption
+    ? quizItems
+        .find(i => i.id === quizItem.id)
+        ?.options.find(o => o.id === optionId)
+    : quizItem.options.find(o => o.id === optionAnswer.quizOptionId)
 
-  const itemAnswersUnlimitedTries =
-    showFeedbackForEachAnswerOption ?? false
-      ? quizItems
-          .find(i => i.id === quizItem.id)
-          ?.options.find(o => o.id === optionId)
-      : itemAnswer
+  const itemAnswersUnlimitedTries = showFeedbackForEachAnswerOption
+    ? quizItems
+        .find(i => i.id === quizItem.id)
+        ?.options.find(o => o.id === optionId)
+    : itemAnswer
 
   const optionSuccess = selectedOption?.successMessage
   const optionFailure = selectedOption?.failureMessage
