@@ -1,4 +1,4 @@
-import knex from "backendv2/database/knex"
+import knex from "../database/knex"
 import * as Knex from "Knex"
 
 const update_expired_courses = async (client: Knex) => {
