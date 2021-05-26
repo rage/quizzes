@@ -6,6 +6,7 @@ import {
   editedValidityRegex,
   editedQuizItemTitle,
   editedQuizItemBody,
+  editedFormatRegex,
 } from "../../../../store/editor/items/itemAction"
 import { useDispatch } from "react-redux"
 import { useTypedSelector } from "../../../../store/store"
@@ -16,15 +17,19 @@ import {
   faTrash,
 } from "@fortawesome/free-solid-svg-icons"
 import {
-  setValidRegex,
-  setRegex,
-  setTestingRegex,
+  setValidValidityRegex,
+  setValidityTestRegex,
+  toggleValidRegexTestingState,
   setAdvancedEditing,
+  setFormatValidityRegex,
+  toggleFormatRegexTestingState,
+  setFormatTestRegex,
 } from "../../../../store/editor/itemVariables/itemVariableActions"
 import OpenModalContent from "./OpenModalContent"
 import { deletedItem } from "../../../../store/editor/editorActions"
-import RegexTesterModalContent from "./RegexTesterModalContent"
+import ValidityRegexTesterModalContent from "./ValidityRegexTesterModalContent"
 import MarkdownEditor from "../../../MarkdownEditor"
+import FormatRegexTesterModalContent from "./FormatRegexTesterModalContent"
 
 const AdvancedBox = styled(Box)`
   background-color: #fafafa !important;
@@ -39,7 +44,7 @@ const EditItemButton = styled(Button)``
 
 const EditButtonWrapper = styled.div`
   display: flex;
-  justify-content: flex-end !important;
+  justify-content: flex-end;
 `
 
 const ItemInfo = styled.div`
@@ -50,11 +55,12 @@ const ItemInfo = styled.div`
 const StyledButton = styled(Button)`
   display: flex;
   width: 20%;
-  margin-left: 0.5rem !important;
+  margin-left: 0.5rem;
 `
 
 const RegexContainer = styled.div`
   display: flex;
+  margin: 1rem 0;
 `
 
 const StyledModal = styled(Modal)`
@@ -65,17 +71,17 @@ const StyledModal = styled(Modal)`
 
 const StyledBox = styled(Box)`
   background-color: #fafafa;
-  min-width: 300px !important;
-  min-height: 300px !important;
-  max-height: 300px !important;
-  max-width: 300px !important;
+  min-width: 300px;
+  min-height: 300px;
+  max-height: 300px;
+  max-width: 300px;
 `
 const CloseButton = styled(Button)`
-  display: flex !important;
+  display: flex;
 `
 
 const DeleteButton = styled(Button)`
-  display: flex !important;
+  display: flex;
 `
 
 const ModalButtonWrapper = styled.div`
@@ -94,13 +100,21 @@ const OpenContent = ({ item }: openContentProps) => {
   )
   const dispatch = useDispatch()
 
-  const handleRegexChange = (input: string): void => {
+  const handleValidRegexChange = (input: string): void => {
     try {
-      const newRegex = new RegExp(input)
       dispatch(editedValidityRegex(item.id, input))
-      dispatch(setValidRegex(storeItem.id, true))
+      dispatch(setValidValidityRegex(storeItem.id, true))
     } catch (err) {
-      dispatch(setValidRegex(storeItem.id, false))
+      dispatch(setValidValidityRegex(storeItem.id, false))
+    }
+  }
+
+  const handleFormatRegexChange = (input: string): void => {
+    try {
+      dispatch(editedFormatRegex(item.id, input))
+      dispatch(setFormatValidityRegex(storeItem.id, true))
+    } catch (err) {
+      dispatch(setFormatValidityRegex(storeItem.id, false))
     }
   }
 
@@ -142,18 +156,42 @@ const OpenContent = ({ item }: openContentProps) => {
       </StyledModal>
       <StyledModal
         open={variables.testingRegex}
-        onClose={() => dispatch(setTestingRegex(storeItem.id, false))}
+        onClose={() =>
+          dispatch(toggleValidRegexTestingState(storeItem.id, false))
+        }
       >
         <StyledBox>
           <ModalButtonWrapper>
             <CloseButton
-              onClick={() => dispatch(setTestingRegex(storeItem.id, false))}
+              onClick={() =>
+                dispatch(toggleValidRegexTestingState(storeItem.id, false))
+              }
               size="small"
             >
               <FontAwesomeIcon icon={faWindowClose} size="2x" />
             </CloseButton>
           </ModalButtonWrapper>
-          <RegexTesterModalContent item={item} />
+          <ValidityRegexTesterModalContent item={item} />
+        </StyledBox>
+      </StyledModal>
+      <StyledModal
+        open={variables.testingFormatRegex}
+        onClose={() =>
+          dispatch(toggleFormatRegexTestingState(storeItem.id, false))
+        }
+      >
+        <StyledBox>
+          <ModalButtonWrapper>
+            <CloseButton
+              onClick={() =>
+                dispatch(toggleFormatRegexTestingState(storeItem.id, false))
+              }
+              size="small"
+            >
+              <FontAwesomeIcon icon={faWindowClose} size="2x" />
+            </CloseButton>
+          </ModalButtonWrapper>
+          <FormatRegexTesterModalContent item={item} />
         </StyledBox>
       </StyledModal>
       <ItemInfo>
@@ -183,13 +221,38 @@ const OpenContent = ({ item }: openContentProps) => {
           value={variables.regex ?? ""}
           helperText={!variables.validRegex && "Invalid regex"}
           onChange={event => {
-            dispatch(setRegex(storeItem.id, event.target.value))
-            handleRegexChange(event.target.value)
+            dispatch(setValidityTestRegex(storeItem.id, event.target.value))
+            handleValidRegexChange(event.target.value)
           }}
         />
         <StyledButton
           variant="outlined"
-          onClick={() => dispatch(setTestingRegex(storeItem.id, true))}
+          onClick={() =>
+            dispatch(toggleValidRegexTestingState(storeItem.id, true))
+          }
+          size="large"
+        >
+          Test Regex
+        </StyledButton>
+      </RegexContainer>
+      <RegexContainer>
+        <TextField
+          error={!variables.validFormatRegex}
+          fullWidth
+          label="Format regex"
+          variant="outlined"
+          value={variables.formatRegex ?? ""}
+          helperText={!variables.validFormatRegex && "Invalid regex"}
+          onChange={event => {
+            dispatch(setFormatTestRegex(storeItem.id, event.target.value))
+            handleFormatRegexChange(event.target.value)
+          }}
+        />
+        <StyledButton
+          variant="outlined"
+          onClick={() =>
+            dispatch(toggleFormatRegexTestingState(storeItem.id, true))
+          }
           size="large"
         >
           Test Regex
