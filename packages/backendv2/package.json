@@ -14,6 +14,7 @@
     "reset-test-db": "cross-env NODE_ENV=test && (dropdb quizzes_test || true) && createdb quizzes_test && knex migrate:latest",
     "migrate": "knex migrate:latest",
     "seed": "knex seed:run --specific a.ts",
+    "update-expired-courses": "node ./dist/bin/update-expired-courses.js",
     "background-producer": "node ./dist/bin/kafkaBackgroundProducer.js"
   },
   "devDependencies": {

@@ -1,16 +1,16 @@
 apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
-  name: course-expired
+  name: update-expired-courses
   schedule: "0 0 1 * *"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
       restartPolicy: OnFailure
           containers:
-            - name: create-user-quiz-states
+            - name: update-expired-courses
               image: ${BACKEND_IMAGE}
-              command: ["node", "run", "update-expired-courses"]
+              command: ["npm", "run", "update-expired-courses"]
               resources:
                 requests:
                   memory: "1000Mi"
