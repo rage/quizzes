@@ -16,5 +16,10 @@ const update_expired_courses = async (client: Knex) => {
         where ended_courses.course_id = c.id;
     `)
 }
-
-await update_expired_courses(knex)
+;(async () => {
+  try {
+    await update_expired_courses(knex)
+  } catch (err) {
+    console.error("Failed to update expired courses:", err)
+  }
+})()
