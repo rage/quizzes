@@ -14,7 +14,8 @@
     "reset-test-db": "cross-env NODE_ENV=test && (dropdb quizzes_test || true) && createdb quizzes_test && knex migrate:latest",
     "migrate": "knex migrate:latest",
     "seed": "knex seed:run --specific a.ts",
-    "background-producer": "node ./dist/bin/kafkaBackgroundProducer.js"
+    "background-producer": "node ./dist/bin/kafkaBackgroundProducer.js",
+    "rollback-latest": "knex migrate:down"
   },
   "devDependencies": {
     "@types/ioredis": "^4.17.11",

@@ -5,6 +5,7 @@ import QuizItemAnswer from "./quiz_item_answer"
 class QuizOptionAnswer extends BaseModel {
   id!: string
   quizOptionId!: string
+  quizItemAnswerId!: string
 
   static get tableName() {
     return "quiz_option_answer"

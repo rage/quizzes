@@ -3,9 +3,9 @@ import * as Knex from "knex"
 export async function seed(knex: Knex): Promise<void> {
   await knex("language").insert([
     {
-      id: "xy_YZ",
-      country: "country",
-      name: "language",
+      id: "ab_BA",
+      country: "ab_BA",
+      name: "ab_BA",
     },
   ])
 
@@ -27,7 +27,7 @@ export async function seed(knex: Knex): Promise<void> {
   await knex("course_translation").insert([
     {
       course_id: "cd02cb32-d8d9-407f-b95f-4357864bee7a",
-      language_id: "xy_YZ",
+      language_id: "ab_BA",
       title: "course 1",
       body: "course",
       abbreviation: "course",
@@ -56,7 +56,7 @@ export async function seed(knex: Knex): Promise<void> {
   await knex("quiz_translation").insert([
     {
       quiz_id: "d7389c86-7a3a-4593-b810-b2be35319520",
-      language_id: "xy_YZ",
+      language_id: "ab_BA",
       title: "quiz 1",
       body: "body",
       submit_message: "nice one!",
@@ -70,7 +70,8 @@ export async function seed(knex: Knex): Promise<void> {
       type: "multiple-choice",
       order: 1,
       uses_shared_option_feedback_message: false,
-      multiple_choice_grading_policy: "NeedToSelectAllCorrectOptions",
+      multiple_selected_options_grading_options:
+        "NeedToSelectAllCorrectOptions",
       multi: true,
     },
     {
@@ -79,7 +80,7 @@ export async function seed(knex: Knex): Promise<void> {
       type: "multiple-choice",
       order: 2,
       uses_shared_option_feedback_message: false,
-      multiple_choice_grading_policy: "NeedToSelectNCorrectOptions",
+      multiple_selected_options_grading_options: "NeedToSelectNCorrectOptions",
       multiple_selected_options_grading_policy_n: 2,
       multi: true,
     },
@@ -88,7 +89,7 @@ export async function seed(knex: Knex): Promise<void> {
   await knex("quiz_item_translation").insert([
     {
       quiz_item_id: "40f7a704-fbbe-4411-8176-31449a5968fe",
-      language_id: "xy_YZ",
+      language_id: "ab_BA",
       title: "multiple-choice",
       body: "item",
       success_message: "yay!",
@@ -148,5 +149,5 @@ export async function seed(knex: Knex): Promise<void> {
     },
   ])
 
-  await knex("user").insert([{ id: 1234 }])
+  await knex("user").insert([{ id: 1357 }])
 }

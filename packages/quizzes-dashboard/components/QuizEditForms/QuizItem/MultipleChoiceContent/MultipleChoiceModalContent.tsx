@@ -77,6 +77,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
   const storeOptions = useTypedSelector(state => state.editor.options)
   const dispatch = useDispatch()
+
   return (
     <ModalWrapper>
       <ModalContentTitleWrapper>
@@ -130,19 +131,24 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
       </ModalContent>
       <ModalContent>
         <AllAnswersCorrectField>
-          <FormGroup row>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={storeItem.allAnswersCorrect}
-                  onChange={() =>
-                    dispatch(toggledAllAnswersCorrect(storeItem.id))
-                  }
-                />
-              }
-              label="All answers correct (no matter what one answers it is correct)"
-            />
-          </FormGroup>
+          {storeItem.multipleSelectedOptionsGradingOptions ===
+          "NeedToSelectAllCorrectOptions" ? (
+            <FormGroup row>
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={storeItem.allAnswersCorrect}
+                    onChange={() =>
+                      dispatch(toggledAllAnswersCorrect(storeItem.id))
+                    }
+                  />
+                }
+                label="All answers correct (no matter what one answers it is correct)"
+              />
+            </FormGroup>
+          ) : (
+            <div>Jotain muuta</div>
+          )}
         </AllAnswersCorrectField>
       </ModalContent>
       <ModalContent>

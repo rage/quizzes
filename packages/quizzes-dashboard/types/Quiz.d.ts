@@ -47,6 +47,10 @@ export interface Item {
   sharedOptionFeedbackMessage: null
   allAnswersCorrect: boolean
   direction: "row" | "column"
+  multipleSelectedOptionsGradingOptions:
+    | "NeedToSelectAllCorrectOptions"
+    | "NeedToSelectNCorrectOptions"
+  multipleSelectedOptionsGradingPolicyN: number
 }
 
 export interface Option {

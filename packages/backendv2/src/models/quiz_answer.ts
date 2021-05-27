@@ -21,6 +21,8 @@ import softDelete from "objection-soft-delete"
 import { mixin } from "objection"
 import QuizAnswerStatusModification from "./quiz_answer_status_modification"
 import { TStatusModificationOperation } from "./../types/index"
+import QuizOption from "./quiz_option"
+import QuizItem from "./quiz_item"
 
 type QuizAnswerStatus =
   | "draft"
@@ -529,18 +531,24 @@ class QuizAnswer extends mixin(BaseModel, [
 
     const trx = await knex.transaction()
     try {
-      const quizId = quizAnswer.quizId
       const isUserInDb = await User.getById(userId, trx)
       if (!isUserInDb) {
         quizAnswer.user = User.fromJson({ id: userId })
       }
-      quizAnswer.userId = userId
+
+      const quizId = quizAnswer.quizId
       const quiz = await Quiz.getById(quizId, trx)
       const course = await Course.getById(quiz.courseId, trx)
-      quizAnswer.languageId = course.languageId
       const userQuizState =
-        (await UserQuizState.getByUserAndQuiz(userId, quizId, trx)) ??
-        UserQuizState.fromJson({ userId, quizId, tries: 0 })
+        (await UserQuizState.getByUserAndQuiz(
+          userId,
+          quizAnswer.quizId,
+          trx,
+        )) ?? UserQuizState.fromJson({ userId, quizId, tries: 0 })
+
+      quizAnswer.userId = userId
+      quizAnswer.languageId = course.languageId
+
       this.checkIfSubmittable(quiz, userQuizState)
       this.removeIds(quizAnswer)
       await this.assessAnswerStatus(
@@ -550,9 +558,10 @@ class QuizAnswer extends mixin(BaseModel, [
         course,
         trx,
       )
-      this.assessAnswer(quizAnswer, quiz)
+      await this.assessAnswer(quizAnswer, quiz, trx)
       this.gradeAnswer(quizAnswer, userQuizState, quiz)
-      this.assessUserQuizStatus(quizAnswer, userQuizState, quiz, false)
+      this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
+
       let savedQuizAnswer
       let savedUserQuizState
       await this.markPreviousAsDeprecated(userId, quizId, trx)
@@ -598,7 +607,7 @@ class QuizAnswer extends mixin(BaseModel, [
   ) {
     const course = await Course.getById(quiz.courseId, trx)
     await this.assessAnswerStatus(quizAnswer, userQuizState, quiz, course, trx)
-    this.assessAnswer(quizAnswer, quiz)
+    this.assessAnswer(quizAnswer, quiz, trx)
     this.gradeAnswer(quizAnswer, userQuizState, quiz)
     this.assessUserQuizStatus(quizAnswer, userQuizState, quiz, true)
     if (quizAnswer.status === "confirmed") {
@@ -632,7 +641,11 @@ class QuizAnswer extends mixin(BaseModel, [
     }
   }
 
-  private static assessAnswer(quizAnswer: QuizAnswer, quiz: Quiz) {
+  private static async assessAnswer(
+    quizAnswer: QuizAnswer,
+    quiz: Quiz,
+    trx: Knex.Transaction,
+  ) {
     const quizItemAnswers = quizAnswer.itemAnswers
     const quizItems = quiz.items
     if (!quizItemAnswers || quizItemAnswers.length === 0) {
@@ -672,27 +685,48 @@ class QuizAnswer extends mixin(BaseModel, [
         case "multiple-choice-dropdown":
         case "clickable-multiple-choice":
         case "multiple-choice":
+          const rightAmountOptionsSelected = await this.rightAmountOfOptionsSelectedforEveryQuizItem(
+            quizAnswer,
+            trx,
+          )
+
+          if (!rightAmountOptionsSelected) {
+            throw new BadRequestError("Not right amount of options selected")
+          }
+
           const quizOptionAnswers = quizItemAnswer.optionAnswers
           const quizOptions = quizItem.options
+
           if (!quizOptionAnswers || quizOptionAnswers.length === 0) {
             throw new BadRequestError("option answers missing")
           }
+
           const correctOptionIds = quizOptions
             .filter(quizOption => quizOption.correct === true)
             .map(quizOption => quizOption.id)
+
           const selectedCorrectOptions = quizOptionAnswers.filter(
             quizOptionAnswer =>
               correctOptionIds.includes(quizOptionAnswer.quizOptionId),
           )
+
           const allSelectedOptionsAreCorrect = quizOptionAnswers.every(
             quizOptionAnswer =>
               correctOptionIds.includes(quizOptionAnswer.quizOptionId),
           )
-          quizItemAnswer.correct = quizItem.multi
-            ? correctOptionIds.length === selectedCorrectOptions.length &&
-              allSelectedOptionsAreCorrect
-            : selectedCorrectOptions.length > 0 &&
-              quizOptionAnswers.length === 1
+
+          const correct =
+            quizItem.multipleSelectedOptionsGradingOptions ===
+            "NeedToSelectAllCorrectOptions"
+              ? correctOptionIds.length === selectedCorrectOptions.length &&
+                allSelectedOptionsAreCorrect
+              : quizItem.multipleSelectedOptionsGradingOptions ===
+                "NeedToSelectNCorrectOptions"
+              ? selectedCorrectOptions.length >=
+                quizItem.multipleSelectedOptionsGradingPolicyN
+              : false
+
+          quizItemAnswer.correct = correct
           break
         case "custom-frontend-accept-data":
           break
@@ -803,7 +837,7 @@ class QuizAnswer extends mixin(BaseModel, [
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
     quiz: Quiz,
-    update: boolean,
+    update: boolean = false,
   ) {
     if (!update) {
       userQuizState.tries += 1
@@ -1178,6 +1212,46 @@ class QuizAnswer extends mixin(BaseModel, [
       delete itemAnswer.id
       itemAnswer.optionAnswers?.forEach(optionAnswer => delete optionAnswer.id)
     })
+  }
+
+  private static async rightAmountOfOptionsSelectedforEveryQuizItem(
+    quizAnswer: QuizAnswer,
+    trx: Knex.Transaction,
+  ) {
+    console.log(quizAnswer.itemAnswers.map(ia => ia.quizItemId))
+
+    const quizzesQuisItems = await QuizItem.query(trx)
+      .whereIn(
+        "id",
+        quizAnswer.itemAnswers.map(ia => ia.quizItemId),
+      )
+      .withGraphFetched("options")
+
+    const quizItemIdToAmountOfCorrectOptions = new Map<string, number>()
+
+    for (const quizItem of quizzesQuisItems) {
+      quizItemIdToAmountOfCorrectOptions.set(
+        quizItem.id,
+        quizItem.options.filter(qio => qio.correct).length,
+      )
+    }
+
+    const quizAnswerQuizItemIdToAmountOfSelectedOptions = new Map<
+      string,
+      number
+    >()
+
+    for (const ia of quizAnswer.itemAnswers) {
+      quizAnswerQuizItemIdToAmountOfSelectedOptions.set(
+        ia.quizItemId,
+        ia.optionAnswers.length,
+      )
+    }
+
+    return _.isEqual(
+      quizItemIdToAmountOfCorrectOptions,
+      quizAnswerQuizItemIdToAmountOfSelectedOptions,
+    )
   }
 }
 

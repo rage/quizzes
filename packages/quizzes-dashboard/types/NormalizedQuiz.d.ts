@@ -64,6 +64,10 @@ export interface NormalizedItem {
   sharedOptionFeedbackMessage: string | null
   allAnswersCorrect: boolean
   direction: "row" | "column"
+  multipleSelectedOptionsGradingOptions:
+    | "NeedToSelectAllCorrectOptions"
+    | "NeedToSelectNCorrectOptions"
+  multipleSelectedOptionsGradingPolicyN: number
 }
 
 export interface NormalizedOption {

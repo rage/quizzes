@@ -1,8 +1,6 @@
 import Quiz from "./quiz"
-import QuizOption, { QuizOptionType } from "./quiz_option"
-import QuizItemTranslation, {
-  QuizItemTranslationType,
-} from "./quiz_item_translation"
+import QuizOption from "./quiz_option"
+import QuizItemTranslation from "./quiz_item_translation"
 import BaseModel from "./base_model"
 import { mixin, ModelObject } from "objection"
 import softDelete from "objection-soft-delete"
@@ -19,7 +17,7 @@ export type itemType =
   | "multiple-choice-dropdown"
   | "clickable-multiple-choice"
 
-export type MultipleChoiceGradingPolicy =
+export type MultipleSelectedOptionsGradingPolicy =
   | "NeedToSelectAllCorrectOptions"
   | "NeedToSelectNCorrectOptions"
 
@@ -37,10 +35,11 @@ class QuizItem extends mixin(BaseModel, [
   successMessage!: string
   failureMessage!: string
   sharedOptionFeedbackMessage!: string
-  allAnswersCorrect!: string
+  allAnswersCorrect!: boolean
   deleted!: boolean
   direction!: "row" | "column"
-  multipleChoiceGradingPolicy!: MultipleChoiceGradingPolicy
+  multipleSelectedOptionsGradingOptions!: MultipleSelectedOptionsGradingPolicy
+  multipleSelectedOptionsGradingPolicyN!: number
 
   static get tableName() {
     return "quiz_item"

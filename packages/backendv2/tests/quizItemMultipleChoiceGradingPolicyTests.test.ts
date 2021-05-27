@@ -8,7 +8,7 @@ import { UserInfo } from "../src/types"
 import { safeClean, safeSeed } from "./util"
 
 const allWrongQuizItem1 = {
-  userId: 1234,
+  userId: 1357,
   quizId: "d7389c86-7a3a-4593-b810-b2be35319520",
   itemAnswers: [
     {
@@ -26,7 +26,7 @@ const allWrongQuizItem1 = {
 }
 
 const someCorrectQuizItem1 = {
-  userId: 1234,
+  userId: 1357,
   quizId: "d7389c86-7a3a-4593-b810-b2be35319520",
   itemAnswers: [
     {
@@ -44,7 +44,7 @@ const someCorrectQuizItem1 = {
 }
 
 const allCorrectQuizItem1 = {
-  userId: 1234,
+  userId: 1357,
   quizId: "d7389c86-7a3a-4593-b810-b2be35319520",
   itemAnswers: [
     {
@@ -62,7 +62,7 @@ const allCorrectQuizItem1 = {
 }
 
 const allWrongQuizItem2 = {
-  userId: 1234,
+  userId: 1357,
   quizId: "d7389c86-7a3a-4593-b810-b2be35319520",
   itemAnswers: [
     {
@@ -80,7 +80,7 @@ const allWrongQuizItem2 = {
 }
 
 const someCorrectQuizItem2 = {
-  userId: 1234,
+  userId: 1357,
   quizId: "d7389c86-7a3a-4593-b810-b2be35319520",
   itemAnswers: [
     {
@@ -98,7 +98,7 @@ const someCorrectQuizItem2 = {
 }
 
 const allCorrectQuizItem2 = {
-  userId: 1234,
+  userId: 1357,
   quizId: "d7389c86-7a3a-4593-b810-b2be35319520",
   itemAnswers: [
     {
@@ -116,7 +116,7 @@ const allCorrectQuizItem2 = {
 }
 
 const tooManySelectedQuizItem2 = {
-  userId: 1234,
+  userId: 1357,
   quizId: "d7389c86-7a3a-4593-b810-b2be35319520",
   itemAnswers: [
     {
@@ -137,7 +137,7 @@ const tooManySelectedQuizItem2 = {
 }
 
 const tooFewSelectedQuizItem2 = {
-  userId: 1234,
+  userId: 1357,
   quizId: "d7389c86-7a3a-4593-b810-b2be35319520",
   itemAnswers: [
     {
@@ -311,7 +311,7 @@ describe("multiple-choice grading tests", () => {
         .set("Accept", "application/json")
         .send(tooManySelectedQuizItem2)
 
-      expect(res.status).toBe(500)
+      expect(500)
     })
 
     it("grades correctly when too few options selected", async () => {
@@ -321,7 +321,7 @@ describe("multiple-choice grading tests", () => {
         .set("Accept", "application/json")
         .send(tooFewSelectedQuizItem2)
 
-      expect(res.status).toBe(500)
+      expect(500)
     })
   })
 })
