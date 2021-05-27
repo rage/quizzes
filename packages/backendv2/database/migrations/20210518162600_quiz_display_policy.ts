@@ -19,4 +19,7 @@ export async function down(knex: Knex): Promise<void> {
   await knex.schema.table("quiz_item", table => {
     table.dropColumn("feedback_display_policy")
   })
+  await knex.schema.raw(
+    `DROP TYPE if exists quiz_item_feedback_display_policy;`,
+  )
 }
