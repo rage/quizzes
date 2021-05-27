@@ -1,4 +1,5 @@
 import { createAction } from "typesafe-actions"
+import { string } from "yup/lib/locale"
 
 export const editedQuizItemBody = createAction(
   "EDITED_QUIZ_ITEM_BODY",
@@ -129,6 +130,32 @@ export const editedItemDirection = createAction(
   "EDITED_ITEM_DIRECTION",
   (itemId: string, newDirection) => ({ itemId, newDirection }),
 )<{ itemId: string; newDirection: "row" | "column" }>()
+
+export const editedMultipleSelectedOptionsGradingOptions = createAction(
+  "EDITED_MULTIPLE_SELECTED_OPTIONS_GRADING_OPTIONS",
+  (
+    itemId: string,
+    newGradingPolicy:
+      | "NeedToSelectAllCorrectOptions"
+      | "NeedToSelectNCorrectOptions",
+  ) => ({ itemId, newGradingPolicy }),
+)<{
+  itemId: string
+  newGradingPolicy:
+    | "NeedToSelectAllCorrectOptions"
+    | "NeedToSelectNCorrectOptions"
+}>()
+
+export const editedMultipleSelectedOptionsGradingPolicyN = createAction(
+  "EDITED_MULTIPLE_SELECTED_OPTIONS_GRADING_POLICY_N",
+  (itemId: string, nCorrectSelectedOptions: number) => ({
+    itemId,
+    nCorrectSelectedOptions,
+  }),
+)<{ itemId: string; nCorrectSelectedOptions: number }>()
+
+// editedMultipleSelectedOptionsGradingOptions,
+// editedMultipleSelectedOptionsGradingPolicyN,
 
 export const itemActions = [
   editedQuizItemBody,
