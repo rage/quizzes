@@ -19,6 +19,7 @@ import {
   Grow,
   Collapse,
   Slide,
+  InputLabel,
 } from "@material-ui/core"
 import {
   editedQuizItemTitle,
@@ -95,27 +96,6 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
         <Typography variant="h4">Advanced editing</Typography>
       </ModalContentTitleWrapper>
       <ModalContent>
-        <Select
-          fullWidth
-          label="Feedback display policy"
-          variant="outlined"
-          value={storeItem.feedbackDisplayPolicy}
-          onChange={event =>
-            dispatch(
-              editedQuizItemFeedbackDisplayPolicy(
-                storeItem.id,
-                event.target.value,
-              ),
-            )
-          }
-        >
-          <MenuItem value="DisplayFeedbackOnQuizItem">On quiz item</MenuItem>
-          <MenuItem value="DisplayFeedbackOnAllOptions">
-            On each quiz item answer option
-          </MenuItem>
-        </Select>
-      </ModalContent>
-      <ModalContent>
         <MarkdownEditor
           label="Title"
           onChange={event =>
@@ -125,39 +105,61 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
         />
       </ModalContent>
       <ModalContent>
-        <AllAnswersCorrectField>
-          <FormGroup row>
+        <FormGroup row>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={storeItem.allAnswersCorrect}
+                onChange={() =>
+                  dispatch(toggledAllAnswersCorrect(storeItem.id))
+                }
+              />
+            }
+            label="All answers correct (no matter what one answers it is correct)"
+            labelPlacement="start"
+          />
+          <Grow in={!storeItem.allAnswersCorrect}>
             <FormControlLabel
+              label="Multi"
+              labelPlacement="start"
               control={
-                <Switch
-                  checked={storeItem.allAnswersCorrect}
-                  onChange={() =>
-                    dispatch(toggledAllAnswersCorrect(storeItem.id))
+                <Checkbox
+                  color="primary"
+                  checked={storeItem.multi}
+                  onChange={event =>
+                    dispatch(
+                      toggledMultiOptions(storeItem.id, event.target.checked),
+                    )
                   }
                 />
               }
-              label="All answers correct (no matter what one answers it is correct)"
-              labelPlacement="start"
             />
-            <Grow in={!storeItem.allAnswersCorrect}>
-              <FormControlLabel
-                label="Multi"
-                labelPlacement="start"
-                control={
-                  <Checkbox
-                    color="primary"
-                    checked={storeItem.multi}
-                    onChange={event =>
-                      dispatch(
-                        toggledMultiOptions(storeItem.id, event.target.checked),
-                      )
-                    }
-                  />
-                }
-              />
-            </Grow>
-          </FormGroup>
-        </AllAnswersCorrectField>
+          </Grow>
+        </FormGroup>
+      </ModalContent>
+      <ModalContent>
+        <FormControl variant="outlined">
+          <InputLabel>Feedback display policy</InputLabel>
+          <Select
+            native
+            variant="outlined"
+            label="Feedback display policy"
+            value={storeItem.feedbackDisplayPolicy}
+            onChange={event =>
+              dispatch(
+                editedQuizItemFeedbackDisplayPolicy(
+                  storeItem.id,
+                  event.target.value as string,
+                ),
+              )
+            }
+          >
+            <option value="DisplayFeedbackOnQuizItem">On quiz item</option>
+            <option value="DisplayFeedbackOnAllOptions">
+              On each quiz item answer option
+            </option>
+          </Select>
+        </FormControl>
       </ModalContent>
       <Collapse in={!storeItem.allAnswersCorrect && storeItem.multi}>
         <ModalContent>

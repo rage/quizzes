@@ -141,7 +141,7 @@ export const editedItemDirection = createAction(
 
 export const editedQuizItemFeedbackDisplayPolicy = createAction(
   "EDITED_QUIZ_ITEM_FEEDBACK_POLICY",
-  (itemId: string, newPolicy) => ({ itemId, newPolicy }),
+  (itemId: string, newPolicy: string) => ({ itemId, newPolicy }),
 )<{
   itemId: string
   newPolicy: "DisplayFeedbackOnQuizItem" | "DisplayFeedbackOnAllOptions"
