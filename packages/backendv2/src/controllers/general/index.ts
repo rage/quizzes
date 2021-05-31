@@ -21,7 +21,7 @@ const general = new Router<CustomState, CustomContext>({
     }
   })
 
-  .get("/course/:courseId/quiz-titles", accessControl(), async ctx => {
+  .get("/course/:courseId/quiz-titles", async ctx => {
     const courseId = ctx.params.courseId
     let quiz_titles: { [key: string]: string } = {}
 
