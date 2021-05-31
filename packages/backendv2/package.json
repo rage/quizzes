@@ -15,7 +15,8 @@
     "migrate": "knex migrate:latest",
     "seed": "knex seed:run --specific a.ts",
     "update-expired-courses": "node ./dist/bin/update-expired-courses.js",
-    "background-producer": "node ./dist/bin/kafkaBackgroundProducer.js"
+    "background-producer": "node ./dist/bin/kafkaBackgroundProducer.js",
+    "rollback-latest": "knex migrate:down"
   },
   "devDependencies": {
     "@types/ioredis": "^4.17.11",

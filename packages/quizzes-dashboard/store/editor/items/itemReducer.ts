@@ -19,6 +19,8 @@ import {
   toggledAllAnswersCorrect,
   editedItemDirection,
   editedQuizItemFeedbackDisplayPolicy,
+  editedMultipleSelectedOptionsGradingOptions,
+  editedMultipleSelectedOptionsGradingPolicyN,
 } from "./itemAction"
 import {
   initializedEditor,
@@ -158,6 +160,8 @@ export const itemReducer = createReducer<
         allAnswersCorrect: false,
         direction: "row",
         feedbackDisplayPolicy: "DisplayFeedbackOnQuizItem",
+        multipleSelectedOptionsGradingOptions: "NeedToSelectAllCorrectOptions",
+        multipleSelectedOptionsGradingPolicyN: 1,
       }
       draftState[action.payload.itemId] = newItem
     })
@@ -261,5 +265,29 @@ export const itemReducer = createReducer<
       draftState[action.payload.itemId].direction = action.payload.newDirection
     })
   })
+
+  .handleAction(
+    editedMultipleSelectedOptionsGradingOptions,
+    (state, action) => {
+      return produce(state, draftState => {
+        draftState[
+          action.payload.itemId
+        ].multipleSelectedOptionsGradingOptions =
+          action.payload.newGradingPolicy
+      })
+    },
+  )
+
+  .handleAction(
+    editedMultipleSelectedOptionsGradingPolicyN,
+    (state, action) => {
+      return produce(state, draftState => {
+        draftState[
+          action.payload.itemId
+        ].multipleSelectedOptionsGradingPolicyN =
+          action.payload.nCorrectSelectedOptions
+      })
+    },
+  )
 
 export default itemReducer

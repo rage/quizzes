@@ -2,12 +2,16 @@ import { BadRequestError, NotFoundError } from "./../util/error"
 import QuizAnswer from "./quiz_answer"
 import UserQuizState from "./user_quiz_state"
 import Quiz from "./quiz"
-import PeerReviewQuestionAnswer from "./peer_review_question_answer"
-import PeerReviewQuestion from "./peer_review_question"
+import PeerReviewQuestionAnswer, {
+  PeerReviewQuestionAnswerType,
+} from "./peer_review_question_answer"
+import PeerReviewQuestion, {
+  PeerReviewQuestionType,
+} from "./peer_review_question"
 import knex from "../../database/knex"
 import BaseModel from "./base_model"
 import softDelete from "objection-soft-delete"
-import { mixin } from "objection"
+import { mixin, ModelObject } from "objection"
 import { Transaction } from "knex"
 
 class PeerReview extends BaseModel {
@@ -181,5 +185,7 @@ class PeerReview extends BaseModel {
     return peerReview
   }
 }
+
+export type PeerReviewType = ModelObject<PeerReview>
 
 export default PeerReview

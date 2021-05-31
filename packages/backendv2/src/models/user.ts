@@ -1,8 +1,10 @@
 import QuizAnswer from "./quiz_answer"
 import UserQuizState from "./user_quiz_state"
-import UserCourseRole from "./user_course_role"
+import UserCourseRole, { UserCourseRoleType } from "./user_course_role"
 import Knex from "knex"
 import BaseModel from "./base_model"
+
+import { ModelObject } from "objection"
 
 class User extends BaseModel {
   id!: number
@@ -46,5 +48,7 @@ class User extends BaseModel {
     return await this.query(trx).findById(id)
   }
 }
+
+export type UserType = ModelObject<User>
 
 export default User

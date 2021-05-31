@@ -1,4 +1,5 @@
 import Knex from "knex"
+import { ModelObject } from "objection"
 import { TStatusModificationOperation } from "./../types/index"
 import BaseModel from "./base_model"
 import User from "./user"
@@ -75,5 +76,9 @@ class QuizAnswerStatusModification extends BaseModel {
     await this.query(trx).insert(logsToInsert)
   }
 }
+
+export type QuizAnswerStatusModificationType = ModelObject<
+  QuizAnswerStatusModification
+>
 
 export default QuizAnswerStatusModification

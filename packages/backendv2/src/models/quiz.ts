@@ -1,7 +1,9 @@
-import QuizItem from "./quiz_item"
-import QuizTranslation from "./quiz_translation"
-import PeerReviewCollection from "./peer_review_collection"
-import Course from "./course"
+import QuizItem, { QuizItemType } from "./quiz_item"
+import QuizTranslation, { QuizTranslationType } from "./quiz_translation"
+import PeerReviewCollection, {
+  PeerReviewCollectionType,
+} from "./peer_review_collection"
+import Course, { CourseType } from "./course"
 import { NotFoundError } from "../util/error"
 import moduleInitializer from "../util/initializer"
 import stringify from "csv-stringify"
@@ -11,7 +13,7 @@ import Knex from "knex"
 import UserQuizState from "./user_quiz_state"
 import * as Kafka from "../services/kafka"
 import PeerReviewQuestion from "./peer_review_question"
-import { NotNullViolationError } from "objection"
+import { ModelObject, NotNullViolationError } from "objection"
 import BaseModel from "./base_model"
 import knex from "../../database/knex"
 
@@ -397,5 +399,7 @@ export class Quiz extends BaseModel {
     return quiz
   }
 }
+
+export type QuizType = ModelObject<Quiz>
 
 export default Quiz

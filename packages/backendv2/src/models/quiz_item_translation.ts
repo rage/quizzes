@@ -1,3 +1,4 @@
+import { ModelObject } from "objection"
 import BaseModel from "./base_model"
 import QuizItem from "./quiz_item"
 
@@ -27,5 +28,7 @@ class QuizItemTranslation extends BaseModel {
     },
   }
 }
+
+export type QuizItemTranslationType = ModelObject<QuizItemTranslation>
 
 export default QuizItemTranslation

@@ -4,6 +4,7 @@ import QuizAnswer from "./quiz_answer"
 import Knex, { Transaction } from "knex"
 import BaseModel from "./base_model"
 import knex from "../../database/knex"
+import { ModelObject } from "objection"
 
 class UserQuizState extends BaseModel {
   userId!: number
@@ -129,5 +130,7 @@ class UserQuizState extends BaseModel {
   //   })
   // }
 }
+
+export type UserQuizStateType = ModelObject<UserQuizState>
 
 export default UserQuizState

@@ -1,3 +1,4 @@
+import { ModelObject } from "objection"
 import BaseModel from "./base_model"
 import PeerReviewQuestion from "./peer_review_question"
 
@@ -29,4 +30,7 @@ class PeerReviewQuestionTranslation extends BaseModel {
   }
 }
 
+export type PeerReviewQuestionTranslationType = ModelObject<
+  PeerReviewQuestionTranslation
+>
 export default PeerReviewQuestionTranslation
