@@ -2,11 +2,15 @@ apiVersion: batch/v1beta1
 kind: CronJob
 metadata:
   name: update-expired-courses
+spec:
   schedule: "0 0 1 * *"
   concurrencyPolicy: Forbid
   jobTemplate:
     spec:
-      restartPolicy: OnFailure
+      activeDeadlineSeconds: 3600
+      template:
+        spec:
+          restartPolicy: OnFailure
           containers:
             - name: update-expired-courses
               image: ${BACKEND_IMAGE}
