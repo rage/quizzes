@@ -1,10 +1,10 @@
 import Knex from "knex"
 import { NotFoundError } from "./../util/error"
-import QuizItemAnswer, { QuizItemAnswerType } from "./quiz_item_answer"
-import User, { UserType } from "./user"
-import PeerReview, { PeerReviewType } from "./peer_review"
-import Quiz, { QuizType } from "./quiz"
-import UserQuizState, { UserQuizStateType } from "./user_quiz_state"
+import QuizItemAnswer from "./quiz_item_answer"
+import User from "./user"
+import PeerReview from "./peer_review"
+import Quiz from "./quiz"
+import UserQuizState from "./user_quiz_state"
 import { BadRequestError } from "../util/error"
 import { removeNonPrintingCharacters } from "../util/tools"
 import knex from "../../database/knex"
@@ -13,7 +13,7 @@ import PeerReviewQuestion from "./peer_review_question"
 import UserCoursePartState from "./user_course_part_state"
 import * as Kafka from "../services/kafka"
 import SpamFlag from "./spam_flag"
-import _, { cond } from "lodash"
+import _ from "lodash"
 import Objection, { ModelObject, raw } from "objection"
 import BaseModel from "./base_model"
 import QuizOptionAnswer from "./quiz_option_answer"
@@ -21,7 +21,6 @@ import softDelete from "objection-soft-delete"
 import { mixin } from "objection"
 import QuizAnswerStatusModification from "./quiz_answer_status_modification"
 import { TStatusModificationOperation } from "./../types/index"
-import QuizOption from "./quiz_option"
 import QuizItem from "./quiz_item"
 
 type QuizAnswerStatus =
@@ -685,48 +684,9 @@ class QuizAnswer extends mixin(BaseModel, [
         case "multiple-choice-dropdown":
         case "clickable-multiple-choice":
         case "multiple-choice":
-          const rightAmountOptionsSelected = await this.rightAmountOfOptionsSelectedforEveryQuizItem(
-            quizAnswer,
-            trx,
-          )
-
-          if (!rightAmountOptionsSelected) {
-            throw new BadRequestError("Not right amount of options selected")
-          }
-
-          const quizOptionAnswers = quizItemAnswer.optionAnswers
-          const quizOptions = quizItem.options
-
-          if (!quizOptionAnswers || quizOptionAnswers.length === 0) {
-            throw new BadRequestError("option answers missing")
-          }
-
-          const correctOptionIds = quizOptions
-            .filter(quizOption => quizOption.correct === true)
-            .map(quizOption => quizOption.id)
-
-          const selectedCorrectOptions = quizOptionAnswers.filter(
-            quizOptionAnswer =>
-              correctOptionIds.includes(quizOptionAnswer.quizOptionId),
-          )
-
-          const allSelectedOptionsAreCorrect = quizOptionAnswers.every(
-            quizOptionAnswer =>
-              correctOptionIds.includes(quizOptionAnswer.quizOptionId),
-          )
-
-          const correct =
-            quizItem.multipleSelectedOptionsGradingOptions ===
-            "NeedToSelectAllCorrectOptions"
-              ? correctOptionIds.length === selectedCorrectOptions.length &&
-                allSelectedOptionsAreCorrect
-              : quizItem.multipleSelectedOptionsGradingOptions ===
-                "NeedToSelectNCorrectOptions"
-              ? selectedCorrectOptions.length >=
-                quizItem.multipleSelectedOptionsGradingPolicyN
-              : false
-
-          quizItemAnswer.correct = correct
+          quizItemAnswer.correct = quizItem.multi
+            ? this.multipleSelectedQuizItemOptions(quizItem, quizItemAnswer)
+            : this.oneSelectedQuizItemOption(quizItem, quizItemAnswer)
           break
         case "custom-frontend-accept-data":
           break
@@ -1214,44 +1174,51 @@ class QuizAnswer extends mixin(BaseModel, [
     })
   }
 
-  private static async rightAmountOfOptionsSelectedforEveryQuizItem(
-    quizAnswer: QuizAnswer,
-    trx: Knex.Transaction,
-  ) {
-    console.log(quizAnswer.itemAnswers.map(ia => ia.quizItemId))
+  private static multipleSelectedQuizItemOptions(
+    quizItem: QuizItem,
+    quizItemAnswer: QuizItemAnswer,
+  ): boolean {
+    switch (quizItem.multipleSelectedOptionsGradingOptions) {
+      case "NeedToSelectAllCorrectOptions":
+        return (
+          quizItemAnswer.optionAnswers
+            .map(qoa => qoa.quizOptionId)
+            .every(qoa =>
+              quizItem.options
+                .filter(qo => qo.correct)
+                .map(qo => qo.id)
+                .includes(qoa),
+            ) &&
+          quizItemAnswer.optionAnswers.length ===
+            quizItem.options.filter(qo => qo.correct).length
+        )
 
-    const quizzesQuisItems = await QuizItem.query(trx)
-      .whereIn(
-        "id",
-        quizAnswer.itemAnswers.map(ia => ia.quizItemId),
-      )
-      .withGraphFetched("options")
+      case "NeedToSelectNCorrectOptions":
+        return (
+          quizItemAnswer.optionAnswers.filter(qoa =>
+            quizItem.options
+              .filter(qio => qio.correct)
+              .map(qio => qio.id)
+              .includes(qoa.quizOptionId),
+          ).length === quizItem.multipleSelectedOptionsGradingPolicyN
+        )
+      default:
+        throw new BadRequestError("Unknown quizOption grading policy")
+    }
+  }
 
-    const quizItemIdToAmountOfCorrectOptions = new Map<string, number>()
-
-    for (const quizItem of quizzesQuisItems) {
-      quizItemIdToAmountOfCorrectOptions.set(
-        quizItem.id,
-        quizItem.options.filter(qio => qio.correct).length,
+  private static oneSelectedQuizItemOption(
+    quizItem: QuizItem,
+    quizItemAnswer: QuizItemAnswer,
+  ): boolean {
+    if (quizItem.options.length > 1) {
+      throw new BadRequestError(
+        "Too many options selected for quizItem, where only one option can be selected",
       )
     }
-
-    const quizAnswerQuizItemIdToAmountOfSelectedOptions = new Map<
-      string,
-      number
-    >()
-
-    for (const ia of quizAnswer.itemAnswers) {
-      quizAnswerQuizItemIdToAmountOfSelectedOptions.set(
-        ia.quizItemId,
-        ia.optionAnswers.length,
-      )
-    }
-
-    return _.isEqual(
-      quizItemIdToAmountOfCorrectOptions,
-      quizAnswerQuizItemIdToAmountOfSelectedOptions,
-    )
+    const selectedOptionId = quizItemAnswer.optionAnswers[0].id
+    const correctOptionId = quizItem.options.filter(qio => qio.correct)[0].id
+    return selectedOptionId === correctOptionId
   }
 }
 

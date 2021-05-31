@@ -133,12 +133,7 @@ export const editedItemDirection = createAction(
 
 export const editedMultipleSelectedOptionsGradingOptions = createAction(
   "EDITED_MULTIPLE_SELECTED_OPTIONS_GRADING_OPTIONS",
-  (
-    itemId: string,
-    newGradingPolicy:
-      | "NeedToSelectAllCorrectOptions"
-      | "NeedToSelectNCorrectOptions",
-  ) => ({ itemId, newGradingPolicy }),
+  (itemId: string, newGradingPolicy: string) => ({ itemId, newGradingPolicy }),
 )<{
   itemId: string
   newGradingPolicy:
