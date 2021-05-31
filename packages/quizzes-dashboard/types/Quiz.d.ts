@@ -47,6 +47,9 @@ export interface Item {
   sharedOptionFeedbackMessage: null
   allAnswersCorrect: boolean
   direction: "row" | "column"
+  feedbackDisplayPolicy:
+    | "DisplayFeedbackOnQuizItem"
+    | "DisplayFeedbackOnAllOptions"
 }
 
 export interface Option {

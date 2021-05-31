@@ -18,6 +18,7 @@ import {
   decreasedItemOrder,
   toggledAllAnswersCorrect,
   editedItemDirection,
+  editedQuizItemFeedbackDisplayPolicy,
 } from "./itemAction"
 import {
   initializedEditor,
@@ -124,6 +125,13 @@ export const itemReducer = createReducer<
     })
   })
 
+  .handleAction(editedQuizItemFeedbackDisplayPolicy, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].feedbackDisplayPolicy =
+        action.payload.newPolicy
+    })
+  })
+
   .handleAction(createdNewItem, (state, action) => {
     return produce(state, draftState => {
       const newItem: NormalizedItem = {
@@ -149,6 +157,7 @@ export const itemReducer = createReducer<
         options: [],
         allAnswersCorrect: false,
         direction: "row",
+        feedbackDisplayPolicy: "DisplayFeedbackOnQuizItem",
       }
       draftState[action.payload.itemId] = newItem
     })

@@ -12,6 +12,7 @@ const configOptions: { [env: string]: Config } = {
     connection: {
       host: env.DB_HOST || "/var/run/postgresql",
       database: env.DB_NAME || "quizzes_dev",
+      user: env.DB_USER || "postgres",
       password: env.DB_PASSWORD || "",
       timezone: "UTC",
     },

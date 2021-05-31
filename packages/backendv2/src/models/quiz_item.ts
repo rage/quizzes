@@ -17,11 +17,16 @@ export type QuizItemType =
   | "multiple-choice-dropdown"
   | "clickable-multiple-choice"
 
+export type QuizItemFeedbackDisplayPolicy =
+  | "DisplayFeedbackOnQuizItem"
+  | "DisplayFeedbackOnAllOptions"
+
 class QuizItem extends mixin(BaseModel, [
   softDelete({ columnName: "deleted" }),
 ]) {
   id!: string
   type!: QuizItemType
+  feedbackDisplayPolicy!: QuizItemFeedbackDisplayPolicy
   validityRegex!: string
   multi!: string
   texts!: QuizItemTranslation[]

@@ -17,6 +17,11 @@ export enum QuizItemDirection {
   column = "column",
 }
 
+export enum QuizItemFeedbackDisplayPolicy {
+  onQuizItem = "DisplayFeedbackOnQuizItem",
+  onAllOptions = "DisplayFeedbackOnAllOptions",
+}
+
 export type MiscEvent = React.FormEvent<
   HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
 >
@@ -121,6 +126,7 @@ export type QuizItem = {
   maxLabel: string
   sharedOptionFeedbackMessage?: string
   direction: QuizItemDirection
+  feedbackDisplayPolicy: QuizItemFeedbackDisplayPolicy
 }
 
 export type PeerReviewQuestion = {
