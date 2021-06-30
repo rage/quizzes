@@ -164,6 +164,19 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     )
   })
 
+  .get("/:quizId/plagiarism-suspected", accessControl(), async ctx => {
+    const quizId = ctx.params.quizId
+    const courseId = await getCourseIdByQuizId(quizId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
+    const { page, size, order } = ctx.request.query
+    ctx.body = await QuizAnswer.getPaginatedSuspectedPlagiarism(
+      quizId,
+      page,
+      size,
+      order,
+    )
+  })
+
   .post("/:quizId/manual-review", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
     const courseId = await getCourseIdByQuizId(quizId)

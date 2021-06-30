@@ -20,18 +20,18 @@ import {
   useAnswerListState,
 } from "../../../contexts/AnswerListContext"
 import AnswerListOptions from "../../Answer/AnswerListOptions"
-import { useRequiringAttention } from "../../../hooks/useAnswersRequiringAttention"
+import { useFlaggedAsPlagiarism } from "../../../hooks/useAnswersFlaggedAsPlagiarism"
 import { useSearchResultsRequiringAttention } from "../../../hooks/useSearchResults"
 import SkeletonLoader from "../../Shared/SkeletonLoader"
 
-export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
+export const FlaggedAsPlagiarism = ({ quiz, course }: IQuizTabProps) => {
   const [{ expandAll }, dispatch] = useAnswerListState()
 
   const route = useRouter()
   const { pageNo, sort, answers } = route.query
   const quizId = route.query.quizId?.toString() ?? ""
 
-  const pathname = `/quizzes/${quizId}/answers-requiring-attention/`
+  const pathname = `/quizzes/${quizId}/answers-flagged-as-plagiarism/`
 
   const [currentPage, setCurrentPage] = useState(Number(pageNo) || 1)
   const [sortOrder, setSortOrder] = useState((sort as string) || "desc")
@@ -42,15 +42,15 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
   const [searchQuery, setSearchQuery] = useState("")
 
   const {
-    answersRequiringAttention,
-    answersRequiringAttentionLoading,
-    answersRequiringAttentionError,
-  } = useRequiringAttention(
+    answersFlaggedAsPlagiarism,
+    answersFlaggedAsPlagiarismLoading,
+    answersFlaggedAsPlagiarismError,
+  } = useFlaggedAsPlagiarism(
     quizId,
     currentPage,
     answersDisplayed,
     sortOrder,
-    "answers-requiring-attention",
+    "answers-flagged-as-plagiarism",
   )
 
   const {
@@ -135,17 +135,17 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
   }
 
   const answersAreBeingFetched =
-    searchResultsLoading || answersRequiringAttentionLoading
+    searchResultsLoading || answersFlaggedAsPlagiarismLoading
   const errorFetchingAnswers =
-    answersRequiringAttentionError || searchResultsError
+    answersFlaggedAsPlagiarismError || searchResultsError
 
   const answersToDisplay = searchResults
     ? searchResults
-    : answersRequiringAttention
+    : answersFlaggedAsPlagiarism
 
   return (
     <>
-      <TabText text="Answers requiring attention" />
+      <TabText text="Answers automatically flagged as plagiarism" />
 
       <QuizTitle quiz={quiz} />
       <OptionsContainer>
@@ -213,4 +213,4 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
   )
 }
 
-export default RequiringAttention
+export default FlaggedAsPlagiarism

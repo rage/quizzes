@@ -11,7 +11,9 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import OverView from "../quizPages/overview"
 import EditPage from "../quizPages/edit"
 import AllAnswers from "../quizPages/answers/all"
-import RequiringAttention from "../quizPages/answers/requiring-attention"
+import RequiringAttention, {
+  FlaggedAsPlagiarism,
+} from "../quizPages/answers/requiring-attention"
 import { ITabToComponent } from "../CoursePage/types"
 import { AnswerListProvider } from "../../contexts/AnswerListContext"
 import { useQuiz } from "../../hooks/useQuiz"
@@ -58,6 +60,7 @@ export const TabNavigator = () => {
     edit: EditPage,
     "all-answers": AllAnswers,
     "answers-requiring-attention": RequiringAttention,
+    "answers-flagged-as-plagiarism": FlaggedAsPlagiarism,
     default_tab: OverView,
   }
 
@@ -129,6 +132,30 @@ export const TabNavigator = () => {
             router.push(`${pathname}/answers-requiring-attention`, undefined, {
               shallow: true,
             })
+          }}
+        />
+
+        <Tab
+          key="answers-flagged-as-plagiarism"
+          icon={<FontAwesomeIcon icon={faExclamationTriangle} />}
+          value="answers-flagged-as-plagiarism"
+          label={
+            <Badge
+              variant="standard"
+              badgeContent={requiringAttention}
+              color="error"
+            >
+              <Typography>Answers flagged as plagiarism</Typography>
+            </Badge>
+          }
+          onClick={() => {
+            router.push(
+              `${pathname}/answers-flagged-as-plagiarism`,
+              undefined,
+              {
+                shallow: true,
+              },
+            )
           }}
         />
       </Tabs>

@@ -137,6 +137,29 @@ export const getAnswersRequiringAttention = async (
   throw new Error()
 }
 
+export const getAnswersFlaggedAsPlagiarism = async (
+  quizId: string,
+  page: number,
+  size: number,
+  order: string,
+): Promise<{ results: Answer[]; total: number }> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (
+      await api.get(
+        `/answers/${quizId}/plagiarism-suspected?page=${page -
+          1}&size=${size}&order=${order}`,
+        config,
+      )
+    ).data
+    return response
+  }
+  throw new Error()
+}
+
 export const getAnswersRequiringAttentionMatchingQuery = async (
   quizId: string,
   size: number,
@@ -303,6 +326,24 @@ export const getUserAbilitiesForCourse = async (
 }
 
 export const getAnswersRequiringAttentionByQuizId = async (
+  quizId: string,
+): Promise<number> => {
+  const userInfo = checkStore()
+  if (userInfo && quizId) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (
+      await api.get(
+        `/quizzes/${quizId}/count-answers-requiring-attention`,
+        config,
+      )
+    ).data
+  }
+  throw new Error()
+}
+
+export const getAnswersFlaggedAsPlagiarismByQuizId = async (
   quizId: string,
 ): Promise<number> => {
   const userInfo = checkStore()

@@ -335,6 +335,33 @@ class QuizAnswer extends mixin(BaseModel, [
     return paginated
   }
 
+  public static async getPaginatedSuspectedPlagiarism(
+    quizId: string,
+    page: number,
+    pageSize: number,
+    order: "asc" | "desc",
+  ) {
+    const paginated = await this.query()
+      .where("quiz_id", quizId)
+      .andWhere("plagiarism_detected", true)
+      .orderBy([{ column: "created_at", order: order }])
+      .page(page, pageSize)
+      .withGraphFetched("userQuizState")
+      .withGraphFetched("itemAnswers.[optionAnswers]")
+      .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+      .withGraphFetched("quiz.[peerReviewCollections]")
+
+    paginated.results.map(async answer => {
+      if (answer.peerReviews.length > 0) {
+        answer.peerReviews = await this.showQuestionInPeerReview(
+          answer.peerReviews,
+        )
+      }
+    })
+
+    return paginated
+  }
+
   public static async getPaginatedManualReviewBySearchQuery(
     quizId: string,
     pageSize: number,

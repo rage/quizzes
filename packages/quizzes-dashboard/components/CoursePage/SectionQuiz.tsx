@@ -89,6 +89,19 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
                     </Button>
                   </Link>
                 </Badge>
+                <Badge
+                  color="error"
+                  badgeContent={requiringAttention}
+                  invisible={requiringAttention === undefined}
+                >
+                  <Link
+                    href={`/quizzes/${quiz.id}/answers-flagged-as-plagiarism`}
+                  >
+                    <Button variant="outlined">
+                      <Typography>Answers requiring attention</Typography>
+                    </Button>
+                  </Link>
+                </Badge>
                 {userAbilities?.includes("edit") && (
                   <Link href={`/quizzes/${quiz.id}/edit`}>
                     <Button variant="outlined">
