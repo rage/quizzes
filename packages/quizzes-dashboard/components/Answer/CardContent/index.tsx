@@ -15,7 +15,11 @@ import AnswerLink from "./AnswerLink"
 import ManualReviewField from "./ManualReviewField"
 import Peerreviews from "./Peerreviews"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faWindowClose, faTrash } from "@fortawesome/free-solid-svg-icons"
+import {
+  faWindowClose,
+  faTrash,
+  faExclamation,
+} from "@fortawesome/free-solid-svg-icons"
 import DebugDialog from "../../DebugDialog"
 import { editableAnswerStates } from "../../constants"
 import { useAnswerListState } from "../../../contexts/AnswerListContext"
@@ -144,8 +148,10 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
         setShowAnswerDeletionModal={setShowAnswerDeletionModal}
         showAnswerDeletionModal={showAnswerDeletionModal}
       />
+
       <ContentContainer>
         <AnswerLink answer={answer} />
+
         <ButtonContainer>
           <ButtonWrapper>
             <DeleteButton
@@ -162,6 +168,14 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
           </ButtonWrapper>
         </ButtonContainer>
       </ContentContainer>
+      {answer.plagiarismDetected == true && (
+        <ContentContainer>
+          <Typography color="error" align="left">
+            <FontAwesomeIcon icon={faExclamation}></FontAwesomeIcon> &nbsp;This
+            answer has been automatically flagged as plagiarism.
+          </Typography>
+        </ContentContainer>
+      )}
       <ContentContainer>
         <AnswerOverView answer={answer} />
       </ContentContainer>

@@ -92,16 +92,31 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
           className="button-reject"
           onClick={() => handleAcceptOrReject(answer.id, "rejected")}
         >
-          <Typography>Reject</Typography>
+          {answer.plagiarismDetected == false ? (
+            <Typography>Reject</Typography>
+          ) : (
+            <Typography>Reject as not plagiarism</Typography>
+          )}
         </Button>
-        <Button
-          className="button-plagiarism"
-          onClick={() => {
-            handleAcceptOrReject(answer.id, "rejected", true)
-          }}
-        >
-          <Typography>Suspect plagiarism</Typography>
-        </Button>
+        {answer.plagiarismDetected == false ? (
+          <Button
+            className="button-plagiarism"
+            onClick={() => {
+              handleAcceptOrReject(answer.id, "rejected", true)
+            }}
+          >
+            <Typography>Suspect plagiarism</Typography>
+          </Button>
+        ) : (
+          <Button
+            className="button-plagiarism"
+            onClick={() => {
+              handleAcceptOrReject(answer.id, "rejected", true)
+            }}
+          >
+            <Typography>Confirm plagiarism</Typography>
+          </Button>
+        )}
       </ButtonFieldWrapper>
     </>
   )
