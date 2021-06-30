@@ -11,9 +11,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import OverView from "../quizPages/overview"
 import EditPage from "../quizPages/edit"
 import AllAnswers from "../quizPages/answers/all"
-import RequiringAttention, {
-  FlaggedAsPlagiarism,
-} from "../quizPages/answers/requiring-attention"
+import RequiringAttention from "../quizPages/answers/requiring-attention"
+import FlaggedAsPlagiarism from "../quizPages/answers/flagged-as-plagiarism"
 import { ITabToComponent } from "../CoursePage/types"
 import { AnswerListProvider } from "../../contexts/AnswerListContext"
 import { useQuiz } from "../../hooks/useQuiz"

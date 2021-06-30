@@ -48,6 +48,7 @@ class QuizAnswer extends mixin(BaseModel, [
   status!: QuizAnswerStatus
   itemAnswers!: QuizItemAnswer[]
   user!: User
+  plagiarismDetected: boolean
   peerReviews!: PeerReview[]
   userQuizState!: UserQuizState
   quiz!: Quiz

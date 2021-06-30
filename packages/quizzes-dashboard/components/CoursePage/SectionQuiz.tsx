@@ -98,7 +98,7 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
                     href={`/quizzes/${quiz.id}/answers-flagged-as-plagiarism`}
                   >
                     <Button variant="outlined">
-                      <Typography>Answers requiring attention</Typography>
+                      <Typography>Answers flagged as plagiarism</Typography>
                     </Button>
                   </Link>
                 </Badge>

@@ -6,6 +6,7 @@ export interface Answer {
   userId: number
   languageId: string
   status: string
+  plagiarismDetected: boolean
   createdAt: string
   updatedAt: string
   userQuizState: UserQuizState
