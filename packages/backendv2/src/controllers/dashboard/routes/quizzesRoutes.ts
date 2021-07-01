@@ -41,6 +41,20 @@ const quizzesRoutes = new Router<CustomState, CustomContext>({
     },
   )
 
+  .get(
+    "/:quizId/count-answers-flagged-as-plagiarism",
+    accessControl(),
+    async ctx => {
+      const quizId = ctx.params.quizId
+      const quiz = await Quiz.getById(quizId)
+      await checkAccessOrThrow(ctx.state.user, quiz.courseId, "view")
+      const flaggedAsPlagiarism = await QuizAnswer.getFlaggedAsPlagiarismCountByQuizId(
+        quizId,
+      )
+      ctx.body = flaggedAsPlagiarism
+    },
+  )
+
   .post("/:quizId/download-quiz-info", accessControl(), async ctx => {
     const quizId = ctx.params.quizId
     const { courseId } = ctx.request.body

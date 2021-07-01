@@ -7,6 +7,7 @@ import { useUserAbilities } from "../../hooks/useUserAbilities"
 interface quizProps {
   quiz: Quiz
   requiringAttention: number
+  flaggedAsPlagiarism: number
 }
 
 const TitleWrapper = styled.div`
@@ -56,7 +57,11 @@ const QuizLink = styled.a`
   cursor: pointer;
 `
 
-export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
+export const QuizOfSection = ({
+  quiz,
+  requiringAttention,
+  flaggedAsPlagiarism,
+}: quizProps) => {
   const title = quiz.title
   const types = Array.from(new Set(quiz.items.map(item => item.type)))
   const { userAbilities } = useUserAbilities(
@@ -91,8 +96,8 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
                 </Badge>
                 <Badge
                   color="error"
-                  badgeContent={requiringAttention}
-                  invisible={requiringAttention === undefined}
+                  badgeContent={flaggedAsPlagiarism}
+                  invisible={flaggedAsPlagiarism === undefined}
                 >
                   <Link
                     href={`/quizzes/${quiz.id}/answers-flagged-as-plagiarism`}

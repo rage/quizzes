@@ -21,6 +21,7 @@ import { useUserAbilities } from "../../hooks/useUserAbilities"
 import { TabTextError, TabTextLoading } from "../quizPages/TabHeaders"
 import SkeletonLoader from "../Shared/SkeletonLoader"
 import { useAnswersRequiringAttentionCount } from "../../hooks/useAnswersRequiringAttention"
+import { useAnswersFlaggedAsPlagiarismCount } from "../../hooks/useAnswersFlaggedAsPlagiarism"
 
 export const TabNavigator = () => {
   const router = useRouter()
@@ -30,7 +31,7 @@ export const TabNavigator = () => {
   /* tokens passed to hooks are for swr caching  */
   const { quiz, quizLoading, quizError } = useQuiz(quizId, `quiz-${quizId}}`)
   const { course, courseLoading, courseError } = useCourse(
-    quiz?.courseId ?? "",
+    quiz?.courattentseId ?? "",
     "course",
   )
   const {
@@ -43,6 +44,11 @@ export const TabNavigator = () => {
     requiringAttentionLoading,
     requiringAttentionError,
   } = useAnswersRequiringAttentionCount(quizId, "requiring-attention")
+  const {
+    flaggedAsPlagiarism,
+    flaggedAsPlagiarismLoading,
+    flaggedAsPlagiarismError,
+  } = useAnswersFlaggedAsPlagiarismCount(quizId, "flagged-as-plagiarism")
 
   const [currentTab, setCurrentTab] = useState("overview")
 
@@ -67,10 +73,15 @@ export const TabNavigator = () => {
     quizLoading ||
     userAbilitiesLoading ||
     courseLoading ||
-    requiringAttentionLoading
+    requiringAttentionLoading ||
+    flaggedAsPlagiarismLoading
 
   const errorFetchingData =
-    quizError || courseError || userAbilitiesError || requiringAttentionError
+    quizError ||
+    courseError ||
+    userAbilitiesError ||
+    requiringAttentionError ||
+    flaggedAsPlagiarismError
 
   const ComponentTag = quizTabs[currentTab]
     ? quizTabs[currentTab]
@@ -141,7 +152,7 @@ export const TabNavigator = () => {
           label={
             <Badge
               variant="standard"
-              badgeContent={requiringAttention}
+              badgeContent={flaggedAsPlagiarism}
               color="error"
             >
               <Typography>Answers flagged as plagiarism</Typography>

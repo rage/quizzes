@@ -48,7 +48,7 @@ class QuizAnswer extends mixin(BaseModel, [
   status!: QuizAnswerStatus
   itemAnswers!: QuizItemAnswer[]
   user!: User
-  plagiarismDetected: boolean
+  plagiarismDetected!: boolean
   peerReviews!: PeerReview[]
   userQuizState!: UserQuizState
   quiz!: Quiz
@@ -507,10 +507,42 @@ class QuizAnswer extends mixin(BaseModel, [
     return countByQuizId
   }
 
+  public static async getFlaggedAsPlagiarismCountsByCourseId(courseId: string) {
+    // validate course id
+    try {
+      await Course.getFlattenedById(courseId)
+    } catch (error) {
+      throw error
+    }
+
+    const counts: any[] = await this.query()
+      .select(["quiz_id"])
+      .join("quiz", "quiz_answer.quiz_id", "=", "quiz.id")
+      .where("course_id", courseId)
+      .andWhere("plagiarism_deteted", true)
+      .count()
+      .groupBy("quiz_id")
+    const countByQuizId: {
+      [quizId: string]: number
+    } = {}
+    for (const count of counts) {
+      countByQuizId[count.quizId] = count.count
+    }
+    console.log("count", countByQuizId)
+    return countByQuizId
+  }
+
   public static async getManualReviewCountByQuizId(quizId: string) {
     return await this.query()
       .where("quiz_id", quizId)
       .andWhere("status", "manual-review")
+      .resultSize()
+  }
+
+  public static async getFlaggedAsPlagiarismCountByQuizId(quizId: string) {
+    return await this.query()
+      .where("quiz_id", quizId)
+      .andWhere("plagiarism_detected", true)
       .resultSize()
   }
 

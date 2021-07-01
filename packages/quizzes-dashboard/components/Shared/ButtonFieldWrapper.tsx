@@ -31,12 +31,23 @@ export const ButtonFieldWrapper = styled.div`
       color: #000;
     }
   }
-  .button-plagiarism {
+  .button-suspect-plagiarism {
     background-color: #b26500;
     color: white;
 
     :hover {
       background-color: #b26500;
+      opacity: 0.6;
+      color: #000;
+    }
+  }
+
+  .button-reject-not-plagiarism {
+    background-color: #ff6f00;
+    color: white;
+
+    :hover {
+      background-color: #ff6f00;
       opacity: 0.6;
       color: #000;
     }

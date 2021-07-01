@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react"
-import { Button, Typography, Snackbar, Slide } from "@material-ui/core"
+import { Button, Typography, Snackbar, Slide, Tooltip } from "@material-ui/core"
 import styled from "styled-components"
 import { Answer } from "../../../types/Answer"
+import { withStyles, makeStyles } from "@material-ui/core/styles"
+
 import {
   changeAnswerStatus,
   logSuspectedPlagiarism,
@@ -20,6 +22,13 @@ export const RejectButton = styled(Button)`
   border-color: red !important;
   border-width: 5px !important;
 `
+
+const StyledTooltip = withStyles(theme => ({
+  tooltip: {
+    boxShadow: theme.shadows[1],
+    fontSize: "0.9rem",
+  },
+}))(Tooltip)
 
 export interface ManualReviewProps {
   answer: Answer
@@ -60,6 +69,7 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
       setSuccess(false)
     }
   }
+
   return (
     <>
       <Snackbar
@@ -88,19 +98,26 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
         >
           <Typography>Accept</Typography>
         </Button>
-        <Button
-          className="button-reject"
-          onClick={() => handleAcceptOrReject(answer.id, "rejected")}
-        >
-          {answer.plagiarismDetected == false ? (
-            <Typography>Reject</Typography>
-          ) : (
-            <Typography>Reject as not plagiarism</Typography>
-          )}
-        </Button>
         {answer.plagiarismDetected == false ? (
           <Button
-            className="button-plagiarism"
+            className="button-reject"
+            onClick={() => handleAcceptOrReject(answer.id, "rejected")}
+          >
+            <Typography>Reject</Typography>
+          </Button>
+        ) : (
+          <StyledTooltip title="Answer is plagiarized and will be rejected.">
+            <Button
+              className="button-reject"
+              onClick={() => handleAcceptOrReject(answer.id, "rejected")}
+            >
+              <Typography>Plagiarized</Typography>
+            </Button>
+          </StyledTooltip>
+        )}
+        {answer.plagiarismDetected == false ? (
+          <Button
+            className="button-suspect-plagiarism"
             onClick={() => {
               handleAcceptOrReject(answer.id, "rejected", true)
             }}
@@ -108,14 +125,16 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
             <Typography>Suspect plagiarism</Typography>
           </Button>
         ) : (
-          <Button
-            className="button-plagiarism"
-            onClick={() => {
-              handleAcceptOrReject(answer.id, "rejected", true)
-            }}
-          >
-            <Typography>Confirm plagiarism</Typography>
-          </Button>
+          <StyledTooltip title="Answer is not plagiarized but not acceptable. Answer will be rejected.">
+            <Button
+              className="button-reject-not-plagiarism"
+              onClick={() => {
+                handleAcceptOrReject(answer.id, "rejected", true)
+              }}
+            >
+              <Typography>Reject</Typography>
+            </Button>
+          </StyledTooltip>
         )}
       </ButtonFieldWrapper>
     </>

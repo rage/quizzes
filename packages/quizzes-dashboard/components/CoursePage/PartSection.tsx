@@ -7,12 +7,14 @@ interface sectionProps {
   section: string
   quizzes: Quiz[]
   requiringAttention: { [quizId: string]: number }
+  flaggedAsPlagiarism: { [quizId: string]: number }
 }
 
 export const SectionOfPart = ({
   section,
   quizzes,
   requiringAttention,
+  flaggedAsPlagiarism,
 }: sectionProps) => {
   return (
     <>
@@ -23,6 +25,7 @@ export const SectionOfPart = ({
             key={quiz.id}
             quiz={quiz}
             requiringAttention={requiringAttention[quiz.id!]}
+            flaggedAsPlagiarism={flaggedAsPlagiarism[quiz.id!]}
           />
         )
       })}

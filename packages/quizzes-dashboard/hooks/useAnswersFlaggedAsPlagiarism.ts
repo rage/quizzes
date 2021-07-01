@@ -13,7 +13,6 @@ export const useAnswersFlaggedAsPlagiarismCount = (
   token: string,
 ) => {
   const { data, error } = useSWR([quizId, token], countFetcher)
-
   return {
     flaggedAsPlagiarism: data,
     flaggedAsPlagiarismLoading: !error && data === undefined,

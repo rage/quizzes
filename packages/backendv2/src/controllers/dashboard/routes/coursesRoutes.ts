@@ -47,6 +47,19 @@ const coursesRoutes = new Router<CustomState, CustomContext>({
       ctx.body = await QuizAnswer.getManualReviewCountsByCourseId(courseId)
     },
   )
+
+  .get(
+    "/:courseId/count-answers-flagged-as-plagiarism",
+    accessControl(),
+    async ctx => {
+      const courseId = ctx.params.courseId
+      await checkAccessOrThrow(ctx.state.user, courseId, "view")
+      ctx.body = await QuizAnswer.getFlaggedAsPlagiarismCountsByCourseId(
+        courseId,
+      )
+    },
+  )
+
   .post("/:courseId/duplicate-course", accessControl(), async ctx => {
     const oldCourseId = ctx.params.courseId
     const name = ctx.request.body.name

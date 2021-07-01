@@ -299,6 +299,24 @@ export const getAnswersRequiringAttentionCounts = async (
   throw new Error()
 }
 
+export const getAnswersFlaggedAsPlagiarismCounts = async (
+  courseId: string,
+): Promise<{ [quizId: string]: number }> => {
+  const userInfo = checkStore()
+  if (userInfo && courseId) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (
+      await api.get(
+        `/courses/${courseId}/count-answers-flagged-as-plagiarism`,
+        config,
+      )
+    ).data
+  }
+  throw new Error()
+}
+
 export const getUsersAbilities = async (): Promise<{
   [courseId: string]: string[]
 }> => {
@@ -353,7 +371,7 @@ export const getAnswersFlaggedAsPlagiarismByQuizId = async (
     }
     return (
       await api.get(
-        `/quizzes/${quizId}/count-answers-requiring-attention`,
+        `/quizzes/${quizId}/count-answers-flagged-as-plagiarism`,
         config,
       )
     ).data

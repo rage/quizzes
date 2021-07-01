@@ -1,6 +1,7 @@
 import React from "react"
 import {
   fetchCourseQuizzes,
+  getAnswersFlaggedAsPlagiarismCounts,
   getAnswersRequiringAttentionCounts,
   getUserAbilitiesForCourse,
 } from "../../services/quizzes"
@@ -40,6 +41,10 @@ export const CoursePage = () => {
   const [data, error] = usePromise(() => fetchCourseQuizzes(id), [id])
   const [answersRequiringAttention, answersError] = usePromise(
     () => getAnswersRequiringAttentionCounts(id),
+    [id],
+  )
+  const [answersFlaggedAsPlagiarism, plagAnswersError] = usePromise(
+    () => getAnswersFlaggedAsPlagiarismCounts(id),
     [id],
   )
   const [userAbilities, userError] = usePromise(
@@ -86,6 +91,7 @@ export const CoursePage = () => {
   }
 
   const requiringAttention = answersRequiringAttention
+  const flaggedAsPlagiarism = answersFlaggedAsPlagiarism
   const quizzes = data.quizzes
   const course = data.course
   const byPart = groupBy(quizzes, "part")
@@ -131,6 +137,7 @@ export const CoursePage = () => {
                 section={section}
                 quizzes={quizzes}
                 requiringAttention={requiringAttention}
+                flaggedAsPlagiarism={flaggedAsPlagiarism}
               />
             )
           })}

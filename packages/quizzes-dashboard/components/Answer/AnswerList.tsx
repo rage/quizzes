@@ -118,7 +118,7 @@ export const AnswerList = ({ data }: AnswerListProps) => {
               <Typography>Reject all</Typography>
             </Button>
             <Button
-              className="button-plagiarism"
+              className="button-suspect-plagiarism"
               onClick={() => handleBulkAction("rejected", true)}
             >
               {" "}
