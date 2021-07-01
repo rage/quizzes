@@ -168,7 +168,7 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
           </ButtonWrapper>
         </ButtonContainer>
       </ContentContainer>
-      {answer.plagiarismDetected == true && (
+      {answer.plagiarismCheckStatus == "plagiarism-suspected" && (
         <ContentContainer>
           <Typography color="error" align="left">
             <FontAwesomeIcon icon={faExclamation}></FontAwesomeIcon> &nbsp;This

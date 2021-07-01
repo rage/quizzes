@@ -38,6 +38,12 @@ type QuizAnswerStatus =
   | "rejected"
   | "deprecated"
 
+type PlagiarismCheckStatus =
+  | "plagiarism-suspected"
+  | "plagiarism-not-suspected"
+  | "not-started"
+  | "in-progress"
+
 class QuizAnswer extends mixin(BaseModel, [
   softDelete({ columnName: "deleted" }),
 ]) {
@@ -48,7 +54,7 @@ class QuizAnswer extends mixin(BaseModel, [
   status!: QuizAnswerStatus
   itemAnswers!: QuizItemAnswer[]
   user!: User
-  plagiarismDetected!: boolean
+  plagiarismCheckStatus!: PlagiarismCheckStatus
   peerReviews!: PeerReview[]
   userQuizState!: UserQuizState
   quiz!: Quiz
@@ -344,7 +350,7 @@ class QuizAnswer extends mixin(BaseModel, [
   ) {
     const paginated = await this.query()
       .where("quiz_id", quizId)
-      .andWhere("plagiarism_detected", true)
+      .andWhere("plagiarism_check_status", "plagiarism-suspected")
       .orderBy([{ column: "created_at", order: order }])
       .page(page, pageSize)
       .withGraphFetched("userQuizState")
@@ -519,7 +525,7 @@ class QuizAnswer extends mixin(BaseModel, [
       .select(["quiz_id"])
       .join("quiz", "quiz_answer.quiz_id", "=", "quiz.id")
       .where("course_id", courseId)
-      .andWhere("plagiarism_deteted", true)
+      .andWhere("plagiarism_check_status", "plagiarism-suspected")
       .count()
       .groupBy("quiz_id")
     const countByQuizId: {
@@ -542,7 +548,7 @@ class QuizAnswer extends mixin(BaseModel, [
   public static async getFlaggedAsPlagiarismCountByQuizId(quizId: string) {
     return await this.query()
       .where("quiz_id", quizId)
-      .andWhere("plagiarism_detected", true)
+      .andWhere("plagiarism_check_status", "plagiarism-suspected")
       .resultSize()
   }
 

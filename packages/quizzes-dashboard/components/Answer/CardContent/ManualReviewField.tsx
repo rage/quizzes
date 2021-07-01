@@ -98,7 +98,7 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
         >
           <Typography>Accept</Typography>
         </Button>
-        {answer.plagiarismDetected == false ? (
+        {answer.plagiarismCheckStatus !== "plagiarism-suspected" ? (
           <Button
             className="button-reject"
             onClick={() => handleAcceptOrReject(answer.id, "rejected")}
@@ -115,7 +115,7 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
             </Button>
           </StyledTooltip>
         )}
-        {answer.plagiarismDetected == false ? (
+        {answer.plagiarismCheckStatus !== "plagiarism-suspected" ? (
           <Button
             className="button-suspect-plagiarism"
             onClick={() => {
