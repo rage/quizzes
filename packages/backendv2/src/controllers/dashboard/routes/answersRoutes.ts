@@ -49,6 +49,34 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     ctx.body = quizAnswer
   })
 
+  .post("/:answerId/plagiarism-status", accessControl(), async ctx => {
+    const answerId = ctx.params.answerId
+    const courseId = await getCourseIdByAnswerId(answerId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "grade")
+    const { status, plagiarismStatus } = ctx.request.body
+    const modifierId = ctx.state.user.id
+
+    const quizAnswer = await QuizAnswer.setManualReviewStatus(answerId, status)
+
+    // log status change
+    const operation = getPlagiarismStatusChangeOperation(
+      status,
+      plagiarismStatus,
+    )
+
+    await knex.transaction(
+      async trx =>
+        await QuizAnswerStatusModification.logStatusChange(
+          answerId,
+          operation,
+          trx,
+          modifierId,
+        ),
+    )
+
+    ctx.body = quizAnswer
+  })
+
   .post("/status", accessControl(), async ctx => {
     const { status, answerIds, plagiarismSuspected } = ctx.request.body
     const modifierId = ctx.state.user.id

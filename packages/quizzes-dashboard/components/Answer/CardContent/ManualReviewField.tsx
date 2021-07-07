@@ -7,6 +7,7 @@ import { withStyles, makeStyles } from "@material-ui/core/styles"
 import {
   changeAnswerStatus,
   logSuspectedPlagiarism,
+  changeAnswerPlagiarismStatus,
 } from "../../../services/quizzes"
 import { Alert } from "@material-ui/lab"
 import { TransitionProps } from "@material-ui/core/transitions"
@@ -48,26 +49,48 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
     answerId: string,
     status: string,
     plagiarismSuspected = false,
+    plagiarismConfirmed = false,
   ) => {
-    try {
-      const res = await changeAnswerStatus(
-        answerId,
-        status,
-        plagiarismSuspected,
-      )
-      if (res.status === status) {
-        mutate()
-        setSuccess(true)
+    if (!plagiarismConfirmed)
+      try {
+        const res = await changeAnswerStatus(
+          answerId,
+          status,
+          plagiarismSuspected,
+        )
+        if (res.status === status) {
+          mutate()
+          setSuccess(true)
+          setShowSnacks(true)
+          dispatch(setHandledAnswers([res]))
+        } else {
+          setSuccess(false)
+          setShowSnacks(true)
+        }
+      } catch (e) {
         setShowSnacks(true)
-        dispatch(setHandledAnswers([res]))
-      } else {
         setSuccess(false)
-        setShowSnacks(true)
       }
-    } catch (e) {
-      setShowSnacks(true)
-      setSuccess(false)
-    }
+    else
+      try {
+        const res = await changeAnswerPlagiarismStatus(
+          answerId,
+          status,
+          "confirmed-plagiarism",
+        )
+        if (res.status === status) {
+          mutate()
+          setSuccess(true)
+          setShowSnacks(true)
+          dispatch(setHandledAnswers([res]))
+        } else {
+          setSuccess(false)
+          setShowSnacks(true)
+        }
+      } catch (e) {
+        setShowSnacks(true)
+        setSuccess(false)
+      }
   }
 
   return (
@@ -103,13 +126,15 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
             className="button-reject"
             onClick={() => handleAcceptOrReject(answer.id, "rejected")}
           >
-            <Typography>Reject</Typography>
+            <Typography>Reject</Typography>false
           </Button>
         ) : (
           <StyledTooltip title="Answer is plagiarized and will be rejected.">
             <Button
               className="button-reject"
-              onClick={() => handleAcceptOrReject(answer.id, "rejected")}
+              onClick={() =>
+                handleAcceptOrReject(answer.id, "rejected", false, true)
+              }
             >
               <Typography>Plagiarized</Typography>
             </Button>
@@ -129,7 +154,7 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
             <Button
               className="button-reject-not-plagiarism"
               onClick={() => {
-                handleAcceptOrReject(answer.id, "rejected", true)
+                handleAcceptOrReject(answer.id, "rejected", false)
               }}
             >
               <Typography>Reject</Typography>
