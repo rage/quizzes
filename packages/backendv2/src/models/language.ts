@@ -1,6 +1,8 @@
 import BaseModel from "./base_model"
 
 class Language extends BaseModel {
+  name!: string
+  
   static get tableName() {
     return "language"
   }
