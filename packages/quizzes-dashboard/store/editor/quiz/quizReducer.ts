@@ -149,7 +149,9 @@ export const quizReducer = createReducer<
 
   .handleAction(createdNewPeerReview, (state, action) => {
     return produce(state, draftState => {
-      draftState[action.payload.quizId].peerReviews.push(action.payload.newId)
+      draftState[action.payload.quizId].peerReviewCollections.push(
+        action.payload.newId,
+      )
     })
   })
 
