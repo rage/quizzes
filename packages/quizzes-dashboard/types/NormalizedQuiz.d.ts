@@ -34,7 +34,7 @@ export interface NormalizedQuiz {
   grantPointsPolicy: string
   autoReject: boolean
   items: string[]
-  peerReviews: any[]
+  peerReviewCollections: any[]
   course: string
   title: string
   body: string
