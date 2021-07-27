@@ -583,7 +583,9 @@ class QuizAnswer extends mixin(BaseModel, [
       }
       await trx.commit()
       quiz.course = course
-      await this.relayData(savedQuizAnswer, quiz)
+      if (quiz.checkPlagiarism) {
+        await this.relayData(savedQuizAnswer, quiz)
+      }
       return {
         quiz,
         quizAnswer: savedQuizAnswer,
@@ -609,7 +611,6 @@ class QuizAnswer extends mixin(BaseModel, [
             quizItemAnswerId: itemAnswer.id,
             language: language.name.split(" ")[0].toLowerCase(),
             data: itemAnswer.textData,
-            returnUrl: process.env.RETURN_URL || ""
           })
         }
       }
