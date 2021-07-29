@@ -146,6 +146,11 @@ export const editedQuizItemFeedbackDisplayPolicy = createAction(
   newPolicy: "DisplayFeedbackOnQuizItem" | "DisplayFeedbackOnAllOptions"
 }>()
 
+export const editedQuizItemPrefaceTitle = createAction(
+  "EDITED_QUIZ_ITEM_PREFACE_TITLE",
+  (itemId: string, newPrefaceTitle: string) => ({ itemId, newPrefaceTitle }),
+)<{ itemId: string; newPrefaceTitle: string }>()
+
 export const itemActions = [
   editedQuizItemBody,
   editedQuizItemTitle,
@@ -167,6 +172,7 @@ export const itemActions = [
   toggledAllAnswersCorrect,
   editedItemDirection,
   editedQuizItemFeedbackDisplayPolicy,
+  editedQuizItemPrefaceTitle,
 ]
 
 export default itemActions
