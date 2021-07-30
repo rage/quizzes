@@ -19,6 +19,7 @@ import {
   toggledAllAnswersCorrect,
   editedItemDirection,
   editedQuizItemFeedbackDisplayPolicy,
+  editedQuizItemPrefaceTitle,
 } from "./itemAction"
 import {
   initializedEditor,
@@ -132,6 +133,13 @@ export const itemReducer = createReducer<
     })
   })
 
+  .handleAction(editedQuizItemPrefaceTitle, (state, action) => {
+    return produce(state, draftState => {
+      draftState[action.payload.itemId].prefaceTitle =
+        action.payload.newPrefaceTitle
+    })
+  })
+
   .handleAction(createdNewItem, (state, action) => {
     return produce(state, draftState => {
       const newItem: NormalizedItem = {
@@ -158,6 +166,7 @@ export const itemReducer = createReducer<
         allAnswersCorrect: false,
         direction: "row",
         feedbackDisplayPolicy: "DisplayFeedbackOnQuizItem",
+        prefaceTitle: null,
       }
       draftState[action.payload.itemId] = newItem
     })

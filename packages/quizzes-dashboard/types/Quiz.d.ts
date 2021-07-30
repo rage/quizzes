@@ -50,7 +50,7 @@ export interface Item {
   feedbackDisplayPolicy:
     | "DisplayFeedbackOnQuizItem"
     | "DisplayFeedbackOnAllOptions"
-  prefaceTitle: string
+  prefaceTitle: string | null
 }
 
 export interface Option {

@@ -67,7 +67,7 @@ export interface NormalizedItem {
   feedbackDisplayPolicy:
     | "DisplayFeedbackOnQuizItem"
     | "DisplayFeedbackOnAllOptions"
-  prefaceTitle: string
+  prefaceTitle: string | null
 }
 
 export interface NormalizedOption {
