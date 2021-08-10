@@ -50,26 +50,26 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
     plagiarismSuspected = false,
     plagiarismConfirmed = false,
   ) => {
-      try {
-        const res = await changeAnswerStatus(
-          answerId,
-          status,
-          plagiarismSuspected,
-          plagiarismConfirmed,
-        )
-        if (res.status === status) {
-          mutate()
-          setSuccess(true)
-          setShowSnacks(true)
-          dispatch(setHandledAnswers([res]))
-        } else {
-          setSuccess(false)
-          setShowSnacks(true)
-        }
-      } catch (e) {
+    try {
+      const res = await changeAnswerStatus(
+        answerId,
+        status,
+        plagiarismSuspected,
+        plagiarismConfirmed,
+      )
+      if (res.status === status) {
+        mutate()
+        setSuccess(true)
         setShowSnacks(true)
+        dispatch(setHandledAnswers([res]))
+      } else {
         setSuccess(false)
-      
+        setShowSnacks(true)
+      }
+    } catch (e) {
+      setShowSnacks(true)
+      setSuccess(false)
+    }
   }
 
   return (
