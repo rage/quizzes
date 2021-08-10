@@ -1,5 +1,8 @@
 import Knex from "knex"
-import { TStatusModificationOperation } from "./../types/index"
+import {
+  PlagStatusModificationOperation,
+  TStatusModificationOperation,
+} from "./../types/index"
 import BaseModel from "./base_model"
 import User from "./user"
 
@@ -8,6 +11,7 @@ class QuizAnswerStatusModification extends BaseModel {
   quizAnswerId!: string
   modifierId!: number
   operation!: TStatusModificationOperation
+  plagiarismStatus!: PlagStatusModificationOperation
 
   static get tableName() {
     return "quiz_answer_status_modification"
@@ -49,6 +53,7 @@ class QuizAnswerStatusModification extends BaseModel {
   static async logStatusChange(
     quizAnswerId: string,
     operation: TStatusModificationOperation,
+    plagiarismStatus: PlagStatusModificationOperation,
     trx: Knex.Transaction,
     modifierId?: number,
   ) {
@@ -57,6 +62,7 @@ class QuizAnswerStatusModification extends BaseModel {
         quizAnswerId,
         modifierId,
         operation,
+        plagiarismStatus,
       }),
     )
   }

@@ -211,6 +211,7 @@ export const changeAnswerStatus = async (
   answerId: string,
   status: string,
   plagiarismSuspected: boolean,
+  plagiarismConfirmed: boolean,
 ): Promise<Answer> => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -220,29 +221,7 @@ export const changeAnswerStatus = async (
     const response = (
       await api.post(
         `/answers/${answerId}/status`,
-        { status, plagiarismSuspected },
-        config,
-      )
-    ).data
-    return response
-  }
-  throw new Error()
-}
-
-export const changeAnswerPlagiarismStatus = async (
-  answerId: string,
-  status: string,
-  plagiarismStatus: string,
-): Promise<Answer> => {
-  const userInfo = checkStore()
-  if (userInfo) {
-    const config = {
-      headers: { Authorization: "bearer " + userInfo.accessToken },
-    }
-    const response = (
-      await api.post(
-        `/answers/${answerId}/plagiarism-status`,
-        { status, plagiarismStatus },
+        { status, plagiarismSuspected, plagiarismConfirmed },
         config,
       )
     ).data

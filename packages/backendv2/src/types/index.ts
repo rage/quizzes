@@ -154,3 +154,7 @@ export type TStatusModificationOperation =
   | "peer-review-accept"
   | "peer-review-reject"
   | "peer-review-spam"
+
+export type PlagStatusModificationOperation =
+  | "confirmed-plagiarism"
+  | "not-plagiarism"

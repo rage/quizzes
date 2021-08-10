@@ -44,6 +44,11 @@ type PlagiarismCheckStatus =
   | "not-started"
   | "in-progress"
 
+type PlagiarismStatus =
+  | "not-decided"
+  | "confirmed-plagiarism"
+  | "not-plagiarism"
+
 class QuizAnswer extends mixin(BaseModel, [
   softDelete({ columnName: "deleted" }),
 ]) {
@@ -55,6 +60,7 @@ class QuizAnswer extends mixin(BaseModel, [
   itemAnswers!: QuizItemAnswer[]
   user!: User
   plagiarismCheckStatus!: PlagiarismCheckStatus
+  plagiarismStatus!: PlagiarismStatus
   peerReviews!: PeerReview[]
   userQuizState!: UserQuizState
   quiz!: Quiz
@@ -458,6 +464,67 @@ class QuizAnswer extends mixin(BaseModel, [
       }
 
       quizAnswer = await quizAnswer.$query(trx).patchAndFetch({ status })
+
+      await UserQuizState.upsert(userQuizState, trx)
+      await UserCoursePartState.update(
+        quizAnswer.userId,
+        quiz.courseId,
+        quiz.part,
+        trx,
+      )
+
+      await Kafka.broadcastQuizAnswerUpdated(
+        quizAnswer,
+        userQuizState,
+        quiz,
+        trx,
+      )
+
+      await Kafka.broadcastUserProgressUpdated(
+        quizAnswer.userId,
+        quiz.courseId,
+        trx,
+      )
+
+      await trx.commit()
+
+      return quizAnswer
+    } catch (error) {
+      await trx.rollback()
+      throw error
+    }
+  }
+
+  public static async setPlagiarismStatus(
+    answerId: string,
+    plagiarismStatus: PlagiarismStatus,
+  ) {
+    const trx = await knex.transaction()
+    try {
+      // get quizAnswer by provided id
+      let quizAnswer = (
+        await this.query(trx)
+          .where("quiz_answer.id", answerId)
+          .withGraphJoined("userQuizState")
+          .withGraphJoined("quiz")
+      )[0]
+      const userQuizState = quizAnswer.userQuizState
+      const quiz = quizAnswer.quiz
+
+      const triesAreNotLimited = !quiz.triesLimited
+      const userHasTriesLeft = userQuizState.tries < quiz.tries
+
+      if (status === "confirmed") {
+        await userQuizState.$query(trx).patch({ pointsAwarded: quiz.points })
+      } else if (triesAreNotLimited || userHasTriesLeft) {
+        await userQuizState
+          .$query(trx)
+          .patch({ peerReviewsReceived: 0, spamFlags: 0, status: "open" })
+      }
+
+      quizAnswer = await quizAnswer
+        .$query(trx)
+        .patchAndFetch({ plagiarismStatus })
 
       await UserQuizState.upsert(userQuizState, trx)
       await UserCoursePartState.update(

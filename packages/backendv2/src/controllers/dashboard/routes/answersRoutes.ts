@@ -21,6 +21,21 @@ const getStatusChangeOperation = (
     : "teacher-reject"
 }
 
+const getPlagiarismStatusChangeOperation = (
+  status: string,
+  plagiarismConfirmed: boolean,
+) => {
+  return plagiarismConfirmed
+    ? "teacher-reject"
+    : status === "confirmed"
+    ? "teacher-accept"
+    : "teacher-reject"
+}
+
+const getPlagiarismConfirmedStatus = (plagiarismConfirmed: boolean) => {
+  return plagiarismConfirmed ? "confirmed-plagiarism" : "not-plagiarism"
+}
+
 const answersRoutes = new Router<CustomState, CustomContext>({
   prefix: "/answers",
 })
@@ -28,7 +43,11 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "grade")
-    const { status, plagiarismSuspected } = ctx.request.body
+    const {
+      status,
+      plagiarismSuspected,
+      plagiarismConfirmed,
+    } = ctx.request.body
     const modifierId = ctx.state.user.id
 
     const quizAnswer = await QuizAnswer.setManualReviewStatus(answerId, status)
@@ -36,11 +55,15 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     // log status change
     const operation = getStatusChangeOperation(status, plagiarismSuspected)
 
+    // plagiarism status "not-plagiarism" or "confirmed-plagiarism"
+    const plagiarismStatus = getPlagiarismConfirmedStatus(plagiarismConfirmed)
+
     await knex.transaction(
       async trx =>
         await QuizAnswerStatusModification.logStatusChange(
           answerId,
           operation,
+          plagiarismStatus,
           trx,
           modifierId,
         ),
@@ -69,6 +92,7 @@ const answersRoutes = new Router<CustomState, CustomContext>({
         await QuizAnswerStatusModification.logStatusChange(
           answerId,
           operation,
+          plagiarismStatus,
           trx,
           modifierId,
         ),
@@ -249,6 +273,7 @@ const answersRoutes = new Router<CustomState, CustomContext>({
         await QuizAnswerStatusModification.logStatusChange(
           answerId,
           "teacher-suspects-plagiarism",
+          "confirmed-plagiarism",
           trx,
           userId,
         ),

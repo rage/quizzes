@@ -7,7 +7,6 @@ import { withStyles, makeStyles } from "@material-ui/core/styles"
 import {
   changeAnswerStatus,
   logSuspectedPlagiarism,
-  changeAnswerPlagiarismStatus,
 } from "../../../services/quizzes"
 import { Alert } from "@material-ui/lab"
 import { TransitionProps } from "@material-ui/core/transitions"
@@ -51,12 +50,12 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
     plagiarismSuspected = false,
     plagiarismConfirmed = false,
   ) => {
-    if (!plagiarismConfirmed)
       try {
         const res = await changeAnswerStatus(
           answerId,
           status,
           plagiarismSuspected,
+          plagiarismConfirmed,
         )
         if (res.status === status) {
           mutate()
@@ -70,27 +69,7 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
       } catch (e) {
         setShowSnacks(true)
         setSuccess(false)
-      }
-    else
-      try {
-        const res = await changeAnswerPlagiarismStatus(
-          answerId,
-          status,
-          "confirmed-plagiarism",
-        )
-        if (res.status === status) {
-          mutate()
-          setSuccess(true)
-          setShowSnacks(true)
-          dispatch(setHandledAnswers([res]))
-        } else {
-          setSuccess(false)
-          setShowSnacks(true)
-        }
-      } catch (e) {
-        setShowSnacks(true)
-        setSuccess(false)
-      }
+      
   }
 
   return (
@@ -144,7 +123,7 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
           <Button
             className="button-suspect-plagiarism"
             onClick={() => {
-              handleAcceptOrReject(answer.id, "rejected", true)
+              handleAcceptOrReject(answer.id, "rejected", true, true)
             }}
           >
             <Typography>Suspect plagiarism</Typography>
@@ -154,7 +133,7 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
             <Button
               className="button-reject-not-plagiarism"
               onClick={() => {
-                handleAcceptOrReject(answer.id, "rejected", false)
+                handleAcceptOrReject(answer.id, "rejected")
               }}
             >
               <Typography>Reject</Typography>
