@@ -105,7 +105,7 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
             className="button-reject"
             onClick={() => handleAcceptOrReject(answer.id, "rejected")}
           >
-            <Typography>Reject</Typography>false
+            <Typography>Reject</Typography>
           </Button>
         ) : (
           <StyledTooltip title="Answer is plagiarized and will be rejected.">

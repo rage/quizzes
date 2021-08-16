@@ -870,6 +870,7 @@ class QuizAnswer extends mixin(BaseModel, [
   public static async logAnswerStatusChange(
     oldAnswerStatus: QuizAnswerStatus,
     newAnswerStatus: QuizAnswerStatus,
+    plagiarismStatus: PlagiarismStatus,
     quizAnswerId: string,
     trx: Knex.Transaction,
   ) {
@@ -891,6 +892,7 @@ class QuizAnswer extends mixin(BaseModel, [
         await QuizAnswerStatusModification.logStatusChange(
           quizAnswerId,
           operation,
+          plagiarismStatus,
           trx,
         )
       }
@@ -922,6 +924,7 @@ class QuizAnswer extends mixin(BaseModel, [
         await this.logAnswerStatusChange(
           quizAnswer.status,
           quizAnswerStatusAfterAssessment,
+          quizAnswer.plagiarismStatus,
           quizAnswer.id,
           trx,
         )

@@ -158,3 +158,4 @@ export type TStatusModificationOperation =
 export type PlagStatusModificationOperation =
   | "confirmed-plagiarism"
   | "not-plagiarism"
+  | "not-decided"
