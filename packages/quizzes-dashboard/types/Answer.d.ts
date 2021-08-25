@@ -7,10 +7,12 @@ export interface Answer {
   languageId: string
   status: string
   plagiarismCheckStatus: string
+  plagiarismStatus: string
   createdAt: string
   updatedAt: string
   userQuizState: UserQuizState
   itemAnswers: ItemAnswer[]
+  plagiarismSources: Answer[]
   peerReviews: PeerReview[]
   quiz: Quiz
   deleted: boolean

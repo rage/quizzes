@@ -109,6 +109,7 @@ export interface AnswerContentProps {
 export const AnswerContent = ({ answer }: AnswerContentProps) => {
   const [{ expandAll, handledAnswers }] = useAnswerListState()
   const [showMore, setShowMore] = useState(expandAll)
+  const [showSource, setShowSource] = useState(false)
   const [showPeerreviewModal, setShowPeerreviewModal] = useState(false)
   const [height, setHeight] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
@@ -185,14 +186,26 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
         </ContentContainer>
       </Collapse>
       <ContentContainer>
-        {answer.peerReviews.length > 0 && (
-          <PeerreviewButton
-            variant="outlined"
-            title=":D"
-            onClick={() => setShowPeerreviewModal(true)}
-          >
-            <Typography variant="subtitle2">Show Peerreviews</Typography>
-          </PeerreviewButton>
+        {answer.peerReviews.length > 0 &&
+          answer.plagiarismCheckStatus !== "plagiarism-suspected" && (
+            <PeerreviewButton
+              variant="outlined"
+              title=":D"
+              onClick={() => setShowPeerreviewModal(true)}
+            >
+              <Typography variant="subtitle2">Show Peerreviews</Typography>
+            </PeerreviewButton>
+          )}
+        {answer.plagiarismCheckStatus == "plagiarism-suspected" && (
+          <Collapse in={showSource} collapsedHeight={0}>
+            <ContentContainer>
+              {answer.plagiarismSources !== undefined &&
+                answer.plagiarismSources}
+              {answer.plagiarismSources == undefined && (
+                <Typography>sources undefined</Typography>
+              )}
+            </ContentContainer>
+          </Collapse>
         )}
       </ContentContainer>
       <StatButtonWrapper>
@@ -217,6 +230,29 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
             )}
           </>
         )}
+      </StatButtonWrapper>
+      <StatButtonWrapper>
+        {
+          <>
+            {showSource ? (
+              <Button
+                variant="outlined"
+                size="medium"
+                onClick={() => setShowSource(false)}
+              >
+                Hide source answer
+              </Button>
+            ) : (
+              <Button
+                variant="outlined"
+                size="medium"
+                onClick={() => setShowSource(true)}
+              >
+                Show source answer
+              </Button>
+            )}
+          </>
+        }
       </StatButtonWrapper>
       {editableAnswerStates.includes(answer.status) &&
         answer.quiz.peerReviewCollections.length > 0 && (

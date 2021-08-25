@@ -53,18 +53,18 @@ class QuizAnswerStatusModification extends BaseModel {
   static async logStatusChange(
     quizAnswerId: string,
     operation: TStatusModificationOperation,
-    plagiarismStatus: PlagStatusModificationOperation,
     trx: Knex.Transaction,
     modifierId?: number,
   ) {
-    await this.query(trx).insert(
-      this.fromJson({
-        quizAnswerId,
-        modifierId,
-        operation,
-        plagiarismStatus,
-      }),
-    )
+    await this.query(trx)
+      .insert(
+        this.fromJson({
+          quizAnswerId,
+          modifierId,
+          operation,
+        }),
+      )
+      .debug()
   }
 
   static async logStatusChangeForMany(

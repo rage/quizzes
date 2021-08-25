@@ -13,27 +13,15 @@ import {
 const getStatusChangeOperation = (
   status: string,
   plagiarismSuspected: boolean,
+  plagiarismConfirmed: boolean,
 ) => {
   return plagiarismSuspected
     ? "teacher-suspects-plagiarism"
     : status === "confirmed"
     ? "teacher-accept"
+    : plagiarismConfirmed
+    ? "teacher-reject-plagiarism"
     : "teacher-reject"
-}
-
-const getPlagiarismStatusChangeOperation = (
-  status: string,
-  plagiarismConfirmed: boolean,
-) => {
-  return plagiarismConfirmed
-    ? "teacher-reject"
-    : status === "confirmed"
-    ? "teacher-accept"
-    : "teacher-reject"
-}
-
-const getPlagiarismConfirmedStatus = (plagiarismConfirmed: boolean) => {
-  return plagiarismConfirmed ? "confirmed-plagiarism" : "not-plagiarism"
 }
 
 const answersRoutes = new Router<CustomState, CustomContext>({
@@ -50,49 +38,28 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     } = ctx.request.body
     const modifierId = ctx.state.user.id
 
-    const quizAnswer = await QuizAnswer.setManualReviewStatus(answerId, status)
+    const plagiarismStatus = plagiarismConfirmed
+      ? "confirmed-plagiarism"
+      : "not-plagiarism"
 
-    // log status change
-    const operation = getStatusChangeOperation(status, plagiarismSuspected)
-
-    // plagiarism status "not-plagiarism" or "confirmed-plagiarism"
-    const plagiarismStatus = getPlagiarismConfirmedStatus(plagiarismConfirmed)
-
-    await knex.transaction(
-      async trx =>
-        await QuizAnswerStatusModification.logStatusChange(
-          answerId,
-          operation,
-          plagiarismStatus,
-          trx,
-          modifierId,
-        ),
-    )
-
-    ctx.body = quizAnswer
-  })
-
-  .post("/:answerId/plagiarism-status", accessControl(), async ctx => {
-    const answerId = ctx.params.answerId
-    const courseId = await getCourseIdByAnswerId(answerId)
-    await checkAccessOrThrow(ctx.state.user, courseId, "grade")
-    const { status, plagiarismStatus } = ctx.request.body
-    const modifierId = ctx.state.user.id
-
-    const quizAnswer = await QuizAnswer.setManualReviewStatus(answerId, status)
-
-    // log status change
-    const operation = getPlagiarismStatusChangeOperation(
+    const quizAnswer = await QuizAnswer.setManualReviewAndPlagiarismStatus(
+      answerId,
       status,
       plagiarismStatus,
     )
 
+    // log status change
+    const operation = getStatusChangeOperation(
+      status,
+      plagiarismSuspected,
+      plagiarismConfirmed,
+    )
+    console.log(operation)
     await knex.transaction(
       async trx =>
         await QuizAnswerStatusModification.logStatusChange(
           answerId,
           operation,
-          plagiarismStatus,
           trx,
           modifierId,
         ),

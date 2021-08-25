@@ -61,6 +61,7 @@ class QuizAnswer extends mixin(BaseModel, [
   user!: User
   plagiarismCheckStatus!: PlagiarismCheckStatus
   plagiarismStatus!: PlagiarismStatus
+  plagiarismSources!: QuizAnswer[]
   peerReviews!: PeerReview[]
   userQuizState!: UserQuizState
   quiz!: Quiz
@@ -97,6 +98,14 @@ class QuizAnswer extends mixin(BaseModel, [
       join: {
         from: "quiz_answer.id",
         to: "peer_review.quiz_answer_id",
+      },
+    },
+    plagiarismSources: {
+      relation: BaseModel.HasManyRelation,
+      modelClass: QuizAnswer,
+      join: {
+        from: "quiz_answer.id",
+        to: "plagiarism_source.target_answer_id",
       },
     },
     userQuizState: {
@@ -495,6 +504,72 @@ class QuizAnswer extends mixin(BaseModel, [
     }
   }
 
+  public static async setManualReviewAndPlagiarismStatus(
+    answerId: string,
+    status: QuizAnswerStatus,
+    plagiarismStatus: PlagiarismStatus,
+  ) {
+    if (!["confirmed", "rejected"].includes(status)) {
+      throw new BadRequestError("invalid status")
+    }
+    const trx = await knex.transaction()
+    try {
+      // get quizAnswer by provided id
+      let quizAnswer = (
+        await this.query(trx)
+          .where("quiz_answer.id", answerId)
+          .withGraphJoined("userQuizState")
+          .withGraphJoined("quiz")
+      )[0]
+      const userQuizState = quizAnswer.userQuizState
+      const quiz = quizAnswer.quiz
+
+      const triesAreNotLimited = !quiz.triesLimited
+      const userHasTriesLeft = userQuizState.tries < quiz.tries
+
+      if (status === "confirmed") {
+        await userQuizState.$query(trx).patch({ pointsAwarded: quiz.points })
+      } else if (triesAreNotLimited || userHasTriesLeft) {
+        await userQuizState
+          .$query(trx)
+          .patch({ peerReviewsReceived: 0, spamFlags: 0, status: "open" })
+      }
+
+      quizAnswer = await quizAnswer
+        .$query(trx)
+        .patchAndFetch({ status, plagiarismStatus })
+
+      await UserQuizState.upsert(userQuizState, trx)
+      await UserCoursePartState.update(
+        quizAnswer.userId,
+        quiz.courseId,
+        quiz.part,
+        trx,
+      )
+
+      await Kafka.broadcastQuizAnswerUpdated(
+        quizAnswer,
+        userQuizState,
+        quiz,
+        trx,
+      )
+
+      await Kafka.broadcastUserProgressUpdated(
+        quizAnswer.userId,
+        quiz.courseId,
+        trx,
+      )
+
+      await trx.commit()
+
+      return quizAnswer
+    } catch (error) {
+      await trx.rollback()
+      throw error
+    }
+  }
+
+  /* 
   public static async setPlagiarismStatus(
     answerId: string,
     plagiarismStatus: PlagiarismStatus,
@@ -554,7 +629,7 @@ class QuizAnswer extends mixin(BaseModel, [
       await trx.rollback()
       throw error
     }
-  }
+  } */
 
   public static async getManualReviewCountsByCourseId(courseId: string) {
     // validate course id
@@ -889,10 +964,10 @@ class QuizAnswer extends mixin(BaseModel, [
         mapStatusToOperation[newAnswerStatus]
 
       if (operation) {
+        console.log(operation)
         await QuizAnswerStatusModification.logStatusChange(
           quizAnswerId,
           operation,
-          plagiarismStatus,
           trx,
         )
       }

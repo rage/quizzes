@@ -94,12 +94,27 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
         </Alert>
       </Snackbar>
       <ButtonFieldWrapper>
-        <Button
-          className="button-accept"
-          onClick={() => handleAcceptOrReject(answer.id, "confirmed")}
-        >
-          <Typography>Accept</Typography>
-        </Button>
+        {answer.plagiarismCheckStatus !== "plagiarism-suspected" ? (
+          <Button
+            className="button-accept"
+            onClick={() => handleAcceptOrReject(answer.id, "confirmed")}
+          >
+            <Typography>Accept</Typography>
+          </Button>
+        ) : (
+          <StyledTooltip title="This answer is acceptable and not plagiarized. Answer will be accepted.">
+            <Button
+              className="button-accept-plag-view"
+              onClick={() => handleAcceptOrReject(answer.id, "confirmed")}
+            >
+              <Typography>
+                Accept answer
+                <br />
+                (Not plagiarism)
+              </Typography>
+            </Button>
+          </StyledTooltip>
+        )}
         {answer.plagiarismCheckStatus !== "plagiarism-suspected" ? (
           <Button
             className="button-reject"
@@ -108,14 +123,18 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
             <Typography>Reject</Typography>
           </Button>
         ) : (
-          <StyledTooltip title="Answer is plagiarized and will be rejected.">
+          <StyledTooltip title="This answer is not plagiarized but not acceptable. Answer will be rejected.">
             <Button
-              className="button-reject"
-              onClick={() =>
-                handleAcceptOrReject(answer.id, "rejected", false, true)
-              }
+              className="button-reject-not-plagiarism"
+              onClick={() => {
+                handleAcceptOrReject(answer.id, "rejected")
+              }}
             >
-              <Typography>Plagiarized</Typography>
+              <Typography>
+                Reject answer
+                <br />
+                (Not plagiarism)
+              </Typography>
             </Button>
           </StyledTooltip>
         )}
@@ -129,14 +148,18 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
             <Typography>Suspect plagiarism</Typography>
           </Button>
         ) : (
-          <StyledTooltip title="Answer is not plagiarized but not acceptable. Answer will be rejected.">
+          <StyledTooltip title="This answer is plagiarized and will be rejected.">
             <Button
-              className="button-reject-not-plagiarism"
-              onClick={() => {
-                handleAcceptOrReject(answer.id, "rejected")
-              }}
+              className="button-reject-plag-view"
+              onClick={() =>
+                handleAcceptOrReject(answer.id, "rejected", false, true)
+              }
             >
-              <Typography>Reject</Typography>
+              <Typography>
+                Reject answer
+                <br />
+                (Confirm plagiarism)
+              </Typography>
             </Button>
           </StyledTooltip>
         )}
