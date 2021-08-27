@@ -205,7 +205,6 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
                     {answer.plagiarismSources.map(source => (
                       <Typography>{source.targetAnswerId}</Typography>
                     ))}
-                    {console.log(answer.plagiarismSources[0])}
                   </Typography>
                 )}
               {(answer.plagiarismSources == undefined ||
