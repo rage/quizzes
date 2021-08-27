@@ -200,9 +200,17 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
           <Collapse in={showSource} collapsedHeight={0}>
             <ContentContainer>
               {answer.plagiarismSources !== undefined &&
-                answer.plagiarismSources}
-              {answer.plagiarismSources == undefined && (
-                <Typography>sources undefined</Typography>
+                answer.plagiarismSources.length > 0 && (
+                  <Typography>
+                    {answer.plagiarismSources.map(source => (
+                      <Typography>{source.targetAnswerId}</Typography>
+                    ))}
+                    {console.log(answer.plagiarismSources[0])}
+                  </Typography>
+                )}
+              {(answer.plagiarismSources == undefined ||
+                answer.plagiarismSources.length == 0) && (
+                <Typography>no sources :(</Typography>
               )}
             </ContentContainer>
           </Collapse>

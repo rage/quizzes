@@ -12,7 +12,7 @@ export interface Answer {
   updatedAt: string
   userQuizState: UserQuizState
   itemAnswers: ItemAnswer[]
-  plagiarismSources: Answer[]
+  plagiarismSources: PlagiarismSource[]
   peerReviews: PeerReview[]
   quiz: Quiz
   deleted: boolean
@@ -94,4 +94,10 @@ export interface UserQuizState {
   status: string
   createdAt: string
   updatedAt: string
+}
+
+export interface PlagiarismSource {
+  targetAnswerId: string
+  sourceAnswerId: string
+  verified: boolean
 }

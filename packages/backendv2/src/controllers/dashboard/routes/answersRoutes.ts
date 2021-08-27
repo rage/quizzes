@@ -69,7 +69,12 @@ const answersRoutes = new Router<CustomState, CustomContext>({
   })
 
   .post("/status", accessControl(), async ctx => {
-    const { status, answerIds, plagiarismSuspected } = ctx.request.body
+    const {
+      status,
+      answerIds,
+      plagiarismSuspected,
+      plagiarismConfirmed,
+    } = ctx.request.body
     const modifierId = ctx.state.user.id
 
     if (!answerIds || !answerIds[0]) {
@@ -90,7 +95,11 @@ const answersRoutes = new Router<CustomState, CustomContext>({
       status,
     )
 
-    const operation = getStatusChangeOperation(status, plagiarismSuspected)
+    const operation = getStatusChangeOperation(
+      status,
+      plagiarismSuspected,
+      plagiarismConfirmed,
+    )
 
     await knex.transaction(
       async trx =>
@@ -240,7 +249,6 @@ const answersRoutes = new Router<CustomState, CustomContext>({
         await QuizAnswerStatusModification.logStatusChange(
           answerId,
           "teacher-suspects-plagiarism",
-          "confirmed-plagiarism",
           trx,
           userId,
         ),

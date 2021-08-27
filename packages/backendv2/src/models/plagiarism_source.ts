@@ -1,12 +1,13 @@
 import Knex from "knex"
 import BaseModel from "./base_model"
-import User from "./user"
+import QuizAnswer from "./quiz_answer"
 
 class PlagiarismSource extends BaseModel {
   id!: string
   targetAnswerId!: string
   sourceAnswerId!: number
-  // verified: whether this has been confirmed by teacher to be a true match. Default false
+  // verified: whether this has been confirmed by teacher to be a true match. Default false.
+  // There is not yet a functionality to change this value
   verified!: boolean
 
   static get tableName() {
@@ -16,7 +17,7 @@ class PlagiarismSource extends BaseModel {
   static relationMappings = {
     targetAnswer: {
       relation: BaseModel.BelongsToOneRelation,
-      modelClass: `${__dirname}/quiz_answer`,
+      modelClass: QuizAnswer,
       join: {
         from: "plagiarism_source.target_answer_id",
         to: "quiz_answer.id",
@@ -24,7 +25,7 @@ class PlagiarismSource extends BaseModel {
     },
     sourceAnswer: {
       relation: BaseModel.BelongsToOneRelation,
-      modelClass: `${__dirname}/quiz_answer`,
+      modelClass: QuizAnswer,
       join: {
         from: "plagiarism_source.source_answer_id",
         to: "quiz_answer.id",

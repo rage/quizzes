@@ -250,6 +250,7 @@ export const changeAnswerStatusForMany = async (
   answerIds: string[],
   status: string,
   plagiarismSuspected: boolean,
+  plagiarismConfirmed: boolean,
 ): Promise<Answer[]> => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -259,7 +260,7 @@ export const changeAnswerStatusForMany = async (
     const response = (
       await api.post(
         `/answers/status`,
-        { status, answerIds, plagiarismSuspected },
+        { status, answerIds, plagiarismSuspected, plagiarismConfirmed },
         config,
       )
     ).data

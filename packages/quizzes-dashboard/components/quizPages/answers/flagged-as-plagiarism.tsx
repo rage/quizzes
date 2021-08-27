@@ -146,6 +146,11 @@ export const FlaggedAsPlagiarism = ({ quiz, course }: IQuizTabProps) => {
   return (
     <>
       <TabText text="Answers automatically flagged as plagiarism" />
+      <Typography color="error">
+        <br />
+        This is a highly experimental feature and the information listed below
+        may not be reliable!
+      </Typography>
 
       <QuizTitle quiz={quiz} />
       <OptionsContainer>
@@ -184,6 +189,7 @@ export const FlaggedAsPlagiarism = ({ quiz, course }: IQuizTabProps) => {
           <MenuItem value="asc">Oldest first</MenuItem>
         </SortOrderField>
       </OptionsContainer>
+
       {answersToDisplay ? (
         <>
           <AnswerListOptions
@@ -191,6 +197,7 @@ export const FlaggedAsPlagiarism = ({ quiz, course }: IQuizTabProps) => {
             handleTextSearch={handleTextSearch}
             searchResultCount={searchResults?.total || 0}
           />
+
           <AnswerListWrapper
             order={sortOrder}
             quizId={quizId}

@@ -43,12 +43,14 @@ export const AnswerList = ({ data }: AnswerListProps) => {
   const handleBulkAction = async (
     actionType: string,
     plagiarismSuspected = false,
+    plagiarismConfirmed = false,
   ) => {
     try {
       const res = await changeAnswerStatusForMany(
         bulkSelectedIds,
         actionType,
         plagiarismSuspected,
+        plagiarismConfirmed,
       )
 
       if (res[0].status === actionType) {

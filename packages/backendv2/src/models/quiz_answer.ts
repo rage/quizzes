@@ -5,6 +5,7 @@ import User from "./user"
 import PeerReview from "./peer_review"
 import Quiz from "./quiz"
 import UserQuizState from "./user_quiz_state"
+import { Language } from "."
 import { BadRequestError } from "../util/error"
 import { removeNonPrintingCharacters } from "../util/tools"
 import knex from "../../database/knex"
@@ -21,6 +22,8 @@ import softDelete from "objection-soft-delete"
 import { mixin } from "objection"
 import QuizAnswerStatusModification from "./quiz_answer_status_modification"
 import { TStatusModificationOperation } from "./../types/index"
+import PlagiarismSource from "./plagiarism_source"
+import { relayNewAnswer } from "../services/plagiarism"
 
 type QuizAnswerStatus =
   | "draft"
@@ -61,7 +64,7 @@ class QuizAnswer extends mixin(BaseModel, [
   user!: User
   plagiarismCheckStatus!: PlagiarismCheckStatus
   plagiarismStatus!: PlagiarismStatus
-  plagiarismSources!: QuizAnswer[]
+  plagiarismSources!: PlagiarismSource[]
   peerReviews!: PeerReview[]
   userQuizState!: UserQuizState
   quiz!: Quiz
@@ -102,7 +105,7 @@ class QuizAnswer extends mixin(BaseModel, [
     },
     plagiarismSources: {
       relation: BaseModel.HasManyRelation,
-      modelClass: QuizAnswer,
+      modelClass: PlagiarismSource,
       join: {
         from: "quiz_answer.id",
         to: "plagiarism_source.target_answer_id",
@@ -156,6 +159,7 @@ class QuizAnswer extends mixin(BaseModel, [
       .withGraphFetched("itemAnswers.[optionAnswers]")
       .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
       .withGraphFetched("quiz.[peerReviewCollections]")
+      .withGraphFetched("plagiarismSources")
 
     if (!quizAnswer) {
       throw new NotFoundError(`quiz answer not found: ${quizAnswerId}`)
@@ -174,6 +178,7 @@ class QuizAnswer extends mixin(BaseModel, [
     const quizAnswer = await this.query(trx)
       .findById(quizAnswerId)
       .withGraphFetched("itemAnswers.[optionAnswers]")
+      .withGraphFetched("plagiarismSources")
 
     if (!quizAnswer) {
       throw new NotFoundError(`quiz answer not found: ${quizAnswerId}`)
@@ -372,6 +377,7 @@ class QuizAnswer extends mixin(BaseModel, [
       .withGraphFetched("itemAnswers.[optionAnswers]")
       .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
       .withGraphFetched("quiz.[peerReviewCollections]")
+      .withGraphFetched("plagiarismSources")
 
     paginated.results.map(async answer => {
       if (answer.peerReviews.length > 0) {
@@ -945,7 +951,6 @@ class QuizAnswer extends mixin(BaseModel, [
   public static async logAnswerStatusChange(
     oldAnswerStatus: QuizAnswerStatus,
     newAnswerStatus: QuizAnswerStatus,
-    plagiarismStatus: PlagiarismStatus,
     quizAnswerId: string,
     trx: Knex.Transaction,
   ) {
@@ -999,7 +1004,6 @@ class QuizAnswer extends mixin(BaseModel, [
         await this.logAnswerStatusChange(
           quizAnswer.status,
           quizAnswerStatusAfterAssessment,
-          quizAnswer.plagiarismStatus,
           quizAnswer.id,
           trx,
         )

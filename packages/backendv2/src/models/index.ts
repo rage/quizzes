@@ -27,6 +27,8 @@ import UserQuizState from "./user_quiz_state"
 
 import UserCourseRole from "./user_course_role"
 
+import PlagiarismSource from "./plagiarism_source"
+
 import Course from "./course"
 import CourseTranslation from "./course_translation"
 
@@ -55,6 +57,7 @@ export {
   PeerReviewQuestionTranslation,
   PeerReviewQuestionAnswer,
   PeerReview,
+  PlagiarismSource,
   User,
   UserQuizState,
   UserCourseRole,

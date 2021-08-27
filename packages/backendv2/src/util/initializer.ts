@@ -15,6 +15,7 @@ import {
   PeerReviewCollectionTranslation,
   PeerReviewQuestion,
   PeerReviewQuestionTranslation,
+  PlagiarismSource,
   User,
   UserQuizState,
 } from "../models"
@@ -39,6 +40,7 @@ export const moduleInitializer = async () => {
     PeerReviewCollectionTranslation,
     PeerReviewQuestion,
     PeerReviewQuestionTranslation,
+    PlagiarismSource,
     User,
     UserQuizState,
     Course,
