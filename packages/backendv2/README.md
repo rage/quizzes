@@ -33,7 +33,7 @@ Differences to db in production:
 ### Backend
 Routes added:
 * ```.get("/:quizId/plagiarism-suspected)``` returns page view of suspected plagiarism cases; this calls ```getPaginatedByQuizId```
-* ```getFlaggedAsPlagiarismCountsByCourseId``` counts plag-flagged answers
+* ```.get("/:courseId/count-answers-flagged-as-plagiarism",``` calls ```getFlaggedAsPlagiarismCountsByCourseId```, which  counts plag-flagged answers
 * status change operation ```.post("/:answerId/status"``` now calls ```setManualReviewAndPlagiarismStatus```, which logs also plagiarism status changes
 * ```.get("/:answerId/plag-sources)``` returns ids of answers that have been listed as sources; this calls 
 
@@ -45,23 +45,34 @@ Models changed to reflect addition of plagiarism feature:
 
 
 ### Frontend
-Class PlagiarismSources added. This is very simple for now, it takes an answer id as a parameter and displays 
+* Class ```PlagiarismSources``` added. This is very simple for now, it takes an answer id as a parameter and displays the source answers' ItemAnswers.
+* Action buttons (Accept, reject etc.) under answers now render conditionally, depending on whether the answer has plagiarism_status 'plagiarism-suspected' or not.
+* Also for plag-suspected answers, the "Show/Hide source answers" button appears
+* Types and services added / modified to reflect db and route changes
+
 
 ### Future development needs
 
+#### Migration files missing for some of the tables
+* Migration files should be added.
+
 #### Bug: Plagiarism status isn't logged correctly yet
+* Button functions need to be debugged.
 
-#### Bug: Course is sometimes undefined, for example on the header on top of the page
+#### Bug: Course is sometimes undefined
+* For example, on the header on top of the page
 
-#### Bug: Plagiarism-flagged answers are still displayed also in the manual review tab
+#### Bug: Plagiarism-flagged answers are still displayed in the manual review tab
+* These should be taken out, so that manual review only shows answers marked as status: 'manual-review' and plagiarism_status NOT 'plagiarism-suspected' 
 
-#### Bug: Button for suspected plagiarism in course view is too wide
+#### Bug: Button for suspected plagiarism in course overview is too wide
+* This clogs the box
 
 #### Confidence score for the entire answer
-* this would probably be the highest confidence number of potential matches for that answer
+* This would probably be the highest confidence number of potential matches for that answer
 
 #### Possibility to mark a plagiarism source as correct match
-* this would be good data for us in the future, considering machine-learning possibilities
+* This would be good data for us in the future, considering machine-learning possibilities
 
 #### Possibility to mass review entries
 
@@ -72,4 +83,5 @@ Class PlagiarismSources added. This is very simple for now, it takes an answer i
 #### Handling of repeat offenders
 * Possibility to flag user who has committed plagiarism repeatedly, so that action against more plagiarism could be taken
 
-#### 
+#### Confidence score display missing
+* The source card should display plagiarism confidence numbers
