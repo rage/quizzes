@@ -1,7 +1,11 @@
 import Router from "koa-router"
 import knex from "../../../../database/knex"
 import accessControl from "../../../middleware/access_control"
-import { QuizAnswer, QuizAnswerStatusModification } from "../../../models"
+import {
+  PlagiarismSource,
+  QuizAnswer,
+  QuizAnswerStatusModification,
+} from "../../../models"
 import { CustomState, CustomContext } from "../../../types"
 import { BadRequestError } from "../../../util/error"
 import {
@@ -119,6 +123,18 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await QuizAnswer.getByIdWithPeerReviews(answerId)
+  })
+
+  .get("/:answerId/plag-sources", accessControl(), async ctx => {
+    const answerId = ctx.params.answerId
+    const courseId = await getCourseIdByAnswerId(answerId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "view")
+
+    const sourceAnswers = await PlagiarismSource.getSourceIdsByTargetAnswerId(
+      answerId,
+    )
+
+    ctx.body = await QuizAnswer.getManyByIds(sourceAnswers)
   })
 
   .get("/:quizId/all", accessControl(), async ctx => {

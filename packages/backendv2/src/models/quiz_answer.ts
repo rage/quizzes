@@ -65,6 +65,7 @@ class QuizAnswer extends mixin(BaseModel, [
   plagiarismCheckStatus!: PlagiarismCheckStatus
   plagiarismStatus!: PlagiarismStatus
   plagiarismSources!: PlagiarismSource[]
+  sourceAnswers!: QuizAnswer[]
   peerReviews!: PeerReview[]
   userQuizState!: UserQuizState
   quiz!: Quiz
@@ -171,6 +172,22 @@ class QuizAnswer extends mixin(BaseModel, [
       )
     }
 
+    return quizAnswer
+  }
+
+  public static async getManyByIds(
+    quizAnswerIds: string[],
+    trx?: Knex.Transaction,
+  ) {
+    const quizAnswer = await this.query(trx)
+      .whereIn("id", quizAnswerIds)
+      .withGraphFetched("itemAnswers.[optionAnswers]")
+
+    if (!quizAnswer || quizAnswer.length < quizAnswerIds.length) {
+      throw new NotFoundError(
+        `some of the following answers were not found: ${quizAnswerIds}`,
+      )
+    }
     return quizAnswer
   }
 

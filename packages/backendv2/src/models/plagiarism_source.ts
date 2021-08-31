@@ -1,11 +1,13 @@
 import Knex from "knex"
 import BaseModel from "./base_model"
 import QuizAnswer from "./quiz_answer"
+import Answer from "./quiz_answer"
 
 class PlagiarismSource extends BaseModel {
   id!: string
   targetAnswerId!: string
-  sourceAnswerId!: number
+  sourceAnswerId!: string
+  sourceAnswers!: Answer[]
   // verified: whether this has been confirmed by teacher to be a true match. Default false.
   // There is not yet a functionality to change this value
   verified!: boolean
@@ -38,13 +40,17 @@ class PlagiarismSource extends BaseModel {
     return allMatches
   }
 
-  static async getAllByTargetAnswerId(
+  static async getSourceIdsByTargetAnswerId(
     quizAnswerId: string,
-  ): Promise<PlagiarismSource[] | undefined> {
-    return await this.query()
-      .select("*")
+  ): Promise<string[]> {
+    const ids = await this.query()
+      .select("source_answer_id")
       .where({ target_answer_id: quizAnswerId })
-      .withGraphFetched("sourceAnswer")
+
+    const idStrings = ids.map(id => id.sourceAnswerId.toString())
+    console.log(idStrings)
+
+    return idStrings
   }
 }
 

@@ -160,6 +160,22 @@ export const getAnswersFlaggedAsPlagiarism = async (
   throw new Error()
 }
 
+export const getPlagiarismSourceAnswers = async (
+  answerId: string,
+): Promise<{ results: Answer[]; total: number }> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    const response = (
+      await api.get(`/answers/${answerId}/plag-sources`, config)
+    ).data
+    return response
+  }
+  throw new Error()
+}
+
 export const getAnswersRequiringAttentionMatchingQuery = async (
   quizId: string,
   size: number,

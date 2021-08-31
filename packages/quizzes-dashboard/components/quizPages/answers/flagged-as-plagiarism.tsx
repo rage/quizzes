@@ -147,7 +147,6 @@ export const FlaggedAsPlagiarism = ({ quiz, course }: IQuizTabProps) => {
     <>
       <TabText text="Answers automatically flagged as plagiarism" />
       <Typography color="error">
-        <br />
         This is a highly experimental feature and the information listed below
         may not be reliable!
       </Typography>

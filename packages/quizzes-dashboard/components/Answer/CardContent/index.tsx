@@ -24,6 +24,8 @@ import DebugDialog from "../../DebugDialog"
 import { editableAnswerStates } from "../../constants"
 import { useAnswerListState } from "../../../contexts/AnswerListContext"
 import AnswerDeletionDialog from "./AnswerDeletionDialog"
+import { getPlagiarismSourceAnswers } from "../../../services/quizzes"
+import PlagiarismSources from "./PlagiarismSources"
 
 export const ContentContainer = styled.div`
   display: flex !important;
@@ -185,36 +187,6 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
           <ItemAnswers itemAnswers={answer.itemAnswers} />
         </ContentContainer>
       </Collapse>
-      <ContentContainer>
-        {answer.peerReviews.length > 0 &&
-          answer.plagiarismCheckStatus !== "plagiarism-suspected" && (
-            <PeerreviewButton
-              variant="outlined"
-              title=":D"
-              onClick={() => setShowPeerreviewModal(true)}
-            >
-              <Typography variant="subtitle2">Show Peerreviews</Typography>
-            </PeerreviewButton>
-          )}
-        {answer.plagiarismCheckStatus == "plagiarism-suspected" && (
-          <Collapse in={showSource} collapsedHeight={0}>
-            <ContentContainer>
-              {answer.plagiarismSources !== undefined &&
-                answer.plagiarismSources.length > 0 && (
-                  <Typography>
-                    {answer.plagiarismSources.map(source => (
-                      <Typography>{source.targetAnswerId}</Typography>
-                    ))}
-                  </Typography>
-                )}
-              {(answer.plagiarismSources == undefined ||
-                answer.plagiarismSources.length == 0) && (
-                <Typography>no sources :(</Typography>
-              )}
-            </ContentContainer>
-          </Collapse>
-        )}
-      </ContentContainer>
       <StatButtonWrapper>
         {height > 300 && (
           <>
@@ -238,6 +210,34 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
           </>
         )}
       </StatButtonWrapper>
+      <ContentContainer>
+        {answer.peerReviews.length > 0 &&
+          answer.plagiarismCheckStatus !== "plagiarism-suspected" && (
+            <PeerreviewButton
+              variant="outlined"
+              title=":D"
+              onClick={() => setShowPeerreviewModal(true)}
+            >
+              <Typography variant="subtitle2">Show Peerreviews</Typography>
+            </PeerreviewButton>
+          )}
+        {answer.plagiarismCheckStatus == "plagiarism-suspected" && (
+          <Collapse in={showSource} collapsedHeight={0}>
+            <ContentContainer>
+              {answer.plagiarismSources !== undefined &&
+                answer.plagiarismSources.length > 0 && (
+                  <PlagiarismSources answerId={answer.id}></PlagiarismSources>
+                )}
+
+              {(answer.plagiarismSources == undefined ||
+                answer.plagiarismSources == null ||
+                answer.plagiarismSources.length == 0) && (
+                <Typography>no sources available</Typography>
+              )}
+            </ContentContainer>
+          </Collapse>
+        )}
+      </ContentContainer>
       <StatButtonWrapper>
         {
           <>
@@ -247,7 +247,7 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
                 size="medium"
                 onClick={() => setShowSource(false)}
               >
-                Hide source answer
+                Hide source answers
               </Button>
             ) : (
               <Button
@@ -255,7 +255,7 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
                 size="medium"
                 onClick={() => setShowSource(true)}
               >
-                Show source answer
+                Show source answers
               </Button>
             )}
           </>
