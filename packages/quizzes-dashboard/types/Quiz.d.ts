@@ -50,6 +50,10 @@ export interface Item {
   feedbackDisplayPolicy:
     | "DisplayFeedbackOnQuizItem"
     | "DisplayFeedbackOnAllOptions"
+  multipleSelectedOptionsGradingOptions:
+    | "NeedToSelectAllCorrectOptions"
+    | "NeedToSelectNCorrectOptions"
+  multipleSelectedOptionsGradingPolicyN: number
 }
 
 export interface Option {

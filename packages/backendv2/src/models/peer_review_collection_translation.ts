@@ -1,3 +1,4 @@
+import { ModelObject } from "objection"
 import BaseModel from "./base_model"
 import PeerReviewCollection from "./peer_review_collection"
 
@@ -24,5 +25,9 @@ class PeerReviewCollectionTranslation extends BaseModel {
     },
   }
 }
+
+export type PeerReviewCollectionTranslationType = ModelObject<
+  PeerReviewCollectionTranslation
+>
 
 export default PeerReviewCollectionTranslation

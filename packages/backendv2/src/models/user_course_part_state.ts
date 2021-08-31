@@ -4,6 +4,7 @@ import Course from "./course"
 import { PointsByGroup } from "../types"
 import Quiz from "./quiz"
 import BaseModel from "./base_model"
+import { ModelObject } from "objection"
 
 class UserCoursePartState extends BaseModel {
   userId!: number
@@ -178,5 +179,7 @@ class UserCoursePartState extends BaseModel {
     })
   }
 }
+
+export type UserCoursePartStateType = ModelObject<UserCoursePartState>
 
 export default UserCoursePartState

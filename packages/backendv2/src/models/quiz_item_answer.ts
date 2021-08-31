@@ -1,7 +1,8 @@
+import { ModelObject } from "objection"
 import BaseModel from "./base_model"
-import QuizAnswer from "./quiz_answer"
-import QuizItem from "./quiz_item"
-import QuizOptionAnswer from "./quiz_option_answer"
+import QuizAnswer, { QuizAnswerType } from "./quiz_answer"
+import QuizItem, { QuizItemType } from "./quiz_item"
+import QuizOptionAnswer, { QuizOptionAnswerType } from "./quiz_option_answer"
 
 class QuizItemAnswer extends BaseModel {
   id!: string
@@ -44,5 +45,7 @@ class QuizItemAnswer extends BaseModel {
     },
   }
 }
+
+export type QuizItemAnswerType = ModelObject<QuizItemAnswer>
 
 export default QuizItemAnswer

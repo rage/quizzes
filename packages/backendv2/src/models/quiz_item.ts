@@ -2,10 +2,10 @@ import Quiz from "./quiz"
 import QuizOption from "./quiz_option"
 import QuizItemTranslation from "./quiz_item_translation"
 import BaseModel from "./base_model"
-import { mixin } from "objection"
+import { mixin, ModelObject } from "objection"
 import softDelete from "objection-soft-delete"
 
-export type QuizItemType =
+export type itemType =
   | "open"
   | "scale"
   | "essay"
@@ -20,15 +20,18 @@ export type QuizItemType =
 export type QuizItemFeedbackDisplayPolicy =
   | "DisplayFeedbackOnQuizItem"
   | "DisplayFeedbackOnAllOptions"
+export type MultipleSelectedOptionsGradingPolicy =
+  | "NeedToSelectAllCorrectOptions"
+  | "NeedToSelectNCorrectOptions"
 
 class QuizItem extends mixin(BaseModel, [
   softDelete({ columnName: "deleted" }),
 ]) {
   id!: string
-  type!: QuizItemType
   feedbackDisplayPolicy!: QuizItemFeedbackDisplayPolicy
+  type!: itemType
   validityRegex!: string
-  multi!: string
+  multi!: boolean
   texts!: QuizItemTranslation[]
   options!: QuizOption[]
   title!: string
@@ -36,9 +39,11 @@ class QuizItem extends mixin(BaseModel, [
   successMessage!: string
   failureMessage!: string
   sharedOptionFeedbackMessage!: string
-  allAnswersCorrect!: string
+  allAnswersCorrect!: boolean
   deleted!: boolean
   direction!: "row" | "column"
+  multipleSelectedOptionsGradingOptions!: MultipleSelectedOptionsGradingPolicy
+  multipleSelectedOptionsGradingPolicyN!: number
 
   static get tableName() {
     return "quiz_item"
@@ -75,5 +80,7 @@ class QuizItem extends mixin(BaseModel, [
     return await this.query().findById(id)
   }
 }
+
+export type QuizItemType = ModelObject<QuizItem>
 
 export default QuizItem

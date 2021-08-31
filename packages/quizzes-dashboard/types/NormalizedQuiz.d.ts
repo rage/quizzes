@@ -67,6 +67,10 @@ export interface NormalizedItem {
   feedbackDisplayPolicy:
     | "DisplayFeedbackOnQuizItem"
     | "DisplayFeedbackOnAllOptions"
+  multipleSelectedOptionsGradingOptions:
+    | "NeedToSelectAllCorrectOptions"
+    | "NeedToSelectNCorrectOptions"
+  multipleSelectedOptionsGradingPolicyN: number
 }
 
 export interface NormalizedOption {

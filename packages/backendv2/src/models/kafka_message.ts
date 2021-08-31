@@ -1,4 +1,5 @@
 import Knex from "knex"
+import { ModelObject } from "objection"
 import { ProgressMessage, QuizAnswerMessage, QuizMessage } from "../types"
 import BaseModel from "./base_model"
 
@@ -44,5 +45,7 @@ class KafkaMessage extends BaseModel {
       .resultSize()
   }
 }
+
+export type KafkaMessageType = ModelObject<KafkaMessage>
 
 export default KafkaMessage

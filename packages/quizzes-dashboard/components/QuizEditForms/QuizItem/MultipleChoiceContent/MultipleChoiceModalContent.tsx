@@ -11,8 +11,15 @@ import {
   RadioGroup,
   FormControl,
   FormHelperText,
+  useFormControl,
   Select,
   MenuItem,
+  TextField,
+  Fade,
+  Grow,
+  Collapse,
+  Slide,
+  InputLabel,
 } from "@material-ui/core"
 import {
   editedQuizItemTitle,
@@ -24,6 +31,8 @@ import {
   toggledAllAnswersCorrect,
   editedItemDirection,
   editedQuizItemFeedbackDisplayPolicy,
+  editedMultipleSelectedOptionsGradingOptions,
+  editedMultipleSelectedOptionsGradingPolicyN,
 } from "../../../../store/editor/items/itemAction"
 import { useTypedSelector } from "../../../../store/store"
 import { useDispatch } from "react-redux"
@@ -39,7 +48,7 @@ import { ModalWrapper } from "../../../Shared/Modal"
 const ModalContent = styled.div`
   display: flex;
   padding: 1rem;
-  justify-content: center;
+  justify-content: space-between;
   @media only screen and (max-width: 600px) {
     width: 100%;
   }
@@ -80,69 +89,12 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
   const storeItem = useTypedSelector(state => state.editor.items[item.id])
   const storeOptions = useTypedSelector(state => state.editor.options)
   const dispatch = useDispatch()
+
   return (
     <ModalWrapper>
       <ModalContentTitleWrapper>
         <Typography variant="h4">Advanced editing</Typography>
       </ModalContentTitleWrapper>
-      <ModalContent>
-        <FormGroup row>
-          <FormControlLabel
-            label="Shared feedback message"
-            labelPlacement="start"
-            control={
-              <Checkbox
-                color="primary"
-                checked={storeItem.usesSharedOptionFeedbackMessage}
-                onChange={event =>
-                  dispatch(
-                    toggledSharedOptionFeedbackMessage(
-                      storeItem.id,
-                      event.target.checked,
-                    ),
-                  )
-                }
-              />
-            }
-          />
-          <FormControlLabel
-            label="Multi"
-            labelPlacement="start"
-            control={
-              <Checkbox
-                color="primary"
-                checked={storeItem.multi}
-                onChange={event =>
-                  dispatch(
-                    toggledMultiOptions(storeItem.id, event.target.checked),
-                  )
-                }
-              />
-            }
-          />
-        </FormGroup>
-      </ModalContent>
-      <ModalContent>
-        <Select
-          fullWidth
-          label="Feedback display policy"
-          variant="outlined"
-          value={storeItem.feedbackDisplayPolicy}
-          onChange={event =>
-            dispatch(
-              editedQuizItemFeedbackDisplayPolicy(
-                storeItem.id,
-                event.target.value,
-              ),
-            )
-          }
-        >
-          <MenuItem value="DisplayFeedbackOnQuizItem">On quiz item</MenuItem>
-          <MenuItem value="DisplayFeedbackOnAllOptions">
-            On each quiz item answer option
-          </MenuItem>
-        </Select>
-      </ModalContent>
       <ModalContent>
         <MarkdownEditor
           label="Title"
@@ -153,22 +105,106 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
         />
       </ModalContent>
       <ModalContent>
-        <AllAnswersCorrectField>
-          <FormGroup row>
+        <FormGroup row>
+          <FormControlLabel
+            control={
+              <Switch
+                checked={storeItem.allAnswersCorrect}
+                onChange={() =>
+                  dispatch(toggledAllAnswersCorrect(storeItem.id))
+                }
+              />
+            }
+            label="All answers correct (no matter what one answers it is correct)"
+            labelPlacement="start"
+          />
+          <Grow in={!storeItem.allAnswersCorrect}>
             <FormControlLabel
+              label="Multi"
+              labelPlacement="start"
               control={
-                <Switch
-                  checked={storeItem.allAnswersCorrect}
-                  onChange={() =>
-                    dispatch(toggledAllAnswersCorrect(storeItem.id))
+                <Checkbox
+                  color="primary"
+                  checked={storeItem.multi}
+                  onChange={event =>
+                    dispatch(
+                      toggledMultiOptions(storeItem.id, event.target.checked),
+                    )
                   }
                 />
               }
-              label="All answers correct (no matter what one answers it is correct)"
             />
-          </FormGroup>
-        </AllAnswersCorrectField>
+          </Grow>
+        </FormGroup>
       </ModalContent>
+      <ModalContent>
+        <FormControl variant="outlined">
+          <InputLabel>Feedback display policy</InputLabel>
+          <Select
+            native
+            variant="outlined"
+            label="Feedback display policy"
+            value={storeItem.feedbackDisplayPolicy}
+            onChange={event =>
+              dispatch(
+                editedQuizItemFeedbackDisplayPolicy(
+                  storeItem.id,
+                  event.target.value as string,
+                ),
+              )
+            }
+          >
+            <option value="DisplayFeedbackOnQuizItem">On quiz item</option>
+            <option value="DisplayFeedbackOnAllOptions">
+              On each quiz item answer option
+            </option>
+          </Select>
+        </FormControl>
+      </ModalContent>
+      <Collapse in={!storeItem.allAnswersCorrect && storeItem.multi}>
+        <ModalContent>
+          <Select
+            variant="outlined"
+            value={storeItem.multipleSelectedOptionsGradingOptions}
+            onChange={e =>
+              dispatch(
+                editedMultipleSelectedOptionsGradingOptions(
+                  storeItem.id,
+                  e.target.value as string,
+                ),
+              )
+            }
+          >
+            <MenuItem value="NeedToSelectAllCorrectOptions">
+              Need to select all correct options
+            </MenuItem>
+            <MenuItem value="NeedToSelectNCorrectOptions">
+              Need to select n -correct options
+            </MenuItem>
+          </Select>
+          <Grow
+            in={
+              storeItem.multipleSelectedOptionsGradingOptions ===
+              "NeedToSelectNCorrectOptions"
+            }
+          >
+            <TextField
+              helperText="Amount of correct options to select"
+              variant="outlined"
+              type="number"
+              value={storeItem.multipleSelectedOptionsGradingPolicyN}
+              onChange={e =>
+                dispatch(
+                  editedMultipleSelectedOptionsGradingPolicyN(
+                    storeItem.id,
+                    (e.target.value as unknown) as number,
+                  ),
+                )
+              }
+            ></TextField>
+          </Grow>
+        </ModalContent>
+      </Collapse>
       <ModalContent>
         <Button
           title="add option"
@@ -203,6 +239,28 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
           <FormControlLabel value="column" control={<Radio />} label="Column" />
         </RadioGroup>
       </FormControl>
+      <ModalContent>
+        <FormGroup row>
+          <FormControlLabel
+            label="Shared feedback message"
+            labelPlacement="start"
+            control={
+              <Checkbox
+                color="primary"
+                checked={storeItem.usesSharedOptionFeedbackMessage}
+                onChange={event =>
+                  dispatch(
+                    toggledSharedOptionFeedbackMessage(
+                      storeItem.id,
+                      event.target.checked,
+                    ),
+                  )
+                }
+              />
+            }
+          />
+        </FormGroup>
+      </ModalContent>
       {storeItem.usesSharedOptionFeedbackMessage ? (
         <ModalContent>
           <MarkdownEditor

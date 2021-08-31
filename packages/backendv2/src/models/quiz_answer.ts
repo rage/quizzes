@@ -13,14 +13,15 @@ import PeerReviewQuestion from "./peer_review_question"
 import UserCoursePartState from "./user_course_part_state"
 import * as Kafka from "../services/kafka"
 import SpamFlag from "./spam_flag"
-import _, { cond } from "lodash"
-import Objection, { raw } from "objection"
+import _ from "lodash"
+import Objection, { ModelObject, raw } from "objection"
 import BaseModel from "./base_model"
 import QuizOptionAnswer from "./quiz_option_answer"
 import softDelete from "objection-soft-delete"
 import { mixin } from "objection"
 import QuizAnswerStatusModification from "./quiz_answer_status_modification"
 import { TStatusModificationOperation } from "./../types/index"
+import QuizItem from "./quiz_item"
 
 type QuizAnswerStatus =
   | "draft"
@@ -531,18 +532,24 @@ class QuizAnswer extends mixin(BaseModel, [
 
     const trx = await knex.transaction()
     try {
-      const quizId = quizAnswer.quizId
       const isUserInDb = await User.getById(userId, trx)
       if (!isUserInDb) {
         quizAnswer.user = User.fromJson({ id: userId })
       }
-      quizAnswer.userId = userId
+
+      const quizId = quizAnswer.quizId
       const quiz = await Quiz.getById(quizId, trx)
       const course = await Course.getById(quiz.courseId, trx)
-      quizAnswer.languageId = course.languageId
       const userQuizState =
-        (await UserQuizState.getByUserAndQuiz(userId, quizId, trx)) ??
-        UserQuizState.fromJson({ userId, quizId, tries: 0 })
+        (await UserQuizState.getByUserAndQuiz(
+          userId,
+          quizAnswer.quizId,
+          trx,
+        )) ?? UserQuizState.fromJson({ userId, quizId, tries: 0 })
+
+      quizAnswer.userId = userId
+      quizAnswer.languageId = course.languageId
+
       this.checkIfSubmittable(quiz, userQuizState)
       this.removeIds(quizAnswer)
       await this.assessAnswerStatus(
@@ -552,9 +559,10 @@ class QuizAnswer extends mixin(BaseModel, [
         course,
         trx,
       )
-      this.assessAnswer(quizAnswer, quiz)
+      await this.assessAnswer(quizAnswer, quiz, trx)
       this.gradeAnswer(quizAnswer, userQuizState, quiz)
-      this.assessUserQuizStatus(quizAnswer, userQuizState, quiz, false)
+      this.assessUserQuizStatus(quizAnswer, userQuizState, quiz)
+
       let savedQuizAnswer
       let savedUserQuizState
       await this.markPreviousAsDeprecated(userId, quizId, trx)
@@ -600,7 +608,7 @@ class QuizAnswer extends mixin(BaseModel, [
   ) {
     const course = await Course.getById(quiz.courseId, trx)
     await this.assessAnswerStatus(quizAnswer, userQuizState, quiz, course, trx)
-    this.assessAnswer(quizAnswer, quiz)
+    this.assessAnswer(quizAnswer, quiz, trx)
     this.gradeAnswer(quizAnswer, userQuizState, quiz)
     this.assessUserQuizStatus(quizAnswer, userQuizState, quiz, true)
     if (quizAnswer.status === "confirmed") {
@@ -634,7 +642,11 @@ class QuizAnswer extends mixin(BaseModel, [
     }
   }
 
-  private static assessAnswer(quizAnswer: QuizAnswer, quiz: Quiz) {
+  private static async assessAnswer(
+    quizAnswer: QuizAnswer,
+    quiz: Quiz,
+    trx: Knex.Transaction,
+  ) {
     const quizItemAnswers = quizAnswer.itemAnswers
     const quizItems = quiz.items
     if (!quizItemAnswers || quizItemAnswers.length === 0) {
@@ -649,7 +661,6 @@ class QuizAnswer extends mixin(BaseModel, [
         quizItemAnswer.correct = false
         continue
       }
-
       if (quizItem.allAnswersCorrect) {
         quizItemAnswer.correct = true
         continue
@@ -675,27 +686,9 @@ class QuizAnswer extends mixin(BaseModel, [
         case "multiple-choice-dropdown":
         case "clickable-multiple-choice":
         case "multiple-choice":
-          const quizOptionAnswers = quizItemAnswer.optionAnswers
-          const quizOptions = quizItem.options
-          if (!quizOptionAnswers || quizOptionAnswers.length === 0) {
-            throw new BadRequestError("option answers missing")
-          }
-          const correctOptionIds = quizOptions
-            .filter(quizOption => quizOption.correct === true)
-            .map(quizOption => quizOption.id)
-          const selectedCorrectOptions = quizOptionAnswers.filter(
-            quizOptionAnswer =>
-              correctOptionIds.includes(quizOptionAnswer.quizOptionId),
-          )
-          const allSelectedOptionsAreCorrect = quizOptionAnswers.every(
-            quizOptionAnswer =>
-              correctOptionIds.includes(quizOptionAnswer.quizOptionId),
-          )
           quizItemAnswer.correct = quizItem.multi
-            ? correctOptionIds.length === selectedCorrectOptions.length &&
-              allSelectedOptionsAreCorrect
-            : selectedCorrectOptions.length > 0 &&
-              quizOptionAnswers.length === 1
+            ? this.multipleSelectedQuizItemOptions(quizItem, quizItemAnswer)
+            : this.oneSelectedQuizItemOption(quizItem, quizItemAnswer)
           break
         case "custom-frontend-accept-data":
           break
@@ -806,7 +799,7 @@ class QuizAnswer extends mixin(BaseModel, [
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
     quiz: Quiz,
-    update: boolean,
+    update: boolean = false,
   ) {
     if (!update) {
       userQuizState.tries += 1
@@ -1182,6 +1175,55 @@ class QuizAnswer extends mixin(BaseModel, [
       itemAnswer.optionAnswers?.forEach(optionAnswer => delete optionAnswer.id)
     })
   }
+
+  private static multipleSelectedQuizItemOptions(
+    quizItem: QuizItem,
+    quizItemAnswer: QuizItemAnswer,
+  ): boolean {
+    switch (quizItem.multipleSelectedOptionsGradingOptions) {
+      case "NeedToSelectAllCorrectOptions":
+        return (
+          quizItemAnswer.optionAnswers
+            .map(qoa => qoa.quizOptionId)
+            .every(qoa =>
+              quizItem.options
+                .filter(qo => qo.correct)
+                .map(qo => qo.id)
+                .includes(qoa),
+            ) &&
+          quizItemAnswer.optionAnswers.length ===
+            quizItem.options.filter(qo => qo.correct).length
+        )
+
+      case "NeedToSelectNCorrectOptions":
+        return (
+          quizItemAnswer.optionAnswers.filter(qoa =>
+            quizItem.options
+              .filter(qio => qio.correct)
+              .map(qio => qio.id)
+              .includes(qoa.quizOptionId),
+          ).length === quizItem.multipleSelectedOptionsGradingPolicyN
+        )
+      default:
+        throw new BadRequestError("Unknown quizOption grading policy")
+    }
+  }
+
+  private static oneSelectedQuizItemOption(
+    quizItem: QuizItem,
+    quizItemAnswer: QuizItemAnswer,
+  ): boolean {
+    if (quizItem.options.length > 1) {
+      throw new BadRequestError(
+        "Too many options selected for quizItem, where only one option can be selected",
+      )
+    }
+    const selectedOptionId = quizItemAnswer.optionAnswers[0].id
+    const correctOptionId = quizItem.options.filter(qio => qio.correct)[0].id
+    return selectedOptionId === correctOptionId
+  }
 }
+
+export type QuizAnswerType = ModelObject<QuizAnswer>
 
 export default QuizAnswer
