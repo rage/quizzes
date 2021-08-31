@@ -46,6 +46,7 @@ class PlagiarismSource extends BaseModel {
     const ids = await this.query()
       .select("source_answer_id")
       .where({ target_answer_id: quizAnswerId })
+      .limit(10)
 
     const idStrings = ids.map(id => id.sourceAnswerId.toString())
     console.log(idStrings)
