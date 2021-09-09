@@ -57,6 +57,7 @@ const configOptions: { [env: string]: Config } = {
     },
     pool: {
       afterCreate: setTimeZoneToUTC,
+      propagateCreateError: false,
     },
     migrations: {
       directory: "./database/migrations",
