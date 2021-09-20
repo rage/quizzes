@@ -939,17 +939,12 @@ class QuizAnswer extends mixin(BaseModel, [
       throw error
     }
 
-    const answerIds = this.query()
-      .select("id")
-      .where("quiz_id", quizId)
-
     const givenPeerReviews = await PeerReview.query()
-      .whereIn("quiz_answer_id", answerIds)
-      .andWhere("user_id", reviewerId)
+      .join("quiz_answer", "quiz_answer_id", "=", "id")
+      .where("peer_review.user_id", reviewerId)
+      .andWhere("quiz_answer.quiz_id", quizId)
 
     const givenSpamFlags = await SpamFlag.query().where("user_id", reviewerId)
-
-    givenPeerReviews.map(pr => pr.rejectedQuizAnswerIds)
 
     const rejected: string[] = givenPeerReviews
       .map(pr => pr.rejectedQuizAnswerIds)
