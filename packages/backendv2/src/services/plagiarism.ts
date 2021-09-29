@@ -12,6 +12,6 @@ export const relayNewAnswer = async (data: any) => {
       },
     })
   } catch (error) {
-    console.log(error)
+    console.log(error.response)
   }
 }
