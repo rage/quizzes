@@ -35,6 +35,7 @@ export class Quiz extends BaseModel {
   title!: string
   body!: string
   submitMessage!: string
+  checkPlagiarism!: boolean
 
   static get tableName() {
     return "quiz"
