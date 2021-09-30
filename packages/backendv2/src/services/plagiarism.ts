@@ -1,5 +1,6 @@
 import axios from "axios"
 import jwt from "jsonwebtoken"
+import { GlobalLogger } from "../middleware/logger"
 
 export const relayNewAnswer = async (data: any) => {
   try {
@@ -12,6 +13,6 @@ export const relayNewAnswer = async (data: any) => {
       },
     })
   } catch (error) {
-    console.log(error.response)
+    GlobalLogger.error("plagiarism backend responded with error")
   }
 }

@@ -35,6 +35,7 @@ const general = new Router<CustomState, CustomContext>({
 
   .post("/plagiarism", async ctx => {
     console.log(ctx.request.body)
+    ctx.status = 200
   })
 
 export default general
