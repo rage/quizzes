@@ -584,7 +584,7 @@ class QuizAnswer extends mixin(BaseModel, [
       await trx.commit()
       quiz.course = course
       if (quiz.checkPlagiarism) {
-        await this.relayData(savedQuizAnswer, quiz)
+        await this.relayPlagiarismData(savedQuizAnswer, quiz)
       }
       return {
         quiz,
