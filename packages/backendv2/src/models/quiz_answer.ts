@@ -597,7 +597,7 @@ class QuizAnswer extends mixin(BaseModel, [
     }
   }
 
-  private static async relayData(quizAnswer: QuizAnswer, quiz: Quiz) {
+  private static async relayPlagiarismData(quizAnswer: QuizAnswer, quiz: Quiz) {
     const language = await Language.query().findById(quiz.course.languageId)
     for (const quizItem of quiz.items) {
       if (quizItem.type === "essay") {
