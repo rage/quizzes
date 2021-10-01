@@ -17,7 +17,7 @@ spec:
               command: ["sh", "-c", "cd /app && npm run refresh-reaktor-view"]
               resources:
                 requests:
-                  memory: "1000Mi"
+                  memory: "100Mi"
               env:
                 - name: REDIS_HOST
                   value: "quizzes-backend-redis-master.default.svc.cluster.local"
