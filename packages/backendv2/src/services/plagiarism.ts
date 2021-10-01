@@ -8,7 +8,7 @@ const source = CancelToken.source()
 export const relayNewAnswer = async (data: any) => {
   try {
     const csd_url = process.env.CSD_URL || "http://localhost/5150"
-    await axios.post(csd_url, data, {
+    await axios.post(csd_url + "/new", data, {
       headers: {
         authorization: jwt.sign(
           { source: "quizzes" },
