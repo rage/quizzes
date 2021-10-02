@@ -659,7 +659,7 @@ class QuizAnswer extends mixin(BaseModel, [
     }
   }
 
-  private static async assessAnswer(quizAnswer: QuizAnswer, quiz: Quiz) {
+  private static assessAnswer(quizAnswer: QuizAnswer, quiz: Quiz) {
     const quizItemAnswers = quizAnswer.itemAnswers
     const quizItems = quiz.items
     if (!quizItemAnswers || quizItemAnswers.length === 0) {

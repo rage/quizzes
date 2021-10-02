@@ -15,6 +15,7 @@ export const input = {
     awardPointsEvenIfWrong: false,
     grantPointsPolicy: "grant_whenever_possible",
     autoReject: true,
+    checkPlagiarism: false,
     title: "quiz",
     body: "body",
     submitMessage: "nice one!",
@@ -86,6 +87,7 @@ export const input = {
     awardPointsEvenIfWrong: false,
     grantPointsPolicy: "grant_whenever_possible",
     autoReject: true,
+    checkPlagiarism: false,
     title: "quiz",
     body: "body",
     submitMessage: "nice one!",
@@ -238,6 +240,8 @@ interface QuizValidator {
   awardPointsEvenIfWrong: false
   grantPointsPolicy: "grant_whenever_possible"
   autoReject: true
+
+  checkPlagiarism: false
   title: "quiz"
   body: "body"
   submitMessage: "nice one!"
@@ -261,6 +265,7 @@ export const validation = {
     awardPointsEvenIfWrong: false,
     grantPointsPolicy: "grant_whenever_possible",
     autoReject: true,
+    checkPlagiarism: false,
     title: "quiz",
     body: "body",
     submitMessage: "nice one!",
@@ -375,6 +380,7 @@ export const validation = {
     awardPointsEvenIfWrong: false,
     grantPointsPolicy: "grant_whenever_possible",
     autoReject: true,
+    checkPlagiarism: false,
     title: "quiz",
     body: "body",
     submitMessage: "nice one!",
@@ -475,6 +481,7 @@ export const validation = {
     awardPointsEvenIfWrong: false,
     grantPointsPolicy: "grant_whenever_possible",
     autoReject: true,
+    checkPlagiarism: false,
     title: "quiz 1",
     body: "body",
     submitMessage: "nice one!",
@@ -589,6 +596,7 @@ export const validation = {
     awardPointsEvenIfWrong: false,
     grantPointsPolicy: "grant_whenever_possible",
     autoReject: true,
+    checkPlagiarism: false,
     title: "quiz 2",
     body: "body",
     submitMessage: "nice one!",
@@ -663,6 +671,7 @@ export const validation = {
     awardPointsEvenIfWrong: false,
     grantPointsPolicy: "grant_whenever_possible",
     autoReject: true,
+    checkPlagiarism: false,
     title: "quiz",
     body: "body",
     submitMessage: "nice one!",
@@ -737,6 +746,7 @@ export const validation = {
     awardPointsEvenIfWrong: false,
     grantPointsPolicy: "grant_whenever_possible",
     autoReject: true,
+    checkPlagiarism: false,
     title: "quiz",
     body: "body",
     submitMessage: "nice one!",
@@ -990,6 +1000,7 @@ export const validation = {
     quiz: {
       autoConfirm: true,
       autoReject: true,
+      checkPlagiarism: false,
       awardPointsEvenIfWrong: false,
       courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
       createdAt: expect.stringMatching(dateTime),
@@ -1271,6 +1282,7 @@ export const validation = {
       excludedFromScore: false,
       autoConfirm: true,
       autoReject: true,
+      checkPlagiarism: false,
       triesLimited: true,
       tries: 1,
       grantPointsPolicy: "grant_whenever_possible",
@@ -1460,6 +1472,7 @@ export const validation = {
     excludedFromScore: false,
     autoConfirm: true,
     autoReject: true,
+    checkPlagiarism: false,
     triesLimited: true,
     tries: 1,
     grantPointsPolicy: "grant_whenever_possible",
