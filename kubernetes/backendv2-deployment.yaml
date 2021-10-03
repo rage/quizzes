@@ -96,6 +96,16 @@ spec:
               secretKeyRef:
                 name: backend-database-secret
                 key: SENTRY_DSN
+          - name: CSD_URL
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: CSD_URL
+          - name: JWT_SECRET
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: JWT_SECRET
       initContainers:
         - name: quizzes-backendv2-run-migrations
           image: ${BACKENDV2_IMAGE}
