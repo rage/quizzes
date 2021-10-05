@@ -1,7 +1,5 @@
 FROM node:11-alpine
 
-# COPY --chown=node . /app
-
 USER node
 VOLUME /quizzes/dashboard
 WORKDIR /quizzes/dashboard
