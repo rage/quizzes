@@ -2,49 +2,17 @@
 
 [![CircleCI](https://circleci.com/gh/rage/quizzes/tree/master.svg?style=svg)](https://circleci.com/gh/rage/quizzes/tree/master)
 
-You can set up you shell to automatically switch node version between folders. [Instructions](https://github.com/nvm-sh/nvm#deeper-shell-integration).
+## Setup
 
-To run locally
-
-At the project root
+Setup the project locally by running the command:
 
 ```bash
-nvm use
-npm ci
+docker-compose up -d
 ```
 
-To start the server:
-```bash
-cd packages/backend
-nvm use
-npm ci
-npm run build
-npm start
+To setup the database run the command:
+```
+./bin/setup-database.sh
 ```
 
-To start the server (V2):
-```bash
-cd packages/backendv2
-nvm use
-npm ci
-npm run dev
-```
-
-To start the dashboard:
-
-```bash
-cd packages/dashboard
-nvm use
-npm ci
-npm start
-```
-
-To load widget in playground:
-```bash
-cd packages/moocfi-quizzes
-nvm use
-npm ci
-cd example
-npm ci
-npm start
-```
+Visit example project at http://localhost:1234 and dashboard at http://localhost:5000
