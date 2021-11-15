@@ -1,10 +1,12 @@
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: refresh-reaktor-view
 spec:
   schedule: "55 0 * * *"
   concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 3
   jobTemplate:
     spec:
       activeDeadlineSeconds: 3600

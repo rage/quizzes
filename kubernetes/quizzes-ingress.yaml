@@ -1,4 +1,4 @@
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: quizzes-ingress
@@ -11,33 +11,27 @@ spec:
     - quizzes2.mooc.fi
     secretName: quizzes-cert-secret
   rules:
-    - host: quizzes.mooc.fi
-      http:
-        paths:
-        - path: /api/
-          backend:
-            serviceName: quizzes-backend-service
-            servicePort: 80
-        - path: /api/v2/
-          backend:
-            serviceName: quizzes-backendv2-service
-            servicePort: 80
-        - path: /
-          backend:
-            serviceName: quizzes-dashboardv2-service
-            servicePort: 80
-    # - host: quizzes2.mooc.fi
-    #   http:
-    #     paths:
-    #     - path: /api/
-    #       backend:
-    #         serviceName: quizzes-backend-service
-    #         servicePort: 80
-    #     - path: /api/v2/
-    #       backend:
-    #         serviceName: quizzes-backendv2-service
-    #         servicePort: 80
-    #     - path: /
-    #       backend:
-    #         serviceName: quizzes-dashboard-service
-    #         servicePort: 80
+  - host: quizzes.mooc.fi
+    http:
+      paths:
+      - backend:
+          service:
+            name: quizzes-backend-service
+            port:
+              number: 80
+        path: /api/
+        pathType: Prefix
+      - backend:
+          service:
+            name: quizzes-backendv2-service
+            port:
+              number: 80
+        path: /api/v2/
+        pathType: Prefix
+      - backend:
+          service:
+            name: quizzes-dashboardv2-service
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
