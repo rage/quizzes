@@ -91,6 +91,7 @@ const greekLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Επιλέξτε όλα όσα ισχύουν",
     answerCorrectLabel: "Σωστό",
     answerIncorrectLabel: "Λάθος",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Απάντηση στην άσκηση",

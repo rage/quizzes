@@ -84,6 +84,7 @@ const estonianLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "vali kõik, mis sobivad.",
     answerCorrectLabel: "Õige",
     answerIncorrectLabel: "Vale",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Harjutusele vastamine",

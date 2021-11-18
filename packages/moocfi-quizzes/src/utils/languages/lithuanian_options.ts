@@ -88,6 +88,7 @@ const lithuanianLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Pasirinkite visus tinkamus atsakymus.",
     answerCorrectLabel: "Teisinga",
     answerIncorrectLabel: "Neteisinga",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Teikiamas pratimo atsakymas",

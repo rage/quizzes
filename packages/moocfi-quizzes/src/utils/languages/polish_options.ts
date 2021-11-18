@@ -81,6 +81,7 @@ const polishLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Zaznacz wszystkie pasujące odpowiedzi",
     answerCorrectLabel: "Odpowiedź prawidłowa",
     answerIncorrectLabel: "Odpowiedź nieprawidłowa",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Rozwiązywanie ćwiczenia",

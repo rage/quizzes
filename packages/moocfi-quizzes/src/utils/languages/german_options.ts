@@ -89,6 +89,7 @@ const germanLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Bitte wähle alle passenden Alternativen.",
     answerCorrectLabel: "Richtig",
     answerIncorrectLabel: "Falsch",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Beantworten der Übung",

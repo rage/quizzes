@@ -94,6 +94,7 @@ const frenchLabels: SingleLanguageLabels = {
       "Sélectionnez toutes les options appropriées",
     answerCorrectLabel: "Correcte",
     answerIncorrectLabel: "Incorrecte",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Répondre au quiz",

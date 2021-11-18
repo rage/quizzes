@@ -83,6 +83,7 @@ const slovenianLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Izberite vse relevantne možnosti",
     answerCorrectLabel: "Pravilno",
     answerIncorrectLabel: "Napačno",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Izpolnjevanje naloge",
