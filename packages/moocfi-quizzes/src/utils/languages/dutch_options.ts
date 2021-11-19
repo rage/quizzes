@@ -85,6 +85,7 @@ const dutchLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Meer dan één antwoord mogelijk",
     answerCorrectLabel: "Juist",
     answerIncorrectLabel: "Onjuist",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Oefening aan het beantwoorden",

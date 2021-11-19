@@ -89,6 +89,7 @@ const irishLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Roghnaigh gach ceann is infheidhme.",
     answerCorrectLabel: "Ceart",
     answerIncorrectLabel: "Mícheart",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "An cleachtadh á fhreagairt",

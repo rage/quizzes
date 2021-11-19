@@ -89,6 +89,7 @@ const swedishLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Välj alla passande alternativ",
     answerCorrectLabel: "Rätt",
     answerIncorrectLabel: "Fel",
+    selectOption: "välj ett alternativ",
   },
   stage: {
     answerStageLabel: "Att ge svar på uppgiften",

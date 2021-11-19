@@ -85,6 +85,7 @@ const spanishLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Seleccionar todas las aplicables",
     answerCorrectLabel: "Correcto",
     answerIncorrectLabel: "Incorrecto",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Respondiendo al ejercicio",

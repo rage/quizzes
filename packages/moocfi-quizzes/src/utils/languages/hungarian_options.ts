@@ -85,6 +85,7 @@ const hungarianLabels: SingleLanguageLabels = {
       "Kérjük, jelölje be az összes megfelelő választ",
     answerCorrectLabel: "Helyes",
     answerIncorrectLabel: "Helytelen",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "A feladat megválaszolása",

@@ -86,6 +86,7 @@ const danishLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Der kan vælges flere svar.",
     answerCorrectLabel: "Korrekt",
     answerIncorrectLabel: "Forkert",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Besvarelse af øvelsen",

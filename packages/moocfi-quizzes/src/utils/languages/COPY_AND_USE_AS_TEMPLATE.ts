@@ -86,6 +86,7 @@ const finnishLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Valitse kaikki sopivat vaihtoehdot.",
     answerCorrectLabel: "Oikein",
     answerIncorrectLabel: "Väärin",
+    selectOption: "valitse vaihtoehto",
   },
   stage: {
     answerStageLabel: "Tehtävään vastaaminen",

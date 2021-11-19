@@ -88,6 +88,7 @@ const norwegianLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Velg  riktige påstander",
     answerCorrectLabel: "Korrekt",
     answerIncorrectLabel: "Galt",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Å svare på oppgaven",

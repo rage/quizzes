@@ -88,6 +88,7 @@ const romanianLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Selectați toate variantele aplicabile.",
     answerCorrectLabel: "Corect",
     answerIncorrectLabel: "Inorect",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Se transmit răspunsurile la exercițiu",

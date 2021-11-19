@@ -88,6 +88,7 @@ const malteseLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Agħżel dawk kollha li japplikaw",
     answerCorrectLabel: "Korretta",
     answerIncorrectLabel: "Żbaljata",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Naħdmu l-eżerċizzju",
