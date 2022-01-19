@@ -121,24 +121,37 @@ export const CoursePage = () => {
       ) : (
         ""
       )}
-      {Object.entries(byPartAndSection).map(([part, section]) => (
-        <div key={part}>
-          <Typography variant="h4">Part {part}</Typography>
-          {Object.entries(section).map(([section, quizzes]) => {
-            return (
-              <SectionOfPart
-                key={part + "-" + section}
-                section={section}
-                quizzes={quizzes}
-                requiringAttention={requiringAttention}
-              />
-            )
-          })}
-        </div>
-      ))}
+      {Object.entries(byPartAndSection)
+        .sort((a, b) => {
+          // sorts part 0 as last because it's the part for deleted quizzes
+          const first = Number(a[0])
+          const second = Number(b[0])
+          return zeroIsInfinity(first) - zeroIsInfinity(second)
+        })
+        .map(([part, section]) => (
+          <div key={part}>
+            <Typography variant="h4">
+              Part {part} {part === "0" && <span>(Deleted)</span>}
+            </Typography>
+            {Object.entries(section).map(([section, quizzes]) => {
+              return (
+                <SectionOfPart
+                  key={part + "-" + section}
+                  section={section}
+                  quizzes={quizzes}
+                  requiringAttention={requiringAttention}
+                />
+              )
+            })}
+          </div>
+        ))}
       <DebugDialog object={course} />
     </>
   )
+}
+
+function zeroIsInfinity(value: number): number {
+  return value === 0 ? Infinity : value
 }
 
 export default CoursePage
