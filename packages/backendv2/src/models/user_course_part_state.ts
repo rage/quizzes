@@ -138,24 +138,24 @@ class UserCoursePartState extends BaseModel {
         .where("course_id", courseId)
         .andWhereNot("part", 0)
 
-      const progress: PointsByGroup[] = userCoursePartStates.map(ucps => {
-        const maxPoints = quizzes
-          .filter(
-            quiz =>
-              quiz.part === ucps.coursePart && quiz.excludedFromScore === false,
-          )
-          .map(quiz => quiz.points)
-          .reduce((acc, curr) => acc + curr, 0)
-
-        const coursePartString = ucps.coursePart.toString()
+      const quizGroups: { [part: string] : Quiz[] } = {}
+      quizzes.forEach(quiz => {
+        quizGroups[quiz.part] = quizGroups[quiz.part] ?? []
+        quizGroups[quiz.part].push(quiz)
+      })
+      const courseParts: number[] = Object.keys(quizGroups).map(key => parseInt(key)).sort()
+      const progress: PointsByGroup[] = courseParts.map(part => {
+        const maxPoints = quizGroups[part].map(quiz => quiz.points).reduce((a, b) => a + b)
+        const userScoreList = userCoursePartStates.filter(ucps => ucps.coursePart == part)
+                                              .map(ucps => ucps.score)
+        const userScore = userScoreList.length > 0 ? userScoreList.reduce((a, b) => a + b) : 0
+        const groupString = `${part < 10 ? "osa0" : "osa"}${part}`
 
         return {
-          group: `${
-            coursePartString.length > 1 ? "osa" : "osa0"
-          }${coursePartString}`,
-          progress: Math.round((ucps.score / maxPoints) * 100) / 100,
-          n_points: Number(ucps.score.toFixed(2)),
-          max_points: maxPoints,
+          group: groupString,
+          progress: Math.round((userScore / maxPoints) * 100) / 100,
+          n_points: Number(userScore.toFixed(2)),
+          max_points: maxPoints
         }
       })
 
