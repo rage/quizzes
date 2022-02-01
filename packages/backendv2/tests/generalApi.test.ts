@@ -20,7 +20,7 @@ afterEach(async () => {
 describe("general-api", () => {
   beforeAll(async () => {
     await safeSeed(configA)
-  })  
+  })
 
   afterAll(async () => {
     nock.cleanAll()
