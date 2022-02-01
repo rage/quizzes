@@ -20,7 +20,7 @@ afterEach(async () => {
 describe("general-api", () => {
   beforeAll(async () => {
     await safeSeed(configA)
-  })
+  })  
 
   afterAll(async () => {
     nock.cleanAll()
@@ -87,7 +87,7 @@ describe("general-api", () => {
       .expect(response => {
         const data = response.body
         expect(data).toBeArray()
-        expect(data.length).toBe(1)
+        expect(data.length).toBe(2)
         // Check element of array
         const progress = data[0]
         expect(progress).toBeObject()

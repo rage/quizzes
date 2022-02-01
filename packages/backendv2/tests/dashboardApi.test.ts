@@ -1252,7 +1252,7 @@ describe("fetching user progress should", () => {
         }
       })
   })
-  test("return empty when user has no progress", done => {
+  test("return everything when user has no progress", done => {
     request(app.callback())
       .get(
         "/api/v2/dashboard/courses/51b66fc3-4da2-48aa-8eab-404370250ca3/user/current/progress",
@@ -1260,7 +1260,7 @@ describe("fetching user progress should", () => {
       .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
       .expect(res => {
-        expect(res.body).toEqual([])
+        expect(res.body).toEqual(validation.userWithoutProgressValidator)
       })
       .expect(200)
       .end(done)

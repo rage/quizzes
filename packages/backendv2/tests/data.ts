@@ -1097,7 +1097,20 @@ export const validation = {
       progress: 0,
       n_points: 0,
       max_points: 1,
-    },
+    },{
+      group: "osa02",
+      progress: 0,
+      n_points: 0,
+      max_points: 1,
+    }
+  ],
+  userWithoutProgressValidator: [
+    {
+      group: "osa01",
+      progress: 0,
+      n_points: 0,
+      max_points: 2,
+     }
   ],
   receivedPeerReviewsValidator: [
     {
