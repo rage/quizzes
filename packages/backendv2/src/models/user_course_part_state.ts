@@ -148,6 +148,7 @@ class UserCoursePartState extends BaseModel {
         .sort()
       const progress: PointsByGroup[] = courseParts.map(part => {
         const maxPoints = quizGroups[part]
+          .filter(quiz => !quiz.excludedFromScore)
           .map(quiz => quiz.points)
           .reduce((a, b) => a + b)
         const userScoreList = userCoursePartStates
