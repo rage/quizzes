@@ -89,10 +89,20 @@ export const CoursePage = () => {
   const quizzes = data.quizzes
   const course = data.course
   const byPart = groupBy(quizzes, "part")
+  const pointsByParts: { [part: number]: number } = {}
   let byPartAndSection: Record<string, Dictionary<Quiz[]>> = {}
   for (let [part, quizzes] of Object.entries(byPart)) {
     byPartAndSection[part] = groupBy(quizzes, "section")
+    pointsByParts[parseInt(part)] = quizzes
+      .filter(quiz => !quiz.excludedFromScore)
+      .map(quiz => quiz.points)
+      .reduce((a, b) => a + b)
   }
+
+  const points = data.quizzes
+    .filter(quiz => !quiz.excludedFromScore)
+    .map(quiz => quiz.points)
+    .reduce((a, b) => a + b)
 
   return (
     <>
@@ -108,6 +118,7 @@ export const CoursePage = () => {
       <CourseTitleWrapper>
         <Typography variant="h3" component="h1">
           {course.title}
+          <Typography variant="subtitle1">(Max points: {points})</Typography>
         </Typography>
 
         <Link href={`/courses/${id}/quizzes/new`}>
@@ -132,6 +143,11 @@ export const CoursePage = () => {
           <div key={part}>
             <Typography variant="h4">
               Part {part} {part === "0" && <span>(Deleted)</span>}
+              {part !== "0" && (
+                <Typography variant="subtitle2">
+                  (Points: {pointsByParts[parseInt(part)]})
+                </Typography>
+              )}
             </Typography>
             {Object.entries(section).map(([section, quizzes]) => {
               return (
