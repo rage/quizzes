@@ -34,6 +34,8 @@ const StyledButton = styled(Button)`
   }
 `
 
+const POINT_COLOR = "#505050"
+
 export const CoursePage = () => {
   const router = useRouter()
   const id = router.query.courseId?.toString() ?? ""
@@ -89,10 +91,20 @@ export const CoursePage = () => {
   const quizzes = data.quizzes
   const course = data.course
   const byPart = groupBy(quizzes, "part")
+  const pointsByParts: { [part: number]: number } = {}
   let byPartAndSection: Record<string, Dictionary<Quiz[]>> = {}
   for (let [part, quizzes] of Object.entries(byPart)) {
     byPartAndSection[part] = groupBy(quizzes, "section")
+    pointsByParts[parseInt(part)] = quizzes
+      .filter(quiz => !quiz.excludedFromScore)
+      .map(quiz => quiz.points)
+      .reduce((a, b) => a + b, 0)
   }
+
+  let points = data.quizzes
+    .filter(quiz => !quiz.excludedFromScore && quiz.part !== 0)
+    .map(quiz => quiz.points)
+    .reduce((a, b) => a + b, 0)
 
   return (
     <>
@@ -108,6 +120,9 @@ export const CoursePage = () => {
       <CourseTitleWrapper>
         <Typography variant="h3" component="h1">
           {course.title}
+          <Typography style={{ color: POINT_COLOR, fontSize: "20px" }}>
+            (Max points: {points})
+          </Typography>
         </Typography>
 
         <Link href={`/courses/${id}/quizzes/new`}>
@@ -131,7 +146,14 @@ export const CoursePage = () => {
         .map(([part, section]) => (
           <div key={part}>
             <Typography variant="h4">
-              Part {part} {part === "0" && <span>(Deleted)</span>}
+              Part {part}{" "}
+              {part === "0" ? (
+                <span>(Deleted)</span>
+              ) : (
+                <span style={{ color: POINT_COLOR, fontSize: "14px" }}>
+                  (Points: {pointsByParts[parseInt(part)]})
+                </span>
+              )}
             </Typography>
             {Object.entries(section).map(([section, quizzes]) => {
               return (
