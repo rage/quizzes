@@ -852,7 +852,7 @@ class QuizAnswer extends mixin(BaseModel, [
       userQuizState.status = "open"
     } else {
       userQuizState.status = "locked"
-      if (quiz.give_max_points_when_tries_run_out) {
+      if (quiz.giveMaxPointsWhenTriesRunOut) {
         userQuizState.pointsAwarded = quiz.points
       }
     }
