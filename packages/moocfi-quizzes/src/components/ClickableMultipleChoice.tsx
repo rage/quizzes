@@ -250,6 +250,7 @@ const Option: React.FunctionComponent<OptionProps> = ({
     // should be impossible
     return <div>Cannot find related item or language</div>
   }
+  const generalLabels = languageLabels.general
   const itemAnswer = quizAnswer.itemAnswers.find(
     ia => ia.quizItemId === item.id,
   )
@@ -322,7 +323,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
             {...clickOptions}
             aria-selected={optionIsSelected}
             aria-label={`${text.title}-${
-              option.correct ? "correct" : "incorrect"
+              option.correct
+                ? generalLabels.answerCorrectLabel
+                : generalLabels.answerIncorrectLabel
             }`}
           >
             <MarkdownText Component={justADiv} removeParagraphs>
@@ -348,7 +351,9 @@ const Option: React.FunctionComponent<OptionProps> = ({
           {...clickOptions}
           aria-selected={optionIsSelected}
           aria-label={`${text.title}-${
-            option.correct ? "correct" : "incorrect"
+            option.correct
+              ? generalLabels.answerCorrectLabel
+              : generalLabels.answerIncorrectLabel
           }`}
         >
           <MarkdownText Component={justADiv} removeParagraphs>
