@@ -1,15 +1,15 @@
-import * as Kafka from 'node-rdkafka';
-import { promisify } from 'util';
+import * as Kafka from "node-rdkafka"
+import { promisify } from "util"
 
-import { quizzes as knex } from '../config/knex';
-import { RequiredAction } from '../services/kafka.service';
+import { quizzes as knex } from "../config/knex"
+import { RequiredAction } from "../services/kafka.service"
 import {
   ExerciseData,
   PointsByGroup,
   ProgressMessage,
   QuizAnswerMessage,
   QuizMessage,
-} from '../types';
+} from "../types"
 
 const producer = new Kafka.Producer({
   "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
