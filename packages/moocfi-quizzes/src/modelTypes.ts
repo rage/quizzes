@@ -225,4 +225,5 @@ export interface QuizAnswerMessage {
   service_id: string
   required_actions: string[] | null
   message_format_version: number
+  original_submission_date: string | null
 }

@@ -89,6 +89,7 @@ export default class KafkaService {
 
     const message: QuizAnswerMessage = {
       timestamp: new Date().toISOString(),
+      original_submission_date: quizAnswer.createdAt.toISOString(),
       exercise_id: quizAnswer.quizId,
       n_points: quiz.excludedFromScore ? 0 : userQuizState.pointsAwarded,
       completed: quizAnswer.status === "confirmed",
