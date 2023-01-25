@@ -1,58 +1,49 @@
-import React, { useContext, useState, useEffect } from "react"
+import React, { useContext, useEffect, useState } from "react"
+import BreadCrumbContext from "../contexts/BreadCrumbContext"
 import { Breadcrumbs, Typography } from "@material-ui/core"
 import Link from "next/link"
-import BreadCrumbContext from "../contexts/BreadCrumbContext"
-import { Alert, Skeleton } from "@material-ui/lab"
 import styled from "styled-components"
-import LoginStateContext from "../contexts/LoginStateContext"
 
-const StyledSkeleton = styled(Skeleton)`
-  margin-bottom: 1rem;
+
+const BreadCrumbContainer = styled(Breadcrumbs)`
+  text-decoration: none;
+  cursor: pointer;
+  height: 40px;
+  background-color: white;
+  border-bottom: 1px solid #D3D3D3;
+  color: black;
+  display: flex;
+  align-items:center;
+  padding-left: 12px;
+  position: relative;
 `
 
-const StyledBreadcrumbs = styled(Breadcrumbs)`
-  .MuiBreadcrumbs-separator {
-    color: white;
-  }
-`
 
-const BreadCrumbText = styled(Typography)`
-  display: flex !important;
-  color: lavender !important;
+const BreadCrumbText = styled.p`
+    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+    font-size: 1rem;
+    
+    &:hover {
+        text-decoration: underline;
+    }
+
+  
 `
 
 const BreadCrumbLink = styled.a`
-  color: white;
   text-decoration: none;
   cursor: pointer;
+  font-size: 1rem;
+  color: #757575;
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
 `
 
-const BreadCrumb = () => {
-  const [loading, setLoading] = useState(true)
+const BreadCrumbs: React.FC = () => {
   const { breadCrumbs } = useContext(BreadCrumbContext)
-  const breadCrumbsNotDefined = breadCrumbs.length === 0
-  const { loggedIn } = useContext(LoginStateContext)
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setLoading(false)
-    }, 1000)
-    return () => {
-      clearTimeout(timeoutId)
-    }
-  }, [])
-  if (loading && breadCrumbsNotDefined) {
-    return <StyledSkeleton variant="rect" height={50} />
-  }
-  if (breadCrumbsNotDefined && loggedIn) {
-    return (
-      <Alert severity="warning">
-        This page has not specified the contents of breadcrumb.
-      </Alert>
-    )
-  }
+
   return (
-    <StyledBreadcrumbs separator=">">
-      {breadCrumbs.map(crumb => (
+    <BreadCrumbContainer>
+{breadCrumbs.map(crumb => (
         <div key={crumb.label}>
           {crumb.as ? (
             <Link href={crumb.as} passHref>
@@ -63,8 +54,8 @@ const BreadCrumb = () => {
           )}
         </div>
       ))}
-    </StyledBreadcrumbs>
+    </BreadCrumbContainer>
   )
 }
 
-export default BreadCrumb
+export default BreadCrumbs

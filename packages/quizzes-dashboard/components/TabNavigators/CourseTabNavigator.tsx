@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { faChalkboard, faPen } from "@fortawesome/free-solid-svg-icons"
+import { faClipboardList, faPenSquare, faUsersCog } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Tab, Tabs, Typography } from "@material-ui/core"
 import { useRouter } from "next/router"
@@ -7,6 +7,7 @@ import { ITabToComponent } from "../CoursePage/types"
 import { CoursePage } from "../CoursePage"
 import EditCourseDetails from "../CoursePage/EditDetailsForm"
 import { useUserAbilities } from "../../hooks/useUserAbilities"
+import CompletionPage from "../CompletionPage"
 
 const CourseTabNavigator = () => {
   const router = useRouter()
@@ -24,6 +25,7 @@ const CourseTabNavigator = () => {
   const coursePageTabs: ITabToComponent = {
     listing: CoursePage,
     edit: EditCourseDetails,
+    completion: CompletionPage,
     default_tab: CoursePage,
   }
 
@@ -48,7 +50,7 @@ const CourseTabNavigator = () => {
       >
         <Tab
           key="listing"
-          icon={<FontAwesomeIcon icon={faChalkboard} />}
+          icon={<FontAwesomeIcon icon={faClipboardList} />}
           value="listing"
           label={<Typography>Part Listing</Typography>}
           onClick={() => {
@@ -58,13 +60,25 @@ const CourseTabNavigator = () => {
         {userAbilities?.includes("edit") && (
           <Tab
             key="edit"
-            icon={<FontAwesomeIcon icon={faPen} />}
+            icon={<FontAwesomeIcon icon={faPenSquare} />}
             value="edit"
-            label={<Typography>Edit Course Details</Typography>}
+            label={<Typography>Course Details</Typography>}
             onClick={() => {
               router.push(`${pathname}/edit`, undefined, { shallow: true })
             }}
           />
+          
+        )}
+         {userAbilities?.includes("edit") && (
+          <Tab
+            key="completion"
+            icon={<FontAwesomeIcon icon={faUsersCog} />}
+            value="completion"
+            label={<Typography>Completion settings</Typography>}
+            onClick={() => {
+              router.push(`${pathname}/completion`, undefined, { shallow: true })
+            }}
+        />
         )}
       </Tabs>
       <ComponentTag />

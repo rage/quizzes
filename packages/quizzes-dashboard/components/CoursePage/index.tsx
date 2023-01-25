@@ -106,7 +106,7 @@ export const CoursePage = () => {
         </Head>
       </div>
       <CourseTitleWrapper>
-        <Typography variant="h3" component="h1">
+        <Typography style={{fontWeight: 'bold'}} variant="h3" component="h1">
           {course.title}
         </Typography>
 
@@ -116,26 +116,26 @@ export const CoursePage = () => {
           </StyledButton>
         </Link>
       </CourseTitleWrapper>
-      {userAbilities.includes("duplicate") ? (
-        <DuplicateCourseButton course={course} />
-      ) : (
-        ""
-      )}
       {Object.entries(byPartAndSection).map(([part, section]) => (
         <div key={part}>
           <Typography variant="h4">Part {part}</Typography>
           {Object.entries(section).map(([section, quizzes]) => {
             return (
               <SectionOfPart
-                key={part + "-" + section}
-                section={section}
-                quizzes={quizzes}
-                requiringAttention={requiringAttention}
+              key={part + "-" + section}
+              section={section}
+              quizzes={quizzes}
+              requiringAttention={requiringAttention}
               />
-            )
-          })}
+              )
+            })}
         </div>
       ))}
+      {userAbilities.includes("duplicate") ? (
+        <DuplicateCourseButton course={course} />
+      ) : (
+        ""
+      )}
       <DebugDialog object={course} />
     </>
   )

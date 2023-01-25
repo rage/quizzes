@@ -7,6 +7,7 @@ import Language from "./language"
 import CourseTranslation from "./course_translation"
 import knex from "../../database/knex"
 import BaseModel from "./base_model"
+import { EditCourseCompletionPayloadFields } from "../types"
 
 class Course extends BaseModel {
   id!: string
@@ -349,6 +350,23 @@ class Course extends BaseModel {
 
     return { success: true, newCourseId: newCourseId }
   }
+
+
+
+  /**
+   * updates the properties of the course included in the payload
+   * @param id Id of the course
+   * @param payload Course completion payload
+   * @see EditCourseCompletionPayloadFields
+   */
+  static async updateCourseProperties(
+    id: string,
+    payload: EditCourseCompletionPayloadFields,
+  ) {
+    const course = await this.getById(id)
+    return await course.$query().patchAndFetch(payload)
+  }
+
 
   static async getCorrespondenceFile(oldCourseId: string, newCourseId: string) {
     const stringifier = stringify({

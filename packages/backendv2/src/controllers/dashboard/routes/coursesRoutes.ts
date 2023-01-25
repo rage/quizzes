@@ -93,6 +93,32 @@ const coursesRoutes = new Router<CustomState, CustomContext>({
     ]
     ctx.body = allAbilities
   })
+  .post("/:courseId/completion", accessControl(), async ctx => {
+    const courseId = ctx.params.courseId
+    const payload = ctx.request.body
+    
+    await checkAccessOrThrow(ctx.state.user, courseId, "edit")
+    
+    // Check if the course exists
+    try {
+      await Course.getFlattenedById(courseId)
+    } catch (error) {
+      throw error
+    }
+
+    // Check existance of moocId and payload
+    if (!payload) {
+      throw new BadRequestError("No edited properties provided.")
+    }
+
+    await Course.updateCourseProperties(
+      courseId,
+      payload
+    )
+
+    ctx.body = await Course.getFlattenedById(courseId)
+
+  })
   .post("/:courseId/edit", accessControl(), async ctx => {
     const courseId = ctx.params.courseId
     const payload = ctx.request.body

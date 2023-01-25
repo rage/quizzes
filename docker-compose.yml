@@ -33,8 +33,6 @@ services:
     build: 
       context: ./packages/quizzes-dashboard
       dockerfile: development.Dockerfile
-    volumes:
-      - ./packages/quizzes-dashboard:/quizzes/dashboard
     depends_on:
       - backend
     ports:
