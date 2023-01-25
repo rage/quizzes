@@ -89,6 +89,7 @@ const italianLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Più risposte possibili",
     answerCorrectLabel: "Esatto",
     answerIncorrectLabel: "Sbagliato",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Fare l'esercizio",

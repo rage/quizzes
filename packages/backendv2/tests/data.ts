@@ -3,6 +3,7 @@ import { uuid, dateTime } from "./util"
 export const input = {
   newQuiz: {
     courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    giveMaxPointsWhenTriesRunOut: false,
     part: 1,
     section: 1,
     points: 1,
@@ -15,6 +16,7 @@ export const input = {
     awardPointsEvenIfWrong: false,
     grantPointsPolicy: "grant_whenever_possible",
     autoReject: true,
+    checkPlagiarism: false,
     title: "quiz",
     body: "body",
     submitMessage: "nice one!",
@@ -74,6 +76,7 @@ export const input = {
   quizUpdate: {
     id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
     courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    giveMaxPointsWhenTriesRunOut: false,
     part: 1,
     section: 1,
     points: 1,
@@ -86,6 +89,7 @@ export const input = {
     awardPointsEvenIfWrong: false,
     grantPointsPolicy: "grant_whenever_possible",
     autoReject: true,
+    checkPlagiarism: false,
     title: "quiz",
     body: "body",
     submitMessage: "nice one!",
@@ -226,6 +230,7 @@ export const input = {
 interface QuizValidator {
   id: string
   courseId: string
+  giveMaxPointsWhenTriesRunOut: false
   part: number
   section: number
   points: number
@@ -238,6 +243,8 @@ interface QuizValidator {
   awardPointsEvenIfWrong: false
   grantPointsPolicy: "grant_whenever_possible"
   autoReject: true
+
+  checkPlagiarism: false
   title: "quiz"
   body: "body"
   submitMessage: "nice one!"
@@ -249,6 +256,7 @@ export const validation = {
   newQuiz: {
     id: expect.stringMatching(uuid),
     courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    giveMaxPointsWhenTriesRunOut: false,
     part: 1,
     section: 1,
     points: 1,
@@ -261,6 +269,7 @@ export const validation = {
     awardPointsEvenIfWrong: false,
     grantPointsPolicy: "grant_whenever_possible",
     autoReject: true,
+    checkPlagiarism: false,
     title: "quiz",
     body: "body",
     submitMessage: "nice one!",
@@ -363,6 +372,7 @@ export const validation = {
   quizUpdate: {
     id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
     courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    giveMaxPointsWhenTriesRunOut: false,
     part: 1,
     section: 1,
     points: 1,
@@ -375,6 +385,7 @@ export const validation = {
     awardPointsEvenIfWrong: false,
     grantPointsPolicy: "grant_whenever_possible",
     autoReject: true,
+    checkPlagiarism: false,
     title: "quiz",
     body: "body",
     submitMessage: "nice one!",
@@ -463,6 +474,7 @@ export const validation = {
   quiz1: {
     id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
     courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    giveMaxPointsWhenTriesRunOut: false,
     part: 1,
     section: 1,
     points: 1,
@@ -475,6 +487,7 @@ export const validation = {
     awardPointsEvenIfWrong: false,
     grantPointsPolicy: "grant_whenever_possible",
     autoReject: true,
+    checkPlagiarism: false,
     title: "quiz 1",
     body: "body",
     submitMessage: "nice one!",
@@ -577,6 +590,7 @@ export const validation = {
   quiz2: {
     id: "2b8f05ac-2a47-436e-8675-35bfe9a5c0ac",
     courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    giveMaxPointsWhenTriesRunOut: false,
     part: 2,
     section: 1,
     points: 1,
@@ -589,6 +603,7 @@ export const validation = {
     awardPointsEvenIfWrong: false,
     grantPointsPolicy: "grant_whenever_possible",
     autoReject: true,
+    checkPlagiarism: false,
     title: "quiz 2",
     body: "body",
     submitMessage: "nice one!",
@@ -651,6 +666,7 @@ export const validation = {
   quizWithoutPeerReviews: {
     id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
     courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    giveMaxPointsWhenTriesRunOut: false,
     part: 1,
     section: 1,
     points: 1,
@@ -663,6 +679,7 @@ export const validation = {
     awardPointsEvenIfWrong: false,
     grantPointsPolicy: "grant_whenever_possible",
     autoReject: true,
+    checkPlagiarism: false,
     title: "quiz",
     body: "body",
     submitMessage: "nice one!",
@@ -725,6 +742,7 @@ export const validation = {
   quizWithoutPeerReviewQuestions: {
     id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
     courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    giveMaxPointsWhenTriesRunOut: false,
     part: 1,
     section: 1,
     points: 1,
@@ -737,6 +755,7 @@ export const validation = {
     awardPointsEvenIfWrong: false,
     grantPointsPolicy: "grant_whenever_possible",
     autoReject: true,
+    checkPlagiarism: false,
     title: "quiz",
     body: "body",
     submitMessage: "nice one!",
@@ -990,8 +1009,10 @@ export const validation = {
     quiz: {
       autoConfirm: true,
       autoReject: true,
+      checkPlagiarism: false,
       awardPointsEvenIfWrong: false,
       courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+      giveMaxPointsWhenTriesRunOut: false,
       createdAt: expect.stringMatching(dateTime),
       deadline: null,
       excludedFromScore: false,
@@ -1263,6 +1284,7 @@ export const validation = {
     quiz: {
       id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
       courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+      giveMaxPointsWhenTriesRunOut: false,
       part: 1,
       section: 1,
       points: 1,
@@ -1271,6 +1293,7 @@ export const validation = {
       excludedFromScore: false,
       autoConfirm: true,
       autoReject: true,
+      checkPlagiarism: false,
       triesLimited: true,
       tries: 1,
       grantPointsPolicy: "grant_whenever_possible",
@@ -1452,6 +1475,7 @@ export const validation = {
   quizPreview: {
     id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
     courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
+    giveMaxPointsWhenTriesRunOut: false,
     part: 1,
     section: 1,
     points: 1,
@@ -1460,6 +1484,7 @@ export const validation = {
     excludedFromScore: false,
     autoConfirm: true,
     autoReject: true,
+    checkPlagiarism: false,
     triesLimited: true,
     tries: 1,
     grantPointsPolicy: "grant_whenever_possible",

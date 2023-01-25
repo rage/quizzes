@@ -21,6 +21,8 @@ import softDelete from "objection-soft-delete"
 import { mixin } from "objection"
 import QuizAnswerStatusModification from "./quiz_answer_status_modification"
 import { TStatusModificationOperation } from "./../types/index"
+import { relayNewAnswer } from "../services/plagiarism"
+import Language from "./language"
 
 type QuizAnswerStatus =
   | "draft"
@@ -581,6 +583,9 @@ class QuizAnswer extends mixin(BaseModel, [
       }
       await trx.commit()
       quiz.course = course
+      if (quiz.checkPlagiarism) {
+        await this.relayPlagiarismData(savedQuizAnswer, quiz)
+      }
       return {
         quiz,
         quizAnswer: savedQuizAnswer,
@@ -589,6 +594,26 @@ class QuizAnswer extends mixin(BaseModel, [
     } catch (error) {
       await trx.rollback()
       throw error
+    }
+  }
+
+  private static async relayPlagiarismData(quizAnswer: QuizAnswer, quiz: Quiz) {
+    const language = await Language.query().findById(quiz.course.languageId)
+    for (const quizItem of quiz.items) {
+      if (quizItem.type === "essay") {
+        const itemAnswer = quizAnswer.itemAnswers.find(
+          itemAnswer => itemAnswer.quizItemId === quizItem.id,
+        )
+        if (itemAnswer) {
+          relayNewAnswer({
+            quizId: quiz.id,
+            quizAnswerId: quizAnswer.id,
+            quizItemAnswerId: itemAnswer.id,
+            language: language.name.split(" ")[0].toLowerCase(),
+            data: itemAnswer.textData,
+          })
+        }
+      }
     }
   }
 
@@ -827,6 +852,9 @@ class QuizAnswer extends mixin(BaseModel, [
       userQuizState.status = "open"
     } else {
       userQuizState.status = "locked"
+      if (quiz.giveMaxPointsWhenTriesRunOut) {
+        userQuizState.pointsAwarded = quiz.points
+      }
     }
   }
 

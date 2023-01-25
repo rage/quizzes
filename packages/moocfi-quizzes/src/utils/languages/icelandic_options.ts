@@ -87,6 +87,7 @@ const icelandicLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Veldu allt sem við á",
     answerCorrectLabel: "Rétt",
     answerIncorrectLabel: "Rangt",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Svarar æfingunni",

@@ -69,6 +69,7 @@ export type MultipleChoiceLabels = {
   chooseAllSuitableOptionsLabel: string
   answerCorrectLabel: string
   answerIncorrectLabel: string
+  selectOption: string
 }
 
 export type EssayLabels = {

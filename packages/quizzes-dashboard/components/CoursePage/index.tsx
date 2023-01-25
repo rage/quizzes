@@ -34,6 +34,8 @@ const StyledButton = styled(Button)`
   }
 `
 
+const POINT_COLOR = "#505050"
+
 export const CoursePage = () => {
   const router = useRouter()
   const id = router.query.courseId?.toString() ?? ""
@@ -89,10 +91,20 @@ export const CoursePage = () => {
   const quizzes = data.quizzes
   const course = data.course
   const byPart = groupBy(quizzes, "part")
+  const pointsByParts: { [part: number]: number } = {}
   let byPartAndSection: Record<string, Dictionary<Quiz[]>> = {}
   for (let [part, quizzes] of Object.entries(byPart)) {
     byPartAndSection[part] = groupBy(quizzes, "section")
+    pointsByParts[parseInt(part)] = quizzes
+      .filter(quiz => !quiz.excludedFromScore)
+      .map(quiz => quiz.points)
+      .reduce((a, b) => a + b, 0)
   }
+
+  let points = data.quizzes
+    .filter(quiz => !quiz.excludedFromScore && quiz.part !== 0)
+    .map(quiz => quiz.points)
+    .reduce((a, b) => a + b, 0)
 
   return (
     <>
@@ -108,6 +120,9 @@ export const CoursePage = () => {
       <CourseTitleWrapper>
         <Typography style={{fontWeight: 'bold'}} variant="h3" component="h1">
           {course.title}
+          <Typography style={{ color: POINT_COLOR, fontSize: "20px" }}>
+            (Max points: {points})
+          </Typography>
         </Typography>
 
         <Link href={`/courses/${id}/quizzes/new`}>
@@ -116,21 +131,37 @@ export const CoursePage = () => {
           </StyledButton>
         </Link>
       </CourseTitleWrapper>
-      {Object.entries(byPartAndSection).map(([part, section]) => (
-        <div key={part}>
-          <Typography variant="h4">Part {part}</Typography>
-          {Object.entries(section).map(([section, quizzes]) => {
-            return (
-              <SectionOfPart
-              key={part + "-" + section}
-              section={section}
-              quizzes={quizzes}
-              requiringAttention={requiringAttention}
-              />
+      {Object.entries(byPartAndSection)
+        .sort((a, b) => {
+          // sorts part 0 as last because it's the part for deleted quizzes
+          const first = Number(a[0])
+          const second = Number(b[0])
+          return zeroIsInfinity(first) - zeroIsInfinity(second)
+        })
+        .map(([part, section]) => (
+          <div key={part}>
+            <Typography variant="h4">
+              Part {part}{" "}
+              {part === "0" ? (
+                <span>(Deleted)</span>
+              ) : (
+                <span style={{ color: POINT_COLOR, fontSize: "14px" }}>
+                  (Points: {pointsByParts[parseInt(part)]})
+                </span>
+              )}
+            </Typography>
+            {Object.entries(section).map(([section, quizzes]) => {
+              return (
+                <SectionOfPart
+                  key={part + "-" + section}
+                  section={section}
+                  quizzes={quizzes}
+                  requiringAttention={requiringAttention}
+                />
               )
             })}
-        </div>
-      ))}
+          </div>
+        ))}
       {userAbilities.includes("duplicate") ? (
         <DuplicateCourseButton course={course} />
       ) : (
@@ -139,6 +170,10 @@ export const CoursePage = () => {
       <DebugDialog object={course} />
     </>
   )
+}
+
+function zeroIsInfinity(value: number): number {
+  return value === 0 ? Infinity : value
 }
 
 export default CoursePage

@@ -84,6 +84,7 @@ const latvianLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Atlasiet visu attiecīgo!",
     answerCorrectLabel: "Pareizi",
     answerIncorrectLabel: "Nepareizi",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Atbildēšana uz uzdevumu",

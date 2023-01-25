@@ -83,6 +83,7 @@ const slovakLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Vyberať všetky vhodné možnosti",
     answerCorrectLabel: "Správne",
     answerIncorrectLabel: "Nesprávne",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Práca na cvičení",

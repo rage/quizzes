@@ -84,6 +84,7 @@ const bulgarianLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Изберете всички приложими отговори",
     answerCorrectLabel: "Правилен отговор",
     answerIncorrectLabel: "Неправилен отговор",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Отговор на упражнението",

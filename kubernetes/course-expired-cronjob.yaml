@@ -1,10 +1,12 @@
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: update-expired-courses
 spec:
   schedule: "0 0 1 * *"
   concurrencyPolicy: Forbid
+  failedJobsHistoryLimit: 1
+  successfulJobsHistoryLimit: 3
   jobTemplate:
     spec:
       activeDeadlineSeconds: 3600
@@ -17,7 +19,7 @@ spec:
               command: ["npm", "run", "update-expired-courses"]
               resources:
                 requests:
-                  memory: "1000Mi"
+                  memory: "500Mi"
               env:
                 - name: REDIS_HOST
                   value: "quizzes-backend-redis-master.default.svc.cluster.local"

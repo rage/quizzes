@@ -27,6 +27,7 @@ export interface ManualReviewProps {
 
 export const ManualReviewField = ({ answer }: ManualReviewProps) => {
   const [success, setSuccess] = useState(false)
+  const [error, setError] = useState<null | Error>(null)
   const [showSnacks, setShowSnacks] = useState(false)
   const [, dispatch] = useAnswerListState()
 
@@ -41,6 +42,7 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
     plagiarismSuspected = false,
   ) => {
     try {
+      setError(null)
       const res = await changeAnswerStatus(
         answerId,
         status,
@@ -56,6 +58,9 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
         setShowSnacks(true)
       }
     } catch (e) {
+      if (e instanceof Error) {
+        setError(e)
+      }
       setShowSnacks(true)
       setSuccess(false)
     }
@@ -76,7 +81,16 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
             <Typography>Answer status saved successfully</Typography>
           ) : (
             <Typography>
-              Something went wrong while saving status, status not changed
+              Something went wrong while saving status, status not changed.
+              {error && (
+                <>
+                  <p>
+                    Reason: <pre>{error.toString()}</pre>
+                  </p>
+                  {/* @ts-expect-error: axios property error.response */}
+                  {error?.response?.data && <p>{error.response.data}</p>}
+                </>
+              )}
             </Typography>
           )}
         </Alert>

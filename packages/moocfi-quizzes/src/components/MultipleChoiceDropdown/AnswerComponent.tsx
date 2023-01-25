@@ -45,10 +45,15 @@ const AnswerComponent = ({
   // This does not support selecting multiple options at the moment.
   const selectedOption = selectedOptionIds[0]
 
+  const languageLabels = useTypedSelector(
+    state => state.language.languageLabels,
+  )
+  const multipleChoiceLabels = languageLabels?.multipleChoice
+
   return (
     <>
       <InputLabel id="demo-simple-select-outlined-label">
-        select an option
+        {multipleChoiceLabels?.selectOption}
       </InputLabel>
       <StyledSelect
         labelId="demo-simple-select-outlined-label"

@@ -82,6 +82,7 @@ const czechLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Vybrat všechny vhodné možnosti",
     answerCorrectLabel: "Správně",
     answerIncorrectLabel: "Špatně",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "Plnění úkolu",

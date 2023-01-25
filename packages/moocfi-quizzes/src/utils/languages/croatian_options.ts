@@ -88,6 +88,7 @@ const croatianLabels: SingleLanguageLabels = {
     chooseAllSuitableOptionsLabel: "Označite sve moguće odgovore.",
     answerCorrectLabel: "Točno.",
     answerIncorrectLabel: "Netočno.",
+    selectOption: "select an option",
   },
   stage: {
     answerStageLabel: "U tijeku je rješavanje zadatka",

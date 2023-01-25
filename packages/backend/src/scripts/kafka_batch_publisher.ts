@@ -1,8 +1,8 @@
 import * as Kafka from "node-rdkafka"
-import { quizzes as knex } from "../config/knex"
-
 import { promisify } from "util"
 
+import { quizzes as knex } from "../config/knex"
+import { RequiredAction } from "../services/kafka.service"
 import {
   ExerciseData,
   PointsByGroup,
@@ -10,8 +10,6 @@ import {
   QuizAnswerMessage,
   QuizMessage,
 } from "../types"
-
-import { RequiredAction } from "../services/kafka.service"
 
 const producer = new Kafka.Producer({
   "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
@@ -358,7 +356,7 @@ const publishProgress = async (
           }${coursePartString}`,
           progress: Math.floor(ucps.progress * 100) / 100,
           n_points: Number(ucps.score.toFixed(2)),
-          max_points: maxPointsByPart[ucps.course_part],
+          max_points: maxPointsByPart[ucps.course_part] ?? 0,
         }
       })
       const message: ProgressMessage = {
