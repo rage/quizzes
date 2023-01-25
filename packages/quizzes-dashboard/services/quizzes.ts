@@ -394,17 +394,17 @@ export const updateCourseProperties = async (
 
 export interface CompletionProperties {
   // Spam flags
-  maxReviewSpamFlags?: number | undefined,
-  maxSpamFlags?: number | undefined,
+  maxReviewSpamFlags?: number | undefined
+  maxSpamFlags?: number | undefined
   // Peer review
-  minPeerReviewsGiven?: number | undefined,
-  minPeerReviewsReceived?: number | undefined,
-  minReviewAverage?: number | undefined,
+  minPeerReviewsGiven?: number | undefined
+  minPeerReviewsReceived?: number | undefined
+  minReviewAverage?: number | undefined
 }
 
 export const updateCourseCompletionProperties = async (
   courseId: string,
-  changedProperties: CompletionProperties
+  changedProperties: CompletionProperties,
 ): Promise<Course> => {
   const userInfo = checkStore()
   if (userInfo) {
@@ -412,7 +412,11 @@ export const updateCourseCompletionProperties = async (
       headers: { Authorization: "bearer " + userInfo.accessToken },
     }
     return (
-      await api.post(`/courses/${courseId}/completion`, changedProperties, config)
+      await api.post(
+        `/courses/${courseId}/completion`,
+        changedProperties,
+        config,
+      )
     ).data
   } else {
     throw new Error()

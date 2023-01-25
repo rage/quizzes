@@ -1,4 +1,11 @@
-import { Typography, Card, CardContent, Button, Badge, CardHeader } from "@material-ui/core"
+import {
+  Typography,
+  Card,
+  CardContent,
+  Button,
+  Badge,
+  CardHeader,
+} from "@material-ui/core"
 import Link from "next/link"
 import React from "react"
 import styled from "styled-components"
@@ -65,36 +72,34 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
     quiz?.courseId ?? "",
     "user-abilities",
   )
-  
+
   const quizType = types.length > 0 ? types[0] : "unknown"
 
   return (
     <Link href={`/quizzes/${quiz.id}/overview`} passHref>
       <QuizLink>
         <QuizCard>
-          <CardHeader title={title} subheader={quizType}/>
-              <ButtonContainer>
-                <Badge
-                  color="error"
-                  badgeContent={requiringAttention}
-                  invisible={requiringAttention === undefined}
-                >
-                  <Link
-                    href={`/quizzes/${quiz.id}/answers-requiring-attention`}
-                  >
-                    <Button variant="outlined">
-                      <Typography>Answers requiring attention</Typography>
-                    </Button>
-                  </Link>
-                </Badge>
-                {userAbilities?.includes("edit") && (
-                  <Link href={`/quizzes/${quiz.id}/edit`}>
-                    <Button variant="outlined">
-                      <Typography>Edit quiz</Typography>
-                    </Button>
-                  </Link>
-                )}
-              </ButtonContainer>
+          <CardHeader title={title} subheader={quizType} />
+          <ButtonContainer>
+            <Badge
+              color="error"
+              badgeContent={requiringAttention}
+              invisible={requiringAttention === undefined}
+            >
+              <Link href={`/quizzes/${quiz.id}/answers-requiring-attention`}>
+                <Button variant="outlined">
+                  <Typography>Answers requiring attention</Typography>
+                </Button>
+              </Link>
+            </Badge>
+            {userAbilities?.includes("edit") && (
+              <Link href={`/quizzes/${quiz.id}/edit`}>
+                <Button variant="outlined">
+                  <Typography>Edit quiz</Typography>
+                </Button>
+              </Link>
+            )}
+          </ButtonContainer>
         </QuizCard>
       </QuizLink>
     </Link>

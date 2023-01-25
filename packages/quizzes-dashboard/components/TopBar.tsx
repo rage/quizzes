@@ -9,9 +9,7 @@ import Link from "next/link"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faHome, faSignOutAlt } from "@fortawesome/free-solid-svg-icons"
 
-const StyledAppBar = styled(AppBar)`
-
-`
+const StyledAppBar = styled(AppBar)``
 
 const EmptySpace = styled.div`
   flex: 1;
@@ -34,25 +32,30 @@ const TopBar = () => {
   return (
     <>
       <StyledAppBar elevation={0} position="sticky">
-        
         <Toolbar>
           <Link href="/">
             <LinkWrapper>
-              <Typography style={{ fontSize: "22px", fontWeight: "bold" }}>Quizzes</Typography>
+              <Typography style={{ fontSize: "22px", fontWeight: "bold" }}>
+                Quizzes
+              </Typography>
             </LinkWrapper>
           </Link>
           <EmptySpace />
           <EmptySpace />
-          {loggedIn && 
+          {loggedIn && (
             <>
-              <Button style={{fontWeight:'bold'}} color="inherit" onClick={handleLogout}>
-                <FontAwesomeIcon icon={faSignOutAlt}/>
-                <p style={{marginLeft:'6px'}}>Logout</p>
+              <Button
+                style={{ fontWeight: "bold" }}
+                color="inherit"
+                onClick={handleLogout}
+              >
+                <FontAwesomeIcon icon={faSignOutAlt} />
+                <p style={{ marginLeft: "6px" }}>Logout</p>
               </Button>
             </>
-          }
+          )}
         </Toolbar>
-        { loggedIn && <BreadCrumb /> }
+        {loggedIn && <BreadCrumb />}
       </StyledAppBar>
     </>
   )

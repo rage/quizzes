@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react"
-import { faClipboardList, faPenSquare, faUsersCog } from "@fortawesome/free-solid-svg-icons"
+import {
+  faClipboardList,
+  faPenSquare,
+  faUsersCog,
+} from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Tab, Tabs, Typography } from "@material-ui/core"
 import { useRouter } from "next/router"
@@ -67,18 +71,19 @@ const CourseTabNavigator = () => {
               router.push(`${pathname}/edit`, undefined, { shallow: true })
             }}
           />
-          
         )}
-         {userAbilities?.includes("edit") && (
+        {userAbilities?.includes("edit") && (
           <Tab
             key="completion"
             icon={<FontAwesomeIcon icon={faUsersCog} />}
             value="completion"
             label={<Typography>Completion settings</Typography>}
             onClick={() => {
-              router.push(`${pathname}/completion`, undefined, { shallow: true })
+              router.push(`${pathname}/completion`, undefined, {
+                shallow: true,
+              })
             }}
-        />
+          />
         )}
       </Tabs>
       <ComponentTag />

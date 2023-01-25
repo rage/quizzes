@@ -118,7 +118,7 @@ export const CoursePage = () => {
         </Head>
       </div>
       <CourseTitleWrapper>
-        <Typography style={{fontWeight: 'bold'}} variant="h3" component="h1">
+        <Typography style={{ fontWeight: "bold" }} variant="h3" component="h1">
           {course.title}
           <Typography style={{ color: POINT_COLOR, fontSize: "20px" }}>
             (Max points: {points})

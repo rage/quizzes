@@ -351,8 +351,6 @@ class Course extends BaseModel {
     return { success: true, newCourseId: newCourseId }
   }
 
-
-
   /**
    * updates the properties of the course included in the payload
    * @param id Id of the course
@@ -366,7 +364,6 @@ class Course extends BaseModel {
     const course = await this.getById(id)
     return await course.$query().patchAndFetch(payload)
   }
-
 
   static async getCorrespondenceFile(oldCourseId: string, newCourseId: string) {
     const stringifier = stringify({

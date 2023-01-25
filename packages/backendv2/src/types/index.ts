@@ -103,12 +103,12 @@ export interface EditCoursePayloadFields {
 
 export interface EditCourseCompletionPayloadFields {
   // Spam flags
-  maxReviewSpamFlags?: number,
-  maxSpamFlags?: number,
+  maxReviewSpamFlags?: number
+  maxSpamFlags?: number
   // Peer review
-  minPeerReviewsGiven?: number,
-  minPeerReviewsReceived?: number,
-  minReviewAverage?: number,
+  minPeerReviewsGiven?: number
+  minPeerReviewsReceived?: number
+  minReviewAverage?: number
 }
 
 export interface IPeerReview {

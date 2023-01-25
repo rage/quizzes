@@ -4,30 +4,26 @@ import { Breadcrumbs, Typography } from "@material-ui/core"
 import Link from "next/link"
 import styled from "styled-components"
 
-
 const BreadCrumbContainer = styled(Breadcrumbs)`
   text-decoration: none;
   cursor: pointer;
   height: 40px;
   background-color: white;
-  border-bottom: 1px solid #D3D3D3;
+  border-bottom: 1px solid #d3d3d3;
   color: black;
   display: flex;
-  align-items:center;
+  align-items: center;
   padding-left: 12px;
   position: relative;
 `
 
-
 const BreadCrumbText = styled.p`
-    font-family: "Roboto", "Helvetica", "Arial", sans-serif;
-    font-size: 1rem;
-    
-    &:hover {
-        text-decoration: underline;
-    }
+  font-family: "Roboto", "Helvetica", "Arial", sans-serif;
+  font-size: 1rem;
 
-  
+  &:hover {
+    text-decoration: underline;
+  }
 `
 
 const BreadCrumbLink = styled.a`
@@ -43,7 +39,7 @@ const BreadCrumbs: React.FC = () => {
 
   return (
     <BreadCrumbContainer>
-{breadCrumbs.map(crumb => (
+      {breadCrumbs.map(crumb => (
         <div key={crumb.label}>
           {crumb.as ? (
             <Link href={crumb.as} passHref>
