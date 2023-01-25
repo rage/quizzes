@@ -7,11 +7,9 @@ import { unauthenticate } from "../services/tmcApi"
 import BreadCrumb from "./BreadCrumb"
 import Link from "next/link"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faHome } from "@fortawesome/free-solid-svg-icons"
+import { faHome, faSignOutAlt } from "@fortawesome/free-solid-svg-icons"
 
-const StyledAppBar = styled(AppBar)`
-  margin-bottom: 2rem;
-`
+const StyledAppBar = styled(AppBar)``
 
 const EmptySpace = styled.div`
   flex: 1;
@@ -32,24 +30,34 @@ const TopBar = () => {
   }
 
   return (
-    <StyledAppBar position="sticky">
-      <Toolbar>
-        <Link href="/">
-          <LinkWrapper>
-            <Typography>Quizzes</Typography>
-            <FontAwesomeIcon icon={faHome} style={{ marginLeft: "0.5rem" }} />
-          </LinkWrapper>
-        </Link>
-        <EmptySpace />
-        <BreadCrumb />
-        <EmptySpace />
-        {loggedIn && (
-          <Button color="inherit" onClick={handleLogout}>
-            Logout
-          </Button>
-        )}
-      </Toolbar>
-    </StyledAppBar>
+    <>
+      <StyledAppBar elevation={0} position="sticky">
+        <Toolbar>
+          <Link href="/">
+            <LinkWrapper>
+              <Typography style={{ fontSize: "22px", fontWeight: "bold" }}>
+                Quizzes
+              </Typography>
+            </LinkWrapper>
+          </Link>
+          <EmptySpace />
+          <EmptySpace />
+          {loggedIn && (
+            <>
+              <Button
+                style={{ fontWeight: "bold" }}
+                color="inherit"
+                onClick={handleLogout}
+              >
+                <FontAwesomeIcon icon={faSignOutAlt} />
+                <p style={{ marginLeft: "6px" }}>Logout</p>
+              </Button>
+            </>
+          )}
+        </Toolbar>
+        {loggedIn && <BreadCrumb />}
+      </StyledAppBar>
+    </>
   )
 }
 

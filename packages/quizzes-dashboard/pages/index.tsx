@@ -19,7 +19,7 @@ const Index = () => {
     <>
       <StyledTitleWrapper>
         <Typography variant="h2" component="h1">
-          All courses
+          Courses
         </Typography>
       </StyledTitleWrapper>
       <CourseList data={data} error={error} />

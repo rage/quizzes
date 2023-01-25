@@ -36,6 +36,10 @@ const TextFieldContainer = styled.div`
   padding: 1rem;
 `
 
+const CenteredBox = styled.div`
+  margin-top: 20%;
+`
+
 const LoginView = () => {
   const [userName, setUserName] = useState("")
   const [password, setPassword] = useState("")
@@ -56,7 +60,7 @@ const LoginView = () => {
   useBreadcrumbs([])
 
   return (
-    <>
+    <CenteredBox>
       <Snackbar
         open={error}
         autoHideDuration={5000}
@@ -109,7 +113,7 @@ const LoginView = () => {
           </ButtonContainer>
         </Card>
       </form>
-    </>
+    </CenteredBox>
   )
 }
 

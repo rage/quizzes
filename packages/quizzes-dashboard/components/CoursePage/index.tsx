@@ -118,7 +118,7 @@ export const CoursePage = () => {
         </Head>
       </div>
       <CourseTitleWrapper>
-        <Typography variant="h3" component="h1">
+        <Typography style={{ fontWeight: "bold" }} variant="h3" component="h1">
           {course.title}
           <Typography style={{ color: POINT_COLOR, fontSize: "20px" }}>
             (Max points: {points})
@@ -131,11 +131,6 @@ export const CoursePage = () => {
           </StyledButton>
         </Link>
       </CourseTitleWrapper>
-      {userAbilities.includes("duplicate") ? (
-        <DuplicateCourseButton course={course} />
-      ) : (
-        ""
-      )}
       {Object.entries(byPartAndSection)
         .sort((a, b) => {
           // sorts part 0 as last because it's the part for deleted quizzes
@@ -167,6 +162,11 @@ export const CoursePage = () => {
             })}
           </div>
         ))}
+      {userAbilities.includes("duplicate") ? (
+        <DuplicateCourseButton course={course} />
+      ) : (
+        ""
+      )}
       <DebugDialog object={course} />
     </>
   )

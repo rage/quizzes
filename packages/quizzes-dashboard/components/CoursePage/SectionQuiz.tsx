@@ -1,4 +1,11 @@
-import { Typography, Card, CardContent, Button, Badge } from "@material-ui/core"
+import {
+  Typography,
+  Card,
+  CardContent,
+  Button,
+  Badge,
+  CardHeader,
+} from "@material-ui/core"
 import Link from "next/link"
 import React from "react"
 import styled from "styled-components"
@@ -32,9 +39,11 @@ const TitleContainer = styled.div`
 
 const ButtonContainer = styled.div`
   display: flex;
-  width: 40%;
-  justify-content: space-between;
-  margin-left: 0.5px;
+  justify-content: space-around;
+  margin-right: 8px;
+  margin-bottom: 8px;
+  float: right;
+  width: 35%;
   @media only screen and (max-width: 535px) {
     width: 100%;
     margin-top: 5px;
@@ -64,54 +73,33 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
     "user-abilities",
   )
 
+  const quizType = types.length > 0 ? types.join(", ") : "unknown"
+
   return (
     <Link href={`/quizzes/${quiz.id}/overview`} passHref>
       <QuizLink>
         <QuizCard>
-          <CardContent>
-            <TitleWrapper>
-              <TitleContainer>
-                <Typography color="inherit" variant="body1">
-                  {title}
-                </Typography>
-              </TitleContainer>
-              <ButtonContainer>
-                <Badge
-                  color="error"
-                  badgeContent={requiringAttention}
-                  invisible={requiringAttention === undefined}
-                >
-                  <Link
-                    href={`/quizzes/${quiz.id}/answers-requiring-attention`}
-                  >
-                    <Button variant="outlined">
-                      <Typography>Answers requiring attention</Typography>
-                    </Button>
-                  </Link>
-                </Badge>
-                {userAbilities?.includes("edit") && (
-                  <Link href={`/quizzes/${quiz.id}/edit`}>
-                    <Button variant="outlined">
-                      <Typography>Edit quiz</Typography>
-                    </Button>
-                  </Link>
-                )}
-              </ButtonContainer>
-            </TitleWrapper>
-            {types.length > 0 ? (
-              <div>
-                [{" "}
-                {types.map(type => (
-                  <StyledType key={type} variant="overline">
-                    {type}{" "}
-                  </StyledType>
-                ))}
-                ]
-              </div>
-            ) : (
-              ""
+          <CardHeader title={title} subheader={quizType} />
+          <ButtonContainer>
+            <Badge
+              color="error"
+              badgeContent={requiringAttention}
+              invisible={requiringAttention === undefined}
+            >
+              <Link href={`/quizzes/${quiz.id}/answers-requiring-attention`}>
+                <Button variant="outlined">
+                  <Typography>Answers requiring attention</Typography>
+                </Button>
+              </Link>
+            </Badge>
+            {userAbilities?.includes("edit") && (
+              <Link href={`/quizzes/${quiz.id}/edit`}>
+                <Button variant="outlined">
+                  <Typography>Edit quiz</Typography>
+                </Button>
+              </Link>
             )}
-          </CardContent>
+          </ButtonContainer>
         </QuizCard>
       </QuizLink>
     </Link>

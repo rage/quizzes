@@ -221,6 +221,7 @@ export const EditDetailsForm = ({
             </FieldSet>
             <ButtonWrapper>
               <Button
+                fullWidth
                 type="submit"
                 variant="contained"
                 color="primary"

@@ -101,6 +101,16 @@ export interface EditCoursePayloadFields {
   status?: string
 }
 
+export interface EditCourseCompletionPayloadFields {
+  // Spam flags
+  maxReviewSpamFlags?: number
+  maxSpamFlags?: number
+  // Peer review
+  minPeerReviewsGiven?: number
+  minPeerReviewsReceived?: number
+  minReviewAverage?: number
+}
+
 export interface IPeerReview {
   id: string
   quizAnswerId: string

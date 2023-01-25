@@ -392,6 +392,37 @@ export const updateCourseProperties = async (
   }
 }
 
+export interface CompletionProperties {
+  // Spam flags
+  maxReviewSpamFlags?: number | undefined
+  maxSpamFlags?: number | undefined
+  // Peer review
+  minPeerReviewsGiven?: number | undefined
+  minPeerReviewsReceived?: number | undefined
+  minReviewAverage?: number | undefined
+}
+
+export const updateCourseCompletionProperties = async (
+  courseId: string,
+  changedProperties: CompletionProperties,
+): Promise<Course> => {
+  const userInfo = checkStore()
+  if (userInfo) {
+    const config = {
+      headers: { Authorization: "bearer " + userInfo.accessToken },
+    }
+    return (
+      await api.post(
+        `/courses/${courseId}/completion`,
+        changedProperties,
+        config,
+      )
+    ).data
+  } else {
+    throw new Error()
+  }
+}
+
 export const getCorrespondenceFile = async (
   newCourseId: string,
   oldCourseId: string,

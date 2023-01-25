@@ -5,9 +5,9 @@ import {
   CardContent,
   TextField,
   MenuItem,
-  FormGroup,
-  FormControlLabel,
-  Switch,
+  InputAdornment,
+  Checkbox,
+  CardHeader,
 } from "@material-ui/core"
 import Link from "next/link"
 import { Course } from "../types/Quiz"
@@ -15,74 +15,89 @@ import _ from "lodash"
 import DebugDialog from "./DebugDialog"
 import SkeletonLoader from "./Shared/SkeletonLoader"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faCircle } from "@fortawesome/free-solid-svg-icons"
-
-const StyledCard = styled(Card)`
-  margin-bottom: 1rem;
-`
-
-const StyledCardContent = styled(CardContent)`
-  display: flex !important;
-  align-items: baseline;
-`
-
-const SortSelector = styled(TextField)`
-  display: flex !important;
-  width: 25% !important;
-  margin-right: 1rem !important;
-`
-
-const OrderSelector = styled(TextField)`
-  display: flex !important;
-  width: 25% !important;
-`
-
-const OptionWrapper = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  width: 100%;
-`
-
-const CourseLink = styled.a`
-  color: white;
-  text-decoration: none;
-  cursor: pointer;
-`
-
-const QuizNameWrapper = styled.div`
-  display: flex;
-  justify-content: flex-start;
-  width: 85%;
-  align-items: center;
-`
-
-const QuizStatusWrapper = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  width: 15%;
-  align-items: center;
-`
-
-const StatusCircleContainer = styled.div`
-  display: flex;
-  margin-right: 0.5rem;
-`
-
-const StatusTextWrapper = styled.div`
-  display: flex;
-  width: 50%;
-`
+import { faFilter } from "@fortawesome/free-solid-svg-icons"
 
 interface CourseListProps {
   data: Course[] | undefined
   error: any
 }
 
+const SortingContainer = styled.div`
+  margin-top: 19px;
+  display: flex;
+  flex-direction: row;
+`
+
+const CheckboxContainer = styled.div`
+  display: flex;
+  align-items: center;
+`
+
+const ToggleFilterContainer = styled.div`
+  display: flex;
+  width: 30%;
+  justify-content: space-evenly;
+`
+
+const SelectContainer = styled.div`
+  display: flex;
+  width: 70%;
+`
+
+interface CourseCardProps {
+  courseId: string
+  name: string
+  abbreviation: string
+  active: boolean
+}
+
+const ActiveText = styled.span`
+  color: #009e2c;
+  float: right;
+  position: relative;
+  margin-right: 8px;
+  margin-bottom: 8px;
+`
+const EndedText = styled.span`
+  color: #d00019;
+  float: right;
+  position: relative;
+  margin-right: 8px;
+  margin-bottom: 8px;
+`
+
+const CardContainer = styled.div`
+  &:hover {
+    cursor: pointer;
+  }
+  margin-bottom: 16px;
+`
+
+const CourseCard: React.FC<CourseCardProps> = ({
+  courseId,
+  name,
+  abbreviation,
+  active,
+}) => {
+  return (
+    <Link key={courseId} href={`/courses/${courseId}/listing`} passHref>
+      <CardContainer>
+        <Card>
+          <CardHeader title={name} subheader={abbreviation} />
+          {active ? (
+            <ActiveText> active </ActiveText>
+          ) : (
+            <EndedText> ended </EndedText>
+          )}
+        </Card>
+      </CardContainer>
+    </Link>
+  )
+}
+
 const CourseList = ({ data, error }: CourseListProps) => {
-  const [sortBy, setSortBy] = useState("title")
-  const [sortOrder, setSortOrder] = useState("asc")
+  const [filterWord, setFilterWord] = useState("")
+  const [sortOrder, setSortOrder] = useState("alphabetic-ascending")
   const [showActiveCourses, setShowActiveCourses] = useState(true)
   const [showEndedCourses, setShowEndedCourses] = useState(false)
 
@@ -92,87 +107,180 @@ const CourseList = ({ data, error }: CourseListProps) => {
 
   if (!data) return <SkeletonLoader height={50} skeletonCount={15} />
 
-  let order: "asc" | "desc" = "asc"
-  if (sortOrder === "desc") {
-    order = "desc"
+  const getFilteredAndSortedCourses = () => {
+    let courses = _.chain(data)
+    if (!showActiveCourses) {
+      courses = courses.filter(course => course.status !== "active")
+    }
+    if (!showEndedCourses) {
+      courses = courses.filter(course => course.status !== "ended")
+    }
+    if (filterWord.trim() !== "") {
+      const filterWordLowerCase = filterWord.toLowerCase()
+      courses = courses.filter(
+        course =>
+          course.title.toLowerCase().includes(filterWordLowerCase) ||
+          course.abbreviation.toLowerCase().includes(filterWordLowerCase),
+      )
+    }
+    switch (sortOrder) {
+      case "alphabetic-ascending":
+        courses = courses.sort((a, b) => {
+          if (a.title < b.title) {
+            return -1
+          } else if (a.title > b.title) {
+            return 1
+          } else {
+            return 0
+          }
+        })
+        break
+      case "alphabetic-descending":
+        courses = courses.sort((a, b) => {
+          if (a.title < b.title) {
+            return 1
+          } else if (a.title > b.title) {
+            return -1
+          } else {
+            return 0
+          }
+        })
+        break
+      case "created-at-oldest-first":
+        courses = courses.sort((a, b) => {
+          if (a.createdAt < b.createdAt) {
+            return 1
+          } else if (a.createdAt > b.createdAt) {
+            return -1
+          } else {
+            return 0
+          }
+        })
+        break
+      case "created-at-latest-first":
+        courses = courses.sort((a, b) => {
+          if (a.createdAt < b.createdAt) {
+            return -1
+          } else if (a.createdAt > b.createdAt) {
+            return 1
+          } else {
+            return 0
+          }
+        })
+        break
+      case "updated-at-latest-first":
+        courses = courses.sort((a, b) => {
+          if (a.updatedAt < b.updatedAt) {
+            return -1
+          } else if (a.updatedAt > b.updatedAt) {
+            return 1
+          } else {
+            return 0
+          }
+        })
+        break
+      case "updated-at-oldest-first":
+        courses = courses.sort((a, b) => {
+          if (a.updatedAt < b.updatedAt) {
+            return 1
+          } else if (a.updatedAt > b.updatedAt) {
+            return -1
+          } else {
+            return 0
+          }
+        })
+        break
+    }
+    return courses.value()
   }
-  const statusFilters = [
-    ...(showActiveCourses ? ["active"] : []),
-    ...(showEndedCourses ? ["ended"] : []),
-  ]
-  const courses = _.chain(data)
-    .filter(course => {
-      return statusFilters.includes(course.status)
-    })
-    .orderBy([sortBy], [order])
-    .value()
+
+  const courses = getFilteredAndSortedCourses()
 
   return (
     <>
-      <OptionWrapper>
-        <FormGroup row>
-          <FormControlLabel
-            label="show active"
-            control={
-              <Switch
-                checked={showActiveCourses}
-                onChange={event => setShowActiveCourses(event.target.checked)}
-              ></Switch>
-            }
-          ></FormControlLabel>
-          <FormControlLabel
-            label="show ended"
-            control={
-              <Switch
-                checked={showEndedCourses}
-                onChange={event => setShowEndedCourses(event.target.checked)}
-              ></Switch>
-            }
-          ></FormControlLabel>
-        </FormGroup>
-        <SortSelector
-          variant="outlined"
-          select
-          value={sortBy}
-          onChange={event => setSortBy(event.target.value)}
-        >
-          <MenuItem value="title">Alphabetical</MenuItem>
-          <MenuItem value="createdAt">Created at</MenuItem>
-          <MenuItem value="updatedAt">Updated at</MenuItem>
-        </SortSelector>
-        <OrderSelector
-          variant="outlined"
-          select
-          value={sortOrder}
-          onChange={event => setSortOrder(event.target.value)}
-        >
-          <MenuItem value="asc">
-            {sortBy === "title" ? "[A - Z]" : "Oldest first"}
-          </MenuItem>
-          <MenuItem value="desc">
-            {sortBy === "title" ? "[Z - A]" : "Latest  first"}
-          </MenuItem>
-        </OrderSelector>
-      </OptionWrapper>
+      <Card elevation={0}>
+        <CardContent>
+          <TextField
+            fullWidth
+            variant="outlined"
+            label="Filter courses"
+            id="outlined-start-adornment"
+            value={filterWord}
+            onChange={evt => {
+              setFilterWord(evt.target.value)
+            }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <FontAwesomeIcon icon={faFilter} />
+                </InputAdornment>
+              ),
+            }}
+          />
+
+          <SortingContainer>
+            <SelectContainer>
+              <TextField
+                fullWidth
+                select
+                variant="outlined"
+                id="course-sorting-order"
+                value={sortOrder}
+                label="Sort courses"
+                onChange={evt => {
+                  setSortOrder(evt.target.value)
+                }}
+              >
+                <MenuItem value={"alphabetic-ascending"}>
+                  Ascending alphabetical order
+                </MenuItem>
+                <MenuItem value={"alphabetic-descending"}>
+                  Descending alphabetical order
+                </MenuItem>
+                <MenuItem value={"created-at-latest-first"}>
+                  Created at, latest first{" "}
+                </MenuItem>
+                <MenuItem value={"created-at-oldest-first"}>
+                  Created at, oldest first{" "}
+                </MenuItem>
+                <MenuItem value={"updated-at-latest-first"}>
+                  Updated at, latest first{" "}
+                </MenuItem>
+                <MenuItem value={"updated-at-oldest-first"}>
+                  Updated at, oldest first{" "}
+                </MenuItem>
+              </TextField>
+            </SelectContainer>
+
+            <ToggleFilterContainer>
+              <CheckboxContainer>
+                <p>Active: </p>
+                <Checkbox
+                  value={showActiveCourses}
+                  checked={showActiveCourses}
+                  onClick={() => setShowActiveCourses(!showActiveCourses)}
+                />
+              </CheckboxContainer>
+              <CheckboxContainer>
+                <p>Ended: </p>
+                <Checkbox
+                  value={showEndedCourses}
+                  checked={showEndedCourses}
+                  onClick={() => setShowEndedCourses(!showEndedCourses)}
+                />
+              </CheckboxContainer>
+            </ToggleFilterContainer>
+          </SortingContainer>
+        </CardContent>
+      </Card>
+
       {courses.map(course => (
-        <Link key={course.id} href={`/courses/${course.id}/listing`} passHref>
-          <CourseLink>
-            <StyledCard key={course.id}>
-              <StyledCardContent>
-                <QuizNameWrapper>{course.title || course.id}</QuizNameWrapper>
-                <QuizStatusWrapper>
-                  <StatusCircleContainer>
-                    <FontAwesomeIcon
-                      icon={faCircle}
-                      color={course.status === "active" ? "green" : "red"}
-                    />
-                  </StatusCircleContainer>
-                  <StatusTextWrapper>{course.status}</StatusTextWrapper>
-                </QuizStatusWrapper>
-              </StyledCardContent>
-            </StyledCard>
-          </CourseLink>
-        </Link>
+        <CourseCard
+          courseId={course.id}
+          name={course.title}
+          abbreviation={course.abbreviation}
+          active={course.status === "active"}
+        />
       ))}
 
       <DebugDialog object={courses} />

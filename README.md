@@ -2,6 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/rage/quizzes/tree/master.svg?style=svg)](https://circleci.com/gh/rage/quizzes/tree/master)
 
+## Setup locally
 You can set up you shell to automatically switch node version between folders. [Instructions](https://github.com/nvm-sh/nvm#deeper-shell-integration).
 
 To run locally
@@ -48,3 +49,19 @@ cd example
 npm ci
 npm start
 ```
+
+
+## Setup with docker compose
+
+Setup the project locally by running the command:
+
+```bash
+docker-compose up -d
+```
+
+To setup the database run the command:
+```
+./bin/setup-database.sh
+```
+
+Visit example project at http://localhost:1234 and dashboard at http://localhost:5000
