@@ -73,7 +73,7 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
     "user-abilities",
   )
 
-  const quizType = types.length > 0 ? types[0] : "unknown"
+  const quizType = types.length > 0 ? types.join(", ") : "unknown"
 
   return (
     <Link href={`/quizzes/${quiz.id}/overview`} passHref>
