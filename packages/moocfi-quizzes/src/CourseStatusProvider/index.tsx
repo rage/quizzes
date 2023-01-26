@@ -273,6 +273,11 @@ const transformData = (
       .filter(ex => ex.part !== 0)
       .map(ex => ex.max_points)
       .reduce((a, b) => a + b, 0)
+    if (exercises.length === 0) {
+      exercises = courseData.exercises.map(e => {
+        return {...e, exercise_completions: []}
+      })
+    }
   }
 
   n_points = Math.floor(n_points * 100) / 100
