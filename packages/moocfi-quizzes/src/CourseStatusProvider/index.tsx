@@ -275,7 +275,7 @@ const transformData = (
       .reduce((a, b) => a + b, 0)
     if (exercises.length === 0) {
       exercises = courseData.exercises.map(e => {
-        return {...e, exercise_completions: []}
+        return { ...e, exercise_completions: [] }
       })
     }
   }
