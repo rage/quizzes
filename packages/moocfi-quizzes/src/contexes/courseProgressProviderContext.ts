@@ -3,6 +3,17 @@ import React, { createContext, useContext, useReducer } from "react"
 import { ProviderBaseInterface } from "./courseStatusProviderContext"
 import { PointsByGroup } from "../modelTypes"
 
+export interface UserCourseSummaryResponse {
+  user_course_progress: Omit<UserCourseProgress, "course">
+  completion: Completion
+  course: UserCourseSummaryCourseResponse
+  exercise_completions: Array<ExerciseCompletion>
+}
+
+export interface UserCourseSummaryCourseResponse {
+  points_needed: number
+  exercises: Array<Omit<Exercise, "exercise_completions">>
+}
 export interface ProgressResponse {
   user_course_progressess: UserCourseProgress
   completions: Completion[]
@@ -88,7 +99,7 @@ export interface CourseProgressProviderInterface extends ProviderBaseInterface {
   loggedIn?: boolean
 }
 
-interface CourseProgressProviderContextInterface {
+export interface CourseProgressProviderContextInterface {
   progress: CourseProgressProviderInterface
   fetchProgressData: () => Promise<void>
 }
