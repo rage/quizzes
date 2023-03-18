@@ -235,9 +235,10 @@ const publishAnswers = async (course: ICourse, userId?: string) => {
       ])
       .as("latest")
 
-    const answersQuery = knex("user_quiz_state")
+    const answersQuery = knex<any, IPublishQuizAnswer>("user_quiz_state")
       .select([
         "quiz_answer.quiz_id",
+        "quiz_answer.created_at",
         "user_quiz_state.points_awarded",
         "quiz_answer.status",
         "quiz_answer.user_id",
@@ -259,7 +260,7 @@ const publishAnswers = async (course: ICourse, userId?: string) => {
       answersQuery.andWhere("quiz_answer.user_id", userId)
     }
 
-    const answers = await answersQuery
+    const answers: IPublishQuizAnswer[] = await answersQuery
 
     let answer
 
@@ -279,6 +280,7 @@ const publishAnswers = async (course: ICourse, userId?: string) => {
 
       const message: QuizAnswerMessage = {
         timestamp: new Date().toISOString(),
+        original_submission_date: answer.created_at,
         exercise_id: answer.quiz_id,
         n_points: answer.excluded_from_score ? 0 : answer.points_awarded || 0,
         completed: answer.status === "confirmed",
@@ -429,6 +431,18 @@ interface IQuiz {
   auto_confirm: boolean
   excluded_from_score: boolean
   grantPointsPolicy: any
+}
+
+interface IPublishQuizAnswer {
+  quiz_id: string
+  created_at: string
+  points_awarded: number
+  status: string
+  user_id: number
+  types: string[]
+  peer_reviews_given: number
+  peer_reviews_received: number
+  excluded_from_score: boolean
 }
 
 producer.on("ready", publish)

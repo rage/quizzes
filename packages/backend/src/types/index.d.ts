@@ -227,6 +227,7 @@ export interface QuizAnswerMessage {
   service_id: string
   required_actions: RequiredAction[] | null
   message_format_version: number
+  original_submission_date: string | null
   attempted: boolean
 }
 

@@ -68,6 +68,7 @@ export const broadcastQuizAnswerUpdated = async (
 
   const message: QuizAnswerMessage = {
     timestamp: new Date().toISOString(),
+    original_submission_date: quizAnswer.createdAt,
     exercise_id: quizAnswer.quizId,
     n_points: quiz.excludedFromScore ? 0 : userQuizState.pointsAwarded ?? 0,
     completed: quizAnswer.status === "confirmed",

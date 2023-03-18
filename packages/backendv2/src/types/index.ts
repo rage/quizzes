@@ -56,6 +56,7 @@ export interface QuizAnswerMessage {
   required_actions: RequiredAction[] | null
   message_format_version: number
   attempted: boolean
+  original_submission_date: string | null
 }
 
 export interface QuizMessage {
