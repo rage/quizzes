@@ -90,10 +90,9 @@ export const getUserCourseSummary = async (
     }
   `
 
-  const data = await request<{ currentUser: Array<UserCourseSummaryResponse> }>(
-    accessToken,
-    query,
-  )
+  const data = await request<{
+    currentUser: { user_course_summary?: Array<UserCourseSummaryResponse> }
+  }>(accessToken, query)
 
   return data
 }

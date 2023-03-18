@@ -80,7 +80,7 @@ export const CourseStatusProvider: React.FunctionComponent<CourseStatusProviderP
         accessToken,
       )
       const data = transformUserCourseSummaryData(
-        userCourseSummaryData.currentUser,
+        userCourseSummaryData.currentUser?.user_course_summary ?? [],
       )
       // const progressData = await getUserCourseData(courseId, accessToken)
       // const data = transformData(progressData.currentUser, progressData.course)
@@ -247,7 +247,7 @@ const transformUserCourseSummaryData = (
     completion,
     course,
     exercise_completions: exerciseCompletions,
-  } = data[0]
+  } = data[0] ?? {}
   const completed = Boolean(completion)
   let points_to_pass = 0
   let n_points = 0
