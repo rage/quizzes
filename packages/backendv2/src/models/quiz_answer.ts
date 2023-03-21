@@ -1161,10 +1161,10 @@ class QuizAnswer extends mixin(BaseModel, [
     ],
     ["given-enough", "manual-review-once-received-enough"],
     ["submitted"],
-    ["manual-review-once-given-enough"],
     ["manual-review-once-given-and-received-enough"],
-    ["manual-review"],
     ["confirmed"],
+    ["manual-review"],
+    ["manual-review-once-given-enough"],
     ["enough-received-but-not-given"],
   ]
 
@@ -1173,12 +1173,18 @@ class QuizAnswer extends mixin(BaseModel, [
     queryBuilder: Knex.QueryBuilder,
     rejected: string[],
   ) {
+    const statuses = this.statusesByPriority[priority]
+    const areWeSelectingConfirmed = statuses.includes("confirmed")
     // we won't consider rejected answers
     if (priority < this.statusesByPriority.length) {
       queryBuilder = queryBuilder
         .andWhere("quiz_answer.id", "NOT IN", rejected)
-        .andWhere("quiz_answer.status", "IN", this.statusesByPriority[priority])
-        .orderBy("quiz_answer.created_at", "asc")
+        .andWhere("quiz_answer.status", "IN", statuses)
+        // if we're selecting confirmed, prioritize newer answers because answers stay in the confirmed state forever and if we prioritized older answers here this would always return the same answers.
+        .orderBy(
+          "quiz_answer.created_at",
+          areWeSelectingConfirmed ? "desc" : "asc",
+        )
     }
     // let's check the few rejected answers, too
     else if (priority === this.statusesByPriority.length) {
