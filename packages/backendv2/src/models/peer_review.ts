@@ -43,7 +43,7 @@ class PeerReview extends BaseModel {
   public static async getWithAnswersByAnswerId(quizAnswerId: string) {
     // check that answerId exists
     try {
-      await QuizAnswer.getByIdWithPeerReviews(quizAnswerId)
+      await QuizAnswer.getById(quizAnswerId)
     } catch (error) {
       throw error
     }
@@ -51,6 +51,7 @@ class PeerReview extends BaseModel {
     const peerReviews = await this.query()
       .where("quiz_answer_id", quizAnswerId)
       .withGraphJoined("answers")
+      .limit(100)
 
     return peerReviews
   }
