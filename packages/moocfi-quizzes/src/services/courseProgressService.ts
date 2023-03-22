@@ -2,10 +2,11 @@ import axios from "axios"
 import BASE_URL from "../config"
 import { PointsByGroup } from "../modelTypes"
 import { GraphQLClient } from "graphql-request"
+import { UserCourseSummaryResponse } from "../contexes/courseProgressProviderContext"
 
 let graphQLClient: GraphQLClient
 
-const request = async (accessToken: string, query: string) => {
+const request = async <T = any>(accessToken: string, query: string) => {
   if (!graphQLClient) {
     graphQLClient = new GraphQLClient(`https://www.mooc.fi/api`, {
       headers: {
@@ -13,7 +14,7 @@ const request = async (accessToken: string, query: string) => {
       },
     })
   }
-  return await graphQLClient.request(query)
+  return await graphQLClient.request<T>(query)
 }
 
 /*export const getUserCourseData = async (
@@ -48,6 +49,53 @@ const request = async (accessToken: string, query: string) => {
   `
   return await request(accessToken, query)
 }*/
+
+export const getUserCourseSummary = async (
+  courseId: string,
+  accessToken: string,
+) => {
+  const query = `
+    {
+      currentUser {
+        user_course_summary(course_id: "${courseId}", includeNoPointsAwardedExercises: true) {
+          user_course_progress {
+            max_points
+            n_points
+            progress
+          }
+          completion {
+            id
+          }
+          course {
+            points_needed
+            exercises {
+              id
+              quizzes_id: custom_id
+              name
+              part
+              section
+              max_points
+            }
+          }
+          exercise_completions {
+            exercise_id
+            completed
+            n_points
+            exercise_completion_required_actions {
+              value
+            }
+          }
+        }
+      }
+    }
+  `
+
+  const data = await request<{
+    currentUser: { user_course_summary?: Array<UserCourseSummaryResponse> }
+  }>(accessToken, query)
+
+  return data
+}
 
 export const getUserCourseData = async (
   courseId: string,
