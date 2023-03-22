@@ -19,10 +19,10 @@ spec:
         resources:
           requests:
             memory: "100Mi"
-            cpu: "50m"
+            cpu: "10m"
           limits:
             memory: "200Mi"
-            cpu: "100m"
+            cpu: "30m"
         ports:
         - name: dv2-http
           containerPort: 5000
