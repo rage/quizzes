@@ -18,11 +18,11 @@ spec:
         imagePullPolicy: Always
         resources:
           requests:
-            memory: "200Mi"
-            cpu: "50m"
+            memory: "300Mi"
+            cpu: "60m"
           limits:
-            memory: "500Mi"
-            cpu: "500m"
+            memory: "900Mi"
+            cpu: "600m"
         # readinessProbe:
         #   httpGet:
         #     path: /api/healthz
