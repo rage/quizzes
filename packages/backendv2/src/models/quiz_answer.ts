@@ -977,8 +977,6 @@ class QuizAnswer extends mixin(BaseModel, [
 
     const givenSpamFlags = await SpamFlag.query().where("user_id", reviewerId)
 
-    givenPeerReviews.map(pr => pr.rejectedQuizAnswerIds)
-
     const rejected: string[] = givenPeerReviews
       .map(pr => pr.rejectedQuizAnswerIds)
       .flat()
@@ -1032,7 +1030,7 @@ class QuizAnswer extends mixin(BaseModel, [
 
     allCandidates = allCandidates.slice(0, 2)
 
-    return await this.query()
+    return this.query()
       .withGraphJoined("itemAnswers.[optionAnswers]")
       .whereIn(
         "quiz_answer.id",
@@ -1173,7 +1171,7 @@ class QuizAnswer extends mixin(BaseModel, [
     queryBuilder: Knex.QueryBuilder,
     rejected: string[],
   ) {
-    const statuses = this.statusesByPriority[priority]
+    const statuses = this.statusesByPriority[priority] ?? []
     const areWeSelectingConfirmed = statuses.includes("confirmed")
     // we won't consider rejected answers
     if (priority < this.statusesByPriority.length) {

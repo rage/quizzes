@@ -25,6 +25,7 @@ export const GlobalLogger = winston.createLogger({
     format.errors({ stack: true }),
     myFormat,
   ),
+  // silent: process.env.NODE_ENV === "test",
   transports: [new winston.transports.Console()],
 })
 
