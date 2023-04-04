@@ -75,13 +75,9 @@ const publish = async () => {
               await publishProgress(course, quizzes, user_id)
 
               console.log("publishing answers for user: " + user_id)
-              if (USE_USER_POINTS_BATCH) {
-                await publishCourseAnswers(course, user_id, {
-                  useUserPointsBatch: true,
-                })
-              } else {
-                await publishCourseAnswers(course, user_id)
-              }
+              await publishCourseAnswers(course, user_id, {
+                useUserPointsBatch: USE_USER_POINTS_BATCH,
+              })
             } else {
               console.log("publishing quizzes")
               const quizzes = await publishQuizzes(course)
@@ -90,11 +86,9 @@ const publish = async () => {
               await publishProgress(course, quizzes)
 
               console.log("publishing answers")
-              if (USE_USER_POINTS_BATCH) {
-                await publishCourseAnswers(course, { useUserPointsBatch: true })
-              } else {
-                await publishCourseAnswers(course)
-              }
+              await publishCourseAnswers(course, {
+                useUserPointsBatch: USE_USER_POINTS_BATCH,
+              })
             }
           } else {
             console.error("No moocfi_id for task. Aborting.")
