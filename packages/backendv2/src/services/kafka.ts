@@ -22,7 +22,9 @@ export const broadcastUserProgressUpdated = async (
   trx: Knex.Transaction,
 ) => {
   const course = await Course.query(trx).findById(courseId)
-
+  if (!course.moocfiId) {
+    return
+  }
   const progress = await UserCoursePartState.getProgress(userId, courseId, trx)
   const message: ProgressMessage = {
     timestamp: new Date().toISOString(),
@@ -33,13 +35,11 @@ export const broadcastUserProgressUpdated = async (
     message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
   }
 
-  if (course.moocfiId) {
-    await KafkaMessage.createMessageEntry(
-      "user-course-progress-realtime",
-      message,
-      trx,
-    )
-  }
+  await KafkaMessage.createMessageEntry(
+    "user-course-progress-realtime",
+    message,
+    trx,
+  )
 }
 
 export const broadcastQuizAnswerUpdated = async (
@@ -50,6 +50,9 @@ export const broadcastQuizAnswerUpdated = async (
 ) => {
   const messages: RequiredAction[] = []
   const course = await quiz.$relatedQuery("course", trx)
+  if (!course.moocfiId) {
+    return
+  }
   const items = await quiz.$relatedQuery("items", trx)
 
   if (quizAnswer.status === "rejected" || quizAnswer.status === "spam") {
@@ -80,20 +83,21 @@ export const broadcastQuizAnswerUpdated = async (
     attempted: quizAnswer.deleted ? false : true,
   }
 
-  if (course.moocfiId) {
-    await KafkaMessage.createMessageEntry("user-points-realtime", message, trx)
-  }
+  await KafkaMessage.createMessageEntry("user-points-realtime", message, trx)
 }
 
 export const broadcastCourseQuizzesUpdated = async (
   courseId: string,
   trx: Knex.Transaction,
 ) => {
+  const course = await Course.query(trx).findById(courseId)
+  if (!course.moocfiId) {
+    return
+  }
   const quizzes = await Quiz.query(trx)
     .where("course_id", courseId)
     .whereNot("part", 0)
     .withGraphJoined("texts")
-  const course = await Course.query(trx).findById(courseId)
 
   const data: ExerciseData[] = quizzes.map(quiz => {
     return {
@@ -113,9 +117,7 @@ export const broadcastCourseQuizzesUpdated = async (
     data,
     message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
   }
-  if (course.moocfiId) {
-    await KafkaMessage.createMessageEntry("exercise", message, trx)
-  }
+  await KafkaMessage.createMessageEntry("exercise", message, trx)
 }
 
 export const broadcastUserCourse = async (userId: number, courseId: string) => {

@@ -231,6 +231,14 @@ export interface QuizAnswerMessage {
   attempted: boolean
 }
 
+export interface CourseQuizAnswersMessage {
+  timestamp: string
+  user_id: number
+  course_id: string
+  exercises: QuizAnswerMessage[]
+  message_format_version: number
+}
+
 export interface QuizMessage {
   timestamp: string
   course_id: string
