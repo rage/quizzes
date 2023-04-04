@@ -76,7 +76,9 @@ const publish = async () => {
 
               console.log("publishing answers for user: " + user_id)
               if (USE_USER_POINTS_BATCH) {
-                await publishAnswers(course, user_id)
+                await publishCourseAnswers(course, user_id, {
+                  useUserPointsBatch: true,
+                })
               } else {
                 await publishCourseAnswers(course, user_id)
               }
@@ -89,7 +91,7 @@ const publish = async () => {
 
               console.log("publishing answers")
               if (USE_USER_POINTS_BATCH) {
-                await publishAnswers(course)
+                await publishCourseAnswers(course, { useUserPointsBatch: true })
               } else {
                 await publishCourseAnswers(course)
               }
@@ -225,85 +227,116 @@ const publishQuizzes = async (course: ICourse): Promise<IQuiz[]> => {
   }
 }
 
-const publishAnswers = async (course: ICourse, userId?: string) => {
-  try {
-    const courseId = course.id
+const getAnswers = async (courseId: string, userId?: string) => {
+  const distinctTypes = knex("quiz")
+    .select([
+      "quiz.id",
+      knex.raw("json_agg(distinct(quiz_item.type)) as types"),
+    ])
+    .join("quiz_item", { "quiz.id": "quiz_item.quiz_id" })
+    .groupBy("quiz.id")
+    .as("types")
 
-    const distinctTypes = knex("quiz")
-      .select([
-        "quiz.id",
-        knex.raw("json_agg(distinct(quiz_item.type)) as types"),
-      ])
-      .join("quiz_item", { "quiz.id": "quiz_item.quiz_id" })
-      .groupBy("quiz.id")
-      .as("types")
+  // why isn't this used?
+  const latest = knex("quiz_answer")
+    .select([
+      "id",
+      knex.raw(
+        "row_number() over(partition by user_id, quiz_id order by created_at desc) as rn",
+      ),
+    ])
+    .as("latest")
 
-    // why isn't this used?
-    const latest = knex("quiz_answer")
-      .select([
-        "id",
-        knex.raw(
-          "row_number() over(partition by user_id, quiz_id order by created_at desc) as rn",
-        ),
-      ])
-      .as("latest")
+  const answersQuery = knex<any, IPublishQuizAnswer>("user_quiz_state")
+    .select([
+      "quiz_answer.quiz_id",
+      "quiz_answer.created_at",
+      "user_quiz_state.points_awarded",
+      "quiz_answer.status",
+      "quiz_answer.user_id",
+      "types.types",
+      "user_quiz_state.peer_reviews_given",
+      "user_quiz_state.peer_reviews_received",
+      "quiz.excluded_from_score",
+    ])
+    .join("quiz_answer", {
+      "user_quiz_state.quiz_id": "quiz_answer.quiz_id",
+      "user_quiz_state.user_id": "quiz_answer.user_id",
+    })
+    .join("quiz", { "user_quiz_state.quiz_id": "quiz.id" })
+    .join(distinctTypes, { "user_quiz_state.quiz_id": "types.id" })
+    .where("quiz.course_id", courseId)
+    .andWhereNot("quiz_answer.status", "deprecated")
 
-    const answersQuery = knex<any, IPublishQuizAnswer>("user_quiz_state")
-      .select([
-        "quiz_answer.quiz_id",
-        "quiz_answer.created_at",
-        "user_quiz_state.points_awarded",
-        "quiz_answer.status",
-        "quiz_answer.user_id",
-        "types.types",
-        "user_quiz_state.peer_reviews_given",
-        "user_quiz_state.peer_reviews_received",
-        "quiz.excluded_from_score",
-      ])
-      .join("quiz_answer", {
-        "user_quiz_state.quiz_id": "quiz_answer.quiz_id",
-        "user_quiz_state.user_id": "quiz_answer.user_id",
-      })
-      .join("quiz", { "user_quiz_state.quiz_id": "quiz.id" })
-      .join(distinctTypes, { "user_quiz_state.quiz_id": "types.id" })
-      .where("quiz.course_id", courseId)
-      .andWhereNot("quiz_answer.status", "deprecated")
+  if (userId) {
+    answersQuery.andWhere("quiz_answer.user_id", userId)
+  }
 
-    if (userId) {
-      answersQuery.andWhere("quiz_answer.user_id", userId)
+  const answers: IPublishQuizAnswer[] = await answersQuery
+
+  return answers
+}
+
+const createAnswerMessage = (answer: IPublishQuizAnswer, course: ICourse) => {
+  const actions: RequiredAction[] = []
+
+  if (answer.status === "rejected" || answer.status === "spam") {
+    actions.push(RequiredAction.REJECTED)
+  } else if (answer.types.includes("essay")) {
+    if (answer.peer_reviews_given < course.min_peer_reviews_given) {
+      actions.push(RequiredAction.GIVE_PEER_REVIEW)
     }
+    if (answer.peer_reviews_received < course.min_peer_reviews_received) {
+      actions.push(RequiredAction.PENDING_PEER_REVIEW)
+    }
+  }
 
-    const answers: IPublishQuizAnswer[] = await answersQuery
+  const message: QuizAnswerMessage = {
+    timestamp: new Date().toISOString(),
+    original_submission_date: answer.created_at,
+    exercise_id: answer.quiz_id,
+    n_points: answer.excluded_from_score ? 0 : answer.points_awarded || 0,
+    completed: answer.status === "confirmed",
+    user_id: answer.user_id,
+    course_id: course.moocfi_id,
+    service_id: process.env.SERVICE_ID,
+    required_actions: actions,
+    message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
+    attempted: true,
+  }
 
-    let answer
+  return message
+}
 
-    for (answer of answers) {
-      const actions: RequiredAction[] = []
+const createUnansweredMessage = (
+  quiz: ICourseQuiz,
+  course: ICourse,
+  userId: string,
+) => {
+  const message: QuizAnswerMessage = {
+    timestamp: new Date().toISOString(),
+    original_submission_date: null,
+    exercise_id: quiz.quiz_id,
+    n_points: 0,
+    completed: false,
+    user_id: Number(userId),
+    course_id: course.moocfi_id,
+    service_id: process.env.SERVICE_ID,
+    required_actions: [],
+    message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
+    attempted: false,
+  }
+  return message
+}
 
-      if (answer.status === "rejected" || answer.status === "spam") {
-        actions.push(RequiredAction.REJECTED)
-      } else if (answer.types.includes("essay")) {
-        if (answer.peer_reviews_given < course.min_peer_reviews_given) {
-          actions.push(RequiredAction.GIVE_PEER_REVIEW)
-        }
-        if (answer.peer_reviews_received < course.min_peer_reviews_received) {
-          actions.push(RequiredAction.PENDING_PEER_REVIEW)
-        }
-      }
+const publishAnswers = async (course: ICourse, userId?: string) => {
+  const courseId = course.id
 
-      const message: QuizAnswerMessage = {
-        timestamp: new Date().toISOString(),
-        original_submission_date: answer.created_at,
-        exercise_id: answer.quiz_id,
-        n_points: answer.excluded_from_score ? 0 : answer.points_awarded || 0,
-        completed: answer.status === "confirmed",
-        user_id: answer.user_id,
-        course_id: course.moocfi_id,
-        service_id: process.env.SERVICE_ID,
-        required_actions: actions,
-        message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
-        attempted: true,
-      }
+  const answers = await getAnswers(courseId, userId)
+
+  try {
+    for (const answer of answers) {
+      const message = createAnswerMessage(answer, course)
 
       producer.produce(
         "user-points-batch",
@@ -320,27 +353,37 @@ const publishAnswers = async (course: ICourse, userId?: string) => {
   }
 }
 
-const publishCourseAnswers = async (course: ICourse, userId?: string) => {
+interface PublishCourseAnswerOptions {
+  useUserPointsBatch?: boolean
+}
+
+const publishCourseAnswers = async (
+  course: ICourse,
+  userIdOrOptions?: string | PublishCourseAnswerOptions,
+  options?: PublishCourseAnswerOptions,
+) => {
+  let userId: string | undefined
+  let _options: PublishCourseAnswerOptions | undefined = options
+  if (typeof userIdOrOptions === "string") {
+    userId = userIdOrOptions
+  } else {
+    _options = userIdOrOptions
+  }
+  const { useUserPointsBatch = false } = _options || {}
+
   try {
     const courseId = course.id
 
-    const distinctTypes = knex("quiz")
-      .select([
-        "quiz.id",
-        knex.raw("json_agg(distinct(quiz_item.type)) as types"),
+    const courseQuizzes = await knex("quiz")
+      .select<any, ICourseQuiz[]>([
+        "quiz.id as quiz_id",
+        "quiz.excluded_from_score",
       ])
-      .join("quiz_item", { "quiz.id": "quiz_item.quiz_id" })
-      .groupBy("quiz.id")
-      .as("types")
+      .where("course_id", courseId)
 
-    const courseQuizzes = await knex("quiz").select([
-      "quiz.id as quiz_id",
-      "quiz.excluded_from_score",
-    ])
-
-    let answererIds: number[] = []
+    let answererIds: string[] = []
     if (userId) {
-      answererIds = [Number(userId)]
+      answererIds = [userId]
     } else {
       const uniqueAnswerers = await knex("quiz_answer")
         .select("user_id")
@@ -350,31 +393,11 @@ const publishCourseAnswers = async (course: ICourse, userId?: string) => {
         .whereNotNull("user_id")
         .andWhereNot("quiz_answer.status", "deprecated")
 
-      answererIds = uniqueAnswerers.map(a => Number(a.user_id))
+      answererIds = uniqueAnswerers.map(a => a.user_id)
     }
 
     for (const answererId of answererIds) {
-      const answers = await knex("user_quiz_state")
-        .select<any, IPublishQuizAnswer[]>([
-          "quiz_answer.quiz_id",
-          "quiz_answer.created_at",
-          "user_quiz_state.points_awarded",
-          "quiz_answer.status",
-          "quiz_answer.user_id",
-          "types.types",
-          "user_quiz_state.peer_reviews_given",
-          "user_quiz_state.peer_reviews_received",
-          "quiz.excluded_from_score",
-        ])
-        .join("quiz_answer", {
-          "user_quiz_state.quiz_id": "quiz_answer.quiz_id",
-          "user_quiz_state.user_id": "quiz_answer.user_id",
-        })
-        .join("quiz", { "user_quiz_state.quiz_id": "quiz.id" })
-        .join(distinctTypes, { "user_quiz_state.quiz_id": "types.id" })
-        .where("quiz.course_id", courseId)
-        .andWhere("quiz_answer.user_id", answererId)
-        .andWhereNot("quiz_answer.status", "deprecated")
+      const answers = await getAnswers(courseId, answererId)
 
       const answeredIds = answers.map(a => a.quiz_id)
       const unansweredQuizzes = courseQuizzes.filter(
@@ -384,50 +407,34 @@ const publishCourseAnswers = async (course: ICourse, userId?: string) => {
       const exercises: QuizAnswerMessage[] = []
 
       for (const answer of answers) {
-        const actions: RequiredAction[] = []
-
-        if (answer.status === "rejected" || answer.status === "spam") {
-          actions.push(RequiredAction.REJECTED)
-        } else if (answer.types.includes("essay")) {
-          if (answer.peer_reviews_given < course.min_peer_reviews_given) {
-            actions.push(RequiredAction.GIVE_PEER_REVIEW)
-          }
-          if (answer.peer_reviews_received < course.min_peer_reviews_received) {
-            actions.push(RequiredAction.PENDING_PEER_REVIEW)
-          }
-        }
-
-        const exercise: QuizAnswerMessage = {
-          timestamp: new Date().toISOString(),
-          original_submission_date: answer.created_at,
-          exercise_id: answer.quiz_id,
-          n_points: answer.excluded_from_score ? 0 : answer.points_awarded || 0,
-          completed: answer.status === "confirmed",
-          user_id: answer.user_id,
-          course_id: course.moocfi_id,
-          service_id: process.env.SERVICE_ID,
-          required_actions: actions,
-          message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
-          attempted: true,
+        const exercise = createAnswerMessage(answer, course)
+        if (useUserPointsBatch) {
+          producer.produce(
+            "user-points-batch",
+            null,
+            Buffer.from(JSON.stringify(exercise)),
+          )
+          await flush(10000)
         }
         exercises.push(exercise)
       }
 
       for (const unanswered of unansweredQuizzes) {
-        const exercise: QuizAnswerMessage = {
-          timestamp: new Date().toISOString(),
-          original_submission_date: null,
-          exercise_id: unanswered.quiz_id,
-          n_points: null,
-          completed: false,
-          user_id: answererId,
-          course_id: course.moocfi_id,
-          service_id: process.env.SERVICE_ID,
-          required_actions: [],
-          message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
-          attempted: false,
+        const exercise = createUnansweredMessage(unanswered, course, answererId)
+
+        if (useUserPointsBatch) {
+          producer.produce(
+            "user-points-batch",
+            null,
+            Buffer.from(JSON.stringify(exercise)),
+          )
+          await flush(10000)
         }
         exercises.push(exercise)
+      }
+
+      if (useUserPointsBatch) {
+        return
       }
 
       const message: CourseQuizAnswersMessage = {
@@ -574,6 +581,11 @@ interface IQuiz {
   auto_confirm: boolean
   excluded_from_score: boolean
   grantPointsPolicy: any
+}
+
+interface ICourseQuiz {
+  quiz_id: string
+  excluded_from_score: boolean
 }
 
 interface IPublishQuizAnswer {
