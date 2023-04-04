@@ -380,8 +380,7 @@ const publishCourseAnswers = async (
       answererIds = [userId]
     } else {
       const uniqueAnswerers = await knex("quiz_answer")
-        .select("user_id")
-        .distinctOn("user_id")
+        .distinct("user_id")
         .join("quiz", { "quiz_answer.quiz_id": "quiz.id" })
         .where("quiz.course_id", courseId)
         .whereNotNull("user_id")
