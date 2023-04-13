@@ -29,7 +29,7 @@ import {
 const StyledFab = styled(Fab)`
   display: flex !important;
   position: fixed !important;
-  top: 10% !important;
+  top: 15% !important;
   right: 5% !important;
   z-index: 1 !important;
   @media only screen and (max-width: 600px) {
@@ -41,7 +41,7 @@ const StyledFab = styled(Fab)`
 const StyledCircularProgress = styled(CircularProgress)`
   display: flex !important;
   position: fixed !important;
-  top: 10% !important;
+  top: 15% !important;
   right: 5% !important;
   z-index: 1 !important;
   @media only screen and (max-width: 600px) {
