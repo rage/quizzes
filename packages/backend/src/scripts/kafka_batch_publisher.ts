@@ -432,7 +432,7 @@ const publishCourseAnswers = async (
 
       const message: CourseQuizAnswersMessage = {
         timestamp: new Date().toISOString(),
-        user_id: Number(userId),
+        user_id: Number(answererId),
         course_id: course.moocfi_id,
         exercises,
         message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
