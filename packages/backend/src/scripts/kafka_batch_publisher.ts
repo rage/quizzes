@@ -427,7 +427,7 @@ const publishCourseAnswers = async (
       }
 
       if (useUserPointsBatch) {
-        return
+        continue
       }
 
       const message: CourseQuizAnswersMessage = {
