@@ -221,7 +221,7 @@ const publishQuizzes = async (course: ICourse): Promise<IQuiz[]> => {
   }
 }
 
-const getAnswers = async (courseId: string, userId?: string) => {
+const getAnswers = async (courseId: string, userId?: number) => {
   const distinctTypes = knex("quiz")
     .select([
       "quiz.id",
@@ -305,7 +305,7 @@ const createAnswerMessage = (answer: IPublishQuizAnswer, course: ICourse) => {
 const createUnansweredMessage = (
   quiz: ICourseQuiz,
   course: ICourse,
-  userId: string,
+  userId: number,
 ) => {
   const message: QuizAnswerMessage = {
     timestamp: new Date().toISOString(),
@@ -323,7 +323,7 @@ const createUnansweredMessage = (
   return message
 }
 
-const publishAnswers = async (course: ICourse, userId?: string) => {
+const publishAnswers = async (course: ICourse, userId?: number) => {
   const courseId = course.id
 
   const answers = await getAnswers(courseId, userId)
@@ -353,15 +353,15 @@ interface PublishCourseAnswerOptions {
 
 const publishCourseAnswers = async (
   course: ICourse,
-  userIdOrOptions?: string | PublishCourseAnswerOptions,
+  userIdOrOptions?: number | PublishCourseAnswerOptions,
   options?: PublishCourseAnswerOptions,
 ) => {
-  let userId: string | undefined
+  let userId: number | undefined
   let _options: PublishCourseAnswerOptions | undefined = options
-  if (typeof userIdOrOptions === "string") {
-    userId = userIdOrOptions
-  } else {
+  if (typeof userIdOrOptions === "object") {
     _options = userIdOrOptions
+  } else {
+    userId = Number(userIdOrOptions)
   }
   const { useUserPointsBatch = false } = _options || {}
 
@@ -375,7 +375,7 @@ const publishCourseAnswers = async (
       ])
       .where("course_id", courseId)
 
-    let answererIds: string[] = []
+    let answererIds: number[] = []
     if (userId) {
       answererIds = [userId]
     } else {
@@ -427,7 +427,7 @@ const publishCourseAnswers = async (
       }
 
       if (useUserPointsBatch) {
-        return
+        continue
       }
 
       const message: CourseQuizAnswersMessage = {
@@ -453,7 +453,7 @@ const publishCourseAnswers = async (
 const publishProgress = async (
   course: ICourse,
   quizzes: any[],
-  userId?: string,
+  userId?: number,
 ) => {
   try {
     const courseId = course.id
@@ -531,7 +531,7 @@ interface IKafkaTask {
   id: string
   course_id: string
   quiz_id: string
-  user_id: string
+  user_id: number
   recalculate_progress: boolean
   recalculate_only: boolean
   created_at: Date
