@@ -180,10 +180,10 @@ export class CourseService {
       rawQuery = builder.raw(
         `
       INSERT INTO quiz_item_translation
-        (quiz_item_id, language_id, title, body, success_message, failure_message, min_label, max_label)
+        (quiz_item_id, language_id, title, body, success_message, failure_message, min_label, max_label, shared_option_feedback_message)
       SELECT
         uuid_generate_v5(:newCourseId, quiz_item_id::text), language_id, title,
-        body, success_message, failure_message, min_label, max_label
+        body, success_message, failure_message, min_label, max_label, shared_option_feedback_message
       FROM quiz_item_translation
         WHERE quiz_item_id in (
           SELECT id FROM quiz_item WHERE quiz_id in (
