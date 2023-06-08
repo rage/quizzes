@@ -183,6 +183,7 @@ export const languageOptions: LanguageLabels = {
   pl_PL: polishLabels,
   mt_MT: malteseLabels,
   es_ES: spanishLabels,
+  es_UY: spanishLabels,
   sl_SI: slovenianLabels,
   bg_BG: bulgarianLabels,
   sk_SK: slovakLabels,
