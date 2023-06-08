@@ -7,6 +7,7 @@ if (env.REDIS_HOST && env.REDIS_PORT) {
     port: Number(env.REDIS_PORT),
     host: env.REDIS_HOST,
     password: env.REDIS_PASSWORD && env.REDIS_PASSWORD,
+    db: env.REDIS_DB ? Number(env.REDIS_DB) : 3,
   })
   if (client) {
     console.log(
