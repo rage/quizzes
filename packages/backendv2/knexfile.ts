@@ -54,6 +54,7 @@ const configOptions: { [env: string]: Config } = {
       user: env.DB_USER,
       password: env.DB_PASSWORD,
       timezone: "UTC",
+      application_name: "quizzes",
     },
     pool: {
       afterCreate: setTimeZoneToUTC,
