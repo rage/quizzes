@@ -12,6 +12,7 @@ export const quizzes = Knex({
     database: process.env.DB_NAME,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD || undefined,
+    application_name: "quizzes",
   },
 })
 
@@ -22,5 +23,6 @@ export const moocfi = Knex({
     database: "moocfi",
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD || undefined,
+    application_name: "quizzes",
   },
 })
