@@ -38,7 +38,7 @@
     "newrelic": "^6.4.2",
     "node-rdkafka": "^2.8.1",
     "pg": "^8.2.1",
-    "redis": "^3.0.2",
+    "redis": "^3.1.1",
     "reflect-metadata": "^0.1.12",
     "routing-controllers": "^0.7.7",
     "tmc-client-js": "0.0.9",
