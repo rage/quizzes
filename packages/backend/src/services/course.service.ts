@@ -126,13 +126,14 @@ export class CourseService {
         `
         INSERT INTO quiz
           (id, course_id, part, section, points, deadline,
-          open, excluded_from_score, auto_confirm, tries, tries_limited,
-          award_points_even_if_wrong)
+          open, excluded_from_score, auto_confirm, auto_reject, tries, tries_limited,
+          award_points_even_if_wrong, grant_points_policy, check_plagiarism,
+          give_max_points_when_tries_run_out)
 
         SELECT
           uuid_generate_v5(:newCourseId, id::text), :newCourseId, part, section, points, deadline,
-          open, excluded_from_score, auto_confirm, tries, tries_limited,
-          award_points_even_if_wrong
+          open, excluded_from_score, auto_confirm, auto_reject, tries, tries_limited,
+          award_points_even_if_wrong, grant_points_policy, check_plagiarism
          
         FROM quiz WHERE course_id = :oldCourseId;
       `,
@@ -162,11 +163,13 @@ export class CourseService {
       rawQuery = builder.raw(
         `
         INSERT INTO quiz_item
-          (id, quiz_id, type, "order", validity_regex, format_regex, multi, min_words, max_words, max_value, min_value)
+          (id, quiz_id, type, "order", validity_regex, format_regex, multi, min_words, max_words, 
+          max_value, min_value, uses_shared_option_feedback_message)
 
         SELECT
           uuid_generate_v5(:newCourseId, id::text), uuid_generate_v5(:newCourseId, quiz_id::text), type,
-          "order", validity_regex, format_regex, multi, min_words, max_words, max_value, min_value
+          "order", validity_regex, format_regex, multi, min_words, max_words, max_value, min_value,
+          uses_shared_option_feedback_message
 
         FROM quiz_item WHERE quiz_id in (SELECT id FROM quiz WHERE course_id = :oldCourseId);`,
         {
@@ -180,7 +183,8 @@ export class CourseService {
       rawQuery = builder.raw(
         `
       INSERT INTO quiz_item_translation
-        (quiz_item_id, language_id, title, body, success_message, failure_message, min_label, max_label, shared_option_feedback_message)
+        (quiz_item_id, language_id, title, body, success_message, failure_message, min_label, max_label, 
+        shared_option_feedback_message)
       SELECT
         uuid_generate_v5(:newCourseId, quiz_item_id::text), language_id, title,
         body, success_message, failure_message, min_label, max_label, shared_option_feedback_message
