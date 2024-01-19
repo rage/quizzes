@@ -175,8 +175,7 @@ const Open: React.FunctionComponent<OpenProps> = ({ item }) => {
         />
         {showFormatError && textData && !answerFormatIsValid && (
           <InvalidFormatErrorText>
-            The answer does not match the answer format specified for this
-            exercise.
+            {openLabels.yourAnswerIsNotFormattedCorrectly}
           </InvalidFormatErrorText>
         )}
       </div>

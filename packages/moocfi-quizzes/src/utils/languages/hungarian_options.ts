@@ -27,6 +27,7 @@ const hungarianLabels: SingleLanguageLabels = {
     userAnswerLabel: "Az Ön válasza",
     feedbackForSuccess: "Válasza helyes",
     feedbackForFailure: "Válasza helytelen",
+    yourAnswerIsNotFormattedCorrectly: "A válaszod nincs megfelelően formázva",
   },
   peerReviews: {
     loadingLabel: "Betöltés",

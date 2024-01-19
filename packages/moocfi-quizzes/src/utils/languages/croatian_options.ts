@@ -29,6 +29,7 @@ const croatianLabels: SingleLanguageLabels = {
     userAnswerLabel: "Vaš odgovor",
     feedbackForFailure: "Vaš odgovor nije točan.",
     feedbackForSuccess: "Vaš odgovor je točan.",
+    yourAnswerIsNotFormattedCorrectly: "Vaš odgovor nije pravilno formatiran",
   },
   peerReviews: {
     loadingLabel: "Učitavanje",

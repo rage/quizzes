@@ -29,6 +29,7 @@ const swedishLabels: SingleLanguageLabels = {
     userAnswerLabel: "Ditt svar",
     feedbackForFailure: "Ditt svar är fel",
     feedbackForSuccess: "Ditt svar är rätt",
+    yourAnswerIsNotFormattedCorrectly: "Ditt svar är inte korrekt formaterat",
   },
   peerReviews: {
     loadingLabel: "Laddar",

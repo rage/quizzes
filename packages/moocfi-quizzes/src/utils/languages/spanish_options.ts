@@ -27,6 +27,8 @@ const spanishLabels: SingleLanguageLabels = {
     userAnswerLabel: "Tu respuesta",
     feedbackForSuccess: "La respuesta es correcta.",
     feedbackForFailure: "La respuesta no es correcta.",
+    yourAnswerIsNotFormattedCorrectly:
+      "Tu respuesta no está formateada correctamente",
   },
   peerReviews: {
     loadingLabel: "Cargando",

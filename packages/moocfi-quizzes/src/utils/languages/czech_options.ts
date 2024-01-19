@@ -27,6 +27,7 @@ const czechLabels: SingleLanguageLabels = {
     userAnswerLabel: "Vaše odpověď",
     feedbackForSuccess: "Vaše odpověď je správná",
     feedbackForFailure: "Vaše odpověď není správná",
+    yourAnswerIsNotFormattedCorrectly: "Vaše odpověď není správně formátována",
   },
   peerReviews: {
     loadingLabel: "Načítá se",

@@ -131,6 +131,7 @@ export type OpenLabels = {
   userAnswerLabel: string
   feedbackForSuccess: string
   feedbackForFailure: string
+  yourAnswerIsNotFormattedCorrectly: string
 }
 
 export type ErrorLabels = {

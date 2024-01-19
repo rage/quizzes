@@ -27,6 +27,7 @@ const icelandicLabels: SingleLanguageLabels = {
     userAnswerLabel: "Svar þitt",
     feedbackForSuccess: "Svarið er rétt",
     feedbackForFailure: "Svarið er rangt",
+    yourAnswerIsNotFormattedCorrectly: "Svarið þitt er ekki rétt sniðið",
   },
   peerReviews: {
     loadingLabel: "Sæki...",

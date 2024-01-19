@@ -29,6 +29,7 @@ const romanianLabels: SingleLanguageLabels = {
     userAnswerLabel: "Răspunsul dumneavoastră",
     feedbackForFailure: "Nu ați răspuns corect",
     feedbackForSuccess: "Ați răspuns corect",
+    yourAnswerIsNotFormattedCorrectly: "Răspunsul tău nu este formatat corect",
   },
   peerReviews: {
     loadingLabel: "Se încarcă",

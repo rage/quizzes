@@ -29,6 +29,8 @@ const dutchLabels: SingleLanguageLabels = {
     userAnswerLabel: "Uw antwoord",
     feedbackForFailure: "Uw antwoord is onjuist",
     feedbackForSuccess: "Uw antwoord is juist",
+    yourAnswerIsNotFormattedCorrectly:
+      "Uw antwoord is niet correct geformatteerd",
   },
   peerReviews: {
     loadingLabel: "Laden",

@@ -29,6 +29,7 @@ const danishLabels: SingleLanguageLabels = {
     userAnswerLabel: "Dit svar",
     feedbackForFailure: "Dit svar er ikke korrekt",
     feedbackForSuccess: "Dit svar er korrekt",
+    yourAnswerIsNotFormattedCorrectly: "Dit svar er ikke formateret korrekt",
   },
   peerReviews: {
     loadingLabel: "Indlæser",

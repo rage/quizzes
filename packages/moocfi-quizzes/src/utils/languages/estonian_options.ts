@@ -29,6 +29,8 @@ const estonianLabels: SingleLanguageLabels = {
     userAnswerLabel: "Sinu vastus",
     feedbackForFailure: "Sinu vastus ei ole õige",
     feedbackForSuccess: "Sinu vastus on õige",
+    yourAnswerIsNotFormattedCorrectly:
+      "Sinu vastus ei ole korrektselt vormindatud",
   },
   peerReviews: {
     loadingLabel: "Laeb",

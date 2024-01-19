@@ -29,6 +29,7 @@ const irishLabels: SingleLanguageLabels = {
     userAnswerLabel: "An freagra uait",
     feedbackForFailure: "Níl an freagra uait ceart",
     feedbackForSuccess: "Tá an freagra uait ceart",
+    yourAnswerIsNotFormattedCorrectly: "Níl do fhreagra formáidithe go ceart",
   },
   peerReviews: {
     loadingLabel: "Ag lódáil",

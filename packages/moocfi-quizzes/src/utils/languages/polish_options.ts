@@ -27,6 +27,8 @@ const polishLabels: SingleLanguageLabels = {
     userAnswerLabel: "Twoja odpowiedź",
     feedbackForSuccess: "Odpowiedź jest prawidłowa",
     feedbackForFailure: "Odpowiedź nie jest prawidłowa",
+    yourAnswerIsNotFormattedCorrectly:
+      "Twoja odpowiedź nie jest poprawnie sformatowana",
   },
   peerReviews: {
     loadingLabel: "Pobieranie danych",

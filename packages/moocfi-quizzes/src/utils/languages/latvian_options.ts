@@ -29,6 +29,7 @@ const latvianLabels: SingleLanguageLabels = {
     userAnswerLabel: "Jūsu atbilde",
     feedbackForFailure: "Atbilde nav pareiza.",
     feedbackForSuccess: "Atbilde pareiza.",
+    yourAnswerIsNotFormattedCorrectly: "Jūsu atbilde nav pareizi formatēta",
   },
   peerReviews: {
     loadingLabel: "Notiek ielāde",

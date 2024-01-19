@@ -27,6 +27,8 @@ const slovakLabels: SingleLanguageLabels = {
     userAnswerLabel: "Vaša odpoveď",
     feedbackForSuccess: "Vaša odpoveď je správna.",
     feedbackForFailure: "Vaša odpoveď je nesprávna.",
+    yourAnswerIsNotFormattedCorrectly:
+      "Vaša odpoveď nie je správne formátovaná",
   },
   peerReviews: {
     loadingLabel: "Načítava sa...",

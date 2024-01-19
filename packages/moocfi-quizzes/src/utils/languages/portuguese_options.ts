@@ -29,6 +29,8 @@ const portugueseLabels: SingleLanguageLabels = {
     userAnswerLabel: "A sua resposta",
     feedbackForFailure: "A sua resposta está incorreta",
     feedbackForSuccess: "A sua resposta está correta",
+    yourAnswerIsNotFormattedCorrectly:
+      "A sua resposta não está formatada corretamente",
   },
   peerReviews: {
     loadingLabel: "A carregar",

@@ -29,6 +29,7 @@ const finnishLabels: SingleLanguageLabels = {
     userAnswerLabel: "Vastauksesi",
     feedbackForFailure: "Vastauksesi ei ole oikein",
     feedbackForSuccess: "Vastauksesi on oikein",
+    yourAnswerIsNotFormattedCorrectly: "Vastauksesi ei ole oikeassa muodossa",
   },
   peerReviews: {
     loadingLabel: "Ladataan",

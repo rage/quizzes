@@ -27,6 +27,7 @@ const slovenianLabels: SingleLanguageLabels = {
     userAnswerLabel: "Vaš odgovor",
     feedbackForSuccess: "Vaš odgovor je pravilen",
     feedbackForFailure: "Vaš odgovor ni pravilen",
+    yourAnswerIsNotFormattedCorrectly: "Vaš odgovor ni pravilno oblikovan",
   },
   peerReviews: {
     loadingLabel: "Nalaganje",

@@ -29,6 +29,8 @@ const lithuanianLabels: SingleLanguageLabels = {
     userAnswerLabel: "Jūsų atsakymas",
     feedbackForFailure: "Jūsų atsakymas neteisingas.",
     feedbackForSuccess: "Jūsų atsakymas teisingas.",
+    yourAnswerIsNotFormattedCorrectly:
+      "Jūsų atsakymas nėra tinkamai suformatuotas",
   },
   peerReviews: {
     loadingLabel: "Įkeliama",

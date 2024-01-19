@@ -29,6 +29,7 @@ const norwegianLabels: SingleLanguageLabels = {
     userAnswerLabel: "Ditt svar",
     feedbackForFailure: "Svaret ditt er galt",
     feedbackForSuccess: "Svaret ditt er korrekt",
+    yourAnswerIsNotFormattedCorrectly: "Svaret ditt er ikke formatert riktig",
   },
   peerReviews: {
     loadingLabel: "Laster inn",

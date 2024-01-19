@@ -27,6 +27,7 @@ const englishLabels: SingleLanguageLabels = {
     userAnswerLabel: "Your answer",
     feedbackForSuccess: "Your answer is correct",
     feedbackForFailure: "Your answer is not correct",
+    yourAnswerIsNotFormattedCorrectly: "Your answer is not formatted correctly",
   },
   peerReviews: {
     loadingLabel: "Loading",

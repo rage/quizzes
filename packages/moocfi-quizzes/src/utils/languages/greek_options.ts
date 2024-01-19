@@ -27,6 +27,8 @@ const greekLabels: SingleLanguageLabels = {
     userAnswerLabel: "Η απάντησή σας",
     feedbackForSuccess: "Η απάντησή σας είναι λάθος",
     feedbackForFailure: "Η απάντησή σας είναι σωστή",
+    yourAnswerIsNotFormattedCorrectly:
+      "Η απάντησή σας δεν είναι διαμορφωμένη σωστά",
   },
   peerReviews: {
     loadingLabel: "Φόρτωση",

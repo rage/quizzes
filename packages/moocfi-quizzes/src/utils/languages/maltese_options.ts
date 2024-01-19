@@ -27,6 +27,8 @@ const malteseLabels: SingleLanguageLabels = {
     userAnswerLabel: "It-tweġiba tiegħek",
     feedbackForSuccess: "It-tweġiba tiegħek mhix tajba",
     feedbackForFailure: "It-tweġiba tiegħek hija tajba",
+    yourAnswerIsNotFormattedCorrectly:
+      "It-tweġiba tiegħek mhijiex ifformattjata korrettament",
   },
   peerReviews: {
     loadingLabel: "Qed jillowdja",

@@ -27,6 +27,7 @@ const bulgarianLabels: SingleLanguageLabels = {
     userAnswerLabel: "Вашият отговор",
     feedbackForSuccess: "Правилен отговор",
     feedbackForFailure: "Неправилен отговор",
+    yourAnswerIsNotFormattedCorrectly: "Отговорът Ви не е форматиран правилно",
   },
   peerReviews: {
     loadingLabel: "Зарежда се",
