@@ -74,18 +74,6 @@ spec:
               secretKeyRef:
                 name: backend-database-secret
                 key: MESSAGE_FORMAT_VERSION
-          - name: NEW_RELIC_LICENSE_KEY
-            valueFrom:
-              secretKeyRef:
-                name: backend-database-secret
-                key: NEW_RELIC_LICENSE_KEY
-          - name: NEW_RELIC_APP_NAME
-            valueFrom:
-              secretKeyRef:
-                name: backend-database-secret
-                key: NEW_RELIC_APP_NAME
-          - name: NEW_RELIC_NO_CONFIG_FILE
-            value: "true"
           - name: SERVICE_ID
             valueFrom:
               secretKeyRef:
