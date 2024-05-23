@@ -36,7 +36,7 @@
     "module-alias": "^2.1.0",
     "morgan": "^1.9.1",
     "newrelic": "^6.4.2",
-    "node-rdkafka": "^2.8.1",
+    "node-rdkafka": "^2.15.0",
     "pg": "^8.2.1",
     "redis": "^3.0.2",
     "reflect-metadata": "^0.1.12",
@@ -46,12 +46,12 @@
     "typeorm": "^0.3.0-rc.19",
     "typeorm-routing-controllers-extensions": "^0.2.0",
     "typeorm-typedi-extensions": "^0.2.1",
+    "typescript": "^3.9.3",
     "uuid": "^8.1.0",
     "uuid-by-string": "^3.0.2",
     "validator": "^13.0.0",
     "websocket": "^1.0.31",
-    "winston": "^3.2.1",
-    "typescript": "^3.9.3"
+    "winston": "^3.2.1"
   },
   "devDependencies": {
     "@sentry/node": "^5.15.5",
