@@ -72,6 +72,8 @@ setUpDB()
 const producer = new Kafka.Producer({
   "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
   dr_cb: false,
+  "security.protocol": "ssl",
+  "enable.ssl.certificate.verification": false,
 })
 
 const flusher = promisify(producer.flush.bind(producer))

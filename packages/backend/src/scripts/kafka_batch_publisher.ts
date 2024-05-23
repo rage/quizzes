@@ -18,6 +18,8 @@ const USE_USER_POINTS_BATCH = process.env.USE_USER_POINTS_BATCH === "true"
 const producer = new Kafka.Producer({
   "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
   dr_cb: false,
+  "security.protocol": "ssl",
+  "enable.ssl.certificate.verification": false,
 })
 
 const flush = promisify(producer.flush.bind(producer))

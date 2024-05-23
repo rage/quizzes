@@ -164,6 +164,8 @@ export default class KafkaService {
         this.producer = new Kafka.Producer({
           "metadata.broker.list": process.env.KAFKA_HOST || "localhost:9092",
           dr_cb: false,
+          "security.protocol": "ssl",
+          "enable.ssl.certificate.verification": false,
         })
         await this.connect()
         this.flush = promisify(this.producer.flush.bind(this.producer))
