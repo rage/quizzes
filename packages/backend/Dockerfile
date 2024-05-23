@@ -4,7 +4,7 @@ ARG GIT_COMMIT=""
 LABEL GIT_COMMIT=${GIT_COMMIT}
 
 RUN apk --no-cache update \
-&& apk --no-cache add g++ make bash zlib-dev libpng-dev postgresql-client redis python2 \
+&& apk --no-cache add g++ make bash zlib-dev libpng-dev postgresql-client redis python2 openssl-dev \
 &&  rm -fr /var/cache/apk/*
 
 COPY --chown=node . /app
