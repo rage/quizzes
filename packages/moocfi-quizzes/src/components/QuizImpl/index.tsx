@@ -221,7 +221,6 @@ const FuncQuizImpl: React.FunctionComponent<QuizProps> = ({
   })
 
   if (fatal) {
-    console.log("quiz")
     courseStatusProvider.notifyError &&
       courseStatusProvider.notifyError(messageState.message)
     return (
