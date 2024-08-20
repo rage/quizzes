@@ -41,7 +41,7 @@ export const accessControl = (options?: AccessControlOptions) => {
         // fetch user from TMC server and cache details
         user = await getCurrentUserDetails(token)
         if (redis.client) {
-          await redis.client.set(token, JSON.stringify(user), "EX", 604800)
+          await redis.client.set(token, JSON.stringify(user), "EX", 3600)
         }
       } catch (error) {
         throw new UnauthorizedError("unauthorized")
