@@ -140,11 +140,13 @@ const ReceivedReviewsSummary: React.FunctionComponent<IReceivedReviewsProps> = (
   peerReviews,
   receivedReviewsLabels,
 }) => {
-  const gradeAnswers = peerReviews.flatMap(review =>
-    review.answers
-      .filter(a => typeof (a as PeerReviewGradeAnswer).value === "number")
-      .map(prqa => (prqa as PeerReviewGradeAnswer).value!),
-  )
+  const gradeAnswers = peerReviews
+    .flatMap(review =>
+      review.answers
+        .filter(a => typeof (a as PeerReviewGradeAnswer).value === "number")
+        .map(prqa => (prqa as PeerReviewGradeAnswer).value!),
+    )
+    .filter(a => a !== null && a !== undefined && !Number.isNaN(a) && a !== 0)
 
   let average: number | string = "-"
 
