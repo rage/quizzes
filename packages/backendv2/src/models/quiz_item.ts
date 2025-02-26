@@ -39,6 +39,7 @@ class QuizItem extends mixin(BaseModel, [
   allAnswersCorrect!: string
   deleted!: boolean
   direction!: "row" | "column"
+  prefaceText!: string
 
   static get tableName() {
     return "quiz_item"
