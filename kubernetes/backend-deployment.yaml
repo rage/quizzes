@@ -36,7 +36,7 @@ spec:
           containerPort: 7000
         env:
           - name: REDIS_HOST
-            value: "redis-ha-server-0.redis.svc.cluster.local"
+            value: "redis-ha-announce-0.redis.svc.cluster.local"
           - name: REDIS_PORT
             value: "6379"
           - name: REDIS_PASSWORD
