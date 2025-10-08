@@ -1,9 +1,5 @@
 version: 2.1
 
-orbs:
-  docker: circleci/docker@2.0.0
-  jq: circleci/jq@3.0.2
-
 jobs:
   code_style:
     docker:
@@ -22,8 +18,11 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
-      - jq/install
-      - docker/install-docker-tools
+      - run:
+          name: Install Docker CLI
+          command: |
+            apt-get update
+            apt-get install -y docker.io
       - setup_remote_docker
       - run:
           name: "Build dashboard image"
@@ -37,8 +36,11 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
-      - jq/install
-      - docker/install-docker-tools
+      - run:
+          name: Install Docker CLI
+          command: |
+            apt-get update
+            apt-get install -y docker.io
       - setup_remote_docker
       - run:
           name: "Build dashboard v2 image"
@@ -52,8 +54,11 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
-      - jq/install
-      - docker/install-docker-tools
+      - run:
+          name: Install Docker CLI
+          command: |
+            apt-get update
+            apt-get install -y docker.io
       - setup_remote_docker
       - run:
           name: "Build widgets image"
@@ -64,8 +69,11 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
-      - jq/install
-      - docker/install-docker-tools
+      - run:
+          name: Install Docker CLI
+          command: |
+            apt-get update
+            apt-get install -y docker.io
       - setup_remote_docker
       - run:
           name: "Build backend image"
@@ -138,8 +146,11 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
-      - jq/install
-      - docker/install-docker-tools
+      - run:
+          name: Install Docker CLI
+          command: |
+            apt-get update
+            apt-get install -y docker.io
       - setup_remote_docker
       - run:
           name: "Build backend v2 image"
@@ -153,8 +164,11 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
-      - jq/install
-      - docker/install-docker-tools
+      - run:
+          name: Install Docker CLI
+          command: |
+            apt-get update
+            apt-get install -y docker.io
       - setup_remote_docker
       - run:
           name: install envsubst
