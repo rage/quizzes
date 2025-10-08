@@ -22,17 +22,28 @@ export const accessControl = (options?: AccessControlOptions) => {
       return next()
     }
 
-    if (!ctx.headers.authorization) {
+    if (!(ctx as any).headers.authorization) {
       throw new BadRequestError("No Authorization header provided.")
     }
 
     const token: string =
-      ctx.headers.authorization.replace(/bearer /i, "") || ""
+      (ctx as any).headers.authorization.replace(/bearer /i, "") || ""
 
     // attempt retrieval of user from cache
     let user = null
     if (redis.client) {
-      user = JSON.parse((await redis.client.get(token)) as string)
+      try {
+        const cachedUser = await redis.client.get(token)
+        if (cachedUser) {
+          user = JSON.parse(cachedUser)
+        }
+      } catch (error) {
+        ctx.log.error("Redis GET operation failed", {
+          error: error instanceof Error ? error.message : String(error),
+          stack: error instanceof Error ? error.stack : undefined,
+        })
+        // Continue without cache - will fetch from TMC server
+      }
     }
 
     // catches null and undefined
@@ -41,14 +52,22 @@ export const accessControl = (options?: AccessControlOptions) => {
         // fetch user from TMC server and cache details
         user = await getCurrentUserDetails(token)
         if (redis.client) {
-          await redis.client.set(token, JSON.stringify(user), "EX", 3600)
+          try {
+            await redis.client.set(token, JSON.stringify(user), "EX", 3600)
+          } catch (error) {
+            ctx.log.error("Redis SET operation failed", {
+              error: error instanceof Error ? error.message : String(error),
+              stack: error instanceof Error ? error.stack : undefined,
+            })
+            // Continue without caching - user is still authenticated
+          }
         }
       } catch (error) {
         throw new UnauthorizedError("unauthorized")
       }
     }
 
-    ctx.state.user = user
+    ;(ctx as any).state.user = user
 
     if (options?.administrator && !user.administrator) {
       throw new ForbiddenError("forbidden")
