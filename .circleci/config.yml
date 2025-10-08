@@ -21,6 +21,7 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
+      - jq/install
       - docker/install-docker-tools
       - setup_remote_docker
       - run:
@@ -35,6 +36,7 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
+      - jq/install
       - docker/install-docker-tools
       - setup_remote_docker
       - run:
@@ -49,6 +51,7 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
+      - jq/install
       - docker/install-docker-tools
       - setup_remote_docker
       - run:
@@ -60,6 +63,7 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
+      - jq/install
       - docker/install-docker-tools
       - setup_remote_docker
       - run:
@@ -133,6 +137,7 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
+      - jq/install
       - docker/install-docker-tools
       - setup_remote_docker
       - run:
@@ -147,6 +152,7 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
+      - jq/install
       - docker/install-docker-tools
       - setup_remote_docker
       - run:
