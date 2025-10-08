@@ -44,6 +44,11 @@ spec:
               secretKeyRef:
                 name: new-redis
                 key: redis-password
+          - name: REDIS_SENTINELS
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: REDIS_SENTINELS
           - name: DB_NAME
             valueFrom:
               secretKeyRef:
