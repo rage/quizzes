@@ -462,11 +462,13 @@ const publishProgress = async (
 
     const maxPointsByPart: { [part: number]: number } = {}
 
-    quizzes.forEach(({ part, points }) =>
-      maxPointsByPart[part]
-        ? (maxPointsByPart[part] += points)
-        : (maxPointsByPart[part] = points),
-    )
+    quizzes.forEach(({ part, points, excluded_from_score }) => {
+      if (!excluded_from_score) {
+        maxPointsByPart[part]
+          ? (maxPointsByPart[part] += points)
+          : (maxPointsByPart[part] = points)
+      }
+    })
 
     const userCoursePartStatesQuery = knex<IUserCoursePartState>(
       "user_course_part_state",
@@ -497,13 +499,14 @@ const publishProgress = async (
     for (group of groupedByUser) {
       const progress: PointsByGroup[] = group.map(ucps => {
         const coursePartString: string = ucps.course_part.toString()
+        const maxPoints = maxPointsByPart[ucps.course_part] ?? 0
         return {
           group: `${
             coursePartString.length > 1 ? "osa" : "osa0"
           }${coursePartString}`,
-          progress: Math.floor(ucps.progress * 100) / 100,
+          progress: Math.round((ucps.score / maxPoints) * 100) / 100,
           n_points: Number(ucps.score.toFixed(2)),
-          max_points: maxPointsByPart[ucps.course_part] ?? 0,
+          max_points: maxPoints,
         }
       })
       const message: ProgressMessage = {
