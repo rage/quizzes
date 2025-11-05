@@ -11,6 +11,7 @@ import { mixin } from "objection"
 import { Transaction } from "knex"
 
 class PeerReview extends BaseModel {
+  id!: string
   userId!: number
   quizAnswerId!: string
   rejectedQuizAnswerIds!: string[]
@@ -56,7 +57,10 @@ class PeerReview extends BaseModel {
     return peerReviews
   }
 
-  public static async givePeerReview(peerReview: PeerReview) {
+  public static async givePeerReview(
+    peerReview: PeerReview,
+    skipGiverRequirements: boolean = false,
+  ) {
     peerReview.answers.forEach((answer: PeerReviewQuestionAnswer): void => {
       if (answer.text) {
         return
@@ -80,7 +84,8 @@ class PeerReview extends BaseModel {
       sourceUserId,
       quizAnswerId,
     )
-    if (peerReviewAlreadyGiven) {
+    const isUpdating = skipGiverRequirements && peerReviewAlreadyGiven
+    if (peerReviewAlreadyGiven && !skipGiverRequirements) {
       throw new BadRequestError("Answer can only be peer reviewed once")
     }
 
@@ -88,10 +93,10 @@ class PeerReview extends BaseModel {
 
     const quizId = targetQuizAnswer.quizId
 
-    const sourceQuizAnswer = await QuizAnswer.getByUserAndQuiz(
-      sourceUserId,
-      quizId,
-    )
+    let sourceQuizAnswer: QuizAnswer | null = null
+    if (!skipGiverRequirements) {
+      sourceQuizAnswer = await QuizAnswer.getByUserAndQuiz(sourceUserId, quizId)
+    }
 
     const quiz = await Quiz.getById(quizId)
     quiz.course = await quiz.$relatedQuery("course")
@@ -103,52 +108,79 @@ class PeerReview extends BaseModel {
       throw new BadRequestError("User cannot review their own answer")
     }
 
-    let sourceUserQuizState, targetUserQuizState
+    let sourceUserQuizState: UserQuizState | null = null
+    let targetUserQuizState: UserQuizState
 
-    sourceUserQuizState = await UserQuizState.getByUserAndQuiz(
-      sourceUserId,
-      quizId,
-    )
+    if (!skipGiverRequirements) {
+      sourceUserQuizState = await UserQuizState.getByUserAndQuiz(
+        sourceUserId,
+        quizId,
+      )
+    }
 
     targetUserQuizState = await UserQuizState.getByUserAndQuiz(
       targetUserId,
       quizId,
     )
 
-    if (!sourceUserQuizState || !targetUserQuizState) {
+    if (!targetUserQuizState) {
+      throw new NotFoundError(`User quiz state not found.`)
+    }
+
+    if (!skipGiverRequirements && !sourceUserQuizState) {
       throw new NotFoundError(`User quiz state not found.`)
     }
 
     // increment peer review stats for both source and target users
-    if (sourceUserQuizState.peerReviewsGiven === null) {
-      sourceUserQuizState.peerReviewsGiven = 1
-    } else {
-      sourceUserQuizState.peerReviewsGiven += 1
+    if (!skipGiverRequirements && sourceUserQuizState) {
+      if (sourceUserQuizState.peerReviewsGiven === null) {
+        sourceUserQuizState.peerReviewsGiven = 1
+      } else {
+        sourceUserQuizState.peerReviewsGiven += 1
+      }
     }
 
-    if (targetUserQuizState.peerReviewsReceived === null) {
-      targetUserQuizState.peerReviewsReceived = 1
-    } else {
-      targetUserQuizState.peerReviewsReceived += 1
+    if (!isUpdating) {
+      if (targetUserQuizState.peerReviewsReceived === null) {
+        targetUserQuizState.peerReviewsReceived = 1
+      } else {
+        targetUserQuizState.peerReviewsReceived += 1
+      }
     }
 
     const trx = await knex.transaction()
 
     try {
-      // create the peer review
-      const newPeerReview = await this.query(trx).insertGraphAndFetch(
-        this.fromJson(peerReview),
-      )
+      let newPeerReview: PeerReview
+      if (isUpdating && peerReviewAlreadyGiven) {
+        const peerReviewData = this.fromJson(peerReview)
+        peerReviewData.id = peerReviewAlreadyGiven.id
+        newPeerReview = await this.query(trx).upsertGraphAndFetch(
+          peerReviewData,
+        )
+      } else {
+        newPeerReview = await this.query(trx).insertGraphAndFetch(
+          this.fromJson(peerReview),
+        )
+      }
 
       // update quiz answers for both users
-      await QuizAnswer.update(sourceQuizAnswer, sourceUserQuizState, quiz, trx)
+      if (!skipGiverRequirements && sourceQuizAnswer && sourceUserQuizState) {
+        await QuizAnswer.update(
+          sourceQuizAnswer,
+          sourceUserQuizState,
+          quiz,
+          trx,
+        )
+        await QuizAnswer.save(sourceQuizAnswer, trx)
+      }
       await QuizAnswer.update(targetQuizAnswer, targetUserQuizState, quiz, trx)
-
-      await QuizAnswer.save(sourceQuizAnswer, trx)
       await QuizAnswer.save(targetQuizAnswer, trx)
 
       // update quiz states for both users
-      await UserQuizState.upsert(sourceUserQuizState, trx)
+      if (!skipGiverRequirements && sourceUserQuizState) {
+        await UserQuizState.upsert(sourceUserQuizState, trx)
+      }
       await UserQuizState.upsert(targetUserQuizState, trx)
 
       await trx.commit()

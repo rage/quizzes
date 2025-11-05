@@ -104,4 +104,15 @@ const widget = new Router<CustomState, CustomContext>({
     ctx.body = await PeerReview.givePeerReview(peerReview)
   })
 
+  .post(
+    "/answers/give-review/only-admins",
+    accessControl({ administrator: true }),
+    async ctx => {
+      const userId = ctx.state.user.id
+      const peerReview = ctx.request.body
+      peerReview.userId = userId
+      ctx.body = await PeerReview.givePeerReview(peerReview, true)
+    },
+  )
+
 export default widget
