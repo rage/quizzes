@@ -86,13 +86,20 @@ export const getDownloadTokenFromRedis = async (
 ): Promise<string> => {
   let downloadToken = ""
   if (redis.client) {
-    const cachedToken = await redis.client.get(userId)
-    if (cachedToken) {
-      downloadToken = cachedToken
-    } else {
-      const randomToken = `dl_tkn_${crypto.randomBytes(100).toString("hex")}`
-      await redis.client.set(userId, randomToken, "EX", 600)
-      downloadToken = randomToken
+    try {
+      const cachedToken = await redis.client.get(userId)
+      if (cachedToken) {
+        downloadToken = cachedToken
+      } else {
+        const randomToken = `dl_tkn_${crypto.randomBytes(100).toString("hex")}`
+        await redis.client.set(userId, randomToken, "EX", 600)
+        downloadToken = randomToken
+      }
+    } catch (error) {
+      console.error(
+        "Redis operation failed in getDownloadTokenFromRedis:",
+        error,
+      )
     }
   }
   // will return empty string if redis unavailable

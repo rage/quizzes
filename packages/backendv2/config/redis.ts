@@ -29,7 +29,30 @@ if (env.REDIS_SENTINELS) {
     sentinelPassword: env.REDIS_SENTINEL_PASSWORD || undefined,
     db: env.REDIS_DB ? Number(env.REDIS_DB) : 3,
     enableReadyCheck: true,
-    sentinelRetryStrategy: (times: number) => Math.min(times * 1000, 10000),
+    maxRetriesPerRequest: 1,
+    enableOfflineQueue: false,
+    lazyConnect: true,
+  })
+
+  client.on("error", err => {
+    GlobalLogger.error("Redis connection error", {
+      error: err.message,
+      stack: err.stack,
+    })
+  })
+
+  client.on("reconnecting", () => {
+    GlobalLogger.warn("Redis reconnecting...")
+  })
+
+  client.on("connect", () => {
+    GlobalLogger.info("Redis connected")
+  })
+
+  client.connect().catch(err => {
+    GlobalLogger.error("Failed to connect to Redis on startup", {
+      error: err.message,
+    })
   })
 
   GlobalLogger.info(
@@ -44,6 +67,30 @@ if (env.REDIS_SENTINELS) {
     host: env.REDIS_HOST,
     password: env.REDIS_PASSWORD && env.REDIS_PASSWORD,
     db: env.REDIS_DB ? Number(env.REDIS_DB) : 3,
+    maxRetriesPerRequest: 1,
+    enableOfflineQueue: false,
+    lazyConnect: true,
+  })
+
+  client.on("error", err => {
+    GlobalLogger.error("Redis connection error", {
+      error: err.message,
+      stack: err.stack,
+    })
+  })
+
+  client.on("reconnecting", () => {
+    GlobalLogger.warn("Redis reconnecting...")
+  })
+
+  client.on("connect", () => {
+    GlobalLogger.info("Redis connected")
+  })
+
+  client.connect().catch(err => {
+    GlobalLogger.error("Failed to connect to Redis on startup", {
+      error: err.message,
+    })
   })
 
   GlobalLogger.info(

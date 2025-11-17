@@ -76,17 +76,26 @@ const quizzesRoutes = new Router<CustomState, CustomContext>({
 
     // validate token
     if (downloadToken && redis.client) {
-      const cachedToken = await redis.client.get(userId)
+      try {
+        const cachedToken = await redis.client.get(userId)
 
-      if (cachedToken === downloadToken) {
-        const stream = await Quiz.getQuizInfo(quizId)
-        ctx.response.set("Content-Type", "text/csv")
-        ctx.response.attachment(
-          `quiz-info-${quizName}-${courseName}-${isoDate}.csv`,
-        )
-        ctx.body = stream
-      } else {
-        throw new BadRequestError("Download token does not match cached token.")
+        if (cachedToken === downloadToken) {
+          const stream = await Quiz.getQuizInfo(quizId)
+          ctx.response.set("Content-Type", "text/csv")
+          ctx.response.attachment(
+            `quiz-info-${quizName}-${courseName}-${isoDate}.csv`,
+          )
+          ctx.body = stream
+        } else {
+          throw new BadRequestError(
+            "Download token does not match cached token.",
+          )
+        }
+      } catch (error) {
+        if (error instanceof BadRequestError) {
+          throw error
+        }
+        throw new BadRequestError("Failed to validate download token.")
       }
     }
   })
@@ -127,17 +136,26 @@ const quizzesRoutes = new Router<CustomState, CustomContext>({
 
     // validate token
     if (downloadToken && redis.client) {
-      const cachedToken = await redis.client.get(userId)
+      try {
+        const cachedToken = await redis.client.get(userId)
 
-      if (cachedToken === downloadToken) {
-        const stream = await Quiz.getPeerReviewInfo(quizId)
-        ctx.response.set("Content-Type", "text/csv")
-        ctx.response.attachment(
-          `quiz-peer_review-info-${quizName}-${courseName}-${isoDate}.csv`,
-        )
-        ctx.body = stream
-      } else {
-        throw new BadRequestError("Download token does not match cached token.")
+        if (cachedToken === downloadToken) {
+          const stream = await Quiz.getPeerReviewInfo(quizId)
+          ctx.response.set("Content-Type", "text/csv")
+          ctx.response.attachment(
+            `quiz-peer_review-info-${quizName}-${courseName}-${isoDate}.csv`,
+          )
+          ctx.body = stream
+        } else {
+          throw new BadRequestError(
+            "Download token does not match cached token.",
+          )
+        }
+      } catch (error) {
+        if (error instanceof BadRequestError) {
+          throw error
+        }
+        throw new BadRequestError("Failed to validate download token.")
       }
     }
   })
@@ -178,16 +196,25 @@ const quizzesRoutes = new Router<CustomState, CustomContext>({
 
     // validate token
     if (downloadToken && redis.client) {
-      const cachedToken = await redis.client.get(userId)
-      if (cachedToken === downloadToken) {
-        const stream = await Quiz.getQuizAnswerInfo(quizId)
-        ctx.response.set("Content-Type", "text/csv")
-        ctx.response.attachment(
-          `quiz-answer-info-${quizName}-${courseName}-${isoDate}.csv`,
-        )
-        ctx.body = stream
-      } else {
-        throw new BadRequestError("Download token does not match cached token.")
+      try {
+        const cachedToken = await redis.client.get(userId)
+        if (cachedToken === downloadToken) {
+          const stream = await Quiz.getQuizAnswerInfo(quizId)
+          ctx.response.set("Content-Type", "text/csv")
+          ctx.response.attachment(
+            `quiz-answer-info-${quizName}-${courseName}-${isoDate}.csv`,
+          )
+          ctx.body = stream
+        } else {
+          throw new BadRequestError(
+            "Download token does not match cached token.",
+          )
+        }
+      } catch (error) {
+        if (error instanceof BadRequestError) {
+          throw error
+        }
+        throw new BadRequestError("Failed to validate download token.")
       }
     }
   })
