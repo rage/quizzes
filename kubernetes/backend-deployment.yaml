@@ -36,7 +36,10 @@ spec:
           containerPort: 7000
         env:
           - name: REDIS_HOST
-            value: "redis-ha-announce-0.redis.svc.cluster.local"
+            valueFrom:
+              secretKeyRef:
+                name: backend-database-secret
+                key: REDIS_HOST
           - name: REDIS_PORT
             value: "6379"
           - name: REDIS_PASSWORD
@@ -44,11 +47,6 @@ spec:
               secretKeyRef:
                 name: new-redis
                 key: redis-password
-          - name: REDIS_SENTINELS
-            valueFrom:
-              secretKeyRef:
-                name: backend-database-secret
-                key: REDIS_SENTINELS
           - name: DB_NAME
             valueFrom:
               secretKeyRef:
