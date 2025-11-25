@@ -7,7 +7,7 @@ const quizzesViews = [
   "peer_review_collection",
   "peer_review_collection_translation",
   "peer_review_question",
-  "peer_review_question_answer",
+  // "peer_review_question_answer",
   "peer_review_question_translation",
   "quiz",
   "quiz_answer",
