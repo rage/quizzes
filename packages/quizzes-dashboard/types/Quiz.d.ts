@@ -52,9 +52,27 @@ export interface Item {
     | "DisplayFeedbackOnAllOptions"
 }
 
+export interface PublicSpecItem {
+  id: string
+  type: string
+  order: number
+  formatRegex: null
+  multi: boolean
+  minWords: number | null
+  maxWords: number | null
+  maxValue: number | null
+  minValue: number | null
+  maxLabel: string | null
+  minLabel: string | null
+  options: PublicSpecOption[]
+  title: null
+  body: null
+  direction: "row" | "column"
+}
+
 export interface Option {
   id: string
-  quizItemId?: string
+  quizItemId: string
   order: number
   correct: boolean
   createdAt: Date
@@ -63,6 +81,14 @@ export interface Option {
   body: string | null
   successMessage: null | string
   failureMessage: null | string
+}
+
+export interface PublicSpecOption {
+  id: string
+  quizItemId: string
+  order: number
+  title: string
+  body: string | null
 }
 
 export interface PeerReviewCollection {

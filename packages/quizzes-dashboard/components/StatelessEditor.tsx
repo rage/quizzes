@@ -11,11 +11,13 @@ const Wrapper = styled.div`
 `
 
 interface StatelessEditorProps {
-  onHeightChange: (newHeight: number) => void
+  onHeightChange: (newHeight: number, port: MessagePort) => void
+  port: MessagePort
 }
 
 const StatelessEditor: React.FC<StatelessEditorProps> = ({
   onHeightChange,
+  port,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null)
   const store = useTypedSelector(state => state)
@@ -25,7 +27,7 @@ const StatelessEditor: React.FC<StatelessEditorProps> = ({
     if (!ref) {
       return
     }
-    onHeightChange(ref.getBoundingClientRect().height)
+    onHeightChange(ref.getBoundingClientRect().height, port)
   }, [store])
 
   return (
