@@ -47,6 +47,7 @@
     "timezone-support": "^2.0.2",
     "tmc-client-js": "0.0.9",
     "typesafe-actions": "^5.1.0",
+    "use-memo-one": "^1.1.2",
     "uuid": "^8.3.2",
     "yup": "^0.32.8"
   },

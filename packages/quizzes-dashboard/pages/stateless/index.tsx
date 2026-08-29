@@ -1,92 +1,89 @@
 import { denormalize, normalize } from "normalizr"
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
 import { v4 } from "uuid"
 import StatelessEditor from "../../components/StatelessEditor"
 import { normalizedQuiz } from "../../schemas"
 import { initializedEditor } from "../../store/editor/editorActions"
 import { storeState, useTypedSelector } from "../../store/store"
-import { Quiz } from "../../types/Quiz"
+import {
+  Item,
+  PrivateSpecItem,
+  PrivateSpecOption,
+  PublicSpecItem,
+  PublicSpecOption,
+  Quiz,
+} from "../../types/Quiz"
 
 const Stateless: React.FC = () => {
   const dispatch = useDispatch()
-  // const [state, _setState] = useState()
-
-  // const stateRef = useRef(state)
-  // const setState = (data: any) => {
-  //   stateRef.current = data
-  //   _setState(data)
-  //   console.log("Posting current state to parent")
-  //   window.parent.postMessage(
-  //     { message: "current-state2", message_type: "moocfi/editor-message", data: data },
-  //     "*",
-  //   )
-  // }
+  const store = useTypedSelector(state => state)
+  const [port, setPort] = useState<MessagePort | null>(null)
 
   useEffect(() => {
-    if (typeof window === undefined) {
-      console.log("Not adding a event listener because window is undefined.")
+    if (!port) {
       return
     }
-    const handleMessage = handleMessageCreator()
-    console.log("Adding event listener...")
-    window.addEventListener("message", handleMessage)
-    if (window.parent === window) {
-      console.warn(
-        "Cannot inform the parent we're ready since there is no parent. Please make sure you're using this from an iframe.",
-      )
-    } else {
-      console.log("Telling the parent we're ready")
-      window.parent.postMessage(
-        { message: "ready", message_type: "moocfi/editor-message" },
-        "*",
-      )
-    }
-    const removeListener = () => {
-      console.log("Removing event listener")
-      window.removeEventListener("message", handleMessage)
-    }
-    return removeListener
-  }, [])
+    port.postMessage({
+      message: "current-state",
+      data: convertStoreToSpecs(store),
+    })
+  }, [store])
 
-  const handleMessageCreator = () => {
-    return function handleMessage(event: WindowEventMap["message"]) {
-      if (event.data.message_type !== "moocfi/editor-message") {
+  useEffect(() => {
+    const handler = (message: WindowEventMap["message"]) => {
+      if (message.source !== parent) {
         return
       }
-      console.log("Frame received an event: ", JSON.stringify(event.data))
-      if (event.data.message === "content") {
-        dispatch(
-          initializedEditor(normalizeData(event.data.data), event.data.data),
-        )
-        // setState(event.data.data || [])
-      }
-      if (event.data.message === "give-state") {
-        const data = denormalizeData(useTypedSelector(state => state))
-        window.parent.postMessage(
-          {
-            message: "current-state",
-            message_type: "moocfi/editor-message",
-            data: data,
-          },
-          "*",
-        )
+      const port = message.ports[0]
+      if (port) {
+        console.log("Frame received a port:", port)
+        setPort(port)
+        port.onmessage = (message: WindowEventMap["message"]) => {
+          console.log(
+            "Frame received a message from port",
+            JSON.stringify(message.data),
+          )
+          const data = message.data
+          if (data.message === "set-state") {
+            console.log("Frame: setting state from message")
+            console.log(data)
+            dispatch(initializedEditor(normalizeData(data.data), data.data))
+          } else {
+            console.error("Frame received an unknown message from message port")
+          }
+        }
       }
     }
+    console.log("frame adding event listener")
+    addEventListener("message", handler)
+    // target origin is *, beacause this is a sandboxed iframe without the
+    // allow-same-origin permission
+    parent.postMessage("ready", "*")
+
+    // cleanup function
+    return () => {
+      console.log("removing event listener")
+      removeEventListener("message", handler)
+    }
+  }, [store])
+
+  if (!store) {
+    return <>Waiting for content...</>
   }
 
-  return <StatelessEditor onHeightChange={onHeightChange} />
+  if (!port) {
+    return <>Waiting for port...</>
+  }
+
+  return <StatelessEditor onHeightChange={onHeightChange} port={port} />
 }
 
-const onHeightChange = (newHeight: number) => {
-  window.parent.postMessage(
-    {
-      message: "height-changed",
-      data: newHeight,
-      message_type: "moocfi/editor-message",
-    },
-    "*",
-  )
+const onHeightChange = (newHeight: number, port: MessagePort) => {
+  port.postMessage({
+    message: "height-changed",
+    data: newHeight,
+  })
 }
 
 const normalizeData = (data: any) => {
@@ -104,8 +101,53 @@ const normalizeData = (data: any) => {
     questions: normalizedInputData.entities.questions ?? {},
   }
 }
+interface QuizzesSpecs {
+  private_spec: Quiz
+  public_spec: { id: string; items: PublicSpecItem[] }
+}
 
-const denormalizeData = (store: storeState) => {
+const convertStoreToSpecs = (store: storeState): QuizzesSpecs => {
+  const denormalizedData = denormalizeData(store)
+
+  const specs: QuizzesSpecs = {
+    private_spec: denormalizeData(store),
+    public_spec: {
+      id: v4(),
+      items: denormalizedData.items.map(i => {
+        const publicItem: PublicSpecItem = {
+          formatRegex: i.formatRegex,
+          multi: i.multi,
+          id: i.id,
+          body: i.body,
+          direction: i.direction,
+          maxLabel: i.maxLabel,
+          maxValue: i.maxValue,
+          maxWords: i.maxWords,
+          minLabel: i.minLabel,
+          minValue: i.minValue,
+          minWords: i.minWords,
+          order: i.order,
+          title: i.title,
+          type: i.type,
+          options: i.options.map(o => {
+            const publicOption: PublicSpecOption = {
+              id: o.id,
+              body: o.body,
+              order: o.order,
+              title: o.title,
+              quizItemId: o.quizItemId,
+            }
+            return publicOption
+          }),
+        }
+        return publicItem
+      }),
+    },
+  }
+  return specs
+}
+
+const denormalizeData = (store: storeState): Quiz => {
   let quizData = {
     quizzes: store.editor.quizzes,
     items: store.editor.items,
@@ -117,7 +159,6 @@ const denormalizeData = (store: storeState) => {
   return denormalize(quizData.quizId, normalizedQuiz, quizData)
 }
 
-//From parent?
 const emptyQuiz: Quiz = {
   id: v4(),
   autoConfirm: true,
