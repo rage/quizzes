@@ -24,7 +24,7 @@
     "tmc-client-js": "0.0.9",
     "typesafe-actions": "^4.4.2",
     "typescript": "^3.9.3",
-    "xlsx": "^0.16.1",
+    "xlsx": "^0.17.0",
     "redux-devtools-extension": "^2.13.5",
     "tslint": "^6.1.2",
     "tslint-config-prettier": "^1.15.0",
