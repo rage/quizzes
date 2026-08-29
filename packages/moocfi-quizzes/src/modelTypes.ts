@@ -127,6 +127,7 @@ export type QuizItem = {
   sharedOptionFeedbackMessage?: string
   direction: QuizItemDirection
   feedbackDisplayPolicy: QuizItemFeedbackDisplayPolicy
+  prefaceText: string
 }
 
 export type PeerReviewQuestion = {

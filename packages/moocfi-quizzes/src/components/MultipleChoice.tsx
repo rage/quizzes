@@ -96,6 +96,11 @@ const LeftAlignedMarkdownText = styled(MarkdownText)`
 
 const justADiv = styled.div``
 
+const PrefaceMarkdown = styled(MarkdownText)`
+  padding-top: 1em;
+  padding-bottom: 1em;
+`
+
 type MultipleChoiceProps = {
   item: QuizItem
 }
@@ -108,11 +113,10 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
   const quizDisabled = useTypedSelector(state => state.quizAnswer.quizDisabled)
   const answer = useTypedSelector(state => state.quizAnswer.quizAnswer)
   const options = item.options
-
+  // preface_text
   if (!quiz) {
     return <div />
   }
-
   const itemAnswer = answer.itemAnswers.find(ia => ia.quizItemId === item.id)
   if (!itemAnswer && !quizDisabled) {
     return <LaterQuizItemAddition item={item} />
@@ -130,6 +134,11 @@ const MultipleChoice: React.FunctionComponent<MultipleChoiceProps> = ({
 
   return (
     <div role="group" aria-label={item.title}>
+      {item.prefaceText.length > 1 ? (
+        <PrefaceMarkdown Component={justADiv} removeParagraphs>
+          {item.prefaceText}
+        </PrefaceMarkdown>
+      ) : null}
       <ItemContent
         direction={direction}
         providedStyles={themeProvider.multipleChoiceItemContentStyles}

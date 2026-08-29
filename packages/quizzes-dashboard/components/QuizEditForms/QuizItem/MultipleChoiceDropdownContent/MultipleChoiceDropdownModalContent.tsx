@@ -15,6 +15,7 @@ import {
   editedSharedOptionsFeedbackMessage,
   editedItemSuccessMessage,
   editedItemFailureMessage,
+  editedQuizItemPrefaceTitle,
 } from "../../../../store/editor/items/itemAction"
 import { useTypedSelector } from "../../../../store/store"
 import { useDispatch } from "react-redux"
@@ -159,6 +160,17 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
           </ModalContent>
         </>
       )}
+      <ModalContent>
+        <MarkdownEditor
+          label="prefaceTitle"
+          text={storeItem.prefaceTitle ?? ""}
+          onChange={event =>
+            dispatch(
+              editedQuizItemPrefaceTitle(event.target.value, storeItem.id),
+            )
+          }
+        />
+      </ModalContent>
     </>
   )
 }
