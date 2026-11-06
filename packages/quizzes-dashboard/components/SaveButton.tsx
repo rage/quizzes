@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useMemo } from "react"
 
 import { isAxiosError } from "axios"
 import { denormalize, normalize } from "normalizr"
@@ -69,7 +69,8 @@ const SaveButton = () => {
   const [showSpinner, setShowSpinner] = useState(false)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const store = useTypedSelector((state) => state)
+  const editor = useTypedSelector((state) => state.editor)
+  const store = useMemo(() => ({ editor }), [editor])
   const quizId = useTypedSelector((state) => state.editor.quizId)
   const changes = useTypedSelector(
     (state) => state.editor.editorChanges.changes,

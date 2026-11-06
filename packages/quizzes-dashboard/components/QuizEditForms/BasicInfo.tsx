@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 
 import { DateTime } from "luxon"
 import { useDispatch } from "react-redux"
@@ -179,7 +179,8 @@ const BasicInformation = () => {
     setDeadline(parseDeadline(variables.deadline))
   }
 
-  const store = useTypedSelector((state) => state)
+  const editor = useTypedSelector((state) => state.editor)
+  const store = useMemo(() => ({ editor }), [editor])
 
   const changes = useTypedSelector(
     (state) => state.editor.editorChanges.changes,

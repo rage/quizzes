@@ -21,7 +21,7 @@ const StatelessEditor: React.FC<StatelessEditorProps> = ({
   onHeightChange,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null)
-  const store = useTypedSelector((state) => state)
+  const editor = useTypedSelector((state) => state.editor)
 
   useLayoutEffect(() => {
     const ref = contentRef.current
@@ -29,7 +29,7 @@ const StatelessEditor: React.FC<StatelessEditorProps> = ({
       return
     }
     onHeightChange(ref.getBoundingClientRect().height)
-  }, [store])
+  }, [editor])
 
   return (
     <Wrapper ref={contentRef}>
