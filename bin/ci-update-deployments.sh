@@ -28,3 +28,5 @@ envsubst < "$CURRENT_DIR/../kubernetes/kafka-background-producer-deployment.yaml
 
 echo "Applying changes"
 kubectl replace -f "$CURRENT_DIR/../updated-kubernetes-configs"
+# apply, not replace: this cronjob may not exist in the cluster yet
+envsubst < "$CURRENT_DIR/../kubernetes/course-expired-cronjob.yaml" | kubectl apply -f -
