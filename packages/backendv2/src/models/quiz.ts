@@ -44,7 +44,7 @@ export class Quiz extends BaseModel {
     return "quiz"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     items: {
       relation: BaseModel.HasManyRelation,
       modelClass: QuizItem,
@@ -101,7 +101,7 @@ export class Quiz extends BaseModel {
         to: "peer_review_question.quiz_id",
       },
     },
-  }
+  })
 
   static get modifiers() {
     return {

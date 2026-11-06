@@ -17,7 +17,7 @@ class PeerReviewQuestionTranslation extends BaseModel {
     return ["peer_review_question_id", "language_id"]
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     question: {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: PeerReviewQuestion,
@@ -26,7 +26,7 @@ class PeerReviewQuestionTranslation extends BaseModel {
         to: "peer_review_question.id",
       },
     },
-  }
+  })
 }
 
 export default PeerReviewQuestionTranslation

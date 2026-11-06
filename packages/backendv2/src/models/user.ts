@@ -13,7 +13,7 @@ class User extends BaseModel {
     return "user"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     answers: {
       relation: BaseModel.HasManyRelation,
       modelClass: QuizAnswer,
@@ -38,7 +38,7 @@ class User extends BaseModel {
         to: "user_course_role.user_id",
       },
     },
-  }
+  })
 
   public static async getById(
     id: number,

@@ -14,7 +14,7 @@ class QuizAnswerStatusModification extends BaseModel {
     return "quiz_answer_status_modification"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     user: {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: User,
@@ -31,7 +31,7 @@ class QuizAnswerStatusModification extends BaseModel {
         to: "quiz_answer.id",
       },
     },
-  }
+  })
 
   static async getAll() {
     const loggedChanges = await this.query()

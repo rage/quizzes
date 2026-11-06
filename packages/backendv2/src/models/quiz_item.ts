@@ -45,7 +45,7 @@ class QuizItem extends mixin(BaseModel, [
     return "quiz_item"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     quiz: {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: Quiz,
@@ -70,7 +70,7 @@ class QuizItem extends mixin(BaseModel, [
         to: "quiz_item_translation.quiz_item_id",
       },
     },
-  }
+  })
 
   static async getById(id: string): Promise<QuizItem | undefined> {
     return await this.query().findById(id)

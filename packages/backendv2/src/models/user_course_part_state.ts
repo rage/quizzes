@@ -21,7 +21,7 @@ class UserCoursePartState extends BaseModel {
     return ["user_id", "course_id", "course_part"]
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     user: {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: User,
@@ -38,7 +38,7 @@ class UserCoursePartState extends BaseModel {
         to: "course.id",
       },
     },
-  }
+  })
 
   public static async update(
     userId: number,

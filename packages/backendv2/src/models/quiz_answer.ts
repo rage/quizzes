@@ -64,7 +64,7 @@ class QuizAnswer extends mixin(BaseModel, [
     return "quiz_answer"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     user: {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: User,
@@ -113,7 +113,7 @@ class QuizAnswer extends mixin(BaseModel, [
         to: "spam_flag.quiz_answer_id",
       },
     },
-  }
+  })
 
   private static async showQuestionInPeerReview(peerReviews: PeerReview[]) {
     peerReviews.map((peerReview) => {

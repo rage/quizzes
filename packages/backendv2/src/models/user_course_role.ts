@@ -8,7 +8,7 @@ class UserCourseRole extends BaseModel {
   static get tableName() {
     return "user_course_role"
   }
-  static relationMappings = {
+  static relationMappings = () => ({
     user: {
       relation: BaseModel.HasOneRelation,
       modelClass: User,
@@ -17,7 +17,7 @@ class UserCourseRole extends BaseModel {
         to: "user.id",
       },
     },
-  }
+  })
   public static async getByUserId(userId: number) {
     return await this.query().where("user_id", userId)
   }

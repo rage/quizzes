@@ -16,7 +16,7 @@ class SpamFlag extends BaseModel {
     return "spam_flag"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     user: {
       relation: BaseModel.HasManyRelation,
       modelClass: User,
@@ -33,7 +33,7 @@ class SpamFlag extends BaseModel {
         to: "quiz_answer.id",
       },
     },
-  }
+  })
 
   public static async reportSpam(
     quizAnswerId: string,

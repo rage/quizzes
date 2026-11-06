@@ -22,7 +22,7 @@ class PeerReview extends BaseModel {
     return "peer_review"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     quizAnswer: {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: QuizAnswer,
@@ -39,7 +39,7 @@ class PeerReview extends BaseModel {
         to: "peer_review_question_answer.peer_review_id",
       },
     },
-  }
+  })
 
   public static async getWithAnswersByAnswerId(quizAnswerId: string) {
     // check that answerId exists

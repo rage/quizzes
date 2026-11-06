@@ -20,7 +20,7 @@ export class PeerReviewCollection extends mixin(BaseModel, [
     return "peer_review_collection"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     quiz: {
       relation: BaseModel.HasOneRelation,
       modelClass: Quiz,
@@ -45,7 +45,7 @@ export class PeerReviewCollection extends mixin(BaseModel, [
         to: "peer_review_question.peer_review_collection_id",
       },
     },
-  }
+  })
 
   static async getById(id: string): Promise<PeerReviewCollection | undefined> {
     return await this.query().findById(id)

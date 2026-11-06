@@ -25,7 +25,7 @@ class UserQuizState extends BaseModel {
     return ["user_id", "quiz_id"]
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     user: {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: User,
@@ -50,7 +50,7 @@ class UserQuizState extends BaseModel {
         to: ["quiz_answer.user_id", "quiz_answer.quiz_id"],
       },
     },
-  }
+  })
 
   public static async getByUserAndQuiz(
     userId: number,

@@ -17,7 +17,7 @@ class CourseTranslation extends BaseModel {
     return ["course_id", "language_id"]
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     course: {
       relation: BaseModel.HasOneRelation,
       modelClass: Course,
@@ -26,7 +26,7 @@ class CourseTranslation extends BaseModel {
         to: "course.id",
       },
     },
-  }
+  })
 
   static async getById(id: string) {
     return await this.query().findOne({

@@ -30,7 +30,7 @@ class Course extends BaseModel {
     return "course"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     quizzes: {
       relation: BaseModel.HasManyRelation,
       modelClass: Quiz,
@@ -47,7 +47,7 @@ class Course extends BaseModel {
         to: "course_translation.course_id",
       },
     },
-  }
+  })
 
   static async getFlattenedById(id: string) {
     const courses = await this.query()
