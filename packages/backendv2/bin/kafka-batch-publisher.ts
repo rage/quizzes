@@ -220,9 +220,7 @@ const publishQuizzes = async (course: CourseRow) => {
     id: quiz.id,
     part: quiz.part,
     section: quiz.section,
-    // Unlike broadcastCourseQuizzesUpdated, excluded quizzes keep their points
-    // here; kept for payload compatibility.
-    max_points: quiz.points,
+    max_points: quiz.excluded_from_score ? 0 : quiz.points,
     deleted: false,
   }))
 
