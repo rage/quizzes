@@ -65,6 +65,8 @@ const theme = createTheme({
       },
     },
     MuiButton: {
+      // The app's button styles assume MUI v4's neutral default, not v5+'s primary blue
+      defaultProps: { color: "inherit" },
       styleOverrides: {
         root: {
           textTransform: "none",
