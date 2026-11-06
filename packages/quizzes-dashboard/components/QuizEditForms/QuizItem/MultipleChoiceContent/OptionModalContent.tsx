@@ -6,7 +6,7 @@ import {
   FormControlLabel,
   Checkbox,
   TextField,
-} from "@material-ui/core"
+} from "@mui/material"
 import {
   editedOptionTitle,
   editedOptionSuccessMessage,

@@ -50,6 +50,7 @@ describe("general-api", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 

@@ -1,5 +1,5 @@
 import React from "react"
-import { Button, Typography } from "@material-ui/core"
+import { Button, Typography } from "@mui/material"
 import styled from "styled-components"
 import { createdNewItem } from "../../../store/editor/editorActions"
 import { useDispatch } from "react-redux"

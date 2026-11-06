@@ -14,7 +14,7 @@ import {
   Fade,
   Modal,
   Box,
-} from "@material-ui/core"
+} from "@mui/material"
 import styled from "styled-components"
 import { useDispatch } from "react-redux"
 import { useTypedSelector } from "../../../../store/store"

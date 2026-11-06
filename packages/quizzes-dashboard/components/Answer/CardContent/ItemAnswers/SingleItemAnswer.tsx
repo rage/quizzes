@@ -1,6 +1,6 @@
 import React from "react"
 import { ItemAnswer } from "../../../../types/Answer"
-import { Typography } from "@material-ui/core"
+import { Typography } from "@mui/material"
 import styled from "styled-components"
 
 export const ItemAnswerContainer = styled.div`

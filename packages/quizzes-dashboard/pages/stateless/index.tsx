@@ -1,15 +1,16 @@
 import { denormalize, normalize } from "normalizr"
 import React, { useEffect } from "react"
-import { useDispatch } from "react-redux"
+import { useDispatch, useStore } from "react-redux"
 import { v4 } from "uuid"
 import StatelessEditor from "../../components/StatelessEditor"
 import { normalizedQuiz } from "../../schemas"
 import { initializedEditor } from "../../store/editor/editorActions"
-import { storeState, useTypedSelector } from "../../store/store"
+import { storeState } from "../../store/store"
 import { Quiz } from "../../types/Quiz"
 
-const Stateless: React.FC = () => {
+const Stateless: React.FC & { noLayout?: boolean } = () => {
   const dispatch = useDispatch()
+  const store = useStore<storeState>()
   // const [state, _setState] = useState()
 
   // const stateRef = useRef(state)
@@ -62,7 +63,7 @@ const Stateless: React.FC = () => {
         // setState(event.data.data || [])
       }
       if (event.data.message === "give-state") {
-        const data = denormalizeData(useTypedSelector(state => state))
+        const data = denormalizeData(store.getState())
         window.parent.postMessage(
           {
             message: "current-state",
@@ -142,7 +143,6 @@ const emptyQuiz: Quiz = {
   open: new Date(),
 }
 
-// @ts-ignore
 Stateless.noLayout = true
 
 export default Stateless

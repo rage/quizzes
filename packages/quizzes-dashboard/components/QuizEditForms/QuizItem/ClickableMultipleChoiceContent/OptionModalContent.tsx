@@ -5,7 +5,7 @@ import {
   FormControl,
   FormControlLabel,
   Checkbox,
-} from "@material-ui/core"
+} from "@mui/material"
 import {
   editedOptionTitle,
   editedOptionSuccessMessage,

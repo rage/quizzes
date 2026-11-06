@@ -7,9 +7,9 @@ import {
   Button,
   Card,
   Snackbar,
-} from "@material-ui/core"
+} from "@mui/material"
 import { authenticate } from "../services/tmcApi"
-import Alert from "@material-ui/lab/Alert"
+import Alert from '@mui/material/Alert'
 import LoginStateContext from "../contexts/LoginStateContext"
 import useBreadcrumbs from "../hooks/useBreadcrumbs"
 

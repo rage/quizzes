@@ -1,6 +1,6 @@
 import React from "react"
 import styled from "styled-components"
-import { Checkbox, Typography, TextField } from "@material-ui/core"
+import { Checkbox, Typography, TextField } from "@mui/material"
 import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
 import { useDispatch } from "react-redux"
 import { useTypedSelector } from "../../../../store/store"

@@ -71,6 +71,7 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 

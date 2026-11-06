@@ -2,7 +2,7 @@ import BaseModel from "./base_model"
 import PeerReviewCollection from "./peer_review_collection"
 import PeerReviewQuestionTranslation from "./peer_review_question_translation"
 import { mixin } from "objection"
-import softDelete from "objection-soft-delete"
+import softDelete from "./soft_delete"
 
 class PeerReviewQuestion extends mixin(BaseModel, [
   softDelete({ columnName: "deleted" }),
@@ -37,7 +37,7 @@ class PeerReviewQuestion extends mixin(BaseModel, [
     },
   }
 
-  static async getById(id: string): Promise<PeerReviewQuestion> {
+  static async getById(id: string): Promise<PeerReviewQuestion | undefined> {
     return await this.query().findById(id)
   }
 }

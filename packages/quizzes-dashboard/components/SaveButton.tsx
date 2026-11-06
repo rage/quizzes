@@ -5,8 +5,8 @@ import {
   Snackbar,
   Fab,
   Zoom,
-} from "@material-ui/core"
-import Alert from "@material-ui/lab/Alert"
+} from "@mui/material"
+import Alert from '@mui/material/Alert'
 import { useDispatch } from "react-redux"
 import { saveQuiz } from "../services/quizzes"
 import {

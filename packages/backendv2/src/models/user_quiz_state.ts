@@ -1,7 +1,7 @@
 import Quiz from "./quiz"
 import User from "./user"
 import QuizAnswer from "./quiz_answer"
-import Knex, { Transaction } from "knex"
+import type { Knex } from "knex"
 import BaseModel from "./base_model"
 import knex from "../../database/knex"
 
@@ -55,7 +55,7 @@ class UserQuizState extends BaseModel {
     userId: number,
     quizId: string,
     trx?: Knex.Transaction,
-  ): Promise<UserQuizState> {
+  ): Promise<UserQuizState | undefined> {
     return await this.query(trx).findById([userId, quizId])
   }
 

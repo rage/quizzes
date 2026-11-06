@@ -1,6 +1,6 @@
 import React from "react"
 import { NormalizedItem } from "../../../../types/NormalizedQuiz"
-import { TextField, Button, Modal, Box, Fade } from "@material-ui/core"
+import { TextField, Button, Modal, Box, Fade } from "@mui/material"
 import styled from "styled-components"
 import {
   editedValidityRegex,

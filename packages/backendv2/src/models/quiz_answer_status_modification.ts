@@ -1,4 +1,4 @@
-import Knex from "knex"
+import type { Knex } from "knex"
 import { TStatusModificationOperation } from "./../types/index"
 import BaseModel from "./base_model"
 import User from "./user"
@@ -62,7 +62,7 @@ class QuizAnswerStatusModification extends BaseModel {
   }
 
   static async logStatusChangeForMany(
-    quizAnswerIds: [string],
+    quizAnswerIds: string[],
     operation: TStatusModificationOperation,
     trx: Knex.Transaction,
     modifierId?: number,

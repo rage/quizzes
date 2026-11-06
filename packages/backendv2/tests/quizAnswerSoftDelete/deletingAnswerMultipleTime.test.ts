@@ -46,7 +46,7 @@ describe("test", () => {
           .andWhere("quiz_id", "f98cd4b0-41b1-4a15-89a2-4c991ec67264")
       )[0]
 
-      expect(deletedQuizAnswer.deleted).toEqual(true)
+      expect(deletedQuizAnswer?.deleted).toEqual(true)
       expect(userQuizState.pointsAwarded).toEqual(3)
       expect(userQuizState.status).toEqual("locked")
       expect(userQuizState.tries).toEqual(3)
@@ -67,5 +67,6 @@ const userSetup = () => {
           } as UserInfo,
         ]
       }
+      return [401]
     })
 }

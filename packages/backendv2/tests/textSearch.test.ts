@@ -70,6 +70,7 @@ describe("dashboard: searching for all answers based on text content should", ()
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -182,6 +183,7 @@ describe("dashboard: searching for manual review answers based on text content s
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 

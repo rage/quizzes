@@ -6,7 +6,7 @@ import {
   deletedOption,
   createdNewQuiz,
 } from "../editorActions"
-import produce from "immer"
+import { produce } from "immer"
 import { setOptionEditing } from "./optionVariableActions"
 
 export const optionVariableReducers = createReducer<

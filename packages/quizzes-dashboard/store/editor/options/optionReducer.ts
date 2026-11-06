@@ -12,7 +12,7 @@ import {
   createdNewOption,
   createdNewQuiz,
 } from "../editorActions"
-import produce from "immer"
+import { produce } from "immer"
 import { Quiz } from "../../../types/Quiz"
 import { normalizedQuiz } from "../../../schemas"
 import { normalize } from "normalizr"

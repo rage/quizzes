@@ -1,5 +1,5 @@
 import * as React from "react"
-import { Container } from "@material-ui/core"
+import { Container } from "@mui/material"
 import styled from "styled-components"
 import Footer from "./Footer"
 import LoginStateWrapper from "./LoginStateWrapper"

@@ -1,7 +1,7 @@
 import QuizAnswer from "./quiz_answer"
 import UserQuizState from "./user_quiz_state"
 import UserCourseRole from "./user_course_role"
-import Knex from "knex"
+import type { Knex } from "knex"
 import BaseModel from "./base_model"
 
 class User extends BaseModel {
@@ -42,7 +42,7 @@ class User extends BaseModel {
   public static async getById(
     id: number,
     trx?: Knex.Transaction,
-  ): Promise<User> {
+  ): Promise<User | undefined> {
     return await this.query(trx).findById(id)
   }
 }

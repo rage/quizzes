@@ -3,7 +3,7 @@ import QuizOption from "./quiz_option"
 import QuizItemTranslation from "./quiz_item_translation"
 import BaseModel from "./base_model"
 import { mixin } from "objection"
-import softDelete from "objection-soft-delete"
+import softDelete from "./soft_delete"
 
 export type QuizItemType =
   | "open"
@@ -71,7 +71,7 @@ class QuizItem extends mixin(BaseModel, [
     },
   }
 
-  static async getById(id: string): Promise<QuizItem> {
+  static async getById(id: string): Promise<QuizItem | undefined> {
     return await this.query().findById(id)
   }
 }

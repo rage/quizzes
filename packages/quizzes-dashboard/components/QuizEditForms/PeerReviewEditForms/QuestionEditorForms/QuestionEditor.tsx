@@ -5,7 +5,7 @@ import {
   Switch,
   FormGroup,
   FormControlLabel,
-} from "@material-ui/core"
+} from "@mui/material"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
 import { useTypedSelector } from "../../../../store/store"

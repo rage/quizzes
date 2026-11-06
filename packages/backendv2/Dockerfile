@@ -40,4 +40,4 @@ RUN pnpm run build
 
 EXPOSE 3003
 
-CMD [ "node", "dist/server.js" ]
+CMD [ "node", "--import", "./dist/instrument.js", "dist/server.js" ]

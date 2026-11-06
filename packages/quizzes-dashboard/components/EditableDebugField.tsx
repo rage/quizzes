@@ -1,5 +1,5 @@
 import React from "react"
-import { ControlledEditor } from "@monaco-editor/react"
+import Editor from "@monaco-editor/react"
 
 interface EditableDebugFieldProps {
   initialValue: string
@@ -10,18 +10,20 @@ const EditableDebugField = ({
   initialValue,
   setDebugViewChanges,
 }: EditableDebugFieldProps) => {
-  const handleEditorChange = (_unusedParam: any, value: string | undefined) => {
-    const editedQuiz = JSON.parse(value as string)
-    // send changes to parent
-    setDebugViewChanges(editedQuiz)
+  const handleEditorChange = (value: string | undefined) => {
+    try {
+      setDebugViewChanges(JSON.parse(value ?? ""))
+    } catch {
+      // Mid-edit JSON is often invalid; keep the last valid value
+    }
   }
 
   return (
-    <ControlledEditor
+    <Editor
       options={{ wordWrap: "on" }}
       height="80vh"
       language="json"
-      value={initialValue}
+      defaultValue={initialValue}
       onChange={handleEditorChange}
     />
   )

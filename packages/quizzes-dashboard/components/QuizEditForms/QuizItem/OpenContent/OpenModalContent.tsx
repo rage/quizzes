@@ -23,7 +23,7 @@ import {
   Checkbox,
   Button,
   Typography,
-} from "@material-ui/core"
+} from "@mui/material"
 import MarkdownEditor from "../../../MarkdownEditor"
 
 const ModalContent = styled.div`

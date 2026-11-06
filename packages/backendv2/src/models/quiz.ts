@@ -1,13 +1,14 @@
 import QuizItem from "./quiz_item"
+import type QuizOption from "./quiz_option"
 import QuizTranslation from "./quiz_translation"
 import PeerReviewCollection from "./peer_review_collection"
 import Course from "./course"
 import { NotFoundError } from "../util/error"
 import moduleInitializer from "../util/initializer"
-import stringify from "csv-stringify"
+import { stringify } from "csv-stringify"
 import QuizAnswer from "./quiz_answer"
 import { BadRequestError } from "../util/error"
-import Knex from "knex"
+import type { Knex } from "knex"
 import UserQuizState from "./user_quiz_state"
 import * as Kafka from "../services/kafka"
 import PeerReviewQuestion from "./peer_review_question"
@@ -260,13 +261,13 @@ export class Quiz extends BaseModel {
 
   static async getByIdStripped(quizId: string) {
     const quiz = await this.getById(quizId)
-    delete quiz.submitMessage
-    for (const quizItem of quiz.items) {
+    delete (quiz as Partial<Quiz>).submitMessage
+    for (const quizItem of quiz.items as Partial<QuizItem>[]) {
       delete quizItem.successMessage
       delete quizItem.failureMessage
       delete quizItem.sharedOptionFeedbackMessage
       delete quizItem.validityRegex
-      for (const quizOption of quizItem.options) {
+      for (const quizOption of quizItem.options as Partial<QuizOption>[]) {
         delete quizOption.successMessage
         delete quizOption.failureMessage
         delete quizOption.correct
@@ -362,7 +363,7 @@ export class Quiz extends BaseModel {
     quiz.title = text?.title
     quiz.body = text?.body
     quiz.submitMessage = text?.submitMessage
-    delete quiz.texts
+    delete (quiz as Partial<Quiz>).texts
     quiz.items = quiz.items?.map((item: any) => {
       const text = item.texts[0]
       item.title = text?.title

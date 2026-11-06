@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Button, Modal, Box, Typography } from "@material-ui/core"
+import { Button, Modal, Box, Typography } from "@mui/material"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWindowClose } from "@fortawesome/free-solid-svg-icons"

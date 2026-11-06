@@ -1,6 +1,7 @@
 import { EditCoursePayloadFields } from "./../types/index"
 import BaseModel from "./base_model"
 import Course from "./course"
+import { NotFoundError } from "../util/error"
 
 class CourseTranslation extends BaseModel {
   languageId!: string
@@ -43,6 +44,9 @@ class CourseTranslation extends BaseModel {
     payload: EditCoursePayloadFields,
   ) {
     const courseTranslation = await this.getById(id)
+    if (!courseTranslation) {
+      throw new NotFoundError(`course translation not found: ${id}`)
+    }
     return await courseTranslation.$query().patchAndFetch(payload)
   }
 }

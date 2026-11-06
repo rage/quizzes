@@ -53,6 +53,7 @@ describe("dashboard: get courses", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -120,6 +121,7 @@ describe("dashboard: get single course should", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -198,6 +200,7 @@ describe("dashboard - courses: count answers requiring attention should", () => 
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -300,6 +303,7 @@ describe("dashboard - quizzes: count answers requiring attention should", () => 
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -387,6 +391,7 @@ describe("dashboard: get quizzes by course id", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -426,6 +431,7 @@ describe("dashboard: get quizzes by course id", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -490,6 +496,7 @@ describe("dashboard: get quiz by id", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -555,6 +562,7 @@ describe("dashboard: save quiz", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -672,6 +680,7 @@ describe("dashboard: get answer by id", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -736,6 +745,7 @@ describe("dashboard: get answers by quiz id", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -840,6 +850,7 @@ describe("dashboard: get manual review answers", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -932,6 +943,7 @@ describe("get deleted/not deleted answers only", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -995,6 +1007,7 @@ describe("dashboard: update manual review status", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -1114,6 +1127,7 @@ describe("Answer: spam flags", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -1250,6 +1264,7 @@ describe("fetching user progress should", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
   test("return empty when user has no progress", done => {
@@ -1327,6 +1342,7 @@ describe("dashboard - courses: duplicating course should", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -1391,9 +1407,9 @@ describe("dashboard - courses: duplicating course should", () => {
         .expect(200)
         .end(done)
     })
-    test("set defaults for new course when title and abbreviation missing ", async done => {
+    test("set defaults for new course when title and abbreviation missing ", async () => {
       const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44b"
-      request(app.callback())
+      await request(app.callback())
         .post(`/api/v2/dashboard/courses/${courseId}/duplicate-course`)
         .set("Authorization", `bearer ADMIN_TOKEN`)
         .send({ ...input.duplicateCourseValid, name: null, abbr: null })
@@ -1407,7 +1423,6 @@ describe("dashboard - courses: duplicating course should", () => {
           )
         })
         .expect(200)
-        .end(done)
     })
   })
 })
@@ -1445,6 +1460,7 @@ describe("dashboard - courses: downloading a correspondence file should", () => 
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -1498,6 +1514,7 @@ describe("dashboard: fetching all existing languages", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -1536,6 +1553,7 @@ describe("dashboard: an edit made to a course should", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -1570,10 +1588,9 @@ describe("dashboard: get current users abilities", () => {
     await safeSeed(configA)
   })
 
-  afterAll(async done => {
+  afterAll(async () => {
     nock.cleanAll()
     await safeClean()
-    done()
   })
 
   test("dashboard: get current users abilities, teacher", done => {
@@ -1598,6 +1615,7 @@ describe("dashboard: get current users abilities", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
     request(app.callback())
       .get("/api/v2/dashboard/users/current/abilities")
@@ -1632,6 +1650,7 @@ describe("dashboard: get current users abilities", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
     request(app.callback())
       .get("/api/v2/dashboard/users/current/abilities")
@@ -1650,10 +1669,9 @@ describe("dashboard: get user abilities for course", () => {
     await safeSeed(configA)
   })
 
-  afterAll(async done => {
+  afterAll(async () => {
     nock.cleanAll()
     await safeClean()
-    done()
   })
 
   test("get user abilities, assistant", done => {
@@ -1678,6 +1696,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
     request(app.callback())
       .get(
@@ -1723,6 +1742,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
     request(app.callback())
       .get(
@@ -1759,6 +1779,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
     request(app.callback())
       .get(
@@ -1795,6 +1816,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
     request(app.callback())
       .get(
@@ -1838,6 +1860,7 @@ describe("dashboard: get user abilities for course", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
     request(app.callback())
       .get(
@@ -1858,10 +1881,9 @@ describe("dashboard: get quizzes answer statistics", () => {
     await safeSeed(configA)
   })
 
-  afterAll(async done => {
+  afterAll(async () => {
     nock.cleanAll()
     await safeClean()
-    done()
   })
 
   beforeEach(async () => {
@@ -1895,6 +1917,7 @@ describe("dashboard: get quizzes answer statistics", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -1942,10 +1965,9 @@ describe("dashboard: get all answer states", () => {
     await safeSeed(configA)
   })
 
-  afterAll(async done => {
+  afterAll(async () => {
     nock.cleanAll()
     await safeClean()
-    done()
   })
 
   beforeEach(async () => {
@@ -1979,6 +2001,7 @@ describe("dashboard: get all answer states", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 

@@ -16,7 +16,10 @@ function parseSentinels(csv: string | undefined) {
     })
 }
 
-let client
+// Production runs Redis 4, which predates RESP3 and the HELLO handshake.
+const RESP_VERSION = 2
+
+let client: Redis | undefined
 
 // Check if we're using Sentinel mode
 if (env.REDIS_SENTINELS) {
@@ -29,6 +32,7 @@ if (env.REDIS_SENTINELS) {
     sentinelPassword: env.REDIS_SENTINEL_PASSWORD || undefined,
     db: env.REDIS_DB ? Number(env.REDIS_DB) : 3,
     enableReadyCheck: true,
+    protocol: RESP_VERSION,
     maxRetriesPerRequest: 1,
     enableOfflineQueue: false,
     lazyConnect: true,
@@ -67,6 +71,7 @@ if (env.REDIS_SENTINELS) {
     host: env.REDIS_HOST,
     password: env.REDIS_PASSWORD && env.REDIS_PASSWORD,
     db: env.REDIS_DB ? Number(env.REDIS_DB) : 3,
+    protocol: RESP_VERSION,
     maxRetriesPerRequest: 1,
     enableOfflineQueue: false,
     lazyConnect: true,
@@ -100,4 +105,6 @@ if (env.REDIS_SENTINELS) {
   GlobalLogger.warn("Redis uninitialized. Configuration missing.")
 }
 
-export default { client }
+const redis = { client }
+
+export default redis

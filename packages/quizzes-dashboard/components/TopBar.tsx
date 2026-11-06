@@ -1,5 +1,5 @@
 import * as React from "react"
-import { AppBar, Toolbar, Button, Typography } from "@material-ui/core"
+import { AppBar, Toolbar, Button, Typography } from "@mui/material"
 import styled from "styled-components"
 import LoginStateContext from "../contexts/LoginStateContext"
 import { useContext } from "react"
@@ -15,10 +15,11 @@ const EmptySpace = styled.div`
   flex: 1;
 `
 
-const LinkWrapper = styled.div`
-  cursor: pointer;
+const HomeLink = styled(Link)`
   display: flex;
   align-items: center;
+  color: inherit;
+  text-decoration: none;
 `
 
 const TopBar = () => {
@@ -33,13 +34,11 @@ const TopBar = () => {
     <>
       <StyledAppBar elevation={0} position="sticky">
         <Toolbar>
-          <Link href="/">
-            <LinkWrapper>
-              <Typography style={{ fontSize: "22px", fontWeight: "bold" }}>
-                Quizzes
-              </Typography>
-            </LinkWrapper>
-          </Link>
+          <HomeLink href="/">
+            <Typography style={{ fontSize: "22px", fontWeight: "bold" }}>
+              Quizzes
+            </Typography>
+          </HomeLink>
           <EmptySpace />
           <EmptySpace />
           {loggedIn && (

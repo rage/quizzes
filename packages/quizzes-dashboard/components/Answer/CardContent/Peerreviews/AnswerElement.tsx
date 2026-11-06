@@ -6,7 +6,7 @@ import {
   FormControlLabel,
   FormGroup,
   Radio,
-} from "@material-ui/core"
+} from "@mui/material"
 import styled from "styled-components"
 
 export const StyledText = styled(Typography)`

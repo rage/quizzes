@@ -1,6 +1,6 @@
 import React from "react"
 import { Answer } from "../../../types/Answer"
-import { Typography } from "@material-ui/core"
+import { Typography } from "@mui/material"
 import _ from "lodash"
 import styled from "styled-components"
 

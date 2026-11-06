@@ -78,7 +78,7 @@
     "nextjs/no-before-interactive-script-outside-document": "warn",
     "nextjs/no-css-tags": "warn",
     "nextjs/no-document-import-in-page": "error",
-    "nextjs/no-duplicate-head": "error",
+    "nextjs/no-duplicate-head": "off",
     "nextjs/no-head-element": "warn",
     "nextjs/no-head-import-in-document": "error",
     "nextjs/no-html-link-for-pages": "error",

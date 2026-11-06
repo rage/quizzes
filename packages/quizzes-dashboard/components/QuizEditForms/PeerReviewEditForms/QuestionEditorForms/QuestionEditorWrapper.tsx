@@ -2,7 +2,7 @@ import React from "react"
 import { useTypedSelector } from "../../../../store/store"
 import { QuestionEditor } from "./QuestionEditor"
 import styled from "styled-components"
-import { Typography, Divider, Button } from "@material-ui/core"
+import { Typography, Divider, Button } from "@mui/material"
 import {
   faAngleUp,
   faAngleDown,

@@ -12,10 +12,10 @@ const errorHandler = async (ctx: CustomContext, next: () => Promise<any>) => {
     await next()
   } catch (error) {
     ctx.body = {
-      message: error.message,
+      message: error instanceof Error ? error.message : String(error),
     }
     let reportError = true
-    switch (error.constructor) {
+    switch (error instanceof Error ? error.constructor : undefined) {
       case BadRequestError:
         ctx.status = 400
         break
@@ -36,12 +36,7 @@ const errorHandler = async (ctx: CustomContext, next: () => Promise<any>) => {
     }
 
     if (reportError) {
-      Sentry.withScope(function(scope) {
-        scope.addEventProcessor(function(event) {
-          return Sentry.Handlers.parseRequest(event, ctx.request as any)
-        })
-        Sentry.captureException(error)
-      })
+      Sentry.captureException(error)
     }
   }
 }

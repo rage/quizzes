@@ -54,6 +54,7 @@ describe("kafka routes tests", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -92,6 +93,7 @@ describe("kafka routes tests", () => {
               } as UserInfo,
             ]
           }
+          return [401]
         })
     })
 

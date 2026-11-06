@@ -1,4 +1,4 @@
-import Router from "koa-router"
+import Router from "@koa/router"
 import accessControl from "../../../middleware/access_control"
 import { UserCourseRole } from "../../../models"
 import { CustomContext, CustomState } from "../../../types"
@@ -20,7 +20,7 @@ const userRoutes = new Router<CustomState, CustomContext>({
   .get("/:userId/broadcast/:courseId", accessControl(), async ctx => {
     const { userId, courseId } = ctx.params
     await checkAccessOrThrow(ctx.state.user, courseId, "edit")
-    await Kafka.broadcastUserCourse(userId, courseId)
+    await Kafka.broadcastUserCourse(Number(userId), courseId)
   })
 
 export default userRoutes

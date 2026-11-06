@@ -15,7 +15,7 @@ export const SkeletonLoader = ({
       {Array.from({ length: skeletonCount }, (_, i) => (
         <StyledSkeleton
           key={i}
-          variant="rect"
+          variant="rectangular"
           height={height}
           animation="wave"
           {...props}

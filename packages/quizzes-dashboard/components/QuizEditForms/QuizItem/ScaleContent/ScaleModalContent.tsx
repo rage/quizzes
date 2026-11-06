@@ -8,7 +8,7 @@ import {
   FormGroup,
   Radio,
   FormControlLabel,
-} from "@material-ui/core"
+} from "@mui/material"
 import {
   editedQuizItemTitle,
   editedScaleMinLabel,

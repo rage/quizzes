@@ -1,7 +1,7 @@
 import React from "react"
 import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import styled from "styled-components"
-import { Typography, TextField } from "@material-ui/core"
+import { Typography, TextField } from "@mui/material"
 import { useTypedSelector } from "../../../../store/store"
 import { useDispatch } from "react-redux"
 import { editedFormatRegex } from "../../../../store/editor/items/itemAction"

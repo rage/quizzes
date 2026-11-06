@@ -175,7 +175,7 @@ describe("Peer review acceptance or rejection", () => {
   test("should log a peer review accept operation when status changes to confirmed", async () => {
     const quizAnswerId = "0cb3e4de-fc11-4aac-be45-06312aa4677c"
     const quiz = await Quiz.getById("4bf4cf2f-3058-4311-8d16-26d781261af7")
-    const userQuizState = await UserQuizState.getByUserAndQuiz(1234, quiz.id)
+    const userQuizState = (await UserQuizState.getByUserAndQuiz(1234, quiz.id))!
 
     userQuizState.peerReviewsReceived = 2
     userQuizState.peerReviewsGiven = 3
@@ -212,7 +212,7 @@ describe("Peer review acceptance or rejection", () => {
   test("should log a peer review reject operation when status changes to rejected", async () => {
     const quizAnswerId = "ae29c3be-b5b6-4901-8588-5b0e88774748"
     const quiz = await Quiz.getById("4bf4cf2f-3058-4311-8d16-26d781261af7")
-    const userQuizState = await UserQuizState.getByUserAndQuiz(2345, quiz.id)
+    const userQuizState = (await UserQuizState.getByUserAndQuiz(2345, quiz.id))!
 
     userQuizState.peerReviewsReceived = 2
     userQuizState.peerReviewsGiven = 3
@@ -364,5 +364,6 @@ const checkTmcCredentials = () => {
           } as UserInfo,
         ]
       }
+      return [401]
     })
 }

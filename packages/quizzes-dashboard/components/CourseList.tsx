@@ -8,7 +8,7 @@ import {
   InputAdornment,
   Checkbox,
   CardHeader,
-} from "@material-ui/core"
+} from "@mui/material"
 import Link from "next/link"
 import { Course } from "../types/Quiz"
 import _ from "lodash"
@@ -66,10 +66,10 @@ const EndedText = styled.span`
   margin-bottom: 8px;
 `
 
-const CardContainer = styled.div`
-  &:hover {
-    cursor: pointer;
-  }
+const CardContainer = styled(Link)`
+  display: block;
+  color: inherit;
+  text-decoration: none;
   margin-bottom: 16px;
 `
 
@@ -80,18 +80,16 @@ const CourseCard: React.FC<CourseCardProps> = ({
   active,
 }) => {
   return (
-    <Link key={courseId} href={`/courses/${courseId}/listing`} passHref>
-      <CardContainer>
-        <Card>
-          <CardHeader title={name} subheader={abbreviation} />
-          {active ? (
-            <ActiveText> active </ActiveText>
-          ) : (
-            <EndedText> ended </EndedText>
-          )}
-        </Card>
-      </CardContainer>
-    </Link>
+    <CardContainer href={`/courses/${courseId}/listing`}>
+      <Card>
+        <CardHeader title={name} subheader={abbreviation} />
+        {active ? (
+          <ActiveText> active </ActiveText>
+        ) : (
+          <EndedText> ended </EndedText>
+        )}
+      </Card>
+    </CardContainer>
   )
 }
 
@@ -209,12 +207,14 @@ const CourseList = ({ data, error }: CourseListProps) => {
             onChange={evt => {
               setFilterWord(evt.target.value)
             }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <FontAwesomeIcon icon={faFilter} />
-                </InputAdornment>
-              ),
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FontAwesomeIcon icon={faFilter} />
+                  </InputAdornment>
+                ),
+              }
             }}
           />
 
@@ -276,6 +276,7 @@ const CourseList = ({ data, error }: CourseListProps) => {
 
       {courses.map(course => (
         <CourseCard
+          key={course.id}
           courseId={course.id}
           name={course.title}
           abbreviation={course.abbreviation}

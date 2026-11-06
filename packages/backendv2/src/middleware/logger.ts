@@ -1,6 +1,6 @@
 import { CustomContext } from "../types"
 import winston, { format } from "winston"
-import { v4 as uuidv4 } from "uuid"
+import { randomUUID } from "crypto"
 
 const myFormat = format.printf(
   ({ level, message, timestamp, requestId, stack, ...metadata }) => {
@@ -35,8 +35,7 @@ const loggerMiddleware = async (
 ) => {
   const start = Date.now()
   ctx.state.start = start
-  const log = GlobalLogger.child({ requestId: uuidv4() })
-  // @ts-ignore
+  const log = GlobalLogger.child({ requestId: randomUUID() })
   ctx.log = log
   log.info(`${ctx.request.method} ${ctx.req.url}`, {
     ip: ctx.request.ip,
@@ -47,8 +46,8 @@ const loggerMiddleware = async (
   } catch (e) {
     const ms = Date.now() - start
     log.error(`Crashed ${ctx.request.method} ${ctx.req.url} in ${ms}ms`, {
-      error: e.message,
-      stack: e.stack,
+      error: e instanceof Error ? e.message : e,
+      stack: e instanceof Error ? e.stack : undefined,
     })
     throw e
   }

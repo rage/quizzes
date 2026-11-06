@@ -9,7 +9,7 @@ import {
   Chip,
   FormGroup,
   FormControlLabel,
-} from "@material-ui/core"
+} from "@mui/material"
 import styled from "styled-components"
 import QuizTitle from "../QuizTitleContainer"
 import { TabText } from "../TabHeaders"
@@ -20,7 +20,7 @@ import {
   SortOrderField,
   FilterParamsField,
 } from "./styles"
-import { ChipProps, IQuizTabProps, TAnswersDisplayed } from "./types"
+import { IQuizTabProps, TAnswersDisplayed } from "./types"
 import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
 import AnswerListWrapper from "../../Answer/AnswerListWrapper"
 import {
@@ -34,10 +34,10 @@ import { useAllAnswers } from "../../../hooks/useAllAnswers"
 import { useSearchResultsAllAnswers } from "../../../hooks/useSearchResults"
 import SkeletonLoader from "../../Shared/SkeletonLoader"
 
-const StyledChip = styled(Chip)<ChipProps>`
+const StyledChip = styled(Chip)<{ $checked: boolean }>`
   display: flex !important;
   background: ${props => {
-    if (props.checked) {
+    if (props.$checked) {
       return "linear-gradient(rgba(0, 0, 0, 0.2), rgba(63, 81, 181, 0.3)) !important"
     }
   }};
@@ -371,7 +371,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
               key={state}
               label={state}
               variant="outlined"
-              checked={chipStates[state].checked}
+              $checked={chipStates[state].checked}
               onClick={() => {
                 const newStates = _.clone(chipStates)
                 newStates[state].checked = !newStates[state].checked

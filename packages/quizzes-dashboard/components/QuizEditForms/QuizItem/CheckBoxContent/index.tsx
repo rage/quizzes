@@ -9,7 +9,7 @@ import {
   Box,
   Fade,
   Button,
-} from "@material-ui/core"
+} from "@mui/material"
 import { useTypedSelector } from "../../../../store/store"
 import { useDispatch } from "react-redux"
 import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"

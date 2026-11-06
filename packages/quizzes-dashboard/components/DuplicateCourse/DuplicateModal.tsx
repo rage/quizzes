@@ -6,15 +6,15 @@ import {
   Snackbar,
   Typography,
   Fade,
-} from "@material-ui/core"
-import usePromise from "react-use-promise"
+} from "@mui/material"
+import useSWR from "swr"
 import { Course } from "../../types/Quiz"
 import {
   duplicateCourse,
   getAllLanguages,
   getCorrespondenceFile,
 } from "../../services/quizzes"
-import { Alert, Autocomplete } from "@material-ui/lab"
+import { Alert, Autocomplete } from "@mui/material"
 
 const SubmitButton = styled(Button)`
   display: flex !important;
@@ -47,7 +47,7 @@ const StyledTextField = styled(TextField)`
   margin-top: 1.5rem !important;
 `
 
-const MessageBox = styled.div<{ success: boolean }>`
+const MessageBox = styled.div<{ $success: boolean }>`
   display: flex;
   justify-content: center;
   margin-top: 1rem;
@@ -57,7 +57,7 @@ const MessageBox = styled.div<{ success: boolean }>`
   border-radius: 5px !important;
   border-width: 5px !important;
   border-color: ${props => {
-    if (props.success) {
+    if (props.$success) {
       return "#76ff03"
     } else {
       return "#ef5350"
@@ -70,7 +70,9 @@ interface DuplicateModalProps {
 }
 
 export const DuplicateModal = ({ course }: DuplicateModalProps) => {
-  const [langs, langsError] = usePromise(() => getAllLanguages(), [])
+  const { data: langs, error: langsError } = useSWR("languages", () =>
+    getAllLanguages(),
+  )
   const [name, setName] = useState("")
   const [abbr, setAbbr] = useState("")
   const [lang, setLang] = useState(course.languageId)
@@ -175,7 +177,7 @@ export const DuplicateModal = ({ course }: DuplicateModalProps) => {
               </SubmitButton>
             </SubmitButtonWrapper>
             <Fade in={response}>
-              <MessageBox success={success}>
+              <MessageBox $success={success}>
                 {success ? (
                   <Typography>Course duplicated succesfully!</Typography>
                 ) : (

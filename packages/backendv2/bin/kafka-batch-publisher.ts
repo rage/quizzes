@@ -60,6 +60,7 @@ interface AnswerRow {
 
 interface UserCoursePartStateRow {
   user_id: number
+  course_id: string
   course_part: number
   score: number
 }
@@ -81,6 +82,7 @@ const producer = new Kafka.Producer({
   dr_cb: false,
   "security.protocol": "ssl",
   "enable.ssl.certificate.verification": false,
+  "ssl.endpoint.identification.algorithm": "none",
 })
 
 const flush = promisify(producer.flush.bind(producer))

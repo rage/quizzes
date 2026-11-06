@@ -33,6 +33,8 @@ permissions:
     build: false
   "@parcel/watcher":
     build: false
+  esbuild:
+    build: false
   node-rdkafka:
     build: true
   protobufjs:
@@ -63,6 +65,13 @@ minimumReleaseAgeExclude:
   - "@next/swc-win32-x64-msvc@16.4.5"
 
 packageExtensions:
+  # Its typings import "koa", whose types live in @types/koa.
+  "@koa/router":
+    peerDependencies:
+      "@types/koa": "*"
+    peerDependenciesMeta:
+      "@types/koa":
+        optional: true
   # Its install script calls node-gyp from PATH, which pnpm no longer bundles.
   node-rdkafka:
     dependencies:

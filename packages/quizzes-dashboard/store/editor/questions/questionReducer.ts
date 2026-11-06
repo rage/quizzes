@@ -2,7 +2,7 @@ import { createReducer } from "typesafe-actions"
 import { Question } from "../../../types/Quiz"
 import { action, NormalizedQuestion } from "../../../types/NormalizedQuiz"
 import { initializedEditor } from "../editorActions"
-import produce from "immer"
+import { produce } from "immer"
 import {
   editedPeerReviewQuestionTitle,
   editedPeerReviewQuestionBody,

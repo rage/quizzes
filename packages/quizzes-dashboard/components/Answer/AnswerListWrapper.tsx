@@ -1,6 +1,6 @@
 import React from "react"
 import styled from "styled-components"
-import { Pagination } from "@material-ui/lab"
+import { Pagination } from "@mui/material"
 import { AnswerList } from "./AnswerList"
 import { Answer } from "../../types/Answer"
 

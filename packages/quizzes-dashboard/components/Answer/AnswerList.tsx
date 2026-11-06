@@ -1,6 +1,6 @@
-import { Button, Slide, Snackbar, Typography } from "@material-ui/core"
-import { TransitionProps } from "@material-ui/core/transitions"
-import { Alert } from "@material-ui/lab"
+import { Button, Snackbar, Typography } from "@mui/material"
+import { Alert } from "@mui/material"
+import { SlideDown } from "../Shared/SlideDown"
 import React, { useEffect, useState } from "react"
 import styled from "styled-components"
 import {
@@ -80,9 +80,7 @@ export const AnswerList = ({ data }: AnswerListProps) => {
         onClose={() => setShowSnacks(false)}
         autoHideDuration={5000}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        TransitionComponent={(props: TransitionProps) => {
-          return <Slide {...props} direction="down" />
-        }}
+        slots={{ transition: SlideDown }}
       >
         <Alert severity={handledAnswers ? "success" : "error"}>
           {handledAnswers ? (

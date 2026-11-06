@@ -18,7 +18,7 @@ const produce = async (
   try {
     producer.produce(topic, null, Buffer.from(message))
   } catch (error) {
-    throw new Error(error)
+    throw new Error(String(error), { cause: error })
   }
 }
 
@@ -74,6 +74,7 @@ const producer = new Kafka.Producer({
   dr_cb: false,
   "security.protocol": "ssl",
   "enable.ssl.certificate.verification": false,
+  "ssl.endpoint.identification.algorithm": "none",
 })
 
 const flusher = promisify(producer.flush.bind(producer))

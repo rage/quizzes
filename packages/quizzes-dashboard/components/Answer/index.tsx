@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react"
-import { Checkbox } from "@material-ui/core"
+import { Checkbox } from "@mui/material"
 
 import { Answer } from "../../types/Answer"
-import { Card } from "@material-ui/core"
+import { Card } from "@mui/material"
 import styled from "styled-components"
 import { AnswerContent } from "./CardContent"
 import { editableAnswerStates } from "../constants"
@@ -19,10 +19,8 @@ interface AdditionalAnswerCardProps {
 
 const AnswerCardWrapper = styled.div`
   display: flex;
-  .PrivateSwitchBase-root-5 {
-    &:hover {
-      background: transparent !important;
-    }
+  .custom-checkbox-root:hover {
+    background: transparent !important;
   }
 
   .custom-checkbox-root .MuiSvgIcon-root {
@@ -113,7 +111,9 @@ export const AnswerCard = ({ answer }: AnswerProps) => {
           color="primary"
           checked={checked}
           onChange={handleAnswerSelection}
-          inputProps={{ "aria-label": "Select answer" }}
+          slotProps={{
+            input: { "aria-label": "Select answer" }
+          }}
         />
       )}
       <StyledAnswerCard

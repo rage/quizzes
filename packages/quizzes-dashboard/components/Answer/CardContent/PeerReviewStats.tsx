@@ -1,7 +1,7 @@
 import React from "react"
 import { PeerReview } from "../../../types/Answer"
 import Peerreviews from "./Peerreviews"
-import { Typography } from "@material-ui/core"
+import { Typography } from "@mui/material"
 import styled from "styled-components"
 
 export const TitleContainer = styled.div`

@@ -1,6 +1,6 @@
 import React from "react"
 import styled from "styled-components"
-import { TextField, Typography } from "@material-ui/core"
+import { TextField, Typography } from "@mui/material"
 import { useTypedSelector } from "../../../../store/store"
 import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import { useDispatch } from "react-redux"

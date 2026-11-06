@@ -1,6 +1,6 @@
 import { faSearch } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { Button, Switch, Typography } from "@material-ui/core"
+import { Button, Switch, Typography } from "@mui/material"
 import React, { useState } from "react"
 import styled from "styled-components"
 import {

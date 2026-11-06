@@ -1,7 +1,7 @@
 import React from "react"
 import { PeerReview } from "../../../../types/Answer"
 import styled from "styled-components"
-import { Typography, Divider } from "@material-ui/core"
+import { Typography, Divider } from "@mui/material"
 import { DateTime } from "luxon"
 import ReviewAnswerElement from "./AnswerElement"
 

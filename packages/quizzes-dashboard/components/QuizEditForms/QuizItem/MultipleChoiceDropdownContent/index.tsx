@@ -1,7 +1,7 @@
 import React from "react"
 import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import styled from "styled-components"
-import { Button, TextField, Modal, Fade, Box } from "@material-ui/core"
+import { Button, TextField, Modal, Fade, Box } from "@mui/material"
 import { useDispatch } from "react-redux"
 import { useTypedSelector } from "../../../../store/store"
 import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"

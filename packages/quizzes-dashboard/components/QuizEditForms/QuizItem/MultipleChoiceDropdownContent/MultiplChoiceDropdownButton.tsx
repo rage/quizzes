@@ -1,6 +1,6 @@
 import React from "react"
 import styled from "styled-components"
-import { Modal, Box, Button, Fade } from "@material-ui/core"
+import { Modal, Box, Button, Fade } from "@mui/material"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faWindowClose, faTrash } from "@fortawesome/free-solid-svg-icons"
 import { NormalizedOption } from "../../../../types/NormalizedQuiz"

@@ -1,4 +1,4 @@
-import Knex from "knex"
+import type { Knex } from "knex"
 import {
   ExerciseData,
   ProgressMessage,
@@ -22,7 +22,7 @@ export const broadcastUserProgressUpdated = async (
   trx: Knex.Transaction,
 ) => {
   const course = await Course.query(trx).findById(courseId)
-  if (!course.moocfiId) {
+  if (!course?.moocfiId) {
     return
   }
   const progress = await UserCoursePartState.getProgress(userId, courseId, trx)
@@ -50,7 +50,7 @@ export const broadcastQuizAnswerUpdated = async (
 ) => {
   const messages: RequiredAction[] = []
   const course = await quiz.$relatedQuery("course", trx)
-  if (!course.moocfiId) {
+  if (!course?.moocfiId) {
     return
   }
   const items = await quiz.$relatedQuery("items", trx)
@@ -91,7 +91,7 @@ export const broadcastCourseQuizzesUpdated = async (
   trx: Knex.Transaction,
 ) => {
   const course = await Course.query(trx).findById(courseId)
-  if (!course.moocfiId) {
+  if (!course?.moocfiId) {
     return
   }
   const quizzes = await Quiz.query(trx)

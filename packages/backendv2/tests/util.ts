@@ -1,6 +1,7 @@
 const knexCleaner = require("knex-cleaner")
 import knex from "../database/knex"
 import { Quiz } from "../src/models"
+import type BaseModel from "../src/models/base_model"
 
 export const uuid = /[0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12}/
 export const dateTime = /\d{4}-[01]\d-[0-3]\dT[0-2]\d:[0-5]\d:[0-5]\d(?:\.\d+)?Z?/
@@ -25,27 +26,27 @@ export const configQuizAnswerSoftDelete = {
 }
 
 export const expectQuizToEqual = (received: Quiz, expected: any) => {
-  delete received.createdAt
-  delete received.updatedAt
+  delete (received as Partial<BaseModel>).createdAt
+  delete (received as Partial<BaseModel>).updatedAt
   delete expected.createdAt
   delete expected.updatedAt
   const receivedItems = received.items.map(item => {
-    delete item.createdAt
-    delete item.updatedAt
+    delete (item as Partial<BaseModel>).createdAt
+    delete (item as Partial<BaseModel>).updatedAt
     item.options.map(option => {
-      delete option.createdAt
-      delete option.updatedAt
+      delete (option as Partial<BaseModel>).createdAt
+      delete (option as Partial<BaseModel>).updatedAt
       return option
     })
     return item
   })
 
   const expectedItems: any[] = expected.items.map((item: any) => {
-    delete item.createdAt
-    delete item.updatedAt
+    delete (item as Partial<BaseModel>).createdAt
+    delete (item as Partial<BaseModel>).updatedAt
     item.options.map((option: any) => {
-      delete option.createdAt
-      delete option.updatedAt
+      delete (option as Partial<BaseModel>).createdAt
+      delete (option as Partial<BaseModel>).updatedAt
       return option
     })
     return item
@@ -68,21 +69,21 @@ export const expectQuizToEqual = (received: Quiz, expected: any) => {
   }
 
   const receivedPeerReviews = received.peerReviewCollections.map(prc => {
-    delete prc.createdAt
-    delete prc.updatedAt
+    delete (prc as Partial<BaseModel>).createdAt
+    delete (prc as Partial<BaseModel>).updatedAt
     prc.questions.map(prcq => {
-      delete prcq.createdAt
-      delete prcq.updatedAt
+      delete (prcq as Partial<BaseModel>).createdAt
+      delete (prcq as Partial<BaseModel>).updatedAt
       return prcq
     })
     return prc
   })
   const expectedPeerReviews = expected.peerReviewCollections.map((prc: any) => {
-    delete prc.createdAt
-    delete prc.updatedAt
+    delete (prc as Partial<BaseModel>).createdAt
+    delete (prc as Partial<BaseModel>).updatedAt
     prc.questions.map((prcq: any) => {
-      delete prcq.createdAt
-      delete prcq.updatedAt
+      delete (prcq as Partial<BaseModel>).createdAt
+      delete (prcq as Partial<BaseModel>).updatedAt
       return prcq
     })
     return prc
@@ -113,9 +114,9 @@ export const expectQuizToEqual = (received: Quiz, expected: any) => {
   }
 
   const expectedClone = { ...expected }
-  delete received.items
+  delete (received as Partial<Quiz>).items
   delete expectedClone.items
-  delete received.peerReviewCollections
+  delete (received as Partial<Quiz>).peerReviewCollections
   delete expectedClone.peerReviewCollections
   expect(received).toStrictEqual(expectedClone)
 }

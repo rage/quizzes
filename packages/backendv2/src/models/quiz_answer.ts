@@ -1,4 +1,4 @@
-import Knex from "knex"
+import type { Knex } from "knex"
 import { NotFoundError } from "./../util/error"
 import QuizItemAnswer from "./quiz_item_answer"
 import User from "./user"
@@ -14,17 +14,17 @@ import UserCoursePartState from "./user_course_part_state"
 import * as Kafka from "../services/kafka"
 import SpamFlag from "./spam_flag"
 import _, { cond } from "lodash"
-import Objection, { raw } from "objection"
+import { raw } from "objection"
 import BaseModel from "./base_model"
 import QuizOptionAnswer from "./quiz_option_answer"
-import softDelete from "objection-soft-delete"
+import softDelete from "./soft_delete"
 import { mixin } from "objection"
 import QuizAnswerStatusModification from "./quiz_answer_status_modification"
 import { TStatusModificationOperation } from "./../types/index"
 import { relayNewAnswer } from "../services/plagiarism"
 import Language from "./language"
 
-type QuizAnswerStatus =
+export type QuizAnswerStatus =
   | "draft"
   | "given-more-than-enough"
   | "given-enough"
@@ -203,35 +203,24 @@ class QuizAnswer extends mixin(BaseModel, [
     deleted: boolean,
     notDeleted: boolean,
   ) {
-    let paginated: Objection.Page<QuizAnswer>
-    const noFiltersProvided = filters.length === 0
-    let deleteConditions: boolean[] = [
+    const deleteConditions: boolean[] = [
       ...(deleted ? [true] : []),
       ...(notDeleted ? [false] : []),
     ]
 
-    if (noFiltersProvided) {
-      paginated = await this.query()
-        .where("quiz_id", quizId)
-        .whereIn("deleted", deleteConditions)
-        .orderBy([{ column: "created_at", order: order }])
-        .page(page, pageSize)
-        .withGraphFetched("quiz.[peerReviewCollections]")
-        .withGraphFetched("userQuizState")
-        .withGraphFetched("itemAnswers.[quizItem, optionAnswers]")
-        .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
-    } else {
-      paginated = await this.query()
-        .where("quiz_id", quizId)
-        .whereIn("deleted", deleteConditions)
-        .whereIn("status", filters)
-        .orderBy([{ column: "created_at", order: order }])
-        .page(page, pageSize)
-        .withGraphFetched("quiz.[peerReviewCollections]")
-        .withGraphFetched("userQuizState")
-        .withGraphFetched("itemAnswers.[quizItem, optionAnswers]")
-        .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+    const query = this.query()
+      .where("quiz_id", quizId)
+      .whereIn("deleted", deleteConditions)
+    if (filters.length > 0) {
+      query.whereIn("status", filters)
     }
+    const paginated = await query
+      .orderBy([{ column: "created_at", order: order }])
+      .page(page, pageSize)
+      .withGraphFetched("quiz.[peerReviewCollections]")
+      .withGraphFetched("userQuizState")
+      .withGraphFetched("itemAnswers.[quizItem, optionAnswers]")
+      .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
 
     paginated.results.map(async answer => {
       const answerHasPeerReviews = answer.peerReviews.length > 0
@@ -598,7 +587,9 @@ class QuizAnswer extends mixin(BaseModel, [
   }
 
   private static async relayPlagiarismData(quizAnswer: QuizAnswer, quiz: Quiz) {
-    const language = await Language.query().findById(quiz.course.languageId)
+    const language = await Language.query()
+      .findById(quiz.course.languageId)
+      .throwIfNotFound()
     for (const quizItem of quiz.items) {
       if (quizItem.type === "essay") {
         const itemAnswer = quizAnswer.itemAnswers.find(
@@ -1043,6 +1034,13 @@ class QuizAnswer extends mixin(BaseModel, [
 
     try {
       const quizAnswer = await this.query(trx).findById(answerId)
+      if (!quizAnswer) {
+        throw new NotFoundError(`quiz answer not found: ${answerId}`)
+      }
+      const quiz = await Quiz.query(trx).findById(quizAnswer.quizId)
+      if (!quiz) {
+        throw new NotFoundError(`quiz not found: ${quizAnswer.quizId}`)
+      }
 
       await this.query(trx)
         .delete()
@@ -1060,8 +1058,7 @@ class QuizAnswer extends mixin(BaseModel, [
             )[0]
           : undefined
 
-      const maxPoints = (await Quiz.query(trx).findById(quizAnswer.quizId))
-        .points
+      const maxPoints = quiz.points
 
       const userQuizState = (
         await UserQuizState.query(trx)
@@ -1074,11 +1071,7 @@ class QuizAnswer extends mixin(BaseModel, [
       const updatedUserQuizState = await userQuizState
         .$query(trx)
         .updateAndFetch({
-          status:
-            newTries >=
-            (await Quiz.query(trx).findById(quizAnswer.quizId)).tries
-              ? "locked"
-              : "open",
+          status: newTries >= quiz.tries ? "locked" : "open",
           tries: newTries,
           spamFlags: nextBestQuizAnswer
             ? (
@@ -1097,24 +1090,24 @@ class QuizAnswer extends mixin(BaseModel, [
         ? await Kafka.broadcastQuizAnswerUpdated(
             nextBestQuizAnswer,
             updatedUserQuizState,
-            await Quiz.query(trx).findById(quizAnswer.quizId),
+            quiz,
             trx,
           )
         : await Kafka.broadcastQuizAnswerUpdated(
             quizAnswer,
             updatedUserQuizState,
-            await Quiz.query(trx).findById(quizAnswer.quizId),
+            quiz,
             trx,
           )
 
       await Kafka.broadcastUserProgressUpdated(
         quizAnswer.userId,
-        (await Quiz.query(trx).findById(quizAnswer.quizId)).courseId,
+        quiz.courseId,
         trx,
       )
 
       await trx.commit()
-      return await this.query().findById(answerId)
+      return await this.query().findById(answerId).throwIfNotFound()
     } catch (error) {
       await trx.rollback()
       throw error
@@ -1208,10 +1201,12 @@ class QuizAnswer extends mixin(BaseModel, [
   }
 
   private static removeIds(quizAnswer: QuizAnswer) {
-    delete quizAnswer.id
+    delete (quizAnswer as Partial<QuizAnswer>).id
     quizAnswer.itemAnswers?.forEach(itemAnswer => {
-      delete itemAnswer.id
-      itemAnswer.optionAnswers?.forEach(optionAnswer => delete optionAnswer.id)
+      delete (itemAnswer as Partial<QuizItemAnswer>).id
+      itemAnswer.optionAnswers?.forEach(
+        optionAnswer => delete (optionAnswer as Partial<QuizOptionAnswer>).id,
+      )
     })
   }
 }

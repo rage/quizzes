@@ -1,11 +1,21 @@
 import React from "react"
-import usePromise from "react-use-promise"
 import { useRouter } from "next/router"
 import { QetQuizAnswerStatistics } from "../../services/quizzes"
 import styled from "styled-components"
-import { Typography } from "@material-ui/core"
+import { Typography } from "@mui/material"
 import { Doughnut } from "react-chartjs-2"
+import {
+  Chart as ChartJS,
+  ArcElement,
+  Tooltip,
+  Legend,
+  type ChartData,
+  type ChartOptions,
+} from "chart.js"
+import useSWR from "swr"
 import _ from "lodash"
+
+ChartJS.register(ArcElement, Tooltip, Legend)
 
 const AnswerStatsContainer = styled.div`
   flex-wrap: wrap;
@@ -17,10 +27,9 @@ export const AnswerStatistics = () => {
   const router = useRouter()
   const quizId = router.query.quizId?.toString() ?? ""
 
-  //TODO: use swr
-  const [stats, statsError] = usePromise(
-    () => QetQuizAnswerStatistics(quizId),
-    [quizId],
+  const { data: stats, error: statsError } = useSWR(
+    quizId ? ["answerStatistics", quizId] : null,
+    ([, id]) => QetQuizAnswerStatistics(id),
   )
   if (statsError) {
     return <>Something went wrong while fetching answer statistics</>
@@ -33,7 +42,7 @@ export const AnswerStatistics = () => {
 
   delete statswithoutTotal["total"]
 
-  const pieChartData: Chart.ChartData = {
+  const pieChartData: ChartData<"doughnut"> = {
     labels: Object.keys(statswithoutTotal).map(
       label =>
         `${label} | ${stats[label]}; ${(
@@ -43,7 +52,6 @@ export const AnswerStatistics = () => {
     ),
     datasets: [
       {
-        type: "doughnut",
         data: Object.values(statswithoutTotal),
         backgroundColor: [
           "#d32f2f",
@@ -64,10 +72,13 @@ export const AnswerStatistics = () => {
     ],
   }
 
-  const chartOptions: Chart.ChartOptions = {
-    legend: {
-      position: "left",
-      labels: { fontSize: 15 },
+  const chartOptions: ChartOptions<"doughnut"> = {
+    aspectRatio: 2,
+    plugins: {
+      legend: {
+        position: "left",
+        labels: { font: { size: 15 } },
+      },
     },
   }
 

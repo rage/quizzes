@@ -1,6 +1,6 @@
 import React from "react"
 import { PeerReview } from "../../../../types/Answer"
-import { Typography, Divider } from "@material-ui/core"
+import { Typography, Divider } from "@mui/material"
 import ReviewContent from "./ReviewContent"
 import styled from "styled-components"
 

@@ -1,5 +1,5 @@
 import { checkAccessOrThrow } from "./../dashboard/util"
-import Router from "koa-router"
+import Router from "@koa/router"
 import knex from "../../../database/knex"
 import { CustomContext, CustomState } from "../../types"
 import {
@@ -81,12 +81,12 @@ const widget = new Router<CustomState, CustomContext>({
 
   .post("/answer", accessControl(), async ctx => {
     const user = ctx.state.user
-    const answer = ctx.request.body
+    const answer = ctx.request.body as object
     ctx.body = await QuizAnswer.newAnswer(user.id, QuizAnswer.fromJson(answer))
   })
 
   .post("/answers/report-spam", accessControl(), async ctx => {
-    const quizAnswerId = ctx.request.body.quizAnswerId
+    const { quizAnswerId } = ctx.request.body as { quizAnswerId: string }
     const userId = ctx.state.user.id
     ctx.body = await SpamFlag.reportSpam(quizAnswerId, userId)
   })
@@ -99,7 +99,7 @@ const widget = new Router<CustomState, CustomContext>({
 
   .post("/answers/give-review", accessControl(), async ctx => {
     const userId = ctx.state.user.id
-    const peerReview = ctx.request.body
+    const peerReview = ctx.request.body as PeerReview
     peerReview.userId = userId
     ctx.body = await PeerReview.givePeerReview(peerReview)
   })
@@ -109,7 +109,7 @@ const widget = new Router<CustomState, CustomContext>({
     accessControl({ administrator: true }),
     async ctx => {
       const userId = ctx.state.user.id
-      const peerReview = ctx.request.body
+      const peerReview = ctx.request.body as PeerReview
       peerReview.userId = userId
       ctx.body = await PeerReview.givePeerReview(peerReview, true)
     },

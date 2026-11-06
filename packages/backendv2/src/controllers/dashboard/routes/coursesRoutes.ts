@@ -1,4 +1,4 @@
-import Router from "koa-router"
+import Router from "@koa/router"
 import _ from "lodash"
 import knex from "../../../../database/knex"
 import accessControl from "../../../middleware/access_control"
@@ -10,7 +10,12 @@ import {
   CourseTranslation,
 } from "../../../models"
 import UserCoursePartState from "../../../models/user_course_part_state"
-import { CustomContext, CustomState } from "../../../types"
+import {
+  CustomContext,
+  CustomState,
+  EditCourseCompletionPayloadFields,
+  EditCoursePayloadFields,
+} from "../../../types"
 import { BadRequestError } from "../../../util/error"
 import {
   checkAccessOrThrow,
@@ -49,17 +54,21 @@ const coursesRoutes = new Router<CustomState, CustomContext>({
   )
   .post("/:courseId/duplicate-course", accessControl(), async ctx => {
     const oldCourseId = ctx.params.courseId
-    const name = ctx.request.body.name
-    const abbr = ctx.request.body.abbr
-    const languageId = ctx.request.body.lang
+    const { name, abbr, lang: languageId } = ctx.request.body as {
+      name: string
+      abbr: string
+      lang: string
+    }
     await checkAccessOrThrow(ctx.state.user, oldCourseId, "duplicate")
     ctx.body = await Course.duplicateCourse(oldCourseId, name, abbr, languageId)
   })
 
   .post("/download-correspondence-file", accessControl(), async ctx => {
-    const oldCourseId = ctx.request.body.oldCourseId
-    const courseId = ctx.request.body.newCourseId
-    ctx.response.set("Content-Type", "text/csv")
+    const { oldCourseId, newCourseId: courseId } = ctx.request.body as {
+      oldCourseId: string
+      newCourseId: string
+    }
+    ctx.response.set("Content-Type", "text/csv; charset=utf-8")
     ctx.response.attachment(`update_ids_from_${oldCourseId}_to_${courseId}.csv`)
     await checkAccessOrThrow(ctx.state.user, oldCourseId, "download")
     const stream = await Course.getCorrespondenceFile(oldCourseId, courseId)
@@ -95,7 +104,9 @@ const coursesRoutes = new Router<CustomState, CustomContext>({
   })
   .post("/:courseId/completion", accessControl(), async ctx => {
     const courseId = ctx.params.courseId
-    const payload = ctx.request.body
+    const payload = ctx.request.body as
+      | EditCourseCompletionPayloadFields
+      | undefined
 
     await checkAccessOrThrow(ctx.state.user, courseId, "edit")
 
@@ -117,7 +128,7 @@ const coursesRoutes = new Router<CustomState, CustomContext>({
   })
   .post("/:courseId/edit", accessControl(), async ctx => {
     const courseId = ctx.params.courseId
-    const payload = ctx.request.body
+    const payload = ctx.request.body as EditCoursePayloadFields
     const moocfiId = payload.moocfiId
     await checkAccessOrThrow(ctx.state.user, courseId, "edit")
 

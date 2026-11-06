@@ -5,7 +5,7 @@ import {
   faUsersCog,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { Tab, Tabs, Typography } from "@material-ui/core"
+import { Tab, Tabs, Typography } from "@mui/material"
 import { useRouter } from "next/router"
 import { ITabToComponent } from "../CoursePage/types"
 import { CoursePage } from "../CoursePage"

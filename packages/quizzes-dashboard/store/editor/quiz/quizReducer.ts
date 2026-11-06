@@ -19,7 +19,7 @@ import {
   deletedItem,
   createdNewQuiz,
 } from "../editorActions"
-import produce from "immer"
+import { produce } from "immer"
 import { DateTime } from "luxon"
 import { Quiz } from "../../../types/Quiz"
 import { normalize } from "normalizr"
@@ -67,13 +67,9 @@ export const quizReducer = createReducer<
 
   .handleAction(editedQuizzesDeadline, (state, action) => {
     return produce(state, draftState => {
-      if (action.payload.deadline !== null) {
-        const deadline = DateTime.fromISO(
-          action.payload.deadline.toISOString(),
-        ).toLocal()
-        if (deadline.isValid) {
-          draftState[action.payload.id].deadline = deadline.toISO()
-        }
+      const { deadline } = action.payload
+      if (deadline?.isValid) {
+        draftState[action.payload.id].deadline = deadline.toLocal().toISO()
       }
     })
   })

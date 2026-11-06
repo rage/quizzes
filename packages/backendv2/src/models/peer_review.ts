@@ -6,9 +6,8 @@ import PeerReviewQuestionAnswer from "./peer_review_question_answer"
 import PeerReviewQuestion from "./peer_review_question"
 import knex from "../../database/knex"
 import BaseModel from "./base_model"
-import softDelete from "objection-soft-delete"
+import softDelete from "./soft_delete"
 import { mixin } from "objection"
-import { Transaction } from "knex"
 
 class PeerReview extends BaseModel {
   id!: string
@@ -109,16 +108,13 @@ class PeerReview extends BaseModel {
     }
 
     let sourceUserQuizState: UserQuizState | null = null
-    let targetUserQuizState: UserQuizState
 
     if (!skipGiverRequirements) {
-      sourceUserQuizState = await UserQuizState.getByUserAndQuiz(
-        sourceUserId,
-        quizId,
-      )
+      sourceUserQuizState =
+        (await UserQuizState.getByUserAndQuiz(sourceUserId, quizId)) ?? null
     }
 
-    targetUserQuizState = await UserQuizState.getByUserAndQuiz(
+    const targetUserQuizState = await UserQuizState.getByUserAndQuiz(
       targetUserId,
       quizId,
     )

@@ -1,10 +1,8 @@
-import React, { useEffect } from "react"
-import "date-fns"
-import DateFnsUtils from "@date-io/date-fns"
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDateTimePicker,
-} from "@material-ui/pickers"
+import React, { useEffect, useState } from "react"
+import { DateTime } from "luxon"
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
+import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon"
 import {
   Typography,
   TextField,
@@ -12,7 +10,7 @@ import {
   Fade,
   Switch,
   FormControlLabel,
-} from "@material-ui/core"
+} from "@mui/material"
 import styled from "styled-components"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
@@ -163,6 +161,11 @@ const BasicInformation = () => {
     state => state.editor.quizVariables[quizId],
   )
 
+  // Local so that a partially typed (invalid) date isn't overwritten by the store's last valid value
+  const [deadline, setDeadline] = useState<DateTime | null>(() =>
+    variables.deadline ? DateTime.fromISO(variables.deadline) : null,
+  )
+
   const store = useTypedSelector(state => state)
 
   const changes = useTypedSelector(state => state.editor.editorChanges.changes)
@@ -234,7 +237,9 @@ const BasicInformation = () => {
                   dispatch(editedQuizTriesLimited(event.target.checked, quizId))
                 }
                 color="secondary"
-                inputProps={{ "aria-label": "check tries allowed" }}
+                slotProps={{
+                  input: { "aria-label": "check tries allowed" }
+                }}
               />
             }
             label="Limit tries"
@@ -248,7 +253,6 @@ const BasicInformation = () => {
           {triesAreLimited && (
             <TextField
               type="number"
-              InputProps={{ inputProps: { min: 1, max: null } }}
               label="Number of tries allowed"
               variant="outlined"
               value={numberOfTries ?? ""}
@@ -261,6 +265,7 @@ const BasicInformation = () => {
                   ),
                 )
               }
+              slotProps={{ htmlInput: { min: 1 } }}
             />
           )}
         </TryLimitNumberContainer>
@@ -301,25 +306,26 @@ const BasicInformation = () => {
         </TextField>
       </InfoContainer>
       <InfoContainer>
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <KeyboardDateTimePicker
-            fullWidth
-            InputLabelProps={{ shrink: !!variables.deadline }}
-            value={variables.deadline || ""}
-            error={!variables.validDeadline}
-            variant="dialog"
-            inputVariant="outlined"
+        <LocalizationProvider dateAdapter={AdapterLuxon}>
+          <DateTimePicker
             label="Deadline"
+            value={deadline}
             format="dd-MM-yyyy HH:mm"
-            KeyboardButtonProps={{
-              "aria-label": "change time",
+            ampm={false}
+            onChange={value => {
+              setDeadline(value)
+              dispatch(editedQuizzesDeadline(value, quizId))
             }}
-            onChange={event => {
-              dispatch(editedQuizzesDeadline(event, quizId))
+            slotProps={{
+              textField: {
+                fullWidth: true,
+                error: !variables.validDeadline,
+                helperText: variables.deadline,
+              },
+              openPickerButton: { "aria-label": "change time" },
             }}
-            helperText={variables.deadline}
           />
-        </MuiPickersUtilsProvider>
+        </LocalizationProvider>
       </InfoContainer>
       <InfoContainer>
         <MarkdownEditor

@@ -19,7 +19,7 @@ export interface UserInfo {
   administrator: boolean
 }
 
-export interface ExtraFields {}
+export type ExtraFields = Record<string, unknown>
 
 export interface UserField {
   first_name: string
@@ -35,7 +35,7 @@ export interface ProgressMessage {
   course_id: string
   service_id: string
   progress: PointsByGroup[]
-  message_format_version: Number
+  message_format_version: number
 }
 
 export interface PointsByGroup {

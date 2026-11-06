@@ -1,4 +1,4 @@
-import Router from "koa-router"
+import Router from "@koa/router"
 import accessControl from "../../../middleware/access_control"
 import { Language } from "../../../models"
 import { CustomContext, CustomState } from "../../../types"

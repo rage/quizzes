@@ -1,9 +1,9 @@
-import { Button, TextField, Typography } from "@material-ui/core"
+import { Button, TextField, Typography } from "@mui/material"
 import { Field, Form, Formik } from "formik"
 import _ from "lodash"
 import { useRouter } from "next/router"
 import React, { useState } from "react"
-import usePromise from "react-use-promise"
+import useSWR from "swr"
 import styled from "styled-components"
 import { number, object } from "yup"
 import {
@@ -36,9 +36,9 @@ const CompletionPage = () => {
     setCompletionValues,
   ] = useState<CompletionProperties | null>(null)
   const id = router.query.courseId?.toString() ?? ""
-  const [courseData, courseFetchError] = usePromise(
-    () => fetchCourseQuizzes(id),
-    [id],
+  const { data: courseData, error: courseFetchError } = useSWR(
+    id ? ["courseQuizzes", id] : null,
+    ([, courseId]) => fetchCourseQuizzes(courseId),
   )
 
   if (courseFetchError) {
@@ -126,6 +126,7 @@ const CompletionPage = () => {
                 name="maxSpamFlags"
                 type="number"
                 as={TextField}
+                variant="standard"
                 label="maxSpamFlags"
                 error={errors.maxSpamFlags}
                 helperText={errors.maxSpamFlags}
@@ -135,6 +136,7 @@ const CompletionPage = () => {
                 name="maxReviewSpamFlags"
                 type="number"
                 as={TextField}
+                variant="standard"
                 label="maxReviewSpamFlags"
                 error={errors.maxReviewSpamFlags}
                 helperText={errors.maxReviewSpamFlags}
@@ -149,6 +151,7 @@ const CompletionPage = () => {
                 name="minPeerReviewsGiven"
                 type="number"
                 as={TextField}
+                variant="standard"
                 label="minPeerReviewsGiven"
                 error={errors.minPeerReviewsGiven}
                 helperText={errors.minPeerReviewsGiven}
@@ -159,6 +162,7 @@ const CompletionPage = () => {
                 name="minPeerReviewsReceived"
                 type="number"
                 as={TextField}
+                variant="standard"
                 label="minPeerReviewsReceived"
                 error={errors.minPeerReviewsReceived}
                 helperText={errors.minPeerReviewsReceived}
@@ -169,6 +173,7 @@ const CompletionPage = () => {
                 name="minReviewAverage"
                 type="number"
                 as={TextField}
+                variant="standard"
                 label="minReviewAverage"
                 error={errors.minReviewAverage}
                 helperText={errors.minReviewAverage}

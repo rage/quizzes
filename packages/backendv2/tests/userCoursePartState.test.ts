@@ -49,7 +49,7 @@ describe("test", () => {
         1,
       ])
 
-      expect(typeof updatedCoursePart.progress).toEqual("number")
+      expect(typeof updatedCoursePart?.progress).toEqual("number")
     })
   })
 
@@ -69,6 +69,6 @@ describe("test", () => {
       1,
     ])
 
-    expect(typeof updatedCoursePart.progress).toEqual("number")
+    expect(typeof updatedCoursePart?.progress).toEqual("number")
   })
 })

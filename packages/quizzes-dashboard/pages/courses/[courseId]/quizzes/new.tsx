@@ -1,22 +1,23 @@
 import React, { useEffect } from "react"
 import QuizEditForms from "../../../../components/QuizEditForms"
-import { Typography } from "@material-ui/core"
+import { Typography } from "@mui/material"
 import SaveButton from "../../../../components/SaveButton"
 import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
 import { useDispatch } from "react-redux"
 import { createdNewQuiz } from "../../../../store/editor/editorActions"
 import Head from "next/head"
-import usePromise from "react-use-promise"
+import useSWR from "swr"
 import { fetchCourseById } from "../../../../services/quizzes"
 
 const NewQuiz = () => {
   const dispatch = useDispatch()
   const router = useRouter()
   const courseId: string = router.query.courseId?.toString() ?? ""
-  const [course, error] = usePromise(() => fetchCourseById(courseId), [
-    courseId,
-  ])
+  const { data: course } = useSWR(
+    courseId ? ["courseById", courseId] : null,
+    ([, id]) => fetchCourseById(id),
+  )
   useEffect(() => {
     dispatch(createdNewQuiz(courseId))
   }, [])

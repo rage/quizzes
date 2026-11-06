@@ -1,5 +1,5 @@
 import { createStore, combineReducers } from "redux"
-import { composeWithDevTools } from "redux-devtools-extension"
+import { composeWithDevTools } from "@redux-devtools/extension"
 import { useSelector, TypedUseSelectorHook } from "react-redux"
 import { optionReducer } from "./editor/options/optionReducer"
 import { itemReducer } from "./editor/items/itemReducer"

@@ -1,35 +1,15 @@
 import Koa from "koa"
-import * as Sentry from "@sentry/node"
-import { Model, snakeCaseMappers } from "objection"
 import bodyParser from "koa-bodyparser"
-import knex, { setUpDB } from "./database/knex"
+import cors from "@koa/cors"
+import { setUpDB } from "./database/knex"
 import api from "./src/controllers/api"
 import logger from "./src/middleware/logger"
 import errorHandler from "./src/middleware/error_handler"
 import { CustomContext, CustomState } from "./src/types"
-import cors from "koa-cors"
-
-import * as pg from "pg"
 
 setUpDB()
 
 const app = new Koa<CustomState, CustomContext>()
-
-if (process.env.SENTRY_DSN) {
-  Sentry.init({
-    dsn: process.env.SENTRY_DSN,
-    release: `quizzes-backend@${process.env.GIT_COMMIT}`,
-  })
-
-  app.on("error", (err, ctx) => {
-    Sentry.withScope(function(scope) {
-      scope.addEventProcessor(function(event) {
-        return Sentry.Handlers.parseRequest(event, ctx.request)
-      })
-      Sentry.captureException(err)
-    })
-  })
-}
 
 app.use(cors())
 

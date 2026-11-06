@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import { Answer } from "../../../types/Answer"
-import { Typography } from "@material-ui/core"
+import { Typography } from "@mui/material"
 import styled from "styled-components"
 import { useAnswerListState } from "../../../contexts/AnswerListContext"
 

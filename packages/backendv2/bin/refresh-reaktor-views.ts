@@ -1,4 +1,4 @@
-import Knex from "knex"
+import { knex as createKnex } from "knex"
 import knex from "../database/knex"
 import env from "../src/util/environment"
 import { GlobalLogger } from "../src/middleware/logger"
@@ -28,7 +28,7 @@ const moocfiViews = ["user_course_settings", `"user"`, "completion"]
 
 // The moocfi views live in another database on the same server, reached with
 // the quizzes credentials.
-const moocfi = Knex({
+const moocfi = createKnex({
   client: "pg",
   connection: {
     host: env.DB_HOST || "/var/run/postgresql",

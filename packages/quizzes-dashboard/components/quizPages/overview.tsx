@@ -1,6 +1,6 @@
 import React from "react"
 import styled from "styled-components"
-import { Typography, Card } from "@material-ui/core"
+import { Typography, Card } from "@mui/material"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
 import DownloadInfoForms from "../DownloadInfoForms"
 import QuizTitle from "./QuizTitleContainer"

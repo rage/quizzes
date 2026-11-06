@@ -1,4 +1,4 @@
-import Router from "koa-router"
+import Router from "@koa/router"
 import { CustomContext, CustomState } from "../types"
 import widget from "./widget"
 import dashboard from "./dashboard"

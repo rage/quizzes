@@ -10,7 +10,7 @@ import {
   createdNewPeerReview,
   deletePeerReview,
 } from "./peerReviewCollectionActions"
-import produce from "immer"
+import { produce } from "immer"
 import {
   createdNewPeerReviewQuestion,
   deletedPRQ,

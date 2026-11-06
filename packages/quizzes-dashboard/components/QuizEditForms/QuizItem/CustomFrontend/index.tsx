@@ -2,7 +2,7 @@ import React from "react"
 import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import { useTypedSelector } from "../../../../store/store"
 import styled from "styled-components"
-import { Box, Button, Fade, Modal } from "@material-ui/core"
+import { Box, Button, Fade, Modal } from "@mui/material"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   faPen,

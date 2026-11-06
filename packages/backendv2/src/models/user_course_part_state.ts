@@ -1,5 +1,5 @@
 import User from "./user"
-import Knex from "knex"
+import type { Knex } from "knex"
 import Course from "./course"
 import { PointsByGroup } from "../types"
 import Quiz from "./quiz"

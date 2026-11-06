@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Tabs, Tab, Badge, Typography } from "@material-ui/core"
+import { Tabs, Tab, Badge, Typography } from "@mui/material"
 import { useRouter } from "next/router"
 import {
   faPen,

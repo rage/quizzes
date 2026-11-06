@@ -1,4 +1,4 @@
-import { BadRequestError } from "../util/error"
+import { BadRequestError, NotFoundError } from "../util/error"
 import Quiz from "./quiz"
 import QuizAnswer from "./quiz_answer"
 import User from "./user"
@@ -55,6 +55,11 @@ class SpamFlag extends BaseModel {
         quizAnswer.userId,
         quiz.id,
       )
+      if (!userQuizState) {
+        throw new NotFoundError(
+          `No quiz state for user ${quizAnswer.userId} in quiz ${quiz.id}`,
+        )
+      }
 
       if (userQuizState.spamFlags === null) {
         userQuizState.spamFlags = 1

@@ -1,5 +1,5 @@
 import { createReducer } from "typesafe-actions"
-import produce from "immer"
+import { produce } from "immer"
 import { action } from "../../types/NormalizedQuiz"
 import { checkForChanges } from "./editorActions"
 import _ from "lodash"

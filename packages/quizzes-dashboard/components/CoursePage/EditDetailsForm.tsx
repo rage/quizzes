@@ -1,9 +1,9 @@
 import React, { useState } from "react"
 import { Formik, Form, Field } from "formik"
-import { Alert } from "@material-ui/lab"
-import { FormHelperText, MenuItem } from "@material-ui/core"
+import { Alert } from "@mui/material"
+import { FormHelperText, MenuItem } from "@mui/material"
 import { useRouter } from "next/router"
-import usePromise from "react-use-promise"
+import useSWR from "swr"
 import {
   fetchCourseQuizzes,
   getAllLanguages,
@@ -16,7 +16,7 @@ import {
   Snackbar,
   TextField,
   Typography,
-} from "@material-ui/core"
+} from "@mui/material"
 import styled from "styled-components"
 import { object, string } from "yup"
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
@@ -176,6 +176,7 @@ export const EditDetailsForm = ({
                 name="title"
                 type="string"
                 as={TextField}
+                variant="standard"
                 label="Title"
                 error={errors.title}
                 helperText={errors.title}
@@ -185,6 +186,7 @@ export const EditDetailsForm = ({
                 name="abbreviation"
                 type="string"
                 as={TextField}
+                variant="standard"
                 label="Abbreviation"
                 error={errors.abbreviation}
                 helperText={errors.abbreviation}
@@ -193,6 +195,7 @@ export const EditDetailsForm = ({
                 name="moocfiId"
                 type="string"
                 as={TextField}
+                variant="standard"
                 label="Moocfi Id"
                 error={errors.moocfiId}
                 helperText={errors.moocfiId}
@@ -201,6 +204,7 @@ export const EditDetailsForm = ({
                 name="languageId"
                 label="Language Id"
                 as={TextField}
+                variant="standard"
                 select
               >
                 {Array.isArray(languageIds) &&
@@ -241,13 +245,13 @@ export const EditDetailsForm = ({
 const EditCourseDetails = () => {
   const router = useRouter()
   const id = router.query.courseId?.toString() ?? ""
-  const [courseData, courseFetchError] = usePromise(
-    () => fetchCourseQuizzes(id),
-    [id],
+  const { data: courseData, error: courseFetchError } = useSWR(
+    id ? ["courseQuizzes", id] : null,
+    ([, courseId]) => fetchCourseQuizzes(courseId),
   )
-  const [languageData, languagesFetchError] = usePromise(
+  const { data: languageData, error: languagesFetchError } = useSWR(
+    "languages",
     () => getAllLanguages(),
-    [],
   )
 
   useBreadcrumbs([

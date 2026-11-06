@@ -1,4 +1,4 @@
-import * as Knex from "knex"
+import type { Knex } from "knex"
 
 const dropOperationEnum =
   "DROP TYPE quiz_answer_status_modification_operations_enum"

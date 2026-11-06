@@ -17,10 +17,6 @@ export interface IQueryParams {
   }
 }
 
-export interface ChipProps {
-  checked: boolean
-}
-
 export interface AnswerListProps {
   data: Answer[]
   error: any

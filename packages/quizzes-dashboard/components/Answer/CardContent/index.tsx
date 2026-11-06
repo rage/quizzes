@@ -10,7 +10,7 @@ import {
   Fade,
   Box,
   Modal,
-} from "@material-ui/core"
+} from "@mui/material"
 import AnswerLink from "./AnswerLink"
 import ManualReviewField from "./ManualReviewField"
 import Peerreviews from "./Peerreviews"
@@ -91,7 +91,7 @@ const ButtonWrapper = styled.div`
 const DeleteButton = styled(Button)`
   display: flex !important;
   background-color: #c62828 !important;
-  :hover {
+  &:hover {
     background-color: #c62828;
     opacity: 0.6;
     color: #000;
@@ -165,7 +165,7 @@ export const AnswerContent = ({ answer }: AnswerContentProps) => {
       <ContentContainer>
         <AnswerOverView answer={answer} />
       </ContentContainer>
-      <Collapse in={showMore} collapsedHeight={300}>
+      <Collapse in={showMore} collapsedSize={300}>
         <ContentContainer ref={ref}>
           <ItemAnswers itemAnswers={answer.itemAnswers} />
         </ContentContainer>

@@ -9,8 +9,8 @@ import {
   Grow,
   Divider,
   FormHelperText,
-} from "@material-ui/core"
-import { Alert } from "@material-ui/lab"
+} from "@mui/material"
+import { Alert } from "@mui/material"
 import React, { useState } from "react"
 import styled from "styled-components"
 import { deleteQuizAnswer } from "../../../services/quizzes"
@@ -65,9 +65,7 @@ const AnswerDeletionDialog = ({
 
   return (
     <Dialog open={showAnswerDeletionDialog} fullWidth>
-      <DialogTitle>
-        <Typography>Are you sure you want to delete this answer?</Typography>
-      </DialogTitle>
+      <DialogTitle>Are you sure you want to delete this answer?</DialogTitle>
       <DialogContent>
         {!deleting && (
           <>

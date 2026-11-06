@@ -1,48 +1,45 @@
 import React from "react"
-import NextDocument from "next/document"
+import { Html, Head, Main, NextScript } from "next/document"
+import { ServerStyleSheet } from "styled-components"
 import {
-  ServerStyleSheet as StyledComponentSheets,
-  createGlobalStyle,
-} from "styled-components"
-import { ServerStyleSheets as MaterialUiServerStyleSheets } from "@material-ui/styles"
+  DocumentHeadTags,
+  documentGetInitialProps,
+} from "@mui/material-nextjs/v16-pagesRouter"
 
-const GlobalStyle = createGlobalStyle`
-html, body {
-  padding: 0;
-  margin: 0;
+export default function Document(props) {
+  return (
+    <Html>
+      <Head>
+        {/* Emotion's insertion point must precede the styled-components tags so app styles override MUI */}
+        <DocumentHeadTags {...props} />
+      </Head>
+      <body>
+        <Main />
+        <NextScript />
+      </body>
+    </Html>
+  )
 }
-`
 
-export default class Document extends NextDocument {
-  static async getInitialProps(ctx) {
-    const styledComponentSheet = new StyledComponentSheets()
-    const materialUiSheets = new MaterialUiServerStyleSheets()
-    const originalRenderPage = ctx.renderPage
-
-    try {
-      ctx.renderPage = () =>
-        originalRenderPage({
+Document.getInitialProps = async ctx => {
+  const styledComponentSheet = new ServerStyleSheet()
+  try {
+    return await documentGetInitialProps(ctx, {
+      plugins: [
+        {
           enhanceApp: App => props =>
-            styledComponentSheet.collectStyles(
-              materialUiSheets.collect(<App {...props} />),
-            ),
-        })
-
-      const initialProps = await NextDocument.getInitialProps(ctx)
-
-      return {
-        ...initialProps,
-        styles: [
-          <React.Fragment key="styles">
-            {initialProps.styles}
-            {materialUiSheets.getStyleElement()}
-            {styledComponentSheet.getStyleElement()}
-            <GlobalStyle />
-          </React.Fragment>,
-        ],
-      }
-    } finally {
-      styledComponentSheet.seal()
-    }
+            styledComponentSheet.collectStyles(<App {...props} />),
+          resolveProps: async initialProps => ({
+            ...initialProps,
+            styles: [
+              ...React.Children.toArray(initialProps.styles),
+              styledComponentSheet.getStyleElement(),
+            ],
+          }),
+        },
+      ],
+    })
+  } finally {
+    styledComponentSheet.seal()
   }
 }

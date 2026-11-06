@@ -14,4 +14,6 @@ const FooterBar = styled.footer`
   padding: 10rem;
 `
 
-export default () => <FooterBar />
+const Footer = () => <FooterBar />
+
+export default Footer

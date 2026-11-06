@@ -1,10 +1,10 @@
 import React, { useState } from "react"
 import styled from "styled-components"
-import { Button, TextField } from "@material-ui/core"
-import usePromise from "react-use-promise"
+import { Button, TextField } from "@mui/material"
+import useSWR from "swr"
 import { fetchCourses, getCorrespondenceFile } from "../../services/quizzes"
 import { Course } from "../../types/Quiz"
-import { Autocomplete } from "@material-ui/lab"
+import { Autocomplete } from "@mui/material"
 
 const SubmitButton = styled(Button)`
   display: flex !important;
@@ -35,7 +35,9 @@ interface CorrespondenceProps {
 }
 
 export const CorrespondenceModal = ({ course }: CorrespondenceProps) => {
-  const [courses, coursesError] = usePromise(() => fetchCourses(), [])
+  const { data: courses, error: coursesError } = useSWR("courses", () =>
+    fetchCourses(),
+  )
 
   const [courseId, setCourseId] = useState("")
 

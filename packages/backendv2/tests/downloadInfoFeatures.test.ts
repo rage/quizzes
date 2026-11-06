@@ -39,6 +39,7 @@ const checkTmcCredentials = () => {
           } as UserInfo,
         ]
       }
+      return [401]
     })
 }
 
@@ -122,11 +123,11 @@ describe("dashboard - courses: downloading quiz info should", () => {
   })
 
   describe("attempting to download with a download token", () => {
-    test("should return csv content on success ", async done => {
+    test("should return csv content on success ", async () => {
       const downloadToken = await redis.client?.get("2222")
 
       const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
-      request(app.callback())
+      await request(app.callback())
         .post(
           `/api/v2/dashboard/quizzes/download/download-quiz-info/${quizId}?&downloadToken=${downloadToken}`,
         )
@@ -137,7 +138,6 @@ describe("dashboard - courses: downloading quiz info should", () => {
         })
         .expect("Content-Type", "text/csv; charset=utf-8")
         .expect(200)
-        .end(done)
     })
   })
 })
@@ -214,10 +214,10 @@ describe("dashboard: downloading peer review info should", () => {
   })
 
   describe("attempting to download with a download token", () => {
-    test("should return csv content on success ", async done => {
+    test("should return csv content on success ", async () => {
       const downloadToken = await redis.client?.get("2222")
       const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
-      request(app.callback())
+      await request(app.callback())
         .post(
           `/api/v2/dashboard/quizzes/download/download-peerreview-info/${quizId}?&downloadToken=${downloadToken}`,
         )
@@ -228,7 +228,6 @@ describe("dashboard: downloading peer review info should", () => {
         })
         .expect("Content-Type", "text/csv; charset=utf-8")
         .expect(200)
-        .end(done)
     })
   })
 })
@@ -238,10 +237,9 @@ describe("dashboard: downloading answer info should", () => {
     await safeSeed(configA)
   })
 
-  afterAll(async done => {
+  afterAll(async () => {
     nock.cleanAll()
     await safeClean()
-    done()
   })
 
   test("respond with 401 if invalid credentials", done => {
@@ -304,10 +302,10 @@ describe("dashboard: downloading answer info should", () => {
   })
 
   describe("attempting to download with a download token", () => {
-    test("should return csv content on success ", async done => {
+    test("should return csv content on success ", async () => {
       const downloadToken = await redis.client?.get("2222")
       const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
-      request(app.callback())
+      await request(app.callback())
         .post(
           `/api/v2/dashboard/quizzes/download/download-answer-info/${quizId}?&downloadToken=${downloadToken}`,
         )
@@ -318,7 +316,6 @@ describe("dashboard: downloading answer info should", () => {
         })
         .expect("Content-Type", "text/csv; charset=utf-8")
         .expect(200)
-        .end(done)
     })
   })
 })
@@ -413,6 +410,7 @@ describe("downloading info when redis unavailable", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 

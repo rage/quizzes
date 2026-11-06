@@ -13,7 +13,7 @@ import {
   TableRow,
   Tabs,
   Typography,
-} from "@material-ui/core"
+} from "@mui/material"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faChalkboard, faScroll } from "@fortawesome/free-solid-svg-icons"
 import AnswerCard from "../../../../components/Answer"
@@ -39,7 +39,7 @@ interface IAnswerStatusChange {
 }
 
 const StyledTableContainer = styled(TableContainer)<{
-  component: React.ReactNode
+  component: React.ElementType
 }>`
   margin-top: 3rem;
 `

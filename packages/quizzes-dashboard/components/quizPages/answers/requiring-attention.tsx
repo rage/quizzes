@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { useRouter } from "next/router"
 import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
-import { MenuItem, Switch, Typography } from "@material-ui/core"
+import { MenuItem, Switch, Typography } from "@mui/material"
 import QuizTitle from "../QuizTitleContainer"
 import { TabText } from "../TabHeaders"
 import {

@@ -35,10 +35,10 @@ describe("autoreject off 1", () => {
     quizAnswer = await QuizAnswer.getById(
       "baa83266-2194-43f4-be37-177c273c82b1",
     )
-    userQuizState = await UserQuizState.getByUserAndQuiz(
+    userQuizState = (await UserQuizState.getByUserAndQuiz(
       1234,
       "3c954097-268f-44bf-9d2e-1efaf9e8f122",
-    )
+    ))!
     course = await Course.getById(quiz.courseId)
   })
 
@@ -152,10 +152,10 @@ describe("auto confirm off 1", () => {
     quizAnswer = await QuizAnswer.getById(
       "baa83266-2194-43f4-be37-177c273c82b1",
     )
-    userQuizState = await UserQuizState.getByUserAndQuiz(
+    userQuizState = (await UserQuizState.getByUserAndQuiz(
       1234,
       "3c954097-268f-44bf-9d2e-1efaf9e8f122",
-    )
+    ))!
     course = await Course.getById(quiz.courseId)
   })
 
@@ -193,10 +193,10 @@ describe("autoreject off 1, failing", () => {
     quizAnswer = await QuizAnswer.getById(
       "baa83266-2194-43f4-be37-177c273c82b1",
     )
-    userQuizState = await UserQuizState.getByUserAndQuiz(
+    userQuizState = (await UserQuizState.getByUserAndQuiz(
       1234,
       "3c954097-268f-44bf-9d2e-1efaf9e8f122",
-    )
+    ))!
     course = await Course.getById(quiz.courseId)
   })
   test("given 4, received 2, fail", async () => {
@@ -233,10 +233,10 @@ describe("autoreject off 2", () => {
     quizAnswer = await QuizAnswer.getById(
       "baa83266-2194-43f4-be37-177c273c82b1",
     )
-    userQuizState = await UserQuizState.getByUserAndQuiz(
+    userQuizState = (await UserQuizState.getByUserAndQuiz(
       1234,
       "3c954097-268f-44bf-9d2e-1efaf9e8f122",
-    )
+    ))!
     course = await Course.getById(quiz.courseId)
   })
 
@@ -320,10 +320,10 @@ describe("autoreject of 3", () => {
     quizAnswer = await QuizAnswer.getById(
       "baa83266-2194-43f4-be37-177c273c82b1",
     )
-    userQuizState = await UserQuizState.getByUserAndQuiz(
+    userQuizState = (await UserQuizState.getByUserAndQuiz(
       1234,
       "3c954097-268f-44bf-9d2e-1efaf9e8f122",
-    )
+    ))!
     course = await Course.getById(quiz.courseId)
   })
 
@@ -411,10 +411,10 @@ describe("autoreject on 1", () => {
     quizAnswer = await QuizAnswer.getById(
       "baa83266-2194-43f4-be37-177c273c82b1",
     )
-    userQuizState = await UserQuizState.getByUserAndQuiz(
+    userQuizState = (await UserQuizState.getByUserAndQuiz(
       1234,
       "3c954097-268f-44bf-9d2e-1efaf9e8f122",
-    )
+    ))!
     course = await Course.getById(quiz.courseId)
   })
 
@@ -453,10 +453,10 @@ describe("autoreject on 2", () => {
     quizAnswer = await QuizAnswer.getById(
       "baa83266-2194-43f4-be37-177c273c82b1",
     )
-    userQuizState = await UserQuizState.getByUserAndQuiz(
+    userQuizState = (await UserQuizState.getByUserAndQuiz(
       1234,
       "3c954097-268f-44bf-9d2e-1efaf9e8f122",
-    )
+    ))!
     course = await Course.getById(quiz.courseId)
   })
 

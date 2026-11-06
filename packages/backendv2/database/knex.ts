@@ -1,8 +1,8 @@
 import { Model, snakeCaseMappers } from "objection"
-import Knex from "knex"
-import * as knexConfig from "../knexfile"
+import { knex as createKnex } from "knex"
+import knexConfig from "../knexfile"
 
-const knex = Knex(knexConfig)
+const knex = createKnex(knexConfig)
 
 export const setUpDB = () => {
   Model.knex(knex)

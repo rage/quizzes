@@ -66,7 +66,7 @@ describe("Soft delete peer review questions", () => {
     const deletedQuestion = await PeerReviewQuestion.getById(
       peerReviewQuestionId,
     )
-    expect(deletedQuestion.deleted).toEqual(true)
+    expect(deletedQuestion?.deleted).toEqual(true)
   })
 })
 
@@ -108,7 +108,7 @@ describe("Soft delete peer review collections", () => {
     const deletedPeerReviewCollection = await PeerReviewCollection.getById(
       peerReviewCollectionId,
     )
-    expect(deletedPeerReviewCollection.deleted).toEqual(true)
+    expect(deletedPeerReviewCollection?.deleted).toEqual(true)
   })
 })
 
@@ -148,7 +148,7 @@ describe("Soft delete quiz item options", () => {
     expectQuizToEqual(res.body, quiz)
 
     const deletedQuizOption = await QuizOption.getById(quizOptionId)
-    expect(deletedQuizOption.deleted).toEqual(true)
+    expect(deletedQuizOption?.deleted).toEqual(true)
   })
 })
 
@@ -188,7 +188,7 @@ describe("Soft delete quiz items", () => {
     expectQuizToEqual(res.body, quiz)
 
     const deletedQuizItem = await QuizItem.getById(quizItemId)
-    expect(deletedQuizItem.deleted).toEqual(true)
+    expect(deletedQuizItem?.deleted).toEqual(true)
   })
 })
 
@@ -214,5 +214,6 @@ const userSetup = () => {
           } as UserInfo,
         ]
       }
+      return [401]
     })
 }

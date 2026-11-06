@@ -13,7 +13,7 @@ import {
   FormHelperText,
   Select,
   MenuItem,
-} from "@material-ui/core"
+} from "@mui/material"
 import {
   editedQuizItemTitle,
   toggledSharedOptionFeedbackMessage,

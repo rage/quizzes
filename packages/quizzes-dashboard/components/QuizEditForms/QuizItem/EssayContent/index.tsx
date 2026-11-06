@@ -1,6 +1,6 @@
 import React, { useEffect } from "react"
 import styled from "styled-components"
-import { TextField, Button, Modal, Box, Fade } from "@material-ui/core"
+import { TextField, Button, Modal, Box, Fade } from "@mui/material"
 import { useDispatch } from "react-redux"
 import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import {

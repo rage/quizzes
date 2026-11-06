@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from "react"
-import { Button, Typography, Snackbar, Slide } from "@material-ui/core"
+import { Button, Typography, Snackbar } from "@mui/material"
 import styled from "styled-components"
 import { Answer } from "../../../types/Answer"
 import {
   changeAnswerStatus,
   logSuspectedPlagiarism,
 } from "../../../services/quizzes"
-import { Alert } from "@material-ui/lab"
-import { TransitionProps } from "@material-ui/core/transitions"
+import { Alert } from "@mui/material"
+import { SlideDown } from "../../Shared/SlideDown"
 import { ButtonFieldWrapper } from "../../Shared/ButtonFieldWrapper"
 import {
   setHandledAnswers,
@@ -72,9 +72,7 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
         autoHideDuration={5000}
         onClose={() => setShowSnacks(false)}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        TransitionComponent={(props: TransitionProps) => {
-          return <Slide {...props} direction="down" />
-        }}
+        slots={{ transition: SlideDown }}
       >
         <Alert severity={success ? "success" : "error"}>
           {success ? (

@@ -29,7 +29,7 @@ export const authenticate = async (
   try {
     return await tmcClient.authenticate(credentials)
   } catch (e) {
-    return e
+    return e as TMCProfile
   }
 }
 
@@ -43,5 +43,3 @@ export const checkStore = ():
   const res = tmcClient.getUser()
   return res
 }
-
-export default { getProfile, authenticate, checkStore, unauthenticate }

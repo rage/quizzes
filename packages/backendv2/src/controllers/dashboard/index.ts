@@ -1,4 +1,4 @@
-import Router from "koa-router"
+import Router from "@koa/router"
 import { CustomContext, CustomState } from "../../types"
 import answersRoutes from "./routes/answersRoutes"
 import quizzesRoutes from "./routes/quizzesRoutes"

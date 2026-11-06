@@ -44,7 +44,7 @@ describe("Deleting multiple of users answers", () => {
           .andWhere("quiz_id", "f98cd4b0-41b1-4a15-89a2-4c991ec67264")
       )[0]
 
-      expect(deletedQuizAnswer.deleted).toEqual(true)
+      expect(deletedQuizAnswer?.deleted).toEqual(true)
       expect(userQuizState.pointsAwarded).toEqual(2.25)
       expect(userQuizState.status).toEqual("open")
       expect(userQuizState.tries).toEqual(2)
@@ -71,7 +71,7 @@ describe("Deleting multiple of users answers", () => {
           .andWhere("quiz_id", "f98cd4b0-41b1-4a15-89a2-4c991ec67264")
       )[0]
 
-      expect(deletedQuizAnswer.deleted).toEqual(true)
+      expect(deletedQuizAnswer?.deleted).toEqual(true)
       expect(userQuizState.pointsAwarded).toEqual(1.5)
       expect(userQuizState.status).toEqual("open")
       expect(userQuizState.tries).toEqual(1)
@@ -98,7 +98,7 @@ describe("Deleting multiple of users answers", () => {
           .andWhere("quiz_id", "f98cd4b0-41b1-4a15-89a2-4c991ec67264")
       )[0]
 
-      expect(deletedQuizAnswer.deleted).toEqual(true)
+      expect(deletedQuizAnswer?.deleted).toEqual(true)
       expect(userQuizState.pointsAwarded).toEqual(0)
       expect(userQuizState.status).toEqual("open")
       expect(userQuizState.tries).toEqual(0)
@@ -147,5 +147,6 @@ const userSetup = () => {
           } as UserInfo,
         ]
       }
+      return [401]
     })
 }

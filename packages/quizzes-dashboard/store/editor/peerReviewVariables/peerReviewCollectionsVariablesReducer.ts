@@ -4,7 +4,7 @@ import {
   peerReviewVariables as peerReviewCollectionVariables,
 } from "../../../types/NormalizedQuiz"
 import { initializedEditor } from "../editorActions"
-import produce from "immer"
+import { produce } from "immer"
 import { createdNewPeerReviewQuestion } from "../questions/questionActions"
 import { createdNewPeerReview as createdNewPeerReviewCollection } from "../peerReviewCollections/peerReviewCollectionActions"
 

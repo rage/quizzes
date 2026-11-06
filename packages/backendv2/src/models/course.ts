@@ -1,7 +1,7 @@
-import Knex from "knex"
-import { v4 } from "uuid"
+import type { Knex } from "knex"
+import { randomUUID } from "crypto"
 import { BadRequestError, NotFoundError } from "./../util/error"
-import stringify from "csv-stringify"
+import { stringify } from "csv-stringify"
 import Quiz from "./quiz"
 import Language from "./language"
 import CourseTranslation from "./course_translation"
@@ -64,7 +64,7 @@ class Course extends BaseModel {
     course.title = texts.title
     course.body = texts.body
     course.abbreviation = texts.abbreviation
-    delete course.texts
+    delete (course as Partial<Course>).texts
     return course
   }
 
@@ -136,7 +136,7 @@ class Course extends BaseModel {
       throw new BadRequestError(`Invalid language id provided: ${language_id}`)
     }
 
-    const newCourseId = v4()
+    const newCourseId = randomUUID()
 
     await knex
       .transaction(async trx => {
@@ -405,6 +405,9 @@ class Course extends BaseModel {
       throw new Error("invalid status")
     }
     const course = await Course.query().findById(courseId)
+    if (!course) {
+      throw new NotFoundError(`course not found: ${courseId}`)
+    }
     return course.$query().patchAndFetch({ status: newStatus })
   }
 

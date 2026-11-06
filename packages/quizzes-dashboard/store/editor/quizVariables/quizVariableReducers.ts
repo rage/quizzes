@@ -1,6 +1,6 @@
 import { createReducer } from "typesafe-actions"
 import { QuizVariables, action } from "../../../types/NormalizedQuiz"
-import produce from "immer"
+import { produce } from "immer"
 import {
   initializedEditor,
   createdNewItem,
@@ -26,9 +26,7 @@ export const quizVariableReducers = createReducer<
 
       let withOffset = ""
       if (deadline) {
-        withOffset = DateTime.fromISO(deadline)
-          .toLocal()
-          .toISO()
+        withOffset = DateTime.fromISO(deadline).toLocal().toISO() ?? ""
       }
       draftState[action.payload.normalizedQuiz.result] = {
         initialState: init,
@@ -101,26 +99,15 @@ export const quizVariableReducers = createReducer<
 
   .handleAction(editedQuizzesDeadline, (state, action) => {
     return produce(state, draftState => {
-      if (!action.payload.deadline) {
-        draftState[action.payload.id].validDeadline = true
-        draftState[action.payload.id].deadline = ""
-      }
-      if (action.payload.deadline !== null) {
-        if (DateTime.fromISO(action.payload.deadline.toISOString()).isValid) {
-          draftState[action.payload.id].validDeadline = true
-          draftState[action.payload.id].deadline = DateTime.fromISO(
-            action.payload.deadline.toISOString(),
-          )
-            .toLocal()
-            .toISO()
-        } else {
-          draftState[action.payload.id].validDeadline = false
-          draftState[action.payload.id].deadline = draftState[
-            action.payload.id
-          ].deadline = DateTime.fromISO(action.payload.deadline.toISOString())
-            .toLocal()
-            .toISO()
-        }
+      const { deadline, id } = action.payload
+      if (!deadline) {
+        draftState[id].validDeadline = true
+        draftState[id].deadline = ""
+      } else if (deadline.isValid) {
+        draftState[id].validDeadline = true
+        draftState[id].deadline = deadline.toLocal().toISO() ?? ""
+      } else {
+        draftState[id].validDeadline = false
       }
     })
   })

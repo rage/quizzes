@@ -1,4 +1,4 @@
-import Knex from "knex"
+import type { Knex } from "knex"
 import { ProgressMessage, QuizAnswerMessage, QuizMessage } from "../types"
 import BaseModel from "./base_model"
 

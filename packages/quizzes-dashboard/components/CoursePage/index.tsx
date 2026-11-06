@@ -5,9 +5,9 @@ import {
   getUserAbilitiesForCourse,
 } from "../../services/quizzes"
 import Head from "next/head"
-import usePromise from "react-use-promise"
+import useSWR from "swr"
 import { groupBy, Dictionary } from "lodash"
-import { Typography, Button } from "@material-ui/core"
+import { Typography, Button } from "@mui/material"
 import DebugDialog from "../DebugDialog"
 import Link from "next/link"
 import styled from "styled-components"
@@ -27,7 +27,10 @@ const CourseTitleWrapper = styled.div`
   }
 `
 
-const StyledButton = styled(Button)`
+const StyledButton = styled(Button)<{
+  component: React.ElementType
+  href: string
+}>`
   max-height: 3rem;
   @media only screen and (max-width: 535px) {
     align-self: flex-end !important;
@@ -39,14 +42,17 @@ const POINT_COLOR = "#505050"
 export const CoursePage = () => {
   const router = useRouter()
   const id = router.query.courseId?.toString() ?? ""
-  const [data, error] = usePromise(() => fetchCourseQuizzes(id), [id])
-  const [answersRequiringAttention, answersError] = usePromise(
-    () => getAnswersRequiringAttentionCounts(id),
-    [id],
+  const { data, error } = useSWR(
+    id ? ["courseQuizzes", id] : null,
+    ([, courseId]) => fetchCourseQuizzes(courseId),
   )
-  const [userAbilities, userError] = usePromise(
-    () => getUserAbilitiesForCourse(id),
-    [id],
+  const { data: answersRequiringAttention, error: answersError } = useSWR(
+    id ? ["answersRequiringAttentionCounts", id] : null,
+    ([, courseId]) => getAnswersRequiringAttentionCounts(courseId),
+  )
+  const { data: userAbilities, error: userError } = useSWR(
+    id ? ["userAbilitiesForCourse", id] : null,
+    ([, courseId]) => getUserAbilitiesForCourse(courseId),
   )
 
   useBreadcrumbs([
@@ -125,11 +131,13 @@ export const CoursePage = () => {
           </Typography>
         </Typography>
 
-        <Link href={`/courses/${id}/quizzes/new`}>
-          <StyledButton variant="outlined">
-            <Typography variant="overline">Add New Quiz</Typography>
-          </StyledButton>
-        </Link>
+        <StyledButton
+          variant="outlined"
+          component={Link}
+          href={`/courses/${id}/quizzes/new`}
+        >
+          <Typography variant="overline">Add New Quiz</Typography>
+        </StyledButton>
       </CourseTitleWrapper>
       {Object.entries(byPartAndSection)
         .sort((a, b) => {

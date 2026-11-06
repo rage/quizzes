@@ -1,7 +1,7 @@
 import React from "react"
 import { useTypedSelector } from "../../../store/store"
 import { PeerReviewEditor } from "./PeerReviewEditor"
-import { Typography, Button } from "@material-ui/core"
+import { Typography, Button } from "@mui/material"
 import styled from "styled-components"
 import { useDispatch } from "react-redux"
 import {

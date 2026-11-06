@@ -1,4 +1,4 @@
-import { Button, TextField, Typography } from "@material-ui/core"
+import { Button, TextField, Typography } from "@mui/material"
 import React, { useState } from "react"
 import styled from "styled-components"
 
@@ -73,7 +73,7 @@ const AnswerSearchForm = (props: IFormProps) => {
           <TextField
             label="Phrase"
             multiline
-            rowsMax={8}
+            maxRows={8}
             value={searchQuery}
             onChange={event => setSearchQuery(event.target.value)}
             variant="outlined"

@@ -8,7 +8,7 @@ import {
   createdNewOption,
   createdNewQuiz,
 } from "../editorActions"
-import produce from "immer"
+import { produce } from "immer"
 import _ from "lodash"
 import {
   setAdvancedEditing,

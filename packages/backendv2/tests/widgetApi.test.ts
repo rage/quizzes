@@ -1,5 +1,5 @@
 import request from "supertest"
-import { v4 as uuidv4 } from "uuid"
+import { randomUUID } from "crypto"
 import nock from "nock"
 import app from "../app"
 import knex from "../database/knex"
@@ -56,11 +56,12 @@ describe("widget: save quiz answer", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
-  test("no answer past deadline", async done => {
-    request(app.callback())
+  test("no answer past deadline", async () => {
+    await request(app.callback())
       .post("/api/v2/widget/answer")
       .set("Authorization", `bearer 1234`)
       .set("Accept", "application/json")
@@ -69,11 +70,10 @@ describe("widget: save quiz answer", () => {
       .expect(response =>
         expect(response.body.message).toMatch("no submission past deadline"),
       )
-      .end(done)
   })
 
-  test("no answers exceeding number of tries", async done => {
-    request(app.callback())
+  test("no answers exceeding number of tries", async () => {
+    await request(app.callback())
       .post("/api/v2/widget/answer")
       .set("Authorization", `bearer 1234`)
       .set("Accept", "application/json")
@@ -82,13 +82,14 @@ describe("widget: save quiz answer", () => {
       .expect(response =>
         expect(response.body.message).toMatch("already answered"),
       )
-      .end(done)
   })
 
-  test("no answers without item answers", async done => {
-    const quizAnswer = { ...input.quizAnswerOpen }
+  test("no answers without item answers", async () => {
+    const quizAnswer: Partial<typeof input.quizAnswerOpen> = {
+      ...input.quizAnswerOpen,
+    }
     delete quizAnswer.itemAnswers
-    request(app.callback())
+    await request(app.callback())
       .post("/api/v2/widget/answer")
       .set("Authorization", `bearer 4321`)
       .set("Accept", "application/json")
@@ -97,17 +98,15 @@ describe("widget: save quiz answer", () => {
       .expect(response =>
         expect(response.body.message).toMatch("item answers missing"),
       )
-      .end(done)
   })
 
-  test("save", async done => {
-    request(app.callback())
+  test("save", async () => {
+    await request(app.callback())
       .post("/api/v2/widget/answer")
       .set("Authorization", `bearer 1234`)
       .set("Accept", "application/json")
       .send(input.quizAnswerOpen)
       .expect(200)
-      .end(done)
   })
 })
 
@@ -152,11 +151,12 @@ describe("widget: quiz answers marked as deleted", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
-  test("should throw when submitted", async done => {
-    request(app.callback())
+  test("should throw when submitted", async () => {
+    await request(app.callback())
       .post("/api/v2/widget/answer")
       .set("Authorization", `bearer 4321`)
       .set("Accept", "application/json")
@@ -181,15 +181,14 @@ describe("widget: quiz answers marked as deleted", () => {
           `A new answer cannot be marked as deleted.`,
         )
       })
-      .end(done)
   })
 
-  test("should not be returned when fetched", async done => {
+  test("should not be returned when fetched", async () => {
     await QuizAnswer.query().patchAndFetchById(
       "ae29c3be-b5b6-4901-8588-5b0e88774748",
       { deleted: true },
     )
-    request(app.callback())
+    await request(app.callback())
       .get("/api/v2/widget/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
       .set("Authorization", "bearer 2345")
       .set("Accept", "application/json")
@@ -197,7 +196,6 @@ describe("widget: quiz answers marked as deleted", () => {
         expect(res.body.quizAnswer).toBeNull()
       })
       .expect(200)
-      .end(done)
   })
 })
 
@@ -233,6 +231,7 @@ describe("widget: a fetch for peer reviews for some quiz answer...", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -297,6 +296,7 @@ describe("on a valid request", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
   test("returns an empty array if no peer reviews received", done => {
@@ -387,6 +387,7 @@ describe("widget: submitting a peer review", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -402,7 +403,7 @@ describe("widget: submitting a peer review", () => {
   })
 
   test("responds with 404 if invalid answer id", done => {
-    const randomUuid = uuidv4()
+    const randomUuid = randomUUID()
     request(app.callback())
       .post("/api/v2/widget/answers/give-review")
       .set("Authorization", `bearer PLEB_TOKEN`)
@@ -531,6 +532,7 @@ describe("widget: fetching quiz info", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -627,6 +629,7 @@ describe("widget: fetching peer review candidates", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -746,6 +749,7 @@ describe("Answer: spam flags", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 

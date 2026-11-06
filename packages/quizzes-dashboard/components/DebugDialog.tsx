@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Button, Dialog, Typography } from "@material-ui/core"
+import { Button, Dialog, Typography } from "@mui/material"
 import styled from "styled-components"
 import { useDispatch } from "react-redux"
 import EditableDebugField from "./EditableDebugField"
@@ -28,7 +28,7 @@ const ContentWrapper = styled.div`
 `
 
 interface DebugDialogProps {
-  object?: Object
+  object?: object
 }
 
 export const DebugDialog = ({ object }: DebugDialogProps) => {
@@ -39,15 +39,9 @@ export const DebugDialog = ({ object }: DebugDialogProps) => {
   const quizId = useTypedSelector(state => state.editor.quizId)
   const { quiz } = useQuiz(quizId, `quiz-${quizId}`)
 
-  let data: Object | Quiz
-
-  if (object) {
-    data = object
-  } else {
-    const quizId = useTypedSelector(state => state.editor.quizId)
-    const quiz = useTypedSelector(state => state.editor)
-    data = denormalize(quizId, normalizedQuiz, quiz)
-  }
+  const editor = useTypedSelector(state => state.editor)
+  const data: object | Quiz =
+    object ?? denormalize(quizId, normalizedQuiz, editor)
 
   const [debugOpen, setDebugOpen] = useState(false)
   const content = JSON.stringify(data, undefined, 2)
