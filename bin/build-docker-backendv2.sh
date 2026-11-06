@@ -13,8 +13,6 @@ fi
 
 TAG="eu.gcr.io/moocfi/quizzes-backendv2:build-$REV"
 echo Building "$TAG"
-cd packages/backendv2
-docker build . -t "$TAG" --build-arg=GIT_COMMIT="$(git rev-parse --short HEAD)"
-cd ../..
+docker build . -f packages/backendv2/Dockerfile -t "$TAG" --build-arg=GIT_COMMIT="$(git rev-parse --short HEAD)"
 
 echo "Successfully built image: $TAG"

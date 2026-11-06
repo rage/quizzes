@@ -1,16 +1,31 @@
-FROM node:12.8.1-alpine
+# Build context is the repository root (see bin/build-docker-dashboardv2.sh): the pnpm workspace
+# files and lockfile live there.
+FROM node:26.13.0-alpine
 
-COPY --chown=node package.json package-lock.json /app/
+RUN mkdir -p /app && chown -R node /app
+
+COPY package.json /tmp/package.json
+RUN npm install -g --no-update-notifier \
+      "$(node -p 'require("/tmp/package.json").packageManager')" \
+    && rm /tmp/package.json
 
 USER node
+
 WORKDIR /app
 
-RUN npm ci
+COPY --chown=node package.json pnpm-lock.yaml pnpm-workspace.yaml /app/
+COPY --chown=node packages/quizzes-dashboard/package.json /app/packages/quizzes-dashboard/
 
-COPY --chown=node . /app
+RUN pnpm install --frozen-lockfile --filter ./packages/quizzes-dashboard
 
-RUN npm run build
+COPY --chown=node packages/quizzes-dashboard /app/packages/quizzes-dashboard
+
+WORKDIR /app/packages/quizzes-dashboard
+
+RUN pnpm run build
+
+ENV NODE_ENV=production
 
 EXPOSE 5000
 
-CMD [ "npm", "run", "start" ]
+CMD [ "node", "node_modules/next/dist/bin/next", "start", "-p", "5000" ]

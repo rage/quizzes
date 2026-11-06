@@ -1,13 +1,7 @@
-const withPlugins = require("next-compose-plugins")
-
-const withCSS = require("@zeit/next-css")
-
 require("dotenv").config()
 
-const nextConfiguration = {
+module.exports = {
   env: {
     TOKEN: process.env.TOKEN,
   },
 }
-
-module.exports = withPlugins([withCSS], nextConfiguration)

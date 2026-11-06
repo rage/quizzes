@@ -4,8 +4,8 @@ services:
   backend:
     restart: always 
     build: 
-      context: ./packages/backendv2
-      dockerfile: development.Dockerfile
+      context: .
+      dockerfile: packages/backendv2/development.Dockerfile
     ports:
       - 3003:3003
     depends_on:
@@ -31,8 +31,8 @@ services:
   dashboard:
     restart: always
     build: 
-      context: ./packages/quizzes-dashboard
-      dockerfile: development.Dockerfile
+      context: .
+      dockerfile: packages/quizzes-dashboard/development.Dockerfile
     depends_on:
       - backend
     ports:

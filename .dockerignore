@@ -4,5 +4,9 @@
 *Dockerfile*
 *docker-compose*
 **/node_modules
-node_modules
+**/.env
+**/.next
+**/build
+**/dist
 *secret.yaml
+packages/moocfi-quizzes

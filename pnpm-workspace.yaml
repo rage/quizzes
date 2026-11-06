@@ -1,0 +1,87 @@
+packages:
+  - packages/backendv2
+  - packages/quizzes-dashboard
+
+engineStrict: true
+
+linkWorkspacePackages: true
+
+pmOnFail: download
+
+minimumReleaseAge: 10080
+minimumReleaseAgeIgnoreMissingTime: false
+minimumReleaseAgeExcludePrune: true
+
+nodeVersion: 26.13.0
+
+preferFrozenLockfile: true
+
+preferWorkspacePackages: true
+
+registrySupportsTimeField: false
+
+resolutionMode: time-based
+
+saveWorkspaceProtocol: rolling
+
+strictDepBuilds: true
+
+permissions:
+  "@newrelic/fn-inspect":
+    build: false
+  "@newrelic/native-metrics":
+    build: false
+  "@parcel/watcher":
+    build: false
+  node-rdkafka:
+    build: true
+  protobufjs:
+    build: false
+  unrs-resolver:
+    build: true
+
+trustLockfile: true
+
+updateNotifier: false
+
+minimumReleaseAgeExclude:
+  # TypeScript 7.0 GA + the v6 API compat package, published at GA and newer than the 7-day gate.
+  # typescript@7 lists all 20 platform binary packages as deps, so exempt them all.
+  - "typescript@7.0.2"
+  - "@typescript/typescript-*"
+  - "@typescript/typescript6@6.0.2"
+  # 16.4.0–16.4.4 have open security advisories.
+  - "next@16.4.5"
+  - "@next/env@16.4.5"
+  - "@next/swc-darwin-arm64@16.4.5"
+  - "@next/swc-darwin-x64@16.4.5"
+  - "@next/swc-linux-arm64-gnu@16.4.5"
+  - "@next/swc-linux-arm64-musl@16.4.5"
+  - "@next/swc-linux-x64-gnu@16.4.5"
+  - "@next/swc-linux-x64-musl@16.4.5"
+  - "@next/swc-win32-arm64-msvc@16.4.5"
+  - "@next/swc-win32-x64-msvc@16.4.5"
+
+packageExtensions:
+  # Its install script calls node-gyp from PATH, which pnpm no longer bundles.
+  node-rdkafka:
+    dependencies:
+      node-gyp: "^13.1.0"
+
+# Docker images install one workspace with --filter, so nothing hoisted from another workspace is
+# there; without hoisting, undeclared dependencies fail locally too.
+hoistPattern: []
+# Typings of next etc. import "react" without a peer on @types/react; TypeScript
+# finds it only by walking up to the root node_modules.
+publicHoistPattern:
+  - "@types/react"
+  - "@types/react-dom"
+
+autoDedupe: true
+
+lockfile:
+  includeResolutionSettings: true
+overrides:
+  dompurify@<=3.4.16: ^3.4.17
+  glob@>=9.0.0 <=14.0.1: ^14.0.2
+  minimatch@>=7.0.0 <11.0.1: ^11.0.1

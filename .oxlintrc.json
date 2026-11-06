@@ -1,0 +1,94 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["typescript", "react", "import", "nextjs"],
+  "categories": {
+    "correctness": "off"
+  },
+  "env": {
+    "builtin": true,
+    "es2018": true,
+    "browser": true,
+    "node": true
+  },
+  "settings": {
+    "next": {
+      "rootDir": "packages/quizzes-dashboard"
+    }
+  },
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/.next/**",
+    "**/coverage/**",
+    "packages/moocfi-quizzes/**"
+  ],
+  "rules": {
+    "typescript/ban-ts-comment": [
+      "error",
+      {
+        "ts-ignore": "allow-with-description",
+        "ts-expect-error": "allow-with-description",
+        "ts-nocheck": "allow-with-description",
+        "ts-check": false
+      }
+    ],
+    "typescript/no-array-constructor": "error",
+    "typescript/no-duplicate-enum-values": "error",
+    "typescript/no-empty-object-type": "error",
+    "typescript/no-extra-non-null-assertion": "error",
+    "typescript/no-misused-new": "error",
+    "typescript/no-namespace": "error",
+    "typescript/no-non-null-asserted-nullish-coalescing": "error",
+    "typescript/no-non-null-asserted-optional-chain": "error",
+    "typescript/no-this-alias": "error",
+    "typescript/no-unnecessary-type-constraint": "error",
+    "typescript/no-unsafe-declaration-merging": "error",
+    "typescript/no-unsafe-function-type": "error",
+    "typescript/no-wrapper-object-types": "error",
+    "typescript/prefer-as-const": "error",
+    "typescript/triple-slash-reference": "error",
+    "no-loss-of-precision": "error",
+    "no-restricted-imports": [
+      "warn",
+      {
+        "patterns": [
+          {
+            "group": ["@mui/*/*/*"],
+            "message": "Don't use deep @mui imports - prevents module duplication"
+          }
+        ]
+      }
+    ],
+    "no-warning-comments": [
+      "error",
+      {
+        "terms": ["debug", "removeme", "remove-me"],
+        "location": "start"
+      }
+    ],
+    "complexity": "warn",
+    "react/rules-of-hooks": "error",
+    "import/no-anonymous-default-export": "error",
+    "nextjs/google-font-display": "warn",
+    "nextjs/google-font-preconnect": "warn",
+    "nextjs/inline-script-id": "error",
+    "nextjs/next-script-for-ga": "warn",
+    "nextjs/no-assign-module-variable": "error",
+    "nextjs/no-async-client-component": "warn",
+    "nextjs/no-before-interactive-script-outside-document": "warn",
+    "nextjs/no-css-tags": "warn",
+    "nextjs/no-document-import-in-page": "error",
+    "nextjs/no-duplicate-head": "error",
+    "nextjs/no-head-element": "warn",
+    "nextjs/no-head-import-in-document": "error",
+    "nextjs/no-html-link-for-pages": "error",
+    "nextjs/no-img-element": "warn",
+    "nextjs/no-page-custom-font": "warn",
+    "nextjs/no-script-component-in-head": "error",
+    "nextjs/no-styled-jsx-in-document": "warn",
+    "nextjs/no-sync-scripts": "error",
+    "nextjs/no-title-in-document-head": "warn",
+    "nextjs/no-typos": "warn",
+    "nextjs/no-unwanted-polyfillio": "warn"
+  }
+}

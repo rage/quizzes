@@ -1,17 +1,30 @@
 version: 2.1
 
+commands:
+  install_pnpm:
+    steps:
+      - run:
+          name: "Install pnpm"
+          command: |
+            PNPM_SPEC=$(node -p 'require(process.argv[1]).packageManager' "$(git rev-parse --show-toplevel)/package.json")
+            cd /tmp && sudo npm install -g --no-update-notifier "$PNPM_SPEC"
+
 jobs:
   code_style:
     docker:
-      - image: circleci/node:12
+      - image: cimg/node:26.13.0
     steps:
       - checkout
+      - install_pnpm
       - run:
           name: "Install dependencies"
-          command: "npm ci"
+          command: pnpm install --frozen-lockfile
       - run:
           name: "Check code style"
-          command: "bin/check-code-style.sh"
+          command: pnpm run format:check
+      - run:
+          name: "Lint"
+          command: pnpm run lint:ci
 
   build_dashboardv2:
     docker:
@@ -48,7 +61,7 @@ jobs:
 
   test_backend_v2:
     docker:
-      - image: circleci/node:11
+      - image: cimg/node:26.13.0
       - image: circleci/postgres:9.6-alpine
         environment:
           POSTGRES_USER: postgres
@@ -58,6 +71,7 @@ jobs:
 
     steps:
       - checkout
+      - install_pnpm
       - run:
           name: "Waiting for Postgres to be ready"
           command: |
@@ -80,10 +94,10 @@ jobs:
             echo Failed waiting for Redis && exit 1
       - run:
           name: "install dependencies"
-          command: cd packages/backendv2 && npm ci
+          command: pnpm install --frozen-lockfile --filter ./packages/backendv2
       - run:
           name: "run migrations"
-          command: cd packages/backendv2 && export NODE_ENV=test && npx knex migrate:latest
+          command: cd packages/backendv2 && export NODE_ENV=test && pnpm exec knex migrate:latest
       - run:
           name: install dockerize
           command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
@@ -97,7 +111,7 @@ jobs:
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
           name: "run tests"
-          command: "cd packages/backendv2 && npm run test -- --coverage"
+          command: "cd packages/backendv2 && pnpm run test --coverage"
           environment:
             REDIS_HOST: localhost
             REDIS_PORT: 6379

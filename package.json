@@ -1,18 +1,31 @@
 {
   "name": "quizzes",
-  "license": "Apache-2.0 OR MIT",
   "private": true,
+  "license": "Apache-2.0 OR MIT",
+  "type": "module",
   "scripts": {
-    "prettier": "prettier --write \"packages/**/*.js\" \"packages/**/*.ts\" \"packages/**/*.jsx\" \"packages/**/*.tsx\"",
-    "prettier-check": "prettier  --list-different \"packages/**/*.js\" \"packages/**/*.ts\" \"packages/**/*.jsx\" \"packages/**/*.tsx\""
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "lint": "oxlint --fix",
+    "lint:ci": "oxlint",
+    "prepare": "husky",
+    "typecheck": "pnpm -r --no-bail run typecheck"
   },
   "devDependencies": {
-    "husky": "^4.2.5",
-    "prettier": "^1.13.6"
+    "@types/node": "^26.6.6",
+    "@typescript/native": "npm:typescript@^7.0.2",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
+    "oxfmt": "0.75.0",
+    "oxlint": "1.90.0",
+    "typescript": "npm:@typescript/typescript6@^6.0.2"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "./bin/check-code-style.sh"
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": "26.13.0",
+      "onFail": "error"
     }
-  }
+  },
+  "packageManager": "pnpm@12.17.0"
 }
