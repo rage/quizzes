@@ -62,7 +62,7 @@ export const useSearchResultsAllAnswers = (
   const searchQueryProvided = !isEmpty(searchQuery)
 
   const { data, error } = useSWR(
-    searchQuery
+    quizId && searchQuery
       ? [
           "searchResultsAllAnswers",
           quizId,
@@ -95,7 +95,7 @@ export const useSearchResultsRequiringAttention = (
   const searchQueryProvided = !isEmpty(searchQuery)
 
   const { data, error } = useSWR(
-    searchQuery
+    quizId && searchQuery
       ? [
           "searchResultsRequiringAttention",
           quizId,

@@ -22,13 +22,15 @@ const NewQuiz = () => {
     ([, id]) => fetchCourseById(id),
   )
   useEffect(() => {
-    dispatch(createdNewQuiz(courseId))
-  }, [])
+    if (courseId) {
+      dispatch(createdNewQuiz(courseId))
+    }
+  }, [courseId])
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
       label: `${course ? course.title : ""}`,
-      as: `/courses/${courseId}/listing`,
+      as: courseId ? `/courses/${courseId}/listing` : undefined,
       href: "/courses/[courseId]/[...page]",
     },
     { label: "New Quiz" },

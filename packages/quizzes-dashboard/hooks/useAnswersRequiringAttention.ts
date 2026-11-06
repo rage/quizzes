@@ -13,7 +13,7 @@ export const useAnswersRequiringAttentionCount = (
   token: string,
 ) => {
   const { data, error } = useSWR(
-    ["answersRequiringAttentionCount", quizId, token],
+    quizId ? ["answersRequiringAttentionCount", quizId, token] : null,
     countFetcher,
   )
 
@@ -42,14 +42,16 @@ export const useRequiringAttention = (
   token: string,
 ) => {
   const { data, error } = useSWR(
-    [
-      "answersRequiringAttention",
-      quizId,
-      currentPage,
-      answersDisplayed,
-      sortOrder,
-      token,
-    ],
+    quizId
+      ? [
+          "answersRequiringAttention",
+          quizId,
+          currentPage,
+          answersDisplayed,
+          sortOrder,
+          token,
+        ]
+      : null,
     answerFetcher,
   )
 

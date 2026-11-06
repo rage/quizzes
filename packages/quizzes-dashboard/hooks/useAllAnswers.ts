@@ -43,17 +43,19 @@ export const useAllAnswers = (
   token: string,
 ) => {
   const { data, error } = useSWR(
-    [
-      "allAnswers",
-      quizId,
-      currentPage,
-      answersDisplayed,
-      sortOrder,
-      filterParameters,
-      deleted,
-      notDeleted,
-      token,
-    ],
+    quizId
+      ? [
+          "allAnswers",
+          quizId,
+          currentPage,
+          answersDisplayed,
+          sortOrder,
+          filterParameters,
+          deleted,
+          notDeleted,
+          token,
+        ]
+      : null,
     fetcher,
   )
 
