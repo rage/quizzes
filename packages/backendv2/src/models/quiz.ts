@@ -252,6 +252,11 @@ export class Quiz extends BaseModel {
           peerReviewCollection.where("deleted", false)
         })
         .where("quiz.id", quizId)
+        .orderBy([
+          "items.order",
+          "items:options.order",
+          "peerReviewCollections:questions.order",
+        ])
     )[0]
 
     if (!quiz) {

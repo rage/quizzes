@@ -135,8 +135,8 @@ describe("Soft delete quiz item options", () => {
 
   it("Soft deletes quiz item option", async () => {
     const quiz = await Quiz.getById("4bf4cf2f-3058-4311-8d16-26d781261af7")
-    const quizOptionId = quiz.items[1].options[0].id
-    quiz.items[1].options.shift()
+    const quizOptionId = quiz.items[0].options[0].id
+    quiz.items[0].options.shift()
     const res = await request(app.callback())
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer admin_token`)
