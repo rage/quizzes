@@ -67,26 +67,22 @@ export const itemVariableReducers = createReducer<
 
   .handleAction(setScaleMax, (state, action) => {
     return produce(state, (draftState) => {
-      draftState[action.payload.itemId].scaleMax = action.payload.newValue
-      draftState[action.payload.itemId].validMax = action.payload.valid
-      if (action.payload.valid) {
-        draftState[action.payload.itemId].array = _.range(
-          state[action.payload.itemId].scaleMin ?? 0,
-          action.payload.newValue + 1,
-        )
+      const variables = draftState[action.payload.itemId]
+      variables.scaleMax = action.payload.newValue
+      variables.validMax = action.payload.valid
+      if (variables.validMin && variables.validMax) {
+        variables.array = _.range(variables.scaleMin, variables.scaleMax + 1)
       }
     })
   })
 
   .handleAction(setScaleMin, (state, action) => {
     return produce(state, (draftState) => {
-      draftState[action.payload.itemId].scaleMin = action.payload.newValue
-      draftState[action.payload.itemId].validMin = action.payload.valid
-      if (action.payload.valid) {
-        draftState[action.payload.itemId].array = _.range(
-          action.payload.newValue,
-          (state[action.payload.itemId].scaleMax ?? 0) + 1,
-        )
+      const variables = draftState[action.payload.itemId]
+      variables.scaleMin = action.payload.newValue
+      variables.validMin = action.payload.valid
+      if (variables.validMin && variables.validMax) {
+        variables.array = _.range(variables.scaleMin, variables.scaleMax + 1)
       }
     })
   })

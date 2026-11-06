@@ -11,19 +11,10 @@ import {
   FormControlLabel,
 } from "@mui/material"
 
-import {
-  editedQuizItemTitle,
-  editedScaleMinLabel,
-  editedScaleMaxLabel,
-  editedScaleMaxValue,
-  editedScaleMinValue,
-} from "../../../../store/editor/items/itemAction"
-import {
-  setScaleMin,
-  setScaleMax,
-} from "../../../../store/editor/itemVariables/itemVariableActions"
+import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
 import { useTypedSelector } from "../../../../store/store"
 import { NormalizedItem } from "../../../../types/NormalizedQuiz"
+import { useScaleRange } from "./useScaleRange"
 
 const ModalContent = styled.div`
   padding: 1rem;
@@ -71,23 +62,7 @@ export const ScaleModalContent = ({ item }: ScaleItemEditorModalProps) => {
     (state) => state.editor.itemVariables[item.id],
   )
 
-  const handleMinValueChange = (value: number) => {
-    if (value >= 0 && value < variables.scaleMax) {
-      dispatch(setScaleMin(storeItem.id, value, true))
-      dispatch(editedScaleMinValue(storeItem.id, value))
-    } else {
-      dispatch(setScaleMin(storeItem.id, value, false))
-    }
-  }
-
-  const handleMaxValueChange = (value: number) => {
-    if (value >= 0 && value > variables.scaleMin && value < 11) {
-      dispatch(setScaleMax(storeItem.id, value, true))
-      dispatch(editedScaleMaxValue(storeItem.id, value))
-    } else {
-      dispatch(setScaleMax(storeItem.id, value, false))
-    }
-  }
+  const { onMinChange, onMaxChange } = useScaleRange(item.id)
 
   return (
     <>
@@ -115,7 +90,7 @@ export const ScaleModalContent = ({ item }: ScaleItemEditorModalProps) => {
           value={variables.scaleMin ?? ""}
           fullWidth
           variant="outlined"
-          onChange={(event) => handleMinValueChange(Number(event.target.value))}
+          onChange={(event) => onMinChange(Number(event.target.value))}
         />
       </ModalContent>
       <ModalContent>
@@ -127,7 +102,7 @@ export const ScaleModalContent = ({ item }: ScaleItemEditorModalProps) => {
           value={variables.scaleMax ?? ""}
           fullWidth
           variant="outlined"
-          onChange={(event) => handleMaxValueChange(Number(event.target.value))}
+          onChange={(event) => onMaxChange(Number(event.target.value))}
         />
       </ModalContent>
       <PreviewModalContainer>

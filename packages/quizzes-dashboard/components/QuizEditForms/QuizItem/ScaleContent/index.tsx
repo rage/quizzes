@@ -21,20 +21,13 @@ import {
 } from "@mui/material"
 
 import { deletedItem } from "../../../../store/editor/editorActions"
-import {
-  editedQuizItemTitle,
-  editedScaleMinValue,
-  editedScaleMaxValue,
-} from "../../../../store/editor/items/itemAction"
-import {
-  setScaleMin,
-  setScaleMax,
-  setAdvancedEditing,
-} from "../../../../store/editor/itemVariables/itemVariableActions"
+import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
+import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
 import { useTypedSelector } from "../../../../store/store"
 import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import MarkdownEditor from "../../../MarkdownEditor"
 import ScaleModalContent from "./ScaleModalContent"
+import { useScaleRange } from "./useScaleRange"
 
 const ScaleContainer = styled.div`
   padding-top: 1rem;
@@ -118,24 +111,7 @@ const ScaleContent = ({ item }: scaleContentProps) => {
     (state) => state.editor.itemVariables[item.id],
   )
   const dispatch = useDispatch()
-
-  const handleMinValueChange = (value: number) => {
-    if (value >= 0 && value < variables.scaleMax) {
-      dispatch(setScaleMin(storeItem.id, value, true))
-      dispatch(editedScaleMinValue(storeItem.id, value))
-    } else {
-      dispatch(setScaleMin(storeItem.id, value, false))
-    }
-  }
-
-  const handleMaxValueChange = (value: number) => {
-    if (value >= 0 && value > variables.scaleMin && value < 11) {
-      dispatch(setScaleMax(storeItem.id, value, true))
-      dispatch(editedScaleMaxValue(storeItem.id, value))
-    } else {
-      dispatch(setScaleMax(storeItem.id, value, false))
-    }
-  }
+  const { onMinChange, onMaxChange } = useScaleRange(item.id)
 
   return (
     <>
@@ -208,7 +184,7 @@ const ScaleContent = ({ item }: scaleContentProps) => {
           value={variables.scaleMin ?? ""}
           variant="outlined"
           type="number"
-          onChange={(event) => handleMinValueChange(Number(event.target.value))}
+          onChange={(event) => onMinChange(Number(event.target.value))}
         />
         <MaxField
           error={!variables.validMax}
@@ -217,7 +193,7 @@ const ScaleContent = ({ item }: scaleContentProps) => {
           value={variables.scaleMax ?? ""}
           variant="outlined"
           type="number"
-          onChange={(event) => handleMaxValueChange(Number(event.target.value))}
+          onChange={(event) => onMaxChange(Number(event.target.value))}
         />
       </MinMaxContainer>
     </>
