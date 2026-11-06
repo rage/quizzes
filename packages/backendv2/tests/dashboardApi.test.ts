@@ -644,6 +644,24 @@ describe("dashboard: save quiz", () => {
       })
       .end(done)
   })
+
+  test("update existing quiz item direction", async () => {
+    const quiz = structuredClone(input.quizUpdate)
+    const essay = quiz.items.find((item) => item.type === "essay")!
+    Object.assign(essay, { direction: "column" })
+
+    const response = await request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .send(quiz)
+      .expect(200)
+
+    const savedEssay = response.body.items.find(
+      (item: { id: string }) => item.id === essay.id,
+    )
+    expect(savedEssay.direction).toEqual("column")
+  })
 })
 
 describe("dashboard: get answer by id", () => {
