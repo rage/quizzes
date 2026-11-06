@@ -34,6 +34,44 @@ import {
   editedQuizItemFeedbackDisplayPolicy,
 } from "./itemAction"
 
+type ItemsById = { [itemId: string]: NormalizedItem }
+
+const quizItemsByOrder = (items: ItemsById, quizId: string) =>
+  Object.values(items)
+    .filter((item) => item.quizId === quizId)
+    .sort((a, b) => a.order - b.order)
+
+/** The order for an item appended to the quiz; stored orders may start at 0 or 1. */
+export const nextItemOrder = (items: ItemsById, quizId: string): number => {
+  const orders = quizItemsByOrder(items, quizId).map((item) => item.order)
+  return orders.length > 0 ? Math.max(...orders) + 1 : 0
+}
+
+/**
+ * Moves an item one step (`direction` -1 or 1) among its quiz's items.
+ *
+ * Renumbers the quiz's items consecutively from their lowest order, which also repairs duplicates.
+ */
+export const moveItem = (
+  items: ItemsById,
+  itemId: string,
+  direction: -1 | 1,
+): ItemsById => {
+  const sorted = quizItemsByOrder(items, items[itemId].quizId)
+  const from = sorted.findIndex((item) => item.id === itemId)
+  const to = from + direction
+  if (to < 0 || to >= sorted.length) {
+    return items
+  }
+  const baseOrder = sorted[0].order
+  ;[sorted[from], sorted[to]] = [sorted[to], sorted[from]]
+  return produce(items, (draftItems) => {
+    sorted.forEach((item, index) => {
+      draftItems[item.id].order = baseOrder + index
+    })
+  })
+}
+
 export const itemReducer = createReducer<
   { [itemId: string]: NormalizedItem },
   action
@@ -152,7 +190,7 @@ export const itemReducer = createReducer<
         maxWords: null,
         minWords: null,
         multi: false,
-        order: Object.keys(state).length,
+        order: nextItemOrder(state, action.payload.quizId),
         usesSharedOptionFeedbackMessage: false,
         sharedOptionFeedbackMessage: null,
         options: [],
@@ -219,35 +257,13 @@ export const itemReducer = createReducer<
     return normalized.entities.items ?? {}
   })
 
-  .handleAction(increasedItemOrder, (state, action) => {
-    return produce(state, (draftState) => {
-      const order = draftState[action.payload.itemId].order
-      if (order < Object.keys(state).length - 1) {
-        for (let key in state) {
-          if (state[key].order - 1 === order) {
-            draftState[key].order = state[key].order - 1
-          }
-        }
-        draftState[action.payload.itemId].order =
-          state[action.payload.itemId].order + 1
-      }
-    })
-  })
+  .handleAction(increasedItemOrder, (state, action) =>
+    moveItem(state, action.payload.itemId, 1),
+  )
 
-  .handleAction(decreasedItemOrder, (state, action) => {
-    return produce(state, (draftState) => {
-      const order = draftState[action.payload.itemId].order
-      if (order > 0) {
-        for (let key in state) {
-          if (state[key].order + 1 === order) {
-            draftState[key].order = state[key].order + 1
-          }
-        }
-        draftState[action.payload.itemId].order =
-          state[action.payload.itemId].order - 1
-      }
-    })
-  })
+  .handleAction(decreasedItemOrder, (state, action) =>
+    moveItem(state, action.payload.itemId, -1),
+  )
 
   .handleAction(toggledAllAnswersCorrect, (state, action) => {
     return produce(state, (draftState) => {
