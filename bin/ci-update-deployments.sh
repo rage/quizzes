@@ -30,3 +30,7 @@ echo "Applying changes"
 kubectl replace -f "$CURRENT_DIR/../updated-kubernetes-configs"
 # apply, not replace: this cronjob may not exist in the cluster yet
 envsubst < "$CURRENT_DIR/../kubernetes/course-expired-cronjob.yaml" | kubectl apply -f -
+
+echo "Removing retired backend v1 resources"
+kubectl delete --ignore-not-found deployment quizzes-backend-deployment
+kubectl delete --ignore-not-found service quizzes-backend-service ws
