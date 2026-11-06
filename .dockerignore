@@ -1,12 +1,17 @@
-# add git-ignore syntax here of things you don't want copied into docker image
+*
+!package.json
+!pnpm-lock.yaml
+!pnpm-workspace.yaml
+!packages/backendv2
+!packages/quizzes-dashboard
 
-.git
-*Dockerfile*
-*docker-compose*
 **/node_modules
-**/.env
 **/.next
-**/build
 **/dist
-*secret.yaml
-packages/moocfi-quizzes
+**/build
+**/coverage
+**/.env*
+**/*.log
+**/*.tsbuildinfo
+**/Dockerfile
+**/*.Dockerfile
