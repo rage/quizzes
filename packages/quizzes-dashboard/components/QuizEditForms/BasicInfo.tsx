@@ -127,6 +127,9 @@ const AutoConfirmSwitch = styled.div`
   width: 50%;
 `
 
+const parseDeadline = (deadline: string) =>
+  deadline ? DateTime.fromISO(deadline) : null
+
 const BasicInformation = () => {
   const dispatch = useDispatch()
 
@@ -166,8 +169,15 @@ const BasicInformation = () => {
 
   // Local so that a partially typed (invalid) date isn't overwritten by the store's last valid value
   const [deadline, setDeadline] = useState<DateTime | null>(() =>
-    variables.deadline ? DateTime.fromISO(variables.deadline) : null,
+    parseDeadline(variables.deadline),
   )
+  const [syncedStoreDeadline, setSyncedStoreDeadline] = useState(
+    variables.deadline,
+  )
+  if (variables.deadline !== syncedStoreDeadline) {
+    setSyncedStoreDeadline(variables.deadline)
+    setDeadline(parseDeadline(variables.deadline))
+  }
 
   const store = useTypedSelector((state) => state)
 

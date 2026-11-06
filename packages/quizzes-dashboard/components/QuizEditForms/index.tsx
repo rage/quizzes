@@ -43,7 +43,7 @@ const QuizEditForms = () => {
   }
   return (
     <>
-      <BasicInfo />
+      <BasicInfo key={quizId} />
       <QuizItems />
       <StyledDivider />
       <PeerReviewEditForms />
