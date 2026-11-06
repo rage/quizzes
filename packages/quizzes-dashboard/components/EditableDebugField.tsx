@@ -12,11 +12,7 @@ const EditableDebugField = ({
   setDebugViewChanges,
 }: EditableDebugFieldProps) => {
   const handleEditorChange = (value: string | undefined) => {
-    try {
-      setDebugViewChanges(JSON.parse(value ?? ""))
-    } catch {
-      // Mid-edit JSON is often invalid; keep the last valid value
-    }
+    setDebugViewChanges(value ?? null)
   }
 
   return (

@@ -6,7 +6,6 @@ import styled from "styled-components"
 
 import { Button, Dialog, Typography } from "@mui/material"
 
-import { useQuiz } from "../hooks/useQuiz"
 import { normalizedQuiz } from "../schemas"
 import { initializedEditor } from "../store/editor/editorActions"
 import { useTypedSelector } from "../store/store"
@@ -40,7 +39,9 @@ export const DebugDialog = ({ object }: DebugDialogProps) => {
 
   const dispatch = useDispatch()
   const quizId = useTypedSelector((state) => state.editor.quizId)
-  const { quiz } = useQuiz(quizId, `quiz-${quizId}`)
+  const initialQuiz = useTypedSelector(
+    (state) => state.editor.quizVariables[quizId]?.initialState,
+  )
 
   const editor = useTypedSelector((state) => state.editor)
   const data: object | Quiz =
@@ -50,21 +51,18 @@ export const DebugDialog = ({ object }: DebugDialogProps) => {
   const content = JSON.stringify(data, undefined, 2)
 
   const handleEditorChanges = () => {
-    if (!debugViewChanges) return
+    // Only the quiz editor's own state is editable; a passed `object` is read-only.
+    if (object || !debugViewChanges || !initialQuiz) return
+    setDebugViewChanges(null)
 
-    // check if JSON changes are valid
+    let editedQuiz: Quiz
     try {
-      JSON.parse(debugViewChanges as string)
-    } catch (err) {
-      setDebugViewChanges(null)
+      editedQuiz = JSON.parse(debugViewChanges)
+    } catch {
       return
     }
 
-    // normalize quiz
-    const normalizedUpdatedQuizData = normalize(
-      debugViewChanges,
-      normalizedQuiz,
-    )
+    const normalizedUpdatedQuizData = normalize(editedQuiz, normalizedQuiz)
 
     // cherry pick data pieces to put in state
     const normalizedDataToBeSentToEditorState = {
@@ -77,8 +75,13 @@ export const DebugDialog = ({ object }: DebugDialogProps) => {
       questions: normalizedUpdatedQuizData.entities.questions ?? {},
     }
 
-    // send to state
-    dispatch(initializedEditor(normalizedDataToBeSentToEditorState, quiz!))
+    // Keeps the saved state as the baseline so the edits show up as unsaved changes.
+    dispatch(
+      initializedEditor(
+        normalizedDataToBeSentToEditorState,
+        initialQuiz as Quiz,
+      ),
+    )
   }
 
   return (
