@@ -3,7 +3,7 @@ import { mixin } from "objection"
 import BaseModel from "./base_model"
 import PeerReviewCollectionTranslation from "./peer_review_collection_translation"
 import PeerReviewQuestion from "./peer_review_question"
-import Quiz from "./quiz_item"
+import Quiz from "./quiz"
 import softDelete from "./soft_delete"
 
 export class PeerReviewCollection extends mixin(BaseModel, [
