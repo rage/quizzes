@@ -2,13 +2,21 @@ import fs from "fs"
 import path from "path"
 
 import type { Knex } from "knex"
-import { types } from "pg"
+import { defaults, types } from "pg"
 
 import env from "./src/util/environment"
 
 types.setTypeParser(types.builtins.NUMERIC, (value) => parseFloat(value))
 types.setTypeParser(types.builtins.FLOAT8, (value) => parseFloat(value))
 types.setTypeParser(types.builtins.INT8, (value) => parseInt(value))
+
+// `timestamp without time zone` columns hold UTC, so read and write them as UTC
+// regardless of the process's time zone.
+const parseTimestampTz = types.getTypeParser(types.builtins.TIMESTAMPTZ)
+types.setTypeParser(types.builtins.TIMESTAMP, (value) =>
+  parseTimestampTz(`${value}+00`),
+)
+defaults.parseInputDatesAsUTC = true
 
 const migrationsDirectory = path.join(__dirname, "database", "migrations")
 

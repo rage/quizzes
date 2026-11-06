@@ -1,6 +1,6 @@
 import { stringify } from "csv-stringify"
 import type { Knex } from "knex"
-import { NotNullViolationError } from "objection"
+import { NotNullViolationError, type ModelOptions, type Pojo } from "objection"
 
 import knex from "../../database/knex"
 import * as Kafka from "../services/kafka"
@@ -23,7 +23,8 @@ export class Quiz extends BaseModel {
   part!: number
   section!: number
   points!: number
-  deadline!: Date
+  deadline!: Date | null
+  open!: Date | null
   triesLimited!: boolean
   tries!: number
   excludedFromScore!: boolean
@@ -42,6 +43,18 @@ export class Quiz extends BaseModel {
 
   static get tableName() {
     return "quiz"
+  }
+
+  $parseJson(json: Pojo, opt?: ModelOptions) {
+    const parsed = super.$parseJson(json, opt)
+    // Postgres drops the offset of a string cast to `timestamp without time
+    // zone`; a Date is sent as UTC instead.
+    for (const column of ["deadline", "open"]) {
+      if (typeof parsed[column] === "string") {
+        parsed[column] = new Date(parsed[column])
+      }
+    }
+    return parsed
   }
 
   static relationMappings = () => ({
