@@ -3,6 +3,7 @@ import { useContext } from "react"
 
 import Link from "next/link"
 import styled from "styled-components"
+import { useSWRConfig } from "swr"
 
 import { faHome, faSignOutAlt } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
@@ -27,9 +28,12 @@ const HomeLink = styled(Link)`
 
 const TopBar = () => {
   const { loggedIn, setLoggedIn } = useContext(LoginStateContext)
+  const { mutate } = useSWRConfig()
 
   const handleLogout = () => {
     unauthenticate()
+    // SWR keys don't include the user, so the next user would see this user's cached responses
+    mutate(() => true, undefined, { revalidate: false })
     setLoggedIn(false)
   }
 
