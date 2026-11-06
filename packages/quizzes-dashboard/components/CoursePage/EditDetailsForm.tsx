@@ -211,7 +211,13 @@ export const EditDetailsForm = ({
                     </MenuItem>
                   ))}
               </Field>
-              <Field name="status" label="status" as={TextField} select>
+              <Field
+                name="status"
+                label="status"
+                as={TextField}
+                variant="standard"
+                select
+              >
                 <MenuItem key="active" value="active">
                   active
                 </MenuItem>
