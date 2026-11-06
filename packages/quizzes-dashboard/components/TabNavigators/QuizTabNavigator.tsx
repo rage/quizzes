@@ -70,6 +70,9 @@ export const TabNavigator = () => {
   const errorFetchingData =
     quizError || courseError || userAbilitiesError || requiringAttentionError
 
+  const isCurrentTabRendered =
+    currentTab !== "edit" || userAbilities?.includes("edit")
+
   const ComponentTag = quizTabs[currentTab]
     ? quizTabs[currentTab]
     : quizTabs["default_tab"]
@@ -78,7 +81,7 @@ export const TabNavigator = () => {
     <>
       <Tabs
         variant="fullWidth"
-        value={currentTab}
+        value={isCurrentTabRendered ? currentTab : false}
         indicatorColor="primary"
         textColor="primary"
       >

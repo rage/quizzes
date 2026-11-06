@@ -33,6 +33,11 @@ const CourseTabNavigator = () => {
     default_tab: CoursePage,
   }
 
+  const canEdit = userAbilities?.includes("edit")
+  const isCurrentTabRendered =
+    currentTab === "listing" ||
+    (canEdit && (currentTab === "edit" || currentTab === "completion"))
+
   const ComponentTag = coursePageTabs[currentTab]
     ? coursePageTabs[currentTab]
     : coursePageTabs["default_tab"]
@@ -47,7 +52,7 @@ const CourseTabNavigator = () => {
     <>
       <Tabs
         variant="fullWidth"
-        value={currentTab}
+        value={isCurrentTabRendered ? currentTab : false}
         indicatorColor="primary"
         textColor="primary"
         style={{ marginBottom: "3rem" }}
@@ -61,7 +66,7 @@ const CourseTabNavigator = () => {
             router.push(`${pathname}/listing`, undefined, { shallow: true })
           }}
         />
-        {userAbilities?.includes("edit") && (
+        {canEdit && (
           <Tab
             key="edit"
             icon={<FontAwesomeIcon icon={faPenSquare} />}
@@ -72,7 +77,7 @@ const CourseTabNavigator = () => {
             }}
           />
         )}
-        {userAbilities?.includes("edit") && (
+        {canEdit && (
           <Tab
             key="completion"
             icon={<FontAwesomeIcon icon={faUsersCog} />}
