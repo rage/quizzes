@@ -270,6 +270,7 @@ const getAnswers = async (
     .join(distinctTypes, { "user_quiz_state.quiz_id": "types.id" })
     .where("quiz.course_id", courseId)
     .andWhereNot("quiz_answer.status", "deprecated")
+    .andWhere("quiz_answer.deleted", false)
     .andWhere("quiz_answer.user_id", userId)
 }
 

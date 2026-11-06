@@ -55,16 +55,21 @@ export const broadcastQuizAnswerUpdated = async (
     return
   }
   const items = await quiz.$relatedQuery("items", trx)
+  // Deleting a user's last answer leaves the quiz unattempted, which is reported
+  // like the batch publisher reports an unanswered quiz.
+  const attempted = !quizAnswer.deleted
 
-  if (quizAnswer.status === "rejected" || quizAnswer.status === "spam") {
+  if (
+    attempted &&
+    (quizAnswer.status === "rejected" || quizAnswer.status === "spam")
+  ) {
     messages.push(RequiredAction.REJECTED)
-  } else if (items[0].type === "essay") {
+  } else if (attempted && items.some((item) => item.type === "essay")) {
     if (userQuizState.peerReviewsGiven < course.minPeerReviewsGiven) {
       messages.push(RequiredAction.GIVE_PEER_REVIEW)
     }
     if (
-      userQuizState.peerReviewsReceived ??
-      0 < course.minPeerReviewsReceived
+      (userQuizState.peerReviewsReceived ?? 0) < course.minPeerReviewsReceived
     ) {
       messages.push(RequiredAction.PENDING_PEER_REVIEW)
     }
@@ -72,16 +77,16 @@ export const broadcastQuizAnswerUpdated = async (
 
   const message: QuizAnswerMessage = {
     timestamp: new Date().toISOString(),
-    original_submission_date: quizAnswer.createdAt,
+    original_submission_date: attempted ? quizAnswer.createdAt : null,
     exercise_id: quizAnswer.quizId,
     n_points: quiz.excludedFromScore ? 0 : (userQuizState.pointsAwarded ?? 0),
-    completed: quizAnswer.status === "confirmed",
+    completed: attempted && quizAnswer.status === "confirmed",
     user_id: quizAnswer.userId,
     course_id: course.moocfiId,
     service_id: process.env.SERVICE_ID || "",
     required_actions: messages,
     message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
-    attempted: quizAnswer.deleted ? false : true,
+    attempted,
   }
 
   await KafkaMessage.createMessageEntry("user-points-realtime", message, trx)

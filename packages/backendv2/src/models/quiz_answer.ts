@@ -1024,7 +1024,8 @@ class QuizAnswer extends mixin(BaseModel, [
         throw new NotFoundError(`quiz not found: ${quizAnswer.quizId}`)
       }
 
-      await this.query(trx).delete().where("id", answerId)
+      // Soft-deletes the instance too, so a broadcast of it reports no attempt.
+      await quizAnswer.$query(trx).delete()
 
       const quizAnswers = await QuizAnswer.query(trx)
         .where("user_id", quizAnswer.userId)
