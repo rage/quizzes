@@ -5,7 +5,7 @@ import request from "supertest"
 import app from "../app"
 import redis from "../config/redis"
 import knex from "../database/knex"
-import { QuizAnswer } from "../src/models"
+import { QuizAnswer, UserQuizState } from "../src/models"
 import { UserInfo } from "../src/types"
 import { BadRequestError, NotFoundError } from "./../src/util/error"
 
@@ -37,6 +37,18 @@ afterAll(async () => {
   await knex.destroy()
   await redis.client?.quit()
 })
+
+const quizWithoutUserQuizStatesId = "2a0c2270-011e-40b2-8796-625764828034"
+
+// The b.ts seed creates manual-review answers with random ids for users 1-15.
+const answerIdWithoutUserQuizState = async (userId: number) => {
+  const answer = await QuizAnswer.query()
+    .where("user_id", userId)
+    .andWhere("quiz_id", quizWithoutUserQuizStatesId)
+    .first()
+    .throwIfNotFound()
+  return answer.id
+}
 
 describe("dashboard: updating the status of multiple quiz answers should", () => {
   beforeAll(async () => {
@@ -197,5 +209,73 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
         })
         .expect(200, done)
     })
+
+    test("create the missing user quiz state when confirming", async () => {
+      const response = await request(app.callback())
+        .post("/api/v2/dashboard/answers/status")
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .set("Accept", "application/json")
+        .send({
+          answerIds: [await answerIdWithoutUserQuizState(1)],
+          status: "confirmed",
+        })
+        .expect(200)
+
+      expect(response.body[0].status).toEqual("confirmed")
+      const userQuizState = await UserQuizState.getByUserAndQuiz(
+        1,
+        quizWithoutUserQuizStatesId,
+      )
+      expect(userQuizState?.pointsAwarded).toEqual(1)
+      expect(userQuizState?.tries).toEqual(1)
+    })
+
+    test("reject an answer that has no user quiz state", async () => {
+      const response = await request(app.callback())
+        .post("/api/v2/dashboard/answers/status")
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .set("Accept", "application/json")
+        .send({
+          answerIds: [await answerIdWithoutUserQuizState(2)],
+          status: "rejected",
+        })
+        .expect(200)
+
+      expect(response.body[0].status).toEqual("rejected")
+    })
+  })
+})
+
+describe("dashboard: deleting a quiz answer should", () => {
+  beforeAll(async () => {
+    await safeSeed({
+      directory: "./database/seeds",
+    })
+  })
+
+  afterAll(async () => {
+    await safeClean()
+  })
+
+  beforeEach(() => {
+    nock("https://tmc.mooc.fi")
+      .get("/api/v8/users/current?show_user_fields=true")
+      .reply(200, { administrator: true } as UserInfo)
+  })
+
+  test("delete an answer that has no user quiz state", async () => {
+    const answerId = await answerIdWithoutUserQuizState(3)
+    const response = await request(app.callback())
+      .delete(`/api/v2/dashboard/answers/${answerId}`)
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .expect(200)
+
+    expect(response.body.deleted).toEqual(true)
+    const userQuizState = await UserQuizState.getByUserAndQuiz(
+      3,
+      quizWithoutUserQuizStatesId,
+    )
+    expect(userQuizState).toBeUndefined()
   })
 })

@@ -367,30 +367,43 @@ class QuizAnswer extends mixin(BaseModel, [
     }
     const trx = await knex.transaction()
     try {
-      // get quizAnswer by provided id
       let quizAnswer = (
         await this.query(trx)
           .where("quiz_answer.id", answerId)
           .withGraphJoined("userQuizState")
           .withGraphJoined("quiz")
       )[0]
-      const userQuizState = quizAnswer.userQuizState
+      if (!quizAnswer) {
+        throw new NotFoundError(`quiz answer not found: ${answerId}`)
+      }
       const quiz = quizAnswer.quiz
+      const userQuizState =
+        quizAnswer.userQuizState ??
+        UserQuizState.fromJson({
+          userId: quizAnswer.userId,
+          quizId: quizAnswer.quizId,
+          // Every submission uses a try and only deletion gives one back.
+          tries: await this.query(trx)
+            .where("user_id", quizAnswer.userId)
+            .andWhere("quiz_id", quizAnswer.quizId)
+            .andWhere("deleted", false)
+            .resultSize(),
+        })
 
       const triesAreNotLimited = !quiz.triesLimited
       const userHasTriesLeft = userQuizState.tries < quiz.tries
 
       if (status === "confirmed") {
-        await userQuizState.$query(trx).patch({ pointsAwarded: quiz.points })
+        userQuizState.pointsAwarded = quiz.points
       } else if (triesAreNotLimited || userHasTriesLeft) {
-        await userQuizState
-          .$query(trx)
-          .patch({ peerReviewsReceived: 0, spamFlags: 0, status: "open" })
+        userQuizState.peerReviewsReceived = 0
+        userQuizState.spamFlags = 0
+        userQuizState.status = "open"
       }
 
       quizAnswer = await quizAnswer.$query(trx).patchAndFetch({ status })
 
-      await UserQuizState.upsert(userQuizState, trx)
+      const savedUserQuizState = await UserQuizState.upsert(userQuizState, trx)
       await UserCoursePartState.update(
         quizAnswer.userId,
         quiz.courseId,
@@ -400,7 +413,7 @@ class QuizAnswer extends mixin(BaseModel, [
 
       await Kafka.broadcastQuizAnswerUpdated(
         quizAnswer,
-        userQuizState,
+        savedUserQuizState,
         quiz,
         trx,
       )
@@ -1027,51 +1040,53 @@ class QuizAnswer extends mixin(BaseModel, [
 
       const maxPoints = quiz.points
 
-      const userQuizState = (
-        await UserQuizState.query(trx)
-          .where("user_id", quizAnswer.userId)
-          .andWhere("quiz_id", quizAnswer.quizId)
-      )[0]
-
-      const newTries = userQuizState.tries > 0 ? userQuizState.tries - 1 : 0
-
-      const updatedUserQuizState = await userQuizState
-        .$query(trx)
-        .updateAndFetch({
-          status: newTries >= quiz.tries ? "locked" : "open",
-          tries: newTries,
-          spamFlags: nextBestQuizAnswer
-            ? (
-                await SpamFlag.query(trx).where(
-                  "quiz_answer_id",
-                  nextBestQuizAnswer.id,
-                )
-              ).length
-            : 0,
-          pointsAwarded: nextBestQuizAnswer
-            ? maxPoints * nextBestQuizAnswer.correctnessCoefficient
-            : 0,
-        })
-
-      nextBestQuizAnswer
-        ? await Kafka.broadcastQuizAnswerUpdated(
-            nextBestQuizAnswer,
-            updatedUserQuizState,
-            quiz,
-            trx,
-          )
-        : await Kafka.broadcastQuizAnswerUpdated(
-            quizAnswer,
-            updatedUserQuizState,
-            quiz,
-            trx,
-          )
-
-      await Kafka.broadcastUserProgressUpdated(
+      const userQuizState = await UserQuizState.getByUserAndQuiz(
         quizAnswer.userId,
-        quiz.courseId,
+        quizAnswer.quizId,
         trx,
       )
+      // No state means nothing was recorded for this answer, so nothing to roll back.
+      if (userQuizState) {
+        const newTries = userQuizState.tries > 0 ? userQuizState.tries - 1 : 0
+
+        const updatedUserQuizState = await userQuizState
+          .$query(trx)
+          .updateAndFetch({
+            status: newTries >= quiz.tries ? "locked" : "open",
+            tries: newTries,
+            spamFlags: nextBestQuizAnswer
+              ? (
+                  await SpamFlag.query(trx).where(
+                    "quiz_answer_id",
+                    nextBestQuizAnswer.id,
+                  )
+                ).length
+              : 0,
+            pointsAwarded: nextBestQuizAnswer
+              ? maxPoints * nextBestQuizAnswer.correctnessCoefficient
+              : 0,
+          })
+
+        nextBestQuizAnswer
+          ? await Kafka.broadcastQuizAnswerUpdated(
+              nextBestQuizAnswer,
+              updatedUserQuizState,
+              quiz,
+              trx,
+            )
+          : await Kafka.broadcastQuizAnswerUpdated(
+              quizAnswer,
+              updatedUserQuizState,
+              quiz,
+              trx,
+            )
+
+        await Kafka.broadcastUserProgressUpdated(
+          quizAnswer.userId,
+          quiz.courseId,
+          trx,
+        )
+      }
 
       await trx.commit()
       return await this.query().findById(answerId).throwIfNotFound()
