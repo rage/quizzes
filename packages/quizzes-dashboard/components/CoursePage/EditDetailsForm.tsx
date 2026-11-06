@@ -56,10 +56,12 @@ export const EditDetailsForm = ({
   initialValues,
   courseId,
   languageIds,
+  onSaved,
 }: {
   initialValues: EditCoursePayloadFields
   courseId: string
   languageIds: string[]
+  onSaved: () => Promise<unknown>
 }) => {
   // for letting user know which course properties were edited
   const [saved, setSaved] = useState<string | null>(null)
@@ -100,6 +102,7 @@ export const EditDetailsForm = ({
         courseId,
         changedProperties,
       )
+      await onSaved()
       // use returned values to re-populate initial values to prevent multiple submissions of changes
       const newValues = {
         title: courseEdited.title,
@@ -239,10 +242,20 @@ export const EditDetailsForm = ({
 const EditCourseDetails = () => {
   const router = useRouter()
   const id = router.query.courseId?.toString() ?? ""
-  const { data: courseData, error: courseFetchError } = useSWR(
-    id ? ["courseQuizzes", id] : null,
-    ([, courseId]) => fetchCourseQuizzes(courseId),
+  const {
+    data: courseData,
+    error: courseFetchError,
+    isValidating,
+    mutate,
+  } = useSWR(id ? ["courseQuizzes", id] : null, ([, courseId]) =>
+    fetchCourseQuizzes(courseId),
   )
+  // The form copies its initial values once, so seed it only from revalidated data
+  const [hasRevalidatedSinceMount, setHasRevalidatedSinceMount] =
+    useState(false)
+  if (!hasRevalidatedSinceMount && courseData && !isValidating) {
+    setHasRevalidatedSinceMount(true)
+  }
   const { data: languageData, error: languagesFetchError } = useSWR(
     "languages",
     () => getAllLanguages(),
@@ -259,7 +272,7 @@ const EditCourseDetails = () => {
     return <p>Something went wrong....</p>
   }
 
-  if (!courseData?.course || !languageData) {
+  if (!courseData?.course || !languageData || !hasRevalidatedSinceMount) {
     return <p>Loading....</p>
   }
 
@@ -290,6 +303,7 @@ const EditCourseDetails = () => {
         initialValues={initialValues}
         courseId={id}
         languageIds={languageIds}
+        onSaved={() => mutate()}
       />
       <DebugDialog object={courseData.course} />
     </>

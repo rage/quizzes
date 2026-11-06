@@ -37,16 +37,21 @@ const CompletionPage = () => {
   const [completionValues, setCompletionValues] =
     useState<CompletionProperties | null>(null)
   const id = router.query.courseId?.toString() ?? ""
-  const { data: courseData, error: courseFetchError } = useSWR(
-    id ? ["courseQuizzes", id] : null,
-    ([, courseId]) => fetchCourseQuizzes(courseId),
+  const {
+    data: courseData,
+    error: courseFetchError,
+    isValidating,
+    mutate,
+  } = useSWR(id ? ["courseQuizzes", id] : null, ([, courseId]) =>
+    fetchCourseQuizzes(courseId),
   )
 
   if (courseFetchError) {
     return <p>Something went wrong....</p>
   }
 
-  if (!courseData?.course) {
+  // Seed only from revalidated data: a cached course may predate the last save
+  if (!courseData?.course || (!completionValues && isValidating)) {
     return <p>Loading....</p>
   }
 
@@ -93,6 +98,7 @@ const CompletionPage = () => {
         id,
         changedProperties,
       )
+      await mutate()
 
       // UPDATE SYNC VALUES
       await actions.resetForm({
