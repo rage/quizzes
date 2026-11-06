@@ -15,24 +15,14 @@ spec:
           restartPolicy: OnFailure
           containers:
             - name: refresh-reaktor-view
-              image: ${BACKEND_IMAGE}
-              command: ["sh", "-c", "cd /app && npm run refresh-reaktor-view"]
+              image: ${BACKENDV2_IMAGE}
+              command: ["npm", "run", "refresh-reaktor-view"]
               resources:
                 requests:
                   memory: "100Mi"
               env:
-                - name: REDIS_HOST
-                  valueFrom:
-                    secretKeyRef:
-                      name: backend-database-secret
-                      key: REDIS_HOST
-                - name: REDIS_PORT
-                  value: "6379"
-                - name: REDIS_PASSWORD
-                  valueFrom:
-                    secretKeyRef:
-                      name: new-redis
-                      key: redis-password
+                - name: NODE_ENV
+                  value: production
                 - name: DB_NAME
                   valueFrom:
                     secretKeyRef:
@@ -53,26 +43,6 @@ spec:
                     secretKeyRef:
                       name: backend-database-secret
                       key: POSTGRES_USERNAME
-                - name: TMC_TOKEN
-                  valueFrom:
-                    secretKeyRef:
-                      name: backend-database-secret
-                      key: TMC_TOKEN
-                - name: KAFKA_HOST
-                  valueFrom:
-                    secretKeyRef:
-                      name: backend-database-secret
-                      key: KAFKA_HOST
-                - name: MESSAGE_FORMAT_VERSION
-                  valueFrom:
-                    secretKeyRef:
-                      name: backend-database-secret
-                      key: MESSAGE_FORMAT_VERSION
-                - name: SERVICE_ID
-                  valueFrom:
-                    secretKeyRef:
-                      name: backend-database-secret
-                      key: SERVICE_ID
           initContainers:
             - name: quizzes-backendv2-run-migrations
               image: ${BACKENDV2_IMAGE}

@@ -15,7 +15,9 @@
     "migrate": "knex migrate:latest",
     "seed": "knex seed:run --specific a.ts",
     "update-expired-courses": "node ./dist/bin/update-expired-courses.js",
-    "background-producer": "node ./dist/bin/kafkaBackgroundProducer.js"
+    "background-producer": "node ./dist/bin/kafkaBackgroundProducer.js",
+    "kafka-batch-publish": "node --max-old-space-size=2048 ./dist/bin/kafka-batch-publisher.js",
+    "refresh-reaktor-view": "node ./dist/bin/refresh-reaktor-views.js"
   },
   "devDependencies": {
     "@types/ioredis": "^4.17.11",
