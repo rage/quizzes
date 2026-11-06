@@ -1,25 +1,21 @@
 import React, { useState, useEffect, useRef, useLayoutEffect } from "react"
+
 import styled from "styled-components"
+
+import { faWindowClose, faTrash } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Button, Collapse, Typography, Fade, Box, Modal } from "@mui/material"
+
+import { useAnswerListState } from "../../../contexts/AnswerListContext"
+import { Answer } from "../../../types/Answer"
+import { editableAnswerStates } from "../../constants"
+import DebugDialog from "../../DebugDialog"
+import AnswerDeletionDialog from "./AnswerDeletionDialog"
+import AnswerLink from "./AnswerLink"
 import AnswerOverView from "./AnswerOverView"
 import ItemAnswers from "./ItemAnswers"
-import { Answer } from "../../../types/Answer"
-import {
-  Button,
-  Collapse,
-  Typography,
-  Fade,
-  Box,
-  Modal,
-} from "@mui/material"
-import AnswerLink from "./AnswerLink"
 import ManualReviewField from "./ManualReviewField"
 import Peerreviews from "./Peerreviews"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faWindowClose, faTrash } from "@fortawesome/free-solid-svg-icons"
-import DebugDialog from "../../DebugDialog"
-import { editableAnswerStates } from "../../constants"
-import { useAnswerListState } from "../../../contexts/AnswerListContext"
-import AnswerDeletionDialog from "./AnswerDeletionDialog"
 
 export const ContentContainer = styled.div`
   display: flex !important;

@@ -1,5 +1,6 @@
-import { Model, snakeCaseMappers } from "objection"
 import { knex as createKnex } from "knex"
+import { Model, snakeCaseMappers } from "objection"
+
 import knexConfig from "../knexfile"
 
 const knex = createKnex(knexConfig)

@@ -1,5 +1,18 @@
-import { action, NormalizedItem } from "../../../types/NormalizedQuiz"
+import { produce } from "immer"
+import { normalize } from "normalizr"
 import { createReducer } from "typesafe-actions"
+
+import { normalizedQuiz } from "../../../schemas"
+import { action, NormalizedItem } from "../../../types/NormalizedQuiz"
+import { Quiz } from "../../../types/Quiz"
+import {
+  initializedEditor,
+  createdNewItem,
+  deletedItem,
+  createdNewOption,
+  deletedOption,
+  createdNewQuiz,
+} from "../editorActions"
 import {
   editedQuizItemBody,
   editedQuizItemTitle,
@@ -20,18 +33,6 @@ import {
   editedItemDirection,
   editedQuizItemFeedbackDisplayPolicy,
 } from "./itemAction"
-import {
-  initializedEditor,
-  createdNewItem,
-  deletedItem,
-  createdNewOption,
-  deletedOption,
-  createdNewQuiz,
-} from "../editorActions"
-import { produce } from "immer"
-import { Quiz } from "../../../types/Quiz"
-import { normalizedQuiz } from "../../../schemas"
-import { normalize } from "normalizr"
 
 export const itemReducer = createReducer<
   { [itemId: string]: NormalizedItem },
@@ -43,97 +44,97 @@ export const itemReducer = createReducer<
   )
 
   .handleAction(editedQuizItemBody, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.id].body = action.payload.body
     })
   })
 
   .handleAction(editedQuizItemTitle, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.id].title = action.payload.title
     })
   })
 
   .handleAction(editedScaleMaxValue, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].maxValue = action.payload.newValue
     })
   })
 
   .handleAction(editedScaleMinValue, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].minValue = action.payload.newValue
     })
   })
 
   .handleAction(editedValidityRegex, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].validityRegex = action.payload.newRegex
     })
   })
 
   .handleAction(editedFormatRegex, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].formatRegex = action.payload.newRegex
     })
   })
 
   .handleAction(toggledMultiOptions, (state, action) => {
-    return produce(state, draftState => {
-      draftState[action.payload.itemId].multi = !state[action.payload.itemId]
-        .multi
+    return produce(state, (draftState) => {
+      draftState[action.payload.itemId].multi =
+        !state[action.payload.itemId].multi
     })
   })
 
   .handleAction(editedItemSuccessMessage, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].successMessage =
         action.payload.newMessage
     })
   })
 
   .handleAction(editedItemFailureMessage, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].failureMessage =
         action.payload.newMessage
     })
   })
 
   .handleAction(editedItemMaxWords, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].maxWords = action.payload.maxWords
     })
   })
 
   .handleAction(editedItemMinWords, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].minWords = action.payload.minWords
     })
   })
 
   .handleAction(editedSharedOptionsFeedbackMessage, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].sharedOptionFeedbackMessage =
         action.payload.newMessage
     })
   })
 
   .handleAction(toggledSharedOptionFeedbackMessage, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].usesSharedOptionFeedbackMessage =
         action.payload.sharedFeedback
     })
   })
 
   .handleAction(editedQuizItemFeedbackDisplayPolicy, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].feedbackDisplayPolicy =
         action.payload.newPolicy
     })
   })
 
   .handleAction(createdNewItem, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       const newItem: NormalizedItem = {
         id: action.payload.itemId,
         quizId: action.payload.quizId,
@@ -164,7 +165,7 @@ export const itemReducer = createReducer<
   })
 
   .handleAction(deletedItem, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       const deletedOrder = state[action.payload.itemId].order
       delete draftState[action.payload.itemId]
       for (let key in draftState) {
@@ -176,16 +177,16 @@ export const itemReducer = createReducer<
   })
 
   .handleAction(createdNewOption, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].options.push(action.payload.optionId)
     })
   })
 
   .handleAction(deletedOption, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].options = draftState[
         action.payload.itemId
-      ].options.filter(optionId => optionId !== action.payload.optionId)
+      ].options.filter((optionId) => optionId !== action.payload.optionId)
     })
   })
 
@@ -219,7 +220,7 @@ export const itemReducer = createReducer<
   })
 
   .handleAction(increasedItemOrder, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       const order = draftState[action.payload.itemId].order
       if (order < Object.keys(state).length - 1) {
         for (let key in state) {
@@ -234,7 +235,7 @@ export const itemReducer = createReducer<
   })
 
   .handleAction(decreasedItemOrder, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       const order = draftState[action.payload.itemId].order
       if (order > 0) {
         for (let key in state) {
@@ -249,15 +250,14 @@ export const itemReducer = createReducer<
   })
 
   .handleAction(toggledAllAnswersCorrect, (state, action) => {
-    return produce(state, draftState => {
-      draftState[action.payload.itemId].allAnswersCorrect = !draftState[
-        action.payload.itemId
-      ].allAnswersCorrect
+    return produce(state, (draftState) => {
+      draftState[action.payload.itemId].allAnswersCorrect =
+        !draftState[action.payload.itemId].allAnswersCorrect
     })
   })
 
   .handleAction(editedItemDirection, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].direction = action.payload.newDirection
     })
   })

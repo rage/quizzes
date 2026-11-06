@@ -1,20 +1,21 @@
+import { produce } from "immer"
 import { createReducer } from "typesafe-actions"
+
 import {
   action,
   NormalizedPeerReviewCollection,
 } from "../../../types/NormalizedQuiz"
 import { initializedEditor } from "../editorActions"
 import {
+  createdNewPeerReviewQuestion,
+  deletedPRQ,
+} from "../questions/questionActions"
+import {
   editedPeerReviewTitle,
   editedPeerReviewBody,
   createdNewPeerReview,
   deletePeerReview,
 } from "./peerReviewCollectionActions"
-import { produce } from "immer"
-import {
-  createdNewPeerReviewQuestion,
-  deletedPRQ,
-} from "../questions/questionActions"
 
 export const peerReviewReducer = createReducer<
   { [peerReviewCollectionId: string]: NormalizedPeerReviewCollection },
@@ -26,19 +27,19 @@ export const peerReviewReducer = createReducer<
   )
 
   .handleAction(editedPeerReviewTitle, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.peerReviewId].title = action.payload.newTitle
     })
   })
 
   .handleAction(editedPeerReviewBody, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.peerReviewId].body = action.payload.newBody
     })
   })
 
   .handleAction(createdNewPeerReview, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       const newPeerReview: NormalizedPeerReviewCollection = {
         id: action.payload.newId,
         quizId: action.payload.quizId,
@@ -53,7 +54,7 @@ export const peerReviewReducer = createReducer<
   })
 
   .handleAction(createdNewPeerReviewQuestion, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.peerReviewCollectionId].questions.push(
         action.payload.newId,
       )
@@ -61,15 +62,15 @@ export const peerReviewReducer = createReducer<
   })
 
   .handleAction(deletePeerReview, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       delete draftState[action.payload.peerReviewId]
     })
   })
 
   .handleAction(deletedPRQ, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.peerReviewId].questions = draftState[
         action.payload.peerReviewId
-      ].questions.filter(question => question !== action.payload.questionId)
+      ].questions.filter((question) => question !== action.payload.questionId)
     })
   })

@@ -1,14 +1,15 @@
 import Redis from "ioredis"
-import env from "../src/util/environment"
+
 import { GlobalLogger } from "../src/middleware/logger"
+import env from "../src/util/environment"
 
 function parseSentinels(csv: string | undefined) {
   if (!csv) return []
   return csv
     .split(",")
-    .map(s => s.trim())
+    .map((s) => s.trim())
     .filter(Boolean)
-    .map(entry => {
+    .map((entry) => {
       // supports "host:port" or just "host"
       const [host, portStr] = entry.replace(/^\[|\]$/g, "").split(":") // IPv6 [] safe-ish
       const port = portStr ? Number(portStr) : 26379
@@ -38,7 +39,7 @@ if (env.REDIS_SENTINELS) {
     lazyConnect: true,
   })
 
-  client.on("error", err => {
+  client.on("error", (err) => {
     GlobalLogger.error("Redis connection error", {
       error: err.message,
       stack: err.stack,
@@ -53,7 +54,7 @@ if (env.REDIS_SENTINELS) {
     GlobalLogger.info("Redis connected")
   })
 
-  client.connect().catch(err => {
+  client.connect().catch((err) => {
     GlobalLogger.error("Failed to connect to Redis on startup", {
       error: err.message,
     })
@@ -61,7 +62,7 @@ if (env.REDIS_SENTINELS) {
 
   GlobalLogger.info(
     `Redis (Sentinel) client initialized. Sentinels: ${sentinels
-      .map(s => `${s.host}:${s.port}`)
+      .map((s) => `${s.host}:${s.port}`)
       .join(", ")}`,
   )
 } else if (env.REDIS_HOST && env.REDIS_PORT) {
@@ -77,7 +78,7 @@ if (env.REDIS_SENTINELS) {
     lazyConnect: true,
   })
 
-  client.on("error", err => {
+  client.on("error", (err) => {
     GlobalLogger.error("Redis connection error", {
       error: err.message,
       stack: err.stack,
@@ -92,7 +93,7 @@ if (env.REDIS_SENTINELS) {
     GlobalLogger.info("Redis connected")
   })
 
-  client.connect().catch(err => {
+  client.connect().catch((err) => {
     GlobalLogger.error("Failed to connect to Redis on startup", {
       error: err.message,
     })

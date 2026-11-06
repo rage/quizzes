@@ -1,8 +1,10 @@
+import React, { useEffect, useState } from "react"
+
+import styled from "styled-components"
+
 import { Button, Snackbar, Typography } from "@mui/material"
 import { Alert } from "@mui/material"
-import { SlideDown } from "../Shared/SlideDown"
-import React, { useEffect, useState } from "react"
-import styled from "styled-components"
+
 import {
   setHandledAnswers,
   useAnswerListState,
@@ -11,6 +13,7 @@ import { changeAnswerStatusForMany } from "../../services/quizzes"
 import { Answer } from "../../types/Answer"
 import AnswerCard from "../Answer"
 import { ButtonFieldWrapper } from "../Shared/ButtonFieldWrapper"
+import { SlideDown } from "../Shared/SlideDown"
 
 export interface AnswerListProps {
   data: Answer[]
@@ -58,7 +61,7 @@ export const AnswerList = ({ data }: AnswerListProps) => {
         const returnedIds = res.map((updated: Answer) => updated.id)
 
         setAnswers(
-          answers.map(answer => {
+          answers.map((answer) => {
             if (returnedIds.includes(answer.id)) {
               return { ...answer, status: actionType }
             }
@@ -125,7 +128,7 @@ export const AnswerList = ({ data }: AnswerListProps) => {
           </ButtonFieldWrapper>
         </BulkActionWrapper>
       )}
-      {answers.map(answer => (
+      {answers.map((answer) => (
         <AnswerCard key={answer.id} answer={answer} />
       ))}
     </>

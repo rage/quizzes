@@ -1,6 +1,7 @@
 import React, { useContext } from "react"
-import LoginView from "./LoginView"
+
 import LoginStateContext from "../contexts/LoginStateContext"
+import LoginView from "./LoginView"
 
 interface Props {
   children: any

@@ -1,4 +1,5 @@
 import Router from "@koa/router"
+
 import knex from "../../../../database/knex"
 import accessControl from "../../../middleware/access_control"
 import { QuizAnswer, QuizAnswerStatusModification } from "../../../models"
@@ -18,8 +19,8 @@ const getStatusChangeOperation = (
   return plagiarismSuspected
     ? "teacher-suspects-plagiarism"
     : status === "confirmed"
-    ? "teacher-accept"
-    : "teacher-reject"
+      ? "teacher-accept"
+      : "teacher-reject"
 }
 
 type PaginationQuery = Partial<
@@ -36,7 +37,7 @@ const parseOrder = (order?: string) => (order === "desc" ? "desc" : "asc")
 const answersRoutes = new Router<CustomState, CustomContext>({
   prefix: "/answers",
 })
-  .post("/:answerId/status", accessControl(), async ctx => {
+  .post("/:answerId/status", accessControl(), async (ctx) => {
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "grade")
@@ -52,7 +53,7 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     const operation = getStatusChangeOperation(status, plagiarismSuspected)
 
     await knex.transaction(
-      async trx =>
+      async (trx) =>
         await QuizAnswerStatusModification.logStatusChange(
           answerId,
           operation,
@@ -64,7 +65,7 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     ctx.body = quizAnswer
   })
 
-  .post("/status", accessControl(), async ctx => {
+  .post("/status", accessControl(), async (ctx) => {
     const { status, answerIds, plagiarismSuspected } = ctx.request.body as {
       status: QuizAnswerStatus
       answerIds?: string[]
@@ -93,7 +94,7 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     const operation = getStatusChangeOperation(status, plagiarismSuspected)
 
     await knex.transaction(
-      async trx =>
+      async (trx) =>
         await QuizAnswerStatusModification.logStatusChangeForMany(
           answerIds,
           operation,
@@ -105,25 +106,19 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     ctx.body = quizAnswers
   })
 
-  .get("/:answerId", accessControl(), async ctx => {
+  .get("/:answerId", accessControl(), async (ctx) => {
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await QuizAnswer.getByIdWithPeerReviews(answerId)
   })
 
-  .get("/:quizId/all", accessControl(), async ctx => {
+  .get("/:quizId/all", accessControl(), async (ctx) => {
     const quizId = ctx.params.quizId
     const courseId = await getCourseIdByQuizId(quizId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
-    const {
-      page,
-      size,
-      order,
-      filters,
-      deleted,
-      notDeleted,
-    } = ctx.request.query as PaginationQuery
+    const { page, size, order, filters, deleted, notDeleted } = ctx.request
+      .query as PaginationQuery
 
     ctx.body = await QuizAnswer.getPaginatedByQuizId(
       quizId,
@@ -136,7 +131,7 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     )
   })
 
-  .post("/:quizId/all", accessControl(), async ctx => {
+  .post("/:quizId/all", accessControl(), async (ctx) => {
     const quizId = ctx.params.quizId
     const courseId = await getCourseIdByQuizId(quizId)
 
@@ -155,7 +150,7 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     )
   })
 
-  .get("/:quizId/manual-review", accessControl(), async ctx => {
+  .get("/:quizId/manual-review", accessControl(), async (ctx) => {
     const quizId = ctx.params.quizId
     const courseId = await getCourseIdByQuizId(quizId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
@@ -168,7 +163,7 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     )
   })
 
-  .post("/:quizId/manual-review", accessControl(), async ctx => {
+  .post("/:quizId/manual-review", accessControl(), async (ctx) => {
     const quizId = ctx.params.quizId
     const courseId = await getCourseIdByQuizId(quizId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
@@ -182,7 +177,7 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     )
   })
 
-  .delete("/:answerId", accessControl(), async ctx => {
+  .delete("/:answerId", accessControl(), async (ctx) => {
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "delete-answer")
@@ -194,28 +189,32 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     }
   })
 
-  .get("/:answerId/status-changes", accessControl(), async ctx => {
+  .get("/:answerId/status-changes", accessControl(), async (ctx) => {
     const answerId = ctx.params.answerId
     const courseId = await getCourseIdByAnswerId(answerId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await QuizAnswerStatusModification.getAllByQuizAnswerId(answerId)
   })
 
-  .post("/answers/:answerId/suspect-plagiarism", accessControl(), async ctx => {
-    const answerId = ctx.params.answerId
-    const courseId = await getCourseIdByAnswerId(answerId)
-    const userId = ctx.state.user.id
-    await checkAccessOrThrow(ctx.state.user, courseId, "view")
+  .post(
+    "/answers/:answerId/suspect-plagiarism",
+    accessControl(),
+    async (ctx) => {
+      const answerId = ctx.params.answerId
+      const courseId = await getCourseIdByAnswerId(answerId)
+      const userId = ctx.state.user.id
+      await checkAccessOrThrow(ctx.state.user, courseId, "view")
 
-    ctx.body = await knex.transaction(
-      async trx =>
-        await QuizAnswerStatusModification.logStatusChange(
-          answerId,
-          "teacher-suspects-plagiarism",
-          trx,
-          userId,
-        ),
-    )
-  })
+      ctx.body = await knex.transaction(
+        async (trx) =>
+          await QuizAnswerStatusModification.logStatusChange(
+            answerId,
+            "teacher-suspects-plagiarism",
+            trx,
+            userId,
+          ),
+      )
+    },
+  )
 
 export default answersRoutes

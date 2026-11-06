@@ -1,7 +1,7 @@
+import { NotFoundError } from "../util/error"
 import { EditCoursePayloadFields } from "./../types/index"
 import BaseModel from "./base_model"
 import Course from "./course"
-import { NotFoundError } from "../util/error"
 
 class CourseTranslation extends BaseModel {
   languageId!: string

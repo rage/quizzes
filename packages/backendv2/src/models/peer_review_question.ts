@@ -1,7 +1,8 @@
+import { mixin } from "objection"
+
 import BaseModel from "./base_model"
 import PeerReviewCollection from "./peer_review_collection"
 import PeerReviewQuestionTranslation from "./peer_review_question_translation"
-import { mixin } from "objection"
 import softDelete from "./soft_delete"
 
 class PeerReviewQuestion extends mixin(BaseModel, [

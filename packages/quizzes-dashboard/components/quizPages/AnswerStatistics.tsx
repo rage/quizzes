@@ -1,9 +1,5 @@
 import React from "react"
-import { useRouter } from "next/router"
-import { QetQuizAnswerStatistics } from "../../services/quizzes"
-import styled from "styled-components"
-import { Typography } from "@mui/material"
-import { Doughnut } from "react-chartjs-2"
+
 import {
   Chart as ChartJS,
   ArcElement,
@@ -12,8 +8,15 @@ import {
   type ChartData,
   type ChartOptions,
 } from "chart.js"
-import useSWR from "swr"
 import _ from "lodash"
+import { useRouter } from "next/router"
+import { Doughnut } from "react-chartjs-2"
+import styled from "styled-components"
+import useSWR from "swr"
+
+import { Typography } from "@mui/material"
+
+import { QetQuizAnswerStatistics } from "../../services/quizzes"
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -44,7 +47,7 @@ export const AnswerStatistics = () => {
 
   const pieChartData: ChartData<"doughnut"> = {
     labels: Object.keys(statswithoutTotal).map(
-      label =>
+      (label) =>
         `${label} | ${stats[label]}; ${(
           (stats[label] / stats["total"]) *
           100

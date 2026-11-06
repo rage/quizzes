@@ -1,13 +1,14 @@
-import { CustomContext } from "../types"
-import winston, { format } from "winston"
 import { randomUUID } from "crypto"
+
+import winston, { format } from "winston"
+
+import { CustomContext } from "../types"
 
 const myFormat = format.printf(
   ({ level, message, timestamp, requestId, stack, ...metadata }) => {
-    const logMessage = `${timestamp} [${requestId ||
-      "00000000-0000-0000-0000-000000000000"}] ${level}: ${message}, ${JSON.stringify(
-      metadata,
-    )}`
+    const logMessage = `${timestamp} [${
+      requestId || "00000000-0000-0000-0000-000000000000"
+    }] ${level}: ${message}, ${JSON.stringify(metadata)}`
     if (stack) {
       return `${logMessage}\n${stack}`
     }

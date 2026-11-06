@@ -1,6 +1,7 @@
 import http from "http"
-import { GlobalLogger } from "./src/middleware/logger"
+
 import app from "./app"
+import { GlobalLogger } from "./src/middleware/logger"
 
 http
   .createServer(app.callback())

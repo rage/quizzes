@@ -1,4 +1,5 @@
 import useSWR from "swr"
+
 import { getAnswerById } from "./../services/quizzes"
 
 const fetcher = ([, answerId]: [string, string, string]) =>

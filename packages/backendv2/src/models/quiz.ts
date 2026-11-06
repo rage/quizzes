@@ -1,20 +1,21 @@
+import { stringify } from "csv-stringify"
+import type { Knex } from "knex"
+import { NotNullViolationError } from "objection"
+
+import knex from "../../database/knex"
+import * as Kafka from "../services/kafka"
+import { NotFoundError } from "../util/error"
+import { BadRequestError } from "../util/error"
+import moduleInitializer from "../util/initializer"
+import BaseModel from "./base_model"
+import Course from "./course"
+import PeerReviewCollection from "./peer_review_collection"
+import PeerReviewQuestion from "./peer_review_question"
+import QuizAnswer from "./quiz_answer"
 import QuizItem from "./quiz_item"
 import type QuizOption from "./quiz_option"
 import QuizTranslation from "./quiz_translation"
-import PeerReviewCollection from "./peer_review_collection"
-import Course from "./course"
-import { NotFoundError } from "../util/error"
-import moduleInitializer from "../util/initializer"
-import { stringify } from "csv-stringify"
-import QuizAnswer from "./quiz_answer"
-import { BadRequestError } from "../util/error"
-import type { Knex } from "knex"
 import UserQuizState from "./user_quiz_state"
-import * as Kafka from "../services/kafka"
-import PeerReviewQuestion from "./peer_review_question"
-import { NotNullViolationError } from "objection"
-import BaseModel from "./base_model"
-import knex from "../../database/knex"
 
 export class Quiz extends BaseModel {
   id!: string
@@ -237,17 +238,17 @@ export class Quiz extends BaseModel {
       await this.query()
         .withGraphJoined("texts")
         .withGraphJoined("items.[texts, options.[texts]]")
-        .modifyGraph("items.[options]", option => {
+        .modifyGraph("items.[options]", (option) => {
           option.where("deleted", false)
         })
-        .modifyGraph("items", item => {
+        .modifyGraph("items", (item) => {
           item.where("deleted", false)
         })
         .withGraphJoined("peerReviewCollections.[texts, questions.[texts]]")
-        .modifyGraph("peerReviewCollections.[questions]", question => {
+        .modifyGraph("peerReviewCollections.[questions]", (question) => {
           question.where("deleted", false)
         })
-        .modifyGraph("peerReviewCollections", peerReviewCollection => {
+        .modifyGraph("peerReviewCollections", (peerReviewCollection) => {
           peerReviewCollection.where("deleted", false)
         })
         .where("quiz.id", quizId)
@@ -296,7 +297,7 @@ export class Quiz extends BaseModel {
         .withGraphJoined("items.[texts, options.[texts]]")
         .withGraphJoined("peerReviewCollections.[texts, questions.[texts]]")
         .where("quiz.course_id", courseId)
-    ).map(quiz => this.moveTextsToParent(quiz))
+    ).map((quiz) => this.moveTextsToParent(quiz))
   }
 
   static async getQuizInfo(quizId: string) {

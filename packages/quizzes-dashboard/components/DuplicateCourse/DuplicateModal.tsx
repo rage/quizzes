@@ -1,20 +1,17 @@
 import React, { useState } from "react"
+
 import styled from "styled-components"
-import {
-  Button,
-  TextField,
-  Snackbar,
-  Typography,
-  Fade,
-} from "@mui/material"
 import useSWR from "swr"
-import { Course } from "../../types/Quiz"
+
+import { Button, TextField, Snackbar, Typography, Fade } from "@mui/material"
+import { Alert, Autocomplete } from "@mui/material"
+
 import {
   duplicateCourse,
   getAllLanguages,
   getCorrespondenceFile,
 } from "../../services/quizzes"
-import { Alert, Autocomplete } from "@mui/material"
+import { Course } from "../../types/Quiz"
 
 const SubmitButton = styled(Button)`
   display: flex !important;
@@ -56,7 +53,7 @@ const MessageBox = styled.div<{ $success: boolean }>`
   border-style: solid;
   border-radius: 5px !important;
   border-width: 5px !important;
-  border-color: ${props => {
+  border-color: ${(props) => {
     if (props.$success) {
       return "#76ff03"
     } else {
@@ -107,7 +104,7 @@ export const DuplicateModal = ({ course }: DuplicateModalProps) => {
   }
 
   const langsProps: LangsProps = {
-    getOptionLabel: lang => lang.name,
+    getOptionLabel: (lang) => lang.name,
     onChange: (_event, value, _reason) => setLang(value ? value.id : ""),
   }
 
@@ -138,7 +135,7 @@ export const DuplicateModal = ({ course }: DuplicateModalProps) => {
                 variant="outlined"
                 inputMode="text"
                 name="name"
-                onChange={event => {
+                onChange={(event) => {
                   setName(event.target.value)
                 }}
               />
@@ -150,14 +147,14 @@ export const DuplicateModal = ({ course }: DuplicateModalProps) => {
                 variant="outlined"
                 inputMode="text"
                 name="abbr"
-                onChange={event => setAbbr(event.target.value)}
+                onChange={(event) => setAbbr(event.target.value)}
               />
             </InputContainer>
             <InputContainer>
               <Autocomplete
                 options={langs}
                 {...langsProps}
-                renderInput={params => (
+                renderInput={(params) => (
                   <StyledTextField
                     {...params}
                     label="Languages"

@@ -1,8 +1,11 @@
 import React, { useContext, useEffect, useState } from "react"
-import BreadCrumbContext from "../contexts/BreadCrumbContext"
-import { Breadcrumbs, Typography } from "@mui/material"
+
 import Link from "next/link"
 import styled from "styled-components"
+
+import { Breadcrumbs, Typography } from "@mui/material"
+
+import BreadCrumbContext from "../contexts/BreadCrumbContext"
 
 const BreadCrumbContainer = styled(Breadcrumbs)`
   text-decoration: none;
@@ -39,7 +42,7 @@ const BreadCrumbs: React.FC = () => {
 
   return (
     <BreadCrumbContainer>
-      {breadCrumbs.map(crumb => (
+      {breadCrumbs.map((crumb) => (
         <div key={crumb.label}>
           {crumb.as ? (
             <BreadCrumbLink href={crumb.as}>{crumb.label}</BreadCrumbLink>

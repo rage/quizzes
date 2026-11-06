@@ -1,11 +1,14 @@
-import { Button, TextField, Typography } from "@mui/material"
+import React, { useState } from "react"
+
 import { Field, Form, Formik } from "formik"
 import _ from "lodash"
 import { useRouter } from "next/router"
-import React, { useState } from "react"
-import useSWR from "swr"
 import styled from "styled-components"
+import useSWR from "swr"
 import { number, object } from "yup"
+
+import { Button, TextField, Typography } from "@mui/material"
+
 import {
   CompletionProperties,
   fetchCourseQuizzes,
@@ -31,10 +34,8 @@ const initialCompletionValues: CompletionProperties = {
 
 const CompletionPage = () => {
   const router = useRouter()
-  const [
-    completionValues,
-    setCompletionValues,
-  ] = useState<CompletionProperties | null>(null)
+  const [completionValues, setCompletionValues] =
+    useState<CompletionProperties | null>(null)
   const id = router.query.courseId?.toString() ?? ""
   const { data: courseData, error: courseFetchError } = useSWR(
     id ? ["courseQuizzes", id] : null,

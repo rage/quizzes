@@ -1,8 +1,11 @@
 import React, { useEffect } from "react"
-import { Answer } from "../../../types/Answer"
-import { Typography } from "@mui/material"
+
 import styled from "styled-components"
+
+import { Typography } from "@mui/material"
+
 import { useAnswerListState } from "../../../contexts/AnswerListContext"
+import { Answer } from "../../../types/Answer"
 
 export interface AnswerOverViewProps {
   answer: Answer
@@ -30,7 +33,7 @@ export const AnswerOverView = ({ answer }: AnswerOverViewProps) => {
   const [{ handledAnswers }] = useAnswerListState()
 
   useEffect(() => {
-    handledAnswers.forEach(a => {
+    handledAnswers.forEach((a) => {
       if (a.id === answer.id) {
         answer.status = a.status
       }

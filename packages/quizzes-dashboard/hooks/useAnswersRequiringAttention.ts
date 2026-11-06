@@ -1,4 +1,5 @@
 import useSWR from "swr"
+
 import {
   getAnswersRequiringAttentionByQuizId,
   getAnswersRequiringAttention,
@@ -41,7 +42,14 @@ export const useRequiringAttention = (
   token: string,
 ) => {
   const { data, error } = useSWR(
-    ["answersRequiringAttention", quizId, currentPage, answersDisplayed, sortOrder, token],
+    [
+      "answersRequiringAttention",
+      quizId,
+      currentPage,
+      answersDisplayed,
+      sortOrder,
+      token,
+    ],
     answerFetcher,
   )
 

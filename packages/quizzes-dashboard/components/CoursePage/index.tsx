@@ -1,22 +1,25 @@
 import React from "react"
+
+import { groupBy, Dictionary } from "lodash"
+import Head from "next/head"
+import Link from "next/link"
+import { useRouter } from "next/router"
+import styled from "styled-components"
+import useSWR from "swr"
+
+import { Typography, Button } from "@mui/material"
+
+import useBreadcrumbs from "../../hooks/useBreadcrumbs"
 import {
   fetchCourseQuizzes,
   getAnswersRequiringAttentionCounts,
   getUserAbilitiesForCourse,
 } from "../../services/quizzes"
-import Head from "next/head"
-import useSWR from "swr"
-import { groupBy, Dictionary } from "lodash"
-import { Typography, Button } from "@mui/material"
-import DebugDialog from "../DebugDialog"
-import Link from "next/link"
-import styled from "styled-components"
-import { useRouter } from "next/router"
 import { Quiz } from "../../types/Quiz"
-import useBreadcrumbs from "../../hooks/useBreadcrumbs"
+import DebugDialog from "../DebugDialog"
 import DuplicateCourseButton from "../DuplicateCourse"
-import { SectionOfPart } from "./PartSection"
 import SkeletonLoader from "../Shared/SkeletonLoader"
+import { SectionOfPart } from "./PartSection"
 
 const CourseTitleWrapper = styled.div`
   display: flex;
@@ -102,14 +105,14 @@ export const CoursePage = () => {
   for (let [part, quizzes] of Object.entries(byPart)) {
     byPartAndSection[part] = groupBy(quizzes, "section")
     pointsByParts[parseInt(part)] = quizzes
-      .filter(quiz => !quiz.excludedFromScore)
-      .map(quiz => quiz.points)
+      .filter((quiz) => !quiz.excludedFromScore)
+      .map((quiz) => quiz.points)
       .reduce((a, b) => a + b, 0)
   }
 
   let points = data.quizzes
-    .filter(quiz => !quiz.excludedFromScore && quiz.part !== 0)
-    .map(quiz => quiz.points)
+    .filter((quiz) => !quiz.excludedFromScore && quiz.part !== 0)
+    .map((quiz) => quiz.points)
     .reduce((a, b) => a + b, 0)
 
   return (

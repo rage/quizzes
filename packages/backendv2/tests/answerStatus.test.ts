@@ -1,5 +1,6 @@
-import knex from "../database/knex"
 import { Model, snakeCaseMappers } from "objection"
+
+import knex from "../database/knex"
 import { Quiz, QuizAnswer, UserQuizState, Course } from "../src/models"
 import { safeClean, safeSeed } from "./util"
 
@@ -43,7 +44,7 @@ describe("autoreject off 1", () => {
   })
 
   test("fresh answer", async () => {
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -58,7 +59,7 @@ describe("autoreject off 1", () => {
 
   test("given 2", async () => {
     userQuizState.peerReviewsGiven = 2
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -73,7 +74,7 @@ describe("autoreject off 1", () => {
 
   test("given 3", async () => {
     userQuizState.peerReviewsGiven = 3
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -88,7 +89,7 @@ describe("autoreject off 1", () => {
 
   test("given 4", async () => {
     userQuizState.peerReviewsGiven = 4
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -104,7 +105,7 @@ describe("autoreject off 1", () => {
   test("given 4, received 1", async () => {
     userQuizState.peerReviewsGiven = 4
     userQuizState.peerReviewsReceived = 1
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -120,7 +121,7 @@ describe("autoreject off 1", () => {
   test("given 4, received 2", async () => {
     userQuizState.peerReviewsGiven = 4
     userQuizState.peerReviewsReceived = 2
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -162,7 +163,7 @@ describe("auto confirm off 1", () => {
   test("given 3, received 2", async () => {
     userQuizState.peerReviewsGiven = 3
     userQuizState.peerReviewsReceived = 2
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -202,7 +203,7 @@ describe("autoreject off 1, failing", () => {
   test("given 4, received 2, fail", async () => {
     userQuizState.peerReviewsGiven = 4
     userQuizState.peerReviewsReceived = 2
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -242,7 +243,7 @@ describe("autoreject off 2", () => {
 
   test("spam 1", async () => {
     userQuizState.spamFlags = 1
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -257,7 +258,7 @@ describe("autoreject off 2", () => {
 
   test("spam 2", async () => {
     userQuizState.spamFlags = 2
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -272,7 +273,7 @@ describe("autoreject off 2", () => {
 
   test("spam 3", async () => {
     userQuizState.spamFlags = 3
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -288,7 +289,7 @@ describe("autoreject off 2", () => {
   test("spam 3, given 3", async () => {
     userQuizState.spamFlags = 3
     userQuizState.peerReviewsGiven = 3
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -329,7 +330,7 @@ describe("autoreject of 3", () => {
 
   test("spam 1", async () => {
     userQuizState.spamFlags = 1
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -345,7 +346,7 @@ describe("autoreject of 3", () => {
   test("spam 1, given 3", async () => {
     userQuizState.spamFlags = 1
     userQuizState.peerReviewsGiven = 3
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -361,7 +362,7 @@ describe("autoreject of 3", () => {
   test("spam 1, given 4", async () => {
     userQuizState.spamFlags = 1
     userQuizState.peerReviewsGiven = 4
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -380,7 +381,7 @@ describe("autoreject of 3", () => {
     userQuizState.spamFlags = 1
     userQuizState.peerReviewsGiven = 3
     userQuizState.peerReviewsReceived = 2
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -422,7 +423,7 @@ describe("autoreject on 1", () => {
     quiz.autoReject = true
     userQuizState.peerReviewsGiven = 3
     userQuizState.peerReviewsReceived = 2
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -463,7 +464,7 @@ describe("autoreject on 2", () => {
   test("spam 1", async () => {
     quiz.autoReject = true
     userQuizState.spamFlags = 1
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -479,7 +480,7 @@ describe("autoreject on 2", () => {
   test("spam 2", async () => {
     quiz.autoReject = true
     userQuizState.spamFlags = 2
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -495,7 +496,7 @@ describe("autoreject on 2", () => {
   test("spam 3", async () => {
     quiz.autoReject = true
     userQuizState.spamFlags = 3
-    const status = await knex.transaction(async trx => {
+    const status = await knex.transaction(async (trx) => {
       await QuizAnswer.assessAnswerStatus(
         quizAnswer,
         userQuizState,

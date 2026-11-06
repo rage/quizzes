@@ -1,8 +1,9 @@
-import Quiz from "./quiz"
-import QuizOption from "./quiz_option"
-import QuizItemTranslation from "./quiz_item_translation"
-import BaseModel from "./base_model"
 import { mixin } from "objection"
+
+import BaseModel from "./base_model"
+import Quiz from "./quiz"
+import QuizItemTranslation from "./quiz_item_translation"
+import QuizOption from "./quiz_option"
 import softDelete from "./soft_delete"
 
 export type QuizItemType =

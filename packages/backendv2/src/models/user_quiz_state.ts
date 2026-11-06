@@ -1,9 +1,10 @@
-import Quiz from "./quiz"
-import User from "./user"
-import QuizAnswer from "./quiz_answer"
 import type { Knex } from "knex"
-import BaseModel from "./base_model"
+
 import knex from "../../database/knex"
+import BaseModel from "./base_model"
+import Quiz from "./quiz"
+import QuizAnswer from "./quiz_answer"
+import User from "./user"
 
 class UserQuizState extends BaseModel {
   userId!: number

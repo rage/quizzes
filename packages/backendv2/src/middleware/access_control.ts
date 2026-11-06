@@ -1,12 +1,11 @@
-import { CustomContext } from "../types"
+import redis from "../../config/redis"
 import { getCurrentUserDetails } from "../services/tmc"
+import { CustomContext } from "../types"
 import {
   ForbiddenError,
   UnauthorizedError,
   BadRequestError,
 } from "../util/error"
-
-import redis from "../../config/redis"
 
 interface AccessControlOptions {
   administrator?: boolean

@@ -1,11 +1,12 @@
-import { createReducer } from "typesafe-actions"
 import { produce } from "immer"
-import { action } from "../../types/NormalizedQuiz"
-import { checkForChanges } from "./editorActions"
 import _ from "lodash"
 import { denormalize } from "normalizr"
+import { createReducer } from "typesafe-actions"
+
 import { normalizedQuiz } from "../../schemas"
+import { action } from "../../types/NormalizedQuiz"
 import { Quiz } from "../../types/Quiz"
+import { checkForChanges } from "./editorActions"
 
 export const editorChangesReducer = createReducer<{ changes: boolean }, action>(
   {
@@ -13,7 +14,7 @@ export const editorChangesReducer = createReducer<{ changes: boolean }, action>(
   },
 ).handleAction(checkForChanges, (state, action) => {
   if (action.payload.store.editor.quizId !== "") {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       const initState: Quiz =
         action.payload.store.editor.quizVariables[
           action.payload.store.editor.quizId
@@ -38,7 +39,7 @@ export const editorChangesReducer = createReducer<{ changes: boolean }, action>(
       draftState.changes = !_.isEqual(initState, newState)
     })
   } else {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState.changes = false
     })
   }

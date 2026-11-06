@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from "react"
-import { Button, Typography, Snackbar } from "@mui/material"
+
 import styled from "styled-components"
-import { Answer } from "../../../types/Answer"
-import {
-  changeAnswerStatus,
-  logSuspectedPlagiarism,
-} from "../../../services/quizzes"
+
+import { Button, Typography, Snackbar } from "@mui/material"
 import { Alert } from "@mui/material"
-import { SlideDown } from "../../Shared/SlideDown"
-import { ButtonFieldWrapper } from "../../Shared/ButtonFieldWrapper"
+
 import {
   setHandledAnswers,
   useAnswerListState,
 } from "../../../contexts/AnswerListContext"
 import { useAnswer } from "../../../hooks/useAnswer"
+import {
+  changeAnswerStatus,
+  logSuspectedPlagiarism,
+} from "../../../services/quizzes"
+import { Answer } from "../../../types/Answer"
+import { ButtonFieldWrapper } from "../../Shared/ButtonFieldWrapper"
+import { SlideDown } from "../../Shared/SlideDown"
 
 export const RejectButton = styled(Button)`
   display: flex !important;

@@ -1,10 +1,13 @@
 import React from "react"
+
 import styled from "styled-components"
+
 import { Button } from "@mui/material"
-import { QuizInfoForm } from "./QuizInfoForm"
-import PeerReviewInfoForm from "./PeerReviewInfoForm"
-import AnswerInfoForm from "./AnswerInfoForm"
+
 import { Quiz, Course } from "../../types/Quiz"
+import AnswerInfoForm from "./AnswerInfoForm"
+import PeerReviewInfoForm from "./PeerReviewInfoForm"
+import { QuizInfoForm } from "./QuizInfoForm"
 
 const FormContainer = styled.div`
   display: flex;

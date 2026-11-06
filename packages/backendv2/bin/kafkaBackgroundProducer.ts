@@ -1,11 +1,13 @@
-import * as Kafka from "node-rdkafka"
 import { promisify } from "util"
-import { KafkaMessage } from "../src/models"
+
+import * as Kafka from "node-rdkafka"
+
 import { setUpDB } from "../database/knex"
 import { GlobalLogger } from "../src/middleware/logger"
+import { KafkaMessage } from "../src/models"
 
 const sleep = (ms: number) => {
-  return new Promise(resolve => {
+  return new Promise((resolve) => {
     setTimeout(resolve, ms)
   })
 }
@@ -46,7 +48,7 @@ export const kafkaBackgroundMessageProducer = async () => {
     try {
       const messages = await KafkaMessage.fetchSomeMessage(100)
       if (messages.length > 0) {
-        const topics = [...new Set(messages.map(msg => msg.topic))]
+        const topics = [...new Set(messages.map((msg) => msg.topic))]
         GlobalLogger.info(`Producing ${messages.length} messages`)
         GlobalLogger.info(`Topics: ${topics}`)
         GlobalLogger.info(`Timestamp: ${messages[0].createdAt}`)

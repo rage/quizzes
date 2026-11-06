@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react"
-import { Tabs, Tab, Badge, Typography } from "@mui/material"
+
 import { useRouter } from "next/router"
+
 import {
   faPen,
   faChalkboard,
@@ -8,18 +9,20 @@ import {
   faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import OverView from "../quizPages/overview"
-import EditPage from "../quizPages/edit"
+import { Tabs, Tab, Badge, Typography } from "@mui/material"
+
+import { AnswerListProvider } from "../../contexts/AnswerListContext"
+import { useAnswersRequiringAttentionCount } from "../../hooks/useAnswersRequiringAttention"
+import { useCourse } from "../../hooks/useCourse"
+import { useQuiz } from "../../hooks/useQuiz"
+import { useUserAbilities } from "../../hooks/useUserAbilities"
+import { ITabToComponent } from "../CoursePage/types"
 import AllAnswers from "../quizPages/answers/all"
 import RequiringAttention from "../quizPages/answers/requiring-attention"
-import { ITabToComponent } from "../CoursePage/types"
-import { AnswerListProvider } from "../../contexts/AnswerListContext"
-import { useQuiz } from "../../hooks/useQuiz"
-import { useCourse } from "../../hooks/useCourse"
-import { useUserAbilities } from "../../hooks/useUserAbilities"
+import EditPage from "../quizPages/edit"
+import OverView from "../quizPages/overview"
 import { TabTextError, TabTextLoading } from "../quizPages/TabHeaders"
 import SkeletonLoader from "../Shared/SkeletonLoader"
-import { useAnswersRequiringAttentionCount } from "../../hooks/useAnswersRequiringAttention"
 
 export const TabNavigator = () => {
   const router = useRouter()
@@ -32,11 +35,8 @@ export const TabNavigator = () => {
     quiz?.courseId ?? "",
     "course",
   )
-  const {
-    userAbilities,
-    userAbilitiesLoading,
-    userAbilitiesError,
-  } = useUserAbilities(quiz?.courseId ?? "", "user-abilities")
+  const { userAbilities, userAbilitiesLoading, userAbilitiesError } =
+    useUserAbilities(quiz?.courseId ?? "", "user-abilities")
   const {
     requiringAttention,
     requiringAttentionLoading,

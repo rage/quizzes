@@ -1,6 +1,7 @@
 import nock from "nock"
 import { Model, snakeCaseMappers } from "objection"
 import request from "supertest"
+
 import app from "../../app"
 import redis from "../../config/redis"
 import knex from "../../database/knex"
@@ -170,7 +171,7 @@ describe("Soft delete quiz answer and update user quiz state", () => {
 const userSetup = () => {
   nock("https://tmc.mooc.fi")
     .get("/api/v8/users/current?show_user_fields=true")
-    .reply(function() {
+    .reply(function () {
       const auth = this.req.headers.authorization
       if (auth === "Bearer admin_token") {
         return [

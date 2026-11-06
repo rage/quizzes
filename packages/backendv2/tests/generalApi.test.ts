@@ -1,10 +1,10 @@
-import request from "supertest"
 import nock from "nock"
+import request from "supertest"
+
 import app from "../app"
+import redis from "../config/redis"
 import knex from "../database/knex"
 import { UserInfo } from "../src/types"
-
-import redis from "../config/redis"
 import { safeClean, safeSeed, configA } from "./util"
 
 afterAll(async () => {
@@ -30,7 +30,7 @@ describe("general-api", () => {
   beforeEach(async () => {
     nock("https://tmc.mooc.fi")
       .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
+      .reply(function () {
         const auth = this.req.headers.authorization
         if (auth === "Bearer PLEB_TOKEN") {
           return [
@@ -54,21 +54,21 @@ describe("general-api", () => {
       })
   })
 
-  it("returns quiz titles of specified course", done => {
+  it("returns quiz titles of specified course", (done) => {
     request(app.callback())
       .get(
         "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/quiz-titles",
       )
       .set("Authorization", "bearer ADMIN_TOKEN")
       .expect(200)
-      .expect(response => {
+      .expect((response) => {
         const data = response.body
         expect(data["4bf4cf2f-3058-4311-8d16-26d781261af7"]).toEqual("quiz 1")
       })
       .end(done)
   })
 
-  it("progress api doesn't allow unauthorized access", done => {
+  it("progress api doesn't allow unauthorized access", (done) => {
     request(app.callback())
       .get(
         "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/progress",
@@ -78,14 +78,14 @@ describe("general-api", () => {
       .end(done)
   })
 
-  it("progress api returns an array", done => {
+  it("progress api returns an array", (done) => {
     request(app.callback())
       .get(
         "/api/v2/general/course/46d7ceca-e1ed-508b-91b5-3cc8385fa44b/progress",
       )
       .set("Authorization", "bearer ADMIN_TOKEN")
       .expect(200)
-      .expect(response => {
+      .expect((response) => {
         const data = response.body
         expect(data).toBeArray()
         expect(data.length).toBe(1)

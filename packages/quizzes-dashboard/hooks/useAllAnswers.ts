@@ -1,4 +1,5 @@
 import useSWR from "swr"
+
 import { getAllAnswers } from "./../services/quizzes"
 
 const fetcher = ([

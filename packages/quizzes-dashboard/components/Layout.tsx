@@ -1,11 +1,14 @@
 import * as React from "react"
-import { Container } from "@mui/material"
+
 import styled from "styled-components"
+
+import { Container } from "@mui/material"
+
+import { BreadCrumbs } from "../contexts/BreadCrumbContext"
+import { LoginChecker } from "../contexts/LoginStateContext"
 import Footer from "./Footer"
 import LoginStateWrapper from "./LoginStateWrapper"
-import { LoginChecker } from "../contexts/LoginStateContext"
 import TopBar from "./TopBar"
-import { BreadCrumbs } from "../contexts/BreadCrumbContext"
 
 interface TemplateProps {
   children?: React.ReactNode

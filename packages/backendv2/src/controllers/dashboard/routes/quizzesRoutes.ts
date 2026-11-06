@@ -1,4 +1,5 @@
 import Router from "@koa/router"
+
 import redis from "../../../../config/redis"
 import accessControl from "../../../middleware/access_control"
 import { Quiz, QuizAnswer } from "../../../models"
@@ -20,13 +21,13 @@ interface DownloadRequestBody {
 const quizzesRoutes = new Router<CustomState, CustomContext>({
   prefix: "/quizzes",
 })
-  .post("/", accessControl(), async ctx => {
+  .post("/", accessControl(), async (ctx) => {
     const quizData = ctx.request.body as { courseId: string }
     await checkAccessOrThrow(ctx.state.user, quizData.courseId, "edit")
     ctx.body = await Quiz.save(quizData)
   })
 
-  .get("/:quizId", accessControl(), async ctx => {
+  .get("/:quizId", accessControl(), async (ctx) => {
     const quizId = ctx.params.quizId
     const quiz = await Quiz.getById(quizId)
     await checkAccessOrThrow(ctx.state.user, quiz.courseId, "view")
@@ -36,18 +37,17 @@ const quizzesRoutes = new Router<CustomState, CustomContext>({
   .get(
     "/:quizId/count-answers-requiring-attention",
     accessControl(),
-    async ctx => {
+    async (ctx) => {
       const quizId = ctx.params.quizId
       const quiz = await Quiz.getById(quizId)
       await checkAccessOrThrow(ctx.state.user, quiz.courseId, "view")
-      const requiringAttention = await QuizAnswer.getManualReviewCountByQuizId(
-        quizId,
-      )
+      const requiringAttention =
+        await QuizAnswer.getManualReviewCountByQuizId(quizId)
       ctx.body = requiringAttention
     },
   )
 
-  .post("/:quizId/download-quiz-info", accessControl(), async ctx => {
+  .post("/:quizId/download-quiz-info", accessControl(), async (ctx) => {
     const quizId = ctx.params.quizId
     const { courseId } = ctx.request.body as { courseId: string }
 
@@ -72,13 +72,16 @@ const quizzesRoutes = new Router<CustomState, CustomContext>({
     }
   })
 
-  .post("/download/download-quiz-info/:quizId", async ctx => {
+  .post("/download/download-quiz-info/:quizId", async (ctx) => {
     const downloadToken = ctx.query.downloadToken
     const { quizId } = ctx.params
     const isoDate = getFormattedIsoDate()
 
-    const { quizName, courseName, userId: bodyUserId } = ctx.request
-      .body as DownloadRequestBody
+    const {
+      quizName,
+      courseName,
+      userId: bodyUserId,
+    } = ctx.request.body as DownloadRequestBody
     const userId = bodyUserId.toString()
 
     // validate token
@@ -107,7 +110,7 @@ const quizzesRoutes = new Router<CustomState, CustomContext>({
     }
   })
 
-  .post("/:quizId/download-peerreview-info", accessControl(), async ctx => {
+  .post("/:quizId/download-peerreview-info", accessControl(), async (ctx) => {
     const quizId = ctx.params.quizId
     const { courseId } = ctx.request.body as { courseId: string }
 
@@ -133,13 +136,16 @@ const quizzesRoutes = new Router<CustomState, CustomContext>({
     }
   })
 
-  .post("/download/download-peerreview-info/:quizId", async ctx => {
+  .post("/download/download-peerreview-info/:quizId", async (ctx) => {
     const downloadToken = ctx.query.downloadToken?.toString()
     const { quizId } = ctx.params
     const isoDate = getFormattedIsoDate()
 
-    const { quizName, courseName, userId: bodyUserId } = ctx.request
-      .body as DownloadRequestBody
+    const {
+      quizName,
+      courseName,
+      userId: bodyUserId,
+    } = ctx.request.body as DownloadRequestBody
     const userId = bodyUserId.toString()
 
     // validate token
@@ -168,7 +174,7 @@ const quizzesRoutes = new Router<CustomState, CustomContext>({
     }
   })
 
-  .post("/:quizId/download-answer-info", accessControl(), async ctx => {
+  .post("/:quizId/download-answer-info", accessControl(), async (ctx) => {
     const quizId = ctx.params.quizId
     const { courseId } = ctx.request.body as { courseId: string }
 
@@ -194,13 +200,16 @@ const quizzesRoutes = new Router<CustomState, CustomContext>({
     }
   })
 
-  .post("/download/download-answer-info/:quizId", async ctx => {
+  .post("/download/download-answer-info/:quizId", async (ctx) => {
     const downloadToken = ctx.query.downloadToken?.toString()
     const { quizId } = ctx.params
     const isoDate = getFormattedIsoDate()
 
-    const { quizName, courseName, userId: bodyUserId } = ctx.request
-      .body as DownloadRequestBody
+    const {
+      quizName,
+      courseName,
+      userId: bodyUserId,
+    } = ctx.request.body as DownloadRequestBody
     const userId = bodyUserId.toString()
 
     // validate token
@@ -228,14 +237,14 @@ const quizzesRoutes = new Router<CustomState, CustomContext>({
     }
   })
 
-  .get("/:quizId/answerStatistics", accessControl(), async ctx => {
+  .get("/:quizId/answerStatistics", accessControl(), async (ctx) => {
     const quizId = ctx.params.quizId
     const courseId = await getCourseIdByQuizId(quizId)
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await QuizAnswer.getAnswerCountsByStatus(quizId)
   })
 
-  .get("/answers/get-answer-states", accessControl(), async ctx => {
+  .get("/answers/get-answer-states", accessControl(), async (ctx) => {
     ctx.body = await QuizAnswer.getStates()
   })
 

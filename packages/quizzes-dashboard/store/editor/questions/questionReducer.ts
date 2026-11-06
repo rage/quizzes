@@ -1,8 +1,10 @@
-import { createReducer } from "typesafe-actions"
-import { Question } from "../../../types/Quiz"
-import { action, NormalizedQuestion } from "../../../types/NormalizedQuiz"
-import { initializedEditor } from "../editorActions"
 import { produce } from "immer"
+import { createReducer } from "typesafe-actions"
+
+import { action, NormalizedQuestion } from "../../../types/NormalizedQuiz"
+import { Question } from "../../../types/Quiz"
+import { initializedEditor } from "../editorActions"
+import { deletePeerReview } from "../peerReviewCollections/peerReviewCollectionActions"
 import {
   editedPeerReviewQuestionTitle,
   editedPeerReviewQuestionBody,
@@ -14,7 +16,6 @@ import {
   toggledQuestionAnswerRequired,
   deletedPRQ,
 } from "./questionActions"
-import { deletePeerReview } from "../peerReviewCollections/peerReviewCollectionActions"
 
 export const questionReducer = createReducer<
   {
@@ -28,25 +29,25 @@ export const questionReducer = createReducer<
   )
 
   .handleAction(editedPeerReviewQuestionTitle, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.prqId].title = action.payload.newTitle
     })
   })
 
   .handleAction(editedPeerReviewQuestionBody, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.prqId].body = action.payload.newBody
     })
   })
 
   .handleAction(editedPeerReviewQuestionType, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.prqId].type = action.payload.newType
     })
   })
 
   .handleAction(increasedPRQOrder, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       const order = draftState[action.payload.prqId].order
       if (order < Object.keys(state).length - 1) {
         for (let key in state) {
@@ -61,7 +62,7 @@ export const questionReducer = createReducer<
   })
 
   .handleAction(decreasedPRQOrder, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       const order = draftState[action.payload.prqId].order
       if (order > 0) {
         for (let key in state) {
@@ -76,9 +77,9 @@ export const questionReducer = createReducer<
   })
 
   .handleAction(createdNewPeerReviewQuestion, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       const order = Object.values(state).filter(
-        question =>
+        (question) =>
           question.peerReviewCollectionId ===
           action.payload.peerReviewCollectionId,
       ).length
@@ -100,21 +101,21 @@ export const questionReducer = createReducer<
   })
 
   .handleAction(toggledQuestionDefault, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.questionId].default =
         action.payload.questionDefault
     })
   })
 
   .handleAction(toggledQuestionAnswerRequired, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.questionId].answerRequired =
         action.payload.answerRequired
     })
   })
 
   .handleAction(deletePeerReview, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       for (const key in draftState) {
         if (
           draftState[key].peerReviewCollectionId === action.payload.peerReviewId
@@ -126,7 +127,7 @@ export const questionReducer = createReducer<
   })
 
   .handleAction(deletedPRQ, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       delete draftState[action.payload.questionId]
     })
   })

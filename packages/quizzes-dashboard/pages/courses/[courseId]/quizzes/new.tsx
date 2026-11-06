@@ -1,14 +1,17 @@
 import React, { useEffect } from "react"
-import QuizEditForms from "../../../../components/QuizEditForms"
-import { Typography } from "@mui/material"
-import SaveButton from "../../../../components/SaveButton"
-import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
+
+import Head from "next/head"
 import { useRouter } from "next/router"
 import { useDispatch } from "react-redux"
-import { createdNewQuiz } from "../../../../store/editor/editorActions"
-import Head from "next/head"
 import useSWR from "swr"
+
+import { Typography } from "@mui/material"
+
+import QuizEditForms from "../../../../components/QuizEditForms"
+import SaveButton from "../../../../components/SaveButton"
+import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
 import { fetchCourseById } from "../../../../services/quizzes"
+import { createdNewQuiz } from "../../../../store/editor/editorActions"
 
 const NewQuiz = () => {
   const dispatch = useDispatch()

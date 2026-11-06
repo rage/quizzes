@@ -1,7 +1,8 @@
 import React from "react"
-import { NormalizedItem } from "../../../../types/NormalizedQuiz"
+
+import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { useTypedSelector } from "../../../../store/store"
+
 import {
   TextField,
   Typography,
@@ -9,6 +10,7 @@ import {
   Radio,
   FormControlLabel,
 } from "@mui/material"
+
 import {
   editedQuizItemTitle,
   editedScaleMinLabel,
@@ -16,11 +18,12 @@ import {
   editedScaleMaxValue,
   editedScaleMinValue,
 } from "../../../../store/editor/items/itemAction"
-import { useDispatch } from "react-redux"
 import {
   setScaleMin,
   setScaleMax,
 } from "../../../../store/editor/itemVariables/itemVariableActions"
+import { useTypedSelector } from "../../../../store/store"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 
 const ModalContent = styled.div`
   padding: 1rem;
@@ -63,9 +66,9 @@ interface ScaleItemEditorModalProps {
 }
 export const ScaleModalContent = ({ item }: ScaleItemEditorModalProps) => {
   const dispatch = useDispatch()
-  const storeItem = useTypedSelector(state => state.editor.items[item.id])
+  const storeItem = useTypedSelector((state) => state.editor.items[item.id])
   const variables = useTypedSelector(
-    state => state.editor.itemVariables[item.id],
+    (state) => state.editor.itemVariables[item.id],
   )
 
   const handleMinValueChange = (value: number) => {
@@ -98,7 +101,7 @@ export const ScaleModalContent = ({ item }: ScaleItemEditorModalProps) => {
           fullWidth
           multiline
           variant="outlined"
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
           }
         />
@@ -112,7 +115,7 @@ export const ScaleModalContent = ({ item }: ScaleItemEditorModalProps) => {
           value={variables.scaleMin ?? ""}
           fullWidth
           variant="outlined"
-          onChange={event => handleMinValueChange(Number(event.target.value))}
+          onChange={(event) => handleMinValueChange(Number(event.target.value))}
         />
       </ModalContent>
       <ModalContent>
@@ -124,12 +127,12 @@ export const ScaleModalContent = ({ item }: ScaleItemEditorModalProps) => {
           value={variables.scaleMax ?? ""}
           fullWidth
           variant="outlined"
-          onChange={event => handleMaxValueChange(Number(event.target.value))}
+          onChange={(event) => handleMaxValueChange(Number(event.target.value))}
         />
       </ModalContent>
       <PreviewModalContainer>
         <FormGroup row>
-          {variables.array.map(item => {
+          {variables.array.map((item) => {
             return (
               <div key={item}>
                 <StyledFormLabel

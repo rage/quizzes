@@ -1,9 +1,10 @@
-import User from "./user"
 import type { Knex } from "knex"
-import Course from "./course"
+
 import { PointsByGroup } from "../types"
-import Quiz from "./quiz"
 import BaseModel from "./base_model"
+import Course from "./course"
+import Quiz from "./quiz"
+import User from "./user"
 
 class UserCoursePartState extends BaseModel {
   userId!: number
@@ -138,13 +139,13 @@ class UserCoursePartState extends BaseModel {
         .where("course_id", courseId)
         .andWhereNot("part", 0)
 
-      const progress: PointsByGroup[] = userCoursePartStates.map(ucps => {
+      const progress: PointsByGroup[] = userCoursePartStates.map((ucps) => {
         const maxPoints = quizzes
           .filter(
-            quiz =>
+            (quiz) =>
               quiz.part === ucps.coursePart && quiz.excludedFromScore === false,
           )
-          .map(quiz => quiz.points)
+          .map((quiz) => quiz.points)
           .reduce((acc, curr) => acc + curr, 0)
 
         const coursePartString = ucps.coursePart.toString()
@@ -169,9 +170,9 @@ class UserCoursePartState extends BaseModel {
 
   public static async refreshCourse(userId: number, courseId: string) {
     const parts = await Course.getParts(courseId)
-    await this.knex().transaction(async trx => {
+    await this.knex().transaction(async (trx) => {
       await Promise.all(
-        parts.map(async part => {
+        parts.map(async (part) => {
           await this.update(userId, courseId, part, trx)
         }),
       )

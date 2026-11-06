@@ -1,5 +1,6 @@
-import BreadCrumbContext, { CrumbItem } from "../contexts/BreadCrumbContext"
 import { useEffect, useContext } from "react"
+
+import BreadCrumbContext, { CrumbItem } from "../contexts/BreadCrumbContext"
 
 const useBreadcrumbs = (crumbs: CrumbItem[]) => {
   const { setBreadCrumbs } = useContext(BreadCrumbContext)

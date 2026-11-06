@@ -1,13 +1,13 @@
-import { QuizAnswer } from "../src/models"
-import { BadRequestError, NotFoundError } from "./../src/util/error"
 import nock from "nock"
-import request from "supertest"
-import app from "../app"
-import knex from "../database/knex"
 import { Model, snakeCaseMappers } from "objection"
+import request from "supertest"
 
-import { UserInfo } from "../src/types"
+import app from "../app"
 import redis from "../config/redis"
+import knex from "../database/knex"
+import { QuizAnswer } from "../src/models"
+import { UserInfo } from "../src/types"
+import { BadRequestError, NotFoundError } from "./../src/util/error"
 
 const knexCleaner = require("knex-cleaner")
 
@@ -52,7 +52,7 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
   beforeEach(async () => {
     nock("https://tmc.mooc.fi")
       .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
+      .reply(function () {
         const auth = this.req.headers.authorization
         if (auth === "Bearer PLEB_TOKEN") {
           return [
@@ -75,7 +75,7 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
       })
   })
 
-  test("respond with 401 if invalid credentials", done => {
+  test("respond with 401 if invalid credentials", (done) => {
     request(app.callback())
       .post("/api/v2/dashboard/answers/status")
       .set("Authorization", `bearer BAD_TOKEN`)
@@ -83,7 +83,7 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
       .expect(401, done)
   })
 
-  test("respond with 403 if insufficient privilege", done => {
+  test("respond with 403 if insufficient privilege", (done) => {
     request(app.callback())
       .post("/api/v2/dashboard/answers/status")
       .set("Authorization", `bearer PLEB_TOKEN`)
@@ -92,20 +92,20 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
       .expect(403, done)
   })
 
-  test("throw bad request if no answer ids provided", done => {
+  test("throw bad request if no answer ids provided", (done) => {
     request(app.callback())
       .post("/api/v2/dashboard/answers/status")
       .set("Authorization", `bearer ADMIN_TOKEN`)
       .set("Accept", "application/json")
       .send({ answerIds: [] })
-      .expect(response => {
+      .expect((response) => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual("No answer ids provided.")
       })
       .expect(400, done)
   })
 
-  test("throw not found error if no course found for answer ids", done => {
+  test("throw not found error if no course found for answer ids", (done) => {
     request(app.callback())
       .post("/api/v2/dashboard/answers/status")
       .set("Authorization", `bearer ADMIN_TOKEN`)
@@ -116,7 +116,7 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
           "f7bd5724-1f80-4297-8134-b7c980d17a7a",
         ],
       })
-      .expect(response => {
+      .expect((response) => {
         const received: NotFoundError = response.body
         expect(received.message).toEqual(
           "No course found for answer id: af87b380-743a-4200-900e-b4bba8207381",
@@ -125,7 +125,7 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
       .expect(404, done)
   })
 
-  test("throw bad request error if no status provided for status update", done => {
+  test("throw bad request error if no status provided for status update", (done) => {
     request(app.callback())
       .post("/api/v2/dashboard/answers/status")
       .set("Authorization", `bearer ADMIN_TOKEN`)
@@ -134,7 +134,7 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
         answerIds: ["0cb3e4de-fc11-4aac-be45-06312aa4677c"],
         status: "bad status",
       })
-      .expect(response => {
+      .expect((response) => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual("Invalid answer status provided.")
       })
@@ -142,7 +142,7 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
   })
 
   describe("on successful bulk status change", () => {
-    test("return 200", done => {
+    test("return 200", (done) => {
       request(app.callback())
         .post("/api/v2/dashboard/answers/status")
         .set("Authorization", `bearer ADMIN_TOKEN`)
@@ -154,7 +154,7 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
         .expect(200, done)
     })
 
-    test("return 2 answers with confirmed statuses when 2 confirmed", done => {
+    test("return 2 answers with confirmed statuses when 2 confirmed", (done) => {
       request(app.callback())
         .post("/api/v2/dashboard/answers/status")
         .set("Authorization", `bearer ADMIN_TOKEN`)
@@ -166,7 +166,7 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
           ],
           status: "confirmed",
         })
-        .expect(response => {
+        .expect((response) => {
           const quizAnswers: QuizAnswer[] = response.body
           expect(quizAnswers.length).toEqual(2)
           expect(quizAnswers[0].status === "confirmed")
@@ -175,7 +175,7 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
         .expect(200, done)
     })
 
-    test("return 3 answers with rejected statuses when 3 rejeceted", done => {
+    test("return 3 answers with rejected statuses when 3 rejeceted", (done) => {
       request(app.callback())
         .post("/api/v2/dashboard/answers/status")
         .set("Authorization", `bearer ADMIN_TOKEN`)
@@ -188,7 +188,7 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
           ],
           status: "rejected",
         })
-        .expect(response => {
+        .expect((response) => {
           const quizAnswers: QuizAnswer[] = response.body
           expect(quizAnswers.length).toEqual(3)
           expect(quizAnswers[0].status === "rejected")

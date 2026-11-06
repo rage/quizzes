@@ -1,11 +1,6 @@
 import type { Knex } from "knex"
-import {
-  ExerciseData,
-  ProgressMessage,
-  QuizAnswerMessage,
-  QuizMessage,
-  RequiredAction,
-} from "../types"
+
+import knex from "../../database/knex"
 import {
   Course,
   KafkaMessage,
@@ -14,7 +9,13 @@ import {
   UserQuizState,
 } from "../models"
 import UserCoursePartState from "../models/user_course_part_state"
-import knex from "../../database/knex"
+import {
+  ExerciseData,
+  ProgressMessage,
+  QuizAnswerMessage,
+  QuizMessage,
+  RequiredAction,
+} from "../types"
 
 export const broadcastUserProgressUpdated = async (
   userId: number,
@@ -73,7 +74,7 @@ export const broadcastQuizAnswerUpdated = async (
     timestamp: new Date().toISOString(),
     original_submission_date: quizAnswer.createdAt,
     exercise_id: quizAnswer.quizId,
-    n_points: quiz.excludedFromScore ? 0 : userQuizState.pointsAwarded ?? 0,
+    n_points: quiz.excludedFromScore ? 0 : (userQuizState.pointsAwarded ?? 0),
     completed: quizAnswer.status === "confirmed",
     user_id: quizAnswer.userId,
     course_id: course.moocfiId,
@@ -99,7 +100,7 @@ export const broadcastCourseQuizzesUpdated = async (
     .whereNot("part", 0)
     .withGraphJoined("texts")
 
-  const data: ExerciseData[] = quizzes.map(quiz => {
+  const data: ExerciseData[] = quizzes.map((quiz) => {
     return {
       name: quiz.texts[0].title,
       id: quiz.id,
@@ -127,7 +128,7 @@ export const broadcastUserCourse = async (userId: number, courseId: string) => {
     .withGraphJoined("userQuizState")
     .where("quiz_answer.user_id", userId)
     .andWhere("course_id", courseId)
-  await knex.transaction(async trx => {
+  await knex.transaction(async (trx) => {
     for (const quizAnswer of quizAnswers) {
       const { quiz, userQuizState } = quizAnswer
       await broadcastQuizAnswerUpdated(quizAnswer, userQuizState, quiz, trx)

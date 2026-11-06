@@ -1,6 +1,14 @@
 import React from "react"
-import { NormalizedItem } from "../../../../types/NormalizedQuiz"
+
+import { useDispatch } from "react-redux"
 import styled from "styled-components"
+
+import {
+  faWindowClose,
+  faTrash,
+  faPen,
+} from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   Typography,
   TextField,
@@ -10,19 +18,14 @@ import {
   Fade,
   Button,
 } from "@mui/material"
-import { useTypedSelector } from "../../../../store/store"
-import { useDispatch } from "react-redux"
+
+import { deletedItem } from "../../../../store/editor/editorActions"
 import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
 import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
-import CheckBoxModalContent from "./CheckBoxModalContent"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import {
-  faWindowClose,
-  faTrash,
-  faPen,
-} from "@fortawesome/free-solid-svg-icons"
-import { deletedItem } from "../../../../store/editor/editorActions"
+import { useTypedSelector } from "../../../../store/store"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import MarkdownEditor from "../../../MarkdownEditor"
+import CheckBoxModalContent from "./CheckBoxModalContent"
 
 interface contentBoxProps {
   item: NormalizedItem
@@ -97,10 +100,10 @@ const EditButtonWrapper = styled.div`
 `
 
 const CheckBoxContent = ({ item }: contentBoxProps) => {
-  const storeItem = useTypedSelector(state => state.editor.items[item.id])
-  const quizId = useTypedSelector(state => state.editor.quizId)
+  const storeItem = useTypedSelector((state) => state.editor.items[item.id])
+  const quizId = useTypedSelector((state) => state.editor.quizId)
   const variables = useTypedSelector(
-    state => state.editor.itemVariables[item.id],
+    (state) => state.editor.itemVariables[item.id],
   )
   const dispatch = useDispatch()
   return (
@@ -145,7 +148,7 @@ const CheckBoxContent = ({ item }: contentBoxProps) => {
         <TitleField>
           <MarkdownEditor
             label="title"
-            onChange={event =>
+            onChange={(event) =>
               dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
             }
             text={storeItem.title ?? ""}

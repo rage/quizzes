@@ -1,17 +1,20 @@
 import React from "react"
+
+import { Provider } from "react-redux"
 import {
   ThemeProvider as StyledThemeProvider,
   createGlobalStyle,
 } from "styled-components"
+
+import { config as fontAwesomeConfig } from "@fortawesome/fontawesome-svg-core"
+import { AppCacheProvider } from "@mui/material-nextjs/v16-pagesRouter"
+import "@fortawesome/fontawesome-svg-core/styles.css"
 import {
   ThemeProvider as MaterialThemeProvider,
   createTheme,
 } from "@mui/material/styles"
-import { AppCacheProvider } from "@mui/material-nextjs/v16-pagesRouter"
+
 import Layout from "../components/Layout"
-import "@fortawesome/fontawesome-svg-core/styles.css"
-import { config as fontAwesomeConfig } from "@fortawesome/fontawesome-svg-core"
-import { Provider } from "react-redux"
 import store from "../store/store"
 import "./index.css"
 

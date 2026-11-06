@@ -1,12 +1,14 @@
 import fs from "fs"
 import path from "path"
+
 import type { Knex } from "knex"
-import env from "./src/util/environment"
 import { types } from "pg"
 
-types.setTypeParser(types.builtins.NUMERIC, value => parseFloat(value))
-types.setTypeParser(types.builtins.FLOAT8, value => parseFloat(value))
-types.setTypeParser(types.builtins.INT8, value => parseInt(value))
+import env from "./src/util/environment"
+
+types.setTypeParser(types.builtins.NUMERIC, (value) => parseFloat(value))
+types.setTypeParser(types.builtins.FLOAT8, (value) => parseFloat(value))
+types.setTypeParser(types.builtins.INT8, (value) => parseInt(value))
 
 const migrationsDirectory = path.join(__dirname, "database", "migrations")
 
@@ -16,9 +18,9 @@ const migrationSource: Knex.MigrationSource<{ file: string }> = {
   async getMigrations() {
     const files = await fs.promises.readdir(migrationsDirectory)
     return files
-      .filter(file => /\.(ts|js)$/.test(file))
+      .filter((file) => /\.(ts|js)$/.test(file))
       .sort()
-      .map(file => ({ file }))
+      .map((file) => ({ file }))
   },
   getMigrationName({ file }) {
     return file.replace(/\.js$/, ".ts")
@@ -86,7 +88,7 @@ function setTimeZoneToUTC(
   connection: { query: (sql: string, cb: (err: Error | null) => void) => void },
   callback: (err: Error | null, connection: unknown) => void,
 ) {
-  connection.query("SET TIMEZONE = UTC;", err => {
+  connection.query("SET TIMEZONE = UTC;", (err) => {
     callback(err, connection)
   })
 }

@@ -1,10 +1,14 @@
 import React from "react"
-import { NormalizedItem } from "../../../../types/NormalizedQuiz"
+
+import { useDispatch } from "react-redux"
+import styled from "styled-components"
+
 import {
-  editedQuizItemTitle,
-  editedScaleMinValue,
-  editedScaleMaxValue,
-} from "../../../../store/editor/items/itemAction"
+  faPen,
+  faWindowClose,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   TextField,
   FormGroup,
@@ -15,23 +19,22 @@ import {
   Modal,
   Box,
 } from "@mui/material"
-import styled from "styled-components"
-import { useDispatch } from "react-redux"
-import { useTypedSelector } from "../../../../store/store"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+
+import { deletedItem } from "../../../../store/editor/editorActions"
 import {
-  faPen,
-  faWindowClose,
-  faTrash,
-} from "@fortawesome/free-solid-svg-icons"
-import ScaleModalContent from "./ScaleModalContent"
+  editedQuizItemTitle,
+  editedScaleMinValue,
+  editedScaleMaxValue,
+} from "../../../../store/editor/items/itemAction"
 import {
   setScaleMin,
   setScaleMax,
   setAdvancedEditing,
 } from "../../../../store/editor/itemVariables/itemVariableActions"
-import { deletedItem } from "../../../../store/editor/editorActions"
+import { useTypedSelector } from "../../../../store/store"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import MarkdownEditor from "../../../MarkdownEditor"
+import ScaleModalContent from "./ScaleModalContent"
 
 const ScaleContainer = styled.div`
   padding-top: 1rem;
@@ -109,10 +112,10 @@ interface scaleContentProps {
   item: NormalizedItem
 }
 const ScaleContent = ({ item }: scaleContentProps) => {
-  const quizId = useTypedSelector(state => state.editor.quizId)
-  const storeItem = useTypedSelector(state => state.editor.items[item.id])
+  const quizId = useTypedSelector((state) => state.editor.quizId)
+  const storeItem = useTypedSelector((state) => state.editor.items[item.id])
   const variables = useTypedSelector(
-    state => state.editor.itemVariables[item.id],
+    (state) => state.editor.itemVariables[item.id],
   )
   const dispatch = useDispatch()
 
@@ -176,13 +179,13 @@ const ScaleContent = ({ item }: scaleContentProps) => {
         <MarkdownEditor
           label="Title"
           text={storeItem.title ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
           }
         />
         <PreviewContainer>
           <FormGroup row>
-            {variables.array.map(item => {
+            {variables.array.map((item) => {
               return (
                 <div key={item}>
                   <StyledFormLabel
@@ -205,7 +208,7 @@ const ScaleContent = ({ item }: scaleContentProps) => {
           value={variables.scaleMin ?? ""}
           variant="outlined"
           type="number"
-          onChange={event => handleMinValueChange(Number(event.target.value))}
+          onChange={(event) => handleMinValueChange(Number(event.target.value))}
         />
         <MaxField
           error={!variables.validMax}
@@ -214,7 +217,7 @@ const ScaleContent = ({ item }: scaleContentProps) => {
           value={variables.scaleMax ?? ""}
           variant="outlined"
           type="number"
-          onChange={event => handleMaxValueChange(Number(event.target.value))}
+          onChange={(event) => handleMaxValueChange(Number(event.target.value))}
         />
       </MinMaxContainer>
     </>

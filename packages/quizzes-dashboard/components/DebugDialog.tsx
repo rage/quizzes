@@ -1,14 +1,17 @@
 import React, { useState } from "react"
-import { Button, Dialog, Typography } from "@mui/material"
-import styled from "styled-components"
-import { useDispatch } from "react-redux"
-import EditableDebugField from "./EditableDebugField"
-import { useTypedSelector } from "../store/store"
-import { normalizedQuiz } from "../schemas"
+
 import { denormalize, normalize } from "normalizr"
-import { Quiz } from "../types/Quiz"
+import { useDispatch } from "react-redux"
+import styled from "styled-components"
+
+import { Button, Dialog, Typography } from "@mui/material"
+
 import { useQuiz } from "../hooks/useQuiz"
+import { normalizedQuiz } from "../schemas"
 import { initializedEditor } from "../store/editor/editorActions"
+import { useTypedSelector } from "../store/store"
+import { Quiz } from "../types/Quiz"
+import EditableDebugField from "./EditableDebugField"
 
 const DialogTitleContainer = styled.div`
   display: flex;
@@ -36,10 +39,10 @@ export const DebugDialog = ({ object }: DebugDialogProps) => {
   const [debugViewChanges, setDebugViewChanges] = useState<string | null>(null)
 
   const dispatch = useDispatch()
-  const quizId = useTypedSelector(state => state.editor.quizId)
+  const quizId = useTypedSelector((state) => state.editor.quizId)
   const { quiz } = useQuiz(quizId, `quiz-${quizId}`)
 
-  const editor = useTypedSelector(state => state.editor)
+  const editor = useTypedSelector((state) => state.editor)
   const data: object | Quiz =
     object ?? denormalize(quizId, normalizedQuiz, editor)
 

@@ -1,5 +1,7 @@
-import * as Kafka from "node-rdkafka"
 import { promisify } from "util"
+
+import * as Kafka from "node-rdkafka"
+
 import knex from "../database/knex"
 import { GlobalLogger } from "../src/middleware/logger"
 import {
@@ -98,12 +100,8 @@ const publish = async () => {
     GlobalLogger.info(`Performing ${tasks.length} tasks`)
 
     for (const task of tasks) {
-      const {
-        course_id,
-        user_id,
-        recalculate_progress,
-        recalculate_only,
-      } = task
+      const { course_id, user_id, recalculate_progress, recalculate_only } =
+        task
       GlobalLogger.info(
         `Task ${task.id}: course ${course_id}, user ${user_id}, recalculate ${recalculate_progress}`,
       )
@@ -136,9 +134,7 @@ const publish = async () => {
         }
       }
 
-      await knex("kafka_task")
-        .where("id", task.id)
-        .del()
+      await knex("kafka_task").where("id", task.id).del()
     }
     GlobalLogger.info("Done")
   } catch (error) {
@@ -210,9 +206,7 @@ const recalculateProgress = async (courseId: string) => {
   )
 }
 
-const getQuizTranslations = (
-  courseId: string,
-): Promise<QuizTranslationRow[]> =>
+const getQuizTranslations = (courseId: string): Promise<QuizTranslationRow[]> =>
   knex("quiz")
     .join("quiz_translation", { "quiz.id": "quiz_translation.quiz_id" })
     .where({ course_id: courseId })
@@ -221,7 +215,7 @@ const getQuizTranslations = (
 const publishQuizzes = async (course: CourseRow) => {
   const quizzes = await getQuizTranslations(course.id)
 
-  const data: ExerciseData[] = quizzes.map(quiz => ({
+  const data: ExerciseData[] = quizzes.map((quiz) => ({
     name: quiz.title,
     id: quiz.id,
     part: quiz.part,
@@ -347,18 +341,18 @@ const publishCourseAnswers = async (course: CourseRow, userId?: number) => {
       .where("quiz.course_id", course.id)
       .whereNotNull("user_id")
       .andWhereNot("quiz_answer.status", "deprecated")
-    answererIds = answerers.map(a => a.user_id)
+    answererIds = answerers.map((a) => a.user_id)
   }
 
   for (const answererId of answererIds) {
     const answers = await getAnswers(course.id, answererId)
-    const answeredIds = answers.map(a => a.quiz_id)
+    const answeredIds = answers.map((a) => a.quiz_id)
 
     const exercises = [
-      ...answers.map(answer => createAnswerMessage(answer, course)),
+      ...answers.map((answer) => createAnswerMessage(answer, course)),
       ...courseQuizzes
-        .filter(q => !answeredIds.includes(q.quiz_id))
-        .map(q => createUnansweredMessage(q, course, answererId)),
+        .filter((q) => !answeredIds.includes(q.quiz_id))
+        .map((q) => createUnansweredMessage(q, course, answererId)),
     ]
 
     const message: CourseQuizAnswersMessage = {
@@ -406,7 +400,7 @@ const publishProgress = async (
   }
 
   for (const [user, userStates] of statesByUser) {
-    const progress: PointsByGroup[] = userStates.map(state => {
+    const progress: PointsByGroup[] = userStates.map((state) => {
       const coursePart = state.course_part.toString()
       const maxPoints = maxPointsByPart[state.course_part] ?? 0
       return {
@@ -431,7 +425,7 @@ const publishProgress = async (
 
 producer.on("ready", publish)
 
-producer.connect({}, err => {
+producer.connect({}, (err) => {
   if (err) {
     GlobalLogger.error("Producer failed to connect", err)
     process.exit(1)

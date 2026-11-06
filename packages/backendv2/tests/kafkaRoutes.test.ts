@@ -1,11 +1,12 @@
 import nock from "nock"
 import { Model, snakeCaseMappers } from "objection"
+import request from "supertest"
+
+import app from "../app"
 import redis from "../config/redis"
 import knex from "../database/knex"
 import { UserInfo } from "../src/types"
 import { safeSeed, safeClean } from "./util"
-import request from "supertest"
-import app from "../app"
 
 beforeAll(() => {
   Model.knex(knex)
@@ -34,7 +35,7 @@ describe("kafka routes tests", () => {
   beforeEach(() => {
     nock("https://tmc.mooc.fi")
       .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
+      .reply(function () {
         const auth = this.req.headers.authorization
         if (auth === "Bearer PLEB_TOKEN") {
           return [
@@ -82,7 +83,7 @@ describe("kafka routes tests", () => {
     beforeEach(() => {
       nock("https://tmc.mooc.fi")
         .get("/api/v8/users/current?show_user_fields=true")
-        .reply(function() {
+        .reply(function () {
           const auth = this.req.headers.authorization
           if (auth === "Bearer ADMIN_TOKEN") {
             return [

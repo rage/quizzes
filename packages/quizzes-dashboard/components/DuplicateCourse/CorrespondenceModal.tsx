@@ -1,10 +1,13 @@
 import React, { useState } from "react"
+
 import styled from "styled-components"
-import { Button, TextField } from "@mui/material"
 import useSWR from "swr"
+
+import { Button, TextField } from "@mui/material"
+import { Autocomplete } from "@mui/material"
+
 import { fetchCourses, getCorrespondenceFile } from "../../services/quizzes"
 import { Course } from "../../types/Quiz"
-import { Autocomplete } from "@mui/material"
 
 const SubmitButton = styled(Button)`
   display: flex !important;
@@ -51,7 +54,7 @@ export const CorrespondenceModal = ({ course }: CorrespondenceProps) => {
   }
 
   const coursesProps: CourseProps = {
-    getOptionLabel: course => course.title,
+    getOptionLabel: (course) => course.title,
     onChange: (_event, value, _reason) => setCourseId(value ? value.id : ""),
   }
 
@@ -67,7 +70,7 @@ export const CorrespondenceModal = ({ course }: CorrespondenceProps) => {
             <Autocomplete
               options={courses}
               {...coursesProps}
-              renderInput={params => (
+              renderInput={(params) => (
                 <StyledTextField
                   {...params}
                   label="Courses"

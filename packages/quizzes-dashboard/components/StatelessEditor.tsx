@@ -1,6 +1,9 @@
-import { Typography } from "@mui/material"
 import React, { useLayoutEffect, useRef } from "react"
+
 import styled from "styled-components"
+
+import { Typography } from "@mui/material"
+
 import { useTypedSelector } from "../store/store"
 import QuizItems from "./QuizEditForms/QuizItems"
 
@@ -18,7 +21,7 @@ const StatelessEditor: React.FC<StatelessEditorProps> = ({
   onHeightChange,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null)
-  const store = useTypedSelector(state => state)
+  const store = useTypedSelector((state) => state)
 
   useLayoutEffect(() => {
     const ref = contentRef.current

@@ -1,14 +1,17 @@
 import React from "react"
+
+import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { Modal, Box, Button, Fade } from "@mui/material"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+
 import { faWindowClose, faTrash } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Modal, Box, Button, Fade } from "@mui/material"
+
+import { deletedOption } from "../../../../store/editor/editorActions"
+import { setOptionEditing } from "../../../../store/editor/optionVariables/optionVariableActions"
+import { useTypedSelector } from "../../../../store/store"
 import { NormalizedOption } from "../../../../types/NormalizedQuiz"
 import OptionModalContent from "./OptionModalContent"
-import { useTypedSelector } from "../../../../store/store"
-import { useDispatch } from "react-redux"
-import { setOptionEditing } from "../../../../store/editor/optionVariables/optionVariableActions"
-import { deletedOption } from "../../../../store/editor/editorActions"
 
 const StyledModal = styled(Modal)`
   display: flex;
@@ -53,9 +56,11 @@ interface clickableMultipleChoiceButtonProps {
 const ClickableMultipleChoiceButton = ({
   option,
 }: clickableMultipleChoiceButtonProps) => {
-  const storeOption = useTypedSelector(state => state.editor.options[option.id])
+  const storeOption = useTypedSelector(
+    (state) => state.editor.options[option.id],
+  )
   const variables = useTypedSelector(
-    state => state.editor.optionVariables[option.id],
+    (state) => state.editor.optionVariables[option.id],
   )
   const dispatch = useDispatch()
 

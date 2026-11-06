@@ -1,8 +1,9 @@
-import Quiz from "./quiz_item"
+import { mixin } from "objection"
+
+import BaseModel from "./base_model"
 import PeerReviewCollectionTranslation from "./peer_review_collection_translation"
 import PeerReviewQuestion from "./peer_review_question"
-import BaseModel from "./base_model"
-import { mixin } from "objection"
+import Quiz from "./quiz_item"
 import softDelete from "./soft_delete"
 
 export class PeerReviewCollection extends mixin(BaseModel, [

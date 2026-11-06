@@ -1,9 +1,10 @@
 import React from "react"
+
 import { downloadPeerReviewInfo } from "../../services/quizzes"
-import { DownloadFormProps } from "../../types/Quiz"
-import { createAndSubmitDownloadForm, HOST } from "./util"
-import { StyledForm, SubmitButton } from "./"
 import { checkStore, getProfile } from "../../services/tmcApi"
+import { DownloadFormProps } from "../../types/Quiz"
+import { StyledForm, SubmitButton } from "./"
+import { createAndSubmitDownloadForm, HOST } from "./util"
 
 export const PeerReviewInfoForm = ({
   quizId,

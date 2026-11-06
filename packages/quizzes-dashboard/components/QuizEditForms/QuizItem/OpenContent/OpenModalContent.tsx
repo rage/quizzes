@@ -1,8 +1,17 @@
 import React from "react"
-import { NormalizedItem } from "../../../../types/NormalizedQuiz"
-import styled from "styled-components"
-import { useTypedSelector } from "../../../../store/store"
+
 import { useDispatch } from "react-redux"
+import styled from "styled-components"
+
+import {
+  TextField,
+  FormControl,
+  FormControlLabel,
+  Checkbox,
+  Button,
+  Typography,
+} from "@mui/material"
+
 import {
   editedQuizItemTitle,
   editedQuizItemBody,
@@ -16,14 +25,8 @@ import {
   toggleValidRegexTestingState,
   setValidValidityRegex,
 } from "../../../../store/editor/itemVariables/itemVariableActions"
-import {
-  TextField,
-  FormControl,
-  FormControlLabel,
-  Checkbox,
-  Button,
-  Typography,
-} from "@mui/material"
+import { useTypedSelector } from "../../../../store/store"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import MarkdownEditor from "../../../MarkdownEditor"
 
 const ModalContent = styled.div`
@@ -48,9 +51,9 @@ interface ModalContentProps {
 }
 
 export const OpenModalContent = ({ item }: ModalContentProps) => {
-  const storeItem = useTypedSelector(state => state.editor.items[item.id])
+  const storeItem = useTypedSelector((state) => state.editor.items[item.id])
   const variables = useTypedSelector(
-    state => state.editor.itemVariables[item.id],
+    (state) => state.editor.itemVariables[item.id],
   )
   const dispatch = useDispatch()
 
@@ -73,7 +76,7 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
         <MarkdownEditor
           label="Title"
           text={storeItem.title ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
           }
         />
@@ -82,7 +85,7 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
         <MarkdownEditor
           label="Body"
           text={storeItem.body ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizItemBody(event.target.value, storeItem.id))
           }
         />
@@ -95,7 +98,7 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
           variant="outlined"
           value={variables.regex ?? ""}
           helperText={!variables.validRegex && "Invalid regex"}
-          onChange={event => {
+          onChange={(event) => {
             dispatch(setValidityTestRegex(storeItem.id, event.target.value))
             handleRegexChange(event.target.value)
           }}
@@ -119,7 +122,7 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
               <Checkbox
                 color="primary"
                 checked={storeItem.multi}
-                onChange={event =>
+                onChange={(event) =>
                   dispatch(
                     toggledMultiOptions(storeItem.id, event.target.checked),
                   )
@@ -133,7 +136,7 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
         <MarkdownEditor
           label="Success message"
           text={storeItem.successMessage ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedItemSuccessMessage(storeItem.id, event.target.value))
           }
         />
@@ -142,7 +145,7 @@ export const OpenModalContent = ({ item }: ModalContentProps) => {
         <MarkdownEditor
           label="Failure message"
           text={storeItem.failureMessage ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedItemFailureMessage(storeItem.id, event.target.value))
           }
         />

@@ -1,13 +1,16 @@
 import React from "react"
+
 import styled from "styled-components"
-import QuizItems from "./QuizItems"
-import BasicInfo from "./BasicInfo"
-import { useTypedSelector } from "../../store/store"
+
 import { Skeleton } from "@mui/material"
-import DebugDialog from "../DebugDialog"
-import useBeforeUnload from "../../hooks/useBeforeUnload"
 import { Divider } from "@mui/material"
+
+import useBeforeUnload from "../../hooks/useBeforeUnload"
+import { useTypedSelector } from "../../store/store"
+import DebugDialog from "../DebugDialog"
+import BasicInfo from "./BasicInfo"
 import { PeerReviewEditForms } from "./PeerReviewEditForms"
+import QuizItems from "./QuizItems"
 
 const StyledSkeleton = styled(Skeleton)`
   margin-bottom: 1rem;
@@ -20,8 +23,10 @@ const StyledDivider = styled(Divider)`
 `
 
 const QuizEditForms = () => {
-  const quizId = useTypedSelector(state => state.editor.quizId)
-  const changes = useTypedSelector(state => state.editor.editorChanges.changes)
+  const quizId = useTypedSelector((state) => state.editor.quizId)
+  const changes = useTypedSelector(
+    (state) => state.editor.editorChanges.changes,
+  )
   useBeforeUnload((e: BeforeUnloadEvent) => {
     e.preventDefault()
     e.returnValue = ""

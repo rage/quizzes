@@ -1,6 +1,8 @@
 import React from "react"
+
 import { Html, Head, Main, NextScript } from "next/document"
 import { ServerStyleSheet } from "styled-components"
+
 import {
   DocumentHeadTags,
   documentGetInitialProps,
@@ -21,15 +23,15 @@ export default function Document(props) {
   )
 }
 
-Document.getInitialProps = async ctx => {
+Document.getInitialProps = async (ctx) => {
   const styledComponentSheet = new ServerStyleSheet()
   try {
     return await documentGetInitialProps(ctx, {
       plugins: [
         {
-          enhanceApp: App => props =>
+          enhanceApp: (App) => (props) =>
             styledComponentSheet.collectStyles(<App {...props} />),
-          resolveProps: async initialProps => ({
+          resolveProps: async (initialProps) => ({
             ...initialProps,
             styles: [
               ...React.Children.toArray(initialProps.styles),

@@ -1,5 +1,7 @@
-import { Typography } from "@mui/material"
 import React from "react"
+
+import { Typography } from "@mui/material"
+
 import { Quiz } from "../../types/Quiz"
 import { QuizOfSection } from "./SectionQuiz"
 
@@ -17,7 +19,7 @@ export const SectionOfPart = ({
   return (
     <>
       <Typography variant="h6">Section {section}</Typography>
-      {quizzes.map(quiz => {
+      {quizzes.map((quiz) => {
         return (
           <QuizOfSection
             key={quiz.id}

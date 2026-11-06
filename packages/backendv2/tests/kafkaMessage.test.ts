@@ -1,4 +1,5 @@
 import { Model, snakeCaseMappers } from "objection"
+
 import redis from "../config/redis"
 import knex from "../database/knex"
 import { KafkaMessage } from "../src/models"

@@ -1,8 +1,11 @@
 import React from "react"
-import { PeerReview } from "../../../../types/Answer"
-import { Typography, Divider } from "@mui/material"
-import ReviewContent from "./ReviewContent"
+
 import styled from "styled-components"
+
+import { Typography, Divider } from "@mui/material"
+
+import { PeerReview } from "../../../../types/Answer"
+import ReviewContent from "./ReviewContent"
 
 export const StyledDivider = styled(Divider)`
   display: flex !important;

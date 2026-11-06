@@ -1,10 +1,13 @@
 import React from "react"
-import CourseList from "../components/CourseList"
-import useSWR from "swr"
-import { fetchCourses } from "../services/quizzes"
-import useBreadcrumbs from "../hooks/useBreadcrumbs"
+
 import styled from "styled-components"
+import useSWR from "swr"
+
 import { Typography } from "@mui/material"
+
+import CourseList from "../components/CourseList"
+import useBreadcrumbs from "../hooks/useBreadcrumbs"
+import { fetchCourses } from "../services/quizzes"
 
 const StyledTitleWrapper = styled.div`
   display: flex !important;

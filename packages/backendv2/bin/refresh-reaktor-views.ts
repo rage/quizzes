@@ -1,7 +1,8 @@
 import { knex as createKnex } from "knex"
+
 import knex from "../database/knex"
-import env from "../src/util/environment"
 import { GlobalLogger } from "../src/middleware/logger"
+import env from "../src/util/environment"
 
 const quizzesViews = [
   "course",

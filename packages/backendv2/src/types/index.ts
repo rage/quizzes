@@ -1,5 +1,5 @@
-import winston from "winston"
 import { ParameterizedContext } from "koa"
+import winston from "winston"
 
 export interface CustomContext extends ParameterizedContext {
   log: winston.Logger

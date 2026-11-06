@@ -1,4 +1,5 @@
 import axios from "axios"
+
 import { UserInfo } from "../types"
 
 export const getCurrentUserDetails = async (

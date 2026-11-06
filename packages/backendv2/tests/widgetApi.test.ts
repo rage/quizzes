@@ -1,18 +1,20 @@
-import request from "supertest"
 import { randomUUID } from "crypto"
+
 import nock from "nock"
+import request from "supertest"
+
 import app from "../app"
+import redis from "../config/redis"
 import knex from "../database/knex"
-import { input, validation } from "./data"
+import { QuizAnswer } from "../src/models"
 import { UserInfo } from "../src/types"
 import {
   BadRequestError,
   NotFoundError,
   UnauthorizedError,
 } from "../src/util/error"
+import { input, validation } from "./data"
 import { safeClean, safeSeed, configA } from "./util"
-import redis from "../config/redis"
-import { QuizAnswer } from "../src/models"
 
 afterAll(async () => {
   await redis.client?.quit()
@@ -38,7 +40,7 @@ describe("widget: save quiz answer", () => {
   beforeEach(async () => {
     nock("https://tmc.mooc.fi")
       .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
+      .reply(function () {
         const auth = this.req.headers.authorization
         if (auth === "Bearer 1234") {
           return [
@@ -67,7 +69,7 @@ describe("widget: save quiz answer", () => {
       .set("Accept", "application/json")
       .send(input.quizAnswerPastDeadline)
       .expect(400)
-      .expect(response =>
+      .expect((response) =>
         expect(response.body.message).toMatch("no submission past deadline"),
       )
   })
@@ -79,7 +81,7 @@ describe("widget: save quiz answer", () => {
       .set("Accept", "application/json")
       .send(input.quizAnswerAlreadyAnswered)
       .expect(400)
-      .expect(response =>
+      .expect((response) =>
         expect(response.body.message).toMatch("already answered"),
       )
   })
@@ -95,7 +97,7 @@ describe("widget: save quiz answer", () => {
       .set("Accept", "application/json")
       .send(quizAnswer)
       .expect(400)
-      .expect(response =>
+      .expect((response) =>
         expect(response.body.message).toMatch("item answers missing"),
       )
   })
@@ -125,7 +127,7 @@ describe("widget: quiz answers marked as deleted", () => {
   beforeEach(async () => {
     nock("https://tmc.mooc.fi")
       .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
+      .reply(function () {
         const auth = this.req.headers.authorization
         if (auth === "Bearer 1234") {
           return [
@@ -175,7 +177,7 @@ describe("widget: quiz answers marked as deleted", () => {
         ],
       })
       .expect(400)
-      .expect(response => {
+      .expect((response) => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual(
           `A new answer cannot be marked as deleted.`,
@@ -192,7 +194,7 @@ describe("widget: quiz answers marked as deleted", () => {
       .get("/api/v2/widget/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
       .set("Authorization", "bearer 2345")
       .set("Accept", "application/json")
-      .expect(res => {
+      .expect((res) => {
         expect(res.body.quizAnswer).toBeNull()
       })
       .expect(200)
@@ -212,7 +214,7 @@ describe("widget: a fetch for peer reviews for some quiz answer...", () => {
   beforeEach(() => {
     nock("https://tmc.mooc.fi")
       .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
+      .reply(function () {
         const auth = this.req.headers.authorization
         if (auth === "Bearer PLEB_TOKEN") {
           return [
@@ -235,26 +237,26 @@ describe("widget: a fetch for peer reviews for some quiz answer...", () => {
       })
   })
 
-  test("responds with 401 if invalid credentials", done => {
+  test("responds with 401 if invalid credentials", (done) => {
     request(app.callback())
       .get(
         "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/peer-reviews",
       )
       .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(response => {
+      .expect((response) => {
         const received: UnauthorizedError = response.body
         expect(received.message).toEqual("unauthorized")
       })
       .expect(401, done)
   })
 
-  test("responds with 404 if invalid answer id", done => {
+  test("responds with 404 if invalid answer id", (done) => {
     request(app.callback())
       .get(
         "/api/v2/widget/answers/1cb3e4de-fc11-4aac-be45-06312aa4677c/peer-reviews",
       )
       .set("Authorization", `bearer ADMIN_TOKEN`)
-      .expect(response => {
+      .expect((response) => {
         const received: NotFoundError = response.body
         expect(received.message).toEqual(
           "quiz answer not found: 1cb3e4de-fc11-4aac-be45-06312aa4677c",
@@ -277,7 +279,7 @@ describe("on a valid request", () => {
   beforeEach(() => {
     nock("https://tmc.mooc.fi")
       .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
+      .reply(function () {
         const auth = this.req.headers.authorization
         if (auth === "Bearer PLEB_TOKEN") {
           return [
@@ -299,36 +301,36 @@ describe("on a valid request", () => {
         return [401]
       })
   })
-  test("returns an empty array if no peer reviews received", done => {
+  test("returns an empty array if no peer reviews received", (done) => {
     request(app.callback())
       .get(
         "/api/v2/widget/answers/ae29c3be-b5b6-4901-8588-5b0e88774748/peer-reviews",
       )
       .set("Authorization", `bearer ADMIN_TOKEN`)
-      .expect(response => {
+      .expect((response) => {
         expect(response.body).toEqual([])
       })
       .expect(200, done)
   })
 
-  test("returns correct number of peer reviews on valid request", done => {
+  test("returns correct number of peer reviews on valid request", (done) => {
     request(app.callback())
       .get(
         "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/peer-reviews",
       )
       .set("Authorization", `bearer ADMIN_TOKEN`)
-      .expect(response => {
+      .expect((response) => {
         expect(response.body.length).toEqual(2)
       })
       .expect(200, done)
   })
-  test("returns peer reviews that are of correct shape", done => {
+  test("returns peer reviews that are of correct shape", (done) => {
     request(app.callback())
       .get(
         "/api/v2/widget/answers/0cb3e4de-fc11-4aac-be45-06312aa4677c/peer-reviews",
       )
       .set("Authorization", `bearer ADMIN_TOKEN`)
-      .expect(response => {
+      .expect((response) => {
         expect(response.body).toStrictEqual(
           validation.receivedPeerReviewsValidator,
         )
@@ -350,7 +352,7 @@ describe("widget: submitting a peer review", () => {
   beforeEach(() => {
     nock("https://tmc.mooc.fi")
       .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
+      .reply(function () {
         const auth = this.req.headers.authorization
         if (auth === "Bearer PLEB_TOKEN") {
           return [
@@ -391,18 +393,18 @@ describe("widget: submitting a peer review", () => {
       })
   })
 
-  test("responds with 401 if invalid credentials", done => {
+  test("responds with 401 if invalid credentials", (done) => {
     request(app.callback())
       .post("/api/v2/widget/answers/give-review")
       .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(response => {
+      .expect((response) => {
         const received: UnauthorizedError = response.body
         expect(received.message).toEqual("unauthorized")
       })
       .expect(401, done)
   })
 
-  test("responds with 404 if invalid answer id", done => {
+  test("responds with 404 if invalid answer id", (done) => {
     const randomUuid = randomUUID()
     request(app.callback())
       .post("/api/v2/widget/answers/give-review")
@@ -412,14 +414,14 @@ describe("widget: submitting a peer review", () => {
         ...input.peerReviewCollection1,
         quizAnswerId: randomUuid,
       })
-      .expect(response => {
+      .expect((response) => {
         const received: NotFoundError = response.body
         expect(received.message).toEqual(`quiz answer not found: ${randomUuid}`)
       })
       .expect(404, done)
   })
 
-  test("throws when peer review answer contains no text or value", done => {
+  test("throws when peer review answer contains no text or value", (done) => {
     request(app.callback())
       .post("/api/v2/widget/answers/give-review")
       .set("Authorization", `bearer PLEB_TOKEN`)
@@ -433,33 +435,33 @@ describe("widget: submitting a peer review", () => {
           },
         ],
       })
-      .expect(response => {
+      .expect((response) => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual(`review must contain values`)
       })
       .expect(400, done)
   })
-  test("throws when user quiz state not found", done => {
+  test("throws when user quiz state not found", (done) => {
     request(app.callback())
       .post("/api/v2/widget/answers/give-review")
       .set("Authorization", `bearer PLEB_TOKEN_1`)
       .set("Accept", "application/json")
       .send(input.peerReviewCollection3)
-      .expect(response => {
+      .expect((response) => {
         const received: NotFoundError = response.body
         expect(received.message).toEqual(`User quiz state not found.`)
       })
       .expect(404, done)
   })
 
-  test("returns peer review in correct shape when request successful", done => {
+  test("returns peer review in correct shape when request successful", (done) => {
     request(app.callback())
       .post("/api/v2/widget/answers/give-review")
       .set("Authorization", `bearer PLEB_TOKEN_2`)
       .set("Accept", "application/json")
       .send(input.peerReviewCollection2)
       .expect(200)
-      .expect(response => {
+      .expect((response) => {
         const {
           userQuizState: { peerReviewsGiven },
         } = response.body
@@ -470,27 +472,27 @@ describe("widget: submitting a peer review", () => {
       })
       .end(done)
   })
-  test("throws if user reviewing their own answer", done => {
+  test("throws if user reviewing their own answer", (done) => {
     request(app.callback())
       .post("/api/v2/widget/answers/give-review")
       .set("Authorization", `bearer PLEB_TOKEN_2`)
       .set("Accept", "application/json")
       .send(input.peerReviewCollection1)
-      .expect(response => {
+      .expect((response) => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual(`User cannot review their own answer`)
       })
       .expect(400, done)
   })
 
-  test("does not allow the same answer to be reviewed twice by the same user", done => {
+  test("does not allow the same answer to be reviewed twice by the same user", (done) => {
     request(app.callback())
       .post("/api/v2/widget/answers/give-review")
       .set("Authorization", `bearer PLEB_TOKEN_2`)
       .set("Accept", "application/json")
       .send(input.peerReviewCollection2)
       .expect(400)
-      .expect(response => {
+      .expect((response) => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual(
           `Answer can only be peer reviewed once`,
@@ -513,7 +515,7 @@ describe("widget: fetching quiz info", () => {
   beforeEach(() => {
     nock("https://tmc.mooc.fi")
       .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
+      .reply(function () {
         const auth = this.req.headers.authorization
         if (auth === "Bearer PLEB_TOKEN") {
           return [
@@ -536,61 +538,61 @@ describe("widget: fetching quiz info", () => {
       })
   })
 
-  test("responds with 401 if invalid credentials", done => {
+  test("responds with 401 if invalid credentials", (done) => {
     request(app.callback())
       .get("/api/v2/widget/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
       .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(response => {
+      .expect((response) => {
         const received: UnauthorizedError = response.body
         expect(received.message).toEqual("unauthorized")
       })
       .expect(401, done)
   })
 
-  test("should throw with 404 if invalid quiz id", done => {
+  test("should throw with 404 if invalid quiz id", (done) => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af6"
     request(app.callback())
       .get(`/api/v2/widget/quizzes/${quizId}`)
       .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
-      .expect(response => {
+      .expect((response) => {
         const received: NotFoundError = response.body
         expect(received.message).toEqual(`quiz not found: ${quizId}`)
       })
       .expect(404, done)
   })
 
-  test("should return quiz with all info when valid quiz id provided", done => {
+  test("should return quiz with all info when valid quiz id provided", (done) => {
     request(app.callback())
       .get("/api/v2/widget/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
       .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
-      .expect(res => {
+      .expect((res) => {
         expect(res.body).toStrictEqual(validation.quizForWidget1)
       })
       .expect(200, done)
   })
 
-  test("should throw when not-logged in", done => {
+  test("should throw when not-logged in", (done) => {
     request(app.callback())
       .get("/api/v2/widget/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7")
       .set("Authorization", "bearer BAD_TOKEN")
       .set("Accept", "application/json")
-      .expect(res => {
+      .expect((res) => {
         const received: UnauthorizedError = res.body
         expect(received.message).toEqual("unauthorized")
       })
       .expect(401, done)
   })
 
-  test("should return title and body as preview when not logged in and fetching info ", done => {
+  test("should return title and body as preview when not logged in and fetching info ", (done) => {
     request(app.callback())
       .get(
         "/api/v2/widget/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/preview",
       )
       .set("Authorization", "bearer BAD_TOKEN")
       .set("Accept", "application/json")
-      .expect(res => {
+      .expect((res) => {
         expect(res.body).toStrictEqual(validation.quizPreview)
       })
       .expect(200, done)
@@ -610,7 +612,7 @@ describe("widget: fetching peer review candidates", () => {
   beforeEach(() => {
     nock("https://tmc.mooc.fi")
       .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
+      .reply(function () {
         const auth = this.req.headers.authorization
         if (auth === "Bearer PLEB_TOKEN") {
           return [
@@ -633,52 +635,52 @@ describe("widget: fetching peer review candidates", () => {
       })
   })
 
-  test("responds with 401 if invalid credentials", done => {
+  test("responds with 401 if invalid credentials", (done) => {
     request(app.callback())
       .get(
         "/api/v2/widget/answers/4bf4cf2f-3058-4311-8d16-26d781261af7/get-candidates",
       )
       .set("Authorization", `bearer BAD_TOKEN`)
-      .expect(response => {
+      .expect((response) => {
         const received: UnauthorizedError = response.body
         expect(received.message).toEqual("unauthorized")
       })
       .expect(401, done)
   })
 
-  test("should throw with 404 if invalid quiz id", done => {
+  test("should throw with 404 if invalid quiz id", (done) => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af6"
     request(app.callback())
       .get(`/api/v2/widget/answers/${quizId}/get-candidates`)
       .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
-      .expect(response => {
+      .expect((response) => {
         const received: NotFoundError = response.body
         expect(received.message).toEqual(`quiz not found: ${quizId}`)
       })
       .expect(404, done)
   })
 
-  test("returns correct number of candidates", done => {
+  test("returns correct number of candidates", (done) => {
     request(app.callback())
       .get(
         "/api/v2/widget/answers/4bf4cf2f-3058-4311-8d16-26d781261af7/get-candidates",
       )
       .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
-      .expect(res => {
+      .expect((res) => {
         expect(res.body.length).toEqual(1)
       })
       .expect(200, done)
   })
-  test("returns candidates for review in correct shape", done => {
+  test("returns candidates for review in correct shape", (done) => {
     request(app.callback())
       .get(
         "/api/v2/widget/answers/4bf4cf2f-3058-4311-8d16-26d781261af7/get-candidates",
       )
       .set("Authorization", "bearer PLEB_TOKEN")
       .set("Accept", "application/json")
-      .expect(res => {
+      .expect((res) => {
         expect(res.body[0]).toStrictEqual(validation.quizAnswerValidator2)
       })
       .expect(200, done)
@@ -703,7 +705,7 @@ describe("Answer: spam flags", () => {
     nock("https://tmc.mooc.fi")
       .persist()
       .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
+      .reply(function () {
         const auth = this.req.headers.authorization
         if (auth === "Bearer PLEB_TOKEN_1") {
           return [
@@ -761,7 +763,7 @@ describe("Answer: spam flags", () => {
       .send({
         quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
       })
-      .expect(response => {
+      .expect((response) => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual("Can only give one spam flag")
       })

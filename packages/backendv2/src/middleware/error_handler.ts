@@ -1,3 +1,5 @@
+import * as Sentry from "@sentry/node"
+
 import { CustomContext } from "../types"
 import {
   BadRequestError,
@@ -5,7 +7,6 @@ import {
   NotFoundError,
   UnauthorizedError,
 } from "../util/error"
-import * as Sentry from "@sentry/node"
 
 const errorHandler = async (ctx: CustomContext, next: () => Promise<any>) => {
   try {

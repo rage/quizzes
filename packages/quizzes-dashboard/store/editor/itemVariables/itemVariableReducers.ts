@@ -1,4 +1,7 @@
+import { produce } from "immer"
+import _ from "lodash"
 import { createReducer } from "typesafe-actions"
+
 import { ItemVariables } from "../../../types/NormalizedQuiz"
 import { action } from "../../../types/NormalizedQuiz"
 import {
@@ -8,8 +11,6 @@ import {
   createdNewOption,
   createdNewQuiz,
 } from "../editorActions"
-import { produce } from "immer"
-import _ from "lodash"
 import {
   setAdvancedEditing,
   setScaleMax,
@@ -29,7 +30,7 @@ export const itemVariableReducers = createReducer<
   action
 >({})
   .handleAction(initializedEditor, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       for (const [id, item] of Object.entries(
         action.payload.normalizedQuiz.items,
       )) {
@@ -59,13 +60,13 @@ export const itemVariableReducers = createReducer<
   })
 
   .handleAction(setAdvancedEditing, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].advancedEditing = action.payload.editing
     })
   })
 
   .handleAction(setScaleMax, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].scaleMax = action.payload.newValue
       draftState[action.payload.itemId].validMax = action.payload.valid
       if (action.payload.valid) {
@@ -78,7 +79,7 @@ export const itemVariableReducers = createReducer<
   })
 
   .handleAction(setScaleMin, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].scaleMin = action.payload.newValue
       draftState[action.payload.itemId].validMin = action.payload.valid
       if (action.payload.valid) {
@@ -91,58 +92,58 @@ export const itemVariableReducers = createReducer<
   })
 
   .handleAction(toggleValidRegexTestingState, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].testingRegex = action.payload.testing
     })
   })
 
   .handleAction(toggleFormatRegexTestingState, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].testingFormatRegex =
         action.payload.testing
     })
   })
 
   .handleAction(setValidityTestRegex, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].regex = action.payload.testRegex
     })
   })
 
   .handleAction(setFormatTestRegex, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].formatRegex = action.payload.testRegex
     })
   })
 
   .handleAction(setValidityRegexTestAnswer, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].validityRegexTestAnswer =
         action.payload.testAnswer
     })
   })
 
   .handleAction(setFormatRegexTestAnswer, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].formatRegexTestAnswer =
         action.payload.testAnswer
     })
   })
 
   .handleAction(setValidValidityRegex, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].validRegex = action.payload.valid
     })
   })
 
   .handleAction(setFormatValidityRegex, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].validFormatRegex = action.payload.valid
     })
   })
 
   .handleAction(createdNewItem, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId] = {
         advancedEditing: false,
         regex: "",
@@ -164,14 +165,14 @@ export const itemVariableReducers = createReducer<
   })
 
   .handleAction(deletedItem, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].advancedEditing = false
       delete draftState[action.payload.itemId]
     })
   })
 
   .handleAction(createdNewOption, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.itemId].newOptions.push(action.payload.optionId)
     })
   })

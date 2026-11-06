@@ -1,9 +1,9 @@
-version: '3.8'
+version: "3.8"
 
 services:
   backend:
-    restart: always 
-    build: 
+    restart: always
+    build:
       context: .
       dockerfile: packages/backendv2/development.Dockerfile
     ports:
@@ -17,7 +17,7 @@ services:
       - DB_HOST=postgres
       - DB_USER=postgres
       - DB_PASSWORD=postgres
-  
+
   example:
     restart: always
     build:
@@ -30,7 +30,7 @@ services:
 
   dashboard:
     restart: always
-    build: 
+    build:
       context: .
       dockerfile: packages/quizzes-dashboard/development.Dockerfile
     depends_on:
@@ -53,7 +53,7 @@ services:
   redis:
     image: redis:5-alpine
     container_name: redis
-    restart: always 
+    restart: always
 
 volumes:
   postgres: ~

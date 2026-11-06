@@ -1,4 +1,9 @@
 import React, { useState, useEffect } from "react"
+
+import { denormalize, normalize } from "normalizr"
+import { useDispatch } from "react-redux"
+import styled from "styled-components"
+
 import {
   Typography,
   CircularProgress,
@@ -6,17 +11,15 @@ import {
   Fab,
   Zoom,
 } from "@mui/material"
-import Alert from '@mui/material/Alert'
-import { useDispatch } from "react-redux"
+import Alert from "@mui/material/Alert"
+
+import { normalizedQuiz } from "../schemas"
 import { saveQuiz } from "../services/quizzes"
 import {
   initializedEditor,
   checkForChanges,
 } from "../store/editor/editorActions"
 import { useTypedSelector, storeState } from "../store/store"
-import { denormalize, normalize } from "normalizr"
-import styled from "styled-components"
-import { normalizedQuiz } from "../schemas"
 import {
   TEditorItem,
   TEditorPeerReviewCollection,
@@ -57,9 +60,11 @@ const SaveButton = () => {
   const [showMessage, setShowMessage] = useState(false)
   const [showSpinner, setShowSpinner] = useState(false)
 
-  const store = useTypedSelector(state => state)
-  const quizId = useTypedSelector(state => state.editor.quizId)
-  const changes = useTypedSelector(state => state.editor.editorChanges.changes)
+  const store = useTypedSelector((state) => state)
+  const quizId = useTypedSelector((state) => state.editor.quizId)
+  const changes = useTypedSelector(
+    (state) => state.editor.editorChanges.changes,
+  )
 
   const handleClick = async (store: storeState) => {
     setSaved(false)
@@ -80,13 +85,13 @@ const SaveButton = () => {
         for (let option of item.options) {
           if (
             store.editor.itemVariables[item.id].newOptions.some(
-              id => id === option.id,
+              (id) => id === option.id,
             )
           ) {
             delete (option as TEditorOption).id
             if (
               store.editor.quizVariables[store.editor.quizId].newItems.some(
-                id => id === item.id,
+                (id) => id === item.id,
               )
             ) {
               delete option.quizItemId
@@ -96,7 +101,7 @@ const SaveButton = () => {
       }
       if (
         store.editor.quizVariables[store.editor.quizId].newItems.some(
-          id => id === item.id,
+          (id) => id === item.id,
         )
       ) {
         delete (item as TEditorItem).id
@@ -112,13 +117,13 @@ const SaveButton = () => {
           if (
             store.editor.peerReviewCollectionVariables[
               peerReviewCollection.id
-            ].newQuestions.some(id => id === question.id)
+            ].newQuestions.some((id) => id === question.id)
           ) {
             delete (question as TEditorQuestion).id
             if (
               store.editor.quizVariables[
                 store.editor.quizId
-              ].newPeerReviews.some(id => id === peerReviewCollection.id)
+              ].newPeerReviews.some((id) => id === peerReviewCollection.id)
             ) {
               delete question.peerReviewCollectionId
             }
@@ -127,7 +132,7 @@ const SaveButton = () => {
       }
       if (
         store.editor.quizVariables[store.editor.quizId].newPeerReviews.some(
-          id => id === peerReviewCollection.id,
+          (id) => id === peerReviewCollection.id,
         )
       ) {
         delete (peerReviewCollection as TEditorPeerReviewCollection).id

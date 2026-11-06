@@ -1,8 +1,11 @@
 import React from "react"
-import { Button, Typography } from "@mui/material"
-import styled from "styled-components"
-import { createdNewItem } from "../../../store/editor/editorActions"
+
 import { useDispatch } from "react-redux"
+import styled from "styled-components"
+
+import { Button, Typography } from "@mui/material"
+
+import { createdNewItem } from "../../../store/editor/editorActions"
 import { useTypedSelector } from "../../../store/store"
 
 const StyledButton = styled(Button)`
@@ -25,7 +28,7 @@ interface ButtonProps {
 
 export const AddQuizItemButton = ({ type }: ButtonProps) => {
   const dispatch = useDispatch()
-  const quizId = useTypedSelector(state => state.editor.quizId)
+  const quizId = useTypedSelector((state) => state.editor.quizId)
   return (
     <>
       <StyledButton

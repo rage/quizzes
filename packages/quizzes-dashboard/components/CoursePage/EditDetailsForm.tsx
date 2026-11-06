@@ -1,14 +1,14 @@
 import React, { useState } from "react"
+
 import { Formik, Form, Field } from "formik"
+import _ from "lodash"
+import { useRouter } from "next/router"
+import styled from "styled-components"
+import useSWR from "swr"
+import { object, string } from "yup"
+
 import { Alert } from "@mui/material"
 import { FormHelperText, MenuItem } from "@mui/material"
-import { useRouter } from "next/router"
-import useSWR from "swr"
-import {
-  fetchCourseQuizzes,
-  getAllLanguages,
-  updateCourseProperties,
-} from "../../services/quizzes"
 import {
   Button,
   Card,
@@ -17,12 +17,15 @@ import {
   TextField,
   Typography,
 } from "@mui/material"
-import styled from "styled-components"
-import { object, string } from "yup"
+
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
-import _ from "lodash"
-import { EditCoursePayloadFields } from "./types"
+import {
+  fetchCourseQuizzes,
+  getAllLanguages,
+  updateCourseProperties,
+} from "../../services/quizzes"
 import DebugDialog from "../DebugDialog"
+import { EditCoursePayloadFields } from "./types"
 
 const FieldSet = styled.fieldset`
   display: flex;
@@ -143,24 +146,15 @@ export const EditDetailsForm = ({
       </Snackbar>
       <Formik
         validationSchema={object({
-          courseId: string()
-            .uuid()
-            .required(),
+          courseId: string().uuid().required(),
 
           moocfiId: string().uuid(),
 
-          title: string()
-            .required()
-            .min(3),
+          title: string().required().min(3),
 
-          abbreviation: string()
-            .required()
-            .min(3),
+          abbreviation: string().required().min(3),
 
-          languageId: string()
-            .required()
-            .min(5)
-            .max(5),
+          languageId: string().required().min(5).max(5),
 
           status: string().required(),
         })}
@@ -278,7 +272,7 @@ const EditCourseDetails = () => {
     status: courseData?.course.status || undefined,
   }
 
-  const languageIds = languageData.map(l => l.id) || []
+  const languageIds = languageData.map((l) => l.id) || []
 
   return (
     <>

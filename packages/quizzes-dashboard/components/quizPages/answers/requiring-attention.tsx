@@ -1,7 +1,22 @@
 import React, { useEffect, useState } from "react"
+
 import { useRouter } from "next/router"
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
+
 import { MenuItem, Switch, Typography } from "@mui/material"
+
+import {
+  setBulkSelectedIds,
+  setExpandAll,
+  setHandledAnswers,
+  useAnswerListState,
+} from "../../../contexts/AnswerListContext"
+import { useRequiringAttention } from "../../../hooks/useAnswersRequiringAttention"
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
+import { useSearchResultsRequiringAttention } from "../../../hooks/useSearchResults"
+import { Answer } from "../../../types/Answer"
+import AnswerListOptions from "../../Answer/AnswerListOptions"
+import AnswerListWrapper from "../../Answer/AnswerListWrapper"
+import SkeletonLoader from "../../Shared/SkeletonLoader"
 import QuizTitle from "../QuizTitleContainer"
 import { TabText } from "../TabHeaders"
 import {
@@ -11,18 +26,6 @@ import {
   SortOrderField,
 } from "./styles"
 import { IQuizTabProps, TAnswersDisplayed } from "./types"
-import AnswerListWrapper from "../../Answer/AnswerListWrapper"
-import { Answer } from "../../../types/Answer"
-import {
-  setBulkSelectedIds,
-  setExpandAll,
-  setHandledAnswers,
-  useAnswerListState,
-} from "../../../contexts/AnswerListContext"
-import AnswerListOptions from "../../Answer/AnswerListOptions"
-import { useRequiringAttention } from "../../../hooks/useAnswersRequiringAttention"
-import { useSearchResultsRequiringAttention } from "../../../hooks/useSearchResults"
-import SkeletonLoader from "../../Shared/SkeletonLoader"
 
 export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
   const [{ expandAll }, dispatch] = useAnswerListState()
@@ -53,17 +56,14 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
     "answers-requiring-attention",
   )
 
-  const {
-    searchResults,
-    searchResultsLoading,
-    searchResultsError,
-  } = useSearchResultsRequiringAttention(
-    quizId,
-    answersDisplayed,
-    sortOrder,
-    searchQuery,
-    "search-answers-requiring-attention",
-  )
+  const { searchResults, searchResultsLoading, searchResultsError } =
+    useSearchResultsRequiringAttention(
+      quizId,
+      answersDisplayed,
+      sortOrder,
+      searchQuery,
+      "search-answers-requiring-attention",
+    )
 
   useEffect(() => {
     dispatch(setBulkSelectedIds([]))
@@ -154,7 +154,7 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
           <Switch
             name="expand-field"
             checked={route.query.expandAll ? true : expandAll}
-            onChange={event => {
+            onChange={(event) => {
               handleFieldChange(event, "expand")
             }}
           />
@@ -165,7 +165,7 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
           label="Answers"
           variant="outlined"
           select
-          onChange={event => handleFieldChange(event, "pages")}
+          onChange={(event) => handleFieldChange(event, "pages")}
           helperText="How many answers are shown per page"
         >
           <MenuItem value={10}>10</MenuItem>
@@ -178,7 +178,7 @@ export const RequiringAttention = ({ quiz, course }: IQuizTabProps) => {
           select
           helperText="Sorts answers by date they've been submitted"
           value={sortOrder}
-          onChange={event => handleFieldChange(event, "order")}
+          onChange={(event) => handleFieldChange(event, "order")}
         >
           <MenuItem value="desc">Latest first</MenuItem>
           <MenuItem value="asc">Oldest first</MenuItem>

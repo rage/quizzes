@@ -26,6 +26,7 @@
     "coverage",
     "**/pnpm-lock.yaml",
     "kubernetes",
-    "packages/moocfi-quizzes"
+    "packages/moocfi-quizzes",
+    "**/next-env.d.ts"
   ]
 }

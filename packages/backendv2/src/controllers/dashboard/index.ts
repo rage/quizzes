@@ -1,10 +1,11 @@
 import Router from "@koa/router"
+
 import { CustomContext, CustomState } from "../../types"
 import answersRoutes from "./routes/answersRoutes"
-import quizzesRoutes from "./routes/quizzesRoutes"
 import coursesRoutes from "./routes/coursesRoutes"
-import userRoutes from "./routes/usersRoutes"
 import languagesRoutes from "./routes/languagesRoutes"
+import quizzesRoutes from "./routes/quizzesRoutes"
+import userRoutes from "./routes/usersRoutes"
 
 const dashboard = new Router<CustomState, CustomContext>({
   prefix: "/dashboard",

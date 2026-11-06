@@ -1,5 +1,6 @@
-import knex from "../database/knex"
 import type { Knex } from "knex"
+
+import knex from "../database/knex"
 
 const update_expired_courses = async (client: Knex) => {
   await client.raw(`

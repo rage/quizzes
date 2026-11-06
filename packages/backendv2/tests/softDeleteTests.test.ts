@@ -1,13 +1,11 @@
-import request from "supertest"
-import nock from "nock"
-import app from "../app"
-import knex from "../database/knex"
-import { input } from "./data"
-import { UserInfo } from "../src/types"
-
-import { safeClean, safeSeed, configA, expectQuizToEqual } from "./util"
 import _ from "lodash"
+import nock from "nock"
 import { Model, snakeCaseMappers } from "objection"
+import request from "supertest"
+
+import app from "../app"
+import redis from "../config/redis"
+import knex from "../database/knex"
 import {
   PeerReviewCollection,
   PeerReviewQuestion,
@@ -15,7 +13,9 @@ import {
   QuizItem,
   QuizOption,
 } from "../src/models"
-import redis from "../config/redis"
+import { UserInfo } from "../src/types"
+import { input } from "./data"
+import { safeClean, safeSeed, configA, expectQuizToEqual } from "./util"
 
 beforeAll(() => {
   Model.knex(knex)
@@ -63,9 +63,8 @@ describe("Soft delete peer review questions", () => {
     expect(res.status).toEqual(200)
     expectQuizToEqual(res.body, quiz)
 
-    const deletedQuestion = await PeerReviewQuestion.getById(
-      peerReviewQuestionId,
-    )
+    const deletedQuestion =
+      await PeerReviewQuestion.getById(peerReviewQuestionId)
     expect(deletedQuestion?.deleted).toEqual(true)
   })
 })
@@ -195,7 +194,7 @@ describe("Soft delete quiz items", () => {
 const userSetup = () => {
   nock("https://tmc.mooc.fi")
     .get("/api/v8/users/current?show_user_fields=true")
-    .reply(function() {
+    .reply(function () {
       const auth = this.req.headers.authorization
       if (auth === "Bearer pleb_token") {
         return [

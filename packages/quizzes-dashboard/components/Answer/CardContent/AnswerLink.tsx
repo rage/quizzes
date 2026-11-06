@@ -1,8 +1,11 @@
 import React from "react"
+
 import Link from "next/link"
-import { Link as LinkTypography } from "@mui/material"
-import styled from "styled-components"
 import { useRouter } from "next/router"
+import styled from "styled-components"
+
+import { Link as LinkTypography } from "@mui/material"
+
 import { Answer } from "../../../types/Answer"
 
 export const AnswerLinkContainer = styled.div`

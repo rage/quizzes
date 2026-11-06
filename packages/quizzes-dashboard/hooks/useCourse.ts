@@ -1,4 +1,5 @@
 import useSWR from "swr"
+
 import { fetchCourseById } from "./../services/quizzes"
 
 const fetcher = ([, courseId]: [string, string, string]) =>

@@ -1,13 +1,14 @@
-import { BadRequestError, NotFoundError } from "./../util/error"
-import QuizAnswer from "./quiz_answer"
-import UserQuizState from "./user_quiz_state"
-import Quiz from "./quiz"
-import PeerReviewQuestionAnswer from "./peer_review_question_answer"
-import PeerReviewQuestion from "./peer_review_question"
-import knex from "../../database/knex"
-import BaseModel from "./base_model"
-import softDelete from "./soft_delete"
 import { mixin } from "objection"
+
+import knex from "../../database/knex"
+import { BadRequestError, NotFoundError } from "./../util/error"
+import BaseModel from "./base_model"
+import PeerReviewQuestion from "./peer_review_question"
+import PeerReviewQuestionAnswer from "./peer_review_question_answer"
+import Quiz from "./quiz"
+import QuizAnswer from "./quiz_answer"
+import softDelete from "./soft_delete"
+import UserQuizState from "./user_quiz_state"
 
 class PeerReview extends BaseModel {
   id!: string
@@ -151,9 +152,8 @@ class PeerReview extends BaseModel {
       if (isUpdating && peerReviewAlreadyGiven) {
         const peerReviewData = this.fromJson(peerReview)
         peerReviewData.id = peerReviewAlreadyGiven.id
-        newPeerReview = await this.query(trx).upsertGraphAndFetch(
-          peerReviewData,
-        )
+        newPeerReview =
+          await this.query(trx).upsertGraphAndFetch(peerReviewData)
       } else {
         newPeerReview = await this.query(trx).insertGraphAndFetch(
           this.fromJson(peerReview),

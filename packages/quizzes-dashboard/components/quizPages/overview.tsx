@@ -1,13 +1,16 @@
 import React from "react"
+
 import styled from "styled-components"
+
 import { Typography, Card } from "@mui/material"
+
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
 import DownloadInfoForms from "../DownloadInfoForms"
-import QuizTitle from "./QuizTitleContainer"
-import { TabText } from "./TabHeaders"
-import { AnswerStatistics } from "./AnswerStatistics"
 import { MarkDownText } from "../MarkDownText"
 import { IQuizTabProps } from "./answers/types"
+import { AnswerStatistics } from "./AnswerStatistics"
+import QuizTitle from "./QuizTitleContainer"
+import { TabText } from "./TabHeaders"
 
 const DescriptionContainer = styled.div`
   display: flex;
@@ -27,8 +30,10 @@ const StyledCard = styled(Card)`
   flex-wrap: wrap !important;
   width: 100%;
   margin-top: 1rem;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 7px 0px,
-    rgba(0, 0, 0, 0.15) 0px 3px 6px -2px, rgba(0, 0, 0, 0.25) 0px 1px 10px 0px !important;
+  box-shadow:
+    rgba(0, 0, 0, 0.15) 0px 2px 7px 0px,
+    rgba(0, 0, 0, 0.15) 0px 3px 6px -2px,
+    rgba(0, 0, 0, 0.25) 0px 1px 10px 0px !important;
 `
 
 export const OverView = ({ quiz, course, userAbilities }: IQuizTabProps) => {

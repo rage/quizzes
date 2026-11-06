@@ -1,7 +1,9 @@
-import { denormalize, normalize } from "normalizr"
 import React, { useEffect } from "react"
+
+import { denormalize, normalize } from "normalizr"
 import { useDispatch, useStore } from "react-redux"
 import { v4 } from "uuid"
+
 import StatelessEditor from "../../components/StatelessEditor"
 import { normalizedQuiz } from "../../schemas"
 import { initializedEditor } from "../../store/editor/editorActions"

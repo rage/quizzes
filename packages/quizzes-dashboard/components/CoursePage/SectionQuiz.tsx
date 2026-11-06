@@ -1,3 +1,8 @@
+import React from "react"
+
+import Link from "next/link"
+import styled from "styled-components"
+
 import {
   Typography,
   Card,
@@ -6,11 +11,9 @@ import {
   Badge,
   CardHeader,
 } from "@mui/material"
-import Link from "next/link"
-import React from "react"
-import styled from "styled-components"
-import { Quiz } from "../../types/Quiz"
+
 import { useUserAbilities } from "../../hooks/useUserAbilities"
+import { Quiz } from "../../types/Quiz"
 interface quizProps {
   quiz: Quiz
   requiringAttention: number
@@ -67,7 +70,7 @@ const QuizLink = styled(Link)`
 
 export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
   const title = quiz.title
-  const types = Array.from(new Set(quiz.items.map(item => item.type)))
+  const types = Array.from(new Set(quiz.items.map((item) => item.type)))
   const { userAbilities } = useUserAbilities(
     quiz?.courseId ?? "",
     "user-abilities",

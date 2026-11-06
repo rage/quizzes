@@ -1,19 +1,20 @@
 import Router from "@koa/router"
-import { CustomContext, CustomState } from "../../types"
+
+import knex from "../../../database/knex"
+import accessControl from "../../middleware/access_control"
 import Quiz from "../../models/quiz"
 import UserCoursePartState from "../../models/user_course_part_state"
-import accessControl from "../../middleware/access_control"
-import knex from "../../../database/knex"
+import { CustomContext, CustomState } from "../../types"
 
 const general = new Router<CustomState, CustomContext>({
   prefix: "/general",
 })
-  .get("/course/:courseId/progress", accessControl(), async ctx => {
+  .get("/course/:courseId/progress", accessControl(), async (ctx) => {
     const courseId = ctx.params.courseId
     const user = ctx.state.user
     try {
       ctx.body = await knex.transaction(
-        async trx =>
+        async (trx) =>
           await UserCoursePartState.getProgress(user.id, courseId, trx),
       )
     } catch (err) {
@@ -21,7 +22,7 @@ const general = new Router<CustomState, CustomContext>({
     }
   })
 
-  .get("/course/:courseId/quiz-titles", async ctx => {
+  .get("/course/:courseId/quiz-titles", async (ctx) => {
     const courseId = ctx.params.courseId
     let quiz_titles: { [key: string]: string } = {}
 

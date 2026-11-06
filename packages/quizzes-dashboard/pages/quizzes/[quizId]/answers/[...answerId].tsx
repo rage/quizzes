@@ -1,7 +1,10 @@
 import React, { useEffect, useState } from "react"
-import styled from "styled-components"
-import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
+
 import { useRouter } from "next/router"
+import styled from "styled-components"
+
+import { faChalkboard, faScroll } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   Paper,
   Tab,
@@ -14,8 +17,7 @@ import {
   Tabs,
   Typography,
 } from "@mui/material"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faChalkboard, faScroll } from "@fortawesome/free-solid-svg-icons"
+
 import AnswerCard from "../../../../components/Answer"
 import {
   TabTextLoading,
@@ -23,8 +25,9 @@ import {
   TabTextError,
 } from "../../../../components/quizPages/TabHeaders"
 import SkeletonLoader from "../../../../components/Shared/SkeletonLoader"
-import { useQuiz } from "../../../../hooks/useQuiz"
 import { useAnswer } from "../../../../hooks/useAnswer"
+import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
+import { useQuiz } from "../../../../hooks/useQuiz"
 import { useStatusChangeLogs } from "../../../../hooks/useStatusChangeLogs"
 import { Answer } from "../../../../types/Answer"
 

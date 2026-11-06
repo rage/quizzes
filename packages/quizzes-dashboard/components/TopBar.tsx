@@ -1,13 +1,16 @@
 import * as React from "react"
-import { AppBar, Toolbar, Button, Typography } from "@mui/material"
-import styled from "styled-components"
-import LoginStateContext from "../contexts/LoginStateContext"
 import { useContext } from "react"
+
+import Link from "next/link"
+import styled from "styled-components"
+
+import { faHome, faSignOutAlt } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { AppBar, Toolbar, Button, Typography } from "@mui/material"
+
+import LoginStateContext from "../contexts/LoginStateContext"
 import { unauthenticate } from "../services/tmcApi"
 import BreadCrumb from "./BreadCrumb"
-import Link from "next/link"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faHome, faSignOutAlt } from "@fortawesome/free-solid-svg-icons"
 
 const StyledAppBar = styled(AppBar)``
 

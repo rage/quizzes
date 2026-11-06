@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react"
+
 import { DateTime } from "luxon"
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
-import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon"
+import { useDispatch } from "react-redux"
+import styled from "styled-components"
+
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   Typography,
   TextField,
@@ -11,10 +14,11 @@ import {
   Switch,
   FormControlLabel,
 } from "@mui/material"
-import styled from "styled-components"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
-import { useDispatch } from "react-redux"
+import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon"
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
+
+import { checkForChanges } from "../../store/editor/editorActions"
 import {
   editedQuizTitle,
   editedQuizzesNumberOfTries,
@@ -29,7 +33,6 @@ import {
   editedQuizzesAutoconfirm,
 } from "../../store/editor/quiz/quizActions"
 import { useTypedSelector } from "../../store/store"
-import { checkForChanges } from "../../store/editor/editorActions"
 import MarkdownEditor from "../MarkdownEditor"
 
 const SubsectionTitleWrapper = styled.div`
@@ -127,38 +130,38 @@ const AutoConfirmSwitch = styled.div`
 const BasicInformation = () => {
   const dispatch = useDispatch()
 
-  const quizId = useTypedSelector(state => state.editor.quizId)
+  const quizId = useTypedSelector((state) => state.editor.quizId)
 
   const pointsGrantingPolicy = useTypedSelector(
-    state => state.editor.quizzes[quizId].grantPointsPolicy,
+    (state) => state.editor.quizzes[quizId].grantPointsPolicy,
   )
 
   const numberOfTries = useTypedSelector(
-    state => state.editor.quizzes[quizId].tries,
+    (state) => state.editor.quizzes[quizId].tries,
   )
 
   const triesAreLimited = useTypedSelector(
-    state => state.editor.quizzes[quizId].triesLimited,
+    (state) => state.editor.quizzes[quizId].triesLimited,
   )
 
   const pointsToGain = useTypedSelector(
-    state => state.editor.quizzes[quizId].points,
+    (state) => state.editor.quizzes[quizId].points,
   )
-  const title = useTypedSelector(state => state.editor.quizzes[quizId].title)
+  const title = useTypedSelector((state) => state.editor.quizzes[quizId].title)
 
-  const body = useTypedSelector(state => state.editor.quizzes[quizId].body)
+  const body = useTypedSelector((state) => state.editor.quizzes[quizId].body)
 
   const submitMessage = useTypedSelector(
-    state => state.editor.quizzes[quizId].submitMessage,
+    (state) => state.editor.quizzes[quizId].submitMessage,
   )
-  const part = useTypedSelector(state => state.editor.quizzes[quizId].part)
+  const part = useTypedSelector((state) => state.editor.quizzes[quizId].part)
 
   const section = useTypedSelector(
-    state => state.editor.quizzes[quizId].section,
+    (state) => state.editor.quizzes[quizId].section,
   )
 
   const variables = useTypedSelector(
-    state => state.editor.quizVariables[quizId],
+    (state) => state.editor.quizVariables[quizId],
   )
 
   // Local so that a partially typed (invalid) date isn't overwritten by the store's last valid value
@@ -166,12 +169,14 @@ const BasicInformation = () => {
     variables.deadline ? DateTime.fromISO(variables.deadline) : null,
   )
 
-  const store = useTypedSelector(state => state)
+  const store = useTypedSelector((state) => state)
 
-  const changes = useTypedSelector(state => state.editor.editorChanges.changes)
+  const changes = useTypedSelector(
+    (state) => state.editor.editorChanges.changes,
+  )
 
   const autoConfirm = useTypedSelector(
-    state => state.editor.quizzes[quizId].autoConfirm,
+    (state) => state.editor.quizzes[quizId].autoConfirm,
   )
 
   useEffect(() => {
@@ -199,7 +204,7 @@ const BasicInformation = () => {
         <MarkdownEditor
           label="Quiz title"
           text={title ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizTitle(event.target.value, quizId))
           }
         />
@@ -211,7 +216,7 @@ const BasicInformation = () => {
           label="Part"
           variant="outlined"
           value={part ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizzesPart(quizId, Number(event.target.value)))
           }
         />
@@ -221,7 +226,7 @@ const BasicInformation = () => {
           label="Section"
           variant="outlined"
           value={section ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizzesSection(quizId, Number(event.target.value)))
           }
         />
@@ -233,12 +238,12 @@ const BasicInformation = () => {
             control={
               <Switch
                 checked={triesAreLimited}
-                onChange={event =>
+                onChange={(event) =>
                   dispatch(editedQuizTriesLimited(event.target.checked, quizId))
                 }
                 color="secondary"
                 slotProps={{
-                  input: { "aria-label": "check tries allowed" }
+                  input: { "aria-label": "check tries allowed" },
                 }}
               />
             }
@@ -257,7 +262,7 @@ const BasicInformation = () => {
               variant="outlined"
               value={numberOfTries ?? ""}
               fullWidth
-              onChange={event =>
+              onChange={(event) =>
                 dispatch(
                   editedQuizzesNumberOfTries(
                     Number(event.target.value),
@@ -277,7 +282,7 @@ const BasicInformation = () => {
           fullWidth
           variant="outlined"
           value={pointsToGain ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(
               editedQuizzesPointsToGain(Number(event.target.value), quizId),
             )
@@ -291,7 +296,7 @@ const BasicInformation = () => {
           variant="outlined"
           select
           value={pointsGrantingPolicy}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(
               editedQuizzesPointsGrantingPolicy(event.target.value, quizId),
             )
@@ -312,7 +317,7 @@ const BasicInformation = () => {
             value={deadline}
             format="dd-MM-yyyy HH:mm"
             ampm={false}
-            onChange={value => {
+            onChange={(value) => {
               setDeadline(value)
               dispatch(editedQuizzesDeadline(value, quizId))
             }}
@@ -331,7 +336,7 @@ const BasicInformation = () => {
         <MarkdownEditor
           text={body ?? ""}
           label="Quiz description"
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizzesBody(quizId, event.target.value))
           }
         />
@@ -340,7 +345,7 @@ const BasicInformation = () => {
         <MarkdownEditor
           text={submitMessage ?? ""}
           label="Submit message"
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizzesSubmitmessage(quizId, event.target.value))
           }
         />
@@ -353,7 +358,7 @@ const BasicInformation = () => {
             control={
               <Switch
                 checked={autoConfirm}
-                onChange={event =>
+                onChange={(event) =>
                   dispatch(
                     editedQuizzesAutoconfirm(quizId, event.target.checked),
                   )

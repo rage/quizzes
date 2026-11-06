@@ -1,4 +1,5 @@
 import type { Knex } from "knex"
+
 import { TStatusModificationOperation } from "./../types/index"
 import BaseModel from "./base_model"
 import User from "./user"
@@ -67,7 +68,7 @@ class QuizAnswerStatusModification extends BaseModel {
     trx: Knex.Transaction,
     modifierId?: number,
   ) {
-    const logsToInsert = quizAnswerIds.map(quizAnswerId => ({
+    const logsToInsert = quizAnswerIds.map((quizAnswerId) => ({
       quizAnswerId,
       modifierId,
       operation,

@@ -1,11 +1,11 @@
+import knex from "../../database/knex"
 import { BadRequestError, NotFoundError } from "../util/error"
+import BaseModel from "./base_model"
 import Quiz from "./quiz"
 import QuizAnswer from "./quiz_answer"
+import QuizAnswerStatusModification from "./quiz_answer_status_modification"
 import User from "./user"
 import UserQuizState from "./user_quiz_state"
-import knex from "../../database/knex"
-import BaseModel from "./base_model"
-import QuizAnswerStatusModification from "./quiz_answer_status_modification"
 
 class SpamFlag extends BaseModel {
   id!: string

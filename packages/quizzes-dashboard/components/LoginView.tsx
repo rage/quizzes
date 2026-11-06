@@ -1,17 +1,14 @@
 import React, { useContext } from "react"
 import { useState } from "react"
+
 import styled from "styled-components"
-import {
-  Typography,
-  TextField,
-  Button,
-  Card,
-  Snackbar,
-} from "@mui/material"
-import { authenticate } from "../services/tmcApi"
-import Alert from '@mui/material/Alert'
+
+import { Typography, TextField, Button, Card, Snackbar } from "@mui/material"
+import Alert from "@mui/material/Alert"
+
 import LoginStateContext from "../contexts/LoginStateContext"
 import useBreadcrumbs from "../hooks/useBreadcrumbs"
+import { authenticate } from "../services/tmcApi"
 
 const LoginFieldContainer = styled.div`
   left: 0px;
@@ -90,7 +87,7 @@ const LoginView = () => {
                 variant="outlined"
                 label="Email or username"
                 autoComplete="username"
-                onChange={event => setUserName(event.target.value)}
+                onChange={(event) => setUserName(event.target.value)}
               />
             </TextFieldContainer>
             <TextFieldContainer>
@@ -102,7 +99,7 @@ const LoginView = () => {
                 variant="outlined"
                 label="Password"
                 autoComplete="current-password"
-                onChange={event => setPassword(event.target.value)}
+                onChange={(event) => setPassword(event.target.value)}
               />
             </TextFieldContainer>
           </LoginFieldContainer>

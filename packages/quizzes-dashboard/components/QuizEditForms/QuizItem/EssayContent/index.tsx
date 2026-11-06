@@ -1,25 +1,28 @@
 import React, { useEffect } from "react"
-import styled from "styled-components"
-import { TextField, Button, Modal, Box, Fade } from "@mui/material"
+
 import { useDispatch } from "react-redux"
-import { NormalizedItem } from "../../../../types/NormalizedQuiz"
-import {
-  editedItemMaxWords,
-  editedItemMinWords,
-  editedQuizItemTitle,
-} from "../../../../store/editor/items/itemAction"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import styled from "styled-components"
+
 import {
   faTrash,
   faWindowClose,
   faPen,
 } from "@fortawesome/free-solid-svg-icons"
-import { useTypedSelector } from "../../../../store/store"
-import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { TextField, Button, Modal, Box, Fade } from "@mui/material"
+
 import { checkForChanges } from "../../../../store/editor/editorActions"
-import EssayModalContent from "./EssayModalContent"
 import { deletedItem } from "../../../../store/editor/editorActions"
+import {
+  editedItemMaxWords,
+  editedItemMinWords,
+  editedQuizItemTitle,
+} from "../../../../store/editor/items/itemAction"
+import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
+import { useTypedSelector } from "../../../../store/store"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import MarkdownEditor from "../../../MarkdownEditor"
+import EssayModalContent from "./EssayModalContent"
 
 const InfoContainer = styled.div`
   padding: 1rem 0;
@@ -76,10 +79,10 @@ interface essayContentProps {
 }
 
 const EssayContent = ({ item }: essayContentProps) => {
-  const quizId = useTypedSelector(state => state.editor.quizId)
-  const storeItem = useTypedSelector(state => state.editor.items[item.id])
+  const quizId = useTypedSelector((state) => state.editor.quizId)
+  const storeItem = useTypedSelector((state) => state.editor.items[item.id])
   const variables = useTypedSelector(
-    state => state.editor.itemVariables[item.id],
+    (state) => state.editor.itemVariables[item.id],
   )
 
   const dispatch = useDispatch()
@@ -125,7 +128,7 @@ const EssayContent = ({ item }: essayContentProps) => {
       <InfoContainer>
         <MarkdownEditor
           label="Description for this quiz item"
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
           }
           text={storeItem.title ?? ""}
@@ -139,7 +142,7 @@ const EssayContent = ({ item }: essayContentProps) => {
             variant="outlined"
             value={storeItem.minWords ?? ""}
             type="number"
-            onChange={event =>
+            onChange={(event) =>
               dispatch(
                 editedItemMinWords(storeItem.id, Number(event.target.value)),
               )
@@ -153,7 +156,7 @@ const EssayContent = ({ item }: essayContentProps) => {
             variant="outlined"
             value={storeItem.maxWords ?? ""}
             type="number"
-            onChange={event =>
+            onChange={(event) =>
               dispatch(
                 editedItemMaxWords(storeItem.id, Number(event.target.value)),
               )

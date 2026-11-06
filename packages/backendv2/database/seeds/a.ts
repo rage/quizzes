@@ -64,7 +64,7 @@ export async function seed(knex: Knex): Promise<any> {
     ]),
   ])
 
-  await knex("quiz").insert([
+  ;(await knex("quiz").insert([
     {
       id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
       course_id: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
@@ -154,7 +154,7 @@ export async function seed(knex: Knex): Promise<any> {
           submit_message: "nice one!",
         },
       ]),
-    ])
+    ]))
 
   await knex.raw(`? ON CONFLICT (id) DO NOTHING`, [
     knex("quiz_item").insert([

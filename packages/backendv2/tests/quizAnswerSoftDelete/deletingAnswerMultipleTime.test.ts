@@ -1,11 +1,12 @@
 import nock from "nock"
+import request from "supertest"
+
+import app from "../../app"
+import redis from "../../config/redis"
 import knex from "../../database/knex"
+import { QuizAnswer, UserQuizState } from "../../src/models"
 import { UserInfo } from "../../src/types"
 import { configQuizAnswerSoftDelete, safeClean, safeSeed } from "../util"
-import request from "supertest"
-import app from "../../app"
-import { QuizAnswer, UserQuizState } from "../../src/models"
-import redis from "../../config/redis"
 
 describe("test", () => {
   afterAll(async () => {
@@ -57,7 +58,7 @@ describe("test", () => {
 const userSetup = () => {
   nock("https://tmc.mooc.fi")
     .get("/api/v8/users/current?show_user_fields=true")
-    .reply(function() {
+    .reply(function () {
       const auth = this.req.headers.authorization
       if (auth === "Bearer admin_token") {
         return [

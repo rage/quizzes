@@ -1,4 +1,7 @@
 import React, { useEffect, useState } from "react"
+
+import { useRouter } from "next/router"
+
 import {
   faClipboardList,
   faPenSquare,
@@ -6,12 +9,12 @@ import {
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { Tab, Tabs, Typography } from "@mui/material"
-import { useRouter } from "next/router"
-import { ITabToComponent } from "../CoursePage/types"
-import { CoursePage } from "../CoursePage"
-import EditCourseDetails from "../CoursePage/EditDetailsForm"
+
 import { useUserAbilities } from "../../hooks/useUserAbilities"
 import CompletionPage from "../CompletionPage"
+import { CoursePage } from "../CoursePage"
+import EditCourseDetails from "../CoursePage/EditDetailsForm"
+import { ITabToComponent } from "../CoursePage/types"
 
 const CourseTabNavigator = () => {
   const router = useRouter()
@@ -20,11 +23,8 @@ const CourseTabNavigator = () => {
 
   const pathname = `/courses/${courseId}`
 
-  const {
-    userAbilities,
-    userAbilitiesLoading,
-    userAbilitiesError,
-  } = useUserAbilities(courseId ?? "", "user-abilities")
+  const { userAbilities, userAbilitiesLoading, userAbilitiesError } =
+    useUserAbilities(courseId ?? "", "user-abilities")
 
   const coursePageTabs: ITabToComponent = {
     listing: CoursePage,

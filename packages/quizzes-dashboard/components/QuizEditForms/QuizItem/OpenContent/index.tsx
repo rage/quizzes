@@ -1,21 +1,23 @@
 import React from "react"
-import { NormalizedItem } from "../../../../types/NormalizedQuiz"
-import { TextField, Button, Modal, Box, Fade } from "@mui/material"
+
+import { useDispatch } from "react-redux"
 import styled from "styled-components"
+
+import {
+  faWindowClose,
+  faPen,
+  faTrash,
+} from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { TextField, Button, Modal, Box, Fade } from "@mui/material"
+
+import { deletedItem } from "../../../../store/editor/editorActions"
 import {
   editedValidityRegex,
   editedQuizItemTitle,
   editedQuizItemBody,
   editedFormatRegex,
 } from "../../../../store/editor/items/itemAction"
-import { useDispatch } from "react-redux"
-import { useTypedSelector } from "../../../../store/store"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import {
-  faWindowClose,
-  faPen,
-  faTrash,
-} from "@fortawesome/free-solid-svg-icons"
 import {
   setValidValidityRegex,
   setValidityTestRegex,
@@ -25,11 +27,12 @@ import {
   toggleFormatRegexTestingState,
   setFormatTestRegex,
 } from "../../../../store/editor/itemVariables/itemVariableActions"
-import OpenModalContent from "./OpenModalContent"
-import { deletedItem } from "../../../../store/editor/editorActions"
-import ValidityRegexTesterModalContent from "./ValidityRegexTesterModalContent"
+import { useTypedSelector } from "../../../../store/store"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import MarkdownEditor from "../../../MarkdownEditor"
 import FormatRegexTesterModalContent from "./FormatRegexTesterModalContent"
+import OpenModalContent from "./OpenModalContent"
+import ValidityRegexTesterModalContent from "./ValidityRegexTesterModalContent"
 
 const AdvancedBox = styled(Box)`
   background-color: #fafafa !important;
@@ -93,10 +96,10 @@ interface openContentProps {
 }
 
 const OpenContent = ({ item }: openContentProps) => {
-  const quizId = useTypedSelector(state => state.editor.quizId)
-  const storeItem = useTypedSelector(state => state.editor.items[item.id])
+  const quizId = useTypedSelector((state) => state.editor.quizId)
+  const storeItem = useTypedSelector((state) => state.editor.items[item.id])
   const variables = useTypedSelector(
-    state => state.editor.itemVariables[item.id],
+    (state) => state.editor.itemVariables[item.id],
   )
   const dispatch = useDispatch()
 
@@ -198,7 +201,7 @@ const OpenContent = ({ item }: openContentProps) => {
         <MarkdownEditor
           label="Title"
           text={storeItem.title ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
           }
         />
@@ -207,7 +210,7 @@ const OpenContent = ({ item }: openContentProps) => {
         <MarkdownEditor
           label="Body"
           text={storeItem.body ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizItemBody(event.target.value, storeItem.id))
           }
         />
@@ -220,7 +223,7 @@ const OpenContent = ({ item }: openContentProps) => {
           variant="outlined"
           value={variables.regex ?? ""}
           helperText={!variables.validRegex && "Invalid regex"}
-          onChange={event => {
+          onChange={(event) => {
             dispatch(setValidityTestRegex(storeItem.id, event.target.value))
             handleValidRegexChange(event.target.value)
           }}
@@ -243,7 +246,7 @@ const OpenContent = ({ item }: openContentProps) => {
           variant="outlined"
           value={variables.formatRegex ?? ""}
           helperText={!variables.validFormatRegex && "Invalid regex"}
-          onChange={event => {
+          onChange={(event) => {
             dispatch(setFormatTestRegex(storeItem.id, event.target.value))
             handleFormatRegexChange(event.target.value)
           }}

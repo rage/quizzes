@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from "axios"
 import TmcClient from "tmc-client-js"
+
 import { TMCCredentials, TMCProfile, TMCProfileDetails } from "../types/TMC"
 
 const BASE_URL = "https://tmc.mooc.fi/api/v8"

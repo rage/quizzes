@@ -1,4 +1,5 @@
 import React from "react"
+
 import { StyledSkeleton } from "../quizPages/answers/styles"
 
 export const SkeletonLoader = ({
