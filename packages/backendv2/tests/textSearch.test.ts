@@ -120,18 +120,34 @@ describe("dashboard: searching for all answers based on text content should", ()
         .expect(200, done)
     })
 
-    test("return 3 answers when 3 answers match search query", (done) => {
-      request(app.callback())
+    test("return an answer once even if several of its item answers match", async () => {
+      const response = await request(app.callback())
         .post(
           "/api/v2/dashboard/answers/4bf4cf2f-3058-4311-8d16-26d781261af7/all?page=0",
         )
         .set("Authorization", `bearer ADMIN_TOKEN`)
         .set("Accept", "application/json")
         .send({ searchQuery: "blaadi blaa" })
-        .expect((response) => {
-          expect(response.body.total).toEqual(3)
-        })
-        .expect(200, done)
+        .expect(200)
+
+      expect(response.body.total).toEqual(1)
+      expect(response.body.results).toHaveLength(1)
+      expect(response.body.results[0].id).toEqual(
+        "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      )
+    })
+
+    test("include the quiz with its peer review collections", async () => {
+      const response = await request(app.callback())
+        .post(
+          "/api/v2/dashboard/answers/4bf4cf2f-3058-4311-8d16-26d781261af7/all?page=0",
+        )
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .set("Accept", "application/json")
+        .send({ searchQuery: "blaadi blaa" })
+        .expect(200)
+
+      expect(response.body.results[0].quiz.peerReviewCollections).toBeArray()
     })
 
     test("return 0 answers when no content matching search query ", (done) => {
@@ -257,6 +273,9 @@ describe("dashboard: searching for manual review answers based on text content s
         .send({ searchQuery: "linked to" })
         .expect((response) => {
           expect(response.body.total).toEqual(1)
+          expect(
+            response.body.results[0].quiz.peerReviewCollections,
+          ).toBeArray()
         })
         .expect(200, done)
     })

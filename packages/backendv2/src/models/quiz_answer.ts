@@ -231,6 +231,17 @@ class QuizAnswer extends mixin(BaseModel, [
     return paginated
   }
 
+  private static itemAnswersMatching(searchQuery: string) {
+    return QuizItemAnswer.query()
+      .whereColumn("quiz_item_answer.quiz_answer_id", "quiz_answer.id")
+      .where(
+        raw(
+          `to_tsvector('english', coalesce(text_data, '')) @@ phraseto_tsquery(?)`,
+          [searchQuery],
+        ),
+      )
+  }
+
   public static async getPaginatedByQuizIdAndSearchQuery(
     quizId: string,
     pageSize: number,
@@ -242,47 +253,20 @@ class QuizAnswer extends mixin(BaseModel, [
       throw new BadRequestError("No search query provided.")
     }
 
-    let paginated
-    const filtersProvided = filters.length > 0
-
-    if (!filtersProvided) {
-      paginated = await this.query()
-        .where("quiz_answer.quiz_id", quizId)
-        .orderBy([{ column: "created_at", order: order }])
-        .page(this.FIRST_PAGE_INDEX, pageSize)
-        .withGraphFetched("userQuizState")
-        .withGraphFetched("itemAnswers.[optionAnswers]")
-        .join(
-          raw("quiz_item_answer as qia on quiz_answer.id = qia.quiz_answer_id"),
-        )
-        .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
-        .where(
-          raw(
-            `to_tsvector('english', coalesce(text_data, '')) @@ phraseto_tsquery(?)`,
-            [searchQuery],
-          ),
-        )
-        .limit(this.SEARCH_RESULT_LIMIT)
-    } else {
-      paginated = await this.query()
-        .where("quiz_answer.quiz_id", quizId)
-        .whereIn("status", filters)
-        .orderBy([{ column: "created_at", order: order }])
-        .page(this.FIRST_PAGE_INDEX, pageSize)
-        .withGraphFetched("userQuizState")
-        .withGraphFetched("itemAnswers.[optionAnswers]")
-        .join(
-          raw("quiz_item_answer as qia on quiz_answer.id = qia.quiz_answer_id"),
-        )
-        .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
-        .where(
-          raw(
-            `to_tsvector('english', coalesce(text_data, '')) @@ phraseto_tsquery(?)`,
-            [searchQuery],
-          ),
-        )
-        .limit(this.SEARCH_RESULT_LIMIT)
+    const query = this.query()
+      .where("quiz_id", quizId)
+      .whereExists(this.itemAnswersMatching(searchQuery))
+    if (filters.length > 0) {
+      query.whereIn("status", filters)
     }
+    const paginated = await query
+      .orderBy([{ column: "created_at", order: order }])
+      .page(this.FIRST_PAGE_INDEX, pageSize)
+      .limit(this.SEARCH_RESULT_LIMIT)
+      .withGraphFetched("quiz.[peerReviewCollections]")
+      .withGraphFetched("userQuizState")
+      .withGraphFetched("itemAnswers.[optionAnswers]")
+      .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
 
     paginated.results.map(async (answer) => {
       const answerHasPeerReviews = answer.peerReviews.length > 0
@@ -334,23 +318,16 @@ class QuizAnswer extends mixin(BaseModel, [
     }
 
     const paginated = await this.query()
-      .where("quiz_answer.quiz_id", quizId)
+      .where("quiz_id", quizId)
       .andWhere("status", "manual-review")
+      .whereExists(this.itemAnswersMatching(searchQuery))
       .orderBy([{ column: "created_at", order: order }])
       .page(this.FIRST_PAGE_INDEX, pageSize)
+      .limit(this.SEARCH_RESULT_LIMIT)
+      .withGraphFetched("quiz.[peerReviewCollections]")
       .withGraphFetched("userQuizState")
       .withGraphFetched("itemAnswers.[optionAnswers]")
-      .join(
-        raw("quiz_item_answer as qia on quiz_answer.id = qia.quiz_answer_id"),
-      )
       .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
-      .where(
-        raw(
-          `to_tsvector('english', coalesce(text_data, '')) @@ phraseto_tsquery(?)`,
-          [searchQuery],
-        ),
-      )
-      .limit(this.SEARCH_RESULT_LIMIT)
 
     paginated.results.map(async (answer) => {
       const answerHasPeerReviews = answer.peerReviews.length > 0
