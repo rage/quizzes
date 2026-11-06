@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react"
 
+import { isAxiosError } from "axios"
 import { denormalize, normalize } from "normalizr"
 import { useDispatch } from "react-redux"
 import styled from "styled-components"
@@ -53,12 +54,20 @@ const StyledCircularProgress = styled(CircularProgress)`
   }
 `
 
+const saveErrorMessage = (error: unknown): string => {
+  if (isAxiosError<{ message?: string }>(error)) {
+    return error.response?.data?.message ?? error.message
+  }
+  return error instanceof Error ? error.message : String(error)
+}
+
 const SaveButton = () => {
   const dispatch = useDispatch()
 
   const [saved, setSaved] = useState(true)
   const [showMessage, setShowMessage] = useState(false)
   const [showSpinner, setShowSpinner] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const store = useTypedSelector((state) => state)
   const quizId = useTypedSelector((state) => state.editor.quizId)
@@ -141,10 +150,8 @@ const SaveButton = () => {
     if (store.editor.quizVariables[store.editor.quizId].newQuiz) {
       delete (quiz as TEditorQuiz).id
     }
-    const response = await saveQuiz(quiz)
-
-    setShowSpinner(false)
-    if (response.errorMessage === undefined) {
+    try {
+      const response = await saveQuiz(quiz)
       const normalizedResponse = normalize(response, normalizedQuiz)
       const data = {
         quizzes: normalizedResponse.entities.quizzes ?? {},
@@ -157,8 +164,12 @@ const SaveButton = () => {
       }
       dispatch(initializedEditor(data, response))
       setSaved(true)
+    } catch (error) {
+      setErrorMessage(saveErrorMessage(error))
+    } finally {
+      setShowSpinner(false)
+      setShowMessage(true)
     }
-    setShowMessage(true)
   }
 
   useEffect(() => {
@@ -181,6 +192,7 @@ const SaveButton = () => {
           ) : (
             <Alert severity="error" onClose={() => setShowMessage(false)}>
               Something went wrong, couldn't save quiz!
+              {errorMessage && ` ${errorMessage}`}
             </Alert>
           )}
         </Snackbar>

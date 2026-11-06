@@ -75,6 +75,7 @@ export const saveQuiz = async (quiz: Quiz | NewQuiz): Promise<any> => {
     const response = (await api.post(`/quizzes`, quiz, config)).data
     return response
   }
+  throw new Error("Not logged in")
 }
 
 export const getAnswerById = async (answerId: string): Promise<Answer> => {
