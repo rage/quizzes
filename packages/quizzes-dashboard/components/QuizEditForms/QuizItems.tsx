@@ -1,13 +1,16 @@
 import React, { useEffect } from "react"
-import { useTypedSelector } from "../../store/store"
-import QuizItem from "./QuizItem"
-import styled from "styled-components"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faSitemap } from "@fortawesome/free-solid-svg-icons"
-import { Typography, Divider } from "@material-ui/core"
-import AddQuizItem from "./AddQuizItem"
+
 import { useDispatch } from "react-redux"
+import styled from "styled-components"
+
+import { faSitemap } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Typography, Divider } from "@mui/material"
+
 import { checkForChanges } from "../../store/editor/editorActions"
+import { useTypedSelector } from "../../store/store"
+import AddQuizItem from "./AddQuizItem"
+import QuizItem from "./QuizItem"
 
 const ItemsTitleContainer = styled.div`
   display: flex;
@@ -28,7 +31,7 @@ const TitleIcon = styled(FontAwesomeIcon)`
 
 const QuizItems = () => {
   const storeItems = Object.values(
-    useTypedSelector(state => state.editor.items),
+    useTypedSelector((state) => state.editor.items),
   )
 
   storeItems.sort((item1, item2) => item1.order - item2.order)
@@ -40,7 +43,7 @@ const QuizItems = () => {
           <Typography variant="h2">Quiz items</Typography>
         </SubsectionTitleWrapper>{" "}
       </ItemsTitleContainer>
-      {storeItems.map(item => {
+      {storeItems.map((item) => {
         return (
           <div key={item.id}>
             <QuizItem item={item} />

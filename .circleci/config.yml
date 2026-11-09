@@ -1,46 +1,49 @@
 version: 2.1
 
-jobs:
-  code_style:
-    docker:
-      - image: circleci/node:12
+commands:
+  install_pnpm:
     steps:
-      - checkout
       - run:
-          name: "Install dependencies"
-          command: "npm ci"
-      - run:
-          name: "Check code style"
-          command: "bin/check-code-style.sh"
+          name: "Install pnpm"
+          command: |
+            PNPM_SPEC=$(node -p 'require(process.argv[1]).packageManager' "$(git rev-parse --show-toplevel)/package.json")
+            cd /tmp && sudo npm install -g --no-update-notifier "$PNPM_SPEC"
 
-  build_dashboard:
-    docker:
-      - image: google/cloud-sdk
+  install_docker:
     steps:
-      - checkout
       - run:
-          name: Install Docker CLI
+          name: Install Docker CLI and Buildx
           command: |
             apt-get update
             apt-get install -y docker.io
-      - setup_remote_docker
+            mkdir -p ~/.docker/cli-plugins
+            curl -fsSL -o ~/.docker/cli-plugins/docker-buildx "https://github.com/docker/buildx/releases/download/v0.19.3/buildx-v0.19.3.linux-amd64"
+            chmod +x ~/.docker/cli-plugins/docker-buildx
+            docker buildx version
+
+jobs:
+  code_style:
+    docker:
+      - image: cimg/node:26.13.0
+    steps:
+      - checkout
+      - install_pnpm
       - run:
-          name: "Build dashboard image"
-          command: "bin/build-docker-dashboard.sh"
+          name: "Install dependencies"
+          command: pnpm install --frozen-lockfile
       - run:
-          name: "Push image if on master"
-          command: "bin/push-docker-dashboard-image.sh"
+          name: "Check code style"
+          command: pnpm run format:check
+      - run:
+          name: "Lint"
+          command: pnpm run lint:ci
 
   build_dashboardv2:
     docker:
       - image: google/cloud-sdk
     steps:
       - checkout
-      - run:
-          name: Install Docker CLI
-          command: |
-            apt-get update
-            apt-get install -y docker.io
+      - install_docker
       - setup_remote_docker
       - run:
           name: "Build dashboard v2 image"
@@ -54,37 +57,15 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
-      - run:
-          name: Install Docker CLI
-          command: |
-            apt-get update
-            apt-get install -y docker.io
+      - install_docker
       - setup_remote_docker
       - run:
           name: "Build widgets image"
           command: "bin/build-docker-widgets.sh"
 
-  build_backend:
-    docker:
-      - image: google/cloud-sdk
-    steps:
-      - checkout
-      - run:
-          name: Install Docker CLI
-          command: |
-            apt-get update
-            apt-get install -y docker.io
-      - setup_remote_docker
-      - run:
-          name: "Build backend image"
-          command: "bin/build-docker-backend.sh"
-      - run:
-          name: "Push image if on master"
-          command: "bin/push-docker-backend-image.sh"
-
   test_backend_v2:
     docker:
-      - image: circleci/node:11
+      - image: cimg/node:26.13.0
       - image: circleci/postgres:9.6-alpine
         environment:
           POSTGRES_USER: postgres
@@ -94,6 +75,7 @@ jobs:
 
     steps:
       - checkout
+      - install_pnpm
       - run:
           name: "Waiting for Postgres to be ready"
           command: |
@@ -116,10 +98,10 @@ jobs:
             echo Failed waiting for Redis && exit 1
       - run:
           name: "install dependencies"
-          command: cd packages/backendv2 && npm ci
+          command: pnpm install --frozen-lockfile --filter ./packages/backendv2
       - run:
           name: "run migrations"
-          command: cd packages/backendv2 && export NODE_ENV=test && npx knex migrate:latest
+          command: cd packages/backendv2 && NODE_ENV=test pnpm run migrate
       - run:
           name: install dockerize
           command: wget https://github.com/jwilder/dockerize/releases/download/$DOCKERIZE_VERSION/dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && sudo tar -C /usr/local/bin -xzvf dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz && rm dockerize-linux-amd64-$DOCKERIZE_VERSION.tar.gz
@@ -133,7 +115,7 @@ jobs:
           command: dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
           name: "run tests"
-          command: "cd packages/backendv2 && npm run test -- --coverage"
+          command: "cd packages/backendv2 && pnpm run test --coverage"
           environment:
             REDIS_HOST: localhost
             REDIS_PORT: 6379
@@ -146,11 +128,7 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
-      - run:
-          name: Install Docker CLI
-          command: |
-            apt-get update
-            apt-get install -y docker.io
+      - install_docker
       - setup_remote_docker
       - run:
           name: "Build backend v2 image"
@@ -164,11 +142,7 @@ jobs:
       - image: google/cloud-sdk
     steps:
       - checkout
-      - run:
-          name: Install Docker CLI
-          command: |
-            apt-get update
-            apt-get install -y docker.io
+      - install_docker
       - setup_remote_docker
       - run:
           name: install envsubst
@@ -181,8 +155,6 @@ workflows:
   version: 2
   build-deploy:
     jobs:
-      - build_dashboard
-      - build_backend
       - build_dashboardv2
       - test_backend_v2
       - build_backendv2
@@ -190,8 +162,6 @@ workflows:
       - code_style
       - deploy_to_production:
           requires:
-            - build_dashboard
-            - build_backend
             - build_dashboardv2
             - test_backend_v2
             - build_backendv2

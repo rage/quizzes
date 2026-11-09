@@ -1,13 +1,15 @@
-import Knex from "knex"
-import { v4 } from "uuid"
-import { BadRequestError, NotFoundError } from "./../util/error"
-import stringify from "csv-stringify"
-import Quiz from "./quiz"
-import Language from "./language"
-import CourseTranslation from "./course_translation"
+import { randomUUID } from "crypto"
+
+import { stringify } from "csv-stringify"
+import type { Knex } from "knex"
+
 import knex from "../../database/knex"
-import BaseModel from "./base_model"
 import { EditCourseCompletionPayloadFields } from "../types"
+import { BadRequestError, NotFoundError } from "./../util/error"
+import BaseModel from "./base_model"
+import CourseTranslation from "./course_translation"
+import Language from "./language"
+import Quiz from "./quiz"
 
 class Course extends BaseModel {
   id!: string
@@ -28,7 +30,7 @@ class Course extends BaseModel {
     return "course"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     quizzes: {
       relation: BaseModel.HasManyRelation,
       modelClass: Quiz,
@@ -45,7 +47,7 @@ class Course extends BaseModel {
         to: "course_translation.course_id",
       },
     },
-  }
+  })
 
   static async getFlattenedById(id: string) {
     const courses = await this.query()
@@ -64,31 +66,25 @@ class Course extends BaseModel {
     course.title = texts.title
     course.body = texts.body
     course.abbreviation = texts.abbreviation
-    delete course.texts
+    delete (course as Partial<Course>).texts
     return course
   }
 
   static async getById(id: string, trx?: Knex.Transaction) {
     return this.moveTextsToParent(
-      (
-        await this.query(trx)
-          .withGraphJoined("texts")
-          .where("id", id)
-      )[0],
+      (await this.query(trx).withGraphJoined("texts").where("id", id))[0],
     )
   }
 
   static async getByTitle(title: string) {
     return (
-      await this.query()
-        .withGraphJoined("texts")
-        .where("title", title)
+      await this.query().withGraphJoined("texts").where("title", title)
     )[0]
   }
 
   static async getAll() {
     const courses = await this.query().withGraphJoined("texts")
-    return courses.map(course => this.moveTextsToParent(course))
+    return courses.map((course) => this.moveTextsToParent(course))
   }
 
   private static moveTextsToParent(course: any) {
@@ -136,10 +132,10 @@ class Course extends BaseModel {
       throw new BadRequestError(`Invalid language id provided: ${language_id}`)
     }
 
-    const newCourseId = v4()
+    const newCourseId = randomUUID()
 
     await knex
-      .transaction(async trx => {
+      .transaction(async (trx) => {
         await trx("course").insert({ id: newCourseId })
 
         await trx("course_translation").insert({
@@ -344,7 +340,7 @@ class Course extends BaseModel {
           },
         )
       })
-      .catch(e => {
+      .catch((e) => {
         throw new Error(e)
       })
 
@@ -394,7 +390,7 @@ class Course extends BaseModel {
         .distinct("part")
         .where({ course_id: courseId })
         .andWhereNot("part", 0)
-    ).map(q => q.part)
+    ).map((q) => q.part)
   }
 
   public static async updateCourseActiveStatus(
@@ -405,6 +401,9 @@ class Course extends BaseModel {
       throw new Error("invalid status")
     }
     const course = await Course.query().findById(courseId)
+    if (!course) {
+      throw new NotFoundError(`course not found: ${courseId}`)
+    }
     return course.$query().patchAndFetch({ status: newStatus })
   }
 

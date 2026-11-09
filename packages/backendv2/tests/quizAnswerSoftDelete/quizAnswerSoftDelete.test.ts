@@ -1,6 +1,7 @@
 import nock from "nock"
 import { Model, snakeCaseMappers } from "objection"
 import request from "supertest"
+
 import app from "../../app"
 import redis from "../../config/redis"
 import knex from "../../database/knex"
@@ -84,7 +85,7 @@ describe("Soft delete quiz answer and update user quiz state", () => {
             .andWhere("quiz_id", "f98cd4b0-41b1-4a15-89a2-4c991ec67264")
         )[0]
 
-        expect(deletedQuizAnswer.deleted).toEqual(true)
+        expect(deletedQuizAnswer?.deleted).toEqual(true)
         expect(userQuizState.pointsAwarded).toEqual(2.25)
         expect(userQuizState.status).toEqual("open")
         expect(userQuizState.tries).toEqual(2)
@@ -121,7 +122,7 @@ describe("Soft delete quiz answer and update user quiz state", () => {
             .andWhere("quiz_id", "f98cd4b0-41b1-4a15-89a2-4c991ec67264")
         )[0]
 
-        expect(deletedQuizAnswer.deleted).toEqual(true)
+        expect(deletedQuizAnswer?.deleted).toEqual(true)
         expect(userQuizState.pointsAwarded).toEqual(2.25)
         expect(userQuizState.status).toEqual("open")
         expect(userQuizState.tries).toEqual(2)
@@ -158,7 +159,7 @@ describe("Soft delete quiz answer and update user quiz state", () => {
             .andWhere("quiz_id", "f98cd4b0-41b1-4a15-89a2-4c991ec67264")
         )[0]
 
-        expect(deletedQuizAnswer.deleted).toEqual(true)
+        expect(deletedQuizAnswer?.deleted).toEqual(true)
         expect(userQuizState.pointsAwarded).toEqual(2.25)
         expect(userQuizState.status).toEqual("open")
         expect(userQuizState.tries).toEqual(2)
@@ -170,7 +171,7 @@ describe("Soft delete quiz answer and update user quiz state", () => {
 const userSetup = () => {
   nock("https://tmc.mooc.fi")
     .get("/api/v8/users/current?show_user_fields=true")
-    .reply(function() {
+    .reply(function () {
       const auth = this.req.headers.authorization
       if (auth === "Bearer admin_token") {
         return [
@@ -207,5 +208,6 @@ const userSetup = () => {
           } as UserInfo,
         ]
       }
+      return [401]
     })
 }

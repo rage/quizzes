@@ -1,9 +1,10 @@
-import Quiz from "./quiz_item"
+import { mixin } from "objection"
+
+import BaseModel from "./base_model"
 import PeerReviewCollectionTranslation from "./peer_review_collection_translation"
 import PeerReviewQuestion from "./peer_review_question"
-import BaseModel from "./base_model"
-import { mixin } from "objection"
-import softDelete from "objection-soft-delete"
+import Quiz from "./quiz"
+import softDelete from "./soft_delete"
 
 export class PeerReviewCollection extends mixin(BaseModel, [
   softDelete({ columnName: "deleted" }),
@@ -19,7 +20,7 @@ export class PeerReviewCollection extends mixin(BaseModel, [
     return "peer_review_collection"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     quiz: {
       relation: BaseModel.HasOneRelation,
       modelClass: Quiz,
@@ -44,9 +45,9 @@ export class PeerReviewCollection extends mixin(BaseModel, [
         to: "peer_review_question.peer_review_collection_id",
       },
     },
-  }
+  })
 
-  static async getById(id: string): Promise<PeerReviewCollection> {
+  static async getById(id: string): Promise<PeerReviewCollection | undefined> {
     return await this.query().findById(id)
   }
 }

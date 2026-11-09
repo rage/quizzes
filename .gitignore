@@ -19,6 +19,7 @@ coverage
 # API keys and secrets
 .env
 .env*
+!.envrc
 
 # Dependency directory
 node_modules
@@ -60,3 +61,5 @@ dist
 # circleci
 
 /process.yml
+
+.direnv/

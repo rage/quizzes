@@ -1,19 +1,22 @@
 import React, { useEffect, useState } from "react"
-import { Button, Typography, Snackbar, Slide } from "@material-ui/core"
+
 import styled from "styled-components"
-import { Answer } from "../../../types/Answer"
-import {
-  changeAnswerStatus,
-  logSuspectedPlagiarism,
-} from "../../../services/quizzes"
-import { Alert } from "@material-ui/lab"
-import { TransitionProps } from "@material-ui/core/transitions"
-import { ButtonFieldWrapper } from "../../Shared/ButtonFieldWrapper"
+
+import { Button, Typography, Snackbar } from "@mui/material"
+import { Alert } from "@mui/material"
+
 import {
   setHandledAnswers,
   useAnswerListState,
 } from "../../../contexts/AnswerListContext"
 import { useAnswer } from "../../../hooks/useAnswer"
+import {
+  changeAnswerStatus,
+  logSuspectedPlagiarism,
+} from "../../../services/quizzes"
+import { Answer } from "../../../types/Answer"
+import { ButtonFieldWrapper } from "../../Shared/ButtonFieldWrapper"
+import { SlideDown } from "../../Shared/SlideDown"
 
 export const RejectButton = styled(Button)`
   display: flex !important;
@@ -72,9 +75,7 @@ export const ManualReviewField = ({ answer }: ManualReviewProps) => {
         autoHideDuration={5000}
         onClose={() => setShowSnacks(false)}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        TransitionComponent={(props: TransitionProps) => {
-          return <Slide {...props} direction="down" />
-        }}
+        slots={{ transition: SlideDown }}
       >
         <Alert severity={success ? "success" : "error"}>
           {success ? (

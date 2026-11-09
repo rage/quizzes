@@ -1,15 +1,17 @@
 import React, { useEffect } from "react"
-import { initializedEditor } from "../../store/editor/editorActions"
-import { useDispatch } from "react-redux"
-import SaveButton from "../SaveButton"
-import { normalizedQuiz } from "../../schemas"
-import { normalize } from "normalizr"
-import useBreadcrumbs from "../../hooks/useBreadcrumbs"
-import QuizEditForms from "../QuizEditForms"
+
 import _ from "lodash"
+import { normalize } from "normalizr"
+import { useDispatch } from "react-redux"
+
+import useBreadcrumbs from "../../hooks/useBreadcrumbs"
+import { normalizedQuiz } from "../../schemas"
+import { initializedEditor } from "../../store/editor/editorActions"
+import QuizEditForms from "../QuizEditForms"
+import SaveButton from "../SaveButton"
+import { IQuizTabProps } from "./answers/types"
 import QuizTitle from "./QuizTitleContainer"
 import { TabText } from "./TabHeaders"
-import { IQuizTabProps } from "./answers/types"
 
 const EditPage = ({ quiz, course }: IQuizTabProps) => {
   const dispatch = useDispatch()

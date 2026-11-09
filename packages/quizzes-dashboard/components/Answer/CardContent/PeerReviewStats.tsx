@@ -1,8 +1,11 @@
 import React from "react"
+
+import styled from "styled-components"
+
+import { Typography } from "@mui/material"
+
 import { PeerReview } from "../../../types/Answer"
 import Peerreviews from "./Peerreviews"
-import { Typography } from "@material-ui/core"
-import styled from "styled-components"
 
 export const TitleContainer = styled.div`
   display: flex;

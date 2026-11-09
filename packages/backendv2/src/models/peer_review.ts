@@ -1,14 +1,14 @@
-import { BadRequestError, NotFoundError } from "./../util/error"
-import QuizAnswer from "./quiz_answer"
-import UserQuizState from "./user_quiz_state"
-import Quiz from "./quiz"
-import PeerReviewQuestionAnswer from "./peer_review_question_answer"
-import PeerReviewQuestion from "./peer_review_question"
-import knex from "../../database/knex"
-import BaseModel from "./base_model"
-import softDelete from "objection-soft-delete"
 import { mixin } from "objection"
-import { Transaction } from "knex"
+
+import knex from "../../database/knex"
+import { BadRequestError, NotFoundError } from "./../util/error"
+import BaseModel from "./base_model"
+import PeerReviewQuestion from "./peer_review_question"
+import PeerReviewQuestionAnswer from "./peer_review_question_answer"
+import Quiz from "./quiz"
+import QuizAnswer from "./quiz_answer"
+import softDelete from "./soft_delete"
+import UserQuizState from "./user_quiz_state"
 
 class PeerReview extends BaseModel {
   id!: string
@@ -22,7 +22,7 @@ class PeerReview extends BaseModel {
     return "peer_review"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     quizAnswer: {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: QuizAnswer,
@@ -39,7 +39,7 @@ class PeerReview extends BaseModel {
         to: "peer_review_question_answer.peer_review_id",
       },
     },
-  }
+  })
 
   public static async getWithAnswersByAnswerId(quizAnswerId: string) {
     // check that answerId exists
@@ -109,16 +109,13 @@ class PeerReview extends BaseModel {
     }
 
     let sourceUserQuizState: UserQuizState | null = null
-    let targetUserQuizState: UserQuizState
 
     if (!skipGiverRequirements) {
-      sourceUserQuizState = await UserQuizState.getByUserAndQuiz(
-        sourceUserId,
-        quizId,
-      )
+      sourceUserQuizState =
+        (await UserQuizState.getByUserAndQuiz(sourceUserId, quizId)) ?? null
     }
 
-    targetUserQuizState = await UserQuizState.getByUserAndQuiz(
+    const targetUserQuizState = await UserQuizState.getByUserAndQuiz(
       targetUserId,
       quizId,
     )
@@ -155,9 +152,8 @@ class PeerReview extends BaseModel {
       if (isUpdating && peerReviewAlreadyGiven) {
         const peerReviewData = this.fromJson(peerReview)
         peerReviewData.id = peerReviewAlreadyGiven.id
-        newPeerReview = await this.query(trx).upsertGraphAndFetch(
-          peerReviewData,
-        )
+        newPeerReview =
+          await this.query(trx).upsertGraphAndFetch(peerReviewData)
       } else {
         newPeerReview = await this.query(trx).insertGraphAndFetch(
           this.fromJson(peerReview),

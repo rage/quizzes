@@ -1,21 +1,22 @@
-import { action, NormalizedOption } from "../../../types/NormalizedQuiz"
+import { produce } from "immer"
+import { normalize } from "normalizr"
 import { createReducer } from "typesafe-actions"
-import {
-  editedOptionTitle,
-  editedOptionCorrectness,
-  editedOptionSuccessMessage,
-  editedOptionFailureMessage,
-} from "./optionActions"
+
+import { normalizedQuiz } from "../../../schemas"
+import { action, NormalizedOption } from "../../../types/NormalizedQuiz"
+import { Quiz } from "../../../types/Quiz"
 import {
   initializedEditor,
   deletedOption,
   createdNewOption,
   createdNewQuiz,
 } from "../editorActions"
-import produce from "immer"
-import { Quiz } from "../../../types/Quiz"
-import { normalizedQuiz } from "../../../schemas"
-import { normalize } from "normalizr"
+import {
+  editedOptionTitle,
+  editedOptionCorrectness,
+  editedOptionSuccessMessage,
+  editedOptionFailureMessage,
+} from "./optionActions"
 
 export const optionReducer = createReducer<
   { [optionId: string]: NormalizedOption },
@@ -27,33 +28,33 @@ export const optionReducer = createReducer<
   )
 
   .handleAction(editedOptionTitle, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.optionId].title = action.payload.newTitle
     })
   })
 
   .handleAction(editedOptionCorrectness, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.optionId].correct = action.payload.correct
     })
   })
 
   .handleAction(editedOptionSuccessMessage, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.optionId].successMessage =
         action.payload.newMessage
     })
   })
 
   .handleAction(editedOptionFailureMessage, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.optionId].failureMessage =
         action.payload.newMessage
     })
   })
 
   .handleAction(createdNewOption, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       draftState[action.payload.optionId] = {
         id: action.payload.optionId,
         quizItemId: action.payload.itemId,
@@ -70,7 +71,7 @@ export const optionReducer = createReducer<
   })
 
   .handleAction(deletedOption, (state, action) => {
-    return produce(state, draftState => {
+    return produce(state, (draftState) => {
       delete draftState[action.payload.optionId]
     })
   })

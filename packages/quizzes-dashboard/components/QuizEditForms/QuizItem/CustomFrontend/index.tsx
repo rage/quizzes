@@ -1,18 +1,21 @@
 import React from "react"
-import { NormalizedItem } from "../../../../types/NormalizedQuiz"
-import { useTypedSelector } from "../../../../store/store"
+
+import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { Box, Button, Fade, Modal } from "@material-ui/core"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+
 import {
   faPen,
   faWindowClose,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons"
-import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
-import { useDispatch } from "react-redux"
-import CustomModalContent from "./CustomModalContent"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Box, Button, Fade, Modal } from "@mui/material"
+
 import { deletedItem } from "../../../../store/editor/editorActions"
+import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
+import { useTypedSelector } from "../../../../store/store"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
+import CustomModalContent from "./CustomModalContent"
 
 interface customFrontend {
   item: NormalizedItem
@@ -57,10 +60,10 @@ const ModalButtonWrapper = styled.div`
 `
 
 export const CustomFrontend = ({ item }: customFrontend) => {
-  const quizId = useTypedSelector(state => state.editor.quizId)
-  const storeItem = useTypedSelector(state => state.editor.items[item.id])
+  const quizId = useTypedSelector((state) => state.editor.quizId)
+  const storeItem = useTypedSelector((state) => state.editor.items[item.id])
   const variables = useTypedSelector(
-    state => state.editor.itemVariables[item.id],
+    (state) => state.editor.itemVariables[item.id],
   )
   const dispatch = useDispatch()
   return (

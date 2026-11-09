@@ -1,13 +1,16 @@
 import React from "react"
-import { AnswerElement } from "../../../../types/Answer"
+
+import styled from "styled-components"
+
 import {
   Typography,
   Divider,
   FormControlLabel,
   FormGroup,
   Radio,
-} from "@material-ui/core"
-import styled from "styled-components"
+} from "@mui/material"
+
+import { AnswerElement } from "../../../../types/Answer"
 
 export const StyledText = styled(Typography)`
   display: flex;

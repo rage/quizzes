@@ -1,22 +1,25 @@
 import React from "react"
+
+import { groupBy, Dictionary } from "lodash"
+import Head from "next/head"
+import Link from "next/link"
+import { useRouter } from "next/router"
+import styled from "styled-components"
+import useSWR from "swr"
+
+import { Typography, Button } from "@mui/material"
+
+import useBreadcrumbs from "../../hooks/useBreadcrumbs"
 import {
   fetchCourseQuizzes,
   getAnswersRequiringAttentionCounts,
   getUserAbilitiesForCourse,
 } from "../../services/quizzes"
-import Head from "next/head"
-import usePromise from "react-use-promise"
-import { groupBy, Dictionary } from "lodash"
-import { Typography, Button } from "@material-ui/core"
-import DebugDialog from "../DebugDialog"
-import Link from "next/link"
-import styled from "styled-components"
-import { useRouter } from "next/router"
 import { Quiz } from "../../types/Quiz"
-import useBreadcrumbs from "../../hooks/useBreadcrumbs"
+import DebugDialog from "../DebugDialog"
 import DuplicateCourseButton from "../DuplicateCourse"
-import { SectionOfPart } from "./PartSection"
 import SkeletonLoader from "../Shared/SkeletonLoader"
+import { SectionOfPart } from "./PartSection"
 
 const CourseTitleWrapper = styled.div`
   display: flex;
@@ -27,7 +30,10 @@ const CourseTitleWrapper = styled.div`
   }
 `
 
-const StyledButton = styled(Button)`
+const StyledButton = styled(Button)<{
+  component: React.ElementType
+  href: string
+}>`
   max-height: 3rem;
   @media only screen and (max-width: 535px) {
     align-self: flex-end !important;
@@ -39,14 +45,17 @@ const POINT_COLOR = "#505050"
 export const CoursePage = () => {
   const router = useRouter()
   const id = router.query.courseId?.toString() ?? ""
-  const [data, error] = usePromise(() => fetchCourseQuizzes(id), [id])
-  const [answersRequiringAttention, answersError] = usePromise(
-    () => getAnswersRequiringAttentionCounts(id),
-    [id],
+  const { data, error } = useSWR(
+    id ? ["courseQuizzes", id] : null,
+    ([, courseId]) => fetchCourseQuizzes(courseId),
   )
-  const [userAbilities, userError] = usePromise(
-    () => getUserAbilitiesForCourse(id),
-    [id],
+  const { data: answersRequiringAttention, error: answersError } = useSWR(
+    id ? ["answersRequiringAttentionCounts", id] : null,
+    ([, courseId]) => getAnswersRequiringAttentionCounts(courseId),
+  )
+  const { data: userAbilities, error: userError } = useSWR(
+    id ? ["userAbilitiesForCourse", id] : null,
+    ([, courseId]) => getUserAbilitiesForCourse(courseId),
   )
 
   useBreadcrumbs([
@@ -96,14 +105,14 @@ export const CoursePage = () => {
   for (let [part, quizzes] of Object.entries(byPart)) {
     byPartAndSection[part] = groupBy(quizzes, "section")
     pointsByParts[parseInt(part)] = quizzes
-      .filter(quiz => !quiz.excludedFromScore)
-      .map(quiz => quiz.points)
+      .filter((quiz) => !quiz.excludedFromScore)
+      .map((quiz) => quiz.points)
       .reduce((a, b) => a + b, 0)
   }
 
   let points = data.quizzes
-    .filter(quiz => !quiz.excludedFromScore && quiz.part !== 0)
-    .map(quiz => quiz.points)
+    .filter((quiz) => !quiz.excludedFromScore && quiz.part !== 0)
+    .map((quiz) => quiz.points)
     .reduce((a, b) => a + b, 0)
 
   return (
@@ -125,11 +134,13 @@ export const CoursePage = () => {
           </Typography>
         </Typography>
 
-        <Link href={`/courses/${id}/quizzes/new`}>
-          <StyledButton variant="outlined">
-            <Typography variant="overline">Add New Quiz</Typography>
-          </StyledButton>
-        </Link>
+        <StyledButton
+          variant="outlined"
+          component={Link}
+          href={`/courses/${id}/quizzes/new`}
+        >
+          <Typography variant="overline">Add New Quiz</Typography>
+        </StyledButton>
       </CourseTitleWrapper>
       {Object.entries(byPartAndSection)
         .sort((a, b) => {

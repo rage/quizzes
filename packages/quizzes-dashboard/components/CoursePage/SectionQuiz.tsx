@@ -1,3 +1,8 @@
+import React from "react"
+
+import Link from "next/link"
+import styled from "styled-components"
+
 import {
   Typography,
   Card,
@@ -5,12 +10,10 @@ import {
   Button,
   Badge,
   CardHeader,
-} from "@material-ui/core"
-import Link from "next/link"
-import React from "react"
-import styled from "styled-components"
-import { Quiz } from "../../types/Quiz"
+} from "@mui/material"
+
 import { useUserAbilities } from "../../hooks/useUserAbilities"
+import { Quiz } from "../../types/Quiz"
 interface quizProps {
   quiz: Quiz
   requiringAttention: number
@@ -59,15 +62,15 @@ const StyledType = styled(Typography)`
   color: #f44336 !important;
 `
 
-const QuizLink = styled.a`
-  color: white;
+const QuizLink = styled(Link)`
+  display: block;
+  color: inherit;
   text-decoration: none;
-  cursor: pointer;
 `
 
 export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
   const title = quiz.title
-  const types = Array.from(new Set(quiz.items.map(item => item.type)))
+  const types = Array.from(new Set(quiz.items.map((item) => item.type)))
   const { userAbilities } = useUserAbilities(
     quiz?.courseId ?? "",
     "user-abilities",
@@ -76,32 +79,34 @@ export const QuizOfSection = ({ quiz, requiringAttention }: quizProps) => {
   const quizType = types.length > 0 ? types.join(", ") : "unknown"
 
   return (
-    <Link href={`/quizzes/${quiz.id}/overview`} passHref>
-      <QuizLink>
-        <QuizCard>
-          <CardHeader title={title} subheader={quizType} />
-          <ButtonContainer>
-            <Badge
-              color="error"
-              badgeContent={requiringAttention}
-              invisible={requiringAttention === undefined}
-            >
-              <Link href={`/quizzes/${quiz.id}/answers-requiring-attention`}>
-                <Button variant="outlined">
-                  <Typography>Answers requiring attention</Typography>
-                </Button>
-              </Link>
-            </Badge>
-            {userAbilities?.includes("edit") && (
-              <Link href={`/quizzes/${quiz.id}/edit`}>
-                <Button variant="outlined">
-                  <Typography>Edit quiz</Typography>
-                </Button>
-              </Link>
-            )}
-          </ButtonContainer>
-        </QuizCard>
+    <QuizCard>
+      <QuizLink href={`/quizzes/${quiz.id}/overview`}>
+        <CardHeader title={title} subheader={quizType} />
       </QuizLink>
-    </Link>
+      <ButtonContainer>
+        <Badge
+          color="error"
+          badgeContent={requiringAttention}
+          invisible={requiringAttention === undefined}
+        >
+          <Button
+            variant="outlined"
+            component={Link}
+            href={`/quizzes/${quiz.id}/answers-requiring-attention`}
+          >
+            <Typography>Answers requiring attention</Typography>
+          </Button>
+        </Badge>
+        {userAbilities?.includes("edit") && (
+          <Button
+            variant="outlined"
+            component={Link}
+            href={`/quizzes/${quiz.id}/edit`}
+          >
+            <Typography>Edit quiz</Typography>
+          </Button>
+        )}
+      </ButtonContainer>
+    </QuizCard>
   )
 }

@@ -1,3 +1,4 @@
+import { DateTime } from "luxon"
 import { createAction } from "typesafe-actions"
 
 export const editedQuizTitle = createAction(
@@ -36,11 +37,11 @@ export const editedQuizzesPointsGrantingPolicy = createAction(
 
 export const editedQuizzesDeadline = createAction(
   "EDITED_QUIZZES_DEADLINE",
-  (deadline: Date | null, quizId: string) => ({
+  (deadline: DateTime | null, quizId: string) => ({
     deadline: deadline,
     id: quizId,
   }),
-)<{ deadline: Date | null; id: string }>()
+)<{ deadline: DateTime | null; id: string }>()
 
 export const editedQuizzesBody = createAction(
   "EDITED_QUIZZES_BODY",

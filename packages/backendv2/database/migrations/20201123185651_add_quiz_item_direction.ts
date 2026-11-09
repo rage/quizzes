@@ -1,10 +1,10 @@
-import * as Knex from "knex"
+import type { Knex } from "knex"
 
 export async function up(knex: Knex): Promise<void> {
   if (process.env.NODE_ENV === "production") {
     await knex.raw("DROP MATERIALIZED VIEW reaktor.quiz_item CASCADE")
 
-    await knex.schema.alterTable("quiz_item", table => {
+    await knex.schema.alterTable("quiz_item", (table) => {
       table
         .enu("direction", ["column", "row"], {
           useNative: true,
@@ -122,7 +122,7 @@ export async function down(knex: Knex): Promise<void> {
   if (process.env.NODE_ENV === "production") {
     await knex.raw("DROP MATERIALIZED VIEW reaktor.quiz_item CASCADE")
 
-    await knex.schema.alterTable("quiz_item", table => {
+    await knex.schema.alterTable("quiz_item", (table) => {
       table.dropColumn("direction")
     })
 

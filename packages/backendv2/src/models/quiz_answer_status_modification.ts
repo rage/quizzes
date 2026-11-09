@@ -1,4 +1,5 @@
-import Knex from "knex"
+import type { Knex } from "knex"
+
 import { TStatusModificationOperation } from "./../types/index"
 import BaseModel from "./base_model"
 import User from "./user"
@@ -13,7 +14,7 @@ class QuizAnswerStatusModification extends BaseModel {
     return "quiz_answer_status_modification"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     user: {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: User,
@@ -30,7 +31,7 @@ class QuizAnswerStatusModification extends BaseModel {
         to: "quiz_answer.id",
       },
     },
-  }
+  })
 
   static async getAll() {
     const loggedChanges = await this.query()
@@ -62,12 +63,12 @@ class QuizAnswerStatusModification extends BaseModel {
   }
 
   static async logStatusChangeForMany(
-    quizAnswerIds: [string],
+    quizAnswerIds: string[],
     operation: TStatusModificationOperation,
     trx: Knex.Transaction,
     modifierId?: number,
   ) {
-    const logsToInsert = quizAnswerIds.map(quizAnswerId => ({
+    const logsToInsert = quizAnswerIds.map((quizAnswerId) => ({
       quizAnswerId,
       modifierId,
       operation,

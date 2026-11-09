@@ -1,30 +1,36 @@
 import React, { useEffect } from "react"
-import QuizEditForms from "../../../../components/QuizEditForms"
-import { Typography } from "@material-ui/core"
-import SaveButton from "../../../../components/SaveButton"
-import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
+
+import Head from "next/head"
 import { useRouter } from "next/router"
 import { useDispatch } from "react-redux"
-import { createdNewQuiz } from "../../../../store/editor/editorActions"
-import Head from "next/head"
-import usePromise from "react-use-promise"
+import useSWR from "swr"
+
+import { Typography } from "@mui/material"
+
+import QuizEditForms from "../../../../components/QuizEditForms"
+import SaveButton from "../../../../components/SaveButton"
+import useBreadcrumbs from "../../../../hooks/useBreadcrumbs"
 import { fetchCourseById } from "../../../../services/quizzes"
+import { createdNewQuiz } from "../../../../store/editor/editorActions"
 
 const NewQuiz = () => {
   const dispatch = useDispatch()
   const router = useRouter()
   const courseId: string = router.query.courseId?.toString() ?? ""
-  const [course, error] = usePromise(() => fetchCourseById(courseId), [
-    courseId,
-  ])
+  const { data: course } = useSWR(
+    courseId ? ["courseById", courseId] : null,
+    ([, id]) => fetchCourseById(id),
+  )
   useEffect(() => {
-    dispatch(createdNewQuiz(courseId))
-  }, [])
+    if (courseId) {
+      dispatch(createdNewQuiz(courseId))
+    }
+  }, [courseId])
   useBreadcrumbs([
     { label: "Courses", as: "/", href: "/" },
     {
       label: `${course ? course.title : ""}`,
-      as: `/courses/${courseId}/listing`,
+      as: courseId ? `/courses/${courseId}/listing` : undefined,
       href: "/courses/[courseId]/[...page]",
     },
     { label: "New Quiz" },

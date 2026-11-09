@@ -1,19 +1,31 @@
-import NextApp from "next/app"
 import React from "react"
-import { ThemeProvider as StyledThemeProvider } from "styled-components"
+
+import { Provider } from "react-redux"
+import {
+  ThemeProvider as StyledThemeProvider,
+  createGlobalStyle,
+} from "styled-components"
+
+import { config as fontAwesomeConfig } from "@fortawesome/fontawesome-svg-core"
+import { AppCacheProvider } from "@mui/material-nextjs/v16-pagesRouter"
+import "@fortawesome/fontawesome-svg-core/styles.css"
 import {
   ThemeProvider as MaterialThemeProvider,
-  createMuiTheme,
-  StylesProvider,
-} from "@material-ui/core/styles"
+  createTheme,
+} from "@mui/material/styles"
+
 import Layout from "../components/Layout"
-import "@fortawesome/fontawesome-svg-core/styles.css"
-import { config as fontAwesomeConfig } from "@fortawesome/fontawesome-svg-core"
-import { Provider } from "react-redux"
 import store from "../store/store"
 import "./index.css"
 
 fontAwesomeConfig.autoAddCss = false
+
+const GlobalStyle = createGlobalStyle`
+html, body {
+  padding: 0;
+  margin: 0;
+}
+`
 
 const textScalar = {
   "@media only screen and (max-width:600px)": {
@@ -33,62 +45,56 @@ const textScalar = {
   },
 }
 
-const theme = createMuiTheme({
-  overrides: {
+const theme = createTheme({
+  components: {
     MuiTypography: {
-      h1: { fontSize: "2.5rem" },
-      h2: { fontSize: "2rem" },
-      h3: { fontSize: "1.75rem" },
-      h4: { fontSize: "1.5rem" },
-      h5: { fontSize: "1.25rem" },
-      h6: { fontSize: "1rem" },
-      paragraph: textScalar,
-      body1: textScalar,
-      body2: textScalar,
-      caption: textScalar,
-      overline: textScalar,
-      srOnly: textScalar,
-      subtitle1: textScalar,
-      subtitle2: textScalar,
-      button: textScalar,
+      styleOverrides: {
+        h1: { fontSize: "2.5rem" },
+        h2: { fontSize: "2rem" },
+        h3: { fontSize: "1.75rem" },
+        h4: { fontSize: "1.5rem" },
+        h5: { fontSize: "1.25rem" },
+        h6: { fontSize: "1rem" },
+        body1: textScalar,
+        body2: textScalar,
+        caption: textScalar,
+        overline: textScalar,
+        subtitle1: textScalar,
+        subtitle2: textScalar,
+        button: textScalar,
+      },
     },
     MuiButton: {
-      label: {
-        textTransform: "none",
-      },
-      root: {
-        textTransform: "none",
+      // The app's button styles assume MUI v4's neutral default, not v5+'s primary blue
+      defaultProps: { color: "inherit" },
+      styleOverrides: {
+        root: {
+          textTransform: "none",
+        },
       },
     },
   },
 })
 
-export default class App extends NextApp {
-  componentDidMount() {
-    const jssStyles = document.querySelector("#jss-server-side")
-    if (jssStyles && jssStyles.parentNode)
-      jssStyles.parentNode.removeChild(jssStyles)
-  }
+export default function App(props) {
+  const { Component, pageProps } = props
 
-  render() {
-    const { Component, pageProps } = this.props
-
-    return (
+  return (
+    <AppCacheProvider {...props}>
       <Provider store={store}>
-        <StylesProvider injectFirst>
-          <StyledThemeProvider theme={theme}>
-            <MaterialThemeProvider theme={theme}>
-              {Component.noLayout ? (
+        <StyledThemeProvider theme={theme}>
+          <MaterialThemeProvider theme={theme}>
+            <GlobalStyle />
+            {Component.noLayout ? (
+              <Component {...pageProps} />
+            ) : (
+              <Layout>
                 <Component {...pageProps} />
-              ) : (
-                <Layout>
-                  <Component {...pageProps} />
-                </Layout>
-              )}
-            </MaterialThemeProvider>
-          </StyledThemeProvider>
-        </StylesProvider>
+              </Layout>
+            )}
+          </MaterialThemeProvider>
+        </StyledThemeProvider>
       </Provider>
-    )
-  }
+    </AppCacheProvider>
+  )
 }

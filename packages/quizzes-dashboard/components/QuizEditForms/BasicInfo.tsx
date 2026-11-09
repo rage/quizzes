@@ -1,10 +1,11 @@
-import React, { useEffect } from "react"
-import "date-fns"
-import DateFnsUtils from "@date-io/date-fns"
-import {
-  MuiPickersUtilsProvider,
-  KeyboardDateTimePicker,
-} from "@material-ui/pickers"
+import React, { useEffect, useMemo, useState } from "react"
+
+import { DateTime } from "luxon"
+import { useDispatch } from "react-redux"
+import styled from "styled-components"
+
+import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   Typography,
   TextField,
@@ -12,11 +13,12 @@ import {
   Fade,
   Switch,
   FormControlLabel,
-} from "@material-ui/core"
-import styled from "styled-components"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons"
-import { useDispatch } from "react-redux"
+} from "@mui/material"
+import { AdapterLuxon } from "@mui/x-date-pickers/AdapterLuxon"
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
+
+import { checkForChanges } from "../../store/editor/editorActions"
 import {
   editedQuizTitle,
   editedQuizzesNumberOfTries,
@@ -31,7 +33,6 @@ import {
   editedQuizzesAutoconfirm,
 } from "../../store/editor/quiz/quizActions"
 import { useTypedSelector } from "../../store/store"
-import { checkForChanges } from "../../store/editor/editorActions"
 import MarkdownEditor from "../MarkdownEditor"
 
 const SubsectionTitleWrapper = styled.div`
@@ -126,49 +127,67 @@ const AutoConfirmSwitch = styled.div`
   width: 50%;
 `
 
+const parseDeadline = (deadline: string) =>
+  deadline ? DateTime.fromISO(deadline) : null
+
 const BasicInformation = () => {
   const dispatch = useDispatch()
 
-  const quizId = useTypedSelector(state => state.editor.quizId)
+  const quizId = useTypedSelector((state) => state.editor.quizId)
 
   const pointsGrantingPolicy = useTypedSelector(
-    state => state.editor.quizzes[quizId].grantPointsPolicy,
+    (state) => state.editor.quizzes[quizId].grantPointsPolicy,
   )
 
   const numberOfTries = useTypedSelector(
-    state => state.editor.quizzes[quizId].tries,
+    (state) => state.editor.quizzes[quizId].tries,
   )
 
   const triesAreLimited = useTypedSelector(
-    state => state.editor.quizzes[quizId].triesLimited,
+    (state) => state.editor.quizzes[quizId].triesLimited,
   )
 
   const pointsToGain = useTypedSelector(
-    state => state.editor.quizzes[quizId].points,
+    (state) => state.editor.quizzes[quizId].points,
   )
-  const title = useTypedSelector(state => state.editor.quizzes[quizId].title)
+  const title = useTypedSelector((state) => state.editor.quizzes[quizId].title)
 
-  const body = useTypedSelector(state => state.editor.quizzes[quizId].body)
+  const body = useTypedSelector((state) => state.editor.quizzes[quizId].body)
 
   const submitMessage = useTypedSelector(
-    state => state.editor.quizzes[quizId].submitMessage,
+    (state) => state.editor.quizzes[quizId].submitMessage,
   )
-  const part = useTypedSelector(state => state.editor.quizzes[quizId].part)
+  const part = useTypedSelector((state) => state.editor.quizzes[quizId].part)
 
   const section = useTypedSelector(
-    state => state.editor.quizzes[quizId].section,
+    (state) => state.editor.quizzes[quizId].section,
   )
 
   const variables = useTypedSelector(
-    state => state.editor.quizVariables[quizId],
+    (state) => state.editor.quizVariables[quizId],
   )
 
-  const store = useTypedSelector(state => state)
+  // Local so that a partially typed (invalid) date isn't overwritten by the store's last valid value
+  const [deadline, setDeadline] = useState<DateTime | null>(() =>
+    parseDeadline(variables.deadline),
+  )
+  const [syncedStoreDeadline, setSyncedStoreDeadline] = useState(
+    variables.deadline,
+  )
+  if (variables.deadline !== syncedStoreDeadline) {
+    setSyncedStoreDeadline(variables.deadline)
+    setDeadline(parseDeadline(variables.deadline))
+  }
 
-  const changes = useTypedSelector(state => state.editor.editorChanges.changes)
+  const editor = useTypedSelector((state) => state.editor)
+  const store = useMemo(() => ({ editor }), [editor])
+
+  const changes = useTypedSelector(
+    (state) => state.editor.editorChanges.changes,
+  )
 
   const autoConfirm = useTypedSelector(
-    state => state.editor.quizzes[quizId].autoConfirm,
+    (state) => state.editor.quizzes[quizId].autoConfirm,
   )
 
   useEffect(() => {
@@ -196,7 +215,7 @@ const BasicInformation = () => {
         <MarkdownEditor
           label="Quiz title"
           text={title ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizTitle(event.target.value, quizId))
           }
         />
@@ -208,7 +227,7 @@ const BasicInformation = () => {
           label="Part"
           variant="outlined"
           value={part ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizzesPart(quizId, Number(event.target.value)))
           }
         />
@@ -218,7 +237,7 @@ const BasicInformation = () => {
           label="Section"
           variant="outlined"
           value={section ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizzesSection(quizId, Number(event.target.value)))
           }
         />
@@ -230,11 +249,13 @@ const BasicInformation = () => {
             control={
               <Switch
                 checked={triesAreLimited}
-                onChange={event =>
+                onChange={(event) =>
                   dispatch(editedQuizTriesLimited(event.target.checked, quizId))
                 }
                 color="secondary"
-                inputProps={{ "aria-label": "check tries allowed" }}
+                slotProps={{
+                  input: { "aria-label": "check tries allowed" },
+                }}
               />
             }
             label="Limit tries"
@@ -248,12 +269,11 @@ const BasicInformation = () => {
           {triesAreLimited && (
             <TextField
               type="number"
-              InputProps={{ inputProps: { min: 1, max: null } }}
               label="Number of tries allowed"
               variant="outlined"
               value={numberOfTries ?? ""}
               fullWidth
-              onChange={event =>
+              onChange={(event) =>
                 dispatch(
                   editedQuizzesNumberOfTries(
                     Number(event.target.value),
@@ -261,6 +281,7 @@ const BasicInformation = () => {
                   ),
                 )
               }
+              slotProps={{ htmlInput: { min: 1 } }}
             />
           )}
         </TryLimitNumberContainer>
@@ -272,7 +293,7 @@ const BasicInformation = () => {
           fullWidth
           variant="outlined"
           value={pointsToGain ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(
               editedQuizzesPointsToGain(Number(event.target.value), quizId),
             )
@@ -286,7 +307,7 @@ const BasicInformation = () => {
           variant="outlined"
           select
           value={pointsGrantingPolicy}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(
               editedQuizzesPointsGrantingPolicy(event.target.value, quizId),
             )
@@ -301,31 +322,32 @@ const BasicInformation = () => {
         </TextField>
       </InfoContainer>
       <InfoContainer>
-        <MuiPickersUtilsProvider utils={DateFnsUtils}>
-          <KeyboardDateTimePicker
-            fullWidth
-            InputLabelProps={{ shrink: !!variables.deadline }}
-            value={variables.deadline || ""}
-            error={!variables.validDeadline}
-            variant="dialog"
-            inputVariant="outlined"
+        <LocalizationProvider dateAdapter={AdapterLuxon}>
+          <DateTimePicker
             label="Deadline"
+            value={deadline}
             format="dd-MM-yyyy HH:mm"
-            KeyboardButtonProps={{
-              "aria-label": "change time",
+            ampm={false}
+            onChange={(value) => {
+              setDeadline(value)
+              dispatch(editedQuizzesDeadline(value, quizId))
             }}
-            onChange={event => {
-              dispatch(editedQuizzesDeadline(event, quizId))
+            slotProps={{
+              textField: {
+                fullWidth: true,
+                error: !variables.validDeadline,
+                helperText: variables.deadline,
+              },
+              openPickerButton: { "aria-label": "change time" },
             }}
-            helperText={variables.deadline}
           />
-        </MuiPickersUtilsProvider>
+        </LocalizationProvider>
       </InfoContainer>
       <InfoContainer>
         <MarkdownEditor
           text={body ?? ""}
           label="Quiz description"
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizzesBody(quizId, event.target.value))
           }
         />
@@ -334,7 +356,7 @@ const BasicInformation = () => {
         <MarkdownEditor
           text={submitMessage ?? ""}
           label="Submit message"
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizzesSubmitmessage(quizId, event.target.value))
           }
         />
@@ -347,7 +369,7 @@ const BasicInformation = () => {
             control={
               <Switch
                 checked={autoConfirm}
-                onChange={event =>
+                onChange={(event) =>
                   dispatch(
                     editedQuizzesAutoconfirm(quizId, event.target.checked),
                   )

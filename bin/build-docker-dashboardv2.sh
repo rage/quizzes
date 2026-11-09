@@ -13,8 +13,7 @@ fi
 
 TAG="eu.gcr.io/moocfi/quizzes-dashboardv2:build-$REV"
 echo Building "$TAG"
-cd packages/quizzes-dashboard
-docker build . -t "$TAG"
-cd ../..
+# Cache mounts need BuildKit; CI installs the buildx plugin for it.
+DOCKER_BUILDKIT=1 docker build . -f packages/quizzes-dashboard/Dockerfile -t "$TAG"
 
 echo "Successfully built image: $TAG"

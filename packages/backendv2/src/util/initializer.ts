@@ -1,4 +1,5 @@
 import { initialize } from "objection"
+
 import {
   Course,
   CourseTranslation,

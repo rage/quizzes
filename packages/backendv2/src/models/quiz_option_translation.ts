@@ -15,7 +15,7 @@ class QuizOptionTranslation extends BaseModel {
     return ["quiz_option_id", "language_id"]
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     quizOption: {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: QuizOption,
@@ -24,7 +24,7 @@ class QuizOptionTranslation extends BaseModel {
         to: "quiz_option.id",
       },
     },
-  }
+  })
 }
 
 export default QuizOptionTranslation

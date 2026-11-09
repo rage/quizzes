@@ -13,7 +13,7 @@ class PeerReviewCollectionTranslation extends BaseModel {
     return ["peer_review_collection_id", "language_id"]
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     collection: {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: PeerReviewCollection,
@@ -22,7 +22,7 @@ class PeerReviewCollectionTranslation extends BaseModel {
         to: "peer_review_collection.id",
       },
     },
-  }
+  })
 }
 
 export default PeerReviewCollectionTranslation

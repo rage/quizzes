@@ -1,7 +1,7 @@
-import * as Knex from "knex"
+import type { Knex } from "knex"
 
 export async function up(knex: Knex): Promise<void> {
-  await knex.schema.table("quiz_item", table => {
+  await knex.schema.table("quiz_item", (table) => {
     table
       .enu(
         "feedback_display_policy",
@@ -16,7 +16,7 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-  await knex.schema.table("quiz_item", table => {
+  await knex.schema.table("quiz_item", (table) => {
     table.dropColumn("feedback_display_policy")
   })
   await knex.schema.raw(

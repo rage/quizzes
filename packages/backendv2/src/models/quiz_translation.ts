@@ -16,7 +16,7 @@ class QuizTranslation extends BaseModel {
     return ["quiz_id", "language_id"]
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     quiz: {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: Quiz,
@@ -25,7 +25,7 @@ class QuizTranslation extends BaseModel {
         to: "quiz.id",
       },
     },
-  }
+  })
 
   static get modifiers() {
     return {

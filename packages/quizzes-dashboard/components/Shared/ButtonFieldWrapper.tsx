@@ -6,15 +6,18 @@ export const ButtonFieldWrapper = styled.div`
   justify-content: space-around;
   width: 100%;
 
-  .MuiButton-label {
+  .MuiButton-root {
     font-size: 1.2rem;
+  }
+
+  .MuiButton-root > .MuiTypography-root {
     padding: 0.5rem;
   }
 
   .button-accept {
     background-color: #78ab46;
     color: white;
-    :hover {
+    &:hover {
       background-color: #78ab46;
       opacity: 0.6;
       color: #000;
@@ -25,7 +28,7 @@ export const ButtonFieldWrapper = styled.div`
     background-color: #ff1744;
     color: white;
 
-    :hover {
+    &:hover {
       background-color: #ff1744;
       opacity: 0.6;
       color: #000;
@@ -35,7 +38,7 @@ export const ButtonFieldWrapper = styled.div`
     background-color: #b26500;
     color: white;
 
-    :hover {
+    &:hover {
       background-color: #b26500;
       opacity: 0.6;
       color: #000;

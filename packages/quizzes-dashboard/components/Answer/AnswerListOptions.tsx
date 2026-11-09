@@ -1,8 +1,11 @@
+import React, { useState } from "react"
+
+import styled from "styled-components"
+
 import { faSearch } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { Button, Switch, Typography } from "@material-ui/core"
-import React, { useState } from "react"
-import styled from "styled-components"
+import { Button, Switch, Typography } from "@mui/material"
+
 import {
   setBulkSelectedIds,
   setHandledAnswers,
@@ -11,8 +14,8 @@ import {
 } from "../../contexts/AnswerListContext"
 import { Answer } from "../../types/Answer"
 import AnswerSearchForm from "../AnswerSearchForm"
-import { SwitchField } from "../quizPages/answers/styles"
 import { editableAnswerStates } from "../constants"
+import { SwitchField } from "../quizPages/answers/styles"
 
 const BulkSelectWrapper = styled.div`
   display: flex;
@@ -51,8 +54,8 @@ const AnswerListOptions = ({
 
   const handleSelectAll = () => {
     const allSelected = answers?.results
-      .filter(answer => editableAnswerStates.includes(answer.status))
-      .map(editableAnswer => editableAnswer.id)
+      .filter((answer) => editableAnswerStates.includes(answer.status))
+      .map((editableAnswer) => editableAnswer.id)
     dispatch(setBulkSelectedIds(allSelected))
   }
 

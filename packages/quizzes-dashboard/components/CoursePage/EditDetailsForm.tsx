@@ -1,14 +1,14 @@
 import React, { useState } from "react"
+
 import { Formik, Form, Field } from "formik"
-import { Alert } from "@material-ui/lab"
-import { FormHelperText, MenuItem } from "@material-ui/core"
+import _ from "lodash"
 import { useRouter } from "next/router"
-import usePromise from "react-use-promise"
-import {
-  fetchCourseQuizzes,
-  getAllLanguages,
-  updateCourseProperties,
-} from "../../services/quizzes"
+import styled from "styled-components"
+import useSWR from "swr"
+import { object, string } from "yup"
+
+import { Alert } from "@mui/material"
+import { FormHelperText, MenuItem } from "@mui/material"
 import {
   Button,
   Card,
@@ -16,13 +16,16 @@ import {
   Snackbar,
   TextField,
   Typography,
-} from "@material-ui/core"
-import styled from "styled-components"
-import { object, string } from "yup"
+} from "@mui/material"
+
 import useBreadcrumbs from "../../hooks/useBreadcrumbs"
-import _ from "lodash"
-import { EditCoursePayloadFields } from "./types"
+import {
+  fetchCourseQuizzes,
+  getAllLanguages,
+  updateCourseProperties,
+} from "../../services/quizzes"
 import DebugDialog from "../DebugDialog"
+import { EditCoursePayloadFields } from "./types"
 
 const FieldSet = styled.fieldset`
   display: flex;
@@ -53,10 +56,12 @@ export const EditDetailsForm = ({
   initialValues,
   courseId,
   languageIds,
+  onSaved,
 }: {
   initialValues: EditCoursePayloadFields
   courseId: string
   languageIds: string[]
+  onSaved: () => Promise<unknown>
 }) => {
   // for letting user know which course properties were edited
   const [saved, setSaved] = useState<string | null>(null)
@@ -97,6 +102,7 @@ export const EditDetailsForm = ({
         courseId,
         changedProperties,
       )
+      await onSaved()
       // use returned values to re-populate initial values to prevent multiple submissions of changes
       const newValues = {
         title: courseEdited.title,
@@ -143,24 +149,15 @@ export const EditDetailsForm = ({
       </Snackbar>
       <Formik
         validationSchema={object({
-          courseId: string()
-            .uuid()
-            .required(),
+          courseId: string().uuid().required(),
 
           moocfiId: string().uuid(),
 
-          title: string()
-            .required()
-            .min(3),
+          title: string().required().min(3),
 
-          abbreviation: string()
-            .required()
-            .min(3),
+          abbreviation: string().required().min(3),
 
-          languageId: string()
-            .required()
-            .min(5)
-            .max(5),
+          languageId: string().required().min(5).max(5),
 
           status: string().required(),
         })}
@@ -176,6 +173,7 @@ export const EditDetailsForm = ({
                 name="title"
                 type="string"
                 as={TextField}
+                variant="standard"
                 label="Title"
                 error={errors.title}
                 helperText={errors.title}
@@ -185,6 +183,7 @@ export const EditDetailsForm = ({
                 name="abbreviation"
                 type="string"
                 as={TextField}
+                variant="standard"
                 label="Abbreviation"
                 error={errors.abbreviation}
                 helperText={errors.abbreviation}
@@ -193,6 +192,7 @@ export const EditDetailsForm = ({
                 name="moocfiId"
                 type="string"
                 as={TextField}
+                variant="standard"
                 label="Moocfi Id"
                 error={errors.moocfiId}
                 helperText={errors.moocfiId}
@@ -201,6 +201,7 @@ export const EditDetailsForm = ({
                 name="languageId"
                 label="Language Id"
                 as={TextField}
+                variant="standard"
                 select
               >
                 {Array.isArray(languageIds) &&
@@ -210,7 +211,13 @@ export const EditDetailsForm = ({
                     </MenuItem>
                   ))}
               </Field>
-              <Field name="status" label="status" as={TextField} select>
+              <Field
+                name="status"
+                label="status"
+                as={TextField}
+                variant="standard"
+                select
+              >
                 <MenuItem key="active" value="active">
                   active
                 </MenuItem>
@@ -241,13 +248,23 @@ export const EditDetailsForm = ({
 const EditCourseDetails = () => {
   const router = useRouter()
   const id = router.query.courseId?.toString() ?? ""
-  const [courseData, courseFetchError] = usePromise(
-    () => fetchCourseQuizzes(id),
-    [id],
+  const {
+    data: courseData,
+    error: courseFetchError,
+    isValidating,
+    mutate,
+  } = useSWR(id ? ["courseQuizzes", id] : null, ([, courseId]) =>
+    fetchCourseQuizzes(courseId),
   )
-  const [languageData, languagesFetchError] = usePromise(
+  // The form copies its initial values once, so seed it only from revalidated data
+  const [hasRevalidatedSinceMount, setHasRevalidatedSinceMount] =
+    useState(false)
+  if (!hasRevalidatedSinceMount && courseData && !isValidating) {
+    setHasRevalidatedSinceMount(true)
+  }
+  const { data: languageData, error: languagesFetchError } = useSWR(
+    "languages",
     () => getAllLanguages(),
-    [],
   )
 
   useBreadcrumbs([
@@ -261,7 +278,7 @@ const EditCourseDetails = () => {
     return <p>Something went wrong....</p>
   }
 
-  if (!courseData?.course || !languageData) {
+  if (!courseData?.course || !languageData || !hasRevalidatedSinceMount) {
     return <p>Loading....</p>
   }
 
@@ -274,7 +291,7 @@ const EditCourseDetails = () => {
     status: courseData?.course.status || undefined,
   }
 
-  const languageIds = languageData.map(l => l.id) || []
+  const languageIds = languageData.map((l) => l.id) || []
 
   return (
     <>
@@ -292,6 +309,7 @@ const EditCourseDetails = () => {
         initialValues={initialValues}
         courseId={id}
         languageIds={languageIds}
+        onSaved={() => mutate()}
       />
       <DebugDialog object={courseData.course} />
     </>

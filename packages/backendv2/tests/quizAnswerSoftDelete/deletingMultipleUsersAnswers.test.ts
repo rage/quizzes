@@ -1,12 +1,13 @@
 import nock from "nock"
-import app from "../../app"
-import knex from "../../database/knex"
-import { UserInfo } from "../../src/types"
-import { safeClean, safeSeed, configQuizAnswerSoftDelete } from "../util"
 import request from "supertest"
+
+import app from "../../app"
+import redis from "../../config/redis"
+import knex from "../../database/knex"
 import QuizAnswer from "../../src/models/quiz_answer"
 import UserQuizState from "../../src/models/user_quiz_state"
-import redis from "../../config/redis"
+import { UserInfo } from "../../src/types"
+import { safeClean, safeSeed, configQuizAnswerSoftDelete } from "../util"
 
 describe("Deleting multiple of users answers", () => {
   afterAll(async () => {
@@ -44,7 +45,7 @@ describe("Deleting multiple of users answers", () => {
           .andWhere("quiz_id", "f98cd4b0-41b1-4a15-89a2-4c991ec67264")
       )[0]
 
-      expect(deletedQuizAnswer.deleted).toEqual(true)
+      expect(deletedQuizAnswer?.deleted).toEqual(true)
       expect(userQuizState.pointsAwarded).toEqual(2.25)
       expect(userQuizState.status).toEqual("open")
       expect(userQuizState.tries).toEqual(2)
@@ -71,7 +72,7 @@ describe("Deleting multiple of users answers", () => {
           .andWhere("quiz_id", "f98cd4b0-41b1-4a15-89a2-4c991ec67264")
       )[0]
 
-      expect(deletedQuizAnswer.deleted).toEqual(true)
+      expect(deletedQuizAnswer?.deleted).toEqual(true)
       expect(userQuizState.pointsAwarded).toEqual(1.5)
       expect(userQuizState.status).toEqual("open")
       expect(userQuizState.tries).toEqual(1)
@@ -98,7 +99,7 @@ describe("Deleting multiple of users answers", () => {
           .andWhere("quiz_id", "f98cd4b0-41b1-4a15-89a2-4c991ec67264")
       )[0]
 
-      expect(deletedQuizAnswer.deleted).toEqual(true)
+      expect(deletedQuizAnswer?.deleted).toEqual(true)
       expect(userQuizState.pointsAwarded).toEqual(0)
       expect(userQuizState.status).toEqual("open")
       expect(userQuizState.tries).toEqual(0)
@@ -110,7 +111,7 @@ describe("Deleting multiple of users answers", () => {
 const userSetup = () => {
   nock("https://tmc.mooc.fi")
     .get("/api/v8/users/current?show_user_fields=true")
-    .reply(function() {
+    .reply(function () {
       const auth = this.req.headers.authorization
       if (auth === "Bearer admin_token") {
         return [
@@ -147,5 +148,6 @@ const userSetup = () => {
           } as UserInfo,
         ]
       }
+      return [401]
     })
 }

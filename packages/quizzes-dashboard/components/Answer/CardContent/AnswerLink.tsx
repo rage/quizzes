@@ -1,8 +1,11 @@
 import React from "react"
+
 import Link from "next/link"
-import { Link as LinkTypography } from "@material-ui/core"
-import styled from "styled-components"
 import { useRouter } from "next/router"
+import styled from "styled-components"
+
+import { Link as LinkTypography } from "@mui/material"
+
 import { Answer } from "../../../types/Answer"
 
 export const AnswerLinkContainer = styled.div`
@@ -24,15 +27,14 @@ export const AnswerLink = ({ answer }: AnswerLinkProps) => {
 
   return (
     <AnswerLinkContainer>
-      <Link href={answerOverviewHref} passHref>
-        <LinkTypography
-          component="a"
-          variant="body2"
-          style={{ cursor: "pointer" }}
-        >
-          View Answer: {answer.id}
-        </LinkTypography>
-      </Link>
+      <LinkTypography
+        component={Link}
+        href={answerOverviewHref}
+        variant="body2"
+        underline="hover"
+      >
+        View Answer: {answer.id}
+      </LinkTypography>
     </AnswerLinkContainer>
   )
 }

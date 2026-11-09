@@ -1,10 +1,11 @@
 import crypto from "crypto"
-import { NotFoundError } from "./../../util/error"
+
+import redis from "../../../config/redis"
 import knex from "../../../database/knex"
 import { UserCourseRole, Course } from "../../models"
 import { UserInfo } from "../../types"
 import { ForbiddenError } from "../../util/error"
-import redis from "../../../config/redis"
+import { NotFoundError } from "./../../util/error"
 
 export const checkAccessOrThrow = async (
   userInfo: UserInfo,
@@ -36,7 +37,7 @@ export const getAccessibleCourses = async (
   }
   const userCourseRoles = await UserCourseRole.getByUserId(userInfo.id)
   const courses = await Promise.all(
-    userCourseRoles.map(async userCourseRole => {
+    userCourseRoles.map(async (userCourseRole) => {
       if (abilitiesByRole[userCourseRole.role]?.includes(operation)) {
         return await Course.getById(userCourseRole.courseId)
       }
@@ -74,11 +75,8 @@ export const getCourseIdByAnswerId = async (answerId: string) => {
 }
 
 export const getCourseIdByQuizId = async (quizId: string) => {
-  return (
-    await knex("quiz")
-      .select("course_id")
-      .where("quiz.id", quizId)
-  )[0].course_id
+  return (await knex("quiz").select("course_id").where("quiz.id", quizId))[0]
+    .course_id
 }
 
 export const getDownloadTokenFromRedis = async (

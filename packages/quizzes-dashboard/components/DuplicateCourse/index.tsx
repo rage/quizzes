@@ -1,11 +1,14 @@
 import React, { useState } from "react"
-import { Button, Modal, Box, Typography } from "@material-ui/core"
+
 import styled from "styled-components"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+
 import { faWindowClose } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Button, Modal, Box, Typography } from "@mui/material"
+
 import { Course } from "../../types/Quiz"
-import DuplicateModal from "./DuplicateModal"
 import CorrespondenceModal from "./CorrespondenceModal"
+import DuplicateModal from "./DuplicateModal"
 
 const StyledModal = styled(Modal)`
   display: flex !important;

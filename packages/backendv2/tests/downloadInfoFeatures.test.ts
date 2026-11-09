@@ -1,17 +1,17 @@
-import { BadRequestError } from "./../src/util/error"
-import request from "supertest"
 import nock from "nock"
-import app from "../app"
-import knex from "../database/knex"
-import { configA, safeClean, safeSeed } from "./util"
-import { UserInfo } from "../src/types"
+import request from "supertest"
 
+import app from "../app"
 import redis from "../config/redis"
+import knex from "../database/knex"
+import { UserInfo } from "../src/types"
+import { BadRequestError } from "./../src/util/error"
+import { configA, safeClean, safeSeed } from "./util"
 
 const checkTmcCredentials = () => {
   nock("https://tmc.mooc.fi")
     .get("/api/v8/users/current?show_user_fields=true")
-    .reply(function() {
+    .reply(function () {
       const auth = this.req.headers.authorization
       if (auth === "Bearer PLEB_TOKEN") {
         return [
@@ -39,6 +39,7 @@ const checkTmcCredentials = () => {
           } as UserInfo,
         ]
       }
+      return [401]
     })
 }
 
@@ -61,7 +62,7 @@ describe("dashboard - courses: downloading quiz info should", () => {
 
   beforeEach(() => checkTmcCredentials())
 
-  test("respond with 401 if invalid credentials", done => {
+  test("respond with 401 if invalid credentials", (done) => {
     request(app.callback())
       .post(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-quiz-info",
@@ -71,7 +72,7 @@ describe("dashboard - courses: downloading quiz info should", () => {
       .end(done)
   })
 
-  test("respond with BadRequestError if user id not provided", done => {
+  test("respond with BadRequestError if user id not provided", (done) => {
     request(app.callback())
       .post(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-quiz-info",
@@ -79,14 +80,14 @@ describe("dashboard - courses: downloading quiz info should", () => {
       .set("Authorization", `Bearer ADMIN_TOKEN_NO_ID`)
       .expect(400)
 
-      .expect(response => {
+      .expect((response) => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual("No user id provided.")
       })
       .end(done)
   })
 
-  test("return 200 on successful request", done => {
+  test("return 200 on successful request", (done) => {
     request(app.callback())
       .post(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-quiz-info",
@@ -99,7 +100,7 @@ describe("dashboard - courses: downloading quiz info should", () => {
       .end(done)
   })
 
-  test("return a valid download url on successful request", done => {
+  test("return a valid download url on successful request", (done) => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
     request(app.callback())
       .post(`/api/v2/dashboard/quizzes/${quizId}/download-quiz-info`)
@@ -108,7 +109,7 @@ describe("dashboard - courses: downloading quiz info should", () => {
         courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
       })
       .expect(200)
-      .expect(response => {
+      .expect((response) => {
         const { downloadUrl } = response.body
         const downloadToken = downloadUrl.substring(
           downloadUrl.lastIndexOf("=") + 1,
@@ -122,11 +123,11 @@ describe("dashboard - courses: downloading quiz info should", () => {
   })
 
   describe("attempting to download with a download token", () => {
-    test("should return csv content on success ", async done => {
+    test("should return csv content on success ", async () => {
       const downloadToken = await redis.client?.get("2222")
 
       const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
-      request(app.callback())
+      await request(app.callback())
         .post(
           `/api/v2/dashboard/quizzes/download/download-quiz-info/${quizId}?&downloadToken=${downloadToken}`,
         )
@@ -137,7 +138,6 @@ describe("dashboard - courses: downloading quiz info should", () => {
         })
         .expect("Content-Type", "text/csv; charset=utf-8")
         .expect(200)
-        .end(done)
     })
   })
 })
@@ -154,7 +154,7 @@ describe("dashboard: downloading peer review info should", () => {
 
   beforeEach(() => checkTmcCredentials())
 
-  test("respond with 401 if invalid credentials", done => {
+  test("respond with 401 if invalid credentials", (done) => {
     request(app.callback())
       .post(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-peerreview-info",
@@ -164,21 +164,21 @@ describe("dashboard: downloading peer review info should", () => {
       .end(done)
   })
 
-  test("respond with BadRequestError if user id not provided", done => {
+  test("respond with BadRequestError if user id not provided", (done) => {
     request(app.callback())
       .post(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-peerreview-info",
       )
       .set("Authorization", `Bearer ADMIN_TOKEN_NO_ID`)
       .expect(400)
-      .expect(response => {
+      .expect((response) => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual("No user id provided.")
       })
       .end(done)
   })
 
-  test("respond with 200 on successful request", done => {
+  test("respond with 200 on successful request", (done) => {
     request(app.callback())
       .post(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-peerreview-info",
@@ -191,7 +191,7 @@ describe("dashboard: downloading peer review info should", () => {
       .end(done)
   })
 
-  test("return a valid download url on successful request", done => {
+  test("return a valid download url on successful request", (done) => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
     request(app.callback())
       .post(`/api/v2/dashboard/quizzes/${quizId}/download-peerreview-info`)
@@ -200,7 +200,7 @@ describe("dashboard: downloading peer review info should", () => {
         courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
       })
       .expect(200)
-      .expect(response => {
+      .expect((response) => {
         const { downloadUrl } = response.body
         const downloadToken = downloadUrl.substring(
           downloadUrl.lastIndexOf("=") + 1,
@@ -214,10 +214,10 @@ describe("dashboard: downloading peer review info should", () => {
   })
 
   describe("attempting to download with a download token", () => {
-    test("should return csv content on success ", async done => {
+    test("should return csv content on success ", async () => {
       const downloadToken = await redis.client?.get("2222")
       const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
-      request(app.callback())
+      await request(app.callback())
         .post(
           `/api/v2/dashboard/quizzes/download/download-peerreview-info/${quizId}?&downloadToken=${downloadToken}`,
         )
@@ -228,7 +228,6 @@ describe("dashboard: downloading peer review info should", () => {
         })
         .expect("Content-Type", "text/csv; charset=utf-8")
         .expect(200)
-        .end(done)
     })
   })
 })
@@ -238,13 +237,12 @@ describe("dashboard: downloading answer info should", () => {
     await safeSeed(configA)
   })
 
-  afterAll(async done => {
+  afterAll(async () => {
     nock.cleanAll()
     await safeClean()
-    done()
   })
 
-  test("respond with 401 if invalid credentials", done => {
+  test("respond with 401 if invalid credentials", (done) => {
     request(app.callback())
       .post(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-answer-info",
@@ -254,21 +252,21 @@ describe("dashboard: downloading answer info should", () => {
       .end(done)
   })
 
-  test("respond with BadRequestError if user id not provided", done => {
+  test("respond with BadRequestError if user id not provided", (done) => {
     request(app.callback())
       .post(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-answer-info",
       )
       .set("Authorization", `Bearer ADMIN_TOKEN_NO_ID`)
       .expect(400)
-      .expect(response => {
+      .expect((response) => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual("No user id provided.")
       })
       .end(done)
   })
 
-  test("respond with 200 on successful request", done => {
+  test("respond with 200 on successful request", (done) => {
     request(app.callback())
       .post(
         "/api/v2/dashboard/quizzes/4bf4cf2f-3058-4311-8d16-26d781261af7/download-answer-info",
@@ -281,7 +279,7 @@ describe("dashboard: downloading answer info should", () => {
       .end(done)
   })
 
-  test("return a download url on successful request", done => {
+  test("return a download url on successful request", (done) => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
     request(app.callback())
       .post(`/api/v2/dashboard/quizzes/${quizId}/download-answer-info`)
@@ -290,7 +288,7 @@ describe("dashboard: downloading answer info should", () => {
         courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
       })
       .expect(200)
-      .expect(response => {
+      .expect((response) => {
         const { downloadUrl } = response.body
         const downloadToken = downloadUrl.substring(
           downloadUrl.lastIndexOf("=") + 1,
@@ -304,10 +302,10 @@ describe("dashboard: downloading answer info should", () => {
   })
 
   describe("attempting to download with a download token", () => {
-    test("should return csv content on success ", async done => {
+    test("should return csv content on success ", async () => {
       const downloadToken = await redis.client?.get("2222")
       const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
-      request(app.callback())
+      await request(app.callback())
         .post(
           `/api/v2/dashboard/quizzes/download/download-answer-info/${quizId}?&downloadToken=${downloadToken}`,
         )
@@ -318,7 +316,6 @@ describe("dashboard: downloading answer info should", () => {
         })
         .expect("Content-Type", "text/csv; charset=utf-8")
         .expect(200)
-        .end(done)
     })
   })
 })
@@ -348,7 +345,7 @@ describe("downloading info in sequence", () => {
         courseId,
       })
       .expect(200)
-      .expect(response => {
+      .expect((response) => {
         downloadUrl = response.body.downloadUrl
         downloadTokenOnFirstCall = downloadUrl.substring(
           downloadUrl.lastIndexOf("=") + 1,
@@ -373,7 +370,7 @@ describe("downloading info in sequence", () => {
         courseId,
       })
       .expect(200)
-      .expect(response => {
+      .expect((response) => {
         downloadUrl = response.body.downloadUrl
         downloadTokenOnSecondCall = downloadUrl.substring(
           downloadUrl.lastIndexOf("=") + 1,
@@ -402,7 +399,7 @@ describe("downloading info when redis unavailable", () => {
     redis.client = undefined
     nock("https://tmc.mooc.fi")
       .get("/api/v8/users/current?show_user_fields=true")
-      .reply(function() {
+      .reply(function () {
         const auth = this.req.headers.authorization
         if (auth === "Bearer ADMIN_TOKEN") {
           return [
@@ -413,6 +410,7 @@ describe("downloading info when redis unavailable", () => {
             } as UserInfo,
           ]
         }
+        return [401]
       })
   })
 
@@ -420,7 +418,7 @@ describe("downloading info when redis unavailable", () => {
     redis.client = tmp
   })
 
-  test("should throw a BadRequestError when token not generated on quiz info download", done => {
+  test("should throw a BadRequestError when token not generated on quiz info download", (done) => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
     request(app.callback())
       .post(`/api/v2/dashboard/quizzes/${quizId}/download-quiz-info`)
@@ -429,13 +427,13 @@ describe("downloading info when redis unavailable", () => {
         courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
       })
       .expect(400)
-      .expect(response => {
+      .expect((response) => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual("Failed to generate download token.")
       })
       .end(done)
   })
-  test("should throw a BadRequestError when token not generated on peer review info download", done => {
+  test("should throw a BadRequestError when token not generated on peer review info download", (done) => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
     request(app.callback())
       .post(`/api/v2/dashboard/quizzes/${quizId}/download-peerreview-info`)
@@ -444,13 +442,13 @@ describe("downloading info when redis unavailable", () => {
         courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
       })
       .expect(400)
-      .expect(response => {
+      .expect((response) => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual("Failed to generate download token.")
       })
       .end(done)
   })
-  test("should throw a BadRequestError when token not generated on answer info download", done => {
+  test("should throw a BadRequestError when token not generated on answer info download", (done) => {
     const quizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
     request(app.callback())
       .post(`/api/v2/dashboard/quizzes/${quizId}/download-answer-info`)
@@ -459,7 +457,7 @@ describe("downloading info when redis unavailable", () => {
         courseId: "46d7ceca-e1ed-508b-91b5-3cc8385fa44b",
       })
       .expect(400)
-      .expect(response => {
+      .expect((response) => {
         const received: BadRequestError = response.body
         expect(received.message).toEqual("Failed to generate download token.")
       })

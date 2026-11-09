@@ -1,8 +1,11 @@
 import React from "react"
-import styled from "styled-components"
-import { Checkbox, Typography, TextField } from "@material-ui/core"
-import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
+
 import { useDispatch } from "react-redux"
+import styled from "styled-components"
+
+import { Checkbox, Typography, TextField } from "@mui/material"
+
+import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
 import { useTypedSelector } from "../../../../store/store"
 import { ModalWrapper } from "../../../Shared/Modal"
 
@@ -45,7 +48,7 @@ interface CheckBoxModalProps {
 
 export const CheckBoxModalContent = ({ itemId }: CheckBoxModalProps) => {
   const dispatch = useDispatch()
-  const storeItem = useTypedSelector(state => state.editor.items[itemId])
+  const storeItem = useTypedSelector((state) => state.editor.items[itemId])
   return (
     <ModalWrapper>
       <Container>
@@ -56,7 +59,7 @@ export const CheckBoxModalContent = ({ itemId }: CheckBoxModalProps) => {
             multiline
             value={storeItem.title ?? ""}
             variant="outlined"
-            onChange={event =>
+            onChange={(event) =>
               dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
             }
           />

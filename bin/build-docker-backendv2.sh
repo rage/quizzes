@@ -13,8 +13,7 @@ fi
 
 TAG="eu.gcr.io/moocfi/quizzes-backendv2:build-$REV"
 echo Building "$TAG"
-cd packages/backendv2
-docker build . -t "$TAG" --build-arg=GIT_COMMIT="$(git rev-parse --short HEAD)"
-cd ../..
+# Cache mounts need BuildKit; CI installs the buildx plugin for it.
+DOCKER_BUILDKIT=1 docker build . -f packages/backendv2/Dockerfile -t "$TAG" --build-arg=GIT_COMMIT="$(git rev-parse --short HEAD)"
 
 echo "Successfully built image: $TAG"

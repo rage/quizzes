@@ -1,21 +1,24 @@
 import React from "react"
-import { useTypedSelector } from "../../../../store/store"
-import { QuestionEditor } from "./QuestionEditor"
+
+import { useDispatch } from "react-redux"
 import styled from "styled-components"
-import { Typography, Divider, Button } from "@material-ui/core"
+
 import {
   faAngleUp,
   faAngleDown,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { useDispatch } from "react-redux"
+import { Typography, Divider, Button } from "@mui/material"
+
 import {
   decreasedPRQOrder,
   increasedPRQOrder,
   createdNewPeerReviewQuestion,
   deletedPRQ,
 } from "../../../../store/editor/questions/questionActions"
+import { useTypedSelector } from "../../../../store/store"
+import { QuestionEditor } from "./QuestionEditor"
 
 const StyledPRQEditor = styled.div`
   display: flex;
@@ -76,16 +79,16 @@ export const QuestionEditorWrapper = ({
   peerReviewId,
 }: QuestionEditorWrapperProps) => {
   const peerReviewQuestions = Object.values(
-    useTypedSelector(state => state.editor.questions),
+    useTypedSelector((state) => state.editor.questions),
   )
 
   const filteredQuestions = peerReviewQuestions.filter(
-    question => question.peerReviewCollectionId === peerReviewId,
+    (question) => question.peerReviewCollectionId === peerReviewId,
   )
 
   filteredQuestions.sort((a, b) => a.order - b.order)
 
-  const quizId = useTypedSelector(state => state.editor.quizId)
+  const quizId = useTypedSelector((state) => state.editor.quizId)
   const dispatch = useDispatch()
   return (
     <>

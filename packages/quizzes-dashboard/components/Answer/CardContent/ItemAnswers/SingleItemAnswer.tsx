@@ -1,7 +1,10 @@
 import React from "react"
-import { ItemAnswer } from "../../../../types/Answer"
-import { Typography } from "@material-ui/core"
+
 import styled from "styled-components"
+
+import { Typography } from "@mui/material"
+
+import { ItemAnswer } from "../../../../types/Answer"
 
 export const ItemAnswerContainer = styled.div`
   display: flex;

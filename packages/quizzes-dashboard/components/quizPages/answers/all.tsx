@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from "react"
+
 import _ from "lodash"
-import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
 import { useRouter } from "next/router"
+import styled from "styled-components"
+
 import {
   MenuItem,
   Switch,
@@ -9,8 +11,21 @@ import {
   Chip,
   FormGroup,
   FormControlLabel,
-} from "@material-ui/core"
-import styled from "styled-components"
+} from "@mui/material"
+
+import {
+  useAnswerListState,
+  setExpandAll,
+  setBulkSelectedIds,
+  setHandledAnswers,
+} from "../../../contexts/AnswerListContext"
+import { useAllAnswers } from "../../../hooks/useAllAnswers"
+import useBreadcrumbs from "../../../hooks/useBreadcrumbs"
+import { useSearchResultsAllAnswers } from "../../../hooks/useSearchResults"
+import AnswerListOptions from "../../Answer/AnswerListOptions"
+import AnswerListWrapper from "../../Answer/AnswerListWrapper"
+import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
+import SkeletonLoader from "../../Shared/SkeletonLoader"
 import QuizTitle from "../QuizTitleContainer"
 import { TabText } from "../TabHeaders"
 import {
@@ -20,24 +35,12 @@ import {
   SortOrderField,
   FilterParamsField,
 } from "./styles"
-import { ChipProps, IQuizTabProps, TAnswersDisplayed } from "./types"
-import { StyledTitle } from "../../Answer/CardContent/Peerreviews/Review"
-import AnswerListWrapper from "../../Answer/AnswerListWrapper"
-import {
-  useAnswerListState,
-  setExpandAll,
-  setBulkSelectedIds,
-  setHandledAnswers,
-} from "../../../contexts/AnswerListContext"
-import AnswerListOptions from "../../Answer/AnswerListOptions"
-import { useAllAnswers } from "../../../hooks/useAllAnswers"
-import { useSearchResultsAllAnswers } from "../../../hooks/useSearchResults"
-import SkeletonLoader from "../../Shared/SkeletonLoader"
+import { IQuizTabProps, TAnswersDisplayed } from "./types"
 
-const StyledChip = styled(Chip)<ChipProps>`
+const StyledChip = styled(Chip)<{ $checked: boolean }>`
   display: flex !important;
-  background: ${props => {
-    if (props.checked) {
+  background: ${(props) => {
+    if (props.$checked) {
       return "linear-gradient(rgba(0, 0, 0, 0.2), rgba(63, 81, 181, 0.3)) !important"
     }
   }};
@@ -104,20 +107,17 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
     "all-answers",
   )
 
-  const {
-    searchResults,
-    searchResultsLoading,
-    searchResultsError,
-  } = useSearchResultsAllAnswers(
-    quizId,
-    answersDisplayed,
-    sortOrder,
-    searchQuery,
-    filterParameters,
-    deleted,
-    notDeleted,
-    "search-all-answers",
-  )
+  const { searchResults, searchResultsLoading, searchResultsError } =
+    useSearchResultsAllAnswers(
+      quizId,
+      answersDisplayed,
+      sortOrder,
+      searchQuery,
+      filterParameters,
+      deleted,
+      notDeleted,
+      "search-all-answers",
+    )
 
   const isIncludedInFilter = (param: string) => {
     if (!route.query.filters) {
@@ -330,7 +330,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
           <Typography>Expand all</Typography>
           <Switch
             checked={route.query.expandAll ? true : expandAll}
-            onChange={event => {
+            onChange={(event) => {
               handleFieldChange(event, "expand")
             }}
           />
@@ -342,7 +342,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
           variant="outlined"
           helperText="How many answers are shown per page"
           select
-          onChange={event => {
+          onChange={(event) => {
             handleFieldChange(event, "pages")
           }}
         >
@@ -356,7 +356,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
           select
           helperText="Sorts answers by date they've been submitted"
           value={sortOrder}
-          onChange={event => handleFieldChange(event, "order")}
+          onChange={(event) => handleFieldChange(event, "order")}
         >
           <MenuItem value="desc">Latest first</MenuItem>
           <MenuItem value="asc">Oldest first</MenuItem>
@@ -364,14 +364,14 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
       </OptionsContainer>
       <StyledTitle variant="subtitle1">Status filters</StyledTitle>
       <FilterParamsField>
-        {Object.keys(chipStates).map(state => {
+        {Object.keys(chipStates).map((state) => {
           return (
             <StyledChip
               defaultValue={state}
               key={state}
               label={state}
               variant="outlined"
-              checked={chipStates[state].checked}
+              $checked={chipStates[state].checked}
               onClick={() => {
                 const newStates = _.clone(chipStates)
                 newStates[state].checked = !newStates[state].checked
@@ -381,7 +381,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
                   paramsToSet = paramsToSet.concat(state)
                   setFilterParameters(paramsToSet)
                 } else {
-                  paramsToSet = paramsToSet.filter(param => param !== state)
+                  paramsToSet = paramsToSet.filter((param) => param !== state)
                   setFilterParameters(paramsToSet)
                 }
                 // update url
@@ -396,7 +396,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
           control={
             <Switch
               checked={notDeleted}
-              onChange={event => handleFieldChange(event, "not-deleted")}
+              onChange={(event) => handleFieldChange(event, "not-deleted")}
               name="not-deleted switch"
             ></Switch>
           }
@@ -406,7 +406,7 @@ export const AllAnswers = ({ quiz, course }: IQuizTabProps) => {
           control={
             <Switch
               checked={deleted}
-              onChange={event => handleFieldChange(event, "deleted")}
+              onChange={(event) => handleFieldChange(event, "deleted")}
               name="deleted switch"
             ></Switch>
           }

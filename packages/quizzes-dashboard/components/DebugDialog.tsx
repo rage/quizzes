@@ -1,14 +1,16 @@
 import React, { useState } from "react"
-import { Button, Dialog, Typography } from "@material-ui/core"
-import styled from "styled-components"
-import { useDispatch } from "react-redux"
-import EditableDebugField from "./EditableDebugField"
-import { useTypedSelector } from "../store/store"
-import { normalizedQuiz } from "../schemas"
+
 import { denormalize, normalize } from "normalizr"
-import { Quiz } from "../types/Quiz"
-import { useQuiz } from "../hooks/useQuiz"
+import { useDispatch } from "react-redux"
+import styled from "styled-components"
+
+import { Button, Dialog, Typography } from "@mui/material"
+
+import { normalizedQuiz } from "../schemas"
 import { initializedEditor } from "../store/editor/editorActions"
+import { useTypedSelector } from "../store/store"
+import { Quiz } from "../types/Quiz"
+import EditableDebugField from "./EditableDebugField"
 
 const DialogTitleContainer = styled.div`
   display: flex;
@@ -28,7 +30,7 @@ const ContentWrapper = styled.div`
 `
 
 interface DebugDialogProps {
-  object?: Object
+  object?: object
 }
 
 export const DebugDialog = ({ object }: DebugDialogProps) => {
@@ -36,38 +38,31 @@ export const DebugDialog = ({ object }: DebugDialogProps) => {
   const [debugViewChanges, setDebugViewChanges] = useState<string | null>(null)
 
   const dispatch = useDispatch()
-  const quizId = useTypedSelector(state => state.editor.quizId)
-  const { quiz } = useQuiz(quizId, `quiz-${quizId}`)
+  const quizId = useTypedSelector((state) => state.editor.quizId)
+  const initialQuiz = useTypedSelector(
+    (state) => state.editor.quizVariables[quizId]?.initialState,
+  )
 
-  let data: Object | Quiz
-
-  if (object) {
-    data = object
-  } else {
-    const quizId = useTypedSelector(state => state.editor.quizId)
-    const quiz = useTypedSelector(state => state.editor)
-    data = denormalize(quizId, normalizedQuiz, quiz)
-  }
+  const editor = useTypedSelector((state) => state.editor)
+  const data: object | Quiz =
+    object ?? denormalize(quizId, normalizedQuiz, editor)
 
   const [debugOpen, setDebugOpen] = useState(false)
   const content = JSON.stringify(data, undefined, 2)
 
   const handleEditorChanges = () => {
-    if (!debugViewChanges) return
+    // Only the quiz editor's own state is editable; a passed `object` is read-only.
+    if (object || !debugViewChanges || !initialQuiz) return
+    setDebugViewChanges(null)
 
-    // check if JSON changes are valid
+    let editedQuiz: Quiz
     try {
-      JSON.parse(debugViewChanges as string)
-    } catch (err) {
-      setDebugViewChanges(null)
+      editedQuiz = JSON.parse(debugViewChanges)
+    } catch {
       return
     }
 
-    // normalize quiz
-    const normalizedUpdatedQuizData = normalize(
-      debugViewChanges,
-      normalizedQuiz,
-    )
+    const normalizedUpdatedQuizData = normalize(editedQuiz, normalizedQuiz)
 
     // cherry pick data pieces to put in state
     const normalizedDataToBeSentToEditorState = {
@@ -80,8 +75,13 @@ export const DebugDialog = ({ object }: DebugDialogProps) => {
       questions: normalizedUpdatedQuizData.entities.questions ?? {},
     }
 
-    // send to state
-    dispatch(initializedEditor(normalizedDataToBeSentToEditorState, quiz!))
+    // Keeps the saved state as the baseline so the edits show up as unsaved changes.
+    dispatch(
+      initializedEditor(
+        normalizedDataToBeSentToEditorState,
+        initialQuiz as Quiz,
+      ),
+    )
   }
 
   return (

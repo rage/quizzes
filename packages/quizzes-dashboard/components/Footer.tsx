@@ -1,4 +1,5 @@
 import React from "react"
+
 import styled from "styled-components"
 
 const FooterBar = styled.footer`
@@ -14,4 +15,6 @@ const FooterBar = styled.footer`
   padding: 10rem;
 `
 
-export default () => <FooterBar />
+const Footer = () => <FooterBar />
+
+export default Footer

@@ -1,8 +1,11 @@
 import React from "react"
+
 import styled from "styled-components"
-import { Pagination } from "@material-ui/lab"
-import { AnswerList } from "./AnswerList"
+
+import { Pagination } from "@mui/material"
+
 import { Answer } from "../../types/Answer"
+import { AnswerList } from "./AnswerList"
 
 export const PaginationField = styled.div`
   display: flex;

@@ -1,8 +1,11 @@
 import React from "react"
-import { PeerReview } from "../../../../types/Answer"
-import styled from "styled-components"
-import { Typography, Divider } from "@material-ui/core"
+
 import { DateTime } from "luxon"
+import styled from "styled-components"
+
+import { Typography, Divider } from "@mui/material"
+
+import { PeerReview } from "../../../../types/Answer"
 import ReviewAnswerElement from "./AnswerElement"
 
 export const PeerreviewContainer = styled.div`

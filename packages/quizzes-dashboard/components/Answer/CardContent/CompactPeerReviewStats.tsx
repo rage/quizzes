@@ -1,8 +1,11 @@
 import React from "react"
-import { Answer } from "../../../types/Answer"
-import { Typography } from "@material-ui/core"
+
 import _ from "lodash"
 import styled from "styled-components"
+
+import { Typography } from "@mui/material"
+
+import { Answer } from "../../../types/Answer"
 
 export const StyledOneLiner = styled(Typography)`
   display: flex !important;
@@ -18,9 +21,9 @@ export const CompactPeerReviewStats = ({ answer }: CompactStatProps) => {
   let sd = 0
   if (answer.peerReviews && answer.peerReviews.length > 0) {
     const answerElementValues = answer.peerReviews
-      .map(review => review.answers)
+      .map((review) => review.answers)
       .reduce((prev, next) => prev.concat(next))
-      .map(elem => elem.value)
+      .map((elem) => elem.value)
 
     average =
       answerElementValues.reduce((prev, next) => prev + next) /
@@ -28,7 +31,7 @@ export const CompactPeerReviewStats = ({ answer }: CompactStatProps) => {
 
     sd = Math.sqrt(
       answerElementValues
-        .map(value => Math.pow(value - average, 2))
+        .map((value) => Math.pow(value - average, 2))
         .reduce((prev, next) => prev + next, 0) / answerElementValues.length,
     )
   }

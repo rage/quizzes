@@ -1,4 +1,5 @@
-import Knex from "knex"
+import type { Knex } from "knex"
+
 import { ProgressMessage, QuizAnswerMessage, QuizMessage } from "../types"
 import BaseModel from "./base_model"
 
@@ -24,24 +25,20 @@ class KafkaMessage extends BaseModel {
   }
 
   public static async fetchSomeMessage(amount: number) {
-    return await this.query()
-      .select("*")
-      .limit(amount)
+    return await this.query().select("*").limit(amount)
   }
 
   public static async batchDelete(messages: KafkaMessage[]) {
     return await this.query()
       .whereIn(
         "id",
-        messages.map(msg => msg.id),
+        messages.map((msg) => msg.id),
       )
       .delete()
   }
 
   public static async getCurrentCountByTopic(topic = "user-points-realtime") {
-    return this.query()
-      .where({ topic })
-      .resultSize()
+    return this.query().where({ topic }).resultSize()
   }
 }
 

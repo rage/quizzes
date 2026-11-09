@@ -1,6 +1,8 @@
-import { Button, TextField, Typography } from "@material-ui/core"
 import React, { useState } from "react"
+
 import styled from "styled-components"
+
+import { Button, TextField, Typography } from "@mui/material"
 
 interface IFormProps {
   handleSubmit: (searchQuery: string) => Promise<void>
@@ -63,7 +65,7 @@ const AnswerSearchForm = (props: IFormProps) => {
   return (
     <>
       <FormWrapper
-        onSubmit={e => {
+        onSubmit={(e) => {
           e.preventDefault()
           handleSubmit(searchQuery)
           setDisplayingResultsFor(searchQuery)
@@ -73,9 +75,9 @@ const AnswerSearchForm = (props: IFormProps) => {
           <TextField
             label="Phrase"
             multiline
-            rowsMax={8}
+            maxRows={8}
             value={searchQuery}
-            onChange={event => setSearchQuery(event.target.value)}
+            onChange={(event) => setSearchQuery(event.target.value)}
             variant="outlined"
             helperText="Enter a search phrase"
             fullWidth={true}

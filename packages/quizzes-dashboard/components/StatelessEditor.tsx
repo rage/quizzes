@@ -1,6 +1,9 @@
-import { Typography } from "@material-ui/core"
 import React, { useLayoutEffect, useRef } from "react"
+
 import styled from "styled-components"
+
+import { Typography } from "@mui/material"
+
 import { useTypedSelector } from "../store/store"
 import QuizItems from "./QuizEditForms/QuizItems"
 
@@ -18,7 +21,7 @@ const StatelessEditor: React.FC<StatelessEditorProps> = ({
   onHeightChange,
 }) => {
   const contentRef = useRef<HTMLDivElement>(null)
-  const store = useTypedSelector(state => state)
+  const editor = useTypedSelector((state) => state.editor)
 
   useLayoutEffect(() => {
     const ref = contentRef.current
@@ -26,7 +29,7 @@ const StatelessEditor: React.FC<StatelessEditorProps> = ({
       return
     }
     onHeightChange(ref.getBoundingClientRect().height)
-  }, [store])
+  }, [editor])
 
   return (
     <Wrapper ref={contentRef}>

@@ -1,4 +1,10 @@
 import React from "react"
+
+import { useDispatch } from "react-redux"
+import styled from "styled-components"
+
+import { faPlus } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   Typography,
   FormGroup,
@@ -13,7 +19,9 @@ import {
   FormHelperText,
   Select,
   MenuItem,
-} from "@material-ui/core"
+} from "@mui/material"
+
+import { createdNewOption } from "../../../../store/editor/editorActions"
 import {
   editedQuizItemTitle,
   toggledSharedOptionFeedbackMessage,
@@ -26,15 +34,10 @@ import {
   editedQuizItemFeedbackDisplayPolicy,
 } from "../../../../store/editor/items/itemAction"
 import { useTypedSelector } from "../../../../store/store"
-import { useDispatch } from "react-redux"
-import styled from "styled-components"
 import { NormalizedItem } from "../../../../types/NormalizedQuiz"
-import MultipleChoiceButton from "./MultiplChoiceButton"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faPlus } from "@fortawesome/free-solid-svg-icons"
-import { createdNewOption } from "../../../../store/editor/editorActions"
 import MarkdownEditor from "../../../MarkdownEditor"
 import { ModalWrapper } from "../../../Shared/Modal"
+import MultipleChoiceButton from "./MultiplChoiceButton"
 
 const ModalContent = styled.div`
   display: flex;
@@ -77,8 +80,8 @@ interface EditorModalProps {
 }
 
 export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
-  const storeItem = useTypedSelector(state => state.editor.items[item.id])
-  const storeOptions = useTypedSelector(state => state.editor.options)
+  const storeItem = useTypedSelector((state) => state.editor.items[item.id])
+  const storeOptions = useTypedSelector((state) => state.editor.options)
   const dispatch = useDispatch()
   return (
     <ModalWrapper>
@@ -94,7 +97,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
               <Checkbox
                 color="primary"
                 checked={storeItem.usesSharedOptionFeedbackMessage}
-                onChange={event =>
+                onChange={(event) =>
                   dispatch(
                     toggledSharedOptionFeedbackMessage(
                       storeItem.id,
@@ -112,7 +115,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
               <Checkbox
                 color="primary"
                 checked={storeItem.multi}
-                onChange={event =>
+                onChange={(event) =>
                   dispatch(
                     toggledMultiOptions(storeItem.id, event.target.checked),
                   )
@@ -128,7 +131,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
           label="Feedback display policy"
           variant="outlined"
           value={storeItem.feedbackDisplayPolicy}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(
               editedQuizItemFeedbackDisplayPolicy(
                 storeItem.id,
@@ -146,7 +149,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
       <ModalContent>
         <MarkdownEditor
           label="Title"
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
           }
           text={storeItem.title}
@@ -178,7 +181,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
         </Button>
       </ModalContent>
       <ModalContentOptionWrapper>
-        {storeItem.options.map(option => (
+        {storeItem.options.map((option) => (
           <ModalContent key={option}>
             <MultipleChoiceButton option={storeOptions[option]} />
           </ModalContent>
@@ -191,7 +194,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
           aria-label="direction"
           name="direction"
           value={storeItem.direction}
-          onChange={e =>
+          onChange={(e) =>
             dispatch(editedItemDirection(storeItem.id, e.target.value))
           }
         >
@@ -207,7 +210,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
         <ModalContent>
           <MarkdownEditor
             label="Shared option feedback message"
-            onChange={event =>
+            onChange={(event) =>
               dispatch(
                 editedSharedOptionsFeedbackMessage(
                   storeItem.id,
@@ -223,7 +226,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
           <ModalContent>
             <MarkdownEditor
               label="Success message"
-              onChange={event =>
+              onChange={(event) =>
                 dispatch(
                   editedItemSuccessMessage(storeItem.id, event.target.value),
                 )
@@ -234,7 +237,7 @@ export const MultipleChoiceModalContent = ({ item }: EditorModalProps) => {
           <ModalContent>
             <MarkdownEditor
               label="Failure message"
-              onChange={event =>
+              onChange={(event) =>
                 dispatch(
                   editedItemFailureMessage(storeItem.id, event.target.value),
                 )

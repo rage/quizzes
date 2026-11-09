@@ -1,6 +1,9 @@
 import React from "react"
+
 import styled from "styled-components"
-import { Typography } from "@material-ui/core"
+
+import { Typography } from "@mui/material"
+
 import AddQuizItemButton from "./AddQuizItemButton"
 
 const AddQuizItemWrapper = styled.div`
@@ -37,7 +40,7 @@ export const AddQuizItem = () => {
       <AddQuizItemWrapper>
         <Typography variant="h3">Add new Quiz item</Typography>
         <TypeContainer>
-          {types.map(type => (
+          {types.map((type) => (
             <AddQuizItemButton key={type} type={type} />
           ))}
         </TypeContainer>

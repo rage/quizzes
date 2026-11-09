@@ -1,8 +1,9 @@
 import axios from "axios"
-import { checkStore } from "./tmcApi"
-import { Quiz, Course } from "../types/Quiz"
-import { NewQuiz } from "../types/NormalizedQuiz"
+
 import { Answer } from "../types/Answer"
+import { NewQuiz } from "../types/NormalizedQuiz"
+import { Quiz, Course } from "../types/Quiz"
+import { checkStore } from "./tmcApi"
 
 let HOST = "http://localhost:3003"
 
@@ -74,6 +75,7 @@ export const saveQuiz = async (quiz: Quiz | NewQuiz): Promise<any> => {
     const response = (await api.post(`/quizzes`, quiz, config)).data
     return response
   }
+  throw new Error("Not logged in")
 }
 
 export const getAnswerById = async (answerId: string): Promise<Answer> => {
@@ -104,8 +106,9 @@ export const getAllAnswers = async (
     }
     const response = (
       await api.get(
-        `/answers/${quizId}/all?page=${page -
-          1}&size=${size}&order=${order}&filters=${filters}&deleted=${deleted}&notDeleted=${notDeleted}`,
+        `/answers/${quizId}/all?page=${
+          page - 1
+        }&size=${size}&order=${order}&filters=${filters}&deleted=${deleted}&notDeleted=${notDeleted}`,
         config,
       )
     ).data
@@ -127,8 +130,9 @@ export const getAnswersRequiringAttention = async (
     }
     const response = (
       await api.get(
-        `/answers/${quizId}/manual-review?page=${page -
-          1}&size=${size}&order=${order}`,
+        `/answers/${quizId}/manual-review?page=${
+          page - 1
+        }&size=${size}&order=${order}`,
         config,
       )
     ).data
@@ -244,10 +248,12 @@ export const changeAnswerStatusForMany = async (
   throw new Error()
 }
 
-export const getAllLanguages = async (): Promise<{
-  id: string
-  name: string
-}[]> => {
+export const getAllLanguages = async (): Promise<
+  {
+    id: string
+    name: string
+  }[]
+> => {
   const userInfo = checkStore()
   if (userInfo) {
     const config = {

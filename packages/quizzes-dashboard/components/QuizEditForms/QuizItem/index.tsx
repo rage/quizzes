@@ -1,22 +1,25 @@
 import React from "react"
-import { NormalizedItem } from "../../../types/NormalizedQuiz"
-import styled from "styled-components"
-import EssayContent from "./EssayContent"
-import { Typography, Button } from "@material-ui/core"
-import MultipleChoiceContent from "./MultipleChoiceContent"
-import CheckBoxContent from "./CheckBoxContent"
-import OpenContent from "./OpenContent"
-import ScaleContent from "./ScaleContent"
-import CustomFrontend from "./CustomFrontend"
-import MultipleChoiceDropdownContent from "./MultipleChoiceDropdownContent"
-import ClickableMultipleChoiceContent from "./ClickableMultipleChoiceContent"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faAngleUp, faAngleDown } from "@fortawesome/free-solid-svg-icons"
+
 import { useDispatch } from "react-redux"
+import styled from "styled-components"
+
+import { faAngleUp, faAngleDown } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Typography, Button } from "@mui/material"
+
 import {
   decreasedItemOrder,
   increasedItemOrder,
 } from "../../../store/editor/items/itemAction"
+import { NormalizedItem } from "../../../types/NormalizedQuiz"
+import CheckBoxContent from "./CheckBoxContent"
+import ClickableMultipleChoiceContent from "./ClickableMultipleChoiceContent"
+import CustomFrontend from "./CustomFrontend"
+import EssayContent from "./EssayContent"
+import MultipleChoiceContent from "./MultipleChoiceContent"
+import MultipleChoiceDropdownContent from "./MultipleChoiceDropdownContent"
+import OpenContent from "./OpenContent"
+import ScaleContent from "./ScaleContent"
 
 const TypeWrapper = styled.div`
   display: flex;

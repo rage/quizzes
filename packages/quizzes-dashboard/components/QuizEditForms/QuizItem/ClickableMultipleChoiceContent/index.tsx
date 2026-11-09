@@ -1,25 +1,28 @@
 import React from "react"
-import { NormalizedItem } from "../../../../types/NormalizedQuiz"
-import styled from "styled-components"
-import { Button, Modal, Fade, Box } from "@material-ui/core"
+
 import { useDispatch } from "react-redux"
-import { useTypedSelector } from "../../../../store/store"
-import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import styled from "styled-components"
+
 import {
   faWindowClose,
   faPen,
   faPlus,
   faTrash,
 } from "@fortawesome/free-solid-svg-icons"
-import ClickableMultipleChoiceModalContent from "./ClickableMultipleChoiceModalContent"
-import ClickableMultipleChoiceButton from "./ClickableMultiplChoiceButton"
-import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Button, Modal, Fade, Box } from "@mui/material"
+
 import {
   createdNewOption,
   deletedItem,
 } from "../../../../store/editor/editorActions"
+import { editedQuizItemTitle } from "../../../../store/editor/items/itemAction"
+import { setAdvancedEditing } from "../../../../store/editor/itemVariables/itemVariableActions"
+import { useTypedSelector } from "../../../../store/store"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import MarkdownEditor from "../../../MarkdownEditor"
+import ClickableMultipleChoiceButton from "./ClickableMultiplChoiceButton"
+import ClickableMultipleChoiceModalContent from "./ClickableMultipleChoiceModalContent"
 
 const QuizContent = styled.div`
   padding: 1rem;
@@ -73,11 +76,11 @@ interface clickableMultiplChoiceContentProps {
 const ClickableMultipleChoiceContent = ({
   item,
 }: clickableMultiplChoiceContentProps) => {
-  const quizId = useTypedSelector(state => state.editor.quizId)
-  const storeOptions = useTypedSelector(state => state.editor.options)
-  const storeItem = useTypedSelector(state => state.editor.items[item.id])
+  const quizId = useTypedSelector((state) => state.editor.quizId)
+  const storeOptions = useTypedSelector((state) => state.editor.options)
+  const storeItem = useTypedSelector((state) => state.editor.items[item.id])
   const variables = useTypedSelector(
-    state => state.editor.itemVariables[item.id],
+    (state) => state.editor.itemVariables[item.id],
   )
   const dispatch = useDispatch()
   return (
@@ -122,11 +125,11 @@ const ClickableMultipleChoiceContent = ({
         <MarkdownEditor
           label="Title"
           text={storeItem.title ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizItemTitle(event.target.value, storeItem.id))
           }
         />
-        {storeItem.options.map(option => (
+        {storeItem.options.map((option) => (
           <QuizContent key={option}>
             <ClickableMultipleChoiceButton option={storeOptions[option]} />
           </QuizContent>

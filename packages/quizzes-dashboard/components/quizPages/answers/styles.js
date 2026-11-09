@@ -1,6 +1,7 @@
 import styled from "styled-components"
-import { TextField, Typography } from "@material-ui/core"
-import { Pagination, Skeleton } from "@material-ui/lab"
+
+import { TextField, Typography } from "@mui/material"
+import { Pagination, Skeleton } from "@mui/material"
 
 export const SizeSelectorContainer = styled.div`
   display: flex;

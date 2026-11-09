@@ -1,4 +1,4 @@
-import * as Knex from "knex"
+import type { Knex } from "knex"
 
 export async function seed(knex: Knex): Promise<any> {
   let ids = []
@@ -15,7 +15,7 @@ export async function seed(knex: Knex): Promise<any> {
             status: "manual-review",
           })
           .returning("id")
-      )[0],
+      )[0].id,
     )
   }
   let itemAnswerIds = []
@@ -29,7 +29,7 @@ export async function seed(knex: Knex): Promise<any> {
         .returning("id"),
     )
   }
-  for (const itemAnswerId of itemAnswerIds.flat()) {
+  for (const { id: itemAnswerId } of itemAnswerIds.flat()) {
     await knex("quiz_option_answer").insert({
       quiz_item_answer_id: itemAnswerId,
       quiz_option_id: "2bdd0438-9c2f-4ede-81ff-a1cf55c647cd",
@@ -46,7 +46,7 @@ export async function seed(knex: Knex): Promise<any> {
         .returning("id"),
     )
   }
-  for (const itemAnswerId of itemAnswerIds.flat()) {
+  for (const { id: itemAnswerId } of itemAnswerIds.flat()) {
     await knex("quiz_option_answer").insert({
       quiz_item_answer_id: itemAnswerId,
       quiz_option_id: "1265f35e-77d9-4e20-9fdf-407b00cbd692",
@@ -67,7 +67,7 @@ export async function seed(knex: Knex): Promise<any> {
             status: "confirmed",
           })
           .returning("id")
-      )[0],
+      )[0].id,
     )
   }
   itemAnswerIds = []
@@ -81,7 +81,7 @@ export async function seed(knex: Knex): Promise<any> {
         .returning("id"),
     )
   }
-  for (const itemAnswerId of itemAnswerIds.flat()) {
+  for (const { id: itemAnswerId } of itemAnswerIds.flat()) {
     await knex("quiz_option_answer").insert({
       quiz_item_answer_id: itemAnswerId,
       quiz_option_id: "2bdd0438-9c2f-4ede-81ff-a1cf55c647cd",
@@ -98,7 +98,7 @@ export async function seed(knex: Knex): Promise<any> {
         .returning("id"),
     )
   }
-  for (const itemAnswerId of itemAnswerIds.flat()) {
+  for (const { id: itemAnswerId } of itemAnswerIds.flat()) {
     await knex("quiz_option_answer").insert({
       quiz_item_answer_id: itemAnswerId,
       quiz_option_id: "1265f35e-77d9-4e20-9fdf-407b00cbd692",
@@ -118,7 +118,7 @@ export async function seed(knex: Knex): Promise<any> {
             status: "deprecated",
           })
           .returning("id")
-      )[0],
+      )[0].id,
     )
   }
   itemAnswerIds = []
@@ -132,7 +132,7 @@ export async function seed(knex: Knex): Promise<any> {
         .returning("id"),
     )
   }
-  for (const itemAnswerId of itemAnswerIds.flat()) {
+  for (const { id: itemAnswerId } of itemAnswerIds.flat()) {
     await knex("quiz_option_answer").insert({
       quiz_item_answer_id: itemAnswerId,
       quiz_option_id: "2bdd0438-9c2f-4ede-81ff-a1cf55c647cd",
@@ -149,7 +149,7 @@ export async function seed(knex: Knex): Promise<any> {
         .returning("id"),
     )
   }
-  for (const itemAnswerId of itemAnswerIds.flat()) {
+  for (const { id: itemAnswerId } of itemAnswerIds.flat()) {
     await knex("quiz_option_answer").insert({
       quiz_item_answer_id: itemAnswerId,
       quiz_option_id: "1265f35e-77d9-4e20-9fdf-407b00cbd692",

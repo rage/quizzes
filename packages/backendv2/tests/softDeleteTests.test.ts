@@ -1,13 +1,11 @@
-import request from "supertest"
-import nock from "nock"
-import app from "../app"
-import knex from "../database/knex"
-import { input } from "./data"
-import { UserInfo } from "../src/types"
-
-import { safeClean, safeSeed, configA, expectQuizToEqual } from "./util"
 import _ from "lodash"
+import nock from "nock"
 import { Model, snakeCaseMappers } from "objection"
+import request from "supertest"
+
+import app from "../app"
+import redis from "../config/redis"
+import knex from "../database/knex"
 import {
   PeerReviewCollection,
   PeerReviewQuestion,
@@ -15,7 +13,9 @@ import {
   QuizItem,
   QuizOption,
 } from "../src/models"
-import redis from "../config/redis"
+import { UserInfo } from "../src/types"
+import { input } from "./data"
+import { safeClean, safeSeed, configA, expectQuizToEqual } from "./util"
 
 beforeAll(() => {
   Model.knex(knex)
@@ -63,10 +63,9 @@ describe("Soft delete peer review questions", () => {
     expect(res.status).toEqual(200)
     expectQuizToEqual(res.body, quiz)
 
-    const deletedQuestion = await PeerReviewQuestion.getById(
-      peerReviewQuestionId,
-    )
-    expect(deletedQuestion.deleted).toEqual(true)
+    const deletedQuestion =
+      await PeerReviewQuestion.getById(peerReviewQuestionId)
+    expect(deletedQuestion?.deleted).toEqual(true)
   })
 })
 
@@ -108,7 +107,7 @@ describe("Soft delete peer review collections", () => {
     const deletedPeerReviewCollection = await PeerReviewCollection.getById(
       peerReviewCollectionId,
     )
-    expect(deletedPeerReviewCollection.deleted).toEqual(true)
+    expect(deletedPeerReviewCollection?.deleted).toEqual(true)
   })
 })
 
@@ -136,8 +135,8 @@ describe("Soft delete quiz item options", () => {
 
   it("Soft deletes quiz item option", async () => {
     const quiz = await Quiz.getById("4bf4cf2f-3058-4311-8d16-26d781261af7")
-    const quizOptionId = quiz.items[1].options[0].id
-    quiz.items[1].options.shift()
+    const quizOptionId = quiz.items[0].options[0].id
+    quiz.items[0].options.shift()
     const res = await request(app.callback())
       .post("/api/v2/dashboard/quizzes")
       .set("Authorization", `bearer admin_token`)
@@ -148,7 +147,7 @@ describe("Soft delete quiz item options", () => {
     expectQuizToEqual(res.body, quiz)
 
     const deletedQuizOption = await QuizOption.getById(quizOptionId)
-    expect(deletedQuizOption.deleted).toEqual(true)
+    expect(deletedQuizOption?.deleted).toEqual(true)
   })
 })
 
@@ -188,14 +187,14 @@ describe("Soft delete quiz items", () => {
     expectQuizToEqual(res.body, quiz)
 
     const deletedQuizItem = await QuizItem.getById(quizItemId)
-    expect(deletedQuizItem.deleted).toEqual(true)
+    expect(deletedQuizItem?.deleted).toEqual(true)
   })
 })
 
 const userSetup = () => {
   nock("https://tmc.mooc.fi")
     .get("/api/v8/users/current?show_user_fields=true")
-    .reply(function() {
+    .reply(function () {
       const auth = this.req.headers.authorization
       if (auth === "Bearer pleb_token") {
         return [
@@ -214,5 +213,6 @@ const userSetup = () => {
           } as UserInfo,
         ]
       }
+      return [401]
     })
 }

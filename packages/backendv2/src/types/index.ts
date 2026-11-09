@@ -1,5 +1,5 @@
-import winston from "winston"
 import { ParameterizedContext } from "koa"
+import winston from "winston"
 
 export interface CustomContext extends ParameterizedContext {
   log: winston.Logger
@@ -19,7 +19,7 @@ export interface UserInfo {
   administrator: boolean
 }
 
-export interface ExtraFields {}
+export type ExtraFields = Record<string, unknown>
 
 export interface UserField {
   first_name: string
@@ -35,7 +35,7 @@ export interface ProgressMessage {
   course_id: string
   service_id: string
   progress: PointsByGroup[]
-  message_format_version: Number
+  message_format_version: number
 }
 
 export interface PointsByGroup {
@@ -57,6 +57,14 @@ export interface QuizAnswerMessage {
   message_format_version: number
   attempted: boolean
   original_submission_date: string | null
+}
+
+export interface CourseQuizAnswersMessage {
+  timestamp: string
+  user_id: number
+  course_id: string
+  exercises: QuizAnswerMessage[]
+  message_format_version: number
 }
 
 export interface QuizMessage {

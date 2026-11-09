@@ -1,7 +1,10 @@
 import React from "react"
-import { Quiz } from "../../types/Quiz"
+
 import styled from "styled-components"
-import { Typography } from "@material-ui/core"
+
+import { Typography } from "@mui/material"
+
+import { Quiz } from "../../types/Quiz"
 
 interface QuizTitleProps {
   quiz: Quiz

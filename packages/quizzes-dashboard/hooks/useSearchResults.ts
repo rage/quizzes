@@ -1,4 +1,5 @@
 import useSWR from "swr"
+
 import {
   getAllAnswersMatchingQuery,
   getAnswersRequiringAttentionMatchingQuery,
@@ -8,13 +9,24 @@ const isEmpty = (str: string) => {
   return !str || 0 === str.length
 }
 
-const fetchAll = (
-  quizId: string,
-  answersDisplayed: number,
-  sortOrder: string,
-  filterParameters: string[],
-  searchQuery: string,
-) =>
+const fetchAll = ([
+  ,
+  quizId,
+  answersDisplayed,
+  sortOrder,
+  filterParameters,
+  searchQuery,
+]: [
+  string,
+  string,
+  number,
+  string,
+  string[],
+  string,
+  boolean,
+  boolean,
+  string,
+]) =>
   getAllAnswersMatchingQuery(
     quizId,
     answersDisplayed,
@@ -23,12 +35,13 @@ const fetchAll = (
     searchQuery,
   )
 
-const fetchRequiringAttention = (
-  quizId: string,
-  answersDisplayed: number,
-  sortOrder: string,
-  searchQuery: string,
-) =>
+const fetchRequiringAttention = ([
+  ,
+  quizId,
+  answersDisplayed,
+  sortOrder,
+  searchQuery,
+]: [string, string, number, string, string, string]) =>
   getAnswersRequiringAttentionMatchingQuery(
     quizId,
     answersDisplayed,
@@ -49,8 +62,9 @@ export const useSearchResultsAllAnswers = (
   const searchQueryProvided = !isEmpty(searchQuery)
 
   const { data, error } = useSWR(
-    searchQuery
+    quizId && searchQuery
       ? [
+          "searchResultsAllAnswers",
           quizId,
           answersDisplayed,
           sortOrder,
@@ -81,8 +95,15 @@ export const useSearchResultsRequiringAttention = (
   const searchQueryProvided = !isEmpty(searchQuery)
 
   const { data, error } = useSWR(
-    searchQuery
-      ? [quizId, answersDisplayed, sortOrder, searchQuery, token]
+    quizId && searchQuery
+      ? [
+          "searchResultsRequiringAttention",
+          quizId,
+          answersDisplayed,
+          sortOrder,
+          searchQuery,
+          token,
+        ]
       : null,
     fetchRequiringAttention,
   )

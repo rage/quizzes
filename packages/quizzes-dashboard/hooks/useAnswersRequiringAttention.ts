@@ -1,17 +1,21 @@
 import useSWR from "swr"
+
 import {
   getAnswersRequiringAttentionByQuizId,
   getAnswersRequiringAttention,
 } from "../services/quizzes"
 
-const countFetcher = (quizId: string) =>
+const countFetcher = ([, quizId]: [string, string, string]) =>
   getAnswersRequiringAttentionByQuizId(quizId)
 
 export const useAnswersRequiringAttentionCount = (
   quizId: string,
   token: string,
 ) => {
-  const { data, error } = useSWR([quizId, token], countFetcher)
+  const { data, error } = useSWR(
+    quizId ? ["answersRequiringAttentionCount", quizId, token] : null,
+    countFetcher,
+  )
 
   return {
     requiringAttention: data,
@@ -20,12 +24,14 @@ export const useAnswersRequiringAttentionCount = (
   }
 }
 
-const answerFetcher = (
-  quizId: string,
-  currentPage: number,
-  answersDisplayed: number,
-  sortOrder: string,
-) =>
+const answerFetcher = ([, quizId, currentPage, answersDisplayed, sortOrder]: [
+  string,
+  string,
+  number,
+  number,
+  string,
+  string,
+]) =>
   getAnswersRequiringAttention(quizId, currentPage, answersDisplayed, sortOrder)
 
 export const useRequiringAttention = (
@@ -36,7 +42,16 @@ export const useRequiringAttention = (
   token: string,
 ) => {
   const { data, error } = useSWR(
-    [quizId, currentPage, answersDisplayed, sortOrder, token],
+    quizId
+      ? [
+          "answersRequiringAttention",
+          quizId,
+          currentPage,
+          answersDisplayed,
+          sortOrder,
+          token,
+        ]
+      : null,
     answerFetcher,
   )
 

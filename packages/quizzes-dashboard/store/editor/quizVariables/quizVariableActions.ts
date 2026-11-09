@@ -1,4 +1,5 @@
 import { createAction } from "typesafe-actions"
+
 import { Quiz } from "../../../types/Quiz"
 
 export const setInitialState = createAction(

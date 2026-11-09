@@ -1,6 +1,7 @@
 import { createAction } from "typesafe-actions"
-import { Entities, NewQuiz } from "../../types/NormalizedQuiz"
 import { v4 } from "uuid"
+
+import { Entities, NewQuiz } from "../../types/NormalizedQuiz"
 import { Quiz } from "../../types/Quiz"
 import { storeState } from "../store"
 

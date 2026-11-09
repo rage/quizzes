@@ -1,30 +1,31 @@
-import Knex from "knex"
-import { NotFoundError } from "./../util/error"
-import QuizItemAnswer from "./quiz_item_answer"
-import User from "./user"
-import PeerReview from "./peer_review"
-import Quiz from "./quiz"
-import UserQuizState from "./user_quiz_state"
+import type { Knex } from "knex"
+import _, { cond } from "lodash"
+import { raw } from "objection"
+import { mixin } from "objection"
+
+import knex from "../../database/knex"
+import * as Kafka from "../services/kafka"
+import { relayNewAnswer } from "../services/plagiarism"
 import { BadRequestError } from "../util/error"
 import { removeNonPrintingCharacters } from "../util/tools"
-import knex from "../../database/knex"
-import Course from "./course"
-import PeerReviewQuestion from "./peer_review_question"
-import UserCoursePartState from "./user_course_part_state"
-import * as Kafka from "../services/kafka"
-import SpamFlag from "./spam_flag"
-import _, { cond } from "lodash"
-import Objection, { raw } from "objection"
-import BaseModel from "./base_model"
-import QuizOptionAnswer from "./quiz_option_answer"
-import softDelete from "objection-soft-delete"
-import { mixin } from "objection"
-import QuizAnswerStatusModification from "./quiz_answer_status_modification"
 import { TStatusModificationOperation } from "./../types/index"
-import { relayNewAnswer } from "../services/plagiarism"
+import { NotFoundError } from "./../util/error"
+import BaseModel from "./base_model"
+import Course from "./course"
 import Language from "./language"
+import PeerReview from "./peer_review"
+import PeerReviewQuestion from "./peer_review_question"
+import Quiz from "./quiz"
+import QuizAnswerStatusModification from "./quiz_answer_status_modification"
+import QuizItemAnswer from "./quiz_item_answer"
+import QuizOptionAnswer from "./quiz_option_answer"
+import softDelete from "./soft_delete"
+import SpamFlag from "./spam_flag"
+import User from "./user"
+import UserCoursePartState from "./user_course_part_state"
+import UserQuizState from "./user_quiz_state"
 
-type QuizAnswerStatus =
+export type QuizAnswerStatus =
   | "draft"
   | "given-more-than-enough"
   | "given-enough"
@@ -63,7 +64,7 @@ class QuizAnswer extends mixin(BaseModel, [
     return "quiz_answer"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     user: {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: User,
@@ -112,13 +113,13 @@ class QuizAnswer extends mixin(BaseModel, [
         to: "spam_flag.quiz_answer_id",
       },
     },
-  }
+  })
 
   private static async showQuestionInPeerReview(peerReviews: PeerReview[]) {
-    peerReviews.map(peerReview => {
+    peerReviews.map((peerReview) => {
       const peerReviewHasAnswers = peerReview.answers.length > 0
       if (peerReviewHasAnswers) {
-        return peerReview.answers.map(peerReviewAnswer => {
+        return peerReview.answers.map((peerReviewAnswer) => {
           peerReviewAnswer.question = this.moveQuestionTextsToparent(
             peerReviewAnswer.question,
           )
@@ -174,14 +175,10 @@ class QuizAnswer extends mixin(BaseModel, [
 
   public static async save(quizAnswer: QuizAnswer, trx: Knex.Transaction) {
     const { id, itemAnswers, ...parentData } = quizAnswer
-    await this.query(trx)
-      .update(parentData)
-      .where("id", id)
+    await this.query(trx).update(parentData).where("id", id)
     for (const itemAnswer of itemAnswers) {
       const { id, optionAnswers, ...itemAnswerData } = itemAnswer
-      await QuizItemAnswer.query(trx)
-        .update(itemAnswerData)
-        .where("id", id)
+      await QuizItemAnswer.query(trx).update(itemAnswerData).where("id", id)
       if (optionAnswers) {
         for (const optionAnswer of optionAnswers) {
           const { id, ...optionAnswerData } = optionAnswer
@@ -203,37 +200,26 @@ class QuizAnswer extends mixin(BaseModel, [
     deleted: boolean,
     notDeleted: boolean,
   ) {
-    let paginated: Objection.Page<QuizAnswer>
-    const noFiltersProvided = filters.length === 0
-    let deleteConditions: boolean[] = [
+    const deleteConditions: boolean[] = [
       ...(deleted ? [true] : []),
       ...(notDeleted ? [false] : []),
     ]
 
-    if (noFiltersProvided) {
-      paginated = await this.query()
-        .where("quiz_id", quizId)
-        .whereIn("deleted", deleteConditions)
-        .orderBy([{ column: "created_at", order: order }])
-        .page(page, pageSize)
-        .withGraphFetched("quiz.[peerReviewCollections]")
-        .withGraphFetched("userQuizState")
-        .withGraphFetched("itemAnswers.[quizItem, optionAnswers]")
-        .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
-    } else {
-      paginated = await this.query()
-        .where("quiz_id", quizId)
-        .whereIn("deleted", deleteConditions)
-        .whereIn("status", filters)
-        .orderBy([{ column: "created_at", order: order }])
-        .page(page, pageSize)
-        .withGraphFetched("quiz.[peerReviewCollections]")
-        .withGraphFetched("userQuizState")
-        .withGraphFetched("itemAnswers.[quizItem, optionAnswers]")
-        .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
+    const query = this.query()
+      .where("quiz_id", quizId)
+      .whereIn("deleted", deleteConditions)
+    if (filters.length > 0) {
+      query.whereIn("status", filters)
     }
+    const paginated = await query
+      .orderBy([{ column: "created_at", order: order }])
+      .page(page, pageSize)
+      .withGraphFetched("quiz.[peerReviewCollections]")
+      .withGraphFetched("userQuizState")
+      .withGraphFetched("itemAnswers.[quizItem, optionAnswers]")
+      .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
 
-    paginated.results.map(async answer => {
+    paginated.results.map(async (answer) => {
       const answerHasPeerReviews = answer.peerReviews.length > 0
       if (answerHasPeerReviews) {
         answer.peerReviews = await this.showQuestionInPeerReview(
@@ -243,6 +229,17 @@ class QuizAnswer extends mixin(BaseModel, [
     })
 
     return paginated
+  }
+
+  private static itemAnswersMatching(searchQuery: string) {
+    return QuizItemAnswer.query()
+      .whereColumn("quiz_item_answer.quiz_answer_id", "quiz_answer.id")
+      .where(
+        raw(
+          `to_tsvector('english', coalesce(text_data, '')) @@ phraseto_tsquery(?)`,
+          [searchQuery],
+        ),
+      )
   }
 
   public static async getPaginatedByQuizIdAndSearchQuery(
@@ -256,49 +253,22 @@ class QuizAnswer extends mixin(BaseModel, [
       throw new BadRequestError("No search query provided.")
     }
 
-    let paginated
-    const filtersProvided = filters.length > 0
-
-    if (!filtersProvided) {
-      paginated = await this.query()
-        .where("quiz_answer.quiz_id", quizId)
-        .orderBy([{ column: "created_at", order: order }])
-        .page(this.FIRST_PAGE_INDEX, pageSize)
-        .withGraphFetched("userQuizState")
-        .withGraphFetched("itemAnswers.[optionAnswers]")
-        .join(
-          raw("quiz_item_answer as qia on quiz_answer.id = qia.quiz_answer_id"),
-        )
-        .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
-        .where(
-          raw(
-            `to_tsvector('english', coalesce(text_data, '')) @@ phraseto_tsquery(?)`,
-            [searchQuery],
-          ),
-        )
-        .limit(this.SEARCH_RESULT_LIMIT)
-    } else {
-      paginated = await this.query()
-        .where("quiz_answer.quiz_id", quizId)
-        .whereIn("status", filters)
-        .orderBy([{ column: "created_at", order: order }])
-        .page(this.FIRST_PAGE_INDEX, pageSize)
-        .withGraphFetched("userQuizState")
-        .withGraphFetched("itemAnswers.[optionAnswers]")
-        .join(
-          raw("quiz_item_answer as qia on quiz_answer.id = qia.quiz_answer_id"),
-        )
-        .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
-        .where(
-          raw(
-            `to_tsvector('english', coalesce(text_data, '')) @@ phraseto_tsquery(?)`,
-            [searchQuery],
-          ),
-        )
-        .limit(this.SEARCH_RESULT_LIMIT)
+    const query = this.query()
+      .where("quiz_id", quizId)
+      .whereExists(this.itemAnswersMatching(searchQuery))
+    if (filters.length > 0) {
+      query.whereIn("status", filters)
     }
+    const paginated = await query
+      .orderBy([{ column: "created_at", order: order }])
+      .page(this.FIRST_PAGE_INDEX, pageSize)
+      .limit(this.SEARCH_RESULT_LIMIT)
+      .withGraphFetched("quiz.[peerReviewCollections]")
+      .withGraphFetched("userQuizState")
+      .withGraphFetched("itemAnswers.[optionAnswers]")
+      .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
 
-    paginated.results.map(async answer => {
+    paginated.results.map(async (answer) => {
       const answerHasPeerReviews = answer.peerReviews.length > 0
       if (answerHasPeerReviews) {
         answer.peerReviews = await this.showQuestionInPeerReview(
@@ -326,7 +296,7 @@ class QuizAnswer extends mixin(BaseModel, [
       .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
       .withGraphFetched("quiz.[peerReviewCollections]")
 
-    paginated.results.map(async answer => {
+    paginated.results.map(async (answer) => {
       if (answer.peerReviews.length > 0) {
         answer.peerReviews = await this.showQuestionInPeerReview(
           answer.peerReviews,
@@ -348,25 +318,18 @@ class QuizAnswer extends mixin(BaseModel, [
     }
 
     const paginated = await this.query()
-      .where("quiz_answer.quiz_id", quizId)
+      .where("quiz_id", quizId)
       .andWhere("status", "manual-review")
+      .whereExists(this.itemAnswersMatching(searchQuery))
       .orderBy([{ column: "created_at", order: order }])
       .page(this.FIRST_PAGE_INDEX, pageSize)
+      .limit(this.SEARCH_RESULT_LIMIT)
+      .withGraphFetched("quiz.[peerReviewCollections]")
       .withGraphFetched("userQuizState")
       .withGraphFetched("itemAnswers.[optionAnswers]")
-      .join(
-        raw("quiz_item_answer as qia on quiz_answer.id = qia.quiz_answer_id"),
-      )
       .withGraphFetched("peerReviews.[answers.[question.[texts]]]")
-      .where(
-        raw(
-          `to_tsvector('english', coalesce(text_data, '')) @@ phraseto_tsquery(?)`,
-          [searchQuery],
-        ),
-      )
-      .limit(this.SEARCH_RESULT_LIMIT)
 
-    paginated.results.map(async answer => {
+    paginated.results.map(async (answer) => {
       const answerHasPeerReviews = answer.peerReviews.length > 0
       if (answerHasPeerReviews) {
         answer.peerReviews = await this.showQuestionInPeerReview(
@@ -388,7 +351,7 @@ class QuizAnswer extends mixin(BaseModel, [
 
     let promises: Promise<QuizAnswer>[] = []
 
-    answerIds.forEach(answerId => {
+    answerIds.forEach((answerId) => {
       promises.push(this.setManualReviewStatus(answerId, status))
     })
 
@@ -404,30 +367,43 @@ class QuizAnswer extends mixin(BaseModel, [
     }
     const trx = await knex.transaction()
     try {
-      // get quizAnswer by provided id
       let quizAnswer = (
         await this.query(trx)
           .where("quiz_answer.id", answerId)
           .withGraphJoined("userQuizState")
           .withGraphJoined("quiz")
       )[0]
-      const userQuizState = quizAnswer.userQuizState
+      if (!quizAnswer) {
+        throw new NotFoundError(`quiz answer not found: ${answerId}`)
+      }
       const quiz = quizAnswer.quiz
+      const userQuizState =
+        quizAnswer.userQuizState ??
+        UserQuizState.fromJson({
+          userId: quizAnswer.userId,
+          quizId: quizAnswer.quizId,
+          // Every submission uses a try and only deletion gives one back.
+          tries: await this.query(trx)
+            .where("user_id", quizAnswer.userId)
+            .andWhere("quiz_id", quizAnswer.quizId)
+            .andWhere("deleted", false)
+            .resultSize(),
+        })
 
       const triesAreNotLimited = !quiz.triesLimited
       const userHasTriesLeft = userQuizState.tries < quiz.tries
 
       if (status === "confirmed") {
-        await userQuizState.$query(trx).patch({ pointsAwarded: quiz.points })
+        userQuizState.pointsAwarded = quiz.points
       } else if (triesAreNotLimited || userHasTriesLeft) {
-        await userQuizState
-          .$query(trx)
-          .patch({ peerReviewsReceived: 0, spamFlags: 0, status: "open" })
+        userQuizState.peerReviewsReceived = 0
+        userQuizState.spamFlags = 0
+        userQuizState.status = "open"
       }
 
       quizAnswer = await quizAnswer.$query(trx).patchAndFetch({ status })
 
-      await UserQuizState.upsert(userQuizState, trx)
+      const savedUserQuizState = await UserQuizState.upsert(userQuizState, trx)
       await UserCoursePartState.update(
         quizAnswer.userId,
         quiz.courseId,
@@ -437,7 +413,7 @@ class QuizAnswer extends mixin(BaseModel, [
 
       await Kafka.broadcastQuizAnswerUpdated(
         quizAnswer,
-        userQuizState,
+        savedUserQuizState,
         quiz,
         trx,
       )
@@ -495,9 +471,7 @@ class QuizAnswer extends mixin(BaseModel, [
       .count()
       .groupBy("status")
 
-    const total: any[] = await this.query()
-      .where("quiz_id", quizId)
-      .count()
+    const total: any[] = await this.query().where("quiz_id", quizId).count()
 
     const countByStatus: { [status: string]: number } = {}
     for (const count of counts) {
@@ -509,11 +483,9 @@ class QuizAnswer extends mixin(BaseModel, [
   }
 
   public static async getStates() {
-    const states = await this.query()
-      .select("status")
-      .distinct("status")
+    const states = await this.query().select("status").distinct("status")
 
-    return states.map(state => state.status)
+    return states.map((state) => state.status)
   }
 
   private static moveQuestionTextsToparent = (question: PeerReviewQuestion) => {
@@ -598,11 +570,13 @@ class QuizAnswer extends mixin(BaseModel, [
   }
 
   private static async relayPlagiarismData(quizAnswer: QuizAnswer, quiz: Quiz) {
-    const language = await Language.query().findById(quiz.course.languageId)
+    const language = await Language.query()
+      .findById(quiz.course.languageId)
+      .throwIfNotFound()
     for (const quizItem of quiz.items) {
       if (quizItem.type === "essay") {
         const itemAnswer = quizAnswer.itemAnswers.find(
-          itemAnswer => itemAnswer.quizItemId === quizItem.id,
+          (itemAnswer) => itemAnswer.quizItemId === quizItem.id,
         )
         if (itemAnswer) {
           relayNewAnswer({
@@ -667,7 +641,7 @@ class QuizAnswer extends mixin(BaseModel, [
     }
     for (const quizItemAnswer of quizItemAnswers) {
       const quizItem = quizItems.find(
-        item => item.id === quizItemAnswer.quizItemId,
+        (item) => item.id === quizItemAnswer.quizItemId,
       )
       if (!quizItem) {
         // If the quiz item has been deleted
@@ -706,14 +680,14 @@ class QuizAnswer extends mixin(BaseModel, [
             throw new BadRequestError("option answers missing")
           }
           const correctOptionIds = quizOptions
-            .filter(quizOption => quizOption.correct === true)
-            .map(quizOption => quizOption.id)
+            .filter((quizOption) => quizOption.correct === true)
+            .map((quizOption) => quizOption.id)
           const selectedCorrectOptions = quizOptionAnswers.filter(
-            quizOptionAnswer =>
+            (quizOptionAnswer) =>
               correctOptionIds.includes(quizOptionAnswer.quizOptionId),
           )
           const allSelectedOptionsAreCorrect = quizOptionAnswers.every(
-            quizOptionAnswer =>
+            (quizOptionAnswer) =>
               correctOptionIds.includes(quizOptionAnswer.quizOptionId),
           )
           quizItemAnswer.correct = quizItem.multi
@@ -780,13 +754,14 @@ class QuizAnswer extends mixin(BaseModel, [
           .where("quiz_answer_id", quizAnswer.id)
           .withGraphJoined("answers")
 
-        const quizAnswerStatusAfterAssessment = this.assessAnswerWithPeerReviewsStatus(
-          quiz,
-          quizAnswer,
-          userQuizState,
-          peerReviews,
-          course,
-        )
+        const quizAnswerStatusAfterAssessment =
+          this.assessAnswerWithPeerReviewsStatus(
+            quiz,
+            quizAnswer,
+            userQuizState,
+            peerReviews,
+            course,
+          )
 
         await this.logAnswerStatusChange(
           quizAnswer.status,
@@ -818,7 +793,7 @@ class QuizAnswer extends mixin(BaseModel, [
     }
     const quizItemAnswers = quizAnswer.itemAnswers
     const nCorrect = quizItemAnswers.filter(
-      itemAnswer => itemAnswer.correct === true,
+      (itemAnswer) => itemAnswer.correct === true,
     ).length
     const total = quizItemAnswers.length
     const points = (nCorrect / total) * quiz.points
@@ -939,9 +914,9 @@ class QuizAnswer extends mixin(BaseModel, [
     }
 
     const answers = peerReviews
-      .map(pr => pr.answers.map(a => a.value))
+      .map((pr) => pr.answers.map((a) => a.value))
       .flat()
-      .filter(o => o !== undefined && o !== null)
+      .filter((o) => o !== undefined && o !== null)
 
     const sum: number = answers.reduce((prev, curr) => prev + curr, 0)
 
@@ -967,9 +942,7 @@ class QuizAnswer extends mixin(BaseModel, [
       throw error
     }
 
-    const answerIds = this.query()
-      .select("id")
-      .where("quiz_id", quizId)
+    const answerIds = this.query().select("id").where("quiz_id", quizId)
 
     const givenPeerReviews = await PeerReview.query()
       .whereIn("quiz_answer_id", answerIds)
@@ -978,12 +951,12 @@ class QuizAnswer extends mixin(BaseModel, [
     const givenSpamFlags = await SpamFlag.query().where("user_id", reviewerId)
 
     const rejected: string[] = givenPeerReviews
-      .map(pr => pr.rejectedQuizAnswerIds)
+      .map((pr) => pr.rejectedQuizAnswerIds)
       .flat()
 
-    const flagged = givenSpamFlags.map(spamFlag => spamFlag.quizAnswerId)
+    const flagged = givenSpamFlags.map((spamFlag) => spamFlag.quizAnswerId)
 
-    const alreadyReviewed = givenPeerReviews.map(pr => pr.quizAnswerId)
+    const alreadyReviewed = givenPeerReviews.map((pr) => pr.quizAnswerId)
 
     // query will fail if this array is empty
     rejected.push("d28359ed-fe18-4f79-b1a1-b33ee157d004")
@@ -1034,7 +1007,7 @@ class QuizAnswer extends mixin(BaseModel, [
       .withGraphJoined("itemAnswers.[optionAnswers]")
       .whereIn(
         "quiz_answer.id",
-        allCandidates.map(c => c.id),
+        allCandidates.map((c) => c.id),
       )
   }
 
@@ -1043,10 +1016,16 @@ class QuizAnswer extends mixin(BaseModel, [
 
     try {
       const quizAnswer = await this.query(trx).findById(answerId)
+      if (!quizAnswer) {
+        throw new NotFoundError(`quiz answer not found: ${answerId}`)
+      }
+      const quiz = await Quiz.query(trx).findById(quizAnswer.quizId)
+      if (!quiz) {
+        throw new NotFoundError(`quiz not found: ${quizAnswer.quizId}`)
+      }
 
-      await this.query(trx)
-        .delete()
-        .where("id", answerId)
+      // Soft-deletes the instance too, so a broadcast of it reports no attempt.
+      await quizAnswer.$query(trx).delete()
 
       const quizAnswers = await QuizAnswer.query(trx)
         .where("user_id", quizAnswer.userId)
@@ -1060,61 +1039,58 @@ class QuizAnswer extends mixin(BaseModel, [
             )[0]
           : undefined
 
-      const maxPoints = (await Quiz.query(trx).findById(quizAnswer.quizId))
-        .points
+      const maxPoints = quiz.points
 
-      const userQuizState = (
-        await UserQuizState.query(trx)
-          .where("user_id", quizAnswer.userId)
-          .andWhere("quiz_id", quizAnswer.quizId)
-      )[0]
-
-      const newTries = userQuizState.tries > 0 ? userQuizState.tries - 1 : 0
-
-      const updatedUserQuizState = await userQuizState
-        .$query(trx)
-        .updateAndFetch({
-          status:
-            newTries >=
-            (await Quiz.query(trx).findById(quizAnswer.quizId)).tries
-              ? "locked"
-              : "open",
-          tries: newTries,
-          spamFlags: nextBestQuizAnswer
-            ? (
-                await SpamFlag.query(trx).where(
-                  "quiz_answer_id",
-                  nextBestQuizAnswer.id,
-                )
-              ).length
-            : 0,
-          pointsAwarded: nextBestQuizAnswer
-            ? maxPoints * nextBestQuizAnswer.correctnessCoefficient
-            : 0,
-        })
-
-      nextBestQuizAnswer
-        ? await Kafka.broadcastQuizAnswerUpdated(
-            nextBestQuizAnswer,
-            updatedUserQuizState,
-            await Quiz.query(trx).findById(quizAnswer.quizId),
-            trx,
-          )
-        : await Kafka.broadcastQuizAnswerUpdated(
-            quizAnswer,
-            updatedUserQuizState,
-            await Quiz.query(trx).findById(quizAnswer.quizId),
-            trx,
-          )
-
-      await Kafka.broadcastUserProgressUpdated(
+      const userQuizState = await UserQuizState.getByUserAndQuiz(
         quizAnswer.userId,
-        (await Quiz.query(trx).findById(quizAnswer.quizId)).courseId,
+        quizAnswer.quizId,
         trx,
       )
+      // No state means nothing was recorded for this answer, so nothing to roll back.
+      if (userQuizState) {
+        const newTries = userQuizState.tries > 0 ? userQuizState.tries - 1 : 0
+
+        const updatedUserQuizState = await userQuizState
+          .$query(trx)
+          .updateAndFetch({
+            status: newTries >= quiz.tries ? "locked" : "open",
+            tries: newTries,
+            spamFlags: nextBestQuizAnswer
+              ? (
+                  await SpamFlag.query(trx).where(
+                    "quiz_answer_id",
+                    nextBestQuizAnswer.id,
+                  )
+                ).length
+              : 0,
+            pointsAwarded: nextBestQuizAnswer
+              ? maxPoints * nextBestQuizAnswer.correctnessCoefficient
+              : 0,
+          })
+
+        nextBestQuizAnswer
+          ? await Kafka.broadcastQuizAnswerUpdated(
+              nextBestQuizAnswer,
+              updatedUserQuizState,
+              quiz,
+              trx,
+            )
+          : await Kafka.broadcastQuizAnswerUpdated(
+              quizAnswer,
+              updatedUserQuizState,
+              quiz,
+              trx,
+            )
+
+        await Kafka.broadcastUserProgressUpdated(
+          quizAnswer.userId,
+          quiz.courseId,
+          trx,
+        )
+      }
 
       await trx.commit()
-      return await this.query().findById(answerId)
+      return await this.query().findById(answerId).throwIfNotFound()
     } catch (error) {
       await trx.rollback()
       throw error
@@ -1149,22 +1125,20 @@ class QuizAnswer extends mixin(BaseModel, [
     return await query
   }
 
-  private static statusesByPriority: (
-    | QuizAnswerStatus
-    | QuizAnswerStatus[]
-  )[] = [
+  private static statusesByPriority: (QuizAnswerStatus | QuizAnswerStatus[])[] =
     [
-      "given-more-than-enough",
-      "manual-review-once-received-enough-given-more-than-enough",
-    ],
-    ["given-enough", "manual-review-once-received-enough"],
-    ["submitted"],
-    ["manual-review-once-given-and-received-enough"],
-    ["confirmed"],
-    ["manual-review"],
-    ["manual-review-once-given-enough"],
-    ["enough-received-but-not-given"],
-  ]
+      [
+        "given-more-than-enough",
+        "manual-review-once-received-enough-given-more-than-enough",
+      ],
+      ["given-enough", "manual-review-once-received-enough"],
+      ["submitted"],
+      ["manual-review-once-given-and-received-enough"],
+      ["confirmed"],
+      ["manual-review"],
+      ["manual-review-once-given-enough"],
+      ["enough-received-but-not-given"],
+    ]
 
   private static addCriteriaBasedOnPriority(
     priority: number,
@@ -1208,10 +1182,12 @@ class QuizAnswer extends mixin(BaseModel, [
   }
 
   private static removeIds(quizAnswer: QuizAnswer) {
-    delete quizAnswer.id
-    quizAnswer.itemAnswers?.forEach(itemAnswer => {
-      delete itemAnswer.id
-      itemAnswer.optionAnswers?.forEach(optionAnswer => delete optionAnswer.id)
+    delete (quizAnswer as Partial<QuizAnswer>).id
+    quizAnswer.itemAnswers?.forEach((itemAnswer) => {
+      delete (itemAnswer as Partial<QuizItemAnswer>).id
+      itemAnswer.optionAnswers?.forEach(
+        (optionAnswer) => delete (optionAnswer as Partial<QuizOptionAnswer>).id,
+      )
     })
   }
 }

@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from "react"
+
+import { useRouter } from "next/router"
+
 import {
   faClipboardList,
   faPenSquare,
   faUsersCog,
 } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { Tab, Tabs, Typography } from "@material-ui/core"
-import { useRouter } from "next/router"
-import { ITabToComponent } from "../CoursePage/types"
-import { CoursePage } from "../CoursePage"
-import EditCourseDetails from "../CoursePage/EditDetailsForm"
+import { Tab, Tabs, Typography } from "@mui/material"
+
 import { useUserAbilities } from "../../hooks/useUserAbilities"
 import CompletionPage from "../CompletionPage"
+import { CoursePage } from "../CoursePage"
+import EditCourseDetails from "../CoursePage/EditDetailsForm"
+import { ITabToComponent } from "../CoursePage/types"
 
 const CourseTabNavigator = () => {
   const router = useRouter()
@@ -20,11 +23,8 @@ const CourseTabNavigator = () => {
 
   const pathname = `/courses/${courseId}`
 
-  const {
-    userAbilities,
-    userAbilitiesLoading,
-    userAbilitiesError,
-  } = useUserAbilities(courseId ?? "", "user-abilities")
+  const { userAbilities, userAbilitiesLoading, userAbilitiesError } =
+    useUserAbilities(courseId ?? "", "user-abilities")
 
   const coursePageTabs: ITabToComponent = {
     listing: CoursePage,
@@ -32,6 +32,11 @@ const CourseTabNavigator = () => {
     completion: CompletionPage,
     default_tab: CoursePage,
   }
+
+  const canEdit = userAbilities?.includes("edit")
+  const isCurrentTabRendered =
+    currentTab === "listing" ||
+    (canEdit && (currentTab === "edit" || currentTab === "completion"))
 
   const ComponentTag = coursePageTabs[currentTab]
     ? coursePageTabs[currentTab]
@@ -47,7 +52,7 @@ const CourseTabNavigator = () => {
     <>
       <Tabs
         variant="fullWidth"
-        value={currentTab}
+        value={isCurrentTabRendered ? currentTab : false}
         indicatorColor="primary"
         textColor="primary"
         style={{ marginBottom: "3rem" }}
@@ -61,7 +66,7 @@ const CourseTabNavigator = () => {
             router.push(`${pathname}/listing`, undefined, { shallow: true })
           }}
         />
-        {userAbilities?.includes("edit") && (
+        {canEdit && (
           <Tab
             key="edit"
             icon={<FontAwesomeIcon icon={faPenSquare} />}
@@ -72,7 +77,7 @@ const CourseTabNavigator = () => {
             }}
           />
         )}
-        {userAbilities?.includes("edit") && (
+        {canEdit && (
           <Tab
             key="completion"
             icon={<FontAwesomeIcon icon={faUsersCog} />}

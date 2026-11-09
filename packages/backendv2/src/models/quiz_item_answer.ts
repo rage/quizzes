@@ -17,7 +17,7 @@ class QuizItemAnswer extends BaseModel {
     return "quiz_item_answer"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     quizAnswer: {
       relation: BaseModel.HasOneRelation,
       modelClass: QuizAnswer,
@@ -42,7 +42,7 @@ class QuizItemAnswer extends BaseModel {
         to: "quiz_item.id",
       },
     },
-  }
+  })
 }
 
 export default QuizItemAnswer

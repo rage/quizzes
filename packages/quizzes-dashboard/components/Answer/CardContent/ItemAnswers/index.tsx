@@ -1,7 +1,9 @@
 import React, { useRef, useState, useEffect } from "react"
+
+import styled from "styled-components"
+
 import { ItemAnswer } from "../../../../types/Answer"
 import SingleItemAnswer from "./SingleItemAnswer"
-import styled from "styled-components"
 
 export const ItemAnswerWrapper = styled.div`
   display: flex;
@@ -16,7 +18,7 @@ export const ItemAnswers = ({ itemAnswers }: ItemAnswerProps) => {
   return (
     <>
       <ItemAnswerWrapper>
-        {itemAnswers.map(itemAnswer => (
+        {itemAnswers.map((itemAnswer) => (
           <SingleItemAnswer itemAnswer={itemAnswer} key={itemAnswer.id} />
         ))}
       </ItemAnswerWrapper>

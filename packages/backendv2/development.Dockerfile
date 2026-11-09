@@ -1,25 +1,43 @@
-FROM node:11-alpine
+# Build context is the repository root (see docker-compose.yml): the pnpm workspace files and
+# lockfile live there.
+FROM node:26.13.0-alpine
 
-RUN apk --no-cache add \
+RUN apk add --no-cache \
       bash \
-      g++ \
+      build-base \
       ca-certificates \
-      lz4-dev \
-      musl-dev \
       cyrus-sasl-dev \
+      linux-headers \
+      lz4-dev \
       openssl-dev \
-      make \
-      python
+      python3 \
+      zlib-dev \
+      zstd-dev
 
-COPY --chown=node . /app
-ENV BASE_PATH /v2
+RUN mkdir -p /app && chown -R node /app
+
+COPY package.json /tmp/package.json
+RUN npm install -g --no-update-notifier \
+      "$(node -p 'require("/tmp/package.json").packageManager')" \
+    && rm /tmp/package.json
 
 USER node
+
 WORKDIR /app
 
-RUN npm ci
-RUN npm run build
+COPY --chown=node package.json pnpm-lock.yaml pnpm-workspace.yaml /app/
+COPY --chown=node packages/backendv2/package.json /app/packages/backendv2/
+
+RUN pnpm install --frozen-lockfile --filter ./packages/backendv2
+
+COPY --chown=node packages/backendv2 /app/packages/backendv2
+
+WORKDIR /app/packages/backendv2
+
+ENV BASE_PATH=/v2
+
+RUN pnpm run build
 
 EXPOSE 3003
 
-CMD [ "npm", "run", "dev" ]
+CMD [ "pnpm", "run", "dev" ]

@@ -1,4 +1,5 @@
 import React from "react"
+
 import { StyledSkeleton } from "../quizPages/answers/styles"
 
 export const SkeletonLoader = ({
@@ -15,7 +16,7 @@ export const SkeletonLoader = ({
       {Array.from({ length: skeletonCount }, (_, i) => (
         <StyledSkeleton
           key={i}
-          variant="rect"
+          variant="rectangular"
           height={height}
           animation="wave"
           {...props}

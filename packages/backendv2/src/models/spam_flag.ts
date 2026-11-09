@@ -1,11 +1,11 @@
-import { BadRequestError } from "../util/error"
+import knex from "../../database/knex"
+import { BadRequestError, NotFoundError } from "../util/error"
+import BaseModel from "./base_model"
 import Quiz from "./quiz"
 import QuizAnswer from "./quiz_answer"
+import QuizAnswerStatusModification from "./quiz_answer_status_modification"
 import User from "./user"
 import UserQuizState from "./user_quiz_state"
-import knex from "../../database/knex"
-import BaseModel from "./base_model"
-import QuizAnswerStatusModification from "./quiz_answer_status_modification"
 
 class SpamFlag extends BaseModel {
   id!: string
@@ -16,7 +16,7 @@ class SpamFlag extends BaseModel {
     return "spam_flag"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     user: {
       relation: BaseModel.HasManyRelation,
       modelClass: User,
@@ -33,7 +33,7 @@ class SpamFlag extends BaseModel {
         to: "quiz_answer.id",
       },
     },
-  }
+  })
 
   public static async reportSpam(
     quizAnswerId: string,
@@ -55,6 +55,11 @@ class SpamFlag extends BaseModel {
         quizAnswer.userId,
         quiz.id,
       )
+      if (!userQuizState) {
+        throw new NotFoundError(
+          `No quiz state for user ${quizAnswer.userId} in quiz ${quiz.id}`,
+        )
+      }
 
       if (userQuizState.spamFlags === null) {
         userQuizState.spamFlags = 1

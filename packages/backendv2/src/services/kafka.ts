@@ -1,11 +1,6 @@
-import Knex from "knex"
-import {
-  ExerciseData,
-  ProgressMessage,
-  QuizAnswerMessage,
-  QuizMessage,
-  RequiredAction,
-} from "../types"
+import type { Knex } from "knex"
+
+import knex from "../../database/knex"
 import {
   Course,
   KafkaMessage,
@@ -14,7 +9,13 @@ import {
   UserQuizState,
 } from "../models"
 import UserCoursePartState from "../models/user_course_part_state"
-import knex from "../../database/knex"
+import {
+  ExerciseData,
+  ProgressMessage,
+  QuizAnswerMessage,
+  QuizMessage,
+  RequiredAction,
+} from "../types"
 
 export const broadcastUserProgressUpdated = async (
   userId: number,
@@ -22,7 +23,7 @@ export const broadcastUserProgressUpdated = async (
   trx: Knex.Transaction,
 ) => {
   const course = await Course.query(trx).findById(courseId)
-  if (!course.moocfiId) {
+  if (!course?.moocfiId) {
     return
   }
   const progress = await UserCoursePartState.getProgress(userId, courseId, trx)
@@ -50,20 +51,25 @@ export const broadcastQuizAnswerUpdated = async (
 ) => {
   const messages: RequiredAction[] = []
   const course = await quiz.$relatedQuery("course", trx)
-  if (!course.moocfiId) {
+  if (!course?.moocfiId) {
     return
   }
   const items = await quiz.$relatedQuery("items", trx)
+  // Deleting a user's last answer leaves the quiz unattempted, which is reported
+  // like the batch publisher reports an unanswered quiz.
+  const attempted = !quizAnswer.deleted
 
-  if (quizAnswer.status === "rejected" || quizAnswer.status === "spam") {
+  if (
+    attempted &&
+    (quizAnswer.status === "rejected" || quizAnswer.status === "spam")
+  ) {
     messages.push(RequiredAction.REJECTED)
-  } else if (items[0].type === "essay") {
+  } else if (attempted && items.some((item) => item.type === "essay")) {
     if (userQuizState.peerReviewsGiven < course.minPeerReviewsGiven) {
       messages.push(RequiredAction.GIVE_PEER_REVIEW)
     }
     if (
-      userQuizState.peerReviewsReceived ??
-      0 < course.minPeerReviewsReceived
+      (userQuizState.peerReviewsReceived ?? 0) < course.minPeerReviewsReceived
     ) {
       messages.push(RequiredAction.PENDING_PEER_REVIEW)
     }
@@ -71,16 +77,16 @@ export const broadcastQuizAnswerUpdated = async (
 
   const message: QuizAnswerMessage = {
     timestamp: new Date().toISOString(),
-    original_submission_date: quizAnswer.createdAt,
+    original_submission_date: attempted ? quizAnswer.createdAt : null,
     exercise_id: quizAnswer.quizId,
-    n_points: quiz.excludedFromScore ? 0 : userQuizState.pointsAwarded ?? 0,
-    completed: quizAnswer.status === "confirmed",
+    n_points: quiz.excludedFromScore ? 0 : (userQuizState.pointsAwarded ?? 0),
+    completed: attempted && quizAnswer.status === "confirmed",
     user_id: quizAnswer.userId,
     course_id: course.moocfiId,
     service_id: process.env.SERVICE_ID || "",
     required_actions: messages,
     message_format_version: Number(process.env.MESSAGE_FORMAT_VERSION),
-    attempted: quizAnswer.deleted ? false : true,
+    attempted,
   }
 
   await KafkaMessage.createMessageEntry("user-points-realtime", message, trx)
@@ -91,7 +97,7 @@ export const broadcastCourseQuizzesUpdated = async (
   trx: Knex.Transaction,
 ) => {
   const course = await Course.query(trx).findById(courseId)
-  if (!course.moocfiId) {
+  if (!course?.moocfiId) {
     return
   }
   const quizzes = await Quiz.query(trx)
@@ -99,7 +105,7 @@ export const broadcastCourseQuizzesUpdated = async (
     .whereNot("part", 0)
     .withGraphJoined("texts")
 
-  const data: ExerciseData[] = quizzes.map(quiz => {
+  const data: ExerciseData[] = quizzes.map((quiz) => {
     return {
       name: quiz.texts[0].title,
       id: quiz.id,
@@ -127,7 +133,7 @@ export const broadcastUserCourse = async (userId: number, courseId: string) => {
     .withGraphJoined("userQuizState")
     .where("quiz_answer.user_id", userId)
     .andWhere("course_id", courseId)
-  await knex.transaction(async trx => {
+  await knex.transaction(async (trx) => {
     for (const quizAnswer of quizAnswers) {
       const { quiz, userQuizState } = quizAnswer
       await broadcastQuizAnswerUpdated(quizAnswer, userQuizState, quiz, trx)

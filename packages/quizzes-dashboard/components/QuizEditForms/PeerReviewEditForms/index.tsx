@@ -1,15 +1,18 @@
 import React from "react"
-import { useTypedSelector } from "../../../store/store"
-import { PeerReviewEditor } from "./PeerReviewEditor"
-import { Typography, Button } from "@material-ui/core"
-import styled from "styled-components"
+
 import { useDispatch } from "react-redux"
+import styled from "styled-components"
+
+import { faTrash } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { Typography, Button } from "@mui/material"
+
 import {
   createdNewPeerReview,
   deletePeerReview,
 } from "../../../store/editor/peerReviewCollections/peerReviewCollectionActions"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faTrash } from "@fortawesome/free-solid-svg-icons"
+import { useTypedSelector } from "../../../store/store"
+import { PeerReviewEditor } from "./PeerReviewEditor"
 
 const PeerReviewTitleWrapper = styled.div`
   display: flex !important;
@@ -45,9 +48,9 @@ const PeerReviewWrapper = styled.div`
 `
 
 export const PeerReviewEditForms = () => {
-  const quizId = useTypedSelector(state => state.editor.quizId)
+  const quizId = useTypedSelector((state) => state.editor.quizId)
   const peerReviews = Object.values(
-    useTypedSelector(state => state.editor.peerReviewCollections),
+    useTypedSelector((state) => state.editor.peerReviewCollections),
   )
 
   const dispatch = useDispatch()

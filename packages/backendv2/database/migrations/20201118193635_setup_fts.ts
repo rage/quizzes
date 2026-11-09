@@ -1,4 +1,4 @@
-import * as Knex from "knex"
+import type { Knex } from "knex"
 
 const addAnswerIndex = `
 CREATE INDEX IF NOT EXISTS idx_fts_answer ON public.quiz_item_answer USING gin (to_tsvector('english', coalesce(text_data, '')));

@@ -1,14 +1,16 @@
 import React from "react"
+
+import { useDispatch } from "react-redux"
+import styled from "styled-components"
+
 import {
   TextField,
   MenuItem,
   Switch,
   FormGroup,
   FormControlLabel,
-} from "@material-ui/core"
-import { useDispatch } from "react-redux"
-import styled from "styled-components"
-import { useTypedSelector } from "../../../../store/store"
+} from "@mui/material"
+
 import {
   editedPeerReviewQuestionTitle,
   editedPeerReviewQuestionBody,
@@ -16,6 +18,7 @@ import {
   toggledQuestionDefault,
   toggledQuestionAnswerRequired,
 } from "../../../../store/editor/questions/questionActions"
+import { useTypedSelector } from "../../../../store/store"
 import MarkdownEditor from "../../../MarkdownEditor"
 
 const PRQWrapper = styled.div`
@@ -36,20 +39,20 @@ interface PRQEditorProps {
 
 export const QuestionEditor = ({ id }: PRQEditorProps) => {
   const dispatch = useDispatch()
-  const prq = useTypedSelector(state => state.editor.questions[id])
+  const prq = useTypedSelector((state) => state.editor.questions[id])
   return (
     <PRQWrapper>
       <MarkdownEditor
         label="Question title"
         text={prq.title ?? ""}
-        onChange={event =>
+        onChange={(event) =>
           dispatch(editedPeerReviewQuestionTitle(event.target.value, id))
         }
       />
       <MarkdownEditor
         label="Question body"
         text={prq.body ?? ""}
-        onChange={event =>
+        onChange={(event) =>
           dispatch(editedPeerReviewQuestionBody(event.target.value, id))
         }
       />
@@ -59,7 +62,7 @@ export const QuestionEditor = ({ id }: PRQEditorProps) => {
         variant="outlined"
         fullWidth
         value={prq.type}
-        onChange={event =>
+        onChange={(event) =>
           dispatch(editedPeerReviewQuestionType(event.target.value, id))
         }
       >
@@ -71,7 +74,7 @@ export const QuestionEditor = ({ id }: PRQEditorProps) => {
           control={
             <Switch
               checked={prq.default}
-              onChange={event =>
+              onChange={(event) =>
                 dispatch(toggledQuestionDefault(prq.id, event.target.checked))
               }
               name="default"
@@ -84,7 +87,7 @@ export const QuestionEditor = ({ id }: PRQEditorProps) => {
           control={
             <Switch
               checked={prq.answerRequired}
-              onChange={event =>
+              onChange={(event) =>
                 dispatch(
                   toggledQuestionAnswerRequired(prq.id, event.target.checked),
                 )

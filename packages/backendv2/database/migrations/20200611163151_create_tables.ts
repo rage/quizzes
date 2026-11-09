@@ -1,9 +1,9 @@
-import * as Knex from "knex"
+import type { Knex } from "knex"
 
 export async function up(knex: Knex): Promise<any> {
   await knex.schema.raw('CREATE EXTENSION IF NOT EXISTS "uuid-ossp"')
   if (!(await knex.schema.hasTable("course"))) {
-    await knex.schema.createTable("course", table => {
+    await knex.schema.createTable("course", (table) => {
       table
         .uuid("id")
         .primary()
@@ -29,11 +29,8 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("language"))) {
-    await knex.schema.createTable("language", table => {
-      table
-        .text("id")
-        .primary()
-        .notNullable()
+    await knex.schema.createTable("language", (table) => {
+      table.text("id").primary().notNullable()
       table.text("name").notNullable()
       table.text("country").notNullable()
       table
@@ -47,7 +44,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("course_language"))) {
-    await knex.schema.createTable("course_language", table => {
+    await knex.schema.createTable("course_language", (table) => {
       table
         .uuid("course_id")
         .references("id")
@@ -64,7 +61,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("course_translation"))) {
-    await knex.schema.createTable("course_translation", table => {
+    await knex.schema.createTable("course_translation", (table) => {
       table
         .uuid("course_id")
         .references("id")
@@ -77,18 +74,9 @@ export async function up(knex: Knex): Promise<any> {
         .inTable("language")
         .notNullable()
         .onDelete("CASCADE")
-      table
-        .text("abbreviation")
-        .defaultTo("")
-        .notNullable()
-      table
-        .text("title")
-        .defaultTo("")
-        .notNullable()
-      table
-        .text("body")
-        .defaultTo("")
-        .notNullable()
+      table.text("abbreviation").defaultTo("").notNullable()
+      table.text("title").defaultTo("").notNullable()
+      table.text("body").defaultTo("").notNullable()
       table
         .timestamp("created_at", { useTz: false })
         .defaultTo(knex.fn.now())
@@ -101,7 +89,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("quiz"))) {
-    await knex.schema.createTable("quiz", table => {
+    await knex.schema.createTable("quiz", (table) => {
       table
         .uuid("id")
         .primary()
@@ -119,26 +107,11 @@ export async function up(knex: Knex): Promise<any> {
       table.timestamp("deadline", { useTz: false })
 
       table.timestamp("open", { useTz: false })
-      table
-        .boolean("excluded_from_score")
-        .notNullable()
-        .defaultTo(false)
-      table
-        .boolean("auto_confirm")
-        .notNullable()
-        .defaultTo(true)
-      table
-        .boolean("auto_reject")
-        .notNullable()
-        .defaultTo(true)
-      table
-        .boolean("tries_limited")
-        .notNullable()
-        .defaultTo(true)
-      table
-        .integer("tries")
-        .notNullable()
-        .defaultTo(1)
+      table.boolean("excluded_from_score").notNullable().defaultTo(false)
+      table.boolean("auto_confirm").notNullable().defaultTo(true)
+      table.boolean("auto_reject").notNullable().defaultTo(true)
+      table.boolean("tries_limited").notNullable().defaultTo(true)
+      table.integer("tries").notNullable().defaultTo(1)
       table
         .enu(
           "grant_points_policy",
@@ -147,10 +120,7 @@ export async function up(knex: Knex): Promise<any> {
         )
         .notNullable()
         .defaultTo("grant_whenever_possible")
-      table
-        .boolean("award_points_even_if_wrong")
-        .notNullable()
-        .defaultTo(false)
+      table.boolean("award_points_even_if_wrong").notNullable().defaultTo(false)
       table
         .timestamp("created_at", { useTz: false })
         .defaultTo(knex.fn.now())
@@ -162,7 +132,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("quiz_translation"))) {
-    await knex.schema.createTable("quiz_translation", table => {
+    await knex.schema.createTable("quiz_translation", (table) => {
       table
         .uuid("quiz_id")
         .references("id")
@@ -175,14 +145,8 @@ export async function up(knex: Knex): Promise<any> {
         .inTable("language")
         .notNullable()
         .onDelete("CASCADE")
-      table
-        .text("title")
-        .defaultTo("")
-        .notNullable()
-      table
-        .text("body")
-        .defaultTo("")
-        .notNullable()
+      table.text("title").defaultTo("").notNullable()
+      table.text("body").defaultTo("").notNullable()
       table.text("submit_message")
       table
         .timestamp("created_at", { useTz: false })
@@ -196,7 +160,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("quiz_item"))) {
-    await knex.schema.createTable("quiz_item", table => {
+    await knex.schema.createTable("quiz_item", (table) => {
       table
         .uuid("id")
         .primary()
@@ -252,7 +216,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("quiz_item_translation"))) {
-    await knex.schema.createTable("quiz_item_translation", table => {
+    await knex.schema.createTable("quiz_item_translation", (table) => {
       table
         .uuid("quiz_item_id")
         .references("id")
@@ -265,14 +229,8 @@ export async function up(knex: Knex): Promise<any> {
         .inTable("language")
         .notNullable()
         .onDelete("CASCADE")
-      table
-        .text("title")
-        .defaultTo("")
-        .notNullable()
-      table
-        .text("body")
-        .defaultTo("")
-        .notNullable()
+      table.text("title").defaultTo("").notNullable()
+      table.text("body").defaultTo("").notNullable()
       table.text("success_message")
       table.text("failure_message")
       table.text("min_label")
@@ -290,7 +248,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("quiz_option"))) {
-    await knex.schema.createTable("quiz_option", table => {
+    await knex.schema.createTable("quiz_option", (table) => {
       table
         .uuid("id")
         .primary()
@@ -315,7 +273,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("quiz_option_translation"))) {
-    await knex.schema.createTable("quiz_option_translation", table => {
+    await knex.schema.createTable("quiz_option_translation", (table) => {
       table
         .uuid("quiz_option_id")
         .references("id")
@@ -328,14 +286,8 @@ export async function up(knex: Knex): Promise<any> {
         .inTable("language")
         .notNullable()
         .onDelete("CASCADE")
-      table
-        .text("title")
-        .defaultTo("")
-        .notNullable()
-      table
-        .text("body")
-        .defaultTo("")
-        .notNullable()
+      table.text("title").defaultTo("").notNullable()
+      table.text("body").defaultTo("").notNullable()
       table.text("success_message")
       table.text("failure_message")
       table
@@ -350,7 +302,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("peer_review_collection"))) {
-    await knex.schema.createTable("peer_review_collection", table => {
+    await knex.schema.createTable("peer_review_collection", (table) => {
       table
         .uuid("id")
         .primary()
@@ -375,7 +327,7 @@ export async function up(knex: Knex): Promise<any> {
   if (!(await knex.schema.hasTable("peer_review_collection_translation"))) {
     await knex.schema.createTable(
       "peer_review_collection_translation",
-      table => {
+      (table) => {
         table
           .uuid("peer_review_collection_id")
           .references("id")
@@ -388,14 +340,8 @@ export async function up(knex: Knex): Promise<any> {
           .inTable("language")
           .notNullable()
           .onDelete("CASCADE")
-        table
-          .text("title")
-          .defaultTo("")
-          .notNullable()
-        table
-          .text("body")
-          .defaultTo("")
-          .notNullable()
+        table.text("title").defaultTo("").notNullable()
+        table.text("body").defaultTo("").notNullable()
         table
           .timestamp("created_at", { useTz: false })
           .defaultTo(knex.fn.now())
@@ -409,17 +355,13 @@ export async function up(knex: Knex): Promise<any> {
     )
   }
   if (!(await knex.schema.hasTable("peer_review_question"))) {
-    await knex.schema.createTable("peer_review_question", table => {
+    await knex.schema.createTable("peer_review_question", (table) => {
       table
         .uuid("id")
         .primary()
         .defaultTo(knex.raw("uuid_generate_v4()"))
         .notNullable()
-      table
-        .uuid("quiz_id")
-        .references("id")
-        .inTable("quiz")
-        .onDelete("CASCADE")
+      table.uuid("quiz_id").references("id").inTable("quiz").onDelete("CASCADE")
       table
         .uuid("peer_review_collection_id")
         .references("id")
@@ -434,10 +376,7 @@ export async function up(knex: Knex): Promise<any> {
           enumName: "peer_review_question_type_enum",
         })
         .notNullable()
-      table
-        .boolean("answer_required")
-        .notNullable()
-        .defaultTo(true)
+      table.boolean("answer_required").notNullable().defaultTo(true)
       table
         .timestamp("created_at", { useTz: false })
         .defaultTo(knex.fn.now())
@@ -449,44 +388,38 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("peer_review_question_translation"))) {
-    await knex.schema.createTable("peer_review_question_translation", table => {
-      table
-        .uuid("peer_review_question_id")
-        .references("id")
-        .inTable("peer_review_question")
-        .notNullable()
-        .onDelete("CASCADE")
-      table
-        .text("language_id")
-        .references("id")
-        .inTable("language")
-        .notNullable()
-        .onDelete("CASCADE")
-      table
-        .text("title")
-        .defaultTo("")
-        .notNullable()
-      table
-        .text("body")
-        .defaultTo("")
-        .notNullable()
-      table
-        .timestamp("created_at", { useTz: false })
-        .defaultTo(knex.fn.now())
-        .notNullable()
-      table
-        .timestamp("updated_at", { useTz: false })
-        .defaultTo(knex.fn.now())
-        .notNullable()
-      table.primary(["peer_review_question_id", "language_id"])
-    })
+    await knex.schema.createTable(
+      "peer_review_question_translation",
+      (table) => {
+        table
+          .uuid("peer_review_question_id")
+          .references("id")
+          .inTable("peer_review_question")
+          .notNullable()
+          .onDelete("CASCADE")
+        table
+          .text("language_id")
+          .references("id")
+          .inTable("language")
+          .notNullable()
+          .onDelete("CASCADE")
+        table.text("title").defaultTo("").notNullable()
+        table.text("body").defaultTo("").notNullable()
+        table
+          .timestamp("created_at", { useTz: false })
+          .defaultTo(knex.fn.now())
+          .notNullable()
+        table
+          .timestamp("updated_at", { useTz: false })
+          .defaultTo(knex.fn.now())
+          .notNullable()
+        table.primary(["peer_review_question_id", "language_id"])
+      },
+    )
   }
   if (!(await knex.schema.hasTable("user"))) {
-    await knex.schema.createTable("user", table => {
-      table
-        .integer("id")
-        .primary()
-        .notNullable()
+    await knex.schema.createTable("user", (table) => {
+      table.integer("id").primary().notNullable()
       table
         .timestamp("created_at", { useTz: false })
         .defaultTo(knex.fn.now())
@@ -498,7 +431,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("quiz_answer"))) {
-    await knex.schema.createTable("quiz_answer", table => {
+    await knex.schema.createTable("quiz_answer", (table) => {
       table
         .uuid("id")
         .primary()
@@ -558,7 +491,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("quiz_item_answer"))) {
-    await knex.schema.createTable("quiz_item_answer", table => {
+    await knex.schema.createTable("quiz_item_answer", (table) => {
       table
         .uuid("id")
         .primary()
@@ -590,7 +523,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("quiz_option_answer"))) {
-    await knex.schema.createTable("quiz_option_answer", table => {
+    await knex.schema.createTable("quiz_option_answer", (table) => {
       table
         .uuid("id")
         .primary()
@@ -619,7 +552,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("peer_review"))) {
-    await knex.schema.createTable("peer_review", table => {
+    await knex.schema.createTable("peer_review", (table) => {
       table
         .uuid("id")
         .primary()
@@ -655,7 +588,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("peer_review_question_answer"))) {
-    await knex.schema.createTable("peer_review_question_answer", table => {
+    await knex.schema.createTable("peer_review_question_answer", (table) => {
       table
         .uuid("peer_review_id")
         .references("id")
@@ -682,7 +615,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("spam_flag"))) {
-    await knex.schema.createTable("spam_flag", table => {
+    await knex.schema.createTable("spam_flag", (table) => {
       table
         .uuid("id")
         .primary()
@@ -711,7 +644,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("user_quiz_state"))) {
-    await knex.schema.createTable("user_quiz_state", table => {
+    await knex.schema.createTable("user_quiz_state", (table) => {
       table
         .integer("user_id")
         .references("id")
@@ -748,7 +681,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("user_course_part_state"))) {
-    await knex.schema.createTable("user_course_part_state", table => {
+    await knex.schema.createTable("user_course_part_state", (table) => {
       table
         .integer("user_id")
         .references("id")
@@ -762,18 +695,9 @@ export async function up(knex: Knex): Promise<any> {
         .notNullable()
         .onDelete("CASCADE")
       table.integer("course_part").notNullable()
-      table
-        .decimal("progress")
-        .notNullable()
-        .defaultTo(0)
-      table
-        .decimal("score")
-        .notNullable()
-        .defaultTo(0)
-      table
-        .boolean("completed")
-        .notNullable()
-        .defaultTo(false)
+      table.decimal("progress").notNullable().defaultTo(0)
+      table.decimal("score").notNullable().defaultTo(0)
+      table.boolean("completed").notNullable().defaultTo(false)
       table
         .timestamp("created_at", { useTz: false })
         .defaultTo(knex.fn.now())
@@ -786,7 +710,7 @@ export async function up(knex: Knex): Promise<any> {
     })
   }
   if (!(await knex.schema.hasTable("user_course_role"))) {
-    await knex.schema.createTable("user_course_role", table => {
+    await knex.schema.createTable("user_course_role", (table) => {
       table
         .uuid("id")
         .primary()

@@ -11,6 +11,7 @@
 # next.js
 /.next/
 /out/
+next-env.d.ts
 
 # production
 /build
@@ -27,3 +28,5 @@ yarn-error.log*
 .idea
 
 *.rest
+
+*.tsbuildinfo

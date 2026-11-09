@@ -1,11 +1,11 @@
-import request from "supertest"
-import nock from "nock"
-import app from "../app"
-import knex from "../database/knex"
-import { UserInfo } from "../src/types"
-import { safeClean, safeSeed, configA } from "./util"
 import _ from "lodash"
+import nock from "nock"
 import { Model, snakeCaseMappers } from "objection"
+import request from "supertest"
+
+import app from "../app"
+import redis from "../config/redis"
+import knex from "../database/knex"
 import {
   QuizAnswerStatusModification,
   SpamFlag,
@@ -13,7 +13,8 @@ import {
   Quiz,
   UserQuizState,
 } from "../src/models"
-import redis from "../config/redis"
+import { UserInfo } from "../src/types"
+import { safeClean, safeSeed, configA } from "./util"
 
 beforeAll(() => {
   Model.knex(knex)
@@ -51,9 +52,8 @@ describe("Dashboard: when the status of a quiz answer is manually changed", () =
     expect(res.status).toEqual(200)
 
     // fetch now updated logs
-    const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
-      quizAnswerId,
-    )
+    const logs =
+      await QuizAnswerStatusModification.getAllByQuizAnswerId(quizAnswerId)
 
     if (logs != null) {
       expect(logs[0].modifierId).toEqual(1234)
@@ -70,9 +70,8 @@ describe("Dashboard: when the status of a quiz answer is manually changed", () =
       .send({ status: "rejected" })
     expect(res.status).toEqual(200)
 
-    const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
-      quizAnswerId,
-    )
+    const logs =
+      await QuizAnswerStatusModification.getAllByQuizAnswerId(quizAnswerId)
 
     if (logs != null) {
       expect(logs[1].modifierId).toEqual(1234)
@@ -89,9 +88,8 @@ describe("Dashboard: when the status of a quiz answer is manually changed", () =
       .send({ status: "rejected", plagiarismSuspected: true })
     expect(res.status).toEqual(200)
 
-    const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
-      quizAnswerId,
-    )
+    const logs =
+      await QuizAnswerStatusModification.getAllByQuizAnswerId(quizAnswerId)
 
     if (logs != null) {
       expect(logs[2].modifierId).toEqual(1234)
@@ -125,9 +123,8 @@ describe("Peer review spam:", () => {
 
     const quizAnswerAfterSpamFlag = await QuizAnswer.getById(quizAnswerId)
 
-    const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
-      quizAnswerId,
-    )
+    const logs =
+      await QuizAnswerStatusModification.getAllByQuizAnswerId(quizAnswerId)
 
     expect(quizAnswerAfterSpamFlag.status).toEqual(
       quizAnswerBeforeSpamFlag.status,
@@ -145,9 +142,8 @@ describe("Peer review spam:", () => {
 
     const quizAnswerAfterSpamFlag = await QuizAnswer.getById(quizAnswerId)
 
-    const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
-      quizAnswerId,
-    )
+    const logs =
+      await QuizAnswerStatusModification.getAllByQuizAnswerId(quizAnswerId)
 
     expect(quizAnswerAfterSpamFlag.status).toEqual("spam")
 
@@ -175,11 +171,11 @@ describe("Peer review acceptance or rejection", () => {
   test("should log a peer review accept operation when status changes to confirmed", async () => {
     const quizAnswerId = "0cb3e4de-fc11-4aac-be45-06312aa4677c"
     const quiz = await Quiz.getById("4bf4cf2f-3058-4311-8d16-26d781261af7")
-    const userQuizState = await UserQuizState.getByUserAndQuiz(1234, quiz.id)
+    const userQuizState = (await UserQuizState.getByUserAndQuiz(1234, quiz.id))!
 
     userQuizState.peerReviewsReceived = 2
     userQuizState.peerReviewsGiven = 3
-    await knex.transaction(async trx => {
+    await knex.transaction(async (trx) => {
       await UserQuizState.upsert(userQuizState, trx)
     })
 
@@ -200,9 +196,8 @@ describe("Peer review acceptance or rejection", () => {
       })
       .expect(200)
 
-    const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
-      quizAnswerId,
-    )
+    const logs =
+      await QuizAnswerStatusModification.getAllByQuizAnswerId(quizAnswerId)
 
     if (logs) {
       expect(logs[0].operation).toEqual("peer-review-accept")
@@ -212,11 +207,11 @@ describe("Peer review acceptance or rejection", () => {
   test("should log a peer review reject operation when status changes to rejected", async () => {
     const quizAnswerId = "ae29c3be-b5b6-4901-8588-5b0e88774748"
     const quiz = await Quiz.getById("4bf4cf2f-3058-4311-8d16-26d781261af7")
-    const userQuizState = await UserQuizState.getByUserAndQuiz(2345, quiz.id)
+    const userQuizState = (await UserQuizState.getByUserAndQuiz(2345, quiz.id))!
 
     userQuizState.peerReviewsReceived = 2
     userQuizState.peerReviewsGiven = 3
-    await knex.transaction(async trx => {
+    await knex.transaction(async (trx) => {
       await UserQuizState.upsert(userQuizState, trx)
     })
 
@@ -237,9 +232,8 @@ describe("Peer review acceptance or rejection", () => {
       })
       .expect(200)
 
-    const logs = await QuizAnswerStatusModification.getAllByQuizAnswerId(
-      quizAnswerId,
-    )
+    const logs =
+      await QuizAnswerStatusModification.getAllByQuizAnswerId(quizAnswerId)
 
     if (logs) {
       expect(logs[0].operation).toEqual("peer-review-reject")
@@ -336,7 +330,7 @@ describe("When the status of answers are modified in batch", () => {
 const checkTmcCredentials = () => {
   nock("https://tmc.mooc.fi")
     .get("/api/v8/users/current?show_user_fields=true")
-    .reply(function() {
+    .reply(function () {
       const auth = this.req.headers.authorization
       if (auth === "Bearer pleb_token") {
         return [
@@ -364,5 +358,6 @@ const checkTmcCredentials = () => {
           } as UserInfo,
         ]
       }
+      return [401]
     })
 }

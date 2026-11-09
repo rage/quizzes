@@ -1,3 +1,4 @@
+import { NotFoundError } from "../util/error"
 import { EditCoursePayloadFields } from "./../types/index"
 import BaseModel from "./base_model"
 import Course from "./course"
@@ -16,7 +17,7 @@ class CourseTranslation extends BaseModel {
     return ["course_id", "language_id"]
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     course: {
       relation: BaseModel.HasOneRelation,
       modelClass: Course,
@@ -25,7 +26,7 @@ class CourseTranslation extends BaseModel {
         to: "course.id",
       },
     },
-  }
+  })
 
   static async getById(id: string) {
     return await this.query().findOne({
@@ -43,6 +44,9 @@ class CourseTranslation extends BaseModel {
     payload: EditCoursePayloadFields,
   ) {
     const courseTranslation = await this.getById(id)
+    if (!courseTranslation) {
+      throw new NotFoundError(`course translation not found: ${id}`)
+    }
     return await courseTranslation.$query().patchAndFetch(payload)
   }
 }

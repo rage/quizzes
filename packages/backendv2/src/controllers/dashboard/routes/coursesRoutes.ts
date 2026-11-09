@@ -1,5 +1,7 @@
-import Router from "koa-router"
 import _ from "lodash"
+
+import Router from "@koa/router"
+
 import knex from "../../../../database/knex"
 import accessControl from "../../../middleware/access_control"
 import {
@@ -10,7 +12,12 @@ import {
   CourseTranslation,
 } from "../../../models"
 import UserCoursePartState from "../../../models/user_course_part_state"
-import { CustomContext, CustomState } from "../../../types"
+import {
+  CustomContext,
+  CustomState,
+  EditCourseCompletionPayloadFields,
+  EditCoursePayloadFields,
+} from "../../../types"
 import { BadRequestError } from "../../../util/error"
 import {
   checkAccessOrThrow,
@@ -21,18 +28,18 @@ import {
 const coursesRoutes = new Router<CustomState, CustomContext>({
   prefix: "/courses",
 })
-  .get("/:courseId/quizzes", accessControl(), async ctx => {
+  .get("/:courseId/quizzes", accessControl(), async (ctx) => {
     const courseId = ctx.params.courseId
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await Quiz.getByCourseId(courseId)
   })
 
-  .get("/", accessControl(), async ctx => {
+  .get("/", accessControl(), async (ctx) => {
     const user = ctx.state.user
     ctx.body = await getAccessibleCourses(user, "view")
   })
 
-  .get("/:courseId", accessControl(), async ctx => {
+  .get("/:courseId", accessControl(), async (ctx) => {
     const courseId = ctx.params.courseId
     await checkAccessOrThrow(ctx.state.user, courseId, "view")
     ctx.body = await Course.getFlattenedById(courseId)
@@ -41,61 +48,71 @@ const coursesRoutes = new Router<CustomState, CustomContext>({
   .get(
     "/:courseId/count-answers-requiring-attention",
     accessControl(),
-    async ctx => {
+    async (ctx) => {
       const courseId = ctx.params.courseId
       await checkAccessOrThrow(ctx.state.user, courseId, "view")
       ctx.body = await QuizAnswer.getManualReviewCountsByCourseId(courseId)
     },
   )
-  .post("/:courseId/duplicate-course", accessControl(), async ctx => {
+  .post("/:courseId/duplicate-course", accessControl(), async (ctx) => {
     const oldCourseId = ctx.params.courseId
-    const name = ctx.request.body.name
-    const abbr = ctx.request.body.abbr
-    const languageId = ctx.request.body.lang
+    const {
+      name,
+      abbr,
+      lang: languageId,
+    } = ctx.request.body as {
+      name: string
+      abbr: string
+      lang: string
+    }
     await checkAccessOrThrow(ctx.state.user, oldCourseId, "duplicate")
     ctx.body = await Course.duplicateCourse(oldCourseId, name, abbr, languageId)
   })
 
-  .post("/download-correspondence-file", accessControl(), async ctx => {
-    const oldCourseId = ctx.request.body.oldCourseId
-    const courseId = ctx.request.body.newCourseId
-    ctx.response.set("Content-Type", "text/csv")
+  .post("/download-correspondence-file", accessControl(), async (ctx) => {
+    const { oldCourseId, newCourseId: courseId } = ctx.request.body as {
+      oldCourseId: string
+      newCourseId: string
+    }
+    ctx.response.set("Content-Type", "text/csv; charset=utf-8")
     ctx.response.attachment(`update_ids_from_${oldCourseId}_to_${courseId}.csv`)
     await checkAccessOrThrow(ctx.state.user, oldCourseId, "download")
     const stream = await Course.getCorrespondenceFile(oldCourseId, courseId)
     ctx.body = stream
   })
 
-  .get("/:courseId/user/current/progress", accessControl(), async ctx => {
+  .get("/:courseId/user/current/progress", accessControl(), async (ctx) => {
     const courseId = ctx.params.courseId
     const user = ctx.state.user
     try {
       ctx.body = await knex.transaction(
-        async trx =>
+        async (trx) =>
           await UserCoursePartState.getProgress(user.id, courseId, trx),
       )
     } catch (err) {
       throw err
     }
   })
-  .get("/:courseId/user/abilities", accessControl(), async ctx => {
+  .get("/:courseId/user/abilities", accessControl(), async (ctx) => {
     const courseRole = (
       await UserCourseRole.getByUserIdAndCourseId(
         ctx.state.user.id,
         ctx.params.courseId,
       )
-    ).map(role => role.role)
+    ).map((role) => role.role)
     if (ctx.state.user.administrator) {
       courseRole.push("admin")
     }
     const allAbilities = [
-      ...new Set(courseRole.map(role => abilitiesByRole[role]).flat()),
+      ...new Set(courseRole.map((role) => abilitiesByRole[role]).flat()),
     ]
     ctx.body = allAbilities
   })
-  .post("/:courseId/completion", accessControl(), async ctx => {
+  .post("/:courseId/completion", accessControl(), async (ctx) => {
     const courseId = ctx.params.courseId
-    const payload = ctx.request.body
+    const payload = ctx.request.body as
+      | EditCourseCompletionPayloadFields
+      | undefined
 
     await checkAccessOrThrow(ctx.state.user, courseId, "edit")
 
@@ -115,9 +132,9 @@ const coursesRoutes = new Router<CustomState, CustomContext>({
 
     ctx.body = await Course.getFlattenedById(courseId)
   })
-  .post("/:courseId/edit", accessControl(), async ctx => {
+  .post("/:courseId/edit", accessControl(), async (ctx) => {
     const courseId = ctx.params.courseId
-    const payload = ctx.request.body
+    const payload = ctx.request.body as EditCoursePayloadFields
     const moocfiId = payload.moocfiId
     await checkAccessOrThrow(ctx.state.user, courseId, "edit")
 

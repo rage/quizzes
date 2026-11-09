@@ -1,21 +1,24 @@
 import React from "react"
+
+import { useDispatch } from "react-redux"
 import styled from "styled-components"
+
 import {
   Typography,
   FormControl,
   FormControlLabel,
   Checkbox,
   TextField,
-} from "@material-ui/core"
+} from "@mui/material"
+
 import {
   editedOptionTitle,
   editedOptionSuccessMessage,
   editedOptionFailureMessage,
   editedOptionCorrectness,
 } from "../../../../store/editor/options/optionActions"
-import { useDispatch } from "react-redux"
-import { NormalizedOption } from "../../../../types/NormalizedQuiz"
 import { useTypedSelector } from "../../../../store/store"
+import { NormalizedOption } from "../../../../types/NormalizedQuiz"
 import MarkdownEditor from "../../../MarkdownEditor"
 import { ModalContent } from "../../../Shared/Modal"
 
@@ -24,7 +27,9 @@ interface OptionEditorProps {
 }
 
 export const OptionModalContent = ({ option }: OptionEditorProps) => {
-  const storeOption = useTypedSelector(state => state.editor.options[option.id])
+  const storeOption = useTypedSelector(
+    (state) => state.editor.options[option.id],
+  )
   const dispatch = useDispatch()
   return (
     <>
@@ -40,7 +45,7 @@ export const OptionModalContent = ({ option }: OptionEditorProps) => {
               <Checkbox
                 color="primary"
                 checked={storeOption.correct}
-                onChange={event =>
+                onChange={(event) =>
                   dispatch(
                     editedOptionCorrectness(
                       storeOption.id,
@@ -57,7 +62,7 @@ export const OptionModalContent = ({ option }: OptionEditorProps) => {
         <MarkdownEditor
           label="Option title"
           text={storeOption.title ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedOptionTitle(event.target.value, storeOption.id))
           }
         />
@@ -67,19 +72,19 @@ export const OptionModalContent = ({ option }: OptionEditorProps) => {
           label={storeOption.correct ? "Success message" : "Failure message"}
           text={
             storeOption.correct
-              ? storeOption.successMessage ?? ""
-              : storeOption.failureMessage ?? ""
+              ? (storeOption.successMessage ?? "")
+              : (storeOption.failureMessage ?? "")
           }
           onChange={
             storeOption.correct
-              ? event =>
+              ? (event) =>
                   dispatch(
                     editedOptionSuccessMessage(
                       storeOption.id,
                       event.target.value,
                     ),
                   )
-              : event =>
+              : (event) =>
                   dispatch(
                     editedOptionFailureMessage(
                       storeOption.id,

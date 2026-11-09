@@ -1,5 +1,7 @@
+import type React from "react"
+
 export interface ITabToComponent {
-  [key: string]: (any) => JSX.Element
+  [key: string]: (props: any) => React.JSX.Element
 }
 
 export interface EditCoursePayloadFields {

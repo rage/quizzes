@@ -1,4 +1,8 @@
 * {
-    margin: 0;
-    padding: 0;
+  margin: 0;
+  padding: 0;
+}
+/* Font Awesome 7 makes every icon fixed-width; keep the natural widths the layout was built for */
+.svg-inline--fa {
+  --fa-width: auto;
 }

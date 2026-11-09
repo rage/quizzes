@@ -1,20 +1,17 @@
 import React, { useState } from "react"
+
 import styled from "styled-components"
-import {
-  Button,
-  TextField,
-  Snackbar,
-  Typography,
-  Fade,
-} from "@material-ui/core"
-import usePromise from "react-use-promise"
-import { Course } from "../../types/Quiz"
+import useSWR from "swr"
+
+import { Button, TextField, Snackbar, Typography, Fade } from "@mui/material"
+import { Alert, Autocomplete } from "@mui/material"
+
 import {
   duplicateCourse,
   getAllLanguages,
   getCorrespondenceFile,
 } from "../../services/quizzes"
-import { Alert, Autocomplete } from "@material-ui/lab"
+import { Course } from "../../types/Quiz"
 
 const SubmitButton = styled(Button)`
   display: flex !important;
@@ -47,7 +44,7 @@ const StyledTextField = styled(TextField)`
   margin-top: 1.5rem !important;
 `
 
-const MessageBox = styled.div<{ success: boolean }>`
+const MessageBox = styled.div<{ $success: boolean }>`
   display: flex;
   justify-content: center;
   margin-top: 1rem;
@@ -56,8 +53,8 @@ const MessageBox = styled.div<{ success: boolean }>`
   border-style: solid;
   border-radius: 5px !important;
   border-width: 5px !important;
-  border-color: ${props => {
-    if (props.success) {
+  border-color: ${(props) => {
+    if (props.$success) {
       return "#76ff03"
     } else {
       return "#ef5350"
@@ -70,7 +67,9 @@ interface DuplicateModalProps {
 }
 
 export const DuplicateModal = ({ course }: DuplicateModalProps) => {
-  const [langs, langsError] = usePromise(() => getAllLanguages(), [])
+  const { data: langs, error: langsError } = useSWR("languages", () =>
+    getAllLanguages(),
+  )
   const [name, setName] = useState("")
   const [abbr, setAbbr] = useState("")
   const [lang, setLang] = useState(course.languageId)
@@ -105,7 +104,7 @@ export const DuplicateModal = ({ course }: DuplicateModalProps) => {
   }
 
   const langsProps: LangsProps = {
-    getOptionLabel: lang => lang.name,
+    getOptionLabel: (lang) => lang.name,
     onChange: (_event, value, _reason) => setLang(value ? value.id : ""),
   }
 
@@ -136,7 +135,7 @@ export const DuplicateModal = ({ course }: DuplicateModalProps) => {
                 variant="outlined"
                 inputMode="text"
                 name="name"
-                onChange={event => {
+                onChange={(event) => {
                   setName(event.target.value)
                 }}
               />
@@ -148,14 +147,14 @@ export const DuplicateModal = ({ course }: DuplicateModalProps) => {
                 variant="outlined"
                 inputMode="text"
                 name="abbr"
-                onChange={event => setAbbr(event.target.value)}
+                onChange={(event) => setAbbr(event.target.value)}
               />
             </InputContainer>
             <InputContainer>
               <Autocomplete
                 options={langs}
                 {...langsProps}
-                renderInput={params => (
+                renderInput={(params) => (
                   <StyledTextField
                     {...params}
                     label="Languages"
@@ -175,7 +174,7 @@ export const DuplicateModal = ({ course }: DuplicateModalProps) => {
               </SubmitButton>
             </SubmitButtonWrapper>
             <Fade in={response}>
-              <MessageBox success={success}>
+              <MessageBox $success={success}>
                 {success ? (
                   <Typography>Course duplicated succesfully!</Typography>
                 ) : (

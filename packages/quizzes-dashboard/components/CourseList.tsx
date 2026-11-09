@@ -1,5 +1,11 @@
 import React, { useState } from "react"
+
+import _ from "lodash"
+import Link from "next/link"
 import styled from "styled-components"
+
+import { faFilter } from "@fortawesome/free-solid-svg-icons"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
   Card,
   CardContent,
@@ -8,14 +14,11 @@ import {
   InputAdornment,
   Checkbox,
   CardHeader,
-} from "@material-ui/core"
-import Link from "next/link"
+} from "@mui/material"
+
 import { Course } from "../types/Quiz"
-import _ from "lodash"
 import DebugDialog from "./DebugDialog"
 import SkeletonLoader from "./Shared/SkeletonLoader"
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faFilter } from "@fortawesome/free-solid-svg-icons"
 
 interface CourseListProps {
   data: Course[] | undefined
@@ -66,10 +69,10 @@ const EndedText = styled.span`
   margin-bottom: 8px;
 `
 
-const CardContainer = styled.div`
-  &:hover {
-    cursor: pointer;
-  }
+const CardContainer = styled(Link)`
+  display: block;
+  color: inherit;
+  text-decoration: none;
   margin-bottom: 16px;
 `
 
@@ -80,18 +83,16 @@ const CourseCard: React.FC<CourseCardProps> = ({
   active,
 }) => {
   return (
-    <Link key={courseId} href={`/courses/${courseId}/listing`} passHref>
-      <CardContainer>
-        <Card>
-          <CardHeader title={name} subheader={abbreviation} />
-          {active ? (
-            <ActiveText> active </ActiveText>
-          ) : (
-            <EndedText> ended </EndedText>
-          )}
-        </Card>
-      </CardContainer>
-    </Link>
+    <CardContainer href={`/courses/${courseId}/listing`}>
+      <Card>
+        <CardHeader title={name} subheader={abbreviation} />
+        {active ? (
+          <ActiveText> active </ActiveText>
+        ) : (
+          <EndedText> ended </EndedText>
+        )}
+      </Card>
+    </CardContainer>
   )
 }
 
@@ -110,15 +111,15 @@ const CourseList = ({ data, error }: CourseListProps) => {
   const getFilteredAndSortedCourses = () => {
     let courses = _.chain(data)
     if (!showActiveCourses) {
-      courses = courses.filter(course => course.status !== "active")
+      courses = courses.filter((course) => course.status !== "active")
     }
     if (!showEndedCourses) {
-      courses = courses.filter(course => course.status !== "ended")
+      courses = courses.filter((course) => course.status !== "ended")
     }
     if (filterWord.trim() !== "") {
       const filterWordLowerCase = filterWord.toLowerCase()
       courses = courses.filter(
-        course =>
+        (course) =>
           course.title.toLowerCase().includes(filterWordLowerCase) ||
           course.abbreviation.toLowerCase().includes(filterWordLowerCase),
       )
@@ -206,15 +207,17 @@ const CourseList = ({ data, error }: CourseListProps) => {
             label="Filter courses"
             id="outlined-start-adornment"
             value={filterWord}
-            onChange={evt => {
+            onChange={(evt) => {
               setFilterWord(evt.target.value)
             }}
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <FontAwesomeIcon icon={faFilter} />
-                </InputAdornment>
-              ),
+            slotProps={{
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <FontAwesomeIcon icon={faFilter} />
+                  </InputAdornment>
+                ),
+              },
             }}
           />
 
@@ -227,7 +230,7 @@ const CourseList = ({ data, error }: CourseListProps) => {
                 id="course-sorting-order"
                 value={sortOrder}
                 label="Sort courses"
-                onChange={evt => {
+                onChange={(evt) => {
                   setSortOrder(evt.target.value)
                 }}
               >
@@ -274,8 +277,9 @@ const CourseList = ({ data, error }: CourseListProps) => {
         </CardContent>
       </Card>
 
-      {courses.map(course => (
+      {courses.map((course) => (
         <CourseCard
+          key={course.id}
           courseId={course.id}
           name={course.title}
           abbreviation={course.abbreviation}

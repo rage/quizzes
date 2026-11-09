@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react"
-import { Checkbox } from "@material-ui/core"
 
-import { Answer } from "../../types/Answer"
-import { Card } from "@material-ui/core"
 import styled from "styled-components"
-import { AnswerContent } from "./CardContent"
-import { editableAnswerStates } from "../constants"
+
+import { Checkbox } from "@mui/material"
+import { Card } from "@mui/material"
+
 import {
   setBulkSelectedIds,
   useAnswerListState,
 } from "../../contexts/AnswerListContext"
+import { Answer } from "../../types/Answer"
+import { editableAnswerStates } from "../constants"
+import { AnswerContent } from "./CardContent"
 
 interface AdditionalAnswerCardProps {
   $faded: boolean
@@ -19,10 +21,8 @@ interface AdditionalAnswerCardProps {
 
 const AnswerCardWrapper = styled.div`
   display: flex;
-  .PrivateSwitchBase-root-5 {
-    &:hover {
-      background: transparent !important;
-    }
+  .custom-checkbox-root:hover {
+    background: transparent !important;
   }
 
   .custom-checkbox-root .MuiSvgIcon-root {
@@ -47,9 +47,11 @@ export const StyledAnswerCard = styled(Card)<AdditionalAnswerCardProps>`
   margin: 1.5rem 0;
   flex-wrap: wrap;
   padding: 2.5rem;
-  box-shadow: rgba(0, 0, 0, 0.15) 0px 2px 7px 0px,
-    rgba(0, 0, 0, 0.15) 0px 3px 6px -2px, rgba(0, 0, 0, 0.25) 0px 1px 10px 0px !important;
-  background-color: ${props => {
+  box-shadow:
+    rgba(0, 0, 0, 0.15) 0px 2px 7px 0px,
+    rgba(0, 0, 0, 0.15) 0px 3px 6px -2px,
+    rgba(0, 0, 0, 0.25) 0px 1px 10px 0px !important;
+  background-color: ${(props) => {
     if (props.$deleted) {
       return `rgba(110, 110, 110, 0.2) !important;`
     }
@@ -72,14 +74,12 @@ export const AnswerCard = ({ answer }: AnswerProps) => {
   const [faded, setFaded] = useState(false)
   const [statusChange, setStatusChange] = useState("")
   const [checked, setChecked] = useState(false)
-  const [
-    { bulkSelectMode, bulkSelectedIds, handledAnswers },
-    dispatch,
-  ] = useAnswerListState()
+  const [{ bulkSelectMode, bulkSelectedIds, handledAnswers }, dispatch] =
+    useAnswerListState()
 
   useEffect(() => {
     setChecked(bulkSelectedIds.includes(answer.id))
-    handledAnswers.forEach(a => {
+    handledAnswers.forEach((a) => {
       if (a.id === answer.id) {
         setStatusChange(a.status)
         setFaded(true)
@@ -113,7 +113,9 @@ export const AnswerCard = ({ answer }: AnswerProps) => {
           color="primary"
           checked={checked}
           onChange={handleAnswerSelection}
-          inputProps={{ "aria-label": "Select answer" }}
+          slotProps={{
+            input: { "aria-label": "Select answer" },
+          }}
         />
       )}
       <StyledAnswerCard

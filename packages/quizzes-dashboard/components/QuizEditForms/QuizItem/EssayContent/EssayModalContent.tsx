@@ -1,14 +1,17 @@
 import React from "react"
-import styled from "styled-components"
-import { TextField, Typography } from "@material-ui/core"
-import { useTypedSelector } from "../../../../store/store"
-import { NormalizedItem } from "../../../../types/NormalizedQuiz"
+
 import { useDispatch } from "react-redux"
+import styled from "styled-components"
+
+import { TextField, Typography } from "@mui/material"
+
 import {
   editedItemMinWords,
   editedItemMaxWords,
   editedQuizItemBody,
 } from "../../../../store/editor/items/itemAction"
+import { useTypedSelector } from "../../../../store/store"
+import { NormalizedItem } from "../../../../types/NormalizedQuiz"
 import MarkdownEditor from "../../../MarkdownEditor"
 import { ModalContent, ModalContentTitleWrapper } from "../../../Shared/Modal"
 
@@ -27,7 +30,7 @@ interface ModalContentProps {
 }
 
 export const EssayModalContent = ({ item }: ModalContentProps) => {
-  const storeItem = useTypedSelector(state => state.editor.items[item.id])
+  const storeItem = useTypedSelector((state) => state.editor.items[item.id])
   const dispatch = useDispatch()
   return (
     <>
@@ -38,7 +41,7 @@ export const EssayModalContent = ({ item }: ModalContentProps) => {
         <MarkdownEditor
           label="Description for this quiz item"
           text={storeItem.body ?? ""}
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedQuizItemBody(event.target.value, storeItem.id))
           }
         />
@@ -50,7 +53,7 @@ export const EssayModalContent = ({ item }: ModalContentProps) => {
           variant="outlined"
           value={item.maxWords ?? ""}
           type="number"
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedItemMaxWords(item.id, Number(event.target.value)))
           }
         />
@@ -60,7 +63,7 @@ export const EssayModalContent = ({ item }: ModalContentProps) => {
           variant="outlined"
           value={item.minValue ?? ""}
           type="number"
-          onChange={event =>
+          onChange={(event) =>
             dispatch(editedItemMinWords(item.id, Number(event.target.value)))
           }
         />

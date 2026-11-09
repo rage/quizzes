@@ -1,10 +1,8 @@
-import { createStore, combineReducers } from "redux"
-import { composeWithDevTools } from "redux-devtools-extension"
 import { useSelector, TypedUseSelectorHook } from "react-redux"
-import { optionReducer } from "./editor/options/optionReducer"
-import { itemReducer } from "./editor/items/itemReducer"
-import { quizReducer } from "./editor/quiz/quizReducer"
-import { resultReducer } from "./editor/result/resultReducer"
+import { createStore, combineReducers } from "redux"
+
+import { composeWithDevTools } from "@redux-devtools/extension"
+
 import {
   NormalizedQuiz,
   NormalizedItem,
@@ -16,13 +14,17 @@ import {
   NormalizedQuestion,
   peerReviewVariables,
 } from "../types/NormalizedQuiz"
-import { itemVariableReducers } from "./editor/itemVariables/itemVariableReducers"
-import { optionVariableReducers } from "./editor/optionVariables/optionVariableReducers"
-import { quizVariableReducers } from "./editor/quizVariables/quizVariableReducers"
 import editorChangesReducer from "./editor/editorReducer"
+import { itemReducer } from "./editor/items/itemReducer"
+import { itemVariableReducers } from "./editor/itemVariables/itemVariableReducers"
+import { optionReducer } from "./editor/options/optionReducer"
+import { optionVariableReducers } from "./editor/optionVariables/optionVariableReducers"
 import { peerReviewReducer } from "./editor/peerReviewCollections/peerReviewCollectionReducer"
-import { questionReducer } from "./editor/questions/questionReducer"
 import { peerReviewVariablesReducer } from "./editor/peerReviewVariables/peerReviewCollectionsVariablesReducer"
+import { questionReducer } from "./editor/questions/questionReducer"
+import { quizReducer } from "./editor/quiz/quizReducer"
+import { quizVariableReducers } from "./editor/quizVariables/quizVariableReducers"
+import { resultReducer } from "./editor/result/resultReducer"
 
 const editorReducer = combineReducers({
   quizzes: quizReducer,

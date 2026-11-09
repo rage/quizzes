@@ -1,0 +1,32 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "semi": false,
+  "singleQuote": false,
+  "trailingComma": "all",
+  "printWidth": 80,
+  "bracketSpacing": true,
+  "sortPackageJson": true,
+  "sortImports": {
+    "customGroups": [
+      { "groupName": "react", "elementNamePattern": ["react", "react-dom"] },
+      { "groupName": "scoped", "elementNamePattern": ["@*/**", "@*"] }
+    ],
+    "groups": [
+      ["builtin", "react"],
+      "external",
+      "scoped",
+      ["parent", "sibling", "index"],
+      "unknown"
+    ]
+  },
+  "ignorePatterns": [
+    "node_modules",
+    ".next",
+    "dist",
+    "coverage",
+    "**/pnpm-lock.yaml",
+    "kubernetes",
+    "packages/moocfi-quizzes",
+    "**/next-env.d.ts"
+  ]
+}

@@ -17,13 +17,6 @@ spec:
       paths:
       - backend:
           service:
-            name: quizzes-backend-service
-            port:
-              number: 80
-        path: /api/
-        pathType: Prefix
-      - backend:
-          service:
             name: quizzes-backendv2-service
             port:
               number: 80

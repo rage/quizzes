@@ -1,5 +1,6 @@
 import axios, { AxiosError, AxiosResponse } from "axios"
 import TmcClient from "tmc-client-js"
+
 import { TMCCredentials, TMCProfile, TMCProfileDetails } from "../types/TMC"
 
 const BASE_URL = "https://tmc.mooc.fi/api/v8"
@@ -29,7 +30,7 @@ export const authenticate = async (
   try {
     return await tmcClient.authenticate(credentials)
   } catch (e) {
-    return e
+    return e as TMCProfile
   }
 }
 
@@ -43,5 +44,3 @@ export const checkStore = ():
   const res = tmcClient.getUser()
   return res
 }
-
-export default { getProfile, authenticate, checkStore, unauthenticate }

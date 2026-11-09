@@ -14,15 +14,12 @@ else
   REV="$DATE-$(git rev-parse --verify HEAD)"
 fi
 
-export DASHBOARD_IMAGE="eu.gcr.io/moocfi/quizzes-dashboard:build-$REV"
-export BACKEND_IMAGE="eu.gcr.io/moocfi/quizzes-backend:build-$REV"
 export DASHBOARDV2_IMAGE="eu.gcr.io/moocfi/quizzes-dashboardv2:build-$REV"
 export BACKENDV2_IMAGE="eu.gcr.io/moocfi/quizzes-backendv2:build-$REV"
 
 echo "Building new Kubernetes configs"
 mkdir -p "$CURRENT_DIR/../updated-kubernetes-configs"
 envsubst < "$CURRENT_DIR/../kubernetes/quizzes-ingress.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/quizzes-ingress.yaml"
-envsubst < "$CURRENT_DIR/../kubernetes/backend-deployment.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/backend-deployment.yaml"
 envsubst < "$CURRENT_DIR/../kubernetes/backendv2-deployment.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/backendv2-deployment.yaml"
 envsubst < "$CURRENT_DIR/../kubernetes/dashboardv2-deployment.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/dashboardv2-deployment.yaml"
 envsubst < "$CURRENT_DIR/../kubernetes/kafka-batch-producer-cronjob.yaml" > "$CURRENT_DIR/../updated-kubernetes-configs/kafka-batch-producer-cronjob.yaml"
@@ -31,3 +28,9 @@ envsubst < "$CURRENT_DIR/../kubernetes/kafka-background-producer-deployment.yaml
 
 echo "Applying changes"
 kubectl replace -f "$CURRENT_DIR/../updated-kubernetes-configs"
+# apply, not replace: this cronjob may not exist in the cluster yet
+envsubst < "$CURRENT_DIR/../kubernetes/course-expired-cronjob.yaml" | kubectl apply -f -
+
+echo "Removing retired backend v1 resources"
+kubectl delete --ignore-not-found deployment quizzes-backend-deployment
+kubectl delete --ignore-not-found service quizzes-backend-service ws

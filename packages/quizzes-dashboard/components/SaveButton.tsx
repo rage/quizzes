@@ -1,22 +1,26 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useMemo } from "react"
+
+import { isAxiosError } from "axios"
+import { denormalize, normalize } from "normalizr"
+import { useDispatch } from "react-redux"
+import styled from "styled-components"
+
 import {
   Typography,
   CircularProgress,
   Snackbar,
   Fab,
   Zoom,
-} from "@material-ui/core"
-import Alert from "@material-ui/lab/Alert"
-import { useDispatch } from "react-redux"
+} from "@mui/material"
+import Alert from "@mui/material/Alert"
+
+import { normalizedQuiz } from "../schemas"
 import { saveQuiz } from "../services/quizzes"
 import {
   initializedEditor,
   checkForChanges,
 } from "../store/editor/editorActions"
 import { useTypedSelector, storeState } from "../store/store"
-import { denormalize, normalize } from "normalizr"
-import styled from "styled-components"
-import { normalizedQuiz } from "../schemas"
 import {
   TEditorItem,
   TEditorPeerReviewCollection,
@@ -50,16 +54,27 @@ const StyledCircularProgress = styled(CircularProgress)`
   }
 `
 
+const saveErrorMessage = (error: unknown): string => {
+  if (isAxiosError<{ message?: string }>(error)) {
+    return error.response?.data?.message ?? error.message
+  }
+  return error instanceof Error ? error.message : String(error)
+}
+
 const SaveButton = () => {
   const dispatch = useDispatch()
 
   const [saved, setSaved] = useState(true)
   const [showMessage, setShowMessage] = useState(false)
   const [showSpinner, setShowSpinner] = useState(false)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
-  const store = useTypedSelector(state => state)
-  const quizId = useTypedSelector(state => state.editor.quizId)
-  const changes = useTypedSelector(state => state.editor.editorChanges.changes)
+  const editor = useTypedSelector((state) => state.editor)
+  const store = useMemo(() => ({ editor }), [editor])
+  const quizId = useTypedSelector((state) => state.editor.quizId)
+  const changes = useTypedSelector(
+    (state) => state.editor.editorChanges.changes,
+  )
 
   const handleClick = async (store: storeState) => {
     setSaved(false)
@@ -80,13 +95,13 @@ const SaveButton = () => {
         for (let option of item.options) {
           if (
             store.editor.itemVariables[item.id].newOptions.some(
-              id => id === option.id,
+              (id) => id === option.id,
             )
           ) {
             delete (option as TEditorOption).id
             if (
               store.editor.quizVariables[store.editor.quizId].newItems.some(
-                id => id === item.id,
+                (id) => id === item.id,
               )
             ) {
               delete option.quizItemId
@@ -96,7 +111,7 @@ const SaveButton = () => {
       }
       if (
         store.editor.quizVariables[store.editor.quizId].newItems.some(
-          id => id === item.id,
+          (id) => id === item.id,
         )
       ) {
         delete (item as TEditorItem).id
@@ -112,13 +127,13 @@ const SaveButton = () => {
           if (
             store.editor.peerReviewCollectionVariables[
               peerReviewCollection.id
-            ].newQuestions.some(id => id === question.id)
+            ].newQuestions.some((id) => id === question.id)
           ) {
             delete (question as TEditorQuestion).id
             if (
               store.editor.quizVariables[
                 store.editor.quizId
-              ].newPeerReviews.some(id => id === peerReviewCollection.id)
+              ].newPeerReviews.some((id) => id === peerReviewCollection.id)
             ) {
               delete question.peerReviewCollectionId
             }
@@ -127,7 +142,7 @@ const SaveButton = () => {
       }
       if (
         store.editor.quizVariables[store.editor.quizId].newPeerReviews.some(
-          id => id === peerReviewCollection.id,
+          (id) => id === peerReviewCollection.id,
         )
       ) {
         delete (peerReviewCollection as TEditorPeerReviewCollection).id
@@ -136,10 +151,8 @@ const SaveButton = () => {
     if (store.editor.quizVariables[store.editor.quizId].newQuiz) {
       delete (quiz as TEditorQuiz).id
     }
-    const response = await saveQuiz(quiz)
-
-    setShowSpinner(false)
-    if (response.errorMessage === undefined) {
+    try {
+      const response = await saveQuiz(quiz)
       const normalizedResponse = normalize(response, normalizedQuiz)
       const data = {
         quizzes: normalizedResponse.entities.quizzes ?? {},
@@ -152,8 +165,12 @@ const SaveButton = () => {
       }
       dispatch(initializedEditor(data, response))
       setSaved(true)
+    } catch (error) {
+      setErrorMessage(saveErrorMessage(error))
+    } finally {
+      setShowSpinner(false)
+      setShowMessage(true)
     }
-    setShowMessage(true)
   }
 
   useEffect(() => {
@@ -176,6 +193,7 @@ const SaveButton = () => {
           ) : (
             <Alert severity="error" onClose={() => setShowMessage(false)}>
               Something went wrong, couldn't save quiz!
+              {errorMessage && ` ${errorMessage}`}
             </Alert>
           )}
         </Snackbar>

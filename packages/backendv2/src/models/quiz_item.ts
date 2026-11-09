@@ -1,9 +1,10 @@
-import Quiz from "./quiz"
-import QuizOption from "./quiz_option"
-import QuizItemTranslation from "./quiz_item_translation"
-import BaseModel from "./base_model"
 import { mixin } from "objection"
-import softDelete from "objection-soft-delete"
+
+import BaseModel from "./base_model"
+import Quiz from "./quiz"
+import QuizItemTranslation from "./quiz_item_translation"
+import QuizOption from "./quiz_option"
+import softDelete from "./soft_delete"
 
 export type QuizItemType =
   | "open"
@@ -44,7 +45,7 @@ class QuizItem extends mixin(BaseModel, [
     return "quiz_item"
   }
 
-  static relationMappings = {
+  static relationMappings = () => ({
     quiz: {
       relation: BaseModel.BelongsToOneRelation,
       modelClass: Quiz,
@@ -69,9 +70,9 @@ class QuizItem extends mixin(BaseModel, [
         to: "quiz_item_translation.quiz_item_id",
       },
     },
-  }
+  })
 
-  static async getById(id: string): Promise<QuizItem> {
+  static async getById(id: string): Promise<QuizItem | undefined> {
     return await this.query().findById(id)
   }
 }

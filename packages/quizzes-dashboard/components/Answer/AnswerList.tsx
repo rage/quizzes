@@ -1,8 +1,10 @@
-import { Button, Slide, Snackbar, Typography } from "@material-ui/core"
-import { TransitionProps } from "@material-ui/core/transitions"
-import { Alert } from "@material-ui/lab"
 import React, { useEffect, useState } from "react"
+
 import styled from "styled-components"
+
+import { Button, Snackbar, Typography } from "@mui/material"
+import { Alert } from "@mui/material"
+
 import {
   setHandledAnswers,
   useAnswerListState,
@@ -11,6 +13,7 @@ import { changeAnswerStatusForMany } from "../../services/quizzes"
 import { Answer } from "../../types/Answer"
 import AnswerCard from "../Answer"
 import { ButtonFieldWrapper } from "../Shared/ButtonFieldWrapper"
+import { SlideDown } from "../Shared/SlideDown"
 
 export interface AnswerListProps {
   data: Answer[]
@@ -58,7 +61,7 @@ export const AnswerList = ({ data }: AnswerListProps) => {
         const returnedIds = res.map((updated: Answer) => updated.id)
 
         setAnswers(
-          answers.map(answer => {
+          answers.map((answer) => {
             if (returnedIds.includes(answer.id)) {
               return { ...answer, status: actionType }
             }
@@ -80,9 +83,7 @@ export const AnswerList = ({ data }: AnswerListProps) => {
         onClose={() => setShowSnacks(false)}
         autoHideDuration={5000}
         anchorOrigin={{ vertical: "top", horizontal: "center" }}
-        TransitionComponent={(props: TransitionProps) => {
-          return <Slide {...props} direction="down" />
-        }}
+        slots={{ transition: SlideDown }}
       >
         <Alert severity={handledAnswers ? "success" : "error"}>
           {handledAnswers ? (
@@ -127,7 +128,7 @@ export const AnswerList = ({ data }: AnswerListProps) => {
           </ButtonFieldWrapper>
         </BulkActionWrapper>
       )}
-      {answers.map(answer => (
+      {answers.map((answer) => (
         <AnswerCard key={answer.id} answer={answer} />
       ))}
     </>

@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react"
-import {
-  TextField,
-  Tab,
-  Tabs,
-  Paper,
-  Typography,
-  Link,
-} from "@material-ui/core"
+
 import styled from "styled-components"
+
+import { TextField, Tab, Tabs, Paper, Typography, Link } from "@mui/material"
+
 import { MarkDownText } from "./MarkDownText"
 
 const StyledAppBar = styled(Paper)`
@@ -69,7 +65,7 @@ export const MarkdownEditor = ({
         <HelperText>
           This is markdown editor. You can write your text as markdown and
           preview it by selecting "PREVIEW". For more info about markdown visit
-          <Link href="https://spec.commonmark.org/current/">
+          <Link href="https://spec.commonmark.org/current/" underline="hover">
             {" "}
             https://spec.commonmark.org/current/
           </Link>
@@ -82,7 +78,7 @@ export const MarkdownEditor = ({
             type="text"
             value={text}
             onChange={onChange}
-            rowsMax={1000}
+            maxRows={1000}
             multiline
             required
           />

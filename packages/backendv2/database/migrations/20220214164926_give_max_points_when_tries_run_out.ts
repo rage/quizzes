@@ -1,7 +1,7 @@
-import * as Knex from "knex"
+import type { Knex } from "knex"
 
 export async function up(knex: Knex): Promise<void> {
-  await knex.schema.table("quiz", table => {
+  await knex.schema.table("quiz", (table) => {
     table
       .boolean("give_max_points_when_tries_run_out")
       .defaultTo(false)
@@ -10,7 +10,7 @@ export async function up(knex: Knex): Promise<void> {
 }
 
 export async function down(knex: Knex): Promise<void> {
-  await knex.schema.table("quiz", table => {
+  await knex.schema.table("quiz", (table) => {
     table.dropColumn("give_max_points_when_tries_run_out")
   })
 }
