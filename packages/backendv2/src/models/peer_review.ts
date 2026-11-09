@@ -1,3 +1,4 @@
+import _ from "lodash"
 import { mixin } from "objection"
 
 import knex from "../../database/knex"
@@ -14,6 +15,7 @@ class PeerReview extends BaseModel {
   id!: string
   userId!: number
   quizAnswerId!: string
+  peerReviewCollectionId!: string
   rejectedQuizAnswerIds!: string[]
   answers!: PeerReviewQuestionAnswer[]
   questions!: PeerReviewQuestion[]
@@ -57,6 +59,25 @@ class PeerReview extends BaseModel {
     return peerReviews
   }
 
+  /** Builds a review by `userId` from a widget submission body, keeping only the fields a reviewer sets. */
+  public static fromSubmission(body: any, userId: number): PeerReview {
+    if (!Array.isArray(body?.answers)) {
+      throw new BadRequestError("review must contain answers")
+    }
+    return this.fromJson({
+      ..._.pick(body, [
+        "quizAnswerId",
+        "peerReviewCollectionId",
+        "rejectedQuizAnswerIds",
+      ]),
+      userId,
+      answers: body.answers.map((answer: any) =>
+        _.pick(answer, ["peerReviewQuestionId", "value", "text"]),
+      ),
+    })
+  }
+
+  /** Stores a review; `peerReview` must come from `fromSubmission`. */
   public static async givePeerReview(
     peerReview: PeerReview,
     skipGiverRequirements: boolean = false,
@@ -92,6 +113,7 @@ class PeerReview extends BaseModel {
     const targetQuizAnswer = await QuizAnswer.getById(quizAnswerId)
 
     const quizId = targetQuizAnswer.quizId
+    await this.checkQuestionsBelongToQuiz(peerReview, quizId)
 
     let sourceQuizAnswer: QuizAnswer | null = null
     if (!skipGiverRequirements) {
@@ -152,12 +174,13 @@ class PeerReview extends BaseModel {
       if (isUpdating && peerReviewAlreadyGiven) {
         const peerReviewData = this.fromJson(peerReview)
         peerReviewData.id = peerReviewAlreadyGiven.id
-        newPeerReview =
-          await this.query(trx).upsertGraphAndFetch(peerReviewData)
+        newPeerReview = await this.query(trx)
+          .allowGraph("answers")
+          .upsertGraphAndFetch(peerReviewData)
       } else {
-        newPeerReview = await this.query(trx).insertGraphAndFetch(
-          this.fromJson(peerReview),
-        )
+        newPeerReview = await this.query(trx)
+          .allowGraph("answers")
+          .insertGraphAndFetch(this.fromJson(peerReview))
       }
 
       // update quiz answers for both users
@@ -189,6 +212,40 @@ class PeerReview extends BaseModel {
     } catch (err) {
       await trx.rollback()
       throw err
+    }
+  }
+
+  /**
+   * Throws a BadRequestError unless the review's collection belongs to the quiz and every
+   * answer is to a question of that collection. Deleted ones count, as a widget may still
+   * show them.
+   */
+  private static async checkQuestionsBelongToQuiz(
+    peerReview: PeerReview,
+    quizId: string,
+  ) {
+    const collection =
+      peerReview.peerReviewCollectionId &&
+      (await knex("peer_review_collection")
+        .select("id")
+        .where({ id: peerReview.peerReviewCollectionId, quiz_id: quizId })
+        .first())
+    if (!collection) {
+      throw new BadRequestError(
+        "peer review collection does not belong to the quiz",
+      )
+    }
+    const questionIds = new Set(
+      peerReview.answers.map((answer) => answer.peerReviewQuestionId),
+    )
+    const questions = await knex("peer_review_question")
+      .select("id")
+      .whereIn("id", [...questionIds])
+      .andWhere("peer_review_collection_id", collection.id)
+    if (questions.length !== questionIds.size) {
+      throw new BadRequestError(
+        "peer review question does not belong to the collection",
+      )
     }
   }
 

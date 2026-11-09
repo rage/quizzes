@@ -498,14 +498,43 @@ class QuizAnswer extends mixin(BaseModel, [
     return question
   }
 
-  public static async newAnswer(userId: number, quizAnswer: QuizAnswer) {
-    if (quizAnswer.deleted) {
+  /**
+   * Builds an answer from a widget submission body, keeping only the fields a student sets.
+   *
+   * Other fields are dropped rather than rejected: the widget resubmits its stored answer,
+   * server-set fields included.
+   */
+  public static fromSubmission(body: any): QuizAnswer {
+    if (body?.deleted) {
       throw new BadRequestError("A new answer cannot be marked as deleted.")
     }
+    const itemAnswers = Array.isArray(body?.itemAnswers)
+      ? body.itemAnswers.map((itemAnswer: any) => ({
+          ..._.pick(itemAnswer, [
+            "quizItemId",
+            "textData",
+            "intData",
+            "correct",
+          ]),
+          optionAnswers: Array.isArray(itemAnswer?.optionAnswers)
+            ? itemAnswer.optionAnswers.map((optionAnswer: any) =>
+                _.pick(optionAnswer, ["quizOptionId"]),
+              )
+            : undefined,
+        }))
+      : undefined
+    return this.fromJson({
+      ..._.pick(body, ["quizId", "createdAt"]),
+      itemAnswers,
+    })
+  }
 
+  /** Grades and stores a student's submission; `quizAnswer` must come from `fromSubmission`. */
+  public static async newAnswer(userId: number, quizAnswer: QuizAnswer) {
     const trx = await knex.transaction()
     try {
       const quizId = quizAnswer.quizId
+      await UserQuizState.lockForSubmission(userId, quizId, trx)
       const isUserInDb = await User.getById(userId, trx)
       if (!isUserInDb) {
         quizAnswer.user = User.fromJson({ id: userId })
@@ -519,6 +548,16 @@ class QuizAnswer extends mixin(BaseModel, [
         UserQuizState.fromJson({ userId, quizId, tries: 0 })
       this.checkIfSubmittable(quiz, userQuizState)
       this.removeIds(quizAnswer)
+      if (
+        !(await this.isAttemptCreationTime(
+          userId,
+          quizId,
+          quizAnswer.createdAt,
+          trx,
+        ))
+      ) {
+        delete (quizAnswer as Partial<QuizAnswer>).createdAt
+      }
       await this.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -526,13 +565,16 @@ class QuizAnswer extends mixin(BaseModel, [
         course,
         trx,
       )
+      await this.checkAnswersBelongToQuiz(quizAnswer, quizId, trx)
       this.assessAnswer(quizAnswer, quiz)
       this.gradeAnswer(quizAnswer, userQuizState, quiz)
       this.assessUserQuizStatus(quizAnswer, userQuizState, quiz, false)
       let savedQuizAnswer
       let savedUserQuizState
       await this.markPreviousAsDeprecated(userId, quizId, trx)
-      savedQuizAnswer = await this.query(trx).insertGraphAndFetch(quizAnswer)
+      savedQuizAnswer = await this.query(trx)
+        .allowGraph("[user, itemAnswers.optionAnswers]")
+        .insertGraphAndFetch(quizAnswer)
       savedUserQuizState = await UserQuizState.upsert(userQuizState, trx)
       if (savedQuizAnswer.status === "confirmed") {
         await UserCoursePartState.update(
@@ -558,8 +600,16 @@ class QuizAnswer extends mixin(BaseModel, [
       if (quiz.checkPlagiarism) {
         await this.relayPlagiarismData(savedQuizAnswer, quiz)
       }
+      const canSeeAnswers =
+        savedUserQuizState.status === "locked" ||
+        // Same full-points tolerance as the widget's submit action in moocfi-quizzes.
+        (savedUserQuizState.pointsAwarded ?? 0) > quiz.points - 0.001
+      const responseQuiz = canSeeAnswers
+        ? quiz
+        : await Quiz.getByIdStripped(quizId)
+      responseQuiz.course = course
       return {
-        quiz,
+        quiz: responseQuiz,
         quizAnswer: savedQuizAnswer,
         userQuizState: savedUserQuizState,
       }
@@ -567,6 +617,34 @@ class QuizAnswer extends mixin(BaseModel, [
       await trx.rollback()
       throw error
     }
+  }
+
+  /**
+   * Whether `createdAt` is the creation time of one of the user's attempts at the quiz.
+   *
+   * A resubmission from the widget carries its stored answer's `createdAt`, which is kept so
+   * that the answer's original submission time survives.
+   */
+  private static async isAttemptCreationTime(
+    userId: number,
+    quizId: string,
+    createdAt: unknown,
+    trx: Knex.Transaction,
+  ): Promise<boolean> {
+    if (typeof createdAt !== "string") {
+      return false
+    }
+    const time = new Date(createdAt).getTime()
+    if (Number.isNaN(time)) {
+      return false
+    }
+    const attempts = await this.query(trx)
+      .select("created_at")
+      .where("user_id", userId)
+      .andWhere("quiz_id", quizId)
+    return attempts.some(
+      (attempt) => new Date(attempt.createdAt).getTime() === time,
+    )
   }
 
   private static async relayPlagiarismData(quizAnswer: QuizAnswer, quiz: Quiz) {
@@ -621,6 +699,58 @@ class QuizAnswer extends mixin(BaseModel, [
         quiz.courseId,
         trx,
       )
+    }
+  }
+
+  /**
+   * Throws a BadRequestError unless each item answer is to a distinct item of the quiz and each
+   * of its option answers to a distinct option of that item. Deleted items and options count,
+   * as a resubmitted stored answer may still refer to them.
+   */
+  private static async checkAnswersBelongToQuiz(
+    quizAnswer: QuizAnswer,
+    quizId: string,
+    trx: Knex.Transaction,
+  ) {
+    const items: { id: string }[] = await trx("quiz_item")
+      .select("id")
+      .where("quiz_id", quizId)
+    const options: { id: string; quiz_item_id: string }[] = await trx(
+      "quiz_option",
+    )
+      .select("id", "quiz_item_id")
+      .whereIn(
+        "quiz_item_id",
+        items.map((item) => item.id),
+      )
+    const itemIds = new Set(items.map((item) => item.id))
+    const itemIdByOptionId = new Map(
+      options.map((option) => [option.id, option.quiz_item_id]),
+    )
+
+    const answeredItemIds = new Set<string>()
+    for (const itemAnswer of quizAnswer.itemAnswers ?? []) {
+      if (!itemIds.has(itemAnswer.quizItemId)) {
+        throw new BadRequestError("item answer does not belong to the quiz")
+      }
+      if (answeredItemIds.has(itemAnswer.quizItemId)) {
+        throw new BadRequestError("duplicate item answer")
+      }
+      answeredItemIds.add(itemAnswer.quizItemId)
+
+      const chosenOptionIds = new Set<string>()
+      for (const optionAnswer of itemAnswer.optionAnswers ?? []) {
+        if (
+          itemIdByOptionId.get(optionAnswer.quizOptionId) !==
+          itemAnswer.quizItemId
+        ) {
+          throw new BadRequestError("option answer does not belong to the item")
+        }
+        if (chosenOptionIds.has(optionAnswer.quizOptionId)) {
+          throw new BadRequestError("duplicate option answer")
+        }
+        chosenOptionIds.add(optionAnswer.quizOptionId)
+      }
     }
   }
 
@@ -934,6 +1064,7 @@ class QuizAnswer extends mixin(BaseModel, [
     }
   }
 
+  /** Picks up to two other students' answers to offer a reviewer, with only what the review form shows. */
   public static async getAnswersToReview(reviewerId: number, quizId: string) {
     // validate quiz id
     try {
@@ -1003,12 +1134,26 @@ class QuizAnswer extends mixin(BaseModel, [
 
     allCandidates = allCandidates.slice(0, 2)
 
-    return this.query()
+    const answers = await this.query()
       .withGraphJoined("itemAnswers.[optionAnswers]")
       .whereIn(
         "quiz_answer.id",
         allCandidates.map((c) => c.id),
       )
+
+    return answers.map((answer) => ({
+      id: answer.id,
+      quizId: answer.quizId,
+      itemAnswers: answer.itemAnswers.map((itemAnswer) => ({
+        id: itemAnswer.id,
+        quizItemId: itemAnswer.quizItemId,
+        textData: itemAnswer.textData,
+        optionAnswers: itemAnswer.optionAnswers.map((optionAnswer) => ({
+          id: optionAnswer.id,
+          quizOptionId: optionAnswer.quizOptionId,
+        })),
+      })),
+    }))
   }
 
   public static async deleteAnswer(answerId: string): Promise<QuizAnswer> {
