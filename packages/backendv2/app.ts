@@ -17,9 +17,6 @@ app.use(cors())
 
 app.use(async (ctx, next) => {
   ctx.set("X-Content-Type-Options", "nosniff")
-  if (ctx.path.startsWith("/api/v2/dashboard/")) {
-    ctx.set("Cache-Control", "no-store")
-  }
   await next()
 })
 

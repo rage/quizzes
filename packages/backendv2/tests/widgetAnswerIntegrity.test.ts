@@ -5,6 +5,7 @@ import app from "../app"
 import redis from "../config/redis"
 import knex from "../database/knex"
 import Quiz from "../src/models/quiz"
+import UserQuizState from "../src/models/user_quiz_state"
 import { configA, safeClean, safeSeed } from "./util"
 
 const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44b"
@@ -70,6 +71,14 @@ const submit = (userId: number, body: object) =>
     .set("Accept", "application/json")
     .send(body)
 
+const fetchQuiz = (userId: number) =>
+  request(app.callback())
+    .get(`/api/v2/widget/quizzes/${quizId}`)
+    .set("Authorization", `bearer user-${userId}`)
+
+const openItemOf = (quiz: any) =>
+  quiz.items.find((item: any) => item.id === openItemId)
+
 const giveReview = (userId: number, body: object) =>
   request(app.callback())
     .post("/api/v2/widget/answers/give-review")
@@ -113,6 +122,37 @@ const answerPeerReviewedQuiz = async (
     .onConflict(["user_id", "quiz_id"])
     .ignore()
   return id
+}
+
+const peerReviewedQuizState = (userId: number) =>
+  knex("user_quiz_state")
+    .where({ user_id: userId, quiz_id: peerReviewedQuizId })
+    .first()
+
+/**
+ * Sends `send` while another transaction holds `userId`'s lock on the peer-reviewed quiz and
+ * raises their tries to 2, so a request that read their state without the lock writes back 1.
+ */
+const whileTriesChange = async (
+  userId: number,
+  send: () => request.Test,
+): Promise<request.Response> => {
+  const trx = await knex.transaction()
+  let response: Promise<request.Response>
+  try {
+    await UserQuizState.lock(userId, peerReviewedQuizId, trx)
+    await trx("user_quiz_state")
+      .update({ tries: 2 })
+      .where({ user_id: userId, quiz_id: peerReviewedQuizId })
+    // `then` starts the request, which must reach the lock before it is released.
+    response = send().then((sent) => sent)
+    await new Promise((resolve) => setTimeout(resolve, 300))
+    await trx.commit()
+  } catch (error) {
+    await trx.rollback()
+    throw error
+  }
+  return response
 }
 
 const setTries = (tries: number) =>
@@ -236,10 +276,19 @@ beforeEach(() => {
 afterEach(async () => {
   nock.cleanAll()
   await redis.client?.flushall()
-  await setTries(3)
+  await knex("quiz").update({ tries: 3, points: 1 }).where("id", quizId)
+  await knex("quiz_item")
+    .update({ validity_regex: "koira" })
+    .where("id", openItemId)
 })
 
 describe("widget answer submission", () => {
+  test("rejects a submission without a quiz id", async () => {
+    const userId = await newUser()
+    const { quizId: _, ...answer } = correctAnswer()
+    await submit(userId, answer).expect(400)
+  })
+
   test("ignores nested relations and server-set fields", async () => {
     const userId = await newUser()
     const victimId = await newUser()
@@ -303,7 +352,7 @@ describe("widget answer response", () => {
 
     expect(response.body.userQuizState.status).toEqual("open")
     const items = response.body.quiz.items
-    const openItem = items.find((item: any) => item.id === openItemId)
+    const openItem = openItemOf(response.body.quiz)
     const multiItem = items.find((item: any) => item.id === multiItemId)
     expect(openItem.validityRegex).toBeUndefined()
     expect(openItem.successMessage).toBeUndefined()
@@ -314,46 +363,36 @@ describe("widget answer response", () => {
 
   test("hides the answer key of a quiz worth no points while tries remain", async () => {
     await knex("quiz").update({ points: 0 }).where("id", quizId)
-    try {
-      const userId = await newUser()
-      const response = await submit(userId, wrongAnswer()).expect(200)
+    const userId = await newUser()
+    const response = await submit(userId, wrongAnswer()).expect(200)
 
-      expect(response.body.userQuizState.status).toEqual("open")
-      const openItem = response.body.quiz.items.find(
-        (item: any) => item.id === openItemId,
-      )
-      expect(openItem.validityRegex).toBeUndefined()
-    } finally {
-      await knex("quiz").update({ points: 1 }).where("id", quizId)
-    }
+    expect(response.body.userQuizState.status).toEqual("open")
+    expect(openItemOf(response.body.quiz).validityRegex).toBeUndefined()
   })
 
   test("hides the answer key of a quiz worth no points when fetched", async () => {
     await knex("quiz").update({ points: 0 }).where("id", quizId)
-    try {
-      const userId = await newUser()
-      await submit(userId, wrongAnswer()).expect(200)
-      const fetched = await request(app.callback())
-        .get(`/api/v2/widget/quizzes/${quizId}`)
-        .set("Authorization", `bearer user-${userId}`)
-        .expect(200)
+    const userId = await newUser()
+    await submit(userId, wrongAnswer()).expect(200)
+    const fetched = await fetchQuiz(userId).expect(200)
 
-      const openItem = fetched.body.quiz.items.find(
-        (item: any) => item.id === openItemId,
-      )
-      expect(openItem.validityRegex).toBeUndefined()
-    } finally {
-      await knex("quiz").update({ points: 1 }).where("id", quizId)
-    }
+    expect(openItemOf(fetched.body.quiz).validityRegex).toBeUndefined()
+  })
+
+  test("shows the answer key to a student with more than the quiz's points", async () => {
+    await knex("quiz").update({ points: 2 }).where("id", quizId)
+    const userId = await newUser()
+    await submit(userId, correctAnswer()).expect(200)
+    await knex("quiz").update({ points: 1 }).where("id", quizId)
+    const fetched = await fetchQuiz(userId).expect(200)
+
+    expect(openItemOf(fetched.body.quiz).validityRegex).toEqual("koira")
   })
 
   test("hides the answer key like the widget's quiz route does", async () => {
     const userId = await newUser()
     const submitted = await submit(userId, wrongAnswer()).expect(200)
-    const fetched = await request(app.callback())
-      .get(`/api/v2/widget/quizzes/${quizId}`)
-      .set("Authorization", `bearer user-${userId}`)
-      .expect(200)
+    const fetched = await fetchQuiz(userId).expect(200)
 
     expect(submitted.body.quiz).toEqual(fetched.body.quiz)
   })
@@ -375,10 +414,7 @@ describe("widget answer response", () => {
     const response = await submit(userId, wrongAnswer()).expect(200)
 
     expect(response.body.userQuizState.status).toEqual("locked")
-    const openItem = response.body.quiz.items.find(
-      (item: any) => item.id === openItemId,
-    )
-    expect(openItem.validityRegex).toEqual("koira")
+    expect(openItemOf(response.body.quiz).validityRegex).toEqual("koira")
   })
 
   test("shows the answer key after full points", async () => {
@@ -387,10 +423,7 @@ describe("widget answer response", () => {
 
     expect(response.body.userQuizState.status).toEqual("open")
     expect(response.body.userQuizState.pointsAwarded).toEqual(1)
-    const openItem = response.body.quiz.items.find(
-      (item: any) => item.id === openItemId,
-    )
-    expect(openItem.validityRegex).toEqual("koira")
+    expect(openItemOf(response.body.quiz).validityRegex).toEqual("koira")
   })
 })
 
@@ -490,17 +523,11 @@ describe("widget answer grading", () => {
     await knex("quiz_item")
       .update({ validity_regex: "(" })
       .where("id", openItemId)
-    try {
-      const userId = await newUser()
-      const response = await submit(userId, correctAnswer()).expect(400)
-      expect(response.body.message).toEqual(
-        "the item's answer check is misconfigured",
-      )
-    } finally {
-      await knex("quiz_item")
-        .update({ validity_regex: "koira" })
-        .where("id", openItemId)
-    }
+    const userId = await newUser()
+    const response = await submit(userId, correctAnswer()).expect(400)
+    expect(response.body.message).toEqual(
+      "the item's answer check is misconfigured",
+    )
   })
 
   test("counts an unanswered item as wrong", async () => {
@@ -764,6 +791,20 @@ describe("widget peer review", () => {
     ).expect(400)
     expect(response.body.message).toEqual("User cannot review their own answer")
   })
+
+  test("does not overwrite a state the reviewed student changes meanwhile", async () => {
+    const userId = await reviewer()
+    const targetUserId = await newUser()
+    const answerId = await answerPeerReviewedQuiz(targetUserId)
+    const response = await whileTriesChange(targetUserId, () =>
+      giveReview(userId, review({ quizAnswerId: answerId })),
+    )
+
+    expect(response.status).toEqual(200)
+    const state = await peerReviewedQuizState(targetUserId)
+    expect(state.tries).toEqual(2)
+    expect(state.peer_reviews_received).toEqual(1)
+  })
 })
 
 describe("widget peer review candidates", () => {
@@ -850,6 +891,21 @@ describe("widget spam flags", () => {
     expect(
       await knex("spam_flag").where("quiz_answer_id", targetId),
     ).toHaveLength(0)
+  })
+
+  test("do not overwrite a state the flagged student changes meanwhile", async () => {
+    const targetUserId = await newUser()
+    const targetId = await answerPeerReviewedQuiz(targetUserId)
+    const userId = await newUser()
+    await answerPeerReviewedQuiz(userId)
+    const response = await whileTriesChange(targetUserId, () =>
+      reportSpam(userId, targetId),
+    )
+
+    expect(response.status).toEqual(200)
+    const state = await peerReviewedQuizState(targetUserId)
+    expect(state.tries).toEqual(2)
+    expect(state.spam_flags).toEqual(1)
   })
 
   test("are refused on the user's own answer", async () => {

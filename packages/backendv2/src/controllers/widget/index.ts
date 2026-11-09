@@ -11,7 +11,7 @@ import {
   SpamFlag,
 } from "../../models/"
 import { CustomContext, CustomState } from "../../types"
-import { checkAccessOrThrow, getCourseIdByAnswerId } from "./../dashboard/util"
+import { checkAccessOrThrow, getCourseIdByQuizId } from "./../dashboard/util"
 
 const widget = new Router<CustomState, CustomContext>({
   prefix: "/widget",
@@ -28,10 +28,8 @@ const widget = new Router<CustomState, CustomContext>({
     if (quizAnswer?.deleted) {
       quizAnswer = null
     }
-    const fullQuiz = await Quiz.getById(quizId)
-    const quiz = Quiz.canSeeAnswerKey(userQuizState, fullQuiz.points)
-      ? fullQuiz
-      : Quiz.removeAnswerKey(fullQuiz)
+    const quiz = await Quiz.getById(quizId)
+    Quiz.hideAnswerKeyFrom(quiz, userQuizState)
     const course = await Course.getById(quiz.courseId)
     quiz.course = course
     ctx.body = {
@@ -52,11 +50,11 @@ const widget = new Router<CustomState, CustomContext>({
 
   .get("/answers/:answerId/peer-reviews", accessControl(), async (ctx) => {
     const answerId = ctx.params.answerId
-    const answer = await QuizAnswer.getById(answerId)
+    const answer = await QuizAnswer.getOwnerAndQuiz(answerId)
     if (answer.userId !== ctx.state.user.id) {
       await checkAccessOrThrow(
         ctx.state.user,
-        await getCourseIdByAnswerId(answerId),
+        await getCourseIdByQuizId(answer.quizId),
         "view",
       )
     }

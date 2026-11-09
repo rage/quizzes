@@ -1,3 +1,4 @@
+import type { Knex } from "knex"
 import _ from "lodash"
 import { mixin } from "objection"
 
@@ -71,6 +72,27 @@ class PeerReview extends BaseModel {
     }
     assertUuid(body.quizAnswerId)
     assertUuid(body.peerReviewCollectionId)
+    for (const answer of body.answers) {
+      const hasValue = !_.isNil(answer?.value)
+      if (
+        hasValue &&
+        !(
+          Number.isInteger(answer.value) &&
+          answer.value >= MIN_GRADE &&
+          answer.value <= MAX_GRADE
+        )
+      ) {
+        throw new BadRequestError(
+          `review values must be integers from ${MIN_GRADE} to ${MAX_GRADE}`,
+        )
+      }
+      if (!_.isNil(answer?.text) && typeof answer.text !== "string") {
+        throw new BadRequestError("review texts must be strings")
+      }
+      if (!hasValue && !answer?.text) {
+        throw new BadRequestError("review must contain values")
+      }
+    }
     return this.fromJson({
       ..._.pick(body, [
         "quizAnswerId",
@@ -94,126 +116,111 @@ class PeerReview extends BaseModel {
     peerReview: PeerReview,
     skipGiverRequirements: boolean = false,
   ) {
-    for (const answer of peerReview.answers) {
-      const hasValue = answer.value !== null && answer.value !== undefined
-      if (
-        hasValue &&
-        !(
-          Number.isInteger(answer.value) &&
-          answer.value >= MIN_GRADE &&
-          answer.value <= MAX_GRADE
-        )
-      ) {
-        throw new BadRequestError(
-          `review values must be integers from ${MIN_GRADE} to ${MAX_GRADE}`,
-        )
-      }
-      if (
-        answer.text !== null &&
-        answer.text !== undefined &&
-        typeof answer.text !== "string"
-      ) {
-        throw new BadRequestError("review texts must be strings")
-      }
-      if (!hasValue && !answer.text) {
-        throw new BadRequestError("review must contain values")
-      }
-    }
-
     const { quizAnswerId, userId: sourceUserId } = peerReview
 
-    const targetQuizAnswer = await QuizAnswer.getById(quizAnswerId)
-    const quizId = targetQuizAnswer.quizId
-    const { userId: targetUserId } = targetQuizAnswer
+    const { userId: targetUserId, quizId } =
+      await QuizAnswer.getOwnerAndQuiz(quizAnswerId)
 
     if (sourceUserId === targetUserId) {
       throw new BadRequestError("User cannot review their own answer")
     }
 
-    let sourceQuizAnswer: QuizAnswer | null = null
-    if (!skipGiverRequirements) {
-      sourceQuizAnswer =
-        (await QuizAnswer.getByUserAndQuiz(sourceUserId, quizId)) ?? null
-      if (!sourceQuizAnswer || sourceQuizAnswer.deleted) {
-        throw new ForbiddenError("answer the quiz before reviewing others")
-      }
-      if (!QuizAnswer.isOpenForReview(targetQuizAnswer)) {
-        throw new BadRequestError("answer is not open for review")
-      }
-    }
-
-    // check if peer review already given by this user for this quiz answer
-    const peerReviewAlreadyGiven = await this.getByUserIdAndQuizAnswerId(
-      sourceUserId,
-      quizAnswerId,
-    )
-    const isUpdating = skipGiverRequirements && peerReviewAlreadyGiven
-    if (peerReviewAlreadyGiven && !skipGiverRequirements) {
-      throw new BadRequestError("Answer can only be peer reviewed once")
-    }
-
-    const typeByQuestionId = await this.checkQuestionsBelongToQuiz(
-      peerReview,
-      quizId,
-    )
-    for (const answer of peerReview.answers) {
-      const matchesQuestionType =
-        typeByQuestionId.get(answer.peerReviewQuestionId) === "grade"
-          ? answer.value !== null &&
-            answer.value !== undefined &&
-            (answer.text === null || answer.text === undefined)
-          : Boolean(answer.text) &&
-            (answer.value === null || answer.value === undefined)
-      if (!matchesQuestionType) {
-        throw new BadRequestError(
-          "grade questions take a value and essay questions a text",
-        )
-      }
-    }
-
-    const quiz = await Quiz.getById(quizId)
-    quiz.course = await quiz.$relatedQuery("course")
-
-    let sourceUserQuizState: UserQuizState | null = null
-
-    if (!skipGiverRequirements) {
-      sourceUserQuizState =
-        (await UserQuizState.getByUserAndQuiz(sourceUserId, quizId)) ?? null
-    }
-
-    const targetUserQuizState = await UserQuizState.getByUserAndQuiz(
-      targetUserId,
-      quizId,
-    )
-
-    if (!targetUserQuizState) {
-      throw new NotFoundError(`User quiz state not found.`)
-    }
-
-    if (!skipGiverRequirements && !sourceUserQuizState) {
-      throw new NotFoundError(`User quiz state not found.`)
-    }
-
-    // increment peer review stats for both source and target users
-    if (!skipGiverRequirements && sourceUserQuizState) {
-      if (sourceUserQuizState.peerReviewsGiven === null) {
-        sourceUserQuizState.peerReviewsGiven = 1
-      } else {
-        sourceUserQuizState.peerReviewsGiven += 1
-      }
-    }
-
-    if (!isUpdating) {
-      if (targetUserQuizState.peerReviewsReceived === null) {
-        targetUserQuizState.peerReviewsReceived = 1
-      } else {
-        targetUserQuizState.peerReviewsReceived += 1
-      }
-    }
-
     const trx = await knex.transaction()
 
     try {
+      const quiz = await Quiz.getById(quizId, trx)
+      quiz.course = await quiz.$relatedQuery("course", trx)
+
+      // Ascending order keeps two users reviewing each other from deadlocking.
+      const lockedUserIds = skipGiverRequirements
+        ? [targetUserId]
+        : [sourceUserId, targetUserId].sort((a, b) => a - b)
+      for (const userId of lockedUserIds) {
+        await UserQuizState.lock(userId, quizId, trx)
+      }
+
+      const targetQuizAnswer = await QuizAnswer.getById(quizAnswerId, trx)
+
+      let sourceQuizAnswer: QuizAnswer | null = null
+      if (!skipGiverRequirements) {
+        sourceQuizAnswer =
+          (await QuizAnswer.getByUserAndQuiz(sourceUserId, quizId, trx)) ?? null
+        if (
+          !sourceQuizAnswer ||
+          !QuizAnswer.isOpenForReview(sourceQuizAnswer)
+        ) {
+          throw new ForbiddenError("answer the quiz before reviewing others")
+        }
+        if (!QuizAnswer.isOpenForReview(targetQuizAnswer)) {
+          throw new BadRequestError("answer is not open for review")
+        }
+      }
+
+      const peerReviewAlreadyGiven = await this.getByUserIdAndQuizAnswerId(
+        sourceUserId,
+        quizAnswerId,
+        trx,
+      )
+      const isUpdating = skipGiverRequirements && peerReviewAlreadyGiven
+      if (peerReviewAlreadyGiven && !skipGiverRequirements) {
+        throw new BadRequestError("Answer can only be peer reviewed once")
+      }
+
+      const typeByQuestionId = await this.checkQuestionsBelongToQuiz(
+        peerReview,
+        quizId,
+        trx,
+      )
+      for (const answer of peerReview.answers) {
+        const matchesQuestionType =
+          typeByQuestionId.get(answer.peerReviewQuestionId) === "grade"
+            ? !_.isNil(answer.value) && _.isNil(answer.text)
+            : Boolean(answer.text) && _.isNil(answer.value)
+        if (!matchesQuestionType) {
+          throw new BadRequestError(
+            "grade questions take a value and essay questions a text",
+          )
+        }
+      }
+
+      let sourceUserQuizState: UserQuizState | null = null
+
+      if (!skipGiverRequirements) {
+        sourceUserQuizState =
+          (await UserQuizState.getByUserAndQuiz(sourceUserId, quizId, trx)) ??
+          null
+      }
+
+      const targetUserQuizState = await UserQuizState.getByUserAndQuiz(
+        targetUserId,
+        quizId,
+        trx,
+      )
+
+      if (!targetUserQuizState) {
+        throw new NotFoundError(`User quiz state not found.`)
+      }
+
+      if (!skipGiverRequirements && !sourceUserQuizState) {
+        throw new NotFoundError(`User quiz state not found.`)
+      }
+
+      if (!skipGiverRequirements && sourceUserQuizState) {
+        if (sourceUserQuizState.peerReviewsGiven === null) {
+          sourceUserQuizState.peerReviewsGiven = 1
+        } else {
+          sourceUserQuizState.peerReviewsGiven += 1
+        }
+      }
+
+      if (!isUpdating) {
+        if (targetUserQuizState.peerReviewsReceived === null) {
+          targetUserQuizState.peerReviewsReceived = 1
+        } else {
+          targetUserQuizState.peerReviewsReceived += 1
+        }
+      }
+
       let newPeerReview: PeerReview
       if (isUpdating && peerReviewAlreadyGiven) {
         const peerReviewData = this.fromJson(peerReview)
@@ -269,13 +276,12 @@ class PeerReview extends BaseModel {
   private static async checkQuestionsBelongToQuiz(
     peerReview: PeerReview,
     quizId: string,
+    trx: Knex.Transaction,
   ): Promise<Map<string, "essay" | "grade">> {
-    const collection =
-      peerReview.peerReviewCollectionId &&
-      (await knex("peer_review_collection")
-        .select("id")
-        .where({ id: peerReview.peerReviewCollectionId, quiz_id: quizId })
-        .first())
+    const collection = await trx("peer_review_collection")
+      .select("id")
+      .where({ id: peerReview.peerReviewCollectionId, quiz_id: quizId })
+      .first()
     if (!collection) {
       throw new BadRequestError(
         "peer review collection does not belong to the quiz",
@@ -289,7 +295,7 @@ class PeerReview extends BaseModel {
         "peer review questions can be answered only once",
       )
     }
-    const questions: { id: string; type: "essay" | "grade" }[] = await knex(
+    const questions: { id: string; type: "essay" | "grade" }[] = await trx(
       "peer_review_question",
     )
       .select("id", "type")
@@ -306,6 +312,7 @@ class PeerReview extends BaseModel {
   public static async getByUserIdAndQuizAnswerId(
     userId: number,
     quizAnswerId: string,
+    trx?: Knex.Transaction,
   ): Promise<PeerReview | undefined> {
     if (!userId || !quizAnswerId) {
       throw new BadRequestError(
@@ -313,7 +320,7 @@ class PeerReview extends BaseModel {
       )
     }
     const peerReview = (
-      await this.query()
+      await this.query(trx)
         .where({ user_id: userId, quiz_answer_id: quizAnswerId })
         .limit(1)
     )[0]

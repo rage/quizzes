@@ -11,6 +11,10 @@ const dashboard = new Router<CustomState, CustomContext>({
   prefix: "/dashboard",
 })
 
+dashboard.use(async (ctx, next) => {
+  ctx.set("Cache-Control", "no-store")
+  await next()
+})
 dashboard.use(answersRoutes.routes())
 dashboard.use(quizzesRoutes.routes())
 dashboard.use(coursesRoutes.routes())

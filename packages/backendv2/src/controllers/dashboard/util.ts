@@ -56,24 +56,6 @@ export const abilitiesByRole: { [role: string]: string[] } = {
   reviewer: ["view", "grade"],
 }
 
-export const getCourseIdByAnswerId = async (answerId: string) => {
-  let courses
-  try {
-    courses = await knex("quiz")
-      .select("course_id")
-      .innerJoin("quiz_answer", "quiz.id", "quiz_answer.quiz_id")
-      .where("quiz_answer.id", answerId)
-  } catch (error) {
-    throw error
-  }
-
-  if (courses[0]) {
-    return courses[0].course_id
-  } else {
-    throw new NotFoundError(`No course found for answer id: ${answerId}`)
-  }
-}
-
 /**
  * Returns the distinct courses the given answers belong to.
  * Throws NotFoundError if any answer does not exist.
@@ -93,6 +75,9 @@ export const getCourseIdsByAnswerIds = async (
   return [...new Set(rows.map((row) => row.course_id))]
 }
 
+export const getCourseIdByAnswerId = async (answerId: string) =>
+  (await getCourseIdsByAnswerIds([answerId]))[0]
+
 export const getCourseIdByQuizId = async (quizId: string): Promise<string> => {
   const quiz = await knex("quiz")
     .select("course_id")
@@ -107,7 +92,6 @@ export const getCourseIdByQuizId = async (quizId: string): Promise<string> => {
 export type DownloadKind = "quiz-info" | "peerreview-info" | "answer-info"
 
 interface DownloadGrant {
-  userId: number
   quizId: string
   kind: DownloadKind
 }
@@ -121,7 +105,6 @@ const downloadTokenKey = (token: string) => `download-token:${token}`
  * it with `consumeDownloadToken`. Returns "" when Redis is unavailable.
  */
 export const createDownloadToken = async (
-  userId: number,
   quizId: string,
   kind: DownloadKind,
 ): Promise<string> => {
@@ -129,7 +112,7 @@ export const createDownloadToken = async (
     return ""
   }
   const token = `dl_tkn_${crypto.randomBytes(32).toString("hex")}`
-  const grant: DownloadGrant = { userId, quizId, kind }
+  const grant: DownloadGrant = { quizId, kind }
   try {
     await redis.client.set(
       downloadTokenKey(token),

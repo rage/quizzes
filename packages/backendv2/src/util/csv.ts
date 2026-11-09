@@ -3,7 +3,7 @@ import { pipeline, type Readable } from "stream"
 import { stringify, type Options, type Stringifier } from "csv-stringify"
 
 const FORMULA_START = /^[=+\-@\t\r\uFF1D\uFF0B\uFF0D\uFF20]/
-// Numeric-looking strings (pg returns decimals as strings) such as "-1" are harmless and must stay intact.
+// Text that is just a number, such as an open answer of "-1", is harmless and must stay intact.
 const PLAIN_NUMBER = /^-?\d+(\.\d+)?$/
 
 /** Neutralizes spreadsheet formulas in untrusted text by prefixing an apostrophe. */

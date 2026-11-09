@@ -5,7 +5,7 @@ import Router, { RouterMiddleware } from "@koa/router"
 import accessControl from "../../../middleware/access_control"
 import { Quiz, QuizAnswer } from "../../../models"
 import { CustomContext, CustomState } from "../../../types"
-import { BadRequestError, ForbiddenError } from "../../../util/error"
+import { BadRequestError } from "../../../util/error"
 import { getFormattedIsoDate } from "../../../util/tools"
 import {
   checkAccessOrThrow,
@@ -50,11 +50,7 @@ const issueDownloadUrl =
     const courseId = await getCourseIdByQuizId(quizId)
     await checkAccessOrThrow(ctx.state.user, courseId, "download")
 
-    const downloadToken = await createDownloadToken(
-      ctx.state.user.id,
-      quizId,
-      kind,
-    )
+    const downloadToken = await createDownloadToken(quizId, kind)
     if (!downloadToken) {
       throw new BadRequestError("Failed to generate download token.")
     }
@@ -99,12 +95,6 @@ const quizzesRoutes = new Router<CustomState, CustomContext>({
   .post("/", accessControl(), async (ctx) => {
     const quizData = ctx.request.body as { id?: string; courseId: string }
     await checkAccessOrThrow(ctx.state.user, quizData.courseId, "edit")
-    if (quizData.id) {
-      const existingQuiz = await Quiz.query().findById(quizData.id)
-      if (existingQuiz && existingQuiz.courseId !== quizData.courseId) {
-        throw new ForbiddenError("A quiz cannot be moved to another course.")
-      }
-    }
     ctx.body = await Quiz.save(quizData)
   })
 

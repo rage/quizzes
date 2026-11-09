@@ -6,7 +6,7 @@ import { mixin } from "objection"
 import knex from "../../database/knex"
 import * as Kafka from "../services/kafka"
 import { BadRequestError, ForbiddenError } from "../util/error"
-import { removeNonPrintingCharacters } from "../util/tools"
+import { assertUuid, removeNonPrintingCharacters } from "../util/tools"
 import { TStatusModificationOperation } from "./../types/index"
 import { NotFoundError } from "./../util/error"
 import BaseModel from "./base_model"
@@ -165,9 +165,29 @@ class QuizAnswer extends mixin(BaseModel, [
     return quizAnswer
   }
 
-  public static async getByUserAndQuiz(userId: number, quizId: string) {
+  /**
+   * Who wrote an answer and to which quiz, without loading the answer. Throws NotFoundError if
+   * there is no such answer.
+   */
+  public static async getOwnerAndQuiz(
+    quizAnswerId: string,
+  ): Promise<{ userId: number; quizId: string }> {
+    const quizAnswer = await this.query()
+      .select("user_id", "quiz_id")
+      .findById(quizAnswerId)
+    if (!quizAnswer) {
+      throw new NotFoundError(`quiz answer not found: ${quizAnswerId}`)
+    }
+    return { userId: quizAnswer.userId, quizId: quizAnswer.quizId }
+  }
+
+  public static async getByUserAndQuiz(
+    userId: number,
+    quizId: string,
+    trx?: Knex.Transaction,
+  ) {
     return (
-      await this.query()
+      await this.query(trx)
         .withGraphFetched("itemAnswers.[optionAnswers]")
         .where("user_id", userId)
         .andWhere("quiz_id", quizId)
@@ -390,8 +410,10 @@ class QuizAnswer extends mixin(BaseModel, [
     if (!["confirmed", "rejected"].includes(status)) {
       throw new BadRequestError("invalid status")
     }
+    const { userId, quizId } = await this.getOwnerAndQuiz(answerId)
     const trx = await knex.transaction()
     try {
+      await UserQuizState.lock(userId, quizId, trx)
       let quizAnswer = (
         await this.query(trx)
           .where("quiz_answer.id", answerId)
@@ -533,6 +555,7 @@ class QuizAnswer extends mixin(BaseModel, [
     if (body?.deleted) {
       throw new BadRequestError("A new answer cannot be marked as deleted.")
     }
+    assertUuid(body?.quizId)
     const itemAnswers = Array.isArray(body?.itemAnswers)
       ? body.itemAnswers.map((itemAnswer: any) => ({
           ..._.pick(itemAnswer, [
@@ -559,7 +582,7 @@ class QuizAnswer extends mixin(BaseModel, [
     const trx = await knex.transaction()
     try {
       const quizId = quizAnswer.quizId
-      await UserQuizState.lockForSubmission(userId, quizId, trx)
+      await UserQuizState.lock(userId, quizId, trx)
       const isUserInDb = await User.getById(userId, trx)
       if (!isUserInDb) {
         quizAnswer.user = User.fromJson({ id: userId })
@@ -621,13 +644,11 @@ class QuizAnswer extends mixin(BaseModel, [
           trx,
         )
       }
-      const responseQuiz = Quiz.canSeeAnswerKey(savedUserQuizState, quiz.points)
-        ? quiz
-        : Quiz.removeAnswerKey(quiz)
-      responseQuiz.course = course
+      Quiz.hideAnswerKeyFrom(quiz, savedUserQuizState)
+      quiz.course = course
       await trx.commit()
       return {
-        quiz: responseQuiz,
+        quiz,
         quizAnswer: savedQuizAnswer,
         userQuizState: savedUserQuizState,
       }
@@ -1204,6 +1225,7 @@ class QuizAnswer extends mixin(BaseModel, [
       if (!quizAnswer) {
         throw new NotFoundError(`quiz answer not found: ${answerId}`)
       }
+      await UserQuizState.lock(quizAnswer.userId, quizAnswer.quizId, trx)
       const quiz = await Quiz.query(trx).findById(quizAnswer.quizId)
       if (!quiz) {
         throw new NotFoundError(`quiz not found: ${quizAnswer.quizId}`)

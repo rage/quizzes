@@ -12,7 +12,7 @@ import knex from "../../database/knex"
 import * as Kafka from "../services/kafka"
 import { toCsvStream } from "../util/csv"
 import { NotFoundError } from "../util/error"
-import { BadRequestError } from "../util/error"
+import { BadRequestError, ForbiddenError } from "../util/error"
 import moduleInitializer from "../util/initializer"
 import { assertUuid } from "../util/tools"
 import BaseModel from "./base_model"
@@ -28,6 +28,8 @@ import UserQuizState from "./user_quiz_state"
 // Must cover every relation quizzes-dashboard's SaveButton sends.
 const EDITABLE_GRAPH =
   "[texts, items.[texts, options.[texts]], peerReviewCollections.[texts, questions.[texts]]]"
+
+const EXPORT_CSV_OPTIONS = { delimiter: ",", quoted: true, header: true }
 
 export class Quiz extends BaseModel {
   id!: string
@@ -219,9 +221,10 @@ export class Quiz extends BaseModel {
     let savedQuiz: Quiz | Quiz[]
 
     try {
-      const oldQuiz = quiz.id
-        ? await this.query(trx).findById(quiz.id)
-        : undefined
+      const oldQuiz = await this.query(trx).findById(quiz.id)
+      if (oldQuiz && oldQuiz.courseId !== quiz.courseId) {
+        throw new ForbiddenError("A quiz cannot be moved to another course.")
+      }
       if (oldQuiz) {
         savedQuiz = await this.query(trx)
           .allowGraph(EDITABLE_GRAPH)
@@ -301,10 +304,26 @@ export class Quiz extends BaseModel {
   }
 
   /**
-   * Whether a student in `state` may see a quiz's answer key: once their state is locked or
-   * they have its full `points`. Matches the moocfi-quizzes widget's check.
+   * Removes the answer key from `quiz`, in place, unless the student whose state on it is `state`
+   * may see it.
    */
-  static canSeeAnswerKey(
+  static hideAnswerKeyFrom(
+    quiz: Quiz,
+    state:
+      | { status?: string; pointsAwarded?: number | null }
+      | null
+      | undefined,
+  ) {
+    if (!this.canSeeAnswerKey(state, quiz.points)) {
+      this.removeAnswerKey(quiz)
+    }
+  }
+
+  /**
+   * Whether a student in `state` may see a quiz's answer key: once their state is locked or
+   * they have at least its `points`, which they exceed if the quiz's points were lowered later.
+   */
+  private static canSeeAnswerKey(
     state:
       | { status?: string; pointsAwarded?: number | null }
       | null
@@ -314,12 +333,12 @@ export class Quiz extends BaseModel {
     const pointsAwarded = state?.pointsAwarded
     return (
       state?.status === "locked" ||
-      (!!pointsAwarded && Math.abs(pointsAwarded - points) < 0.001)
+      (!!pointsAwarded && pointsAwarded > points - 0.001)
     )
   }
 
   /** Removes the feedback and answer checks that would give away the correct answers from `quiz`, in place. */
-  static removeAnswerKey(quiz: Quiz) {
+  private static removeAnswerKey(quiz: Quiz) {
     delete (quiz as Partial<Quiz>).submitMessage
     for (const quizItem of quiz.items as Partial<QuizItem>[]) {
       delete quizItem.successMessage
@@ -332,7 +351,6 @@ export class Quiz extends BaseModel {
         delete quizOption.correct
       }
     }
-    return quiz
   }
 
   static async getPreviewById(quizId: string) {
@@ -370,7 +388,7 @@ export class Quiz extends BaseModel {
       .toKnexQuery()
       .stream()
 
-    return toCsvStream(rows, { delimiter: ",", quoted: true, header: true })
+    return toCsvStream(rows, EXPORT_CSV_OPTIONS)
   }
 
   static async getPeerReviewInfo(quizId: string) {
@@ -383,7 +401,7 @@ export class Quiz extends BaseModel {
       .toKnexQuery()
       .stream()
 
-    return toCsvStream(rows, { delimiter: ",", quoted: true, header: true })
+    return toCsvStream(rows, EXPORT_CSV_OPTIONS)
   }
 
   static async getQuizAnswerInfo(quizId: string) {
@@ -396,7 +414,7 @@ export class Quiz extends BaseModel {
       .toKnexQuery()
       .stream()
 
-    return toCsvStream(rows, { delimiter: ",", quoted: true, header: true })
+    return toCsvStream(rows, EXPORT_CSV_OPTIONS)
   }
 
   private static moveTextsToParent(quiz: Quiz) {

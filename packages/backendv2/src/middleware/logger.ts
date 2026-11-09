@@ -1,9 +1,9 @@
 import { randomUUID } from "crypto"
 
-import { DatabaseError } from "pg"
 import winston, { format } from "winston"
 
 import { CustomContext } from "../types"
+import { databaseErrorOf } from "../util/error"
 
 const myFormat = format.printf(
   ({ level, message, timestamp, requestId, stack, ...metadata }) => {
@@ -33,9 +33,8 @@ export const GlobalLogger = winston.createLogger({
 
 // Database error messages carry the failing SQL and its bound values.
 const describeError = (error: unknown) => {
-  const dbError =
-    (error as { nativeError?: unknown } | null)?.nativeError ?? error
-  if (dbError instanceof DatabaseError) {
+  const dbError = databaseErrorOf(error)
+  if (dbError) {
     const { code, routine, table, column, constraint } = dbError
     return {
       error: `database error ${code}`,
