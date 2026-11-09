@@ -236,7 +236,7 @@ export class Quiz extends BaseModel {
     } catch (error) {
       await trx.rollback()
       if (error instanceof NotNullViolationError) {
-        throw new BadRequestError(error)
+        throw new BadRequestError(`${error.table}.${error.column} is required`)
       }
       if (error instanceof ValidationError) {
         throw new BadRequestError(error.message)
@@ -265,7 +265,7 @@ export class Quiz extends BaseModel {
 
   static async getById(quizId: string, trx?: Knex.Transaction): Promise<Quiz> {
     const quiz = (
-      await this.query()
+      await this.query(trx)
         .withGraphJoined("texts")
         .withGraphJoined("items.[texts, options.[texts]]")
         .modifyGraph("items.[options]", (option) => {

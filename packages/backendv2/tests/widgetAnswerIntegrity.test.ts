@@ -311,6 +311,22 @@ describe("widget answer response", () => {
     }
   })
 
+  test("hides the answer key of a quiz worth no points while tries remain", async () => {
+    await knex("quiz").update({ points: 0 }).where("id", quizId)
+    try {
+      const userId = await newUser()
+      const response = await submit(userId, wrongAnswer()).expect(200)
+
+      expect(response.body.userQuizState.status).toEqual("open")
+      const openItem = response.body.quiz.items.find(
+        (item: any) => item.id === openItemId,
+      )
+      expect(openItem.validityRegex).toBeUndefined()
+    } finally {
+      await knex("quiz").update({ points: 1 }).where("id", quizId)
+    }
+  })
+
   test("shows the answer key once the quiz is locked", async () => {
     await setTries(1)
     const userId = await newUser()
@@ -485,6 +501,17 @@ describe("widget answer tries", () => {
       .first()
     expect(state.tries).toEqual(2)
   })
+
+  test("more parallel submissions than pooled connections all complete", async () => {
+    const submissions = knex.client.pool.max + 2
+    await setTries(submissions)
+    const userId = await newUser()
+    const responses = await Promise.all(
+      Array.from({ length: submissions }, () => submit(userId, wrongAnswer())),
+    )
+
+    expect(responses.every((r) => r.status === 200)).toBe(true)
+  })
 })
 
 describe("widget peer review", () => {
@@ -562,6 +589,26 @@ describe("widget peer review", () => {
       userId,
       review({
         answers: [{ peerReviewQuestionId: otherQuestionId, value: 4 }],
+      }),
+    ).expect(400)
+  })
+
+  test("rejects a review without answers", async () => {
+    const userId = await reviewer()
+    await giveReview(userId, review({ answers: [] })).expect(400)
+
+    expect(await knex("peer_review").where("user_id", userId)).toHaveLength(0)
+  })
+
+  test("rejects two answers to one question", async () => {
+    const userId = await reviewer()
+    await giveReview(
+      userId,
+      review({
+        answers: [
+          { peerReviewQuestionId, value: 4 },
+          { peerReviewQuestionId, value: 5 },
+        ],
       }),
     ).expect(400)
   })

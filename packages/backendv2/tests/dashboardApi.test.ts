@@ -703,6 +703,20 @@ describe("dashboard: save quiz", () => {
     expect(stored.course_id).toEqual("51b66fc3-4da2-48aa-8eab-404370250ca3")
   })
 
+  test("respond with 400 naming a missing required field", async () => {
+    const quiz: Partial<typeof input.newQuiz> = structuredClone(input.newQuiz)
+    delete quiz.part
+
+    const response = await request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .send(quiz)
+      .expect(400)
+
+    expect(response.body.message).toEqual("quiz.part is required")
+  })
+
   test("respond with 400 when the quiz graph includes its course", async () => {
     const quiz = {
       ...structuredClone(input.quizUpdate),

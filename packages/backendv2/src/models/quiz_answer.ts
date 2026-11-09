@@ -628,10 +628,11 @@ class QuizAnswer extends mixin(BaseModel, [
       if (quiz.checkPlagiarism) {
         await this.relayPlagiarismData(savedQuizAnswer, quiz)
       }
+      const { pointsAwarded } = savedUserQuizState
       const canSeeAnswers =
         savedUserQuizState.status === "locked" ||
-        // Same full-points tolerance as the widget's submit action in moocfi-quizzes.
-        (savedUserQuizState.pointsAwarded ?? 0) > quiz.points - 0.001
+        // Same full-points check as the widget's submit action in moocfi-quizzes.
+        (!!pointsAwarded && Math.abs(pointsAwarded - quiz.points) < 0.001)
       const responseQuiz = canSeeAnswers
         ? quiz
         : await Quiz.getByIdStripped(quizId)

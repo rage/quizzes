@@ -125,8 +125,8 @@ class UserCoursePartState extends BaseModel {
   ): Promise<PointsByGroup[]> {
     try {
       // course validation
-      await Course.getFlattenedById(courseId)
-      await User.getById(userId)
+      await Course.getFlattenedById(courseId, trx)
+      await User.getById(userId, trx)
 
       const userCoursePartStates = await this.query(trx)
         .where({

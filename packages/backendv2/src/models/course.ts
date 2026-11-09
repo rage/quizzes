@@ -51,8 +51,8 @@ class Course extends BaseModel {
     },
   })
 
-  static async getFlattenedById(id: string) {
-    const courses = await this.query()
+  static async getFlattenedById(id: string, trx?: Knex.Transaction) {
+    const courses = await this.query(trx)
       .withGraphJoined("texts")
       .where("id", id)
       .limit(1)

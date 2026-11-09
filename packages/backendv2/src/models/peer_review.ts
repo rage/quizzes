@@ -65,7 +65,7 @@ class PeerReview extends BaseModel {
 
   /** Builds a review by `userId` from a widget submission body, keeping only the fields a reviewer sets. */
   public static fromSubmission(body: any, userId: number): PeerReview {
-    if (!Array.isArray(body?.answers)) {
+    if (!Array.isArray(body?.answers) || body.answers.length === 0) {
       throw new BadRequestError("review must contain answers")
     }
     return this.fromJson({
@@ -258,7 +258,7 @@ class PeerReview extends BaseModel {
 
   /**
    * Throws a BadRequestError unless the review's collection belongs to the quiz and every
-   * answer is to a question of that collection. Deleted ones count, as a widget may still
+   * answer is to a distinct question of that collection. Deleted ones count, as a widget may still
    * show them.
    *
    * Returns the type of each answered question by its id.
@@ -281,6 +281,11 @@ class PeerReview extends BaseModel {
     const questionIds = new Set(
       peerReview.answers.map((answer) => answer.peerReviewQuestionId),
     )
+    if (questionIds.size !== peerReview.answers.length) {
+      throw new BadRequestError(
+        "peer review questions can be answered only once",
+      )
+    }
     const questions: { id: string; type: "essay" | "grade" }[] = await knex(
       "peer_review_question",
     )
