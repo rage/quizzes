@@ -1,6 +1,11 @@
 import { stringify } from "csv-stringify"
 import type { Knex } from "knex"
-import { NotNullViolationError, type ModelOptions, type Pojo } from "objection"
+import {
+  NotNullViolationError,
+  ValidationError,
+  type ModelOptions,
+  type Pojo,
+} from "objection"
 
 import knex from "../../database/knex"
 import * as Kafka from "../services/kafka"
@@ -16,6 +21,10 @@ import QuizItem from "./quiz_item"
 import type QuizOption from "./quiz_option"
 import QuizTranslation from "./quiz_translation"
 import UserQuizState from "./user_quiz_state"
+
+// Must cover every relation quizzes-dashboard's SaveButton sends.
+const EDITABLE_GRAPH =
+  "[texts, items.[texts, options.[texts]], peerReviewCollections.[texts, questions.[texts]]]"
 
 export class Quiz extends BaseModel {
   id!: string
@@ -208,13 +217,17 @@ export class Quiz extends BaseModel {
         ? await this.query(trx).findById(quiz.id)
         : undefined
       if (oldQuiz) {
-        savedQuiz = await this.query(trx).upsertGraphAndFetch(quiz)
+        savedQuiz = await this.query(trx)
+          .allowGraph(EDITABLE_GRAPH)
+          .upsertGraphAndFetch(quiz)
 
         if (Array.isArray(savedQuiz)) {
           savedQuiz = savedQuiz[0]
         }
       } else {
-        savedQuiz = await this.query(trx).insertGraphAndFetch(quiz)
+        savedQuiz = await this.query(trx)
+          .allowGraph(EDITABLE_GRAPH)
+          .insertGraphAndFetch(quiz)
       }
       await this.updateCourseProgressesIfNecessary(oldQuiz, savedQuiz, trx)
       await Kafka.broadcastCourseQuizzesUpdated(course.id, trx)
@@ -223,6 +236,9 @@ export class Quiz extends BaseModel {
       await trx.rollback()
       if (error instanceof NotNullViolationError) {
         throw new BadRequestError(error)
+      }
+      if (error instanceof ValidationError) {
+        throw new BadRequestError(error.message)
       }
       throw error
     }

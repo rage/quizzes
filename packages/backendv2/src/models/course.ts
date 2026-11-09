@@ -2,6 +2,7 @@ import { randomUUID } from "crypto"
 
 import { stringify } from "csv-stringify"
 import type { Knex } from "knex"
+import _ from "lodash"
 
 import knex from "../../database/knex"
 import { EditCourseCompletionPayloadFields } from "../types"
@@ -358,7 +359,17 @@ class Course extends BaseModel {
     payload: EditCourseCompletionPayloadFields,
   ) {
     const course = await this.getById(id)
-    return await course.$query().patchAndFetch(payload)
+    return await course
+      .$query()
+      .patchAndFetch(
+        _.pick(payload, [
+          "maxReviewSpamFlags",
+          "maxSpamFlags",
+          "minPeerReviewsGiven",
+          "minPeerReviewsReceived",
+          "minReviewAverage",
+        ]),
+      )
   }
 
   static async getCorrespondenceFile(oldCourseId: string, newCourseId: string) {

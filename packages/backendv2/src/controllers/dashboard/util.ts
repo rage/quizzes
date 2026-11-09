@@ -3,12 +3,12 @@ import crypto from "crypto"
 import redis from "../../../config/redis"
 import knex from "../../../database/knex"
 import { UserCourseRole, Course } from "../../models"
-import { UserInfo } from "../../types"
+import { AuthenticatedUser } from "../../types"
 import { ForbiddenError } from "../../util/error"
 import { NotFoundError } from "./../../util/error"
 
 export const checkAccessOrThrow = async (
-  userInfo: UserInfo,
+  userInfo: AuthenticatedUser,
   courseId: string,
   operation: string,
 ) => {
@@ -29,7 +29,7 @@ export const checkAccessOrThrow = async (
 }
 
 export const getAccessibleCourses = async (
-  userInfo: UserInfo,
+  userInfo: AuthenticatedUser,
   operation: string,
 ) => {
   if (userInfo.administrator) {
@@ -74,32 +74,95 @@ export const getCourseIdByAnswerId = async (answerId: string) => {
   }
 }
 
-export const getCourseIdByQuizId = async (quizId: string) => {
-  return (await knex("quiz").select("course_id").where("quiz.id", quizId))[0]
-    .course_id
+/**
+ * Returns the distinct courses the given answers belong to.
+ * Throws NotFoundError if any answer does not exist.
+ */
+export const getCourseIdsByAnswerIds = async (
+  answerIds: string[],
+): Promise<string[]> => {
+  const rows: { answer_id: string; course_id: string }[] = await knex("quiz")
+    .select("quiz_answer.id as answer_id", "quiz.course_id")
+    .innerJoin("quiz_answer", "quiz.id", "quiz_answer.quiz_id")
+    .whereIn("quiz_answer.id", answerIds)
+  const foundAnswerIds = new Set(rows.map((row) => row.answer_id))
+  const missingAnswerId = answerIds.find((id) => !foundAnswerIds.has(id))
+  if (missingAnswerId) {
+    throw new NotFoundError(`No course found for answer id: ${missingAnswerId}`)
+  }
+  return [...new Set(rows.map((row) => row.course_id))]
 }
 
-export const getDownloadTokenFromRedis = async (
-  userId: string,
-): Promise<string> => {
-  let downloadToken = ""
-  if (redis.client) {
-    try {
-      const cachedToken = await redis.client.get(userId)
-      if (cachedToken) {
-        downloadToken = cachedToken
-      } else {
-        const randomToken = `dl_tkn_${crypto.randomBytes(100).toString("hex")}`
-        await redis.client.set(userId, randomToken, "EX", 600)
-        downloadToken = randomToken
-      }
-    } catch (error) {
-      console.error(
-        "Redis operation failed in getDownloadTokenFromRedis:",
-        error,
-      )
-    }
+export const getCourseIdByQuizId = async (quizId: string): Promise<string> => {
+  const quiz = await knex("quiz")
+    .select("course_id")
+    .where("quiz.id", quizId)
+    .first()
+  if (!quiz) {
+    throw new NotFoundError(`quiz not found: ${quizId}`)
   }
-  // will return empty string if redis unavailable
-  return downloadToken
+  return quiz.course_id
+}
+
+export type DownloadKind = "quiz-info" | "peerreview-info" | "answer-info"
+
+interface DownloadGrant {
+  userId: number
+  quizId: string
+  kind: DownloadKind
+}
+
+const DOWNLOAD_TOKEN_TTL_SECONDS = 600
+
+const downloadTokenKey = (token: string) => `download-token:${token}`
+
+/**
+ * Issues a single-use token for downloading one quiz's CSV of one kind; redeem
+ * it with `consumeDownloadToken`. Returns "" when Redis is unavailable.
+ */
+export const createDownloadToken = async (
+  userId: number,
+  quizId: string,
+  kind: DownloadKind,
+): Promise<string> => {
+  if (!redis.client) {
+    return ""
+  }
+  const token = `dl_tkn_${crypto.randomBytes(32).toString("hex")}`
+  const grant: DownloadGrant = { userId, quizId, kind }
+  try {
+    await redis.client.set(
+      downloadTokenKey(token),
+      JSON.stringify(grant),
+      "EX",
+      DOWNLOAD_TOKEN_TTL_SECONDS,
+    )
+  } catch (error) {
+    console.error("Redis operation failed in createDownloadToken:", error)
+    return ""
+  }
+  return token
+}
+
+/**
+ * Redeems a token from `createDownloadToken`, deleting it whether or not it
+ * matches. Returns true only if it was issued for this quiz and kind.
+ */
+export const consumeDownloadToken = async (
+  token: string,
+  quizId: string,
+  kind: DownloadKind,
+): Promise<boolean> => {
+  if (!redis.client) {
+    return false
+  }
+  const key = downloadTokenKey(token)
+  // MULTI GET+DEL instead of GETDEL, which production's Redis 4 lacks.
+  const results = await redis.client.multi().get(key).del(key).exec()
+  const stored = results?.[0]?.[1]
+  if (typeof stored !== "string") {
+    return false
+  }
+  const grant = JSON.parse(stored) as DownloadGrant
+  return grant.quizId === quizId && grant.kind === kind
 }

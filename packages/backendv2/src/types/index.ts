@@ -6,7 +6,7 @@ export interface CustomContext extends ParameterizedContext {
 }
 
 export interface CustomState {
-  user: UserInfo
+  user: AuthenticatedUser
   start: number
 }
 
@@ -18,6 +18,9 @@ export interface UserInfo {
   extra_fields: ExtraFields
   administrator: boolean
 }
+
+/** The part of a TMC user that authenticated requests carry in `ctx.state.user`. */
+export type AuthenticatedUser = Pick<UserInfo, "id" | "administrator">
 
 export type ExtraFields = Record<string, unknown>
 

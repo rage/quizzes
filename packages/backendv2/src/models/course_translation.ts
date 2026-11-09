@@ -1,3 +1,5 @@
+import _ from "lodash"
+
 import { NotFoundError } from "../util/error"
 import { EditCoursePayloadFields } from "./../types/index"
 import BaseModel from "./base_model"
@@ -47,7 +49,9 @@ class CourseTranslation extends BaseModel {
     if (!courseTranslation) {
       throw new NotFoundError(`course translation not found: ${id}`)
     }
-    return await courseTranslation.$query().patchAndFetch(payload)
+    return await courseTranslation
+      .$query()
+      .patchAndFetch(_.pick(payload, ["title", "abbreviation", "languageId"]))
   }
 }
 
