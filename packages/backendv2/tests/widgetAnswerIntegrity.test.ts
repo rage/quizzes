@@ -22,7 +22,11 @@ const peerReviewedQuizId = "4bf4cf2f-3058-4311-8d16-26d781261af7"
 const reviewedAnswerId = "ae29c3be-b5b6-4901-8588-5b0e88774748"
 const peerReviewCollectionId = "aeb6d4f1-a691-45e4-a900-2f7654a004cf"
 const peerReviewQuestionId = "730e3083-7a0d-4ea7-9837-61ee93c6692f"
+const peerReviewedChoiceItemId = "aeb6d4f1-a691-45e4-a900-2f7654a004cf"
+const peerReviewedEssayItemId = "707195a3-aafe-4c06-bf23-854e54e084db"
+const peerReviewedOptionId = "7c802f5b-52f1-468e-a798-3028edc1d3fd"
 const otherQuizId = "2a0c2270-011e-40b2-8796-625764828034"
+const essayQuestionId = "11111111-0000-4000-8000-000000000203"
 const otherCollectionId = "11111111-0000-4000-8000-000000000201"
 const otherQuestionId = "11111111-0000-4000-8000-000000000202"
 
@@ -71,6 +75,44 @@ const giveReview = (userId: number, body: object) =>
     .set("Authorization", `bearer user-${userId}`)
     .set("Accept", "application/json")
     .send(body)
+
+/** Stores an attempt at the peer-reviewed quiz by `userId` and locks their quiz state, as a widget submission would. */
+const answerPeerReviewedQuiz = async (
+  userId: number,
+  answer: { status?: string; deleted?: boolean } = {},
+): Promise<string> => {
+  const [{ id }] = await knex("quiz_answer")
+    .insert({
+      quiz_id: peerReviewedQuizId,
+      user_id: userId,
+      language_id: "xy_YZ",
+      status: "submitted",
+      ...answer,
+    })
+    .returning("id")
+  const [{ id: choiceAnswerId }] = await knex("quiz_item_answer")
+    .insert({ quiz_answer_id: id, quiz_item_id: peerReviewedChoiceItemId })
+    .returning("id")
+  await knex("quiz_option_answer").insert({
+    quiz_item_answer_id: choiceAnswerId,
+    quiz_option_id: peerReviewedOptionId,
+  })
+  await knex("quiz_item_answer").insert({
+    quiz_answer_id: id,
+    quiz_item_id: peerReviewedEssayItemId,
+    text_data: "essay",
+  })
+  await knex("user_quiz_state")
+    .insert({
+      user_id: userId,
+      quiz_id: peerReviewedQuizId,
+      tries: 1,
+      status: "locked",
+    })
+    .onConflict(["user_id", "quiz_id"])
+    .ignore()
+  return id
+}
 
 const setTries = (tries: number) =>
   knex("quiz").update({ tries }).where("id", quizId)
@@ -160,6 +202,14 @@ beforeAll(async () => {
     answer_required: true,
     default: false,
     order: 1,
+  })
+  await knex("peer_review_question").insert({
+    id: essayQuestionId,
+    peer_review_collection_id: peerReviewCollectionId,
+    type: "essay",
+    answer_required: true,
+    default: false,
+    order: 2,
   })
 })
 
@@ -350,7 +400,59 @@ describe("widget answer grading", () => {
       ],
     }).expect(200)
 
-    expect(response.body.userQuizState.pointsAwarded).toBeCloseTo(2 / 3)
+    expect(response.body.userQuizState.pointsAwarded).toBeCloseTo(1)
+  })
+
+  const openAnswer = (textData: unknown) => ({
+    quizId,
+    itemAnswers: [
+      { quizItemId: openItemId, textData, optionAnswers: [] },
+      correctAnswer().itemAnswers[1],
+    ],
+  })
+
+  test("accepts an open answer of the maximum length", async () => {
+    const userId = await newUser()
+    await submit(userId, openAnswer("a".repeat(10_000))).expect(200)
+  })
+
+  test("rejects a longer open answer", async () => {
+    const userId = await newUser()
+    await submit(userId, openAnswer("a".repeat(10_001))).expect(400)
+
+    expect(await knex("quiz_answer").where("user_id", userId)).toHaveLength(0)
+  })
+
+  test("rejects a non-string open answer", async () => {
+    const userId = await newUser()
+    await submit(userId, openAnswer(["koira"])).expect(400)
+  })
+
+  test("reports an invalid validity regex as a bad request", async () => {
+    await knex("quiz_item")
+      .update({ validity_regex: "(" })
+      .where("id", openItemId)
+    try {
+      const userId = await newUser()
+      const response = await submit(userId, correctAnswer()).expect(400)
+      expect(response.body.message).toEqual(
+        "the item's answer check is misconfigured",
+      )
+    } finally {
+      await knex("quiz_item")
+        .update({ validity_regex: "koira" })
+        .where("id", openItemId)
+    }
+  })
+
+  test("counts an unanswered item as wrong", async () => {
+    const userId = await newUser()
+    const response = await submit(userId, {
+      quizId,
+      itemAnswers: [correctAnswer().itemAnswers[0]],
+    }).expect(200)
+
+    expect(response.body.userQuizState.pointsAwarded).toBeCloseTo(1 / 2)
   })
 })
 
@@ -396,12 +498,7 @@ describe("widget peer review", () => {
 
   const reviewer = async () => {
     const userId = await newUser()
-    await knex("user_quiz_state").insert({
-      user_id: userId,
-      quiz_id: peerReviewedQuizId,
-      tries: 1,
-      status: "locked",
-    })
+    await answerPeerReviewedQuiz(userId)
     return userId
   }
 
@@ -468,15 +565,128 @@ describe("widget peer review", () => {
       }),
     ).expect(400)
   })
+
+  test.each([1, 5])("accepts the grade %p", async (value) => {
+    const userId = await reviewer()
+    await giveReview(
+      userId,
+      review({ answers: [{ peerReviewQuestionId, value }] }),
+    ).expect(200)
+  })
+
+  test.each([0, 6, 4.5, -1, "4"])("rejects the grade %p", async (value) => {
+    const userId = await reviewer()
+    await giveReview(
+      userId,
+      review({ answers: [{ peerReviewQuestionId, value }] }),
+    ).expect(400)
+
+    expect(await knex("peer_review").where("user_id", userId)).toHaveLength(0)
+  })
+
+  test("rejects text as the answer to a grade question", async () => {
+    const userId = await reviewer()
+    await giveReview(
+      userId,
+      review({ answers: [{ peerReviewQuestionId, text: "great" }] }),
+    ).expect(400)
+  })
+
+  test("accepts text as the answer to an essay question", async () => {
+    const userId = await reviewer()
+    await giveReview(
+      userId,
+      review({
+        answers: [
+          { peerReviewQuestionId, value: 4 },
+          { peerReviewQuestionId: essayQuestionId, value: null, text: "great" },
+        ],
+      }),
+    ).expect(200)
+  })
+
+  test("rejects a grade as the answer to an essay question", async () => {
+    const userId = await reviewer()
+    await giveReview(
+      userId,
+      review({
+        answers: [{ peerReviewQuestionId: essayQuestionId, value: 5 }],
+      }),
+    ).expect(400)
+  })
+
+  test("rejects a non-string essay answer", async () => {
+    const userId = await reviewer()
+    await giveReview(
+      userId,
+      review({
+        answers: [{ peerReviewQuestionId: essayQuestionId, text: ["great"] }],
+      }),
+    ).expect(400)
+  })
+
+  test("is refused from a user who has not answered the quiz", async () => {
+    const userId = await newUser()
+    await knex("user_quiz_state").insert({
+      user_id: userId,
+      quiz_id: peerReviewedQuizId,
+      tries: 1,
+      status: "locked",
+    })
+    await giveReview(userId, review()).expect(403)
+  })
+
+  test("is refused from a user whose answer was deleted", async () => {
+    const userId = await newUser()
+    await answerPeerReviewedQuiz(userId, { deleted: true })
+    await giveReview(userId, review()).expect(403)
+  })
+
+  test("rejects a superseded answer", async () => {
+    const targetId = await answerPeerReviewedQuiz(await newUser(), {
+      status: "deprecated",
+    })
+    const userId = await reviewer()
+    const response = await giveReview(
+      userId,
+      review({ quizAnswerId: targetId }),
+    ).expect(400)
+    expect(response.body.message).toEqual("answer is not open for review")
+  })
+
+  test("rejects a deleted answer", async () => {
+    const targetId = await answerPeerReviewedQuiz(await newUser(), {
+      deleted: true,
+    })
+    const userId = await reviewer()
+    const response = await giveReview(
+      userId,
+      review({ quizAnswerId: targetId }),
+    ).expect(400)
+    expect(response.body.message).toEqual("answer is not open for review")
+  })
+
+  test("rejects the reviewer's own answer", async () => {
+    const userId = await newUser()
+    const answerId = await answerPeerReviewedQuiz(userId)
+    const response = await giveReview(
+      userId,
+      review({ quizAnswerId: answerId }),
+    ).expect(400)
+    expect(response.body.message).toEqual("User cannot review their own answer")
+  })
 })
 
 describe("widget peer review candidates", () => {
+  const getCandidates = (userId: number, quiz = peerReviewedQuizId) =>
+    request(app.callback())
+      .get(`/api/v2/widget/answers/${quiz}/get-candidates`)
+      .set("Authorization", `bearer user-${userId}`)
+
   test("do not reveal reviewee identity or grading", async () => {
     const userId = await newUser()
-    const response = await request(app.callback())
-      .get(`/api/v2/widget/answers/${peerReviewedQuizId}/get-candidates`)
-      .set("Authorization", `bearer user-${userId}`)
-      .expect(200)
+    await answerPeerReviewedQuiz(userId)
+    const response = await getCandidates(userId).expect(200)
 
     expect(response.body.length).toBeGreaterThan(0)
     for (const candidate of response.body) {
@@ -489,5 +699,116 @@ describe("widget peer review candidates", () => {
         expect(itemAnswer.correct).toBeUndefined()
       }
     }
+  })
+
+  test("are refused to a user who has not answered the quiz", async () => {
+    const userId = await newUser()
+    await getCandidates(userId).expect(403)
+  })
+
+  test("are refused to a user whose answer was deleted", async () => {
+    const userId = await newUser()
+    await answerPeerReviewedQuiz(userId, { deleted: true })
+    await getCandidates(userId).expect(403)
+  })
+
+  test("are refused to a user whose only answer is superseded", async () => {
+    const userId = await newUser()
+    await answerPeerReviewedQuiz(userId, { status: "deprecated" })
+    await getCandidates(userId).expect(403)
+  })
+
+  test("are refused for a quiz without peer review", async () => {
+    const userId = await newUser()
+    await submit(userId, correctAnswer()).expect(200)
+    await getCandidates(userId, quizId).expect(400)
+  })
+
+  test("leave out deleted answers", async () => {
+    const deletedAnswerId = await answerPeerReviewedQuiz(await newUser(), {
+      status: "given-more-than-enough",
+      deleted: true,
+    })
+    const userId = await newUser()
+    await answerPeerReviewedQuiz(userId)
+    const response = await getCandidates(userId).expect(200)
+
+    expect(response.body.map((answer: any) => answer.id)).not.toContain(
+      deletedAnswerId,
+    )
+  })
+})
+
+describe("widget spam flags", () => {
+  const reportSpam = (userId: number, quizAnswerId: string) =>
+    request(app.callback())
+      .post("/api/v2/widget/answers/report-spam")
+      .set("Authorization", `bearer user-${userId}`)
+      .send({ quizAnswerId })
+
+  test("are accepted from another student of the quiz", async () => {
+    const targetId = await answerPeerReviewedQuiz(await newUser())
+    const userId = await newUser()
+    await answerPeerReviewedQuiz(userId)
+    await reportSpam(userId, targetId).expect(200)
+  })
+
+  test("are refused from a user who has not answered the quiz", async () => {
+    const targetId = await answerPeerReviewedQuiz(await newUser())
+    const userId = await newUser()
+    await reportSpam(userId, targetId).expect(403)
+
+    expect(
+      await knex("spam_flag").where("quiz_answer_id", targetId),
+    ).toHaveLength(0)
+  })
+
+  test("are refused on the user's own answer", async () => {
+    const userId = await newUser()
+    const answerId = await answerPeerReviewedQuiz(userId)
+    await reportSpam(userId, answerId).expect(403)
+  })
+
+  test("are refused on a superseded answer", async () => {
+    const targetId = await answerPeerReviewedQuiz(await newUser(), {
+      status: "deprecated",
+    })
+    const userId = await newUser()
+    await answerPeerReviewedQuiz(userId)
+    const response = await reportSpam(userId, targetId).expect(400)
+    expect(response.body.message).toEqual("answer is not open for review")
+
+    expect(
+      (await knex("quiz_answer").where("id", targetId).first()).status,
+    ).toEqual("deprecated")
+  })
+})
+
+describe("widget received peer reviews", () => {
+  const getPeerReviews = (userId: number, quizAnswerId: string) =>
+    request(app.callback())
+      .get(`/api/v2/widget/answers/${quizAnswerId}/peer-reviews`)
+      .set("Authorization", `bearer user-${userId}`)
+
+  test("are shown to the answer's author", async () => {
+    const userId = await newUser()
+    const answerId = await answerPeerReviewedQuiz(userId)
+    await getPeerReviews(userId, answerId).expect(200)
+  })
+
+  test("are hidden from other students", async () => {
+    const userId = await newUser()
+    await answerPeerReviewedQuiz(userId)
+    await getPeerReviews(userId, reviewedAnswerId).expect(403)
+  })
+
+  test("are shown to the course's staff", async () => {
+    const courseTeacherId = 1234
+    await getPeerReviews(courseTeacherId, reviewedAnswerId).expect(200)
+  })
+
+  test("are hidden from another course's staff", async () => {
+    const otherCourseTeacherId = 9876
+    await getPeerReviews(otherCourseTeacherId, reviewedAnswerId).expect(403)
   })
 })

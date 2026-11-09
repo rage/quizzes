@@ -1,5 +1,5 @@
 import knex from "../../database/knex"
-import { BadRequestError, NotFoundError } from "../util/error"
+import { BadRequestError, ForbiddenError, NotFoundError } from "../util/error"
 import BaseModel from "./base_model"
 import Quiz from "./quiz"
 import QuizAnswer from "./quiz_answer"
@@ -35,10 +35,26 @@ class SpamFlag extends BaseModel {
     },
   })
 
+  /**
+   * Records `flaggingUserId`'s spam flag on another student's answer to a quiz they have a
+   * current answer to; throws a ForbiddenError otherwise.
+   */
   public static async reportSpam(
     quizAnswerId: string,
     flaggingUserId: number,
   ): Promise<SpamFlag | BadRequestError> {
+    const quizAnswer = await QuizAnswer.getById(quizAnswerId)
+    if (quizAnswer.userId === flaggingUserId) {
+      throw new ForbiddenError("cannot flag your own answer")
+    }
+    if (
+      !(await QuizAnswer.hasCurrentAnswer(flaggingUserId, quizAnswer.quizId))
+    ) {
+      throw new ForbiddenError("answer the quiz before flagging others")
+    }
+    if (!QuizAnswer.isOpenForReview(quizAnswer)) {
+      throw new BadRequestError("answer is not open for review")
+    }
     if (
       await this.getSpamFlagByUserIdAndQuizAnswerId(
         flaggingUserId,
@@ -47,8 +63,6 @@ class SpamFlag extends BaseModel {
     ) {
       throw new BadRequestError("Can only give one spam flag")
     } else {
-      const quizAnswer = await QuizAnswer.getById(quizAnswerId)
-
       const quiz = await Quiz.getById(quizAnswer.quizId)
 
       const userQuizState = await UserQuizState.getByUserAndQuiz(

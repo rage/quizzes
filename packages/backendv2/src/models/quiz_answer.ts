@@ -6,7 +6,7 @@ import { mixin } from "objection"
 import knex from "../../database/knex"
 import * as Kafka from "../services/kafka"
 import { relayNewAnswer } from "../services/plagiarism"
-import { BadRequestError } from "../util/error"
+import { BadRequestError, ForbiddenError } from "../util/error"
 import { removeNonPrintingCharacters } from "../util/tools"
 import { TStatusModificationOperation } from "./../types/index"
 import { NotFoundError } from "./../util/error"
@@ -17,6 +17,7 @@ import PeerReview from "./peer_review"
 import PeerReviewQuestion from "./peer_review_question"
 import Quiz from "./quiz"
 import QuizAnswerStatusModification from "./quiz_answer_status_modification"
+import type QuizItem from "./quiz_item"
 import QuizItemAnswer from "./quiz_item_answer"
 import QuizOptionAnswer from "./quiz_option_answer"
 import softDelete from "./soft_delete"
@@ -56,6 +57,9 @@ class QuizAnswer extends mixin(BaseModel, [
   quiz!: Quiz
   correctnessCoefficient!: number
   deleted!: boolean
+
+  /** Longest open-item answer accepted, in characters; bounds the input of a teacher's validity regex. */
+  static MAX_OPEN_ANSWER_LENGTH = 10_000
 
   static SEARCH_RESULT_LIMIT = 100
   static FIRST_PAGE_INDEX = 0
@@ -171,6 +175,29 @@ class QuizAnswer extends mixin(BaseModel, [
         .andWhere("quiz_id", quizId)
         .andWhereNot("status", "deprecated")
     )[0]
+  }
+
+  /**
+   * Whether the user has a current answer to the quiz: one neither deleted nor superseded by a
+   * later attempt. Reviewing and flagging others' answers require one.
+   */
+  public static async hasCurrentAnswer(
+    userId: number,
+    quizId: string,
+  ): Promise<boolean> {
+    const answer = await this.query()
+      .select("id")
+      .where("user_id", userId)
+      .andWhere("quiz_id", quizId)
+      .andWhere("deleted", false)
+      .andWhereNot("status", "deprecated")
+      .first()
+    return answer !== undefined
+  }
+
+  /** Whether other students may still review or flag `quizAnswer`. */
+  public static isOpenForReview(quizAnswer: QuizAnswer): boolean {
+    return !quizAnswer.deleted && quizAnswer.status !== "deprecated"
   }
 
   public static async save(quizAnswer: QuizAnswer, trx: Knex.Transaction) {
@@ -566,6 +593,7 @@ class QuizAnswer extends mixin(BaseModel, [
         trx,
       )
       await this.checkAnswersBelongToQuiz(quizAnswer, quizId, trx)
+      this.checkOpenAnswers(quizAnswer, quiz)
       this.assessAnswer(quizAnswer, quiz)
       this.gradeAnswer(quizAnswer, userQuizState, quiz)
       this.assessUserQuizStatus(quizAnswer, userQuizState, quiz, false)
@@ -754,6 +782,26 @@ class QuizAnswer extends mixin(BaseModel, [
     }
   }
 
+  /** Throws a BadRequestError unless each open-item answer is a string of at most `MAX_OPEN_ANSWER_LENGTH`. */
+  private static checkOpenAnswers(quizAnswer: QuizAnswer, quiz: Quiz) {
+    const openItemIds = new Set(
+      quiz.items.filter((item) => item.type === "open").map((item) => item.id),
+    )
+    for (const itemAnswer of quizAnswer.itemAnswers ?? []) {
+      if (!openItemIds.has(itemAnswer.quizItemId)) {
+        continue
+      }
+      if (typeof itemAnswer.textData !== "string") {
+        throw new BadRequestError("no answer provided")
+      }
+      if (itemAnswer.textData.length > this.MAX_OPEN_ANSWER_LENGTH) {
+        throw new BadRequestError(
+          `answer is longer than ${this.MAX_OPEN_ANSWER_LENGTH} characters`,
+        )
+      }
+    }
+  }
+
   private static checkIfSubmittable(quiz: Quiz, userQuizState: UserQuizState) {
     if (userQuizState.status === "locked") {
       throw new BadRequestError("already answered")
@@ -792,9 +840,7 @@ class QuizAnswer extends mixin(BaseModel, [
           if (!textData) {
             throw new BadRequestError("no answer provided")
           }
-          const validityRegex = quizItem.validityRegex.trim()
-          const validator = new RegExp(validityRegex, "i")
-          quizItemAnswer.correct = validator.test(textData) ? true : false
+          quizItemAnswer.correct = this.validityRegexOf(quizItem).test(textData)
           break
         case "essay":
           if (quizAnswer.status === "confirmed") {
@@ -837,6 +883,14 @@ class QuizAnswer extends mixin(BaseModel, [
           quizItemAnswer.correct = true
           break
       }
+    }
+  }
+
+  private static validityRegexOf(quizItem: QuizItem): RegExp {
+    try {
+      return new RegExp(quizItem.validityRegex.trim(), "i")
+    } catch {
+      throw new BadRequestError("the item's answer check is misconfigured")
     }
   }
 
@@ -909,6 +963,11 @@ class QuizAnswer extends mixin(BaseModel, [
     }
   }
 
+  /**
+   * Raises the user's points to the share of the quiz's current items `quizAnswer` got right,
+   * once the answer is confirmed. Unanswered items count as wrong, as every item type takes an
+   * answer; answers to deleted items count for nothing.
+   */
   private static gradeAnswer(
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
@@ -921,12 +980,19 @@ class QuizAnswer extends mixin(BaseModel, [
       userQuizState.pointsAwarded = quiz.points
       return
     }
-    const quizItemAnswers = quizAnswer.itemAnswers
-    const nCorrect = quizItemAnswers.filter(
-      (itemAnswer) => itemAnswer.correct === true,
-    ).length
-    const total = quizItemAnswers.length
-    const points = (nCorrect / total) * quiz.points
+    const itemIds = new Set(quiz.items.map((item) => item.id))
+    const correctItemIds = new Set(
+      quizAnswer.itemAnswers
+        .filter(
+          (itemAnswer) =>
+            itemAnswer.correct === true && itemIds.has(itemAnswer.quizItemId),
+        )
+        .map((itemAnswer) => itemAnswer.quizItemId),
+    )
+    const points =
+      itemIds.size === 0
+        ? 0
+        : (correctItemIds.size / itemIds.size) * quiz.points
     const pointsAwarded = userQuizState.pointsAwarded ?? 0
     userQuizState.pointsAwarded =
       points > pointsAwarded ? points : pointsAwarded
@@ -1064,13 +1130,19 @@ class QuizAnswer extends mixin(BaseModel, [
     }
   }
 
-  /** Picks up to two other students' answers to offer a reviewer, with only what the review form shows. */
+  /**
+   * Picks up to two other students' answers to offer a reviewer, with only what the review form shows.
+   *
+   * Throws a BadRequestError if the quiz has no peer review, and a ForbiddenError unless the
+   * reviewer has a current answer to it.
+   */
   public static async getAnswersToReview(reviewerId: number, quizId: string) {
-    // validate quiz id
-    try {
-      await Quiz.getById(quizId)
-    } catch (error) {
-      throw error
+    const quiz = await Quiz.getById(quizId)
+    if (quiz.peerReviewCollections.length === 0) {
+      throw new BadRequestError("quiz has no peer review")
+    }
+    if (!(await this.hasCurrentAnswer(reviewerId, quizId))) {
+      throw new ForbiddenError("answer the quiz before reviewing others")
     }
 
     const answerIds = this.query().select("id").where("quiz_id", quizId)
@@ -1256,6 +1328,7 @@ class QuizAnswer extends mixin(BaseModel, [
       .select("quiz_answer.id", "quiz_answer.status")
       .where("quiz_answer.quiz_id", quizId)
       .andWhere("quiz_answer.user_id", "!=", reviewerId)
+      .andWhere("quiz_answer.deleted", false)
       .andWhere("quiz_answer.id", "NOT IN", alreadyReviewed)
       .andWhere("quiz_answer.id", "NOT IN", flagged)
 

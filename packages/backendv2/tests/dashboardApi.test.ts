@@ -1179,6 +1179,14 @@ describe("dashboard: update manual review status", () => {
 describe("Answer: spam flags", () => {
   beforeAll(async () => {
     await safeSeed(configA)
+    await knex("quiz_answer").insert(
+      [3456, 4567].map((userId) => ({
+        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        user_id: userId,
+        language_id: "xy_YZ",
+        status: "given-enough",
+      })),
+    )
   })
 
   afterAll(async () => {
@@ -1239,7 +1247,7 @@ describe("Answer: spam flags", () => {
       })
   })
 
-  test("spam flag already given", (done) => {
+  test("own answer cannot be flagged", (done) => {
     request(app.callback())
       .post("/api/v2/widget/answers/report-spam")
       .set("Authorization", "bearer PLEB_TOKEN_1")
@@ -1248,10 +1256,9 @@ describe("Answer: spam flags", () => {
         quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
       })
       .expect((response) => {
-        const received: BadRequestError = response.body
-        expect(received.message).toEqual("Can only give one spam flag")
+        expect(response.body.message).toEqual("cannot flag your own answer")
       })
-      .expect(400)
+      .expect(403)
       .end(done)
   })
 
@@ -1336,6 +1343,22 @@ describe("Answer: spam flags", () => {
         expect(response.body.status).toEqual("spam")
       })
       .expect(200)
+      .end(done)
+  })
+
+  test("spam flag already given", (done) => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/report-spam")
+      .set("Authorization", "bearer PLEB_TOKEN_2")
+      .set("Accept", "application/json")
+      .send({
+        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      })
+      .expect((response) => {
+        const received: BadRequestError = response.body
+        expect(received.message).toEqual("Can only give one spam flag")
+      })
+      .expect(400)
       .end(done)
   })
 })

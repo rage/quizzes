@@ -11,7 +11,7 @@ import {
   SpamFlag,
 } from "../../models/"
 import { CustomContext, CustomState } from "../../types"
-import { checkAccessOrThrow } from "./../dashboard/util"
+import { checkAccessOrThrow, getCourseIdByAnswerId } from "./../dashboard/util"
 
 const widget = new Router<CustomState, CustomContext>({
   prefix: "/widget",
@@ -57,12 +57,13 @@ const widget = new Router<CustomState, CustomContext>({
 
   .get("/answers/:answerId/peer-reviews", accessControl(), async (ctx) => {
     const answerId = ctx.params.answerId
-
-    // check that answerId exists
-    try {
-      await QuizAnswer.getByIdWithPeerReviews(answerId)
-    } catch (error) {
-      throw error
+    const answer = await QuizAnswer.getById(answerId)
+    if (answer.userId !== ctx.state.user.id) {
+      await checkAccessOrThrow(
+        ctx.state.user,
+        await getCourseIdByAnswerId(answerId),
+        "view",
+      )
     }
 
     const peerReviews = await PeerReview.getWithAnswersByAnswerId(answerId)

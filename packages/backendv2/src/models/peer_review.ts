@@ -2,7 +2,7 @@ import _ from "lodash"
 import { mixin } from "objection"
 
 import knex from "../../database/knex"
-import { BadRequestError, NotFoundError } from "./../util/error"
+import { BadRequestError, ForbiddenError, NotFoundError } from "./../util/error"
 import BaseModel from "./base_model"
 import PeerReviewQuestion from "./peer_review_question"
 import PeerReviewQuestionAnswer from "./peer_review_question_answer"
@@ -10,6 +10,10 @@ import Quiz from "./quiz"
 import QuizAnswer from "./quiz_answer"
 import softDelete from "./soft_delete"
 import UserQuizState from "./user_quiz_state"
+
+// The widget grades on likert-react's default scale: five icons valued 1 to 5.
+const MIN_GRADE = 1
+const MAX_GRADE = 5
 
 class PeerReview extends BaseModel {
   id!: string
@@ -77,27 +81,62 @@ class PeerReview extends BaseModel {
     })
   }
 
-  /** Stores a review; `peerReview` must come from `fromSubmission`. */
+  /**
+   * Stores a review; `peerReview` must come from `fromSubmission`.
+   *
+   * Unless `skipGiverRequirements`, the reviewer must have a current answer to the quiz
+   * (ForbiddenError) and the reviewed answer must be open for review.
+   */
   public static async givePeerReview(
     peerReview: PeerReview,
     skipGiverRequirements: boolean = false,
   ) {
-    peerReview.answers.forEach((answer: PeerReviewQuestionAnswer): void => {
-      if (answer.text) {
-        return
+    for (const answer of peerReview.answers) {
+      const hasValue = answer.value !== null && answer.value !== undefined
+      if (
+        hasValue &&
+        !(
+          Number.isInteger(answer.value) &&
+          answer.value >= MIN_GRADE &&
+          answer.value <= MAX_GRADE
+        )
+      ) {
+        throw new BadRequestError(
+          `review values must be integers from ${MIN_GRADE} to ${MAX_GRADE}`,
+        )
       }
-      if (answer.value === null) {
+      if (
+        answer.text !== null &&
+        answer.text !== undefined &&
+        typeof answer.text !== "string"
+      ) {
+        throw new BadRequestError("review texts must be strings")
+      }
+      if (!hasValue && !answer.text) {
         throw new BadRequestError("review must contain values")
       }
-    })
+    }
 
     const { quizAnswerId, userId: sourceUserId } = peerReview
 
-    // validate quiz answer id
-    try {
-      await QuizAnswer.getById(quizAnswerId)
-    } catch (error) {
-      throw error
+    const targetQuizAnswer = await QuizAnswer.getById(quizAnswerId)
+    const quizId = targetQuizAnswer.quizId
+    const { userId: targetUserId } = targetQuizAnswer
+
+    if (sourceUserId === targetUserId) {
+      throw new BadRequestError("User cannot review their own answer")
+    }
+
+    let sourceQuizAnswer: QuizAnswer | null = null
+    if (!skipGiverRequirements) {
+      sourceQuizAnswer =
+        (await QuizAnswer.getByUserAndQuiz(sourceUserId, quizId)) ?? null
+      if (!sourceQuizAnswer || sourceQuizAnswer.deleted) {
+        throw new ForbiddenError("answer the quiz before reviewing others")
+      }
+      if (!QuizAnswer.isOpenForReview(targetQuizAnswer)) {
+        throw new BadRequestError("answer is not open for review")
+      }
     }
 
     // check if peer review already given by this user for this quiz answer
@@ -110,25 +149,27 @@ class PeerReview extends BaseModel {
       throw new BadRequestError("Answer can only be peer reviewed once")
     }
 
-    const targetQuizAnswer = await QuizAnswer.getById(quizAnswerId)
-
-    const quizId = targetQuizAnswer.quizId
-    await this.checkQuestionsBelongToQuiz(peerReview, quizId)
-
-    let sourceQuizAnswer: QuizAnswer | null = null
-    if (!skipGiverRequirements) {
-      sourceQuizAnswer = await QuizAnswer.getByUserAndQuiz(sourceUserId, quizId)
+    const typeByQuestionId = await this.checkQuestionsBelongToQuiz(
+      peerReview,
+      quizId,
+    )
+    for (const answer of peerReview.answers) {
+      const matchesQuestionType =
+        typeByQuestionId.get(answer.peerReviewQuestionId) === "grade"
+          ? answer.value !== null &&
+            answer.value !== undefined &&
+            (answer.text === null || answer.text === undefined)
+          : Boolean(answer.text) &&
+            (answer.value === null || answer.value === undefined)
+      if (!matchesQuestionType) {
+        throw new BadRequestError(
+          "grade questions take a value and essay questions a text",
+        )
+      }
     }
 
     const quiz = await Quiz.getById(quizId)
     quiz.course = await quiz.$relatedQuery("course")
-
-    const { userId: targetUserId } = targetQuizAnswer
-
-    // cannot peer review own answer
-    if (sourceUserId === targetUserId) {
-      throw new BadRequestError("User cannot review their own answer")
-    }
 
     let sourceUserQuizState: UserQuizState | null = null
 
@@ -219,11 +260,13 @@ class PeerReview extends BaseModel {
    * Throws a BadRequestError unless the review's collection belongs to the quiz and every
    * answer is to a question of that collection. Deleted ones count, as a widget may still
    * show them.
+   *
+   * Returns the type of each answered question by its id.
    */
   private static async checkQuestionsBelongToQuiz(
     peerReview: PeerReview,
     quizId: string,
-  ) {
+  ): Promise<Map<string, "essay" | "grade">> {
     const collection =
       peerReview.peerReviewCollectionId &&
       (await knex("peer_review_collection")
@@ -238,8 +281,10 @@ class PeerReview extends BaseModel {
     const questionIds = new Set(
       peerReview.answers.map((answer) => answer.peerReviewQuestionId),
     )
-    const questions = await knex("peer_review_question")
-      .select("id")
+    const questions: { id: string; type: "essay" | "grade" }[] = await knex(
+      "peer_review_question",
+    )
+      .select("id", "type")
       .whereIn("id", [...questionIds])
       .andWhere("peer_review_collection_id", collection.id)
     if (questions.length !== questionIds.size) {
@@ -247,6 +292,7 @@ class PeerReview extends BaseModel {
         "peer review question does not belong to the collection",
       )
     }
+    return new Map(questions.map((question) => [question.id, question.type]))
   }
 
   public static async getByUserIdAndQuizAnswerId(
