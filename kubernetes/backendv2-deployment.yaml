@@ -12,9 +12,19 @@ spec:
       labels:
         app: quizzes-backendv2
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: quizzes-backendv2
         image: ${BACKENDV2_IMAGE}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: [ALL]
         imagePullPolicy: Always
         resources:
           requests:
@@ -100,6 +110,10 @@ spec:
       initContainers:
         - name: quizzes-backendv2-run-migrations
           image: ${BACKENDV2_IMAGE}
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]
           command: ['npx', 'knex', '--knexfile', 'dist/knexfile.js', 'migrate:latest']
           env:
             - name: DB_NAME

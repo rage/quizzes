@@ -12,9 +12,19 @@ spec:
       labels:
         app: quizzes-dashboardv2
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: quizzes-dashboardv2
         image: ${DASHBOARDV2_IMAGE}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: [ALL]
         imagePullPolicy: Always
         resources:
           requests:
