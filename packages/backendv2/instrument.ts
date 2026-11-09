@@ -9,5 +9,11 @@ if (process.env.SENTRY_DSN) {
   Sentry.init({
     dsn: process.env.SENTRY_DSN,
     release: `quizzes-backend@${process.env.GIT_COMMIT}`,
+    // Request bodies and query data hold student answers.
+    dataCollection: {
+      userInfo: false,
+      httpBodies: [],
+      databaseQueryData: false,
+    },
   })
 }

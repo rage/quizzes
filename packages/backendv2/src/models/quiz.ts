@@ -1,4 +1,3 @@
-import { stringify } from "csv-stringify"
 import type { Knex } from "knex"
 import {
   NotNullViolationError,
@@ -9,9 +8,11 @@ import {
 
 import knex from "../../database/knex"
 import * as Kafka from "../services/kafka"
+import { toCsvStream } from "../util/csv"
 import { NotFoundError } from "../util/error"
 import { BadRequestError } from "../util/error"
 import moduleInitializer from "../util/initializer"
+import { assertUuid } from "../util/tools"
 import BaseModel from "./base_model"
 import Course from "./course"
 import PeerReviewCollection from "./peer_review_collection"
@@ -317,10 +318,10 @@ export class Quiz extends BaseModel {
         .withGraphJoined("texts(previewSelect)")
         .where("quiz.id", quizId)
     )[0]
-    quiz.items = []
     if (!quiz) {
       throw new NotFoundError(`quiz not found: ${quizId}`)
     }
+    quiz.items = []
     return this.moveTextsToParent(quiz)
   }
 
@@ -335,62 +336,44 @@ export class Quiz extends BaseModel {
   }
 
   static async getQuizInfo(quizId: string) {
+    assertUuid(quizId)
     await moduleInitializer()
 
-    const stringifier = stringify({
-      delimiter: ",",
-      quoted: true,
-      header: true,
-    })
-
-    const stream = this.query()
+    const rows = this.query()
       .withGraphJoined("texts")
       .withGraphJoined("items.[texts, options.[texts]]")
       .withGraphJoined("peerReviewCollections.[texts, questions.[texts]]")
       .where("quiz.id", quizId)
       .toKnexQuery()
       .stream()
-      .pipe(stringifier)
 
-    return stream
+    return toCsvStream(rows, { delimiter: ",", quoted: true, header: true })
   }
 
   static async getPeerReviewInfo(quizId: string) {
+    assertUuid(quizId)
     await moduleInitializer()
 
-    const stringifier = stringify({
-      delimiter: ",",
-      quoted: true,
-      header: true,
-    })
-
-    const stream = this.query()
+    const rows = this.query()
       .withGraphJoined("peerReviewCollections.[texts, questions.[texts]]")
       .where("quiz.id", quizId)
       .toKnexQuery()
       .stream()
-      .pipe(stringifier)
 
-    return stream
+    return toCsvStream(rows, { delimiter: ",", quoted: true, header: true })
   }
 
   static async getQuizAnswerInfo(quizId: string) {
+    assertUuid(quizId)
     await moduleInitializer()
 
-    const stringifier = stringify({
-      delimiter: ",",
-      quoted: true,
-      header: true,
-    })
-
-    const stream = this.query()
+    const rows = this.query()
       .withGraphJoined("answers.[itemAnswers.[optionAnswers]]")
       .where("quiz.id", quizId)
       .toKnexQuery()
       .stream()
-      .pipe(stringifier)
 
-    return stream
+    return toCsvStream(rows, { delimiter: ",", quoted: true, header: true })
   }
 
   private static moveTextsToParent(quiz: Quiz) {

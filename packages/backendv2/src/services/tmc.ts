@@ -9,6 +9,7 @@ export const getCurrentUserDetails = async (
     `https://tmc.mooc.fi/api/v8/users/current?show_user_fields=true`,
     {
       headers: { Authorization: `Bearer ${accessToken}` },
+      timeout: 10_000,
     },
   )
   const userInfo = res.data

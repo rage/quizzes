@@ -56,9 +56,7 @@ class SpamFlag extends BaseModel {
         quiz.id,
       )
       if (!userQuizState) {
-        throw new NotFoundError(
-          `No quiz state for user ${quizAnswer.userId} in quiz ${quiz.id}`,
-        )
+        throw new NotFoundError("No quiz state for the answer's author")
       }
 
       if (userQuizState.spamFlags === null) {

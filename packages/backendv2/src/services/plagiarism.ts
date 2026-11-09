@@ -23,7 +23,9 @@ export const relayNewAnswer = async (data: any) => {
     })
     clearTimeout(timeout)
   } catch (error) {
-    console.log(error)
-    GlobalLogger.error("plagiarism detection: backend responded with error")
+    GlobalLogger.error("plagiarism detection: backend responded with error", {
+      error: error instanceof Error ? error.message : String(error),
+      status: axios.isAxiosError(error) ? error.response?.status : undefined,
+    })
   }
 }
