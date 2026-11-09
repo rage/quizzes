@@ -621,16 +621,11 @@ class QuizAnswer extends mixin(BaseModel, [
           trx,
         )
       }
-      await trx.commit()
-      const { pointsAwarded } = savedUserQuizState
-      const canSeeAnswers =
-        savedUserQuizState.status === "locked" ||
-        // Same full-points check as the widget's submit action in moocfi-quizzes.
-        (!!pointsAwarded && Math.abs(pointsAwarded - quiz.points) < 0.001)
-      const responseQuiz = canSeeAnswers
+      const responseQuiz = Quiz.canSeeAnswerKey(savedUserQuizState, quiz.points)
         ? quiz
-        : await Quiz.getByIdStripped(quizId)
+        : Quiz.removeAnswerKey(quiz)
       responseQuiz.course = course
+      await trx.commit()
       return {
         quiz: responseQuiz,
         quizAnswer: savedQuizAnswer,

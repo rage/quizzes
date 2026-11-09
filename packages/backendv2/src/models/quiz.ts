@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto"
+
 import type { Knex } from "knex"
 import {
   NotNullViolationError,
@@ -136,6 +138,7 @@ export class Quiz extends BaseModel {
 
   static async save(data: any) {
     const quiz = data
+    quiz.id ||= randomUUID()
     const course = await Course.getById(quiz.courseId)
     const languageId = course.languageId
     quiz.texts = [
@@ -207,6 +210,8 @@ export class Quiz extends BaseModel {
         ]
         delete peerReviewQuestion.title
         delete peerReviewQuestion.body
+        // Not a relation of this graph, so objection leaves the client's value in place.
+        peerReviewQuestion.quizId = quiz.id
       })
     })
 
@@ -295,8 +300,26 @@ export class Quiz extends BaseModel {
     return this.moveTextsToParent(quiz)
   }
 
-  static async getByIdStripped(quizId: string) {
-    const quiz = await this.getById(quizId)
+  /**
+   * Whether a student in `state` may see a quiz's answer key: once their state is locked or
+   * they have its full `points`. Matches the moocfi-quizzes widget's check.
+   */
+  static canSeeAnswerKey(
+    state:
+      | { status?: string; pointsAwarded?: number | null }
+      | null
+      | undefined,
+    points: number,
+  ) {
+    const pointsAwarded = state?.pointsAwarded
+    return (
+      state?.status === "locked" ||
+      (!!pointsAwarded && Math.abs(pointsAwarded - points) < 0.001)
+    )
+  }
+
+  /** Removes the feedback and answer checks that would give away the correct answers from `quiz`, in place. */
+  static removeAnswerKey(quiz: Quiz) {
     delete (quiz as Partial<Quiz>).submitMessage
     for (const quizItem of quiz.items as Partial<QuizItem>[]) {
       delete quizItem.successMessage

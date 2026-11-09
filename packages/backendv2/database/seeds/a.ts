@@ -367,6 +367,7 @@ export async function seed(knex: Knex): Promise<any> {
     knex("peer_review_question").insert([
       {
         id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
+        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
         peer_review_collection_id: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
         default: true,
         type: "grade",

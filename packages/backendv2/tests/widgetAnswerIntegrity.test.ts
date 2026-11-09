@@ -4,6 +4,7 @@ import request from "supertest"
 import app from "../app"
 import redis from "../config/redis"
 import knex from "../database/knex"
+import Quiz from "../src/models/quiz"
 import { configA, safeClean, safeSeed } from "./util"
 
 const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44b"
@@ -324,6 +325,47 @@ describe("widget answer response", () => {
       expect(openItem.validityRegex).toBeUndefined()
     } finally {
       await knex("quiz").update({ points: 1 }).where("id", quizId)
+    }
+  })
+
+  test("hides the answer key of a quiz worth no points when fetched", async () => {
+    await knex("quiz").update({ points: 0 }).where("id", quizId)
+    try {
+      const userId = await newUser()
+      await submit(userId, wrongAnswer()).expect(200)
+      const fetched = await request(app.callback())
+        .get(`/api/v2/widget/quizzes/${quizId}`)
+        .set("Authorization", `bearer user-${userId}`)
+        .expect(200)
+
+      const openItem = fetched.body.quiz.items.find(
+        (item: any) => item.id === openItemId,
+      )
+      expect(openItem.validityRegex).toBeUndefined()
+    } finally {
+      await knex("quiz").update({ points: 1 }).where("id", quizId)
+    }
+  })
+
+  test("hides the answer key like the widget's quiz route does", async () => {
+    const userId = await newUser()
+    const submitted = await submit(userId, wrongAnswer()).expect(200)
+    const fetched = await request(app.callback())
+      .get(`/api/v2/widget/quizzes/${quizId}`)
+      .set("Authorization", `bearer user-${userId}`)
+      .expect(200)
+
+    expect(submitted.body.quiz).toEqual(fetched.body.quiz)
+  })
+
+  test("is built without reading the quiz again", async () => {
+    const getById = jest.spyOn(Quiz, "getById")
+    try {
+      const userId = await newUser()
+      await submit(userId, wrongAnswer()).expect(200)
+      expect(getById).toHaveBeenCalledTimes(1)
+    } finally {
+      getById.mockRestore()
     }
   })
 

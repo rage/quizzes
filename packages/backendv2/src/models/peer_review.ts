@@ -2,6 +2,7 @@ import _ from "lodash"
 import { mixin } from "objection"
 
 import knex from "../../database/knex"
+import { assertUuid } from "../util/tools"
 import { BadRequestError, ForbiddenError, NotFoundError } from "./../util/error"
 import BaseModel from "./base_model"
 import PeerReviewQuestion from "./peer_review_question"
@@ -68,6 +69,8 @@ class PeerReview extends BaseModel {
     if (!Array.isArray(body?.answers) || body.answers.length === 0) {
       throw new BadRequestError("review must contain answers")
     }
+    assertUuid(body.quizAnswerId)
+    assertUuid(body.peerReviewCollectionId)
     return this.fromJson({
       ..._.pick(body, [
         "quizAnswerId",

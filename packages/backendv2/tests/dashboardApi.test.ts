@@ -735,6 +735,84 @@ describe("dashboard: save quiz", () => {
       .first()
     expect(course.max_spam_flags).not.toEqual(12345)
   })
+
+  const otherQuizId = "2a0c2270-011e-40b2-8796-625764828034"
+
+  test("tie a new quiz's peer review questions to it", async () => {
+    const quiz = structuredClone(input.newQuiz)
+    const clientQuizId = "6a6e2c55-1b1f-4f0e-9d0c-4d1f3a3e9c11"
+    Object.assign(quiz.items[0], { quizId: clientQuizId })
+    Object.assign(quiz.peerReviewCollections[0], { quizId: clientQuizId })
+    Object.assign(quiz.peerReviewCollections[0].questions[0], {
+      quizId: clientQuizId,
+    })
+
+    const response = await request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send(quiz)
+      .expect(200)
+
+    const quizId = response.body.id
+    expect(quizId).not.toEqual(clientQuizId)
+    const questions = await knex("peer_review_question")
+      .join(
+        "peer_review_collection",
+        "peer_review_collection.id",
+        "peer_review_question.peer_review_collection_id",
+      )
+      .where("peer_review_collection.quiz_id", quizId)
+      .select("peer_review_question.quiz_id")
+    expect(questions).toEqual([{ quiz_id: quizId }])
+    const items = await knex("quiz_item").where("quiz_id", quizId)
+    expect(items).toHaveLength(2)
+  })
+
+  test("keep the saved quiz's rows from pointing at another quiz", async () => {
+    const created = await request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send(structuredClone(input.newQuiz))
+      .expect(200)
+    const quiz = created.body
+    const collection = quiz.peerReviewCollections[0]
+    quiz.items[0].quizId = otherQuizId
+    collection.quizId = otherQuizId
+    collection.questions[0].quizId = otherQuizId
+    collection.questions.push({
+      quizId: otherQuizId,
+      peerReviewCollectionId: collection.id,
+      default: false,
+      type: "grade",
+      order: 2,
+      title: "another question",
+      body: "answer this too",
+    })
+
+    await request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send(quiz)
+      .expect(200)
+
+    const questions = await knex("peer_review_question").where(
+      "peer_review_collection_id",
+      collection.id,
+    )
+    expect(questions.map((question) => question.quiz_id)).toEqual([
+      quiz.id,
+      quiz.id,
+    ])
+    const item = await knex("quiz_item").where("id", quiz.items[0].id).first()
+    expect(item.quiz_id).toEqual(quiz.id)
+    const storedCollection = await knex("peer_review_collection")
+      .where("id", collection.id)
+      .first()
+    expect(storedCollection.quiz_id).toEqual(quiz.id)
+    expect(
+      await knex("peer_review_question").where("quiz_id", otherQuizId),
+    ).toEqual([])
+  })
 })
 
 describe("dashboard: get answer by id", () => {
@@ -800,6 +878,14 @@ describe("dashboard: get answer by id", () => {
       })
       .expect(200)
       .end(done)
+  })
+
+  test("respond with 400 without SQL if the answer id is not a UUID", async () => {
+    const response = await request(app.callback())
+      .get("/api/v2/dashboard/answers/not-a-uuid")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(400)
+    expect(response.body.message).not.toMatch(/select|not-a-uuid/i)
   })
 })
 

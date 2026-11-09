@@ -58,13 +58,13 @@ describe("error responses", () => {
     expect(response.status).toBe(404)
   })
 
-  test("a server error hides the SQL", async () => {
+  test("a malformed id is a 400 that hides the SQL", async () => {
     const response = await request(app.callback()).get(
       "/api/v2/widget/quizzes/not-a-uuid/preview",
     )
-    expect(response.status).toBe(500)
-    expect(response.body.message).not.toMatch(/select/i)
-    expect(Sentry.captureException).toHaveBeenCalledTimes(1)
+    expect(response.status).toBe(400)
+    expect(response.body.message).not.toMatch(/select|not-a-uuid/i)
+    expect(Sentry.captureException).not.toHaveBeenCalled()
   })
 })
 

@@ -501,6 +501,23 @@ describe("widget: submitting a peer review", () => {
       })
       .end(done)
   })
+
+  test("responds with 400 if the answer id is missing", async () => {
+    const { quizAnswerId: _, ...review } = input.peerReviewCollection1
+    await request(app.callback())
+      .post("/api/v2/widget/answers/give-review")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .send(review)
+      .expect(400)
+  })
+
+  test("responds with 400 without SQL if an answer id is not a UUID", async () => {
+    const response = await request(app.callback())
+      .get("/api/v2/widget/answers/not-a-uuid/peer-reviews")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(400)
+    expect(response.body.message).not.toMatch(/select|not-a-uuid/i)
+  })
 })
 
 describe("widget: fetching quiz info", () => {

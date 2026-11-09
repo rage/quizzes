@@ -1,3 +1,5 @@
+import { DatabaseError } from "pg"
+
 import * as Sentry from "@sentry/node"
 
 import { CustomContext } from "../types"
@@ -15,9 +17,22 @@ const statusByErrorType = new Map<unknown, number>([
   [NotFoundError, 404],
 ])
 
+const INVALID_TEXT_REPRESENTATION = "22P02"
+
+const isInvalidTextRepresentation = (error: Error) => {
+  const dbError = (error as { nativeError?: unknown }).nativeError ?? error
+  return (
+    dbError instanceof DatabaseError &&
+    dbError.code === INVALID_TEXT_REPRESENTATION
+  )
+}
+
 const statusOf = (error: unknown): number => {
   if (!(error instanceof Error)) {
     return 500
+  }
+  if (isInvalidTextRepresentation(error)) {
+    return 400
   }
   const status = statusByErrorType.get(error.constructor)
   if (status !== undefined) {
@@ -37,7 +52,10 @@ const errorHandler = async (ctx: CustomContext, next: () => Promise<any>) => {
   } catch (error) {
     const status = statusOf(error)
     ctx.status = status
-    if (status < 500 && error instanceof Error) {
+    if (error instanceof Error && isInvalidTextRepresentation(error)) {
+      // The database's message quotes the offending value and query.
+      ctx.body = { message: "malformed value in request" }
+    } else if (status < 500 && error instanceof Error) {
       ctx.body = { message: error.message }
     } else {
       // Server error messages can carry SQL with bound values.

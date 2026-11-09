@@ -356,7 +356,7 @@ export const validation = {
           {
             id: expect.stringMatching(uuid),
             peerReviewCollectionId: expect.stringMatching(uuid),
-            quizId: null,
+            quizId: expect.stringMatching(uuid),
             answerRequired: true,
             default: true,
             type: "grade",
@@ -460,7 +460,7 @@ export const validation = {
           {
             id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
             peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-            quizId: null,
+            quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
             answerRequired: true,
             deleted: false,
             default: true,
@@ -578,7 +578,7 @@ export const validation = {
           {
             id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
             peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-            quizId: null,
+            quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
             answerRequired: true,
             default: true,
             deleted: false,
@@ -955,7 +955,7 @@ export const validation = {
               id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
               order: 1,
               peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-              quizId: null,
+              quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
               deleted: false,
               texts: [
                 {
@@ -994,7 +994,7 @@ export const validation = {
               id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
               order: 1,
               peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-              quizId: null,
+              quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
               deleted: false,
               texts: [
                 {
@@ -1370,7 +1370,7 @@ export const validation = {
           questions: [
             {
               id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
-              quizId: null,
+              quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
               peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
               default: true,
               order: 1,

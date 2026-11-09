@@ -28,15 +28,10 @@ const widget = new Router<CustomState, CustomContext>({
     if (quizAnswer?.deleted) {
       quizAnswer = null
     }
-    let canSeeAnswers = false
-    const strippedQuiz = await Quiz.getByIdStripped(quizId)
-    if (
-      userQuizState?.status === "locked" ||
-      (userQuizState?.pointsAwarded || 0) >= strippedQuiz.points
-    ) {
-      canSeeAnswers = true
-    }
-    const quiz = canSeeAnswers ? await Quiz.getById(quizId) : strippedQuiz
+    const fullQuiz = await Quiz.getById(quizId)
+    const quiz = Quiz.canSeeAnswerKey(userQuizState, fullQuiz.points)
+      ? fullQuiz
+      : Quiz.removeAnswerKey(fullQuiz)
     const course = await Course.getById(quiz.courseId)
     quiz.course = course
     ctx.body = {
