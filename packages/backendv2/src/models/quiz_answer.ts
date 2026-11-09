@@ -5,14 +5,12 @@ import { mixin } from "objection"
 
 import knex from "../../database/knex"
 import * as Kafka from "../services/kafka"
-import { relayNewAnswer } from "../services/plagiarism"
 import { BadRequestError, ForbiddenError } from "../util/error"
 import { removeNonPrintingCharacters } from "../util/tools"
 import { TStatusModificationOperation } from "./../types/index"
 import { NotFoundError } from "./../util/error"
 import BaseModel from "./base_model"
 import Course from "./course"
-import Language from "./language"
 import PeerReview from "./peer_review"
 import PeerReviewQuestion from "./peer_review_question"
 import Quiz from "./quiz"
@@ -624,10 +622,6 @@ class QuizAnswer extends mixin(BaseModel, [
         )
       }
       await trx.commit()
-      quiz.course = course
-      if (quiz.checkPlagiarism) {
-        await this.relayPlagiarismData(savedQuizAnswer, quiz)
-      }
       const { pointsAwarded } = savedUserQuizState
       const canSeeAnswers =
         savedUserQuizState.status === "locked" ||
@@ -674,28 +668,6 @@ class QuizAnswer extends mixin(BaseModel, [
     return attempts.some(
       (attempt) => new Date(attempt.createdAt).getTime() === time,
     )
-  }
-
-  private static async relayPlagiarismData(quizAnswer: QuizAnswer, quiz: Quiz) {
-    const language = await Language.query()
-      .findById(quiz.course.languageId)
-      .throwIfNotFound()
-    for (const quizItem of quiz.items) {
-      if (quizItem.type === "essay") {
-        const itemAnswer = quizAnswer.itemAnswers.find(
-          (itemAnswer) => itemAnswer.quizItemId === quizItem.id,
-        )
-        if (itemAnswer) {
-          relayNewAnswer({
-            quizId: quiz.id,
-            quizAnswerId: quizAnswer.id,
-            quizItemAnswerId: itemAnswer.id,
-            language: language.name.split(" ")[0].toLowerCase(),
-            data: itemAnswer.textData,
-          })
-        }
-      }
-    }
   }
 
   public static async update(
