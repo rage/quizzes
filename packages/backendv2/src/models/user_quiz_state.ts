@@ -60,6 +60,21 @@ class UserQuizState extends BaseModel {
     return await this.query(trx).findById([userId, quizId])
   }
 
+  /**
+   * Serializes changes to one user's state and answers for one quiz until `trx` ends, whether or
+   * not their state row exists yet. Take it before reading anything such a change is based on.
+   */
+  public static async lock(
+    userId: number,
+    quizId: string,
+    trx: Knex.Transaction,
+  ) {
+    await trx.raw("select pg_advisory_xact_lock(?, hashtext(?))", [
+      userId,
+      quizId,
+    ])
+  }
+
   public static async getByUserAndCourse(
     userId: number,
     courseId: string,

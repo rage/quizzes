@@ -1,12 +1,20 @@
-import { stringify } from "csv-stringify"
+import { randomUUID } from "node:crypto"
+
 import type { Knex } from "knex"
-import { NotNullViolationError, type ModelOptions, type Pojo } from "objection"
+import {
+  NotNullViolationError,
+  ValidationError,
+  type ModelOptions,
+  type Pojo,
+} from "objection"
 
 import knex from "../../database/knex"
 import * as Kafka from "../services/kafka"
+import { toCsvStream } from "../util/csv"
 import { NotFoundError } from "../util/error"
-import { BadRequestError } from "../util/error"
+import { BadRequestError, ForbiddenError } from "../util/error"
 import moduleInitializer from "../util/initializer"
+import { assertUuid } from "../util/tools"
 import BaseModel from "./base_model"
 import Course from "./course"
 import PeerReviewCollection from "./peer_review_collection"
@@ -16,6 +24,12 @@ import QuizItem from "./quiz_item"
 import type QuizOption from "./quiz_option"
 import QuizTranslation from "./quiz_translation"
 import UserQuizState from "./user_quiz_state"
+
+// Must cover every relation quizzes-dashboard's SaveButton sends.
+const EDITABLE_GRAPH =
+  "[texts, items.[texts, options.[texts]], peerReviewCollections.[texts, questions.[texts]]]"
+
+const EXPORT_CSV_OPTIONS = { delimiter: ",", quoted: true, header: true }
 
 export class Quiz extends BaseModel {
   id!: string
@@ -126,6 +140,7 @@ export class Quiz extends BaseModel {
 
   static async save(data: any) {
     const quiz = data
+    quiz.id ||= randomUUID()
     const course = await Course.getById(quiz.courseId)
     const languageId = course.languageId
     quiz.texts = [
@@ -197,6 +212,8 @@ export class Quiz extends BaseModel {
         ]
         delete peerReviewQuestion.title
         delete peerReviewQuestion.body
+        // Not a relation of this graph, so objection leaves the client's value in place.
+        peerReviewQuestion.quizId = quiz.id
       })
     })
 
@@ -204,17 +221,22 @@ export class Quiz extends BaseModel {
     let savedQuiz: Quiz | Quiz[]
 
     try {
-      const oldQuiz = quiz.id
-        ? await this.query(trx).findById(quiz.id)
-        : undefined
+      const oldQuiz = await this.query(trx).findById(quiz.id)
+      if (oldQuiz && oldQuiz.courseId !== quiz.courseId) {
+        throw new ForbiddenError("A quiz cannot be moved to another course.")
+      }
       if (oldQuiz) {
-        savedQuiz = await this.query(trx).upsertGraphAndFetch(quiz)
+        savedQuiz = await this.query(trx)
+          .allowGraph(EDITABLE_GRAPH)
+          .upsertGraphAndFetch(quiz)
 
         if (Array.isArray(savedQuiz)) {
           savedQuiz = savedQuiz[0]
         }
       } else {
-        savedQuiz = await this.query(trx).insertGraphAndFetch(quiz)
+        savedQuiz = await this.query(trx)
+          .allowGraph(EDITABLE_GRAPH)
+          .insertGraphAndFetch(quiz)
       }
       await this.updateCourseProgressesIfNecessary(oldQuiz, savedQuiz, trx)
       await Kafka.broadcastCourseQuizzesUpdated(course.id, trx)
@@ -222,7 +244,10 @@ export class Quiz extends BaseModel {
     } catch (error) {
       await trx.rollback()
       if (error instanceof NotNullViolationError) {
-        throw new BadRequestError(error)
+        throw new BadRequestError(`${error.table}.${error.column} is required`)
+      }
+      if (error instanceof ValidationError) {
+        throw new BadRequestError(error.message)
       }
       throw error
     }
@@ -248,7 +273,7 @@ export class Quiz extends BaseModel {
 
   static async getById(quizId: string, trx?: Knex.Transaction): Promise<Quiz> {
     const quiz = (
-      await this.query()
+      await this.query(trx)
         .withGraphJoined("texts")
         .withGraphJoined("items.[texts, options.[texts]]")
         .modifyGraph("items.[options]", (option) => {
@@ -278,8 +303,42 @@ export class Quiz extends BaseModel {
     return this.moveTextsToParent(quiz)
   }
 
-  static async getByIdStripped(quizId: string) {
-    const quiz = await this.getById(quizId)
+  /**
+   * Removes the answer key from `quiz`, in place, unless the student whose state on it is `state`
+   * may see it.
+   */
+  static hideAnswerKeyFrom(
+    quiz: Quiz,
+    state:
+      | { status?: string; pointsAwarded?: number | null }
+      | null
+      | undefined,
+  ) {
+    if (!this.canSeeAnswerKey(state, quiz.points)) {
+      this.removeAnswerKey(quiz)
+    }
+  }
+
+  /**
+   * Whether a student in `state` may see a quiz's answer key: once their state is locked or
+   * they have at least its `points`, which they exceed if the quiz's points were lowered later.
+   */
+  private static canSeeAnswerKey(
+    state:
+      | { status?: string; pointsAwarded?: number | null }
+      | null
+      | undefined,
+    points: number,
+  ) {
+    const pointsAwarded = state?.pointsAwarded
+    return (
+      state?.status === "locked" ||
+      (!!pointsAwarded && pointsAwarded > points - 0.001)
+    )
+  }
+
+  /** Removes the feedback and answer checks that would give away the correct answers from `quiz`, in place. */
+  private static removeAnswerKey(quiz: Quiz) {
     delete (quiz as Partial<Quiz>).submitMessage
     for (const quizItem of quiz.items as Partial<QuizItem>[]) {
       delete quizItem.successMessage
@@ -292,7 +351,6 @@ export class Quiz extends BaseModel {
         delete quizOption.correct
       }
     }
-    return quiz
   }
 
   static async getPreviewById(quizId: string) {
@@ -301,10 +359,10 @@ export class Quiz extends BaseModel {
         .withGraphJoined("texts(previewSelect)")
         .where("quiz.id", quizId)
     )[0]
-    quiz.items = []
     if (!quiz) {
       throw new NotFoundError(`quiz not found: ${quizId}`)
     }
+    quiz.items = []
     return this.moveTextsToParent(quiz)
   }
 
@@ -319,62 +377,44 @@ export class Quiz extends BaseModel {
   }
 
   static async getQuizInfo(quizId: string) {
+    assertUuid(quizId)
     await moduleInitializer()
 
-    const stringifier = stringify({
-      delimiter: ",",
-      quoted: true,
-      header: true,
-    })
-
-    const stream = this.query()
+    const rows = this.query()
       .withGraphJoined("texts")
       .withGraphJoined("items.[texts, options.[texts]]")
       .withGraphJoined("peerReviewCollections.[texts, questions.[texts]]")
       .where("quiz.id", quizId)
       .toKnexQuery()
       .stream()
-      .pipe(stringifier)
 
-    return stream
+    return toCsvStream(rows, EXPORT_CSV_OPTIONS)
   }
 
   static async getPeerReviewInfo(quizId: string) {
+    assertUuid(quizId)
     await moduleInitializer()
 
-    const stringifier = stringify({
-      delimiter: ",",
-      quoted: true,
-      header: true,
-    })
-
-    const stream = this.query()
+    const rows = this.query()
       .withGraphJoined("peerReviewCollections.[texts, questions.[texts]]")
       .where("quiz.id", quizId)
       .toKnexQuery()
       .stream()
-      .pipe(stringifier)
 
-    return stream
+    return toCsvStream(rows, EXPORT_CSV_OPTIONS)
   }
 
   static async getQuizAnswerInfo(quizId: string) {
+    assertUuid(quizId)
     await moduleInitializer()
 
-    const stringifier = stringify({
-      delimiter: ",",
-      quoted: true,
-      header: true,
-    })
-
-    const stream = this.query()
+    const rows = this.query()
       .withGraphJoined("answers.[itemAnswers.[optionAnswers]]")
       .where("quiz.id", quizId)
       .toKnexQuery()
       .stream()
-      .pipe(stringifier)
 
-    return stream
+    return toCsvStream(rows, EXPORT_CSV_OPTIONS)
   }
 
   private static moveTextsToParent(quiz: Quiz) {

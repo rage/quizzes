@@ -13,9 +13,19 @@ spec:
       template:
         spec:
           restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
           containers:
             - name: refresh-reaktor-view
               image: ${BACKENDV2_IMAGE}
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: [ALL]
               command: ["npm", "run", "refresh-reaktor-view"]
               resources:
                 requests:
@@ -46,6 +56,10 @@ spec:
           initContainers:
             - name: quizzes-backendv2-run-migrations
               image: ${BACKENDV2_IMAGE}
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: [ALL]
               command: ['npx', 'knex', '--knexfile', 'dist/knexfile.js', 'migrate:latest']
               env:
                 - name: DB_NAME

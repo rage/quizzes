@@ -11,7 +11,7 @@ import {
   SpamFlag,
 } from "../../models/"
 import { CustomContext, CustomState } from "../../types"
-import { checkAccessOrThrow } from "./../dashboard/util"
+import { checkAccessOrThrow, getCourseIdByQuizId } from "./../dashboard/util"
 
 const widget = new Router<CustomState, CustomContext>({
   prefix: "/widget",
@@ -28,15 +28,8 @@ const widget = new Router<CustomState, CustomContext>({
     if (quizAnswer?.deleted) {
       quizAnswer = null
     }
-    let canSeeAnswers = false
-    const strippedQuiz = await Quiz.getByIdStripped(quizId)
-    if (
-      userQuizState?.status === "locked" ||
-      (userQuizState?.pointsAwarded || 0) >= strippedQuiz.points
-    ) {
-      canSeeAnswers = true
-    }
-    const quiz = canSeeAnswers ? await Quiz.getById(quizId) : strippedQuiz
+    const quiz = await Quiz.getById(quizId)
+    Quiz.hideAnswerKeyFrom(quiz, userQuizState)
     const course = await Course.getById(quiz.courseId)
     quiz.course = course
     ctx.body = {
@@ -57,12 +50,13 @@ const widget = new Router<CustomState, CustomContext>({
 
   .get("/answers/:answerId/peer-reviews", accessControl(), async (ctx) => {
     const answerId = ctx.params.answerId
-
-    // check that answerId exists
-    try {
-      await QuizAnswer.getByIdWithPeerReviews(answerId)
-    } catch (error) {
-      throw error
+    const answer = await QuizAnswer.getOwnerAndQuiz(answerId)
+    if (answer.userId !== ctx.state.user.id) {
+      await checkAccessOrThrow(
+        ctx.state.user,
+        await getCourseIdByQuizId(answer.quizId),
+        "view",
+      )
     }
 
     const peerReviews = await PeerReview.getWithAnswersByAnswerId(answerId)
@@ -82,8 +76,10 @@ const widget = new Router<CustomState, CustomContext>({
 
   .post("/answer", accessControl(), async (ctx) => {
     const user = ctx.state.user
-    const answer = ctx.request.body as object
-    ctx.body = await QuizAnswer.newAnswer(user.id, QuizAnswer.fromJson(answer))
+    ctx.body = await QuizAnswer.newAnswer(
+      user.id,
+      QuizAnswer.fromSubmission(ctx.request.body),
+    )
   })
 
   .post("/answers/report-spam", accessControl(), async (ctx) => {
@@ -100,9 +96,9 @@ const widget = new Router<CustomState, CustomContext>({
 
   .post("/answers/give-review", accessControl(), async (ctx) => {
     const userId = ctx.state.user.id
-    const peerReview = ctx.request.body as PeerReview
-    peerReview.userId = userId
-    ctx.body = await PeerReview.givePeerReview(peerReview)
+    ctx.body = await PeerReview.givePeerReview(
+      PeerReview.fromSubmission(ctx.request.body, userId),
+    )
   })
 
   .post(
@@ -110,9 +106,10 @@ const widget = new Router<CustomState, CustomContext>({
     accessControl({ administrator: true }),
     async (ctx) => {
       const userId = ctx.state.user.id
-      const peerReview = ctx.request.body as PeerReview
-      peerReview.userId = userId
-      ctx.body = await PeerReview.givePeerReview(peerReview, true)
+      ctx.body = await PeerReview.givePeerReview(
+        PeerReview.fromSubmission(ctx.request.body, userId),
+        true,
+      )
     },
   )
 

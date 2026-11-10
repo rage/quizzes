@@ -441,17 +441,18 @@ describe("widget: submitting a peer review", () => {
       })
       .expect(400, done)
   })
-  test("throws when user quiz state not found", (done) => {
+  test("forbids reviewers who have not answered the quiz", (done) => {
     request(app.callback())
       .post("/api/v2/widget/answers/give-review")
       .set("Authorization", `bearer PLEB_TOKEN_1`)
       .set("Accept", "application/json")
       .send(input.peerReviewCollection3)
       .expect((response) => {
-        const received: NotFoundError = response.body
-        expect(received.message).toEqual(`User quiz state not found.`)
+        expect(response.body.message).toEqual(
+          "answer the quiz before reviewing others",
+        )
       })
-      .expect(404, done)
+      .expect(403, done)
   })
 
   test("returns peer review in correct shape when request successful", (done) => {
@@ -499,6 +500,23 @@ describe("widget: submitting a peer review", () => {
         )
       })
       .end(done)
+  })
+
+  test("responds with 400 if the answer id is missing", async () => {
+    const { quizAnswerId: _, ...review } = input.peerReviewCollection1
+    await request(app.callback())
+      .post("/api/v2/widget/answers/give-review")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .send(review)
+      .expect(400)
+  })
+
+  test("responds with 400 without SQL if an answer id is not a UUID", async () => {
+    const response = await request(app.callback())
+      .get("/api/v2/widget/answers/not-a-uuid/peer-reviews")
+      .set("Authorization", `bearer PLEB_TOKEN`)
+      .expect(400)
+    expect(response.body.message).not.toMatch(/select|not-a-uuid/i)
   })
 })
 
@@ -694,6 +712,14 @@ describe("Answer: spam flags", () => {
       await safeClean()
     } catch (e) {}
     await safeSeed(configA)
+    await knex("quiz_answer").insert(
+      [3456, 4567].map((userId) => ({
+        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        user_id: userId,
+        language_id: "xy_YZ",
+        status: "given-enough",
+      })),
+    )
   })
 
   afterAll(async () => {
@@ -755,7 +781,7 @@ describe("Answer: spam flags", () => {
       })
   })
 
-  test("spam flag already given", async () => {
+  test("own answer cannot be flagged", async () => {
     await request(app.callback())
       .post("/api/v2/widget/answers/report-spam")
       .set("Authorization", "bearer PLEB_TOKEN_1")
@@ -764,10 +790,9 @@ describe("Answer: spam flags", () => {
         quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
       })
       .expect((response) => {
-        const received: BadRequestError = response.body
-        expect(received.message).toEqual("Can only give one spam flag")
+        expect(response.body.message).toEqual("cannot flag your own answer")
       })
-      .expect(400)
+      .expect(403)
   })
 
   test("spam flags lifecycle", async () => {
@@ -834,5 +859,20 @@ describe("Answer: spam flags", () => {
     expect(answerStatus3.body.status).toEqual("spam")
     expect(answerStatus3.body.userQuizState.tries).toEqual(1)
     expect(answerStatus3.status).toEqual(200)
+  })
+
+  test("spam flag already given", async () => {
+    await request(app.callback())
+      .post("/api/v2/widget/answers/report-spam")
+      .set("Authorization", "bearer PLEB_TOKEN_2")
+      .set("Accept", "application/json")
+      .send({
+        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      })
+      .expect((response) => {
+        const received: BadRequestError = response.body
+        expect(received.message).toEqual("Can only give one spam flag")
+      })
+      .expect(400)
   })
 })

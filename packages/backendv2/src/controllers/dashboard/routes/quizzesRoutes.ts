@@ -1,6 +1,7 @@
-import Router from "@koa/router"
+import { Readable } from "stream"
 
-import redis from "../../../../config/redis"
+import Router, { RouterMiddleware } from "@koa/router"
+
 import accessControl from "../../../middleware/access_control"
 import { Quiz, QuizAnswer } from "../../../models"
 import { CustomContext, CustomState } from "../../../types"
@@ -8,21 +9,91 @@ import { BadRequestError } from "../../../util/error"
 import { getFormattedIsoDate } from "../../../util/tools"
 import {
   checkAccessOrThrow,
+  consumeDownloadToken,
+  createDownloadToken,
+  DownloadKind,
   getCourseIdByQuizId,
-  getDownloadTokenFromRedis,
 } from "../util"
 
 interface DownloadRequestBody {
   quizName: string
   courseName: string
-  userId: number | string
 }
+
+const downloads: Record<
+  DownloadKind,
+  { filePrefix: string; stream: (quizId: string) => Promise<Readable> }
+> = {
+  "quiz-info": {
+    filePrefix: "quiz-info",
+    stream: (quizId) => Quiz.getQuizInfo(quizId),
+  },
+  "peerreview-info": {
+    filePrefix: "quiz-peer_review-info",
+    stream: (quizId) => Quiz.getPeerReviewInfo(quizId),
+  },
+  "answer-info": {
+    filePrefix: "quiz-answer-info",
+    stream: (quizId) => Quiz.getQuizAnswerInfo(quizId),
+  },
+}
+
+const issueDownloadUrl =
+  (kind: DownloadKind): RouterMiddleware<CustomState, CustomContext> =>
+  async (ctx) => {
+    const quizId = ctx.params.quizId
+
+    if (!ctx.state.user.id) {
+      throw new BadRequestError("No user id provided.")
+    }
+
+    const courseId = await getCourseIdByQuizId(quizId)
+    await checkAccessOrThrow(ctx.state.user, courseId, "download")
+
+    const downloadToken = await createDownloadToken(quizId, kind)
+    if (!downloadToken) {
+      throw new BadRequestError("Failed to generate download token.")
+    }
+    ctx.body = {
+      downloadUrl: `/api/v2/dashboard/quizzes/download/download-${kind}/${quizId}?&downloadToken=${downloadToken}`,
+    }
+  }
+
+// Unauthenticated: reached by a browser form post, so the token is the only credential.
+const serveDownload =
+  (kind: DownloadKind): RouterMiddleware<CustomState, CustomContext> =>
+  async (ctx) => {
+    const downloadToken = ctx.query.downloadToken?.toString()
+    const quizId = ctx.params.quizId
+    const { quizName, courseName } = ctx.request.body as DownloadRequestBody
+
+    if (!downloadToken) {
+      throw new BadRequestError("No download token provided.")
+    }
+
+    let isValid: boolean
+    try {
+      isValid = await consumeDownloadToken(downloadToken, quizId, kind)
+    } catch (error) {
+      throw new BadRequestError("Failed to validate download token.")
+    }
+    if (!isValid) {
+      throw new BadRequestError("Invalid or expired download token.")
+    }
+
+    const { filePrefix, stream } = downloads[kind]
+    ctx.response.set("Content-Type", "text/csv; charset=utf-8")
+    ctx.response.attachment(
+      `${filePrefix}-${quizName}-${courseName}-${getFormattedIsoDate()}.csv`,
+    )
+    ctx.body = await stream(quizId)
+  }
 
 const quizzesRoutes = new Router<CustomState, CustomContext>({
   prefix: "/quizzes",
 })
   .post("/", accessControl(), async (ctx) => {
-    const quizData = ctx.request.body as { courseId: string }
+    const quizData = ctx.request.body as { id?: string; courseId: string }
     await checkAccessOrThrow(ctx.state.user, quizData.courseId, "edit")
     ctx.body = await Quiz.save(quizData)
   })
@@ -47,195 +118,29 @@ const quizzesRoutes = new Router<CustomState, CustomContext>({
     },
   )
 
-  .post("/:quizId/download-quiz-info", accessControl(), async (ctx) => {
-    const quizId = ctx.params.quizId
-    const { courseId } = ctx.request.body as { courseId: string }
+  .post(
+    "/:quizId/download-quiz-info",
+    accessControl(),
+    issueDownloadUrl("quiz-info"),
+  )
+  .post("/download/download-quiz-info/:quizId", serveDownload("quiz-info"))
 
-    if (!ctx.state.user.id) {
-      throw new BadRequestError("No user id provided.")
-    }
+  .post(
+    "/:quizId/download-peerreview-info",
+    accessControl(),
+    issueDownloadUrl("peerreview-info"),
+  )
+  .post(
+    "/download/download-peerreview-info/:quizId",
+    serveDownload("peerreview-info"),
+  )
 
-    const userId = ctx.state.user.id.toString() as string
-
-    // check permissions
-    await checkAccessOrThrow(ctx.state.user, courseId, "download")
-
-    // attempt retrieval of download token from cache
-    const downloadToken = await getDownloadTokenFromRedis(userId)
-
-    if (downloadToken) {
-      ctx.body = {
-        downloadUrl: `/api/v2/dashboard/quizzes/download/download-quiz-info/${quizId}?&downloadToken=${downloadToken}`,
-      }
-    } else {
-      throw new BadRequestError("Failed to generate download token.")
-    }
-  })
-
-  .post("/download/download-quiz-info/:quizId", async (ctx) => {
-    const downloadToken = ctx.query.downloadToken
-    const { quizId } = ctx.params
-    const isoDate = getFormattedIsoDate()
-
-    const {
-      quizName,
-      courseName,
-      userId: bodyUserId,
-    } = ctx.request.body as DownloadRequestBody
-    const userId = bodyUserId.toString()
-
-    // validate token
-    if (downloadToken && redis.client) {
-      try {
-        const cachedToken = await redis.client.get(userId)
-
-        if (cachedToken === downloadToken) {
-          const stream = await Quiz.getQuizInfo(quizId)
-          ctx.response.set("Content-Type", "text/csv; charset=utf-8")
-          ctx.response.attachment(
-            `quiz-info-${quizName}-${courseName}-${isoDate}.csv`,
-          )
-          ctx.body = stream
-        } else {
-          throw new BadRequestError(
-            "Download token does not match cached token.",
-          )
-        }
-      } catch (error) {
-        if (error instanceof BadRequestError) {
-          throw error
-        }
-        throw new BadRequestError("Failed to validate download token.")
-      }
-    }
-  })
-
-  .post("/:quizId/download-peerreview-info", accessControl(), async (ctx) => {
-    const quizId = ctx.params.quizId
-    const { courseId } = ctx.request.body as { courseId: string }
-
-    if (!ctx.state.user.id) {
-      throw new BadRequestError("No user id provided.")
-    }
-
-    const userId = ctx.state.user.id.toString()
-
-    // check permissions
-    await checkAccessOrThrow(ctx.state.user, courseId, "download")
-
-    // attempt retrieval of download token from cache
-    const downloadToken = await getDownloadTokenFromRedis(userId)
-
-    if (downloadToken) {
-      // since permission checked and token ready, return download url & token
-      ctx.body = {
-        downloadUrl: `/api/v2/dashboard/quizzes/download/download-peerreview-info/${quizId}?&downloadToken=${downloadToken}`,
-      }
-    } else {
-      throw new BadRequestError("Failed to generate download token.")
-    }
-  })
-
-  .post("/download/download-peerreview-info/:quizId", async (ctx) => {
-    const downloadToken = ctx.query.downloadToken?.toString()
-    const { quizId } = ctx.params
-    const isoDate = getFormattedIsoDate()
-
-    const {
-      quizName,
-      courseName,
-      userId: bodyUserId,
-    } = ctx.request.body as DownloadRequestBody
-    const userId = bodyUserId.toString()
-
-    // validate token
-    if (downloadToken && redis.client) {
-      try {
-        const cachedToken = await redis.client.get(userId)
-
-        if (cachedToken === downloadToken) {
-          const stream = await Quiz.getPeerReviewInfo(quizId)
-          ctx.response.set("Content-Type", "text/csv; charset=utf-8")
-          ctx.response.attachment(
-            `quiz-peer_review-info-${quizName}-${courseName}-${isoDate}.csv`,
-          )
-          ctx.body = stream
-        } else {
-          throw new BadRequestError(
-            "Download token does not match cached token.",
-          )
-        }
-      } catch (error) {
-        if (error instanceof BadRequestError) {
-          throw error
-        }
-        throw new BadRequestError("Failed to validate download token.")
-      }
-    }
-  })
-
-  .post("/:quizId/download-answer-info", accessControl(), async (ctx) => {
-    const quizId = ctx.params.quizId
-    const { courseId } = ctx.request.body as { courseId: string }
-
-    if (!ctx.state.user.id) {
-      throw new BadRequestError("No user id provided.")
-    }
-
-    const userId = ctx.state.user.id.toString()
-
-    // check permissions
-    await checkAccessOrThrow(ctx.state.user, courseId, "download")
-
-    // attempt retrieval of download token from cache
-    const downloadToken = await getDownloadTokenFromRedis(userId)
-
-    if (downloadToken) {
-      // since permission checked and token ready, return download url & token
-      ctx.body = {
-        downloadUrl: `/api/v2/dashboard/quizzes/download/download-answer-info/${quizId}?&downloadToken=${downloadToken}`,
-      }
-    } else {
-      throw new BadRequestError("Failed to generate download token.")
-    }
-  })
-
-  .post("/download/download-answer-info/:quizId", async (ctx) => {
-    const downloadToken = ctx.query.downloadToken?.toString()
-    const { quizId } = ctx.params
-    const isoDate = getFormattedIsoDate()
-
-    const {
-      quizName,
-      courseName,
-      userId: bodyUserId,
-    } = ctx.request.body as DownloadRequestBody
-    const userId = bodyUserId.toString()
-
-    // validate token
-    if (downloadToken && redis.client) {
-      try {
-        const cachedToken = await redis.client.get(userId)
-        if (cachedToken === downloadToken) {
-          const stream = await Quiz.getQuizAnswerInfo(quizId)
-          ctx.response.set("Content-Type", "text/csv; charset=utf-8")
-          ctx.response.attachment(
-            `quiz-answer-info-${quizName}-${courseName}-${isoDate}.csv`,
-          )
-          ctx.body = stream
-        } else {
-          throw new BadRequestError(
-            "Download token does not match cached token.",
-          )
-        }
-      } catch (error) {
-        if (error instanceof BadRequestError) {
-          throw error
-        }
-        throw new BadRequestError("Failed to validate download token.")
-      }
-    }
-  })
+  .post(
+    "/:quizId/download-answer-info",
+    accessControl(),
+    issueDownloadUrl("answer-info"),
+  )
+  .post("/download/download-answer-info/:quizId", serveDownload("answer-info"))
 
   .get("/:quizId/answerStatistics", accessControl(), async (ctx) => {
     const quizId = ctx.params.quizId

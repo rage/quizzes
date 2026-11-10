@@ -3,6 +3,7 @@ import PeerReview from "./peer_review"
 import PeerReviewQuestion from "./peer_review_question"
 
 class PeerReviewQuestionAnswer extends BaseModel {
+  peerReviewQuestionId!: string
   value!: number
   question!: PeerReviewQuestion
   text!: string

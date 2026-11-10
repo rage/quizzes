@@ -1,6 +1,8 @@
+import crypto from "crypto"
+
 import redis from "../../config/redis"
 import { getCurrentUserDetails } from "../services/tmc"
-import { CustomContext } from "../types"
+import { AuthenticatedUser, CustomContext } from "../types"
 import {
   ForbiddenError,
   UnauthorizedError,
@@ -11,6 +13,10 @@ interface AccessControlOptions {
   administrator?: boolean
   unrestricted?: boolean
 }
+
+// Hashed and prefixed so a bearer token can never address another Redis key.
+const authCacheKey = (token: string) =>
+  `tmc-user:${crypto.createHash("sha256").update(token).digest("hex")}`
 
 export const accessControl = (options?: AccessControlOptions) => {
   const accessControl = async (
@@ -28,11 +34,11 @@ export const accessControl = (options?: AccessControlOptions) => {
     const token: string =
       (ctx as any).headers.authorization.replace(/bearer /i, "") || ""
 
-    // attempt retrieval of user from cache
-    let user = null
+    const cacheKey = authCacheKey(token)
+    let user: AuthenticatedUser | null = null
     if (redis.client) {
       try {
-        const cachedUser = await redis.client.get(token)
+        const cachedUser = await redis.client.get(cacheKey)
         if (cachedUser) {
           user = JSON.parse(cachedUser)
         }
@@ -48,11 +54,11 @@ export const accessControl = (options?: AccessControlOptions) => {
     // catches null and undefined
     if (user === null) {
       try {
-        // fetch user from TMC server and cache details
-        user = await getCurrentUserDetails(token)
+        const { id, administrator } = await getCurrentUserDetails(token)
+        user = { id, administrator }
         if (redis.client) {
           try {
-            await redis.client.set(token, JSON.stringify(user), "EX", 3600)
+            await redis.client.set(cacheKey, JSON.stringify(user), "EX", 3600)
           } catch (error) {
             ctx.log.error("Redis SET operation failed", {
               error: error instanceof Error ? error.message : String(error),

@@ -356,7 +356,7 @@ export const validation = {
           {
             id: expect.stringMatching(uuid),
             peerReviewCollectionId: expect.stringMatching(uuid),
-            quizId: null,
+            quizId: expect.stringMatching(uuid),
             answerRequired: true,
             default: true,
             type: "grade",
@@ -460,7 +460,7 @@ export const validation = {
           {
             id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
             peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-            quizId: null,
+            quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
             answerRequired: true,
             deleted: false,
             default: true,
@@ -578,7 +578,7 @@ export const validation = {
           {
             id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
             peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-            quizId: null,
+            quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
             answerRequired: true,
             default: true,
             deleted: false,
@@ -955,7 +955,7 @@ export const validation = {
               id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
               order: 1,
               peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-              quizId: null,
+              quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
               deleted: false,
               texts: [
                 {
@@ -994,7 +994,7 @@ export const validation = {
               id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
               order: 1,
               peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
-              quizId: null,
+              quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
               deleted: false,
               texts: [
                 {
@@ -1051,43 +1051,23 @@ export const validation = {
   quizAnswerValidator2: {
     id: "ae29c3be-b5b6-4901-8588-5b0e88774748",
     quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
-    userId: 2345,
-    languageId: "xy_YZ",
-    status: "given-enough",
-    createdAt: expect.stringMatching(dateTime),
-    updatedAt: expect.stringMatching(dateTime),
-    deleted: false,
-    correctnessCoefficient: 0,
     itemAnswers: [
       {
         id: "7f92ac20-f9f2-44eb-a5ea-5192254c394d",
-        quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
         quizItemId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
         textData: null,
-        intData: null,
         optionAnswers: [
           {
-            createdAt: expect.stringMatching(dateTime),
-            updatedAt: expect.stringMatching(dateTime),
             id: "942584cd-1cb1-4d2a-a0c4-3b3f19495b75",
-            quizItemAnswerId: "7f92ac20-f9f2-44eb-a5ea-5192254c394d",
             quizOptionId: "7c802f5b-52f1-468e-a798-3028edc1d3fd",
           },
         ],
-        correct: null,
-        createdAt: expect.stringMatching(dateTime),
-        updatedAt: expect.stringMatching(dateTime),
       },
       {
         id: "1e39c9ac-b9d9-4156-8c79-6eb9bf9eabb4",
-        quizAnswerId: "ae29c3be-b5b6-4901-8588-5b0e88774748",
         quizItemId: "707195a3-aafe-4c06-bf23-854e54e084db",
         textData: null,
         optionAnswers: [],
-        intData: null,
-        correct: null,
-        createdAt: expect.stringMatching(dateTime),
-        updatedAt: expect.stringMatching(dateTime),
       },
     ],
   },
@@ -1390,7 +1370,7 @@ export const validation = {
           questions: [
             {
               id: "730e3083-7a0d-4ea7-9837-61ee93c6692f",
-              quizId: null,
+              quizId: "4bf4cf2f-3058-4311-8d16-26d781261af7",
               peerReviewCollectionId: "aeb6d4f1-a691-45e4-a900-2f7654a004cf",
               default: true,
               order: 1,

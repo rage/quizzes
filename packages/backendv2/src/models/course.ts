@@ -1,10 +1,12 @@
 import { randomUUID } from "crypto"
 
-import { stringify } from "csv-stringify"
 import type { Knex } from "knex"
+import _ from "lodash"
 
 import knex from "../../database/knex"
 import { EditCourseCompletionPayloadFields } from "../types"
+import { toCsvStream } from "../util/csv"
+import { assertUuid } from "../util/tools"
 import { BadRequestError, NotFoundError } from "./../util/error"
 import BaseModel from "./base_model"
 import CourseTranslation from "./course_translation"
@@ -49,8 +51,8 @@ class Course extends BaseModel {
     },
   })
 
-  static async getFlattenedById(id: string) {
-    const courses = await this.query()
+  static async getFlattenedById(id: string, trx?: Knex.Transaction) {
+    const courses = await this.query(trx)
       .withGraphJoined("texts")
       .where("id", id)
       .limit(1)
@@ -358,15 +360,24 @@ class Course extends BaseModel {
     payload: EditCourseCompletionPayloadFields,
   ) {
     const course = await this.getById(id)
-    return await course.$query().patchAndFetch(payload)
+    return await course
+      .$query()
+      .patchAndFetch(
+        _.pick(payload, [
+          "maxReviewSpamFlags",
+          "maxSpamFlags",
+          "minPeerReviewsGiven",
+          "minPeerReviewsReceived",
+          "minReviewAverage",
+        ]),
+      )
   }
 
   static async getCorrespondenceFile(oldCourseId: string, newCourseId: string) {
-    const stringifier = stringify({
-      delimiter: " ",
-    })
+    assertUuid(oldCourseId)
+    assertUuid(newCourseId)
 
-    const stream = knex
+    const rows = knex
       .raw(
         `
       SELECT id AS old_id, uuid_generate_v5(:newCourseId, id::text) AS new_id
@@ -379,9 +390,8 @@ class Course extends BaseModel {
         },
       )
       .stream()
-      .pipe(stringifier)
 
-    return stream
+    return toCsvStream(rows, { delimiter: " " })
   }
 
   public static async getParts(courseId: string) {

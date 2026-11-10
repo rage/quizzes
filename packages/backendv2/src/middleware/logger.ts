@@ -3,6 +3,7 @@ import { randomUUID } from "crypto"
 import winston, { format } from "winston"
 
 import { CustomContext } from "../types"
+import { databaseErrorOf } from "../util/error"
 
 const myFormat = format.printf(
   ({ level, message, timestamp, requestId, stack, ...metadata }) => {
@@ -30,6 +31,25 @@ export const GlobalLogger = winston.createLogger({
   transports: [new winston.transports.Console()],
 })
 
+// Database error messages carry the failing SQL and its bound values.
+const describeError = (error: unknown) => {
+  const dbError = databaseErrorOf(error)
+  if (dbError) {
+    const { code, routine, table, column, constraint } = dbError
+    return {
+      error: `database error ${code}`,
+      routine,
+      table,
+      column,
+      constraint,
+    }
+  }
+  return {
+    error: error instanceof Error ? error.message : error,
+    stack: error instanceof Error ? error.stack : undefined,
+  }
+}
+
 const loggerMiddleware = async (
   ctx: CustomContext,
   next: () => Promise<any>,
@@ -38,7 +58,7 @@ const loggerMiddleware = async (
   ctx.state.start = start
   const log = GlobalLogger.child({ requestId: randomUUID() })
   ctx.log = log
-  log.info(`${ctx.request.method} ${ctx.req.url}`, {
+  log.info(`${ctx.request.method} ${ctx.path}`, {
     ip: ctx.request.ip,
     origin: ctx.request.origin,
   })
@@ -46,15 +66,15 @@ const loggerMiddleware = async (
     await next()
   } catch (e) {
     const ms = Date.now() - start
-    log.error(`Crashed ${ctx.request.method} ${ctx.req.url} in ${ms}ms`, {
-      error: e instanceof Error ? e.message : e,
-      stack: e instanceof Error ? e.stack : undefined,
-    })
+    log.error(
+      `Crashed ${ctx.request.method} ${ctx.path} in ${ms}ms`,
+      describeError(e),
+    )
     throw e
   }
   const ms = Date.now() - start
   log.info(
-    `Completed ${ctx.request.method} ${ctx.req.url} ${ctx.response.status} in ${ms}ms`,
+    `Completed ${ctx.request.method} ${ctx.path} ${ctx.response.status} in ${ms}ms`,
   )
 }
 

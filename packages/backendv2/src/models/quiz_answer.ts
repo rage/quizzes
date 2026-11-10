@@ -5,18 +5,17 @@ import { mixin } from "objection"
 
 import knex from "../../database/knex"
 import * as Kafka from "../services/kafka"
-import { relayNewAnswer } from "../services/plagiarism"
-import { BadRequestError } from "../util/error"
-import { removeNonPrintingCharacters } from "../util/tools"
+import { BadRequestError, ForbiddenError } from "../util/error"
+import { assertUuid, removeNonPrintingCharacters } from "../util/tools"
 import { TStatusModificationOperation } from "./../types/index"
 import { NotFoundError } from "./../util/error"
 import BaseModel from "./base_model"
 import Course from "./course"
-import Language from "./language"
 import PeerReview from "./peer_review"
 import PeerReviewQuestion from "./peer_review_question"
 import Quiz from "./quiz"
 import QuizAnswerStatusModification from "./quiz_answer_status_modification"
+import type QuizItem from "./quiz_item"
 import QuizItemAnswer from "./quiz_item_answer"
 import QuizOptionAnswer from "./quiz_option_answer"
 import softDelete from "./soft_delete"
@@ -56,6 +55,9 @@ class QuizAnswer extends mixin(BaseModel, [
   quiz!: Quiz
   correctnessCoefficient!: number
   deleted!: boolean
+
+  /** Longest open-item answer accepted, in characters; bounds the input of a teacher's validity regex. */
+  static MAX_OPEN_ANSWER_LENGTH = 10_000
 
   static SEARCH_RESULT_LIMIT = 100
   static FIRST_PAGE_INDEX = 0
@@ -163,14 +165,57 @@ class QuizAnswer extends mixin(BaseModel, [
     return quizAnswer
   }
 
-  public static async getByUserAndQuiz(userId: number, quizId: string) {
+  /**
+   * Who wrote an answer and to which quiz, without loading the answer. Throws NotFoundError if
+   * there is no such answer.
+   */
+  public static async getOwnerAndQuiz(
+    quizAnswerId: string,
+  ): Promise<{ userId: number; quizId: string }> {
+    const quizAnswer = await this.query()
+      .select("user_id", "quiz_id")
+      .findById(quizAnswerId)
+    if (!quizAnswer) {
+      throw new NotFoundError(`quiz answer not found: ${quizAnswerId}`)
+    }
+    return { userId: quizAnswer.userId, quizId: quizAnswer.quizId }
+  }
+
+  public static async getByUserAndQuiz(
+    userId: number,
+    quizId: string,
+    trx?: Knex.Transaction,
+  ) {
     return (
-      await this.query()
+      await this.query(trx)
         .withGraphFetched("itemAnswers.[optionAnswers]")
         .where("user_id", userId)
         .andWhere("quiz_id", quizId)
         .andWhereNot("status", "deprecated")
     )[0]
+  }
+
+  /**
+   * Whether the user has a current answer to the quiz: one neither deleted nor superseded by a
+   * later attempt. Reviewing and flagging others' answers require one.
+   */
+  public static async hasCurrentAnswer(
+    userId: number,
+    quizId: string,
+  ): Promise<boolean> {
+    const answer = await this.query()
+      .select("id")
+      .where("user_id", userId)
+      .andWhere("quiz_id", quizId)
+      .andWhere("deleted", false)
+      .andWhereNot("status", "deprecated")
+      .first()
+    return answer !== undefined
+  }
+
+  /** Whether other students may still review or flag `quizAnswer`. */
+  public static isOpenForReview(quizAnswer: QuizAnswer): boolean {
+    return !quizAnswer.deleted && quizAnswer.status !== "deprecated"
   }
 
   public static async save(quizAnswer: QuizAnswer, trx: Knex.Transaction) {
@@ -365,8 +410,10 @@ class QuizAnswer extends mixin(BaseModel, [
     if (!["confirmed", "rejected"].includes(status)) {
       throw new BadRequestError("invalid status")
     }
+    const { userId, quizId } = await this.getOwnerAndQuiz(answerId)
     const trx = await knex.transaction()
     try {
+      await UserQuizState.lock(userId, quizId, trx)
       let quizAnswer = (
         await this.query(trx)
           .where("quiz_answer.id", answerId)
@@ -498,14 +545,44 @@ class QuizAnswer extends mixin(BaseModel, [
     return question
   }
 
-  public static async newAnswer(userId: number, quizAnswer: QuizAnswer) {
-    if (quizAnswer.deleted) {
+  /**
+   * Builds an answer from a widget submission body, keeping only the fields a student sets.
+   *
+   * Other fields are dropped rather than rejected: the widget resubmits its stored answer,
+   * server-set fields included.
+   */
+  public static fromSubmission(body: any): QuizAnswer {
+    if (body?.deleted) {
       throw new BadRequestError("A new answer cannot be marked as deleted.")
     }
+    assertUuid(body?.quizId)
+    const itemAnswers = Array.isArray(body?.itemAnswers)
+      ? body.itemAnswers.map((itemAnswer: any) => ({
+          ..._.pick(itemAnswer, [
+            "quizItemId",
+            "textData",
+            "intData",
+            "correct",
+          ]),
+          optionAnswers: Array.isArray(itemAnswer?.optionAnswers)
+            ? itemAnswer.optionAnswers.map((optionAnswer: any) =>
+                _.pick(optionAnswer, ["quizOptionId"]),
+              )
+            : undefined,
+        }))
+      : undefined
+    return this.fromJson({
+      ..._.pick(body, ["quizId", "createdAt"]),
+      itemAnswers,
+    })
+  }
 
+  /** Grades and stores a student's submission; `quizAnswer` must come from `fromSubmission`. */
+  public static async newAnswer(userId: number, quizAnswer: QuizAnswer) {
     const trx = await knex.transaction()
     try {
       const quizId = quizAnswer.quizId
+      await UserQuizState.lock(userId, quizId, trx)
       const isUserInDb = await User.getById(userId, trx)
       if (!isUserInDb) {
         quizAnswer.user = User.fromJson({ id: userId })
@@ -519,6 +596,16 @@ class QuizAnswer extends mixin(BaseModel, [
         UserQuizState.fromJson({ userId, quizId, tries: 0 })
       this.checkIfSubmittable(quiz, userQuizState)
       this.removeIds(quizAnswer)
+      if (
+        !(await this.isAttemptCreationTime(
+          userId,
+          quizId,
+          quizAnswer.createdAt,
+          trx,
+        ))
+      ) {
+        delete (quizAnswer as Partial<QuizAnswer>).createdAt
+      }
       await this.assessAnswerStatus(
         quizAnswer,
         userQuizState,
@@ -526,13 +613,17 @@ class QuizAnswer extends mixin(BaseModel, [
         course,
         trx,
       )
+      await this.checkAnswersBelongToQuiz(quizAnswer, quizId, trx)
+      this.checkOpenAnswers(quizAnswer, quiz)
       this.assessAnswer(quizAnswer, quiz)
       this.gradeAnswer(quizAnswer, userQuizState, quiz)
       this.assessUserQuizStatus(quizAnswer, userQuizState, quiz, false)
       let savedQuizAnswer
       let savedUserQuizState
       await this.markPreviousAsDeprecated(userId, quizId, trx)
-      savedQuizAnswer = await this.query(trx).insertGraphAndFetch(quizAnswer)
+      savedQuizAnswer = await this.query(trx)
+        .allowGraph("[user, itemAnswers.optionAnswers]")
+        .insertGraphAndFetch(quizAnswer)
       savedUserQuizState = await UserQuizState.upsert(userQuizState, trx)
       if (savedQuizAnswer.status === "confirmed") {
         await UserCoursePartState.update(
@@ -553,11 +644,9 @@ class QuizAnswer extends mixin(BaseModel, [
           trx,
         )
       }
-      await trx.commit()
+      Quiz.hideAnswerKeyFrom(quiz, savedUserQuizState)
       quiz.course = course
-      if (quiz.checkPlagiarism) {
-        await this.relayPlagiarismData(savedQuizAnswer, quiz)
-      }
+      await trx.commit()
       return {
         quiz,
         quizAnswer: savedQuizAnswer,
@@ -569,26 +658,32 @@ class QuizAnswer extends mixin(BaseModel, [
     }
   }
 
-  private static async relayPlagiarismData(quizAnswer: QuizAnswer, quiz: Quiz) {
-    const language = await Language.query()
-      .findById(quiz.course.languageId)
-      .throwIfNotFound()
-    for (const quizItem of quiz.items) {
-      if (quizItem.type === "essay") {
-        const itemAnswer = quizAnswer.itemAnswers.find(
-          (itemAnswer) => itemAnswer.quizItemId === quizItem.id,
-        )
-        if (itemAnswer) {
-          relayNewAnswer({
-            quizId: quiz.id,
-            quizAnswerId: quizAnswer.id,
-            quizItemAnswerId: itemAnswer.id,
-            language: language.name.split(" ")[0].toLowerCase(),
-            data: itemAnswer.textData,
-          })
-        }
-      }
+  /**
+   * Whether `createdAt` is the creation time of one of the user's attempts at the quiz.
+   *
+   * A resubmission from the widget carries its stored answer's `createdAt`, which is kept so
+   * that the answer's original submission time survives.
+   */
+  private static async isAttemptCreationTime(
+    userId: number,
+    quizId: string,
+    createdAt: unknown,
+    trx: Knex.Transaction,
+  ): Promise<boolean> {
+    if (typeof createdAt !== "string") {
+      return false
     }
+    const time = new Date(createdAt).getTime()
+    if (Number.isNaN(time)) {
+      return false
+    }
+    const attempts = await this.query(trx)
+      .select("created_at")
+      .where("user_id", userId)
+      .andWhere("quiz_id", quizId)
+    return attempts.some(
+      (attempt) => new Date(attempt.createdAt).getTime() === time,
+    )
   }
 
   public static async update(
@@ -621,6 +716,78 @@ class QuizAnswer extends mixin(BaseModel, [
         quiz.courseId,
         trx,
       )
+    }
+  }
+
+  /**
+   * Throws a BadRequestError unless each item answer is to a distinct item of the quiz and each
+   * of its option answers to a distinct option of that item. Deleted items and options count,
+   * as a resubmitted stored answer may still refer to them.
+   */
+  private static async checkAnswersBelongToQuiz(
+    quizAnswer: QuizAnswer,
+    quizId: string,
+    trx: Knex.Transaction,
+  ) {
+    const items: { id: string }[] = await trx("quiz_item")
+      .select("id")
+      .where("quiz_id", quizId)
+    const options: { id: string; quiz_item_id: string }[] = await trx(
+      "quiz_option",
+    )
+      .select("id", "quiz_item_id")
+      .whereIn(
+        "quiz_item_id",
+        items.map((item) => item.id),
+      )
+    const itemIds = new Set(items.map((item) => item.id))
+    const itemIdByOptionId = new Map(
+      options.map((option) => [option.id, option.quiz_item_id]),
+    )
+
+    const answeredItemIds = new Set<string>()
+    for (const itemAnswer of quizAnswer.itemAnswers ?? []) {
+      if (!itemIds.has(itemAnswer.quizItemId)) {
+        throw new BadRequestError("item answer does not belong to the quiz")
+      }
+      if (answeredItemIds.has(itemAnswer.quizItemId)) {
+        throw new BadRequestError("duplicate item answer")
+      }
+      answeredItemIds.add(itemAnswer.quizItemId)
+
+      const chosenOptionIds = new Set<string>()
+      for (const optionAnswer of itemAnswer.optionAnswers ?? []) {
+        if (
+          itemIdByOptionId.get(optionAnswer.quizOptionId) !==
+          itemAnswer.quizItemId
+        ) {
+          throw new BadRequestError("option answer does not belong to the item")
+        }
+        if (chosenOptionIds.has(optionAnswer.quizOptionId)) {
+          throw new BadRequestError("duplicate option answer")
+        }
+        chosenOptionIds.add(optionAnswer.quizOptionId)
+      }
+    }
+  }
+
+  /** Throws a BadRequestError unless each open-item answer is a string of at most `MAX_OPEN_ANSWER_LENGTH`. */
+  private static checkOpenAnswers(quizAnswer: QuizAnswer, quiz: Quiz) {
+    const openItemIds = new Set(
+      quiz.items.filter((item) => item.type === "open").map((item) => item.id),
+    )
+    for (const itemAnswer of quizAnswer.itemAnswers ?? []) {
+      if (!openItemIds.has(itemAnswer.quizItemId)) {
+        continue
+      }
+      if (typeof itemAnswer.textData !== "string") {
+        throw new BadRequestError("no answer provided")
+      }
+      if (itemAnswer.textData.length > this.MAX_OPEN_ANSWER_LENGTH) {
+        throw new BadRequestError(
+          `answer is longer than ${this.MAX_OPEN_ANSWER_LENGTH} characters`,
+        )
+      }
     }
   }
 
@@ -662,9 +829,7 @@ class QuizAnswer extends mixin(BaseModel, [
           if (!textData) {
             throw new BadRequestError("no answer provided")
           }
-          const validityRegex = quizItem.validityRegex.trim()
-          const validator = new RegExp(validityRegex, "i")
-          quizItemAnswer.correct = validator.test(textData) ? true : false
+          quizItemAnswer.correct = this.validityRegexOf(quizItem).test(textData)
           break
         case "essay":
           if (quizAnswer.status === "confirmed") {
@@ -707,6 +872,14 @@ class QuizAnswer extends mixin(BaseModel, [
           quizItemAnswer.correct = true
           break
       }
+    }
+  }
+
+  private static validityRegexOf(quizItem: QuizItem): RegExp {
+    try {
+      return new RegExp(quizItem.validityRegex.trim(), "i")
+    } catch {
+      throw new BadRequestError("the item's answer check is misconfigured")
     }
   }
 
@@ -779,6 +952,11 @@ class QuizAnswer extends mixin(BaseModel, [
     }
   }
 
+  /**
+   * Raises the user's points to the share of the quiz's current items `quizAnswer` got right,
+   * once the answer is confirmed. Unanswered items count as wrong, as every item type takes an
+   * answer; answers to deleted items count for nothing.
+   */
   private static gradeAnswer(
     quizAnswer: QuizAnswer,
     userQuizState: UserQuizState,
@@ -791,12 +969,19 @@ class QuizAnswer extends mixin(BaseModel, [
       userQuizState.pointsAwarded = quiz.points
       return
     }
-    const quizItemAnswers = quizAnswer.itemAnswers
-    const nCorrect = quizItemAnswers.filter(
-      (itemAnswer) => itemAnswer.correct === true,
-    ).length
-    const total = quizItemAnswers.length
-    const points = (nCorrect / total) * quiz.points
+    const itemIds = new Set(quiz.items.map((item) => item.id))
+    const correctItemIds = new Set(
+      quizAnswer.itemAnswers
+        .filter(
+          (itemAnswer) =>
+            itemAnswer.correct === true && itemIds.has(itemAnswer.quizItemId),
+        )
+        .map((itemAnswer) => itemAnswer.quizItemId),
+    )
+    const points =
+      itemIds.size === 0
+        ? 0
+        : (correctItemIds.size / itemIds.size) * quiz.points
     const pointsAwarded = userQuizState.pointsAwarded ?? 0
     userQuizState.pointsAwarded =
       points > pointsAwarded ? points : pointsAwarded
@@ -934,12 +1119,19 @@ class QuizAnswer extends mixin(BaseModel, [
     }
   }
 
+  /**
+   * Picks up to two other students' answers to offer a reviewer, with only what the review form shows.
+   *
+   * Throws a BadRequestError if the quiz has no peer review, and a ForbiddenError unless the
+   * reviewer has a current answer to it.
+   */
   public static async getAnswersToReview(reviewerId: number, quizId: string) {
-    // validate quiz id
-    try {
-      await Quiz.getById(quizId)
-    } catch (error) {
-      throw error
+    const quiz = await Quiz.getById(quizId)
+    if (quiz.peerReviewCollections.length === 0) {
+      throw new BadRequestError("quiz has no peer review")
+    }
+    if (!(await this.hasCurrentAnswer(reviewerId, quizId))) {
+      throw new ForbiddenError("answer the quiz before reviewing others")
     }
 
     const answerIds = this.query().select("id").where("quiz_id", quizId)
@@ -1003,12 +1195,26 @@ class QuizAnswer extends mixin(BaseModel, [
 
     allCandidates = allCandidates.slice(0, 2)
 
-    return this.query()
+    const answers = await this.query()
       .withGraphJoined("itemAnswers.[optionAnswers]")
       .whereIn(
         "quiz_answer.id",
         allCandidates.map((c) => c.id),
       )
+
+    return answers.map((answer) => ({
+      id: answer.id,
+      quizId: answer.quizId,
+      itemAnswers: answer.itemAnswers.map((itemAnswer) => ({
+        id: itemAnswer.id,
+        quizItemId: itemAnswer.quizItemId,
+        textData: itemAnswer.textData,
+        optionAnswers: itemAnswer.optionAnswers.map((optionAnswer) => ({
+          id: optionAnswer.id,
+          quizOptionId: optionAnswer.quizOptionId,
+        })),
+      })),
+    }))
   }
 
   public static async deleteAnswer(answerId: string): Promise<QuizAnswer> {
@@ -1019,6 +1225,7 @@ class QuizAnswer extends mixin(BaseModel, [
       if (!quizAnswer) {
         throw new NotFoundError(`quiz answer not found: ${answerId}`)
       }
+      await UserQuizState.lock(quizAnswer.userId, quizAnswer.quizId, trx)
       const quiz = await Quiz.query(trx).findById(quizAnswer.quizId)
       if (!quiz) {
         throw new NotFoundError(`quiz not found: ${quizAnswer.quizId}`)
@@ -1111,6 +1318,7 @@ class QuizAnswer extends mixin(BaseModel, [
       .select("quiz_answer.id", "quiz_answer.status")
       .where("quiz_answer.quiz_id", quizId)
       .andWhere("quiz_answer.user_id", "!=", reviewerId)
+      .andWhere("quiz_answer.deleted", false)
       .andWhere("quiz_answer.id", "NOT IN", alreadyReviewed)
       .andWhere("quiz_answer.id", "NOT IN", flagged)
 

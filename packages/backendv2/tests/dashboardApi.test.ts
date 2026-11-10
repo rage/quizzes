@@ -552,6 +552,15 @@ describe("dashboard: save quiz", () => {
             } as UserInfo,
           ]
         }
+        if (auth === "Bearer TEACHER_TOKEN") {
+          return [
+            200,
+            {
+              id: 1234,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
         if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
@@ -662,6 +671,148 @@ describe("dashboard: save quiz", () => {
     )
     expect(savedEssay.direction).toEqual("column")
   })
+
+  test("save a quiz as fetched by the dashboard", async () => {
+    const quizId = "2b8f05ac-2a47-436e-8675-35bfe9a5c0ac"
+    const fetched = await request(app.callback())
+      .get(`/api/v2/dashboard/quizzes/${quizId}`)
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(200)
+
+    await request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send(fetched.body)
+      .expect(200)
+  })
+
+  test("respond with 403 when saving a quiz of another course", async () => {
+    const quiz = structuredClone(input.quizUpdate)
+    quiz.id = "2a0c2270-011e-40b2-8796-625764828034"
+
+    await request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer TEACHER_TOKEN`)
+      .set("Accept", "application/json")
+      .send(quiz)
+      .expect(403)
+
+    const stored = await knex("quiz")
+      .where("id", "2a0c2270-011e-40b2-8796-625764828034")
+      .first()
+    expect(stored.course_id).toEqual("51b66fc3-4da2-48aa-8eab-404370250ca3")
+  })
+
+  test("respond with 400 naming a missing required field", async () => {
+    const quiz: Partial<typeof input.newQuiz> = structuredClone(input.newQuiz)
+    delete quiz.part
+
+    const response = await request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .send(quiz)
+      .expect(400)
+
+    expect(response.body.message).toEqual("quiz.part is required")
+  })
+
+  test("respond with 400 when the quiz graph includes its course", async () => {
+    const quiz = {
+      ...structuredClone(input.quizUpdate),
+      course: { id: input.quizUpdate.courseId, maxSpamFlags: 12345 },
+    }
+
+    await request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .send(quiz)
+      .expect(400)
+
+    const course = await knex("course")
+      .where("id", input.quizUpdate.courseId)
+      .first()
+    expect(course.max_spam_flags).not.toEqual(12345)
+  })
+
+  const otherQuizId = "2a0c2270-011e-40b2-8796-625764828034"
+
+  test("tie a new quiz's peer review questions to it", async () => {
+    const quiz = structuredClone(input.newQuiz)
+    const clientQuizId = "6a6e2c55-1b1f-4f0e-9d0c-4d1f3a3e9c11"
+    Object.assign(quiz.items[0], { quizId: clientQuizId })
+    Object.assign(quiz.peerReviewCollections[0], { quizId: clientQuizId })
+    Object.assign(quiz.peerReviewCollections[0].questions[0], {
+      quizId: clientQuizId,
+    })
+
+    const response = await request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send(quiz)
+      .expect(200)
+
+    const quizId = response.body.id
+    expect(quizId).not.toEqual(clientQuizId)
+    const questions = await knex("peer_review_question")
+      .join(
+        "peer_review_collection",
+        "peer_review_collection.id",
+        "peer_review_question.peer_review_collection_id",
+      )
+      .where("peer_review_collection.quiz_id", quizId)
+      .select("peer_review_question.quiz_id")
+    expect(questions).toEqual([{ quiz_id: quizId }])
+    const items = await knex("quiz_item").where("quiz_id", quizId)
+    expect(items).toHaveLength(2)
+  })
+
+  test("keep the saved quiz's rows from pointing at another quiz", async () => {
+    const created = await request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send(structuredClone(input.newQuiz))
+      .expect(200)
+    const quiz = created.body
+    const collection = quiz.peerReviewCollections[0]
+    quiz.items[0].quizId = otherQuizId
+    collection.quizId = otherQuizId
+    collection.questions[0].quizId = otherQuizId
+    collection.questions.push({
+      quizId: otherQuizId,
+      peerReviewCollectionId: collection.id,
+      default: false,
+      type: "grade",
+      order: 2,
+      title: "another question",
+      body: "answer this too",
+    })
+
+    await request(app.callback())
+      .post("/api/v2/dashboard/quizzes")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send(quiz)
+      .expect(200)
+
+    const questions = await knex("peer_review_question").where(
+      "peer_review_collection_id",
+      collection.id,
+    )
+    expect(questions.map((question) => question.quiz_id)).toEqual([
+      quiz.id,
+      quiz.id,
+    ])
+    const item = await knex("quiz_item").where("id", quiz.items[0].id).first()
+    expect(item.quiz_id).toEqual(quiz.id)
+    const storedCollection = await knex("peer_review_collection")
+      .where("id", collection.id)
+      .first()
+    expect(storedCollection.quiz_id).toEqual(quiz.id)
+    expect(
+      await knex("peer_review_question").where("quiz_id", otherQuizId),
+    ).toEqual([])
+  })
 })
 
 describe("dashboard: get answer by id", () => {
@@ -727,6 +878,14 @@ describe("dashboard: get answer by id", () => {
       })
       .expect(200)
       .end(done)
+  })
+
+  test("respond with 400 without SQL if the answer id is not a UUID", async () => {
+    const response = await request(app.callback())
+      .get("/api/v2/dashboard/answers/not-a-uuid")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(400)
+    expect(response.body.message).not.toMatch(/select|not-a-uuid/i)
   })
 })
 
@@ -924,6 +1083,38 @@ describe("dashboard: get manual review answers", () => {
       .expect(200)
       .end(done)
   })
+
+  test.each(["manual-review", "all"])(
+    "respond with 400 on a non-numeric page size (%s)",
+    async (listing) => {
+      await request(app.callback())
+        .get(
+          `/api/v2/dashboard/answers/2a0c2270-011e-40b2-8796-625764828034/${listing}?page=0&size=abc`,
+        )
+        .set("Authorization", `bearer ADMIN_TOKEN`)
+        .expect(400)
+    },
+  )
+
+  test("clamp a page size below one to one", async () => {
+    const response = await request(app.callback())
+      .get(
+        "/api/v2/dashboard/answers/2a0c2270-011e-40b2-8796-625764828034/manual-review?page=0&size=-5",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(200)
+    expect(response.body.results).toHaveLength(1)
+  })
+
+  test("treat a negative page as the first page", async () => {
+    const response = await request(app.callback())
+      .get(
+        "/api/v2/dashboard/answers/2a0c2270-011e-40b2-8796-625764828034/manual-review?page=-1&size=10",
+      )
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .expect(200)
+    expect(response.body.results).toHaveLength(10)
+  })
 })
 
 describe("get deleted/not deleted answers only", () => {
@@ -1088,6 +1279,14 @@ describe("dashboard: update manual review status", () => {
 describe("Answer: spam flags", () => {
   beforeAll(async () => {
     await safeSeed(configA)
+    await knex("quiz_answer").insert(
+      [3456, 4567].map((userId) => ({
+        quiz_id: "4bf4cf2f-3058-4311-8d16-26d781261af7",
+        user_id: userId,
+        language_id: "xy_YZ",
+        status: "given-enough",
+      })),
+    )
   })
 
   afterAll(async () => {
@@ -1148,7 +1347,7 @@ describe("Answer: spam flags", () => {
       })
   })
 
-  test("spam flag already given", (done) => {
+  test("own answer cannot be flagged", (done) => {
     request(app.callback())
       .post("/api/v2/widget/answers/report-spam")
       .set("Authorization", "bearer PLEB_TOKEN_1")
@@ -1157,10 +1356,9 @@ describe("Answer: spam flags", () => {
         quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
       })
       .expect((response) => {
-        const received: BadRequestError = response.body
-        expect(received.message).toEqual("Can only give one spam flag")
+        expect(response.body.message).toEqual("cannot flag your own answer")
       })
-      .expect(400)
+      .expect(403)
       .end(done)
   })
 
@@ -1245,6 +1443,22 @@ describe("Answer: spam flags", () => {
         expect(response.body.status).toEqual("spam")
       })
       .expect(200)
+      .end(done)
+  })
+
+  test("spam flag already given", (done) => {
+    request(app.callback())
+      .post("/api/v2/widget/answers/report-spam")
+      .set("Authorization", "bearer PLEB_TOKEN_2")
+      .set("Accept", "application/json")
+      .send({
+        quizAnswerId: "0cb3e4de-fc11-4aac-be45-06312aa4677c",
+      })
+      .expect((response) => {
+        const received: BadRequestError = response.body
+        expect(received.message).toEqual("Can only give one spam flag")
+      })
+      .expect(400)
       .end(done)
   })
 })
@@ -1597,6 +1811,47 @@ describe("dashboard: an edit made to a course should", () => {
       })
       .expect(200)
       .end(done)
+  })
+
+  test("keep the translation on the course in the path", async () => {
+    const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44b"
+    const otherCourseId = "51b66fc3-4da2-48aa-8eab-404370250ca3"
+
+    await request(app.callback())
+      .post(`/api/v2/dashboard/courses/${courseId}/edit`)
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send({ courseId: otherCourseId, title: "pinned title" })
+      .expect(200)
+
+    const translations = await knex("course_translation").whereIn("course_id", [
+      courseId,
+      otherCourseId,
+    ])
+    expect(
+      translations.filter((t) => t.course_id === courseId).map((t) => t.title),
+    ).toEqual(["pinned title"])
+    expect(
+      translations.filter((t) => t.course_id === otherCourseId),
+    ).toHaveLength(1)
+  })
+
+  test("only change completion properties the dashboard edits", async () => {
+    const courseId = "46d7ceca-e1ed-508b-91b5-3cc8385fa44b"
+
+    const response = await request(app.callback())
+      .post(`/api/v2/dashboard/courses/${courseId}/completion`)
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .send({
+        maxSpamFlags: 4,
+        minScoreToPass: 99,
+        moocfiId: "00000000-0000-0000-0000-000000000000",
+      })
+      .expect(200)
+
+    expect(response.body.maxSpamFlags).toEqual(4)
+    const course = await knex("course").where("id", courseId).first()
+    expect(course.min_score_to_pass).toBeNull()
+    expect(course.moocfi_id).not.toEqual("00000000-0000-0000-0000-000000000000")
   })
 })
 

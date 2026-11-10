@@ -10,6 +10,7 @@ import {
   getCourseIdByAnswerId,
   checkAccessOrThrow,
   getCourseIdByQuizId,
+  getCourseIdsByAnswerIds,
 } from "../util"
 
 const getStatusChangeOperation = (
@@ -29,6 +30,35 @@ type PaginationQuery = Partial<
     string
   >
 >
+
+const MAX_PAGE_SIZE = 100
+
+const parseInteger = (
+  value: string | undefined,
+  name: string,
+  fallback: number,
+) => {
+  if (value === undefined) {
+    return fallback
+  }
+  const parsed = Number(value)
+  if (
+    typeof value !== "string" ||
+    value.trim() === "" ||
+    !Number.isFinite(parsed)
+  ) {
+    throw new BadRequestError(`Invalid ${name}: ${value}`)
+  }
+  return Math.floor(parsed)
+}
+
+const parsePage = (page?: string) => Math.max(parseInteger(page, "page", 0), 0)
+
+const parsePageSize = (size?: string) =>
+  Math.min(
+    Math.max(parseInteger(size, "size", MAX_PAGE_SIZE), 1),
+    MAX_PAGE_SIZE,
+  )
 
 const parseFilters = (filters?: string) => (filters ? filters.split(",") : [])
 
@@ -73,19 +103,16 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     }
     const modifierId = ctx.state.user.id
 
-    if (!answerIds || !answerIds[0]) {
+    if (!Array.isArray(answerIds) || !answerIds[0]) {
       throw new BadRequestError("No answer ids provided.")
     }
-
-    let courseId
-
-    try {
-      courseId = await getCourseIdByAnswerId(answerIds[0])
-    } catch (error) {
-      throw error
+    if (!answerIds.every((id) => typeof id === "string")) {
+      throw new BadRequestError("Answer ids must be strings.")
     }
 
-    await checkAccessOrThrow(ctx.state.user, courseId, "grade")
+    for (const courseId of await getCourseIdsByAnswerIds(answerIds)) {
+      await checkAccessOrThrow(ctx.state.user, courseId, "grade")
+    }
     const quizAnswers = await QuizAnswer.setManualReviewStatusForMany(
       answerIds,
       status,
@@ -122,8 +149,8 @@ const answersRoutes = new Router<CustomState, CustomContext>({
 
     ctx.body = await QuizAnswer.getPaginatedByQuizId(
       quizId,
-      Number(page),
-      Number(size),
+      parsePage(page),
+      parsePageSize(size),
       parseOrder(order),
       parseFilters(filters),
       deleted === "true",
@@ -143,7 +170,7 @@ const answersRoutes = new Router<CustomState, CustomContext>({
 
     ctx.body = await QuizAnswer.getPaginatedByQuizIdAndSearchQuery(
       quizId,
-      Number(size),
+      parsePageSize(size),
       parseOrder(order),
       parseFilters(filters),
       searchQuery,
@@ -157,8 +184,8 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     const { page, size, order } = ctx.request.query as PaginationQuery
     ctx.body = await QuizAnswer.getPaginatedManualReview(
       quizId,
-      Number(page),
-      Number(size),
+      parsePage(page),
+      parsePageSize(size),
       parseOrder(order),
     )
   })
@@ -171,7 +198,7 @@ const answersRoutes = new Router<CustomState, CustomContext>({
     const { searchQuery } = ctx.request.body as { searchQuery: string }
     ctx.body = await QuizAnswer.getPaginatedManualReviewBySearchQuery(
       quizId,
-      Number(size),
+      parsePageSize(size),
       parseOrder(order),
       searchQuery,
     )

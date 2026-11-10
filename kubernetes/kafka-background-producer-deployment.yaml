@@ -12,9 +12,19 @@ spec:
       labels:
         app: kafka-background-producer
     spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
       containers:
       - name: kafka-background-producer
         image: ${BACKENDV2_IMAGE}
+        securityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: [ALL]
         command: ["npm", "run", "background-producer"]
         imagePullPolicy: Always
         resources:

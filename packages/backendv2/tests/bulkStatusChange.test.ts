@@ -75,6 +75,15 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
             } as UserInfo,
           ]
         }
+        if (auth === "Bearer TEACHER_TOKEN") {
+          return [
+            200,
+            {
+              id: 9876,
+              administrator: false,
+            } as UserInfo,
+          ]
+        }
         if (auth === "Bearer ADMIN_TOKEN") {
           return [
             200,
@@ -135,6 +144,41 @@ describe("dashboard: updating the status of multiple quiz answers should", () =>
         )
       })
       .expect(404, done)
+  })
+
+  test("respond with 403 if any answer is in a course the user cannot grade", async () => {
+    const answerInGradableCourse = await answerIdWithoutUserQuizState(3)
+    const answerInOtherCourse = "0cb3e4de-fc11-4aac-be45-06312aa4677c"
+
+    await request(app.callback())
+      .post("/api/v2/dashboard/answers/status")
+      .set("Authorization", `bearer TEACHER_TOKEN`)
+      .set("Accept", "application/json")
+      .send({
+        answerIds: [answerInGradableCourse, answerInOtherCourse],
+        status: "rejected",
+      })
+      .expect(403)
+
+    const untouched = await QuizAnswer.query().findById(answerInOtherCourse)
+    expect(untouched?.status).toEqual("given-enough")
+  })
+
+  test("throw not found error if any answer id is unknown", async () => {
+    const unknownAnswerId = "af87b380-743a-4200-900e-b4bba8207381"
+    const response = await request(app.callback())
+      .post("/api/v2/dashboard/answers/status")
+      .set("Authorization", `bearer ADMIN_TOKEN`)
+      .set("Accept", "application/json")
+      .send({
+        answerIds: [await answerIdWithoutUserQuizState(4), unknownAnswerId],
+        status: "rejected",
+      })
+      .expect(404)
+
+    expect(response.body.message).toEqual(
+      `No course found for answer id: ${unknownAnswerId}`,
+    )
   })
 
   test("throw bad request error if no status provided for status update", (done) => {
